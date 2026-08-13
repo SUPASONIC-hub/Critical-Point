@@ -3,5 +3,5 @@ services:
     runtime: static
     name: critical-point
     buildCommand: npm ci && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
     autoDeploy: true
