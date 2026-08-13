@@ -78,6 +78,7 @@ function App() {
   const sessionId = useMemo(() => getSessionId(), []);
 
   const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
+  const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
   const [started, setStarted] = useState(saved?.started ?? false);
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
   const [completedCases, setCompletedCases] = useState(saved?.completedCases ?? []);
@@ -129,6 +130,7 @@ function App() {
       STORAGE_KEY,
       JSON.stringify({
         playerName,
+        dataConsent,
         started,
         currentCase,
         completedCases,
@@ -154,6 +156,7 @@ function App() {
     setNodeEnteredAt(Date.now());
     persist({
       playerName: name,
+      dataConsent,
       started: true,
       currentCase: "case01",
       nodeId: "start",
@@ -281,10 +284,10 @@ function App() {
         }
       : caseResults;
 
-    if (completedNow && caseSummary) {
+    if (completedNow && caseSummary && telemetryEnabled && dataConsent) {
       saveCaseTelemetry({
         session_id: sessionId,
-        player_name: playerName || "익명",
+        player_name: null,
         case_id: currentCase,
         case_title: activeCaseMeta?.title ?? currentCase,
         completed_at: new Date().toISOString(),
@@ -325,6 +328,7 @@ function App() {
     localStorage.removeItem("trigger-prototype");
     localStorage.removeItem(STORAGE_KEY);
     setPlayerName("");
+    setDataConsent(false);
     setStarted(false);
     setCurrentCase("case01");
     setCompletedCases([]);
@@ -363,6 +367,7 @@ function App() {
       summary: result,
       log,
       telemetryEnabled,
+      dataConsent,
       sessionId,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -455,6 +460,24 @@ function App() {
                 첫 케이스 시작
               </button>
             </div>
+            <label className="consent-box">
+              <input
+                type="checkbox"
+                checked={dataConsent}
+                onChange={(event) => {
+                  setDataConsent(event.target.checked);
+                  persist({ dataConsent: event.target.checked });
+                }}
+              />
+              <span>
+                <b>플레이테스트 데이터 제공 동의</b>
+                <small>
+                  {telemetryEnabled
+                    ? "케이스 결과, 선택 로그, 응답 시간, 자유입력 내용이 연구용으로 저장됩니다. 이름은 원격 DB에 저장하지 않습니다."
+                    : "현재 배포 환경에는 DB가 연결되어 있지 않아 원격 저장은 비활성화됩니다."}
+                </small>
+              </span>
+            </label>
             <button className="test-unlock" onClick={unlockAllCasesForTest}>
               테스트용 전체 케이스 열기
             </button>

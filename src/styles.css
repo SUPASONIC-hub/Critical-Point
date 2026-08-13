@@ -316,6 +316,41 @@ button {
   color: #18201f;
 }
 
+.consent-box {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 12px;
+  background: #f8faf7;
+  border: 1px solid #d8ded7;
+  border-radius: 6px;
+}
+
+.consent-box input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  accent-color: #2c4a46;
+}
+
+.consent-box span {
+  display: grid;
+  gap: 4px;
+}
+
+.consent-box b {
+  font-size: 13px;
+}
+
+.consent-box small {
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .test-unlock {
   width: 100%;
   min-height: 38px;
