@@ -39,6 +39,12 @@ npm run build
 
 플레이테스트 절차는 `playtest-guide.md`를 따른다.
 
+운영 문서:
+
+- [participant-invite.md](./participant-invite.md): 참가자에게 보낼 안내문
+- [operator-checklist.md](./operator-checklist.md): 테스트 전/중/후 체크리스트
+- [playtest-guide.md](./playtest-guide.md): 관찰 항목과 인터뷰 질문
+
 ## Render 배포
 
 현재 앱은 Vite 정적 사이트이므로 Render에서는 `Static Site`로 배포한다.
