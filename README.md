@@ -88,6 +88,7 @@ create table public.playtest_sessions (
   triggers jsonb not null,
   cognition jsonb not null,
   decision_log jsonb not null,
+  feedback jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -98,6 +99,37 @@ on public.playtest_sessions
 for insert
 to anon
 with check (true);
+```
+
+결과 화면의 별도 피드백 저장용 테이블:
+
+```sql
+create table public.playtest_feedback (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  case_id text not null,
+  case_title text,
+  submitted_at timestamptz not null,
+  clarity_score integer check (clarity_score between 1 and 5),
+  difficulty_score integer check (difficulty_score between 1 and 5),
+  comment text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.playtest_feedback enable row level security;
+
+create policy "allow anonymous playtest feedback inserts"
+on public.playtest_feedback
+for insert
+to anon
+with check (true);
+```
+
+이미 `playtest_sessions` 테이블을 만들어둔 뒤라면 아래 SQL만 추가로 실행한다.
+
+```sql
+alter table public.playtest_sessions
+add column if not exists feedback jsonb;
 ```
 
 Render 환경변수:
@@ -115,6 +147,7 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 - API: Render Web Service 또는 Supabase Edge Function
 - DB: Supabase Postgres 또는 Render Postgres
 - 저장 데이터: 세션 ID, 케이스 ID, 선택 로그, 자원 변화, 자유입력 여부, 응답 시간, 결과 트리거
+- 추가 피드백: 결과 화면 이해도, 고민 강도, 자유 의견
 
 초기에는 Supabase 테이블 하나로 충분하다. 현재 원격 저장 payload는 이름을 저장하지 않고 `player_name`을 `null`로 보낸다. 자유입력 내용에는 개인정보가 들어갈 수 있으므로 공개 테스트 전에는 안내 문구와 삭제 요청 방법을 추가한다.
 

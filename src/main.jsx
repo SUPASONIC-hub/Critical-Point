@@ -32,7 +32,12 @@ import {
   triggerLabels,
 } from "./gameData.js";
 import { applyEffect, clamp, getEcho, makeEmptyScores, scoreFreeText } from "./gameLogic.js";
-import { getSessionId, saveCaseTelemetry, telemetryEnabled } from "./telemetry.js";
+import {
+  getSessionId,
+  saveCaseTelemetry,
+  saveFeedbackTelemetry,
+  telemetryEnabled,
+} from "./telemetry.js";
 
 const resourceMeta = {
   time: { label: "TIME", suffix: "h", icon: Clock3 },
@@ -83,6 +88,7 @@ function App() {
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
   const [completedCases, setCompletedCases] = useState(saved?.completedCases ?? []);
   const [caseResults, setCaseResults] = useState(saved?.caseResults ?? {});
+  const [playtestFeedback, setPlaytestFeedback] = useState(saved?.playtestFeedback ?? {});
   const [nodeId, setNodeId] = useState(saved?.nodeId ?? "start");
   const [resources, setResources] = useState(saved?.resources ?? initialResources);
   const [log, setLog] = useState(saved?.log ?? []);
@@ -124,6 +130,13 @@ function App() {
   };
   const fixedChoices = node?.choices?.filter((choice) => choice.type !== "free") ?? [];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
+  const currentFeedback = playtestFeedback[currentCase] ?? {
+    clarity: "",
+    difficulty: "",
+    comment: "",
+    savedAt: "",
+  };
+  const [feedbackStatus, setFeedbackStatus] = useState("");
 
   function persist(nextState) {
     localStorage.setItem(
@@ -135,6 +148,7 @@ function App() {
         currentCase,
         completedCases,
         caseResults,
+        playtestFeedback,
         nodeId,
         resources,
         log,
@@ -296,6 +310,7 @@ function App() {
         triggers: nextTriggers,
         cognition: nextCognition,
         decision_log: nextLog,
+        feedback: playtestFeedback[currentCase] ?? null,
       }).catch((error) => {
         console.warn(error);
       });
@@ -333,6 +348,7 @@ function App() {
     setCurrentCase("case01");
     setCompletedCases([]);
     setCaseResults({});
+    setPlaytestFeedback({});
     setNodeId("start");
     setResources(initialResources);
     setLog([]);
@@ -361,6 +377,7 @@ function App() {
       currentCase,
       completedCases,
       caseResults,
+      playtestFeedback,
       resources,
       triggers,
       cognition,
@@ -396,6 +413,54 @@ function App() {
     return { primary, secondary, thinking, freeCount, averageResponseTime, longestDecision };
   }, [triggers, cognition, log]);
 
+  function updateCurrentFeedback(patch) {
+    const nextFeedback = {
+      ...playtestFeedback,
+      [currentCase]: {
+        ...currentFeedback,
+        ...patch,
+      },
+    };
+    setPlaytestFeedback(nextFeedback);
+    setFeedbackStatus("");
+    persist({ playtestFeedback: nextFeedback });
+  }
+
+  async function submitCurrentFeedback() {
+    const savedAt = new Date().toISOString();
+    const feedback = {
+      ...currentFeedback,
+      savedAt,
+    };
+    const nextFeedback = {
+      ...playtestFeedback,
+      [currentCase]: feedback,
+    };
+    setPlaytestFeedback(nextFeedback);
+    persist({ playtestFeedback: nextFeedback });
+
+    if (!telemetryEnabled || !dataConsent) {
+      setFeedbackStatus("로컬에 저장했습니다. DB 연결 또는 동의가 없으면 원격 저장은 건너뜁니다.");
+      return;
+    }
+
+    try {
+      await saveFeedbackTelemetry({
+        session_id: sessionId,
+        case_id: currentCase,
+        case_title: activeCaseMeta?.title ?? currentCase,
+        submitted_at: savedAt,
+        clarity_score: Number(feedback.clarity) || null,
+        difficulty_score: Number(feedback.difficulty) || null,
+        comment: feedback.comment.trim() || null,
+      });
+      setFeedbackStatus("피드백을 저장했습니다.");
+    } catch (error) {
+      console.warn(error);
+      setFeedbackStatus("로컬에는 저장했습니다. 원격 저장은 실패했습니다.");
+    }
+  }
+
   const progress = isResult
     ? 100
     : Math.round(
@@ -417,6 +482,10 @@ function App() {
           </div>
           <h1>{GAME_TITLE}</h1>
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
+          <div className="creator-badge">
+            <img src="/profile.jpg" alt="" />
+            <span>Created by SUPASONIC</span>
+          </div>
           <p>
             트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
             사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
@@ -691,6 +760,54 @@ function App() {
               </p>
             </section>
           </div>
+          <section className="feedback-panel">
+            <div className="panel-title-row">
+              <h2>
+                <MessageSquareText size={17} />
+                플레이테스트 피드백
+              </h2>
+              <span>이 케이스가 실제로 고민을 만들었는지 확인합니다.</span>
+            </div>
+            <div className="feedback-controls">
+              <label>
+                <span>이해도</span>
+                <select
+                  value={currentFeedback.clarity}
+                  onChange={(event) => updateCurrentFeedback({ clarity: event.target.value })}
+                >
+                  <option value="">선택</option>
+                  <option value="1">1 · 거의 이해되지 않음</option>
+                  <option value="2">2 · 일부만 이해됨</option>
+                  <option value="3">3 · 보통</option>
+                  <option value="4">4 · 대체로 명확함</option>
+                  <option value="5">5 · 매우 명확함</option>
+                </select>
+              </label>
+              <label>
+                <span>고민 강도</span>
+                <select
+                  value={currentFeedback.difficulty}
+                  onChange={(event) => updateCurrentFeedback({ difficulty: event.target.value })}
+                >
+                  <option value="">선택</option>
+                  <option value="1">1 · 바로 결정함</option>
+                  <option value="2">2 · 조금 고민함</option>
+                  <option value="3">3 · 보통</option>
+                  <option value="4">4 · 꽤 오래 고민함</option>
+                  <option value="5">5 · 매우 결정하기 어려움</option>
+                </select>
+              </label>
+            </div>
+            <textarea
+              value={currentFeedback.comment}
+              onChange={(event) => updateCurrentFeedback({ comment: event.target.value })}
+              placeholder="막힌 장면, 이해되지 않은 용어, 다시 보고 싶은 선택지를 짧게 남겨주세요."
+            />
+            <div className="feedback-actions">
+              <button onClick={submitCurrentFeedback}>피드백 저장</button>
+              {feedbackStatus && <span>{feedbackStatus}</span>}
+            </div>
+          </section>
           <section className="bars-panel">
             <h2>Trigger Map</h2>
             {Object.entries(triggerLabels).map(([key, label]) => (

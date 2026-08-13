@@ -20,6 +20,7 @@ body {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -100,6 +101,26 @@ button {
   color: #d9ff62;
   font-size: 22px;
   line-height: 1.35;
+}
+
+.creator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 7px 10px 7px 7px;
+  color: #18201f;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.creator-badge img {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .intro p {
@@ -934,9 +955,66 @@ textarea {
 
 .bars-panel,
 .history,
+.feedback-panel,
 .resource-delta-panel {
   margin-top: 16px;
   padding: 18px;
+}
+
+.feedback-panel {
+  background: #ffffff;
+  border: 1px solid #d8ded7;
+  border-radius: 8px;
+}
+
+.feedback-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.feedback-controls label {
+  display: grid;
+  gap: 7px;
+}
+
+.feedback-controls span {
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.feedback-controls select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  color: #18201f;
+  background: #f8faf7;
+  border: 1px solid #cbd3cc;
+  border-radius: 6px;
+}
+
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.feedback-actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #18201f;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
+.feedback-actions span {
+  color: #52605b;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .bar-row {
@@ -1126,6 +1204,7 @@ textarea {
   .memo-panel ul,
   .result-grid,
   .case-roadmap,
+  .feedback-controls,
   .guide-grid,
   .season-summary-list {
     grid-template-columns: 1fr;

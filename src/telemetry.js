@@ -35,3 +35,24 @@ export async function saveCaseTelemetry(payload) {
 
   return { saved: true };
 }
+
+export async function saveFeedbackTelemetry(payload) {
+  if (!telemetryEnabled) return { skipped: true };
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_feedback`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Feedback save failed: ${response.status}`);
+  }
+
+  return { saved: true };
+}
