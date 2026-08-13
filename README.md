@@ -65,14 +65,58 @@ npm run build
 
 지금 버전은 브라우저 `localStorage`와 JSON 로그 내보내기로 테스트한다. 여러 사람의 데이터를 자동으로 모으려면 다음 단계에서 서버 저장을 붙여야 한다.
 
-권장 1차 구조:
+현재 코드는 Supabase 환경변수가 있으면 케이스 완료 시 플레이 로그를 자동 저장한다. 환경변수가 없으면 저장 요청을 건너뛰고 기존 로컬 플레이만 동작한다.
+
+무료 DB 추천:
+
+- Supabase Free Plan
+- 테이블 1개로 시작
+- Render Static Site 환경변수에 Supabase URL과 anon key만 등록
+
+Supabase 테이블 SQL:
+
+```sql
+create table public.playtest_sessions (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  player_name text,
+  case_id text not null,
+  case_title text,
+  completed_at timestamptz not null,
+  summary jsonb not null,
+  resources jsonb not null,
+  triggers jsonb not null,
+  cognition jsonb not null,
+  decision_log jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.playtest_sessions enable row level security;
+
+create policy "allow anonymous playtest inserts"
+on public.playtest_sessions
+for insert
+to anon
+with check (true);
+```
+
+Render 환경변수:
+
+```text
+VITE_SUPABASE_URL=https://프로젝트ID.supabase.co
+VITE_SUPABASE_ANON_KEY=Supabase anon public key
+```
+
+Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 재배포한다.
+
+권장 확장 구조:
 
 - 프론트엔드: 현재 Vite 앱 유지
 - API: Render Web Service 또는 Supabase Edge Function
 - DB: Supabase Postgres 또는 Render Postgres
 - 저장 데이터: 세션 ID, 케이스 ID, 선택 로그, 자원 변화, 자유입력 여부, 응답 시간, 결과 트리거
 
-무료/저비용으로 빠르게 검증하려면 Supabase 테이블 하나를 만들고, 게임 종료 시 결과 JSON을 저장하는 방식이 가장 단순하다.
+초기에는 Supabase 테이블 하나로 충분하다. 플레이어 개인정보는 이름 입력값 외에는 저장하지 말고, 공개 테스트 전에는 안내 문구와 삭제 요청 방법을 추가한다.
 
 ## 이미지 출처
 

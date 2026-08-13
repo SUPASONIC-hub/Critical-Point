@@ -1,0 +1,37 @@
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+export function getSessionId() {
+  const key = "critical-point-session-id";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+
+  const next =
+    crypto?.randomUUID?.() ??
+    `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  localStorage.setItem(key, next);
+  return next;
+}
+
+export async function saveCaseTelemetry(payload) {
+  if (!telemetryEnabled) return { skipped: true };
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_sessions`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Telemetry save failed: ${response.status}`);
+  }
+
+  return { saved: true };
+}

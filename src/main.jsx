@@ -32,6 +32,7 @@ import {
   triggerLabels,
 } from "./gameData.js";
 import { applyEffect, clamp, getEcho, makeEmptyScores, scoreFreeText } from "./gameLogic.js";
+import { getSessionId, saveCaseTelemetry, telemetryEnabled } from "./telemetry.js";
 
 const resourceMeta = {
   time: { label: "TIME", suffix: "h", icon: Clock3 },
@@ -74,6 +75,7 @@ function App() {
       return null;
     }
   }, []);
+  const sessionId = useMemo(() => getSessionId(), []);
 
   const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
   const [started, setStarted] = useState(saved?.started ?? false);
@@ -269,12 +271,32 @@ function App() {
         ? Array.from(new Set([...completedCases, currentCase]))
         : completedCases;
     const completedNow = nextCompletedCases !== completedCases;
+    const caseSummary = completedNow
+      ? buildCaseSummary(nextTriggers, nextCognition, nextLog)
+      : null;
     const nextCaseResults = completedNow
       ? {
           ...caseResults,
-          [currentCase]: buildCaseSummary(nextTriggers, nextCognition, nextLog),
+          [currentCase]: caseSummary,
         }
       : caseResults;
+
+    if (completedNow && caseSummary) {
+      saveCaseTelemetry({
+        session_id: sessionId,
+        player_name: playerName || "익명",
+        case_id: currentCase,
+        case_title: activeCaseMeta?.title ?? currentCase,
+        completed_at: new Date().toISOString(),
+        summary: caseSummary,
+        resources: nextResources,
+        triggers: nextTriggers,
+        cognition: nextCognition,
+        decision_log: nextLog,
+      }).catch((error) => {
+        console.warn(error);
+      });
+    }
 
     setResources(nextResources);
     setTriggers(nextTriggers);
@@ -340,6 +362,8 @@ function App() {
       cognition,
       summary: result,
       log,
+      telemetryEnabled,
+      sessionId,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
