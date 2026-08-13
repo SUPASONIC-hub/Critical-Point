@@ -12,6 +12,7 @@ import {
   Info,
   LockKeyhole,
   MessageSquareText,
+  Copy,
   RefreshCcw,
   Send,
   Shield,
@@ -34,6 +35,7 @@ import {
 import { applyEffect, clamp, getEcho, makeEmptyScores, scoreFreeText } from "./gameLogic.js";
 import {
   getSessionId,
+  getSessionCode,
   saveCaseTelemetry,
   saveFeedbackTelemetry,
   telemetryEnabled,
@@ -81,6 +83,7 @@ function App() {
     }
   }, []);
   const sessionId = useMemo(() => getSessionId(), []);
+  const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
 
   const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
   const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
@@ -97,6 +100,7 @@ function App() {
   const [freeText, setFreeText] = useState("");
   const [echo, setEcho] = useState(saved?.echo ?? "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
+  const [copyStatus, setCopyStatus] = useState("");
 
   const node = nodes[nodeId];
   const isResult =
@@ -301,6 +305,7 @@ function App() {
     if (completedNow && caseSummary && telemetryEnabled && dataConsent) {
       saveCaseTelemetry({
         session_id: sessionId,
+        session_code: sessionCode,
         player_name: null,
         case_id: currentCase,
         case_title: activeCaseMeta?.title ?? currentCase,
@@ -386,6 +391,7 @@ function App() {
       telemetryEnabled,
       dataConsent,
       sessionId,
+      sessionCode,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -394,6 +400,16 @@ function App() {
     anchor.download = `trigger-playtest-${Date.now()}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function copySessionCode() {
+    try {
+      await navigator.clipboard.writeText(sessionCode);
+      setCopyStatus("복사됨");
+    } catch {
+      setCopyStatus("복사 실패");
+    }
+    window.setTimeout(() => setCopyStatus(""), 1600);
   }
 
   const result = useMemo(() => {
@@ -447,6 +463,7 @@ function App() {
     try {
       await saveFeedbackTelemetry({
         session_id: sessionId,
+        session_code: sessionCode,
         case_id: currentCase,
         case_title: activeCaseMeta?.title ?? currentCase,
         submitted_at: savedAt,
@@ -642,6 +659,17 @@ function App() {
                 : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}
             </h1>
           </div>
+          <section className="session-panel">
+            <div>
+              <span>PLAYTEST SESSION</span>
+              <strong>{sessionCode}</strong>
+              <p>테스터 인터뷰, JSON 로그, Supabase row를 맞출 때 쓰는 짧은 세션 코드입니다.</p>
+            </div>
+            <button onClick={copySessionCode}>
+              <Copy size={16} />
+              {copyStatus || "코드 복사"}
+            </button>
+          </section>
           {currentCase === "case01" && (
             <section className="next-case-panel">
               <div>

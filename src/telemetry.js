@@ -15,6 +15,10 @@ export function getSessionId() {
   return next;
 }
 
+export function getSessionCode(sessionId) {
+  return sessionId.replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCase();
+}
+
 export async function saveCaseTelemetry(payload) {
   if (!telemetryEnabled) return { skipped: true };
 

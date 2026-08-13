@@ -73,12 +73,15 @@ npm run build
 - 테이블 1개로 시작
 - Render Static Site 환경변수에 Supabase URL과 anon key만 등록
 
-Supabase 테이블 SQL:
+Supabase 테이블 SQL은 [supabase/schema.sql](./supabase/schema.sql)에 따로 정리해뒀다. Supabase SQL Editor에 파일 내용을 붙여 넣고 실행하면 된다.
+
+핵심 테이블:
 
 ```sql
 create table public.playtest_sessions (
   id uuid primary key default gen_random_uuid(),
   session_id text not null,
+  session_code text not null,
   player_name text,
   case_id text not null,
   case_title text,
@@ -107,6 +110,7 @@ with check (true);
 create table public.playtest_feedback (
   id uuid primary key default gen_random_uuid(),
   session_id text not null,
+  session_code text not null,
   case_id text not null,
   case_title text,
   submitted_at timestamptz not null,
@@ -129,7 +133,13 @@ with check (true);
 
 ```sql
 alter table public.playtest_sessions
+add column if not exists session_code text;
+
+alter table public.playtest_sessions
 add column if not exists feedback jsonb;
+
+alter table public.playtest_feedback
+add column if not exists session_code text;
 ```
 
 Render 환경변수:
@@ -147,6 +157,7 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 - API: Render Web Service 또는 Supabase Edge Function
 - DB: Supabase Postgres 또는 Render Postgres
 - 저장 데이터: 세션 ID, 케이스 ID, 선택 로그, 자원 변화, 자유입력 여부, 응답 시간, 결과 트리거
+- 운영 식별값: 결과 화면에 표시되는 8자리 세션 코드
 - 추가 피드백: 결과 화면 이해도, 고민 강도, 자유 의견
 
 초기에는 Supabase 테이블 하나로 충분하다. 현재 원격 저장 payload는 이름을 저장하지 않고 `player_name`을 `null`로 보낸다. 자유입력 내용에는 개인정보가 들어갈 수 있으므로 공개 테스트 전에는 안내 문구와 삭제 요청 방법을 추가한다.

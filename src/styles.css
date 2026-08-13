@@ -939,6 +939,53 @@ textarea {
   font-weight: 900;
 }
 
+.session-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #d8ded7;
+  border-radius: 8px;
+}
+
+.session-panel span {
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.session-panel strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+.session-panel p {
+  margin: 0;
+  color: #52605b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.session-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 12px;
+  color: #18201f;
+  background: #eef1ed;
+  border: 1px solid #d8ded7;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
 .wide-report {
   grid-column: span 2;
 }
@@ -1173,6 +1220,11 @@ textarea {
   }
 
   .next-case-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .session-panel {
     align-items: stretch;
     flex-direction: column;
   }
