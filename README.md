@@ -151,6 +151,12 @@ VITE_SUPABASE_ANON_KEY=Supabase anon public key
 
 Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 재배포한다.
 
+분석 쿼리:
+
+- [supabase/analysis.sql](./supabase/analysis.sql)을 Supabase SQL Editor에서 실행한다.
+- 케이스별 완료 수, 평균 응답 시간, 자유입력 수, 트리거 분포, 오래 고민한 장면, 피드백 점수를 확인할 수 있다.
+- 삭제 요청이 들어오면 파일 하단의 `delete` 쿼리에 8자리 세션 코드를 넣어 실행한다.
+
 배포 후 확인:
 
 - 시작 화면의 데이터 동의 박스에 `DB 연결됨`이 보이면 환경변수가 적용된 상태다.
