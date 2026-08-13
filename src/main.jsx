@@ -606,6 +606,14 @@ function App() {
                 </small>
               </span>
             </label>
+            <div className="privacy-note">
+              <b>데이터 안내</b>
+              <p>
+                이름은 원격 DB에 저장하지 않습니다. 자유입력과 피드백에는 실명, 연락처,
+                회사명처럼 개인이나 조직을 식별할 수 있는 정보는 쓰지 마세요. 삭제 요청은
+                결과 화면의 8자리 세션 코드로 처리합니다.
+              </p>
+            </div>
             <button className="test-unlock" onClick={unlockAllCasesForTest}>
               테스트용 전체 케이스 열기
             </button>
@@ -876,6 +884,9 @@ function App() {
               onChange={(event) => updateCurrentFeedback({ comment: event.target.value })}
               placeholder="막힌 장면, 이해되지 않은 용어, 다시 보고 싶은 선택지를 짧게 남겨주세요."
             />
+            <p className="input-note">
+              실명, 연락처, 회사명, 실제 사건 관계자 이름은 적지 마세요.
+            </p>
             <div className="feedback-actions">
               <button onClick={submitCurrentFeedback}>피드백 저장</button>
               {feedbackStatus && <span>{feedbackStatus}</span>}
@@ -1081,6 +1092,9 @@ function App() {
                 onChange={(event) => setFreeText(event.target.value)}
                 placeholder="예: 누구를 새로 협상장에 부를지, 어떤 조건을 교환할지, 어떤 정보를 먼저 확인할지 적는다."
               />
+              <p className="input-note">
+                자유입력은 로그에 남을 수 있습니다. 실제 개인정보나 식별 가능한 회사명은 쓰지 마세요.
+              </p>
               <button
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}

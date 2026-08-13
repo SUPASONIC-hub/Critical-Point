@@ -390,6 +390,30 @@ button {
   background: #fff0bf;
 }
 
+.privacy-note {
+  margin-top: 10px;
+  padding: 12px;
+  color: #24302e;
+  background: #fff8e6;
+  border: 1px solid #ebd99f;
+  border-radius: 6px;
+}
+
+.privacy-note b {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.privacy-note p,
+.input-note {
+  margin: 0;
+  color: #6a5420;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
 .test-unlock {
   width: 100%;
   min-height: 38px;
@@ -789,6 +813,10 @@ textarea {
   border: 1px solid #a9b0aa;
   border-radius: 6px;
   line-height: 1.6;
+}
+
+.input-note {
+  margin-top: 7px;
 }
 
 .status-board {
