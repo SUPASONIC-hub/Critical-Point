@@ -151,6 +151,13 @@ VITE_SUPABASE_ANON_KEY=Supabase anon public key
 
 Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 재배포한다.
 
+배포 후 확인:
+
+- 시작 화면의 데이터 동의 박스에 `DB 연결됨`이 보이면 환경변수가 적용된 상태다.
+- `DB 미연결`이면 Render 환경변수 이름 또는 재배포 여부를 확인한다.
+- 케이스 완료 결과 화면의 `PLAYTEST SESSION` 패널에서 원격 저장 성공/실패 상태를 확인한다.
+- 원격 저장 실패 시 `로그 내보내기` JSON을 백업으로 받는다.
+
 권장 확장 구조:
 
 - 프론트엔드: 현재 Vite 앱 유지

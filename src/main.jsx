@@ -101,6 +101,12 @@ function App() {
   const [echo, setEcho] = useState(saved?.echo ?? "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
+  const [telemetryStatus, setTelemetryStatus] = useState({
+    tone: telemetryEnabled ? "ready" : "local",
+    text: telemetryEnabled
+      ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+      : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+  });
 
   const node = nodes[nodeId];
   const isResult =
@@ -302,23 +308,50 @@ function App() {
         }
       : caseResults;
 
-    if (completedNow && caseSummary && telemetryEnabled && dataConsent) {
-      saveCaseTelemetry({
-        session_id: sessionId,
-        session_code: sessionCode,
-        player_name: null,
-        case_id: currentCase,
-        case_title: activeCaseMeta?.title ?? currentCase,
-        completed_at: new Date().toISOString(),
-        summary: caseSummary,
-        resources: nextResources,
-        triggers: nextTriggers,
-        cognition: nextCognition,
-        decision_log: nextLog,
-        feedback: playtestFeedback[currentCase] ?? null,
-      }).catch((error) => {
-        console.warn(error);
-      });
+    if (completedNow && caseSummary) {
+      if (!telemetryEnabled) {
+        setTelemetryStatus({
+          tone: "local",
+          text: "DB 미연결. 이 케이스 로그는 로컬과 JSON 내보내기에만 남습니다.",
+        });
+      } else if (!dataConsent) {
+        setTelemetryStatus({
+          tone: "local",
+          text: "데이터 제공 동의가 없어 원격 저장을 건너뛰었습니다.",
+        });
+      } else {
+        setTelemetryStatus({
+          tone: "pending",
+          text: "케이스 로그를 원격 DB에 저장하는 중입니다.",
+        });
+        saveCaseTelemetry({
+          session_id: sessionId,
+          session_code: sessionCode,
+          player_name: null,
+          case_id: currentCase,
+          case_title: activeCaseMeta?.title ?? currentCase,
+          completed_at: new Date().toISOString(),
+          summary: caseSummary,
+          resources: nextResources,
+          triggers: nextTriggers,
+          cognition: nextCognition,
+          decision_log: nextLog,
+          feedback: playtestFeedback[currentCase] ?? null,
+        })
+          .then(() => {
+            setTelemetryStatus({
+              tone: "success",
+              text: "케이스 로그가 원격 DB에 저장됐습니다.",
+            });
+          })
+          .catch((error) => {
+            console.warn(error);
+            setTelemetryStatus({
+              tone: "error",
+              text: "원격 저장에 실패했습니다. JSON 로그 내보내기를 백업으로 사용하세요.",
+            });
+          });
+      }
     }
 
     setResources(nextResources);
@@ -362,6 +395,12 @@ function App() {
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     setNodeEnteredAt(Date.now());
+    setTelemetryStatus({
+      tone: telemetryEnabled ? "ready" : "local",
+      text: telemetryEnabled
+        ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+        : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+    });
   }
 
   function showSeasonMap() {
@@ -562,6 +601,9 @@ function App() {
                     ? "케이스 결과, 선택 로그, 응답 시간, 자유입력 내용이 연구용으로 저장됩니다. 이름은 원격 DB에 저장하지 않습니다."
                     : "현재 배포 환경에는 DB가 연결되어 있지 않아 원격 저장은 비활성화됩니다."}
                 </small>
+                <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
+                  {telemetryEnabled ? "DB 연결됨" : "DB 미연결"}
+                </small>
               </span>
             </label>
             <button className="test-unlock" onClick={unlockAllCasesForTest}>
@@ -664,6 +706,9 @@ function App() {
               <span>PLAYTEST SESSION</span>
               <strong>{sessionCode}</strong>
               <p>테스터 인터뷰, JSON 로그, Supabase row를 맞출 때 쓰는 짧은 세션 코드입니다.</p>
+              <small className={`remote-status ${telemetryStatus.tone}`}>
+                {telemetryStatus.text}
+              </small>
             </div>
             <button onClick={copySessionCode}>
               <Copy size={16} />

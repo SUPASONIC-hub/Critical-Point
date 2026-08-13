@@ -372,6 +372,24 @@ button {
   line-height: 1.45;
 }
 
+.data-status {
+  width: fit-content;
+  margin-top: 2px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.data-status.ready {
+  color: #1d4e3f;
+  background: #dff4ea;
+}
+
+.data-status.local {
+  color: #6a5420;
+  background: #fff0bf;
+}
+
 .test-unlock {
   width: 100%;
   min-height: 38px;
@@ -969,6 +987,33 @@ textarea {
   color: #52605b;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.remote-status {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.remote-status.ready,
+.remote-status.success {
+  color: #1d4e3f;
+  background: #dff4ea;
+}
+
+.remote-status.local,
+.remote-status.pending {
+  color: #6a5420;
+  background: #fff0bf;
+}
+
+.remote-status.error {
+  color: #7a2f22;
+  background: #f5ded8;
 }
 
 .session-panel button {
