@@ -1029,7 +1029,7 @@ summary:focus-visible {
 
 .game-hud {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -1077,6 +1077,24 @@ summary:focus-visible {
 .risk-card.critical {
   border-color: #e0a093;
   background: #f5ded8;
+}
+
+.timer-card {
+  border-color: #b9c6c1;
+}
+
+.timer-card strong {
+  color: #2c4a46;
+}
+
+.timer-card.urgent {
+  border-color: #e0a093;
+  background: #f5ded8;
+}
+
+.timer-card.urgent strong,
+.timer-card.urgent p {
+  color: #7a2f22;
 }
 
 .scene-challenge {

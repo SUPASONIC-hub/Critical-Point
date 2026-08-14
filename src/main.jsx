@@ -357,6 +357,7 @@ function App() {
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
   const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
+  const [decisionSeconds, setDecisionSeconds] = useState(45);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -440,7 +441,9 @@ function App() {
     rank: gameplayRank,
   } = gameplayStats;
   const activeBonus =
-    freeTextCombo >= 2
+    log.at(-1)?.tempoBonus
+      ? "QUICK READ"
+      : freeTextCombo >= 2
       ? "판 바꾸기 보너스"
       : currentChallengeStreak >= 2
         ? "연속 챌린지 보너스"
@@ -615,6 +618,7 @@ function App() {
     { label: "압력", value: `${riskTier} ${riskPressure}` },
     { label: "모멘텀", value: `${momentumTier} ${momentumScore}` },
     { label: "보너스", value: activeBonus },
+    { label: "남은 시간", value: `${decisionSeconds}초` },
   ];
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
@@ -648,6 +652,15 @@ function App() {
         text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
       };
   const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
+
+  useEffect(() => {
+    if (!started || isResult) return undefined;
+    setDecisionSeconds(45);
+    const timer = window.setInterval(() => {
+      setDecisionSeconds((value) => Math.max(0, value - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [started, currentCase, resolvedNodeId, isResult]);
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -884,6 +897,16 @@ function App() {
       finalResources: nextResources,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
+    const quickRead = responseTimeSec <= 12 && challengeMatch;
+    const tempoBonus = quickRead
+      ? {
+          label: "QUICK READ",
+          text: "장면의 핵심 압박을 빠르게 읽고, 망설임 없이 챌린지를 맞혔습니다.",
+          effect: { trust: 1, fatigue: -1 },
+        }
+      : null;
+    const finalEffect = tempoBonus ? mergeEffects(effect, tempoBonus.effect) : effect;
+    const finalResourcesWithTempo = applyEffect(resources, finalEffect);
     const nextTriggers = { ...triggers };
     const nextCognition = { ...cognition };
 
@@ -900,10 +923,10 @@ function App() {
       choice: choice.label,
       spokenChoice: getDramaticChoiceLabel(choice),
       freeText: free ? freeText.trim() : "",
-      effect,
+      effect: finalEffect,
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
-      sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", effect),
+      sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", finalEffect),
       challenge: {
         title: sceneChallenge.title,
         matched: challengeMatch,
@@ -911,10 +934,11 @@ function App() {
       },
       tactical: tacticalRead,
       flowSurge,
+      tempoBonus,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
-      resourcesAfter: nextResources,
+      resourcesAfter: finalResourcesWithTempo,
     };
 
     const nextLog = [...log, entry];
@@ -960,7 +984,7 @@ function App() {
           case_title: activeCaseMeta?.title ?? currentCase,
           completed_at: new Date().toISOString(),
           summary: caseSummary,
-          resources: nextResources,
+          resources: finalResourcesWithTempo,
           triggers: nextTriggers,
           cognition: nextCognition,
           decision_log: nextLog,
@@ -993,7 +1017,7 @@ function App() {
       }
     }
 
-    setResources(nextResources);
+    setResources(finalResourcesWithTempo);
     setTriggers(nextTriggers);
     setCognition(nextCognition);
     setLog(nextLog);
@@ -1004,7 +1028,7 @@ function App() {
     setCaseResults(nextCaseResults);
     setNodeEnteredAt(Date.now());
     persist({
-      resources: nextResources,
+      resources: finalResourcesWithTempo,
       triggers: nextTriggers,
       cognition: nextCognition,
       log: nextLog,
@@ -1986,6 +2010,11 @@ function App() {
             <span>MOMENTUM</span>
             <strong>{momentumTier}</strong>
             <p>{momentumScore}점 · 챌린지 {currentChallengeStreak}연속</p>
+          </article>
+          <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
+            <span>DECISION WINDOW</span>
+            <strong>{decisionSeconds}s</strong>
+            <p>{decisionSeconds <= 10 ? "다음 판단이 닫히기 전" : "빠른 챌린지 적중 보너스 가능"}</p>
           </article>
         </section>
 
