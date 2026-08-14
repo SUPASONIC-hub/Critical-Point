@@ -672,6 +672,54 @@ summary:focus-visible {
   line-height: 1.5;
 }
 
+.resume-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px;
+  color: #18201f;
+  background: #d9ff62;
+  border: 1px solid #c0ea4b;
+  border-radius: 8px;
+}
+
+.resume-panel div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.resume-panel span,
+.resume-panel small {
+  color: #2c4a46;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.resume-panel strong {
+  font-size: 17px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.resume-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0 13px;
+  color: #ffffff;
+  background: #18201f;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
 .test-unlock {
   width: 100%;
   min-height: 38px;
@@ -874,6 +922,20 @@ summary:focus-visible {
   padding: 0 12px;
   color: #24302e;
   background: #eef1ed;
+}
+
+.save-status {
+  width: fit-content;
+  max-width: 100%;
+  margin: -10px 0 16px;
+  padding: 7px 9px;
+  color: #1d4e3f;
+  background: #dff4ea;
+  border: 1px solid #9ccbb4;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
 }
 
 .game-hud {
@@ -1216,8 +1278,15 @@ summary:focus-visible {
 }
 
 .scene > p {
-  padding-top: 2px;
-  font-size: 16px;
+  grid-column: 1 / -1;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(217, 255, 98, 0.2);
+  border-left: 4px solid #d9ff62;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
 }
 
 .memo-panel,
@@ -1397,7 +1466,7 @@ summary:focus-visible {
 
 .memo-panel ul {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 10px;
   padding: 0;
   margin: 14px 0 0;

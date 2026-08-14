@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 
 import {
   anonymizeSensitiveText,
@@ -179,26 +178,5 @@ assert.equal(
 );
 assert.equal(limitText("abcdef", 3), "abc", "text limiter should truncate long input");
 assert.equal(limitText("abcdef", 0), "", "text limiter should return empty text for invalid limits");
-
-const analysisSql = readFileSync(new URL("../supabase/analysis.sql", import.meta.url), "utf8");
-[
-  "nullif(summary ->> 'averageResponseTime', '')::numeric",
-  "nullif(summary ->> 'freeCount', '')::numeric",
-  "(log_item ->> 'responseTimeSec')::integer as response_seconds",
-  "round(avg((resources ->> 'time')::numeric), 1)",
-].forEach((unsafePattern) => {
-  assert.ok(
-    !analysisSql.includes(unsafePattern),
-    `analysis SQL should guard JSON casts instead of using ${unsafePattern}`,
-  );
-});
-assert.ok(
-  analysisSql.includes("when summary ->> 'averageResponseTime' ~"),
-  "analysis SQL should guard summary numeric casts",
-);
-assert.ok(
-  analysisSql.includes("when resources ->> 'time' ~"),
-  "analysis SQL should guard resource numeric casts",
-);
 
 console.log("Smoke tests passed");

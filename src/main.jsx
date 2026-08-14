@@ -14,6 +14,7 @@ import {
   MessageSquareText,
   Copy,
   RefreshCcw,
+  Save,
   Send,
   Shield,
   Sparkles,
@@ -186,6 +187,9 @@ function App() {
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
+  const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
+  const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -345,6 +349,11 @@ function App() {
   const [feedbackStatus, setFeedbackStatus] = useState("");
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
+  const hasResumableSave =
+    !started &&
+    currentCase &&
+    nodeId &&
+    (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -363,9 +372,7 @@ function App() {
   }, [started, currentCase, nodeId, isResult]);
 
   function persist(nextState) {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
+    const payload = {
         saveSchemaVersion: SAVE_SCHEMA_VERSION,
         playerName,
         dataConsent,
@@ -381,15 +388,18 @@ function App() {
         cognition,
         echo,
         nodeEnteredAt,
+        savedAt: new Date().toISOString(),
         ...nextState,
-      }),
-    );
+      };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    return payload;
   }
 
   function startGame() {
     const name = playerName.trim() || "분석관";
     setPlayerName(name);
     setStarted(true);
+    setIsPausedSave(false);
     setCurrentCase("case01");
     setNodeId("start");
     setNodeEnteredAt(Date.now());
@@ -400,7 +410,38 @@ function App() {
       currentCase: "case01",
       nodeId: "start",
       nodeEnteredAt: Date.now(),
+      paused: false,
     });
+  }
+
+  function resumeSavedGame() {
+    setStarted(true);
+    setIsPausedSave(false);
+    setNodeEnteredAt(Date.now());
+    setSaveStatus("");
+    persist({
+      started: true,
+      paused: false,
+      nodeEnteredAt: Date.now(),
+    });
+  }
+
+  function saveCurrentGame({ exit = false } = {}) {
+    const nextStarted = exit ? false : started;
+    const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
+    const payload = persist({
+      started: nextStarted,
+      paused: exit,
+      nodeEnteredAt: nextNodeEnteredAt,
+    });
+    setLastSavedAt(payload.savedAt);
+    setIsPausedSave(exit);
+    setSaveStatus(`저장됨 ${formatSaveTime(payload.savedAt)}`);
+    if (exit) {
+      setStarted(false);
+    } else {
+      setNodeEnteredAt(nextNodeEnteredAt);
+    }
   }
 
   function startCase(caseId) {
@@ -429,6 +470,7 @@ function App() {
           ? "이번 사건의 핵심은 증거와 신뢰의 충돌입니다. 에코는 당신이 무엇을 믿고 싶은지와 무엇을 증명할 수 있는지를 분리해서 묻습니다."
           : "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
     setStarted(true);
+    setIsPausedSave(false);
     setCurrentCase(caseId);
     setNodeId(startNode);
     setResources(initialResources);
@@ -440,6 +482,7 @@ function App() {
     setNodeEnteredAt(Date.now());
     persist({
       started: true,
+      paused: false,
       currentCase: caseId,
       nodeId: startNode,
       resources: initialResources,
@@ -631,6 +674,9 @@ function App() {
     setCognition(makeEmptyScores(cognitionLabels));
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
+    setSaveStatus("");
+    setLastSavedAt("");
+    setIsPausedSave(false);
     setNodeEnteredAt(Date.now());
     setTelemetryStatus({
       tone: telemetryEnabled ? "ready" : "local",
@@ -642,7 +688,8 @@ function App() {
 
   function showSeasonMap() {
     setStarted(false);
-    persist({ started: false });
+    setIsPausedSave(true);
+    persist({ started: false, paused: true });
   }
 
   function unlockAllCasesForTest() {
@@ -864,6 +911,20 @@ function App() {
     return "이전 케이스 필요";
   }
 
+  function formatSaveTime(value) {
+    if (!value) return "";
+    try {
+      return new Intl.DateTimeFormat("ko-KR", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(value));
+    } catch {
+      return "";
+    }
+  }
+
   if (!started) {
     return (
       <main className="shell intro-shell">
@@ -926,6 +987,21 @@ function App() {
             </article>
           </section>
           <div className="start-panel">
+            {hasResumableSave && (
+              <div className="resume-panel">
+                <div>
+                  <span>저장된 진행</span>
+                  <strong>{activeCaseMeta?.label ?? "현재 케이스"} · {node.title}</strong>
+                  <small>
+                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
+                  </small>
+                </div>
+                <button type="button" onClick={resumeSavedGame}>
+                  <ChevronRight size={18} />
+                  이어하기
+                </button>
+              </div>
+            )}
             <label htmlFor="playerName">분석관 이름</label>
             <div className="start-input-row">
               <input
@@ -1449,11 +1525,22 @@ function App() {
             <span className="case-chip">{node.phase}</span>
             <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
           </div>
-          <button className="ghost" onClick={reset}>
-            <RefreshCcw size={16} />
-            초기화
-          </button>
+          <div className="top-actions">
+            <button className="ghost" onClick={() => saveCurrentGame()}>
+              <Save size={16} />
+              저장
+            </button>
+            <button className="ghost" onClick={() => saveCurrentGame({ exit: true })}>
+              <FileText size={16} />
+              저장 후 나가기
+            </button>
+            <button className="ghost" onClick={reset}>
+              <RefreshCcw size={16} />
+              초기화
+            </button>
+          </div>
         </header>
+        {saveStatus && <p className="save-status">{saveStatus}</p>}
         <div
           className="progress-wrap"
           role="progressbar"
