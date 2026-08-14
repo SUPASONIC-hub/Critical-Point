@@ -105,6 +105,35 @@ const playStyleOptions = [
   },
 ];
 
+const caseSequence = ["case01", "case02", "case03", "case04", "case05", "final"];
+
+const legacyProfiles = {
+  S: {
+    label: "CLEAR SIGNAL",
+    title: "이전 판단의 신뢰가 다음 사건을 받칩니다.",
+    text: "직전 케이스에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 신뢰와 정당성을 품고 시작합니다.",
+    effect: { trust: 4, legitimacy: 3 },
+  },
+  A: {
+    label: "STABLE HAND",
+    title: "이전 판단의 균형이 남아 있습니다.",
+    text: "대부분의 압박을 통제했습니다. 다음 사건은 약간의 신뢰와 정당성을 가진 채 열립니다.",
+    effect: { trust: 2, legitimacy: 1 },
+  },
+  B: {
+    label: "UNFINISHED COST",
+    title: "해결되지 않은 비용이 다음 사건으로 넘어왔습니다.",
+    text: "사건은 통과했지만 설명되지 않은 손실이 남았습니다. 다음 사건은 피로를 안고 시작합니다.",
+    effect: { fatigue: 2 },
+  },
+  C: {
+    label: "OPEN WOUND",
+    title: "지난 판단의 균열이 아직 닫히지 않았습니다.",
+    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 정당성과 피로가 불리하게 출발합니다.",
+    effect: { legitimacy: -2, fatigue: 4 },
+  },
+};
+
 const musicModes = {
   intro: {
     label: "대기",
@@ -384,6 +413,7 @@ function App() {
 
   const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
+  const [openingLegacy, setOpeningLegacy] = useState(saved?.openingLegacy ?? null);
   const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
   const [started, setStarted] = useState(saved?.started ?? false);
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
@@ -793,6 +823,7 @@ function App() {
         saveSchemaVersion: SAVE_SCHEMA_VERSION,
         playerName,
         playStyle,
+        openingLegacy,
         dataConsent,
         started,
         currentCase,
@@ -825,11 +856,13 @@ function App() {
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
+    setOpeningLegacy(null);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
       playerName: name,
       playStyle,
+      openingLegacy: null,
       dataConsent,
       started: true,
       currentCase: "case01",
@@ -897,17 +930,22 @@ function App() {
         : caseId === "case02"
           ? "이번 사건의 핵심은 증거와 신뢰의 충돌입니다. 에코는 당신이 무엇을 믿고 싶은지와 무엇을 증명할 수 있는지를 분리해서 묻습니다."
           : "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
+    const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
+    const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
+    const legacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
+    const openingResources = legacy ? applyEffect(initialResources, legacy.effect) : initialResources;
     setStarted(true);
     setIsPausedSave(false);
     setCurrentCase(caseId);
     setNodeId(startNode);
-    setResources(initialResources);
+    setResources(openingResources);
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
+    setOpeningLegacy(legacy);
     setEcho(introEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -916,13 +954,14 @@ function App() {
       paused: false,
       currentCase: caseId,
       nodeId: startNode,
-      resources: initialResources,
+      resources: openingResources,
       log: [],
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
       protocolUsed: false,
       timerPenaltyApplied: false,
       probeUsed: false,
+      openingLegacy: legacy,
       echo: introEcho,
       nodeEnteredAt: Date.now(),
     });
@@ -1283,6 +1322,7 @@ function App() {
     setStarted(false);
     setCurrentCase("case01");
     setCompletedCases([]);
+    setOpeningLegacy(null);
     setCaseResults({});
     setPlaytestFeedback({});
     setPendingTelemetry([]);
@@ -1326,6 +1366,7 @@ function App() {
       exportedAt: new Date().toISOString(),
       playerName,
       currentCase,
+      openingLegacy,
       completedCases,
       caseResults,
       playtestFeedback,
@@ -2209,6 +2250,22 @@ function App() {
             <strong>{node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}</strong>
           </div>
         </section>
+        {openingLegacy && (
+          <section className="legacy-panel">
+            <div>
+              <span>{openingLegacy.label}</span>
+              <strong>{openingLegacy.title}</strong>
+            </div>
+            <p>{openingLegacy.text}</p>
+            <div className="legacy-effect">
+              {Object.entries(openingLegacy.effect).map(([key, value]) => (
+                <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
+                  {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
+                </small>
+              ))}
+            </div>
+          </section>
+        )}
         <details className="play-help">
           <summary>
             <span>
