@@ -11,6 +11,122 @@ export function applyEffect(resources, effect = {}) {
   return next;
 }
 
+const riskDefaults = {
+  time: 72,
+  capital: 100,
+  humanCost: 0,
+  fatigue: 0,
+};
+
+export function getRiskPressure(resources = {}) {
+  const nextResources = { ...riskDefaults, ...resources };
+  return Math.round(
+    Math.max(0, 72 - nextResources.time) * 0.3 +
+      (100 - nextResources.capital) * 0.25 +
+      nextResources.humanCost * 0.25 +
+      nextResources.fatigue * 0.2,
+  );
+}
+
+export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
+  const freeCount = entries.filter((entry) => entry.freeText).length;
+  const reducedRiskCount = entries.filter(
+    (entry) =>
+      entry.resourcesBefore &&
+      entry.resourcesAfter &&
+      getRiskPressure(entry.resourcesAfter) < getRiskPressure(entry.resourcesBefore),
+  ).length;
+  const challengeClearCount = entries.filter((entry) => entry.challenge?.matched).length;
+  const streakBreakIndex = [...entries].reverse().findIndex((entry) => !entry.challenge?.matched);
+  const currentChallengeStreak =
+    streakBreakIndex === -1 ? entries.length : Math.max(0, streakBreakIndex);
+  const finalRiskPressure = entries.at(-1)?.resourcesAfter
+    ? getRiskPressure(entries.at(-1).resourcesAfter)
+    : fallbackRiskPressure;
+  const momentumScore = Math.round(
+    clamp(
+      challengeClearCount * 16 +
+        reducedRiskCount * 14 +
+        freeCount * 12 +
+        Math.min(entries.length, 5) * 6 -
+        Math.max(0, finalRiskPressure - 35) * 0.4,
+      0,
+      100,
+    ),
+  );
+
+  return {
+    freeCount,
+    reducedRiskCount,
+    challengeClearCount,
+    currentChallengeStreak,
+    momentumScore,
+    momentumTier: momentumScore >= 70 ? "FLOW" : momentumScore >= 40 ? "READY" : "BUILDING",
+    rank: momentumScore >= 85 ? "S" : momentumScore >= 70 ? "A" : momentumScore >= 50 ? "B" : "C",
+  };
+}
+
+export function createCaseSummary(
+  triggerScores = {},
+  cognitionScores = {},
+  entries = [],
+  { resources = {}, schemaVersion = 1, includeLongestDecision = false } = {},
+) {
+  const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
+  const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
+  const stats = getGameplayStats(entries, getRiskPressure(resources));
+  const summary = {
+    schemaVersion,
+    primary: sortedTriggers[0] ?? ["responsibility", 0],
+    secondary: sortedTriggers[1] ?? ["protection", 0],
+    thinking: sortedCognition[0] ?? ["persistence", 0],
+    freeCount: stats.freeCount,
+    averageResponseTime:
+      entries.length > 0
+        ? Math.round(
+            entries.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) /
+              entries.length,
+          )
+        : 0,
+    challengeClearCount: stats.challengeClearCount,
+    reducedRiskCount: stats.reducedRiskCount,
+    momentumScore: stats.momentumScore,
+    momentumTier: stats.momentumTier,
+    rank: stats.rank,
+  };
+
+  if (includeLongestDecision) {
+    summary.longestDecision = [...entries].sort(
+      (a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0),
+    )[0];
+  }
+
+  return summary;
+}
+
+const emailPattern = /[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+/;
+const phonePattern = /01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/;
+const organizationPattern =
+  /(주식회사|\(주\)|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))/i;
+
+export function detectPrivacySignals(text = "") {
+  return [
+    { label: "이메일", active: emailPattern.test(text) },
+    { label: "전화번호", active: phonePattern.test(text) },
+    { label: "회사·조직명", active: organizationPattern.test(text) },
+  ];
+}
+
+export function anonymizeSensitiveText(text = "") {
+  return text
+    .replace(/[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+/g, "익명 이메일")
+    .replace(/01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/g, "익명 연락처")
+    .replace(
+      /(주식회사|\(주\)|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))/gi,
+      "익명 조직",
+    );
+}
+
 export function getEcho(choiceId, freeText) {
   if (freeText) {
     const text = freeText.toLowerCase();
@@ -91,7 +207,7 @@ function getSubjectParticle(name = "상대") {
   return (code - 0xac00) % 28 === 0 ? "가" : "이";
 }
 
-function speechifyChoice(choice) {
+export function speechifyChoice(choice) {
   const label = choice.label ?? "그 판단을 밀고 가겠습니다";
   const endings = [
     ["제안한다", "제안하겠습니다."],

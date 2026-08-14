@@ -34,8 +34,11 @@ src/styles.css    UI 스타일
 ## 테스트
 
 ```bash
+npm test
 npm run build
 ```
+
+`npm test`는 게임 로직 smoke test를 실행한다. 위험 압력, 자원 변화 clamp, 모멘텀/랭크 계산, 선택지 발화 변환이 깨지지 않았는지 확인한다.
 
 플레이테스트 절차는 `playtest-guide.md`를 따른다.
 
@@ -53,7 +56,7 @@ npm run build
 
 - Repository: GitHub의 이 프로젝트 저장소
 - Branch: `main`
-- Build Command: `npm ci && npm run build`
+- Build Command: `npm ci && npm test && npm run build`
 - Publish Directory: `dist`
 - Auto-Deploy: On Commit
 
@@ -69,7 +72,7 @@ npm run build
 
 ## 데이터 수집 방향
 
-지금 버전은 브라우저 `localStorage`와 JSON 로그 내보내기로 테스트한다. 여러 사람의 데이터를 자동으로 모으려면 다음 단계에서 서버 저장을 붙여야 한다.
+지금 버전은 브라우저 `localStorage`와 JSON 로그 내보내기로 테스트한다. 저장 데이터와 내보내기 JSON에는 `saveSchemaVersion`이 포함되어 이후 분석 시 버전 차이를 구분할 수 있다.
 
 현재 코드는 Supabase 환경변수가 있고 플레이어가 시작 화면에서 데이터 제공에 동의하면 케이스 완료 시 플레이 로그를 자동 저장한다. 환경변수가 없거나 동의하지 않으면 저장 요청을 건너뛰고 기존 로컬 플레이만 동작한다.
 
@@ -160,7 +163,7 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 분석 쿼리:
 
 - [supabase/analysis.sql](./supabase/analysis.sql)을 Supabase SQL Editor에서 실행한다.
-- 케이스별 완료 수, 평균 응답 시간, 자유입력 수, 트리거 분포, 오래 고민한 장면, 피드백 점수를 확인할 수 있다.
+- 케이스별 완료 수, 로그 스키마 버전, 평균 응답 시간, 자유입력 수, 평균 모멘텀, 랭크 분포, 챌린지 달성률, 트리거 분포, 오래 고민한 장면, 피드백 점수를 확인할 수 있다.
 - 삭제 요청이 들어오면 파일 하단의 `delete` 쿼리에 8자리 세션 코드를 넣어 실행한다.
 
 배포 후 확인:
@@ -191,7 +194,11 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 
 ## 이미지 출처
 
-인트로 배경은 외부 사진을 사용하지 않고 `src/styles.css`의 CSS 그래픽으로 구성한다.
+인트로와 플레이 장면의 키 비주얼은 외부 사진을 사용하지 않고 생성형 이미지로 만든 라이트노벨풍 일러스트를 사용한다.
+
+- `public/triggerlab-key-visual.webp`: 앱에서 우선 사용하는 최적화 WebP 파일
+- `public/triggerlab-key-visual.png`: WebP 미지원 환경과 원본 보관용 PNG 파일
+
 향후 무료 이미지를 추가할 때도 실사 사진보다 애니메이션, 라이트노벨 삽화, 그래픽 노벨풍 자산을 우선한다.
 
 ## 주의

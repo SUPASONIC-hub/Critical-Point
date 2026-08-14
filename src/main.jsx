@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import "./styles.css";
+import { SAVE_SCHEMA_VERSION, STORAGE_KEY } from "./appConfig.js";
 import {
   boardChangePrompts,
   caseObjectives,
@@ -33,15 +34,21 @@ import {
 } from "./gameData.js";
 import {
   applyEffect,
+  anonymizeSensitiveText,
   buildSceneBeat,
   clamp,
+  createCaseSummary,
+  detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
   getDramaticChoiceLabel,
   getEcho,
   getFreeTextSignals,
+  getGameplayStats,
+  getRiskPressure,
   makeEmptyScores,
   scoreFreeText,
+  speechifyChoice,
 } from "./gameLogic.js";
 import {
   getSessionId,
@@ -60,7 +67,6 @@ const resourceMeta = {
   fatigue: { label: "FATIGUE", suffix: "", icon: BarChart3 },
 };
 
-const STORAGE_KEY = "trigger-prototype-v2";
 const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
@@ -217,6 +223,10 @@ function App() {
     stance: "상황 설명",
     job: "현재 국면의 핵심 정보를 전달한다.",
     appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
+    thought: "이 장면에서 놓친 전제가 있는지 다시 확인한다.",
+    gesture: "사건 관계자는 잠깐 말을 멈추고, 테이블 위 자료를 다시 바라본다.",
+    voice: "상황을 과장하지 않고 필요한 정보만 전달한다.",
+    line: "지금 결정하면, 무엇이 다음 장면으로 넘어갑니까?",
   };
   const fixedChoices = node?.choices?.filter((choice) => choice.type !== "free") ?? [];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
@@ -224,25 +234,38 @@ function App() {
   const freeTextSignals = getFreeTextSignals(freeText);
   const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
   const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
+  const privacySignals = detectPrivacySignals(freeText);
+  const activePrivacySignals = privacySignals.filter((signal) => signal.active);
   const currentAverageResponseTime =
     log.length > 0
       ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
       : 0;
-  function getRiskPressure(nextResources) {
-    return Math.round(
-      Math.max(0, 72 - nextResources.time) * 0.3 +
-        (100 - nextResources.capital) * 0.25 +
-        nextResources.humanCost * 0.25 +
-        nextResources.fatigue * 0.2,
-    );
-  }
   const riskPressure = getRiskPressure(resources);
   const riskTier =
     riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
-  const freeTextCombo = log.filter((entry) => entry.freeText).length;
+  const primarySceneTrigger = node?.triggers?.[0] ?? "responsibility";
+  const primarySceneTriggerLabel = triggerLabels[primarySceneTrigger] ?? "책임";
+  const sceneDirection =
+    riskTier === "CRITICAL"
+      ? `${primarySceneTriggerLabel} 압박이 회의실의 말끝을 짧게 자른다. 누구도 먼저 편한 결론을 꺼내지 못한다.`
+      : riskTier === "UNSTABLE"
+        ? `${primarySceneTriggerLabel} 압박이 테이블 위에 얇게 깔린다. 대답은 가능하지만, 아직 비용의 이름이 다 불리지 않았다.`
+        : `${primarySceneTriggerLabel} 압박은 낮게 유지된다. 그래서 지금은 결론보다 전제를 바꾸기 좋은 순간이다.`;
+  const gameplayStats = getGameplayStats(log, riskPressure);
+  const {
+    freeCount: freeTextCombo,
+    reducedRiskCount,
+    challengeClearCount,
+    currentChallengeStreak,
+    momentumScore,
+    momentumTier,
+    rank: gameplayRank,
+  } = gameplayStats;
   const activeBonus =
     freeTextCombo >= 2
       ? "판 바꾸기 보너스"
+      : currentChallengeStreak >= 2
+        ? "연속 챌린지 보너스"
       : currentAverageResponseTime >= 20
         ? "숙고 보너스"
         : log.length >= 3
@@ -280,6 +303,32 @@ function App() {
     }
     return "";
   }
+  const questSteps = [
+    {
+      title: "장면 챌린지",
+      value: `${challengeClearCount}/${Math.max(1, log.length)}`,
+      text: currentChallengeStreak > 0 ? `${currentChallengeStreak}연속 유지 중` : "이번 장면에서 다시 시작",
+      complete: currentChallengeStreak > 0,
+    },
+    {
+      title: "위험 압력 제어",
+      value: `${reducedRiskCount}`,
+      text: reducedRiskCount > 0 ? "하락 선택 기록됨" : "위험 하락 선택을 찾아야 함",
+      complete: reducedRiskCount > 0,
+    },
+    {
+      title: "판 바꾸기",
+      value: `${freeTextCombo}`,
+      text: freeTextCombo > 0 ? "선택지 밖 계획이 남음" : "구조 재설계 미사용",
+      complete: freeTextCombo > 0,
+    },
+  ];
+  const turnBriefItems = [
+    { label: "챌린지", value: sceneChallenge.title },
+    { label: "압력", value: `${riskTier} ${riskPressure}` },
+    { label: "모멘텀", value: `${momentumTier} ${momentumScore}` },
+    { label: "보너스", value: activeBonus },
+  ];
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
     difficulty: "",
@@ -288,6 +337,11 @@ function App() {
   };
   const [feedbackStatus, setFeedbackStatus] = useState("");
   const firstRenderRef = useRef(true);
+  const sceneTitleRef = useRef(null);
+
+  function getScrollBehavior() {
+    return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  }
 
   useEffect(() => {
     if (firstRenderRef.current) {
@@ -295,7 +349,8 @@ function App() {
       return;
     }
     window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
+      sceneTitleRef.current?.focus({ preventScroll: true });
       setIsAdvancing(false);
     });
   }, [started, currentCase, nodeId, isResult]);
@@ -304,6 +359,7 @@ function App() {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
+        saveSchemaVersion: SAVE_SCHEMA_VERSION,
         playerName,
         dataConsent,
         started,
@@ -388,31 +444,30 @@ function App() {
     });
   }
 
+  function anonymizeFreeText() {
+    setFreeText(anonymizeSensitiveText(freeText));
+  }
+
   function buildCaseSummary(nextTriggers, nextCognition, nextLog) {
-    const sortedTriggers = Object.entries(nextTriggers).sort((a, b) => b[1] - a[1]);
-    const sortedCognition = Object.entries(nextCognition).sort((a, b) => b[1] - a[1]);
-    return {
-      primary: sortedTriggers[0] ?? ["responsibility", 0],
-      secondary: sortedTriggers[1] ?? ["protection", 0],
-      thinking: sortedCognition[0] ?? ["persistence", 0],
-      freeCount: nextLog.filter((entry) => entry.freeText).length,
-      averageResponseTime:
-        nextLog.length > 0
-          ? Math.round(
-              nextLog.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) /
-                nextLog.length,
-            )
-          : 0,
-    };
+    return createCaseSummary(nextTriggers, nextCognition, nextLog, {
+      resources,
+      schemaVersion: SAVE_SCHEMA_VERSION,
+    });
   }
 
   function normalizeCaseSummary(summary) {
     return {
+      schemaVersion: summary?.schemaVersion ?? 1,
       primary: summary?.primary ?? ["responsibility", 0],
       secondary: summary?.secondary ?? ["protection", 0],
       thinking: summary?.thinking ?? ["persistence", 0],
       freeCount: summary?.freeCount ?? 0,
       averageResponseTime: summary?.averageResponseTime ?? 0,
+      challengeClearCount: summary?.challengeClearCount ?? 0,
+      reducedRiskCount: summary?.reducedRiskCount ?? 0,
+      momentumScore: summary?.momentumScore ?? 0,
+      momentumTier: summary?.momentumTier ?? "BUILDING",
+      rank: summary?.rank ?? "C",
     };
   }
 
@@ -591,6 +646,7 @@ function App() {
 
   function exportPlaytestLog() {
     const payload = {
+      saveSchemaVersion: SAVE_SCHEMA_VERSION,
       exportedAt: new Date().toISOString(),
       playerName,
       currentCase,
@@ -601,6 +657,18 @@ function App() {
       triggers,
       cognition,
       summary: result,
+      gameplay: {
+        rank: resultRank,
+        momentumScore,
+        momentumTier,
+        challengeClearCount,
+        reducedRiskCount,
+        currentChallengeStreak,
+        freeTextCombo,
+        riskPressure,
+        riskTier,
+        activeBonus,
+      },
       log,
       telemetryEnabled,
       dataConsent,
@@ -627,21 +695,12 @@ function App() {
   }
 
   const result = useMemo(() => {
-    const sortedTriggers = Object.entries(triggers).sort((a, b) => b[1] - a[1]);
-    const sortedCognition = Object.entries(cognition).sort((a, b) => b[1] - a[1]);
-    const primary = sortedTriggers[0] ?? ["responsibility", 0];
-    const secondary = sortedTriggers[1] ?? ["protection", 0];
-    const thinking = sortedCognition[0] ?? ["persistence", 0];
-    const freeCount = log.filter((entry) => entry.freeText).length;
-    const averageResponseTime =
-      log.length > 0
-        ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
-        : 0;
-    const longestDecision = [...log].sort(
-      (a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0),
-    )[0];
-    return { primary, secondary, thinking, freeCount, averageResponseTime, longestDecision };
-  }, [triggers, cognition, log]);
+    return createCaseSummary(triggers, cognition, log, {
+      resources,
+      schemaVersion: SAVE_SCHEMA_VERSION,
+      includeLongestDecision: true,
+    });
+  }, [triggers, cognition, log, resources]);
 
   function updateCurrentFeedback(patch) {
     const nextFeedback = {
@@ -703,14 +762,26 @@ function App() {
     result.longestDecision
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
-  const reducedRiskCount = log.filter(
-    (entry) =>
-      entry.resourcesBefore &&
-      entry.resourcesAfter &&
-      getRiskPressure(entry.resourcesAfter) < getRiskPressure(entry.resourcesBefore),
-  ).length;
-  const challengeClearCount = log.filter((entry) => entry.challenge?.matched).length;
+  const resultRank = gameplayRank;
+  const screenReaderStatus = isResult
+    ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 모멘텀 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
+    : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
+  const rankLine =
+    resultRank === "S"
+      ? "장면 목표, 위험 제어, 판 바꾸기가 균형 있게 맞물렸습니다."
+      : resultRank === "A"
+        ? "판단 흐름이 안정적입니다. 한두 장면만 더 공략하면 최고 랭크에 닿습니다."
+        : resultRank === "B"
+          ? "핵심 선택은 통과했습니다. 다음 플레이에서는 챌린지 조건을 더 의식해도 좋습니다."
+          : "사건은 통과했지만 보상 조건은 많이 남았습니다. 위험 예고와 구조 재설계를 더 활용해보세요.";
+  const scoreBreakdown = [
+    { label: "챌린지", value: challengeClearCount, text: `${challengeClearCount}개 달성` },
+    { label: "위험 제어", value: reducedRiskCount, text: `${reducedRiskCount}회 하락` },
+    { label: "판 바꾸기", value: freeTextCombo, text: `${freeTextCombo}회 사용` },
+    { label: "응답 평균", value: result.averageResponseTime, text: `${result.averageResponseTime}s` },
+  ];
   const achievementBadges = [
+    { title: `Momentum ${momentumTier}`, text: `플레이 모멘텀 ${momentumScore}점을 기록했습니다.` },
     result.freeCount > 0
       ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
       : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
@@ -779,6 +850,22 @@ function App() {
             <img src="/profile.jpg" alt="" />
             <span>Created by SUPASONIC</span>
           </div>
+          <figure className="intro-visual">
+            <picture>
+              <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
+              <img
+                src="/triggerlab-key-visual.png"
+                alt="트리거랩 작전실에서 사건 지도를 분석하는 라이트노벨풍 일러스트"
+                width="1792"
+                height="1024"
+                fetchPriority="high"
+              />
+            </picture>
+            <figcaption>
+              <span>TRIGGERLAB NIGHT SHIFT</span>
+              <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+            </figcaption>
+          </figure>
           <p>
             트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
             사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
@@ -884,7 +971,8 @@ function App() {
                     <b>{caseItem.label}</b>
                     <span>{triggerLabels[caseItem.result.primary[0]]}</span>
                     <small>
-                      {caseItem.result.averageResponseTime}s · 자유입력 {caseItem.result.freeCount}
+                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}s · 자유입력{" "}
+                      {caseItem.result.freeCount}
                     </small>
                   </article>
                 ))}
@@ -900,9 +988,20 @@ function App() {
               const savedResult = caseResults[caseItem.id]
                 ? normalizeCaseSummary(caseResults[caseItem.id])
                 : null;
+              const canOpenCase =
+                caseItem.status === "OPEN" ||
+                caseItem.status === "PLAYING" ||
+                caseItem.status === "COMPLETE";
+              function openCaseFromCard() {
+                if (canOpenCase) startCase(caseItem.id);
+              }
               return (
                 <article
                   key={caseItem.id}
+                  role={canOpenCase ? "button" : undefined}
+                  tabIndex={canOpenCase ? 0 : undefined}
+                  aria-disabled={canOpenCase ? undefined : true}
+                  aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"
                       ? "case-card active-case"
@@ -910,13 +1009,11 @@ function App() {
                         ? "case-card complete-case"
                         : "case-card"
                   }
-                  onClick={() => {
-                    if (
-                      caseItem.status === "OPEN" ||
-                      caseItem.status === "PLAYING" ||
-                      caseItem.status === "COMPLETE"
-                    ) {
-                      startCase(caseItem.id);
+                  onClick={openCaseFromCard}
+                  onKeyDown={(event) => {
+                    if ((event.key === "Enter" || event.key === " ") && canOpenCase) {
+                      event.preventDefault();
+                      openCaseFromCard();
                     }
                   }}
                 >
@@ -935,7 +1032,7 @@ function App() {
                   )}
                   {savedResult && (
                     <small className="case-result-mini">
-                      {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 자유입력{" "}
+                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 자유입력{" "}
                       {savedResult.freeCount}
                     </small>
                   )}
@@ -951,6 +1048,9 @@ function App() {
   if (isResult) {
     return (
       <main className="shell">
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {screenReaderStatus}
+        </p>
         <section className="result-page">
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
@@ -971,12 +1071,37 @@ function App() {
           </div>
           <div className="result-hero">
             <p>{playerName}의 {activeCaseMeta?.label} 사고 활성 프로필</p>
-            <h1>
+            <h1 ref={sceneTitleRef} tabIndex={-1}>
               {currentCase === "final"
                 ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다."
                 : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}
             </h1>
           </div>
+          <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
+            <div className="rank-mark">
+              <span>CASE RANK</span>
+              <strong>{resultRank}</strong>
+            </div>
+            <div className="rank-copy">
+              <span>{momentumTier} · {momentumScore} POINTS</span>
+              <h2>{rankLine}</h2>
+              <p>
+                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 그래도 랭크는
+                이번 사건을 얼마나 능동적으로 공략했는지 보여주는 플레이 지표입니다.
+              </p>
+            </div>
+            <div className="score-breakdown">
+              {scoreBreakdown.map((item) => (
+                <article key={item.label}>
+                  <span>{item.label}</span>
+                  <b>{item.text}</b>
+                  <div>
+                    <i style={{ width: `${clamp(item.value * 18, item.value > 0 ? 14 : 4, 100)}%` }} />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
           <section className="session-panel">
             <div>
               <span>PLAYTEST SESSION</span>
@@ -1219,6 +1344,12 @@ function App() {
 
   return (
     <main className="shell game-shell">
+      <a className="skip-link" href="#choice-panel">
+        선택지로 건너뛰기
+      </a>
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {screenReaderStatus}
+      </p>
         <section className="game-board">
         <section className="mission-strip">
           <div>
@@ -1254,14 +1385,21 @@ function App() {
         <header className="game-header">
           <div>
             <span className="case-chip">{node.phase}</span>
-            <h1>{node.title}</h1>
+            <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
           </div>
           <button className="ghost" onClick={reset}>
             <RefreshCcw size={16} />
             초기화
           </button>
         </header>
-        <div className="progress-wrap" aria-label={`진행률 ${progress}%`}>
+        <div
+          className="progress-wrap"
+          role="progressbar"
+          aria-label="현재 케이스 진행률"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={progress}
+        >
           <div style={{ width: `${progress}%` }} />
         </div>
 
@@ -1281,6 +1419,11 @@ function App() {
             <strong>{progress}%</strong>
             <p>{log.length}개 판단 기록</p>
           </article>
+          <article>
+            <span>MOMENTUM</span>
+            <strong>{momentumTier}</strong>
+            <p>{momentumScore}점 · 챌린지 {currentChallengeStreak}연속</p>
+          </article>
         </section>
 
         <section className="scene-challenge">
@@ -1289,6 +1432,19 @@ function App() {
             <strong>{sceneChallenge.title}</strong>
           </div>
           <p>{sceneChallenge.text}</p>
+        </section>
+
+        <section className="quest-panel" aria-label="현재 플레이 퀘스트">
+          {questSteps.map((quest) => (
+            <article className={quest.complete ? "quest-step complete" : "quest-step"} key={quest.title}>
+              <span>
+                <Check size={15} />
+                {quest.title}
+              </span>
+              <strong>{quest.value}</strong>
+              <p>{quest.text}</p>
+            </article>
+          ))}
         </section>
 
         <section className="lab-trace">
@@ -1303,6 +1459,12 @@ function App() {
         </section>
 
         <div className="scene">
+          <div className="scene-visual" aria-hidden="true">
+            <picture>
+              <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
+              <img src="/triggerlab-key-visual.png" alt="" width="1792" height="1024" loading="lazy" />
+            </picture>
+          </div>
           <div className="speaker">
             <div>{node.speaker.slice(0, 1)}</div>
             <span>
@@ -1314,6 +1476,27 @@ function App() {
             <span>{speakerProfile.appearance}</span>
             <b>{speakerProfile.job}</b>
           </div>
+          <aside className="character-cutin">
+            <div>
+              <span>CHARACTER CUT-IN</span>
+              <strong>{speakerProfile.line}</strong>
+            </div>
+            <p className="scene-direction">{sceneDirection}</p>
+            <dl>
+              <div>
+                <dt>생각</dt>
+                <dd>'{speakerProfile.thought}'</dd>
+              </div>
+              <div>
+                <dt>지문</dt>
+                <dd>{speakerProfile.gesture}</dd>
+              </div>
+              <div>
+                <dt>말투</dt>
+                <dd>{speakerProfile.voice}</dd>
+              </div>
+            </dl>
+          </aside>
           <p>{node.text}</p>
         </div>
 
@@ -1370,7 +1553,7 @@ function App() {
           </details>
         </section>
 
-        <section className="choice-panel">
+        <section className="choice-panel" id="choice-panel" tabIndex={-1}>
           <div className="choice-heading">
             <h2>어떻게 말할까</h2>
             <p>
@@ -1398,12 +1581,14 @@ function App() {
                   className="choice"
                   onClick={() => choose(choice)}
                   disabled={isAdvancing}
+                  aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
                 >
                   <span className="choice-main">
                     <Check size={16} />
                     {getDramaticChoiceLabel(choice)}
                   </span>
                   <span className="choice-action">{choice.label}</span>
+                  <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
                   <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
                   {choice.effect && (
@@ -1454,10 +1639,33 @@ function App() {
                 value={freeText}
                 onChange={(event) => setFreeText(event.target.value)}
                 placeholder="예: 누구를 새로 협상장에 부를지, 어떤 조건을 교환할지, 어떤 정보를 먼저 확인할지 적는다."
+                aria-label="구조 재설계 자유입력"
+                aria-describedby="reframe-input-note"
               />
-              <p className="input-note">
+              <p className="input-note" id="reframe-input-note">
                 자유입력은 로그에 남을 수 있습니다. 실제 개인정보나 식별 가능한 회사명은 쓰지 마세요.
               </p>
+              {activePrivacySignals.length > 0 && (
+                <div className="privacy-warning" role="alert">
+                  <strong>식별 정보로 보일 수 있는 표현이 있습니다.</strong>
+                  <p>
+                    감지 항목: {activePrivacySignals.map((signal) => signal.label).join(" / ")}.
+                    실제 이름, 연락처, 회사명은 가상의 역할명이나 익명 표현으로 바꿔주세요.
+                  </p>
+                  <button type="button" onClick={anonymizeFreeText}>
+                    감지 표현 익명화
+                  </button>
+                </div>
+              )}
+              {freeText.trim() && (
+                <div className="reframe-speech">
+                  <span>발화 예고</span>
+                  <p>"{freeText.trim()}"</p>
+                  <small>
+                    준비된 선택지 밖으로 나가면, 이 문장이 그대로 장면 로그와 에코의 반론에 남습니다.
+                  </small>
+                </div>
+              )}
               <div className="reframe-signals">
                 <div>
                   <span>반영 기준</span>
@@ -1528,6 +1736,11 @@ function App() {
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
                 disabled={!freeText.trim() || isAdvancing}
+                aria-label={
+                  freeText.trim()
+                    ? `구조 재설계 제출. ${freeText.trim()}`
+                    : "구조 재설계 내용을 입력해야 제출할 수 있습니다."
+                }
               >
                 <span className="choice-main">
                   <Send size={16} />
@@ -1544,6 +1757,18 @@ function App() {
           <span>분석관</span>
           <strong>{playerName}</strong>
         </div>
+        <section className="turn-brief">
+          <h2>이번 턴 브리프</h2>
+          <div>
+            {turnBriefItems.map((item) => (
+              <article key={item.label}>
+                <span>{item.label}</span>
+                <b>{item.value}</b>
+              </article>
+            ))}
+          </div>
+          <p>{sceneChallenge.text}</p>
+        </section>
         <section>
           <h2>상황판</h2>
           <div className="resource-list">

@@ -2,13 +2,36 @@
 select
   case_id,
   max(case_title) as case_title,
+  max(coalesce(nullif(summary ->> 'schemaVersion', '')::integer, 1)) as latest_schema_version,
   count(*) as completions,
-  round(avg((summary ->> 'averageResponseTime')::numeric), 1) as avg_response_seconds,
-  round(avg((summary ->> 'freeCount')::numeric), 1) as avg_free_text_count,
+  round(avg(nullif(summary ->> 'averageResponseTime', '')::numeric), 1) as avg_response_seconds,
+  round(avg(nullif(summary ->> 'freeCount', '')::numeric), 1) as avg_free_text_count,
+  round(avg(coalesce(nullif(summary ->> 'momentumScore', '')::numeric, 0)), 1) as avg_momentum_score,
+  round(avg(coalesce(nullif(summary ->> 'challengeClearCount', '')::numeric, 0)), 1) as avg_challenge_clears,
+  round(avg(coalesce(nullif(summary ->> 'reducedRiskCount', '')::numeric, 0)), 1) as avg_risk_reductions,
   max(completed_at) as latest_completion
 from public.playtest_sessions
 group by case_id
 order by case_id;
+
+-- Submitted log schema versions.
+select
+  coalesce(nullif(summary ->> 'schemaVersion', '')::integer, 1) as schema_version,
+  count(*) as submissions,
+  min(completed_at) as first_seen,
+  max(completed_at) as last_seen
+from public.playtest_sessions
+group by schema_version
+order by schema_version;
+
+-- Gameplay rank distribution by completed case.
+select
+  case_id,
+  coalesce(summary ->> 'rank', 'C') as rank,
+  count(*) as count
+from public.playtest_sessions
+group by case_id, rank
+order by case_id, rank;
 
 -- Trigger distribution by completed case.
 select
@@ -18,6 +41,30 @@ select
 from public.playtest_sessions
 group by case_id, primary_trigger
 order by case_id, count desc;
+
+-- Scene challenge outcomes across submitted logs.
+select
+  case_id,
+  log_item ->> 'title' as scene_title,
+  log_item #>> '{challenge,title}' as challenge_title,
+  count(*) filter (where log_item #>> '{challenge,matched}' = 'true') as cleared,
+  count(*) filter (where log_item #>> '{challenge,matched}' = 'false') as missed,
+  round(
+    avg(
+      case
+        when log_item #>> '{challenge,riskDelta}' ~ '^-?[0-9]+(\.[0-9]+)?$'
+          then (log_item #>> '{challenge,riskDelta}')::numeric
+        else null
+      end
+    ),
+    1
+  ) as avg_risk_delta
+from public.playtest_sessions
+cross join lateral jsonb_array_elements(decision_log) as log_item
+where log_item ? 'challenge'
+  and log_item #>> '{challenge,title}' is not null
+group by case_id, scene_title, challenge_title
+order by case_id, scene_title;
 
 -- Longest decision scenes across all submitted logs.
 select

@@ -2,6 +2,7 @@
 
 ## 테스트 전
 
+- 로컬에서 `npm test`와 `npm run build`가 통과하는지 확인한다.
 - Render 최신 배포 커밋이 GitHub `main` 최신 커밋과 같은지 확인한다.
 - 시작 화면에 `DB 연결됨`이 보이는지 확인한다.
 - Supabase SQL Editor에서 [supabase/schema.sql](./supabase/schema.sql)을 실행했는지 확인한다.
@@ -22,4 +23,3 @@
 - 이해도 평균 3점 이하 케이스는 UX/문구를 먼저 수정한다.
 - 고민 강도 평균 2점 이하 케이스는 선택지 비용과 에코 반론을 강화한다.
 - 삭제 요청이 들어오면 세션 코드 기준으로 `playtest_sessions`, `playtest_feedback`을 함께 삭제한다.
-
