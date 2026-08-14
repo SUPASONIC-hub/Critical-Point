@@ -2461,6 +2461,47 @@ textarea {
   background: #f5ded8;
 }
 
+.retry-telemetry {
+  display: grid;
+  gap: 7px;
+  width: min(560px, 100%);
+  margin-top: 12px;
+  padding: 12px;
+  color: #18201f;
+  background: #fff8e6;
+  border: 1px solid #ebd99f;
+  border-radius: 6px;
+}
+
+.retry-telemetry b {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.retry-telemetry p {
+  color: #6a5420;
+  font-size: 12px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.retry-telemetry button {
+  width: fit-content;
+  min-height: 36px;
+  padding: 0 11px;
+  color: #ffffff;
+  background: #18201f;
+  border: 0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.retry-telemetry button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .session-panel button {
   display: inline-flex;
   align-items: center;

@@ -190,6 +190,8 @@ function App() {
   const [saveStatus, setSaveStatus] = useState("");
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
+  const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
+  const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -405,6 +407,7 @@ function App() {
         cognition,
         echo,
         nodeEnteredAt,
+        pendingTelemetry,
         savedAt: new Date().toISOString(),
         ...nextState,
       };
@@ -538,6 +541,58 @@ function App() {
     };
   }
 
+  function queueTelemetry(item) {
+    const nextQueue = [
+      ...pendingTelemetry.filter((queued) => queued.id !== item.id),
+      {
+        queuedAt: new Date().toISOString(),
+        ...item,
+      },
+    ];
+    setPendingTelemetry(nextQueue);
+    persist({ pendingTelemetry: nextQueue });
+  }
+
+  async function sendTelemetryItem(item) {
+    if (item.type === "case") return saveCaseTelemetry(item.payload);
+    if (item.type === "feedback") return saveFeedbackTelemetry(item.payload);
+    throw new Error(`Unknown telemetry item type: ${item.type}`);
+  }
+
+  async function retryPendingTelemetry() {
+    if (!telemetryEnabled || !dataConsent || pendingTelemetry.length === 0 || isRetryingTelemetry) return;
+    setIsRetryingTelemetry(true);
+    setTelemetryStatus({
+      tone: "pending",
+      text: `대기 중인 원격 저장 ${pendingTelemetry.length}건을 다시 전송하는 중입니다.`,
+    });
+
+    const failedItems = [];
+    for (const item of pendingTelemetry) {
+      try {
+        await sendTelemetryItem(item);
+      } catch (error) {
+        console.warn(error);
+        failedItems.push(item);
+      }
+    }
+
+    setPendingTelemetry(failedItems);
+    persist({ pendingTelemetry: failedItems });
+    setIsRetryingTelemetry(false);
+    setTelemetryStatus(
+      failedItems.length === 0
+        ? {
+            tone: "success",
+            text: "대기 중이던 원격 저장을 모두 완료했습니다.",
+          }
+        : {
+            tone: "error",
+            text: `원격 저장 ${failedItems.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`,
+          },
+    );
+  }
+
   function choose(choice) {
     if (isAdvancing) return;
     setIsAdvancing(true);
@@ -617,11 +672,7 @@ function App() {
           text: "데이터 제공 동의가 없어 원격 저장을 건너뛰었습니다.",
         });
       } else {
-        setTelemetryStatus({
-          tone: "pending",
-          text: "케이스 로그를 원격 DB에 저장하는 중입니다.",
-        });
-        saveCaseTelemetry({
+        const caseTelemetryPayload = {
           session_id: sessionId,
           session_code: sessionCode,
           player_name: null,
@@ -634,7 +685,12 @@ function App() {
           cognition: nextCognition,
           decision_log: nextLog,
           feedback: playtestFeedback[currentCase] ?? null,
-        })
+        };
+        setTelemetryStatus({
+          tone: "pending",
+          text: "케이스 로그를 원격 DB에 저장하는 중입니다.",
+        });
+        saveCaseTelemetry(caseTelemetryPayload)
           .then(() => {
             setTelemetryStatus({
               tone: "success",
@@ -643,9 +699,15 @@ function App() {
           })
           .catch((error) => {
             console.warn(error);
+            queueTelemetry({
+              id: `case-${currentCase}-${Date.now()}`,
+              type: "case",
+              label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
+              payload: caseTelemetryPayload,
+            });
             setTelemetryStatus({
               tone: "error",
-              text: "원격 저장에 실패했습니다. JSON 로그 내보내기를 백업으로 사용하세요.",
+              text: "원격 저장에 실패했습니다. 로컬 대기열에 보관했으니 결과 화면에서 재시도할 수 있습니다.",
             });
           });
       }
@@ -684,6 +746,7 @@ function App() {
     setCompletedCases([]);
     setCaseResults({});
     setPlaytestFeedback({});
+    setPendingTelemetry([]);
     setNodeId("start");
     setResources(initialResources);
     setLog([]);
@@ -745,6 +808,7 @@ function App() {
       dataConsent,
       sessionId,
       sessionCode,
+      pendingTelemetry,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -818,8 +882,7 @@ function App() {
       return;
     }
 
-    try {
-      await saveFeedbackTelemetry({
+    const feedbackTelemetryPayload = {
         session_id: sessionId,
         session_code: sessionCode,
         case_id: currentCase,
@@ -828,11 +891,20 @@ function App() {
         clarity_score: Number(feedback.clarity) || null,
         difficulty_score: Number(feedback.difficulty) || null,
         comment: feedback.comment.trim() || null,
-      });
+      };
+
+    try {
+      await saveFeedbackTelemetry(feedbackTelemetryPayload);
       setFeedbackStatus("피드백을 저장했습니다.");
     } catch (error) {
       console.warn(error);
-      setFeedbackStatus("로컬에는 저장했습니다. 원격 저장은 실패했습니다.");
+      queueTelemetry({
+        id: `feedback-${currentCase}-${Date.now()}`,
+        type: "feedback",
+        label: `${activeCaseMeta?.label ?? currentCase} 피드백`,
+        payload: feedbackTelemetryPayload,
+      });
+      setFeedbackStatus("로컬에는 저장했습니다. 원격 저장 실패분은 대기열에 보관했습니다.");
     }
   }
 
@@ -1243,6 +1315,21 @@ function App() {
               <small className={`remote-status ${telemetryStatus.tone}`}>
                 {telemetryStatus.text}
               </small>
+              {pendingTelemetry.length > 0 && (
+                <div className="retry-telemetry">
+                  <b>원격 저장 대기 {pendingTelemetry.length}건</b>
+                  <p>
+                    {pendingTelemetry.map((item) => item.label).join(" · ")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={retryPendingTelemetry}
+                    disabled={!telemetryEnabled || !dataConsent || isRetryingTelemetry}
+                  >
+                    {isRetryingTelemetry ? "재전송 중" : "원격 저장 재시도"}
+                  </button>
+                </div>
+              )}
             </div>
             <button onClick={copySessionCode}>
               <Copy size={16} />
