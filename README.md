@@ -191,10 +191,8 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 
 ## 이미지 출처
 
-인트로 배경 이미지는 Unsplash의 무료 이미지를 사용한다.
-
-- Photo by Vitaly Gariev on Unsplash
-- Source: https://unsplash.com/photos/two-colleagues-working-late-in-a-dimly-lit-office-S-YM-CY8X8A
+인트로 배경은 외부 사진을 사용하지 않고 `src/styles.css`의 CSS 그래픽으로 구성한다.
+향후 무료 이미지를 추가할 때도 실사 사진보다 애니메이션, 라이트노벨 삽화, 그래픽 노벨풍 자산을 우선한다.
 
 ## 주의
 

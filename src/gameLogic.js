@@ -1,4 +1,4 @@
-import { echoReplies } from "./gameData.js";
+import { characterProfiles, choiceSubtexts, choiceVoiceLines, echoReplies } from "./gameData.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -26,6 +26,59 @@ export function getEcho(choiceId, freeText) {
     return "선택지 밖의 제안은 판을 넓힙니다. 이제 그 방법의 비용, 반대자, 실패 조건을 구체화해야 합니다.";
   }
   return echoReplies[choiceId] ?? echoReplies.default;
+}
+
+export function getDramaticChoiceLabel(choice) {
+  if (choice.type === "free") return choice.label;
+  return choiceVoiceLines[choice.id] ?? choice.label;
+}
+
+export function getChoiceSubtext(choice) {
+  const strongestCognition = Object.entries(choice.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0];
+  return choiceSubtexts[strongestCognition] ?? choiceSubtexts.default;
+}
+
+function getStrongestDelta(effect = {}) {
+  return Object.entries(effect).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0] ?? null;
+}
+
+function describeDelta(delta) {
+  if (!delta) return "상황판의 숫자는 크게 움직이지 않지만, 회의실의 침묵은 조금 길어진다.";
+  const [key, value] = delta;
+  const labels = {
+    time: "남은 시간",
+    capital: "현금 여력",
+    trust: "신뢰",
+    legitimacy: "정당성",
+    humanCost: "사람에게 옮겨간 비용",
+    fatigue: "피로",
+  };
+  const label = labels[key] ?? key;
+  if (value > 0) return `${label}이 올라간다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
+  return `${label}이 줄어든다. 누군가는 그 감소분을 자기 몫으로 떠안게 된다.`;
+}
+
+export function buildSceneBeat(node, choice, freeText, effect = {}) {
+  const profile = characterProfiles[node?.speaker] ?? {
+    appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
+    thought: "이 선택은 아직 끝나지 않았다.",
+    gesture: "상대는 잠시 말을 고른다.",
+    voice: "상황을 확인하는 말투로 반응한다.",
+    line: "그 판단을 계속 밀고 갈 수 있습니까?",
+  };
+  const said = choice.type === "free"
+    ? `"${freeText.trim()}"`
+    : `"${getDramaticChoiceLabel(choice)}"`;
+  const deltaLine = describeDelta(getStrongestDelta(effect));
+
+  return [
+    `${profile.appearance} ${profile.gesture}`,
+    `'${profile.thought}'`,
+    `당신은 준비된 대응안의 이름 대신 이렇게 말한다. ${said}`,
+    `${node?.speaker ?? "상대"}가 시선을 든다. ${profile.voice}`,
+    `"${profile.line}"`,
+    deltaLine,
+  ].join("\n");
 }
 
 export function scoreFreeText(value) {

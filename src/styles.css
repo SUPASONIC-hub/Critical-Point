@@ -38,12 +38,37 @@ button {
   display: grid;
   align-items: center;
   background:
-    linear-gradient(110deg, rgba(14, 18, 20, 0.9), rgba(20, 30, 31, 0.72) 46%, rgba(20, 30, 31, 0.24)),
-    url("https://images.unsplash.com/photo-1758520145132-b0ecdb967295?auto=format&fit=crop&w=1800&q=80")
-      center/cover;
+    linear-gradient(110deg, rgba(14, 18, 20, 0.96), rgba(20, 30, 31, 0.78) 46%, rgba(45, 69, 67, 0.48)),
+    linear-gradient(132deg, transparent 0 63%, rgba(217, 255, 98, 0.22) 63% 77%, transparent 77%),
+    linear-gradient(135deg, transparent 0 58%, rgba(217, 255, 98, 0.5) 58% 59%, transparent 59%),
+    linear-gradient(25deg, rgba(255, 255, 255, 0.08) 0 8%, transparent 8% 14%, rgba(255, 255, 255, 0.06) 14% 22%, transparent 22%),
+    #18201f;
+  background-size: auto, 100% 100%, 100% 100%, 44px 44px, auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-shell::after {
+  content: "";
+  position: absolute;
+  right: clamp(18px, 8vw, 120px);
+  bottom: clamp(24px, 7vw, 92px);
+  width: min(34vw, 360px);
+  aspect-ratio: 3 / 4;
+  border: 2px solid rgba(217, 255, 98, 0.72);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, transparent 0 23%, rgba(217, 255, 98, 0.2) 23% 24%, transparent 24%),
+    linear-gradient(90deg, transparent 0 48%, rgba(255, 255, 255, 0.16) 48% 49%, transparent 49%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.18), rgba(44, 74, 70, 0.7));
+  box-shadow: 18px 18px 0 rgba(217, 255, 98, 0.12);
+  clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+  pointer-events: none;
 }
 
 .intro {
+  position: relative;
+  z-index: 1;
   width: min(760px, 100%);
   color: #ffffff;
 }
@@ -477,8 +502,12 @@ button {
 
 .game-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(640px, 860px) 320px;
   gap: 22px;
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  align-items: start;
+  justify-content: center;
 }
 
 .game-board,
@@ -649,7 +678,8 @@ button {
 
 .memo-panel,
 .echo-panel,
-.choice-panel {
+.choice-panel,
+.scene-beat {
   margin-top: 18px;
   padding: 18px;
   background: #f8faf7;
@@ -695,6 +725,22 @@ button {
 .echo-panel p {
   padding-left: 14px;
   border-left: 4px solid #c49a2c;
+}
+
+.scene-beat {
+  background: #f3f2ff;
+  border-color: #cbc7ef;
+}
+
+.scene-beat p {
+  margin: 0;
+  padding-left: 14px;
+  border-left: 4px solid #6c65ad;
+  line-height: 1.75;
+}
+
+.scene-beat p + p {
+  margin-top: 9px;
 }
 
 .memo-panel ul {
@@ -744,6 +790,16 @@ button {
   color: #5e6a65;
   font-size: 12px;
   line-height: 1.35;
+}
+
+.choice-subtext {
+  display: block;
+  margin-top: 7px;
+  padding-left: 24px;
+  color: #3e4a45;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .choice-cognition {
@@ -856,6 +912,15 @@ textarea {
   display: block;
   margin-bottom: 4px;
   font-size: 20px;
+}
+
+.speaker-card small {
+  display: block;
+  margin-top: 8px;
+  color: #2c4a46;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .speaker-card p {
@@ -1269,6 +1334,7 @@ textarea {
 
   .game-shell {
     grid-template-columns: 1fr;
+    width: min(760px, 100%);
   }
 
   .status-board {

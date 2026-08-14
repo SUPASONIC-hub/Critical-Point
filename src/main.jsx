@@ -25,14 +25,22 @@ import {
   caseObjectives,
   characterProfiles,
   cognitionLabels,
-  echoReplies,
   initialResources,
   nodeOrders,
   nodes,
   seasonCasesBase,
   triggerLabels,
 } from "./gameData.js";
-import { applyEffect, clamp, getEcho, makeEmptyScores, scoreFreeText } from "./gameLogic.js";
+import {
+  applyEffect,
+  buildSceneBeat,
+  clamp,
+  getChoiceSubtext,
+  getDramaticChoiceLabel,
+  getEcho,
+  makeEmptyScores,
+  scoreFreeText,
+} from "./gameLogic.js";
 import {
   getSessionId,
   getSessionCode,
@@ -137,9 +145,11 @@ function App() {
     role: "사건 관계자",
     stance: "상황 설명",
     job: "현재 국면의 핵심 정보를 전달한다.",
+    appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
   };
   const fixedChoices = node?.choices?.filter((choice) => choice.type !== "free") ?? [];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
+  const latestBeat = log.at(-1)?.sceneBeat ?? "";
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
     difficulty: "",
@@ -275,10 +285,12 @@ function App() {
       nodeId,
       title: node.title,
       choice: choice.label,
+      spokenChoice: getDramaticChoiceLabel(choice),
       freeText: free ? freeText.trim() : "",
       effect,
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
+      sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", effect),
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -911,7 +923,8 @@ function App() {
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <b>{entry.title}</b>
-                  <p>{entry.freeText || entry.choice}</p>
+                  <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
+                  {entry.sceneBeat && <small>{entry.sceneBeat.split("\n").slice(1).join(" ")}</small>}
                   <small>{entry.responseTimeSec}s · {entry.echo}</small>
                 </div>
               </article>
@@ -1018,6 +1031,21 @@ function App() {
           <p>{node.text}</p>
         </div>
 
+        {latestBeat && (
+          <section className="scene-beat">
+            <div className="panel-title-row">
+              <h2>
+                <MessageSquareText size={17} />
+                직전 선택의 여운
+              </h2>
+              <span>선택이 회의실의 대화와 침묵을 어떻게 바꿨는지 기록합니다.</span>
+            </div>
+            {latestBeat.split("\n").map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </section>
+        )}
+
         <section className="memo-panel">
           <h2>
             <FileText size={17} />
@@ -1042,7 +1070,7 @@ function App() {
         </section>
 
         <section className="choice-panel">
-          <h2>대응안 선택</h2>
+          <h2>어떻게 말할까</h2>
           <div className="choices">
             {fixedChoices.map((choice) => (
               <button
@@ -1052,8 +1080,9 @@ function App() {
               >
                 <span className="choice-main">
                   <Check size={16} />
-                  {choice.label}
+                  {getDramaticChoiceLabel(choice)}
                 </span>
+                <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
                 {choice.effect && (
                   <span className="choice-effect">
                     {Object.entries(choice.effect)
@@ -1140,6 +1169,7 @@ function App() {
           <div className="speaker-card">
             <strong>{node.speaker}</strong>
             <span>{speakerProfile.role}</span>
+            <small>{speakerProfile.appearance}</small>
             <p>{speakerProfile.job}</p>
           </div>
         </section>
