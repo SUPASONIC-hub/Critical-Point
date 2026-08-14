@@ -217,6 +217,28 @@ function App() {
   const latestBeat = log.at(-1)?.sceneBeat ?? "";
   const freeTextSignals = getFreeTextSignals(freeText);
   const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
+  const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
+  const currentAverageResponseTime =
+    log.length > 0
+      ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
+      : 0;
+  const riskPressure = Math.round(
+    Math.max(0, 72 - resources.time) * 0.3 +
+      (100 - resources.capital) * 0.25 +
+      resources.humanCost * 0.25 +
+      resources.fatigue * 0.2,
+  );
+  const riskTier =
+    riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
+  const freeTextCombo = log.filter((entry) => entry.freeText).length;
+  const activeBonus =
+    freeTextCombo >= 2
+      ? "판 바꾸기 보너스"
+      : currentAverageResponseTime >= 20
+        ? "숙고 보너스"
+        : log.length >= 3
+          ? "연속 판단 보너스"
+          : "보너스 대기";
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
     difficulty: "",
@@ -625,6 +647,26 @@ function App() {
     result.longestDecision
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
+  const achievementBadges = [
+    result.freeCount > 0
+      ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
+      : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
+    result.averageResponseTime >= 20
+      ? { title: "Slow Thinker", text: "한 장면 이상에서 판단을 오래 붙잡았습니다." }
+      : { title: "Fast Closer", text: "빠르게 결론을 닫는 플레이를 보였습니다." },
+    riskTier === "CRITICAL"
+      ? { title: "Crisis Runner", text: "높은 압력 상태로 케이스를 통과했습니다." }
+      : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
+  ];
+  const feedbackPrompts = [
+    `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
+    result.freeCount > 0
+      ? "구조 재설계 입력이 선택지 밖의 계획처럼 느껴졌나요?"
+      : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
+    nextCaseSignal
+      ? `${nextCaseSignal.title}로 넘어가고 싶은 이유가 생겼나요?`
+      : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
+  ];
   function getSceneLineType(line) {
     if (line.startsWith("'")) return "thought-line";
     if (line.startsWith('"')) return "spoken-line";
@@ -645,6 +687,13 @@ function App() {
       ? `${triggerLabels[currentNode.triggers[0]]} 압박 때문에 생략한 근거가 있는지 확인`
       : "방금 판단에서 빠진 이해관계자 확인";
     return [...memoChecks, triggerCheck];
+  }
+
+  function getCaseStatusText(status) {
+    if (status === "PLAYING") return "진행 중";
+    if (status === "OPEN") return "시작 가능";
+    if (status === "COMPLETE") return "완료됨";
+    return "이전 케이스 필요";
   }
 
   if (!started) {
@@ -675,19 +724,22 @@ function App() {
               설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
             </p>
           </div>
-          <section className="quick-guide" aria-label="처음 플레이 가이드">
-            <div className="guide-heading">
-              <Info size={16} />
-              <span>처음 플레이할 때 보는 기준</span>
-            </div>
-            <div className="guide-grid">
-              {playGuideItems.map((item) => (
-                <article key={item.title}>
-                  <b>{item.title}</b>
-                  <p>{item.text}</p>
-                </article>
-              ))}
-            </div>
+          <section className="intro-brief" aria-label="첫 케이스 브리핑">
+            <article>
+              <span>첫 사건</span>
+              <b>{seasonCasesBase[0].title}</b>
+              <p>{caseObjectives.case01}</p>
+            </article>
+            <article>
+              <span>관찰 항목</span>
+              <b>손실 배분 순서</b>
+              <p>{triggerLabSignals.case01}</p>
+            </article>
+            <article>
+              <span>다음 압박</span>
+              <b>기록은 다음 사건으로 이동한다</b>
+              <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
+            </article>
           </section>
           <div className="start-panel">
             <label htmlFor="playerName">분석관 이름</label>
@@ -737,6 +789,20 @@ function App() {
               테스트용 전체 케이스 열기
             </button>
           </div>
+          <section className="quick-guide" aria-label="처음 플레이 가이드">
+            <div className="guide-heading">
+              <Info size={16} />
+              <span>처음 플레이할 때 보는 기준</span>
+            </div>
+            <div className="guide-grid">
+              {playGuideItems.map((item) => (
+                <article key={item.title}>
+                  <b>{item.title}</b>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
           {completedCaseResultList.length > 0 && (
             <section className="season-summary">
               <div>
@@ -756,6 +822,10 @@ function App() {
               </div>
             </section>
           )}
+          <div className="roadmap-heading">
+            <span>SEASON ROADMAP</span>
+            <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
+          </div>
           <div className="case-roadmap">
             {seasonCases.map((caseItem) => (
               <article
@@ -779,11 +849,17 @@ function App() {
               >
                 <div>
                   <span>{caseItem.label}</span>
-                  {caseItem.status === "LOCKED" && <LockKeyhole size={14} />}
+                  <small className="case-status-chip">
+                    {caseItem.status === "LOCKED" && <LockKeyhole size={13} />}
+                    {getCaseStatusText(caseItem.status)}
+                  </small>
                 </div>
                 <h2>{caseItem.title}</h2>
                 <b>{caseItem.trigger}</b>
                 <p>{caseItem.summary}</p>
+                {caseItem.status === "LOCKED" && (
+                  <small className="case-lock-note">앞선 케이스의 판단 로그가 필요합니다.</small>
+                )}
                 {caseResults[caseItem.id] && (
                   <small className="case-result-mini">
                     {triggerLabels[caseResults[caseItem.id].primary[0]]} ·{" "}
@@ -857,6 +933,23 @@ function App() {
               </button>
             </section>
           )}
+          <section className="achievement-panel">
+            <div className="panel-title-row">
+              <h2>
+                <Sparkles size={17} />
+                획득 배지
+              </h2>
+              <span>이번 케이스의 플레이 스타일입니다.</span>
+            </div>
+            <div>
+              {achievementBadges.map((badge) => (
+                <article key={badge.title}>
+                  <b>{badge.title}</b>
+                  <p>{badge.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
           <div className="result-grid">
             <section className="report-section">
               <h2>Primary Trigger</h2>
@@ -914,6 +1007,14 @@ function App() {
                 플레이테스트 피드백
               </h2>
               <span>이 케이스가 실제로 고민을 만들었는지 확인합니다.</span>
+            </div>
+            <div className="feedback-prompts">
+              <span>이번 케이스에서 확인할 질문</span>
+              <ul>
+                {feedbackPrompts.map((prompt) => (
+                  <li key={prompt}>{prompt}</li>
+                ))}
+              </ul>
             </div>
             <div className="feedback-controls">
               <label>
@@ -1080,6 +1181,24 @@ function App() {
           <div style={{ width: `${progress}%` }} />
         </div>
 
+        <section className="game-hud">
+          <article className={`risk-card ${riskTier.toLowerCase()}`}>
+            <span>RISK</span>
+            <strong>{riskTier}</strong>
+            <p>{riskPressure} 압력</p>
+          </article>
+          <article>
+            <span>ACTIVE BONUS</span>
+            <strong>{activeBonus}</strong>
+            <p>자유입력 {freeTextCombo}회 · 평균 {currentAverageResponseTime}s</p>
+          </article>
+          <article>
+            <span>OBJECTIVE</span>
+            <strong>{progress}%</strong>
+            <p>{log.length}개 판단 기록</p>
+          </article>
+        </section>
+
         <section className="lab-trace">
           <div>
             <span>TRIGGERLAB TRACE</span>
@@ -1115,21 +1234,30 @@ function App() {
               </h2>
               <span>선택이 회의실의 대화와 침묵을 어떻게 바꿨는지 기록합니다.</span>
             </div>
-            {renderSceneLines(latestBeat)}
+            <div className="scene-beat-preview">
+              {renderSceneLines(latestBeat.split("\n").slice(0, 2).join("\n"))}
+            </div>
+            <details className="scene-beat-more">
+              <summary>전체 장면 보기</summary>
+              <div>{renderSceneLines(latestBeat)}</div>
+            </details>
           </section>
         )}
 
-        <section className="memo-panel">
-          <h2>
-            <FileText size={17} />
-            케이스데스크 자료
-          </h2>
+        <details className="memo-panel" open>
+          <summary>
+            <h2>
+              <FileText size={17} />
+              케이스데스크 자료
+            </h2>
+            <span>{node.memo.length}개 근거</span>
+          </summary>
           <ul>
             {node.memo.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </section>
+        </details>
 
         <section className="echo-panel">
           <div className="panel-title-row">
@@ -1140,14 +1268,14 @@ function App() {
             <span>선택을 돕는 조언자가 아니라, 판단의 약점을 드러내는 반론자</span>
           </div>
           <p>{echo}</p>
-          <div className="echo-checks">
-            <span>다시 확인할 것</span>
+          <details className="echo-checks">
+            <summary>다시 확인할 것</summary>
             <ul>
               {getEchoChecks(node).map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-          </div>
+          </details>
         </section>
 
         <section className="choice-panel">
@@ -1239,6 +1367,29 @@ function App() {
                   계획으로 기록됩니다.
                 </p>
               </div>
+              {freeTextPreview && (
+                <div className="reframe-preview">
+                  <span>예상 반영</span>
+                  <p>{explainResourceTradeoff(freeTextPreview.effect)}</p>
+                  <div>
+                    {Object.entries(freeTextPreview.effect).map(([key, value]) => (
+                      <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
+                        {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}
+                        {value}
+                      </small>
+                    ))}
+                  </div>
+                  <div>
+                    {Object.entries(freeTextPreview.cognition)
+                      .filter(([, value]) => value > 0)
+                      .map(([key, value]) => (
+                        <small key={key} className="cognition-preview">
+                          {cognitionLabels[key] ?? key} +{value}
+                        </small>
+                      ))}
+                  </div>
+                </div>
+              )}
               <button
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
