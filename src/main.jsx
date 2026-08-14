@@ -358,6 +358,7 @@ function App() {
   const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [decisionSeconds, setDecisionSeconds] = useState(45);
+  const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -441,7 +442,9 @@ function App() {
     rank: gameplayRank,
   } = gameplayStats;
   const activeBonus =
-    log.at(-1)?.tempoBonus
+    log.at(-1)?.title === "CRISIS PROTOCOL"
+      ? "구조 개입"
+      : log.at(-1)?.tempoBonus
       ? "QUICK READ"
       : freeTextCombo >= 2
       ? "판 바꾸기 보너스"
@@ -696,6 +699,7 @@ function App() {
         echo,
         nodeEnteredAt,
         pendingTelemetry,
+        protocolUsed,
         savedAt: new Date().toISOString(),
         ...nextState,
       };
@@ -709,6 +713,7 @@ function App() {
     setStarted(true);
     setIsPausedSave(false);
     setCurrentCase("case01");
+    setProtocolUsed(false);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -718,6 +723,7 @@ function App() {
       currentCase: "case01",
       nodeId: "start",
       nodeEnteredAt: Date.now(),
+      protocolUsed: false,
       paused: false,
     });
   }
@@ -785,6 +791,7 @@ function App() {
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
+    setProtocolUsed(false);
     setEcho(introEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -797,6 +804,7 @@ function App() {
       log: [],
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
+      protocolUsed: false,
       echo: introEcho,
       nodeEnteredAt: Date.now(),
     });
@@ -804,6 +812,46 @@ function App() {
 
   function anonymizeFreeText() {
     setFreeText(limitText(anonymizeSensitiveText(freeText), FREE_TEXT_MAX_LENGTH));
+  }
+
+  function activateCrisisProtocol() {
+    if (protocolUsed || riskPressure < 60 || isAdvancing) return;
+    const protocolEffect = { time: -4, capital: -2, legitimacy: 3, fatigue: 4 };
+    const nextResources = applyEffect(resources, protocolEffect);
+    const entry = {
+      nodeId: resolvedNodeId,
+      title: "CRISIS PROTOCOL",
+      choice: "위기 프로토콜 발동",
+      spokenChoice: "지금 구조를 바꾸고, 그 비용을 기록하겠습니다.",
+      freeText: "",
+      effect: protocolEffect,
+      triggers: ["responsibility", "order"],
+      echo: "프로토콜은 시간을 구하지 않습니다. 대신 누구에게 어떤 기준으로 개입했는지 남깁니다.",
+      sceneBeat: `에코: 위험 압력 ${riskPressure}에서 일반 절차를 유지할 여유가 사라졌습니다.\n당신: 위기 프로토콜을 발동한다. 시간과 현금을 더 내놓고, 판단 기준을 공개된 절차로 묶는다.`,
+      challenge: { title: "위기 압력 버티기", matched: true, riskDelta: getRiskPressure(nextResources) - riskPressure },
+      tactical: { grade: "A", gradeText: "공략 후보", reward: "구조 개입", cost: "TIME -4 · CAPITAL -2", gain: "LEGITIMACY +3" },
+      flowSurge: null,
+      tempoBonus: null,
+      note: "케이스당 1회 사용 가능한 구조 개입",
+      responseTimeSec: Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000)),
+      resourcesBefore: resources,
+      resourcesAfter: nextResources,
+    };
+    const nextLog = [...log, entry];
+    setProtocolUsed(true);
+    setResources(nextResources);
+    setLog(nextLog);
+    setEcho(entry.echo);
+    setNodeEnteredAt(Date.now());
+    setDecisionSeconds(45);
+    setSaveStatus("위기 프로토콜 발동됨");
+    persist({
+      protocolUsed: true,
+      resources: nextResources,
+      log: nextLog,
+      echo: entry.echo,
+      nodeEnteredAt: Date.now(),
+    });
   }
 
   function buildCaseSummary(nextTriggers, nextCognition, nextLog) {
@@ -1056,6 +1104,7 @@ function App() {
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
+    setProtocolUsed(false);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     setSaveStatus("");
@@ -1106,6 +1155,7 @@ function App() {
         riskPressure,
         riskTier,
         activeBonus,
+        protocolUsed,
       },
       log,
       telemetryEnabled,
@@ -2025,6 +2075,26 @@ function App() {
           </div>
           <p>{sceneChallenge.text}</p>
         </section>
+
+        {riskPressure >= 60 && (
+          <section className={protocolUsed ? "protocol-panel used" : "protocol-panel"}>
+            <div>
+              <span>EMERGENCY OPTION</span>
+              <strong>{protocolUsed ? "위기 프로토콜 사용 완료" : "위기 프로토콜"}</strong>
+              <p>
+                {protocolUsed
+                  ? "이번 케이스에서는 더 이상 구조 개입을 요청할 수 없습니다. 이제 남은 비용을 감당해야 합니다."
+                  : "시간과 현금을 더 내어놓고 판단 기준을 공개 절차로 묶습니다. 케이스당 한 번만 사용할 수 있습니다."}
+              </p>
+            </div>
+            {!protocolUsed && (
+              <button type="button" onClick={activateCrisisProtocol} disabled={isAdvancing}>
+                <Shield size={16} />
+                프로토콜 발동
+              </button>
+            )}
+          </section>
+        )}
 
         <section className="quest-panel" aria-label="현재 플레이 퀘스트">
           {questSteps.map((quest) => (

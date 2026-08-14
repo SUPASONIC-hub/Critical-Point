@@ -1133,6 +1133,69 @@ summary:focus-visible {
   line-height: 1.45;
 }
 
+.protocol-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -4px 0 16px;
+  padding: 14px;
+  color: #ffffff;
+  background: #7a2f22;
+  border: 1px solid #a84f3f;
+  border-radius: 8px;
+}
+
+.protocol-panel > div {
+  min-width: 0;
+}
+
+.protocol-panel span {
+  color: #ffd7c8;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.protocol-panel strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 17px;
+}
+
+.protocol-panel p {
+  margin: 5px 0 0;
+  color: #ffe9e1;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.protocol-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 13px;
+  color: #7a2f22;
+  background: #fff0bf;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
+.protocol-panel.used {
+  color: #18201f;
+  background: #fff0bf;
+  border-color: #ebd99f;
+}
+
+.protocol-panel.used span,
+.protocol-panel.used p {
+  color: #6a5420;
+}
+
 .quest-panel {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3180,6 +3243,7 @@ textarea {
   .start-input-row button,
   .next-case-panel button,
   .session-panel button,
+  .protocol-panel button,
   .feedback-actions button {
     width: 100%;
   }
@@ -3228,6 +3292,11 @@ textarea {
   .game-board,
   .status-board {
     padding: 16px;
+  }
+
+  .protocol-panel {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .intro-visual figcaption {
