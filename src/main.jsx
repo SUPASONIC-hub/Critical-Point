@@ -361,6 +361,7 @@ function App() {
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
   const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
+  const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -482,7 +483,13 @@ function App() {
               id: "find-cost",
               title: "숨은 비용 찾기",
               text: "가장 좋아 보이는 선택의 반대 비용을 확인하고 고릅니다.",
-            };
+          };
+  const echoProbeHint = {
+    "lower-risk": "힌트: 지금은 가장 큰 이득보다 위험 압력을 실제로 낮추는 선택이 오래 버팁니다.",
+    "use-reframe": "힌트: 사람, 조건, 순서 중 두 가지 이상을 다시 설계하면 선택지 밖 계획으로 인정됩니다.",
+    "avoid-risk": "힌트: 경쟁자의 속도를 따라가는 대신 위험을 유지하거나 낮추는 선택이 다음 장면을 엽니다.",
+    "find-cost": "힌트: 가장 좋아 보이는 선택이 누구에게 비용을 넘기는지 먼저 찾으십시오.",
+  }[sceneChallenge.id];
   function getChallengeMatch(choice, riskDelta) {
     if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
     if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
@@ -664,6 +671,7 @@ function App() {
     if (!started || isResult) return undefined;
     setDecisionSeconds(45);
     setTimerPenaltyApplied(false);
+    setProbeUsed(false);
     const timer = window.setInterval(() => {
       setDecisionSeconds((value) => Math.max(0, value - 1));
     }, 1000);
@@ -763,6 +771,7 @@ function App() {
     setCurrentCase("case01");
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
+    setProbeUsed(false);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -774,6 +783,7 @@ function App() {
       nodeEnteredAt: Date.now(),
       protocolUsed: false,
       timerPenaltyApplied: false,
+      probeUsed: false,
       paused: false,
     });
   }
@@ -843,6 +853,7 @@ function App() {
     setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
+    setProbeUsed(false);
     setEcho(introEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -857,6 +868,7 @@ function App() {
       cognition: makeEmptyScores(cognitionLabels),
       protocolUsed: false,
       timerPenaltyApplied: false,
+      probeUsed: false,
       echo: introEcho,
       nodeEnteredAt: Date.now(),
     });
@@ -864,6 +876,47 @@ function App() {
 
   function anonymizeFreeText() {
     setFreeText(limitText(anonymizeSensitiveText(freeText), FREE_TEXT_MAX_LENGTH));
+  }
+
+  function requestEchoProbe() {
+    if (probeUsed || isAdvancing || !echoProbeHint) return;
+    const probeEffect = { time: -1, fatigue: 1 };
+    const nextResources = applyEffect(resources, probeEffect);
+    const probeLine = `${echoProbeHint} 단, 힌트를 얻는 대가로 결정 시간 8초와 피로 1을 지불합니다.`;
+    const entry = {
+      nodeId: resolvedNodeId,
+      title: "ECHO PROBE",
+      choice: "에코에게 힌트 요청",
+      spokenChoice: "판단을 대신하지 말고, 어느 방향을 더 봐야 하는지만 말해.",
+      freeText: "",
+      effect: probeEffect,
+      triggers: ["curiosity", "inference"],
+      echo: probeLine,
+      sceneBeat: `당신: 에코에게 한 번 더 묻는다.\n에코: ${echoProbeHint}`,
+      challenge: null,
+      tactical: null,
+      flowSurge: null,
+      tempoBonus: null,
+      instinctSurge: null,
+      note: "장면당 1회 힌트 요청",
+      responseTimeSec: 8,
+      resourcesBefore: resources,
+      resourcesAfter: nextResources,
+      isSystemEvent: true,
+    };
+    const nextLog = [...log, entry];
+    setProbeUsed(true);
+    setResources(nextResources);
+    setLog(nextLog);
+    setEcho(probeLine);
+    setDecisionSeconds((value) => Math.max(0, value - 8));
+    setSaveStatus("에코 힌트 확보됨 · 결정 시간 8초 사용");
+    persist({
+      probeUsed: true,
+      resources: nextResources,
+      log: nextLog,
+      echo: probeLine,
+    });
   }
 
   function activateCrisisProtocol() {
@@ -1150,6 +1203,7 @@ function App() {
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
       timerPenaltyApplied: false,
+      probeUsed: false,
       nodeEnteredAt: Date.now(),
     });
   }
@@ -1172,6 +1226,7 @@ function App() {
     setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
+    setProbeUsed(false);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     setSaveStatus("");
@@ -2287,6 +2342,15 @@ function App() {
             <b>반론 열기</b>
           </summary>
           <p>{echo}</p>
+          <div className="echo-probe">
+            <div>
+              <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
+              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : "결정 시간 8초와 피로 1을 지불하고 방향성만 확인합니다."}</span>
+            </div>
+            <button type="button" onClick={requestEchoProbe} disabled={probeUsed || isAdvancing}>
+              {probeUsed ? "확인됨" : "힌트 요청"}
+            </button>
+          </div>
           <details className="echo-checks">
             <summary>다시 확인할 것</summary>
             <ul>
