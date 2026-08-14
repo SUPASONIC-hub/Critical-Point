@@ -354,6 +354,23 @@ function App() {
     currentCase &&
     nodeId &&
     (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
+  const telemetrySummary = telemetryEnabled
+    ? dataConsent
+      ? {
+          tone: "ready",
+          title: "DB 연결됨",
+          text: "케이스 완료와 피드백 제출 시 Supabase에 원격 저장합니다.",
+        }
+      : {
+          tone: "pending",
+          title: "DB 연결됨 · 동의 대기",
+          text: "체크박스에 동의하면 이 세션의 완료 로그와 피드백을 원격 저장합니다.",
+        }
+    : {
+        tone: "local",
+        title: "DB 미연결",
+        text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
+      };
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -793,7 +810,11 @@ function App() {
     persist({ playtestFeedback: nextFeedback });
 
     if (!telemetryEnabled || !dataConsent) {
-      setFeedbackStatus("로컬에 저장했습니다. DB 연결 또는 동의가 없으면 원격 저장은 건너뜁니다.");
+      setFeedbackStatus(
+        telemetryEnabled
+          ? "로컬에 저장했습니다. 데이터 제공 동의가 없어 원격 저장은 건너뛰었습니다."
+          : "로컬에 저장했습니다. DB 미연결 상태라 원격 저장은 건너뛰었습니다.",
+      );
       return;
     }
 
@@ -1037,6 +1058,14 @@ function App() {
                 </small>
               </span>
             </label>
+            <div className={`db-status-panel ${telemetrySummary.tone}`}>
+              <div>
+                <span>DB 상태</span>
+                <strong>{telemetrySummary.title}</strong>
+              </div>
+              <p>{telemetrySummary.text}</p>
+              <small>세션 코드 {sessionCode}</small>
+            </div>
             <div className="privacy-note">
               <b>데이터 안내</b>
               <p>
