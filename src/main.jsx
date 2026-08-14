@@ -2096,29 +2096,41 @@ function App() {
           </section>
         )}
 
-        <section className="quest-panel" aria-label="현재 플레이 퀘스트">
-          {questSteps.map((quest) => (
-            <article className={quest.complete ? "quest-step complete" : "quest-step"} key={quest.title}>
-              <span>
-                <Check size={15} />
-                {quest.title}
-              </span>
-              <strong>{quest.value}</strong>
-              <p>{quest.text}</p>
-            </article>
-          ))}
-        </section>
-
-        <section className="lab-trace">
-          <div>
-            <span>TRIGGERLAB TRACE</span>
-            <strong>{triggerLabSignals[currentCase] ?? triggerLabSignals.case01}</strong>
+        <details className="insight-drawer quest-drawer">
+          <summary>
+            <span>QUESTS</span>
+            <b>{questSteps.filter((quest) => quest.complete).length}/{questSteps.length} 완료</b>
+          </summary>
+          <div className="quest-panel" aria-label="현재 플레이 퀘스트">
+            {questSteps.map((quest) => (
+              <article className={quest.complete ? "quest-step complete" : "quest-step"} key={quest.title}>
+                <span>
+                  <Check size={15} />
+                  {quest.title}
+                </span>
+                <strong>{quest.value}</strong>
+                <p>{quest.text}</p>
+              </article>
+            ))}
           </div>
-          <p>
-            현재 {log.length}개 선택이 기록됐고, {node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}
-            압박이 다음 장면 조정값으로 남습니다.
-          </p>
-        </section>
+        </details>
+
+        <details className="insight-drawer trace-drawer">
+          <summary>
+            <span>TRIGGERLAB TRACE</span>
+            <b>관찰 항목 보기</b>
+          </summary>
+          <div className="lab-trace">
+            <div>
+              <span>현재 관찰 중</span>
+              <strong>{triggerLabSignals[currentCase] ?? triggerLabSignals.case01}</strong>
+            </div>
+            <p>
+              현재 {log.length}개 선택이 기록됐고, {node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}
+              압박이 다음 장면 조정값으로 남습니다.
+            </p>
+          </div>
+        </details>
 
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
@@ -2181,7 +2193,7 @@ function App() {
           </section>
         )}
 
-        <details className="memo-panel" open>
+        <details className="memo-panel">
           <summary>
             <h2>
               <FileText size={17} />
@@ -2196,14 +2208,11 @@ function App() {
           </ul>
         </details>
 
-        <section className="echo-panel">
-          <div className="panel-title-row">
-            <h2>
-              <MessageSquareText size={17} />
-              에코의 검증 질문
-            </h2>
-            <span>선택을 돕는 조언자가 아니라, 판단의 약점을 드러내는 반론자</span>
-          </div>
+        <details className="echo-panel insight-drawer">
+          <summary>
+            <span>에코의 검증 질문</span>
+            <b>반론 열기</b>
+          </summary>
           <p>{echo}</p>
           <details className="echo-checks">
             <summary>다시 확인할 것</summary>
@@ -2213,7 +2222,7 @@ function App() {
               ))}
             </ul>
           </details>
-        </section>
+        </details>
 
         <section className="choice-panel" id="choice-panel" tabIndex={-1}>
           <div className="choice-heading">
@@ -2462,8 +2471,11 @@ function App() {
           </div>
           <p>{sceneChallenge.text}</p>
         </section>
-        <section>
-          <h2>상황판</h2>
+        <details className="insight-drawer status-drawer">
+          <summary>
+            <span>상황판</span>
+            <b>자원 상세 보기</b>
+          </summary>
           <div className="resource-list">
             {Object.entries(resourceMeta).map(([key, meta]) => {
               const Icon = meta.icon;
@@ -2481,33 +2493,45 @@ function App() {
               );
             })}
           </div>
-        </section>
-        <section>
-          <h2>발언자</h2>
+        </details>
+        <details className="insight-drawer status-drawer">
+          <summary>
+            <span>발언자</span>
+            <b>맥락 보기</b>
+          </summary>
           <div className="speaker-card">
             <strong>{node.speaker}</strong>
             <span>{speakerProfile.role}</span>
             <small>{speakerProfile.appearance}</small>
             <p>{speakerProfile.job}</p>
           </div>
-        </section>
-        <section>
-          <h2>현재 트리거</h2>
+        </details>
+        <details className="insight-drawer status-drawer">
+          <summary>
+            <span>현재 트리거</span>
+            <b>{node.triggers.length}개 활성</b>
+          </summary>
           <div className="trigger-tags">
             {node.triggers.map((trigger) => (
               <span key={trigger}>{triggerLabels[trigger]}</span>
             ))}
           </div>
-        </section>
-        <section>
-          <h2>진행률</h2>
+        </details>
+        <details className="insight-drawer status-drawer">
+          <summary>
+            <span>진행률</span>
+            <b>{progress}%</b>
+          </summary>
           <div className="mini-progress">
             <div style={{ width: `${progress}%` }} />
           </div>
           <p className="status-note">{progress}% · {log.length}개 선택 기록됨</p>
-        </section>
-        <section>
-          <h2>시즌 아크</h2>
+        </details>
+        <details className="insight-drawer status-drawer">
+          <summary>
+            <span>시즌 아크</span>
+            <b>사건 배경</b>
+          </summary>
           <p className="status-note">
             {activeCaseMeta?.label}은 {activeCaseMeta?.summary}
           </p>
@@ -2515,7 +2539,7 @@ function App() {
             완료 {completedCases.length}개 케이스와 현재 로그 {log.length}개가 다음 사건의 압박
             조건으로 누적됩니다.
           </p>
-        </section>
+        </details>
       </aside>
     </main>
   );

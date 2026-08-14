@@ -1470,6 +1470,75 @@ summary:focus-visible {
   border-radius: 8px;
 }
 
+.insight-drawer {
+  margin-top: 12px;
+  padding: 13px 15px;
+  background: #ffffff;
+  border: 1px solid #d8ded7;
+  border-radius: 8px;
+}
+
+.insight-drawer > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.insight-drawer > summary::-webkit-details-marker {
+  display: none;
+}
+
+.insight-drawer > summary::before {
+  content: "+";
+  order: 2;
+  width: 22px;
+  height: 22px;
+  color: #2c4a46;
+  background: #eef1ed;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+.insight-drawer[open] > summary::before {
+  content: "-";
+}
+
+.insight-drawer > summary span {
+  min-width: 0;
+  color: #2c4a46;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.insight-drawer > summary b {
+  margin-left: auto;
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.insight-drawer[open] > summary {
+  margin-bottom: 12px;
+}
+
+.quest-drawer,
+.trace-drawer {
+  background: #f8faf7;
+}
+
+.quest-drawer .quest-panel,
+.trace-drawer .lab-trace {
+  margin: 0;
+}
+
 .memo-panel h2,
 .echo-panel h2,
 .choice-panel h2,
@@ -1526,6 +1595,15 @@ summary:focus-visible {
 .echo-panel {
   background: #fff8e6;
   border-color: #ebd99f;
+}
+
+.echo-panel > summary span {
+  color: #6a5420;
+}
+
+.echo-panel > summary::before {
+  color: #6a5420;
+  background: #fff0bf;
 }
 
 .echo-panel p {
@@ -2373,6 +2451,11 @@ textarea {
 
 .status-board section + section {
   margin-top: 20px;
+}
+
+.status-board > .insight-drawer + .insight-drawer,
+.status-board > .turn-brief + .insight-drawer {
+  margin-top: 10px;
 }
 
 .status-note {
