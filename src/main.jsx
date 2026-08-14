@@ -20,7 +20,12 @@ import {
   Users,
 } from "lucide-react";
 import "./styles.css";
-import { SAVE_SCHEMA_VERSION, STORAGE_KEY } from "./appConfig.js";
+import {
+  FEEDBACK_COMMENT_MAX_LENGTH,
+  FREE_TEXT_MAX_LENGTH,
+  SAVE_SCHEMA_VERSION,
+  STORAGE_KEY,
+} from "./appConfig.js";
 import {
   boardChangePrompts,
   caseObjectives,
@@ -46,6 +51,7 @@ import {
   getFreeTextSignals,
   getGameplayStats,
   getRiskPressure,
+  limitText,
   makeEmptyScores,
   scoreFreeText,
   speechifyChoice,
@@ -236,6 +242,7 @@ function App() {
   const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
   const privacySignals = detectPrivacySignals(freeText);
   const activePrivacySignals = privacySignals.filter((signal) => signal.active);
+  const freeTextBlockedByPrivacy = activePrivacySignals.length > 0;
   const currentAverageResponseTime =
     log.length > 0
       ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
@@ -445,7 +452,7 @@ function App() {
   }
 
   function anonymizeFreeText() {
-    setFreeText(anonymizeSensitiveText(freeText));
+    setFreeText(limitText(anonymizeSensitiveText(freeText), FREE_TEXT_MAX_LENGTH));
   }
 
   function buildCaseSummary(nextTriggers, nextCognition, nextLog) {
@@ -703,11 +710,15 @@ function App() {
   }, [triggers, cognition, log, resources]);
 
   function updateCurrentFeedback(patch) {
+    const normalizedPatch =
+      typeof patch.comment === "string"
+        ? { ...patch, comment: limitText(patch.comment, FEEDBACK_COMMENT_MAX_LENGTH) }
+        : patch;
     const nextFeedback = {
       ...playtestFeedback,
       [currentCase]: {
         ...currentFeedback,
-        ...patch,
+        ...normalizedPatch,
       },
     };
     setPlaytestFeedback(nextFeedback);
@@ -716,9 +727,15 @@ function App() {
   }
 
   async function submitCurrentFeedback() {
+    if (activeFeedbackPrivacySignals.length > 0) {
+      setFeedbackStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 저장해 주세요.");
+      return;
+    }
+
     const savedAt = new Date().toISOString();
     const feedback = {
       ...currentFeedback,
+      comment: limitText(currentFeedback.comment, FEEDBACK_COMMENT_MAX_LENGTH),
       savedAt,
     };
     const nextFeedback = {
@@ -751,6 +768,15 @@ function App() {
     }
   }
 
+  function anonymizeFeedbackComment() {
+    updateCurrentFeedback({
+      comment: limitText(
+        anonymizeSensitiveText(currentFeedback.comment),
+        FEEDBACK_COMMENT_MAX_LENGTH,
+      ),
+    });
+  }
+
   const progress = isResult
     ? 100
     : Math.round(((activeNodeOrder.indexOf(resolvedNodeId) + 1) / activeNodeOrder.length) * 100);
@@ -763,6 +789,8 @@ function App() {
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
   const resultRank = gameplayRank;
+  const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
+  const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
   const screenReaderStatus = isResult
     ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 모멘텀 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
     : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
@@ -1247,14 +1275,48 @@ function App() {
             <textarea
               value={currentFeedback.comment}
               onChange={(event) => updateCurrentFeedback({ comment: event.target.value })}
+              maxLength={FEEDBACK_COMMENT_MAX_LENGTH}
               placeholder="막힌 장면, 이해되지 않은 용어, 다시 보고 싶은 선택지를 짧게 남겨주세요."
+              aria-label="플레이테스트 피드백 자유 의견"
+              aria-describedby={
+                activeFeedbackPrivacySignals.length > 0
+                  ? "feedback-input-note feedback-privacy-warning"
+                  : "feedback-input-note"
+              }
             />
-            <p className="input-note">
-              실명, 연락처, 회사명, 실제 사건 관계자 이름은 적지 마세요.
+            <p className="input-note" id="feedback-input-note">
+              실명, 연락처, 회사명, 실제 사건 관계자 이름은 적지 마세요. {currentFeedback.comment.length}/
+              {FEEDBACK_COMMENT_MAX_LENGTH}
             </p>
+            {activeFeedbackPrivacySignals.length > 0 && (
+              <div className="privacy-warning" id="feedback-privacy-warning" role="alert">
+                <strong>피드백에 식별 정보로 보일 수 있는 표현이 있습니다.</strong>
+                <p>
+                  감지 항목: {activeFeedbackPrivacySignals.map((signal) => signal.label).join(" / ")}.
+                  저장하려면 인터뷰 기록과 원격 DB에 남기기 전에 익명 표현으로 바꿔주세요.
+                </p>
+                <button type="button" onClick={anonymizeFeedbackComment}>
+                  피드백 익명화
+                </button>
+              </div>
+            )}
             <div className="feedback-actions">
-              <button onClick={submitCurrentFeedback}>피드백 저장</button>
-              {feedbackStatus && <span>{feedbackStatus}</span>}
+              <button
+                onClick={submitCurrentFeedback}
+                disabled={activeFeedbackPrivacySignals.length > 0}
+                aria-label={
+                  activeFeedbackPrivacySignals.length > 0
+                    ? "식별 정보로 보일 수 있는 표현을 익명화해야 피드백을 저장할 수 있습니다."
+                    : "피드백 저장"
+                }
+              >
+                피드백 저장
+              </button>
+              {feedbackStatus && (
+                <span role="status" aria-live="polite">
+                  {feedbackStatus}
+                </span>
+              )}
             </div>
           </section>
           <section className="bars-panel">
@@ -1350,7 +1412,7 @@ function App() {
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {screenReaderStatus}
       </p>
-        <section className="game-board">
+      <section className="game-board">
         <section className="mission-strip">
           <div>
             <span>현재 목표</span>
@@ -1638,19 +1700,25 @@ function App() {
               <textarea
                 value={freeText}
                 onChange={(event) => setFreeText(event.target.value)}
+                maxLength={FREE_TEXT_MAX_LENGTH}
                 placeholder="예: 누구를 새로 협상장에 부를지, 어떤 조건을 교환할지, 어떤 정보를 먼저 확인할지 적는다."
                 aria-label="구조 재설계 자유입력"
-                aria-describedby="reframe-input-note"
+                aria-describedby={
+                  freeTextBlockedByPrivacy
+                    ? "reframe-input-note reframe-privacy-warning"
+                    : "reframe-input-note"
+                }
               />
               <p className="input-note" id="reframe-input-note">
-                자유입력은 로그에 남을 수 있습니다. 실제 개인정보나 식별 가능한 회사명은 쓰지 마세요.
+                자유입력은 로그에 남을 수 있습니다. 실제 개인정보나 식별 가능한 회사명은 쓰지 마세요.{" "}
+                {freeText.length}/{FREE_TEXT_MAX_LENGTH}
               </p>
               {activePrivacySignals.length > 0 && (
-                <div className="privacy-warning" role="alert">
+                <div className="privacy-warning" id="reframe-privacy-warning" role="alert">
                   <strong>식별 정보로 보일 수 있는 표현이 있습니다.</strong>
                   <p>
                     감지 항목: {activePrivacySignals.map((signal) => signal.label).join(" / ")}.
-                    실제 이름, 연락처, 회사명은 가상의 역할명이나 익명 표현으로 바꿔주세요.
+                    제출하려면 실제 이름, 연락처, 회사명을 가상의 역할명이나 익명 표현으로 바꿔주세요.
                   </p>
                   <button type="button" onClick={anonymizeFreeText}>
                     감지 표현 익명화
@@ -1735,11 +1803,13 @@ function App() {
               <button
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
-                disabled={!freeText.trim() || isAdvancing}
+                disabled={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
                 aria-label={
-                  freeText.trim()
-                    ? `구조 재설계 제출. ${freeText.trim()}`
-                    : "구조 재설계 내용을 입력해야 제출할 수 있습니다."
+                  freeTextBlockedByPrivacy
+                    ? "식별 정보로 보일 수 있는 표현을 익명화해야 구조 재설계를 제출할 수 있습니다."
+                    : freeText.trim()
+                      ? `구조 재설계 제출. ${freeText.trim()}`
+                      : "구조 재설계 내용을 입력해야 제출할 수 있습니다."
                 }
               >
                 <span className="choice-main">

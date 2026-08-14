@@ -104,10 +104,13 @@ export function createCaseSummary(
   return summary;
 }
 
-const emailPattern = /[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+/;
-const phonePattern = /01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/;
-const organizationPattern =
-  /(주식회사|\(주\)|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))/i;
+const emailPatternSource = String.raw`[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+`;
+const phonePatternSource = String.raw`01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}`;
+const organizationPatternSource = String.raw`((주식회사|\(주\))\s*[가-힣A-Za-z0-9]+?(?=(과|와|에|에서|에게|으로|로|은|는|이|가|을|를|,|\.|\s|$))|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))`;
+
+const emailPattern = new RegExp(emailPatternSource);
+const phonePattern = new RegExp(phonePatternSource);
+const organizationPattern = new RegExp(organizationPatternSource, "i");
 
 export function detectPrivacySignals(text = "") {
   return [
@@ -119,12 +122,14 @@ export function detectPrivacySignals(text = "") {
 
 export function anonymizeSensitiveText(text = "") {
   return text
-    .replace(/[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+/g, "익명 이메일")
-    .replace(/01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/g, "익명 연락처")
-    .replace(
-      /(주식회사|\(주\)|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))/gi,
-      "익명 조직",
-    );
+    .replace(new RegExp(emailPatternSource, "g"), "익명 이메일")
+    .replace(new RegExp(phonePatternSource, "g"), "익명 연락처")
+    .replace(new RegExp(organizationPatternSource, "gi"), "익명 조직");
+}
+
+export function limitText(text = "", maxLength = 0) {
+  if (!Number.isFinite(maxLength) || maxLength <= 0) return "";
+  return String(text).slice(0, maxLength);
 }
 
 export function getEcho(choiceId, freeText) {

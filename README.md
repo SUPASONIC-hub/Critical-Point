@@ -164,6 +164,7 @@ Render에 환경변수를 추가한 뒤 `Manual Deploy` 또는 GitHub push로 �
 
 - [supabase/analysis.sql](./supabase/analysis.sql)을 Supabase SQL Editor에서 실행한다.
 - 케이스별 완료 수, 로그 스키마 버전, 평균 응답 시간, 자유입력 수, 평균 모멘텀, 랭크 분포, 챌린지 달성률, 트리거 분포, 오래 고민한 장면, 피드백 점수를 확인할 수 있다.
+- 분석 쿼리는 오래된 로그나 수동 보정 JSON에 비숫자 값이 섞여도 해당 값을 건너뛰도록 구성했다.
 - 삭제 요청이 들어오면 파일 하단의 `delete` 쿼리에 8자리 세션 코드를 넣어 실행한다.
 
 배포 후 확인:

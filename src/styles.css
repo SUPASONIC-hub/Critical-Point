@@ -76,6 +76,7 @@ summary:focus-visible {
 .shell {
   min-height: 100vh;
   padding: 28px;
+  width: 100%;
 }
 
 .intro-shell {
@@ -127,12 +128,18 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .brand-row,
 .topbar,
 .game-header {
   justify-content: space-between;
+}
+
+.top-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .brand-mark,
@@ -318,6 +325,8 @@ summary:focus-visible {
 }
 
 .intro-brief article {
+  display: grid;
+  align-content: start;
   min-height: 132px;
   padding: 14px;
   color: #ffffff;
@@ -429,6 +438,8 @@ summary:focus-visible {
 }
 
 .case-card {
+  display: grid;
+  align-content: start;
   min-height: 172px;
   padding: 14px;
   color: #dce5df;
@@ -463,7 +474,9 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   min-height: 20px;
+  min-width: 0;
 }
 
 .case-card.active-case span {
@@ -486,6 +499,7 @@ summary:focus-visible {
   font-size: 11px;
   font-weight: 900;
   line-height: 1.2;
+  flex: 0 0 auto;
 }
 
 .active-case .case-status-chip {
@@ -504,6 +518,7 @@ summary:focus-visible {
   margin: 12px 0 8px;
   font-size: 20px;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .case-card b {
@@ -516,6 +531,7 @@ summary:focus-visible {
   margin: 0;
   font-size: 13px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .case-result-mini {
@@ -571,6 +587,7 @@ summary:focus-visible {
 }
 
 .start-input-row button {
+  flex: 0 0 auto;
   height: 48px;
   padding: 0 18px;
   background: #d9ff62;
@@ -599,6 +616,7 @@ summary:focus-visible {
 .consent-box span {
   display: grid;
   gap: 4px;
+  min-width: 0;
 }
 
 .consent-box b {
@@ -717,9 +735,9 @@ summary:focus-visible {
 
 .game-shell {
   display: grid;
-  grid-template-columns: minmax(640px, 860px) 320px;
+  grid-template-columns: minmax(0, 860px) minmax(280px, 320px);
   gap: 22px;
-  width: min(1220px, 100%);
+  width: min(1240px, 100%);
   margin: 0 auto;
   align-items: start;
   justify-content: center;
@@ -737,6 +755,7 @@ summary:focus-visible {
 
 .game-board {
   padding: 24px;
+  min-width: 0;
 }
 
 .mission-strip {
@@ -747,6 +766,8 @@ summary:focus-visible {
 }
 
 .mission-strip div {
+  display: grid;
+  align-content: start;
   min-height: 74px;
   padding: 13px;
   background: #f4f6f3;
@@ -768,6 +789,7 @@ summary:focus-visible {
   display: block;
   margin-top: 7px;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .play-help {
@@ -808,7 +830,12 @@ summary:focus-visible {
 }
 
 .game-header {
+  align-items: flex-start;
   margin-bottom: 22px;
+}
+
+.game-header > div {
+  min-width: 0;
 }
 
 .progress-wrap,
@@ -839,6 +866,7 @@ summary:focus-visible {
   margin: 10px 0 0;
   font-size: 34px;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .ghost {
@@ -856,6 +884,8 @@ summary:focus-visible {
 }
 
 .game-hud article {
+  display: grid;
+  align-content: start;
   min-height: 82px;
   padding: 12px;
   background: #f4f6f3;
@@ -1027,6 +1057,7 @@ summary:focus-visible {
   background: #18201f;
   color: #ffffff;
   border-radius: 8px;
+  overflow: hidden;
 }
 
 .scene-visual {
@@ -1384,6 +1415,7 @@ summary:focus-visible {
 .choices {
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .choice-heading {
@@ -1411,6 +1443,7 @@ summary:focus-visible {
 .choice {
   display: grid;
   grid-template-columns: 1fr;
+  min-width: 0;
   min-height: 48px;
   padding: 10px 14px;
   justify-content: flex-start;
@@ -1425,6 +1458,11 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.choice-main svg {
+  flex: 0 0 auto;
 }
 
 .choice-effect {
@@ -1439,6 +1477,7 @@ summary:focus-visible {
 .choice-action {
   display: block;
   width: fit-content;
+  max-width: calc(100% - 24px);
   margin-top: 8px;
   margin-left: 24px;
   padding: 4px 7px;
@@ -1469,6 +1508,7 @@ summary:focus-visible {
 .challenge-match {
   display: block;
   width: fit-content;
+  max-width: calc(100% - 24px);
   margin-top: 7px;
   margin-left: 24px;
   padding: 5px 8px;
@@ -1508,6 +1548,7 @@ summary:focus-visible {
 .choice-risk {
   display: block;
   width: fit-content;
+  max-width: calc(100% - 24px);
   margin-top: 7px;
   margin-left: 24px;
   padding: 5px 8px;
@@ -1836,6 +1877,7 @@ textarea {
 
 .status-board {
   height: fit-content;
+  min-width: 0;
   position: sticky;
   top: 22px;
   padding: 18px;
@@ -1950,6 +1992,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   min-height: 42px;
   padding: 0 10px;
   background: #f4f6f3;
@@ -1961,12 +2004,18 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .resource span {
+  overflow-wrap: anywhere;
   font-size: 12px;
   font-weight: 800;
   color: #52605b;
+}
+
+.resource b {
+  flex: 0 0 auto;
 }
 
 .status-board section + section {
@@ -1978,6 +2027,8 @@ textarea {
   color: #52605b;
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .trigger-tags {
@@ -1989,11 +2040,13 @@ textarea {
   background: #e8eee9;
   border-radius: 6px;
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .result-page {
   width: min(1180px, 100%);
   margin: 0 auto;
+  min-width: 0;
 }
 
 .result-page .topbar {
@@ -2030,6 +2083,7 @@ textarea {
   background: #d9ff62;
   color: #18201f;
   border-radius: 8px;
+  min-width: 0;
 }
 
 .rank-mark span,
@@ -2048,6 +2102,7 @@ textarea {
 
 .rank-copy {
   align-self: center;
+  min-width: 0;
 }
 
 .rank-copy span {
@@ -2058,6 +2113,7 @@ textarea {
   margin: 8px 0 10px;
   font-size: 28px;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .rank-copy p {
@@ -2070,6 +2126,7 @@ textarea {
 .score-breakdown {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .score-breakdown article {
@@ -2161,6 +2218,10 @@ textarea {
   border-radius: 8px;
 }
 
+.next-case-panel > div {
+  min-width: 0;
+}
+
 .next-case-panel span {
   color: #2c4a46;
   font-size: 12px;
@@ -2171,6 +2232,7 @@ textarea {
   margin: 7px 0 6px;
   font-size: 26px;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .next-case-panel p {
@@ -2188,6 +2250,7 @@ textarea {
 .next-case-panel small {
   display: block;
   width: fit-content;
+  max-width: 100%;
   margin-top: 12px;
   padding: 6px 8px;
   color: #ffffff;
@@ -2225,6 +2288,10 @@ textarea {
   border-radius: 8px;
 }
 
+.session-panel > div {
+  min-width: 0;
+}
+
 .session-panel span {
   color: #52605b;
   font-size: 12px;
@@ -2236,6 +2303,7 @@ textarea {
   margin: 5px 0;
   font-size: 30px;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .session-panel p {
@@ -2375,6 +2443,7 @@ textarea {
 .feedback-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 10px;
 }
@@ -2389,10 +2458,16 @@ textarea {
   font-weight: 900;
 }
 
+.feedback-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .feedback-actions span {
   color: #52605b;
   font-size: 13px;
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .bar-row {
@@ -2608,12 +2683,16 @@ textarea {
 
   .game-shell {
     grid-template-columns: 1fr;
-    width: min(760px, 100%);
+    width: min(820px, 100%);
   }
 
   .status-board {
     position: static;
-    order: -1;
+    order: 2;
+  }
+
+  .game-board {
+    order: 1;
   }
 
   .result-grid {
@@ -2723,6 +2802,19 @@ textarea {
     flex-direction: column;
   }
 
+  .top-actions,
+  .top-actions .ghost,
+  .start-input-row button,
+  .next-case-panel button,
+  .session-panel button,
+  .feedback-actions button {
+    width: 100%;
+  }
+
+  .top-actions {
+    justify-content: stretch;
+  }
+
   .memo-panel ul,
   .result-grid,
   .case-roadmap,
@@ -2742,6 +2834,14 @@ textarea {
   .rank-panel,
   .score-breakdown {
     grid-template-columns: 1fr;
+  }
+
+  .rank-mark {
+    min-height: 118px;
+  }
+
+  .rank-mark strong {
+    font-size: 64px;
   }
 
   .turn-brief > div {

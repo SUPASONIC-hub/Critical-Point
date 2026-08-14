@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   anonymizeSensitiveText,
@@ -7,13 +8,21 @@ import {
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
+  limitText,
   speechifyChoice,
 } from "../src/gameLogic.js";
-import { SAVE_SCHEMA_VERSION, STORAGE_KEY } from "../src/appConfig.js";
+import {
+  FEEDBACK_COMMENT_MAX_LENGTH,
+  FREE_TEXT_MAX_LENGTH,
+  SAVE_SCHEMA_VERSION,
+  STORAGE_KEY,
+} from "../src/appConfig.js";
 import { initialResources } from "../src/gameData.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
+assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
+assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
 
 const riskyResources = {
   time: 40,
@@ -143,6 +152,53 @@ assert.equal(
   anonymizeSensitiveText(sensitiveText),
   "담당자는 익명 이메일, 익명 연락처, 익명 조직에 공유한다.",
   "privacy anonymizer should replace direct identifiers",
+);
+assert.equal(
+  anonymizeSensitiveText("주식회사 세림과 (주)하람에 확인한다."),
+  "익명 조직과 익명 조직에 확인한다.",
+  "privacy anonymizer should remove organization names after company prefixes",
+);
+assert.deepEqual(
+  detectPrivacySignals("주식회사 세림과 회의했다.")
+    .filter((signal) => signal.active)
+    .map((signal) => signal.label),
+  ["회사·조직명"],
+  "privacy detector should flag prefixed organization names",
+);
+assert.deepEqual(
+  detectPrivacySignals("회사 정책과 전자 문서를 다시 검토한다.")
+    .filter((signal) => signal.active)
+    .map((signal) => signal.label),
+  [],
+  "privacy detector should not flag generic business terms as organizations",
+);
+assert.equal(
+  anonymizeSensitiveText("회사 정책과 전자 문서를 다시 검토한다."),
+  "회사 정책과 전자 문서를 다시 검토한다.",
+  "privacy anonymizer should keep generic business terms unchanged",
+);
+assert.equal(limitText("abcdef", 3), "abc", "text limiter should truncate long input");
+assert.equal(limitText("abcdef", 0), "", "text limiter should return empty text for invalid limits");
+
+const analysisSql = readFileSync(new URL("../supabase/analysis.sql", import.meta.url), "utf8");
+[
+  "nullif(summary ->> 'averageResponseTime', '')::numeric",
+  "nullif(summary ->> 'freeCount', '')::numeric",
+  "(log_item ->> 'responseTimeSec')::integer as response_seconds",
+  "round(avg((resources ->> 'time')::numeric), 1)",
+].forEach((unsafePattern) => {
+  assert.ok(
+    !analysisSql.includes(unsafePattern),
+    `analysis SQL should guard JSON casts instead of using ${unsafePattern}`,
+  );
+});
+assert.ok(
+  analysisSql.includes("when summary ->> 'averageResponseTime' ~"),
+  "analysis SQL should guard summary numeric casts",
+);
+assert.ok(
+  analysisSql.includes("when resources ->> 'time' ~"),
+  "analysis SQL should guard resource numeric casts",
 );
 
 console.log("Smoke tests passed");
