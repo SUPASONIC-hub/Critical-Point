@@ -1783,6 +1783,29 @@ summary:focus-visible {
   color: #24302e;
 }
 
+.tactical-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 34px;
+  margin: 0 0 12px auto;
+  padding: 0 10px;
+  color: #2c4a46;
+  background: #eef1ed;
+  border: 1px solid #d8ded7;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.tactical-toggle:hover,
+.tactical-toggle:focus-visible {
+  color: #18201f;
+  background: #d9ff62;
+  border-color: #c0ea4b;
+}
+
 .choice {
   display: grid;
   grid-template-columns: 1fr;
@@ -1918,6 +1941,16 @@ summary:focus-visible {
   font-weight: 900;
   line-height: 1.45;
   overflow-wrap: anywhere;
+}
+
+.choice-intuition-hint {
+  display: block;
+  margin-top: 8px;
+  margin-left: 24px;
+  color: #52605b;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.35;
 }
 
 .challenge-match {

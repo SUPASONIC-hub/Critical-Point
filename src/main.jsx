@@ -359,6 +359,7 @@ function App() {
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [decisionSeconds, setDecisionSeconds] = useState(45);
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
+  const [showTacticalDetails, setShowTacticalDetails] = useState(false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -444,17 +445,19 @@ function App() {
   const activeBonus =
     log.at(-1)?.title === "CRISIS PROTOCOL"
       ? "구조 개입"
-      : log.at(-1)?.tempoBonus
-      ? "QUICK READ"
-      : freeTextCombo >= 2
-      ? "판 바꾸기 보너스"
-      : currentChallengeStreak >= 2
-        ? "연속 챌린지 보너스"
-      : currentAverageResponseTime >= 20
-        ? "숙고 보너스"
-        : log.length >= 3
-          ? "연속 판단 보너스"
-          : "보너스 대기";
+      : log.at(-1)?.instinctSurge
+        ? "INSTINCT SURGE"
+        : log.at(-1)?.tempoBonus
+          ? "QUICK READ"
+          : freeTextCombo >= 2
+            ? "판 바꾸기 보너스"
+            : currentChallengeStreak >= 2
+              ? "연속 챌린지 보너스"
+              : currentAverageResponseTime >= 20
+                ? "숙고 보너스"
+                : log.length >= 3
+                  ? "연속 판단 보너스"
+                  : "보너스 대기";
   const sceneChallenge =
     riskPressure >= 35
       ? {
@@ -678,6 +681,7 @@ function App() {
       window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
       sceneTitleRef.current?.focus({ preventScroll: true });
       setIsAdvancing(false);
+      setShowTacticalDetails(false);
     });
   }, [started, currentCase, nodeId, isResult]);
 
@@ -945,6 +949,14 @@ function App() {
       finalResources: nextResources,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
+    const instinctChoice = !showTacticalDetails;
+    const instinctSurge = instinctChoice && challengeMatch
+      ? {
+          label: "INSTINCT SURGE",
+          text: "정보를 더 열어보지 않고 장면의 핵심 압박을 읽었습니다.",
+          effect: { trust: 2, fatigue: -1 },
+        }
+      : null;
     const quickRead = responseTimeSec <= 12 && challengeMatch;
     const tempoBonus = quickRead
       ? {
@@ -953,7 +965,11 @@ function App() {
           effect: { trust: 1, fatigue: -1 },
         }
       : null;
-    const finalEffect = tempoBonus ? mergeEffects(effect, tempoBonus.effect) : effect;
+    const finalEffect = mergeEffects(
+      effect,
+      ...(tempoBonus ? [tempoBonus.effect] : []),
+      ...(instinctSurge ? [instinctSurge.effect] : []),
+    );
     const finalResourcesWithTempo = applyEffect(resources, finalEffect);
     const nextTriggers = { ...triggers };
     const nextCognition = { ...cognition };
@@ -983,6 +999,7 @@ function App() {
       tactical: tacticalRead,
       flowSurge,
       tempoBonus,
+      instinctSurge,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -2235,11 +2252,21 @@ function App() {
               <span>이번 턴 공략</span>
               <strong>{sceneChallenge.title}</strong>
               <p>
-                전술 등급은 챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 함께 계산한
-                빠른 판단 지표입니다.
+                {showTacticalDetails
+                  ? "챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 계산한 전술 정보입니다."
+                  : "먼저 장면과 대화만 보고 판단해 보세요. 필요한 경우 전술 정보를 열 수 있습니다."}
               </p>
             </div>
           </div>
+          <button
+            type="button"
+            className="tactical-toggle"
+            onClick={() => setShowTacticalDetails((value) => !value)}
+            aria-expanded={showTacticalDetails}
+          >
+            <Info size={15} />
+            {showTacticalDetails ? "전술 정보 닫기" : "전술 정보 열기"}
+          </button>
           <div className="choices">
             {fixedChoices.map((choice) => {
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
@@ -2267,46 +2294,55 @@ function App() {
                     <Check size={16} />
                     {getDramaticChoiceLabel(choice)}
                   </span>
-                  <span className="choice-tactical">
-                    <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
-                      {tacticalRead.grade}
-                    </b>
-                    <span>
-                      <strong>{tacticalRead.gradeText}</strong>
-                      <small>{tacticalRead.reward} · 보상 {tacticalRead.gain} · 비용 {tacticalRead.cost}</small>
-                    </span>
-                  </span>
                   <span className="choice-action">{choice.label}</span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
-                  {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
-                  {choiceRead.flowSurge && (
-                    <span className="choice-surge">
-                      {choiceRead.flowSurge.label} · {explainResourceTradeoff(choiceRead.flowSurge.effect)}
-                    </span>
+                  {showTacticalDetails && (
+                    <>
+                      <span className="choice-tactical">
+                        <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
+                          {tacticalRead.grade}
+                        </b>
+                        <span>
+                          <strong>{tacticalRead.gradeText}</strong>
+                          <small>{tacticalRead.reward} · 보상 {tacticalRead.gain} · 비용 {tacticalRead.cost}</small>
+                        </span>
+                      </span>
+                      {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
+                      {choiceRead.flowSurge && (
+                        <span className="choice-surge">
+                          {choiceRead.flowSurge.label} · {explainResourceTradeoff(choiceRead.flowSurge.effect)}
+                        </span>
+                      )}
+                      <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
+                      {choice.effect && (
+                        <span className="choice-tradeoff">
+                          {explainResourceTradeoff(choice.effect)}
+                        </span>
+                      )}
+                      {choice.effect && (
+                        <span className={`choice-risk ${riskClass}`}>
+                          {riskLabel} · 예상 압력 {projectedRisk}
+                        </span>
+                      )}
+                      {choice.effect && (
+                        <span className="choice-effect">
+                          {Object.entries(choiceRead.finalEffect)
+                            .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
+                            .join(" · ")}
+                        </span>
+                      )}
+                      {choice.cognition && (
+                        <span className="choice-cognition">
+                          {Object.entries(choice.cognition)
+                            .map(([key, value]) => `${cognitionLabels[key] ?? key} +${value}`)
+                            .join(" · ")}
+                        </span>
+                      )}
+                    </>
                   )}
-                  <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
-                  {choice.effect && (
-                    <span className="choice-tradeoff">
-                      {explainResourceTradeoff(choice.effect)}
-                    </span>
-                  )}
-                  {choice.effect && (
-                    <span className={`choice-risk ${riskClass}`}>
-                      {riskLabel} · 예상 압력 {projectedRisk}
-                    </span>
-                  )}
-                  {choice.effect && (
-                    <span className="choice-effect">
-                      {Object.entries(choiceRead.finalEffect)
-                        .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
-                        .join(" · ")}
-                    </span>
-                  )}
-                  {choice.cognition && (
-                    <span className="choice-cognition">
-                      {Object.entries(choice.cognition)
-                        .map(([key, value]) => `${cognitionLabels[key] ?? key} +${value}`)
-                        .join(" · ")}
+                  {!showTacticalDetails && (
+                    <span className="choice-intuition-hint">
+                      직관 선택 · 챌린지 적중 시 INSTINCT SURGE
                     </span>
                   )}
                 </button>
