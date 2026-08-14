@@ -35,9 +35,11 @@ import {
   applyEffect,
   buildSceneBeat,
   clamp,
+  explainResourceTradeoff,
   getChoiceSubtext,
   getDramaticChoiceLabel,
   getEcho,
+  getFreeTextSignals,
   makeEmptyScores,
   scoreFreeText,
 } from "./gameLogic.js";
@@ -63,6 +65,59 @@ const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
 
+const nextCaseSignals = {
+  case01: {
+    eyebrow: "NEXT CASE UNLOCKED",
+    caseId: "case02",
+    title: "CASE 02 - FALSE SIGNAL",
+    button: "CASE 02 시작",
+    premise:
+      "동료가 내부 정보 유출자로 지목됩니다. 증거는 명확하지만, 사람의 맥락은 다른 이야기를 합니다.",
+    hook:
+      "트리거랩은 방금 당신이 손실을 누구에게 먼저 배분했는지 기록했습니다. 다음 사건에서는 그 기준이 사람을 믿을지, 기록을 믿을지의 압박으로 바뀝니다.",
+  },
+  case02: {
+    eyebrow: "NEXT CASE UNLOCKED",
+    caseId: "case03",
+    title: "CASE 03 - RED TEAM",
+    button: "CASE 03 시작",
+    premise:
+      "오진우와 같은 자료를 받고 동시에 해결안을 냅니다. 이번에는 경쟁심이 판단을 빠르게 만드는지, 얕게 만드는지 확인합니다.",
+    hook:
+      "당신이 증거와 신뢰 사이에서 망설인 시간은 다음 테스트의 난이도가 됩니다. 오진우는 그 망설임을 점수판으로 바꿔 보여줄 것입니다.",
+  },
+  case03: {
+    eyebrow: "NEXT CASE UNLOCKED",
+    caseId: "case04",
+    title: "CASE 04 - THE PRICE",
+    button: "CASE 04 시작",
+    premise:
+      "작은 규칙 위반이 수천 명을 살릴 수 있습니다. 이번에는 좋은 결과가 절차 훼손을 어디까지 정당화하는지 묻습니다.",
+    hook:
+      "경쟁 압박 속에서 당신이 줄인 검증과 남긴 근거가 분리됩니다. 다음 사건은 좋은 결과를 얻기 위해 어느 선까지 넘을 수 있는지 묻습니다.",
+  },
+  case04: {
+    eyebrow: "NEXT CASE UNLOCKED",
+    caseId: "case05",
+    title: "CASE 05 - NO ONE TO BLAME",
+    button: "CASE 05 시작",
+    premise:
+      "명백한 악인은 없습니다. 모두가 합리적으로 움직였지만 시스템은 가장 조용한 사람들을 밀어냈습니다.",
+    hook:
+      "명분 있는 예외를 허용한 기록은 사라지지 않습니다. 다음 사건에서는 누구도 규칙을 어기지 않았는데도 피해가 생깁니다.",
+  },
+  case05: {
+    eyebrow: "FINAL CASE UNLOCKED",
+    caseId: "final",
+    title: "FINAL - TRIGGER LAB",
+    button: "FINAL 시작",
+    premise:
+      "모든 사건의 로그가 하나의 폴더로 연결됩니다. 이제 트리거랩이 당신의 사고 조건을 어떻게 사용했는지 마주합니다.",
+    hook:
+      "악인이 없는 실패까지 통과한 뒤, 남는 것은 사건이 아니라 당신의 반응 패턴입니다. 마지막 폴더에는 그 패턴이 사건 설계에 쓰인 흔적이 있습니다.",
+  },
+};
+
 const playGuideItems = [
   {
     title: "에코",
@@ -81,6 +136,15 @@ const playGuideItems = [
     text: "플레이어가 오래 멈추거나 원칙을 바꾸는 압박 조건입니다. 결과와 다음 사건의 연결 단서가 됩니다.",
   },
 ];
+
+const triggerLabSignals = {
+  case01: "관찰 항목: 손실 배분 순서, 보호 대상, 공개 지연 허용선",
+  case02: "관찰 항목: 로그 신뢰도, 관계 신뢰도, 절차 밖 확인 허용선",
+  case03: "관찰 항목: 경쟁 상황의 검증 생략, 속도 보상 반응, 점수판 민감도",
+  case04: "관찰 항목: 좋은 결과를 위한 예외 허용선, 기록 은폐 저항, 공개 감사 선호",
+  case05: "관찰 항목: 단일 책임 욕구, 구조 실패 인내, 조용한 피해자 감지",
+  final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
+};
 
 function App() {
   const saved = useMemo(() => {
@@ -150,6 +214,8 @@ function App() {
   const fixedChoices = node?.choices?.filter((choice) => choice.type !== "free") ?? [];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
   const latestBeat = log.at(-1)?.sceneBeat ?? "";
+  const freeTextSignals = getFreeTextSignals(freeText);
+  const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
     difficulty: "",
@@ -539,6 +605,32 @@ function App() {
   const completedCaseResultList = seasonCasesBase
     .filter((caseItem) => caseResults[caseItem.id])
     .map((caseItem) => ({ ...caseItem, result: caseResults[caseItem.id] }));
+  const nextCaseSignal = nextCaseSignals[currentCase];
+  const resultBridge =
+    result.longestDecision
+      ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
+      : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
+  function getSceneLineType(line) {
+    if (line.startsWith("'")) return "thought-line";
+    if (line.startsWith('"')) return "spoken-line";
+    return "narration-line";
+  }
+
+  function renderSceneLines(text) {
+    return text.split("\n").map((line) => (
+      <p className={getSceneLineType(line)} key={line}>
+        {line}
+      </p>
+    ));
+  }
+
+  function getEchoChecks(currentNode) {
+    const memoChecks = (currentNode?.memo ?? []).slice(0, 2);
+    const triggerCheck = currentNode?.triggers?.[0]
+      ? `${triggerLabels[currentNode.triggers[0]]} 압박 때문에 생략한 근거가 있는지 확인`
+      : "방금 판단에서 빠진 이해관계자 확인";
+    return [...memoChecks, triggerCheck];
+  }
 
   if (!started) {
     return (
@@ -735,83 +827,18 @@ function App() {
               {copyStatus || "코드 복사"}
             </button>
           </section>
-          {currentCase === "case01" && (
+          {nextCaseSignal && (
             <section className="next-case-panel">
               <div>
-                <span>NEXT CASE UNLOCKED</span>
-                <h2>CASE 02 — FALSE SIGNAL</h2>
-                <p>
-                  동료가 내부 정보 유출자로 지목됩니다. 증거는 명확하지만, 사람의 맥락은
-                  다른 이야기를 합니다.
-                </p>
+                <span>{nextCaseSignal.eyebrow}</span>
+                <h2>{nextCaseSignal.title}</h2>
+                <p>{nextCaseSignal.premise}</p>
+                <p className="next-case-hook">{nextCaseSignal.hook}</p>
+                <small>{resultBridge}</small>
               </div>
-              <button onClick={() => startCase("case02")}>
+              <button onClick={() => startCase(nextCaseSignal.caseId)}>
                 <ChevronRight size={18} />
-                CASE 02 시작
-              </button>
-            </section>
-          )}
-          {currentCase === "case02" && (
-            <section className="next-case-panel">
-              <div>
-                <span>NEXT CASE UNLOCKED</span>
-                <h2>CASE 03 — RED TEAM</h2>
-                <p>
-                  오진우와 같은 자료를 받고 동시에 해결안을 냅니다. 이번에는 경쟁심이
-                  판단을 빠르게 만드는지, 얕게 만드는지 확인합니다.
-                </p>
-              </div>
-              <button onClick={() => startCase("case03")}>
-                <ChevronRight size={18} />
-                CASE 03 시작
-              </button>
-            </section>
-          )}
-          {currentCase === "case03" && (
-            <section className="next-case-panel">
-              <div>
-                <span>NEXT CASE UNLOCKED</span>
-                <h2>CASE 04 — THE PRICE</h2>
-                <p>
-                  작은 규칙 위반이 수천 명을 살릴 수 있습니다. 이번에는 좋은 결과가
-                  절차 훼손을 어디까지 정당화하는지 묻습니다.
-                </p>
-              </div>
-              <button onClick={() => startCase("case04")}>
-                <ChevronRight size={18} />
-                CASE 04 시작
-              </button>
-            </section>
-          )}
-          {currentCase === "case04" && (
-            <section className="next-case-panel">
-              <div>
-                <span>NEXT CASE UNLOCKED</span>
-                <h2>CASE 05 — NO ONE TO BLAME</h2>
-                <p>
-                  명백한 악인은 없습니다. 모두가 합리적으로 움직였지만 시스템은 가장
-                  조용한 사람들을 밀어냈습니다.
-                </p>
-              </div>
-              <button onClick={() => startCase("case05")}>
-                <ChevronRight size={18} />
-                CASE 05 시작
-              </button>
-            </section>
-          )}
-          {currentCase === "case05" && (
-            <section className="next-case-panel">
-              <div>
-                <span>FINAL CASE UNLOCKED</span>
-                <h2>FINAL — TRIGGER LAB</h2>
-                <p>
-                  모든 사건의 로그가 하나의 폴더로 연결됩니다. 이제 트리거랩이 당신의
-                  사고 조건을 어떻게 사용했는지 마주합니다.
-                </p>
-              </div>
-              <button onClick={() => startCase("final")}>
-                <ChevronRight size={18} />
-                FINAL 시작
+                {nextCaseSignal.button}
               </button>
             </section>
           )}
@@ -820,36 +847,48 @@ function App() {
               <h2>Primary Trigger</h2>
               <strong>{triggerLabels[result.primary[0]]}</strong>
               <p>
-                이 조건이 등장한 뒤 선택 유지, 정보 탐색, 자유입력, 반론 대응이 가장 크게
-                증가했습니다.
+                {result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다.
+                이후 선택 로그는 이 조건을 중심으로 다음 사건에 반영됩니다.
               </p>
             </section>
             <section className="report-section">
               <h2>Secondary Trigger</h2>
               <strong>{triggerLabels[result.secondary[0]]}</strong>
-              <p>두 번째로 강하게 사고를 밀어붙인 조건입니다.</p>
+              <p>
+                첫 번째 조건을 보조한 압박입니다. 같은 선택 안에서도 명분과 비용이 이
+                방향으로 다시 흔들렸습니다.
+              </p>
             </section>
             <section className="report-section">
               <h2>Cognitive Acceleration</h2>
               <strong>{cognitionLabels[result.thinking[0]]}</strong>
-              <p>이번 플레이에서는 이 사고 능력이 가장 자주 사용됐습니다.</p>
+              <p>
+                로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로
+                한 번 더 버티거나 뒤집었습니다.
+              </p>
             </section>
             <section className="report-section">
               <h2>Free Text</h2>
               <strong>{result.freeCount}회</strong>
-              <p>선택지 밖에서 판을 바꾸려 한 횟수입니다.</p>
+              <p>
+                준비된 선택지 밖에서 조건을 다시 짠 횟수입니다. 0회라면 다음 테스트에서는
+                구조 재설계 유도가 충분했는지 확인해야 합니다.
+              </p>
             </section>
             <section className="report-section">
               <h2>Avg Time</h2>
               <strong>{result.averageResponseTime}s</strong>
-              <p>각 국면에서 결정을 내리기까지 걸린 평균 시간입니다.</p>
+              <p>
+                각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가
+                명확했거나 압박이 약했을 수 있습니다.
+              </p>
             </section>
             <section className="report-section wide-report">
               <h2>Longest Decision</h2>
               <strong>{result.longestDecision?.title ?? "없음"}</strong>
               <p>
-                가장 오래 머문 국면입니다. 테스트 때 이 장면에서 실제 고민이 생겼는지
-                확인해야 합니다.
+                가장 오래 머문 국면입니다. 이 장면의 메모, 에코 반론, 선택지 비용이 실제
+                고민을 만들었는지 인터뷰에서 우선 확인합니다.
               </p>
             </section>
           </div>
@@ -924,7 +963,12 @@ function App() {
                 <div>
                   <b>{entry.title}</b>
                   <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
-                  {entry.sceneBeat && <small>{entry.sceneBeat.split("\n").slice(1).join(" ")}</small>}
+                  {entry.sceneBeat && (
+                    <details className="decision-scene">
+                      <summary>장면 다시 보기</summary>
+                      <div>{renderSceneLines(entry.sceneBeat)}</div>
+                    </details>
+                  )}
                   <small>{entry.responseTimeSec}s · {entry.echo}</small>
                 </div>
               </article>
@@ -944,6 +988,7 @@ function App() {
                       </span>
                     ))}
                   </div>
+                  <p>{explainResourceTradeoff(entry.effect)}</p>
                 </article>
               ))}
             </div>
@@ -1020,6 +1065,17 @@ function App() {
           <div style={{ width: `${progress}%` }} />
         </div>
 
+        <section className="lab-trace">
+          <div>
+            <span>TRIGGERLAB TRACE</span>
+            <strong>{triggerLabSignals[currentCase] ?? triggerLabSignals.case01}</strong>
+          </div>
+          <p>
+            현재 {log.length}개 선택이 기록됐고, {node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}
+            압박이 다음 장면 조정값으로 남습니다.
+          </p>
+        </section>
+
         <div className="scene">
           <div className="speaker">
             <div>{node.speaker.slice(0, 1)}</div>
@@ -1027,6 +1083,10 @@ function App() {
               <b>{node.speaker}</b>
               <small>{speakerProfile.role} · {speakerProfile.stance}</small>
             </span>
+          </div>
+          <div className="speaker-context">
+            <span>{speakerProfile.appearance}</span>
+            <b>{speakerProfile.job}</b>
           </div>
           <p>{node.text}</p>
         </div>
@@ -1040,9 +1100,7 @@ function App() {
               </h2>
               <span>선택이 회의실의 대화와 침묵을 어떻게 바꿨는지 기록합니다.</span>
             </div>
-            {latestBeat.split("\n").map((line) => (
-              <p key={line}>{line}</p>
-            ))}
+            {renderSceneLines(latestBeat)}
           </section>
         )}
 
@@ -1067,10 +1125,24 @@ function App() {
             <span>선택을 돕는 조언자가 아니라, 판단의 약점을 드러내는 반론자</span>
           </div>
           <p>{echo}</p>
+          <div className="echo-checks">
+            <span>다시 확인할 것</span>
+            <ul>
+              {getEchoChecks(node).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         <section className="choice-panel">
-          <h2>어떻게 말할까</h2>
+          <div className="choice-heading">
+            <h2>어떻게 말할까</h2>
+            <p>
+              어떤 선택도 무료가 아닙니다. 지금 고르는 말은 한 자원을 올리는 대신 다른
+              부담을 다음 장면으로 넘깁니다.
+            </p>
+          </div>
           <div className="choices">
             {fixedChoices.map((choice) => (
               <button
@@ -1082,7 +1154,13 @@ function App() {
                   <Check size={16} />
                   {getDramaticChoiceLabel(choice)}
                 </span>
+                <span className="choice-action">{choice.label}</span>
                 <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
+                {choice.effect && (
+                  <span className="choice-tradeoff">
+                    {explainResourceTradeoff(choice.effect)}
+                  </span>
+                )}
                 {choice.effect && (
                   <span className="choice-effect">
                     {Object.entries(choice.effect)
@@ -1124,6 +1202,27 @@ function App() {
               <p className="input-note">
                 자유입력은 로그에 남을 수 있습니다. 실제 개인정보나 식별 가능한 회사명은 쓰지 마세요.
               </p>
+              <div className="reframe-signals">
+                <div>
+                  <span>반영 기준</span>
+                  <b>{activeFreeTextSignalCount}/4</b>
+                </div>
+                <ul>
+                  {freeTextSignals.map((signal) => (
+                    <li className={signal.active ? "active" : ""} key={signal.id}>
+                      <Check size={14} />
+                      <span>
+                        <b>{signal.label}</b>
+                        <small>{signal.hint}</small>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p>
+                  두 개 이상 채워지면 선택지 밖의 제안이 단순 의견이 아니라 판을 바꾸는
+                  계획으로 기록됩니다.
+                </p>
+              </div>
               <button
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
@@ -1192,6 +1291,10 @@ function App() {
           <h2>시즌 아크</h2>
           <p className="status-note">
             {activeCaseMeta?.label}은 {activeCaseMeta?.summary}
+          </p>
+          <p className="status-note">
+            완료 {completedCases.length}개 케이스와 현재 로그 {log.length}개가 다음 사건의 압박
+            조건으로 누적됩니다.
           </p>
         </section>
       </aside>
