@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   AlertTriangle,
@@ -173,6 +173,7 @@ function App() {
   const [echo, setEcho] = useState(saved?.echo ?? "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -223,6 +224,18 @@ function App() {
     savedAt: "",
   };
   const [feedbackStatus, setFeedbackStatus] = useState("");
+  const firstRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      setIsAdvancing(false);
+    });
+  }, [started, currentCase, nodeId, isResult]);
 
   function persist(nextState) {
     localStorage.setItem(
@@ -331,6 +344,8 @@ function App() {
   }
 
   function choose(choice) {
+    if (isAdvancing) return;
+    setIsAdvancing(true);
     const responseTimeSec = Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000));
     const free = choice.type === "free";
     const freeResult = free ? scoreFreeText(freeText) : null;
@@ -1149,6 +1164,7 @@ function App() {
                 key={choice.id}
                 className="choice"
                 onClick={() => choose(choice)}
+                disabled={isAdvancing}
               >
                 <span className="choice-main">
                   <Check size={16} />
@@ -1226,7 +1242,7 @@ function App() {
               <button
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
-                disabled={!freeText.trim()}
+                disabled={!freeText.trim() || isAdvancing}
               >
                 <span className="choice-main">
                   <Send size={16} />
