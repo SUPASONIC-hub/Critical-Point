@@ -360,6 +360,7 @@ function App() {
   const [decisionSeconds, setDecisionSeconds] = useState(45);
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
+  const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled ? "ready" : "local",
     text: telemetryEnabled
@@ -662,11 +663,53 @@ function App() {
   useEffect(() => {
     if (!started || isResult) return undefined;
     setDecisionSeconds(45);
+    setTimerPenaltyApplied(false);
     const timer = window.setInterval(() => {
       setDecisionSeconds((value) => Math.max(0, value - 1));
     }, 1000);
     return () => window.clearInterval(timer);
   }, [started, currentCase, resolvedNodeId, isResult]);
+
+  useEffect(() => {
+    if (!started || isResult || decisionSeconds > 0 || timerPenaltyApplied) return;
+    const timeoutEffect = { time: -2, fatigue: 3 };
+    const nextResources = applyEffect(resources, timeoutEffect);
+    const entry = {
+      nodeId: resolvedNodeId,
+      title: "TIMEOUT PRESSURE",
+      choice: "결정 윈도우 초과",
+      spokenChoice: "잠깐. 늦어진 만큼의 비용도 기록하겠습니다.",
+      freeText: "",
+      effect: timeoutEffect,
+      triggers: ["fear", "responsibility"],
+      echo: "결정을 늦추는 것도 하나의 결정입니다. 이제 줄어든 시간과 늘어난 피로를 감안하십시오.",
+      sceneBeat: "에코: 결정 윈도우가 닫혔습니다.\n회의실: 아무도 당신을 대신해 결론을 내리지 않았지만, 기다린 비용은 이미 숫자로 남았습니다.",
+      challenge: { title: "시간 압박 버티기", matched: false, riskDelta: getRiskPressure(nextResources) - riskPressure },
+      tactical: null,
+      flowSurge: null,
+      tempoBonus: null,
+      instinctSurge: null,
+      note: "결정 윈도우 초과 비용",
+      responseTimeSec: 45,
+      resourcesBefore: resources,
+      resourcesAfter: nextResources,
+      isSystemEvent: true,
+    };
+    const nextLog = [...log, entry];
+    setTimerPenaltyApplied(true);
+    setResources(nextResources);
+    setLog(nextLog);
+    setEcho(entry.echo);
+    setNodeEnteredAt(Date.now());
+    setSaveStatus("결정 윈도우 초과 비용 적용됨");
+    persist({
+      timerPenaltyApplied: true,
+      resources: nextResources,
+      log: nextLog,
+      echo: entry.echo,
+      nodeEnteredAt: Date.now(),
+    });
+  }, [decisionSeconds, isResult, log, nodeEnteredAt, persist, resources, resolvedNodeId, riskPressure, started, timerPenaltyApplied]);
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -704,6 +747,7 @@ function App() {
         nodeEnteredAt,
         pendingTelemetry,
         protocolUsed,
+        timerPenaltyApplied,
         savedAt: new Date().toISOString(),
         ...nextState,
       };
@@ -718,6 +762,7 @@ function App() {
     setIsPausedSave(false);
     setCurrentCase("case01");
     setProtocolUsed(false);
+    setTimerPenaltyApplied(false);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -728,6 +773,7 @@ function App() {
       nodeId: "start",
       nodeEnteredAt: Date.now(),
       protocolUsed: false,
+      timerPenaltyApplied: false,
       paused: false,
     });
   }
@@ -796,6 +842,7 @@ function App() {
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
+    setTimerPenaltyApplied(false);
     setEcho(introEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -809,6 +856,7 @@ function App() {
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
       protocolUsed: false,
+      timerPenaltyApplied: false,
       echo: introEcho,
       nodeEnteredAt: Date.now(),
     });
@@ -1101,6 +1149,7 @@ function App() {
       nodeId: nextNode,
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
+      timerPenaltyApplied: false,
       nodeEnteredAt: Date.now(),
     });
   }
@@ -1122,6 +1171,7 @@ function App() {
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
+    setTimerPenaltyApplied(false);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     setSaveStatus("");
@@ -2081,7 +2131,13 @@ function App() {
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
             <span>DECISION WINDOW</span>
             <strong>{decisionSeconds}s</strong>
-            <p>{decisionSeconds <= 10 ? "다음 판단이 닫히기 전" : "빠른 챌린지 적중 보너스 가능"}</p>
+            <p>
+              {decisionSeconds === 0
+                ? "시간·피로 비용 적용됨"
+                : decisionSeconds <= 10
+                  ? "다음 판단이 닫히기 전"
+                  : "빠른 챌린지 적중 보너스 가능"}
+            </p>
           </article>
         </section>
 
