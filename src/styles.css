@@ -1740,6 +1740,22 @@ summary:focus-visible {
   line-height: 1.25;
 }
 
+.choice-surge {
+  display: block;
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin-top: 7px;
+  margin-left: 24px;
+  padding: 6px 9px;
+  color: #18201f;
+  background: #d9ff62;
+  border: 1px solid #c0ea4b;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
 .choice-subtext {
   display: block;
   margin-top: 7px;
@@ -2833,6 +2849,37 @@ textarea {
 .history-challenge .challenge-miss {
   color: #6a5420;
   background: #fff0bf;
+}
+
+.history-challenge .challenge-grade {
+  color: #ffffff;
+  background: #52605b;
+}
+
+.history-challenge .challenge-grade.grade-s,
+.history-challenge .surge-success {
+  color: #18201f;
+  background: #d9ff62;
+}
+
+.history-challenge .challenge-grade.grade-a {
+  color: #ffffff;
+  background: #2c4a46;
+}
+
+.history-challenge .challenge-grade.grade-b {
+  color: #ffffff;
+  background: #4e6f67;
+}
+
+.history-challenge .challenge-grade.grade-c {
+  color: #18201f;
+  background: #fff0bf;
+}
+
+.history-challenge .challenge-grade.grade-d {
+  color: #ffffff;
+  background: #7a2f22;
 }
 
 .decision-scene {

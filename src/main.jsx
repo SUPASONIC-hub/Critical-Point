@@ -344,12 +344,13 @@ function App() {
       D: "고위험 도박",
     }[grade];
     const reward =
-      challengeMatch ||
-      (riskDelta < 0
-        ? "위험 압력 하락"
-        : riskDelta === 0
-          ? "압력 유지"
-          : `위험 압력 +${riskDelta}`);
+      challengeMatch
+        ? "챌린지 적중"
+        : riskDelta < 0
+          ? "위험 압력 하락"
+          : riskDelta === 0
+            ? "압력 유지"
+            : `위험 압력 +${riskDelta}`;
     const cost = biggestCost
       ? `${resourceMeta[biggestCost[0]]?.label ?? biggestCost[0]} ${biggestCost[1]}`
       : "즉시 손실 낮음";
@@ -361,6 +362,69 @@ function App() {
 
     return { grade, gradeText, reward, cost, gain };
   }
+
+  function mergeEffects(...effects) {
+    return effects.reduce((merged, effect = {}) => {
+      Object.entries(effect).forEach(([key, value]) => {
+        merged[key] = (merged[key] ?? 0) + value;
+      });
+      return merged;
+    }, {});
+  }
+
+  function getFlowSurge(tacticalRead, challengeMatch, riskDelta) {
+    if (tacticalRead.grade === "S") {
+      return {
+        label: "FLOW SURGE",
+        text: "챌린지와 위험 제어가 동시에 맞물려 회의실의 지지가 붙었습니다.",
+        effect: { trust: 2, legitimacy: 2, fatigue: -3 },
+      };
+    }
+    if (tacticalRead.grade === "A" && challengeMatch) {
+      return {
+        label: "CHALLENGE SURGE",
+        text: "장면 목표를 정확히 찔러 다음 선택의 피로가 줄었습니다.",
+        effect: { trust: 1, legitimacy: 1, fatigue: -2 },
+      };
+    }
+    if (riskDelta < 0) {
+      return {
+        label: "PRESSURE DROP",
+        text: "위험 압력을 낮춘 덕분에 판단 여력이 조금 회복됐습니다.",
+        effect: { fatigue: -1 },
+      };
+    }
+    return null;
+  }
+
+  function getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect) {
+    const baseResources = applyEffect(resources, baseEffect);
+    const baseRiskDelta = getRiskPressure(baseResources) - riskPressure;
+    const challengeMatch =
+      choice.type === "free"
+        ? sceneChallenge.id === "use-reframe" && getFreeTextSignals(freeText).filter((signal) => signal.active).length >= 2
+        : Boolean(getChallengeMatch(choice, baseRiskDelta));
+    const tacticalRead = getTacticalRead(
+      { ...choice, effect: baseEffect, cognition: cognitiveEffect },
+      baseRiskDelta,
+      challengeMatch,
+    );
+    const flowSurge = getFlowSurge(tacticalRead, challengeMatch, baseRiskDelta);
+    const finalEffect = flowSurge ? mergeEffects(baseEffect, flowSurge.effect) : baseEffect;
+    const finalResources = applyEffect(resources, finalEffect);
+    const finalRiskDelta = getRiskPressure(finalResources) - riskPressure;
+
+    return {
+      baseRiskDelta,
+      challengeMatch,
+      tacticalRead,
+      flowSurge,
+      finalEffect,
+      finalResources,
+      finalRiskDelta,
+    };
+  }
+
   const questSteps = [
     {
       title: "장면 챌린지",
@@ -644,13 +708,16 @@ function App() {
     const responseTimeSec = Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000));
     const free = choice.type === "free";
     const freeResult = free ? scoreFreeText(freeText) : null;
-    const effect = free ? freeResult.effect : choice.effect;
+    const baseEffect = free ? freeResult.effect : choice.effect;
     const cognitiveEffect = free ? freeResult.cognition : choice.cognition;
-    const nextResources = applyEffect(resources, effect);
-    const challengeRiskDelta = getRiskPressure(nextResources) - riskPressure;
-    const challengeMatch = free
-      ? sceneChallenge.id === "use-reframe" && getFreeTextSignals(freeText).filter((signal) => signal.active).length >= 2
-      : Boolean(getChallengeMatch(choice, challengeRiskDelta));
+    const {
+      challengeMatch,
+      tacticalRead,
+      flowSurge,
+      finalEffect: effect,
+      finalResources: nextResources,
+      finalRiskDelta: challengeRiskDelta,
+    } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
     const nextTriggers = { ...triggers };
     const nextCognition = { ...cognition };
 
@@ -676,6 +743,8 @@ function App() {
         matched: challengeMatch,
         riskDelta: challengeRiskDelta,
       },
+      tactical: tacticalRead,
+      flowSurge,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -974,6 +1043,7 @@ function App() {
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
   const resultRank = gameplayRank;
+  const flowSurgeCount = log.filter((entry) => entry.flowSurge).length;
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
   const screenReaderStatus = isResult
@@ -990,6 +1060,7 @@ function App() {
   const scoreBreakdown = [
     { label: "챌린지", value: challengeClearCount, text: `${challengeClearCount}개 달성` },
     { label: "위험 제어", value: reducedRiskCount, text: `${reducedRiskCount}회 하락` },
+    { label: "플로우 서지", value: flowSurgeCount, text: `${flowSurgeCount}회 발동` },
     { label: "판 바꾸기", value: freeTextCombo, text: `${freeTextCombo}회 사용` },
     { label: "응답 평균", value: result.averageResponseTime, text: `${result.averageResponseTime}s` },
   ];
@@ -1007,6 +1078,9 @@ function App() {
     challengeClearCount > 0
       ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
       : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
+    flowSurgeCount > 0
+      ? { title: "Flow Surge", text: `${flowSurgeCount}번 보너스 자원 회복을 만들었습니다.` }
+      : { title: "No Surge", text: "챌린지와 위험 제어가 아직 보너스로 이어지지 않았습니다." },
     riskTier === "CRITICAL"
       ? { title: "Crisis Runner", text: "높은 압력 상태로 케이스를 통과했습니다." }
       : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
@@ -1578,6 +1652,11 @@ function App() {
                   <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
                   {entry.challenge && (
                     <div className="history-challenge">
+                      {entry.tactical && (
+                        <small className={`challenge-grade grade-${entry.tactical.grade.toLowerCase()}`}>
+                          등급 {entry.tactical.grade} · {entry.tactical.gradeText}
+                        </small>
+                      )}
                       <small className={entry.challenge.matched ? "challenge-success" : "challenge-miss"}>
                         {entry.challenge.matched ? "챌린지 달성" : "챌린지 미달"} · {entry.challenge.title}
                       </small>
@@ -1585,6 +1664,11 @@ function App() {
                         위험 {entry.challenge.riskDelta > 0 ? "+" : ""}
                         {entry.challenge.riskDelta}
                       </small>
+                      {entry.flowSurge && (
+                        <small className="surge-success">
+                          {entry.flowSurge.label} · {entry.flowSurge.text}
+                        </small>
+                      )}
                     </div>
                   )}
                   {entry.sceneBeat && (
@@ -1881,9 +1965,9 @@ function App() {
           </div>
           <div className="choices">
             {fixedChoices.map((choice) => {
-              const projectedResources = applyEffect(resources, choice.effect);
-              const projectedRisk = getRiskPressure(projectedResources);
-              const riskDelta = projectedRisk - riskPressure;
+              const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
+              const projectedRisk = getRiskPressure(choiceRead.finalResources);
+              const riskDelta = choiceRead.finalRiskDelta;
               const riskClass =
                 riskDelta > 0 ? "risk-up" : riskDelta < 0 ? "risk-down" : "risk-flat";
               const riskLabel =
@@ -1892,8 +1976,8 @@ function App() {
                   : riskDelta < 0
                     ? `위험 ${riskDelta}`
                     : "위험 유지";
-              const challengeMatch = getChallengeMatch(choice, riskDelta);
-              const tacticalRead = getTacticalRead(choice, riskDelta, challengeMatch);
+              const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
+              const tacticalRead = choiceRead.tacticalRead;
               return (
                 <button
                   key={choice.id}
@@ -1918,6 +2002,11 @@ function App() {
                   <span className="choice-action">{choice.label}</span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
+                  {choiceRead.flowSurge && (
+                    <span className="choice-surge">
+                      {choiceRead.flowSurge.label} · {explainResourceTradeoff(choiceRead.flowSurge.effect)}
+                    </span>
+                  )}
                   <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
                   {choice.effect && (
                     <span className="choice-tradeoff">
@@ -1931,7 +2020,7 @@ function App() {
                   )}
                   {choice.effect && (
                     <span className="choice-effect">
-                      {Object.entries(choice.effect)
+                      {Object.entries(choiceRead.finalEffect)
                         .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
                         .join(" · ")}
                     </span>
