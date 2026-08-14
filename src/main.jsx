@@ -541,8 +541,38 @@ function App() {
                 : log.length >= 3
                   ? "연속 판단 보너스"
                   : "보너스 대기";
+  const inheritedChallenge =
+    openingLegacy && resolvedNodeId === activeNodeOrder[0]
+      ? {
+          id:
+            openingLegacy.label === "CLEAR SIGNAL"
+              ? "protect-trust"
+              : openingLegacy.label === "OPEN WOUND"
+                ? "repair-legitimacy"
+                : openingLegacy.label === "UNFINISHED COST"
+                  ? "lower-risk"
+                  : "find-cost",
+          title:
+            openingLegacy.label === "CLEAR SIGNAL"
+              ? "신뢰를 다음 장면에 넘기기"
+              : openingLegacy.label === "OPEN WOUND"
+                ? "정당성 균열 봉합하기"
+                : openingLegacy.label === "UNFINISHED COST"
+                  ? "남은 비용 줄이기"
+                  : "이전 판단의 비용 확인하기",
+          text:
+            openingLegacy.label === "CLEAR SIGNAL"
+              ? "이전 케이스에서 얻은 신뢰를 잃지 않는 선택이 다음 압박의 문을 엽니다."
+              : openingLegacy.label === "OPEN WOUND"
+                ? "정당성을 회복하는 선택으로 지난 사건의 균열을 먼저 봉합해야 합니다."
+                : openingLegacy.label === "UNFINISHED COST"
+                  ? "지난 사건에서 넘어온 비용을 줄이면 이번 장면의 회복 보너스가 붙습니다."
+                  : "이전 판단이 남긴 숨은 비용을 찾아야 다음 사건의 기준을 다시 세울 수 있습니다.",
+        }
+      : null;
   const sceneChallenge =
-    riskPressure >= 35
+    inheritedChallenge ??
+    (riskPressure >= 35
       ? {
           id: "lower-risk",
           title: "위험 압력 낮추기",
@@ -564,8 +594,10 @@ function App() {
               id: "find-cost",
               title: "숨은 비용 찾기",
               text: "가장 좋아 보이는 선택의 반대 비용을 확인하고 고릅니다.",
-          };
+            });
   const echoProbeHint = {
+    "protect-trust": "힌트: 이번 장면에서는 가장 큰 성과보다 관계를 회복하는 말이 지난 사건의 신뢰를 이어갑니다.",
+    "repair-legitimacy": "힌트: 정당성을 올리는 선택을 먼저 골라야 지난 사건의 균열이 다음 장면을 삼키지 않습니다.",
     "lower-risk": "힌트: 지금은 가장 큰 이득보다 위험 압력을 실제로 낮추는 선택이 오래 버팁니다.",
     "use-reframe": "힌트: 사람, 조건, 순서 중 두 가지 이상을 다시 설계하면 선택지 밖 계획으로 인정됩니다.",
     "avoid-risk": "힌트: 경쟁자의 속도를 따라가는 대신 위험을 유지하거나 낮추는 선택이 다음 장면을 엽니다.",
@@ -573,6 +605,8 @@ function App() {
   }[sceneChallenge.id];
   const echoProbeCost = playStyle === "mediator" ? "결정 시간 4초와 신뢰 1" : "결정 시간 8초와 피로 1";
   function getChallengeMatch(choice, riskDelta) {
+    if (sceneChallenge.id === "protect-trust" && (choice.effect?.trust ?? 0) > 0) return "신뢰 회복 후보";
+    if (sceneChallenge.id === "repair-legitimacy" && (choice.effect?.legitimacy ?? 0) > 0) return "정당성 회복 후보";
     if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
     if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
     if (sceneChallenge.id === "find-cost" && Object.values(choice.effect ?? {}).some((value) => value < 0)) {
