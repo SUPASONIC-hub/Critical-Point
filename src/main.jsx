@@ -181,7 +181,13 @@ function App() {
       : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
 
-  const node = nodes[nodeId];
+  const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
+    ? currentCase
+    : "case01";
+  const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders.case01;
+  const fallbackNodeId = activeNodeOrder[0] ?? "start";
+  const resolvedNodeId = nodes[nodeId] ? nodeId : fallbackNodeId;
+  const node = nodes[resolvedNodeId] ?? nodes.start;
   const isResult =
     nodeId === "result" ||
     nodeId === "case02_result" ||
@@ -222,12 +228,15 @@ function App() {
     log.length > 0
       ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
       : 0;
-  const riskPressure = Math.round(
-    Math.max(0, 72 - resources.time) * 0.3 +
-      (100 - resources.capital) * 0.25 +
-      resources.humanCost * 0.25 +
-      resources.fatigue * 0.2,
-  );
+  function getRiskPressure(nextResources) {
+    return Math.round(
+      Math.max(0, 72 - nextResources.time) * 0.3 +
+        (100 - nextResources.capital) * 0.25 +
+        nextResources.humanCost * 0.25 +
+        nextResources.fatigue * 0.2,
+    );
+  }
+  const riskPressure = getRiskPressure(resources);
   const riskTier =
     riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const freeTextCombo = log.filter((entry) => entry.freeText).length;
@@ -239,6 +248,38 @@ function App() {
         : log.length >= 3
           ? "연속 판단 보너스"
           : "보너스 대기";
+  const sceneChallenge =
+    riskPressure >= 35
+      ? {
+          id: "lower-risk",
+          title: "위험 압력 낮추기",
+          text: "예상 위험이 내려가는 선택을 찾으면 압박 관리 보너스가 붙습니다.",
+        }
+      : freeTextCombo === 0 && freeChoice
+        ? {
+            id: "use-reframe",
+            title: "판 바꾸기 시도",
+            text: "구조 재설계에서 반영 기준 2개 이상을 채우면 보너스 조건이 열립니다.",
+          }
+        : (node?.triggers ?? []).includes("competition")
+          ? {
+              id: "avoid-risk",
+              title: "속도에 말리지 않기",
+              text: "위험 상승을 감수하지 않고 경쟁 압박을 통과하는 선택을 찾습니다.",
+            }
+          : {
+              id: "find-cost",
+              title: "숨은 비용 찾기",
+              text: "가장 좋아 보이는 선택의 반대 비용을 확인하고 고릅니다.",
+            };
+  function getChallengeMatch(choice, riskDelta) {
+    if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
+    if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
+    if (sceneChallenge.id === "find-cost" && Object.values(choice.effect ?? {}).some((value) => value < 0)) {
+      return "비용 확인됨";
+    }
+    return "";
+  }
   const currentFeedback = playtestFeedback[currentCase] ?? {
     clarity: "",
     difficulty: "",
@@ -365,6 +406,16 @@ function App() {
     };
   }
 
+  function normalizeCaseSummary(summary) {
+    return {
+      primary: summary?.primary ?? ["responsibility", 0],
+      secondary: summary?.secondary ?? ["protection", 0],
+      thinking: summary?.thinking ?? ["persistence", 0],
+      freeCount: summary?.freeCount ?? 0,
+      averageResponseTime: summary?.averageResponseTime ?? 0,
+    };
+  }
+
   function choose(choice) {
     if (isAdvancing) return;
     setIsAdvancing(true);
@@ -374,6 +425,10 @@ function App() {
     const effect = free ? freeResult.effect : choice.effect;
     const cognitiveEffect = free ? freeResult.cognition : choice.cognition;
     const nextResources = applyEffect(resources, effect);
+    const challengeRiskDelta = getRiskPressure(nextResources) - riskPressure;
+    const challengeMatch = free
+      ? sceneChallenge.id === "use-reframe" && getFreeTextSignals(freeText).filter((signal) => signal.active).length >= 2
+      : Boolean(getChallengeMatch(choice, challengeRiskDelta));
     const nextTriggers = { ...triggers };
     const nextCognition = { ...cognition };
 
@@ -385,7 +440,7 @@ function App() {
     });
 
     const entry = {
-      nodeId,
+      nodeId: resolvedNodeId,
       title: node.title,
       choice: choice.label,
       spokenChoice: getDramaticChoiceLabel(choice),
@@ -394,6 +449,11 @@ function App() {
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
       sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", effect),
+      challenge: {
+        title: sceneChallenge.title,
+        matched: challengeMatch,
+        riskDelta: challengeRiskDelta,
+      },
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -634,19 +694,22 @@ function App() {
 
   const progress = isResult
     ? 100
-    : Math.round(
-        (((nodeOrders[currentCase] ?? nodeOrders.case01).indexOf(nodeId) + 1) /
-          (nodeOrders[currentCase] ?? nodeOrders.case01).length) *
-          100,
-      );
+    : Math.round(((activeNodeOrder.indexOf(resolvedNodeId) + 1) / activeNodeOrder.length) * 100);
   const completedCaseResultList = seasonCasesBase
     .filter((caseItem) => caseResults[caseItem.id])
-    .map((caseItem) => ({ ...caseItem, result: caseResults[caseItem.id] }));
+    .map((caseItem) => ({ ...caseItem, result: normalizeCaseSummary(caseResults[caseItem.id]) }));
   const nextCaseSignal = nextCaseSignals[currentCase];
   const resultBridge =
     result.longestDecision
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
+  const reducedRiskCount = log.filter(
+    (entry) =>
+      entry.resourcesBefore &&
+      entry.resourcesAfter &&
+      getRiskPressure(entry.resourcesAfter) < getRiskPressure(entry.resourcesBefore),
+  ).length;
+  const challengeClearCount = log.filter((entry) => entry.challenge?.matched).length;
   const achievementBadges = [
     result.freeCount > 0
       ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
@@ -654,6 +717,12 @@ function App() {
     result.averageResponseTime >= 20
       ? { title: "Slow Thinker", text: "한 장면 이상에서 판단을 오래 붙잡았습니다." }
       : { title: "Fast Closer", text: "빠르게 결론을 닫는 플레이를 보였습니다." },
+    reducedRiskCount > 0
+      ? { title: "Risk Cutter", text: `${reducedRiskCount}번 위험 압력을 낮췄습니다.` }
+      : { title: "Heat Taker", text: "위험을 낮추기보다 다른 목표를 우선했습니다." },
+    challengeClearCount > 0
+      ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
+      : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
     riskTier === "CRITICAL"
       ? { title: "Crisis Runner", text: "높은 압력 상태로 케이스를 통과했습니다." }
       : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
@@ -827,48 +896,52 @@ function App() {
             <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
           </div>
           <div className="case-roadmap">
-            {seasonCases.map((caseItem) => (
-              <article
-                key={caseItem.id}
-                className={
-                  caseItem.status === "PLAYING" || caseItem.status === "OPEN"
-                    ? "case-card active-case"
-                    : caseItem.status === "COMPLETE"
-                      ? "case-card complete-case"
-                      : "case-card"
-                }
-                onClick={() => {
-                  if (
-                    caseItem.status === "OPEN" ||
-                    caseItem.status === "PLAYING" ||
-                    caseItem.status === "COMPLETE"
-                  ) {
-                    startCase(caseItem.id);
+            {seasonCases.map((caseItem) => {
+              const savedResult = caseResults[caseItem.id]
+                ? normalizeCaseSummary(caseResults[caseItem.id])
+                : null;
+              return (
+                <article
+                  key={caseItem.id}
+                  className={
+                    caseItem.status === "PLAYING" || caseItem.status === "OPEN"
+                      ? "case-card active-case"
+                      : caseItem.status === "COMPLETE"
+                        ? "case-card complete-case"
+                        : "case-card"
                   }
-                }}
-              >
-                <div>
-                  <span>{caseItem.label}</span>
-                  <small className="case-status-chip">
-                    {caseItem.status === "LOCKED" && <LockKeyhole size={13} />}
-                    {getCaseStatusText(caseItem.status)}
-                  </small>
-                </div>
-                <h2>{caseItem.title}</h2>
-                <b>{caseItem.trigger}</b>
-                <p>{caseItem.summary}</p>
-                {caseItem.status === "LOCKED" && (
-                  <small className="case-lock-note">앞선 케이스의 판단 로그가 필요합니다.</small>
-                )}
-                {caseResults[caseItem.id] && (
-                  <small className="case-result-mini">
-                    {triggerLabels[caseResults[caseItem.id].primary[0]]} ·{" "}
-                    {caseResults[caseItem.id].averageResponseTime}s · 자유입력{" "}
-                    {caseResults[caseItem.id].freeCount}
-                  </small>
-                )}
-              </article>
-            ))}
+                  onClick={() => {
+                    if (
+                      caseItem.status === "OPEN" ||
+                      caseItem.status === "PLAYING" ||
+                      caseItem.status === "COMPLETE"
+                    ) {
+                      startCase(caseItem.id);
+                    }
+                  }}
+                >
+                  <div>
+                    <span>{caseItem.label}</span>
+                    <small className="case-status-chip">
+                      {caseItem.status === "LOCKED" && <LockKeyhole size={13} />}
+                      {getCaseStatusText(caseItem.status)}
+                    </small>
+                  </div>
+                  <h2>{caseItem.title}</h2>
+                  <b>{caseItem.trigger}</b>
+                  <p>{caseItem.summary}</p>
+                  {caseItem.status === "LOCKED" && (
+                    <small className="case-lock-note">앞선 케이스의 판단 로그가 필요합니다.</small>
+                  )}
+                  {savedResult && (
+                    <small className="case-result-mini">
+                      {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 자유입력{" "}
+                      {savedResult.freeCount}
+                    </small>
+                  )}
+                </article>
+              );
+            })}
           </div>
         </section>
       </main>
@@ -1079,6 +1152,17 @@ function App() {
                 <div>
                   <b>{entry.title}</b>
                   <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
+                  {entry.challenge && (
+                    <div className="history-challenge">
+                      <small className={entry.challenge.matched ? "challenge-success" : "challenge-miss"}>
+                        {entry.challenge.matched ? "챌린지 달성" : "챌린지 미달"} · {entry.challenge.title}
+                      </small>
+                      <small>
+                        위험 {entry.challenge.riskDelta > 0 ? "+" : ""}
+                        {entry.challenge.riskDelta}
+                      </small>
+                    </div>
+                  )}
                   {entry.sceneBeat && (
                     <details className="decision-scene">
                       <summary>장면 다시 보기</summary>
@@ -1199,6 +1283,14 @@ function App() {
           </article>
         </section>
 
+        <section className="scene-challenge">
+          <div>
+            <span>SCENE CHALLENGE</span>
+            <strong>{sceneChallenge.title}</strong>
+          </div>
+          <p>{sceneChallenge.text}</p>
+        </section>
+
         <section className="lab-trace">
           <div>
             <span>TRIGGERLAB TRACE</span>
@@ -1287,40 +1379,60 @@ function App() {
             </p>
           </div>
           <div className="choices">
-            {fixedChoices.map((choice) => (
-              <button
-                key={choice.id}
-                className="choice"
-                onClick={() => choose(choice)}
-                disabled={isAdvancing}
-              >
-                <span className="choice-main">
-                  <Check size={16} />
-                  {getDramaticChoiceLabel(choice)}
-                </span>
-                <span className="choice-action">{choice.label}</span>
-                <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
-                {choice.effect && (
-                  <span className="choice-tradeoff">
-                    {explainResourceTradeoff(choice.effect)}
+            {fixedChoices.map((choice) => {
+              const projectedResources = applyEffect(resources, choice.effect);
+              const projectedRisk = getRiskPressure(projectedResources);
+              const riskDelta = projectedRisk - riskPressure;
+              const riskClass =
+                riskDelta > 0 ? "risk-up" : riskDelta < 0 ? "risk-down" : "risk-flat";
+              const riskLabel =
+                riskDelta > 0
+                  ? `위험 +${riskDelta}`
+                  : riskDelta < 0
+                    ? `위험 ${riskDelta}`
+                    : "위험 유지";
+              const challengeMatch = getChallengeMatch(choice, riskDelta);
+              return (
+                <button
+                  key={choice.id}
+                  className="choice"
+                  onClick={() => choose(choice)}
+                  disabled={isAdvancing}
+                >
+                  <span className="choice-main">
+                    <Check size={16} />
+                    {getDramaticChoiceLabel(choice)}
                   </span>
-                )}
-                {choice.effect && (
-                  <span className="choice-effect">
-                    {Object.entries(choice.effect)
-                      .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
-                      .join(" · ")}
-                  </span>
-                )}
-                {choice.cognition && (
-                  <span className="choice-cognition">
-                    {Object.entries(choice.cognition)
-                      .map(([key, value]) => `${cognitionLabels[key] ?? key} +${value}`)
-                      .join(" · ")}
-                  </span>
-                )}
-              </button>
-            ))}
+                  <span className="choice-action">{choice.label}</span>
+                  {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
+                  <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
+                  {choice.effect && (
+                    <span className="choice-tradeoff">
+                      {explainResourceTradeoff(choice.effect)}
+                    </span>
+                  )}
+                  {choice.effect && (
+                    <span className={`choice-risk ${riskClass}`}>
+                      {riskLabel} · 예상 압력 {projectedRisk}
+                    </span>
+                  )}
+                  {choice.effect && (
+                    <span className="choice-effect">
+                      {Object.entries(choice.effect)
+                        .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
+                        .join(" · ")}
+                    </span>
+                  )}
+                  {choice.cognition && (
+                    <span className="choice-cognition">
+                      {Object.entries(choice.cognition)
+                        .map(([key, value]) => `${cognitionLabels[key] ?? key} +${value}`)
+                        .join(" · ")}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
           {freeChoice && (
             <div className="reframe-box">
@@ -1351,6 +1463,9 @@ function App() {
                   <span>반영 기준</span>
                   <b>{activeFreeTextSignalCount}/4</b>
                 </div>
+                {sceneChallenge.id === "use-reframe" && activeFreeTextSignalCount >= 2 && (
+                  <strong className="reframe-challenge-hit">챌린지 달성 가능</strong>
+                )}
                 <ul>
                   {freeTextSignals.map((signal) => (
                     <li className={signal.active ? "active" : ""} key={signal.id}>
@@ -1371,6 +1486,25 @@ function App() {
                 <div className="reframe-preview">
                   <span>예상 반영</span>
                   <p>{explainResourceTradeoff(freeTextPreview.effect)}</p>
+                  {(() => {
+                    const projectedRisk = getRiskPressure(applyEffect(resources, freeTextPreview.effect));
+                    const riskDelta = projectedRisk - riskPressure;
+                    const riskClass =
+                      riskDelta > 0 ? "risk-up" : riskDelta < 0 ? "risk-down" : "risk-flat";
+                    const riskLabel =
+                      riskDelta > 0
+                        ? `위험 +${riskDelta}`
+                        : riskDelta < 0
+                          ? `위험 ${riskDelta}`
+                          : "위험 유지";
+                    return (
+                      <div>
+                        <small className={`preview-risk ${riskClass}`}>
+                          {riskLabel} · 예상 압력 {projectedRisk}
+                        </small>
+                      </div>
+                    );
+                  })()}
                   <div>
                     {Object.entries(freeTextPreview.effect).map(([key, value]) => (
                       <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
