@@ -19,6 +19,8 @@ import {
   Shield,
   Sparkles,
   Users,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import "./styles.css";
 import {
@@ -77,6 +79,169 @@ const resourceMeta = {
 const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
+const MUSIC_PREF_KEY = "critical-point-music-enabled";
+
+const musicModes = {
+  intro: {
+    label: "대기",
+    interval: 920,
+    volume: 0.034,
+    wave: "sine",
+    bass: [55, 55, 65.4, 49],
+    notes: [220, null, 277.18, null, 196, 246.94, null, 164.81],
+  },
+  controlled: {
+    label: "안정",
+    interval: 760,
+    volume: 0.036,
+    wave: "triangle",
+    bass: [65.4, 73.42, 82.41, 73.42],
+    notes: [261.63, null, 329.63, 392, null, 293.66, 349.23, null],
+  },
+  unstable: {
+    label: "불안정",
+    interval: 560,
+    volume: 0.04,
+    wave: "triangle",
+    bass: [73.42, 69.3, 82.41, 65.4],
+    notes: [293.66, 311.13, null, 392, 349.23, null, 329.63, 277.18],
+  },
+  critical: {
+    label: "위기",
+    interval: 390,
+    volume: 0.045,
+    wave: "sawtooth",
+    bass: [49, 51.91, 55, 46.25],
+    notes: [196, 207.65, null, 233.08, 246.94, null, 220, 207.65],
+  },
+  result: {
+    label: "결과",
+    interval: 980,
+    volume: 0.038,
+    wave: "sine",
+    bass: [65.4, 82.41, 98, 73.42],
+    notes: [261.63, null, 392, 329.63, null, 440, 392, null],
+  },
+};
+
+function playTone(context, destination, frequency, duration, gainValue, type = "sine") {
+  if (!frequency) return;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  const now = context.currentTime;
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.025);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  oscillator.connect(gain);
+  gain.connect(destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.04);
+}
+
+function AdaptiveMusic({ modeKey }) {
+  const [enabled, setEnabled] = useState(() => localStorage.getItem(MUSIC_PREF_KEY) !== "false");
+  const contextRef = useRef(null);
+  const masterGainRef = useRef(null);
+  const timerRef = useRef(null);
+  const stepRef = useRef(0);
+  const modeRef = useRef(musicModes[modeKey] ?? musicModes.intro);
+  const mode = musicModes[modeKey] ?? musicModes.intro;
+
+  useEffect(() => {
+    modeRef.current = mode;
+    if (masterGainRef.current) {
+      masterGainRef.current.gain.setTargetAtTime(mode.volume, contextRef.current.currentTime, 0.35);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    localStorage.setItem(MUSIC_PREF_KEY, String(enabled));
+    if (!enabled) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+      masterGainRef.current?.gain.setTargetAtTime(0.0001, contextRef.current?.currentTime ?? 0, 0.08);
+      return;
+    }
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = contextRef.current ?? new AudioContextClass();
+    contextRef.current = context;
+    if (!masterGainRef.current) {
+      masterGainRef.current = context.createGain();
+      masterGainRef.current.gain.value = modeRef.current.volume;
+      masterGainRef.current.connect(context.destination);
+    }
+    context.resume?.();
+
+    function resumeAfterAutoplayBlock() {
+      if (context.state === "suspended") {
+        context.resume?.();
+      }
+    }
+    window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
+    window.addEventListener("keydown", resumeAfterAutoplayBlock);
+
+    function pulse() {
+      if (context.state === "suspended") return;
+      const currentMode = modeRef.current;
+      const step = stepRef.current;
+      const note = currentMode.notes[step % currentMode.notes.length];
+      const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
+      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, currentMode.volume, currentMode.wave);
+      if (step % 4 === 0) {
+        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, currentMode.volume * 0.62, "sine");
+      }
+      stepRef.current += 1;
+    }
+
+    pulse();
+    timerRef.current = window.setInterval(pulse, modeRef.current.interval);
+    return () => {
+      window.clearInterval(timerRef.current);
+      window.removeEventListener("pointerdown", resumeAfterAutoplayBlock);
+      window.removeEventListener("keydown", resumeAfterAutoplayBlock);
+    };
+  }, [enabled]);
+
+  useEffect(() => {
+    if (enabled && timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+      const context = contextRef.current;
+      if (!context || !masterGainRef.current) return;
+      function pulse() {
+        if (context.state === "suspended") return;
+        const currentMode = modeRef.current;
+        const step = stepRef.current;
+        const note = currentMode.notes[step % currentMode.notes.length];
+        const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
+        playTone(context, masterGainRef.current, note, currentMode.interval / 1200, currentMode.volume, currentMode.wave);
+        if (step % 4 === 0) {
+          playTone(context, masterGainRef.current, bass, currentMode.interval / 650, currentMode.volume * 0.62, "sine");
+        }
+        stepRef.current += 1;
+      }
+      pulse();
+      timerRef.current = window.setInterval(pulse, modeRef.current.interval);
+    }
+  }, [enabled, modeKey]);
+
+  return (
+    <button
+      type="button"
+      className={enabled ? "music-toggle active" : "music-toggle"}
+      onClick={() => setEnabled((value) => !value)}
+      aria-label={enabled ? "배경음악 끄기" : "배경음악 켜기"}
+      title={enabled ? "배경음악 끄기" : "배경음악 켜기"}
+    >
+      {enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+      <span>{mode.label}</span>
+    </button>
+  );
+}
 
 const nextCaseSignals = {
   case01: {
@@ -482,6 +647,7 @@ function App() {
         title: "DB 미연결",
         text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
       };
+  const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -1140,6 +1306,7 @@ function App() {
   if (!started) {
     return (
       <main className="shell intro-shell">
+        <AdaptiveMusic modeKey={musicModeKey} />
         <section className="intro">
           <div className="brand-row">
             <span className="brand-mark">{GAME_TITLE}</span>
@@ -1372,6 +1539,7 @@ function App() {
   if (isResult) {
     return (
       <main className="shell">
+        <AdaptiveMusic modeKey={musicModeKey} />
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {screenReaderStatus}
         </p>
@@ -1727,6 +1895,7 @@ function App() {
 
   return (
     <main className="shell game-shell">
+      <AdaptiveMusic modeKey={musicModeKey} />
       <a className="skip-link" href="#choice-panel">
         선택지로 건너뛰기
       </a>

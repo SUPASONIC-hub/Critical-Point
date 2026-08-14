@@ -73,6 +73,43 @@ summary:focus-visible {
   transform: translateY(0);
 }
 
+.music-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 10px;
+  color: #dce5df;
+  background: rgba(24, 32, 31, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.music-toggle svg {
+  flex: 0 0 auto;
+}
+
+.music-toggle.active {
+  color: #18201f;
+  background: #d9ff62;
+  border-color: #c0ea4b;
+}
+
+.music-toggle span {
+  max-width: 58px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .shell {
   min-height: 100vh;
   padding: 28px;
@@ -3095,6 +3132,17 @@ textarea {
 }
 
 @media (max-width: 620px) {
+  .music-toggle {
+    top: 10px;
+    right: 10px;
+    min-height: 36px;
+    padding: 0 9px;
+  }
+
+  .music-toggle span {
+    max-width: 46px;
+  }
+
   .intro h1,
   .result-hero h1 {
     font-size: 42px;
