@@ -316,6 +316,51 @@ function App() {
     }
     return "";
   }
+
+  function getTacticalRead(choice, riskDelta, challengeMatch) {
+    const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
+    const biggestCost = effectEntries
+      .filter(([, value]) => value < 0)
+      .sort((a, b) => a[1] - b[1])[0];
+    const biggestGain = effectEntries
+      .filter(([, value]) => value > 0)
+      .sort((a, b) => b[1] - a[1])[0];
+    const cognitionGain = Object.values(choice.cognition ?? {}).reduce((sum, value) => sum + value, 0);
+    const grade =
+      challengeMatch && riskDelta < 0
+        ? "S"
+        : challengeMatch || riskDelta < 0
+          ? "A"
+          : riskDelta === 0 && cognitionGain >= 2
+            ? "B"
+            : riskDelta <= 6
+              ? "C"
+              : "D";
+    const gradeText = {
+      S: "브레이크스루",
+      A: "공략 후보",
+      B: "안정 전개",
+      C: "대가 있는 선택",
+      D: "고위험 도박",
+    }[grade];
+    const reward =
+      challengeMatch ||
+      (riskDelta < 0
+        ? "위험 압력 하락"
+        : riskDelta === 0
+          ? "압력 유지"
+          : `위험 압력 +${riskDelta}`);
+    const cost = biggestCost
+      ? `${resourceMeta[biggestCost[0]]?.label ?? biggestCost[0]} ${biggestCost[1]}`
+      : "즉시 손실 낮음";
+    const gain = biggestGain
+      ? `${resourceMeta[biggestGain[0]]?.label ?? biggestGain[0]} +${biggestGain[1]}`
+      : cognitionGain > 0
+        ? `사고 가속 +${cognitionGain}`
+        : "관망";
+
+    return { grade, gradeText, reward, cost, gain };
+  }
   const questSteps = [
     {
       title: "장면 챌린지",
@@ -1825,6 +1870,14 @@ function App() {
               어떤 선택도 무료가 아닙니다. 지금 고르는 말은 한 자원을 올리는 대신 다른
               부담을 다음 장면으로 넘깁니다.
             </p>
+            <div className="turn-tactic">
+              <span>이번 턴 공략</span>
+              <strong>{sceneChallenge.title}</strong>
+              <p>
+                전술 등급은 챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 함께 계산한
+                빠른 판단 지표입니다.
+              </p>
+            </div>
           </div>
           <div className="choices">
             {fixedChoices.map((choice) => {
@@ -1840,6 +1893,7 @@ function App() {
                     ? `위험 ${riskDelta}`
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, riskDelta);
+              const tacticalRead = getTacticalRead(choice, riskDelta, challengeMatch);
               return (
                 <button
                   key={choice.id}
@@ -1851,6 +1905,15 @@ function App() {
                   <span className="choice-main">
                     <Check size={16} />
                     {getDramaticChoiceLabel(choice)}
+                  </span>
+                  <span className="choice-tactical">
+                    <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
+                      {tacticalRead.grade}
+                    </b>
+                    <span>
+                      <strong>{tacticalRead.gradeText}</strong>
+                      <small>{tacticalRead.reward} · 보상 {tacticalRead.gain} · 비용 {tacticalRead.cost}</small>
+                    </span>
                   </span>
                   <span className="choice-action">{choice.label}</span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>

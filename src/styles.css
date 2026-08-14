@@ -1561,6 +1561,32 @@ summary:focus-visible {
   line-height: 1.45;
 }
 
+.turn-tactic {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 12px;
+  color: #18201f;
+  background: #d9ff62;
+  border: 1px solid #c0ea4b;
+  border-radius: 6px;
+}
+
+.turn-tactic span {
+  color: #2c4a46;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.turn-tactic strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.turn-tactic p {
+  color: #24302e;
+}
+
 .choice {
   display: grid;
   grid-template-columns: 1fr;
@@ -1584,6 +1610,78 @@ summary:focus-visible {
 
 .choice-main svg {
   flex: 0 0 auto;
+}
+
+.choice-tactical {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 10px;
+  margin-left: 24px;
+  padding: 10px;
+  background: #f4f6f3;
+  border: 1px solid #d8ded7;
+  border-radius: 6px;
+}
+
+.choice-tactical > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.choice-tactical strong,
+.choice-tactical small {
+  display: block;
+  line-height: 1.35;
+}
+
+.choice-tactical strong {
+  font-size: 13px;
+}
+
+.choice-tactical small {
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.tactical-grade {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  min-height: 34px;
+  color: #ffffff;
+  background: #52605b;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tactical-grade.grade-s {
+  color: #18201f;
+  background: #d9ff62;
+}
+
+.tactical-grade.grade-a {
+  background: #2c4a46;
+}
+
+.tactical-grade.grade-b {
+  background: #4e6f67;
+}
+
+.tactical-grade.grade-c {
+  color: #18201f;
+  background: #fff0bf;
+}
+
+.tactical-grade.grade-d {
+  background: #7a2f22;
 }
 
 .choice-effect {

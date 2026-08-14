@@ -14,17 +14,17 @@ npm run dev -- --port 5173
 ## 주요 기능
 
 - CASE 01부터 FINAL까지 이어지는 시즌형 의사결정 플로우
-- 선택지, 구조 재설계 자유입력, 에코 반론, 자원 변화, 결과 리포트
+- 선택지 전술 등급, 구조 재설계 자유입력, 에코 반론, 자원 변화, 결과 리포트
 - 브라우저 `localStorage` 기반 진행 저장, 저장 후 나가기, 이어하기
 - 플레이 로그 JSON 내보내기
-- 선택적 Supabase 원격 저장
+- 선택적 Supabase 원격 저장과 실패분 재시도 대기열
 
 ## 파일 구조
 
 ```text
 index.html             Vite 앱 엔트리와 메타 태그
 public/                앱 이미지와 아이콘 자산
-src/main.jsx           화면, 상태 관리, 저장/이어하기, 케이스 전환
+src/main.jsx           화면, 상태 관리, 저장/이어하기, 케이스 전환, 전술 등급 UI
 src/gameData.js        시즌/케이스/노드/선택지 데이터
 src/gameLogic.js       자원 계산, 자유입력 평가, 결과 요약
 src/styles.css         UI 스타일
