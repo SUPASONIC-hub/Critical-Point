@@ -1076,6 +1076,194 @@ summary:focus-visible {
   white-space: nowrap;
 }
 
+.pressure-cascade {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(180px, 0.8fr);
+  gap: 16px;
+  align-items: center;
+  margin: -4px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid #c9d4c9;
+  border-left: 5px solid #5a8275;
+  border-radius: 8px;
+  background: #f4f7f2;
+}
+
+.pressure-cascade.unstable {
+  border-color: #d6c998;
+  border-left-color: #b17c2d;
+  background: #fff9e9;
+}
+
+.pressure-cascade.critical {
+  border-color: #d7a59b;
+  border-left-color: #a74332;
+  background: #fff1ee;
+}
+
+.pressure-cascade-mark {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 102px;
+  padding-right: 16px;
+  border-right: 1px solid currentColor;
+}
+
+.pressure-cascade-mark span,
+.pressure-cascade-mark strong {
+  color: #2c4a46;
+  font-weight: 950;
+}
+
+.pressure-cascade-mark span {
+  font-size: 10px;
+}
+
+.pressure-cascade-mark strong {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.pressure-cascade h2 {
+  margin: 0;
+  color: #18201f;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.pressure-cascade p,
+.pressure-cascade small {
+  display: block;
+  margin: 4px 0 0;
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.pressure-cascade small {
+  margin: 0;
+  color: #3e4a45;
+}
+
+.decision-reveal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 28, 25, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.decision-reveal {
+  width: min(680px, 100%);
+  padding: 28px;
+  color: #18201f;
+  background: #fffdf8;
+  border: 1px solid #d4cdbb;
+  border-top: 5px solid #6c65ad;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  animation: reveal-in 220ms ease-out both;
+}
+
+.decision-reveal.cascade {
+  border-top-color: #a74332;
+}
+
+.decision-reveal-kicker,
+.decision-reveal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.decision-reveal-kicker span,
+.decision-reveal-kicker strong {
+  color: #6c65ad;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.decision-reveal.cascade .decision-reveal-kicker span,
+.decision-reveal.cascade .decision-reveal-kicker strong {
+  color: #a74332;
+}
+
+.decision-reveal h2 {
+  margin: 12px 0 16px;
+  font-size: clamp(24px, 4vw, 38px);
+  line-height: 1.2;
+}
+
+.decision-reveal-choice {
+  margin: 0;
+  padding: 15px 17px;
+  color: #2c4a46;
+  background: #edf4ee;
+  border-left: 4px solid #2c4a46;
+  font-size: 20px;
+  font-weight: 950;
+  line-height: 1.45;
+}
+
+.decision-reveal-beat {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.decision-reveal-beat p {
+  margin: 0;
+  color: #52605b;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.decision-reveal-beat .spoken-line {
+  color: #18201f;
+  font-weight: 900;
+}
+
+.decision-reveal-consequence {
+  margin: 18px 0;
+  padding-top: 16px;
+  color: #7a2f22;
+  border-top: 1px solid #e2d7ca;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.6;
+}
+
+.decision-reveal-footer {
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.decision-reveal-footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 42px;
+  padding: 0 15px;
+  color: #ffffff;
+  background: #2c4a46;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .play-help {
   margin-bottom: 16px;
   padding: 13px;
@@ -3570,6 +3758,14 @@ textarea {
     justify-content: flex-start;
   }
 
+  .pressure-cascade {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .pressure-cascade > small {
+    grid-column: 1 / -1;
+  }
+
   .game-hud,
   .quest-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3698,6 +3894,28 @@ textarea {
   .game-board,
   .status-board {
     padding: 16px;
+  }
+
+  .decision-reveal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .decision-reveal {
+    padding: 21px;
+  }
+
+  .decision-reveal-choice {
+    font-size: 17px;
+  }
+
+  .decision-reveal-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .decision-reveal-footer button {
+    justify-content: center;
   }
 
   .protocol-panel {

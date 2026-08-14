@@ -430,6 +430,7 @@ function App() {
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [decisionReveal, setDecisionReveal] = useState(null);
   const [saveStatus, setSaveStatus] = useState("");
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
@@ -513,6 +514,39 @@ function App() {
       : riskTier === "UNSTABLE"
         ? `${primarySceneTriggerLabel} 압박이 테이블 위에 얇게 깔린다. 대답은 가능하지만, 아직 비용의 이름이 다 불리지 않았다.`
         : `${primarySceneTriggerLabel} 압박은 낮게 유지된다. 그래서 지금은 결론보다 전제를 바꾸기 좋은 순간이다.`;
+  const pressureCascade = useMemo(() => {
+    const latest = log.at(-1);
+    const humanCost = resources.humanCost ?? 0;
+    const fatigue = resources.fatigue ?? 0;
+    const pressure = riskPressure;
+    if (pressure >= 72 || humanCost >= 28) {
+      return {
+        tone: "critical",
+        label: "PRESSURE CASCADE",
+        title: "숫자로 막던 문제가 사람의 반응으로 새고 있습니다.",
+        text: "다음 선택은 자원 하나만 움직이지 않습니다. 침묵한 사람, 떠날 사람, 기록을 들고 있는 사람이 동시에 반응합니다.",
+        cue: "가장 큰 성과보다 피해가 어디로 이동하는지 먼저 말해야 합니다.",
+      };
+    }
+    if (pressure >= 48 || fatigue >= 32) {
+      return {
+        tone: "unstable",
+        label: "AFTERSHOCK",
+        title: "직전 판단의 비용이 아직 회의실에 남아 있습니다.",
+        text: "다음 결론을 서두르면 방금 줄인 비용이 다른 이해관계자에게 옮겨갈 수 있습니다.",
+        cue: latest?.challenge?.matched
+          ? "챌린지를 맞혔어도, 남겨둔 비용까지 사라진 것은 아닙니다."
+          : "이번 장면은 정답보다 비용의 이동 경로를 확인해야 합니다.",
+      };
+    }
+    return {
+      tone: "stable",
+      label: "LOW SIGNAL",
+      title: "아직 방향을 바꿀 여지가 있습니다.",
+      text: "압박이 낮을 때는 빠른 결론보다 다음 사건에 남길 기준을 설계할 수 있습니다.",
+      cue: "지금 남기는 문장이 다음 장면의 출발점이 됩니다.",
+    };
+  }, [log, resources, riskPressure]);
   const gameplayStats = getGameplayStats(log, riskPressure);
   const {
     freeCount: freeTextCombo,
@@ -891,6 +925,7 @@ function App() {
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
     setOpeningLegacy(null);
+    setDecisionReveal(null);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -914,6 +949,7 @@ function App() {
     setIsPausedSave(false);
     setNodeEnteredAt(Date.now());
     setSaveStatus("");
+    setDecisionReveal(null);
     persist({
       started: true,
       paused: false,
@@ -980,6 +1016,7 @@ function App() {
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
     setOpeningLegacy(legacy);
+    setDecisionReveal(null);
     setEcho(introEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -1332,6 +1369,27 @@ function App() {
     setCompletedCases(nextCompletedCases);
     setCaseResults(nextCaseResults);
     setNodeEnteredAt(Date.now());
+    const strongestCost = Object.entries(finalEffect)
+      .filter(([, value]) => value < 0)
+      .sort((a, b) => a[1] - b[1])[0];
+    const cascade = finalResourcesWithTempo.humanCost >= 28 || getRiskPressure(finalResourcesWithTempo) >= 72;
+    setDecisionReveal({
+      title: cascade ? "선택이 연쇄 반응을 일으켰습니다." : "선택의 잔향",
+      label: cascade ? "CASCADE DETECTED" : "DECISION AFTERIMAGE",
+      spokenChoice: entry.spokenChoice,
+      beat: entry.sceneBeat,
+      effect: finalEffect,
+      consequence: cascade
+        ? "당신의 말은 실행안으로 끝나지 않았습니다. 누군가의 행동을 바꾸고, 다음 장면의 압박을 앞당겼습니다."
+        : strongestCost
+          ? `${resourceMeta[strongestCost[0]]?.label ?? strongestCost[0]}의 감소분이 다음 장면의 숨은 질문으로 남습니다.`
+          : entry.challenge?.matched
+            ? "장면의 핵심을 읽어낸 대가로, 회의실은 당신의 기준을 기억하기 시작합니다."
+            : "결론은 닫혔지만, 말하지 않은 비용은 아직 닫히지 않았습니다.",
+      nextTitle: nodes[nextNode]?.title ?? "결과 화면",
+      nextNode,
+      cascade,
+    });
     persist({
       resources: finalResourcesWithTempo,
       triggers: nextTriggers,
@@ -1368,6 +1426,7 @@ function App() {
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
+    setDecisionReveal(null);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     setSaveStatus("");
@@ -1618,6 +1677,38 @@ function App() {
       ? `${triggerLabels[currentNode.triggers[0]]} 압박 때문에 생략한 근거가 있는지 확인`
       : "방금 판단에서 빠진 이해관계자 확인";
     return [...memoChecks, triggerCheck];
+  }
+
+  function renderDecisionReveal() {
+    if (!decisionReveal) return null;
+    return (
+      <div className="decision-reveal-backdrop" role="presentation">
+        <section
+          className={decisionReveal.cascade ? "decision-reveal cascade" : "decision-reveal"}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="decision-reveal-title"
+        >
+          <div className="decision-reveal-kicker">
+            <span>{decisionReveal.label}</span>
+            {decisionReveal.cascade && <strong>압박 연쇄</strong>}
+          </div>
+          <h2 id="decision-reveal-title">{decisionReveal.title}</h2>
+          <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
+          <div className="decision-reveal-beat">
+            {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
+          </div>
+          <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
+          <div className="decision-reveal-footer">
+            <span>다음 장면 · {decisionReveal.nextTitle}</span>
+            <button type="button" onClick={() => setDecisionReveal(null)} autoFocus>
+              다음 장면으로
+              <ChevronRight size={17} />
+            </button>
+          </div>
+        </section>
+      </div>
+    );
   }
 
   function getCaseStatusText(status) {
@@ -1907,6 +1998,7 @@ function App() {
     return (
       <main className="shell">
         <AdaptiveMusic modeKey={musicModeKey} />
+        {renderDecisionReveal()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {screenReaderStatus}
         </p>
@@ -2263,6 +2355,7 @@ function App() {
   return (
     <main className="shell game-shell">
       <AdaptiveMusic modeKey={musicModeKey} />
+      {renderDecisionReveal()}
       <a className="skip-link" href="#choice-panel">
         선택지로 건너뛰기
       </a>
@@ -2300,6 +2393,17 @@ function App() {
             </div>
           </section>
         )}
+        <section className={`pressure-cascade ${pressureCascade.tone}`}>
+          <div className="pressure-cascade-mark">
+            <span>{pressureCascade.label}</span>
+            <strong>{riskPressure}</strong>
+          </div>
+          <div>
+            <h2>{pressureCascade.title}</h2>
+            <p>{pressureCascade.text}</p>
+          </div>
+          <small>{pressureCascade.cue}</small>
+        </section>
         <details className="play-help">
           <summary>
             <span>
