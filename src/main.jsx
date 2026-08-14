@@ -2347,32 +2347,13 @@ function App() {
               <small>{speakerProfile.role} · {speakerProfile.stance}</small>
             </span>
           </div>
-          <div className="speaker-context">
-            <span>{speakerProfile.appearance}</span>
-            <b>{speakerProfile.job}</b>
+          <div className="scene-story">
+            <p className="scene-narration">{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            <p className="scene-thought">'{speakerProfile.thought}'</p>
+            <p className="scene-narration scene-direction">{sceneDirection}</p>
+            <p className="scene-body">{node.text}</p>
+            <p className="scene-dialogue">"{speakerProfile.line}" <span>({speakerProfile.voice})</span></p>
           </div>
-          <aside className="character-cutin">
-            <div>
-              <span>CHARACTER CUT-IN</span>
-              <strong>{speakerProfile.line}</strong>
-            </div>
-            <p className="scene-direction">{sceneDirection}</p>
-            <dl>
-              <div>
-                <dt>생각</dt>
-                <dd>'{speakerProfile.thought}'</dd>
-              </div>
-              <div>
-                <dt>지문</dt>
-                <dd>{speakerProfile.gesture}</dd>
-              </div>
-              <div>
-                <dt>말투</dt>
-                <dd>{speakerProfile.voice}</dd>
-              </div>
-            </dl>
-          </aside>
-          <p>{node.text}</p>
         </div>
 
         {latestBeat && (
@@ -2485,10 +2466,10 @@ function App() {
                 >
                   <span className="choice-main">
                     <Check size={16} />
-                    {getDramaticChoiceLabel(choice)}
+                    <small>선택</small>
                   </span>
-                  <span className="choice-action">{choice.label}</span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
+                  <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
                   {showTacticalDetails && (
                     <>
                       <span className="choice-tactical">
@@ -2732,8 +2713,7 @@ function App() {
           <div className="speaker-card">
             <strong>{node.speaker}</strong>
             <span>{speakerProfile.role}</span>
-            <small>{speakerProfile.appearance}</small>
-            <p>{speakerProfile.job}</p>
+            <p>{speakerProfile.stance}</p>
           </div>
         </details>
         <details className="insight-drawer status-drawer">
