@@ -109,7 +109,7 @@ const musicModes = {
   intro: {
     label: "대기",
     interval: 920,
-    volume: 0.034,
+    volume: 0.085,
     wave: "sine",
     bass: [55, 55, 65.4, 49],
     notes: [220, null, 277.18, null, 196, 246.94, null, 164.81],
@@ -117,7 +117,7 @@ const musicModes = {
   controlled: {
     label: "안정",
     interval: 760,
-    volume: 0.036,
+    volume: 0.09,
     wave: "triangle",
     bass: [65.4, 73.42, 82.41, 73.42],
     notes: [261.63, null, 329.63, 392, null, 293.66, 349.23, null],
@@ -125,7 +125,7 @@ const musicModes = {
   unstable: {
     label: "불안정",
     interval: 560,
-    volume: 0.04,
+    volume: 0.095,
     wave: "triangle",
     bass: [73.42, 69.3, 82.41, 65.4],
     notes: [293.66, 311.13, null, 392, 349.23, null, 329.63, 277.18],
@@ -133,7 +133,7 @@ const musicModes = {
   critical: {
     label: "위기",
     interval: 390,
-    volume: 0.045,
+    volume: 0.1,
     wave: "sawtooth",
     bass: [49, 51.91, 55, 46.25],
     notes: [196, 207.65, null, 233.08, 246.94, null, 220, 207.65],
@@ -141,7 +141,7 @@ const musicModes = {
   result: {
     label: "결과",
     interval: 980,
-    volume: 0.038,
+    volume: 0.09,
     wave: "sine",
     bass: [65.4, 82.41, 98, 73.42],
     notes: [261.63, null, 392, 329.63, null, 440, 392, null],
@@ -166,10 +166,13 @@ function playTone(context, destination, frequency, duration, gainValue, type = "
 
 function AdaptiveMusic({ modeKey }) {
   const [enabled, setEnabled] = useState(() => localStorage.getItem(MUSIC_PREF_KEY) !== "false");
+  const [audioState, setAudioState] = useState("starting");
   const contextRef = useRef(null);
   const masterGainRef = useRef(null);
   const timerRef = useRef(null);
   const stepRef = useRef(0);
+  const pulseRef = useRef(null);
+  const resumeRef = useRef(null);
   const modeRef = useRef(musicModes[modeKey] ?? musicModes.intro);
   const mode = musicModes[modeKey] ?? musicModes.intro;
 
@@ -185,6 +188,7 @@ function AdaptiveMusic({ modeKey }) {
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
+      setAudioState("off");
       masterGainRef.current?.gain.setTargetAtTime(0.0001, contextRef.current?.currentTime ?? 0, 0.08);
       return;
     }
@@ -198,15 +202,6 @@ function AdaptiveMusic({ modeKey }) {
       masterGainRef.current.gain.value = modeRef.current.volume;
       masterGainRef.current.connect(context.destination);
     }
-    context.resume?.();
-
-    function resumeAfterAutoplayBlock() {
-      if (context.state === "suspended") {
-        context.resume?.();
-      }
-    }
-    window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
-    window.addEventListener("keydown", resumeAfterAutoplayBlock);
 
     function pulse() {
       if (context.state === "suspended") return;
@@ -214,19 +209,41 @@ function AdaptiveMusic({ modeKey }) {
       const step = stepRef.current;
       const note = currentMode.notes[step % currentMode.notes.length];
       const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
-      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, currentMode.volume, currentMode.wave);
+      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.22, currentMode.wave);
       if (step % 4 === 0) {
-        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, currentMode.volume * 0.62, "sine");
+        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.14, "sine");
       }
       stepRef.current += 1;
     }
 
+    pulseRef.current = pulse;
+    async function resumeAudio() {
+      try {
+        await context.resume?.();
+        setAudioState(context.state === "running" ? "running" : "blocked");
+        if (context.state === "running") pulse();
+      } catch (error) {
+        console.warn("Audio resume blocked", error);
+        setAudioState("blocked");
+      }
+    }
+    resumeRef.current = resumeAudio;
+    function resumeAfterAutoplayBlock() {
+      resumeAudio();
+    }
+    window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
+    window.addEventListener("keydown", resumeAfterAutoplayBlock);
+    window.addEventListener("touchstart", resumeAfterAutoplayBlock, { passive: true });
+
     pulse();
+    resumeAudio();
     timerRef.current = window.setInterval(pulse, modeRef.current.interval);
     return () => {
       window.clearInterval(timerRef.current);
       window.removeEventListener("pointerdown", resumeAfterAutoplayBlock);
       window.removeEventListener("keydown", resumeAfterAutoplayBlock);
+      window.removeEventListener("touchstart", resumeAfterAutoplayBlock);
+      if (pulseRef.current === pulse) pulseRef.current = null;
     };
   }, [enabled]);
 
@@ -242,9 +259,9 @@ function AdaptiveMusic({ modeKey }) {
         const step = stepRef.current;
         const note = currentMode.notes[step % currentMode.notes.length];
         const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
-        playTone(context, masterGainRef.current, note, currentMode.interval / 1200, currentMode.volume, currentMode.wave);
+        playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.22, currentMode.wave);
         if (step % 4 === 0) {
-          playTone(context, masterGainRef.current, bass, currentMode.interval / 650, currentMode.volume * 0.62, "sine");
+          playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.14, "sine");
         }
         stepRef.current += 1;
       }
@@ -257,12 +274,18 @@ function AdaptiveMusic({ modeKey }) {
     <button
       type="button"
       className={enabled ? "music-toggle active" : "music-toggle"}
-      onClick={() => setEnabled((value) => !value)}
-      aria-label={enabled ? "배경음악 끄기" : "배경음악 켜기"}
-      title={enabled ? "배경음악 끄기" : "배경음악 켜기"}
+      onClick={() => {
+        if (enabled && audioState !== "running") {
+          resumeRef.current?.();
+          return;
+        }
+        setEnabled((value) => !value);
+      }}
+      aria-label={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
+      title={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
     >
-      {enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-      <span>{mode.label}</span>
+      {enabled && audioState === "running" ? <Volume2 size={18} /> : <VolumeX size={18} />}
+      <span>{enabled ? (audioState === "running" ? mode.label : "소리 시작") : "꺼짐"}</span>
     </button>
   );
 }
