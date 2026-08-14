@@ -81,6 +81,30 @@ const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 
+const playStyleOptions = [
+  {
+    id: "instinct",
+    label: "감각형",
+    title: "첫 반응을 믿는다",
+    text: "전술 정보를 덜 보고 장면의 온도와 사람의 반응으로 결정합니다.",
+    payoff: "직관 챌린지 보너스 강화",
+  },
+  {
+    id: "auditor",
+    label: "감사형",
+    title: "근거를 끝까지 확인한다",
+    text: "비용과 위험을 펼쳐 본 뒤, 설명 가능한 선택을 밀어붙입니다.",
+    payoff: "전술 챌린지 보너스 강화",
+  },
+  {
+    id: "mediator",
+    label: "중재형",
+    title: "대화로 압박을 낮춘다",
+    text: "에코의 힌트와 관계의 맥락을 활용해 손실을 분산합니다.",
+    payoff: "에코 힌트 비용 절감",
+  },
+];
+
 const musicModes = {
   intro: {
     label: "대기",
@@ -336,6 +360,7 @@ function App() {
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
 
   const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
+  const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
   const [started, setStarted] = useState(saved?.started ?? false);
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
@@ -372,6 +397,7 @@ function App() {
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
     : "case01";
+  const activePlayStyle = playStyleOptions.find((style) => style.id === playStyle) ?? playStyleOptions[0];
   const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders.case01;
   const fallbackNodeId = activeNodeOrder[0] ?? "start";
   const resolvedNodeId = nodes[nodeId] ? nodeId : fallbackNodeId;
@@ -449,6 +475,8 @@ function App() {
       ? "구조 개입"
       : log.at(-1)?.instinctSurge
         ? "INSTINCT SURGE"
+        : log.at(-1)?.auditSurge
+          ? "AUDIT SURGE"
         : log.at(-1)?.tempoBonus
           ? "QUICK READ"
           : freeTextCombo >= 2
@@ -490,6 +518,7 @@ function App() {
     "avoid-risk": "힌트: 경쟁자의 속도를 따라가는 대신 위험을 유지하거나 낮추는 선택이 다음 장면을 엽니다.",
     "find-cost": "힌트: 가장 좋아 보이는 선택이 누구에게 비용을 넘기는지 먼저 찾으십시오.",
   }[sceneChallenge.id];
+  const echoProbeCost = playStyle === "mediator" ? "결정 시간 4초와 신뢰 1" : "결정 시간 8초와 피로 1";
   function getChallengeMatch(choice, riskDelta) {
     if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
     if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
@@ -740,6 +769,7 @@ function App() {
     const payload = {
         saveSchemaVersion: SAVE_SCHEMA_VERSION,
         playerName,
+        playStyle,
         dataConsent,
         started,
         currentCase,
@@ -776,6 +806,7 @@ function App() {
     setNodeEnteredAt(Date.now());
     persist({
       playerName: name,
+      playStyle,
       dataConsent,
       started: true,
       currentCase: "case01",
@@ -880,9 +911,12 @@ function App() {
 
   function requestEchoProbe() {
     if (probeUsed || isAdvancing || !echoProbeHint) return;
-    const probeEffect = { time: -1, fatigue: 1 };
+    const probeSeconds = playStyle === "mediator" ? 4 : 8;
+    const probeEffect = playStyle === "mediator"
+      ? { time: -1, trust: 1 }
+      : { time: -1, fatigue: 1 };
     const nextResources = applyEffect(resources, probeEffect);
-    const probeLine = `${echoProbeHint} 단, 힌트를 얻는 대가로 결정 시간 8초와 피로 1을 지불합니다.`;
+    const probeLine = `${echoProbeHint} 단, 힌트를 얻는 대가로 결정 시간 ${probeSeconds}초를 지불합니다.`;
     const entry = {
       nodeId: resolvedNodeId,
       title: "ECHO PROBE",
@@ -899,7 +933,7 @@ function App() {
       tempoBonus: null,
       instinctSurge: null,
       note: "장면당 1회 힌트 요청",
-      responseTimeSec: 8,
+      responseTimeSec: probeSeconds,
       resourcesBefore: resources,
       resourcesAfter: nextResources,
       isSystemEvent: true,
@@ -909,8 +943,8 @@ function App() {
     setResources(nextResources);
     setLog(nextLog);
     setEcho(probeLine);
-    setDecisionSeconds((value) => Math.max(0, value - 8));
-    setSaveStatus("에코 힌트 확보됨 · 결정 시간 8초 사용");
+    setDecisionSeconds((value) => Math.max(0, value - probeSeconds));
+    setSaveStatus(`에코 힌트 확보됨 · 결정 시간 ${probeSeconds}초 사용`);
     persist({
       probeUsed: true,
       resources: nextResources,
@@ -1050,12 +1084,19 @@ function App() {
       finalResources: nextResources,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-    const instinctChoice = !showTacticalDetails;
+    const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
     const instinctSurge = instinctChoice && challengeMatch
       ? {
           label: "INSTINCT SURGE",
           text: "정보를 더 열어보지 않고 장면의 핵심 압박을 읽었습니다.",
-          effect: { trust: 2, fatigue: -1 },
+          effect: { trust: 3, fatigue: -2 },
+        }
+      : null;
+    const auditSurge = playStyle === "auditor" && showTacticalDetails && challengeMatch
+      ? {
+          label: "AUDIT SURGE",
+          text: "비용과 위험을 확인한 뒤, 설명 가능한 챌린지 선택을 완수했습니다.",
+          effect: { legitimacy: 2, fatigue: -1 },
         }
       : null;
     const quickRead = responseTimeSec <= 12 && challengeMatch;
@@ -1070,6 +1111,7 @@ function App() {
       effect,
       ...(tempoBonus ? [tempoBonus.effect] : []),
       ...(instinctSurge ? [instinctSurge.effect] : []),
+      ...(auditSurge ? [auditSurge.effect] : []),
     );
     const finalResourcesWithTempo = applyEffect(resources, finalEffect);
     const nextTriggers = { ...triggers };
@@ -1101,6 +1143,7 @@ function App() {
       flowSurge,
       tempoBonus,
       instinctSurge,
+      auditSurge,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -1212,6 +1255,7 @@ function App() {
     localStorage.removeItem("trigger-prototype");
     localStorage.removeItem(STORAGE_KEY);
     setPlayerName("");
+    setPlayStyle("instinct");
     setDataConsent(false);
     setStarted(false);
     setCurrentCase("case01");
@@ -1560,6 +1604,35 @@ function App() {
               <b>기록은 다음 사건으로 이동한다</b>
               <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
             </article>
+          </section>
+          <section className="play-style-panel" aria-label="플레이 스타일 선택">
+            <div className="panel-title-row">
+              <div>
+                <span>ANALYST PROTOCOL</span>
+                <h2>어떤 방식으로 판단할까요?</h2>
+              </div>
+              <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
+            </div>
+            <div className="play-style-grid">
+              {playStyleOptions.map((style) => (
+                <button
+                  type="button"
+                  key={style.id}
+                  className={playStyle === style.id ? "play-style selected" : "play-style"}
+                  onClick={() => {
+                    setPlayStyle(style.id);
+                    persist({ playStyle: style.id });
+                  }}
+                  aria-pressed={playStyle === style.id}
+                >
+                  <span>{style.label}</span>
+                  <strong>{style.title}</strong>
+                  <p>{style.text}</p>
+                  <small>{style.payoff}</small>
+                </button>
+              ))}
+            </div>
+            <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
           <div className="start-panel">
             {hasResumableSave && (
@@ -2345,7 +2418,7 @@ function App() {
           <div className="echo-probe">
             <div>
               <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
-              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : "결정 시간 8초와 피로 1을 지불하고 방향성만 확인합니다."}</span>
+              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : `${echoProbeCost}을 지불하고 방향성만 확인합니다.`}</span>
             </div>
             <button type="button" onClick={requestEchoProbe} disabled={probeUsed || isAdvancing}>
               {probeUsed ? "확인됨" : "힌트 요청"}
@@ -2614,6 +2687,7 @@ function App() {
         <div className="analyst-card">
           <span>분석관</span>
           <strong>{playerName}</strong>
+          <small>{activePlayStyle.label} · {activePlayStyle.title}</small>
         </div>
         <section className="turn-brief">
           <h2>이번 턴 브리프</h2>

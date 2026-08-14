@@ -392,6 +392,105 @@ summary:focus-visible {
   line-height: 1.5;
 }
 
+.play-style-panel {
+  width: min(960px, 100%);
+  margin: 18px auto 0;
+  padding: 16px;
+  color: #18201f;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #d8ded7;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.play-style-panel .panel-title-row {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.play-style-panel .panel-title-row > div {
+  display: grid;
+  gap: 4px;
+}
+
+.play-style-panel .panel-title-row span {
+  color: #2c4a46;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.play-style-panel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.play-style-panel .panel-title-row small {
+  color: #52605b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.play-style-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.play-style {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 150px;
+  padding: 12px;
+  color: #24302e;
+  background: #f4f6f3;
+  border: 1px solid #d8ded7;
+  border-radius: 7px;
+  text-align: left;
+}
+
+.play-style:hover,
+.play-style:focus-visible,
+.play-style.selected {
+  color: #18201f;
+  background: #eef7f3;
+  border-color: #2c4a46;
+  box-shadow: inset 0 0 0 2px #bed6cc;
+}
+
+.play-style > span {
+  color: #2c4a46;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.play-style strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.play-style p {
+  margin: 0;
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.play-style small {
+  margin-top: auto;
+  color: #226347;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.play-style-note {
+  margin: 10px 0 0;
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .quick-guide {
   width: min(960px, 100%);
   margin: 18px auto 0;
@@ -2413,6 +2512,14 @@ textarea {
   font-size: 24px;
 }
 
+.analyst-card small {
+  display: block;
+  margin-top: 5px;
+  color: #dce5df;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .turn-brief {
   padding: 12px;
   background: #18201f;
@@ -3308,6 +3415,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .play-style-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .season-summary-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3423,6 +3534,10 @@ textarea {
   .game-hud,
   .quest-panel,
   .season-summary-list {
+    grid-template-columns: 1fr;
+  }
+
+  .play-style-grid {
     grid-template-columns: 1fr;
   }
 
