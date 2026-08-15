@@ -501,10 +501,13 @@ function App() {
   const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
   const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
-    tone: telemetryEnabled ? "ready" : "local",
-    text: telemetryEnabled
-      ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-      : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+    tone: telemetryEnabled && globalThis.navigator?.onLine !== false ? "ready" : "local",
+    text:
+      globalThis.navigator?.onLine === false
+        ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
+        : telemetryEnabled
+          ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
@@ -974,6 +977,29 @@ function App() {
     })),
     [caseResults, playerName, sessionCode],
   );
+  useEffect(() => {
+    const updateNetworkStatus = () => {
+      if (globalThis.navigator?.onLine === false) {
+        setTelemetryStatus({
+          tone: "local",
+          text: "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+        });
+        return;
+      }
+      setTelemetryStatus({
+        tone: telemetryEnabled ? "ready" : "local",
+        text: telemetryEnabled
+          ? "네트워크 연결됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+      });
+    };
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+    return () => {
+      window.removeEventListener("online", updateNetworkStatus);
+      window.removeEventListener("offline", updateNetworkStatus);
+    };
+  }, []);
   useEffect(() => {
     if (!showRanking) return undefined;
     let cancelled = false;
