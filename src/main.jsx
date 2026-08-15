@@ -2383,7 +2383,7 @@ function App() {
                 onKeyDown={(event) => event.key === "Enter" && startGame()}
                 placeholder="이름을 입력하세요"
               />
-              <button onClick={startGame}>
+              <button type="button" onClick={startGame}>
                 <ChevronRight size={18} />
                 첫 케이스 시작
               </button>
@@ -2435,7 +2435,7 @@ function App() {
                 결과 화면의 8자리 세션 코드로 처리합니다.
               </p>
             </div>
-            <button className="test-unlock" onClick={unlockAllCasesForTest}>
+            <button type="button" className="test-unlock" onClick={unlockAllCasesForTest}>
               테스트용 전체 케이스 열기
             </button>
           </div>
@@ -2573,11 +2573,11 @@ function App() {
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
             <div className="top-actions">
-              <button className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
+              <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
                 <Trophy size={16} />
                 랭킹
               </button>
-              <button className="ghost" onClick={showSeasonMap}>
+              <button type="button" className="ghost" onClick={showSeasonMap}>
                 <FileText size={16} />
                 시즌 로드맵
               </button>
@@ -2585,7 +2585,7 @@ function App() {
                 <Download size={16} />
                 로그 내보내기
               </button>
-              <button className="ghost" onClick={reset}>
+              <button type="button" className="ghost" onClick={reset}>
                 <RefreshCcw size={16} />
                 다시 플레이
               </button>
@@ -2743,7 +2743,7 @@ function App() {
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>
                 <small>{resultBridge}</small>
               </div>
-              <button onClick={() => startCase(nextCaseSignal.caseId)}>
+              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)}>
                 <ChevronRight size={18} />
                 {nextCaseSignal.button}
               </button>
@@ -2921,6 +2921,7 @@ function App() {
             )}
             <div className="feedback-actions">
               <button
+                type="button"
                 onClick={submitCurrentFeedback}
                 disabled={activeFeedbackPrivacySignals.length > 0 || isSubmittingFeedback}
                 aria-busy={isSubmittingFeedback}
@@ -3144,15 +3145,15 @@ function App() {
             <h1 ref={sceneTitleRef} tabIndex={-1}>{simplifyPlayerText(node.title)}</h1>
           </div>
           <div className="top-actions">
-            <button className="ghost" onClick={() => saveCurrentGame()}>
+              <button type="button" className="ghost" onClick={() => saveCurrentGame()}>
               <Save size={16} />
               저장
             </button>
-            <button className="ghost" onClick={() => saveCurrentGame({ exit: true })}>
+              <button type="button" className="ghost" onClick={() => saveCurrentGame({ exit: true })}>
               <FileText size={16} />
               저장 후 나가기
             </button>
-            <button className="ghost" onClick={reset}>
+              <button type="button" className="ghost" onClick={reset}>
               <RefreshCcw size={16} />
               초기화
             </button>
@@ -3539,6 +3540,7 @@ function App() {
               const tacticalRead = choiceRead.tacticalRead;
               return (
                 <button
+                  type="button"
                   key={choice.id}
                   className={pendingChoice?.id === choice.id ? "choice selected" : "choice"}
                   onClick={() => previewChoice(choice)}
@@ -3616,7 +3618,7 @@ function App() {
               </div>
               <div className="prompt-chips">
                 {boardChangePrompts.map((prompt) => (
-                  <button key={prompt} onClick={() => updateFreeText(prompt)}>
+                  <button type="button" key={prompt} onClick={() => updateFreeText(prompt)}>
                     {prompt}
                   </button>
                 ))}
@@ -3725,6 +3727,7 @@ function App() {
                 </div>
               )}
               <button
+                type="button"
                 className="choice free-choice submit-reframe"
                 onClick={() => choose(freeChoice)}
                 disabled={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
