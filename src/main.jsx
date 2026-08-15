@@ -818,6 +818,13 @@ function App() {
   }
 
   function getFlowSurge(tacticalRead, challengeMatch, riskDelta) {
+    if (currentChallengeStreak >= 2 && challengeMatch) {
+      return {
+        label: "STREAK BREAKTHROUGH",
+        text: "세 번째 연속 공략이 맞물렸습니다. 팀의 신뢰가 붙고 판단 피로가 회복됩니다.",
+        effect: { trust: 2, legitimacy: 2, fatigue: -2 },
+      };
+    }
     if (tacticalRead.grade === "S") {
       return {
         label: "FLOW SURGE",
@@ -2051,6 +2058,9 @@ function App() {
     challengeClearCount > 0
       ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
       : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
+    currentChallengeStreak >= 3
+      ? { title: "Streak Breakthrough", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 추가 보상을 열었습니다.` }
+      : { title: "Chain Starter", text: "장면 목표를 연속으로 맞히면 추가 보상이 열립니다." },
     flowSurgeCount > 0
       ? { title: "Flow Surge", text: `${flowSurgeCount}번 보너스 자원 회복을 만들었습니다.` }
       : { title: "No Surge", text: "챌린지와 위험 제어가 아직 보너스로 이어지지 않았습니다." },
@@ -3596,6 +3606,14 @@ function App() {
                       {choice.effect && (
                         <span className={`choice-risk ${riskClass}`}>
                           {riskLabel} · 예상 압력 {projectedRisk}
+                        </span>
+                      )}
+                      {choice.effect && (
+                        <span className={`choice-impact ${riskClass}`} aria-label={`예상 압력 ${projectedRisk}`}>
+                          <span className="choice-impact-track" aria-hidden="true">
+                            <span style={{ width: `${Math.min(100, Math.max(4, projectedRisk))}%` }} />
+                          </span>
+                          <b>압력 {projectedRisk}/100</b>
                         </span>
                       )}
                       {choice.effect && (
