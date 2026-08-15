@@ -31,6 +31,7 @@ import {
   copyText,
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
+  normalizeFeedback,
   normalizePlayerName,
   normalizeSavedText,
   parseSavedState,
@@ -945,12 +946,7 @@ function App() {
     { label: "보너스", value: activeBonus },
     { label: "남은 시간", value: `${decisionSeconds}초` },
   ];
-  const currentFeedback = playtestFeedback[currentCase] ?? {
-    clarity: "",
-    difficulty: "",
-    comment: "",
-    savedAt: "",
-  };
+  const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const [feedbackStatus, setFeedbackStatus] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const firstRenderRef = useRef(true);

@@ -13,6 +13,16 @@ export function normalizeSavedText(value, maxLength = 0) {
   return Number.isFinite(maxLength) && maxLength > 0 ? value.slice(0, maxLength) : value;
 }
 
+export function normalizeFeedback(value) {
+  const feedback = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return {
+    clarity: normalizeSavedText(feedback.clarity),
+    difficulty: normalizeSavedText(feedback.difficulty),
+    comment: normalizeSavedText(feedback.comment, FEEDBACK_COMMENT_MAX_LENGTH),
+    savedAt: normalizeSavedText(feedback.savedAt),
+  };
+}
+
 export function parseSavedState(raw, schemaVersion) {
   try {
     const parsed = JSON.parse(raw);
