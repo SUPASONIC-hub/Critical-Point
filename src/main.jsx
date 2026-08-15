@@ -2377,8 +2377,18 @@ function App() {
                 type="checkbox"
                 checked={dataConsent}
                 onChange={(event) => {
-                  setDataConsent(event.target.checked);
-                  persist({ dataConsent: event.target.checked });
+                  const nextConsent = event.target.checked;
+                  setDataConsent(nextConsent);
+                  if (!nextConsent) {
+                    setPendingTelemetry([]);
+                    setTelemetryStatus({
+                      tone: "local",
+                      text: "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다.",
+                    });
+                    persist({ dataConsent: false, pendingTelemetry: [] });
+                    return;
+                  }
+                  persist({ dataConsent: true });
                 }}
               />
               <span>
