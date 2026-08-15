@@ -479,7 +479,7 @@ function App() {
   const [log, setLog] = useState(saved?.log ?? []);
   const [triggers, setTriggers] = useState(saved?.triggers ?? makeEmptyScores(triggerLabels));
   const [cognition, setCognition] = useState(saved?.cognition ?? makeEmptyScores(cognitionLabels));
-  const [freeText, setFreeText] = useState("");
+  const [freeText, setFreeText] = useState(saved?.freeText ?? "");
   const [echo, setEcho] = useState(saved?.echo ?? "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
@@ -1085,6 +1085,7 @@ function App() {
         log,
         triggers,
         cognition,
+        freeText,
         echo,
         nodeEnteredAt,
         pendingTelemetry,
@@ -1248,6 +1249,7 @@ function App() {
       log: [],
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
+      freeText: "",
       protocolUsed: false,
       timerPenaltyApplied: false,
       probeUsed: false,
@@ -1258,7 +1260,13 @@ function App() {
   }
 
   function anonymizeFreeText() {
-    setFreeText(limitText(anonymizeSensitiveText(freeText), FREE_TEXT_MAX_LENGTH));
+    updateFreeText(anonymizeSensitiveText(freeText));
+  }
+
+  function updateFreeText(value) {
+    const nextText = limitText(value, FREE_TEXT_MAX_LENGTH);
+    setFreeText(nextText);
+    persist({ freeText: nextText });
   }
 
   function requestEchoProbe() {
@@ -1644,6 +1652,7 @@ function App() {
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
       discoveredClues: nextDiscoveredClues,
+      freeText: "",
       timerPenaltyApplied: false,
       probeUsed: false,
       nodeEnteredAt: Date.now(),
@@ -3461,14 +3470,14 @@ function App() {
               </div>
               <div className="prompt-chips">
                 {boardChangePrompts.map((prompt) => (
-                  <button key={prompt} onClick={() => setFreeText(prompt)}>
+                  <button key={prompt} onClick={() => updateFreeText(prompt)}>
                     {prompt}
                   </button>
                 ))}
               </div>
               <textarea
                 value={freeText}
-                onChange={(event) => setFreeText(event.target.value)}
+                onChange={(event) => updateFreeText(event.target.value)}
                 maxLength={FREE_TEXT_MAX_LENGTH}
                 placeholder="예: 누구를 새로 협상장에 부를지, 어떤 조건을 교환할지, 어떤 정보를 먼저 확인할지 적는다."
                 aria-label="구조 재설계 자유입력"
