@@ -5,7 +5,7 @@
 ## 실행
 
 ```bash
-npm install
+npm ci
 npm run dev -- --port 5173
 ```
 
