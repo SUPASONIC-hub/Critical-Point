@@ -521,6 +521,7 @@ function App() {
   });
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
+  const choiceButtonsRef = useRef(new Map());
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -1063,6 +1064,10 @@ function App() {
     window.addEventListener("keydown", handleChoiceShortcut);
     return () => window.removeEventListener("keydown", handleChoiceShortcut);
   }, [decisionReveal, fixedChoices, isAdvancing, isResult, pendingChoice, started]);
+  useEffect(() => {
+    if (!pendingChoice) return;
+    choiceButtonsRef.current.get(pendingChoice.id)?.focus({ preventScroll: true });
+  }, [pendingChoice]);
   useEffect(() => {
     if (decisionReveal) {
       hadDecisionRevealRef.current = true;
@@ -3630,6 +3635,10 @@ function App() {
                 <button
                   type="button"
                   key={choice.id}
+                  ref={(button) => {
+                    if (button) choiceButtonsRef.current.set(choice.id, button);
+                    else choiceButtonsRef.current.delete(choice.id);
+                  }}
                   className={pendingChoice?.id === choice.id ? "choice selected" : "choice"}
                   onClick={() => previewChoice(choice)}
                   disabled={isAdvancing}
