@@ -67,9 +67,43 @@ assert.equal(
   "valid save shapes should be restorable",
 );
 assert.equal(
+  isSavedStateShapeValid({
+    currentCase: "case01",
+    nodeId: "start",
+    completedCases: [],
+    discoveredClues: [],
+    log: [],
+    pendingTelemetry: [{ id: "case-1", type: "case", label: "케이스 로그", payload: { case_id: "case01" } }],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: {},
+    triggers: {},
+    cognition: {},
+  }),
+  true,
+  "valid pending telemetry items should be restorable",
+);
+assert.equal(
   isSavedStateShapeValid({ currentCase: "case01", nodeId: "start", completedCases: {} }),
   false,
   "invalid save shapes should be ignored",
+);
+assert.equal(
+  isSavedStateShapeValid({
+    currentCase: "case01",
+    nodeId: "start",
+    completedCases: [],
+    discoveredClues: [],
+    log: [],
+    pendingTelemetry: [null],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: {},
+    triggers: {},
+    cognition: {},
+  }),
+  false,
+  "corrupt pending telemetry items should be ignored",
 );
 assert.equal(readStoredValue("missing-key", "fallback"), "fallback", "storage reads should degrade gracefully");
 assert.equal(writeStoredValue("test-key", "value"), false, "storage writes should report unavailable browser storage");

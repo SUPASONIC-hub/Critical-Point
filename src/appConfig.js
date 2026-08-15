@@ -17,8 +17,20 @@ export function isSavedStateShapeValid(state) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return false;
   const arrayKeys = ["completedCases", "discoveredClues", "log", "pendingTelemetry"];
   const objectKeys = ["caseResults", "playtestFeedback", "resources", "triggers", "cognition"];
+  const pendingTelemetryIsValid = Array.isArray(state.pendingTelemetry) && state.pendingTelemetry.every(
+    (item) =>
+      item &&
+      typeof item === "object" &&
+      typeof item.id === "string" &&
+      typeof item.type === "string" &&
+      typeof item.label === "string" &&
+      item.payload &&
+      typeof item.payload === "object" &&
+      !Array.isArray(item.payload),
+  );
   return (
     arrayKeys.every((key) => Array.isArray(state[key])) &&
+    pendingTelemetryIsValid &&
     objectKeys.every((key) => state[key] && typeof state[key] === "object" && !Array.isArray(state[key])) &&
     typeof state.currentCase === "string" &&
     typeof state.nodeId === "string"
