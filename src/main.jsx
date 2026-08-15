@@ -3251,6 +3251,9 @@ function App() {
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
             <span>남은 결정 시간</span>
             <strong>{decisionSeconds}s</strong>
+            <div className="timer-meter" aria-label={`남은 결정 시간 ${decisionSeconds}초`}>
+              <div style={{ width: `${Math.min(100, Math.max(0, (decisionSeconds / 45) * 100))}%` }} />
+            </div>
             <p>
               {decisionSeconds === 0
                 ? "시간·피로 비용 적용됨"

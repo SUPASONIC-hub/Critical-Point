@@ -5438,6 +5438,29 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 118, 95, 0.14), inset 0 1px 0 #ffffff;
 }
 
+.timer-meter {
+  height: 7px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: #f0c9bf;
+  border-radius: 999px;
+}
+
+.timer-meter > div {
+  height: 100%;
+  background: var(--signal);
+  border-radius: inherit;
+  transition: width 900ms linear;
+}
+
+.timer-card:not(.urgent) .timer-meter {
+  background: #dbe6dc;
+}
+
+.timer-card:not(.urgent) .timer-meter > div {
+  background: var(--teal);
+}
+
 .streak-meter {
   display: flex;
   align-items: center;
