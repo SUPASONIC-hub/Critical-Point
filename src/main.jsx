@@ -1747,9 +1747,12 @@ function App() {
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
       cascade,
-      suspenseEvent,
-      clue,
-    });
+          suspenseEvent,
+          clue,
+          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward]
+            .filter(Boolean)
+            .map(({ label, text, effect }) => ({ label, text, effect })),
+        });
     persist({
       resources: finalResourcesWithTempo,
       triggers: nextTriggers,
@@ -2167,6 +2170,16 @@ function App() {
             {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
           </div>
           <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
+          {decisionReveal.bonuses?.length > 0 && (
+            <div className="decision-bonus-stack" aria-label="이번 선택으로 발동한 보너스">
+              {decisionReveal.bonuses.map((bonus) => (
+                <div className="decision-bonus" key={bonus.label}>
+                  <strong>{bonus.label}</strong>
+                  <span>{bonus.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
           {decisionReveal.clue && (
             <div className="cinematic-clue-card">
               <Sparkles size={18} />

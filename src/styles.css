@@ -3381,6 +3381,33 @@ summary:focus-visible {
   font-weight: 900;
 }
 
+.decision-bonus-stack {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.decision-bonus {
+  display: grid;
+  gap: 3px;
+  padding: 9px 11px;
+  color: #18201f;
+  background: #d9ff62;
+  border: 1px solid #c0ea4b;
+  border-radius: 6px;
+}
+
+.decision-bonus strong {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.decision-bonus span {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
 .live-ledger {
   display: flex;
   align-items: center;
