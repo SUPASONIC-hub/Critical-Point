@@ -1068,6 +1068,7 @@ function App() {
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
     const timer = window.setInterval(() => {
+      if (document.hidden) return;
       setDecisionSeconds((value) => Math.max(0, value - 1));
     }, 1000);
     return () => window.clearInterval(timer);
