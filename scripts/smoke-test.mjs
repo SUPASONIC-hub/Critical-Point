@@ -45,8 +45,12 @@ assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should in
 assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should include its aftermath scene");
 assert.ok(nodes.c1_witness && nodes.c1_verdict, "case 01 should include connective witness and verdict scenes");
 assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice, "every middle case should include a new evidence scene");
-assert.equal(nodeOrders.case01.length, 11, "case 01 should have expanded to eleven playable scenes");
-assert.equal(nodeOrders.final.length, 7, "the final act should have expanded to seven playable scenes");
+assert.equal(nodeOrders.case01.length, 15, "case 01 should have expanded to fifteen playable scenes");
+assert.equal(nodeOrders.final.length, 9, "the final act should have expanded to nine playable scenes");
+assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
+assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
+assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");
+assert.ok(nodeOrders.final.length > 8, "the final act should include a second layer of reaction scenes");
 assert.equal(
   getDiscoveryClue({ currentCase: "case01", challengeMatch: true, riskDelta: 4, responseTimeSec: 20, logLength: 1 }).id,
   "c1-hidden-ledger",
