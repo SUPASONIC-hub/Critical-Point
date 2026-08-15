@@ -22,6 +22,7 @@ npm run dev -- --port 5173
 - 결과 화면에서 `R`로 재도전, `N`으로 다음 사건 이동
 - 장면 목표 연속 달성에 따른 STREAK BREAKTHROUGH 보상
 - 5연속 장면 목표 달성 시 PERFECT RUN 최고 보상
+- 연속 목표가 끊길 때 결과 연출창에 STREAK BROKEN 피드백 표시
 - 숨은 단서 발견 시 EVIDENCE BONUS 자원 보상
 - 선택 직후 발동한 보너스를 연출창에서 즉시 확인
 - 압력·서스펜스·자원 변화를 한눈에 보는 관제형 플레이 화면

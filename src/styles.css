@@ -3500,6 +3500,15 @@ summary:focus-visible {
   line-height: 1.4;
 }
 
+.decision-bonus.break {
+  border-color: rgba(167, 67, 50, 0.46);
+  background: #fff0eb;
+}
+
+.decision-bonus.break strong {
+  color: #a74332;
+}
+
 .live-ledger {
   display: flex;
   align-items: center;

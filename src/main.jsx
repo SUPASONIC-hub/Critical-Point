@@ -1629,6 +1629,13 @@ function App() {
         effect: { trust: 1, fatigue: -1 },
       }
       : null;
+    const streakBreak = currentChallengeStreak > 0 && !challengeMatch
+      ? {
+          label: "STREAK BROKEN",
+          text: `${currentChallengeStreak}연속 장면 목표가 끊겼습니다. 다음 장면부터 다시 흐름을 쌓을 수 있습니다.`,
+          tone: "break",
+        }
+      : null;
     const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec);
     const clueReward = clue
       ? {
@@ -1808,9 +1815,9 @@ function App() {
       cascade,
           suspenseEvent,
           clue,
-          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward]
+          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward, streakBreak]
             .filter(Boolean)
-            .map(({ label, text, effect }) => ({ label, text, effect })),
+            .map(({ label, text, effect, tone }) => ({ label, text, effect, tone })),
         });
     persist({
       resources: finalResourcesWithTempo,
@@ -2236,7 +2243,7 @@ function App() {
           {decisionReveal.bonuses?.length > 0 && (
             <div className="decision-bonus-stack" aria-label="이번 선택으로 발동한 보너스">
               {decisionReveal.bonuses.map((bonus) => (
-                <div className="decision-bonus" key={bonus.label}>
+                <div className={`decision-bonus ${bonus.tone ?? ""}`} key={bonus.label}>
                   <strong>{bonus.label}</strong>
                   <span>{bonus.text}</span>
                 </div>
