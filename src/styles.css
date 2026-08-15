@@ -3345,8 +3345,11 @@ summary:focus-visible {
 }
 
 .forecast-highlight {
+  min-width: 0;
   color: #18201f;
   text-align: left;
+  overflow-wrap: anywhere;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
 .forecast-highlight:hover,
@@ -3398,6 +3401,7 @@ summary:focus-visible {
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-width: 0;
   min-height: 54px;
   padding: 8px;
   color: #18201f;
@@ -3405,6 +3409,7 @@ summary:focus-visible {
   border: 0;
   border-radius: 0;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .forecast-choice:hover,
