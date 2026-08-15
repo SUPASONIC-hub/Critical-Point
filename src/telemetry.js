@@ -7,6 +7,9 @@ const TELEMETRY_TIMEOUT_MS = 10000;
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 async function fetchWithTimeout(url, options = {}) {
+  if (globalThis.navigator?.onLine === false) {
+    throw new Error("Network unavailable");
+  }
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = setTimeout(() => controller?.abort(), TELEMETRY_TIMEOUT_MS);
   try {

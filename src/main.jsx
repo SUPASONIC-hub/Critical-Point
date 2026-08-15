@@ -2590,7 +2590,7 @@ function App() {
                 </div>
               )}
             </div>
-            <button onClick={copySessionCode}>
+            <button type="button" onClick={copySessionCode}>
               <Copy size={16} />
               {copyStatus || "코드 복사"}
             </button>
