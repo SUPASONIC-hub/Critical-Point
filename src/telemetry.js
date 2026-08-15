@@ -2,8 +2,22 @@ import { readStoredValue, writeStoredValue } from "./appConfig.js";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const TELEMETRY_TIMEOUT_MS = 10000;
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+async function fetchWithTimeout(url, options = {}) {
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = setTimeout(() => controller?.abort(), TELEMETRY_TIMEOUT_MS);
+  try {
+    return await fetch(url, {
+      ...options,
+      ...(controller ? { signal: controller.signal } : {}),
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 export function getSessionId() {
   const key = "critical-point-session-id";
@@ -24,7 +38,7 @@ export function getSessionCode(sessionId) {
 export async function saveCaseTelemetry(payload) {
   if (!telemetryEnabled) return { skipped: true };
 
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_sessions`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_sessions`, {
     method: "POST",
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -45,7 +59,7 @@ export async function saveCaseTelemetry(payload) {
 export async function saveFeedbackTelemetry(payload) {
   if (!telemetryEnabled) return { skipped: true };
 
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_feedback`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_feedback`, {
     method: "POST",
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -71,7 +85,7 @@ export async function fetchLeaderboard(limit = 100) {
     order: "completed_at.desc",
     limit: String(limit),
   });
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_sessions?${query.toString()}`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_sessions?${query.toString()}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
