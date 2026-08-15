@@ -119,6 +119,15 @@ const playStyleOptions = [
 
 const caseSequence = ["case01", "case02", "case03", "case04", "case05", "final"];
 
+const sceneVisuals = {
+  case01: "/scene-case01.png",
+  case02: "/scene-case02.png",
+  case03: "/scene-case03.png",
+  case04: "/scene-case04.png",
+  case05: "/scene-case05.png",
+  final: "/scene-final.png",
+};
+
 const legacyProfiles = {
   S: {
     label: "CLEAR SIGNAL",
@@ -150,7 +159,7 @@ const musicModes = {
   intro: {
     label: "대기",
     interval: 920,
-    volume: 0.085,
+    volume: 0.14,
     wave: "sine",
     bass: [55, 55, 65.4, 49],
     notes: [220, null, 277.18, null, 196, 246.94, null, 164.81],
@@ -158,7 +167,7 @@ const musicModes = {
   controlled: {
     label: "안정",
     interval: 760,
-    volume: 0.09,
+    volume: 0.15,
     wave: "triangle",
     bass: [65.4, 73.42, 82.41, 73.42],
     notes: [261.63, null, 329.63, 392, null, 293.66, 349.23, null],
@@ -166,7 +175,7 @@ const musicModes = {
   unstable: {
     label: "불안정",
     interval: 560,
-    volume: 0.095,
+    volume: 0.16,
     wave: "triangle",
     bass: [73.42, 69.3, 82.41, 65.4],
     notes: [293.66, 311.13, null, 392, 349.23, null, 329.63, 277.18],
@@ -174,7 +183,7 @@ const musicModes = {
   critical: {
     label: "위기",
     interval: 390,
-    volume: 0.1,
+    volume: 0.18,
     wave: "sawtooth",
     bass: [49, 51.91, 55, 46.25],
     notes: [196, 207.65, null, 233.08, 246.94, null, 220, 207.65],
@@ -182,7 +191,7 @@ const musicModes = {
   result: {
     label: "결과",
     interval: 980,
-    volume: 0.09,
+    volume: 0.15,
     wave: "sine",
     bass: [65.4, 82.41, 98, 73.42],
     notes: [261.63, null, 392, 329.63, null, 440, 392, null],
@@ -235,7 +244,10 @@ function AdaptiveMusic({ modeKey }) {
     }
 
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
+    if (!AudioContextClass) {
+      setAudioState("unsupported");
+      return;
+    }
     const context = contextRef.current ?? new AudioContextClass();
     contextRef.current = context;
     if (!masterGainRef.current) {
@@ -250,9 +262,9 @@ function AdaptiveMusic({ modeKey }) {
       const step = stepRef.current;
       const note = currentMode.notes[step % currentMode.notes.length];
       const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
-      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.22, currentMode.wave);
+      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.3, currentMode.wave);
       if (step % 4 === 0) {
-        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.14, "sine");
+        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.2, "sine");
       }
       stepRef.current += 1;
     }
@@ -269,6 +281,9 @@ function AdaptiveMusic({ modeKey }) {
       }
     }
     resumeRef.current = resumeAudio;
+    context.onstatechange = () => {
+      setAudioState(context.state === "running" ? "running" : context.state === "closed" ? "off" : "blocked");
+    };
     function resumeAfterAutoplayBlock() {
       resumeAudio();
     }
@@ -289,34 +304,42 @@ function AdaptiveMusic({ modeKey }) {
   }, [enabled]);
 
   useEffect(() => {
-    if (enabled && timerRef.current) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-      const context = contextRef.current;
-      if (!context || !masterGainRef.current) return;
-      function pulse() {
-        if (context.state === "suspended") return;
-        const currentMode = modeRef.current;
-        const step = stepRef.current;
-        const note = currentMode.notes[step % currentMode.notes.length];
-        const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
-        playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.22, currentMode.wave);
-        if (step % 4 === 0) {
-          playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.14, "sine");
-        }
-        stepRef.current += 1;
-      }
-      pulse();
-      timerRef.current = window.setInterval(pulse, modeRef.current.interval);
-    }
+    if (!enabled || !timerRef.current || !pulseRef.current) return;
+    window.clearInterval(timerRef.current);
+    pulseRef.current();
+    timerRef.current = window.setInterval(pulseRef.current, modeRef.current.interval);
   }, [enabled, modeKey]);
+
+  function startAudioFromGesture() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+      setAudioState("unsupported");
+      return;
+    }
+    const context = contextRef.current ?? new AudioContextClass();
+    contextRef.current = context;
+    if (!masterGainRef.current) {
+      masterGainRef.current = context.createGain();
+      masterGainRef.current.gain.value = modeRef.current.volume;
+      masterGainRef.current.connect(context.destination);
+    }
+    context.resume().then(() => {
+      setAudioState(context.state === "running" ? "running" : "blocked");
+      if (context.state === "running") pulseRef.current?.();
+    }).catch(() => setAudioState("blocked"));
+  }
 
   return (
     <button
       type="button"
       className={enabled ? "music-toggle active" : "music-toggle"}
       onClick={() => {
-        if (enabled && audioState !== "running") {
+        if (!enabled) {
+          setEnabled(true);
+          startAudioFromGesture();
+          return;
+        }
+        if (enabled && audioState !== "running" && audioState !== "unsupported") {
           resumeRef.current?.();
           return;
         }
@@ -326,7 +349,7 @@ function AdaptiveMusic({ modeKey }) {
       title={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
     >
       {enabled && audioState === "running" ? <Volume2 size={18} /> : <VolumeX size={18} />}
-      <span>{enabled ? (audioState === "running" ? mode.label : "소리 시작") : "꺼짐"}</span>
+      <span>{enabled ? (audioState === "running" ? mode.label : audioState === "unsupported" ? "미지원" : "소리 시작") : "꺼짐"}</span>
     </button>
   );
 }
@@ -2900,10 +2923,13 @@ function App() {
 
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
-            <picture>
-              <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
-              <img src="/triggerlab-key-visual.png" alt="" width="1792" height="1024" loading="lazy" />
-            </picture>
+            <img
+              src={sceneVisuals[currentCase] ?? "/triggerlab-key-visual.png"}
+              alt=""
+              width="1792"
+              height="1024"
+              loading="lazy"
+            />
           </div>
           <div className="speaker">
             <div>{node.speaker.slice(0, 1)}</div>
