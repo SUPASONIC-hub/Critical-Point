@@ -1043,6 +1043,11 @@ function App() {
       if (event.repeat) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "Escape" && pendingChoice) {
+        event.preventDefault();
+        setPendingChoice(null);
+        return;
+      }
       if (event.key === "Enter" && pendingChoice) {
         event.preventDefault();
         choose(pendingChoice);
