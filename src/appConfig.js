@@ -4,6 +4,10 @@ export const PLAYER_NAME_MAX_LENGTH = 24;
 export const FREE_TEXT_MAX_LENGTH = 600;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 
+export function normalizePlayerName(value) {
+  return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
+}
+
 export function parseSavedState(raw, schemaVersion) {
   try {
     const parsed = JSON.parse(raw);

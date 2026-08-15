@@ -31,6 +31,7 @@ import {
   copyText,
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
+  normalizePlayerName,
   parseSavedState,
   readStoredValue,
   removeStoredValue,
@@ -467,7 +468,7 @@ function App() {
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
 
-  const [playerName, setPlayerName] = useState(saved?.playerName ?? "");
+  const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [openingLegacy, setOpeningLegacy] = useState(saved?.openingLegacy ?? null);
   const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
@@ -1172,7 +1173,7 @@ function App() {
   }
 
   function startGame() {
-    const name = limitText(playerName.trim(), PLAYER_NAME_MAX_LENGTH) || "분석관";
+    const name = normalizePlayerName(playerName) || "분석관";
     setPlayerName(name);
     setStarted(true);
     setIsPausedSave(false);
