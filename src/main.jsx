@@ -1872,6 +1872,11 @@ function App() {
   const completedCaseResultList = seasonCasesBase
     .filter((caseItem) => caseResults[caseItem.id])
     .map((caseItem) => ({ ...caseItem, result: normalizeCaseSummary(caseResults[caseItem.id]) }));
+  const seasonJourney = completedCaseResultList.map((caseItem) => ({
+    ...caseItem,
+    outcome: getCaseOutcome({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
+    carryover: getOutcomeCarryover({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
+  }));
   const nextCaseSignal = nextCaseSignals[currentCase];
   const resultBridge =
     result.longestDecision
@@ -2310,6 +2315,28 @@ function App() {
                       {caseItem.result.freeCount}
                     </small>
                   </article>
+                ))}
+              </div>
+              <div className="season-journey" aria-label="사건 간 결말 연결">
+                {seasonJourney.map((caseItem, index) => (
+                  <React.Fragment key={caseItem.id}>
+                    {index > 0 && <ChevronRight className="season-journey-arrow" size={18} aria-hidden="true" />}
+                    <article className="season-journey-card">
+                      <div className="season-journey-card-head">
+                        <b>{caseItem.label}</b>
+                        <span>{caseItem.outcome.tag}</span>
+                      </div>
+                      <strong>{caseItem.outcome.title}</strong>
+                      <p>{caseItem.outcome.text}</p>
+                      {Object.keys(caseItem.carryover).length > 0 && (
+                        <small>
+                          다음 사건 전달: {Object.entries(caseItem.carryover)
+                            .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
+                            .join(" · ")}
+                        </small>
+                      )}
+                    </article>
+                  </React.Fragment>
                 ))}
               </div>
             </section>
