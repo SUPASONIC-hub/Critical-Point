@@ -1089,6 +1089,8 @@ function App() {
         pendingTelemetry,
         protocolUsed,
         timerPenaltyApplied,
+        probeUsed,
+        paused: isPausedSave,
         savedAt: new Date().toISOString(),
         ...nextState,
       };
