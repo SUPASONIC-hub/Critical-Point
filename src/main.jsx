@@ -1039,10 +1039,20 @@ function App() {
   }, [decisionReveal, showRanking]);
   useEffect(() => {
     const handleChoiceShortcut = (event) => {
-      if (!started || isResult || decisionReveal || isAdvancing) return;
+      if (!started || decisionReveal || isAdvancing) return;
       if (event.repeat) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (isResult) {
+        if (event.key.toLowerCase() === "r") {
+          event.preventDefault();
+          startCase(currentCase);
+        } else if (event.key.toLowerCase() === "n" && nextCaseSignal) {
+          event.preventDefault();
+          startCase(nextCaseSignal.caseId);
+        }
+        return;
+      }
       if (event.key === "Escape" && pendingChoice) {
         event.preventDefault();
         setPendingChoice(null);
@@ -1068,7 +1078,7 @@ function App() {
     };
     window.addEventListener("keydown", handleChoiceShortcut);
     return () => window.removeEventListener("keydown", handleChoiceShortcut);
-  }, [decisionReveal, fixedChoices, isAdvancing, isResult, pendingChoice, started]);
+  }, [currentCase, decisionReveal, fixedChoices, isAdvancing, isResult, pendingChoice, started]);
   useEffect(() => {
     if (!pendingChoice) return;
     choiceButtonsRef.current.get(pendingChoice.id)?.focus({ preventScroll: true });
