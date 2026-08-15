@@ -32,6 +32,7 @@ import {
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
   normalizePlayerName,
+  normalizeSavedText,
   parseSavedState,
   readStoredValue,
   removeStoredValue,
@@ -483,8 +484,10 @@ function App() {
   const [log, setLog] = useState(saved?.log ?? []);
   const [triggers, setTriggers] = useState(saved?.triggers ?? makeEmptyScores(triggerLabels));
   const [cognition, setCognition] = useState(saved?.cognition ?? makeEmptyScores(cognitionLabels));
-  const [freeText, setFreeText] = useState(saved?.freeText ?? "");
-  const [echo, setEcho] = useState(saved?.echo ?? "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
+  const [freeText, setFreeText] = useState(() => normalizeSavedText(saved?.freeText, FREE_TEXT_MAX_LENGTH));
+  const [echo, setEcho] = useState(
+    () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+  );
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
   const [isAdvancing, setIsAdvancing] = useState(false);

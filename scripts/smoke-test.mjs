@@ -29,6 +29,7 @@ import {
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
   normalizePlayerName,
+  normalizeSavedText,
   parseSavedState,
   readStoredValue,
   removeStoredValue,
@@ -47,6 +48,8 @@ assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a 
 assert.equal(PLAYER_NAME_MAX_LENGTH, 24, "player names should keep a bounded display length");
 assert.equal(normalizePlayerName("  analyst "), "analyst", "player names should be trimmed when restored");
 assert.equal(normalizePlayerName({}), "", "invalid saved player names should be ignored");
+assert.equal(normalizeSavedText("abcdef", 3), "abc", "saved text should keep the configured limit");
+assert.equal(normalizeSavedText(null, 3), "", "invalid saved text should be ignored");
 assert.deepEqual(
   parseSavedState(JSON.stringify({ saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false }), SAVE_SCHEMA_VERSION),
   { saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false },

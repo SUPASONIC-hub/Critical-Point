@@ -8,6 +8,11 @@ export function normalizePlayerName(value) {
   return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
 }
 
+export function normalizeSavedText(value, maxLength = 0) {
+  if (typeof value !== "string") return "";
+  return Number.isFinite(maxLength) && maxLength > 0 ? value.slice(0, maxLength) : value;
+}
+
 export function parseSavedState(raw, schemaVersion) {
   try {
     const parsed = JSON.parse(raw);
