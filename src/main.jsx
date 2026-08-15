@@ -3677,6 +3677,12 @@ function App() {
                         .join(" · ")}
                     </span>
                   )}
+                  {(isSafestChoice || isCostliestChoice) && (
+                    <span className="choice-badges" aria-label="선택 비교 태그">
+                      {isSafestChoice && <b className="choice-badge safe">가장 안정</b>}
+                      {isCostliestChoice && <b className="choice-badge cost">대가 큼</b>}
+                    </span>
+                  )}
                   {showTacticalDetails && (
                     <>
                       <span className="choice-tactical">
@@ -3695,12 +3701,6 @@ function App() {
                         </span>
                       )}
                       <span className="choice-subtext">{simplifyPlayerText(getChoiceSubtext(choice))}</span>
-                      {(isSafestChoice || isCostliestChoice) && (
-                        <span className="choice-badges" aria-label="선택 비교 태그">
-                          {isSafestChoice && <b className="choice-badge safe">가장 안정</b>}
-                          {isCostliestChoice && <b className="choice-badge cost">대가 큼</b>}
-                        </span>
-                      )}
                       {choice.effect && (
                         <span className="choice-tradeoff">
                           {simplifyPlayerText(explainResourceTradeoff(choice.effect))}
