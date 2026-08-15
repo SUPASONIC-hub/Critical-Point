@@ -1037,6 +1037,24 @@ function App() {
     return () => window.removeEventListener("keydown", closeOverlay);
   }, [decisionReveal, showRanking]);
   useEffect(() => {
+    const handleChoiceShortcut = (event) => {
+      if (!started || isResult || decisionReveal || isAdvancing) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "Enter" && pendingChoice) {
+        event.preventDefault();
+        choose(pendingChoice);
+        return;
+      }
+      const choiceIndex = Number(event.key) - 1;
+      if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || !fixedChoices[choiceIndex]) return;
+      event.preventDefault();
+      previewChoice(fixedChoices[choiceIndex]);
+    };
+    window.addEventListener("keydown", handleChoiceShortcut);
+    return () => window.removeEventListener("keydown", handleChoiceShortcut);
+  }, [decisionReveal, fixedChoices, isAdvancing, isResult, pendingChoice, started]);
+  useEffect(() => {
     if (decisionReveal) {
       hadDecisionRevealRef.current = true;
       return;
@@ -3607,6 +3625,8 @@ function App() {
                   onClick={() => previewChoice(choice)}
                   disabled={isAdvancing}
                   aria-pressed={pendingChoice?.id === choice.id}
+                  aria-keyshortcuts={String(choiceIndex + 1)}
+                  title={`${choiceIndex + 1}번 키로 선택 미리보기`}
                   aria-label={`${simplifyPlayerText(speechifyChoice(choice))} ${riskLabel}. ${simplifyPlayerText(getChoiceSubtext(choice))}`}
                 >
                   <span className="choice-main">
