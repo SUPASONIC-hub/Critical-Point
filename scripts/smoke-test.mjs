@@ -74,6 +74,7 @@ assert.equal(caseOpeningRoutes.final.c5_after_system, "f_start_system", "the fin
 assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings should be real playable nodes");
 assert.equal(getOutcomeCarryover({ caseId: "case01", choiceId: "c1_after_people" }).trust, 6, "outcome effects should carry into the next case");
 assert.equal(getContinuityChallenge({ caseId: "case02", choiceId: "c1_after_people" }).id, "protect-trust", "outcome branches should create a custom next-case challenge");
+assert.equal(Object.values(caseOpeningRoutes.case02).length, 3, "all case 02 opening branches should be addressable");
 
 const riskyResources = {
   time: 40,

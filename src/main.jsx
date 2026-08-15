@@ -502,6 +502,19 @@ function App() {
   const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders.case01;
   const fallbackNodeId = activeNodeOrder[0] ?? "start";
   const resolvedNodeId = nodes[nodeId] ? nodeId : fallbackNodeId;
+  const baseCaseStartNodes = {
+    case01: "start",
+    case02: "c2_start",
+    case03: "c3_start",
+    case04: "c4_start",
+    case05: "c5_start",
+    final: "f_start",
+  };
+  const branchOpeningNodeIds = new Set([
+    baseCaseStartNodes[fallbackCaseId],
+    ...Object.values(caseOpeningRoutes[fallbackCaseId] ?? {}),
+  ]);
+  const isOpeningNode = branchOpeningNodeIds.has(resolvedNodeId);
   const node = nodes[resolvedNodeId] ?? nodes.start;
   const isResult =
     nodeId === "result" ||
@@ -649,7 +662,7 @@ function App() {
                   ? "연속 판단 보너스"
                   : "보너스 대기";
   const inheritedChallenge =
-    openingLegacy && resolvedNodeId === activeNodeOrder[0]
+    openingLegacy && isOpeningNode
       ? (openingLegacy.continuityChallenge ?? {
           id:
             openingLegacy.label === "CLEAR SIGNAL"
