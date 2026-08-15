@@ -1150,6 +1150,7 @@ function App() {
     setOpeningLegacy(null);
     setDecisionReveal(null);
     setPendingChoice(null);
+    setFreeText("");
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -1160,6 +1161,7 @@ function App() {
       started: true,
       currentCase: "case01",
       nodeId: "start",
+      freeText: "",
       nodeEnteredAt: Date.now(),
       protocolUsed: false,
       timerPenaltyApplied: false,
@@ -1432,7 +1434,7 @@ function App() {
   }
 
   async function retryPendingTelemetry() {
-    if (!telemetryEnabled || !dataConsent || pendingTelemetry.length === 0 || isRetryingTelemetry) return;
+    if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetry.length === 0 || isRetryingTelemetry) return;
     setIsRetryingTelemetry(true);
     setTelemetryStatus({
       tone: "pending",
@@ -2618,9 +2620,9 @@ function App() {
                   <button
                     type="button"
                     onClick={retryPendingTelemetry}
-                    disabled={!telemetryEnabled || !dataConsent || isRetryingTelemetry}
+                    disabled={!telemetryEnabled || !dataConsent || !isOnline || isRetryingTelemetry}
                   >
-                    {isRetryingTelemetry ? "재전송 중" : "원격 저장 재시도"}
+                    {isRetryingTelemetry ? "재전송 중" : isOnline ? "원격 저장 재시도" : "연결 대기 중"}
                   </button>
                 </div>
               )}
