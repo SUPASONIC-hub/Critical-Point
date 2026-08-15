@@ -1097,8 +1097,11 @@ function App() {
         savedAt: new Date().toISOString(),
         ...nextState,
       };
-    writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
-    return payload;
+    const storageSaved = writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
+    if (!storageSaved) {
+      setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 탭에서만 진행됩니다.");
+    }
+    return { ...payload, storageSaved };
   }
 
   function startGame() {
@@ -1152,9 +1155,15 @@ function App() {
       paused: exit,
       nodeEnteredAt: nextNodeEnteredAt,
     });
-    setLastSavedAt(payload.savedAt);
+    if (payload.storageSaved) {
+      setLastSavedAt(payload.savedAt);
+    }
     setIsPausedSave(exit);
-    setSaveStatus(`저장됨 ${formatSaveTime(payload.savedAt)}`);
+    setSaveStatus(
+      payload.storageSaved
+        ? `저장됨 ${formatSaveTime(payload.savedAt)}`
+        : "브라우저 저장소를 사용할 수 없어 현재 탭에서만 진행됩니다.",
+    );
     if (exit) {
       setStarted(false);
     } else {
