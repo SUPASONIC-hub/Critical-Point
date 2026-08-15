@@ -1658,7 +1658,6 @@ function App() {
           triggers: nextTriggers,
           cognition: nextCognition,
           decision_log: nextLog,
-          feedback: playtestFeedback[currentCase] ?? null,
         };
         setTelemetryStatus({
           tone: "pending",
