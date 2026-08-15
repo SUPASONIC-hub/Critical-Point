@@ -43,8 +43,12 @@ export function removeStoredValue(key) {
 export async function copyText(value) {
   try {
     if (globalThis.navigator?.clipboard?.writeText) {
-      await globalThis.navigator.clipboard.writeText(value);
-      return true;
+      try {
+        await globalThis.navigator.clipboard.writeText(value);
+        return true;
+      } catch {
+        // Permission policies can reject Clipboard API calls while legacy copy still works.
+      }
     }
 
     const documentRef = globalThis.document;

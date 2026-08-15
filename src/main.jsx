@@ -2629,7 +2629,7 @@ function App() {
             </div>
             <button type="button" onClick={copySessionCode}>
               <Copy size={16} />
-              {copyStatus || "코드 복사"}
+              <span aria-live="polite">{copyStatus || "코드 복사"}</span>
             </button>
           </section>
           {nextCaseSignal && (
