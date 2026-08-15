@@ -500,10 +500,11 @@ function App() {
   const [leaderboardError, setLeaderboardError] = useState("");
   const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
   const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
+  const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
   const [telemetryStatus, setTelemetryStatus] = useState({
-    tone: telemetryEnabled && globalThis.navigator?.onLine !== false ? "ready" : "local",
+    tone: telemetryEnabled && isOnline ? "ready" : "local",
     text:
-      globalThis.navigator?.onLine === false
+      !isOnline
         ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
         : telemetryEnabled
           ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
@@ -949,7 +950,13 @@ function App() {
     currentCase &&
     nodeId &&
     (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
-  const telemetrySummary = telemetryEnabled
+  const telemetrySummary = !isOnline
+    ? {
+        tone: "local",
+        title: "오프라인",
+        text: "연결이 복구되면 원격 저장을 다시 사용할 수 있습니다. 현재 기록은 브라우저에 저장됩니다.",
+      }
+    : telemetryEnabled
     ? dataConsent
       ? {
           tone: "ready",
@@ -979,7 +986,9 @@ function App() {
   );
   useEffect(() => {
     const updateNetworkStatus = () => {
-      if (globalThis.navigator?.onLine === false) {
+      const online = globalThis.navigator?.onLine !== false;
+      setIsOnline(online);
+      if (!online) {
         setTelemetryStatus({
           tone: "local",
           text: "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
@@ -2307,7 +2316,7 @@ function App() {
                     : "현재 배포 환경에는 DB가 연결되어 있지 않아 원격 저장은 비활성화됩니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
-                  {telemetryEnabled ? "DB 연결됨" : "DB 미연결"}
+                  {!isOnline ? "오프라인" : telemetryEnabled ? "DB 연결됨" : "DB 미연결"}
                 </small>
               </span>
             </label>
