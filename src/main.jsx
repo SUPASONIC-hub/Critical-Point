@@ -1567,7 +1567,15 @@ function App() {
       ? {
           label: "QUICK READ",
           text: "장면의 핵심 압박을 빠르게 읽고, 망설임 없이 챌린지를 맞혔습니다.",
-          effect: { trust: 1, fatigue: -1 },
+        effect: { trust: 1, fatigue: -1 },
+      }
+      : null;
+    const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec);
+    const clueReward = clue
+      ? {
+          label: "EVIDENCE BONUS",
+          text: "숨은 단서를 확보해 정당성이 오르고 판단 피로가 줄었습니다.",
+          effect: { legitimacy: 2, fatigue: -1 },
         }
       : null;
     const finalEffect = mergeEffects(
@@ -1575,9 +1583,9 @@ function App() {
       ...(tempoBonus ? [tempoBonus.effect] : []),
       ...(instinctSurge ? [instinctSurge.effect] : []),
       ...(auditSurge ? [auditSurge.effect] : []),
+      ...(clueReward ? [clueReward.effect] : []),
     );
     const finalResourcesWithTempo = applyEffect(resources, finalEffect);
-    const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec);
     const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
       riskBefore: riskPressure,
@@ -1616,6 +1624,7 @@ function App() {
       tempoBonus,
       instinctSurge,
       auditSurge,
+      clueReward,
       suspenseEvent,
       clue,
       note: freeResult?.note ?? "",
