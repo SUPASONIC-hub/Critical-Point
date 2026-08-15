@@ -28,6 +28,68 @@ export function getRiskPressure(resources = {}) {
   );
 }
 
+export function getRiskPressureDrivers(resources = {}) {
+  const nextResources = { ...riskDefaults, ...resources };
+  const drivers = [
+    {
+      id: "time",
+      label: "시간 부족",
+      value: Math.max(0, 72 - nextResources.time),
+      pressure: Math.max(0, 72 - nextResources.time) * 0.3,
+    },
+    {
+      id: "capital",
+      label: "현금 압박",
+      value: Math.max(0, 100 - nextResources.capital),
+      pressure: Math.max(0, 100 - nextResources.capital) * 0.25,
+    },
+    {
+      id: "humanCost",
+      label: "인적 비용",
+      value: nextResources.humanCost,
+      pressure: nextResources.humanCost * 0.25,
+    },
+    {
+      id: "fatigue",
+      label: "판단 피로",
+      value: nextResources.fatigue,
+      pressure: nextResources.fatigue * 0.2,
+    },
+  ];
+
+  return drivers
+    .map((driver) => ({ ...driver, pressure: Math.round(driver.pressure) }))
+    .sort((a, b) => b.pressure - a.pressure);
+}
+
+export function createDecisionForecast(choice = {}, resources = {}) {
+  const beforeRisk = getRiskPressure(resources);
+  const afterResources = applyEffect(resources, choice.effect);
+  const afterRisk = getRiskPressure(afterResources);
+  const riskDelta = afterRisk - beforeRisk;
+  const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
+  const scoreDelta = ([key, value]) => (key === "humanCost" || key === "fatigue" ? -value : value);
+  const biggestGain = effectEntries
+    .filter((entry) => scoreDelta(entry) > 0)
+    .sort((a, b) => scoreDelta(b) - scoreDelta(a))[0];
+  const biggestCost = effectEntries
+    .filter((entry) => scoreDelta(entry) < 0)
+    .sort((a, b) => scoreDelta(a) - scoreDelta(b))[0];
+  const cognitionGain = Object.values(choice.cognition ?? {}).reduce((sum, value) => sum + value, 0);
+
+  return {
+    choiceId: choice.id,
+    beforeRisk,
+    afterRisk,
+    riskDelta,
+    afterResources,
+    biggestGain,
+    biggestCost,
+    cognitionGain,
+    pressureDrivers: getRiskPressureDrivers(afterResources).slice(0, 2),
+  };
+}
+
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const freeCount = entries.filter((entry) => entry.freeText).length;
   const reducedRiskCount = entries.filter(

@@ -45,6 +45,7 @@ import {
   anonymizeSensitiveText,
   buildSceneBeat,
   clamp,
+  createDecisionForecast,
   createCaseSummary,
   detectPrivacySignals,
   explainResourceTradeoff,
@@ -54,6 +55,7 @@ import {
   getFreeTextSignals,
   getGameplayStats,
   getRiskPressure,
+  getRiskPressureDrivers,
   limitText,
   makeEmptyScores,
   scoreFreeText,
@@ -756,6 +758,39 @@ function App() {
       finalRiskDelta,
     };
   }
+
+  const riskPressureDrivers = getRiskPressureDrivers(resources);
+  const decisionForecasts = fixedChoices
+    .map((choice) => {
+      const read = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
+      const forecast = createDecisionForecast({ ...choice, effect: read.finalEffect }, resources);
+      return {
+        choice,
+        read,
+        forecast,
+        tacticalRead: read.tacticalRead,
+      };
+    })
+    .sort((a, b) => {
+      if (a.forecast.riskDelta !== b.forecast.riskDelta) {
+        return a.forecast.riskDelta - b.forecast.riskDelta;
+      }
+      return b.forecast.cognitionGain - a.forecast.cognitionGain;
+    });
+  const safestForecast = decisionForecasts[0];
+  const costliestForecast = [...decisionForecasts].sort((a, b) => {
+    const aCost = Math.abs(a.forecast.biggestCost?.[1] ?? 0);
+    const bCost = Math.abs(b.forecast.biggestCost?.[1] ?? 0);
+    return bCost - aCost;
+  })[0];
+  const pressureLeader = riskPressureDrivers[0];
+  const formatResourceDelta = (delta) => {
+    if (!delta) return "즉시 비용 낮음";
+    const [key, value] = delta;
+    return `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
+  };
+  const formatRiskDelta = (value) =>
+    value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
 
   const questSteps = [
     {
@@ -2659,6 +2694,60 @@ function App() {
             <Info size={15} />
             {showTacticalDetails ? "전술 정보 닫기" : "전술 정보 열기"}
           </button>
+          {showTacticalDetails && decisionForecasts.length > 0 && (
+            <section className="decision-forecast" aria-label="결정 예보">
+              <div className="forecast-header">
+                <span>결정 예보</span>
+                <strong>현재 압박 {riskPressure}</strong>
+                <p>
+                  {pressureLeader
+                    ? `${pressureLeader.label}이 가장 크게 압력을 만들고 있습니다.`
+                    : "현재 압박 요인이 낮게 유지되고 있습니다."}
+                </p>
+              </div>
+              <div className="forecast-grid">
+                <article>
+                  <span>가장 안정적인 말</span>
+                  <b>{safestForecast.choice.label}</b>
+                  <small>
+                    위험 {formatRiskDelta(safestForecast.forecast.riskDelta)} · 예상 압력{" "}
+                    {safestForecast.forecast.afterRisk}
+                  </small>
+                </article>
+                <article>
+                  <span>가장 큰 대가</span>
+                  <b>{costliestForecast.choice.label}</b>
+                  <small>{formatResourceDelta(costliestForecast.forecast.biggestCost)}</small>
+                </article>
+                <article>
+                  <span>압박 원인</span>
+                  <b>{riskPressureDrivers.slice(0, 2).map((driver) => driver.label).join(" / ")}</b>
+                  <small>
+                    {riskPressureDrivers
+                      .slice(0, 2)
+                      .map((driver) => `${driver.value}`)
+                      .join(" · ")}
+                  </small>
+                </article>
+              </div>
+              <ol className="forecast-list">
+                {decisionForecasts.map(({ choice, forecast, tacticalRead }) => (
+                  <li key={choice.id}>
+                    <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
+                      {tacticalRead.grade}
+                    </b>
+                    <span>
+                      <strong>{choice.label}</strong>
+                      <small>
+                        위험 {formatRiskDelta(forecast.riskDelta)} · 예상 압력 {forecast.afterRisk} ·{" "}
+                        {formatResourceDelta(forecast.biggestGain)} / {formatResourceDelta(forecast.biggestCost)}
+                      </small>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
           <div className="choices">
             {fixedChoices.map((choice) => {
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);

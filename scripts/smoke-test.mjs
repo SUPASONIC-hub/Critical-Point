@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import {
   anonymizeSensitiveText,
   applyEffect,
+  createDecisionForecast,
   createCaseSummary,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
+  getRiskPressureDrivers,
   limitText,
   speechifyChoice,
 } from "../src/gameLogic.js";
@@ -46,12 +48,34 @@ assert.ok(
   getRiskPressure(recoveredResources) < getRiskPressure(riskyResources),
   "recovered resources should reduce risk pressure",
 );
+assert.deepEqual(
+  getRiskPressureDrivers(riskyResources)
+    .slice(0, 2)
+    .map((driver) => driver.id),
+  ["time", "capital"],
+  "risk pressure drivers should be sorted by pressure contribution",
+);
 
 assert.deepEqual(
   applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
   { ...initialResources, time: 72, fatigue: 100 },
   "resource effects should clamp to resource caps",
 );
+
+const decisionForecast = createDecisionForecast(
+  {
+    id: "recover",
+    effect: { time: 8, capital: 10, fatigue: -12 },
+    cognition: { inference: 2, risk: 1 },
+  },
+  riskyResources,
+);
+
+assert.equal(decisionForecast.choiceId, "recover", "decision forecast should keep the choice id");
+assert.ok(decisionForecast.riskDelta < 0, "decision forecast should calculate risk reduction");
+assert.deepEqual(decisionForecast.biggestGain, ["fatigue", -12], "decision forecast should identify biggest gain");
+assert.deepEqual(decisionForecast.biggestCost, undefined, "decision forecast should allow choices without costs");
+assert.equal(decisionForecast.cognitionGain, 3, "decision forecast should sum cognition gain");
 
 const gameplayStats = getGameplayStats(
   [
