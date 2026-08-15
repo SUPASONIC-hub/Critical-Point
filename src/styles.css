@@ -1768,6 +1768,16 @@ summary:focus-visible {
   border-top-color: #a74332;
 }
 
+.decision-reveal.streak-break {
+  border-top-color: #a74332;
+  background: #fff7f2;
+}
+
+.decision-reveal.streak-break .cinematic-status b,
+.decision-reveal.streak-break .decision-reveal-kicker span {
+  color: #a74332;
+}
+
 .decision-reveal.suspense-twist {
   border-top-color: #d9ff62;
   background: #1a2421;

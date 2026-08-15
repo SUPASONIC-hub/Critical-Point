@@ -1813,6 +1813,7 @@ function App() {
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
       cascade,
+      streakBreak,
           suspenseEvent,
           clue,
           bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward, streakBreak]
@@ -2206,6 +2207,8 @@ function App() {
         ? "system-alert"
         : decisionReveal.cascade
           ? "chain-reaction"
+          : decisionReveal.streakBreak
+            ? "streak-break"
           : "decision-locked";
     return (
       <div className="decision-reveal-backdrop" role="presentation">
@@ -2226,7 +2229,7 @@ function App() {
         >
           <div className="cinematic-status">
             <span className="cinematic-status-dot" />
-            <b>{decisionReveal.clue ? "NEW EVIDENCE" : decisionReveal.suspenseEvent ? "SYSTEM ALERT" : decisionReveal.cascade ? "CHAIN REACTION" : "DECISION LOCKED"}</b>
+            <b>{decisionReveal.clue ? "NEW EVIDENCE" : decisionReveal.suspenseEvent ? "SYSTEM ALERT" : decisionReveal.cascade ? "CHAIN REACTION" : decisionReveal.streakBreak ? "STREAK BROKEN" : "DECISION LOCKED"}</b>
             <span>{decisionReveal.clue ? "새 단서가 기록되었습니다" : "선택의 영향이 번지는 중"}</span>
           </div>
           <div className="decision-reveal-kicker">
