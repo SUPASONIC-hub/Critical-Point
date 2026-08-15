@@ -1750,6 +1750,12 @@ function App() {
   }
 
   function reset() {
+    if (
+      typeof globalThis.confirm === "function" &&
+      !globalThis.confirm("저장된 진행과 현재 플레이 기록을 모두 지울까요?")
+    ) {
+      return;
+    }
     removeStoredValue("trigger-prototype");
     removeStoredValue(STORAGE_KEY);
     setPlayerName("");
