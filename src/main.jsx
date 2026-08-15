@@ -1026,13 +1026,17 @@ function App() {
         if (cancelled) return;
         console.warn(error);
         setLeaderboard(buildLeaderboard(localLeaderboardRows));
-        setLeaderboardStatus("error");
-        setLeaderboardError("원격 기록을 불러오지 못해 이 브라우저의 완료 기록만 표시합니다.");
+        setLeaderboardStatus(isOnline ? "error" : "local");
+        setLeaderboardError(
+          isOnline
+            ? "원격 기록을 불러오지 못해 이 브라우저의 완료 기록만 표시합니다."
+            : "오프라인이라 이 브라우저의 완료 기록만 표시합니다.",
+        );
       });
     return () => {
       cancelled = true;
     };
-  }, [localLeaderboardRows, showRanking]);
+  }, [isOnline, localLeaderboardRows, showRanking]);
   const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
 
   useEffect(() => {
