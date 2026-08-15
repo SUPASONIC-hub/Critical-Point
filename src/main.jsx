@@ -2691,7 +2691,12 @@ function App() {
               <span>PLAYTEST SESSION</span>
               <strong>{sessionCode}</strong>
               <p>테스터 인터뷰, JSON 로그, Supabase row를 맞출 때 쓰는 짧은 세션 코드입니다.</p>
-              <small className={`remote-status ${telemetryStatus.tone}`}>
+              <small
+                className={`remote-status ${telemetryStatus.tone}`}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 {telemetryStatus.text}
               </small>
               {pendingTelemetry.length > 0 && (
@@ -3136,7 +3141,11 @@ function App() {
             </button>
           </div>
         </header>
-        {saveStatus && <p className="save-status">{saveStatus}</p>}
+        {saveStatus && (
+          <p className="save-status" role="status" aria-live="polite" aria-atomic="true">
+            {saveStatus}
+          </p>
+        )}
         <div
           className="progress-wrap"
           role="progressbar"
