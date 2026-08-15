@@ -3580,6 +3580,13 @@ function App() {
                   </span>
                   <span className="choice-speech">"{simplifyPlayerText(speechifyChoice(choice))}"</span>
                   <span className="choice-action">{simplifyPlayerText(getDramaticChoiceLabel(choice))}</span>
+                  {choice.effect && !showTacticalDetails && (
+                    <span className="choice-effect choice-effect-compact">
+                      예상 변화 · {Object.entries(choiceRead.finalEffect)
+                        .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
+                        .join(" · ")}
+                    </span>
+                  )}
                   {showTacticalDetails && (
                     <>
                       <span className="choice-tactical">

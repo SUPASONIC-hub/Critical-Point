@@ -3364,9 +3364,21 @@ summary:focus-visible {
   display: block;
   margin-top: 5px;
   padding-left: 24px;
-  color: #5e6a65;
+  color: #24302e;
   font-size: 12px;
   line-height: 1.35;
+}
+
+.choice-effect-compact {
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin-left: 24px;
+  padding: 6px 9px;
+  color: #1d4e3f;
+  background: #e6f4eb;
+  border: 1px solid #afd2bc;
+  border-radius: 5px;
+  font-weight: 900;
 }
 
 .live-ledger {
@@ -5211,7 +5223,7 @@ body {
   text-wrap: balance;
 }
 
-.intro p {
+.intro > p {
   margin-inline: 0;
   max-width: 680px;
   color: #d8e5dc;
@@ -5521,12 +5533,48 @@ body {
 }
 
 .intro h1,
-.intro p {
+.intro > p {
   margin-inline: auto;
 }
 
 .intro-visual {
   margin-inline: auto;
+}
+
+.start-panel .consent-box {
+  color: #18201f;
+  background: #ffffff;
+  border-color: #c7d5ca;
+}
+
+.start-panel .consent-box b {
+  color: #18201f;
+}
+
+.start-panel .consent-box small {
+  color: #3e4a45;
+}
+
+.start-panel .db-status-panel p,
+.start-panel .db-status-panel small,
+.start-panel .db-status-panel span {
+  color: #24302e;
+}
+
+.start-panel .db-status-panel strong {
+  color: #18201f;
+}
+
+.start-panel .db-status-panel.ready strong {
+  color: #1d4e3f;
+}
+
+.start-panel .db-status-panel.pending strong {
+  color: #6a5420;
+}
+
+.start-panel .db-status-panel.local strong {
+  color: #3e4a45;
 }
 
 @media (max-width: 920px) {
