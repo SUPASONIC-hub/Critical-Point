@@ -28,6 +28,7 @@ npm run build
 - LIVE LEDGER: 현재 세션의 누적 비용, 회복 선택, 위험 궤적
 - DECISION DNA: 트리거·사고 방식·선택 패턴을 조합한 플레이 프로필
 - COUNTERFACTUAL LAB: 실제 선택과 가장 안전한 대안, 가장 큰 압박 경로 비교
+- PUBLIC SIGNAL BOARD: 완료 세션의 최고 모멘텀 점수와 랭크를 비교하는 참가자 랭킹
 - 타이머, 에코 반론, 위기 프로토콜, 적응형 배경음악
 - 브라우저 저장, 이어하기, JSON 로그 내보내기
 - 선택적 Supabase 원격 저장과 실패분 재시도 대기열
@@ -42,7 +43,8 @@ src/gameData.js        케이스, 장면, 선택지, 캐릭터 데이터
 src/gameLogic.js       자원, 위험, 예보, 원장, DNA, 대안 경로, 텍스트 처리
 src/styles.css         화면 스타일과 반응형 레이아웃
 src/appConfig.js       저장 키와 입력 제한
-src/telemetry.js       선택적 Supabase 저장 클라이언트
+src/telemetry.js       선택적 Supabase 저장/랭킹 조회 클라이언트
+src/ranking.js         세션 중복 제거와 랭킹 정렬 로직
 scripts/smoke-test.mjs 핵심 로직 스모크 테스트
 render.yaml            Render 정적 사이트 배포 설정
 ```
@@ -64,4 +66,4 @@ VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
 
-환경변수가 없으면 플레이는 로컬 저장과 JSON 내보내기로 동작합니다.
+환경변수가 없으면 플레이는 로컬 저장과 JSON 내보내기로 동작하며, 랭킹 페이지도 현재 브라우저의 완료 기록만 표시합니다.

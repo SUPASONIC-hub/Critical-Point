@@ -60,3 +60,25 @@ export async function saveFeedbackTelemetry(payload) {
 
   return { saved: true };
 }
+
+export async function fetchLeaderboard(limit = 100) {
+  if (!telemetryEnabled) return { skipped: true, rows: [] };
+
+  const query = new URLSearchParams({
+    select: "session_code,player_name,case_id,case_title,completed_at,summary",
+    order: "completed_at.desc",
+    limit: String(limit),
+  });
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/playtest_sessions?${query.toString()}`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Leaderboard fetch failed: ${response.status}`);
+  }
+
+  return { rows: await response.json() };
+}

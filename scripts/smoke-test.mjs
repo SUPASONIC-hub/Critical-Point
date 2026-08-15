@@ -22,6 +22,7 @@ import {
   STORAGE_KEY,
 } from "../src/appConfig.js";
 import { initialResources } from "../src/gameData.js";
+import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
@@ -124,6 +125,34 @@ assert.equal(counterfactuals.length, 1, "counterfactual report should include co
 assert.equal(counterfactuals[0].actual.id, "slow", "counterfactual report should identify the actual choice");
 assert.equal(counterfactuals[0].safest.id, "slow", "counterfactual report should identify the safest alternative");
 assert.equal(counterfactuals[0].actualWasSafest, true, "counterfactual report should flag safest actual choices");
+
+const leaderboard = buildLeaderboard([
+  {
+    session_code: "ALPHA",
+    player_name: "첫 분석관",
+    case_id: "case01",
+    case_title: "CASE 01",
+    summary: { rank: "A", momentumScore: 72, primary: ["responsibility", 4], averageResponseTime: 18, freeCount: 1 },
+  },
+  {
+    session_code: "ALPHA",
+    player_name: "첫 분석관",
+    case_id: "final",
+    case_title: "FINAL",
+    summary: { rank: "S", momentumScore: 88, primary: ["curiosity", 5], averageResponseTime: 21, freeCount: 2 },
+  },
+  {
+    session_code: "BETA",
+    player_name: "두 번째 분석관",
+    case_id: "case02",
+    case_title: "CASE 02",
+    summary: { rank: "A", momentumScore: 80, primary: ["trust", 4], averageResponseTime: 15, freeCount: 0 },
+  },
+]);
+assert.equal(leaderboard.length, 2, "leaderboard should keep one best run per session");
+assert.equal(leaderboard[0].sessionCode, "ALPHA", "leaderboard should sort by momentum score");
+assert.equal(leaderboard[0].position, 1, "leaderboard should assign positions");
+assert.match(getLeaderboardHeadline(leaderboard).title, /첫 분석관/, "leaderboard headline should name the leader");
 
 const gameplayStats = getGameplayStats(
   [

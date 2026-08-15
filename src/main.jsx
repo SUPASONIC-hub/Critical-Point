@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   AlertTriangle,
+  ArrowLeft,
   BarChart3,
   BriefcaseBusiness,
   Check,
@@ -12,6 +13,7 @@ import {
   Info,
   LockKeyhole,
   MessageSquareText,
+  Trophy,
   Copy,
   RefreshCcw,
   Save,
@@ -69,8 +71,10 @@ import {
   getSessionCode,
   saveCaseTelemetry,
   saveFeedbackTelemetry,
+  fetchLeaderboard,
   telemetryEnabled,
 } from "./telemetry.js";
+import { buildLeaderboard, getLeaderboardHeadline } from "./ranking.js";
 
 const resourceMeta = {
   time: { label: "TIME", suffix: "h", icon: Clock3 },
@@ -444,6 +448,10 @@ function App() {
   const [decisionSeconds, setDecisionSeconds] = useState(45);
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
+  const [showRanking, setShowRanking] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardStatus, setLeaderboardStatus] = useState("idle");
+  const [leaderboardError, setLeaderboardError] = useState("");
   const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
   const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
   const [telemetryStatus, setTelemetryStatus] = useState({
@@ -862,8 +870,41 @@ function App() {
     : {
         tone: "local",
         title: "DB 미연결",
-        text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
-      };
+      text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
+    };
+  const localLeaderboardRows = useMemo(
+    () => Object.entries(caseResults).map(([caseId, summary]) => ({
+      session_code: sessionCode,
+      player_name: playerName || "현재 분석관",
+      case_id: caseId,
+      case_title: seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.title ?? caseId,
+      completed_at: summary?.completedAt ?? "",
+      summary,
+    })),
+    [caseResults, playerName, sessionCode],
+  );
+  useEffect(() => {
+    if (!showRanking) return undefined;
+    let cancelled = false;
+    setLeaderboardStatus("loading");
+    setLeaderboardError("");
+    fetchLeaderboard()
+      .then(({ rows = [], skipped = false }) => {
+        if (cancelled) return;
+        setLeaderboard(buildLeaderboard([...rows, ...localLeaderboardRows]));
+        setLeaderboardStatus(skipped ? "local" : "ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.warn(error);
+        setLeaderboard(buildLeaderboard(localLeaderboardRows));
+        setLeaderboardStatus("error");
+        setLeaderboardError("원격 기록을 불러오지 못해 이 브라우저의 완료 기록만 표시합니다.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [localLeaderboardRows, showRanking]);
   const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
 
   useEffect(() => {
@@ -1371,7 +1412,7 @@ function App() {
         const caseTelemetryPayload = {
           session_id: sessionId,
           session_code: sessionCode,
-          player_name: null,
+          player_name: playerName.trim().slice(0, 24) || "익명 분석관",
           case_id: currentCase,
           case_title: activeCaseMeta?.title ?? currentCase,
           completed_at: new Date().toISOString(),
@@ -1659,6 +1700,7 @@ function App() {
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
       : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
   const resultRank = gameplayRank;
+  const rankingHeadline = getLeaderboardHeadline(leaderboard);
   const flowSurgeCount = log.filter((entry) => entry.flowSurge).length;
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
@@ -1785,6 +1827,83 @@ function App() {
     }
   }
 
+  if (showRanking && !started) {
+    return (
+      <main className="shell ranking-shell">
+        <AdaptiveMusic modeKey="intro" />
+        <section className="ranking-page">
+          <div className="topbar">
+            <button className="ghost" type="button" onClick={() => setShowRanking(false)}>
+              <ArrowLeft size={16} />
+              브리핑으로 돌아가기
+            </button>
+            <span className="brand-mark">{GAME_TITLE}</span>
+          </div>
+          <header className="ranking-hero">
+            <span>PUBLIC SIGNAL BOARD</span>
+            <h1>누가 가장 오래 생각했는가</h1>
+            <p>
+              완료된 사건의 모멘텀 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
+              압박 속에서 위험을 관리하고 선택지를 확장했다는 뜻입니다.
+            </p>
+          </header>
+          <section className="ranking-status-bar">
+            <div>
+              <span>{leaderboardStatus === "ready" ? "REMOTE LEADERBOARD" : "LOCAL PLAYTEST BOARD"}</span>
+              <strong>{rankingHeadline.title}</strong>
+              <p>{leaderboardError || rankingHeadline.text}</p>
+            </div>
+            <button type="button" onClick={() => setShowRanking(false)}>
+              <ChevronRight size={17} />
+              내 기록 만들기
+            </button>
+          </section>
+          <section className="ranking-table-panel" aria-label="플레이어 랭킹">
+            <div className="ranking-table-heading">
+              <div>
+                <span>SEASON 1 / BEST RUN</span>
+                <h2>현재 기준선</h2>
+              </div>
+              <small>{leaderboard.length}명의 기록</small>
+            </div>
+            {leaderboardStatus === "loading" ? (
+              <p className="ranking-empty">기록을 불러오는 중입니다.</p>
+            ) : leaderboard.length === 0 ? (
+              <p className="ranking-empty">아직 완료된 기록이 없습니다. 첫 시즌을 끝내고 기준선을 세워보세요.</p>
+            ) : (
+              <div className="ranking-list">
+                {leaderboard.map((entry) => (
+                  <article className={entry.sessionCode === sessionCode ? "ranking-row current-player" : "ranking-row"} key={entry.id}>
+                    <strong className="ranking-position">{String(entry.position).padStart(2, "0")}</strong>
+                    <div className="ranking-player">
+                      <b>{entry.name}</b>
+                      <small>{entry.caseTitle} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
+                    </div>
+                    <div className="ranking-stat">
+                      <span>RANK</span>
+                      <b>{entry.rank}</b>
+                    </div>
+                    <div className="ranking-stat score-stat">
+                      <span>MOMENTUM</span>
+                      <b>{entry.score}</b>
+                    </div>
+                    <div className="ranking-detail">
+                      <span>평균 {entry.averageResponseTime}s</span>
+                      <span>자유입력 {entry.freeCount}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+          <p className="ranking-footnote">
+            이름은 데이터 제공 동의가 있는 완료 기록에만 표시되며, 원격 연결이 없으면 이 브라우저의 로컬 기록만 집계합니다.
+          </p>
+        </section>
+      </main>
+    );
+  }
+
   if (!started) {
     return (
       <main className="shell intro-shell">
@@ -1792,7 +1911,13 @@ function App() {
         <section className="intro">
           <div className="brand-row">
             <span className="brand-mark">{GAME_TITLE}</span>
-            <span className="case-chip">{GAME_LABEL} / {activeCaseMeta?.title ?? GAME_TITLE}</span>
+            <div className="top-actions">
+              <button className="ghost intro-ranking-button" type="button" onClick={() => setShowRanking(true)}>
+                <Trophy size={16} />
+                랭킹
+              </button>
+              <span className="case-chip">{GAME_LABEL} / {activeCaseMeta?.title ?? GAME_TITLE}</span>
+            </div>
           </div>
           <h1>{GAME_TITLE}</h1>
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
@@ -2059,6 +2184,10 @@ function App() {
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
             <div className="top-actions">
+              <button className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
+                <Trophy size={16} />
+                랭킹
+              </button>
               <button className="ghost" onClick={showSeasonMap}>
                 <FileText size={16} />
                 시즌 로드맵
