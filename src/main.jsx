@@ -2614,6 +2614,10 @@ function App() {
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
             <div className="top-actions">
+              <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)}>
+                <RefreshCcw size={16} />
+                이 사건 다시 도전
+              </button>
               <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
                 <Trophy size={16} />
                 랭킹
