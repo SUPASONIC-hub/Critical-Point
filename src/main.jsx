@@ -2661,7 +2661,7 @@ function App() {
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
             <div className="top-actions">
-              <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)}>
+              <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)} aria-keyshortcuts="R">
                 <RefreshCcw size={16} />
                 이 사건 다시 도전
               </button>
@@ -2835,7 +2835,7 @@ function App() {
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>
                 <small>{resultBridge}</small>
               </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)}>
+              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
                 <ChevronRight size={18} />
                 {nextCaseSignal.button}
               </button>
