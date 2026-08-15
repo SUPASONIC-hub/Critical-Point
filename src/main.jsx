@@ -1776,10 +1776,12 @@ function App() {
     setIsPausedSave(false);
     setNodeEnteredAt(Date.now());
     setTelemetryStatus({
-      tone: telemetryEnabled ? "ready" : "local",
-      text: telemetryEnabled
-        ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-        : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+      tone: telemetryEnabled && isOnline ? "ready" : "local",
+      text: !isOnline
+        ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
+        : telemetryEnabled
+          ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
     });
   }
 
