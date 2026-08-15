@@ -27,6 +27,7 @@ import {
 import "./styles.css";
 import {
   FEEDBACK_COMMENT_MAX_LENGTH,
+  copyText,
   FREE_TEXT_MAX_LENGTH,
   readStoredValue,
   removeStoredValue,
@@ -1753,10 +1754,9 @@ function App() {
   }
 
   async function copySessionCode() {
-    try {
-      await navigator.clipboard.writeText(sessionCode);
+    if (await copyText(sessionCode)) {
       setCopyStatus("복사됨");
-    } catch {
+    } else {
       setCopyStatus("복사 실패");
     }
     window.setTimeout(() => setCopyStatus(""), 1600);

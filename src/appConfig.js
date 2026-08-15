@@ -29,3 +29,27 @@ export function removeStoredValue(key) {
     // Storage can be unavailable in private or embedded browser contexts.
   }
 }
+
+export async function copyText(value) {
+  try {
+    if (globalThis.navigator?.clipboard?.writeText) {
+      await globalThis.navigator.clipboard.writeText(value);
+      return true;
+    }
+
+    const documentRef = globalThis.document;
+    if (!documentRef?.body) return false;
+    const textarea = documentRef.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    documentRef.body.appendChild(textarea);
+    textarea.select();
+    const copied = documentRef.execCommand?.("copy") ?? false;
+    textarea.remove();
+    return copied;
+  } catch {
+    return false;
+  }
+}

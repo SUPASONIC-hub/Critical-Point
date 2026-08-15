@@ -24,6 +24,7 @@ import {
 } from "../src/gameLogic.js";
 import {
   FEEDBACK_COMMENT_MAX_LENGTH,
+  copyText,
   FREE_TEXT_MAX_LENGTH,
   readStoredValue,
   removeStoredValue,
@@ -42,6 +43,7 @@ assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a 
 assert.equal(readStoredValue("missing-key", "fallback"), "fallback", "storage reads should degrade gracefully");
 assert.equal(writeStoredValue("test-key", "value"), false, "storage writes should report unavailable browser storage");
 removeStoredValue("test-key");
+assert.equal(await copyText("test"), false, "clipboard fallback should fail safely without a browser");
 assert.equal(easyResourceLabels.capital, "현금", "player language should use an intuitive resource label");
 assert.equal(
   simplifyPlayerText("CASE 02 / LEGITIMACY / HIDDEN PROTOCOL"),
