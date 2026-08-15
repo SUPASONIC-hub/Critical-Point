@@ -26,6 +26,7 @@ import {
   FEEDBACK_COMMENT_MAX_LENGTH,
   copyText,
   FREE_TEXT_MAX_LENGTH,
+  parseSavedState,
   readStoredValue,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
@@ -40,6 +41,13 @@ assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on th
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
 assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
+assert.deepEqual(
+  parseSavedState(JSON.stringify({ saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false }), SAVE_SCHEMA_VERSION),
+  { saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false },
+  "matching save schemas should be restored",
+);
+assert.equal(parseSavedState('{"saveSchemaVersion":1}', SAVE_SCHEMA_VERSION), null, "old save schemas should be ignored");
+assert.equal(parseSavedState("not-json", SAVE_SCHEMA_VERSION), null, "corrupt saves should be ignored");
 assert.equal(readStoredValue("missing-key", "fallback"), "fallback", "storage reads should degrade gracefully");
 assert.equal(writeStoredValue("test-key", "value"), false, "storage writes should report unavailable browser storage");
 removeStoredValue("test-key");

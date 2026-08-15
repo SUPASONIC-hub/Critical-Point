@@ -29,6 +29,7 @@ import {
   FEEDBACK_COMMENT_MAX_LENGTH,
   copyText,
   FREE_TEXT_MAX_LENGTH,
+  parseSavedState,
   readStoredValue,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
@@ -458,11 +459,7 @@ function getRouteMarker(entry) {
 
 function App() {
   const saved = useMemo(() => {
-    try {
-      return JSON.parse(readStoredValue(STORAGE_KEY, "null"));
-    } catch {
-      return null;
-    }
+    return parseSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
   }, []);
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);

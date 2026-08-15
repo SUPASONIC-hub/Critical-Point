@@ -3,6 +3,16 @@ export const SAVE_SCHEMA_VERSION = 2;
 export const FREE_TEXT_MAX_LENGTH = 600;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 
+export function parseSavedState(raw, schemaVersion) {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    return parsed.saveSchemaVersion === schemaVersion ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export function readStoredValue(key, fallback = null) {
   try {
     return globalThis.localStorage?.getItem(key) ?? fallback;
