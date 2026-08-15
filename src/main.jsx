@@ -3646,6 +3646,8 @@ function App() {
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
               const tacticalRead = choiceRead.tacticalRead;
+              const isSafestChoice = safestForecast?.choice.id === choice.id;
+              const isCostliestChoice = costliestForecast?.choice.id === choice.id;
               return (
                 <button
                   type="button"
@@ -3693,6 +3695,12 @@ function App() {
                         </span>
                       )}
                       <span className="choice-subtext">{simplifyPlayerText(getChoiceSubtext(choice))}</span>
+                      {(isSafestChoice || isCostliestChoice) && (
+                        <span className="choice-badges" aria-label="선택 비교 태그">
+                          {isSafestChoice && <b className="choice-badge safe">가장 안정</b>}
+                          {isCostliestChoice && <b className="choice-badge cost">대가 큼</b>}
+                        </span>
+                      )}
                       {choice.effect && (
                         <span className="choice-tradeoff">
                           {simplifyPlayerText(explainResourceTradeoff(choice.effect))}

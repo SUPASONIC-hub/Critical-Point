@@ -3589,6 +3589,35 @@ summary:focus-visible {
   line-height: 1.45;
 }
 
+.choice-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+  margin-left: 24px;
+}
+
+.choice-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.choice-badge.safe {
+  color: #163728;
+  background: #b8e68a;
+}
+
+.choice-badge.cost {
+  color: #fff5f0;
+  background: #a74332;
+}
+
 .choice-tradeoff {
   display: block;
   margin-top: 8px;
