@@ -441,6 +441,7 @@ function App() {
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
   const [copyStatus, setCopyStatus] = useState("");
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [pendingChoice, setPendingChoice] = useState(null);
   const [decisionReveal, setDecisionReveal] = useState(null);
   const [saveStatus, setSaveStatus] = useState("");
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
@@ -821,6 +822,12 @@ function App() {
   };
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
+  const pendingChoiceRead = pendingChoice
+    ? getEffectiveChoiceRead(pendingChoice, pendingChoice.effect, pendingChoice.cognition)
+    : null;
+  const pendingChoiceForecast = pendingChoiceRead
+    ? createDecisionForecast({ ...pendingChoice, effect: pendingChoiceRead.finalEffect }, resources)
+    : null;
 
   const questSteps = [
     {
@@ -981,6 +988,7 @@ function App() {
       sceneTitleRef.current?.focus({ preventScroll: true });
       setIsAdvancing(false);
       setShowTacticalDetails(false);
+      setPendingChoice(null);
     });
   }, [started, currentCase, nodeId, isResult]);
 
@@ -1024,6 +1032,7 @@ function App() {
     setProbeUsed(false);
     setOpeningLegacy(null);
     setDecisionReveal(null);
+    setPendingChoice(null);
     setNodeId("start");
     setNodeEnteredAt(Date.now());
     persist({
@@ -1302,6 +1311,7 @@ function App() {
   function choose(choice) {
     if (isAdvancing) return;
     setIsAdvancing(true);
+    setPendingChoice(null);
     const responseTimeSec = Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000));
     const free = choice.type === "free";
     const freeResult = free ? scoreFreeText(freeText) : null;
@@ -1512,6 +1522,11 @@ function App() {
       probeUsed: false,
       nodeEnteredAt: Date.now(),
     });
+  }
+
+  function previewChoice(choice) {
+    if (isAdvancing || choice.type === "free") return;
+    setPendingChoice(choice);
   }
 
   function reset() {
@@ -3011,6 +3026,29 @@ function App() {
               </ol>
             </section>
           )}
+          {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
+            <section className={`commit-console ${suspenseState.tier.toLowerCase()}`} aria-label="선택 확정 콘솔">
+              <div className="commit-console-heading">
+                <span>COMMIT SEQUENCE</span>
+                <strong>이 말을 실제로 남기겠습니까?</strong>
+              </div>
+              <p className="commit-console-choice">“{speechifyChoice(pendingChoice)}”</p>
+              <div className="commit-console-readout">
+                <span>예상 위험 <b>{formatRiskDelta(pendingChoiceForecast.riskDelta)}</b></span>
+                <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
+                <span>전술 등급 <b>{pendingChoiceRead.tacticalRead.grade}</b></span>
+              </div>
+              <div className="commit-console-actions">
+                <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
+                  다시 고르기
+                </button>
+                <button type="button" className="commit-confirm" onClick={() => choose(pendingChoice)}>
+                  <LockKeyhole size={16} />
+                  이 선택을 기록한다
+                </button>
+              </div>
+            </section>
+          )}
           <div className="choices">
             {fixedChoices.map((choice) => {
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
@@ -3029,14 +3067,15 @@ function App() {
               return (
                 <button
                   key={choice.id}
-                  className="choice"
-                  onClick={() => choose(choice)}
+                  className={pendingChoice?.id === choice.id ? "choice selected" : "choice"}
+                  onClick={() => previewChoice(choice)}
                   disabled={isAdvancing}
+                  aria-pressed={pendingChoice?.id === choice.id}
                   aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
                 >
                   <span className="choice-main">
                     <Check size={16} />
-                    <small>선택</small>
+                    <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>

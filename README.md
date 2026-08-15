@@ -31,6 +31,7 @@ npm run build
 - PUBLIC SIGNAL BOARD: 완료 세션의 최고 모멘텀 점수와 랭크를 비교하는 참가자 랭킹
 - SUSPENSE CONSOLE: 위험 압력과 결정 시간에 따라 상승하는 장면 긴장도
 - HIDDEN PROTOCOL: 임계선을 넘는 선택에서 관찰자, 패턴 고정, 숨은 프로토콜이 드러나는 반전 이벤트
+- COMMIT SEQUENCE: 선택을 미리 검토한 뒤 실제 기록으로 확정하는 2단계 결정 UX
 - 타이머, 에코 반론, 위기 프로토콜, 적응형 배경음악
 - 브라우저 저장, 이어하기, JSON 로그 내보내기
 - 선택적 Supabase 원격 저장과 실패분 재시도 대기열
