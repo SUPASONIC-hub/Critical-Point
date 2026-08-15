@@ -1039,11 +1039,20 @@ function App() {
   useEffect(() => {
     const handleChoiceShortcut = (event) => {
       if (!started || isResult || decisionReveal || isAdvancing) return;
+      if (event.repeat) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
       if (event.key === "Enter" && pendingChoice) {
         event.preventDefault();
         choose(pendingChoice);
+        return;
+      }
+      if (fixedChoices.length > 1 && ["ArrowDown", "ArrowRight", "j", "J", "ArrowUp", "ArrowLeft", "k", "K"].includes(event.key)) {
+        event.preventDefault();
+        const currentIndex = pendingChoice ? fixedChoices.findIndex((choice) => choice.id === pendingChoice.id) : -1;
+        const direction = ["ArrowUp", "ArrowLeft", "k", "K"].includes(event.key) ? -1 : 1;
+        const nextIndex = (currentIndex + direction + fixedChoices.length) % fixedChoices.length;
+        previewChoice(fixedChoices[nextIndex]);
         return;
       }
       const choiceIndex = Number(event.key) - 1;
