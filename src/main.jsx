@@ -1157,7 +1157,18 @@ function App() {
           : "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
     const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
     const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
-    const legacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
+    const previousOutcome = previousResult?.outcomeChoiceId
+      ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
+      : null;
+    const legacy = previousResult
+      ? {
+          ...(legacyProfiles[previousResult.rank] ?? legacyProfiles.C),
+          continuity: previousOutcome,
+        }
+      : null;
+    const openingEcho = previousOutcome
+      ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
+      : introEcho;
     const openingResources = legacy ? applyEffect(initialResources, legacy.effect) : initialResources;
     setStarted(true);
     setIsPausedSave(false);
@@ -1172,7 +1183,7 @@ function App() {
     setProbeUsed(false);
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
-    setEcho(introEcho);
+    setEcho(openingEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
     persist({
@@ -1188,7 +1199,7 @@ function App() {
       timerPenaltyApplied: false,
       probeUsed: false,
       openingLegacy: legacy,
-      echo: introEcho,
+      echo: openingEcho,
       nodeEnteredAt: Date.now(),
     });
   }
@@ -1301,6 +1312,8 @@ function App() {
       momentumScore: summary?.momentumScore ?? 0,
       momentumTier: summary?.momentumTier ?? "BUILDING",
       rank: summary?.rank ?? "C",
+      outcomeChoiceId: summary?.outcomeChoiceId ?? null,
+      outcomeNodeId: summary?.outcomeNodeId ?? null,
     };
   }
 
@@ -1464,7 +1477,11 @@ function App() {
         : completedCases;
     const completedNow = nextCompletedCases !== completedCases;
     const caseSummary = completedNow
-      ? buildCaseSummary(nextTriggers, nextCognition, nextLog)
+      ? {
+          ...buildCaseSummary(nextTriggers, nextCognition, nextLog),
+          outcomeChoiceId: entry.choiceId,
+          outcomeNodeId: entry.nodeId,
+        }
       : null;
     const nextCaseResults = completedNow
       ? {
@@ -2800,6 +2817,13 @@ function App() {
               <strong>{simplifyPlayerText(openingLegacy.title)}</strong>
             </div>
             <p>{simplifyPlayerText(openingLegacy.text)}</p>
+            {openingLegacy.continuity && (
+              <div className="continuity-bridge">
+                <span>직전 사건의 결과</span>
+                <strong>{simplifyPlayerText(openingLegacy.continuity.title)}</strong>
+                <p>{simplifyPlayerText(openingLegacy.continuity.text)}</p>
+              </div>
+            )}
             <div className="legacy-effect">
               {Object.entries(openingLegacy.effect).map(([key, value]) => (
                 <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
