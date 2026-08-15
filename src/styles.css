@@ -3335,12 +3335,26 @@ summary:focus-visible {
   gap: 8px;
 }
 
-.forecast-grid article {
+.forecast-grid article,
+.forecast-highlight {
   min-height: 92px;
   padding: 10px;
   background: #ffffff;
   border: 1px solid #d8ded7;
   border-radius: 6px;
+}
+
+.forecast-highlight {
+  color: #18201f;
+  text-align: left;
+}
+
+.forecast-highlight:hover,
+.forecast-highlight:focus-visible,
+.forecast-highlight[aria-pressed="true"] {
+  background: #eff8d7;
+  border-color: var(--teal);
+  transform: translateY(-2px);
 }
 
 .forecast-grid b,

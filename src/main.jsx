@@ -3579,19 +3579,31 @@ function App() {
                 </p>
               </div>
               <div className="forecast-grid">
-                <article>
+                <button
+                  type="button"
+                  className="forecast-highlight"
+                  onClick={() => previewChoice(safestForecast.choice)}
+                  aria-pressed={pendingChoice?.id === safestForecast.choice.id}
+                  aria-label="가장 안정적인 선택 미리보기"
+                >
                   <span>가장 안정적인 말</span>
-                    <b>{simplifyPlayerText(safestForecast.choice.label)}</b>
+                  <b>{simplifyPlayerText(safestForecast.choice.label)}</b>
                   <small>
                     위험 {formatRiskDelta(safestForecast.forecast.riskDelta)} · 예상 압력{" "}
                     {safestForecast.forecast.afterRisk}
                   </small>
-                </article>
-                <article>
+                </button>
+                <button
+                  type="button"
+                  className="forecast-highlight"
+                  onClick={() => previewChoice(costliestForecast.choice)}
+                  aria-pressed={pendingChoice?.id === costliestForecast.choice.id}
+                  aria-label="가장 큰 대가 선택 미리보기"
+                >
                   <span>가장 큰 대가</span>
-                    <b>{simplifyPlayerText(costliestForecast.choice.label)}</b>
+                  <b>{simplifyPlayerText(costliestForecast.choice.label)}</b>
                   <small>{formatResourceDelta(costliestForecast.forecast.biggestCost)}</small>
-                </article>
+                </button>
                 <article>
                   <span>압박 원인</span>
                   <b>{riskPressureDrivers.slice(0, 2).map((driver) => driver.label).join(" / ")}</b>
