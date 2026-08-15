@@ -1144,6 +1144,14 @@ function App() {
     setStarted(true);
     setIsPausedSave(false);
     setCurrentCase("case01");
+    setCompletedCases([]);
+    setDiscoveredClues([]);
+    setCaseResults({});
+    setPlaytestFeedback({});
+    setResources(initialResources);
+    setLog([]);
+    setTriggers(makeEmptyScores(triggerLabels));
+    setCognition(makeEmptyScores(cognitionLabels));
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
@@ -1160,6 +1168,14 @@ function App() {
       dataConsent,
       started: true,
       currentCase: "case01",
+      completedCases: [],
+      discoveredClues: [],
+      caseResults: {},
+      playtestFeedback: {},
+      resources: initialResources,
+      log: [],
+      triggers: makeEmptyScores(triggerLabels),
+      cognition: makeEmptyScores(cognitionLabels),
       nodeId: "start",
       freeText: "",
       nodeEnteredAt: Date.now(),
