@@ -5438,6 +5438,33 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 118, 95, 0.14), inset 0 1px 0 #ffffff;
 }
 
+.streak-meter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.streak-meter i {
+  display: block;
+  width: 22px;
+  height: 6px;
+  background: #cbd8cf;
+  border-radius: 999px;
+}
+
+.streak-meter i.filled {
+  background: var(--acid-dark);
+  box-shadow: 0 0 8px rgba(159, 202, 53, 0.42);
+}
+
+.streak-meter small {
+  margin-left: 4px;
+  color: var(--teal);
+  font-size: 9px;
+  font-weight: 950;
+}
+
 .decision-rail {
   display: flex;
   align-items: center;

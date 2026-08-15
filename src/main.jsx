@@ -3240,7 +3240,13 @@ function App() {
           <article>
             <span>플레이 흐름</span>
             <strong>{simplifyPlayerText(momentumTier)}</strong>
-            <p>{momentumScore}점 · 장면 목표 {currentChallengeStreak}연속</p>
+            <div className="streak-meter" aria-label={`장면 목표 ${currentChallengeStreak}연속. 다음 보상까지 ${Math.max(0, 3 - currentChallengeStreak)}회`}>
+              {[0, 1, 2].map((step) => (
+                <i className={currentChallengeStreak > step ? "filled" : ""} key={step} />
+              ))}
+              <small>{currentChallengeStreak >= 3 ? "BREAKTHROUGH" : `${Math.min(3, currentChallengeStreak)}/3`}</small>
+            </div>
+            <p>{momentumScore}점 · 다음 보상까지 {Math.max(0, 3 - currentChallengeStreak)}회</p>
           </article>
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
             <span>남은 결정 시간</span>
