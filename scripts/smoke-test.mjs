@@ -25,7 +25,7 @@ import {
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
 } from "../src/appConfig.js";
-import { initialResources } from "../src/gameData.js";
+import { initialResources, nodeOrders, nodes } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 
@@ -39,6 +39,10 @@ assert.equal(
   "사건 2 / 공정함 / 숨은 긴급 절차",
   "player language should translate visible system terms",
 );
+assert.ok(nodes.c1_aftershock?.choices?.length === 3, "case 01 should include a post-decision branch scene");
+assert.ok(nodes.f_aftershock?.choices?.length === 3, "the final act should include a final branch scene");
+assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should include its aftermath scene");
+assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should include its aftermath scene");
 assert.equal(
   getDiscoveryClue({ currentCase: "case01", challengeMatch: true, riskDelta: 4, responseTimeSec: 20, logLength: 1 }).id,
   "c1-hidden-ledger",

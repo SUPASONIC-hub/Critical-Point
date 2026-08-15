@@ -1541,3 +1541,108 @@ export const nodes = {
     ],
   },
 };
+
+const aftermathNodes = {
+  c1_aftershock: {
+    phase: "AFTERMATH",
+    title: "다음 날의 급여명세서",
+    speaker: "도윤하",
+    text: "결정 다음 날, 숫자보다 먼저 사람들의 반응이 도착했습니다. 직원들은 누가 보호받았는지 묻고, 협력사 대표는 당신이 남긴 약속을 다시 읽습니다.",
+    memo: ["직원 공지에 서로 다른 해석이 퍼짐", "협력사 대표가 조건 재협상을 요청함", "투자자는 당신의 다음 기준을 확인하려 함"],
+    triggers: ["protection", "responsibility", "trust"],
+    choices: [
+      { id: "c1_after_people", label: "직원과 협력사 앞에서 먼저 약속을 설명한다", effect: { trust: 8, legitimacy: 4, fatigue: 5 }, next: "result", cognition: { persistence: 1 } },
+      { id: "c1_after_numbers", label: "현금 흐름표를 공개하고 감당할 손실을 정한다", effect: { capital: -6, legitimacy: 8, fatigue: 4 }, next: "result", cognition: { inference: 1, risk: 1 } },
+      { id: "c1_after_silence", label: "다음 자금이 들어올 때까지 공개를 늦춘다", effect: { capital: 8, trust: -10, legitimacy: -6, fatigue: 2 }, next: "result", cognition: { risk: 2 } },
+    ],
+  },
+  c2_aftershock: {
+    phase: "AFTERMATH",
+    title: "누가 기록을 고쳤는가",
+    speaker: "에코",
+    text: "보고서가 올라간 뒤 원본 로그 한 줄이 사라졌습니다. 이민서를 지목한 기록과 당신이 선택한 보고 방식이 같은 손에서 만들어졌을 가능성이 생겼습니다.",
+    memo: ["원본 로그와 복사본의 시각이 다름", "이민서 계정은 이미 잠김", "삭제 권한은 세 사람에게만 있었음"],
+    triggers: ["trust", "curiosity", "injustice"],
+    choices: [
+      { id: "c2_after_audit", label: "원본 보관자부터 조사해 기록의 흐름을 복원한다", effect: { time: -7, legitimacy: 8, fatigue: 6 }, next: "case02_result", cognition: { inference: 2 } },
+      { id: "c2_after_person", label: "이민서에게 직접 사라진 기록을 묻는다", effect: { trust: 8, legitimacy: -2, fatigue: 5 }, next: "case02_result", cognition: { persistence: 1, reframing: 1 } },
+      { id: "c2_after_public", label: "기록 조작 가능성을 즉시 외부에 알린다", effect: { trust: -4, legitimacy: 14, capital: -8, fatigue: 8 }, next: "case02_result", cognition: { risk: 2 } },
+    ],
+  },
+  c3_aftershock: {
+    phase: "AFTERMATH",
+    title: "승자의 빈 화면",
+    speaker: "오진우",
+    text: "발표가 끝났지만 점수는 공개되지 않았습니다. 오진우는 당신에게 묻습니다. 이번 승리가 고객을 위한 것이었는지, 누군가가 만든 경주에서 이긴 것인지.",
+    memo: ["고객사는 두 안 모두 보류함", "오진우의 원본 제출 시간이 조작됐을 가능성", "보안 결함을 숨긴 쪽이 높은 점수를 받음"],
+    triggers: ["competition", "recognition", "curiosity"],
+    choices: [
+      { id: "c3_after_share", label: "두 안의 장점을 합쳐 고객에게 다시 제안한다", effect: { trust: 8, legitimacy: 5, fatigue: 7 }, next: "case03_result", cognition: { reframing: 2 } },
+      { id: "c3_after_proof", label: "점수보다 보안 결함의 증거를 먼저 공개한다", effect: { capital: -8, legitimacy: 14, fatigue: 6 }, next: "case03_result", cognition: { inference: 2, persistence: 1 } },
+      { id: "c3_after_win", label: "승리를 확정하고 경쟁자의 허점을 이용한다", effect: { capital: 12, trust: -10, legitimacy: -8, fatigue: 3 }, next: "case03_result", cognition: { risk: 2 } },
+    ],
+  },
+  c4_aftershock: {
+    phase: "AFTERMATH",
+    title: "예외의 청구서",
+    speaker: "반재욱",
+    text: "보조금 심사 결과보다 먼저 감사 요청서가 도착했습니다. 작은 예외를 허용한 순간, 같은 예외를 기다리던 다른 기관들이 줄을 섰습니다.",
+    memo: ["비슷한 사정을 가진 기관 11곳이 연락함", "심사관은 해석 기준의 공개를 요구함", "현장 서비스는 당장 멈추지 않았음"],
+    triggers: ["order", "responsibility", "reward"],
+    choices: [
+      { id: "c4_after_rule", label: "예외 조건을 모두 공개하고 새 기준을 만든다", effect: { legitimacy: 12, trust: 6, fatigue: 8 }, next: "case04_result", cognition: { reframing: 2, persistence: 1 } },
+      { id: "c4_after_service", label: "서비스를 지키기 위해 같은 예외를 한 번 더 허용한다", effect: { capital: 10, legitimacy: -12, humanCost: -4, fatigue: 5 }, next: "case04_result", cognition: { risk: 2 } },
+      { id: "c4_after_stop", label: "감사를 위해 예외 적용을 즉시 중단한다", effect: { capital: -12, legitimacy: 10, humanCost: 10, fatigue: 4 }, next: "case04_result", cognition: { inference: 1 } },
+    ],
+  },
+  c5_aftershock: {
+    phase: "AFTERMATH",
+    title: "아무도 서명하지 않은 실패",
+    speaker: "도윤하",
+    text: "실패 원인을 찾는 회의가 열렸지만 누구도 단독 책임을 지지 않았습니다. 회의실 밖에는 조용히 떠난 사람의 자리가 하나 남아 있습니다.",
+    memo: ["각 팀의 결정은 당시 기준으로 합리적이었음", "피해를 먼저 알린 기록은 삭제됨", "책임을 나누면 개선 속도가 느려질 수 있음"],
+    triggers: ["responsibility", "protection", "curiosity"],
+    choices: [
+      { id: "c5_after_owner", label: "내 결정부터 책임지고 개선 작업을 맡는다", effect: { trust: 10, legitimacy: 8, fatigue: 9 }, next: "case05_result", cognition: { persistence: 2 } },
+      { id: "c5_after_system", label: "개인 탓 대신 반복을 막는 구조를 다시 설계한다", effect: { legitimacy: 10, trust: 6, capital: -5, fatigue: 8 }, next: "case05_result", cognition: { reframing: 3 } },
+      { id: "c5_after_name", label: "가장 큰 실수를 한 사람을 공식 책임자로 세운다", effect: { trust: -12, legitimacy: 4, humanCost: 8, fatigue: 3 }, next: "case05_result", cognition: { risk: 2 } },
+    ],
+  },
+  f_aftershock: {
+    phase: "LAST EVIDENCE",
+    title: "당신의 선택이 사용되는 밤",
+    speaker: "에코",
+    text: "마지막 폴더가 열리자, 트리거랩이 당신의 선택을 다음 참가자에게 보여주고 있었다는 사실이 드러납니다. 이제 결말은 실험을 끝내는 방식에 달렸습니다.",
+    memo: ["당신의 선택 문장이 다음 테스트의 선택지로 복제됨", "단서가 많을수록 실험 설계자 이름에 가까워짐", "외부 공개와 내부 개혁 모두 누군가의 피해를 요구함"],
+    triggers: ["curiosity", "responsibility", "order"],
+    choices: [
+      { id: "f_after_witness", label: "모든 기록을 증거로 보존하고 외부 증언을 준비한다", effect: { legitimacy: 12, trust: 4, fatigue: 8 }, next: "final_result", cognition: { inference: 2, persistence: 1 } },
+      { id: "f_after_control", label: "실험을 멈추지 않고 참가자 동의 규칙부터 바꾼다", effect: { trust: 10, legitimacy: 8, fatigue: 10 }, next: "final_result", cognition: { reframing: 3 } },
+      { id: "f_after_burn", label: "모든 데이터를 태워 누구도 다시 이용하지 못하게 한다", effect: { legitimacy: 6, trust: -6, fatigue: 5 }, next: "final_result", cognition: { risk: 2 } },
+    ],
+  },
+};
+
+Object.assign(nodes, aftermathNodes);
+
+const aftermathRoutes = {
+  final: "c1_aftershock",
+  c2_final: "c2_aftershock",
+  c3_final: "c3_aftershock",
+  c4_final: "c4_aftershock",
+  c5_final: "c5_aftershock",
+  f_choice: "f_aftershock",
+};
+
+Object.entries(aftermathRoutes).forEach(([nodeId, nextNode]) => {
+  nodes[nodeId].choices.forEach((choice) => {
+    choice.next = nextNode;
+  });
+});
+
+nodeOrders.case01.push("c1_aftershock");
+nodeOrders.case02.push("c2_aftershock");
+nodeOrders.case03.push("c3_aftershock");
+nodeOrders.case04.push("c4_aftershock");
+nodeOrders.case05.push("c5_aftershock");
+nodeOrders.final.push("f_aftershock");

@@ -1696,6 +1696,29 @@ function App() {
       includeLongestDecision: true,
     });
   }, [triggers, cognition, log, resources]);
+  const finalEndingEntry = [...log].reverse().find((entry) => entry.nodeId === "f_choice");
+  const finalAftermathEntry = [...log].reverse().find((entry) => entry.nodeId === "f_aftershock");
+  const endingProfiles = {
+    ending_seal: {
+      tag: "봉인",
+      title: "당신은 문을 닫았지만, 흔적은 남겼다.",
+      text: "데이터를 봉인해 다시 이용되지 않게 했습니다. 그러나 마지막 후폭풍에서 고른 태도는 당신이 지키려는 것이 침묵인지 안전인지 드러냈습니다.",
+    },
+    ending_reform: {
+      tag: "개혁",
+      title: "당신은 실험을 규칙으로 바꾸었다.",
+      text: "트리거를 없애는 대신 동의와 감시를 붙였습니다. 사람을 읽는 힘을 누가, 언제, 어디까지 쓸 수 있는지 직접 정했습니다.",
+    },
+    ending_expose: {
+      tag: "폭로",
+      title: "당신은 관찰자를 세상 밖으로 끌어냈다.",
+      text: "실험의 구조를 공개했습니다. 혼란은 시작됐지만, 적어도 다음 참가자는 자신이 관찰당하고 있다는 사실을 알고 선택할 수 있습니다.",
+    },
+  }[finalEndingEntry?.choiceId] ?? {
+    tag: "미확정",
+    title: "당신의 마지막 선택은 아직 기록 중이다.",
+    text: "마지막 폴더의 문장이 완전히 닫히지 않았습니다. 다음 플레이에서는 다른 결말의 조건을 시험해 보십시오.",
+  };
 
   function updateCurrentFeedback(patch) {
     const normalizedPatch =
@@ -2702,11 +2725,10 @@ function App() {
           </section>
           {currentCase === "final" ? (
             <section className="story-reveal ending-reveal">
-              <span>SEASON 1 COMPLETE</span>
-              <h2>나는 이런 조건에서 생각을 멈추지 않는다.</h2>
+              <span>SEASON 1 COMPLETE · {endingProfile.tag}</span>
+              <h2>{endingProfile.title}</h2>
               <p>
-                이 결과는 능력 평가가 아닙니다. 당신을 더 깊이 생각하게 만든 조건의
-                기록입니다. 이제 남은 질문은 그 조건을 숨길지, 고칠지, 사용할지입니다.
+                {endingProfile.text} {finalAftermathEntry ? `마지막 후폭풍에서 "${finalAftermathEntry.choice}"을 선택했습니다.` : ""}
               </p>
               <div className="ending-clue-summary">
                 <strong>{clueCount}/6 숨은 단서 발견</strong>
