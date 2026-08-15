@@ -522,6 +522,7 @@ function App() {
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
   const choiceButtonsRef = useRef(new Map());
+  const visibilityPauseRef = useRef(null);
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -1143,6 +1144,24 @@ function App() {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [started, currentCase, resolvedNodeId, isResult]);
+
+  useEffect(() => {
+    if (!started || isResult) return undefined;
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        visibilityPauseRef.current ??= Date.now();
+        return;
+      }
+      if (visibilityPauseRef.current === null) return;
+      const pausedForMs = Date.now() - visibilityPauseRef.current;
+      visibilityPauseRef.current = null;
+      const adjustedNodeEnteredAt = nodeEnteredAt + pausedForMs;
+      setNodeEnteredAt(adjustedNodeEnteredAt);
+      persist({ nodeEnteredAt: adjustedNodeEnteredAt });
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [isResult, nodeEnteredAt, persist, started]);
 
   useEffect(() => {
     if (!started || isResult || decisionSeconds > 0 || timerPenaltyApplied) return;
