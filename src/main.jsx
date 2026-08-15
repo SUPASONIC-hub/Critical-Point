@@ -34,6 +34,7 @@ import {
 import {
   boardChangePrompts,
   caseObjectives,
+  caseOpeningRoutes,
   characterProfiles,
   cognitionLabels,
   initialResources,
@@ -1131,7 +1132,7 @@ function App() {
   }
 
   function startCase(caseId) {
-    const startNode =
+    const baseStartNode =
       caseId === "final"
         ? "f_start"
         : caseId === "case05"
@@ -1157,6 +1158,7 @@ function App() {
           : "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
     const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
     const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
+    const startNode = caseOpeningRoutes[caseId]?.[previousResult?.outcomeChoiceId] ?? baseStartNode;
     const previousOutcome = previousResult?.outcomeChoiceId
       ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : null;

@@ -26,7 +26,7 @@ import {
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
 } from "../src/appConfig.js";
-import { initialResources, nodeOrders, nodes } from "../src/gameData.js";
+import { caseOpeningRoutes, initialResources, nodeOrders, nodes } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 
@@ -47,7 +47,7 @@ assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should in
 assert.ok(nodes.c1_witness && nodes.c1_verdict, "case 01 should include connective witness and verdict scenes");
 assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice, "every middle case should include a new evidence scene");
 assert.equal(nodeOrders.case01.length, 15, "case 01 should have expanded to fifteen playable scenes");
-assert.equal(nodeOrders.final.length, 9, "the final act should have expanded to nine playable scenes");
+assert.equal(nodeOrders.final.length, 12, "the final act should have expanded to twelve playable scenes");
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
 assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");
@@ -67,6 +67,9 @@ assert.equal(
   "서비스를 지킨 결말",
   "case outcomes should reflect the selected aftermath branch",
 );
+assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
+assert.equal(caseOpeningRoutes.final.c5_after_system, "f_start_system", "the final act should have a system-led opening route");
+assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings should be real playable nodes");
 
 const riskyResources = {
   time: 40,
