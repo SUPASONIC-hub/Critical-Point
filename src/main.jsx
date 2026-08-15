@@ -3599,7 +3599,12 @@ function App() {
             </section>
           )}
           {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
-            <section className={`commit-console ${suspenseState.tier.toLowerCase()}`} aria-label="선택 확정 콘솔">
+            <section
+              className={`commit-console ${suspenseState.tier.toLowerCase()}`}
+              aria-label="선택 확정 콘솔"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <div className="commit-console-heading">
                 <span>선택 확인</span>
                 <strong>이 말을 실제로 남기겠습니까?</strong>
