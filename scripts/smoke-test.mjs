@@ -257,7 +257,14 @@ const leaderboard = buildLeaderboard([
 assert.equal(leaderboard.length, 2, "leaderboard should keep one best run per session");
 assert.equal(leaderboard[0].sessionCode, "ALPHA", "leaderboard should sort by momentum score");
 assert.equal(leaderboard[0].position, 1, "leaderboard should assign positions");
-assert.match(getLeaderboardHeadline(leaderboard).title, /첫 분석관/, "leaderboard headline should name the leader");
+assert.match(getLeaderboardHeadline(leaderboard).title, /익명 분석관/, "remote leaderboard should use anonymous names");
+assert.match(
+  getLeaderboardHeadline(
+    buildLeaderboard([{ local: true, session_code: "LOCAL", player_name: "현재 분석관", summary: { rank: "S", momentumScore: 90 } }]),
+  ).title,
+  /현재 분석관/,
+  "local leaderboard should keep the local player name",
+);
 
 const gameplayStats = getGameplayStats(
   [

@@ -979,6 +979,7 @@ function App() {
     };
   const localLeaderboardRows = useMemo(
     () => Object.entries(caseResults).map(([caseId, summary]) => ({
+      local: true,
       session_code: sessionCode,
       player_name: playerName || "현재 분석관",
       case_id: caseId,

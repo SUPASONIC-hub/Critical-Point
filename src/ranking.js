@@ -18,7 +18,7 @@ function normalizeEntry(row = {}) {
   return {
     id: `${row.session_code ?? "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     sessionCode: row.session_code ?? "LOCAL",
-    name: String(row.player_name || "익명 분석관").slice(0, 24),
+    name: row.local ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
     caseId: row.case_id ?? "case01",
     caseTitle: row.case_title ?? row.case_id ?? "CASE",
     completedAt: row.completed_at ?? "",
