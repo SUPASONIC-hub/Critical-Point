@@ -3304,7 +3304,7 @@ function App() {
             <strong>{clueCount}/6</strong>
             <p>{clueCount > 0 ? "다음 비밀이 열림" : "장면 목표를 노려보세요"}</p>
           </article>
-          <article>
+          <article className={currentChallengeStreak >= 5 ? "streak-hud perfect" : "streak-hud"}>
             <span>플레이 흐름</span>
             <strong>{simplifyPlayerText(momentumTier)}</strong>
             <div className="streak-meter" aria-label={`장면 목표 ${currentChallengeStreak}연속. 다음 보상까지 ${streakRemaining}회`}>

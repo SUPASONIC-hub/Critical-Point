@@ -5603,6 +5603,21 @@ body {
   font-weight: 950;
 }
 
+.streak-hud.perfect {
+  background: #eff8d7;
+  border-color: var(--acid-dark);
+  box-shadow: inset 0 0 0 2px rgba(117, 167, 121, 0.28), 0 12px 24px rgba(99, 123, 35, 0.14);
+}
+
+.streak-hud.perfect .streak-meter i.filled {
+  background: var(--acid-dark);
+  box-shadow: 0 0 0 2px rgba(192, 234, 75, 0.36);
+}
+
+.streak-hud.perfect .streak-meter small {
+  color: #315f3b;
+}
+
 .decision-rail {
   display: flex;
   align-items: center;
