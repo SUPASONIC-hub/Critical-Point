@@ -3685,5 +3685,48 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+class AppErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error("Critical Point render error", error);
+  }
+
+  reload({ clearSave = false } = {}) {
+    if (clearSave) removeStoredValue(STORAGE_KEY);
+    window.location.reload();
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+
+    return (
+      <main className="error-screen">
+        <section className="error-panel" role="alert">
+          <span className="eyebrow">CRITICAL POINT / RECOVERY</span>
+          <h1>장면을 불러오지 못했습니다.</h1>
+          <p>일시적인 오류일 수 있습니다. 다시 시도하거나 저장된 플레이를 초기화하고 시작할 수 있습니다.</p>
+          <div className="error-actions">
+            <button type="button" onClick={() => this.reload()}>
+              다시 시도
+            </button>
+            <button type="button" className="ghost" onClick={() => this.reload({ clearSave: true })}>
+              저장된 플레이 초기화
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+}
+
+createRoot(document.getElementById("root")).render(
+  <AppErrorBoundary>
+    <App />
+  </AppErrorBoundary>,
+);
 

@@ -8,6 +8,40 @@
   text-rendering: optimizeLegibility;
 }
 
+.error-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #101716;
+  color: #edf2ee;
+}
+
+.error-panel {
+  width: min(100%, 520px);
+  padding: 32px;
+  border: 1px solid rgba(237, 242, 238, 0.18);
+  background: #18201f;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.error-panel h1 {
+  margin: 12px 0;
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+}
+
+.error-panel p {
+  color: #b8c4be;
+  line-height: 1.7;
+}
+
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 * {
   box-sizing: border-box;
 }
