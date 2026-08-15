@@ -1071,7 +1071,7 @@ function App() {
         setPendingChoice(null);
         return;
       }
-      if (event.key === "Enter" && pendingChoice) {
+      if ((event.key === "Enter" || event.key === " ") && pendingChoice) {
         event.preventDefault();
         choose(pendingChoice);
         return;
@@ -2264,7 +2264,7 @@ function App() {
           </div>
           <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
           {decisionReveal.bonuses?.length > 0 && (
-            <div className="decision-bonus-stack" aria-label="이번 선택으로 발동한 보너스">
+            <div className="decision-bonus-stack" aria-label="이번 선택의 추가 신호와 보너스">
               {decisionReveal.bonuses.map((bonus) => (
                 <div className={`decision-bonus ${bonus.tone ?? ""}`} key={bonus.label}>
                   <strong>{bonus.label}</strong>
@@ -3755,7 +3755,7 @@ function App() {
                   onClick={() => previewChoice(choice)}
                   disabled={isAdvancing}
                   aria-pressed={pendingChoice?.id === choice.id}
-                  aria-keyshortcuts={String(choiceIndex + 1)}
+                  aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
                   title={`${choiceIndex + 1}번 키로 선택 미리보기`}
                   aria-label={`${simplifyPlayerText(speechifyChoice(choice))} ${riskLabel}. ${simplifyPlayerText(getChoiceSubtext(choice))}`}
                 >
