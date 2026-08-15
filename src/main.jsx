@@ -3307,7 +3307,15 @@ function App() {
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
             <span>남은 결정 시간</span>
             <strong>{decisionSeconds}s</strong>
-            <div className="timer-meter" aria-label={`남은 결정 시간 ${decisionSeconds}초`}>
+            <div
+              className="timer-meter"
+              role="progressbar"
+              aria-label="남은 결정 시간"
+              aria-valuemin="0"
+              aria-valuemax="45"
+              aria-valuenow={decisionSeconds}
+              aria-valuetext={`${decisionSeconds}초`}
+            >
               <div style={{ width: `${Math.min(100, Math.max(0, (decisionSeconds / 45) * 100))}%` }} />
             </div>
             <p>
@@ -3732,7 +3740,15 @@ function App() {
                         </span>
                       )}
                       {choice.effect && (
-                        <span className={`choice-impact ${riskClass}`} aria-label={`예상 압력 ${projectedRisk}`}>
+                        <span
+                          className={`choice-impact ${riskClass}`}
+                          role="meter"
+                          aria-label="예상 압력"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-valuenow={projectedRisk}
+                          aria-valuetext={`${projectedRisk}`}
+                        >
                           <span className="choice-impact-track" aria-hidden="true">
                             <span style={{ width: `${Math.min(100, Math.max(4, projectedRisk))}%` }} />
                           </span>
