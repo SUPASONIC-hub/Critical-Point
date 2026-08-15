@@ -498,6 +498,7 @@ function App() {
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
   const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
+  const pendingTelemetryRef = useRef(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [decisionSeconds, setDecisionSeconds] = useState(45);
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
@@ -1466,12 +1467,13 @@ function App() {
 
   function queueTelemetry(item) {
     const nextQueue = [
-      ...pendingTelemetry.filter((queued) => queued.id !== item.id),
+      ...pendingTelemetryRef.current.filter((queued) => queued.id !== item.id),
       {
         queuedAt: new Date().toISOString(),
         ...item,
       },
     ];
+    pendingTelemetryRef.current = nextQueue;
     setPendingTelemetry(nextQueue);
     persist({ pendingTelemetry: nextQueue });
   }
@@ -1483,15 +1485,16 @@ function App() {
   }
 
   async function retryPendingTelemetry() {
-    if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetry.length === 0 || isRetryingTelemetry) return;
+    const retryBatch = pendingTelemetryRef.current;
+    if (!telemetryEnabled || !dataConsent || !isOnline || retryBatch.length === 0 || isRetryingTelemetry) return;
     setIsRetryingTelemetry(true);
     setTelemetryStatus({
       tone: "pending",
-      text: `대기 중인 원격 저장 ${pendingTelemetry.length}건을 다시 전송하는 중입니다.`,
+      text: `대기 중인 원격 저장 ${retryBatch.length}건을 다시 전송하는 중입니다.`,
     });
 
     const failedItems = [];
-    for (const item of pendingTelemetry) {
+    for (const item of retryBatch) {
       try {
         await sendTelemetryItem(item);
       } catch (error) {
@@ -1500,18 +1503,22 @@ function App() {
       }
     }
 
-    setPendingTelemetry(failedItems);
-    persist({ pendingTelemetry: failedItems });
+    const retryIds = new Set(retryBatch.map((item) => item.id));
+    const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
+    const nextQueue = [...failedItems, ...newlyQueuedItems];
+    pendingTelemetryRef.current = nextQueue;
+    setPendingTelemetry(nextQueue);
+    persist({ pendingTelemetry: nextQueue });
     setIsRetryingTelemetry(false);
     setTelemetryStatus(
-      failedItems.length === 0
+      nextQueue.length === 0
         ? {
             tone: "success",
             text: "대기 중이던 원격 저장을 모두 완료했습니다.",
           }
         : {
             tone: "error",
-            text: `원격 저장 ${failedItems.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`,
+            text: `원격 저장 ${nextQueue.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`,
           },
     );
   }
@@ -1768,6 +1775,7 @@ function App() {
     setCaseResults({});
     setDiscoveredClues([]);
     setPlaytestFeedback({});
+    pendingTelemetryRef.current = [];
     setPendingTelemetry([]);
     setNodeId("start");
     setResources(initialResources);
@@ -2396,6 +2404,7 @@ function App() {
                   const nextConsent = event.target.checked;
                   setDataConsent(nextConsent);
                   if (!nextConsent) {
+                    pendingTelemetryRef.current = [];
                     setPendingTelemetry([]);
                     setTelemetryStatus({
                       tone: "local",
