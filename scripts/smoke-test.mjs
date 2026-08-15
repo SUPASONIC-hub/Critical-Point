@@ -5,6 +5,7 @@ import {
   applyEffect,
   createDecisionForecast,
   createCaseSummary,
+  getCounterfactualReport,
   getDecisionFingerprint,
   getDecisionLedger,
   detectPrivacySignals,
@@ -101,6 +102,28 @@ const fingerprint = getDecisionFingerprint({
 assert.equal(fingerprint.mode, "GUARDIAN", "decision fingerprint should classify recovery-led play");
 assert.deepEqual(fingerprint.primaryTrigger, ["responsibility", 12], "decision fingerprint should expose primary pressure");
 assert.equal(fingerprint.pressureShare, 55, "decision fingerprint should calculate pressure share");
+
+const counterfactuals = getCounterfactualReport(
+  [{
+    nodeId: "briefing",
+    choiceId: "slow",
+    title: "브리핑",
+    choice: "느린 선택",
+    resourcesBefore: riskyResources,
+  }],
+  {
+    briefing: {
+      choices: [
+        { id: "slow", label: "느린 선택", effect: { time: 8, capital: 4 } },
+        { id: "fast", label: "빠른 선택", effect: { time: -12, capital: 10, fatigue: 8 } },
+      ],
+    },
+  },
+);
+assert.equal(counterfactuals.length, 1, "counterfactual report should include comparable scenes");
+assert.equal(counterfactuals[0].actual.id, "slow", "counterfactual report should identify the actual choice");
+assert.equal(counterfactuals[0].safest.id, "slow", "counterfactual report should identify the safest alternative");
+assert.equal(counterfactuals[0].actualWasSafest, true, "counterfactual report should flag safest actual choices");
 
 const gameplayStats = getGameplayStats(
   [

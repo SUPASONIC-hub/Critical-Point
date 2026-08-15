@@ -212,6 +212,38 @@ export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {
   };
 }
 
+export function getCounterfactualReport(entries = [], sceneMap = {}) {
+  return entries
+    .map((entry) => {
+      const scene = sceneMap[entry.nodeId];
+      const choices = scene?.choices?.filter((choice) => choice.type !== "free" && choice.effect) ?? [];
+      if (choices.length < 2) return null;
+      const beforeResources = entry.resourcesBefore ?? {};
+      const forecasts = choices
+        .map((choice) => ({
+          choice,
+          forecast: createDecisionForecast(choice, beforeResources),
+        }))
+        .sort((a, b) => a.forecast.riskDelta - b.forecast.riskDelta);
+      const actual = forecasts.find(({ choice }) => choice.id === entry.choiceId) ?? null;
+      const safest = forecasts[0];
+      const costliest = [...forecasts].sort((a, b) => b.forecast.riskDelta - a.forecast.riskDelta)[0];
+      return {
+        nodeId: entry.nodeId,
+        title: entry.title,
+        actual: actual?.choice ?? { id: entry.choiceId, label: entry.choice },
+        actualForecast: actual?.forecast ?? null,
+        safest: safest.choice,
+        safestForecast: safest.forecast,
+        costliest: costliest.choice,
+        costliestForecast: costliest.forecast,
+        actualWasSafest: actual?.choice.id === safest.choice.id,
+        riskGap: actual ? actual.forecast.riskDelta - safest.forecast.riskDelta : null,
+      };
+    })
+    .filter(Boolean);
+}
+
 export function createCaseSummary(
   triggerScores = {},
   cognitionScores = {},

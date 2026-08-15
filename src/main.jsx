@@ -52,6 +52,7 @@ import {
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
+  getCounterfactualReport,
   getDramaticChoiceLabel,
   getEcho,
   getFreeTextSignals,
@@ -559,6 +560,10 @@ function App() {
     entries: log,
     resources,
   });
+  const counterfactualReport = useMemo(
+    () => getCounterfactualReport(log, nodes),
+    [log],
+  );
   const {
     freeCount: freeTextCombo,
     reducedRiskCount,
@@ -1303,6 +1308,7 @@ function App() {
 
     const entry = {
       nodeId: resolvedNodeId,
+      choiceId: choice.id,
       title: node.title,
       choice: choice.label,
       spokenChoice: getDramaticChoiceLabel(choice),
@@ -1513,6 +1519,7 @@ function App() {
       summary: result,
       fingerprint: decisionFingerprint,
       ledger: decisionLedger,
+      counterfactuals: counterfactualReport,
       gameplay: {
         rank: resultRank,
         momentumScore,
@@ -2127,6 +2134,43 @@ function App() {
                 </small>
               </article>
             </div>
+          </section>
+          <section className="counterfactual-panel" aria-label="Counterfactual Lab">
+            <div className="panel-title-row">
+              <h2>COUNTERFACTUAL LAB</h2>
+              <span>실제 선택과 버린 경로의 압박 차이</span>
+            </div>
+            {counterfactualReport.length > 0 ? (
+              <div className="counterfactual-list">
+                {counterfactualReport.map((report) => (
+                  <article key={report.nodeId}>
+                    <div className="counterfactual-scene">
+                      <span>{report.title}</span>
+                      <small>{report.actualWasSafest ? "가장 낮은 위험 경로" : "대안 경로와 차이 발생"}</small>
+                    </div>
+                    <div className="counterfactual-path actual-path">
+                      <b>ACTUAL</b>
+                      <strong>{report.actual.label}</strong>
+                      <small>
+                        위험 {report.actualForecast ? formatRiskDelta(report.actualForecast.riskDelta) : "기록"}
+                      </small>
+                    </div>
+                    <div className="counterfactual-path safest-path">
+                      <b>SAFEST ALTERNATIVE</b>
+                      <strong>{report.safest.label}</strong>
+                      <small>위험 {formatRiskDelta(report.safestForecast.riskDelta)}</small>
+                    </div>
+                    <div className="counterfactual-path costliest-path">
+                      <b>HIGHEST PRESSURE</b>
+                      <strong>{report.costliest.label}</strong>
+                      <small>위험 {formatRiskDelta(report.costliestForecast.riskDelta)}</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="counterfactual-empty">선택 로그가 쌓이면 지나간 장면의 다른 경로가 열립니다.</p>
+            )}
           </section>
           <section className="session-panel">
             <div>
