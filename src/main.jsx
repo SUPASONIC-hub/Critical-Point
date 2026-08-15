@@ -3585,7 +3585,7 @@ function App() {
             </section>
           )}
           <div className="choices">
-            {fixedChoices.map((choice) => {
+            {fixedChoices.map((choice, choiceIndex) => {
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
               const projectedRisk = getRiskPressure(choiceRead.finalResources);
               const riskDelta = choiceRead.finalRiskDelta;
@@ -3611,7 +3611,7 @@ function App() {
                 >
                   <span className="choice-main">
                     <Check size={16} />
-                    <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
+                    <small><b className="choice-index">{String(choiceIndex + 1).padStart(2, "0")}</b> {pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
                   <span className="choice-speech">"{simplifyPlayerText(speechifyChoice(choice))}"</span>
                   <span className="choice-action">{simplifyPlayerText(getDramaticChoiceLabel(choice))}</span>
