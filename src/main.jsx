@@ -3610,6 +3610,16 @@ function App() {
                 <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
                 <span>전술 등급 <b>{pendingChoiceRead.tacticalRead.grade}</b></span>
               </div>
+              <div className="commit-console-effects" aria-label="예상 자원 변화">
+                <span>예상 자원</span>
+                {Object.entries(pendingChoiceRead.finalEffect)
+                  .filter(([, value]) => value !== 0)
+                  .map(([key, value]) => (
+                    <b key={key} className={value > 0 ? "positive" : "negative"}>
+                      {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
+                    </b>
+                  ))}
+              </div>
               <div className="commit-console-actions">
                 <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
                   다시 고르기
