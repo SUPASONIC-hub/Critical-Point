@@ -19,6 +19,7 @@ function parseSummary(summary) {
 function normalizeEntry(row = {}) {
   const summary = parseSummary(row.summary);
   const rank = normalizeRank(summary.rank);
+  const parsedScore = Number(summary.momentumScore);
   return {
     id: `${row.session_code ?? "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     sessionCode: row.session_code ?? "LOCAL",
@@ -27,7 +28,7 @@ function normalizeEntry(row = {}) {
     caseTitle: row.case_title ?? row.case_id ?? "CASE",
     completedAt: row.completed_at ?? "",
     rank,
-    score: Number(summary.momentumScore) || 0,
+    score: Number.isFinite(parsedScore) ? parsedScore : null,
     trigger: summary.primary?.[0] ?? "responsibility",
     averageResponseTime: Number(summary.averageResponseTime) || 0,
     freeCount: Number(summary.freeCount) || 0,
@@ -36,7 +37,9 @@ function normalizeEntry(row = {}) {
 }
 
 export function buildLeaderboard(rows = [], limit = 50) {
-  const normalized = rows.map(normalizeEntry).filter((entry) => entry.score >= 0);
+  const normalized = rows
+    .map(normalizeEntry)
+    .filter((entry) => entry.score !== null && entry.score >= 0 && entry.score <= 100);
   const bestBySession = new Map();
   normalized.forEach((entry) => {
     const key = entry.sessionCode || entry.id;

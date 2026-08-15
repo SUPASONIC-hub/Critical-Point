@@ -269,6 +269,14 @@ const malformedLeaderboard = buildLeaderboard([
   { session_code: "MALFORMED", summary: { rank: "UNKNOWN", momentumScore: 30 } },
 ]);
 assert.equal(malformedLeaderboard[0].rank, "C", "leaderboard should normalize unknown ranks");
+assert.equal(
+  buildLeaderboard([
+    { session_code: "INVALID", summary: { rank: "A", momentumScore: "not-a-score" } },
+    { session_code: "OUT-OF-RANGE", summary: { rank: "A", momentumScore: 101 } },
+  ]).length,
+  0,
+  "leaderboard should omit invalid scores",
+);
 
 const gameplayStats = getGameplayStats(
   [
