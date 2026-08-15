@@ -819,6 +819,13 @@ function App() {
   }
 
   function getFlowSurge(tacticalRead, challengeMatch, riskDelta) {
+    if (currentChallengeStreak >= 4 && challengeMatch) {
+      return {
+        label: "PERFECT RUN",
+        text: "다섯 번째 연속 공략이 맞물렸습니다. 팀의 신뢰와 정당성이 최고 흐름에 들어갑니다.",
+        effect: { trust: 3, legitimacy: 3, fatigue: -3 },
+      };
+    }
     if (currentChallengeStreak >= 2 && challengeMatch) {
       return {
         label: "STREAK BREAKTHROUGH",
@@ -2088,6 +2095,8 @@ function App() {
   const resultRank = gameplayRank;
   const rankingHeadline = getLeaderboardHeadline(leaderboard);
   const flowSurgeCount = log.filter((entry) => entry.flowSurge).length;
+  const streakGoal = currentChallengeStreak < 3 ? 3 : 5;
+  const streakRemaining = Math.max(0, streakGoal - currentChallengeStreak);
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
   const screenReaderStatus = isResult
@@ -2122,7 +2131,9 @@ function App() {
     challengeClearCount > 0
       ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
       : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
-    currentChallengeStreak >= 3
+    currentChallengeStreak >= 5
+      ? { title: "Perfect Run", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 최고 보상을 열었습니다.` }
+      : currentChallengeStreak >= 3
       ? { title: "Streak Breakthrough", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 추가 보상을 열었습니다.` }
       : { title: "Chain Starter", text: "장면 목표를 연속으로 맞히면 추가 보상이 열립니다." },
     flowSurgeCount > 0
@@ -3296,13 +3307,13 @@ function App() {
           <article>
             <span>플레이 흐름</span>
             <strong>{simplifyPlayerText(momentumTier)}</strong>
-            <div className="streak-meter" aria-label={`장면 목표 ${currentChallengeStreak}연속. 다음 보상까지 ${Math.max(0, 3 - currentChallengeStreak)}회`}>
-              {[0, 1, 2].map((step) => (
+            <div className="streak-meter" aria-label={`장면 목표 ${currentChallengeStreak}연속. 다음 보상까지 ${streakRemaining}회`}>
+              {Array.from({ length: streakGoal }, (_, step) => (
                 <i className={currentChallengeStreak > step ? "filled" : ""} key={step} />
               ))}
-              <small>{currentChallengeStreak >= 3 ? "BREAKTHROUGH" : `${Math.min(3, currentChallengeStreak)}/3`}</small>
+              <small>{currentChallengeStreak >= 5 ? "PERFECT RUN" : `${Math.min(streakGoal, currentChallengeStreak)}/${streakGoal}`}</small>
             </div>
-            <p>{momentumScore}점 · 다음 보상까지 {Math.max(0, 3 - currentChallengeStreak)}회</p>
+            <p>{momentumScore}점 · 다음 보상까지 {streakRemaining}회</p>
           </article>
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
             <span>남은 결정 시간</span>
