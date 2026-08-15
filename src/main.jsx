@@ -3606,16 +3606,24 @@ function App() {
               <ol className="forecast-list">
                 {decisionForecasts.map(({ choice, forecast, tacticalRead }) => (
                   <li key={choice.id}>
-                    <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
-                      {tacticalRead.grade}
-                    </b>
-                    <span>
-                      <strong>{simplifyPlayerText(choice.label)}</strong>
-                      <small>
-                        위험 {formatRiskDelta(forecast.riskDelta)} · 예상 압력 {forecast.afterRisk} ·{" "}
-                        {formatResourceDelta(forecast.biggestGain)} / {formatResourceDelta(forecast.biggestCost)}
-                      </small>
-                    </span>
+                    <button
+                      type="button"
+                      className="forecast-choice"
+                      onClick={() => previewChoice(choice)}
+                      aria-pressed={pendingChoice?.id === choice.id}
+                      aria-label={`${simplifyPlayerText(choice.label)} 미리보기`}
+                    >
+                      <b className={`tactical-grade grade-${tacticalRead.grade.toLowerCase()}`}>
+                        {tacticalRead.grade}
+                      </b>
+                      <span>
+                        <strong>{simplifyPlayerText(choice.label)}</strong>
+                        <small>
+                          위험 {formatRiskDelta(forecast.riskDelta)} · 예상 압력 {forecast.afterRisk} ·{" "}
+                          {formatResourceDelta(forecast.biggestGain)} / {formatResourceDelta(forecast.biggestCost)}
+                        </small>
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ol>
