@@ -52,6 +52,7 @@ import {
   getDecisionFingerprint,
   getDecisionLedger,
   getDiscoveryClue,
+  getCaseOutcome,
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
@@ -1698,6 +1699,9 @@ function App() {
   }, [triggers, cognition, log, resources]);
   const finalEndingEntry = [...log].reverse().find((entry) => entry.nodeId === "f_choice");
   const finalAftermathEntry = [...log].reverse().find((entry) => entry.nodeId === "f_aftershock");
+  const outcomeNodeId = currentCase === "final" ? "f_aftershock" : `${currentCase}_aftershock`;
+  const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
+  const caseOutcome = getCaseOutcome({ caseId: currentCase, choiceId: outcomeEntry?.choiceId });
   const endingProfiles = {
     ending_seal: {
       tag: "봉인",
@@ -2352,6 +2356,16 @@ function App() {
                 : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}
             </h1>
           </div>
+          <section className="outcome-panel" aria-label="내가 만든 결말">
+            <div className="outcome-panel-mark">
+              <span>YOUR CONSEQUENCE</span>
+              <strong>{caseOutcome.tag}</strong>
+            </div>
+            <div>
+              <h2>{caseOutcome.title}</h2>
+              <p>{caseOutcome.text}</p>
+            </div>
+          </section>
           <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
             <div className="rank-mark">
               <span>CASE RANK</span>

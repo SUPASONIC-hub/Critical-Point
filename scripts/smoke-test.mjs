@@ -9,6 +9,7 @@ import {
   getDecisionFingerprint,
   getDecisionLedger,
   getDiscoveryClue,
+  getCaseOutcome,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
@@ -60,6 +61,11 @@ assert.equal(
   getDiscoveryClue({ currentCase: "case01", challengeMatch: false, riskDelta: 8, responseTimeSec: 20, logLength: 1 }),
   null,
   "a risky choice without a challenge should not reveal a clue",
+);
+assert.equal(
+  getCaseOutcome({ caseId: "case04", choiceId: "c4_after_service" }).tag,
+  "서비스를 지킨 결말",
+  "case outcomes should reflect the selected aftermath branch",
 );
 
 const riskyResources = {
