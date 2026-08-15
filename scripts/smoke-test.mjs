@@ -5,6 +5,8 @@ import {
   applyEffect,
   createDecisionForecast,
   createCaseSummary,
+  getDecisionFingerprint,
+  getDecisionLedger,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
@@ -76,6 +78,29 @@ assert.ok(decisionForecast.riskDelta < 0, "decision forecast should calculate ri
 assert.deepEqual(decisionForecast.biggestGain, ["fatigue", -12], "decision forecast should identify biggest gain");
 assert.deepEqual(decisionForecast.biggestCost, undefined, "decision forecast should allow choices without costs");
 assert.equal(decisionForecast.cognitionGain, 3, "decision forecast should sum cognition gain");
+
+const ledger = getDecisionLedger(
+  [
+    { effect: { time: -8, capital: -4 }, resourcesBefore: initialResources, resourcesAfter: riskyResources },
+    { effect: { trust: 2, humanCost: -8 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+  ],
+  recoveredResources,
+);
+assert.equal(ledger.riskRises, 1, "decision ledger should count rising pressure turns");
+assert.equal(ledger.riskDrops, 1, "decision ledger should count recovery turns");
+assert.deepEqual(ledger.strongestRecovery, ["humanCost", -8], "decision ledger should identify recovery effects");
+
+const fingerprint = getDecisionFingerprint({
+  triggerScores: { responsibility: 12, protection: 8, curiosity: 2 },
+  cognitionScores: { reframing: 4, inference: 2 },
+  entries: [
+    { freeText: "조건을 다시 설계한다", challenge: { matched: true }, effect: { humanCost: -6 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+  ],
+  resources: recoveredResources,
+});
+assert.equal(fingerprint.mode, "GUARDIAN", "decision fingerprint should classify recovery-led play");
+assert.deepEqual(fingerprint.primaryTrigger, ["responsibility", 12], "decision fingerprint should expose primary pressure");
+assert.equal(fingerprint.pressureShare, 55, "decision fingerprint should calculate pressure share");
 
 const gameplayStats = getGameplayStats(
   [

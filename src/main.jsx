@@ -47,6 +47,8 @@ import {
   clamp,
   createDecisionForecast,
   createCaseSummary,
+  getDecisionFingerprint,
+  getDecisionLedger,
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
@@ -550,6 +552,13 @@ function App() {
     };
   }, [log, resources, riskPressure]);
   const gameplayStats = getGameplayStats(log, riskPressure);
+  const decisionLedger = getDecisionLedger(log, resources);
+  const decisionFingerprint = getDecisionFingerprint({
+    triggerScores: triggers,
+    cognitionScores: cognition,
+    entries: log,
+    resources,
+  });
   const {
     freeCount: freeTextCombo,
     reducedRiskCount,
@@ -1502,6 +1511,8 @@ function App() {
       triggers,
       cognition,
       summary: result,
+      fingerprint: decisionFingerprint,
+      ledger: decisionLedger,
       gameplay: {
         rank: resultRank,
         momentumScore,
@@ -2088,6 +2099,35 @@ function App() {
               ))}
             </div>
           </section>
+          <section className="fingerprint-panel" aria-label="판단 DNA">
+            <div className="fingerprint-heading">
+              <div>
+                <span>DECISION DNA</span>
+                <h2>{decisionFingerprint.modeTitle}</h2>
+                <p>{decisionFingerprint.modeText}</p>
+              </div>
+              <strong>{decisionFingerprint.mode}</strong>
+            </div>
+            <div className="fingerprint-grid">
+              <article>
+                <span>PRIMARY PRESSURE</span>
+                <b>{triggerLabels[decisionFingerprint.primaryTrigger[0]]}</b>
+                <small>{decisionFingerprint.pressureShare}% of recorded pressure</small>
+              </article>
+              <article>
+                <span>THINKING ENGINE</span>
+                <b>{cognitionLabels[decisionFingerprint.primaryCognition[0]]}</b>
+                <small>{decisionFingerprint.signature.join(" / ")}</small>
+              </article>
+              <article>
+                <span>RISK TRAJECTORY</span>
+                <b>{decisionFingerprint.ledger.netRiskDelta > 0 ? "압박 누적" : "압박 회수"}</b>
+                <small>
+                  {decisionFingerprint.ledger.riskDrops}회 하락 · {decisionFingerprint.ledger.riskRises}회 상승
+                </small>
+              </article>
+            </div>
+          </section>
           <section className="session-panel">
             <div>
               <span>PLAYTEST SESSION</span>
@@ -2520,6 +2560,18 @@ function App() {
                   : "빠른 챌린지 적중 보너스 가능"}
             </p>
           </article>
+        </section>
+
+        <section className="live-ledger" aria-label="누적 판단 원장">
+          <div>
+            <span>LIVE LEDGER</span>
+            <strong>{decisionFingerprint.modeTitle}</strong>
+          </div>
+          <div className="live-ledger-stats">
+            <span>압박 변화 <b>{decisionLedger.netRiskDelta > 0 ? "+" : ""}{decisionLedger.netRiskDelta}</b></span>
+            <span>회복 선택 <b>{decisionLedger.riskDrops}</b></span>
+            <span>누적 비용 <b>{decisionLedger.strongestCost ? `${resourceMeta[decisionLedger.strongestCost[0]]?.label ?? decisionLedger.strongestCost[0]} ${decisionLedger.strongestCost[1]}` : "없음"}</b></span>
+          </div>
         </section>
 
         <section className="scene-challenge">

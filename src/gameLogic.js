@@ -128,6 +128,90 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+export function getDecisionLedger(entries = [], resources = {}) {
+  const totals = {};
+  entries.forEach((entry) => {
+    Object.entries(entry.effect ?? {}).forEach(([key, value]) => {
+      totals[key] = (totals[key] ?? 0) + value;
+    });
+  });
+
+  const riskDeltas = entries
+    .map((entry) => {
+      if (entry.resourcesBefore && entry.resourcesAfter) {
+        return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
+      }
+      return entry.challenge?.riskDelta ?? 0;
+    });
+  const riskRises = riskDeltas.filter((value) => value > 0).length;
+  const riskDrops = riskDeltas.filter((value) => value < 0).length;
+  const strongestCost = Object.entries(totals)
+    .filter(([, value]) => value < 0)
+    .sort((a, b) => a[1] - b[1])[0] ?? null;
+  const strongestRecovery = Object.entries(totals)
+    .filter(([key, value]) => (key === "humanCost" || key === "fatigue" ? value < 0 : value > 0))
+    .sort((a, b) => {
+      const score = ([key, value]) => key === "humanCost" || key === "fatigue" ? -value : value;
+      return score(b) - score(a);
+    })[0] ?? null;
+
+  return {
+    totals,
+    riskDeltas,
+    riskRises,
+    riskDrops,
+    strongestCost,
+    strongestRecovery,
+    netRiskDelta: getRiskPressure(resources) - (riskDeltas.length > 0 ? getRiskPressure(entries[0]?.resourcesBefore ?? resources) : getRiskPressure(resources)),
+    lastRiskDelta: riskDeltas.at(-1) ?? 0,
+  };
+}
+
+export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {}, entries = [], resources = {} } = {}) {
+  const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
+  const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
+  const ledger = getDecisionLedger(entries, resources);
+  const freeCount = entries.filter((entry) => entry.freeText).length;
+  const challengeCount = entries.filter((entry) => entry.challenge?.matched).length;
+  const dominantTrigger = sortedTriggers[0] ?? ["responsibility", 0];
+  const dominantCognition = sortedCognition[0] ?? ["persistence", 0];
+  const guardianScore = Math.max(0, -(ledger.totals.humanCost ?? 0)) + challengeCount * 2;
+  const disruptorScore = freeCount * 4 + Math.max(0, ledger.totals.legitimacy ?? 0) * 0.2;
+  const stabilizerScore = ledger.riskDrops * 3 - ledger.riskRises + (ledger.totals.fatigue ?? 0) < 0 ? 6 : ledger.riskDrops * 3 - ledger.riskRises;
+  const mode = guardianScore >= Math.max(disruptorScore, stabilizerScore)
+    ? "GUARDIAN"
+    : disruptorScore >= stabilizerScore
+      ? "RE-FRAMER"
+      : "PRESSURE PILOT";
+  const modeMeta = {
+    GUARDIAN: {
+      title: "피해의 이동을 먼저 막는 사람",
+      text: "결과의 크기보다 누가 비용을 떠안는지 확인하며 판단을 오래 유지합니다.",
+    },
+    "RE-FRAMER": {
+      title: "판 자체를 다시 짜는 사람",
+      text: "주어진 선택지의 균형을 따르기보다 이해관계자와 조건을 다시 배치합니다.",
+    },
+    "PRESSURE PILOT": {
+      title: "압박 안에서 방향을 조정하는 사람",
+      text: "위험이 커져도 결정을 멈추지 않고, 다음 장면으로 넘길 비용을 선택합니다.",
+    },
+  }[mode];
+
+  return {
+    mode,
+    modeTitle: modeMeta.title,
+    modeText: modeMeta.text,
+    primaryTrigger: dominantTrigger,
+    primaryCognition: dominantCognition,
+    pressureShare: sortedTriggers.length > 0
+      ? Math.round((dominantTrigger[1] / Math.max(1, sortedTriggers.reduce((sum, [, value]) => sum + value, 0))) * 100)
+      : 0,
+    signature: [dominantTrigger[0], dominantCognition[0], mode.toLowerCase().replace("-", "_")],
+    ledger,
+  };
+}
+
 export function createCaseSummary(
   triggerScores = {},
   cognitionScores = {},
