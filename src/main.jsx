@@ -1649,7 +1649,7 @@ function App() {
         const caseTelemetryPayload = {
           session_id: sessionId,
           session_code: sessionCode,
-          player_name: playerName.trim().slice(0, 24) || "익명 분석관",
+          player_name: "익명 분석관",
           case_id: currentCase,
           case_title: activeCaseMeta?.title ?? currentCase,
           completed_at: new Date().toISOString(),
