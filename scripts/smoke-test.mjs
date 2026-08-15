@@ -26,11 +26,18 @@ import {
 } from "../src/appConfig.js";
 import { initialResources } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
+import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
 assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
+assert.equal(easyResourceLabels.capital, "현금", "player language should use an intuitive resource label");
+assert.equal(
+  simplifyPlayerText("CASE 02 / LEGITIMACY / HIDDEN PROTOCOL"),
+  "사건 2 / 공정함 / 숨은 긴급 절차",
+  "player language should translate visible system terms",
+);
 
 const riskyResources = {
   time: 40,

@@ -78,14 +78,15 @@ import {
   telemetryEnabled,
 } from "./telemetry.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "./ranking.js";
+import { easyCognitionLabels, easyResourceLabels, easyRiskLabels, simplifyPlayerText } from "./playerLanguage.js";
 
 const resourceMeta = {
-  time: { label: "TIME", suffix: "h", icon: Clock3 },
-  capital: { label: "CAPITAL", suffix: "", icon: BriefcaseBusiness },
-  trust: { label: "TRUST", suffix: "", icon: Users },
-  legitimacy: { label: "LEGITIMACY", suffix: "", icon: Shield },
-  humanCost: { label: "HUMAN COST", suffix: "", icon: AlertTriangle },
-  fatigue: { label: "FATIGUE", suffix: "", icon: BarChart3 },
+  time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },
+  capital: { label: easyResourceLabels.capital, suffix: "", icon: BriefcaseBusiness },
+  trust: { label: easyResourceLabels.trust, suffix: "", icon: Users },
+  legitimacy: { label: easyResourceLabels.legitimacy, suffix: "", icon: Shield },
+  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: AlertTriangle },
+  fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: BarChart3 },
 };
 
 const GAME_TITLE = "임계점";
@@ -358,8 +359,8 @@ const nextCaseSignals = {
   case01: {
     eyebrow: "NEXT CASE UNLOCKED",
     caseId: "case02",
-    title: "CASE 02 - FALSE SIGNAL",
-    button: "CASE 02 시작",
+    title: "사건 02 - 가짜 신호",
+    button: "사건 02 시작",
     premise:
       "동료가 내부 정보 유출자로 지목됩니다. 증거는 명확하지만, 사람의 맥락은 다른 이야기를 합니다.",
     hook:
@@ -368,8 +369,8 @@ const nextCaseSignals = {
   case02: {
     eyebrow: "NEXT CASE UNLOCKED",
     caseId: "case03",
-    title: "CASE 03 - RED TEAM",
-    button: "CASE 03 시작",
+    title: "사건 03 - 경쟁자의 반격",
+    button: "사건 03 시작",
     premise:
       "오진우와 같은 자료를 받고 동시에 해결안을 냅니다. 이번에는 경쟁심이 판단을 빠르게 만드는지, 얕게 만드는지 확인합니다.",
     hook:
@@ -378,8 +379,8 @@ const nextCaseSignals = {
   case03: {
     eyebrow: "NEXT CASE UNLOCKED",
     caseId: "case04",
-    title: "CASE 04 - THE PRICE",
-    button: "CASE 04 시작",
+    title: "사건 04 - 치러야 할 대가",
+    button: "사건 04 시작",
     premise:
       "작은 규칙 위반이 수천 명을 살릴 수 있습니다. 이번에는 좋은 결과가 절차 훼손을 어디까지 정당화하는지 묻습니다.",
     hook:
@@ -388,8 +389,8 @@ const nextCaseSignals = {
   case04: {
     eyebrow: "NEXT CASE UNLOCKED",
     caseId: "case05",
-    title: "CASE 05 - NO ONE TO BLAME",
-    button: "CASE 05 시작",
+    title: "사건 05 - 범인은 없었다",
+    button: "사건 05 시작",
     premise:
       "명백한 악인은 없습니다. 모두가 합리적으로 움직였지만 시스템은 가장 조용한 사람들을 밀어냈습니다.",
     hook:
@@ -398,8 +399,8 @@ const nextCaseSignals = {
   case05: {
     eyebrow: "FINAL CASE UNLOCKED",
     caseId: "final",
-    title: "FINAL - TRIGGER LAB",
-    button: "FINAL 시작",
+    title: "마지막 사건 - 트리거랩의 진실",
+    button: "마지막 사건 시작",
     premise:
       "모든 사건의 로그가 하나의 폴더로 연결됩니다. 이제 트리거랩이 당신의 사고 조건을 어떻게 사용했는지 마주합니다.",
     hook:
@@ -410,19 +411,19 @@ const nextCaseSignals = {
 const playGuideItems = [
   {
     title: "에코",
-    text: "정답을 알려주는 조언자가 아니라, 방금 선택의 약한 근거를 되묻는 반론자입니다.",
+    text: "정답을 주는 사람이 아니라, 방금 선택에서 빠진 점을 알려주는 도우미입니다.",
   },
   {
-    title: "구조 재설계",
-    text: "주어진 대응안이 답처럼 보이지 않을 때 이해관계자, 조건, 순서를 직접 다시 짜는 선택입니다.",
+    title: "판 바꾸기",
+    text: "보기 중 마음에 드는 답이 없을 때 사람, 조건, 순서를 직접 새로 정합니다.",
   },
   {
-    title: "자원 변화",
-    text: "좋고 나쁜 점수가 아니라 선택의 비용입니다. 시간이 줄면 빠르게 해결한 만큼 검증 여지가 줄어듭니다.",
+    title: "상태 변화",
+    text: "선택 뒤에 달라지는 시간, 현금, 믿음, 공정함, 사람 피해, 지침을 보여줍니다.",
   },
   {
-    title: "트리거",
-    text: "플레이어가 오래 멈추거나 원칙을 바꾸는 압박 조건입니다. 결과와 다음 사건의 연결 단서가 됩니다.",
+    title: "반응 버튼",
+    text: "당신이 특히 오래 고민하거나 쉽게 움직이는 마음의 지점입니다. 다음 사건에도 영향을 줍니다.",
   },
 ];
 
@@ -1826,7 +1827,7 @@ function App() {
   function renderSceneLines(text) {
     return text.split("\n").map((line) => (
       <p className={getSceneLineType(line)} key={line}>
-        {line}
+        {simplifyPlayerText(line)}
       </p>
     ));
   }
@@ -1854,8 +1855,8 @@ function App() {
             {decisionReveal.cascade && <strong>압박 연쇄</strong>}
             {decisionReveal.suspenseEvent && <strong>반전 신호</strong>}
           </div>
-          <h2 id="decision-reveal-title">{decisionReveal.title}</h2>
-          <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
+          <h2 id="decision-reveal-title">{simplifyPlayerText(decisionReveal.title)}</h2>
+          <p className="decision-reveal-choice">"{simplifyPlayerText(decisionReveal.spokenChoice)}"</p>
           <div className="decision-reveal-beat">
             {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
           </div>
@@ -1982,7 +1983,7 @@ function App() {
                 <Trophy size={16} />
                 랭킹
               </button>
-              <span className="case-chip">{GAME_LABEL} / {activeCaseMeta?.title ?? GAME_TITLE}</span>
+              <span className="case-chip">임계점 / {simplifyPlayerText(activeCaseMeta?.title ?? GAME_TITLE)}</span>
             </div>
           </div>
           <h1>{GAME_TITLE}</h1>
@@ -2072,7 +2073,7 @@ function App() {
               <div className="resume-panel">
                 <div>
                   <span>저장된 진행</span>
-                  <strong>{activeCaseMeta?.label ?? "현재 케이스"} · {node.title}</strong>
+                  <strong>{simplifyPlayerText(activeCaseMeta?.label ?? "현재 사건")} · {simplifyPlayerText(node.title)}</strong>
                   <small>
                     {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
                   </small>
@@ -2217,9 +2218,9 @@ function App() {
                       {getCaseStatusText(caseItem.status)}
                     </small>
                   </div>
-                  <h2>{caseItem.title}</h2>
-                  <b>{caseItem.trigger}</b>
-                  <p>{caseItem.summary}</p>
+                  <h2>{simplifyPlayerText(caseItem.title)}</h2>
+                  <b>{simplifyPlayerText(caseItem.trigger)}</b>
+                  <p>{simplifyPlayerText(caseItem.summary)}</p>
                   {caseItem.status === "LOCKED" && (
                     <small className="case-lock-note">앞선 케이스의 판단 로그가 필요합니다.</small>
                   )}
@@ -2318,7 +2319,7 @@ function App() {
               </article>
               <article>
                 <span>THINKING ENGINE</span>
-                <b>{cognitionLabels[decisionFingerprint.primaryCognition[0]]}</b>
+                <b>{easyCognitionLabels[decisionFingerprint.primaryCognition[0]] ?? cognitionLabels[decisionFingerprint.primaryCognition[0]]}</b>
                 <small>{decisionFingerprint.signature.join(" / ")}</small>
               </article>
               <article>
@@ -2447,7 +2448,7 @@ function App() {
             </section>
             <section className="report-section">
               <h2>Cognitive Acceleration</h2>
-              <strong>{cognitionLabels[result.thinking[0]]}</strong>
+              <strong>{easyCognitionLabels[result.thinking[0]] ?? cognitionLabels[result.thinking[0]]}</strong>
               <p>
                 로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로
                 한 번 더 버티거나 뒤집었습니다.
@@ -2685,24 +2686,24 @@ function App() {
         <section className="mission-strip">
           <div>
             <span>현재 목표</span>
-            <strong>{caseObjectives[currentCase] ?? caseObjectives.case01}</strong>
+            <strong>{simplifyPlayerText(caseObjectives[currentCase] ?? caseObjectives.case01)}</strong>
           </div>
           <div>
             <span>이번 장면</span>
-            <strong>{node.phase}</strong>
+            <strong>{simplifyPlayerText(node.phase)}</strong>
           </div>
           <div>
             <span>핵심 압박</span>
-            <strong>{node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}</strong>
+            <strong>{simplifyPlayerText(node.triggers.map((trigger) => triggerLabels[trigger]).join(" / "))}</strong>
           </div>
         </section>
         {openingLegacy && (
           <section className="legacy-panel">
             <div>
-              <span>{openingLegacy.label}</span>
-              <strong>{openingLegacy.title}</strong>
+              <span>{simplifyPlayerText(openingLegacy.label)}</span>
+              <strong>{simplifyPlayerText(openingLegacy.title)}</strong>
             </div>
-            <p>{openingLegacy.text}</p>
+            <p>{simplifyPlayerText(openingLegacy.text)}</p>
             <div className="legacy-effect">
               {Object.entries(openingLegacy.effect).map(([key, value]) => (
                 <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
@@ -2714,27 +2715,27 @@ function App() {
         )}
         <section className={`pressure-cascade ${pressureCascade.tone}`}>
           <div className="pressure-cascade-mark">
-            <span>{pressureCascade.label}</span>
+            <span>{simplifyPlayerText(pressureCascade.label)}</span>
             <strong>{riskPressure}</strong>
           </div>
           <div>
-            <h2>{pressureCascade.title}</h2>
-            <p>{pressureCascade.text}</p>
+            <h2>{simplifyPlayerText(pressureCascade.title)}</h2>
+            <p>{simplifyPlayerText(pressureCascade.text)}</p>
           </div>
-          <small>{pressureCascade.cue}</small>
+          <small>{simplifyPlayerText(pressureCascade.cue)}</small>
         </section>
         <section className={`suspense-console ${suspenseState.tier.toLowerCase()}`} aria-label="서스펜스 신호">
           <div className="suspense-console-mark">
-            <span>{suspenseState.label}</span>
+            <span>{simplifyPlayerText(suspenseState.label)}</span>
             <strong>{String(suspenseState.score).padStart(2, "0")}</strong>
           </div>
           <div className="suspense-console-copy">
-            <h2>{suspenseState.title}</h2>
-            <p>{suspenseState.text}</p>
+            <h2>{simplifyPlayerText(suspenseState.title)}</h2>
+            <p>{simplifyPlayerText(suspenseState.text)}</p>
           </div>
           <div className="suspense-meter" aria-label={`서스펜스 ${suspenseState.score}퍼센트`}>
             <div style={{ width: `${suspenseState.score}%` }} />
-            <small>{suspenseState.cue} · CASE {suspenseState.caseCode}</small>
+            <small>{simplifyPlayerText(suspenseState.cue)} · 사건 {suspenseState.caseCode}</small>
           </div>
         </section>
         <details className="play-help">
@@ -2756,8 +2757,8 @@ function App() {
         </details>
         <header className="game-header">
           <div>
-            <span className="case-chip">{node.phase}</span>
-            <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
+            <span className="case-chip">{simplifyPlayerText(node.phase)}</span>
+            <h1 ref={sceneTitleRef} tabIndex={-1}>{simplifyPlayerText(node.title)}</h1>
           </div>
           <div className="top-actions">
             <button className="ghost" onClick={() => saveCurrentGame()}>
@@ -2788,27 +2789,27 @@ function App() {
 
         <section className="game-hud">
           <article className={`risk-card ${riskTier.toLowerCase()}`}>
-            <span>RISK</span>
-            <strong>{riskTier}</strong>
-            <p>{riskPressure} 압력</p>
+            <span>위험</span>
+            <strong>{easyRiskLabels[riskTier] ?? riskTier}</strong>
+            <p>{riskPressure} 압박</p>
           </article>
           <article>
-            <span>ACTIVE BONUS</span>
-            <strong>{activeBonus}</strong>
+            <span>지금 받는 보너스</span>
+            <strong>{simplifyPlayerText(activeBonus)}</strong>
             <p>자유입력 {freeTextCombo}회 · 평균 {currentAverageResponseTime}s</p>
           </article>
           <article>
-            <span>OBJECTIVE</span>
+            <span>진행 목표</span>
             <strong>{progress}%</strong>
             <p>{log.length}개 판단 기록</p>
           </article>
           <article>
-            <span>MOMENTUM</span>
-            <strong>{momentumTier}</strong>
-            <p>{momentumScore}점 · 챌린지 {currentChallengeStreak}연속</p>
+            <span>플레이 흐름</span>
+            <strong>{simplifyPlayerText(momentumTier)}</strong>
+            <p>{momentumScore}점 · 장면 목표 {currentChallengeStreak}연속</p>
           </article>
           <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
-            <span>DECISION WINDOW</span>
+            <span>남은 결정 시간</span>
             <strong>{decisionSeconds}s</strong>
             <p>
               {decisionSeconds === 0
@@ -2822,8 +2823,8 @@ function App() {
 
         <section className="live-ledger" aria-label="누적 판단 원장">
           <div>
-            <span>LIVE LEDGER</span>
-            <strong>{decisionFingerprint.modeTitle}</strong>
+            <span>선택 기록</span>
+            <strong>{simplifyPlayerText(decisionFingerprint.modeTitle)}</strong>
           </div>
           <div className="live-ledger-stats">
             <span>압박 변화 <b>{decisionLedger.netRiskDelta > 0 ? "+" : ""}{decisionLedger.netRiskDelta}</b></span>
@@ -2834,10 +2835,10 @@ function App() {
 
         <section className="scene-challenge">
           <div>
-            <span>SCENE CHALLENGE</span>
-            <strong>{sceneChallenge.title}</strong>
+            <span>이번 장면 목표</span>
+            <strong>{simplifyPlayerText(sceneChallenge.title)}</strong>
           </div>
-          <p>{sceneChallenge.text}</p>
+          <p>{simplifyPlayerText(sceneChallenge.text)}</p>
         </section>
 
         {riskPressure >= 60 && (
@@ -2881,16 +2882,16 @@ function App() {
 
         <details className="insight-drawer trace-drawer">
           <summary>
-            <span>TRIGGERLAB TRACE</span>
+            <span>트리거랩 관찰 기록</span>
             <b>관찰 항목 보기</b>
           </summary>
           <div className="lab-trace">
             <div>
               <span>현재 관찰 중</span>
-              <strong>{triggerLabSignals[currentCase] ?? triggerLabSignals.case01}</strong>
+              <strong>{simplifyPlayerText(triggerLabSignals[currentCase] ?? triggerLabSignals.case01)}</strong>
             </div>
             <p>
-              현재 {log.length}개 선택이 기록됐고, {node.triggers.map((trigger) => triggerLabels[trigger]).join(" / ")}
+              현재 {log.length}개 선택이 기록됐고, {simplifyPlayerText(node.triggers.map((trigger) => triggerLabels[trigger]).join(" / "))}
               압박이 다음 장면 조정값으로 남습니다.
             </p>
           </div>
@@ -2898,25 +2899,25 @@ function App() {
 
         <section className={`narrative-spine ${suspenseState.tier.toLowerCase()}`} aria-label="이야기 흐름">
           <div className="narrative-spine-heading">
-            <span>STORY THREAD / {String(narrativeSpine.turn).padStart(2, "0")}</span>
+            <span>이야기 흐름 / {String(narrativeSpine.turn).padStart(2, "0")}</span>
             <strong>이번 장면을 읽는 순서</strong>
           </div>
           <div className="narrative-spine-grid">
             <article>
               <span>01 · 지금까지</span>
-              <p>{narrativeSpine.previous}</p>
+              <p>{simplifyPlayerText(narrativeSpine.previous)}</p>
             </article>
             <article>
               <span>02 · 현재 충돌</span>
-              <p>{narrativeSpine.conflict}</p>
+              <p>{simplifyPlayerText(narrativeSpine.conflict)}</p>
             </article>
             <article>
               <span>03 · 이번 질문</span>
-              <p>{narrativeSpine.question}</p>
+              <p>{simplifyPlayerText(narrativeSpine.question)}</p>
             </article>
             <article>
               <span>04 · 다음 파장</span>
-              <p>{narrativeSpine.consequence}</p>
+              <p>{simplifyPlayerText(narrativeSpine.consequence)}</p>
             </article>
           </div>
         </section>
@@ -2935,15 +2936,15 @@ function App() {
             <div>{node.speaker.slice(0, 1)}</div>
             <span>
               <b>{node.speaker}</b>
-              <small>{speakerProfile.role} · {speakerProfile.stance}</small>
+              <small>{simplifyPlayerText(speakerProfile.role)} · {simplifyPlayerText(speakerProfile.stance)}</small>
             </span>
           </div>
           <div className="scene-story">
-            <p className="scene-narration"><span className="story-label">상황</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
-            <p className="scene-thought"><span className="story-label">내면</span>'{speakerProfile.thought}'</p>
-            <p className="scene-narration scene-direction"><span className="story-label">압박</span>{sceneDirection}</p>
-            <p className="scene-body"><span className="story-label">사건 보고</span>{node.text}</p>
-            <p className="scene-dialogue"><span className="story-label">핵심 발화</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <p className="scene-narration"><span className="story-label">상황</span>{simplifyPlayerText(speakerProfile.appearance)} {simplifyPlayerText(speakerProfile.gesture)}</p>
+            <p className="scene-thought"><span className="story-label">속마음</span>'{simplifyPlayerText(speakerProfile.thought)}'</p>
+            <p className="scene-narration scene-direction"><span className="story-label">지금의 압박</span>{simplifyPlayerText(sceneDirection)}</p>
+            <p className="scene-body"><span className="story-label">사건 보고</span>{simplifyPlayerText(node.text)}</p>
+            <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{simplifyPlayerText(speakerProfile.line)}" <span className="story-voice">({simplifyPlayerText(speakerProfile.voice)})</span></p>
           </div>
         </div>
 
@@ -2976,7 +2977,7 @@ function App() {
           </summary>
           <ul>
             {node.memo.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item}>{simplifyPlayerText(item)}</li>
             ))}
           </ul>
         </details>
@@ -2986,7 +2987,7 @@ function App() {
             <span>에코의 검증 질문</span>
             <b>반론 열기</b>
           </summary>
-          <p>{echo}</p>
+          <p>{simplifyPlayerText(echo)}</p>
           <div className="echo-probe">
             <div>
               <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
@@ -3000,7 +3001,7 @@ function App() {
             <summary>다시 확인할 것</summary>
             <ul>
               {getEchoChecks(node).map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item}>{simplifyPlayerText(item)}</li>
               ))}
             </ul>
           </details>
@@ -3015,7 +3016,7 @@ function App() {
             </p>
             <div className="turn-tactic">
               <span>이번 턴 공략</span>
-              <strong>{sceneChallenge.title}</strong>
+              <strong>{simplifyPlayerText(sceneChallenge.title)}</strong>
               <p>
                 {showTacticalDetails
                   ? "챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 계산한 전술 정보입니다."
@@ -3035,7 +3036,7 @@ function App() {
           {showTacticalDetails && decisionForecasts.length > 0 && (
             <section className="decision-forecast" aria-label="결정 예보">
               <div className="forecast-header">
-                <span>결정 예보</span>
+                <span>선택 미리보기</span>
                 <strong>현재 압박 {riskPressure}</strong>
                 <p>
                   {pressureLeader
@@ -3046,7 +3047,7 @@ function App() {
               <div className="forecast-grid">
                 <article>
                   <span>가장 안정적인 말</span>
-                  <b>{safestForecast.choice.label}</b>
+                    <b>{simplifyPlayerText(safestForecast.choice.label)}</b>
                   <small>
                     위험 {formatRiskDelta(safestForecast.forecast.riskDelta)} · 예상 압력{" "}
                     {safestForecast.forecast.afterRisk}
@@ -3054,7 +3055,7 @@ function App() {
                 </article>
                 <article>
                   <span>가장 큰 대가</span>
-                  <b>{costliestForecast.choice.label}</b>
+                    <b>{simplifyPlayerText(costliestForecast.choice.label)}</b>
                   <small>{formatResourceDelta(costliestForecast.forecast.biggestCost)}</small>
                 </article>
                 <article>
@@ -3075,7 +3076,7 @@ function App() {
                       {tacticalRead.grade}
                     </b>
                     <span>
-                      <strong>{choice.label}</strong>
+                      <strong>{simplifyPlayerText(choice.label)}</strong>
                       <small>
                         위험 {formatRiskDelta(forecast.riskDelta)} · 예상 압력 {forecast.afterRisk} ·{" "}
                         {formatResourceDelta(forecast.biggestGain)} / {formatResourceDelta(forecast.biggestCost)}
@@ -3089,10 +3090,10 @@ function App() {
           {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
             <section className={`commit-console ${suspenseState.tier.toLowerCase()}`} aria-label="선택 확정 콘솔">
               <div className="commit-console-heading">
-                <span>COMMIT SEQUENCE</span>
+                <span>선택 확인</span>
                 <strong>이 말을 실제로 남기겠습니까?</strong>
               </div>
-              <p className="commit-console-choice">“{speechifyChoice(pendingChoice)}”</p>
+              <p className="commit-console-choice">“{simplifyPlayerText(speechifyChoice(pendingChoice))}”</p>
               <div className="commit-console-readout">
                 <span>예상 위험 <b>{formatRiskDelta(pendingChoiceForecast.riskDelta)}</b></span>
                 <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
@@ -3131,14 +3132,14 @@ function App() {
                   onClick={() => previewChoice(choice)}
                   disabled={isAdvancing}
                   aria-pressed={pendingChoice?.id === choice.id}
-                  aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
+                  aria-label={`${simplifyPlayerText(speechifyChoice(choice))} ${riskLabel}. ${simplifyPlayerText(getChoiceSubtext(choice))}`}
                 >
                   <span className="choice-main">
                     <Check size={16} />
                     <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
-                  <span className="choice-speech">"{speechifyChoice(choice)}"</span>
-                  <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
+                  <span className="choice-speech">"{simplifyPlayerText(speechifyChoice(choice))}"</span>
+                  <span className="choice-action">{simplifyPlayerText(getDramaticChoiceLabel(choice))}</span>
                   {showTacticalDetails && (
                     <>
                       <span className="choice-tactical">
@@ -3146,20 +3147,20 @@ function App() {
                           {tacticalRead.grade}
                         </b>
                         <span>
-                          <strong>{tacticalRead.gradeText}</strong>
-                          <small>{tacticalRead.reward} · 보상 {tacticalRead.gain} · 비용 {tacticalRead.cost}</small>
+                          <strong>{simplifyPlayerText(tacticalRead.gradeText)}</strong>
+                          <small>{simplifyPlayerText(tacticalRead.reward)} · 얻는 것 {simplifyPlayerText(tacticalRead.gain)} · 드는 것 {simplifyPlayerText(tacticalRead.cost)}</small>
                         </span>
                       </span>
-                      {challengeMatch && <span className="challenge-match">{challengeMatch}</span>}
+                      {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
                       {choiceRead.flowSurge && (
                         <span className="choice-surge">
-                          {choiceRead.flowSurge.label} · {explainResourceTradeoff(choiceRead.flowSurge.effect)}
+                          {simplifyPlayerText(choiceRead.flowSurge.label)} · {simplifyPlayerText(explainResourceTradeoff(choiceRead.flowSurge.effect))}
                         </span>
                       )}
-                      <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
+                      <span className="choice-subtext">{simplifyPlayerText(getChoiceSubtext(choice))}</span>
                       {choice.effect && (
                         <span className="choice-tradeoff">
-                          {explainResourceTradeoff(choice.effect)}
+                          {simplifyPlayerText(explainResourceTradeoff(choice.effect))}
                         </span>
                       )}
                       {choice.effect && (
@@ -3177,7 +3178,7 @@ function App() {
                       {choice.cognition && (
                         <span className="choice-cognition">
                           {Object.entries(choice.cognition)
-                            .map(([key, value]) => `${cognitionLabels[key] ?? key} +${value}`)
+                            .map(([key, value]) => `${easyCognitionLabels[key] ?? cognitionLabels[key] ?? key} +${value}`)
                             .join(" · ")}
                         </span>
                       )}
@@ -3185,7 +3186,7 @@ function App() {
                   )}
                   {!showTacticalDetails && (
                     <span className="choice-intuition-hint">
-                      직관 선택 · 챌린지 적중 시 INSTINCT SURGE
+                      바로 선택 · 장면 목표를 맞히면 직감 보너스
                     </span>
                   )}
                 </button>
@@ -3305,7 +3306,7 @@ function App() {
                       .filter(([, value]) => value > 0)
                       .map(([key, value]) => (
                         <small key={key} className="cognition-preview">
-                          {cognitionLabels[key] ?? key} +{value}
+                          {easyCognitionLabels[key] ?? cognitionLabels[key] ?? key} +{value}
                         </small>
                       ))}
                   </div>

@@ -22,10 +22,10 @@ export const triggerLabels = {
 };
 
 export const cognitionLabels = {
-  persistence: "지속성",
-  inference: "추론",
-  reframing: "재구성",
-  risk: "위험조정",
+  persistence: "끝까지 버티기",
+  inference: "꼼꼼히 확인하기",
+  reframing: "판 바꾸기",
+  risk: "위험 다루기",
 };
 
 export const characterProfiles = {
@@ -146,48 +146,48 @@ export const caseObjectives = {
 export const seasonCasesBase = [
   {
     id: "case01",
-    label: "CASE 01",
-    title: "72 HOURS",
+    label: "사건 01",
+    title: "72시간",
     trigger: "책임 / 보호 / 부당함",
     status: "PLAYABLE",
     summary: "플로우온의 현금이 72시간 뒤 바닥난다. 생존, 투명성, 직원 보호가 처음 충돌한다.",
   },
   {
     id: "case02",
-    label: "CASE 02",
-    title: "FALSE SIGNAL",
+    label: "사건 02",
+    title: "가짜 신호",
     trigger: "신뢰 / 정의 / 애정",
     status: "LOCKED",
     summary: "가까운 동료가 내부 정보 유출자로 지목된다. 증거는 명확하지만 어딘가 조작된 흔적이 있다.",
   },
   {
     id: "case03",
-    label: "CASE 03",
-    title: "RED TEAM",
+    label: "사건 03",
+    title: "경쟁자의 반격",
     trigger: "경쟁 / 인정 / 호기심",
     status: "LOCKED",
     summary: "오진우가 같은 사건을 더 빠르게 해결한다. 플레이어의 반응 패턴이 사건 난이도를 바꾸기 시작한다.",
   },
   {
     id: "case04",
-    label: "CASE 04",
-    title: "THE PRICE",
+    label: "사건 04",
+    title: "치러야 할 대가",
     trigger: "보상 / 책임 / 질서",
     status: "LOCKED",
     summary: "작은 규칙 위반 하나가 수백 명을 살릴 수 있다. 대신 누군가 그 약점을 기록한다.",
   },
   {
     id: "case05",
-    label: "CASE 05",
-    title: "NO ONE TO BLAME",
+    label: "사건 05",
+    title: "범인은 없었다",
     trigger: "시스템 / 호기심 / 무력감",
     status: "LOCKED",
     summary: "명백한 악인은 없다. 모두가 합리적으로 움직였지만 시스템 전체가 실패한다.",
   },
   {
     id: "final",
-    label: "FINAL",
-    title: "TRIGGER LAB",
+    label: "마지막 사건",
+    title: "트리거랩의 진실",
     trigger: "자기 인식 / 조종 / 선택",
     status: "LOCKED",
     summary: "트리거랩의 목적이 드러난다. 사고가 활성화되는 조건은 동시에 조종 가능한 조건이었다.",
