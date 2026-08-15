@@ -1756,6 +1756,17 @@ summary:focus-visible {
   border-radius: 8px;
 }
 
+.game-hud .clue-hud {
+  background: #fff8e6;
+  border-color: #ebd99f;
+}
+
+.game-hud .clue-hud.discovered {
+  color: #18201f;
+  background: #d9ff62;
+  border-color: #c0ea4b;
+}
+
 .game-hud span {
   color: #52605b;
   font-size: 11px;
@@ -2384,6 +2395,46 @@ summary:focus-visible {
 .quest-drawer,
 .trace-drawer {
   background: #f8faf7;
+}
+
+.clue-drawer {
+  background: #fffdf4;
+  border-color: #ebd99f;
+}
+
+.clue-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.clue-grid article {
+  min-height: 112px;
+  padding: 12px;
+  background: #fff8e6;
+  border: 1px solid #ebd99f;
+  border-radius: 6px;
+}
+
+.clue-grid article span {
+  color: #8b6414;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.clue-grid article strong {
+  display: block;
+  margin-top: 6px;
+  color: #18201f;
+  font-size: 14px;
+}
+
+.clue-grid article p {
+  margin: 7px 0 0;
+  color: #52605b;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .quest-drawer .quest-panel,
@@ -4390,6 +4441,24 @@ textarea {
   background: #2c4a46;
 }
 
+.ending-clue-summary {
+  display: grid;
+  gap: 5px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.ending-clue-summary strong {
+  color: #d9ff62;
+  font-size: 18px;
+}
+
+.ending-clue-summary span {
+  color: #dce5df;
+  font-size: 13px;
+}
+
 .history article {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
@@ -4703,6 +4772,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .clue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .scene-challenge {
     align-items: flex-start;
     flex-direction: column;
@@ -4847,6 +4920,10 @@ textarea {
   .ranking-table-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .clue-grid {
+    grid-template-columns: 1fr;
   }
 
   .ranking-row {

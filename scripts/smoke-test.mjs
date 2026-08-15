@@ -8,6 +8,7 @@ import {
   getCounterfactualReport,
   getDecisionFingerprint,
   getDecisionLedger,
+  getDiscoveryClue,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
@@ -37,6 +38,16 @@ assert.equal(
   simplifyPlayerText("CASE 02 / LEGITIMACY / HIDDEN PROTOCOL"),
   "사건 2 / 공정함 / 숨은 긴급 절차",
   "player language should translate visible system terms",
+);
+assert.equal(
+  getDiscoveryClue({ currentCase: "case01", challengeMatch: true, riskDelta: 4, responseTimeSec: 20, logLength: 1 }).id,
+  "c1-hidden-ledger",
+  "a risky successful choice should reveal a case clue",
+);
+assert.equal(
+  getDiscoveryClue({ currentCase: "case01", challengeMatch: false, riskDelta: 8, responseTimeSec: 20, logLength: 1 }),
+  null,
+  "a risky choice without a challenge should not reveal a clue",
 );
 
 const riskyResources = {

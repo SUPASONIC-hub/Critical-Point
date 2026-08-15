@@ -51,6 +51,7 @@ import {
   createCaseSummary,
   getDecisionFingerprint,
   getDecisionLedger,
+  getDiscoveryClue,
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
@@ -454,6 +455,7 @@ function App() {
   const [started, setStarted] = useState(saved?.started ?? false);
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
   const [completedCases, setCompletedCases] = useState(saved?.completedCases ?? []);
+  const [discoveredClues, setDiscoveredClues] = useState(saved?.discoveredClues ?? []);
   const [caseResults, setCaseResults] = useState(saved?.caseResults ?? {});
   const [playtestFeedback, setPlaytestFeedback] = useState(saved?.playtestFeedback ?? {});
   const [nodeId, setNodeId] = useState(saved?.nodeId ?? "start");
@@ -603,6 +605,7 @@ function App() {
     };
   }, [log, resources, riskPressure]);
   const gameplayStats = getGameplayStats(log, riskPressure);
+  const clueCount = discoveredClues.length;
   const decisionLedger = getDecisionLedger(log, resources);
   const decisionFingerprint = getDecisionFingerprint({
     triggerScores: triggers,
@@ -793,6 +796,17 @@ function App() {
       };
     }
     return null;
+  }
+
+  function getClueReveal(challengeMatch, riskDelta, responseTimeSec) {
+    const clue = getDiscoveryClue({
+      currentCase,
+      challengeMatch,
+      riskDelta,
+      responseTimeSec,
+      logLength: log.length,
+    });
+    return clue && !discoveredClues.some((item) => item.id === clue.id) ? clue : null;
   }
 
   function getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect) {
@@ -1388,6 +1402,8 @@ function App() {
       ...(auditSurge ? [auditSurge.effect] : []),
     );
     const finalResourcesWithTempo = applyEffect(resources, finalEffect);
+    const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec);
+    const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
       riskBefore: riskPressure,
       riskAfter: getRiskPressure(finalResourcesWithTempo),
@@ -1426,6 +1442,7 @@ function App() {
       instinctSurge,
       auditSurge,
       suspenseEvent,
+      clue,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -1517,6 +1534,7 @@ function App() {
     setNodeId(nextNode);
     setCompletedCases(nextCompletedCases);
     setCaseResults(nextCaseResults);
+    setDiscoveredClues(nextDiscoveredClues);
     setNodeEnteredAt(Date.now());
     const strongestCost = Object.entries(finalEffect)
       .filter(([, value]) => value < 0)
@@ -1530,6 +1548,8 @@ function App() {
       effect: finalEffect,
       consequence: suspenseEvent
         ? suspenseEvent.text
+        : clue
+        ? `${clue.title}를 발견했습니다. 다음 사건에서 이 단서를 잊지 마십시오.`
         : cascade
         ? "당신의 말은 실행안으로 끝나지 않았습니다. 누군가의 행동을 바꾸고, 다음 장면의 압박을 앞당겼습니다."
         : strongestCost
@@ -1551,6 +1571,7 @@ function App() {
       nodeId: nextNode,
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
+      discoveredClues: nextDiscoveredClues,
       timerPenaltyApplied: false,
       probeUsed: false,
       nodeEnteredAt: Date.now(),
@@ -1573,6 +1594,7 @@ function App() {
     setCompletedCases([]);
     setOpeningLegacy(null);
     setCaseResults({});
+    setDiscoveredClues([]);
     setPlaytestFeedback({});
     setPendingTelemetry([]);
     setNodeId("start");
@@ -2656,6 +2678,14 @@ function App() {
                 이 결과는 능력 평가가 아닙니다. 당신을 더 깊이 생각하게 만든 조건의
                 기록입니다. 이제 남은 질문은 그 조건을 숨길지, 고칠지, 사용할지입니다.
               </p>
+              <div className="ending-clue-summary">
+                <strong>{clueCount}/6 숨은 단서 발견</strong>
+                <span>
+                  {clueCount >= 4
+                    ? "실험의 바깥쪽까지 도달했습니다. 마지막 기록이 당신의 선택을 기다립니다."
+                    : "다른 장면에서 위험한 성공을 만들면 더 많은 기록을 찾을 수 있습니다."}
+                </span>
+              </div>
             </section>
           ) : (
             <section className="story-reveal">
@@ -2803,6 +2833,11 @@ function App() {
             <strong>{progress}%</strong>
             <p>{log.length}개 판단 기록</p>
           </article>
+          <article className={clueCount > 0 ? "clue-hud discovered" : "clue-hud"}>
+            <span>숨은 단서</span>
+            <strong>{clueCount}/6</strong>
+            <p>{clueCount > 0 ? "다음 비밀이 열림" : "장면 목표를 노려보세요"}</p>
+          </article>
           <article>
             <span>플레이 흐름</span>
             <strong>{simplifyPlayerText(momentumTier)}</strong>
@@ -2895,6 +2930,26 @@ function App() {
               압박이 다음 장면 조정값으로 남습니다.
             </p>
           </div>
+        </details>
+
+        <details className="insight-drawer clue-drawer" open={clueCount > 0}>
+          <summary>
+            <span>숨은 단서 보관함</span>
+            <b>{clueCount}/6 발견</b>
+          </summary>
+          {clueCount > 0 ? (
+            <div className="clue-grid">
+              {discoveredClues.map((clue) => (
+                <article key={clue.id}>
+                  <span>FOUND</span>
+                  <strong>{clue.title}</strong>
+                  <p>{clue.text}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="status-note">위험을 감수하면서도 이번 장면의 목표를 맞히면 숨은 단서가 나타납니다.</p>
+          )}
         </details>
 
         <section className={`narrative-spine ${suspenseState.tier.toLowerCase()}`} aria-label="이야기 흐름">

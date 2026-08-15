@@ -228,6 +228,50 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+export function getDiscoveryClue({
+  currentCase = "case01",
+  challengeMatch = false,
+  riskDelta = 0,
+  responseTimeSec = 45,
+  logLength = 0,
+} = {}) {
+  const clues = {
+    case01: {
+      id: "c1-hidden-ledger",
+      title: "숨은 급여표",
+      text: "공식 보고서보다 먼저 움직인 돈의 흔적이 있습니다. 누군가는 이미 다음 사건을 알고 있었습니다.",
+    },
+    case02: {
+      id: "c2-false-timestamp",
+      title: "어긋난 시간",
+      text: "유출 기록의 시간이 서로 맞지 않습니다. 범인보다 기록을 만든 사람이 더 중요할 수 있습니다.",
+    },
+    case03: {
+      id: "c3-second-scoreboard",
+      title: "두 번째 점수판",
+      text: "공개 점수판 뒤에 다른 평가표가 있습니다. 경쟁자는 당신의 답뿐 아니라 망설임도 보고 있습니다.",
+    },
+    case04: {
+      id: "c4-exception-file",
+      title: "예외 파일",
+      text: "이번 규칙 위반은 처음이 아닙니다. 누군가는 오래전부터 예외를 정상처럼 기록해 왔습니다.",
+    },
+    case05: {
+      id: "c5-empty-seat",
+      title: "비어 있는 자리",
+      text: "실패 보고서에는 이름이 하나 빠져 있습니다. 말하지 못한 사람이 시스템의 가장 큰 비용을 떠안았습니다.",
+    },
+    final: {
+      id: "final-observer-key",
+      title: "관찰자의 열쇠",
+      text: "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다.",
+    },
+  };
+  const clue = clues[currentCase];
+  const qualifies = challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12) && logLength >= 1;
+  return qualifies ? clue : null;
+}
+
 export function getDecisionLedger(entries = [], resources = {}) {
   const totals = {};
   entries.forEach((entry) => {
