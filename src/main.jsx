@@ -509,8 +509,8 @@ function App() {
       !isOnline
         ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
         : telemetryEnabled
-          ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
@@ -965,18 +965,18 @@ function App() {
     ? dataConsent
       ? {
           tone: "ready",
-          title: "DB 연결됨",
-          text: "케이스 완료와 피드백 제출 시 Supabase에 원격 저장합니다.",
+          title: "원격 저장 준비됨",
+          text: "케이스 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다.",
         }
       : {
           tone: "pending",
-          title: "DB 연결됨 · 동의 대기",
+          title: "원격 저장 준비됨 · 동의 대기",
           text: "체크박스에 동의하면 이 세션의 완료 로그와 피드백을 원격 저장합니다.",
         }
     : {
         tone: "local",
-        title: "DB 미연결",
-      text: "환경변수가 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
+        title: "로컬 저장",
+        text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
     };
   const localLeaderboardRows = useMemo(
     () => Object.entries(caseResults).map(([caseId, summary]) => ({
@@ -1005,7 +1005,7 @@ function App() {
         tone: telemetryEnabled ? "ready" : "local",
         text: telemetryEnabled
           ? "네트워크 연결됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
       });
     };
     window.addEventListener("online", updateNetworkStatus);
@@ -1640,7 +1640,7 @@ function App() {
       if (!telemetryEnabled) {
         setTelemetryStatus({
           tone: "local",
-          text: "DB 미연결. 이 케이스 로그는 로컬과 JSON 내보내기에만 남습니다.",
+          text: "원격 저장 미설정. 이 케이스 로그는 로컬과 JSON 내보내기에만 남습니다.",
         });
       } else if (!dataConsent) {
         setTelemetryStatus({
@@ -1663,13 +1663,13 @@ function App() {
         };
         setTelemetryStatus({
           tone: "pending",
-          text: "케이스 로그를 원격 DB에 저장하는 중입니다.",
+          text: "케이스 로그를 원격 저장하는 중입니다.",
         });
         saveCaseTelemetry(caseTelemetryPayload)
           .then(() => {
             setTelemetryStatus({
               tone: "success",
-              text: "케이스 로그가 원격 DB에 저장됐습니다.",
+              text: "케이스 로그가 원격 저장됐습니다.",
             });
           })
           .catch((error) => {
@@ -1782,8 +1782,8 @@ function App() {
       text: !isOnline
         ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
         : telemetryEnabled
-          ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-          : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
+          ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
     });
   }
 
@@ -1940,7 +1940,7 @@ function App() {
       setFeedbackStatus(
         telemetryEnabled
           ? "로컬에 저장했습니다. 데이터 제공 동의가 없어 원격 저장은 건너뛰었습니다."
-          : "로컬에 저장했습니다. DB 미연결 상태라 원격 저장은 건너뛰었습니다.",
+          : "로컬에 저장했습니다. 원격 저장 미설정 상태라 원격 저장은 건너뛰었습니다.",
       );
       setIsSubmittingFeedback(false);
       return;
@@ -2403,17 +2403,17 @@ function App() {
                 <b>플레이테스트 데이터 제공 동의</b>
                 <small>
                   {telemetryEnabled
-                    ? "케이스 결과, 선택 로그, 응답 시간, 자유입력 내용이 연구용으로 저장됩니다. 이름은 원격 DB에 저장하지 않습니다."
-                    : "현재 배포 환경에는 DB가 연결되어 있지 않아 원격 저장은 비활성화됩니다."}
+                    ? "케이스 결과, 선택 로그, 응답 시간, 자유입력 내용이 연구용으로 저장됩니다. 이름은 원격 저장하지 않습니다."
+                    : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
-                  {!isOnline ? "오프라인" : telemetryEnabled ? "DB 연결됨" : "DB 미연결"}
+                  {!isOnline ? "오프라인" : telemetryEnabled ? "원격 저장 준비됨" : "로컬 저장"}
                 </small>
               </span>
             </label>
             <div className={`db-status-panel ${telemetrySummary.tone}`}>
               <div>
-                <span>DB 상태</span>
+                <span>저장 상태</span>
                 <strong>{telemetrySummary.title}</strong>
               </div>
               <p>{telemetrySummary.text}</p>
@@ -2422,7 +2422,7 @@ function App() {
             <div className="privacy-note">
               <b>데이터 안내</b>
               <p>
-                이름은 원격 DB에 저장하지 않습니다. 자유입력과 피드백에는 실명, 연락처,
+                이름은 원격 저장하지 않습니다. 자유입력과 피드백에는 실명, 연락처,
                 회사명처럼 개인이나 조직을 식별할 수 있는 정보는 쓰지 마세요. 삭제 요청은
                 결과 화면의 8자리 세션 코드로 처리합니다.
               </p>
@@ -2696,7 +2696,7 @@ function App() {
             <div>
               <span>PLAYTEST SESSION</span>
               <strong>{sessionCode}</strong>
-              <p>테스터 인터뷰, JSON 로그, Supabase row를 맞출 때 쓰는 짧은 세션 코드입니다.</p>
+              <p>테스터 인터뷰, JSON 로그, 원격 저장 기록을 맞출 때 쓰는 짧은 세션 코드입니다.</p>
               <small
                 className={`remote-status ${telemetryStatus.tone}`}
                 role="status"
@@ -2904,7 +2904,7 @@ function App() {
                 <strong>피드백에 식별 정보로 보일 수 있는 표현이 있습니다.</strong>
                 <p>
                   감지 항목: {activeFeedbackPrivacySignals.map((signal) => signal.label).join(" / ")}.
-                  저장하려면 인터뷰 기록과 원격 DB에 남기기 전에 익명 표현으로 바꿔주세요.
+                  저장하려면 인터뷰 기록과 원격 저장 기록에 남기기 전에 익명 표현으로 바꿔주세요.
                 </p>
                 <button type="button" onClick={anonymizeFeedbackComment}>
                   피드백 익명화
