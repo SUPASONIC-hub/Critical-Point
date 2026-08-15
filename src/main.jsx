@@ -1838,8 +1838,14 @@ function App() {
     const anchor = document.createElement("a");
     anchor.href = url;
     anchor.download = `trigger-playtest-${Date.now()}.json`;
+    anchor.type = "application/json";
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
     anchor.click();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => {
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }, 1000);
   }
 
   async function copySessionCode() {
@@ -2549,7 +2555,7 @@ function App() {
                 <FileText size={16} />
                 시즌 로드맵
               </button>
-              <button className="ghost" onClick={exportPlaytestLog}>
+              <button className="ghost" type="button" onClick={exportPlaytestLog}>
                 <Download size={16} />
                 로그 내보내기
               </button>
