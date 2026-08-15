@@ -513,6 +513,7 @@ function App() {
           : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
   const hadDecisionRevealRef = useRef(false);
+  const decisionRevealRef = useRef(null);
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -2058,6 +2059,23 @@ function App() {
     return [...memoChecks, triggerCheck];
   }
 
+  function trapDecisionRevealFocus(event) {
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(
+      decisionRevealRef.current?.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])") ?? [],
+    ).filter((element) => !element.disabled);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   function renderDecisionReveal() {
     if (!decisionReveal) return null;
     const revealTone = decisionReveal.clue
@@ -2077,10 +2095,12 @@ function App() {
           </div>
         </div>
         <section
+          ref={decisionRevealRef}
           className={`decision-reveal ${revealTone}${decisionReveal.cascade ? " cascade" : ""}${decisionReveal.suspenseEvent ? " suspense-twist" : ""}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="decision-reveal-title"
+          onKeyDown={trapDecisionRevealFocus}
         >
           <div className="cinematic-status">
             <span className="cinematic-status-dot" />
