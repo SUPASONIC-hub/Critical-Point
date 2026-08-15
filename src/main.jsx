@@ -947,6 +947,7 @@ function App() {
     savedAt: "",
   };
   const [feedbackStatus, setFeedbackStatus] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
   const hasResumableSave =
@@ -1915,11 +1916,13 @@ function App() {
   }
 
   async function submitCurrentFeedback() {
+    if (isSubmittingFeedback) return;
     if (activeFeedbackPrivacySignals.length > 0) {
       setFeedbackStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 저장해 주세요.");
       return;
     }
 
+    setIsSubmittingFeedback(true);
     const savedAt = new Date().toISOString();
     const feedback = {
       ...currentFeedback,
@@ -1939,6 +1942,7 @@ function App() {
           ? "로컬에 저장했습니다. 데이터 제공 동의가 없어 원격 저장은 건너뛰었습니다."
           : "로컬에 저장했습니다. DB 미연결 상태라 원격 저장은 건너뛰었습니다.",
       );
+      setIsSubmittingFeedback(false);
       return;
     }
 
@@ -1965,6 +1969,8 @@ function App() {
         payload: feedbackTelemetryPayload,
       });
       setFeedbackStatus("로컬에는 저장했습니다. 원격 저장 실패분은 대기열에 보관했습니다.");
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   }
 
@@ -2908,14 +2914,17 @@ function App() {
             <div className="feedback-actions">
               <button
                 onClick={submitCurrentFeedback}
-                disabled={activeFeedbackPrivacySignals.length > 0}
+                disabled={activeFeedbackPrivacySignals.length > 0 || isSubmittingFeedback}
+                aria-busy={isSubmittingFeedback}
                 aria-label={
                   activeFeedbackPrivacySignals.length > 0
                     ? "식별 정보로 보일 수 있는 표현을 익명화해야 피드백을 저장할 수 있습니다."
-                    : "피드백 저장"
+                    : isSubmittingFeedback
+                      ? "피드백 저장 중"
+                      : "피드백 저장"
                 }
               >
-                피드백 저장
+                {isSubmittingFeedback ? "저장 중..." : "피드백 저장"}
               </button>
               {feedbackStatus && (
                 <span role="status" aria-live="polite">
