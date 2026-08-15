@@ -27,6 +27,7 @@ import {
 import "./styles.css";
 import {
   FEEDBACK_COMMENT_MAX_LENGTH,
+  PLAYER_NAME_MAX_LENGTH,
   copyText,
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
@@ -1171,7 +1172,7 @@ function App() {
   }
 
   function startGame() {
-    const name = playerName.trim() || "분석관";
+    const name = limitText(playerName.trim(), PLAYER_NAME_MAX_LENGTH) || "분석관";
     setPlayerName(name);
     setStarted(true);
     setIsPausedSave(false);
@@ -2371,7 +2372,8 @@ function App() {
               <input
                 id="playerName"
                 value={playerName}
-                onChange={(event) => setPlayerName(event.target.value)}
+                maxLength={PLAYER_NAME_MAX_LENGTH}
+                onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
                 onKeyDown={(event) => event.key === "Enter" && startGame()}
                 placeholder="이름을 입력하세요"
               />

@@ -24,6 +24,7 @@ import {
 } from "../src/gameLogic.js";
 import {
   FEEDBACK_COMMENT_MAX_LENGTH,
+  PLAYER_NAME_MAX_LENGTH,
   copyText,
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
@@ -42,6 +43,7 @@ assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on th
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
 assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
+assert.equal(PLAYER_NAME_MAX_LENGTH, 24, "player names should keep a bounded display length");
 assert.deepEqual(
   parseSavedState(JSON.stringify({ saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false }), SAVE_SCHEMA_VERSION),
   { saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false },
