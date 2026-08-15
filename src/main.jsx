@@ -1691,6 +1691,7 @@ function App() {
       instinctSurge,
       auditSurge,
       clueReward,
+      streakBreak,
       suspenseEvent,
       clue,
       note: freeResult?.note ?? "",
@@ -2954,6 +2955,7 @@ function App() {
                           {entry.challenge.matched ? "목표 달성" : "목표 미달"}
                         </b>
                       )}
+                      {entry.streakBreak && <b className="route-break">연속 끊김</b>}
                       {entry.clue && <b className="route-clue">단서 발견</b>}
                     </div>
                     <strong>{entry.title}</strong>
@@ -3102,6 +3104,11 @@ function App() {
                       {entry.suspenseEvent && (
                         <small className="suspense-event-log">
                           {entry.suspenseEvent.label} · {entry.suspenseEvent.text}
+                        </small>
+                      )}
+                      {entry.streakBreak && (
+                        <small className="streak-break-log">
+                          {entry.streakBreak.label} · {entry.streakBreak.text}
                         </small>
                       )}
                     </div>

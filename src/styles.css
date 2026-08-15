@@ -5099,6 +5099,11 @@ textarea {
   background: #fff0bf;
 }
 
+.route-atlas-meta .route-break {
+  color: #fff5f0;
+  background: #a74332;
+}
+
 .route-atlas-copy strong,
 .route-atlas-copy p {
   overflow-wrap: anywhere;
@@ -5215,6 +5220,12 @@ textarea {
 .history-challenge .suspense-event-log {
   color: #9b3d2e;
   background: #f8ded8;
+  font-weight: 950;
+}
+
+.history-challenge .streak-break-log {
+  color: #a74332;
+  background: #fff0eb;
   font-weight: 950;
 }
 
