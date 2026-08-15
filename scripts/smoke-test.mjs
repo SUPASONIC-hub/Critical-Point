@@ -10,6 +10,7 @@ import {
   getDecisionLedger,
   getDiscoveryClue,
   getCaseOutcome,
+  getOutcomeCarryover,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
@@ -70,6 +71,7 @@ assert.equal(
 assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 assert.equal(caseOpeningRoutes.final.c5_after_system, "f_start_system", "the final act should have a system-led opening route");
 assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings should be real playable nodes");
+assert.equal(getOutcomeCarryover({ caseId: "case01", choiceId: "c1_after_people" }).trust, 6, "outcome effects should carry into the next case");
 
 const riskyResources = {
   time: 40,

@@ -54,6 +54,7 @@ import {
   getDecisionLedger,
   getDiscoveryClue,
   getCaseOutcome,
+  getOutcomeCarryover,
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
@@ -1162,16 +1163,25 @@ function App() {
     const previousOutcome = previousResult?.outcomeChoiceId
       ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : null;
+    const carryoverEffect = previousResult?.outcomeChoiceId
+      ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
+      : {};
+    const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
+    const openingEffect = { ...(baseLegacy?.effect ?? {}) };
+    Object.entries(carryoverEffect).forEach(([key, value]) => {
+      openingEffect[key] = (openingEffect[key] ?? 0) + value;
+    });
     const legacy = previousResult
       ? {
-          ...(legacyProfiles[previousResult.rank] ?? legacyProfiles.C),
+          ...baseLegacy,
+          effect: openingEffect,
           continuity: previousOutcome,
         }
       : null;
     const openingEcho = previousOutcome
       ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
       : introEcho;
-    const openingResources = legacy ? applyEffect(initialResources, legacy.effect) : initialResources;
+    const openingResources = previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
     setStarted(true);
     setIsPausedSave(false);
     setCurrentCase(caseId);

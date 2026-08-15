@@ -308,6 +308,37 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
   return outcomes[caseId]?.[choiceId] ?? { tag: "기록되지 않은 결말", title: "아직 닫히지 않은 결과", text: "이번 선택의 파장은 다음 기록에 남아 있습니다." };
 }
 
+export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
+  const carryovers = {
+    case01: {
+      c1_after_people: { trust: 6, humanCost: -3, fatigue: 4 },
+      c1_after_numbers: { capital: -4, legitimacy: 5, fatigue: 2 },
+      c1_after_silence: { capital: 5, trust: -7, legitimacy: -4 },
+    },
+    case02: {
+      c2_after_audit: { time: -5, legitimacy: 6, fatigue: 3 },
+      c2_after_person: { trust: 6, humanCost: -2, fatigue: 5 },
+      c2_after_public: { capital: -5, legitimacy: 8, trust: -3, fatigue: 4 },
+    },
+    case03: {
+      c3_after_share: { trust: 7, fatigue: 5, legitimacy: 3 },
+      c3_after_proof: { capital: -5, legitimacy: 8, time: -4 },
+      c3_after_win: { capital: 7, trust: -8, fatigue: 2 },
+    },
+    case04: {
+      c4_after_rule: { legitimacy: 8, trust: 4, time: -4 },
+      c4_after_service: { humanCost: -4, legitimacy: -8, trust: -3 },
+      c4_after_stop: { capital: -7, legitimacy: 7, humanCost: 8 },
+    },
+    case05: {
+      c5_after_owner: { trust: 7, legitimacy: 5, fatigue: 6 },
+      c5_after_system: { legitimacy: 8, capital: -4, fatigue: 5 },
+      c5_after_name: { trust: -9, humanCost: 7, fatigue: 2 },
+    },
+  };
+  return carryovers[caseId]?.[choiceId] ?? {};
+}
+
 export function getDecisionLedger(entries = [], resources = {}) {
   const totals = {};
   entries.forEach((entry) => {
