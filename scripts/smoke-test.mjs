@@ -43,6 +43,10 @@ assert.ok(nodes.c1_aftershock?.choices?.length === 3, "case 01 should include a 
 assert.ok(nodes.f_aftershock?.choices?.length === 3, "the final act should include a final branch scene");
 assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should include its aftermath scene");
 assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should include its aftermath scene");
+assert.ok(nodes.c1_witness && nodes.c1_verdict, "case 01 should include connective witness and verdict scenes");
+assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice, "every middle case should include a new evidence scene");
+assert.equal(nodeOrders.case01.length, 11, "case 01 should have expanded to eleven playable scenes");
+assert.equal(nodeOrders.final.length, 7, "the final act should have expanded to seven playable scenes");
 assert.equal(
   getDiscoveryClue({ currentCase: "case01", challengeMatch: true, riskDelta: 4, responseTimeSec: 20, logLength: 1 }).id,
   "c1-hidden-ledger",
