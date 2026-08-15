@@ -1,5 +1,9 @@
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
 
+function normalizeRank(value) {
+  return typeof value === "string" && Object.hasOwn(rankWeight, value) ? value : "C";
+}
+
 function parseSummary(summary) {
   if (!summary) return {};
   if (typeof summary === "string") {
@@ -14,7 +18,7 @@ function parseSummary(summary) {
 
 function normalizeEntry(row = {}) {
   const summary = parseSummary(row.summary);
-  const rank = summary.rank ?? "C";
+  const rank = normalizeRank(summary.rank);
   return {
     id: `${row.session_code ?? "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     sessionCode: row.session_code ?? "LOCAL",

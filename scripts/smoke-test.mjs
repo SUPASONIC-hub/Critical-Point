@@ -265,6 +265,10 @@ assert.match(
   /현재 분석관/,
   "local leaderboard should keep the local player name",
 );
+const malformedLeaderboard = buildLeaderboard([
+  { session_code: "MALFORMED", summary: { rank: "UNKNOWN", momentumScore: 30 } },
+]);
+assert.equal(malformedLeaderboard[0].rank, "C", "leaderboard should normalize unknown ranks");
 
 const gameplayStats = getGameplayStats(
   [
