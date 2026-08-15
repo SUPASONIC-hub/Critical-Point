@@ -3430,6 +3430,13 @@ function App() {
         </details>
 
         <section className="choice-panel" id="choice-panel" tabIndex={-1}>
+          <div className="decision-rail" aria-label="판단 단계">
+            <span className="done"><b>01</b> 상황 읽기</span>
+            <i aria-hidden="true" />
+            <span className="active"><b>02</b> 말 고르기</span>
+            <i aria-hidden="true" />
+            <span className={pendingChoice ? "active" : "muted"}><b>03</b> 기록 확정</span>
+          </div>
           <div className="choice-heading">
             <h2>어떻게 말할까</h2>
             <p>
