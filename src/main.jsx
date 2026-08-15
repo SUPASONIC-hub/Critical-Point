@@ -1053,6 +1053,11 @@ function App() {
         }
         return;
       }
+      if (event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        saveCurrentGame({ exit: event.shiftKey });
+        return;
+      }
       if (event.key === "Escape" && pendingChoice) {
         event.preventDefault();
         setPendingChoice(null);
@@ -3237,11 +3242,11 @@ function App() {
             <h1 ref={sceneTitleRef} tabIndex={-1}>{simplifyPlayerText(node.title)}</h1>
           </div>
           <div className="top-actions">
-              <button type="button" className="ghost" onClick={() => saveCurrentGame()}>
+              <button type="button" className="ghost" onClick={() => saveCurrentGame()} aria-keyshortcuts="P">
               <Save size={16} />
               저장
             </button>
-              <button type="button" className="ghost" onClick={() => saveCurrentGame({ exit: true })}>
+              <button type="button" className="ghost" onClick={() => saveCurrentGame({ exit: true })} aria-keyshortcuts="Shift+P">
               <FileText size={16} />
               저장 후 나가기
             </button>
