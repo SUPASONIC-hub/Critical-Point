@@ -2180,6 +2180,84 @@ summary:focus-visible {
   padding: 2px 0;
 }
 
+.narrative-spine {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 14px;
+  color: #18201f;
+  background: #eef7f3;
+  border: 1px solid #bed6cc;
+  border-left: 5px solid #2c4a46;
+  border-radius: 8px;
+}
+
+.narrative-spine.watch {
+  border-left-color: #b17c2d;
+  background: #fff9e9;
+}
+
+.narrative-spine.unstable,
+.narrative-spine.redline {
+  border-left-color: #a74332;
+  background: #fff1ee;
+}
+
+.narrative-spine-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.narrative-spine-heading span,
+.narrative-spine-grid article > span {
+  color: #2c4a46;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.narrative-spine-heading strong {
+  font-size: 14px;
+}
+
+.narrative-spine-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.narrative-spine-grid article {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 86px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(44, 74, 70, 0.16);
+  border-radius: 6px;
+}
+
+.narrative-spine-grid p {
+  margin: 0;
+  color: #3e4a45;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.story-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #2c4a46;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .scene-story p {
   margin: 0;
   overflow-wrap: anywhere;
@@ -2226,7 +2304,7 @@ summary:focus-visible {
   line-height: 1.5;
 }
 
-.scene-dialogue span {
+.scene-dialogue .story-voice {
   display: inline;
   color: #2c4a46;
   font-size: 12px;
@@ -4634,6 +4712,10 @@ textarea {
     max-width: none;
   }
 
+  .narrative-spine-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .scene {
     grid-template-columns: 1fr;
   }
@@ -4887,6 +4969,15 @@ textarea {
   .scene-visual,
   .scene-visual img {
     min-height: 180px;
+  }
+
+  .narrative-spine-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .narrative-spine-grid {
+    grid-template-columns: 1fr;
   }
 
   .character-cutin dl div {

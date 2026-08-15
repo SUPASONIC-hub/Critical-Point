@@ -128,6 +128,40 @@ export function getSuspenseEvent({ riskBefore = 0, riskAfter = 0, currentCase = 
   return null;
 }
 
+export function buildNarrativeSpine({
+  caseObjective = "",
+  node = {},
+  log = [],
+  triggerLabels = {},
+  riskTier = "CONTROLLED",
+  suspenseState = {},
+} = {}) {
+  const last = log.at(-1);
+  const pressure = (node.triggers ?? []).map((trigger) => triggerLabels[trigger] ?? trigger).join(" / ");
+  const previous = last
+    ? `직전 장면에서 “${last.spokenChoice || last.choice || "판단"}”를 남겼습니다.`
+    : caseObjective || "첫 번째 사건의 문이 열렸습니다.";
+  const conflict = pressure
+    ? `${pressure}이(가) ${node.phase ?? "현재 국면"}에서 충돌합니다.`
+    : `${node.phase ?? "현재 국면"}의 전제가 흔들립니다.`;
+  const question = node.title
+    ? `${node.title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.`
+    : "지금 무엇을 먼저 지킬지 결정해야 합니다.";
+  const consequence = suspenseState.tier === "REDLINE"
+    ? "다음 선택은 사건의 결말이 아니라 당신의 허용선을 기록합니다."
+    : riskTier === "CRITICAL"
+      ? "비용을 숨길 수 없는 단계입니다. 한쪽을 구하면 다른 쪽이 즉시 반응합니다."
+      : "이번 선택의 비용은 다음 장면의 첫 번째 질문이 됩니다.";
+
+  return {
+    turn: log.length + 1,
+    previous,
+    conflict,
+    question,
+    consequence,
+  };
+}
+
 export function createDecisionForecast(choice = {}, resources = {}) {
   const beforeRisk = getRiskPressure(resources);
   const afterResources = applyEffect(resources, choice.effect);

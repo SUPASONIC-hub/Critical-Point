@@ -59,6 +59,7 @@ import {
   getEcho,
   getFreeTextSignals,
   getGameplayStats,
+  buildNarrativeSpine,
   getRiskPressure,
   getRiskPressureDrivers,
   getSuspenseEvent,
@@ -527,6 +528,14 @@ function App() {
     decisionSeconds,
     log,
     currentCase,
+  });
+  const narrativeSpine = buildNarrativeSpine({
+    caseObjective: caseObjectives[currentCase],
+    node,
+    log,
+    triggerLabels,
+    riskTier,
+    suspenseState,
   });
   const primarySceneTrigger = node?.triggers?.[0] ?? "responsibility";
   const primarySceneTriggerLabel = triggerLabels[primarySceneTrigger] ?? "책임";
@@ -2864,6 +2873,31 @@ function App() {
           </div>
         </details>
 
+        <section className={`narrative-spine ${suspenseState.tier.toLowerCase()}`} aria-label="이야기 흐름">
+          <div className="narrative-spine-heading">
+            <span>STORY THREAD / {String(narrativeSpine.turn).padStart(2, "0")}</span>
+            <strong>이번 장면을 읽는 순서</strong>
+          </div>
+          <div className="narrative-spine-grid">
+            <article>
+              <span>01 · 지금까지</span>
+              <p>{narrativeSpine.previous}</p>
+            </article>
+            <article>
+              <span>02 · 현재 충돌</span>
+              <p>{narrativeSpine.conflict}</p>
+            </article>
+            <article>
+              <span>03 · 이번 질문</span>
+              <p>{narrativeSpine.question}</p>
+            </article>
+            <article>
+              <span>04 · 다음 파장</span>
+              <p>{narrativeSpine.consequence}</p>
+            </article>
+          </div>
+        </section>
+
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
             <picture>
@@ -2879,11 +2913,11 @@ function App() {
             </span>
           </div>
           <div className="scene-story">
-            <p className="scene-narration">{speakerProfile.appearance} {speakerProfile.gesture}</p>
-            <p className="scene-thought">'{speakerProfile.thought}'</p>
-            <p className="scene-narration scene-direction">{sceneDirection}</p>
-            <p className="scene-body">{node.text}</p>
-            <p className="scene-dialogue">"{speakerProfile.line}" <span>({speakerProfile.voice})</span></p>
+            <p className="scene-narration"><span className="story-label">상황</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            <p className="scene-thought"><span className="story-label">내면</span>'{speakerProfile.thought}'</p>
+            <p className="scene-narration scene-direction"><span className="story-label">압박</span>{sceneDirection}</p>
+            <p className="scene-body"><span className="story-label">사건 보고</span>{node.text}</p>
+            <p className="scene-dialogue"><span className="story-label">핵심 발화</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
           </div>
         </div>
 

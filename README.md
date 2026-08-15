@@ -18,7 +18,7 @@ npm test
 npm run build
 ```
 
-스모크 테스트는 자원 계산, 위험 예보, 누적 판단 원장, 판단 DNA, 케이스 요약, 개인정보 감지/익명화, 입력 제한을 검증합니다.
+스모크 테스트는 자원 계산, 위험 예보, 서스펜스, 이야기 흐름, 누적 판단 원장, 판단 DNA, 케이스 요약, 개인정보 감지/익명화, 입력 제한을 검증합니다.
 
 ## 플레이 시스템
 
@@ -32,6 +32,7 @@ npm run build
 - SUSPENSE CONSOLE: 위험 압력과 결정 시간에 따라 상승하는 장면 긴장도
 - HIDDEN PROTOCOL: 임계선을 넘는 선택에서 관찰자, 패턴 고정, 숨은 프로토콜이 드러나는 반전 이벤트
 - COMMIT SEQUENCE: 선택을 미리 검토한 뒤 실제 기록으로 확정하는 2단계 결정 UX
+- NARRATIVE SPINE: 직전 사건, 현재 충돌, 이번 질문, 다음 파장을 한 화면에서 연결
 - 타이머, 에코 반론, 위기 프로토콜, 적응형 배경음악
 - 브라우저 저장, 이어하기, JSON 로그 내보내기
 - 선택적 Supabase 원격 저장과 실패분 재시도 대기열
@@ -43,7 +44,7 @@ index.html             Vite 엔트리와 메타 태그
 public/                런타임 이미지 자산
 src/main.jsx           React 앱과 게임 상태/화면
 src/gameData.js        케이스, 장면, 선택지, 캐릭터 데이터
-src/gameLogic.js       자원, 위험, 서스펜스, 예보, 원장, DNA, 대안 경로, 텍스트 처리
+src/gameLogic.js       자원, 위험, 서스펜스, 이야기 흐름, 예보, 원장, DNA, 대안 경로, 텍스트 처리
 src/styles.css         화면 스타일과 반응형 레이아웃
 src/appConfig.js       저장 키와 입력 제한
 src/telemetry.js       선택적 Supabase 저장/랭킹 조회 클라이언트

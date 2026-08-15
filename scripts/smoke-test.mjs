@@ -12,6 +12,7 @@ import {
   getGameplayStats,
   getRiskPressure,
   getRiskPressureDrivers,
+  buildNarrativeSpine,
   getSuspenseEvent,
   getSuspenseState,
   limitText,
@@ -69,6 +70,17 @@ const observerEvent = getSuspenseEvent({ riskBefore: 42, riskAfter: 54, currentC
 assert.equal(observerEvent.id, "observer-awake", "suspense event should reveal observer at the unstable threshold");
 const protocolEvent = getSuspenseEvent({ riskBefore: 68, riskAfter: 74, currentCase: "case03", logLength: 2 });
 assert.equal(protocolEvent.tone, "redline", "suspense event should use redline tone at critical threshold");
+const narrativeSpine = buildNarrativeSpine({
+  caseObjective: "72시간 안에 손실 구조를 선택한다",
+  node: { phase: "BOARD", title: "누가 비용을 내는가", triggers: ["responsibility", "protection"] },
+  log: [{ choice: "기록을 남긴다" }],
+  triggerLabels: { responsibility: "책임", protection: "보호" },
+  riskTier: "UNSTABLE",
+  suspenseState: { tier: "UNSTABLE" },
+});
+assert.equal(narrativeSpine.turn, 2, "narrative spine should number the current turn");
+assert.match(narrativeSpine.previous, /기록을 남긴다/, "narrative spine should carry the previous decision");
+assert.match(narrativeSpine.conflict, /책임 \/ 보호/, "narrative spine should summarize current conflict");
 
 assert.deepEqual(
   applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
