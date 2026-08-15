@@ -35,7 +35,9 @@ npm run build
 ## 파일 구조
 
 ```text
+.node-version           배포 Node 런타임 버전
 index.html              앱 HTML과 메타 태그
+src/appConfig.js        저장 형식과 입력 길이 제한
 src/main.jsx            React 화면, 저장, 선택 흐름
 src/gameData.js         사건, 선택지, 결말 분기
 src/gameLogic.js        점수, 위험, 단서, 결과 계산

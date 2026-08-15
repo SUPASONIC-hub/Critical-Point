@@ -5426,6 +5426,69 @@ body {
   font-size: 14px;
 }
 
+/* Keep dark-sidebar text readable on its intentionally light detail cards. */
+.status-board .analyst-card span {
+  color: var(--acid);
+}
+
+.status-board .turn-brief article b {
+  color: var(--acid);
+}
+
+.status-board .turn-brief p {
+  color: var(--ink);
+}
+
+.status-board .resource {
+  color: var(--ink);
+  background: #f4f6f3;
+}
+
+.status-board .resource span,
+.status-board .resource b {
+  color: #52605b;
+}
+
+.status-board .resource b {
+  color: var(--ink);
+}
+
+.status-board .speaker-card {
+  color: var(--ink);
+  background: #f8faf7;
+}
+
+.status-board .speaker-card strong {
+  color: var(--ink);
+}
+
+.status-board .speaker-card span {
+  color: var(--teal);
+}
+
+.status-board .speaker-card p,
+.status-board .status-note {
+  color: #52605b;
+}
+
+.status-board .trigger-tags span {
+  color: var(--ink);
+  background: #e8eee9;
+}
+
+.intro {
+  text-align: center;
+}
+
+.intro h1,
+.intro p {
+  margin-inline: auto;
+}
+
+.intro-visual {
+  margin-inline: auto;
+}
+
 @media (max-width: 920px) {
   .shell {
     padding: 16px;
