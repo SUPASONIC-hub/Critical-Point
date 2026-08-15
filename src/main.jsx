@@ -28,8 +28,11 @@ import "./styles.css";
 import {
   FEEDBACK_COMMENT_MAX_LENGTH,
   FREE_TEXT_MAX_LENGTH,
+  readStoredValue,
+  removeStoredValue,
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
+  writeStoredValue,
 } from "./appConfig.js";
 import {
   boardChangePrompts,
@@ -221,7 +224,7 @@ function playTone(context, destination, frequency, duration, gainValue, type = "
 }
 
 function AdaptiveMusic({ modeKey }) {
-  const [enabled, setEnabled] = useState(() => localStorage.getItem(MUSIC_PREF_KEY) !== "false");
+  const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
   const [audioState, setAudioState] = useState("starting");
   const contextRef = useRef(null);
   const masterGainRef = useRef(null);
@@ -240,7 +243,7 @@ function AdaptiveMusic({ modeKey }) {
   }, [mode]);
 
   useEffect(() => {
-    localStorage.setItem(MUSIC_PREF_KEY, String(enabled));
+    writeStoredValue(MUSIC_PREF_KEY, String(enabled));
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
@@ -455,7 +458,7 @@ function getRouteMarker(entry) {
 function App() {
   const saved = useMemo(() => {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      return JSON.parse(readStoredValue(STORAGE_KEY, "null"));
     } catch {
       return null;
     }
@@ -1094,7 +1097,7 @@ function App() {
         savedAt: new Date().toISOString(),
         ...nextState,
       };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
     return payload;
   }
 
@@ -1646,8 +1649,8 @@ function App() {
   }
 
   function reset() {
-    localStorage.removeItem("trigger-prototype");
-    localStorage.removeItem(STORAGE_KEY);
+    removeStoredValue("trigger-prototype");
+    removeStoredValue(STORAGE_KEY);
     setPlayerName("");
     setPlayStyle("instinct");
     setDataConsent(false);

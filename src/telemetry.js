@@ -1,3 +1,5 @@
+import { readStoredValue, writeStoredValue } from "./appConfig.js";
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -5,13 +7,13 @@ export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export function getSessionId() {
   const key = "critical-point-session-id";
-  const existing = localStorage.getItem(key);
+  const existing = readStoredValue(key);
   if (existing) return existing;
 
   const next =
     globalThis.crypto?.randomUUID?.() ??
     `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  localStorage.setItem(key, next);
+  writeStoredValue(key, next);
   return next;
 }
 
