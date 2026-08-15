@@ -13,6 +13,18 @@ export function parseSavedState(raw, schemaVersion) {
   }
 }
 
+export function isSavedStateShapeValid(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return false;
+  const arrayKeys = ["completedCases", "discoveredClues", "log", "pendingTelemetry"];
+  const objectKeys = ["caseResults", "playtestFeedback", "resources", "triggers", "cognition"];
+  return (
+    arrayKeys.every((key) => Array.isArray(state[key])) &&
+    objectKeys.every((key) => state[key] && typeof state[key] === "object" && !Array.isArray(state[key])) &&
+    typeof state.currentCase === "string" &&
+    typeof state.nodeId === "string"
+  );
+}
+
 export function readStoredValue(key, fallback = null) {
   try {
     return globalThis.localStorage?.getItem(key) ?? fallback;

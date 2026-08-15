@@ -26,6 +26,7 @@ import {
   FEEDBACK_COMMENT_MAX_LENGTH,
   copyText,
   FREE_TEXT_MAX_LENGTH,
+  isSavedStateShapeValid,
   parseSavedState,
   readStoredValue,
   removeStoredValue,
@@ -48,6 +49,28 @@ assert.deepEqual(
 );
 assert.equal(parseSavedState('{"saveSchemaVersion":1}', SAVE_SCHEMA_VERSION), null, "old save schemas should be ignored");
 assert.equal(parseSavedState("not-json", SAVE_SCHEMA_VERSION), null, "corrupt saves should be ignored");
+assert.equal(
+  isSavedStateShapeValid({
+    currentCase: "case01",
+    nodeId: "start",
+    completedCases: [],
+    discoveredClues: [],
+    log: [],
+    pendingTelemetry: [],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: {},
+    triggers: {},
+    cognition: {},
+  }),
+  true,
+  "valid save shapes should be restorable",
+);
+assert.equal(
+  isSavedStateShapeValid({ currentCase: "case01", nodeId: "start", completedCases: {} }),
+  false,
+  "invalid save shapes should be ignored",
+);
 assert.equal(readStoredValue("missing-key", "fallback"), "fallback", "storage reads should degrade gracefully");
 assert.equal(writeStoredValue("test-key", "value"), false, "storage writes should report unavailable browser storage");
 removeStoredValue("test-key");
