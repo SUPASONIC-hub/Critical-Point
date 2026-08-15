@@ -1372,6 +1372,105 @@ summary:focus-visible {
   color: #3e4a45;
 }
 
+.suspense-console {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(150px, 0.65fr);
+  gap: 16px;
+  align-items: center;
+  margin: -4px 0 16px;
+  padding: 13px 15px;
+  color: #ffffff;
+  background: #18201f;
+  border: 1px solid #3d5e55;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(24, 32, 31, 0.14);
+}
+
+.suspense-console.watch {
+  border-color: #b17c2d;
+  background: #24231e;
+}
+
+.suspense-console.unstable,
+.suspense-console.redline {
+  border-color: #a74332;
+  background: #2d1e1c;
+}
+
+.suspense-console.redline {
+  animation: suspense-pulse 1.9s ease-in-out infinite;
+}
+
+.suspense-console-mark {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-width: 102px;
+  padding-right: 15px;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.suspense-console-mark span,
+.suspense-meter small {
+  color: #d9ff62;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.suspense-console-mark strong {
+  font-size: 29px;
+  line-height: 1;
+}
+
+.suspense-console-copy {
+  min-width: 0;
+}
+
+.suspense-console-copy h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.suspense-console-copy p {
+  margin: 4px 0 0;
+  color: #b9c6c1;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.suspense-meter {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.suspense-meter > div {
+  height: 7px;
+  overflow: hidden;
+  background: #0e1312;
+  border-radius: 99px;
+}
+
+.suspense-meter > div > div {
+  height: 100%;
+  min-width: 5px;
+  background: #d9ff62;
+  border-radius: inherit;
+  transition: width 360ms ease-out;
+}
+
+.suspense-console.unstable .suspense-meter > div > div,
+.suspense-console.redline .suspense-meter > div > div {
+  background: #ff8a70;
+}
+
+.game-shell.suspense-redline .game-board {
+  box-shadow: 0 0 0 1px rgba(167, 67, 50, 0.35), 0 18px 60px rgba(167, 67, 50, 0.12);
+}
+
 .decision-reveal-backdrop {
   position: fixed;
   z-index: 20;
@@ -1397,6 +1496,43 @@ summary:focus-visible {
 
 .decision-reveal.cascade {
   border-top-color: #a74332;
+}
+
+.decision-reveal.suspense-twist {
+  border-top-color: #d9ff62;
+  background: #1a2421;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(217, 255, 98, 0.25), 0 24px 80px rgba(167, 67, 50, 0.32);
+  animation: twist-in 280ms ease-out both;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-kicker span,
+.decision-reveal.suspense-twist .decision-reveal-kicker strong {
+  color: #d9ff62;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-choice {
+  color: #dce5df;
+  background: #24302e;
+  border-left-color: #d9ff62;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-beat p {
+  color: #b9c6c1;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-beat .spoken-line {
+  color: #ffffff;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-consequence {
+  color: #ffb09f;
+  border-top-color: #3d5e55;
+}
+
+.decision-reveal.suspense-twist .decision-reveal-footer button {
+  color: #18201f;
+  background: #d9ff62;
 }
 
 .decision-reveal-kicker,
@@ -1487,6 +1623,17 @@ summary:focus-visible {
 @keyframes reveal-in {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes twist-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); filter: saturate(0.7); }
+  65% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1); }
+}
+
+@keyframes suspense-pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(167, 67, 50, 0.14); }
+  50% { box-shadow: 0 8px 34px rgba(167, 67, 50, 0.34); }
 }
 
 .play-help {
@@ -4129,6 +4276,12 @@ textarea {
   background: #2c4a46;
 }
 
+.history-challenge .suspense-event-log {
+  color: #9b3d2e;
+  background: #f8ded8;
+  font-weight: 950;
+}
+
 .history-challenge .challenge-grade.grade-b {
   color: #ffffff;
   background: #4e6f67;
@@ -4347,6 +4500,14 @@ textarea {
     grid-column: 1 / -1;
   }
 
+  .suspense-console {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .suspense-meter {
+    grid-column: 1 / -1;
+  }
+
   .game-hud,
   .quest-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4417,6 +4578,19 @@ textarea {
 
   .music-toggle span {
     max-width: 46px;
+  }
+
+  .suspense-console {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .suspense-console-mark {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 0;
+    border-right: 0;
   }
 
   .intro h1,

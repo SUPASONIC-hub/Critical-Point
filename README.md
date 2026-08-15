@@ -29,6 +29,8 @@ npm run build
 - DECISION DNA: 트리거·사고 방식·선택 패턴을 조합한 플레이 프로필
 - COUNTERFACTUAL LAB: 실제 선택과 가장 안전한 대안, 가장 큰 압박 경로 비교
 - PUBLIC SIGNAL BOARD: 완료 세션의 최고 모멘텀 점수와 랭크를 비교하는 참가자 랭킹
+- SUSPENSE CONSOLE: 위험 압력과 결정 시간에 따라 상승하는 장면 긴장도
+- HIDDEN PROTOCOL: 임계선을 넘는 선택에서 관찰자, 패턴 고정, 숨은 프로토콜이 드러나는 반전 이벤트
 - 타이머, 에코 반론, 위기 프로토콜, 적응형 배경음악
 - 브라우저 저장, 이어하기, JSON 로그 내보내기
 - 선택적 Supabase 원격 저장과 실패분 재시도 대기열
@@ -40,7 +42,7 @@ index.html             Vite 엔트리와 메타 태그
 public/                런타임 이미지 자산
 src/main.jsx           React 앱과 게임 상태/화면
 src/gameData.js        케이스, 장면, 선택지, 캐릭터 데이터
-src/gameLogic.js       자원, 위험, 예보, 원장, DNA, 대안 경로, 텍스트 처리
+src/gameLogic.js       자원, 위험, 서스펜스, 예보, 원장, DNA, 대안 경로, 텍스트 처리
 src/styles.css         화면 스타일과 반응형 레이아웃
 src/appConfig.js       저장 키와 입력 제한
 src/telemetry.js       선택적 Supabase 저장/랭킹 조회 클라이언트

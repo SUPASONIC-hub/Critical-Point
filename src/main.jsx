@@ -61,6 +61,8 @@ import {
   getGameplayStats,
   getRiskPressure,
   getRiskPressureDrivers,
+  getSuspenseEvent,
+  getSuspenseState,
   limitText,
   makeEmptyScores,
   scoreFreeText,
@@ -519,6 +521,12 @@ function App() {
   const riskPressure = getRiskPressure(resources);
   const riskTier =
     riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
+  const suspenseState = getSuspenseState({
+    riskPressure,
+    decisionSeconds,
+    log,
+    currentCase,
+  });
   const primarySceneTrigger = node?.triggers?.[0] ?? "responsibility";
   const primarySceneTriggerLabel = triggerLabels[primarySceneTrigger] ?? "책임";
   const sceneDirection =
@@ -1337,6 +1345,12 @@ function App() {
       ...(auditSurge ? [auditSurge.effect] : []),
     );
     const finalResourcesWithTempo = applyEffect(resources, finalEffect);
+    const suspenseEvent = getSuspenseEvent({
+      riskBefore: riskPressure,
+      riskAfter: getRiskPressure(finalResourcesWithTempo),
+      currentCase,
+      logLength: log.length,
+    });
     const nextTriggers = { ...triggers };
     const nextCognition = { ...cognition };
 
@@ -1368,6 +1382,7 @@ function App() {
       tempoBonus,
       instinctSurge,
       auditSurge,
+      suspenseEvent,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
@@ -1465,12 +1480,14 @@ function App() {
       .sort((a, b) => a[1] - b[1])[0];
     const cascade = finalResourcesWithTempo.humanCost >= 28 || getRiskPressure(finalResourcesWithTempo) >= 72;
     setDecisionReveal({
-      title: cascade ? "선택이 연쇄 반응을 일으켰습니다." : "선택의 잔향",
-      label: cascade ? "CASCADE DETECTED" : "DECISION AFTERIMAGE",
+      title: suspenseEvent?.title ?? (cascade ? "선택이 연쇄 반응을 일으켰습니다." : "선택의 잔향"),
+      label: suspenseEvent?.label ?? (cascade ? "CASCADE DETECTED" : "DECISION AFTERIMAGE"),
       spokenChoice: entry.spokenChoice,
       beat: entry.sceneBeat,
       effect: finalEffect,
-      consequence: cascade
+      consequence: suspenseEvent
+        ? suspenseEvent.text
+        : cascade
         ? "당신의 말은 실행안으로 끝나지 않았습니다. 누군가의 행동을 바꾸고, 다음 장면의 압박을 앞당겼습니다."
         : strongestCost
           ? `${resourceMeta[strongestCost[0]]?.label ?? strongestCost[0]}의 감소분이 다음 장면의 숨은 질문으로 남습니다.`
@@ -1480,6 +1497,7 @@ function App() {
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
       cascade,
+      suspenseEvent,
     });
     persist({
       resources: finalResourcesWithTempo,
@@ -1779,7 +1797,7 @@ function App() {
     return (
       <div className="decision-reveal-backdrop" role="presentation">
         <section
-          className={decisionReveal.cascade ? "decision-reveal cascade" : "decision-reveal"}
+          className={`decision-reveal${decisionReveal.cascade ? " cascade" : ""}${decisionReveal.suspenseEvent ? " suspense-twist" : ""}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="decision-reveal-title"
@@ -1787,6 +1805,7 @@ function App() {
           <div className="decision-reveal-kicker">
             <span>{decisionReveal.label}</span>
             {decisionReveal.cascade && <strong>압박 연쇄</strong>}
+            {decisionReveal.suspenseEvent && <strong>반전 신호</strong>}
           </div>
           <h2 id="decision-reveal-title">{decisionReveal.title}</h2>
           <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
@@ -2544,6 +2563,11 @@ function App() {
                           {entry.flowSurge.label} · {entry.flowSurge.text}
                         </small>
                       )}
+                      {entry.suspenseEvent && (
+                        <small className="suspense-event-log">
+                          {entry.suspenseEvent.label} · {entry.suspenseEvent.text}
+                        </small>
+                      )}
                     </div>
                   )}
                   {entry.sceneBeat && (
@@ -2601,7 +2625,7 @@ function App() {
   }
 
   return (
-    <main className="shell game-shell">
+    <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
       {renderDecisionReveal()}
       <a className="skip-link" href="#choice-panel">
@@ -2651,6 +2675,20 @@ function App() {
             <p>{pressureCascade.text}</p>
           </div>
           <small>{pressureCascade.cue}</small>
+        </section>
+        <section className={`suspense-console ${suspenseState.tier.toLowerCase()}`} aria-label="서스펜스 신호">
+          <div className="suspense-console-mark">
+            <span>{suspenseState.label}</span>
+            <strong>{String(suspenseState.score).padStart(2, "0")}</strong>
+          </div>
+          <div className="suspense-console-copy">
+            <h2>{suspenseState.title}</h2>
+            <p>{suspenseState.text}</p>
+          </div>
+          <div className="suspense-meter" aria-label={`서스펜스 ${suspenseState.score}퍼센트`}>
+            <div style={{ width: `${suspenseState.score}%` }} />
+            <small>{suspenseState.cue} · CASE {suspenseState.caseCode}</small>
+          </div>
         </section>
         <details className="play-help">
           <summary>

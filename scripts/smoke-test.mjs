@@ -12,6 +12,8 @@ import {
   getGameplayStats,
   getRiskPressure,
   getRiskPressureDrivers,
+  getSuspenseEvent,
+  getSuspenseState,
   limitText,
   speechifyChoice,
 } from "../src/gameLogic.js";
@@ -59,6 +61,14 @@ assert.deepEqual(
   ["time", "capital"],
   "risk pressure drivers should be sorted by pressure contribution",
 );
+
+const suspenseWatch = getSuspenseState({ riskPressure: 20, decisionSeconds: 35, log: [{}, {}], currentCase: "case02" });
+assert.equal(suspenseWatch.tier, "WATCH", "suspense state should escalate into watch tier");
+assert.equal(suspenseWatch.caseCode, "02", "suspense state should expose compact case code");
+const observerEvent = getSuspenseEvent({ riskBefore: 42, riskAfter: 54, currentCase: "case02", logLength: 1 });
+assert.equal(observerEvent.id, "observer-awake", "suspense event should reveal observer at the unstable threshold");
+const protocolEvent = getSuspenseEvent({ riskBefore: 68, riskAfter: 74, currentCase: "case03", logLength: 2 });
+assert.equal(protocolEvent.tone, "redline", "suspense event should use redline tone at critical threshold");
 
 assert.deepEqual(
   applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
