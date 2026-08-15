@@ -339,6 +339,37 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
   return carryovers[caseId]?.[choiceId] ?? {};
 }
 
+export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}) {
+  const challenges = {
+    case02: {
+      c1_after_people: { id: "protect-trust", title: "보호를 기록으로 만들기", text: "지난 사건처럼 사람을 먼저 보되, 이번에는 보호의 근거까지 기록해야 보너스를 얻습니다." },
+      c1_after_numbers: { id: "find-cost", title: "숫자 뒤의 사람 찾기", text: "공개한 숫자가 누구에게 어떤 부담을 옮겼는지 찾아야 다음 선택의 보너스가 열립니다." },
+      c1_after_silence: { id: "repair-legitimacy", title: "늦은 설명 되찾기", text: "지난 사건의 침묵으로 흔들린 공정함을 회복하는 선택이 다음 압박을 낮춥니다." },
+    },
+    case03: {
+      c2_after_audit: { id: "find-cost", title: "기록의 빈틈 찾기", text: "복원한 기록이 놓친 비용을 하나 더 찾아야 경쟁자의 빠른 답을 넘어설 수 있습니다." },
+      c2_after_person: { id: "protect-trust", title: "보호와 검증 함께 하기", text: "사람을 지키면서도 근거를 남기는 선택을 찾으면 경쟁 압박을 견딜 수 있습니다." },
+      c2_after_public: { id: "lower-risk", title: "경보의 위험 낮추기", text: "공개 이후 커진 위험을 낮추는 선택이 다음 사건의 기준이 됩니다." },
+    },
+    case04: {
+      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업의 빈 책임을 사람·조건·순서로 다시 설계하면 보너스가 열립니다." },
+      c3_after_proof: { id: "repair-legitimacy", title: "정직함의 피해 줄이기", text: "증거를 공개한 뒤 생긴 피해를 줄이면서 공정함을 유지해야 합니다." },
+      c3_after_win: { id: "find-cost", title: "승리의 숨은 대가 찾기", text: "좋은 결과 뒤에 남은 규칙 위반의 대가를 먼저 찾으면 다음 압박을 통제할 수 있습니다." },
+    },
+    case05: {
+      c4_after_rule: { id: "lower-risk", title: "새 기준의 빈틈 막기", text: "공개한 기준이 현장에서 만들 위험을 낮추는 선택을 찾아야 합니다." },
+      c4_after_service: { id: "repair-legitimacy", title: "예외의 믿음 회복하기", text: "서비스를 지킨 뒤 흔들린 규칙의 믿음을 회복하는 선택이 보너스를 만듭니다." },
+      c4_after_stop: { id: "protect-trust", title: "멈춤의 피해 보호하기", text: "감사를 위해 멈춘 서비스의 사람들을 먼저 보호해야 다음 사건을 버틸 수 있습니다." },
+    },
+    final: {
+      c5_after_owner: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
+      c5_after_system: { id: "use-reframe", title: "고친 구조도 의심하기", text: "새로 만든 구조가 다시 누군가를 관찰하지 않는지 판을 뒤집어 확인해야 합니다." },
+      c5_after_name: { id: "repair-legitimacy", title: "이름 뒤의 공정함 회복하기", text: "한 사람에게 모인 책임을 다시 나누고, 피해를 회복하는 선택을 찾아야 합니다." },
+    },
+  };
+  return challenges[caseId]?.[choiceId] ?? null;
+}
+
 export function getDecisionLedger(entries = [], resources = {}) {
   const totals = {};
   entries.forEach((entry) => {

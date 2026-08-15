@@ -11,6 +11,7 @@ import {
   getDiscoveryClue,
   getCaseOutcome,
   getOutcomeCarryover,
+  getContinuityChallenge,
   detectPrivacySignals,
   getGameplayStats,
   getRiskPressure,
@@ -72,6 +73,7 @@ assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 
 assert.equal(caseOpeningRoutes.final.c5_after_system, "f_start_system", "the final act should have a system-led opening route");
 assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings should be real playable nodes");
 assert.equal(getOutcomeCarryover({ caseId: "case01", choiceId: "c1_after_people" }).trust, 6, "outcome effects should carry into the next case");
+assert.equal(getContinuityChallenge({ caseId: "case02", choiceId: "c1_after_people" }).id, "protect-trust", "outcome branches should create a custom next-case challenge");
 
 const riskyResources = {
   time: 40,

@@ -55,6 +55,7 @@ import {
   getDiscoveryClue,
   getCaseOutcome,
   getOutcomeCarryover,
+  getContinuityChallenge,
   detectPrivacySignals,
   explainResourceTradeoff,
   getChoiceSubtext,
@@ -649,7 +650,7 @@ function App() {
                   : "보너스 대기";
   const inheritedChallenge =
     openingLegacy && resolvedNodeId === activeNodeOrder[0]
-      ? {
+      ? (openingLegacy.continuityChallenge ?? {
           id:
             openingLegacy.label === "CLEAR SIGNAL"
               ? "protect-trust"
@@ -674,7 +675,7 @@ function App() {
                 : openingLegacy.label === "UNFINISHED COST"
                   ? "지난 사건에서 넘어온 비용을 줄이면 이번 장면의 회복 보너스가 붙습니다."
                   : "이전 판단이 남긴 숨은 비용을 찾아야 다음 사건의 기준을 다시 세울 수 있습니다.",
-        }
+        })
       : null;
   const sceneChallenge =
     inheritedChallenge ??
@@ -1163,6 +1164,9 @@ function App() {
     const previousOutcome = previousResult?.outcomeChoiceId
       ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : null;
+    const continuityChallenge = previousResult?.outcomeChoiceId
+      ? getContinuityChallenge({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
+      : null;
     const carryoverEffect = previousResult?.outcomeChoiceId
       ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : {};
@@ -1176,6 +1180,7 @@ function App() {
           ...baseLegacy,
           effect: openingEffect,
           continuity: previousOutcome,
+          continuityChallenge,
         }
       : null;
     const openingEcho = previousOutcome
