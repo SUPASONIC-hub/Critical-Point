@@ -441,6 +441,17 @@ const triggerLabSignals = {
   final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
 };
 
+function getRouteMarker(entry) {
+  const scene = nodes[entry.nodeId];
+  if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
+  if (entry.nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
+  if (entry.nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
+  if (["WITNESS", "TRACE", "ASSEMBLY", "BARGAIN", "AUDIT", "PUBLIC", "PATTERN", "VOICE", "DILEMMA"].some((phase) => scene?.phase?.includes(phase))) {
+    return { label: "증거 추적", tone: "evidence" };
+  }
+  return { label: "핵심 판단", tone: "decision" };
+}
+
 function App() {
   const saved = useMemo(() => {
     try {
@@ -1744,6 +1755,10 @@ function App() {
       includeLongestDecision: true,
     });
   }, [triggers, cognition, log, resources]);
+  const routeTimeline = useMemo(
+    () => log.filter((entry) => !entry.isSystemEvent).map((entry, index) => ({ ...entry, index, marker: getRouteMarker(entry) })),
+    [log],
+  );
   const finalEndingEntry = [...log].reverse().find((entry) => entry.nodeId === "f_choice");
   const finalAftermathEntry = [...log].reverse().find((entry) => entry.nodeId === "f_aftershock");
   const outcomeNodeId = currentCase === "final" ? "f_aftershock" : `${currentCase}_aftershock`;
@@ -2615,6 +2630,35 @@ function App() {
               </p>
             </section>
           </div>
+          <section className="route-atlas">
+            <div className="panel-title-row">
+              <h2>
+                <Sparkles size={17} />
+                내가 지나온 경로
+              </h2>
+              <span>{routeTimeline.length}개 판단 · 마지막 선택이 이번 결말을 만들었습니다.</span>
+            </div>
+            <div className="route-atlas-track" aria-label="이번 플레이 선택 경로">
+              {routeTimeline.map((entry) => (
+                <article className={`route-atlas-node ${entry.marker.tone}`} key={`${entry.nodeId}-${entry.index}`}>
+                  <div className="route-atlas-dot" aria-hidden="true">{String(entry.index + 1).padStart(2, "0")}</div>
+                  <div className="route-atlas-copy">
+                    <div className="route-atlas-meta">
+                      <span>{entry.marker.label}</span>
+                      {entry.challenge && (
+                        <b className={entry.challenge.matched ? "route-hit" : "route-miss"}>
+                          {entry.challenge.matched ? "목표 달성" : "목표 미달"}
+                        </b>
+                      )}
+                      {entry.clue && <b className="route-clue">단서 발견</b>}
+                    </div>
+                    <strong>{entry.title}</strong>
+                    <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
           <section className="feedback-panel">
             <div className="panel-title-row">
               <h2>

@@ -4686,6 +4686,120 @@ textarea {
   color: #dce5df;
 }
 
+.route-atlas {
+  margin-top: 16px;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #d8ded7;
+  border-radius: 8px;
+}
+
+.route-atlas-track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 0;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+}
+
+.route-atlas-node {
+  position: relative;
+  min-width: 150px;
+  padding: 0 12px 0 0;
+}
+
+.route-atlas-node:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 31px;
+  width: calc(100% - 28px);
+  height: 2px;
+  background: #d8ded7;
+}
+
+.route-atlas-node.branch:not(:last-child)::after,
+.route-atlas-node.aftermath:not(:last-child)::after {
+  background: #b7c9bc;
+}
+
+.route-atlas-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  color: #ffffff;
+  background: #52605b;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #b8c4bb;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.route-atlas-node.branch .route-atlas-dot { background: #6c65ad; }
+.route-atlas-node.evidence .route-atlas-dot { background: #2c4a46; }
+.route-atlas-node.reaction .route-atlas-dot { background: #b17c2d; }
+.route-atlas-node.aftermath .route-atlas-dot { background: #a74332; }
+
+.route-atlas-copy {
+  display: grid;
+  gap: 4px;
+  margin-top: 9px;
+  padding-right: 8px;
+}
+
+.route-atlas-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 18px;
+}
+
+.route-atlas-meta span,
+.route-atlas-meta b {
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #52605b;
+  background: #eef1ed;
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.route-atlas-meta .route-hit,
+.route-atlas-meta .route-clue {
+  color: #18201f;
+  background: #d9ff62;
+}
+
+.route-atlas-meta .route-miss {
+  color: #6a5420;
+  background: #fff0bf;
+}
+
+.route-atlas-copy strong,
+.route-atlas-copy p {
+  overflow-wrap: anywhere;
+}
+
+.route-atlas-copy strong {
+  color: #18201f;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.route-atlas-copy p {
+  margin: 0;
+  color: #52605b;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
 .ending-reveal {
   background: #2c4a46;
 }
