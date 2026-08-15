@@ -1012,6 +1012,18 @@ function App() {
     };
   }, []);
   useEffect(() => {
+    const closeOverlay = (event) => {
+      if (event.key !== "Escape") return;
+      if (decisionReveal) {
+        setDecisionReveal(null);
+      } else if (showRanking) {
+        setShowRanking(false);
+      }
+    };
+    window.addEventListener("keydown", closeOverlay);
+    return () => window.removeEventListener("keydown", closeOverlay);
+  }, [decisionReveal, showRanking]);
+  useEffect(() => {
     if (!showRanking) return undefined;
     let cancelled = false;
     setLeaderboardStatus("loading");
