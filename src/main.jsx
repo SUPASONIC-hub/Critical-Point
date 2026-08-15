@@ -512,6 +512,7 @@ function App() {
           ? "DB 연결 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
           : "DB 미연결. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
+  const hadDecisionRevealRef = useRef(false);
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -1023,6 +1024,15 @@ function App() {
     window.addEventListener("keydown", closeOverlay);
     return () => window.removeEventListener("keydown", closeOverlay);
   }, [decisionReveal, showRanking]);
+  useEffect(() => {
+    if (decisionReveal) {
+      hadDecisionRevealRef.current = true;
+      return;
+    }
+    if (!hadDecisionRevealRef.current) return;
+    hadDecisionRevealRef.current = false;
+    window.requestAnimationFrame(() => sceneTitleRef.current?.focus({ preventScroll: true }));
+  }, [decisionReveal]);
   useEffect(() => {
     if (!showRanking) return undefined;
     let cancelled = false;
