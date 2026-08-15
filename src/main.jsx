@@ -3759,6 +3759,7 @@ function App() {
                       {isCostliestChoice && <b className="choice-badge cost">대가 큼</b>}
                     </span>
                   )}
+                  {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
                   {showTacticalDetails && (
                     <>
                       <span className="choice-tactical">
@@ -3770,7 +3771,6 @@ function App() {
                           <small>{simplifyPlayerText(tacticalRead.reward)} · 얻는 것 {simplifyPlayerText(tacticalRead.gain)} · 드는 것 {simplifyPlayerText(tacticalRead.cost)}</small>
                         </span>
                       </span>
-                      {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
                       {choiceRead.flowSurge && (
                         <span className="choice-surge">
                           {simplifyPlayerText(choiceRead.flowSurge.label)} · {simplifyPlayerText(explainResourceTradeoff(choiceRead.flowSurge.effect))}

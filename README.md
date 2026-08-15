@@ -29,6 +29,7 @@ npm run dev -- --port 5173
 - 상황·선택·확정을 분리한 판단 레일과 반응형 HUD
 - 전술 상세에서 선택별 예상 압력 미터 비교
 - 선택 예보 항목을 눌러 해당 선택을 바로 미리보기
+- 기본 선택 화면에서 현재 장면 목표에 맞는 선택을 즉시 식별
 - 기본 선택 화면에서도 예상 자원 변화가 즉시 보이는 결과 요약
 - 브라우저 자동 저장, 완료 기록 JSON 내보내기, 로컬 랭킹
 - 결과 화면에서 현재 사건만 즉시 재도전
@@ -43,24 +44,6 @@ npm run dev -- --port 5173
 ```bash
 npm test
 npm run build
-```
-
-## 파일 구조
-
-```text
-.node-version           배포 Node 런타임 버전
-index.html              앱 HTML과 메타 태그
-src/appConfig.js        저장 형식과 입력 길이 제한
-src/main.jsx            React 화면, 저장, 선택 흐름
-src/gameData.js         사건, 선택지, 결말 분기
-src/gameLogic.js        점수, 위험, 단서, 결과 계산
-src/playerLanguage.js   화면 문구 정리
-src/ranking.js          로컬/원격 랭킹 정규화
-src/telemetry.js        선택적 원격 저장 연동
-src/styles.css          화면 스타일
-public/                 프로필 및 장면 이미지
-scripts/smoke-test.mjs  핵심 계산 테스트
-render.yaml             Render 배포 설정
 ```
 
 ## 배포
