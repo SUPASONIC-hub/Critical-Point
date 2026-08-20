@@ -26,18 +26,28 @@ import {
 } from "lucide-react";
 import "./styles.css";
 import {
+  appendStoredErrorLog,
+  ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
   PLAYER_NAME_MAX_LENGTH,
+  appendSaveSlot,
   copyText,
   FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
   normalizeFeedback,
   normalizePlayerName,
   normalizeSavedText,
+  parseCurrentSavedState,
+  parseRecoverySlots,
   parseSavedState,
   readStoredValue,
+  RECOVERY_SLOT_SCHEMA_VERSION,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
+  SAVE_SLOT_STORAGE_KEY,
+  restoreRecoverySnapshot,
+  createSafeErrorContext,
+  serializeError,
   STORAGE_KEY,
   writeStoredValue,
 } from "./appConfig.js";
@@ -88,6 +98,8 @@ import {
   getSessionId,
   getSessionCode,
   saveCaseTelemetry,
+  checkTelemetryHealth,
+  saveErrorTelemetry,
   saveFeedbackTelemetry,
   fetchLeaderboard,
   telemetryEnabled,
@@ -451,6 +463,139 @@ const triggerLabSignals = {
   final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
 };
 
+const baseCaseStartNodes = {
+  case01: "start",
+  case02: "c2_start",
+  case03: "c3_start",
+  case04: "c4_start",
+  case05: "c5_start",
+  final: "f_start",
+};
+const caseResultNodeIds = {
+  case01: "result",
+  case02: "case02_result",
+  case03: "case03_result",
+  case04: "case04_result",
+  case05: "case05_result",
+  final: "final_result",
+};
+const debugToolsEnabled =
+  import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
+  (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
+const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
+
+function isKnownCaseId(caseId) {
+  return caseSequence.includes(caseId);
+}
+
+function isNodeValidForCase(caseId, nodeId) {
+  if (!isKnownCaseId(caseId) || typeof nodeId !== "string") return false;
+  return Boolean(nodeOrders[caseId]?.includes(nodeId) || caseResultNodeIds[caseId] === nodeId);
+}
+
+function repairSavedRoute(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
+  const currentCase = isKnownCaseId(state.currentCase) ? state.currentCase : "case01";
+  const nodeId = isNodeValidForCase(currentCase, state.nodeId) ? state.nodeId : baseCaseStartNodes[currentCase];
+  if (currentCase === state.currentCase && nodeId === state.nodeId) return state;
+  return {
+    ...state,
+    currentCase,
+    nodeId,
+    paused: true,
+    lastError: {
+      id: `repair-${Date.now()}`,
+      occurredAt: new Date().toISOString(),
+      source: "save-integrity",
+      message: "Saved route was repaired before resume.",
+      currentCase,
+      nodeId,
+    },
+  };
+}
+
+function normalizeNumberMap(value, defaults) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { value: { ...defaults }, changed: true };
+  }
+
+  const allowedKeys = Object.keys(defaults);
+  const sourceKeys = Object.keys(value);
+  let changed = sourceKeys.length !== allowedKeys.length;
+  const next = {};
+
+  allowedKeys.forEach((key) => {
+    const candidate = value[key];
+    if (Number.isFinite(candidate)) {
+      next[key] = candidate;
+      return;
+    }
+    next[key] = defaults[key];
+    changed = true;
+  });
+
+  return { value: next, changed };
+}
+
+function normalizeSavedGameplayState(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
+
+  const normalizedResources = normalizeNumberMap(state.resources, initialResources);
+  const normalizedTriggers = normalizeNumberMap(state.triggers, makeEmptyScores(triggerLabels));
+  const normalizedCognition = normalizeNumberMap(state.cognition, makeEmptyScores(cognitionLabels));
+
+  if (!normalizedResources.changed && !normalizedTriggers.changed && !normalizedCognition.changed) {
+    return state;
+  }
+
+  return {
+    ...state,
+    resources: normalizedResources.value,
+    triggers: normalizedTriggers.value,
+    cognition: normalizedCognition.value,
+    paused: true,
+    lastError: state.lastError ?? {
+      id: `repair-${Date.now()}`,
+      occurredAt: new Date().toISOString(),
+      source: "save-integrity",
+      message: "Saved gameplay metrics were repaired before resume.",
+      currentCase: state.currentCase,
+      nodeId: state.nodeId,
+    },
+  };
+}
+
+function shouldCaptureSaveSlot(previousState, nextState) {
+  if (!nextState?.saveSchemaVersion) return false;
+  if (nextState.lastError) return true;
+  if (!previousState?.started && nextState.started) return true;
+  if (previousState?.currentCase !== nextState.currentCase) return true;
+  if (previousState?.nodeId !== nextState.nodeId) return true;
+  const previousCompletedCount = Array.isArray(previousState?.completedCases) ? previousState.completedCases.length : 0;
+  const nextCompletedCount = Array.isArray(nextState.completedCases) ? nextState.completedCases.length : 0;
+  return previousCompletedCount !== nextCompletedCount;
+}
+
+function createSafeDomSnapshot(documentRef = globalThis.document) {
+  try {
+    const root = documentRef?.querySelector?.("#root");
+    if (!root) return "";
+    const elements = [...root.querySelectorAll("main, section, article, button, input, select, textarea, [role], [aria-label]")].slice(0, 40);
+    return elements
+      .map((element) => {
+        const tag = element.tagName.toLowerCase();
+        const className = typeof element.className === "string" ? element.className.split(/\s+/).filter(Boolean).slice(0, 3).join(".") : "";
+        const role = element.getAttribute("role");
+        const ariaLabel = element.getAttribute("aria-label");
+        return [tag, className ? `.${className}` : "", role ? `[role=${role}]` : "", ariaLabel ? "[aria-label]" : ""].join("");
+      })
+      .join(" > ")
+      .slice(0, 1800);
+  } catch {
+    return "";
+  }
+}
+
 function getRouteMarker(entry) {
   const scene = nodes[entry.nodeId];
   if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
@@ -462,10 +607,123 @@ function getRouteMarker(entry) {
   return { label: "핵심 판단", tone: "decision" };
 }
 
+function getSavedRecoveryState() {
+  const saved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+  return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : null;
+}
+
+function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
+  const saved = getSavedRecoveryState();
+  const serialized = serializeError(error);
+  const occurredAt = new Date().toISOString();
+  const context = createSafeErrorContext(saved ?? {}, source);
+
+  return {
+    id: `error-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    occurredAt,
+    error: serialized,
+    componentStack: errorInfo?.componentStack ?? "",
+    domSnapshot: createSafeDomSnapshot(),
+    viewport: {
+      width: globalThis.innerWidth ?? 0,
+      height: globalThis.innerHeight ?? 0,
+    },
+    context,
+  };
+}
+
+function persistErrorRecovery(entry) {
+  appendStoredErrorLog(entry);
+  const saved = getSavedRecoveryState();
+  if (saved) {
+    const recoveredSave = {
+      ...saved,
+      savedAt: entry.occurredAt,
+      paused: true,
+      lastError: {
+        id: entry.id,
+        occurredAt: entry.occurredAt,
+        source: entry.context.source,
+        message: entry.error.message,
+        currentCase: entry.context.currentCase,
+        nodeId: entry.context.nodeId,
+      },
+    };
+    writeStoredValue(STORAGE_KEY, JSON.stringify(recoveredSave));
+    appendSaveSlot(recoveredSave);
+  }
+}
+
+function createErrorTelemetryPayload(entry) {
+  const sessionId = getSessionId();
+  return {
+    session_id: sessionId,
+    session_code: getSessionCode(sessionId),
+    occurred_at: entry.occurredAt,
+    source: entry.context.source,
+    current_case: entry.context.currentCase,
+    node_id: entry.context.nodeId,
+    error_name: entry.error.name,
+    error_message: entry.error.message,
+    error_stack: entry.error.stack,
+    component_stack: entry.componentStack,
+    dom_snapshot: entry.domSnapshot ?? "",
+    viewport: entry.viewport ?? {},
+    context: entry.context,
+  };
+}
+
+function queueSavedErrorTelemetry(entry) {
+  const saved = getSavedRecoveryState();
+  if (!saved) return false;
+  const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
+  const nextQueue = [
+    ...pendingTelemetry.filter((item) => item.id !== entry.id),
+    {
+      id: entry.id,
+      queuedAt: new Date().toISOString(),
+      type: "error",
+      label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
+      payload: createErrorTelemetryPayload(entry),
+    },
+  ];
+  return writeStoredValue(
+    STORAGE_KEY,
+    JSON.stringify({
+      ...saved,
+      pendingTelemetry: nextQueue,
+      savedAt: entry.occurredAt,
+    }),
+  );
+}
+
+function reportErrorRecovery(entry) {
+  if (!telemetryEnabled) return;
+  const saved = getSavedRecoveryState();
+  if (!saved?.dataConsent) return;
+  saveErrorTelemetry(createErrorTelemetryPayload(entry)).catch((telemetryError) => {
+    console.warn("Critical Point error telemetry failed", telemetryError);
+    queueSavedErrorTelemetry(entry);
+  });
+}
+
+function recordAppError(error, errorInfo = {}, source = "runtime") {
+  const entry = createErrorRecoveryEntry(error, errorInfo, source);
+  persistErrorRecovery(entry);
+  reportErrorRecovery(entry);
+  return entry;
+}
+
 function App() {
   const saved = useMemo(() => {
-    const parsed = parseSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-    return isSavedStateShapeValid(parsed) ? parsed : null;
+    const parsed = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const repaired = normalizeSavedGameplayState(repairSavedRoute(parsed));
+    if (!isSavedStateShapeValid(repaired)) return null;
+    if (repaired !== parsed) {
+      writeStoredValue(STORAGE_KEY, JSON.stringify(repaired));
+      appendSaveSlot(repaired);
+    }
+    return repaired;
   }, []);
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
@@ -519,6 +777,22 @@ function App() {
           ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
+  const [lastRecoveredError, setLastRecoveredError] = useState(saved?.lastError ?? null);
+  const [showErrorLog, setShowErrorLog] = useState(false);
+  const [localErrorEntries, setLocalErrorEntries] = useState(() => {
+    const localErrorLog = parseSavedState(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"), 1);
+    return Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [];
+  });
+  const [saveSlots, setSaveSlots] = useState(() => {
+    const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
+    return Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [];
+  });
+  const [telemetryHealth, setTelemetryHealth] = useState({ status: "idle", tables: [] });
+  const [telemetryRetryInfo, setTelemetryRetryInfo] = useState({ attempt: 0, nextRetryAt: "" });
+  const [debugCaseId, setDebugCaseId] = useState("case05");
+  const [debugNodeId, setDebugNodeId] = useState("c5_start");
+  const telemetryRetryAttemptRef = useRef(0);
+  const telemetryRetryTimerRef = useRef(null);
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
   const choiceButtonsRef = useRef(new Map());
@@ -529,6 +803,7 @@ function App() {
     : "case01";
   const activePlayStyle = playStyleOptions.find((style) => style.id === playStyle) ?? playStyleOptions[0];
   const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders.case01;
+  const debugNodeOptions = nodeOrders[debugCaseId] ?? nodeOrders.case05;
   const fallbackNodeId = activeNodeOrder[0] ?? "start";
   const resolvedNodeId = nodes[nodeId] ? nodeId : fallbackNodeId;
   const baseCaseStartNodes = {
@@ -1034,6 +1309,75 @@ function App() {
     };
   }, []);
   useEffect(() => {
+    if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetry.length === 0) return undefined;
+    scheduleTelemetryRetry({ immediate: telemetryRetryAttemptRef.current === 0 });
+    return () => {
+      if (telemetryRetryTimerRef.current) {
+        window.clearTimeout(telemetryRetryTimerRef.current);
+        telemetryRetryTimerRef.current = null;
+      }
+    };
+  }, [dataConsent, isOnline, pendingTelemetry.length]);
+  useEffect(() => {
+    if (!debugToolsEnabled) return undefined;
+    if (!telemetryEnabled || !isOnline) {
+      setTelemetryHealth({ status: telemetryEnabled ? "offline" : "disabled", tables: [] });
+      return undefined;
+    }
+    let cancelled = false;
+    setTelemetryHealth({ status: "checking", tables: [] });
+    checkTelemetryHealth()
+      .then((health) => {
+        if (cancelled) return;
+        setTelemetryHealth({
+          status: health.ok ? "ok" : "error",
+          tables: health.tables ?? [],
+        });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setTelemetryHealth({
+          status: "error",
+          tables: [{ table: "healthcheck", ok: false, status: 0, message: error instanceof Error ? error.message : "failed" }],
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOnline]);
+  useEffect(() => {
+    const handleWindowError = (event) => {
+      const entry = recordAppError(event.error ?? event.message, {}, "window-error");
+      setLastRecoveredError({
+        id: entry.id,
+        occurredAt: entry.occurredAt,
+        source: entry.context.source,
+        message: entry.error.message,
+        currentCase: entry.context.currentCase,
+        nodeId: entry.context.nodeId,
+      });
+      refreshLocalErrorLog();
+    };
+    const handleUnhandledRejection = (event) => {
+      const entry = recordAppError(event.reason, {}, "unhandled-rejection");
+      setLastRecoveredError({
+        id: entry.id,
+        occurredAt: entry.occurredAt,
+        source: entry.context.source,
+        message: entry.error.message,
+        currentCase: entry.context.currentCase,
+        nodeId: entry.context.nodeId,
+      });
+      refreshLocalErrorLog();
+    };
+    window.addEventListener("error", handleWindowError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    return () => {
+      window.removeEventListener("error", handleWindowError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, []);
+  useEffect(() => {
     const closeOverlay = (event) => {
       if (event.key !== "Escape") return;
       if (decisionReveal) {
@@ -1242,7 +1586,7 @@ function App() {
         freeText,
         echo,
         nodeEnteredAt,
-        pendingTelemetry,
+        pendingTelemetry: pendingTelemetryRef.current,
         protocolUsed,
         timerPenaltyApplied,
         probeUsed,
@@ -1250,7 +1594,16 @@ function App() {
         savedAt: new Date().toISOString(),
         ...nextState,
       };
+    const previousState = {
+      started,
+      currentCase,
+      nodeId,
+      completedCases,
+    };
     const storageSaved = writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
+    if (storageSaved && shouldCaptureSaveSlot(previousState, payload)) {
+      appendSaveSlot(payload);
+    }
     if (!storageSaved) {
       setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 탭에서만 진행됩니다.");
     }
@@ -1340,6 +1693,71 @@ function App() {
     } else {
       setNodeEnteredAt(nextNodeEnteredAt);
     }
+  }
+
+  function refreshLocalErrorLog() {
+    const localErrorLog = parseSavedState(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"), 1);
+    setLocalErrorEntries(Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : []);
+    refreshSaveSlots();
+  }
+
+  function refreshSaveSlots() {
+    const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
+    setSaveSlots(Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : []);
+  }
+
+  function dismissRecoveryNotice() {
+    setLastRecoveredError(null);
+    persist({ lastError: null });
+  }
+
+  function clearLocalErrorLog() {
+    const cleared = removeStoredValue(ERROR_LOG_STORAGE_KEY);
+    if (!cleared) {
+      recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
+      setSaveStatus("Error log clear failed: browser storage is unavailable.");
+      refreshLocalErrorLog();
+      return;
+    }
+    setLocalErrorEntries([]);
+    setLastRecoveredError(null);
+    persist({ lastError: null });
+  }
+
+  function deleteSaveSlot(slotId) {
+    const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
+    const deleteSaved = writeStoredValue(
+      SAVE_SLOT_STORAGE_KEY,
+      JSON.stringify({
+        recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION,
+        slots: nextSlots,
+      }),
+    );
+    if (!deleteSaved) {
+      recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
+      setSaveStatus("Delete failed: browser storage is unavailable.");
+      return;
+    }
+    setSaveSlots(nextSlots);
+  }
+
+  function restoreSaveSlot(slot) {
+    const restored = restoreRecoverySnapshot(slot?.snapshot);
+    const repaired = repairSavedRoute(restored);
+    if (!repaired || !isSavedStateShapeValid(repaired)) return;
+    const nextState = normalizeSavedGameplayState({
+      ...repaired,
+      paused: true,
+      started: false,
+      savedAt: new Date().toISOString(),
+    });
+    const savedRestore = writeStoredValue(STORAGE_KEY, JSON.stringify(nextState));
+    if (!savedRestore) {
+      recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
+      setSaveStatus("Restore failed: browser storage is unavailable.");
+      return;
+    }
+    window.location.reload();
   }
 
   function startCase(caseId) {
@@ -1558,20 +1976,46 @@ function App() {
         ...item,
       },
     ];
-    pendingTelemetryRef.current = nextQueue;
-    setPendingTelemetry(nextQueue);
-    persist({ pendingTelemetry: nextQueue });
+    commitPendingTelemetryQueue(nextQueue);
+  }
+
+  function commitPendingTelemetryQueue(nextQueue) {
+    const latestSaved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    if (!isSavedStateShapeValid(latestSaved)) {
+      setSaveStatus("원격 저장 대기열을 저장하지 못했습니다. 브라우저 저장본을 확인해 주세요.");
+      return false;
+    }
+    const savedAt = new Date().toISOString();
+    const stored = writeStoredValue(
+      STORAGE_KEY,
+      JSON.stringify({
+        ...latestSaved,
+        pendingTelemetry: nextQueue,
+        savedAt,
+      }),
+    );
+    if (stored) {
+      pendingTelemetryRef.current = nextQueue;
+      setPendingTelemetry(nextQueue);
+      setLastSavedAt(savedAt);
+      return true;
+    }
+    setSaveStatus("브라우저 저장소를 사용할 수 없어 원격 저장 대기열 변경을 반영하지 못했습니다.");
+    return false;
   }
 
   async function sendTelemetryItem(item) {
     if (item.type === "case") return saveCaseTelemetry(item.payload);
     if (item.type === "feedback") return saveFeedbackTelemetry(item.payload);
+    if (item.type === "error") return saveErrorTelemetry(item.payload);
     throw new Error(`Unknown telemetry item type: ${item.type}`);
   }
 
   async function retryPendingTelemetry() {
     const retryBatch = pendingTelemetryRef.current;
-    if (!telemetryEnabled || !dataConsent || !isOnline || retryBatch.length === 0 || isRetryingTelemetry) return;
+    if (!telemetryEnabled || !dataConsent || !isOnline || retryBatch.length === 0 || isRetryingTelemetry) {
+      return { attempted: false, failedCount: retryBatch.length };
+    }
     setIsRetryingTelemetry(true);
     setTelemetryStatus({
       tone: "pending",
@@ -1591,21 +2035,44 @@ function App() {
     const retryIds = new Set(retryBatch.map((item) => item.id));
     const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
     const nextQueue = [...failedItems, ...newlyQueuedItems];
-    pendingTelemetryRef.current = nextQueue;
-    setPendingTelemetry(nextQueue);
-    persist({ pendingTelemetry: nextQueue });
+    const queueCommitted = commitPendingTelemetryQueue(nextQueue);
+    const visibleQueue = queueCommitted ? nextQueue : retryBatch;
     setIsRetryingTelemetry(false);
+    if (queueCommitted && nextQueue.length === 0) {
+      telemetryRetryAttemptRef.current = 0;
+      setTelemetryRetryInfo({ attempt: 0, nextRetryAt: "" });
+    }
     setTelemetryStatus(
-      nextQueue.length === 0
+      queueCommitted && nextQueue.length === 0
         ? {
             tone: "success",
             text: "대기 중이던 원격 저장을 모두 완료했습니다.",
           }
         : {
             tone: "error",
-            text: `원격 저장 ${nextQueue.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`,
+            text: queueCommitted
+              ? `원격 저장 ${visibleQueue.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`
+              : "원격 저장 응답을 받았지만 브라우저 저장본 갱신에 실패했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
           },
     );
+    return { attempted: true, failedCount: visibleQueue.length, queueCommitted };
+  }
+
+  function scheduleTelemetryRetry({ immediate = false } = {}) {
+    if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetryRef.current.length === 0 || isRetryingTelemetry) return;
+    if (telemetryRetryTimerRef.current) return;
+    const attempt = immediate ? 0 : telemetryRetryAttemptRef.current + 1;
+    const delayMs = immediate ? 0 : Math.min(60_000, 2_000 * 2 ** Math.max(0, attempt - 1));
+    const nextRetryAt = new Date(Date.now() + delayMs).toISOString();
+    telemetryRetryAttemptRef.current = attempt;
+    setTelemetryRetryInfo({ attempt, nextRetryAt });
+    telemetryRetryTimerRef.current = window.setTimeout(async () => {
+      telemetryRetryTimerRef.current = null;
+      const result = await retryPendingTelemetry();
+      if (result?.failedCount > 0) {
+        scheduleTelemetryRetry();
+      }
+    }, delayMs);
   }
 
   function choose(choice) {
@@ -1869,8 +2336,13 @@ function App() {
     ) {
       return;
     }
-    removeStoredValue("trigger-prototype");
-    removeStoredValue(STORAGE_KEY);
+    const resetStorageResults = [
+      ["trigger-prototype", removeStoredValue("trigger-prototype")],
+      [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
+      [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
+      [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
+    ];
+    const failedResetKeys = resetStorageResults.filter(([, removed]) => !removed).map(([key]) => key);
     setPlayerName("");
     setPlayStyle("instinct");
     setDataConsent(false);
@@ -1883,6 +2355,9 @@ function App() {
     setPlaytestFeedback({});
     pendingTelemetryRef.current = [];
     setPendingTelemetry([]);
+    setLocalErrorEntries([]);
+    setSaveSlots([]);
+    setLastRecoveredError(null);
     setNodeId("start");
     setResources(initialResources);
     setLog([]);
@@ -1894,7 +2369,29 @@ function App() {
     setDecisionReveal(null);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
-    setSaveStatus("");
+    let resetErrorLogSaved = true;
+    if (failedResetKeys.length > 0) {
+      resetErrorLogSaved = appendStoredErrorLog({
+        id: `reset-failed-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        error: {
+          name: "StorageResetError",
+          message: "Some browser storage keys could not be removed during reset.",
+          stack: "",
+        },
+        context: {
+          source: "reset",
+          currentCase,
+          nodeId,
+          failedStorageKeys: failedResetKeys,
+        },
+      });
+    }
+    setSaveStatus(
+      failedResetKeys.length === 0
+        ? ""
+        : `일부 브라우저 저장소를 지우지 못했습니다: ${failedResetKeys.join(", ")}${resetErrorLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`,
+    );
     setLastSavedAt("");
     setIsPausedSave(false);
     setNodeEnteredAt(Date.now());
@@ -1906,6 +2403,39 @@ function App() {
           ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
     });
+  }
+
+  function retryStorageCleanup() {
+    const cleanupResults = [
+      ["trigger-prototype", removeStoredValue("trigger-prototype")],
+      [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
+      [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
+      [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
+    ];
+    const failedKeys = cleanupResults.filter(([, removed]) => !removed).map(([key]) => key);
+    if (failedKeys.length === 0) {
+      setLocalErrorEntries([]);
+      setSaveSlots([]);
+      setLastRecoveredError(null);
+      setSaveStatus("브라우저 저장소 정리를 완료했습니다.");
+      return;
+    }
+    const retryLogSaved = appendStoredErrorLog({
+      id: `reset-retry-failed-${Date.now()}`,
+      occurredAt: new Date().toISOString(),
+      error: {
+        name: "StorageResetRetryError",
+        message: "Some browser storage keys could not be removed during reset retry.",
+        stack: "",
+      },
+      context: {
+        source: "reset-retry",
+        currentCase,
+        nodeId,
+        failedStorageKeys: failedKeys,
+      },
+    });
+    setSaveStatus(`저장소 정리 재시도 실패: ${failedKeys.join(", ")}${retryLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`);
   }
 
   function showSeasonMap() {
@@ -1920,16 +2450,75 @@ function App() {
     persist({ completedCases: allPlayableCases });
   }
 
-  function exportPlaytestLog() {
+  function startAtNode(
+    caseIdValue,
+    nodeIdValue,
+    {
+      echoText = "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
+      persistRun = true,
+    } = {},
+  ) {
+    const caseId = seasonCasesBase.some((caseItem) => caseItem.id === caseIdValue) ? caseIdValue : "case05";
+    const nodeOptions = nodeOrders[caseId] ?? nodeOrders.case05;
+    const nextNodeId = nodeOptions.includes(nodeIdValue) ? nodeIdValue : nodeOptions[0];
+    const allPreviousCases = caseSequence.slice(0, Math.max(0, caseSequence.indexOf(caseId)));
+    const now = Date.now();
+    setStarted(true);
+    setIsPausedSave(false);
+    setCurrentCase(caseId);
+    setCompletedCases(allPreviousCases);
+    setNodeId(nextNodeId);
+    setResources(initialResources);
+    setLog([]);
+    setTriggers(makeEmptyScores(triggerLabels));
+    setCognition(makeEmptyScores(cognitionLabels));
+    setProtocolUsed(false);
+    setTimerPenaltyApplied(false);
+    setProbeUsed(false);
+    setOpeningLegacy(null);
+    setDecisionReveal(null);
+    setPendingChoice(null);
+    setFreeText("");
+    setEcho(echoText);
+    setShowErrorLog(false);
+    setNodeEnteredAt(now);
+    if (persistRun) {
+      persist({
+        started: true,
+        paused: false,
+        currentCase: caseId,
+        completedCases: allPreviousCases,
+        nodeId: nextNodeId,
+        resources: initialResources,
+        log: [],
+        triggers: makeEmptyScores(triggerLabels),
+        cognition: makeEmptyScores(cognitionLabels),
+        freeText: "",
+        echo: echoText,
+        protocolUsed: false,
+        timerPenaltyApplied: false,
+        probeUsed: false,
+        openingLegacy: null,
+        nodeEnteredAt: now,
+      });
+    }
+  }
+
+  function startDebugNode() {
+    startAtNode(debugCaseId, debugNodeId);
+  }
+
+  function exportPlaytestLog({ includeDiagnostics = false } = {}) {
+    const localErrorLog = parseSavedState(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"), 1);
+    const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
     const payload = {
       saveSchemaVersion: SAVE_SCHEMA_VERSION,
       exportedAt: new Date().toISOString(),
-      playerName,
+      exportMode: includeDiagnostics ? "diagnostic" : "summary",
       currentCase,
       openingLegacy,
       completedCases,
       caseResults,
-      playtestFeedback,
       resources,
       triggers,
       cognition,
@@ -1950,18 +2539,24 @@ function App() {
         activeBonus,
         protocolUsed,
       },
-      log,
       telemetryEnabled,
       dataConsent,
-      sessionId,
       sessionCode,
-      pendingTelemetry,
     };
+    if (includeDiagnostics) {
+      payload.playerName = playerName;
+      payload.playtestFeedback = playtestFeedback;
+      payload.log = log;
+      payload.sessionId = sessionId;
+      payload.pendingTelemetry = pendingTelemetry;
+      payload.errorLog = Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [];
+      payload.saveSlots = Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [];
+    }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `trigger-playtest-${Date.now()}.json`;
+    anchor.download = includeDiagnostics ? `trigger-diagnostic-${Date.now()}.json` : `trigger-summary-${Date.now()}.json`;
     anchor.type = "application/json";
     anchor.style.display = "none";
     document.body.appendChild(anchor);
@@ -2295,6 +2890,172 @@ function App() {
     );
   }
 
+  function renderRecoveryNotice() {
+    if (!lastRecoveredError) return null;
+    return (
+      <section className="recovery-notice" role="status" aria-live="polite">
+        <div>
+          <span>복구됨</span>
+          <strong>{lastRecoveredError.currentCase} / {lastRecoveredError.nodeId}</strong>
+          <p>{lastRecoveredError.message}</p>
+        </div>
+        <div className="recovery-actions">
+          {debugToolsEnabled && (
+            <button type="button" data-testid="open-error-log-from-notice" onClick={() => setShowErrorLog(true)}>
+              에러 로그
+            </button>
+          )}
+          <button type="button" className="ghost" onClick={dismissRecoveryNotice}>
+            닫기
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  function renderSaveStatus() {
+    if (!saveStatus) return null;
+    return (
+      <section className="save-status" role="status" aria-live="polite" aria-atomic="true">
+        <p>{saveStatus}</p>
+        {saveStatus.includes("저장소") && (
+          <button type="button" className="ghost" data-testid="retry-storage-cleanup" onClick={retryStorageCleanup}>
+            저장소 정리 재시도
+          </button>
+        )}
+      </section>
+    );
+  }
+
+  function renderErrorLogPanel() {
+    if (!showErrorLog || !debugToolsEnabled) return null;
+    return (
+      <section className="error-log-panel" aria-label="로컬 에러 로그" data-testid="error-log-panel">
+        <div className="panel-title-row">
+          <div>
+            <span>ERROR LOG</span>
+            <h2>최근 오류 기록</h2>
+          </div>
+          <div className="error-log-actions">
+            <button type="button" onClick={refreshLocalErrorLog}>
+              새로고침
+            </button>
+            <button type="button" className="ghost" onClick={clearLocalErrorLog}>
+              로그 비우기
+            </button>
+            <button type="button" className="ghost" onClick={() => setShowErrorLog(false)}>
+              닫기
+            </button>
+          </div>
+        </div>
+        <div className={`telemetry-health ${telemetryHealth.status}`}>
+          <strong>원격 로그 읽기 점검</strong>
+          <span>
+            {telemetryHealth.status === "ok"
+              ? "정상"
+              : telemetryHealth.status === "checking"
+                ? "확인 중"
+                : telemetryHealth.status === "disabled"
+                  ? "비활성"
+                  : telemetryHealth.status === "offline"
+                    ? "오프라인"
+                    : "확인 필요"}
+          </span>
+          {telemetryHealth.tables.length > 0 && (
+            <small>
+              {telemetryHealth.tables
+                .map((table) => `${table.table}:${table.ok ? "ok" : table.status ?? "fail"}`)
+                .join(" / ")}
+            </small>
+          )}
+          {telemetryRetryInfo.nextRetryAt && pendingTelemetry.length > 0 && (
+            <small>
+              retry {telemetryRetryInfo.attempt + 1} · {formatSaveTime(telemetryRetryInfo.nextRetryAt)}
+            </small>
+          )}
+        </div>
+        {localErrorEntries.length === 0 ? (
+          <p className="error-log-empty">저장된 오류 기록이 없습니다.</p>
+        ) : (
+          <div className="error-log-list">
+            {localErrorEntries.map((entry) => (
+              <article key={entry.id}>
+                <div>
+                  <span>{formatSaveTime(entry.occurredAt)} · {entry.context?.source ?? "runtime"}</span>
+                  <strong>{entry.context?.currentCase ?? "unknown"} / {entry.context?.nodeId ?? "unknown"}</strong>
+                  <p>{entry.error?.message ?? "Unknown error"}</p>
+                </div>
+                <small>
+                  로그 {entry.context?.logLength ?? 0}개 · 마지막 선택 {entry.context?.lastChoiceId || "없음"}
+                </small>
+                <button
+                  type="button"
+                  className="ghost error-replay-button"
+                  onClick={() =>
+                    startAtNode(
+                      entry.context?.currentCase,
+                      entry.context?.nodeId,
+                      {
+                        echoText: "에러 로그 재현 진입입니다. 저장된 지점의 장면 흐름을 다시 확인합니다.",
+                        persistRun: false,
+                      },
+                    )
+                  }
+                >
+                  재현
+                </button>
+                <details className="error-log-details">
+                  <summary>상세</summary>
+                  <dl>
+                    <dt>stack</dt>
+                    <dd>{entry.error?.stack || "없음"}</dd>
+                    <dt>viewport</dt>
+                    <dd>{entry.viewport ? `${entry.viewport.width ?? 0}x${entry.viewport.height ?? 0}` : "없음"}</dd>
+                    <dt>dom</dt>
+                    <dd>{entry.domSnapshot || "없음"}</dd>
+                  </dl>
+                </details>
+              </article>
+            ))}
+          </div>
+        )}
+        <section className="save-slot-panel" aria-label="복구 슬롯" data-testid="save-slot-panel">
+          <div className="panel-title-row">
+            <div>
+              <span>RECOVERY SLOTS</span>
+              <h3>최근 복구 지점</h3>
+            </div>
+            <button type="button" className="ghost" onClick={refreshSaveSlots}>
+              새로고침
+            </button>
+          </div>
+          {saveSlots.length === 0 ? (
+            <p className="error-log-empty">저장된 복구 슬롯이 없습니다.</p>
+          ) : (
+            <div className="save-slot-list">
+              {saveSlots.map((slot) => (
+                <article key={slot.id}>
+                  <div>
+                    <strong>{slot.currentCase} / {slot.nodeId}</strong>
+                    <small>{formatSaveTime(slot.savedAt)} · 완료 {slot.completedCases?.length ?? 0}</small>
+                  </div>
+                  <div className="save-slot-actions">
+                    <button type="button" onClick={() => restoreSaveSlot(slot)}>
+                      복원
+                    </button>
+                    <button type="button" className="ghost" onClick={() => deleteSaveSlot(slot.id)}>
+                      삭제
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </section>
+    );
+  }
+
   function getCaseStatusText(status) {
     if (status === "PLAYING") return "진행 중";
     if (status === "OPEN") return "시작 가능";
@@ -2397,6 +3158,9 @@ function App() {
     return (
       <main className="shell intro-shell">
         <AdaptiveMusic modeKey={musicModeKey} />
+        {renderRecoveryNotice()}
+        {renderErrorLogPanel()}
+        {renderSaveStatus()}
         <section className="intro">
           <div className="brand-row">
             <span className="brand-mark">{GAME_TITLE}</span>
@@ -2405,6 +3169,12 @@ function App() {
                 <Trophy size={16} />
                 랭킹
               </button>
+              {debugToolsEnabled && (
+                <button className="ghost intro-ranking-button" type="button" data-testid="open-error-log-from-header" onClick={() => setShowErrorLog(true)}>
+                  <AlertTriangle size={16} />
+                  에러 로그
+                </button>
+              )}
               <span className="case-chip">임계점 / {simplifyPlayerText(activeCaseMeta?.title ?? GAME_TITLE)}</span>
             </div>
           </div>
@@ -2500,7 +3270,7 @@ function App() {
                     {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
                   </small>
                 </div>
-                <button type="button" onClick={resumeSavedGame}>
+                <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
                   <ChevronRight size={18} />
                   이어하기
                 </button>
@@ -2527,18 +3297,41 @@ function App() {
                 checked={dataConsent}
                 onChange={(event) => {
                   const nextConsent = event.target.checked;
-                  setDataConsent(nextConsent);
                   if (!nextConsent) {
+                    const previousQueue = pendingTelemetryRef.current;
+                    const cleared = persist({ dataConsent: false, pendingTelemetry: [] });
+                    if (!cleared.storageSaved) {
+                      event.target.checked = true;
+                      setDataConsent(true);
+                      pendingTelemetryRef.current = previousQueue;
+                      setPendingTelemetry(previousQueue);
+                      setSaveStatus("동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.");
+                      setTelemetryStatus({
+                        tone: "error",
+                        text: "동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
+                      });
+                      return;
+                    }
+                    setDataConsent(false);
                     pendingTelemetryRef.current = [];
                     setPendingTelemetry([]);
                     setTelemetryStatus({
                       tone: "local",
                       text: "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다.",
                     });
-                    persist({ dataConsent: false, pendingTelemetry: [] });
                     return;
                   }
-                  persist({ dataConsent: true });
+                  const savedConsent = persist({ dataConsent: true });
+                  if (!savedConsent.storageSaved) {
+                    event.target.checked = false;
+                    setSaveStatus("데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.");
+                    setTelemetryStatus({
+                      tone: "error",
+                      text: "데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.",
+                    });
+                    return;
+                  }
+                  setDataConsent(true);
                 }}
               />
               <span>
@@ -2569,9 +3362,53 @@ function App() {
                 결과 화면의 8자리 세션 코드로 처리합니다.
               </p>
             </div>
-            <button type="button" className="test-unlock" onClick={unlockAllCasesForTest}>
-              테스트용 전체 케이스 열기
-            </button>
+            {debugToolsEnabled && (
+              <button type="button" className="test-unlock" onClick={unlockAllCasesForTest}>
+                테스트용 전체 케이스 열기
+              </button>
+            )}
+            {debugToolsEnabled && (
+            <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
+              <div>
+                <span>DEBUG JUMP</span>
+                <strong>특정 장면 바로 시작</strong>
+              </div>
+              <div className="debug-jump-controls">
+                <select
+                  data-testid="debug-case-select"
+                  value={debugCaseId}
+                  onChange={(event) => {
+                    const nextCaseId = event.target.value;
+                    const nextNodeOptions = nodeOrders[nextCaseId] ?? [];
+                    setDebugCaseId(nextCaseId);
+                    setDebugNodeId(nextNodeOptions[0] ?? "start");
+                  }}
+                  aria-label="디버그 케이스 선택"
+                >
+                  {caseSequence.map((caseId) => (
+                    <option key={caseId} value={caseId}>
+                      {seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.label ?? caseId}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  data-testid="debug-node-select"
+                  value={debugNodeId}
+                  onChange={(event) => setDebugNodeId(event.target.value)}
+                  aria-label="디버그 장면 선택"
+                >
+                  {debugNodeOptions.map((debugNode) => (
+                    <option key={debugNode} value={debugNode}>
+                      {debugNode} · {nodes[debugNode]?.title ?? debugNode}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" data-testid="debug-start-node" onClick={startDebugNode}>
+                  장면 시작
+                </button>
+              </div>
+            </div>
+            )}
           </div>
           <section className="quick-guide" aria-label="처음 플레이 가이드">
             <div className="guide-heading">
@@ -2646,11 +3483,10 @@ function App() {
                 if (canOpenCase) startCase(caseItem.id);
               }
               return (
-                <article
+                <button
+                  type="button"
                   key={caseItem.id}
-                  role={canOpenCase ? "button" : undefined}
-                  tabIndex={canOpenCase ? 0 : undefined}
-                  aria-disabled={canOpenCase ? undefined : true}
+                  disabled={!canOpenCase}
                   aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"
@@ -2660,12 +3496,6 @@ function App() {
                         : "case-card"
                   }
                   onClick={openCaseFromCard}
-                  onKeyDown={(event) => {
-                    if ((event.key === "Enter" || event.key === " ") && canOpenCase) {
-                      event.preventDefault();
-                      openCaseFromCard();
-                    }
-                  }}
                 >
                   <div>
                     <span>{caseItem.label}</span>
@@ -2686,7 +3516,7 @@ function App() {
                       {savedResult.freeCount}
                     </small>
                   )}
-                </article>
+                </button>
               );
             })}
           </div>
@@ -2700,6 +3530,8 @@ function App() {
       <main className="shell">
         <AdaptiveMusic modeKey={musicModeKey} />
         {renderDecisionReveal()}
+        {renderRecoveryNotice()}
+        {renderErrorLogPanel()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {screenReaderStatus}
         </p>
@@ -2719,10 +3551,35 @@ function App() {
                 <FileText size={16} />
                 시즌 로드맵
               </button>
-              <button className="ghost" type="button" onClick={exportPlaytestLog}>
+              {debugToolsEnabled && (
+                <button type="button" className="ghost" onClick={() => setShowErrorLog(true)}>
+                  <AlertTriangle size={16} />
+                  에러 로그
+                </button>
+              )}
+              <button className="ghost" type="button" data-testid="export-play-log" onClick={() => exportPlaytestLog()}>
                 <Download size={16} />
-                로그 내보내기
+                공유 요약
               </button>
+              {debugToolsEnabled && (
+                <button
+                  className="ghost"
+                  type="button"
+                  data-testid="export-diagnostic-log"
+                  onClick={() => {
+                    if (
+                      typeof globalThis.confirm === "function" &&
+                      !globalThis.confirm("진단 로그에는 원문 선택 로그, 피드백 원문, 에러 stack, DOM 스냅샷, 복구 슬롯이 포함됩니다. 내보낼까요?")
+                    ) {
+                      return;
+                    }
+                    exportPlaytestLog({ includeDiagnostics: true });
+                  }}
+                >
+                  <Download size={16} />
+                  진단 로그
+                </button>
+              )}
               <button type="button" className="ghost" onClick={reset}>
                 <RefreshCcw size={16} />
                 다시 플레이
@@ -2859,7 +3716,12 @@ function App() {
                   </p>
                   <button
                     type="button"
-                    onClick={retryPendingTelemetry}
+                    onClick={async () => {
+                      const result = await retryPendingTelemetry();
+                      if (result?.failedCount > 0) {
+                        scheduleTelemetryRetry();
+                      }
+                    }}
                     disabled={!telemetryEnabled || !dataConsent || !isOnline || isRetryingTelemetry}
                   >
                     {isRetryingTelemetry ? "재전송 중" : isOnline ? "원격 저장 재시도" : "연결 대기 중"}
@@ -3197,6 +4059,8 @@ function App() {
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
       {renderDecisionReveal()}
+      {renderRecoveryNotice()}
+      {renderErrorLogPanel()}
       <a className="skip-link" href="#choice-panel">
         선택지로 건너뛰기
       </a>
@@ -3303,11 +4167,7 @@ function App() {
             </button>
           </div>
         </header>
-        {saveStatus && (
-          <p className="save-status" role="status" aria-live="polite" aria-atomic="true">
-            {saveStatus}
-          </p>
-        )}
+        {renderSaveStatus()}
         <div
           className="progress-wrap"
           role="progressbar"
@@ -4081,36 +4941,49 @@ function App() {
 }
 
 class AppErrorBoundary extends React.Component {
-  state = { hasError: false };
+  state = { hasError: false, recoveryMessage: "" };
 
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  componentDidCatch(error) {
+  componentDidCatch(error, errorInfo) {
     console.error("Critical Point render error", error);
+    recordAppError(error, errorInfo, "react-render");
   }
 
   reload({ clearSave = false } = {}) {
-    if (clearSave) removeStoredValue(STORAGE_KEY);
+    if (clearSave && !removeStoredValue(STORAGE_KEY)) {
+      this.setState({
+        recoveryMessage: "현재 저장본을 삭제하지 못했습니다. 브라우저 저장소 권한을 확인한 뒤 다시 시도하세요.",
+      });
+      return;
+    }
+    removeStoredValue(DEBUG_RENDER_CRASH_KEY);
     window.location.reload();
   }
 
   render() {
-    if (!this.state.hasError) return this.props.children;
+    const forcedDebugError = debugToolsEnabled && readStoredValue(DEBUG_RENDER_CRASH_KEY) === "1";
+    if (!this.state.hasError && !forcedDebugError) return this.props.children;
 
     return (
       <main className="error-screen">
         <section className="error-panel" role="alert">
           <span className="eyebrow">CRITICAL POINT / RECOVERY</span>
           <h1>장면을 불러오지 못했습니다.</h1>
-          <p>일시적인 오류일 수 있습니다. 다시 시도하거나 저장된 플레이를 초기화하고 시작할 수 있습니다.</p>
+          <p>오류 지점은 자동 저장됐습니다. 수정 후 다시 열면 저장된 장면에서 이어서 진행할 수 있습니다.</p>
+          {this.state.recoveryMessage && (
+            <p className="error-recovery-message" role="status">
+              {this.state.recoveryMessage}
+            </p>
+          )}
           <div className="error-actions">
             <button type="button" onClick={() => this.reload()}>
-              다시 시도
+              저장된 지점에서 다시 시도
             </button>
             <button type="button" className="ghost" onClick={() => this.reload({ clearSave: true })}>
-              저장된 플레이 초기화
+              현재 저장본만 초기화
             </button>
           </div>
         </section>

@@ -19,6 +19,11 @@ export const triggerLabels = {
   affection: "애정",
   recognition: "인정",
   fear: "공포",
+  system: "시스템",
+  helplessness: "무력감",
+  selfAwareness: "자기 인식",
+  manipulation: "조종",
+  choice: "선택",
 };
 
 export const cognitionLabels = {

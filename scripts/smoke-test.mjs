@@ -23,6 +23,10 @@ import {
   speechifyChoice,
 } from "../src/gameLogic.js";
 import {
+  appendStoredErrorLog,
+  appendSaveSlot,
+  ERROR_LOG_MAX_ITEMS,
+  ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
   PLAYER_NAME_MAX_LENGTH,
   copyText,
@@ -32,18 +36,35 @@ import {
   normalizePlayerName,
   normalizeSavedText,
   parseSavedState,
+  parseRecoverySlots,
   readStoredValue,
+  RECOVERY_SLOT_SCHEMA_VERSION,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
+  SAVE_SLOT_MAX_ITEMS,
+  SAVE_SLOT_STORAGE_KEY,
+  serializeError,
   STORAGE_KEY,
+  TELEMETRY_QUEUE_TYPES,
   writeStoredValue,
+  createSafeErrorContext,
+  createRecoverySnapshot,
+  restoreRecoverySnapshot,
+  parseCurrentSavedState,
+  migrateSavedState,
 } from "../src/appConfig.js";
-import { caseOpeningRoutes, initialResources, nodeOrders, nodes } from "../src/gameData.js";
+import { caseOpeningRoutes, initialResources, nodeOrders, nodes, triggerLabels } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
+assert.equal(ERROR_LOG_STORAGE_KEY, "trigger-prototype-error-log-v1", "error logs should use a separate storage namespace");
 assert.equal(SAVE_SCHEMA_VERSION, 2, "save schema version should match exported log format");
+assert.equal(RECOVERY_SLOT_SCHEMA_VERSION, 1, "recovery slots should keep their own schema version");
+assert.equal(ERROR_LOG_MAX_ITEMS, 20, "local error logs should be bounded");
+assert.equal(SAVE_SLOT_STORAGE_KEY, "trigger-prototype-save-slots-v1", "save recovery slots should use a separate namespace");
+assert.equal(SAVE_SLOT_MAX_ITEMS, 5, "save recovery slots should keep a bounded history");
+assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
 assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
 assert.equal(PLAYER_NAME_MAX_LENGTH, 24, "player names should keep a bounded display length");
@@ -61,8 +82,75 @@ assert.deepEqual(
   { saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false },
   "matching save schemas should be restored",
 );
+assert.deepEqual(
+  migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] }),
+  {
+    saveSchemaVersion: 2,
+    currentCase: "case01",
+    nodeId: "start",
+    completedCases: [],
+    log: [],
+    discoveredClues: [],
+    pendingTelemetry: [],
+    caseResults: {},
+    playtestFeedback: {},
+    protocolUsed: false,
+    timerPenaltyApplied: false,
+    probeUsed: false,
+  },
+  "v1 saves should migrate into the current schema",
+);
+assert.equal(
+  parseCurrentSavedState(JSON.stringify({ saveSchemaVersion: 9 }), SAVE_SCHEMA_VERSION),
+  null,
+  "future save schemas should not be restored",
+);
 assert.equal(parseSavedState('{"saveSchemaVersion":1}', SAVE_SCHEMA_VERSION), null, "old save schemas should be ignored");
 assert.equal(parseSavedState("not-json", SAVE_SCHEMA_VERSION), null, "corrupt saves should be ignored");
+assert.equal(
+  parseRecoverySlots(JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: [] }))?.slots.length,
+  0,
+  "matching recovery slot schemas should be restored",
+);
+assert.equal(parseRecoverySlots(JSON.stringify({ saveSchemaVersion: 1, slots: [] })), null, "save schemas should not parse as recovery slots");
+assert.equal(
+  parseRecoverySlots(JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: {} })),
+  null,
+  "recovery slot saves should require a slot array",
+);
+assert.deepEqual(
+  parseRecoverySlots(
+    JSON.stringify({
+      recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION,
+      slots: [
+        {
+          id: "valid-slot",
+          savedAt: "now",
+          currentCase: "case05",
+          nodeId: "c5_voice",
+          completedCases: ["case01"],
+          snapshot: {
+            saveSchemaVersion: SAVE_SCHEMA_VERSION,
+            currentCase: "case05",
+            nodeId: "c5_voice",
+            completedCases: ["case01"],
+            discoveredClues: [],
+            log: [],
+            pendingTelemetry: [],
+            caseResults: {},
+            playtestFeedback: {},
+            resources: {},
+            triggers: {},
+            cognition: {},
+          },
+        },
+        { id: "", savedAt: "now", currentCase: "case05", nodeId: "c5_voice", snapshot: null },
+      ],
+    }),
+  )?.slots.map((slot) => slot.id),
+  ["valid-slot"],
+  "recovery slot parsing should filter malformed slots",
+);
 assert.equal(
   isSavedStateShapeValid({
     currentCase: "case01",
@@ -98,6 +186,23 @@ assert.equal(
   "valid pending telemetry items should be restorable",
 );
 assert.equal(
+  isSavedStateShapeValid({
+    currentCase: "case05",
+    nodeId: "c5_voice",
+    completedCases: [],
+    discoveredClues: [],
+    log: [],
+    pendingTelemetry: [{ id: "error-1", type: "error", label: "에러 로그", payload: { current_case: "case05" } }],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: {},
+    triggers: {},
+    cognition: {},
+  }),
+  true,
+  "error telemetry items should be restorable in the retry queue",
+);
+assert.equal(
   isSavedStateShapeValid({ currentCase: "case01", nodeId: "start", completedCases: {} }),
   false,
   "invalid save shapes should be ignored",
@@ -119,9 +224,97 @@ assert.equal(
   false,
   "corrupt pending telemetry items should be ignored",
 );
+assert.equal(
+  isSavedStateShapeValid({
+    currentCase: "case01",
+    nodeId: "start",
+    completedCases: [],
+    discoveredClues: [],
+    log: [],
+    pendingTelemetry: [{ id: "unknown-1", type: "unknown", label: "잘못된 큐", payload: {} }],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: {},
+    triggers: {},
+    cognition: {},
+  }),
+  false,
+  "unknown pending telemetry item types should be ignored",
+);
 assert.equal(readStoredValue("missing-key", "fallback"), "fallback", "storage reads should degrade gracefully");
 assert.equal(writeStoredValue("test-key", "value"), false, "storage writes should report unavailable browser storage");
-removeStoredValue("test-key");
+assert.equal(removeStoredValue("test-key"), false, "storage removals should report unavailable browser storage");
+assert.equal(serializeError(new Error("boom")).message, "boom", "errors should serialize for recovery logs");
+assert.equal(serializeError("plain failure").message, "plain failure", "string errors should serialize for recovery logs");
+const safeErrorContext = createSafeErrorContext(
+  {
+    currentCase: "case05",
+    nodeId: "c5_voice",
+    started: true,
+    completedCases: ["case01"],
+    freeText: "민감한 자유입력",
+    log: [{ nodeId: "c5_voice", choiceId: "choice-1", freeText: "민감한 로그 전문", spokenChoice: "전체 문장" }],
+  },
+  "react-render",
+);
+assert.deepEqual(
+  safeErrorContext,
+  {
+    source: "react-render",
+    currentCase: "case05",
+    nodeId: "c5_voice",
+    started: true,
+    completedCases: ["case01"],
+    logLength: 1,
+    lastChoiceId: "choice-1",
+    lastNodeId: "c5_voice",
+  },
+  "error contexts should keep reproduction metadata without free text or full choice text",
+);
+assert.equal("freeText" in safeErrorContext, false, "error contexts must not include free text");
+assert.equal(
+  appendStoredErrorLog({ id: "error-test", occurredAt: "now", error: { message: "boom" }, context: {} }),
+  false,
+  "error log writes should degrade gracefully without browser storage",
+);
+assert.equal(
+  appendSaveSlot({ currentCase: "case05", nodeId: "c5_voice", savedAt: "now", completedCases: [] }),
+  false,
+  "save slot writes should degrade gracefully without browser storage",
+);
+const recoverySnapshot = createRecoverySnapshot({
+  saveSchemaVersion: SAVE_SCHEMA_VERSION,
+  playerName: "Analyst",
+  currentCase: "case05",
+  nodeId: "c5_voice",
+  completedCases: ["case01"],
+  discoveredClues: [],
+  pendingTelemetry: [{ id: "pending", type: "case", label: "pending", payload: {} }],
+  caseResults: {},
+  playtestFeedback: { case05: { clarity: "5", difficulty: "3", comment: "private feedback", savedAt: "now" } },
+  resources: {},
+  triggers: {},
+  cognition: {},
+  freeText: "private free text",
+  log: Array.from({ length: 24 }, (_, index) => ({
+    nodeId: `node-${index}`,
+    choiceId: `choice-${index}`,
+    freeText: "private log text",
+    spokenChoice: "private spoken text",
+    sceneBeat: "private scene beat",
+  })),
+});
+assert.equal("freeText" in recoverySnapshot, false, "recovery snapshots should not duplicate free text");
+assert.equal("freeText" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep free text");
+assert.equal("spokenChoice" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep spoken text");
+assert.equal("sceneBeat" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep scene beats");
+assert.equal(recoverySnapshot.pendingTelemetry.length, 0, "recovery snapshots should not duplicate telemetry queues");
+assert.deepEqual(recoverySnapshot.playtestFeedback, {}, "recovery snapshots should not duplicate playtest feedback");
+assert.equal(recoverySnapshot.log.length, 20, "recovery snapshots should keep only a bounded log tail");
+const restoredRecoverySnapshot = restoreRecoverySnapshot(recoverySnapshot);
+assert.equal(restoredRecoverySnapshot.saveSchemaVersion, SAVE_SCHEMA_VERSION, "recovery snapshots should restore to current save schema");
+assert.equal(restoredRecoverySnapshot.freeText, "", "recovered saves should use empty free text");
+assert.equal("recoverySlotSchemaVersion" in restoredRecoverySnapshot, false, "recovered saves should not keep recovery slot schema metadata");
 assert.equal(await copyText("test"), false, "clipboard fallback should fail safely without a browser");
 assert.equal(easyResourceLabels.capital, "현금", "player language should use an intuitive resource label");
 assert.equal(
@@ -162,6 +355,104 @@ assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings sho
 assert.equal(getOutcomeCarryover({ caseId: "case01", choiceId: "c1_after_people" }).trust, 6, "outcome effects should carry into the next case");
 assert.equal(getContinuityChallenge({ caseId: "case02", choiceId: "c1_after_people" }).id, "protect-trust", "outcome branches should create a custom next-case challenge");
 assert.equal(Object.values(caseOpeningRoutes.case02).length, 3, "all case 02 opening branches should be addressable");
+assert.equal(triggerLabels.system, "시스템", "case 05 roadmap labels should have a trigger translation");
+assert.equal(triggerLabels.helplessness, "무력감", "case 05 roadmap labels should cover helplessness");
+assert.equal(triggerLabels.selfAwareness, "자기 인식", "final roadmap labels should cover self awareness");
+
+const resultNodeIds = new Set(["result", "case02_result", "case03_result", "case04_result", "case05_result", "final_result"]);
+const nodeIdsInOrders = new Set(Object.values(nodeOrders).flat());
+Object.entries(nodes).forEach(([nodeId, node]) => {
+  assert.ok(nodeIdsInOrders.has(nodeId), `${nodeId} should be present in a case order`);
+  assert.ok(Array.isArray(node.choices) && node.choices.length > 0, `${nodeId} should expose playable choices`);
+  node.choices.forEach((choice) => {
+    assert.ok(choice.next, `${nodeId}/${choice.id} should have a next route`);
+    assert.ok(nodes[choice.next] || resultNodeIds.has(choice.next), `${nodeId}/${choice.id} should route to an existing node or result`);
+  });
+  (node.triggers ?? []).forEach((trigger) => {
+    assert.ok(triggerLabels[trigger], `${nodeId} trigger ${trigger} should have a display label`);
+  });
+});
+
+const caseResultNodeIds = {
+  case01: "result",
+  case02: "case02_result",
+  case03: "case03_result",
+  case04: "case04_result",
+  case05: "case05_result",
+  final: "final_result",
+};
+const baseStartNodeIds = {
+  case01: "start",
+  case02: "c2_start",
+  case03: "c3_start",
+  case04: "c4_start",
+  case05: "c5_start",
+  final: "f_start",
+};
+function simulateCaseRoute(caseId, startNodeId = baseStartNodeIds[caseId], choiceIndex = 0) {
+  const visited = [];
+  let cursor = startNodeId;
+  for (let step = 0; step < 80; step += 1) {
+    if (cursor === caseResultNodeIds[caseId]) return visited;
+    const node = nodes[cursor];
+    assert.ok(node, `${caseId} route reached missing node ${cursor}`);
+    const playableChoices = node.choices.filter((choice) => choice.type !== "free");
+    assert.ok(playableChoices.length > 0, `${cursor} should have fixed choices for automated route simulation`);
+    const choice = playableChoices[Math.min(choiceIndex, playableChoices.length - 1)];
+    visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
+    cursor = choice.next;
+  }
+  assert.fail(`${caseId} route did not reach ${caseResultNodeIds[caseId]}`);
+}
+for (const caseId of ["case01", "case02", "case03", "case04", "case05", "final"]) {
+  for (const choiceIndex of [0, 1, 2]) {
+    const route = simulateCaseRoute(caseId, baseStartNodeIds[caseId], choiceIndex);
+    assert.ok(route.length > 0, `${caseId} simulated route should contain decisions`);
+    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `${caseId} should end at its result screen`);
+  }
+}
+Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
+  Object.entries(routes).forEach(([outcomeId, startNodeId]) => {
+    assert.ok(nodes[startNodeId], `${caseId}/${outcomeId} branch opening should exist`);
+    const route = simulateCaseRoute(caseId, startNodeId, 1);
+    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `${caseId}/${outcomeId} should complete from branch opening`);
+  });
+});
+
+function createSeededRandom(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value * 1664525 + 1013904223) >>> 0;
+    return value / 0x100000000;
+  };
+}
+
+function simulateRandomCaseRoute(caseId, startNodeId, random) {
+  const visited = [];
+  let cursor = startNodeId;
+  for (let step = 0; step < 80; step += 1) {
+    if (cursor === caseResultNodeIds[caseId]) return visited;
+    const node = nodes[cursor];
+    assert.ok(node, `${caseId} random route reached missing node ${cursor}`);
+    const playableChoices = node.choices.filter((choice) => choice.type !== "free");
+    assert.ok(playableChoices.length > 0, `${cursor} should have fixed choices for random simulation`);
+    const choice = playableChoices[Math.floor(random() * playableChoices.length)];
+    visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
+    cursor = choice.next;
+  }
+  assert.fail(`${caseId} random route did not reach ${caseResultNodeIds[caseId]}`);
+}
+
+for (let seed = 1; seed <= 200; seed += 1) {
+  const random = createSeededRandom(seed);
+  let previousOutcomeChoiceId = null;
+  for (const caseId of ["case01", "case02", "case03", "case04", "case05", "final"]) {
+    const startNodeId = caseOpeningRoutes[caseId]?.[previousOutcomeChoiceId] ?? baseStartNodeIds[caseId];
+    const route = simulateRandomCaseRoute(caseId, startNodeId, random);
+    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `seed ${seed} ${caseId} should complete`);
+    previousOutcomeChoiceId = route.at(-1).choiceId;
+  }
+}
 
 const riskyResources = {
   time: 40,

@@ -1,7 +1,10 @@
 import { readStoredValue, writeStoredValue } from "./appConfig.js";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const localTelemetryConfigEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true";
+const localTelemetryUrl = localTelemetryConfigEnabled ? readStoredValue("critical-point-telemetry-url", "") : "";
+const localTelemetryKey = localTelemetryConfigEnabled ? readStoredValue("critical-point-telemetry-key", "") : "";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || localTelemetryUrl;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || localTelemetryKey;
 const TELEMETRY_TIMEOUT_MS = 10000;
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
@@ -78,6 +81,66 @@ export async function saveFeedbackTelemetry(payload) {
   }
 
   return { saved: true };
+}
+
+export async function saveErrorTelemetry(payload) {
+  if (!telemetryEnabled) return { skipped: true };
+
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/app_error_logs`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error log save failed: ${response.status}`);
+  }
+
+  return { saved: true };
+}
+
+async function checkTelemetryTable(tableName) {
+  if (!telemetryEnabled) return { table: tableName, ok: false, skipped: true };
+
+  const query = new URLSearchParams({
+    select: "*",
+    limit: "1",
+  });
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${tableName}?${query.toString()}`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  });
+
+  return {
+    table: tableName,
+    ok: response.ok,
+    status: response.status,
+  };
+}
+
+export async function checkTelemetryHealth() {
+  if (!telemetryEnabled) return { skipped: true, tables: [] };
+  const tables = await Promise.all(
+    ["playtest_sessions", "playtest_feedback", "app_error_logs"].map((tableName) =>
+      checkTelemetryTable(tableName).catch((error) => ({
+        table: tableName,
+        ok: false,
+        status: 0,
+        message: error instanceof Error ? error.message : "Healthcheck failed",
+      })),
+    ),
+  );
+  return {
+    ok: tables.every((table) => table.ok),
+    tables,
+  };
 }
 
 export async function fetchLeaderboard(limit = 100) {

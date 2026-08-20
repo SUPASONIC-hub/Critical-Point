@@ -612,6 +612,7 @@ summary:focus-visible {
   align-content: start;
   min-height: 172px;
   padding: 14px;
+  width: 100%;
   color: #dce5df;
   background: rgba(24, 32, 31, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -623,9 +624,13 @@ summary:focus-visible {
   cursor: pointer;
 }
 
-.case-card[role="button"]:focus-visible {
+.case-card:focus-visible {
   outline: 3px solid #ffffff;
   outline-offset: 4px;
+}
+
+.case-card:disabled {
+  cursor: not-allowed;
 }
 
 .case-card.active-case {
@@ -2040,6 +2045,10 @@ summary:focus-visible {
 }
 
 .save-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   width: fit-content;
   max-width: 100%;
   margin: -10px 0 16px;
@@ -2051,6 +2060,16 @@ summary:focus-visible {
   font-size: 12px;
   font-weight: 900;
   line-height: 1.35;
+}
+
+.save-status p {
+  margin: 0;
+}
+
+.save-status button {
+  min-height: 30px;
+  padding: 0 9px;
+  font-size: 12px;
 }
 
 .game-hud {
@@ -2575,7 +2594,7 @@ summary:focus-visible {
 .story-label {
   display: block;
   margin-bottom: 5px;
-  color: #2c4a46;
+  color: #d9ff62;
   font-size: 10px;
   font-style: normal;
   font-weight: 950;
@@ -2605,6 +2624,10 @@ summary:focus-visible {
   font-style: italic;
   font-weight: 800;
   line-height: 1.6;
+}
+
+.scene-thought .story-label {
+  color: #34304e;
 }
 
 .scene-body {
@@ -5704,7 +5727,13 @@ body {
 }
 
 .decision-rail .muted {
-  opacity: 0.65;
+  color: #3e4a45;
+  opacity: 1;
+}
+
+.decision-rail .muted b {
+  color: #ffffff;
+  background: #52605b;
 }
 
 .decision-rail i {
@@ -6289,5 +6318,263 @@ body {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
+  }
+}
+
+.recovery-notice,
+.error-log-panel,
+.debug-jump-panel {
+  width: min(1120px, calc(100% - 32px));
+  margin: 16px auto;
+  border: 1px solid rgba(255, 197, 90, 0.35);
+  background: rgba(22, 24, 30, 0.92);
+  color: #f7f1e3;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.recovery-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.recovery-notice span,
+.debug-jump-panel span,
+.error-log-panel span {
+  display: block;
+  color: #ffce73;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.recovery-notice strong,
+.debug-jump-panel strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.recovery-notice p,
+.error-log-panel p {
+  margin: 6px 0 0;
+  color: rgba(247, 241, 227, 0.78);
+}
+
+.recovery-actions,
+.error-log-actions,
+.debug-jump-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recovery-actions button,
+.error-log-actions button,
+.debug-jump-controls button,
+.debug-jump-controls select {
+  min-height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7f1e3;
+  border-radius: 6px;
+  padding: 0 12px;
+}
+
+.recovery-actions button:not(.ghost),
+.debug-jump-controls button {
+  background: #ffce73;
+  color: #151515;
+  border-color: #ffce73;
+  font-weight: 800;
+}
+
+.error-log-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.save-slot-panel {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.telemetry-health {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 12px 0 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+.telemetry-health strong {
+  color: #ffffff;
+}
+
+.telemetry-health span {
+  color: #d9ff62;
+  font-weight: 900;
+}
+
+.telemetry-health small {
+  flex-basis: 100%;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.error-log-list article {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.error-replay-button {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 0 10px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.error-log-details {
+  flex: 1 1 100%;
+  min-width: 220px;
+}
+
+.error-log-details summary {
+  cursor: pointer;
+  color: #ffce73;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.error-log-details dl {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.error-log-details dt {
+  color: rgba(247, 241, 227, 0.72);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.error-log-details dd {
+  max-height: 110px;
+  margin: 0;
+  overflow: auto;
+  color: rgba(247, 241, 227, 0.82);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.save-slot-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.save-slot-list article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.save-slot-list strong,
+.save-slot-list small {
+  display: block;
+}
+
+.save-slot-list small {
+  color: rgba(247, 241, 227, 0.68);
+}
+
+.save-slot-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.save-slot-actions button {
+  min-height: 32px;
+  padding: 0 10px;
+  color: #151515;
+  background: #ffce73;
+  border: 1px solid #ffce73;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.save-slot-actions button.ghost {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.error-log-list strong {
+  display: block;
+  margin-top: 3px;
+}
+
+.error-log-list small,
+.error-log-empty {
+  color: rgba(247, 241, 227, 0.68);
+}
+
+.debug-jump-panel {
+  border-color: rgba(123, 211, 255, 0.32);
+}
+
+.debug-jump-panel span {
+  color: #7bd3ff;
+}
+
+.debug-jump-controls {
+  margin-top: 12px;
+}
+
+.debug-jump-controls select {
+  min-width: min(100%, 220px);
+}
+
+@media (max-width: 720px) {
+  .recovery-notice,
+  .error-log-list article,
+  .save-slot-list article {
+    display: block;
+  }
+
+  .recovery-actions,
+  .error-log-actions,
+  .debug-jump-controls {
+    margin-top: 12px;
   }
 }

@@ -1,5 +1,7 @@
 node_modules/
 dist/
+test-results/
+debug.log
 .env
 .DS_Store
 Profile.jpg
