@@ -1609,6 +1609,7 @@ summary:focus-visible {
   padding: 24px;
   background: rgba(16, 28, 25, 0.72);
   backdrop-filter: blur(5px);
+  overflow: auto;
 }
 
 .cinematic-burst {
@@ -1759,6 +1760,8 @@ summary:focus-visible {
 
 .decision-reveal {
   width: min(680px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
   padding: 28px;
   color: #18201f;
   background: #fffdf8;
@@ -3034,6 +3037,24 @@ summary:focus-visible {
   border-radius: 7px;
   box-shadow: 0 12px 30px rgba(24, 32, 31, 0.16);
   animation: commit-in 180ms ease-out both;
+}
+
+@media (max-width: 720px) {
+  .commit-console {
+    position: sticky;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 12;
+    margin: 10px -4px 14px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 12px 32px rgba(24, 32, 31, 0.32);
+  }
+
+  .commit-console-actions {
+    position: sticky;
+    bottom: 0;
+    padding-top: 4px;
+    background: #18201f;
+  }
 }
 
 .commit-console.unstable,
@@ -5044,6 +5065,11 @@ textarea {
   padding: 4px 0 8px;
 }
 
+.route-atlas-track:focus-visible {
+  outline: 3px solid var(--accent-bright);
+  outline-offset: 4px;
+}
+
 .route-atlas-node {
   position: relative;
   min-width: 150px;
@@ -6363,6 +6389,26 @@ body {
   color: rgba(247, 241, 227, 0.78);
 }
 
+.recovery-guidance,
+.error-recovery-hint {
+  max-width: 68ch;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.error-retry-blocked {
+  margin: 14px 0 0;
+  color: #ffb09f;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.error-recovery-hint {
+  margin-top: 14px;
+  color: rgba(247, 241, 227, 0.72);
+}
+
 .recovery-actions,
 .error-log-actions,
 .debug-jump-controls {
@@ -6576,5 +6622,30 @@ body {
   .error-log-actions,
   .debug-jump-controls {
     margin-top: 12px;
+  }
+
+  .recovery-actions button,
+  .error-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .decision-reveal-backdrop {
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .decision-reveal {
+    width: 100%;
+    max-height: calc(100dvh - 16px);
+    padding: 18px;
+  }
+
+  .decision-reveal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding-top: 12px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: inherit;
   }
 }

@@ -2,6 +2,7 @@ export const STORAGE_KEY = "trigger-prototype-v2";
 export const ERROR_LOG_STORAGE_KEY = "trigger-prototype-error-log-v1";
 export const ERROR_LOG_MAX_ITEMS = 20;
 export const SAVE_SLOT_STORAGE_KEY = "trigger-prototype-save-slots-v1";
+export const RECOVERY_CENTER_STORAGE_KEY = "trigger-prototype-recovery-center-v1";
 export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 2;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
@@ -144,7 +145,7 @@ export function serializeError(error) {
 
 export function createSafeErrorContext(saved = {}, source = "runtime") {
   const logEntries = Array.isArray(saved.log) ? saved.log : [];
-  const lastEntry = logEntries.at(-1) ?? {};
+  const lastEntry = logEntries.at(-1);
   return {
     source,
     currentCase: typeof saved.currentCase === "string" ? saved.currentCase : "unknown",
@@ -152,17 +153,69 @@ export function createSafeErrorContext(saved = {}, source = "runtime") {
     started: Boolean(saved.started),
     completedCases: Array.isArray(saved.completedCases) ? saved.completedCases : [],
     logLength: logEntries.length,
-    lastChoiceId: typeof lastEntry.choiceId === "string" ? lastEntry.choiceId : "",
-    lastNodeId: typeof lastEntry.nodeId === "string" ? lastEntry.nodeId : "",
+    lastChoiceId: typeof lastEntry?.choiceId === "string" ? lastEntry.choiceId : "",
+    lastNodeId: typeof lastEntry?.nodeId === "string" ? lastEntry.nodeId : "",
   };
 }
 
+function normalizeErrorLogEntry(entry) {
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+  const context = entry.context && typeof entry.context === "object" && !Array.isArray(entry.context)
+    ? entry.context
+    : {};
+  const error = entry.error && typeof entry.error === "object" && !Array.isArray(entry.error)
+    ? entry.error
+    : {};
+  return {
+    id: normalizeSavedText(entry.id) || `error-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    occurredAt: normalizeSavedText(entry.occurredAt),
+    error: {
+      name: normalizeSavedText(error.name) || "Error",
+      message: normalizeSavedText(error.message) || "Unknown error",
+      stack: normalizeSavedText(error.stack, 12000),
+    },
+    componentStack: normalizeSavedText(entry.componentStack, 12000),
+    domSnapshot: normalizeSavedText(entry.domSnapshot, 12000),
+    viewport: {
+      width: Number.isFinite(entry.viewport?.width) ? entry.viewport.width : 0,
+      height: Number.isFinite(entry.viewport?.height) ? entry.viewport.height : 0,
+    },
+    context: {
+      source: normalizeSavedText(context.source) || "runtime",
+      currentCase: normalizeSavedText(context.currentCase) || "unknown",
+      nodeId: normalizeSavedText(context.nodeId) || "unknown",
+      started: Boolean(context.started),
+      completedCases: Array.isArray(context.completedCases) ? context.completedCases.filter((value) => typeof value === "string") : [],
+      logLength: Number.isFinite(context.logLength) ? context.logLength : 0,
+      lastChoiceId: normalizeSavedText(context.lastChoiceId),
+      lastNodeId: normalizeSavedText(context.lastNodeId),
+      failedStorageKeys: Array.isArray(context.failedStorageKeys)
+        ? context.failedStorageKeys.filter((value) => typeof value === "string")
+        : [],
+    },
+  };
+}
+
+export function parseErrorLog(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || parsed.saveSchemaVersion !== 1) return null;
+    const entries = Array.isArray(parsed.entries)
+      ? parsed.entries.map(normalizeErrorLogEntry).filter(Boolean).slice(0, ERROR_LOG_MAX_ITEMS)
+      : [];
+    return { saveSchemaVersion: 1, entries };
+  } catch {
+    return null;
+  }
+}
+
 export function appendStoredErrorLog(entry) {
-  const existing = parseSavedState(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"), 1);
+  const existing = parseErrorLog(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"));
+  const normalizedEntry = normalizeErrorLogEntry(entry);
   const entries = Array.isArray(existing?.entries) ? existing.entries : [];
   const nextLog = {
     saveSchemaVersion: 1,
-    entries: [entry, ...entries].slice(0, ERROR_LOG_MAX_ITEMS),
+    entries: [normalizedEntry, ...entries].filter(Boolean).slice(0, ERROR_LOG_MAX_ITEMS),
   };
   return writeStoredValue(ERROR_LOG_STORAGE_KEY, JSON.stringify(nextLog));
 }

@@ -2,17 +2,24 @@ import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 async function chooseFirstFixedChoice(page) {
+  await page.waitForFunction(
+    () => Boolean(document.querySelector(".result-page") || document.querySelector(".choices .choice")),
+    undefined,
+    { timeout: 15_000 },
+  );
+  if (await page.locator(".result-page").isVisible().catch(() => false)) return;
   const firstChoice = page.locator(".choices .choice").first();
-  await expect(firstChoice).toBeVisible();
   await firstChoice.evaluate((button) => button.click());
   const commitButton = page.getByRole("button", { name: /이 선택을 기록한다/ });
   if (await commitButton.isVisible().catch(() => false)) {
-    await commitButton.click();
+    await commitButton.evaluate((button) => button.click());
   }
-  const nextSceneButton = page.getByRole("button", { name: /다음 장면으로/ });
-  if (await nextSceneButton.isVisible().catch(() => false)) {
-    await nextSceneButton.evaluate((button) => button.click());
-  }
+  await page.waitForFunction(
+    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice") || document.querySelector(".result-page")),
+    undefined,
+    { timeout: 15_000 },
+  );
+  await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
 }
 
 async function completeCurrentCase(page) {
@@ -66,6 +73,41 @@ test("case 05 browser flow can unlock and open the final case", async ({ page })
   await expect(page.getByRole("heading", { name: /책임을 맡은 사람의 실험|고쳐진 구조의 실험|이름을 남긴 뒤|TRIGGER LAB/ })).toBeVisible();
 });
 
+test("case flow has no unhandled browser runtime errors", async ({ page }) => {
+  const runtimeErrors = [];
+  page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") runtimeErrors.push(`console: ${message.text()}`);
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await chooseFirstFixedChoice(page);
+  await expect(page.getByRole("heading", { name: /말할 수 있는 조건|선의의 실패|책임의 모양/ })).toBeVisible();
+  expect(runtimeErrors).toEqual([]);
+});
+
+test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/?debug=1");
+  await page.getByTestId("unlock-all-cases").click();
+  await startDebugNode(page, "case01", "start");
+
+  for (let caseIndex = 0; caseIndex < 6; caseIndex += 1) {
+    await completeCurrentCase(page);
+    if (caseIndex < 5) {
+      const nextCaseButton = page.locator(".next-case-panel button");
+      await expect(nextCaseButton).toBeVisible();
+      await nextCaseButton.evaluate((button) => button.click());
+      await expect(page.locator(".game-shell")).toBeVisible();
+    }
+  }
+
+  await expect(page.locator(".ending-reveal")).toBeVisible();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.currentCase).toBe("final");
+  expect(saved.completedCases).toContain("final");
+});
+
 test("debug jump opens case 05 scenes directly", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
@@ -73,6 +115,79 @@ test("debug jump opens case 05 scenes directly", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "이름 없는 증언" })).toBeVisible();
   await chooseFirstFixedChoice(page);
   await expect(page.getByRole("heading", { name: /말할 수 있는 조건|선의의 실패|책임의 모양/ })).toBeVisible();
+});
+
+test("mobile decision actions stay reachable without manual page scrolling", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.locator(".choices .choice").first().click();
+
+  const commitButton = page.getByTestId("commit-confirm");
+  await expect(commitButton).toBeVisible();
+  const commitBox = await commitButton.boundingBox();
+  const viewport = page.viewportSize();
+  expect(commitBox).not.toBeNull();
+  expect(commitBox.y + commitBox.height).toBeLessThanOrEqual(viewport.height + 2);
+
+  await commitButton.click();
+  const nextButton = page.getByTestId("decision-next");
+  await expect(nextButton).toBeVisible();
+  const nextBox = await nextButton.boundingBox();
+  expect(nextBox).not.toBeNull();
+  expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(viewport.height + 2);
+  const overflow = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+});
+
+test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 667, height: 375 });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.locator(".choices .choice").first().click();
+  const commitButton = page.getByTestId("commit-confirm");
+  await expect(commitButton).toBeVisible();
+  const commitBox = await commitButton.boundingBox();
+  expect(commitBox).not.toBeNull();
+  expect(commitBox.y + commitBox.height).toBeLessThanOrEqual(375 + 2);
+  await commitButton.evaluate((button) => button.click());
+  const nextButton = page.getByTestId("decision-next");
+  await expect(nextButton).toBeVisible();
+  const nextBox = await nextButton.boundingBox();
+  expect(nextBox).not.toBeNull();
+  expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(375 + 2);
+});
+
+test("leaving an active scene marks the saved run as paused", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide")));
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).paused))
+    .toBe(true);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.started).toBe(true);
+  expect(saved.currentCase).toBe("case05");
+  expect(saved.nodeId).toBe("c5_voice");
+});
+
+test("bfcache return resumes an active scene without losing its route", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide")));
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).paused))
+    .toBe(true);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })));
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).paused))
+    .toBe(false);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.started).toBe(true);
+  expect(saved.currentCase).toBe("case05");
+  expect(saved.nodeId).toBe("c5_voice");
 });
 
 test("recovery notice and local error log are visible from saved error metadata", async ({ page }) => {
@@ -131,6 +246,91 @@ test("recovery notice and local error log are visible from saved error metadata"
   await expect(page.getByText("복구됨")).toBeVisible();
   await page.getByTestId("open-error-log-from-notice").click();
   await expect(page.getByTestId("error-log-panel").getByText("Synthetic recovery check")).toBeVisible();
+});
+
+test("Escape closes the recovery error panel", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.getByTestId("open-error-log-from-header").click();
+  await expect(page.getByTestId("error-log-panel")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("error-log-panel")).toHaveCount(0);
+});
+
+test("recovery center is reachable for normal players after an error", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        playerName: "E2E",
+        started: false,
+        paused: true,
+        currentCase: "case05",
+        nodeId: "c5_voice",
+        completedCases: ["case01", "case02", "case03", "case04"],
+        discoveredClues: [],
+        log: [],
+        pendingTelemetry: [],
+        caseResults: {},
+        playtestFeedback: {},
+        resources: {},
+        triggers: {},
+        cognition: {},
+        lastError: {
+          id: "normal-recovery-center",
+          occurredAt: new Date().toISOString(),
+          source: "react-render",
+          message: "Recovery center access check",
+          currentCase: "case05",
+          nodeId: "c5_voice",
+        },
+      }),
+    );
+  });
+  await page.goto("/");
+  await page.getByTestId("open-error-log-from-notice").click();
+  await expect(page.getByTestId("error-log-panel")).toBeVisible();
+  await expect(page.getByTestId("save-slot-panel")).toBeVisible();
+});
+
+test("starting a fresh game clears stale recovery guidance", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        playerName: "E2E",
+        started: false,
+        paused: true,
+        currentCase: "case05",
+        nodeId: "c5_voice",
+        completedCases: ["case01", "case02", "case03", "case04"],
+        discoveredClues: [],
+        log: [],
+        pendingTelemetry: [],
+        caseResults: {},
+        playtestFeedback: {},
+        resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 },
+        triggers: {},
+        cognition: {},
+        lastError: {
+          id: "stale-recovery-guidance",
+          occurredAt: new Date().toISOString(),
+          source: "react-render",
+          message: "Stale error should disappear after a fresh start",
+          currentCase: "case05",
+          nodeId: "c5_voice",
+        },
+      }),
+    );
+  });
+  await page.goto("/");
+  await expect(page.getByText("복구됨")).toBeVisible();
+  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
+  await expect(page.locator(".recovery-notice")).toHaveCount(0);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.lastError).toBeNull();
+  expect(saved.currentCase).toBe("case01");
 });
 
 test("error log replay jumps to the captured scene", async ({ page }) => {
@@ -225,6 +425,163 @@ test("corrupt saved route is repaired before resume", async ({ page }) => {
   expect(repaired.lastError.source).toBe("save-integrity");
   await page.getByTestId("resume-save").click();
   await expect(page.getByRole("heading", { name: "NO ONE TO BLAME" })).toBeVisible();
+});
+
+test("corrupt saved nested gameplay data is repaired before render", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        playerName: "E2E",
+        started: true,
+        currentCase: "case05",
+        nodeId: "c5_voice",
+        completedCases: ["case01", "missing-case", null],
+        discoveredClues: [null, { id: "clue-e2e" }],
+        log: [
+          null,
+          { nodeId: null, choiceId: "broken" },
+          {
+            nodeId: "c5_voice",
+            title: "이름 없는 증언",
+            choiceId: "c5_voice_reaction_choice_1",
+            choice: "증언자를 보호하고 기록을 복원한다",
+            effect: { trust: "bad", legitimacy: 4 },
+            triggers: [null, "system"],
+            responseTimeSec: Number.NaN,
+          },
+        ],
+        pendingTelemetry: [],
+        caseResults: {
+          case01: { primary: null, rank: null },
+          missing: { primary: ["responsibility", 1] },
+        },
+        playtestFeedback: {
+          case01: { comment: 42 },
+          missing: { comment: "drop" },
+        },
+        resources: {},
+        triggers: {},
+        cognition: {},
+      }),
+    );
+  });
+  await page.reload();
+
+  await expect(page.locator(".game-shell")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "이름 없는 증언" })).toBeVisible();
+  const repaired = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(repaired.lastError.source).toBe("save-integrity");
+  expect(repaired.completedCases).toEqual(["case01"]);
+  expect(repaired.discoveredClues).toEqual([{ id: "clue-e2e", title: "clue-e2e", text: "" }]);
+  expect(repaired.log).toHaveLength(1);
+  expect(repaired.log[0].effect).toEqual({ legitimacy: 4 });
+  expect(repaired.log[0].triggers).toEqual(["system"]);
+  expect(repaired.caseResults.case01.primary).toEqual(["responsibility", 0]);
+  expect(repaired.caseResults.missing).toBeUndefined();
+  expect(repaired.playtestFeedback.case01.comment).toBe("");
+  expect(repaired.playtestFeedback.missing).toBeUndefined();
+});
+
+test("corrupt error log entries are filtered before the diagnostics panel renders", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        playerName: "E2E",
+        started: false,
+        currentCase: "case01",
+        nodeId: "start",
+        completedCases: [],
+        discoveredClues: [],
+        log: [],
+        pendingTelemetry: [],
+        caseResults: {},
+        playtestFeedback: {},
+        resources: {},
+        triggers: {},
+        cognition: {},
+      }),
+    );
+    localStorage.setItem(
+      "trigger-prototype-error-log-v1",
+      JSON.stringify({
+        saveSchemaVersion: 1,
+        entries: [
+          null,
+          { id: "broken-null-context", context: null, error: null },
+          {
+            id: "valid-error",
+            occurredAt: "2026-08-21T10:00:00.000Z",
+            error: { name: "TypeError", message: "Recovered diagnostic entry", stack: 42 },
+            context: { source: "runtime", currentCase: "case01", nodeId: "start", logLength: 0 },
+          },
+        ],
+      }),
+    );
+  });
+  await page.reload();
+  await page.getByTestId("open-error-log-from-header").click();
+
+  await expect(page.getByTestId("error-log-panel").getByText("Recovered diagnostic entry")).toBeVisible();
+  const entries = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-error-log-v1")).entries);
+  expect(entries).toHaveLength(2);
+  expect(entries[0].context.currentCase).toBe("unknown");
+  expect(entries[0].error.message).toBe("Unknown error");
+  expect(entries[1].error.stack).toBe("");
+});
+
+test("restoring a corrupt recovery slot repairs nested data before resume", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.evaluate(() => {
+    const snapshot = {
+      saveSchemaVersion: 2,
+      playerName: "E2E",
+      started: false,
+      paused: true,
+      currentCase: "case05",
+      nodeId: "c5_voice",
+      completedCases: ["case01", "bad-case"],
+      discoveredClues: [null],
+      log: [null],
+      pendingTelemetry: [{ id: "bad", type: "unknown", payload: {} }],
+      caseResults: { case05: { primary: null } },
+      playtestFeedback: { case05: { comment: 42 } },
+      resources: {},
+      triggers: {},
+      cognition: {},
+    };
+    localStorage.setItem(
+      "trigger-prototype-save-slots-v1",
+      JSON.stringify({
+        recoverySlotSchemaVersion: 1,
+        slots: [{
+          id: "slot-corrupt",
+          savedAt: "2026-08-21T10:00:00.000Z",
+          currentCase: "case05",
+          nodeId: "c5_voice",
+          completedCases: ["case01"],
+          snapshot,
+        }],
+      }),
+    );
+  });
+  await page.reload();
+  await page.getByTestId("open-error-log-from-header").click();
+  await page.getByTestId("restore-save-slot-slot-corrupt").click();
+  await page.waitForLoadState("domcontentloaded");
+
+  const restored = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(restored.currentCase).toBe("case05");
+  expect(restored.nodeId).toBe("c5_voice");
+  expect(restored.completedCases).toEqual(["case01"]);
+  expect(restored.pendingTelemetry).toEqual([]);
+  expect(restored.caseResults.case05.primary).toEqual(["responsibility", 0]);
+  expect(restored.playtestFeedback).toEqual({});
 });
 
 test("storage write failure does not block scene start", async ({ page }) => {
@@ -542,6 +899,44 @@ test("reset failure records failed storage keys", async ({ page }) => {
   const errorLog = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-error-log-v1")));
   expect(errorLog.entries[0].context.failedStorageKeys).toContain("trigger-prototype-save-slots-v1");
   expect(["StorageResetError", "StorageResetRetryError"]).toContain(errorLog.entries[0].error.name);
+});
+
+test("repeated render errors block the retry loop and preserve recovery choices", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        playerName: "E2E",
+        started: true,
+        currentCase: "case05",
+        nodeId: "c5_voice",
+        completedCases: ["case01", "case02", "case03", "case04"],
+        discoveredClues: [],
+        log: [],
+        pendingTelemetry: [],
+        caseResults: {},
+        playtestFeedback: {},
+        resources: {},
+        triggers: {},
+        cognition: {},
+        lastError: {
+          id: "repeat-render-error",
+          occurredAt: new Date().toISOString(),
+          source: "react-render",
+          message: "Repeated render failure",
+          currentCase: "case05",
+          nodeId: "c5_voice",
+          retryCount: 2,
+        },
+      }),
+    );
+    localStorage.setItem("critical-point-force-render-error", "1");
+  });
+  await page.goto("/?debug=1");
+  await expect(page.getByTestId("error-retry")).toBeDisabled();
+  await expect(page.getByText("같은 저장 지점에서 오류가 반복되어 재시도를 중단했습니다.")).toBeVisible();
+  await expect(page.getByTestId("error-start-fresh")).toBeVisible();
 });
 
 test("error boundary can clear the current saved state", async ({ page }) => {
