@@ -404,6 +404,20 @@ function simulateCaseRoute(caseId, startNodeId = baseStartNodeIds[caseId], choic
   }
   assert.fail(`${caseId} route did not reach ${caseResultNodeIds[caseId]}`);
 }
+
+function simulateCaseRouteAfterFirstChoice(caseId, startNodeId, firstChoiceIndex) {
+  const firstNode = nodes[startNodeId];
+  assert.ok(firstNode, `${caseId} first-choice simulation reached missing node ${startNodeId}`);
+  const firstChoice = firstNode.choices[firstChoiceIndex];
+  assert.ok(firstChoice, `${caseId}/${startNodeId} should expose choice ${firstChoiceIndex}`);
+  const visited = [{ nodeId: startNodeId, choiceId: firstChoice.id, next: firstChoice.next }];
+  if (firstChoice.next === caseResultNodeIds[caseId]) return visited;
+  return [
+    ...visited,
+    ...simulateCaseRoute(caseId, firstChoice.next, 0),
+  ];
+}
+
 for (const caseId of ["case01", "case02", "case03", "case04", "case05", "final"]) {
   for (const choiceIndex of [0, 1, 2]) {
     const route = simulateCaseRoute(caseId, baseStartNodeIds[caseId], choiceIndex);
@@ -416,6 +430,19 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
     assert.ok(nodes[startNodeId], `${caseId}/${outcomeId} branch opening should exist`);
     const route = simulateCaseRoute(caseId, startNodeId, 1);
     assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `${caseId}/${outcomeId} should complete from branch opening`);
+  });
+});
+
+Object.entries(nodeOrders).forEach(([caseId, order]) => {
+  [...new Set(order)].forEach((nodeId) => {
+    nodes[nodeId].choices.forEach((choice, choiceIndex) => {
+      const route = simulateCaseRouteAfterFirstChoice(caseId, nodeId, choiceIndex);
+      assert.equal(
+        route.at(-1).next,
+        caseResultNodeIds[caseId],
+        `${caseId}/${nodeId}/${choice.id} should still complete after taking this branch`,
+      );
+    });
   });
 });
 
@@ -620,19 +647,25 @@ assert.equal(
 const gameplayStats = getGameplayStats(
   [
     {
+      responseTimeSec: 14,
       freeText: "",
+      cognition: { inference: 2, risk: 1 },
       challenge: { matched: true },
       resourcesBefore: riskyResources,
       resourcesAfter: recoveredResources,
     },
     {
+      responseTimeSec: 21,
       freeText: "이해관계자를 다시 묶어 조건부 협상안을 제안한다.",
+      cognition: { reframing: 3, persistence: 1 },
       challenge: { matched: true },
       resourcesBefore: recoveredResources,
       resourcesAfter: { ...recoveredResources, fatigue: 24 },
     },
     {
+      responseTimeSec: 9,
       freeText: "",
+      cognition: { ethics: 2 },
       challenge: { matched: false },
       resourcesBefore: initialResources,
       resourcesAfter: initialResources,
@@ -646,7 +679,7 @@ assert.equal(gameplayStats.reducedRiskCount, 1, "risk reductions should be track
 assert.equal(gameplayStats.challengeClearCount, 2, "cleared scene challenges should be tracked");
 assert.equal(gameplayStats.currentChallengeStreak, 0, "failed latest challenge should reset streak");
 assert.equal(gameplayStats.momentumTier, "FLOW", "sample gameplay should reach FLOW momentum");
-assert.equal(gameplayStats.rank, "A", "sample gameplay should map to A rank");
+assert.equal(gameplayStats.rank, "B", "sample gameplay should map to B rank under the burst algorithm");
 
 const caseSummary = createCaseSummary(
   { responsibility: 3, protection: 1 },
@@ -690,7 +723,13 @@ assert.deepEqual(
     reducedRiskCount: 0,
     challengeClearCount: 0,
     currentChallengeStreak: 0,
+    rhythmScore: 0,
+    cognitionScore: 0,
+    pressureAdaptScore: 0,
+    reflectionScore: 0,
+    exploitPenalty: 0,
     momentumScore: 0,
+    burstScore: 0,
     momentumTier: "BUILDING",
     rank: "C",
   },

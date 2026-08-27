@@ -9,6 +9,7 @@ const phraseReplacements = [
   [/\bPLAYING\b/gi, "진행 중"],
   [/\bRISK\b/gi, "위험"],
   [/\bMOMENTUM\b/gi, "흐름"],
+  [/\bBURST\b/gi, "버스트"],
   [/\bPOINTS\b/gi, "점수"],
   [/\bRANK\b/gi, "등급"],
   [/\bACTIVE BONUS\b/gi, "지금 받는 보너스"],

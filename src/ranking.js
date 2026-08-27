@@ -19,7 +19,7 @@ function parseSummary(summary) {
 function normalizeEntry(row = {}) {
   const summary = parseSummary(row.summary);
   const rank = normalizeRank(summary.rank);
-  const parsedScore = Number(summary.momentumScore);
+  const parsedScore = Number(summary.burstScore ?? summary.momentumScore);
   return {
     id: `${row.session_code ?? "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     sessionCode: row.session_code ?? "LOCAL",
@@ -32,6 +32,9 @@ function normalizeEntry(row = {}) {
     trigger: summary.primary?.[0] ?? "responsibility",
     averageResponseTime: Number(summary.averageResponseTime) || 0,
     freeCount: Number(summary.freeCount) || 0,
+    reflectionScore: Number(summary.reflectionScore) || 0,
+    pressureAdaptScore: Number(summary.pressureAdaptScore) || 0,
+    cognitionScore: Number(summary.cognitionScore) || 0,
     summary,
   };
 }
@@ -50,7 +53,15 @@ export function buildLeaderboard(rows = [], limit = 50) {
   });
 
   return [...bestBySession.values()]
-    .sort((a, b) => b.score - a.score || rankWeight[b.rank] - rankWeight[a.rank] || a.averageResponseTime - b.averageResponseTime)
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        rankWeight[b.rank] - rankWeight[a.rank] ||
+        b.reflectionScore - a.reflectionScore ||
+        b.pressureAdaptScore - a.pressureAdaptScore ||
+        b.cognitionScore - a.cognitionScore ||
+        a.averageResponseTime - b.averageResponseTime,
+    )
     .slice(0, limit)
     .map((entry, index) => ({ ...entry, position: index + 1 }));
 }

@@ -191,6 +191,25 @@ export function createDecisionForecast(choice = {}, resources = {}) {
 }
 
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
+  if (entries.length === 0) {
+    return {
+      freeCount: 0,
+      reducedRiskCount: 0,
+      challengeClearCount: 0,
+      currentChallengeStreak: 0,
+      rhythmScore: 0,
+      cognitionScore: 0,
+      pressureAdaptScore: 0,
+      reflectionScore: 0,
+      exploitPenalty: 0,
+      momentumScore: 0,
+      burstScore: 0,
+      momentumTier: "BUILDING",
+      rank: "C",
+    };
+  }
+  const playableEntries = entries.filter((entry) => !entry.isSystemEvent);
+  const scoredEntries = playableEntries.length > 0 ? playableEntries : entries;
   const freeCount = entries.filter((entry) => entry.freeText).length;
   const reducedRiskCount = entries.filter(
     (entry) =>
@@ -205,13 +224,74 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const finalRiskPressure = entries.at(-1)?.resourcesAfter
     ? getRiskPressure(entries.at(-1).resourcesAfter)
     : fallbackRiskPressure;
+  const responseTimes = scoredEntries
+    .map((entry) => Number(entry.responseTimeSec))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const rhythmSamples = responseTimes.length > 0 ? responseTimes : [0];
+  const rhythmScore = Math.round(
+    rhythmSamples.reduce((sum, seconds) => {
+      if (seconds >= 8 && seconds <= 28) return sum + 100;
+      if (seconds >= 4 && seconds < 8) return sum + 70;
+      if (seconds > 28 && seconds <= 45) return sum + 78 - (seconds - 28) * 1.8;
+      if (seconds > 45) return sum + 38;
+      return sum + 24;
+    }, 0) / rhythmSamples.length,
+  );
+  const cognitionKeys = new Set();
+  scoredEntries.forEach((entry) => {
+    Object.entries(entry.cognition ?? {}).forEach(([key, value]) => {
+      if (value > 0) cognitionKeys.add(key);
+    });
+  });
+  const cognitionTypes = scoredEntries
+    .map((entry) => Object.entries(entry.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0])
+    .filter(Boolean);
+  const cognitionShifts = cognitionTypes.reduce(
+    (count, key, index) => count + (index > 0 && cognitionTypes[index - 1] !== key ? 1 : 0),
+    0,
+  );
+  const cognitionScore = Math.round(
+    clamp(cognitionKeys.size * 14 + cognitionShifts * 10 + Math.min(scoredEntries.length, 5) * 4, 0, 100),
+  );
+  const riskDeltas = entries.map((entry) => {
+    if (entry.resourcesBefore && entry.resourcesAfter) {
+      return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
+    }
+    return entry.challenge?.riskDelta ?? 0;
+  });
+  const riskSwing = riskDeltas.reduce((sum, value) => sum + Math.min(14, Math.abs(value)), 0);
+  const recoveryAfterSpike = riskDeltas.some((value, index) => value > 0 && riskDeltas.slice(index + 1).some((next) => next < 0));
+  const pressureAdaptScore = Math.round(
+    clamp(
+      riskSwing * 3 +
+        reducedRiskCount * 10 +
+        (recoveryAfterSpike ? 18 : 0) -
+        Math.max(0, finalRiskPressure - 62) * 1.2,
+      0,
+      100,
+    ),
+  );
+  const freeTextSignalScore = entries.reduce((sum, entry) => {
+    if (!entry.freeText) return sum;
+    const activeSignals = getFreeTextSignals(entry.freeText).filter((signal) => signal.active).length;
+    return sum + Math.min(24, activeSignals * 6 + Math.min(6, Math.floor(entry.freeText.trim().length / 35)));
+  }, 0);
+  const reflectionScore = Math.round(
+    clamp(freeTextSignalScore + freeCount * 8 + challengeClearCount * 4, 0, 100),
+  );
+  const exploitPenalty = Math.min(
+    18,
+    entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.freeText).length * 5,
+  );
+  const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
   const momentumScore = Math.round(
     clamp(
-      challengeClearCount * 16 +
-        reducedRiskCount * 14 +
-        freeCount * 12 +
-        Math.min(entries.length, 5) * 6 -
-        Math.max(0, finalRiskPressure - 35) * 0.4,
+      rhythmScore * 0.24 +
+        cognitionScore * 0.24 +
+        pressureAdaptScore * 0.24 +
+        reflectionScore * 0.2 +
+        challengeSupportScore * 0.08 -
+        exploitPenalty,
       0,
       100,
     ),
@@ -222,9 +302,15 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     reducedRiskCount,
     challengeClearCount,
     currentChallengeStreak,
+    rhythmScore,
+    cognitionScore,
+    pressureAdaptScore,
+    reflectionScore,
+    exploitPenalty,
     momentumScore,
-    momentumTier: momentumScore >= 70 ? "FLOW" : momentumScore >= 40 ? "READY" : "BUILDING",
-    rank: momentumScore >= 85 ? "S" : momentumScore >= 70 ? "A" : momentumScore >= 50 ? "B" : "C",
+    burstScore: momentumScore,
+    momentumTier: momentumScore >= 78 ? "BURST" : momentumScore >= 58 ? "FLOW" : momentumScore >= 36 ? "READY" : "BUILDING",
+    rank: momentumScore >= 88 ? "S" : momentumScore >= 72 ? "A" : momentumScore >= 52 ? "B" : "C",
   };
 }
 
@@ -510,6 +596,12 @@ export function createCaseSummary(
         : 0,
     challengeClearCount: stats.challengeClearCount,
     reducedRiskCount: stats.reducedRiskCount,
+    rhythmScore: stats.rhythmScore,
+    cognitionScore: stats.cognitionScore,
+    pressureAdaptScore: stats.pressureAdaptScore,
+    reflectionScore: stats.reflectionScore,
+    exploitPenalty: stats.exploitPenalty,
+    burstScore: stats.burstScore,
     momentumScore: stats.momentumScore,
     momentumTier: stats.momentumTier,
     rank: stats.rank,

@@ -188,43 +188,58 @@ const legacyProfiles = {
 const musicModes = {
   intro: {
     label: "대기",
-    interval: 920,
-    volume: 0.14,
+    interval: 860,
+    volume: 0.12,
     wave: "sine",
     bass: [55, 55, 65.4, 49],
     notes: [220, null, 277.18, null, 196, 246.94, null, 164.81],
+    chords: [[110, 164.81, 220], null, [98, 146.83, 196], null],
+    hitEvery: 0,
+    noiseEvery: 12,
   },
   controlled: {
     label: "안정",
-    interval: 760,
-    volume: 0.15,
+    interval: 720,
+    volume: 0.14,
     wave: "triangle",
     bass: [65.4, 73.42, 82.41, 73.42],
     notes: [261.63, null, 329.63, 392, null, 293.66, 349.23, null],
+    chords: [[130.81, 196, 261.63], null, [146.83, 220, 293.66], null],
+    hitEvery: 8,
+    noiseEvery: 16,
   },
   unstable: {
     label: "불안정",
-    interval: 560,
+    interval: 520,
     volume: 0.16,
     wave: "triangle",
     bass: [73.42, 69.3, 82.41, 65.4],
     notes: [293.66, 311.13, null, 392, 349.23, null, 329.63, 277.18],
+    chords: [[146.83, 220, 311.13], null, [138.59, 207.65, 277.18], null],
+    hitEvery: 6,
+    noiseEvery: 10,
   },
   critical: {
     label: "위기",
-    interval: 390,
-    volume: 0.18,
+    interval: 360,
+    volume: 0.19,
     wave: "sawtooth",
     bass: [49, 51.91, 55, 46.25],
     notes: [196, 207.65, null, 233.08, 246.94, null, 220, 207.65],
+    chords: [[98, 146.83, 207.65], [92.5, 138.59, 196], null, [103.83, 155.56, 220]],
+    hitEvery: 4,
+    noiseEvery: 6,
   },
   result: {
     label: "결과",
-    interval: 980,
-    volume: 0.15,
+    interval: 940,
+    volume: 0.13,
     wave: "sine",
     bass: [65.4, 82.41, 98, 73.42],
     notes: [261.63, null, 392, 329.63, null, 440, 392, null],
+    chords: [[130.81, 196, 261.63], [164.81, 246.94, 329.63], null, [146.83, 220, 293.66]],
+    hitEvery: 0,
+    noiseEvery: 18,
   },
 };
 
@@ -242,6 +257,36 @@ function playTone(context, destination, frequency, duration, gainValue, type = "
   gain.connect(destination);
   oscillator.start(now);
   oscillator.stop(now + duration + 0.04);
+}
+
+function playChord(context, destination, frequencies = [], duration = 1, gainValue = 0.06, type = "sine") {
+  frequencies.filter(Boolean).forEach((frequency, index) => {
+    playTone(context, destination, frequency, duration + index * 0.04, gainValue / Math.max(1, frequencies.length), type);
+  });
+}
+
+function playNoiseHit(context, destination, duration = 0.18, gainValue = 0.08, filterFrequency = 900) {
+  const sampleCount = Math.max(1, Math.floor(context.sampleRate * duration));
+  const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let index = 0; index < sampleCount; index += 1) {
+    data[index] = (Math.random() * 2 - 1) * (1 - index / sampleCount);
+  }
+  const source = context.createBufferSource();
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+  const now = context.currentTime;
+  filter.type = "bandpass";
+  filter.frequency.setValueAtTime(filterFrequency, now);
+  filter.Q.setValueAtTime(4, now);
+  gain.gain.setValueAtTime(gainValue, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  source.buffer = buffer;
+  source.connect(filter);
+  filter.connect(gain);
+  gain.connect(destination);
+  source.start(now);
+  source.stop(now + duration + 0.02);
 }
 
 function AdaptiveMusic({ modeKey }) {
@@ -292,9 +337,17 @@ function AdaptiveMusic({ modeKey }) {
       const step = stepRef.current;
       const note = currentMode.notes[step % currentMode.notes.length];
       const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
+      const chord = currentMode.chords[Math.floor(step / 4) % currentMode.chords.length];
       playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.3, currentMode.wave);
       if (step % 4 === 0) {
         playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.2, "sine");
+        playChord(context, masterGainRef.current, chord ?? [], currentMode.interval / 420, 0.16, "triangle");
+      }
+      if (currentMode.hitEvery > 0 && step % currentMode.hitEvery === 0) {
+        playTone(context, masterGainRef.current, bass * 2, 0.08, 0.08, "square");
+      }
+      if (currentMode.noiseEvery > 0 && step % currentMode.noiseEvery === 0) {
+        playNoiseHit(context, masterGainRef.current, 0.12, currentMode.volume * 0.45, 700 + step % 5 * 180);
       }
       stepRef.current += 1;
     }
@@ -617,6 +670,7 @@ function normalizeSavedLogEntry(entry) {
     spokenChoice: typeof entry.spokenChoice === "string" ? entry.spokenChoice : "",
     freeText: normalizeSavedText(entry.freeText, FREE_TEXT_MAX_LENGTH),
     effect: normalizeSavedEffect(entry.effect),
+    cognition: normalizeSavedEffect(entry.cognition),
     triggers: Array.isArray(entry.triggers) ? entry.triggers.filter((trigger) => typeof trigger === "string") : [],
     responseTimeSec: Number.isFinite(entry.responseTimeSec) ? entry.responseTimeSec : 0,
     resourcesBefore: normalizeSavedPlainObject(entry.resourcesBefore),
@@ -649,6 +703,12 @@ function normalizeSavedCaseSummaryShape(summary) {
     averageResponseTime: Number.isFinite(summary.averageResponseTime) ? summary.averageResponseTime : 0,
     challengeClearCount: Number.isFinite(summary.challengeClearCount) ? summary.challengeClearCount : 0,
     reducedRiskCount: Number.isFinite(summary.reducedRiskCount) ? summary.reducedRiskCount : 0,
+    rhythmScore: Number.isFinite(summary.rhythmScore) ? summary.rhythmScore : 0,
+    cognitionScore: Number.isFinite(summary.cognitionScore) ? summary.cognitionScore : 0,
+    pressureAdaptScore: Number.isFinite(summary.pressureAdaptScore) ? summary.pressureAdaptScore : 0,
+    reflectionScore: Number.isFinite(summary.reflectionScore) ? summary.reflectionScore : 0,
+    exploitPenalty: Number.isFinite(summary.exploitPenalty) ? summary.exploitPenalty : 0,
+    burstScore: Number.isFinite(summary.burstScore) ? summary.burstScore : Number.isFinite(summary.momentumScore) ? summary.momentumScore : 0,
     momentumScore: Number.isFinite(summary.momentumScore) ? summary.momentumScore : 0,
     momentumTier: typeof summary.momentumTier === "string" ? summary.momentumTier : "BUILDING",
     rank: typeof summary.rank === "string" ? summary.rank : "C",
@@ -1125,6 +1185,11 @@ function App() {
     reducedRiskCount,
     challengeClearCount,
     currentChallengeStreak,
+    rhythmScore,
+    cognitionScore,
+    pressureAdaptScore,
+    reflectionScore,
+    exploitPenalty,
     momentumScore,
     momentumTier,
     rank: gameplayRank,
@@ -1365,15 +1430,14 @@ function App() {
         forecast,
         tacticalRead: read.tacticalRead,
       };
-    })
-    .sort((a, b) => {
-      if (a.forecast.riskDelta !== b.forecast.riskDelta) {
-        return a.forecast.riskDelta - b.forecast.riskDelta;
-      }
-      return b.forecast.cognitionGain - a.forecast.cognitionGain;
     });
-  const safestForecast = decisionForecasts[0];
-  const costliestForecast = [...decisionForecasts].sort((a, b) => {
+  const pressureLensForecast = [...decisionForecasts].sort((a, b) => {
+    if (a.forecast.riskDelta !== b.forecast.riskDelta) {
+      return a.forecast.riskDelta - b.forecast.riskDelta;
+    }
+    return b.forecast.cognitionGain - a.forecast.cognitionGain;
+  })[0];
+  const tradeoffLensForecast = [...decisionForecasts].sort((a, b) => {
     const aCost = Math.abs(a.forecast.biggestCost?.[1] ?? 0);
     const bCost = Math.abs(b.forecast.biggestCost?.[1] ?? 0);
     return bCost - aCost;
@@ -1416,7 +1480,7 @@ function App() {
   const turnBriefItems = [
     { label: "챌린지", value: sceneChallenge.title },
     { label: "압력", value: `${riskTier} ${riskPressure}` },
-    { label: "모멘텀", value: `${momentumTier} ${momentumScore}` },
+    { label: "버스트", value: `${momentumTier} ${momentumScore}` },
     { label: "보너스", value: activeBonus },
     { label: "남은 시간", value: `${decisionSeconds}초` },
   ];
@@ -2198,6 +2262,12 @@ function App() {
       averageResponseTime: summary?.averageResponseTime ?? 0,
       challengeClearCount: summary?.challengeClearCount ?? 0,
       reducedRiskCount: summary?.reducedRiskCount ?? 0,
+      rhythmScore: summary?.rhythmScore ?? 0,
+      cognitionScore: summary?.cognitionScore ?? 0,
+      pressureAdaptScore: summary?.pressureAdaptScore ?? 0,
+      reflectionScore: summary?.reflectionScore ?? 0,
+      exploitPenalty: summary?.exploitPenalty ?? 0,
+      burstScore: summary?.burstScore ?? summary?.momentumScore ?? 0,
       momentumScore: summary?.momentumScore ?? 0,
       momentumTier: summary?.momentumTier ?? "BUILDING",
       rank: summary?.rank ?? "C",
@@ -2401,6 +2471,7 @@ function App() {
       spokenChoice: getDramaticChoiceLabel(choice),
       freeText: free ? freeText.trim() : "",
       effect: finalEffect,
+      cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
       sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", finalEffect),
@@ -2769,6 +2840,11 @@ function App() {
         rank: resultRank,
         momentumScore,
         momentumTier,
+        rhythmScore,
+        cognitionScore,
+        pressureAdaptScore,
+        reflectionScore,
+        exploitPenalty,
         challengeClearCount,
         reducedRiskCount,
         currentChallengeStreak,
@@ -2964,25 +3040,50 @@ function App() {
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
   const screenReaderStatus = isResult
-    ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 모멘텀 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
+    ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
     : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
   const rankLine =
     resultRank === "S"
-      ? "장면 목표, 위험 제어, 판 바꾸기가 균형 있게 맞물렸습니다."
+      ? "사고 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다."
       : resultRank === "A"
-        ? "판단 흐름이 안정적입니다. 한두 장면만 더 공략하면 최고 랭크에 닿습니다."
+        ? "정답을 고른 것이 아니라, 압박 속에서 판단 패턴이 선명하게 드러났습니다."
         : resultRank === "B"
-          ? "핵심 선택은 통과했습니다. 다음 플레이에서는 챌린지 조건을 더 의식해도 좋습니다."
-          : "사건은 통과했지만 보상 조건은 많이 남았습니다. 위험 예고와 구조 재설계를 더 활용해보세요.";
+          ? "사건은 통과했습니다. 다음 플레이에서는 다른 사고 방식으로 흔들어볼 여지가 있습니다."
+          : "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
   const scoreBreakdown = [
-    { label: "챌린지", value: challengeClearCount, text: `${challengeClearCount}개 달성` },
-    { label: "위험 제어", value: reducedRiskCount, text: `${reducedRiskCount}회 하락` },
-    { label: "플로우 서지", value: flowSurgeCount, text: `${flowSurgeCount}회 발동` },
-    { label: "판 바꾸기", value: freeTextCombo, text: `${freeTextCombo}회 사용` },
-    { label: "응답 평균", value: result.averageResponseTime, text: `${result.averageResponseTime}s` },
+    {
+      label: "사고 리듬",
+      value: rhythmScore,
+      text: `${rhythmScore}점`,
+      note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다.",
+    },
+    {
+      label: "관점 전환",
+      value: cognitionScore,
+      text: `${cognitionScore}점`,
+      note: "같은 방식만 반복하지 않고 추론, 위험, 재구성, 버티기 사이를 오간 흔적입니다.",
+    },
+    {
+      label: "압박 대응",
+      value: pressureAdaptScore,
+      text: `${pressureAdaptScore}점`,
+      note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다.",
+    },
+    {
+      label: "구조 재설계",
+      value: reflectionScore,
+      text: `${reflectionScore}점`,
+      note: "선택지 밖에서 이해관계자, 조건, 근거, 실패 가능성을 구체화한 정도입니다.",
+    },
+    {
+      label: "즉답 패널티",
+      value: exploitPenalty,
+      text: exploitPenalty > 0 ? `-${exploitPenalty}점` : "없음",
+      note: "표시된 정보만 따라 빠르게 누르는 플레이가 반복될 때만 감점됩니다.",
+    },
   ];
   const achievementBadges = [
-    { title: `Momentum ${momentumTier}`, text: `플레이 모멘텀 ${momentumScore}점을 기록했습니다.` },
+    { title: `Burst ${momentumTier}`, text: `사고 버스트 ${momentumScore}점을 기록했습니다.` },
     result.freeCount > 0
       ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
       : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
@@ -3350,10 +3451,10 @@ function App() {
           </div>
           <header className="ranking-hero">
             <span>PUBLIC SIGNAL BOARD</span>
-            <h1>누가 가장 오래 생각했는가</h1>
+            <h1>어디서 사고가 터졌는가</h1>
             <p>
-              완료된 사건의 모멘텀 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
-              압박 속에서 위험을 관리하고 선택지를 확장했다는 뜻입니다.
+              완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
+              압박 속에서 사고 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
             </p>
           </header>
           <section className="ranking-status-bar">
@@ -3393,7 +3494,7 @@ function App() {
                       <b>{entry.rank}</b>
                     </div>
                     <div className="ranking-stat score-stat">
-                      <span>MOMENTUM</span>
+                      <span>BURST</span>
                       <b>{entry.score}</b>
                     </div>
                     <div className="ranking-detail">
@@ -3885,8 +3986,8 @@ function App() {
               <span>{momentumTier} · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
               <p>
-                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 그래도 랭크는
-                이번 사건을 얼마나 능동적으로 공략했는지 보여주는 플레이 지표입니다.
+                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는
+                정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.
               </p>
             </div>
             <div className="score-breakdown">
@@ -3894,8 +3995,9 @@ function App() {
                 <article key={item.label}>
                   <span>{item.label}</span>
                   <b>{item.text}</b>
+                  <small>{item.note}</small>
                   <div>
-                    <i style={{ width: `${clamp(item.value * 18, item.value > 0 ? 14 : 4, 100)}%` }} />
+                    <i style={{ width: `${clamp(item.value, item.value > 0 ? 14 : 4, 100)}%` }} />
                   </div>
                 </article>
               ))}
@@ -3933,7 +4035,7 @@ function App() {
           <section className="counterfactual-panel" aria-label="Counterfactual Lab">
             <div className="panel-title-row">
               <h2>COUNTERFACTUAL LAB</h2>
-              <span>실제 선택과 버린 경로의 압박 차이</span>
+              <span>실제 선택과 선택하지 않은 관점의 압박 차이</span>
             </div>
             {counterfactualReport.length > 0 ? (
               <div className="counterfactual-list">
@@ -3941,7 +4043,7 @@ function App() {
                   <article key={report.nodeId}>
                     <div className="counterfactual-scene">
                       <span>{report.title}</span>
-                      <small>{report.actualWasSafest ? "가장 낮은 위험 경로" : "대안 경로와 차이 발생"}</small>
+                      <small>{report.actualWasSafest ? "압박을 낮춘 관점" : "다른 관점과 차이 발생"}</small>
                     </div>
                     <div className="counterfactual-path actual-path">
                       <b>ACTUAL</b>
@@ -3951,12 +4053,12 @@ function App() {
                       </small>
                     </div>
                     <div className="counterfactual-path safest-path">
-                      <b>SAFEST ALTERNATIVE</b>
+                      <b>LOW PRESSURE LENS</b>
                       <strong>{report.safest.label}</strong>
                       <small>위험 {formatRiskDelta(report.safestForecast.riskDelta)}</small>
                     </div>
                     <div className="counterfactual-path costliest-path">
-                      <b>HIGHEST PRESSURE</b>
+                      <b>HIGH PRESSURE LENS</b>
                       <strong>{report.costliest.label}</strong>
                       <small>위험 {formatRiskDelta(report.costliestForecast.riskDelta)}</small>
                     </div>
@@ -4749,39 +4851,39 @@ function App() {
           {showTacticalDetails && decisionForecasts.length > 0 && (
             <section className="decision-forecast" aria-label="결정 예보">
               <div className="forecast-header">
-                <span>선택 미리보기</span>
+                <span>판단 렌즈</span>
                 <strong>현재 압박 {riskPressure}</strong>
                 <p>
                   {pressureLeader
-                    ? `${pressureLeader.label}이 가장 크게 압력을 만들고 있습니다.`
-                    : "현재 압박 요인이 낮게 유지되고 있습니다."}
+                    ? `${pressureLeader.label}이 지금 판단을 가장 세게 흔듭니다. 렌즈는 정답이 아니라 관점입니다.`
+                    : "현재 압박 요인은 낮습니다. 렌즈는 선택의 대가를 비교하기 위한 관점입니다."}
                 </p>
               </div>
               <div className="forecast-grid">
                 <button
                   type="button"
                   className="forecast-highlight"
-                  onClick={() => previewChoice(safestForecast.choice)}
-                  aria-pressed={pendingChoice?.id === safestForecast.choice.id}
-                  aria-label="가장 안정적인 선택 미리보기"
+                  onClick={() => previewChoice(pressureLensForecast.choice)}
+                  aria-pressed={pendingChoice?.id === pressureLensForecast.choice.id}
+                  aria-label="압박을 낮추는 관점 미리보기"
                 >
-                  <span>가장 안정적인 말</span>
-                  <b>{simplifyPlayerText(safestForecast.choice.label)}</b>
+                  <span>압박을 낮추는 관점</span>
+                  <b>{simplifyPlayerText(pressureLensForecast.choice.label)}</b>
                   <small>
-                    위험 {formatRiskDelta(safestForecast.forecast.riskDelta)} · 예상 압력{" "}
-                    {safestForecast.forecast.afterRisk}
+                    위험 {formatRiskDelta(pressureLensForecast.forecast.riskDelta)} · 예상 압력{" "}
+                    {pressureLensForecast.forecast.afterRisk}
                   </small>
                 </button>
                 <button
                   type="button"
                   className="forecast-highlight"
-                  onClick={() => previewChoice(costliestForecast.choice)}
-                  aria-pressed={pendingChoice?.id === costliestForecast.choice.id}
-                  aria-label="가장 큰 대가 선택 미리보기"
+                  onClick={() => previewChoice(tradeoffLensForecast.choice)}
+                  aria-pressed={pendingChoice?.id === tradeoffLensForecast.choice.id}
+                  aria-label="대가를 크게 쓰는 관점 미리보기"
                 >
-                  <span>가장 큰 대가</span>
-                  <b>{simplifyPlayerText(costliestForecast.choice.label)}</b>
-                  <small>{formatResourceDelta(costliestForecast.forecast.biggestCost)}</small>
+                  <span>대가를 크게 쓰는 관점</span>
+                  <b>{simplifyPlayerText(tradeoffLensForecast.choice.label)}</b>
+                  <small>{formatResourceDelta(tradeoffLensForecast.forecast.biggestCost)}</small>
                 </button>
                 <article>
                   <span>압박 원인</span>
@@ -4874,8 +4976,6 @@ function App() {
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
               const tacticalRead = choiceRead.tacticalRead;
-              const isSafestChoice = safestForecast?.choice.id === choice.id;
-              const isCostliestChoice = costliestForecast?.choice.id === choice.id;
               return (
                 <button
                   type="button"
@@ -4903,12 +5003,6 @@ function App() {
                       예상 변화 · {Object.entries(choiceRead.finalEffect)
                         .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
                         .join(" · ")}
-                    </span>
-                  )}
-                  {(isSafestChoice || isCostliestChoice) && (
-                    <span className="choice-badges" aria-label="선택 비교 태그">
-                      {isSafestChoice && <b className="choice-badge safe">가장 안정</b>}
-                      {isCostliestChoice && <b className="choice-badge cost">대가 큼</b>}
                     </span>
                   )}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
@@ -5120,8 +5214,32 @@ function App() {
             </div>
           )}
         </section>
+        {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
+          <section
+            className={`decision-dock ${suspenseState.tier.toLowerCase()}`}
+            aria-label="선택 확정 빠른 실행"
+            aria-live="polite"
+          >
+            <div>
+              <span>선택 대기</span>
+              <strong>{simplifyPlayerText(speechifyChoice(pendingChoice))}</strong>
+              <small>
+                위험 {formatRiskDelta(pendingChoiceForecast.riskDelta)} · 압력 {pendingChoiceForecast.afterRisk} ·
+                전술 {pendingChoiceRead.tacticalRead.grade}
+              </small>
+            </div>
+            <div className="decision-dock-actions">
+              <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
+                다시 고르기
+              </button>
+              <button type="button" className="commit-confirm" onClick={() => choose(pendingChoice)} disabled={isAdvancing}>
+                <LockKeyhole size={16} />
+                기록
+              </button>
+            </div>
+          </section>
+        )}
       </section>
-
       <aside className="status-board">
         <div className="analyst-card">
           <span>분석관</span>

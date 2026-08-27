@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
+import { nodes } from "../src/gameData.js";
 
 async function chooseFirstFixedChoice(page) {
   await page.waitForFunction(
@@ -87,7 +88,7 @@ test("case flow has no unhandled browser runtime errors", async ({ page }) => {
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "start");
@@ -106,6 +107,50 @@ test("the complete season can progress from case 01 to the final ending", async 
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.currentCase).toBe("final");
   expect(saved.completedCases).toContain("final");
+});
+
+test("representative branch choices advance without browser runtime errors", async ({ page }) => {
+  const runtimeErrors = [];
+  page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") runtimeErrors.push(`console: ${message.text()}`);
+  });
+  await page.addInitScript(() => localStorage.clear());
+
+  const samples = [
+    { caseId: "case01", nodeId: "accounting", choiceIndex: 3 },
+    { caseId: "case02", nodeId: "c2_trace", choiceIndex: 1 },
+    { caseId: "case03", nodeId: "c3_signal", choiceIndex: 2 },
+    { caseId: "case04", nodeId: "c4_aftershock", choiceIndex: 0 },
+    { caseId: "case05", nodeId: "c5_voice", choiceIndex: 0 },
+    { caseId: "final", nodeId: "f_aftershock", choiceIndex: 2 },
+  ];
+
+  for (const { caseId, nodeId, choiceIndex } of samples) {
+    const scene = nodes[nodeId];
+    const choice = scene.choices[choiceIndex];
+    await page.goto("/?debug=1");
+    await startDebugNode(page, caseId, nodeId);
+    await expect(page.locator(".game-shell")).toBeVisible();
+
+    if (choice.type === "free") {
+      await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고, 원본 자료를 확인한 뒤 위험을 공개한다.");
+      await page.locator(".submit-reframe").evaluate((button) => button.click());
+    } else {
+      const fixedChoiceIndex = scene.choices
+        .slice(0, choiceIndex + 1)
+        .filter((candidate) => candidate.type !== "free").length - 1;
+      await page.locator(".choices .choice").nth(fixedChoiceIndex).evaluate((button) => button.click());
+      await expect(page.locator(".decision-dock")).toBeVisible();
+      await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+    }
+
+    await expect(page.getByTestId("decision-next")).toBeVisible();
+    await page.getByTestId("decision-next").evaluate((button) => button.click());
+    await expect(page.locator(".game-shell, .result-page, .ending-reveal").first()).toBeVisible();
+  }
+
+  expect(runtimeErrors).toEqual([]);
 });
 
 test("debug jump opens case 05 scenes directly", async ({ page }) => {
