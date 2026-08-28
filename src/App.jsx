@@ -24,7 +24,8 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import "./styles.css";
+import "./styles/tokens.css";
+import "./styles/app.css";
 import {
   appendStoredErrorLog,
   ERROR_LOG_STORAGE_KEY,

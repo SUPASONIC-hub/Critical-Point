@@ -6,3 +6,4 @@ debug.log
 .DS_Store
 Profile.jpg
 !public/profile.jpg
+.tmp-css/
