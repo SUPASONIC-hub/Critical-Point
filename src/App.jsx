@@ -21,8 +21,6 @@ import {
   Shield,
   Sparkles,
   Users,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 import "./styles/tokens.css";
 import "./styles/app.css";
@@ -124,6 +122,29 @@ import { MemoPanel } from "./components/MemoPanel.jsx";
 import { StatusBoard } from "./components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "./components/GameMetricsDrawer.jsx";
 import { GameHeader } from "./components/GameHeader.jsx";
+import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
+import {
+  appendTraceEvent,
+  createReplaySavedState,
+  encodeReplaySeed,
+  getReplaySeedFromLocation,
+  getTraceEvents,
+  TRACE_STORAGE_KEY,
+} from "./state/trace.js";
+import {
+  createErrorRecoveryEntry,
+  getRouteMarker,
+  getSavedRecoveryState,
+  isKnownCaseId,
+  isNodeValidForCase,
+  normalizeSavedCaseSummaryShape,
+  normalizeSavedGameplayState,
+  normalizeSavedNestedState,
+  recordAppError,
+  repairSavedRoute,
+  reportSilentFailure,
+  shouldCaptureSaveSlot,
+} from "./state/savedState.js";
 import { DecisionReveal } from "./components/DecisionReveal.jsx";
 import { RecoveryNotice } from "./components/RecoveryNotice.jsx";
 import { SaveStatus } from "./components/SaveStatus.jsx";
@@ -133,7 +154,7 @@ import { IntroScreen } from "./screens/IntroScreen.jsx";
 import { ResultScreen } from "./screens/ResultScreen.jsx";
 import { PlayScreen } from "./screens/PlayScreen.jsx";
 import { useGameSaveState } from "./state/useGameSave.js";
-import { useDecision } from "./state/useDecision.js";
+import { createChoiceReaders, useDecision } from "./state/useDecision.js";
 
 const resourceMeta = {
   time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },
@@ -147,109 +168,25 @@ const resourceMeta = {
 const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
-const MUSIC_PREF_KEY = "critical-point-music-enabled";
-const TRACE_STORAGE_KEY = "critical-point-trace-v1";
-const TRACE_MAX_ITEMS = 200;
-const REPLAY_QUERY_KEY = "replay";
 const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 
-function encodeReplaySeed(seed) {
+let consoleErrorHookBusy = false;
+
+function safeStringify(value) {
   try {
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(seed))));
-    return encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    return JSON.stringify(value);
   } catch {
-    return "";
+    return String(value);
   }
 }
 
-function decodeReplaySeed(value) {
-  if (!value) return null;
-  try {
-    const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
-    return JSON.parse(decodeURIComponent(escape(atob(padded))));
-  } catch {
-    return null;
-  }
+// The error boundary and reportSilentFailure already write their own entries,
+// so skip their console output instead of logging the same failure twice.
+function isAlreadyRecordedConsoleError(text) {
+  return text.startsWith("Critical Point render error") || text.includes("[silent:");
 }
 
-function getReplaySeedFromLocation() {
-  try {
-    return decodeReplaySeed(new URLSearchParams(globalThis.location?.search ?? "").get(REPLAY_QUERY_KEY));
-  } catch {
-    return null;
-  }
-}
-
-function getTraceEvents() {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(TRACE_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function appendTraceEvent(event = {}) {
-  try {
-    const next = [
-      ...getTraceEvents(),
-      { t: Date.now(), ...event },
-    ].slice(-TRACE_MAX_ITEMS);
-    sessionStorage.setItem(TRACE_STORAGE_KEY, JSON.stringify(next));
-    return next;
-  } catch {
-    return getTraceEvents();
-  }
-}
-
-function createReplaySavedState(seed) {
-  if (!seed || !isKnownCaseId(seed.currentCase) || !isNodeValidForCase(seed.currentCase, seed.nodeId)) return null;
-  const replayLog = (Array.isArray(seed.log) ? seed.log : [])
-    .filter((entry) => entry && typeof entry.nodeId === "string" && nodes[entry.nodeId])
-    .map((entry) => {
-      const choice = nodes[entry.nodeId]?.choices?.find((item) => item.id === entry.choiceId);
-      return {
-        nodeId: entry.nodeId,
-        title: nodes[entry.nodeId]?.title ?? "",
-        choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",
-        choice: choice?.label ?? "",
-        freeText: "",
-        effect: {},
-        cognition: {},
-        triggers: [],
-        responseTimeSec: 0,
-        resourcesBefore: {},
-        resourcesAfter: {},
-        isSystemEvent: false,
-      };
-    });
-  return {
-    schemaVersion: SAVE_SCHEMA_VERSION,
-    playerName: "",
-    playStyle: "instinct",
-    dataConsent: false,
-    started: true,
-    paused: false,
-    currentCase: seed.currentCase,
-    completedCases: [],
-    discoveredClues: [],
-    caseResults: {},
-    playtestFeedback: {},
-    nodeId: seed.nodeId,
-    resources: normalizeNumberMap(seed.resources, initialResources).value,
-    log: replayLog,
-    triggers: makeEmptyScores(triggerLabels),
-    cognition: makeEmptyScores(cognitionLabels),
-    freeText: "",
-    echo: "재현 링크로 복원된 장면입니다.",
-    nodeEnteredAt: Date.now(),
-    pendingTelemetry: [],
-    protocolUsed: false,
-    timerPenaltyApplied: false,
-    probeUsed: false,
-  };
-}
-
+export
 const playStyleOptions = [
   {
     id: "instinct",
@@ -311,258 +248,6 @@ const legacyProfiles = {
     effect: { legitimacy: -2, fatigue: 4 },
   },
 };
-
-const musicModes = {
-  intro: {
-    label: "대기",
-    interval: 860,
-    volume: 0.12,
-    wave: "sine",
-    bass: [55, 55, 65.4, 49],
-    notes: [220, null, 277.18, null, 196, 246.94, null, 164.81],
-    chords: [[110, 164.81, 220], null, [98, 146.83, 196], null],
-    hitEvery: 0,
-    noiseEvery: 12,
-  },
-  controlled: {
-    label: "안정",
-    interval: 720,
-    volume: 0.14,
-    wave: "triangle",
-    bass: [65.4, 73.42, 82.41, 73.42],
-    notes: [261.63, null, 329.63, 392, null, 293.66, 349.23, null],
-    chords: [[130.81, 196, 261.63], null, [146.83, 220, 293.66], null],
-    hitEvery: 8,
-    noiseEvery: 16,
-  },
-  unstable: {
-    label: "불안정",
-    interval: 520,
-    volume: 0.16,
-    wave: "triangle",
-    bass: [73.42, 69.3, 82.41, 65.4],
-    notes: [293.66, 311.13, null, 392, 349.23, null, 329.63, 277.18],
-    chords: [[146.83, 220, 311.13], null, [138.59, 207.65, 277.18], null],
-    hitEvery: 6,
-    noiseEvery: 10,
-  },
-  critical: {
-    label: "위기",
-    interval: 360,
-    volume: 0.19,
-    wave: "sawtooth",
-    bass: [49, 51.91, 55, 46.25],
-    notes: [196, 207.65, null, 233.08, 246.94, null, 220, 207.65],
-    chords: [[98, 146.83, 207.65], [92.5, 138.59, 196], null, [103.83, 155.56, 220]],
-    hitEvery: 4,
-    noiseEvery: 6,
-  },
-  result: {
-    label: "결과",
-    interval: 940,
-    volume: 0.13,
-    wave: "sine",
-    bass: [65.4, 82.41, 98, 73.42],
-    notes: [261.63, null, 392, 329.63, null, 440, 392, null],
-    chords: [[130.81, 196, 261.63], [164.81, 246.94, 329.63], null, [146.83, 220, 293.66]],
-    hitEvery: 0,
-    noiseEvery: 18,
-  },
-};
-
-function playTone(context, destination, frequency, duration, gainValue, type = "sine") {
-  if (!frequency) return;
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  const now = context.currentTime;
-  oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, now);
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.025);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  oscillator.connect(gain);
-  gain.connect(destination);
-  oscillator.start(now);
-  oscillator.stop(now + duration + 0.04);
-}
-
-function playChord(context, destination, frequencies = [], duration = 1, gainValue = 0.06, type = "sine") {
-  frequencies.filter(Boolean).forEach((frequency, index) => {
-    playTone(context, destination, frequency, duration + index * 0.04, gainValue / Math.max(1, frequencies.length), type);
-  });
-}
-
-function playNoiseHit(context, destination, duration = 0.18, gainValue = 0.08, filterFrequency = 900) {
-  const sampleCount = Math.max(1, Math.floor(context.sampleRate * duration));
-  const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let index = 0; index < sampleCount; index += 1) {
-    data[index] = (Math.random() * 2 - 1) * (1 - index / sampleCount);
-  }
-  const source = context.createBufferSource();
-  const filter = context.createBiquadFilter();
-  const gain = context.createGain();
-  const now = context.currentTime;
-  filter.type = "bandpass";
-  filter.frequency.setValueAtTime(filterFrequency, now);
-  filter.Q.setValueAtTime(4, now);
-  gain.gain.setValueAtTime(gainValue, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  source.buffer = buffer;
-  source.connect(filter);
-  filter.connect(gain);
-  gain.connect(destination);
-  source.start(now);
-  source.stop(now + duration + 0.02);
-}
-
-function AdaptiveMusic({ modeKey }) {
-  const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
-  const [audioState, setAudioState] = useState("starting");
-  const contextRef = useRef(null);
-  const masterGainRef = useRef(null);
-  const timerRef = useRef(null);
-  const stepRef = useRef(0);
-  const pulseRef = useRef(null);
-  const resumeRef = useRef(null);
-  const modeRef = useRef(musicModes[modeKey] ?? musicModes.intro);
-  const mode = musicModes[modeKey] ?? musicModes.intro;
-
-  useEffect(() => {
-    modeRef.current = mode;
-    if (masterGainRef.current) {
-      masterGainRef.current.gain.setTargetAtTime(mode.volume, contextRef.current.currentTime, 0.35);
-    }
-  }, [mode]);
-
-  useEffect(() => {
-    writeStoredValue(MUSIC_PREF_KEY, String(enabled));
-    if (!enabled) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-      setAudioState("off");
-      masterGainRef.current?.gain.setTargetAtTime(0.0001, contextRef.current?.currentTime ?? 0, 0.08);
-      return;
-    }
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) {
-      setAudioState("unsupported");
-      return;
-    }
-    const context = contextRef.current ?? new AudioContextClass();
-    contextRef.current = context;
-    if (!masterGainRef.current) {
-      masterGainRef.current = context.createGain();
-      masterGainRef.current.gain.value = modeRef.current.volume;
-      masterGainRef.current.connect(context.destination);
-    }
-
-    function pulse() {
-      if (context.state === "suspended") return;
-      const currentMode = modeRef.current;
-      const step = stepRef.current;
-      const note = currentMode.notes[step % currentMode.notes.length];
-      const bass = currentMode.bass[Math.floor(step / 4) % currentMode.bass.length];
-      const chord = currentMode.chords[Math.floor(step / 4) % currentMode.chords.length];
-      playTone(context, masterGainRef.current, note, currentMode.interval / 1200, 0.3, currentMode.wave);
-      if (step % 4 === 0) {
-        playTone(context, masterGainRef.current, bass, currentMode.interval / 650, 0.2, "sine");
-        playChord(context, masterGainRef.current, chord ?? [], currentMode.interval / 420, 0.16, "triangle");
-      }
-      if (currentMode.hitEvery > 0 && step % currentMode.hitEvery === 0) {
-        playTone(context, masterGainRef.current, bass * 2, 0.08, 0.08, "square");
-      }
-      if (currentMode.noiseEvery > 0 && step % currentMode.noiseEvery === 0) {
-        playNoiseHit(context, masterGainRef.current, 0.12, currentMode.volume * 0.45, 700 + step % 5 * 180);
-      }
-      stepRef.current += 1;
-    }
-
-    pulseRef.current = pulse;
-    async function resumeAudio() {
-      try {
-        await context.resume?.();
-        setAudioState(context.state === "running" ? "running" : "blocked");
-        if (context.state === "running") pulse();
-      } catch (error) {
-        console.warn("Audio resume blocked", error);
-        setAudioState("blocked");
-      }
-    }
-    resumeRef.current = resumeAudio;
-    context.onstatechange = () => {
-      setAudioState(context.state === "running" ? "running" : context.state === "closed" ? "off" : "blocked");
-    };
-    function resumeAfterAutoplayBlock() {
-      resumeAudio();
-    }
-    window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
-    window.addEventListener("keydown", resumeAfterAutoplayBlock);
-    window.addEventListener("touchstart", resumeAfterAutoplayBlock, { passive: true });
-
-    pulse();
-    resumeAudio();
-    timerRef.current = window.setInterval(pulse, modeRef.current.interval);
-    return () => {
-      window.clearInterval(timerRef.current);
-      window.removeEventListener("pointerdown", resumeAfterAutoplayBlock);
-      window.removeEventListener("keydown", resumeAfterAutoplayBlock);
-      window.removeEventListener("touchstart", resumeAfterAutoplayBlock);
-      if (pulseRef.current === pulse) pulseRef.current = null;
-    };
-  }, [enabled]);
-
-  useEffect(() => {
-    if (!enabled || !timerRef.current || !pulseRef.current) return;
-    window.clearInterval(timerRef.current);
-    pulseRef.current();
-    timerRef.current = window.setInterval(pulseRef.current, modeRef.current.interval);
-  }, [enabled, modeKey]);
-
-  function startAudioFromGesture() {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) {
-      setAudioState("unsupported");
-      return;
-    }
-    const context = contextRef.current ?? new AudioContextClass();
-    contextRef.current = context;
-    if (!masterGainRef.current) {
-      masterGainRef.current = context.createGain();
-      masterGainRef.current.gain.value = modeRef.current.volume;
-      masterGainRef.current.connect(context.destination);
-    }
-    context.resume().then(() => {
-      setAudioState(context.state === "running" ? "running" : "blocked");
-      if (context.state === "running") pulseRef.current?.();
-    }).catch(() => setAudioState("blocked"));
-  }
-
-  return (
-    <button
-      type="button"
-      className={enabled ? "music-toggle active" : "music-toggle"}
-      onClick={() => {
-        if (!enabled) {
-          setEnabled(true);
-          startAudioFromGesture();
-          return;
-        }
-        if (enabled && audioState !== "running" && audioState !== "unsupported") {
-          resumeRef.current?.();
-          return;
-        }
-        setEnabled((value) => !value);
-      }}
-      aria-label={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
-      title={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
-    >
-      {enabled && audioState === "running" ? <Volume2 size={18} /> : <VolumeX size={18} />}
-      <span>{enabled ? (audioState === "running" ? mode.label : audioState === "unsupported" ? "미지원" : "소리 시작") : "꺼짐"}</span>
-    </button>
-  );
-}
 
 const nextCaseSignals = {
   case01: {
@@ -654,456 +339,6 @@ const replaySeed = getReplaySeedFromLocation();
 
 export function suppressSaves() {
   saveSuppressed = true;
-}
-
-function isKnownCaseId(caseId) {
-  return caseSequence.includes(caseId);
-}
-
-function isNodeValidForCase(caseId, nodeId) {
-  if (!isKnownCaseId(caseId) || typeof nodeId !== "string") return false;
-  return Boolean(nodeOrders[caseId]?.includes(nodeId) || CASE_RESULT_NODES[caseId] === nodeId);
-}
-
-function repairSavedRoute(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
-  const currentCase = isKnownCaseId(state.currentCase) ? state.currentCase : "case01";
-  const nodeId = isNodeValidForCase(currentCase, state.nodeId) ? state.nodeId : CASE_START_NODES[currentCase];
-  if (currentCase === state.currentCase && nodeId === state.nodeId) return state;
-  reportSilentFailure("route-repair", { from: state.nodeId, to: nodeId, currentCase });
-  return {
-    ...state,
-    currentCase,
-    nodeId,
-    paused: true,
-    lastError: {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved route was repaired before resume.",
-      currentCase,
-      nodeId,
-    },
-  };
-}
-
-function normalizeNumberMap(value, defaults) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return { value: { ...defaults }, changed: true };
-  }
-
-  const allowedKeys = Object.keys(defaults);
-  const sourceKeys = Object.keys(value);
-  let changed = sourceKeys.length !== allowedKeys.length;
-  const next = {};
-
-  allowedKeys.forEach((key) => {
-    const candidate = value[key];
-    if (Number.isFinite(candidate)) {
-      next[key] = candidate;
-      return;
-    }
-    next[key] = defaults[key];
-    changed = true;
-  });
-
-  return { value: next, changed };
-}
-
-function normalizeSavedGameplayState(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
-
-  const normalizedResources = normalizeNumberMap(state.resources, initialResources);
-  const normalizedTriggers = normalizeNumberMap(state.triggers, makeEmptyScores(triggerLabels));
-  const normalizedCognition = normalizeNumberMap(state.cognition, makeEmptyScores(cognitionLabels));
-
-  if (!normalizedResources.changed && !normalizedTriggers.changed && !normalizedCognition.changed) {
-    return state;
-  }
-
-  return {
-    ...state,
-    resources: normalizedResources.value,
-    triggers: normalizedTriggers.value,
-    cognition: normalizedCognition.value,
-    paused: true,
-    lastError: state.lastError ?? {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved gameplay metrics were repaired before resume.",
-      currentCase: state.currentCase,
-      nodeId: state.nodeId,
-    },
-  };
-}
-
-function areSavedValuesEquivalent(left, right) {
-  try {
-    return JSON.stringify(left) === JSON.stringify(right);
-  } catch {
-    return left === right;
-  }
-}
-
-function normalizeSavedArray(value, normalizeItem) {
-  if (!Array.isArray(value)) return { value: [], changed: true };
-  let changed = false;
-  const next = value
-    .map((item) => {
-      const normalized = normalizeItem(item);
-      if (!areSavedValuesEquivalent(normalized, item)) changed = true;
-      return normalized;
-    })
-    .filter((item) => {
-      const keep = item !== null;
-      if (!keep) changed = true;
-      return keep;
-    });
-  if (next.length !== value.length) changed = true;
-  return { value: next, changed };
-}
-
-function normalizeSavedPlainObject(value) {
-  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
-}
-
-function normalizeSavedEffect(value) {
-  const source = normalizeSavedPlainObject(value);
-  return Object.fromEntries(
-    Object.entries(source).filter(([, effectValue]) => Number.isFinite(effectValue)),
-  );
-}
-
-function normalizeSavedLogEntry(entry) {
-  if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-    reportSilentFailure("log-entry-drop", { nodeId: entry?.nodeId, reason: "invalid-entry" });
-    return null;
-  }
-  const nodeId = typeof entry.nodeId === "string" ? entry.nodeId : "";
-  if (!nodeId || (!nodes[nodeId] && !Object.values(CASE_RESULT_NODES).includes(nodeId))) {
-    reportSilentFailure("log-entry-drop", { nodeId, reason: "unknown-node" });
-    return null;
-  }
-  return {
-    ...entry,
-    nodeId,
-    title: typeof entry.title === "string" ? entry.title : nodes[nodeId]?.title ?? "",
-    choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",
-    choice: typeof entry.choice === "string" ? entry.choice : "",
-    spokenChoice: typeof entry.spokenChoice === "string" ? entry.spokenChoice : "",
-    freeText: normalizeSavedText(entry.freeText, FREE_TEXT_MAX_LENGTH),
-    effect: normalizeSavedEffect(entry.effect),
-    cognition: normalizeSavedEffect(entry.cognition),
-    triggers: Array.isArray(entry.triggers) ? entry.triggers.filter((trigger) => typeof trigger === "string") : [],
-    responseTimeSec: Number.isFinite(entry.responseTimeSec) ? entry.responseTimeSec : 0,
-    resourcesBefore: normalizeSavedPlainObject(entry.resourcesBefore),
-    resourcesAfter: normalizeSavedPlainObject(entry.resourcesAfter),
-    isSystemEvent: Boolean(entry.isSystemEvent),
-  };
-}
-
-function normalizeSavedClue(clue) {
-  if (!clue || typeof clue !== "object" || Array.isArray(clue) || typeof clue.id !== "string") return null;
-  return {
-    ...clue,
-    title: typeof clue.title === "string" ? clue.title : clue.id,
-    text: typeof clue.text === "string" ? clue.text : "",
-  };
-}
-
-function normalizeSavedCaseSummaryShape(summary) {
-  if (!summary || typeof summary !== "object" || Array.isArray(summary)) return null;
-  const tuple = (value, fallback) => (
-    Array.isArray(value) && typeof value[0] === "string" && Number.isFinite(value[1]) ? value : fallback
-  );
-  return {
-    ...summary,
-    schemaVersion: Number.isFinite(summary.schemaVersion) ? summary.schemaVersion : SAVE_SCHEMA_VERSION,
-    primary: tuple(summary.primary, ["responsibility", 0]),
-    secondary: tuple(summary.secondary, ["protection", 0]),
-    thinking: tuple(summary.thinking, ["persistence", 0]),
-    freeCount: Number.isFinite(summary.freeCount) ? summary.freeCount : 0,
-    averageResponseTime: Number.isFinite(summary.averageResponseTime) ? summary.averageResponseTime : 0,
-    challengeClearCount: Number.isFinite(summary.challengeClearCount) ? summary.challengeClearCount : 0,
-    reducedRiskCount: Number.isFinite(summary.reducedRiskCount) ? summary.reducedRiskCount : 0,
-    rhythmScore: Number.isFinite(summary.rhythmScore) ? summary.rhythmScore : 0,
-    cognitionScore: Number.isFinite(summary.cognitionScore) ? summary.cognitionScore : 0,
-    pressureAdaptScore: Number.isFinite(summary.pressureAdaptScore) ? summary.pressureAdaptScore : 0,
-    reflectionScore: Number.isFinite(summary.reflectionScore) ? summary.reflectionScore : 0,
-    exploitPenalty: Number.isFinite(summary.exploitPenalty) ? summary.exploitPenalty : 0,
-    burstScore: Number.isFinite(summary.burstScore) ? summary.burstScore : Number.isFinite(summary.momentumScore) ? summary.momentumScore : 0,
-    momentumScore: Number.isFinite(summary.momentumScore) ? summary.momentumScore : 0,
-    momentumTier: typeof summary.momentumTier === "string" ? summary.momentumTier : "BUILDING",
-    rank: typeof summary.rank === "string" ? summary.rank : "C",
-    outcomeChoiceId: typeof summary.outcomeChoiceId === "string" ? summary.outcomeChoiceId : null,
-    outcomeNodeId: typeof summary.outcomeNodeId === "string" ? summary.outcomeNodeId : null,
-  };
-}
-
-function normalizeSavedObjectMap(value, normalizeItem) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return { value: {}, changed: true };
-  let changed = false;
-  const next = {};
-  Object.entries(value).forEach(([key, item]) => {
-    const normalized = normalizeItem(item, key);
-    if (!areSavedValuesEquivalent(normalized, item)) changed = true;
-    if (normalized !== null) next[key] = normalized;
-  });
-  if (Object.keys(next).length !== Object.keys(value).length) changed = true;
-  return { value: next, changed };
-}
-
-function normalizeSavedTelemetryQueue(value) {
-  if (!Array.isArray(value)) return { value: [], changed: true };
-  const next = value.filter(
-    (item) =>
-      item &&
-      typeof item === "object" &&
-      !Array.isArray(item) &&
-      typeof item.id === "string" &&
-      TELEMETRY_QUEUE_TYPES.includes(item.type) &&
-      typeof item.label === "string" &&
-      item.payload &&
-      typeof item.payload === "object" &&
-      !Array.isArray(item.payload),
-  );
-  return { value: next, changed: next.length !== value.length };
-}
-
-function normalizeSavedNestedState(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
-
-  const normalizedCompletedCases = normalizeSavedArray(
-    state.completedCases,
-    (caseId) => (isKnownCaseId(caseId) ? caseId : null),
-  );
-  const normalizedDiscoveredClues = normalizeSavedArray(state.discoveredClues, normalizeSavedClue);
-  const normalizedLog = normalizeSavedArray(state.log, normalizeSavedLogEntry);
-  const normalizedCaseResults = normalizeSavedObjectMap(
-    state.caseResults,
-    (summary, caseId) => (isKnownCaseId(caseId) ? normalizeSavedCaseSummaryShape(summary) : null),
-  );
-  const normalizedFeedback = normalizeSavedObjectMap(
-    state.playtestFeedback,
-    (feedback, caseId) => (isKnownCaseId(caseId) ? normalizeFeedback(feedback) : null),
-  );
-  const normalizedTelemetry = normalizeSavedTelemetryQueue(state.pendingTelemetry);
-  const changed =
-    normalizedCompletedCases.changed ||
-    normalizedDiscoveredClues.changed ||
-    normalizedLog.changed ||
-    normalizedCaseResults.changed ||
-    normalizedFeedback.changed ||
-    normalizedTelemetry.changed;
-
-  if (!changed) return state;
-  return {
-    ...state,
-    completedCases: normalizedCompletedCases.value,
-    discoveredClues: normalizedDiscoveredClues.value,
-    log: normalizedLog.value,
-    caseResults: normalizedCaseResults.value,
-    playtestFeedback: normalizedFeedback.value,
-    pendingTelemetry: normalizedTelemetry.value,
-    paused: true,
-    lastError: state.lastError ?? {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved nested gameplay data was repaired before resume.",
-      currentCase: state.currentCase,
-      nodeId: state.nodeId,
-    },
-  };
-}
-
-function shouldCaptureSaveSlot(previousState, nextState) {
-  if (!nextState?.saveSchemaVersion) return false;
-  if (nextState.lastError) return true;
-  if (!previousState?.started && nextState.started) return true;
-  if (previousState?.currentCase !== nextState.currentCase) return true;
-  if (previousState?.nodeId !== nextState.nodeId) return true;
-  const previousCompletedCount = Array.isArray(previousState?.completedCases) ? previousState.completedCases.length : 0;
-  const nextCompletedCount = Array.isArray(nextState.completedCases) ? nextState.completedCases.length : 0;
-  return previousCompletedCount !== nextCompletedCount;
-}
-
-function createSafeDomSnapshot(documentRef = globalThis.document) {
-  try {
-    const root = documentRef?.querySelector?.("#root");
-    if (!root) return "";
-    const elements = [...root.querySelectorAll("main, section, article, button, input, select, textarea, [role], [aria-label]")].slice(0, 40);
-    return elements
-      .map((element) => {
-        const tag = element.tagName.toLowerCase();
-        const className = typeof element.className === "string" ? element.className.split(/\s+/).filter(Boolean).slice(0, 3).join(".") : "";
-        const role = element.getAttribute("role");
-        const ariaLabel = element.getAttribute("aria-label");
-        return [tag, className ? `.${className}` : "", role ? `[role=${role}]` : "", ariaLabel ? "[aria-label]" : ""].join("");
-      })
-      .join(" > ")
-      .slice(0, 1800);
-  } catch {
-    return "";
-  }
-}
-
-function getRouteMarker(entry) {
-  const nodeId = typeof entry?.nodeId === "string" ? entry.nodeId : "";
-  const scene = nodes[nodeId];
-  if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
-  if (nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
-  if (nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
-  if (["WITNESS", "TRACE", "ASSEMBLY", "BARGAIN", "AUDIT", "PUBLIC", "PATTERN", "VOICE", "DILEMMA"].some((phase) => scene?.phase?.includes(phase))) {
-    return { label: "증거 추적", tone: "evidence" };
-  }
-  return { label: "핵심 판단", tone: "decision" };
-}
-
-function getSavedRecoveryState() {
-  const saved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-  return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : null;
-}
-
-function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
-  const saved = getSavedRecoveryState();
-  const serialized = serializeError(error);
-  const occurredAt = new Date().toISOString();
-  const context = createSafeErrorContext(saved ?? {}, source);
-
-  return {
-    id: `error-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    occurredAt,
-    error: serialized,
-    componentStack: errorInfo?.componentStack ?? "",
-    domSnapshot: createSafeDomSnapshot(),
-    viewport: {
-      width: globalThis.innerWidth ?? 0,
-      height: globalThis.innerHeight ?? 0,
-    },
-    context,
-    trace: getTraceEvents(),
-  };
-}
-
-function persistErrorRecovery(entry) {
-  appendStoredErrorLog(entry);
-  const saved = getSavedRecoveryState();
-  if (saved) {
-    const previousError = saved.lastError;
-    const sameRecoveryPoint =
-      previousError?.currentCase === entry.context.currentCase &&
-      previousError?.nodeId === entry.context.nodeId;
-    const recoveredSave = {
-      ...saved,
-      savedAt: entry.occurredAt,
-      paused: true,
-      lastError: {
-        id: entry.id,
-        occurredAt: entry.occurredAt,
-        source: entry.context.source,
-        message: entry.error.message,
-        currentCase: entry.context.currentCase,
-        nodeId: entry.context.nodeId,
-        retryCount: sameRecoveryPoint ? (Number(previousError.retryCount) || 0) + 1 : 1,
-      },
-    };
-    writeStoredValue(STORAGE_KEY, JSON.stringify(recoveredSave));
-    appendSaveSlot(recoveredSave);
-  }
-}
-
-function createErrorTelemetryPayload(entry) {
-  const sessionId = getSessionId();
-  return {
-    session_id: sessionId,
-    session_code: getSessionCode(sessionId),
-    occurred_at: entry.occurredAt,
-    source: entry.context.source,
-    current_case: entry.context.currentCase,
-    node_id: entry.context.nodeId,
-    error_name: entry.error.name,
-    error_message: entry.error.message,
-    error_stack: entry.error.stack,
-    component_stack: entry.componentStack,
-    dom_snapshot: entry.domSnapshot ?? "",
-    viewport: entry.viewport ?? {},
-    context: entry.context,
-  };
-}
-
-function queueSavedErrorTelemetry(entry) {
-  const saved = getSavedRecoveryState();
-  if (!saved) return false;
-  const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
-  const nextQueue = [
-    ...pendingTelemetry.filter((item) => item.id !== entry.id),
-    {
-      id: entry.id,
-      queuedAt: new Date().toISOString(),
-      type: "error",
-      label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
-      payload: createErrorTelemetryPayload(entry),
-    },
-  ];
-  return writeStoredValue(
-    STORAGE_KEY,
-    JSON.stringify({
-      ...saved,
-      pendingTelemetry: nextQueue,
-      savedAt: entry.occurredAt,
-    }),
-  );
-}
-
-function reportErrorRecovery(entry) {
-  if (!telemetryEnabled) return;
-  const saved = getSavedRecoveryState();
-  if (!saved?.dataConsent) return;
-  saveErrorTelemetry(createErrorTelemetryPayload(entry)).catch((telemetryError) => {
-    console.warn("Critical Point error telemetry failed", telemetryError);
-    queueSavedErrorTelemetry(entry);
-  });
-}
-
-function recordAppError(error, errorInfo = {}, source = "runtime") {
-  const saved = getSavedRecoveryState();
-  appendTraceEvent({
-    kind: "error",
-    caseId: saved?.currentCase,
-    nodeId: saved?.nodeId,
-    logLength: saved?.log?.length ?? 0,
-    note: serializeError(error).message,
-  });
-  const entry = createErrorRecoveryEntry(error, errorInfo, source);
-  persistErrorRecovery(entry);
-  reportErrorRecovery(entry);
-  return entry;
-}
-
-let consoleErrorHookBusy = false;
-
-function safeStringify(value) {
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}
-
-// The error boundary and reportSilentFailure already write their own entries,
-// so skip their console output instead of logging the same failure twice.
-function isAlreadyRecordedConsoleError(text) {
-  return text.startsWith("Critical Point render error") || text.includes("[silent:");
-}
-
-function reportSilentFailure(code, detail = {}) {
-  const error = new Error(`[silent:${code}] ${JSON.stringify(detail)}`);
-  error.name = "SilentRouteFailure";
-  recordAppError(error, {}, `silent-${code}`);
-  if (import.meta.env.DEV) console.warn(error);
-  return error;
 }
 
 export function App() {
@@ -1469,156 +704,27 @@ export function App() {
     "find-cost": "힌트: 가장 좋아 보이는 선택이 누구에게 비용을 넘기는지 먼저 찾으십시오.",
   }[sceneChallenge.id];
   const echoProbeCost = playStyle === "mediator" ? "결정 시간 4초와 신뢰 1" : "결정 시간 8초와 피로 1";
-  function getChallengeMatch(choice, riskDelta) {
-    if (sceneChallenge.id === "protect-trust" && (choice.effect?.trust ?? 0) > 0) return "신뢰 회복 후보";
-    if (sceneChallenge.id === "repair-legitimacy" && (choice.effect?.legitimacy ?? 0) > 0) return "정당성 회복 후보";
-    if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
-    if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
-    if (sceneChallenge.id === "find-cost" && Object.values(choice.effect ?? {}).some((value) => value < 0)) {
-      return "비용 확인됨";
-    }
-    return "";
-  }
-
-  function getTacticalRead(choice, riskDelta, challengeMatch) {
-    const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
-    const biggestCost = effectEntries
-      .filter(([, value]) => value < 0)
-      .sort((a, b) => a[1] - b[1])[0];
-    const biggestGain = effectEntries
-      .filter(([, value]) => value > 0)
-      .sort((a, b) => b[1] - a[1])[0];
-    const cognitionGain = Object.values(choice.cognition ?? {}).reduce((sum, value) => sum + value, 0);
-    const grade =
-      challengeMatch && riskDelta < 0
-        ? "S"
-        : challengeMatch || riskDelta < 0
-          ? "A"
-          : riskDelta === 0 && cognitionGain >= 2
-            ? "B"
-            : riskDelta <= 6
-              ? "C"
-              : "D";
-    const gradeText = {
-      S: "브레이크스루",
-      A: "공략 후보",
-      B: "안정 전개",
-      C: "대가 있는 선택",
-      D: "고위험 도박",
-    }[grade];
-    const reward =
-      challengeMatch
-        ? "챌린지 적중"
-        : riskDelta < 0
-          ? "위험 압력 하락"
-          : riskDelta === 0
-            ? "압력 유지"
-            : `위험 압력 +${riskDelta}`;
-    const cost = biggestCost
-      ? `${resourceMeta[biggestCost[0]]?.label ?? biggestCost[0]} ${biggestCost[1]}`
-      : "즉시 손실 낮음";
-    const gain = biggestGain
-      ? `${resourceMeta[biggestGain[0]]?.label ?? biggestGain[0]} +${biggestGain[1]}`
-      : cognitionGain > 0
-        ? `사고 가속 +${cognitionGain}`
-        : "관망";
-
-    return { grade, gradeText, reward, cost, gain };
-  }
-
-  function describeForecast(forecast) {
-    if (evidenceCount === 0) return "??";
-    const direction = forecast.riskDelta > 0 ? "위험 ↑" : forecast.riskDelta < 0 ? "위험 ↓" : "위험 유지";
-    if (evidenceCount < 3) return direction;
-    return `${direction} · ${formatResourceDelta(forecast.biggestGain)} / ${formatResourceDelta(forecast.biggestCost)}`;
-  }
-
-  function mergeEffects(...effects) {
-    return effects.reduce((merged, effect = {}) => {
-      Object.entries(effect).forEach(([key, value]) => {
-        merged[key] = (merged[key] ?? 0) + value;
-      });
-      return merged;
-    }, {});
-  }
-
-  function getFlowSurge(tacticalRead, challengeMatch, riskDelta) {
-    if (currentChallengeStreak >= 4 && challengeMatch) {
-      return {
-        label: "PERFECT RUN",
-        text: "다섯 번째 연속 공략이 맞물렸습니다. 팀의 신뢰와 정당성이 최고 흐름에 들어갑니다.",
-        effect: { trust: 3, legitimacy: 3, fatigue: -3 },
-      };
-    }
-    if (currentChallengeStreak >= 2 && challengeMatch) {
-      return {
-        label: "STREAK BREAKTHROUGH",
-        text: "세 번째 연속 공략이 맞물렸습니다. 팀의 신뢰가 붙고 판단 피로가 회복됩니다.",
-        effect: { trust: 2, legitimacy: 2, fatigue: -2 },
-      };
-    }
-    if (tacticalRead.grade === "S") {
-      return {
-        label: "FLOW SURGE",
-        text: "챌린지와 위험 제어가 동시에 맞물려 회의실의 지지가 붙었습니다.",
-        effect: { trust: 2, legitimacy: 2, fatigue: -3 },
-      };
-    }
-    if (tacticalRead.grade === "A" && challengeMatch) {
-      return {
-        label: "CHALLENGE SURGE",
-        text: "장면 목표를 정확히 찔러 다음 선택의 피로가 줄었습니다.",
-        effect: { trust: 1, legitimacy: 1, fatigue: -2 },
-      };
-    }
-    if (riskDelta < 0) {
-      return {
-        label: "PRESSURE DROP",
-        text: "위험 압력을 낮춘 덕분에 판단 여력이 조금 회복됐습니다.",
-        effect: { fatigue: -1 },
-      };
-    }
-    return null;
-  }
-
-  function getClueReveal(challengeMatch, riskDelta, responseTimeSec) {
-    const clue = getDiscoveryClue({
-      currentCase,
-      challengeMatch,
-      riskDelta,
-      responseTimeSec,
-      logLength: log.length,
-    });
-    return clue && !discoveredClues.some((item) => item.id === clue.id) ? clue : null;
-  }
-
-  function getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect) {
-    const baseResources = applyEffect(resources, baseEffect);
-    const baseRiskDelta = getRiskPressure(baseResources) - riskPressure;
-    const challengeMatch =
-      choice.type === "free"
-        ? sceneChallenge.id === "use-reframe" && getFreeTextSignals(freeText).filter((signal) => signal.active).length >= 2
-        : Boolean(getChallengeMatch(choice, baseRiskDelta));
-    const tacticalRead = getTacticalRead(
-      { ...choice, effect: baseEffect, cognition: cognitiveEffect },
-      baseRiskDelta,
-      challengeMatch,
-    );
-    const flowSurge = getFlowSurge(tacticalRead, challengeMatch, baseRiskDelta);
-    const finalEffect = flowSurge ? mergeEffects(baseEffect, flowSurge.effect) : baseEffect;
-    const finalResources = applyEffect(resources, finalEffect);
-    const finalRiskDelta = getRiskPressure(finalResources) - riskPressure;
-
-    return {
-      baseRiskDelta,
-      challengeMatch,
-      tacticalRead,
-      flowSurge,
-      finalEffect,
-      finalResources,
-      finalRiskDelta,
-    };
-  }
+  const {
+    getChallengeMatch,
+    getTacticalRead,
+    describeForecast,
+    mergeEffects,
+    getFlowSurge,
+    getClueReveal,
+    getEffectiveChoiceRead,
+  } = createChoiceReaders({
+    sceneChallenge,
+    resources,
+    log,
+    riskPressure,
+    discoveredClues,
+    currentCase,
+    cognition,
+    freeText,
+    currentChallengeStreak,
+    evidenceCount,
+    resourceMeta,
+  });
 
   const riskPressureDrivers = getRiskPressureDrivers(resources);
   const decisionForecasts = fixedChoices

@@ -8,9 +8,10 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node scripts/smoke-test.mjs",
+    "test:runtime": "node scripts/run-e2e.mjs --runtime",
     "test:e2e": "node scripts/run-e2e.mjs",
     "test:e2e:full": "node scripts/run-e2e.mjs --full",
-    "verify": "npm test && npm run build && npm run test:e2e",
+    "verify": "npm test && npm run build && npm run test:runtime && npm run test:e2e",
     "verify:full": "npm run verify && npm run test:e2e:full"
   },
   "dependencies": {

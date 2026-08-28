@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 
 const baseUrl = "http://127.0.0.1:5197";
 const runFullCoverage = process.argv.includes("--full");
-const forwardedArgs = process.argv.slice(2).filter((arg) => arg !== "--full");
+const runRuntimeSmoke = process.argv.includes("--runtime");
+const forwardedArgs = process.argv.slice(2).filter((arg) => arg !== "--full" && arg !== "--runtime");
 
 function spawnCommand(command, args, options = {}) {
   const useWindowsShell = process.platform === "win32";
@@ -45,6 +46,13 @@ let exitCode = 1;
 try {
   await waitForServer(baseUrl);
   exitCode = await new Promise((resolve) => {
+    if (runRuntimeSmoke) {
+      const smoke = spawnCommand("node", ["scripts/runtime-smoke.mjs"], {
+        env: { BASE_URL: baseUrl },
+      });
+      smoke.on("exit", (code) => resolve(code ?? 1));
+      return;
+    }
     const testArgs = runFullCoverage
       ? ["playwright", "test", "tests/full-coverage.spec.js", ...forwardedArgs]
       : ["playwright", "test", "--grep-invert", "@full", ...forwardedArgs];
