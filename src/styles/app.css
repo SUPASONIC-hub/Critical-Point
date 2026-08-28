@@ -1792,20 +1792,52 @@ summary:focus-visible {
 .game-header>div {
   min-width: 0;
 }
-.progress-wrap,
+.status-bar-progress,
 .mini-progress {
   height: 10px;
   overflow: hidden;
   background: var(--c-tone-072);
   border-radius: 999px;
 }
-.progress-wrap {
-  margin: -6px 0 20px;
-}
-.progress-wrap div,
+.status-bar-progress div,
 .mini-progress div {
   height: 100%;
   background: var(--c-teal-deep);
+}
+.game-header {
+  flex-wrap: wrap;
+}
+.game-header > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Its own row under the title, so it never competes for the heading's width. */
+  flex: 1 0 100%;
+  margin: 6px 0 18px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-muted);
+}
+.status-bar b {
+  color: var(--color-ink);
+  font-size: 14px;
+}
+.status-bar-progress {
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+.status-bar-timer.urgent b {
+  color: var(--c-danger);
+}
+@media (max-width: 480px) {
+  .status-bar {
+    gap: 8px;
+    font-size: 11px;
+  }
 }
 .game-header .case-chip {
   color: var(--color-muted);
@@ -2937,17 +2969,6 @@ summary:focus-visible {
   color: var(--c-ink-muted);
   font-size: 11px;
   font-weight: 900;
-}
-.choice-index {
-  display: inline-grid;
-  place-items: center;
-  min-width: 22px;
-  height: 20px;
-  margin-right: 3px;
-  color: var(--c-paper);
-  background: var(--teal);
-  border-radius: 4px;
-  font-size: 10px;
 }
 .choice-tactical {
   display: flex;
@@ -4867,12 +4888,7 @@ body {
   letter-spacing: 0;
   text-wrap: balance;
 }
-.progress-wrap {
-  height: 12px;
-  background: var(--c-tone-127);
-  border: 1px solid var(--c-tone-143);
-}
-.progress-wrap div,
+.status-bar-progress div,
 .mini-progress div {
   background: linear-gradient(90deg,var(--teal),var(--acid-dark));
   box-shadow: 0 0 18px rgba(159, 202, 53, 0.42);
@@ -5819,6 +5835,20 @@ body {
   margin: 0;
   font-size: 34px;
   line-height: 1.35;
+}
+.ending-quiet-line {
+  max-width: 34rem;
+  margin: 0 auto;
+  font-size: 20px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.ending-quiet-skip {
+  margin-top: 2rem;
+  color: var(--color-white-soft);
+  background: none;
+  border: 1px solid var(--color-overlay-line);
+  font-size: 13px;
 }
 .ending-quiet-beat p {
   min-height: 2em;

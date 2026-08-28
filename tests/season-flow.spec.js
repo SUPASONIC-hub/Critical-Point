@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { nodes } from "../src/gameData.js";
+import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 
 async function chooseFirstFixedChoice(page) {
   await page.waitForFunction(
@@ -103,7 +104,24 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
   const gameBoardBlockCount = await page.evaluate(() =>
     document.querySelectorAll(".game-board > section, .game-board > div, .game-board > details").length,
   );
-  expect(gameBoardBlockCount).toBeLessThanOrEqual(6);
+  expect(gameBoardBlockCount).toBeLessThanOrEqual(4);
+
+  const standingNumbers = await page.evaluate(() => {
+    const found = [];
+    for (const element of document.querySelectorAll(".game-board *")) {
+      if (element.closest("details:not([open])")) continue;
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") continue;
+      const own = Array.from(element.childNodes)
+        .filter((node) => node.nodeType === 3)
+        .map((node) => node.textContent.trim())
+        .join(" ")
+        .trim();
+      if (own && /\d/.test(own)) found.push(own.slice(0, 40));
+    }
+    return found;
+  });
+  expect(standingNumbers.length, standingNumbers.join(" / ")).toBeLessThanOrEqual(5);
 
   const transparentText = await page.evaluate(() => {
     const targets = Array.from(
@@ -1341,8 +1359,13 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   }
 
   await expect(page.locator(".ending-step-1")).toBeVisible();
-  await expect(page.locator(".ending-step-1 button")).toBeVisible();
-  await page.locator(".ending-step-1 button").click();
+  await expect(page.locator(".ending-quiet-line")).toBeVisible();
+  // Reduced motion drops the eight-second hold, so the skip control only
+  // appears when the hold is actually running.
+  const quietSkip = page.locator(".ending-quiet-skip");
+  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
+  await expect(page.getByTestId("ending-next")).toBeVisible();
+  await page.getByTestId("ending-next").click();
   await expect(page.locator(".ending-step-2 textarea")).toBeVisible();
   await page.locator(".ending-step-2 textarea").fill("다음 사람은 기록보다 먼저 조건을 확인하세요.");
   await page.locator(".ending-step-2 button").click();
@@ -1352,4 +1375,45 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   await expect
     .poll(async () => page.evaluate(() => localStorage.getItem("critical-point-next-participant-message")))
     .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
+});
+
+test("a replay link restores the captured scene in a fresh context", async ({ page, context }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case04", "c4_vote");
+  await chooseFirstFixedChoice(page);
+  await page.waitForSelector(".game-shell");
+
+  const before = await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
+    return {
+      nodeId: saved.nodeId,
+      currentCase: saved.currentCase,
+      resources: saved.resources,
+      log: (saved.log ?? []).map((entry) => ({ nodeId: entry.nodeId, choiceId: entry.choiceId })),
+    };
+  });
+
+  // The player copies this link from the debug panel; build it with the same
+  // encoder so the test does not depend on a headless clipboard.
+  await expect(page.getByTestId("copy-replay-link")).toBeVisible();
+  const replayUrl = `/?${REPLAY_QUERY_KEY}=${encodeReplaySeed({
+    currentCase: before.currentCase,
+    nodeId: before.nodeId,
+    resources: before.resources,
+    log: before.log,
+  })}`;
+
+  const fresh = await context.newPage();
+  await fresh.goto(replayUrl);
+  await fresh.waitForSelector(".game-shell");
+
+  const after = await fresh.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
+    return { nodeId: saved.nodeId, currentCase: saved.currentCase, resources: saved.resources };
+  });
+
+  expect(after.nodeId).toBe(before.nodeId);
+  expect(after.currentCase).toBe(before.currentCase);
+  expect(after.resources).toEqual(before.resources);
+  await fresh.close();
 });

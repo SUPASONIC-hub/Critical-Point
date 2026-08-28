@@ -1,4 +1,4 @@
-import { characterProfiles, choiceSubtexts, choiceVoiceLines, echoReplies } from "./gameData.js";
+import { CASE_SEQUENCE, characterProfiles, choiceSubtexts, choiceVoiceLines, echoReplies } from "./gameData.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -405,6 +405,16 @@ export function getDiscoveryClue({
   const clue = clues[currentCase];
   const qualifies = challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12) && logLength >= 1;
   return qualifies ? clue : null;
+}
+
+/** Every hidden clue the season can reveal, so the ending can count what stayed shut. */
+export function getAllDiscoveryClueIds() {
+  return CASE_SEQUENCE.map((caseId) => getDiscoveryClue({
+    currentCase: caseId,
+    challengeMatch: true,
+    riskDelta: 2,
+    logLength: 1,
+  })?.id).filter(Boolean);
 }
 
 export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {

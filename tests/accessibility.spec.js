@@ -77,7 +77,11 @@ test("final ending report has no structural accessibility violations", async ({ 
     await page.locator(".ending-sequence button").click();
   }
   await expect(page.locator(".ending-step-1")).toBeVisible();
-  await page.locator(".ending-step-1 button").click();
+  // The quiet beat holds for eight seconds; the skip control ends the hold and
+  // the next control leaves the beat.
+  const quietSkip = page.locator(".ending-quiet-skip");
+  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
+  await page.getByTestId("ending-next").click();
   await page.locator(".ending-step-2 textarea").fill("조건과 기록을 먼저 확인하세요.");
   await page.locator(".ending-step-2 button").click();
   await expect(page.locator(".ending-step-3")).toBeVisible();

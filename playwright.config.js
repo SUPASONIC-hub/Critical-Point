@@ -9,6 +9,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1:5197",
     trace: "on-first-retry",
+    permissions: ["clipboard-read", "clipboard-write"],
   },
   projects: [
     {

@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 
 export function ResultScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
+  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
   return (
       <main className="shell">
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -25,13 +25,19 @@ export function ResultScreen({ view }) {
                     `세 번째 기록: 이번 시즌의 관찰 장부는 ${observationLedger.compliance}/${observationLedger.defiance}/${observationLedger.opacity}/${observationLedger.sacrifice}의 흔적을 남겼다.`,
                   ][endingTwistIndex]}
                 </p>
-                <button type="button" onClick={advanceEndingStep}>다음</button>
+                <button type="button" data-testid="ending-next" onClick={advanceEndingStep}>다음</button>
               </div>
             )}
             {endingStep === 1 && (
               <div className="ending-beat ending-quiet-beat" aria-live="polite">
-                <p>...</p>
-                {endingQuietReady && <button type="button" onClick={advanceEndingStep}>다음</button>}
+                <p className="ending-quiet-line">{endingQuietLine || "..."}</p>
+                {endingQuietReady ? (
+                  <button type="button" data-testid="ending-next" onClick={advanceEndingStep}>다음</button>
+                ) : (
+                  <button type="button" className="ending-quiet-skip" onClick={skipEndingQuietHold}>
+                    이 화면 건너뛰기
+                  </button>
+                )}
               </div>
             )}
             {endingStep === 2 && (
@@ -51,6 +57,7 @@ export function ResultScreen({ view }) {
               <div className="ending-beat">
                 <span>RECORD OPENED</span>
                 <strong>{unopenedRecordCount}개의 기록이 아직 열리지 않았다.</strong>
+                <small>단서 {unopenedClueCount}개 · 밟지 않은 갈래 {unopenedBranchCount}개</small>
                 <small>다음 참가자는 이 빈칸을 이어받습니다.</small>
                 <p>이제 기록 열람을 시작할 수 있습니다.</p>
               </div>

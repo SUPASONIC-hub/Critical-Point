@@ -6,6 +6,7 @@ import { MemoPanel } from "../components/MemoPanel.jsx";
 import { StatusBoard } from "../components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
+import { CASE_SEQUENCE } from "../gameData.js";
 
 export function PlayScreen({ view }) {
   const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
@@ -139,6 +140,36 @@ export function PlayScreen({ view }) {
           questSteps={questSteps}
           simplifyPlayerText={simplifyPlayerText}
         />
+        <MemoPanel
+          memo={node.memo}
+          onOpen={(event) => event.currentTarget.open && setMemoOpened(true)}
+          simplify={simplifyPlayerText}
+        />
+
+        <details className="echo-panel insight-drawer">
+          <summary>
+            <span>에코의 검증 질문</span>
+            <b>반론 열기</b>
+          </summary>
+          <p>{simplifyPlayerText(echo)}</p>
+          <div className="echo-probe">
+            <div>
+              <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
+              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : `${echoProbeCost}을 지불하고 방향성만 확인합니다.`}</span>
+            </div>
+            <button type="button" onClick={requestEchoProbe} disabled={probeUsed || isAdvancing}>
+              {probeUsed ? "확인됨" : "힌트 요청"}
+            </button>
+          </div>
+          <details className="echo-checks">
+            <summary>다시 확인할 것</summary>
+            <ul>
+              {getEchoChecks(node).map((item) => (
+                <li key={item}>{simplifyPlayerText(item)}</li>
+              ))}
+            </ul>
+          </details>
+        </details>
         </details>
         <GameHeader
           node={node}
@@ -147,18 +178,12 @@ export function PlayScreen({ view }) {
           onSave={() => saveCurrentGame()}
           onSaveAndExit={() => saveCurrentGame({ exit: true })}
           onReset={reset}
+          caseNumber={Math.max(1, CASE_SEQUENCE.indexOf(currentCase) + 1)}
+          caseTotal={CASE_SEQUENCE.length}
+          progress={progress}
+          decisionSeconds={decisionSeconds}
         />
         {renderSaveStatus()}
-        <div
-          className="progress-wrap"
-          role="progressbar"
-          aria-label="현재 케이스 진행률"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow={progress}
-        >
-          <div style={{ width: `${progress}%` }} />
-        </div>
 
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
@@ -210,37 +235,6 @@ export function PlayScreen({ view }) {
             </details>
           </section>
         )}
-
-        <MemoPanel
-          memo={node.memo}
-          onOpen={(event) => event.currentTarget.open && setMemoOpened(true)}
-          simplify={simplifyPlayerText}
-        />
-
-        <details className="echo-panel insight-drawer">
-          <summary>
-            <span>에코의 검증 질문</span>
-            <b>반론 열기</b>
-          </summary>
-          <p>{simplifyPlayerText(echo)}</p>
-          <div className="echo-probe">
-            <div>
-              <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
-              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : `${echoProbeCost}을 지불하고 방향성만 확인합니다.`}</span>
-            </div>
-            <button type="button" onClick={requestEchoProbe} disabled={probeUsed || isAdvancing}>
-              {probeUsed ? "확인됨" : "힌트 요청"}
-            </button>
-          </div>
-          <details className="echo-checks">
-            <summary>다시 확인할 것</summary>
-            <ul>
-              {getEchoChecks(node).map((item) => (
-                <li key={item}>{simplifyPlayerText(item)}</li>
-              ))}
-            </ul>
-          </details>
-        </details>
 
         <section className="choice-panel" id="choice-panel" tabIndex={-1}>
           <DecisionRail pendingChoice={pendingChoice} />
@@ -368,7 +362,7 @@ export function PlayScreen({ view }) {
                 >
                   <span className="choice-main">
                     <Check size={16} />
-                    <small><b className="choice-index">{String(choiceIndex + 1).padStart(2, "0")}</b> {pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
+                    <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
@@ -580,7 +574,7 @@ export function PlayScreen({ view }) {
             <div><dt>resources</dt><dd>{Object.entries(resources).map(([key, value]) => `${key}:${value}`).join(" ")}</dd></div>
             <div><dt>silent</dt><dd>{silentFailureCount}</dd></div>
           </dl>
-          <button type="button" className="ghost" onClick={copyReplayLink}>Copy replay link</button>
+          <button type="button" className="ghost" data-testid="copy-replay-link" onClick={copyReplayLink}>Copy replay link</button>
           <button type="button" className="ghost" onClick={copyDiagnosticTrace}>Copy trace</button>
         </aside>
       )}

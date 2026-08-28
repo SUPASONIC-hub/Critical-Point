@@ -1,27 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  AlertTriangle,
-  ArrowLeft,
-  BarChart3,
-  BriefcaseBusiness,
-  Check,
-  ChevronRight,
-  Clock3,
-  Download,
-  FileText,
-  Info,
-  LockKeyhole,
-  MessageSquareText,
-  Trophy,
-  Copy,
-  RefreshCcw,
-  Save,
-  Send,
-  Shield,
-  Sparkles,
-  Users,
-} from "lucide-react";
 import "./styles/tokens.css";
 import "./styles/app.css";
 import {
@@ -66,6 +44,7 @@ import {
   initialResources,
   nodeOrders,
   nodes,
+  getCaseBranchNodes,
   getCaseRouteLength,
   getNodeRouteIndex,
   seasonCasesBase,
@@ -81,6 +60,7 @@ import {
   createCaseSummary,
   getDecisionFingerprint,
   getDecisionLedger,
+  getAllDiscoveryClueIds,
   getDiscoveryClue,
   getCaseOutcome,
   getOutcomeCarryover,
@@ -125,7 +105,6 @@ import { GameHeader } from "./components/GameHeader.jsx";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import {
   appendTraceEvent,
-  createReplaySavedState,
   encodeReplaySeed,
   getReplaySeedFromLocation,
   getTraceEvents,
@@ -133,6 +112,7 @@ import {
 } from "./state/trace.js";
 import {
   createErrorRecoveryEntry,
+  createReplaySavedState,
   getRouteMarker,
   getSavedRecoveryState,
   isKnownCaseId,
@@ -155,15 +135,16 @@ import { ResultScreen } from "./screens/ResultScreen.jsx";
 import { PlayScreen } from "./screens/PlayScreen.jsx";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
-
-const resourceMeta = {
-  time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },
-  capital: { label: easyResourceLabels.capital, suffix: "", icon: BriefcaseBusiness },
-  trust: { label: easyResourceLabels.trust, suffix: "", icon: Users },
-  legitimacy: { label: easyResourceLabels.legitimacy, suffix: "", icon: Shield },
-  humanCost: { label: easyResourceLabels.humanCost, suffix: "", icon: AlertTriangle },
-  fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: BarChart3 },
-};
+import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
+import {
+  legacyProfiles,
+  nextCaseSignals,
+  playGuideItems,
+  playStyleOptions,
+  resourceMeta,
+  sceneVisuals,
+  triggerLabSignals,
+} from "./appContent.js";
 
 const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
@@ -187,148 +168,7 @@ function isAlreadyRecordedConsoleError(text) {
 }
 
 export
-const playStyleOptions = [
-  {
-    id: "instinct",
-    label: "감각형",
-    title: "첫 반응을 믿는다",
-    text: "전술 정보를 덜 보고 장면의 온도와 사람의 반응으로 결정합니다.",
-    payoff: "직관 챌린지 보너스 강화",
-  },
-  {
-    id: "auditor",
-    label: "감사형",
-    title: "근거를 끝까지 확인한다",
-    text: "비용과 위험을 펼쳐 본 뒤, 설명 가능한 선택을 밀어붙입니다.",
-    payoff: "전술 챌린지 보너스 강화",
-  },
-  {
-    id: "mediator",
-    label: "중재형",
-    title: "대화로 압박을 낮춘다",
-    text: "에코의 힌트와 관계의 맥락을 활용해 손실을 분산합니다.",
-    payoff: "에코 힌트 비용 절감",
-  },
-];
-
 const caseSequence = CASE_SEQUENCE;
-
-const sceneVisuals = {
-  case01: "/scene-case01.png",
-  case02: "/scene-case02.png",
-  case03: "/scene-case03.png",
-  case04: "/scene-case04.png",
-  case05: "/scene-case05.png",
-  final: "/scene-final.png",
-};
-
-const legacyProfiles = {
-  S: {
-    label: "CLEAR SIGNAL",
-    title: "이전 판단의 신뢰가 다음 사건을 받칩니다.",
-    text: "직전 케이스에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 신뢰와 정당성을 품고 시작합니다.",
-    effect: { trust: 4, legitimacy: 3 },
-  },
-  A: {
-    label: "STABLE HAND",
-    title: "이전 판단의 균형이 남아 있습니다.",
-    text: "대부분의 압박을 통제했습니다. 다음 사건은 약간의 신뢰와 정당성을 가진 채 열립니다.",
-    effect: { trust: 2, legitimacy: 1 },
-  },
-  B: {
-    label: "UNFINISHED COST",
-    title: "해결되지 않은 비용이 다음 사건으로 넘어왔습니다.",
-    text: "사건은 통과했지만 설명되지 않은 손실이 남았습니다. 다음 사건은 피로를 안고 시작합니다.",
-    effect: { fatigue: 2 },
-  },
-  C: {
-    label: "OPEN WOUND",
-    title: "지난 판단의 균열이 아직 닫히지 않았습니다.",
-    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 정당성과 피로가 불리하게 출발합니다.",
-    effect: { legitimacy: -2, fatigue: 4 },
-  },
-};
-
-const nextCaseSignals = {
-  case01: {
-    eyebrow: "NEXT CASE UNLOCKED",
-    caseId: "case02",
-    title: "사건 02 - 가짜 신호",
-    button: "사건 02 시작",
-    premise:
-      "동료가 내부 정보 유출자로 지목됩니다. 증거는 명확하지만, 사람의 맥락은 다른 이야기를 합니다.",
-    hook:
-      "트리거랩은 방금 당신이 손실을 누구에게 먼저 배분했는지 기록했습니다. 다음 사건에서는 그 기준이 사람을 믿을지, 기록을 믿을지의 압박으로 바뀝니다.",
-  },
-  case02: {
-    eyebrow: "NEXT CASE UNLOCKED",
-    caseId: "case03",
-    title: "사건 03 - 경쟁자의 반격",
-    button: "사건 03 시작",
-    premise:
-      "오진우와 같은 자료를 받고 동시에 해결안을 냅니다. 이번에는 경쟁심이 판단을 빠르게 만드는지, 얕게 만드는지 확인합니다.",
-    hook:
-      "당신이 증거와 신뢰 사이에서 망설인 시간은 다음 테스트의 난이도가 됩니다. 오진우는 그 망설임을 점수판으로 바꿔 보여줄 것입니다.",
-  },
-  case03: {
-    eyebrow: "NEXT CASE UNLOCKED",
-    caseId: "case04",
-    title: "사건 04 - 치러야 할 대가",
-    button: "사건 04 시작",
-    premise:
-      "작은 규칙 위반이 수천 명을 살릴 수 있습니다. 이번에는 좋은 결과가 절차 훼손을 어디까지 정당화하는지 묻습니다.",
-    hook:
-      "경쟁 압박 속에서 당신이 줄인 검증과 남긴 근거가 분리됩니다. 다음 사건은 좋은 결과를 얻기 위해 어느 선까지 넘을 수 있는지 묻습니다.",
-  },
-  case04: {
-    eyebrow: "NEXT CASE UNLOCKED",
-    caseId: "case05",
-    title: "사건 05 - 범인은 없었다",
-    button: "사건 05 시작",
-    premise:
-      "명백한 악인은 없습니다. 모두가 합리적으로 움직였지만 시스템은 가장 조용한 사람들을 밀어냈습니다.",
-    hook:
-      "명분 있는 예외를 허용한 기록은 사라지지 않습니다. 다음 사건에서는 누구도 규칙을 어기지 않았는데도 피해가 생깁니다.",
-  },
-  case05: {
-    eyebrow: "FINAL CASE UNLOCKED",
-    caseId: "final",
-    title: "마지막 사건 - 트리거랩의 진실",
-    button: "마지막 사건 시작",
-    premise:
-      "모든 사건의 로그가 하나의 폴더로 연결됩니다. 이제 트리거랩이 당신의 사고 조건을 어떻게 사용했는지 마주합니다.",
-    hook:
-      "악인이 없는 실패까지 통과한 뒤, 남는 것은 사건이 아니라 당신의 반응 패턴입니다. 마지막 폴더에는 그 패턴이 사건 설계에 쓰인 흔적이 있습니다.",
-  },
-};
-
-const playGuideItems = [
-  {
-    title: "에코",
-    text: "정답을 주는 사람이 아니라, 방금 선택에서 빠진 점을 알려주는 도우미입니다.",
-  },
-  {
-    title: "판 바꾸기",
-    text: "보기 중 마음에 드는 답이 없을 때 사람, 조건, 순서를 직접 새로 정합니다.",
-  },
-  {
-    title: "상태 변화",
-    text: "선택 뒤에 달라지는 시간, 현금, 믿음, 공정함, 사람 피해, 지침을 보여줍니다.",
-  },
-  {
-    title: "반응 버튼",
-    text: "당신이 특히 오래 고민하거나 쉽게 움직이는 마음의 지점입니다. 다음 사건에도 영향을 줍니다.",
-  },
-];
-
-const triggerLabSignals = {
-  case01: "관찰 항목: 손실 배분 순서, 보호 대상, 공개 지연 허용선",
-  case02: "관찰 항목: 로그 신뢰도, 관계 신뢰도, 절차 밖 확인 허용선",
-  case03: "관찰 항목: 경쟁 상황의 검증 생략, 속도 보상 반응, 점수판 민감도",
-  case04: "관찰 항목: 좋은 결과를 위한 예외 허용선, 기록 은폐 저항, 공개 감사 선호",
-  case05: "관찰 항목: 단일 책임 욕구, 구조 실패 인내, 조용한 피해자 감지",
-  final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
-};
 
 const debugToolsEnabled =
   import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
@@ -597,7 +437,20 @@ export function App() {
   const gameplayStats = getGameplayStats(log, riskPressure);
   const observationLedger = getObservationLedger(log);
   const clueCount = discoveredClues.length;
-  const unopenedRecordCount = Math.max(0, 4 - clueCount);
+  // What this run left shut: clues never surfaced, and the far side of every fork.
+  const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
+  const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
+  const unopenedBranchCount = getCaseBranchNodes().reduce(
+    (total, branch) => total + branch.nextIds.filter((nodeId) => !visitedNodeIds.has(nodeId)).length,
+    0,
+  );
+  const unopenedRecordCount = unopenedClueCount + unopenedBranchCount;
+  // The quiet beat shows the player their own words: a free-text line that
+  // cleared the privacy check, otherwise the last thing they chose to say.
+  const endingQuietLine =
+    [...log].reverse().find((entry) => entry.freeTextSuccess && entry.freeText)?.freeText ??
+    [...log].reverse().find((entry) => entry.spokenChoice)?.spokenChoice ??
+    "";
   const decisionLedger = getDecisionLedger(log, resources);
   const decisionFingerprint = getDecisionFingerprint({
     triggerScores: triggers,
@@ -1056,6 +909,10 @@ export function App() {
     };
   }, [isOnline, localLeaderboardRows, showRanking]);
   const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
+
+  function skipEndingQuietHold() {
+    setEndingQuietReady(true);
+  }
 
   useEffect(() => {
     if (!isResult || currentCase !== "final" || endingStep !== 1) return undefined;
@@ -1638,112 +1495,21 @@ export function App() {
     };
   }
 
-  function queueTelemetry(item) {
-    const nextQueue = [
-      ...pendingTelemetryRef.current.filter((queued) => queued.id !== item.id),
-      {
-        queuedAt: new Date().toISOString(),
-        ...item,
-      },
-    ];
-    commitPendingTelemetryQueue(nextQueue);
-  }
-
-  function commitPendingTelemetryQueue(nextQueue) {
-    const latestSaved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-    if (!isSavedStateShapeValid(latestSaved)) {
-      setSaveStatus("원격 저장 대기열을 저장하지 못했습니다. 브라우저 저장본을 확인해 주세요.");
-      return false;
-    }
-    const savedAt = new Date().toISOString();
-    const stored = writeStoredValue(
-      STORAGE_KEY,
-      JSON.stringify({
-        ...latestSaved,
-        pendingTelemetry: nextQueue,
-        savedAt,
-      }),
-    );
-    if (stored) {
-      pendingTelemetryRef.current = nextQueue;
-      setPendingTelemetry(nextQueue);
-      setLastSavedAt(savedAt);
-      return true;
-    }
-    setSaveStatus("브라우저 저장소를 사용할 수 없어 원격 저장 대기열 변경을 반영하지 못했습니다.");
-    return false;
-  }
-
-  async function sendTelemetryItem(item) {
-    if (item.type === "case") return saveCaseTelemetry(item.payload);
-    if (item.type === "feedback") return saveFeedbackTelemetry(item.payload);
-    if (item.type === "error") return saveErrorTelemetry(item.payload);
-    throw new Error(`Unknown telemetry item type: ${item.type}`);
-  }
-
-  async function retryPendingTelemetry() {
-    const retryBatch = pendingTelemetryRef.current;
-    if (!telemetryEnabled || !dataConsent || !isOnline || retryBatch.length === 0 || isRetryingTelemetry) {
-      return { attempted: false, failedCount: retryBatch.length };
-    }
-    setIsRetryingTelemetry(true);
-    setTelemetryStatus({
-      tone: "pending",
-      text: `대기 중인 원격 저장 ${retryBatch.length}건을 다시 전송하는 중입니다.`,
-    });
-
-    const failedItems = [];
-    for (const item of retryBatch) {
-      try {
-        await sendTelemetryItem(item);
-      } catch (error) {
-        console.warn(error);
-        failedItems.push(item);
-      }
-    }
-
-    const retryIds = new Set(retryBatch.map((item) => item.id));
-    const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
-    const nextQueue = [...failedItems, ...newlyQueuedItems];
-    const queueCommitted = commitPendingTelemetryQueue(nextQueue);
-    const visibleQueue = queueCommitted ? nextQueue : retryBatch;
-    setIsRetryingTelemetry(false);
-    if (queueCommitted && nextQueue.length === 0) {
-      telemetryRetryAttemptRef.current = 0;
-      setTelemetryRetryInfo({ attempt: 0, nextRetryAt: "" });
-    }
-    setTelemetryStatus(
-      queueCommitted && nextQueue.length === 0
-        ? {
-            tone: "success",
-            text: "대기 중이던 원격 저장을 모두 완료했습니다.",
-          }
-        : {
-            tone: "error",
-            text: queueCommitted
-              ? `원격 저장 ${visibleQueue.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`
-              : "원격 저장 응답을 받았지만 브라우저 저장본 갱신에 실패했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
-          },
-    );
-    return { attempted: true, failedCount: visibleQueue.length, queueCommitted };
-  }
-
-  function scheduleTelemetryRetry({ immediate = false } = {}) {
-    if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetryRef.current.length === 0 || isRetryingTelemetry) return;
-    if (telemetryRetryTimerRef.current) return;
-    const attempt = immediate ? 0 : telemetryRetryAttemptRef.current + 1;
-    const delayMs = immediate ? 0 : Math.min(60_000, 2_000 * 2 ** Math.max(0, attempt - 1));
-    const nextRetryAt = new Date(Date.now() + delayMs).toISOString();
-    telemetryRetryAttemptRef.current = attempt;
-    setTelemetryRetryInfo({ attempt, nextRetryAt });
-    telemetryRetryTimerRef.current = window.setTimeout(async () => {
-      telemetryRetryTimerRef.current = null;
-      const result = await retryPendingTelemetry();
-      if (result?.failedCount > 0) {
-        scheduleTelemetryRetry();
-      }
-    }, delayMs);
-  }
+  const { queueTelemetry, commitPendingTelemetryQueue, retryPendingTelemetry, scheduleTelemetryRetry } = createTelemetryQueue({
+    pendingTelemetryRef,
+    setPendingTelemetry,
+    setTelemetryStatus,
+    setIsRetryingTelemetry,
+    setTelemetryRetryInfo,
+    telemetryRetryTimerRef,
+    isOnline,
+    dataConsent,
+    telemetryEnabled,
+    isRetryingTelemetry,
+    telemetryRetryAttemptRef,
+    setSaveStatus,
+    setLastSavedAt,
+  });
 
   function choose(choice) {
     if (isAdvancing) return;
@@ -2683,7 +2449,7 @@ export function App() {
     setEndingStep(3);
   }
 
-  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines };
+  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines };
   if (isResult) {
     return <ResultScreen view={resultView} />;
   }

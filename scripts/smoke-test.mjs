@@ -15,6 +15,7 @@ import {
   getContinuityChallenge,
   detectPrivacySignals,
   getGameplayStats,
+  getAllDiscoveryClueIds,
   getObservationLedger,
   getRiskPressure,
   getRiskPressureDrivers,
@@ -61,6 +62,7 @@ import {
   CASE_SEQUENCE,
   CASE_START_NODES,
   caseOpeningRoutes,
+  getCaseBranchNodes,
   getCaseRouteLength,
   getNodeRouteIndex,
   initialResources,
@@ -786,6 +788,58 @@ const observationLedger = getObservationLedger([
   { choice: "침묵을 유지한다", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 32 } },
 ]);
 assert.deepEqual(observationLedger, { compliance: 1, defiance: 1, opacity: 1, sacrifice: 2 }, "observation ledger should be deterministic and hidden during play");
+
+// D-6: system events must not feed the challenge streak or the clear count.
+const statsWithSystemEvent = getGameplayStats(
+  [
+    {
+      responseTimeSec: 8,
+      cognition: { risk: 2 },
+      challenge: { matched: true },
+      resourcesBefore: initialResources,
+      resourcesAfter: initialResources,
+    },
+    {
+      title: "CRISIS PROTOCOL",
+      isSystemEvent: true,
+      responseTimeSec: 3,
+      challenge: { matched: true },
+      resourcesBefore: initialResources,
+      resourcesAfter: initialResources,
+    },
+  ],
+  getRiskPressure(initialResources),
+);
+assert.equal(
+  statsWithSystemEvent.challengeClearCount,
+  1,
+  "D-6: the crisis protocol must not count as a cleared scene challenge",
+);
+
+// D-5: the stabiliser score reads the fatigue bonus as its own comparison.
+const guardianFingerprint = getDecisionFingerprint({
+  triggerScores: {},
+  cognitionScores: {},
+  entries: [
+    { effect: { fatigue: -4 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+    { effect: { fatigue: -3 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+  ],
+  resources: recoveredResources,
+});
+assert.ok(
+  typeof guardianFingerprint.modeTitle === "string" && guardianFingerprint.modeTitle.length > 0,
+  "D-5: the ending mode must resolve to a named profile",
+);
+
+// T5-3: the closing screen counts what the run left shut, from the graph itself.
+const branchNodes = getCaseBranchNodes();
+assert.equal(branchNodes.length, CASE_SEQUENCE.length, "every case should expose exactly one authored fork");
+for (const branch of branchNodes) {
+  assert.ok(branch.nextIds.length >= 2, `${branch.caseId} fork should lead to at least two scenes`);
+}
+const allClueIds = getAllDiscoveryClueIds();
+assert.equal(allClueIds.length, CASE_SEQUENCE.length, "each case should hide exactly one clue");
+assert.equal(new Set(allClueIds).size, allClueIds.length, "hidden clue ids should be unique");
 
 const caseSummary = createCaseSummary(
   { responsibility: 3, protection: 1 },

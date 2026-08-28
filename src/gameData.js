@@ -2396,6 +2396,22 @@ function getPlayableRoute(caseId) {
   return route;
 }
 
+/**
+ * The one authored mid-case fork per case, with the scenes each side leads to.
+ * Derived from the graph so adding a branch needs no second list.
+ */
+export function getCaseBranchNodes() {
+  return CASE_SEQUENCE.map((caseId) => {
+    const nodeId = [...new Set(nodeOrders[caseId])].find((id) => {
+      const scene = nodes[id];
+      if (!scene) return false;
+      return new Set(scene.choices.map((choice) => choice.next)).size > 1;
+    });
+    if (!nodeId) return null;
+    return { caseId, nodeId, nextIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.next))] };
+  }).filter(Boolean);
+}
+
 export function getCaseRouteLength(caseId) {
   return getPlayableRoute(caseId).length;
 }
