@@ -36,11 +36,7 @@ export function GameMetricsDrawer({
   simplifyPlayerText,
 }) {
   return (
-        <details className="game-metrics-drawer insight-drawer">
-          <summary>
-            <span>현재 상황</span>
-            <b>위험·기록·목표 보기</b>
-          </summary>
+        <>
         <section className="game-hud">
           <article className={`risk-card ${riskTier.toLowerCase()}`}>
             <span>위험</span>
@@ -217,7 +213,6 @@ export function GameMetricsDrawer({
             </article>
           </div>
         </section>
-        </details>
-
+        </>
   );
 }

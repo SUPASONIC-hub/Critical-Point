@@ -25,7 +25,7 @@ export function PlayScreen({ view }) {
         <details className="game-context-drawer insight-drawer">
           <summary>
             <span>현재 상황판</span>
-            <b>목표·압박·자원·기록 보기</b>
+            <b>목표·압박·위험·자원·기록·장면 목표 한 번에 보기</b>
           </summary>
         <section className="mission-strip">
           <div>
@@ -106,27 +106,6 @@ export function PlayScreen({ view }) {
             ))}
           </div>
         </details>
-        </details>
-        <GameHeader
-          node={node}
-          simplify={simplifyPlayerText}
-          sceneTitleRef={sceneTitleRef}
-          onSave={() => saveCurrentGame()}
-          onSaveAndExit={() => saveCurrentGame({ exit: true })}
-          onReset={reset}
-        />
-        {renderSaveStatus()}
-        <div
-          className="progress-wrap"
-          role="progressbar"
-          aria-label="현재 케이스 진행률"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow={progress}
-        >
-          <div style={{ width: `${progress}%` }} />
-        </div>
-
         <GameMetricsDrawer
           riskTier={riskTier}
           easyRiskLabels={easyRiskLabels}
@@ -160,6 +139,26 @@ export function PlayScreen({ view }) {
           questSteps={questSteps}
           simplifyPlayerText={simplifyPlayerText}
         />
+        </details>
+        <GameHeader
+          node={node}
+          simplify={simplifyPlayerText}
+          sceneTitleRef={sceneTitleRef}
+          onSave={() => saveCurrentGame()}
+          onSaveAndExit={() => saveCurrentGame({ exit: true })}
+          onReset={reset}
+        />
+        {renderSaveStatus()}
+        <div
+          className="progress-wrap"
+          role="progressbar"
+          aria-label="현재 케이스 진행률"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={progress}
+        >
+          <div style={{ width: `${progress}%` }} />
+        </div>
 
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
@@ -270,70 +269,16 @@ export function PlayScreen({ view }) {
             <Info size={15} />
             {showTacticalDetails ? "전술 정보 닫기" : "전술 정보 열기"}
           </button>
-          {showTacticalDetails && decisionForecasts.length > 0 && (
-            <section className="decision-forecast" aria-label="결정 예보">
+          {showTacticalDetails && (
+            <section className="tactical-brief" aria-label="판단 힌트">
               <div className="forecast-header">
-                <span>판단 렌즈</span>
-                <strong>현재 압박 {riskPressure}</strong>
+                <span>판단 힌트</span>
+                <strong>{pressureLeader ? pressureLeader.label : "현재 압박"}을 먼저 확인하세요</strong>
                 <p>
-                  {pressureLeader
-                    ? `${pressureLeader.label}이 지금 판단을 가장 세게 흔듭니다. 렌즈는 정답이 아니라 관점입니다.`
-                    : "현재 압박 요인은 낮습니다. 렌즈는 선택의 대가를 비교하기 위한 관점입니다."}
+                  이 보기는 정답을 계산하지 않고, 각 선택이 어느 방향의 부담을 만들 수 있는지만 보여줍니다.
+                  정확한 수치와 등급은 선택 후 결과 로그에서 확인합니다.
                 </p>
               </div>
-              <div className="forecast-grid">
-                <button
-                  type="button"
-                  className="forecast-highlight"
-                  onClick={() => previewChoice(pressureLensForecast.choice)}
-                  aria-pressed={pendingChoice?.id === pressureLensForecast.choice.id}
-                  aria-label="압박을 낮추는 관점 미리보기"
-                >
-                  <span>압박을 낮추는 관점</span>
-                  <b>{pressureLensForecast.choice.label}</b>
-                    <small>{describeForecast(pressureLensForecast.forecast)}</small>
-                </button>
-                <button
-                  type="button"
-                  className="forecast-highlight"
-                  onClick={() => previewChoice(tradeoffLensForecast.choice)}
-                  aria-pressed={pendingChoice?.id === tradeoffLensForecast.choice.id}
-                  aria-label="대가를 크게 쓰는 관점 미리보기"
-                >
-                  <span>대가를 크게 쓰는 관점</span>
-                  <b>{tradeoffLensForecast.choice.label}</b>
-                  <small>{describeForecast(tradeoffLensForecast.forecast)}</small>
-                </button>
-                <article>
-                  <span>압박 원인</span>
-                  <b>{riskPressureDrivers.slice(0, 2).map((driver) => driver.label).join(" / ")}</b>
-                  <small>
-                    {riskPressureDrivers
-                      .slice(0, 2)
-                      .map((driver) => `${driver.value}`)
-                      .join(" · ")}
-                  </small>
-                </article>
-              </div>
-              <ol className="forecast-list">
-                {decisionForecasts.map(({ choice, forecast, tacticalRead }) => (
-                  <li key={choice.id}>
-                    <button
-                      type="button"
-                      className="forecast-choice"
-                      onClick={() => previewChoice(choice)}
-                      aria-pressed={pendingChoice?.id === choice.id}
-                      aria-label={`${choice.label} 미리보기`}
-                    >
-                      <b className="forecast-uncertainty">{evidenceCount >= 3 ? "확인" : "미확인"}</b>
-                      <span>
-                        <strong>{choice.label}</strong>
-                        <small>{describeForecast(forecast)}</small>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
             </section>
           )}
           {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
@@ -388,7 +333,12 @@ export function PlayScreen({ view }) {
                     ? `위험 ${riskDelta}`
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
-              const tacticalRead = choiceRead.tacticalRead;
+              const pressureHint =
+                riskDelta > 0
+                  ? "압박이 커질 수 있습니다."
+                  : riskDelta < 0
+                    ? "압박을 낮출 수 있습니다."
+                    : "압박은 크게 움직이지 않습니다.";
               return (
                 <button
                   type="button"
@@ -428,56 +378,16 @@ export function PlayScreen({ view }) {
                     <>
                       <span className="choice-tactical">
                         <span>
-                          <strong>{simplifyPlayerText(tacticalRead.gradeText)}</strong>
-                          <small>{simplifyPlayerText(tacticalRead.reward)} · 얻는 것 {simplifyPlayerText(tacticalRead.gain)} · 드는 것 {simplifyPlayerText(tacticalRead.cost)}</small>
+                          <strong>방향 힌트</strong>
+                          <small>{pressureHint}</small>
                         </span>
                       </span>
                       {choiceRead.flowSurge && (
                         <span className="choice-surge">
-                          {simplifyPlayerText(choiceRead.flowSurge.label)} · {simplifyPlayerText(explainResourceTradeoff(choiceRead.flowSurge.effect))}
+                          {simplifyPlayerText(choiceRead.flowSurge.label)} · 추가 보정이 붙습니다. 정확한 폭은 선택 후 기록에서 확인합니다.
                         </span>
                       )}
                       <span className="choice-subtext">{simplifyPlayerText(getChoiceSubtext(choice))}</span>
-                      {choice.effect && (
-                        <span className="choice-tradeoff">
-                          {simplifyPlayerText(explainResourceTradeoff(choice.effect))}
-                        </span>
-                      )}
-                      {choice.effect && (
-                        <span className={`choice-risk ${riskClass}`}>
-                          {riskLabel} · 예상 압력 {projectedRisk}
-                        </span>
-                      )}
-                      {choice.effect && (
-                        <span
-                          className={`choice-impact ${riskClass}`}
-                          role="meter"
-                          aria-label="예상 압력"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          aria-valuenow={projectedRisk}
-                          aria-valuetext={`${projectedRisk}`}
-                        >
-                          <span className="choice-impact-track" aria-hidden="true">
-                            <span style={{ width: `${Math.min(100, Math.max(4, projectedRisk))}%` }} />
-                          </span>
-                          <b>압력 {projectedRisk}/100</b>
-                        </span>
-                      )}
-                      {choice.effect && (
-                        <span className="choice-effect">
-                          {Object.entries(choiceRead.finalEffect)
-                            .map(([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`)
-                            .join(" · ")}
-                        </span>
-                      )}
-                      {choice.cognition && (
-                        <span className="choice-cognition">
-                          {Object.entries(choice.cognition)
-                            .map(([key, value]) => `${easyCognitionLabels[key] ?? cognitionLabels[key] ?? key} +${value}`)
-                            .join(" · ")}
-                        </span>
-                      )}
                     </>
                   )}
                   {!showTacticalDetails && (

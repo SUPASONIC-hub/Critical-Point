@@ -122,3 +122,71 @@ test("start fresh from recovery clears the saved run and returns to intro", asyn
     .toBeNull();
   await expect(page.locator(".intro-shell")).toBeVisible();
 });
+
+const ERROR_LOG_KEY = "trigger-prototype-error-log-v1";
+
+async function readErrorSources(page) {
+  return page.evaluate((key) => {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    const entries = Array.isArray(parsed) ? parsed : (parsed?.entries ?? parsed?.items ?? []);
+    return entries.map((entry) => entry?.context?.source);
+  }, ERROR_LOG_KEY);
+}
+
+test("a first visit with no saved run does not manufacture an error log entry", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await expect(page.locator(".intro-shell")).toBeVisible();
+  expect(await readErrorSources(page)).toEqual([]);
+});
+
+test("a clean scene transition does not manufacture an error log entry", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.getByTestId("debug-case-select").selectOption("case01");
+  await page.getByTestId("debug-node-select").selectOption("start");
+  await page.getByTestId("debug-start-node").click();
+  await page.waitForSelector(".game-shell");
+  await page.evaluate((key) => localStorage.removeItem(key), ERROR_LOG_KEY);
+
+  await page.locator(".choices .choice").first().evaluate((button) => button.click());
+  await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+  await page.waitForSelector("[data-testid='decision-next']");
+  await page.getByTestId("decision-next").evaluate((button) => button.click());
+  await page.waitForSelector(".game-shell");
+
+  expect(await readErrorSources(page)).toEqual([]);
+  const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), STORAGE_KEY);
+  expect(saved.paused).toBe(false);
+  expect(saved.lastError).toBeFalsy();
+});
+
+test("a saved run that fails shape validation is still reported", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.evaluate(
+    ([storageKey, logKey]) => {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ saveSchemaVersion: 2, started: true, currentCase: "case03", nodeId: 12345, log: "not-an-array" }),
+      );
+      localStorage.removeItem(logKey);
+    },
+    [STORAGE_KEY, ERROR_LOG_KEY],
+  );
+  await page.reload();
+  await expect.poll(async () => (await readErrorSources(page)).length).toBeGreaterThan(0);
+  const sources = await readErrorSources(page);
+  expect(sources.some((source) => String(source).startsWith("silent-"))).toBe(true);
+});
+
+test("console.error from anywhere in the app reaches the error log", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.getByTestId("debug-case-select").selectOption("case01");
+  await page.getByTestId("debug-node-select").selectOption("start");
+  await page.getByTestId("debug-start-node").click();
+  await page.waitForSelector(".game-shell");
+  await page.evaluate((key) => localStorage.removeItem(key), ERROR_LOG_KEY);
+
+  await page.evaluate(() => console.error("synthetic console failure for diagnostics"));
+  await expect.poll(async () => (await readErrorSources(page)).length).toBeGreaterThan(0);
+  expect(await readErrorSources(page)).toContain("console-error");
+});

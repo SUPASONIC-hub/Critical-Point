@@ -92,6 +92,56 @@ test("case flow has no unhandled browser runtime errors", async ({ page }) => {
   expect(runtimeErrors).toEqual([]);
 });
 
+test("play screen keeps choices compact, readable, and free of exact pre-choice forecasts", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+
+  await expect(page.locator(".game-shell")).toBeVisible();
+  await expect(page.locator(".decision-forecast")).toHaveCount(0);
+  await expect(page.locator(".choice-tradeoff, .choice-risk, .choice-impact, .choice-cognition")).toHaveCount(0);
+
+  const gameBoardBlockCount = await page.evaluate(() =>
+    document.querySelectorAll(".game-board > section, .game-board > div, .game-board > details").length,
+  );
+  expect(gameBoardBlockCount).toBeLessThanOrEqual(6);
+
+  const transparentText = await page.evaluate(() => {
+    const targets = Array.from(
+      document.querySelectorAll(
+        ".game-shell, .game-board, .choice-panel, .choices, .choice, .status-board, .decision-dock, .scene",
+      ),
+    );
+    return targets
+      .filter((element) => {
+        const text = element.textContent?.trim();
+        if (!text) return false;
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.width > 0 &&
+          rect.height > 0 &&
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          (style.color === "transparent" || style.color === "rgba(0, 0, 0, 0)")
+        );
+      })
+      .map((element) => element.className || element.tagName)
+      .slice(0, 5);
+  });
+  expect(transparentText).toEqual([]);
+
+  const detailsToggle = page.locator(".tactical-toggle");
+  if (await detailsToggle.isVisible().catch(() => false)) {
+    await detailsToggle.click();
+  }
+
+  await expect(page.locator(".decision-forecast")).toHaveCount(0);
+  await expect(page.locator(".choice-tactical").first()).toBeVisible();
+  const exposedPreChoiceText = await page.locator(".choices").innerText();
+  expect(exposedPreChoiceText).not.toMatch(/\b[ABC]\b/);
+  expect(exposedPreChoiceText).not.toMatch(/[+-]\d/);
+});
+
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
   test.setTimeout(180_000);
   await page.goto("/?debug=1");

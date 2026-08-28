@@ -449,6 +449,19 @@ authoredGeneratedScenes.forEach((node) => {
 });
 assert.equal(generatedChoiceCount, 108, "36 generated scenes should expose 108 authored choices");
 
+const fixedChoiceFallbacks = CASE_SEQUENCE.flatMap((caseId) =>
+  [...new Set(nodeOrders[caseId])].flatMap((nodeId) =>
+    nodes[nodeId].choices
+      .filter((choice) => choice.type !== "free")
+      .filter((choice) => !choiceVoiceLines[choice.id] || !echoReplies[choice.id])
+      .map((choice) => `${nodeId}/${choice.id}`),
+  ),
+);
+assert.ok(
+  fixedChoiceFallbacks.length <= 20,
+  `at most 20 fixed choices may fall back to default copy, found ${fixedChoiceFallbacks.length}: ${fixedChoiceFallbacks.join(", ")}`,
+);
+
 function simulateCaseRoute(caseId, startNodeId = CASE_START_NODES[caseId], choiceIndex = 0) {
   const visited = [];
   let cursor = startNodeId;

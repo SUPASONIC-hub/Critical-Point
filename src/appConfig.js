@@ -124,6 +124,21 @@ export function isSavedStateShapeValid(state) {
   );
 }
 
+export function getInvalidSavedStateKeys(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return ["<not-an-object>"];
+  const invalid = [];
+  for (const key of ["completedCases", "discoveredClues", "log", "pendingTelemetry"]) {
+    if (!Array.isArray(state[key])) invalid.push(key);
+  }
+  for (const key of ["caseResults", "playtestFeedback", "resources", "triggers", "cognition"]) {
+    if (!state[key] || typeof state[key] !== "object" || Array.isArray(state[key])) invalid.push(key);
+  }
+  for (const key of ["currentCase", "nodeId"]) {
+    if (typeof state[key] !== "string") invalid.push(key);
+  }
+  return invalid;
+}
+
 export function readStoredValue(key, fallback = null) {
   try {
     return globalThis.localStorage?.getItem(key) ?? fallback;

@@ -33,6 +33,7 @@ import {
   appendSaveSlot,
   copyText,
   FREE_TEXT_MAX_LENGTH,
+  getInvalidSavedStateKeys,
   isSavedStateShapeValid,
   normalizeFeedback,
   normalizePlayerName,
@@ -122,6 +123,10 @@ import { MemoPanel } from "./components/MemoPanel.jsx";
 import { StatusBoard } from "./components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "./components/GameMetricsDrawer.jsx";
 import { GameHeader } from "./components/GameHeader.jsx";
+import { DecisionReveal } from "./components/DecisionReveal.jsx";
+import { RecoveryNotice } from "./components/RecoveryNotice.jsx";
+import { SaveStatus } from "./components/SaveStatus.jsx";
+import { ErrorLogPanel } from "./components/ErrorLogPanel.jsx";
 import { RankingScreen } from "./screens/RankingScreen.jsx";
 import { IntroScreen } from "./screens/IntroScreen.jsx";
 import { ResultScreen } from "./screens/ResultScreen.jsx";
@@ -1076,6 +1081,22 @@ function recordAppError(error, errorInfo = {}, source = "runtime") {
   return entry;
 }
 
+let consoleErrorHookBusy = false;
+
+function safeStringify(value) {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+// The error boundary and reportSilentFailure already write their own entries,
+// so skip their console output instead of logging the same failure twice.
+function isAlreadyRecordedConsoleError(text) {
+  return text.startsWith("Critical Point render error") || text.includes("[silent:");
+}
+
 function reportSilentFailure(code, detail = {}) {
   const error = new Error(`[silent:${code}] ${JSON.stringify(detail)}`);
   error.name = "SilentRouteFailure";
@@ -1087,13 +1108,20 @@ function reportSilentFailure(code, detail = {}) {
 export function App() {
   const saved = useMemo(() => {
     const replay = createReplaySavedState(replaySeed);
-    const parsed = replay ?? parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const rawSaved = readStoredValue(STORAGE_KEY, "null");
+    const hasStoredSave = Boolean(replay) || (typeof rawSaved === "string" && rawSaved !== "null" && rawSaved !== "");
+    const parsed = replay ?? parseCurrentSavedState(rawSaved, SAVE_SCHEMA_VERSION);
     const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(parsed)));
     if (!isSavedStateShapeValid(repaired)) {
-      reportSilentFailure("save-shape", {
-        currentCase: repaired?.currentCase,
-        nodeId: repaired?.nodeId,
-      });
+      // A first-time visitor simply has no save yet; only a save that exists and
+      // fails validation is a real failure worth spending an error-log slot on.
+      if (hasStoredSave) {
+        reportSilentFailure("save-shape", {
+          currentCase: repaired?.currentCase,
+          nodeId: repaired?.nodeId,
+          invalidKeys: getInvalidSavedStateKeys(repaired),
+        });
+      }
       return null;
     }
     const resumed = repaired.started && repaired.paused ? { ...repaired, paused: false } : repaired;
@@ -1788,9 +1816,31 @@ export function App() {
       });
       refreshLocalErrorLog();
     };
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      originalConsoleError.apply(console, args);
+      if (consoleErrorHookBusy) return;
+      const text = args
+        .map((arg) => (arg instanceof Error ? arg.message : typeof arg === "string" ? arg : safeStringify(arg)))
+        .join(" ")
+        .trim();
+      if (!text || isAlreadyRecordedConsoleError(text)) return;
+      consoleErrorHookBusy = true;
+      try {
+        const consoleError = args.find((arg) => arg instanceof Error) ?? new Error(limitText(text, 400));
+        consoleError.name = "ConsoleError";
+        recordAppError(consoleError, {}, "console-error");
+        refreshLocalErrorLog();
+      } catch {
+        // Never let diagnostics break the console itself.
+      } finally {
+        consoleErrorHookBusy = false;
+      }
+    };
     window.addEventListener("error", handleWindowError);
     window.addEventListener("unhandledrejection", handleUnhandledRejection);
     return () => {
+      console.error = originalConsoleError;
       window.removeEventListener("error", handleWindowError);
       window.removeEventListener("unhandledrejection", handleUnhandledRejection);
     };
@@ -3451,270 +3501,24 @@ export function App() {
     }
   }
 
+  const decisionRevealView = { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal };
   function renderDecisionReveal() {
-    if (!decisionReveal) return null;
-    const revealTone = decisionReveal.clue
-      ? "clue-found"
-      : decisionReveal.suspenseEvent
-        ? "system-alert"
-        : decisionReveal.cascade
-          ? "chain-reaction"
-          : decisionReveal.streakBreak
-            ? "streak-break"
-          : "decision-locked";
-    return (
-      <div className="decision-reveal-backdrop" role="presentation">
-        <div className={`cinematic-burst ${revealTone}`} aria-hidden="true">
-          <div className="cinematic-vignette" />
-          <div className="impact-ring" />
-          <div className="impact-lines">
-            {Array.from({ length: 12 }, (_, index) => <i key={index} style={{ "--line-index": index }} />)}
-          </div>
-        </div>
-        <section
-          ref={decisionRevealRef}
-          className={`decision-reveal ${revealTone}${decisionReveal.cascade ? " cascade" : ""}${decisionReveal.suspenseEvent ? " suspense-twist" : ""}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="decision-reveal-title"
-          onKeyDown={trapDecisionRevealFocus}
-        >
-          <div className="cinematic-status">
-            <span className="cinematic-status-dot" />
-            <b>{decisionReveal.clue ? "NEW EVIDENCE" : decisionReveal.suspenseEvent ? "SYSTEM ALERT" : decisionReveal.cascade ? "CHAIN REACTION" : decisionReveal.streakBreak ? "STREAK BROKEN" : "DECISION LOCKED"}</b>
-            <span>{decisionReveal.clue ? "새 단서가 기록되었습니다" : "선택의 영향이 번지는 중"}</span>
-          </div>
-          <div className="decision-reveal-kicker">
-            <span>{decisionReveal.label}</span>
-            {decisionReveal.cascade && <strong>압박 연쇄</strong>}
-            {decisionReveal.suspenseEvent && <strong>반전 신호</strong>}
-          </div>
-          <h2 id="decision-reveal-title">{simplifyPlayerText(decisionReveal.title)}</h2>
-          <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
-          <div className="decision-reveal-beat">
-            {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
-          </div>
-          <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
-          {decisionReveal.bonuses?.length > 0 && (
-            <div className="decision-bonus-stack" aria-label="이번 선택의 추가 신호와 보너스">
-              {decisionReveal.bonuses.map((bonus) => (
-                <div className={`decision-bonus ${bonus.tone ?? ""}`} key={bonus.label}>
-                  <strong>{bonus.label}</strong>
-                  <span>{bonus.text}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {decisionReveal.clue && (
-            <div className="cinematic-clue-card">
-              <Sparkles size={18} />
-              <div>
-                <span>숨은 단서 발견</span>
-                <strong>{decisionReveal.clue.title}</strong>
-                <p>{decisionReveal.clue.text}</p>
-              </div>
-            </div>
-          )}
-          <div className="decision-reveal-footer">
-            <span>다음 장면 · {decisionReveal.nextTitle}</span>
-            <button type="button" data-testid="decision-next" onClick={() => setDecisionReveal(null)} autoFocus>
-              다음 장면으로
-              <ChevronRight size={17} />
-            </button>
-          </div>
-        </section>
-      </div>
-    );
+    return <DecisionReveal view={decisionRevealView} />;
   }
 
+  const recoveryNoticeView = { lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showErrorLog, setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice };
   function renderRecoveryNotice() {
-    if (!lastRecoveredError) return null;
-    return (
-      <section className="recovery-notice" role="status" aria-live="polite">
-        <div>
-          <span>복구됨</span>
-          <strong>{lastRecoveredError.currentCase} / {lastRecoveredError.nodeId}</strong>
-          <p>{lastRecoveredError.message}</p>
-          <p className="recovery-guidance">
-            같은 지점에서 오류가 반복되면 다시 시도하지 말고, 저장 지점을 일시정지한 뒤 새 게임 또는 복구 슬롯을 선택하세요.
-          </p>
-        </div>
-        <div className="recovery-actions">
-          {started && (
-            <button type="button" data-testid="pause-after-recovery" onClick={pauseAfterRecovery}>
-              저장 지점 일시정지
-            </button>
-          )}
-          <button type="button" className="ghost" data-testid="start-fresh-after-recovery" onClick={startFreshAfterRecovery}>
-            새 게임으로 시작
-          </button>
-          <button
-            type="button"
-            data-testid="open-error-log-from-notice"
-            aria-expanded={showErrorLog}
-            aria-controls={showErrorLog ? "error-log-panel" : undefined}
-            onClick={() => {
-            setShowRecoveryCenter(true);
-            setShowErrorLog(true);
-            }}
-          >
-              에러 로그
-          </button>
-          <button type="button" className="ghost" onClick={dismissRecoveryNotice}>
-            닫기
-          </button>
-        </div>
-      </section>
-    );
+    return <RecoveryNotice view={recoveryNoticeView} />;
   }
 
+  const saveStatusView = { saveStatus, retryStorageCleanup };
   function renderSaveStatus() {
-    if (!saveStatus) return null;
-    return (
-      <section className="save-status" role="status" aria-live="polite" aria-atomic="true">
-        <p>{saveStatus}</p>
-        {saveStatus.includes("저장소") && (
-          <button type="button" className="ghost" data-testid="retry-storage-cleanup" onClick={retryStorageCleanup}>
-            저장소 정리 재시도
-          </button>
-        )}
-      </section>
-    );
+    return <SaveStatus view={saveStatusView} />;
   }
 
+  const errorLogPanelView = { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot };
   function renderErrorLogPanel() {
-    if (!showErrorLog || (!debugToolsEnabled && !showRecoveryCenter)) return null;
-    return (
-      <section id="error-log-panel" className="error-log-panel" aria-label="로컬 에러 로그" data-testid="error-log-panel">
-        <div className="panel-title-row">
-          <div>
-            <span>ERROR LOG</span>
-            <h2>최근 오류 기록</h2>
-          </div>
-          <div className="error-log-actions">
-            <button type="button" onClick={copyDiagnosticTrace}>
-              Copy trace
-            </button>
-            <button type="button" onClick={() => exportPlaytestLog({ includeDiagnostics: true })}>
-              Export diagnostics
-            </button>
-            <button type="button" onClick={refreshLocalErrorLog}>
-              새로고침
-            </button>
-            <button type="button" className="ghost" onClick={clearLocalErrorLog}>
-              로그 비우기
-            </button>
-            <button type="button" className="ghost" onClick={closeRecoveryCenter}>
-              닫기
-            </button>
-          </div>
-        </div>
-        <div className={`telemetry-health ${telemetryHealth.status}`}>
-          <strong>원격 로그 읽기 점검</strong>
-          <span>
-            {telemetryHealth.status === "ok"
-              ? "정상"
-              : telemetryHealth.status === "checking"
-                ? "확인 중"
-                : telemetryHealth.status === "disabled"
-                  ? "비활성"
-                  : telemetryHealth.status === "offline"
-                    ? "오프라인"
-                    : "확인 필요"}
-          </span>
-          {telemetryHealth.tables.length > 0 && (
-            <small>
-              {telemetryHealth.tables
-                .map((table) => `${table.table}:${table.ok ? "ok" : table.status ?? "fail"}`)
-                .join(" / ")}
-            </small>
-          )}
-          {telemetryRetryInfo.nextRetryAt && pendingTelemetry.length > 0 && (
-            <small>
-              retry {telemetryRetryInfo.attempt + 1} · {formatSaveTime(telemetryRetryInfo.nextRetryAt)}
-            </small>
-          )}
-        </div>
-        {localErrorEntries.length === 0 ? (
-          <p className="error-log-empty">저장된 오류 기록이 없습니다.</p>
-        ) : (
-          <div className="error-log-list">
-            {localErrorEntries.map((entry) => (
-              <article key={entry.id}>
-                <div>
-                  <span>{formatSaveTime(entry.occurredAt)} · {entry.context?.source ?? "runtime"}</span>
-                  <strong>{entry.context?.currentCase ?? "unknown"} / {entry.context?.nodeId ?? "unknown"}</strong>
-                  <p>{entry.error?.message ?? "Unknown error"}</p>
-                </div>
-                <small>
-                  로그 {entry.context?.logLength ?? 0}개 · 마지막 선택 {entry.context?.lastChoiceId || "없음"}
-                </small>
-                <button
-                  type="button"
-                  className="ghost error-replay-button"
-                  onClick={() =>
-                    startAtNode(
-                      entry.context?.currentCase,
-                      entry.context?.nodeId,
-                      {
-                        echoText: "에러 로그 재현 진입입니다. 저장된 지점의 장면 흐름을 다시 확인합니다.",
-                        persistRun: false,
-                      },
-                    )
-                  }
-                >
-                  재현
-                </button>
-                <details className="error-log-details">
-                  <summary>상세</summary>
-                  <dl>
-                    <dt>stack</dt>
-                    <dd>{entry.error?.stack || "없음"}</dd>
-                    <dt>viewport</dt>
-                    <dd>{entry.viewport ? `${entry.viewport.width ?? 0}x${entry.viewport.height ?? 0}` : "없음"}</dd>
-                    <dt>dom</dt>
-                    <dd>{entry.domSnapshot || "없음"}</dd>
-                  </dl>
-                </details>
-              </article>
-            ))}
-          </div>
-        )}
-        <section className="save-slot-panel" aria-label="복구 슬롯" data-testid="save-slot-panel">
-          <div className="panel-title-row">
-            <div>
-              <span>RECOVERY SLOTS</span>
-              <h3>최근 복구 지점</h3>
-            </div>
-            <button type="button" className="ghost" onClick={refreshSaveSlots}>
-              새로고침
-            </button>
-          </div>
-          {saveSlots.length === 0 ? (
-            <p className="error-log-empty">저장된 복구 슬롯이 없습니다.</p>
-          ) : (
-            <div className="save-slot-list">
-              {saveSlots.map((slot) => (
-                <article key={slot.id}>
-                  <div>
-                    <strong>{slot.currentCase} / {slot.nodeId}</strong>
-                    <small>{formatSaveTime(slot.savedAt)} · 완료 {slot.completedCases?.length ?? 0}</small>
-                  </div>
-                  <div className="save-slot-actions">
-                    <button type="button" data-testid={`restore-save-slot-${slot.id}`} onClick={() => restoreSaveSlot(slot)}>
-                      복원
-                    </button>
-                    <button type="button" className="ghost" onClick={() => deleteSaveSlot(slot.id)}>
-                      삭제
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-      </section>
-    );
+    return <ErrorLogPanel view={errorLogPanelView} />;
   }
 
   function getCaseStatusText(status) {
