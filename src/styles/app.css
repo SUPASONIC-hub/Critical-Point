@@ -5,6 +5,15 @@
 /*Application styles.
    Rule order is significant and matches the original stylesheet; the
    colours all resolve through the tokens in tokens.css.*/
+/*Application styles.
+   Rule order is significant and matches the original stylesheet; the
+   colours all resolve through the tokens in tokens.css.*/
+/*Application styles.
+   Rule order is significant and matches the original stylesheet; the
+   colours all resolve through the tokens in tokens.css.*/
+/*Application styles.
+   Rule order is significant and matches the original stylesheet; the
+   colours all resolve through the tokens in tokens.css.*/
 .error-screen {
   min-height: 100vh;
   display: grid;
@@ -1815,7 +1824,7 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: 12px;
-  /* Its own row under the title, so it never competes for the heading's width. */
+  /*Its own row under the title, so it never competes for the heading's width.*/
   flex: 1 0 100%;
   margin: 6px 0 18px;
   font-size: 12px;
@@ -2164,52 +2173,6 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 700;
 }
-.speaker-context {
-  display: grid;
-  gap: 5px;
-  margin: 0 0 0 46px;
-  padding: 10px 12px;
-  color: var(--c-line-soft);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 6px;
-}
-.speaker-context span,
-.speaker-context b {
-  display: block;
-  font-size: 13px;
-  line-height: 1.45;
-}
-.speaker-context span {
-  color: var(--c-line-soft);
-}
-.speaker-context b {
-  color: var(--c-acid);
-}
-.character-cutin {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-  background: linear-gradient(135deg, rgba(217, 255, 98, 0.14), transparent 42%),
-    rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(217,255,98,.24);
-  border-radius: 8px;
-  overflow-wrap: anywhere;
-}
-.character-cutin>div {
-  display: grid;
-  gap: 6px;
-}
-.character-cutin span {
-  color: var(--c-acid);
-  font-size: 11px;
-  font-weight: 900;
-}
-.character-cutin strong {
-  color: var(--c-paper);
-  font-size: 17px;
-  line-height: 1.45;
-}
 .character-cutin .scene-direction {
   margin: 0;
   padding: 10px 12px;
@@ -2219,31 +2182,6 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 900;
   line-height: 1.55;
-}
-.character-cutin dl {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-}
-.character-cutin dl div {
-  display: grid;
-  grid-template-columns: 52px minmax(0,1fr);
-  gap: 10px;
-  align-items: start;
-}
-.character-cutin dt,
-.character-cutin dd {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-}
-.character-cutin dt {
-  color: var(--c-ink-faint);
-  font-weight: 900;
-}
-.character-cutin dd {
-  color: var(--c-line-soft);
-  font-weight: 800;
 }
 .scene p,
 .echo-panel p,
@@ -3001,52 +2939,11 @@ summary:focus-visible {
   font-weight: 800;
   overflow-wrap: anywhere;
 }
-.tactical-grade {
-  display: grid;
-  place-items: center;
-  flex: 0 0 34px;
-  width: 34px;
-  min-height: 34px;
-  color: var(--c-paper);
-  background: var(--c-ink-muted);
-  border-radius: 6px;
-  font-size: 18px;
-  font-weight: 900;
-  line-height: 1;
-}
-.tactical-grade.grade-s {
-  color: var(--c-ink);
-  background: var(--c-acid);
-}
-.tactical-grade.grade-a {
-  background: var(--c-teal-deep);
-}
-.tactical-grade.grade-b {
-  background: var(--c-tone-033);
-}
-.tactical-grade.grade-c {
-  color: var(--c-ink);
-  background: var(--c-tone-029);
-}
-.tactical-grade.grade-d {
-  background: var(--c-danger-deep);
-}
-.decision-forecast {
-  display: grid;
-  gap: 12px;
-  margin: 14px 0 16px;
-  padding: 14px;
-  color: var(--c-ink);
-  background: var(--c-paper-soft);
-  border: 1px solid var(--c-mint-line);
-  border-radius: 8px;
-}
 .forecast-header {
   display: grid;
   gap: 4px;
 }
-.forecast-header span,
-.forecast-grid span {
+.forecast-header span {
   color: var(--c-ink-muted);
   font-size: 11px;
   font-weight: 900;
@@ -3061,107 +2958,6 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 800;
   line-height: 1.45;
-}
-.forecast-grid {
-  display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: 8px;
-}
-.forecast-grid article,
-.forecast-highlight {
-  min-height: 92px;
-  padding: 10px;
-  background: var(--c-paper);
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
-}
-.forecast-highlight {
-  min-width: 0;
-  color: var(--c-ink);
-  text-align: left;
-  overflow-wrap: anywhere;
-  transition: transform .16s ease,border-color .16s ease,background .16s ease;
-}
-.forecast-highlight:hover,
-.forecast-highlight:focus-visible,
-.forecast-highlight[aria-pressed=true] {
-  background: var(--c-acid-pale);
-  border-color: var(--teal);
-  transform: translateY(-2px);
-}
-.forecast-highlight[aria-pressed=true],
-.forecast-choice[aria-pressed=true] {
-  box-shadow: inset 0 0 0 2px var(--acid-dark);
-}
-.forecast-grid b,
-.forecast-grid small {
-  display: block;
-  line-height: 1.35;
-}
-.forecast-grid b {
-  margin-top: 6px;
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-.forecast-grid small {
-  margin-top: 5px;
-  color: var(--c-ink-muted);
-  font-size: 12px;
-  font-weight: 900;
-}
-.forecast-list {
-  display: grid;
-  gap: 7px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.forecast-list li {
-  min-height: 54px;
-  padding: 0;
-  background: var(--c-paper);
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.forecast-choice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-  min-height: 54px;
-  padding: 8px;
-  color: var(--c-ink);
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  text-align: left;
-  overflow-wrap: anywhere;
-}
-.forecast-choice:hover,
-.forecast-choice:focus-visible,
-.forecast-choice[aria-pressed=true] {
-  background: var(--c-acid-pale);
-}
-.forecast-choice>span {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-.forecast-list strong,
-.forecast-list small {
-  display: block;
-  line-height: 1.35;
-}
-.forecast-list strong {
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-.forecast-list small {
-  color: var(--c-ink-muted);
-  font-size: 12px;
-  font-weight: 800;
 }
 .choice-effect {
   display: block;
@@ -3336,31 +3132,6 @@ summary:focus-visible {
   font-weight: 700;
   line-height: 1.45;
 }
-.choice-tradeoff {
-  display: block;
-  margin-top: 8px;
-  margin-left: 24px;
-  padding: 8px 10px;
-  color: var(--c-ink-raised);
-  background: var(--c-tone-031);
-  border-left: 4px solid var(--c-tone-085);
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.45;
-}
-.choice-risk {
-  display: block;
-  width: fit-content;
-  max-width: calc(100% - 24px);
-  margin-top: 7px;
-  margin-left: 24px;
-  padding: 5px 8px;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.25;
-}
 .choice-risk.risk-up {
   color: var(--c-danger-deep);
   background: var(--c-blush);
@@ -3373,48 +3144,11 @@ summary:focus-visible {
   color: var(--c-ink-muted);
   background: var(--c-paper-muted);
 }
-.choice-impact {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) auto;
-  align-items: center;
-  gap: 9px;
-  margin-top: 8px;
-  margin-left: 24px;
-  color: var(--c-ink-muted);
-  font-size: 11px;
-  font-weight: 900;
-}
-.choice-impact-track {
-  display: block;
-  height: 7px;
-  overflow: hidden;
-  background: var(--c-tone-105);
-  border-radius: 999px;
-}
-.choice-impact-track>span {
-  display: block;
-  height: 100%;
-  background: var(--c-tone-106);
-  border-radius: inherit;
-}
 .choice-impact.risk-up .choice-impact-track>span {
   background: var(--signal);
 }
 .choice-impact.risk-down .choice-impact-track>span {
   background: var(--teal);
-}
-.choice-impact b {
-  min-width: 82px;
-  text-align: right;
-}
-.choice-cognition {
-  display: block;
-  margin-top: 4px;
-  padding-left: 24px;
-  color: var(--c-teal-deep);
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.35;
 }
 .choice:hover {
   border-color: var(--c-ink);
@@ -5271,7 +5005,6 @@ body {
     min-height: 220px;
   }
   .prompt-chips,
-  .forecast-grid,
   .fingerprint-grid {
     grid-template-columns: 1fr;
   }
@@ -5482,10 +5215,6 @@ body {
   }
   .narrative-spine-grid {
     grid-template-columns: 1fr;
-  }
-  .character-cutin dl div {
-    grid-template-columns: 1fr;
-    gap: 3px;
   }
   .wide-report {
     grid-column: auto;
