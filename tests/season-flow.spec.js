@@ -34,7 +34,12 @@ async function completeCurrentCase(page) {
 async function startDebugNode(page, caseId, nodeId) {
   await page.getByTestId("debug-case-select").selectOption(caseId);
   await page.getByTestId("debug-node-select").selectOption(nodeId);
+  await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
+  await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
   await page.getByTestId("debug-start-node").click();
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
+    .toBe(nodeId);
 }
 
 test("case 05 browser flow can unlock and open the final case", async ({ page }) => {
@@ -103,7 +108,7 @@ test("the complete season can progress from case 01 to the final ending", async 
     }
   }
 
-  await expect(page.locator(".ending-reveal")).toBeVisible();
+  await expect(page.locator(".ending-sequence")).toBeVisible();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.currentCase).toBe("final");
   expect(saved.completedCases).toContain("final");
@@ -1270,4 +1275,31 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
     )
     .toEqual(savedBeforeFailureCallback);
   expect(savedBeforeFailureCallback.currentCase).toBe("final");
+});
+
+test("final ending sequence reveals twists, accepts a handoff note, and unlocks the report", async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "final", "f_aftershock");
+  await completeCurrentCase(page);
+
+  await expect(page.locator(".ending-sequence")).toBeVisible();
+  await expect(page.locator(".result-page.final-report-locked")).toBeVisible();
+  for (let index = 0; index < 3; index += 1) {
+    await page.locator(".ending-sequence button").click();
+  }
+
+  await expect(page.locator(".ending-step-1")).toBeVisible();
+  await expect(page.locator(".ending-step-1 button")).toBeVisible();
+  await page.locator(".ending-step-1 button").click();
+  await expect(page.locator(".ending-step-2 textarea")).toBeVisible();
+  await page.locator(".ending-step-2 textarea").fill("다음 사람은 기록보다 먼저 조건을 확인하세요.");
+  await page.locator(".ending-step-2 button").click();
+
+  await expect(page.locator(".ending-step-3")).toBeVisible();
+  await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
+  await expect
+    .poll(async () => page.evaluate(() => localStorage.getItem("critical-point-next-participant-message")))
+    .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
 });

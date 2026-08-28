@@ -9,7 +9,9 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "node scripts/smoke-test.mjs",
     "test:e2e": "node scripts/run-e2e.mjs",
-    "verify": "npm test && npm run build && npm run test:e2e"
+    "test:e2e:full": "node scripts/run-e2e.mjs --full",
+    "verify": "npm test && npm run build && npm run test:e2e",
+    "verify:full": "npm run verify && npm run test:e2e:full"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

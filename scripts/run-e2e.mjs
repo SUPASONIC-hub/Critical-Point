@@ -1,6 +1,8 @@
 import { spawn } from "node:child_process";
 
 const baseUrl = "http://127.0.0.1:5197";
+const runFullCoverage = process.argv.includes("--full");
+const forwardedArgs = process.argv.slice(2).filter((arg) => arg !== "--full");
 
 function spawnCommand(command, args, options = {}) {
   const useWindowsShell = process.platform === "win32";
@@ -43,7 +45,10 @@ let exitCode = 1;
 try {
   await waitForServer(baseUrl);
   exitCode = await new Promise((resolve) => {
-    const runner = spawnCommand("npx", ["playwright", "test"], {
+    const testArgs = runFullCoverage
+      ? ["playwright", "test", "tests/full-coverage.spec.js", ...forwardedArgs]
+      : ["playwright", "test", "--grep-invert", "@full", ...forwardedArgs];
+    const runner = spawnCommand("npx", testArgs, {
       env: { E2E_BASE_URL: baseUrl },
     });
     runner.on("exit", (code) => resolve(code ?? 1));

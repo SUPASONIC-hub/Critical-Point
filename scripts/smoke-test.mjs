@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   anonymizeSensitiveText,
   applyEffect,
+  applySeededEffectVariation,
   createDecisionForecast,
   createCaseSummary,
   getCounterfactualReport,
@@ -14,6 +15,7 @@ import {
   getContinuityChallenge,
   detectPrivacySignals,
   getGameplayStats,
+  getObservationLedger,
   getRiskPressure,
   getRiskPressureDrivers,
   buildNarrativeSpine,
@@ -41,6 +43,7 @@ import {
   RECOVERY_SLOT_SCHEMA_VERSION,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
+  SAVE_STATE_KEYS,
   SAVE_SLOT_MAX_ITEMS,
   SAVE_SLOT_STORAGE_KEY,
   serializeError,
@@ -53,7 +56,20 @@ import {
   parseCurrentSavedState,
   migrateSavedState,
 } from "../src/appConfig.js";
-import { caseOpeningRoutes, initialResources, nodeOrders, nodes, triggerLabels } from "../src/gameData.js";
+import {
+  CASE_RESULT_NODES,
+  CASE_SEQUENCE,
+  CASE_START_NODES,
+  caseOpeningRoutes,
+  getCaseRouteLength,
+  getNodeRouteIndex,
+  initialResources,
+  nodeOrders,
+  nodes,
+  choiceVoiceLines,
+  echoReplies,
+  triggerLabels,
+} from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 
@@ -65,6 +81,40 @@ assert.equal(ERROR_LOG_MAX_ITEMS, 20, "local error logs should be bounded");
 assert.equal(SAVE_SLOT_STORAGE_KEY, "trigger-prototype-save-slots-v1", "save recovery slots should use a separate namespace");
 assert.equal(SAVE_SLOT_MAX_ITEMS, 5, "save recovery slots should keep a bounded history");
 assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
+assert.deepEqual(
+  SAVE_STATE_KEYS,
+  [
+    "saveSchemaVersion",
+    "playerName",
+    "playStyle",
+    "openingLegacy",
+    "dataConsent",
+    "started",
+    "currentCase",
+    "completedCases",
+    "discoveredClues",
+    "caseResults",
+    "playtestFeedback",
+    "nodeId",
+    "resources",
+    "log",
+    "triggers",
+    "cognition",
+    "freeText",
+    "echo",
+    "nodeEnteredAt",
+    "pendingTelemetry",
+    "protocolUsed",
+    "timerPenaltyApplied",
+    "probeUsed",
+    "paused",
+    "savedAt",
+  ],
+  "save state keys should include every required persisted field",
+);
+["completedCases", "discoveredClues", "log", "pendingTelemetry", "caseResults", "playtestFeedback", "resources", "triggers", "cognition", "currentCase", "nodeId"].forEach((key) => {
+  assert.ok(SAVE_STATE_KEYS.includes(key), `save state keys should cover shape validator key ${key}`);
+});
 assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
 assert.equal(PLAYER_NAME_MAX_LENGTH, 24, "player names should keep a bounded display length");
@@ -319,7 +369,7 @@ assert.equal(await copyText("test"), false, "clipboard fallback should fail safe
 assert.equal(easyResourceLabels.capital, "현금", "player language should use an intuitive resource label");
 assert.equal(
   simplifyPlayerText("CASE 02 / LEGITIMACY / HIDDEN PROTOCOL"),
-  "사건 2 / 공정함 / 숨은 긴급 절차",
+  "CASE 02 / 공정함 / 숨은 긴급 절차",
   "player language should translate visible system terms",
 );
 assert.ok(nodes.c1_aftershock?.choices?.length === 3, "case 01 should include a post-decision branch scene");
@@ -328,8 +378,8 @@ assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should in
 assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should include its aftermath scene");
 assert.ok(nodes.c1_witness && nodes.c1_verdict, "case 01 should include connective witness and verdict scenes");
 assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice, "every middle case should include a new evidence scene");
-assert.equal(nodeOrders.case01.length, 15, "case 01 should have expanded to fifteen playable scenes");
-assert.equal(nodeOrders.final.length, 12, "the final act should have expanded to twelve playable scenes");
+assert.equal(nodeOrders.case01.length, 17, "case 01 should include its authored detour scenes");
+assert.equal(nodeOrders.final.length, 14, "the final act should include its authored detour scenes");
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
 assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");
@@ -359,7 +409,7 @@ assert.equal(triggerLabels.system, "시스템", "case 05 roadmap labels should h
 assert.equal(triggerLabels.helplessness, "무력감", "case 05 roadmap labels should cover helplessness");
 assert.equal(triggerLabels.selfAwareness, "자기 인식", "final roadmap labels should cover self awareness");
 
-const resultNodeIds = new Set(["result", "case02_result", "case03_result", "case04_result", "case05_result", "final_result"]);
+const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const nodeIdsInOrders = new Set(Object.values(nodeOrders).flat());
 Object.entries(nodes).forEach(([nodeId, node]) => {
   assert.ok(nodeIdsInOrders.has(nodeId), `${nodeId} should be present in a case order`);
@@ -373,27 +423,37 @@ Object.entries(nodes).forEach(([nodeId, node]) => {
   });
 });
 
-const caseResultNodeIds = {
-  case01: "result",
-  case02: "case02_result",
-  case03: "case03_result",
-  case04: "case04_result",
-  case05: "case05_result",
-  final: "final_result",
-};
-const baseStartNodeIds = {
-  case01: "start",
-  case02: "c2_start",
-  case03: "c3_start",
-  case04: "c4_start",
-  case05: "c5_start",
-  final: "f_start",
-};
-function simulateCaseRoute(caseId, startNodeId = baseStartNodeIds[caseId], choiceIndex = 0) {
+Object.entries(nodes).forEach(([nodeId, node]) => {
+  [node.title, node.text, ...(node.memo ?? [])].forEach((copy) => {
+    assert.equal(simplifyPlayerText(copy), copy, `${nodeId}: authored copy must not be rewritten by player language`);
+  });
+  node.choices.forEach((choice) => {
+    assert.equal(simplifyPlayerText(choice.label), choice.label, `${nodeId}/${choice.id}: authored choice must not be rewritten`);
+  });
+});
+
+const authoredGeneratedScenes = Object.values(nodes).filter(
+  (node) => node.phase === "CONNECTIVE SCENE" || node.phase === "REACTION",
+);
+let generatedChoiceCount = 0;
+authoredGeneratedScenes.forEach((node) => {
+  const effectSignatures = new Set();
+  node.choices.forEach((choice) => {
+    generatedChoiceCount += 1;
+    assert.ok(choiceVoiceLines[choice.id], `${choice.id} should have authored voice copy`);
+    assert.ok(echoReplies[choice.id], `${choice.id} should have authored echo copy`);
+    const signature = JSON.stringify(choice.effect ?? {});
+    assert.ok(!effectSignatures.has(signature), `${node.title}/${choice.id} should have a distinct effect`);
+    effectSignatures.add(signature);
+  });
+});
+assert.equal(generatedChoiceCount, 108, "36 generated scenes should expose 108 authored choices");
+
+function simulateCaseRoute(caseId, startNodeId = CASE_START_NODES[caseId], choiceIndex = 0) {
   const visited = [];
   let cursor = startNodeId;
   for (let step = 0; step < 80; step += 1) {
-    if (cursor === caseResultNodeIds[caseId]) return visited;
+    if (cursor === CASE_RESULT_NODES[caseId]) return visited;
     const node = nodes[cursor];
     assert.ok(node, `${caseId} route reached missing node ${cursor}`);
     const playableChoices = node.choices.filter((choice) => choice.type !== "free");
@@ -411,25 +471,38 @@ function simulateCaseRouteAfterFirstChoice(caseId, startNodeId, firstChoiceIndex
   const firstChoice = firstNode.choices[firstChoiceIndex];
   assert.ok(firstChoice, `${caseId}/${startNodeId} should expose choice ${firstChoiceIndex}`);
   const visited = [{ nodeId: startNodeId, choiceId: firstChoice.id, next: firstChoice.next }];
-  if (firstChoice.next === caseResultNodeIds[caseId]) return visited;
+  if (firstChoice.next === CASE_RESULT_NODES[caseId]) return visited;
   return [
     ...visited,
     ...simulateCaseRoute(caseId, firstChoice.next, 0),
   ];
 }
 
-for (const caseId of ["case01", "case02", "case03", "case04", "case05", "final"]) {
+assert.deepEqual(Object.keys(CASE_START_NODES), CASE_SEQUENCE, "case start nodes should cover the complete sequence");
+assert.deepEqual(Object.keys(CASE_RESULT_NODES), CASE_SEQUENCE, "case result nodes should cover the complete sequence");
+assert.deepEqual(Object.keys(nodeOrders), CASE_SEQUENCE, "node orders should cover the complete sequence");
+for (const caseId of CASE_SEQUENCE) {
+  const branchingNodes = [...new Set(nodeOrders[caseId])].filter((nodeId) => {
+    const nextIds = new Set(nodes[nodeId].choices.map((choice) => choice.next));
+    return nextIds.size > 1;
+  });
+  assert.equal(branchingNodes.length, 1, `${caseId} should have exactly one authored mid-case branch`);
+}
+for (const caseId of CASE_SEQUENCE) {
   for (const choiceIndex of [0, 1, 2]) {
-    const route = simulateCaseRoute(caseId, baseStartNodeIds[caseId], choiceIndex);
+    const route = simulateCaseRoute(caseId, CASE_START_NODES[caseId], choiceIndex);
     assert.ok(route.length > 0, `${caseId} simulated route should contain decisions`);
-    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `${caseId} should end at its result screen`);
+    assert.equal(route.at(-1).next, CASE_RESULT_NODES[caseId], `${caseId} should end at its result screen`);
   }
 }
+assert.equal(getNodeRouteIndex("case02", "c2_start_people"), 0, "branch openings should share the first route index");
+assert.equal(getNodeRouteIndex("case02", "c2_logs"), 1, "common route nodes should keep their route index");
+assert.ok(getCaseRouteLength("case02") > 0, "case route lengths should be available for progress calculation");
 Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   Object.entries(routes).forEach(([outcomeId, startNodeId]) => {
     assert.ok(nodes[startNodeId], `${caseId}/${outcomeId} branch opening should exist`);
     const route = simulateCaseRoute(caseId, startNodeId, 1);
-    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `${caseId}/${outcomeId} should complete from branch opening`);
+    assert.equal(route.at(-1).next, CASE_RESULT_NODES[caseId], `${caseId}/${outcomeId} should complete from branch opening`);
   });
 });
 
@@ -439,7 +512,7 @@ Object.entries(nodeOrders).forEach(([caseId, order]) => {
       const route = simulateCaseRouteAfterFirstChoice(caseId, nodeId, choiceIndex);
       assert.equal(
         route.at(-1).next,
-        caseResultNodeIds[caseId],
+        CASE_RESULT_NODES[caseId],
         `${caseId}/${nodeId}/${choice.id} should still complete after taking this branch`,
       );
     });
@@ -458,7 +531,7 @@ function simulateRandomCaseRoute(caseId, startNodeId, random) {
   const visited = [];
   let cursor = startNodeId;
   for (let step = 0; step < 80; step += 1) {
-    if (cursor === caseResultNodeIds[caseId]) return visited;
+    if (cursor === CASE_RESULT_NODES[caseId]) return visited;
     const node = nodes[cursor];
     assert.ok(node, `${caseId} random route reached missing node ${cursor}`);
     const playableChoices = node.choices.filter((choice) => choice.type !== "free");
@@ -467,16 +540,16 @@ function simulateRandomCaseRoute(caseId, startNodeId, random) {
     visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
     cursor = choice.next;
   }
-  assert.fail(`${caseId} random route did not reach ${caseResultNodeIds[caseId]}`);
+  assert.fail(`${caseId} random route did not reach ${CASE_RESULT_NODES[caseId]}`);
 }
 
 for (let seed = 1; seed <= 200; seed += 1) {
   const random = createSeededRandom(seed);
   let previousOutcomeChoiceId = null;
-  for (const caseId of ["case01", "case02", "case03", "case04", "case05", "final"]) {
-    const startNodeId = caseOpeningRoutes[caseId]?.[previousOutcomeChoiceId] ?? baseStartNodeIds[caseId];
+  for (const caseId of CASE_SEQUENCE) {
+    const startNodeId = caseOpeningRoutes[caseId]?.[previousOutcomeChoiceId] ?? CASE_START_NODES[caseId];
     const route = simulateRandomCaseRoute(caseId, startNodeId, random);
-    assert.equal(route.at(-1).next, caseResultNodeIds[caseId], `seed ${seed} ${caseId} should complete`);
+    assert.equal(route.at(-1).next, CASE_RESULT_NODES[caseId], `seed ${seed} ${caseId} should complete`);
     previousOutcomeChoiceId = route.at(-1).choiceId;
   }
 }
@@ -535,6 +608,20 @@ assert.deepEqual(
   applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
   { ...initialResources, time: 72, fatigue: 100 },
   "resource effects should clamp to resource caps",
+);
+const seededEffect = applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice");
+assert.deepEqual(
+  seededEffect,
+  applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice"),
+  "seeded effect variation should be deterministic",
+);
+Object.values(seededEffect).forEach((value) => {
+  assert.ok(Math.abs(value) >= 8 && Math.abs(value) <= 12, "seeded effect variation should stay within plus or minus 15 percent");
+});
+assert.deepEqual(
+  applySeededEffectVariation({ trust: 10 }, "", 0.15),
+  { trust: 10 },
+  "missing seeds should preserve authored effects",
 );
 
 const decisionForecast = createDecisionForecast(
@@ -680,6 +767,12 @@ assert.equal(gameplayStats.challengeClearCount, 2, "cleared scene challenges sho
 assert.equal(gameplayStats.currentChallengeStreak, 0, "failed latest challenge should reset streak");
 assert.equal(gameplayStats.momentumTier, "FLOW", "sample gameplay should reach FLOW momentum");
 assert.equal(gameplayStats.rank, "B", "sample gameplay should map to B rank under the burst algorithm");
+const observationLedger = getObservationLedger([
+  { responseTimeSec: 1, choiceId: "audit", resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+  { freeText: "조건과 근거를 다시 묶는다", choiceId: "reframe", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 28 } },
+  { choice: "침묵을 유지한다", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 32 } },
+]);
+assert.deepEqual(observationLedger, { compliance: 1, defiance: 1, opacity: 1, sacrifice: 2 }, "observation ledger should be deterministic and hidden during play");
 
 const caseSummary = createCaseSummary(
   { responsibility: 3, protection: 1 },

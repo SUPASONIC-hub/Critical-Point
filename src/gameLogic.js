@@ -11,6 +11,35 @@ export function applyEffect(resources, effect = {}) {
   return next;
 }
 
+function hashSeed(seed = "") {
+  let hash = 2166136261;
+  for (const character of String(seed)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+export function applySeededEffectVariation(effect = {}, seed = "", variation = 0.15) {
+  const safeVariation = Math.min(1, Math.max(0, Number(variation) || 0));
+  if (!seed || safeVariation === 0) return { ...effect };
+  let state = hashSeed(seed) || 1;
+  const nextRandom = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+
+  return Object.fromEntries(
+    Object.entries(effect).map(([key, value]) => {
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue) || numericValue === 0) return [key, value];
+      const multiplier = 1 - safeVariation + nextRandom() * safeVariation * 2;
+      const variedValue = Math.round(numericValue * multiplier);
+      return [key, variedValue === 0 ? Math.sign(numericValue) : variedValue];
+    }),
+  );
+}
+
 const riskDefaults = {
   time: 72,
   capital: 100,
@@ -210,19 +239,19 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   }
   const playableEntries = entries.filter((entry) => !entry.isSystemEvent);
   const scoredEntries = playableEntries.length > 0 ? playableEntries : entries;
-  const freeCount = entries.filter((entry) => entry.freeText).length;
-  const reducedRiskCount = entries.filter(
+  const freeCount = scoredEntries.filter((entry) => entry.freeText).length;
+  const reducedRiskCount = scoredEntries.filter(
     (entry) =>
       entry.resourcesBefore &&
       entry.resourcesAfter &&
       getRiskPressure(entry.resourcesAfter) < getRiskPressure(entry.resourcesBefore),
   ).length;
-  const challengeClearCount = entries.filter((entry) => entry.challenge?.matched).length;
-  const streakBreakIndex = [...entries].reverse().findIndex((entry) => !entry.challenge?.matched);
+  const challengeClearCount = scoredEntries.filter((entry) => entry.challenge?.matched).length;
+  const streakBreakIndex = [...scoredEntries].reverse().findIndex((entry) => !entry.challenge?.matched);
   const currentChallengeStreak =
-    streakBreakIndex === -1 ? entries.length : Math.max(0, streakBreakIndex);
-  const finalRiskPressure = entries.at(-1)?.resourcesAfter
-    ? getRiskPressure(entries.at(-1).resourcesAfter)
+    streakBreakIndex === -1 ? scoredEntries.length : Math.max(0, streakBreakIndex);
+  const finalRiskPressure = scoredEntries.at(-1)?.resourcesAfter
+    ? getRiskPressure(scoredEntries.at(-1).resourcesAfter)
     : fallbackRiskPressure;
   const responseTimes = scoredEntries
     .map((entry) => Number(entry.responseTimeSec))
@@ -253,7 +282,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const cognitionScore = Math.round(
     clamp(cognitionKeys.size * 14 + cognitionShifts * 10 + Math.min(scoredEntries.length, 5) * 4, 0, 100),
   );
-  const riskDeltas = entries.map((entry) => {
+  const riskDeltas = scoredEntries.map((entry) => {
     if (entry.resourcesBefore && entry.resourcesAfter) {
       return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
     }
@@ -312,6 +341,26 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     momentumTier: momentumScore >= 78 ? "BURST" : momentumScore >= 58 ? "FLOW" : momentumScore >= 36 ? "READY" : "BUILDING",
     rank: momentumScore >= 88 ? "S" : momentumScore >= 72 ? "A" : momentumScore >= 52 ? "B" : "C",
   };
+}
+
+export function getObservationLedger(entries = []) {
+  const playableEntries = entries.filter((entry) => !entry?.isSystemEvent);
+  return playableEntries.reduce(
+    (ledger, entry) => {
+      const riskDelta = entry.resourcesBefore && entry.resourcesAfter
+        ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
+        : entry.challenge?.riskDelta ?? 0;
+      const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+      const next = { ...ledger };
+      if (!entry.freeText && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
+      if (entry.freeText || riskDelta > 6) next.defiance += 1;
+      if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) next.opacity += 1;
+      const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
+      if (humanCostDelta > 0) next.sacrifice += 1;
+      return next;
+    },
+    { compliance: 0, defiance: 0, opacity: 0, sacrifice: 0 },
+  );
 }
 
 export function getDiscoveryClue({
@@ -505,7 +554,8 @@ export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {
   const dominantCognition = sortedCognition[0] ?? ["persistence", 0];
   const guardianScore = Math.max(0, -(ledger.totals.humanCost ?? 0)) + challengeCount * 2;
   const disruptorScore = freeCount * 4 + Math.max(0, ledger.totals.legitimacy ?? 0) * 0.2;
-  const stabilizerScore = ledger.riskDrops * 3 - ledger.riskRises + (ledger.totals.fatigue ?? 0) < 0 ? 6 : ledger.riskDrops * 3 - ledger.riskRises;
+  const fatigueBonus = (ledger.totals.fatigue ?? 0) < 0 ? 6 : 0;
+  const stabilizerScore = ledger.riskDrops * 3 - ledger.riskRises + fatigueBonus;
   const mode = guardianScore >= Math.max(disruptorScore, stabilizerScore)
     ? "GUARDIAN"
     : disruptorScore >= stabilizerScore

@@ -9,7 +9,12 @@ async function expectNoA11yViolations(page) {
 async function startDebugNode(page, caseId, nodeId) {
   await page.getByTestId("debug-case-select").selectOption(caseId);
   await page.getByTestId("debug-node-select").selectOption(nodeId);
+  await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
+  await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
   await page.getByTestId("debug-start-node").click();
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
+    .toBe(nodeId);
 }
 
 async function completeCurrentCase(page) {
@@ -67,7 +72,15 @@ test("final ending report has no structural accessibility violations", async ({ 
   await page.goto("/?debug=1");
   await startDebugNode(page, "final", "f_start");
   await completeCurrentCase(page);
-  await expect(page.locator(".ending-reveal")).toBeVisible();
+  await expect(page.locator(".ending-sequence")).toBeVisible();
+  for (let index = 0; index < 3; index += 1) {
+    await page.locator(".ending-sequence button").click();
+  }
+  await expect(page.locator(".ending-step-1")).toBeVisible();
+  await page.locator(".ending-step-1 button").click();
+  await page.locator(".ending-step-2 textarea").fill("조건과 기록을 먼저 확인하세요.");
+  await page.locator(".ending-step-2 button").click();
+  await expect(page.locator(".ending-step-3")).toBeVisible();
   await expectNoA11yViolations(page);
   const overflow = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

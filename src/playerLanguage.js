@@ -1,7 +1,4 @@
 const phraseReplacements = [
-  [/\bCASE\s*0?([1-5])\b/gi, "사건 $1"],
-  [/\bFINAL CASE\b/gi, "마지막 사건"],
-  [/\bFINAL\b/gi, "마지막"],
   [/\bPLAYABLE\b/gi, "시작 가능"],
   [/\bLOCKED\b/gi, "잠김"],
   [/\bOPEN\b/gi, "열림"],
@@ -47,23 +44,6 @@ const phraseReplacements = [
   [/\bLEGITIMACY\b/gi, "공정함"],
   [/\bHUMAN COST\b/gi, "사람 피해"],
   [/\bFATIGUE\b/gi, "지침"],
-  [/정당성/g, "공정함"],
-  [/인적 비용/g, "사람 피해"],
-  [/판단 피로/g, "머리 피로"],
-  [/결정 예보/g, "선택 미리보기"],
-  [/프로토콜/g, "긴급 절차"],
-  [/챌린지/g, "장면 목표"],
-  [/서스펜스/g, "긴장"],
-  [/원장/g, "기록장"],
-  [/모멘텀/g, "흐름 점수"],
-  [/랭크/g, "등급"],
-  [/트리거(?!랩)/g, "반응 버튼"],
-  [/로그/g, "기록"],
-  [/케이스/g, "사건"],
-  [/분석관/g, "담당자"],
-  [/이해관계자/g, "관련된 사람들"],
-  [/인과관계/g, "원인과 결과"],
-  [/정황/g, "흔적"],
 ];
 
 export function simplifyPlayerText(value = "") {

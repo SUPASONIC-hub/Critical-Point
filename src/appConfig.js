@@ -10,6 +10,33 @@ export const PLAYER_NAME_MAX_LENGTH = 24;
 export const FREE_TEXT_MAX_LENGTH = 600;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 export const TELEMETRY_QUEUE_TYPES = ["case", "feedback", "error"];
+export const SAVE_STATE_KEYS = [
+  "saveSchemaVersion",
+  "playerName",
+  "playStyle",
+  "openingLegacy",
+  "dataConsent",
+  "started",
+  "currentCase",
+  "completedCases",
+  "discoveredClues",
+  "caseResults",
+  "playtestFeedback",
+  "nodeId",
+  "resources",
+  "log",
+  "triggers",
+  "cognition",
+  "freeText",
+  "echo",
+  "nodeEnteredAt",
+  "pendingTelemetry",
+  "protocolUsed",
+  "timerPenaltyApplied",
+  "probeUsed",
+  "paused",
+  "savedAt",
+];
 
 export function normalizePlayerName(value) {
   return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
