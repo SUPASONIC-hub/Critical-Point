@@ -265,6 +265,19 @@ export function PlayScreen({ view }) {
           {showTacticalDetails && (
             <section className="tactical-brief" aria-label="판단 힌트">
               <div className="forecast-header">
+                <div className="forecast-options" aria-label="Choice pressure comparison">
+                  {decisionForecasts.map(({ choice, forecast }) => (
+                    <article key={choice.id} className={`forecast-option ${forecast.forecastPrecision}`}>
+                      <strong>{choice.label}</strong>
+                      <span>
+                        {forecast.forecastPrecision === "precise"
+                          ? `Risk ${formatRiskDelta(forecast.riskDelta)}`
+                          : `Risk ${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`}
+                      </span>
+                      <small>{forecast.forecastPrecision === "precise" ? "Precise forecast" : "Gather evidence to narrow this range"}</small>
+                    </article>
+                  ))}
+                </div>
                 <span>판단 힌트</span>
                 <strong>{pressureLeader ? pressureLeader.label : "현재 압박"}을 먼저 확인하세요</strong>
                 <p>
