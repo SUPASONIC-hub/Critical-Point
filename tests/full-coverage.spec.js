@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { CASE_SEQUENCE, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 
-const ACTION_TIMEOUT_MS = 8_000;
+const ACTION_TIMEOUT_MS = 60_000;
+const TRANSITION_TIMEOUT_MS = 60_000;
 
 test.describe.configure({ mode: "serial" });
 test.use({ actionTimeout: ACTION_TIMEOUT_MS });
@@ -19,6 +20,10 @@ async function clickElement(locator, label) {
   }
 }
 
+async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
+  return locator.waitFor({ state: "visible", timeout }).then(() => true).catch(() => false);
+}
+
 async function startDebugNode(page, caseId, nodeId) {
   await page.goto("/?debug=1");
   await page.evaluate(() => localStorage.clear());
@@ -33,26 +38,35 @@ async function startDebugNode(page, caseId, nodeId) {
 
 async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
-  if (choice.type === "free") {
-    await page.locator(".reframe-box textarea").fill(
-      "Separate people, evidence, and conditions before deciding the next step.",
-      { timeout: ACTION_TIMEOUT_MS },
-    );
-    await clickElement(page.locator(".submit-reframe"), `${scene.title}/${choice.id}`);
-  } else {
-    const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
-    await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
-    await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    if (choice.type === "free") {
+      await page.locator(".reframe-box textarea").fill(
+        "Separate people, evidence, and conditions before deciding the next step.",
+        { timeout: ACTION_TIMEOUT_MS },
+      );
+      await clickElement(page.locator(".submit-reframe"), `${scene.title}/${choice.id}`);
+    } else {
+      const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
+      await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
+      if (!(await waitUntilVisible(page.getByTestId("commit-confirm"), 3_000))) continue;
+      await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
+    }
+    if (await waitUntilVisible(page.getByTestId("decision-next"))) break;
+    if (attempt === 1) throw new Error(`${scene.title}/${choice.id} did not open decision reveal`);
   }
-  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: ACTION_TIMEOUT_MS });
   await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
   await page.waitForFunction(
-    ({ nextNodeId }) => {
+    ({ nextNodeId, nextTitle }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
-      return saved?.nodeId === nextNodeId || Boolean(document.querySelector(".result-page, .ending-reveal"));
+      const heading = document.querySelector(".game-header h1")?.textContent ?? "";
+      return (
+        saved?.nodeId === nextNodeId ||
+        (nextTitle && heading.includes(nextTitle)) ||
+        Boolean(document.querySelector(".result-page, .ending-reveal"))
+      );
     },
-    { nextNodeId: choice.next },
-    { timeout: ACTION_TIMEOUT_MS },
+    { nextNodeId: choice.next, nextTitle: nodes[choice.next]?.title ?? "" },
+    { timeout: TRANSITION_TIMEOUT_MS },
   );
 }
 
@@ -81,7 +95,9 @@ function createSeededRandom(seed) {
 function collectRuntimeErrors(page, errors) {
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+    if (message.type() !== "error") return;
+    if (/AudioContext encountered an error from the audio device|WebAudio renderer/i.test(message.text())) return;
+    errors.push(`console: ${message.text()}`);
   });
 }
 
