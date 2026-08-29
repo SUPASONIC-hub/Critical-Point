@@ -107,11 +107,13 @@ export async function saveErrorTelemetry(payload) {
 async function checkTelemetryTable(tableName) {
   if (!telemetryEnabled) return { table: tableName, ok: false, skipped: true };
 
+  const readTableName = tableName === "playtest_sessions" ? "public_rankings" : tableName;
+
   const query = new URLSearchParams({
     select: "*",
     limit: "1",
   });
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${tableName}?${query.toString()}`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${readTableName}?${query.toString()}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -120,6 +122,7 @@ async function checkTelemetryTable(tableName) {
 
   return {
     table: tableName,
+    endpoint: readTableName,
     ok: response.ok,
     status: response.status,
   };
@@ -151,7 +154,7 @@ export async function fetchLeaderboard(limit = 100) {
     order: "completed_at.desc",
     limit: String(limit),
   });
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_sessions?${query.toString()}`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_rankings?${query.toString()}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,

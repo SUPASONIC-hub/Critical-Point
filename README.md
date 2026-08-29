@@ -58,7 +58,7 @@ Remote ranking setup:
 
 1. Copy `.env.example` to `.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 2. Run `supabase/schema.sql` in the Supabase SQL editor before deploying.
-3. The schema enables anonymous insert for public playtest telemetry and anonymous read for the ranking table. Use a restricted project and rotate keys if this is not a public playtest.
+3. The schema enables anonymous insert for public playtest telemetry and anonymous read only through the `public_rankings` view. Raw session rows remain insert-only for anonymous clients. Use a restricted project and rotate keys if this is not a public playtest.
 
 원격 저장은 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`가 있을 때만 활성화됩니다. 설정하지 않아도 플레이, 자동 저장, JSON 내보내기, 로컬 랭킹은 정상 동작합니다.
 
@@ -98,3 +98,4 @@ create table if not exists app_error_logs (
 - 원격 전송 대기열은 온라인 복귀 후 지수 백오프로 자동 재시도합니다.
 - 디버그 에러 로그 패널에서 `playtest_sessions`, `playtest_feedback`, `app_error_logs` 테이블 읽기 점검을 확인할 수 있습니다.
 - 전체 검증은 `npm run verify`로 실행합니다. 내부 순서는 `npm test`, `npm run build`, `npm run test:e2e`이며 GitHub Actions에서도 같은 명령을 실행합니다.
+- 전체 경로 검증은 `npm run test:e2e:full`로 실행하며, GitHub Actions의 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 이를 수행합니다.

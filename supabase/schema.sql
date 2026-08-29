@@ -40,3 +40,22 @@ drop policy if exists "public can insert playtest feedback" on public.playtest_f
 create policy "public can insert playtest feedback" on public.playtest_feedback for insert to anon with check (true);
 drop policy if exists "public can insert app error logs" on public.app_error_logs;
 create policy "public can insert app error logs" on public.app_error_logs for insert to anon with check (true);
+
+-- Expose only completed-season ranking fields. Raw session rows contain the
+-- decision log and must remain insert-only for anonymous clients.
+revoke select on public.playtest_sessions from anon;
+drop view if exists public.public_rankings;
+create view public.public_rankings as
+select
+  session_code,
+  player_name,
+  case_id,
+  case_title,
+  completed_at,
+  summary
+from public.playtest_sessions
+where case_id = 'season-final'
+  and summary->>'seasonComplete' = 'true'
+  and summary->>'burstScore' ~ '^[0-9]+([.][0-9]+)?$'
+  and (summary->>'burstScore')::numeric between 0 and 100;
+grant select on public.public_rankings to anon;

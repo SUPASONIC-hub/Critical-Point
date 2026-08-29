@@ -76,8 +76,10 @@ async function chooseSceneChoice(page, scene, choiceIndex) {
       { timeout: 2_000 },
     ).then(() => true).catch(() => false);
     if (!transitioned) throw error;
+    await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
     return;
   }
+  await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
   await page.waitForFunction(
     ({ nextNodeId, nextTitle }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
