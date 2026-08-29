@@ -4,7 +4,7 @@ import { AlertTriangle, ChevronRight, Copy, Download, FileText, MessageSquareTex
 export function ResultScreen({ view }) {
   const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
   return (
-      <main className="shell">
+      <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
         {renderDecisionReveal()}
         {renderRecoveryNotice()}
@@ -14,6 +14,10 @@ export function ResultScreen({ view }) {
         </p>
         {currentCase === "final" && (
           <section className={`ending-sequence ending-step-${endingStep}`} aria-label="최종 엔딩 시퀀스">
+            <div className="ending-sequence-header">
+              <span>SEASON 01 / FINAL RECORD</span>
+              <strong>SEASON COMPLETE</strong>
+            </div>
             {endingStep === 0 && (
               <div className="ending-beat">
                 <span>RECORD {endingTwistIndex + 1} / 3</span>
@@ -260,6 +264,12 @@ export function ResultScreen({ view }) {
               >
                 {telemetryStatus.text}
               </small>
+              {!telemetryEnabled && (
+                <p className="telemetry-explanation">원격 랭킹 설정이 없어 이 브라우저에만 저장됩니다.</p>
+              )}
+              {telemetryEnabled && !dataConsent && (
+                <p className="telemetry-explanation">데이터 제공 동의가 없어 원격 랭킹에 기록하지 않았습니다.</p>
+              )}
               {pendingTelemetry.length > 0 && (
                 <div className="retry-telemetry">
                   <b>원격 저장 대기 {pendingTelemetry.length}건</b>

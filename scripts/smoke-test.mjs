@@ -725,6 +725,11 @@ const leaderboard = buildLeaderboard([
 assert.equal(leaderboard.length, 2, "leaderboard should keep one best run per session");
 assert.equal(leaderboard[0].sessionCode, "ALPHA", "leaderboard should sort by momentum score");
 assert.equal(leaderboard[0].position, 1, "leaderboard should assign positions");
+const seasonPreferredLeaderboard = buildLeaderboard([
+  { session_code: "SEASON", case_id: "case05", summary: { rank: "S", momentumScore: 99 } },
+  { session_code: "SEASON", case_id: "season-final", summary: { rank: "B", momentumScore: 40, seasonComplete: true } },
+]);
+assert.equal(seasonPreferredLeaderboard[0].caseId, "season-final", "season completion should outrank partial case records");
 assert.match(getLeaderboardHeadline(leaderboard).title, /익명 분석관/, "remote leaderboard should use anonymous names");
 assert.match(
   getLeaderboardHeadline(

@@ -339,6 +339,17 @@ export function AppContent({ onSuppressSaves }) {
   const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
   const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
   const evidenceCount = discoveredClues.length + (memoOpened ? 1 : 0) + (probeUsed ? 1 : 0) + activeFreeTextSignalCount;
+  const localSeasonLeaderboardRow = useMemo(() => caseResults.final && completedCases.includes("final")
+    ? {
+        local: true,
+        session_code: sessionCode,
+        player_name: playerName || "현재 분석관",
+        case_id: "season-final",
+        case_title: "SEASON 01 COMPLETE",
+        completed_at: caseResults.final.completedAt ?? "",
+        summary: { ...caseResults.final, seasonComplete: true },
+      }
+    : null, [caseResults, completedCases, playerName, sessionCode]);
   useEffect(() => {
     setMemoOpened(false);
   }, [resolvedNodeId]);
@@ -887,13 +898,13 @@ export function AppContent({ onSuppressSaves }) {
     fetchLeaderboard()
       .then(({ rows = [], skipped = false }) => {
         if (cancelled) return;
-        setLeaderboard(buildLeaderboard([...rows, ...localLeaderboardRows]));
+        setLeaderboard(buildLeaderboard([...rows, ...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])]));
         setLeaderboardStatus(skipped ? "local" : "ready");
       })
       .catch((error) => {
         if (cancelled) return;
         console.warn(error);
-        setLeaderboard(buildLeaderboard(localLeaderboardRows));
+        setLeaderboard(buildLeaderboard([...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])]));
         setLeaderboardStatus(isOnline ? "error" : "local");
         setLeaderboardError(
           isOnline
@@ -904,7 +915,7 @@ export function AppContent({ onSuppressSaves }) {
     return () => {
       cancelled = true;
     };
-  }, [isOnline, localLeaderboardRows, showRanking]);
+  }, [isOnline, localLeaderboardRows, localSeasonLeaderboardRow, showRanking]);
   const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
 
   function skipEndingQuietHold() {
@@ -1726,6 +1737,30 @@ export function AppContent({ onSuppressSaves }) {
       }
     }
 
+    if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length && telemetryEnabled && dataConsent) {
+      const seasonTelemetryPayload = {
+        session_id: sessionId,
+        session_code: sessionCode,
+        player_name: "익명 분석관",
+        case_id: "season-final",
+        case_title: "SEASON 01 COMPLETE",
+        completed_at: new Date().toISOString(),
+        summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
+        resources: finalResourcesWithTempo,
+        triggers: nextTriggers,
+        cognition: nextCognition,
+        decision_log: nextLog,
+      };
+      saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
+        queueTelemetry({
+          id: `season-final-${sessionId}`,
+          type: "case",
+          label: "SEASON 01 COMPLETE",
+          payload: seasonTelemetryPayload,
+        });
+      });
+    }
+
     setResources(finalResourcesWithTempo);
     setTriggers(nextTriggers);
     setCognition(nextCognition);
@@ -2455,5 +2490,3 @@ export function AppContent({ onSuppressSaves }) {
   return <PlayScreen view={playView} />;
 
 }
-
-

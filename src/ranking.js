@@ -35,6 +35,7 @@ function normalizeEntry(row = {}) {
     reflectionScore: Number(summary.reflectionScore) || 0,
     pressureAdaptScore: Number(summary.pressureAdaptScore) || 0,
     cognitionScore: Number(summary.cognitionScore) || 0,
+    seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
     summary,
   };
 }
@@ -47,7 +48,13 @@ export function buildLeaderboard(rows = [], limit = 50) {
   normalized.forEach((entry) => {
     const key = entry.sessionCode || entry.id;
     const current = bestBySession.get(key);
-    if (!current || entry.score > current.score || (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank])) {
+    const shouldReplace = !current ||
+      (entry.seasonComplete && !current.seasonComplete) ||
+      (!entry.seasonComplete && !current.seasonComplete && (
+        entry.score > current.score ||
+        (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank])
+      ));
+    if (shouldReplace) {
       bestBySession.set(key, entry);
     }
   });
