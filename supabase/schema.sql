@@ -33,13 +33,108 @@ alter table public.playtest_sessions enable row level security;
 alter table public.playtest_feedback enable row level security;
 alter table public.app_error_logs enable row level security;
 drop policy if exists "public can read playtest sessions" on public.playtest_sessions;
-create policy "public can read playtest sessions" on public.playtest_sessions for select to anon using (true);
 drop policy if exists "public can insert playtest sessions" on public.playtest_sessions;
 create policy "public can insert playtest sessions" on public.playtest_sessions for insert to anon with check (true);
 drop policy if exists "public can insert playtest feedback" on public.playtest_feedback;
 create policy "public can insert playtest feedback" on public.playtest_feedback for insert to anon with check (true);
 drop policy if exists "public can insert app error logs" on public.app_error_logs;
 create policy "public can insert app error logs" on public.app_error_logs for insert to anon with check (true);
+
+create table if not exists public.telemetry_rate_limits (
+  actor_key text primary key,
+  window_started_at timestamptz not null default now(),
+  request_count integer not null default 0
+);
+alter table public.telemetry_rate_limits enable row level security;
+revoke all on public.telemetry_rate_limits from anon;
+
+create or replace function public.validate_telemetry_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  headers_text text;
+  headers jsonb := '{}'::jsonb;
+  actor_key text;
+  request_count integer;
+  window_started_at timestamptz;
+  payload jsonb := to_jsonb(new);
+  session_id_value text := payload->>'session_id';
+  case_id_value text := payload->>'case_id';
+  summary_value jsonb := coalesce(payload->'summary', '{}'::jsonb);
+  score_text text := summary_value->>'burstScore';
+begin
+  if session_id_value is null or length(session_id_value) not between 8 and 128 then
+    raise exception 'invalid telemetry session id';
+  end if;
+
+  headers_text := current_setting('request.headers', true);
+  begin
+    if headers_text is not null and headers_text <> '' then
+      headers := headers_text::jsonb;
+    end if;
+  exception when others then
+    headers := '{}'::jsonb;
+  end;
+  actor_key := left(coalesce(nullif(headers->>'x-forwarded-for', ''), session_id_value), 200);
+
+  insert into public.telemetry_rate_limits (actor_key, window_started_at, request_count)
+  values (actor_key, now(), 1)
+  on conflict (actor_key) do update
+  set request_count = case
+    when now() - telemetry_rate_limits.window_started_at >= interval '1 hour' then 1
+    else telemetry_rate_limits.request_count + 1
+  end,
+  window_started_at = case
+    when now() - telemetry_rate_limits.window_started_at >= interval '1 hour' then now()
+    else telemetry_rate_limits.window_started_at
+  end
+  returning request_count, window_started_at into request_count, window_started_at;
+
+  if request_count > 120 then
+    raise exception 'telemetry rate limit exceeded';
+  end if;
+
+  if TG_TABLE_NAME = 'playtest_sessions' then
+    if case_id_value not in ('case01', 'case02', 'case03', 'case04', 'case05', 'final', 'season-final')
+      or jsonb_typeof(summary_value) <> 'object'
+      or jsonb_typeof(payload->'decision_log') <> 'array'
+      or jsonb_array_length(payload->'decision_log') > 100 then
+      raise exception 'invalid playtest session payload';
+    end if;
+    if case_id_value = 'season-final'
+      and (summary_value->>'seasonComplete') <> 'true'
+      and (summary_value->>'seasonComplete') <> '1' then
+      raise exception 'season ranking requires a completed summary';
+    end if;
+    if case_id_value = 'season-final'
+      and (score_text is null or score_text !~ '^[0-9]+([.][0-9]+)?$' or score_text::numeric not between 0 and 100) then
+      raise exception 'invalid season ranking score';
+    end if;
+  elsif TG_TABLE_NAME = 'playtest_feedback' then
+    if payload->>'case_id' is not null and payload->>'case_id' not in ('case01', 'case02', 'case03', 'case04', 'case05', 'final') then
+      raise exception 'invalid feedback case';
+    end if;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists validate_playtest_session_insert on public.playtest_sessions;
+create trigger validate_playtest_session_insert
+before insert on public.playtest_sessions
+for each row execute function public.validate_telemetry_insert();
+drop trigger if exists validate_playtest_feedback_insert on public.playtest_feedback;
+create trigger validate_playtest_feedback_insert
+before insert on public.playtest_feedback
+for each row execute function public.validate_telemetry_insert();
+drop trigger if exists validate_app_error_log_insert on public.app_error_logs;
+create trigger validate_app_error_log_insert
+before insert on public.app_error_logs
+for each row execute function public.validate_telemetry_insert();
 
 -- Expose only completed-season ranking fields. Raw session rows contain the
 -- decision log and must remain insert-only for anonymous clients.
