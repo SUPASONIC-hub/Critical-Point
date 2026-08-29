@@ -129,6 +129,7 @@ import { ErrorLogPanel } from "./components/ErrorLogPanel.jsx";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
+import { useAppPersistence } from "./state/useAppPersistence.js";
 import {
   legacyProfiles,
   nextCaseSignals,
@@ -292,6 +293,21 @@ export function AppContent({ onSuppressSaves }) {
   const commitConfirmRef = useRef(null);
   const visibilityPauseRef = useRef(null);
   const freeTextSaveTimerRef = useRef(null);
+
+  const { persist: persistenceApi } = useAppPersistence({
+    playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
+    discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
+    freeText, echo, nodeEnteredAt, pendingTelemetryRef, protocolUsed, timerPenaltyApplied, probeUsed,
+    isPausedSave, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
+    setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
+    setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setOpeningLegacy,
+    setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
+    setFreeText, setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries,
+    setSaveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
+    makeEmptyScores, normalizeSavedText, persistSuppressed: () => saveSuppressed,
+    onSuppressSaves, formatSaveTime: (value) => value, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
+  });
+  const persist = persistenceApi;
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -1043,7 +1059,7 @@ export function AppContent({ onSuppressSaves }) {
     });
   }, [started, currentCase, nodeId, isResult]);
 
-  function persist(nextState) {
+  function legacyPersist(nextState) {
     if (saveSuppressed) return { storageSaved: false };
     const baseState = {
         saveSchemaVersion: SAVE_SCHEMA_VERSION,
