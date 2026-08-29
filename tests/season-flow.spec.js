@@ -164,7 +164,7 @@ test("the complete season can progress from case 01 to the final ending", async 
   test.setTimeout(180_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
-  await startDebugNode(page, "case01", "start");
+  await startDebugNode(page, "case01", "payday");
 
   for (let caseIndex = 0; caseIndex < 6; caseIndex += 1) {
     await completeCurrentCase(page);
@@ -258,6 +258,18 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
     scrollWidth: document.documentElement.scrollWidth,
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+});
+
+test("a successful free-text plan enters the authored branch scene", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "payday");
+  await page.locator(".reframe-box textarea").fill("직원과 고객의 조건을 공개하고 근거 로그와 위험 비용을 함께 검토한다");
+  await page.locator(".submit-reframe").click();
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  await page.getByTestId("decision-next").click();
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
+    .toBe("c1_branch_people");
 });
 
 test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {

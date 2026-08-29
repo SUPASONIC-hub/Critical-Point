@@ -1520,6 +1520,12 @@ export function AppContent({ onSuppressSaves }) {
     setLastSavedAt,
   });
 
+  function getFreeTextBranchTarget(caseId, fromNodeId) {
+    const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
+    if (!branch || branch.nodeId === fromNodeId) return null;
+    return branch.nextIds[0] ?? null;
+  }
+
   function choose(choice) {
     if (isAdvancing) return;
     if (!nodes[choice.next] && !Object.values(CASE_RESULT_NODES).includes(choice.next)) {
@@ -1541,6 +1547,9 @@ export function AppContent({ onSuppressSaves }) {
       free &&
       submittedSignalCount >= 3 &&
       !submittedPrivacySignals.some((signal) => signal.active);
+    const freeTextBranchTarget = free && freeTextSuccess && currentCaseFreeTextSuccessCount === 0
+      ? getFreeTextBranchTarget(currentCase, resolvedNodeId)
+      : null;
     const baseEffect = free ? freeResult.effect : choice.effect;
     const cognitiveEffect = free ? freeResult.cognition : choice.cognition;
     const {
@@ -1628,6 +1637,7 @@ export function AppContent({ onSuppressSaves }) {
       freeText: submittedFreeText,
       freeTextSignalCount: submittedSignalCount,
       freeTextSuccess,
+      freeTextBranchId: freeTextBranchTarget,
       effect: finalEffect,
       cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
@@ -1658,7 +1668,7 @@ export function AppContent({ onSuppressSaves }) {
     const nextEcho = safeQuote
       ? `${entry.echo} 다음 장면은 당신이 남긴 문장 \u201c${safeQuote}\u201d을 기준으로 이어집니다.`
       : entry.echo;
-    const nextNode = choice.next;
+    const nextNode = freeTextBranchTarget ?? choice.next;
     appendTraceEvent({
       kind: "choose",
       caseId: currentCase,
