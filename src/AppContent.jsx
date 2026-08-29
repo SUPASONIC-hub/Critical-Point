@@ -49,6 +49,7 @@ import {
 } from "./gameData.js";
 import {
   applyEffect,
+  addForecastUncertainty,
   applySeededEffectVariation,
   anonymizeSensitiveText,
   buildSceneBeat,
@@ -608,7 +609,10 @@ export function AppContent({ onSuppressSaves }) {
   const decisionForecasts = fixedChoices
     .map((choice) => {
       const read = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
-      const forecast = createDecisionForecast({ ...choice, effect: read.finalEffect }, resources);
+      const forecast = addForecastUncertainty(
+        createDecisionForecast({ ...choice, effect: read.finalEffect }, resources),
+        evidenceCount,
+      );
       return {
         choice,
         read,
@@ -639,8 +643,17 @@ export function AppContent({ onSuppressSaves }) {
     ? getEffectiveChoiceRead(pendingChoice, pendingChoice.effect, pendingChoice.cognition)
     : null;
   const pendingChoiceForecast = pendingChoiceRead
-    ? createDecisionForecast({ ...pendingChoice, effect: pendingChoiceRead.finalEffect }, resources)
+    ? addForecastUncertainty(
+        createDecisionForecast({ ...pendingChoice, effect: pendingChoiceRead.finalEffect }, resources),
+        evidenceCount,
+      )
     : null;
+
+  const formatForecastRisk = (forecast) => {
+    if (!forecast) return "?��?";
+    if (forecast.forecastPrecision === "precise") return formatRiskDelta(forecast.riskDelta);
+    return `${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`;
+  };
 
   const questSteps = [
     {

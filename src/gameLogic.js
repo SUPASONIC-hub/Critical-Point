@@ -219,6 +219,22 @@ export function createDecisionForecast(choice = {}, resources = {}) {
   };
 }
 
+// Keep the real forecast for game logic, but reveal only the precision earned by evidence.
+export function addForecastUncertainty(forecast = {}, evidenceCount = 0) {
+  const confidence = clamp(28 + Math.max(0, evidenceCount) * 14, 28, 84);
+  const spread = confidence >= 70 ? 0 : confidence >= 50 ? 5 : 9;
+  const riskDeltaMin = forecast.riskDelta - spread;
+  const riskDeltaMax = forecast.riskDelta + spread;
+  return {
+    ...forecast,
+    forecastConfidence: confidence,
+    riskDeltaMin,
+    riskDeltaMax,
+    afterRisk: spread === 0 ? forecast.afterRisk : `${forecast.afterRisk} (${riskDeltaMin}..${riskDeltaMax})`,
+    forecastPrecision: spread === 0 ? "precise" : spread <= 5 ? "directional" : "uncertain",
+  };
+}
+
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   if (entries.length === 0) {
     return {
