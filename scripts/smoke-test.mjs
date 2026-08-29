@@ -477,7 +477,7 @@ function simulateCaseRoute(caseId, startNodeId = CASE_START_NODES[caseId], choic
     visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
     cursor = choice.next;
   }
-  assert.fail(`${caseId} route did not reach ${caseResultNodeIds[caseId]}`);
+  assert.fail(`${caseId} route did not reach ${CASE_RESULT_NODES[caseId]}`);
 }
 
 function simulateCaseRouteAfterFirstChoice(caseId, startNodeId, firstChoiceIndex) {

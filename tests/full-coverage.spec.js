@@ -1,19 +1,23 @@
 import { expect, test } from "@playwright/test";
-import { caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 
-const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "final"];
-const RESULT_NODE_IDS = {
-  case01: "result",
-  case02: "case02_result",
-  case03: "case03_result",
-  case04: "case04_result",
-  case05: "case05_result",
-  final: "final_result",
-};
+const ACTION_TIMEOUT_MS = 8_000;
+
+test.describe.configure({ mode: "serial" });
+test.use({ actionTimeout: ACTION_TIMEOUT_MS });
 
 test.beforeEach(async ({}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "full coverage runs only once");
 });
+
+async function clickElement(locator, label) {
+  try {
+    await locator.evaluate((button) => button.click(), undefined, { timeout: ACTION_TIMEOUT_MS });
+  } catch (error) {
+    const message = String(error).split("\n")[0];
+    throw new Error(`${label} click failed: ${message}`);
+  }
+}
 
 async function startDebugNode(page, caseId, nodeId) {
   await page.goto("/?debug=1");
@@ -30,22 +34,25 @@ async function startDebugNode(page, caseId, nodeId) {
 async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
   if (choice.type === "free") {
-    await page.locator(".reframe-box textarea").fill("Separate people, evidence, and conditions before deciding the next step.");
-    await page.locator(".submit-reframe").evaluate((button) => button.click());
+    await page.locator(".reframe-box textarea").fill(
+      "Separate people, evidence, and conditions before deciding the next step.",
+      { timeout: ACTION_TIMEOUT_MS },
+    );
+    await clickElement(page.locator(".submit-reframe"), `${scene.title}/${choice.id}`);
   } else {
     const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
-    await page.locator(".choices .choice").nth(fixedIndex).evaluate((button) => button.click());
-    await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+    await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
+    await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
   }
-  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: 8000 });
-  await page.getByTestId("decision-next").evaluate((button) => button.click());
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: ACTION_TIMEOUT_MS });
+  await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
   await page.waitForFunction(
     ({ nextNodeId }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
       return saved?.nodeId === nextNodeId || Boolean(document.querySelector(".result-page, .ending-reveal"));
     },
     { nextNodeId: choice.next },
-    { timeout: 8000 },
+    { timeout: ACTION_TIMEOUT_MS },
   );
 }
 
@@ -104,6 +111,7 @@ test("all scene-choice pairs advance without runtime errors @full", async ({ pag
   test.setTimeout(45 * 60_000);
   const failures = [];
   const errors = [];
+  let aborted = "";
   await page.addInitScript(() => {
     try {
       localStorage.clear();
@@ -126,12 +134,28 @@ test("all scene-choice pairs advance without runtime errors @full", async ({ pag
           }
           if (errors.length) failures.push(`${caseId}/${nodeId}/${choice.id}: ${errors.slice(0, 2).join(" | ")}`);
         } catch (error) {
-          failures.push(`${caseId}/${nodeId}/${choice.id}: ${String(error).split("\n")[0]}`);
+          const message = String(error).split("\n")[0];
+          failures.push(`${caseId}/${nodeId}/${choice.id}: ${message}`);
+          // Once the page or browser is gone, every later pair reports the same
+          // teardown message. Those entries carry no information and would bury
+          // the one failure that actually explains the run, so stop collecting.
+          if (/browser has been closed|Target page.*closed|Test ended/i.test(message)) {
+            aborted = `harness stopped responding at ${caseId}/${nodeId}/${choice.id}`;
+          }
         }
+        if (aborted) break;
       }
+      if (aborted) break;
     }
+    if (aborted) break;
   }
 
+  if (aborted) {
+    throw new Error(
+      `${aborted}\nCollected ${failures.length} failure(s) before the harness died; ` +
+        `only the first explains the run:\n${failures[0] ?? "(none)"}`,
+    );
+  }
   if (failures.length) throw new Error(`${failures.length} failures\n${failures.join("\n")}`);
 });
 
