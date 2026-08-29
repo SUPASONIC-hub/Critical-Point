@@ -233,7 +233,9 @@ export function AppContent({ onSuppressSaves }) {
   });
   const [endingStep, setEndingStep] = useState(0);
   const [endingTwistIndex, setEndingTwistIndex] = useState(0);
-  const [endingQuietReady, setEndingQuietReady] = useState(false);
+  const [endingQuietReady, setEndingQuietReady] = useState(
+    () => globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false,
+  );
   const [nextParticipantMessage, setNextParticipantMessage] = useState(() => readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""));
   const [echo, setEcho] = useState(
     () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
