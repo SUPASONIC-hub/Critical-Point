@@ -19,6 +19,7 @@ import {
   normalizeSavedGameplayState,
   normalizeSavedNestedState,
   repairSavedRoute,
+  recordAppError,
   shouldCaptureSaveSlot,
 } from "./savedState.js";
 
@@ -74,6 +75,7 @@ export function useAppPersistence({
   setSaveStatus,
   setLocalErrorEntries,
   setSaveSlots,
+  saveSlots,
   normalizePlayerName,
   initialResources,
   triggerLabels,
@@ -186,13 +188,19 @@ export function useAppPersistence({
   function closeRecoveryCenter() { setShowErrorLog(false); setShowRecoveryCenter(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
 
   function clearLocalErrorLog() {
-    if (!removeStoredValue(ERROR_LOG_STORAGE_KEY)) { setSaveStatus("Error log clear failed: browser storage is unavailable."); refreshLocalErrorLog(); return; }
+    if (!removeStoredValue(ERROR_LOG_STORAGE_KEY)) {
+      recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
+      setSaveStatus("Error log clear failed: browser storage is unavailable.");
+      refreshLocalErrorLog();
+      return;
+    }
     setLocalErrorEntries([]); setLastRecoveredError(null); persist({ lastError: null });
   }
 
   function deleteSaveSlot(slotId) {
     const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
     if (!writeStoredValue(SAVE_SLOT_STORAGE_KEY, JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: nextSlots }))) {
+      recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
       setSaveStatus("Delete failed: browser storage is unavailable."); return;
     }
     setSaveSlots(nextSlots);
@@ -203,7 +211,11 @@ export function useAppPersistence({
     const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
     if (!repaired || !isSavedStateShapeValid(repaired)) return;
     const nextState = normalizeSavedGameplayState({ ...repaired, paused: true, started: false, savedAt: new Date().toISOString() });
-    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(nextState))) { setSaveStatus("Restore failed: browser storage is unavailable."); return; }
+    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(nextState))) {
+      recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
+      setSaveStatus("Restore failed: browser storage is unavailable.");
+      return;
+    }
     window.location.reload();
   }
 

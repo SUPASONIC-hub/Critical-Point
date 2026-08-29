@@ -297,7 +297,21 @@ export function AppContent({ onSuppressSaves }) {
   const visibilityPauseRef = useRef(null);
   const freeTextSaveTimerRef = useRef(null);
 
-  const { persist: persistenceApi } = useAppPersistence({
+  const {
+    persist: persistenceApi,
+    startGame: persistenceStartGame,
+    resumeSavedGame: persistenceResumeSavedGame,
+    pauseAfterRecovery: persistencePauseAfterRecovery,
+    startFreshAfterRecovery: persistenceStartFreshAfterRecovery,
+    saveCurrentGame: persistenceSaveCurrentGame,
+    refreshLocalErrorLog: persistenceRefreshLocalErrorLog,
+    refreshSaveSlots: persistenceRefreshSaveSlots,
+    dismissRecoveryNotice: persistenceDismissRecoveryNotice,
+    closeRecoveryCenter: persistenceCloseRecoveryCenter,
+    clearLocalErrorLog: persistenceClearLocalErrorLog,
+    deleteSaveSlot: persistenceDeleteSaveSlot,
+    restoreSaveSlot: persistenceRestoreSaveSlot,
+  } = useAppPersistence({
     playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
     discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
     freeText, echo, nodeEnteredAt, pendingTelemetryRef, protocolUsed, timerPenaltyApplied, probeUsed,
@@ -306,9 +320,9 @@ export function AppContent({ onSuppressSaves }) {
     setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setOpeningLegacy,
     setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setFreeText, setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries,
-    setSaveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
+    setSaveSlots, saveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
     makeEmptyScores, normalizeSavedText, persistSuppressed: () => saveSuppressed,
-    onSuppressSaves, formatSaveTime: (value) => value, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
+    onSuppressSaves, formatSaveTime, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
   });
   const persist = persistenceApi;
 
@@ -1130,7 +1144,7 @@ export function AppContent({ onSuppressSaves }) {
     return { ...payload, storageSaved };
   }
 
-  function startGame() {
+  function legacyStartGame() {
     const name = normalizePlayerName(playerName) || "분석관";
     setPlayerName(name);
     setStarted(true);
@@ -1183,7 +1197,7 @@ export function AppContent({ onSuppressSaves }) {
     });
   }
 
-  function resumeSavedGame() {
+  function legacyResumeSavedGame() {
     setStarted(true);
     setIsPausedSave(false);
     setNodeEnteredAt(Date.now());
@@ -1196,14 +1210,14 @@ export function AppContent({ onSuppressSaves }) {
     });
   }
 
-  function pauseAfterRecovery() {
+  function legacyPauseAfterRecovery() {
     setStarted(false);
     setIsPausedSave(true);
     setSaveStatus("저장 지점을 일시정지했습니다. 같은 오류가 반복되면 새로 시작하거나 복구 슬롯을 선택하세요.");
     persist({ started: false, paused: true });
   }
 
-  function startFreshAfterRecovery() {
+  function legacyStartFreshAfterRecovery() {
     onSuppressSaves();
     const removed = removeStoredValue(STORAGE_KEY);
     if (!removed) {
@@ -1216,7 +1230,7 @@ export function AppContent({ onSuppressSaves }) {
     window.location.reload();
   }
 
-  function saveCurrentGame({ exit = false } = {}) {
+  function legacySaveCurrentGame({ exit = false } = {}) {
     const nextStarted = exit ? false : started;
     const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
     const payload = persist({
@@ -1240,7 +1254,7 @@ export function AppContent({ onSuppressSaves }) {
     }
   }
 
-  function refreshLocalErrorLog() {
+  function legacyRefreshLocalErrorLog() {
     const rawErrorLog = readStoredValue(ERROR_LOG_STORAGE_KEY, "null");
     const localErrorLog = parseErrorLog(rawErrorLog);
     if (localErrorLog && rawErrorLog !== JSON.stringify(localErrorLog)) {
@@ -1250,23 +1264,23 @@ export function AppContent({ onSuppressSaves }) {
     refreshSaveSlots();
   }
 
-  function refreshSaveSlots() {
+  function legacyRefreshSaveSlots() {
     const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
     setSaveSlots(Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : []);
   }
 
-  function dismissRecoveryNotice() {
+  function legacyDismissRecoveryNotice() {
     setLastRecoveredError(null);
     persist({ lastError: null });
   }
 
-  function closeRecoveryCenter() {
+  function legacyCloseRecoveryCenter() {
     setShowErrorLog(false);
     setShowRecoveryCenter(false);
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
   }
 
-  function clearLocalErrorLog() {
+  function legacyClearLocalErrorLog() {
     const cleared = removeStoredValue(ERROR_LOG_STORAGE_KEY);
     if (!cleared) {
       recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
@@ -1279,7 +1293,7 @@ export function AppContent({ onSuppressSaves }) {
     persist({ lastError: null });
   }
 
-  function deleteSaveSlot(slotId) {
+  function legacyDeleteSaveSlot(slotId) {
     const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
     const deleteSaved = writeStoredValue(
       SAVE_SLOT_STORAGE_KEY,
@@ -1296,7 +1310,7 @@ export function AppContent({ onSuppressSaves }) {
     setSaveSlots(nextSlots);
   }
 
-  function restoreSaveSlot(slot) {
+  function legacyRestoreSaveSlot(slot) {
     const restored = restoreRecoverySnapshot(slot?.snapshot);
     const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
     if (!repaired || !isSavedStateShapeValid(repaired)) return;
@@ -1314,6 +1328,21 @@ export function AppContent({ onSuppressSaves }) {
     }
     window.location.reload();
   }
+
+  // Persistence is owned by the extracted lifecycle hook. Keep the old
+  // implementations above available for rollback during this migration.
+  const startGame = persistenceStartGame;
+  const resumeSavedGame = persistenceResumeSavedGame;
+  const pauseAfterRecovery = persistencePauseAfterRecovery;
+  const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
+  const saveCurrentGame = persistenceSaveCurrentGame;
+  const refreshLocalErrorLog = persistenceRefreshLocalErrorLog;
+  const refreshSaveSlots = persistenceRefreshSaveSlots;
+  const dismissRecoveryNotice = persistenceDismissRecoveryNotice;
+  const closeRecoveryCenter = persistenceCloseRecoveryCenter;
+  const clearLocalErrorLog = persistenceClearLocalErrorLog;
+  const deleteSaveSlot = persistenceDeleteSaveSlot;
+  const restoreSaveSlot = persistenceRestoreSaveSlot;
 
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
