@@ -57,10 +57,11 @@ export function RankingScreen({
             ) : (
               <div className="ranking-list">
                 {leaderboard.map((entry) => (
-                  <article className={entry.sessionCode === sessionCode ? "ranking-row current-player" : "ranking-row"} key={entry.id}>
+                  <article className={`${entry.sessionCode === sessionCode ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
                     <strong className="ranking-position">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.name}</b>
+                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
                       <small>{entry.caseTitle} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
                     </div>
                     <div className="ranking-stat">

@@ -208,6 +208,8 @@ summary:focus-visible{outline:3px solid var(--color-accent);outline-offset:3px}
 .ranking-stat b,
 .ranking-detail span{display:block}
 .ranking-player b{color:var(--c-ink);font-size:15px;overflow-wrap:anywhere}
+.ranking-player .season-complete-badge{display:inline-flex;margin-top:4px;padding:3px 6px;color:var(--c-teal-deep);background:var(--c-acid);font-size:9px;font-weight:950;letter-spacing:.1em}
+.ranking-row.season-complete{border-color:var(--c-teal-deep);box-shadow:inset 4px 0 var(--c-acid)}
 .ranking-player small,
 .ranking-detail span{margin-top:4px;color:var(--c-ink-muted);font-size:11px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
 .ranking-stat{padding-left:10px;border-left:1px solid var(--c-line)}
