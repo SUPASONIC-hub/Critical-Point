@@ -99,5 +99,5 @@ create table if not exists app_error_logs (
 - 원격 전송 대기열은 온라인 복귀 후 지수 백오프로 자동 재시도합니다.
 - 디버그 에러 로그 패널에서 `playtest_sessions`, `playtest_feedback`, `app_error_logs` 테이블 읽기 점검을 확인할 수 있습니다.
 - 전체 검증은 `npm run verify`로 실행합니다. 내부 순서는 `npm test`, `npm run build`, `npm run test:e2e`이며 GitHub Actions에서도 같은 명령을 실행합니다.
-- 전체 경로 검증은 `npm run test:e2e:full`로 실행하며, GitHub Actions의 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 이를 수행합니다.
+- 전체 경로 검증은 `npm run test:e2e:full`로 실행하며, 독립적인 시즌 시나리오는 4개 워커로 병렬 실행합니다. GitHub Actions의 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 이를 수행합니다.
 - 운영 배포 전 Supabase SQL Editor에서 `supabase/schema.sql`을 다시 실행해 RLS, 공개 랭킹 뷰, telemetry 검증 트리거를 적용합니다.

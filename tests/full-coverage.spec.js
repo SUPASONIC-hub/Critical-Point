@@ -4,8 +4,8 @@ import { CASE_SEQUENCE, caseOpeningRoutes, nodeOrders, nodes } from "../src/game
 const ACTION_TIMEOUT_MS = 60_000;
 const TRANSITION_TIMEOUT_MS = 60_000;
 
-test.describe.configure({ mode: "serial" });
 test.use({ actionTimeout: ACTION_TIMEOUT_MS });
+test.describe.configure({ mode: "parallel" });
 
 test.beforeEach(async ({}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "full coverage runs only once");
