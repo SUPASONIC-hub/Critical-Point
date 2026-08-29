@@ -5,6 +5,7 @@ export function DecisionDock({
   pendingChoice,
   pendingChoiceForecast,
   suspenseTier,
+  formatForecastRisk,
   onCancel,
   onConfirm,
   isAdvancing,
@@ -23,7 +24,7 @@ export function DecisionDock({
         <span>선택 대기</span>
         <strong>{speechify(pendingChoice)}</strong>
         <small>
-          위험 {formatRiskDelta(pendingChoiceForecast.riskDelta)} · 압력 {pendingChoiceForecast.afterRisk}
+          위험 {formatForecastRisk(pendingChoiceForecast)} · 압력 {pendingChoiceForecast.afterRisk}
         </small>
       </div>
       <div className="decision-dock-actions">
