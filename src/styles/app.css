@@ -1194,6 +1194,14 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
 .ending-shell .ending-beat button{min-height:48px;padding:0 24px;border:1px solid var(--color-accent);background:var(--color-accent);color:var(--color-ink-deep);font-weight:900}
 .ending-shell .ending-quiet-skip{background:transparent;color:var(--color-white-soft)}
 .telemetry-explanation{margin:8px 0 0;color:var(--c-amber);font-size:12px;font-weight:800;line-height:1.5}
+.choice-branch-tag{display:inline-flex;align-items:center;width:max-content;padding:4px 7px;border:1px solid var(--color-accent);background:rgba(217,255,98,.12);color:var(--color-accent);font-size:10px;font-weight:900;letter-spacing:.12em}
+.screen-loading{min-height:100dvh}
+@media (max-width:480px){
+  .ending-shell .ending-sequence{min-height:calc(100dvh - 32px);padding:70px 18px 28px}
+  .ending-sequence-header{top:18px;left:18px;right:18px;align-items:flex-start;flex-direction:column;gap:6px}
+  .ending-shell .ending-beat blockquote{font-size:34px}
+  .ending-shell .ending-twist-copy{font-size:14px}
+}
 .ending-beat{display:grid;justify-items:center;gap:18px;width:min(620px,100%)}
 .ending-beat span{color:var(--color-accent);font-size:12px;font-weight:900;letter-spacing:.08em}
 .ending-beat blockquote{margin:0;font-size:34px;line-height:1.35}

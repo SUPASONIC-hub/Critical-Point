@@ -364,6 +364,7 @@ export function PlayScreen({ view }) {
                     <Check size={16} />
                     <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
+                  {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}

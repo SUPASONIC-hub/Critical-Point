@@ -54,6 +54,12 @@ Render 배포는 `render.yaml`을 사용합니다.
 - Build: `npm ci && npm test && npm run build`
 - Publish: `dist`
 
+Remote ranking setup:
+
+1. Copy `.env.example` to `.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+2. Run `supabase/schema.sql` in the Supabase SQL editor before deploying.
+3. The schema enables anonymous insert for public playtest telemetry and anonymous read for the ranking table. Use a restricted project and rotate keys if this is not a public playtest.
+
 원격 저장은 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`가 있을 때만 활성화됩니다. 설정하지 않아도 플레이, 자동 저장, JSON 내보내기, 로컬 랭킹은 정상 동작합니다.
 
 에러 로그까지 원격 수집하려면 Supabase에 `app_error_logs` 테이블을 추가합니다.
