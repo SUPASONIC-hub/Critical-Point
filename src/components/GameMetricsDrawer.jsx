@@ -108,9 +108,9 @@ export function GameMetricsDrawer({
         <section className="scene-challenge">
           <div>
             <span>이번 장면 목표</span>
-            <strong>{simplifyPlayerText(sceneChallenge.title)}</strong>
+          <strong>{sceneChallenge.title}</strong>
           </div>
-          <p>{simplifyPlayerText(sceneChallenge.text)}</p>
+        <p>{sceneChallenge.text}</p>
         </section>
 
         {riskPressure >= 60 && (
@@ -197,19 +197,19 @@ export function GameMetricsDrawer({
           <div className="narrative-spine-grid">
             <article>
               <span>01 · 지금까지</span>
-              <p>{simplifyPlayerText(narrativeSpine.previous)}</p>
+              <p>{narrativeSpine.previous}</p>
             </article>
             <article>
               <span>02 · 현재 충돌</span>
-              <p>{simplifyPlayerText(narrativeSpine.conflict)}</p>
+              <p>{narrativeSpine.conflict}</p>
             </article>
             <article>
               <span>03 · 이번 질문</span>
-              <p>{simplifyPlayerText(narrativeSpine.question)}</p>
+              <p>{narrativeSpine.question}</p>
             </article>
             <article>
               <span>04 · 다음 파장</span>
-              <p>{simplifyPlayerText(narrativeSpine.consequence)}</p>
+              <p>{narrativeSpine.consequence}</p>
             </article>
           </div>
         </section>

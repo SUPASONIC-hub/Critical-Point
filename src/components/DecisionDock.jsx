@@ -8,7 +8,6 @@ export function DecisionDock({
   onCancel,
   onConfirm,
   isAdvancing,
-  simplify,
   speechify,
   formatRiskDelta,
 }) {
@@ -22,7 +21,7 @@ export function DecisionDock({
     >
       <div>
         <span>선택 대기</span>
-        <strong>{simplify(speechify(pendingChoice))}</strong>
+        <strong>{speechify(pendingChoice)}</strong>
         <small>
           위험 {formatRiskDelta(pendingChoiceForecast.riskDelta)} · 압력 {pendingChoiceForecast.afterRisk}
         </small>

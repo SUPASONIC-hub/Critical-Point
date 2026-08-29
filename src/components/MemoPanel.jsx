@@ -1,7 +1,7 @@
 import React from "react";
 import { FileText } from "lucide-react";
 
-export function MemoPanel({ memo = [], onOpen, simplify }) {
+export function MemoPanel({ memo = [], onOpen }) {
   return (
     <details className="memo-panel" onToggle={onOpen}>
       <summary>
@@ -13,7 +13,7 @@ export function MemoPanel({ memo = [], onOpen, simplify }) {
       </summary>
       <ul>
         {memo.map((item) => (
-          <li key={item}>{simplify(item)}</li>
+          <li key={item}>{item}</li>
         ))}
       </ul>
     </details>

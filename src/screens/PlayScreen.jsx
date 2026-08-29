@@ -45,15 +45,15 @@ export function PlayScreen({ view }) {
         {openingLegacy && (
           <section className="legacy-panel">
             <div>
-              <span>{simplifyPlayerText(openingLegacy.label)}</span>
-              <strong>{simplifyPlayerText(openingLegacy.title)}</strong>
+              <span>{openingLegacy.label}</span>
+              <strong>{openingLegacy.title}</strong>
             </div>
-            <p>{simplifyPlayerText(openingLegacy.text)}</p>
+            <p>{openingLegacy.text}</p>
             {openingLegacy.continuity && (
               <div className="continuity-bridge">
                 <span>직전 사건의 결과</span>
-                <strong>{simplifyPlayerText(openingLegacy.continuity.title)}</strong>
-                <p>{simplifyPlayerText(openingLegacy.continuity.text)}</p>
+                <strong>{openingLegacy.continuity.title}</strong>
+                <p>{openingLegacy.continuity.text}</p>
               </div>
             )}
             <div className="legacy-effect">
@@ -67,27 +67,27 @@ export function PlayScreen({ view }) {
         )}
         <section className={`pressure-cascade ${pressureCascade.tone}`}>
           <div className="pressure-cascade-mark">
-            <span>{simplifyPlayerText(pressureCascade.label)}</span>
+            <span>{pressureCascade.label}</span>
             <strong>{riskPressure}</strong>
           </div>
           <div>
-            <h2>{simplifyPlayerText(pressureCascade.title)}</h2>
-            <p>{simplifyPlayerText(pressureCascade.text)}</p>
+            <h2>{pressureCascade.title}</h2>
+            <p>{pressureCascade.text}</p>
           </div>
-          <small>{simplifyPlayerText(pressureCascade.cue)}</small>
+          <small>{pressureCascade.cue}</small>
         </section>
         <section className={`suspense-console ${suspenseState.tier.toLowerCase()}`} aria-label="서스펜스 신호">
           <div className="suspense-console-mark">
-            <span>{simplifyPlayerText(suspenseState.label)}</span>
+            <span>{suspenseState.label}</span>
             <strong>{String(suspenseState.score).padStart(2, "0")}</strong>
           </div>
           <div className="suspense-console-copy">
-            <h2>{simplifyPlayerText(suspenseState.title)}</h2>
-            <p>{simplifyPlayerText(suspenseState.text)}</p>
+            <h2>{suspenseState.title}</h2>
+            <p>{suspenseState.text}</p>
           </div>
           <div className="suspense-meter" aria-label={`서스펜스 ${suspenseState.score}퍼센트`}>
             <div style={{ width: `${suspenseState.score}%` }} />
-            <small>{simplifyPlayerText(suspenseState.cue)} · 사건 {suspenseState.caseCode}</small>
+            <small>{suspenseState.cue} · 사건 {suspenseState.caseCode}</small>
           </div>
         </section>
         <details className="play-help">
@@ -101,7 +101,7 @@ export function PlayScreen({ view }) {
           <div className="guide-grid compact-guide">
             {playGuideItems.map((item) => (
               <article key={item.title}>
-                <b>{item.title}</b>
+              <b>{item.title}</b>
                 <p>{item.text}</p>
               </article>
             ))}
@@ -143,7 +143,6 @@ export function PlayScreen({ view }) {
         <MemoPanel
           memo={node.memo}
           onOpen={(event) => event.currentTarget.open && setMemoOpened(true)}
-          simplify={simplifyPlayerText}
         />
 
         <details className="echo-panel insight-drawer">
@@ -151,7 +150,7 @@ export function PlayScreen({ view }) {
             <span>에코의 검증 질문</span>
             <b>반론 열기</b>
           </summary>
-          <p>{simplifyPlayerText(echo)}</p>
+          <p>{echo}</p>
           <div className="echo-probe">
             <div>
               <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
@@ -165,7 +164,7 @@ export function PlayScreen({ view }) {
             <summary>다시 확인할 것</summary>
             <ul>
               {getEchoChecks(node).map((item) => (
-                <li key={item}>{simplifyPlayerText(item)}</li>
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </details>
@@ -199,13 +198,13 @@ export function PlayScreen({ view }) {
             <div>{node.speaker.slice(0, 1)}</div>
             <span>
               <b>{node.speaker}</b>
-              <small>{simplifyPlayerText(speakerProfile.role)} · {simplifyPlayerText(speakerProfile.stance)}</small>
+              <small>{speakerProfile.role} · {speakerProfile.stance}</small>
             </span>
           </div>
           <div className="scene-story">
-            <p className="scene-narration"><span className="story-label">상황</span>{simplifyPlayerText(speakerProfile.appearance)} {simplifyPlayerText(speakerProfile.gesture)}</p>
-            <p className="scene-thought"><span className="story-label">속마음</span>'{simplifyPlayerText(speakerProfile.thought)}'</p>
-            <p className="scene-narration scene-direction"><span className="story-label">지금의 압박</span>{simplifyPlayerText(sceneDirection)}</p>
+            <p className="scene-narration"><span className="story-label">상황</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            <p className="scene-thought"><span className="story-label">속마음</span>'{speakerProfile.thought}'</p>
+            <p className="scene-narration scene-direction"><span className="story-label">지금의 압박</span>{sceneDirection}</p>
             <p className="scene-body"><span className="story-label">사건 보고</span>{node.text}</p>
             {latestFreeTextSuccess && latestFreeTextSuccess.nodeId !== resolvedNodeId && (
               <p className="scene-continuity-quote">
@@ -213,7 +212,7 @@ export function PlayScreen({ view }) {
                 이전 문장이 다음 장면의 기준으로 남아 있다: “{latestFreeTextSuccess.freeText}”
               </p>
             )}
-            <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{simplifyPlayerText(speakerProfile.line)}" <span className="story-voice">({simplifyPlayerText(speakerProfile.voice)})</span></p>
+            <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
           </div>
         </div>
 
@@ -246,7 +245,7 @@ export function PlayScreen({ view }) {
             </p>
             <div className="turn-tactic">
               <span>이번 턴 공략</span>
-              <strong>{simplifyPlayerText(sceneChallenge.title)}</strong>
+              <strong>{sceneChallenge.title}</strong>
               <p>
                 {showTacticalDetails
                   ? "챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 계산한 전술 정보입니다."
@@ -287,7 +286,7 @@ export function PlayScreen({ view }) {
                 <span>선택 확인</span>
                 <strong>이 말을 실제로 남기겠습니까?</strong>
               </div>
-              <p className="commit-console-choice">“{simplifyPlayerText(speechifyChoice(pendingChoice))}”</p>
+              <p className="commit-console-choice">“{speechifyChoice(pendingChoice)}”</p>
               <div className="commit-console-readout">
                 <span>예상 위험 <b>{formatRiskDelta(pendingChoiceForecast.riskDelta)}</b></span>
                 <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
@@ -358,7 +357,7 @@ export function PlayScreen({ view }) {
                   aria-pressed={pendingChoice?.id === choice.id}
                   aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
                   title={`${choiceIndex + 1}번 키로 선택 미리보기`}
-                  aria-label={`${simplifyPlayerText(speechifyChoice(choice))} ${riskLabel}. ${simplifyPlayerText(getChoiceSubtext(choice))}`}
+                  aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
                 >
                   <span className="choice-main">
                     <Check size={16} />
@@ -382,7 +381,7 @@ export function PlayScreen({ view }) {
                           {simplifyPlayerText(choiceRead.flowSurge.label)} · 추가 보정이 붙습니다. 정확한 폭은 선택 후 기록에서 확인합니다.
                         </span>
                       )}
-                      <span className="choice-subtext">{simplifyPlayerText(getChoiceSubtext(choice))}</span>
+                      <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
                     </>
                   )}
                   {!showTacticalDetails && (
@@ -542,7 +541,6 @@ export function PlayScreen({ view }) {
             onCancel={() => setPendingChoice(null)}
             onConfirm={() => choose(pendingChoice)}
             isAdvancing={isAdvancing}
-            simplify={simplifyPlayerText}
             speechify={speechifyChoice}
             formatRiskDelta={formatRiskDelta}
           />
