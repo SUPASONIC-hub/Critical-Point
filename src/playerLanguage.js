@@ -48,7 +48,10 @@ const phraseReplacements = [
 
 export function simplifyPlayerText(value = "") {
   if (value === null || value === undefined) return "";
-  return phraseReplacements.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), String(value));
+  const text = String(value);
+  // Authored Korean copy may contain English product terms; never rewrite prose globally.
+  if (/[\uAC00-\uD7A3]/.test(text)) return text;
+  return phraseReplacements.reduce((current, [pattern, replacement]) => current.replace(pattern, replacement), text);
 }
 
 export const easyResourceLabels = {

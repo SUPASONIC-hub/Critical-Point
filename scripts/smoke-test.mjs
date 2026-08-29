@@ -374,6 +374,11 @@ assert.equal(
   "CASE 02 / 공정함 / 숨은 긴급 절차",
   "player language should translate visible system terms",
 );
+assert.equal(
+  simplifyPlayerText("이 장면의 RISK 신호는 원고 그대로 남아야 합니다."),
+  "이 장면의 RISK 신호는 원고 그대로 남아야 합니다.",
+  "player language should not rewrite authored Korean prose containing English terms",
+);
 assert.ok(nodes.c1_aftershock?.choices?.length === 3, "case 01 should include a post-decision branch scene");
 assert.ok(nodes.f_aftershock?.choices?.length === 3, "the final act should include a final branch scene");
 assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should include its aftermath scene");
