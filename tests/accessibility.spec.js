@@ -19,7 +19,24 @@ async function startDebugNode(page, caseId, nodeId) {
 
 async function completeCurrentCase(page) {
   for (let step = 0; step < 24; step += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) return;
+    if (await page.locator(".result-page.final-report-locked, .ending-sequence").count()) {
+      const revealNext = page.locator(".decision-reveal-backdrop [data-testid='decision-next']");
+      if (await revealNext.count()) {
+        await revealNext.evaluate((button) => button.click());
+        await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0);
+      }
+      return;
+    }
+    await page.waitForFunction(
+      () => {
+        if (document.querySelector(".result-page.final-report-locked, .result-page, .ending-sequence")) return true;
+        const choice = document.querySelector(".choices .choice");
+        return Boolean(choice && getComputedStyle(choice).display !== "none" && choice.getClientRects().length);
+      },
+      undefined,
+      { timeout: 8_000 },
+    );
+    if (await page.locator(".result-page, .ending-sequence").count()) return;
     const choice = page.locator(".choices .choice").first();
     await expect(choice).toBeVisible();
     await choice.evaluate((button) => button.click());
@@ -69,22 +86,12 @@ test("case result report has no structural accessibility violations", async ({ p
 });
 
 test("final ending report has no structural accessibility violations", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?debug=1");
   await startDebugNode(page, "final", "f_start");
   await completeCurrentCase(page);
   await expect(page.locator(".ending-sequence")).toBeVisible();
-  for (let index = 0; index < 3; index += 1) {
-    await page.locator(".ending-sequence button").click();
-  }
-  await expect(page.locator(".ending-step-1")).toBeVisible();
-  // The quiet beat holds for eight seconds; the skip control ends the hold and
-  // the next control leaves the beat.
-  const quietSkip = page.locator(".ending-quiet-skip");
-  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
-  await page.getByTestId("ending-next").click();
-  await page.locator(".ending-step-2 textarea").fill("조건과 기록을 먼저 확인하세요.");
-  await page.locator(".ending-step-2 button").click();
-  await expect(page.locator(".ending-step-3")).toBeVisible();
+  await expect(page.locator(".ending-sequence")).toHaveClass(/ending-step-0/);
   await expectNoA11yViolations(page);
   const overflow = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

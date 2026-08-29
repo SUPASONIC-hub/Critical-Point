@@ -14,6 +14,7 @@ export function ResultScreen({ view }) {
         </p>
         {currentCase === "final" && (
           <section className={`ending-sequence ending-step-${endingStep}`} aria-label="최종 엔딩 시퀀스">
+            <h1 className="sr-only">Season complete</h1>
             <div className="ending-sequence-header">
               <span>SEASON 01 / FINAL RECORD</span>
               <strong>SEASON COMPLETE</strong>

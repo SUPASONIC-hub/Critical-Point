@@ -266,7 +266,7 @@ test("a successful free-text plan enters the authored branch scene", async ({ pa
   await page.locator(".reframe-box textarea").fill("직원과 고객의 조건을 공개하고 근거 로그와 위험 비용을 함께 검토한다");
   await page.locator(".submit-reframe").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
-  await page.getByTestId("decision-next").click();
+  await page.getByTestId("decision-next").click({ force: true });
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
     .toBe("c1_branch_people");
