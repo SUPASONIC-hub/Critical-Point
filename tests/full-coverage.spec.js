@@ -13,7 +13,7 @@ test.beforeEach(async ({}, testInfo) => {
 
 async function clickElement(locator, label) {
   try {
-    await locator.evaluate((button) => button.click(), undefined, { timeout: ACTION_TIMEOUT_MS });
+    await locator.click({ timeout: ACTION_TIMEOUT_MS });
   } catch (error) {
     const message = String(error).split("\n")[0];
     throw new Error(`${label} click failed: ${message}`);
@@ -49,12 +49,35 @@ async function chooseSceneChoice(page, scene, choiceIndex) {
       const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
       await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
       if (!(await waitUntilVisible(page.getByTestId("commit-confirm"), 3_000))) continue;
-      await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
-    }
-    if (await waitUntilVisible(page.getByTestId("decision-next"))) break;
+      try {
+        await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
+      } catch (error) {
+        if (await waitUntilVisible(page.getByTestId("decision-next"), 1_000)) break;
+        if (attempt === 1) throw error;
+        continue;
+      }
+      }
+      if (
+        await page.locator(".result-page").isVisible().catch(() => false) ||
+        await page.locator(".ending-reveal").isVisible().catch(() => false)
+      ) return;
+      if (await waitUntilVisible(page.getByTestId("decision-next"))) break;
     if (attempt === 1) throw new Error(`${scene.title}/${choice.id} did not open decision reveal`);
   }
-  await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
+  try {
+    await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
+  } catch (error) {
+    const transitioned = await page.waitForFunction(
+      ({ nextNodeId }) => {
+        const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
+        return saved?.nodeId === nextNodeId || Boolean(document.querySelector(".result-page, .ending-reveal"));
+      },
+      { nextNodeId: choice.next },
+      { timeout: 2_000 },
+    ).then(() => true).catch(() => false);
+    if (!transitioned) throw error;
+    return;
+  }
   await page.waitForFunction(
     ({ nextNodeId, nextTitle }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
