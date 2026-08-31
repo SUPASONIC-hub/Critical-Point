@@ -51,6 +51,15 @@ export function ResultScreen({ view }) {
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
     branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.freeText || branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
+  const observerRouteRecords = routeTimeline
+    .filter((entry) => entry.observerTag)
+    .slice(-4)
+    .map((entry) => ({
+      id: `${entry.nodeId}-${entry.index}`,
+      label: entry.observerTag.label,
+      title: entry.title,
+      text: entry.observerTag.text,
+    }));
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -468,6 +477,7 @@ export function ResultScreen({ view }) {
                       )}
                       {entry.streakBreak && <b className="route-break">연속 끊김</b>}
                       {entry.clue && <b className="route-clue">단서 발견</b>}
+                      {entry.observerTag && <b className="route-observer">{entry.observerTag.label}</b>}
                     </div>
                     <strong>{entry.title}</strong>
                     <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
@@ -476,6 +486,26 @@ export function ResultScreen({ view }) {
               ))}
             </div>
           </section>
+          {observerRouteRecords.length > 0 && (
+            <section className="observer-postmortem" aria-label="관찰자 회고">
+              <div className="panel-title-row">
+                <h2>
+                  <Sparkles size={17} />
+                  OBSERVER POSTMORTEM
+                </h2>
+                <span>{observerEndingRecord.label}이 이번 보고서의 해석 기준입니다.</span>
+              </div>
+              <div className="observer-postmortem-grid">
+                {observerRouteRecords.map((record) => (
+                  <article key={record.id}>
+                    <span>{record.label}</span>
+                    <strong>{record.title}</strong>
+                    <p>{record.text}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="feedback-panel">
             <div className="panel-title-row">
               <h2>
@@ -622,6 +652,12 @@ export function ResultScreen({ view }) {
                           {entry.streakBreak.label} · {entry.streakBreak.text}
                         </small>
                       )}
+                    </div>
+                  )}
+                  {entry.observerTag && (
+                    <div className="history-observer">
+                      <span>{entry.observerTag.label}</span>
+                      <p>{entry.observerTag.text}</p>
                     </div>
                   )}
                   {entry.sceneBeat && (
