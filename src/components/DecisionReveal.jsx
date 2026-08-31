@@ -54,6 +54,12 @@ export function DecisionReveal({ view }) {
         <h2 id="decision-reveal-title">{simplifyPlayerText(decisionReveal.title)}</h2>
         <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
         <p className="decision-reveal-archive">{archiveLine}</p>
+        {decisionReveal.observerTag && (
+          <div className={`decision-observer-tag tag-${decisionReveal.observerTag.id}`}>
+            <span>{decisionReveal.observerTag.label}</span>
+            <p>{decisionReveal.observerTag.text}</p>
+          </div>
+        )}
         <div className="decision-reveal-beat">
           {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
         </div>

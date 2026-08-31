@@ -8,6 +8,7 @@ export function ResultScreen({ view }) {
   const firstRouteEntry = routeTimeline[0];
   const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0];
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
+  const taggedRouteEntry = [...routeTimeline].reverse().find((entry) => entry.observerTag);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observationLabels = {
     compliance: "순응",
@@ -19,27 +20,31 @@ export function ResultScreen({ view }) {
     {
       label: "위화감",
       title: "보관소의 첫 번째 기록은 오늘 생성된 파일이 아니다.",
-      evidence: firstRouteEntry?.spokenChoice || firstRouteEntry?.choice || `CASE 01 결말 키: ${firstCaseChoice}`,
+      evidence: firstRouteEntry?.observerTag?.label
+        ? `${firstRouteEntry.observerTag.label}: ${firstRouteEntry.spokenChoice || firstRouteEntry.choice}`
+        : firstRouteEntry?.spokenChoice || firstRouteEntry?.choice || `CASE 01 결말 키: ${firstCaseChoice}`,
       copy: "트리거랩은 당신을 처음 본 것이 아니었다. 첫 사건의 첫 문장은 시작점이 아니라 복원된 흔적이었다.",
     },
     {
       label: "증거",
       title: "에코의 문장은 조언이 아니라 같은 선택을 지나간 사람의 후회였다.",
-      evidence: longestRouteEntry ? `"${longestRouteEntry.spokenChoice || longestRouteEntry.choice}"` : decisionFingerprint.modeTitle,
+      evidence: longestRouteEntry?.observerTag?.label
+        ? `${longestRouteEntry.observerTag.label}: ${longestRouteEntry.spokenChoice || longestRouteEntry.choice}`
+        : longestRouteEntry ? `"${longestRouteEntry.spokenChoice || longestRouteEntry.choice}"` : decisionFingerprint.modeTitle,
       copy: `가장 오래 남은 판단은 ${decisionFingerprint.modeTitle} 프로필과 겹친다. 계속 비용을 다시 계산하라고 말한 목소리는 관찰자가 아니라 이전 기록이었다.`,
     },
     {
       label: "확인",
       title: "보고서는 결말이 아니라 다음 참가자의 사건 설계도였다.",
-      evidence: branchRouteEntry?.freeText || branchRouteEntry?.spokenChoice || `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
+      evidence: branchRouteEntry?.freeText || taggedRouteEntry?.observerTag?.text || `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
       copy: `가장 크게 남은 관찰값은 ${observationLabels[dominantObservation[0]]}이다. 다음 참가자는 당신의 결말이 아니라, 당신이 망설인 방식으로 사건을 시작한다.`,
     },
   ];
   const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
   const witnessRecords = [
-    firstRouteEntry && { label: "처음 남긴 말", text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
-    longestRouteEntry && { label: "가장 오래 붙잡은 말", text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
-    branchRouteEntry && { label: "판을 흔든 말", text: branchRouteEntry.freeText || branchRouteEntry.spokenChoice || branchRouteEntry.choice },
+    firstRouteEntry && { id: "first", label: "처음 남긴 말", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
+    longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
+    branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.freeText || branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
@@ -69,8 +74,9 @@ export function ResultScreen({ view }) {
                 {witnessRecords.length > 0 && (
                   <div className="ending-witness-log" aria-label="엔딩 증거 기록">
                     {witnessRecords.map((record) => (
-                      <article key={record.label}>
+                      <article key={record.id}>
                         <span>{record.label}</span>
+                        {record.tag && <small>{record.tag}</small>}
                         <b>{record.text}</b>
                       </article>
                     ))}

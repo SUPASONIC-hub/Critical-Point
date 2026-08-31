@@ -359,6 +359,54 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   };
 }
 
+export function getObserverTag(entry = {}) {
+  const riskDelta = entry.resourcesBefore && entry.resourcesAfter
+    ? getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore)
+    : entry.challenge?.riskDelta ?? 0;
+  const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
+  const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
+  if (entry.freeText || entry.freeTextSuccess) {
+    return {
+      id: "defiance",
+      label: "거부 표본",
+      text: "준비된 선택지 밖으로 나간 순간입니다. 다음 참가자의 사건에는 이 우회로가 새 조건으로 남습니다.",
+    };
+  }
+  if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) {
+    return {
+      id: "opacity",
+      label: "은폐 표본",
+      text: "공개를 늦춘 판단입니다. 트리거랩은 이 침묵이 누구를 보호하고 누구를 지우는지 따로 보관합니다.",
+    };
+  }
+  if (humanCostDelta > 0) {
+    return {
+      id: "sacrifice",
+      label: "희생 표본",
+      text: "사람에게 비용을 넘긴 판단입니다. 사건은 지나가도 이 손실은 다음 장면의 말투로 되돌아옵니다.",
+    };
+  }
+  if (Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) {
+    return {
+      id: "compliance",
+      label: "순응 표본",
+      text: "빠르게 닫힌 안정 선택입니다. 정답처럼 보인 길이 관찰자에게는 가장 읽기 쉬운 패턴이 됩니다.",
+    };
+  }
+  if (riskDelta > 6) {
+    return {
+      id: "defiance",
+      label: "고압 표본",
+      text: "압박 상승을 감수한 판단입니다. 이 선택은 해결책보다 허용선에 가까운 기록으로 분류됩니다.",
+    };
+  }
+  return {
+    id: "pattern",
+    label: "패턴 표본",
+    text: "크게 튀지 않은 선택입니다. 그래서 더 오래 남습니다. 관찰자는 반복되는 기준을 먼저 찾습니다.",
+  };
+}
+
 export function getObservationLedger(entries = []) {
   const playableEntries = entries.filter((entry) => !entry?.isSystemEvent);
   return playableEntries.reduce(

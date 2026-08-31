@@ -1245,6 +1245,9 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
 .choice-stakes b.negative{color:var(--c-danger-deep);background:var(--c-blush);border-color:var(--c-coral)}
 .choice-dilemma{display:block;margin:8px 0 0 24px;color:var(--c-ink-raised);font-size:13px;font-weight:900;line-height:1.4}
 .decision-reveal-archive{margin:0;padding:9px 11px;color:var(--c-teal-deep);background:var(--c-mint-pale);border:1px solid var(--c-mint-line);border-radius:7px;font-size:13px;font-weight:900;line-height:1.5}
+.decision-observer-tag{display:grid;gap:6px;margin:0;padding:12px 13px;color:var(--c-paper);background:var(--c-ink);border:1px solid var(--c-teal-deep);border-radius:7px;text-align:left}
+.decision-observer-tag span{color:var(--c-acid);font-size:10px;font-weight:950;letter-spacing:.1em}
+.decision-observer-tag p{margin:0;color:var(--c-line-soft);font-size:13px;font-weight:850;line-height:1.55}
 .decision-reveal-stakes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:4px 0}
 .decision-reveal-stakes article{display:grid;align-content:start;gap:6px;min-height:92px;padding:11px;color:var(--c-ink);background:var(--c-paper-dim);border:1px solid var(--c-line);border-radius:7px}
 .decision-reveal-stakes span{color:var(--c-teal-deep);font-size:10px;font-weight:950;letter-spacing:.08em}
@@ -1259,6 +1262,7 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
 .ending-witness-log{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(820px,100%)}
 .ending-witness-log article{display:grid;gap:6px;min-height:96px;padding:11px;text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:7px}
 .ending-witness-log span{color:var(--color-accent);font-size:10px;font-weight:950;letter-spacing:.08em}
+.ending-witness-log small{display:block;color:var(--c-acid);font-size:11px;font-weight:950;letter-spacing:.06em}
 .ending-witness-log b{color:var(--color-white);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
 .choice[data-adaptive=true]{border-color:var(--color-accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--color-accent) 30%,transparent)}
 .commit-console-effects.is-hidden{display:none}

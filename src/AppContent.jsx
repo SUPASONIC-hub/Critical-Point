@@ -72,6 +72,7 @@ import {
   getFreeTextSignals,
   getGameplayStats,
   getObservationLedger,
+  getObserverTag,
   buildNarrativeSpine,
   getRiskPressure,
   getRiskPressureDrivers,
@@ -1687,7 +1688,7 @@ export function AppContent({ onSuppressSaves }) {
       nextCognition[key] = (nextCognition[key] ?? 0) + value;
     });
 
-    const entry = {
+    const entryBase = {
       nodeId: resolvedNodeId,
       caseId: fallbackCaseId,
       choiceId: choice.id,
@@ -1721,6 +1722,10 @@ export function AppContent({ onSuppressSaves }) {
       responseTimeSec,
       resourcesBefore: resources,
       resourcesAfter: finalResourcesWithTempo,
+    };
+    const entry = {
+      ...entryBase,
+      observerTag: getObserverTag(entryBase),
     };
 
     const nextLog = [...log, entry];
@@ -1867,6 +1872,7 @@ export function AppContent({ onSuppressSaves }) {
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
       cascade,
+      observerTag: entry.observerTag,
       streakBreak,
           suspenseEvent,
           clue,
