@@ -407,6 +407,77 @@ export function getObserverTag(entry = {}) {
   };
 }
 
+export function getObserverPattern(entries = []) {
+  const playableEntries = entries.filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent);
+  const taggedEntries = playableEntries.map((entry) => ({
+    ...entry,
+    observerTag: entry.observerTag ?? getObserverTag(entry),
+  }));
+  const counts = taggedEntries.reduce((nextCounts, entry) => {
+    const id = entry.observerTag?.id ?? "pattern";
+    return { ...nextCounts, [id]: (nextCounts[id] ?? 0) + 1 };
+  }, {});
+  const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "pattern";
+  const latest = taggedEntries.at(-1)?.observerTag ?? null;
+  const repeatedTail = taggedEntries
+    .slice(-3)
+    .every((entry) => entry.observerTag?.id && entry.observerTag.id === latest?.id);
+  const labels = {
+    compliance: "순응 표본",
+    defiance: "거부 표본",
+    opacity: "은폐 표본",
+    sacrifice: "희생 표본",
+    pattern: "패턴 표본",
+  };
+  const arcCopy = {
+    compliance: {
+      label: "관찰자 학습",
+      title: "안정적인 선택이 다음 사건의 기본값으로 굳고 있습니다.",
+      text: "정답처럼 닫힌 길이 많을수록, 다음 장면은 더 빠른 결정을 유도하는 구조로 바뀝니다.",
+    },
+    defiance: {
+      label: "관찰자 학습",
+      title: "시스템이 예외 경로를 새 규칙 후보로 붙잡고 있습니다.",
+      text: "준비된 선택지를 벗어난 흔적이 다음 참가자에게는 처음부터 열린 틈으로 나타납니다.",
+    },
+    opacity: {
+      label: "관찰자 학습",
+      title: "말하지 않은 판단이 사건의 어두운 조건으로 축적됩니다.",
+      text: "공개하지 않은 선택은 사라지지 않고, 다음 장면에서 누가 배제됐는지 묻는 질문으로 돌아옵니다.",
+    },
+    sacrifice: {
+      label: "관찰자 학습",
+      title: "누군가에게 넘긴 비용이 다음 사건의 첫 압박이 됩니다.",
+      text: "해결은 되었지만 손실의 방향이 남았습니다. 다음 참가자는 그 손실을 이미 떠안고 시작합니다.",
+    },
+    pattern: {
+      label: "관찰자 학습",
+      title: "반복된 기준이 아직 결말보다 선명하게 남아 있습니다.",
+      text: "크게 튀지 않은 판단들이 모여, 다음 사건의 보이지 않는 기본 규칙을 만듭니다.",
+    },
+  };
+  const escalationText = repeatedTail
+    ? "같은 표본이 연속으로 닫혀 관찰자가 당신의 기준을 확신하기 시작했습니다."
+    : latest
+      ? `${latest.label}이 최근 기록으로 남아 다음 질문의 말투를 바꿉니다.`
+      : "아직 관찰자는 확정된 기준을 만들지 못했습니다.";
+
+  return {
+    counts,
+    dominant,
+    latest,
+    repeatedTail,
+    arc: arcCopy[dominant] ?? arcCopy.pattern,
+    endingRecord: {
+      label: labels[dominant] ?? labels.pattern,
+      title: repeatedTail
+        ? "다음 참가자의 첫 장면은 당신이 반복한 기준에서 시작됩니다."
+        : "다음 참가자의 첫 장면은 당신이 가장 많이 남긴 표본에서 시작됩니다.",
+      text: `${arcCopy[dominant]?.text ?? arcCopy.pattern.text} ${escalationText}`,
+    },
+  };
+}
+
 export function getObservationLedger(entries = []) {
   const playableEntries = entries.filter((entry) => !entry?.isSystemEvent);
   return playableEntries.reduce(

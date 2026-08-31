@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 
 export function ResultScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
+  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
   const firstCaseChoice = caseResults.case01?.outcomeChoiceId ?? "기록 없음";
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0];
@@ -10,6 +10,11 @@ export function ResultScreen({ view }) {
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
   const taggedRouteEntry = [...routeTimeline].reverse().find((entry) => entry.observerTag);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
+  const observerEndingRecord = observerPattern?.endingRecord ?? {
+    label: "패턴 표본",
+    title: "다음 참가자의 첫 장면은 아직 확정되지 않았습니다.",
+    text: "관찰 기록이 부족해 트리거랩은 가장 조용한 기준부터 복원합니다.",
+  };
   const observationLabels = {
     compliance: "순응",
     defiance: "거부",
@@ -82,6 +87,11 @@ export function ResultScreen({ view }) {
                     ))}
                   </div>
                 )}
+                <div className="ending-archive-blueprint" aria-label="다음 참가자에게 넘어갈 사건 설계도">
+                  <span>{observerEndingRecord.label}</span>
+                  <strong>{observerEndingRecord.title}</strong>
+                  <p>{observerEndingRecord.text}</p>
+                </div>
                 <button type="button" data-testid="ending-next" onClick={advanceEndingStep}>다음</button>
               </div>
             )}
@@ -201,6 +211,11 @@ export function ResultScreen({ view }) {
               <div className="panel-title-row">
                 <h2>관찰 장부</h2>
                 <span>이번 시즌에 처음 공개되는 네 가지 반응</span>
+              </div>
+              <div className="observer-pattern-card">
+                <span>{observerEndingRecord.label}</span>
+                <strong>{observerEndingRecord.title}</strong>
+                <p>{observerEndingRecord.text}</p>
               </div>
               <div className="observation-grid">
                 {Object.entries(observationLedger).map(([key, value]) => (
