@@ -1314,3 +1314,37 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
   .decision-reveal-stakes article,
   .ending-witness-log article{min-height:auto}
 }
+
+/* The scene is a reading beat first: image, speaker, critical situation, then choice. */
+.scene{grid-template-columns:1fr;gap:15px;padding:18px}
+.scene-visual{grid-row:auto;min-height:0;aspect-ratio:16 / 8;border-color:rgba(217,255,98,.36)}
+.scene-visual img{min-height:0;object-fit:cover;object-position:center 52%}
+.speaker{grid-column:auto;gap:12px;margin:0;padding:4px 0 2px}
+.speaker img{display:block;width:52px;height:52px;object-fit:cover;border:2px solid var(--c-acid);border-radius:50%;box-shadow:0 0 0 3px rgba(217,255,98,.12)}
+.speaker div{display:none}
+.scene-story{grid-column:auto;gap:11px;padding:0}
+.scene-narration{font-size:13px;line-height:1.55}
+.scene-body.scene-critical{padding:18px 19px;color:var(--c-ink);background:var(--c-paper);border:2px solid var(--c-acid);border-left:7px solid var(--c-acid);border-radius:7px;font-size:20px;font-weight:900;line-height:1.65;box-shadow:0 8px 0 rgba(217,255,98,.2)}
+.scene-critical .story-label{color:var(--c-teal-deep);font-size:11px}
+.scene-direction{padding:12px 14px;color:var(--c-paper);background:rgba(255,255,255,.09);border-left:4px solid var(--c-coral);border-radius:5px;font-size:15px;font-weight:800;line-height:1.6}
+.scene-dialogue{font-size:19px}
+.scene-secondary{padding:10px 12px;color:var(--c-line-soft);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.16);border-radius:6px}
+.scene-secondary summary{cursor:pointer;color:var(--c-acid);font-size:12px;font-weight:900}
+.scene-secondary p{margin-top:10px}
+.scene-secondary-note{color:var(--c-line-soft);font-size:13px;font-weight:700;line-height:1.5}
+.choice{color:#10241f;background:#fff;border-color:#31504a}
+.choice:hover,.choice:focus-visible{color:#10241f;background:#f4f8f1;border-color:#0e4b45}
+.choice.selected{color:#10241f;background:#e9f5b4;border-color:#315f43}
+.choice-speech{color:#10241f;background:#f7faf4;border-left-color:#315f43}
+.choice-dilemma{color:#173b34}
+.choice-action{color:#073d37;background:#e1f4eb;border-color:#5a9f82}
+.choice-effect,.choice-subtext{color:#24473f}
+.choice-effect-compact{color:#124e3f;background:#dff3e8;border-color:#5a9f82}
+.choice-observer-preview{color:#fff;background:#10241f}
+.choice-observer-preview small{color:#e9f5b4}
+@media (max-width:768px){
+  .scene{padding:14px}
+  .scene-visual{aspect-ratio:16 / 10}
+  .scene-body.scene-critical{font-size:18px;line-height:1.6}
+  .scene-dialogue{font-size:18px}
+}

@@ -216,59 +216,37 @@ export function PlayScreen({ view }) {
               width="1792"
               height="1024"
               loading="lazy"
+              onError={(event) => {
+                if (event.currentTarget.dataset.fallback === "true") return;
+                event.currentTarget.dataset.fallback = "true";
+                event.currentTarget.src = "/triggerlab-key-visual.png";
+              }}
             />
           </div>
           <div className="speaker">
-            <div>{node.speaker.slice(0, 1)}</div>
+            <img src="/speaker-profile.png" alt="" width="52" height="52" />
             <span>
               <b>{node.speaker}</b>
               <small>{speakerProfile.role} · {speakerProfile.stance}</small>
             </span>
           </div>
           <div className="scene-story">
-            <p className="scene-narration"><span className="story-label">상황</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
-            <p className="scene-thought"><span className="story-label">속마음</span>'{speakerProfile.thought}'</p>
-            <p className="scene-narration scene-direction"><span className="story-label">지금의 압박</span>{sceneDirection}</p>
-            <p className="scene-body"><span className="story-label">사건 보고</span>{node.text}</p>
+            <p className="scene-narration"><span className="story-label">장면의 표정</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            <p className="scene-body scene-critical"><span className="story-label">이번 장면의 핵심 상황</span>{node.text}</p>
+            <p className="scene-direction"><span className="story-label">왜 지금 결정해야 하나</span>{sceneDirection}</p>
             {latestFreeTextSuccess && latestFreeTextSuccess.nodeId !== resolvedNodeId && (
               <p className="scene-continuity-quote">
                 <span className="story-label">이어진 기록</span>
                 이전 문장이 다음 장면의 기준으로 남아 있다: “{latestFreeTextSuccess.freeText}”
               </p>
             )}
-            <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
-            <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
-            {observerArc && (
-              <div className="observer-arc" aria-label="누적 관찰 패턴">
-                <span>{observerArc.label}</span>
-                <b>{observerArc.title}</b>
-                <small>{observerArc.text}</small>
-              </div>
-            )}
-            {observerPattern?.turningPoint && (
-              <div className="observer-turning-point" aria-label="관찰 패턴 전환점">
-                <span>{observerPattern.turningPoint.label}</span>
-                <b>{observerPattern.turningPoint.title}</b>
-                <small>이미 한 번 바뀐 기준이 있습니다. 이번 선택은 그 전환을 이어가거나 되돌립니다.</small>
-              </div>
-            )}
-            <div className="scene-stakes" aria-label="이번 장면의 긴장">
-              <article>
-                <span>걸림돌</span>
-                <b>{sceneChallenge.title}</b>
-                <small>{sceneChallenge.text}</small>
-              </article>
-              <article>
-                <span>가장 크게 새는 압박</span>
-                <b>{pressureLeader?.label ?? "현재 압박"}</b>
-                <small>{pressureLeader ? "이 축이 다음 선택의 대가를 가장 크게 흔듭니다." : "아직 뚜렷한 압박은 없습니다."}</small>
-              </article>
-              <article>
-                <span>다음 질문</span>
-                <b>{narrativeSpine.consequence}</b>
-                <small>{triggerLabSignals[currentCase]}</small>
-              </article>
-            </div>
+            <p className="scene-dialogue"><span className="story-label">상대가 던진 질문</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <details className="scene-secondary">
+              <summary>장면의 여운과 단서 보기</summary>
+              <p className="scene-thought"><span className="story-label">속마음</span>'{speakerProfile.thought}'</p>
+              <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
+              <p className="scene-secondary-note"><span className="story-label">다음 장면의 질문</span>{narrativeSpine.nextQuestion}</p>
+            </details>
           </div>
         </div>
 
