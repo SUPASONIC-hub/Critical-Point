@@ -478,6 +478,44 @@ export function getObserverPattern(entries = []) {
   };
 }
 
+export function getObserverChoicePreview({
+  choice = {},
+  read = {},
+  resources = {},
+  observerPattern = {},
+  responseTimeSec = 12,
+} = {}) {
+  const entry = {
+    choiceId: choice.id,
+    choice: choice.label,
+    freeText: choice.type === "free" ? "preview" : "",
+    effect: read.finalEffect ?? choice.effect ?? {},
+    challenge: { riskDelta: read.finalRiskDelta ?? 0 },
+    responseTimeSec,
+    resourcesBefore: resources,
+    resourcesAfter: read.finalResources ?? applyEffect(resources, read.finalEffect ?? choice.effect ?? {}),
+  };
+  const tag = getObserverTag(entry);
+  const dominant = observerPattern?.dominant;
+  const repeatsCurrentPattern = Boolean(dominant && dominant === tag.id);
+  const patternPressure = repeatsCurrentPattern
+    ? "지금까지의 관찰 패턴을 더 굳힙니다."
+    : "현재 패턴을 흔들어 관찰자의 분류를 늦춥니다.";
+  const aftershock = {
+    compliance: "다음 장면은 더 빠른 결정을 요구하는 방향으로 좁아질 수 있습니다.",
+    defiance: "다음 장면은 예외 경로를 새 조건처럼 시험할 수 있습니다.",
+    opacity: "다음 장면은 말하지 않은 대상과 지워진 근거를 다시 묻습니다.",
+    sacrifice: "다음 장면은 누가 비용을 떠안았는지를 먼저 압박합니다.",
+    pattern: "다음 장면은 같은 기준을 반복하게 만드는 조용한 구조로 남습니다.",
+  }[tag.id] ?? "다음 장면은 이 판단의 말투를 기준으로 다시 배열됩니다.";
+
+  return {
+    tag,
+    repeatsCurrentPattern,
+    text: `${patternPressure} ${aftershock}`,
+  };
+}
+
 export function getObservationLedger(entries = []) {
   const playableEntries = entries.filter((entry) => !entry?.isSystemEvent);
   return playableEntries.reduce(

@@ -1248,6 +1248,13 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
 .choice-stakes b.positive{color:var(--c-green-deep);background:var(--c-mint-soft);border-color:var(--c-sage)}
 .choice-stakes b.negative{color:var(--c-danger-deep);background:var(--c-blush);border-color:var(--c-coral)}
 .choice-dilemma{display:block;margin:8px 0 0 24px;color:var(--c-ink-raised);font-size:13px;font-weight:900;line-height:1.4}
+.choice-observer-preview{display:flex;align-items:center;gap:6px;width:max-content;max-width:calc(100% - 24px);margin:8px 0 0 24px;padding:5px 8px;color:var(--c-paper);background:var(--c-ink);border:1px solid var(--c-teal-deep);border-radius:999px;line-height:1.2}
+.choice-observer-preview b{font-size:11px;font-weight:950;overflow-wrap:anywhere}
+.choice-observer-preview small{color:var(--c-acid);font-size:10px;font-weight:950;letter-spacing:.04em;white-space:nowrap}
+.choice-observer-preview.is-break{background:var(--c-teal-deep)}
+.commit-observer-preview{display:grid;gap:5px;padding:10px 11px;color:var(--c-paper);background:var(--c-ink);border:1px solid var(--c-teal-deep);border-radius:7px;text-align:left}
+.commit-observer-preview span{color:var(--c-acid);font-size:10px;font-weight:950;letter-spacing:.08em}
+.commit-observer-preview p{margin:0;color:var(--c-line-soft);font-size:13px;font-weight:850;line-height:1.45;overflow-wrap:anywhere}
 .decision-reveal-archive{margin:0;padding:9px 11px;color:var(--c-teal-deep);background:var(--c-mint-pale);border:1px solid var(--c-mint-line);border-radius:7px;font-size:13px;font-weight:900;line-height:1.5}
 .decision-observer-tag{display:grid;gap:6px;margin:0;padding:12px 13px;color:var(--c-paper);background:var(--c-ink);border:1px solid var(--c-teal-deep);border-radius:7px;text-align:left}
 .decision-observer-tag span{color:var(--c-acid);font-size:10px;font-weight:950;letter-spacing:.1em}

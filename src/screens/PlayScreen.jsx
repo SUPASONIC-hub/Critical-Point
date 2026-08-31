@@ -13,6 +13,8 @@ export function PlayScreen({ view }) {
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const latestObserverTag = log.at(-1)?.observerTag;
   const observerArc = observerPattern?.arc;
+  const getObserverPreviewForChoice = (choiceId) =>
+    decisionForecasts.find(({ choice }) => choice.id === choiceId)?.observerPreview;
   const observerWhisper =
     latestObserverTag
       ? `${latestObserverTag.label}: ${latestObserverTag.text}`
@@ -351,6 +353,12 @@ export function PlayScreen({ view }) {
                 <span>예상 위험 <b>{formatForecastRisk(pendingChoiceForecast)}</b></span>
                 <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
               </div>
+              {getObserverPreviewForChoice(pendingChoice.id) && (
+                <div className="commit-observer-preview">
+                  <span>{getObserverPreviewForChoice(pendingChoice.id).tag.label}</span>
+                  <p>{getObserverPreviewForChoice(pendingChoice.id).text}</p>
+                </div>
+              )}
               <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
                 <span>예상 자원</span>
                 {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
@@ -375,6 +383,7 @@ export function PlayScreen({ view }) {
           <div className="choices">
             {fixedChoices.map((choice, choiceIndex) => {
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
+              const observerPreview = getObserverPreviewForChoice(choice.id);
               const projectedRisk = getRiskPressure(choiceRead.finalResources);
               const riskDelta = choiceRead.finalRiskDelta;
               const riskClass =
@@ -426,6 +435,12 @@ export function PlayScreen({ view }) {
                   {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-dilemma">{describeChoiceDilemma(choice)}</span>
+                  {observerPreview && (
+                    <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
+                      <b>{observerPreview.tag.label}</b>
+                      <small>{observerPreview.repeatsCurrentPattern ? "패턴 고정" : "패턴 교란"}</small>
+                    </span>
+                  )}
                   <span className="choice-stakes">
                     {Object.entries(choice.effect ?? {})
                       .filter(([, value]) => value !== 0)

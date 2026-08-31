@@ -72,6 +72,7 @@ import {
   getFreeTextSignals,
   getGameplayStats,
   getObservationLedger,
+  getObserverChoicePreview,
   getObserverPattern,
   getObserverTag,
   buildNarrativeSpine,
@@ -637,6 +638,13 @@ export function AppContent({ onSuppressSaves }) {
         read,
         forecast,
         tacticalRead: read.tacticalRead,
+        observerPreview: getObserverChoicePreview({
+          choice,
+          read,
+          resources,
+          observerPattern,
+          responseTimeSec: Math.max(1, 45 - decisionSeconds),
+        }),
       };
     });
   const pressureLensForecast = [...decisionForecasts].sort((a, b) => {
