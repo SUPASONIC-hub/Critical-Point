@@ -1389,6 +1389,29 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
     .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
 });
 
+test("completed case is retained in the local ranking after leaving the ending", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "final", "f_aftershock");
+  await completeCurrentCase(page);
+
+  for (let index = 0; index < 3; index += 1) {
+    await page.locator(".ending-sequence button").click();
+  }
+  const quietSkip = page.locator(".ending-quiet-skip");
+  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
+  await page.getByTestId("ending-next").click();
+  await page.locator(".ending-step-2 textarea").fill("랭킹 저장 확인");
+  await page.locator(".ending-step-2 button").click();
+
+  await page.locator(".result-page .top-actions button").nth(1).click();
+  await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
+  await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
+  await expect
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v1") || "[]").length))
+    .toBeGreaterThan(0);
+});
+
 test("a replay link restores the captured scene in a fresh context", async ({ page, context }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case04", "c4_vote");

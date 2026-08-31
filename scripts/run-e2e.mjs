@@ -55,7 +55,14 @@ try {
     }
     const testArgs = runFullCoverage
       ? ["playwright", "test", "tests/full-coverage.spec.js", "--project=chromium", "--workers=4", ...forwardedArgs]
-      : ["playwright", "test", "--grep-invert", "@full", ...forwardedArgs];
+      : [
+          "playwright",
+          "test",
+          "--grep-invert",
+          "@full",
+          ...(process.env.CI ? ["--workers=2", "--retries=1"] : []),
+          ...forwardedArgs,
+        ];
     const runner = spawnCommand("npx", testArgs, {
       env: { E2E_BASE_URL: baseUrl },
     });

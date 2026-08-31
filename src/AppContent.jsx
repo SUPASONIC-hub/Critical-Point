@@ -153,6 +153,18 @@ const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
 const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
+const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v1";
+
+function parseLocalRankingRows(rawValue) {
+  try {
+    const parsed = JSON.parse(rawValue || "[]");
+    return Array.isArray(parsed)
+      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary).slice(-100)
+      : [];
+  } catch {
+    return [];
+  }
+}
 
 let consoleErrorHookBusy = false;
 
@@ -253,6 +265,9 @@ export function AppContent({ onSuppressSaves }) {
   const [memoOpened, setMemoOpened] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [localRankingRows, setLocalRankingRows] = useState(() =>
+    parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
+  );
   const [leaderboardStatus, setLeaderboardStatus] = useState("idle");
   const [leaderboardError, setLeaderboardError] = useState("");
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
@@ -743,16 +758,19 @@ export function AppContent({ onSuppressSaves }) {
         text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
     };
   const localLeaderboardRows = useMemo(
-    () => Object.entries(caseResults).map(([caseId, summary]) => ({
-      local: true,
-      session_code: sessionCode,
-      player_name: playerName || "현재 분석관",
-      case_id: caseId,
-      case_title: seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.title ?? caseId,
-      completed_at: summary?.completedAt ?? "",
-      summary,
-    })),
-    [caseResults, playerName, sessionCode],
+    () => [
+      ...localRankingRows,
+      ...Object.entries(caseResults).map(([caseId, summary]) => ({
+        local: true,
+        session_code: sessionCode,
+        player_name: playerName || "현재 분석관",
+        case_id: caseId,
+        case_title: seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.title ?? caseId,
+        completed_at: summary?.completedAt ?? "",
+        summary,
+      })),
+    ],
+    [caseResults, localRankingRows, playerName, sessionCode],
   );
   useEffect(() => {
     const updateNetworkStatus = () => {
@@ -1762,6 +1780,7 @@ export function AppContent({ onSuppressSaves }) {
           ...buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo),
           outcomeChoiceId: entry.choiceId,
           outcomeNodeId: entry.nodeId,
+          completedAt: new Date().toISOString(),
         }
       : null;
     const nextCaseResults = completedNow
@@ -1770,6 +1789,24 @@ export function AppContent({ onSuppressSaves }) {
           [currentCase]: caseSummary,
         }
       : caseResults;
+
+    if (completedNow && caseSummary) {
+      const localRankingRow = {
+        local: true,
+        session_code: sessionCode,
+        player_name: playerName || "현재 분석관",
+        case_id: currentCase,
+        case_title: activeCaseMeta?.title ?? currentCase,
+        completed_at: caseSummary.completedAt,
+        summary: caseSummary,
+      };
+      const nextLocalRankingRows = [
+        ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
+        localRankingRow,
+      ].slice(-100);
+      setLocalRankingRows(nextLocalRankingRows);
+      writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextLocalRankingRows));
+    }
 
     if (completedNow && caseSummary) {
       if (!telemetryEnabled) {
@@ -1823,7 +1860,7 @@ export function AppContent({ onSuppressSaves }) {
       }
     }
 
-    if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length && telemetryEnabled && dataConsent) {
+    if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length) {
       const seasonTelemetryPayload = {
         session_id: sessionId,
         session_code: sessionCode,
@@ -1837,14 +1874,31 @@ export function AppContent({ onSuppressSaves }) {
         cognition: nextCognition,
         decision_log: nextLog,
       };
-      saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
-        queueTelemetry({
-          id: `season-final-${sessionId}`,
-          type: "case",
-          label: "SEASON 01 COMPLETE",
-          payload: seasonTelemetryPayload,
+      const seasonLocalRankingRow = {
+        local: true,
+        session_code: sessionCode,
+        player_name: playerName || "현재 분석관",
+        case_id: "season-final",
+        case_title: "SEASON 01 COMPLETE",
+        completed_at: caseSummary.completedAt,
+        summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
+      };
+      const nextLocalRankingRows = [
+        ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
+        seasonLocalRankingRow,
+      ].slice(-100);
+      setLocalRankingRows(nextLocalRankingRows);
+      writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextLocalRankingRows));
+      if (telemetryEnabled && dataConsent) {
+        saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
+          queueTelemetry({
+            id: `season-final-${sessionId}`,
+            type: "case",
+            label: "SEASON 01 COMPLETE",
+            payload: seasonTelemetryPayload,
+          });
         });
-      });
+      }
     }
 
     setResources(finalResourcesWithTempo);
