@@ -10,6 +10,7 @@ import { CASE_SEQUENCE } from "../gameData.js";
 
 export function PlayScreen({ view }) {
   const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
+  const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
@@ -213,6 +214,23 @@ export function PlayScreen({ view }) {
               </p>
             )}
             <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <div className="scene-stakes" aria-label="이번 장면의 긴장">
+              <article>
+                <span>걸림돌</span>
+                <b>{sceneChallenge.title}</b>
+                <small>{sceneChallenge.text}</small>
+              </article>
+              <article>
+                <span>가장 크게 새는 압박</span>
+                <b>{pressureLeader?.label ?? "현재 압박"}</b>
+                <small>{pressureLeader ? "이 축이 다음 선택의 대가를 가장 크게 흔듭니다." : "아직 뚜렷한 압박은 없습니다."}</small>
+              </article>
+              <article>
+                <span>다음 질문</span>
+                <b>{narrativeSpine.consequence}</b>
+                <small>{triggerLabSignals[currentCase]}</small>
+              </article>
+            </div>
           </div>
         </div>
 
@@ -378,6 +396,17 @@ export function PlayScreen({ view }) {
                   </span>
                   {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
+                  <span className="choice-stakes">
+                    {Object.entries(choice.effect ?? {})
+                      .filter(([, value]) => value !== 0)
+                      .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+                      .slice(0, 3)
+                      .map((entry) => (
+                        <b key={entry[0]} className={entry[1] > 0 ? "positive" : "negative"}>
+                          {formatEffectChip(entry)}
+                        </b>
+                      ))}
+                  </span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}

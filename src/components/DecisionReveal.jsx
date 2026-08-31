@@ -2,8 +2,12 @@ import React from "react";
 import { ChevronRight, Sparkles } from "lucide-react";
 
 export function DecisionReveal({ view }) {
-  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal } = view;
+  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta } = view;
   if (!decisionReveal) return null;
+  const effectEntries = Object.entries(decisionReveal.effect ?? {}).filter(([, value]) => value !== 0);
+  const gains = effectEntries.filter(([, value]) => value > 0).slice(0, 3);
+  const costs = effectEntries.filter(([, value]) => value < 0).slice(0, 3);
+  const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
   const revealTone = decisionReveal.clue
     ? "clue-found"
     : decisionReveal.suspenseEvent
@@ -44,6 +48,20 @@ export function DecisionReveal({ view }) {
         <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
         <div className="decision-reveal-beat">
           {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
+        </div>
+        <div className="decision-reveal-stakes" aria-label="선택으로 열린 것과 닫힌 것">
+          <article>
+            <span>열린 것</span>
+            {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>판단 기준이 기록됨</b>}
+          </article>
+          <article>
+            <span>닫힌 것</span>
+            {costs.length > 0 ? costs.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>즉시 닫힌 자원 없음</b>}
+          </article>
+          <article>
+            <span>다음 잔향</span>
+            <b>{decisionReveal.nextTitle}</b>
+          </article>
         </div>
         <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
         {decisionReveal.bonuses?.length > 0 && (

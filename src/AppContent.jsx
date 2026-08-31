@@ -2477,7 +2477,7 @@ export function AppContent({ onSuppressSaves }) {
     }
   }
 
-  const decisionRevealView = { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal };
+  const decisionRevealView = { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta };
   function renderDecisionReveal() {
     return <DecisionReveal view={decisionRevealView} />;
   }

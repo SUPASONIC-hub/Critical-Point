@@ -3,6 +3,36 @@ import { AlertTriangle, ChevronRight, Copy, Download, FileText, MessageSquareTex
 
 export function ResultScreen({ view }) {
   const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
+  const firstCaseChoice = caseResults.case01?.outcomeChoiceId ?? "기록 없음";
+  const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
+  const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
+  const observationLabels = {
+    compliance: "순응",
+    defiance: "거부",
+    opacity: "은폐",
+    sacrifice: "희생",
+  };
+  const endingTwists = [
+    {
+      label: "위화감",
+      title: "보관소의 첫 번째 기록은 오늘 생성된 파일이 아니다.",
+      evidence: `CASE 01 결말 키가 이미 이전 참가자 칸에 남아 있다: ${firstCaseChoice}`,
+      copy: "트리거랩은 당신을 처음 본 것이 아니었다. 첫 사건의 선택은 시작점이 아니라 복원된 흔적이었다.",
+    },
+    {
+      label: "증거",
+      title: "에코의 문장은 조언이 아니라 같은 선택을 지나간 사람의 후회였다.",
+      evidence: `${decisionFingerprint.modeTitle} · ${decisionFingerprint.pressureShare}% 압박 일치`,
+      copy: "계속 비용을 다시 계산하라고 말한 목소리는 관찰자가 아니었다. 당신과 같은 반응 지문을 가진 이전 기록이었다.",
+    },
+    {
+      label: "확인",
+      title: "보고서는 결말이 아니라 다음 참가자의 사건 설계도였다.",
+      evidence: `${observationLabels[dominantObservation[0]]} ${dominantObservation[1]} · 단서 ${clueCount}/6`,
+      copy: `가장 크게 남은 관찰값은 ${observationLabels[dominantObservation[0]]}이다. 다음 플레이의 압박은 이 숫자를 보고 다시 배치된다.`,
+    },
+  ];
+  const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -21,15 +51,13 @@ export function ResultScreen({ view }) {
             </div>
             {endingStep === 0 && (
               <div className="ending-beat">
-                <span>RECORD {endingTwistIndex + 1} / 3</span>
-                <blockquote>{finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단"}</blockquote>
-                <p className="ending-twist-copy">
-                  {[
-                    `첫 번째 기록: 케이스 01에서 실제로 남긴 선택은 ${caseResults.case01?.outcomeChoiceId ?? "아직 확인되지 않았다"}.`,
-                    `두 번째 기록: 당신의 결정 지문은 ${decisionFingerprint.modeTitle} 방향으로 수렴했다.`,
-                    `세 번째 기록: 이번 시즌의 관찰 장부는 ${observationLedger.compliance}/${observationLedger.defiance}/${observationLedger.opacity}/${observationLedger.sacrifice}의 흔적을 남겼다.`,
-                  ][endingTwistIndex]}
-                </p>
+                <span>RECORD {endingTwistIndex + 1} / 3 · {currentEndingTwist.label}</span>
+                <blockquote>{finalChoiceText}</blockquote>
+                <div className="ending-twist-card">
+                  <h2>{currentEndingTwist.title}</h2>
+                  <p>{currentEndingTwist.copy}</p>
+                  <small>{currentEndingTwist.evidence}</small>
+                </div>
                 <button type="button" data-testid="ending-next" onClick={advanceEndingStep}>다음</button>
               </div>
             )}
