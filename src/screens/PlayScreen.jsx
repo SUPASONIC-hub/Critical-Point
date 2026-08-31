@@ -245,6 +245,13 @@ export function PlayScreen({ view }) {
                 <small>{observerArc.text}</small>
               </div>
             )}
+            {observerPattern?.turningPoint && (
+              <div className="observer-turning-point" aria-label="관찰 패턴 전환점">
+                <span>{observerPattern.turningPoint.label}</span>
+                <b>{observerPattern.turningPoint.title}</b>
+                <small>이미 한 번 바뀐 기준이 있습니다. 이번 선택은 그 전환을 이어가거나 되돌립니다.</small>
+              </div>
+            )}
             <div className="scene-stakes" aria-label="이번 장면의 긴장">
               <article>
                 <span>걸림돌</span>

@@ -422,6 +422,10 @@ export function getObserverPattern(entries = []) {
   const repeatedTail = taggedEntries
     .slice(-3)
     .every((entry) => entry.observerTag?.id && entry.observerTag.id === latest?.id);
+  const turningPoint = taggedEntries.find((entry, index) => {
+    if (index < 2 || entry.observerTag?.id === taggedEntries[index - 1]?.observerTag?.id) return false;
+    return taggedEntries.slice(0, index).filter((previous) => previous.observerTag?.id === dominant).length >= 2;
+  }) ?? null;
   const labels = {
     compliance: "순응 표본",
     defiance: "거부 표본",
@@ -461,19 +465,27 @@ export function getObserverPattern(entries = []) {
     : latest
       ? `${latest.label}이 최근 기록으로 남아 다음 질문의 말투를 바꿉니다.`
       : "아직 관찰자는 확정된 기준을 만들지 못했습니다.";
+  const turningPointRecord = turningPoint
+    ? {
+        label: "전환점 기록",
+        title: `${turningPoint.observerTag.label}이 익숙한 패턴을 끊었습니다.`,
+        text: `“${turningPoint.freeText || turningPoint.spokenChoice || turningPoint.choice}” 이후 관찰자는 같은 사람을 같은 방식으로 분류할 수 없게 됐습니다.`,
+      }
+    : null;
 
   return {
     counts,
     dominant,
     latest,
     repeatedTail,
+    turningPoint: turningPointRecord,
     arc: arcCopy[dominant] ?? arcCopy.pattern,
     endingRecord: {
       label: labels[dominant] ?? labels.pattern,
       title: repeatedTail
         ? "다음 참가자의 첫 장면은 당신이 반복한 기준에서 시작됩니다."
         : "다음 참가자의 첫 장면은 당신이 가장 많이 남긴 표본에서 시작됩니다.",
-      text: `${arcCopy[dominant]?.text ?? arcCopy.pattern.text} ${escalationText}`,
+      text: `${arcCopy[dominant]?.text ?? arcCopy.pattern.text} ${escalationText}${turningPointRecord ? ` ${turningPointRecord.title}` : ""}`,
     },
   };
 }

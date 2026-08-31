@@ -60,6 +60,7 @@ export function ResultScreen({ view }) {
       title: entry.title,
       text: entry.observerTag.text,
     }));
+  const observerTurningPoint = observerPattern?.turningPoint;
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -496,6 +497,13 @@ export function ResultScreen({ view }) {
                 <span>{observerEndingRecord.label}이 이번 보고서의 해석 기준입니다.</span>
               </div>
               <div className="observer-postmortem-grid">
+                {observerTurningPoint && (
+                  <article className="observer-turning-record">
+                    <span>{observerTurningPoint.label}</span>
+                    <strong>{observerTurningPoint.title}</strong>
+                    <p>{observerTurningPoint.text}</p>
+                  </article>
+                )}
                 {observerRouteRecords.map((record) => (
                   <article key={record.id}>
                     <span>{record.label}</span>
