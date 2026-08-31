@@ -60,7 +60,7 @@ try {
           "test",
           "--grep-invert",
           "@full",
-          ...(process.env.CI ? ["--workers=2", "--retries=2"] : []),
+          ...(process.env.CI ? ["--workers=1", "--retries=1"] : []),
           ...forwardedArgs,
         ];
     const runner = spawnCommand("npx", testArgs, {

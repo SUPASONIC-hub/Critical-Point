@@ -1342,6 +1342,9 @@ body{color:var(--ink);background:linear-gradient(135deg,var(--c-tone-002),var(--
 .choice-effect-compact{color:#124e3f;background:#dff3e8;border-color:#5a9f82}
 .choice-observer-preview{color:#fff;background:#10241f}
 .choice-observer-preview small{color:#e9f5b4}
+.decision-reveal-archive{color:#173b34}
+.decision-reveal-stakes article{color:#10241f;background:#f7faf4;border-color:#8ca49b}
+.decision-reveal-stakes span{color:#0e4b45}
 @media (max-width:768px){
   .scene{padding:14px}
   .scene-visual{aspect-ratio:16 / 10}

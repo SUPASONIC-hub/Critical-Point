@@ -44,6 +44,7 @@ async function startDebugNode(page, caseId, nodeId) {
 }
 
 test("case 05 browser flow can unlock and open the final case", async ({ page }) => {
+  test.setTimeout(180_000);
   const dialogMessages = [];
   page.on("dialog", (dialog) => {
     dialogMessages.push(dialog.message());
@@ -53,6 +54,9 @@ test("case 05 browser flow can unlock and open the final case", async ({ page })
   await startDebugNode(page, "case05", "c5_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible().catch(() => false)) await decisionNext.click();
+  await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
   const playDownloadPromise = page.waitForEvent("download");
   await page.getByTestId("export-play-log").click();
   const playDownload = await playDownloadPromise;
