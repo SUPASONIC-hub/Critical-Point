@@ -61,6 +61,27 @@ export function ResultScreen({ view }) {
       text: entry.observerTag.text,
     }));
   const observerTurningPoint = observerPattern?.turningPoint;
+  const endingAfterglow = {
+    compliance: {
+      title: "당신은 질서를 지켰고, 그 질서가 누구를 조용히 밀어냈는지도 남겼습니다.",
+      text: "기록은 당신을 순응한 사람으로만 저장하지 않습니다. 무너지지 않게 붙잡은 순간과, 너무 늦게 질문한 순간을 함께 보관합니다.",
+    },
+    defiance: {
+      title: "당신은 문을 열었고, 이제 그 문으로 들어올 사람의 몫까지 떠안았습니다.",
+      text: "거부는 끝내는 버튼이 아니었습니다. 다음 사람에게 더 큰 선택지를 남기는 대신, 더 큰 책임도 함께 넘긴 일이었습니다.",
+    },
+    opacity: {
+      title: "당신이 숨긴 것은 사라지지 않고, 다음 참가자의 첫 질문이 되었습니다.",
+      text: "침묵은 흔적을 지우지 못했습니다. 다만 누가 그 흔적을 먼저 발견할지, 그 순서만 바꾸었습니다.",
+    },
+    sacrifice: {
+      title: "당신은 누군가를 살리기 위해 자신의 이름을 기록의 가장 앞에 남겼습니다.",
+      text: "희생은 깨끗한 결말이 아닙니다. 남은 사람들은 당신의 선택 덕분에 계속 말할 수 있지만, 그 말의 무게도 함께 기억합니다.",
+    },
+  }[dominantObservation[0]] ?? {
+    title: "당신의 선택은 결론보다 오래 남는 질문이 되었습니다.",
+    text: "기록은 정답을 보관하지 않습니다. 다음 판단이 시작될 수 있도록, 당신이 멈춘 자리의 온도를 보관합니다.",
+  };
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -133,6 +154,11 @@ export function ResultScreen({ view }) {
             {endingStep === 3 && (
               <div className="ending-beat">
                 <span>RECORD OPENED</span>
+                <div className="ending-coda">
+                  <span>당신이 남긴 것</span>
+                  <strong>{endingAfterglow.title}</strong>
+                  <p>{endingAfterglow.text}</p>
+                </div>
                 <strong>{unopenedRecordCount}개의 기록이 아직 열리지 않았다.</strong>
                 <small>단서 {unopenedClueCount}개 · 밟지 않은 갈래 {unopenedBranchCount}개</small>
                 <small>다음 참가자는 이 빈칸을 이어받습니다.</small>
