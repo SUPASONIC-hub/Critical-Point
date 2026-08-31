@@ -8,6 +8,13 @@ export function DecisionReveal({ view }) {
   const gains = effectEntries.filter(([, value]) => value > 0).slice(0, 3);
   const costs = effectEntries.filter(([, value]) => value < 0).slice(0, 3);
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
+  const archiveLine = decisionReveal.cascade
+    ? "이 선택은 사건 해결 로그가 아니라 허용선 표본으로 보관됩니다."
+    : decisionReveal.clue
+      ? "단서가 열린 순간, 이전 참가자의 기록과 같은 폴더에 묶였습니다."
+      : decisionReveal.streakBreak
+        ? "끊긴 연속 기록은 실패가 아니라 다음 압박을 조정하는 근거가 됩니다."
+        : "트리거랩은 결과보다 이 말을 고른 순서를 먼저 저장합니다.";
   const revealTone = decisionReveal.clue
     ? "clue-found"
     : decisionReveal.suspenseEvent
@@ -46,6 +53,7 @@ export function DecisionReveal({ view }) {
         </div>
         <h2 id="decision-reveal-title">{simplifyPlayerText(decisionReveal.title)}</h2>
         <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
+        <p className="decision-reveal-archive">{archiveLine}</p>
         <div className="decision-reveal-beat">
           {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
         </div>

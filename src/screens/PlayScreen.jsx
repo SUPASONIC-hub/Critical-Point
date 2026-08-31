@@ -11,6 +11,23 @@ import { CASE_SEQUENCE } from "../gameData.js";
 export function PlayScreen({ view }) {
   const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
+  const observerWhisper =
+    suspenseState.tier === "REDLINE"
+      ? "관찰 기록이 사건 보고보다 먼저 갱신되고 있습니다."
+      : suspenseState.tier === "UNSTABLE"
+        ? "에코의 질문이 조언보다 검증 절차에 가깝게 변했습니다."
+        : currentChallengeStreak > 0
+          ? "방금 맞힌 목표가 다음 장면의 기준선으로 남았습니다."
+          : "아직 관찰자는 침묵하지만, 선택의 순서는 저장되고 있습니다.";
+  const describeChoiceDilemma = (choice) => {
+    const entries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
+    const gains = entries.filter(([, value]) => value > 0).map(([key]) => resourceMeta[key]?.label ?? key);
+    const costs = entries.filter(([, value]) => value < 0).map(([key]) => resourceMeta[key]?.label ?? key);
+    if (gains.length > 0 && costs.length > 0) return `${gains[0]}을 얻는 대신 ${costs[0]}을 닫습니다.`;
+    if (gains.length > 0) return `${gains[0]}은 열리지만, 관찰자는 그 이유를 기록합니다.`;
+    if (costs.length > 0) return `${costs[0]}을 먼저 소모해 다음 장면의 문을 엽니다.`;
+    return "숫자는 조용하지만, 이 말은 판단 순서를 남깁니다.";
+  };
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
@@ -214,6 +231,7 @@ export function PlayScreen({ view }) {
               </p>
             )}
             <p className="scene-dialogue"><span className="story-label">중요한 말</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
             <div className="scene-stakes" aria-label="이번 장면의 긴장">
               <article>
                 <span>걸림돌</span>
@@ -396,6 +414,7 @@ export function PlayScreen({ view }) {
                   </span>
                   {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
+                  <span className="choice-dilemma">{describeChoiceDilemma(choice)}</span>
                   <span className="choice-stakes">
                     {Object.entries(choice.effect ?? {})
                       .filter(([, value]) => value !== 0)
