@@ -285,6 +285,13 @@ export function ResultScreen({ view }) {
               <p>다음 장면의 핵심 행동: {view.endingSceneProfile.choice}</p>
             </section>
           )}
+          {view.endingPreview && (
+            <section className="ending-preview-panel" aria-label="현재 엔딩 방향">
+              <span>ENDING DIRECTION</span>
+              <strong>{view.endingPreview.label}</strong>
+              <p>{view.endingPreview.text}</p>
+            </section>
+          )}
           {view.failureObjectives?.length > 0 && (
             <section className="failure-objectives" aria-label="실패 재도전 목표">
               <strong>RETRY OBJECTIVES</strong>

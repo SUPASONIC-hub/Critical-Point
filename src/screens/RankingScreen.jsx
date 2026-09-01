@@ -66,7 +66,7 @@ export function RankingScreen({
                       <b>{entry.name}</b>
                       <span className="ranking-style-badge">{entry.style}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
-                      <small>{entry.caseTitle} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
+                      <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
                     </div>
                     <div className="ranking-stat">
                       <span>RANK</span>
@@ -77,6 +77,7 @@ export function RankingScreen({
                       <b>{entry.score}</b>
                     </div>
                     <div className="ranking-detail">
+                      <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
                       <span>평균 {entry.averageResponseTime}s</span>
                       <span>자유입력 {entry.freeCount}</span>
                     </div>

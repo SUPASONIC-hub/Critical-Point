@@ -121,6 +121,34 @@ export function IntroScreen({ view }) {
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
+          {view.operatorProfiles?.length > 0 && (
+            <section className="operator-origin-panel" aria-label="주인공 출신과 권한 선택">
+              <div className="panel-title-row">
+                <div>
+                  <span>OPERATOR ORIGIN</span>
+                  <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
+                </div>
+                <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
+              </div>
+              <div className="operator-origin-grid">
+                {view.operatorProfiles.map((profile) => (
+                  <button
+                    type="button"
+                    key={profile.id}
+                    className={view.operatorOrigin === profile.id ? "operator-origin selected" : "operator-origin"}
+                    onClick={() => view.setOperatorOrigin(profile.id)}
+                    aria-pressed={view.operatorOrigin === profile.id}
+                  >
+                    <span>{profile.label}</span>
+                    <strong>{profile.title}</strong>
+                    <p>{profile.premise}</p>
+                    <small>{profile.authority}</small>
+                  </button>
+                ))}
+              </div>
+              <p className="operator-origin-selected">현재 출신: {view.operatorProfile?.title} · 첫 권한: {view.operatorProfile?.authority}</p>
+            </section>
+          )}
           {view.tutorialSteps && (
             <section className="tutorial-path" aria-label="첫 플레이 안내">
               <span>FIRST RUN PROTOCOL</span>

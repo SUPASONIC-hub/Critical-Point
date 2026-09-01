@@ -34,6 +34,7 @@ function normalizeEntry(row = {}) {
   return {
     id: `${runId || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     runId,
+    runLabel: runId ? `RUN ${String(runId).slice(-8).toUpperCase()}` : "LOCAL RUN",
     sessionCode: row.session_code ?? "LOCAL",
     name: row.local ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
     caseId: row.case_id ?? "case01",

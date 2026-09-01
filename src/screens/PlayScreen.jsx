@@ -181,6 +181,25 @@ export function PlayScreen({ view }) {
             </div>
           </section>
         )}
+        {view.operatorProfile && (
+          <section className="operator-identity-strip" aria-label="주인공 정체성과 현재 권한">
+            <div>
+              <span>{view.operatorProfile.label}</span>
+              <strong>{view.operatorProfile.title}</strong>
+            </div>
+            <p>{view.operatorProfile.authority}</p>
+            <div className="authority-permission-list">
+              <b>{authorityState.level}</b>
+              {(authorityState.permissions ?? []).map((permission) => <span key={permission}>{permission}</span>)}
+            </div>
+            <small className="authority-origin-permission">출신 권한: {(authorityState.origin?.originPermissions ?? []).join(" · ")}</small>
+          </section>
+        )}
+        {view.latestChoiceFeedback && (
+          <p className={`choice-outcome-feedback ${view.latestChoiceFeedback.tone}`} role="status">
+            <strong>{view.latestChoiceFeedback.label}</strong> {view.latestChoiceFeedback.text}
+          </p>
+        )}
         <section className={`pressure-cascade ${pressureCascade.tone}`}>
           <div className="pressure-cascade-mark">
             <span>{pressureCascade.label}</span>

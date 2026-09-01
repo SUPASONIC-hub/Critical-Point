@@ -79,6 +79,12 @@ const speakerMotifs = {
   "에코": { wave: "triangle", semitones: 7, pulse: 0.88 },
 };
 
+const originMotifs = {
+  courier: { wave: "sine", semitones: -2, pulse: 0.98 },
+  lab: { wave: "triangle", semitones: 2, pulse: 1.04 },
+  public: { wave: "sawtooth", semitones: 5, pulse: 1.08 },
+};
+
 function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
 }
@@ -107,6 +113,7 @@ function createSceneMode(modeKey) {
   const isFinal = parts.includes("final");
   const motif = chapterMotifs[parts[1]] ?? chapterMotifs.case01;
   const speakerMotif = speakerMotifs[parts[3]] ?? { wave: motif.wave, semitones: 0, pulse: 1 };
+  const originMotif = originMotifs[parts[5]] ?? { wave: motif.wave, semitones: 0, pulse: 1 };
   const sceneIndex = Number(parts.at(-1));
   const impactBoost = baseKey === "critical" || isFinal ? 1.25 : baseKey === "unstable" ? 1.1 : 1;
   const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
@@ -115,10 +122,10 @@ function createSceneMode(modeKey) {
     ...base,
     interval: Math.max(360, Math.round(base.interval * tempo)),
     volume: Math.min(0.16, base.volume * (impactBoost * motif.impact * speakerMotif.pulse + scenePulse * 0.03)),
-    wave: speakerMotif.wave,
-    bass: shiftPattern(base.bass, semitoneShift + speakerMotif.semitones),
-    notes: shiftPattern(base.notes, semitoneShift + speakerMotif.semitones),
-    chords: shiftPattern(base.chords, semitoneShift + speakerMotif.semitones),
+    wave: originMotif.wave ?? speakerMotif.wave,
+    bass: shiftPattern(base.bass, semitoneShift + speakerMotif.semitones + originMotif.semitones),
+    notes: shiftPattern(base.notes, semitoneShift + speakerMotif.semitones + originMotif.semitones),
+    chords: shiftPattern(base.chords, semitoneShift + speakerMotif.semitones + originMotif.semitones),
     hitEvery: base.hitEvery > 0 ? Math.max(4, base.hitEvery - scenePulse * 2) : isFinal ? 8 + scenePulse * 2 : 0,
     noiseEvery: base.noiseEvery > 0 ? Math.max(6, base.noiseEvery - scenePulse) : 0,
     detuneSpread: 2 + (hash % 9),

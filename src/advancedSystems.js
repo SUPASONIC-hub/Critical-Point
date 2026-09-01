@@ -7,6 +7,56 @@ const chapterUi = {
   final: { label: "OBSERVER CORE", title: "당신의 기록을 판독", accent: "#e9f5b4", metrics: ["자기 인식", "개입 권한", "다음 기록"] },
 };
 
+const operatorProfiles = {
+  courier: {
+    id: "courier",
+    label: "FIELD COURIER",
+    title: "현장 배송망 출신 분석관",
+    authority: "현장 기록을 가장 먼저 보고, 사람에게 사실을 전달할 권한",
+    premise: "배송 지연과 파손 기록에서 시스템의 첫 번째 균열을 발견했습니다.",
+    permissions: ["현장 기록 열람", "당사자 인터뷰", "긴급 전달 요청"],
+  },
+  lab: {
+    id: "lab",
+    label: "TRIGGER LAB",
+    title: "트리거랩 파견 분석관",
+    authority: "실험 기준과 검증 절차를 조정할 권한",
+    premise: "배송망의 이상 징후를 검증하기 위해 트리거랩이 직접 파견했습니다.",
+    permissions: ["실험 로그 열람", "검증 기준 제안", "보호 명부 요청"],
+  },
+  public: {
+    id: "public",
+    label: "PUBLIC AUDITOR",
+    title: "독립 공익 감사관",
+    authority: "기록의 공개 범위와 피해 보호 순서를 조정할 권한",
+    premise: "외부 검증 요청을 받아 회사와 실험실 사이의 기록을 대조합니다.",
+    permissions: ["공개 범위 제안", "외부 검증 요청", "책임 기록 보존"],
+  },
+};
+
+export function getOperatorProfiles() {
+  return Object.values(operatorProfiles);
+}
+
+export function getOperatorProfile(origin = "courier") {
+  return operatorProfiles[origin] ?? operatorProfiles.courier;
+}
+
+export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
+  const profile = getOperatorProfile(origin);
+  const levelPermissions = {
+    OBSERVER: ["제한 열람", "질문 요청", "관찰 기록"],
+    "FIELD ACCESS": ["기록 대조", "관계자 질문", "기준 제안"],
+    OVERSIGHT: ["기록 공개", "현장 개입", "실험 종료"],
+  };
+  return {
+    ...profile,
+    level,
+    permissions: levelPermissions[level] ?? levelPermissions.OBSERVER,
+    originPermissions: profile.permissions,
+  };
+}
+
 const relationshipQuests = {
   "한서윤": { title: "서윤의 지급 명부", goal: "보호 대상의 이름을 지우지 않고 다음 기록으로 넘기기", reward: "human-record", threshold: 24 },
   "반재욱": { title: "재욱의 원본 봉투", goal: "원본과 진술의 충돌을 함께 검증하기", reward: "evidence-reform", threshold: 24 },
@@ -86,6 +136,36 @@ export function getRankingComparison(summary = {}) {
     { label: "PEOPLE", value: Math.min(100, Math.max(0, 100 - (summary.exploitPenalty ?? 0) * 8)) },
     { label: "RHYTHM", value: Math.min(100, summary.rhythmScore ?? 0) },
   ];
+}
+
+export function getEndingPreview(ending = {}) {
+  if (!ending?.id) return null;
+  const labels = {
+    "open-oversight": "공개와 개입",
+    "evidence-reform": "증거와 개혁",
+    "human-record": "사람과 기록",
+    "profitable-silence": "성과와 침묵",
+    "cold-justice": "절차와 책임",
+    "field-pact": "현장과 협약",
+    "quiet-cover": "보호와 은폐",
+    collapse: "압박과 붕괴",
+    "open-question": "질문과 계승",
+  };
+  return {
+    label: labels[ending.id] ?? "미확정 경로",
+    text: ending.failure ? "현재 선택 패턴이 시스템 붕괴 쪽으로 기울고 있습니다." : "현재 선택 패턴이 이 엔딩의 조건을 강화하고 있습니다.",
+  };
+}
+
+export function getChoiceOutcomeFeedback(entry = {}) {
+  if (!entry?.choiceId) return null;
+  const effectCount = Object.values(entry.effect ?? {}).filter((value) => value !== 0).length;
+  const tone = entry.prematureHypothesis ? "warning" : effectCount >= 3 ? "tradeoff" : "signal";
+  return {
+    tone,
+    label: entry.prematureHypothesis ? entry.prematureHypothesis.label : tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED",
+    text: entry.prematureHypothesis?.text ?? "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
+  };
 }
 
 export function getEndingVisualClass(endingId = "open-question") {
