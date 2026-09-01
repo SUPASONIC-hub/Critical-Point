@@ -1,4 +1,4 @@
-import { getRankingLeague } from "./advancedSystems.js";
+import { getRankingIntegrity, getRankingLeague } from "./advancedSystems.js";
 
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
 
@@ -52,6 +52,7 @@ function normalizeEntry(row = {}) {
     cognitionScore: Number(summary.cognitionScore) || 0,
     style,
     league: getRankingLeague(style),
+    integrity: getRankingIntegrity({ runId, completedAt: row.completed_at, summary }),
     seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
     summary,
   };
