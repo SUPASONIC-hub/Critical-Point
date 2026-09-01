@@ -235,7 +235,7 @@ function createRunId() {
   return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-const speakerPortraits = {
+const legacySpeakerPortraits = {
   "한서윤": "/portrait-han-seoyun.png",
   "반재욱": "/portrait-ban-jaeuk.png",
   "도윤하": "/portrait-do-yunha.png",
@@ -244,6 +244,19 @@ const speakerPortraits = {
   "반재현": "/portrait-ban-jaehyun.png",
   "윤서": "/portrait-yunseo.png",
 };
+
+const portraitAssets = [
+  "/portrait-han-seoyun.png",
+  "/portrait-ban-jaeuk.png",
+  "/portrait-do-yunha.png",
+  "/portrait-oh-jinwoo.png",
+  "/portrait-echo.png",
+  "/portrait-ban-jaehyun.png",
+  "/portrait-yunseo.png",
+];
+const speakerPortraits = Object.fromEntries(
+  Object.keys(characterProfiles).map((speaker, index) => [speaker, portraitAssets[index % portraitAssets.length]]),
+);
 
 let consoleErrorHookBusy = false;
 

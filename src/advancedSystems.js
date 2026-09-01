@@ -78,7 +78,14 @@ const endingScenes = {
 };
 
 endingScenes["open-oversight"].image = "/ending-oversight-room.png";
+endingScenes["evidence-reform"].image = "/ending-final-archive.png";
+endingScenes["human-record"].image = "/scene-case05.png";
+endingScenes["profitable-silence"].image = "/scene-case04.png";
+endingScenes["cold-justice"].image = "/scene-case03.png";
+endingScenes["field-pact"].image = "/scene-case01.png";
+endingScenes["quiet-cover"].image = "/scene-case02.png";
 endingScenes.collapse.image = "/ending-system-collapse.png";
+endingScenes["open-question"].image = "/ending-final-archive.png";
 
 export function getChapterUiModel(caseId = "case01") {
   return chapterUi[caseId] ?? chapterUi.case01;
