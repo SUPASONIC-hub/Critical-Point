@@ -14,6 +14,7 @@ export function PlayScreen({ view }) {
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
   const relationshipScores = view.relationshipScores ?? [];
+  const authorityState = view.authorityState ?? { level: "OBSERVER", permissions: [], locked: "권한 정보 없음" };
   const latestObserverTag = log.at(-1)?.observerTag;
   const observerArc = observerPattern?.arc;
   const getObserverPreviewForChoice = (choiceId) =>
@@ -286,6 +287,10 @@ export function PlayScreen({ view }) {
                 <p>{operatorBrief.reason}</p>
               </div>
             </div>
+            <div className="authority-level" aria-label="현재 권한 단계">
+              <div><span>AUTHORITY LEVEL</span><strong>{authorityState.level}</strong><small>{authorityState.locked}</small></div>
+              <div className="authority-permission-list">{authorityState.permissions.map((permission) => <b key={permission}>{permission}</b>)}</div>
+            </div>
             <div className="chapter-rail" aria-label="챕터 진행 경로">
               {CASE_SEQUENCE.map((caseId, index) => (
                 <span key={caseId} className={caseId === currentCase ? "active" : completedCases.includes(caseId) ? "complete" : ""}>
@@ -314,6 +319,19 @@ export function PlayScreen({ view }) {
                   </article>
                 ))}
               </div>
+            </div>
+            <div className="mystery-board" aria-label="반전 단서 보드">
+              <div><span>MYSTERY BOARD</span><b>{discoveredClues.length}개 단서 확보</b></div>
+              {discoveredClues.length > 0 ? (
+                <div className="mystery-clues">
+                  {discoveredClues.slice(-3).map((clue) => (
+                    <article key={clue.id}>
+                      <strong>{clue.title ?? clue.id}</strong>
+                      <p>{clue.text ?? clue.description ?? "기록의 빈틈이 다음 질문으로 남았습니다."}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : <p className="mystery-empty">첫 번째 모순은 아직 모습을 드러내지 않았습니다. 압박을 낮추거나 오래 관찰하면 단서가 열립니다.</p>}
             </div>
           </section>
         )}

@@ -284,10 +284,26 @@ summary:focus-visible{outline:3px solid var(--color-accent);outline-offset:3px}
 .relationship-strip em{display:block;height:100%;background:var(--c-coral);border-radius:inherit}
 .relationship-strip article.active em{background:var(--c-acid)}
 .relationship-strip small{color:var(--c-line-soft);font-size:9px;font-weight:800}
+.mystery-board{display:grid;gap:8px;padding-top:12px;border-top:1px solid rgba(217,255,98,.18)}
+.mystery-board>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.mystery-board>div:first-child span{color:#ffb09e;font-size:10px;font-weight:950;letter-spacing:.1em}
+.mystery-board>div:first-child b{font-size:12px;color:var(--c-paper)}
+.mystery-clues{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.mystery-clues article{display:grid;gap:4px;padding:9px;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.12);border-radius:5px}
+.mystery-clues strong{font-size:11px;color:var(--c-paper);line-height:1.35}
+.mystery-clues p,.mystery-empty{margin:0;color:var(--c-line-soft);font-size:10px;font-weight:700;line-height:1.45}
+.mystery-empty{padding:9px;background:rgba(255,255,255,.05);border-left:2px solid var(--c-coral)}
 .chapter-transfer{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;align-items:center;padding-top:2px}
 .chapter-transfer-route,.chapter-transfer-reason{display:grid;gap:5px}
 .chapter-transfer-route strong{font-size:16px;line-height:1.35;color:var(--c-paper)}
 .chapter-transfer-reason{padding-left:14px;border-left:1px solid rgba(217,255,98,.28)}
+.authority-level{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid rgba(217,255,98,.18);border-bottom:1px solid rgba(217,255,98,.18)}
+.authority-level>div:first-child{display:grid;gap:4px}
+.authority-level span{color:#ffb09e;font-size:10px;font-weight:950;letter-spacing:.1em}
+.authority-level strong{font-size:16px;color:var(--c-paper)}
+.authority-level small{color:var(--c-line-soft);font-size:11px;line-height:1.4}
+.authority-permission-list{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.authority-permission-list b{padding:5px 7px;color:var(--c-acid);background:rgba(217,255,98,.1);border:1px solid rgba(217,255,98,.26);border-radius:4px;font-size:10px}
 .chapter-rail{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding-top:4px}
 .chapter-rail span{display:grid;grid-template-columns:auto 1fr;gap:7px;align-items:center;color:rgba(255,255,255,.52);font-size:10px;font-weight:900}
 .chapter-rail i{display:grid;place-items:center;width:26px;height:26px;color:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.22);border-radius:50%;font-style:normal;font-size:9px}
@@ -298,8 +314,10 @@ summary:focus-visible{outline:3px solid var(--color-accent);outline-offset:3px}
 @media (max-width:900px){.chapter-console-main{grid-template-columns:1fr 1fr}.operator-limit{grid-column:1 / -1}.chapter-transfer{grid-template-columns:1fr}.chapter-transfer-reason{padding-left:0;padding-top:10px;border-top:1px solid rgba(217,255,98,.28);border-left:0}}
 @media (max-width:480px){.chapter-console{padding:15px}.chapter-console-topline{align-items:flex-start;flex-direction:column;gap:6px}.chapter-console-topline b{text-align:left}.chapter-console-main{grid-template-columns:1fr}.operator-limit{grid-column:auto}.chapter-rail{grid-template-columns:repeat(3,1fr);row-gap:10px}}
 @media (max-width:480px){.authority-action{align-items:stretch;flex-direction:column}.authority-action button{width:100%}}
+@media (max-width:480px){.authority-level{align-items:flex-start;flex-direction:column}.authority-permission-list{justify-content:flex-start}}
 @media (max-width:700px){.relationship-strip>div{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:480px){.relationship-strip>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.mystery-clues{grid-template-columns:1fr}}
 .legacy-effect{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .legacy-effect small{white-space:nowrap}
 .pressure-cascade{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(180px,.8fr);gap:16px;align-items:center;margin:-4px 0 16px;padding:14px 16px;border:1px solid var(--c-tone-035);border-left:5px solid var(--c-tone-036);border-radius:8px;background:var(--c-tone-037)}
