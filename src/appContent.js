@@ -83,6 +83,15 @@ export const operatorBriefs = {
   },
 };
 
+export const chapterRules = {
+  case01: { label: "현금과 사람", rule: "살아남는 속도보다 누구의 내일을 먼저 지킬지 결정합니다.", authority: "지급 순서와 공개 기준을 제안" },
+  case02: { label: "증거와 보호", rule: "기록을 보존하면서도 증언자의 말할 권리를 지켜야 합니다.", authority: "접근 권한과 증언 절차를 조정" },
+  case03: { label: "속도와 장기비용", rule: "가장 빠른 답이 가장 싼 실패를 뜻하지는 않습니다.", authority: "경쟁안의 평가 기준을 재설계" },
+  case04: { label: "예외와 책임", rule: "성과를 위해 허용한 예외에는 반드시 이름과 종료 조건이 필요합니다.", authority: "예외 승인 조건과 감시 범위를 제안" },
+  case05: { label: "규칙과 복구", rule: "반복을 막는 규칙이 현장의 피해를 키우지 않는지 확인합니다.", authority: "중단·복구·책임 배분 순서를 조정" },
+  final: { label: "관찰과 선택", rule: "이제 사건이 아니라 당신의 반응 패턴이 실험의 대상입니다.", authority: "실험 데이터의 공개·폐기·계승을 선택" },
+};
+
 export const legacyProfiles = {
   S: {
     label: "CLEAR SIGNAL",

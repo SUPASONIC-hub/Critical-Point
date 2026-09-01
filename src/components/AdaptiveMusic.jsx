@@ -62,6 +62,15 @@ const musicModes = {
   },
 };
 
+const chapterMotifs = {
+  case01: { wave: "sine", lift: 80, impact: 0.92 },
+  case02: { wave: "triangle", lift: 360, impact: 1.04 },
+  case03: { wave: "sawtooth", lift: 620, impact: 1.12 },
+  case04: { wave: "sine", lift: 220, impact: 1.18 },
+  case05: { wave: "triangle", lift: 480, impact: 1.24 },
+  final: { wave: "sine", lift: 760, impact: 1.3 },
+};
+
 function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
 }
@@ -88,6 +97,7 @@ function createSceneMode(modeKey) {
   const tempo = tempoMultipliers[hash % tempoMultipliers.length];
   const semitoneShift = semitoneShifts[Math.floor(hash / 7) % semitoneShifts.length];
   const isFinal = parts.includes("final");
+  const motif = chapterMotifs[parts[1]] ?? chapterMotifs.case01;
   const sceneIndex = Number(parts.at(-1));
   const impactBoost = baseKey === "critical" || isFinal ? 1.25 : baseKey === "unstable" ? 1.1 : 1;
   const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
@@ -95,7 +105,8 @@ function createSceneMode(modeKey) {
   return {
     ...base,
     interval: Math.max(360, Math.round(base.interval * tempo)),
-    volume: Math.min(0.16, base.volume * (impactBoost + scenePulse * 0.03)),
+    volume: Math.min(0.16, base.volume * (impactBoost * motif.impact + scenePulse * 0.03)),
+    wave: motif.wave,
     bass: shiftPattern(base.bass, semitoneShift),
     notes: shiftPattern(base.notes, semitoneShift),
     chords: shiftPattern(base.chords, semitoneShift),
@@ -103,7 +114,7 @@ function createSceneMode(modeKey) {
     noiseEvery: base.noiseEvery > 0 ? Math.max(6, base.noiseEvery - scenePulse) : 0,
     detuneSpread: 2 + (hash % 9),
     impact: impactBoost + scenePulse * 0.12,
-    filterLift: (hash % 5) * 140,
+    filterLift: motif.lift + (hash % 5) * 140,
   };
 }
 

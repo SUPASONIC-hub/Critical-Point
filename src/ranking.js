@@ -21,6 +21,16 @@ function normalizeEntry(row = {}) {
   const rank = normalizeRank(summary.rank);
   const parsedScore = Number(summary.burstScore ?? summary.momentumScore);
   const runId = row.run_id ?? summary.runId ?? "";
+  const reflectionScore = Number(summary.reflectionScore) || 0;
+  const pressureAdaptScore = Number(summary.pressureAdaptScore) || 0;
+  const freeCount = Number(summary.freeCount) || 0;
+  const style = freeCount > 0 && reflectionScore >= pressureAdaptScore
+    ? "BOARD BREAKER"
+    : pressureAdaptScore >= reflectionScore + 12
+      ? "RISK CUTTER"
+      : reflectionScore >= 55
+        ? "SYSTEM THINKER"
+        : "FIELD DECIDER";
   return {
     id: `${runId || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     runId,
@@ -33,10 +43,11 @@ function normalizeEntry(row = {}) {
     score: Number.isFinite(parsedScore) ? parsedScore : null,
     trigger: summary.primary?.[0] ?? "responsibility",
     averageResponseTime: Number(summary.averageResponseTime) || 0,
-    freeCount: Number(summary.freeCount) || 0,
-    reflectionScore: Number(summary.reflectionScore) || 0,
-    pressureAdaptScore: Number(summary.pressureAdaptScore) || 0,
+    freeCount,
+    reflectionScore,
+    pressureAdaptScore,
     cognitionScore: Number(summary.cognitionScore) || 0,
+    style,
     seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
     summary,
   };

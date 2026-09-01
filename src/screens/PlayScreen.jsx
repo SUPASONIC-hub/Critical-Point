@@ -12,6 +12,7 @@ export function PlayScreen({ view }) {
   const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const operatorBrief = view.operatorBriefs?.[currentCase];
+  const chapterRule = view.chapterRules?.[currentCase];
   const latestObserverTag = log.at(-1)?.observerTag;
   const observerArc = observerPattern?.arc;
   const getObserverPreviewForChoice = (choiceId) =>
@@ -258,6 +259,13 @@ export function PlayScreen({ view }) {
                 <strong>집행권은 현장에 남아 있습니다</strong>
                 <p>최종 승인과 실제 집행은 해당 조직의 책임자가 수행합니다. 그래서 당신의 선택은 명령이 아니라 압박과 기준으로 작동합니다.</p>
               </div>
+              {chapterRule && (
+                <div className="chapter-rule">
+                  <span>CHAPTER RULE / {chapterRule.label}</span>
+                  <strong>{chapterRule.rule}</strong>
+                  <p>이번 챕터의 개입 권한: {chapterRule.authority}</p>
+                </div>
+              )}
             </div>
             <div className="chapter-transfer">
               <div className="chapter-transfer-route">
@@ -275,6 +283,16 @@ export function PlayScreen({ view }) {
                   <i>{String(index + 1).padStart(2, "0")}</i>{caseId === currentCase ? "현재" : completedCases.includes(caseId) ? "완료" : "대기"}
                 </span>
               ))}
+            </div>
+            <div className="authority-action">
+              <div>
+                <span>ONE-TIME AUTHORITY</span>
+                <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
+                <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
+              </div>
+              <button type="button" onClick={activateCrisisProtocol} disabled={protocolUsed || riskPressure < 60 || isAdvancing}>
+                {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
+              </button>
             </div>
           </section>
         )}
