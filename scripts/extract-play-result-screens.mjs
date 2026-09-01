@@ -67,7 +67,7 @@ const playAliases = [
   "progress", "easyRiskLabels", "riskTier", "activeBonus", "freeTextCombo", "currentAverageResponseTime", "log", "clueCount",
   "discoveredClues", "currentChallengeStreak", "momentumTier", "streakGoal", "streakRemaining", "momentumScore",
   "decisionSeconds", "protocolUsed", "isAdvancing", "activateCrisisProtocol", "decisionFingerprint", "decisionLedger",
-  "resourceMeta", "sceneChallenge", "triggerLabSignals", "narrativeSpine", "questSteps", "sceneVisuals", "speakerProfile",
+  "resourceMeta", "sceneChallenge", "triggerLabSignals", "narrativeSpine", "questSteps", "sceneVisuals", "speakerProfile", "speakerPortrait",
   "latestFreeTextSuccess", "resolvedNodeId", "sceneDirection", "latestBeat", "renderSceneLines", "setMemoOpened", "echo",
   "probeUsed", "echoProbeCost", "requestEchoProbe", "getEchoChecks", "pendingChoice", "showTacticalDetails",
   "setShowTacticalDetails", "decisionForecasts", "pressureLeader", "pressureLensForecast", "tradeoffLensForecast",
