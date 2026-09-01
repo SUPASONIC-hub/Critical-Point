@@ -1,3 +1,5 @@
+import { getRankingLeague } from "./advancedSystems.js";
+
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
 
 function normalizeRank(value) {
@@ -49,6 +51,7 @@ function normalizeEntry(row = {}) {
     pressureAdaptScore,
     cognitionScore: Number(summary.cognitionScore) || 0,
     style,
+    league: getRankingLeague(style),
     seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
     summary,
   };
