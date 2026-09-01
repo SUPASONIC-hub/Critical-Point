@@ -236,6 +236,49 @@ export function PlayScreen({ view }) {
         />
         {renderSaveStatus()}
 
+        {operatorBrief && (
+          <section className="chapter-console" aria-label="현재 챕터 작전 브리프">
+            <div className="chapter-console-topline">
+              <span>OPERATOR BRIEF / LIVE AUTHORITY</span>
+              <b>당신의 결정은 현장을 바꾸지만, 모든 권한을 갖지는 않습니다</b>
+            </div>
+            <div className="chapter-console-main">
+              <div className="operator-identity">
+                <span>WHO YOU ARE</span>
+                <strong>트리거랩 전환 분석관</strong>
+                <p>기업과 조직의 위기를 관찰하고, 다음 운영 기준을 설계하는 사람</p>
+              </div>
+              <div className="operator-authority">
+                <span>YOUR AUTHORITY</span>
+                <div><b>열람</b><b>질문</b><b>기준 제안</b></div>
+                <p>기록을 열고, 관계자에게 묻고, 임시 기준을 제안할 수 있습니다.</p>
+              </div>
+              <div className="operator-limit">
+                <span>THE LIMIT</span>
+                <strong>집행권은 현장에 남아 있습니다</strong>
+                <p>최종 승인과 실제 집행은 해당 조직의 책임자가 수행합니다. 그래서 당신의 선택은 명령이 아니라 압박과 기준으로 작동합니다.</p>
+              </div>
+            </div>
+            <div className="chapter-transfer">
+              <div className="chapter-transfer-route">
+                <span>CHAPTER {String(CASE_SEQUENCE.indexOf(currentCase) + 1).padStart(2, "0")} / {CASE_SEQUENCE.length}</span>
+                <strong>{operatorBrief.movement}</strong>
+              </div>
+              <div className="chapter-transfer-reason">
+                <span>WHY THIS MOVE</span>
+                <p>{operatorBrief.reason}</p>
+              </div>
+            </div>
+            <div className="chapter-rail" aria-label="챕터 진행 경로">
+              {CASE_SEQUENCE.map((caseId, index) => (
+                <span key={caseId} className={caseId === currentCase ? "active" : completedCases.includes(caseId) ? "complete" : ""}>
+                  <i>{String(index + 1).padStart(2, "0")}</i>{caseId === currentCase ? "현재" : completedCases.includes(caseId) ? "완료" : "대기"}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
             <img
