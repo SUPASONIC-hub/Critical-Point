@@ -139,6 +139,7 @@ import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { createGameEvent, reduceInvestigationState } from "./state/gameEvents.js";
 import { getCharacterState, getRivalResponse } from "./characterSystems.js";
+import { getAchievementProgress, getChapterTransitionBridge, getChoiceImpact, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
 import {
   legacyProfiles,
   nextCaseSignals,
@@ -683,6 +684,13 @@ export function AppContent({ onSuppressSaves }) {
   const dynamicMusicLayers = getDynamicMusicLayers(riskTier, fallbackCaseId);
   const characterState = getCharacterState(speakerProfile?.name ?? speakerProfile?.id ?? "", log);
   const rivalResponse = getRivalResponse(fallbackCaseId, log, resources);
+  const [evidenceRepaired, setEvidenceRepaired] = useState(false);
+  const evidenceRepairPuzzle = getEvidenceRepairPuzzle(discoveredClues, evidenceRepaired);
+  const rivalIntervention = getRivalIntervention({ caseId: fallbackCaseId, log, resources });
+  const operatorReveal = getOperatorReveal({ origin: operatorOrigin, completedCases, caseResults });
+  const chapterTransitionBridge = getChapterTransitionBridge(caseSequence[caseSequence.indexOf(fallbackCaseId) - 1], fallbackCaseId, caseResults[caseSequence[caseSequence.indexOf(fallbackCaseId) - 1]]);
+  const achievementProgress = getAchievementProgress({ log, completedCases, caseResults });
+  const operationsSnapshot = getOperationsSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
   const selectedInvestigationOutcome = getInvestigationOutcome(investigationTargets.find((target) => target.id === selectedInvestigation), log.length);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
@@ -1608,6 +1616,25 @@ export function AppContent({ onSuppressSaves }) {
     setResources(nextResources);
     persist({ resources: nextResources, investigatedTargets: nextInvestigations });
     setSaveStatus(`${target.label}: 조사가 기록되었습니다.`);
+  }
+  function repairEvidence() {
+    if (!evidenceRepairPuzzle || evidenceRepaired) return;
+    const nextResources = applyEffect(resources, evidenceRepairPuzzle.reward);
+    const nextLog = [...log, { isSystemEvent: true, choiceId: "evidence-repair", caseId: fallbackCaseId, resourcesBefore: resources, resourcesAfter: nextResources }];
+    setEvidenceRepaired(true);
+    setResources(nextResources);
+    setLog(nextLog);
+    persist({ resources: nextResources, log: nextLog });
+    setSaveStatus("증거 원본이 복구되었습니다.");
+  }
+  function counterRival(option) {
+    if (!option?.effect) return;
+    const nextResources = applyEffect(resources, option.effect);
+    const nextLog = [...log, { isSystemEvent: true, choiceId: `rival-${option.id}`, caseId: fallbackCaseId, resourcesBefore: resources, resourcesAfter: nextResources }];
+    setResources(nextResources);
+    setLog(nextLog);
+    persist({ resources: nextResources, log: nextLog });
+    setSaveStatus(`${option.label}: 라이벌 개입에 대응했습니다.`);
   }
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
@@ -2585,6 +2612,7 @@ export function AppContent({ onSuppressSaves }) {
   );
   const latestChoiceFeedback = getChoiceOutcomeFeedback(log.at(-1));
   const endingPreview = getEndingPreview(endingVariant);
+  const failureRecovery = getFailureRecovery(endingVariant, resources);
   const endingCause = getFailureCause(endingVariant, resources);
   const endingAtmosphere = getEndingAtmosphere(endingVariant.id);
   const originEndingVariant = getOriginEndingVariant(operatorOrigin, endingVariant.id);
@@ -2959,6 +2987,11 @@ export function AppContent({ onSuppressSaves }) {
   resultView.rankingIntegrity = rankingIntegrity;
   resultView.replayDiagnostics = replayDiagnostics;
   resultView.playReport = playReport;
+  resultView.endingEpilogue = getEndingEpilogue(endingVariant.id);
+  resultView.failureRecovery = failureRecovery;
+  resultView.achievementProgress = achievementProgress;
+  resultView.operatorReveal = operatorReveal;
+  resultView.operationsSnapshot = operationsSnapshot;
   resultView.telemetryDashboard = telemetryDashboard;
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
@@ -2980,6 +3013,13 @@ export function AppContent({ onSuppressSaves }) {
   playView.hypothesisLockState = hypothesisLockState;
   playView.characterState = characterState;
   playView.rivalResponse = rivalResponse;
+  playView.evidenceRepairPuzzle = evidenceRepairPuzzle;
+  playView.repairEvidence = repairEvidence;
+  playView.rivalIntervention = rivalIntervention;
+  playView.counterRival = counterRival;
+  playView.chapterTransitionBridge = chapterTransitionBridge;
+  playView.operatorReveal = operatorReveal;
+  playView.achievementProgress = achievementProgress;
   playView.resourceChain = resourceChain;
   playView.midBoss = midBoss;
   playView.dynamicMusicLayers = dynamicMusicLayers;

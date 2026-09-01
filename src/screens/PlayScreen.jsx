@@ -102,6 +102,8 @@ export function PlayScreen({ view }) {
             <p>{view.pastRunMemory.text}</p>
           </section>
         )}
+        {view.chapterTransitionBridge && <section className="chapter-transition-bridge" aria-label="챕터 이동 기록"><span>{view.chapterTransitionBridge.label}</span><strong>{view.chapterTransitionBridge.title}</strong><p>{view.chapterTransitionBridge.text}</p></section>}
+        {view.operatorReveal && <section className="operator-reveal-panel" aria-label="주인공 기록 공개"><span>{view.operatorReveal.title}</span><p>{view.operatorReveal.text}</p></section>}
         {view.relationshipGraph?.length > 0 && (
           <section className="relationship-graph-panel" aria-label="인물 관계 그래프">
             <span>RELATION MAP</span>
@@ -133,6 +135,8 @@ export function PlayScreen({ view }) {
             {view.selectedInvestigationOutcome && <p>{view.selectedInvestigationOutcome.outcome}{view.selectedInvestigationOutcome.contaminated ? " 단, 이 기록에는 오염 가능성이 있습니다." : ""}</p>}
           </section>
         )}
+        {view.evidenceRepairPuzzle && <section className={`evidence-repair-panel ${view.evidenceRepairPuzzle.repaired ? "repaired" : ""}`} aria-label="증거 원본 복구"><span>{view.evidenceRepairPuzzle.title}</span><p>{view.evidenceRepairPuzzle.prompt}</p><small>{view.evidenceRepairPuzzle.source.join(" / ")}</small>{!view.evidenceRepairPuzzle.repaired && <button type="button" onClick={view.repairEvidence}>원본 복구</button>}</section>}
+        {view.rivalIntervention?.active && <section className="rival-intervention-panel" aria-label="라이벌 개입"><span>{view.rivalIntervention.title}</span><p>{view.rivalIntervention.text}</p><div>{view.rivalIntervention.options.map((option) => <button type="button" key={option.id} onClick={() => view.counterRival(option)}>{option.label}</button>)}</div></section>}
         {view.evidenceContamination && <p className="evidence-contamination" role="alert"><strong>EVIDENCE CONTAMINATION</strong> {view.evidenceContamination.text}</p>}
         {view.evidenceCombinations?.length > 0 && (
           <section className="evidence-combination-panel" aria-label="조합된 증거">

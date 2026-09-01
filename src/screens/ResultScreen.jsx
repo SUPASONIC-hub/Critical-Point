@@ -180,6 +180,11 @@ export function ResultScreen({ view }) {
               <small>{endingVariant.failure ? "자원 관리 실패가 기록되었습니다. 다음 플레이에서는 압박을 분산하십시오." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
             </section>
           )}
+          {view.endingEpilogue && <section className="ending-epilogue-panel" aria-label="엔딩 후일담"><span>AFTER THE RECORD</span><p>{view.endingEpilogue}</p></section>}
+          {view.failureRecovery && <section className="failure-recovery-panel" aria-label="실패 복구 경로"><strong>{view.failureRecovery.title}</strong><p>{view.failureRecovery.text}</p></section>}
+          {view.operatorReveal && <section className="operator-reveal-panel" aria-label="주인공 정체 공개"><span>{view.operatorReveal.title}</span><p>{view.operatorReveal.text}</p></section>}
+          {view.achievementProgress?.length > 0 && <section className="achievement-panel" aria-label="업적 진행"><span>ACHIEVEMENT TRACKER</span><div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div></section>}
+          {view.operationsSnapshot && <section className="operations-snapshot" aria-label="운영 진단"><span>OPERATIONS</span><strong>{view.operationsSnapshot.state}</strong><small>errors {view.operationsSnapshot.errorCount} / pending {view.operationsSnapshot.pendingCount} / rankings {view.operationsSnapshot.rankingCount}</small></section>}
           </section>
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
