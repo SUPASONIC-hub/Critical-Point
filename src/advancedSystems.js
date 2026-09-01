@@ -27,6 +27,9 @@ const endingScenes = {
   "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.png", cue: "다음 분석관의 출입증이 천천히 켜집니다.", choice: "답 대신 가장 위험한 질문을 인계한다" },
 };
 
+endingScenes["open-oversight"].image = "/ending-oversight-room.png";
+endingScenes.collapse.image = "/ending-system-collapse.png";
+
 export function getChapterUiModel(caseId = "case01") {
   return chapterUi[caseId] ?? chapterUi.case01;
 }
@@ -127,4 +130,20 @@ export function getHypothesisFeedback(hypothesis, discoveredClues = []) {
   return supported
     ? { tone: "confirmed", label: "HYPOTHESIS SUPPORTED", text: "다음 선택에서 이 가설을 기준으로 위험을 줄일 수 있습니다." }
     : { tone: "unstable", label: "HYPOTHESIS UNSTABLE", text: "증거가 부족합니다. 성급히 공개하면 신뢰와 시간이 함께 줄어듭니다." };
+}
+
+export function getRelationshipScene(quest = null, caseId = "case01") {
+  if (!quest?.unlocked) return null;
+  return {
+    title: `${quest.speaker} / PRIVATE CHANNEL`,
+    text: `${quest.speaker}가 공식 기록에 남기지 못했던 마지막 조건을 직접 건넵니다. 이 증언은 ${caseId}의 공개 범위를 바꿀 수 있습니다.`,
+    action: "증언을 원문 그대로 보존한다",
+  };
+}
+
+export function getPastRunMemory(memory = {}) {
+  const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
+  if (entries.length === 0) return null;
+  const [caseId, result] = entries.at(-1);
+  return { caseId, choice: result.outcomeChoiceId, label: "PAST RUN MEMORY", text: `이전 기록에서 ${caseId}의 ${result.outcomeChoiceId} 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
 }

@@ -157,6 +157,8 @@ import {
   getEndingVisualClass,
   getInterlude,
   getPlayStyleUnlocks,
+  getPastRunMemory,
+  getRelationshipScene,
   getRelationshipQuest,
   getRankingComparison,
   getSeasonGoals,
@@ -234,6 +236,7 @@ const debugToolsEnabled =
   (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
+const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
 let saveSuppressed = false;
 const replaySeed = getReplaySeedFromLocation();
 
@@ -296,6 +299,9 @@ export function AppContent({ onSuppressSaves }) {
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
+  const [newGamePlusMemory, setNewGamePlusMemory] = useState(() => {
+    try { return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {}; } catch { return {}; }
+  });
   const [endingStep, setEndingStep] = useState(0);
   const [endingTwistIndex, setEndingTwistIndex] = useState(0);
   const [endingQuietReady, setEndingQuietReady] = useState(
@@ -579,6 +585,8 @@ export function AppContent({ onSuppressSaves }) {
   const chapterUiModel = getChapterUiModel(currentCase);
   const activeRelationshipScore = relationshipScores.find((item) => item.active)?.value ?? 0;
   const relationshipQuest = getRelationshipQuest(node?.speaker, activeRelationshipScore);
+  const relationshipScene = getRelationshipScene(relationshipQuest, currentCase);
+  const pastRunMemory = getPastRunMemory(newGamePlusMemory);
   const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
   const playStyleUnlocks = getPlayStyleUnlocks(playStyle, newGamePlusUnlocked);
   const tutorialSteps = getTutorialSteps();
@@ -1474,9 +1482,16 @@ export function AppContent({ onSuppressSaves }) {
   const startGame = persistenceStartGame;
   function startNewGamePlus() {
     if (!newGamePlusUnlocked) return;
+    const memory = caseResults;
     writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+    writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(memory));
+    setNewGamePlusMemory(memory);
     setSaveStatus("NEW GAME+ 기록 모드로 시작합니다. 숨겨진 권한과 추가 단서를 추적하세요.");
     startGame();
+  }
+  function startRecoveryRoute() {
+    setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
+    startCase(currentCase);
   }
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
@@ -1810,12 +1825,24 @@ export function AppContent({ onSuppressSaves }) {
           effect: { legitimacy: 2, fatigue: -1 },
         }
       : null;
+    const choiceSearchText = `${choice.id} ${choice.label}`.toLowerCase();
+    const prematureHypothesis =
+      clueHypotheses.length > 0 &&
+      clueHypotheses.some((hypothesis) => Number(hypothesis.confidence) < 75) &&
+      /expose|public|report|disclosure|공개|폭로|보고/.test(choiceSearchText)
+      ? {
+          label: "HYPOTHESIS CHALLENGED",
+          text: "증거가 덜 모인 가설을 공개선에 올렸습니다. 다음 장면에서 신뢰와 정당성이 흔들립니다.",
+          effect: { trust: -3, legitimacy: -2, fatigue: 3 },
+        }
+      : null;
     const mergedEffect = mergeEffects(
       effect,
       ...(tempoBonus ? [tempoBonus.effect] : []),
       ...(instinctSurge ? [instinctSurge.effect] : []),
       ...(auditSurge ? [auditSurge.effect] : []),
       ...(clueReward ? [clueReward.effect] : []),
+      ...(prematureHypothesis ? [prematureHypothesis.effect] : []),
     );
     const finalEffect = applySeededEffectVariation(
       mergedEffect,
@@ -1868,6 +1895,7 @@ export function AppContent({ onSuppressSaves }) {
       instinctSurge,
       auditSurge,
       clueReward,
+      prematureHypothesis,
       streakBreak,
       suspenseEvent,
       clue,
@@ -2761,6 +2789,7 @@ export function AppContent({ onSuppressSaves }) {
     introView.tutorialSteps = tutorialSteps;
     introView.playStyleUnlocks = playStyleUnlocks;
     introView.seasonGoals = seasonGoals;
+    introView.pastRunMemory = pastRunMemory;
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   function advanceEndingStep() {
@@ -2787,6 +2816,7 @@ export function AppContent({ onSuppressSaves }) {
   resultView.rankingComparison = rankingComparison;
   resultView.seasonGoals = seasonGoals;
   resultView.balanceSignals = balanceSignals;
+  resultView.startRecoveryRoute = startRecoveryRoute;
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
@@ -2799,6 +2829,8 @@ export function AppContent({ onSuppressSaves }) {
   playView.playStyleUnlocks = playStyleUnlocks;
   playView.interlude = interlude;
   playView.balanceSignals = balanceSignals;
+  playView.relationshipScene = relationshipScene;
+  playView.pastRunMemory = pastRunMemory;
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }

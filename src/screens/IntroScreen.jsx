@@ -136,6 +136,12 @@ export function IntroScreen({ view }) {
               {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
             </section>
           )}
+          {view.pastRunMemory && (
+            <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
+              <span>{view.pastRunMemory.label}</span>
+              <p>{view.pastRunMemory.text}</p>
+            </section>
+          )}
           <div className="start-panel">
             {hasResumableSave && (
               <div className="resume-panel">

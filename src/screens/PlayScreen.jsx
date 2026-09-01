@@ -89,6 +89,19 @@ export function PlayScreen({ view }) {
             <p>{view.interlude.text}</p>
           </section>
         )}
+        {view.relationshipScene && (
+          <section className="relationship-scene-panel" aria-label="관계 전용 장면">
+            <span>{view.relationshipScene.title}</span>
+            <p>{view.relationshipScene.text}</p>
+            <strong>{view.relationshipScene.action}</strong>
+          </section>
+        )}
+        {view.pastRunMemory && (
+          <section className="past-run-memory" aria-label="이전 플레이 기록">
+            <span>{view.pastRunMemory.label}</span>
+            <p>{view.pastRunMemory.text}</p>
+          </section>
+        )}
         {view.balanceSignals?.length > 0 && (
           <p className="balance-signal" role="status">{view.balanceSignals[0].signal}: {view.balanceSignals[0].share}%의 기록이 같은 선택에 집중되어 있습니다. 다른 경로를 확인해 보세요.</p>
         )}
