@@ -84,3 +84,47 @@ export function getRankingComparison(summary = {}) {
     { label: "RHYTHM", value: Math.min(100, summary.rhythmScore ?? 0) },
   ];
 }
+
+export function getEndingVisualClass(endingId = "open-question") {
+  return `ending-visual-${String(endingId).replace(/[^a-z0-9-]/gi, "-")}`;
+}
+
+export function getInterlude(caseId = "case01", previousChoice = "") {
+  const interludes = {
+    case02: { label: "TRANSFER / 02", title: "배송망의 원본이 트리거랩으로 도착했습니다.", text: "당신은 장소를 바꾼 것이 아니라, 같은 기록을 다른 권한으로 다시 읽게 됩니다." },
+    case03: { label: "TRANSFER / 03", title: "감사 로그가 경쟁 점수판으로 변환됩니다.", text: "숫자는 달라졌지만 누가 손실을 감당했는지는 아직 같습니다." },
+    case04: { label: "TRANSFER / 04", title: "승리 기록이 정책 예외 문서로 넘어갑니다.", text: "좋은 결과가 규칙 위반을 지워주지는 않습니다." },
+    case05: { label: "TRANSFER / 05", title: "예외 문서에서 책임 공백이 발견됩니다.", text: "이제 문제는 누구를 탓할지가 아니라, 다음 실패를 막을 구조입니다." },
+    final: { label: "TRANSFER / FINAL", title: "모든 장소의 기록이 관찰자 코어에 모였습니다.", text: `당신이 남긴 ${previousChoice || "이전 선택"}이 이제 당신의 권한을 판독하는 자료가 됩니다.` },
+  };
+  return interludes[caseId] ?? null;
+}
+
+export function getSeasonGoals() {
+  return [
+    { id: "protect", label: "PROTECT SEASON", text: "인간 비용 45 이하로 시즌 완료" },
+    { id: "evidence", label: "EVIDENCE SEASON", text: "숨은 단서 5개 이상 확보" },
+    { id: "trust", label: "TRUST SEASON", text: "관계 퀘스트 3개 이상 완료" },
+  ];
+}
+
+export function getBalanceSignals(log = []) {
+  const choices = log.filter((entry) => !entry?.isSystemEvent);
+  const counts = choices.reduce((map, entry) => {
+    map[entry.choiceId] = (map[entry.choiceId] ?? 0) + 1;
+    return map;
+  }, {});
+  const total = choices.length || 1;
+  return Object.entries(counts)
+    .filter(([, count]) => count / total >= 0.6)
+    .map(([choiceId, count]) => ({ choiceId, share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
+}
+
+export function getHypothesisFeedback(hypothesis, discoveredClues = []) {
+  if (!hypothesis) return null;
+  const confidence = Number(hypothesis.confidence) || 0;
+  const supported = discoveredClues.length >= (confidence >= 80 ? 4 : 2);
+  return supported
+    ? { tone: "confirmed", label: "HYPOTHESIS SUPPORTED", text: "다음 선택에서 이 가설을 기준으로 위험을 줄일 수 있습니다." }
+    : { tone: "unstable", label: "HYPOTHESIS UNSTABLE", text: "증거가 부족합니다. 성급히 공개하면 신뢰와 시간이 함께 줄어듭니다." };
+}

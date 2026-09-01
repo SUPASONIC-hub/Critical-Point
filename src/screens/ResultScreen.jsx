@@ -97,7 +97,7 @@ export function ResultScreen({ view }) {
           {screenReaderStatus}
         </p>
         {currentCase === "final" && (
-          <section className={`ending-sequence ending-step-${endingStep}`} aria-label="최종 엔딩 시퀀스">
+            <section className={`ending-sequence ending-step-${endingStep} ${view.endingVisualClass ?? ""}`} aria-label="최종 엔딩 시퀀스">
             <img className="ending-visual" src="/ending-final-archive.png" alt="" aria-hidden="true" />
             <div className="ending-visual-scrim" aria-hidden="true" />
             <h1 className="sr-only">Season complete</h1>
@@ -301,6 +301,18 @@ export function ResultScreen({ view }) {
             <section className="ranking-comparison" aria-label="기록 비교">
               <span>RUN COMPARISON</span>
               {view.rankingComparison.map((item) => <div key={item.label}><b>{item.label}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.value}</small></div>)}
+            </section>
+          )}
+          {view.seasonGoals && (
+            <section className="season-goal-strip result-goals" aria-label="시즌 목표">
+              <span>SEASON GOALS</span>
+              {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
+            </section>
+          )}
+          {view.balanceSignals?.length > 0 && (
+            <section className="balance-report" aria-label="플레이 밸런스 리포트">
+              <span>BALANCE SIGNAL</span>
+              <p>{view.balanceSignals.map((signal) => `${signal.choiceId} ${signal.share}%`).join(" · ")} 선택 편중이 감지되었습니다. 다음 기록에서 다른 선택을 시험해 보세요.</p>
             </section>
           )}
           <section className="ending-axis-panel" aria-label="엔딩 결정 축">

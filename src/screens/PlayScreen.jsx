@@ -82,6 +82,16 @@ export function PlayScreen({ view }) {
             <p>{view.delayedConsequences.at(-1).text}</p>
           </section>
         )}
+        {view.interlude && openingLegacy && (
+          <section className="interlude-panel" aria-label="챕터 전환 장면">
+            <span>{view.interlude.label}</span>
+            <strong>{view.interlude.title}</strong>
+            <p>{view.interlude.text}</p>
+          </section>
+        )}
+        {view.balanceSignals?.length > 0 && (
+          <p className="balance-signal" role="status">{view.balanceSignals[0].signal}: {view.balanceSignals[0].share}%의 기록이 같은 선택에 집중되어 있습니다. 다른 경로를 확인해 보세요.</p>
+        )}
         <section className="mission-strip">
           <div>
             <span>현재 목표</span>

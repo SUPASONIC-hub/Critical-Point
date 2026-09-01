@@ -150,12 +150,16 @@ import {
 } from "./appContent.js";
 import {
   getChapterUiModel,
+  getBalanceSignals,
   getDelayedConsequences,
   getEndingSceneProfile,
   getFailureObjectives,
+  getEndingVisualClass,
+  getInterlude,
   getPlayStyleUnlocks,
   getRelationshipQuest,
   getRankingComparison,
+  getSeasonGoals,
   getTutorialSteps,
 } from "./advancedSystems.js";
 
@@ -578,6 +582,9 @@ export function AppContent({ onSuppressSaves }) {
   const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
   const playStyleUnlocks = getPlayStyleUnlocks(playStyle, newGamePlusUnlocked);
   const tutorialSteps = getTutorialSteps();
+  const seasonGoals = getSeasonGoals();
+  const interlude = getInterlude(currentCase, log.at(-1)?.choice);
+  const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
   const authorityState = useMemo(() => {
     const evidence = discoveredClues.length;
     const trust = resources.trust ?? 0;
@@ -2753,6 +2760,7 @@ export function AppContent({ onSuppressSaves }) {
     introView.newGamePlusUnlocked = newGamePlusUnlocked;
     introView.tutorialSteps = tutorialSteps;
     introView.playStyleUnlocks = playStyleUnlocks;
+    introView.seasonGoals = seasonGoals;
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   function advanceEndingStep() {
@@ -2773,9 +2781,12 @@ export function AppContent({ onSuppressSaves }) {
   const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines };
   resultView.chapterUiModel = chapterUiModel;
   resultView.endingSceneProfile = getEndingSceneProfile(endingVariant.id);
+  resultView.endingVisualClass = getEndingVisualClass(endingVariant.id);
   resultView.failureObjectives = getFailureObjectives(endingVariant);
   resultView.delayedConsequences = delayedConsequences;
   resultView.rankingComparison = rankingComparison;
+  resultView.seasonGoals = seasonGoals;
+  resultView.balanceSignals = balanceSignals;
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
@@ -2786,6 +2797,8 @@ export function AppContent({ onSuppressSaves }) {
   playView.relationshipQuest = relationshipQuest;
   playView.delayedConsequences = delayedConsequences;
   playView.playStyleUnlocks = playStyleUnlocks;
+  playView.interlude = interlude;
+  playView.balanceSignals = balanceSignals;
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }

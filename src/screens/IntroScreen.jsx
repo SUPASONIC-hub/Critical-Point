@@ -130,6 +130,12 @@ export function IntroScreen({ view }) {
           {view.playStyleUnlocks && (
             <p className="play-style-unlock"><strong>{view.playStyleUnlocks.label}</strong> · {view.playStyleUnlocks.unlock} · {view.playStyleUnlocks.newGamePlus}</p>
           )}
+          {view.seasonGoals && (
+            <section className="season-goal-strip" aria-label="시즌 목표">
+              <span>SEASON GOALS</span>
+              {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
+            </section>
+          )}
           <div className="start-panel">
             {hasResumableSave && (
               <div className="resume-panel">
