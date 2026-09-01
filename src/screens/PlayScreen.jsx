@@ -13,6 +13,7 @@ export function PlayScreen({ view }) {
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
+  const relationshipScores = view.relationshipScores ?? [];
   const latestObserverTag = log.at(-1)?.observerTag;
   const observerArc = observerPattern?.arc;
   const getObserverPreviewForChoice = (choiceId) =>
@@ -35,6 +36,14 @@ export function PlayScreen({ view }) {
     if (gains.length > 0) return `${gains[0]}은 열리지만, 관찰자는 그 이유를 기록합니다.`;
     if (costs.length > 0) return `${costs[0]}을 먼저 소모해 다음 장면의 문을 엽니다.`;
     return "숫자는 조용하지만, 이 말은 판단 순서를 남깁니다.";
+  };
+  const getAuthorityImpact = (choice) => {
+    const choiceText = `${choice.id} ${choice.label}`;
+    if (/protect|people|witness|person|사람|보호|증언/.test(choiceText)) return "권한 영향: 보호 절차를 열고 현장의 발언권을 넓힙니다.";
+    if (/expose|public|report|disclosure|공개|폭로|보고/.test(choiceText)) return "권한 영향: 기록의 공개 범위를 넓히지만 조직의 반발을 부릅니다.";
+    if (/isolate|stop|seal|destroy|차단|중단|폐기|잠금/.test(choiceText)) return "권한 영향: 접근을 줄여 피해를 막지만, 확인되지 않은 목소리도 닫힙니다.";
+    if (/system|redesign|reform|구조|개편|재설계/.test(choiceText)) return "권한 영향: 당장의 결론보다 다음 운영 기준에 개입합니다.";
+    return "권한 영향: 이 선택의 흔적이 다음 챕터의 조사 기준으로 남습니다.";
   };
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
@@ -294,6 +303,18 @@ export function PlayScreen({ view }) {
                 {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
               </button>
             </div>
+            <div className="relationship-strip" aria-label="등장인물 관계 온도">
+              <span>RELATIONSHIP HEAT</span>
+              <div>
+                {relationshipScores.map((relationship) => (
+                  <article key={relationship.name} className={relationship.active ? "active" : ""}>
+                    <b>{relationship.name}</b>
+                    <i><em style={{ width: `${relationship.value}%` }} /></i>
+                    <small>{relationship.active ? "현재 대화 상대" : relationship.value > 0 ? "관찰 중" : "아직 연결 전"}</small>
+                  </article>
+                ))}
+              </div>
+            </div>
           </section>
         )}
 
@@ -537,6 +558,7 @@ export function PlayScreen({ view }) {
                       ))}
                   </span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
+                  <span className="choice-authority-impact">{getAuthorityImpact(choice)}</span>
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
                   {showTacticalDetails && (

@@ -46,6 +46,11 @@ export function ResultScreen({ view }) {
     },
   ];
   const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
+  const endingAxes = [
+    { label: "PROTECT", value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)), text: "사람과 현장의 피해를 얼마나 줄였는가" },
+    { label: "EXPOSE", value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.freeCount ?? 0) * 8)), text: "구조와 숨은 비용을 얼마나 드러냈는가" },
+    { label: "HANDOFF", value: Math.min(100, Math.round((result.cognitionScore ?? 0) * 0.7 + (observerPattern?.turningPoint ? 24 : 0))), text: "다음 참가자에게 선택지를 얼마나 남겼는가" },
+  ];
   const witnessRecords = [
     firstRouteEntry && { id: "first", label: "처음 남긴 말", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
@@ -265,6 +270,21 @@ export function ResultScreen({ view }) {
               </div>
             </section>
           )}
+          <section className="ending-axis-panel" aria-label="엔딩 결정 축">
+            <div className="panel-title-row">
+              <h2>ENDING AXIS</h2>
+              <span>이번 선택이 남긴 세 가지 방향</span>
+            </div>
+            <div className="ending-axis-grid">
+              {endingAxes.map((axis) => (
+                <article key={axis.label}>
+                  <div><span>{axis.label}</span><b>{axis.value}</b></div>
+                  <i><em style={{ width: `${axis.value}%` }} /></i>
+                  <p>{axis.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
           <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
             <div className="rank-mark">
               <span>CASE RANK</span>
