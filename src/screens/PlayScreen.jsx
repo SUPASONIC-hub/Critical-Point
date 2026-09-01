@@ -7,9 +7,10 @@ import { StatusBoard } from "../components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
 import { CASE_SEQUENCE } from "../gameData.js";
+import { getAuthorityGate } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
-  const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
+  const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, clueHypotheses = [], discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
@@ -99,6 +100,18 @@ export function PlayScreen({ view }) {
                 </small>
               ))}
             </div>
+            {clueHypotheses.length > 0 && (
+              <div className="hypothesis-board" aria-label="가설 보드">
+                <div><span>WORKING HYPOTHESES</span><b>{clueHypotheses.length}개 가설 조합</b></div>
+                {clueHypotheses.map((hypothesis) => (
+                  <article key={hypothesis.id}>
+                    <strong>{hypothesis.title}</strong>
+                    <p>{hypothesis.text}</p>
+                    <small>CONFIDENCE {hypothesis.confidence}%</small>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
         )}
         {operatorBrief && (
@@ -505,6 +518,7 @@ export function PlayScreen({ view }) {
           )}
           <div className="choices">
             {fixedChoices.map((choice, choiceIndex) => {
+              const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
               const observerPreview = getObserverPreviewForChoice(choice.id);
               const projectedRisk = getRiskPressure(choiceRead.finalResources);
@@ -545,7 +559,7 @@ export function PlayScreen({ view }) {
                       choose(choice);
                     }
                   }}
-                  disabled={isAdvancing}
+                  disabled={isAdvancing || !authorityGate.unlocked}
                   aria-pressed={pendingChoice?.id === choice.id}
                   aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
                   title={`${choiceIndex + 1}번 키로 선택 미리보기`}
@@ -577,6 +591,7 @@ export function PlayScreen({ view }) {
                   </span>
                   <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
                   <span className="choice-authority-impact">{getAuthorityImpact(choice)}</span>
+                  {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
                   {showTacticalDetails && (

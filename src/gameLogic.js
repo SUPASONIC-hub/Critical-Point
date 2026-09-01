@@ -602,6 +602,46 @@ export function getAllDiscoveryClueIds() {
   })?.id).filter(Boolean);
 }
 
+// These systems are derived from the run log, so old saves gain the new
+// mechanics without a migration or a reset.
+export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0 } = {}) {
+  const required = choice.requiredAuthority;
+  if (!required) return { unlocked: true, required: "", reason: "" };
+  const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
+  const current = clueCount >= 5 && legitimacy >= 55 ? "OVERSIGHT" : clueCount >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
+  const unlocked = (levels[current] ?? 0) >= (levels[required] ?? 99);
+  return {
+    unlocked,
+    required,
+    current,
+    reason: unlocked ? "권한이 확인되었습니다." : `${required} 권한과 단서가 더 필요합니다.`,
+  };
+}
+
+export function getClueHypotheses(clues = []) {
+  const ids = new Set(clues.map((clue) => clue?.id));
+  const hypotheses = [];
+  if (ids.has("c1-hidden-ledger") && ids.has("c2-false-timestamp")) {
+    hypotheses.push({ id: "ledger-timestamp", title: "기록은 사후에 만들어졌다", text: "누락된 비용과 어긋난 시각이 같은 조작 흐름을 가리킵니다.", confidence: 72 });
+  }
+  if (ids.has("c3-second-scoreboard") && ids.has("c4-exception-file")) {
+    hypotheses.push({ id: "score-exception", title: "예외는 성과 측정의 일부였다", text: "경쟁 점수와 예외 승인 기록이 같은 운영 규칙을 공유합니다.", confidence: 68 });
+  }
+  if (ids.has("c5-empty-seat") && ids.has("final-observer-key")) {
+    hypotheses.push({ id: "observer-operator", title: "관찰자는 외부인이 아니었다", text: "비어 있는 책임 자리와 관찰자 키가 주인공의 이전 기록을 연결합니다.", confidence: 84 });
+  }
+  return hypotheses;
+}
+
+export function getEndingVariant({ resources = {}, discoveredClues = [], log = [] } = {}) {
+  const pressure = getRiskPressure(resources);
+  const humanCost = resources.humanCost ?? 0;
+  if (pressure >= 82 || humanCost >= 70) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
+  if (discoveredClues.length >= 5 && (resources.legitimacy ?? 0) >= 55) return { id: "oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
+  if (log.filter((entry) => entry?.freeTextSuccess).length >= 2) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신의 문장이 다음 참가자의 첫 단서가 됩니다.", failure: false };
+  return { id: "open-question", label: "OPEN QUESTION", title: "결론보다 오래 남는 질문을 넘겼다.", text: "닫히지 않은 기록이 다음 플레이에서 다른 권한으로 열립니다.", failure: false };
+}
+
 export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
   const outcomes = {
     case01: {

@@ -59,7 +59,10 @@ import {
   getDecisionFingerprint,
   getDecisionLedger,
   getAllDiscoveryClueIds,
+  getClueHypotheses,
   getDiscoveryClue,
+  getAuthorityGate,
+  getEndingVariant,
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
@@ -454,11 +457,28 @@ export function AppContent({ onSuppressSaves }) {
         next: node?.choices?.[0]?.next ?? "result",
         cognition: { reframing: 2, persistence: 1 },
         adaptive: true,
+        requiredAuthority: "FIELD ACCESS",
+      }
+    : null;
+  const speakerRelationship = log.reduce(
+    (score, entry) => score + (entry.speaker === node?.speaker ? 8 : entry.speaker ? -1 : 0),
+    0,
+  );
+  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
+    ? {
+        id: `${fallbackCaseId}_relationship_bridge`,
+        label: "관계의 증언을 먼저 확보한다",
+        effect: { trust: 5, legitimacy: 2, fatigue: 2 },
+        next: node.choices[0].next,
+        cognition: { inference: 1, reframing: 1 },
+        branchId: "relationship-bridge",
+        requiredAuthority: "FIELD ACCESS",
       }
     : null;
   const fixedChoices = [
     ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
     ...(adaptiveChoice ? [adaptiveChoice] : []),
+    ...(relationshipChoice ? [relationshipChoice] : []),
   ];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
   const latestFreeTextSuccess = [...log].reverse().find(
@@ -551,6 +571,7 @@ export function AppContent({ onSuppressSaves }) {
     };
   }, [discoveredClues.length, resources.legitimacy, resources.trust]);
   const clueCount = discoveredClues.length;
+  const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
@@ -1681,6 +1702,11 @@ export function AppContent({ onSuppressSaves }) {
 
   function choose(choice) {
     if (isAdvancing) return;
+    const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
+    if (!authorityGate.unlocked) {
+      setSaveStatus(`Choice locked: ${authorityGate.reason}`);
+      return;
+    }
     if (!nodes[choice.next] && !Object.values(CASE_RESULT_NODES).includes(choice.next)) {
       reportSilentFailure("bad-next", { from: resolvedNodeId, choiceId: choice.id, next: choice.next });
       return;
@@ -1844,6 +1870,7 @@ export function AppContent({ onSuppressSaves }) {
     const caseSummary = completedNow
       ? {
           ...buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo),
+          endingVariant: getEndingVariant({ resources: finalResourcesWithTempo, discoveredClues: nextDiscoveredClues, log: nextLog }),
           runId,
           outcomeChoiceId: entry.choiceId,
           outcomeNodeId: entry.nodeId,
@@ -2364,6 +2391,10 @@ export function AppContent({ onSuppressSaves }) {
       includeLongestDecision: true,
     });
   }, [triggers, cognition, log, resources]);
+  const endingVariant = useMemo(
+    () => getEndingVariant({ resources, discoveredClues, log }),
+    [discoveredClues, log, resources],
+  );
   const routeTimeline = useMemo(
     () => log
       .filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent)
@@ -2704,12 +2735,13 @@ export function AppContent({ onSuppressSaves }) {
     setEndingStep(3);
   }
 
-  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines };
+  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines };
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
 
   const playView = { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace };
+  playView.clueHypotheses = clueHypotheses;
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }
