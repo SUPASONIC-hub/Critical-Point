@@ -123,6 +123,8 @@ export function PlayScreen({ view }) {
         {view.hypothesisConflict && <p className="hypothesis-conflict" role="alert"><strong>{view.hypothesisConflict.title}</strong> {view.hypothesisConflict.text}</p>}
         {view.resourceChain && <p className={`resource-chain-signal ${view.resourceChain.tone}`} role="status"><strong>RESOURCE CHAIN</strong> {view.resourceChain.text}</p>}
         {view.characterMemory && <p className="character-memory" role="status"><strong>MEMORY TRACE</strong> {view.characterMemory.text}</p>}
+        {view.characterState && <p className="character-state-signal" role="status"><strong>CHARACTER STATE</strong> {view.characterState.speaker}: {view.characterState.stance} / TRUST {view.characterState.trust} / PRESSURE {view.characterState.pressure}</p>}
+        {view.rivalResponse && <p className="rival-response-signal" role="status">{view.rivalResponse.response}</p>}
         {view.midBoss && <section className="mid-boss-panel" aria-label="챕터 반박 장면"><span>{view.midBoss.title}</span><p>{view.midBoss.text}</p></section>}
         {view.investigationTargets?.length > 0 && (
           <section className="investigation-panel" aria-label="조사 대상 선택">
@@ -144,6 +146,7 @@ export function PlayScreen({ view }) {
             <div>{view.hypothesisActions.map((action) => <button type="button" key={action.id} onClick={() => view.resolveHypothesisAction(action)}><b>{action.label}</b><small>{action.text}</small></button>)}</div>
           </section>
         )}
+        {view.hypothesisLockState && <p className="hypothesis-lock-signal" role="status"><strong>{view.hypothesisLockState.label}</strong> {view.hypothesisLockState.text}</p>}
         {view.balanceSignals?.length > 0 && (
           <p className="balance-signal" role="status">{view.balanceSignals[0].signal}: {view.balanceSignals[0].share}%의 기록이 같은 선택에 집중되어 있습니다. 다른 경로를 확인해 보세요.</p>
         )}

@@ -35,6 +35,8 @@ export const SAVE_STATE_KEYS = [
   "protocolUsed",
   "timerPenaltyApplied",
   "probeUsed",
+  "investigatedTargets",
+  "hypothesisDecisions",
   "paused",
   "savedAt",
 ];

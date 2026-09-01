@@ -74,6 +74,8 @@ import {
 } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
+import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity } from "../src/advancedSystems.js";
+import { createGameEvent, reduceInvestigationState } from "../src/state/gameEvents.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
 assert.equal(ERROR_LOG_STORAGE_KEY, "trigger-prototype-error-log-v1", "error logs should use a separate storage namespace");
@@ -82,6 +84,14 @@ assert.equal(RECOVERY_SLOT_SCHEMA_VERSION, 1, "recovery slots should keep their 
 assert.equal(ERROR_LOG_MAX_ITEMS, 20, "local error logs should be bounded");
 assert.equal(SAVE_SLOT_STORAGE_KEY, "trigger-prototype-save-slots-v1", "save recovery slots should use a separate namespace");
 assert.equal(SAVE_SLOT_MAX_ITEMS, 5, "save recovery slots should keep a bounded history");
+assert.deepEqual(
+  reduceInvestigationState({}, createGameEvent("INVESTIGATE", { id: "target-1", result: "found" }))["target-1"].status,
+  "investigated",
+  "investigation events should reduce into persisted state",
+);
+assert.equal(getInvestigationOutcome({ id: "target-1", label: "Archive" }, 2).id, "target-1", "investigation outcome should preserve target identity");
+assert.equal(getDynamicMusicLayers("CRITICAL", "final").bass, "deep-impact", "critical final scenes should use impact music layers");
+assert.equal(getRankingIntegrity({ runId: "run-1", completedAt: "2026-01-01", summary: { rank: "S", burstScore: 88 } }).valid, true, "valid rankings should pass integrity checks");
 assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
 assert.deepEqual(
   SAVE_STATE_KEYS,
@@ -110,6 +120,8 @@ assert.deepEqual(
     "protocolUsed",
     "timerPenaltyApplied",
     "probeUsed",
+    "investigatedTargets",
+    "hypothesisDecisions",
     "paused",
     "savedAt",
   ],

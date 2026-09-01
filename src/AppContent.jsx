@@ -137,6 +137,8 @@ import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
+import { createGameEvent, reduceInvestigationState } from "./state/gameEvents.js";
+import { getCharacterState, getRivalResponse } from "./characterSystems.js";
 import {
   legacyProfiles,
   nextCaseSignals,
@@ -320,6 +322,7 @@ export function AppContent({ onSuppressSaves }) {
     freeText, setFreeText, lastSavedAt, setLastSavedAt, isPausedSave, setIsPausedSave,
     pendingTelemetry, setPendingTelemetry, protocolUsed, setProtocolUsed,
     timerPenaltyApplied, setTimerPenaltyApplied, probeUsed, setProbeUsed,
+    investigatedTargets, setInvestigatedTargets, hypothesisDecisions, setHypothesisDecisions,
   } = useGameSaveState({
     saved,
     initialRunId,
@@ -424,9 +427,10 @@ export function AppContent({ onSuppressSaves }) {
     runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
     discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
     freeText, echo, nodeEnteredAt, pendingTelemetryRef, protocolUsed, timerPenaltyApplied, probeUsed,
+    investigatedTargets, hypothesisDecisions,
     isPausedSave, setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
     setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
-    setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setOpeningLegacy,
+    setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setInvestigatedTargets, setHypothesisDecisions, setOpeningLegacy,
     setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setFreeText, setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries,
     setSaveSlots, saveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
@@ -664,6 +668,8 @@ export function AppContent({ onSuppressSaves }) {
   const resourceChain = getResourceChain(resources);
   const midBoss = getMidBoss(fallbackCaseId, log);
   const dynamicMusicLayers = getDynamicMusicLayers(riskTier, fallbackCaseId);
+  const characterState = getCharacterState(speakerProfile?.name ?? speakerProfile?.id ?? "", log);
+  const rivalResponse = getRivalResponse(fallbackCaseId, log, resources);
   const selectedInvestigationOutcome = getInvestigationOutcome(investigationTargets.find((target) => target.id === selectedInvestigation), log.length);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
@@ -859,7 +865,7 @@ export function AppContent({ onSuppressSaves }) {
     : null;
 
   const formatForecastRisk = (forecast) => {
-    if (!forecast) return "?��?";
+    if (!forecast) return "NO FORECAST";
     if (forecast.forecastPrecision === "precise") return formatRiskDelta(forecast.riskDelta);
     return `${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`;
   };
@@ -1565,10 +1571,14 @@ export function AppContent({ onSuppressSaves }) {
       resourcesBefore: resources,
       resourcesAfter: nextResources,
     };
-    const nextLog = [...log, entry];
+    const event = createGameEvent("HYPOTHESIS_ACTION", { id: action.id, action: action.id });
+    const nextDecisions = reduceInvestigationState(hypothesisDecisions, event);
+    const nextLog = [...log, { ...entry, event }];
+    setHypothesisAction(action.id);
+    setHypothesisDecisions(nextDecisions);
     setResources(nextResources);
     setLog(nextLog);
-    persist({ resources: nextResources, log: nextLog });
+    persist({ resources: nextResources, log: nextLog, hypothesisDecisions: nextDecisions });
     setSaveStatus(`${action.label}: ${action.text}`);
   }
   function investigateTarget(target) {
@@ -1576,10 +1586,14 @@ export function AppContent({ onSuppressSaves }) {
       setSaveStatus("현재 권한으로는 이 조사 대상을 열 수 없습니다.");
       return;
     }
+    const outcome = getInvestigationOutcome(target, log.length);
+    const event = createGameEvent("INVESTIGATE", { id: target.id, result: outcome?.outcome });
+    const nextInvestigations = reduceInvestigationState(investigatedTargets, event);
     setSelectedInvestigation(target.id);
+    setInvestigatedTargets(nextInvestigations);
     const nextResources = applyEffect(resources, target.effect);
     setResources(nextResources);
-    persist({ resources: nextResources });
+    persist({ resources: nextResources, investigatedTargets: nextInvestigations });
     setSaveStatus(`${target.label}: 조사가 기록되었습니다.`);
   }
   const resumeSavedGame = persistenceResumeSavedGame;
@@ -1657,6 +1671,8 @@ export function AppContent({ onSuppressSaves }) {
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
+    setInvestigatedTargets({});
+    setHypothesisDecisions({});
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
     setEndingStep(0);
@@ -2287,6 +2303,8 @@ export function AppContent({ onSuppressSaves }) {
     setProtocolUsed(false);
     setTimerPenaltyApplied(false);
     setProbeUsed(false);
+    setInvestigatedTargets({});
+    setHypothesisDecisions({});
     setDecisionReveal(null);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
@@ -2947,6 +2965,8 @@ export function AppContent({ onSuppressSaves }) {
   playView.selectedInvestigationOutcome = selectedInvestigationOutcome;
   playView.evidenceContamination = evidenceContamination;
   playView.hypothesisLockState = hypothesisLockState;
+  playView.characterState = characterState;
+  playView.rivalResponse = rivalResponse;
   playView.resourceChain = resourceChain;
   playView.midBoss = midBoss;
   playView.dynamicMusicLayers = dynamicMusicLayers;

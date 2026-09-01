@@ -24,6 +24,8 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
   const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
   const [timerPenaltyApplied, setTimerPenaltyApplied] = useState(saved?.timerPenaltyApplied ?? false);
   const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
+  const [investigatedTargets, setInvestigatedTargets] = useState(saved?.investigatedTargets ?? {});
+  const [hypothesisDecisions, setHypothesisDecisions] = useState(saved?.hypothesisDecisions ?? {});
 
   return {
     runId, setRunId,
@@ -49,5 +51,7 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
     protocolUsed, setProtocolUsed,
     timerPenaltyApplied, setTimerPenaltyApplied,
     probeUsed, setProbeUsed,
+    investigatedTargets, setInvestigatedTargets,
+    hypothesisDecisions, setHypothesisDecisions,
   };
 }

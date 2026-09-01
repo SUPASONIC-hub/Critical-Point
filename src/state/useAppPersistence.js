@@ -47,6 +47,8 @@ export function useAppPersistence({
   protocolUsed,
   timerPenaltyApplied,
   probeUsed,
+  investigatedTargets,
+  hypothesisDecisions,
   isPausedSave,
   setRunId,
   setPlayerName,
@@ -64,6 +66,8 @@ export function useAppPersistence({
   setProtocolUsed,
   setTimerPenaltyApplied,
   setProbeUsed,
+  setInvestigatedTargets,
+  setHypothesisDecisions,
   setOpeningLegacy,
   setDecisionReveal,
   setPendingChoice,
@@ -117,6 +121,8 @@ export function useAppPersistence({
       protocolUsed,
       timerPenaltyApplied,
       probeUsed,
+      investigatedTargets,
+      hypothesisDecisions,
       paused: isPausedSave,
       savedAt: new Date().toISOString(),
     };
@@ -147,11 +153,12 @@ export function useAppPersistence({
     setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase("case01");
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
     setResources(initialResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
-    setProtocolUsed(false); setTimerPenaltyApplied(false); setProbeUsed(false); setOpeningLegacy(null);
+    setProtocolUsed(false); setTimerPenaltyApplied(false); setProbeUsed(false);
+    setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
     setDecisionReveal(null); setPendingChoice(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setFreeText(""); setNodeId("start"); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyApplied: false, probeUsed: false, paused: false, lastError: null });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyApplied: false, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, paused: false, lastError: null });
   }
 
   function resumeSavedGame() {
