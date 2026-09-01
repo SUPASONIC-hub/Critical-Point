@@ -25,6 +25,17 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
+async function createTelemetryError(response, fallbackMessage) {
+  let detail = "";
+  try {
+    detail = (await response.text()).slice(0, 500);
+  } catch {
+    detail = "";
+  }
+  const suffix = detail ? `: ${detail}` : "";
+  return new Error(`${fallbackMessage}: ${response.status}${suffix}`);
+}
+
 export function getSessionId() {
   const key = "critical-point-session-id";
   const existing = readStoredValue(key);
@@ -56,7 +67,7 @@ export async function saveCaseTelemetry(payload) {
   });
 
   if (!response.ok) {
-    throw new Error(`Telemetry save failed: ${response.status}`);
+    throw await createTelemetryError(response, "Telemetry save failed");
   }
 
   return { saved: true };
@@ -77,7 +88,7 @@ export async function saveFeedbackTelemetry(payload) {
   });
 
   if (!response.ok) {
-    throw new Error(`Feedback save failed: ${response.status}`);
+    throw await createTelemetryError(response, "Feedback save failed");
   }
 
   return { saved: true };
@@ -98,7 +109,7 @@ export async function saveErrorTelemetry(payload) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error log save failed: ${response.status}`);
+    throw await createTelemetryError(response, "Error log save failed");
   }
 
   return { saved: true };
@@ -107,12 +118,12 @@ export async function saveErrorTelemetry(payload) {
 async function checkTelemetryTable(tableName) {
   if (!telemetryEnabled) return { table: tableName, ok: false, skipped: true };
 
-  const readTableName = tableName === "playtest_sessions" ? "public_rankings" : tableName;
-
-  const query = new URLSearchParams({
-    select: "*",
-    limit: "1",
-  });
+  const readTableName = tableName === "playtest_sessions" ? "public_rankings" : "telemetry_health";
+  const query = new URLSearchParams(
+    tableName === "playtest_sessions"
+      ? { select: "*", limit: "1" }
+      : { select: "table_name", table_name: `eq.${tableName}`, limit: "1" },
+  );
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${readTableName}?${query.toString()}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -125,6 +136,7 @@ async function checkTelemetryTable(tableName) {
     endpoint: readTableName,
     ok: response.ok,
     status: response.status,
+    message: response.ok ? "" : (await response.text()).slice(0, 240),
   };
 }
 

@@ -166,6 +166,17 @@ function parseLocalRankingRows(rawValue) {
   }
 }
 
+function appendLocalRankingRow(row) {
+  const nextRows = [
+    ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
+    row,
+  ].slice(-100);
+  return {
+    rows: nextRows,
+    saved: writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextRows)),
+  };
+}
+
 let consoleErrorHookBusy = false;
 
 function safeStringify(value) {
@@ -1800,12 +1811,12 @@ export function AppContent({ onSuppressSaves }) {
         completed_at: caseSummary.completedAt,
         summary: caseSummary,
       };
-      const nextLocalRankingRows = [
-        ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
-        localRankingRow,
-      ].slice(-100);
+      const { rows: nextLocalRankingRows, saved: localRankingSaved } = appendLocalRankingRow(localRankingRow);
       setLocalRankingRows(nextLocalRankingRows);
-      writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextLocalRankingRows));
+      if (!localRankingSaved) {
+        setSaveStatus("Local ranking save failed: browser storage is unavailable.");
+        recordAppError(new Error("Local ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
+      }
     }
 
     if (completedNow && caseSummary) {
@@ -1883,12 +1894,12 @@ export function AppContent({ onSuppressSaves }) {
         completed_at: caseSummary.completedAt,
         summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
       };
-      const nextLocalRankingRows = [
-        ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
-        seasonLocalRankingRow,
-      ].slice(-100);
+      const { rows: nextLocalRankingRows, saved: seasonRankingSaved } = appendLocalRankingRow(seasonLocalRankingRow);
       setLocalRankingRows(nextLocalRankingRows);
-      writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextLocalRankingRows));
+      if (!seasonRankingSaved) {
+        setSaveStatus("Season ranking save failed: browser storage is unavailable.");
+        recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
+      }
       if (telemetryEnabled && dataConsent) {
         saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
           queueTelemetry({
@@ -2003,6 +2014,7 @@ export function AppContent({ onSuppressSaves }) {
       [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
       [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
       [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
+      [LOCAL_RANKING_STORAGE_KEY, removeStoredValue(LOCAL_RANKING_STORAGE_KEY)],
     ];
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     const failedResetKeys = resetStorageResults.filter(([, removed]) => !removed).map(([key]) => key);
@@ -2018,6 +2030,7 @@ export function AppContent({ onSuppressSaves }) {
     setPlaytestFeedback({});
     pendingTelemetryRef.current = [];
     setPendingTelemetry([]);
+    setLocalRankingRows([]);
     setLocalErrorEntries([]);
     setSaveSlots([]);
     setLastRecoveredError(null);
@@ -2075,10 +2088,12 @@ export function AppContent({ onSuppressSaves }) {
       [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
       [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
       [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
+      [LOCAL_RANKING_STORAGE_KEY, removeStoredValue(LOCAL_RANKING_STORAGE_KEY)],
     ];
     const failedKeys = cleanupResults.filter(([, removed]) => !removed).map(([key]) => key);
     if (failedKeys.length === 0) {
       setLocalErrorEntries([]);
+      setLocalRankingRows([]);
       setSaveSlots([]);
       setLastRecoveredError(null);
       setSaveStatus("브라우저 저장소 정리를 완료했습니다.");
