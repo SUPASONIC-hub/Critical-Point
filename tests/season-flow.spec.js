@@ -4,17 +4,34 @@ import { nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 
 async function chooseFirstFixedChoice(page) {
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible().catch(() => false)) {
+    await decisionNext.evaluate((button) => button.click());
+    return;
+  }
   await page.waitForFunction(
-    () => Boolean(document.querySelector(".result-page") || document.querySelector(".choices .choice")),
+    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice")),
     undefined,
     { timeout: 15_000 },
   );
-  if (await page.locator(".result-page").isVisible().catch(() => false)) return;
-  const firstChoice = page.locator(".choices .choice").first();
-  await firstChoice.evaluate((button) => button.click());
-  const commitButton = page.getByRole("button", { name: /이 선택을 기록한다/ });
-  if (await commitButton.isVisible().catch(() => false)) {
-    await commitButton.evaluate((button) => button.click());
+  const domAction = await page.evaluate(() => {
+    const decisionNext = document.querySelector("[data-testid='decision-next']");
+    if (decisionNext instanceof HTMLButtonElement) {
+      decisionNext.click();
+      return "advanced";
+    }
+    if (document.querySelector(".result-page")) return "result";
+    const firstChoice = document.querySelector(".choices .choice");
+    if (firstChoice instanceof HTMLButtonElement) {
+      firstChoice.click();
+      return "choice";
+    }
+    return "none";
+  });
+  if (domAction !== "choice") return;
+  const domCommitButton = page.getByTestId("commit-confirm");
+  if (await domCommitButton.isVisible().catch(() => false)) {
+    await domCommitButton.evaluate((button) => button.click());
   }
   await page.waitForFunction(
     () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice") || document.querySelector(".result-page")),

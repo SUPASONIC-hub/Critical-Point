@@ -162,7 +162,7 @@ export async function fetchLeaderboard(limit = 100) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
   const query = new URLSearchParams({
-    select: "session_code,player_name,case_id,case_title,completed_at,summary",
+    select: "run_id,session_code,player_name,case_id,case_title,completed_at,summary",
     order: "completed_at.desc",
     limit: String(limit),
   });

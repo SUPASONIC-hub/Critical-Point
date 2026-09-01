@@ -12,6 +12,7 @@ export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 export const TELEMETRY_QUEUE_TYPES = ["case", "feedback", "error"];
 export const SAVE_STATE_KEYS = [
   "saveSchemaVersion",
+  "runId",
   "playerName",
   "playStyle",
   "openingLegacy",
@@ -77,6 +78,7 @@ export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSI
     return {
       ...state,
       saveSchemaVersion: 2,
+      runId: typeof state.runId === "string" ? state.runId : "",
       discoveredClues: Array.isArray(state.discoveredClues) ? state.discoveredClues : [],
       pendingTelemetry: Array.isArray(state.pendingTelemetry) ? state.pendingTelemetry : [],
       caseResults: state.caseResults && typeof state.caseResults === "object" && !Array.isArray(state.caseResults) ? state.caseResults : {},
@@ -119,6 +121,7 @@ export function isSavedStateShapeValid(state) {
     arrayKeys.every((key) => Array.isArray(state[key])) &&
     pendingTelemetryIsValid &&
     objectKeys.every((key) => state[key] && typeof state[key] === "object" && !Array.isArray(state[key])) &&
+    (state.runId === undefined || typeof state.runId === "string") &&
     typeof state.currentCase === "string" &&
     typeof state.nodeId === "string"
   );
@@ -136,6 +139,7 @@ export function getInvalidSavedStateKeys(state) {
   for (const key of ["currentCase", "nodeId"]) {
     if (typeof state[key] !== "string") invalid.push(key);
   }
+  if (state.runId !== undefined && typeof state.runId !== "string") invalid.push("runId");
   return invalid;
 }
 
@@ -318,6 +322,7 @@ export function createRecoverySnapshot(snapshot) {
   return {
     recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION,
     saveSchemaVersion: snapshot.saveSchemaVersion ?? SAVE_SCHEMA_VERSION,
+    runId: normalizeSavedText(snapshot.runId),
     playerName: normalizePlayerName(snapshot.playerName),
     playStyle: normalizeSavedText(snapshot.playStyle),
     openingLegacy: snapshot.openingLegacy ?? null,

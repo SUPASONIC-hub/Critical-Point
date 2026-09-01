@@ -20,8 +20,10 @@ function normalizeEntry(row = {}) {
   const summary = parseSummary(row.summary);
   const rank = normalizeRank(summary.rank);
   const parsedScore = Number(summary.burstScore ?? summary.momentumScore);
+  const runId = row.run_id ?? summary.runId ?? "";
   return {
-    id: `${row.session_code ?? "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
+    id: `${runId || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
+    runId,
     sessionCode: row.session_code ?? "LOCAL",
     name: row.local ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
     caseId: row.case_id ?? "case01",
@@ -44,10 +46,10 @@ export function buildLeaderboard(rows = [], limit = 50) {
   const normalized = rows
     .map(normalizeEntry)
     .filter((entry) => entry.score !== null && entry.score >= 0 && entry.score <= 100);
-  const bestBySession = new Map();
+  const bestByRun = new Map();
   normalized.forEach((entry) => {
-    const key = entry.sessionCode || entry.id;
-    const current = bestBySession.get(key);
+    const key = entry.runId || entry.id;
+    const current = bestByRun.get(key);
     const shouldReplace = !current ||
       (entry.seasonComplete && !current.seasonComplete) ||
       (!entry.seasonComplete && !current.seasonComplete && (
@@ -55,11 +57,11 @@ export function buildLeaderboard(rows = [], limit = 50) {
         (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank])
       ));
     if (shouldReplace) {
-      bestBySession.set(key, entry);
+      bestByRun.set(key, entry);
     }
   });
 
-  return [...bestBySession.values()]
+  return [...bestByRun.values()]
     .sort(
       (a, b) =>
         b.score - a.score ||

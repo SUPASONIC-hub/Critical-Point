@@ -87,6 +87,7 @@ assert.deepEqual(
   SAVE_STATE_KEYS,
   [
     "saveSchemaVersion",
+    "runId",
     "playerName",
     "playStyle",
     "openingLegacy",
@@ -142,6 +143,7 @@ assert.deepEqual(
     nodeId: "start",
     completedCases: [],
     log: [],
+    runId: "",
     discoveredClues: [],
     pendingTelemetry: [],
     caseResults: {},
@@ -706,6 +708,7 @@ assert.equal(counterfactuals[0].actualWasSafest, true, "counterfactual report sh
 
 const leaderboard = buildLeaderboard([
   {
+    run_id: "run-alpha-1",
     session_code: "ALPHA",
     player_name: "첫 분석관",
     case_id: "case01",
@@ -713,6 +716,7 @@ const leaderboard = buildLeaderboard([
     summary: { rank: "A", momentumScore: 72, primary: ["responsibility", 4], averageResponseTime: 18, freeCount: 1 },
   },
   {
+    run_id: "run-alpha-1",
     session_code: "ALPHA",
     player_name: "첫 분석관",
     case_id: "final",
@@ -720,6 +724,7 @@ const leaderboard = buildLeaderboard([
     summary: { rank: "S", momentumScore: 88, primary: ["curiosity", 5], averageResponseTime: 21, freeCount: 2 },
   },
   {
+    run_id: "run-beta-1",
     session_code: "BETA",
     player_name: "두 번째 분석관",
     case_id: "case02",
@@ -727,12 +732,17 @@ const leaderboard = buildLeaderboard([
     summary: { rank: "A", momentumScore: 80, primary: ["trust", 4], averageResponseTime: 15, freeCount: 0 },
   },
 ]);
-assert.equal(leaderboard.length, 2, "leaderboard should keep one best run per session");
+assert.equal(leaderboard.length, 2, "leaderboard should keep one best record per run");
 assert.equal(leaderboard[0].sessionCode, "ALPHA", "leaderboard should sort by momentum score");
 assert.equal(leaderboard[0].position, 1, "leaderboard should assign positions");
+const duplicateNameLeaderboard = buildLeaderboard([
+  { run_id: "run-supasonic-1", session_code: "SAME", player_name: "SUPASONIC", case_id: "season-final", summary: { rank: "A", momentumScore: 77, seasonComplete: true } },
+  { run_id: "run-supasonic-2", session_code: "SAME", player_name: "SUPASONIC", case_id: "season-final", summary: { rank: "S", momentumScore: 91, seasonComplete: true } },
+]);
+assert.equal(duplicateNameLeaderboard.length, 2, "same player name should remain separate when run ids differ");
 const seasonPreferredLeaderboard = buildLeaderboard([
-  { session_code: "SEASON", case_id: "case05", summary: { rank: "S", momentumScore: 99 } },
-  { session_code: "SEASON", case_id: "season-final", summary: { rank: "B", momentumScore: 40, seasonComplete: true } },
+  { run_id: "run-season-1", session_code: "SEASON", case_id: "case05", summary: { rank: "S", momentumScore: 99 } },
+  { run_id: "run-season-1", session_code: "SEASON", case_id: "season-final", summary: { rank: "B", momentumScore: 40, seasonComplete: true } },
 ]);
 assert.equal(seasonPreferredLeaderboard[0].caseId, "season-final", "season completion should outrank partial case records");
 assert.match(getLeaderboardHeadline(leaderboard).title, /익명 분석관/, "remote leaderboard should use anonymous names");

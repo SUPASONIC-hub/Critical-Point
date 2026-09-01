@@ -177,6 +177,10 @@ function appendLocalRankingRow(row) {
   };
 }
 
+function createRunId() {
+  return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 const speakerPortraits = {
   "한서윤": "/portrait-han-seoyun.png",
   "반재욱": "/portrait-ban-jaeuk.png",
@@ -245,6 +249,7 @@ export function AppContent({ onSuppressSaves }) {
   }, []);
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
+  const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
 
   const {
     pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
@@ -252,7 +257,7 @@ export function AppContent({ onSuppressSaves }) {
   } = useDecision();
 
   const {
-    playerName, setPlayerName, playStyle, setPlayStyle, openingLegacy, setOpeningLegacy,
+    runId, setRunId, playerName, setPlayerName, playStyle, setPlayStyle, openingLegacy, setOpeningLegacy,
     dataConsent, setDataConsent, started, setStarted, currentCase, setCurrentCase,
     completedCases, setCompletedCases, discoveredClues, setDiscoveredClues,
     caseResults, setCaseResults, playtestFeedback, setPlaytestFeedback, nodeId, setNodeId,
@@ -262,6 +267,7 @@ export function AppContent({ onSuppressSaves }) {
     timerPenaltyApplied, setTimerPenaltyApplied, probeUsed, setProbeUsed,
   } = useGameSaveState({
     saved,
+    initialRunId,
     initialResources,
     triggerDefaults: makeEmptyScores(triggerLabels),
     cognitionDefaults: makeEmptyScores(cognitionLabels),
@@ -351,10 +357,10 @@ export function AppContent({ onSuppressSaves }) {
     deleteSaveSlot: persistenceDeleteSaveSlot,
     restoreSaveSlot: persistenceRestoreSaveSlot,
   } = useAppPersistence({
-    playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
+    runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
     discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
     freeText, echo, nodeEnteredAt, pendingTelemetryRef, protocolUsed, timerPenaltyApplied, probeUsed,
-    isPausedSave, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
+    isPausedSave, setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
     setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
     setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setOpeningLegacy,
     setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
@@ -362,6 +368,7 @@ export function AppContent({ onSuppressSaves }) {
     setSaveSlots, saveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
     makeEmptyScores, normalizeSavedText, persistSuppressed: () => saveSuppressed,
     onSuppressSaves, formatSaveTime, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
+    createRunId,
   });
   const persist = persistenceApi;
 
@@ -416,14 +423,15 @@ export function AppContent({ onSuppressSaves }) {
   const localSeasonLeaderboardRow = useMemo(() => caseResults.final && completedCases.includes("final")
     ? {
         local: true,
+        run_id: caseResults.final.runId ?? runId,
         session_code: sessionCode,
         player_name: playerName || "현재 분석관",
         case_id: "season-final",
         case_title: "SEASON 01 COMPLETE",
         completed_at: caseResults.final.completedAt ?? "",
-        summary: { ...caseResults.final, seasonComplete: true },
+        summary: { ...caseResults.final, runId: caseResults.final.runId ?? runId, seasonComplete: true },
       }
-    : null, [caseResults, completedCases, playerName, sessionCode]);
+    : null, [caseResults, completedCases, playerName, runId, sessionCode]);
   useEffect(() => {
     setMemoOpened(false);
   }, [resolvedNodeId]);
@@ -784,6 +792,7 @@ export function AppContent({ onSuppressSaves }) {
       ...localRankingRows,
       ...Object.entries(caseResults).map(([caseId, summary]) => ({
         local: true,
+        run_id: summary?.runId ?? runId,
         session_code: sessionCode,
         player_name: playerName || "현재 분석관",
         case_id: caseId,
@@ -792,7 +801,7 @@ export function AppContent({ onSuppressSaves }) {
         summary,
       })),
     ],
-    [caseResults, localRankingRows, playerName, sessionCode],
+    [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
   useEffect(() => {
     const updateNetworkStatus = () => {
@@ -1013,7 +1022,16 @@ export function AppContent({ onSuppressSaves }) {
       cancelled = true;
     };
   }, [isOnline, localLeaderboardRows, localSeasonLeaderboardRow, showRanking]);
-  const musicModeKey = isResult ? "result" : started ? riskTier.toLowerCase() : "intro";
+  const musicModeKey = useMemo(() => {
+    if (!started) return "intro:menu";
+    if (isResult) return currentCase === "final" ? `result:final:${endingStep}` : `result:${currentCase}`;
+    const musicRouteIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
+    const phaseKey = String(node?.phase ?? node?.speaker ?? "scene")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "scene";
+    return `${riskTier.toLowerCase()}:${currentCase}:${phaseKey}:${musicRouteIndex}`;
+  }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, resolvedNodeId, riskTier, started]);
 
   function skipEndingQuietHold() {
     setEndingQuietReady(true);
@@ -1612,6 +1630,7 @@ export function AppContent({ onSuppressSaves }) {
       rank: summary?.rank ?? "C",
       outcomeChoiceId: summary?.outcomeChoiceId ?? null,
       outcomeNodeId: summary?.outcomeNodeId ?? null,
+      runId: typeof summary?.runId === "string" ? summary.runId : "",
     };
   }
 
@@ -1800,6 +1819,7 @@ export function AppContent({ onSuppressSaves }) {
     const caseSummary = completedNow
       ? {
           ...buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo),
+          runId,
           outcomeChoiceId: entry.choiceId,
           outcomeNodeId: entry.nodeId,
           completedAt: new Date().toISOString(),
@@ -1815,6 +1835,7 @@ export function AppContent({ onSuppressSaves }) {
     if (completedNow && caseSummary) {
       const localRankingRow = {
         local: true,
+        run_id: runId,
         session_code: sessionCode,
         player_name: playerName || "현재 분석관",
         case_id: currentCase,
@@ -1844,6 +1865,7 @@ export function AppContent({ onSuppressSaves }) {
       } else {
         const caseTelemetryPayload = {
           session_id: sessionId,
+          run_id: runId,
           session_code: sessionCode,
           player_name: "익명 분석관",
           case_id: currentCase,
@@ -1885,6 +1907,7 @@ export function AppContent({ onSuppressSaves }) {
     if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length) {
       const seasonTelemetryPayload = {
         session_id: sessionId,
+        run_id: runId,
         session_code: sessionCode,
         player_name: "익명 분석관",
         case_id: "season-final",
@@ -1898,6 +1921,7 @@ export function AppContent({ onSuppressSaves }) {
       };
       const seasonLocalRankingRow = {
         local: true,
+        run_id: runId,
         session_code: sessionCode,
         player_name: playerName || "현재 분석관",
         case_id: "season-final",
@@ -1914,7 +1938,7 @@ export function AppContent({ onSuppressSaves }) {
       if (telemetryEnabled && dataConsent) {
         saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
           queueTelemetry({
-            id: `season-final-${sessionId}`,
+            id: `season-final-${runId}`,
             type: "case",
             label: "SEASON 01 COMPLETE",
             payload: seasonTelemetryPayload,
@@ -2030,6 +2054,7 @@ export function AppContent({ onSuppressSaves }) {
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     const failedResetKeys = resetStorageResults.filter(([, removed]) => !removed).map(([key]) => key);
     setPlayerName("");
+    setRunId(createRunId());
     setPlayStyle("instinct");
     setDataConsent(false);
     setStarted(false);
@@ -2161,6 +2186,8 @@ export function AppContent({ onSuppressSaves }) {
     });
     const allPreviousCases = caseSequence.slice(0, Math.max(0, caseSequence.indexOf(caseId)));
     const now = Date.now();
+    const nextRunId = persistRun ? createRunId() : runId;
+    if (persistRun) setRunId(nextRunId);
     setStarted(true);
     setIsPausedSave(false);
     setCurrentCase(caseId);
@@ -2182,6 +2209,7 @@ export function AppContent({ onSuppressSaves }) {
     setNodeEnteredAt(now);
     if (persistRun) {
       persist({
+        runId: nextRunId,
         started: true,
         paused: false,
         currentCase: caseId,
@@ -2624,6 +2652,7 @@ export function AppContent({ onSuppressSaves }) {
         rankingHeadline={rankingHeadline}
         leaderboardError={leaderboardError}
         leaderboard={leaderboard}
+        runId={runId}
         sessionCode={sessionCode}
         triggerLabels={triggerLabels}
         onClose={() => setShowRanking(false)}

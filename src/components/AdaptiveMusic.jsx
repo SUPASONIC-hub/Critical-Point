@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
 
@@ -6,7 +6,7 @@ const MUSIC_PREF_KEY = "critical-point-music-enabled";
 
 const musicModes = {
   intro: {
-    label: "대기",
+    label: "INTRO",
     interval: 1200,
     volume: 0.09,
     wave: "sine",
@@ -17,7 +17,7 @@ const musicModes = {
     noiseEvery: 16,
   },
   controlled: {
-    label: "안정",
+    label: "CONTROLLED",
     interval: 980,
     volume: 0.1,
     wave: "triangle",
@@ -28,7 +28,7 @@ const musicModes = {
     noiseEvery: 20,
   },
   unstable: {
-    label: "불안정",
+    label: "UNSTABLE",
     interval: 760,
     volume: 0.115,
     wave: "triangle",
@@ -39,7 +39,7 @@ const musicModes = {
     noiseEvery: 14,
   },
   critical: {
-    label: "위기",
+    label: "CRITICAL",
     interval: 560,
     volume: 0.125,
     wave: "triangle",
@@ -50,7 +50,7 @@ const musicModes = {
     noiseEvery: 10,
   },
   result: {
-    label: "결과",
+    label: "RESULT",
     interval: 1280,
     volume: 0.095,
     wave: "sine",
@@ -61,6 +61,51 @@ const musicModes = {
     noiseEvery: 24,
   },
 };
+
+function hashMusicKey(value = "") {
+  return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
+}
+
+function shiftFrequency(frequency, semitones) {
+  return frequency ? Number((frequency * 2 ** (semitones / 12)).toFixed(2)) : frequency;
+}
+
+function shiftPattern(pattern, semitones) {
+  return pattern.map((item) =>
+    Array.isArray(item)
+      ? item.map((frequency) => shiftFrequency(frequency, semitones))
+      : shiftFrequency(item, semitones),
+  );
+}
+
+function createSceneMode(modeKey) {
+  const parts = String(modeKey || "intro").split(":");
+  const baseKey = parts[0];
+  const base = musicModes[baseKey] ?? musicModes.intro;
+  const hash = Math.abs(hashMusicKey(modeKey));
+  const tempoMultipliers = [1, 0.92, 1.08, 0.84, 1.16, 0.76, 1.24];
+  const semitoneShifts = [-5, -2, 0, 3, 5, 7, -7];
+  const tempo = tempoMultipliers[hash % tempoMultipliers.length];
+  const semitoneShift = semitoneShifts[Math.floor(hash / 7) % semitoneShifts.length];
+  const isFinal = parts.includes("final");
+  const sceneIndex = Number(parts.at(-1));
+  const impactBoost = baseKey === "critical" || isFinal ? 1.25 : baseKey === "unstable" ? 1.1 : 1;
+  const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
+
+  return {
+    ...base,
+    interval: Math.max(360, Math.round(base.interval * tempo)),
+    volume: Math.min(0.16, base.volume * (impactBoost + scenePulse * 0.03)),
+    bass: shiftPattern(base.bass, semitoneShift),
+    notes: shiftPattern(base.notes, semitoneShift),
+    chords: shiftPattern(base.chords, semitoneShift),
+    hitEvery: base.hitEvery > 0 ? Math.max(4, base.hitEvery - scenePulse * 2) : isFinal ? 8 + scenePulse * 2 : 0,
+    noiseEvery: base.noiseEvery > 0 ? Math.max(6, base.noiseEvery - scenePulse) : 0,
+    detuneSpread: 2 + (hash % 9),
+    impact: impactBoost + scenePulse * 0.12,
+    filterLift: (hash % 5) * 140,
+  };
+}
 
 function connectMusicBus(context, output) {
   const lowpass = context.createBiquadFilter();
@@ -173,8 +218,8 @@ export function AdaptiveMusic({ modeKey }) {
   const stepRef = useRef(0);
   const pulseRef = useRef(null);
   const resumeRef = useRef(null);
-  const modeRef = useRef(musicModes[modeKey] ?? musicModes.intro);
-  const mode = musicModes[modeKey] ?? musicModes.intro;
+  const modeRef = useRef(createSceneMode(modeKey));
+  const mode = useMemo(() => createSceneMode(modeKey), [modeKey]);
 
   function ensureAudioGraph() {
     const context = contextRef.current ?? getAudioContext();
@@ -226,29 +271,29 @@ export function AdaptiveMusic({ modeKey }) {
       playTone(context, destination, note, currentMode.interval / 900, 0.06, currentMode.wave, {
         attack: 0.12,
         release: 0.45,
-        filterFrequency: 1500,
-        detune: step % 2 === 0 ? -3 : 3,
+        filterFrequency: 1500 + currentMode.filterLift,
+        detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
       });
 
       if (step % 4 === 0) {
-        playTone(context, destination, bass, currentMode.interval / 360, 0.08, "sine", {
+        playTone(context, destination, bass, currentMode.interval / 360, 0.08 * currentMode.impact, "sine", {
           attack: 0.18,
           release: 0.8,
-          filterFrequency: 520,
+          filterFrequency: 520 + currentMode.filterLift,
         });
         playChord(context, destination, chord ?? [], currentMode.interval / 210, 0.12, "sine");
       }
 
       if (currentMode.hitEvery > 0 && step % currentMode.hitEvery === 0) {
-        playTone(context, destination, bass * 2, 0.16, 0.035, "triangle", {
+        playTone(context, destination, bass * 2, 0.16, 0.035 * currentMode.impact, "triangle", {
           attack: 0.01,
           release: 0.18,
-          filterFrequency: 900,
+          filterFrequency: 900 + currentMode.filterLift,
         });
       }
 
       if (currentMode.noiseEvery > 0 && step % currentMode.noiseEvery === 0) {
-        playNoiseHit(context, destination, 0.7, currentMode.volume * 0.18, 420 + (step % 5) * 120);
+        playNoiseHit(context, destination, 0.7, currentMode.volume * 0.18 * currentMode.impact, 420 + currentMode.filterLift + (step % 5) * 120);
       }
 
       stepRef.current += 1;
@@ -310,6 +355,14 @@ export function AdaptiveMusic({ modeKey }) {
     }).catch(() => setAudioState("blocked"));
   }
 
+  const toggleLabel = enabled
+    ? audioState === "running"
+      ? "BGM off"
+      : audioState === "unsupported"
+        ? "BGM unsupported"
+        : "Start BGM"
+    : "BGM on";
+
   return (
     <button
       type="button"
@@ -326,11 +379,11 @@ export function AdaptiveMusic({ modeKey }) {
         }
         setEnabled((value) => !value);
       }}
-      aria-label={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
-      title={enabled ? (audioState === "running" ? "배경음악 끄기" : "배경음악 재생 시작") : "배경음악 켜기"}
+      aria-label={toggleLabel}
+      title={toggleLabel}
     >
       {enabled && audioState === "running" ? <Volume2 size={18} /> : <VolumeX size={18} />}
-      <span>{enabled ? (audioState === "running" ? mode.label : audioState === "unsupported" ? "미지원" : "소리 시작") : "꺼짐"}</span>
+      <span>{enabled && audioState === "running" ? mode.label : toggleLabel}</span>
     </button>
   );
 }

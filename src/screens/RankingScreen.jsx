@@ -8,6 +8,7 @@ export function RankingScreen({
   rankingHeadline,
   leaderboardError,
   leaderboard,
+  runId,
   sessionCode,
   triggerLabels,
   onClose,
@@ -56,8 +57,10 @@ export function RankingScreen({
               <p className="ranking-empty">아직 완료된 기록이 없습니다. 첫 시즌을 끝내고 기준선을 세워보세요.</p>
             ) : (
               <div className="ranking-list">
-                {leaderboard.map((entry) => (
-                  <article className={`${entry.sessionCode === sessionCode ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
+                {leaderboard.map((entry) => {
+                  const isCurrentRun = entry.runId ? entry.runId === runId : entry.sessionCode === sessionCode;
+                  return (
+                  <article className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
                     <strong className="ranking-position">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.name}</b>
@@ -77,7 +80,8 @@ export function RankingScreen({
                       <span>자유입력 {entry.freeCount}</span>
                     </div>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>

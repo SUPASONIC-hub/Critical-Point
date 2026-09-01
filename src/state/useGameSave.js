@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-export function useGameSaveState({ saved, initialResources, triggerDefaults, cognitionDefaults, normalizeText }) {
+export function useGameSaveState({ saved, initialRunId, initialResources, triggerDefaults, cognitionDefaults, normalizeText }) {
+  const [runId, setRunId] = useState(() => saved?.runId || initialRunId);
   const [playerName, setPlayerName] = useState(() => saved?.playerName ?? "");
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [openingLegacy, setOpeningLegacy] = useState(saved?.openingLegacy ?? null);
@@ -25,6 +26,7 @@ export function useGameSaveState({ saved, initialResources, triggerDefaults, cog
   const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
 
   return {
+    runId, setRunId,
     playerName, setPlayerName,
     playStyle, setPlayStyle,
     openingLegacy, setOpeningLegacy,
