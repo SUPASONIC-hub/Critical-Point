@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, ChevronRight, Info, LockKeyhole, Trophy } from "lucide-react";
+import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 
 export function IntroScreen({ view }) {
   const { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
@@ -152,6 +152,12 @@ export function IntroScreen({ view }) {
                 첫 케이스 시작
               </button>
             </div>
+            {view.newGamePlusUnlocked && (
+              <button type="button" className="new-game-plus-button" onClick={view.startNewGamePlus}>
+                <Sparkles size={16} />
+                NEW GAME+ 시작
+              </button>
+            )}
             <label className="consent-box">
               <input
                 type="checkbox"

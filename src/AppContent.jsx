@@ -219,6 +219,7 @@ const debugToolsEnabled =
   import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
   (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
+const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
 let saveSuppressed = false;
 const replaySeed = getReplaySeedFromLocation();
 
@@ -278,6 +279,9 @@ export function AppContent({ onSuppressSaves }) {
     cognitionDefaults: makeEmptyScores(cognitionLabels),
     normalizeText: (value) => normalizeSavedText(value, FREE_TEXT_MAX_LENGTH),
   });
+  const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
+    () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
+  );
   const [endingStep, setEndingStep] = useState(0);
   const [endingTwistIndex, setEndingTwistIndex] = useState(0);
   const [endingQuietReady, setEndingQuietReady] = useState(
@@ -1445,6 +1449,12 @@ export function AppContent({ onSuppressSaves }) {
   // Persistence is owned by the extracted lifecycle hook. Keep the old
   // implementations above available for rollback during this migration.
   const startGame = persistenceStartGame;
+  function startNewGamePlus() {
+    if (!newGamePlusUnlocked) return;
+    writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+    setSaveStatus("NEW GAME+ 기록 모드로 시작합니다. 숨겨진 권한과 추가 단서를 추적하세요.");
+    startGame();
+  }
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
   const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
@@ -1885,6 +1895,10 @@ export function AppContent({ onSuppressSaves }) {
       : caseResults;
 
     if (completedNow && caseSummary) {
+      if (currentCase === "final") {
+        setNewGamePlusUnlocked(true);
+        writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+      }
       const localRankingRow = {
         local: true,
         run_id: runId,
@@ -2718,6 +2732,8 @@ export function AppContent({ onSuppressSaves }) {
   }
   const introView = { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary };
   if (!started) {
+    introView.startNewGamePlus = startNewGamePlus;
+    introView.newGamePlusUnlocked = newGamePlusUnlocked;
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   function advanceEndingStep() {

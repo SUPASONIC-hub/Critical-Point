@@ -71,6 +71,14 @@ const chapterMotifs = {
   final: { wave: "sine", lift: 760, impact: 1.3 },
 };
 
+const speakerMotifs = {
+  "한서윤": { wave: "sine", semitones: 0, pulse: 0.94 },
+  "반재욱": { wave: "triangle", semitones: -2, pulse: 1.04 },
+  "도윤하": { wave: "sine", semitones: 3, pulse: 1.08 },
+  "오진우": { wave: "sawtooth", semitones: -5, pulse: 1.14 },
+  "에코": { wave: "triangle", semitones: 7, pulse: 0.88 },
+};
+
 function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
 }
@@ -98,6 +106,7 @@ function createSceneMode(modeKey) {
   const semitoneShift = semitoneShifts[Math.floor(hash / 7) % semitoneShifts.length];
   const isFinal = parts.includes("final");
   const motif = chapterMotifs[parts[1]] ?? chapterMotifs.case01;
+  const speakerMotif = speakerMotifs[parts[3]] ?? { wave: motif.wave, semitones: 0, pulse: 1 };
   const sceneIndex = Number(parts.at(-1));
   const impactBoost = baseKey === "critical" || isFinal ? 1.25 : baseKey === "unstable" ? 1.1 : 1;
   const scenePulse = Number.isFinite(sceneIndex) ? sceneIndex % 4 : hash % 4;
@@ -105,11 +114,11 @@ function createSceneMode(modeKey) {
   return {
     ...base,
     interval: Math.max(360, Math.round(base.interval * tempo)),
-    volume: Math.min(0.16, base.volume * (impactBoost * motif.impact + scenePulse * 0.03)),
-    wave: motif.wave,
-    bass: shiftPattern(base.bass, semitoneShift),
-    notes: shiftPattern(base.notes, semitoneShift),
-    chords: shiftPattern(base.chords, semitoneShift),
+    volume: Math.min(0.16, base.volume * (impactBoost * motif.impact * speakerMotif.pulse + scenePulse * 0.03)),
+    wave: speakerMotif.wave,
+    bass: shiftPattern(base.bass, semitoneShift + speakerMotif.semitones),
+    notes: shiftPattern(base.notes, semitoneShift + speakerMotif.semitones),
+    chords: shiftPattern(base.chords, semitoneShift + speakerMotif.semitones),
     hitEvery: base.hitEvery > 0 ? Math.max(4, base.hitEvery - scenePulse * 2) : isFinal ? 8 + scenePulse * 2 : 0,
     noiseEvery: base.noiseEvery > 0 ? Math.max(6, base.noiseEvery - scenePulse) : 0,
     detuneSpread: 2 + (hash % 9),
