@@ -121,6 +121,17 @@ export function PlayScreen({ view }) {
           </section>
         )}
         {view.hypothesisConflict && <p className="hypothesis-conflict" role="alert"><strong>{view.hypothesisConflict.title}</strong> {view.hypothesisConflict.text}</p>}
+        {view.resourceChain && <p className={`resource-chain-signal ${view.resourceChain.tone}`} role="status"><strong>RESOURCE CHAIN</strong> {view.resourceChain.text}</p>}
+        {view.characterMemory && <p className="character-memory" role="status"><strong>MEMORY TRACE</strong> {view.characterMemory.text}</p>}
+        {view.midBoss && <section className="mid-boss-panel" aria-label="챕터 반박 장면"><span>{view.midBoss.title}</span><p>{view.midBoss.text}</p></section>}
+        {view.investigationTargets?.length > 0 && (
+          <section className="investigation-panel" aria-label="조사 대상 선택">
+            <span>ACTIVE INVESTIGATION</span>
+            <div>{view.investigationTargets.map((target) => <button type="button" key={target.id} disabled={target.locked} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => view.investigateTarget(target)}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></button>)}</div>
+            {view.selectedInvestigationOutcome && <p>{view.selectedInvestigationOutcome.outcome}{view.selectedInvestigationOutcome.contaminated ? " 단, 이 기록에는 오염 가능성이 있습니다." : ""}</p>}
+          </section>
+        )}
+        {view.evidenceContamination && <p className="evidence-contamination" role="alert"><strong>EVIDENCE CONTAMINATION</strong> {view.evidenceContamination.text}</p>}
         {view.evidenceCombinations?.length > 0 && (
           <section className="evidence-combination-panel" aria-label="조합된 증거">
             <span>CROSS-REFERENCE</span>

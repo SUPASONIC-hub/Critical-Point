@@ -176,6 +176,17 @@ import {
   getHypothesisConflict,
   getInvestigationTargets,
   getTimelineStamp,
+  getOriginEndingVariant,
+  getCharacterMemory,
+  getInvestigationOutcome,
+  getEvidenceContamination,
+  getHypothesisLockState,
+  getResourceChain,
+  getMidBoss,
+  getDynamicMusicLayers,
+  getAftermath,
+  getRankingIntegrity,
+  getReplayDiagnostics,
   getPlayStyleUnlocks,
   getPastRunMemory,
   getRelationshipScene,
@@ -324,6 +335,8 @@ export function AppContent({ onSuppressSaves }) {
     try { return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {}; } catch { return {}; }
   });
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
+  const [selectedInvestigation, setSelectedInvestigation] = useState("");
+  const [hypothesisAction, setHypothesisAction] = useState("");
   const [endingStep, setEndingStep] = useState(0);
   const [endingTwistIndex, setEndingTwistIndex] = useState(0);
   const [endingQuietReady, setEndingQuietReady] = useState(
@@ -646,6 +659,12 @@ export function AppContent({ onSuppressSaves }) {
   const investigationTargets = getInvestigationTargets(fallbackCaseId, authorityState);
   const autonomousSignal = getAutonomousSignals(fallbackCaseId, log);
   const timelineStamp = getTimelineStamp(fallbackCaseId, log.length);
+  const evidenceContamination = getEvidenceContamination(discoveredClues, log);
+  const hypothesisLockState = getHypothesisLockState(clueHypotheses, hypothesisAction);
+  const resourceChain = getResourceChain(resources);
+  const midBoss = getMidBoss(fallbackCaseId, log);
+  const dynamicMusicLayers = getDynamicMusicLayers(riskTier, fallbackCaseId);
+  const selectedInvestigationOutcome = getInvestigationOutcome(investigationTargets.find((target) => target.id === selectedInvestigation), log.length);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
@@ -1551,6 +1570,17 @@ export function AppContent({ onSuppressSaves }) {
     setLog(nextLog);
     persist({ resources: nextResources, log: nextLog });
     setSaveStatus(`${action.label}: ${action.text}`);
+  }
+  function investigateTarget(target) {
+    if (!target || target.locked) {
+      setSaveStatus("현재 권한으로는 이 조사 대상을 열 수 없습니다.");
+      return;
+    }
+    setSelectedInvestigation(target.id);
+    const nextResources = applyEffect(resources, target.effect);
+    setResources(nextResources);
+    persist({ resources: nextResources });
+    setSaveStatus(`${target.label}: 조사가 기록되었습니다.`);
   }
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
@@ -2526,9 +2556,13 @@ export function AppContent({ onSuppressSaves }) {
   const endingPreview = getEndingPreview(endingVariant);
   const endingCause = getFailureCause(endingVariant, resources);
   const endingAtmosphere = getEndingAtmosphere(endingVariant.id);
+  const originEndingVariant = getOriginEndingVariant(operatorOrigin, endingVariant.id);
+  const aftermath = getAftermath(endingVariant.id, operatorOrigin);
   const playReport = getPlayReport(result, log);
   const telemetryDashboard = getTelemetryDashboardSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
   const authorityReview = getAuthorityReview(operatorProfile, authorityState.level, result);
+  const rankingIntegrity = getRankingIntegrity({ runId, completedAt: result.completedAt ?? new Date().toISOString(), summary: result });
+  const replayDiagnostics = getReplayDiagnostics({ runId, caseId: fallbackCaseId, nodeId: resolvedNodeId, choiceId: log.at(-1)?.choiceId, pending: pendingTelemetry.length });
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   const routeTimeline = useMemo(
     () => log
@@ -2889,6 +2923,10 @@ export function AppContent({ onSuppressSaves }) {
   resultView.endingCause = endingCause;
   resultView.authorityReview = authorityReview;
   resultView.endingAtmosphere = endingAtmosphere;
+  resultView.originEndingVariant = originEndingVariant;
+  resultView.aftermath = aftermath;
+  resultView.rankingIntegrity = rankingIntegrity;
+  resultView.replayDiagnostics = replayDiagnostics;
   resultView.playReport = playReport;
   resultView.telemetryDashboard = telemetryDashboard;
   if (isResult) {
@@ -2904,6 +2942,15 @@ export function AppContent({ onSuppressSaves }) {
   playView.timelineStamp = timelineStamp;
   playView.evidenceMetadata = evidenceMetadata;
   playView.hypothesisConflict = hypothesisConflict;
+  playView.investigationTargets = investigationTargets;
+  playView.investigateTarget = investigateTarget;
+  playView.selectedInvestigationOutcome = selectedInvestigationOutcome;
+  playView.evidenceContamination = evidenceContamination;
+  playView.hypothesisLockState = hypothesisLockState;
+  playView.resourceChain = resourceChain;
+  playView.midBoss = midBoss;
+  playView.dynamicMusicLayers = dynamicMusicLayers;
+  playView.characterMemory = getCharacterMemory(node?.speaker, log);
   playView.evidenceCombinations = evidenceCombinations;
   playView.hypothesisActions = hypothesisActions;
   playView.resolveHypothesisAction = resolveHypothesisAction;

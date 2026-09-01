@@ -303,6 +303,7 @@ export function ResultScreen({ view }) {
               <p>{view.authorityReview.next}</p>
             </section>
           )}
+          {view.originEndingVariant && <p className="origin-ending-note"><strong>{view.originEndingVariant.label}</strong> {view.originEndingVariant.text}</p>}
           {view.failureObjectives?.length > 0 && (
             <section className="failure-objectives" aria-label="실패 재도전 목표">
               <strong>RETRY OBJECTIVES</strong>
@@ -324,6 +325,9 @@ export function ResultScreen({ view }) {
               <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
             </section>
           )}
+          {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`} role="status"><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
+          {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 후일담"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
+          {debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary>REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
           {view.delayedConsequences?.length > 0 && (
             <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">
               <span>CONSEQUENCE CHAIN</span>

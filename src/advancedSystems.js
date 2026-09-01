@@ -381,3 +381,64 @@ export function getRankingLeague(style = "FIELD DECIDER") {
   if (style.includes("SYSTEM")) return "SYSTEM LEAGUE";
   return "FIELD LEAGUE";
 }
+
+export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
+  const labels = { courier: "현장 기록의 계승", lab: "검증 프로토콜의 계승", public: "공개 책임의 계승" };
+  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
+}
+
+export function getCharacterMemory(speaker = "", log = []) {
+  const entries = log.filter((entry) => entry?.speaker === speaker && !entry.isSystemEvent);
+  if (entries.length === 0) return null;
+  const last = entries.at(-1);
+  return { speaker, count: entries.length, lastChoice: last.choice, text: `${speaker}은(는) 이전에 당신이 '${last.choice}'을 선택한 일을 기억하고 있습니다.` };
+}
+
+export function getInvestigationOutcome(target, logLength = 0) {
+  if (!target) return null;
+  const outcomes = ["원본의 시간 순서가 복원되었습니다.", "목격자가 공개 범위를 재협상했습니다.", "기록과 실제 현장의 수치가 어긋납니다."];
+  return { ...target, outcome: outcomes[(logLength + target.label.length) % outcomes.length], contaminated: (logLength + target.label.length) % 4 === 0 };
+}
+
+export function getEvidenceContamination(clues = [], log = []) {
+  const contaminated = clues.filter((clue, index) => (index + log.length) % 5 === 0);
+  return contaminated.length ? { count: contaminated.length, text: "일부 단서가 후속 기록과 충돌합니다. 원본 확인 없이 가설을 확정하면 오판 위험이 커집니다." } : null;
+}
+
+export function getHypothesisLockState(hypotheses = [], action = "") {
+  if (hypotheses.length < 2) return null;
+  return { locked: action === "publish", label: action === "publish" ? "COUNTER-HYPOTHESIS LOCKED" : "MULTIPLE HYPOTHESES OPEN", text: action === "publish" ? "공개한 가설과 반대 가설의 검증 경로가 잠겼습니다." : "가설을 확정하지 않으면 여러 조사 경로를 유지할 수 있습니다." };
+}
+
+export function getResourceChain(resources = {}) {
+  const fatigue = resources.fatigue ?? 0;
+  const trust = resources.trust ?? 0;
+  const time = resources.time ?? 0;
+  if (fatigue >= 35) return { tone: "fatigue", text: "피로가 높아 다음 선택의 신뢰도와 조사 성공률이 낮아집니다." };
+  if (trust <= 30) return { tone: "trust", text: "신뢰가 낮아 인물들이 원본 대신 방어적인 정보만 제공합니다." };
+  if (time <= 25) return { tone: "time", text: "시간이 부족해 조사 대상 하나를 포기해야 할 수 있습니다." };
+  return { tone: "stable", text: "현재 자원 균형이 유지되어 조사와 관계 회복을 함께 진행할 수 있습니다." };
+}
+
+export function getMidBoss(caseId = "case01", log = []) {
+  const bosses = { case01: "현장 운영 책임자", case02: "보호 명부 관리자", case03: "경쟁 기준 설계자", case04: "예외 승인 심사관", case05: "복구 프로토콜 관리자", final: "관찰자 코어" };
+  if (log.length < 3) return null;
+  return { title: `${bosses[caseId] ?? "기록 관리자"} / COUNTER-CLAIM`, text: "당신의 가설은 결과를 설명하지만, 책임의 방향까지 증명하지는 못한다고 반박합니다.", caseId };
+}
+
+export function getDynamicMusicLayers(riskTier = "CONTROLLED", caseId = "case01") {
+  return { bass: riskTier === "CRITICAL" ? "deep-impact" : "measured-bass", lead: caseId === "final" ? "memory-motif" : "chapter-motif", transition: riskTier === "UNSTABLE" ? "short-rise" : "soft-crossfade" };
+}
+
+export function getAftermath(endingId = "open-question", origin = "courier") {
+  return { title: "AFTERMATH / NEXT SHIFT", text: `${origin} 출신 분석관의 선택 이후, ${endingId} 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
+}
+
+export function getRankingIntegrity(entry = {}) {
+  const summary = entry.summary ?? {};
+  return { valid: Boolean(entry.runId && entry.completedAt && summary.rank), label: entry.runId ? "RUN VERIFIED" : "RUN ID MISSING", text: entry.runId ? "독립 런으로 집계된 기록입니다." : "런 식별자가 없어 임시 로컬 기록으로 처리됩니다." };
+}
+
+export function getReplayDiagnostics({ runId = "", caseId = "", nodeId = "", choiceId = "", pending = 0 } = {}) {
+  return { runId, scene: `${caseId}/${nodeId}`, choiceId, pending, text: `${caseId}/${nodeId}에서 ${choiceId || "선택 없음"} 처리 후 대기 큐 ${pending}건` };
+}
