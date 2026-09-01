@@ -169,6 +169,13 @@ import {
   getEndingAtmosphere,
   getPlayReport,
   getTelemetryDashboardSnapshot,
+  getOriginStartEffects,
+  getAuthorityReview,
+  getAutonomousSignals,
+  getEvidenceMetadata,
+  getHypothesisConflict,
+  getInvestigationTargets,
+  getTimelineStamp,
   getPlayStyleUnlocks,
   getPastRunMemory,
   getRelationshipScene,
@@ -634,6 +641,11 @@ export function AppContent({ onSuppressSaves }) {
   const evidenceCombinations = getEvidenceCombinations(discoveredClues);
   const hypothesisActions = getHypothesisActions(clueHypotheses, authorityState);
   const originPrologue = getOriginPrologue(operatorOrigin);
+  const evidenceMetadata = getEvidenceMetadata(discoveredClues);
+  const hypothesisConflict = getHypothesisConflict(clueHypotheses);
+  const investigationTargets = getInvestigationTargets(fallbackCaseId, authorityState);
+  const autonomousSignal = getAutonomousSignals(fallbackCaseId, log);
+  const timelineStamp = getTimelineStamp(fallbackCaseId, log.length);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
@@ -1594,7 +1606,8 @@ export function AppContent({ onSuppressSaves }) {
     const openingEcho = previousOutcome
       ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
       : introEcho;
-    const openingResources = previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
+    const originEffect = caseId === "case01" && !previousResult ? getOriginStartEffects(operatorOrigin) : {};
+    const openingResources = applyEffect(previousResult ? applyEffect(initialResources, openingEffect) : initialResources, originEffect);
     appendTraceEvent({
       kind: "case-start",
       caseId,
@@ -2515,6 +2528,7 @@ export function AppContent({ onSuppressSaves }) {
   const endingAtmosphere = getEndingAtmosphere(endingVariant.id);
   const playReport = getPlayReport(result, log);
   const telemetryDashboard = getTelemetryDashboardSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
+  const authorityReview = getAuthorityReview(operatorProfile, authorityState.level, result);
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   const routeTimeline = useMemo(
     () => log
@@ -2873,6 +2887,7 @@ export function AppContent({ onSuppressSaves }) {
   resultView.balanceSignals = balanceSignals;
   resultView.startRecoveryRoute = startRecoveryRoute;
   resultView.endingCause = endingCause;
+  resultView.authorityReview = authorityReview;
   resultView.endingAtmosphere = endingAtmosphere;
   resultView.playReport = playReport;
   resultView.telemetryDashboard = telemetryDashboard;
@@ -2885,6 +2900,10 @@ export function AppContent({ onSuppressSaves }) {
   playView.chapterUiModel = chapterUiModel;
   playView.relationshipQuest = relationshipQuest;
   playView.relationshipGraph = relationshipGraph;
+  playView.autonomousSignal = autonomousSignal;
+  playView.timelineStamp = timelineStamp;
+  playView.evidenceMetadata = evidenceMetadata;
+  playView.hypothesisConflict = hypothesisConflict;
   playView.evidenceCombinations = evidenceCombinations;
   playView.hypothesisActions = hypothesisActions;
   playView.resolveHypothesisAction = resolveHypothesisAction;

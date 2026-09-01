@@ -308,3 +308,76 @@ export function getTelemetryDashboardSnapshot({ errors = [], pending = [], ranki
     lastError: errors.at(-1)?.error?.message ?? errors.at(-1)?.error_message ?? "none",
   };
 }
+
+export function getOriginStartEffects(origin = "courier") {
+  return {
+    courier: { capital: 4, trust: 4, legitimacy: 0, fatigue: 0 },
+    lab: { capital: 0, trust: 1, legitimacy: 5, fatigue: 2 },
+    public: { capital: -2, trust: 0, legitimacy: 8, fatigue: 3 },
+  }[origin] ?? { capital: 0, trust: 0, legitimacy: 0, fatigue: 0 };
+}
+
+export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {}) {
+  return {
+    title: `${origin.title ?? "분석관"} / AUTHORITY REVIEW`,
+    text: level === "OVERSIGHT"
+      ? "당신은 기록을 읽는 사람에서 종료 조건을 제안하는 사람으로 이동했습니다. 이제 권한의 결과도 책임져야 합니다."
+      : `현재 권한은 ${level}입니다. ${result.challengeClearCount ?? 0}개의 검증 신호와 관계 기록이 다음 심사의 근거가 됩니다.`,
+    next: level === "OBSERVER" ? "증거와 관계자 신뢰를 확보하십시오." : level === "FIELD ACCESS" ? "정당성과 보호 비용을 함께 관리하십시오." : "공개 이후의 피해 복구까지 설계하십시오.",
+  };
+}
+
+export function getAutonomousSignals(caseId = "case01", log = []) {
+  const latest = log.at(-1);
+  const signals = {
+    case01: "현장팀이 지연 비용을 임시로 떠안고 다음 배송을 먼저 움직였습니다.",
+    case02: "증언자가 공개 범위를 스스로 줄여달라는 보호 요청을 남겼습니다.",
+    case03: "경쟁 상대가 당신의 기준표를 역산해 먼저 조건을 바꾸고 있습니다.",
+    case04: "심사관이 빈 승인 칸에 임시 책임자를 적어 절차를 계속 진행했습니다.",
+    case05: "복구팀이 당신의 이전 선택을 기준으로 우회 경로를 만들었습니다.",
+    final: "다음 분석관이 과거 기록을 읽고 아직 답하지 않은 질문을 표시했습니다.",
+  };
+  return { text: signals[caseId] ?? signals.case01, triggeredBy: latest?.choiceId ?? "opening" };
+}
+
+export function getEvidenceMetadata(clues = []) {
+  return clues.map((clue, index) => ({
+    ...clue,
+    sourceType: index % 3 === 0 ? "ORIGINAL LOG" : index % 3 === 1 ? "WITNESS" : "INFERENCE",
+    reliability: Math.max(42, 94 - index * 9),
+  }));
+}
+
+export function getHypothesisConflict(hypotheses = []) {
+  if (hypotheses.length < 2) return null;
+  return { title: "HYPOTHESIS CONFLICT", text: "기록이 사후 조작이라는 가설과 예외가 성과 측정의 일부였다는 가설은 동시에 확정할 수 없습니다. 하나를 공개하면 다른 하나의 신뢰도가 떨어집니다." };
+}
+
+export function getInvestigationTargets(caseId = "case01", authority = {}) {
+  const targets = {
+    case01: ["배송 지연 원본", "현장 관리자", "보상 승인표"],
+    case02: ["증언 보호 명부", "실험 원본", "접근 권한 로그"],
+    case03: ["경쟁 점수표", "검증 기한", "공동 책임자"],
+    case04: ["예외 승인서", "보상 기준", "공개 문안"],
+    case05: ["복구 기록", "책임 공백", "중단 조건"],
+    final: ["이전 런 기록", "관찰자 키", "종료 조건"],
+  };
+  return (targets[caseId] ?? targets.case01).map((label, index) => ({
+    id: `${caseId}-investigate-${index}`,
+    label,
+    locked: index === 2 && authority.level === "OBSERVER",
+    effect: index === 0 ? { time: -1, legitimacy: 1 } : index === 1 ? { trust: 2, fatigue: 1 } : { legitimacy: 2, fatigue: 2 },
+  }));
+}
+
+export function getTimelineStamp(caseId = "case01", logLength = 0) {
+  const base = { case01: "DAY 01 · 08:40", case02: "DAY 02 · 13:10", case03: "DAY 03 · 19:20", case04: "DAY 04 · 10:05", case05: "DAY 05 · 22:45", final: "DAY 06 · 00:15" }[caseId] ?? "SHIFT UNKNOWN";
+  return `${base} · +${logLength * 7} MIN`;
+}
+
+export function getRankingLeague(style = "FIELD DECIDER") {
+  if (style.includes("RISK")) return "RISK LEAGUE";
+  if (style.includes("BOARD")) return "REFRAME LEAGUE";
+  if (style.includes("SYSTEM")) return "SYSTEM LEAGUE";
+  return "FIELD LEAGUE";
+}

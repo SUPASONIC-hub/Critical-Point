@@ -108,6 +108,19 @@ export function PlayScreen({ view }) {
             <div>{view.relationshipGraph.filter((item) => item.value > 0).map((item) => <article key={item.name}><b>{item.name}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.state}</small></article>)}</div>
           </section>
         )}
+        {view.autonomousSignal && (
+          <section className="autonomous-signal-panel" aria-label="인물 자율 행동">
+            <span>WORLD MOVEMENT · {view.timelineStamp}</span>
+            <p>{view.autonomousSignal.text}</p>
+          </section>
+        )}
+        {view.evidenceMetadata?.length > 0 && (
+          <section className="evidence-source-panel" aria-label="단서 출처와 신뢰도">
+            <span>EVIDENCE SOURCES</span>
+            <div>{view.evidenceMetadata.slice(-4).map((item) => <article key={item.id}><b>{item.title}</b><small>{item.sourceType} · {item.reliability}%</small></article>)}</div>
+          </section>
+        )}
+        {view.hypothesisConflict && <p className="hypothesis-conflict" role="alert"><strong>{view.hypothesisConflict.title}</strong> {view.hypothesisConflict.text}</p>}
         {view.evidenceCombinations?.length > 0 && (
           <section className="evidence-combination-panel" aria-label="조합된 증거">
             <span>CROSS-REFERENCE</span>

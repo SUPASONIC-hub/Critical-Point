@@ -296,6 +296,13 @@ export function ResultScreen({ view }) {
               <p>{view.endingPreview.text}</p>
             </section>
           )}
+          {view.authorityReview && (
+            <section className="authority-review-panel" aria-label="권한 심사">
+              <span>{view.authorityReview.title}</span>
+              <strong>{view.authorityReview.text}</strong>
+              <p>{view.authorityReview.next}</p>
+            </section>
+          )}
           {view.failureObjectives?.length > 0 && (
             <section className="failure-objectives" aria-label="실패 재도전 목표">
               <strong>RETRY OBJECTIVES</strong>

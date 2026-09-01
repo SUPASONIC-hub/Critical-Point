@@ -65,6 +65,7 @@ export function RankingScreen({
                     <div className="ranking-player">
                       <b>{entry.name}</b>
                       <span className="ranking-style-badge">{entry.style}</span>
+                      <span className="ranking-league-badge">{entry.league}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
                       <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
                     </div>
