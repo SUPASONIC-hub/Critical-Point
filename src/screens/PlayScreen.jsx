@@ -11,6 +11,7 @@ import { CASE_SEQUENCE } from "../gameData.js";
 export function PlayScreen({ view }) {
   const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
+  const operatorBrief = view.operatorBriefs?.[currentCase];
   const latestObserverTag = log.at(-1)?.observerTag;
   const observerArc = observerPattern?.arc;
   const getObserverPreviewForChoice = (choiceId) =>
@@ -86,6 +87,33 @@ export function PlayScreen({ view }) {
                   {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
                 </small>
               ))}
+            </div>
+          </section>
+        )}
+        {operatorBrief && (
+          <section className="operator-bridge" aria-label="분석관의 위치와 권한">
+            <div className="operator-bridge-heading">
+              <span>OPERATOR BRIEF</span>
+              <strong>당신은 트리거랩의 전환 분석관입니다</strong>
+            </div>
+            <div className="operator-bridge-grid">
+              <div>
+                <span>현재 역할</span>
+                <b>사건을 해결하는 외부 영웅이 아니라, 판단 기준을 설계하는 내부 분석관</b>
+              </div>
+              <div>
+                <span>현재 권한</span>
+                <b>기록 열람 · 관계자 질문 · 임시 운영 기준 제안</b>
+              </div>
+              <div>
+                <span>권한의 경계</span>
+                <b>현장 집행과 최종 승인 권한은 각 조직의 책임자에게 남아 있습니다</b>
+              </div>
+              <div className="operator-bridge-movement">
+                <span>이번 이동</span>
+                <b>{operatorBrief.movement}</b>
+                <p>{operatorBrief.reason}</p>
+              </div>
             </div>
           </section>
         )}

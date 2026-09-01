@@ -56,6 +56,33 @@ export const sceneVisuals = {
   final: "/scene-final.png",
 };
 
+export const operatorBriefs = {
+  case01: {
+    movement: "트리거랩 분석실 → 플로우온 물류 현장",
+    reason: "첫 사건의 운영 데이터를 실제 이해관계자의 언어로 확인하기 위해",
+  },
+  case02: {
+    movement: "플로우온 현장 → 트리거랩 보안 감사실",
+    reason: "현장에서 남긴 보호와 공개의 기준이 내부 기록에 어떻게 반영됐는지 확인하기 위해",
+  },
+  case03: {
+    movement: "트리거랩 감사실 → 고객사 입찰실",
+    reason: "복원한 기록이 속도와 경쟁 압박 속에서도 판단 기준으로 남는지 시험하기 위해",
+  },
+  case04: {
+    movement: "고객사 입찰실 → 트리거랩 운영 검토실",
+    reason: "성과를 위해 허용한 예외가 서비스 이용자에게 어떤 비용으로 돌아가는지 확인하기 위해",
+  },
+  case05: {
+    movement: "트리거랩 운영 검토실 → 현장 복구 통제실",
+    reason: "규칙과 예외가 반복될 때 누가 책임을 떠안는지 직접 확인하기 위해",
+  },
+  final: {
+    movement: "현장 복구 통제실 → 트리거랩 기록 보관소",
+    reason: "여섯 사건에 남은 반응 패턴과 자신의 트리거 사용 권한을 함께 검토하기 위해",
+  },
+};
+
 export const legacyProfiles = {
   S: {
     label: "CLEAR SIGNAL",
