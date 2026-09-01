@@ -121,6 +121,15 @@ export function IntroScreen({ view }) {
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
+          {view.tutorialSteps && (
+            <section className="tutorial-path" aria-label="첫 플레이 안내">
+              <span>FIRST RUN PROTOCOL</span>
+              <div>{view.tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
+            </section>
+          )}
+          {view.playStyleUnlocks && (
+            <p className="play-style-unlock"><strong>{view.playStyleUnlocks.label}</strong> · {view.playStyleUnlocks.unlock} · {view.playStyleUnlocks.newGamePlus}</p>
+          )}
           <div className="start-panel">
             {hasResumableSave && (
               <div className="resume-panel">

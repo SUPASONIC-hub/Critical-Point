@@ -278,6 +278,31 @@ export function ResultScreen({ view }) {
               </div>
             </section>
           )}
+          {view.endingSceneProfile && (
+            <section className="ending-scene-profile" aria-label="엔딩 장면 프로필">
+              <span>{view.endingSceneProfile.location}</span>
+              <strong>{view.endingSceneProfile.cue}</strong>
+              <p>다음 장면의 핵심 행동: {view.endingSceneProfile.choice}</p>
+            </section>
+          )}
+          {view.failureObjectives?.length > 0 && (
+            <section className="failure-objectives" aria-label="실패 재도전 목표">
+              <strong>RETRY OBJECTIVES</strong>
+              {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
+            </section>
+          )}
+          {view.delayedConsequences?.length > 0 && (
+            <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">
+              <span>CONSEQUENCE CHAIN</span>
+              <p>{view.delayedConsequences.map((item) => item.text).join(" ")}</p>
+            </section>
+          )}
+          {view.rankingComparison && (
+            <section className="ranking-comparison" aria-label="기록 비교">
+              <span>RUN COMPARISON</span>
+              {view.rankingComparison.map((item) => <div key={item.label}><b>{item.label}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.value}</small></div>)}
+            </section>
+          )}
           <section className="ending-axis-panel" aria-label="엔딩 결정 축">
             <div className="panel-title-row">
               <h2>ENDING AXIS</h2>

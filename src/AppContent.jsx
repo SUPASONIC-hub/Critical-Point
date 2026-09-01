@@ -148,6 +148,16 @@ import {
   sceneVisuals,
   triggerLabSignals,
 } from "./appContent.js";
+import {
+  getChapterUiModel,
+  getDelayedConsequences,
+  getEndingSceneProfile,
+  getFailureObjectives,
+  getPlayStyleUnlocks,
+  getRelationshipQuest,
+  getRankingComparison,
+  getTutorialSteps,
+} from "./advancedSystems.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
@@ -562,6 +572,12 @@ export function AppContent({ onSuppressSaves }) {
       active: node?.speaker === name,
     };
   });
+  const chapterUiModel = getChapterUiModel(currentCase);
+  const activeRelationshipScore = relationshipScores.find((item) => item.active)?.value ?? 0;
+  const relationshipQuest = getRelationshipQuest(node?.speaker, activeRelationshipScore);
+  const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
+  const playStyleUnlocks = getPlayStyleUnlocks(playStyle, newGamePlusUnlocked);
+  const tutorialSteps = getTutorialSteps();
   const authorityState = useMemo(() => {
     const evidence = discoveredClues.length;
     const trust = resources.trust ?? 0;
@@ -2409,6 +2425,7 @@ export function AppContent({ onSuppressSaves }) {
     () => getEndingVariant({ resources, discoveredClues, log }),
     [discoveredClues, log, resources],
   );
+  const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   const routeTimeline = useMemo(
     () => log
       .filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent)
@@ -2734,6 +2751,8 @@ export function AppContent({ onSuppressSaves }) {
   if (!started) {
     introView.startNewGamePlus = startNewGamePlus;
     introView.newGamePlusUnlocked = newGamePlusUnlocked;
+    introView.tutorialSteps = tutorialSteps;
+    introView.playStyleUnlocks = playStyleUnlocks;
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   function advanceEndingStep() {
@@ -2752,12 +2771,21 @@ export function AppContent({ onSuppressSaves }) {
   }
 
   const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines };
+  resultView.chapterUiModel = chapterUiModel;
+  resultView.endingSceneProfile = getEndingSceneProfile(endingVariant.id);
+  resultView.failureObjectives = getFailureObjectives(endingVariant);
+  resultView.delayedConsequences = delayedConsequences;
+  resultView.rankingComparison = rankingComparison;
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
 
   const playView = { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace };
   playView.clueHypotheses = clueHypotheses;
+  playView.chapterUiModel = chapterUiModel;
+  playView.relationshipQuest = relationshipQuest;
+  playView.delayedConsequences = delayedConsequences;
+  playView.playStyleUnlocks = playStyleUnlocks;
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }

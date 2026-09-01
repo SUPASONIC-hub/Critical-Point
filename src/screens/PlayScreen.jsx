@@ -65,6 +65,23 @@ export function PlayScreen({ view }) {
             <span>현재 상황판</span>
             <b>목표·압박·위험·자원·기록·장면 목표 한 번에 보기</b>
           </summary>
+        {view.chapterUiModel && (
+          <section className="chapter-dashboard" style={{ "--chapter-accent": view.chapterUiModel.accent }} aria-label="챕터 전용 운영판">
+            <div><span>{view.chapterUiModel.label}</span><strong>{view.chapterUiModel.title}</strong></div>
+            <div className="chapter-dashboard-metrics">
+              {view.chapterUiModel.metrics.map((metric) => <b key={metric}>{metric}</b>)}
+            </div>
+            {view.relationshipQuest && (
+              <p><strong>{view.relationshipQuest.title}</strong> · {view.relationshipQuest.goal} · {view.relationshipQuest.unlocked ? "QUEST CLEAR" : `PROGRESS ${view.relationshipQuest.progress}%`}</p>
+            )}
+          </section>
+        )}
+        {view.delayedConsequences?.length > 0 && (
+          <section className="delayed-consequence-strip" aria-label="지연된 결과">
+            <span>DELAYED CONSEQUENCE</span>
+            <p>{view.delayedConsequences.at(-1).text}</p>
+          </section>
+        )}
         <section className="mission-strip">
           <div>
             <span>현재 목표</span>
