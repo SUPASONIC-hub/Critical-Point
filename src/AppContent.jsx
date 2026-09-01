@@ -161,6 +161,14 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
   getChoiceOutcomeFeedback,
+  getOriginPrologue,
+  getRelationshipGraph,
+  getEvidenceCombinations,
+  getHypothesisActions,
+  getFailureCause,
+  getEndingAtmosphere,
+  getPlayReport,
+  getTelemetryDashboardSnapshot,
   getPlayStyleUnlocks,
   getPastRunMemory,
   getRelationshipScene,
@@ -622,6 +630,10 @@ export function AppContent({ onSuppressSaves }) {
   }, [discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust]);
   const clueCount = discoveredClues.length;
   const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
+  const relationshipGraph = getRelationshipGraph(relationshipScores);
+  const evidenceCombinations = getEvidenceCombinations(discoveredClues);
+  const hypothesisActions = getHypothesisActions(clueHypotheses, authorityState);
+  const originPrologue = getOriginPrologue(operatorOrigin);
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
@@ -1507,6 +1519,26 @@ export function AppContent({ onSuppressSaves }) {
   function startRecoveryRoute() {
     setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
     startCase(currentCase);
+  }
+  function resolveHypothesisAction(action) {
+    if (!action?.effect) return;
+    const nextResources = applyEffect(resources, action.effect);
+    const entry = {
+      isSystemEvent: true,
+      nodeId: resolvedNodeId,
+      caseId: fallbackCaseId,
+      choiceId: `hypothesis-${action.id}`,
+      title: "HYPOTHESIS REVIEW",
+      choice: action.label,
+      effect: action.effect,
+      resourcesBefore: resources,
+      resourcesAfter: nextResources,
+    };
+    const nextLog = [...log, entry];
+    setResources(nextResources);
+    setLog(nextLog);
+    persist({ resources: nextResources, log: nextLog });
+    setSaveStatus(`${action.label}: ${action.text}`);
   }
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
@@ -2479,6 +2511,10 @@ export function AppContent({ onSuppressSaves }) {
   );
   const latestChoiceFeedback = getChoiceOutcomeFeedback(log.at(-1));
   const endingPreview = getEndingPreview(endingVariant);
+  const endingCause = getFailureCause(endingVariant, resources);
+  const endingAtmosphere = getEndingAtmosphere(endingVariant.id);
+  const playReport = getPlayReport(result, log);
+  const telemetryDashboard = getTelemetryDashboardSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   const routeTimeline = useMemo(
     () => log
@@ -2801,7 +2837,7 @@ export function AppContent({ onSuppressSaves }) {
       </Suspense>
     );
   }
-  const introView = { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles() };
+  const introView = { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue };
   if (!started) {
     introView.startNewGamePlus = startNewGamePlus;
     introView.newGamePlusUnlocked = newGamePlusUnlocked;
@@ -2826,7 +2862,7 @@ export function AppContent({ onSuppressSaves }) {
     setEndingStep(3);
   }
 
-  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview };
+  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview };
   resultView.chapterUiModel = chapterUiModel;
   resultView.endingSceneProfile = getEndingSceneProfile(endingVariant.id);
   resultView.endingVisualClass = getEndingVisualClass(endingVariant.id);
@@ -2836,6 +2872,10 @@ export function AppContent({ onSuppressSaves }) {
   resultView.seasonGoals = seasonGoals;
   resultView.balanceSignals = balanceSignals;
   resultView.startRecoveryRoute = startRecoveryRoute;
+  resultView.endingCause = endingCause;
+  resultView.endingAtmosphere = endingAtmosphere;
+  resultView.playReport = playReport;
+  resultView.telemetryDashboard = telemetryDashboard;
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
@@ -2844,6 +2884,10 @@ export function AppContent({ onSuppressSaves }) {
   playView.clueHypotheses = clueHypotheses;
   playView.chapterUiModel = chapterUiModel;
   playView.relationshipQuest = relationshipQuest;
+  playView.relationshipGraph = relationshipGraph;
+  playView.evidenceCombinations = evidenceCombinations;
+  playView.hypothesisActions = hypothesisActions;
+  playView.resolveHypothesisAction = resolveHypothesisAction;
   playView.delayedConsequences = delayedConsequences;
   playView.playStyleUnlocks = playStyleUnlocks;
   playView.interlude = interlude;

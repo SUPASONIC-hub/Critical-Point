@@ -102,6 +102,24 @@ export function PlayScreen({ view }) {
             <p>{view.pastRunMemory.text}</p>
           </section>
         )}
+        {view.relationshipGraph?.length > 0 && (
+          <section className="relationship-graph-panel" aria-label="인물 관계 그래프">
+            <span>RELATION MAP</span>
+            <div>{view.relationshipGraph.filter((item) => item.value > 0).map((item) => <article key={item.name}><b>{item.name}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.state}</small></article>)}</div>
+          </section>
+        )}
+        {view.evidenceCombinations?.length > 0 && (
+          <section className="evidence-combination-panel" aria-label="조합된 증거">
+            <span>CROSS-REFERENCE</span>
+            {view.evidenceCombinations.map((item) => <article key={item.id}><strong>{item.title}</strong><p>{item.text}</p></article>)}
+          </section>
+        )}
+        {view.hypothesisActions?.length > 0 && (
+          <section className="hypothesis-actions-panel" aria-label="가설 처리">
+            <span>HYPOTHESIS CONTROL</span>
+            <div>{view.hypothesisActions.map((action) => <button type="button" key={action.id} onClick={() => view.resolveHypothesisAction(action)}><b>{action.label}</b><small>{action.text}</small></button>)}</div>
+          </section>
+        )}
         {view.balanceSignals?.length > 0 && (
           <p className="balance-signal" role="status">{view.balanceSignals[0].signal}: {view.balanceSignals[0].share}%의 기록이 같은 선택에 집중되어 있습니다. 다른 경로를 확인해 보세요.</p>
         )}

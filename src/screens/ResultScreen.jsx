@@ -1,8 +1,8 @@
 import React from "react";
-import { AlertTriangle, ChevronRight, Copy, Download, FileText, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
+import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 
 export function ResultScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
+  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
   const firstCaseChoice = caseResults.case01?.outcomeChoiceId ?? "기록 없음";
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0];
@@ -97,7 +97,7 @@ export function ResultScreen({ view }) {
           {screenReaderStatus}
         </p>
         {currentCase === "final" && (
-            <section className={`ending-sequence ending-step-${endingStep} ${view.endingVisualClass ?? ""}`} aria-label="최종 엔딩 시퀀스">
+            <section className={`ending-sequence ending-step-${endingStep} ending-palette-${view.endingAtmosphere?.palette ?? "archive"} ${view.endingVisualClass ?? ""}`} aria-label="최종 엔딩 시퀀스">
             <img className="ending-visual" src={view.endingSceneProfile?.image ?? "/ending-final-archive.png"} alt="" aria-hidden="true" />
             <div className="ending-visual-scrim" aria-hidden="true" />
             <h1 className="sr-only">Season complete</h1>
@@ -198,6 +198,10 @@ export function ResultScreen({ view }) {
                 <FileText size={16} />
                 시즌 로드맵
               </button>
+              <button className="ghost" type="button" onClick={copyReplayLink}>
+                <Link2 size={16} />
+                리플레이 링크
+              </button>
               {debugToolsEnabled && (
                 <button
                   type="button"
@@ -297,6 +301,20 @@ export function ResultScreen({ view }) {
               <strong>RETRY OBJECTIVES</strong>
               {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
               <button type="button" onClick={view.startRecoveryRoute}>복구 루트 시작</button>
+              {view.endingCause && <p className="failure-cause"><b>PRIMARY CAUSE: {view.endingCause.id}</b> {view.endingCause.text} {view.endingCause.recovery}</p>}
+            </section>
+          )}
+          {view.playReport && (
+            <section className="play-report-panel" aria-label="플레이 리포트">
+              <span>PLAYER REPORT</span>
+              <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
+              <p>최근 경로: {view.playReport.route.join(" → ") || "기록 없음"}</p>
+            </section>
+          )}
+          {view.telemetryDashboard && (
+            <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
+              <span>PLAYTEST HEALTH</span>
+              <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
             </section>
           )}
           {view.delayedConsequences?.length > 0 && (

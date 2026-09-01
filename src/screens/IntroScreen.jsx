@@ -147,6 +147,7 @@ export function IntroScreen({ view }) {
                 ))}
               </div>
               <p className="operator-origin-selected">현재 출신: {view.operatorProfile?.title} · 첫 권한: {view.operatorProfile?.authority}</p>
+              {view.originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{view.originPrologue.title}</strong><p>{view.originPrologue.text}</p></div>}
             </section>
           )}
           {view.tutorialSteps && (

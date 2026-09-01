@@ -227,3 +227,84 @@ export function getPastRunMemory(memory = {}) {
   const [caseId, result] = entries.at(-1);
   return { caseId, choice: result.outcomeChoiceId, label: "PAST RUN MEMORY", text: `이전 기록에서 ${caseId}의 ${result.outcomeChoiceId} 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
 }
+
+export function getOriginPrologue(origin = "courier") {
+  const profiles = {
+    courier: { title: "첫 번째 배송이 멈춘 밤", text: "당신은 배송 지연표의 작은 오차에서 시작했습니다. 누구도 문제라고 부르지 않은 기록이 첫 번째 권한을 열었습니다." },
+    lab: { title: "검증 요청서가 도착한 밤", text: "당신은 트리거랩의 검증 요청을 받고 파견되었습니다. 실험실은 답을 원하지만, 당신은 질문의 출처부터 확인해야 합니다." },
+    public: { title: "외부 감사가 시작된 밤", text: "당신은 외부 감사관으로 기록 사이의 공백을 조사합니다. 공개 권한은 크지만, 보호해야 할 사람도 함께 늘어납니다." },
+  };
+  return profiles[origin] ?? profiles.courier;
+}
+
+export function getRelationshipGraph(scores = []) {
+  return scores.map((item) => ({
+    ...item,
+    state: item.value >= 70 ? "ALLIED" : item.value >= 35 ? "NEGOTIATING" : "DISTANT",
+  }));
+}
+
+export function getEvidenceCombinations(discoveredClues = []) {
+  if (discoveredClues.length < 2) return [];
+  const pairs = [];
+  for (let index = 0; index < discoveredClues.length - 1; index += 2) {
+    const first = discoveredClues[index];
+    const second = discoveredClues[index + 1];
+    pairs.push({
+      id: `${first.id ?? index}-${second.id ?? index + 1}`,
+      title: "CROSS-REFERENCE FOUND",
+      text: `${first.title ?? "기록"} + ${second.title ?? "기록"}이 같은 책임 공백을 가리킵니다. 공개 전에 원본과 증언을 함께 확인할 수 있습니다.`,
+    });
+  }
+  return pairs;
+}
+
+export function getHypothesisActions(hypotheses = [], authority = {}) {
+  if (hypotheses.length === 0) return [];
+  return [
+    { id: "hold", label: "가설 보류", text: "증거를 더 모으고 공개 위험을 줄입니다.", effect: { fatigue: 1, legitimacy: 1 } },
+    { id: "investigate", label: "추가 조사", text: "관계자 질문으로 가설의 반증을 찾습니다.", effect: { time: -2, trust: 2 } },
+    ...(authority.level !== "OBSERVER" ? [{ id: "publish", label: "검증 공개", text: "현재 가설을 공개 검증선에 올립니다.", effect: { legitimacy: 4, trust: -2, fatigue: 3 } }] : []),
+  ];
+}
+
+export function getFailureCause(variant = {}, resources = {}) {
+  if (!variant?.failure) return null;
+  const candidates = [
+    ["human-cost", resources.humanCost ?? 0, "사람의 비용이 누적되었습니다."],
+    ["fatigue", resources.fatigue ?? 0, "판단 피로가 선택의 폭을 좁혔습니다."],
+    ["risk", resources.time ?? 0, "시간 압박이 위험한 지름길을 만들었습니다."],
+  ];
+  const [id, value, text] = candidates.sort((a, b) => b[1] - a[1])[0];
+  return { id, value, text, recovery: id === "human-cost" ? "관계 회복을 먼저 선택하십시오." : id === "fatigue" ? "한 장면을 멈추고 기록을 정리하십시오." : "공개 전에 위험 경로를 하나 줄이십시오." };
+}
+
+export function getEndingAtmosphere(endingId = "open-question") {
+  const atmospheres = {
+    "open-oversight": { palette: "lime", motion: "expanding", sound: "wide-harmonics" },
+    "evidence-reform": { palette: "mint", motion: "layered", sound: "measured-pulse" },
+    "human-record": { palette: "warm", motion: "close-focus", sound: "voice-memory" },
+    collapse: { palette: "redline", motion: "fractured", sound: "low-impact" },
+  };
+  return atmospheres[endingId] ?? { palette: "archive", motion: "slow-pan", sound: "quiet-motif" };
+}
+
+export function getPlayReport(summary = {}, log = []) {
+  const entries = log.filter((entry) => !entry?.isSystemEvent);
+  return {
+    decisions: entries.length,
+    clues: summary.challengeClearCount ?? 0,
+    dominantStyle: summary.freeCount > summary.challengeClearCount ? "BOARD BREAKER" : summary.pressureAdaptScore >= summary.reflectionScore ? "RISK CUTTER" : "SYSTEM THINKER",
+    route: entries.map((entry) => entry.choiceId).filter(Boolean).slice(-8),
+  };
+}
+
+export function getTelemetryDashboardSnapshot({ errors = [], pending = [], rankings = [], caseResults = {} } = {}) {
+  return {
+    errors: errors.length,
+    pending: pending.length,
+    runs: new Set(rankings.map((row) => row.run_id).filter(Boolean)).size,
+    completed: Object.keys(caseResults).length,
+    lastError: errors.at(-1)?.error?.message ?? errors.at(-1)?.error_message ?? "none",
+  };
+}
