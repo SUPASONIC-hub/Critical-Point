@@ -424,7 +424,9 @@ function ensureAudioRuntime(volume) {
 
 export function AdaptiveMusic({ modeKey }) {
   const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
-  const [audioState, setAudioState] = useState("starting");
+  const [audioState, setAudioState] = useState(() =>
+    readStoredValue(MUSIC_PREF_KEY, "true") !== "false" ? "starting" : "off",
+  );
   const timerRef = useRef(null);
   const stepRef = useRef(0);
   const pulseRef = useRef(null);
@@ -447,14 +449,13 @@ export function AdaptiveMusic({ modeKey }) {
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
-      setAudioState("off");
       audioRuntime.master?.gain.setTargetAtTime(0.0001, audioRuntime.context?.currentTime ?? 0, 0.08);
       return undefined;
     }
 
     const context = ensureAudioRuntime(modeRef.current.volume);
     if (!context) {
-      setAudioState("unsupported");
+      queueMicrotask(() => setAudioState("unsupported"));
       return undefined;
     }
 
@@ -594,7 +595,8 @@ export function AdaptiveMusic({ modeKey }) {
           resumeRef.current?.();
           return;
         }
-        setEnabled((value) => !value);
+        setAudioState("off");
+        setEnabled(false);
       }}
       aria-label={toggleLabel}
       title={toggleLabel}

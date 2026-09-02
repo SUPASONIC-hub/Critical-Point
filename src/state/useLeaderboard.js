@@ -20,8 +20,11 @@ export function useLeaderboard({ showRanking, isOnline, localLeaderboardRows, lo
     if (!showRanking) return undefined;
     let cancelled = false;
     const localRows = [...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])];
-    setLeaderboardStatus("loading");
-    setLeaderboardError("");
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setLeaderboardStatus("loading");
+      setLeaderboardError("");
+    });
     fetchLeaderboard()
       .then(({ rows = [], skipped = false }) => {
         if (cancelled) return;

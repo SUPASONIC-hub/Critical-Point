@@ -111,3 +111,9 @@ create table if not exists app_error_logs (
 - 운영 배포 전 `npx supabase db push`로 `supabase/migrations/`를 적용해 RLS, 공개 랭킹 뷰, telemetry 검증 트리거를 반영합니다. 기존에 SQL Editor로 수동 적용한 프로젝트는 첫 연결 시 `npx supabase migration repair --status applied 20260902055713`로 baseline을 적용됨으로 표시합니다.
 - 마이그레이션 이력은 원격의 `supabase_migrations.schema_migrations`에 기록되며, 이 테이블은 `supabase link` 시점에 생성됩니다. 연결 전에는 대시보드 Migrations 탭이나 CLI 조회가 `42P01 relation "supabase_migrations.schema_migrations" does not exist`를 남기는데, 이는 앱 동작과 무관한 로그입니다.
 - 결과 화면의 기본 내보내기는 `src/state/playtestExport.js`가 조립하며, 요약본에서 `playerName`, `log`, `sessionId`, `errorLog`, `saveSlots`, `trace`가 빠지는지 단위 테스트로 고정합니다.
+
+## Maintenance Notes
+
+- Windows PowerShell can render Korean text as mojibake even when files are valid UTF-8. Use `npm run check:encoding` and `npm run check:text` as the source of truth before changing content for display-only corruption.
+- Application CSS is split under `src/styles/app/` and imported by `src/styles/app.css`; keep import order stable because later files contain overrides.
+- Shared resource and label constants live in `src/gameConstants.js`; narrative graph data stays in `src/gameData.js`.

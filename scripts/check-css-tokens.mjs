@@ -1,9 +1,21 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const tokenCss = readFileSync("src/styles/tokens.css", "utf8");
-const appCss = readFileSync("src/styles/app.css", "utf8");
-const allCss = `${tokenCss}\n${appCss}`;
+function readCssFiles(directory) {
+  return readdirSync(directory)
+    .flatMap((entry) => {
+      const path = join(directory, entry);
+      if (statSync(path).isDirectory()) return readCssFiles(path);
+      return path.endsWith(".css") ? [path] : [];
+    })
+    .sort()
+    .map((path) => ({ path, css: readFileSync(path, "utf8") }));
+}
+
+const styleFiles = [{ path: "src/styles/tokens.css", css: tokenCss }, ...readCssFiles("src/styles/app")];
+const allCss = styleFiles.map(({ css }) => css).join("\n");
 const failures = [];
 const budgets = {
   hardcodedHexColors: 300,
@@ -40,9 +52,12 @@ if (cssVariableUsages < budgets.cssVariableUsages) {
   failures.push(`styles use ${cssVariableUsages} CSS variables; expected at least ${budgets.cssVariableUsages}`);
 }
 
-for (const [lineIndex, line] of appCss.split(/\r?\n/).entries()) {
-  if (/(^|[;{])\s*color\s*:\s*rgba?\([^;]*(?:,\s*|\/\s*)0?\.[0-5]\d?[^;]*;/.test(line)) {
-    failures.push(`app.css:${lineIndex + 1} uses low-opacity text color; prefer an opaque token with tested contrast`);
+for (const { path, css } of styleFiles) {
+  if (path === "src/styles/tokens.css") continue;
+  for (const [lineIndex, line] of css.split(/\r?\n/).entries()) {
+    if (/(^|[;{])\s*color\s*:\s*rgba?\([^;]*(?:,\s*|\/\s*)0?\.[0-5]\d?[^;]*;/.test(line)) {
+      failures.push(`${path}:${lineIndex + 1} uses low-opacity text color; prefer an opaque token with tested contrast`);
+    }
   }
 }
 

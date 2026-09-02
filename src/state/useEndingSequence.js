@@ -28,13 +28,23 @@ export function useEndingSequence({ isResult, currentCase }) {
 
   useEffect(() => {
     if (!isResult || currentCase !== "final" || endingStep !== 1) return undefined;
+    let cancelled = false;
     if (prefersReducedMotion()) {
-      setEndingQuietReady(true);
-      return undefined;
+      queueMicrotask(() => {
+        if (!cancelled) setEndingQuietReady(true);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
-    setEndingQuietReady(false);
+    queueMicrotask(() => {
+      if (!cancelled) setEndingQuietReady(false);
+    });
     const timer = window.setTimeout(() => setEndingQuietReady(true), QUIET_HOLD_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [currentCase, endingStep, isResult]);
 
   function skipEndingQuietHold() {

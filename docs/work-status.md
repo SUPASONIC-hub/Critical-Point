@@ -17,11 +17,13 @@ Last updated: 2026-09-02
 2. Keep browser-storage ownership in focused hooks such as `useAppPersistence` and `useLocalRanking`.
 3. Route guarded button behavior through `GuardedButton` instead of repeating `aria-disabled`, `tabIndex`, and click guards.
 4. Put reusable Playwright flow behavior in `tests/helpers/gameFlow.js`.
-5. Keep CSS, text, and graph checks budget/schema-based so content drift is caught before it reaches screenshots.
-6. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
-7. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
-8. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
-9. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+5. Keep CSS split by surface under `src/styles/app/`; preserve import order in `src/styles/app.css`.
+6. Keep shared data constants in `src/gameConstants.js` and larger narrative graph data in `src/gameData.js`.
+7. Keep CSS, text, and graph checks budget/schema-based so content drift is caught before it reaches screenshots.
+8. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
+9. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
+10. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
+11. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
 ## Verification Commands
 

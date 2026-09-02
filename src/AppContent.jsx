@@ -119,6 +119,7 @@ import { buildPlaytestExport, downloadJson } from "./state/playtestExport.js";
 import { createClipboardActions, useClipboardStatus } from "./state/useClipboardStatus.js";
 import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js";
 import { useEndingSequence } from "./state/useEndingSequence.js";
+import { useStableEvent } from "./state/useStableEvent.js";
 import { getCharacterState, getRivalResponse } from "./characterSystems.js";
 import { getAchievementProgress, getChapterTransitionBridge, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
 import {
@@ -313,7 +314,7 @@ export function AppContent({ onSuppressSaves }) {
   const pendingTelemetryRef = useRef(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
-  const [memoOpened, setMemoOpened] = useState(false);
+  const [memoState, setMemoState] = useState({ nodeId: "", opened: false });
   const [showRanking, setShowRanking] = useState(false);
   const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
@@ -376,19 +377,26 @@ export function AppContent({ onSuppressSaves }) {
     deleteSaveSlot: persistenceDeleteSaveSlot,
     restoreSaveSlot: persistenceRestoreSaveSlot,
   } = useAppPersistence({
-    runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
-    discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
-    freeText, echo, nodeEnteredAt, pendingTelemetryRef, protocolUsed, timerPenaltyApplied, probeUsed,
-    investigatedTargets, hypothesisDecisions,
-    isPausedSave, setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
-    setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
-    setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setInvestigatedTargets, setHypothesisDecisions, setOpeningLegacy,
-    setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
-    setFreeText, setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries,
-    setSaveSlots, saveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
-    makeEmptyScores, persistSuppressed: () => saveSuppressed,
-    onSuppressSaves, formatSaveTime, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
-    createRunId,
+    state: {
+      runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
+      discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
+      freeText, echo, nodeEnteredAt, protocolUsed, timerPenaltyApplied, probeUsed,
+      investigatedTargets, hypothesisDecisions, isPausedSave, saveSlots,
+    },
+    refs: { pendingTelemetryRef },
+    setters: {
+      setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
+      setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
+      setCognition, setProtocolUsed, setTimerPenaltyApplied, setProbeUsed, setInvestigatedTargets,
+      setHypothesisDecisions, setOpeningLegacy, setDecisionReveal, setPendingChoice,
+      setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText, setNodeId,
+      setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots,
+    },
+    config: {
+      normalizePlayerName, initialResources, triggerLabels, cognitionLabels, makeEmptyScores,
+      persistSuppressed: () => saveSuppressed, onSuppressSaves, formatSaveTime,
+      debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
+    },
   });
   const persist = persistenceApi;
 
@@ -456,6 +464,10 @@ export function AppContent({ onSuppressSaves }) {
   const freeTextSignals = getFreeTextSignals(freeText);
   const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
   const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
+  const memoOpened = memoState.nodeId === resolvedNodeId && memoState.opened;
+  const setMemoOpened = useStableEvent((opened) => {
+    setMemoState({ nodeId: resolvedNodeId, opened });
+  });
   const evidenceCount = discoveredClues.length + (memoOpened ? 1 : 0) + (probeUsed ? 1 : 0) + activeFreeTextSignalCount;
   const localSeasonLeaderboardRow = useMemo(() => caseResults.final && completedCases.includes("final")
     ? {
@@ -469,9 +481,6 @@ export function AppContent({ onSuppressSaves }) {
         summary: { ...caseResults.final, runId: caseResults.final.runId ?? runId, seasonComplete: true },
       }
     : null, [caseResults, completedCases, playerName, runId, sessionCode]);
-  useEffect(() => {
-    setMemoOpened(false);
-  }, [resolvedNodeId]);
   const privacySignals = detectPrivacySignals(freeText);
   const activePrivacySignals = privacySignals.filter((signal) => signal.active);
   const freeTextBlockedByPrivacy = activePrivacySignals.length > 0;
@@ -481,37 +490,48 @@ export function AppContent({ onSuppressSaves }) {
   ).length;
   const aftermathNodeId = fallbackCaseId === "final" ? "f_aftershock" : `${fallbackCaseId.replace("case", "c")}_aftershock`;
   const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseFreeTextSuccessCount >= 2;
-  const adaptiveChoice = adaptiveChoiceUnlocked
-    ? {
-        id: `${fallbackCaseId}_adaptive_reframe`,
-        label: "앞서 남긴 문장을 공개 기준으로 삼는다",
-        effect: { legitimacy: 7, trust: 5, fatigue: 4 },
-        next: node?.choices?.[0]?.next ?? "result",
-        cognition: { reframing: 2, persistence: 1 },
-        adaptive: true,
-        requiredAuthority: "FIELD ACCESS",
-      }
-    : null;
+  const adaptiveChoice = useMemo(
+    () =>
+      adaptiveChoiceUnlocked
+        ? {
+            id: `${fallbackCaseId}_adaptive_reframe`,
+            label: "앞서 남긴 문장을 공개 기준으로 삼는다",
+            effect: { legitimacy: 7, trust: 5, fatigue: 4 },
+            next: node?.choices?.[0]?.next ?? "result",
+            cognition: { reframing: 2, persistence: 1 },
+            adaptive: true,
+            requiredAuthority: "FIELD ACCESS",
+          }
+        : null,
+    [adaptiveChoiceUnlocked, fallbackCaseId, node?.choices],
+  );
   const speakerRelationship = log.reduce(
     (score, entry) => score + (entry.speaker === node?.speaker ? 8 : entry.speaker ? -1 : 0),
     0,
   );
-  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
-    ? {
-        id: `${fallbackCaseId}_relationship_bridge`,
-        label: "관계의 증언을 먼저 확보한다",
-        effect: { trust: 5, legitimacy: 2, fatigue: 2 },
-        next: node.choices[0].next,
-        cognition: { inference: 1, reframing: 1 },
-        branchId: "relationship-bridge",
-        requiredAuthority: "FIELD ACCESS",
-      }
-    : null;
-  const fixedChoices = [
-    ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
-    ...(adaptiveChoice ? [adaptiveChoice] : []),
-    ...(relationshipChoice ? [relationshipChoice] : []),
-  ];
+  const relationshipChoice = useMemo(
+    () =>
+      !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
+        ? {
+            id: `${fallbackCaseId}_relationship_bridge`,
+            label: "관계의 증언을 먼저 확보한다",
+            effect: { trust: 5, legitimacy: 2, fatigue: 2 },
+            next: node.choices[0].next,
+            cognition: { inference: 1, reframing: 1 },
+            branchId: "relationship-bridge",
+            requiredAuthority: "FIELD ACCESS",
+          }
+        : null,
+    [fallbackCaseId, isResult, log.length, node?.choices, speakerRelationship],
+  );
+  const fixedChoices = useMemo(
+    () => [
+      ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
+      ...(adaptiveChoice ? [adaptiveChoice] : []),
+      ...(relationshipChoice ? [relationshipChoice] : []),
+    ],
+    [adaptiveChoice, node?.choices, relationshipChoice],
+  );
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
   const latestFreeTextSuccess = [...log].reverse().find(
     (entry) => entry.caseId === fallbackCaseId && entry.freeTextSuccess && entry.freeText,
@@ -893,6 +913,41 @@ export function AppContent({ onSuppressSaves }) {
     ],
     [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
+  const nextCaseSignal = nextCaseSignals[currentCase];
+  const resumeSavedGame = persistenceResumeSavedGame;
+  const pauseAfterRecovery = persistencePauseAfterRecovery;
+  const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
+  const saveCurrentGame = persistenceSaveCurrentGame;
+  const refreshLocalErrorLog = persistenceRefreshLocalErrorLog;
+  const refreshSaveSlots = persistenceRefreshSaveSlots;
+  const dismissRecoveryNotice = persistenceDismissRecoveryNotice;
+  const closeRecoveryCenter = persistenceCloseRecoveryCenter;
+  const clearLocalErrorLog = persistenceClearLocalErrorLog;
+  const deleteSaveSlot = persistenceDeleteSaveSlot;
+  const restoreSaveSlot = persistenceRestoreSaveSlot;
+  const { queueTelemetry, retryPendingTelemetry, scheduleTelemetryRetry } = createTelemetryQueue({
+    pendingTelemetryRef,
+    setPendingTelemetry,
+    setTelemetryStatus,
+    setIsRetryingTelemetry,
+    setTelemetryRetryInfo,
+    telemetryRetryTimerRef,
+    isOnline,
+    dataConsent,
+    telemetryEnabled,
+    isRetryingTelemetry,
+    telemetryRetryAttemptRef,
+    setSaveStatus,
+    setLastSavedAt,
+  });
+  const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
+  const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
+  const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
+  const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
+  const setPendingChoiceEvent = useStableEvent(setPendingChoice);
+  const startCaseEvent = useStableEvent(startCase);
+  const chooseEvent = useStableEvent(choose);
+  const previewChoiceEvent = useStableEvent(previewChoice);
   useEffect(() => {
     const updateNetworkStatus = () => {
       const online = globalThis.navigator?.onLine !== false;
@@ -920,22 +975,28 @@ export function AppContent({ onSuppressSaves }) {
   }, []);
   useEffect(() => {
     if (!telemetryEnabled || !dataConsent || !isOnline || pendingTelemetry.length === 0) return undefined;
-    scheduleTelemetryRetry({ immediate: telemetryRetryAttemptRef.current === 0 });
+    scheduleTelemetryRetryEvent({ immediate: telemetryRetryAttemptRef.current === 0 });
     return () => {
       if (telemetryRetryTimerRef.current) {
         window.clearTimeout(telemetryRetryTimerRef.current);
         telemetryRetryTimerRef.current = null;
       }
     };
-  }, [dataConsent, isOnline, pendingTelemetry.length]);
+  }, [dataConsent, isOnline, pendingTelemetry.length, scheduleTelemetryRetryEvent]);
   useEffect(() => {
     if (!debugToolsEnabled) return undefined;
-    if (!telemetryEnabled || !isOnline) {
-      setTelemetryHealth({ status: telemetryEnabled ? "offline" : "disabled", tables: [] });
-      return undefined;
-    }
     let cancelled = false;
-    setTelemetryHealth({ status: "checking", tables: [] });
+    if (!telemetryEnabled || !isOnline) {
+      queueMicrotask(() => {
+        if (!cancelled) setTelemetryHealth({ status: telemetryEnabled ? "offline" : "disabled", tables: [] });
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+    queueMicrotask(() => {
+      if (!cancelled) setTelemetryHealth({ status: "checking", tables: [] });
+    });
     checkTelemetryHealth()
       .then((health) => {
         if (cancelled) return;
@@ -966,7 +1027,7 @@ export function AppContent({ onSuppressSaves }) {
         currentCase: entry.context.currentCase,
         nodeId: entry.context.nodeId,
       });
-      refreshLocalErrorLog();
+      refreshLocalErrorLogEvent();
     };
     const handleUnhandledRejection = (event) => {
       const entry = recordAppError(event.reason, {}, "unhandled-rejection");
@@ -978,7 +1039,7 @@ export function AppContent({ onSuppressSaves }) {
         currentCase: entry.context.currentCase,
         nodeId: entry.context.nodeId,
       });
-      refreshLocalErrorLog();
+      refreshLocalErrorLogEvent();
     };
     const originalConsoleError = console.error;
     console.error = (...args) => {
@@ -994,7 +1055,7 @@ export function AppContent({ onSuppressSaves }) {
         const consoleError = args.find((arg) => arg instanceof Error) ?? new Error(limitText(text, 400));
         consoleError.name = "ConsoleError";
         recordAppError(consoleError, {}, "console-error");
-        refreshLocalErrorLog();
+        refreshLocalErrorLogEvent();
       } catch {
         // Never let diagnostics break the console itself.
       } finally {
@@ -1008,7 +1069,7 @@ export function AppContent({ onSuppressSaves }) {
       window.removeEventListener("error", handleWindowError);
       window.removeEventListener("unhandledrejection", handleUnhandledRejection);
     };
-  }, []);
+  }, [refreshLocalErrorLogEvent]);
   useEffect(() => {
     const closeOverlay = (event) => {
       if (event.key !== "Escape") return;
@@ -1017,12 +1078,12 @@ export function AppContent({ onSuppressSaves }) {
       } else if (showRanking) {
         setShowRanking(false);
       } else if (showErrorLog) {
-        closeRecoveryCenter();
+        closeRecoveryCenterEvent();
       }
     };
     window.addEventListener("keydown", closeOverlay);
     return () => window.removeEventListener("keydown", closeOverlay);
-  }, [decisionReveal, showErrorLog, showRanking]);
+  }, [closeRecoveryCenterEvent, decisionReveal, setDecisionReveal, showErrorLog, showRanking]);
   useEffect(() => {
     const handleChoiceShortcut = (event) => {
       if (!started || decisionReveal || isAdvancing) return;
@@ -1032,26 +1093,26 @@ export function AppContent({ onSuppressSaves }) {
       if (isResult) {
         if (event.key.toLowerCase() === "r") {
           event.preventDefault();
-          startCase(currentCase);
+          startCaseEvent(currentCase);
         } else if (event.key.toLowerCase() === "n" && nextCaseSignal) {
           event.preventDefault();
-          startCase(nextCaseSignal.caseId);
+          startCaseEvent(nextCaseSignal.caseId);
         }
         return;
       }
       if (event.key.toLowerCase() === "p") {
         event.preventDefault();
-        saveCurrentGame({ exit: event.shiftKey });
+        saveCurrentGameEvent({ exit: event.shiftKey });
         return;
       }
       if (event.key === "Escape" && pendingChoice) {
         event.preventDefault();
-        setPendingChoice(null);
+        setPendingChoiceEvent(null);
         return;
       }
       if ((event.key === "Enter" || event.key === " ") && pendingChoice) {
         event.preventDefault();
-        choose(pendingChoice);
+        chooseEvent(pendingChoice);
         return;
       }
       if (fixedChoices.length > 1 && ["ArrowDown", "ArrowRight", "j", "J", "ArrowUp", "ArrowLeft", "k", "K"].includes(event.key)) {
@@ -1059,17 +1120,31 @@ export function AppContent({ onSuppressSaves }) {
         const currentIndex = pendingChoice ? fixedChoices.findIndex((choice) => choice.id === pendingChoice.id) : -1;
         const direction = ["ArrowUp", "ArrowLeft", "k", "K"].includes(event.key) ? -1 : 1;
         const nextIndex = (currentIndex + direction + fixedChoices.length) % fixedChoices.length;
-        previewChoice(fixedChoices[nextIndex]);
+        previewChoiceEvent(fixedChoices[nextIndex]);
         return;
       }
       const choiceIndex = Number(event.key) - 1;
       if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || !fixedChoices[choiceIndex]) return;
       event.preventDefault();
-      previewChoice(fixedChoices[choiceIndex]);
+      previewChoiceEvent(fixedChoices[choiceIndex]);
     };
     window.addEventListener("keydown", handleChoiceShortcut);
     return () => window.removeEventListener("keydown", handleChoiceShortcut);
-  }, [currentCase, decisionReveal, fixedChoices, isAdvancing, isResult, pendingChoice, started]);
+  }, [
+    chooseEvent,
+    currentCase,
+    decisionReveal,
+    fixedChoices,
+    isAdvancing,
+    isResult,
+    nextCaseSignal,
+    pendingChoice,
+    previewChoiceEvent,
+    saveCurrentGameEvent,
+    setPendingChoiceEvent,
+    startCaseEvent,
+    started,
+  ]);
   useEffect(() => {
     if (!pendingChoice) return;
     window.requestAnimationFrame(() => {
@@ -1104,15 +1179,22 @@ export function AppContent({ onSuppressSaves }) {
 
   useEffect(() => {
     if (!started || isResult) return undefined;
-    setDecisionSeconds(45);
-    setTimerPenaltyApplied(false);
-    setProbeUsed(false);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setDecisionSeconds(45);
+      setTimerPenaltyApplied(false);
+      setProbeUsed(false);
+    });
     const timer = window.setInterval(() => {
       if (document.hidden) return;
       setDecisionSeconds((value) => Math.max(0, value - 1));
     }, 1000);
-    return () => window.clearInterval(timer);
-  }, [started, currentCase, resolvedNodeId, isResult]);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [currentCase, isResult, resolvedNodeId, setDecisionSeconds, setProbeUsed, setTimerPenaltyApplied, started]);
 
   useEffect(() => {
     if (!started || isResult) return undefined;
@@ -1149,7 +1231,7 @@ export function AppContent({ onSuppressSaves }) {
       window.removeEventListener("pagehide", handlePageHide);
       window.removeEventListener("pageshow", handlePageShow);
     };
-  }, [persist, started]);
+  }, [persist, setIsPausedSave, started]);
 
   useEffect(() => {
     if (!started || isResult || decisionSeconds > 0 || timerPenaltyApplied) return;
@@ -1177,20 +1259,23 @@ export function AppContent({ onSuppressSaves }) {
       isSystemEvent: true,
     };
     const nextLog = [...log, entry];
-    setTimerPenaltyApplied(true);
-    setResources(nextResources);
-    setLog(nextLog);
-    setEcho(entry.echo);
-    setNodeEnteredAt(Date.now());
-    setSaveStatus("결정 윈도우 초과 비용 적용됨");
+    const nextNodeEnteredAt = Date.now();
+    queueMicrotask(() => {
+      setTimerPenaltyApplied(true);
+      setResources(nextResources);
+      setLog(nextLog);
+      setEcho(entry.echo);
+      setNodeEnteredAt(nextNodeEnteredAt);
+      setSaveStatus("결정 윈도우 초과 비용 적용됨");
+    });
     persist({
       timerPenaltyApplied: true,
       resources: nextResources,
       log: nextLog,
       echo: entry.echo,
-      nodeEnteredAt: Date.now(),
+      nodeEnteredAt: nextNodeEnteredAt,
     });
-  }, [decisionSeconds, isResult, log, nodeEnteredAt, persist, resources, resolvedNodeId, riskPressure, started, timerPenaltyApplied]);
+  }, [decisionSeconds, isResult, log, persist, resources, resolvedNodeId, riskPressure, setLog, setResources, setTimerPenaltyApplied, started, timerPenaltyApplied]);
 
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
@@ -1206,9 +1291,9 @@ export function AppContent({ onSuppressSaves }) {
       sceneTitleRef.current?.focus({ preventScroll: true });
       setIsAdvancing(false);
       setShowTacticalDetails(false);
-      setPendingChoice(null);
+      setPendingChoiceEvent(null);
     });
-  }, [started, currentCase, nodeId, isResult]);
+  }, [currentCase, isResult, nodeId, setPendingChoiceEvent, started]);
 
   // Persistence, save slots and error-log state are owned by useAppPersistence.
   const startGame = persistenceStartGame;
@@ -1283,18 +1368,6 @@ export function AppContent({ onSuppressSaves }) {
     persist({ resources: nextResources, log: nextLog });
     setSaveStatus(`${option.label}: 라이벌 개입에 대응했습니다.`);
   }
-  const resumeSavedGame = persistenceResumeSavedGame;
-  const pauseAfterRecovery = persistencePauseAfterRecovery;
-  const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
-  const saveCurrentGame = persistenceSaveCurrentGame;
-  const refreshLocalErrorLog = persistenceRefreshLocalErrorLog;
-  const refreshSaveSlots = persistenceRefreshSaveSlots;
-  const dismissRecoveryNotice = persistenceDismissRecoveryNotice;
-  const closeRecoveryCenter = persistenceCloseRecoveryCenter;
-  const clearLocalErrorLog = persistenceClearLocalErrorLog;
-  const deleteSaveSlot = persistenceDeleteSaveSlot;
-  const restoreSaveSlot = persistenceRestoreSaveSlot;
-
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
     const introEcho =
@@ -1515,22 +1588,6 @@ export function AppContent({ onSuppressSaves }) {
       runId: typeof summary?.runId === "string" ? summary.runId : "",
     };
   }
-
-  const { queueTelemetry, retryPendingTelemetry, scheduleTelemetryRetry } = createTelemetryQueue({
-    pendingTelemetryRef,
-    setPendingTelemetry,
-    setTelemetryStatus,
-    setIsRetryingTelemetry,
-    setTelemetryRetryInfo,
-    telemetryRetryTimerRef,
-    isOnline,
-    dataConsent,
-    telemetryEnabled,
-    isRetryingTelemetry,
-    telemetryRetryAttemptRef,
-    setSaveStatus,
-    setLastSavedAt,
-  });
 
   function getFreeTextBranchTarget(caseId, fromNodeId) {
     const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
@@ -2283,7 +2340,6 @@ export function AppContent({ onSuppressSaves }) {
     outcome: getCaseOutcome({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
     carryover: getOutcomeCarryover({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
   }));
-  const nextCaseSignal = nextCaseSignals[currentCase];
   const resultBridge =
     result.longestDecision
       ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
