@@ -32,14 +32,21 @@ npm run test:visual
 
 ## Database Deployment
 
+The project is linked and `npx supabase db push` reports it up to date. Apply new
+schema changes by adding a migration and pushing it:
+
 ```bash
-npx supabase link --project-ref <ref>
+npx supabase migration new <name>
 npx supabase db push
 ```
 
-On a project whose schema was applied by hand before the CLI workflow existed, mark the
-baseline as applied once instead of pushing it:
+Credentials come from `supabase/.env.local` (`SUPABASE_ACCESS_TOKEN`,
+`SUPABASE_DB_PASSWORD`), which is ignored by `supabase/.gitignore`. The CLI cannot run
+its browser login flow from a non-TTY shell, so the env vars are the only way to drive
+it from an agent session.
 
-```bash
-npx supabase migration repair --status applied 20260902055713
-```
+Caution: when `link` first created the remote history table it recorded both existing
+migrations as applied without executing them -- the schema had been applied by hand in
+the SQL editor. The history table therefore reflects what `link` inferred, not what the
+CLI ran. Always `db push` before trusting `migration list`, and verify behavior against
+the live database when a migration fixes a runtime error.
