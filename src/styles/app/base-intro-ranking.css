@@ -232,8 +232,8 @@ summary:focus-visible {
   display: grid;
   justify-items: center;
   gap: 0;
-  margin: 28px 0 16px;
-  font-size: clamp(56px, 13vw, 168px);
+  margin: 22px 0 12px;
+  font-size: clamp(52px, 10vw, 132px);
   font-weight: 900;
   line-height: 0.82;
   letter-spacing: -0.045em;
@@ -460,6 +460,8 @@ summary:focus-visible {
   line-height: 1.7;
 }
 .start-panel,
+.start-priority,
+.data-info-panel,
 .season-panel,
 .intro-brief,
 .quick-guide,
@@ -468,10 +470,23 @@ summary:focus-visible {
 .case-card {
   text-align: left;
 }
+.start-priority {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr);
+  align-items: start;
+  gap: 12px;
+  width: min(960px, 100%);
+  margin: 16px auto 22px;
+  padding: 16px;
+  background: rgba(14, 24, 22, 0.78);
+  border: 1px solid rgba(217, 255, 98, 0.42);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px var(--c-tone-013);
+}
 .start-panel {
-  width: min(620px, 100%);
-  margin: 20px auto 0;
-  padding: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 18px;
   background: rgba(255, 255, 255, 0.94);
   color: var(--color-ink);
   border-radius: 8px;
@@ -540,8 +555,8 @@ summary:focus-visible {
   line-height: 1.5;
 }
 .play-style-panel {
-  width: min(960px, 100%);
-  margin: 18px auto 0;
+  width: 100%;
+  margin: 0;
   padding: 16px;
   color: var(--c-ink);
   background: rgba(255, 255, 255, 0.94);
@@ -573,14 +588,14 @@ summary:focus-visible {
 }
 .play-style-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 9px;
 }
 .play-style {
   display: grid;
   align-content: start;
   gap: 6px;
-  min-height: 150px;
+  min-height: 0;
   padding: 12px;
   color: var(--c-ink-raised);
   background: var(--color-paper-soft);
@@ -630,6 +645,17 @@ summary:focus-visible {
   padding: 16px;
   color: var(--color-ink);
   background: rgba(255, 255, 255, 0.94);
+  border-radius: 8px;
+}
+.data-info-panel {
+  display: grid;
+  gap: 10px;
+  width: min(960px, 100%);
+  margin: 12px auto 0;
+  padding: 14px;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
 }
 .guide-heading,
@@ -843,9 +869,10 @@ summary:focus-visible {
 .start-input-row button {
   flex: 0 0 auto;
   height: 48px;
-  padding: 0 18px;
+  padding: 0 22px;
   background: var(--c-acid);
   color: var(--c-ink);
+  font-size: 15px;
 }
 .consent-box {
   display: flex;

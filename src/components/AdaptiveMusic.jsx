@@ -4,6 +4,13 @@ import { readStoredValue, writeStoredValue } from "../appConfig.js";
 
 const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const STEPS_PER_BAR = 16;
+const MIX_VOLUME = 0.74;
+const KICK_GAIN = 0.24;
+const SNARE_GAIN = 0.1;
+const HAT_GAIN = 0.04;
+const BASS_GAIN = 0.08;
+const LEAD_GAIN = 0.045;
+const PAD_GAIN = 0.045;
 
 /**
  * Procedural score.
@@ -188,7 +195,7 @@ function createSceneMode(modeKey) {
   return {
     label: base.label,
     interval: Math.max(96, Math.round(base.stepMs * tempo)),
-    volume: Math.min(0.19, base.volume * (0.86 + intensity * 0.22 + scenePulse * 0.02)),
+    volume: Math.min(0.14, base.volume * MIX_VOLUME * (0.82 + intensity * 0.16 + scenePulse * 0.012)),
     wave: speakerMotif.wave ?? base.wave,
     drive: Math.min(0.9, base.drive * intensity),
     kick: rotate(base.kick, groove.kickShift),
@@ -228,12 +235,12 @@ function connectMusicBus(context, output) {
   shaper.curve = makeDriveCurve(0);
   shaper.oversample = "2x";
   lowpass.type = "lowpass";
-  lowpass.frequency.value = 3200;
+  lowpass.frequency.value = 4200;
   lowpass.Q.value = 0.7;
-  delay.delayTime.value = 0.28;
-  feedback.gain.value = 0.22;
-  wet.gain.value = 0.2;
-  compressor.threshold.value = -22;
+  delay.delayTime.value = 0.18;
+  feedback.gain.value = 0.1;
+  wet.gain.value = 0.08;
+  compressor.threshold.value = -20;
   compressor.knee.value = 20;
   compressor.ratio.value = 4;
   compressor.attack.value = 0.004;
@@ -296,11 +303,11 @@ function playKick(context, destination, gainValue, impact = 1) {
   const oscillator = context.createOscillator();
   const gain = context.createGain();
   const now = context.currentTime;
-  const decay = 0.19 + impact * 0.05;
+  const decay = 0.13 + Math.min(impact, 1.35) * 0.035;
 
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(132 * impact, now);
-  oscillator.frequency.exponentialRampToValueAtTime(38, now + decay);
+  oscillator.frequency.setValueAtTime(118 * impact, now);
+  oscillator.frequency.exponentialRampToValueAtTime(52, now + decay);
   gain.gain.setValueAtTime(gainValue, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
@@ -468,30 +475,30 @@ export function AdaptiveMusic({ modeKey }) {
       const impact = currentMode.impact;
 
       if (currentMode.kick[step]) {
-        playKick(context, destination, 0.34 * impact, impact);
+        playKick(context, destination, KICK_GAIN * impact, impact);
       }
       if (currentMode.snare[step]) {
-        playSnare(context, destination, 0.12 * impact, 1600 + currentMode.filterLift);
+        playSnare(context, destination, SNARE_GAIN * impact, 1900 + currentMode.filterLift);
       }
       if (currentMode.hat[step]) {
-        playHat(context, destination, 0.05 * impact, step % 8 === 6);
+        playHat(context, destination, HAT_GAIN * impact, step % 8 === 6);
       }
 
       const bass = currentMode.bass[step];
       if (bass) {
-        playTone(context, destination, bass, stepSeconds * 1.6, 0.13 * impact, "square", {
+        playTone(context, destination, bass, stepSeconds * 1.15, BASS_GAIN * impact, "triangle", {
           attack: 0.008,
-          release: 0.12,
-          filterFrequency: 320 + currentMode.filterLift * 0.5,
-          q: 6,
+          release: 0.09,
+          filterFrequency: 560 + currentMode.filterLift * 0.42,
+          q: 2.4,
         });
       }
 
       const lead = currentMode.lead[step];
       if (lead) {
-        playTone(context, destination, lead, stepSeconds * 2.2, 0.055, currentMode.wave, {
+        playTone(context, destination, lead, stepSeconds * 1.8, LEAD_GAIN, currentMode.wave, {
           attack: 0.02,
-          release: 0.32,
+          release: 0.24,
           filterFrequency: 1500 + currentMode.filterLift,
           detune: step % 2 === 0 ? -currentMode.detuneSpread : currentMode.detuneSpread,
         });
@@ -499,11 +506,11 @@ export function AdaptiveMusic({ modeKey }) {
 
       const pad = currentMode.pad[step];
       if (pad) {
-        playChord(context, destination, pad, stepSeconds * 10, 0.1, "sine");
+        playChord(context, destination, pad, stepSeconds * 6, PAD_GAIN, "sine");
       }
 
       if (currentMode.noiseEvery > 0 && stepRef.current % currentMode.noiseEvery === 0) {
-        playNoiseSweep(context, destination, 0.8, currentMode.volume * 0.22 * impact, 520 + currentMode.filterLift);
+        playNoiseSweep(context, destination, 0.55, currentMode.volume * 0.12 * impact, 760 + currentMode.filterLift);
       }
 
       stepRef.current += 1;

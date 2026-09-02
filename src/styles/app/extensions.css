@@ -2284,3 +2284,14 @@
 .debug-overlay select {
   pointer-events: auto;
 }
+@media (max-width: 860px) {
+  .start-priority {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .start-priority {
+    padding: 12px;
+  }
+}

@@ -45,6 +45,130 @@ export function IntroScreen({ view }) {
           )}
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
           <StudioCredit />
+          <section className="start-priority" aria-label="게임 시작 준비">
+          <div className="start-panel">
+            {hasResumableSave && (
+              <div className="resume-panel">
+                <div>
+                  <span>저장된 진행</span>
+                  <strong>{activeCaseMeta?.label ?? "현재 사건"} · {node.title}</strong>
+                  <small>
+                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
+                  </small>
+                </div>
+                <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
+                  <ChevronRight size={18} />
+                  이어하기
+                </button>
+              </div>
+            )}
+            <label htmlFor="playerName">분석관 이름</label>
+            <div className="start-input-row">
+              <input
+                id="playerName"
+                value={playerName}
+                maxLength={PLAYER_NAME_MAX_LENGTH}
+                onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
+                onKeyDown={(event) => event.key === "Enter" && startGame()}
+                placeholder="이름을 입력하세요"
+              />
+              <button type="button" onClick={startGame}>
+                <ChevronRight size={18} />
+                첫 케이스 시작
+              </button>
+            </div>
+            {view.newGamePlusUnlocked && (
+              <button type="button" className="new-game-plus-button" onClick={view.startNewGamePlus}>
+                <Sparkles size={16} />
+                NEW GAME+ 시작
+              </button>
+            )}
+            {debugToolsEnabled && (
+              <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
+                테스트용 전체 케이스 열기
+              </button>
+            )}
+            {debugToolsEnabled && (
+            <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
+              <div>
+                <span>DEBUG JUMP</span>
+                <strong>특정 장면 바로 시작</strong>
+              </div>
+              <div className="debug-jump-controls">
+                <select
+                  ref={debugCaseSelectRef}
+                  data-testid="debug-case-select"
+                  value={debugCaseId}
+                  onChange={(event) => {
+                    const nextCaseId = event.target.value;
+                    const nextNodeOptions = nodeOrders[nextCaseId] ?? [];
+                    debugCaseIdRef.current = nextCaseId;
+                    debugNodeIdRef.current = nextNodeOptions[0] ?? "start";
+                    setDebugCaseId(nextCaseId);
+                    setDebugNodeId(nextNodeOptions[0] ?? "start");
+                  }}
+                  aria-label="디버그 케이스 선택"
+                >
+                  {caseSequence.map((caseId) => (
+                    <option key={caseId} value={caseId}>
+                      {seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.label ?? caseId}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  key={debugCaseId}
+                  ref={debugNodeSelectRef}
+                  data-testid="debug-node-select"
+                  defaultValue={debugNodeId}
+                  onChange={(event) => {
+                    debugNodeIdRef.current = event.target.value;
+                    setDebugNodeId(event.target.value);
+                  }}
+                  aria-label="디버그 장면 선택"
+                >
+                  {debugNodeOptions.map((debugNode) => (
+                    <option key={debugNode} value={debugNode}>
+                      {debugNode} · {nodes[debugNode]?.title ?? debugNode}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" data-testid="debug-start-node" onClick={startDebugNode}>
+                  장면 시작
+                </button>
+              </div>
+            </div>
+            )}
+          </div>
+          <section className="play-style-panel" aria-label="플레이 스타일 선택">
+            <div className="panel-title-row">
+              <div>
+                <span>ANALYST PROTOCOL</span>
+                <h2>어떤 방식으로 판단할까요?</h2>
+              </div>
+              <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
+            </div>
+            <div className="play-style-grid">
+              {playStyleOptions.map((style) => (
+                <button
+                  type="button"
+                  key={style.id}
+                  className={playStyle === style.id ? "play-style selected" : "play-style"}
+                  onClick={() => {
+                    setPlayStyle(style.id);
+                    persist({ playStyle: style.id });
+                  }}
+                  aria-pressed={playStyle === style.id}
+                >
+                  <span>{style.label}</span>
+                  <strong>{style.title}</strong>
+                  <p>{style.text}</p>
+                  <small>{style.payoff}</small>
+                </button>
+              ))}
+            </div>
+            <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
+          </section>
+          </section>
           <figure className="intro-visual">
             <picture>
               <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
@@ -91,35 +215,6 @@ export function IntroScreen({ view }) {
               <b>기록은 다음 사건으로 이동한다</b>
               <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
             </article>
-          </section>
-          <section className="play-style-panel" aria-label="플레이 스타일 선택">
-            <div className="panel-title-row">
-              <div>
-                <span>ANALYST PROTOCOL</span>
-                <h2>어떤 방식으로 판단할까요?</h2>
-              </div>
-              <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
-            </div>
-            <div className="play-style-grid">
-              {playStyleOptions.map((style) => (
-                <button
-                  type="button"
-                  key={style.id}
-                  className={playStyle === style.id ? "play-style selected" : "play-style"}
-                  onClick={() => {
-                    setPlayStyle(style.id);
-                    persist({ playStyle: style.id });
-                  }}
-                  aria-pressed={playStyle === style.id}
-                >
-                  <span>{style.label}</span>
-                  <strong>{style.title}</strong>
-                  <p>{style.text}</p>
-                  <small>{style.payoff}</small>
-                </button>
-              ))}
-            </div>
-            <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
           {view.operatorProfiles?.length > 0 && (
             <section className="operator-origin-panel" aria-label="주인공 출신과 권한 선택">
@@ -171,43 +266,21 @@ export function IntroScreen({ view }) {
               <p>{view.pastRunMemory.text}</p>
             </section>
           )}
-          <div className="start-panel">
-            {hasResumableSave && (
-              <div className="resume-panel">
-                <div>
-                  <span>저장된 진행</span>
-                  <strong>{activeCaseMeta?.label ?? "현재 사건"} · {node.title}</strong>
-                  <small>
-                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
-                  </small>
-                </div>
-                <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
-                  <ChevronRight size={18} />
-                  이어하기
-                </button>
-              </div>
-            )}
-            <label htmlFor="playerName">분석관 이름</label>
-            <div className="start-input-row">
-              <input
-                id="playerName"
-                value={playerName}
-                maxLength={PLAYER_NAME_MAX_LENGTH}
-                onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
-                onKeyDown={(event) => event.key === "Enter" && startGame()}
-                placeholder="이름을 입력하세요"
-              />
-              <button type="button" onClick={startGame}>
-                <ChevronRight size={18} />
-                첫 케이스 시작
-              </button>
+          <section className="quick-guide" aria-label="처음 플레이 가이드">
+            <div className="guide-heading">
+              <Info size={16} />
+              <span>처음 플레이할 때 보는 기준</span>
             </div>
-            {view.newGamePlusUnlocked && (
-              <button type="button" className="new-game-plus-button" onClick={view.startNewGamePlus}>
-                <Sparkles size={16} />
-                NEW GAME+ 시작
-              </button>
-            )}
+            <div className="guide-grid">
+              {playGuideItems.map((item) => (
+                <article key={item.title}>
+                  <b>{item.title}</b>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="data-info-panel" aria-label="데이터 저장 안내">
             <label className="consent-box">
               <input
                 type="checkbox"
@@ -278,75 +351,6 @@ export function IntroScreen({ view }) {
                 회사명처럼 개인이나 조직을 식별할 수 있는 정보는 쓰지 마세요. 삭제 요청은
                 결과 화면의 8자리 세션 코드로 처리합니다.
               </p>
-            </div>
-            {debugToolsEnabled && (
-              <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
-                테스트용 전체 케이스 열기
-              </button>
-            )}
-            {debugToolsEnabled && (
-            <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
-              <div>
-                <span>DEBUG JUMP</span>
-                <strong>특정 장면 바로 시작</strong>
-              </div>
-              <div className="debug-jump-controls">
-                <select
-                  ref={debugCaseSelectRef}
-                  data-testid="debug-case-select"
-                  value={debugCaseId}
-                  onChange={(event) => {
-                    const nextCaseId = event.target.value;
-                    const nextNodeOptions = nodeOrders[nextCaseId] ?? [];
-                    debugCaseIdRef.current = nextCaseId;
-                    debugNodeIdRef.current = nextNodeOptions[0] ?? "start";
-                    setDebugCaseId(nextCaseId);
-                    setDebugNodeId(nextNodeOptions[0] ?? "start");
-                  }}
-                  aria-label="디버그 케이스 선택"
-                >
-                  {caseSequence.map((caseId) => (
-                    <option key={caseId} value={caseId}>
-                      {seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.label ?? caseId}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  key={debugCaseId}
-                  ref={debugNodeSelectRef}
-                  data-testid="debug-node-select"
-                  defaultValue={debugNodeId}
-                  onChange={(event) => {
-                    debugNodeIdRef.current = event.target.value;
-                    setDebugNodeId(event.target.value);
-                  }}
-                  aria-label="디버그 장면 선택"
-                >
-                  {debugNodeOptions.map((debugNode) => (
-                    <option key={debugNode} value={debugNode}>
-                      {debugNode} · {nodes[debugNode]?.title ?? debugNode}
-                    </option>
-                  ))}
-                </select>
-                <button type="button" data-testid="debug-start-node" onClick={startDebugNode}>
-                  장면 시작
-                </button>
-              </div>
-            </div>
-            )}
-          </div>
-          <section className="quick-guide" aria-label="처음 플레이 가이드">
-            <div className="guide-heading">
-              <Info size={16} />
-              <span>처음 플레이할 때 보는 기준</span>
-            </div>
-            <div className="guide-grid">
-              {playGuideItems.map((item) => (
-                <article key={item.title}>
-                  <b>{item.title}</b>
-                  <p>{item.text}</p>
-                </article>
-              ))}
             </div>
           </section>
           {completedCaseResultList.length > 0 && (
