@@ -1,12 +1,17 @@
 name: Visual Regression
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_dispatch:
   schedule:
     - cron: "43 3 * * 2"
 
 jobs:
   visual-regression:
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'visual')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -27,3 +32,4 @@ jobs:
             test-results
             playwright-report
           if-no-files-found: ignore
+          retention-days: 14

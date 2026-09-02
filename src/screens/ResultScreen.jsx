@@ -1,5 +1,6 @@
 import React from "react";
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
+import { GuardedButton } from "../components/GuardedButton.jsx";
 
 export function ResultScreen({ view }) {
   const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
@@ -489,7 +490,7 @@ export function ResultScreen({ view }) {
                   <p>
                     {pendingTelemetry.map((item) => item.label).join(" · ")}
                   </p>
-                  <button
+                  <GuardedButton
                     type="button"
                     onClick={async () => {
                       const result = await retryPendingTelemetry();
@@ -500,7 +501,7 @@ export function ResultScreen({ view }) {
                     disabled={!telemetryEnabled || !dataConsent || !isOnline || isRetryingTelemetry}
                   >
                     {isRetryingTelemetry ? "재전송 중" : isOnline ? "원격 저장 재시도" : "연결 대기 중"}
-                  </button>
+                  </GuardedButton>
                 </div>
               )}
             </div>
@@ -724,7 +725,7 @@ export function ResultScreen({ view }) {
               </div>
             )}
             <div className="feedback-actions">
-              <button
+              <GuardedButton
                 type="button"
                 onClick={submitCurrentFeedback}
                 disabled={activeFeedbackPrivacySignals.length > 0 || isSubmittingFeedback}
@@ -738,7 +739,7 @@ export function ResultScreen({ view }) {
                 }
               >
                 {isSubmittingFeedback ? "저장 중..." : "피드백 저장"}
-              </button>
+              </GuardedButton>
               {feedbackStatus && (
                 <span role="status" aria-live="polite">
                   {feedbackStatus}

@@ -10,6 +10,7 @@ import {
   getDecisionFingerprint,
   getDecisionLedger,
   getDiscoveryClue,
+  getEndingVariant,
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
@@ -74,8 +75,9 @@ import {
 } from "../src/gameData.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
-import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity } from "../src/advancedSystems.js";
+import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
 import { createGameEvent, reduceInvestigationState } from "../src/state/gameEvents.js";
+import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
 assert.equal(ERROR_LOG_STORAGE_KEY, "trigger-prototype-error-log-v1", "error logs should use a separate storage namespace");
@@ -92,6 +94,40 @@ assert.deepEqual(
 assert.equal(getInvestigationOutcome({ id: "target-1", label: "Archive" }, 2).id, "target-1", "investigation outcome should preserve target identity");
 assert.equal(getDynamicMusicLayers("CRITICAL", "final").bass, "deep-impact", "critical final scenes should use impact music layers");
 assert.equal(getRankingIntegrity({ runId: "run-1", completedAt: "2026-01-01", summary: { rank: "S", burstScore: 88 } }).valid, true, "valid rankings should pass integrity checks");
+assert.deepEqual(
+  getTelemetryDashboardSnapshot({
+    errors: [{ error: { message: "latest failure" } }],
+    pending: [{ id: "pending-1" }],
+    rankings: [{ run_id: "run-1" }, { run_id: "run-1" }, { run_id: "run-2" }],
+    caseResults: { case01: {}, final: {} },
+  }),
+  { errors: 1, pending: 1, runs: 2, completed: 2, lastError: "latest failure" },
+  "telemetry dashboard snapshots should derive stable counts",
+);
+assert.equal(
+  getEndingVariant({
+    resources: { ...initialResources, trust: 70, legitimacy: 70, humanCost: 5, fatigue: 10 },
+    discoveredClues: Array.from({ length: 5 }, (_, index) => ({ id: `clue-${index}` })),
+    log: [],
+  }).id,
+  "open-oversight",
+  "ending variant should prefer open oversight when evidence and trust are high",
+);
+assert.throws(
+  () => createIntroView({}, {}),
+  /intro view is missing required field/,
+  "intro view contracts should fail fast when required fields are omitted",
+);
+assert.throws(
+  () => createPlayView({ AdaptiveMusic() {}, renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", node: {}, fixedChoices: [], choose() {}, handleChoiceClick() {} }, {}),
+  /play view is missing required field/,
+  "play view contracts should include resource ownership",
+);
+assert.throws(
+  () => createResultView({ AdaptiveMusic() {}, GAME_TITLE: "Critical Point", renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", result: {}, resultRank: "A", reset() {} }, {}),
+  /result view is missing required field/,
+  "result view contracts should include case transition actions",
+);
 assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
 assert.deepEqual(
   SAVE_STATE_KEYS,

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Check, Shield } from "lucide-react";
+import { GuardedButton } from "./GuardedButton.jsx";
 
 export function GameMetricsDrawer({
   riskTier,
@@ -125,10 +126,10 @@ export function GameMetricsDrawer({
               </p>
             </div>
             {!protocolUsed && (
-              <button type="button" onClick={activateCrisisProtocol} disabled={isAdvancing}>
+              <GuardedButton type="button" onClick={activateCrisisProtocol} disabled={isAdvancing}>
                 <Shield size={16} />
                 프로토콜 발동
-              </button>
+              </GuardedButton>
             )}
           </section>
         )}

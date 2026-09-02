@@ -1,5 +1,6 @@
 import React from "react";
 import { LockKeyhole } from "lucide-react";
+import { GuardedButton } from "./GuardedButton.jsx";
 
 export function DecisionDock({
   pendingChoice,
@@ -31,10 +32,10 @@ export function DecisionDock({
         <button type="button" className="commit-cancel" onClick={onCancel}>
           다시 고르기
         </button>
-        <button type="button" className="commit-confirm" onClick={onConfirm} disabled={isAdvancing}>
+        <GuardedButton type="button" className="commit-confirm" onClick={onConfirm} disabled={isAdvancing}>
           <LockKeyhole size={16} />
           기록
-        </button>
+        </GuardedButton>
       </div>
     </section>
   );
