@@ -2,13 +2,14 @@ name: Verify
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches:
       - main
       - master
 
 jobs:
-  verify:
+  verify-quick:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -19,12 +20,39 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run verify
+      - run: npm run verify:quick
       - name: Upload Playwright diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-diagnostics
+          name: quick-playwright-diagnostics
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+  verify-e2e:
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'e2e')
+    needs: verify-quick
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify:e2e
+      - name: Upload E2E diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-playwright-diagnostics
           path: |
             test-results
             playwright-report

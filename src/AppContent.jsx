@@ -137,6 +137,7 @@ import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
+import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
 import { createGameEvent, reduceInvestigationState } from "./state/gameEvents.js";
 import { getCharacterState, getRivalResponse } from "./characterSystems.js";
 import { getAchievementProgress, getChapterTransitionBridge, getChoiceImpact, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
@@ -209,30 +210,6 @@ const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
 const GAME_LABEL = "CRITICAL POINT";
 const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
-const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v1";
-
-function parseLocalRankingRows(rawValue) {
-  try {
-    const parsed = JSON.parse(rawValue || "[]");
-    return Array.isArray(parsed)
-      ? parsed.filter((row) => row && typeof row === "object" && row.case_id && row.summary).slice(-100)
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function appendLocalRankingRow(row) {
-  const nextRows = [
-    ...parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
-    row,
-  ].slice(-100);
-  return {
-    rows: nextRows,
-    saved: writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(nextRows)),
-  };
-}
-
 function createRunId() {
   return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
@@ -374,9 +351,7 @@ export function AppContent({ onSuppressSaves }) {
   const [memoOpened, setMemoOpened] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [localRankingRows, setLocalRankingRows] = useState(() =>
-    parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]")),
-  );
+  const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
   const [leaderboardStatus, setLeaderboardStatus] = useState("idle");
   const [leaderboardError, setLeaderboardError] = useState("");
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
@@ -2107,8 +2082,7 @@ export function AppContent({ onSuppressSaves }) {
         completed_at: caseSummary.completedAt,
         summary: caseSummary,
       };
-      const { rows: nextLocalRankingRows, saved: localRankingSaved } = appendLocalRankingRow(localRankingRow);
-      setLocalRankingRows(nextLocalRankingRows);
+      const { saved: localRankingSaved } = appendLocalRankingRow(localRankingRow);
       if (!localRankingSaved) {
         setSaveStatus("Local ranking save failed: browser storage is unavailable.");
         recordAppError(new Error("Local ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
@@ -2193,8 +2167,7 @@ export function AppContent({ onSuppressSaves }) {
         completed_at: caseSummary.completedAt,
         summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
       };
-      const { rows: nextLocalRankingRows, saved: seasonRankingSaved } = appendLocalRankingRow(seasonLocalRankingRow);
-      setLocalRankingRows(nextLocalRankingRows);
+      const { saved: seasonRankingSaved } = appendLocalRankingRow(seasonLocalRankingRow);
       if (!seasonRankingSaved) {
         setSaveStatus("Season ranking save failed: browser storage is unavailable.");
         recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
@@ -2332,7 +2305,7 @@ export function AppContent({ onSuppressSaves }) {
     setPlaytestFeedback({});
     pendingTelemetryRef.current = [];
     setPendingTelemetry([]);
-    setLocalRankingRows([]);
+    clearLocalRankingRows();
     setLocalErrorEntries([]);
     setSaveSlots([]);
     setLastRecoveredError(null);
@@ -2397,7 +2370,7 @@ export function AppContent({ onSuppressSaves }) {
     const failedKeys = cleanupResults.filter(([, removed]) => !removed).map(([key]) => key);
     if (failedKeys.length === 0) {
       setLocalErrorEntries([]);
-      setLocalRankingRows([]);
+      clearLocalRankingRows();
       setSaveSlots([]);
       setLastRecoveredError(null);
       setSaveStatus("브라우저 저장소 정리를 완료했습니다.");
