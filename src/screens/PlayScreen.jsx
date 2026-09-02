@@ -10,7 +10,46 @@ import { CASE_SEQUENCE } from "../gameData.js";
 import { getAuthorityGate } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
-  const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, clueHypotheses = [], discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
+  const {
+    common: {
+      suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice,
+      renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef,
+      renderSaveStatus, renderSceneLines, playerName, activeCaseMeta,
+    },
+    scene: {
+      caseObjectives, node, openingLegacy, sceneChallenge, narrativeSpine, questSteps, sceneVisuals,
+      speakerProfile, speakerPortrait, resolvedNodeId, sceneDirection, latestBeat,
+    },
+    decision: {
+      decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger,
+      pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader,
+      previewChoice, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta,
+      formatForecastRisk, setPendingChoice, commitConfirmRef, choose,
+    },
+    choices: {
+      fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef,
+      handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext,
+      getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels,
+    },
+    freeInput: {
+      freeTextCombo, latestFreeTextSuccess, freeChoice, boardChangePrompts, updateFreeText, freeText,
+      FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText,
+      activeFreeTextSignalCount, freeTextSignals, freeTextPreview,
+    },
+    status: {
+      triggerLabels, pressureCascade, riskPressure, playGuideItems, saveCurrentGame, reset, progress,
+      easyRiskLabels, riskTier, activeBonus, currentAverageResponseTime, log, clueCount, clueHypotheses = [],
+      discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore,
+      resourceMeta, triggerLabSignals, setMemoOpened, applyEffect, resources, activePlayStyle, turnBriefItems,
+      completedCases, routeIndex, routeLength,
+    },
+    investigation: {
+      echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, evidenceCount,
+    },
+    debug: {
+      debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
+    },
+  } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];

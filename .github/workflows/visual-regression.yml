@@ -3,6 +3,10 @@ name: Visual Regression
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches:
+      - main
+      - master
   workflow_dispatch:
   schedule:
     - cron: "43 3 * * 2"

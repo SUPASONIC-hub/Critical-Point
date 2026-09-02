@@ -2,7 +2,40 @@ import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSq
 import { GuardedButton } from "../components/GuardedButton.jsx";
 
 export function ResultScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines } = view;
+  const {
+    common: {
+      AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel,
+      screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta, sceneTitleRef, renderSceneLines,
+    },
+    ending: {
+      endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant,
+      advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage,
+      saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine,
+      skipEndingQuietHold,
+    },
+    score: {
+      caseResults, decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result,
+      caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp,
+      easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
+      routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount,
+    },
+    telemetry: {
+      sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry,
+      telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus,
+    },
+    feedback: {
+      feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH,
+      activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback,
+      feedbackStatus,
+    },
+    actions: {
+      startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset,
+      nextCaseSignal, resultBridge,
+    },
+    debug: {
+      debugToolsEnabled, showErrorLog, setShowErrorLog,
+    },
+  } = view;
   const firstCaseChoice = caseResults.case01?.outcomeChoiceId ?? "기록 없음";
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0];

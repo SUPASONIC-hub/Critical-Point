@@ -34,7 +34,16 @@ assert.equal(
   "local ranking append should keep the newest row",
 );
 
-assert.throws(() => createIntroView({}, {}), /intro view is missing required field/, "intro view should fail fast");
+assert.throws(
+  () => createIntroView({}, {}),
+  /intro view contract broken: missing common\.AdaptiveMusic/,
+  "intro view should fail fast",
+);
+assert.throws(
+  () => createIntroView({ strayField: 1 }, {}),
+  /ungrouped strayField/,
+  "a field nobody grouped should fail rather than ride along unread",
+);
 assert.throws(
   () => createPlayView({ AdaptiveMusic() {}, renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", node: {}, fixedChoices: [], choose() {}, handleChoiceClick() {} }, {}),
   /resources/,

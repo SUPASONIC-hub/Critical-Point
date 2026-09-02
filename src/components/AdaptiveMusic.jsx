@@ -320,9 +320,13 @@ export function AdaptiveMusic({ modeKey }) {
   const modeRef = useRef(createSceneMode(modeKey));
   const mode = useMemo(() => createSceneMode(modeKey), [modeKey]);
   const effectiveVolume = mode.volume * volumePresets[volumePreset].multiplier;
+  /* The running loop reads the volume through a ref: a preset change has to ramp
+     the master gain without tearing the timer down mid-bar. */
+  const volumeRef = useRef(effectiveVolume);
 
   useEffect(() => {
     modeRef.current = mode;
+    volumeRef.current = effectiveVolume;
     if (audioRuntime.master && audioRuntime.context) {
       audioRuntime.master.gain.setTargetAtTime(effectiveVolume, audioRuntime.context.currentTime, 0.5);
     }
@@ -340,7 +344,7 @@ export function AdaptiveMusic({ modeKey }) {
       return undefined;
     }
 
-    const context = ensureAudioRuntime(effectiveVolume);
+    const context = ensureAudioRuntime(volumeRef.current);
     if (!context) {
       queueMicrotask(() => setAudioState("unsupported"));
       return undefined;
@@ -421,7 +425,7 @@ export function AdaptiveMusic({ modeKey }) {
     window.addEventListener("keydown", resumeAfterAutoplayBlock);
     window.addEventListener("touchstart", resumeAfterAutoplayBlock, { passive: true });
 
-    audioRuntime.master.gain.setTargetAtTime(effectiveVolume, context.currentTime, 0.2);
+    audioRuntime.master.gain.setTargetAtTime(volumeRef.current, context.currentTime, 0.2);
     pulse();
     resumeAudio();
     timerRef.current = window.setInterval(pulse, modeRef.current.interval);
@@ -432,7 +436,7 @@ export function AdaptiveMusic({ modeKey }) {
       window.removeEventListener("touchstart", resumeAfterAutoplayBlock);
       if (pulseRef.current === pulse) pulseRef.current = null;
     };
-  }, [effectiveVolume, enabled]);
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled || !timerRef.current || !pulseRef.current) return;
@@ -452,7 +456,7 @@ export function AdaptiveMusic({ modeKey }) {
   );
 
   function startAudioFromGesture() {
-    if (!ensureAudioRuntime(effectiveVolume)) {
+    if (!ensureAudioRuntime(volumeRef.current)) {
       setAudioState("unsupported");
       return;
     }

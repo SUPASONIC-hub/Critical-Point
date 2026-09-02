@@ -115,17 +115,17 @@ assert.equal(
 );
 assert.throws(
   () => createIntroView({}, {}),
-  /intro view is missing required field/,
+  /intro view contract broken/,
   "intro view contracts should fail fast when required fields are omitted",
 );
 assert.throws(
   () => createPlayView({ AdaptiveMusic() {}, renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", node: {}, fixedChoices: [], choose() {}, handleChoiceClick() {} }, {}),
-  /play view is missing required field/,
+  /play view contract broken/,
   "play view contracts should include resource ownership",
 );
 assert.throws(
   () => createResultView({ AdaptiveMusic() {}, GAME_TITLE: "Critical Point", renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", result: {}, resultRank: "A", reset() {} }, {}),
-  /result view is missing required field/,
+  /result view contract broken/,
   "result view contracts should include case transition actions",
 );
 assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
