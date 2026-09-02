@@ -29,7 +29,6 @@ import {
   CASE_START_NODES,
   caseObjectives,
   caseOpeningRoutes,
-  characterProfiles,
   cognitionLabels,
   initialResources,
   nodeOrders,
@@ -134,6 +133,8 @@ import {
   triggerLabSignals,
 } from "./appCopy.js";
 import { createIntroView, createPlayView, createResultView } from "./viewModels/appViewModels.js";
+import { createActiveBonus, createAuthorityState, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
+import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createTelemetrySummary } from "./viewModels/reportViewModels.js";
 import { createLocalLeaderboardRows, createSeasonCases } from "./viewModels/seasonViewModels.js";
 import {
   getChapterUiModel,
@@ -143,7 +144,6 @@ import {
   getFailureObjectives,
   getEndingVisualClass,
   getEndingPreview,
-  getAuthorityProfile,
   getInterlude,
   getOperatorProfile,
   getOperatorProfiles,
@@ -435,16 +435,7 @@ export function AppContent({ onSuppressSaves }) {
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
   const seasonCases = createSeasonCases({ seasonCasesBase, completedCases, currentCase });
-  const speakerProfile = characterProfiles[node?.speaker] ?? {
-    role: "사건 관계자",
-    stance: "상황 설명",
-    job: "현재 국면의 핵심 정보를 전달한다.",
-    appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
-    thought: "이 장면에서 놓친 전제가 있는지 다시 확인한다.",
-    gesture: "사건 관계자는 잠깐 말을 멈추고, 테이블 위 자료를 다시 바라본다.",
-    voice: "상황을 과장하지 않고 필요한 정보만 전달한다.",
-    line: "지금 결정하면, 무엇이 다음 장면으로 넘어갑니까?",
-  };
+  const speakerProfile = createSpeakerProfile({ node });
   const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.webp";
   const latestBeat = log.at(-1)?.sceneBeat ?? "";
   const freeTextSignals = getFreeTextSignals(freeText);
@@ -551,39 +542,7 @@ export function AppContent({ onSuppressSaves }) {
       : riskTier === "UNSTABLE"
         ? `${primarySceneTriggerLabel} 압박이 테이블 위에 얇게 깔린다. 대답은 가능하지만, 아직 비용의 이름이 다 불리지 않았다.`
         : `${primarySceneTriggerLabel} 압박은 낮게 유지된다. 그래서 지금은 결론보다 전제를 바꾸기 좋은 순간이다.`;
-  const pressureCascade = useMemo(() => {
-    const latest = log.at(-1);
-    const humanCost = resources.humanCost ?? 0;
-    const fatigue = resources.fatigue ?? 0;
-    const pressure = riskPressure;
-    if (pressure >= 72 || humanCost >= 28) {
-      return {
-        tone: "critical",
-        label: "PRESSURE CASCADE",
-        title: "숫자로 막던 문제가 사람의 반응으로 새고 있습니다.",
-        text: "다음 선택은 자원 하나만 움직이지 않습니다. 침묵한 사람, 떠날 사람, 기록을 들고 있는 사람이 동시에 반응합니다.",
-        cue: "가장 큰 성과보다 피해가 어디로 이동하는지 먼저 말해야 합니다.",
-      };
-    }
-    if (pressure >= 48 || fatigue >= 32) {
-      return {
-        tone: "unstable",
-        label: "AFTERSHOCK",
-        title: "직전 판단의 비용이 아직 회의실에 남아 있습니다.",
-        text: "다음 결론을 서두르면 방금 줄인 비용이 다른 이해관계자에게 옮겨갈 수 있습니다.",
-        cue: latest?.challenge?.matched
-          ? "챌린지를 맞혔어도, 남겨둔 비용까지 사라진 것은 아닙니다."
-          : "이번 장면은 정답보다 비용의 이동 경로를 확인해야 합니다.",
-      };
-    }
-    return {
-      tone: "stable",
-      label: "LOW SIGNAL",
-      title: "아직 방향을 바꿀 여지가 있습니다.",
-      text: "압박이 낮을 때는 빠른 결론보다 다음 사건에 남길 기준을 설계할 수 있습니다.",
-      cue: "지금 남기는 문장이 다음 장면의 출발점이 됩니다.",
-    };
-  }, [log, resources, riskPressure]);
+  const pressureCascade = useMemo(() => createPressureCascade({ log, resources, riskPressure }), [log, resources, riskPressure]);
   const gameplayStats = getGameplayStats(log, riskPressure);
   const observationLedger = getObservationLedger(log);
   const observerPattern = getObserverPattern(log);
@@ -607,20 +566,7 @@ export function AppContent({ onSuppressSaves }) {
   const seasonGoals = getSeasonGoals();
   const interlude = getInterlude(currentCase, log.at(-1)?.choice);
   const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
-  const authorityState = useMemo(() => {
-    const evidence = discoveredClues.length;
-    const trust = resources.trust ?? 0;
-    const legitimacy = resources.legitimacy ?? 0;
-    const level = evidence >= 5 && legitimacy >= 55 ? "OVERSIGHT" : evidence >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
-    const authorityProfile = getAuthorityProfile(operatorOrigin, level);
-    return {
-      level,
-      evidence,
-      permissions: authorityProfile.permissions,
-      origin: authorityProfile,
-      locked: level === "OBSERVER" ? "단서 2개 또는 신뢰 55가 필요합니다." : level === "FIELD ACCESS" ? "정당성 55와 단서 5개를 모으면 감독 권한이 열립니다." : "감독 권한이 열려 최종 종료 조건을 제안할 수 있습니다.",
-    };
-  }, [discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust]);
+  const authorityState = useMemo(() => createAuthorityState({ evidence: discoveredClues.length, legitimacy: resources.legitimacy ?? 0, operatorOrigin, trust: resources.trust ?? 0 }), [discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust]);
   const clueCount = discoveredClues.length;
   const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
   const relationshipGraph = getRelationshipGraph(relationshipScores);
@@ -686,78 +632,9 @@ export function AppContent({ onSuppressSaves }) {
     momentumTier,
     rank: gameplayRank,
   } = gameplayStats;
-  const activeBonus =
-    log.at(-1)?.title === "CRISIS PROTOCOL"
-      ? "구조 개입"
-      : log.at(-1)?.instinctSurge
-        ? "INSTINCT SURGE"
-        : log.at(-1)?.auditSurge
-          ? "AUDIT SURGE"
-        : log.at(-1)?.tempoBonus
-          ? "QUICK READ"
-          : freeTextCombo >= 2
-            ? "판 바꾸기 보너스"
-            : currentChallengeStreak >= 2
-              ? "연속 챌린지 보너스"
-              : currentAverageResponseTime >= 20
-                ? "숙고 보너스"
-                : log.length >= 3
-                  ? "연속 판단 보너스"
-                  : "보너스 대기";
-  const inheritedChallenge =
-    openingLegacy && isOpeningNode
-      ? (openingLegacy.continuityChallenge ?? {
-          id:
-            openingLegacy.label === "CLEAR SIGNAL"
-              ? "protect-trust"
-              : openingLegacy.label === "OPEN WOUND"
-                ? "repair-legitimacy"
-                : openingLegacy.label === "UNFINISHED COST"
-                  ? "lower-risk"
-                  : "find-cost",
-          title:
-            openingLegacy.label === "CLEAR SIGNAL"
-              ? "신뢰를 다음 장면에 넘기기"
-              : openingLegacy.label === "OPEN WOUND"
-                ? "정당성 균열 봉합하기"
-                : openingLegacy.label === "UNFINISHED COST"
-                  ? "남은 비용 줄이기"
-                  : "이전 판단의 비용 확인하기",
-          text:
-            openingLegacy.label === "CLEAR SIGNAL"
-              ? "이전 케이스에서 얻은 신뢰를 잃지 않는 선택이 다음 압박의 문을 엽니다."
-              : openingLegacy.label === "OPEN WOUND"
-                ? "정당성을 회복하는 선택으로 지난 사건의 균열을 먼저 봉합해야 합니다."
-                : openingLegacy.label === "UNFINISHED COST"
-                  ? "지난 사건에서 넘어온 비용을 줄이면 이번 장면의 회복 보너스가 붙습니다."
-                  : "이전 판단이 남긴 숨은 비용을 찾아야 다음 사건의 기준을 다시 세울 수 있습니다.",
-        })
-      : null;
-  const sceneChallenge =
-    inheritedChallenge ??
-    (riskPressure >= 35
-      ? {
-          id: "lower-risk",
-          title: "위험 압력 낮추기",
-          text: "예상 위험이 내려가는 선택을 찾으면 압박 관리 보너스가 붙습니다.",
-        }
-      : freeTextCombo === 0 && freeChoice
-        ? {
-            id: "use-reframe",
-            title: "판 바꾸기 시도",
-            text: "구조 재설계에서 반영 기준 2개 이상을 채우면 보너스 조건이 열립니다.",
-          }
-        : (node?.triggers ?? []).includes("competition")
-          ? {
-              id: "avoid-risk",
-              title: "속도에 말리지 않기",
-              text: "위험 상승을 감수하지 않고 경쟁 압박을 통과하는 선택을 찾습니다.",
-            }
-          : {
-              id: "find-cost",
-              title: "숨은 비용 찾기",
-              text: "가장 좋아 보이는 선택의 반대 비용을 확인하고 고릅니다.",
-            });
+  const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, freeTextCombo, log });
+  const inheritedChallenge = createInheritedChallenge({ isOpeningNode, openingLegacy });
+  const sceneChallenge = createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure });
   const echoProbeHint = {
     "protect-trust": "힌트: 이번 장면에서는 가장 큰 성과보다 관계를 회복하는 말이 지난 사건의 신뢰를 이어갑니다.",
     "repair-legitimacy": "힌트: 정당성을 올리는 선택을 먼저 골라야 지난 사건의 균열이 다음 장면을 삼키지 않습니다.",
@@ -825,26 +702,7 @@ export function AppContent({ onSuppressSaves }) {
     return `${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`;
   };
 
-  const questSteps = [
-    {
-      title: "장면 챌린지",
-      value: `${challengeClearCount}/${Math.max(1, log.length)}`,
-      text: currentChallengeStreak > 0 ? `${currentChallengeStreak}연속 유지 중` : "이번 장면에서 다시 시작",
-      complete: currentChallengeStreak > 0,
-    },
-    {
-      title: "위험 압력 제어",
-      value: `${reducedRiskCount}`,
-      text: reducedRiskCount > 0 ? "하락 선택 기록됨" : "위험 하락 선택을 찾아야 함",
-      complete: reducedRiskCount > 0,
-    },
-    {
-      title: "판 바꾸기",
-      value: `${freeTextCombo}`,
-      text: freeTextCombo > 0 ? "선택지 밖 계획이 남음" : "구조 재설계 미사용",
-      complete: freeTextCombo > 0,
-    },
-  ];
+  const questSteps = createQuestSteps({ challengeClearCount, currentChallengeStreak, freeTextCombo, log, reducedRiskCount });
   const turnBriefItems = [
     { label: "챌린지", value: sceneChallenge.title },
     { label: "압력", value: `${riskTier} ${riskPressure}` },
@@ -860,29 +718,7 @@ export function AppContent({ onSuppressSaves }) {
     currentCase &&
     nodeId &&
     (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
-  const telemetrySummary = !isOnline
-    ? {
-        tone: "local",
-        title: "오프라인",
-        text: "연결이 복구되면 원격 저장을 다시 사용할 수 있습니다. 현재 기록은 브라우저에 저장됩니다.",
-      }
-    : telemetryEnabled
-    ? dataConsent
-      ? {
-          tone: "ready",
-          title: "원격 저장 준비됨",
-          text: "케이스 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다.",
-        }
-      : {
-          tone: "pending",
-          title: "원격 저장 준비됨 · 동의 대기",
-          text: "체크박스에 동의하면 이 세션의 완료 로그와 피드백을 원격 저장합니다.",
-        }
-    : {
-        tone: "local",
-        title: "로컬 저장",
-        text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
-    };
+  const telemetrySummary = createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled });
   const localLeaderboardRows = useMemo(
     () => createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
@@ -2277,27 +2113,7 @@ export function AppContent({ onSuppressSaves }) {
   const outcomeNodeId = currentCase === "final" ? "f_aftershock" : `${currentCase}_aftershock`;
   const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
   const caseOutcome = getCaseOutcome({ caseId: currentCase, choiceId: outcomeEntry?.choiceId });
-  const endingProfile = {
-    ending_seal: {
-      tag: "봉인",
-      title: "당신은 문을 닫았지만, 흔적은 남겼다.",
-      text: "데이터를 봉인해 다시 이용되지 않게 했습니다. 그러나 마지막 후폭풍에서 고른 태도는 당신이 지키려는 것이 침묵인지 안전인지 드러냈습니다.",
-    },
-    ending_reform: {
-      tag: "개혁",
-      title: "당신은 실험을 규칙으로 바꾸었다.",
-      text: "트리거를 없애는 대신 동의와 감시를 붙였습니다. 사람을 읽는 힘을 누가, 언제, 어디까지 쓸 수 있는지 직접 정했습니다.",
-    },
-    ending_expose: {
-      tag: "폭로",
-      title: "당신은 관찰자를 세상 밖으로 끌어냈다.",
-      text: "실험의 구조를 공개했습니다. 혼란은 시작됐지만, 적어도 다음 참가자는 자신이 관찰당하고 있다는 사실을 알고 선택할 수 있습니다.",
-    },
-  }[finalEndingEntry?.choiceId] ?? {
-    tag: "미확정",
-    title: "당신의 마지막 선택은 아직 기록 중이다.",
-    text: "마지막 폴더의 문장이 완전히 닫히지 않았습니다. 다음 플레이에서는 다른 결말의 조건을 시험해 보십시오.",
-  };
+  const endingProfile = createEndingProfile({ finalEndingEntry });
 
   const routeLength = getCaseRouteLength(fallbackCaseId);
   const routeIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
@@ -2353,64 +2169,8 @@ export function AppContent({ onSuppressSaves }) {
         : resultRank === "B"
           ? "사건은 통과했습니다. 다음 플레이에서는 다른 사고 방식으로 흔들어볼 여지가 있습니다."
           : "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
-  const scoreBreakdown = [
-    {
-      label: "사고 리듬",
-      value: rhythmScore,
-      text: `${rhythmScore}점`,
-      note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다.",
-    },
-    {
-      label: "관점 전환",
-      value: cognitionScore,
-      text: `${cognitionScore}점`,
-      note: "같은 방식만 반복하지 않고 추론, 위험, 재구성, 버티기 사이를 오간 흔적입니다.",
-    },
-    {
-      label: "압박 대응",
-      value: pressureAdaptScore,
-      text: `${pressureAdaptScore}점`,
-      note: "위험을 무조건 피한 점수가 아니라, 상승한 압박을 다시 회수한 능력입니다.",
-    },
-    {
-      label: "구조 재설계",
-      value: reflectionScore,
-      text: `${reflectionScore}점`,
-      note: "선택지 밖에서 이해관계자, 조건, 근거, 실패 가능성을 구체화한 정도입니다.",
-    },
-    {
-      label: "즉답 패널티",
-      value: exploitPenalty,
-      text: exploitPenalty > 0 ? `-${exploitPenalty}점` : "없음",
-      note: "표시된 정보만 따라 빠르게 누르는 플레이가 반복될 때만 감점됩니다.",
-    },
-  ];
-  const achievementBadges = [
-    { title: `Burst ${momentumTier}`, text: `사고 버스트 ${momentumScore}점을 기록했습니다.` },
-    result.freeCount > 0
-      ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
-      : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
-    result.averageResponseTime >= 20
-      ? { title: "Slow Thinker", text: "한 장면 이상에서 판단을 오래 붙잡았습니다." }
-      : { title: "Fast Closer", text: "빠르게 결론을 닫는 플레이를 보였습니다." },
-    reducedRiskCount > 0
-      ? { title: "Risk Cutter", text: `${reducedRiskCount}번 위험 압력을 낮췄습니다.` }
-      : { title: "Heat Taker", text: "위험을 낮추기보다 다른 목표를 우선했습니다." },
-    challengeClearCount > 0
-      ? { title: "Challenge Clear", text: `${challengeClearCount}개 장면 도전을 달성했습니다.` }
-      : { title: "Open Quest", text: "장면 도전은 남았고, 선택 로그만 기록됐습니다." },
-    currentChallengeStreak >= 5
-      ? { title: "Perfect Run", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 최고 보상을 열었습니다.` }
-      : currentChallengeStreak >= 3
-      ? { title: "Streak Breakthrough", text: `${currentChallengeStreak}연속 장면 목표를 맞혀 추가 보상을 열었습니다.` }
-      : { title: "Chain Starter", text: "장면 목표를 연속으로 맞히면 추가 보상이 열립니다." },
-    flowSurgeCount > 0
-      ? { title: "Flow Surge", text: `${flowSurgeCount}번 보너스 자원 회복을 만들었습니다.` }
-      : { title: "No Surge", text: "챌린지와 위험 제어가 아직 보너스로 이어지지 않았습니다." },
-    riskTier === "CRITICAL"
-      ? { title: "Crisis Runner", text: "높은 압력 상태로 케이스를 통과했습니다." }
-      : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
-  ];
+  const scoreBreakdown = createScoreBreakdown({ cognitionScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore });
+  const achievementBadges = createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier });
   const feedbackPrompts = [
     `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
     result.freeCount > 0
