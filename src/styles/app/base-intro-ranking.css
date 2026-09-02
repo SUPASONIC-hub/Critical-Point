@@ -5,7 +5,7 @@
   place-items: center;
   padding: 24px;
   background: var(--color-ink-deep);
-  color: var(--c-tone-002);
+  color: var(--c-paper-94);
 }
 .error-panel {
   width: min(100%, 520px);
@@ -19,7 +19,7 @@
   font-size: 1.75rem;
 }
 .error-panel p {
-  color: var(--c-tone-003);
+  color: var(--c-gray-75);
   line-height: 1.7;
 }
 .error-actions {
@@ -118,7 +118,7 @@ summary:focus-visible {
   background: rgba(24, 32, 31, 0.86);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  box-shadow: 0 10px 28px var(--c-tone-005);
+  box-shadow: 0 10px 28px var(--c-black-a24);
   backdrop-filter: blur(10px);
   font-size: 12px;
   font-weight: 900;
@@ -151,7 +151,7 @@ summary:focus-visible {
   align-items: center;
   justify-items: center;
   background:
-    linear-gradient(110deg, var(--c-tone-006), var(--c-tone-007) 43%, var(--c-tone-008)),
+    linear-gradient(110deg, var(--c-sky-07-a72), var(--c-teal-10-a50) 43%, var(--c-teal-25-a24)),
     image-set(
       url(/triggerlab-key-visual.webp) type("image/webp"),
       url(/triggerlab-key-visual.jpg) type("image/jpeg")
@@ -432,7 +432,7 @@ summary:focus-visible {
   background: var(--color-ink);
   border: 1px solid rgba(217, 255, 98, 0.34);
   border-radius: 8px;
-  box-shadow: 0 24px 80px var(--c-tone-013);
+  box-shadow: 0 24px 80px var(--c-black-a38);
 }
 .intro-visual picture,
 .intro-visual img {
@@ -499,7 +499,7 @@ summary:focus-visible {
   background: rgba(14, 24, 22, 0.78);
   border: 1px solid rgba(217, 255, 98, 0.42);
   border-radius: 8px;
-  box-shadow: 0 24px 80px var(--c-tone-013);
+  box-shadow: 0 24px 80px var(--c-black-a38);
 }
 .start-panel {
   width: 100%;
@@ -870,7 +870,7 @@ summary:focus-visible {
   min-width: 0;
   height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--c-tone-028);
+  border: 1px solid var(--c-gray-68);
   border-radius: 6px;
 }
 .start-input-row button,
@@ -936,7 +936,7 @@ summary:focus-visible {
 }
 .data-status.local {
   color: var(--c-warn-deep);
-  background: var(--c-tone-029);
+  background: var(--c-cream-deep);
 }
 .db-status-panel {
   display: grid;
@@ -948,10 +948,10 @@ summary:focus-visible {
 }
 .db-status-panel.ready {
   background: var(--c-mint-soft);
-  border-color: var(--c-tone-030);
+  border-color: var(--c-green-70);
 }
 .db-status-panel.pending {
-  background: var(--c-tone-031);
+  background: var(--c-amber-95);
   border-color: var(--c-warn-soft);
 }
 .db-status-panel.local {
@@ -986,7 +986,7 @@ summary:focus-visible {
   margin-top: 10px;
   padding: 12px;
   color: var(--c-ink-raised);
-  background: var(--c-tone-031);
+  background: var(--c-amber-95);
   border: 1px solid var(--c-warn-soft);
   border-radius: 6px;
 }
@@ -1282,7 +1282,7 @@ summary:focus-visible {
   font-size: 20px;
 }
 .ranking-row:first-child .ranking-position {
-  color: var(--c-tone-032);
+  color: var(--c-amber-39);
 }
 .ranking-player,
 .ranking-stat,
@@ -1364,7 +1364,7 @@ summary:focus-visible {
 /* Intro ownership overrides previously lived in the broader result layer. */
 .intro-shell {
   background:
-    linear-gradient(105deg, var(--c-tone-128), var(--c-tone-129) 52%, var(--c-tone-130)),
+    linear-gradient(105deg, var(--c-sky-06-a66), var(--c-teal-11-a46) 52%, var(--c-teal-25-a22)),
     image-set(
       url(/triggerlab-key-visual.webp) type("image/webp"),
       url(/triggerlab-key-visual.jpg) type("image/jpeg")
@@ -1391,7 +1391,7 @@ summary:focus-visible {
 .intro > p {
   margin-inline: auto;
   max-width: 680px;
-  color: var(--c-tone-131);
+  color: var(--c-green-87);
 }
 .intro-visual {
   width: min(920px, 100%);
@@ -1403,12 +1403,12 @@ summary:focus-visible {
 .start-panel,
 .play-style-panel,
 .quick-guide {
-  box-shadow: 0 16px 40px var(--c-tone-135);
+  box-shadow: 0 16px 40px var(--c-mint-04-a16);
 }
 .data-info-panel .consent-box {
   color: var(--c-ink);
   background: var(--c-paper);
-  border-color: var(--c-tone-170);
+  border-color: var(--c-gray-81-5);
 }
 .data-info-panel .consent-box b,
 .data-info-panel .db-status-panel strong {
@@ -1430,4 +1430,82 @@ summary:focus-visible {
 }
 .data-info-panel .db-status-panel.local strong {
   color: var(--c-ink-soft);
+}
+
+/* Rules gathered here from the later layers so this selector is defined in one file. */
+.game-header {
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+.game-header {
+  flex-wrap: wrap;
+}
+.ghost {
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--c-ink-raised);
+  background: var(--c-paper-muted);
+}
+.choice {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 14px;
+  justify-content: flex-start;
+  text-align: left;
+  color: var(--c-ink);
+  background: var(--c-paper);
+  border: 1px solid var(--c-gray-81-2);
+  overflow-wrap: anywhere;
+}
+textarea {
+  width: 100%;
+  min-height: 110px;
+  margin-top: 12px;
+  padding: 14px;
+  resize: vertical;
+  border: 1px solid var(--c-gray-68);
+  border-radius: 6px;
+  line-height: 1.6;
+}
+.input-note {
+  margin-top: 7px;
+}
+body {
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--c-paper-94), var(--c-paper-88));
+}
+.result-hero h1 {
+  margin-inline: 0;
+  max-width: 980px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+.game-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.choice {
+  min-height: 96px;
+  border: 1px solid var(--c-line-strong);
+  background: var(--c-paper);
+  box-shadow: 0 5px var(--c-gray-86);
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+.intro {
+  text-align: center;
+}
+.intro-visual {
+  margin-inline: auto;
+}
+.choice {
+  color: #10241f;
+  background: #fff;
+  border-color: #31504a;
 }

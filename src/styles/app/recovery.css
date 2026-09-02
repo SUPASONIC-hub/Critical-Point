@@ -4,7 +4,7 @@
   width: min(1120px, calc(100% - 32px));
   margin: 16px auto;
   border: 1px solid rgba(255, 197, 90, 0.35);
-  background: var(--c-tone-171);
+  background: var(--c-ink-10-a92);
   color: var(--c-cream);
   border-radius: 8px;
   padding: 16px;
@@ -43,7 +43,7 @@
 }
 .error-retry-blocked {
   margin: 14px 0 0;
-  color: var(--c-tone-001);
+  color: var(--c-danger-81);
   font-size: 13px;
   font-weight: 800;
   line-height: 1.55;
@@ -74,7 +74,7 @@
 .recovery-actions button:not(.ghost),
 .debug-jump-controls button {
   background: var(--c-amber);
-  color: var(--c-tone-174);
+  color: var(--c-ink-08);
   border-color: var(--c-amber);
   font-weight: 800;
 }
@@ -198,7 +198,7 @@
 .save-slot-actions button {
   min-height: 32px;
   padding: 0 10px;
-  color: var(--c-tone-174);
+  color: var(--c-ink-08);
   background: var(--c-amber);
   border: 1px solid var(--c-amber);
   border-radius: 6px;

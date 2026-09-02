@@ -1,4 +1,16 @@
-/* Application styles. Colors resolve through src/styles/tokens.css. */
+/* Application styles. Colors resolve through src/styles/tokens.css.
+
+   These files are a cascade, not five independent screens: each one can
+   override the ones above it, and several do on purpose. Put a rule in the file
+   that owns the selector -- scripts/check-css-structure.mjs fails the build when
+   a selector picks up a second home -- and reach for a later file only when the
+   rule genuinely has to outrank an earlier one.
+
+     base-intro-ranking  shared shell, the intro screen, the ranking screen
+     play                the play screen
+     result              the result screen
+     recovery            the recovery and error surfaces
+     extensions          late overrides that must outrank everything above */
 @import "./app/base-intro-ranking.css";
 @import "./app/play.css";
 @import "./app/result.css";
