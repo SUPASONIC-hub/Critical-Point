@@ -58,7 +58,7 @@ Remote ranking setup:
 
 1. Copy `.env.example` to `.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 2. Apply the database schema with the Supabase CLI before deploying: `npx supabase link --project-ref <ref>` then `npx supabase db push`. Migrations live in `supabase/migrations/`.
-3. The schema enables anonymous insert for public playtest telemetry and anonymous read only through the `public_rankings` view. Raw session rows remain insert-only for anonymous clients. Use a restricted project and rotate keys if this is not a public playtest.
+3. The schema enables anonymous insert for public playtest telemetry. Anonymous read is limited by an RLS policy to completed season rows and by a column-level grant to `run_id`, `session_code`, `player_name`, `case_id`, `case_title`, `completed_at` and `summary`; `decision_log`, `session_id` and `id` stay unreadable, so `select *` on `playtest_sessions` is refused. The `public_rankings` view reads through those same rules with `security_invoker = true`. Use a restricted project and rotate keys if this is not a public playtest.
 4. The schema also validates telemetry payload shape and completed-season scores, and applies a server-side hourly request limit through `telemetry_rate_limits`.
 
 원격 저장은 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`가 있을 때만 활성화됩니다. 설정하지 않아도 플레이, 자동 저장, JSON 내보내기, 로컬 랭킹은 정상 동작합니다.
