@@ -9,6 +9,7 @@ Last updated: 2026-09-02
 - Visual regression is separated into `npm run test:visual` and a dedicated label-aware workflow.
 - Save/recovery, telemetry retry, season flow, accessibility, contrast, text integrity, graph schema, and visual baselines are covered by automated checks.
 - Source text is valid UTF-8. Some Windows shells can render Korean incorrectly, so text integrity is guarded by `npm run check:text` instead of manual terminal inspection.
+- The Supabase schema is deployed through CLI migrations in `supabase/migrations/`, not by pasting SQL into the dashboard editor.
 
 ## Maintenance Priorities
 
@@ -18,10 +19,25 @@ Last updated: 2026-09-02
 4. Put reusable Playwright flow behavior in `tests/helpers/gameFlow.js`.
 5. Keep CSS, text, and graph checks budget/schema-based so content drift is caught before it reaches screenshots.
 6. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
+7. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
 
 ## Verification Commands
 
 ```bash
 npm run verify
 npm run test:visual
+```
+
+## Database Deployment
+
+```bash
+npx supabase link --project-ref <ref>
+npx supabase db push
+```
+
+On a project whose schema was applied by hand before the CLI workflow existed, mark the
+baseline as applied once instead of pushing it:
+
+```bash
+npx supabase migration repair --status applied 20260902055713
 ```

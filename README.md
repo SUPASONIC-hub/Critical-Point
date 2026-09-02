@@ -57,7 +57,7 @@ Render 배포는 `render.yaml`을 사용합니다.
 Remote ranking setup:
 
 1. Copy `.env.example` to `.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-2. Run `supabase/schema.sql` in the Supabase SQL editor before deploying.
+2. Apply the database schema with the Supabase CLI before deploying: `npx supabase link --project-ref <ref>` then `npx supabase db push`. Migrations live in `supabase/migrations/`.
 3. The schema enables anonymous insert for public playtest telemetry and anonymous read only through the `public_rankings` view. Raw session rows remain insert-only for anonymous clients. Use a restricted project and rotate keys if this is not a public playtest.
 4. The schema also validates telemetry payload shape and completed-season scores, and applies a server-side hourly request limit through `telemetry_rate_limits`.
 
@@ -98,6 +98,7 @@ create table if not exists app_error_logs (
 - 결과 화면의 기본 공유 요약은 원격 전송 대기열, 원문 선택 로그, 피드백 원문, 세션 ID, 에러 로그, 복구 슬롯을 제외하고, 디버그 진단 로그에만 원문 `log`, `pendingTelemetry`, `errorLog`, `saveSlots`를 포함합니다.
 - 원격 전송 대기열은 온라인 복귀 후 지수 백오프로 자동 재시도합니다.
 - 디버그 에러 로그 패널에서 `playtest_sessions`, `playtest_feedback`, `app_error_logs` 테이블 읽기 점검을 확인할 수 있습니다.
-- 전체 검증은 `npm run verify`로 실행합니다. 내부 순서는 `npm test`, `npm run build`, `npm run test:e2e`이며 GitHub Actions에서도 같은 명령을 실행합니다.
+- 전체 검증은 `npm run verify`로 실행합니다. 빠른 티어 `npm run verify:quick`(단위/스모크, 인코딩, 텍스트, CSS, 그래프, 빌드, 런타임)과 무거운 티어 `npm run verify:e2e`로 나뉘며, GitHub Actions는 PR에서 quick만 실행하고 E2E는 push 또는 `e2e` 라벨에서 실행합니다.
 - 전체 경로 검증은 `npm run test:e2e:full`로 실행하며, 독립적인 시즌 시나리오는 4개 워커로 병렬 실행합니다. GitHub Actions의 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 이를 수행합니다.
-- 운영 배포 전 Supabase SQL Editor에서 `supabase/schema.sql`을 다시 실행해 RLS, 공개 랭킹 뷰, telemetry 검증 트리거를 적용합니다.
+- 운영 배포 전 `npx supabase db push`로 `supabase/migrations/`를 적용해 RLS, 공개 랭킹 뷰, telemetry 검증 트리거를 반영합니다. 기존에 SQL Editor로 수동 적용한 프로젝트는 첫 연결 시 `npx supabase migration repair --status applied 20260902055713`로 baseline을 적용됨으로 표시합니다.
+- 마이그레이션 이력은 원격의 `supabase_migrations.schema_migrations`에 기록되며, 이 테이블은 `supabase link` 시점에 생성됩니다. 연결 전에는 대시보드 Migrations 탭이나 CLI 조회가 `42P01 relation "supabase_migrations.schema_migrations" does not exist`를 남기는데, 이는 앱 동작과 무관한 로그입니다.
