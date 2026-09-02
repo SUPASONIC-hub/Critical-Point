@@ -17,16 +17,58 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
   return locator.waitFor({ state: "visible", timeout }).then(() => true).catch(() => false);
 }
 
-export async function startDebugNode(page, caseId, nodeId) {
-  await page.goto("/?debug=1");
-  await page.evaluate(() => localStorage.clear());
-  await page.reload();
+export async function startDebugNode(page, caseId, nodeId, options = {}) {
+  const {
+    navigate = true,
+    resetStorage = true,
+    expectGameShell = true,
+  } = options;
+  if (navigate) await page.goto("/?debug=1");
+  if (resetStorage) {
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+  }
   await page.getByTestId("debug-case-select").selectOption(caseId);
   await page.getByTestId("debug-node-select").selectOption(nodeId);
   await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
   await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
   await page.getByTestId("debug-start-node").click();
-  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  if (expectGameShell) await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+}
+
+export async function chooseFirstAvailableChoice(page) {
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible().catch(() => false)) {
+    await decisionNext.evaluate((button) => button.click());
+    return;
+  }
+  await page.waitForFunction(
+    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice:not([aria-disabled='true'])")),
+    undefined,
+    { timeout: 15_000 },
+  );
+  const domAction = await page.evaluate(() => {
+    const decisionNext = document.querySelector("[data-testid='decision-next']");
+    if (decisionNext instanceof HTMLButtonElement) {
+      decisionNext.click();
+      return "advanced";
+    }
+    if (document.querySelector(".result-page")) return "result";
+    const firstChoice = document.querySelector(".choices .choice:not([aria-disabled='true'])");
+    if (firstChoice instanceof HTMLButtonElement) {
+      firstChoice.click();
+      return "choice";
+    }
+    return "none";
+  });
+  if (domAction !== "choice") return;
+  await page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.click());
+  await page.waitForFunction(
+    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice:not([aria-disabled='true'])") || document.querySelector(".result-page")),
+    undefined,
+    { timeout: 15_000 },
+  );
+  await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
 }
 
 export async function chooseSceneChoice(page, scene, choiceIndex) {
@@ -132,7 +174,7 @@ export async function completeCurrentCase(page) {
       await dismissDecisionRevealIfPresent(page);
       return;
     }
-    const choice = page.locator(".choices .choice").first();
+    const choice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
     await expect(choice).toBeVisible();
     await choice.evaluate((button) => button.click());
     const commitButton = page.getByTestId("commit-confirm");

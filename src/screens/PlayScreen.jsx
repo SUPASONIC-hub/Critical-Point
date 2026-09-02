@@ -6,6 +6,7 @@ import { MemoPanel } from "../components/MemoPanel.jsx";
 import { StatusBoard } from "../components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
+import { GuardedButton } from "../components/GuardedButton.jsx";
 import { CASE_SEQUENCE } from "../gameData.js";
 import { getAuthorityGate } from "../gameLogic.js";
 
@@ -131,7 +132,7 @@ export function PlayScreen({ view }) {
         {view.investigationTargets?.length > 0 && (
           <section className="investigation-panel" aria-label="조사 대상 선택">
             <span>ACTIVE INVESTIGATION</span>
-            <div>{view.investigationTargets.map((target) => <button type="button" key={target.id} aria-disabled={target.locked} tabIndex={target.locked ? -1 : 0} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => { if (!target.locked) view.investigateTarget(target); }}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></button>)}</div>
+            <div>{view.investigationTargets.map((target) => <GuardedButton type="button" key={target.id} blocked={target.locked} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => view.investigateTarget(target)}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></GuardedButton>)}</div>
             {view.selectedInvestigationOutcome && <p>{view.selectedInvestigationOutcome.outcome}{view.selectedInvestigationOutcome.contaminated ? " 단, 이 기록에는 오염 가능성이 있습니다." : ""}</p>}
           </section>
         )}
@@ -425,16 +426,13 @@ export function PlayScreen({ view }) {
                 <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
                 <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
               </div>
-              <button
+              <GuardedButton
                 type="button"
-                onClick={() => {
-                  if (!protocolUsed && riskPressure >= 60 && !isAdvancing) activateCrisisProtocol();
-                }}
-                aria-disabled={protocolUsed || riskPressure < 60 || isAdvancing}
-                tabIndex={protocolUsed || riskPressure < 60 || isAdvancing ? -1 : 0}
+                onClick={activateCrisisProtocol}
+                blocked={protocolUsed || riskPressure < 60 || isAdvancing}
               >
                 {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
-              </button>
+              </GuardedButton>
             </div>
             <div className="relationship-strip" aria-label="등장인물 관계 온도">
               <span>RELATIONSHIP HEAT</span>
@@ -654,7 +652,7 @@ export function PlayScreen({ view }) {
                     ? "압박을 낮출 수 있습니다."
                     : "압박은 크게 움직이지 않습니다.";
               return (
-                <button
+                <GuardedButton
                   type="button"
                   key={choice.id}
                   ref={(button) => {
@@ -663,12 +661,8 @@ export function PlayScreen({ view }) {
                   }}
                   className={`${pendingChoice?.id === choice.id ? "choice selected" : "choice"} ${authorityGate.unlocked ? "" : "locked-choice"}`.trim()}
                   data-adaptive={choice.adaptive ? "true" : undefined}
-                  onClick={() => {
-                    if (authorityGate.unlocked) handleChoiceClick(choice);
-                  }}
-                  onPointerDown={() => {
-                    if (authorityGate.unlocked) beginChoiceHold(choice);
-                  }}
+                  onClick={() => handleChoiceClick(choice)}
+                  onPointerDown={() => beginChoiceHold(choice)}
                   onPointerUp={endChoiceHold}
                   onPointerCancel={endChoiceHold}
                   onPointerLeave={endChoiceHold}
@@ -679,8 +673,7 @@ export function PlayScreen({ view }) {
                     }
                   }}
                   disabled={isAdvancing}
-                  aria-disabled={!authorityGate.unlocked}
-                  tabIndex={authorityGate.unlocked ? 0 : -1}
+                  blocked={!authorityGate.unlocked}
                   aria-pressed={pendingChoice?.id === choice.id}
                   aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
                   title={`${choiceIndex + 1}번 키로 선택 미리보기`}
@@ -736,7 +729,7 @@ export function PlayScreen({ view }) {
                       바로 선택 · 장면 목표를 맞히면 직감 보너스
                     </span>
                   )}
-                </button>
+                </GuardedButton>
               );
             })}
           </div>
@@ -859,14 +852,11 @@ export function PlayScreen({ view }) {
                   </div>
                 </div>
               )}
-              <button
+              <GuardedButton
                 type="button"
                 className="choice free-choice submit-reframe"
-                onClick={() => {
-                  if (freeText.trim() && !freeTextBlockedByPrivacy && !isAdvancing) choose(freeChoice);
-                }}
-                aria-disabled={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
-                tabIndex={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing ? -1 : 0}
+                onClick={() => choose(freeChoice)}
+                blocked={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
                 aria-label={
                   freeTextBlockedByPrivacy
                     ? "식별 정보로 보일 수 있는 표현을 익명화해야 구조 재설계를 제출할 수 있습니다."
@@ -879,7 +869,7 @@ export function PlayScreen({ view }) {
                   <Send size={16} />
                   {freeChoice.label}
                 </span>
-              </button>
+              </GuardedButton>
             </div>
           )}
         </section>

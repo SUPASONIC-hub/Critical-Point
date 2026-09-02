@@ -1,5 +1,6 @@
 import React from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
+import { GuardedButton } from "../components/GuardedButton.jsx";
 
 export function IntroScreen({ view }) {
   const { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
@@ -408,12 +409,11 @@ export function IntroScreen({ view }) {
                 if (canOpenCase) startCase(caseItem.id);
               }
               return (
-                <button
+                <GuardedButton
                   type="button"
                   key={caseItem.id}
-                  aria-disabled={!canOpenCase}
+                  blocked={!canOpenCase}
                   aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
-                  tabIndex={canOpenCase ? 0 : -1}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"
                       ? "case-card active-case"
@@ -442,7 +442,7 @@ export function IntroScreen({ view }) {
                       {savedResult.freeCount}
                     </small>
                   )}
-                </button>
+                </GuardedButton>
               );
             })}
           </div>

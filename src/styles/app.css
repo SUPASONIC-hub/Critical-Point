@@ -281,7 +281,7 @@ summary:focus-visible{outline:3px solid var(--color-accent);outline-offset:3px}
 .authority-action b{font-size:13px;line-height:1.4}
 .authority-action small{color:var(--c-line-soft);font-size:11px;line-height:1.4}
 .authority-action button{flex:0 0 auto;min-height:40px;padding:0 15px;color:#0b2622;background:var(--c-acid);border:1px solid var(--c-acid);border-radius:5px;font-size:12px;font-weight:950}
-.authority-action button:disabled{color:rgba(255,255,255,.52);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);cursor:not-allowed}
+.authority-action button:disabled{color:var(--c-line-soft);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);cursor:not-allowed}
 .relationship-strip{display:grid;gap:8px;padding-top:3px}
 .relationship-strip>span{color:var(--c-acid);font-size:10px;font-weight:950;letter-spacing:.1em}
 .relationship-strip>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}

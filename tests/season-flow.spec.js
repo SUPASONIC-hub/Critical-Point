@@ -2,63 +2,18 @@ import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
-
-async function chooseFirstFixedChoice(page) {
-  const decisionNext = page.getByTestId("decision-next");
-  if (await decisionNext.isVisible().catch(() => false)) {
-    await decisionNext.evaluate((button) => button.click());
-    return;
-  }
-  await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice")),
-    undefined,
-    { timeout: 15_000 },
-  );
-  const domAction = await page.evaluate(() => {
-    const decisionNext = document.querySelector("[data-testid='decision-next']");
-    if (decisionNext instanceof HTMLButtonElement) {
-      decisionNext.click();
-      return "advanced";
-    }
-    if (document.querySelector(".result-page")) return "result";
-    const firstChoice = document.querySelector(".choices .choice:not([aria-disabled='true'])");
-    if (firstChoice instanceof HTMLButtonElement) {
-      firstChoice.click();
-      return "choice";
-    }
-    return "none";
-  });
-  if (domAction !== "choice") return;
-  await page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.click());
-  await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice") || document.querySelector(".result-page")),
-    undefined,
-    { timeout: 15_000 },
-  );
-  await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
-}
-
-async function completeCurrentCase(page) {
-  for (let step = 0; step < 24; step += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) {
-      await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
-      await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: 15_000 }).catch(() => {});
-      return;
-    }
-    await chooseFirstFixedChoice(page);
-  }
-  throw new Error("Case did not reach result page");
-}
+import {
+  chooseFirstAvailableChoice,
+  completeCurrentCase,
+  startDebugNode as startDebugNodeFromHelper,
+} from "./helpers/gameFlow.js";
 
 async function startDebugNode(page, caseId, nodeId) {
-  await page.getByTestId("debug-case-select").selectOption(caseId);
-  await page.getByTestId("debug-node-select").selectOption(nodeId);
-  await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
-  await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
-  await page.getByTestId("debug-start-node").click();
-  await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
-    .toBe(nodeId);
+  await startDebugNodeFromHelper(page, caseId, nodeId, {
+    navigate: false,
+    resetStorage: false,
+    expectGameShell: false,
+  });
 }
 
 test("case 05 browser flow can unlock and open the final case", async ({ page }) => {
@@ -110,7 +65,7 @@ test("case flow has no unhandled browser runtime errors", async ({ page }) => {
   });
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
-  await chooseFirstFixedChoice(page);
+  await chooseFirstAvailableChoice(page);
   await expect(page.getByRole("heading", { name: /말할 수 있는 조건|선의의 실패|책임의 모양/ })).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
@@ -254,7 +209,7 @@ test("debug jump opens case 05 scenes directly", async ({ page }) => {
   await startDebugNode(page, "case05", "c5_voice");
 
   await expect(page.getByRole("heading", { name: "이름 없는 증언" })).toBeVisible();
-  await chooseFirstFixedChoice(page);
+  await chooseFirstAvailableChoice(page);
   await expect(page.getByRole("heading", { name: /말할 수 있는 조건|선의의 실패|책임의 모양/ })).toBeVisible();
 });
 
@@ -1438,7 +1393,7 @@ test("completed case is retained in the local ranking after leaving the ending",
 test("a replay link restores the captured scene in a fresh context", async ({ page, context }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case04", "c4_vote");
-  await chooseFirstFixedChoice(page);
+  await chooseFirstAvailableChoice(page);
   await page.waitForSelector(".game-shell");
 
   const before = await page.evaluate(() => {
