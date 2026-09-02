@@ -1,55 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 async function expectNoA11yViolations(page) {
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
-}
-
-async function startDebugNode(page, caseId, nodeId) {
-  await page.getByTestId("debug-case-select").selectOption(caseId);
-  await page.getByTestId("debug-node-select").selectOption(nodeId);
-  await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
-  await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
-  await page.getByTestId("debug-start-node").click();
-  await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
-    .toBe(nodeId);
-}
-
-async function completeCurrentCase(page) {
-  for (let step = 0; step < 24; step += 1) {
-    if (await page.locator(".result-page.final-report-locked, .ending-sequence").count()) {
-      const revealNext = page.locator(".decision-reveal-backdrop [data-testid='decision-next']");
-      if (await revealNext.count()) {
-        await revealNext.evaluate((button) => button.click());
-        await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0);
-      }
-      return;
-    }
-    await page.waitForFunction(
-      () => {
-        if (document.querySelector(".result-page.final-report-locked, .result-page, .ending-sequence")) return true;
-        const choice = document.querySelector(".choices .choice");
-        return Boolean(choice && getComputedStyle(choice).display !== "none" && choice.getClientRects().length);
-      },
-      undefined,
-      { timeout: 8_000 },
-    );
-    if (await page.locator(".result-page, .ending-sequence").count()) return;
-    const choice = page.locator(".choices .choice").first();
-    await expect(choice).toBeVisible();
-    await choice.evaluate((button) => button.click());
-    const commitButton = page.getByTestId("commit-confirm");
-    if (await commitButton.isVisible().catch(() => false)) {
-      await commitButton.evaluate((button) => button.click());
-    }
-    const nextButton = page.getByTestId("decision-next");
-    if (await nextButton.isVisible().catch(() => false)) {
-      await nextButton.evaluate((button) => button.click());
-    }
-  }
-  throw new Error("Case did not reach result page");
 }
 
 test("intro screen has no structural accessibility violations", async ({ page }) => {

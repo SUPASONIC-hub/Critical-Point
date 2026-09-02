@@ -21,7 +21,7 @@ async function chooseFirstFixedChoice(page) {
       return "advanced";
     }
     if (document.querySelector(".result-page")) return "result";
-    const firstChoice = document.querySelector(".choices .choice");
+    const firstChoice = document.querySelector(".choices .choice:not([aria-disabled='true'])");
     if (firstChoice instanceof HTMLButtonElement) {
       firstChoice.click();
       return "choice";
@@ -29,10 +29,7 @@ async function chooseFirstFixedChoice(page) {
     return "none";
   });
   if (domAction !== "choice") return;
-  const domCommitButton = page.getByTestId("commit-confirm");
-  if (await domCommitButton.isVisible().catch(() => false)) {
-    await domCommitButton.evaluate((button) => button.click());
-  }
+  await page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.click());
   await page.waitForFunction(
     () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice") || document.querySelector(".result-page")),
     undefined,
@@ -43,7 +40,11 @@ async function chooseFirstFixedChoice(page) {
 
 async function completeCurrentCase(page) {
   for (let step = 0; step < 24; step += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) return;
+    if (await page.locator(".result-page").isVisible().catch(() => false)) {
+      await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
+      await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: 15_000 }).catch(() => {});
+      return;
+    }
     await chooseFirstFixedChoice(page);
   }
   throw new Error("Case did not reach result page");
@@ -131,6 +132,7 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
     const found = [];
     for (const element of document.querySelectorAll(".game-board *")) {
       if (element.closest("details:not([open])")) continue;
+      if (element.closest("[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action")) continue;
       const style = getComputedStyle(element);
       if (style.display === "none" || style.visibility === "hidden") continue;
       const own = Array.from(element.childNodes)

@@ -151,6 +151,7 @@ import {
   sceneVisuals,
   triggerLabSignals,
 } from "./appContent.js";
+import { createIntroView, createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import {
   getChapterUiModel,
   getBalanceSignals,
@@ -2944,14 +2945,11 @@ export function AppContent({ onSuppressSaves }) {
       </Suspense>
     );
   }
-  const introView = { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue };
+  const introView = createIntroView(
+    { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue },
+    { startNewGamePlus, newGamePlusUnlocked, tutorialSteps, playStyleUnlocks, seasonGoals, pastRunMemory },
+  );
   if (!started) {
-    introView.startNewGamePlus = startNewGamePlus;
-    introView.newGamePlusUnlocked = newGamePlusUnlocked;
-    introView.tutorialSteps = tutorialSteps;
-    introView.playStyleUnlocks = playStyleUnlocks;
-    introView.seasonGoals = seasonGoals;
-    introView.pastRunMemory = pastRunMemory;
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   function advanceEndingStep() {
@@ -2969,70 +2967,18 @@ export function AppContent({ onSuppressSaves }) {
     setEndingStep(3);
   }
 
-  const resultView = { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview };
-  resultView.chapterUiModel = chapterUiModel;
-  resultView.endingSceneProfile = getEndingSceneProfile(endingVariant.id);
-  resultView.endingVisualClass = getEndingVisualClass(endingVariant.id);
-  resultView.failureObjectives = getFailureObjectives(endingVariant);
-  resultView.delayedConsequences = delayedConsequences;
-  resultView.rankingComparison = rankingComparison;
-  resultView.seasonGoals = seasonGoals;
-  resultView.balanceSignals = balanceSignals;
-  resultView.startRecoveryRoute = startRecoveryRoute;
-  resultView.endingCause = endingCause;
-  resultView.authorityReview = authorityReview;
-  resultView.endingAtmosphere = endingAtmosphere;
-  resultView.originEndingVariant = originEndingVariant;
-  resultView.aftermath = aftermath;
-  resultView.rankingIntegrity = rankingIntegrity;
-  resultView.replayDiagnostics = replayDiagnostics;
-  resultView.playReport = playReport;
-  resultView.endingEpilogue = getEndingEpilogue(endingVariant.id);
-  resultView.failureRecovery = failureRecovery;
-  resultView.achievementProgress = achievementProgress;
-  resultView.operatorReveal = operatorReveal;
-  resultView.operationsSnapshot = operationsSnapshot;
-  resultView.telemetryDashboard = telemetryDashboard;
+  const resultView = createResultView(
+    { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
+    { chapterUiModel, endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard },
+  );
   if (isResult) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
 
-  const playView = { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback };
-  playView.clueHypotheses = clueHypotheses;
-  playView.chapterUiModel = chapterUiModel;
-  playView.relationshipQuest = relationshipQuest;
-  playView.relationshipGraph = relationshipGraph;
-  playView.autonomousSignal = autonomousSignal;
-  playView.timelineStamp = timelineStamp;
-  playView.evidenceMetadata = evidenceMetadata;
-  playView.hypothesisConflict = hypothesisConflict;
-  playView.investigationTargets = investigationTargets;
-  playView.investigateTarget = investigateTarget;
-  playView.selectedInvestigationOutcome = selectedInvestigationOutcome;
-  playView.evidenceContamination = evidenceContamination;
-  playView.hypothesisLockState = hypothesisLockState;
-  playView.characterState = characterState;
-  playView.rivalResponse = rivalResponse;
-  playView.evidenceRepairPuzzle = evidenceRepairPuzzle;
-  playView.repairEvidence = repairEvidence;
-  playView.rivalIntervention = rivalIntervention;
-  playView.counterRival = counterRival;
-  playView.chapterTransitionBridge = chapterTransitionBridge;
-  playView.operatorReveal = operatorReveal;
-  playView.achievementProgress = achievementProgress;
-  playView.resourceChain = resourceChain;
-  playView.midBoss = midBoss;
-  playView.dynamicMusicLayers = dynamicMusicLayers;
-  playView.characterMemory = getCharacterMemory(node?.speaker, log);
-  playView.evidenceCombinations = evidenceCombinations;
-  playView.hypothesisActions = hypothesisActions;
-  playView.resolveHypothesisAction = resolveHypothesisAction;
-  playView.delayedConsequences = delayedConsequences;
-  playView.playStyleUnlocks = playStyleUnlocks;
-  playView.interlude = interlude;
-  playView.balanceSignals = balanceSignals;
-  playView.relationshipScene = relationshipScene;
-  playView.pastRunMemory = pastRunMemory;
+  const playView = createPlayView(
+    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
+    { clueHypotheses, chapterUiModel, relationshipQuest, relationshipGraph, autonomousSignal, timelineStamp, evidenceMetadata, hypothesisConflict, investigationTargets, investigateTarget, selectedInvestigationOutcome, evidenceContamination, hypothesisLockState, characterState, rivalResponse, evidenceRepairPuzzle, repairEvidence, rivalIntervention, counterRival, chapterTransitionBridge, operatorReveal, achievementProgress, resourceChain, midBoss, dynamicMusicLayers, characterMemory: getCharacterMemory(node?.speaker, log), evidenceCombinations, hypothesisActions, resolveHypothesisAction, delayedConsequences, playStyleUnlocks, interlude, balanceSignals, relationshipScene, pastRunMemory },
+  );
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }

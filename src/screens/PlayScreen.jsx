@@ -131,7 +131,7 @@ export function PlayScreen({ view }) {
         {view.investigationTargets?.length > 0 && (
           <section className="investigation-panel" aria-label="조사 대상 선택">
             <span>ACTIVE INVESTIGATION</span>
-            <div>{view.investigationTargets.map((target) => <button type="button" key={target.id} disabled={target.locked} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => view.investigateTarget(target)}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></button>)}</div>
+            <div>{view.investigationTargets.map((target) => <button type="button" key={target.id} aria-disabled={target.locked} tabIndex={target.locked ? -1 : 0} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => { if (!target.locked) view.investigateTarget(target); }}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></button>)}</div>
             {view.selectedInvestigationOutcome && <p>{view.selectedInvestigationOutcome.outcome}{view.selectedInvestigationOutcome.contaminated ? " 단, 이 기록에는 오염 가능성이 있습니다." : ""}</p>}
           </section>
         )}
@@ -425,7 +425,14 @@ export function PlayScreen({ view }) {
                 <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
                 <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
               </div>
-              <button type="button" onClick={activateCrisisProtocol} disabled={protocolUsed || riskPressure < 60 || isAdvancing}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!protocolUsed && riskPressure >= 60 && !isAdvancing) activateCrisisProtocol();
+                }}
+                aria-disabled={protocolUsed || riskPressure < 60 || isAdvancing}
+                tabIndex={protocolUsed || riskPressure < 60 || isAdvancing ? -1 : 0}
+              >
                 {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
               </button>
             </div>
@@ -654,10 +661,14 @@ export function PlayScreen({ view }) {
                     if (button) choiceButtonsRef.current.set(choice.id, button);
                     else choiceButtonsRef.current.delete(choice.id);
                   }}
-                  className={pendingChoice?.id === choice.id ? "choice selected" : "choice"}
+                  className={`${pendingChoice?.id === choice.id ? "choice selected" : "choice"} ${authorityGate.unlocked ? "" : "locked-choice"}`.trim()}
                   data-adaptive={choice.adaptive ? "true" : undefined}
-                  onClick={() => handleChoiceClick(choice)}
-                  onPointerDown={() => beginChoiceHold(choice)}
+                  onClick={() => {
+                    if (authorityGate.unlocked) handleChoiceClick(choice);
+                  }}
+                  onPointerDown={() => {
+                    if (authorityGate.unlocked) beginChoiceHold(choice);
+                  }}
                   onPointerUp={endChoiceHold}
                   onPointerCancel={endChoiceHold}
                   onPointerLeave={endChoiceHold}
@@ -667,7 +678,9 @@ export function PlayScreen({ view }) {
                       choose(choice);
                     }
                   }}
-                  disabled={isAdvancing || !authorityGate.unlocked}
+                  disabled={isAdvancing}
+                  aria-disabled={!authorityGate.unlocked}
+                  tabIndex={authorityGate.unlocked ? 0 : -1}
                   aria-pressed={pendingChoice?.id === choice.id}
                   aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
                   title={`${choiceIndex + 1}번 키로 선택 미리보기`}
@@ -849,8 +862,11 @@ export function PlayScreen({ view }) {
               <button
                 type="button"
                 className="choice free-choice submit-reframe"
-                onClick={() => choose(freeChoice)}
-                disabled={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
+                onClick={() => {
+                  if (freeText.trim() && !freeTextBlockedByPrivacy && !isAdvancing) choose(freeChoice);
+                }}
+                aria-disabled={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
+                tabIndex={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing ? -1 : 0}
                 aria-label={
                   freeTextBlockedByPrivacy
                     ? "식별 정보로 보일 수 있는 표현을 익명화해야 구조 재설계를 제출할 수 있습니다."

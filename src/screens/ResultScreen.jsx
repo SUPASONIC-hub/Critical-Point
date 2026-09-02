@@ -331,7 +331,7 @@ export function ResultScreen({ view }) {
             </section>
           )}
           {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`} role="status"><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
-          {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 후일담"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
+          {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
           {debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary>REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
           {view.delayedConsequences?.length > 0 && (
             <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">

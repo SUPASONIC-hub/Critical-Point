@@ -411,8 +411,9 @@ export function IntroScreen({ view }) {
                 <button
                   type="button"
                   key={caseItem.id}
-                  disabled={!canOpenCase}
+                  aria-disabled={!canOpenCase}
                   aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
+                  tabIndex={canOpenCase ? 0 : -1}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"
                       ? "case-card active-case"
