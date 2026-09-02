@@ -20,6 +20,8 @@ Last updated: 2026-09-02
 5. Keep CSS, text, and graph checks budget/schema-based so content drift is caught before it reaches screenshots.
 6. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
 7. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
+8. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
+9. A view that exposes a filtered subset of a table anon cannot read must stay `security_invoker = false`. The view's own WHERE clause is the security boundary.
 
 ## Verification Commands
 
