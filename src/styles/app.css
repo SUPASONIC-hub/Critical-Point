@@ -142,7 +142,7 @@ summary:focus-visible {
     linear-gradient(110deg, var(--c-tone-006), var(--c-tone-007) 43%, var(--c-tone-008)),
     image-set(
       url(/triggerlab-key-visual.webp) type("image/webp"),
-      url(/triggerlab-key-visual.png) type("image/png")
+      url(/triggerlab-key-visual.jpg) type("image/jpeg")
     ),
     linear-gradient(132deg, transparent 0 63%, rgba(217, 255, 98, 0.22) 63% 77%, transparent 77%),
     linear-gradient(135deg, transparent 0 58%, rgba(217, 255, 98, 0.5) 58% 59%, transparent 59%), var(--c-ink);
@@ -214,7 +214,6 @@ summary:focus-visible {
   background: rgba(255, 255, 255, 0.14);
   color: inherit;
 }
-.intro h1,
 .result-hero h1 {
   margin: 24px 0 12px;
   margin-inline: auto;
@@ -222,6 +221,138 @@ summary:focus-visible {
   font-size: 64px;
   line-height: 1;
   letter-spacing: 0;
+}
+
+/* Title lockup ------------------------------------------------------------
+   Heavy stacked caps with a thin chromatic flicker, sized off the viewport so
+   it stays the loudest thing on the intro at every width. The flicker and the
+   sweep are decoration only: both stop under prefers-reduced-motion, and the
+   readable copy is the element's own text, never a transparent fill. */
+.game-wordmark {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  margin: 28px 0 16px;
+  font-size: clamp(56px, 13vw, 168px);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  font-stretch: condensed;
+}
+.wordmark-line {
+  position: relative;
+  display: block;
+  color: var(--c-paper);
+  text-shadow: 0 6px 34px rgba(6, 10, 9, 0.72);
+}
+.wordmark-line::before,
+.wordmark-line::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wordmark-line::before {
+  color: rgb(217 255 98 / 0.85);
+  transform: translate3d(-0.018em, 0.012em, 0);
+  mix-blend-mode: screen;
+  animation: wordmark-drift-a 5.2s steps(2, end) infinite;
+}
+.wordmark-line::after {
+  color: rgb(88 214 255 / 0.72);
+  transform: translate3d(0.018em, -0.012em, 0);
+  mix-blend-mode: screen;
+  animation: wordmark-drift-b 6.7s steps(2, end) infinite;
+}
+.wordmark-line-accent {
+  color: var(--color-accent);
+  text-shadow:
+    0 6px 34px rgba(6, 10, 9, 0.72),
+    0 0 46px rgb(217 255 98 / 0.35);
+}
+.wordmark-rule {
+  display: block;
+  width: min(340px, 62%);
+  height: 5px;
+  margin: 18px 0 14px;
+  background: linear-gradient(90deg, var(--color-accent), rgb(217 255 98 / 0.06));
+  box-shadow: 0 0 22px rgb(217 255 98 / 0.55);
+  transform-origin: left center;
+  animation: wordmark-charge 4.4s ease-in-out infinite;
+}
+.wordmark-reading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--c-paper);
+  font-size: clamp(15px, 1.7vw, 21px);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-transform: none;
+}
+.wordmark-reading i {
+  color: rgb(217 255 98 / 0.85);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+}
+
+@keyframes wordmark-drift-a {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-0.018em, 0.012em, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate3d(-0.05em, 0.02em, 0);
+  }
+  95% {
+    opacity: 0.6;
+    transform: translate3d(-0.008em, -0.01em, 0);
+  }
+}
+@keyframes wordmark-drift-b {
+  0%,
+  84%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0.018em, -0.012em, 0);
+  }
+  87% {
+    opacity: 1;
+    transform: translate3d(0.052em, -0.024em, 0);
+  }
+  93% {
+    opacity: 0.55;
+    transform: translate3d(0.01em, 0.012em, 0);
+  }
+}
+@keyframes wordmark-charge {
+  0%,
+  100% {
+    transform: scaleX(0.72);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-line::before,
+  .wordmark-line::after {
+    display: none;
+  }
+  .wordmark-rule {
+    animation: none;
+    transform: none;
+  }
 }
 .game-header h1:focus,
 .result-hero h1:focus {
@@ -234,23 +365,46 @@ summary:focus-visible {
   font-size: 22px;
   line-height: 1.35;
 }
-.creator-badge {
+.studio-credit {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 18px;
-  padding: 7px 10px 7px 7px;
+  padding: 8px 16px 8px 8px;
   color: var(--c-ink);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--c-paper);
+  border: 1px solid rgba(24, 32, 31, 0.16);
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 900;
+  text-align: left;
 }
-.creator-badge img {
-  width: 34px;
-  height: 34px;
+.studio-credit img {
+  width: 36px;
+  height: 36px;
   object-fit: cover;
   border-radius: 50%;
+}
+.studio-credit dl {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+.studio-credit dl > div {
+  display: grid;
+  grid-template-columns: 58px auto;
+  align-items: baseline;
+  gap: 8px;
+}
+.studio-credit dt {
+  color: var(--c-ink-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+.studio-credit dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
 }
 .intro-visual {
   position: relative;
@@ -268,7 +422,11 @@ summary:focus-visible {
   width: 100%;
 }
 .intro-visual img {
-  aspect-ratio: 16 / 7;
+  /* height:auto is load-bearing: the img carries width/height attributes, and
+     that presentational height otherwise wins over aspect-ratio and squares the
+     frame off, cropping the figures at the left and right edges away. */
+  height: auto;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
 }
 .intro-visual figcaption {
@@ -5164,7 +5322,7 @@ body {
     linear-gradient(105deg, var(--c-tone-128), var(--c-tone-129) 52%, var(--c-tone-130)),
     image-set(
       url(/triggerlab-key-visual.webp) type("image/webp"),
-      url(/triggerlab-key-visual.png) type("image/png")
+      url(/triggerlab-key-visual.jpg) type("image/jpeg")
     );
   background-position: center;
   background-size: cover;

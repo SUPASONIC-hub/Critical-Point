@@ -1,9 +1,11 @@
 import { Fragment } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
+import { GameWordmark } from "../components/GameWordmark.jsx";
+import { StudioCredit } from "../components/StudioCredit.jsx";
 
 export function IntroScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
+  const { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
   const Music = AdaptiveMusic;
   const onShowRanking = view.setShowRanking;
   const gameTitle = GAME_TITLE;
@@ -34,26 +36,23 @@ export function IntroScreen({ view }) {
                   에러 로그
                 </button>
               )}
-              <span className="case-chip">임계점 / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
+              <span className="case-chip">{GAME_TITLE_READING} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
             </div>
           </div>
-          <h1>{gameTitle}</h1>
+          <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
           {nextParticipantMessage && (
             <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
           )}
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
-          <div className="creator-badge">
-            <img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
-            <span>Created by SUPASONIC</span>
-          </div>
+          <StudioCredit />
           <figure className="intro-visual">
             <picture>
               <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
               <img
-                src="/triggerlab-key-visual.png"
-                alt="트리거랩 작전실에서 사건 지도를 분석하는 라이트노벨풍 일러스트"
-                width="1792"
-                height="1024"
+                src="/triggerlab-key-visual.jpg"
+                alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                width="1672"
+                height="941"
                 fetchPriority="high"
               />
             </picture>

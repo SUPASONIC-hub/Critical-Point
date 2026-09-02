@@ -463,7 +463,7 @@ export function PlayScreen({ view }) {
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
             <img
-              src={sceneVisuals[currentCase] ?? "/triggerlab-key-visual.png"}
+              src={sceneVisuals[currentCase] ?? "/triggerlab-key-visual.jpg"}
               alt=""
               width="1792"
               height="1024"
@@ -472,7 +472,7 @@ export function PlayScreen({ view }) {
               onError={(event) => {
                 if (event.currentTarget.dataset.fallback === "true") return;
                 event.currentTarget.dataset.fallback = "true";
-                event.currentTarget.src = "/triggerlab-key-visual.png";
+                event.currentTarget.src = "/triggerlab-key-visual.jpg";
               }}
             />
           </div>
