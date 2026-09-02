@@ -1,0 +1,6 @@
+# Prettier owns the stylesheets only: this is what keeps app.css from being
+# checked in minified again. JS/JSX formatting is left to ESLint and review so
+# that behaviour changes stay readable in diffs.
+*
+!src/styles/
+!src/styles/*.css
