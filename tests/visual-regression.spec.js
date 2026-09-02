@@ -12,6 +12,7 @@ async function stabilizeVisualPage(page) {
         caret-color: transparent !important;
       }
       .debug-overlay,
+      .music-controls,
       .music-toggle,
       .status-bar-timer,
       .timer-card {
@@ -63,3 +64,18 @@ test("intro mobile visual baseline @visual", async ({ page }) => {
     maxDiffPixels: 500,
   });
 });
+
+for (const viewport of [
+  { name: "desktop", width: 1366, height: 768 },
+  { name: "mobile", width: 390, height: 844 },
+]) {
+  test(`intro start controls stay above the fold on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto("/");
+    const startButton = page.locator(".start-input-row button");
+    await expect(startButton).toBeVisible();
+    const box = await startButton.boundingBox();
+    expect(box?.y ?? Number.POSITIVE_INFINITY).toBeGreaterThanOrEqual(0);
+    expect((box?.y ?? 0) + (box?.height ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(viewport.height);
+  });
+}

@@ -134,6 +134,7 @@ import {
   triggerLabSignals,
 } from "./appCopy.js";
 import { createIntroView, createPlayView, createResultView } from "./viewModels/appViewModels.js";
+import { createLocalLeaderboardRows, createSeasonCases } from "./viewModels/seasonViewModels.js";
 import {
   getChapterUiModel,
   getBalanceSignals,
@@ -433,22 +434,7 @@ export function AppContent({ onSuppressSaves }) {
     resetEndingSequence,
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
-  const seasonCases = seasonCasesBase.map((caseItem) => {
-    const isCompleted = completedCases.includes(caseItem.id);
-    const isCurrent = caseItem.id === currentCase;
-    const isUnlocked =
-      caseItem.id === "case01" ||
-      caseItem.id === "case02" && completedCases.includes("case01") ||
-      caseItem.id === "case03" && completedCases.includes("case02") ||
-      caseItem.id === "case04" && completedCases.includes("case03") ||
-      caseItem.id === "case05" && completedCases.includes("case04") ||
-      caseItem.id === "final" && completedCases.includes("case05") ||
-      isCurrent;
-    return {
-      ...caseItem,
-      status: isCompleted ? "COMPLETE" : isCurrent ? "PLAYING" : isUnlocked ? "OPEN" : "LOCKED",
-    };
-  });
+  const seasonCases = createSeasonCases({ seasonCasesBase, completedCases, currentCase });
   const speakerProfile = characterProfiles[node?.speaker] ?? {
     role: "사건 관계자",
     stance: "상황 설명",
@@ -898,19 +884,7 @@ export function AppContent({ onSuppressSaves }) {
         text: "원격 저장 설정이 없어 브라우저 저장과 JSON 내보내기만 사용합니다.",
     };
   const localLeaderboardRows = useMemo(
-    () => [
-      ...localRankingRows,
-      ...Object.entries(caseResults).map(([caseId, summary]) => ({
-        local: true,
-        run_id: summary?.runId ?? runId,
-        session_code: sessionCode,
-        player_name: playerName || "현재 분석관",
-        case_id: caseId,
-        case_title: seasonCasesBase.find((caseItem) => caseItem.id === caseId)?.title ?? caseId,
-        completed_at: summary?.completedAt ?? "",
-        summary,
-      })),
-    ],
+    () => createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
   const nextCaseSignal = nextCaseSignals[currentCase];

@@ -5,9 +5,36 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 
 export function IntroScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
+  const {
+    common: {
+      AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus,
+      GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE,
+    },
+    start: {
+      playStyleOptions, playStyle, setPlayStyle, persist, hasResumableSave, node, formatSaveTime,
+      lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText,
+      startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus,
+    },
+    telemetry: {
+      dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline,
+      telemetrySummary, sessionCode, setPendingTelemetry, setSaveStatus,
+    },
+    debug: {
+      debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef,
+      debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef,
+      caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, nodeOrders,
+    },
+    season: {
+      seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
+      resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, normalizeCaseSummary,
+    },
+    content: {
+      playGuideItems, operatorProfiles, operatorOrigin, setOperatorOrigin, operatorProfile, originPrologue,
+      tutorialSteps, playStyleUnlocks, seasonGoals, pastRunMemory,
+    },
+  } = view;
   const Music = AdaptiveMusic;
-  const onShowRanking = view.setShowRanking;
+  const onShowRanking = view.common.setShowRanking;
   const gameTitle = GAME_TITLE;
   return (
       <main className="shell intro-shell">
@@ -77,8 +104,8 @@ export function IntroScreen({ view }) {
                 첫 케이스 시작
               </button>
             </div>
-            {view.newGamePlusUnlocked && (
-              <button type="button" className="new-game-plus-button" onClick={view.startNewGamePlus}>
+            {newGamePlusUnlocked && (
+              <button type="button" className="new-game-plus-button" onClick={startNewGamePlus}>
                 <Sparkles size={16} />
                 NEW GAME+ 시작
               </button>
@@ -216,7 +243,7 @@ export function IntroScreen({ view }) {
               <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
             </article>
           </section>
-          {view.operatorProfiles?.length > 0 && (
+          {operatorProfiles?.length > 0 && (
             <section className="operator-origin-panel" aria-label="주인공 출신과 권한 선택">
               <div className="panel-title-row">
                 <div>
@@ -226,13 +253,13 @@ export function IntroScreen({ view }) {
                 <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
               </div>
               <div className="operator-origin-grid">
-                {view.operatorProfiles.map((profile) => (
+                {operatorProfiles.map((profile) => (
                   <button
                     type="button"
                     key={profile.id}
-                    className={view.operatorOrigin === profile.id ? "operator-origin selected" : "operator-origin"}
-                    onClick={() => view.setOperatorOrigin(profile.id)}
-                    aria-pressed={view.operatorOrigin === profile.id}
+                    className={operatorOrigin === profile.id ? "operator-origin selected" : "operator-origin"}
+                    onClick={() => setOperatorOrigin(profile.id)}
+                    aria-pressed={operatorOrigin === profile.id}
                   >
                     <span>{profile.label}</span>
                     <strong>{profile.title}</strong>
@@ -241,29 +268,29 @@ export function IntroScreen({ view }) {
                   </button>
                 ))}
               </div>
-              <p className="operator-origin-selected">현재 출신: {view.operatorProfile?.title} · 첫 권한: {view.operatorProfile?.authority}</p>
-              {view.originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{view.originPrologue.title}</strong><p>{view.originPrologue.text}</p></div>}
+              <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
+              {originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
             </section>
           )}
-          {view.tutorialSteps && (
+          {tutorialSteps && (
             <section className="tutorial-path" aria-label="첫 플레이 안내">
               <span>FIRST RUN PROTOCOL</span>
-              <div>{view.tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
+              <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
             </section>
           )}
-          {view.playStyleUnlocks && (
-            <p className="play-style-unlock"><strong>{view.playStyleUnlocks.label}</strong> · {view.playStyleUnlocks.unlock} · {view.playStyleUnlocks.newGamePlus}</p>
+          {playStyleUnlocks && (
+            <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
           )}
-          {view.seasonGoals && (
+          {seasonGoals && (
             <section className="season-goal-strip" aria-label="시즌 목표">
               <span>SEASON GOALS</span>
-              {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
+              {seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
             </section>
           )}
-          {view.pastRunMemory && (
+          {pastRunMemory && (
             <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
-              <span>{view.pastRunMemory.label}</span>
-              <p>{view.pastRunMemory.text}</p>
+              <span>{pastRunMemory.label}</span>
+              <p>{pastRunMemory.text}</p>
             </section>
           )}
           <section className="quick-guide" aria-label="처음 플레이 가이드">

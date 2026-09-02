@@ -1026,55 +1026,12 @@ body {
   color: var(--ink);
   background: linear-gradient(135deg, var(--c-tone-002), var(--c-tone-127));
 }
-.intro-shell {
-  background:
-    linear-gradient(105deg, var(--c-tone-128), var(--c-tone-129) 52%, var(--c-tone-130)),
-    image-set(
-      url(/triggerlab-key-visual.webp) type("image/webp"),
-      url(/triggerlab-key-visual.jpg) type("image/jpeg")
-    );
-  background-position: center;
-  background-size: cover;
-}
-.intro-shell:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.18;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(217, 255, 98, 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 255, 98, 0.18) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: linear-gradient(90deg, var(--c-black), transparent 78%);
-}
-.intro {
-  width: min(1100px, 100%);
-  text-align: left;
-}
-.intro h1,
 .result-hero h1 {
   margin-inline: 0;
   max-width: 980px;
   font-weight: 950;
   letter-spacing: 0;
   text-wrap: balance;
-}
-.intro > p {
-  margin-inline: 0;
-  max-width: 680px;
-  color: var(--c-tone-131);
-}
-.intro-visual {
-  width: min(920px, 100%);
-  margin-left: 0;
-  border-color: rgba(217, 255, 98, 0.55);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
-}
-.start-panel,
-.play-style-panel,
-.quick-guide {
-  box-shadow: 0 16px 40px var(--c-tone-135);
 }
 .game-shell {
   gap: 26px;
@@ -1390,34 +1347,6 @@ body {
 .intro-visual {
   margin-inline: auto;
 }
-.start-panel .consent-box {
-  color: var(--c-ink);
-  background: var(--c-paper);
-  border-color: var(--c-tone-170);
-}
-.start-panel .consent-box b {
-  color: var(--c-ink);
-}
-.start-panel .consent-box small {
-  color: var(--c-ink-soft);
-}
-.start-panel .db-status-panel p,
-.start-panel .db-status-panel small,
-.start-panel .db-status-panel span {
-  color: var(--c-ink-raised);
-}
-.start-panel .db-status-panel strong {
-  color: var(--c-ink);
-}
-.start-panel .db-status-panel.ready strong {
-  color: var(--c-green-deep);
-}
-.start-panel .db-status-panel.pending strong {
-  color: var(--c-warn-deep);
-}
-.start-panel .db-status-panel.local strong {
-  color: var(--c-ink-soft);
-}
 @media (max-width: 1024px) {
   .shell {
     padding: 16px;
@@ -1550,14 +1479,24 @@ body {
   }
 }
 @media (max-width: 480px) {
-  .music-toggle {
+  .music-controls {
     top: 10px;
     right: 10px;
+  }
+  .music-toggle,
+  .music-volume-toggle {
     min-height: 36px;
     padding: 0 9px;
   }
+  .music-volume-toggle {
+    min-width: 0;
+  }
   .music-toggle span {
     max-width: 46px;
+  }
+  .result-page .topbar,
+  .ranking-page .topbar {
+    padding-right: 0;
   }
   .suspense-console {
     grid-template-columns: 1fr;
