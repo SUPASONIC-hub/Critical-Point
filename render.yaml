@@ -2,6 +2,6 @@ services:
   - type: web
     runtime: static
     name: critical-point
-    buildCommand: npm ci && npm run verify:static && npm run build
+    buildCommand: npm ci --include=dev && npm run verify:static && npm run build
     staticPublishPath: ./dist
     autoDeploy: true
