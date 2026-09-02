@@ -31,7 +31,9 @@ async function fresh() {
   await page.evaluate(() => {
     try {
       localStorage.clear();
-    } catch {}
+    } catch {
+      // Storage can be blocked; the smoke run does not depend on it.
+    }
   });
   await page.goto(`${url}/?debug=1`);
   await page.waitForSelector(".intro-shell", { timeout: 10000 });
@@ -83,7 +85,13 @@ await step("play through to a result page", async () => {
 
 await step("free-text scene accepts input", async () => {
   await page.goto(`${url}/?debug=1`);
-  await page.evaluate(() => { try { localStorage.clear(); } catch {} });
+  await page.evaluate(() => {
+    try {
+      localStorage.clear();
+    } catch {
+      // Storage can be blocked; the smoke run does not depend on it.
+    }
+  });
   await page.goto(`${url}/?debug=1`);
   await page.getByTestId("debug-case-select").selectOption("case02");
   await page.getByTestId("debug-node-select").selectOption("c2_final");

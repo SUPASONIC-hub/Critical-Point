@@ -63,15 +63,18 @@ export function buildLeaderboard(rows = [], limit = 50) {
     .map(normalizeEntry)
     .filter((entry) => entry.score !== null && entry.score >= 0 && entry.score <= 100);
   const bestByRun = new Map();
+  const outranks = (entry, current) =>
+    entry.score > current.score ||
+    (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank]);
   normalized.forEach((entry) => {
     const key = entry.runId || entry.id;
     const current = bestByRun.get(key);
+    // A completed season always beats a partial one; within the same tier the
+    // better score wins, so duplicate submissions of one run cannot pin the
+    // leaderboard to whichever row happened to arrive first.
     const shouldReplace = !current ||
       (entry.seasonComplete && !current.seasonComplete) ||
-      (!entry.seasonComplete && !current.seasonComplete && (
-        entry.score > current.score ||
-        (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank])
-      ));
+      (entry.seasonComplete === current.seasonComplete && outranks(entry, current));
     if (shouldReplace) {
       bestByRun.set(key, entry);
     }

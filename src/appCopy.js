@@ -48,12 +48,12 @@ export const playStyleOptions = [
 
 
 export const sceneVisuals = {
-  case01: "/scene-case01.png",
-  case02: "/scene-case02.png",
-  case03: "/scene-case03.png",
-  case04: "/scene-case04.png",
-  case05: "/scene-case05.png",
-  final: "/scene-final.png",
+  case01: "/scene-case01.webp",
+  case02: "/scene-case02.webp",
+  case03: "/scene-case03.webp",
+  case04: "/scene-case04.webp",
+  case05: "/scene-case05.webp",
+  final: "/scene-final.webp",
 };
 
 export const operatorBriefs = {

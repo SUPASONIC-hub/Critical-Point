@@ -2369,7 +2369,7 @@ const branchOpeningCopy = {
 
 Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   const baseNodeId = caseId === "case02" ? "c2_start" : caseId === "case03" ? "c3_start" : caseId === "case04" ? "c4_start" : caseId === "case05" ? "c5_start" : "f_start";
-  Object.entries(routes).forEach(([outcomeId, nodeId]) => {
+  Object.values(routes).forEach((nodeId) => {
     const [title, speaker, text, memo] = branchOpeningCopy[nodeId];
     nodes[nodeId] = {
       ...nodes[baseNodeId],

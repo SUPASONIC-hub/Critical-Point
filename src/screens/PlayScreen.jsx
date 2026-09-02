@@ -1,4 +1,3 @@
-import React from "react";
 import { Check, Info, LockKeyhole, MessageSquareText, Send, Sparkles } from "lucide-react";
 import { DecisionRail } from "../components/DecisionRail.jsx";
 import { DecisionDock } from "../components/DecisionDock.jsx";
@@ -11,14 +10,13 @@ import { CASE_SEQUENCE } from "../gameData.js";
 import { getAuthorityGate } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
-  const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, clueHypotheses = [], discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
+  const { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, clueHypotheses = [], discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace } = view;
   const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
   const relationshipScores = view.relationshipScores ?? [];
   const authorityState = view.authorityState ?? { level: "OBSERVER", permissions: [], locked: "권한 정보 없음" };
   const latestObserverTag = log.at(-1)?.observerTag;
-  const observerArc = observerPattern?.arc;
   const getObserverPreviewForChoice = (choiceId) =>
     decisionForecasts.find(({ choice }) => choice.id === choiceId)?.observerPreview;
   const observerWhisper =
@@ -470,6 +468,7 @@ export function PlayScreen({ view }) {
               width="1792"
               height="1024"
               loading="lazy"
+              decoding="async"
               onError={(event) => {
                 if (event.currentTarget.dataset.fallback === "true") return;
                 event.currentTarget.dataset.fallback = "true";
@@ -479,14 +478,16 @@ export function PlayScreen({ view }) {
           </div>
           <div className="speaker">
             <img
-              src={speakerPortrait ?? "/speaker-profile.png"}
+              src={speakerPortrait ?? "/speaker-profile.webp"}
               alt=""
               width="52"
               height="52"
+              loading="lazy"
+              decoding="async"
               onError={(event) => {
                 if (event.currentTarget.dataset.fallback === "true") return;
                 event.currentTarget.dataset.fallback = "true";
-                event.currentTarget.src = "/speaker-profile.png";
+                event.currentTarget.src = "/speaker-profile.webp";
               }}
             />
             <span>
@@ -565,7 +566,13 @@ export function PlayScreen({ view }) {
               <div className="forecast-header">
                 <div className="forecast-options" aria-label="Choice pressure comparison">
                   {decisionForecasts.map(({ choice, forecast }) => (
-                    <article key={choice.id} className={`forecast-option ${forecast.forecastPrecision}`}>
+                    <button
+                      type="button"
+                      key={choice.id}
+                      className={`forecast-option ${forecast.forecastPrecision}`}
+                      onClick={() => previewChoice(choice)}
+                      aria-pressed={pendingChoice?.id === choice.id}
+                    >
                       <strong>{choice.label}</strong>
                       <span>
                         {forecast.forecastPrecision === "precise"
@@ -573,7 +580,7 @@ export function PlayScreen({ view }) {
                           : `Risk ${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`}
                       </span>
                       <small>{forecast.forecastPrecision === "precise" ? "Precise forecast" : "Gather evidence to narrow this range"}</small>
-                    </article>
+                    </button>
                   ))}
                 </div>
                 <span>판단 힌트</span>
@@ -634,10 +641,7 @@ export function PlayScreen({ view }) {
               const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
               const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
               const observerPreview = getObserverPreviewForChoice(choice.id);
-              const projectedRisk = getRiskPressure(choiceRead.finalResources);
               const riskDelta = choiceRead.finalRiskDelta;
-              const riskClass =
-                riskDelta > 0 ? "risk-up" : riskDelta < 0 ? "risk-down" : "risk-flat";
               const riskLabel =
                 riskDelta > 0
                   ? `위험 +${riskDelta}`
@@ -882,7 +886,6 @@ export function PlayScreen({ view }) {
             onConfirm={() => choose(pendingChoice)}
             isAdvancing={isAdvancing}
             speechify={speechifyChoice}
-            formatRiskDelta={formatRiskDelta}
             formatForecastRisk={formatForecastRisk}
           />
         )}

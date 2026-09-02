@@ -1,4 +1,3 @@
-import React from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export function RankingScreen({

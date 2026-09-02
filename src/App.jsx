@@ -1,8 +1,8 @@
-import React from "react";
+import { Component } from "react";
 import "./styles/tokens.css";
 import "./styles/app.css";
 import { readStoredValue, RECOVERY_CENTER_STORAGE_KEY, removeStoredValue, STORAGE_KEY, writeStoredValue } from "./appConfig.js";
-import { AppContent } from "./AppContent.jsx";
+import { AppContent, resumeSaves, suppressSaves } from "./AppContent.jsx";
 import { getSavedRecoveryState, recordAppError } from "./state/savedState.js";
 
 export const caseSequence = ["case01", "case02", "case03", "case04", "case05", "final"];
@@ -12,17 +12,11 @@ const debugToolsEnabled =
   (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 
-let saveSuppressed = false;
-
-export function suppressSaves() {
-  saveSuppressed = true;
-}
-
 export function App() {
   return <AppContent onSuppressSaves={suppressSaves} />;
 }
 
-export class AppErrorBoundary extends React.Component {
+export class AppErrorBoundary extends Component {
   state = { hasError: false, recoveryMessage: "" };
 
   static getDerivedStateFromError() {
@@ -50,7 +44,7 @@ export class AppErrorBoundary extends React.Component {
 
     if (clearSave) suppressSaves();
     if (clearSave && !removeStoredValue(STORAGE_KEY)) {
-      saveSuppressed = false;
+      resumeSaves();
       this.setState({
         recoveryMessage: "현재 저장본을 삭제하지 못했습니다. 브라우저 저장소 권한을 확인한 뒤 다시 시도하세요.",
       });

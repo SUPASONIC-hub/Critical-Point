@@ -7,9 +7,6 @@ import {
   writeStoredValue,
 } from "../appConfig.js";
 import { saveCaseTelemetry, saveErrorTelemetry, saveFeedbackTelemetry } from "../telemetry.js";
-import { recordAppError } from "./savedState.js";
-
-const TELEMETRY_RETRY_DELAYS = [4000, 12000, 30000];
 
 /**
  * The outbound telemetry queue: buffer an item, flush the buffer, and back off

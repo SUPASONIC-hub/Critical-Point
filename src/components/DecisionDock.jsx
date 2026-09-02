@@ -1,4 +1,3 @@
-import React from "react";
 import { LockKeyhole } from "lucide-react";
 import { GuardedButton } from "./GuardedButton.jsx";
 
@@ -11,7 +10,6 @@ export function DecisionDock({
   onConfirm,
   isAdvancing,
   speechify,
-  formatRiskDelta,
 }) {
   if (!pendingChoice || !pendingChoiceForecast) return null;
 

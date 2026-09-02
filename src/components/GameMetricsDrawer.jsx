@@ -1,4 +1,3 @@
-import React from "react";
 
 import { Check, Shield } from "lucide-react";
 import { GuardedButton } from "./GuardedButton.jsx";

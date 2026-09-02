@@ -31,10 +31,8 @@ export function createChoiceReaders({
   riskPressure,
   discoveredClues,
   currentCase,
-  cognition,
   freeText,
   currentChallengeStreak,
-  evidenceCount,
   resourceMeta,
 }) {
   function getChallengeMatch(choice, riskDelta) {
@@ -92,13 +90,6 @@ export function createChoiceReaders({
         : "관망";
 
     return { grade, gradeText, reward, cost, gain };
-  }
-
-  function describeForecast(forecast) {
-    if (evidenceCount === 0) return "??";
-    const direction = forecast.riskDelta > 0 ? "위험 ↑" : forecast.riskDelta < 0 ? "위험 ↓" : "위험 유지";
-    if (evidenceCount < 3) return direction;
-    return `${direction} · ${formatResourceDelta(forecast.biggestGain)} / ${formatResourceDelta(forecast.biggestCost)}`;
   }
 
   function mergeEffects(...effects) {
@@ -191,7 +182,6 @@ export function createChoiceReaders({
   return {
     getChallengeMatch,
     getTacticalRead,
-    describeForecast,
     mergeEffects,
     getFlowSurge,
     getClueReveal,

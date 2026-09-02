@@ -31,7 +31,7 @@ export function getChapterTransitionBridge(previousCaseId, currentCaseId, previo
   };
 }
 
-export function getOperatorReveal({ origin = "courier", completedCases = [], caseResults = {} } = {}) {
+export function getOperatorReveal({ origin = "courier", completedCases = [] } = {}) {
   const count = completedCases.length;
   if (count < 2) return { level: 0, title: "OPERATOR FILE / SEALED", text: "주인공의 과거 권한은 아직 봉인되어 있습니다." };
   if (count < 4) return { level: 1, title: "OPERATOR FILE / PARTIAL", text: `${origin} 출신 기록관이 단순 관찰자가 아니라 기준을 설계한 인물이었다는 흔적이 남습니다.` };

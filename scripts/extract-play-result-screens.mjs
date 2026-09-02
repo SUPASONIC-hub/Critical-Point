@@ -7,14 +7,6 @@ function unique(items) {
   return items.filter((item, index, all) => item && all.indexOf(item) === index);
 }
 
-function indentBlock(text, spaces) {
-  const prefix = " ".repeat(spaces);
-  return text
-    .split("\n")
-    .map((line) => (line ? `${prefix}${line}` : line))
-    .join("\n");
-}
-
 function extractReturnBody(block) {
   const returnStart = block.indexOf("    return (");
   const returnEnd = block.lastIndexOf("    );");
@@ -34,7 +26,7 @@ function findPatternIndex(pattern, start = 0) {
 }
 
 const resultStart = source.lastIndexOf("  if (isResult) {");
-const playStart = findPatternIndex(/\r?\n  return \(\r?\n    <main className=\{`shell game-shell/, resultStart);
+const playStart = findPatternIndex(/\r?\n {2}return \(\r?\n {4}<main className=\{`shell game-shell/, resultStart);
 const appEnd = findPatternIndex(/\r?\n}\r?\n\r?\nexport class AppErrorBoundary/, playStart);
 if (resultStart < 0 || playStart < 0 || appEnd < 0) {
   throw new Error("Screen markers not found");

@@ -1,4 +1,3 @@
-import React from "react";
 
 export function RecoveryNotice({ view }) {
   const { lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showErrorLog, setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice } = view;

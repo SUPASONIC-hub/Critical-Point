@@ -30,7 +30,7 @@ async function createTelemetryError(response, fallbackMessage) {
   try {
     detail = (await response.text()).slice(0, 500);
   } catch {
-    detail = "";
+    // A body is optional; fall back to the status code alone.
   }
   const suffix = detail ? `: ${detail}` : "";
   return new Error(`${fallbackMessage}: ${response.status}${suffix}`);
@@ -52,67 +52,40 @@ export function getSessionCode(sessionId) {
   return sessionId.replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCase();
 }
 
-export async function saveCaseTelemetry(payload) {
+function restHeaders(extra = {}) {
+  return {
+    apikey: SUPABASE_ANON_KEY,
+    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    ...extra,
+  };
+}
+
+async function insertRow(table, payload, failureLabel) {
   if (!telemetryEnabled) return { skipped: true };
 
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_sessions`, {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
     method: "POST",
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
+    headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    throw await createTelemetryError(response, "Telemetry save failed");
+    throw await createTelemetryError(response, failureLabel);
   }
 
   return { saved: true };
 }
 
-export async function saveFeedbackTelemetry(payload) {
-  if (!telemetryEnabled) return { skipped: true };
-
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/playtest_feedback`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    throw await createTelemetryError(response, "Feedback save failed");
-  }
-
-  return { saved: true };
+export function saveCaseTelemetry(payload) {
+  return insertRow("playtest_sessions", payload, "Telemetry save failed");
 }
 
-export async function saveErrorTelemetry(payload) {
-  if (!telemetryEnabled) return { skipped: true };
+export function saveFeedbackTelemetry(payload) {
+  return insertRow("playtest_feedback", payload, "Feedback save failed");
+}
 
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/app_error_logs`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    throw await createTelemetryError(response, "Error log save failed");
-  }
-
-  return { saved: true };
+export function saveErrorTelemetry(payload) {
+  return insertRow("app_error_logs", payload, "Error log save failed");
 }
 
 async function checkTelemetryTable(tableName) {
@@ -125,10 +98,7 @@ async function checkTelemetryTable(tableName) {
       : { select: "table_name", table_name: `eq.${tableName}`, limit: "1" },
   );
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${readTableName}?${query.toString()}`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    },
+    headers: restHeaders(),
   });
 
   return {
@@ -167,10 +137,7 @@ export async function fetchLeaderboard(limit = 100) {
     limit: String(limit),
   });
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_rankings?${query.toString()}`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    },
+    headers: restHeaders(),
   });
 
   if (!response.ok) {

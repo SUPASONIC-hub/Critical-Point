@@ -20,7 +20,7 @@ for (const [lineIndex, line] of tokenCss.split(/\r?\n/).entries()) {
     const value = declaration[1];
     const rgb = value.match(/rgba?\(([^)]+)\)/);
     if (!rgb) continue;
-    const channels = rgb[1].split(/[\s,\/]+/).filter(Boolean);
+    const channels = rgb[1].split(/[\s,/]+/).filter(Boolean);
     const numericChannels = channels
       .map((channel) => Number(channel.replace("%", "")))
       .filter((channel) => Number.isFinite(channel));

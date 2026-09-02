@@ -1,11 +1,10 @@
-import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import {
   appendStoredErrorLog,
   ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
   PLAYER_NAME_MAX_LENGTH,
   appendSaveSlot,
-  copyText,
   FREE_TEXT_MAX_LENGTH,
   getInvalidSavedStateKeys,
   isSavedStateShapeValid,
@@ -16,16 +15,10 @@ import {
   parseCurrentSavedState,
   parseRecoverySlots,
   readStoredValue,
-  RECOVERY_SLOT_SCHEMA_VERSION,
   RECOVERY_CENTER_STORAGE_KEY,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
-  SAVE_STATE_KEYS,
   SAVE_SLOT_STORAGE_KEY,
-  TELEMETRY_QUEUE_TYPES,
-  restoreRecoverySnapshot,
-  createSafeErrorContext,
-  serializeError,
   STORAGE_KEY,
   writeStoredValue,
 } from "./appConfig.js";
@@ -60,7 +53,6 @@ import {
   getDecisionLedger,
   getAllDiscoveryClueIds,
   getClueHypotheses,
-  getDiscoveryClue,
   getAuthorityGate,
   getEndingVariant,
   getCaseOutcome,
@@ -93,41 +85,24 @@ import {
   getSessionCode,
   saveCaseTelemetry,
   checkTelemetryHealth,
-  saveErrorTelemetry,
-  saveFeedbackTelemetry,
-  fetchLeaderboard,
   telemetryEnabled,
 } from "./telemetry.js";
-import { buildLeaderboard, getLeaderboardHeadline } from "./ranking.js";
-import { easyCognitionLabels, easyResourceLabels, easyRiskLabels, simplifyPlayerText } from "./playerLanguage.js";
-import { DecisionRail } from "./components/DecisionRail.jsx";
-import { DecisionDock } from "./components/DecisionDock.jsx";
-import { MemoPanel } from "./components/MemoPanel.jsx";
-import { StatusBoard } from "./components/StatusBoard.jsx";
-import { GameMetricsDrawer } from "./components/GameMetricsDrawer.jsx";
-import { GameHeader } from "./components/GameHeader.jsx";
+import { getLeaderboardHeadline } from "./ranking.js";
+import { easyCognitionLabels, easyRiskLabels, simplifyPlayerText } from "./playerLanguage.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import {
   appendTraceEvent,
-  encodeReplaySeed,
   getReplaySeedFromLocation,
   getTraceEvents,
-  TRACE_STORAGE_KEY,
 } from "./state/trace.js";
 import {
-  createErrorRecoveryEntry,
   createReplaySavedState,
   getRouteMarker,
-  getSavedRecoveryState,
-  isKnownCaseId,
-  isNodeValidForCase,
-  normalizeSavedCaseSummaryShape,
   normalizeSavedGameplayState,
   normalizeSavedNestedState,
   recordAppError,
   repairSavedRoute,
   reportSilentFailure,
-  shouldCaptureSaveSlot,
 } from "./state/savedState.js";
 import { DecisionReveal } from "./components/DecisionReveal.jsx";
 import { RecoveryNotice } from "./components/RecoveryNotice.jsx";
@@ -139,8 +114,13 @@ import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
 import { createGameEvent, reduceInvestigationState } from "./state/gameEvents.js";
+import { useLeaderboard } from "./state/useLeaderboard.js";
+import { buildPlaytestExport, downloadJson } from "./state/playtestExport.js";
+import { createClipboardActions, useClipboardStatus } from "./state/useClipboardStatus.js";
+import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js";
+import { useEndingSequence } from "./state/useEndingSequence.js";
 import { getCharacterState, getRivalResponse } from "./characterSystems.js";
-import { getAchievementProgress, getChapterTransitionBridge, getChoiceImpact, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
+import { getAchievementProgress, getChapterTransitionBridge, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
 import {
   legacyProfiles,
   nextCaseSignals,
@@ -151,7 +131,7 @@ import {
   resourceMeta,
   sceneVisuals,
   triggerLabSignals,
-} from "./appContent.js";
+} from "./appCopy.js";
 import { createIntroView, createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import {
   getChapterUiModel,
@@ -208,34 +188,19 @@ const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScr
 
 const GAME_TITLE = "임계점";
 const GAME_SUBTITLE = "판단이 깊어지는 순간";
-const GAME_LABEL = "CRITICAL POINT";
-const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 function createRunId() {
   return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-const legacySpeakerPortraits = {
-  "한서윤": "/portrait-han-seoyun.png",
-  "반재욱": "/portrait-ban-jaeuk.png",
-  "도윤하": "/portrait-do-yunha.png",
-  "오진우": "/portrait-oh-jinwoo.png",
-  "에코": "/portrait-echo.png",
-  "반재현": "/portrait-ban-jaehyun.png",
-  "윤서": "/portrait-yunseo.png",
+const speakerPortraits = {
+  "한서윤": "/portrait-han-seoyun.webp",
+  "반재욱": "/portrait-ban-jaeuk.webp",
+  "도윤하": "/portrait-do-yunha.webp",
+  "오진우": "/portrait-oh-jinwoo.webp",
+  "에코": "/portrait-echo.webp",
+  "반재현": "/portrait-ban-jaehyun.webp",
+  "윤서": "/portrait-yunseo.webp",
 };
-
-const portraitAssets = [
-  "/portrait-han-seoyun.png",
-  "/portrait-ban-jaeuk.png",
-  "/portrait-do-yunha.png",
-  "/portrait-oh-jinwoo.png",
-  "/portrait-echo.png",
-  "/portrait-ban-jaehyun.png",
-  "/portrait-yunseo.png",
-];
-const speakerPortraits = Object.fromEntries(
-  Object.keys(characterProfiles).map((speaker, index) => [speaker, portraitAssets[index % portraitAssets.length]]),
-);
 
 let consoleErrorHookBusy = false;
 
@@ -268,6 +233,10 @@ const replaySeed = getReplaySeedFromLocation();
 
 export function suppressSaves() {
   saveSuppressed = true;
+}
+
+export function resumeSaves() {
+  saveSuppressed = false;
 }
 
 export function AppContent({ onSuppressSaves }) {
@@ -332,28 +301,20 @@ export function AppContent({ onSuppressSaves }) {
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const [selectedInvestigation, setSelectedInvestigation] = useState("");
   const [hypothesisAction, setHypothesisAction] = useState("");
-  const [endingStep, setEndingStep] = useState(0);
-  const [endingTwistIndex, setEndingTwistIndex] = useState(0);
-  const [endingQuietReady, setEndingQuietReady] = useState(
-    () => globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false,
-  );
-  const [nextParticipantMessage, setNextParticipantMessage] = useState(() => readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""));
   const [echo, setEcho] = useState(
     () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
   );
   const [nodeEnteredAt, setNodeEnteredAt] = useState(saved?.nodeEnteredAt ?? Date.now());
-  const [copyStatus, setCopyStatus] = useState("");
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const { copyStatus, flashCopyStatus } = useClipboardStatus();
+  const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
   const pendingTelemetryRef = useRef(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
   const [memoOpened, setMemoOpened] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
-  const [leaderboard, setLeaderboard] = useState([]);
   const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
-  const [leaderboardStatus, setLeaderboardStatus] = useState("idle");
-  const [leaderboardError, setLeaderboardError] = useState("");
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
   const [telemetryStatus, setTelemetryStatus] = useState({
     tone: telemetryEnabled && isOnline ? "ready" : "local",
@@ -424,7 +385,7 @@ export function AppContent({ onSuppressSaves }) {
     setDecisionReveal, setPendingChoice, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setFreeText, setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries,
     setSaveSlots, saveSlots, normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
-    makeEmptyScores, normalizeSavedText, persistSuppressed: () => saveSuppressed,
+    makeEmptyScores, persistSuppressed: () => saveSuppressed,
     onSuppressSaves, formatSaveTime, debugErrorKey: DEBUG_RENDER_CRASH_KEY,
     createRunId,
   });
@@ -451,6 +412,17 @@ export function AppContent({ onSuppressSaves }) {
   const isOpeningNode = branchOpeningNodeIds.has(resolvedNodeId);
   const node = nodes[resolvedNodeId] ?? nodes.start;
   const isResult = Object.values(CASE_RESULT_NODES).includes(nodeId);
+  const {
+    endingStep,
+    endingTwistIndex,
+    endingQuietReady,
+    nextParticipantMessage,
+    setNextParticipantMessage,
+    skipEndingQuietHold,
+    advanceEndingStep,
+    saveNextParticipantMessage,
+    resetEndingSequence,
+  } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
   const seasonCases = seasonCasesBase.map((caseItem) => {
     const isCompleted = completedCases.includes(caseItem.id);
@@ -478,7 +450,7 @@ export function AppContent({ onSuppressSaves }) {
     voice: "상황을 과장하지 않고 필요한 정보만 전달한다.",
     line: "지금 결정하면, 무엇이 다음 장면으로 넘어갑니까?",
   };
-  const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.png";
+  const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.webp";
   const latestBeat = log.at(-1)?.sceneBeat ?? "";
   const freeTextSignals = getFreeTextSignals(freeText);
   const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
@@ -790,10 +762,7 @@ export function AppContent({ onSuppressSaves }) {
   const echoProbeCost = playStyle === "mediator" ? "결정 시간 4초와 신뢰 1" : "결정 시간 8초와 피로 1";
   const {
     getChallengeMatch,
-    getTacticalRead,
-    describeForecast,
     mergeEffects,
-    getFlowSurge,
     getClueReveal,
     getEffectiveChoiceRead,
   } = createChoiceReaders({
@@ -803,10 +772,8 @@ export function AppContent({ onSuppressSaves }) {
     riskPressure,
     discoveredClues,
     currentCase,
-    cognition,
     freeText,
     currentChallengeStreak,
-    evidenceCount,
     resourceMeta,
   });
 
@@ -832,23 +799,7 @@ export function AppContent({ onSuppressSaves }) {
         }),
       };
     });
-  const pressureLensForecast = [...decisionForecasts].sort((a, b) => {
-    if (a.forecast.riskDelta !== b.forecast.riskDelta) {
-      return a.forecast.riskDelta - b.forecast.riskDelta;
-    }
-    return b.forecast.cognitionGain - a.forecast.cognitionGain;
-  })[0];
-  const tradeoffLensForecast = [...decisionForecasts].sort((a, b) => {
-    const aCost = Math.abs(a.forecast.biggestCost?.[1] ?? 0);
-    const bCost = Math.abs(b.forecast.biggestCost?.[1] ?? 0);
-    return bCost - aCost;
-  })[0];
   const pressureLeader = riskPressureDrivers[0];
-  const formatResourceDelta = (delta) => {
-    if (!delta) return "즉시 비용 낮음";
-    const [key, value] = delta;
-    return `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
-  };
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
   const pendingChoiceRead = pendingChoice
@@ -895,8 +846,6 @@ export function AppContent({ onSuppressSaves }) {
     { label: "남은 시간", value: `${decisionSeconds}초` },
   ];
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
-  const [feedbackStatus, setFeedbackStatus] = useState("");
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
   const hasResumableSave =
@@ -1136,32 +1085,11 @@ export function AppContent({ onSuppressSaves }) {
     hadDecisionRevealRef.current = false;
     window.requestAnimationFrame(() => sceneTitleRef.current?.focus({ preventScroll: true }));
   }, [decisionReveal]);
-  useEffect(() => {
-    if (!showRanking) return undefined;
-    let cancelled = false;
-    setLeaderboardStatus("loading");
-    setLeaderboardError("");
-    fetchLeaderboard()
-      .then(({ rows = [], skipped = false }) => {
-        if (cancelled) return;
-        setLeaderboard(buildLeaderboard([...rows, ...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])]));
-        setLeaderboardStatus(skipped ? "local" : "ready");
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        console.warn(error);
-        setLeaderboard(buildLeaderboard([...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])]));
-        setLeaderboardStatus(isOnline ? "error" : "local");
-        setLeaderboardError(
-          isOnline
-            ? "원격 기록을 불러오지 못해 이 브라우저의 완료 기록만 표시합니다."
-            : "오프라인이라 이 브라우저의 완료 기록만 표시합니다.",
-        );
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [isOnline, localLeaderboardRows, localSeasonLeaderboardRow, showRanking]);
+  useEffect(() => () => {
+    window.clearTimeout(freeTextSaveTimerRef.current);
+    window.clearTimeout(choiceHoldTimerRef.current);
+  }, []);
+
   const musicModeKey = useMemo(() => {
     if (!started) return "intro:menu";
     if (isResult) return currentCase === "final" ? `result:final:${endingStep}` : `result:${currentCase}`;
@@ -1172,22 +1100,6 @@ export function AppContent({ onSuppressSaves }) {
       .replace(/^-|-$/g, "") || "scene";
       return `${riskTier.toLowerCase()}:${currentCase}:${phaseKey}:${node?.speaker ?? "voice"}:${musicRouteIndex}:${operatorOrigin}`;
   }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, operatorOrigin, resolvedNodeId, riskTier, started]);
-
-  function skipEndingQuietHold() {
-    setEndingQuietReady(true);
-  }
-
-  useEffect(() => {
-    if (!isResult || currentCase !== "final" || endingStep !== 1) return undefined;
-    const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reducedMotion) {
-      setEndingQuietReady(true);
-      return undefined;
-    }
-    setEndingQuietReady(false);
-    const timer = window.setTimeout(() => setEndingQuietReady(true), 8000);
-    return () => window.clearTimeout(timer);
-  }, [currentCase, endingStep, isResult]);
 
   useEffect(() => {
     if (!started || isResult) return undefined;
@@ -1297,249 +1209,7 @@ export function AppContent({ onSuppressSaves }) {
     });
   }, [started, currentCase, nodeId, isResult]);
 
-  function legacyPersist(nextState) {
-    if (saveSuppressed) return { storageSaved: false };
-    const baseState = {
-        saveSchemaVersion: SAVE_SCHEMA_VERSION,
-        playerName,
-        playStyle,
-        openingLegacy,
-        dataConsent,
-        started,
-        currentCase,
-        completedCases,
-        discoveredClues,
-        caseResults,
-        playtestFeedback,
-        nodeId,
-        resources,
-        log,
-        triggers,
-        cognition,
-        freeText,
-        echo,
-        nodeEnteredAt,
-        pendingTelemetry: pendingTelemetryRef.current,
-        protocolUsed,
-        timerPenaltyApplied,
-        probeUsed,
-        paused: isPausedSave,
-        savedAt: new Date().toISOString(),
-      };
-    const missingKeys = SAVE_STATE_KEYS.filter((key) => !Object.hasOwn(baseState, key));
-    if (missingKeys.length > 0 && import.meta.env.DEV) {
-      throw new Error(`Save payload missing keys: ${missingKeys.join(", ")}`);
-    }
-    const payload = {
-      ...SAVE_STATE_KEYS.reduce((state, key) => {
-        state[key] = baseState[key];
-        return state;
-      }, {}),
-      ...nextState,
-    };
-    const previousState = {
-      started,
-      currentCase,
-      nodeId,
-      completedCases,
-    };
-    const storageSaved = writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
-    if (storageSaved && shouldCaptureSaveSlot(previousState, payload)) {
-      appendSaveSlot(payload);
-    }
-    if (!storageSaved) {
-      setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 탭에서만 진행됩니다.");
-    }
-    return { ...payload, storageSaved };
-  }
-
-  function legacyStartGame() {
-    const name = normalizePlayerName(playerName) || "분석관";
-    setPlayerName(name);
-    setStarted(true);
-    setIsPausedSave(false);
-    setCurrentCase("case01");
-    setCompletedCases([]);
-    setDiscoveredClues([]);
-    setCaseResults({});
-    setPlaytestFeedback({});
-    setResources(initialResources);
-    setLog([]);
-    setTriggers(makeEmptyScores(triggerLabels));
-    setCognition(makeEmptyScores(cognitionLabels));
-    setProtocolUsed(false);
-    setTimerPenaltyApplied(false);
-    setProbeUsed(false);
-    setOpeningLegacy(null);
-    setDecisionReveal(null);
-    setPendingChoice(null);
-    setLastRecoveredError(null);
-    setShowRecoveryCenter(false);
-    setShowErrorLog(false);
-    removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    setFreeText("");
-    setNodeId("start");
-    setNodeEnteredAt(Date.now());
-    persist({
-      playerName: name,
-      playStyle,
-      openingLegacy: null,
-      dataConsent,
-      started: true,
-      currentCase: "case01",
-      completedCases: [],
-      discoveredClues: [],
-      caseResults: {},
-      playtestFeedback: {},
-      resources: initialResources,
-      log: [],
-      triggers: makeEmptyScores(triggerLabels),
-      cognition: makeEmptyScores(cognitionLabels),
-      nodeId: "start",
-      freeText: "",
-      nodeEnteredAt: Date.now(),
-      protocolUsed: false,
-      timerPenaltyApplied: false,
-      probeUsed: false,
-      paused: false,
-      lastError: null,
-    });
-  }
-
-  function legacyResumeSavedGame() {
-    setStarted(true);
-    setIsPausedSave(false);
-    setNodeEnteredAt(Date.now());
-    setSaveStatus("");
-    setDecisionReveal(null);
-    persist({
-      started: true,
-      paused: false,
-      nodeEnteredAt: Date.now(),
-    });
-  }
-
-  function legacyPauseAfterRecovery() {
-    setStarted(false);
-    setIsPausedSave(true);
-    setSaveStatus("저장 지점을 일시정지했습니다. 같은 오류가 반복되면 새로 시작하거나 복구 슬롯을 선택하세요.");
-    persist({ started: false, paused: true });
-  }
-
-  function legacyStartFreshAfterRecovery() {
-    onSuppressSaves();
-    const removed = removeStoredValue(STORAGE_KEY);
-    if (!removed) {
-      saveSuppressed = false;
-      setSaveStatus("저장본을 초기화하지 못했습니다. 브라우저 저장소 권한을 확인하세요.");
-      return;
-    }
-    writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1");
-    removeStoredValue(DEBUG_RENDER_CRASH_KEY);
-    window.location.reload();
-  }
-
-  function legacySaveCurrentGame({ exit = false } = {}) {
-    const nextStarted = exit ? false : started;
-    const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
-    const payload = persist({
-      started: nextStarted,
-      paused: exit,
-      nodeEnteredAt: nextNodeEnteredAt,
-    });
-    if (payload.storageSaved) {
-      setLastSavedAt(payload.savedAt);
-    }
-    setIsPausedSave(exit);
-    setSaveStatus(
-      payload.storageSaved
-        ? `저장됨 ${formatSaveTime(payload.savedAt)}`
-        : "브라우저 저장소를 사용할 수 없어 현재 탭에서만 진행됩니다.",
-    );
-    if (exit) {
-      setStarted(false);
-    } else {
-      setNodeEnteredAt(nextNodeEnteredAt);
-    }
-  }
-
-  function legacyRefreshLocalErrorLog() {
-    const rawErrorLog = readStoredValue(ERROR_LOG_STORAGE_KEY, "null");
-    const localErrorLog = parseErrorLog(rawErrorLog);
-    if (localErrorLog && rawErrorLog !== JSON.stringify(localErrorLog)) {
-      writeStoredValue(ERROR_LOG_STORAGE_KEY, JSON.stringify(localErrorLog));
-    }
-    setLocalErrorEntries(Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : []);
-    refreshSaveSlots();
-  }
-
-  function legacyRefreshSaveSlots() {
-    const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
-    setSaveSlots(Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : []);
-  }
-
-  function legacyDismissRecoveryNotice() {
-    setLastRecoveredError(null);
-    persist({ lastError: null });
-  }
-
-  function legacyCloseRecoveryCenter() {
-    setShowErrorLog(false);
-    setShowRecoveryCenter(false);
-    removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-  }
-
-  function legacyClearLocalErrorLog() {
-    const cleared = removeStoredValue(ERROR_LOG_STORAGE_KEY);
-    if (!cleared) {
-      recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
-      setSaveStatus("Error log clear failed: browser storage is unavailable.");
-      refreshLocalErrorLog();
-      return;
-    }
-    setLocalErrorEntries([]);
-    setLastRecoveredError(null);
-    persist({ lastError: null });
-  }
-
-  function legacyDeleteSaveSlot(slotId) {
-    const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
-    const deleteSaved = writeStoredValue(
-      SAVE_SLOT_STORAGE_KEY,
-      JSON.stringify({
-        recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION,
-        slots: nextSlots,
-      }),
-    );
-    if (!deleteSaved) {
-      recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
-      setSaveStatus("Delete failed: browser storage is unavailable.");
-      return;
-    }
-    setSaveSlots(nextSlots);
-  }
-
-  function legacyRestoreSaveSlot(slot) {
-    const restored = restoreRecoverySnapshot(slot?.snapshot);
-    const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
-    if (!repaired || !isSavedStateShapeValid(repaired)) return;
-    const nextState = normalizeSavedGameplayState({
-      ...repaired,
-      paused: true,
-      started: false,
-      savedAt: new Date().toISOString(),
-    });
-    const savedRestore = writeStoredValue(STORAGE_KEY, JSON.stringify(nextState));
-    if (!savedRestore) {
-      recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
-      setSaveStatus("Restore failed: browser storage is unavailable.");
-      return;
-    }
-    window.location.reload();
-  }
-
-  // Persistence is owned by the extracted lifecycle hook. Keep the old
-  // implementations above available for rollback during this migration.
+  // Persistence, save slots and error-log state are owned by useAppPersistence.
   const startGame = persistenceStartGame;
   function startNewGamePlus() {
     if (!newGamePlusUnlocked) return;
@@ -1691,10 +1361,7 @@ export function AppContent({ onSuppressSaves }) {
     setHypothesisDecisions({});
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
-    setEndingStep(0);
-    setEndingTwistIndex(0);
-    setEndingStep(0);
-    setEndingTwistIndex(0);
+    resetEndingSequence();
     setEcho(openingEcho);
     setFreeText("");
     setNodeEnteredAt(Date.now());
@@ -1848,7 +1515,7 @@ export function AppContent({ onSuppressSaves }) {
     };
   }
 
-  const { queueTelemetry, commitPendingTelemetryQueue, retryPendingTelemetry, scheduleTelemetryRetry } = createTelemetryQueue({
+  const { queueTelemetry, retryPendingTelemetry, scheduleTelemetryRetry } = createTelemetryQueue({
     pendingTelemetryRef,
     setPendingTelemetry,
     setTelemetryStatus,
@@ -1906,7 +1573,6 @@ export function AppContent({ onSuppressSaves }) {
       tacticalRead,
       flowSurge,
       finalEffect: effect,
-      finalResources: nextResources,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
     const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
@@ -2478,23 +2144,24 @@ export function AppContent({ onSuppressSaves }) {
   }
 
   function exportPlaytestLog({ includeDiagnostics = false } = {}) {
-    const localErrorLog = parseErrorLog(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"));
-    const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
-    const payload = {
-      saveSchemaVersion: SAVE_SCHEMA_VERSION,
-      exportedAt: new Date().toISOString(),
-      exportMode: includeDiagnostics ? "diagnostic" : "summary",
-      currentCase,
-      openingLegacy,
-      completedCases,
-      caseResults,
-      resources,
-      triggers,
-      cognition,
-      summary: result,
-      fingerprint: decisionFingerprint,
-      ledger: decisionLedger,
-      counterfactuals: counterfactualReport,
+    const payload = buildPlaytestExport({
+      includeDiagnostics,
+      run: {
+        currentCase,
+        openingLegacy,
+        completedCases,
+        caseResults,
+        resources,
+        triggers,
+        cognition,
+        summary: result,
+        fingerprint: decisionFingerprint,
+        ledger: decisionLedger,
+        counterfactuals: counterfactualReport,
+        telemetryEnabled,
+        dataConsent,
+        sessionCode,
+      },
       gameplay: {
         rank: resultRank,
         momentumScore,
@@ -2513,65 +2180,35 @@ export function AppContent({ onSuppressSaves }) {
         activeBonus,
         protocolUsed,
       },
-      telemetryEnabled,
-      dataConsent,
-      sessionCode,
-    };
-    if (includeDiagnostics) {
-      payload.playerName = playerName;
-      payload.playtestFeedback = playtestFeedback;
-      payload.log = log;
-      payload.sessionId = sessionId;
-      payload.pendingTelemetry = pendingTelemetry;
-      payload.errorLog = Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [];
-      payload.saveSlots = Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [];
-      payload.trace = getTraceEvents();
-    }
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = includeDiagnostics ? `trigger-diagnostic-${Date.now()}.json` : `trigger-summary-${Date.now()}.json`;
-    anchor.type = "application/json";
-    anchor.style.display = "none";
-    document.body.appendChild(anchor);
-    anchor.click();
-    window.setTimeout(() => {
-      anchor.remove();
-      URL.revokeObjectURL(url);
-    }, 1000);
+      diagnostics: {
+        playerName,
+        playtestFeedback,
+        log,
+        sessionId,
+        pendingTelemetry,
+      },
+    });
+    const prefix = includeDiagnostics ? "trigger-diagnostic" : "trigger-summary";
+    downloadJson(payload, `${prefix}-${Date.now()}.json`);
   }
 
-  async function copySessionCode() {
-    if (await copyText(sessionCode)) {
-      setCopyStatus("복사됨");
-    } else {
-      setCopyStatus("복사 실패");
-    }
-    window.setTimeout(() => setCopyStatus(""), 1600);
-  }
+  const { leaderboard, leaderboardStatus, leaderboardError } = useLeaderboard({
+    showRanking,
+    isOnline,
+    localLeaderboardRows,
+    localSeasonLeaderboardRow,
+  });
 
-  async function copyDiagnosticTrace() {
-    const copied = await copyText(JSON.stringify(getTraceEvents(), null, 2));
-    setCopyStatus(copied ? "Trace copied" : "Copy failed");
-    window.setTimeout(() => setCopyStatus(""), 1600);
-  }
-
-  async function copyReplayLink() {
-    const seed = {
+  const { copySessionCode, copyDiagnosticTrace, copyReplayLink } = createClipboardActions({
+    flashCopyStatus,
+    sessionCode,
+    buildReplaySeed: () => ({
       currentCase: fallbackCaseId,
       nodeId: resolvedNodeId,
       resources,
       log: routeTimeline.map((entry) => ({ nodeId: entry.nodeId, choiceId: entry.choiceId })),
-    };
-    const encoded = encodeReplaySeed(seed);
-    const replayUrl = encoded
-      ? `${window.location.origin}${window.location.pathname}?${REPLAY_QUERY_KEY}=${encoded}`
-      : "";
-    const copied = replayUrl ? await copyText(replayUrl) : false;
-    setCopyStatus(copied ? "Replay link copied" : "Copy failed");
-    window.setTimeout(() => setCopyStatus(""), 1600);
-  }
+    }),
+  });
 
   const result = useMemo(() => {
     return createCaseSummary(triggers, cognition, log, {
@@ -2630,91 +2267,6 @@ export function AppContent({ onSuppressSaves }) {
     text: "마지막 폴더의 문장이 완전히 닫히지 않았습니다. 다음 플레이에서는 다른 결말의 조건을 시험해 보십시오.",
   };
 
-  function updateCurrentFeedback(patch) {
-    const normalizedPatch =
-      typeof patch.comment === "string"
-        ? { ...patch, comment: limitText(patch.comment, FEEDBACK_COMMENT_MAX_LENGTH) }
-        : patch;
-    const nextFeedback = {
-      ...playtestFeedback,
-      [currentCase]: {
-        ...currentFeedback,
-        ...normalizedPatch,
-      },
-    };
-    setPlaytestFeedback(nextFeedback);
-    setFeedbackStatus("");
-    persist({ playtestFeedback: nextFeedback });
-  }
-
-  async function submitCurrentFeedback() {
-    if (isSubmittingFeedback) return;
-    if (activeFeedbackPrivacySignals.length > 0) {
-      setFeedbackStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 저장해 주세요.");
-      return;
-    }
-
-    setIsSubmittingFeedback(true);
-    const savedAt = new Date().toISOString();
-    const feedback = {
-      ...currentFeedback,
-      comment: limitText(currentFeedback.comment, FEEDBACK_COMMENT_MAX_LENGTH),
-      savedAt,
-    };
-    const nextFeedback = {
-      ...playtestFeedback,
-      [currentCase]: feedback,
-    };
-    setPlaytestFeedback(nextFeedback);
-    persist({ playtestFeedback: nextFeedback });
-
-    if (!telemetryEnabled || !dataConsent) {
-      setFeedbackStatus(
-        telemetryEnabled
-          ? "로컬에 저장했습니다. 데이터 제공 동의가 없어 원격 저장은 건너뛰었습니다."
-          : "로컬에 저장했습니다. 원격 저장 미설정 상태라 원격 저장은 건너뛰었습니다.",
-      );
-      setIsSubmittingFeedback(false);
-      return;
-    }
-
-    const feedbackTelemetryPayload = {
-        session_id: sessionId,
-        session_code: sessionCode,
-        case_id: currentCase,
-        case_title: activeCaseMeta?.title ?? currentCase,
-        submitted_at: savedAt,
-        clarity_score: Number(feedback.clarity) || null,
-        difficulty_score: Number(feedback.difficulty) || null,
-        comment: feedback.comment.trim() || null,
-      };
-
-    try {
-      await saveFeedbackTelemetry(feedbackTelemetryPayload);
-      setFeedbackStatus("피드백을 저장했습니다.");
-    } catch (error) {
-      console.warn(error);
-      queueTelemetry({
-        id: `feedback-${currentCase}-${Date.now()}`,
-        type: "feedback",
-        label: `${activeCaseMeta?.label ?? currentCase} 피드백`,
-        payload: feedbackTelemetryPayload,
-      });
-      setFeedbackStatus("로컬에는 저장했습니다. 원격 저장 실패분은 대기열에 보관했습니다.");
-    } finally {
-      setIsSubmittingFeedback(false);
-    }
-  }
-
-  function anonymizeFeedbackComment() {
-    updateCurrentFeedback({
-      comment: limitText(
-        anonymizeSensitiveText(currentFeedback.comment),
-        FEEDBACK_COMMENT_MAX_LENGTH,
-      ),
-    });
-  }
-
   const routeLength = getCaseRouteLength(fallbackCaseId);
   const routeIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
   const debugTrace = getTraceEvents();
@@ -2742,6 +2294,23 @@ export function AppContent({ onSuppressSaves }) {
   const streakRemaining = Math.max(0, streakGoal - currentChallengeStreak);
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
+
+  const { updateCurrentFeedback, anonymizeFeedbackComment, submitCurrentFeedback } = createFeedbackActions({
+    currentCase,
+    currentFeedback,
+    playtestFeedback,
+    setPlaytestFeedback,
+    persist,
+    activeFeedbackPrivacySignals,
+    isSubmittingFeedback,
+    setIsSubmittingFeedback,
+    setFeedbackStatus,
+    dataConsent,
+    sessionId,
+    sessionCode,
+    activeCaseMeta,
+    queueTelemetry,
+  });
   const screenReaderStatus = isResult
     ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
     : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
@@ -2919,27 +2488,12 @@ export function AppContent({ onSuppressSaves }) {
     );
   }
   const introView = createIntroView(
-    { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue },
+    { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue },
     { startNewGamePlus, newGamePlusUnlocked, tutorialSteps, playStyleUnlocks, seasonGoals, pastRunMemory },
   );
   if (!started) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
-  function advanceEndingStep() {
-    if (endingStep === 0 && endingTwistIndex < 2) {
-      setEndingTwistIndex((index) => index + 1);
-      return;
-    }
-    setEndingStep((step) => Math.min(3, step + 1));
-  }
-
-  function saveNextParticipantMessage() {
-    const message = limitText(nextParticipantMessage.trim(), 180);
-    setNextParticipantMessage(message);
-    writeStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, message);
-    setEndingStep(3);
-  }
-
   const resultView = createResultView(
     { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
     { chapterUiModel, endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard },
@@ -2949,7 +2503,7 @@ export function AppContent({ onSuppressSaves }) {
   }
 
   const playView = createPlayView(
-    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, pressureLensForecast, tradeoffLensForecast, previewChoice, describeForecast, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
+    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextSignals, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
     { clueHypotheses, chapterUiModel, relationshipQuest, relationshipGraph, autonomousSignal, timelineStamp, evidenceMetadata, hypothesisConflict, investigationTargets, investigateTarget, selectedInvestigationOutcome, evidenceContamination, hypothesisLockState, characterState, rivalResponse, evidenceRepairPuzzle, repairEvidence, rivalIntervention, counterRival, chapterTransitionBridge, operatorReveal, achievementProgress, resourceChain, midBoss, dynamicMusicLayers, characterMemory: getCharacterMemory(node?.speaker, log), evidenceCombinations, hypothesisActions, resolveHypothesisAction, delayedConsequences, playStyleUnlocks, interlude, balanceSignals, relationshipScene, pastRunMemory },
   );
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;

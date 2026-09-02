@@ -60,7 +60,7 @@ const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", "51
   stdio: "ignore",
 });
 
-let exitCode = 1;
+let exitCode;
 try {
   await waitForServer(baseUrl);
   exitCode = await new Promise((resolve) => {

@@ -33,6 +33,7 @@ npm run dev -- --port 5173
 - 기본 선택 화면에서도 예상 자원 변화가 즉시 보이는 결과 요약
 - 탭 전환 중 멈춘 결정 시간을 응답 기록과 보너스 계산에서 보정
 - 브라우저 자동 저장, 완료 기록 JSON 내보내기, 로컬 랭킹
+- 장면·엔딩·초상화 이미지는 WebP로 제공하며, 키 비주얼만 `<picture>`/`image-set`의 PNG 대체본을 함께 둡니다
 - 결과 화면에서 현재 사건만 즉시 재도전
 - 분석관 이름과 자유입력 길이 제한
 - 선택적 원격 저장과 원격 랭킹
@@ -43,6 +44,7 @@ npm run dev -- --port 5173
 ## 검증
 
 ```bash
+npm run lint
 npm test
 npm run build
 ```
@@ -51,8 +53,10 @@ npm run build
 
 Render 배포는 `render.yaml`을 사용합니다.
 
-- Build: `npm ci && npm test && npm run build`
+- Build: `npm ci && npm run verify:static && npm run build`
 - Publish: `dist`
+
+`verify:static`은 브라우저가 필요 없는 검증만 모은 티어라 Playwright 브라우저가 없는 배포 환경에서도 실행됩니다.
 
 Remote ranking setup:
 
@@ -98,7 +102,10 @@ create table if not exists app_error_logs (
 - 결과 화면의 기본 공유 요약은 원격 전송 대기열, 원문 선택 로그, 피드백 원문, 세션 ID, 에러 로그, 복구 슬롯을 제외하고, 디버그 진단 로그에만 원문 `log`, `pendingTelemetry`, `errorLog`, `saveSlots`를 포함합니다.
 - 원격 전송 대기열은 온라인 복귀 후 지수 백오프로 자동 재시도합니다.
 - 디버그 에러 로그 패널에서 `playtest_sessions`, `playtest_feedback`, `app_error_logs` 테이블 읽기 점검을 확인할 수 있습니다.
-- 전체 검증은 `npm run verify`로 실행합니다. 빠른 티어 `npm run verify:quick`(단위/스모크, 인코딩, 텍스트, CSS, 그래프, 빌드, 런타임)과 무거운 티어 `npm run verify:e2e`로 나뉘며, GitHub Actions는 PR에서 quick만 실행하고 E2E는 push 또는 `e2e` 라벨에서 실행합니다.
+- 전체 검증은 `npm run verify`로 실행합니다. 브라우저가 필요 없는 `npm run verify:static`(lint, CSS 포맷, 단위/스모크, 인코딩, 텍스트, CSS 토큰, 그래프), 여기에 빌드와 런타임 스모크를 더한 `npm run verify:quick`, 무거운 티어 `npm run verify:e2e`로 나뉘며, GitHub Actions는 PR에서 quick만 실행하고 E2E는 push 또는 `e2e` 라벨에서 실행합니다.
+- 정적 분석은 ESLint(`npm run lint`)가 담당합니다. `no-unused-vars`와 `no-undef`는 오류로 막고, `react-hooks/exhaustive-deps`와 `react-hooks/set-state-in-effect`는 경고로 두어 CI를 막지 않습니다. 후자는 `AppContent`가 아직 명령형으로 다루는 효과들에 대한 남은 과제입니다.
+- Prettier는 `src/styles`만 관리합니다(`npm run format`). `app.css`가 다시 압축된 형태로 커밋되는 것을 막기 위한 장치이고, JS/JSX 포맷은 diff 가독성을 위해 강제하지 않습니다.
 - 전체 경로 검증은 `npm run test:e2e:full`로 실행하며, 독립적인 시즌 시나리오는 4개 워커로 병렬 실행합니다. GitHub Actions의 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 이를 수행합니다.
 - 운영 배포 전 `npx supabase db push`로 `supabase/migrations/`를 적용해 RLS, 공개 랭킹 뷰, telemetry 검증 트리거를 반영합니다. 기존에 SQL Editor로 수동 적용한 프로젝트는 첫 연결 시 `npx supabase migration repair --status applied 20260902055713`로 baseline을 적용됨으로 표시합니다.
 - 마이그레이션 이력은 원격의 `supabase_migrations.schema_migrations`에 기록되며, 이 테이블은 `supabase link` 시점에 생성됩니다. 연결 전에는 대시보드 Migrations 탭이나 CLI 조회가 `42P01 relation "supabase_migrations.schema_migrations" does not exist`를 남기는데, 이는 앱 동작과 무관한 로그입니다.
+- 결과 화면의 기본 내보내기는 `src/state/playtestExport.js`가 조립하며, 요약본에서 `playerName`, `log`, `sessionId`, `errorLog`, `saveSlots`, `trace`가 빠지는지 단위 테스트로 고정합니다.

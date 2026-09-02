@@ -87,7 +87,6 @@ export function useAppPersistence({
   triggerLabels,
   cognitionLabels,
   makeEmptyScores,
-  normalizeSavedText,
   persistSuppressed,
   onSuppressSaves,
   formatSaveTime,

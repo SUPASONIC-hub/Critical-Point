@@ -355,7 +355,7 @@ export function createRecoverySnapshot(snapshot) {
 export function restoreRecoverySnapshot(snapshot) {
   const recoverySnapshot = createRecoverySnapshot(snapshot);
   if (!recoverySnapshot) return null;
-  const { recoverySlotSchemaVersion, ...saveSnapshot } = recoverySnapshot;
+  const { recoverySlotSchemaVersion: _version, ...saveSnapshot } = recoverySnapshot;
   return {
     ...saveSnapshot,
     saveSchemaVersion: SAVE_SCHEMA_VERSION,

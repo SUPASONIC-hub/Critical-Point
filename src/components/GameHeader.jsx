@@ -1,4 +1,3 @@
-import React from "react";
 import { FileText, RefreshCcw, Save } from "lucide-react";
 
 export function GameHeader({

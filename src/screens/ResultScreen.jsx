@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 
@@ -99,7 +98,14 @@ export function ResultScreen({ view }) {
         </p>
         {currentCase === "final" && (
             <section className={`ending-sequence ending-step-${endingStep} ending-palette-${view.endingAtmosphere?.palette ?? "archive"} ${view.endingVisualClass ?? ""}`} aria-label="최종 엔딩 시퀀스">
-            <img className="ending-visual" src={view.endingSceneProfile?.image ?? "/ending-final-archive.png"} alt="" aria-hidden="true" />
+            <img
+              className="ending-visual"
+              src={view.endingSceneProfile?.image ?? "/ending-final-archive.webp"}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+            />
             <div className="ending-visual-scrim" aria-hidden="true" />
             <h1 className="sr-only">Season complete</h1>
             <div className="ending-sequence-header">

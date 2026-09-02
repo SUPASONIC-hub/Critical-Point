@@ -1,9 +1,9 @@
-import React from "react";
+import { Fragment } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 
 export function IntroScreen({ view }) {
-  const { AdaptiveMusic, musicModeKey, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
+  const { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, GAME_TITLE, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary } = view;
   const Music = AdaptiveMusic;
   const onShowRanking = view.setShowRanking;
   const gameTitle = GAME_TITLE;
@@ -43,7 +43,7 @@ export function IntroScreen({ view }) {
           )}
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
           <div className="creator-badge">
-            <img src="/profile.jpg" alt="" />
+            <img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
             <span>Created by SUPASONIC</span>
           </div>
           <figure className="intro-visual">
@@ -370,7 +370,7 @@ export function IntroScreen({ view }) {
               </div>
               <div className="season-journey" aria-label="사건 간 결말 연결">
                 {seasonJourney.map((caseItem, index) => (
-                  <React.Fragment key={caseItem.id}>
+                  <Fragment key={caseItem.id}>
                     {index > 0 && <ChevronRight className="season-journey-arrow" size={18} aria-hidden="true" />}
                     <article className="season-journey-card">
                       <div className="season-journey-card-head">
@@ -387,7 +387,7 @@ export function IntroScreen({ view }) {
                         </small>
                       )}
                     </article>
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
             </section>

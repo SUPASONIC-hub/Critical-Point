@@ -12,7 +12,7 @@ import {
 test.use({ actionTimeout: ACTION_TIMEOUT_MS });
 test.describe.configure({ mode: "parallel" });
 
-test.beforeEach(async ({}, testInfo) => {
+test.beforeEach(async (_fixtures, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "full coverage runs only once");
 });
 
@@ -46,7 +46,9 @@ test("all scene-choice pairs advance without runtime errors @full", async ({ pag
   await page.addInitScript(() => {
     try {
       localStorage.clear();
-    } catch {}
+    } catch {
+      // Storage can be blocked before the app boots.
+    }
   });
   collectRuntimeErrors(page, errors);
 

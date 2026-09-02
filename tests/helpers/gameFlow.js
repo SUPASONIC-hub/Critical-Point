@@ -9,7 +9,7 @@ export async function clickElement(locator, label) {
     await locator.click({ timeout: ACTION_TIMEOUT_MS });
   } catch (error) {
     const message = String(error).split("\n")[0];
-    throw new Error(`${label} click failed: ${message}`);
+    throw new Error(`${label} click failed: ${message}`, { cause: error });
   }
 }
 
