@@ -162,7 +162,9 @@ the eighth is a refactor with its own shape, described at the end.
 the nine endings has become unreachable, which is the shape of bug that hid two
 of them.
 
-**Still open: M-1, splitting the intro out of AppContent.** The entry chunk is
+**Still open: M-1, splitting the intro out of AppContent.** Written up as two
+runnable tasks in `docs/task-m1-intro-split.md`, in the prompt format
+`작업지시서.md` section 6 defines. The entry chunk is
 453KB of source, of which AppContent is 98KB, gameData 62KB and gameDialogue
 22KB. Nothing can be deferred while AppContent renders the intro, because its
 import graph is what pulls the scene graph into the first load. The change is to
