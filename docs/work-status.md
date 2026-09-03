@@ -162,8 +162,12 @@ the eighth is a refactor with its own shape, described at the end.
 the nine endings has become unreachable, which is the shape of bug that hid two
 of them.
 
-**Still open: M-1, splitting the intro out of AppContent.** Written up as two
-runnable tasks in `docs/task-m1-intro-split.md`, in the prompt format
+**Applied: M-1, splitting the intro out of AppContent.** Implemented in
+`src/AppContent.jsx`, `src/GameRuntime.jsx`, and `src/state/errorRecovery.js`.
+The production entry chunk is now about 31KB gzip, and sourcemap checks confirm
+that `gameData.js`, `gameDialogue.js`, and `gameLogic.js` are no longer in the
+entry chunk. The original task write-up remains below as historical context in
+`docs/task-m1-intro-split.md`, in the prompt format
 `작업지시서.md` section 6 defines. The entry chunk is
 453KB of source, of which AppContent is 98KB, gameData 62KB and gameDialogue
 22KB. Nothing can be deferred while AppContent renders the intro, because its
@@ -175,7 +179,7 @@ not justify doing it carelessly at the end of a long pass.
 
 ## Maintenance Priorities
 
-1. Keep `AppContent.jsx` focused on orchestration and move screen contracts into `src/viewModels`.
+1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.
 2. Keep browser-storage ownership in focused hooks such as `useAppPersistence` and `useLocalRanking`.
 3. Route guarded button behavior through `GuardedButton` instead of repeating `aria-disabled`, `tabIndex`, and click guards.
 4. Put reusable Playwright flow behavior in `tests/helpers/gameFlow.js`.
