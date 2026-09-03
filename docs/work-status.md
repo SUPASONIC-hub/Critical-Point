@@ -162,24 +162,39 @@ the eighth is a refactor with its own shape, described at the end.
 the nine endings has become unreachable, which is the shape of bug that hid two
 of them.
 
-**Applied: M-1, splitting the intro out of AppContent.** Implemented in
-`src/AppContent.jsx`, `src/GameRuntime.jsx`, and `src/state/errorRecovery.js`.
-The production entry chunk is now about 31KB gzip, and sourcemap checks confirm
-that `gameData.js`, `gameDialogue.js`, and `gameLogic.js` are no longer in the
-entry chunk. The original task write-up remains below as historical context in
-`docs/task-m1-intro-split.md`, in the prompt format
-`작업지시서.md` section 6 defines. The entry chunk is
-453KB of source, of which AppContent is 98KB, gameData 62KB and gameDialogue
-22KB. Nothing can be deferred while AppContent renders the intro, because its
-import graph is what pulls the scene graph into the first load. The change is to
-move the play and result derivations into a runtime component that mounts after
-the intro, leaving a shell that owns pre-start state. That is a session of its
-own, not a step inside another one, and the 30KB gzipped it would recover does
-not justify doing it carelessly at the end of a long pass.
+**Applied: M-1, splitting the intro out of AppContent.** `AppContent.jsx` is now a
+376-line pre-start shell; `GameRuntime.jsx` (2,402 lines) owns the play and result
+derivations and mounts lazily once a run starts, is resumed, or a debug/replay
+entry asks for it. `src/state/errorRecovery.js` carries the silent-failure
+reporting both files need.
+
+    entry chunk    124KB gzip (at f360e19) -> 31.6KB gzip, 83KB raw
+    entry sources  47 files -> 19; gameData, gameDialogue and gameLogic are gone
+    AppContent     2,387 lines -> 376, plus GameRuntime at 2,402 (+391 total)
+
+The line total grew because the shell assembles its own intro view bag, which the
+runtime also assembles for the intro it still renders after a run pauses back to
+the menu. That duplication is the price paid for the 90KB, and it is the first
+thing to clean up next.
+
+What the shell cannot compute without the graph, it does not render: the season
+journey, the past-run memory and the debug console are absent from the shell
+intro rather than faked, which is the rule the task was written around. One field
+had broken that rule -- the storage banner was a four-line stub in the shell that
+ignored consent and offline state, so three of its four states printed the wrong
+sentence on a deployed build. `createTelemetrySummary` moved from
+`viewModels/reportViewModels.js` to `viewModels/appViewModels.js` and both callers
+share it again; the intro baselines are back to their pre-split height of 6,632px.
+
+Verified: `verify:static` (11 checks), `npm run build`, `test:runtime`,
+`npm run test:e2e` (110 passed) and `npm run test:visual` (5 passed).
 
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.
+   The shell must not fabricate a field the runtime derives. Anything the intro cannot compute without
+   the scene graph is left unrendered; anything it can compute comes from the same helper the runtime
+   calls, not from a copy of it.
 2. Keep browser-storage ownership in focused hooks such as `useAppPersistence` and `useLocalRanking`.
 3. Route guarded button behavior through `GuardedButton` instead of repeating `aria-disabled`, `tabIndex`, and click guards.
 4. Put reusable Playwright flow behavior in `tests/helpers/gameFlow.js`.
@@ -191,8 +206,8 @@ not justify doing it carelessly at the end of a long pass.
 10. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
 11. Keep the balance guardrails honest. `scripts/check-balance.mjs` asserts that
     every choice costs something, that every resource moves both ways, and that
-    each of the three columns ends strictly best on at least one axis in every
-    case. Tune effects against it rather than around it.
+    no choice inside a scene and no column inside a case is Pareto-dominated by
+    a sibling. Tune effects against it rather than around it.
 12. Keep per-second state out of the root. The decision countdown is an external
     store (`src/state/decisionClock.js`) precisely because root state rebuilt the
     whole play view once a second.
