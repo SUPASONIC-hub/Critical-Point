@@ -17,7 +17,7 @@ import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, sea
 import { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
-import { createIntroView } from "./viewModels/appViewModels.js";
+import { createIntroView, createTelemetrySummary } from "./viewModels/appViewModels.js";
 import { createSeasonCases } from "./viewModels/seasonViewModels.js";
 import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
@@ -313,11 +313,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
       setTelemetryStatus: () => {},
       telemetryEnabled,
       isOnline,
-      telemetrySummary: {
-        tone: telemetryEnabled ? "ready" : "local",
-        title: telemetryEnabled ? "원격 저장 준비됨" : "로컬 저장",
-        text: telemetryEnabled ? "데이터 제공 동의 시 케이스 완료 로그가 저장됩니다." : "원격 저장이 설정되지 않았습니다.",
-      },
+      telemetrySummary: createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled }),
       sessionCode,
       debugToolsEnabled: false,
       showErrorLog: false,

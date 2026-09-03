@@ -143,9 +143,9 @@ import {
   sceneVisuals,
   triggerLabSignals,
 } from "./appCopy.js";
-import { createIntroView, createPlayView, createResultView } from "./viewModels/appViewModels.js";
+import { createIntroView, createPlayView, createResultView, createTelemetrySummary } from "./viewModels/appViewModels.js";
 import { createActiveBonus, createAuthorityState, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
-import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createTelemetrySummary } from "./viewModels/reportViewModels.js";
+import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import { createLocalLeaderboardRows, createSeasonCases } from "./viewModels/seasonViewModels.js";
 import {
   getChapterUiModel,
