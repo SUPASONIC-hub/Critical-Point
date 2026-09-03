@@ -1,6 +1,8 @@
 node_modules/
 dist/
+dist-map/
 test-results/
+playwright-report/
 debug.log
 .env
 .DS_Store
