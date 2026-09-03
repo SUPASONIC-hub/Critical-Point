@@ -79,6 +79,21 @@ the e2e helpers, and `AppContent` renders the intro, so nothing can be deferred
 until the graph becomes async and every one of those readers is rewritten around
 it. That is a larger and riskier change than the 30KB justifies today.
 
+## Open: second audit (2026-09-03)
+
+`docs/design-audit-2026-09-03-followup.md` re-measured the app after the first
+pass landed. It confirms the two fixes that mattered -- six idle seconds on the
+play screen now produce 30 DOM mutations, all of them the clock -- and finds nine
+things the first pass either created or uncovered. Nothing in it is applied yet.
+The three worth knowing about before touching those areas:
+
+- The commit button opens 1,639px down a 844px phone screen and takes 700ms of
+  smooth scrolling to arrive. The commit itself is 44ms.
+- 25 choice ids are reused across scenes, so 89 of the 304 spoken lines belong to
+  a different decision than the one being made.
+- `cognitionScore` is 100 for every strategy measured, so 20% of the burst score
+  cannot separate two runs.
+
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` focused on orchestration and move screen contracts into `src/viewModels`.
