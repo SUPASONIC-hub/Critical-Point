@@ -1,9 +1,14 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   appendStoredErrorLog,
+  createRunId,
+  debugToolsEnabled,
   ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
-  PLAYER_NAME_MAX_LENGTH,
+  formatSaveTime,
+  NEW_GAME_PLUS_KEY,
+  NEW_GAME_PLUS_MEMORY_KEY,
+  OPERATOR_ORIGIN_KEY,
   appendSaveSlot,
   FREE_TEXT_MAX_LENGTH,
   getInvalidSavedStateKeys,
@@ -90,6 +95,7 @@ import {
 } from "./telemetry.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { easyCognitionLabels, easyRiskLabels, simplifyPlayerText } from "./playerLanguage.js";
+import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import {
   appendTraceEvent,
@@ -143,10 +149,11 @@ import {
   sceneVisuals,
   triggerLabSignals,
 } from "./appCopy.js";
-import { createIntroView, createPlayView, createResultView, createTelemetrySummary } from "./viewModels/appViewModels.js";
+import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
+import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
 import { createActiveBonus, createAuthorityState, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "./viewModels/reportViewModels.js";
-import { createLocalLeaderboardRows, createSeasonCases } from "./viewModels/seasonViewModels.js";
+import { createLocalLeaderboardRows } from "./viewModels/seasonViewModels.js";
 import {
   getChapterUiModel,
   getBalanceSignals,
@@ -159,7 +166,6 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
   getChoiceOutcomeFeedback,
-  getOriginPrologue,
   getRelationshipGraph,
   getEvidenceCombinations,
   getHypothesisActions,
@@ -191,20 +197,12 @@ import {
   getRelationshipQuest,
   getRankingComparison,
   getSeasonGoals,
-  getTutorialSteps,
 } from "./advancedSystems.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
 const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(({ ResultScreen }) => ({ default: ResultScreen })));
 const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScreen }) => ({ default: PlayScreen })));
-
-const GAME_TITLE = "CRITICAL POINT";
-const GAME_TITLE_READING = "임계점";
-const GAME_SUBTITLE = "판단이 깊어지는 순간";
-function createRunId() {
-  return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
 
 const speakerPortraits = {
   "한서윤": "/portrait-han-seoyun.webp",
@@ -254,13 +252,7 @@ function getSeasonStrain(caseResults = {}, pending = null) {
 const DECISION_WINDOW_SECONDS = 45;
 const OVERTIME_CHARGE_SECONDS = 15;
 
-const debugToolsEnabled =
-  import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
-  (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
-const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
-const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
-const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 let saveSuppressed = false;
 const replaySeed = getReplaySeedFromLocation();
 
@@ -481,7 +473,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     resetEndingSequence,
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
-  const seasonCases = createSeasonCases({ seasonCasesBase, completedCases, currentCase });
   const speakerProfile = createSpeakerProfile({ node });
   const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.webp";
   const latestBeat = log.at(-1)?.sceneBeat ?? "";
@@ -609,7 +600,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const pastRunMemory = getPastRunMemory(newGamePlusMemory);
   const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
   const playStyleUnlocks = getPlayStyleUnlocks(playStyle, newGamePlusUnlocked);
-  const tutorialSteps = getTutorialSteps();
   const seasonGoals = getSeasonGoals();
   const interlude = getInterlude(currentCase, log.at(-1)?.choice);
   const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
@@ -619,7 +609,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const relationshipGraph = getRelationshipGraph(relationshipScores);
   const evidenceCombinations = getEvidenceCombinations(discoveredClues);
   const hypothesisActions = getHypothesisActions(clueHypotheses, authorityState);
-  const originPrologue = getOriginPrologue(operatorOrigin);
   const evidenceMetadata = getEvidenceMetadata(discoveredClues);
   const hypothesisConflict = getHypothesisConflict(clueHypotheses);
   const investigationTargets = getInvestigationTargets(fallbackCaseId, authorityState);
@@ -780,7 +769,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     currentCase &&
     nodeId &&
     (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
-  const telemetrySummary = createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled });
   const localLeaderboardRows = useMemo(
     () => createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
@@ -1448,31 +1436,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     });
   }
 
-  function normalizeCaseSummary(summary) {
-    return {
-      schemaVersion: summary?.schemaVersion ?? 1,
-      primary: summary?.primary ?? ["responsibility", 0],
-      secondary: summary?.secondary ?? ["protection", 0],
-      thinking: summary?.thinking ?? ["persistence", 0],
-      freeCount: summary?.freeCount ?? 0,
-      averageResponseTime: summary?.averageResponseTime ?? 0,
-      challengeClearCount: summary?.challengeClearCount ?? 0,
-      reducedRiskCount: summary?.reducedRiskCount ?? 0,
-      rhythmScore: summary?.rhythmScore ?? 0,
-      cognitionScore: summary?.cognitionScore ?? 0,
-      pressureAdaptScore: summary?.pressureAdaptScore ?? 0,
-      reflectionScore: summary?.reflectionScore ?? 0,
-      consistencyScore: summary?.consistencyScore ?? 0,
-      exploitPenalty: summary?.exploitPenalty ?? 0,
-      burstScore: summary?.burstScore ?? summary?.momentumScore ?? 0,
-      momentumScore: summary?.momentumScore ?? 0,
-      momentumTier: summary?.momentumTier ?? "BUILDING",
-      rank: summary?.rank ?? "C",
-      outcomeChoiceId: summary?.outcomeChoiceId ?? null,
-      outcomeNodeId: summary?.outcomeNodeId ?? null,
-      runId: typeof summary?.runId === "string" ? summary.runId : "",
-    };
-  }
 
   function getFreeTextBranchTarget(caseId, fromNodeId) {
     const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
@@ -2222,9 +2185,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const progress = isResult
     ? 100
     : Math.round(((Math.max(0, routeIndex) + 1) / Math.max(1, routeLength)) * 100);
-  const completedCaseResultList = seasonCasesBase
-    .filter((caseItem) => caseResults[caseItem.id])
-    .map((caseItem) => ({ ...caseItem, result: normalizeCaseSummary(caseResults[caseItem.id]) }));
+  const completedCaseResultList = createCompletedCaseResultList(caseResults);
   const seasonJourney = completedCaseResultList.map((caseItem) => ({
     ...caseItem,
     outcome: getCaseOutcome({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
@@ -2339,27 +2300,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     return <ErrorLogPanel view={errorLogPanelView} />;
   }
 
-  function getCaseStatusText(status) {
-    if (status === "PLAYING") return "진행 중";
-    if (status === "OPEN") return "시작 가능";
-    if (status === "COMPLETE") return "완료됨";
-    return "이전 케이스 필요";
-  }
-
-  function formatSaveTime(value) {
-    if (!value) return "";
-    try {
-      return new Intl.DateTimeFormat("ko-KR", {
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date(value));
-    } catch {
-      return "";
-    }
-  }
-
   if (showRanking && !started) {
     return (
       <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
@@ -2378,10 +2318,25 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       </Suspense>
     );
   }
-  const introView = createIntroView(
-    { AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus, setShowRanking, GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE, playStyleOptions, playStyle, setPlayStyle, persist, seasonCasesBase, caseObjectives, triggerLabSignals, hasResumableSave, node, formatSaveTime, lastSavedAt, log, progress, playerName, PLAYER_NAME_MAX_LENGTH, setPlayerName, limitText, startGame, dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline, telemetrySummary, sessionCode, debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef, caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, playGuideItems, completedCaseResultList, seasonJourney, resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText, resumeSavedGame, activePlayStyle, setPendingTelemetry, setSaveStatus, nodeOrders, normalizeCaseSummary, operatorOrigin, setOperatorOrigin, operatorProfile, operatorProfiles: getOperatorProfiles(), originPrologue },
-    { startNewGamePlus, newGamePlusUnlocked, tutorialSteps, playStyleUnlocks, seasonGoals, pastRunMemory },
-  );
+  const introView = createIntroViewModel({
+    AdaptiveMusic,
+    playerName, setPlayerName, playStyle, setPlayStyle, dataConsent, setDataConsent,
+    operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
+    hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase,
+    newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
+    startGame, startCase, startNewGamePlus, resumeSavedGame, persist, setShowRanking,
+    setSaveStatus, setPendingTelemetry, setTelemetryStatus, pendingTelemetryRef,
+    renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel,
+    // The graph is loaded by the time the runtime shows the intro, so it fills
+    // in everything the pre-start shell has to leave out.
+    runtime: {
+      node, progress, seasonJourney, nodes, nodeOrders,
+      showErrorLog, setShowErrorLog, unlockAllCasesForTest,
+      debugCaseSelectRef, debugCaseId, debugCaseIdRef, debugNodeOptions,
+      debugNodeId, debugNodeIdRef, debugNodeSelectRef,
+      setDebugCaseId, setDebugNodeId, startDebugNode,
+    },
+  });
   if (!started) {
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }

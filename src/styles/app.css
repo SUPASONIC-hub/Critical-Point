@@ -9,10 +9,12 @@
      base-intro-ranking  shared shell, the intro screen, the ranking screen
      play                the play screen
      result              the result screen
+     responsive          the media blocks, which span every screen
      recovery            the recovery and error surfaces
      extensions          late overrides that must outrank everything above */
 @import "./app/base-intro-ranking.css";
 @import "./app/play.css";
 @import "./app/result.css";
+@import "./app/responsive.css";
 @import "./app/recovery.css";
 @import "./app/extensions.css";

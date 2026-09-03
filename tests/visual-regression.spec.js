@@ -15,7 +15,10 @@ async function stabilizeVisualPage(page) {
       .music-controls,
       .music-toggle,
       .status-bar-timer,
-      .timer-card {
+      .timer-card,
+      /* Regenerated per browser context, so it is eight glyphs of noise in
+         every baseline that prints it. */
+      [data-testid="session-code"] {
         visibility: hidden !important;
       }
     `,

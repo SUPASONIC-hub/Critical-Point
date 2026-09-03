@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { readStoredValue, writeStoredValue } from "../appConfig.js";
+import { NEXT_PARTICIPANT_MESSAGE_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 import { limitText } from "../gameLogic.js";
 
-const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
 const QUIET_HOLD_MS = 8000;
 const NEXT_PARTICIPANT_MESSAGE_MAX_LENGTH = 180;
 const TWIST_COUNT = 2;

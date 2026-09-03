@@ -91,9 +91,16 @@ export function IntroScreen({ view }) {
               <div className="resume-panel">
                 <div>
                   <span>저장된 진행</span>
-                  <strong>{activeCaseMeta?.label ?? "현재 사건"} · {node.title}</strong>
+                  {/* The scene title and the route position are read from the
+                      graph, which the pre-start shell has not loaded. It prints
+                      the case and the save time instead of guessing them. */}
+                  <strong>
+                    {activeCaseMeta?.label ?? "현재 사건"}
+                    {node?.title ? ` · ${node.title}` : ""}
+                  </strong>
                   <small>
-                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록 · 진행률 {progress}%
+                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
+                    {progress === null ? "" : ` · 진행률 ${progress}%`}
                   </small>
                 </div>
                 <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
@@ -394,7 +401,9 @@ export function IntroScreen({ view }) {
                 <strong>{telemetrySummary.title}</strong>
               </div>
               <p>{telemetrySummary.text}</p>
-              <small>세션 코드 {sessionCode}</small>
+              <small>
+                세션 코드 <span data-testid="session-code">{sessionCode}</span>
+              </small>
             </div>
             <div className="privacy-note">
               <b>데이터 안내</b>

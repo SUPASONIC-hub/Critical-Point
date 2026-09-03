@@ -39,3 +39,34 @@ export function createLocalLeaderboardRows({
     })),
   ];
 }
+
+/**
+ * A stored case summary read back in full. Saves written by older builds are
+ * missing fields the report and the intro both print, so every reader goes
+ * through this rather than reaching into the stored object.
+ */
+export function normalizeCaseSummary(summary) {
+  return {
+    schemaVersion: summary?.schemaVersion ?? 1,
+    primary: summary?.primary ?? ["responsibility", 0],
+    secondary: summary?.secondary ?? ["protection", 0],
+    thinking: summary?.thinking ?? ["persistence", 0],
+    freeCount: summary?.freeCount ?? 0,
+    averageResponseTime: summary?.averageResponseTime ?? 0,
+    challengeClearCount: summary?.challengeClearCount ?? 0,
+    reducedRiskCount: summary?.reducedRiskCount ?? 0,
+    rhythmScore: summary?.rhythmScore ?? 0,
+    cognitionScore: summary?.cognitionScore ?? 0,
+    pressureAdaptScore: summary?.pressureAdaptScore ?? 0,
+    reflectionScore: summary?.reflectionScore ?? 0,
+    consistencyScore: summary?.consistencyScore ?? 0,
+    exploitPenalty: summary?.exploitPenalty ?? 0,
+    burstScore: summary?.burstScore ?? summary?.momentumScore ?? 0,
+    momentumScore: summary?.momentumScore ?? 0,
+    momentumTier: summary?.momentumTier ?? "BUILDING",
+    rank: summary?.rank ?? "C",
+    outcomeChoiceId: summary?.outcomeChoiceId ?? null,
+    outcomeNodeId: summary?.outcomeNodeId ?? null,
+    runId: typeof summary?.runId === "string" ? summary.runId : "",
+  };
+}

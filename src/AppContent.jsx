@@ -1,10 +1,16 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 
 import {
-  PLAYER_NAME_MAX_LENGTH,
+  NEW_GAME_PLUS_KEY,
+  NEW_GAME_PLUS_MEMORY_KEY,
+  NEXT_PARTICIPANT_MESSAGE_KEY,
+  OPERATOR_ORIGIN_KEY,
   RECOVERY_CENTER_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
+  createRunId,
+  debugToolsEnabled,
+  makeEmptyScores,
   normalizePlayerName,
   getInvalidSavedStateKeys,
   isSavedStateShapeValid,
@@ -13,38 +19,22 @@ import {
   removeStoredValue,
   writeStoredValue,
 } from "./appConfig.js";
-import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, seasonCasesBase } from "./gameCases.js";
+import { CASE_RESULT_NODES, CASE_START_NODES } from "./gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
-import { createIntroView, createTelemetrySummary } from "./viewModels/appViewModels.js";
-import { createSeasonCases } from "./viewModels/seasonViewModels.js";
+import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
-import {
-  getOperatorProfile,
-  getOperatorProfiles,
-  getOriginPrologue,
-  getPastRunMemory,
-  getPlayStyleUnlocks,
-  getSeasonGoals,
-  getTutorialSteps,
-} from "./advancedSystems.js";
-import { playGuideItems, playStyleOptions, resourceMeta, triggerLabSignals } from "./appCopy.js";
-import { getSessionCode, getSessionId, telemetryEnabled } from "./telemetry.js";
-import { simplifyPlayerText } from "./playerLanguage.js";
+import { getOperatorProfiles } from "./advancedSystems.js";
+import { GAME_TITLE } from "./appCopy.js";
+import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 
 const GameRuntime = lazy(() => import("./GameRuntime.jsx").then(({ GameRuntime }) => ({ default: GameRuntime })));
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
-
-const GAME_TITLE = "CRITICAL POINT";
-const GAME_TITLE_READING = "임계점";
-const GAME_SUBTITLE = "판단이 깊어지는 순간";
-const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
-const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 
 let saveSuppressed = false;
 
@@ -54,32 +44,6 @@ export function suppressSaves() {
 
 export function resumeSaves() {
   saveSuppressed = false;
-}
-
-function createRunId() {
-  return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function makeEmptyScores(labels) {
-  return Object.fromEntries(Object.keys(labels).map((key) => [key, 0]));
-}
-
-function limitText(value, maxLength) {
-  return typeof value === "string" ? value.slice(0, maxLength) : "";
-}
-
-function formatSaveTime(value) {
-  if (!value) return "";
-  try {
-    return new Intl.DateTimeFormat("ko-KR", {
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return "";
-  }
 }
 
 function readCurrentSave() {
@@ -131,6 +95,14 @@ function readShellSave() {
   return saved;
 }
 
+function readNewGamePlusMemory() {
+  try {
+    return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {};
+  } catch {
+    return {};
+  }
+}
+
 function createStartSave({ playerName, playStyle, dataConsent }) {
   const now = Date.now();
   return {
@@ -164,10 +136,6 @@ function createStartSave({ playerName, playStyle, dataConsent }) {
     savedAt: new Date(now).toISOString(),
   };
 }
-
-const debugToolsEnabled =
-  import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
-  (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 
 export function AppContent({ onSuppressSaves = suppressSaves }) {
   const replaySeed = useMemo(() => getReplaySeedFromLocation(), []);
@@ -271,98 +239,37 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     writeStoredValue(OPERATOR_ORIGIN_KEY, nextOrigin);
   }
 
-  const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === (saved?.currentCase ?? "case01"));
-  const activePlayStyle = playStyleOptions.find((style) => style.id === playStyle) ?? playStyleOptions[0];
-  const operatorProfile = getOperatorProfile(operatorOrigin);
-  const introView = createIntroView(
-    {
-      AdaptiveMusic,
-      musicModeKey: "intro",
-      triggerLabels,
-      renderRecoveryNotice: () => null,
-      renderErrorLogPanel: () => null,
-      renderSaveStatus: () => (saveStatus ? <p className="save-status">{saveStatus}</p> : null),
-      setShowRanking,
-      GAME_TITLE,
-      GAME_TITLE_READING,
-      simplifyPlayerText,
-      activeCaseMeta,
-      nextParticipantMessage: "",
-      GAME_SUBTITLE,
-      playStyleOptions,
-      playStyle,
-      setPlayStyle,
-      persist,
-      seasonCasesBase,
-      caseObjectives,
-      triggerLabSignals,
-      hasResumableSave: Boolean(saved?.currentCase && saved?.nodeId),
-      node: { title: saved?.nodeId ?? "start" },
-      formatSaveTime,
-      lastSavedAt: saved?.savedAt ?? "",
-      log: Array.isArray(saved?.log) ? saved.log : [],
-      progress: 0,
-      playerName,
-      PLAYER_NAME_MAX_LENGTH,
-      setPlayerName,
-      limitText,
-      startGame,
-      dataConsent,
-      setDataConsent,
-      pendingTelemetryRef,
-      setTelemetryStatus: () => {},
-      telemetryEnabled,
-      isOnline,
-      telemetrySummary: createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled }),
-      sessionCode,
-      debugToolsEnabled: false,
-      showErrorLog: false,
-      setShowErrorLog: () => {},
-      unlockAllCasesForTest: () => setRuntimeActive(true),
-      debugCaseSelectRef: null,
-      debugCaseId: "case01",
-      debugCaseIdRef: null,
-      debugNodeOptions: [],
-      debugNodeId: "start",
-      debugNodeIdRef: null,
-      debugNodeSelectRef: null,
-      caseSequence: CASE_SEQUENCE,
-      nodes: {},
-      setDebugCaseId: () => {},
-      setDebugNodeId: () => {},
-      startDebugNode: () => setRuntimeActive(true),
-      playGuideItems,
-      completedCaseResultList: [],
-      seasonJourney: [],
-      resourceMeta,
-      seasonCases: createSeasonCases({ seasonCasesBase, completedCases: [], currentCase: "case01" }),
-      caseResults: saved?.caseResults ?? {},
-      completedCases: saved?.completedCases ?? [],
-      currentCase: saved?.currentCase ?? "case01",
-      startCase: startGame,
-      getCaseStatusText: (status) =>
-        status === "PLAYING" ? "진행 중" : status === "OPEN" ? "시작 가능" : status === "COMPLETE" ? "완료됨" : "이전 케이스 필요",
-      resumeSavedGame,
-      activePlayStyle,
-      setPendingTelemetry: () => {},
-      setSaveStatus,
-      nodeOrders: {},
-      normalizeCaseSummary: (summary) => summary,
-      operatorOrigin,
-      setOperatorOrigin,
-      operatorProfile,
-      operatorProfiles: getOperatorProfiles(),
-      originPrologue: getOriginPrologue(operatorOrigin),
-    },
-    {
-      startNewGamePlus: startGame,
-      newGamePlusUnlocked: readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true",
-      tutorialSteps: getTutorialSteps(),
-      playStyleUnlocks: getPlayStyleUnlocks(playStyle, false),
-      seasonGoals: getSeasonGoals(),
-      pastRunMemory: getPastRunMemory({}),
-    },
-  );
+  const introView = createIntroViewModel({
+    AdaptiveMusic,
+    playerName,
+    setPlayerName,
+    playStyle,
+    setPlayStyle,
+    dataConsent,
+    setDataConsent,
+    operatorOrigin,
+    setOperatorOrigin,
+    sessionCode,
+    isOnline,
+    hasResumableSave: Boolean(saved?.currentCase && saved?.nodeId),
+    lastSavedAt: saved?.savedAt ?? "",
+    log: Array.isArray(saved?.log) ? saved.log : [],
+    caseResults: saved?.caseResults ?? {},
+    completedCases: saved?.completedCases ?? [],
+    currentCase: saved?.currentCase ?? "case01",
+    newGamePlusUnlocked: readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true",
+    newGamePlusMemory: readNewGamePlusMemory(),
+    nextParticipantMessage: readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""),
+    startGame,
+    startCase: startGame,
+    startNewGamePlus: startGame,
+    resumeSavedGame,
+    persist,
+    setShowRanking,
+    setSaveStatus,
+    pendingTelemetryRef,
+    renderSaveStatus: () => (saveStatus ? <p className="save-status">{saveStatus}</p> : null),
+  });
 
   return (
     <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>

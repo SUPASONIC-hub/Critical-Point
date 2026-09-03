@@ -3,6 +3,22 @@ export const ERROR_LOG_STORAGE_KEY = "trigger-prototype-error-log-v1";
 export const ERROR_LOG_MAX_ITEMS = 20;
 export const SAVE_SLOT_STORAGE_KEY = "trigger-prototype-save-slots-v1";
 export const RECOVERY_CENTER_STORAGE_KEY = "trigger-prototype-recovery-center-v1";
+export const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
+export const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
+export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
+export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
+
+/**
+ * Debug tooling is on in a build that asks for it, and in a dev server visited
+ * with ?debug=1. The shell reads it to decide whether the runtime mounts at once;
+ * the runtime reads it to draw the console. One definition so the two agree.
+ */
+export const debugToolsEnabled =
+  (import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
+  Boolean(
+    (import.meta.env ?? {}).DEV &&
+      new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1",
+  );
 export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 2;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
@@ -421,5 +437,37 @@ export async function copyText(value) {
     return copied;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Small shared helpers. They live beside the storage keys because both the
+ * pre-start shell and the runtime need them and the shell cannot import
+ * gameLogic.js without pulling the scene graph into the first load.
+ */
+export function limitText(text = "", maxLength = 0) {
+  if (!Number.isFinite(maxLength) || maxLength <= 0) return "";
+  return String(text).slice(0, maxLength);
+}
+
+export function makeEmptyScores(labels) {
+  return Object.fromEntries(Object.keys(labels).map((key) => [key, 0]));
+}
+
+export function createRunId() {
+  return globalThis.crypto?.randomUUID?.() ?? `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export function formatSaveTime(value) {
+  if (!value) return "";
+  try {
+    return new Intl.DateTimeFormat("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return "";
   }
 }

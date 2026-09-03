@@ -10,6 +10,12 @@
  * than one file, or twice in one file under the same media context, has to be
  * one of the known leftovers. Both budgets are ratchets -- lower them as the
  * leftovers are cleaned up, never raise them.
+ *
+ * The budgets read 8 and 51 until 2026-09-03, when the parser below stopped
+ * losing its place at a comment written in front of an at-rule. It had been
+ * swallowing everything after such a comment as a single rule, which hid two
+ * selectors with two homes and two repeats. Nothing in the stylesheets changed;
+ * the count did.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -24,11 +30,11 @@ const budgets = {
   // Selectors that still live in two files. Every one of these is a shared
   // prelude whose other selectors belong elsewhere, so splitting it would copy
   // declarations rather than remove them.
-  selectorsWithTwoHomes: 8,
+  selectorsWithTwoHomes: 9,
   // A selector overridden later in the same file is ordinary CSS and readable in
   // one pass -- unlike the same override hiding in another file -- so this budget
   // is deliberately looser. It should still only go down.
-  repeatedInOneFile: 51,
+  repeatedInOneFile: 53,
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */
@@ -42,6 +48,11 @@ function readRules() {
     while (index < css.length) {
       if (css[index] === "/" && css[index + 1] === "*") {
         index = css.indexOf("*/", index) + 2;
+        // The prelude restarts after a comment. Without this a comment sitting
+        // in front of an at-rule made the prelude read as "/* ... */ @media",
+        // which does not start with "@", so the whole block was consumed as one
+        // rule and every rule after it in that file looked top-level.
+        preludeStart = index;
         continue;
       }
       if (css[index] === "{") {

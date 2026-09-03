@@ -1681,3 +1681,9 @@ body {
       );
   }
 }
+
+/* The intro column centres itself; it sat in result.css until the file split. */
+.intro h1,
+.intro > p {
+  margin-inline: auto;
+}

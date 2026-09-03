@@ -10,7 +10,7 @@
  */
 import { readFileSync } from "node:fs";
 import { parse } from "espree";
-import { viewGroups } from "../src/viewModels/appViewModels.js";
+import { INTRO_FIELDS_WITHOUT_RUNTIME, viewGroups } from "../src/viewModels/appViewModels.js";
 
 const VIEW_FACTORIES = {
   createIntroView: "intro",
@@ -45,11 +45,27 @@ function propertyName(property) {
   return property.key.type === "Identifier" ? property.key.name : property.key.value;
 }
 
-const VIEW_PROVIDER_FILES = ["src/AppContent.jsx", "src/GameRuntime.jsx"];
+const VIEW_PROVIDER_FILES = [
+  "src/AppContent.jsx",
+  "src/GameRuntime.jsx",
+  "src/viewModels/introViewModel.js",
+];
+/**
+ * A screen's bag is assembled in one place. The intro used to be assembled twice
+ * -- once by the pre-start shell and once by the runtime -- and the two copies
+ * drifted into printing different sentences, so this is a rule now rather than a
+ * convention.
+ */
+const ASSEMBLED_IN = {
+  intro: "src/viewModels/introViewModel.js",
+  play: "src/GameRuntime.jsx",
+  result: "src/GameRuntime.jsx",
+};
 
-/** Field names the app shell and runtime pass into each create*View call. */
-function readProvidedFields() {
+/** Field names passed into each create*View call, and the file that passes them. */
+function readProvidedFields(problems) {
   const provided = {};
+  const assembledBy = {};
   for (const file of VIEW_PROVIDER_FILES) {
     walk(parseFile(file), (node) => {
       if (node.type !== "CallExpression") return;
@@ -66,16 +82,21 @@ function readProvidedFields() {
           fields.push(propertyName(property));
         }
       }
-      if (provided[screen]) {
-        const current = [...provided[screen]].sort().join("\n");
-        const next = [...fields].sort().join("\n");
-        if (current !== next) {
-          throw new Error(`${screen} view is built with different fields in multiple files.`);
-        }
+      if (assembledBy[screen] && assembledBy[screen] !== file) {
+        problems.push(
+          `${screen}: assembled in both ${assembledBy[screen]} and ${file}. One file builds a screen's bag; ` +
+            "give the second caller the arguments it needs instead of a second copy of the bag.",
+        );
         return;
       }
+      assembledBy[screen] = file;
       provided[screen] = fields;
     });
+  }
+  for (const [screen, file] of Object.entries(ASSEMBLED_IN)) {
+    if (assembledBy[screen] && assembledBy[screen] !== file) {
+      problems.push(`${screen}: expected ${file} to assemble this view, found ${assembledBy[screen]}.`);
+    }
   }
   return provided;
 }
@@ -130,15 +151,26 @@ function readScreenReads(file, groupNames) {
   return { flat, grouped };
 }
 
-const provided = readProvidedFields();
 const problems = [];
+const provided = readProvidedFields(problems);
+
+// The fields the pre-start shell cannot supply carry one agreed empty value, kept
+// in the contract module rather than at either call site. Every name listed there
+// has to be a field of the intro, so an emptied field cannot quietly leave the
+// schema and stop being checked.
+const introSchemaFields = Object.values(viewGroups.intro).flat();
+for (const field of Object.keys(INTRO_FIELDS_WITHOUT_RUNTIME)) {
+  if (!introSchemaFields.includes(field)) {
+    problems.push(`intro: INTRO_FIELDS_WITHOUT_RUNTIME names ${field}, which the intro view does not have.`);
+  }
+}
 
 for (const [screen, groups] of Object.entries(viewGroups)) {
   const groupNames = Object.keys(groups);
   const schemaFields = Object.values(groups).flat();
   const providedFields = provided[screen];
   if (!providedFields) {
-    problems.push(`${screen}: AppContent never builds this view.`);
+    problems.push(`${screen}: nothing builds this view. ${ASSEMBLED_IN[screen] ?? "A provider file"} should.`);
     continue;
   }
   const providedSet = new Set(providedFields);

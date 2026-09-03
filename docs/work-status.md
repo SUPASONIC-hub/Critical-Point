@@ -189,6 +189,55 @@ share it again; the intro baselines are back to their pre-split height of 6,632p
 Verified: `verify:static` (11 checks), `npm run build`, `test:runtime`,
 `npm run test:e2e` (110 passed) and `npm run test:visual` (5 passed).
 
+## Follow-ups from the M-1 review (2026-09-03)
+
+Five findings came out of reviewing the intro split. All five are applied; one of
+them is applied as a measurement and a "no", which is set out below.
+
+- **One intro, assembled once (M-2).** `AppContent.jsx` and `GameRuntime.jsx` each
+  built the intro's 82-field bag, and 23 of the shell's fields were placeholders.
+  `src/viewModels/introViewModel.js` builds it now: constants imported once,
+  shared values derived once, and `INTRO_FIELDS_WITHOUT_RUNTIME` (in
+  `appViewModels.js`) naming the 18 fields the shell cannot supply along with the
+  empty value it shows instead. The storage keys, `formatSaveTime`, `limitText`,
+  `makeEmptyScores`, `createRunId`, `debugToolsEnabled`, the game title constants,
+  `normalizeCaseSummary` and `getCaseStatusText` were all declared twice and now
+  have one home. AppContent is 278 lines and GameRuntime is 2,356, down from 376
+  and 2,402. The intro also stopped guessing: the shell reads the New Game+ memory
+  and the previous participant's message from storage instead of showing nothing,
+  lists the completed cases it can build from the save, and the resume card prints
+  the case and the save time rather than a raw node id and "진행률 0%".
+- **The contract check knows there is one assembler (V-1).** `check-view-contracts`
+  fails if a screen's bag is built in two files, if it is built somewhere other
+  than the file that owns it, or if `INTRO_FIELDS_WITHOUT_RUNTIME` names a field
+  the intro does not have. Verified by making it fail on purpose.
+- **The e2e runner checks that the server is its own (T-1).** `--strictPort` makes
+  vite exit when the port is taken, and `waitForServer` then attached to whatever
+  else was answering -- a leftover `vite preview` on 5197 made three visual tests
+  time out for 60s each with no explanation. The runner now fails in four seconds
+  with the reason, having asked the server for `/@vite/client`.
+- **The session code is out of the baselines (T-2).** It is regenerated per browser
+  context, so two intro baselines and the result baseline carried eight glyphs of
+  noise that only passed because of the pixel budget. It is hidden by
+  `stabilizeVisualPage` through `data-testid="session-code"`.
+- **Per-screen CSS: measured, not shipped (P-3).** With the intro on its own chunk,
+  the question was whether the play and result stylesheets could leave the first
+  load. Measured against the running app: the intro reads 3 selectors from
+  `play.css` and 22 from `result.css`, the play screen reads 65 from `result.css`,
+  and `extensions.css` splits cleanly (32 shell selectors, 60 play selectors, no
+  overlap). The blocker is not the count but the shape: the media blocks group
+  selectors across screens on purpose -- one rule sets the padding of
+  `.brand-row`, `.topbar`, `.game-header`, `.start-input-row` and `.top-actions`
+  together -- so splitting per screen copies declarations rather than moving them.
+  Those blocks moved out of the bottom of `result.css` into
+  `src/styles/app/responsive.css`, in the same cascade position, and the intro
+  rule that had been living at the end of `result.css` moved to
+  `base-intro-ranking.css`. Computed styles across six screen states are
+  byte-identical before and after. `check-css-structure` lost its place at a
+  comment written in front of an at-rule and had been swallowing the rest of the
+  file; with that fixed the true counts are 9 selectors with two homes and 53
+  repeats, not 8 and 51.
+
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.

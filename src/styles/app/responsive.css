@@ -1,0 +1,391 @@
+/* Responsive rules, for every screen.
+
+   These media blocks used to sit at the bottom of result.css, where they were
+   easy to read as the result screen's own. They are not: measured against the
+   running app, 22 of their selectors style the intro and the ranking screen, and
+   the grouped preludes below deliberately span screens -- one rule sets the
+   padding of .brand-row, .topbar, .game-header, .start-input-row and
+   .top-actions together.
+
+   That is also why the app cannot yet ship one stylesheet per screen: splitting
+   this file per screen means splitting those preludes and copying declarations.
+   The rules keep their old position in the cascade -- imported straight after
+   result.css, before recovery.css -- so moving them changed nothing that
+   computes. */
+
+@media (max-width: 1024px) {
+  .shell {
+    padding: 16px;
+  }
+  .game-shell {
+    grid-template-columns: 1fr;
+    width: min(820px, 100%);
+  }
+  .status-board {
+    position: static;
+    order: 2;
+  }
+  .game-board {
+    order: 1;
+  }
+  .result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rank-panel {
+    grid-template-columns: 130px minmax(0, 1fr);
+  }
+  .score-breakdown {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .achievement-panel > div:last-child {
+    grid-template-columns: 1fr;
+  }
+  .case-roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .play-style-grid,
+  .season-summary-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ranking-row {
+    grid-template-columns: 46px minmax(0, 1fr) 68px 92px;
+  }
+  .ranking-detail {
+    grid-column: 2 / -1;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .guide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .next-case-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .roadmap-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .session-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .mission-strip,
+  .legacy-panel {
+    grid-template-columns: 1fr;
+  }
+  .legacy-effect {
+    justify-content: flex-start;
+  }
+  .pressure-cascade {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .pressure-cascade > small {
+    grid-column: 1 / -1;
+  }
+  .suspense-console {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .suspense-meter {
+    grid-column: 1 / -1;
+  }
+  .game-hud,
+  .quest-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lab-trace {
+    grid-template-columns: 1fr;
+  }
+  .clue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .scene-challenge {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .scene-challenge p {
+    max-width: none;
+  }
+  .narrative-spine-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .scene {
+    grid-template-columns: 1fr;
+  }
+  .scene-visual {
+    grid-row: auto;
+    min-height: 220px;
+  }
+  .scene-story {
+    grid-column: auto;
+  }
+  .scene-visual img {
+    min-height: 220px;
+  }
+  .prompt-chips,
+  .fingerprint-grid {
+    grid-template-columns: 1fr;
+  }
+  .counterfactual-list article {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .counterfactual-scene {
+    grid-column: 1 / -1;
+  }
+  .reframe-signals ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .observer-postmortem-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .music-controls {
+    top: 10px;
+    right: 10px;
+  }
+  .music-toggle,
+  .music-volume-toggle {
+    min-height: 36px;
+    padding: 0 9px;
+  }
+  .music-volume-toggle {
+    min-width: 0;
+  }
+  .music-toggle span {
+    max-width: 46px;
+  }
+  .result-page .topbar,
+  .ranking-page .topbar {
+    padding-right: 0;
+  }
+  .suspense-console {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .suspense-console-mark {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 0;
+    border-right: 0;
+  }
+  .commit-console-actions {
+    flex-direction: column-reverse;
+  }
+  .commit-console-actions button {
+    width: 100%;
+  }
+  .decision-dock {
+    align-items: stretch;
+    flex-direction: column;
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  .decision-dock-actions {
+    width: 100%;
+  }
+  .decision-dock-actions button {
+    flex: 1 1 0;
+  }
+  .intro h1,
+  .result-hero h1 {
+    font-size: 42px;
+  }
+  .brand-row,
+  .topbar,
+  .game-header,
+  .start-input-row,
+  .top-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .top-actions,
+  .top-actions .ghost,
+  .start-input-row button,
+  .next-case-panel button,
+  .session-panel button,
+  .protocol-panel button,
+  .feedback-actions button {
+    width: 100%;
+  }
+  .top-actions {
+    justify-content: stretch;
+  }
+  .memo-panel ul,
+  .observer-postmortem-grid,
+  .result-grid,
+  .case-roadmap,
+  .feedback-controls,
+  .guide-grid,
+  .game-hud,
+  .quest-panel,
+  .season-summary-list,
+  .play-style-grid {
+    grid-template-columns: 1fr;
+  }
+  .ranking-status-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .ranking-status-bar button {
+    width: 100%;
+    justify-content: center;
+  }
+  .ranking-table-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .clue-grid {
+    grid-template-columns: 1fr;
+  }
+  .ranking-row {
+    grid-template-columns: 38px minmax(0, 1fr) 56px;
+    gap: 8px;
+  }
+  .ranking-stat.score-stat {
+    grid-column: 2 / 3;
+    grid-row: 2;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ranking-detail {
+    grid-column: 2 / -1;
+    grid-row: 3;
+  }
+  .play-help summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .rank-panel,
+  .score-breakdown,
+  .outcome-panel {
+    grid-template-columns: 1fr;
+  }
+  .outcome-panel-mark {
+    padding-right: 0;
+    padding-bottom: 12px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(24, 32, 31, 0.2);
+  }
+  .live-ledger,
+  .fingerprint-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .live-ledger-stats {
+    justify-content: stretch;
+  }
+  .live-ledger-stats span {
+    flex: 1 1 120px;
+  }
+  .fingerprint-heading > strong {
+    align-self: flex-start;
+  }
+  .counterfactual-list article {
+    grid-template-columns: 1fr;
+  }
+  .counterfactual-scene {
+    grid-column: auto;
+  }
+  .rank-mark {
+    min-height: 118px;
+  }
+  .rank-mark strong {
+    font-size: 64px;
+  }
+  .turn-brief > div {
+    grid-template-columns: 1fr;
+  }
+  .score-breakdown {
+    grid-column: auto;
+  }
+  .game-board,
+  .status-board {
+    padding: 16px;
+  }
+  .decision-reveal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+  .decision-reveal {
+    padding: 21px;
+  }
+  .cinematic-status > span:last-child {
+    display: none;
+  }
+  .decision-reveal-choice {
+    font-size: 17px;
+  }
+  .decision-reveal-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .decision-reveal-footer button {
+    justify-content: center;
+  }
+  .protocol-panel,
+  .echo-probe {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .intro-visual figcaption {
+    position: static;
+    align-items: flex-start;
+    flex-direction: column;
+    border-radius: 0;
+  }
+  .intro-visual img {
+    aspect-ratio: 16 / 9;
+  }
+  .scene-visual,
+  .scene-visual img {
+    min-height: 180px;
+  }
+  .narrative-spine-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .narrative-spine-grid {
+    grid-template-columns: 1fr;
+  }
+  .wide-report {
+    grid-column: auto;
+  }
+  .panel-title-row {
+    display: grid;
+  }
+  .reframe-signals ul {
+    grid-template-columns: 1fr;
+  }
+  .delta-table article {
+    grid-template-columns: 1fr;
+  }
+  .delta-table article p {
+    grid-column: auto;
+  }
+}
+@media (max-width: 480px) {
+  .decision-rail {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .decision-rail i {
+    width: 1px;
+    height: 8px;
+    margin-left: 11px;
+    flex: 0 0 auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

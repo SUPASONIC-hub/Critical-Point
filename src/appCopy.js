@@ -13,6 +13,10 @@ import { easyResourceLabels } from "./playerLanguage.js";
  * Data only — no state, no behaviour — so screens can import it directly.
  */
 
+export const GAME_TITLE = "CRITICAL POINT";
+export const GAME_TITLE_READING = "임계점";
+export const GAME_SUBTITLE = "판단이 깊어지는 순간";
+
 export const resourceMeta = {
   time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },
   capital: { label: easyResourceLabels.capital, suffix: "", icon: BriefcaseBusiness },

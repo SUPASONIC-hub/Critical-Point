@@ -573,7 +573,7 @@ export function ResultScreen({ view }) {
           <section className="session-panel">
             <div>
               <span>PLAYTEST SESSION</span>
-              <strong>{sessionCode}</strong>
+              <strong data-testid="session-code">{sessionCode}</strong>
               <p>테스터 인터뷰, JSON 로그, 원격 저장 기록을 맞출 때 쓰는 짧은 세션 코드입니다.</p>
               <small
                 className={`remote-status ${telemetryStatus.tone}`}

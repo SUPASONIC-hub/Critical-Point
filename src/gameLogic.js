@@ -1,4 +1,5 @@
 import { CASE_SEQUENCE, characterProfiles, choiceSubtexts, choiceVoiceLines, echoReplies } from "./gameData.js";
+import { limitText, makeEmptyScores } from "./appConfig.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -1092,10 +1093,6 @@ export function anonymizeSensitiveText(text = "") {
     .replace(new RegExp(organizationPatternSource, "gi"), "익명 조직");
 }
 
-export function limitText(text = "", maxLength = 0) {
-  if (!Number.isFinite(maxLength) || maxLength <= 0) return "";
-  return String(text).slice(0, maxLength);
-}
 
 export function getEcho(choiceId, freeText) {
   if (freeText) {
@@ -1307,6 +1304,5 @@ export function getFreeTextSignals(value) {
   ];
 }
 
-export function makeEmptyScores(labels) {
-  return Object.fromEntries(Object.keys(labels).map((key) => [key, 0]));
-}
+// Both live in appConfig.js so the pre-start shell can use them without the graph.
+export { limitText, makeEmptyScores };

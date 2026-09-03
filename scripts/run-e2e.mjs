@@ -23,13 +23,43 @@ function spawnCommand(command, args, options = {}) {
   });
 }
 
-async function waitForServer(url, timeoutMs = 30_000) {
+/**
+ * A dev server answers /@vite/client with a JavaScript module. Anything else
+ * listening on the port -- a `vite preview` left running, another checkout's dev
+ * server -- answers the SPA fallback instead, and the suite would then test a
+ * build that has no debug tools in it. `--strictPort` makes our own vite exit
+ * rather than move, so the only way to tell the two apart is to ask.
+ */
+async function servesViteDevClient(url) {
+  try {
+    const response = await fetch(`${url}/@vite/client`);
+    if (!response.ok) return false;
+    return (response.headers.get("content-type") ?? "").includes("javascript");
+  } catch {
+    return false;
+  }
+}
+
+async function waitForServer(url, isRunning, timeoutMs = 30_000) {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
+    if (!isRunning()) {
+      throw new Error(
+        `The dev server exited before it served ${url}. ` +
+          `Something else is probably holding that port -- \`--strictPort\` makes vite exit instead of moving.`,
+      );
+    }
     try {
       const response = await fetch(url);
-      if (response.ok) return;
-    } catch {
+      if (response.ok) {
+        if (await servesViteDevClient(url)) return;
+        throw new Error(
+          `${url} is being served by something that is not our dev server. ` +
+            `Stop whatever is listening on that port (a leftover \`vite preview\` answers here too) and run this again.`,
+        );
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith(url)) throw error;
       // Vite is still starting.
     }
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -59,10 +89,17 @@ function stopProcess(child) {
 const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", "5197", "--strictPort"], {
   stdio: "ignore",
 });
+let serverRunning = true;
+server.on("exit", () => {
+  serverRunning = false;
+});
+server.on("error", () => {
+  serverRunning = false;
+});
 
 let exitCode;
 try {
-  await waitForServer(baseUrl);
+  await waitForServer(baseUrl, () => serverRunning);
   exitCode = await new Promise((resolve) => {
     if (runRuntimeSmoke) {
       const smoke = spawnCommand("node", ["scripts/runtime-smoke.mjs"], {

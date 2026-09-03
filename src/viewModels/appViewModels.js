@@ -9,6 +9,33 @@
  * arriving as undefined. scripts/check-view-contracts.mjs enforces the same
  * partition statically, before the app ever runs.
  */
+/**
+ * What the shell cannot supply, and what the intro shows in its place. Every
+ * value here means "do not render this", which is why none of them is a guess:
+ * the scene title, the route progress and the season journey need the graph, and
+ * the debug console needs both the graph and the runtime's own state.
+ */
+export const INTRO_FIELDS_WITHOUT_RUNTIME = Object.freeze({
+  node: null,
+  progress: null,
+  seasonJourney: [],
+  nodes: {},
+  nodeOrders: {},
+  showErrorLog: false,
+  setShowErrorLog: () => {},
+  unlockAllCasesForTest: () => {},
+  debugCaseSelectRef: null,
+  debugCaseId: "",
+  debugCaseIdRef: null,
+  debugNodeOptions: [],
+  debugNodeId: "",
+  debugNodeIdRef: null,
+  debugNodeSelectRef: null,
+  setDebugCaseId: () => {},
+  setDebugNodeId: () => {},
+  startDebugNode: () => {},
+});
+
 export const viewGroups = {
   intro: {
     common: [
