@@ -28,7 +28,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase,
     completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
     log, triggers, cognition, freeText, echo, nodeEnteredAt, protocolUsed,
-    timerPenaltyApplied, probeUsed, investigatedTargets, hypothesisDecisions,
+    timerPenaltyCount, probeUsed, investigatedTargets, hypothesisDecisions,
     isPausedSave, saveSlots,
   } = state;
   const { pendingTelemetryRef } = refs;
@@ -36,7 +36,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase,
     setCompletedCases, setDiscoveredClues, setCaseResults, setPlaytestFeedback,
     setResources, setLog, setTriggers, setCognition, setProtocolUsed,
-    setTimerPenaltyApplied, setProbeUsed, setInvestigatedTargets,
+    setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
     setHypothesisDecisions, setOpeningLegacy, setDecisionReveal, setPendingChoice,
     setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
@@ -72,7 +72,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
       nodeEnteredAt,
       pendingTelemetry: pendingTelemetryRef.current,
       protocolUsed,
-      timerPenaltyApplied,
+      timerPenaltyCount,
       probeUsed,
       investigatedTargets,
       hypothesisDecisions,
@@ -106,12 +106,12 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase("case01");
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
     setResources(initialResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
-    setProtocolUsed(false); setTimerPenaltyApplied(false); setProbeUsed(false);
+    setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
     setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
     setDecisionReveal(null); setPendingChoice(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setFreeText(""); setNodeId("start"); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyApplied: false, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, paused: false, lastError: null });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, paused: false, lastError: null });
   }
 
   function resumeSavedGame() {

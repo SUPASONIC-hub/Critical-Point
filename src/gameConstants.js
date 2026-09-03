@@ -7,6 +7,12 @@ export const initialResources = {
   fatigue: 10,
 };
 
+/**
+ * The two resources where a rising number is the loss. Colour, arrows and the
+ * balance guardrail all read direction from here rather than from the sign.
+ */
+export const costWhenRising = new Set(["humanCost", "fatigue"]);
+
 export const triggerLabels = {
   protection: "보호",
   injustice: "부당함",

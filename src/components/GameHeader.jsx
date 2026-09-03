@@ -1,4 +1,20 @@
 import { FileText, RefreshCcw, Save } from "lucide-react";
+import { useDecisionSeconds } from "../state/decisionClock.js";
+
+/**
+ * The only place in the header that ticks. It subscribes to the decision clock
+ * itself so a per-second change never re-renders the screen around it.
+ */
+function DecisionWindowLabel() {
+  const seconds = useDecisionSeconds();
+  const remaining = Math.max(0, seconds);
+  const overtime = Math.max(0, -seconds);
+  return (
+    <span className={remaining <= 10 ? "status-bar-timer urgent" : "status-bar-timer"}>
+      {overtime > 0 ? <>초과 <b>{overtime}초</b></> : <>남은 시간 <b>{remaining}초</b></>}
+    </span>
+  );
+}
 
 export function GameHeader({
   node,
@@ -10,7 +26,6 @@ export function GameHeader({
   caseNumber,
   caseTotal,
   progress,
-  decisionSeconds,
 }) {
   return (
     <header className="game-header">
@@ -47,9 +62,7 @@ export function GameHeader({
         >
           <div style={{ width: `${progress}%` }} />
         </div>
-        <span className={decisionSeconds <= 10 ? "status-bar-timer urgent" : "status-bar-timer"}>
-          남은 시간 <b>{decisionSeconds}초</b>
-        </span>
+        <DecisionWindowLabel />
       </div>
     </header>
   );

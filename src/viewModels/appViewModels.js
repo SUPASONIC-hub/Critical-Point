@@ -101,7 +101,7 @@ export const viewGroups = {
     decision: [
       "pendingChoice", "setPendingChoice", "showTacticalDetails", "setShowTacticalDetails",
       "decisionForecasts", "pressureLeader", "previewChoice", "pendingChoiceRead", "pendingChoiceForecast",
-      "commitConsoleRef", "commitConfirmRef", "choose", "decisionSeconds", "decisionFingerprint",
+      "commitConsoleRef", "commitConfirmRef", "choose", "decisionFingerprint",
       "decisionLedger", "isAdvancing", "protocolUsed", "activateCrisisProtocol", "formatRiskDelta",
       "formatForecastRisk",
     ],
@@ -113,7 +113,7 @@ export const viewGroups = {
     freeInput: [
       "freeChoice", "boardChangePrompts", "updateFreeText", "freeText", "FREE_TEXT_MAX_LENGTH",
       "freeTextBlockedByPrivacy", "activePrivacySignals", "anonymizeFreeText", "activeFreeTextSignalCount",
-      "freeTextSignals", "freeTextPreview", "freeTextCombo", "latestFreeTextSuccess",
+      "freeTextPreview", "freeTextCombo", "latestFreeTextSuccess",
     ],
     status: [
       "resources", "applyEffect", "resourceMeta", "resourceChain", "progress", "easyRiskLabels",

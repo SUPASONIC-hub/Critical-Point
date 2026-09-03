@@ -235,6 +235,40 @@ export function addForecastUncertainty(forecast = {}, evidenceCount = 0) {
   };
 }
 
+/**
+ * Which way a decision leaned: toward the people in the scene, or toward the
+ * position you are holding. Ties read as neither.
+ */
+function getDecisionLean(entry = {}) {
+  const effect = entry.effect ?? {};
+  const people = (effect.trust ?? 0) - (effect.humanCost ?? 0);
+  const position = (effect.capital ?? 0) + (effect.time ?? 0);
+  if (people === position) return 0;
+  return people > position ? 1 : -1;
+}
+
+/**
+ * How consistently the run held one of those directions, counting decisions
+ * made under high pressure double. This is the axis that reads the choice
+ * itself rather than how fast or how variably it was made.
+ */
+export function getConsistencyScore(entries = []) {
+  const leaning = entries.filter((entry) => getDecisionLean(entry) !== 0);
+  // Nothing to read (an old save without effect vectors, or a run of pure
+  // ties) is not evidence of inconsistency, so it scores neutral.
+  if (leaning.length === 0) return 50;
+  const weightOf = (entry) => (getRiskPressure(entry.resourcesBefore ?? {}) >= 50 ? 2 : 1);
+  const balance = leaning.reduce((sum, entry) => sum + getDecisionLean(entry) * weightOf(entry), 0);
+  const total = leaning.reduce((sum, entry) => sum + weightOf(entry), 0);
+  if (balance === 0) return 0;
+  const held = leaning.reduce(
+    (sum, entry) => sum + (getDecisionLean(entry) === Math.sign(balance) ? weightOf(entry) : 0),
+    0,
+  );
+  // A run that never commits sits near 50; one that holds its line lands high.
+  return Math.round(clamp(((held / total) * 2 - 1) * 100, 0, 100));
+}
+
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   if (entries.length === 0) {
     return {
@@ -246,6 +280,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
       cognitionScore: 0,
       pressureAdaptScore: 0,
       reflectionScore: 0,
+      consistencyScore: 0,
       exploitPenalty: 0,
       momentumScore: 0,
       burstScore: 0,
@@ -306,16 +341,20 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   });
   const riskSwing = riskDeltas.reduce((sum, value) => sum + Math.min(14, Math.abs(value)), 0);
   const recoveryAfterSpike = riskDeltas.some((value, index) => value > 0 && riskDeltas.slice(index + 1).some((next) => next < 0));
+  // Adaptation is bringing pressure back down, not shaking it. Swing used to
+  // pay three points a unit, which made deliberately spiking risk the fastest
+  // way to score.
   const pressureAdaptScore = Math.round(
     clamp(
-      riskSwing * 3 +
-        reducedRiskCount * 10 +
-        (recoveryAfterSpike ? 18 : 0) -
-        Math.max(0, finalRiskPressure - 62) * 1.2,
+      reducedRiskCount * 14 +
+        (recoveryAfterSpike ? 22 : 0) +
+        Math.min(24, riskSwing) -
+        Math.max(0, finalRiskPressure - 62) * 1.4,
       0,
       100,
     ),
   );
+  const consistencyScore = getConsistencyScore(scoredEntries);
   const freeTextSignalScore = entries.reduce((sum, entry) => {
     if (!entry.freeText) return sum;
     const activeSignals = getFreeTextSignals(entry.freeText).filter((signal) => signal.active).length;
@@ -329,12 +368,15 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.freeText).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
+  // What the score is for: holding a line under pressure. Response rhythm still
+  // counts, but at a weight that no longer makes a stopwatch the best strategy.
   const momentumScore = Math.round(
     clamp(
-      rhythmScore * 0.24 +
-        cognitionScore * 0.24 +
-        pressureAdaptScore * 0.24 +
+      consistencyScore * 0.28 +
+        cognitionScore * 0.2 +
         reflectionScore * 0.2 +
+        pressureAdaptScore * 0.16 +
+        rhythmScore * 0.08 +
         challengeSupportScore * 0.08 -
         exploitPenalty,
       0,
@@ -351,6 +393,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     cognitionScore,
     pressureAdaptScore,
     reflectionScore,
+    consistencyScore,
     exploitPenalty,
     momentumScore,
     burstScore: momentumScore,
@@ -548,48 +591,72 @@ export function getObservationLedger(entries = []) {
   );
 }
 
+const discoveryClues = {
+  case01: {
+    id: "c1-hidden-ledger",
+    title: "숨은 급여표",
+    text: "공식 보고서보다 먼저 움직인 돈의 흔적이 있습니다. 누군가는 이미 다음 사건을 알고 있었습니다.",
+  },
+  case02: {
+    id: "c2-false-timestamp",
+    title: "어긋난 시간",
+    text: "유출 기록의 시간이 서로 맞지 않습니다. 범인보다 기록을 만든 사람이 더 중요할 수 있습니다.",
+  },
+  case03: {
+    id: "c3-second-scoreboard",
+    title: "두 번째 점수판",
+    text: "공개 점수판 뒤에 다른 평가표가 있습니다. 경쟁자는 당신의 답뿐 아니라 망설임도 보고 있습니다.",
+  },
+  case04: {
+    id: "c4-exception-file",
+    title: "예외 파일",
+    text: "이번 규칙 위반은 처음이 아닙니다. 누군가는 오래전부터 예외를 정상처럼 기록해 왔습니다.",
+  },
+  case05: {
+    id: "c5-empty-seat",
+    title: "비어 있는 자리",
+    text: "실패 보고서에는 이름이 하나 빠져 있습니다. 말하지 못한 사람이 시스템의 가장 큰 비용을 떠안았습니다.",
+  },
+  final: {
+    id: "final-observer-key",
+    title: "관찰자의 열쇠",
+    text: "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다.",
+  },
+};
+
+/** The record each case hides, whether or not this run opened it. */
+export function getCaseDiscoveryClue(caseId = "case01") {
+  return discoveryClues[caseId] ?? null;
+}
+
+/**
+ * A hidden record only opens on a decision that read the scene. It used to
+ * need a fast or risky answer on top of that, which put the best ending behind
+ * a gate most runs failed without ever being told. A free-text answer that
+ * landed, or a decision that pulled pressure back down, now qualify too, and
+ * the last case can reopen the earliest record this run left shut.
+ */
 export function getDiscoveryClue({
   currentCase = "case01",
   challengeMatch = false,
   riskDelta = 0,
   responseTimeSec = 45,
   logLength = 0,
+  freeTextSuccess = false,
+  discoveredClueIds = [],
 } = {}) {
-  const clues = {
-    case01: {
-      id: "c1-hidden-ledger",
-      title: "숨은 급여표",
-      text: "공식 보고서보다 먼저 움직인 돈의 흔적이 있습니다. 누군가는 이미 다음 사건을 알고 있었습니다.",
-    },
-    case02: {
-      id: "c2-false-timestamp",
-      title: "어긋난 시간",
-      text: "유출 기록의 시간이 서로 맞지 않습니다. 범인보다 기록을 만든 사람이 더 중요할 수 있습니다.",
-    },
-    case03: {
-      id: "c3-second-scoreboard",
-      title: "두 번째 점수판",
-      text: "공개 점수판 뒤에 다른 평가표가 있습니다. 경쟁자는 당신의 답뿐 아니라 망설임도 보고 있습니다.",
-    },
-    case04: {
-      id: "c4-exception-file",
-      title: "예외 파일",
-      text: "이번 규칙 위반은 처음이 아닙니다. 누군가는 오래전부터 예외를 정상처럼 기록해 왔습니다.",
-    },
-    case05: {
-      id: "c5-empty-seat",
-      title: "비어 있는 자리",
-      text: "실패 보고서에는 이름이 하나 빠져 있습니다. 말하지 못한 사람이 시스템의 가장 큰 비용을 떠안았습니다.",
-    },
-    final: {
-      id: "final-observer-key",
-      title: "관찰자의 열쇠",
-      text: "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다.",
-    },
-  };
-  const clue = clues[currentCase];
-  const qualifies = challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12) && logLength >= 1;
-  return qualifies ? clue : null;
+  const qualifies =
+    logLength >= 1 &&
+    ((challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12 || riskDelta <= -2)) ||
+      (freeTextSuccess && challengeMatch) ||
+      (freeTextSuccess && riskDelta <= -2));
+  if (!qualifies) return null;
+  const own = discoveryClues[currentCase];
+  if (own && !discoveredClueIds.includes(own.id)) return own;
+  if (currentCase !== "final") return null;
+  return CASE_SEQUENCE.map((caseId) => discoveryClues[caseId]).find(
+    (clue) => clue && !discoveredClueIds.includes(clue.id),
+  ) ?? null;
 }
 
 /** Every hidden clue the season can reveal, so the ending can count what stayed shut. */
@@ -608,7 +675,9 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
   const required = choice.requiredAuthority;
   if (!required) return { unlocked: true, required: "", reason: "" };
   const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
-  const current = clueCount >= 5 && legitimacy >= 55 ? "OVERSIGHT" : clueCount >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
+  // Four of the season's six records, not five. Five allowed exactly one miss
+  // across a season whose records could not be recovered once a case closed.
+  const current = clueCount >= 4 && legitimacy >= 55 ? "OVERSIGHT" : clueCount >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
   const unlocked = (levels[current] ?? 0) >= (levels[required] ?? 99);
   return {
     unlocked,
@@ -641,8 +710,8 @@ export function getEndingVariant({ resources = {}, discoveredClues = [], log = [
   const capital = resources.capital ?? 0;
   const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length;
   if (pressure >= 82 || humanCost >= 70) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
-  if (discoveredClues.length >= 5 && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
-  if (discoveredClues.length >= 5 && legitimacy >= 55) return { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false };
+  if (discoveredClues.length >= 4 && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
+  if (discoveredClues.length >= 4 && legitimacy >= 55) return { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false };
   if (freeTextCount >= 2 && trust >= 60) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신의 문장이 다음 참가자의 첫 단서가 됩니다.", failure: false };
   if (capital >= 65 && trust < 40) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false };
   if (legitimacy >= 65 && trust < 50) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false };
@@ -894,6 +963,7 @@ export function createCaseSummary(
     cognitionScore: stats.cognitionScore,
     pressureAdaptScore: stats.pressureAdaptScore,
     reflectionScore: stats.reflectionScore,
+    consistencyScore: stats.consistencyScore,
     exploitPenalty: stats.exploitPenalty,
     burstScore: stats.burstScore,
     momentumScore: stats.momentumScore,
@@ -1108,31 +1178,41 @@ export function scoreFreeText(value) {
   };
 }
 
+/** A reframe has to be a sentence, not a keyword list. */
+export const FREE_TEXT_SIGNAL_MIN_LENGTH = 24;
+
 export function getFreeTextSignals(value) {
-  const text = value.trim();
+  const text = String(value ?? "").trim();
+  // One keyword per bucket used to be enough, so eight characters -- one word
+  // per bucket -- lit every signal and took the full reflection score. A signal
+  // now needs a written sentence around it.
+  const clauses = text
+    .split(/[.!?\n]|(?:다|요|음|함)(?=\s|$)/)
+    .filter((part) => part.trim().length >= 6).length;
+  const written = text.length >= FREE_TEXT_SIGNAL_MIN_LENGTH && clauses >= 1;
   return [
     {
       id: "stakeholder",
       label: "이해관계자",
-      active: /(직원|협력사|투자자|경쟁사|고객|CFO|임원|피해자|기자|보안팀|현장)/i.test(text),
+      active: written && /(직원|협력사|투자자|경쟁사|고객|CFO|임원|피해자|기자|보안팀|현장)/i.test(text),
       hint: "누가 영향을 받는지",
     },
     {
       id: "tradeoff",
       label: "교환 조건",
-      active: /(대신|하지만|조건|분할|우선|동시에|단계|교환|협상|묶어|연기|승계)/i.test(text),
+      active: written && /(대신|하지만|조건|분할|우선|동시에|단계|교환|협상|묶어|연기|승계)/i.test(text),
       hint: "무엇을 얻고 잃는지",
     },
     {
       id: "info",
       label: "근거 확인",
-      active: /(확인|조사|자료|공시|계약|근거|회의록|숫자|로그|원본|검증)/i.test(text),
+      active: written && /(확인|조사|자료|공시|계약|근거|회의록|숫자|로그|원본|검증)/i.test(text),
       hint: "무엇을 더 확인할지",
     },
     {
       id: "risk",
       label: "위험 명시",
-      active: /(위험|손실|비용|실패|법적|평판|시간|유출|무고|중단|이탈)/i.test(text),
+      active: written && clauses >= 2 && /(위험|손실|비용|실패|법적|평판|시간|유출|무고|중단|이탈)/i.test(text),
       hint: "실패하면 어디가 무너지는지",
     },
   ];

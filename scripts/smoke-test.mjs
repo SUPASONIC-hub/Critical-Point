@@ -154,7 +154,7 @@ assert.deepEqual(
     "nodeEnteredAt",
     "pendingTelemetry",
     "protocolUsed",
-    "timerPenaltyApplied",
+    "timerPenaltyCount",
     "probeUsed",
     "investigatedTargets",
     "hypothesisDecisions",
@@ -197,7 +197,7 @@ assert.deepEqual(
     caseResults: {},
     playtestFeedback: {},
     protocolUsed: false,
-    timerPenaltyApplied: false,
+    timerPenaltyCount: 0,
     probeUsed: false,
   },
   "v1 saves should migrate into the current schema",
@@ -504,7 +504,11 @@ authoredGeneratedScenes.forEach((node) => {
     effectSignatures.add(signature);
   });
 });
-assert.equal(generatedChoiceCount, 108, "36 generated scenes should expose 108 authored choices");
+assert.equal(
+  generatedChoiceCount,
+  114,
+  "36 generated scenes should expose 114 authored choices: three each, plus the case-specific fourth option on six connective scenes",
+);
 
 const fixedChoiceFallbacks = CASE_SEQUENCE.flatMap((caseId) =>
   [...new Set(nodeOrders[caseId])].flatMap((nodeId) =>
@@ -821,6 +825,7 @@ const gameplayStats = getGameplayStats(
       freeText: "",
       cognition: { inference: 2, risk: 1 },
       challenge: { matched: true },
+      effect: { trust: 6, humanCost: -3, capital: -5 },
       resourcesBefore: riskyResources,
       resourcesAfter: recoveredResources,
     },
@@ -829,6 +834,7 @@ const gameplayStats = getGameplayStats(
       freeText: "이해관계자를 다시 묶어 조건부 협상안을 제안한다.",
       cognition: { reframing: 3, persistence: 1 },
       challenge: { matched: true },
+      effect: { trust: 7, humanCost: -4, time: -6 },
       resourcesBefore: recoveredResources,
       resourcesAfter: { ...recoveredResources, fatigue: 24 },
     },
@@ -837,6 +843,7 @@ const gameplayStats = getGameplayStats(
       freeText: "",
       cognition: { ethics: 2 },
       challenge: { matched: false },
+      effect: { trust: 5, humanCost: -2, capital: -4 },
       resourcesBefore: initialResources,
       resourcesAfter: initialResources,
     },
@@ -848,6 +855,7 @@ assert.equal(gameplayStats.freeCount, 1, "free text count should be tracked");
 assert.equal(gameplayStats.reducedRiskCount, 1, "risk reductions should be tracked");
 assert.equal(gameplayStats.challengeClearCount, 2, "cleared scene challenges should be tracked");
 assert.equal(gameplayStats.currentChallengeStreak, 0, "failed latest challenge should reset streak");
+assert.equal(gameplayStats.consistencyScore, 100, "a run that holds one direction should score full consistency");
 assert.equal(gameplayStats.momentumTier, "FLOW", "sample gameplay should reach FLOW momentum");
 assert.equal(gameplayStats.rank, "B", "sample gameplay should map to B rank under the burst algorithm");
 const observationLedger = getObservationLedger([
@@ -955,6 +963,7 @@ assert.deepEqual(
     cognitionScore: 0,
     pressureAdaptScore: 0,
     reflectionScore: 0,
+    consistencyScore: 0,
     exploitPenalty: 0,
     momentumScore: 0,
     burstScore: 0,

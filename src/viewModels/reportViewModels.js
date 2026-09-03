@@ -27,13 +27,19 @@ export function createEndingProfile({ finalEndingEntry }) {
   };
 }
 
-export function createScoreBreakdown({ cognitionScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }) {
+export function createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }) {
   return [
+  {
+    label: "기준 유지",
+    value: consistencyScore,
+    text: `${consistencyScore}점`,
+    note: "압박이 올라간 장면에서도 같은 방향을 지켰는지 봅니다. 버스트 점수에서 가장 큰 몫입니다.",
+  },
   {
     label: "사고 리듬",
     value: rhythmScore,
     text: `${rhythmScore}점`,
-    note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다.",
+    note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다. 점수 비중은 가장 작습니다.",
   },
   {
     label: "관점 전환",

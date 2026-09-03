@@ -78,16 +78,19 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
   await expect(page.locator(".decision-forecast")).toHaveCount(0);
   await expect(page.locator(".choice-tradeoff, .choice-risk, .choice-impact, .choice-cognition")).toHaveCount(0);
 
+  // Five top-level blocks: the context drawer, the resource rail, the operator
+  // brief drawer, the scene and the choice panel. The rail is the one place the
+  // standing numbers are allowed to live, which is why the scan below skips it.
   const gameBoardBlockCount = await page.evaluate(() =>
     document.querySelectorAll(".game-board > section, .game-board > div, .game-board > details").length,
   );
-  expect(gameBoardBlockCount).toBeLessThanOrEqual(4);
+  expect(gameBoardBlockCount).toBeLessThanOrEqual(5);
 
   const standingNumbers = await page.evaluate(() => {
     const found = [];
     for (const element of document.querySelectorAll(".game-board *")) {
       if (element.closest("details:not([open])")) continue;
-      if (element.closest("[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action")) continue;
+      if (element.closest("[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action, .resource-rail")) continue;
       const style = getComputedStyle(element);
       if (style.display === "none" || style.visibility === "hidden") continue;
       const own = Array.from(element.childNodes)

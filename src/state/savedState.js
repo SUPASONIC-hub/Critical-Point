@@ -334,7 +334,7 @@ export function createReplaySavedState(seed) {
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],
     protocolUsed: false,
-    timerPenaltyApplied: false,
+    timerPenaltyCount: 0,
     probeUsed: false,
   };
 }

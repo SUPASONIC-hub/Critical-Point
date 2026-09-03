@@ -6,8 +6,9 @@ import { StatusBoard } from "../components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
 import { GuardedButton } from "../components/GuardedButton.jsx";
-import { CASE_SEQUENCE } from "../gameData.js";
-import { getAuthorityGate } from "../gameLogic.js";
+import { ResourceRail } from "../components/ResourceRail.jsx";
+import { CASE_SEQUENCE, costWhenRising } from "../gameData.js";
+import { FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
   const {
@@ -21,7 +22,7 @@ export function PlayScreen({ view }) {
       speakerProfile, speakerPortrait, resolvedNodeId, sceneDirection, latestBeat,
     },
     decision: {
-      decisionSeconds, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger,
+      protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger,
       pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader,
       previewChoice, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta,
       formatForecastRisk, setPendingChoice, commitConfirmRef, choose,
@@ -34,7 +35,7 @@ export function PlayScreen({ view }) {
     freeInput: {
       freeTextCombo, latestFreeTextSuccess, freeChoice, boardChangePrompts, updateFreeText, freeText,
       FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText,
-      activeFreeTextSignalCount, freeTextSignals, freeTextPreview,
+      activeFreeTextSignalCount, freeTextPreview,
     },
     status: {
       triggerLabels, pressureCascade, riskPressure, playGuideItems, saveCurrentGame, reset, progress,
@@ -50,7 +51,22 @@ export function PlayScreen({ view }) {
       debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
     },
   } = view;
-  const formatEffectChip = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"}`;
+  // humanCost and fatigue are the two axes where a rising number is the loss,
+  // so the arrow follows what the change means for the player, not its sign.
+  const isGainForPlayer = (key, value) => (costWhenRising.has(key) ? value < 0 : value > 0);
+  // The exact number stays gated behind evidence, but the size never is:
+  // knowing only the direction makes a trade-off impossible to weigh.
+  const formatEffectChip = ([key, value]) => {
+    const steps = Math.abs(value) >= 8 ? 3 : Math.abs(value) >= 4 ? 2 : 1;
+    const mark = (isGainForPlayer(key, value) ? "▲" : "▼").repeat(steps);
+    return `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"} ${mark}`;
+  };
+  // The four criteria used to be listed while typing, which read as an answer
+  // key: one keyword each cleared all of them. They are feedback on what the
+  // last submitted sentence actually carried instead.
+  const lastFreeTextSignals = latestFreeTextSuccess?.freeText
+    ? getFreeTextSignals(latestFreeTextSuccess.freeText)
+    : null;
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
   const relationshipScores = view.relationshipScores ?? [];
@@ -345,7 +361,6 @@ export function PlayScreen({ view }) {
           streakGoal={streakGoal}
           streakRemaining={streakRemaining}
           momentumScore={momentumScore}
-          decisionSeconds={decisionSeconds}
           protocolUsed={protocolUsed}
           isAdvancing={isAdvancing}
           activateCrisisProtocol={activateCrisisProtocol}
@@ -402,101 +417,113 @@ export function PlayScreen({ view }) {
           caseNumber={Math.max(1, CASE_SEQUENCE.indexOf(currentCase) + 1)}
           caseTotal={CASE_SEQUENCE.length}
           progress={progress}
-          decisionSeconds={decisionSeconds}
         />
         {renderSaveStatus()}
+        <ResourceRail
+          resourceMeta={resourceMeta}
+          resources={resources}
+          riskPressure={riskPressure}
+          riskTier={riskTier}
+          easyRiskLabels={easyRiskLabels}
+        />
 
         {operatorBrief && (
-          <section className="chapter-console" aria-label="현재 챕터 작전 브리프">
-            <div className="chapter-console-topline">
-              <span>OPERATOR BRIEF / LIVE AUTHORITY</span>
-              <b>당신의 결정은 현장을 바꾸지만, 모든 권한을 갖지는 않습니다</b>
-            </div>
-            <div className="chapter-console-main">
-              <div className="operator-identity">
-                <span>WHO YOU ARE</span>
-                <strong>트리거랩 전환 분석관</strong>
-                <p>기업과 조직의 위기를 관찰하고, 다음 운영 기준을 설계하는 사람</p>
+          <details className="chapter-console-drawer insight-drawer">
+            <summary>
+              <span>작전 브리프</span>
+              <b>내 권한, 인물 관계, 확보한 단서 다시 보기</b>
+            </summary>
+            <section className="chapter-console" aria-label="현재 챕터 작전 브리프">
+              <div className="chapter-console-topline">
+                <span>OPERATOR BRIEF / LIVE AUTHORITY</span>
+                <b>당신의 결정은 현장을 바꾸지만, 모든 권한을 갖지는 않습니다</b>
               </div>
-              <div className="operator-authority">
-                <span>YOUR AUTHORITY</span>
-                <div><b>열람</b><b>질문</b><b>기준 제안</b></div>
-                <p>기록을 열고, 관계자에게 묻고, 임시 기준을 제안할 수 있습니다.</p>
-              </div>
-              <div className="operator-limit">
-                <span>THE LIMIT</span>
-                <strong>집행권은 현장에 남아 있습니다</strong>
-                <p>최종 승인과 실제 집행은 해당 조직의 책임자가 수행합니다. 그래서 당신의 선택은 명령이 아니라 압박과 기준으로 작동합니다.</p>
-              </div>
-              {chapterRule && (
-                <div className="chapter-rule">
-                  <span>CHAPTER RULE / {chapterRule.label}</span>
-                  <strong>{chapterRule.rule}</strong>
-                  <p>이번 챕터의 개입 권한: {chapterRule.authority}</p>
+              <div className="chapter-console-main">
+                <div className="operator-identity">
+                  <span>WHO YOU ARE</span>
+                  <strong>트리거랩 전환 분석관</strong>
+                  <p>기업과 조직의 위기를 관찰하고, 다음 운영 기준을 설계하는 사람</p>
                 </div>
-              )}
-            </div>
-            <div className="chapter-transfer">
-              <div className="chapter-transfer-route">
-                <span>CHAPTER {String(CASE_SEQUENCE.indexOf(currentCase) + 1).padStart(2, "0")} / {CASE_SEQUENCE.length}</span>
-                <strong>{operatorBrief.movement}</strong>
+                <div className="operator-authority">
+                  <span>YOUR AUTHORITY</span>
+                  <div><b>열람</b><b>질문</b><b>기준 제안</b></div>
+                  <p>기록을 열고, 관계자에게 묻고, 임시 기준을 제안할 수 있습니다.</p>
+                </div>
+                <div className="operator-limit">
+                  <span>THE LIMIT</span>
+                  <strong>집행권은 현장에 남아 있습니다</strong>
+                  <p>최종 승인과 실제 집행은 해당 조직의 책임자가 수행합니다. 그래서 당신의 선택은 명령이 아니라 압박과 기준으로 작동합니다.</p>
+                </div>
+                {chapterRule && (
+                  <div className="chapter-rule">
+                    <span>CHAPTER RULE / {chapterRule.label}</span>
+                    <strong>{chapterRule.rule}</strong>
+                    <p>이번 챕터의 개입 권한: {chapterRule.authority}</p>
+                  </div>
+                )}
               </div>
-              <div className="chapter-transfer-reason">
-                <span>WHY THIS MOVE</span>
-                <p>{operatorBrief.reason}</p>
+              <div className="chapter-transfer">
+                <div className="chapter-transfer-route">
+                  <span>CHAPTER {String(CASE_SEQUENCE.indexOf(currentCase) + 1).padStart(2, "0")} / {CASE_SEQUENCE.length}</span>
+                  <strong>{operatorBrief.movement}</strong>
+                </div>
+                <div className="chapter-transfer-reason">
+                  <span>WHY THIS MOVE</span>
+                  <p>{operatorBrief.reason}</p>
+                </div>
               </div>
-            </div>
-            <div className="authority-level" aria-label="현재 권한 단계">
-              <div><span>AUTHORITY LEVEL</span><strong>{authorityState.level}</strong><small>{authorityState.locked}</small></div>
-              <div className="authority-permission-list">{authorityState.permissions.map((permission) => <b key={permission}>{permission}</b>)}</div>
-            </div>
-            <div className="chapter-rail" aria-label="챕터 진행 경로">
-              {CASE_SEQUENCE.map((caseId, index) => (
-                <span key={caseId} className={caseId === currentCase ? "active" : completedCases.includes(caseId) ? "complete" : ""}>
-                  <i>{String(index + 1).padStart(2, "0")}</i>{caseId === currentCase ? "현재" : completedCases.includes(caseId) ? "완료" : "대기"}
-                </span>
-              ))}
-            </div>
-            <div className="authority-action">
-              <div>
-                <span>ONE-TIME AUTHORITY</span>
-                <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
-                <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
+              <div className="authority-level" aria-label="현재 권한 단계">
+                <div><span>AUTHORITY LEVEL</span><strong>{authorityState.level}</strong><small>{authorityState.locked}</small></div>
+                <div className="authority-permission-list">{authorityState.permissions.map((permission) => <b key={permission}>{permission}</b>)}</div>
               </div>
-              <GuardedButton
-                type="button"
-                onClick={activateCrisisProtocol}
-                blocked={protocolUsed || riskPressure < 60 || isAdvancing}
-              >
-                {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
-              </GuardedButton>
-            </div>
-            <div className="relationship-strip" aria-label="등장인물 관계 온도">
-              <span>RELATIONSHIP HEAT</span>
-              <div>
-                {relationshipScores.map((relationship) => (
-                  <article key={relationship.name} className={relationship.active ? "active" : ""}>
-                    <b>{relationship.name}</b>
-                    <i><em style={{ width: `${relationship.value}%` }} /></i>
-                    <small>{relationship.active ? "현재 대화 상대" : relationship.value > 0 ? "관찰 중" : "아직 연결 전"}</small>
-                  </article>
+              <div className="chapter-rail" aria-label="챕터 진행 경로">
+                {CASE_SEQUENCE.map((caseId, index) => (
+                  <span key={caseId} className={caseId === currentCase ? "active" : completedCases.includes(caseId) ? "complete" : ""}>
+                    <i>{String(index + 1).padStart(2, "0")}</i>{caseId === currentCase ? "현재" : completedCases.includes(caseId) ? "완료" : "대기"}
+                  </span>
                 ))}
               </div>
-            </div>
-            <div className="mystery-board" aria-label="반전 단서 보드">
-              <div><span>MYSTERY BOARD</span><b>{discoveredClues.length}개 단서 확보</b></div>
-              {discoveredClues.length > 0 ? (
-                <div className="mystery-clues">
-                  {discoveredClues.slice(-3).map((clue) => (
-                    <article key={clue.id}>
-                      <strong>{clue.title ?? clue.id}</strong>
-                      <p>{clue.text ?? clue.description ?? "기록의 빈틈이 다음 질문으로 남았습니다."}</p>
+              <div className="authority-action">
+                <div>
+                  <span>ONE-TIME AUTHORITY</span>
+                  <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
+                  <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
+                </div>
+                <GuardedButton
+                  type="button"
+                  onClick={activateCrisisProtocol}
+                  blocked={protocolUsed || riskPressure < 60 || isAdvancing}
+                >
+                  {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
+                </GuardedButton>
+              </div>
+              <div className="relationship-strip" aria-label="등장인물 관계 온도">
+                <span>RELATIONSHIP HEAT</span>
+                <div>
+                  {relationshipScores.map((relationship) => (
+                    <article key={relationship.name} className={relationship.active ? "active" : ""}>
+                      <b>{relationship.name}</b>
+                      <i><em style={{ width: `${relationship.value}%` }} /></i>
+                      <small>{relationship.active ? "현재 대화 상대" : relationship.value > 0 ? "관찰 중" : "아직 연결 전"}</small>
                     </article>
                   ))}
                 </div>
-              ) : <p className="mystery-empty">첫 번째 모순은 아직 모습을 드러내지 않았습니다. 압박을 낮추거나 오래 관찰하면 단서가 열립니다.</p>}
-            </div>
-          </section>
+              </div>
+              <div className="mystery-board" aria-label="반전 단서 보드">
+                <div><span>MYSTERY BOARD</span><b>{discoveredClues.length}개 단서 확보</b></div>
+                {discoveredClues.length > 0 ? (
+                  <div className="mystery-clues">
+                    {discoveredClues.slice(-3).map((clue) => (
+                      <article key={clue.id}>
+                        <strong>{clue.title ?? clue.id}</strong>
+                        <p>{clue.text ?? clue.description ?? "기록의 빈틈이 다음 질문으로 남았습니다."}</p>
+                      </article>
+                    ))}
+                  </div>
+                ) : <p className="mystery-empty">첫 번째 모순은 아직 모습을 드러내지 않았습니다. 압박을 낮추거나 오래 관찰하면 단서가 열립니다.</p>}
+              </div>
+            </section>
+          </details>
         )}
 
         <div className="scene">
@@ -659,7 +686,7 @@ export function PlayScreen({ view }) {
                 {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
                   .filter(([, value]) => value !== 0)
                   .map(([key, value]) => (
-                    <b key={key} className={value > 0 ? "positive" : "negative"}>
+                    <b key={key} className={isGainForPlayer(key, value) ? "positive" : "negative"}>
                       {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
                     </b>
                   ))}
@@ -729,7 +756,7 @@ export function PlayScreen({ view }) {
                   {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-dilemma">{describeChoiceDilemma(choice)}</span>
-                  {observerPreview && (
+                  {showTacticalDetails && observerPreview && (
                     <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
                       <b>{observerPreview.tag.label}</b>
                       <small>{observerPreview.repeatsCurrentPattern ? "패턴 고정" : "패턴 교란"}</small>
@@ -739,15 +766,15 @@ export function PlayScreen({ view }) {
                     {Object.entries(choice.effect ?? {})
                       .filter(([, value]) => value !== 0)
                       .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-                      .slice(0, 3)
+                      .slice(0, 4)
                       .map((entry) => (
-                        <b key={entry[0]} className={entry[1] > 0 ? "positive" : "negative"}>
+                        <b key={entry[0]} className={isGainForPlayer(entry[0], entry[1]) ? "positive" : "negative"}>
                           {formatEffectChip(entry)}
                         </b>
                       ))}
                   </span>
-                  <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
-                  <span className="choice-authority-impact">{getAuthorityImpact(choice)}</span>
+                  {showTacticalDetails && <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>}
+                  {showTacticalDetails && <span className="choice-authority-impact">{getAuthorityImpact(choice)}</span>}
                   {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
@@ -837,21 +864,23 @@ export function PlayScreen({ view }) {
                 {sceneChallenge.id === "use-reframe" && activeFreeTextSignalCount >= 2 && (
                   <strong className="reframe-challenge-hit">챌린지 달성 가능</strong>
                 )}
-                <ul>
-                  {freeTextSignals.map((signal) => (
-                    <li className={signal.active ? "active" : ""} key={signal.id}>
-                      <Check size={14} />
-                      <span>
-                        <b>{signal.label}</b>
-                        <small>{signal.hint}</small>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <p>
-                  두 개 이상 채워지면 선택지 밖의 제안이 단순 의견이 아니라 판을 바꾸는
-                  계획으로 기록됩니다.
+                <p className="reframe-requirement">
+                  최소 {FREE_TEXT_SIGNAL_MIN_LENGTH}자, 한 문장 이상으로 써야 반영 기준이 잡힙니다.
+                  두 개 이상 채워지면 선택지 밖의 제안이 단순 의견이 아니라 판을 바꾸는 계획으로 기록됩니다.
                 </p>
+                {lastFreeTextSignals && (
+                  <ul className="reframe-signal-feedback">
+                    {lastFreeTextSignals.map((signal) => (
+                      <li className={signal.active ? "active" : ""} key={signal.id}>
+                        <Check size={14} />
+                        <span>
+                          <b>{signal.label}</b>
+                          <small>{signal.active ? "직전 문장에서 확인됨" : signal.hint}</small>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               {freeTextPreview && (
                 <div className="reframe-preview">

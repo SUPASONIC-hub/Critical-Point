@@ -1,6 +1,41 @@
 
 import { Check, Shield } from "lucide-react";
 import { GuardedButton } from "./GuardedButton.jsx";
+import { useDecisionSeconds } from "../state/decisionClock.js";
+
+/**
+ * Subscribes to the decision clock on its own, so the drawer around it is not
+ * rebuilt once a second.
+ */
+function DecisionWindowCard() {
+  const seconds = useDecisionSeconds();
+  const remaining = Math.max(0, seconds);
+  const overtime = Math.max(0, -seconds);
+  return (
+    <article className={remaining <= 10 ? "timer-card urgent" : "timer-card"}>
+      <span>남은 결정 시간</span>
+      <strong>{remaining}s</strong>
+      <div
+        className="timer-meter"
+        role="progressbar"
+        aria-label="남은 결정 시간"
+        aria-valuemin="0"
+        aria-valuemax="45"
+        aria-valuenow={remaining}
+        aria-valuetext={`${remaining}초`}
+      >
+        <div style={{ width: `${Math.min(100, Math.max(0, (remaining / 45) * 100))}%` }} />
+      </div>
+      <p>
+        {remaining === 0
+          ? `초과 ${overtime}초 · 15초마다 시간·피로 비용이 다시 붙습니다`
+          : remaining <= 10
+            ? "다음 판단이 닫히기 전"
+            : "빠른 챌린지 적중 보너스 가능"}
+      </p>
+    </article>
+  );
+}
 
 export function GameMetricsDrawer({
   riskTier,
@@ -18,7 +53,6 @@ export function GameMetricsDrawer({
   streakGoal,
   streakRemaining,
   momentumScore,
-  decisionSeconds,
   protocolUsed,
   isAdvancing,
   activateCrisisProtocol,
@@ -69,28 +103,7 @@ export function GameMetricsDrawer({
             </div>
             <p>{momentumScore}점 · 다음 보상까지 {streakRemaining}회</p>
           </article>
-          <article className={decisionSeconds <= 10 ? "timer-card urgent" : "timer-card"}>
-            <span>남은 결정 시간</span>
-            <strong>{decisionSeconds}s</strong>
-            <div
-              className="timer-meter"
-              role="progressbar"
-              aria-label="남은 결정 시간"
-              aria-valuemin="0"
-              aria-valuemax="45"
-              aria-valuenow={decisionSeconds}
-              aria-valuetext={`${decisionSeconds}초`}
-            >
-              <div style={{ width: `${Math.min(100, Math.max(0, (decisionSeconds / 45) * 100))}%` }} />
-            </div>
-            <p>
-              {decisionSeconds === 0
-                ? "시간·피로 비용 적용됨"
-                : decisionSeconds <= 10
-                  ? "다음 판단이 닫히기 전"
-                  : "빠른 챌린지 적중 보너스 가능"}
-            </p>
-          </article>
+          <DecisionWindowCard />
         </section>
 
         <section className="live-ledger" aria-label="누적 판단 원장">

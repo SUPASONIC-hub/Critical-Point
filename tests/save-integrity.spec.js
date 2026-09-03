@@ -62,7 +62,7 @@ function validSavedState(patch = {}) {
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],
     protocolUsed: false,
-    timerPenaltyApplied: false,
+    timerPenaltyCount: 0,
     probeUsed: false,
     savedAt: new Date().toISOString(),
     ...patch,

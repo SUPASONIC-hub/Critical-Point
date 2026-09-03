@@ -33,13 +33,22 @@ export const SAVE_STATE_KEYS = [
   "nodeEnteredAt",
   "pendingTelemetry",
   "protocolUsed",
-  "timerPenaltyApplied",
+  "timerPenaltyCount",
   "probeUsed",
   "investigatedTargets",
   "hypothesisDecisions",
   "paused",
   "savedAt",
 ];
+
+/**
+ * How many overtime charges this decision has already taken. Saves written
+ * before the window kept charging carry a boolean instead.
+ */
+function normalizeTimerPenaltyCount(state = {}) {
+  if (Number.isFinite(state.timerPenaltyCount)) return Math.max(0, Math.trunc(state.timerPenaltyCount));
+  return state.timerPenaltyApplied ? 1 : 0;
+}
 
 export function normalizePlayerName(value) {
   return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
@@ -86,7 +95,7 @@ export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSI
       caseResults: state.caseResults && typeof state.caseResults === "object" && !Array.isArray(state.caseResults) ? state.caseResults : {},
       playtestFeedback: state.playtestFeedback && typeof state.playtestFeedback === "object" && !Array.isArray(state.playtestFeedback) ? state.playtestFeedback : {},
       protocolUsed: Boolean(state.protocolUsed),
-      timerPenaltyApplied: Boolean(state.timerPenaltyApplied),
+      timerPenaltyCount: normalizeTimerPenaltyCount(state),
       probeUsed: Boolean(state.probeUsed),
     };
   }
@@ -344,7 +353,7 @@ export function createRecoverySnapshot(snapshot) {
     log: Array.isArray(snapshot.log) ? snapshot.log.slice(-20).map(createRecoveryLogEntry) : [],
     pendingTelemetry: [],
     protocolUsed: Boolean(snapshot.protocolUsed),
-    timerPenaltyApplied: Boolean(snapshot.timerPenaltyApplied),
+    timerPenaltyCount: normalizeTimerPenaltyCount(snapshot),
     probeUsed: Boolean(snapshot.probeUsed),
     nodeEnteredAt: Number.isFinite(snapshot.nodeEnteredAt) ? snapshot.nodeEnteredAt : Date.now(),
     savedAt: typeof snapshot.savedAt === "string" ? snapshot.savedAt : new Date().toISOString(),

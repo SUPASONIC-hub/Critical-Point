@@ -1,4 +1,4 @@
-export { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
+export { cognitionLabels, costWhenRising, initialResources, triggerLabels } from "./gameConstants.js";
 export { boardChangePrompts, characterProfiles, choiceSubtexts, choiceVoiceLines } from "./gameDialogue.js";
 export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, nodeOrders, RESULT_NODE_IDS, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
@@ -139,112 +139,284 @@ nodeOrders.final.push("f_aftershock");
 
 const connectiveScenes = [
   ["c1_witness", "accounting", "payday", "누가 숫자를 만들었나", "반재욱", "회계팀의 막내가 회의실 문 앞에서 멈춰 섰습니다. 그는 장부가 틀렸다고 말하지 않았습니다. 대신 숫자가 만들어진 순간, 모두가 무엇을 알고 있었는지 묻습니다.", ["원본 파일은 세 번 저장됨", "막내 직원은 회의 초대를 받지 못함", "CFO의 지시는 구두로만 남음"], ["직원을 보호하며 증언할 자리를 만든다", "원본 파일을 먼저 잠가 증거를 보존한다", "말이 퍼지기 전에 CFO와 비공개로 합의한다"]],
-  ["c1_assembly", "payday", "competitor", "급여일 전의 약속", "도윤하", "급여일 아침을 버티려면 돈만 필요한 것이 아닙니다. 직원들은 회사가 무엇을 숨기고 있는지보다, 내일도 자신이 이곳에 있을지 알고 싶어 합니다.", ["야간조 대표가 공동 공지를 요구함", "협력사 세 곳이 같은 지급 기준을 요구함", "임원진은 개인 보수를 먼저 공개하길 꺼림"], ["직원 대표와 함께 공개 약속을 만든다", "지급 순서를 숫자로 고정한다", "임원진만 아는 임시 합의를 만든다"]],
+  ["c1_assembly", "payday", "competitor", "급여일 전의 약속", "도윤하", "급여일 아침을 버티려면 돈만 필요한 것이 아닙니다. 직원들은 회사가 무엇을 숨기고 있는지보다, 내일도 자신이 이곳에 있을지 알고 싶어 합니다.", ["야간조 대표가 공동 공지를 요구함", "협력사 세 곳이 같은 지급 기준을 요구함", "임원진은 개인 보수를 먼저 공개하길 꺼림"], ["직원 대표와 함께 공개 약속을 만든다", "지급 순서를 숫자로 고정한다", "임원진만 아는 임시 합의를 만든다", "임원 보수를 먼저 깎아 지급 재원을 만든다"]],
   ["c1_bargain", "competitor", "board", "팔리지 않은 자리", "오진우", "북선로지스의 협상안에는 빈칸이 하나 있습니다. 인수하지 않을 사업부, 남겨질 직원, 협력사 중 누가 그 빈칸을 채울지 아무도 쓰지 않았습니다.", ["인수 조건에 책임 주체가 없음", "협력사는 매각보다 지급 보장을 원함", "오진우는 승률을 높이는 문장만 골라냄"], ["빈칸을 채운 뒤에만 협상한다", "가장 약한 쪽의 조건부터 반영한다", "빈칸을 남겨 빠르게 사인한다"]],
   ["c1_verdict", "board", "final", "판결이 아닌 선택", "에코", "모든 자료가 테이블 위에 올라왔지만 결론은 더 멀어졌습니다. 이제 당신의 선택은 회사를 설명하는 문장이 아니라, 누가 내일의 비용을 들 것인지 정하는 문장입니다.", ["직원·협력사·투자자의 요구가 동시에 도착함", "한쪽을 살리면 다른 쪽의 신뢰가 줄어듦", "반응 패턴이 다음 사건으로 전송될 예정"], ["가장 약한 사람의 손실부터 줄인다", "살아남을 돈을 먼저 확보한다", "결정의 책임과 근거를 모두 공개한다"]],
   ["c2_trace", "c2_logs", "c2_meeting", "사라진 11초", "반재욱", "접속 기록에는 11초의 빈틈이 있습니다. 누군가는 그 짧은 시간에 파일을 바꿀 수 있었고, 누군가는 그 빈틈을 일부러 남겼을 수 있습니다.", ["복사본에는 없는 원본의 흔적", "이민서 계정은 빈틈 직전에 사용됨", "보안팀은 빈틈을 단순 오류라고 주장함"], ["11초를 기술적으로 재현한다", "이민서에게 그 시간의 행동을 묻는다", "오류로 처리하고 보고 시간을 지킨다"]],
-  ["c2_witness", "c2_meeting", "c2_pressure", "이민서의 침묵", "도윤하", "이민서는 자신을 변호하지 않습니다. 대신 파일을 받은 사람이 누군지보다, 왜 그 파일이 다음 테스트에 필요했는지부터 물어봅니다.", ["이민서는 CASE 01 보고서를 읽지 못함", "유출 파일에는 선택하지 않은 경로도 포함됨", "누군가 플레이어의 반응을 미리 분류함"], ["이민서의 안전을 먼저 확보한다", "파일의 이동 경로만 추적한다", "침묵을 의심 신호로 기록한다"]],
+  ["c2_witness", "c2_meeting", "c2_pressure", "이민서의 침묵", "도윤하", "이민서는 자신을 변호하지 않습니다. 대신 파일을 받은 사람이 누군지보다, 왜 그 파일이 다음 테스트에 필요했는지부터 물어봅니다.", ["이민서는 CASE 01 보고서를 읽지 못함", "유출 파일에는 선택하지 않은 경로도 포함됨", "누군가 플레이어의 반응을 미리 분류함"], ["이민서의 안전을 먼저 확보한다", "파일의 이동 경로만 추적한다", "침묵을 의심 신호로 기록한다", "이민서와 조건을 걸고 거래한다"]],
   ["c2_judgment", "c2_pressure", "c2_final", "보고서 밖의 사람", "한서윤", "보안팀은 결론을 요구하지만, 이민서의 동료들은 보고서에 없는 사실을 알고 있습니다. 공식 기록과 사람의 기억 중 하나만 고를 수는 없습니다.", ["동료 두 명이 익명 증언을 제출함", "1차 보고 마감까지 18분", "외부 기업은 유출 사실을 부인함"], ["익명 증언을 공식 부록으로 붙인다", "기록에 없는 정보는 보류한다", "외부 기업과 먼저 대면한다"]],
   ["c3_rival", "c3_split", "c3_score", "같은 자료, 다른 목적", "오진우", "오진우는 당신의 자료에 없는 숫자를 들고 왔습니다. 고객이 실제로 원하는 것은 비용 절감이 아니라 실패했을 때 책임질 사람이라는 사실입니다.", ["고객사는 책임 조항을 비공개로 요구함", "경쟁안은 책임을 하청사로 넘김", "보안팀은 발표에서 빠져 있음"], ["책임 조항을 앞에 세운다", "비용표부터 다시 계산한다", "오진우에게 없는 숫자의 출처를 묻는다"]],
-  ["c3_signal", "c3_score", "c3_trap", "관객석의 신호", "에코", "발표장 뒤편의 불이 두 번 깜빡였습니다. 고객 신호인지 트리거랩의 시험인지 알 수 없지만, 오진우는 그 신호를 보고 답을 바꿉니다.", ["불빛은 보안 경고와 같은 주기임", "고객 대표는 신호를 부인함", "오진우의 응답 시간이 비정상적으로 짧아짐"], ["신호를 공개 질문으로 바꾼다", "발표를 멈추고 보안부터 확인한다", "상대보다 먼저 결론을 밀어붙인다"]],
+  ["c3_signal", "c3_score", "c3_trap", "관객석의 신호", "에코", "발표장 뒤편의 불이 두 번 깜빡였습니다. 고객 신호인지 트리거랩의 시험인지 알 수 없지만, 오진우는 그 신호를 보고 답을 바꿉니다.", ["불빛은 보안 경고와 같은 주기임", "고객 대표는 신호를 부인함", "오진우의 응답 시간이 비정상적으로 짧아짐"], ["신호를 공개 질문으로 바꾼다", "발표를 멈추고 보안부터 확인한다", "상대보다 먼저 결론을 밀어붙인다", "오진우와 신호의 해석을 나눠 갖는다"]],
   ["c3_verdict", "c3_trap", "c3_final", "승부의 끝에서", "한서윤", "당신은 이제 오진우보다 빠르거나 느린 사람이 아닙니다. 어떤 기준으로 승부를 끝낼지 정하는 사람입니다.", ["고객사는 오늘 안에 결론을 원함", "보안 결함은 아직 완전 증명 전", "공동 발표를 하면 책임은 나뉨"], ["검증을 끝낸 뒤 발표한다", "공동 책임으로 발표한다", "불확실성을 숨기고 승리를 확정한다"]],
   ["c4_audit", "c4_offer", "c4_leak", "3%의 주인", "반재욱", "부족한 3%는 단순한 숫자가 아니었습니다. 그 숫자를 계산한 사람과, 그 숫자를 기다리는 사람의 이름이 서로 달랐습니다.", ["산식에는 현장 업무가 빠져 있음", "심사 기준은 2년 전 자료에 고정됨", "서비스 이용자 대표가 발언을 요청함"], ["이용자 대표의 기준을 반영한다", "산식 변경 이력을 남긴다", "3%를 조용히 보정한다"]],
-  ["c4_public", "c4_leak", "c4_vote", "기자가 기다리는 문장", "도윤하", "기자는 아직 기사를 쓰지 않았습니다. 다만 당신이 어떤 표현을 선택하는지에 따라 내일의 제목이 정해질 것이라고 말합니다.", ["제보 메일은 내부에서 시작됨", "온새는 서비스 중단을 막고 싶어 함", "심사관은 공개 설명을 요구함"], ["사실과 모르는 것을 함께 공개한다", "서비스 이용자 피해를 먼저 알린다", "기사에 나갈 표현을 최소화한다"]],
+  ["c4_public", "c4_leak", "c4_vote", "기자가 기다리는 문장", "도윤하", "기자는 아직 기사를 쓰지 않았습니다. 다만 당신이 어떤 표현을 선택하는지에 따라 내일의 제목이 정해질 것이라고 말합니다.", ["제보 메일은 내부에서 시작됨", "온새는 서비스 중단을 막고 싶어 함", "심사관은 공개 설명을 요구함"], ["사실과 모르는 것을 함께 공개한다", "서비스 이용자 피해를 먼저 알린다", "기사에 나갈 표현을 최소화한다", "기사 시점을 늦추는 대신 전량 공개를 약속한다"]],
   ["c4_verdict", "c4_vote", "c4_final", "선의의 증거", "에코", "좋은 의도는 증거가 되지 않습니다. 하지만 좋은 결과만을 위해 규칙을 늘리면, 다음 사람은 그 규칙을 이용할 수 있습니다.", ["이사회는 오늘 결정을 요구함", "감사 자료는 공개 가능함", "서비스 이용자 4,200명이 결과를 기다림"], ["예외를 공개된 조건으로 묶는다", "규칙을 지키고 서비스를 포기한다", "결과가 좋다면 기록은 나중에 설명한다"]],
   ["c5_pattern", "c5_map", "c5_blame", "실패가 움직인 경로", "반재욱", "지도 위의 화살표가 한 사람에게 모이지 않습니다. 모든 화살표가 서로의 합리적인 선택을 통과해 같은 곳에 도착했습니다.", ["각 팀은 다른 팀의 정보를 보지 못함", "가장 먼저 위험을 말한 기록이 누락됨", "책임표에는 승인자만 남아 있음"], ["정보가 막힌 지점을 먼저 고친다", "승인자에게 책임을 집중한다", "피해가 큰 부서부터 보상한다"]],
-  ["c5_voice", "c5_blame", "c5_collapse", "이름 없는 증언", "도윤하", "누군가가 회의실 밖에서 말합니다. 자신은 결정권자가 아니었지만, 실패를 가장 먼저 보았다고 합니다.", ["증언자는 기록에서 빠져 있음", "말하면 팀 전체가 조사받을 수 있음", "피해자들은 책임자 이름보다 회복을 요구함"], ["증언자를 보호하고 기록을 복원한다", "공식 책임자 발표를 먼저 한다", "보상안을 만들고 조사를 미룬다"]],
+  ["c5_voice", "c5_blame", "c5_collapse", "이름 없는 증언", "도윤하", "누군가가 회의실 밖에서 말합니다. 자신은 결정권자가 아니었지만, 실패를 가장 먼저 보았다고 합니다.", ["증언자는 기록에서 빠져 있음", "말하면 팀 전체가 조사받을 수 있음", "피해자들은 책임자 이름보다 회복을 요구함"], ["증언자를 보호하고 기록을 복원한다", "공식 책임자 발표를 먼저 한다", "보상안을 만들고 조사를 미룬다", "증언자의 고용을 내 권한으로 보장한다"]],
   ["c5_verdict", "c5_collapse", "c5_final", "책임의 모양", "한서윤", "실패를 설명하는 방법은 세 가지입니다. 사람을 지목하거나, 구조를 고치거나, 피해를 먼저 되돌리는 것. 어느 것도 공짜는 아닙니다.", ["개선 예산은 한정됨", "책임 발표를 기다리는 언론", "피해 복구팀이 즉시 출범할 수 있음"], ["내 결정부터 공개한다", "반복을 막는 구조에 투자한다", "피해 복구를 가장 먼저 시작한다"]],
   ["f_witness", "f_archive", "f_confront", "첫 번째 참가자", "도윤하", "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.", ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"], ["이전 참가자에게 먼저 알린다", "복제된 문장을 모두 증거로 수집한다", "실험을 멈추기 위해 서버를 닫는다"]],
-  ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다"]],
+  ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다", "실험을 이어가되 나를 다음 참가자로 등록한다"]],
 ];
 
+/**
+ * Connective-scene effects, keyed by the authored scene each one follows.
+ *
+ * Every row is a real trade: the people-first option always pays in cash or
+ * time, the procedure-first option always makes someone wait (`humanCost`),
+ * and the profit-first option is the only one that gives `fatigue` back --
+ * cutting the corner costs less of you and more of everyone else. Six scenes
+ * carry a fourth option that exists only in that case.
+ */
 const authoredSceneChoiceEffects = {
-  c1_witness: [{ trust: 6, legitimacy: 2, fatigue: 5 }, { time: -5, legitimacy: 6, fatigue: 4 }, { capital: 4, trust: -6, fatigue: 2 }],
-  c1_assembly: [{ trust: 5, humanCost: -2, fatigue: 5 }, { time: -6, legitimacy: 6, fatigue: 4 }, { capital: 6, trust: -7, fatigue: 2 }],
-  c1_bargain: [{ trust: 6, legitimacy: 4, fatigue: 6 }, { capital: -5, legitimacy: 7, time: -4 }, { capital: 7, trust: -8, fatigue: 2 }],
-  c1_verdict: [{ legitimacy: 7, trust: 4, fatigue: 5 }, { time: -5, capital: -3, legitimacy: 6 }, { capital: 6, trust: -6, fatigue: 2 }],
-  c2_trace: [{ legitimacy: 7, time: -6, fatigue: 3 }, { trust: 6, time: -4, legitimacy: 2 }, { time: 5, legitimacy: -7, fatigue: 2 }],
-  c2_witness: [{ trust: 7, humanCost: -3, fatigue: 5 }, { legitimacy: 6, time: -5, fatigue: 4 }, { capital: 5, trust: -8, fatigue: 2 }],
-  c2_judgment: [{ legitimacy: 8, trust: 3, fatigue: 6 }, { time: -6, capital: -3, legitimacy: 5 }, { capital: 5, trust: -7, fatigue: 2 }],
-  c3_rival: [{ trust: 6, legitimacy: 5, fatigue: 6 }, { capital: -4, time: -5, legitimacy: 7 }, { capital: 8, trust: -8, fatigue: 2 }],
-  c3_signal: [{ legitimacy: 6, trust: 5, time: -5 }, { time: -8, capital: -3, legitimacy: 6 }, { capital: 8, trust: -7, fatigue: 3 }],
-  c3_verdict: [{ legitimacy: 8, trust: 5, fatigue: 6 }, { time: -5, capital: -4, legitimacy: 7 }, { capital: 7, trust: -8, legitimacy: -3 }],
-  c4_audit: [{ legitimacy: 7, trust: 4, time: -5 }, { capital: -6, legitimacy: 8, fatigue: 5 }, { capital: 7, trust: -7, fatigue: 2 }],
-  c4_public: [{ legitimacy: 8, trust: 3, fatigue: 7 }, { capital: 6, legitimacy: -5, time: -4 }, { capital: 8, trust: -8, fatigue: 2 }],
-  c4_verdict: [{ legitimacy: 8, trust: 5, fatigue: 6 }, { capital: -5, time: -6, legitimacy: 7 }, { capital: 7, trust: -8, legitimacy: -4 }],
-  c5_pattern: [{ legitimacy: 7, trust: 4, time: -5 }, { humanCost: -4, legitimacy: 6, fatigue: 5 }, { capital: 6, trust: -8, fatigue: 2 }],
-  c5_voice: [{ trust: 7, humanCost: -3, fatigue: 6 }, { legitimacy: 8, time: -5, fatigue: 5 }, { capital: 5, trust: -7, fatigue: 2 }],
-  c5_verdict: [{ legitimacy: 8, trust: 5, humanCost: -3 }, { capital: -6, legitimacy: 8, fatigue: 6 }, { capital: 7, trust: -9, fatigue: 2 }],
-  f_witness: [{ legitimacy: 8, trust: 5, time: -6 }, { time: -8, capital: -3, legitimacy: 7 }, { capital: 6, trust: -8, fatigue: 3 }],
-  f_dilemma: [{ trust: 8, legitimacy: 6, fatigue: 7 }, { time: -6, capital: -4, legitimacy: 8 }, { capital: 8, trust: -9, fatigue: 2 }],
+  accounting: [
+    { trust: 7, humanCost: -3, capital: -6, time: -4, fatigue: 5 },
+    { legitimacy: 7, time: -6, humanCost: 2, fatigue: 4 },
+    { capital: 6, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -2 },
+  ],
+  payday: [
+    { trust: 8, humanCost: -3, capital: -7, fatigue: 6 },
+    { legitimacy: 6, time: -5, humanCost: 3, fatigue: 3 },
+    { capital: 7, trust: -8, legitimacy: -4, humanCost: 4, fatigue: -2 },
+    { capital: -10, trust: 6, legitimacy: 6, humanCost: -2, fatigue: 7 },
+  ],
+  competitor: [
+    { legitimacy: 6, time: -7, capital: -4, fatigue: 5 },
+    { trust: 7, humanCost: -4, capital: -8, fatigue: 5 },
+    { capital: 8, time: 3, trust: -7, humanCost: 5, fatigue: -2 },
+  ],
+  board: [
+    { humanCost: -6, trust: 7, capital: -8, fatigue: 5 },
+    { capital: 8, humanCost: 5, trust: -6, time: 2, fatigue: -2 },
+    { legitimacy: 8, trust: 3, capital: -3, time: -6, fatigue: 6 },
+  ],
+  c2_logs: [
+    { legitimacy: 7, time: -7, capital: -4, fatigue: 5 },
+    { trust: 6, legitimacy: 2, humanCost: -2, time: -5, fatigue: 4 },
+    { time: 5, capital: 3, legitimacy: -7, humanCost: 4, fatigue: -3 },
+  ],
+  c2_meeting: [
+    { trust: 8, humanCost: -4, capital: -6, time: -4, fatigue: 5 },
+    { legitimacy: 6, time: -7, humanCost: 2, fatigue: 5 },
+    { time: 4, trust: -8, legitimacy: -2, humanCost: 5, fatigue: -2 },
+    { capital: 6, trust: 4, legitimacy: -6, humanCost: 3, fatigue: 3 },
+  ],
+  c2_pressure: [
+    { legitimacy: 7, trust: 5, humanCost: -2, time: -6, fatigue: 6 },
+    { time: 3, legitimacy: -4, trust: -5, humanCost: 5, fatigue: -2 },
+    { capital: 6, legitimacy: 2, trust: -3, humanCost: 2, time: -5, fatigue: 4 },
+  ],
+  c3_split: [
+    { legitimacy: 7, capital: -6, time: -5, fatigue: 5 },
+    { capital: 7, trust: -4, humanCost: 3, time: -6, fatigue: 4 },
+    { trust: 5, legitimacy: 4, humanCost: -2, capital: -3, time: -6, fatigue: 5 },
+  ],
+  c3_score: [
+    { trust: 6, legitimacy: 5, capital: -5, time: -4, fatigue: 5 },
+    { legitimacy: 7, time: -8, capital: -5, fatigue: 6 },
+    { capital: 8, trust: -7, humanCost: 5, time: 3, fatigue: -3 },
+    { capital: 5, trust: 3, legitimacy: -7, humanCost: 2, fatigue: 3 },
+  ],
+  c3_trap: [
+    { legitimacy: 8, time: -8, capital: -5, fatigue: 6 },
+    { trust: 7, legitimacy: 4, humanCost: -3, capital: -6, fatigue: 5 },
+    { capital: 9, trust: -8, legitimacy: -5, humanCost: 6, time: 3, fatigue: -3 },
+  ],
+  c4_offer: [
+    { trust: 7, humanCost: -5, capital: -7, time: -5, fatigue: 5 },
+    { legitimacy: 7, time: -6, humanCost: 2, fatigue: 4 },
+    { capital: 7, legitimacy: -8, humanCost: 4, time: 3, fatigue: -2 },
+  ],
+  c4_leak: [
+    { legitimacy: 8, trust: 3, capital: -7, fatigue: 6 },
+    { humanCost: -5, trust: 7, capital: -6, time: -4, fatigue: 5 },
+    { time: 4, capital: 4, trust: -7, legitimacy: -6, humanCost: 4, fatigue: -3 },
+    { time: -7, legitimacy: 5, trust: 5, capital: -3, humanCost: 2, fatigue: 4 },
+  ],
+  c4_vote: [
+    { legitimacy: 8, time: -6, capital: -4, fatigue: 5 },
+    { legitimacy: 6, humanCost: 7, capital: -8, trust: -3, fatigue: 4 },
+    { capital: 8, legitimacy: -7, trust: -5, humanCost: 4, time: 3, fatigue: -2 },
+  ],
+  c5_map: [
+    { legitimacy: 7, capital: -7, time: -7, fatigue: 6 },
+    { legitimacy: 4, trust: -6, humanCost: 5, time: -3, fatigue: 3 },
+    { humanCost: -6, trust: 6, capital: -9, fatigue: 5 },
+  ],
+  c5_blame: [
+    { trust: 8, humanCost: -4, capital: -5, time: -6, fatigue: 6 },
+    { legitimacy: 7, trust: -4, humanCost: 4, time: -4, fatigue: 4 },
+    { capital: -7, trust: 3, legitimacy: -6, humanCost: -3, time: 4, fatigue: -3 },
+    { trust: 6, legitimacy: -4, capital: -8, humanCost: -5, fatigue: 7 },
+  ],
+  c5_collapse: [
+    { legitimacy: 8, trust: 4, humanCost: 2, time: -4, fatigue: 7 },
+    { capital: -9, legitimacy: 7, time: -6, fatigue: 5 },
+    { humanCost: -7, trust: 7, capital: -8, fatigue: 5 },
+  ],
+  f_archive: [
+    { trust: 8, legitimacy: 5, capital: -4, time: -6, fatigue: 6 },
+    { legitimacy: 8, humanCost: 2, capital: -5, time: -8, fatigue: 6 },
+    { humanCost: -5, legitimacy: -6, trust: -4, capital: -7, time: 4, fatigue: -3 },
+  ],
+  f_confront: [
+    { trust: 8, legitimacy: 6, capital: -6, time: -5, fatigue: 6 },
+    { legitimacy: 8, humanCost: 2, capital: -4, time: -8, fatigue: 5 },
+    { humanCost: -6, legitimacy: -7, trust: -5, capital: -8, time: 4, fatigue: -3 },
+    { trust: 5, legitimacy: 4, humanCost: -3, capital: -5, fatigue: 9 },
+  ],
 };
 
-Object.assign(authoredSceneChoiceEffects, {
-  accounting: authoredSceneChoiceEffects.c1_witness,
-  payday: authoredSceneChoiceEffects.c1_assembly,
-  competitor: authoredSceneChoiceEffects.c1_bargain,
-  board: authoredSceneChoiceEffects.c1_verdict,
-  c2_logs: authoredSceneChoiceEffects.c2_trace,
-  c2_meeting: authoredSceneChoiceEffects.c2_witness,
-  c2_pressure: authoredSceneChoiceEffects.c2_judgment,
-  c3_split: authoredSceneChoiceEffects.c3_rival,
-  c3_score: authoredSceneChoiceEffects.c3_signal,
-  c3_trap: authoredSceneChoiceEffects.c3_verdict,
-  c4_offer: authoredSceneChoiceEffects.c4_audit,
-  c4_leak: authoredSceneChoiceEffects.c4_public,
-  c4_vote: authoredSceneChoiceEffects.c4_verdict,
-  c5_map: authoredSceneChoiceEffects.c5_pattern,
-  c5_blame: authoredSceneChoiceEffects.c5_voice,
-  c5_collapse: authoredSceneChoiceEffects.c5_verdict,
-  f_archive: authoredSceneChoiceEffects.f_witness,
-  f_confront: authoredSceneChoiceEffects.f_dilemma,
-});
+/**
+ * Reaction-scene effects, keyed by the connective scene each one answers.
+ *
+ * Reaction scenes used to reuse the row above them, which made half the graph
+ * the same decision twice. Their own question is who carries the decision
+ * forward, so this is where `fatigue` comes back: handing the work on or
+ * closing the file recovers you and charges someone else.
+ */
+const authoredSceneReactionEffects = {
+  c1_witness: [
+    { trust: 7, legitimacy: 3, time: -5, fatigue: 7 },
+    { time: 5, trust: -5, humanCost: 4, fatigue: -4 },
+    { capital: 5, trust: -3, legitimacy: -4, humanCost: 3, fatigue: -2 },
+  ],
+  c1_assembly: [
+    { legitimacy: 7, trust: 5, capital: -5, fatigue: 6 },
+    { time: 4, trust: -4, humanCost: 4, fatigue: -5 },
+    { trust: -7, legitimacy: -3, humanCost: 5, time: -4, fatigue: 3 },
+  ],
+  c1_bargain: [
+    { trust: 8, humanCost: -4, capital: -7, time: -5, fatigue: 5 },
+    { legitimacy: 6, humanCost: 2, time: -6, fatigue: 4 },
+    { time: 5, trust: -4, humanCost: 3, fatigue: -4 },
+  ],
+  c1_verdict: [
+    { trust: 7, humanCost: -5, capital: -6, fatigue: 6 },
+    { capital: 5, legitimacy: 5, humanCost: 2, time: -5, fatigue: 3 },
+    { time: 4, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -3 },
+  ],
+  c2_trace: [
+    { legitimacy: 7, capital: -4, time: -6, fatigue: 5 },
+    { legitimacy: 4, trust: -3, humanCost: 2, time: -7, fatigue: 6 },
+    { time: 6, capital: -3, legitimacy: -7, humanCost: 6, fatigue: -4 },
+  ],
+  c2_witness: [
+    { trust: 7, legitimacy: 5, time: -6, fatigue: 7 },
+    { trust: 3, humanCost: -2, legitimacy: -3, capital: -4, fatigue: 5 },
+    { time: 5, trust: -7, humanCost: 6, fatigue: -5 },
+  ],
+  c2_judgment: [
+    { legitimacy: 7, trust: 4, time: -5, fatigue: 6 },
+    { legitimacy: 6, trust: -6, humanCost: 5, time: -6, fatigue: 4 },
+    { time: 5, legitimacy: -5, trust: -4, humanCost: 4, fatigue: -4 },
+  ],
+  c3_rival: [
+    { trust: 6, legitimacy: 5, capital: -6, time: -5, fatigue: 4 },
+    { legitimacy: 7, capital: -4, time: -8, fatigue: 5 },
+    { capital: 9, trust: -8, legitimacy: -4, time: 3, fatigue: -2 },
+  ],
+  c3_signal: [
+    { legitimacy: 6, trust: 5, capital: -5, time: -4, fatigue: 5 },
+    { legitimacy: 3, humanCost: 2, time: -3, fatigue: 6 },
+    { capital: 8, trust: -7, humanCost: 5, time: 3, fatigue: -3 },
+  ],
+  c3_verdict: [
+    { trust: 6, legitimacy: 6, time: -6, fatigue: 5 },
+    { legitimacy: 7, trust: 4, humanCost: -3, capital: -6, fatigue: 8 },
+    { time: 5, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
+  ],
+  c4_audit: [
+    { humanCost: -6, trust: 6, capital: -8, time: -4, fatigue: 5 },
+    { legitimacy: 5, humanCost: 3, time: -4, fatigue: 3 },
+    { capital: 6, legitimacy: -4, trust: -5, humanCost: 5, fatigue: -3 },
+  ],
+  c4_public: [
+    { legitimacy: 8, trust: 4, capital: -7, fatigue: 6 },
+    { capital: 6, legitimacy: -5, humanCost: 4, time: 2, fatigue: 2 },
+    { time: 4, trust: -6, legitimacy: -6, humanCost: 3, fatigue: -4 },
+  ],
+  c4_verdict: [
+    { legitimacy: 8, capital: -8, time: -6, fatigue: 7 },
+    { trust: 7, humanCost: -3, legitimacy: -3, capital: -4, fatigue: 5 },
+    { time: 5, trust: -5, legitimacy: -4, humanCost: 5, fatigue: -4 },
+  ],
+  c5_pattern: [
+    { legitimacy: 6, humanCost: -5, capital: -5, time: -8, fatigue: 6 },
+    { legitimacy: 5, trust: -5, humanCost: 4, time: -4, fatigue: 3 },
+    { time: 4, capital: 3, legitimacy: -4, humanCost: 4, fatigue: -4 },
+  ],
+  c5_voice: [
+    { trust: 8, humanCost: -5, capital: -7, fatigue: 6 },
+    { legitimacy: 7, capital: -6, time: -6, fatigue: 7 },
+    { time: 5, trust: -8, legitimacy: -5, humanCost: 6, fatigue: -3 },
+  ],
+  c5_verdict: [
+    { humanCost: -6, trust: 6, capital: -8, fatigue: 5 },
+    { legitimacy: 5, trust: 3, humanCost: 2, time: -4, fatigue: 4 },
+    { time: 5, trust: -6, legitimacy: -3, humanCost: 5, fatigue: -4 },
+  ],
+  f_witness: [
+    { trust: 8, legitimacy: 6, time: -7, fatigue: 6 },
+    { legitimacy: 7, trust: -3, humanCost: 2, time: -5, fatigue: 4 },
+    { humanCost: -4, legitimacy: -8, trust: -4, time: 4, fatigue: -3 },
+  ],
+  f_dilemma: [
+    { trust: 7, legitimacy: 7, time: -8, fatigue: 6 },
+    { legitimacy: 5, humanCost: -4, trust: -4, capital: -5, fatigue: 8 },
+    { time: 5, trust: -7, legitimacy: -6, humanCost: 6, fatigue: -4 },
+  ],
+};
 
 const authoredSceneChoiceCopy = {
   accounting: { voice: ["보호받아야 할 사람의 이름부터 기록하겠습니다.", "원본과 증언을 함께 남기고 다음 판단으로 가겠습니다.", "확인 전 결론은 보류하고 접근 범위를 줄이겠습니다."], echo: ["보호를 먼저 적으면 이후 기록의 책임선이 달라집니다.", "원본을 남기는 선택은 늦어도 되돌릴 수 있습니다.", "보류는 중립이 아니라 접근을 제한하는 결정입니다."] },
-  payday: { voice: ["지급 약속을 공개하고 당사자와 함께 검증하겠습니다.", "현금 흐름과 사람의 손실을 같은 표에 올리겠습니다.", "불만을 숫자로 지우지 않고 협상 조건으로 남기겠습니다."], echo: ["급여표는 돈의 표이면서 신뢰의 기록입니다.", "숫자와 사람을 나누면 다음 장면에서 비용이 돌아옵니다.", "조건을 적어야 약속이 나중에 증언이 됩니다."] },
+  payday: { voice: ["지급 약속을 공개하고 당사자와 함께 검증하겠습니다.", "현금 흐름과 사람의 손실을 같은 표에 올리겠습니다.", "불만을 숫자로 지우지 않고 협상 조건으로 남기겠습니다.", "먼저 깎을 자리는 제 자리라고 적겠습니다."], echo: ["급여표는 돈의 표이면서 신뢰의 기록입니다.", "숫자와 사람을 나누면 다음 장면에서 비용이 돌아옵니다.", "조건을 적어야 약속이 나중에 증언이 됩니다.", "위에서 먼저 깎으면 지급 순서는 설명이 필요 없어집니다."] },
   competitor: { voice: ["경쟁사의 요구를 공개 조건으로 바꾸겠습니다.", "속도보다 누가 무엇을 책임지는지 먼저 묻겠습니다.", "거래의 빈칸마다 되돌릴 조건을 붙이겠습니다."], echo: ["경쟁은 속도를 주지만 책임의 주체를 흐릴 수 있습니다.", "빠른 제안일수록 출처와 책임선을 함께 기록해야 합니다.", "빈칸을 남기면 다음 협상자가 그 비용을 떠안습니다."] },
   board: { voice: ["결론보다 피해를 받는 사람에게 먼저 설명하겠습니다.", "근거와 책임자를 같은 문서에 공개하겠습니다.", "오늘의 합의가 내일의 규칙이 되는지 확인하겠습니다."], echo: ["결론은 설명될 때 비로소 조직의 기록이 됩니다.", "근거 없는 책임은 다음 사건의 희생양을 만듭니다.", "이번 합의에는 다음 사람이 따라야 할 규칙이 남습니다."] },
   c2_logs: { voice: ["공백 전후의 원본 로그를 보존하겠습니다.", "계정의 움직임과 사람의 진술을 대조하겠습니다.", "오류 처리를 서두르지 않고 복구 순서를 공개하겠습니다."], echo: ["짧은 공백도 복원 순서가 없으면 의혹으로 남습니다.", "로그는 행동을 보여주지만 의도까지 대신 말하지는 않습니다.", "복구 순서가 공개돼야 수정이 은폐로 보이지 않습니다."] },
-  c2_meeting: { voice: ["지목된 사람에게 먼저 반박할 권한을 주겠습니다.", "증언과 기록을 서로 검증하는 절차를 만들겠습니다.", "보고서 밖의 사람도 확인 가능한 문장을 남기겠습니다."], echo: ["보호는 침묵시키는 일이 아니라 말할 조건을 만드는 일입니다.", "증언은 기록과 경쟁하지 않고 기록의 빈틈을 드러냅니다.", "보고서 밖의 목소리가 다음 판단의 기준이 될 수 있습니다."] },
+  c2_meeting: { voice: ["지목된 사람에게 먼저 반박할 권한을 주겠습니다.", "증언과 기록을 서로 검증하는 절차를 만들겠습니다.", "보고서 밖의 사람도 확인 가능한 문장을 남기겠습니다.", "지목된 사람과 조건을 걸고 거래하겠습니다."], echo: ["보호는 침묵시키는 일이 아니라 말할 조건을 만드는 일입니다.", "증언은 기록과 경쟁하지 않고 기록의 빈틈을 드러냅니다.", "보고서 밖의 목소리가 다음 판단의 기준이 될 수 있습니다.", "거래는 답을 빨리 주지만 그 답의 값은 나중에 청구됩니다."] },
   c2_pressure: { voice: ["보고 마감보다 사실의 순서를 먼저 고정하겠습니다.", "익명 증언의 위험과 필요를 함께 공개하겠습니다.", "누가 책임을 미뤘는지보다 어떤 장치가 허용했는지 보겠습니다."], echo: ["마감은 중요하지만 잘못 고정된 순서는 더 오래 남습니다.", "익명성은 약점이 아니라 말할 수 있게 하는 비용입니다.", "개인을 지목해도 같은 구조가 반복되면 해결되지 않습니다."] },
   c3_split: { voice: ["고객의 목적과 비용 절감의 목적을 분리해 묻겠습니다.", "경쟁사의 책임 조항을 문장 단위로 확인하겠습니다.", "공동 발표라면 실패했을 때의 책임도 함께 쓰겠습니다."], echo: ["같은 자료가 다른 목적을 섬길 때 기준을 먼저 세워야 합니다.", "책임 조항의 작은 문장이 결론의 방향을 바꿉니다.", "공동 책임은 좋은 말이 아니라 실패 시 작동해야 합니다."] },
-  c3_score: { voice: ["신호를 경보로 단정하기 전에 출처를 확인하겠습니다.", "발표를 잠시 멈추고 고객에게 보이는 사실을 묻겠습니다.", "빠른 승리보다 검증 가능한 조건을 선택하겠습니다."], echo: ["신호는 결론이 아니라 확인할 질문을 만듭니다.", "고객이 본 장면은 내부 점수표보다 먼저 검증돼야 합니다.", "승리의 조건을 적어야 다음 경쟁에서도 기준이 남습니다."] },
+  c3_score: { voice: ["신호를 경보로 단정하기 전에 출처를 확인하겠습니다.", "발표를 잠시 멈추고 고객에게 보이는 사실을 묻겠습니다.", "빠른 승리보다 검증 가능한 조건을 선택하겠습니다.", "신호의 해석을 경쟁자와 나눠 갖겠습니다."], echo: ["신호는 결론이 아니라 확인할 질문을 만듭니다.", "고객이 본 장면은 내부 점수표보다 먼저 검증돼야 합니다.", "승리의 조건을 적어야 다음 경쟁에서도 기준이 남습니다.", "해석을 나누면 위험도 나뉘지만 기준도 함께 흐려집니다."] },
   c3_trap: { voice: ["경보의 주기와 출처를 모두 공개하겠습니다.", "불확실성을 숨기지 않고 발표의 전제로 삼겠습니다.", "결론을 밀기 전에 보안 담당자의 확인을 받겠습니다."], echo: ["반복되는 신호일수록 출처를 확인해야 패턴이 됩니다.", "불확실성을 공개하면 오히려 검증의 범위가 선명해집니다.", "보안 확인은 속도를 늦추지만 잘못된 확신을 막습니다."] },
-  c3_verdict: { voice: ["성과와 책임을 같은 발표문에 넣겠습니다.", "검증이 끝난 부분과 남은 부분을 구분하겠습니다.", "공동 결정의 실패 비용도 공동으로 기록하겠습니다."], echo: ["성과만 남은 발표는 다음 판단의 함정이 됩니다.", "검증된 사실과 추정은 문장부터 나눠야 합니다.", "공동 결정에는 공동으로 감당할 비용이 따라옵니다."] },
   c4_offer: { voice: ["예외 조건의 수혜자와 비용 부담자를 함께 적겠습니다.", "작은 비율의 차이가 누구에게 누적되는지 계산하겠습니다.", "서비스를 유지하되 감사 가능한 조건을 붙이겠습니다."], echo: ["작은 비율도 반복되면 조직의 규칙이 됩니다.", "수혜자와 부담자가 다르면 예외는 먼저 공개돼야 합니다.", "서비스의 명분은 감사 가능한 조건을 가질 때 지켜집니다."] },
-  c4_leak: { voice: ["공개 가능한 사실과 아직 모르는 사실을 나누겠습니다.", "기자의 문장보다 피해 복구의 순서를 먼저 확정하겠습니다.", "보안 결함의 범위와 책임을 함께 설명하겠습니다."], echo: ["모르는 것을 함께 적는 것이 공개의 첫 조건입니다.", "기사의 속도보다 복구 순서가 피해자에게 직접 닿습니다.", "결함을 설명하지 않으면 책임의 방향도 왜곡됩니다."] },
+  c4_leak: { voice: ["공개 가능한 사실과 아직 모르는 사실을 나누겠습니다.", "기자의 문장보다 피해 복구의 순서를 먼저 확정하겠습니다.", "보안 결함의 범위와 책임을 함께 설명하겠습니다.", "기사 시점을 늦추는 대신 전량 공개를 약속하겠습니다."], echo: ["모르는 것을 함께 적는 것이 공개의 첫 조건입니다.", "기사의 속도보다 복구 순서가 피해자에게 직접 닿습니다.", "결함을 설명하지 않으면 책임의 방향도 왜곡됩니다.", "시간을 사면 공개의 범위는 넓어지지만 약속은 되돌릴 수 없습니다."] },
   c4_vote: { voice: ["감사 결과를 보상 기준과 함께 공개하겠습니다.", "좋은 결과가 규칙 위반을 지우지 못하게 하겠습니다.", "예외를 허용한 결정권자의 근거를 남기겠습니다."], echo: ["보상 기준이 공개되면 결과 뒤의 규칙도 보입니다.", "좋은 결과는 규칙을 면제하는 증거가 아닙니다.", "결정권자의 근거가 없으면 예외는 다시 반복됩니다."] },
   c5_map: { voice: ["실패가 모이는 경로부터 다시 그리겠습니다.", "한 사람의 과실과 시스템의 빈틈을 분리하겠습니다.", "피해가 반복된 지점을 개선 예산에 올리겠습니다."], echo: ["실패의 경로를 그리면 비난보다 개입 지점이 보입니다.", "개인의 과실만 남기면 시스템의 빈틈은 계속 작동합니다.", "개선 예산은 피해가 반복된 곳에 먼저 닿아야 합니다."] },
-  c5_blame: { voice: ["말할 수 없었던 사람의 조건부터 복구하겠습니다.", "책임 발표 전에 결정권과 정보 흐름을 공개하겠습니다.", "보상과 조사 일정을 한 번에 약속하겠습니다."], echo: ["침묵의 조건을 고치지 않으면 같은 증언은 다시 사라집니다.", "책임은 결정권과 정보 접근이 확인될 때 구체화됩니다.", "보상과 조사는 서로를 미루는 핑계가 되어서는 안 됩니다."] },
+  c5_blame: { voice: ["말할 수 없었던 사람의 조건부터 복구하겠습니다.", "책임 발표 전에 결정권과 정보 흐름을 공개하겠습니다.", "보상과 조사 일정을 한 번에 약속하겠습니다.", "증언자의 자리를 제 권한으로 보장하겠습니다."], echo: ["침묵의 조건을 고치지 않으면 같은 증언은 다시 사라집니다.", "책임은 결정권과 정보 접근이 확인될 때 구체화됩니다.", "보상과 조사는 서로를 미루는 핑계가 되어서는 안 됩니다.", "개인이 보증한 자리는 그 개인이 사라지면 함께 사라집니다."] },
   c5_collapse: { voice: ["사과문보다 피해 복구의 첫 행동을 정하겠습니다.", "책임자의 이름과 개선 기한을 함께 기록하겠습니다.", "다음 실패를 막는 장치를 지금 결정하겠습니다."], echo: ["사과는 첫 행동이 기록될 때 책임으로 이어집니다.", "이름만 남은 책임은 기한이 없으면 다시 흐려집니다.", "다음 실패를 막는 장치가 없으면 결말은 반복됩니다."] },
   f_archive: { voice: ["이전 참가자의 선택과 조건을 원본 그대로 열겠습니다.", "복제된 문장과 실제 결과를 나란히 비교하겠습니다.", "실험을 멈출 조건을 먼저 기록하겠습니다."], echo: ["이전 기록은 정답지가 아니라 다음 판단의 조건입니다.", "문장이 복제되면 결과가 누구의 것인지 다시 물어야 합니다.", "멈출 조건이 없으면 실험은 책임을 외주화합니다."] },
-  f_confront: { voice: ["관찰된 선택을 숨기지 않고 당사자에게 돌려주겠습니다.", "종료 권한과 감시 규칙을 함께 공개하겠습니다.", "다음 참가자가 바꿀 수 있는 빈칸을 남기겠습니다."], echo: ["관찰은 공개될 때 조작이 아니라 기록이 될 수 있습니다.", "종료 권한 없는 실험은 참가자의 동의로 끝나지 않습니다.", "빈칸을 남기는 일은 다음 판단자에게 책임을 넘기는 방식입니다."] },
+  f_confront: { voice: ["관찰된 선택을 숨기지 않고 당사자에게 돌려주겠습니다.", "종료 권한과 감시 규칙을 함께 공개하겠습니다.", "다음 참가자가 바꿀 수 있는 빈칸을 남기겠습니다.", "실험을 이어가되 다음 참가자 자리에 제 이름을 넣겠습니다."], echo: ["관찰은 공개될 때 조작이 아니라 기록이 될 수 있습니다.", "종료 권한 없는 실험은 참가자의 동의로 끝나지 않습니다.", "빈칸을 남기는 일은 다음 판단자에게 책임을 넘기는 방식입니다.", "자신을 넣는 선택은 실험을 멈추지 않고 관찰자만 한 명 줄입니다."] },
 };
 
-Object.assign(authoredSceneChoiceCopy, {
-  c1_witness: authoredSceneChoiceCopy.accounting,
-  c1_assembly: authoredSceneChoiceCopy.payday,
-  c1_bargain: authoredSceneChoiceCopy.competitor,
-  c1_verdict: authoredSceneChoiceCopy.board,
-  c2_trace: authoredSceneChoiceCopy.c2_logs,
-  c2_witness: authoredSceneChoiceCopy.c2_meeting,
-  c2_judgment: authoredSceneChoiceCopy.c2_pressure,
-  c3_rival: authoredSceneChoiceCopy.c3_split,
-  c3_signal: authoredSceneChoiceCopy.c3_score,
-  c3_verdict: authoredSceneChoiceCopy.c3_trap,
-  c4_audit: authoredSceneChoiceCopy.c4_offer,
-  c4_public: authoredSceneChoiceCopy.c4_leak,
-  c4_verdict: authoredSceneChoiceCopy.c4_vote,
-  c5_pattern: authoredSceneChoiceCopy.c5_map,
-  c5_voice: authoredSceneChoiceCopy.c5_blame,
-  c5_verdict: authoredSceneChoiceCopy.c5_collapse,
-  f_witness: authoredSceneChoiceCopy.f_archive,
-  f_dilemma: authoredSceneChoiceCopy.f_confront,
-});
+/**
+ * Reaction-scene copy, keyed by the connective scene each one answers. These
+ * used to fall back to the parent's lines, so 54 of the player's sentences
+ * repeated verbatim one scene later.
+ */
+const authoredSceneReactionCopy = {
+  c1_witness: { voice: ["보호의 기준을 팀 전체가 읽을 수 있게 적겠습니다.", "오늘은 여기까지 기록하고 판단은 문서에 맡기겠습니다.", "지목된 쪽에도 먼저 답할 자리를 주겠습니다."], echo: ["기준이 공개되면 보호는 특혜가 아니라 절차가 됩니다.", "회의를 닫는 일도 하나의 판단이고, 남은 질문은 사라지지 않습니다.", "먼저 답할 자리를 주면 반박은 빨라지고 검증은 느려집니다."] },
+  c1_assembly: { voice: ["아는 것과 모르는 것을 같은 공지에 적겠습니다.", "숫자가 확정된 뒤에 한 번만 말하겠습니다.", "소문의 출처부터 확인하겠습니다."], echo: ["모르는 것을 적은 공지는 다음 질문의 범위를 좁힙니다.", "한 번에 말하면 정확하지만 그때까지의 불안은 계산되지 않습니다.", "출처를 쫓는 동안 사람들은 자신이 조사 대상이라고 느낍니다."] },
+  c1_bargain: { voice: ["자리에 없는 사람을 협상 테이블로 부르겠습니다.", "조건표를 끝내고 나서 다시 마주 앉겠습니다.", "상대가 돌아올 때까지 아무것도 확정하지 않겠습니다."], echo: ["빈 의자를 채우면 협상은 느려지고 합의는 오래갑니다.", "완성된 조건표는 협상을 지키지만 빠진 사람도 함께 고정합니다.", "기다림은 중립처럼 보이지만 그 시간의 비용은 누군가 냅니다."] },
+  c1_verdict: { voice: ["가장 크게 잃는 사람에게 먼저 설명하겠습니다.", "투자자에게 근거를 먼저 제출하겠습니다.", "회의록에는 결정한 사람만 남기겠습니다."], echo: ["먼저 듣는 사람이 누구인지가 결론의 성격을 정합니다.", "근거가 먼저 가면 돈은 남지만 설명의 순서는 뒤집힙니다.", "이름만 남은 회의록은 다음 사람에게 아무 조건도 남기지 않습니다."] },
+  c2_trace: { voice: ["기록을 그대로 두고 접근만 잠그겠습니다.", "그 계정이 무엇을 했는지 끝까지 따라가겠습니다.", "시스템을 초기화하고 처음부터 다시 세우겠습니다."], echo: ["잠그는 일은 고치는 일이 아니지만 지울 수도 없게 만듭니다.", "계정을 따라가면 원인에 닿지만 사람에게도 닿습니다.", "초기화는 오류와 함께 증거도 지웁니다."] },
+  c2_witness: { voice: ["당사자가 직접 말할 절차를 만들겠습니다.", "제가 대신 진술해 위험을 나누겠습니다.", "보호를 풀고 공식 조사에 맡기겠습니다."], echo: ["직접 말할 절차는 느리지만 그 진술은 대신 무너지지 않습니다.", "대신 말하면 안전해지지만 그 사람의 말은 기록에서 사라집니다.", "보호를 푸는 순간 의심과 기회가 동시에 돌아옵니다."] },
+  c2_judgment: { voice: ["익명을 지키고 그 한계를 함께 쓰겠습니다.", "실명을 확인한 뒤에 보고하겠습니다.", "증언을 빼고 기록만 제출하겠습니다."], echo: ["한계를 적은 증언은 약해 보이지만 반박에도 견딥니다.", "실명은 보고서를 단단하게 하고 증언자를 얇게 만듭니다.", "빼기로 한 문장은 보고서 밖에서 계속 돌아다닙니다."] },
+  c3_rival: { voice: ["공동 검증 조건을 먼저 제안하겠습니다.", "자료의 출처를 확인할 때까지 협상을 멈추겠습니다.", "상대의 안을 이용해 먼저 제출하겠습니다."], echo: ["공동 검증은 승부를 늦추고 기준을 남깁니다.", "멈추는 동안 상대는 계속 움직이지만 근거는 당신 쪽에 쌓입니다.", "먼저 제출하면 이기고, 그 안의 출처는 영원히 당신 것이 아닙니다."] },
+  c3_signal: { voice: ["신호가 무엇인지 모두 앞에서 묻겠습니다.", "발표를 계속하면서 신호를 기록해 두겠습니다.", "신호는 두고 점수부터 확보하겠습니다."], echo: ["공개된 질문은 답이 없어도 기준을 만듭니다.", "기록하면서 계속하는 선택은 아무것도 결정하지 않는 방식이기도 합니다.", "점수를 먼저 챙기면 신호는 다음 사람의 문제가 됩니다."] },
+  c3_verdict: { voice: ["책임표를 함께 작성하겠습니다.", "책임표 맨 위에 제 이름을 적겠습니다.", "성과를 확정한 뒤에 책임을 논의하겠습니다."], echo: ["함께 적은 표는 실패했을 때 실제로 작동합니다.", "맨 위의 이름은 방패가 되지만 그 사람 하나만 방패입니다.", "뒤로 미룬 책임 논의는 대개 열리지 않습니다."] },
+  c4_audit: { voice: ["가장 약한 이용자를 기준으로 삼겠습니다.", "전체 평균을 기준으로 삼겠습니다.", "심사관의 기준을 그대로 따르겠습니다."], echo: ["가장 약한 쪽을 기준으로 잡으면 비용은 즉시, 이득은 나중에 옵니다.", "평균은 공정해 보이지만 평균 밖의 사람은 계속 밖에 있습니다.", "남의 기준을 따르면 빨라지고, 설명할 근거는 남지 않습니다."] },
+  c4_public: { voice: ["모르는 부분까지 넣은 문장을 고르겠습니다.", "서비스가 유지된다는 사실을 앞세우겠습니다.", "논란이 될 표현은 모두 빼겠습니다."], echo: ["모르는 것을 적은 기사에는 다음 질문의 자리가 남습니다.", "유지된다는 문장은 안심을 주고 피해자는 문장 밖에 둡니다.", "다듬은 문장은 오늘 조용하고 내일 다시 열립니다."] },
+  c4_verdict: { voice: ["자료를 공개하고 규칙을 다시 쓰겠습니다.", "제보자를 보호하고 내부에서 정리하겠습니다.", "문을 닫고 심사 결과를 기다리겠습니다."], echo: ["규칙을 다시 쓰면 이번 사건보다 다음 사건이 달라집니다.", "내부 정리는 사람을 지키지만 같은 예외를 다시 허용합니다.", "기다리는 동안 결정은 다른 사람의 책상에서 내려집니다."] },
+  c5_pattern: { voice: ["분류를 폐기하고 처음부터 다시 듣겠습니다.", "가장 큰 승인자부터 조사하겠습니다.", "지도는 두고 빠진 부분만 채우겠습니다."], echo: ["분류를 버리면 느려지지만 빠졌던 목소리가 돌아옵니다.", "승인자를 겨누면 빠르고, 구조는 그대로 남습니다.", "보완만 하면 지도의 틀린 전제도 함께 유지됩니다."] },
+  c5_voice: { voice: ["떠나지 않고도 말할 수 있게 보장하겠습니다.", "증언 직후에 조직을 바꾸겠습니다.", "조직을 지키기 위해 증언을 미루겠습니다."], echo: ["자리를 지키게 하는 보장은 비싸고, 다음 증언자를 만듭니다.", "증언 뒤의 개편은 빠르지만 그 사람은 개편의 이유가 됩니다.", "미룬 증언은 사라지지 않고 다른 사람의 입으로 나옵니다."] },
+  c5_verdict: { voice: ["복구를 발표의 첫 문장으로 두겠습니다.", "책임자의 사과를 먼저 받겠습니다.", "개선 계획이 끝날 때까지 말하지 않겠습니다."], echo: ["복구가 첫 문장이면 사과는 설명이 아니라 약속이 됩니다.", "사과는 형식을 갖추지만 피해는 그 자리에 그대로입니다.", "침묵은 계획을 지키고 기다리는 사람을 잃습니다."] },
+  f_witness: { voice: ["기록을 돌려주고 실험을 처음부터 다시 설명하겠습니다.", "기록은 증거로 두고 동의를 요청하겠습니다.", "기록을 지워 피해를 끝내겠습니다."], echo: ["돌려준 기록은 실험을 흔들고 참가자를 사람으로 되돌립니다.", "동의를 요청하는 순간 실험의 전제가 처음으로 공개됩니다.", "지운 기록은 피해를 멈추고 책임도 함께 지웁니다."] },
+  f_dilemma: { voice: ["종료 조건을 참가자들과 함께 정하겠습니다.", "제가 혼자 버튼을 누르겠습니다.", "버튼을 숨기고 시스템을 지켜보겠습니다."], echo: ["함께 정한 종료 조건은 느리지만 다음 실험에도 남습니다.", "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.", "숨긴 버튼은 통제가 아니라 다음 관찰자의 권한이 됩니다."] },
+};
 
 function getAuthoredSceneEffects(sourceId, id) {
-  const effects = authoredSceneChoiceEffects[sourceId];
+  const table = id.endsWith("_reaction") ? authoredSceneReactionEffects : authoredSceneChoiceEffects;
+  const effects = table[sourceId];
   if (!effects) {
     throw new Error(`Missing authored choice effects for generated scene source: ${sourceId} (${id})`);
   }
@@ -252,12 +424,17 @@ function getAuthoredSceneEffects(sourceId, id) {
 }
 
 function getAuthoredSceneCopy(sourceId, id) {
-  const copy = authoredSceneChoiceCopy[sourceId];
+  const table = id.endsWith("_reaction") ? authoredSceneReactionCopy : authoredSceneChoiceCopy;
+  const copy = table[sourceId];
   if (!copy) {
     throw new Error(`Missing authored choice copy for generated scene source: ${sourceId} (${id})`);
   }
-  return id.endsWith("_reaction") ? copy.reaction ?? copy : copy;
+  return copy;
 }
+
+// The fourth option each case adds is a reframe of the case itself, so it
+// reads as its own cognitive move rather than another risk call.
+const connectiveCognitions = [{ persistence: 1 }, { inference: 1 }, { risk: 1 }, { reframing: 2 }];
 
 function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, labels]) {
   const source = nodes[sourceId];
@@ -278,7 +455,7 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
         label,
         effect: effects[index],
         next: nextId,
-        cognition: index === 0 ? { persistence: 1 } : index === 1 ? { inference: 1 } : { risk: 1 },
+        cognition: connectiveCognitions[index] ?? { reframing: 2 },
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -395,9 +572,9 @@ const authoredBranchScenes = {
     memo: ["협력사 지급 보장", "남겨질 직원의 고용 기간", "인수 이후 책임 주체"],
     triggers: ["protection", "responsibility"],
     choices: [
-      { id: "c1_branch_people_a", label: "남겨질 사람부터 협상서에 적는다", effect: { trust: 7, capital: -6, fatigue: 3 }, next: "c1_branch_people_follow", cognition: { reframing: 2 } },
-      { id: "c1_branch_people_b", label: "협력사 지급일을 먼저 고정한다", effect: { legitimacy: 5, time: -5, trust: 2 }, next: "c1_branch_people_follow", cognition: { inference: 1 } },
-      { id: "c1_branch_people_c", label: "인수 조건만 남기고 서명한다", effect: { capital: 8, trust: -7, fatigue: 4 }, next: "c1_branch_people_follow", cognition: { risk: 2 } },
+      { id: "c1_branch_people_a", label: "남겨질 사람부터 협상서에 적는다", effect: { trust: 7, humanCost: -3, capital: -9, fatigue: 4 }, next: "c1_branch_people_follow", cognition: { reframing: 2 } },
+      { id: "c1_branch_people_b", label: "협력사 지급일을 먼저 고정한다", effect: { legitimacy: 5, time: -5, trust: 2, humanCost: 2 }, next: "c1_branch_people_follow", cognition: { inference: 1 } },
+      { id: "c1_branch_people_c", label: "인수 조건만 남기고 서명한다", effect: { capital: 8, trust: -7, humanCost: 5, fatigue: -2 }, next: "c1_branch_people_follow", cognition: { risk: 2 } },
     ],
   },
   c1_branch_people_follow: {
@@ -408,7 +585,7 @@ const authoredBranchScenes = {
     memo: ["계약서 밖의 이해관계자", "첫 지급 이후의 책임", "약속을 검증할 기록"],
     triggers: ["trust", "responsibility"],
     choices: [
-      { id: "c1_branch_people_follow_a", label: "약속을 공개 기록으로 남긴다", effect: { legitimacy: 6, time: -4, fatigue: 2 }, next: "board", cognition: { inference: 1 } },
+      { id: "c1_branch_people_follow_a", label: "약속을 공개 기록으로 남긴다", effect: { legitimacy: 6, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "board", cognition: { inference: 1 } },
       { id: "c1_branch_people_follow_b", label: "전화한 사람의 조건을 반영한다", effect: { trust: 5, capital: -4, humanCost: -2 }, next: "board", cognition: { reframing: 1 } },
       { id: "c1_branch_people_follow_c", label: "계약서만이 기준이라고 답한다", effect: { capital: 4, trust: -6, legitimacy: -2 }, next: "board", cognition: { risk: 1 } },
     ],
@@ -421,9 +598,9 @@ const authoredBranchScenes = {
     memo: ["원본 로그의 공백", "접속 계정의 순서", "삭제 요청의 승인자"],
     triggers: ["curiosity", "trust"],
     choices: [
-      { id: "c2_branch_records_a", label: "원본과 백업을 동시에 보존한다", effect: { legitimacy: 7, time: -6, fatigue: 3 }, next: "c2_branch_records_follow", cognition: { inference: 2 } },
-      { id: "c2_branch_records_b", label: "접속자의 진술부터 확보한다", effect: { trust: 6, time: -5, legitimacy: 2 }, next: "c2_branch_records_follow", cognition: { persistence: 1 } },
-      { id: "c2_branch_records_c", label: "오류로 표시하고 보고를 진행한다", effect: { time: 5, legitimacy: -7, fatigue: 2 }, next: "c2_branch_records_follow", cognition: { risk: 2 } },
+      { id: "c2_branch_records_a", label: "원본과 백업을 동시에 보존한다", effect: { legitimacy: 7, time: -8, capital: -5, fatigue: 4 }, next: "c2_branch_records_follow", cognition: { inference: 2 } },
+      { id: "c2_branch_records_b", label: "접속자의 진술부터 확보한다", effect: { trust: 6, time: -6, legitimacy: 2, humanCost: -2, fatigue: 4 }, next: "c2_branch_records_follow", cognition: { persistence: 1 } },
+      { id: "c2_branch_records_c", label: "오류로 표시하고 보고를 진행한다", effect: { time: 5, legitimacy: -7, humanCost: 4, fatigue: -3 }, next: "c2_branch_records_follow", cognition: { risk: 2 } },
     ],
   },
   c2_branch_records_follow: {
@@ -434,9 +611,9 @@ const authoredBranchScenes = {
     memo: ["복원 시각", "진술 순서", "보고서에 남길 원문"],
     triggers: ["injustice", "responsibility"],
     choices: [
-      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 6, legitimacy: 3, fatigue: 4 }, next: "c2_final", cognition: { reframing: 1 } },
+      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 6, legitimacy: 3, capital: -5, time: -4, fatigue: 5 }, next: "c2_final", cognition: { reframing: 1 } },
       { id: "c2_branch_records_follow_b", label: "원문을 첨부해 외부 검증을 연다", effect: { legitimacy: 8, capital: -5, time: -4 }, next: "c2_final", cognition: { inference: 2 } },
-      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 4, trust: -6, legitimacy: -4 }, next: "c2_final", cognition: { risk: 1 } },
+      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 4, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -3 }, next: "c2_final", cognition: { risk: 1 } },
     ],
   },
   c3_branch_signal: {
@@ -447,9 +624,9 @@ const authoredBranchScenes = {
     memo: ["신호가 켜진 시각", "고객 계정의 반응", "발표 중단 비용"],
     triggers: ["competition", "curiosity"],
     choices: [
-      { id: "c3_branch_signal_a", label: "신호를 공개 질문으로 전환한다", effect: { trust: 6, legitimacy: 5, time: -5 }, next: "c3_branch_signal_follow", cognition: { reframing: 2 } },
+      { id: "c3_branch_signal_a", label: "신호를 공개 질문으로 전환한다", effect: { trust: 6, legitimacy: 5, time: -6, capital: -5, fatigue: 3 }, next: "c3_branch_signal_follow", cognition: { reframing: 2 } },
       { id: "c3_branch_signal_b", label: "발표를 멈추고 출처를 확인한다", effect: { time: -8, capital: -3, legitimacy: 6 }, next: "c3_branch_signal_follow", cognition: { inference: 2 } },
-      { id: "c3_branch_signal_c", label: "신호를 무시하고 승부를 끝낸다", effect: { capital: 8, trust: -6, fatigue: 3 }, next: "c3_branch_signal_follow", cognition: { risk: 2 } },
+      { id: "c3_branch_signal_c", label: "신호를 무시하고 승부를 끝낸다", effect: { capital: 8, trust: -6, humanCost: 4, fatigue: -2 }, next: "c3_branch_signal_follow", cognition: { risk: 2 } },
     ],
   },
   c3_branch_signal_follow: {
@@ -460,9 +637,9 @@ const authoredBranchScenes = {
     memo: ["승리 발표의 수혜자", "검증되지 않은 보안 항목", "다음 계약의 조건"],
     triggers: ["competition", "order"],
     choices: [
-      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 7, time: -5, fatigue: 2 }, next: "c3_final", cognition: { persistence: 1 } },
+      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 7, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "c3_final", cognition: { persistence: 1 } },
       { id: "c3_branch_signal_follow_b", label: "공동 책임자를 발표한다", effect: { trust: 7, capital: -4, legitimacy: 3 }, next: "c3_final", cognition: { reframing: 1 } },
-      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 7, trust: -7, legitimacy: -3 }, next: "c3_final", cognition: { risk: 1 } },
+      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 7, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -2 }, next: "c3_final", cognition: { risk: 1 } },
     ],
   },
   c4_branch_exception: {
@@ -473,9 +650,9 @@ const authoredBranchScenes = {
     memo: ["예외 승인자", "서비스 이용자 수", "재사용 가능한 조건"],
     triggers: ["order", "injustice"],
     choices: [
-      { id: "c4_branch_exception_a", label: "예외 조건을 누구나 읽게 공개한다", effect: { legitimacy: 8, trust: 3, time: -6 }, next: "c4_branch_exception_follow", cognition: { inference: 1 } },
+      { id: "c4_branch_exception_a", label: "예외 조건을 누구나 읽게 공개한다", effect: { legitimacy: 8, trust: 3, time: -7, capital: -5 }, next: "c4_branch_exception_follow", cognition: { inference: 1 } },
       { id: "c4_branch_exception_b", label: "피해 이용자에게 먼저 보상한다", effect: { humanCost: -5, capital: -7, trust: 6 }, next: "c4_branch_exception_follow", cognition: { reframing: 1 } },
-      { id: "c4_branch_exception_c", label: "이번 사례만 조용히 승인한다", effect: { time: 5, legitimacy: -8, fatigue: 3 }, next: "c4_branch_exception_follow", cognition: { risk: 2 } },
+      { id: "c4_branch_exception_c", label: "이번 사례만 조용히 승인한다", effect: { time: 5, legitimacy: -8, humanCost: 5, fatigue: -3 }, next: "c4_branch_exception_follow", cognition: { risk: 2 } },
     ],
   },
   c4_branch_exception_follow: {
@@ -486,9 +663,9 @@ const authoredBranchScenes = {
     memo: ["감사 요청의 범위", "예외 승인 기록", "보상 기준의 공개 여부"],
     triggers: ["responsibility", "recognition"],
     choices: [
-      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 7, trust: 5, time: -5 }, next: "c4_final", cognition: { inference: 1 } },
+      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 7, trust: 5, time: -6, capital: -6, fatigue: 2 }, next: "c4_final", cognition: { inference: 1 } },
       { id: "c4_branch_exception_follow_b", label: "감사 범위를 이용자 대표와 정한다", effect: { trust: 7, capital: -4, fatigue: 4 }, next: "c4_final", cognition: { reframing: 2 } },
-      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 5, legitimacy: -6, fatigue: 2 }, next: "c4_final", cognition: { risk: 1 } },
+      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 5, legitimacy: -6, humanCost: 4, fatigue: -2 }, next: "c4_final", cognition: { risk: 1 } },
     ],
   },
   c5_branch_owner: {
@@ -499,7 +676,7 @@ const authoredBranchScenes = {
     memo: ["결정권자의 승인", "누락된 안전장치", "피해를 되돌릴 순서"],
     triggers: ["responsibility", "helplessness"],
     choices: [
-      { id: "c5_branch_owner_a", label: "내 승인부터 공개한다", effect: { legitimacy: 7, trust: 4, humanCost: -3 }, next: "c5_branch_owner_follow", cognition: { persistence: 1 } },
+      { id: "c5_branch_owner_a", label: "내 승인부터 공개한다", effect: { legitimacy: 7, trust: 4, humanCost: -3, capital: -6, fatigue: 4 }, next: "c5_branch_owner_follow", cognition: { persistence: 1 } },
       { id: "c5_branch_owner_b", label: "누락된 안전장치를 복구한다", effect: { capital: -6, legitimacy: 6, fatigue: 5 }, next: "c5_branch_owner_follow", cognition: { reframing: 2 } },
       { id: "c5_branch_owner_c", label: "실패를 한 사람의 책임으로 닫는다", effect: { time: 4, trust: -8, humanCost: 6 }, next: "c5_branch_owner_follow", cognition: { risk: 1 } },
     ],
@@ -512,9 +689,9 @@ const authoredBranchScenes = {
     memo: ["복구된 사람", "재발 방지 소유자", "공개할 책임 범위"],
     triggers: ["protection", "responsibility"],
     choices: [
-      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 6, legitimacy: 6, fatigue: 4 }, next: "c5_final", cognition: { inference: 1 } },
+      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 6, legitimacy: 6, capital: -7, fatigue: 5 }, next: "c5_final", cognition: { inference: 1 } },
       { id: "c5_branch_owner_follow_b", label: "재발 방지 장치에 예산을 고정한다", effect: { capital: -8, legitimacy: 7, humanCost: -2 }, next: "c5_final", cognition: { persistence: 2 } },
-      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 5, trust: -6, legitimacy: -4 }, next: "c5_final", cognition: { risk: 1 } },
+      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 5, trust: -6, legitimacy: -4, humanCost: 5, fatigue: -3 }, next: "c5_final", cognition: { risk: 1 } },
     ],
   },
   f_branch_witness: {
@@ -525,9 +702,9 @@ const authoredBranchScenes = {
     memo: ["이전 참가자의 선택", "삭제된 마지막 문장", "기록을 읽는 권한"],
     triggers: ["selfAwareness", "curiosity"],
     choices: [
-      { id: "f_branch_witness_a", label: "빈칸을 참가자들에게 공개한다", effect: { legitimacy: 8, trust: 5, time: -6 }, next: "f_branch_witness_follow", cognition: { inference: 2 } },
+      { id: "f_branch_witness_a", label: "빈칸을 참가자들에게 공개한다", effect: { legitimacy: 8, trust: 5, time: -7, capital: -5 }, next: "f_branch_witness_follow", cognition: { inference: 2 } },
       { id: "f_branch_witness_b", label: "삭제 흔적부터 복원한다", effect: { time: -8, capital: -3, legitimacy: 6 }, next: "f_branch_witness_follow", cognition: { persistence: 1 } },
-      { id: "f_branch_witness_c", label: "기록의 결론만 믿고 넘어간다", effect: { time: 5, trust: -7, fatigue: 3 }, next: "f_branch_witness_follow", cognition: { risk: 2 } },
+      { id: "f_branch_witness_c", label: "기록의 결론만 믿고 넘어간다", effect: { time: 5, trust: -7, humanCost: 4, fatigue: -2 }, next: "f_branch_witness_follow", cognition: { risk: 2 } },
     ],
   },
   f_branch_witness_follow: {
@@ -538,26 +715,55 @@ const authoredBranchScenes = {
     memo: ["열람자의 범위", "재현 가능한 선택", "종료 조건"],
     triggers: ["selfAwareness", "choice"],
     choices: [
-      { id: "f_branch_witness_follow_a", label: "모든 참가자에게 열람 권한을 준다", effect: { legitimacy: 7, trust: 6, time: -5 }, next: "f_choice", cognition: { reframing: 1 } },
+      { id: "f_branch_witness_follow_a", label: "모든 참가자에게 열람 권한을 준다", effect: { legitimacy: 7, trust: 6, time: -6, capital: -5, fatigue: 3 }, next: "f_choice", cognition: { reframing: 1 } },
       { id: "f_branch_witness_follow_b", label: "독립 검토자에게 먼저 맡긴다", effect: { trust: 4, capital: -5, legitimacy: 8 }, next: "f_choice", cognition: { inference: 2 } },
-      { id: "f_branch_witness_follow_c", label: "내 기록만 보관하고 문을 닫는다", effect: { time: 4, trust: -6, legitimacy: -5 }, next: "f_choice", cognition: { risk: 1 } },
+      { id: "f_branch_witness_follow_c", label: "내 기록만 보관하고 문을 닫는다", effect: { time: 4, trust: -6, legitimacy: -5, humanCost: 4, fatigue: -3 }, next: "f_choice", cognition: { risk: 1 } },
     ],
   },
 };
 
+/**
+ * Conditions that decide whether a detour opens on this run.
+ *
+ * Two of the six forks are gated so the detour is not simply a column the
+ * player learns to pick. Both default to open when the context is missing, so
+ * a debug jump or a fresh crawl still reaches the scenes.
+ */
+export const branchConditions = {
+  costAlreadyPaid: {
+    label: "이미 누군가 비용을 치른 뒤에만 열립니다",
+    test: ({ resources } = {}) =>
+      (resources?.humanCost ?? 0) >= 6 || (resources?.legitimacy ?? 100) <= 45,
+  },
+  ruleNotYetClosed: {
+    label: "직전 사건을 규칙으로 닫지 않았을 때만 열립니다",
+    test: ({ previousOutcomeChoiceId } = {}) => previousOutcomeChoiceId !== "c4_after_rule",
+  },
+};
+
+// caseId, source scene, which column carries the detour, the two detour scenes,
+// and the optional condition that has to hold for the detour to open. The
+// column differs per case on purpose: one fixed column would teach the player
+// that the hidden scenes always sit behind the same button.
 const authoredBranchPlans = [
-  ["case01", "competitor", 0, "c1_branch_people", "c1_branch_people_follow"],
+  ["case01", "competitor", 2, "c1_branch_people", "c1_branch_people_follow"],
   ["case02", "c2_meeting", 0, "c2_branch_records", "c2_branch_records_follow"],
-  ["case03", "c3_score", 0, "c3_branch_signal", "c3_branch_signal_follow"],
-  ["case04", "c4_leak", 0, "c4_branch_exception", "c4_branch_exception_follow"],
-  ["case05", "c5_blame", 0, "c5_branch_owner", "c5_branch_owner_follow"],
+  ["case03", "c3_score", 1, "c3_branch_signal", "c3_branch_signal_follow"],
+  ["case04", "c4_leak", 2, "c4_branch_exception", "c4_branch_exception_follow", "costAlreadyPaid"],
+  ["case05", "c5_blame", 1, "c5_branch_owner", "c5_branch_owner_follow", "ruleNotYetClosed"],
   ["final", "f_confront", 0, "f_branch_witness", "f_branch_witness_follow"],
 ];
 
-authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId]) => {
+authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) => {
   const source = nodes[sourceId];
   if (!source || !authoredBranchScenes[firstId] || !authoredBranchScenes[secondId]) return;
-  source.choices[choiceIndex] = { ...source.choices[choiceIndex], next: firstId, branchId: firstId };
+  const bypassNodeId = source.choices[choiceIndex].next;
+  source.choices[choiceIndex] = {
+    ...source.choices[choiceIndex],
+    next: firstId,
+    branchId: firstId,
+    ...(conditionId ? { branchCondition: conditionId, branchBypass: bypassNodeId } : {}),
+  };
   nodes[firstId] = authoredBranchScenes[firstId];
   nodes[secondId] = authoredBranchScenes[secondId];
   const order = nodeOrders[caseId];
@@ -652,8 +858,26 @@ export function getCaseBranchNodes() {
       return new Set(scene.choices.map((choice) => choice.next)).size > 1;
     });
     if (!nodeId) return null;
-    return { caseId, nodeId, nextIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.next))] };
+    return {
+      caseId,
+      nodeId,
+      nextIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.next))],
+      // Named separately from nextIds: the detour is no longer always the first
+      // route out of the fork, because it is no longer always on the first column.
+      detourIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.branchId).filter(Boolean))],
+    };
   }).filter(Boolean);
+}
+
+/**
+ * Where a gated detour choice actually goes on this run. Returns the bypass
+ * route when the condition does not hold, and null when the choice routes
+ * normally, so callers can write `detour ?? choice.next`.
+ */
+export function getBranchDetourBypass(choice = {}, context = {}) {
+  const condition = branchConditions[choice.branchCondition];
+  if (!condition || !choice.branchBypass) return null;
+  return condition.test(context) ? null : choice.branchBypass;
 }
 
 export function getCaseRouteLength(caseId) {

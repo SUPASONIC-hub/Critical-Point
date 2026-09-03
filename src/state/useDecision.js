@@ -140,13 +140,15 @@ export function createChoiceReaders({
     return null;
   }
 
-  function getClueReveal(challengeMatch, riskDelta, responseTimeSec) {
+  function getClueReveal(challengeMatch, riskDelta, responseTimeSec, freeTextSuccess = false) {
     const clue = getDiscoveryClue({
       currentCase,
       challengeMatch,
       riskDelta,
       responseTimeSec,
+      freeTextSuccess,
       logLength: log.length,
+      discoveredClueIds: discoveredClues.map((item) => item.id),
     });
     return clue && !discoveredClues.some((item) => item.id === clue.id) ? clue : null;
   }
