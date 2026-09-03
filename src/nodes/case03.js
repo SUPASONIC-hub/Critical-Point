@@ -117,7 +117,7 @@ export const case03Nodes = {
       {
         id: "c3_score_deep",
         label: "익명 제보자의 신뢰도를 추적한다",
-        effect: { time: -12, legitimacy: 2, humanCost: 3, fatigue: 4 },
+        effect: { time: -12, legitimacy: 6, humanCost: 3, fatigue: 4 },
         next: "c3_trap",
         cognition: { inference: 3 },
       },

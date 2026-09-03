@@ -136,6 +136,19 @@ test("mobile commit console opens inside the viewport", async ({ page }) => {
   expect(track.at(-1)).toBeLessThan(844);
   // Only the open animation may move it, never a scroll chasing it down the page.
   expect(Math.abs(track.at(-1) - track[0])).toBeLessThan(80);
+
+  // Every row the console keeps is a choice card it hides, so its footprint is
+  // a budget too: it was 356px and covered two cards including the selected one.
+  const footprint = await page.evaluate(() => {
+    const box = document.querySelector(".commit-console").getBoundingClientRect();
+    const fullyCovered = [...document.querySelectorAll(".choices .choice")].filter((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1;
+    }).length;
+    return { height: Math.round(box.height), fullyCovered };
+  });
+  expect(footprint.height).toBeLessThan(240);
+  expect(footprint.fullyCovered).toBeLessThanOrEqual(1);
 });
 
 test("intro mobile visual baseline @visual", async ({ page }) => {

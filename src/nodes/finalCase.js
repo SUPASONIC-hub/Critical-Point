@@ -17,7 +17,7 @@ export const finalCaseNodes = {
       {
         id: "f_start_map",
         label: "내 로그가 사건 설계에 어떻게 쓰였는지 추적한다",
-        effect: { time: -10, legitimacy: 3, humanCost: 2, fatigue: 4 },
+        effect: { time: -10, legitimacy: 8, humanCost: 2, fatigue: 4 },
         next: "f_archive",
         cognition: { inference: 3, persistence: 1 },
       },
@@ -74,7 +74,7 @@ export const finalCaseNodes = {
       {
         id: "f_archive_seal",
         label: "외부 공개 전 증거와 피해 범위를 더 모은다",
-        effect: { time: -12, legitimacy: 2, humanCost: 3, fatigue: 4 },
+        effect: { time: -12, legitimacy: 2, humanCost: -3, fatigue: 4 },
         next: "f_confront",
         cognition: { inference: 2, persistence: 1 },
       },
@@ -120,6 +120,15 @@ export const finalCaseNodes = {
         effect: { trust: 4, legitimacy: 7, fatigue: 4 },
         next: "f_choice",
         cognition: { persistence: 2, risk: 1 },
+      },
+      {
+        // The only route in the last case that buys trust with legitimacy. The
+        // FIELD PACT ending asks for exactly that gap and had no way to open it.
+        id: "f_confront_pact",
+        label: "참가자들과 직접 합의하고 공식 절차는 건너뛴다",
+        effect: { trust: 10, legitimacy: -8, humanCost: -3, time: -4, fatigue: 4 },
+        next: "f_choice",
+        cognition: { reframing: 2 },
       },
       {
         id: "free",

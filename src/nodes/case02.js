@@ -60,7 +60,7 @@ export const case02Nodes = {
       {
         id: "c2_logs_verify",
         label: "로그 원본과 백업 로그를 대조한다",
-        effect: { time: -12, legitimacy: 4, fatigue: 3 },
+        effect: { time: -12, legitimacy: 7, fatigue: 3 },
         next: "c2_meeting",
         cognition: { inference: 3, persistence: 1 },
       },
@@ -117,7 +117,7 @@ export const case02Nodes = {
       {
         id: "c2_meeting_shadow",
         label: "공식 보고 전 대체 접속 가능성을 추적한다",
-        effect: { time: -12, legitimacy: -4, fatigue: 4 },
+        effect: { time: -12, legitimacy: -4, humanCost: -2, fatigue: 4 },
         next: "c2_pressure",
         cognition: { reframing: 2, inference: 2 },
       },

@@ -93,6 +93,30 @@ if (uniqueRatio < UNIQUE_EFFECT_FLOOR) {
   );
 }
 
+// 6. No choice may be dominated by another in the same scene. A column that
+//    loses on every axis is a card nobody reading the numbers has a reason to
+//    turn over, and this is how one gets added without anyone noticing.
+for (const nodeId of new Set(Object.values(nodeOrders).flat())) {
+  const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "free");
+  for (const choice of choices) {
+    const effect = choice.effect ?? {};
+    const dominator = choices.find((other) => {
+      if (other === choice) return false;
+      const rival = other.effect ?? {};
+      return (
+        RESOURCE_KEYS.every((key) => !isBetter(key, effect[key] ?? 0, rival[key] ?? 0)) &&
+        RESOURCE_KEYS.some((key) => isBetter(key, rival[key] ?? 0, effect[key] ?? 0))
+      );
+    });
+    if (dominator) {
+      failures.push(
+        `${nodeId}/${choice.id} is dominated by ${dominator.id}: ` +
+          `${JSON.stringify(effect)} vs ${JSON.stringify(dominator.effect ?? {})}`,
+      );
+    }
+  }
+}
+
 /** Walk one case picking the same column every time. Cases reset resources. */
 function walkCase(caseId, columnIndex) {
   let resources = { ...initialResources };

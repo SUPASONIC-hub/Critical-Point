@@ -283,7 +283,7 @@ const authoredSceneReactionEffects = {
   c1_assembly: [
     { legitimacy: 7, trust: 5, capital: -5, fatigue: 6 },
     { time: 4, trust: -4, humanCost: 4, fatigue: -5 },
-    { trust: -7, legitimacy: -3, humanCost: 5, time: -4, fatigue: 3 },
+    { trust: -7, legitimacy: 2, humanCost: 5, time: -4, fatigue: 3 },
   ],
   c1_bargain: [
     { trust: 8, humanCost: -4, capital: -7, time: -5, fatigue: 5 },
@@ -677,7 +677,7 @@ const authoredBranchScenes = {
     triggers: ["responsibility", "helplessness"],
     choices: [
       { id: "c5_branch_owner_a", label: "내 승인부터 공개한다", effect: { legitimacy: 7, trust: 4, humanCost: -3, capital: -6, fatigue: 4 }, next: "c5_branch_owner_follow", cognition: { persistence: 1 } },
-      { id: "c5_branch_owner_b", label: "누락된 안전장치를 복구한다", effect: { capital: -6, legitimacy: 6, fatigue: 5 }, next: "c5_branch_owner_follow", cognition: { reframing: 2 } },
+      { id: "c5_branch_owner_b", label: "누락된 안전장치를 복구한다", effect: { capital: -6, legitimacy: 6, humanCost: -5, fatigue: 5 }, next: "c5_branch_owner_follow", cognition: { reframing: 2 } },
       { id: "c5_branch_owner_c", label: "실패를 한 사람의 책임으로 닫는다", effect: { time: 4, trust: -8, humanCost: 6 }, next: "c5_branch_owner_follow", cognition: { risk: 1 } },
     ],
   },
@@ -905,7 +905,7 @@ const openingSignatureChoices = {
   },
   c5_start_stop: {
     label: "중단 기간의 조용한 피해자부터 보상 대상에 올린다",
-    effect: { humanCost: -6, trust: 5, capital: -8, fatigue: 4 },
+    effect: { humanCost: -6, trust: 5, legitimacy: 5, capital: -8, fatigue: 4 },
     cognition: { persistence: 2 },
     voice: "멈춘 동안 아무 말도 못 한 쪽을 보상 명단의 첫 줄에 적는다.",
     echo: "말하지 않은 피해를 먼저 세면 기준이 생깁니다. 예산은 말한 사람들 몫에서 먼저 깎입니다.",
@@ -943,8 +943,15 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
       const openingChoiceId = choice.id.startsWith(baseNodeId)
         ? `${nodeId}${choice.id.slice(baseNodeId.length)}`
         : `${nodeId}_${choice.id}`;
-      if (choiceVoiceLines[choice.id]) choiceVoiceLines[openingChoiceId] = choiceVoiceLines[choice.id];
-      if (echoReplies[choice.id]) echoReplies[openingChoiceId] = echoReplies[choice.id];
+      // Fall back to the base scene's line only where the opening has not been
+      // written its own: the three branches reach the same decision from
+      // different places, and most of them now say so.
+      if (!choiceVoiceLines[openingChoiceId] && choiceVoiceLines[choice.id]) {
+        choiceVoiceLines[openingChoiceId] = choiceVoiceLines[choice.id];
+      }
+      if (!echoReplies[openingChoiceId] && echoReplies[choice.id]) {
+        echoReplies[openingChoiceId] = echoReplies[choice.id];
+      }
       return { ...choice, id: openingChoiceId };
     });
     const signature = openingSignatureChoices[nodeId];

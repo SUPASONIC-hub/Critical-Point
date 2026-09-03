@@ -2048,9 +2048,10 @@
     padding-top: 4px;
     background: var(--c-ink);
   }
-  /* Room for the panel that is now over the page rather than in it. */
+  /* Room for the panel that is now over the page rather than in it. Folded, it
+     is about a fifth of the viewport instead of the 42% it took open. */
   .game-board.has-commit-console {
-    padding-bottom: 60dvh;
+    padding-bottom: 34dvh;
   }
 }
 .commit-console.unstable,
@@ -3190,4 +3191,18 @@
   .status-board {
     position: static;
   }
+}
+.commit-console-detail > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--c-ink-muted);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.commit-console-detail[open] > summary {
+  margin-bottom: 6px;
 }

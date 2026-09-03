@@ -2,7 +2,9 @@
   position: fixed;
   right: 16px;
   bottom: 16px;
-  z-index: 20;
+  /* Under the commit console. A developer tool must not sit on top of the
+     button the player is trying to press -- it was intercepting the tap. */
+  z-index: 10;
   width: min(360px, calc(100vw - 32px));
   padding: 12px;
   border: 1px solid rgba(138, 180, 255, 0.45);
@@ -2247,3 +2249,16 @@
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  /* The console is over the page here, so every row it keeps is a choice card it
+     hides. The title said what the quote below it already says, and the two
+     actions do not need a line each. */
+  .commit-console-heading {
+    display: none;
+  }
+  .commit-console-actions {
+    flex-direction: row-reverse;
+  }
+}
+

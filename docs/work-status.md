@@ -127,26 +127,49 @@ column to end a case strictly best on some resource; it now requires that no
 column is Pareto-dominated. That is the property the file exists to protect, and
 it does not misfire when two columns both cap a resource at 100.
 
-## Open: third audit (2026-09-03)
+## Third audit (2026-09-03), applied
 
-`docs/design-audit-2026-09-03-round3.md` measured the state the two applied
-passes left. Eight findings, none applied yet. The three that matter:
+`docs/design-audit-2026-09-03-round3.md` found eight things. Seven are applied;
+the eighth is a refactor with its own shape, described at the end.
 
-- The season's only failure ending cannot happen. `SYSTEM COLLAPSE` needs
-  pressure 82 or humanCost 70; across 4,000 random final-case runs the maxima
-  were 33 and 31, because resources reset at the start of every case while the
-  ending thresholds are written for a season-long total. `FIELD PACT` is
-  unreachable for a similar reason, and a quarter of runs end on the fallback.
-- 11 choices are Pareto-dominated inside their own scene, so a player reading the
-  numbers has no reason to pick them. One is an opening choice this repo added
-  last pass, which is what a scene-level version of the balance check would have
-  caught.
-- The commit console that was fixed to the viewport last pass covers two choice
-  cards, 105px of the selected one and 238px of an alternative. Confirming got
-  faster; comparing got slower.
+- **The failure ending can happen (E-1).** `collapse` asked for pressure 82 or
+  humanCost 70 while resources reset at every case start, so a single case peaked
+  at 33 and 31 across 4,000 runs. The ruling reads the season now: the human cost
+  each case ended on, added up, and the highest pressure any case reached. Case
+  summaries carry `finalHumanCost` and `peakRiskPressure` for it. Thresholds are
+  52 peak pressure or 150 season human cost -- reached by a run that keeps
+  offloading cost, or by one that protects everyone until nothing is left.
+- **FIELD PACT can happen (E-2).** It asked for high trust with low legitimacy,
+  which the final case could not produce because its two rise together. It
+  compares them against each other now, and `f_confront` gained the one route in
+  the last case that buys trust with legitimacy.
+- **The fallback ending reads the run (E-3).** A quarter of runs reach it and it
+  was one line for all of them. It has three forms, named for whichever of trust,
+  legitimacy or capital the run ended holding.
+- **No dead choices (D-1).** 11 choices lost to a sibling on every axis. Each was
+  given the thing its own label is good at, and `check-balance` now runs its
+  domination test inside every scene as well as between the columns of a case.
+- **Every choice has its own line (D-2).** 45 branch-opening lines were written,
+  so the three openings of a case no longer say the same sentences: all 320
+  choices now have a unique voice line and a unique echo reply, up from 274.
+- **The commit console stops covering the board (U-1, U-2).** Its observer
+  preview and resource forecast fold behind a summary, the title row and the
+  stacked action buttons collapse on a phone, and it is 213px instead of 356px --
+  one card behind it instead of two including the one just selected. The page
+  padding while it is open drops from 60dvh to 34dvh.
 
-It also closes P-2 with a second measurement -- see "P-2 종결 기록" in that
-document, and the P-2 section above.
+`npm run check:endings` is new: it walks 6,000 random seasons and fails if any of
+the nine endings has become unreachable, which is the shape of bug that hid two
+of them.
+
+**Still open: M-1, splitting the intro out of AppContent.** The entry chunk is
+453KB of source, of which AppContent is 98KB, gameData 62KB and gameDialogue
+22KB. Nothing can be deferred while AppContent renders the intro, because its
+import graph is what pulls the scene graph into the first load. The change is to
+move the play and result derivations into a runtime component that mounts after
+the intro, leaving a shell that owns pre-start state. That is a session of its
+own, not a step inside another one, and the 30KB gzipped it would recover does
+not justify doing it carelessly at the end of a long pass.
 
 ## Maintenance Priorities
 

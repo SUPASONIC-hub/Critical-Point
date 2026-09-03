@@ -235,6 +235,21 @@ function isAlreadyRecordedConsoleError(text) {
 export
 const caseSequence = CASE_SEQUENCE;
 
+/**
+ * What the season has cost so far, for the closing ruling.
+ *
+ * Every case starts from the same resources, so the last case alone never
+ * reaches the thresholds the ending is written against. This adds up the human
+ * cost each case ended on and takes the highest pressure any case reached.
+ */
+function getSeasonStrain(caseResults = {}, pending = null) {
+  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
+  return {
+    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
+    peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
+  };
+}
+
 /** The decision window, and how often overtime is billed once it closes. */
 const DECISION_WINDOW_SECONDS = 45;
 const OVERTIME_CHARGE_SECONDS = 15;
@@ -1634,10 +1649,18 @@ export function AppContent({ onSuppressSaves }) {
       ? Array.from(new Set([...completedCases, currentCase]))
       : completedCases;
     const completedNow = nextCompletedCases !== completedCases;
+    const caseSummaryDraft = completedNow
+      ? buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo)
+      : null;
     const caseSummary = completedNow
       ? {
-          ...buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo),
-          endingVariant: getEndingVariant({ resources: finalResourcesWithTempo, discoveredClues: nextDiscoveredClues, log: nextLog }),
+          ...caseSummaryDraft,
+          endingVariant: getEndingVariant({
+            resources: finalResourcesWithTempo,
+            discoveredClues: nextDiscoveredClues,
+            log: nextLog,
+            ...getSeasonStrain(caseResults, caseSummaryDraft),
+          }),
           runId,
           outcomeChoiceId: entry.choiceId,
           outcomeNodeId: entry.nodeId,
@@ -2148,8 +2171,8 @@ export function AppContent({ onSuppressSaves }) {
     });
   }, [triggers, cognition, log, resources]);
   const endingVariant = useMemo(
-    () => getEndingVariant({ resources, discoveredClues, log }),
-    [discoveredClues, log, resources],
+    () => getEndingVariant({ resources, discoveredClues, log, ...getSeasonStrain(caseResults) }),
+    [caseResults, discoveredClues, log, resources],
   );
   const latestChoiceFeedback = getChoiceOutcomeFeedback(log.at(-1));
   const endingPreview = getEndingPreview(endingVariant);

@@ -681,22 +681,30 @@ export function PlayScreen({ view }) {
                 <span>예상 위험 <b>{formatForecastRisk(pendingChoiceForecast)}</b></span>
                 <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
               </div>
-              {getObserverPreviewForChoice(pendingChoice.id) && (
-                <div className="commit-observer-preview">
-                  <span>{getObserverPreviewForChoice(pendingChoice.id).tag.label}</span>
-                  <p>{getObserverPreviewForChoice(pendingChoice.id).text}</p>
+              {/* Folded by default: open, the console covered two choice cards,
+                  so comparing the alternatives meant scrolling past the panel
+                  asking you to commit. */}
+              <details className="commit-console-detail">
+                <summary>
+                  <span>관찰자 반응과 예상 자원</span>
+                </summary>
+                {getObserverPreviewForChoice(pendingChoice.id) && (
+                  <div className="commit-observer-preview">
+                    <span>{getObserverPreviewForChoice(pendingChoice.id).tag.label}</span>
+                    <p>{getObserverPreviewForChoice(pendingChoice.id).text}</p>
+                  </div>
+                )}
+                <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
+                  <span>예상 자원</span>
+                  {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
+                    .filter(([, value]) => value !== 0)
+                    .map(([key, value]) => (
+                      <b key={key} className={isGainForPlayer(key, value) ? "positive" : "negative"}>
+                        {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
+                      </b>
+                    ))}
                 </div>
-              )}
-              <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
-                <span>예상 자원</span>
-                {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
-                  .filter(([, value]) => value !== 0)
-                  .map(([key, value]) => (
-                    <b key={key} className={isGainForPlayer(key, value) ? "positive" : "negative"}>
-                      {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
-                    </b>
-                  ))}
-              </div>
+              </details>
               <div className="commit-console-actions">
                 <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
                   다시 고르기

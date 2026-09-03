@@ -197,6 +197,52 @@ export const choiceVoiceLines = {
   f_confront_destroy: "내 기록을 잃더라도, 이 구조는 남기지 않겠다고 말한다.",
   f_confront_reform: "숨기는 대신 쓰는 방법을 내가 쓰겠다고 나선다.",
   f_confront_seal: "더 쓰이지 않게 하겠다며, 내 기록에 자물쇠를 건다.",
+  f_confront_pact: "승인 절차를 기다리지 않고, 참가자들과 직접 약속을 맺는다.",
+  c2_start_people_report: "지난번엔 사람을 먼저 적었으니, 이번엔 기록부터 올려보겠다고 말한다.",
+  c2_start_people_meet: "또 사람부터 만나는 사람이 되겠다며, 이민서에게 먼저 연락한다.",
+  c2_start_people_verify: "보호가 감정이 아니었다는 걸 증명하려고, 원본 로그부터 다시 연다.",
+  c2_start_records_report: "내가 공개한 숫자로 시작한 사건이니, 기록으로 끝내겠다고 말한다.",
+  c2_start_records_meet: "숫자만으로는 알 수 없는 게 있다며, 이민서를 먼저 만난다.",
+  c2_start_records_verify: "내가 낸 자료가 조작의 재료가 됐는지부터 확인한다.",
+  c2_start_silence_report: "이번엔 늦지 않겠다며, 가진 것만으로 먼저 보고를 올린다.",
+  c2_start_silence_meet: "말하지 않아 생긴 일이라며, 이번엔 당사자를 먼저 찾아간다.",
+  c2_start_silence_verify: "숨긴 조건이 유출 파일에 있는지부터 원본으로 확인한다.",
+  c3_start_audit_fast: "복원해 둔 기록이 있으니 속도로도 진다고 생각하지 않는다.",
+  c3_start_audit_deep: "기록을 복원한 사람답게, 이번에도 결함부터 끝까지 본다.",
+  c3_start_audit_mirror: "오진우가 무엇을 지웠을지부터 추정해 대응안을 짠다.",
+  c3_start_person_fast: "사람을 지킨 대가를 속도로 갚겠다며 먼저 안을 낸다.",
+  c3_start_person_deep: "한 번 믿은 사람을 다시 의심하지 않기 위해, 결함 쪽을 판다.",
+  c3_start_person_mirror: "오진우가 그 보호를 어떻게 쓸지 먼저 계산한다.",
+  c3_start_public_fast: "경보를 낸 쪽이 느리면 안 된다며 결론을 먼저 낸다.",
+  c3_start_public_deep: "알린 사람이 증명도 해야 한다며 결함 검증을 끝까지 간다.",
+  c3_start_public_mirror: "경보를 이용하려는 쪽의 수부터 읽는다.",
+  c4_start_joint_approve: "같이 만든 안을 살리려면 여기서 한 칸 넓혀야 한다고 판단한다.",
+  c4_start_joint_refuse: "공동안이라도 숫자를 바꿀 수는 없다고 못박는다.",
+  c4_start_joint_contain: "넓히되 그 넓힌 만큼을 문서로 묶자고 제안한다.",
+  c4_start_proof_approve: "정직했던 대가가 서비스 중단이면 안 된다며 기준을 넓힌다.",
+  c4_start_proof_refuse: "결함을 공개한 사람이 산식을 손댈 수는 없다고 말한다.",
+  c4_start_proof_contain: "공개했던 방식 그대로, 조건과 검증을 함께 건다.",
+  c4_start_win_approve: "이겨본 방식대로, 결과부터 만들고 설명은 뒤에 붙인다.",
+  c4_start_win_refuse: "이겼기 때문에 더 지켜야 한다며 지표를 그대로 낸다.",
+  c4_start_win_contain: "이긴 방식에 감시를 붙여 다음 사람도 쓸 수 있게 만든다.",
+  c5_start_rule_blame: "내가 만든 기준을 지킨 사람을 조사해야 하는지 물으며 이름을 부른다.",
+  c5_start_rule_map: "기준이 어디서 현장을 막았는지 흐름부터 그린다.",
+  c5_start_rule_redesign: "기준을 잠시 내려놓고 손으로 돌리자고 결정한다.",
+  c5_start_service_blame: "서비스를 지킨 예외가 여기까지 왔다는 걸 알면서 책임자를 부른다.",
+  c5_start_service_map: "지킨 서비스가 누구를 밀어냈는지 전체 흐름을 편다.",
+  c5_start_service_redesign: "유지가 목적이었으니 유지 방식을 바꾸자고 말한다.",
+  c5_start_stop_blame: "멈춘 결정은 내가 했으니 실행의 책임부터 확인하겠다고 말한다.",
+  c5_start_stop_map: "멈춘 동안 무엇이 어디서 끊겼는지 지도부터 그린다.",
+  c5_start_stop_redesign: "멈춘 걸 다시 세우는 게 먼저라며 수동 체계로 돌린다.",
+  f_start_owner_map: "내 이름이 올라간 기록이 어디로 갔는지부터 따라간다.",
+  f_start_owner_expose: "책임을 진 사람이 침묵할 수는 없다며 공개를 준비한다.",
+  f_start_owner_contain: "책임을 함께 적은 사람에게 먼저 설명을 요구한다.",
+  f_start_system_map: "내가 고친 구조가 실험에 어떻게 쓰였는지 추적한다.",
+  f_start_system_expose: "구조를 고친 사람으로서 이 구조도 공개해야 한다고 말한다.",
+  f_start_system_contain: "새 규칙이 여기서도 지켜졌는지 내부에 먼저 묻는다.",
+  f_start_name_map: "내가 적은 이름이 실험에서 어떻게 쓰였는지 따라간다.",
+  f_start_name_expose: "한 사람에게 지웠던 것을 이번엔 밖으로 낸다.",
+  f_start_name_contain: "이름을 적게 만든 절차부터 안에서 설명받겠다고 한다.",
 };
 
 export const choiceSubtexts = {
@@ -511,4 +557,96 @@ export const authoredEchoReplies = {
     "규칙을 직접 쓰면 통제권이 옵니다. 그 규칙의 첫 적용 대상도 당신입니다.",
   f_confront_seal:
     "봉인은 당신을 지킵니다. 봉인된 기록은 다음 참가자를 지키는 데도 쓰이지 못합니다.",
+  f_confront_pact:
+    "직접 맺은 약속은 가장 빨리 지켜집니다. 그 약속을 검증할 사람이 당신뿐이라는 것도 같이 남습니다.",
+  c2_start_people_report:
+    "지난 사건에서 사람을 먼저 세운 사람이 이번엔 기록을 먼저 냅니다. 그 전환을 팀도 봅니다.",
+  c2_start_people_meet:
+    "같은 방식을 두 번 쓰면 원칙이 됩니다. 원칙은 예측 가능해지고, 예측 가능한 것은 이용됩니다.",
+  c2_start_people_verify:
+    "지난번의 보호를 정당화하려면 이번 검증은 더 엄격해야 합니다. 그 부담은 당신 몫입니다.",
+  c2_start_records_report:
+    "공개한 숫자가 사건의 입구가 됐습니다. 같은 방식으로 닫으면 책임의 선이 분명해집니다.",
+  c2_start_records_meet:
+    "숫자를 공개한 사람이 사람을 만나러 가면, 조직은 그 전환의 이유를 묻습니다.",
+  c2_start_records_verify:
+    "자신이 공개한 자료를 의심하는 일은 느립니다. 그러나 그 순서를 건너뛰면 나머지 판단이 다 흔들립니다.",
+  c2_start_silence_report:
+    "지난번의 침묵이 이번의 속도를 만듭니다. 서두른 보고가 또 다른 침묵을 덮지 않도록 하십시오.",
+  c2_start_silence_meet:
+    "미룬 말은 사라지지 않고 상대에게 도착합니다. 지금 만나는 것은 사과가 아니라 순서의 수정입니다.",
+  c2_start_silence_verify:
+    "당신이 말하지 않은 것이 남의 손에 먼저 있습니다. 검증의 결과가 자신을 향할 수도 있습니다.",
+  c3_start_audit_fast:
+    "근거가 있는 속도는 다릅니다. 다만 상대는 그 근거를 읽지 않고 결론만 봅니다.",
+  c3_start_audit_deep:
+    "복원의 습관이 검증의 습관이 됩니다. 두 번 다 느렸다는 평가도 함께 쌓입니다.",
+  c3_start_audit_mirror:
+    "지운 흔적을 찾아본 사람은 상대의 공백을 먼저 봅니다. 그 시선이 이번엔 추측이 됩니다.",
+  c3_start_person_fast:
+    "보호의 비용을 성과로 덮으려는 선택입니다. 덮은 비용은 사라지지 않고 자리를 옮깁니다.",
+  c3_start_person_deep:
+    "사람을 믿은 판단을 지키려면 다른 곳에서 근거를 더 가져와야 합니다.",
+  c3_start_person_mirror:
+    "상대는 이미 당신의 지난 결정을 자료로 씁니다. 대응은 늦게 시작됩니다.",
+  c3_start_public_fast:
+    "먼저 알린 사람에게는 먼저 답할 의무가 붙습니다. 그 의무가 속도를 강제합니다.",
+  c3_start_public_deep:
+    "공개는 시작이고 증명은 부담입니다. 지금 멈추면 경보만 남습니다.",
+  c3_start_public_mirror:
+    "공개된 위험은 모두의 자원이 됩니다. 상대가 먼저 쓰기 전에 읽어야 합니다.",
+  c4_start_joint_approve:
+    "공동안이 예외의 명분이 됩니다. 파트너도 같은 명분을 다음에 씁니다.",
+  c4_start_joint_refuse:
+    "함께 만든 것을 함께 포기하는 일입니다. 파트너가 같은 선택을 할지는 별개입니다.",
+  c4_start_joint_contain:
+    "공동 작업에는 공동 감시가 따라야 합니다. 어느 쪽도 혼자 풀 수 없게 됩니다.",
+  c4_start_proof_approve:
+    "정직의 비용을 예외로 메우는 선택입니다. 두 기록이 같은 파일에 남습니다.",
+  c4_start_proof_refuse:
+    "일관성은 가장 비싼 자산입니다. 이번에는 서비스가 그 값을 냅니다.",
+  c4_start_proof_contain:
+    "지난번의 공개가 이번 조건의 신뢰를 만듭니다. 조건을 어기면 둘 다 잃습니다.",
+  c4_start_win_approve:
+    "성공의 기억이 기준을 미리 넓혀 둡니다. 그 기억은 다음 예외도 승인합니다.",
+  c4_start_win_refuse:
+    "승자가 규칙을 지키면 규칙이 강해집니다. 이번 손실은 그 값입니다.",
+  c4_start_win_contain:
+    "성공을 조건과 함께 넘기면 재현 가능해집니다. 재현 가능한 것은 검증도 가능합니다.",
+  c5_start_rule_blame:
+    "기준을 만든 사람이 그 기준을 따른 사람을 조사합니다. 순서가 이상하다는 것을 모두가 압니다.",
+  c5_start_rule_map:
+    "자기 규칙의 실패를 그리는 일은 느리고 정확합니다. 그 사이 피해는 계속됩니다.",
+  c5_start_rule_redesign:
+    "만든 규칙을 스스로 끄는 선택입니다. 다시 켤 조건을 지금 적어야 합니다.",
+  c5_start_service_blame:
+    "예외를 승인한 것은 당신이고 실행한 것은 그 사람입니다. 조사는 한쪽에서만 시작됩니다.",
+  c5_start_service_map:
+    "지킨 것을 세는 표와 밀려난 사람을 세는 표는 다릅니다. 두 표를 겹쳐야 실패가 보입니다.",
+  c5_start_service_redesign:
+    "임시 체계는 서비스를 살립니다. 임시가 길어지면 그것이 기준이 됩니다.",
+  c5_start_stop_blame:
+    "중단을 승인한 사람이 중단의 책임을 묻습니다. 답하는 쪽은 그 순서를 기억합니다.",
+  c5_start_stop_map:
+    "중단의 공백은 기록이 얇습니다. 그리는 동안 조용한 피해가 계속 쌓입니다.",
+  c5_start_stop_redesign:
+    "복구가 조사보다 앞섭니다. 원인은 복구된 시스템 위에서 찾아야 합니다.",
+  f_start_owner_map:
+    "책임을 적은 사람의 기록은 가장 많이 인용됩니다. 인용의 경로가 곧 실험의 설계도입니다.",
+  f_start_owner_expose:
+    "이름을 걸었던 사람의 공개는 무겁습니다. 그 무게가 다음 참가자에게도 걸립니다.",
+  f_start_owner_contain:
+    "안에서 먼저 묻는 것은 관계를 지킵니다. 그 관계가 답을 늦추는 이유가 되기도 합니다.",
+  f_start_system_map:
+    "고친 구조가 실험의 도구가 됐다면, 개선과 이용의 경계를 다시 그려야 합니다.",
+  f_start_system_expose:
+    "규칙을 만든 사람의 폭로는 규칙의 신뢰를 흔듭니다. 그래도 이 규칙은 공개돼야 합니다.",
+  f_start_system_contain:
+    "자기 규칙의 적용을 묻는 일입니다. 아니라는 답이 오면 규칙은 형식이었습니다.",
+  f_start_name_map:
+    "지목은 사건을 닫았지만 데이터로는 열려 있었습니다. 그 경로를 보는 것이 첫 수습입니다.",
+  f_start_name_expose:
+    "지목으로 닫은 사람이 공개로 여는 일입니다. 두 결정이 같은 기록에 나란히 남습니다.",
+  f_start_name_contain:
+    "절차를 물으면 절차가 답합니다. 지목당한 사람은 그 답에 포함되지 않습니다.",
 };
