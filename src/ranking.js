@@ -33,12 +33,19 @@ function normalizeEntry(row = {}) {
       : reflectionScore >= 55
         ? "SYSTEM THINKER"
         : "FIELD DECIDER";
+  const isLocal = Boolean(row.local);
+  const runLabel = runId ? `RUN ${String(runId).slice(-8).toUpperCase()}` : "LOCAL RUN";
   return {
     id: `${runId || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     runId,
-    runLabel: runId ? `RUN ${String(runId).slice(-8).toUpperCase()}` : "LOCAL RUN",
+    runLabel,
     sessionCode: row.session_code ?? "LOCAL",
-    name: row.local ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
+    isLocal,
+    name: isLocal ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
+    // Every remote row carries the same anonymous name, so the row is headed by
+    // what the run did and identified by its own run label instead.
+    headline: isLocal ? String(row.player_name || "현재 분석관").slice(0, 24) : style,
+    handle: isLocal ? runLabel : `${runLabel} · 익명`,
     caseId: row.case_id ?? "case01",
     caseTitle: row.case_title ?? row.case_id ?? "CASE",
     completedAt: row.completed_at ?? "",
@@ -103,7 +110,7 @@ export function getLeaderboardHeadline(entries = []) {
   }
   const leader = entries[0];
   return {
-    title: `${leader.name}이(가) 현재 기준선을 세웠습니다.`,
+    title: `${leader.isLocal ? leader.name : `${leader.name} (${leader.style})`}이(가) 현재 기준선을 세웠습니다.`,
     text: `${leader.caseTitle}에서 ${leader.score}점과 ${leader.rank} 랭크를 기록했습니다.`,
   };
 }

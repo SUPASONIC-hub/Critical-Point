@@ -5,3 +5,20 @@ services:
     buildCommand: npm ci --include=dev && npm run verify:static && npm run build
     staticPublishPath: ./dist
     autoDeploy: true
+    # Declared here without values so the keys survive a service rebuild. Set
+    # them in the Render dashboard; when they are missing the app silently runs
+    # with telemetry and the remote leaderboard switched off.
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    headers:
+      # Vite fingerprints everything under assets/, so those files never change
+      # behind a given name.
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache

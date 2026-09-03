@@ -62,9 +62,9 @@ export function RankingScreen({
                   <article className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
                     <strong className="ranking-position">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
-                      <b>{entry.name}</b>
-                      <span className="ranking-style-badge">{entry.style}</span>
+                      <b>{entry.headline}</b>
                       <span className="ranking-league-badge">{entry.league}</span>
+                      <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
                       <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
@@ -89,7 +89,7 @@ export function RankingScreen({
             )}
           </section>
           <p className="ranking-footnote">
-            이름은 데이터 제공 동의가 있는 완료 기록에만 표시되며, 원격 연결이 없으면 이 브라우저의 로컬 기록만 집계합니다.
+            다른 참가자는 이름 대신 판단 유형과 실행 번호로 구분됩니다. 이름은 이 브라우저의 기록에만 표시되며, 원격 연결이 없으면 로컬 기록만 집계합니다.
           </p>
         </section>
       </main>
