@@ -73,7 +73,18 @@ export function IntroScreen({ view }) {
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
           <StudioCredit />
           <section className="start-priority" aria-label="게임 시작 준비">
-          <div className="start-panel">
+          <div className="start-console-heading">
+            <div>
+              <span>CASE ACCESS SETUP</span>
+              <h2>기록 진입 설정</h2>
+            </div>
+            <small>분석관 이름, 판단 프로토콜, 기록의 출발점을 확정한 뒤 첫 사건으로 들어갑니다.</small>
+          </div>
+          <div className="start-panel start-console-section">
+            <div className="start-section-heading">
+              <span>01 IDENTITY</span>
+              <strong>분석관 호출명</strong>
+            </div>
             {hasResumableSave && (
               <div className="resume-panel">
                 <div>
@@ -166,10 +177,44 @@ export function IntroScreen({ view }) {
             </div>
             )}
           </div>
+          </section>
+          <section className="prestart-briefing" aria-label="시작 전 브리핑">
+            <div className="prestart-heading">
+              <div>
+                <span>PRE-START BRIEFING</span>
+                <h2>시작 전에 알아둘 것</h2>
+              </div>
+              <small>첫 사건의 상황과 판단 흐름을 먼저 확인한 뒤 플레이 조건을 고릅니다.</small>
+            </div>
+            <div className="prestart-grid">
+              <article>
+                <span>첫 사건</span>
+                <b>{seasonCasesBase[0].title}</b>
+                <p>{caseObjectives.case01}</p>
+              </article>
+              <article>
+                <span>관찰 목표</span>
+                <b>손실 배분 순서</b>
+                <p>{triggerLabSignals.case01}</p>
+              </article>
+              <article>
+                <span>다음 압박</span>
+                <b>기록은 다음 사건으로 이동한다</b>
+                <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
+              </article>
+            </div>
+            {tutorialSteps && (
+              <div className="prestart-tutorial">
+                <span>FIRST RUN PROTOCOL</span>
+                <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
+              </div>
+            )}
+          </section>
+          <section className="start-options" aria-label="게임 시작 선택 설정">
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
               <div>
-                <span>ANALYST PROTOCOL</span>
+                <span>02 ANALYST PROTOCOL</span>
                 <h2>어떤 방식으로 판단할까요?</h2>
               </div>
               <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
@@ -195,6 +240,35 @@ export function IntroScreen({ view }) {
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
+          {operatorProfiles?.length > 0 && (
+            <section className="operator-origin-panel start-console-section" aria-label="주인공 출신과 권한 선택">
+              <div className="panel-title-row">
+                <div>
+                  <span>03 OPERATOR ORIGIN</span>
+                  <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
+                </div>
+                <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
+              </div>
+              <div className="operator-origin-grid">
+                {operatorProfiles.map((profile) => (
+                  <button
+                    type="button"
+                    key={profile.id}
+                    className={operatorOrigin === profile.id ? "operator-origin selected" : "operator-origin"}
+                    onClick={() => setOperatorOrigin(profile.id)}
+                    aria-pressed={operatorOrigin === profile.id}
+                  >
+                    <span>{profile.label}</span>
+                    <strong>{profile.title}</strong>
+                    <p>{profile.premise}</p>
+                    <small>{profile.authority}</small>
+                  </button>
+                ))}
+              </div>
+              <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
+              {originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
+            </section>
+          )}
           </section>
           <figure className="intro-visual">
             <picture>
@@ -226,58 +300,6 @@ export function IntroScreen({ view }) {
               설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
             </p>
           </div>
-          <section className="intro-brief" aria-label="첫 케이스 브리핑">
-            <article>
-              <span>첫 사건</span>
-              <b>{seasonCasesBase[0].title}</b>
-              <p>{caseObjectives.case01}</p>
-            </article>
-            <article>
-              <span>관찰 항목</span>
-              <b>손실 배분 순서</b>
-              <p>{triggerLabSignals.case01}</p>
-            </article>
-            <article>
-              <span>다음 압박</span>
-              <b>기록은 다음 사건으로 이동한다</b>
-              <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
-            </article>
-          </section>
-          {operatorProfiles?.length > 0 && (
-            <section className="operator-origin-panel" aria-label="주인공 출신과 권한 선택">
-              <div className="panel-title-row">
-                <div>
-                  <span>OPERATOR ORIGIN</span>
-                  <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
-                </div>
-                <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
-              </div>
-              <div className="operator-origin-grid">
-                {operatorProfiles.map((profile) => (
-                  <button
-                    type="button"
-                    key={profile.id}
-                    className={operatorOrigin === profile.id ? "operator-origin selected" : "operator-origin"}
-                    onClick={() => setOperatorOrigin(profile.id)}
-                    aria-pressed={operatorOrigin === profile.id}
-                  >
-                    <span>{profile.label}</span>
-                    <strong>{profile.title}</strong>
-                    <p>{profile.premise}</p>
-                    <small>{profile.authority}</small>
-                  </button>
-                ))}
-              </div>
-              <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
-              {originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
-            </section>
-          )}
-          {tutorialSteps && (
-            <section className="tutorial-path" aria-label="첫 플레이 안내">
-              <span>FIRST RUN PROTOCOL</span>
-              <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
-            </section>
-          )}
           {playStyleUnlocks && (
             <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
           )}

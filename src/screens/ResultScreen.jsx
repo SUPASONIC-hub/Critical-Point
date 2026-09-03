@@ -14,7 +14,7 @@ export function ResultScreen({ view }) {
       skipEndingQuietHold,
     },
     score: {
-      caseResults, decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result,
+      decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result,
       caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp,
       easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
       routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount,
@@ -36,12 +36,10 @@ export function ResultScreen({ view }) {
       debugToolsEnabled, showErrorLog, setShowErrorLog,
     },
   } = view;
-  const firstCaseChoice = caseResults.case01?.outcomeChoiceId ?? "기록 없음";
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0];
   const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0];
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
-  const taggedRouteEntry = [...routeTimeline].reverse().find((entry) => entry.observerTag);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observerEndingRecord = observerPattern?.endingRecord ?? {
     label: "패턴 표본",
@@ -54,31 +52,66 @@ export function ResultScreen({ view }) {
     opacity: "은폐",
     sacrifice: "희생",
   };
+  const choiceVerdicts = {
+    ending_seal: {
+      title: "트리거랩의 개인 조건 데이터는 봉인됩니다.",
+      ruling: "실험은 중단되고 외부 공개도 보류됩니다. 피해를 더 키우지는 않았지만, 기록을 열람할 권한은 소수의 감사자에게만 남습니다.",
+      execution: "즉시 적용: 개인 프로필 접근 차단, 기존 실험 세션 격리, 다음 참가자 모집 정지.",
+      cost: "남는 대가: 구조를 바꾸기보다 문을 닫았기 때문에, 같은 방식의 실험이 다른 이름으로 돌아올 여지가 남습니다.",
+    },
+    ending_reform: {
+      title: "트리거랩은 폐쇄되지 않고 공적 감시 절차로 전환됩니다.",
+      ruling: "당신의 조건은 약점 목록이 아니라 사용 규칙의 기준표가 됩니다. 실험은 계속되지만, 동의와 감사 없이는 누구도 사람의 반응을 설계에 쓸 수 없습니다.",
+      execution: "즉시 적용: 동의 없는 프로필 사용 금지, 케이스 설계 변경 로그 공개, 피해자 보호 절차 우선 적용.",
+      cost: "남는 대가: 시스템은 살아남습니다. 그래서 앞으로의 문제는 파괴가 아니라 감시를 얼마나 오래 유지하느냐가 됩니다.",
+    },
+    ending_expose: {
+      title: "트리거랩의 구조는 외부로 넘어가고 실험은 공개 사건이 됩니다.",
+      ruling: "숨겨진 기록은 더 이상 내부 자산이 아닙니다. 사회적 검증은 시작되지만, 공개된 자료는 보호받아야 할 사람들의 이름 가까이까지 번집니다.",
+      execution: "즉시 적용: 실험 구조 외부 제출, 운영진 권한 회수, 관련 조직 전수 감사 개시.",
+      cost: "남는 대가: 진실은 빠르게 움직입니다. 그 속도 때문에 누군가는 보호보다 먼저 노출될 수 있습니다.",
+    },
+  };
+  const failureVerdict = {
+    title: "트리거랩의 운영은 붕괴합니다.",
+    ruling: "권한은 있었지만 감당할 시간과 신뢰가 남지 않았습니다. 기록은 보존되지만, 지금의 시스템은 더 이상 같은 방식으로 작동할 수 없습니다.",
+    execution: "즉시 적용: 진행 중인 케이스 정지, 복구 키 분리, 다음 실행에서 압박 분산 조건 강제.",
+    cost: "남는 대가: 실패는 결론이 아니라 복구 조건이 됩니다. 다음 플레이는 더 좁은 권한에서 시작합니다.",
+  };
+  const openVerdict = {
+    title: endingVariant?.title ?? "트리거랩은 완전히 닫히지 않습니다.",
+    ruling: endingVariant?.text ?? "당신은 답 하나를 확정하지 않고, 다음 사람이 판단해야 할 조건을 남겼습니다.",
+    execution: view.endingSceneProfile?.choice
+      ? `즉시 적용: ${view.endingSceneProfile.choice}.`
+      : "즉시 적용: 미해결 기록을 다음 근무자에게 인계합니다.",
+    cost: "남는 대가: 결론을 유예한 만큼 다음 참가자는 더 많은 권한과 더 무거운 질문을 동시에 받습니다.",
+  };
+  const finalVerdict = endingVariant?.failure
+    ? failureVerdict
+    : (choiceVerdicts[finalEndingEntry?.choiceId] ?? openVerdict);
   const endingTwists = [
     {
-      label: "위화감",
-      title: "보관소의 첫 번째 기록은 오늘 생성된 파일이 아니다.",
-      evidence: firstRouteEntry?.observerTag?.label
-        ? `${firstRouteEntry.observerTag.label}: ${firstRouteEntry.spokenChoice || firstRouteEntry.choice}`
-        : firstRouteEntry?.spokenChoice || firstRouteEntry?.choice || `CASE 01 결말 키: ${firstCaseChoice}`,
-      copy: "트리거랩은 당신을 처음 본 것이 아니었다. 첫 사건의 첫 문장은 시작점이 아니라 복원된 흔적이었다.",
+      label: "판정",
+      title: finalVerdict.title,
+      evidence: endingVariant?.label ?? endingProfile.tag,
+      copy: finalVerdict.ruling,
     },
     {
-      label: "증거",
-      title: "에코의 문장은 조언이 아니라 같은 선택을 지나간 사람의 후회였다.",
-      evidence: longestRouteEntry?.observerTag?.label
-        ? `${longestRouteEntry.observerTag.label}: ${longestRouteEntry.spokenChoice || longestRouteEntry.choice}`
-        : longestRouteEntry ? `"${longestRouteEntry.spokenChoice || longestRouteEntry.choice}"` : decisionFingerprint.modeTitle,
-      copy: `가장 오래 남은 판단은 ${decisionFingerprint.modeTitle} 프로필과 겹친다. 계속 비용을 다시 계산하라고 말한 목소리는 관찰자가 아니라 이전 기록이었다.`,
+      label: "집행",
+      title: "당신의 마지막 선택은 바로 운영 규칙으로 적용됩니다.",
+      evidence: finalChoiceText,
+      copy: finalVerdict.execution,
     },
     {
-      label: "확인",
-      title: "보고서는 결말이 아니라 다음 참가자의 사건 설계도였다.",
-      evidence: branchRouteEntry?.freeText || taggedRouteEntry?.observerTag?.text || `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
-      copy: `가장 크게 남은 관찰값은 ${observationLabels[dominantObservation[0]]}이다. 다음 참가자는 당신의 결말이 아니라, 당신이 망설인 방식으로 사건을 시작한다.`,
+      label: "대가",
+      title: "끝난 것은 사건이고, 남은 것은 책임입니다.",
+      evidence: view.endingSceneProfile?.location ?? `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
+      copy: finalVerdict.cost,
     },
   ];
   const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
+  const endingTwistCount = endingTwists.length;
+  const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { label: "PROTECT", value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)), text: "사람과 현장의 피해를 얼마나 줄였는가" },
     { label: "EXPOSE", value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.freeCount ?? 0) * 8)), text: "구조와 숨은 비용을 얼마나 드러냈는가" },
@@ -147,14 +180,14 @@ export function ResultScreen({ view }) {
             </div>
             {endingStep === 0 && (
               <div className="ending-beat">
-                <span>RECORD {endingTwistIndex + 1} / 3 · {currentEndingTwist.label}</span>
-                <blockquote>{finalChoiceText}</blockquote>
+                <span>RECORD {Math.min(endingTwistIndex + 1, endingTwistCount)} / {endingTwistCount} · {currentEndingTwist.label}</span>
+                <blockquote>{currentEndingTwist.evidence}</blockquote>
                 <div className="ending-twist-card">
                   <h2>{currentEndingTwist.title}</h2>
                   <p>{currentEndingTwist.copy}</p>
-                  <small>{currentEndingTwist.evidence}</small>
+                  <small>{finalChoiceText}</small>
                 </div>
-                {witnessRecords.length > 0 && (
+                {isFinalEndingTwist && witnessRecords.length > 0 && (
                   <div className="ending-witness-log" aria-label="엔딩 증거 기록">
                     {witnessRecords.map((record) => (
                       <article key={record.id}>
@@ -165,11 +198,11 @@ export function ResultScreen({ view }) {
                     ))}
                   </div>
                 )}
-                <div className="ending-archive-blueprint" aria-label="다음 참가자에게 넘어갈 사건 설계도">
+                {isFinalEndingTwist && <div className="ending-archive-blueprint" aria-label="다음 참가자에게 넘어갈 사건 설계도">
                   <span>{observerEndingRecord.label}</span>
                   <strong>{observerEndingRecord.title}</strong>
                   <p>{observerEndingRecord.text}</p>
-                </div>
+                </div>}
                 <button type="button" data-testid="ending-next" onClick={advanceEndingStep}>다음</button>
               </div>
             )}
@@ -212,19 +245,6 @@ export function ResultScreen({ view }) {
                 <p>이제 기록 열람을 시작할 수 있습니다.</p>
               </div>
             )}
-          {endingVariant && (
-            <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label="결말 변형">
-              <span>{endingVariant.label}</span>
-              <h2>{endingVariant.title}</h2>
-              <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? "자원 관리 실패가 기록되었습니다. 다음 플레이에서는 압박을 분산하십시오." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
-            </section>
-          )}
-          {view.endingEpilogue && <section className="ending-epilogue-panel" aria-label="엔딩 후일담"><span>AFTER THE RECORD</span><p>{view.endingEpilogue}</p></section>}
-          {view.failureRecovery && <section className="failure-recovery-panel" aria-label="실패 복구 경로"><strong>{view.failureRecovery.title}</strong><p>{view.failureRecovery.text}</p></section>}
-          {view.operatorReveal && <section className="operator-reveal-panel" aria-label="주인공 정체 공개"><span>{view.operatorReveal.title}</span><p>{view.operatorReveal.text}</p></section>}
-          {view.achievementProgress?.length > 0 && <section className="achievement-panel" aria-label="업적 진행"><span>ACHIEVEMENT TRACKER</span><div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div></section>}
-          {view.operationsSnapshot && <section className="operations-snapshot" aria-label="운영 진단"><span>OPERATIONS</span><strong>{view.operationsSnapshot.state}</strong><small>errors {view.operationsSnapshot.errorCount} / pending {view.operationsSnapshot.pendingCount} / rankings {view.operationsSnapshot.rankingCount}</small></section>}
           </section>
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -306,6 +326,45 @@ export function ResultScreen({ view }) {
               <p>{caseOutcome.text}</p>
             </div>
           </section>
+          {currentCase === "final" && endingVariant && (
+            <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label="결말 변형">
+              <span>{endingVariant.label}</span>
+              <h2>{endingVariant.title}</h2>
+              <p>{endingVariant.text}</p>
+              <small>{endingVariant.failure ? "자원 관리 실패가 기록되었습니다. 다음 플레이에서는 압박을 분산하십시오." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
+            </section>
+          )}
+          {currentCase === "final" && view.endingEpilogue && (
+            <section className="ending-epilogue-panel" aria-label="엔딩 에필로그">
+              <span>AFTER THE RECORD</span>
+              <p>{view.endingEpilogue}</p>
+            </section>
+          )}
+          {currentCase === "final" && view.failureRecovery && (
+            <section className="failure-recovery-panel" aria-label="실패 복구 경로">
+              <strong>{view.failureRecovery.title}</strong>
+              <p>{view.failureRecovery.text}</p>
+            </section>
+          )}
+          {currentCase === "final" && view.operatorReveal && (
+            <section className="operator-reveal-panel" aria-label="주인공 정체 공개">
+              <span>{view.operatorReveal.title}</span>
+              <p>{view.operatorReveal.text}</p>
+            </section>
+          )}
+          {currentCase === "final" && view.achievementProgress?.length > 0 && (
+            <section className="achievement-panel ending-achievement-panel" aria-label="업적 진행">
+              <span>ACHIEVEMENT TRACKER</span>
+              <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
+            </section>
+          )}
+          {currentCase === "final" && view.operationsSnapshot && (
+            <section className="operations-snapshot" aria-label="운영 진단">
+              <span>OPERATIONS</span>
+              <strong>{view.operationsSnapshot.state}</strong>
+              <small>errors {view.operationsSnapshot.errorCount} / pending {view.operationsSnapshot.pendingCount} / rankings {view.operationsSnapshot.rankingCount}</small>
+            </section>
+          )}
           {currentCase === "final" && (
             <section className="observation-panel" aria-label="관찰 장부">
               <div className="panel-title-row">

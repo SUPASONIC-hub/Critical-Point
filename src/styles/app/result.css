@@ -1234,9 +1234,6 @@
   .case-roadmap {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .intro-brief {
-    grid-template-columns: 1fr;
-  }
   .play-style-grid,
   .season-summary-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
