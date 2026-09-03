@@ -67,9 +67,9 @@ const aftermathNodes = {
     memo: ["고객사는 두 안 모두 보류함", "오진우의 원본 제출 시간이 조작됐을 가능성", "보안 결함을 숨긴 쪽이 높은 점수를 받음"],
     triggers: ["competition", "recognition", "curiosity"],
     choices: [
-      { id: "c3_after_share", label: "두 안의 장점을 합쳐 고객에게 다시 제안한다", effect: { trust: 8, legitimacy: 5, fatigue: 7 }, next: "case03_result", cognition: { reframing: 2 } },
+      { id: "c3_after_share", label: "두 안의 장점을 합쳐 고객에게 다시 제안한다", effect: { trust: 8, legitimacy: 5, humanCost: -3, fatigue: 7 }, next: "case03_result", cognition: { reframing: 2 } },
       { id: "c3_after_proof", label: "점수보다 보안 결함의 증거를 먼저 공개한다", effect: { capital: -8, legitimacy: 14, fatigue: 6 }, next: "case03_result", cognition: { inference: 2, persistence: 1 } },
-      { id: "c3_after_win", label: "승리를 확정하고 경쟁자의 허점을 이용한다", effect: { capital: 12, trust: -10, legitimacy: -8, fatigue: 3 }, next: "case03_result", cognition: { risk: 2 } },
+      { id: "c3_after_win", label: "승리를 확정하고 경쟁자의 허점을 이용한다", effect: { capital: 12, trust: -10, legitimacy: -8, humanCost: 5, fatigue: 3 }, next: "case03_result", cognition: { risk: 2 } },
     ],
   },
   c4_aftershock: {
@@ -106,9 +106,9 @@ const aftermathNodes = {
     memo: ["당신의 선택 문장이 다음 테스트의 선택지로 복제됨", "단서가 많을수록 실험 설계자 이름에 가까워짐", "외부 공개와 내부 개혁 모두 누군가의 피해를 요구함"],
     triggers: ["curiosity", "responsibility", "order"],
     choices: [
-      { id: "f_after_witness", label: "모든 기록을 증거로 보존하고 외부 증언을 준비한다", effect: { legitimacy: 12, trust: 4, fatigue: 8 }, next: "final_result", cognition: { inference: 2, persistence: 1 } },
+      { id: "f_after_witness", label: "모든 기록을 증거로 보존하고 외부 증언을 준비한다", effect: { legitimacy: 12, trust: 4, humanCost: -3, fatigue: 8 }, next: "final_result", cognition: { inference: 2, persistence: 1 } },
       { id: "f_after_control", label: "실험을 멈추지 않고 참가자 동의 규칙부터 바꾼다", effect: { trust: 10, legitimacy: 8, fatigue: 10 }, next: "final_result", cognition: { reframing: 3 } },
-      { id: "f_after_burn", label: "모든 데이터를 태워 누구도 다시 이용하지 못하게 한다", effect: { legitimacy: 6, trust: -6, fatigue: 5 }, next: "final_result", cognition: { risk: 2 } },
+      { id: "f_after_burn", label: "모든 데이터를 태워 누구도 다시 이용하지 못하게 한다", effect: { legitimacy: 6, trust: -6, humanCost: 4, fatigue: 5 }, next: "final_result", cognition: { risk: 2 } },
     ],
   },
 };
@@ -817,10 +817,151 @@ const branchOpeningCopy = {
   f_start_name: ["이름을 남긴 뒤", "반재욱", "한 사람을 책임자로 세운 뒤 사건은 빨리 닫혔습니다. 이제 트리거랩은 당신에게 그 이름을 이용해 더 큰 통제를 제안합니다.", ["책임자의 기록이 다음 테스트에 사용됨", "피해자는 여전히 회복되지 않음", "실험의 종료 권한이 당신에게 옴"]],
 };
 
+/**
+ * The one move each opening allows that the other two do not.
+ *
+ * The three openings used to be the base scene's choices with a different
+ * paragraph on top -- same ids, same labels, same effects -- so the branch the
+ * previous case earned changed the framing and nothing else. Each now carries a
+ * fourth option that only exists because of what the last case ended on.
+ */
+const openingSignatureChoices = {
+  c2_start_people: {
+    label: "지난 사건에서 보호한 사람에게 먼저 연락한다",
+    effect: { trust: 7, humanCost: -3, legitimacy: -2, time: -5, fatigue: 4 },
+    cognition: { reframing: 2 },
+    voice: "절차보다 먼저, 지난 사건에서 이름을 지켜준 사람에게 전화를 건다.",
+    echo: "지난 보호가 이번 사건의 통로가 됩니다. 그 통로를 쓰는 순간 보호는 거래처럼 보이기도 합니다.",
+  },
+  c2_start_records: {
+    label: "공개했던 수치를 기준선으로 삼아 조작 지점을 역추적한다",
+    effect: { legitimacy: 6, capital: -3, time: -7, fatigue: 5 },
+    cognition: { inference: 2 },
+    voice: "내가 공개한 숫자가 어디서 어긋났는지부터 거꾸로 짚는다.",
+    echo: "공개한 숫자는 이제 비교 기준이 됩니다. 그 기준이 틀렸다면 이번 조사도 함께 무너집니다.",
+  },
+  c2_start_silence: {
+    label: "말하지 않았던 조건을 내가 먼저 공개한다",
+    effect: { legitimacy: 7, trust: 5, capital: -6, humanCost: -2, fatigue: 6 },
+    cognition: { persistence: 2 },
+    voice: "유출된 문서가 말하기 전에, 지난번 삼킨 조건을 내 입으로 꺼낸다.",
+    echo: "미뤄둔 말을 스스로 꺼내면 주도권이 돌아옵니다. 왜 그때는 말하지 않았는지도 함께 묻게 됩니다.",
+  },
+  c3_start_audit: {
+    label: "복원한 기록을 입찰 근거로 공개한다",
+    effect: { legitimacy: 7, trust: 3, capital: -4, time: -6 },
+    cognition: { inference: 2 },
+    voice: "복원해 둔 원본을 그대로 입찰 자료에 붙인다.",
+    echo: "복원된 기록은 반박하기 어렵습니다. 동시에 경쟁사에게도 당신의 근거를 통째로 보여줍니다.",
+  },
+  c3_start_person: {
+    label: "이민서에게 이번 검증을 맡긴다",
+    effect: { trust: 7, humanCost: -2, capital: -5, time: -4, fatigue: 3 },
+    cognition: { reframing: 2 },
+    voice: "의심받았던 사람에게 이번 검증의 이름을 준다.",
+    echo: "지목당했던 사람이 검증자가 되면 조직의 기준이 바뀝니다. 실패하면 두 번째 지목이 됩니다.",
+  },
+  c3_start_public: {
+    label: "경보를 낸 사람으로서 공개 검증단을 요구한다",
+    effect: { legitimacy: 8, capital: -5, time: -7, fatigue: 4 },
+    cognition: { persistence: 2 },
+    voice: "내가 먼저 알렸으니 검증도 공개로 하자고 요구한다.",
+    echo: "공개 검증은 의심을 끝냅니다. 끝나기 전까지 입찰은 멈추고 그 비용은 당신이 냅니다.",
+  },
+  c4_start_joint: {
+    label: "공동안 파트너에게 예외 요구를 함께 거절하자고 제안한다",
+    effect: { legitimacy: 6, trust: 5, capital: -7, time: -4, fatigue: 4 },
+    cognition: { reframing: 2 },
+    voice: "혼자 거절하면 밀린다며, 같이 만든 쪽에 함께 서자고 말한다.",
+    echo: "둘이 거절하면 기준은 버팁니다. 파트너가 물러서면 남는 것은 당신의 이름뿐입니다.",
+  },
+  c4_start_proof: {
+    label: "정직함의 대가를 숫자로 만들어 심사에 제출한다",
+    effect: { legitimacy: 7, humanCost: -3, capital: -6, time: -5, fatigue: 5 },
+    cognition: { inference: 2 },
+    voice: "결함을 공개해서 잃은 것을 그대로 계산해 심사표에 붙인다.",
+    echo: "정직의 비용을 수치로 만들면 다음 사람도 그 값을 압니다. 이번 심사에서는 약점으로 읽힐 수 있습니다.",
+  },
+  c4_start_win: {
+    label: "승리 사례를 근거로 기준 자체의 재심사를 요구한다",
+    effect: { legitimacy: 5, capital: 5, trust: -3, humanCost: 3, time: -4 },
+    cognition: { risk: 2 },
+    voice: "이겼던 방식이 규칙보다 낫다며, 규칙을 다시 보자고 밀어붙인다.",
+    echo: "성공 사례는 설득력이 큽니다. 성공을 근거로 기준을 바꾸면 다음 성공도 같은 방식으로 요구됩니다.",
+  },
+  c5_start_rule: {
+    label: "내가 만든 기준이 현장을 늦췄는지 먼저 확인한다",
+    effect: { legitimacy: 6, humanCost: -4, capital: -3, time: -7, fatigue: 5 },
+    cognition: { persistence: 2 },
+    voice: "남을 조사하기 전에, 내가 세운 기준부터 시험대에 올린다.",
+    echo: "자기 기준을 먼저 의심하면 조사는 정직해집니다. 그 사이 다른 원인은 계속 작동합니다.",
+  },
+  c5_start_service: {
+    label: "유지된 서비스가 누구를 빼놓았는지 명단을 연다",
+    effect: { humanCost: -5, trust: 6, capital: -6, time: -5, fatigue: 4 },
+    cognition: { reframing: 2 },
+    voice: "지켜냈다는 서비스에서 빠진 이름부터 세어 본다.",
+    echo: "지킨 것과 빠뜨린 것을 같은 표에 놓으면 성과의 크기가 달라집니다. 그 표는 되돌릴 수 없습니다.",
+  },
+  c5_start_stop: {
+    label: "중단 기간의 조용한 피해자부터 보상 대상에 올린다",
+    effect: { humanCost: -6, trust: 5, capital: -8, fatigue: 4 },
+    cognition: { persistence: 2 },
+    voice: "멈춘 동안 아무 말도 못 한 쪽을 보상 명단의 첫 줄에 적는다.",
+    echo: "말하지 않은 피해를 먼저 세면 기준이 생깁니다. 예산은 말한 사람들 몫에서 먼저 깎입니다.",
+  },
+  f_start_owner: {
+    label: "내 이름이 올라간 문서부터 참가자에게 공개한다",
+    effect: { legitimacy: 7, trust: 6, time: -6, fatigue: 5 },
+    cognition: { persistence: 2 },
+    voice: "책임을 적었던 문서를 실험 참가자들에게 먼저 연다.",
+    echo: "책임진 기록을 공개하면 신뢰가 옵니다. 그 기록은 다음 실험의 교재로도 쓰입니다.",
+  },
+  f_start_system: {
+    label: "내가 만든 규칙을 실험 자신에게 적용하라고 요구한다",
+    effect: { legitimacy: 8, trust: 4, capital: -4, time: -7, fatigue: 5 },
+    cognition: { reframing: 2 },
+    voice: "현장에 적용한 규칙을 이 실험에도 적용하라고 요구한다.",
+    echo: "같은 규칙을 설계자에게 들이대면 실험의 전제가 드러납니다. 거절당하면 그 거절이 증거가 됩니다.",
+  },
+  f_start_name: {
+    label: "지목했던 사람에게 이 실험의 기록을 먼저 돌려준다",
+    effect: { trust: 8, humanCost: -5, legitimacy: -3, capital: -5, fatigue: 5 },
+    cognition: { reframing: 2 },
+    voice: "이름을 적어 사건을 닫았던 그 사람에게, 기록을 먼저 건넨다.",
+    echo: "지목한 사람에게 기록을 돌려주면 관계는 회복될 수 있습니다. 절차상으로는 유출입니다.",
+  },
+};
+
 Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   const baseNodeId = caseId === "case02" ? "c2_start" : caseId === "case03" ? "c3_start" : caseId === "case04" ? "c4_start" : caseId === "case05" ? "c5_start" : "f_start";
   Object.values(routes).forEach((nodeId) => {
     const [title, speaker, text, memo] = branchOpeningCopy[nodeId];
+    // The cloned choices are the same decisions, so they keep the base scene's
+    // lines -- but under their own ids, so the log can say which opening it was.
+    const clonedChoices = nodes[baseNodeId].choices.map((choice) => {
+      const openingChoiceId = choice.id.startsWith(baseNodeId)
+        ? `${nodeId}${choice.id.slice(baseNodeId.length)}`
+        : `${nodeId}_${choice.id}`;
+      if (choiceVoiceLines[choice.id]) choiceVoiceLines[openingChoiceId] = choiceVoiceLines[choice.id];
+      if (echoReplies[choice.id]) echoReplies[openingChoiceId] = echoReplies[choice.id];
+      return { ...choice, id: openingChoiceId };
+    });
+    const signature = openingSignatureChoices[nodeId];
+    if (signature) {
+      const signatureId = `${nodeId}_signature`;
+      choiceVoiceLines[signatureId] = signature.voice;
+      echoReplies[signatureId] = signature.echo;
+      const routed = clonedChoices.find((choice) => choice.type !== "free") ?? clonedChoices[0];
+      // Before the free-input option, which stays last on every scene.
+      clonedChoices.splice(clonedChoices.length - 1, 0, {
+        id: signatureId,
+        label: signature.label,
+        effect: signature.effect,
+        cognition: signature.cognition,
+        next: routed.next,
+      });
+    }
     nodes[nodeId] = {
       ...nodes[baseNodeId],
       phase: "BRANCH BRIEFING",
@@ -828,7 +969,7 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
       speaker,
       text,
       memo,
-      choices: nodes[baseNodeId].choices.map((choice) => ({ ...choice })),
+      choices: clonedChoices,
     };
   });
   nodeOrders[caseId].unshift(...Object.values(routes));

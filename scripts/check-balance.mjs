@@ -67,13 +67,22 @@ if (fatigueRecovery < FATIGUE_RECOVERY_FLOOR) {
 }
 
 // 3. The game is about who carries the cost, so humanCost has to be on enough
-//    of the board to be a real lever rather than a label.
+//    of the board to be a real lever rather than a label. Per case, not overall:
+//    the season average was 46% while case 03 sat at 25% and the final case --
+//    where the theme lands -- at 26%.
 const humanCostCoverage =
   effects.filter((effect) => Number.isFinite(effect.humanCost) && effect.humanCost !== 0).length / effects.length;
-if (humanCostCoverage < HUMAN_COST_COVERAGE_FLOOR) {
-  failures.push(
-    `humanCost appears on ${(humanCostCoverage * 100).toFixed(0)}% of choices, need ${HUMAN_COST_COVERAGE_FLOOR * 100}%`,
-  );
+for (const caseId of CASE_SEQUENCE) {
+  const caseEffects = [...new Set(nodeOrders[caseId])]
+    .flatMap((nodeId) => nodes[nodeId]?.choices ?? [])
+    .filter((choice) => choice.type !== "free")
+    .map((choice) => choice.effect ?? {});
+  const coverage = caseEffects.filter((effect) => (effect.humanCost ?? 0) !== 0).length / caseEffects.length;
+  if (coverage < HUMAN_COST_COVERAGE_FLOOR) {
+    failures.push(
+      `${caseId}: humanCost is on ${(coverage * 100).toFixed(0)}% of choices, need ${HUMAN_COST_COVERAGE_FLOOR * 100}%`,
+    );
+  }
 }
 
 // 4. Distinct effect vectors, so scenes are not the same decision retitled.
@@ -100,21 +109,26 @@ function walkCase(caseId, columnIndex) {
   return resources;
 }
 
-// 5. In every case each archetype -- people first, procedure first, profit
-//    first -- has to end strictly best on at least one axis. That is what makes
-//    the column you pick a judgement instead of a solved optimum.
+// 5. No column may be dominated: ending a case at least as well on every
+//    resource and better on one means the other column was simply the right
+//    answer, which is the free lunch this whole file exists to prevent. Stated
+//    as domination rather than "strictly best on something" because resources
+//    cap at 100, and two columns both reaching the cap is a tie, not a trap.
 const COLUMNS = [0, 1, 2];
 for (const caseId of CASE_SEQUENCE) {
   const outcomes = COLUMNS.map((columnIndex) => walkCase(caseId, columnIndex));
   for (const columnIndex of COLUMNS) {
     const mine = outcomes[columnIndex];
-    const wins = RESOURCE_KEYS.filter((key) =>
-      COLUMNS.every((other) => other === columnIndex || isBetter(key, mine[key], outcomes[other][key])),
+    const dominator = COLUMNS.find(
+      (other) =>
+        other !== columnIndex &&
+        RESOURCE_KEYS.every((key) => !isBetter(key, mine[key], outcomes[other][key])) &&
+        RESOURCE_KEYS.some((key) => isBetter(key, outcomes[other][key], mine[key])),
     );
-    if (wins.length === 0) {
+    if (dominator !== undefined) {
       failures.push(
-        `${caseId}: column ${columnIndex + 1} is not strictly best on any resource ` +
-          `(${RESOURCE_KEYS.map((key) => `${key} ${mine[key]}`).join(", ")})`,
+        `${caseId}: column ${columnIndex + 1} is dominated by column ${dominator + 1} ` +
+          `(${RESOURCE_KEYS.map((key) => `${key} ${mine[key]}/${outcomes[dominator][key]}`).join(", ")})`,
       );
     }
   }

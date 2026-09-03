@@ -195,7 +195,9 @@ test("representative branch choices advance without browser runtime errors", asy
         .slice(0, choiceIndex + 1)
         .filter((candidate) => candidate.type !== "free").length - 1;
       await page.locator(".choices .choice").nth(fixedChoiceIndex).evaluate((button) => button.click());
-      await expect(page.locator(".decision-dock")).toBeVisible();
+      // The commit console, not the dock: the dock is desktop-only now that the
+      // console is fixed to the viewport on a phone.
+      await expect(page.locator(".commit-console")).toBeVisible();
       await page.getByTestId("commit-confirm").evaluate((button) => button.click());
     }
 

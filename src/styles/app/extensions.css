@@ -2238,3 +2238,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  /* The quick-confirm dock existed because the commit console was buried in the
+     choice list. With the console fixed to the viewport they are the same bar in
+     the same place, and the dock was landing on top of the confirm button. */
+  .decision-dock {
+    display: none;
+  }
+}

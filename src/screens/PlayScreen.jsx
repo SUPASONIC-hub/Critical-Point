@@ -115,7 +115,7 @@ export function PlayScreen({ view }) {
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {screenReaderStatus}
       </p>
-      <section className="game-board">
+      <section className={pendingChoice ? "game-board has-commit-console" : "game-board"}>
         <details className="game-context-drawer insight-drawer">
           <summary>
             <span>현재 상황판</span>
@@ -969,8 +969,6 @@ export function PlayScreen({ view }) {
         activePlayStyle={activePlayStyle}
         turnBriefItems={turnBriefItems}
         sceneChallenge={sceneChallenge}
-        resourceMeta={resourceMeta}
-        resources={resources}
         node={node}
         speakerProfile={speakerProfile}
         triggerLabels={triggerLabels}

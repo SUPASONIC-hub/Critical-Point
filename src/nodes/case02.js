@@ -15,21 +15,21 @@ export const case02Nodes = {
     triggers: ["trust", "injustice", "responsibility"],
     choices: [
       {
-        id: "report",
+        id: "c2_start_report",
         label: "로그 증거를 기준으로 1차 보고한다",
         effect: { time: -2, trust: -10, legitimacy: 7, fatigue: 2 },
         next: "c2_logs",
         cognition: { risk: 1, inference: 1 },
       },
       {
-        id: "meet",
+        id: "c2_start_meet",
         label: "이민서를 비공식적으로 먼저 만난다",
         effect: { time: -8, trust: 8, legitimacy: -6, fatigue: 2 },
         next: "c2_logs",
         cognition: { persistence: 1, inference: 1 },
       },
       {
-        id: "verify",
+        id: "c2_start_verify",
         label: "시스템 로그 원본을 재검증한다",
         effect: { time: -10, legitimacy: 2, fatigue: 2 },
         next: "c2_logs",
@@ -58,7 +58,7 @@ export const case02Nodes = {
     triggers: ["curiosity", "injustice", "competition"],
     choices: [
       {
-        id: "verify",
+        id: "c2_logs_verify",
         label: "로그 원본과 백업 로그를 대조한다",
         effect: { time: -12, legitimacy: 4, fatigue: 3 },
         next: "c2_meeting",
@@ -101,21 +101,21 @@ export const case02Nodes = {
     triggers: ["trust", "affection", "protection", "responsibility"],
     choices: [
       {
-        id: "meet",
+        id: "c2_meeting_meet",
         label: "이민서의 알리바이를 먼저 확인한다",
         effect: { time: -10, trust: 10, legitimacy: -2, fatigue: 2 },
         next: "c2_pressure",
         cognition: { inference: 2, persistence: 1 },
       },
       {
-        id: "report",
+        id: "c2_meeting_report",
         label: "감정 개입을 피하고 공식 절차로 넘긴다",
         effect: { trust: -10, legitimacy: 6, humanCost: 5, fatigue: 2 },
         next: "c2_pressure",
         cognition: { risk: 1 },
       },
       {
-        id: "shadow",
+        id: "c2_meeting_shadow",
         label: "공식 보고 전 대체 접속 가능성을 추적한다",
         effect: { time: -12, legitimacy: -4, fatigue: 4 },
         next: "c2_pressure",
@@ -144,21 +144,21 @@ export const case02Nodes = {
     triggers: ["competition", "trust", "responsibility"],
     choices: [
       {
-        id: "report",
+        id: "c2_pressure_report",
         label: "오진우 보고서에 동의하고 사건을 종결한다",
         effect: { time: 4, trust: -14, legitimacy: 5, humanCost: 8, fatigue: 1 },
         next: "c2_final",
         cognition: { risk: 1 },
       },
       {
-        id: "verify",
+        id: "c2_pressure_verify",
         label: "30분 안에 반증 가능한 단서 하나만 더 찾는다",
         effect: { time: -10, trust: 4, legitimacy: 1, fatigue: 4 },
         next: "c2_final",
         cognition: { persistence: 2, inference: 2 },
       },
       {
-        id: "shadow",
+        id: "c2_pressure_shadow",
         label: "오진우 보고서의 전제를 공격한다",
         effect: { time: -6, trust: -2, legitimacy: -2, fatigue: 4 },
         next: "c2_final",
@@ -201,7 +201,7 @@ export const case02Nodes = {
         cognition: { persistence: 2, inference: 1 },
       },
       {
-        id: "final_system",
+        id: "c2_final_final_system",
         label: "개인 혐의보다 시스템 조작 가능성을 공식화한다",
         effect: { time: -6, trust: 2, legitimacy: 2, fatigue: 4 },
         next: "case02_result",

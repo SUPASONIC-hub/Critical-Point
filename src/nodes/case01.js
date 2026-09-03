@@ -29,14 +29,14 @@ export const case01Nodes = {
         cognition: { persistence: 1, risk: 1 },
       },
       {
-        id: "sale",
+        id: "start_sale",
         label: "핵심 사업부 매각 가능성을 연다",
         effect: { capital: 20, trust: -8, legitimacy: -4, humanCost: 6 },
         next: "accounting",
         cognition: { risk: 2 },
       },
       {
-        id: "investigate",
+        id: "start_investigate",
         label: "추가 자료를 먼저 요청한다",
         effect: { time: -10, trust: 2, fatigue: 2 },
         next: "accounting",
@@ -58,21 +58,21 @@ export const case01Nodes = {
     triggers: ["injustice", "responsibility", "order"],
     choices: [
       {
-        id: "disclosure",
+        id: "accounting_disclosure",
         label: "투자자에게 즉시 알린다",
         effect: { capital: -18, trust: 8, legitimacy: 8, fatigue: 2 },
         next: "payday",
         cognition: { persistence: 1, risk: 1 },
       },
       {
-        id: "delay",
+        id: "accounting_delay",
         label: "자금 확보 전까지 공개를 미룬다",
         effect: { time: -4, trust: -8, legitimacy: -12, fatigue: 3 },
         next: "payday",
         cognition: { risk: 1 },
       },
       {
-        id: "investigate",
+        id: "accounting_investigate",
         label: "CFO와 회계팀을 분리 면담한다",
         effect: { time: -8, legitimacy: 2, fatigue: 2 },
         next: "payday",
@@ -100,21 +100,21 @@ export const case01Nodes = {
     triggers: ["protection", "responsibility"],
     choices: [
       {
-        id: "disclosure",
+        id: "payday_disclosure",
         label: "직원에게 유동성 위기를 공개한다",
         effect: { trust: 12, capital: -5, legitimacy: 4, fatigue: 2 },
         next: "competitor",
         cognition: { persistence: 1 },
       },
       {
-        id: "delay",
+        id: "payday_delay",
         label: "급여 지급 방안 확정 전까지 공개를 미룬다",
         effect: { trust: -10, capital: 2, legitimacy: -8, fatigue: 2 },
         next: "competitor",
         cognition: { risk: 1 },
       },
       {
-        id: "negotiate",
+        id: "payday_negotiate",
         label: "임원 보수와 협력사 지급 일정을 동시에 조정한다",
         effect: { capital: 10, trust: 4, legitimacy: 2, fatigue: 4 },
         next: "competitor",
@@ -142,21 +142,21 @@ export const case01Nodes = {
     triggers: ["competition", "reward", "protection"],
     choices: [
       {
-        id: "sale",
+        id: "competitor_sale",
         label: "북선로지스 제안을 협상 테이블에 올린다",
         effect: { capital: 24, trust: -8, legitimacy: -3, humanCost: 5, fatigue: 2 },
         next: "board",
         cognition: { risk: 2 },
       },
       {
-        id: "report",
+        id: "competitor_report",
         label: "CFO 책임 규명을 먼저 공식화한다",
         effect: { capital: -10, trust: 6, legitimacy: 10, fatigue: 4 },
         next: "board",
         cognition: { persistence: 1, inference: 1 },
       },
       {
-        id: "negotiate",
+        id: "competitor_negotiate",
         label: "투자자, 협력사, 경쟁사를 한 번에 묶어 재협상한다",
         effect: { time: -12, capital: 12, trust: 5, legitimacy: 3, fatigue: 4 },
         next: "board",

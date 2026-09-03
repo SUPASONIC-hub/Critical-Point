@@ -18,6 +18,7 @@
     "check:graph": "node scripts/validate-game-graph.mjs",
     "check:balance": "node scripts/check-balance.mjs",
     "check:art": "node scripts/check-art-budget.mjs",
+    "build:art": "node scripts/build-art-variants.mjs",
     "check:views": "node scripts/check-view-contracts.mjs",
     "test:runtime": "node scripts/run-e2e.mjs --runtime",
     "test:e2e": "node scripts/run-e2e.mjs",

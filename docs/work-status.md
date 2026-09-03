@@ -79,20 +79,48 @@ the e2e helpers, and `AppContent` renders the intro, so nothing can be deferred
 until the graph becomes async and every one of those readers is rewritten around
 it. That is a larger and riskier change than the 30KB justifies today.
 
-## Open: second audit (2026-09-03)
+## Second audit (2026-09-03), applied
 
 `docs/design-audit-2026-09-03-followup.md` re-measured the app after the first
-pass landed. It confirms the two fixes that mattered -- six idle seconds on the
-play screen now produce 30 DOM mutations, all of them the clock -- and finds nine
-things the first pass either created or uncovered. Nothing in it is applied yet.
-The three worth knowing about before touching those areas:
+pass landed and found nine things. All nine are applied.
 
-- The commit button opens 1,639px down a 844px phone screen and takes 700ms of
-  smooth scrolling to arrive. The commit itself is 44ms.
-- 25 choice ids are reused across scenes, so 89 of the 304 spoken lines belong to
-  a different decision than the one being made.
-- `cognitionScore` is 100 for every strategy measured, so 20% of the burst score
-  cannot separate two runs.
+- **Commit console (U-1).** It opened 1,639px down an 844px phone screen and took
+  700ms of smooth scrolling to arrive; a tap during that landed on whatever slid
+  past. It is fixed to the viewport on a phone now and opens at 726px, moving
+  only for its 0.18s animation. The commit itself was always 44ms.
+- **Choice ids (D-1).** 25 ids were shared between scenes and voice lines are
+  keyed by id, so 89 of 304 spoken lines came from another decision. The 68
+  colliding ids carry their scene as a prefix and 44 new lines were written for
+  the decisions that had been borrowing. Every fixed choice now has authored
+  copy; twelve had none before.
+- **Case openings (D-2).** The 15 openings cloned the base scene's choices down
+  to their ids, so the branch the previous case earned changed only the
+  paragraph on top. Each now has its own ids and a fourth option that exists
+  only on that branch.
+- **Cognitive spread (S-1).** `cognitionScore` returned 100 for every strategy
+  measured. It is normalised entropy over the four ways of thinking now: one
+  repeated approach scores 0, an even spread across all four scores 100, and the
+  five fixed strategies land between 25 and 84.
+- **Consistency (S-2).** The axis spanned 21 to 49, so 28% of the score moved the
+  total by eight points. Direction changes are counted directly and decisions
+  under pressure weigh triple: a run that holds one line now scores 100 and one
+  that oscillates scores 2.
+- **Reflection (S-3).** Opening a hidden record counts toward it, so a player who
+  never uses free text is no longer starting a fifth of the score at zero.
+- **humanCost per case (D-3).** The floor in `check-balance` is per case rather
+  than season-wide, and case 03 and the final case were filled to it: coverage
+  now runs 44% to 70% instead of 25% to 65%.
+- **Status board (U-2).** The turn brief folds like the five drawers under it and
+  the resource list is gone from it entirely -- the rail above the choices is
+  its one home. The board is 413px instead of 820px and the mobile play screen is
+  3,906px, down from 5,775px before either pass.
+- **Art variants (O-1).** `npm run build:art` regenerates them, so the procedure
+  `check:art` enforces is a command rather than a paragraph.
+
+One check changed shape while doing this. `check-balance` used to require each
+column to end a case strictly best on some resource; it now requires that no
+column is Pareto-dominated. That is the property the file exists to protect, and
+it does not misfire when two columns both cap a resource at 100.
 
 ## Maintenance Priorities
 

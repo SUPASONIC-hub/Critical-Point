@@ -257,7 +257,7 @@ export function getConsistencyScore(entries = []) {
   // Nothing to read (an old save without effect vectors, or a run of pure
   // ties) is not evidence of inconsistency, so it scores neutral.
   if (leaning.length === 0) return 50;
-  const weightOf = (entry) => (getRiskPressure(entry.resourcesBefore ?? {}) >= 50 ? 2 : 1);
+  const weightOf = (entry) => (getRiskPressure(entry.resourcesBefore ?? {}) >= 50 ? 3 : 1);
   const balance = leaning.reduce((sum, entry) => sum + getDecisionLean(entry) * weightOf(entry), 0);
   const total = leaning.reduce((sum, entry) => sum + weightOf(entry), 0);
   if (balance === 0) return 0;
@@ -265,8 +265,42 @@ export function getConsistencyScore(entries = []) {
     (sum, entry) => sum + (getDecisionLean(entry) === Math.sign(balance) ? weightOf(entry) : 0),
     0,
   );
-  // A run that never commits sits near 50; one that holds its line lands high.
-  return Math.round(clamp(((held / total) * 2 - 1) * 100, 0, 100));
+  // Changing direction is what breaks a line, so it is counted directly rather
+  // than left to the ratio. Without it the axis only spanned 21 to 49 across
+  // every fixed strategy, which moved the total by eight points.
+  const flips = leaning.reduce(
+    (count, entry, index) =>
+      count + (index > 0 && getDecisionLean(entry) !== getDecisionLean(leaning[index - 1]) ? 1 : 0),
+    0,
+  );
+  const flipRate = leaning.length > 1 ? flips / (leaning.length - 1) : 0;
+  return Math.round(clamp((((held / total) * 2 - 1) - flipRate * 0.5) * 140, 0, 100));
+}
+
+/**
+ * How evenly the run moved between the four ways of thinking.
+ *
+ * This used to be `types * 14 + shifts * 10 + length * 4`, which any run of a
+ * dozen decisions filled to the cap: measured across five fixed strategies it
+ * returned 100 every time, so a fifth of the score could not separate two runs.
+ * Normalised entropy answers the same question and actually varies -- one
+ * repeated approach lands near 0, an even spread across all four near 100.
+ */
+export function getCognitionSpread(types = []) {
+  if (types.length === 0) return 0;
+  const counts = new Map();
+  for (const type of types) counts.set(type, (counts.get(type) ?? 0) + 1);
+  if (counts.size < 2) return 0;
+  const entropy = [...counts.values()].reduce((sum, count) => {
+    const share = count / types.length;
+    return sum - share * Math.log(share);
+  }, 0);
+  const ceiling = Math.log(Math.min(counts.size, types.length));
+  const evenness = ceiling > 0 ? entropy / ceiling : 0;
+  // A run that only ever used two of the four ways cannot reach the top, even
+  // if it alternated them perfectly.
+  const reach = counts.size / 4;
+  return Math.round(clamp(evenness * reach * 100, 0, 100));
 }
 
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
@@ -317,22 +351,10 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
       return sum + 24;
     }, 0) / rhythmSamples.length,
   );
-  const cognitionKeys = new Set();
-  scoredEntries.forEach((entry) => {
-    Object.entries(entry.cognition ?? {}).forEach(([key, value]) => {
-      if (value > 0) cognitionKeys.add(key);
-    });
-  });
   const cognitionTypes = scoredEntries
     .map((entry) => Object.entries(entry.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0])
     .filter(Boolean);
-  const cognitionShifts = cognitionTypes.reduce(
-    (count, key, index) => count + (index > 0 && cognitionTypes[index - 1] !== key ? 1 : 0),
-    0,
-  );
-  const cognitionScore = Math.round(
-    clamp(cognitionKeys.size * 14 + cognitionShifts * 10 + Math.min(scoredEntries.length, 5) * 4, 0, 100),
-  );
+  const cognitionScore = getCognitionSpread(cognitionTypes);
   const riskDeltas = scoredEntries.map((entry) => {
     if (entry.resourcesBefore && entry.resourcesAfter) {
       return getRiskPressure(entry.resourcesAfter) - getRiskPressure(entry.resourcesBefore);
@@ -360,8 +382,12 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     const activeSignals = getFreeTextSignals(entry.freeText).filter((signal) => signal.active).length;
     return sum + Math.min(24, activeSignals * 6 + Math.min(6, Math.floor(entry.freeText.trim().length / 35)));
   }, 0);
+  // Opening a hidden record is the other way a player shows their working, and
+  // it is the only one available to someone who never uses free text -- who
+  // otherwise started this axis at zero.
+  const recordsOpened = scoredEntries.filter((entry) => entry.clue).length;
   const reflectionScore = Math.round(
-    clamp(freeTextSignalScore + freeCount * 8 + challengeClearCount * 4, 0, 100),
+    clamp(freeTextSignalScore + freeCount * 8 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
   const exploitPenalty = Math.min(
     18,

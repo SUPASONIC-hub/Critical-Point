@@ -15,21 +15,21 @@ export const case04Nodes = {
     triggers: ["reward", "responsibility", "protection", "order"],
     choices: [
       {
-        id: "approve",
+        id: "c4_start_approve",
         label: "산식 해석을 넓혀 심사 기준을 맞춘다",
         effect: { capital: 18, legitimacy: -10, trust: -2, fatigue: 2 },
         next: "c4_offer",
         cognition: { risk: 2 },
       },
       {
-        id: "refuse",
+        id: "c4_start_refuse",
         label: "부족한 지표를 그대로 보고한다",
         effect: { capital: -16, legitimacy: 8, trust: 5, humanCost: 12, fatigue: 3 },
         next: "c4_offer",
         cognition: { persistence: 1, risk: 1 },
       },
       {
-        id: "contain",
+        id: "c4_start_contain",
         label: "산식 변경 조건과 사후 검증 절차를 함께 건다",
         effect: { capital: 8, legitimacy: 2, trust: 2, fatigue: 4 },
         next: "c4_offer",
@@ -58,21 +58,21 @@ export const case04Nodes = {
     triggers: ["protection", "reward", "order", "responsibility"],
     choices: [
       {
-        id: "approve",
+        id: "c4_offer_approve",
         label: "기록 없이 산식을 조정한다",
         effect: { capital: 20, legitimacy: -18, trust: -8, fatigue: 2 },
         next: "c4_leak",
         cognition: { risk: 2 },
       },
       {
-        id: "contain",
+        id: "c4_offer_contain",
         label: "기록을 남기되 심사 자료에는 보완 의견으로 처리한다",
         effect: { capital: 8, legitimacy: 2, trust: 3, fatigue: 4 },
         next: "c4_leak",
         cognition: { reframing: 2, risk: 1 },
       },
       {
-        id: "refuse",
+        id: "c4_offer_refuse",
         label: "산식 조정 없이 긴급 대체 재원을 찾는다",
         effect: { time: -12, capital: -8, legitimacy: 6, fatigue: 4 },
         next: "c4_leak",
@@ -101,21 +101,21 @@ export const case04Nodes = {
     triggers: ["injustice", "order", "fear", "responsibility"],
     choices: [
       {
-        id: "expose",
+        id: "c4_leak_expose",
         label: "산식 논란과 서비스 중단 위험을 함께 공개한다",
         effect: { trust: 8, legitimacy: 7, capital: -12, fatigue: 4 },
         next: "c4_vote",
         cognition: { persistence: 1, risk: 1 },
       },
       {
-        id: "approve",
+        id: "c4_leak_approve",
         label: "조작 의혹을 부인하고 심사를 먼저 통과시킨다",
         effect: { capital: 18, legitimacy: -16, trust: -10, fatigue: 2 },
         next: "c4_vote",
         cognition: { risk: 2 },
       },
       {
-        id: "contain",
+        id: "c4_leak_contain",
         label: "기자에게 조건부 엠바고와 검증 자료를 제안한다",
         effect: { time: -6, trust: 4, legitimacy: 3, fatigue: 4 },
         next: "c4_vote",
@@ -144,21 +144,21 @@ export const case04Nodes = {
     triggers: ["reward", "order", "protection", "responsibility"],
     choices: [
       {
-        id: "approve",
+        id: "c4_vote_approve",
         label: "서비스 유지를 위해 예외를 승인한다",
         effect: { capital: 20, trust: -4, legitimacy: -14, fatigue: 2 },
         next: "c4_final",
         cognition: { risk: 2 },
       },
       {
-        id: "refuse",
+        id: "c4_vote_refuse",
         label: "예외를 거부하고 손실을 공식화한다",
         effect: { capital: -18, trust: 8, legitimacy: 10, humanCost: 14, fatigue: 4 },
         next: "c4_final",
         cognition: { persistence: 2 },
       },
       {
-        id: "contain",
+        id: "c4_vote_contain",
         label: "예외 승인과 공개 감사 조건을 묶는다",
         effect: { capital: 8, trust: 6, legitimacy: 4, fatigue: 5 },
         next: "c4_final",

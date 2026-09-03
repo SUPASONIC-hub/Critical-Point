@@ -15,6 +15,7 @@ import {
   getOutcomeCarryover,
   getContinuityChallenge,
   detectPrivacySignals,
+  getCognitionSpread,
   getGameplayStats,
   getAllDiscoveryClueIds,
   getObservationLedger,
@@ -856,6 +857,20 @@ assert.equal(gameplayStats.reducedRiskCount, 1, "risk reductions should be track
 assert.equal(gameplayStats.challengeClearCount, 2, "cleared scene challenges should be tracked");
 assert.equal(gameplayStats.currentChallengeStreak, 0, "failed latest challenge should reset streak");
 assert.equal(gameplayStats.consistencyScore, 100, "a run that holds one direction should score full consistency");
+// The axis this replaced returned 100 for every strategy measured, so it could
+// not separate two runs. These pin the ends and the middle of the new one.
+assert.equal(getCognitionSpread([]), 0, "no decisions should not score cognitive spread");
+assert.equal(getCognitionSpread(["risk", "risk", "risk"]), 0, "one repeated approach is no spread");
+assert.equal(getCognitionSpread(["risk", "inference", "risk", "inference"]), 50, "two even approaches should sit mid-scale");
+assert.equal(
+  getCognitionSpread(["risk", "inference", "reframing", "persistence"]),
+  100,
+  "an even spread across all four approaches should reach the top",
+);
+assert.ok(
+  getCognitionSpread(["risk", "risk", "risk", "risk", "risk", "inference", "reframing", "persistence"]) < 90,
+  "a lopsided spread should score below an even one",
+);
 assert.equal(gameplayStats.momentumTier, "FLOW", "sample gameplay should reach FLOW momentum");
 assert.equal(gameplayStats.rank, "B", "sample gameplay should map to B rank under the burst algorithm");
 const observationLedger = getObservationLedger([

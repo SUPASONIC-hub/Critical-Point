@@ -106,9 +106,36 @@ test("mobile play screen keeps the decision reachable", async ({ page }) => {
   // 5,775px with the choices starting around y=2,600 before the layout pass.
   expect(choicePanelTop).toBeLessThan(844 * 2);
   const pageHeight = await page.evaluate(() => document.body.scrollHeight);
-  expect(pageHeight).toBeLessThan(844 * 5.5);
+  expect(pageHeight).toBeLessThan(844 * 5);
   await page.locator("#choice-panel").scrollIntoViewIfNeeded();
   await expect(rail).toBeInViewport();
+});
+
+// U-1: the console used to open 1,639px down an 844px screen and take 700ms of
+// smooth scrolling to arrive, so a tap during the scroll landed on whatever slid
+// past. It is fixed to the viewport on a phone now.
+test("mobile commit console opens inside the viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  });
+  await startDebugNode(page, "case05", "c5_voice");
+  await expect(page.locator(".game-shell")).toBeVisible();
+  const track = await page.evaluate(async () => {
+    document.querySelector(".choices .choice").click();
+    const samples = [];
+    for (let frame = 0; frame < 30; frame += 1) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const button = document.querySelector("[data-testid='commit-confirm']");
+      if (button) samples.push(Math.round(button.getBoundingClientRect().top));
+    }
+    return samples;
+  });
+  expect(track.length).toBeGreaterThan(0);
+  expect(track[0]).toBeLessThan(844);
+  expect(track.at(-1)).toBeLessThan(844);
+  // Only the open animation may move it, never a scroll chasing it down the page.
+  expect(Math.abs(track.at(-1) - track[0])).toBeLessThan(80);
 });
 
 test("intro mobile visual baseline @visual", async ({ page }) => {

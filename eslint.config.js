@@ -41,7 +41,9 @@ export default [
     rules: { "no-unused-vars": unusedVars },
   },
   {
-    files: ["scripts/runtime-smoke.mjs", "scripts/extract-*.mjs", "tests/**/*.js"],
+    // These run node code that also evaluates in a page, so both sets of
+    // globals are legitimate in one file.
+    files: ["scripts/runtime-smoke.mjs", "scripts/build-art-variants.mjs", "tests/**/*.js"],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ];

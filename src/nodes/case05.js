@@ -15,21 +15,21 @@ export const case05Nodes = {
     triggers: ["responsibility", "curiosity", "order"],
     choices: [
       {
-        id: "blame",
+        id: "c5_start_blame",
         label: "운영 책임자를 특정해 조사한다",
         effect: { trust: -4, legitimacy: 5, fatigue: 2 },
         next: "c5_map",
         cognition: { risk: 1 },
       },
       {
-        id: "map",
+        id: "c5_start_map",
         label: "누락이 생긴 전체 의사결정 흐름을 그린다",
         effect: { time: -12, legitimacy: 2, fatigue: 4 },
         next: "c5_map",
         cognition: { inference: 2, persistence: 1 },
       },
       {
-        id: "redesign",
+        id: "c5_start_redesign",
         label: "즉시 임시 수동 배차 체계로 전환한다",
         effect: { capital: -8, trust: 6, humanCost: -8, fatigue: 4 },
         next: "c5_map",
@@ -58,21 +58,21 @@ export const case05Nodes = {
     triggers: ["curiosity", "order", "responsibility"],
     choices: [
       {
-        id: "map",
+        id: "c5_map_map",
         label: "기준별로 밀려난 사람들의 공통점을 찾는다",
         effect: { time: -10, legitimacy: 3, fatigue: 4 },
         next: "c5_blame",
         cognition: { inference: 3 },
       },
       {
-        id: "blame",
+        id: "c5_map_blame",
         label: "경고 지표를 놓친 관리자 책임을 묻는다",
         effect: { trust: -6, legitimacy: 5, fatigue: 2 },
         next: "c5_blame",
         cognition: { risk: 1 },
       },
       {
-        id: "redesign",
+        id: "c5_map_redesign",
         label: "누락자 보호 가중치를 임시로 높인다",
         effect: { capital: -6, trust: 6, humanCost: -10, fatigue: 4 },
         next: "c5_blame",
@@ -101,21 +101,21 @@ export const case05Nodes = {
     triggers: ["responsibility", "competition", "injustice"],
     choices: [
       {
-        id: "blame",
+        id: "c5_blame_blame",
         label: "관리자 징계와 보상안을 먼저 발표한다",
         effect: { trust: 8, legitimacy: 2, humanCost: -4, fatigue: 2 },
         next: "c5_collapse",
         cognition: { risk: 2 },
       },
       {
-        id: "map",
+        id: "c5_blame_map",
         label: "단일 책임보다 구조 실패 보고서를 발표한다",
         effect: { trust: -6, legitimacy: 5, fatigue: 4 },
         next: "c5_collapse",
         cognition: { persistence: 2, inference: 1 },
       },
       {
-        id: "redesign",
+        id: "c5_blame_redesign",
         label: "징계, 보상, 시스템 개편을 한 패키지로 묶는다",
         effect: { capital: -8, trust: 5, legitimacy: 4, humanCost: -6, fatigue: 5 },
         next: "c5_collapse",
@@ -144,21 +144,21 @@ export const case05Nodes = {
     triggers: ["protection", "curiosity", "order"],
     choices: [
       {
-        id: "redesign",
+        id: "c5_collapse_redesign",
         label: "조용한 사람을 보호하는 역가중치를 넣는다",
         effect: { capital: -10, trust: 8, legitimacy: 5, humanCost: -12, fatigue: 4 },
         next: "c5_final",
         cognition: { reframing: 3, inference: 1 },
       },
       {
-        id: "blame",
+        id: "c5_collapse_blame",
         label: "기존 관리자 책임과 현장 보완 교육을 선택한다",
         effect: { trust: 4, legitimacy: 3, humanCost: -4, fatigue: 2 },
         next: "c5_final",
         cognition: { risk: 1 },
       },
       {
-        id: "map",
+        id: "c5_collapse_map",
         label: "피해자 기준으로 전체 지표를 다시 설계한다",
         effect: { time: -12, capital: -8, legitimacy: 6, humanCost: -10, fatigue: 5 },
         next: "c5_final",
@@ -194,7 +194,7 @@ export const case05Nodes = {
         cognition: { risk: 2 },
       },
       {
-        id: "final_system",
+        id: "c5_final_final_system",
         label: "시스템 개편과 피해자 기준 재설계를 우선한다",
         effect: { capital: -12, trust: 3, legitimacy: 7, humanCost: -12, fatigue: 5 },
         next: "case05_result",

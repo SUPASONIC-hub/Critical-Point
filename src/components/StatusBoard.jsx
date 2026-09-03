@@ -4,8 +4,6 @@ export function StatusBoard({
   activePlayStyle,
   turnBriefItems,
   sceneChallenge,
-  resourceMeta,
-  resources,
   node,
   speakerProfile,
   triggerLabels,
@@ -21,8 +19,14 @@ export function StatusBoard({
           <strong>{playerName}</strong>
           <small>{activePlayStyle.label} · {activePlayStyle.title}</small>
         </div>
-        <section className="turn-brief">
-          <h2>이번 턴 브리프</h2>
+        {/* The scene's own goal stays out; the rest of the brief folds like the
+            five drawers under it, because the rail above the choices already
+            carries the resources and the pressure this repeated. */}
+        <details className="insight-drawer status-drawer turn-brief">
+          <summary>
+            <span>이번 턴 브리프</span>
+            <b>{sceneChallenge.title}</b>
+          </summary>
           <div>
             {turnBriefItems.map((item) => (
               <article key={item.label}>
@@ -32,29 +36,6 @@ export function StatusBoard({
             ))}
           </div>
           <p>{sceneChallenge.text}</p>
-        </section>
-        <details className="insight-drawer status-drawer">
-          <summary>
-            <span>상황판</span>
-            <b>자원 상세 보기</b>
-          </summary>
-          <div className="resource-list">
-            {Object.entries(resourceMeta).map(([key, meta]) => {
-              const Icon = meta.icon;
-              return (
-                <div className="resource" key={key}>
-                  <div>
-                    <Icon size={16} />
-                    <span>{meta.label}</span>
-                  </div>
-                  <b>
-                    {resources[key]}
-                    {meta.suffix}
-                  </b>
-                </div>
-              );
-            })}
-          </div>
         </details>
         <details className="insight-drawer status-drawer">
           <summary>

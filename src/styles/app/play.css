@@ -2027,11 +2027,18 @@
   animation: commit-in 0.18s ease-out both;
 }
 @media (max-width: 768px) {
+  /* Fixed, not sticky. Sticky kept the console in the flow of the choice list,
+     which on a phone put the confirm button 1,639px down an 844px screen and
+     made opening it a 700ms scroll. It now opens where the thumb already is. */
   .commit-console {
-    position: sticky;
-    bottom: max(10px, env(safe-area-inset-bottom));
-    z-index: 12;
-    margin: 10px -4px 14px;
+    position: fixed;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 8px;
+    z-index: 14;
+    max-height: 72dvh;
+    overflow-y: auto;
+    margin: 0;
     padding-bottom: calc(14px + env(safe-area-inset-bottom));
     box-shadow: 0 12px 32px rgba(24, 32, 31, 0.32);
   }
@@ -2040,6 +2047,10 @@
     bottom: 0;
     padding-top: 4px;
     background: var(--c-ink);
+  }
+  /* Room for the panel that is now over the page rather than in it. */
+  .game-board.has-commit-console {
+    padding-bottom: 60dvh;
   }
 }
 .commit-console.unstable,
@@ -2815,7 +2826,8 @@
   border: 1px solid var(--c-teal-deep);
   border-radius: 8px;
 }
-.turn-brief h2 {
+.turn-brief > summary span,
+.turn-brief > summary b {
   color: var(--c-paper);
 }
 .turn-brief > div {

@@ -990,7 +990,11 @@ export function AppContent({ onSuppressSaves }) {
   useEffect(() => {
     if (!pendingChoice) return;
     window.requestAnimationFrame(() => {
-      commitConsoleRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "center" });
+      // On a phone the console is fixed to the viewport, so there is nothing to
+      // scroll to; scrolling there was what made confirming feel slow.
+      if (!window.matchMedia?.("(max-width: 768px)").matches) {
+        commitConsoleRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "nearest" });
+      }
       commitConfirmRef.current?.focus({ preventScroll: true });
     });
   }, [pendingChoice]);
