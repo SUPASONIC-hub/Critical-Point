@@ -1,5 +1,6 @@
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
+import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 
 export function ResultScreen({ view }) {
   const {
@@ -111,6 +112,8 @@ export function ResultScreen({ view }) {
   ];
   const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
   const endingTwistCount = endingTwists.length;
+  const endingImage = view.endingSceneProfile?.image ?? "/ending-final-archive.webp";
+  const endingArt = getArtSources(endingImage);
   const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { label: "PROTECT", value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)), text: "사람과 현장의 피해를 얼마나 줄였는가" },
@@ -164,14 +167,18 @@ export function ResultScreen({ view }) {
         </p>
         {currentCase === "final" && (
             <section className={`ending-sequence ending-step-${endingStep} ending-palette-${view.endingAtmosphere?.palette ?? "archive"} ${view.endingVisualClass ?? ""}`} aria-label="최종 엔딩 시퀀스">
-            <img
-              className="ending-visual"
-              src={view.endingSceneProfile?.image ?? "/ending-final-archive.webp"}
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              decoding="async"
-            />
+            <picture>
+              {endingArt && <source media={PHONE_ART_MEDIA} srcSet={endingArt.phone} type="image/webp" />}
+              {endingArt && <source srcSet={endingArt.wide} type="image/webp" />}
+              <img
+                className="ending-visual"
+                src={endingImage}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <div className="ending-visual-scrim" aria-hidden="true" />
             <h1 className="sr-only">Season complete</h1>
             <div className="ending-sequence-header">

@@ -14,8 +14,9 @@ Last updated: 2026-09-03
 ## Design Audit (2026-09-03)
 
 `docs/design-audit-2026-09-03.md` measured the graph and the screens across nine
-axes and found 18 issues. All of them are now applied except the bundle split
-(P-2), which is explained at the bottom of this section.
+axes and found 18 issues. All of them are now applied -- P-2 in the form the
+measurements pointed at rather than the two mechanisms it suggested, which is
+set out under "P-2, measured" below.
 
 - Resource design (G-1, G-2). Picking the first column every time used to win
   every axis at once. Effects were rewritten so each archetype pays: people
@@ -37,13 +38,46 @@ axes and found 18 issues. All of them are now applied except the bundle split
   outside React state; only the two components that print it subscribe per
   second, and the root subscribes to a coarse phase.
 
-Not applied: P-2 (bundle and CSS splitting). Both halves need structural work
-this pass did not scope. Lazy-loading `play.css` would reorder the cascade that
-`src/styles/app.css` documents and `check-css-structure` guards -- `extensions.css`
-has to outrank it, and a lazy chunk lands after it. Deferring per-case node
-modules needs the scene graph to become async, and every consumer, script and
-test reads it synchronously. The audit's own dependency-ordered work queue leaves
-P-2 out for the same reason.
+### P-2, measured (2026-09-03, second pass)
+
+P-2 asked for two mechanisms and listed three pieces of evidence. The two
+mechanisms were built and measured; the third piece of evidence turned out to be
+the one carrying the weight, and that is what shipped.
+
+**Shipped: the art is sized to the slot it is painted into.** The key visual was
+a single 1,672px file used both as the intro backdrop and as the hero, so a
+phone downloaded 146KB for a 356px slot, twice over once the responsive hero was
+added. Each of the ten scene, ending and key-visual images now also exists at
+480px and 960px, and the intro backdrop, the hero, the play scene and the ending
+visual all pick by media and pixel density. The variants were re-encoded through
+Chromium's own webp encoder, so this needs no image toolchain.
+
+    first load     desktop 873KB -> 776KB      phone 890KB -> 744KB
+    key visual     146KB -> 49KB desktop, 17KB phone
+    play screen    desktop 326KB -> 194KB      phone 336KB -> 86KB
+
+`npm run check:art` holds the variants and their byte budgets.
+
+**Not shipped: lazy CSS chunks.** Splitting `play.css` into the screen chunk cuts
+`index.css` from 155KB to 102KB (27.3KB to 19.1KB gzipped). Load order cannot
+carry the cascade -- `extensions.css` has to outrank `play.css` and a lazy chunk
+lands after it -- so this was built with `@layer` instead. Cascade layers
+outrank specificity, not just order, which silently rewrites conflicts that
+specificity used to settle: `.intro p { font-size: 20px }` in the base layer lost
+to `.play-style-unlock { font-size: 12px }` in the extensions layer purely
+because extensions is a later layer. Seven computed styles changed on the intro
+alone. An 8KB gzip saving is not worth a cascade whose behaviour nobody has
+signed off, so the layers were reverted. Doing this properly means either
+flattening the five files into one order-independent set, or a build step that
+emits per-screen CSS and proves rule-for-rule equivalence.
+
+**Not shipped: deferring the scene graph.** Stubbing every authored Korean string
+in `src/nodes/`, `gameData.js` and `gameDialogue.js` takes the entry chunk from
+348KB to 261KB, 115.7KB to 85.2KB gzipped. That 30KB is real, but the graph is
+read synchronously at module scope by `AppContent`, both validation scripts and
+the e2e helpers, and `AppContent` renders the intro, so nothing can be deferred
+until the graph becomes async and every one of those readers is rewritten around
+it. That is a larger and riskier change than the 30KB justifies today.
 
 ## Maintenance Priorities
 
@@ -64,7 +98,13 @@ P-2 out for the same reason.
 12. Keep per-second state out of the root. The decision countdown is an external
     store (`src/state/decisionClock.js`) precisely because root state rebuilt the
     whole play view once a second.
-13. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+13. Ship art at the width it is painted at. `src/responsiveArt.js` lists the
+    images that have 480px and 960px variants and builds the `srcset` for them;
+    `npm run check:art` fails when a variant is missing or has crept back up
+    toward the original's weight. Regenerate variants by drawing the original to
+    a canvas at the target width and reading back `toDataURL("image/webp", 0.82)`
+    -- the browser is the encoder, so there is no image toolchain to install.
+14. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
 ## Verification Commands
 

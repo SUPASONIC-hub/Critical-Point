@@ -3,8 +3,10 @@ import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
+import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 
 export function IntroScreen({ view }) {
+  const heroArt = getArtSources("/triggerlab-key-visual.webp");
   const {
     common: {
       AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus,
@@ -272,7 +274,8 @@ export function IntroScreen({ view }) {
           </section>
           <figure className="intro-visual">
             <picture>
-              <source srcSet="/triggerlab-key-visual.webp" type="image/webp" />
+              <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
+              <source srcSet={heroArt.wide} type="image/webp" />
               <img
                 src="/triggerlab-key-visual.jpg"
                 alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"

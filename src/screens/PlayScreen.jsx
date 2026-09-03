@@ -8,6 +8,7 @@ import { GameHeader } from "../components/GameHeader.jsx";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ResourceRail } from "../components/ResourceRail.jsx";
 import { CASE_SEQUENCE, costWhenRising } from "../gameData.js";
+import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
@@ -67,6 +68,7 @@ export function PlayScreen({ view }) {
   const lastFreeTextSignals = latestFreeTextSuccess?.freeText
     ? getFreeTextSignals(latestFreeTextSuccess.freeText)
     : null;
+  const sceneArt = getArtSources(sceneVisuals[currentCase]);
   const operatorBrief = view.operatorBriefs?.[currentCase];
   const chapterRule = view.chapterRules?.[currentCase];
   const relationshipScores = view.relationshipScores ?? [];
@@ -528,23 +530,27 @@ export function PlayScreen({ view }) {
 
         <div className="scene">
           <div className="scene-visual" aria-hidden="true">
-            <img
-              src={sceneVisuals[currentCase] ?? "/triggerlab-key-visual.jpg"}
-              alt=""
-              width="1792"
-              height="1024"
-              loading="lazy"
-              decoding="async"
-              onError={(event) => {
-                if (event.currentTarget.dataset.fallback === "true") return;
-                event.currentTarget.dataset.fallback = "true";
-                event.currentTarget.src = "/triggerlab-key-visual.jpg";
-              }}
-            />
+            <picture>
+              {sceneArt && <source media={PHONE_ART_MEDIA} srcSet={sceneArt.phone} type="image/webp" />}
+              {sceneArt && <source srcSet={sceneArt.wide} type="image/webp" />}
+              <img
+                src={sceneVisuals[currentCase] ?? "/triggerlab-key-visual.jpg"}
+                alt=""
+                width="1792"
+                height="1024"
+                loading="lazy"
+                decoding="async"
+                onError={(event) => {
+                  if (event.currentTarget.dataset.fallback === "true") return;
+                  event.currentTarget.dataset.fallback = "true";
+                  event.currentTarget.src = "/triggerlab-key-visual.jpg";
+                }}
+              />
+            </picture>
           </div>
           <div className="speaker">
             <img
-              src={speakerPortrait ?? "/speaker-profile.webp"}
+              src={speakerPortrait ?? "/speaker-profile-160.webp"}
               alt=""
               width="52"
               height="52"
@@ -553,7 +559,7 @@ export function PlayScreen({ view }) {
               onError={(event) => {
                 if (event.currentTarget.dataset.fallback === "true") return;
                 event.currentTarget.dataset.fallback = "true";
-                event.currentTarget.src = "/speaker-profile.webp";
+                event.currentTarget.src = "/speaker-profile-160.webp";
               }}
             />
             <span>
