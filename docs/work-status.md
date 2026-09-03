@@ -59,17 +59,22 @@ Chromium's own webp encoder, so this needs no image toolchain.
 `npm run check:art` holds the variants and their byte budgets.
 
 **Not shipped: lazy CSS chunks.** Splitting `play.css` into the screen chunk cuts
-`index.css` from 155KB to 102KB (27.3KB to 19.1KB gzipped). Load order cannot
-carry the cascade -- `extensions.css` has to outrank `play.css` and a lazy chunk
-lands after it -- so this was built with `@layer` instead. Cascade layers
-outrank specificity, not just order, which silently rewrites conflicts that
-specificity used to settle: `.intro p { font-size: 20px }` in the base layer lost
-to `.play-style-unlock { font-size: 12px }` in the extensions layer purely
-because extensions is a later layer. Seven computed styles changed on the intro
-alone. An 8KB gzip saving is not worth a cascade whose behaviour nobody has
-signed off, so the layers were reverted. Doing this properly means either
-flattening the five files into one order-independent set, or a build step that
-emits per-screen CSS and proves rule-for-rule equivalence.
+`index.css` from 155KB to 102KB (27.5KB to 19.0KB gzipped). Measured twice, from
+both directions. With `@layer`, which is the only way load order can carry the
+cascade, layers outrank specificity and not just order, so conflicts specificity
+used to settle get rewritten: `.intro p { font-size: 20px }` in the base layer
+lost to `.play-style-unlock { font-size: 12px }` in extensions purely because
+extensions is a later layer, and seven computed styles changed on the intro
+alone. Without layers, comparing every element's computed style across six
+screens before and after found 101 (element, property) differences: the intro and
+ranking screens read rules that live in `play.css` (`.panel-title-row` and its
+children), and on the play screen the overrides `result.css` and
+`extensions.css` apply to `.scene`, `.game-board` and the effect chips invert.
+Clearing that means relocating some forty rules and then permanently owing the
+rule that a screen file outranks the override layer. 8.5KB gzipped does not buy
+that. Doing it properly means either flattening the five files into one
+order-independent set, or a build step that emits per-screen CSS and proves
+rule-for-rule equivalence.
 
 **Not shipped: deferring the scene graph.** Stubbing every authored Korean string
 in `src/nodes/`, `gameData.js` and `gameDialogue.js` takes the entry chunk from
@@ -121,6 +126,27 @@ One check changed shape while doing this. `check-balance` used to require each
 column to end a case strictly best on some resource; it now requires that no
 column is Pareto-dominated. That is the property the file exists to protect, and
 it does not misfire when two columns both cap a resource at 100.
+
+## Open: third audit (2026-09-03)
+
+`docs/design-audit-2026-09-03-round3.md` measured the state the two applied
+passes left. Eight findings, none applied yet. The three that matter:
+
+- The season's only failure ending cannot happen. `SYSTEM COLLAPSE` needs
+  pressure 82 or humanCost 70; across 4,000 random final-case runs the maxima
+  were 33 and 31, because resources reset at the start of every case while the
+  ending thresholds are written for a season-long total. `FIELD PACT` is
+  unreachable for a similar reason, and a quarter of runs end on the fallback.
+- 11 choices are Pareto-dominated inside their own scene, so a player reading the
+  numbers has no reason to pick them. One is an opening choice this repo added
+  last pass, which is what a scene-level version of the balance check would have
+  caught.
+- The commit console that was fixed to the viewport last pass covers two choice
+  cards, 105px of the selected one and 238px of an alternative. Confirming got
+  faster; comparing got slower.
+
+It also closes P-2 with a second measurement -- see "P-2 종결 기록" in that
+document, and the P-2 section above.
 
 ## Maintenance Priorities
 
