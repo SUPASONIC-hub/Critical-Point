@@ -45,26 +45,38 @@ function propertyName(property) {
   return property.key.type === "Identifier" ? property.key.name : property.key.value;
 }
 
-/** Field names AppContent passes into each create*View call. */
+const VIEW_PROVIDER_FILES = ["src/AppContent.jsx", "src/GameRuntime.jsx"];
+
+/** Field names the app shell and runtime pass into each create*View call. */
 function readProvidedFields() {
   const provided = {};
-  walk(parseFile("src/AppContent.jsx"), (node) => {
-    if (node.type !== "CallExpression") return;
-    if (node.callee.type !== "Identifier") return;
-    const screen = VIEW_FACTORIES[node.callee.name];
-    if (!screen) return;
-    const fields = [];
-    for (const argument of node.arguments) {
-      if (argument.type !== "ObjectExpression") continue;
-      for (const property of argument.properties) {
-        if (property.type !== "Property") {
-          throw new Error(`${node.callee.name} spreads into its view bag; the contract cannot be read statically.`);
+  for (const file of VIEW_PROVIDER_FILES) {
+    walk(parseFile(file), (node) => {
+      if (node.type !== "CallExpression") return;
+      if (node.callee.type !== "Identifier") return;
+      const screen = VIEW_FACTORIES[node.callee.name];
+      if (!screen) return;
+      const fields = [];
+      for (const argument of node.arguments) {
+        if (argument.type !== "ObjectExpression") continue;
+        for (const property of argument.properties) {
+          if (property.type !== "Property") {
+            throw new Error(`${node.callee.name} spreads into its view bag; the contract cannot be read statically.`);
+          }
+          fields.push(propertyName(property));
         }
-        fields.push(propertyName(property));
       }
-    }
-    provided[screen] = fields;
-  });
+      if (provided[screen]) {
+        const current = [...provided[screen]].sort().join("\n");
+        const next = [...fields].sort().join("\n");
+        if (current !== next) {
+          throw new Error(`${screen} view is built with different fields in multiple files.`);
+        }
+        return;
+      }
+      provided[screen] = fields;
+    });
+  }
   return provided;
 }
 

@@ -3,7 +3,7 @@ import "./styles/tokens.css";
 import "./styles/app.css";
 import { readStoredValue, RECOVERY_CENTER_STORAGE_KEY, removeStoredValue, STORAGE_KEY, writeStoredValue } from "./appConfig.js";
 import { AppContent, resumeSaves, suppressSaves } from "./AppContent.jsx";
-import { getSavedRecoveryState, recordAppError } from "./state/savedState.js";
+import { getSavedRecoveryState, recordAppError } from "./state/errorRecovery.js";
 
 export const caseSequence = ["case01", "case02", "case03", "case04", "case05", "final"];
 
