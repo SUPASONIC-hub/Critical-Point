@@ -66,6 +66,7 @@ import {
   CASE_START_NODES,
   caseOpeningRoutes,
   getCaseBranchNodes,
+  getContinuityMemoryChoice,
   getCaseRouteLength,
   getNodeRouteIndex,
   initialResources,
@@ -457,6 +458,24 @@ assert.equal(
   getAuthorityGate(nodes.f_route_map.choices.at(-1), { clueCount: 4, trust: 60, legitimacy: 55 }).unlocked,
   true,
   "final evidence turnaround should unlock at oversight authority",
+);
+assert.equal(
+  getContinuityMemoryChoice({
+    caseId: "case03",
+    nodeId: CASE_START_NODES.case03,
+    log: [{ caseId: "case02", nodeId: "c2_evidence_turn", choiceId: "c2_evidence_turn_guard" }],
+  }).next,
+  "c3_evidence_turn",
+  "previous evidence turns should add a next-case memory choice that changes the opening question",
+);
+assert.equal(
+  getContinuityMemoryChoice({
+    caseId: "final",
+    nodeId: CASE_START_NODES.final,
+    log: [{ caseId: "case05", nodeId: "c5_route_system", choiceId: "c5_route_system_a", freeTextSuccess: true }],
+  }).next,
+  "f_route_system",
+  "previous free-text routes should add a next-case memory choice into the hidden system route",
 );
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");

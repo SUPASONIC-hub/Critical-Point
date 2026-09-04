@@ -40,6 +40,7 @@ import {
   nodes,
   getBranchDetourBypass,
   getCaseBranchNodes,
+  getContinuityMemoryChoice,
   getCaseRouteLength,
   getNodeRouteIndex,
   seasonCasesBase,
@@ -539,13 +540,18 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         : null,
     [fallbackCaseId, isResult, log.length, node?.choices, speakerRelationship],
   );
+  const continuityMemoryChoice = useMemo(
+    () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, log }),
+    [fallbackCaseId, log, resolvedNodeId],
+  );
   const fixedChoices = useMemo(
     () => [
       ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
+      ...(continuityMemoryChoice ? [continuityMemoryChoice] : []),
       ...(adaptiveChoice ? [adaptiveChoice] : []),
       ...(relationshipChoice ? [relationshipChoice] : []),
     ],
-    [adaptiveChoice, node?.choices, relationshipChoice],
+    [adaptiveChoice, continuityMemoryChoice, node?.choices, relationshipChoice],
   );
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
   const latestFreeTextSuccess = [...log].reverse().find(

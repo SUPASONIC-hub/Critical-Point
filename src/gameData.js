@@ -1724,6 +1724,93 @@ function registerEvidenceTurnaround(caseId, plan) {
 
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
+const continuityMemoryChoicePlans = {
+  case02: {
+    routeNext: "c2_route_person",
+    systemNext: "c2_route_system",
+    evidenceNext: "c2_evidence_turn",
+    routeLabel: "직전 사건의 남은 약속을 이민서에게 먼저 확인한다",
+    systemLabel: "직전 자유응답 문장이 유출 파일에 복제됐는지 본다",
+    evidenceLabel: "직전 단서를 붙여 유출 파일의 전제를 뒤집는다",
+  },
+  case03: {
+    routeNext: "c3_route_mirror",
+    systemNext: "c3_route_system",
+    evidenceNext: "c3_evidence_turn",
+    routeLabel: "직전 사건의 보호 결정을 경쟁자의 계약서에 대조한다",
+    systemLabel: "직전 자유응답 문장이 점수판에 반영됐는지 본다",
+    evidenceLabel: "직전 단서를 붙여 두 번째 점수판을 연다",
+  },
+  case04: {
+    routeNext: "c4_route_audit",
+    systemNext: "c4_route_system",
+    evidenceNext: "c4_evidence_turn",
+    routeLabel: "직전 사건의 점수 기준을 예외 승인표에 대조한다",
+    systemLabel: "직전 자유응답 문장이 예외 사유로 쓰였는지 본다",
+    evidenceLabel: "직전 단서를 붙여 예외 파일의 원래 수신자를 연다",
+  },
+  case05: {
+    routeNext: "c5_route_map",
+    systemNext: "c5_route_system",
+    evidenceNext: "c5_evidence_turn",
+    routeLabel: "직전 사건의 예외 조건을 실패 지도에 겹쳐 본다",
+    systemLabel: "직전 자유응답 문장이 복구 우선순위에 들어갔는지 본다",
+    evidenceLabel: "직전 단서를 붙여 사라진 피해자 기준을 연다",
+  },
+  final: {
+    routeNext: "f_route_map",
+    systemNext: "f_route_system",
+    evidenceNext: "f_evidence_turn",
+    routeLabel: "직전 사건의 실패 지도를 내 플레이 로그에 겹쳐 본다",
+    systemLabel: "직전 자유응답 문장이 다음 참가자의 선택지가 됐는지 본다",
+    evidenceLabel: "직전 단서를 붙여 모든 선택 문장의 원본을 연다",
+  },
+};
+
+export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", log = [] } = {}) {
+  const plan = continuityMemoryChoicePlans[caseId];
+  if (!plan) return null;
+  const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
+  if (!openingNodes.has(nodeId)) return null;
+  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+  if (!previousCaseId) return null;
+  const previousEntries = log.filter((entry) => entry?.caseId === previousCaseId);
+  if (previousEntries.length === 0) return null;
+  const sawEvidenceTurn = previousEntries.some((entry) => String(entry.choiceId ?? "").includes("evidence_turn") || String(entry.nodeId ?? "").includes("evidence_turn"));
+  if (sawEvidenceTurn) {
+    return {
+      id: `${caseId}_memory_evidence`,
+      label: plan.evidenceLabel,
+      effect: { legitimacy: 5, trust: 2, time: -5, fatigue: 5 },
+      cognition: { inference: 2, reframing: 1 },
+      next: plan.evidenceNext,
+      requiredAuthority: caseId === "final" ? "OVERSIGHT" : "FIELD ACCESS",
+      continuityMemory: true,
+    };
+  }
+  const sawSystemRoute = previousEntries.some((entry) => entry?.freeTextSuccess || String(entry.freeTextBranchId ?? "").includes("route_system") || String(entry.nodeId ?? "").includes("route_system"));
+  if (sawSystemRoute) {
+    return {
+      id: `${caseId}_memory_system`,
+      label: plan.systemLabel,
+      effect: { legitimacy: 4, trust: 1, time: -4, fatigue: 4 },
+      cognition: { reframing: 2 },
+      next: plan.systemNext,
+      continuityMemory: true,
+    };
+  }
+  const sawRouteSplit = previousEntries.some((entry) => String(entry.nodeId ?? "").includes("_route_") || String(entry.choiceId ?? "").includes("_route_"));
+  if (!sawRouteSplit) return null;
+  return {
+    id: `${caseId}_memory_route`,
+    label: plan.routeLabel,
+    effect: { trust: 4, legitimacy: 3, time: -3, fatigue: 4 },
+    cognition: { persistence: 1, inference: 1 },
+    next: plan.routeNext,
+    continuityMemory: true,
+  };
+}
+
 export const caseOpeningRoutes = {
   case02: {
     c1_after_people: "c2_start_people",
