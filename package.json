@@ -19,6 +19,7 @@
     "check:dialogue": "node scripts/check-dialogue.mjs",
     "check:balance": "node scripts/check-balance.mjs",
     "check:endings": "node scripts/check-endings.mjs",
+    "report:endings": "node scripts/check-endings.mjs --report",
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
     "build:critical": "node scripts/build-critical-css.mjs",

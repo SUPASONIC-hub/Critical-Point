@@ -22,14 +22,24 @@ import { viewGroups } from "../src/viewModels/appViewModels.js";
 const root = process.cwd();
 
 const BUDGETS = {
+  "src/gameData.js": {
+    lines: 2367,
+    importedNames: 12,
+    hooks: {},
+  },
+  "src/gameLogic.js": {
+    lines: 1240,
+    importedNames: 17,
+    hooks: {},
+  },
   "src/GameRuntime.jsx": {
     lines: 2267,
     importedNames: 167,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {
-    lines: 865,
-    importedNames: 20,
+    lines: 749,
+    importedNames: 17,
     hooks: {},
   },
   "src/screens/ResultScreen.jsx": {
