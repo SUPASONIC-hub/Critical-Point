@@ -81,16 +81,21 @@ for (let run = 0; run < RUNS; run += 1) {
  * ratchet the floor up as headroom is won, and treat lowering it as a decision
  * worth writing down.
  */
-const RARE_ENDING_FLOOR = 10;
+const RARE_ENDING_FLOORS = {
+  collapse: 300,
+  "profitable-silence": 50,
+  "cold-justice": 50,
+  "field-pact": 10,
+};
 
 const missing = EXPECTED.filter((id) => !seen.has(id));
 assert.deepEqual(missing, [], `endings never reached in ${RUNS} random seasons: ${missing.join(", ")}`);
 const unexpected = [...seen.keys()].filter((id) => !EXPECTED.includes(id));
 assert.deepEqual(unexpected, [], `unlisted ending ids reached: ${unexpected.join(", ")}`);
 
-const thin = EXPECTED.filter((id) => (seen.get(id) ?? 0) < RARE_ENDING_FLOOR).map(
-  (id) => `${id} reached ${seen.get(id) ?? 0} of ${RUNS} seasons, under the floor of ${RARE_ENDING_FLOOR}`,
-);
+const thin = Object.entries(RARE_ENDING_FLOORS)
+  .filter(([id, floor]) => (seen.get(id) ?? 0) < floor)
+  .map(([id, floor]) => `${id} reached ${seen.get(id) ?? 0} of ${RUNS} seasons, under the floor of ${floor}`);
 assert.deepEqual(thin, [], thin.join("\n"));
 
 const spread = EXPECTED.map((id) => `${id} ${((seen.get(id) / RUNS) * 100).toFixed(1)}%`).join(", ");

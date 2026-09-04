@@ -7,9 +7,15 @@ import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ResourceRail } from "../components/ResourceRail.jsx";
-import { CASE_SEQUENCE, costWhenRising } from "../gameData.js";
+import { CASE_SEQUENCE } from "../gameData.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { describeChoiceDilemma, FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
+import {
+  formatChoiceEffectChip as formatExternalChoiceEffectChip,
+  getChoiceAuthorityImpact as getExternalChoiceAuthorityImpact,
+  getChoiceRouteBadge as getExternalChoiceRouteBadge,
+  isChoiceEffectGain as isExternalChoiceEffectGain,
+} from "../viewModels/playChoiceViewModel.js";
 
 export function PlayScreen({ view }) {
   const {
@@ -52,16 +58,6 @@ export function PlayScreen({ view }) {
       debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
     },
   } = view;
-  // humanCost and fatigue are the two axes where a rising number is the loss,
-  // so the arrow follows what the change means for the player, not its sign.
-  const isGainForPlayer = (key, value) => (costWhenRising.has(key) ? value < 0 : value > 0);
-  // The exact number stays gated behind evidence, but the size never is:
-  // knowing only the direction makes a trade-off impossible to weigh.
-  const formatEffectChip = ([key, value]) => {
-    const steps = Math.abs(value) >= 8 ? 3 : Math.abs(value) >= 4 ? 2 : 1;
-    const mark = (isGainForPlayer(key, value) ? "▲" : "▼").repeat(steps);
-    return `${resourceMeta[key]?.label ?? key} ${value > 0 ? "상승" : "소모"} ${mark}`;
-  };
   // The four criteria used to be listed while typing, which read as an answer
   // key: one keyword each cleared all of them. They are feedback on what the
   // last submitted sentence actually carried instead.
@@ -86,23 +82,6 @@ export function PlayScreen({ view }) {
         : currentChallengeStreak > 0
           ? "방금 맞힌 목표가 다음 장면의 기준선으로 남았습니다."
           : "아직 관찰자는 침묵하지만, 선택의 순서는 저장되고 있습니다.";
-  const getAuthorityImpact = (choice) => {
-    const choiceText = `${choice.id} ${choice.label}`;
-    if (/protect|people|witness|person|사람|보호|증언/.test(choiceText)) return "권한 영향: 보호 절차를 열고 현장의 발언권을 넓힙니다.";
-    if (/expose|public|report|disclosure|공개|폭로|보고/.test(choiceText)) return "권한 영향: 기록의 공개 범위를 넓히지만 조직의 반발을 부릅니다.";
-    if (/isolate|stop|seal|destroy|차단|중단|폐기|잠금/.test(choiceText)) return "권한 영향: 접근을 줄여 피해를 막지만, 확인되지 않은 목소리도 닫힙니다.";
-    if (/system|redesign|reform|구조|개편|재설계/.test(choiceText)) return "권한 영향: 당장의 결론보다 다음 운영 기준에 개입합니다.";
-    return "권한 영향: 이 선택의 흔적이 다음 챕터의 조사 기준으로 남습니다.";
-  };
-  const getChoiceRouteBadge = (choice) => {
-    if (choice.continuityMemory) return { label: "MEMORY ROUTE", text: "이전 사건의 선택 로그가 만든 추가 선택지" };
-    if (String(choice.id ?? "").includes("evidence_turn")) return { label: "EVIDENCE TURN", text: "발견한 단서가 질문의 전제를 바꾸는 선택지" };
-    if (choice.requiredAuthority === "OVERSIGHT") return { label: "OVERSIGHT", text: "감독 권한으로만 열리는 선택지" };
-    if (choice.requiredAuthority === "FIELD ACCESS") return { label: "FIELD ACCESS", text: "단서 또는 신뢰가 충분할 때 열리는 선택지" };
-    if (choice.adaptive) return { label: "ADAPTIVE", text: "자유응답 기록이 만든 추가 선택지" };
-    if (choice.routeSplit || choice.branchId) return { label: "ROUTE SPLIT", text: "다른 질문 경로로 갈라지는 선택지" };
-    return null;
-  };
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
@@ -699,7 +678,7 @@ export function PlayScreen({ view }) {
                   {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
                     .filter(([, value]) => value !== 0)
                     .map(([key, value]) => (
-                      <b key={key} className={isGainForPlayer(key, value) ? "positive" : "negative"}>
+                      <b key={key} className={isExternalChoiceEffectGain(key, value) ? "positive" : "negative"}>
                         {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
                       </b>
                     ))}
@@ -729,7 +708,7 @@ export function PlayScreen({ view }) {
                     ? `위험 ${riskDelta}`
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
-              const routeBadge = getChoiceRouteBadge(choice);
+              const routeBadge = getExternalChoiceRouteBadge(choice);
               const pressureHint =
                 riskDelta > 0
                   ? "압박이 커질 수 있습니다."
@@ -789,13 +768,13 @@ export function PlayScreen({ view }) {
                       .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
                       .slice(0, 4)
                       .map((entry) => (
-                        <b key={entry[0]} className={isGainForPlayer(entry[0], entry[1]) ? "positive" : "negative"}>
-                          {formatEffectChip(entry)}
+                        <b key={entry[0]} className={isExternalChoiceEffectGain(entry[0], entry[1]) ? "positive" : "negative"}>
+                          {formatExternalChoiceEffectChip(entry, resourceMeta)}
                         </b>
                       ))}
                   </span>
                   {showTacticalDetails && <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>}
-                  {showTacticalDetails && <span className="choice-authority-impact">{getAuthorityImpact(choice)}</span>}
+                  {showTacticalDetails && <span className="choice-authority-impact">{getExternalChoiceAuthorityImpact(choice)}</span>}
                   {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
                   {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
                   {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}

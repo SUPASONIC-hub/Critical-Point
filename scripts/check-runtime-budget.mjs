@@ -23,9 +23,14 @@ const root = process.cwd();
 
 const BUDGETS = {
   "src/GameRuntime.jsx": {
-    lines: 2354,
-    importedNames: 173,
+    lines: 2318,
+    importedNames: 165,
     hooks: { useState: 24, useMemo: 18, useEffect: 14, useRef: 18 },
+  },
+  "src/screens/PlayScreen.jsx": {
+    lines: 993,
+    importedNames: 25,
+    hooks: {},
   },
 };
 

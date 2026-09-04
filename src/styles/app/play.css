@@ -2467,6 +2467,40 @@
   font-weight: 900;
   line-height: 1.35;
 }
+.choice-route-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  min-height: 22px;
+  margin-left: 24px;
+  padding: 4px 7px;
+  border: 1px solid var(--c-acid-dark);
+  background: var(--c-acid-pale);
+  color: var(--c-ink);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.choice[data-continuity-memory="true"] {
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 1px rgba(72, 196, 173, 0.35);
+}
+.choice[data-continuity-memory="true"] .choice-route-badge {
+  color: var(--c-ink);
+  background: var(--c-mint);
+  border-color: var(--c-teal-deep);
+}
+.choice[data-evidence-turn="true"] {
+  border-color: var(--c-coral);
+  box-shadow: 0 0 0 1px rgba(239, 111, 82, 0.34);
+}
+.choice[data-evidence-turn="true"] .choice-route-badge {
+  color: var(--c-ink);
+  background: var(--c-coral-soft);
+  border-color: var(--c-coral);
+}
 .challenge-match {
   display: block;
   width: fit-content;
