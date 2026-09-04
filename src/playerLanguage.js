@@ -54,6 +54,36 @@ export function simplifyPlayerText(value = "") {
   return phraseReplacements.reduce((current, [pattern, replacement]) => current.replace(pattern, replacement), text);
 }
 
+/**
+ * A Korean particle agrees with the sound the preceding word ends on, so a
+ * sentence built at runtime cannot bake one into its format string: "사람 피해을"
+ * is what happens when it does. Numbers are read aloud, so the agreement follows
+ * the Korean reading of the last digit -- 2/4/5/9 end on a vowel, and anything
+ * ending in 0 is read 십/백/천/만, which does not.
+ */
+const DIGIT_ENDS_ON_CONSONANT = [true, true, false, true, false, false, true, true, true, false];
+
+export function endsOnConsonant(word = "") {
+  const lastChar = String(word).trim().at(-1);
+  if (!lastChar) return true;
+  if (lastChar >= "0" && lastChar <= "9") return DIGIT_ENDS_ON_CONSONANT[Number(lastChar)];
+  const code = lastChar.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return true;
+  return (code - 0xac00) % 28 !== 0;
+}
+
+export function objectParticle(word) {
+  return endsOnConsonant(word) ? "을" : "를";
+}
+
+export function subjectParticle(word) {
+  return endsOnConsonant(word) ? "이" : "가";
+}
+
+export function topicParticle(word) {
+  return endsOnConsonant(word) ? "은" : "는";
+}
+
 export const easyResourceLabels = {
   time: "남은 시간",
   capital: "현금",

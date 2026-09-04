@@ -1,11 +1,14 @@
 import { ChevronRight, Sparkles } from "lucide-react";
+import { byEffectWeight, isResourceGain } from "../gameConstants.js";
 
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta } = view;
   if (!decisionReveal) return null;
+  // "열린 것" is what the choice bought, not what went up: 사람 피해 +11 belongs
+  // under 닫힌 것. Three entries fit, so they are the three that moved most.
   const effectEntries = Object.entries(decisionReveal.effect ?? {}).filter(([, value]) => value !== 0);
-  const gains = effectEntries.filter(([, value]) => value > 0).slice(0, 3);
-  const costs = effectEntries.filter(([, value]) => value < 0).slice(0, 3);
+  const gains = effectEntries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
+  const costs = effectEntries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
   const archiveLine = decisionReveal.cascade
     ? "이 선택은 사건 해결 로그가 아니라 허용선 표본으로 보관됩니다."

@@ -19,6 +19,9 @@ import {
   parseRecoverySlots,
   restoreRecoverySnapshot,
 } from "../src/appConfig.js";
+import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic.js";
+import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { nodes } from "../src/gameData.js";
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
 assert.deepEqual(parseLocalRankingRows("not json"), [], "local ranking parser should ignore corrupt JSON");
@@ -113,5 +116,64 @@ assert.equal(
   90,
   "a second completed-season row for one run should win on score, not arrival order",
 );
+
+// A Korean particle agrees with the sound before it, and the sentences the game
+// builds at runtime kept baking one in: the play screen printed "사람 피해을"
+// under every choice that moved it.
+assert.equal(objectParticle("사람 피해"), "를", "a vowel-final label takes 를");
+assert.equal(objectParticle("믿음"), "을", "a consonant-final label takes 을");
+assert.equal(subjectParticle("신뢰"), "가", "신뢰 ends on a vowel");
+assert.equal(subjectParticle("현금"), "이", "현금 ends on a consonant");
+// Numbers are spoken, so the agreement follows the reading of the last digit.
+assert.equal(objectParticle("현금 +2"), "를", "2 is read 이, which ends on a vowel");
+assert.equal(objectParticle("현금 +7"), "을", "7 is read 칠, which ends on a consonant");
+assert.equal(endsOnConsonant("믿음 -10"), true, "anything ending in 0 is read 십/백/천/만");
+
+// The trade-off line sits directly above the effect chips and used to disagree
+// with them: it split the effect by sign, so a rising 사람 피해 was announced as
+// something the choice won.
+assert.equal(
+  describeChoiceDilemma({ capital: 24, humanCost: 11, trust: -6 }),
+  "현금을 얻는 대신 사람 피해를 키웁니다.",
+  "rising 사람 피해 is what the choice costs, and it is the biggest cost here",
+);
+assert.equal(
+  describeChoiceDilemma({ trust: 8, humanCost: -4, fatigue: 2 }),
+  "믿음을 얻는 대신 지침을 키웁니다.",
+  "falling 사람 피해 is a gain, so the cost named is the rising 지침",
+);
+assert.equal(
+  describeChoiceDilemma({ humanCost: -9, capital: -2 }),
+  "사람 피해를 줄이는 대신 현금을 닫습니다.",
+  "cutting a cost is described as cutting it, not as winning it",
+);
+assert.equal(
+  describeChoiceDilemma({ trust: 2, capital: 9, legitimacy: -1, time: -8 }),
+  "현금을 얻는 대신 남은 시간을 닫습니다.",
+  "the sentence names what moved most, not whichever key was typed first",
+);
+
+// The result ledger's sentence reads the same numbers the same way.
+assert.match(
+  explainResourceTradeoff({ capital: 12, humanCost: 5 }),
+  /^현금 \+12를 얻는 대신 사람 피해 \+5를 감수했습니다\.$/u,
+  "rising 사람 피해 belongs on the cost side, and the particles follow the digits",
+);
+assert.match(
+  explainResourceTradeoff({ trust: 6, fatigue: -3 }),
+  /지침 -3/u,
+  "falling 지침 is a gain, so it is not listed as something the run gave up",
+);
+
+// Nothing in the graph may produce a particle that disagrees with the word in
+// front of it. The pairs below are the only ones these sentences can build.
+const WRONG_PARTICLES = /(피해을|지침를|현금를|믿음를|공정함를|시간를|신뢰이|피로이)/u;
+for (const node of Object.values(nodes)) {
+  for (const choice of node.choices ?? []) {
+    const line = describeChoiceDilemma(choice.effect ?? {});
+    assert.doesNotMatch(line, WRONG_PARTICLES, `${node.title}/${choice.id}: "${line}"`);
+    assert.doesNotMatch(explainResourceTradeoff(choice.effect ?? {}), WRONG_PARTICLES, `${choice.id} ledger line`);
+  }
+}
 
 console.log("Unit tests passed");

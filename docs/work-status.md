@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 ## Current State
 
@@ -238,6 +238,47 @@ them is applied as a measurement and a "no", which is set out below.
   file; with that fixed the true counts are 9 selectors with two homes and 53
   repeats, not 8 and 51.
 
+## What the screen says about a choice (2026-09-04)
+
+Playing a season and reading every sentence the game prints about a button found
+three ways the description had come apart from the decision.
+
+- **One rule for what a number means.** `humanCost` and `fatigue` are the two
+  resources where a rising number is the loss. The effect chips knew that; the
+  four surfaces that summarise the same effect did not, and split by sign: the
+  line above the chips, the reveal's opened/closed columns, the reveal's closing
+  sentence and the result ledger. 56 of 495 choices were announced as winning a
+  rising 사람 피해. All four call `isResourceGain()` now, and sort by
+  `byEffectWeight` so the sentence names the resource that actually moved rather
+  than whichever key the effect object listed first.
+- **Particles agree with the word in front of them.** Runtime-built sentences had
+  the particle baked into the format string, so the play screen printed
+  "사람 피해을" and the reveal printed "신뢰이 올라간다". `playerLanguage.js` owns
+  `endsOnConsonant` and the three particle helpers; numbers follow the Korean
+  reading of the last digit, so 2/4/5/9 take 를 and anything ending in 0 does
+  not. `gameLogic`'s private `getSubjectParticle` was the same function and is
+  gone, along with the two extra resource-label tables that had the reveal
+  calling 믿음 "신뢰" one line under a chip that said 믿음.
+- **Lines answer the button they sit under.** Generated scenes take copy from an
+  array matched to the labels by position, with nothing tying the two together.
+  When the 15 connective scenes' labels were rewritten the tables stayed behind,
+  so "살아남을 돈을 먼저 확보한다" spoke "근거와 책임자를 같은 문서에 공개하겠습니다";
+  `c3_rival` and `c5_verdict` had two lines each straight swapped. The 18 reaction
+  scenes were all correct. The connective tables are rewritten against the labels
+  now.
+
+`npm run check:dialogue` is new: it walks the 36 generated scenes and fails when
+another voice line in the same scene answers a label better than the one assigned
+to it. Korean marks grammar with endings, so it compares stems. Only voice lines
+are checked -- an echo argues from what the choice gave up, which is often the
+sibling's subject, and both arrays live in the same table entry. Verified by
+restoring the old table: it catches seven of the misassignments including both
+swapped pairs.
+
+`run-e2e.mjs` reads `E2E_PORT`. It already refused to test against a server that
+was not its own, but had no way out of a taken port, so two checkouts of this
+repo on one machine could not both run verification.
+
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.
@@ -253,20 +294,30 @@ them is applied as a measurement and a "no", which is set out below.
 8. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
 9. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
 10. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
-11. Keep the balance guardrails honest. `scripts/check-balance.mjs` asserts that
+11. One rule decides whether a number was good for the run. `isResourceGain()` in
+    `src/gameConstants.js` is that rule, and every surface that prints an effect asks
+    it rather than comparing to zero -- `humanCost` and `fatigue` read backwards
+    otherwise. Sort with `byEffectWeight` before naming a resource in a sentence.
+12. Never bake a Korean particle into a format string. `endsOnConsonant`,
+    `objectParticle`, `subjectParticle` and `topicParticle` in `src/playerLanguage.js`
+    agree with whatever the sentence actually ends on, digits included.
+13. Authored copy tables are matched to their labels by position. Editing one list
+    means editing the other; `npm run check:dialogue` is what catches it when that
+    does not happen.
+14. Keep the balance guardrails honest. `scripts/check-balance.mjs` asserts that
     every choice costs something, that every resource moves both ways, and that
     no choice inside a scene and no column inside a case is Pareto-dominated by
     a sibling. Tune effects against it rather than around it.
-12. Keep per-second state out of the root. The decision countdown is an external
+15. Keep per-second state out of the root. The decision countdown is an external
     store (`src/state/decisionClock.js`) precisely because root state rebuilt the
     whole play view once a second.
-13. Ship art at the width it is painted at. `src/responsiveArt.js` lists the
+16. Ship art at the width it is painted at. `src/responsiveArt.js` lists the
     images that have 480px and 960px variants and builds the `srcset` for them;
     `npm run check:art` fails when a variant is missing or has crept back up
     toward the original's weight. Regenerate variants by drawing the original to
     a canvas at the target width and reading back `toDataURL("image/webp", 0.82)`
     -- the browser is the encoder, so there is no image toolchain to install.
-14. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+17. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
 ## Verification Commands
 

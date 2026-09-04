@@ -9,7 +9,7 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ResourceRail } from "../components/ResourceRail.jsx";
 import { CASE_SEQUENCE, costWhenRising } from "../gameData.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
-import { FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
+import { describeChoiceDilemma, FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
   const {
@@ -86,15 +86,6 @@ export function PlayScreen({ view }) {
         : currentChallengeStreak > 0
           ? "방금 맞힌 목표가 다음 장면의 기준선으로 남았습니다."
           : "아직 관찰자는 침묵하지만, 선택의 순서는 저장되고 있습니다.";
-  const describeChoiceDilemma = (choice) => {
-    const entries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
-    const gains = entries.filter(([, value]) => value > 0).map(([key]) => resourceMeta[key]?.label ?? key);
-    const costs = entries.filter(([, value]) => value < 0).map(([key]) => resourceMeta[key]?.label ?? key);
-    if (gains.length > 0 && costs.length > 0) return `${gains[0]}을 얻는 대신 ${costs[0]}을 닫습니다.`;
-    if (gains.length > 0) return `${gains[0]}은 열리지만, 관찰자는 그 이유를 기록합니다.`;
-    if (costs.length > 0) return `${costs[0]}을 먼저 소모해 다음 장면의 문을 엽니다.`;
-    return "숫자는 조용하지만, 이 말은 판단 순서를 남깁니다.";
-  };
   const getAuthorityImpact = (choice) => {
     const choiceText = `${choice.id} ${choice.label}`;
     if (/protect|people|witness|person|사람|보호|증언/.test(choiceText)) return "권한 영향: 보호 절차를 열고 현장의 발언권을 넓힙니다.";
@@ -785,7 +776,7 @@ export function PlayScreen({ view }) {
                     </span>
                   )}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
-                  <span className="choice-dilemma">{describeChoiceDilemma(choice)}</span>
+                  <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>
                   {showTacticalDetails && observerPreview && (
                     <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
                       <b>{observerPreview.tag.label}</b>

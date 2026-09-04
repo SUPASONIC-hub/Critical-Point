@@ -1,5 +1,6 @@
-import { CASE_SEQUENCE, characterProfiles, choiceSubtexts, choiceVoiceLines, echoReplies } from "./gameData.js";
+import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceSubtexts, choiceVoiceLines, costWhenRising, echoReplies, isResourceGain } from "./gameData.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
+import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -1144,50 +1145,64 @@ function getStrongestDelta(effect = {}) {
 function describeDelta(delta) {
   if (!delta) return "상황판의 숫자는 크게 움직이지 않지만, 회의실의 침묵은 조금 길어진다.";
   const [key, value] = delta;
-  const labels = {
-    time: "남은 시간",
-    capital: "현금 여력",
-    trust: "신뢰",
-    legitimacy: "정당성",
-    humanCost: "사람에게 옮겨간 비용",
-    fatigue: "피로",
-  };
-  const label = labels[key] ?? key;
-  if (value > 0) return `${label}이 올라간다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
-  return `${label}이 줄어든다. 누군가는 그 감소분을 자기 몫으로 떠안게 된다.`;
+  // The sentence is about what the move cost, so it follows the meaning of the
+  // number rather than its sign: 사람 피해 going up is not a windfall, and going
+  // down is not something a third party absorbs.
+  const label = easyResourceLabels[key] ?? key;
+  if (isResourceGain(key, value)) return `${label}${subjectParticle(label)} 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
+  return `${label}${subjectParticle(label)} 대가로 남는다. 누군가는 그 몫을 자기 자리에서 떠안게 된다.`;
+}
+
+/**
+ * The one-line trade-off printed above a choice's effect chips. It reads the
+ * numbers the way the chips do -- a rising 사람 피해 is what the choice costs,
+ * not what it wins -- and names the resource that actually moved rather than
+ * whichever key the effect object happens to list first.
+ */
+export function describeChoiceDilemma(effect = {}) {
+  const entries = Object.entries(effect).filter(([, value]) => value !== 0);
+  const gains = entries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight);
+  const costs = entries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight);
+  // Cutting a cost is not "winning" it and letting one run is not "closing" it,
+  // so the verb follows the resource as well as the direction.
+  const name = ([key]) => easyResourceLabels[key] ?? key;
+  const won = ([key]) => (costWhenRising.has(key) ? "줄이는" : "얻는");
+  const paid = ([key]) => (costWhenRising.has(key) ? "키웁니다" : "닫습니다");
+  if (gains.length > 0 && costs.length > 0) {
+    const gain = name(gains[0]);
+    const cost = name(costs[0]);
+    return `${gain}${objectParticle(gain)} ${won(gains[0])} 대신 ${cost}${objectParticle(cost)} ${paid(costs[0])}.`;
+  }
+  if (gains.length > 0) {
+    const gain = name(gains[0]);
+    return `${gain}${objectParticle(gain)} ${won(gains[0])} 선택이지만, 관찰자는 그 이유를 기록합니다.`;
+  }
+  if (costs.length > 0) {
+    const cost = name(costs[0]);
+    return `${cost}${objectParticle(cost)} 먼저 ${costWhenRising.has(costs[0][0]) ? "키우고" : "닫고"} 다음 장면의 문을 엽니다.`;
+  }
+  return "숫자는 조용하지만, 이 말은 판단 순서를 남깁니다.";
 }
 
 export function explainResourceTradeoff(effect = {}) {
   const entries = Object.entries(effect).filter(([, value]) => value !== 0);
   if (entries.length === 0) return "숫자는 거의 움직이지 않았지만, 이 선택은 판단의 기준을 남겼습니다.";
 
-  const gains = entries.filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
-  const losses = entries.filter(([, value]) => value < 0).sort((a, b) => a[1] - b[1]);
-  const labels = {
-    time: "시간",
-    capital: "현금",
-    trust: "신뢰",
-    legitimacy: "정당성",
-    humanCost: "사람에게 옮겨간 비용",
-    fatigue: "피로",
-  };
-  const format = ([key, value]) => `${labels[key] ?? key} ${value > 0 ? "+" : ""}${value}`;
+  // Same rule as the chips beside this sentence: a rising 사람 피해 is a loss, and
+  // the resources named are the ones that moved most. The labels come from the
+  // one table the rest of the game prints, so the sentence and the chip above it
+  // cannot call the same resource two different names.
+  const gains = entries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight);
+  const losses = entries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight);
+  const format = ([key, value]) => `${easyResourceLabels[key] ?? key} ${value > 0 ? "+" : ""}${value}`;
   const gainText = gains.length > 0 ? gains.slice(0, 2).map(format).join(", ") : "즉시 얻은 것은 적고";
   const lossText = losses.length > 0 ? losses.slice(0, 2).map(format).join(", ") : "눈에 보이는 손실은 작습니다";
 
   if (gains.length > 0 && losses.length > 0) {
-    return `${gainText}을 얻는 대신 ${lossText}을 감수했습니다.`;
+    return `${gainText}${objectParticle(gainText)} 얻는 대신 ${lossText}${objectParticle(lossText)} 감수했습니다.`;
   }
-  if (gains.length > 0) return `${gainText}이 올라갔지만, 그 이득이 다음 장면의 압박으로 남습니다.`;
-  return `${lossText}이 줄었습니다. 선택의 명분은 남았지만 여력이 깎였습니다.`;
-}
-
-function getSubjectParticle(name = "상대") {
-  const lastChar = name.at(-1);
-  if (!lastChar) return "가";
-  const code = lastChar.charCodeAt(0);
-  if (code < 0xac00 || code > 0xd7a3) return "가";
-  return (code - 0xac00) % 28 === 0 ? "가" : "이";
+  if (gains.length > 0) return `${gainText}${subjectParticle(gainText)} 열렸지만, 그 이득이 다음 장면의 압박으로 남습니다.`;
+  return `${lossText}${objectParticle(lossText)} 감수했습니다. 선택의 명분은 남았지만 여력이 깎였습니다.`;
 }
 
 export function speechifyChoice(choice) {
@@ -1271,7 +1286,7 @@ export function buildSceneBeat(node, choice, freeText, effect = {}) {
     `${profile.appearance} ${profile.gesture}`,
     `'${profile.thought}'`,
     `당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. ${said}`,
-    `${speakerName}${getSubjectParticle(speakerName)} 시선을 든다. ${profile.voice}`,
+    `${speakerName}${subjectParticle(speakerName)} 시선을 든다. ${profile.voice}`,
     `"${profile.line}"`,
     deltaLine,
   ].join("\n");

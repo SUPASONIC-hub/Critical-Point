@@ -1,6 +1,10 @@
 import { spawn } from "node:child_process";
 
-const baseUrl = "http://127.0.0.1:5197";
+// The runner already refuses to test against a server that is not its own, but
+// until now it had no way out of a taken port: a second checkout of this repo on
+// the same machine could only wait for the first to stop. E2E_PORT moves it.
+const port = process.env.E2E_PORT ?? "5197";
+const baseUrl = `http://127.0.0.1:${port}`;
 const runFullCoverage = process.argv.includes("--full");
 const runRuntimeSmoke = process.argv.includes("--runtime");
 const forwardedArgs = process.argv.slice(2).filter((arg) => arg !== "--full" && arg !== "--runtime");
@@ -86,7 +90,7 @@ function stopProcess(child) {
   });
 }
 
-const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", "5197", "--strictPort"], {
+const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", port, "--strictPort"], {
   stdio: "ignore",
 });
 let serverRunning = true;
