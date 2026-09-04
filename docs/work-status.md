@@ -353,6 +353,44 @@ signs and Korean particle agreement). The stale worktree that was checked out on
 it is gone; the branch and its commit are untouched.
 
 
+## What a choice gives (2026-09-04)
+
+Every authored gain went up by a tenth, never by less than one point, and no cost
+moved. 914 gains across 449 effects, applied by `scripts/raise-choice-gains.mjs`
+so that the rule is one line of code rather than 914 hand edits.
+
+The map is `magnitude + max(1, round(magnitude / 10))`, which is strictly
+increasing and therefore cannot invent a domination: on any one resource the
+order between two siblings comes from comparing their values, and raising the
+gains while fixing the costs preserves every one of those comparisons -- a gain
+still beats a cost, a bigger gain still beats a smaller one, equal stays equal.
+Being injective it also cannot collapse two effect vectors into one, so the
+uniqueness floor is untouched. `check:balance` reports the same four numbers it
+did before: 495 choices, 86% unique, humanCost on 56%, 86 fatigue recoveries.
+
+What it does move is the season. Measured over the same 36,000 case-ends
+`check-endings` walks, from the same seed:
+
+                    average           at the 100 cap
+    trust           56.9 -> 60.4      0.0% -> 0.7%
+    legitimacy      68.3 -> 72.3      4.2% -> 8.1%
+    capital         86.3 -> 86.6     16.0% -> 17.5%
+    humanCost        8.0 ->  7.7     (at zero) 24.8% -> 27.4%
+    fatigue         34.5 -> 33.6
+
+All nine endings are still reachable, but the ones that need a run to end badly
+got thinner, because a season that gains more ends higher: `evidence-reform`
+10.5% -> 7.5%, `profitable-silence` 1.9% -> 1.1%, `cold-justice` 2.2% -> 1.6%,
+`field-pact` 0.3% -> 0.2%, while `open-oversight` went 27.8% -> 31.0%.
+`field-pact` is now twelve seasons in six thousand. The sampling is seeded, so
+that number is stable rather than lucky, but it is the figure to watch: another
+uplift of this size is the one that would take it to zero, and
+`npm run check:endings` is what would say so.
+
+The two play-screen baselines were re-recorded. The differing pixels are
+confined to the choice list -- y 1901-2704 of 2867 on desktop, y 2233-3310 of
+3907 on mobile -- which is the effect chips and nothing else.
+
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.
@@ -408,7 +446,12 @@ it is gone; the branch and its commit are untouched.
     whenever a stylesheet changes, and commit it. The build fails otherwise --
     it compares the hash of the sheet the file was cut from against the one it
     just produced.
-19. Visual baselines are per platform. A runner added to a workflow needs its
+19. Raise what choices give with `npm run raise:gains`, never by hand: the
+    uplift has to stay a strictly increasing function of the magnitude, applied
+    to gains only, or it starts inventing dominations that `check:balance` was
+    written to catch. Read `npm run check:endings` afterwards -- bigger gains
+    end seasons higher and thin out the endings that need a run to go badly.
+20. Visual baselines are per platform. A runner added to a workflow needs its
     baselines recorded and committed before that job can pass;
     `npm run check:visual-baselines` says which are missing.
 ## Verification Commands

@@ -22,6 +22,7 @@
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
     "build:critical": "node scripts/build-critical-css.mjs",
+    "raise:gains": "node scripts/raise-choice-gains.mjs",
     "check:views": "node scripts/check-view-contracts.mjs",
     "check:constants": "node scripts/check-shared-constants.mjs",
     "check:runtime-budget": "node scripts/check-runtime-budget.mjs",

@@ -71,10 +71,27 @@ for (let run = 0; run < RUNS; run += 1) {
   seen.set(ending.id, (seen.get(ending.id) ?? 0) + 1);
 }
 
+/**
+ * Reachability alone only fails once an ending is already gone, and an ending
+ * does not vanish in one step -- it thins. Raising every authored gain by a
+ * tenth (2026-09-04) took `field-pact` from 0.3% to 0.2%, which is twelve
+ * seasons in six thousand and one more change of that size away from nothing.
+ * This floor is what makes the erosion fail while the ending is still there to
+ * save. The sampling is seeded, so the counts are stable rather than lucky;
+ * ratchet the floor up as headroom is won, and treat lowering it as a decision
+ * worth writing down.
+ */
+const RARE_ENDING_FLOOR = 10;
+
 const missing = EXPECTED.filter((id) => !seen.has(id));
 assert.deepEqual(missing, [], `endings never reached in ${RUNS} random seasons: ${missing.join(", ")}`);
 const unexpected = [...seen.keys()].filter((id) => !EXPECTED.includes(id));
 assert.deepEqual(unexpected, [], `unlisted ending ids reached: ${unexpected.join(", ")}`);
+
+const thin = EXPECTED.filter((id) => (seen.get(id) ?? 0) < RARE_ENDING_FLOOR).map(
+  (id) => `${id} reached ${seen.get(id) ?? 0} of ${RUNS} seasons, under the floor of ${RARE_ENDING_FLOOR}`,
+);
+assert.deepEqual(thin, [], thin.join("\n"));
 
 const spread = EXPECTED.map((id) => `${id} ${((seen.get(id) / RUNS) * 100).toFixed(1)}%`).join(", ");
 console.log(`Ending checks passed (${RUNS} random seasons: ${spread})`);
