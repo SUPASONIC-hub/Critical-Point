@@ -1,6 +1,7 @@
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
+import { isResourceGain } from "../gameConstants.js";
 
 export function ResultScreen({ view }) {
   const {
@@ -930,8 +931,10 @@ export function ResultScreen({ view }) {
                 <article key={`${entry.nodeId}-delta-${index}`}>
                   <b>{String(index + 1).padStart(2, "0")} · {entry.title}</b>
                   <div>
+                    {/* Green marks what the run gained, so 사람 피해 +11 is a
+                        loss here even though the number went up. */}
                     {Object.entries(entry.effect ?? {}).map(([key, value]) => (
-                      <span key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
+                      <span key={key} className={isResourceGain(key, value) ? "delta-up" : "delta-down"}>
                         {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}
                         {value}
                       </span>

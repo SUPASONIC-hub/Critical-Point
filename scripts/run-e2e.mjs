@@ -8,8 +8,12 @@ import { createServer } from "node:net";
  * passed the `/@vite/client` identity probe below and served that checkout's
  * code to the whole run. A pass then meant nothing about this working tree.
  *
- * Asking the OS for a free port removes the collision instead of detecting it.
- * The probe stays as the second line of defence for the race between releasing
+ * Asking the OS for a free port removes the collision instead of detecting it,
+ * so two checkouts on one machine can both run verification without agreeing on
+ * anything. `E2E_PORT` still pins it for the cases that need a known address --
+ * attaching a debugger, or pointing a browser at the run by hand.
+ *
+ * The probe stays as the second line of defence, for the race between releasing
  * this socket and vite binding it.
  */
 async function findFreePort() {
@@ -24,7 +28,7 @@ async function findFreePort() {
   });
 }
 
-const port = await findFreePort();
+const port = process.env.E2E_PORT ?? (await findFreePort());
 const baseUrl = `http://127.0.0.1:${port}`;
 const runFullCoverage = process.argv.includes("--full");
 const runRuntimeSmoke = process.argv.includes("--runtime");

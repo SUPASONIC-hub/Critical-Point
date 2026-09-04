@@ -13,6 +13,26 @@ export const initialResources = {
  */
 export const costWhenRising = new Set(["humanCost", "fatigue"]);
 
+/**
+ * Every surface that summarises an effect has to answer the same question:
+ * was this good for the player? Reading the sign gets it backwards on the two
+ * resources above, so the four places that print an effect -- the choice chips,
+ * the trade-off line above them, the reveal's opened/closed columns and the
+ * result ledger -- all ask here instead of comparing to zero themselves.
+ */
+export function isResourceGain(key, value) {
+  return costWhenRising.has(key) ? value < 0 : value > 0;
+}
+
+/**
+ * Effect objects are written in whatever order the author typed them, so the
+ * first entry is not the one worth naming. Sorting by size lets a sentence name
+ * the resource that actually moved.
+ */
+export function byEffectWeight([, a], [, b]) {
+  return Math.abs(b) - Math.abs(a);
+}
+
 export const triggerLabels = {
   protection: "보호",
   injustice: "부당함",
