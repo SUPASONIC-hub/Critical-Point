@@ -12,6 +12,7 @@ import {
   nodes,
   triggerLabels,
 } from "../src/gameData.js";
+import { applyEffect, getAuthorityLevel } from "../src/gameLogic.js";
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const orderedNodeIds = new Set(Object.values(nodeOrders).flat());
@@ -148,6 +149,53 @@ for (const caseId of CASE_SEQUENCE) {
   }
   for (const nodeId of reached) {
     if (!closes.has(nodeId)) failures.push(`${caseId}/${nodeId} has no path left to ${resultNodeId}`);
+  }
+
+  /**
+   * A gated choice that no run can open is worse than a missing one: the player
+   * is shown the scene it leads to and told what would unlock it. Case 01 spent
+   * a day in that state -- a season hands out one record per case, the first
+   * record cannot land before the second decision, and no case 01 route reached
+   * trust 55 by then, so FIELD ACCESS was unreachable for the whole case.
+   *
+   * So walk the case on its ungated edges, keep the best trust and legitimacy
+   * each scene can be reached with, and pair that with the most records a run
+   * could be holding there: one per case already played, plus this case's own
+   * once a decision has been made.
+   */
+  const caseIndex = CASE_SEQUENCE.indexOf(caseId);
+  const bestStanding = new Map();
+  const walk = [{ nodeId: CASE_START_NODES[caseId], resources: { ...initialResources }, depth: 0 }];
+  const openingNodeIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
+  for (const nodeId of openingNodeIds) walk.push({ nodeId, resources: { ...initialResources }, depth: 0 });
+  while (walk.length > 0) {
+    const { nodeId, resources, depth } = walk.shift();
+    if (!nodes[nodeId]) continue;
+    const standing = bestStanding.get(nodeId);
+    if (standing && standing.trust >= resources.trust && standing.legitimacy >= resources.legitimacy && standing.depth <= depth) continue;
+    bestStanding.set(nodeId, {
+      trust: Math.max(standing?.trust ?? 0, resources.trust),
+      legitimacy: Math.max(standing?.legitimacy ?? 0, resources.legitimacy),
+      depth: Math.min(standing?.depth ?? Infinity, depth),
+    });
+    for (const choice of nodes[nodeId].choices ?? []) {
+      if (choice.requiredAuthority) continue;
+      walk.push({ nodeId: choice.next, resources: applyEffect(resources, choice.effect ?? {}), depth: depth + 1 });
+    }
+  }
+  for (const [nodeId, standing] of bestStanding) {
+    const clues = caseIndex + (standing.depth >= 1 ? 1 : 0);
+    for (const choice of nodes[nodeId].choices ?? []) {
+      if (!choice.requiredAuthority) continue;
+      const reachable = getAuthorityLevel({ clueCount: clues, trust: standing.trust, legitimacy: standing.legitimacy });
+      const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
+      if ((levels[reachable] ?? 0) < (levels[choice.requiredAuthority] ?? 99)) {
+        failures.push(
+          `${caseId}/${nodeId}/${choice.id} asks for ${choice.requiredAuthority}, ` +
+            `but the best run reaches it with ${clues} clues, trust ${standing.trust}, legitimacy ${standing.legitimacy}`,
+        );
+      }
+    }
   }
 }
 

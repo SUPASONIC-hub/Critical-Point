@@ -1,5 +1,6 @@
 import { characterProfiles } from "../gameDialogue.js";
 import { getAuthorityProfile } from "../advancedSystems.js";
+import { AUTHORITY_THRESHOLDS, getAuthorityLevel } from "../gameLogic.js";
 
 /**
  * Derived scene state. Each of these reads a handful of run values and returns
@@ -55,14 +56,19 @@ export function createPressureCascade({ log, resources, riskPressure }) {
 }
 
 export function createAuthorityState({ evidence, legitimacy, operatorOrigin, trust }) {
-  const level = evidence >= 5 && legitimacy >= 55 ? "OVERSIGHT" : evidence >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
+  const level = getAuthorityLevel({ clueCount: evidence, legitimacy, trust });
   const authorityProfile = getAuthorityProfile(operatorOrigin, level);
+  const { oversightClues, oversightLegitimacy, fieldClues, fieldTrust } = AUTHORITY_THRESHOLDS;
   return {
     level,
     evidence,
     permissions: authorityProfile.permissions,
     origin: authorityProfile,
-    locked: level === "OBSERVER" ? "단서 2개 또는 신뢰 55가 필요합니다." : level === "FIELD ACCESS" ? "정당성 55와 단서 5개를 모으면 감독 권한이 열립니다." : "감독 권한이 열려 최종 종료 조건을 제안할 수 있습니다.",
+    locked: level === "OBSERVER"
+      ? `단서 ${fieldClues}개 또는 신뢰 ${fieldTrust}가 필요합니다.`
+      : level === "FIELD ACCESS"
+        ? `정당성 ${oversightLegitimacy}와 단서 ${oversightClues}개를 모으면 감독 권한이 열립니다.`
+        : "감독 권한이 열려 최종 종료 조건을 제안할 수 있습니다.",
   };
 }
 

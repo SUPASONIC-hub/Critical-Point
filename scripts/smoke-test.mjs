@@ -444,15 +444,15 @@ assert.ok(nodeOrders.case01.length >= 17, "case 01 should include its authored d
 assert.ok(nodeOrders.final.length >= 14, "the final act should include its authored detour scenes");
 assert.ok(nodes.c1_route_layoff && nodes.c3_route_fast && nodes.c4_route_exception && nodes.c5_route_map && nodes.f_route_map, "every main act should split its main question routes");
 assert.ok(nodes.c1_evidence_turn && nodes.c2_evidence_turn && nodes.c5_evidence_turn && nodes.f_evidence_turn, "evidence should unlock route-changing turnaround scenes");
-assert.equal(nodes.c1_route_layoff.choices.at(-1).next, "c1_evidence_turn", "case 01 route evidence choice should change the question path");
+assert.equal(nodes.c1_final_layoff.choices.at(-1).next, "c1_evidence_turn", "case 01 offers its turnaround on the route final, the first point a run can hold the authority for it");
 assert.equal(nodes.f_route_map.choices.at(-1).requiredAuthority, "OVERSIGHT", "final evidence turnaround should require oversight authority");
 assert.equal(
-  getAuthorityGate(nodes.c1_route_layoff.choices.at(-1), { clueCount: 0, trust: 45, legitimacy: 45 }).unlocked,
+  getAuthorityGate(nodes.c1_final_layoff.choices.at(-1), { clueCount: 0, trust: 45, legitimacy: 45 }).unlocked,
   false,
   "evidence turnaround should be locked before the player earns field access",
 );
 assert.equal(
-  getAuthorityGate(nodes.c1_route_layoff.choices.at(-1), { clueCount: 2, trust: 45, legitimacy: 45 }).unlocked,
+  getAuthorityGate(nodes.c1_final_layoff.choices.at(-1), { clueCount: 2, trust: 45, legitimacy: 45 }).unlocked,
   true,
   "two clues should unlock field evidence turnaround choices",
 );

@@ -1793,7 +1793,13 @@ const evidenceTurnaroundPlans = {
   case01: {
     node: "c1_evidence_turn",
     result: "c1_aftershock",
-    sourceRoutes: ["c1_route_layoff", "c1_route_funding", "c1_route_sale", "c1_route_investigate", "c1_route_system"],
+    // The other cases offer the turnaround on the route node, two scenes in.
+    // Case 01 cannot: a season hands out one clue per case, the first clue can
+    // only land on the second decision, and no case 01 route reaches trust 55
+    // by then -- so FIELD ACCESS was unreachable and the locked button was a
+    // promise the first case could never keep. Offered on the route finals
+    // instead, where trust reaches 67-82 and a clue has had time to arrive.
+    sourceRoutes: ["c1_final_layoff", "c1_final_funding", "c1_final_sale", "c1_final_investigate", "c1_final_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "모아 둔 단서를 펼쳐, 이 안건들이 같은 표에서 나왔는지부터 확인한다.",
     entryEcho: "단서를 대면 세 해결책이 하나의 원인으로 묶입니다.",
@@ -2014,7 +2020,10 @@ export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", log 
       effect: { legitimacy: 5, trust: 2, time: -5, fatigue: 5 },
       cognition: { inference: 2, reframing: 1 },
       next: plan.evidenceNext,
-      requiredAuthority: caseId === "final" ? "OVERSIGHT" : "FIELD ACCESS",
+      // No authority check here. This choice only exists because the previous
+      // case's turnaround was actually walked, and that is the credential --
+      // asking for FIELD ACCESS on top of it locked the case 02 opening behind
+      // two clues the player could not yet hold.
       continuityMemory: true,
     };
   }

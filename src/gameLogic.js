@@ -698,13 +698,29 @@ export function getAllDiscoveryClueIds() {
 
 // These systems are derived from the run log, so old saves gain the new
 // mechanics without a migration or a reset.
+/**
+ * One reading of the player's standing, for both the gate and the HUD that
+ * tells them what would open it. They used to disagree: the badge promised
+ * oversight at five records while the gate opened at four, so the panel was
+ * quoting a threshold the game did not use.
+ *
+ * Four of the season's six records, not five. Five allowed exactly one miss
+ * across a season whose records could not be recovered once a case closed.
+ */
+export const AUTHORITY_THRESHOLDS = { oversightClues: 4, oversightLegitimacy: 55, fieldClues: 2, fieldTrust: 55 };
+
+export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0 } = {}) {
+  const { oversightClues, oversightLegitimacy, fieldClues, fieldTrust } = AUTHORITY_THRESHOLDS;
+  if (clueCount >= oversightClues && legitimacy >= oversightLegitimacy) return "OVERSIGHT";
+  if (clueCount >= fieldClues || trust >= fieldTrust) return "FIELD ACCESS";
+  return "OBSERVER";
+}
+
 export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0 } = {}) {
   const required = choice.requiredAuthority;
   if (!required) return { unlocked: true, required: "", reason: "" };
   const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
-  // Four of the season's six records, not five. Five allowed exactly one miss
-  // across a season whose records could not be recovered once a case closed.
-  const current = clueCount >= 4 && legitimacy >= 55 ? "OVERSIGHT" : clueCount >= 2 || trust >= 55 ? "FIELD ACCESS" : "OBSERVER";
+  const current = getAuthorityLevel({ clueCount, trust, legitimacy });
   const unlocked = (levels[current] ?? 0) >= (levels[required] ?? 99);
   return {
     unlocked,
