@@ -1438,8 +1438,17 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
 
 
   function getFreeTextBranchTarget(caseId, fromNodeId) {
-    if (caseId === "case02" && !["c2_route_system", "c2_branch_records", "c2_branch_records_follow"].includes(fromNodeId)) {
-      return "c2_route_system";
+    const dramaticFreeRoutes = {
+      case01: "c1_route_system",
+      case02: "c2_route_system",
+      case03: "c3_route_system",
+      case04: "c4_route_system",
+      case05: "c5_route_system",
+      final: "f_route_system",
+    };
+    const dramaticRoute = dramaticFreeRoutes[caseId];
+    if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) {
+      return dramaticRoute;
     }
     const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
     if (!branch || branch.nodeId === fromNodeId) return null;

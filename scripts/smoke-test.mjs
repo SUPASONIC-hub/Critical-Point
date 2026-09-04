@@ -436,8 +436,9 @@ assert.equal(nodeOrders.case01.at(-1), "c1_aftershock", "case 01 order should in
 assert.equal(nodeOrders.final.at(-1), "f_aftershock", "the final order should include its aftermath scene");
 assert.ok(nodes.c1_witness && nodes.c1_verdict, "case 01 should include connective witness and verdict scenes");
 assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice, "every middle case should include a new evidence scene");
-assert.equal(nodeOrders.case01.length, 17, "case 01 should include its authored detour scenes");
-assert.equal(nodeOrders.final.length, 14, "the final act should include its authored detour scenes");
+assert.ok(nodeOrders.case01.length >= 17, "case 01 should include its authored detour scenes");
+assert.ok(nodeOrders.final.length >= 14, "the final act should include its authored detour scenes");
+assert.ok(nodes.c1_route_layoff && nodes.c3_route_fast && nodes.c4_route_exception && nodes.c5_route_map && nodes.f_route_map, "every main act should split its main question routes");
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
 assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");
@@ -567,10 +568,10 @@ for (const caseId of CASE_SEQUENCE) {
     branchingNodes.length >= 1,
     `${caseId} should expose at least one playable branch`,
   );
-  if (caseId === "case02") {
+  if (["case01", "case02", "case03", "case04", "case05", "final"].includes(caseId)) {
     assert.ok(
       branchingNodes.length > 1,
-      "case02 should intentionally split its main route into different question paths",
+      `${caseId} should intentionally split its main route into different question paths`,
     );
   } else {
     assert.equal(branchingNodes.length, 1, `${caseId} should keep one authored mid-case branch`);
