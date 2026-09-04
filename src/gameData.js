@@ -1682,10 +1682,12 @@ function registerDramaticRoutePlan(caseId, plan) {
   if (!order.includes(plan.system.route)) order.splice(Math.max(0, order.indexOf(plan.start) + 1), 0, plan.system.route);
   if (!order.includes(plan.system.final)) order.splice(Math.max(0, order.indexOf(plan.start) + 1), 0, plan.system.final);
 
+  // Authored copy wins. These stay as the net under a choice that has not been
+  // written yet, so a new route is playable the moment it is wired.
   [...Object.values(plan.choices).flatMap((route) => [route.route, route.final]), plan.system.route, plan.system.final].forEach((nodeId) => {
     nodes[nodeId].choices.forEach((choice) => {
-      choiceVoiceLines[choice.id] = choice.label;
-      echoReplies[choice.id] = `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`;
+      choiceVoiceLines[choice.id] ??= choice.label;
+      echoReplies[choice.id] ??= `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`;
     });
   });
 }
@@ -1793,6 +1795,8 @@ const evidenceTurnaroundPlans = {
     result: "c1_aftershock",
     sourceRoutes: ["c1_route_layoff", "c1_route_funding", "c1_route_sale", "c1_route_investigate", "c1_route_system"],
     requiredAuthority: "FIELD ACCESS",
+    entryVoice: "모아 둔 단서를 펼쳐, 이 안건들이 같은 표에서 나왔는지부터 확인한다.",
+    entryEcho: "단서를 대면 세 해결책이 하나의 원인으로 묶입니다.",
     title: "첫 단서가 세 안건을 한 줄로 묶는다",
     speaker: "에코",
     text: "확보한 단서를 대조하자 감축, 자금, 매각이 서로 다른 해결책이 아니라 같은 누락 기준표의 결과라는 사실이 보입니다. 이제 무엇을 고를지가 아니라 기준표를 누가 다시 쓸지가 사건의 결론입니다.",
@@ -1810,6 +1814,8 @@ const evidenceTurnaroundPlans = {
     result: "c2_aftershock",
     sourceRoutes: ["c2_route_report", "c2_route_person", "c2_route_origin", "c2_route_system"],
     requiredAuthority: "FIELD ACCESS",
+    entryVoice: "확보한 단서를 꺼내, 이 사건이 정말 한 사람의 일인지부터 되묻는다.",
+    entryEcho: "단서를 대면 혐의의 주어가 사람에서 기록으로 옮겨 갑니다.",
     title: "보호된 증언이 기록을 뒤집는다",
     speaker: "이민서",
     text: "앞서 얻은 단서를 붙이자 유출 파일의 시간이 맞지 않습니다. 누가 말했는지보다 누가 말할 수 없게 만들었는지가 새 질문으로 떠오릅니다.",
@@ -1827,6 +1833,8 @@ const evidenceTurnaroundPlans = {
     result: "c3_aftershock",
     sourceRoutes: ["c3_route_fast", "c3_route_deep", "c3_route_mirror", "c3_route_system"],
     requiredAuthority: "FIELD ACCESS",
+    entryVoice: "확보한 단서를 꺼내, 이 점수판이 하나뿐인지부터 확인한다.",
+    entryEcho: "단서를 대면 승부의 기준이 승부보다 먼저 문제가 됩니다.",
     title: "두 번째 점수판",
     speaker: "오진우",
     text: "단서를 대조하자 고객에게 보이는 점수판과 내부 심사용 점수판이 다르다는 사실이 드러납니다. 이제 승패보다 어느 점수판을 진짜 계약 기준으로 인정할지가 문제입니다.",
@@ -1844,6 +1852,8 @@ const evidenceTurnaroundPlans = {
     result: "c4_aftershock",
     sourceRoutes: ["c4_route_exception", "c4_route_rule", "c4_route_audit", "c4_route_system"],
     requiredAuthority: "FIELD ACCESS",
+    entryVoice: "확보한 단서를 꺼내, 이 예외가 정말 처음인지부터 확인한다.",
+    entryEcho: "단서를 대면 예외는 판단이 아니라 반복으로 읽힙니다.",
     title: "예외 파일의 원래 수신자",
     speaker: "반재",
     text: "단서 조합은 예외 승인이 한 번의 선의가 아니라 미리 설계된 반복 절차였음을 보여줍니다. 질문은 허용 여부에서, 반복을 누가 승인했는지로 이동합니다.",
@@ -1861,6 +1871,8 @@ const evidenceTurnaroundPlans = {
     result: "c5_aftershock",
     sourceRoutes: ["c5_route_blame", "c5_route_map", "c5_route_redesign", "c5_route_system"],
     requiredAuthority: "FIELD ACCESS",
+    entryVoice: "확보한 단서를 꺼내, 누가 지도에서 먼저 지워졌는지부터 확인한다.",
+    entryEcho: "단서를 대면 실패의 피해자 목록이 먼저 바뀝니다.",
     title: "사라진 피해자의 우선순위",
     speaker: "한서윤",
     text: "지금까지의 단서가 겹치자 조용한 피해자가 매번 낮은 우선순위로 밀린 이유가 보입니다. 책임자를 찾는 질문은 피해자가 시스템에서 어떻게 사라졌는지로 바뀝니다.",
@@ -1880,6 +1892,8 @@ const evidenceTurnaroundPlans = {
     result: "f_choice",
     sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
     requiredAuthority: "OVERSIGHT",
+    entryVoice: "확보한 단서를 꺼내, 이 선택지들이 어디서 왔는지부터 확인한다.",
+    entryEcho: "단서를 대면 마지막 질문을 누가 냈는지가 드러납니다.",
     title: "모든 단서가 플레이어의 문장을 가리킨다",
     speaker: "에코",
     text: "감독 권한으로 원본을 열자 사건의 공통점이 사람이 아니라 질문 문장이라는 사실이 드러납니다. 최종 선택은 데이터를 공개할지가 아니라, 당신의 판단 양식을 다음 참가자에게 물려줄지입니다.",
@@ -1926,13 +1940,15 @@ function registerEvidenceTurnaround(caseId, plan) {
   const insertIndex = resultIndex >= 0 ? resultIndex : order.length;
   if (!order.includes(plan.node)) order.splice(insertIndex, 0, plan.node);
   nodes[plan.node].choices.forEach((choice) => {
-    choiceVoiceLines[choice.id] = choice.label;
-    echoReplies[choice.id] = `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`;
+    choiceVoiceLines[choice.id] ??= choice.label;
+    echoReplies[choice.id] ??= `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`;
   });
+  // Every route offers the turnaround under one label, but what the clue
+  // overturns differs per case, so the copy is written per case, not per route.
   plan.sourceRoutes.forEach((routeId) => {
     const choiceId = `${routeId}_evidence_turn`;
-    choiceVoiceLines[choiceId] = "확보한 단서를 대조해 이 질문의 전제를 뒤집는다";
-    echoReplies[choiceId] = "단서 대조가 열리며, 이 루트의 결론이 다른 질문으로 바뀝니다.";
+    choiceVoiceLines[choiceId] = plan.entryVoice;
+    echoReplies[choiceId] = plan.entryEcho;
   });
 }
 

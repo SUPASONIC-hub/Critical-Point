@@ -76,6 +76,7 @@ import {
   echoReplies,
   triggerLabels,
 } from "../src/gameData.js";
+import { authoredEchoReplies } from "../src/gameDialogue.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
@@ -602,6 +603,28 @@ Object.entries(nodes).forEach(([nodeId, node]) => {
     assert.equal(simplifyPlayerText(choice.label), choice.label, `${nodeId}/${choice.id}: authored choice must not be rewritten`);
   });
 });
+
+// Route scenes used to fall back to the button label for voice and one shared
+// sentence for echo, which read as if the reveal had nothing to say. Both are
+// written now, and the copy is checked in both directions: no choice without a
+// line, no line left behind by a scene that has been retired.
+const allChoiceIds = new Set(Object.values(nodes).flatMap((node) => node.choices.map((choice) => choice.id)));
+// Free-text choices are spoken in the player's own words, so they have no
+// authored line to check.
+const authoredChoiceIds = new Set(
+  Object.values(nodes).flatMap((node) => node.choices.filter((choice) => choice.type !== "free").map((choice) => choice.id)),
+);
+for (const choiceId of authoredChoiceIds) {
+  assert.ok(choiceVoiceLines[choiceId], `${choiceId} should have authored voice copy`);
+  assert.notEqual(echoReplies[choiceId], undefined, `${choiceId} should have echo copy`);
+}
+for (const choiceId of Object.keys(choiceVoiceLines)) {
+  assert.ok(allChoiceIds.has(choiceId), `voice copy for ${choiceId} no longer belongs to any choice`);
+}
+for (const choiceId of Object.keys(authoredEchoReplies)) {
+  if (choiceId === "default") continue;
+  assert.ok(allChoiceIds.has(choiceId), `echo copy for ${choiceId} no longer belongs to any choice`);
+}
 
 const authoredGeneratedScenes = Object.values(nodes).filter(
   (node) => node.phase === "CONNECTIVE SCENE" || node.phase === "REACTION",
