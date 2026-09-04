@@ -771,6 +771,337 @@ authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, 
   if (sourceOrderIndex >= 0) order.splice(sourceOrderIndex + 1, 0, firstId, secondId);
 });
 
+const case02RouteNodes = {
+  c2_route_report: {
+    phase: "PROCEDURE ROUTE",
+    title: "보고서가 먼저 움직인다",
+    speaker: "한서윤",
+    text:
+      "당신의 1차 보고가 올라가자 보안팀은 이민서의 계정을 잠그고 징계 절차를 예고합니다. 이제 질문은 '그가 했는가'가 아니라 '잘못된 절차를 어디서 멈출 수 있는가'로 바뀝니다.",
+    memo: [
+      "징계 예고 문서가 먼저 생성됨",
+      "오진우 보고서가 공식 초안에 붙음",
+      "반박 자료는 절차 밖 문서로 분류됨",
+    ],
+    triggers: ["order", "responsibility", "injustice"],
+    choices: [
+      {
+        id: "c2_route_report_hold",
+        label: "징계 문서에 임시 보류 조건을 삽입한다",
+        effect: { legitimacy: 7, trust: 2, time: -7, capital: -3, humanCost: -2, fatigue: 5 },
+        next: "c2_pressure",
+        cognition: { persistence: 2, inference: 1 },
+      },
+      {
+        id: "c2_route_report_sign",
+        label: "절차대로 서명하되 반박 가능성을 각주로 남긴다",
+        effect: { time: 4, legitimacy: 4, trust: -6, humanCost: 5, fatigue: -2 },
+        next: "c2_pressure",
+        cognition: { risk: 2 },
+      },
+      {
+        id: "c2_route_report_reopen",
+        label: "보고서 자체를 증거로 삼아 누가 서둘렀는지 추적한다",
+        effect: { legitimacy: 9, trust: -2, time: -8, capital: -4, fatigue: 6 },
+        next: "c2_pressure",
+        cognition: { reframing: 2, inference: 1 },
+      },
+    ],
+  },
+  c2_route_person: {
+    phase: "WITNESS ROUTE",
+    title: "기록보다 먼저 도착한 사람",
+    speaker: "도윤하",
+    text:
+      "이민서는 당신이 오기 전부터 병원 접수 메시지를 들고 기다리고 있었습니다. 보호는 이제 감정적 선택이 아니라, 말할 수 있는 조건을 설계하는 문제가 됩니다.",
+    memo: [
+      "응급실 접수 문자는 원본 확인 전",
+      "비공식 접촉 자체가 절차 위반으로 기록될 수 있음",
+      "이민서는 유출 파일의 일부 문장을 알아봄",
+    ],
+    triggers: ["trust", "protection", "responsibility"],
+    choices: [
+      {
+        id: "c2_route_person_record",
+        label: "이민서가 직접 말할 수 있는 공식 기록 자리를 만든다",
+        effect: { trust: 8, legitimacy: 2, time: -7, capital: -4, humanCost: -3, fatigue: 6 },
+        next: "c2_meeting",
+        cognition: { reframing: 2, persistence: 1 },
+      },
+      {
+        id: "c2_route_person_shield",
+        label: "당신이 대신 진술해 당장의 노출을 줄인다",
+        effect: { trust: 5, legitimacy: -5, humanCost: -4, time: -5, fatigue: 7 },
+        next: "c2_meeting",
+        cognition: { persistence: 2 },
+      },
+      {
+        id: "c2_route_person_trade",
+        label: "보호를 조건으로 파일 출처를 먼저 묻는다",
+        effect: { capital: 4, trust: -5, legitimacy: -2, humanCost: 3, fatigue: -2 },
+        next: "c2_meeting",
+        cognition: { risk: 2, inference: 1 },
+      },
+    ],
+  },
+  c2_route_origin: {
+    phase: "ORIGIN ROUTE",
+    title: "원본이 답을 거부한다",
+    speaker: "반재욱",
+    text:
+      "원본 로그를 열자 복사본에는 없는 11초의 공백이 보입니다. 이민서의 이름보다 먼저, 누가 그 공백을 보고서에서 지웠는지가 새로운 질문이 됩니다.",
+    memo: [
+      "원본과 백업의 해시가 서로 다름",
+      "공백 직후 관리자 토큰이 한 번 사용됨",
+      "사건 01 반응 로그가 테스트 데이터로 재사용됨",
+    ],
+    triggers: ["curiosity", "injustice", "order"],
+    choices: [
+      {
+        id: "c2_route_origin_freeze",
+        label: "원본과 백업을 모두 동결하고 차이를 공개한다",
+        effect: { legitimacy: 8, trust: 2, capital: -5, time: -8, fatigue: 6 },
+        next: "c2_logs",
+        cognition: { inference: 3 },
+      },
+      {
+        id: "c2_route_origin_token",
+        label: "관리자 토큰 사용자를 추적한다",
+        effect: { legitimacy: 5, trust: -2, time: -9, capital: -3, humanCost: 2, fatigue: 5 },
+        next: "c2_logs",
+        cognition: { persistence: 1, inference: 2 },
+      },
+      {
+        id: "c2_route_origin_patch",
+        label: "공백을 오류로 패치하고 보고 마감을 맞춘다",
+        effect: { time: 5, capital: 3, legitimacy: -8, trust: -4, humanCost: 5, fatigue: -3 },
+        next: "c2_logs",
+        cognition: { risk: 2 },
+      },
+    ],
+  },
+  c2_route_system: {
+    phase: "HIDDEN ROUTE",
+    title: "당신의 질문이 로그를 깨운다",
+    speaker: "에코",
+    text:
+      "준비된 선택지 밖의 문장을 남기자, 보안 로그 한 줄이 새로 열립니다. 이 사건은 이민서의 혐의가 아니라 플레이어의 판단 문장을 복제하는 실험일 수 있습니다.",
+    memo: [
+      "자유입력 문장이 테스트 데이터와 대조됨",
+      "사건 01의 선택 문장 일부가 유출 파일과 일치",
+      "에코는 이 경로를 공식 절차에 남기지 않음",
+    ],
+    triggers: ["curiosity", "selfAwareness", "responsibility"],
+    choices: [
+      {
+        id: "c2_route_system_copy",
+        label: "복제된 선택 문장을 증거로 보존한다",
+        effect: { legitimacy: 8, trust: 3, capital: -5, time: -7, fatigue: 6 },
+        next: "c2_branch_records",
+        cognition: { inference: 2, persistence: 1 },
+      },
+      {
+        id: "c2_route_system_warn",
+        label: "다음 참가자에게 이 실험 가능성을 먼저 경고한다",
+        effect: { trust: 7, legitimacy: -3, humanCost: -4, capital: -4, fatigue: 7 },
+        next: "c2_branch_records",
+        cognition: { reframing: 2 },
+      },
+      {
+        id: "c2_route_system_hide",
+        label: "실험 흔적을 숨기고 이민서 사건만 해결한다",
+        effect: { time: 5, capital: 4, legitimacy: -7, trust: -5, humanCost: 4, fatigue: -3 },
+        next: "c2_branch_records",
+        cognition: { risk: 2 },
+      },
+    ],
+  },
+  c2_final_evidence: {
+    phase: "FINAL DECISION",
+    title: "절차가 만든 범인",
+    speaker: "한서윤",
+    text:
+      "징계 절차는 이미 움직이고 있습니다. 마지막 질문은 이민서가 유출자인지보다, 잘못 시작된 절차를 어디서 공개적으로 멈출 것인지입니다.",
+    memo: [
+      "보안팀 초안은 이민서 단독 책임으로 닫힘",
+      "보류 조건을 넣으면 보고 마감이 깨짐",
+      "절차를 그대로 두면 반박권이 사후 처리됨",
+    ],
+    triggers: ["order", "injustice", "responsibility"],
+    choices: [
+      {
+        id: "c2_final_evidence_stop",
+        label: "징계보다 먼저 반박권과 원본 검증을 공개 조건으로 건다",
+        effect: { legitimacy: 8, trust: 5, time: -8, capital: -4, humanCost: -4, fatigue: 7 },
+        next: "c2_aftershock",
+        cognition: { persistence: 2, inference: 1 },
+      },
+      {
+        id: "c2_final_evidence_file",
+        label: "1차 보고를 올리되 절차 결함을 별도 사건으로 등록한다",
+        effect: { legitimacy: 6, trust: -3, humanCost: 3, time: -3, fatigue: 4 },
+        next: "c2_aftershock",
+        cognition: { risk: 1, inference: 1 },
+      },
+      {
+        id: "c2_final_evidence_close",
+        label: "오진우 초안대로 닫고, 책임은 사후 감사에 맡긴다",
+        effect: { time: 6, capital: 4, trust: -10, legitimacy: -4, humanCost: 8, fatigue: -3 },
+        next: "c2_aftershock",
+        cognition: { risk: 2 },
+      },
+    ],
+  },
+  c2_final_person: {
+    phase: "FINAL DECISION",
+    title: "보호는 누구의 목소리인가",
+    speaker: "도윤하",
+    text:
+      "이민서를 보호한 덕분에 새로운 말이 생겼지만, 그 말을 당신이 대신 정리하면 다시 그의 목소리가 사라집니다. 마지막 질문은 보호할 것인지, 말할 권한을 돌려줄 것인지입니다.",
+    memo: [
+      "이민서는 자기 진술을 직접 확인하고 싶어 함",
+      "실명 공개는 즉시 위험을 키움",
+      "대리 진술은 안전하지만 당사자성을 지움",
+    ],
+    triggers: ["trust", "protection", "responsibility"],
+    choices: [
+      {
+        id: "c2_final_person_voice",
+        label: "이민서가 직접 진술하고 공개 범위를 고르게 한다",
+        effect: { trust: 9, legitimacy: 4, capital: -5, time: -7, humanCost: -4, fatigue: 7 },
+        next: "c2_aftershock",
+        cognition: { reframing: 2, persistence: 1 },
+      },
+      {
+        id: "c2_final_person_proxy",
+        label: "당신이 대신 진술해 이름을 잠시 가린다",
+        effect: { trust: 5, legitimacy: -4, humanCost: -5, time: -4, fatigue: 6 },
+        next: "c2_aftershock",
+        cognition: { persistence: 2 },
+      },
+      {
+        id: "c2_final_person_release",
+        label: "보호를 풀고 공식 조사에서 스스로 증명하게 한다",
+        effect: { time: 5, legitimacy: 5, trust: -9, humanCost: 7, fatigue: -3 },
+        next: "c2_aftershock",
+        cognition: { risk: 2 },
+      },
+    ],
+  },
+  c2_final_system: {
+    phase: "FINAL DECISION",
+    title: "범인이 아니라 설계자",
+    speaker: "에코",
+    text:
+      "로그의 공백, 복제된 선택 문장, 사후에 정리된 보고서가 한 방향을 가리킵니다. 마지막 질문은 한 사람의 혐의를 닫을지, 사건을 만든 구조를 공개할지입니다.",
+    memo: [
+      "사건 01 선택 문장이 테스트 데이터로 재사용됨",
+      "관리자 토큰은 아직 실명 확인 전",
+      "공개하면 이민서의 혐의는 약해지지만 실험 전체가 흔들림",
+    ],
+    triggers: ["curiosity", "selfAwareness", "injustice"],
+    choices: [
+      {
+        id: "c2_final_system_expose",
+        label: "개인 혐의보다 실험 설계 가능성을 공식화한다",
+        effect: { legitimacy: 9, trust: 4, capital: -6, time: -8, fatigue: 8 },
+        next: "c2_aftershock",
+        cognition: { reframing: 3, inference: 1 },
+      },
+      {
+        id: "c2_final_system_trace",
+        label: "관리자 토큰 실명을 확인할 때까지 모든 결론을 보류한다",
+        effect: { legitimacy: 6, trust: 3, time: -10, capital: -4, humanCost: -2, fatigue: 7 },
+        next: "c2_aftershock",
+        cognition: { inference: 3 },
+      },
+      {
+        id: "c2_final_system_contain",
+        label: "실험 흔적은 봉인하고 이민서 혐의만 낮춰 보고한다",
+        effect: { time: 4, capital: 4, trust: -5, legitimacy: -6, humanCost: 3, fatigue: -3 },
+        next: "c2_aftershock",
+        cognition: { risk: 2 },
+      },
+    ],
+  },
+};
+
+function registerCase02DramaticRoutes() {
+  Object.assign(nodes, case02RouteNodes);
+  Object.assign(choiceVoiceLines, {
+    c2_route_report_hold: "징계 문서에 멈춤 조건을 끼워 넣어, 절차가 사람을 앞질러 가지 못하게 한다.",
+    c2_route_report_sign: "보고는 올리되, 반박 가능성을 작은 각주로 남긴다.",
+    c2_route_report_reopen: "보고서가 왜 이렇게 빨리 완성됐는지부터 다시 추적한다.",
+    c2_route_person_record: "보호받는 사람이 직접 말할 수 있는 공식 자리를 만든다.",
+    c2_route_person_shield: "위험을 줄이기 위해, 이민서의 말을 내 이름으로 대신 제출한다.",
+    c2_route_person_trade: "보호를 약속하는 대신, 파일 출처를 먼저 묻는다.",
+    c2_route_origin_freeze: "원본과 백업을 모두 얼려 두고 차이를 공개한다.",
+    c2_route_origin_token: "공백 직후 깨어난 관리자 토큰의 주인을 쫓는다.",
+    c2_route_origin_patch: "공백을 오류로 처리하고 마감 시간에 맞춘다.",
+    c2_route_system_copy: "복제된 선택 문장을 증거로 남겨, 사건의 주어를 바꾼다.",
+    c2_route_system_warn: "다음 참가자에게 이 실험 가능성을 먼저 알린다.",
+    c2_route_system_hide: "실험 흔적은 덮고, 이민서 사건만 조용히 해결한다.",
+    c2_final_evidence_stop: "징계보다 먼저 반박권과 원본 검증을 공개 조건으로 건다.",
+    c2_final_evidence_file: "보고는 올리되, 절차 결함을 별도 사건으로 떼어 등록한다.",
+    c2_final_evidence_close: "오진우의 초안대로 닫고, 책임은 나중의 감사로 넘긴다.",
+    c2_final_person_voice: "이민서에게 자기 진술의 공개 범위를 직접 고르게 한다.",
+    c2_final_person_proxy: "그의 이름을 가리기 위해 내가 대신 진술한다.",
+    c2_final_person_release: "보호를 풀고 공식 조사에서 스스로 증명하게 한다.",
+    c2_final_system_expose: "한 사람의 혐의 대신, 실험 설계 가능성을 공식 문장으로 세운다.",
+    c2_final_system_trace: "관리자 토큰의 실명을 확인할 때까지 결론을 보류한다.",
+    c2_final_system_contain: "실험 흔적은 봉인하고 이민서의 혐의만 낮춰 보고한다.",
+  });
+  Object.assign(echoReplies, {
+    c2_route_report_hold: "보류 조건은 절차를 늦추지만, 잘못 움직인 절차도 기록으로 붙잡습니다.",
+    c2_route_report_sign: "각주는 사람을 구하기에는 작고, 나중에 책임을 증명하기에는 충분할 수 있습니다.",
+    c2_route_report_reopen: "보고서의 속도를 조사하면 범인보다 설계자가 먼저 보일 수 있습니다.",
+    c2_route_person_record: "말할 자리를 만든 보호는 의심받을 권리까지 남깁니다.",
+    c2_route_person_shield: "대신 말하면 안전해지지만, 그 사람의 목소리는 다시 당신의 문장이 됩니다.",
+    c2_route_person_trade: "보호를 거래로 쓰는 순간 관계는 빨리 움직이고 오래 상합니다.",
+    c2_route_origin_freeze: "원본을 얼리면 누구도 쉽게 결론을 고치지 못합니다.",
+    c2_route_origin_token: "토큰을 쫓는 선택은 사람의 이름보다 권한의 이동을 보게 합니다.",
+    c2_route_origin_patch: "패치는 마감을 구하지만 공백의 의미도 함께 지웁니다.",
+    c2_route_system_copy: "선택 문장이 증거가 되면 플레이어도 사건 안으로 들어옵니다.",
+    c2_route_system_warn: "경고는 다음 사람을 지키지만 실험자에게도 당신의 위치를 알립니다.",
+    c2_route_system_hide: "흔적을 숨기면 사건은 작아지고, 같은 실험은 계속될 수 있습니다.",
+    c2_final_evidence_stop: "절차를 멈추는 문장은 늦지만, 다음 징계의 기준이 됩니다.",
+    c2_final_evidence_file: "별도 사건은 오늘의 마감을 살리고 내일의 책임을 만듭니다.",
+    c2_final_evidence_close: "빠른 종결은 운영을 지키지만 반박권을 사후 처리로 밀어냅니다.",
+    c2_final_person_voice: "목소리를 돌려주면 보호는 통제가 아니라 권한이 됩니다.",
+    c2_final_person_proxy: "대리 진술은 안전을 사지만 당사자의 선택을 다시 빼앗습니다.",
+    c2_final_person_release: "보호를 푸는 순간 공식성은 올라가고 사람의 비용도 올라갑니다.",
+    c2_final_system_expose: "구조를 공개하면 이민서의 이름은 흐려지고 실험 전체가 흔들립니다.",
+    c2_final_system_trace: "결론을 미루는 동안 위험은 남지만 증거의 방향은 선명해집니다.",
+    c2_final_system_contain: "봉인은 피해를 줄일 수 있지만, 실험의 권한은 그대로 남습니다.",
+  });
+
+  const routeByStartChoice = {
+    c2_start_report: "c2_route_report",
+    c2_start_meet: "c2_route_person",
+    c2_start_verify: "c2_route_origin",
+    free: "c2_logs",
+  };
+  nodes.c2_start.choices.forEach((choice) => {
+    if (routeByStartChoice[choice.id]) choice.next = routeByStartChoice[choice.id];
+  });
+  nodes.c2_pressure.choices.forEach((choice) => { choice.next = "c2_judgment"; });
+  nodes.c2_judgment_reaction.choices.forEach((choice) => { choice.next = "c2_final_evidence"; });
+  nodes.c2_witness_reaction.choices.forEach((choice) => { choice.next = "c2_final_person"; });
+  nodes.c2_trace_reaction.choices.forEach((choice) => { choice.next = "c2_final_system"; });
+  nodes.c2_branch_records_follow.choices.forEach((choice) => { choice.next = "c2_final_system"; });
+
+  const order = nodeOrders.case02;
+  const startIndex = order.indexOf("c2_start");
+  if (startIndex >= 0) {
+    order.splice(startIndex + 1, 0, "c2_route_report", "c2_route_person", "c2_route_origin", "c2_route_system");
+  }
+  const aftershockIndex = order.indexOf("c2_aftershock");
+  const finalInsertIndex = aftershockIndex >= 0 ? aftershockIndex : order.length;
+  order.splice(finalInsertIndex, 0, "c2_final_evidence", "c2_final_person", "c2_final_system");
+}
+
+registerCase02DramaticRoutes();
+
 export const caseOpeningRoutes = {
   case02: {
     c1_after_people: "c2_start_people",
@@ -830,6 +1161,7 @@ const openingSignatureChoices = {
     label: "지난 사건에서 보호한 사람에게 먼저 연락한다",
     effect: { trust: 7, humanCost: -3, legitimacy: -2, time: -5, fatigue: 4 },
     cognition: { reframing: 2 },
+    next: "c2_route_person",
     voice: "절차보다 먼저, 지난 사건에서 이름을 지켜준 사람에게 전화를 건다.",
     echo: "지난 보호가 이번 사건의 통로가 됩니다. 그 통로를 쓰는 순간 보호는 거래처럼 보이기도 합니다.",
   },
@@ -837,6 +1169,7 @@ const openingSignatureChoices = {
     label: "공개했던 수치를 기준선으로 삼아 조작 지점을 역추적한다",
     effect: { legitimacy: 6, capital: -3, time: -7, fatigue: 5 },
     cognition: { inference: 2 },
+    next: "c2_route_origin",
     voice: "내가 공개한 숫자가 어디서 어긋났는지부터 거꾸로 짚는다.",
     echo: "공개한 숫자는 이제 비교 기준이 됩니다. 그 기준이 틀렸다면 이번 조사도 함께 무너집니다.",
   },
@@ -844,6 +1177,7 @@ const openingSignatureChoices = {
     label: "말하지 않았던 조건을 내가 먼저 공개한다",
     effect: { legitimacy: 7, trust: 5, capital: -6, humanCost: -2, fatigue: 6 },
     cognition: { persistence: 2 },
+    next: "c2_route_report",
     voice: "유출된 문서가 말하기 전에, 지난번 삼킨 조건을 내 입으로 꺼낸다.",
     echo: "미뤄둔 말을 스스로 꺼내면 주도권이 돌아옵니다. 왜 그때는 말하지 않았는지도 함께 묻게 됩니다.",
   },
@@ -966,7 +1300,7 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
         label: signature.label,
         effect: signature.effect,
         cognition: signature.cognition,
-        next: routed.next,
+        next: signature.next ?? routed.next,
       });
     }
     nodes[nodeId] = {
@@ -983,13 +1317,22 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
 });
 
 function getPlayableRoute(caseId) {
-  const route = [];
+  const route = new Map();
+  const queue = [
+    CASE_START_NODES[caseId],
+    ...Object.values(caseOpeningRoutes[caseId] ?? {}),
+  ].filter(Boolean).map((nodeId) => ({ nodeId, depth: 0 }));
   const seen = new Set();
-  let nodeId = CASE_START_NODES[caseId];
-  while (nodeId && !seen.has(nodeId) && !RESULT_NODE_IDS.has(nodeId)) {
+  while (queue.length > 0) {
+    const { nodeId, depth } = queue.shift();
+    if (!nodeId || seen.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
     seen.add(nodeId);
-    route.push(nodeId);
-    nodeId = nodes[nodeId]?.choices?.[0]?.next;
+    route.set(nodeId, depth);
+    for (const choice of nodes[nodeId]?.choices ?? []) {
+      if (choice.next && !seen.has(choice.next) && !RESULT_NODE_IDS.has(choice.next)) {
+        queue.push({ nodeId: choice.next, depth: depth + 1 });
+      }
+    }
   }
   return route;
 }
@@ -1003,7 +1346,7 @@ export function getCaseBranchNodes() {
     const nodeId = [...new Set(nodeOrders[caseId])].find((id) => {
       const scene = nodes[id];
       if (!scene) return false;
-      return new Set(scene.choices.map((choice) => choice.next)).size > 1;
+      return scene.choices.some((choice) => choice.branchId);
     });
     if (!nodeId) return null;
     return {
@@ -1029,11 +1372,12 @@ export function getBranchDetourBypass(choice = {}, context = {}) {
 }
 
 export function getCaseRouteLength(caseId) {
-  return getPlayableRoute(caseId).length;
+  const route = getPlayableRoute(caseId);
+  return Math.max(1, ...route.values()) + 1;
 }
 
 export function getNodeRouteIndex(caseId, nodeId) {
   const branchStartIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
   if (branchStartIds.has(nodeId)) return 0;
-  return getPlayableRoute(caseId).indexOf(nodeId);
+  return getPlayableRoute(caseId).get(nodeId) ?? -1;
 }

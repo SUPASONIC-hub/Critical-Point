@@ -1438,6 +1438,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
 
 
   function getFreeTextBranchTarget(caseId, fromNodeId) {
+    if (caseId === "case02" && !["c2_route_system", "c2_branch_records", "c2_branch_records_follow"].includes(fromNodeId)) {
+      return "c2_route_system";
+    }
     const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
     if (!branch || branch.nodeId === fromNodeId) return null;
     return branch.detourIds[0] ?? branch.nextIds[0] ?? null;

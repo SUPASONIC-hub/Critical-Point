@@ -561,7 +561,20 @@ for (const caseId of CASE_SEQUENCE) {
     const nextIds = new Set(nodes[nodeId].choices.map((choice) => choice.next));
     return nextIds.size > 1;
   });
-  assert.equal(branchingNodes.length, 1, `${caseId} should have exactly one authored mid-case branch`);
+  const authoredFork = getCaseBranchNodes().find((branch) => branch.caseId === caseId);
+  assert.ok(authoredFork, `${caseId} should expose an authored mid-case branch`);
+  assert.ok(
+    branchingNodes.length >= 1,
+    `${caseId} should expose at least one playable branch`,
+  );
+  if (caseId === "case02") {
+    assert.ok(
+      branchingNodes.length > 1,
+      "case02 should intentionally split its main route into different question paths",
+    );
+  } else {
+    assert.equal(branchingNodes.length, 1, `${caseId} should keep one authored mid-case branch`);
+  }
 }
 for (const caseId of CASE_SEQUENCE) {
   for (const choiceIndex of [0, 1, 2]) {
