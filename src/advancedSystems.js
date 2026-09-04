@@ -200,15 +200,6 @@ export function getBalanceSignals(log = []) {
     .map(([choiceId, count]) => ({ choiceId, share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
 }
 
-export function getHypothesisFeedback(hypothesis, discoveredClues = []) {
-  if (!hypothesis) return null;
-  const confidence = Number(hypothesis.confidence) || 0;
-  const supported = discoveredClues.length >= (confidence >= 80 ? 4 : 2);
-  return supported
-    ? { tone: "confirmed", label: "HYPOTHESIS SUPPORTED", text: "다음 선택에서 이 가설을 기준으로 위험을 줄일 수 있습니다." }
-    : { tone: "unstable", label: "HYPOTHESIS UNSTABLE", text: "증거가 부족합니다. 성급히 공개하면 신뢰와 시간이 함께 줄어듭니다." };
-}
-
 export function getRelationshipScene(quest = null, caseId = "case01") {
   if (!quest?.unlocked) return null;
   return {

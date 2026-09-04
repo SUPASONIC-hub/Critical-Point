@@ -38,11 +38,6 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
   return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 어떤 사건을 기록할지 정해온 설계자였습니다." };
 }
 
-export function getChoiceImpact(choice = {}, before = {}, after = {}) {
-  const changes = Object.keys({ ...before, ...after }).map((key) => [key, Number(after[key] ?? 0) - Number(before[key] ?? 0)]).filter(([, value]) => value !== 0);
-  return { choiceId: choice.id, changes, label: changes.length ? "IMPACT RECORDED" : "NO RESOURCE SHIFT" };
-}
-
 export function getEndingEpilogue(endingId = "open-question") {
   const epilogues = {
     "open-oversight": "새 감독관들은 당신이 남긴 공개 규칙을 기준으로 첫 번째 공동 감사를 시작합니다.",
