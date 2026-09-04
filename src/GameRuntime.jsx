@@ -148,7 +148,7 @@ import { createPlayView, createResultView } from "./viewModels/appViewModels.js"
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
 import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
-import { createLocalLeaderboardRows } from "./viewModels/seasonViewModels.js";
+import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import {
   getEndingSceneProfile,
   getFailureObjectives,
@@ -402,18 +402,19 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setMemoState({ nodeId: resolvedNodeId, opened });
   });
   const evidenceCount = discoveredClues.length + (memoOpened ? 1 : 0) + (probeUsed ? 1 : 0) + activeFreeTextSignalCount;
-  const localSeasonLeaderboardRow = useMemo(() => caseResults.final && completedCases.includes("final")
-    ? {
-        local: true,
-        run_id: caseResults.final.runId ?? runId,
-        session_code: sessionCode,
-        player_name: playerName || "현재 분석관",
-        case_id: "season-final",
-        case_title: "SEASON 01 COMPLETE",
-        completed_at: caseResults.final.completedAt ?? "",
-        summary: { ...caseResults.final, runId: caseResults.final.runId ?? runId, seasonComplete: true },
-      }
-    : null, [caseResults, completedCases, playerName, runId, sessionCode]);
+  const localSeasonLeaderboardRow = useMemo(
+    () =>
+      caseResults.final && completedCases.includes("final")
+        ? seasonViewModels.createSeasonLeaderboardRow({
+            caseSummary: caseResults.final,
+            completedCaseCount: completedCases.length,
+            playerName,
+            runId,
+            sessionCode,
+          })
+        : null,
+    [caseResults.final, completedCases, playerName, runId, sessionCode],
+  );
   const privacySignals = detectPrivacySignals(freeText);
   const activePrivacySignals = privacySignals.filter((signal) => signal.active);
   const freeTextBlockedByPrivacy = activePrivacySignals.length > 0;
@@ -716,7 +717,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     nodeId &&
     (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
   const localLeaderboardRows = useMemo(
-    () => createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
+    () => seasonViewModels.createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
   const nextCaseSignal = nextCaseSignals[currentCase];
@@ -1634,30 +1635,24 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     }
 
     if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length) {
-      const seasonTelemetryPayload = {
-        session_id: sessionId,
-        run_id: runId,
-        session_code: sessionCode,
-        player_name: "익명 분석관",
-        case_id: "season-final",
-        case_title: "SEASON 01 COMPLETE",
-        completed_at: new Date().toISOString(),
-        summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
-        resources: finalResourcesWithTempo,
-        triggers: nextTriggers,
+      const seasonTelemetryPayload = seasonViewModels.createSeasonTelemetryPayload({
+        caseSummary,
+        completedCaseCount: nextCompletedCases.length,
         cognition: nextCognition,
-        decision_log: nextLog,
-      };
-      const seasonLocalRankingRow = {
-        local: true,
-        run_id: runId,
-        session_code: sessionCode,
-        player_name: playerName || "현재 분석관",
-        case_id: "season-final",
-        case_title: "SEASON 01 COMPLETE",
-        completed_at: caseSummary.completedAt,
-        summary: { ...caseSummary, seasonComplete: true, completedCaseCount: nextCompletedCases.length },
-      };
+        decisionLog: nextLog,
+        resources: finalResourcesWithTempo,
+        runId,
+        sessionCode,
+        sessionId,
+        triggers: nextTriggers,
+      });
+      const seasonLocalRankingRow = seasonViewModels.createSeasonLeaderboardRow({
+        caseSummary,
+        completedCaseCount: nextCompletedCases.length,
+        playerName,
+        runId,
+        sessionCode,
+      });
       const { saved: seasonRankingSaved } = appendLocalRankingRow(seasonLocalRankingRow);
       if (!seasonRankingSaved) {
         setSaveStatus("Season ranking save failed: browser storage is unavailable.");

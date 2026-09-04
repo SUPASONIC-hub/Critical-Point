@@ -9,6 +9,10 @@ import {
   createPlayView,
   createResultView,
 } from "../src/viewModels/appViewModels.js";
+import {
+  createSeasonLeaderboardRow,
+  createSeasonTelemetryPayload,
+} from "../src/viewModels/seasonViewModels.js";
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
@@ -163,6 +167,34 @@ test("a second completed-season row for one run should win on score, not arrival
     90,
     "a second completed-season row for one run should win on score, not arrival order",
   );
+});
+test("season leaderboard rows should be marked as a full-season completion", () => {
+  const row = createSeasonLeaderboardRow({
+    caseSummary: { rank: "A", momentumScore: 81, completedAt: "2026-01-03" },
+    completedCaseCount: 6,
+    playerName: "tester",
+    runId: "run-season",
+    sessionCode: "ABC123",
+  });
+  assert.equal(row.case_id, "season-final", "season leaderboard row should use the aggregate case id");
+  assert.equal(row.summary.seasonComplete, true, "season leaderboard row should carry the aggregate completion flag");
+  assert.equal(row.summary.completedCaseCount, 6, "season leaderboard row should carry the completed case count");
+});
+test("season telemetry payloads should reuse the aggregate season summary shape", () => {
+  const payload = createSeasonTelemetryPayload({
+    caseSummary: { rank: "S", momentumScore: 95 },
+    completedCaseCount: 6,
+    cognition: { inference: 2 },
+    decisionLog: [{ choiceId: "final" }],
+    resources: { trust: 20 },
+    runId: "run-season",
+    sessionCode: "ABC123",
+    sessionId: "session-season",
+    triggers: { protection: 1 },
+  });
+  assert.equal(payload.case_id, "season-final", "season telemetry payload should use the aggregate case id");
+  assert.equal(payload.summary.seasonComplete, true, "season telemetry payload should carry the aggregate completion flag");
+  assert.equal(payload.decision_log.length, 1, "season telemetry payload should keep the decision log");
 });
 
 // A Korean particle agrees with the sound before it, and the sentences the game

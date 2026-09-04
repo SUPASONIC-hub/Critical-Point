@@ -40,6 +40,56 @@ export function createLocalLeaderboardRows({
   ];
 }
 
+export function createSeasonCompletionSummary({ caseSummary, completedCaseCount }) {
+  return { ...caseSummary, seasonComplete: true, completedCaseCount };
+}
+
+export function createSeasonLeaderboardRow({
+  caseSummary,
+  completedCaseCount,
+  playerName,
+  runId,
+  sessionCode,
+}) {
+  return {
+    local: true,
+    run_id: caseSummary?.runId ?? runId,
+    session_code: sessionCode,
+    player_name: playerName || "현재 분석관",
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: caseSummary?.completedAt ?? "",
+    summary: createSeasonCompletionSummary({ caseSummary, completedCaseCount }),
+  };
+}
+
+export function createSeasonTelemetryPayload({
+  caseSummary,
+  completedCaseCount,
+  cognition,
+  decisionLog,
+  resources,
+  runId,
+  sessionCode,
+  sessionId,
+  triggers,
+}) {
+  return {
+    session_id: sessionId,
+    run_id: runId,
+    session_code: sessionCode,
+    player_name: "익명 분석관",
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: new Date().toISOString(),
+    summary: createSeasonCompletionSummary({ caseSummary, completedCaseCount }),
+    resources,
+    triggers,
+    cognition,
+    decision_log: decisionLog,
+  };
+}
+
 /**
  * A stored case summary read back in full. Saves written by older builds are
  * missing fields the report and the intro both print, so every reader goes
