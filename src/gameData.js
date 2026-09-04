@@ -1125,6 +1125,11 @@ const dramaticRoutePlans = {
         finalTitle: "절감액 뒤에 남은 이름",
         finalText: "감축은 비용을 줄였지만 다음 사건의 증언자를 바꿨습니다. 이제 결론은 절감 여부가 아니라, 누구의 침묵을 비용으로 처리했는지에 걸립니다.",
         finalMemo: ["직원 신뢰가 다음 케이스의 시작 조건으로 이동", "절감액은 확보됐지만 내부 증언 경로가 좁아짐", "보호 대상 공개 여부가 새 선택지로 떠오름"],
+        finalChoices: [
+          ["a", "감축 명단과 그 판단 기준을 대상자에게 먼저 보낸다", { legitimacy: 8, trust: 6, capital: -7, time: -7, fatigue: 8 }, { persistence: 2, inference: 1 }],
+          ["b", "명단을 먼저 확정하고 통보 순서는 나중에 정한다", { capital: 10, time: 4, trust: -8, legitimacy: -6, humanCost: 6, fatigue: -2 }, { risk: 2 }],
+          ["c", "감축 폭을 줄이는 대신 임원 보수 삭감을 명단 첫 줄에 올린다", { trust: 8, legitimacy: 5, capital: -6, time: -4, humanCost: -3, fatigue: 7 }, { reframing: 2 }],
+        ],
       },
       funding: {
         route: "c1_route_funding",
@@ -1143,6 +1148,11 @@ const dramaticRoutePlans = {
         finalTitle: "살아남는 돈의 조건",
         finalText: "자금은 회사를 살렸지만 다음 사건의 질문을 바꿨습니다. 이제 플레이어는 문제를 해결하는 사람인지, 조건을 승인하는 사람인지 선택해야 합니다.",
         finalMemo: ["자금 조건이 다음 케이스 공개 범위를 흔듦", "시간 확보는 됐지만 외부 통제 비용이 생김", "조건 공개 여부가 신뢰의 분기점이 됨"],
+        finalChoices: [
+          ["a", "자금 조건 전문을 이사회 밖에도 공개한다", { legitimacy: 9, trust: 5, capital: -6, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
+          ["b", "조건은 비공개로 두고 입금 일정부터 확정한다", { capital: 11, time: 5, trust: -7, legitimacy: -7, humanCost: 4, fatigue: -2 }, { risk: 2 }],
+          ["c", "설명 권한을 지키는 조건으로 조달 규모를 절반으로 줄인다", { trust: 7, legitimacy: 6, capital: -4, time: -5, fatigue: 6 }, { reframing: 2 }],
+        ],
       },
       start_sale: {
         route: "c1_route_sale",
@@ -1161,6 +1171,11 @@ const dramaticRoutePlans = {
         finalTitle: "팔지 않은 증거",
         finalText: "매각하지 않은 자료가 다음 사건의 단서가 됩니다. 하지만 현금 부족은 더 빠르고 거친 결정을 요구하기 시작합니다.",
         finalMemo: ["보존한 로그가 다음 케이스 단서로 연결", "현금 압박이 커짐", "고객 고지가 신뢰 회복 경로를 만듦"],
+        finalChoices: [
+          ["a", "매각 목록에서 로그와 고객 데이터를 빼고 그 사실을 공지한다", { legitimacy: 8, trust: 6, capital: -8, time: -6, fatigue: 8 }, { persistence: 2, inference: 1 }],
+          ["b", "묶음 그대로 넘기고 고객 고지는 계약 뒤로 미룬다", { capital: 12, time: 4, trust: -9, legitimacy: -6, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+          ["c", "인수자에게 기록 보존 의무를 계약 조건으로 건다", { trust: 7, legitimacy: 7, capital: -5, time: -5, fatigue: 6 }, { reframing: 2 }],
+        ],
       },
       start_investigate: {
         route: "c1_route_investigate",
@@ -1179,6 +1194,11 @@ const dramaticRoutePlans = {
         finalTitle: "첫 사건의 진짜 시작점",
         finalText: "감사는 답을 늦췄지만 질문의 방향을 바꿨습니다. 다음 사건은 더 이상 우연한 문제가 아니라, 누군가 반복해서 같은 빈칸을 만든 기록으로 시작됩니다.",
         finalMemo: ["누락 로그가 시리즈 전체 단서로 격상", "즉시 성과는 낮지만 해석 권한이 커짐", "공동 조사 여부가 다음 케이스의 시작 태도를 바꿈"],
+        finalChoices: [
+          ["a", "누락 로그와 작성자를 함께 공개하고 세 안건을 재심사한다", { legitimacy: 9, trust: 5, capital: -7, time: -8, fatigue: 8 }, { inference: 2, persistence: 1 }],
+          ["b", "감사를 접고 가장 빠른 안건 하나만 실행한다", { capital: 9, time: 5, trust: -8, legitimacy: -7, humanCost: 5, fatigue: -2 }, { risk: 2 }],
+          ["c", "감사 권한을 외부 회계인에게 넘기고 결과를 기다린다", { trust: 8, legitimacy: 6, capital: -6, time: -6, fatigue: 6 }, { reframing: 2 }],
+        ],
       },
     },
     system: {
@@ -1188,6 +1208,11 @@ const dramaticRoutePlans = {
       speaker: "에코",
       text: "준비된 답이 아닌 문장을 입력하자 화면은 절감, 자금, 매각을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
       memo: ["자유입력이 숨은 공통 원인 경로를 엶", "모든 해결책이 같은 기준표를 통과함", "플레이어 문장이 다음 질문의 기준으로 기록됨"],
+      routeChoices: [
+        ["c1_route_system_trace", "기준표를 누가 언제 고쳤는지부터 되짚는다", { legitimacy: 7, trust: 2, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
+        ["c1_route_system_use", "기준표는 그대로 두고 가장 빠른 안건을 밀어붙인다", { capital: 8, time: 5, trust: -6, legitimacy: -5, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+        ["c1_route_system_open", "기준표를 회의 밖 사람들에게 먼저 보여준다", { trust: 7, legitimacy: 5, capital: -5, time: -5, fatigue: 6 }, { reframing: 2 }],
+      ],
     },
     finalChoices: [
       ["a", "공통 기준표를 공개하고 모든 안건을 재심사한다", { legitimacy: 8, trust: 5, capital: -7, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
@@ -1217,6 +1242,11 @@ const dramaticRoutePlans = {
         finalTitle: "빠른 답이 만든 기준",
         finalText: "당신은 이길 수 있습니다. 문제는 이긴 뒤 고객이 같은 속도를 다음 사람에게도 요구하게 된다는 점입니다.",
         finalMemo: ["점수판은 속도를 보상함", "검증 기한은 아직 계약 조건 밖", "오진우는 같은 압박을 다음 입찰에도 쓸 수 있음"],
+        finalChoices: [
+          ["a", "이긴 안에 검증 기한을 계약 조건으로 박아 넣는다", { legitimacy: 8, trust: 5, capital: -6, time: -6, fatigue: 7 }, { persistence: 2, reframing: 1 }],
+          ["b", "속도를 성과로 보고하고 다음 입찰도 같은 기준으로 받는다", { capital: 9, time: 5, trust: -7, legitimacy: -7, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+          ["c", "내가 생략한 항목 목록을 고객에게 함께 넘긴다", { trust: 9, legitimacy: 6, capital: -5, time: -4, fatigue: 7 }, { reframing: 3 }],
+        ],
       },
       c3_start_deep: {
         route: "c3_route_deep",
@@ -1235,6 +1265,11 @@ const dramaticRoutePlans = {
         finalTitle: "맞는 답의 손실",
         finalText: "느린 답은 더 정확하지만, 정확함만으로는 입찰장을 이기지 못합니다. 이제 손실을 누가 공식적으로 감수할지 정해야 합니다.",
         finalMemo: ["결함은 상당히 유력함", "마감 연장은 불확실함", "정확한 답은 당장의 점수를 잃음"],
+        finalChoices: [
+          ["a", "결함 보고서를 붙인 안을 그대로 내고 탈락을 감수한다", { legitimacy: 9, trust: 4, capital: -8, time: -5, fatigue: 7 }, { persistence: 2, inference: 1 }],
+          ["b", "결함은 부록에 묻고 가격으로 계약을 가져온다", { capital: 9, time: 4, trust: -7, legitimacy: -8, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+          ["c", "손실을 회사 비용으로 공식화하고 결함 검증은 계약 밖에서 계속한다", { trust: 8, legitimacy: 6, capital: -6, fatigue: 8 }, { reframing: 3 }],
+        ],
       },
       c3_start_mirror: {
         route: "c3_route_mirror",
@@ -1253,6 +1288,11 @@ const dramaticRoutePlans = {
         finalTitle: "경쟁자를 도구로 쓸 것인가",
         finalText: "오진우를 이기는 길과 오진우를 증인으로 만드는 길이 갈라졌습니다. 당신은 경쟁을 끝낼 수도, 경쟁 자체를 증거로 만들 수도 있습니다.",
         finalMemo: ["공동안은 책임을 나눔", "독자안은 점수판에서 유리함", "경쟁 구조 공개는 고객을 불편하게 함"],
+        finalChoices: [
+          ["a", "공동안을 내고 책임 조항을 두 사람 이름으로 채운다", { legitimacy: 7, trust: 6, capital: -6, time: -6, fatigue: 7 }, { reframing: 2, persistence: 1 }],
+          ["b", "오진우의 빈칸을 근거로 독자안을 밀어붙인다", { capital: 10, time: 4, trust: -8, legitimacy: -6, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+          ["c", "경쟁 구조 자체를 고객 앞에서 문제로 올린다", { trust: 9, legitimacy: 7, capital: -7, time: -4, fatigue: 8 }, { reframing: 3 }],
+        ],
       },
     },
     system: {
@@ -1262,6 +1302,11 @@ const dramaticRoutePlans = {
       speaker: "에코",
       text: "준비된 전략 밖의 말을 남기자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
       memo: ["자유입력 문장이 새 평가 항목으로 변환됨", "오진우 점수도 동시에 재계산됨", "고객 화면에는 변경 사유가 보이지 않음"],
+      routeChoices: [
+        ["c3_route_system_read", "새로 생긴 평가 항목이 어디서 왔는지 추적한다", { legitimacy: 7, trust: 2, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
+        ["c3_route_system_ride", "바뀐 점수판을 그대로 타고 우위를 굳힌다", { capital: 8, time: 5, trust: -7, legitimacy: -5, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+        ["c3_route_system_tell", "오진우에게 점수판이 바뀌었다는 사실을 먼저 알린다", { trust: 8, legitimacy: 4, capital: -5, time: -4, fatigue: 6 }, { reframing: 2 }],
+      ],
     },
     finalChoices: [
       ["a", "내가 만든 평가 기준을 고객에게 공개한다", { legitimacy: 8, trust: 4, capital: -6, time: -6, fatigue: 7 }, { reframing: 2, persistence: 1 }],
@@ -1291,6 +1336,11 @@ const dramaticRoutePlans = {
         finalTitle: "예외가 규칙이 되는 순간",
         finalText: "선의로 넓힌 규칙은 이미 다른 사람의 기준이 됐습니다. 이제 예외를 숨길지, 공개해 새 규칙으로 만들지 결정해야 합니다.",
         finalMemo: ["서비스는 유지될 수 있음", "예외 반복 요구 증가", "공개하면 심사 자체가 흔들림"],
+        finalChoices: [
+          ["a", "예외 사유와 수혜 대상을 공개하고 새 규칙으로 등록한다", { legitimacy: 9, trust: 6, capital: -7, time: -6, fatigue: 7 }, { persistence: 2, inference: 1 }],
+          ["b", "이번 한 번의 판단으로 두고 예외 기록은 남기지 않는다", { capital: 9, time: 4, trust: -5, legitimacy: -9, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+          ["c", "예외 적용을 피해 당사자 동의 절차 뒤로 미룬다", { trust: 8, legitimacy: 6, capital: -8, humanCost: -5, fatigue: 8 }, { reframing: 3 }],
+        ],
       },
       c4_start_refuse: {
         route: "c4_route_rule",
@@ -1309,6 +1359,11 @@ const dramaticRoutePlans = {
         finalTitle: "깨끗한 절차의 피해자",
         finalText: "규칙은 지켜졌지만 잃을 사람이 생겼습니다. 마지막 질문은 절차의 깨끗함과 피해 완화를 어떻게 함께 기록할지입니다.",
         finalMemo: ["절차상 리스크는 낮음", "현장 피해는 즉시 발생 가능", "대체 재원은 불확실함"],
+        finalChoices: [
+          ["a", "절차 기록과 피해 명단을 같은 문서에 올린다", { legitimacy: 9, trust: 4, capital: -6, time: -7, fatigue: 7 }, { persistence: 2, inference: 1 }],
+          ["b", "절차상 문제가 없다는 결론만 남기고 명단은 내부에 둔다", { capital: 8, time: 5, trust: -6, legitimacy: -7, humanCost: 6, fatigue: -3 }, { risk: 2 }],
+          ["c", "대체 재원을 찾을 때까지 심사 결과 집행을 늦춘다", { trust: 7, legitimacy: 5, capital: -9, time: -6, humanCost: -5, fatigue: 8 }, { reframing: 3 }],
+        ],
       },
       c4_start_contain: {
         route: "c4_route_audit",
@@ -1327,6 +1382,11 @@ const dramaticRoutePlans = {
         finalTitle: "감시받는 선의",
         finalText: "조건을 붙인 결정은 해결이 아니라 운영 구조가 됐습니다. 이제 그 구조를 공개할지, 내부에서만 통제할지 선택해야 합니다.",
         finalMemo: ["조건부 승인은 양쪽 리스크를 모두 남김", "외부 감시는 느리지만 신뢰를 줌", "내부 통제는 빠르지만 은폐로 보일 수 있음"],
+        finalChoices: [
+          ["a", "조건과 감사 결과를 이용자에게 정기 공개한다", { legitimacy: 8, trust: 6, capital: -7, time: -6, fatigue: 7 }, { persistence: 2, reframing: 1 }],
+          ["b", "조건은 유지하되 감사 내용은 내부 문서로만 남긴다", { capital: 7, time: 4, trust: -5, legitimacy: -8, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+          ["c", "감사 권한을 이용자 대표에게 넘기고 나는 심사만 맡는다", { trust: 9, legitimacy: 6, capital: -8, humanCost: -4, fatigue: 8 }, { reframing: 3 }],
+        ],
       },
     },
     system: {
@@ -1336,6 +1396,11 @@ const dramaticRoutePlans = {
       speaker: "에코",
       text: "자유로운 제안을 남기자 트리거랩 화면에 '명분 있는 위반 허용선'이 표시됩니다. 당신의 선의는 다음 기관이 규칙을 넘는 안내문으로 바뀔 수 있습니다.",
       memo: ["제안 문장이 예외 승인 모델에 기록됨", "다음 기관 시뮬레이션이 자동 생성됨", "피해자 명단은 아직 입력되지 않음"],
+      routeChoices: [
+        ["c4_route_system_limit", "허용선 문장에 사용 한도부터 적어 넣는다", { legitimacy: 8, trust: 3, capital: -5, time: -6, fatigue: 6 }, { persistence: 2, inference: 1 }],
+        ["c4_route_system_ship", "허용선은 그대로 두고 이번 승인부터 끝낸다", { capital: 8, time: 5, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+        ["c4_route_system_ask", "다음 기관 시뮬레이션에 피해자 명단부터 넣는다", { trust: 7, legitimacy: 5, capital: -6, humanCost: -4, fatigue: 7 }, { reframing: 2 }],
+      ],
     },
     finalChoices: [
       ["a", "내 예외 기준을 모두 공개하고 재사용을 막는다", { legitimacy: 9, trust: 5, capital: -7, time: -6, fatigue: 7 }, { persistence: 2 }],
@@ -1365,6 +1430,11 @@ const dramaticRoutePlans = {
         finalTitle: "이름으로 닫힌 문",
         finalText: "책임자를 세우면 설명은 빨라집니다. 하지만 다음 실패를 막을 장치는 아직 없습니다.",
         finalMemo: ["여론은 빠르게 안정될 수 있음", "피해자는 즉시 보상을 원함", "시스템 구조는 아직 그대로임"],
+        finalChoices: [
+          ["a", "책임자 발표와 재발 방지 예산을 같은 날 확정한다", { trust: 8, legitimacy: 7, capital: -9, humanCost: -8, fatigue: 8 }, { reframing: 3 }],
+          ["b", "발표는 한 사람의 책임으로 끝내고 구조 조사는 접는다", { trust: 5, capital: -5, legitimacy: -7, humanCost: -5, fatigue: 7 }, { risk: 2 }],
+          ["c", "지목을 보류하고 승인 경로 전체를 공개 조사로 연다", { legitimacy: 9, trust: 2, capital: -6, time: -8, fatigue: 8 }, { inference: 2, persistence: 1 }],
+        ],
       },
       c5_start_map: {
         route: "c5_route_map",
@@ -1383,6 +1453,11 @@ const dramaticRoutePlans = {
         finalTitle: "책임이 흩어지는 방식",
         finalText: "구조를 보면 누구도 혼자 유죄가 아닙니다. 그렇다고 아무도 책임지지 않는 결론을 낼 수는 없습니다.",
         finalMemo: ["공개 지도는 조직 전체를 흔듦", "결정권자 매핑은 반발을 부름", "보상 우선은 구조 수정을 늦춤"],
+        finalChoices: [
+          ["a", "화살표마다 결정권자와 보상 책임을 함께 붙여 공개한다", { trust: 7, legitimacy: 8, capital: -9, humanCost: -9, fatigue: 8 }, { reframing: 3 }],
+          ["b", "지도는 내부 자료로 두고 보상 발표만 먼저 낸다", { trust: 6, capital: -6, legitimacy: -7, humanCost: -6, fatigue: 7 }, { risk: 2 }],
+          ["c", "구조 실패 보고서를 외부 검토에 그대로 넘긴다", { legitimacy: 10, trust: 3, capital: -7, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
+        ],
       },
       c5_start_redesign: {
         route: "c5_route_redesign",
@@ -1401,6 +1476,11 @@ const dramaticRoutePlans = {
         finalTitle: "복구가 지운 증거",
         finalText: "피해는 줄었지만 원인 기록도 바뀌었습니다. 이제 회복과 책임 규명의 순서를 정해야 합니다.",
         finalMemo: ["복구는 실제로 효과가 있음", "원인 증거는 사라질 수 있음", "현장 피로가 다음 실패를 부를 수 있음"],
+        finalChoices: [
+          ["a", "복구 전 스냅샷을 공개하고 새 보호 규칙을 함께 낸다", { trust: 8, legitimacy: 6, capital: -9, humanCost: -10, fatigue: 8 }, { reframing: 3 }],
+          ["b", "복구를 계속하고 원인 기록은 다음 과제로 넘긴다", { trust: 5, capital: -5, legitimacy: -8, humanCost: -7, fatigue: 7 }, { risk: 2 }],
+          ["c", "복구를 잠시 멈추고 원인 로그부터 보존한다", { legitimacy: 9, trust: 2, capital: -6, time: -8, humanCost: 3, fatigue: 8 }, { inference: 2, persistence: 1 }],
+        ],
       },
     },
     system: {
@@ -1410,6 +1490,11 @@ const dramaticRoutePlans = {
       speaker: "에코",
       text: "준비된 선택지 밖의 복구안을 내자, 알고리즘의 숨은 가중치가 보입니다. 시스템은 도움을 크게 요구하지 못하는 사람을 낮은 우선순위로 배웠습니다.",
       memo: ["불만 제기 빈도가 보호 가중치에 역으로 작용", "가족 연락처 불안정이 낮은 신뢰도로 처리됨", "조용한 피해자는 모델 학습에서 누락됨"],
+      routeChoices: [
+        ["c5_route_system_audit", "가중치가 학습한 자료부터 열어 본다", { legitimacy: 8, trust: 2, capital: -4, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
+        ["c5_route_system_patch", "가중치는 두고 이번 배차만 손으로 고친다", { capital: 6, time: 5, trust: -5, legitimacy: -6, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+        ["c5_route_system_call", "누락된 사람들에게 먼저 연락해 기준을 묻는다", { trust: 8, legitimacy: 4, capital: -6, humanCost: -6, fatigue: 7 }, { reframing: 2 }],
+      ],
     },
     finalChoices: [
       ["a", "조용한 사람 보호 가중치를 공개 기준으로 넣는다", { trust: 8, legitimacy: 7, capital: -9, humanCost: -10, fatigue: 8 }, { reframing: 3 }],
@@ -1443,6 +1528,11 @@ const dramaticRoutePlans = {
         finalTitle: "내 기준을 공개할 것인가",
         finalText: "당신이 만든 질문은 이미 다른 사람에게 쓰였습니다. 이제 그 사실을 증거로 열지, 조용히 지울지 정해야 합니다.",
         finalMemo: ["공개하면 모든 케이스의 전제가 흔들림", "삭제는 악용을 줄이지만 책임도 지움", "돌려주기는 동의 절차를 다시 요구함"],
+        finalChoices: [
+          ["a", "내 로그가 바꾼 질문을 전부 목록으로 공개한다", { legitimacy: 8, trust: 4, capital: -4, time: -6, humanCost: -3, fatigue: 7 }, { persistence: 2 }],
+          ["b", "복제된 선택지를 원래 참가자에게 돌려주고 삭제 권한까지 넘긴다", { trust: 9, legitimacy: 6, capital: -6, humanCost: -4, fatigue: 8 }, { reframing: 3 }],
+          ["c", "내 로그를 포함한 모든 원본을 다음 참가자에게 넘긴다", { legitimacy: 18, trust: 6, humanCost: 3, time: -6, fatigue: 8 }, { risk: 1, inference: 1 }],
+        ],
       },
       f_start_expose: {
         route: "f_route_expose",
@@ -1461,6 +1551,11 @@ const dramaticRoutePlans = {
         finalTitle: "폭로의 피해자를 줄일 것인가",
         finalText: "구조를 드러내는 일도 누군가의 기록을 노출합니다. 마지막 질문은 진실의 속도와 보호의 순서입니다.",
         finalMemo: ["원본 공개는 가장 빠름", "익명화는 시간이 듦", "감사 대기는 증거 삭제 위험을 키움"],
+        finalChoices: [
+          ["a", "참가자 식별자를 지운 구조 증거만 외부에 넘긴다", { legitimacy: 9, trust: 4, capital: -5, time: -7, humanCost: -5, fatigue: 7 }, { persistence: 2 }],
+          ["b", "공개 전에 참가자 동의 절차부터 다시 돌린다", { trust: 10, legitimacy: 3, capital: -7, time: -5, fatigue: 8 }, { reframing: 3 }],
+          ["c", "원본을 그대로 넘겨 삭제될 시간을 없앤다", { legitimacy: 19, trust: -4, humanCost: 6, time: 5, fatigue: -3 }, { risk: 2, inference: 1 }],
+        ],
       },
       f_start_contain: {
         route: "f_route_contain",
@@ -1479,6 +1574,11 @@ const dramaticRoutePlans = {
         finalTitle: "도구를 남길 조건",
         finalText: "트리거랩은 완전히 거짓도, 완전히 선의도 아니었습니다. 이제 도구를 남길 조건을 누가 정할지 선택해야 합니다.",
         finalMemo: ["폐기는 연구를 끝냄", "내부 개혁은 빠르지만 불신을 남김", "참가자 통제는 느리지만 권한을 돌려줌"],
+        finalChoices: [
+          ["a", "참가자 대표가 통제하는 운영위에 도구를 넘긴다", { legitimacy: 8, trust: 6, capital: -6, time: -6, humanCost: -3, fatigue: 7 }, { persistence: 2 }],
+          ["b", "도구를 멈추고 동의 절차를 처음부터 다시 받는다", { trust: 11, legitimacy: 2, capital: -8, time: -7, fatigue: 8 }, { reframing: 3 }],
+          ["c", "실험 구조와 사용 기록을 전부 공개 기록으로 넘긴다", { legitimacy: 17, trust: 5, humanCost: 4, time: -5, fatigue: 8 }, { risk: 1, inference: 1 }],
+        ],
       },
     },
     system: {
@@ -1488,6 +1588,11 @@ const dramaticRoutePlans = {
       speaker: "에코",
       text: "준비된 결말 밖의 문장을 쓰자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 쓴 문장입니다.",
       memo: ["자유입력 문장이 다음 참가자 선택지로 변환됨", "삭제 전송과 공개 전송이 동시에 대기 중", "종료 권한은 아직 당신에게 있음"],
+      routeChoices: [
+        ["f_route_system_read", "내 문장이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 8, trust: 3, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
+        ["f_route_system_send", "확인하지 않고 전송 대기열을 그대로 둔다", { capital: 6, time: 5, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -3 }, { risk: 2 }],
+        ["f_route_system_warn", "다음 참가자에게 이 화면을 먼저 보여준다", { trust: 8, legitimacy: 5, capital: -5, humanCost: -4, fatigue: 7 }, { reframing: 2 }],
+      ],
     },
     finalChoices: [
       ["a", "내 문장이 다음 선택지가 되지 못하게 막는다", { legitimacy: 7, trust: 3, capital: -5, time: -6, humanCost: -4, fatigue: 7 }, { persistence: 2 }],
@@ -1497,8 +1602,14 @@ const dramaticRoutePlans = {
   },
 };
 
-function makeFinalChoices(plan, finalId) {
-  return plan.finalChoices.map(([suffix, label, effect, cognition]) => ({
+/**
+ * Every route final used to close on the same three lines, so four routes with
+ * four different scenes still ended by asking one question. `finalChoices` on a
+ * route replaces them with the dilemma that route actually walked into; the
+ * case-level list stays as the hidden route's own close.
+ */
+function makeFinalChoices(plan, finalId, choices = plan.finalChoices) {
+  return choices.map(([suffix, label, effect, cognition]) => ({
     id: `${finalId}_${suffix}`,
     label,
     effect,
@@ -1532,7 +1643,7 @@ function registerDramaticRoutePlan(caseId, plan) {
       text: route.finalText,
       memo: route.finalMemo,
       triggers: route.triggers,
-      choices: makeFinalChoices(plan, route.final),
+      choices: makeFinalChoices(plan, route.final, route.finalChoices ?? plan.finalChoices),
     };
     nodes[plan.start].choices.forEach((choice) => {
       if (choice.id === choiceId) choice.next = route.route;
@@ -1549,8 +1660,10 @@ function registerDramaticRoutePlan(caseId, plan) {
     text: plan.system.text,
     memo: plan.system.memo,
     triggers: ["curiosity", "selfAwareness", "responsibility"],
-    choices: plan.finalChoices.map(([suffix, label, effect, cognition]) => ({
-      id: `${plan.system.route}_${suffix}`,
+    // The hidden route asked its final's three questions and then asked them
+    // again one scene later. It gets its own opening moves instead.
+    choices: (plan.system.routeChoices ?? plan.finalChoices).map(([suffix, label, effect, cognition]) => ({
+      id: suffix.startsWith(plan.system.route) ? suffix : `${plan.system.route}_${suffix}`,
       label,
       effect,
       cognition,

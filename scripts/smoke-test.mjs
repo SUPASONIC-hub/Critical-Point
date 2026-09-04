@@ -524,6 +524,28 @@ for (const [routeId, finalId] of [
   }
 }
 assert.ok(!nodes.final && !nodes.c2_final && !nodes.c5_final, "route finals should have retired the old shared case finals");
+// Four routes closing on four scenes that ask the same three questions is the
+// same convergence the split was meant to remove, one scene later.
+for (const caseId of CASE_SEQUENCE) {
+  const asked = new Map();
+  for (const nodeId of new Set(nodeOrders[caseId])) {
+    if (nodes[nodeId]?.phase !== "ROUTE FINAL") continue;
+    const question = nodes[nodeId].choices.map((choice) => choice.label).join(" | ");
+    assert.ok(!asked.has(question), `${nodeId} closes on the same question as ${asked.get(question)}`);
+    asked.set(question, nodeId);
+  }
+}
+for (const [routeId, finalId] of [
+  ["c1_route_system", "c1_final_system"],
+  ["c3_route_system", "c3_final_system"],
+  ["c4_route_system", "c4_final_system"],
+  ["c5_route_system", "c5_final_system_route"],
+  ["f_route_system", "f_final_system"],
+]) {
+  const opening = nodes[routeId].choices.map((choice) => choice.label).join(" | ");
+  const closing = nodes[finalId].choices.map((choice) => choice.label).join(" | ");
+  assert.notEqual(opening, closing, `${routeId} should not ask ${finalId}'s question one scene early`);
+}
 for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
   for (const choice of nodes[finalId].choices) {
     assert.equal(choice.next, "f_choice", `${finalId} should hand the run to the scene that names the ending`);
