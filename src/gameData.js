@@ -2003,17 +2003,20 @@ const continuityMemoryChoicePlans = {
   },
 };
 
-export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", log = [] } = {}) {
+/**
+ * Reads the previous case's recorded route memory, not the run log: a case
+ * start clears the log, so the log-based version of this could never find
+ * anything and the choice never once appeared in a played season.
+ */
+export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", caseResults = {} } = {}) {
   const plan = continuityMemoryChoicePlans[caseId];
   if (!plan) return null;
   const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
   if (!openingNodes.has(nodeId)) return null;
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
-  if (!previousCaseId) return null;
-  const previousEntries = log.filter((entry) => entry?.caseId === previousCaseId);
-  if (previousEntries.length === 0) return null;
-  const sawEvidenceTurn = previousEntries.some((entry) => String(entry.choiceId ?? "").includes("evidence_turn") || String(entry.nodeId ?? "").includes("evidence_turn"));
-  if (sawEvidenceTurn) {
+  const memory = previousCaseId ? caseResults?.[previousCaseId]?.routeMemory : null;
+  if (!memory) return null;
+  if (memory.evidenceTurn) {
     return {
       id: `${caseId}_memory_evidence`,
       label: plan.evidenceLabel,
@@ -2027,8 +2030,7 @@ export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", log 
       continuityMemory: true,
     };
   }
-  const sawSystemRoute = previousEntries.some((entry) => entry?.freeTextSuccess || String(entry.freeTextBranchId ?? "").includes("route_system") || String(entry.nodeId ?? "").includes("route_system"));
-  if (sawSystemRoute) {
+  if (memory.systemRoute) {
     return {
       id: `${caseId}_memory_system`,
       label: plan.systemLabel,
@@ -2038,8 +2040,7 @@ export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", log 
       continuityMemory: true,
     };
   }
-  const sawRouteSplit = previousEntries.some((entry) => String(entry.nodeId ?? "").includes("_route_") || String(entry.choiceId ?? "").includes("_route_"));
-  if (!sawRouteSplit) return null;
+  if (!memory.routeSplit) return null;
   return {
     id: `${caseId}_memory_route`,
     label: plan.routeLabel,

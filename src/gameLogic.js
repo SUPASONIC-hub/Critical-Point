@@ -1033,6 +1033,16 @@ export function getCounterfactualReport(entries = [], sceneMap = {}) {
     .filter(Boolean);
 }
 
+/** The three shapes of "how the last case was shaken" the next opening reads. */
+export function getRouteMemory(entries = []) {
+  const trail = (entry) => `${entry?.nodeId ?? ""} ${entry?.choiceId ?? ""} ${entry?.freeTextBranchId ?? ""}`;
+  return {
+    evidenceTurn: entries.some((entry) => trail(entry).includes("evidence_turn")),
+    systemRoute: entries.some((entry) => entry?.freeTextSuccess || trail(entry).includes("route_system")),
+    routeSplit: entries.some((entry) => trail(entry).includes("_route_")),
+  };
+}
+
 export function createCaseSummary(
   triggerScores = {},
   cognitionScores = {},
@@ -1075,6 +1085,11 @@ export function createCaseSummary(
       (peak, entry) => (entry.resourcesAfter ? Math.max(peak, getRiskPressure(entry.resourcesAfter)) : peak),
       getRiskPressure(resources),
     ),
+    // What the next case's opening screen needs to know about how this one was
+    // shaken. It used to read the run log directly, but starting a case clears
+    // the log, so by the time the choice was offered there was nothing left to
+    // read and it never appeared. Written down here, where it survives.
+    routeMemory: getRouteMemory(entries),
   };
 
   if (includeLongestDecision) {

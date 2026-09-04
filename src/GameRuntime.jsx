@@ -542,8 +542,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     [fallbackCaseId, isResult, log.length, node?.choices, speakerRelationship],
   );
   const continuityMemoryChoice = useMemo(
-    () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, log }),
-    [fallbackCaseId, log, resolvedNodeId],
+    () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, caseResults }),
+    [caseResults, fallbackCaseId, resolvedNodeId],
   );
   const fixedChoices = useMemo(
     () => [

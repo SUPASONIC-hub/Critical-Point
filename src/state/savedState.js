@@ -214,6 +214,14 @@ export function normalizeSavedCaseSummaryShape(summary) {
     rank: typeof summary.rank === "string" ? summary.rank : "C",
     outcomeChoiceId: typeof summary.outcomeChoiceId === "string" ? summary.outcomeChoiceId : null,
     outcomeNodeId: typeof summary.outcomeNodeId === "string" ? summary.outcomeNodeId : null,
+    // The next case's opening reads this to decide which memory choice to
+    // offer, so a corrupted value must not reach the choice builder. A save
+    // written before the field existed simply offers no memory choice.
+    routeMemory: {
+      evidenceTurn: Boolean(summary.routeMemory?.evidenceTurn),
+      systemRoute: Boolean(summary.routeMemory?.systemRoute),
+      routeSplit: Boolean(summary.routeMemory?.routeSplit),
+    },
   };
 }
 

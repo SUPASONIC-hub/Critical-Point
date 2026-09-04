@@ -10,6 +10,7 @@ import {
   getDecisionFingerprint,
   getDecisionLedger,
   getDiscoveryClue,
+  getRouteMemory,
   getEndingVariant,
   getAuthorityGate,
   getCaseOutcome,
@@ -465,7 +466,7 @@ assert.equal(
   getContinuityMemoryChoice({
     caseId: "case03",
     nodeId: CASE_START_NODES.case03,
-    log: [{ caseId: "case02", nodeId: "c2_evidence_turn", choiceId: "c2_evidence_turn_guard" }],
+    caseResults: { case02: { routeMemory: getRouteMemory([{ nodeId: "c2_evidence_turn", choiceId: "c2_evidence_turn_guard" }]) } },
   }).next,
   "c3_evidence_turn",
   "previous evidence turns should add a next-case memory choice that changes the opening question",
@@ -474,10 +475,29 @@ assert.equal(
   getContinuityMemoryChoice({
     caseId: "final",
     nodeId: CASE_START_NODES.final,
-    log: [{ caseId: "case05", nodeId: "c5_route_system", choiceId: "c5_route_system_a", freeTextSuccess: true }],
+    caseResults: { case05: { routeMemory: getRouteMemory([{ nodeId: "c5_route_system", choiceId: "c5_route_system_a", freeTextSuccess: true }]) } },
   }).next,
   "f_route_system",
   "previous free-text routes should add a next-case memory choice into the hidden system route",
+);
+// The choice used to be derived from the run log, and starting a case clears
+// the log, so it never appeared in a played season. What it reads has to be
+// something a finished case writes down and a case start does not wipe.
+assert.deepEqual(
+  createCaseSummary({}, {}, [{ nodeId: "c1_route_layoff", choiceId: "c1_route_layoff_notice" }], { resources: initialResources }).routeMemory,
+  { evidenceTurn: false, systemRoute: false, routeSplit: true },
+  "a closed case should record which kind of route it was shaken by",
+);
+assert.equal(
+  getContinuityMemoryChoice({
+    caseId: "case02",
+    nodeId: CASE_START_NODES.case02,
+    caseResults: {
+      case01: createCaseSummary({}, {}, [{ nodeId: "c1_route_layoff", choiceId: "c1_route_layoff_notice" }], { resources: initialResources }),
+    },
+  })?.next,
+  "c2_route_person",
+  "a case 01 summary alone should open the next case's memory choice, with no run log left to read",
 );
 assert.deepEqual(
   getRouteMarker({ nodeId: "c3_start", routeChangeKind: "memory", continuityMemory: true }),
