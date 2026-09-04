@@ -4,3 +4,8 @@
 *
 !src/styles/
 !src/styles/*.css
+
+# Minified output of `npm run build:critical`, sliced verbatim out of the built
+# stylesheet. Reformatting it would break the staleness guard in vite.config.js,
+# which proves each inlined rule still appears in the sheet byte for byte.
+src/styles/critical.generated.css

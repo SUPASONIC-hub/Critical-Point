@@ -7,6 +7,10 @@ export const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
 export const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
+// Set by the debug console to force the next render to throw, and cleared by the
+// error boundary's reload. Both files used to spell the string out for
+// themselves, which is one typo away from a boundary that can never be reset.
+export const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

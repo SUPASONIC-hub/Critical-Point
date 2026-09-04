@@ -51,6 +51,21 @@ npm test
 npm run build
 ```
 
+`npm test`는 `node --test`로 돌아갑니다. 어서션 하나가 실패해도 나머지가 모두 실행되고,
+실패한 것만 이름으로 보고됩니다.
+
+## 생성물
+
+브라우저로 측정해 만들고 저장소에 커밋하는 파일이 둘 있습니다. 배포 환경에는 Playwright
+브라우저가 없으므로 빌드가 이것들을 다시 만들지 않습니다.
+
+- `npm run build:art` — 반응형 이미지 변형. `npm run check:art`가 예산을 지킵니다.
+- `npm run build:critical` — 인트로가 실제로 칠하는 CSS. `src/styles/critical.generated.css`에
+  쓰고, `vite.config.js`가 이를 인라인한 뒤 전체 스타일시트를 비차단으로 내립니다. 생성 파일은
+  잘라낸 스타일시트의 해시를 함께 기록하므로, 스타일이 바뀌면 빌드가 재생성을 요구하며 실패합니다.
+
+  첫 페인트를 막는 바이트: 28.5KB gzip → 8.0KB gzip.
+
 ## 배포
 
 Render 배포는 `render.yaml`을 사용합니다.

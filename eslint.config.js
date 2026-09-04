@@ -43,7 +43,12 @@ export default [
   {
     // These run node code that also evaluates in a page, so both sets of
     // globals are legitimate in one file.
-    files: ["scripts/runtime-smoke.mjs", "scripts/build-art-variants.mjs", "tests/**/*.js"],
+    files: [
+      "scripts/runtime-smoke.mjs",
+      "scripts/build-art-variants.mjs",
+      "scripts/build-critical-css.mjs",
+      "tests/**/*.js",
+    ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ];

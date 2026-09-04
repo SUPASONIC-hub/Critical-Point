@@ -1,6 +1,31 @@
 import { spawn } from "node:child_process";
+import { createServer } from "node:net";
 
-const baseUrl = "http://127.0.0.1:5197";
+/**
+ * The suite used to pin 5197. `--strictPort` then made our own vite exit when
+ * something already held it, and `waitForServer` attached to whatever was
+ * answering -- which, when the squatter was another checkout's dev server,
+ * passed the `/@vite/client` identity probe below and served that checkout's
+ * code to the whole run. A pass then meant nothing about this working tree.
+ *
+ * Asking the OS for a free port removes the collision instead of detecting it.
+ * The probe stays as the second line of defence for the race between releasing
+ * this socket and vite binding it.
+ */
+async function findFreePort() {
+  return new Promise((resolve, reject) => {
+    const probe = createServer();
+    probe.unref();
+    probe.on("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const { port } = probe.address();
+      probe.close(() => resolve(port));
+    });
+  });
+}
+
+const port = await findFreePort();
+const baseUrl = `http://127.0.0.1:${port}`;
 const runFullCoverage = process.argv.includes("--full");
 const runRuntimeSmoke = process.argv.includes("--runtime");
 const forwardedArgs = process.argv.slice(2).filter((arg) => arg !== "--full" && arg !== "--runtime");
@@ -55,7 +80,7 @@ async function waitForServer(url, isRunning, timeoutMs = 30_000) {
         if (await servesViteDevClient(url)) return;
         throw new Error(
           `${url} is being served by something that is not our dev server. ` +
-            `Stop whatever is listening on that port (a leftover \`vite preview\` answers here too) and run this again.`,
+            `The port was free a moment ago, so something raced us onto it; run this again.`,
         );
       }
     } catch (error) {
@@ -86,7 +111,7 @@ function stopProcess(child) {
   });
 }
 
-const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", "5197", "--strictPort"], {
+const server = spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], {
   stdio: "ignore",
 });
 let serverRunning = true;

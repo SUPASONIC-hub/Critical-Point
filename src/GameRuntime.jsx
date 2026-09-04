@@ -3,6 +3,7 @@ import {
   appendStoredErrorLog,
   createRunId,
   debugToolsEnabled,
+  DEBUG_RENDER_CRASH_KEY,
   ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
   formatSaveTime,
@@ -60,7 +61,6 @@ import {
   getDecisionLedger,
   getAllDiscoveryClueIds,
   getCaseDiscoveryClue,
-  getClueHypotheses,
   getAuthorityGate,
   getEndingVariant,
   getCaseOutcome,
@@ -106,7 +106,6 @@ import {
 } from "./state/trace.js";
 import {
   createReplaySavedState,
-  getRouteMarker,
   normalizeSavedGameplayState,
   normalizeSavedNestedState,
   recordAppError,
@@ -138,8 +137,9 @@ import {
   stopDecisionWindow,
   useDecisionPhase,
 } from "./state/decisionClock.js";
-import { getCharacterState, getRivalResponse } from "./characterSystems.js";
-import { getAchievementProgress, getChapterTransitionBridge, getEndingEpilogue, getEvidenceRepairPuzzle, getFailureRecovery, getOperatorReveal, getOperationsSnapshot, getRivalIntervention } from "./featurePack.js";
+import { useCaseSystems } from "./state/useCaseSystems.js";
+import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
+import { getEndingEpilogue } from "./featurePack.js";
 import {
   legacyProfiles,
   nextCaseSignals,
@@ -153,52 +153,18 @@ import {
 } from "./appCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
-import { createActiveBonus, createAuthorityState, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
-import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "./viewModels/reportViewModels.js";
+import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
+import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import { createLocalLeaderboardRows } from "./viewModels/seasonViewModels.js";
 import {
-  getChapterUiModel,
-  getBalanceSignals,
-  getDelayedConsequences,
   getEndingSceneProfile,
   getFailureObjectives,
   getEndingVisualClass,
-  getEndingPreview,
-  getInterlude,
   getOperatorProfile,
   getOperatorProfiles,
-  getChoiceOutcomeFeedback,
-  getRelationshipGraph,
-  getEvidenceCombinations,
-  getHypothesisActions,
-  getFailureCause,
-  getEndingAtmosphere,
-  getPlayReport,
-  getTelemetryDashboardSnapshot,
   getOriginStartEffects,
-  getAuthorityReview,
-  getAutonomousSignals,
-  getEvidenceMetadata,
-  getHypothesisConflict,
-  getInvestigationTargets,
-  getTimelineStamp,
-  getOriginEndingVariant,
   getCharacterMemory,
   getInvestigationOutcome,
-  getEvidenceContamination,
-  getHypothesisLockState,
-  getResourceChain,
-  getMidBoss,
-  getDynamicMusicLayers,
-  getAftermath,
-  getRankingIntegrity,
-  getReplayDiagnostics,
-  getPlayStyleUnlocks,
-  getPastRunMemory,
-  getRelationshipScene,
-  getRelationshipQuest,
-  getRankingComparison,
-  getSeasonGoals,
 } from "./advancedSystems.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
@@ -235,26 +201,11 @@ function isAlreadyRecordedConsoleError(text) {
 export
 const caseSequence = CASE_SEQUENCE;
 
-/**
- * What the season has cost so far, for the closing ruling.
- *
- * Every case starts from the same resources, so the last case alone never
- * reaches the thresholds the ending is written against. This adds up the human
- * cost each case ended on and takes the highest pressure any case reached.
- */
-function getSeasonStrain(caseResults = {}, pending = null) {
-  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
-  return {
-    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
-    peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
-  };
-}
 
 /** The decision window, and how often overtime is billed once it closes. */
 const DECISION_WINDOW_SECONDS = 45;
 const OVERTIME_CHARGE_SECONDS = 15;
 
-const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 let saveSuppressed = false;
 const replaySeed = getReplaySeedFromLocation();
 
@@ -600,42 +551,65 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       active: node?.speaker === name,
     };
   });
-  const chapterUiModel = getChapterUiModel(currentCase);
-  const activeRelationshipScore = relationshipScores.find((item) => item.active)?.value ?? 0;
-  const relationshipQuest = getRelationshipQuest(node?.speaker, activeRelationshipScore);
-  const relationshipScene = getRelationshipScene(relationshipQuest, currentCase);
-  const pastRunMemory = getPastRunMemory(newGamePlusMemory);
-  const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
-  const playStyleUnlocks = getPlayStyleUnlocks(playStyle, newGamePlusUnlocked);
-  const seasonGoals = getSeasonGoals();
-  const interlude = getInterlude(currentCase, log.at(-1)?.choice);
-  const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
-  const authorityState = useMemo(() => createAuthorityState({ evidence: discoveredClues.length, legitimacy: resources.legitimacy ?? 0, operatorOrigin, trust: resources.trust ?? 0 }), [discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust]);
-  const clueCount = discoveredClues.length;
-  const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
-  const relationshipGraph = getRelationshipGraph(relationshipScores);
-  const evidenceCombinations = getEvidenceCombinations(discoveredClues);
-  const hypothesisActions = getHypothesisActions(clueHypotheses, authorityState);
-  const evidenceMetadata = getEvidenceMetadata(discoveredClues);
-  const hypothesisConflict = getHypothesisConflict(clueHypotheses);
-  const investigationTargets = getInvestigationTargets(fallbackCaseId, authorityState);
-  const autonomousSignal = getAutonomousSignals(fallbackCaseId, log);
-  const timelineStamp = getTimelineStamp(fallbackCaseId, log.length);
-  const evidenceContamination = getEvidenceContamination(discoveredClues, log);
-  const hypothesisLockState = getHypothesisLockState(clueHypotheses, hypothesisAction);
-  const resourceChain = getResourceChain(resources);
-  const midBoss = getMidBoss(fallbackCaseId, log);
-  const dynamicMusicLayers = getDynamicMusicLayers(riskTier, fallbackCaseId);
-  const characterState = getCharacterState(speakerProfile?.name ?? speakerProfile?.id ?? "", log);
-  const rivalResponse = getRivalResponse(fallbackCaseId, log, resources);
-  const [evidenceRepaired, setEvidenceRepaired] = useState(false);
-  const evidenceRepairPuzzle = getEvidenceRepairPuzzle(discoveredClues, evidenceRepaired);
-  const rivalIntervention = getRivalIntervention({ caseId: fallbackCaseId, log, resources });
-  const operatorReveal = getOperatorReveal({ origin: operatorOrigin, completedCases, caseResults });
-  const chapterTransitionBridge = getChapterTransitionBridge(caseSequence[caseSequence.indexOf(fallbackCaseId) - 1], fallbackCaseId, caseResults[caseSequence[caseSequence.indexOf(fallbackCaseId) - 1]]);
-  const achievementProgress = getAchievementProgress({ log, completedCases, caseResults });
-  const operationsSnapshot = getOperationsSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
-  const selectedInvestigationOutcome = getInvestigationOutcome(investigationTargets.find((target) => target.id === selectedInvestigation), log.length);
+  const {
+    achievementProgress,
+    authorityState,
+    autonomousSignal,
+    balanceSignals,
+    chapterTransitionBridge,
+    chapterUiModel,
+    characterState,
+    clueCount,
+    clueHypotheses,
+    delayedConsequences,
+    dynamicMusicLayers,
+    evidenceCombinations,
+    evidenceContamination,
+    evidenceMetadata,
+    evidenceRepairPuzzle,
+    evidenceRepaired,
+    hypothesisActions,
+    hypothesisConflict,
+    hypothesisLockState,
+    interlude,
+    investigationTargets,
+    midBoss,
+    operationsSnapshot,
+    operatorReveal,
+    pastRunMemory,
+    playStyleUnlocks,
+    relationshipGraph,
+    relationshipQuest,
+    relationshipScene,
+    resourceChain,
+    rivalIntervention,
+    rivalResponse,
+    seasonGoals,
+    selectedInvestigationOutcome,
+    setEvidenceRepaired,
+    timelineStamp,
+  } = useCaseSystems({
+    caseResults,
+    completedCases,
+    currentCase,
+    discoveredClues,
+    fallbackCaseId,
+    hypothesisAction,
+    localErrorEntries,
+    localRankingRows,
+    log,
+    newGamePlusMemory,
+    newGamePlusUnlocked,
+    node,
+    operatorOrigin,
+    pendingTelemetry,
+    playStyle,
+    relationshipScores,
+    resources,
+    riskTier,
+    selectedInvestigation,
+    speakerProfile,
+  });
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
@@ -2160,42 +2134,45 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     }),
   });
 
-  const result = useMemo(() => {
-    return createCaseSummary(triggers, cognition, log, {
-      resources,
-      schemaVersion: SAVE_SCHEMA_VERSION,
-      includeLongestDecision: true,
-    });
-  }, [triggers, cognition, log, resources]);
-  const endingVariant = useMemo(
-    () => getEndingVariant({ resources, discoveredClues, log, ...getSeasonStrain(caseResults) }),
-    [caseResults, discoveredClues, log, resources],
-  );
-  const latestChoiceFeedback = getChoiceOutcomeFeedback(log.at(-1));
-  const endingPreview = getEndingPreview(endingVariant);
-  const failureRecovery = getFailureRecovery(endingVariant, resources);
-  const endingCause = getFailureCause(endingVariant, resources);
-  const endingAtmosphere = getEndingAtmosphere(endingVariant.id);
-  const originEndingVariant = getOriginEndingVariant(operatorOrigin, endingVariant.id);
-  const aftermath = getAftermath(endingVariant.id, operatorOrigin);
-  const playReport = getPlayReport(result, log);
-  const telemetryDashboard = getTelemetryDashboardSnapshot({ errors: localErrorEntries, pending: pendingTelemetry, rankings: localRankingRows, caseResults });
-  const authorityReview = getAuthorityReview(operatorProfile, authorityState.level, result);
-  const rankingIntegrity = getRankingIntegrity({ runId, completedAt: result.completedAt ?? new Date().toISOString(), summary: result });
-  const replayDiagnostics = getReplayDiagnostics({ runId, caseId: fallbackCaseId, nodeId: resolvedNodeId, choiceId: log.at(-1)?.choiceId, pending: pendingTelemetry.length });
-  const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
-  const routeTimeline = useMemo(
-    () => log
-      .filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent)
-      .map((entry, index) => ({ ...entry, index, marker: getRouteMarker(entry) })),
-    [log],
-  );
-  const finalEndingEntry = [...log].reverse().find((entry) => entry.nodeId === "f_choice");
-  const finalAftermathEntry = [...log].reverse().find((entry) => entry.nodeId === "f_aftershock");
-  const outcomeNodeId = currentCase === "final" ? "f_aftershock" : `${currentCase}_aftershock`;
-  const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
-  const caseOutcome = getCaseOutcome({ caseId: currentCase, choiceId: outcomeEntry?.choiceId });
-  const endingProfile = createEndingProfile({ finalEndingEntry });
+  const {
+    aftermath,
+    authorityReview,
+    caseOutcome,
+    endingAtmosphere,
+    endingCause,
+    endingPreview,
+    endingProfile,
+    endingVariant,
+    failureRecovery,
+    finalAftermathEntry,
+    finalEndingEntry,
+    latestChoiceFeedback,
+    originEndingVariant,
+    playReport,
+    rankingComparison,
+    rankingIntegrity,
+    replayDiagnostics,
+    result,
+    routeTimeline,
+    telemetryDashboard,
+  } = useResultReport({
+    authorityState,
+    caseResults,
+    cognition,
+    currentCase,
+    discoveredClues,
+    fallbackCaseId,
+    localErrorEntries,
+    localRankingRows,
+    log,
+    operatorOrigin,
+    operatorProfile,
+    pendingTelemetry,
+    resolvedNodeId,
+    resources,
+    runId,
+    triggers,
+  });
 
   const routeLength = getCaseRouteLength(fallbackCaseId);
   const routeIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);

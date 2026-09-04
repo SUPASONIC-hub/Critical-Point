@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 ## Current State
 
@@ -238,6 +238,77 @@ them is applied as a measurement and a "no", which is set out below.
   file; with that fixed the true counts are 9 selectors with two homes and 53
   repeats, not 8 and 51.
 
+## Improvement pass (2026-09-04)
+
+Six things, all applied. What each one measured is below; the running history is
+in `docs/changelog/`.
+
+- **The visual workflow could not have passed once (CI-1).** Only `win32`
+  baselines were committed and the job ran on `ubuntu-latest`, so Playwright
+  looked for `-chromium-linux.png` and reported five missing snapshots on every
+  push to main and every Tuesday cron. The job runs in
+  `mcr.microsoft.com/playwright:v1.62.1-noble` now, so the renderer is pinned as
+  tightly as the code; `@playwright/test` is pinned exactly to match the tag, and
+  `npm run check:visual-baselines` fails if the two disagree, if a CI platform
+  has no baseline, or if a baseline belongs to no screenshot. A
+  `workflow_dispatch` input records the Linux set and pushes it to a branch --
+  they cannot be produced from Windows, so **the Linux baselines still have to be
+  recorded once before that job can go green**, and `check:visual-baselines` is
+  deliberately out of `verify:static` until they land.
+  `snapshotPathTemplate` is also spelled out in `playwright.config.js` rather
+  than left to the default, since the platform token is the whole issue.
+- **App.jsx was outside the M-1/M-2 split (C-1).** It carried a third
+  `debugToolsEnabled` (without the `?? {}` guard the shared one has, so it
+  returned `undefined` rather than `false`), a second `DEBUG_RENDER_CRASH_KEY`
+  literal, a hardcoded `caseSequence` nothing imported, and one sentence written
+  twice -- once in Korean and once as thirteen unicode escapes -- which the panel
+  could print twice in a row. All now come from `appConfig.js`.
+  `npm run check:constants` is the ratchet: no file may redeclare a name a home
+  module exports, and no storage-key literal may be written down twice.
+- **A leftover dev server was answering the test suite (T-3).** The e2e runner
+  pinned port 5197. T-1 taught it to reject a squatter that is not a vite dev
+  server, but another checkout's dev server passes that probe, so the suite could
+  test a different working tree and pass. Found live: a server from 13:47 was
+  still holding 5197 and served two runs of `test:visual`. The runner asks the OS
+  for a free port now, which removes the collision rather than detecting it.
+- **The test files run under `node:test` (T-4).** 1,229 lines of flat assertions
+  stopped at the first failure, so one regression hid the other 225. All 213 are
+  named cases now -- names taken from the assert messages they already carried --
+  and the assert count is unchanged (225 + 24). Verified by breaking two on
+  purpose: 2 failed by name, 211 still ran. One counter that was incremented in
+  one assertion and read by the next is derived at module scope instead.
+- **GameRuntime has two seams cut out of it (M-3).** `useResultReport` (the
+  closing report's twenty derivations) and `useCaseSystems` (the thirty-six
+  evidence, hypothesis, relationship and chapter derivations) are hooks now, with
+  their free variables computed from the AST rather than read off by eye.
+  `useMemo` went 26 to 18 and imported names 220 to 173.
+  `npm run check:runtime-budget` holds the line: lines, imports, and each hook
+  kind, plus the three view bags. Ratchet them down, never up.
+- **The intro's CSS no longer waits for the play and result screens (P-4).**
+  P-2 and P-3 both measured splitting the stylesheet per screen and said no,
+  correctly: the files are a cascade and moving a rule changes what wins.
+  Inlining adds instead of moving -- the full sheet still loads, in the same
+  order, with the same contents, so the settled cascade is unchanged by
+  construction and a miss is a flash rather than a wrong screen.
+
+      render-blocking bytes    28.5KB gzip -> 8.0KB gzip
+      critical CSS             29.0KB of 153.6KB, inlined
+      full sheet               unchanged, media="print" until onload
+
+  `npm run build:critical` measures it with Chromium's CSS coverage at both
+  baseline viewports and then proves the claim: with the deferred sheet blocked,
+  eleven intro elements compute identically to the full sheet across fourteen
+  properties. The output is committed, like the art variants, because the deploy
+  environment has no browser. It records the hash of the sheet it was cut from
+  and `vite.config.js` fails the build when they differ -- a rule-by-rule guard
+  was tried first and could not see a rule being *added*, which is exactly the
+  change that brings the flash back.
+
+Not done, and left for the owner to decide: the branch
+`worktree-next-improvement` holds one unmerged commit (`2a084b0`, effect-chip
+signs and Korean particle agreement). The stale worktree that was checked out on
+it is gone; the branch and its commit are untouched.
+
 ## Maintenance Priorities
 
 1. Keep `AppContent.jsx` as the pre-start shell and put gameplay orchestration in `GameRuntime.jsx`.
@@ -268,6 +339,24 @@ them is applied as a measurement and a "no", which is set out below.
     -- the browser is the encoder, so there is no image toolchain to install.
 14. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
+15. Constants have one home. `src/appConfig.js`, `src/gameConstants.js` and
+    `src/gameCases.js` own the shared values; nothing else declares a name they
+    export, and no storage-key literal is written down twice.
+    `npm run check:constants` enforces both.
+16. Keep `GameRuntime.jsx` under its budget. New derivations go into a hook of
+    their own -- `useCaseSystems` and `useResultReport` are the pattern -- not
+    into the component body. `npm run check:runtime-budget` holds lines,
+    imports, each hook kind, and the three view-bag sizes.
+17. The e2e runner takes a free port from the OS. Never pin one: a dev server
+    from another checkout answers the `/@vite/client` identity probe, so a
+    pinned port lets the suite pass against a different working tree.
+18. Regenerate `src/styles/critical.generated.css` with `npm run build:critical`
+    whenever a stylesheet changes, and commit it. The build fails otherwise --
+    it compares the hash of the sheet the file was cut from against the one it
+    just produced.
+19. Visual baselines are per platform. A runner added to a workflow needs its
+    baselines recorded and committed before that job can pass;
+    `npm run check:visual-baselines` says which are missing.
 ## Verification Commands
 
 ```bash
@@ -275,7 +364,13 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` now includes `npm run check:balance`.
+`npm run verify:static` is fourteen checks: lint, format, tests, encoding, text,
+CSS tokens, CSS structure, graph, balance, endings, art, views, constants and the
+runtime budget.
+
+Two artifacts are generated with a browser and committed, so a deploy needs no
+browser to build: `npm run build:art` and `npm run build:critical`. Each has a
+guard that fails when its output has gone stale.
 
 ## Database Deployment
 

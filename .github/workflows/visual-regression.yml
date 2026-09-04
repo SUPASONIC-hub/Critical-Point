@@ -8,6 +8,11 @@ on:
       - main
       - master
   workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: "Record the Linux baselines instead of comparing against them, and push them to a branch"
+        type: boolean
+        default: false
   schedule:
     - cron: "43 3 * * 2"
 
@@ -17,7 +22,15 @@ jobs:
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.labels.*.name, 'visual')
     runs-on: ubuntu-latest
+    # Screenshots are compared byte-for-byte against a committed baseline, so the
+    # thing that renders them has to be pinned as tightly as the code is. The
+    # runner image is not: `ubuntu-latest` changes its font packages underneath
+    # us. This tag is checked against the locked playwright version by
+    # `npm run check:visual-baselines`.
+    container: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -25,8 +38,39 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:visual
+
+      # Fails in seconds with the name of the missing file. Without it a missing
+      # baseline set surfaces as five screenshot timeouts and no explanation.
+      - name: Check baseline coverage
+        if: ${{ !inputs.update_baselines }}
+        run: npm run check:visual-baselines
+
+      - name: Compare against baselines
+        if: ${{ !inputs.update_baselines }}
+        run: npm run test:visual
+
+      - name: Record baselines
+        if: ${{ inputs.update_baselines }}
+        run: npm run test:visual -- --update-snapshots
+
+      - name: Push recorded baselines
+        if: ${{ inputs.update_baselines }}
+        env:
+          BRANCH: visual-baselines/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tests
+          if git diff --cached --quiet; then
+            echo "Baselines already match this runner; nothing to push."
+            exit 0
+          fi
+          git checkout -b "$BRANCH"
+          git commit -m "Record visual baselines on $(node -p 'process.platform')"
+          git push origin "$BRANCH"
+          echo "Baselines pushed to $BRANCH. Open a pull request from it." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload visual diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -35,5 +79,6 @@ jobs:
           path: |
             test-results
             playwright-report
+            tests/visual-regression.spec.js-snapshots
           if-no-files-found: ignore
           retention-days: 14

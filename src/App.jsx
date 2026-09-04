@@ -1,16 +1,24 @@
 import { Component } from "react";
 import "./styles/tokens.css";
 import "./styles/app.css";
-import { readStoredValue, RECOVERY_CENTER_STORAGE_KEY, removeStoredValue, STORAGE_KEY, writeStoredValue } from "./appConfig.js";
+import {
+  DEBUG_RENDER_CRASH_KEY,
+  debugToolsEnabled,
+  readStoredValue,
+  RECOVERY_CENTER_STORAGE_KEY,
+  removeStoredValue,
+  STORAGE_KEY,
+  writeStoredValue,
+} from "./appConfig.js";
 import { AppContent, resumeSaves, suppressSaves } from "./AppContent.jsx";
 import { getSavedRecoveryState, recordAppError } from "./state/errorRecovery.js";
 
-export const caseSequence = ["case01", "case02", "case03", "case04", "case05", "final"];
-
-const debugToolsEnabled =
-  import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true" ||
-  (import.meta.env.DEV && new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
-const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
+// Two failed reloads from the same save is where retrying stops being a retry.
+// The sentence is written once because the panel prints it twice: as the message
+// the blocked reload sets, and as the standing note under the buttons. It used to
+// be plain Korean in one place and a row of unicode escapes in the other.
+const RETRY_BLOCKED_MESSAGE = "같은 저장 지점에서 오류가 반복되어 재시도를 중단했습니다.";
+const MAX_RETRIES_FROM_ONE_SAVE = 2;
 
 export function App() {
   return <AppContent onSuppressSaves={suppressSaves} />;
@@ -34,11 +42,8 @@ export class AppErrorBoundary extends Component {
 
   reload({ clearSave = false } = {}) {
     const retryCount = Number(getSavedRecoveryState()?.lastError?.retryCount) || 0;
-    if (!clearSave && retryCount >= 2) {
-      this.setState({
-        recoveryMessage:
-          "같은 저장 지점에서 오류가 반복되어 재시도를 중단했습니다.",
-      });
+    if (!clearSave && retryCount >= MAX_RETRIES_FROM_ONE_SAVE) {
+      this.setState({ recoveryMessage: RETRY_BLOCKED_MESSAGE });
       return;
     }
 
@@ -72,9 +77,11 @@ export class AppErrorBoundary extends Component {
               {this.state.recoveryMessage}
             </p>
           )}
-          {retryCount >= 2 && (
+          {/* The blocked reload sets the same sentence as its message, so without
+              this guard a blocked retry prints it twice in a row. */}
+          {retryCount >= MAX_RETRIES_FROM_ONE_SAVE && this.state.recoveryMessage !== RETRY_BLOCKED_MESSAGE && (
             <p className="error-retry-blocked" role="status">
-              {"\uAC19\uC740 \uC800\uC7A5 \uC9C0\uC810\uC5D0\uC11C \uC624\uB958\uAC00 \uBC18\uBCF5\uB418\uC5B4 \uC7AC\uC2DC\uB3C4\uB97C \uC911\uB2E8\uD588\uC2B5\uB2C8\uB2E4."}
+              {RETRY_BLOCKED_MESSAGE}
             </p>
           )}
           <div className="error-actions">
@@ -87,7 +94,7 @@ export class AppErrorBoundary extends Component {
             >
               저장본을 초기화하고 새 게임
             </button>
-            <button type="button" data-testid="error-retry" disabled={retryCount >= 2} onClick={() => this.reload()}>
+            <button type="button" data-testid="error-retry" disabled={retryCount >= MAX_RETRIES_FROM_ONE_SAVE} onClick={() => this.reload()}>
               저장된 지점에서 다시 시도
             </button>
           </div>
