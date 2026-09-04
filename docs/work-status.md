@@ -294,10 +294,18 @@ in `docs/changelog/`.
   tightly as the code; `@playwright/test` is pinned exactly to match the tag, and
   `npm run check:visual-baselines` fails if the two disagree, if a CI platform
   has no baseline, or if a baseline belongs to no screenshot. A
-  `workflow_dispatch` input records the Linux set and pushes it to a branch --
-  they cannot be produced from Windows, so **the Linux baselines still have to be
-  recorded once before that job can go green**, and `check:visual-baselines` is
-  deliberately out of `verify:static` until they land.
+  `workflow_dispatch` input records the Linux set, and running it is how the five
+  Linux baselines in this repository were produced -- from the same commit the
+  Windows set was recorded on. The artifact carried the Windows files back
+  byte-identical, which is what proves the run only added to them; the Linux
+  images are the same layout at the same widths, 22 to 163 pixels shorter, which
+  is the font rasterisation that made the platform token necessary in the first
+  place. `check:visual-baselines` joined `verify:static` once they landed, so
+  that tier is sixteen checks.
+
+  That dispatch failed on its first attempt, after recording the images: the
+  Playwright container's shell is dash, which has no `pipefail`, so the push
+  step's `set -euo pipefail` aborted it on line one. The step names `bash` now.
   `snapshotPathTemplate` is also spelled out in `playwright.config.js` rather
   than left to the default, since the platform token is the whole issue.
 - **App.jsx was outside the M-1/M-2 split (C-1).** It carried a third
@@ -451,9 +459,13 @@ confined to the choice list -- y 1901-2704 of 2867 on desktop, y 2233-3310 of
     to gains only, or it starts inventing dominations that `check:balance` was
     written to catch. Read `npm run check:endings` afterwards -- bigger gains
     end seasons higher and thin out the endings that need a run to go badly.
-20. Visual baselines are per platform. A runner added to a workflow needs its
-    baselines recorded and committed before that job can pass;
-    `npm run check:visual-baselines` says which are missing.
+20. Visual baselines are per platform, and `linux` and `win32` are both
+    committed. A runner added to a workflow needs its own set recorded before
+    that job can pass -- dispatch Visual Regression with `update_baselines` and
+    merge the branch it pushes. `npm run check:visual-baselines` says which are
+    missing, and it runs inside `verify:static`.
+21. A `run:` step in the Playwright container gets dash, not bash. Say
+    `shell: bash` on any step that uses `pipefail`, arrays, or `[[`.
 ## Verification Commands
 
 ```bash

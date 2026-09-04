@@ -55,6 +55,10 @@ jobs:
 
       - name: Push recorded baselines
         if: ${{ inputs.update_baselines }}
+        # The Playwright container's default shell is dash, which has no
+        # `pipefail`, so `set -euo pipefail` aborted this step before it ran a
+        # single line -- after the baselines had already been recorded.
+        shell: bash
         env:
           BRANCH: visual-baselines/${{ github.run_id }}
         run: |

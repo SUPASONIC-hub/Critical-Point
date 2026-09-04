@@ -16,6 +16,11 @@ import path from "node:path";
  * and fails when a combination has no committed file. It also fails on a
  * baseline no screenshot call names any more, which is how a renamed test leaves
  * a stale PNG behind.
+ *
+ * The Linux set was recorded on 2026-09-04 by the workflow's `update_baselines`
+ * dispatch, from the same commit the Windows set was recorded on; the artifact
+ * carried the Windows files back byte-identical, which is what proves the run
+ * only added to them. This check joined `verify:static` at that point.
  */
 
 const root = process.cwd();
