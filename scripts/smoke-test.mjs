@@ -11,6 +11,7 @@ import {
   getDecisionLedger,
   getDiscoveryClue,
   getEndingVariant,
+  getAuthorityGate,
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
@@ -439,6 +440,24 @@ assert.ok(nodes.c2_trace && nodes.c3_signal && nodes.c4_public && nodes.c5_voice
 assert.ok(nodeOrders.case01.length >= 17, "case 01 should include its authored detour scenes");
 assert.ok(nodeOrders.final.length >= 14, "the final act should include its authored detour scenes");
 assert.ok(nodes.c1_route_layoff && nodes.c3_route_fast && nodes.c4_route_exception && nodes.c5_route_map && nodes.f_route_map, "every main act should split its main question routes");
+assert.ok(nodes.c1_evidence_turn && nodes.c2_evidence_turn && nodes.c5_evidence_turn && nodes.f_evidence_turn, "evidence should unlock route-changing turnaround scenes");
+assert.equal(nodes.c1_route_layoff.choices.at(-1).next, "c1_evidence_turn", "case 01 route evidence choice should change the question path");
+assert.equal(nodes.f_route_map.choices.at(-1).requiredAuthority, "OVERSIGHT", "final evidence turnaround should require oversight authority");
+assert.equal(
+  getAuthorityGate(nodes.c1_route_layoff.choices.at(-1), { clueCount: 0, trust: 45, legitimacy: 45 }).unlocked,
+  false,
+  "evidence turnaround should be locked before the player earns field access",
+);
+assert.equal(
+  getAuthorityGate(nodes.c1_route_layoff.choices.at(-1), { clueCount: 2, trust: 45, legitimacy: 45 }).unlocked,
+  true,
+  "two clues should unlock field evidence turnaround choices",
+);
+assert.equal(
+  getAuthorityGate(nodes.f_route_map.choices.at(-1), { clueCount: 4, trust: 60, legitimacy: 55 }).unlocked,
+  true,
+  "final evidence turnaround should unlock at oversight authority",
+);
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
 assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");

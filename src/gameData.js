@@ -1575,6 +1575,155 @@ function registerDramaticRoutePlan(caseId, plan) {
 
 Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticRoutePlan(caseId, plan));
 
+const evidenceTurnaroundPlans = {
+  case01: {
+    node: "c1_evidence_turn",
+    result: "c1_aftershock",
+    sourceRoutes: ["c1_route_layoff", "c1_route_funding", "c1_route_sale", "c1_route_investigate", "c1_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    title: "첫 단서가 세 안건을 한 줄로 묶는다",
+    speaker: "에코",
+    text: "확보한 단서를 대조하자 감축, 자금, 매각이 서로 다른 해결책이 아니라 같은 누락 기준표의 결과라는 사실이 보입니다. 이제 무엇을 고를지가 아니라 기준표를 누가 다시 쓸지가 사건의 결론입니다.",
+    memo: ["숨은 급여표와 누락 로그가 같은 작성자를 가리킴", "세 안건의 효과가 하나의 기준표에서 계산됨", "다음 사건의 증거 공개 범위를 지금 정할 수 있음"],
+    triggers: ["curiosity", "system", "responsibility"],
+    entryEffect: { legitimacy: 3, trust: 2, time: -3, fatigue: 3 },
+    choices: [
+      ["c1_evidence_turn_public", "기준표와 작성자를 함께 공개한다", { legitimacy: 9, trust: 3, capital: -7, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 }],
+      ["c1_evidence_turn_private", "작성자는 숨기고 기준표만 내부 수정한다", { capital: 5, trust: -4, legitimacy: -3, time: 3, humanCost: 3, fatigue: -2 }, { risk: 2 }],
+      ["c1_evidence_turn_transfer", "다음 사건 담당자에게 원본 검증권을 넘긴다", { trust: 8, legitimacy: 5, capital: -5, fatigue: 6 }, { reframing: 2 }],
+    ],
+  },
+  case02: {
+    node: "c2_evidence_turn",
+    result: "c2_aftershock",
+    sourceRoutes: ["c2_route_report", "c2_route_person", "c2_route_origin", "c2_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    title: "보호된 증언이 기록을 뒤집는다",
+    speaker: "이민서",
+    text: "앞서 얻은 단서를 붙이자 유출 파일의 시간이 맞지 않습니다. 누가 말했는지보다 누가 말할 수 없게 만들었는지가 새 질문으로 떠오릅니다.",
+    memo: ["증언 시간과 파일 생성 시간이 어긋남", "보호 조치가 오히려 증언자를 고립시킨 흔적", "다음 케이스의 점수판에 같은 시간 조작이 남아 있음"],
+    triggers: ["protection", "injustice", "curiosity"],
+    entryEffect: { trust: 3, legitimacy: 2, time: -3, fatigue: 3 },
+    choices: [
+      ["c2_evidence_turn_guard", "증언자의 열람권을 먼저 복구한다", { trust: 8, legitimacy: 4, capital: -6, time: -5, fatigue: 6 }, { reframing: 2 }],
+      ["c2_evidence_turn_stamp", "시간 조작 증거를 외부 감사에 보낸다", { legitimacy: 9, trust: -2, capital: -7, time: -6, fatigue: 7 }, { inference: 2 }],
+      ["c2_evidence_turn_delay", "증언을 늦추고 로그 복원부터 끝낸다", { time: -8, legitimacy: 6, trust: 2, fatigue: 6 }, { persistence: 2 }],
+    ],
+  },
+  case03: {
+    node: "c3_evidence_turn",
+    result: "c3_aftershock",
+    sourceRoutes: ["c3_route_fast", "c3_route_deep", "c3_route_mirror", "c3_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    title: "두 번째 점수판",
+    speaker: "오진우",
+    text: "단서를 대조하자 고객에게 보이는 점수판과 내부 심사용 점수판이 다르다는 사실이 드러납니다. 이제 승패보다 어느 점수판을 진짜 계약 기준으로 인정할지가 문제입니다.",
+    memo: ["외부 점수판과 내부 점수판의 가중치가 다름", "오진우도 같은 불일치를 알고 있음", "빠른 승리는 숨은 점수판을 그대로 남길 수 있음"],
+    triggers: ["competition", "injustice", "curiosity"],
+    entryEffect: { legitimacy: 3, trust: 1, time: -4, fatigue: 3 },
+    choices: [
+      ["c3_evidence_turn_merge", "두 점수판을 합쳐 고객에게 다시 제출한다", { legitimacy: 8, trust: 5, capital: -7, time: -7, fatigue: 7 }, { reframing: 2, inference: 1 }],
+      ["c3_evidence_turn_use", "내부 점수판의 허점을 이용해 계약을 딴다", { capital: 10, time: 4, trust: -8, legitimacy: -6, humanCost: 4, fatigue: -2 }, { risk: 2 }],
+      ["c3_evidence_turn_refuse", "점수판 계약 자체를 거부한다", { trust: 7, legitimacy: 8, capital: -9, fatigue: 8 }, { persistence: 2 }],
+    ],
+  },
+  case04: {
+    node: "c4_evidence_turn",
+    result: "c4_aftershock",
+    sourceRoutes: ["c4_route_exception", "c4_route_rule", "c4_route_audit", "c4_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    title: "예외 파일의 원래 수신자",
+    speaker: "반재",
+    text: "단서 조합은 예외 승인이 한 번의 선의가 아니라 미리 설계된 반복 절차였음을 보여줍니다. 질문은 허용 여부에서, 반복을 누가 승인했는지로 이동합니다.",
+    memo: ["예외 파일 수신자가 여러 케이스에 반복 등장", "성과 지표가 예외 승인 뒤에 수정됨", "감사 권한 없이는 원본을 열 수 없음"],
+    triggers: ["order", "responsibility", "system"],
+    entryEffect: { legitimacy: 3, time: -3, fatigue: 3 },
+    choices: [
+      ["c4_evidence_turn_owner", "반복 승인자를 공개 기록에 남긴다", { legitimacy: 9, trust: 3, capital: -8, time: -6, fatigue: 7 }, { inference: 2 }],
+      ["c4_evidence_turn_stop", "승인 절차를 멈추고 피해자 동의를 새 조건으로 넣는다", { trust: 8, legitimacy: 6, capital: -9, humanCost: -4, fatigue: 8 }, { reframing: 2 }],
+      ["c4_evidence_turn_patch", "반복 절차는 숨기고 이번 예외만 봉합한다", { capital: 7, trust: -7, legitimacy: -6, humanCost: 5, fatigue: -2 }, { risk: 2 }],
+    ],
+  },
+  case05: {
+    node: "c5_evidence_turn",
+    result: "c5_aftershock",
+    sourceRoutes: ["c5_route_blame", "c5_route_map", "c5_route_redesign", "c5_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    title: "사라진 피해자의 우선순위",
+    speaker: "한서윤",
+    text: "지금까지의 단서가 겹치자 조용한 피해자가 매번 낮은 우선순위로 밀린 이유가 보입니다. 책임자를 찾는 질문은 피해자가 시스템에서 어떻게 사라졌는지로 바뀝니다.",
+    memo: ["피해자 누락은 신고 빈도 가중치에서 시작됨", "복구가 빠를수록 원인 로그가 사라질 수 있음", "최종장 실험 데이터와 같은 규칙이 쓰임"],
+    triggers: ["protection", "injustice", "system"],
+    entryEffect: { trust: 3, legitimacy: 2, humanCost: -2, fatigue: 4 },
+    choices: [
+      ["c5_evidence_turn_weight", "조용한 피해자 가중치를 공개 규칙으로 올린다", { trust: 9, legitimacy: 7, capital: -9, humanCost: -8, fatigue: 8 }, { reframing: 3 }],
+      ["c5_evidence_turn_archive", "복구 전에 원인 로그를 보존한다", { legitimacy: 8, trust: 2, capital: -6, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
+      ["c5_evidence_turn_close", "피해 보상만 먼저 끝내고 규칙 공개를 미룬다", { trust: 5, capital: -6, legitimacy: -5, humanCost: -7, fatigue: 6 }, { risk: 2 }],
+    ],
+  },
+  final: {
+    node: "f_evidence_turn",
+    result: "f_aftershock",
+    sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
+    requiredAuthority: "OVERSIGHT",
+    title: "모든 단서가 플레이어의 문장을 가리킨다",
+    speaker: "에코",
+    text: "감독 권한으로 원본을 열자 사건의 공통점이 사람이 아니라 질문 문장이라는 사실이 드러납니다. 최종 선택은 데이터를 공개할지가 아니라, 당신의 판단 양식을 다음 참가자에게 물려줄지입니다.",
+    memo: ["모든 케이스의 숨은 단서가 선택 문장과 연결됨", "다음 참가자의 첫 선택지 일부가 이미 생성됨", "종료 권한은 공개와 폐기 중 하나만 완전하게 보장함"],
+    triggers: ["selfAwareness", "choice", "system"],
+    entryEffect: { legitimacy: 5, trust: 2, time: -5, fatigue: 5 },
+    choices: [
+      ["f_evidence_turn_burn", "내 선택 문장까지 포함해 실험 원본을 폐기한다", { legitimacy: 10, trust: 4, capital: -8, time: -8, humanCost: -3, fatigue: 9 }, { persistence: 2 }],
+      ["f_evidence_turn_seed", "내 문장을 경고문으로 남기고 다음 참가자에게 넘긴다", { trust: 9, legitimacy: 6, capital: -6, humanCost: 3, fatigue: 8 }, { reframing: 3 }],
+      ["f_evidence_turn_publish", "모든 원본과 선택 복제 규칙을 공개한다", { legitimacy: 12, trust: -4, capital: -7, humanCost: 5, time: -4, fatigue: 7 }, { risk: 1, inference: 2 }],
+    ],
+  },
+};
+
+function registerEvidenceTurnaround(caseId, plan) {
+  const order = nodeOrders[caseId];
+  nodes[plan.node] = {
+    phase: "EVIDENCE TURN",
+    title: plan.title,
+    speaker: plan.speaker,
+    text: plan.text,
+    memo: plan.memo,
+    triggers: plan.triggers,
+    choices: plan.choices.map(([id, label, effect, cognition]) => ({
+      id,
+      label,
+      effect,
+      cognition,
+      next: plan.result,
+    })),
+  };
+  plan.sourceRoutes.forEach((routeId) => {
+    if (!nodes[routeId]?.choices || nodes[routeId].choices.some((choice) => choice.id === `${routeId}_evidence_turn`)) return;
+    nodes[routeId].choices.push({
+      id: `${routeId}_evidence_turn`,
+      label: "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
+      effect: plan.entryEffect,
+      cognition: { inference: 2, reframing: 1 },
+      next: plan.node,
+      requiredAuthority: plan.requiredAuthority,
+    });
+  });
+  const resultIndex = order.indexOf(plan.result);
+  const insertIndex = resultIndex >= 0 ? resultIndex : order.length;
+  if (!order.includes(plan.node)) order.splice(insertIndex, 0, plan.node);
+  nodes[plan.node].choices.forEach((choice) => {
+    choiceVoiceLines[choice.id] = choice.label;
+    echoReplies[choice.id] = `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`;
+  });
+  plan.sourceRoutes.forEach((routeId) => {
+    const choiceId = `${routeId}_evidence_turn`;
+    choiceVoiceLines[choiceId] = "확보한 단서를 대조해 이 질문의 전제를 뒤집는다";
+    echoReplies[choiceId] = "단서 대조가 열리며, 이 루트의 결론이 다른 질문으로 바뀝니다.";
+  });
+}
+
+Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
+
 export const caseOpeningRoutes = {
   case02: {
     c1_after_people: "c2_start_people",
