@@ -78,9 +78,14 @@ has to keep, and the commands that prove it. What changed and why is in
     missing, and it runs inside `verify:static`.
 20. A `run:` step in the Playwright container gets dash, not bash. Say
     `shell: bash` on any step that uses `pipefail`, arrays, or `[[`.
-21. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
-22. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
-23. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+21. Node has one home: `.node-version`. The Render build reads it, and every
+    `actions/setup-node` step takes `node-version-file: .node-version` rather
+    than a literal. They drifted once -- CI on 24, the file on 22.16.0 -- which
+    means the checks were passing on a major the deploy never built with. A
+    workflow that hardcodes `node-version:` puts that gap back.
+22. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
+23. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
+24. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
 ## Verification Commands
 

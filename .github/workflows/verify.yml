@@ -14,9 +14,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+      # Node comes from .node-version, which is also what the Render build
+      # reads. CI used to say `node-version: 24` while that file said 22.16.0,
+      # so every check ran on a major the deploy never built with.
       - uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
@@ -41,9 +44,10 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
+      # One Node version for CI and the Render build: .node-version.
       - uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium

@@ -33,9 +33,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v5
+      # One Node version for CI and the Render build: .node-version.
       - uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: npm
       - run: npm ci
 
