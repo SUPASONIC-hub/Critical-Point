@@ -81,8 +81,11 @@ has to keep, and the commands that prove it. What changed and why is in
 21. Node has one home: `.node-version`. The Render build reads it, and every
     `actions/setup-node` step takes `node-version-file: .node-version` rather
     than a literal. They drifted once -- CI on 24, the file on 22.16.0 -- which
-    means the checks were passing on a major the deploy never built with. A
-    workflow that hardcodes `node-version:` puts that gap back.
+    means the checks were passing on a major the deploy never built with.
+    `npm run check:node` is the ratchet: it rejects an inline `node-version:`,
+    a pin that is not an exact x.y.z, a job that runs npm with no setup-node, a
+    `NODE_VERSION` in `render.yaml`, and an `engines.node` naming another
+    major.
 22. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
 23. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
 24. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
@@ -94,11 +97,11 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` is sixteen checks: lint, CSS format, unit and smoke
+`npm run verify:static` is seventeen checks: lint, CSS format, unit and smoke
 tests, encoding, text, CSS tokens, CSS structure, graph, dialogue, balance,
-endings, art, view contracts, constants, the runtime budget and the visual
-baselines. None of them needs a browser, which is what lets the deploy build
-run them.
+endings, art, view contracts, constants, the runtime budget, the visual
+baselines and the Node pin. None of them needs a browser, which is what lets
+the deploy build run them.
 
 Two artifacts are generated with a browser and committed, so a deploy needs no
 browser to build: `npm run build:art` and `npm run build:critical`. Each has a
