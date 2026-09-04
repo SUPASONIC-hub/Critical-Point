@@ -94,7 +94,7 @@ await step("free-text scene accepts input", async () => {
   });
   await page.goto(`${url}/?debug=1`);
   await page.getByTestId("debug-case-select").selectOption("case02");
-  await page.getByTestId("debug-node-select").selectOption("c2_final");
+  await page.getByTestId("debug-node-select").selectOption("c2_pressure");
   await page.getByTestId("debug-start-node").click();
   await page.waitForSelector(".game-shell", { timeout: 10000 });
   await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고 원본 기록을 확인한 뒤 위험을 공개한다.");

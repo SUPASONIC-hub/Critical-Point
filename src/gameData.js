@@ -1432,7 +1432,11 @@ const dramaticRoutePlans = {
         memo: ["선택 로그와 사건 설계 변경 기록 일치", "응답 시간이 압박 조건으로 재사용됨", "일부 선택 문장은 다음 참가자 선택지로 복제됨"],
         triggers: ["curiosity", "selfAwareness", "responsibility"],
         routeChoices: [
-          ["f_route_map_open", "내 로그가 바꾼 질문을 모두 공개한다", { legitimacy: 9, trust: 4, capital: -6, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
+          // Cheaper in money than the routes that stage a confrontation: the
+          // records already exist, so this route pays in time and trust instead.
+          // It is also what keeps the trace column from being dominated once the
+          // route walks its authored scenes.
+          ["f_route_map_open", "내 로그가 바꾼 질문을 모두 공개한다", { legitimacy: 9, trust: 4, capital: -3, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
           ["f_route_map_delete", "내 로그만 삭제하고 다른 참가자 기록은 남긴다", { trust: -5, legitimacy: -4, humanCost: 5, time: 4, fatigue: -3 }, { risk: 2 }],
           ["f_route_map_return", "복제된 선택지를 원래 참가자에게 돌려준다", { trust: 8, legitimacy: 5, capital: -7, humanCost: -4, fatigue: 8 }, { reframing: 2 }],
         ],
@@ -1575,6 +1579,101 @@ function registerDramaticRoutePlan(caseId, plan) {
 
 Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticRoutePlan(caseId, plan));
 
+/**
+ * The route split gave every case a new question, but in cases 01, 03, 04, 05
+ * and the finale it also cut the authored middle out of the main line: the
+ * fixed choices ran start -> route -> route final -> aftermath in four scenes,
+ * and everything between (the witness scenes, the reactions, the branch
+ * detours) was reachable only through free input. CASE 02 was wired the other
+ * way -- each route walks its own authored scenes and closes on its own final
+ * -- so this puts the rest of the season on that same shape.
+ *
+ * `entry` is the authored scene the route now opens into, `tail` is the last
+ * scene of that stretch, whose choices close on the route's own `final`. Every
+ * route gets a stretch nobody else walks, so two routes never ask the same
+ * middle questions.
+ */
+const routeBodyPlans = {
+  // CASE 02 already walks its authored middle; only its old shared final, which
+  // the three route finals replaced, is still sitting in the graph unreachable.
+  case02: { retire: ["c2_final"] },
+  case01: {
+    routes: {
+      c1_route_investigate: { entry: "accounting", tail: "c1_witness_reaction", final: "c1_final_investigate" },
+      c1_route_layoff: { entry: "payday", tail: "c1_assembly_reaction", final: "c1_final_layoff" },
+      c1_route_sale: { entry: "competitor", tail: "c1_bargain_reaction", final: "c1_final_sale" },
+      c1_route_funding: { entry: "board", tail: "c1_verdict_reaction", final: "c1_final_funding" },
+      c1_route_system: { entry: "c1_branch_people", tail: "c1_branch_people_follow", final: "c1_final_system" },
+    },
+    retire: ["final"],
+  },
+  case03: {
+    routes: {
+      c3_route_deep: { entry: "c3_split", tail: "c3_rival_reaction", final: "c3_final_right" },
+      c3_route_fast: { entry: "c3_score", tail: "c3_signal_reaction", final: "c3_final_win" },
+      c3_route_mirror: { entry: "c3_trap", tail: "c3_verdict_reaction", final: "c3_final_joint" },
+      c3_route_system: { entry: "c3_branch_signal", tail: "c3_branch_signal_follow", final: "c3_final_system" },
+    },
+    retire: ["c3_final"],
+  },
+  case04: {
+    routes: {
+      c4_route_exception: { entry: "c4_offer", tail: "c4_audit_reaction", final: "c4_final_exception" },
+      c4_route_audit: { entry: "c4_leak", tail: "c4_public_reaction", final: "c4_final_audit" },
+      c4_route_rule: { entry: "c4_vote", tail: "c4_verdict_reaction", final: "c4_final_rule" },
+      c4_route_system: { entry: "c4_branch_exception", tail: "c4_branch_exception_follow", final: "c4_final_system" },
+    },
+    retire: ["c4_final"],
+  },
+  case05: {
+    routes: {
+      c5_route_map: { entry: "c5_map", tail: "c5_pattern_reaction", final: "c5_final_map_route" },
+      c5_route_blame: { entry: "c5_blame", tail: "c5_voice_reaction", final: "c5_final_blame_route" },
+      c5_route_redesign: { entry: "c5_collapse", tail: "c5_verdict_reaction", final: "c5_final_redesign_route" },
+      c5_route_system: { entry: "c5_branch_owner", tail: "c5_branch_owner_follow", final: "c5_final_system_route" },
+    },
+    retire: ["c5_final"],
+  },
+  final: {
+    routes: {
+      f_route_map: { entry: "f_archive", tail: "f_witness_reaction", final: "f_final_map" },
+      f_route_expose: { entry: "f_confront", tail: "f_dilemma_reaction", final: "f_final_expose" },
+      f_route_contain: { entry: "f_branch_witness", tail: "f_branch_witness_follow", final: "f_final_contain" },
+    },
+    // f_choice is where the season picks its 봉인/개혁/폭로 framing, so the last
+    // case is the one place the route finals still converge: they hand the run
+    // to that scene instead of jumping past it into the aftermath.
+    rewire: { f_final_map: "f_choice", f_final_expose: "f_choice", f_final_contain: "f_choice", f_final_system: "f_choice" },
+  },
+};
+
+function registerRouteBodies(caseId, plan) {
+  Object.entries(plan.routes ?? {}).forEach(([routeId, body]) => {
+    nodes[routeId].choices.forEach((choice) => { choice.next = body.entry; });
+    nodes[body.tail].choices.forEach((choice) => { choice.next = body.final; });
+  });
+  Object.entries(plan.rewire ?? {}).forEach(([nodeId, next]) => {
+    nodes[nodeId].choices.forEach((choice) => { choice.next = next; });
+  });
+  (plan.retire ?? []).forEach((nodeId) => {
+    delete nodes[nodeId];
+    const index = nodeOrders[caseId].indexOf(nodeId);
+    if (index >= 0) nodeOrders[caseId].splice(index, 1);
+  });
+}
+
+Object.entries(routeBodyPlans).forEach(([caseId, plan]) => registerRouteBodies(caseId, plan));
+
+/**
+ * Where the first successful free-text answer of a case lands. It lives next to
+ * the route plans so the runtime and the graph check read one map instead of
+ * two copies that can drift apart.
+ */
+export const freeTextRouteNodes = {
+  case02: "c2_route_system",
+  ...Object.fromEntries(Object.entries(dramaticRoutePlans).map(([caseId, plan]) => [caseId, plan.defaultFree])),
+};
+
 const evidenceTurnaroundPlans = {
   case01: {
     node: "c1_evidence_turn",
@@ -1663,7 +1762,9 @@ const evidenceTurnaroundPlans = {
   },
   final: {
     node: "f_evidence_turn",
-    result: "f_aftershock",
+    // Same reason the last case's route finals stop at f_choice: the clue
+    // turnaround must not skip the scene that names the ending.
+    result: "f_choice",
     sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
     requiredAuthority: "OVERSIGHT",
     title: "모든 단서가 플레이어의 문장을 가리킨다",

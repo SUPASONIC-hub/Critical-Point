@@ -692,6 +692,15 @@
 .route-atlas-node.evidence .route-atlas-dot {
   background: var(--c-teal-deep);
 }
+.route-atlas-node.memory .route-atlas-dot {
+  background: var(--c-teal);
+}
+.route-atlas-node.turnaround .route-atlas-dot {
+  background: var(--c-coral);
+}
+.route-atlas-node.system .route-atlas-dot {
+  background: var(--c-violet);
+}
 .route-atlas-node.reaction .route-atlas-dot {
   background: var(--c-coral-44);
 }
@@ -736,6 +745,18 @@
 .route-atlas-meta .route-observer {
   color: var(--c-paper);
   background: var(--c-ink);
+}
+.route-atlas-meta .route-memory {
+  color: var(--c-ink);
+  background: var(--c-mint);
+}
+.route-atlas-meta .route-turnaround {
+  color: var(--c-ink);
+  background: var(--c-coral-soft);
+}
+.route-atlas-meta .route-system {
+  color: var(--c-paper);
+  background: var(--c-violet);
 }
 .route-atlas-copy strong,
 .route-atlas-copy p {

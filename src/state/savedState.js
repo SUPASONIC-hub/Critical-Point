@@ -166,6 +166,9 @@ function normalizeSavedLogEntry(entry) {
     choice: typeof entry.choice === "string" ? entry.choice : "",
     spokenChoice: typeof entry.spokenChoice === "string" ? entry.spokenChoice : "",
     freeText: normalizeSavedText(entry.freeText, FREE_TEXT_MAX_LENGTH),
+    freeTextBranchId: typeof entry.freeTextBranchId === "string" ? entry.freeTextBranchId : "",
+    continuityMemory: Boolean(entry.continuityMemory),
+    routeChangeKind: ["memory", "evidence-turn", "free-text"].includes(entry.routeChangeKind) ? entry.routeChangeKind : "",
     effect: normalizeSavedEffect(entry.effect),
     cognition: normalizeSavedEffect(entry.cognition),
     triggers: Array.isArray(entry.triggers) ? entry.triggers.filter((trigger) => typeof trigger === "string") : [],
@@ -373,6 +376,9 @@ export function createSafeDomSnapshot(documentRef = globalThis.document) {
 export function getRouteMarker(entry) {
   const nodeId = typeof entry?.nodeId === "string" ? entry.nodeId : "";
   const scene = nodes[nodeId];
+  if (entry?.routeChangeKind === "memory" || entry?.continuityMemory) return { label: "이전 선택 귀환", tone: "memory" };
+  if (entry?.routeChangeKind === "evidence-turn" || nodeId.includes("evidence_turn") || String(entry?.choiceId ?? "").includes("evidence_turn")) return { label: "단서 역전", tone: "turnaround" };
+  if (entry?.routeChangeKind === "free-text" || entry?.freeTextBranchId) return { label: "문장 분기", tone: "system" };
   if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
   if (nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
   if (nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
@@ -507,6 +513,6 @@ export function reportSilentFailure(code, detail = {}) {
   const error = new Error(`[silent:${code}] ${JSON.stringify(detail)}`);
   error.name = "SilentRouteFailure";
   recordAppError(error, {}, `silent-${code}`);
-  if (import.meta.env.DEV) console.warn(error);
+  if ((import.meta.env ?? {}).DEV) console.warn(error);
   return error;
 }

@@ -243,7 +243,10 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 });
 
-test("a successful free-text plan enters the authored branch scene", async ({ page }) => {
+// An answer nobody wrote a button for is supposed to buy a scene nobody else
+// sees: the case's hidden route. It used to land on the shared branch detour,
+// which the fixed choices could also reach, so the reward was invisible.
+test("a successful free-text plan enters the case's hidden route", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case01", "payday");
   await page.locator(".reframe-box textarea").fill("직원과 고객의 조건을 공개하고 근거 로그와 위험 비용을 함께 검토한다");
@@ -252,7 +255,7 @@ test("a successful free-text plan enters the authored branch scene", async ({ pa
   await page.getByTestId("decision-next").click({ force: true });
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
-    .toBe("c1_branch_people");
+    .toBe("c1_route_system");
 });
 
 test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {

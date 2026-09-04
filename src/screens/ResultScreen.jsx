@@ -719,6 +719,9 @@ export function ResultScreen({ view }) {
                       )}
                       {entry.streakBreak && <b className="route-break">연속 끊김</b>}
                       {entry.clue && <b className="route-clue">단서 발견</b>}
+                      {entry.routeChangeKind === "memory" && <b className="route-memory">MEMORY</b>}
+                      {entry.routeChangeKind === "evidence-turn" && <b className="route-turnaround">EVIDENCE TURN</b>}
+                      {entry.routeChangeKind === "free-text" && <b className="route-system">FREE TEXT</b>}
                       {entry.observerTag && <b className="route-observer">{entry.observerTag.label}</b>}
                     </div>
                     <strong>{entry.title}</strong>

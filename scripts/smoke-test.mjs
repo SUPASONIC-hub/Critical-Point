@@ -80,6 +80,7 @@ import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
 import { createGameEvent, reduceInvestigationState } from "../src/state/gameEvents.js";
+import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedState.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 
 assert.equal(STORAGE_KEY, "trigger-prototype-v2", "storage key should stay on the v2 namespace");
@@ -477,6 +478,57 @@ assert.equal(
   "f_route_system",
   "previous free-text routes should add a next-case memory choice into the hidden system route",
 );
+assert.deepEqual(
+  getRouteMarker({ nodeId: "c3_start", routeChangeKind: "memory", continuityMemory: true }),
+  { label: "이전 선택 귀환", tone: "memory" },
+  "result route atlas should mark next-case memory choices",
+);
+assert.deepEqual(
+  getRouteMarker({ nodeId: "c3_evidence_turn", choiceId: "c3_evidence_turn_merge", routeChangeKind: "evidence-turn" }),
+  { label: "단서 역전", tone: "turnaround" },
+  "result route atlas should mark evidence turnaround choices",
+);
+assert.equal(
+  normalizeSavedNestedState({
+    saveSchemaVersion: SAVE_SCHEMA_VERSION,
+    currentCase: "case03",
+    completedCases: [],
+    discoveredClues: [],
+    caseResults: {},
+    playtestFeedback: {},
+    pendingTelemetry: [],
+    resources: initialResources,
+    triggers: {},
+    cognition: {},
+    nodeId: "c3_start",
+    log: [{ nodeId: "c3_start", routeChangeKind: "memory", continuityMemory: true, freeTextBranchId: "c3_route_system" }],
+  }).log[0].routeChangeKind,
+  "memory",
+  "save normalization should preserve route-change markers for the result atlas",
+);
+// Every main route has to walk authored scenes before it closes. When the route
+// split first landed, the fixed choices ran start -> route -> route final in
+// four scenes and the written middle of five cases was reachable only by free
+// text, so this pins the shape rather than the scene names.
+for (const [routeId, finalId] of [
+  ["c1_route_layoff", "c1_final_layoff"],
+  ["c3_route_fast", "c3_final_win"],
+  ["c4_route_rule", "c4_final_rule"],
+  ["c5_route_map", "c5_final_map_route"],
+  ["f_route_expose", "f_final_expose"],
+]) {
+  const routed = nodes[routeId].choices.filter((choice) => !choice.id.includes("evidence_turn"));
+  assert.ok(routed.length > 0, `${routeId} should still offer its own route choices`);
+  for (const choice of routed) {
+    assert.notEqual(choice.next, finalId, `${routeId} should open an authored scene before ${finalId}`);
+  }
+}
+assert.ok(!nodes.final && !nodes.c2_final && !nodes.c5_final, "route finals should have retired the old shared case finals");
+for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
+  for (const choice of nodes[finalId].choices) {
+    assert.equal(choice.next, "f_choice", `${finalId} should hand the run to the scene that names the ending`);
+  }
+}
 assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");
 assert.ok(nodes.c4_public_reaction && nodes.c5_voice_reaction && nodes.f_dilemma_reaction, "late cases should include reaction scenes");
 assert.ok(nodeOrders.case01.length > 14, "case 01 should include a second layer of reaction scenes");

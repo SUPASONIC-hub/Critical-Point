@@ -5,6 +5,8 @@ import {
   CASE_START_NODES,
   caseOpeningRoutes,
   cognitionLabels,
+  freeTextRouteNodes,
+  getContinuityMemoryChoice,
   initialResources,
   nodeOrders,
   nodes,
@@ -83,6 +85,69 @@ for (const [nodeId, node] of Object.entries(nodes)) {
 for (const [caseId, routes] of Object.entries(caseOpeningRoutes)) {
   for (const [outcomeId, nodeId] of Object.entries(routes)) {
     if (!nodes[nodeId]) failures.push(`${caseId}/${outcomeId} routes to missing opening ${nodeId}`);
+  }
+}
+
+/**
+ * A scene can pass every check above and still never be played. When the cases
+ * were split into route nodes, the start choices were pointed at the new routes
+ * and the authored middle of five cases silently fell off the graph -- fifteen
+ * written scenes in case 01 alone. Structure checks did not notice, because
+ * every orphan was still a valid scene. So walk each case the way a player
+ * does and fail on anything the walk cannot reach or cannot leave.
+ */
+function getCaseEntryNodes(caseId) {
+  const entries = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})];
+  // A first successful free-text answer jumps to the case's hidden route, and
+  // a previous case's log can add a memory choice on the opening screen. Both
+  // are real ways in, so neither counts as an orphan.
+  if (freeTextRouteNodes[caseId]) entries.push(freeTextRouteNodes[caseId]);
+  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+  for (const previousEntry of [
+    { nodeId: "prev_evidence_turn", choiceId: "prev_evidence_turn" },
+    { freeTextSuccess: true, nodeId: "prev", choiceId: "prev" },
+    { nodeId: "prev_route_split", choiceId: "prev" },
+  ]) {
+    const memoryChoice = getContinuityMemoryChoice({
+      caseId,
+      nodeId: CASE_START_NODES[caseId],
+      log: [{ caseId: previousCaseId, ...previousEntry }],
+    });
+    if (memoryChoice?.next) entries.push(memoryChoice.next);
+  }
+  return entries.filter(Boolean);
+}
+
+for (const caseId of CASE_SEQUENCE) {
+  const resultNodeId = CASE_RESULT_NODES[caseId];
+  const reached = new Set();
+  const queue = getCaseEntryNodes(caseId);
+  while (queue.length > 0) {
+    const nodeId = queue.shift();
+    if (!nodeId || reached.has(nodeId) || !nodes[nodeId]) continue;
+    reached.add(nodeId);
+    for (const choice of nodes[nodeId].choices ?? []) queue.push(choice.next);
+  }
+  for (const nodeId of new Set(nodeOrders[caseId] ?? [])) {
+    if (!reached.has(nodeId)) failures.push(`${caseId}/${nodeId} is authored but no route reaches it`);
+  }
+
+  // Every reachable scene has to be able to finish the case. A route that only
+  // loops back on itself would strand the run with no way to the result screen.
+  const closes = new Set();
+  for (let changed = true; changed; ) {
+    changed = false;
+    for (const nodeId of reached) {
+      if (closes.has(nodeId)) continue;
+      const exits = (nodes[nodeId].choices ?? []).map((choice) => choice.next);
+      if (exits.some((next) => next === resultNodeId || closes.has(next))) {
+        closes.add(nodeId);
+        changed = true;
+      }
+    }
+  }
+  for (const nodeId of reached) {
+    if (!closes.has(nodeId)) failures.push(`${caseId}/${nodeId} has no path left to ${resultNodeId}`);
   }
 }
 

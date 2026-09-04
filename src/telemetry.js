@@ -1,10 +1,11 @@
 import { readStoredValue, writeStoredValue } from "./appConfig.js";
 
-const localTelemetryConfigEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEBUG_TOOLS === "true";
+const viteEnv = import.meta.env ?? {};
+const localTelemetryConfigEnabled = viteEnv.DEV || viteEnv.VITE_ENABLE_DEBUG_TOOLS === "true";
 const localTelemetryUrl = localTelemetryConfigEnabled ? readStoredValue("critical-point-telemetry-url", "") : "";
 const localTelemetryKey = localTelemetryConfigEnabled ? readStoredValue("critical-point-telemetry-key", "") : "";
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || localTelemetryUrl;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || localTelemetryKey;
+const SUPABASE_URL = viteEnv.VITE_SUPABASE_URL || localTelemetryUrl;
+const SUPABASE_ANON_KEY = viteEnv.VITE_SUPABASE_ANON_KEY || localTelemetryKey;
 const TELEMETRY_TIMEOUT_MS = 10000;
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);

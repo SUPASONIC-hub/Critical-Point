@@ -35,6 +35,7 @@ import {
   caseObjectives,
   caseOpeningRoutes,
   cognitionLabels,
+  freeTextRouteNodes,
   initialResources,
   nodeOrders,
   nodes,
@@ -1444,15 +1445,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
 
 
   function getFreeTextBranchTarget(caseId, fromNodeId) {
-    const dramaticFreeRoutes = {
-      case01: "c1_route_system",
-      case02: "c2_route_system",
-      case03: "c3_route_system",
-      case04: "c4_route_system",
-      case05: "c5_route_system",
-      final: "f_route_system",
-    };
-    const dramaticRoute = dramaticFreeRoutes[caseId];
+    const dramaticRoute = freeTextRouteNodes[caseId];
     if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) {
       return dramaticRoute;
     }
@@ -1591,6 +1584,14 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       freeTextSignalCount: submittedSignalCount,
       freeTextSuccess,
       freeTextBranchId: freeTextBranchTarget,
+      continuityMemory: Boolean(choice.continuityMemory),
+      routeChangeKind: choice.continuityMemory
+        ? "memory"
+        : String(choice.id ?? "").includes("evidence_turn")
+          ? "evidence-turn"
+          : freeTextBranchTarget
+            ? "free-text"
+            : undefined,
       effect: finalEffect,
       cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
