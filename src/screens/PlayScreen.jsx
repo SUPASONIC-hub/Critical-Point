@@ -109,7 +109,7 @@ export function PlayScreen({ view }) {
     if (choice.requiredAuthority === "OVERSIGHT") return { label: "OVERSIGHT", text: "감독 권한으로만 열리는 선택지" };
     if (choice.requiredAuthority === "FIELD ACCESS") return { label: "FIELD ACCESS", text: "단서 또는 신뢰가 충분할 때 열리는 선택지" };
     if (choice.adaptive) return { label: "ADAPTIVE", text: "자유응답 기록이 만든 추가 선택지" };
-    if (choice.branchId) return { label: "ROUTE SPLIT", text: "다른 질문 경로로 갈라지는 선택지" };
+    if (choice.routeSplit || choice.branchId) return { label: "ROUTE SPLIT", text: "다른 질문 경로로 갈라지는 선택지" };
     return null;
   };
   return (

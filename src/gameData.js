@@ -2276,6 +2276,20 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   nodeOrders[caseId].unshift(...Object.values(routes));
 });
 
+/**
+ * The play screen badges a choice that changes the question -- memory, evidence
+ * turn, authority, adaptive, branch detour -- but the main split had no mark on
+ * it. The four buttons on a case briefing send the player down four different
+ * routes with four different endings, and they looked like ordinary choices.
+ * Tagged from the graph, after every route is wired, so it cannot fall out of
+ * step with where the choices actually go.
+ */
+Object.values(nodes).forEach((node) => {
+  node.choices.forEach((choice) => {
+    if (nodes[choice.next]?.phase?.endsWith(" ROUTE")) choice.routeSplit = true;
+  });
+});
+
 function getPlayableRoute(caseId) {
   const route = new Map();
   const queue = [

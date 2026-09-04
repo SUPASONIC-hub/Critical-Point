@@ -1142,6 +1142,29 @@ assert.equal(
   "조건을 다시 설계하겠습니다.",
   "choice labels should be converted into spoken lines",
 );
+// The named-ending list only covered part of the verbs in play, and 173 of the
+// season's labels came out as "…한다. 이 방향으로 가겠습니다." -- pasted in
+// rather than spoken. Both plain-present shapes convert now.
+for (const [label, spoken] of [
+  ["전제를 뒤집는다", "전제를 뒤집겠습니다."],
+  ["경고문으로 남긴다", "경고문으로 남기겠습니다."],
+  ["대응안을 만든다", "대응안을 만들겠습니다."],
+  ["검증 절차를 함께 건다", "검증 절차를 함께 걸겠습니다."],
+  ["열람권을 준다", "열람권을 주겠습니다."],
+  ["기준을 다시 쓴다", "기준을 다시 쓰겠습니다."],
+  ["확인하지 않는다", "확인하지 않겠습니다."],
+]) {
+  assert.equal(speechifyChoice({ label }), spoken, `${label} should be spoken, not appended to`);
+}
+for (const node of Object.values(nodes)) {
+  for (const choice of node.choices) {
+    if (choice.type === "free") continue;
+    assert.ok(
+      !speechifyChoice(choice).endsWith("이 방향으로 가겠습니다."),
+      `${choice.id} falls back to the pasted-in spoken line: ${choice.label}`,
+    );
+  }
+}
 
 const sensitiveText = "담당자는 test@example.com, 010-1234-5678, 플로우온테크에 공유한다.";
 assert.deepEqual(

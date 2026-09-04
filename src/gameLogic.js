@@ -1224,7 +1224,33 @@ export function speechifyChoice(choice) {
   const matchedEnding = endings.find(([ending]) => label.endsWith(ending));
   if (matchedEnding) return `${label.slice(0, -matchedEnding[0].length)}${matchedEnding[1]}`;
   if (label.endsWith("한다")) return `${label.slice(0, -2)}하겠습니다.`;
+  const spokenStem = getSpokenStem(label);
+  if (spokenStem) return `${spokenStem}겠습니다.`;
   return `${label}. 이 방향으로 가겠습니다.`;
+}
+
+/**
+ * The list above named one ending at a time and 173 of the season's labels --
+ * roughly one choice in three -- fell past it into "…한다. 이 방향으로
+ * 가겠습니다.", which reads like the line was pasted in rather than spoken.
+ *
+ * Korean plain present tense is the stem plus 는다 after a consonant and ㄴ
+ * after a vowel, so both are reversible: strip 는다, or strip the ㄴ off the
+ * last syllable. The one thing the shape cannot tell us is a ㄹ stem, where the
+ * ㄹ dropped when the ending went on (만들다 -> 만든다), so those are named.
+ */
+const SPOKEN_L_STEMS = { 만든: "만들", 건: "걸", 연: "열", 든: "들", 민: "밀", 판: "팔" };
+
+function getSpokenStem(label) {
+  if (label.endsWith("는다")) return label.slice(0, -2);
+  if (!label.endsWith("다") || label.length < 3) return "";
+  const head = label.slice(0, -2);
+  const syllable = label.charCodeAt(label.length - 2);
+  const offset = syllable - 0xac00;
+  // Jongseong ㄴ is index 4 of 28, and dropping it is the same subtraction.
+  if (offset < 0 || offset >= 11172 || offset % 28 !== 4) return "";
+  const stemSyllable = String.fromCharCode(syllable - 4);
+  return `${head}${SPOKEN_L_STEMS[label.slice(-2, -1)] ?? stemSyllable}`;
 }
 
 export function buildSceneBeat(node, choice, freeText, effect = {}) {
