@@ -103,6 +103,15 @@ export function PlayScreen({ view }) {
     if (/system|redesign|reform|구조|개편|재설계/.test(choiceText)) return "권한 영향: 당장의 결론보다 다음 운영 기준에 개입합니다.";
     return "권한 영향: 이 선택의 흔적이 다음 챕터의 조사 기준으로 남습니다.";
   };
+  const getChoiceRouteBadge = (choice) => {
+    if (choice.continuityMemory) return { label: "MEMORY ROUTE", text: "이전 사건의 선택 로그가 만든 추가 선택지" };
+    if (String(choice.id ?? "").includes("evidence_turn")) return { label: "EVIDENCE TURN", text: "발견한 단서가 질문의 전제를 바꾸는 선택지" };
+    if (choice.requiredAuthority === "OVERSIGHT") return { label: "OVERSIGHT", text: "감독 권한으로만 열리는 선택지" };
+    if (choice.requiredAuthority === "FIELD ACCESS") return { label: "FIELD ACCESS", text: "단서 또는 신뢰가 충분할 때 열리는 선택지" };
+    if (choice.adaptive) return { label: "ADAPTIVE", text: "자유응답 기록이 만든 추가 선택지" };
+    if (choice.branchId) return { label: "ROUTE SPLIT", text: "다른 질문 경로로 갈라지는 선택지" };
+    return null;
+  };
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
@@ -729,6 +738,7 @@ export function PlayScreen({ view }) {
                     ? `위험 ${riskDelta}`
                     : "위험 유지";
               const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
+              const routeBadge = getChoiceRouteBadge(choice);
               const pressureHint =
                 riskDelta > 0
                   ? "압박이 커질 수 있습니다."
@@ -745,6 +755,8 @@ export function PlayScreen({ view }) {
                   }}
                   className={`${pendingChoice?.id === choice.id ? "choice selected" : "choice"} ${authorityGate.unlocked ? "" : "locked-choice"}`.trim()}
                   data-adaptive={choice.adaptive ? "true" : undefined}
+                  data-continuity-memory={choice.continuityMemory ? "true" : undefined}
+                  data-evidence-turn={String(choice.id ?? "").includes("evidence_turn") ? "true" : undefined}
                   onClick={() => handleChoiceClick(choice)}
                   onPointerDown={() => beginChoiceHold(choice)}
                   onPointerUp={endChoiceHold}
@@ -767,7 +779,11 @@ export function PlayScreen({ view }) {
                     <Check size={16} />
                     <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
                   </span>
-                  {choice.branchId && <span className="choice-branch-tag">ROUTE SPLIT</span>}
+                  {routeBadge && (
+                    <span className="choice-route-badge" title={routeBadge.text}>
+                      {routeBadge.label}
+                    </span>
+                  )}
                   <span className="choice-speech">"{speechifyChoice(choice)}"</span>
                   <span className="choice-dilemma">{describeChoiceDilemma(choice)}</span>
                   {showTacticalDetails && observerPreview && (
