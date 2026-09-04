@@ -1,4 +1,4 @@
-import { Check, Info, LockKeyhole, MessageSquareText, Send, Sparkles } from "lucide-react";
+import { Check, Info, MessageSquareText, Send, Sparkles } from "lucide-react";
 import { DecisionRail } from "../components/DecisionRail.jsx";
 import { DecisionDock } from "../components/DecisionDock.jsx";
 import { MemoPanel } from "../components/MemoPanel.jsx";
@@ -7,15 +7,11 @@ import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ResourceRail } from "../components/ResourceRail.jsx";
+import { CommitConsole } from "../components/CommitConsole.jsx";
+import { ChoiceList } from "../components/ChoiceList.jsx";
 import { CASE_SEQUENCE } from "../gameData.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
-import { describeChoiceDilemma, FREE_TEXT_SIGNAL_MIN_LENGTH, getAuthorityGate, getFreeTextSignals } from "../gameLogic.js";
-import {
-  formatChoiceEffectChip as formatExternalChoiceEffectChip,
-  getChoiceAuthorityImpact as getExternalChoiceAuthorityImpact,
-  getChoiceRouteBadge as getExternalChoiceRouteBadge,
-  isChoiceEffectGain as isExternalChoiceEffectGain,
-} from "../viewModels/playChoiceViewModel.js";
+import { FREE_TEXT_SIGNAL_MIN_LENGTH, getFreeTextSignals } from "../gameLogic.js";
 
 export function PlayScreen({ view }) {
   const {
@@ -643,166 +639,42 @@ export function PlayScreen({ view }) {
               </div>
             </section>
           )}
-          {pendingChoice && pendingChoiceRead && pendingChoiceForecast && (
-            <section
-              ref={commitConsoleRef}
-              className={`commit-console ${suspenseState.tier.toLowerCase()}`}
-              aria-label="선택 확정 콘솔"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <div className="commit-console-heading">
-                <span>선택 확인</span>
-                <strong>이 말을 실제로 남기겠습니까?</strong>
-              </div>
-              <p className="commit-console-choice">“{speechifyChoice(pendingChoice)}”</p>
-              <div className="commit-console-readout">
-                <span>예상 위험 <b>{formatForecastRisk(pendingChoiceForecast)}</b></span>
-                <span>압력 <b>{pendingChoiceForecast.afterRisk}</b></span>
-              </div>
-              {/* Folded by default: open, the console covered two choice cards,
-                  so comparing the alternatives meant scrolling past the panel
-                  asking you to commit. */}
-              <details className="commit-console-detail">
-                <summary>
-                  <span>관찰자 반응과 예상 자원</span>
-                </summary>
-                {getObserverPreviewForChoice(pendingChoice.id) && (
-                  <div className="commit-observer-preview">
-                    <span>{getObserverPreviewForChoice(pendingChoice.id).tag.label}</span>
-                    <p>{getObserverPreviewForChoice(pendingChoice.id).text}</p>
-                  </div>
-                )}
-                <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
-                  <span>예상 자원</span>
-                  {evidenceCount >= 3 && Object.entries(pendingChoiceRead.finalEffect)
-                    .filter(([, value]) => value !== 0)
-                    .map(([key, value]) => (
-                      <b key={key} className={isExternalChoiceEffectGain(key, value) ? "positive" : "negative"}>
-                        {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
-                      </b>
-                    ))}
-                </div>
-              </details>
-              <div className="commit-console-actions">
-                <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
-                  다시 고르기
-                </button>
-                <button ref={commitConfirmRef} type="button" data-testid="commit-confirm" className="commit-confirm" onClick={() => choose(pendingChoice)}>
-                  <LockKeyhole size={16} />
-                  이 선택을 기록한다
-                </button>
-              </div>
-            </section>
-          )}
-          <div className="choices">
-            {fixedChoices.map((choice, choiceIndex) => {
-              const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
-              const choiceRead = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
-              const observerPreview = getObserverPreviewForChoice(choice.id);
-              const riskDelta = choiceRead.finalRiskDelta;
-              const riskLabel =
-                riskDelta > 0
-                  ? `위험 +${riskDelta}`
-                  : riskDelta < 0
-                    ? `위험 ${riskDelta}`
-                    : "위험 유지";
-              const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
-              const routeBadge = getExternalChoiceRouteBadge(choice);
-              const pressureHint =
-                riskDelta > 0
-                  ? "압박이 커질 수 있습니다."
-                  : riskDelta < 0
-                    ? "압박을 낮출 수 있습니다."
-                    : "압박은 크게 움직이지 않습니다.";
-              return (
-                <GuardedButton
-                  type="button"
-                  key={choice.id}
-                  ref={(button) => {
-                    if (button) choiceButtonsRef.current.set(choice.id, button);
-                    else choiceButtonsRef.current.delete(choice.id);
-                  }}
-                  className={`${pendingChoice?.id === choice.id ? "choice selected" : "choice"} ${authorityGate.unlocked ? "" : "locked-choice"}`.trim()}
-                  data-adaptive={choice.adaptive ? "true" : undefined}
-                  data-continuity-memory={choice.continuityMemory ? "true" : undefined}
-                  data-evidence-turn={String(choice.id ?? "").includes("evidence_turn") ? "true" : undefined}
-                  onClick={() => handleChoiceClick(choice)}
-                  onPointerDown={() => beginChoiceHold(choice)}
-                  onPointerUp={endChoiceHold}
-                  onPointerCancel={endChoiceHold}
-                  onPointerLeave={endChoiceHold}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && pendingChoice?.id === choice.id) {
-                      event.preventDefault();
-                      choose(choice);
-                    }
-                  }}
-                  disabled={isAdvancing}
-                  blocked={!authorityGate.unlocked}
-                  aria-pressed={pendingChoice?.id === choice.id}
-                  aria-keyshortcuts={`${choiceIndex + 1} Enter Space`}
-                  title={`${choiceIndex + 1}번 키로 선택 미리보기`}
-                  aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
-                >
-                  <span className="choice-main">
-                    <Check size={16} />
-                    <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
-                  </span>
-                  {routeBadge && (
-                    <span className="choice-route-badge" title={routeBadge.text}>
-                      {routeBadge.label}
-                    </span>
-                  )}
-                  <span className="choice-speech">"{speechifyChoice(choice)}"</span>
-                  <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>
-                  {showTacticalDetails && observerPreview && (
-                    <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
-                      <b>{observerPreview.tag.label}</b>
-                      <small>{observerPreview.repeatsCurrentPattern ? "패턴 고정" : "패턴 교란"}</small>
-                    </span>
-                  )}
-                  <span className="choice-stakes">
-                    {Object.entries(choice.effect ?? {})
-                      .filter(([, value]) => value !== 0)
-                      .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-                      .slice(0, 4)
-                      .map((entry) => (
-                        <b key={entry[0]} className={isExternalChoiceEffectGain(entry[0], entry[1]) ? "positive" : "negative"}>
-                          {formatExternalChoiceEffectChip(entry, resourceMeta)}
-                        </b>
-                      ))}
-                  </span>
-                  {showTacticalDetails && <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>}
-                  {showTacticalDetails && <span className="choice-authority-impact">{getExternalChoiceAuthorityImpact(choice)}</span>}
-                  {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
-                  {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
-                  {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
-                  {showTacticalDetails && (
-                    <>
-                      <span className="choice-tactical">
-                        <span>
-                          <strong>방향 힌트</strong>
-                          <small>{pressureHint}</small>
-                        </span>
-                      </span>
-                      {choiceRead.flowSurge && (
-                        <span className="choice-surge">
-                          {simplifyPlayerText(choiceRead.flowSurge.label)} · 추가 보정이 붙습니다. 정확한 폭은 선택 후 기록에서 확인합니다.
-                        </span>
-                      )}
-                      <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
-                    </>
-                  )}
-                  {!showTacticalDetails && (
-                    <span className="choice-intuition-hint">
-                      바로 선택 · 장면 목표를 맞히면 직감 보너스
-                    </span>
-                  )}
-                </GuardedButton>
-              );
-            })}
-          </div>
+          <CommitConsole
+            suspenseTier={suspenseState.tier}
+            commitConsoleRef={commitConsoleRef}
+            commitConfirmRef={commitConfirmRef}
+            pendingChoice={pendingChoice}
+            pendingChoiceRead={pendingChoiceRead}
+            pendingChoiceForecast={pendingChoiceForecast}
+            speechifyChoice={speechifyChoice}
+            formatForecastRisk={formatForecastRisk}
+            getObserverPreviewForChoice={getObserverPreviewForChoice}
+            evidenceCount={evidenceCount}
+            resourceMeta={resourceMeta}
+            setPendingChoice={setPendingChoice}
+            choose={choose}
+          />
+          <ChoiceList
+            fixedChoices={fixedChoices}
+            clueCount={clueCount}
+            resources={resources}
+            getEffectiveChoiceRead={getEffectiveChoiceRead}
+            getObserverPreviewForChoice={getObserverPreviewForChoice}
+            getChallengeMatch={getChallengeMatch}
+            pendingChoice={pendingChoice}
+            choiceButtonsRef={choiceButtonsRef}
+            handleChoiceClick={handleChoiceClick}
+            beginChoiceHold={beginChoiceHold}
+            endChoiceHold={endChoiceHold}
+            isAdvancing={isAdvancing}
+            choose={choose}
+            speechifyChoice={speechifyChoice}
+            getChoiceSubtext={getChoiceSubtext}
+            showTacticalDetails={showTacticalDetails}
+            getDramaticChoiceLabel={getDramaticChoiceLabel}
+            simplifyPlayerText={simplifyPlayerText}
+            resourceMeta={resourceMeta}
+          />
           {freeChoice && (
             <div className="reframe-box">
               <div className="panel-title-row">

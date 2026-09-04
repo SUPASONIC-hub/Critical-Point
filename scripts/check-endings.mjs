@@ -14,6 +14,7 @@ import { applyEffect, getEndingVariant, getRiskPressure } from "../src/gameLogic
  */
 
 const RUNS = 6000;
+const reportMode = process.argv.includes("--report");
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const EXPECTED = [
   "collapse",
@@ -99,4 +100,15 @@ const thin = Object.entries(RARE_ENDING_FLOORS)
 assert.deepEqual(thin, [], thin.join("\n"));
 
 const spread = EXPECTED.map((id) => `${id} ${((seen.get(id) / RUNS) * 100).toFixed(1)}%`).join(", ");
+if (reportMode) {
+  console.log(JSON.stringify({
+    runs: RUNS,
+    endings: EXPECTED.map((id) => ({
+      id,
+      count: seen.get(id) ?? 0,
+      percent: Number((((seen.get(id) ?? 0) / RUNS) * 100).toFixed(2)),
+      floor: RARE_ENDING_FLOORS[id] ?? 1,
+    })),
+  }, null, 2));
+}
 console.log(`Ending checks passed (${RUNS} random seasons: ${spread})`);

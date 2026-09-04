@@ -34,7 +34,16 @@ const budgets = {
   // A selector overridden later in the same file is ordinary CSS and readable in
   // one pass -- unlike the same override hiding in another file -- so this budget
   // is deliberately looser. It should still only go down.
-  repeatedInOneFile: 53,
+  repeatedInOneFile: 50,
+};
+
+const fileBudgets = {
+  "base-intro-ranking.css": { lines: 1690, bytes: 35349 },
+  "extensions.css": { lines: 2193, bytes: 45440 },
+  "play.css": { lines: 3292, bytes: 68581 },
+  "recovery.css": { lines: 266, bytes: 5754 },
+  "responsive.css": { lines: 392, bytes: 8189 },
+  "result.css": { lines: 1223, bytes: 26149 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */
@@ -89,6 +98,18 @@ assert.deepEqual(
   imported,
   `every file in ${APP_DIR} must be imported by app.css: on disk ${onDisk.join(", ")}, imported ${imported.join(", ")}`,
 );
+
+for (const file of onDisk) {
+  const css = readFileSync(`${APP_DIR}/${file}`, "utf8");
+  const budget = fileBudgets[file];
+  if (!budget) {
+    failures.push(`${file} has no CSS size budget.`);
+    continue;
+  }
+  const lines = css.split(/\r?\n/).length;
+  if (lines > budget.lines) failures.push(`${file} is ${lines} lines, over the ${budget.lines} budget.`);
+  if (css.length > budget.bytes) failures.push(`${file} is ${css.length} bytes, over the ${budget.bytes} budget.`);
+}
 
 const rules = readRules();
 
