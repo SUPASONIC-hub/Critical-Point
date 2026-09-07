@@ -32,6 +32,7 @@ import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
 import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
+import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
@@ -352,4 +353,13 @@ test("streak rewards trigger only at the 3 and 5 milestones", () => {
     effect: { trust: 2, legitimacy: 2, fatigue: -3 },
   });
   assert.equal(createStreakReward({ previousStreak: 2, challengeMatch: false }), null);
+});
+test("streak rewards take priority in immediate choice feedback", () => {
+  const feedback = getChoiceOutcomeFeedback({
+    choiceId: "choice",
+    effect: { trust: 2 },
+    streakReward: { label: "STREAK PAYOUT", text: "연속 보상" },
+  });
+  assert.equal(feedback.label, "STREAK PAYOUT");
+  assert.equal(feedback.text, "연속 보상");
 });

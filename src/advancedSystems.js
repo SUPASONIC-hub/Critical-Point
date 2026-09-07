@@ -157,11 +157,11 @@ export function getEndingPreview(ending = {}) {
 export function getChoiceOutcomeFeedback(entry = {}) {
   if (!entry?.choiceId) return null;
   const effectCount = Object.values(entry.effect ?? {}).filter((value) => value !== 0).length;
-  const tone = entry.prematureHypothesis ? "warning" : effectCount >= 3 ? "tradeoff" : "signal";
+  const tone = entry.prematureHypothesis ? "warning" : entry.streakReward ? "signal" : effectCount >= 3 ? "tradeoff" : "signal";
   return {
     tone,
-    label: entry.prematureHypothesis ? entry.prematureHypothesis.label : tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED",
-    text: entry.prematureHypothesis?.text ?? "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
+    label: entry.prematureHypothesis?.label ?? entry.streakReward?.label ?? (tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED"),
+    text: entry.prematureHypothesis?.text ?? entry.streakReward?.text ?? "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
   };
 }
 
