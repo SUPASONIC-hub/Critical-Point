@@ -8,6 +8,7 @@ import {
 } from "../appConfig.js";
 import { saveCaseTelemetry, saveErrorTelemetry, saveFeedbackTelemetry } from "../telemetry.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
+import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
 
 /**
  * The outbound telemetry queue: buffer an item, flush the buffer, and back off
@@ -30,13 +31,13 @@ export function createTelemetryQueue({
   setLastSavedAt,
 }) {
   function queueTelemetry(item) {
-    const nextQueue = [
+    const nextQueue = pruneTelemetryQueue([
       ...pendingTelemetryRef.current.filter((queued) => queued.id !== item.id),
       {
         queuedAt: new Date().toISOString(),
         ...item,
       },
-    ];
+    ]);
     commitPendingTelemetryQueue(nextQueue);
   }
 
@@ -97,7 +98,7 @@ export function createTelemetryQueue({
 
     const retryIds = new Set(retryBatch.map((item) => item.id));
     const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
-    const nextQueue = [...failedItems, ...newlyQueuedItems];
+    const nextQueue = pruneTelemetryQueue([...failedItems, ...newlyQueuedItems]);
     const queueCommitted = commitPendingTelemetryQueue(nextQueue);
     const visibleQueue = queueCommitted ? nextQueue : retryBatch;
     setIsRetryingTelemetry(false);

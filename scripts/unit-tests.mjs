@@ -16,6 +16,7 @@ import {
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { safeStringify } from "../src/state/diagnosticUtils.js";
 import { validatePlaytestExport, validateTelemetryItem } from "../src/state/payloadSchemas.js";
+import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
   createRecoverySnapshot,
@@ -179,6 +180,18 @@ test("telemetry schema should reject private fields and unknown types", () => {
   assert.deepEqual(validateTelemetryItem({ type: "unknown", payload: {} }), ["invalid type unknown"]);
   assert.deepEqual(validateTelemetryItem({ type: "case", payload: { nested: { freeText: "private" } } }), ["payload contains private fields"]);
   assert.deepEqual(validateTelemetryItem({ type: "error", payload: { source: "test" } }), []);
+});
+test("telemetry queue policy should expire old items and cap retained items", () => {
+  const now = Date.parse("2026-09-07T00:00:00.000Z");
+  const oldItem = { id: "old", queuedAt: "2026-08-01T00:00:00.000Z" };
+  const recentItems = Array.from({ length: TELEMETRY_QUEUE_MAX_ITEMS + 1 }, (_, index) => ({
+    id: `item-${index}`,
+    queuedAt: "2026-09-06T00:00:00.000Z",
+  }));
+  const retained = pruneTelemetryQueue([oldItem, ...recentItems], now);
+  assert.equal(retained.length, TELEMETRY_QUEUE_MAX_ITEMS);
+  assert.equal(retained.some((item) => item.id === "old"), false);
+  assert.equal(retained[0].id, "item-1");
 });
 
 const seasonRow = (score, completedAt) => ({
