@@ -1126,10 +1126,12 @@ test("error boundary clear save failure does not reload", async ({ page }) => {
 
 test("pending telemetry retries after a failed Supabase response", async ({ page }) => {
   let requestCount = 0;
+  const postBodies = [];
   await page.route("https://e2e.supabase.co/**", async (route) => {
     requestCount += 1;
+    if (route.request().method() === "POST") postBodies.push(route.request().postDataJSON());
     await route.fulfill({
-      status: requestCount === 1 ? 500 : 201,
+      status: postBodies.length === 1 ? 500 : 201,
       contentType: "application/json",
       body: "{}",
     });
@@ -1174,6 +1176,9 @@ test("pending telemetry retries after a failed Supabase response", async ({ page
     )
     .toBe(0);
   expect(requestCount).toBeGreaterThanOrEqual(2);
+  expect(postBodies.length).toBeGreaterThanOrEqual(2);
+  expect(postBodies[0].event_id).toBe("telemetry-retry-e2e");
+  expect(postBodies[1].event_id).toBe("telemetry-retry-e2e");
 });
 
 test("telemetry retry keeps the queue when storage commit fails", async ({ page }) => {
