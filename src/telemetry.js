@@ -8,6 +8,13 @@ const SUPABASE_URL = viteEnv.VITE_SUPABASE_URL || localTelemetryUrl;
 const SUPABASE_ANON_KEY = viteEnv.VITE_SUPABASE_ANON_KEY || localTelemetryKey;
 const TELEMETRY_TIMEOUT_MS = 10000;
 const telemetryStats = { attempted: 0, saved: 0, failed: 0 };
+const telemetryStatsListeners = new Set();
+let telemetryStatsSnapshot = Object.freeze({ ...telemetryStats });
+
+function publishTelemetryStats() {
+  telemetryStatsSnapshot = Object.freeze({ ...telemetryStats });
+  telemetryStatsListeners.forEach((listener) => listener());
+}
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
@@ -65,6 +72,7 @@ function restHeaders(extra = {}) {
 async function insertRow(table, payload, failureLabel, eventId = null) {
   if (!telemetryEnabled) return { skipped: true };
   telemetryStats.attempted += 1;
+  publishTelemetryStats();
 
   try {
     const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
@@ -78,9 +86,11 @@ async function insertRow(table, payload, failureLabel, eventId = null) {
     }
 
     telemetryStats.saved += 1;
+    publishTelemetryStats();
     return { saved: true };
   } catch (error) {
     telemetryStats.failed += 1;
+    publishTelemetryStats();
     throw error;
   }
 }
@@ -90,7 +100,12 @@ export function buildTelemetryPayload(payload, eventId = null) {
 }
 
 export function getTelemetryStats() {
-  return { ...telemetryStats };
+  return telemetryStatsSnapshot;
+}
+
+export function subscribeTelemetryStats(listener) {
+  telemetryStatsListeners.add(listener);
+  return () => telemetryStatsListeners.delete(listener);
 }
 
 export function saveCaseTelemetry(payload, eventId = null) {

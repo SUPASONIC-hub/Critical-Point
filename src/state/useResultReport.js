@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 import { SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import {
@@ -19,7 +19,7 @@ import { getFailureRecovery } from "../featurePack.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant } from "../gameLogic.js";
 import { createEndingProfile } from "../viewModels/reportViewModels.js";
 import { getRouteMarker } from "./savedState.js";
-import { getTelemetryStats } from "../telemetry.js";
+import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 
 /**
  * What the season has cost so far, for the closing ruling.
@@ -67,6 +67,7 @@ export function useResultReport({
   runId,
   triggers,
 }) {
+  const telemetryStats = useSyncExternalStore(subscribeTelemetryStats, getTelemetryStats, getTelemetryStats);
   const result = useMemo(
     () =>
       createCaseSummary(triggers, cognition, log, {
@@ -115,7 +116,7 @@ export function useResultReport({
       rankings: localRankingRows,
       caseResults,
     }),
-    telemetryStats: getTelemetryStats(),
+    telemetryStats,
     authorityReview: getAuthorityReview(operatorProfile, authorityState.level, result),
     rankingIntegrity: getRankingIntegrity({
       runId,

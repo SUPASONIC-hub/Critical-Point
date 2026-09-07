@@ -16,7 +16,7 @@ import {
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { safeStringify } from "../src/state/diagnosticUtils.js";
 import { validatePlaytestExport, validateSavedStatePayload, validateTelemetryItem } from "../src/state/payloadSchemas.js";
-import { buildTelemetryPayload } from "../src/telemetry.js";
+import { buildTelemetryPayload, getTelemetryStats, subscribeTelemetryStats } from "../src/telemetry.js";
 import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
@@ -203,6 +203,14 @@ test("telemetry payload should carry the queue identity without mutating the sou
   const payload = { case_id: "case01" };
   assert.deepEqual(buildTelemetryPayload(payload, "event-1"), { case_id: "case01", event_id: "event-1" });
   assert.deepEqual(payload, { case_id: "case01" });
+});
+test("telemetry stats subscriptions should unsubscribe cleanly", () => {
+  let notifications = 0;
+  const unsubscribe = subscribeTelemetryStats(() => { notifications += 1; });
+  assert.equal(typeof unsubscribe, "function");
+  unsubscribe();
+  assert.deepEqual(Object.keys(getTelemetryStats()).sort(), ["attempted", "failed", "saved"]);
+  assert.equal(notifications, 0);
 });
 test("saved state validation should use the shared payload schema", () => {
   const state = { currentCase: "case01", nodeId: "start", completedCases: [], discoveredClues: [], log: [], pendingTelemetry: [], caseResults: {}, playtestFeedback: {}, resources: {}, triggers: {}, cognition: {} };
