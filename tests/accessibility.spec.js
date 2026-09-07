@@ -40,6 +40,17 @@ test("case result report has no structural accessibility violations", async ({ p
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 });
 
+test("case result report keeps keyboard focus on an actionable control", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await completeCurrentCase(page);
+  const firstButton = page.locator(".result-page button").first();
+  await firstButton.focus();
+  await expect(firstButton).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator(".result-page :focus")).toBeVisible();
+});
+
 test("final ending report has no structural accessibility violations", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?debug=1");
