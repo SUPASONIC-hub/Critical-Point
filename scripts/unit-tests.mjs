@@ -15,6 +15,7 @@ import {
 } from "../src/viewModels/seasonViewModels.js";
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { safeStringify } from "../src/state/diagnosticUtils.js";
+import { validatePlaytestExport } from "../src/state/payloadSchemas.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
   createRecoverySnapshot,
@@ -166,6 +167,13 @@ test("diagnostic stringify should fall back for circular values", () => {
   const circular = {};
   circular.self = circular;
   assert.equal(safeStringify(circular), "[object Object]");
+});
+test("playtest export schema should reject missing and private summary fields", () => {
+  assert.deepEqual(validatePlaytestExport({ exportMode: "summary" }), [
+    "missing saveSchemaVersion", "missing exportedAt", "missing currentCase", "missing summary", "missing gameplay",
+  ]);
+  assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "summary", currentCase: "case01", summary: {}, gameplay: {}, playerName: "private" }), ["private field playerName"]);
+  assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "diagnostic", currentCase: "case01", summary: {}, gameplay: {}, sessionId: "session" }, { includeDiagnostics: true }), []);
 });
 
 const seasonRow = (score, completedAt) => ({

@@ -7,6 +7,7 @@ import {
   SAVE_SLOT_STORAGE_KEY,
 } from "../appConfig.js";
 import { getTraceEvents } from "./trace.js";
+import { validatePlaytestExport } from "./payloadSchemas.js";
 
 const REVOKE_DELAY_MS = 1000;
 const PRIVATE_EXPORT_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment"]);
@@ -37,17 +38,24 @@ export function buildPlaytestExport({ includeDiagnostics = false, run, gameplay,
     ...run,
     gameplay,
   };
-  if (!includeDiagnostics) return payload;
+  if (!includeDiagnostics) {
+    const errors = validatePlaytestExport(payload);
+    if (errors.length) throw new Error(`Invalid summary export: ${errors.join(", ")}`);
+    return payload;
+  }
 
   const localErrorLog = parseErrorLog(readStoredValue(ERROR_LOG_STORAGE_KEY, "null"));
   const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
-  return {
+  const diagnosticPayload = {
     ...payload,
     ...sanitizeDiagnosticValue(diagnostics),
     errorLog: Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [],
     saveSlots: Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [],
     trace: getTraceEvents(),
   };
+  const errors = validatePlaytestExport(diagnosticPayload, { includeDiagnostics: true });
+  if (errors.length) throw new Error(`Invalid diagnostic export: ${errors.join(", ")}`);
+  return diagnosticPayload;
 }
 
 export function downloadJson(payload, fileName) {
