@@ -97,10 +97,8 @@ function createPrompt(role, reportPath, runDir, cycle) {
 
 function runCodex(prompt, reportPath) {
   return new Promise((resolvePromise, reject) => {
-    const commandArgs = process.platform === "win32"
-      ? ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", codexCommand, "exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"]
-      : ["exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"];
-    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs.slice(5)] : commandArgs, {
+    const commandArgs = ["--ask-for-approval", "never", "exec", "-s", "workspace-write", "--ephemeral", "-C", root, "-o", reportPath, "-"];
+    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs] : commandArgs, {
       cwd: root,
       stdio: ["pipe", "inherit", "inherit"],
       windowsHide: true,
