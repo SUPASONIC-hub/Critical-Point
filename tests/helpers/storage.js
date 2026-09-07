@@ -8,6 +8,8 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   localRanking: "critical-point-local-ranking-v1",
   nextParticipantMessage: "critical-point-next-participant-message",
   forceRenderError: "critical-point-force-render-error",
+  telemetryUrl: "critical-point-telemetry-url",
+  telemetryKey: "critical-point-telemetry-key",
 });
 
 export async function clearGameStorage(page) {
