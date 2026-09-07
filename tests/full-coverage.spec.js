@@ -8,6 +8,7 @@ import {
   createSeededRandom,
   startDebugNode,
 } from "./helpers/gameFlow.js";
+import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 test.use({ actionTimeout: ACTION_TIMEOUT_MS });
 test.describe.configure({ mode: "parallel" });
@@ -19,17 +20,15 @@ test.beforeEach(async (_fixtures, testInfo) => {
 async function assertReloadRoundTrip(page, before) {
   await page.reload();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
-  const after = await page.evaluate(() => {
-    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
-    return {
-      currentCase: saved.currentCase,
-      nodeId: saved.nodeId,
-      logLength: saved.log.length,
-      clueCount: saved.discoveredClues.length,
-      paused: saved.paused,
-      lastError: saved.lastError ?? null,
-    };
-  });
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const after = {
+    currentCase: saved.currentCase,
+    nodeId: saved.nodeId,
+    logLength: saved.log.length,
+    clueCount: saved.discoveredClues.length,
+    paused: saved.paused,
+    lastError: saved.lastError ?? null,
+  };
   expect(after.currentCase).toBe(before.currentCase);
   expect(after.nodeId).toBe(before.nodeId);
   expect(after.logLength).toBe(before.logLength);
@@ -103,7 +102,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
     for (let index = 0; index < CASE_SEQUENCE.length; index += 1) {
       const caseId = CASE_SEQUENCE[index];
       await completeCase(page, random);
-      const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+      const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
       expect(saved.completedCases).toContain(caseId);
       expect(saved.caseResults[caseId]?.outcomeChoiceId).toBeTruthy();
       if (index < CASE_SEQUENCE.length - 1) {
@@ -113,12 +112,12 @@ for (let seed = 1; seed <= 20; seed += 1) {
         await expect(nextCaseButton).toBeVisible({ timeout: 8000 });
         await nextCaseButton.evaluate((button) => button.click());
         await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
-        const afterTransition = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+        const afterTransition = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
         if (expectedStart) expect(afterTransition.nodeId).toBe(expectedStart);
       }
     }
     await expect(page.locator(".ending-sequence")).toBeVisible({ timeout: 8000 });
-    const completed = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).completedCases);
+    const completed = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).completedCases;
     expect(completed).toHaveLength(6);
     if (errors.length) throw new Error(errors.slice(0, 2).join("\n"));
   });

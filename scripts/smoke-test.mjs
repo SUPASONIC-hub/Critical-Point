@@ -147,6 +147,13 @@ test("ending variant should prefer open oversight when evidence and trust are hi
     "ending variant should prefer open oversight when evidence and trust are high",
   );
 });
+test("rare ending thresholds should stay reachable without overriding evidence endings", () => {
+  const base = { ...initialResources, humanCost: 5, fatigue: 10 };
+  assert.equal(getEndingVariant({ resources: { ...base, capital: 55, trust: 47 }, log: [] }).id, "profitable-silence");
+  assert.equal(getEndingVariant({ resources: { ...base, legitimacy: 60, trust: 54 }, log: [] }).id, "cold-justice");
+  assert.equal(getEndingVariant({ resources: { ...base, trust: 58, legitimacy: 50 }, log: [] }).id, "field-pact");
+  assert.equal(getEndingVariant({ resources: { ...base, capital: 55, trust: 47, legitimacy: 55 }, discoveredClues: Array.from({ length: 4 }, () => ({})), log: [] }).id, "evidence-reform");
+});
 test("intro view contracts should fail fast when required fields are omitted", () => {
   assert.throws(
     () => createIntroView({}, {}),
@@ -1606,5 +1613,3 @@ test("text limiter should truncate long input", () => {
 test("text limiter should return empty text for invalid limits", () => {
   assert.equal(limitText("abcdef", 0), "", "text limiter should return empty text for invalid limits");
 });
-
-
