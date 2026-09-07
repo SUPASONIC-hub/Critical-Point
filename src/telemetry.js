@@ -7,6 +7,7 @@ const localTelemetryKey = localTelemetryConfigEnabled ? readStoredValue("critica
 const SUPABASE_URL = viteEnv.VITE_SUPABASE_URL || localTelemetryUrl;
 const SUPABASE_ANON_KEY = viteEnv.VITE_SUPABASE_ANON_KEY || localTelemetryKey;
 const TELEMETRY_TIMEOUT_MS = 10000;
+const telemetryStats = { attempted: 0, saved: 0, failed: 0 };
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
@@ -63,18 +64,29 @@ function restHeaders(extra = {}) {
 
 async function insertRow(table, payload, failureLabel) {
   if (!telemetryEnabled) return { skipped: true };
+  telemetryStats.attempted += 1;
 
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: "POST",
-    headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: "POST",
+      headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
+      body: JSON.stringify(payload),
+    });
 
-  if (!response.ok) {
-    throw await createTelemetryError(response, failureLabel);
+    if (!response.ok) {
+      throw await createTelemetryError(response, failureLabel);
+    }
+
+    telemetryStats.saved += 1;
+    return { saved: true };
+  } catch (error) {
+    telemetryStats.failed += 1;
+    throw error;
   }
+}
 
-  return { saved: true };
+export function getTelemetryStats() {
+  return { ...telemetryStats };
 }
 
 export function saveCaseTelemetry(payload) {

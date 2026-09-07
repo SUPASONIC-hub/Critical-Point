@@ -89,6 +89,7 @@ import {
   getSessionCode,
   saveCaseTelemetry,
   checkTelemetryHealth,
+  getTelemetryStats,
   telemetryEnabled,
 } from "./telemetry.js";
 import { getLeaderboardHeadline } from "./ranking.js";
@@ -128,6 +129,7 @@ import { useCaseSystems } from "./state/useCaseSystems.js";
 import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
 import { useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
+import { safeStringify } from "./state/diagnosticUtils.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import {
   legacyProfiles,
@@ -173,14 +175,6 @@ const speakerPortraits = {
 };
 
 let consoleErrorHookBusy = false;
-
-function safeStringify(value) {
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}
 
 // The error boundary and reportSilentFailure already write their own entries,
 // so skip their console output instead of logging the same failure twice.
@@ -2015,6 +2009,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         log,
         sessionId,
         pendingTelemetry,
+        telemetryStats: getTelemetryStats(),
       },
     });
     const prefix = includeDiagnostics ? "trigger-diagnostic" : "trigger-summary";

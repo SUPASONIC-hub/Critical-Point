@@ -14,6 +14,7 @@ import {
   createSeasonTelemetryPayload,
 } from "../src/viewModels/seasonViewModels.js";
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
+import { safeStringify } from "../src/state/diagnosticUtils.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
   createRecoverySnapshot,
@@ -160,6 +161,11 @@ test("playtest exports should omit private text and names", () => {
   assert.equal(serializedSummary.includes("private"), false, "summary export must not contain free text");
   assert.equal(serializedDiagnostics.includes("private"), false, "diagnostic export must not contain free text");
   assert.equal(serializedDiagnostics.includes("tester"), false, "diagnostic export must not contain player names");
+});
+test("diagnostic stringify should fall back for circular values", () => {
+  const circular = {};
+  circular.self = circular;
+  assert.equal(safeStringify(circular), "[object Object]");
 });
 
 const seasonRow = (score, completedAt) => ({
