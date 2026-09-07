@@ -15,7 +15,8 @@ import {
 } from "../src/viewModels/seasonViewModels.js";
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { safeStringify } from "../src/state/diagnosticUtils.js";
-import { validatePlaytestExport, validateTelemetryItem } from "../src/state/payloadSchemas.js";
+import { validatePlaytestExport, validateSavedStatePayload, validateTelemetryItem } from "../src/state/payloadSchemas.js";
+import { buildTelemetryPayload } from "../src/telemetry.js";
 import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
@@ -197,6 +198,15 @@ test("telemetry queue items should have stable identities for retry deduplicatio
   const item = { id: "case-case01-123", type: "case", payload: { case_id: "case01" } };
   assert.equal(validateTelemetryItem(item).length, 0);
   assert.equal(item.id, "case-case01-123", "the queue id is the retry idempotency key");
+});
+test("telemetry payload should carry the queue identity without mutating the source", () => {
+  const payload = { case_id: "case01" };
+  assert.deepEqual(buildTelemetryPayload(payload, "event-1"), { case_id: "case01", event_id: "event-1" });
+  assert.deepEqual(payload, { case_id: "case01" });
+});
+test("saved state validation should use the shared payload schema", () => {
+  const state = { currentCase: "case01", nodeId: "start", completedCases: [], discoveredClues: [], log: [], pendingTelemetry: [], caseResults: {}, playtestFeedback: {}, resources: {}, triggers: {}, cognition: {} };
+  assert.deepEqual(validateSavedStatePayload(state), []);
 });
 
 const seasonRow = (score, completedAt) => ({

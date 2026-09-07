@@ -70,7 +70,7 @@ async function insertRow(table, payload, failureLabel, eventId = null) {
     const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
       method: "POST",
       headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal,resolution=ignore-duplicates" }),
-      body: JSON.stringify(eventId ? { ...payload, event_id: eventId } : payload),
+      body: JSON.stringify(buildTelemetryPayload(payload, eventId)),
     });
 
     if (!response.ok) {
@@ -83,6 +83,10 @@ async function insertRow(table, payload, failureLabel, eventId = null) {
     telemetryStats.failed += 1;
     throw error;
   }
+}
+
+export function buildTelemetryPayload(payload, eventId = null) {
+  return eventId ? { ...payload, event_id: eventId } : payload;
 }
 
 export function getTelemetryStats() {

@@ -1,3 +1,5 @@
+import { validateSavedStatePayload } from "./state/payloadSchemas.js";
+
 export const STORAGE_KEY = "trigger-prototype-v2";
 export const ERROR_LOG_STORAGE_KEY = "trigger-prototype-error-log-v1";
 export const ERROR_LOG_MAX_ITEMS = 20;
@@ -134,28 +136,7 @@ export function parseCurrentSavedState(raw, schemaVersion = SAVE_SCHEMA_VERSION)
 }
 
 export function isSavedStateShapeValid(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return false;
-  const arrayKeys = ["completedCases", "discoveredClues", "log", "pendingTelemetry"];
-  const objectKeys = ["caseResults", "playtestFeedback", "resources", "triggers", "cognition"];
-  const pendingTelemetryIsValid = Array.isArray(state.pendingTelemetry) && state.pendingTelemetry.every(
-    (item) =>
-      item &&
-      typeof item === "object" &&
-      typeof item.id === "string" &&
-      TELEMETRY_QUEUE_TYPES.includes(item.type) &&
-      typeof item.label === "string" &&
-      item.payload &&
-      typeof item.payload === "object" &&
-      !Array.isArray(item.payload),
-  );
-  return (
-    arrayKeys.every((key) => Array.isArray(state[key])) &&
-    pendingTelemetryIsValid &&
-    objectKeys.every((key) => state[key] && typeof state[key] === "object" && !Array.isArray(state[key])) &&
-    (state.runId === undefined || typeof state.runId === "string") &&
-    typeof state.currentCase === "string" &&
-    typeof state.nodeId === "string"
-  );
+  return validateSavedStatePayload(state).length === 0;
 }
 
 export function getInvalidSavedStateKeys(state) {

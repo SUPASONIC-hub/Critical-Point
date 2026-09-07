@@ -33,3 +33,25 @@ export function validateTelemetryItem(item) {
   if (containsPrivateTelemetryKey(item?.payload)) errors.push("payload contains private fields");
   return errors;
 }
+
+export function validateSavedStatePayload(state) {
+  const errors = [];
+  if (!state || typeof state !== "object" || Array.isArray(state)) return ["state must be an object"];
+  for (const key of ["completedCases", "discoveredClues", "log", "pendingTelemetry"]) {
+    if (!Array.isArray(state[key])) errors.push(`invalid ${key}`);
+  }
+  for (const key of ["caseResults", "playtestFeedback", "resources", "triggers", "cognition"]) {
+    if (!state[key] || typeof state[key] !== "object" || Array.isArray(state[key])) errors.push(`invalid ${key}`);
+  }
+  if (typeof state.currentCase !== "string") errors.push("invalid currentCase");
+  if (typeof state.nodeId !== "string") errors.push("invalid nodeId");
+  if (state.runId !== undefined && typeof state.runId !== "string") errors.push("invalid runId");
+  if (Array.isArray(state.pendingTelemetry)) {
+    for (const item of state.pendingTelemetry) {
+      if (!item || typeof item !== "object" || typeof item.id !== "string" || typeof item.label !== "string" || validateTelemetryItem(item).length) {
+        errors.push("invalid pendingTelemetry item");
+      }
+    }
+  }
+  return errors;
+}
