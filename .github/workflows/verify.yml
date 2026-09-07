@@ -39,7 +39,6 @@ jobs:
     if: >-
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.labels.*.name, 'e2e')
-    needs: verify-quick
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
