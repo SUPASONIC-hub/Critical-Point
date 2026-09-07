@@ -100,7 +100,7 @@ function runCodex(prompt, reportPath) {
     const commandArgs = process.platform === "win32"
       ? ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", codexCommand, "exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"]
       : ["exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"];
-    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs.slice(6)] : commandArgs, {
+    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs.slice(5)] : commandArgs, {
       cwd: root,
       stdio: ["pipe", "inherit", "inherit"],
       windowsHide: true,
