@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { nodes } from "../../src/gameData.js";
+import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
 export const ACTION_TIMEOUT_MS = 60_000;
 export const TRANSITION_TIMEOUT_MS = 60_000;
@@ -25,7 +26,7 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
   } = options;
   if (navigate) await page.goto("/?debug=1");
   if (resetStorage) {
-    await page.evaluate(() => localStorage.clear());
+    await clearGameStorage(page);
     await page.reload();
   }
   await page.getByTestId("debug-case-select").selectOption(caseId);
@@ -137,7 +138,7 @@ export async function completeCase(page, random) {
   for (let step = 0; step < 80; step += 1) {
     if (await page.locator(".result-page").isVisible().catch(() => false)) return;
     await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
-    const { nodeId } = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), "trigger-prototype-v2");
+    const { nodeId } = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
     const scene = nodes[nodeId];
     if (!scene) throw new Error(`missing scene ${nodeId}`);
     const choiceIndex = Math.floor(random() * scene.choices.length);

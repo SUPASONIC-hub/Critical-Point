@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 const STORAGE_KEY = "trigger-prototype-v2";
 const EMPTY_TRIGGERS = {
@@ -84,7 +85,7 @@ test("ordinary save keeps discovered clues and does not create recovery metadata
   await expect(page.locator(".game-shell")).toBeVisible();
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: false })));
   await page.reload();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.discoveredClues).toHaveLength(1);
   expect(saved.lastError).toBeFalsy();
 });
@@ -92,9 +93,9 @@ test("ordinary save keeps discovered clues and does not create recovery metadata
 test("clearing the saved run before navigation does not resurrect it", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case02", "c2_logs");
-  await page.evaluate(() => localStorage.clear());
+  await clearGameStorage(page);
   await page.goto("/?debug=1");
-  expect(await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).toBeNull();
+  expect(await readJsonStorage(page, TEST_STORAGE_KEYS.save)).toBeNull();
   await expect(page.locator(".intro-shell")).toBeVisible();
 });
 

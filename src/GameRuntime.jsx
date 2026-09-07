@@ -103,10 +103,6 @@ import {
   recordAppError,
   reportSilentFailure,
 } from "./state/savedState.js";
-import { DecisionReveal } from "./components/DecisionReveal.jsx";
-import { RecoveryNotice } from "./components/RecoveryNotice.jsx";
-import { SaveStatus } from "./components/SaveStatus.jsx";
-import { ErrorLogPanel } from "./components/ErrorLogPanel.jsx";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
@@ -146,6 +142,7 @@ import {
 } from "./appCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
+import { createRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
@@ -2145,20 +2142,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       ? `${nextCaseSignal.title}로 넘어가고 싶은 이유가 생겼나요?`
       : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
   ];
-  function getSceneLineType(line) {
-    if (line.startsWith("'")) return "thought-line";
-    if (line.startsWith('"')) return "spoken-line";
-    return "narration-line";
-  }
-
-  function renderSceneLines(text) {
-    return text.split("\n").map((line, index) => (
-      <p className={getSceneLineType(line)} key={`${index}-${line.slice(0, 12)}`}>
-        {line}
-      </p>
-    ));
-  }
-
   function getEchoChecks(currentNode) {
     const memoChecks = (currentNode?.memo ?? []).slice(0, 2);
     const triggerCheck = currentNode?.triggers?.[0]
@@ -2184,25 +2167,20 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     }
   }
 
-  const decisionRevealView = { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta };
-  function renderDecisionReveal() {
-    return <DecisionReveal view={decisionRevealView} />;
-  }
-
-  const recoveryNoticeView = { lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showErrorLog, setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice };
-  function renderRecoveryNotice() {
-    return <RecoveryNotice view={recoveryNoticeView} />;
-  }
-
-  const saveStatusView = { saveStatus, retryStorageCleanup };
-  function renderSaveStatus() {
-    return <SaveStatus view={saveStatusView} />;
-  }
-
-  const errorLogPanelView = { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot };
-  function renderErrorLogPanel() {
-    return <ErrorLogPanel view={errorLogPanelView} />;
-  }
+  const {
+    renderSceneLines,
+    renderDecisionReveal,
+    renderRecoveryNotice,
+    renderSaveStatus,
+    renderErrorLogPanel,
+  } = createRuntimeRenderers({
+    decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
+    lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
+    setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup,
+    debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog,
+    closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
+    startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot,
+  });
 
   if (showRanking && !started) {
     return (
