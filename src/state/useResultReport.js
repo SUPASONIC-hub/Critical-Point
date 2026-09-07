@@ -101,7 +101,7 @@ export function useResultReport({
     finalEndingEntry,
     finalAftermathEntry,
     latestChoiceFeedback: getChoiceOutcomeFeedback(log.at(-1)),
-    endingPreview: getEndingPreview(endingVariant),
+    endingPreview: { ...getEndingPreview(endingVariant), rationale: [`신뢰 ${resources.trust ?? 0}`, `정당성 ${resources.legitimacy ?? 0}`, `자본 ${resources.capital ?? 0}`, `단서 ${discoveredClues.length}`] },
     failureRecovery: getFailureRecovery(endingVariant, resources),
     endingCause: getFailureCause(endingVariant, resources),
     endingAtmosphere: getEndingAtmosphere(endingVariant.id),

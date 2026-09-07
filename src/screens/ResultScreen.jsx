@@ -10,7 +10,7 @@ export function ResultScreen({ view }) {
       screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta, sceneTitleRef, renderSceneLines,
     },
     ending: {
-      endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant,
+      endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant, endingPreview,
       advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage,
       saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine,
       skipEndingQuietHold,
@@ -39,8 +39,7 @@ export function ResultScreen({ view }) {
     },
   } = view;
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
-  const firstRouteEntry = routeTimeline[0];
-  const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0];
+  const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0];
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observerEndingRecord = observerPattern?.endingRecord ?? {
@@ -344,6 +343,7 @@ export function ResultScreen({ view }) {
               <p>{view.endingPreview.text}</p>
             </section>
           )}
+          {endingPreview?.rationale && <p className="ending-rationale" role="status">엔딩 근거: {endingPreview.rationale.join(" · ")}</p>}
           {view.authorityReview && (
             <section className="authority-review-panel" aria-label="권한 심사">
               <span>{view.authorityReview.title}</span>
