@@ -23,7 +23,7 @@ export function ResultScreen({ view }) {
     },
     telemetry: {
       sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry,
-      telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus,
+      telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, telemetryStats,
     },
     feedback: {
       feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH,
@@ -372,6 +372,11 @@ export function ResultScreen({ view }) {
               <span>PLAYTEST HEALTH</span>
               <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
             </section>
+          )}
+          {debugToolsEnabled && telemetryStats && (
+            <p className="telemetry-stats" role="status">
+              TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted
+            </p>
           )}
           {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`} role="status"><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
           {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}

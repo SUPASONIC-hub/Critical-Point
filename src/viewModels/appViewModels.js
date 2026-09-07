@@ -95,6 +95,7 @@ export const viewGroups = {
       "sessionCode", "telemetryStatus", "pendingTelemetry", "retryPendingTelemetry",
       "scheduleTelemetryRetry", "telemetryEnabled", "dataConsent", "isOnline", "isRetryingTelemetry",
       "copySessionCode", "copyStatus", "telemetryDashboard",
+      "telemetryStats",
     ],
     feedback: [
       "feedbackPrompts", "currentFeedback", "updateCurrentFeedback", "FEEDBACK_COMMENT_MAX_LENGTH",
