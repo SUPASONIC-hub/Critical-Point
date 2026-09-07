@@ -90,6 +90,23 @@ test("case result desktop visual baseline @visual", async ({ page }) => {
   });
 });
 
+test("case result mobile layout stays within the viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  });
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    resultWidth: document.querySelector(".result-page")?.getBoundingClientRect().width ?? 0,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  expect(dimensions.resultWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+});
+
 // U-1: one decision used to be seven screens of scrolling on a phone, with the
 // resource board below the choices. Both are budgets, not pixel comparisons, so
 // they fail on a layout regression rather than on a font hint.
