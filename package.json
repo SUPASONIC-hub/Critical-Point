@@ -31,6 +31,7 @@
     "check:export-schema": "node scripts/check-export-schema.mjs",
     "check:test-storage": "node scripts/check-test-storage.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
+    "agents:cycle": "node scripts/agent-cycle.mjs",
     "check:visual-baselines": "node scripts/check-visual-baselines.mjs",
     "check:node": "node scripts/check-node-version.mjs",
     "test:runtime": "node scripts/run-e2e.mjs --runtime",

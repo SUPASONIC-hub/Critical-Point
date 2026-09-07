@@ -11,3 +11,4 @@ Profile.jpg
 .tmp-css/
 .tmp/
 .claude/worktrees/
+.agents/runs/
