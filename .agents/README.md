@@ -11,6 +11,7 @@ Useful modes:
 ```powershell
 npm run agents:cycle -- --dry-run
 npm run agents:cycle -- --cycles 3
+npm run agents:cycle -- --brief "결과 화면에서 다음 사건으로 넘어가는 흐름을 개선"
 npm run agents:cycle -- --from qa
 ```
 

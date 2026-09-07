@@ -8,6 +8,7 @@ const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const cycleCount = readNumberFlag("--cycles", 1);
 const fromRole = readStringFlag("--from", "pm");
+const taskBrief = readStringFlag("--brief", "");
 
 const roles = [
   { id: "pm", file: "pm.md", report: "01-pm.md" },
@@ -75,7 +76,7 @@ for (let cycle = 1; cycle <= cycleCount; cycle += 1) {
 }
 
 function createManifest(runId, cycle) {
-  return `# Agent Cycle ${runId}\n\n- cycle: ${cycle}\n- created: ${new Date().toISOString()}\n- policy: .agents/AGENTS.md\n- result: review 07-qa.md before committing\n`;
+  return `# Agent Cycle ${runId}\n\n- cycle: ${cycle}\n- created: ${new Date().toISOString()}\n- policy: .agents/AGENTS.md\n- task brief: ${taskBrief || "PM selects the next improvement"}\n- result: review 07-qa.md before committing\n`;
 }
 
 function createPrompt(role, reportPath, runDir, cycle) {
@@ -86,6 +87,7 @@ function createPrompt(role, reportPath, runDir, cycle) {
   return `You are the ${role.id} agent in improvement cycle ${cycle} for this repository.\n\n` +
     `Read .agents/AGENTS.md and .agents/roles/${role.file} first.\n` +
     `Repository: ${root}\nRun directory: ${runDir}\nYour report must be written to: ${reportPath}\n` +
+    `Task brief from the user: ${taskBrief || "No explicit brief; PM should select one measurable improvement."}\n` +
     (upstream ? `Read these upstream reports before acting:\n${upstream}\n` : "") +
     "Do not ask the user for routine choices. Make conservative assumptions and record them. " +
     "Do not commit, push, reset, checkout, install packages, apply remote migrations, or access secrets. " +
