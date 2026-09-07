@@ -1,0 +1,30 @@
+name: Deployed Smoke Check
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Verify]
+    types: [completed]
+
+jobs:
+  smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check deployed app
+        if: env.DEPLOY_URL != ''
+        run: npm run check:deploy
+      - name: Explain skipped check
+        if: env.DEPLOY_URL == ''
+        run: echo 'DEPLOY_URL secret is not configured; configure it to enable the deployed smoke check.'
