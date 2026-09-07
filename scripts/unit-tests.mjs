@@ -193,6 +193,11 @@ test("telemetry queue policy should expire old items and cap retained items", ()
   assert.equal(retained.some((item) => item.id === "old"), false);
   assert.equal(retained[0].id, "item-1");
 });
+test("telemetry queue items should have stable identities for retry deduplication", () => {
+  const item = { id: "case-case01-123", type: "case", payload: { case_id: "case01" } };
+  assert.equal(validateTelemetryItem(item).length, 0);
+  assert.equal(item.id, "case-case01-123", "the queue id is the retry idempotency key");
+});
 
 const seasonRow = (score, completedAt) => ({
   run_id: "run-1",

@@ -69,9 +69,9 @@ export function createTelemetryQueue({
   async function sendTelemetryItem(item) {
     const validationErrors = validateTelemetryItem(item);
     if (validationErrors.length) throw new Error(`Invalid telemetry item: ${validationErrors.join(", ")}`);
-    if (item.type === "case") return saveCaseTelemetry(item.payload);
-    if (item.type === "feedback") return saveFeedbackTelemetry(item.payload);
-    if (item.type === "error") return saveErrorTelemetry(item.payload);
+    if (item.type === "case") return saveCaseTelemetry(item.payload, item.id);
+    if (item.type === "feedback") return saveFeedbackTelemetry(item.payload, item.id);
+    if (item.type === "error") return saveErrorTelemetry(item.payload, item.id);
     throw new Error(`Unknown telemetry item type: ${item.type}`);
   }
 

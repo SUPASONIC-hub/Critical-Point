@@ -62,15 +62,15 @@ function restHeaders(extra = {}) {
   };
 }
 
-async function insertRow(table, payload, failureLabel) {
+async function insertRow(table, payload, failureLabel, eventId = null) {
   if (!telemetryEnabled) return { skipped: true };
   telemetryStats.attempted += 1;
 
   try {
     const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
       method: "POST",
-      headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
-      body: JSON.stringify(payload),
+      headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal,resolution=ignore-duplicates" }),
+      body: JSON.stringify(eventId ? { ...payload, event_id: eventId } : payload),
     });
 
     if (!response.ok) {
@@ -89,16 +89,16 @@ export function getTelemetryStats() {
   return { ...telemetryStats };
 }
 
-export function saveCaseTelemetry(payload) {
-  return insertRow("playtest_sessions", payload, "Telemetry save failed");
+export function saveCaseTelemetry(payload, eventId = null) {
+  return insertRow("playtest_sessions", payload, "Telemetry save failed", eventId);
 }
 
-export function saveFeedbackTelemetry(payload) {
-  return insertRow("playtest_feedback", payload, "Feedback save failed");
+export function saveFeedbackTelemetry(payload, eventId = null) {
+  return insertRow("playtest_feedback", payload, "Feedback save failed", eventId);
 }
 
-export function saveErrorTelemetry(payload) {
-  return insertRow("app_error_logs", payload, "Error log save failed");
+export function saveErrorTelemetry(payload, eventId = null) {
+  return insertRow("app_error_logs", payload, "Error log save failed", eventId);
 }
 
 async function checkTelemetryTable(tableName) {
