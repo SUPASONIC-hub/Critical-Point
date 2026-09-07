@@ -1,5 +1,6 @@
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
 
 const root = process.cwd();
 const assetsDir = path.join(root, "dist", "assets");
@@ -27,9 +28,13 @@ for (const budget of budgets) {
     failures.push(`no bundle matched ${budget.pattern}`);
     continue;
   }
-  const bytes = statSync(path.join(assetsDir, file)).size;
-  reported.push(`${file}: ${bytes} bytes`);
+  const assetPath = path.join(assetsDir, file);
+  const bytes = statSync(assetPath).size;
+  const gzipBytes = gzipSync(readFileSync(assetPath)).length;
+  const gzipBudget = Math.ceil(budget.maxBytes * 0.4);
+  reported.push(`${file}: ${bytes} bytes raw / ${gzipBytes} bytes gzip`);
   if (bytes > budget.maxBytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.maxBytes} byte budget.`);
+  if (gzipBytes > gzipBudget) failures.push(`${file} is ${gzipBytes} gzip bytes, over the ${gzipBudget} gzip budget.`);
 }
 
 if (failures.length) {

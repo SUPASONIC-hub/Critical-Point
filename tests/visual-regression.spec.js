@@ -107,6 +107,34 @@ test("case result mobile layout stays within the viewport", async ({ page }) => 
   expect(dimensions.resultWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 });
 
+test("case result mobile visual baseline @visual", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  });
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  await stabilizeVisualPage(page);
+  await expect(page.locator(".result-page")).toHaveScreenshot("case-result-mobile.png", {
+    animations: "disabled",
+    caret: "hide",
+    maxDiffPixels: 2500,
+  });
+});
+
+test("case result explains the ending signals", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  });
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".ending-rationale")).toContainText("신뢰");
+  await expect(page.locator(".ending-rationale")).toContainText("정당성");
+});
+
 // U-1: one decision used to be seven screens of scrolling on a phone, with the
 // resource board below the choices. Both are budgets, not pixel comparisons, so
 // they fail on a layout regression rather than on a font hint.

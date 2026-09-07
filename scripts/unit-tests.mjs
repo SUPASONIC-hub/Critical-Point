@@ -154,6 +154,13 @@ test("diagnostic export should carry the session id", () => {
 test("diagnostic export should include an error log array", () => {
   assert.deepEqual(diagnosticExport.errorLog, [], "diagnostic export should include an error log array");
 });
+test("playtest exports should omit private text and names", () => {
+  const serializedSummary = JSON.stringify(summaryExport);
+  const serializedDiagnostics = JSON.stringify(diagnosticExport);
+  assert.equal(serializedSummary.includes("private"), false, "summary export must not contain free text");
+  assert.equal(serializedDiagnostics.includes("private"), false, "diagnostic export must not contain free text");
+  assert.equal(serializedDiagnostics.includes("tester"), false, "diagnostic export must not contain player names");
+});
 
 const seasonRow = (score, completedAt) => ({
   run_id: "run-1",

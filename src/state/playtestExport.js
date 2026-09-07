@@ -9,6 +9,17 @@ import {
 import { getTraceEvents } from "./trace.js";
 
 const REVOKE_DELAY_MS = 1000;
+const PRIVATE_EXPORT_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment"]);
+
+function sanitizeDiagnosticValue(value) {
+  if (Array.isArray(value)) return value.map(sanitizeDiagnosticValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !PRIVATE_EXPORT_KEYS.has(key))
+      .map(([key, entry]) => [key, sanitizeDiagnosticValue(entry)]),
+  );
+}
 
 /**
  * Builds the JSON a playtester hands back.
@@ -32,7 +43,7 @@ export function buildPlaytestExport({ includeDiagnostics = false, run, gameplay,
   const localSaveSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
   return {
     ...payload,
-    ...diagnostics,
+    ...sanitizeDiagnosticValue(diagnostics),
     errorLog: Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [],
     saveSlots: Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [],
     trace: getTraceEvents(),
