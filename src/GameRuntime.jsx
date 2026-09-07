@@ -145,7 +145,7 @@ import {
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
 import { createRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
-import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
+import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile, createStreakReward } from "./viewModels/sceneViewModels.js";
 import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import {
@@ -1401,6 +1401,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
           tone: "break",
         }
       : null;
+    const streakReward = createStreakReward({ previousStreak: currentChallengeStreak, challengeMatch });
     const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
     const clueReward = clue
       ? {
@@ -1426,6 +1427,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       ...(instinctSurge ? [instinctSurge.effect] : []),
       ...(auditSurge ? [auditSurge.effect] : []),
       ...(clueReward ? [clueReward.effect] : []),
+      ...(streakReward ? [streakReward.effect] : []),
       ...(prematureHypothesis ? [prematureHypothesis.effect] : []),
     );
     const finalEffect = applySeededEffectVariation(
@@ -1711,7 +1713,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       streakBreak,
           suspenseEvent,
           clue,
-          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward, streakBreak]
+          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward, streakReward, streakBreak]
             .filter(Boolean)
             .map(({ label, text, effect, tone }) => ({ label, text, effect, tone })),
         });

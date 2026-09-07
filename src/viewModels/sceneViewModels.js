@@ -75,6 +75,8 @@ export function createAuthorityState({ evidence, legitimacy, operatorOrigin, tru
 export function createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, freeTextCombo, log }) {
   return log.at(-1)?.title === "CRISIS PROTOCOL"
     ? "구조 개입"
+    : log.at(-1)?.streakReward
+      ? log.at(-1).streakReward.label
     : log.at(-1)?.instinctSurge
       ? "INSTINCT SURGE"
       : log.at(-1)?.auditSurge
@@ -92,6 +94,25 @@ export function createActiveBonus({ currentAverageResponseTime, currentChallenge
                 : "보너스 대기";
 }
 
+export function createStreakReward({ previousStreak = 0, challengeMatch = false } = {}) {
+  if (!challengeMatch) return null;
+  const streak = previousStreak + 1;
+  if (streak === 5) {
+    return {
+      label: "PERFECT PAYOUT",
+      text: "5연속 장면 목표를 맞혔습니다. 신뢰와 정당성을 회복하고 피로를 덜어냅니다.",
+      effect: { trust: 2, legitimacy: 2, fatigue: -3 },
+    };
+  }
+  if (streak === 3) {
+    return {
+      label: "STREAK PAYOUT",
+      text: "3연속 장면 목표를 맞혔습니다. 다음 판단을 위한 신뢰가 올라가고 피로가 줄어듭니다.",
+      effect: { trust: 2, fatigue: -2 },
+    };
+  }
+  return null;
+}
 export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {
   return openingLegacy && isOpeningNode
     ? (openingLegacy.continuityChallenge ?? {

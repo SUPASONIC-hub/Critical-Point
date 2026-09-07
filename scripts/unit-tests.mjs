@@ -31,6 +31,7 @@ import { test } from "node:test";
 import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
+import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
 
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
@@ -336,4 +337,19 @@ test("no choice in the graph builds a disagreeing particle", () => {
       assert.doesNotMatch(explainResourceTradeoff(choice.effect ?? {}), WRONG_PARTICLES, `${choice.id} ledger line`);
     }
   }
+});
+
+test("streak rewards trigger only at the 3 and 5 milestones", () => {
+  assert.equal(createStreakReward({ previousStreak: 1, challengeMatch: true }), null);
+  assert.deepEqual(createStreakReward({ previousStreak: 2, challengeMatch: true }), {
+    label: "STREAK PAYOUT",
+    text: "3연속 장면 목표를 맞혔습니다. 다음 판단을 위한 신뢰가 올라가고 피로가 줄어듭니다.",
+    effect: { trust: 2, fatigue: -2 },
+  });
+  assert.deepEqual(createStreakReward({ previousStreak: 4, challengeMatch: true }), {
+    label: "PERFECT PAYOUT",
+    text: "5연속 장면 목표를 맞혔습니다. 신뢰와 정당성을 회복하고 피로를 덜어냅니다.",
+    effect: { trust: 2, legitimacy: 2, fatigue: -3 },
+  });
+  assert.equal(createStreakReward({ previousStreak: 2, challengeMatch: false }), null);
 });
