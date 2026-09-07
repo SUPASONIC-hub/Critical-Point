@@ -7,6 +7,7 @@ import {
   writeStoredValue,
 } from "../appConfig.js";
 import { saveCaseTelemetry, saveErrorTelemetry, saveFeedbackTelemetry } from "../telemetry.js";
+import { validateTelemetryItem } from "./payloadSchemas.js";
 
 /**
  * The outbound telemetry queue: buffer an item, flush the buffer, and back off
@@ -65,6 +66,8 @@ export function createTelemetryQueue({
   }
 
   async function sendTelemetryItem(item) {
+    const validationErrors = validateTelemetryItem(item);
+    if (validationErrors.length) throw new Error(`Invalid telemetry item: ${validationErrors.join(", ")}`);
     if (item.type === "case") return saveCaseTelemetry(item.payload);
     if (item.type === "feedback") return saveFeedbackTelemetry(item.payload);
     if (item.type === "error") return saveErrorTelemetry(item.payload);

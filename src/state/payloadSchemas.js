@@ -16,3 +16,20 @@ export function validatePlaytestExport(payload, { includeDiagnostics = false } =
   }
   return errors;
 }
+
+const TELEMETRY_TYPES = new Set(["case", "feedback", "error"]);
+const PRIVATE_TELEMETRY_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment", "spokenChoice"]);
+
+function containsPrivateTelemetryKey(value) {
+  if (Array.isArray(value)) return value.some(containsPrivateTelemetryKey);
+  if (!value || typeof value !== "object") return false;
+  return Object.entries(value).some(([key, entry]) => PRIVATE_TELEMETRY_KEYS.has(key) || containsPrivateTelemetryKey(entry));
+}
+
+export function validateTelemetryItem(item) {
+  const errors = [];
+  if (!TELEMETRY_TYPES.has(item?.type)) errors.push(`invalid type ${item?.type}`);
+  if (!item?.payload || typeof item.payload !== "object" || Array.isArray(item.payload)) errors.push("payload must be an object");
+  if (containsPrivateTelemetryKey(item?.payload)) errors.push("payload contains private fields");
+  return errors;
+}

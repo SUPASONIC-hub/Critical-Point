@@ -15,7 +15,7 @@ import {
 } from "../src/viewModels/seasonViewModels.js";
 import { buildPlaytestExport } from "../src/state/playtestExport.js";
 import { safeStringify } from "../src/state/diagnosticUtils.js";
-import { validatePlaytestExport } from "../src/state/payloadSchemas.js";
+import { validatePlaytestExport, validateTelemetryItem } from "../src/state/payloadSchemas.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
   createRecoverySnapshot,
@@ -174,6 +174,11 @@ test("playtest export schema should reject missing and private summary fields", 
   ]);
   assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "summary", currentCase: "case01", summary: {}, gameplay: {}, playerName: "private" }), ["private field playerName"]);
   assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "diagnostic", currentCase: "case01", summary: {}, gameplay: {}, sessionId: "session" }, { includeDiagnostics: true }), []);
+});
+test("telemetry schema should reject private fields and unknown types", () => {
+  assert.deepEqual(validateTelemetryItem({ type: "unknown", payload: {} }), ["invalid type unknown"]);
+  assert.deepEqual(validateTelemetryItem({ type: "case", payload: { nested: { freeText: "private" } } }), ["payload contains private fields"]);
+  assert.deepEqual(validateTelemetryItem({ type: "error", payload: { source: "test" } }), []);
 });
 
 const seasonRow = (score, completedAt) => ({
