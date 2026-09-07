@@ -24,6 +24,12 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:quick
+      - name: Summarize bundle and test budgets
+        if: always()
+        run: |
+          echo '### Verification summary' >> "$GITHUB_STEP_SUMMARY"
+          npm run check:bundle >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+          npm run check:export-schema >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
       - name: Upload Playwright diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -51,6 +57,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:e2e
+      - name: Summarize E2E result
+        if: always()
+        run: echo 'E2E suite completed; see the Playwright artifact for detailed results.' >> "$GITHUB_STEP_SUMMARY"
       - name: Upload E2E diagnostics
         if: always()
         uses: actions/upload-artifact@v4
