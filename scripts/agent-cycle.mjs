@@ -32,8 +32,9 @@ if (initialStatus && !dryRun) {
 }
 
 const codexCommand = process.env.CODEX_CLI || (process.platform === "win32" ? join(process.env.APPDATA || "", "npm", "codex.ps1") : "codex");
-if (!dryRun && process.platform === "win32" && !existsSync(codexCommand)) {
-  fail(`Codex CLI was not found at ${codexCommand}. Set CODEX_CLI to its executable path.`);
+const codexScript = process.platform === "win32" ? join(resolve(codexCommand, ".."), "node_modules", "@openai", "codex", "bin", "codex.js") : codexCommand;
+if (!dryRun && process.platform === "win32" && !existsSync(codexScript)) {
+  fail(`Codex CLI was not found at ${codexScript}. Set CODEX_CLI to its executable path.`);
 }
 
 for (let cycle = 1; cycle <= cycleCount; cycle += 1) {
@@ -99,7 +100,7 @@ function runCodex(prompt, reportPath) {
     const commandArgs = process.platform === "win32"
       ? ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", codexCommand, "exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"]
       : ["exec", "-s", "workspace-write", "-a", "never", "--ephemeral", "-C", root, "-o", reportPath, "-"];
-    const child = spawn(process.platform === "win32" ? "powershell.exe" : codexCommand, commandArgs, {
+    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs.slice(6)] : commandArgs, {
       cwd: root,
       stdio: ["pipe", "inherit", "inherit"],
       windowsHide: true,
