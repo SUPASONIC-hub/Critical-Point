@@ -31,6 +31,7 @@ export function IntroScreen({ view }) {
   const [openingBurst, setOpeningBurst] = useState(false);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
+  const startSetupRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
   const {
     common: {
@@ -81,6 +82,13 @@ export function IntroScreen({ view }) {
   const startNewRun = () => beginOpeningBurst(startGame);
   const startNewGamePlusRun = () => beginOpeningBurst(startNewGamePlus);
   const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId));
+  function showCaseAccessSetup() {
+    const setup = startSetupRef.current;
+    if (!setup) return;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    setup.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    setup.focus({ preventScroll: true });
+  }
   return (
       <main className="shell intro-shell" aria-busy={openingBurst}>
         <Music modeKey={musicModeKey} />
@@ -132,10 +140,10 @@ export function IntroScreen({ view }) {
             <figcaption>
               <span>TRIGGERLAB NIGHT SHIFT</span>
               <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
-              <div className="start-input-row"><button type="button" onClick={startNewRun} disabled={openingBurst}><ChevronRight size={18} />첫 사건 진입</button></div>
+              <div className="start-input-row"><button type="button" onClick={showCaseAccessSetup} disabled={openingBurst} aria-controls="case-access-setup"><ChevronRight size={18} />첫 사건 진입</button></div>
             </figcaption>
           </figure>
-          <section className="start-priority" aria-label="게임 시작 준비">
+          <section id="case-access-setup" ref={startSetupRef} className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
           <div className="start-console-heading">
             <div>
               <span>CASE ACCESS SETUP</span>

@@ -163,6 +163,23 @@ test("the complete season can progress from case 01 to the final ending", async 
   expect(saved.completedCases).toContain("final");
 });
 
+test("hero entry guides to setup without starting a fresh run", async ({ page }) => {
+  await page.addInitScript(() => localStorage.clear());
+  await page.goto("/");
+
+  await page.getByRole("button", { name: /첫 사건 진입/ }).click();
+
+  await expect(page.locator(".intro")).toBeVisible();
+  await expect(page.getByTestId("opening-burst")).toHaveCount(0);
+  await expect(page.locator("#case-access-setup")).toBeFocused();
+  const savedAfterHeroClick = await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"));
+  expect(savedAfterHeroClick).toBeNull();
+
+  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
+  await expect(page.getByTestId("opening-burst")).toBeVisible();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+});
+
 test("representative branch choices advance without browser runtime errors", async ({ page }) => {
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
