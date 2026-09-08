@@ -49,6 +49,7 @@ export function buildNarrativeSpine({
     conflict,
     question,
     consequence,
+    nextQuestion: riskTier === "CRITICAL" ? "다음 장면에서 가장 먼저 반응하는 사람은 누구인가?" : "다음 장면에서 이 비용은 누구에게 넘어가는가?",
   };
 }
 
