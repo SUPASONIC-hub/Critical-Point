@@ -1,6 +1,5 @@
 import { Info, MessageSquareText } from "lucide-react";
 import { DecisionRail } from "../components/DecisionRail.jsx";
-import { DecisionDock } from "../components/DecisionDock.jsx";
 import { MemoPanel } from "../components/MemoPanel.jsx";
 import { StatusBoard } from "../components/StatusBoard.jsx";
 import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
@@ -586,7 +585,8 @@ export function PlayScreen({ view }) {
         <section className="choice-panel" id="choice-panel" aria-labelledby="choice-heading" tabIndex={-1}>
           <DecisionRail pendingChoice={pendingChoice} />
           <div className="choice-heading">
-            <h2 id="choice-heading">어떻게 말할까</h2>`n            <p className="choice-question">{narrativeSpine.question}</p>
+            <h2 id="choice-heading">어떻게 말할까</h2>
+            <p className="choice-question">{narrativeSpine.question}</p>
             <p>
               어떤 선택도 무료가 아닙니다. 지금 고르는 말은 한 자원을 올리는 대신 다른
               부담을 다음 장면으로 넘깁니다.
@@ -702,18 +702,6 @@ export function PlayScreen({ view }) {
             updateFreeText={updateFreeText}
           />
         </section>
-        {pendingChoiceRead && (
-          <DecisionDock
-            pendingChoice={pendingChoice}
-            pendingChoiceForecast={pendingChoiceForecast}
-            suspenseTier={suspenseState.tier}
-            onCancel={() => setPendingChoice(null)}
-            onConfirm={() => choose(pendingChoice)}
-            isAdvancing={isAdvancing}
-            speechify={speechifyChoice}
-            formatForecastRisk={formatForecastRisk}
-          />
-        )}
       </section>
       <StatusBoard
         playerName={playerName}

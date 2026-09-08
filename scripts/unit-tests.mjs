@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   appendLocalRankingRowToRows,
@@ -84,6 +85,13 @@ test("result view should require transition actions", () => {
     /startCase/,
     "result view should require transition actions",
   );
+});
+
+const playScreenSource = readFileSync("src/screens/PlayScreen.jsx", "utf8");
+test("fixed choices should use CommitConsole as the only confirmation surface", () => {
+  assert.match(playScreenSource, /<CommitConsole\b/, "the fixed-choice confirmation surface should remain CommitConsole");
+  assert.doesNotMatch(playScreenSource, /DecisionDock/, "the duplicate DecisionDock confirmation path should stay out of PlayScreen");
+  assert.doesNotMatch(playScreenSource, /<\/h2>`n\s*<p className="choice-question">/, "the choice heading should not print a literal `n artifact");
 });
 
 const migrated = migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] });
