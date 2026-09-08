@@ -9,6 +9,7 @@ const dryRun = args.includes("--dry-run");
 const cycleCount = readNumberFlag("--cycles", 1);
 const fromRole = readStringFlag("--from", "pm");
 const taskBrief = readStringFlag("--brief", "");
+const codexSandbox = process.env.CODEX_SANDBOX || "workspace-write";
 
 const roles = [
   { id: "pm", file: "pm.md", report: "01-pm.md" },
@@ -97,7 +98,7 @@ function createPrompt(role, reportPath, runDir, cycle) {
 
 function runCodex(prompt, reportPath) {
   return new Promise((resolvePromise, reject) => {
-    const commandArgs = ["--ask-for-approval", "never", "exec", "-s", "workspace-write", "--ephemeral", "-C", root, "-o", reportPath, "-"];
+    const commandArgs = ["--ask-for-approval", "never", "exec", "-s", codexSandbox, "--ephemeral", "-C", root, "-o", reportPath, "-"];
     const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs] : commandArgs, {
       cwd: root,
       stdio: ["pipe", "inherit", "inherit"],
