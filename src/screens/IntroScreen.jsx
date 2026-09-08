@@ -89,6 +89,7 @@ export function IntroScreen({ view }) {
             <figcaption>
               <span>TRIGGERLAB NIGHT SHIFT</span>
               <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+              <button type="button" className="ghost hero-start-action" onClick={startGame}><ChevronRight size={18} />첫 사건 진입</button>
             </figcaption>
           </figure>
           <section className="start-priority" aria-label="게임 시작 준비">
