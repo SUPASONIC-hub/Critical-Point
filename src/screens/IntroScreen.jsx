@@ -74,6 +74,23 @@ export function IntroScreen({ view }) {
           )}
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
           <StudioCredit />
+          <figure className="intro-visual">
+            <picture>
+              <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
+              <source srcSet={heroArt.wide} type="image/webp" />
+              <img
+                src="/triggerlab-key-visual.jpg"
+                alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                width="1672"
+                height="941"
+                fetchPriority="high"
+              />
+            </picture>
+            <figcaption>
+              <span>TRIGGERLAB NIGHT SHIFT</span>
+              <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+            </figcaption>
+          </figure>
           <section className="start-priority" aria-label="게임 시작 준비">
           <div className="start-console-heading">
             <div>
@@ -279,23 +296,6 @@ export function IntroScreen({ view }) {
             </section>
           )}
           </section>
-          <figure className="intro-visual">
-            <picture>
-              <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
-              <source srcSet={heroArt.wide} type="image/webp" />
-              <img
-                src="/triggerlab-key-visual.jpg"
-                alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
-                width="1672"
-                height="941"
-                fetchPriority="high"
-              />
-            </picture>
-            <figcaption>
-              <span>TRIGGERLAB NIGHT SHIFT</span>
-              <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
-            </figcaption>
-          </figure>
           <p>
             트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
             사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
