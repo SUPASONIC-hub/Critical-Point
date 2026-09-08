@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 test.use({ colorScheme: "light" });
@@ -25,12 +26,54 @@ async function stabilizeVisualPage(page) {
   });
 }
 
-test("intro desktop visual baseline @visual", async ({ page }) => {
+function readPngSize(file) {
+  const buffer = readFileSync(file);
+  return {
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+  };
+}
+
+async function readCaptureGeometry(target, { fullPage = false } = {}) {
+  if (fullPage) {
+    return await target.evaluate(() => {
+      const root = document.documentElement;
+      const body = document.body;
+      return {
+        width: Math.ceil(Math.max(root.clientWidth, root.scrollWidth, body?.scrollWidth ?? 0)),
+        height: Math.ceil(Math.max(root.clientHeight, root.scrollHeight, body?.scrollHeight ?? 0)),
+      };
+    });
+  }
+
+  const box = await target.boundingBox();
+  expect(box, "visual capture target must have a measurable bounding box").not.toBeNull();
+  return {
+    width: Math.ceil(box.width),
+    height: Math.ceil(box.height),
+  };
+}
+
+async function expectCaptureGeometry(target, testInfo, screenshotName, options = {}) {
+  const baselinePath = testInfo.snapshotPath(screenshotName, { kind: "screenshot" });
+  expect(existsSync(baselinePath), `visual baseline is missing: ${baselinePath}`).toBe(true);
+  const baseline = readPngSize(baselinePath);
+  const actual = await readCaptureGeometry(target, options);
+
+  expect(
+    actual,
+    `${screenshotName} capture geometry changed: expected ${baseline.width}x${baseline.height}, ` +
+      `measured ${actual.width}x${actual.height}. Identify the layout or harness cause before refreshing baselines.`,
+  ).toEqual(baseline);
+}
+
+test("intro desktop visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
   await stabilizeVisualPage(page);
+  await expectCaptureGeometry(page, testInfo, "intro-desktop.png", { fullPage: true });
   await expect(page).toHaveScreenshot("intro-desktop.png", {
     fullPage: true,
     animations: "disabled",
@@ -39,7 +82,7 @@ test("intro desktop visual baseline @visual", async ({ page }) => {
   });
 });
 
-test("case play desktop visual baseline @visual", async ({ page }) => {
+test("case play desktop visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.addInitScript(() => {
@@ -48,14 +91,16 @@ test("case play desktop visual baseline @visual", async ({ page }) => {
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);
-  await expect(page.locator(".game-shell")).toHaveScreenshot("case-play-desktop.png", {
+  const gameShell = page.locator(".game-shell");
+  await expectCaptureGeometry(gameShell, testInfo, "case-play-desktop.png");
+  await expect(gameShell).toHaveScreenshot("case-play-desktop.png", {
     animations: "disabled",
     caret: "hide",
   });
 });
 
 // The densest screen in the app, and the one the layout work was aimed at.
-test("case play mobile visual baseline @visual", async ({ page }) => {
+test("case play mobile visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
@@ -64,13 +109,15 @@ test("case play mobile visual baseline @visual", async ({ page }) => {
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await stabilizeVisualPage(page);
-  await expect(page.locator(".game-shell")).toHaveScreenshot("case-play-mobile.png", {
+  const gameShell = page.locator(".game-shell");
+  await expectCaptureGeometry(gameShell, testInfo, "case-play-mobile.png");
+  await expect(gameShell).toHaveScreenshot("case-play-mobile.png", {
     animations: "disabled",
     caret: "hide",
   });
 });
 
-test("case result desktop visual baseline @visual", async ({ page }) => {
+test("case result desktop visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.addInitScript(() => {
@@ -83,7 +130,9 @@ test("case result desktop visual baseline @visual", async ({ page }) => {
   // The report prints numbers derived from real response times, so a few
   // hundred glyph pixels differ every run. The budget is wide enough to ignore
   // those and narrow enough that a moved block still fails.
-  await expect(page.locator(".result-page")).toHaveScreenshot("case-result-desktop.png", {
+  const resultPage = page.locator(".result-page");
+  await expectCaptureGeometry(resultPage, testInfo, "case-result-desktop.png");
+  await expect(resultPage).toHaveScreenshot("case-result-desktop.png", {
     animations: "disabled",
     caret: "hide",
     maxDiffPixels: 4000,
@@ -107,7 +156,7 @@ test("case result mobile layout stays within the viewport", async ({ page }) => 
   expect(dimensions.resultWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 });
 
-test("case result mobile visual baseline @visual", async ({ page }) => {
+test("case result mobile visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
@@ -117,7 +166,9 @@ test("case result mobile visual baseline @visual", async ({ page }) => {
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   await stabilizeVisualPage(page);
-  await expect(page.locator(".result-page")).toHaveScreenshot("case-result-mobile.png", {
+  const resultPage = page.locator(".result-page");
+  await expectCaptureGeometry(resultPage, testInfo, "case-result-mobile.png");
+  await expect(resultPage).toHaveScreenshot("case-result-mobile.png", {
     animations: "disabled",
     caret: "hide",
     maxDiffPixels: 2500,
@@ -199,12 +250,13 @@ test("mobile commit console opens inside the viewport", async ({ page }) => {
   expect(footprint.fullyCovered).toBeLessThanOrEqual(1);
 });
 
-test("intro mobile visual baseline @visual", async ({ page }) => {
+test("intro mobile visual baseline @visual", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
   await stabilizeVisualPage(page);
+  await expectCaptureGeometry(page, testInfo, "intro-mobile.png", { fullPage: true });
   await expect(page).toHaveScreenshot("intro-mobile.png", {
     fullPage: true,
     animations: "disabled",
