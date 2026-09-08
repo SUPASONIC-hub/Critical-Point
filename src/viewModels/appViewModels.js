@@ -73,7 +73,7 @@ export const viewGroups = {
     common: [
       "AdaptiveMusic", "musicModeKey", "renderDecisionReveal", "renderRecoveryNotice",
       "renderErrorLogPanel", "renderSceneLines", "screenReaderStatus", "GAME_TITLE", "currentCase",
-      "activeCaseMeta", "playerName", "sceneTitleRef", "chapterUiModel", "operatorProfile",
+      "activeCaseMeta", "playerName", "sceneTitleRef", "operatorProfile",
     ],
     ending: [
       "endingStep", "endingTwistIndex", "finalAftermathEntry", "finalEndingEntry", "endingProfile",

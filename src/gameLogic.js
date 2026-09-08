@@ -985,7 +985,6 @@ export function anonymizeSensitiveText(text = "") {
     .replace(new RegExp(organizationPatternSource, "gi"), "익명 조직");
 }
 
-
 export function getEcho(choiceId, freeText) {
   if (freeText) {
     const text = freeText.toLowerCase();

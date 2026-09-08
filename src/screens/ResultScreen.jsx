@@ -13,7 +13,7 @@ export function ResultScreen({ view }) {
       endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant, endingPreview,
       advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage,
       saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine,
-      skipEndingQuietHold,
+      skipEndingQuietHold, endingSceneProfile,
     },
     score: {
       decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result,
@@ -82,14 +82,10 @@ export function ResultScreen({ view }) {
   const openVerdict = {
     title: endingVariant?.title ?? "트리거랩은 완전히 닫히지 않습니다.",
     ruling: endingVariant?.text ?? "당신은 답 하나를 확정하지 않고, 다음 사람이 판단해야 할 조건을 남겼습니다.",
-    execution: view.endingSceneProfile?.choice
-      ? `즉시 적용: ${view.endingSceneProfile.choice}.`
-      : "즉시 적용: 미해결 기록을 다음 근무자에게 인계합니다.",
+    execution: endingSceneProfile?.choice ? `즉시 적용: ${endingSceneProfile.choice}.` : "즉시 적용: 미해결 기록을 다음 근무자에게 인계합니다.",
     cost: "남는 대가: 결론을 유예한 만큼 다음 참가자는 더 많은 권한과 더 무거운 질문을 동시에 받습니다.",
   };
-  const finalVerdict = endingVariant?.failure
-    ? failureVerdict
-    : (choiceVerdicts[finalEndingEntry?.choiceId] ?? openVerdict);
+  const finalVerdict = endingVariant?.failure ? failureVerdict : (choiceVerdicts[finalEndingEntry?.choiceId] ?? openVerdict);
   const endingTwists = [
     {
       label: "판정",
@@ -106,13 +102,12 @@ export function ResultScreen({ view }) {
     {
       label: "대가",
       title: "끝난 것은 사건이고, 남은 것은 책임입니다.",
-      evidence: view.endingSceneProfile?.location ?? `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
+      evidence: endingSceneProfile?.location ?? `${observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
       copy: finalVerdict.cost,
     },
   ];
   const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
   const endingTwistCount = endingTwists.length;
-  const endingImage = view.endingSceneProfile?.image ?? "/ending-final-archive.webp";
   const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { label: "PROTECT", value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)), text: "사람과 현장의 피해를 얼마나 줄였는가" },
@@ -187,7 +182,7 @@ export function ResultScreen({ view }) {
             unopenedBranchCount={unopenedBranchCount}
             endingAtmosphere={view.endingAtmosphere}
             endingVisualClass={view.endingVisualClass}
-            endingImage={endingImage}
+            endingImage={endingSceneProfile?.image ?? "/ending-final-archive.webp"}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -329,11 +324,11 @@ export function ResultScreen({ view }) {
               </div>
             </section>
           )}
-          {view.endingSceneProfile && (
+          {endingSceneProfile && (
             <section className="ending-scene-profile" aria-label="엔딩 장면 프로필">
-              <span>{view.endingSceneProfile.location}</span>
-              <strong>{view.endingSceneProfile.cue}</strong>
-              <p>다음 장면의 핵심 행동: {view.endingSceneProfile.choice}</p>
+              <span>{endingSceneProfile.location}</span>
+              <strong>{endingSceneProfile.cue}</strong>
+              <p>다음 장면의 핵심 행동: {endingSceneProfile.choice}</p>
             </section>
           )}
           {view.endingPreview && (
@@ -373,11 +368,7 @@ export function ResultScreen({ view }) {
               <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
             </section>
           )}
-          {debugToolsEnabled && telemetryStats && (
-            <p className="telemetry-stats" role="status">
-              TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted
-            </p>
-          )}
+          {debugToolsEnabled && telemetryStats && <p className="telemetry-stats" role="status">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
           {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`} role="status"><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
           {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
           {debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary>REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
