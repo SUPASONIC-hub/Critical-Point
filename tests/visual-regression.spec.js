@@ -60,6 +60,40 @@ async function expectCaptureGeometry(target, testInfo, screenshotName, options =
   const baseline = readPngSize(baselinePath);
   const actual = await readCaptureGeometry(target, options);
 
+  if (actual.width !== baseline.width || actual.height !== baseline.height) {
+    const actualPngPath = testInfo.outputPath(`${screenshotName.replace(/\.png$/u, "")}-geometry-actual.png`);
+    await target.screenshot({
+      path: actualPngPath,
+      ...(options.fullPage ? { fullPage: true } : {}),
+      animations: "disabled",
+      caret: "hide",
+    });
+    const captured = readPngSize(actualPngPath);
+    const classification = captured.width === actual.width && captured.height === actual.height ? "layout" : "harness";
+    const diagnostics = {
+      screenshotName,
+      classification,
+      baseline,
+      measuredDomGeometry: actual,
+      capturedPngGeometry: captured,
+      widthDelta: actual.width - baseline.width,
+      heightDelta: actual.height - baseline.height,
+    };
+    await testInfo.attach(`${screenshotName} geometry diagnostics`, {
+      body: JSON.stringify(diagnostics, null, 2),
+      contentType: "application/json",
+    });
+
+    expect(
+      actual,
+      `${screenshotName} capture geometry changed: classification=${classification}; ` +
+        `expected baseline ${baseline.width}x${baseline.height}, measured DOM ${actual.width}x${actual.height}, ` +
+        `captured PNG ${captured.width}x${captured.height}. ` +
+        `If classification=layout, fix the rendered layout before refreshing baselines; ` +
+        `if classification=harness, fix readCaptureGeometry().`,
+    ).toEqual(baseline);
+  }
+
   expect(
     actual,
     `${screenshotName} capture geometry changed: expected ${baseline.width}x${baseline.height}, ` +
