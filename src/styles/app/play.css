@@ -55,9 +55,9 @@
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) auto;
   gap: 14px;
   align-items: center;
-  margin: -4px 0 16px;
+  margin:-4px 0 16px;
   padding: 12px 14px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-teal-deep);
   border: 1px solid var(--c-gray-37);
   border-radius: 8px;
@@ -95,7 +95,7 @@
   letter-spacing: 0.05em;
 }
 .continuity-bridge strong {
-  color: var(--c-paper);
+  color:var(--c-paper);
   font-size: 13px;
 }
 .continuity-bridge p {
@@ -111,7 +111,7 @@
   background: linear-gradient(135deg, rgba(14, 49, 43, 0.96), rgba(28, 63, 55, 0.92));
   border: 1px solid rgba(217, 255, 98, 0.32);
   border-radius: 8px;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .operator-bridge-heading {
   display: grid;
@@ -148,7 +148,7 @@
 .operator-bridge-grid b {
   font-size: 12px;
   line-height: 1.5;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .operator-bridge-movement {
   grid-column: 1 / -1;
@@ -174,7 +174,7 @@
   display: grid;
   gap: 16px;
   padding: 18px 20px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: linear-gradient(125deg, #0b2622 0%, #123c34 58%, #1c493b 100%);
   border: 1px solid rgba(217, 255, 98, 0.45);
   border-left: 6px solid var(--c-acid);
@@ -225,7 +225,7 @@
 .operator-identity strong {
   font-size: 23px;
   line-height: 1.15;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .chapter-console p {
   margin: 0;
@@ -271,7 +271,7 @@
 .chapter-rule strong {
   font-size: 16px;
   line-height: 1.35;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .authority-action {
   display: flex;
@@ -347,7 +347,7 @@
 }
 .relationship-strip b {
   font-size: 11px;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .relationship-strip i {
   display: block;
@@ -390,7 +390,7 @@
 }
 .mystery-board > div:first-child b {
   font-size: 12px;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .mystery-clues {
   display: grid;
@@ -407,7 +407,7 @@
 }
 .mystery-clues strong {
   font-size: 11px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   line-height: 1.35;
 }
 .mystery-clues p,
@@ -438,7 +438,7 @@
 .chapter-transfer-route strong {
   font-size: 16px;
   line-height: 1.35;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .chapter-transfer-reason {
   padding-left: 14px;
@@ -465,7 +465,7 @@
 }
 .authority-level strong {
   font-size: 16px;
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .authority-level small {
   color: var(--c-line-soft);
@@ -520,7 +520,7 @@
   border-color: var(--c-acid);
 }
 .chapter-rail span.active {
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .chapter-rail span.active i {
   color: #0b2622;
@@ -615,7 +615,7 @@
   grid-template-columns: auto minmax(0, 1fr) minmax(180px, 0.8fr);
   gap: 16px;
   align-items: center;
-  margin: -4px 0 16px;
+  margin:-4px 0 16px;
   padding: 14px 16px;
   border: 1px solid var(--c-gray-81);
   border-left: 5px solid var(--c-mint-43);
@@ -671,16 +671,16 @@
   margin: 0;
   color: var(--c-ink-soft);
 }
-.suspense-console {
+.suspense-console,.story-turn-panel {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(150px, 0.65fr);
+  grid-template-columns:auto 1fr minmax(150px,.65fr);
   gap: 16px;
   align-items: center;
-  margin: -4px 0 16px;
-  padding: 13px 15px;
-  color: var(--c-paper);
+  margin:-4px 0 16px;
+  padding:13px 15px;
+  color:var(--c-paper);
   background: var(--c-ink);
-  border: 1px solid var(--c-mint-30);
+  border:1px solid var(--c-mint-30);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(24, 32, 31, 0.14);
 }
@@ -927,7 +927,7 @@
 .decision-reveal.suspense-twist {
   border-top-color: var(--c-acid);
   background: var(--c-ink-12);
-  color: var(--c-paper);
+  color:var(--c-paper);
   box-shadow:
     0 0 0 1px rgba(217, 255, 98, 0.25),
     0 24px 80px rgba(167, 67, 50, 0.32);
@@ -946,7 +946,7 @@
   color: var(--c-ink-faint);
 }
 .decision-reveal.suspense-twist .decision-reveal-beat .spoken-line {
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .decision-reveal.suspense-twist .decision-reveal-consequence {
   color: var(--c-danger-81);
@@ -1023,7 +1023,7 @@
   gap: 5px;
   min-height: 42px;
   padding: 0 15px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-teal-deep);
   border: 0;
   border-radius: 6px;
@@ -1369,9 +1369,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: -4px 0 16px;
+  margin:-4px 0 16px;
   padding: 14px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-danger-deep);
   border: 1px solid var(--c-danger-45);
   border-radius: 8px;
@@ -1499,7 +1499,7 @@
   align-items: start;
   padding: 22px;
   background: var(--c-ink);
-  color: var(--c-paper);
+  color:var(--c-paper);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -1677,7 +1677,7 @@
 }
 .scene-body {
   padding: 15px 17px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(217, 255, 98, 0.2);
   border-left: 4px solid var(--c-acid);
@@ -1687,7 +1687,7 @@
   line-height: 1.75;
 }
 .scene-dialogue {
-  padding: 13px 15px;
+  padding:13px 15px;
   color: var(--c-ink);
   background: var(--c-acid);
   border-radius: 7px;
@@ -1716,7 +1716,7 @@
 }
 .insight-drawer {
   margin-top: 12px;
-  padding: 13px 15px;
+  padding:13px 15px;
   background: var(--c-paper);
   border: 1px solid var(--c-line);
   border-radius: 8px;
@@ -1898,7 +1898,7 @@
   flex: 0 0 auto;
   min-height: 34px;
   padding: 0 10px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-warn-deep);
   border: 0;
   border-radius: 5px;
@@ -2157,7 +2157,7 @@
   gap: 14px;
   margin-top: 16px;
   padding: 12px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: rgba(24, 32, 31, 0.94);
   border: 1px solid rgba(217, 255, 98, 0.48);
   border-left: 5px solid var(--c-acid);
@@ -2186,7 +2186,7 @@
   color: var(--c-acid);
 }
 .decision-dock strong {
-  color: var(--c-paper);
+  color:var(--c-paper);
   font-size: 15px;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -2391,7 +2391,7 @@
   padding: 12px 14px;
   color: var(--c-line-soft);
   background: var(--c-ink-raised);
-  border: 1px solid var(--c-mint-30);
+  border:1px solid var(--c-mint-30);
   border-radius: 7px;
 }
 .live-ledger > div:first-child {
@@ -2426,7 +2426,7 @@
 }
 .live-ledger-stats b {
   margin-left: 4px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   font-size: 12px;
 }
 .choice-action {
@@ -2698,7 +2698,7 @@
   min-height: 34px;
   margin-top: 9px;
   padding: 0 10px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-danger-deep);
   border: 0;
   border-radius: 5px;
@@ -2883,7 +2883,7 @@
 .analyst-card {
   padding: 16px;
   margin-bottom: 18px;
-  color: var(--c-paper);
+  color:var(--c-paper);
   background: var(--c-teal-deep);
   border-radius: 8px;
 }
@@ -2906,13 +2906,13 @@
 .turn-brief {
   padding: 12px;
   background: var(--c-ink);
-  color: var(--c-paper);
+  color:var(--c-paper);
   border: 1px solid var(--c-teal-deep);
   border-radius: 8px;
 }
 .turn-brief > summary span,
 .turn-brief > summary b {
-  color: var(--c-paper);
+  color:var(--c-paper);
 }
 .turn-brief > div {
   display: grid;
