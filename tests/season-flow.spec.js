@@ -728,7 +728,7 @@ test("storage write failure does not block scene start", async ({ page }) => {
     };
   });
   await page.goto("/");
-  await page.locator(".start-input-row button").click();
+  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
   await expect(page.locator(".game-shell")).toBeVisible();
   await expect(page.locator(".choices .choice").first()).toBeVisible();
 });

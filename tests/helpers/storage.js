@@ -10,6 +10,8 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   forceRenderError: "critical-point-force-render-error",
   telemetryUrl: "critical-point-telemetry-url",
   telemetryKey: "critical-point-telemetry-key",
+  musicEnabled: "critical-point-music-enabled",
+  musicVolume: "critical-point-music-volume",
 });
 
 export async function clearGameStorage(page) {

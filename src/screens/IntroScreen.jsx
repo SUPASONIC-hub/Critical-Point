@@ -1,32 +1,11 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
+import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 
-function playOpeningAccent() {
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    const context = new AudioContextClass();
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(110, context.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(220, context.currentTime + 0.16);
-    gain.gain.setValueAtTime(0.0001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.045, context.currentTime + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.2);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.21);
-    window.setTimeout(() => context.close?.(), 260);
-  } catch {
-    // Audio is an enhancement; browsers may reject it during a gesture.
-  }
-}
 export function IntroScreen({ view }) {
   const [openingBurst, setOpeningBurst] = useState(false);
   const openingBurstRef = useRef(false);

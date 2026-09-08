@@ -145,7 +145,7 @@ try {
           ...(
             hasExplicitTestTarget
               ? []
-              : ["tests/accessibility.spec.js", "tests/contrast.spec.js", "tests/save-integrity.spec.js", "tests/season-flow.spec.js"]
+              : ["tests/accessibility.spec.js", "tests/audio-preference.spec.js", "tests/contrast.spec.js", "tests/save-integrity.spec.js", "tests/season-flow.spec.js"]
           ),
           ...(process.env.CI ? ["--workers=1", "--retries=1"] : []),
           ...forwardedArgs,
