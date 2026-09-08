@@ -1546,9 +1546,8 @@ summary:focus-visible {
   color: var(--c-green-87);
 }
 .intro-visual {
-  width: min(920px, 100%);
-  margin-inline: auto;
-  border-color: rgba(217, 255, 98, 0.55);
+  width:calc(100% + 56px); margin:0 -28px;
+  border-color:var(--c-acid);border-radius:0;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
 }
 .start-priority,
