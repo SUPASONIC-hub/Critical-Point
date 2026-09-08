@@ -306,7 +306,7 @@ export function PlayScreen({ view }) {
             <small>{suspenseState.cue} · 사건 {suspenseState.caseCode}</small>
           </div>
         </section>
-        <section className="story-turn-panel" aria-label="story turn"><div className="story-turn-mark"><span>STORY TURN</span><strong>!</strong></div><div><h2>{node.title}</h2><p>{narrativeSpine.consequence}</p></div><p className="story-turn-question">{narrativeSpine.question}</p></section>
+        <section className="story-turn-panel" data-testid="story-turn-panel" aria-label="story turn"><div className="story-turn-mark"><span>STORY TURN</span><strong>!</strong></div><div><small>TURN {String(narrativeSpine.turn).padStart(2,"0")}</small><h2>{node.title}</h2><p>{narrativeSpine.consequence}</p></div><p className="story-turn-question">{narrativeSpine.question}</p></section>
         <details className="play-help">
           <summary>
             <span>
