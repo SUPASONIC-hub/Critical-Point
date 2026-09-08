@@ -4,7 +4,7 @@ import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 test.use({ colorScheme: "light" });
 
-async function stabilizeVisualPage(page) {
+async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -12,6 +12,16 @@ async function stabilizeVisualPage(page) {
         transition: none !important;
         caret-color: transparent !important;
       }
+      /* Blanked, not removed: every element here is one a player sees, so its
+         box is a real layout fact the baseline should keep. Only the content is
+         noise. The music controls are in this group for determinism, not for
+         geometry -- they are position: fixed and contribute no height either
+         way, but the toggle's label, icon, background colour and even the
+         number of buttons all change with audioState and modeKey
+         (src/components/AdaptiveMusic.jsx:473-512), and the CI container may
+         have no audio device at all (tests/helpers/gameFlow.js:210 already
+         filters that error), so a rendered control would differ between
+         captures and between platforms. */
       .debug-overlay,
       .music-controls,
       .music-toggle,
@@ -22,9 +32,43 @@ async function stabilizeVisualPage(page) {
       [data-testid="session-code"] {
         visibility: hidden !important;
       }
+      /* Debug-only chrome, taken out of the flow rather than blanked. The
+         ?debug=1 entry turns all four on in the harness (tests/helpers/gameFlow.js:27,
+         src/appConfig.js:22) and nothing turns them on for a player, so leaving
+         their boxes behind would bake vertical space no player can ever see into
+         the two result baselines: 96px of diagnostics blocks on both, plus 100px
+         of buttons on mobile, where src/styles/app/responsive.css:196-212 stacks
+         .top-actions into full-width rows. Neither debug button has a class of
+         its own; aria-expanded is the error-log disclosure's only signature in
+         this row (src/screens/ResultScreen.jsx:208) and the export button
+         carries a testid (:224). The expectMasked guard below is what keeps
+         those two selectors honest. */
+      .telemetry-stats,
+      .replay-diagnostics,
+      .result-page .top-actions button[aria-expanded],
+      .result-page .top-actions [data-testid="export-diagnostic-log"] {
+        display: none !important;
+      }
     `,
   });
+
+  // A mask selector that silently stops matching would put debug chrome back
+  // into a baseline without failing anything, so assert both halves: the target
+  // is still in the DOM, and it no longer takes up space.
+  for (const selector of expectMasked) {
+    await expect(page.locator(selector), `mask selector matched nothing: ${selector}`).not.toHaveCount(0);
+    await expect(page.locator(`${selector}:visible`), `mask selector left something rendered: ${selector}`).toHaveCount(0);
+  }
 }
+
+// The four selectors the display:none block above has to keep hitting on a
+// result capture. Intro and play captures never render them.
+const RESULT_MASK_SELECTORS = [
+  ".telemetry-stats",
+  ".replay-diagnostics",
+  ".result-page .top-actions button[aria-expanded]",
+  '.result-page .top-actions [data-testid="export-diagnostic-log"]',
+];
 
 function readPngSize(file) {
   const buffer = readFileSync(file);
@@ -55,6 +99,15 @@ async function readCaptureGeometry(target, { fullPage = false } = {}) {
 }
 
 async function expectCaptureGeometry(target, testInfo, screenshotName, options = {}) {
+  // `--update-snapshots` exists to rewrite the baseline; this gate exists to stop
+  // a *comparison* run from rewriting one without an explanation. Leaving it
+  // armed in record mode makes recording impossible: the throw below lands before
+  // toHaveScreenshot() is ever reached, so neither a local refresh nor the
+  // workflow's update_baselines dispatch (.github/workflows/visual-regression.yml:55)
+  // could record a drifted screen. This is a positive allowlist on purpose --
+  // the default "missing" and an explicit "none" both keep the gate armed, so
+  // comparison runs are unchanged.
+  if (testInfo.config.updateSnapshots === "all" || testInfo.config.updateSnapshots === "changed") return;
   const baselinePath = testInfo.snapshotPath(screenshotName, { kind: "screenshot" });
   expect(existsSync(baselinePath), `visual baseline is missing: ${baselinePath}`).toBe(true);
   const baseline = readPngSize(baselinePath);
@@ -160,7 +213,12 @@ test("case result desktop visual baseline @visual", async ({ page }, testInfo) =
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
-  await stabilizeVisualPage(page);
+  await stabilizeVisualPage(page, { expectMasked: RESULT_MASK_SELECTORS });
+  // Eight buttons render under ?debug=1 and six of them are the player's. If the
+  // first line breaks the row changed; if only the second breaks, a mask
+  // selector went stale.
+  await expect(page.locator(".result-page .top-actions button")).toHaveCount(8);
+  await expect(page.locator(".result-page .top-actions button:visible")).toHaveCount(6);
   // The report prints numbers derived from real response times, so a few
   // hundred glyph pixels differ every run. The budget is wide enough to ignore
   // those and narrow enough that a moved block still fails.
@@ -199,7 +257,9 @@ test("case result mobile visual baseline @visual", async ({ page }, testInfo) =>
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
-  await stabilizeVisualPage(page);
+  await stabilizeVisualPage(page, { expectMasked: RESULT_MASK_SELECTORS });
+  await expect(page.locator(".result-page .top-actions button")).toHaveCount(8);
+  await expect(page.locator(".result-page .top-actions button:visible")).toHaveCount(6);
   const resultPage = page.locator(".result-page");
   await expectCaptureGeometry(resultPage, testInfo, "case-result-mobile.png");
   await expect(resultPage).toHaveScreenshot("case-result-mobile.png", {
