@@ -583,10 +583,10 @@ export function PlayScreen({ view }) {
           </section>
         )}
 
-        <section className="choice-panel" id="choice-panel" tabIndex={-1}>
+        <section className="choice-panel" id="choice-panel" aria-labelledby="choice-heading" tabIndex={-1}>
           <DecisionRail pendingChoice={pendingChoice} />
           <div className="choice-heading">
-            <h2>어떻게 말할까</h2>`n            <p className="choice-question">{narrativeSpine.question}</p>
+            <h2 id="choice-heading">어떻게 말할까</h2>`n            <p className="choice-question">{narrativeSpine.question}</p>
             <p>
               어떤 선택도 무료가 아닙니다. 지금 고르는 말은 한 자원을 올리는 대신 다른
               부담을 다음 장면으로 넘깁니다.
