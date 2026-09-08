@@ -1,11 +1,36 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 
+function playOpeningAccent() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(110, context.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(220, context.currentTime + 0.16);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.045, context.currentTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.2);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.21);
+    window.setTimeout(() => context.close?.(), 260);
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
+}
 export function IntroScreen({ view }) {
+  const [openingBurst, setOpeningBurst] = useState(false);
+  const openingBurstRef = useRef(false);
+  const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
   const {
     common: {
@@ -38,8 +63,26 @@ export function IntroScreen({ view }) {
   const Music = AdaptiveMusic;
   const onShowRanking = view.common.setShowRanking;
   const gameTitle = GAME_TITLE;
+  useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
+
+  function beginOpeningBurst(callback) {
+    if (openingBurstRef.current) return;
+    openingBurstRef.current = true;
+    setOpeningBurst(true);
+    playOpeningAccent();
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    openingTimerRef.current = window.setTimeout(() => {
+      openingBurstRef.current = false;
+      setOpeningBurst(false);
+      callback();
+    }, reducedMotion ? 140 : 860);
+  }
+
+  const startNewRun = () => beginOpeningBurst(startGame);
+  const startNewGamePlusRun = () => beginOpeningBurst(startNewGamePlus);
+  const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId));
   return (
-      <main className="shell intro-shell">
+      <main className="shell intro-shell" aria-busy={openingBurst}>
         <Music modeKey={musicModeKey} />
         {renderRecoveryNotice()}
         {renderErrorLogPanel()}
@@ -89,7 +132,7 @@ export function IntroScreen({ view }) {
             <figcaption>
               <span>TRIGGERLAB NIGHT SHIFT</span>
               <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
-              <div className="start-input-row"><button type="button" onClick={startGame}><ChevronRight size={18} />첫 사건 진입</button></div>
+              <div className="start-input-row"><button type="button" onClick={startNewRun} disabled={openingBurst}><ChevronRight size={18} />첫 사건 진입</button></div>
             </figcaption>
           </figure>
           <section className="start-priority" aria-label="게임 시작 준비">
@@ -134,16 +177,16 @@ export function IntroScreen({ view }) {
                 value={playerName}
                 maxLength={PLAYER_NAME_MAX_LENGTH}
                 onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
-                onKeyDown={(event) => event.key === "Enter" && startGame()}
+                onKeyDown={(event) => event.key === "Enter" && startNewRun()}
                 placeholder="이름을 입력하세요"
               />
-              <button type="button" onClick={startGame}>
+              <button type="button" onClick={startNewRun} disabled={openingBurst}>
                 <ChevronRight size={18} />
                 첫 케이스 시작
               </button>
             </div>
             {newGamePlusUnlocked && (
-              <button type="button" className="new-game-plus-button" onClick={startNewGamePlus}>
+              <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={openingBurst}>
                 <Sparkles size={16} />
                 NEW GAME+ 시작
               </button>
@@ -471,7 +514,7 @@ export function IntroScreen({ view }) {
                 caseItem.status === "PLAYING" ||
                 caseItem.status === "COMPLETE";
               function openCaseFromCard() {
-                if (canOpenCase) startCase(caseItem.id);
+                if (canOpenCase) startCaseRun(caseItem.id);
               }
               return (
                 <GuardedButton
@@ -512,6 +555,16 @@ export function IntroScreen({ view }) {
             })}
           </div>
         </section>
+        {openingBurst && (
+          <div className="opening-burst" data-testid="opening-burst" role="status" aria-live="polite" aria-label="첫 사건으로 진입 중">
+            <div className="opening-burst-grid" aria-hidden="true" />
+            <div className="opening-burst-panel">
+              <span>CREATIVITY BURST / CASE 01 ACCESS</span>
+              <strong>첫 판단 조건 동기화 중</strong>
+              <i aria-hidden="true" />
+            </div>
+          </div>
+        )}
       </main>
 );
 }
