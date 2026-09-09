@@ -102,6 +102,12 @@ has to keep, and the commands that prove it. What changed and why is in
     button that did not start the game rather than open the door. The setup
     console keeps its fields and stays expanded; everything optional folds.
 25. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+26. Every procedural cue reads the mute preference before it touches the audio
+    graph. `playOpeningAccent`, `playTargetLockCue` and `playDecisionRevealCue`
+    all open with that check -- the start accent lost it once and played for
+    someone who had muted. A cue that can only fire mid-run may bail when the
+    shared `AudioContext` is missing; one that can fire on the first click has
+    to build it inside the gesture instead.
 
 ## Verification Commands
 
