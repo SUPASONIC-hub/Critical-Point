@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { LockKeyhole } from "lucide-react";
 
+import { playTargetLockCue } from "./AdaptiveMusic.jsx";
 import { isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
 
 export function CommitConsole({
@@ -17,8 +19,18 @@ export function CommitConsole({
   setPendingChoice,
   choose,
 }) {
+  // The cue belongs to the console rather than to the runtime: it marks this
+  // panel opening, and it has to re-fire when the player stages another choice
+  // without closing it first.
+  const stagedChoiceId = pendingChoice?.id ?? null;
+  useEffect(() => {
+    if (!stagedChoiceId) return;
+    playTargetLockCue();
+  }, [stagedChoiceId]);
+
   if (!pendingChoice || !pendingChoiceRead || !pendingChoiceForecast) return null;
   const observerPreview = getObserverPreviewForChoice(pendingChoice.id);
+  const targetLock = pendingChoiceRead.targetLock;
 
   return (
     <section
@@ -41,10 +53,29 @@ export function CommitConsole({
           압력 <b>{pendingChoiceForecast.afterRisk}</b>
         </span>
       </div>
+      {targetLock && (
+        <div className="commit-console-readout commit-target-lock" data-testid="commit-target-lock" aria-label="결정 목표 잠금">
+          {Object.entries(targetLock).map(([key, item]) => (
+            <span key={key} className={`commit-target-lock-row ${item.tone}`}>
+              {item.label} <b>{item.value}</b>
+            </span>
+          ))}
+        </div>
+      )}
       <details className="commit-console-detail">
         <summary>
-          <span>관찰자 반응과 예상 자원</span>
+          <span>목표 잠금 설명과 관찰자 반응</span>
         </summary>
+        {targetLock && (
+          <dl className="commit-target-lock-notes">
+            {Object.entries(targetLock).map(([key, item]) => (
+              <div key={key}>
+                <dt>{item.label}</dt>
+                <dd>{item.text}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
         {observerPreview && (
           <div className="commit-observer-preview">
             <span>{observerPreview.tag.label}</span>

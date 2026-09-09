@@ -332,6 +332,9 @@ test("mobile commit console opens inside the viewport", async ({ page }) => {
 
   // Every row the console keeps is a choice card it hides, so its footprint is
   // a budget too: it was 356px and covered two cards including the selected one.
+  // 240 until 2026-09-09, when the target-lock chips added a row; the covered
+  // card count below is the harm the height was standing in for, and it went
+  // from one card to none over the same change.
   const footprint = await page.evaluate(() => {
     const box = document.querySelector(".commit-console").getBoundingClientRect();
     const fullyCovered = [...document.querySelectorAll(".choices .choice")].filter((el) => {
@@ -340,7 +343,7 @@ test("mobile commit console opens inside the viewport", async ({ page }) => {
     }).length;
     return { height: Math.round(box.height), fullyCovered };
   });
-  expect(footprint.height).toBeLessThan(240);
+  expect(footprint.height).toBeLessThan(260);
   expect(footprint.fullyCovered).toBeLessThanOrEqual(1);
 });
 

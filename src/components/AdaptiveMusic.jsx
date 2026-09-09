@@ -344,6 +344,39 @@ export function playOpeningAccent() {
   }
 }
 
+export function playTargetLockCue() {
+  try {
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    const context = audioRuntime.context;
+    if (!context) return;
+    Promise.resolve(context.resume?.()).catch(() => {});
+
+    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+    const peak = ACCENT_PEAK_GAIN * 0.72 * multiplier;
+    const now = context.currentTime;
+    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
+    const notes = [196, 246.94, 293.66];
+
+    notes.forEach((frequency, index) => {
+      const start = now + index * 0.045;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(frequency, start);
+      oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.06, start + 0.09);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
+      oscillator.connect(gain);
+      gain.connect(destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.13);
+    });
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
+}
+
 export function AdaptiveMusic({ modeKey }) {
   const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
   const [volumePreset, setVolumePreset] = useState(() =>

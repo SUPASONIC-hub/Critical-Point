@@ -34,6 +34,7 @@ import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerL
 import { nodes } from "../src/gameData.js";
 import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
+import { createDecisionTargetLock } from "../src/viewModels/playChoiceViewModel.js";
 
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
@@ -370,4 +371,28 @@ test("streak rewards take priority in immediate choice feedback", () => {
   });
   assert.equal(feedback.label, "STREAK PAYOUT");
   assert.equal(feedback.text, "연속 보상");
+});
+
+test("decision target lock summarizes objective, streak, and evidence without numeric forecasts", () => {
+  const lock = createDecisionTargetLock({
+    pendingChoiceRead: { challengeMatch: true },
+    sceneChallenge: { title: "Lower risk pressure" },
+    currentChallengeStreak: 2,
+    hiddenEvidenceCandidate: { id: "clue" },
+  });
+  assert.equal(lock.objective.value, "LOCKED");
+  assert.equal(lock.streak.value, "PAYOUT READY");
+  assert.equal(lock.evidence.value, "CAN OPEN");
+  assert.doesNotMatch(JSON.stringify(lock), /[+-]\d/);
+});
+
+test("decision target lock marks a choice that misses the scene objective", () => {
+  const lock = createDecisionTargetLock({
+    pendingChoiceRead: { challengeMatch: false },
+    sceneChallenge: { title: "Find hidden cost" },
+    currentChallengeStreak: 1,
+  });
+  assert.equal(lock.objective.value, "OFF TARGET");
+  assert.equal(lock.streak.value, "CHAIN BREAKS");
+  assert.equal(lock.evidence.value, "NO SIGNAL");
 });

@@ -240,6 +240,14 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
   await startDebugNode(page, "case05", "c5_voice");
   await page.locator(".choices .choice").first().click();
 
+  const targetLock = page.getByTestId("commit-target-lock");
+  await expect(targetLock).toBeVisible();
+  await expect(targetLock.locator(".commit-target-lock-row")).toHaveCount(3);
+  await expect(targetLock).toContainText("목표");
+  await expect(targetLock).toContainText("연속");
+  await expect(targetLock).toContainText("증거");
+  expect(await targetLock.innerText()).not.toMatch(/[+-]\d/);
+
   const commitButton = page.getByTestId("commit-confirm");
   await expect(commitButton).toBeVisible();
   const commitBox = await commitButton.boundingBox();

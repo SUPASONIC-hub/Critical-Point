@@ -632,6 +632,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     mergeEffects,
     getClueReveal,
     getEffectiveChoiceRead,
+    getPendingChoiceRead,
   } = useMemo(
     () =>
       createChoiceReaders({
@@ -677,7 +678,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
   const pendingChoiceRead = pendingChoice
-    ? getEffectiveChoiceRead(pendingChoice, pendingChoice.effect, pendingChoice.cognition)
+    ? getPendingChoiceRead(pendingChoice, Math.max(1, DECISION_WINDOW_SECONDS - getDecisionSeconds()))
     : null;
   const pendingChoiceForecast = pendingChoiceRead
     ? addForecastUncertainty(

@@ -3,6 +3,7 @@ import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 const ACCENT_PEAK_GAIN = 0.045;
 const LOW_PRESET_MULTIPLIER = 0.58;
+const TARGET_LOCK_GAIN_RATIO = 0.72;
 
 /* The probe counts the objects that can make sound instead of listening for it:
    headless Chromium has no audio device, but node creation is still observable. */
@@ -105,4 +106,14 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
   expect(after.contexts).toBe(1);
   const accentTarget = after.gainTargets.find((value) => Math.abs(value - expectedPeak) < 1e-5);
   expect(accentTarget).toBeCloseTo(expectedPeak, 5);
+
+  const beforeLock = await readProbe(page);
+  await page.locator(".choices .choice").first().click();
+  await expect(page.getByTestId("commit-target-lock")).toBeVisible();
+
+  const afterLock = await readProbe(page);
+  const expectedLockPeak = ACCENT_PEAK_GAIN * TARGET_LOCK_GAIN_RATIO * LOW_PRESET_MULTIPLIER;
+  expect(afterLock.oscillators).toBeGreaterThanOrEqual(beforeLock.oscillators + 3);
+  const lockTarget = afterLock.gainTargets.find((value) => Math.abs(value - expectedLockPeak) < 1e-5);
+  expect(lockTarget).toBeCloseTo(expectedLockPeak, 5);
 });
