@@ -9,6 +9,8 @@ const dryRun = args.includes("--dry-run");
 const cycleCount = readNumberFlag("--cycles", 1);
 const fromRole = readStringFlag("--from", "pm");
 const taskBrief = readStringFlag("--brief", "");
+const provider = readStringFlag("--provider", process.env.AGENT_PROVIDER || "codex");
+const agentModel = readStringFlag("--model", process.env.AGENT_MODEL || "");
 const codexSandbox = process.env.CODEX_SANDBOX || "workspace-write";
 
 const roles = [
@@ -32,11 +34,11 @@ if (initialStatus && !dryRun) {
   fail("working tree is not clean; review or stash existing changes before starting an agent cycle");
 }
 
-const codexCommand = process.env.CODEX_CLI || (process.platform === "win32" ? join(process.env.APPDATA || "", "npm", "codex.ps1") : "codex");
-const codexScript = process.platform === "win32" ? join(resolve(codexCommand, ".."), "node_modules", "@openai", "codex", "bin", "codex.js") : codexCommand;
-if (!dryRun && process.platform === "win32" && !existsSync(codexScript)) {
-  fail(`Codex CLI was not found at ${codexScript}. Set CODEX_CLI to its executable path.`);
+const runners = { codex: resolveCodexRunner, claude: resolveClaudeRunner };
+if (!Object.hasOwn(runners, provider)) {
+  fail(`Unknown provider "${provider}". Use: ${Object.keys(runners).join(", ")}`);
 }
+const runner = runners[provider]();
 
 for (let cycle = 1; cycle <= cycleCount; cycle += 1) {
   const runId = `${timestamp()}-cycle-${cycle}`;
@@ -44,7 +46,7 @@ for (let cycle = 1; cycle <= cycleCount; cycle += 1) {
   mkdirSync(runDir, { recursive: true });
   writeFileSync(join(runDir, "00-manifest.md"), createManifest(runId, cycle), "utf8");
 
-  console.log(`\nAgent cycle ${cycle}/${cycleCount}: ${runId}`);
+  console.log(`\nAgent cycle ${cycle}/${cycleCount}: ${runId} (${provider})`);
   for (let index = startIndex; index < roles.length; index += 1) {
     const role = roles[index];
     const reportPath = join(runDir, role.report);
@@ -56,7 +58,7 @@ for (let cycle = 1; cycle <= cycleCount; cycle += 1) {
       continue;
     }
 
-    await runCodex(prompt, reportPath);
+    await runAgent(prompt, reportPath);
     if (!existsSync(reportPath)) {
       fail(`${role.id} did not produce ${role.report}`);
     }
@@ -96,18 +98,72 @@ function createPrompt(role, reportPath, runDir, cycle) {
     "When your role is complete, write the report to the exact path above and summarize the result in your final response.";
 }
 
-function runCodex(prompt, reportPath) {
+function resolveCodexRunner() {
+  const command = process.env.CODEX_CLI || (process.platform === "win32" ? join(process.env.APPDATA || "", "npm", "codex.ps1") : "codex");
+  const script = process.platform === "win32" ? join(resolve(command, ".."), "node_modules", "@openai", "codex", "bin", "codex.js") : command;
+  if (!dryRun && process.platform === "win32" && !existsSync(script)) {
+    fail(`Codex CLI was not found at ${script}. Set CODEX_CLI to its executable path.`);
+  }
+  return {
+    file: process.platform === "win32" ? process.execPath : command,
+    buildArgs: (reportPath) => [
+      ...(process.platform === "win32" ? [script] : []),
+      "--ask-for-approval",
+      "never",
+      "exec",
+      "-s",
+      codexSandbox,
+      "--ephemeral",
+      "-C",
+      root,
+      ...(agentModel ? ["-m", agentModel] : []),
+      "-o",
+      reportPath,
+      "-",
+    ],
+    capturesReport: false,
+  };
+}
+
+function resolveClaudeRunner() {
+  const command = process.env.CLAUDE_CLI || (process.platform === "win32"
+    ? join(process.env.APPDATA || "", "npm", "node_modules", "@anthropic-ai", "claude-code", "bin", "claude.exe")
+    : "claude");
+  if (!dryRun && process.platform === "win32" && !existsSync(command)) {
+    fail(`Claude CLI was not found at ${command}. Set CLAUDE_CLI to its executable path.`);
+  }
+  return {
+    file: command,
+    buildArgs: () => ["-p", "--permission-mode", "bypassPermissions", ...(agentModel ? ["--model", agentModel] : [])],
+    capturesReport: true,
+  };
+}
+
+function runAgent(prompt, reportPath) {
   return new Promise((resolvePromise, reject) => {
-    const commandArgs = ["--ask-for-approval", "never", "exec", "-s", codexSandbox, "--ephemeral", "-C", root, "-o", reportPath, "-"];
-    const child = spawn(process.platform === "win32" ? process.execPath : codexCommand, process.platform === "win32" ? [codexScript, ...commandArgs] : commandArgs, {
+    const child = spawn(runner.file, runner.buildArgs(reportPath), {
       cwd: root,
-      stdio: ["pipe", "inherit", "inherit"],
+      stdio: ["pipe", runner.capturesReport ? "pipe" : "inherit", "inherit"],
       windowsHide: true,
     });
+    let transcript = "";
+    if (runner.capturesReport) {
+      child.stdout.setEncoding("utf8");
+      child.stdout.on("data", (chunk) => {
+        transcript += chunk;
+        process.stdout.write(chunk);
+      });
+    }
     child.on("error", reject);
     child.on("close", (code) => {
-      if (code === 0) resolvePromise();
-      else reject(new Error(`codex exec exited with code ${code}`));
+      if (code !== 0) {
+        reject(new Error(`${provider} exec exited with code ${code}`));
+        return;
+      }
+      if (runner.capturesReport && transcript.trim() && !existsSync(reportPath)) {
+        writeFileSync(reportPath, `${transcript.trim()}\n`, "utf8");
+      }
+      resolvePromise();
     });
     child.stdin.end(prompt);
   });
