@@ -145,8 +145,22 @@ try {
           ...(
             hasExplicitTestTarget
               ? []
-              : ["tests/accessibility.spec.js", "tests/audio-preference.spec.js", "tests/contrast.spec.js", "tests/save-integrity.spec.js", "tests/season-flow.spec.js"]
+              : [
+                  "tests/accessibility.spec.js",
+                  "tests/audio-preference.spec.js",
+                  "tests/contrast.spec.js",
+                  "tests/save-integrity.spec.js",
+                  "tests/season-flow.spec.js",
+                  // The layout ratchets in this file are measurements, not
+                  // screenshots. Leaving the whole spec to `test:visual` -- which
+                  // only greps @visual -- meant nothing ran them: an intro could
+                  // grow back past the reading budget with every gate green.
+                  "tests/visual-regression.spec.js",
+                ]
           ),
+          // Raster comparison stays in its own workflow, so the default run
+          // takes the measurements and leaves the baselines alone.
+          ...(hasExplicitTestTarget ? [] : ["--grep-invert", "@visual"]),
           ...(process.env.CI ? ["--workers=1", "--retries=1"] : []),
           ...forwardedArgs,
         ];

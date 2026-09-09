@@ -18,6 +18,27 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
   return locator.waitFor({ state: "visible", timeout }).then(() => true).catch(() => false);
 }
 
+/**
+ * The intro's entry path, in one place. Every spec that opens a run from the
+ * intro goes through these so the locators live here and not in nine files.
+ */
+export async function startFirstRun(page) {
+  await clickElement(page.getByTestId("start-first-case"), "start first case");
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+export async function resumeSavedRun(page) {
+  await clickElement(page.getByTestId("resume-save"), "resume saved run");
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+/** Pre-start prose sits in closed <details>; force one open to reach a control. */
+export async function openIntroDrawer(page, selector) {
+  await page.locator(`details.intro-drawer:has(${selector})`).evaluate((element) => {
+    element.open = true;
+  });
+}
+
 export async function startDebugNode(page, caseId, nodeId, options = {}) {
   const {
     navigate = true,

@@ -137,6 +137,18 @@ function createStartSave({ playerName, playStyle, dataConsent }) {
   };
 }
 
+/** The three fields the runtime's own resume flips, over an existing save. */
+function createResumedSave(current) {
+  const now = Date.now();
+  return {
+    ...current,
+    started: true,
+    paused: false,
+    nodeEnteredAt: now,
+    savedAt: new Date(now).toISOString(),
+  };
+}
+
 export function AppContent({ onSuppressSaves = suppressSaves }) {
   const replaySeed = useMemo(() => getReplaySeedFromLocation(), []);
   const saved = useMemo(() => readShellSave(), []);
@@ -228,7 +240,21 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     setRuntimeActive(true);
   }
 
+  // GameRuntime reads `started` from the save, so a paused save handed to it
+  // unchanged renders the intro a second time and 이어하기 takes two clicks.
+  // The shell has to write the resume itself, the way the runtime's own
+  // resumeSavedGame does. persist() cannot be reused: it clamps started to
+  // false, which is the whole point of that clamp for preference writes.
+  function persistResumedRun() {
+    const current = readCurrentSave();
+    if (!current) return;
+    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(createResumedSave(current)))) {
+      setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+    }
+  }
+
   function resumeSavedGame() {
+    persistResumedRun();
     resumeSaves();
     setRuntimeActive(true);
   }
@@ -251,7 +277,18 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     setOperatorOrigin,
     sessionCode,
     isOnline,
-    hasResumableSave: Boolean(saved?.currentCase && saved?.nodeId),
+    // A preference write goes through persist(), which materialises a full save
+    // when none exists -- so currentCase and nodeId alone are also true for a
+    // player who only ticked a box. The hero shows 이어하기 for a resumable run,
+    // so the branch has to ask for evidence of an actual run, the way the
+    // runtime's own hasResumableSave does (GameRuntime.jsx).
+    hasResumableSave: Boolean(
+      saved?.currentCase &&
+        saved?.nodeId &&
+        (saved.paused ||
+          (Array.isArray(saved.log) && saved.log.length > 0) ||
+          (Array.isArray(saved.completedCases) && saved.completedCases.length > 0)),
+    ),
     lastSavedAt: saved?.savedAt ?? "",
     log: Array.isArray(saved?.log) ? saved.log : [],
     caseResults: saved?.caseResults ?? {},

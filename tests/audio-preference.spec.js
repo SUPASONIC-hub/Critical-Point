@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { startFirstRun } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 const ACCENT_PEAK_GAIN = 0.045;
@@ -78,9 +79,11 @@ test("muted player hears nothing when the first case starts", async ({ page }) =
   await seedMusicPreference(page, "false", "normal");
   await page.goto("/");
 
-  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
-  await expect(page.getByTestId("opening-burst")).toBeVisible();
-  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  // The burst assertion moved to season-flow's cold-open test, which clicks
+  // raw and can catch the 860ms overlay; startFirstRun waits for the shell, and
+  // the shell is only reachable through the burst callback, so racing a
+  // finished overlay here would only add flake.
+  await startFirstRun(page);
 
   const probe = await readProbe(page);
   expect(probe.contexts).toBe(0);
@@ -98,8 +101,7 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
   expect(before.risingSweeps).toBe(0);
   expect(before.gainTargets.some((value) => Math.abs(value - expectedPeak) < 1e-5)).toBe(false);
 
-  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
-  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  await startFirstRun(page);
 
   const after = await readProbe(page);
   expect(after.risingSweeps).toBeGreaterThanOrEqual(1);

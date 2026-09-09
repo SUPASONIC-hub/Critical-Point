@@ -5,6 +5,9 @@ import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
   completeCurrentCase,
+  openIntroDrawer,
+  resumeSavedRun,
+  startFirstRun,
   startDebugNode as startDebugNodeFromHelper,
 } from "./helpers/gameFlow.js";
 
@@ -163,21 +166,94 @@ test("the complete season can progress from case 01 to the final ending", async 
   expect(saved.completedCases).toContain("final");
 });
 
-test("hero entry guides to setup without starting a fresh run", async ({ page }) => {
+// Was "hero entry guides to setup without starting a fresh run" until 2026-09-09.
+// The old contract said the first-viewport button must NOT start the game; it
+// scrolled to a form instead. This pair replaces it with the opposite contract
+// and keeps the guarantee the old assertion stood in for: the second test seeds
+// an actual resumable run and proves the hero leaves it byte-identical, which
+// the old test could not do because it ran with empty storage.
+test("hero entry opens the first scene in one click", async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/");
-
-  await page.getByRole("button", { name: /첫 사건 진입/ }).click();
-
   await expect(page.locator(".intro")).toBeVisible();
-  await expect(page.getByTestId("opening-burst")).toHaveCount(0);
-  await expect(page.locator("#case-access-setup")).toBeFocused();
-  const savedAfterHeroClick = await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"));
-  expect(savedAfterHeroClick).toBeNull();
+  await expect(page.locator(".choices .choice")).toHaveCount(0);
 
-  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
+  await page.getByTestId("start-first-case").click();
   await expect(page.getByTestId("opening-burst")).toBeVisible();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  await expect(page.locator(".choices .choice").first()).toBeVisible();
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.started).toBe(true);
+  expect(saved.currentCase).toBe("case01");
+  expect(saved.nodeId).toBe("start");
+  // No form was filled: the run carries the default call sign, which is what
+  // makes the one-click open possible.
+  expect(saved.playerName).toBe("분석관");
+});
+
+test("hero entry resumes a saved run without clobbering it", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "trigger-prototype-v2",
+      JSON.stringify({
+        saveSchemaVersion: 2,
+        runId: "e2e-resume-guard",
+        playerName: "E2E",
+        started: false,
+        paused: true,
+        currentCase: "case05",
+        nodeId: "c5_voice",
+        completedCases: ["case01", "case02", "case03", "case04"],
+        discoveredClues: [],
+        log: [{ nodeId: "c5_start", choiceId: "seed" }],
+        pendingTelemetry: [],
+        caseResults: {},
+        playtestFeedback: {},
+        resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 },
+        triggers: {},
+        cognition: {},
+      }),
+    );
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  // With a save present the first-viewport action is resume, and the
+  // fresh-start control is not in the first viewport at all.
+  const resume = page.getByTestId("resume-save");
+  await expect(resume).toBeVisible();
+  const resumeBox = await resume.boundingBox();
+  expect(resumeBox.y + resumeBox.height).toBeLessThanOrEqual(844);
+  const freshBox = await page.getByTestId("start-first-case").boundingBox();
+  expect(freshBox.y).toBeGreaterThan(844);
+
+  // One click, from a plain "/" load: the shell has to write the resume itself
+  // or the runtime mounts on a paused save and renders the intro again.
+  await resumeSavedRun(page);
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.runId).toBe("e2e-resume-guard");
+  expect(saved.currentCase).toBe("case05");
+  expect(saved.nodeId).toBe("c5_voice");
+  expect(saved.log).toHaveLength(1);
+  expect(saved.completedCases).toHaveLength(4);
+});
+
+// A preference write goes through persist(), which materialises a full save
+// when none exists. That save must not turn the hero into a resume button for
+// a run that never happened.
+test("a consent tick does not turn the hero into a resume button", async ({ page }) => {
+  await page.addInitScript(() => localStorage.clear());
+  await page.goto("/");
+  await openIntroDrawer(page, ".data-info-panel");
+  const consentCheckbox = page.locator(".consent-box input");
+  await consentCheckbox.check({ force: true });
+  await consentCheckbox.uncheck({ force: true });
+
+  await page.reload();
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(page.getByTestId("resume-save")).toHaveCount(0);
 });
 
 test("representative branch choices advance without browser runtime errors", async ({ page }) => {
@@ -467,7 +543,7 @@ test("starting a fresh game clears stale recovery guidance", async ({ page }) =>
   });
   await page.goto("/");
   await expect(page.getByText("복구됨")).toBeVisible();
-  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
+  await startFirstRun(page);
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.lastError).toBeNull();
@@ -736,8 +812,7 @@ test("storage write failure does not block scene start", async ({ page }) => {
     };
   });
   await page.goto("/");
-  await page.getByRole("button", { name: /첫 케이스 시작/ }).click();
-  await expect(page.locator(".game-shell")).toBeVisible();
+  await startFirstRun(page);
   await expect(page.locator(".choices .choice").first()).toBeVisible();
 });
 
@@ -1296,6 +1371,7 @@ test("consent opt-out failure keeps consent and pending telemetry intact", async
     };
   });
   await page.goto("/");
+  await openIntroDrawer(page, ".data-info-panel");
   const consentCheckbox = page.locator(".consent-box input");
   await expect(consentCheckbox).toBeChecked();
   await consentCheckbox.click({ force: true });
@@ -1340,6 +1416,7 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   });
 
   await page.goto("/?debug=1");
+  await openIntroDrawer(page, ".data-info-panel");
   await page.locator(".consent-box input").check({ force: true });
   await startDebugNode(page, "case05", "c5_aftershock");
   await completeCurrentCase(page);

@@ -362,18 +362,39 @@ test("intro mobile visual baseline @visual", async ({ page }, testInfo) => {
   });
 });
 
+// The two spec widths plus the three the layout has to survive between them.
 for (const viewport of [
   { name: "desktop", width: 1366, height: 768 },
+  { name: "laptop", width: 1280, height: 720 },
   { name: "mobile", width: 390, height: 844 },
+  { name: "narrow phone", width: 320, height: 844 },
+  { name: "large phone", width: 412, height: 915 },
 ]) {
   test(`intro start controls stay reachable on ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.goto("/");
-    const startButton = page.locator(".start-input-row button").first();
+    const startButton = page.getByTestId("start-first-case");
     await expect(startButton).toBeVisible();
     const box = await startButton.boundingBox();
     expect(box?.y ?? Number.POSITIVE_INFINITY).toBeGreaterThanOrEqual(0);
-    const documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-    expect((box?.y ?? 0) + (box?.height ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(documentHeight);
+    // Was "inside the document" until 2026-09-09, which an eight-screen intro
+    // passed at y=3,000 on an 844px phone. The control the first click needs has
+    // to be in the first viewport, so the viewport is the bound.
+    expect((box?.y ?? 0) + (box?.height ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(viewport.height);
+    const horizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(horizontalOverflow).toBe(0);
   });
 }
+
+// Budget, not a measurement: ratchet it down, never up. The intro was 6,687px on
+// a 390x844 screen -- 7.9 viewports -- against 3,953px for the play screen it was
+// supposed to be the door to.
+test("intro fits a phone reading budget", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.locator(".intro")).toBeVisible();
+  const pageHeight = await page.evaluate(() => document.body.scrollHeight);
+  expect(pageHeight).toBeLessThan(844 * 4);
+});

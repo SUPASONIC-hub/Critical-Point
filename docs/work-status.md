@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-04
+Last updated: 2026-09-09
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in
@@ -67,7 +67,13 @@ has to keep, and the commands that prove it. What changed and why is in
     a canvas at the target width and reading back `toDataURL("image/webp", 0.82)`
     -- the browser is the encoder, so there is no image toolchain to install.
 16. Keep CSS, text, and graph checks budget/schema-based so content drift is caught before it reaches screenshots.
-17. Run heavyweight E2E and visual regression separately from default PR verification because browser raster differences can be environment-sensitive.
+17. Run heavyweight E2E and raster comparison separately from default PR
+    verification because browser raster differences can be environment-sensitive.
+    Only the `@visual` screenshot tests are separate, though. The measurement
+    tests in `visual-regression.spec.js` -- viewport reachability, the intro
+    reading budget, horizontal overflow -- run in the default e2e list with
+    `--grep-invert @visual`. They were in neither list once, so nothing ran
+    them: the intro could have grown back past its budget with every gate green.
 18. The e2e runner takes a free port from the OS. Never pin one: a dev server
     from another checkout answers the `/@vite/client` identity probe, so a
     pinned port lets the suite pass against a different working tree.
@@ -88,7 +94,14 @@ has to keep, and the commands that prove it. What changed and why is in
     major.
 22. Add schema changes as new files in `supabase/migrations/` so the remote migration history stays authoritative. Never edit the applied baseline in place.
 23. Never name a PL/pgSQL variable after a column of a table the same function writes to. `validate_telemetry_insert` did, and the resulting `42702` ambiguity blocked every telemetry insert. Prefix locals with `v_`.
-24. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
+24. The intro's primary action starts the run. One click from a cold load
+    reaches a choice, with the default analyst name and no setup interaction;
+    when a save exists that same slot resumes it in one click. Nothing that
+    merely scrolls or focuses may take that position again, and no test may
+    assert that it does -- one did, and three cycles polished the copy of a
+    button that did not start the game rather than open the door. The setup
+    console keeps its fields and stays expanded; everything optional folds.
+25. Keep anon's read rules on the table, not in a view. `playtest_sessions` pairs an RLS policy (completed season rows) with a column-level grant (no `decision_log`, `session_id` or `id`), so `public_rankings` can stay `security_invoker = true` and any future reader inherits the same limits. A `security_definer` view would work too, but it moves the whole boundary into the view body and Supabase's advisor flags it as critical.
 
 ## Verification Commands
 

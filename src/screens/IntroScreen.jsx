@@ -10,7 +10,6 @@ export function IntroScreen({ view }) {
   const [openingBurst, setOpeningBurst] = useState(false);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
-  const startSetupRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
   const {
     common: {
@@ -61,13 +60,39 @@ export function IntroScreen({ view }) {
   const startNewRun = () => beginOpeningBurst(startGame);
   const startNewGamePlusRun = () => beginOpeningBurst(startNewGamePlus);
   const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId));
-  function showCaseAccessSetup() {
-    const setup = startSetupRef.current;
-    if (!setup) return;
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    setup.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
-    setup.focus({ preventScroll: true });
-  }
+  // One node with two homes. With no save it is the hero's primary action, so
+  // the first click on the page opens the first scene; with a save it sits back
+  // beside the name input, below the fold, so overwriting a run stays a
+  // deliberate act. Rendering it in both places at once would make every
+  // strict-mode locator in the suite ambiguous.
+  const startFirstCaseButton = (
+    <button type="button" data-testid="start-first-case" onClick={startNewRun} disabled={openingBurst}>
+      <ChevronRight size={18} />
+      첫 케이스 시작
+    </button>
+  );
+  const resumePanel = (
+    <div className="resume-panel">
+      <div>
+        <span>저장된 진행</span>
+        {/* The scene title and the route position are read from the
+            graph, which the pre-start shell has not loaded. It prints
+            the case and the save time instead of guessing them. */}
+        <strong>
+          {activeCaseMeta?.label ?? "현재 사건"}
+          {node?.title ? ` · ${node.title}` : ""}
+        </strong>
+        <small>
+          {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
+          {progress === null ? "" : ` · 진행률 ${progress}%`}
+        </small>
+      </div>
+      <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
+        <ChevronRight size={18} />
+        이어하기
+      </button>
+    </div>
+  );
   return (
       <main className="shell intro-shell" aria-busy={openingBurst}>
         <Music modeKey={musicModeKey} />
@@ -99,11 +124,11 @@ export function IntroScreen({ view }) {
             </div>
           </div>
           <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
-          {nextParticipantMessage && (
-            <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
-          )}
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
-          <StudioCredit />
+          {/* The studio credit and the returning-player line sit below the key
+              visual on purpose: above it they spend the first viewport on an
+              attribution chip and a variable-height paragraph, and the second
+              one only exists for the players whose primary action is resume. */}
           <figure className="intro-visual">
             <picture>
               <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
@@ -119,44 +144,26 @@ export function IntroScreen({ view }) {
             <figcaption>
               <span>TRIGGERLAB NIGHT SHIFT</span>
               <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
-              <div className="start-input-row"><button type="button" onClick={showCaseAccessSetup} disabled={openingBurst} aria-controls="case-access-setup"><ChevronRight size={18} />첫 사건 진입</button></div>
+              {hasResumableSave ? resumePanel : <div className="start-input-row">{startFirstCaseButton}</div>}
             </figcaption>
           </figure>
-          <section id="case-access-setup" ref={startSetupRef} className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
+          <StudioCredit />
+          {nextParticipantMessage && (
+            <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
+          )}
+          <section id="case-access-setup" className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
           <div className="start-console-heading">
             <div>
               <span>CASE ACCESS SETUP</span>
               <h2>기록 진입 설정</h2>
             </div>
-            <small>분석관 이름, 판단 프로토콜, 기록의 출발점을 확정한 뒤 첫 사건으로 들어갑니다.</small>
+            <small>이름과 판단 프로토콜은 시작 전 언제든 바꿀 수 있습니다.</small>
           </div>
           <div className="start-panel start-console-section">
             <div className="start-section-heading">
               <span>01 IDENTITY</span>
               <strong>분석관 호출명</strong>
             </div>
-            {hasResumableSave && (
-              <div className="resume-panel">
-                <div>
-                  <span>저장된 진행</span>
-                  {/* The scene title and the route position are read from the
-                      graph, which the pre-start shell has not loaded. It prints
-                      the case and the save time instead of guessing them. */}
-                  <strong>
-                    {activeCaseMeta?.label ?? "현재 사건"}
-                    {node?.title ? ` · ${node.title}` : ""}
-                  </strong>
-                  <small>
-                    {formatSaveTime(lastSavedAt)} 저장 · {log.length}개 판단 기록
-                    {progress === null ? "" : ` · 진행률 ${progress}%`}
-                  </small>
-                </div>
-                <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
-                  <ChevronRight size={18} />
-                  이어하기
-                </button>
-              </div>
-            )}
             <label htmlFor="playerName">분석관 이름</label>
             <div className="start-input-row">
               <input
@@ -167,10 +174,7 @@ export function IntroScreen({ view }) {
                 onKeyDown={(event) => event.key === "Enter" && startNewRun()}
                 placeholder="이름을 입력하세요"
               />
-              <button type="button" onClick={startNewRun} disabled={openingBurst}>
-                <ChevronRight size={18} />
-                첫 케이스 시작
-              </button>
+              {hasResumableSave && startFirstCaseButton}
             </div>
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={openingBurst}>
@@ -235,12 +239,23 @@ export function IntroScreen({ view }) {
             )}
           </div>
           </section>
+          {/* The premise reads directly under the door. It also keeps
+              `.intro p` -- one of build-critical-css.mjs's probes -- pointing at
+              a rendered element now that the briefing grid is folded away. */}
+          <p>
+            트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
+            사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
+          </p>
+          {/* Pre-start prose folds behind closed native <details>. The element
+              supplies the disclosure state, the button role and Enter/Space to
+              assistive tech, so nothing here hand-rolls aria-expanded. */}
+          <details className="intro-drawer">
+            <summary>
+              <span>PRE-START BRIEFING</span>
+              <h2>시작 전에 알아둘 것</h2>
+            </summary>
           <section className="prestart-briefing" aria-label="시작 전 브리핑">
             <div className="prestart-heading">
-              <div>
-                <span>PRE-START BRIEFING</span>
-                <h2>시작 전에 알아둘 것</h2>
-              </div>
               <small>첫 사건의 상황과 판단 흐름을 먼저 확인한 뒤 플레이 조건을 고릅니다.</small>
             </div>
             <div className="prestart-grid">
@@ -267,13 +282,14 @@ export function IntroScreen({ view }) {
               </div>
             )}
           </section>
-          <section className="start-options" aria-label="게임 시작 선택 설정">
+          </details>
+          <details className="intro-drawer">
+            <summary>
+              <span>02 ANALYST PROTOCOL</span>
+              <h2>어떤 방식으로 판단할까요?</h2>
+            </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
-              <div>
-                <span>02 ANALYST PROTOCOL</span>
-                <h2>어떤 방식으로 판단할까요?</h2>
-              </div>
               <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
             </div>
             <div className="play-style-grid">
@@ -297,13 +313,15 @@ export function IntroScreen({ view }) {
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
+          </details>
           {operatorProfiles?.length > 0 && (
+            <details className="intro-drawer">
+              <summary>
+                <span>03 OPERATOR ORIGIN</span>
+                <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
+              </summary>
             <section className="operator-origin-panel start-console-section" aria-label="주인공 출신과 권한 선택">
               <div className="panel-title-row">
-                <div>
-                  <span>03 OPERATOR ORIGIN</span>
-                  <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
-                </div>
                 <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
               </div>
               <div className="operator-origin-grid">
@@ -325,30 +343,33 @@ export function IntroScreen({ view }) {
               <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
               {originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
             </section>
+            </details>
           )}
-          </section>
-          <p>
-            트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
-            사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
-          </p>
-          <div className="season-panel">
-            <div>
+          <details className="intro-drawer">
+            <summary>
               <span>SEASON 1</span>
-              <strong>사고를 깨우는 조건은 조종 가능한 조건이기도 하다.</strong>
+              <h2>사고를 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
+            </summary>
+            <div className="season-panel">
+              <p>
+                처음에는 내 판단이 깊어지는 순간을 찾습니다. 마지막에는 누군가 그 순간을
+                설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
+              </p>
             </div>
-            <p>
-              처음에는 내 판단이 깊어지는 순간을 찾습니다. 마지막에는 누군가 그 순간을
-              설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
-            </p>
-          </div>
-          {playStyleUnlocks && (
-            <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
-          )}
+            {playStyleUnlocks && (
+              <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
+            )}
+          </details>
           {seasonGoals && (
+            <details className="intro-drawer">
+              <summary>
+                <span>SEASON GOALS</span>
+                <h2>시즌 목표</h2>
+              </summary>
             <section className="season-goal-strip" aria-label="시즌 목표">
-              <span>SEASON GOALS</span>
               {seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
             </section>
+            </details>
           )}
           {pastRunMemory && (
             <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
@@ -356,6 +377,10 @@ export function IntroScreen({ view }) {
               <p>{pastRunMemory.text}</p>
             </section>
           )}
+          <details className="intro-drawer">
+            <summary>
+              <h2>처음 플레이 가이드</h2>
+            </summary>
           <section className="quick-guide" aria-label="처음 플레이 가이드">
             <div className="guide-heading">
               <Info size={16} />
@@ -370,6 +395,14 @@ export function IntroScreen({ view }) {
               ))}
             </div>
           </section>
+          </details>
+          {/* The summary text stays visible: consent is opt-in and default off,
+              and this drawer is never nested inside another closed one, so the
+              notice is always one deliberate click away before anything moves. */}
+          <details className="intro-drawer">
+            <summary>
+              <h2>데이터 저장 안내</h2>
+            </summary>
           <section className="data-info-panel" aria-label="데이터 저장 안내">
             <label className="consent-box">
               <input
@@ -445,6 +478,7 @@ export function IntroScreen({ view }) {
               </p>
             </div>
           </section>
+          </details>
           {completedCaseResultList.length > 0 && (
             <section className="season-summary">
               <div>

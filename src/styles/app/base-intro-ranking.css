@@ -252,7 +252,7 @@ summary:focus-visible {
   justify-items: center;
   gap: 0;
   margin: 22px 0 12px;
-  font-size: clamp(52px, 10vw, 132px);
+  font-size: clamp(52px, 7.4vw, 96px);
   font-weight: 900;
   line-height: 0.82;
   letter-spacing: -0.045em;
@@ -447,6 +447,13 @@ summary:focus-visible {
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  /* The cap is what puts the start control in the first viewport on a desktop:
+     at 1366px the 16/9 frame is a 651px slab and the figcaption rides its bottom
+     edge. It is viewport-relative, not a width breakpoint, so a short laptop
+     screen crops too; at phone widths the art is already shorter and it never
+     binds. The offset keeps the two figures and the skyline in the band. */
+  max-height: min(38vh, 340px);
+  object-position: center 34%;
 }
 .intro-visual figcaption {
   position: absolute;
@@ -480,7 +487,6 @@ summary:focus-visible {
 }
 .start-panel,
 .start-priority,
-.start-options,
 .prestart-briefing,
 .data-info-panel,
 .season-panel,
@@ -490,12 +496,13 @@ summary:focus-visible {
 .case-card {
   text-align: left;
 }
-.start-priority,
-.start-options {
+.start-priority {
   display: grid;
+  grid-template-columns: 1fr;
   align-items: stretch;
   gap: 14px;
   width: min(960px, 100%);
+  margin: 16px auto 12px;
   padding: 18px;
   color: var(--c-paper);
   background:
@@ -506,9 +513,79 @@ summary:focus-visible {
   border-radius: 8px;
   box-shadow: 0 24px 80px var(--c-black-a38);
 }
-.start-priority {
-  grid-template-columns: 1fr;
-  margin: 16px auto 12px;
+/* Intro drawers ------------------------------------------------------------
+   Pre-start prose folds behind a closed <details> so the first viewport is the
+   door to the first scene, not a reading list. The mechanics are the play
+   screen's .insight-drawer idiom -- flex summary, native marker off, a +/- pill
+   that flips on [open] -- restated here because base-intro-ranking.css owns the
+   intro and play.css is imported after it, so an override could not reach.
+   Native <details> supplies the expanded state to assistive tech; nothing here
+   hand-rolls aria-expanded. */
+.intro-drawer {
+  width: min(960px, 100%);
+  margin: 0 auto 12px;
+}
+.intro-drawer > summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-height: 44px;
+  padding: 9px 14px;
+  color: var(--c-paper);
+  background: rgba(24, 32, 31, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 6px solid var(--c-acid);
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+  text-align: left;
+}
+.intro-drawer > summary::-webkit-details-marker {
+  display: none;
+}
+.intro-drawer > summary:before {
+  content: "+";
+  order: 2;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--c-ink);
+  background: var(--c-acid);
+  border-radius: 50%;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 25px;
+  text-align: center;
+}
+.intro-drawer[open] > summary:before {
+  content: "-";
+}
+.intro-drawer > summary span {
+  color: var(--c-acid);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+.intro-drawer > summary h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--c-line-soft);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.intro-drawer[open] > summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.intro-drawer > :not(summary) {
+  width: 100%;
+  margin: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 .prestart-briefing {
   display: grid;
@@ -612,10 +689,6 @@ summary:focus-visible {
   font-size: 11px;
   font-weight: 800;
   line-height: 1.35;
-}
-.start-options {
-  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr);
-  margin: 0 auto 22px;
 }
 .start-console-heading {
   grid-column: 1 / -1;
@@ -1544,6 +1617,7 @@ summary:focus-visible {
   margin-inline: auto;
   max-width: 680px;
   color: var(--c-green-87);
+  font-size: 17px;
 }
 .intro-visual {
   width:calc(100% + 56px); margin:0 -28px;
@@ -1551,7 +1625,6 @@ summary:focus-visible {
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
 }
 .start-priority,
-.start-options,
 .prestart-briefing,
 .quick-guide {
   box-shadow: 0 16px 40px var(--c-mint-04-a16);

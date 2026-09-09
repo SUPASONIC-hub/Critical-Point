@@ -319,7 +319,12 @@ const ACCENT_PEAK_GAIN = 0.045;
 export function playOpeningAccent() {
   try {
     if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
-    const context = audioRuntime.context;
+    // The start button is the page's first gesture now, and on a slow device it
+    // is clickable seconds before AdaptiveMusic's mount effect builds the shared
+    // runtime. Building it here rather than bailing keeps the cold open's one
+    // confirmation cue on exactly the devices where the burst runs longest. The
+    // mute check above still runs first, so a muted player creates no context.
+    const context = audioRuntime.context ?? ensureAudioRuntime(0.0001);
     if (!context) return;
     Promise.resolve(context.resume?.()).catch(() => {});
 

@@ -17,6 +17,9 @@
  * selectors with two homes and two repeats. Nothing in the stylesheets changed;
  * the count did.
  *
+ * base-intro-ranking.css read 1690 lines / 35349 bytes until 2026-09-09, when
+ * the intro gained the cold-open drawers.
+ *
  * play.css read 3292 lines / 68581 bytes until 2026-09-09, when the commit
  * console gained the target-lock rows. The file budgets are sized to the file
  * as it stands, so a surface that grows has to move its number; the two
@@ -43,7 +46,7 @@ const budgets = {
 };
 
 const fileBudgets = {
-  "base-intro-ranking.css": { lines: 1690, bytes: 35349 },
+  "base-intro-ranking.css": { lines: 1763, bytes: 37606 },
   "extensions.css": { lines: 2193, bytes: 45440 },
   "play.css": { lines: 3338, bytes: 69629 },
   "recovery.css": { lines: 266, bytes: 5754 },
