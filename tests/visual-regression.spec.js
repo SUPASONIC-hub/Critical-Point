@@ -25,6 +25,11 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
       .debug-overlay,
       .music-controls,
       .music-toggle,
+      /* The decision window is a live countdown, so its bar and its read change
+         between captures. The header no longer prints it -- one clock, above the
+         choices -- but status-bar-timer and timer-card stay listed because the
+         record room's detailed read still uses the latter. */
+      .decision-clock,
       .status-bar-timer,
       .timer-card,
       /* Regenerated per browser context, so it is eight glyphs of noise in
@@ -296,10 +301,11 @@ test("mobile play screen keeps the decision reachable", async ({ page }) => {
   await expect(rail).toBeVisible();
   const choicePanelTop = await page.locator("#choice-panel").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
   // Budgets, not measurements: ratchet them down, never up. The screen was
-  // 5,775px with the choices starting around y=2,600 before the layout pass.
-  expect(choicePanelTop).toBeLessThan(844 * 2);
+  // 5,775px with the choices starting around y=2,600 before the first layout
+  // pass, and 3,953px with the choices at y=1,535 before the record room.
+  expect(choicePanelTop).toBeLessThan(844 * 1.7);
   const pageHeight = await page.evaluate(() => document.body.scrollHeight);
-  expect(pageHeight).toBeLessThan(844 * 5);
+  expect(pageHeight).toBeLessThan(844 * 3.1);
   await page.locator("#choice-panel").scrollIntoViewIfNeeded();
   await expect(rail).toBeInViewport();
 });

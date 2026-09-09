@@ -735,7 +735,7 @@ test("route finals should have retired the old shared case finals", () => {
 for (const caseId of CASE_SEQUENCE) {
   const asked = new Map();
   for (const nodeId of new Set(nodeOrders[caseId])) {
-    if (nodes[nodeId]?.phase !== "ROUTE FINAL") continue;
+    if (nodes[nodeId]?.phase !== "LAST CALL") continue;
     const question = nodes[nodeId].choices.map((choice) => choice.label).join(" | ");
     assert.ok(!asked.has(question), `${nodeId} closes on the same question as ${asked.get(question)}`);
     asked.set(question, nodeId);
@@ -868,7 +868,7 @@ for (const choiceId of Object.keys(authoredEchoReplies)) {
 }
 
 const authoredGeneratedScenes = Object.values(nodes).filter(
-  (node) => node.phase === "CONNECTIVE SCENE" || node.phase === "REACTION",
+  (node) => node.phase === "OFF THE RECORD" || node.phase === "THE ROOM AFTER",
 );
 const generatedChoiceCount = authoredGeneratedScenes.reduce((total, node) => total + node.choices.length, 0);
 test("every generated scene choice has authored copy and a distinct effect", () => {

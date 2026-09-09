@@ -21,7 +21,10 @@
  * the intro gained the cold-open drawers.
  *
  * play.css read 3292 lines / 68581 bytes until 2026-09-09, when the commit
- * console gained the target-lock rows. The file budgets are sized to the file
+ * console gained the target-lock rows, and 3338 / 69629 until later the same
+ * day, when the record room, the play rail and the decision clock landed. That
+ * pass removed far more markup than it added CSS: the stylesheet grew 5KB and
+ * the phone's play screen lost more than half its height. The file budgets are sized to the file
  * as it stands, so a surface that grows has to move its number; the two
  * duplication budgets above are the ones that only go down.
  */
@@ -46,12 +49,12 @@ const budgets = {
 };
 
 const fileBudgets = {
-  "base-intro-ranking.css": { lines: 1763, bytes: 37606 },
+  "base-intro-ranking.css": { lines: 1795, bytes: 38900 },
   "extensions.css": { lines: 2193, bytes: 45440 },
-  "play.css": { lines: 3338, bytes: 69629 },
+  "play.css": { lines: 3560, bytes: 74900 },
   "recovery.css": { lines: 266, bytes: 5754 },
-  "responsive.css": { lines: 392, bytes: 8189 },
-  "result.css": { lines: 1223, bytes: 26149 },
+  "responsive.css": { lines: 402, bytes: 8500 },
+  "result.css": { lines: 1390, bytes: 29800 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

@@ -9,6 +9,11 @@ has to keep, and the commands that prove it. What changed and why is in
 ## Current State
 
 - Core verification passes with `npm run verify`.
+- The play screen is 2,370px on a 390x844 phone and the report 3,081px; they were
+  3,953px and 10,616px before the 2026-09-09 layout pass. Both numbers are held
+  by budget tests in `tests/visual-regression.spec.js`.
+- The whole app shares the intro's night ground; panels stay light. Lime is the
+  accent for the control that records a decision.
 - Fast CI checks and heavyweight E2E checks are split in GitHub Actions.
 - Visual regression is separated into `npm run test:visual` and a dedicated label-aware workflow.
 - Save/recovery, telemetry retry, season flow, accessibility, contrast, text integrity, graph schema, and visual baselines are covered by automated checks.
@@ -108,6 +113,27 @@ has to keep, and the commands that prove it. What changed and why is in
     someone who had muted. A cue that can only fire mid-run may bail when the
     shared `AudioContext` is missing; one that can fire on the first click has
     to build it inside the gesture instead.
+27. One decision, one screen. `PlayScreen.jsx` renders the scene, the clock,
+    the three standing resources and the choices; everything else belongs in
+    `RecordRoom.jsx`, behind one door. The phone budget in
+    `visual-regression.spec.js` is the ratchet -- the screen was 3,953px for one
+    of forty-two decisions before this rule existed. A new panel in front of the
+    choice is the change this rule exists to stop.
+28. The report is three acts. The ending, the rank and the next case are the
+    first screen; `왜 이렇게 됐나` answers with three cards; everything else is
+    inside `.report-archive`. It reached 10,616px on a phone -- twelve and a half
+    screens as the reward for finishing -- by growing one named region at a time.
+29. Numbers stay behind `전술 정보`. The choice cards print the qualitative
+    trade-off; the resource deltas, the observer preview and the risk hint are
+    all gated on `showTacticalDetails`, because the screen promises the player
+    can judge on the scene first and the chips used to render regardless.
+30. Lime is the accent for one thing at a time. `--c-acid` marks the control
+    that records a decision and the active step of the decision rail; a note, a
+    quote or a heading gets a lime rule at most. Four lime fills on one screen is
+    the state this rule was written after.
+31. A phase is player copy. `node.phase` prints on the scene chip and in the
+    mission strip, so it names a story beat -- never the function that generated
+    the node. "CONNECTIVE SCENE" shipped for weeks.
 
 ## Verification Commands
 

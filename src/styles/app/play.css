@@ -17,6 +17,7 @@
   border-radius: var(--radius-md);
 }
 .game-board {
+  grid-column: 1;
   padding: 24px;
   min-width: 0;
 }
@@ -1687,20 +1688,21 @@
   line-height: 1.75;
 }
 .scene-dialogue {
-  padding:13px 15px;
-  color: var(--c-ink);
-  background: var(--c-acid);
+  padding: 13px 15px;
+  color: var(--c-paper);
+  background: var(--c-ink-raised);
+  border-left: 4px solid var(--c-acid);
   border-radius: 7px;
   font-size: 20px;
   font-weight: 900;
   line-height: 1.5;
 }
 .scene-dialogue .story-label {
-  color: var(--c-ink);
+  color: var(--c-acid);
 }
 .scene-dialogue .story-voice {
   display: inline;
-  color: var(--c-teal-deep);
+  color: var(--c-ink-faint);
   font-size: 12px;
   font-weight: 800;
 }
@@ -2275,10 +2277,11 @@
   display: grid;
   gap: 5px;
   margin-top: 8px;
-  padding: 12px;
+  padding: 10px 12px;
   color: var(--c-ink);
-  background: var(--c-acid);
-  border: 1px solid var(--c-acid-deep);
+  background: var(--c-paper-soft);
+  border: 1px solid var(--c-line);
+  border-left: 4px solid var(--c-acid);
   border-radius: 6px;
 }
 .turn-tactic span {
@@ -3262,13 +3265,14 @@
   list-style: none;
 }
 .resource-rail li {
-  display: flex;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 6px;
   align-items: baseline;
-  padding: 4px 9px;
+  padding: 6px 10px;
   background: var(--color-paper-soft);
   border: 1px solid var(--color-line);
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
 }
 .resource-rail li span {
   color: var(--c-ink-muted);
@@ -3334,4 +3338,204 @@
 }
 .commit-console-detail[open] > summary {
   margin-bottom: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   One decision, one screen.
+
+   The play screen used to stack every panel it owns in front of the choice, so
+   a phone measured 3,953px for one decision. The record room is the single door
+   those panels went behind; the play rail is what stays on screen instead --
+   three meters and the clock, pinned. The rail is placed by grid column rather
+   than by DOM order, so the phone gets it above the board and the desktop gets
+   it in the column the status board used to leave empty.
+   ------------------------------------------------------------------------- */
+.play-rail {
+  grid-column: 2;
+  grid-row: 1;
+  position: sticky;
+  top: 12px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.play-rail .resource-rail {
+  position: static;
+  margin: 0;
+}
+.resource-rail li .gauge {
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: var(--c-paper-90);
+  border-radius: 999px;
+}
+.resource-rail li .gauge em {
+  display: block;
+  height: 100%;
+  background: var(--c-green);
+  border-radius: 999px;
+}
+.resource-rail li .gauge.cost em {
+  background: var(--c-coral);
+}
+.resource-rail li.strained .gauge em {
+  background: var(--c-danger);
+}
+
+/* The window, made physical. Four tiers, read from the clock rather than
+   recomputed: hold, press, critical, overtime. */
+.decision-clock {
+  display: grid;
+  gap: 6px;
+  padding: 9px 12px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.decision-clock-track {
+  height: 6px;
+  overflow: hidden;
+  background: var(--c-paper-90);
+  border-radius: 999px;
+}
+.decision-clock-track i {
+  display: block;
+  height: 100%;
+  background: var(--c-green);
+  border-radius: 999px;
+}
+.decision-clock-read {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.decision-clock-read b {
+  font-size: 17px;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+}
+.decision-clock-read span {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.decision-clock.press .decision-clock-track i {
+  background: var(--c-amber);
+}
+.decision-clock.critical {
+  border-color: var(--c-coral);
+}
+.decision-clock.critical .decision-clock-track i,
+.decision-clock.overtime .decision-clock-track i {
+  background: var(--c-signal);
+}
+.decision-clock.critical .decision-clock-read b,
+.decision-clock.overtime .decision-clock-read b {
+  color: var(--c-danger-deep);
+}
+.decision-clock.overtime {
+  background: var(--c-blush);
+  border-color: var(--c-danger);
+}
+
+/* Session controls: three icons in one row, not three labelled rows above the
+   story. The label survives in aria-label and title. */
+.top-actions.compact-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.top-actions.compact-actions button {
+  padding: 7px 9px;
+}
+
+/* The one door. Everything that is not the scene, the clock, the three standing
+   resources or the choices is behind it. */
+.record-room {
+  margin: 0 0 14px;
+  background: var(--color-paper-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.record-room > summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.record-room > summary span {
+  font-size: 13px;
+  font-weight: 950;
+}
+.record-room > summary b {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.record-room-body {
+  display: grid;
+  gap: 12px;
+  padding: 4px 14px 14px;
+}
+.record-resource-table {
+  display: grid;
+  gap: 8px;
+}
+.record-resource-table > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.record-resource-table article {
+  display: grid;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+}
+.record-resource-table article span {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.record-resource-table article b {
+  font-size: 14px;
+  font-weight: 950;
+}
+.record-room-progress {
+  margin: 0;
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Six paintings, forty-two scenes. The route index picks a crop and a colour
+   temperature so the same room reads as a later hour rather than as a repeat. */
+.scene-visual.tone-1 img {
+  object-position: 50% 32%;
+  filter: saturate(0.92) brightness(0.94) hue-rotate(-6deg);
+}
+.scene-visual.tone-2 img {
+  object-position: 62% 50%;
+  filter: saturate(0.84) brightness(0.88) contrast(1.06);
+}
+.scene-visual.tone-3 img {
+  object-position: 38% 62%;
+  filter: saturate(0.76) brightness(0.8) hue-rotate(8deg) contrast(1.1);
+}
+
+@media (max-width: 1023px) {
+  .play-rail {
+    grid-column: 1;
+    grid-row: auto;
+    top: 0;
+    z-index: 12;
+    padding: 8px 0;
+    background: var(--color-paper-soft);
+  }
 }

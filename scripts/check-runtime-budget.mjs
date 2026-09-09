@@ -17,13 +17,22 @@ import { viewGroups } from "../src/viewModels/appViewModels.js";
  * These are budgets, not measurements: ratchet them down as work lands, never
  * up. A number that has to rise is a decision worth writing down in
  * `docs/work-status.md`, not a constant worth editing quietly.
+ *
+ * Three moved on 2026-09-09 with the one-decision-one-screen pass. PlayScreen
+ * dropped 749 -> 340 and 17 -> 14 imports: everything that is not the scene,
+ * the clock, the three standing resources or the choices moved into
+ * `RecordRoom`. ResultScreen rose 914 -> 975 and gameData 2367 -> 2375, both
+ * for copy the player reads -- the report's second act ("왜 이렇게 됐나", the
+ * three cards and the named doors) and the phase rename that stopped shipping
+ * "CONNECTIVE SCENE" as a scene name. Maintenance priority 27 records the rule
+ * those two numbers now stand for.
  */
 
 const root = process.cwd();
 
 const BUDGETS = {
   "src/gameData.js": {
-    lines: 2367,
+    lines: 2382,
     importedNames: 12,
     hooks: {},
   },
@@ -38,12 +47,12 @@ const BUDGETS = {
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {
-    lines: 749,
-    importedNames: 17,
+    lines: 340,
+    importedNames: 14,
     hooks: {},
   },
   "src/screens/ResultScreen.jsx": {
-    lines: 914,
+    lines: 975,
     importedNames: 13,
     hooks: {},
   },

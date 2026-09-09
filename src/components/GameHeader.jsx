@@ -1,21 +1,15 @@
 import { FileText, RefreshCcw, Save } from "lucide-react";
-import { useDecisionSeconds } from "../state/decisionClock.js";
 
 /**
- * The only place in the header that ticks. It subscribes to the decision clock
- * itself so a per-second change never re-renders the screen around it.
+ * Scene identity and the run's two standing numbers.
+ *
+ * The three session buttons used to be full-width rows above the story -- 250px
+ * of save/exit/reset before a phone reader reached the scene. They are icons in
+ * one row now, with the label carried by `aria-label` and `title` rather than
+ * by a line of type. The decision clock moved out of this bar entirely: it
+ * belongs above the choices, where the decision is, and one clock is enough
+ * (`src/components/DecisionClock.jsx`).
  */
-function DecisionWindowLabel() {
-  const seconds = useDecisionSeconds();
-  const remaining = Math.max(0, seconds);
-  const overtime = Math.max(0, -seconds);
-  return (
-    <span className={remaining <= 10 ? "status-bar-timer urgent" : "status-bar-timer"}>
-      {overtime > 0 ? <>초과 <b>{overtime}초</b></> : <>남은 시간 <b>{remaining}초</b></>}
-    </span>
-  );
-}
-
 export function GameHeader({
   node,
   simplify,
@@ -33,21 +27,25 @@ export function GameHeader({
         <span className="case-chip">{simplify(node.phase)}</span>
         <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
       </div>
-      <div className="top-actions">
-        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts="P">
+      <div className="top-actions compact-actions">
+        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts="P" aria-label="저장" title="저장">
           <Save size={16} />
-          저장
         </button>
-        <button type="button" className="ghost" onClick={onSaveAndExit} aria-keyshortcuts="Shift+P">
+        <button
+          type="button"
+          className="ghost"
+          onClick={onSaveAndExit}
+          aria-keyshortcuts="Shift+P"
+          aria-label="저장 후 나가기"
+          title="저장 후 나가기"
+        >
           <FileText size={16} />
-          저장 후 나가기
         </button>
-        <button type="button" className="ghost" onClick={onReset}>
+        <button type="button" className="ghost" onClick={onReset} aria-label="초기화" title="초기화">
           <RefreshCcw size={16} />
-          초기화
         </button>
       </div>
-      {/* Layer 1 keeps exactly three standing numbers: which case, how far in, how long left. */}
+      {/* Layer 1 keeps exactly two standing numbers: which case, and how far in. */}
       <div className="status-bar" aria-label="현재 진행 상태">
         <span>
           사건 <b>{caseNumber}</b>/{caseTotal}
@@ -62,7 +60,6 @@ export function GameHeader({
         >
           <div style={{ width: `${progress}%` }} />
         </div>
-        <DecisionWindowLabel />
       </div>
     </header>
   );

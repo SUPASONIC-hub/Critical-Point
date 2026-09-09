@@ -114,6 +114,17 @@ export function ResultScreen({ view }) {
     { label: "EXPOSE", value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.freeCount ?? 0) * 8)), text: "구조와 숨은 비용을 얼마나 드러냈는가" },
     { label: "HANDOFF", value: Math.min(100, Math.round((result.cognitionScore ?? 0) * 0.7 + (observerPattern?.turningPoint ? 24 : 0))), text: "다음 참가자에게 선택지를 얼마나 남겼는가" },
   ];
+  // The doors this run walked past, named. The counts alone ("기록 3개 미열람")
+  // are not a reason to play again; a scene title and the lens that was not
+  // taken is. Sorted by the report's own order, which is the route's order.
+  const unopenedDoors = counterfactualReport
+    .filter((report) => !report.actualWasSafest)
+    .slice(0, 3)
+    .map((report) => ({
+      nodeId: report.nodeId,
+      title: report.title,
+      label: `가지 않은 길: ${report.costliest.label}`,
+    }));
   const witnessRecords = [
     firstRouteEntry && { id: "first", label: "처음 남긴 말", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
@@ -284,6 +295,94 @@ export function ResultScreen({ view }) {
               <p>{view.failureRecovery.text}</p>
             </section>
           )}
+          <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
+            <div className="rank-mark">
+              <span>CASE RANK</span>
+              <strong>{resultRank}</strong>
+            </div>
+            <div className="rank-copy">
+              <span>{momentumTier} · {momentumScore} POINTS</span>
+              <h2>{rankLine}</h2>
+              <p>
+                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는
+                정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.
+              </p>
+            </div>
+            <div className="score-breakdown">
+              {scoreBreakdown.map((item) => (
+                <article key={item.label}>
+                  <span>{item.label}</span>
+                  <b>{item.text}</b>
+                  <small>{item.note}</small>
+                  <div>
+                    <i style={{ width: `${clamp(item.value, item.value > 0 ? 14 : 4, 100)}%` }} />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+          {nextCaseSignal && (
+            <section className="next-case-panel">
+              <div>
+                <span>{nextCaseSignal.eyebrow}</span>
+                <h2>{nextCaseSignal.title}</h2>
+                <p>{nextCaseSignal.premise}</p>
+                <p className="next-case-hook">{nextCaseSignal.hook}</p>
+                <small>{resultBridge}</small>
+              </div>
+              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
+                <ChevronRight size={18} />
+                {nextCaseSignal.button}
+              </button>
+            </section>
+          )}
+          {/* Act two. The report used to answer "why" in twenty-five named
+              regions spread over 10,616px; these are the three answers a player
+              actually leaves with, and the archive below keeps the rest. */}
+          <section className="result-why" aria-label="왜 이렇게 됐나">
+            <div className="panel-title-row">
+              <h2>왜 이렇게 됐나</h2>
+              <span>이번 판을 결정한 세 가지</span>
+            </div>
+            <div className="result-why-grid">
+              <article>
+                <span>결말을 정한 축</span>
+                <strong>{endingAxes[0]?.label ?? "기록 부족"}</strong>
+                <p>{endingAxes[0]?.text ?? "선택이 더 쌓이면 축이 갈립니다."}</p>
+              </article>
+              <article>
+                <span>당신이 반복한 방식</span>
+                <strong>{decisionFingerprint.modeTitle}</strong>
+                <p>{view.endingCause ? view.endingCause.text : decisionFingerprint.modeText}</p>
+              </article>
+              <article className="result-why-doors">
+                <span>열지 않은 문</span>
+                <strong>{unopenedRecordCount}개</strong>
+                {unopenedDoors.length > 0 ? (
+                  <ul>
+                    {unopenedDoors.map((door) => (
+                      <li key={door.nodeId}>
+                        <b>{door.title}</b>
+                        <small>{door.label}</small>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>단서 {unopenedClueCount}개와 분기 {unopenedBranchCount}개가 아직 기록에 없습니다.</p>
+                )}
+                <button type="button" className="ghost" onClick={() => startCase(currentCase)}>
+                  이 사건을 다시 열기
+                </button>
+              </article>
+            </div>
+          </section>
+          {/* Act three. Everything the report used to open with. */}
+          <details className="report-archive">
+            <summary>
+              <span>전체 기록</span>
+              <b>랭크 근거, 판단 DNA, 경로 지도, 관찰 장부, 선택 로그</b>
+            </summary>
+            <div className="report-archive-body">
           {currentCase === "final" && view.operatorReveal && (
             <section className="operator-reveal-panel" aria-label="주인공 정체 공개">
               <span>{view.operatorReveal.title}</span>
@@ -411,32 +510,6 @@ export function ResultScreen({ view }) {
               ))}
             </div>
           </section>
-          <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
-            <div className="rank-mark">
-              <span>CASE RANK</span>
-              <strong>{resultRank}</strong>
-            </div>
-            <div className="rank-copy">
-              <span>{momentumTier} · {momentumScore} POINTS</span>
-              <h2>{rankLine}</h2>
-              <p>
-                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는
-                정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.
-              </p>
-            </div>
-            <div className="score-breakdown">
-              {scoreBreakdown.map((item) => (
-                <article key={item.label}>
-                  <span>{item.label}</span>
-                  <b>{item.text}</b>
-                  <small>{item.note}</small>
-                  <div>
-                    <i style={{ width: `${clamp(item.value, item.value > 0 ? 14 : 4, 100)}%` }} />
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
           <section className="fingerprint-panel" aria-label="판단 DNA">
             <div className="fingerprint-heading">
               <div>
@@ -548,21 +621,6 @@ export function ResultScreen({ view }) {
               <span aria-live="polite">{copyStatus || "코드 복사"}</span>
             </button>
           </section>
-          {nextCaseSignal && (
-            <section className="next-case-panel">
-              <div>
-                <span>{nextCaseSignal.eyebrow}</span>
-                <h2>{nextCaseSignal.title}</h2>
-                <p>{nextCaseSignal.premise}</p>
-                <p className="next-case-hook">{nextCaseSignal.hook}</p>
-                <small>{resultBridge}</small>
-              </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
-                <ChevronRight size={18} />
-                {nextCaseSignal.button}
-              </button>
-            </section>
-          )}
           <section className="achievement-panel">
             <div className="panel-title-row">
               <h2>
@@ -903,6 +961,8 @@ export function ResultScreen({ view }) {
               </p>
             </section>
           )}
+            </div>
+          </details>
         </section>
       </main>
 );

@@ -226,8 +226,12 @@ summary:focus-visible {
   letter-spacing: 0;
 }
 .brand-mark {
+  /* The report's topbar is a flex row that let the wordmark shrink until it
+     broke across two lines next to six buttons. */
+  flex: 0 0 auto;
   background: var(--color-ink);
   color: var(--c-paper);
+  white-space: nowrap;
 }
 .case-chip {
   background: rgba(255, 255, 255, 0.14);
@@ -1702,9 +1706,24 @@ textarea {
 .input-note {
   margin-top: 7px;
 }
+/* One ground for the whole game.
+
+   The intro opened on a night field and the play and result screens then opened
+   on a light grey gradient, so the first click changed the genre. The panels
+   stay light -- they are case files -- but they lie on the field the intro
+   already established, which is what makes the three screens one place. This is
+   the second `body` rule in this file on purpose: it is the one that wins, and
+   splitting the ground across both homes is how a page ends up with two.
+
+   The text colour stays dark ink: nearly all copy sits inside a light panel,
+   and the two surfaces that do not -- the intro and the scene card -- set their
+   own. `background-attachment: fixed` is deliberately absent; it repaints per
+   viewport, which both janks a phone scroll and slices a full-page capture. */
 body {
   color: var(--ink);
-  background: linear-gradient(135deg, var(--c-paper-94), var(--c-paper-88));
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--c-teal-25-a24), transparent 62%),
+    linear-gradient(168deg, var(--c-ink-deep), var(--c-ink) 46%, var(--c-ink-darkest));
 }
 .result-hero h1 {
   margin-inline: 0;

@@ -6,9 +6,11 @@ const MUSIC_PREF_KEY = "critical-point-music-enabled";
 const MUSIC_VOLUME_KEY = "critical-point-music-volume";
 const STEPS_PER_BAR = 16;
 const MIX_VOLUME = 0.74;
-const KICK_GAIN = 0.24;
+// The kick is the only percussive voice with weight now; the hats are room
+// noise, not a hi-hat line, so they sit well under the pad.
+const KICK_GAIN = 0.2;
 const SNARE_GAIN = 0.1;
-const HAT_GAIN = 0.04;
+const HAT_GAIN = 0.022;
 const BASS_GAIN = 0.08;
 const LEAD_GAIN = 0.045;
 const PAD_GAIN = 0.045;
@@ -307,6 +309,7 @@ function ensureAudioRuntime(volume) {
 
 const ACCENT_PEAK_GAIN = 0.045;
 const REVEAL_PEAK_GAIN = 0.035;
+const TICK_PEAK_GAIN = 0.02;
 
 /**
  * The start button's confirmation tone.
@@ -421,6 +424,45 @@ export function playDecisionRevealCue(tone = "decision-locked") {
       oscillator.start(start);
       oscillator.stop(start + 0.22);
     });
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
+}
+
+/**
+ * The last ten seconds of the decision window, as a heartbeat.
+ *
+ * `remaining` is the seconds left, so the pitch rises as the window closes and
+ * the closing beat is a lower, longer thud. It is the smallest cue in the game
+ * on purpose: it repeats up to eleven times per scene, forty-two scenes a run,
+ * so it sits under the score rather than on top of it.
+ */
+export function playDecisionTick(remaining) {
+  try {
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    const context = audioRuntime.context;
+    if (!context) return;
+
+    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+    const overtime = remaining === "overtime";
+    const seconds = overtime ? 0 : Math.max(0, Math.min(10, Number(remaining) || 0));
+    const peak = TICK_PEAK_GAIN * multiplier * (overtime ? 1.4 : 1 + (10 - seconds) / 14);
+    const now = context.currentTime;
+    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = overtime ? "sine" : "triangle";
+    const base = overtime ? 58 : 96 + (10 - seconds) * 7;
+    oscillator.frequency.setValueAtTime(base, now);
+    oscillator.frequency.exponentialRampToValueAtTime(base * (overtime ? 0.7 : 0.86), now + 0.09);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(peak, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (overtime ? 0.34 : 0.14));
+    oscillator.connect(gain);
+    gain.connect(destination);
+    oscillator.start(now);
+    oscillator.stop(now + (overtime ? 0.36 : 0.16));
   } catch {
     // Audio is an enhancement; browsers may reject it during a gesture.
   }

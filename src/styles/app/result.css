@@ -6,13 +6,16 @@
 .result-page .topbar {
   margin-bottom: 30px;
 }
+/* The hero sits on the night ground rather than inside a panel, so it carries
+   the light half of the palette itself. */
 .result-hero {
   padding: 26px 0 12px;
+  color: var(--c-paper);
 }
 .result-hero p {
   margin: 0;
   font-weight: 800;
-  color: var(--c-ink-muted);
+  color: var(--c-line-soft);
 }
 .outcome-panel {
   display: grid;
@@ -22,8 +25,9 @@
   margin: 0 0 16px;
   padding: 19px;
   color: var(--c-ink);
-  background: var(--c-acid);
-  border: 1px solid var(--c-acid-deep);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-left: 6px solid var(--c-acid);
   border-radius: 8px;
   box-shadow: 0 12px 34px var(--c-acid-21-a14);
 }
@@ -62,7 +66,7 @@
   display: grid;
   grid-template-columns: 150px minmax(0, 1fr) minmax(280px, 0.8fr);
   gap: 16px;
-  align-items: stretch;
+  align-items: start;
   margin: 0 0 16px;
   padding: 18px;
   color: var(--c-paper);
@@ -222,7 +226,8 @@
 .rank-mark {
   display: grid;
   place-items: center;
-  min-height: 150px;
+  align-self: start;
+  min-height: 132px;
   background: var(--c-acid);
   color: var(--c-ink);
   border-radius: 8px;
@@ -344,16 +349,17 @@
   gap: 18px;
   margin: 0 0 16px;
   padding: 20px;
-  color: var(--c-ink);
-  background: var(--c-acid);
-  border: 1px solid var(--c-acid-deep);
+  color: var(--c-paper);
+  background: var(--c-ink);
+  border: 1px solid var(--c-acid);
+  border-left: 6px solid var(--c-acid);
   border-radius: 8px;
 }
 .next-case-panel > div {
   min-width: 0;
 }
 .next-case-panel span {
-  color: var(--c-teal-deep);
+  color: var(--c-acid);
   font-size: 12px;
   font-weight: 900;
 }
@@ -386,6 +392,8 @@
   font-weight: 900;
   line-height: 1.45;
 }
+/* The one action on the report carries the accent; the panel around it went
+   from a lime fill to the night panel so the button is the lime thing. */
 .next-case-panel button {
   display: inline-flex;
   align-items: center;
@@ -394,8 +402,8 @@
   flex: 0 0 auto;
   min-height: 46px;
   padding: 0 16px;
-  color: var(--c-paper);
-  background: var(--c-ink);
+  color: var(--c-ink);
+  background: var(--c-acid);
   border: 0;
   border-radius: 6px;
   font-weight: 900;
@@ -1219,4 +1227,143 @@
 .status-board .trigger-tags span {
   color: var(--ink);
   background: var(--c-paper-92);
+}
+
+/* ---------------------------------------------------------------------------
+   Three acts, not one archive.
+
+   The report opened with twenty-five named regions and measured 10,616px on a
+   390x844 phone -- twelve and a half screens of reading as the reward for
+   finishing a case. The ending, the rank and the next case are the first
+   screen; "왜 이렇게 됐나" answers the question a player actually leaves with;
+   everything that was in between is behind one door.
+   ------------------------------------------------------------------------- */
+.result-why {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 18px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-left: 5px solid var(--c-acid);
+  border-radius: var(--radius-md);
+}
+.result-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.result-why-grid article {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 14px;
+  background: var(--color-paper-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+}
+.result-why-grid article span {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+.result-why-grid article strong {
+  font-size: 17px;
+  font-weight: 950;
+  line-height: 1.3;
+}
+.result-why-grid article p {
+  margin: 0;
+  color: var(--c-ink-soft);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.result-why-doors ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.result-why-doors li {
+  display: grid;
+  gap: 2px;
+  padding: 7px 9px;
+  background: var(--color-paper);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.result-why-doors li b {
+  font-size: 13px;
+  font-weight: 900;
+}
+.result-why-doors li small {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.result-why-doors button {
+  justify-self: start;
+  margin-top: 2px;
+}
+.report-archive {
+  margin: 18px 0 0;
+  background: var(--color-paper-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.report-archive > summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.report-archive > summary span {
+  font-size: 14px;
+  font-weight: 950;
+}
+.report-archive > summary b {
+  color: var(--c-ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.report-archive-body {
+  padding: 0 16px 16px;
+}
+
+@media (max-width: 900px) {
+  .result-why-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The hero and the session controls are the only report copy that sits on the
+   night ground rather than inside a panel, so they carry the light half of the
+   palette themselves. `.ending-rationale` had no rule at all and was reading as
+   dark ink on dark ground. */
+.ending-rationale {
+  margin: 10px 0;
+  padding: 9px 12px;
+  color: var(--c-line-soft);
+  background: var(--color-overlay-soft);
+  border-left: 4px solid var(--c-acid);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  /* Seven full-width rows of session controls opened the report. They are a
+     two-up grid on a phone: the same buttons, a third of the height. */
+  .result-page .top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .result-page .top-actions .ghost {
+    width: 100%;
+  }
 }

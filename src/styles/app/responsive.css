@@ -213,6 +213,16 @@
   .top-actions {
     justify-content: stretch;
   }
+  /* Icons, not labels: the compact row stays a row on a phone. Stacking it
+     spent 130px above the story on three buttons that are 34px wide. */
+  .top-actions.compact-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    width: auto;
+  }
+  .top-actions.compact-actions .ghost {
+    width: auto;
+  }
   .memo-panel ul,
   .observer-postmortem-grid,
   .result-grid,
@@ -368,14 +378,12 @@
 }
 @media (max-width: 480px) {
   .decision-rail {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 7px;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 7px 9px;
+    font-size: 10px;
   }
   .decision-rail i {
-    width: 1px;
-    height: 8px;
-    margin-left: 11px;
     flex: 0 0 auto;
   }
 }

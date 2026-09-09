@@ -451,7 +451,13 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
   const copy = getAuthoredSceneCopy(sourceId, id);
   source.choices.forEach((choice) => { choice.next = id; });
   nodes[id] = {
-    phase: "CONNECTIVE SCENE",
+    // A phase is printed on the scene chip and in the mission strip, so it is
+    // player-facing copy, not a pipeline label. These scenes were shipping as
+    // "CONNECTIVE SCENE" -- the name of the function that builds them -- for the
+    // same reason the reaction, branch and route-final families read as build
+    // steps. They are all the same story beat: the part that happens outside
+    // the meeting that was scheduled.
+    phase: "OFF THE RECORD",
     title,
     speaker,
     text,
@@ -540,7 +546,7 @@ function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) 
   const copy = getAuthoredSceneCopy(sourceId, id);
   source.choices.forEach((choice) => { choice.next = id; });
   nodes[id] = {
-    phase: "REACTION",
+    phase: "THE ROOM AFTER",
     title,
     speaker,
     text,
@@ -573,7 +579,7 @@ reactionScenes.forEach(([id, sourceId]) => {
 // Each case has one authored detour. The second scene always rejoins the existing route.
 const authoredBranchScenes = {
   c1_branch_people: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "누가 빈칸을 채우는가",
     speaker: "도윤하",
     text: "협상서의 빈칸을 사람의 이름으로 채우려는 순간, 숫자로 미뤄 둔 책임이 모두 드러났습니다.",
@@ -586,7 +592,7 @@ const authoredBranchScenes = {
     ],
   },
   c1_branch_people_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "서명 뒤의 첫 전화",
     speaker: "에코",
     text: "서명은 끝났지만 첫 전화는 계약서에 없는 사람에게서 왔습니다. 이제 빈칸은 비용이 아니라 약속의 형태가 됩니다.",
@@ -599,7 +605,7 @@ const authoredBranchScenes = {
     ],
   },
   c2_branch_records: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "11초를 누구의 시간으로 볼 것인가",
     speaker: "반재현",
     text: "기록 사이의 11초를 기술 오류로 닫을지, 누군가의 판단이 들어간 시간으로 열어둘지 선택해야 합니다.",
@@ -612,7 +618,7 @@ const authoredBranchScenes = {
     ],
   },
   c2_branch_records_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "복원된 기록의 주인",
     speaker: "한서윤",
     text: "복원된 기록에는 이름보다 먼저 책임을 미룬 순서가 남아 있습니다. 누가 말할 수 있게 할지도 기록의 일부입니다.",
@@ -625,7 +631,7 @@ const authoredBranchScenes = {
     ],
   },
   c3_branch_signal: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "관객석의 신호를 멈춰 읽기",
     speaker: "에코",
     text: "발표 화면의 신호는 경쟁사의 방해일 수도, 고객이 보내는 마지막 확인 요청일 수도 있습니다.",
@@ -638,7 +644,7 @@ const authoredBranchScenes = {
     ],
   },
   c3_branch_signal_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "빠른 승리의 조건표",
     speaker: "오진우",
     text: "결과가 좋아도 조건표에 빈칸이 남으면 다음 경쟁은 그 빈칸부터 시작됩니다.",
@@ -651,7 +657,7 @@ const authoredBranchScenes = {
     ],
   },
   c4_branch_exception: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "예외의 사용자를 확인하다",
     speaker: "반재현",
     text: "예외 승인은 선의를 증명하지 않습니다. 누구에게 반복될 수 있는지가 이 결정의 핵심입니다.",
@@ -664,7 +670,7 @@ const authoredBranchScenes = {
     ],
   },
   c4_branch_exception_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "좋은 결과 뒤의 감사",
     speaker: "윤서",
     text: "서비스는 멈추지 않았지만 감사 기록은 남았습니다. 다음 사람에게 같은 예외를 허용할 기준이 필요합니다.",
@@ -677,7 +683,7 @@ const authoredBranchScenes = {
     ],
   },
   c5_branch_owner: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "실패의 주어를 고르다",
     speaker: "윤서",
     text: "실패에는 사람이 보이지만, 시스템은 여러 번의 작은 양보로 만들어졌습니다.",
@@ -690,7 +696,7 @@ const authoredBranchScenes = {
     ],
   },
   c5_branch_owner_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "복구 이후에도 남는 이름",
     speaker: "에코",
     text: "복구가 시작되면 책임의 이름은 사라지지 않습니다. 다만 그 이름이 다음 피해를 막는 장치가 될 수 있습니다.",
@@ -703,7 +709,7 @@ const authoredBranchScenes = {
     ],
   },
   f_branch_witness: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "이전 기록의 빈칸",
     speaker: "한서윤",
     text: "이전 참가자의 기록은 당신의 선택과 닮았지만, 마지막 한 줄만 비어 있습니다. 그 빈칸이 실험의 목적일 수 있습니다.",
@@ -716,7 +722,7 @@ const authoredBranchScenes = {
     ],
   },
   f_branch_witness_follow: {
-    phase: "BRANCH DETOUR",
+    phase: "SIDE DOOR",
     title: "에코의 마지막 질문",
     speaker: "에코",
     text: "기록을 읽는 사람도 기록의 일부가 됩니다. 당신의 조건을 누가 다시 읽게 될지 정해야 합니다.",
@@ -739,9 +745,16 @@ const authoredBranchScenes = {
  */
 export const branchConditions = {
   costAlreadyPaid: {
-    label: "이미 누군가 비용을 치른 뒤에만 열립니다",
+    // Two disjuncts read "someone was hurt" and "the record slipped", which is
+    // the harm-first and the procedure-first way of paying. A player who
+    // protects people and follows procedure pays in hours instead, and had no
+    // way in: case 04's detour was unreachable for exactly the run that plays
+    // the case as written. The third disjunct is that run's receipt.
+    label: "이미 누군가 비용을 치른 뒤에만 열립니다 (피해, 정당성, 또는 시간)",
     test: ({ resources } = {}) =>
-      (resources?.humanCost ?? 0) >= 6 || (resources?.legitimacy ?? 100) <= 45,
+      (resources?.humanCost ?? 0) >= 6 ||
+      (resources?.legitimacy ?? 100) <= 45 ||
+      (resources?.time ?? 100) <= 44,
   },
   ruleNotYetClosed: {
     label: "직전 사건을 규칙으로 닫지 않았을 때만 열립니다",
@@ -1645,7 +1658,7 @@ function registerDramaticRoutePlan(caseId, plan) {
       })),
     };
     nodes[route.final] = {
-      phase: "ROUTE FINAL",
+      phase: "LAST CALL",
       title: route.finalTitle,
       speaker: route.speaker,
       text: route.finalText,
@@ -1679,7 +1692,7 @@ function registerDramaticRoutePlan(caseId, plan) {
     })),
   };
   nodes[plan.system.final] = {
-    phase: "ROUTE FINAL",
+    phase: "LAST CALL",
     title: "준비된 결말 밖에서",
     speaker: plan.system.speaker,
     text: "준비된 선택지 밖의 문장은 사건의 규칙을 직접 건드립니다. 이제 플레이어의 문장이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",

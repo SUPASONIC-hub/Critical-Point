@@ -15,7 +15,15 @@ import { easyResourceLabels } from "./playerLanguage.js";
 
 export const GAME_TITLE = "CRITICAL POINT";
 export const GAME_TITLE_READING = "임계점";
-export const GAME_SUBTITLE = "판단이 깊어지는 순간";
+/**
+ * The subtitle names the genre, because nothing else on the screen does.
+ *
+ * "판단이 깊어지는 순간" described a mood and left the reader to guess whether
+ * this was a novel, a quiz or a management sim. The title is a threshold and the
+ * loop is a 45-second window in which somebody has to be charged for the
+ * decision, so the subtitle says that.
+ */
+export const GAME_SUBTITLE = "45초 안에, 누가 대가를 지불할지 정한다";
 
 export const resourceMeta = {
   time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },

@@ -92,30 +92,29 @@ export function ChoiceList({
             )}
             <span className="choice-speech">"{speechifyChoice(choice)}"</span>
             <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>
+            {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
+            {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
             {showTacticalDetails && observerPreview && (
               <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
                 <b>{observerPreview.tag.label}</b>
                 <small>{observerPreview.repeatsCurrentPattern ? "패턴 고정" : "패턴 교란"}</small>
               </span>
             )}
-            <span className="choice-stakes">
-              {Object.entries(choice.effect ?? {})
-                .filter(([, value]) => value !== 0)
-                .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-                .slice(0, 4)
-                .map((entry) => (
-                  <b key={entry[0]} className={isChoiceEffectGain(entry[0], entry[1]) ? "positive" : "negative"}>
-                    {formatChoiceEffectChip(entry, resourceMeta)}
-                  </b>
-                ))}
-            </span>
-            {showTacticalDetails && <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>}
-            {showTacticalDetails && <span className="choice-authority-impact">{getChoiceAuthorityImpact(choice)}</span>}
-            {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
-            {!showTacticalDetails && <span className="choice-effect choice-effect-compact">{getChoiceSubtext(choice)}</span>}
-            {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
             {showTacticalDetails && (
               <>
+                <span className="choice-stakes">
+                  {Object.entries(choice.effect ?? {})
+                    .filter(([, value]) => value !== 0)
+                    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+                    .slice(0, 4)
+                    .map((entry) => (
+                      <b key={entry[0]} className={isChoiceEffectGain(entry[0], entry[1]) ? "positive" : "negative"}>
+                        {formatChoiceEffectChip(entry, resourceMeta)}
+                      </b>
+                    ))}
+                </span>
+                <span className="choice-action">{getDramaticChoiceLabel(choice)}</span>
+                <span className="choice-authority-impact">{getChoiceAuthorityImpact(choice)}</span>
                 <span className="choice-tactical">
                   <span>
                     <strong>방향 힌트</strong>
@@ -129,9 +128,6 @@ export function ChoiceList({
                 )}
                 <span className="choice-subtext">{getChoiceSubtext(choice)}</span>
               </>
-            )}
-            {!showTacticalDetails && (
-              <span className="choice-intuition-hint">바로 선택 · 장면 목표를 맞히면 직감 보너스</span>
             )}
           </GuardedButton>
         );

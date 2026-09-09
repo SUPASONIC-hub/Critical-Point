@@ -1,10 +1,8 @@
-import { Info, MessageSquareText } from "lucide-react";
+import { MessageSquareText, Info } from "lucide-react";
 import { DecisionRail } from "../components/DecisionRail.jsx";
-import { MemoPanel } from "../components/MemoPanel.jsx";
-import { StatusBoard } from "../components/StatusBoard.jsx";
-import { GameMetricsDrawer } from "../components/GameMetricsDrawer.jsx";
+import { DecisionClock } from "../components/DecisionClock.jsx";
+import { RecordRoom } from "../components/RecordRoom.jsx";
 import { GameHeader } from "../components/GameHeader.jsx";
-import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ResourceRail } from "../components/ResourceRail.jsx";
 import { CommitConsole } from "../components/CommitConsole.jsx";
 import { ChoiceList } from "../components/ChoiceList.jsx";
@@ -13,22 +11,30 @@ import { CASE_SEQUENCE } from "../gameData.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getFreeTextSignals } from "../gameLogic.js";
 
+/**
+ * One decision, one screen.
+ *
+ * This screen carried twenty-eight standing sections and seven drawers, which
+ * measured 3,953px on a 390x844 phone: 4.7 screens of scrolling for one of the
+ * forty-two choices in a run. Everything that is not the scene, the clock, the
+ * three standing resources or the choices now lives behind `RecordRoom`, and
+ * the scene reads as prose rather than as seven labelled fields.
+ */
 export function PlayScreen({ view }) {
   const {
     common: {
       suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice,
       renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef,
-      renderSaveStatus, renderSceneLines, playerName, activeCaseMeta,
+      renderSaveStatus, renderSceneLines,
     },
     scene: {
-      caseObjectives, node, openingLegacy, sceneChallenge, narrativeSpine, questSteps, sceneVisuals,
-      speakerProfile, speakerPortrait, resolvedNodeId, sceneDirection, latestBeat,
+      node, sceneChallenge, narrativeSpine, sceneVisuals, speakerProfile, speakerPortrait,
+      resolvedNodeId, sceneDirection, latestBeat,
     },
     decision: {
-      protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger,
-      pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader,
-      previewChoice, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta,
-      formatForecastRisk, setPendingChoice, commitConfirmRef, choose,
+      isAdvancing, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts,
+      pressureLeader, previewChoice, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef,
+      formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose,
     },
     choices: {
       fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef,
@@ -36,20 +42,15 @@ export function PlayScreen({ view }) {
       getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels,
     },
     freeInput: {
-      freeTextCombo, latestFreeTextSuccess, freeChoice, boardChangePrompts, updateFreeText, freeText,
+      latestFreeTextSuccess, freeChoice, boardChangePrompts, updateFreeText, freeText,
       FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText,
       activeFreeTextSignalCount, freeTextPreview,
     },
     status: {
-      triggerLabels, pressureCascade, riskPressure, playGuideItems, saveCurrentGame, reset, progress,
-      easyRiskLabels, riskTier, activeBonus, currentAverageResponseTime, log, clueCount, clueHypotheses = [],
-      discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore,
-      resourceMeta, triggerLabSignals, setMemoOpened, applyEffect, resources, activePlayStyle, turnBriefItems,
-      completedCases, routeIndex, routeLength,
+      riskPressure, saveCurrentGame, reset, progress, easyRiskLabels, riskTier, log, clueCount,
+      currentChallengeStreak, resourceMeta, applyEffect, resources, routeIndex, routeLength,
     },
-    investigation: {
-      echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, evidenceCount,
-    },
+    investigation: { evidenceCount },
     debug: {
       debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
     },
@@ -61,10 +62,6 @@ export function PlayScreen({ view }) {
     ? getFreeTextSignals(latestFreeTextSuccess.freeText)
     : null;
   const sceneArt = getArtSources(sceneVisuals[currentCase]);
-  const operatorBrief = view.operatorBriefs?.[currentCase];
-  const chapterRule = view.chapterRules?.[currentCase];
-  const relationshipScores = view.relationshipScores ?? [];
-  const authorityState = view.authorityState ?? { level: "OBSERVER", permissions: [], locked: "권한 정보 없음" };
   const latestObserverTag = log.at(-1)?.observerTag;
   const getObserverPreviewForChoice = (choiceId) =>
     decisionForecasts.find(({ choice }) => choice.id === choiceId)?.observerPreview;
@@ -78,6 +75,10 @@ export function PlayScreen({ view }) {
         : currentChallengeStreak > 0
           ? "방금 맞힌 목표가 다음 장면의 기준선으로 남았습니다."
           : "아직 관찰자는 침묵하지만, 선택의 순서는 저장되고 있습니다.";
+  // Six paintings carry forty-two scenes, so the same room has to read as a
+  // different hour of the same day. The tone index walks the route rather than
+  // the case, and the stylesheet turns it into a crop and a colour temperature.
+  const sceneTone = Math.max(0, routeIndex) % 4;
   return (
     <main className={`shell game-shell suspense-${suspenseState.tier.toLowerCase()}`}>
       <AdaptiveMusic modeKey={musicModeKey} />
@@ -90,301 +91,17 @@ export function PlayScreen({ view }) {
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {screenReaderStatus}
       </p>
-      <section className={pendingChoice ? "game-board has-commit-console" : "game-board"}>
-        <details className="game-context-drawer insight-drawer">
-          <summary>
-            <span>현재 상황판</span>
-            <b>목표·압박·위험·자원·기록·장면 목표 한 번에 보기</b>
-          </summary>
-        {view.chapterUiModel && (
-          <section className="chapter-dashboard" style={{ "--chapter-accent": view.chapterUiModel.accent }} aria-label="챕터 전용 운영판">
-            <div><span>{view.chapterUiModel.label}</span><strong>{view.chapterUiModel.title}</strong></div>
-            <div className="chapter-dashboard-metrics">
-              {view.chapterUiModel.metrics.map((metric) => <b key={metric}>{metric}</b>)}
-            </div>
-            {view.relationshipQuest && (
-              <p><strong>{view.relationshipQuest.title}</strong> · {view.relationshipQuest.goal} · {view.relationshipQuest.unlocked ? "QUEST CLEAR" : `PROGRESS ${view.relationshipQuest.progress}%`}</p>
-            )}
-          </section>
-        )}
-        {view.delayedConsequences?.length > 0 && (
-          <section className="delayed-consequence-strip" aria-label="지연된 결과">
-            <span>DELAYED CONSEQUENCE</span>
-            <p>{view.delayedConsequences.at(-1).text}</p>
-          </section>
-        )}
-        {view.interlude && openingLegacy && (
-          <section className="interlude-panel" aria-label="챕터 전환 장면">
-            <span>{view.interlude.label}</span>
-            <strong>{view.interlude.title}</strong>
-            <p>{view.interlude.text}</p>
-          </section>
-        )}
-        {view.relationshipScene && (
-          <section className="relationship-scene-panel" aria-label="관계 전용 장면">
-            <span>{view.relationshipScene.title}</span>
-            <p>{view.relationshipScene.text}</p>
-            <strong>{view.relationshipScene.action}</strong>
-          </section>
-        )}
-        {view.pastRunMemory && (
-          <section className="past-run-memory" aria-label="이전 플레이 기록">
-            <span>{view.pastRunMemory.label}</span>
-            <p>{view.pastRunMemory.text}</p>
-          </section>
-        )}
-        {view.chapterTransitionBridge && <section className="chapter-transition-bridge" aria-label="챕터 이동 기록"><span>{view.chapterTransitionBridge.label}</span><strong>{view.chapterTransitionBridge.title}</strong><p>{view.chapterTransitionBridge.text}</p></section>}
-        {view.operatorReveal && <section className="operator-reveal-panel" aria-label="주인공 기록 공개"><span>{view.operatorReveal.title}</span><p>{view.operatorReveal.text}</p></section>}
-        {view.relationshipGraph?.length > 0 && (
-          <section className="relationship-graph-panel" aria-label="인물 관계 그래프">
-            <span>RELATION MAP</span>
-            <div>{view.relationshipGraph.filter((item) => item.value > 0).map((item) => <article key={item.name}><b>{item.name}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.state}</small></article>)}</div>
-          </section>
-        )}
-        {view.autonomousSignal && (
-          <section className="autonomous-signal-panel" aria-label="인물 자율 행동">
-            <span>WORLD MOVEMENT · {view.timelineStamp}</span>
-            <p>{view.autonomousSignal.text}</p>
-          </section>
-        )}
-        {view.evidenceMetadata?.length > 0 && (
-          <section className="evidence-source-panel" aria-label="단서 출처와 신뢰도">
-            <span>EVIDENCE SOURCES</span>
-            <div>{view.evidenceMetadata.slice(-4).map((item) => <article key={item.id}><b>{item.title}</b><small>{item.sourceType} · {item.reliability}%</small></article>)}</div>
-          </section>
-        )}
-        {view.hypothesisConflict && <p className="hypothesis-conflict" role="alert"><strong>{view.hypothesisConflict.title}</strong> {view.hypothesisConflict.text}</p>}
-        {view.resourceChain && <p className={`resource-chain-signal ${view.resourceChain.tone}`} role="status"><strong>RESOURCE CHAIN</strong> {view.resourceChain.text}</p>}
-        {view.characterMemory && <p className="character-memory" role="status"><strong>MEMORY TRACE</strong> {view.characterMemory.text}</p>}
-        {view.characterState && <p className="character-state-signal" role="status"><strong>CHARACTER STATE</strong> {view.characterState.speaker}: {view.characterState.stance} / TRUST {view.characterState.trust} / PRESSURE {view.characterState.pressure}</p>}
-        {view.rivalResponse && <p className="rival-response-signal" role="status">{view.rivalResponse.response}</p>}
-        {view.midBoss && <section className="mid-boss-panel" aria-label="챕터 반박 장면"><span>{view.midBoss.title}</span><p>{view.midBoss.text}</p></section>}
-        {view.investigationTargets?.length > 0 && (
-          <section className="investigation-panel" aria-label="조사 대상 선택">
-            <span>ACTIVE INVESTIGATION</span>
-            <div>{view.investigationTargets.map((target) => <GuardedButton type="button" key={target.id} blocked={target.locked} className={view.selectedInvestigationOutcome?.id === target.id ? "selected" : ""} onClick={() => view.investigateTarget(target)}><b>{target.label}</b><small>{target.locked ? "권한 잠김" : "조사 시작"}</small></GuardedButton>)}</div>
-            {view.selectedInvestigationOutcome && <p>{view.selectedInvestigationOutcome.outcome}{view.selectedInvestigationOutcome.contaminated ? " 단, 이 기록에는 오염 가능성이 있습니다." : ""}</p>}
-          </section>
-        )}
-        {view.evidenceRepairPuzzle && <section className={`evidence-repair-panel ${view.evidenceRepairPuzzle.repaired ? "repaired" : ""}`} aria-label="증거 원본 복구"><span>{view.evidenceRepairPuzzle.title}</span><p>{view.evidenceRepairPuzzle.prompt}</p><small>{view.evidenceRepairPuzzle.source.join(" / ")}</small>{!view.evidenceRepairPuzzle.repaired && <button type="button" onClick={view.repairEvidence}>원본 복구</button>}</section>}
-        {view.rivalIntervention?.active && <section className="rival-intervention-panel" aria-label="라이벌 개입"><span>{view.rivalIntervention.title}</span><p>{view.rivalIntervention.text}</p><div>{view.rivalIntervention.options.map((option) => <button type="button" key={option.id} onClick={() => view.counterRival(option)}>{option.label}</button>)}</div></section>}
-        {view.evidenceContamination && <p className="evidence-contamination" role="alert"><strong>EVIDENCE CONTAMINATION</strong> {view.evidenceContamination.text}</p>}
-        {view.evidenceCombinations?.length > 0 && (
-          <section className="evidence-combination-panel" aria-label="조합된 증거">
-            <span>CROSS-REFERENCE</span>
-            {view.evidenceCombinations.map((item) => <article key={item.id}><strong>{item.title}</strong><p>{item.text}</p></article>)}
-          </section>
-        )}
-        {view.hypothesisActions?.length > 0 && (
-          <section className="hypothesis-actions-panel" aria-label="가설 처리">
-            <span>HYPOTHESIS CONTROL</span>
-            <div>{view.hypothesisActions.map((action) => <button type="button" key={action.id} onClick={() => view.resolveHypothesisAction(action)}><b>{action.label}</b><small>{action.text}</small></button>)}</div>
-          </section>
-        )}
-        {view.hypothesisLockState && <p className="hypothesis-lock-signal" role="status"><strong>{view.hypothesisLockState.label}</strong> {view.hypothesisLockState.text}</p>}
-        {view.balanceSignals?.length > 0 && (
-          <p className="balance-signal" role="status">{view.balanceSignals[0].signal}: {view.balanceSignals[0].share}%의 기록이 같은 선택에 집중되어 있습니다. 다른 경로를 확인해 보세요.</p>
-        )}
-        <section className="mission-strip">
-          <div>
-            <span>현재 목표</span>
-            <strong>{simplifyPlayerText(caseObjectives[currentCase] ?? caseObjectives.case01)}</strong>
-          </div>
-          <div>
-            <span>이번 장면</span>
-            <strong>{simplifyPlayerText(node.phase)}</strong>
-          </div>
-          <div>
-            <span>핵심 압박</span>
-            <strong>{simplifyPlayerText(node.triggers.map((trigger) => triggerLabels[trigger]).join(" / "))}</strong>
-          </div>
-        </section>
-        {openingLegacy && (
-          <section className="legacy-panel">
-            <div>
-              <span>{openingLegacy.label}</span>
-              <strong>{openingLegacy.title}</strong>
-            </div>
-            <p>{openingLegacy.text}</p>
-            {openingLegacy.continuity && (
-              <div className="continuity-bridge">
-                <span>직전 사건의 결과</span>
-                <strong>{openingLegacy.continuity.title}</strong>
-                <p>{openingLegacy.continuity.text}</p>
-              </div>
-            )}
-            <div className="legacy-effect">
-              {Object.entries(openingLegacy.effect).map(([key, value]) => (
-                <small key={key} className={value >= 0 ? "delta-up" : "delta-down"}>
-                  {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}{value}
-                </small>
-              ))}
-            </div>
-            {clueHypotheses.length > 0 && (
-              <div className="hypothesis-board" aria-label="가설 보드">
-                <div><span>WORKING HYPOTHESES</span><b>{clueHypotheses.length}개 가설 조합</b></div>
-                {clueHypotheses.map((hypothesis) => (
-                  <article key={hypothesis.id}>
-                    <strong>{hypothesis.title}</strong>
-                    <p>{hypothesis.text}</p>
-                    <small>CONFIDENCE {hypothesis.confidence}%</small>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-        {operatorBrief && (
-          <section className="operator-bridge" aria-label="분석관의 위치와 권한">
-            <div className="operator-bridge-heading">
-              <span>OPERATOR BRIEF</span>
-              <strong>당신은 트리거랩의 전환 분석관입니다</strong>
-            </div>
-            <div className="operator-bridge-grid">
-              <div>
-                <span>현재 역할</span>
-                <b>사건을 해결하는 외부 영웅이 아니라, 판단 기준을 설계하는 내부 분석관</b>
-              </div>
-              <div>
-                <span>현재 권한</span>
-                <b>기록 열람 · 관계자 질문 · 임시 운영 기준 제안</b>
-              </div>
-              <div>
-                <span>권한의 경계</span>
-                <b>현장 집행과 최종 승인 권한은 각 조직의 책임자에게 남아 있습니다</b>
-              </div>
-              <div className="operator-bridge-movement">
-                <span>이번 이동</span>
-                <b>{operatorBrief.movement}</b>
-                <p>{operatorBrief.reason}</p>
-              </div>
-            </div>
-          </section>
-        )}
-        {view.operatorProfile && (
-          <section className="operator-identity-strip" aria-label="주인공 정체성과 현재 권한">
-            <div>
-              <span>{view.operatorProfile.label}</span>
-              <strong>{view.operatorProfile.title}</strong>
-            </div>
-            <p>{view.operatorProfile.authority}</p>
-            <div className="authority-permission-list">
-              <b>{authorityState.level}</b>
-              {(authorityState.permissions ?? []).map((permission) => <span key={permission}>{permission}</span>)}
-            </div>
-            <small className="authority-origin-permission">출신 권한: {(authorityState.origin?.originPermissions ?? []).join(" · ")}</small>
-          </section>
-        )}
-        {view.latestChoiceFeedback && (
-          <p className={`choice-outcome-feedback ${view.latestChoiceFeedback.tone}`} role="status">
-            <strong>{view.latestChoiceFeedback.label}</strong> {view.latestChoiceFeedback.text}
-          </p>
-        )}
-        <section className={`pressure-cascade ${pressureCascade.tone}`}>
-          <div className="pressure-cascade-mark">
-            <span>{pressureCascade.label}</span>
-            <strong>{riskPressure}</strong>
-          </div>
-          <div>
-            <h2>{pressureCascade.title}</h2>
-            <p>{pressureCascade.text}</p>
-          </div>
-          <small>{pressureCascade.cue}</small>
-        </section>
-        <section className={`suspense-console ${suspenseState.tier.toLowerCase()}`} aria-label="서스펜스 신호">
-          <div className="suspense-console-mark">
-            <span>{suspenseState.label}</span>
-            <strong>{String(suspenseState.score).padStart(2, "0")}</strong>
-          </div>
-          <div className="suspense-console-copy">
-            <h2>{suspenseState.title}</h2>
-            <p>{suspenseState.text}</p>
-          </div>
-          <div className="suspense-meter" aria-label={`서스펜스 ${suspenseState.score}퍼센트`}>
-            <div style={{ width: `${suspenseState.score}%` }} />
-            <small>{suspenseState.cue} · 사건 {suspenseState.caseCode}</small>
-          </div>
-        </section>
-        <section className="story-turn-panel" data-testid="story-turn-panel" aria-label="story turn"><div className="story-turn-mark"><span>이야기 전환점</span><strong>!</strong></div><div><small>TURN {String(narrativeSpine.turn).padStart(2,"0")}</small><h2>{node.title}</h2><p>{narrativeSpine.consequence}</p></div><p className="story-turn-question">{narrativeSpine.question}</p></section>
-        <details className="play-help">
-          <summary>
-            <span>
-              <Info size={16} />
-              플레이 규칙
-            </span>
-            <b>에코, 구조 재설계, 자원 변화를 다시 확인합니다.</b>
-          </summary>
-          <div className="guide-grid compact-guide">
-            {playGuideItems.map((item) => (
-              <article key={item.title}>
-              <b>{item.title}</b>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </details>
-        <GameMetricsDrawer
+      <aside className="play-rail" aria-label="상시 상태">
+        <ResourceRail
+          resourceMeta={resourceMeta}
+          resources={resources}
+          riskPressure={riskPressure}
           riskTier={riskTier}
           easyRiskLabels={easyRiskLabels}
-          riskPressure={riskPressure}
-          activeBonus={activeBonus}
-          freeTextCombo={freeTextCombo}
-          currentAverageResponseTime={currentAverageResponseTime}
-          progress={progress}
-          log={log}
-          clueCount={clueCount}
-          discoveredClues={discoveredClues}
-          currentChallengeStreak={currentChallengeStreak}
-          momentumTier={momentumTier}
-          streakGoal={streakGoal}
-          streakRemaining={streakRemaining}
-          momentumScore={momentumScore}
-          protocolUsed={protocolUsed}
-          isAdvancing={isAdvancing}
-          activateCrisisProtocol={activateCrisisProtocol}
-          decisionFingerprint={decisionFingerprint}
-          decisionLedger={decisionLedger}
-          resourceMeta={resourceMeta}
-          sceneChallenge={sceneChallenge}
-          triggerLabSignals={triggerLabSignals}
-          currentCase={currentCase}
-          node={node}
-          triggerLabels={triggerLabels}
-          narrativeSpine={narrativeSpine}
-          suspenseState={suspenseState}
-          questSteps={questSteps}
-          simplifyPlayerText={simplifyPlayerText}
         />
-        <MemoPanel
-          memo={node.memo}
-          onOpen={(event) => event.currentTarget.open && setMemoOpened(true)}
-        />
-
-        <details className="echo-panel insight-drawer">
-          <summary>
-            <span>에코의 검증 질문</span>
-            <b>반론 열기</b>
-          </summary>
-          <p>{echo}</p>
-          <div className="echo-probe">
-            <div>
-              <strong>{probeUsed ? "힌트 사용 완료" : "막혔다면 에코에게 한 번 더 묻기"}</strong>
-              <span>{probeUsed ? "이번 장면의 방향성 힌트가 대화에 남았습니다." : `${echoProbeCost}을 지불하고 방향성만 확인합니다.`}</span>
-            </div>
-            <button type="button" onClick={requestEchoProbe} disabled={probeUsed || isAdvancing}>
-              {probeUsed ? "확인됨" : "힌트 요청"}
-            </button>
-          </div>
-          <details className="echo-checks">
-            <summary>다시 확인할 것</summary>
-            <ul>
-              {getEchoChecks(node).map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </details>
-        </details>
-        </details>
+        <DecisionClock />
+      </aside>
+      <section className={pendingChoice ? "game-board has-commit-console" : "game-board"}>
         <GameHeader
           node={node}
           simplify={simplifyPlayerText}
@@ -397,115 +114,10 @@ export function PlayScreen({ view }) {
           progress={progress}
         />
         {renderSaveStatus()}
-        <ResourceRail
-          resourceMeta={resourceMeta}
-          resources={resources}
-          riskPressure={riskPressure}
-          riskTier={riskTier}
-          easyRiskLabels={easyRiskLabels}
-        />
-
-        {operatorBrief && (
-          <details className="chapter-console-drawer insight-drawer">
-            <summary>
-              <span>작전 브리프</span>
-              <b>내 권한, 인물 관계, 확보한 단서 다시 보기</b>
-            </summary>
-            <section className="chapter-console" aria-label="현재 챕터 작전 브리프">
-              <div className="chapter-console-topline">
-                <span>OPERATOR BRIEF / LIVE AUTHORITY</span>
-                <b>당신의 결정은 현장을 바꾸지만, 모든 권한을 갖지는 않습니다</b>
-              </div>
-              <div className="chapter-console-main">
-                <div className="operator-identity">
-                  <span>WHO YOU ARE</span>
-                  <strong>트리거랩 전환 분석관</strong>
-                  <p>기업과 조직의 위기를 관찰하고, 다음 운영 기준을 설계하는 사람</p>
-                </div>
-                <div className="operator-authority">
-                  <span>YOUR AUTHORITY</span>
-                  <div><b>열람</b><b>질문</b><b>기준 제안</b></div>
-                  <p>기록을 열고, 관계자에게 묻고, 임시 기준을 제안할 수 있습니다.</p>
-                </div>
-                <div className="operator-limit">
-                  <span>THE LIMIT</span>
-                  <strong>집행권은 현장에 남아 있습니다</strong>
-                  <p>최종 승인과 실제 집행은 해당 조직의 책임자가 수행합니다. 그래서 당신의 선택은 명령이 아니라 압박과 기준으로 작동합니다.</p>
-                </div>
-                {chapterRule && (
-                  <div className="chapter-rule">
-                    <span>CHAPTER RULE / {chapterRule.label}</span>
-                    <strong>{chapterRule.rule}</strong>
-                    <p>이번 챕터의 개입 권한: {chapterRule.authority}</p>
-                  </div>
-                )}
-              </div>
-              <div className="chapter-transfer">
-                <div className="chapter-transfer-route">
-                  <span>CHAPTER {String(CASE_SEQUENCE.indexOf(currentCase) + 1).padStart(2, "0")} / {CASE_SEQUENCE.length}</span>
-                  <strong>{operatorBrief.movement}</strong>
-                </div>
-                <div className="chapter-transfer-reason">
-                  <span>WHY THIS MOVE</span>
-                  <p>{operatorBrief.reason}</p>
-                </div>
-              </div>
-              <div className="authority-level" aria-label="현재 권한 단계">
-                <div><span>AUTHORITY LEVEL</span><strong>{authorityState.level}</strong><small>{authorityState.locked}</small></div>
-                <div className="authority-permission-list">{authorityState.permissions.map((permission) => <b key={permission}>{permission}</b>)}</div>
-              </div>
-              <div className="chapter-rail" aria-label="챕터 진행 경로">
-                {CASE_SEQUENCE.map((caseId, index) => (
-                  <span key={caseId} className={caseId === currentCase ? "active" : completedCases.includes(caseId) ? "complete" : ""}>
-                    <i>{String(index + 1).padStart(2, "0")}</i>{caseId === currentCase ? "현재" : completedCases.includes(caseId) ? "완료" : "대기"}
-                  </span>
-                ))}
-              </div>
-              <div className="authority-action">
-                <div>
-                  <span>ONE-TIME AUTHORITY</span>
-                  <b>위기 프로토콜을 발동해 운영 기준에 직접 개입</b>
-                  <small>시간 -4 · 자본 -2 · 정당성 +3 · 위험 압력이 높을 때만 사용 가능</small>
-                </div>
-                <GuardedButton
-                  type="button"
-                  onClick={activateCrisisProtocol}
-                  blocked={protocolUsed || riskPressure < 60 || isAdvancing}
-                >
-                  {protocolUsed ? "권한 사용 완료" : riskPressure >= 60 ? "권한 행사" : "위험 압력 60 필요"}
-                </GuardedButton>
-              </div>
-              <div className="relationship-strip" aria-label="등장인물 관계 온도">
-                <span>RELATIONSHIP HEAT</span>
-                <div>
-                  {relationshipScores.map((relationship) => (
-                    <article key={relationship.name} className={relationship.active ? "active" : ""}>
-                      <b>{relationship.name}</b>
-                      <i><em style={{ width: `${relationship.value}%` }} /></i>
-                      <small>{relationship.active ? "현재 대화 상대" : relationship.value > 0 ? "관찰 중" : "아직 연결 전"}</small>
-                    </article>
-                  ))}
-                </div>
-              </div>
-              <div className="mystery-board" aria-label="반전 단서 보드">
-                <div><span>MYSTERY BOARD</span><b>{discoveredClues.length}개 단서 확보</b></div>
-                {discoveredClues.length > 0 ? (
-                  <div className="mystery-clues">
-                    {discoveredClues.slice(-3).map((clue) => (
-                      <article key={clue.id}>
-                        <strong>{clue.title ?? clue.id}</strong>
-                        <p>{clue.text ?? clue.description ?? "기록의 빈틈이 다음 질문으로 남았습니다."}</p>
-                      </article>
-                    ))}
-                  </div>
-                ) : <p className="mystery-empty">첫 번째 모순은 아직 모습을 드러내지 않았습니다. 압박을 낮추거나 오래 관찰하면 단서가 열립니다.</p>}
-              </div>
-            </section>
-          </details>
-        )}
+        <RecordRoom view={view} />
 
         <div className="scene">
-          <div className="scene-visual" aria-hidden="true">
+          <div className={`scene-visual tone-${sceneTone}`} aria-hidden="true">
             <picture>
               {sceneArt && <source media={PHONE_ART_MEDIA} srcSet={sceneArt.phone} type="image/webp" />}
               {sceneArt && <source srcSet={sceneArt.wide} type="image/webp" />}
@@ -543,19 +155,23 @@ export function PlayScreen({ view }) {
               <small>{speakerProfile.role} · {speakerProfile.stance}</small>
             </span>
           </div>
+          {/* Prose, not fields. The same three beats were seven labelled rows
+              here, which taught the player to read the labels instead of the
+              scene; the reference reads that used to sit between them are in
+              the fold below. */}
           <div className="scene-story">
-            <p className="scene-narration"><span className="story-label">장면의 표정</span>{speakerProfile.appearance} {speakerProfile.gesture}</p>
-            <p className="scene-body scene-critical"><span className="story-label">이번 장면의 핵심 상황</span>{node.text}</p>
-            <p className="scene-direction"><span className="story-label">왜 지금 결정해야 하나</span>{sceneDirection}</p>
-            {latestFreeTextSuccess && latestFreeTextSuccess.nodeId !== resolvedNodeId && (
-              <p className="scene-continuity-quote">
-                <span className="story-label">이어진 기록</span>
-                이전 문장이 다음 장면의 기준으로 남아 있다: “{latestFreeTextSuccess.freeText}”
-              </p>
-            )}
-            <p className="scene-dialogue"><span className="story-label">상대가 던진 질문</span>"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <p className="scene-narration">{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            <p className="scene-body scene-critical">{node.text}</p>
+            <p className="scene-dialogue">"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
             <details className="scene-secondary">
               <summary>장면의 여운과 단서 보기</summary>
+              <p className="scene-direction"><span className="story-label">왜 지금 결정해야 하나</span>{sceneDirection}</p>
+              {latestFreeTextSuccess && latestFreeTextSuccess.nodeId !== resolvedNodeId && (
+                <p className="scene-continuity-quote">
+                  <span className="story-label">이어진 기록</span>
+                  이전 문장이 다음 장면의 기준으로 남아 있다: “{latestFreeTextSuccess.freeText}”
+                </p>
+              )}
               <p className="scene-thought"><span className="story-label">속마음</span>'{speakerProfile.thought}'</p>
               <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
               <p className="scene-secondary-note"><span className="story-label">다음 장면의 질문</span>{narrativeSpine.nextQuestion}</p>
@@ -587,18 +203,9 @@ export function PlayScreen({ view }) {
           <div className="choice-heading">
             <h2 id="choice-heading">어떻게 말할까</h2>
             <p className="choice-question">{narrativeSpine.question}</p>
-            <p>
-              어떤 선택도 무료가 아닙니다. 지금 고르는 말은 한 자원을 올리는 대신 다른
-              부담을 다음 장면으로 넘깁니다.
-            </p>
             <div className="turn-tactic">
               <span>이번 턴 공략</span>
               <strong>{sceneChallenge.title}</strong>
-              <p>
-                {showTacticalDetails
-                  ? "챌린지 달성 가능성, 위험 압력 변화, 사고 가속 보상을 계산한 전술 정보입니다."
-                  : "먼저 장면과 대화만 보고 판단해 보세요. 필요한 경우 전술 정보를 열 수 있습니다."}
-              </p>
             </div>
           </div>
           <button
@@ -703,19 +310,6 @@ export function PlayScreen({ view }) {
           />
         </section>
       </section>
-      <StatusBoard
-        playerName={playerName}
-        activePlayStyle={activePlayStyle}
-        turnBriefItems={turnBriefItems}
-        sceneChallenge={sceneChallenge}
-        node={node}
-        speakerProfile={speakerProfile}
-        triggerLabels={triggerLabels}
-        progress={progress}
-        log={log}
-        completedCases={completedCases}
-        activeCaseMeta={activeCaseMeta}
-      />
       {debugToolsEnabled && (
         <aside className="debug-overlay" data-testid="debug-overlay" aria-label="개발자 진행 추적">
           <div className="debug-overlay-heading">
@@ -733,5 +327,5 @@ export function PlayScreen({ view }) {
         </aside>
       )}
     </main>
-);
+  );
 }

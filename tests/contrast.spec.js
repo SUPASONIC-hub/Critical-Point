@@ -103,6 +103,12 @@ const COLLECT = () => {
     if (st.display === "none" || st.visibility === "hidden" || Number(st.opacity) < 0.15) continue;
     const box = el.getBoundingClientRect();
     if (box.width === 0 || box.height === 0) continue;
+    // Visually hidden text is announced, never painted, so its ratio against
+    // whatever happens to be behind it means nothing. The 1x1 clipped box is
+    // the .sr-only signature (src/styles/app/base-intro-ranking.css:67): it
+    // reported 1.01:1 the moment the page ground stopped being light, which is
+    // a fact about the utility, not about anything a reader can see.
+    if (box.width <= 1 && box.height <= 1 && (st.clip !== "auto" || st.clipPath !== "none")) continue;
 
     const fg0 = parse(st.color);
     if (!fg0) continue;

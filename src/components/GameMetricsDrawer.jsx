@@ -37,55 +37,21 @@ function DecisionWindowCard() {
   );
 }
 
-export function GameMetricsDrawer({
-  riskTier,
-  easyRiskLabels,
-  riskPressure,
-  activeBonus,
-  freeTextCombo,
-  currentAverageResponseTime,
-  progress,
-  log,
-  clueCount,
-  discoveredClues,
-  currentChallengeStreak,
-  momentumTier,
-  streakGoal,
-  streakRemaining,
-  momentumScore,
-  protocolUsed,
-  isAdvancing,
-  activateCrisisProtocol,
-  decisionFingerprint,
-  decisionLedger,
-  resourceMeta,
-  sceneChallenge,
-  triggerLabSignals,
-  currentCase,
-  node,
-  triggerLabels,
-  narrativeSpine,
-  suspenseState,
-  questSteps,
-  simplifyPlayerText,
-}) {
+export function GameMetricsDrawer({ view }) {
+  const {
+    activeBonus, freeTextCombo, currentAverageResponseTime, log, clueCount, discoveredClues,
+    currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, protocolUsed,
+    isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta,
+    triggerLabSignals, currentCase, node, triggerLabels, narrativeSpine, suspenseState, questSteps,
+    simplifyPlayerText, riskPressure,
+  } = view;
   return (
         <>
         <section className="game-hud">
-          <article className={`risk-card ${riskTier.toLowerCase()}`}>
-            <span>위험</span>
-            <strong>{easyRiskLabels[riskTier] ?? riskTier}</strong>
-            <p>{riskPressure} 압박</p>
-          </article>
           <article>
             <span>지금 받는 보너스</span>
             <strong>{simplifyPlayerText(activeBonus)}</strong>
             <p>자유입력 {freeTextCombo}회 · 평균 {currentAverageResponseTime}s</p>
-          </article>
-          <article>
-            <span>진행 목표</span>
-            <strong>{progress}%</strong>
-            <p>{log.length}개 판단 기록</p>
           </article>
           <article className={clueCount > 0 ? "clue-hud discovered" : "clue-hud"}>
             <span>숨은 단서</span>
@@ -116,14 +82,6 @@ export function GameMetricsDrawer({
             <span>회복 선택 <b>{decisionLedger.riskDrops}</b></span>
             <span>누적 비용 <b>{decisionLedger.strongestCost ? `${resourceMeta[decisionLedger.strongestCost[0]]?.label ?? decisionLedger.strongestCost[0]} ${decisionLedger.strongestCost[1]}` : "없음"}</b></span>
           </div>
-        </section>
-
-        <section className="scene-challenge">
-          <div>
-            <span>이번 장면 목표</span>
-          <strong>{sceneChallenge.title}</strong>
-          </div>
-        <p>{sceneChallenge.text}</p>
         </section>
 
         {riskPressure >= 60 && (

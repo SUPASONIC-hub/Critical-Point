@@ -48,8 +48,12 @@ function shareOfStems(label, line) {
 // share no surface word at all.
 const CLEARLY_BETTER = 0.34;
 
+// The two generated families, named by the beat they play rather than by the
+// function that builds them: connective scenes are "OFF THE RECORD", reaction
+// scenes are "THE ROOM AFTER". They read as phases on the scene chip, so they
+// are player copy; this filter follows the copy.
 const generated = Object.entries(nodes).filter(
-  ([, node]) => node.phase === "CONNECTIVE SCENE" || node.phase === "REACTION",
+  ([, node]) => node.phase === "OFF THE RECORD" || node.phase === "THE ROOM AFTER",
 );
 assert.ok(generated.length === 36, `expected 36 generated scenes, found ${generated.length}`);
 

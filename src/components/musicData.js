@@ -7,6 +7,13 @@
  * alone -- a critical scene lands harder because the kick doubles and the bass
  * plays sixteenths, not just because it is faster.
  *
+ * The percussion used to be a drum machine: backbeat snares on 5 and 13 and a
+ * sixteenth hat line in every mode, which is a groove, and a groove is the one
+ * thing a corporate thriller cannot have under it. What is left is a pulse and a
+ * room -- a kick that reads as a heartbeat, no backbeat at all, and hats thinned
+ * to the irregular ticks of a room that is still being recorded. The bar count
+ * and the engine are unchanged; only what plays on the steps is.
+ *
  * `x` marks a hit, `.` a rest. Frequencies are Hz; null is a rest.
  */
 function pattern(text) {
@@ -16,13 +23,13 @@ function pattern(text) {
 export const musicModes = {
   intro: {
     label: "INTRO",
-    stepMs: 168,
+    stepMs: 196,
     volume: 0.1,
     wave: "triangle",
     drive: 0,
     kick: pattern("x.......x......."),
     snare: pattern("................"),
-    hat: pattern("..x...x...x...x."),
+    hat: pattern("..........x....."),
     bass: [55, null, null, null, 55, null, 65.41, null, 49, null, null, null, 49, null, 55, null],
     lead: [220, null, null, 277.18, null, null, 196, null, null, 246.94, null, null, 220, null, null, null],
     pad: [[110, 164.81, 220], null, null, null, null, null, null, null, [98, 146.83, 196], null, null, null, null, null, null, null],
@@ -30,13 +37,13 @@ export const musicModes = {
   },
   controlled: {
     label: "CONTROLLED",
-    stepMs: 152,
+    stepMs: 178,
     volume: 0.115,
     wave: "triangle",
     drive: 0.12,
     kick: pattern("x.......x...x..."),
-    snare: pattern("....x.......x..."),
-    hat: pattern("..x.x.x...x.x.x."),
+    snare: pattern("................"),
+    hat: pattern("......x.......x."),
     bass: [65.41, null, 65.41, null, 82.41, null, 65.41, null, 73.42, null, 73.42, null, 98, null, 73.42, null],
     lead: [261.63, null, 329.63, null, null, 392, null, null, 293.66, null, 349.23, null, null, 329.63, null, null],
     pad: [[130.81, 196, 261.63], null, null, null, null, null, null, null, [146.83, 220, 293.66], null, null, null, null, null, null, null],
@@ -44,13 +51,13 @@ export const musicModes = {
   },
   unstable: {
     label: "UNSTABLE",
-    stepMs: 134,
+    stepMs: 156,
     volume: 0.128,
     wave: "sawtooth",
     drive: 0.34,
     kick: pattern("x...x...x..x.x.."),
-    snare: pattern("....x.......x..."),
-    hat: pattern("x.xxx.x.x.xxx.xx"),
+    snare: pattern("................"),
+    hat: pattern("...x......x...x."),
     bass: [73.42, 73.42, null, 69.3, 73.42, null, 82.41, 82.41, 65.41, 65.41, null, 69.3, 73.42, null, 87.31, null],
     lead: [293.66, null, 311.13, null, 392, null, null, 349.23, null, 329.63, null, 311.13, null, 415.3, null, null],
     pad: [[146.83, 220, 311.13], null, null, null, null, null, null, null, [138.59, 207.65, 277.18], null, null, null, null, null, null, null],
@@ -58,13 +65,13 @@ export const musicModes = {
   },
   critical: {
     label: "CRITICAL",
-    stepMs: 118,
+    stepMs: 132,
     volume: 0.14,
     wave: "sawtooth",
     drive: 0.62,
     kick: pattern("x.x.x.x.x.x.xxx."),
-    snare: pattern("....x.......x.x."),
-    hat: pattern("xxxxxxxxxxxxxxxx"),
+    snare: pattern("................"),
+    hat: pattern("..x..x..x..x..x."),
     bass: [49, 49, 51.91, 49, 55, 55, 46.25, 49, 49, 49, 58.27, 55, 51.91, 51.91, 49, 46.25],
     lead: [196, null, 207.65, 233.08, null, 246.94, null, 220, 196, null, 233.08, null, 261.63, null, 246.94, null],
     pad: [[98, 146.83, 207.65], null, null, null, [92.5, 138.59, 196], null, null, null, [103.83, 155.56, 220], null, null, null, [98, 146.83, 207.65], null, null, null],
@@ -72,13 +79,13 @@ export const musicModes = {
   },
   result: {
     label: "RESULT",
-    stepMs: 180,
+    stepMs: 208,
     volume: 0.105,
     wave: "sine",
     drive: 0,
     kick: pattern("x.......x......."),
-    snare: pattern("............x..."),
-    hat: pattern("....x.......x..."),
+    snare: pattern("................"),
+    hat: pattern("............x..."),
     bass: [65.41, null, null, null, 82.41, null, null, null, 98, null, null, null, 73.42, null, null, null],
     lead: [261.63, null, null, 392, null, null, 329.63, null, null, 440, null, null, 392, null, null, null],
     pad: [[130.81, 196, 261.63], null, null, null, [164.81, 246.94, 329.63], null, null, null, null, null, null, null, [146.83, 220, 293.66], null, null, null],
@@ -86,13 +93,13 @@ export const musicModes = {
   },
   final: {
     label: "FINAL",
-    stepMs: 142,
+    stepMs: 162,
     volume: 0.148,
     wave: "sawtooth",
     drive: 0.44,
     kick: pattern("x..x..x.x..x..x."),
-    snare: pattern("....x.......x..."),
-    hat: pattern("..x...x...x...x."),
+    snare: pattern("................"),
+    hat: pattern(".....x.......x.."),
     bass: [43.65, null, 43.65, 49, 55, null, 49, null, 41.2, null, 41.2, 46.25, 51.91, null, 58.27, null],
     lead: [349.23, null, 415.3, null, 466.16, null, 392, null, 349.23, null, 311.13, null, 349.23, 415.3, null, null],
     pad: [[87.31, 130.81, 174.61], null, null, null, null, null, null, null, [82.41, 123.47, 164.81], null, null, null, null, null, null, null],
