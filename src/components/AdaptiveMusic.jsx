@@ -306,6 +306,7 @@ function ensureAudioRuntime(volume) {
 }
 
 const ACCENT_PEAK_GAIN = 0.045;
+const REVEAL_PEAK_GAIN = 0.035;
 
 /**
  * The start button's confirmation tone.
@@ -376,6 +377,49 @@ export function playTargetLockCue() {
       gain.connect(destination);
       oscillator.start(start);
       oscillator.stop(start + 0.13);
+    });
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
+}
+
+export function playDecisionRevealCue(tone = "decision-locked") {
+  try {
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    const context = audioRuntime.context;
+    if (!context) return;
+    Promise.resolve(context.resume?.()).catch(() => {});
+
+    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+    const peak = REVEAL_PEAK_GAIN * multiplier;
+    const now = context.currentTime;
+    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
+    const patterns = {
+      "clue-found": [293.66, 369.99, 440],
+      "system-alert": [220, 185, 146.83],
+      "chain-reaction": [164.81, 220, 277.18, 329.63],
+      "streak-break": [246.94, 196],
+      "decision-locked": [196, 261.63, 329.63],
+    };
+    const notes = patterns[tone] ?? patterns["decision-locked"];
+
+    notes.forEach((frequency, index) => {
+      const start = now + index * 0.055;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = tone === "system-alert" || tone === "chain-reaction" ? "sawtooth" : "triangle";
+      oscillator.frequency.setValueAtTime(frequency, start);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        frequency * (tone === "system-alert" || tone === "streak-break" ? 0.92 : 1.08),
+        start + 0.12,
+      );
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(peak / Math.max(1, index + 1), start + 0.014);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.2);
+      oscillator.connect(gain);
+      gain.connect(destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.22);
     });
   } catch {
     // Audio is an enhancement; browsers may reject it during a gesture.

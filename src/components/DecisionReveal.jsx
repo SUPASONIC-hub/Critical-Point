@@ -1,8 +1,23 @@
+import { useEffect } from "react";
 import { ChevronRight, Sparkles } from "lucide-react";
+import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
 
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta } = view;
+  const revealTone = decisionReveal?.clue
+    ? "clue-found"
+    : decisionReveal?.suspenseEvent
+      ? "system-alert"
+      : decisionReveal?.cascade
+        ? "chain-reaction"
+        : decisionReveal?.streakBreak
+          ? "streak-break"
+          : "decision-locked";
+  useEffect(() => {
+    if (!decisionReveal) return;
+    playDecisionRevealCue(revealTone);
+  }, [decisionReveal, revealTone]);
   if (!decisionReveal) return null;
   // "열린 것" is what the choice bought, not what went up: 사람 피해 +11 belongs
   // under 닫힌 것. Three entries fit, so they are the three that moved most.
@@ -17,15 +32,6 @@ export function DecisionReveal({ view }) {
       : decisionReveal.streakBreak
         ? "끊긴 연속 기록은 실패가 아니라 다음 압박을 조정하는 근거가 됩니다."
         : "트리거랩은 결과보다 이 말을 고른 순서를 먼저 저장합니다.";
-  const revealTone = decisionReveal.clue
-    ? "clue-found"
-    : decisionReveal.suspenseEvent
-      ? "system-alert"
-      : decisionReveal.cascade
-        ? "chain-reaction"
-        : decisionReveal.streakBreak
-          ? "streak-break"
-        : "decision-locked";
   return (
     <div className="decision-reveal-backdrop" role="presentation">
       <div className={`cinematic-burst ${revealTone}`} aria-hidden="true">

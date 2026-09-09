@@ -3,6 +3,7 @@ import { startFirstRun } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 const ACCENT_PEAK_GAIN = 0.045;
+const REVEAL_PEAK_GAIN = 0.035;
 const LOW_PRESET_MULTIPLIER = 0.58;
 const TARGET_LOCK_GAIN_RATIO = 0.72;
 
@@ -118,4 +119,14 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
   expect(afterLock.oscillators).toBeGreaterThanOrEqual(beforeLock.oscillators + 3);
   const lockTarget = afterLock.gainTargets.find((value) => Math.abs(value - expectedLockPeak) < 1e-5);
   expect(lockTarget).toBeCloseTo(expectedLockPeak, 5);
+
+  const beforeReveal = await readProbe(page);
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+
+  const afterReveal = await readProbe(page);
+  const expectedRevealPeak = REVEAL_PEAK_GAIN * LOW_PRESET_MULTIPLIER;
+  expect(afterReveal.oscillators).toBeGreaterThanOrEqual(beforeReveal.oscillators + 3);
+  const revealTarget = afterReveal.gainTargets.find((value) => Math.abs(value - expectedRevealPeak) < 1e-5);
+  expect(revealTarget).toBeCloseTo(expectedRevealPeak, 5);
 });
