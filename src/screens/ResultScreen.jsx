@@ -266,7 +266,7 @@ export function ResultScreen({ view }) {
               <strong>{judgmentProfile.label}</strong>
             </div>
             <p>{judgmentProfile.text}</p>
-            <small>{observerEndingRecord.title}</small>
+            <small>{view.delayedConsequences?.at(-1)?.text ?? observerEndingRecord.title}</small>
           </section>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">

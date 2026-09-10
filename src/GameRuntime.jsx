@@ -1389,12 +1389,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       : null;
     const quickRead = responseTimeSec <= 12 && challengeMatch;
     const tempoBonus = quickRead
-      ? {
-          label: "QUICK READ",
-          text: "장면의 핵심 압박을 빠르게 읽고, 망설임 없이 챌린지를 맞혔습니다.",
-        effect: { trust: 1, fatigue: -1 },
-      }
-      : null;
+      ? { label: "QUICK READ", text: "장면의 핵심 압박을 빠르게 읽고, 망설임 없이 챌린지를 맞혔습니다.", effect: { trust: 1, fatigue: -1 } }
+      : responseTimeSec > DECISION_WINDOW_SECONDS
+        ? { label: "SILENCE CHARGED", text: "결정 창을 넘긴 망설임까지 판단 기록으로 남았습니다.", effect: {} }
+        : responseTimeSec >= 24
+          ? { label: "DELIBERATE READ", text: "오래 붙잡은 선택입니다. 관찰자는 확신보다 검토 시간을 먼저 기록합니다.", effect: {} }
+          : { label: "STEADY READ", text: "압박을 읽고 기록 가능한 속도로 결론을 닫았습니다.", effect: {} };
     const streakBreak = currentChallengeStreak > 0 && !challengeMatch
       ? {
           label: "STREAK BROKEN",
