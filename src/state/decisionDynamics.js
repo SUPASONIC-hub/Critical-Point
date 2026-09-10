@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useSyncExternalStore } from "react";
 import { onDecisionTick, getDecisionSeconds } from "./decisionClock.js";
 
 export const DYNAMICS_INITIAL_STATE = Object.freeze({
@@ -247,8 +247,81 @@ export function createDynamicsSummary(state) {
   };
 }
 
+/**
+ * Presentation broadcast for the pressure numbers.
+ *
+ * The feedback layer paints from the reducer, but it hangs off the play screen,
+ * five props deep in a 150-key view bag that a contract check keeps honest. Rather
+ * than thread nine display fields through that bag -- and re-render the screen on
+ * every tick to do it -- the pressure snapshot is published here and read with
+ * `useSyncExternalStore`, exactly how decisionClock keeps the countdown out of
+ * root state. Only the layer subscribes, so only the layer wakes per second.
+ */
+const PRESSURE_FIELDS = [
+  "stressLevel",
+  "thresholdState",
+  "environmentMode",
+  "combo",
+  "rewardMultiplier",
+  "vignette",
+  "heartbeatBpm",
+  "shakeIntensity",
+  "overdrive",
+  "isSlowMotion",
+  "isBlind",
+  "lastDelta",
+  "timeDecay",
+];
+
+function projectSnapshot(state) {
+  const snapshot = {};
+  for (const field of PRESSURE_FIELDS) snapshot[field] = state[field];
+  return Object.freeze(snapshot);
+}
+
+export const PRESSURE_IDLE_SNAPSHOT = projectSnapshot(DYNAMICS_INITIAL_STATE);
+
+let pressureSnapshot = PRESSURE_IDLE_SNAPSHOT;
+const pressureListeners = new Set();
+
+function subscribePressure(listener) {
+  pressureListeners.add(listener);
+  return () => pressureListeners.delete(listener);
+}
+
+export function getPressureSnapshot() {
+  return pressureSnapshot;
+}
+
+function getIdlePressure() {
+  return PRESSURE_IDLE_SNAPSHOT;
+}
+
+/**
+ * `useSyncExternalStore` re-reads on every notify and tears down if the snapshot
+ * is a fresh object each time, so an unchanged tick has to return the identical
+ * reference rather than an equal one.
+ */
+export function publishPressure(state) {
+  for (const field of PRESSURE_FIELDS) {
+    if (pressureSnapshot[field] !== state[field]) {
+      pressureSnapshot = projectSnapshot(state);
+      for (const listener of [...pressureListeners]) listener();
+      return pressureSnapshot;
+    }
+  }
+  return pressureSnapshot;
+}
+
+export function usePressure() {
+  return useSyncExternalStore(subscribePressure, getPressureSnapshot, getIdlePressure);
+}
+
 export function useDecisionDynamics({ active = true } = {}) {
   const [state, dispatch] = useReducer(reduceDecisionDynamics, DYNAMICS_INITIAL_STATE);
+  useEffect(() => {
+    publishPressure(state);
+  }, [state]);
   useEffect(() => {
     if (!active) return undefined;
     dispatch({ type: "DECISION_STARTED" });
