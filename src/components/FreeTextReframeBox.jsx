@@ -142,6 +142,7 @@ export function FreeTextReframeBox({
       <GuardedButton
         type="button"
         className="choice free-choice submit-reframe"
+        data-juice="free-text"
         onClick={() => choose(freeChoice)}
         blocked={!freeText.trim() || freeTextBlockedByPrivacy || isAdvancing}
         aria-label={

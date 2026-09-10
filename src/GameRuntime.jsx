@@ -218,9 +218,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
 
-  const {
-    pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
-  } = useDecision();
   // Coarse only: the exact count lives in the decision clock so a per-second
   // tick never reaches this render.
   const decisionPhase = useDecisionPhase();
@@ -243,6 +240,10 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     cognitionDefaults: makeEmptyScores(cognitionLabels),
     normalizeText: (value) => normalizeSavedText(value, FREE_TEXT_MAX_LENGTH),
   });
+  const {
+    pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
+    dynamicsSummary, dispatchDynamics,
+  } = useDecision({ active: started });
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
@@ -937,11 +938,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       setProbeUsed(false);
     });
     startDecisionWindow(DECISION_WINDOW_SECONDS);
+    dispatchDynamics({ type: "DECISION_STARTED" });
     return () => {
       cancelled = true;
       stopDecisionWindow();
     };
-  }, [currentCase, isResult, resolvedNodeId, setProbeUsed, setTimerPenaltyCount, started]);
+  }, [currentCase, dispatchDynamics, isResult, resolvedNodeId, setProbeUsed, setTimerPenaltyCount, started]);
 
   useEffect(() => {
     if (!started || isResult) return undefined;
@@ -1372,6 +1374,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       finalEffect: effect,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
+    dispatchDynamics({ type: "CHOICE_COMMITTED", challengeMatch });
     const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
     const instinctSurge = instinctChoice && challengeMatch
       ? {
@@ -1600,6 +1603,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
           triggers: nextTriggers,
           cognition: nextCognition,
           decision_log: nextLog,
+          dynamics: { ...dynamicsSummary, responseTimeSec },
         };
         setTelemetryStatus({
           tone: "pending",
@@ -1738,6 +1742,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   function previewChoice(choice) {
     if (isAdvancing || choice.type === "free") return;
     setPendingChoice(choice);
+    dispatchDynamics({ type: "CHOICE_STAGED", choiceId: choice.id });
+  }
+
+  function clearPendingChoice() {
+    setPendingChoice(null);
+    dispatchDynamics({ type: "CHOICE_CANCELLED" });
   }
 
   function beginChoiceHold(choice) {
@@ -2230,7 +2240,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }
 
   const playView = createPlayView(
-    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
+    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice: clearPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
     { clueHypotheses, chapterUiModel, relationshipQuest, relationshipGraph, autonomousSignal, timelineStamp, evidenceMetadata, hypothesisConflict, investigationTargets, investigateTarget, selectedInvestigationOutcome, evidenceContamination, hypothesisLockState, characterState, rivalResponse, evidenceRepairPuzzle, repairEvidence, rivalIntervention, counterRival, chapterTransitionBridge, operatorReveal, achievementProgress, resourceChain, midBoss, dynamicMusicLayers, characterMemory: getCharacterMemory(node?.speaker, log), evidenceCombinations, hypothesisActions, resolveHypothesisAction, delayedConsequences, playStyleUnlocks, interlude, balanceSignals, relationshipScene, pastRunMemory },
   );
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;

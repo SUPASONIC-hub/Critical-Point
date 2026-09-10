@@ -65,6 +65,7 @@ export function ChoiceList({
             data-adaptive={choice.adaptive ? "true" : undefined}
             data-continuity-memory={choice.continuityMemory ? "true" : undefined}
             data-evidence-turn={String(choice.id ?? "").includes("evidence_turn") ? "true" : undefined}
+            data-juice="choice"
             onClick={() => handleChoiceClick(choice)}
             onPointerDown={() => beginChoiceHold(choice)}
             onPointerUp={endChoiceHold}

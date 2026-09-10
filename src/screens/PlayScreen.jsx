@@ -214,6 +214,7 @@ export function PlayScreen({ view }) {
           <button
             type="button"
             className="tactical-toggle"
+            data-juice="toggle"
             onClick={() => setShowTacticalDetails((value) => !value)}
             aria-expanded={showTacticalDetails}
           >
@@ -229,6 +230,7 @@ export function PlayScreen({ view }) {
                       type="button"
                       key={choice.id}
                       className={`forecast-option ${forecast.forecastPrecision}`}
+                      data-juice="forecast"
                       onClick={() => previewChoice(choice)}
                       aria-pressed={pendingChoice?.id === choice.id}
                     >

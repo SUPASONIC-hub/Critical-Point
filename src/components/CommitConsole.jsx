@@ -108,13 +108,14 @@ export function CommitConsole({
         </div>
       </details>
       <div className="commit-console-actions">
-        <button type="button" className="commit-cancel" onClick={() => setPendingChoice(null)}>
+        <button type="button" className="commit-cancel" data-juice="cancel" onClick={() => setPendingChoice(null)}>
           다시 고르기
         </button>
         <button
           ref={commitConfirmRef}
           type="button"
           data-testid="commit-confirm"
+          data-juice="commit"
           className="commit-confirm"
           onClick={() => choose(pendingChoice)}
         >

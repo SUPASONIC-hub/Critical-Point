@@ -1,11 +1,13 @@
 import { applyEffect, getDiscoveryClue, getFreeTextSignals, getRiskPressure } from "../gameLogic.js";
 import { createDecisionTargetLock } from "../viewModels/playChoiceViewModel.js";
 import { useState } from "react";
+import { useDecisionDynamics } from "./decisionDynamics.js";
 
-export function useDecision() {
+export function useDecision({ active = true } = {}) {
   const [pendingChoice, setPendingChoice] = useState(null);
   const [decisionReveal, setDecisionReveal] = useState(null);
   const [decisionSeconds, setDecisionSeconds] = useState(45);
+  const { dynamics, dynamicsSummary, dispatchDynamics } = useDecisionDynamics({ active });
 
   return {
     pendingChoice,
@@ -14,6 +16,9 @@ export function useDecision() {
     setDecisionReveal,
     decisionSeconds,
     setDecisionSeconds,
+    dynamics,
+    dynamicsSummary,
+    dispatchDynamics,
   };
 }
 
