@@ -84,6 +84,7 @@ export function ChoiceList({
             aria-label={`${speechifyChoice(choice)} ${riskLabel}. ${getChoiceSubtext(choice)}`}
           >
             <span className="choice-main">
+              <small aria-hidden="true">{choiceIndex + 1}</small>
               <Check size={16} />
               <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
             </span>
