@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { playJuiceCue } from "./juiceAudio.js";
 import { usePressure } from "../state/decisionDynamics.js";
 
@@ -116,11 +117,16 @@ export function DecisionFeedbackLayer({ active }) {
 
   const thresholdLabel = pressure.isBlind ? "BUST" : pressure.stressLevel >= CRITICAL_FLOOR ? "CRITICAL" : pressure.overdrive ? "OVERDRIVE" : "BUILDING";
 
-  return (
+  if (typeof document === "undefined") return null;
+  // Portaled to the body on purpose. A position:fixed overlay rendered inside
+  // the choice panel counts as a standing number on the play board, and it is
+  // one ancestor transform away from being laid out somewhere else entirely.
+  return createPortal(
     <div className="decision-feedback-layer" aria-hidden="true">
       {pressure.combo > 0 && <span className="decision-combo">COMBO x{pressure.combo}</span>}
       <span className="decision-push">PUSH {pressure.rewardMultiplier.toFixed(2)}x · {thresholdLabel}</span>
       <span className="decision-stress">STRESS {pressure.stressLevel}%</span>
-    </div>
+    </div>,
+    document.body,
   );
 }

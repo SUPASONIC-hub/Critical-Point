@@ -2333,7 +2333,9 @@
 }
 .choice-temptation {
   display: inline-flex;
-  width: max-content;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   margin-left: 24px;
   padding: 4px 7px;
   border-left: 4px solid var(--c-coral);

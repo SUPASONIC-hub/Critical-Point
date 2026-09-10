@@ -51,7 +51,7 @@ const budgets = {
 const fileBudgets = {
   "base-intro-ranking.css": { lines: 1795, bytes: 38900 },
   "extensions.css": { lines: 2193, bytes: 45440 },
-  "play.css": { lines: 3560, bytes: 74900 },
+  "play.css": { lines: 3560, bytes: 74960 },
   "recovery.css": { lines: 266, bytes: 5754 },
   "responsive.css": { lines: 402, bytes: 8500 },
   "result.css": { lines: 1390, bytes: 29800 },
