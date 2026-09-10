@@ -47,12 +47,7 @@ export function ResultScreen({ view }) {
     title: "다음 참가자의 첫 장면은 아직 확정되지 않았습니다.",
     text: "관찰 기록이 부족해 트리거랩은 가장 조용한 기준부터 복원합니다.",
   };
-  const observationLabels = {
-    compliance: "순응",
-    defiance: "거부",
-    opacity: "은폐",
-    sacrifice: "희생",
-  };
+  const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern?.arc?.text ?? observerEndingRecord.text }; const observationLabels = { compliance: "순응", defiance: "거부", opacity: "은폐", sacrifice: "희생" };
   const choiceVerdicts = {
     ending_seal: {
       title: "트리거랩의 개인 조건 데이터는 봉인됩니다.",
@@ -265,6 +260,14 @@ export function ResultScreen({ view }) {
                 : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}
             </h1>
           </div>
+          <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
+            <div>
+              <span>JUDGMENT PROFILE · </span>
+              <strong>{judgmentProfile.label}</strong>
+            </div>
+            <p>{judgmentProfile.text}</p>
+            <small>{observerEndingRecord.title}</small>
+          </section>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">
               <span>YOUR CONSEQUENCE</span>
@@ -324,7 +327,7 @@ export function ResultScreen({ view }) {
           {nextCaseSignal && (
             <section className="next-case-panel">
               <div>
-                <span>{nextCaseSignal.eyebrow}</span>
+                <span>{nextCaseSignal.eyebrow} · CONTAMINATED BY YOUR LAST STANDARD</span>
                 <h2>{nextCaseSignal.title}</h2>
                 <p>{nextCaseSignal.premise}</p>
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>

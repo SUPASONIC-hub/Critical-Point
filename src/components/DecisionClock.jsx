@@ -24,10 +24,10 @@ function tierOf(seconds) {
 }
 
 const TIER_COPY = {
-  hold: "아직 읽을 시간이 있습니다",
-  press: "결정을 좁힐 시간",
-  critical: "닫히기 전",
-  overtime: "초과 · 15초마다 시간·피로 비용이 다시 붙습니다",
+  hold: "읽을수록 조건이 남습니다",
+  press: "이제 기준을 골라야 합니다",
+  critical: "마지막 10초 · 관찰자가 반응합니다",
+  overtime: "초과 · 망설임도 선택으로 기록됩니다",
 };
 
 export function DecisionClock() {

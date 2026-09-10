@@ -62,6 +62,20 @@
   font-weight: 800;
   line-height: 1.6;
 }
+.judgment-profile-panel {
+  color: var(--c-paper);
+  background: linear-gradient(135deg, var(--c-ink), var(--c-green-12));
+  border-left-color: var(--c-coral);
+}
+.judgment-profile-panel :is(span, strong) {
+  color: var(--c-acid);
+}
+.judgment-profile-panel :is(p, small) {
+  margin: 0;
+  color: var(--c-line-soft);
+  font-weight: 800;
+  line-height: 1.55;
+}
 .rank-panel {
   display: grid;
   grid-template-columns: 150px minmax(0, 1fr) minmax(280px, 0.8fr);

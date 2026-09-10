@@ -2331,6 +2331,17 @@
   font-size: 11px;
   font-weight: 900;
 }
+.choice-temptation {
+  display: inline-flex;
+  width: max-content;
+  margin-left: 24px;
+  padding: 4px 7px;
+  border-left: 4px solid var(--c-coral);
+  border-radius: 4px;
+}
+.choice-temptation small {
+  display: none;
+}
 .choice-tactical {
   display: flex;
   align-items: stretch;
@@ -3079,10 +3090,6 @@
   overflow-wrap: anywhere;
 }
 
-/* Rules gathered here from the later layers so this selector is defined in one file. */
-.fingerprint-heading span, .fingerprint-grid span {
-  color: var(--c-green);
-}
 .report-section {
   padding: 18px;
 }
@@ -3412,7 +3419,7 @@
   align-items: baseline;
 }
 .decision-clock-read b {
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 950;
   font-variant-numeric: tabular-nums;
 }
@@ -3426,6 +3433,7 @@
 }
 .decision-clock.critical {
   border-color: var(--c-coral);
+  animation: suspense-pulse 1.3s ease-in-out infinite;
 }
 .decision-clock.critical .decision-clock-track i,
 .decision-clock.overtime .decision-clock-track i {

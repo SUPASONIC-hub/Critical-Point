@@ -5,6 +5,7 @@ import {
   formatChoiceEffectChip,
   getChoiceAuthorityImpact,
   getChoiceRouteBadge,
+  getChoiceTemptation,
   isChoiceEffectGain,
 } from "../viewModels/playChoiceViewModel.js";
 import { GuardedButton } from "./GuardedButton.jsx";
@@ -44,6 +45,7 @@ export function ChoiceList({
         const riskLabel = riskDelta > 0 ? `위험 +${riskDelta}` : riskDelta < 0 ? `위험 ${riskDelta}` : "위험 유지";
         const challengeMatch = getChallengeMatch(choice, choiceRead.baseRiskDelta);
         const routeBadge = getChoiceRouteBadge(choice);
+        const temptation = getChoiceTemptation(choice);
         const pressureHint =
           riskDelta > 0
             ? "압박이 커질 수 있습니다."
@@ -90,6 +92,10 @@ export function ChoiceList({
                 {routeBadge.label}
               </span>
             )}
+            <span className="choice-temptation">
+              <b>{temptation.label}</b>
+              <small>{temptation.text}</small>
+            </span>
             <span className="choice-speech">"{speechifyChoice(choice)}"</span>
             <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>
             {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}

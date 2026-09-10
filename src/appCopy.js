@@ -13,8 +13,8 @@ import { easyResourceLabels } from "./playerLanguage.js";
  * Data only — no state, no behaviour — so screens can import it directly.
  */
 
-export const GAME_TITLE = "CRITICAL POINT";
-export const GAME_TITLE_READING = "임계점";
+export const GAME_TITLE = "TRIGGERLAB: CRITICAL POINT";
+export const GAME_TITLE_READING = "트리거랩";
 /**
  * The subtitle names the genre, because nothing else on the screen does.
  *
@@ -23,7 +23,7 @@ export const GAME_TITLE_READING = "임계점";
  * loop is a 45-second window in which somebody has to be charged for the
  * decision, so the subtitle says that.
  */
-export const GAME_SUBTITLE = "45초 안에, 누가 대가를 지불할지 정한다";
+export const GAME_SUBTITLE = "45초마다 당신의 판단 기준이 기록된다";
 
 export const resourceMeta = {
   time: { label: easyResourceLabels.time, suffix: "시간", icon: Clock3 },

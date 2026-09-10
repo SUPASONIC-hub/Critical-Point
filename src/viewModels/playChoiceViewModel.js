@@ -109,3 +109,48 @@ export function getChoiceRouteBadge(choice) {
   }
   return null;
 }
+
+export function getChoiceTemptation(choice = {}) {
+  const choiceText = `${choice.id ?? ""} ${choice.label ?? ""}`.toLowerCase();
+  const effect = choice.effect ?? {};
+  if (/silence|delay|private|seal|침묵|미루|비공개|봉인|보류/.test(choiceText)) {
+    return {
+      label: "조용히 넘기기",
+      text: "당장의 소란을 줄이는 대신, 다음 사건은 말하지 않은 대상을 먼저 묻습니다.",
+    };
+  }
+  if (/protect|people|witness|person|보호|증언|고용|사람/.test(choiceText)) {
+    return {
+      label: "사람 먼저",
+      text: "기록보다 누군가의 안전을 먼저 세웁니다. 관찰자는 이 선택을 보호 충동으로 저장합니다.",
+    };
+  }
+  if (/expose|public|report|disclosure|공개|폭로|보고|발표/.test(choiceText)) {
+    return {
+      label: "드러내기",
+      text: "숨은 비용을 빠르게 밝힙니다. 대신 공개된 말은 되돌리기 어렵습니다.",
+    };
+  }
+  if (/system|redesign|reform|rule|구조|개편|재설계|규칙|기준/.test(choiceText)) {
+    return {
+      label: "판 바꾸기",
+      text: "지금의 결론보다 다음 운영 규칙에 손을 댑니다. 느리지만 오래 남습니다.",
+    };
+  }
+  if ((effect.time ?? 0) > 0 || (effect.capital ?? 0) > 0) {
+    return {
+      label: "빠른 수습",
+      text: "시간이나 현금을 아낍니다. 지금은 매력적이지만, 누가 비용을 떠안았는지는 남습니다.",
+    };
+  }
+  if ((effect.humanCost ?? 0) < 0 || (effect.trust ?? 0) > 0) {
+    return {
+      label: "피해 줄이기",
+      text: "현장의 손실을 줄이는 쪽입니다. 명분은 강하지만 다른 자원이 닫힐 수 있습니다.",
+    };
+  }
+  return {
+    label: "기준 남기기",
+    text: "이 선택은 답보다 판단 습관을 남깁니다. 다음 장면은 그 습관을 다시 시험합니다.",
+  };
+}
