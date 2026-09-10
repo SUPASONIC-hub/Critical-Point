@@ -34,31 +34,52 @@ export function getEnvironmentEffect(environmentMode) {
 }
 
 export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {}) {
-  switch (event.type) {
-    case "DECISION_STARTED":
-      return { ...DYNAMICS_INITIAL_STATE, environmentMode: state.environmentMode, lastEvent: event.type };
-    case "DECISION_TICK": {
-      const timeDecay = getTimeDecay(event.seconds);
-      return {
-        ...state,
-        timeDecay,
-        stressLevel: clamp(Math.round(timeDecay * 100), 0, 100),
-        lastEvent: event.type,
-      };
-    }
-    case "CHOICE_STAGED":
-      return { ...state, hiddenChoice: event.choiceId ?? null, lastEvent: event.type };
-    case "CHOICE_COMMITTED": {
-      const combo = event.challengeMatch ? state.combo + 1 : 0;
-      const stressLevel = clamp(state.stressLevel + (event.challengeMatch ? -8 : 4), 0, 100);
-      const outcome = getPushYourLuckOutcome({ stressLevel: state.stressLevel, riskDelta: event.riskDelta, challengeMatch: event.challengeMatch });
-      return { ...state, combo, stressLevel, hiddenChoice: null, ...outcome, lastEvent: event.type };
-    }
-    case "CHOICE_CANCELLED":
-      return { ...state, hiddenChoice: null, lastEvent: event.type };
-    default:
-      return state;
+  const type = event?.type;
+  if (!type) return state;
+  if (type === "DECISION_STARTED") {
+    return {
+      ...DYNAMICS_INITIAL_STATE,
+      environmentMode: state.environmentMode === "blackout" ? "reboot" : "stable",
+      lastEvent: type,
+    };
   }
+  if (type === "DECISION_TICK") {
+    const timeDecay = getTimeDecay(Number(event.seconds) || 0);
+    const comboHeat = Math.min(12, state.combo * 1.5);
+    const stressLevel = clamp(Math.round(Math.pow(timeDecay, 1.65) * 100 + comboHeat), 0, 100);
+    return {
+      ...state,
+      timeDecay,
+      stressLevel,
+      thresholdState: stressLevel >= 92 ? "bust" : stressLevel >= 78 ? "critical" : stressLevel >= 45 ? "building" : "idle",
+      lastEvent: type,
+    };
+  }
+  if (type === "CHOICE_STAGED") {
+    return { ...state, hiddenChoice: event.choiceId ?? null, lastEvent: type };
+  }
+  if (type === "CHOICE_COMMITTED") {
+    const riskDelta = Number(event.riskDelta) || 0;
+    const challengeMatch = Boolean(event.challengeMatch);
+    const combo = challengeMatch ? state.combo + 1 : Math.max(0, state.combo - 1);
+    const stressLevel = clamp(
+      state.stressLevel + (challengeMatch ? -Math.min(18, 8 + combo) : 5 + Math.max(0, riskDelta)),
+      0,
+      100,
+    );
+    const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch });
+    return {
+      ...state,
+      combo,
+      stressLevel,
+      hiddenChoice: null,
+      ...outcome,
+      environmentMode: outcome.busted ? "blackout" : state.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
+      lastEvent: type,
+    };
+  }
+  if (type === "CHOICE_CANCELLED") return { ...state, hiddenChoice: null, lastEvent: type };
+  return { ...state, lastEvent: type };
 }
 
 export function createDynamicsSummary(state) {
