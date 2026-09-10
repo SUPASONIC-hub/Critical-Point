@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { LockKeyhole } from "lucide-react";
 
-import { playTargetLockCue } from "./AdaptiveMusic.jsx";
+import { playChoicePreviewCue, playTargetLockCue } from "./AdaptiveMusic.jsx";
 import { getChoiceTemptation, isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
 
 export function CommitConsole({
@@ -25,6 +25,7 @@ export function CommitConsole({
   const stagedChoiceId = pendingChoice?.id ?? null;
   useEffect(() => {
     if (!stagedChoiceId) return;
+    playChoicePreviewCue();
     playTargetLockCue();
   }, [stagedChoiceId]);
 

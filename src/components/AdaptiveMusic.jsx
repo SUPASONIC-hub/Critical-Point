@@ -310,6 +310,7 @@ function ensureAudioRuntime(volume) {
 const ACCENT_PEAK_GAIN = 0.045;
 const REVEAL_PEAK_GAIN = 0.035;
 const TICK_PEAK_GAIN = 0.02;
+const PREVIEW_PEAK_GAIN = 0.014;
 
 /**
  * The start button's confirmation tone.
@@ -381,6 +382,32 @@ export function playTargetLockCue() {
       oscillator.start(start);
       oscillator.stop(start + 0.13);
     });
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
+}
+
+export function playChoicePreviewCue() {
+  try {
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    const context = audioRuntime.context;
+    if (!context) return;
+    Promise.resolve(context.resume?.()).catch(() => {});
+
+    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(330, now);
+    oscillator.frequency.exponentialRampToValueAtTime(392, now + 0.08);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(PREVIEW_PEAK_GAIN * multiplier, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+    oscillator.connect(gain);
+    gain.connect(audioRuntime.bus ?? audioRuntime.master ?? context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.12);
   } catch {
     // Audio is an enhancement; browsers may reject it during a gesture.
   }
