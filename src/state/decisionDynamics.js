@@ -15,6 +15,7 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   isBlind: false,
   shakeIntensity: 0,
   permanentMultiplier: 1,
+  cashedMultiplier: 0,
   heat: 0,
   vignette: 0,
   heartbeatBpm: 58,
@@ -44,6 +45,40 @@ export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challen
 
 export function getEnvironmentEffect(environmentMode) {
   return environmentMode === "blackout" ? { fatigue: 4, time: -3 } : {};
+}
+
+const THRESHOLD_BUST_EFFECT = Object.freeze({ trust: -8, legitimacy: -8, fatigue: 8, time: -4 });
+
+/**
+ * Everything a committed choice owes to the pressure system, settled in one
+ * place from one verdict.
+ *
+ * The runtime used to score this itself, with its own copy of the threshold
+ * formula read against the gauge as it stood *before* the commit. So the run's
+ * resources, the screen's vignette and the state machine's own branch could each
+ * name a different moment as the critical point, and the reward multiplier was
+ * priced off a gauge that had not yet paid. Running the real event through the
+ * pure reducer settles all three, and the caller dispatches the same
+ * `commitEvent` to move the store to the state this verdict already describes.
+ */
+export function resolveDecisionCommit({ dynamics, challengeMatch, riskDelta = 0, seconds, effect = {} } = {}) {
+  const commitEvent = { type: "CHOICE_COMMITTED", challengeMatch: Boolean(challengeMatch), riskDelta, seconds };
+  const verdict = reduceDecisionDynamics(dynamics, commitEvent);
+  // Busting cashes nothing, so the pot stops multiplying and the threshold
+  // penalty is what the turn pays.
+  const rewardMultiplier = verdict.cashedMultiplier || 1;
+  return {
+    commitEvent,
+    verdict,
+    thresholdState: verdict.thresholdState,
+    rewardMultiplier,
+    riskRewardEffect: Object.fromEntries(
+      Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * rewardMultiplier) : value]),
+    ),
+    environmentEffect: getEnvironmentEffect(dynamics?.environmentMode),
+    thresholdEffect: verdict.thresholdState === "bust" ? { ...THRESHOLD_BUST_EFFECT } : {},
+    environmentMode: verdict.environmentMode,
+  };
 }
 
 /**
@@ -189,11 +224,17 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const busted = rawStress >= 100 || outcome.busted;
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const fx = projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion });
-      const payout = challengeMatch && !busted ? Math.round(BASE_PAYOUT * fx.rewardMultiplier * (1 + combo * 0.35)) : 0;
+      // Price the commit off the gauge the player carried in, not the one left
+      // after it vents. Cashing at 94% used to pay the post-vent multiplier,
+      // which quietly made pushing your luck worth less than not pushing it.
+      const carried = projectPressure({ stressLevel: base.stressLevel, combo: base.combo, permanentMultiplier, busted: false, slowMotion: false });
+      const cashedMultiplier = busted ? 0 : carried.rewardMultiplier;
+      const payout = challengeMatch && !busted ? Math.round(BASE_PAYOUT * cashedMultiplier * (1 + combo * 0.35)) : 0;
       const score = busted ? Math.floor(anchorScore * 0.5) : anchorScore + payout;
       return {
         ...base,
         combo: busted ? 0 : combo,
+        cashedMultiplier,
         heat: busted ? 0 : Number(heat.toFixed(2)),
         stressLevel,
         hiddenChoice: null,
@@ -237,6 +278,7 @@ export function createDynamicsSummary(state) {
     isBlind: state.isBlind,
     shakeIntensity: state.shakeIntensity,
     permanentMultiplier: state.permanentMultiplier,
+    cashedMultiplier: state.cashedMultiplier,
     heat: state.heat,
     vignette: state.vignette,
     heartbeatBpm: state.heartbeatBpm,

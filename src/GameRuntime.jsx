@@ -242,7 +242,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   });
   const {
     pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
-    dynamicsSummary, dispatchDynamics,
+    dynamicsSummary, dispatchDynamics, resolveCommit,
   } = useDecision({ active: started });
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
@@ -1374,15 +1374,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       finalEffect: effect,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-    const pressure = Math.min(100, Math.max(0, dynamicsSummary.stressLevel ?? 0));
-    const rewardMultiplier = Number((1 + Math.pow(pressure / 100, 2) * 2.5).toFixed(2));
-    const thresholdState = pressure >= 92 && challengeRiskDelta > 0 && !challengeMatch ? "bust" : pressure >= 78 ? "critical" : "building";
-    const riskRewardEffect = Object.fromEntries(
-      Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * rewardMultiplier) : value]),
-    );
-    const environmentEffect = dynamicsSummary.environmentMode === "blackout" ? { fatigue: 4, time: -3 } : {};
-    const thresholdEffect = thresholdState === "bust" ? { trust: -8, legitimacy: -8, fatigue: 8, time: -4 } : {};
-    dispatchDynamics({ type: "CHOICE_COMMITTED", challengeMatch, riskDelta: challengeRiskDelta });
+    // One verdict for the turn: resolveCommit runs the real event through the
+    // reducer, so resources, screen and state machine cannot disagree about
+    // where the critical point was. The dispatch replays it into the store.
+    const { commitEvent, thresholdState, rewardMultiplier, riskRewardEffect, environmentEffect, thresholdEffect, environmentMode: committedEnvironment } =
+      resolveCommit({ challengeMatch, riskDelta: challengeRiskDelta, seconds: getDecisionSeconds(), effect });
+    dispatchDynamics(commitEvent);
     const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
     const instinctSurge = instinctChoice && challengeMatch
       ? {
@@ -1506,7 +1503,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       clueReward,
       prematureHypothesis,
       threshold: { state: thresholdState, rewardMultiplier, busted: thresholdState === "bust" },
-      environmentMode: dynamicsSummary.environmentMode === "blackout" ? "reboot" : thresholdState === "bust" ? "blackout" : "stable",
+      environmentMode: committedEnvironment,
       streakBreak,
       suspenseEvent,
       clue,

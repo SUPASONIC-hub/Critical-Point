@@ -1,7 +1,7 @@
 import { applyEffect, getDiscoveryClue, getFreeTextSignals, getRiskPressure } from "../gameLogic.js";
 import { createDecisionTargetLock } from "../viewModels/playChoiceViewModel.js";
 import { useState } from "react";
-import { useDecisionDynamics } from "./decisionDynamics.js";
+import { resolveDecisionCommit, useDecisionDynamics } from "./decisionDynamics.js";
 
 export function useDecision({ active = true } = {}) {
   const [pendingChoice, setPendingChoice] = useState(null);
@@ -19,6 +19,7 @@ export function useDecision({ active = true } = {}) {
     dynamics,
     dynamicsSummary,
     dispatchDynamics,
+    resolveCommit: (input) => resolveDecisionCommit({ ...input, dynamics }),
   };
 }
 
