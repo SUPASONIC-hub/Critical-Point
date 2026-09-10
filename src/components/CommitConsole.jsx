@@ -23,6 +23,7 @@ export function CommitConsole({
   // panel opening, and it has to re-fire when the player stages another choice
   // without closing it first.
   const stagedChoiceId = pendingChoice?.id ?? null;
+  const pendingRiskDelta = pendingChoiceForecast?.riskDelta ?? 0;
   const previousStagedChoiceId = useRef(null);
   useEffect(() => {
     if (!stagedChoiceId) {
@@ -30,9 +31,9 @@ export function CommitConsole({
       return;
     }
     if (previousStagedChoiceId.current === null) playTargetLockCue();
-    else playChoicePreviewCue();
+    else playChoicePreviewCue(pendingRiskDelta);
     previousStagedChoiceId.current = stagedChoiceId;
-  }, [stagedChoiceId]);
+  }, [pendingRiskDelta, stagedChoiceId]);
 
   if (!pendingChoice || !pendingChoiceRead || !pendingChoiceForecast) return null;
   const observerPreview = getObserverPreviewForChoice(pendingChoice.id);

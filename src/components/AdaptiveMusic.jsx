@@ -387,7 +387,7 @@ export function playTargetLockCue() {
   }
 }
 
-export function playChoicePreviewCue() {
+export function playChoicePreviewCue(riskDelta = 0) {
   try {
     if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
     const context = audioRuntime.context;
@@ -398,9 +398,12 @@ export function playChoicePreviewCue() {
     const now = context.currentTime;
     const oscillator = context.createOscillator();
     const gain = context.createGain();
+    const risk = Number(riskDelta) || 0;
+    const startFrequency = risk > 0 ? 294 : risk < 0 ? 392 : 330;
+    const endFrequency = risk > 0 ? 330 : risk < 0 ? 494 : 392;
     oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(330, now);
-    oscillator.frequency.exponentialRampToValueAtTime(392, now + 0.08);
+    oscillator.frequency.setValueAtTime(startFrequency, now);
+    oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + 0.08);
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(PREVIEW_PEAK_GAIN * multiplier, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
