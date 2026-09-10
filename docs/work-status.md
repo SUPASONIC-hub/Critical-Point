@@ -126,7 +126,12 @@ has to keep, and the commands that prove it. What changed and why is in
 29. Numbers stay behind `전술 정보`. The choice cards print the qualitative
     trade-off; the resource deltas, the observer preview and the risk hint are
     all gated on `showTacticalDetails`, because the screen promises the player
-    can judge on the scene first and the chips used to render regardless.
+    can judge on the scene first and the chips used to render regardless. The
+    risk hint went back behind the gate on 2026-09-10; it had been printing on
+    every card. That takes season-flow's standing-number scan from 10 to 6
+    against a budget of 5, and the last six are the case progress and the four
+    choice ordinals -- both legitimate UI, so the test stays red until someone
+    decides which of those leaves the board or that the budget was one too tight.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most. Four lime fills on one screen is
