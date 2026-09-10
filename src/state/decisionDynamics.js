@@ -50,6 +50,21 @@ export function getEnvironmentEffect(environmentMode) {
 const THRESHOLD_BUST_EFFECT = Object.freeze({ trust: -8, legitimacy: -8, fatigue: 8, time: -4 });
 
 /**
+ * The pot, applied. Gains scale with the gauge the player is holding; costs are
+ * never discounted, which is the entire shape of the bet.
+ *
+ * The commit console previews the same numbers this produces, so it lives here
+ * rather than in either caller: the console was printing the raw effect while
+ * the runtime committed the multiplied one, and every push the player held made
+ * that preview more wrong.
+ */
+export function applyRiskReward(effect = {}, multiplier = 1) {
+  return Object.fromEntries(
+    Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * multiplier) : value]),
+  );
+}
+
+/**
  * Everything a committed choice owes to the pressure system, settled in one
  * place from one verdict.
  *
@@ -72,9 +87,7 @@ export function resolveDecisionCommit({ dynamics, challengeMatch, riskDelta = 0,
     verdict,
     thresholdState: verdict.thresholdState,
     rewardMultiplier,
-    riskRewardEffect: Object.fromEntries(
-      Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * rewardMultiplier) : value]),
-    ),
+    riskRewardEffect: applyRiskReward(effect, rewardMultiplier),
     environmentEffect: getEnvironmentEffect(dynamics?.environmentMode),
     thresholdEffect: verdict.thresholdState === "bust" ? { ...THRESHOLD_BUST_EFFECT } : {},
     environmentMode: verdict.environmentMode,

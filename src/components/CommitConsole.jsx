@@ -3,6 +3,7 @@ import { LockKeyhole } from "lucide-react";
 
 import { playChoicePreviewCue, playTargetLockCue } from "./AdaptiveMusic.jsx";
 import { getChoiceTemptation, isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
+import { applyRiskReward, usePressure } from "../state/decisionDynamics.js";
 
 export function CommitConsole({
   suspenseTier,
@@ -22,6 +23,7 @@ export function CommitConsole({
   // The cue belongs to the console rather than to the runtime: it marks this
   // panel opening, and it has to re-fire when the player stages another choice
   // without closing it first.
+  const pressure = usePressure();
   const stagedChoiceId = pendingChoice?.id ?? null;
   const pendingRiskDelta = pendingChoiceForecast?.riskDelta ?? 0;
   const previousStagedChoiceId = useRef(null);
@@ -39,6 +41,10 @@ export function CommitConsole({
   const observerPreview = getObserverPreviewForChoice(pendingChoice.id);
   const targetLock = pendingChoiceRead.targetLock;
   const temptation = getChoiceTemptation(pendingChoice);
+  // Preview exactly what commitChoice will apply. Holding the window multiplies
+  // gains, so the raw effect stops being the truth the moment the gauge climbs.
+  const pushMultiplier = pressure.isBlind ? 1 : pressure.rewardMultiplier;
+  const pushedEffect = applyRiskReward(pendingChoiceRead.finalEffect, pushMultiplier);
 
   return (
     <section
@@ -95,9 +101,12 @@ export function CommitConsole({
           </dl>
         )}
         <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
-          <span>예상 자원</span>
+          <span>
+            예상 자원
+            {pushMultiplier > 1 && <i className="commit-console-push">임계 보너스 ×{pushMultiplier.toFixed(2)}</i>}
+          </span>
           {evidenceCount >= 3 &&
-            Object.entries(pendingChoiceRead.finalEffect)
+            Object.entries(pushedEffect)
               .filter(([, value]) => value !== 0)
               .map(([key, value]) => (
                 <b key={key} className={isChoiceEffectGain(key, value) ? "positive" : "negative"}>
