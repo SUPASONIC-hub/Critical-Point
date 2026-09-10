@@ -59,3 +59,19 @@
 .resource-rail-risk b{transform:scale(calc(1 + var(--decision-stress,0) * .12));display:inline-block;transform-origin:left center}
 .game-shell.is-critical .resource-rail-risk,.game-shell.is-bust .resource-rail-risk{border-color:var(--c-danger)}
 @media(prefers-reduced-motion:reduce){.decision-clock-read b,.resource-rail-risk b{transform:none}.decision-clock.slowmo .decision-clock-read b,.decision-clock.critical .decision-clock-cash,.decision-clock.overdrive .decision-clock-cash{animation:none}}
+
+/* 임계점 장부. Mounted twice -- inside the record room door mid-run and inside
+   .report-archive after it -- so it is styled once here rather than in the two
+   files that own those surfaces. */
+.pressure-ledger{display:grid;gap:10px;padding:12px;border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-paper)}
+.pressure-ledger-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pressure-ledger-grid article{display:grid;gap:2px;padding:8px;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--c-paper-90)}
+.pressure-ledger-grid span{color:var(--c-ink-muted);font-size:10px;font-weight:800;letter-spacing:.04em}
+.pressure-ledger-grid b{font-size:19px;font-weight:950;font-variant-numeric:tabular-nums;line-height:1.1}
+.pressure-ledger-grid b.gain{color:var(--c-green)}
+.pressure-ledger-grid b.cost{color:var(--c-danger-deep)}
+.pressure-ledger-grid small{color:var(--c-ink-muted);font-size:10px}
+.pressure-ledger-live{margin:0;padding:7px 9px;border-left:2px solid var(--c-acid);background:var(--c-paper-90);font-size:11px;font-weight:800}
+.pressure-ledger-live b{font-variant-numeric:tabular-nums}
+.pressure-ledger-note{margin:0;color:var(--c-ink-muted);font-size:11px;line-height:1.55}
+@media(max-width:700px){.pressure-ledger-grid{grid-template-columns:repeat(2,1fr)}.pressure-ledger-grid b{font-size:17px}}

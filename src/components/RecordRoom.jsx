@@ -2,6 +2,7 @@ import { Info } from "lucide-react";
 import { GameMetricsDrawer } from "./GameMetricsDrawer.jsx";
 import { GuardedButton } from "./GuardedButton.jsx";
 import { MemoPanel } from "./MemoPanel.jsx";
+import { PressureLedger } from "./PressureLedger.jsx";
 import { CASE_SEQUENCE } from "../gameData.js";
 
 /**
@@ -488,6 +489,7 @@ export function RecordRoom({ view }) {
             ))}
           </div>
         </details>
+        <PressureLedger log={log} showLive />
         <p className="record-room-progress">진행률 {progress}% · 선택 {log.length}개 기록됨</p>
       </div>
     </details>

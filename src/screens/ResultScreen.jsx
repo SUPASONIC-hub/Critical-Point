@@ -1,6 +1,7 @@
 import { AlertTriangle, ChevronRight, Copy, Download, FileText, Link2, MessageSquareText, RefreshCcw, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { EndingSequence } from "../components/EndingSequence.jsx";
+import { PressureLedger } from "../components/PressureLedger.jsx";
 import { isResourceGain } from "../gameConstants.js";
 
 export function ResultScreen({ view }) {
@@ -387,6 +388,7 @@ export function ResultScreen({ view }) {
               <b>랭크 근거, 판단 DNA, 경로 지도, 관찰 장부, 선택 로그</b>
             </summary>
             <div className="report-archive-body">
+          <PressureLedger log={log} />
           {currentCase === "final" && view.operatorReveal && (
             <section className="operator-reveal-panel" aria-label="주인공 정체 공개">
               <span>{view.operatorReveal.title}</span>

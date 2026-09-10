@@ -47,6 +47,58 @@ export function getEnvironmentEffect(environmentMode) {
   return environmentMode === "blackout" ? { fatigue: 4, time: -3 } : {};
 }
 
+/**
+ * What a reboot is worth, and the one place that says so.
+ *
+ * The buff is a pure function of how many times the run has been rebooted, so
+ * the live reducer and a ledger rebuilt from a saved log cannot disagree about
+ * it -- which matters, because the reducer's own state does not survive a
+ * reload and the log does.
+ */
+export const REBOOT_PERMANENT_BONUS = 0.2;
+
+export function getPermanentMultiplier(rebootCount = 0) {
+  return Number((1 + Math.max(0, Number(rebootCount) || 0) * REBOOT_PERMANENT_BONUS).toFixed(2));
+}
+
+/**
+ * The run's push record, rebuilt from the decision log.
+ *
+ * Read from the log rather than from this module's own state on purpose: the
+ * log is what a saved run restores, and the reducer's state is not, so a ledger
+ * read off state would zero itself the first time someone resumed.
+ */
+export function createPressureLedger(log = []) {
+  let busts = 0;
+  let reboots = 0;
+  let bestMultiplier = 1;
+  let bonusPoints = 0;
+  let pushedDecisions = 0;
+
+  for (const entry of log) {
+    const multiplier = Number(entry?.threshold?.rewardMultiplier) || 1;
+    if (entry?.threshold?.busted) busts += 1;
+    if (entry?.environmentMode === "reboot") reboots += 1;
+    if (multiplier > bestMultiplier) bestMultiplier = multiplier;
+    if (multiplier <= 1) continue;
+    pushedDecisions += 1;
+    // The log keeps the multiplied effect, so the bonus is the raw value
+    // subtracted back out of it.
+    for (const value of Object.values(entry.riskRewardEffect ?? {})) {
+      if (value > 0) bonusPoints += value - Math.round(value / multiplier);
+    }
+  }
+
+  return {
+    busts,
+    reboots,
+    bestMultiplier: Number(bestMultiplier.toFixed(2)),
+    bonusPoints,
+    pushedDecisions,
+    permanentMultiplier: getPermanentMultiplier(reboots),
+  };
+}
+
 const THRESHOLD_BUST_EFFECT = Object.freeze({ trust: -8, legitimacy: -8, fatigue: 8, time: -4 });
 
 /**
@@ -155,13 +207,16 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
   switch (type) {
     case "DECISION_STARTED": {
       const rebooting = base.thresholdState === "bust" || base.environmentMode === "blackout";
-      const carried = rebooting ? Number((permanentMultiplier + 0.2).toFixed(2)) : permanentMultiplier;
+      const rebootCount = (Number(base.rebootCount) || 0) + (rebooting ? 1 : 0);
+      // Derived from the count rather than incremented, so a ledger rebuilt from
+      // the log lands on the same number this state is holding.
+      const carried = rebooting ? getPermanentMultiplier(rebootCount) : permanentMultiplier;
       return {
         ...DYNAMICS_INITIAL_STATE,
         environmentMode: rebooting ? "reboot" : "stable",
         permanentMultiplier: carried,
         rewardMultiplier: carried,
-        rebootCount: (Number(base.rebootCount) || 0) + (rebooting ? 1 : 0),
+        rebootCount,
         banked: Number(base.banked) || 0,
         score: rebooting ? 0 : anchorScore,
         lastEvent: rebooting ? "REBOOT" : type,

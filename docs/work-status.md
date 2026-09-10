@@ -134,6 +134,14 @@ has to keep, and the commands that prove it. What changed and why is in
 31. A phase is player copy. `node.phase` prints on the scene chip and in the
     mission strip, so it names a story beat -- never the function that generated
     the node. "CONNECTIVE SCENE" shipped for weeks.
+32. A roguelike buff the player cannot see is not a buff. The reducer banks
+    reboots, the permanent multiplier they buy and the resources the push
+    multiplier added; `PressureLedger` is where all three are read, mounted in
+    the record room mid-run and in `.report-archive` after it. It is rebuilt
+    from the decision log, never from reducer state -- the log survives a reload
+    and the reducer does not, so a ledger read off state would zero itself on a
+    resumed run. This is the decision the `ResultScreen` budget move (975 -> 977
+    lines, 13 -> 14 imports) was made for.
 
 ## Verification Commands
 

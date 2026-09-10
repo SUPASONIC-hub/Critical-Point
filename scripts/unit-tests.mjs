@@ -6,6 +6,12 @@ import {
   parseLocalRankingRows,
 } from "../src/state/useLocalRanking.js";
 import {
+  createPressureLedger,
+  DYNAMICS_INITIAL_STATE,
+  getPermanentMultiplier,
+  reduceDecisionDynamics,
+} from "../src/state/decisionDynamics.js";
+import {
   createIntroView,
   createPlayView,
   createResultView,
@@ -395,4 +401,38 @@ test("decision target lock marks a choice that misses the scene objective", () =
   assert.equal(lock.objective.value, "OFF TARGET");
   assert.equal(lock.streak.value, "CHAIN BREAKS");
   assert.equal(lock.evidence.value, "NO SIGNAL");
+});
+
+test("pressure ledger rebuilds the run's push record from the decision log", () => {
+  const ledger = createPressureLedger([
+    { threshold: { rewardMultiplier: 1, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 4, time: -3 } },
+    { threshold: { rewardMultiplier: 2, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 12, time: -3 } },
+    { threshold: { rewardMultiplier: 2.85, busted: true }, environmentMode: "blackout", riskRewardEffect: { trust: 17 } },
+    { threshold: { rewardMultiplier: 1.2, busted: false }, environmentMode: "reboot", riskRewardEffect: { trust: 6 } },
+  ]);
+  assert.equal(ledger.busts, 1);
+  assert.equal(ledger.reboots, 1);
+  assert.equal(ledger.bestMultiplier, 2.85);
+  assert.equal(ledger.pushedDecisions, 3);
+  // 12 - round(12/2) = 6, 17 - round(17/2.85) = 11, 6 - round(6/1.2) = 1.
+  assert.equal(ledger.bonusPoints, 18);
+  assert.equal(ledger.permanentMultiplier, 1.2);
+});
+
+test("pressure ledger and the reducer agree on what a reboot is worth", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  const log = [];
+  for (let run = 0; run < 3; run += 1) {
+    state = { ...state, thresholdState: "bust", environmentMode: "blackout" };
+    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+    log.push({ threshold: { rewardMultiplier: 1, busted: true }, environmentMode: "reboot", riskRewardEffect: {} });
+  }
+  assert.equal(state.rebootCount, 3);
+  assert.equal(createPressureLedger(log).permanentMultiplier, state.permanentMultiplier);
+  assert.equal(state.permanentMultiplier, getPermanentMultiplier(3));
+});
+
+test("pressure ledger reads an empty log as a run that has not pushed yet", () => {
+  const ledger = createPressureLedger([]);
+  assert.deepEqual(ledger, { busts: 0, reboots: 0, bestMultiplier: 1, bonusPoints: 0, pushedDecisions: 0, permanentMultiplier: 1 });
 });

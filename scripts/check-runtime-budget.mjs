@@ -26,6 +26,11 @@ import { viewGroups } from "../src/viewModels/appViewModels.js";
  * three cards and the named doors) and the phase rename that stopped shipping
  * "CONNECTIVE SCENE" as a scene name. Maintenance priority 27 records the rule
  * those two numbers now stand for.
+ *
+ * ResultScreen read 975 / 13 until 2026-09-10, when the pressure ledger landed
+ * in `.report-archive`. Maintenance priority 32 records why that number moved:
+ * the reducer had been banking reboots and the permanent multiplier they buy
+ * since the gauntlet loop, and the player could not see either one.
  */
 
 const root = process.cwd();
@@ -52,8 +57,8 @@ const BUDGETS = {
     hooks: {},
   },
   "src/screens/ResultScreen.jsx": {
-    lines: 975,
-    importedNames: 13,
+    lines: 977,
+    importedNames: 14,
     hooks: {},
   },
 };
