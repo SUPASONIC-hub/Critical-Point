@@ -483,6 +483,13 @@ summary:focus-visible {
   font-size: 14px;
   line-height: 1.35;
 }
+.intro-protocol-line {
+  color: var(--c-paper);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0;
+  opacity: 0.82;
+}
 .intro p {
   margin-inline: auto;
   max-width: 700px;

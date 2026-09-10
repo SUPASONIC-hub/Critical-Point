@@ -2339,7 +2339,7 @@
   border-left: 4px solid var(--c-coral);
   border-radius: 4px;
 }
-.choice-temptation small {
+.choice-temptation small[hidden] {
   display: none;
 }
 .choice-tactical {
@@ -3391,8 +3391,6 @@
   background: var(--c-danger);
 }
 
-/* The window, made physical. Four tiers, read from the clock rather than
-   recomputed: hold, press, critical, overtime. */
 .decision-clock {
   display: grid;
   gap: 6px;
@@ -3427,6 +3425,16 @@
   color: var(--c-ink-muted);
   font-size: 11px;
   font-weight: 800;
+}
+.decision-clock-read em {
+  margin-left: auto;
+  padding: 3px 6px;
+  color: var(--c-paper);
+  background: var(--c-ink);
+  border-radius: 4px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 950;
 }
 .decision-clock.press .decision-clock-track i {
   background: var(--c-amber);

@@ -35,6 +35,7 @@ export function DecisionClock() {
   const remaining = Math.max(0, seconds);
   const overtime = Math.max(0, -seconds);
   const tier = tierOf(seconds);
+  const tempoRead = tier === "hold" ? "ANALYSIS WINDOW" : tier === "press" ? "COMMIT WINDOW" : tier === "critical" ? "PANIC SIGNAL" : "SILENCE CHARGED";
   const lastTick = useRef(null);
 
   // One cue per second inside the last ten, and one when the window closes.
@@ -62,6 +63,7 @@ export function DecisionClock() {
       <div className="decision-clock-read">
         <b>{overtime > 0 ? `+${overtime}` : remaining}</b>
         <span>{TIER_COPY[tier]}</span>
+        <em>{tempoRead}</em>
       </div>
     </div>
   );

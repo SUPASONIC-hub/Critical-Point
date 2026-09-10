@@ -144,6 +144,7 @@ export function IntroScreen({ view }) {
             <figcaption>
               <span>TRIGGERLAB NIGHT SHIFT</span>
               <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+              <small className="intro-protocol-line">NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED</small>
               {hasResumableSave ? resumePanel : <div className="start-input-row">{startFirstCaseButton}</div>}
             </figcaption>
           </figure>

@@ -68,6 +68,7 @@
   border-left-color: var(--c-coral);
 }
 .judgment-profile-panel :is(span, strong) {
+  display: block;
   color: var(--c-acid);
 }
 .judgment-profile-panel :is(p, small) {
@@ -917,6 +918,10 @@
 .history-challenge .surge-success {
   color: var(--c-ink);
   background: var(--c-acid);
+}
+.history-challenge .tempo-bonus-log {
+  color: var(--c-ink);
+  background: var(--c-green-79);
 }
 .history-challenge .challenge-grade.grade-a {
   color: var(--c-paper);

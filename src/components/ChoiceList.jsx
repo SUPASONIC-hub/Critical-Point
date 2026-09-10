@@ -94,7 +94,7 @@ export function ChoiceList({
             )}
             <span className="choice-temptation">
               <b>{temptation.label}</b>
-              <small>{temptation.text}</small>
+              <small hidden={pendingChoice?.id !== choice.id}>{temptation.text}</small>
             </span>
             <span className="choice-speech">"{speechifyChoice(choice)}"</span>
             <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>

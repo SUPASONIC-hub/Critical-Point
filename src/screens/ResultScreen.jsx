@@ -888,6 +888,7 @@ export function ResultScreen({ view }) {
                           {entry.flowSurge.label} · {entry.flowSurge.text}
                         </small>
                       )}
+                      {entry.tempoBonus && <small className="tempo-bonus-log">{entry.tempoBonus.label} · {entry.tempoBonus.text}</small>}
                       {entry.suspenseEvent && (
                         <small className="suspense-event-log">
                           {entry.suspenseEvent.label} · {entry.suspenseEvent.text}
