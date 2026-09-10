@@ -5,8 +5,11 @@ import { useDecisionSeconds } from "../state/decisionClock.js";
 export function DecisionFeedbackLayer({ active }) {
   const seconds = useDecisionSeconds();
   const stressLevel = Math.min(100, Math.max(0, Math.round((1 - seconds / 45) * 100)));
+  const rewardMultiplier = (1 + Math.pow(stressLevel / 100, 2) * 2.5).toFixed(2);
+  const thresholdLabel = stressLevel >= 92 ? "BUST RISK" : stressLevel >= 78 ? "CRITICAL" : "BUILDING";
   const stressRef = useRef(stressLevel);
   const previousStress = useRef(stressLevel);
+  const lastHeartbeat = useRef(0);
   useEffect(() => {
     stressRef.current = stressLevel;
   }, [stressLevel]);
@@ -18,6 +21,11 @@ export function DecisionFeedbackLayer({ active }) {
     const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const animate = (time) => {
       const pulse = reducedMotion ? 0 : Math.sin(time / 95) * stressRef.current * 0.012;
+      const heartbeatGap = Math.max(360, 820 - stressRef.current * 4);
+      if (stressRef.current >= 35 && time - lastHeartbeat.current >= heartbeatGap) {
+        playJuiceCue("heartbeat", stressRef.current);
+        lastHeartbeat.current = time;
+      }
       root.style.setProperty("--decision-stress", String(stressRef.current / 100));
       root.style.setProperty("--decision-jitter", `${pulse.toFixed(3)}px`);
       root.style.setProperty("--decision-tilt", `${(pulse * 0.18).toFixed(3)}deg`);
@@ -57,6 +65,7 @@ export function DecisionFeedbackLayer({ active }) {
 
   return (
     <div className="decision-feedback-layer" aria-hidden="true">
+      <span className="decision-push">PUSH {rewardMultiplier}x · {thresholdLabel}</span>
       <span className="decision-stress">STRESS {Math.round(stressLevel)}%</span>
     </div>
   );

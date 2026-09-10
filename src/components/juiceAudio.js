@@ -23,14 +23,14 @@ export function playJuiceCue(kind, stress = 0) {
   const now = pool.context.currentTime;
   if (pool.context.state === "suspended") pool.context.resume().catch(() => {});
   const voice = pool.voices[cursor++ % pool.voices.length];
-  const base = kind === "threshold" ? 360 : kind === "click" ? 240 : 180;
+  const base = kind === "heartbeat" ? 72 : kind === "threshold" ? 360 : kind === "click" ? 240 : 180;
   const pitch = base + stress * 2.2;
-  voice.oscillator.type = kind === "threshold" ? "triangle" : "sine";
+  voice.oscillator.type = kind === "heartbeat" ? "sine" : kind === "threshold" ? "triangle" : "sine";
   voice.oscillator.frequency.cancelScheduledValues(now);
   voice.oscillator.frequency.setValueAtTime(pitch, now);
-  voice.oscillator.frequency.linearRampToValueAtTime(pitch + (kind === "threshold" ? 150 : 35), now + 0.08);
+  voice.oscillator.frequency.linearRampToValueAtTime(pitch + (kind === "heartbeat" ? 8 : kind === "threshold" ? 150 : 35), now + (kind === "heartbeat" ? 0.045 : 0.08));
   voice.gain.gain.cancelScheduledValues(now);
   voice.gain.gain.setValueAtTime(0.0001, now);
-  voice.gain.gain.exponentialRampToValueAtTime(kind === "threshold" ? 0.045 : 0.025, now + 0.008);
-  voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + (kind === "threshold" ? 0.24 : 0.1));
+  voice.gain.gain.exponentialRampToValueAtTime(kind === "heartbeat" ? 0.055 : kind === "threshold" ? 0.045 : 0.025, now + 0.008);
+  voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + (kind === "heartbeat" ? 0.14 : kind === "threshold" ? 0.24 : 0.1));
 }

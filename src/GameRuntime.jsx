@@ -1374,7 +1374,15 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       finalEffect: effect,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-    dispatchDynamics({ type: "CHOICE_COMMITTED", challengeMatch });
+    const pressure = Math.min(100, Math.max(0, dynamicsSummary.stressLevel ?? 0));
+    const rewardMultiplier = Number((1 + Math.pow(pressure / 100, 2) * 2.5).toFixed(2));
+    const thresholdState = pressure >= 92 && challengeRiskDelta > 0 && !challengeMatch ? "bust" : pressure >= 78 ? "critical" : "building";
+    const riskRewardEffect = Object.fromEntries(
+      Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * rewardMultiplier) : value]),
+    );
+    const environmentEffect = dynamicsSummary.environmentMode === "blackout" ? { fatigue: 4, time: -3 } : {};
+    const thresholdEffect = thresholdState === "bust" ? { trust: -8, legitimacy: -8, fatigue: 8, time: -4 } : {};
+    dispatchDynamics({ type: "CHOICE_COMMITTED", challengeMatch, riskDelta: challengeRiskDelta });
     const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
     const instinctSurge = instinctChoice && challengeMatch
       ? {
@@ -1426,13 +1434,15 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         }
       : null;
     const mergedEffect = mergeEffects(
-      effect,
+      riskRewardEffect,
       ...(tempoBonus ? [tempoBonus.effect] : []),
       ...(instinctSurge ? [instinctSurge.effect] : []),
       ...(auditSurge ? [auditSurge.effect] : []),
       ...(clueReward ? [clueReward.effect] : []),
       ...(streakReward ? [streakReward.effect] : []),
       ...(prematureHypothesis ? [prematureHypothesis.effect] : []),
+      environmentEffect,
+      thresholdEffect,
     );
     const finalEffect = applySeededEffectVariation(
       mergedEffect,
@@ -1478,6 +1488,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
             ? "free-text"
             : undefined,
       effect: finalEffect,
+      riskRewardEffect,
       cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
@@ -1494,6 +1505,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       auditSurge,
       clueReward,
       prematureHypothesis,
+      threshold: { state: thresholdState, rewardMultiplier, busted: thresholdState === "bust" },
+      environmentMode: dynamicsSummary.environmentMode === "blackout" ? "reboot" : thresholdState === "bust" ? "blackout" : "stable",
       streakBreak,
       suspenseEvent,
       clue,
