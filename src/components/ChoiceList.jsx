@@ -32,7 +32,7 @@ export function ChoiceList({
   resourceMeta,
 }) {
   return (
-    <div className="choices">
+    <div className={`choices${pendingChoice ? " has-pending-choice" : ""}`}>
       {fixedChoices.map((choice, choiceIndex) => {
         const authorityGate = getAuthorityGate(choice, {
           clueCount,

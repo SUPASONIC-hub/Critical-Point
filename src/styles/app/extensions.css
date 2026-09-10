@@ -776,8 +776,6 @@
     min-height: auto;
   }
 }
-
-/* The scene is a reading beat first: image, speaker, critical situation, then choice. */
 .scene {
   grid-template-columns: 1fr;
   gap: 15px;
@@ -846,6 +844,7 @@
   background: #f4f8f1;
   border-color: #0e4b45;
 }
+.choices.has-pending-choice .choice:not(.selected) { opacity: 0.66; }
 .decision-reveal-archive {
   color: #173b34;
 }
