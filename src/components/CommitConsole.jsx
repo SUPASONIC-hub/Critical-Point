@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { LockKeyhole } from "lucide-react";
 
 import { playChoicePreviewCue, playTargetLockCue } from "./AdaptiveMusic.jsx";
@@ -23,10 +23,15 @@ export function CommitConsole({
   // panel opening, and it has to re-fire when the player stages another choice
   // without closing it first.
   const stagedChoiceId = pendingChoice?.id ?? null;
+  const previousStagedChoiceId = useRef(null);
   useEffect(() => {
-    if (!stagedChoiceId) return;
-    playChoicePreviewCue();
-    playTargetLockCue();
+    if (!stagedChoiceId) {
+      previousStagedChoiceId.current = null;
+      return;
+    }
+    if (previousStagedChoiceId.current === null) playTargetLockCue();
+    else playChoicePreviewCue();
+    previousStagedChoiceId.current = stagedChoiceId;
   }, [stagedChoiceId]);
 
   if (!pendingChoice || !pendingChoiceRead || !pendingChoiceForecast) return null;
