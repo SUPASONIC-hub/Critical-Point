@@ -146,48 +146,111 @@ summary:focus-visible {
   padding: 28px;
   width: 100%;
 }
+/* Cold open ---------------------------------------------------------------
+   The intro is the only screen with no case file on it, so it stops pretending
+   to be one. The key visual used to be the page background *and* a framed card
+   in the middle of a centred column, so the photo competed with itself and
+   every panel below it floated on a blurred skyline. It now lives in exactly
+   one place -- the right half of the hero, bled off the edge -- and the ground
+   behind the rest of the page is a flat ink field with an acid hairline grid
+   and one diagonal slash. Flattening the ground is also what lets the contrast
+   audit read the intro at all: text over a photographic background is reported
+   separately and skipped, so half this screen was previously unmeasured.
+
+   Everything is left-anchored and square. No centred text, no rounded panels:
+   the intro reads as a dossier the player is about to open, and the only round
+   thing left on it is the studio credit's portrait. */
 .intro-shell {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  background:
-    linear-gradient(110deg, var(--c-sky-07-a72), var(--c-teal-10-a50) 43%, var(--c-teal-25-a24)),
-    image-set(
-      url(/triggerlab-key-visual-960.webp) type("image/webp") 1x,
-      url(/triggerlab-key-visual.webp) type("image/webp") 2x,
-      url(/triggerlab-key-visual.jpg) type("image/jpeg") 1x
-    ),
-    linear-gradient(132deg, transparent 0 63%, rgba(217, 255, 98, 0.22) 63% 77%, transparent 77%),
-    linear-gradient(135deg, transparent 0 58%, rgba(217, 255, 98, 0.5) 58% 59%, transparent 59%), var(--c-ink);
-  background-position: center, center;
-  background-size:
-    auto,
-    cover,
-    100% 100%,
-    100% 100%,
-    auto;
+  display: block;
+  padding: 0 0 clamp(48px, 8vw, 104px);
+  background: var(--c-ink-darkest);
   position: relative;
   overflow: hidden;
+}
+/* The grid and the slash are the whole decoration budget. Both are masked so
+   they fade out under the reading column rather than tiling the page. */
+.intro-shell:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(217, 255, 98, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 255, 98, 0.16) 1px, transparent 1px);
+  background-size: 92px 92px;
+  mask-image: radial-gradient(128% 72% at 18% 0%, var(--c-black), transparent 74%);
 }
 .intro-shell:after {
   content: "";
   position: absolute;
-  right: clamp(18px, 8vw, 120px);
-  bottom: clamp(24px, 7vw, 92px);
-  width: min(42vw, 520px);
-  aspect-ratio: 16 / 9;
-  border: 1px solid rgba(217, 255, 98, 0.42);
-  border-radius: 8px;
-  background: rgb(217 255 98 / 0.08);
-  box-shadow: 18px 18px 0 rgb(217 255 98 / 0.12);
+  top: -22vh;
+  right: -16vw;
+  width: 72vw;
+  height: 160vh;
+  transform: rotate(13deg);
+  background: linear-gradient(180deg, rgb(217 255 98 / 0.07), transparent 58%);
+  border-left: 1px solid rgb(217 255 98 / 0.22);
   pointer-events: none;
+}
+/* The shell lost its padding to the full-bleed hero, so the two notices that
+   sit outside .intro carry their own inset. */
+.intro-shell > .save-status {
+  margin: 14px clamp(16px, 5vw, 72px);
 }
 .intro {
   position: relative;
   z-index: 1;
-  width: min(960px, 100%);
+  width: 100%;
+  padding-inline: clamp(16px, 5vw, 72px);
   color: var(--c-paper);
-  text-align: center;
+  text-align: left;
+}
+/* One corner radius for the whole cold open: none. Squaring the panels one at
+   a time would mean touching sixteen rules that have nothing else in common,
+   and the seventeenth panel added later would have to remember. `img` is
+   deliberately absent from the list, so the studio credit's portrait keeps its
+   circle -- it is the only round thing left on the screen. */
+.intro article,
+.intro button,
+.intro div,
+.intro figure,
+.intro input,
+.intro label,
+.intro section,
+.intro select,
+.intro small,
+.intro span,
+.intro summary,
+.intro textarea {
+  border-radius: 0;
+}
+/* Hero ---------------------------------------------------------------------
+   Two columns that do not agree: the copy is a 1.05fr reading measure, the art
+   is a 0.95fr slab that runs to the viewport edge. Both break out of .intro's
+   inset, which is why the negative margin here mirrors that padding exactly. */
+.intro-hero,
+.intro-ticker {
+  margin-inline: calc(-1 * clamp(16px, 5vw, 72px));
+}
+.intro-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: stretch;
+  min-height: min(80vh, 720px);
+  border-bottom: 1px solid rgb(217 255 98 / 0.28);
+}
+.intro-hero-copy {
+  display: grid;
+  align-content: center;
+  gap: 0;
+  min-width: 0;
+  padding: clamp(20px, 3.4vw, 46px) clamp(16px, 5vw, 72px) clamp(28px, 4vw, 54px);
+}
+.intro-hero-art {
+  position: relative;
+  min-width: 0;
+  border-left: 1px solid rgb(217 255 98 / 0.28);
 }
 .brand-row,
 .topbar,
@@ -214,6 +277,11 @@ summary:focus-visible {
 .ranking-page .topbar {
   padding-right: 224px;
 }
+.intro .brand-row {
+  padding-bottom: 14px;
+  margin-bottom: clamp(22px, 3.4vw, 40px);
+  border-bottom: 1px solid rgb(217 255 98 / 0.24);
+}
 .brand-mark,
 .case-chip {
   display: inline-flex;
@@ -224,6 +292,25 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0;
+}
+.intro .brand-mark,
+.intro .case-chip,
+.intro .top-actions .ghost {
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.intro .brand-mark {
+  color: var(--c-ink);
+  background: var(--c-acid);
+  border-color: var(--c-acid);
+}
+.intro .top-actions .ghost {
+  color: var(--c-acid);
+  background: transparent;
+  border: 1px solid rgb(217 255 98 / 0.45);
 }
 .brand-mark {
   /* The report's topbar is a flex row that let the wordmark shrink until it
@@ -253,13 +340,15 @@ summary:focus-visible {
    readable copy is the element's own text, never a transparent fill. */
 .game-wordmark {
   display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: 0;
-  margin: 22px 0 12px;
-  font-size: clamp(52px, 7.4vw, 96px);
+  margin: 0 0 4px;
+  /* Sized off the copy column, not the viewport: it is the loudest thing on
+     the page and it is allowed to run to the column's edge. */
+  font-size: clamp(46px, 6.4vw, 118px);
   font-weight: 900;
-  line-height: 0.82;
-  letter-spacing: -0.045em;
+  line-height: 0.78;
+  letter-spacing: -0.055em;
   text-transform: uppercase;
   font-stretch: condensed;
 }
@@ -296,11 +385,11 @@ summary:focus-visible {
 }
 .wordmark-rule {
   display: block;
-  width: min(340px, 62%);
-  height: 5px;
-  margin: 18px 0 14px;
-  background: linear-gradient(90deg, var(--color-accent), rgb(217 255 98 / 0.06));
-  box-shadow: 0 0 22px rgb(217 255 98 / 0.55);
+  width: 100%;
+  height: 10px;
+  margin: 16px 0 12px;
+  background: linear-gradient(90deg, var(--color-accent) 0 42%, rgb(217 255 98 / 0.06));
+  box-shadow: 0 0 22px rgb(217 255 98 / 0.4);
   transform-origin: left center;
   animation: wordmark-charge 4.4s ease-in-out infinite;
 }
@@ -309,7 +398,7 @@ summary:focus-visible {
   align-items: baseline;
   gap: 12px;
   color: var(--c-paper);
-  font-size: clamp(15px, 1.7vw, 21px);
+  font-size: clamp(14px, 1.5vw, 19px);
   font-weight: 700;
   letter-spacing: 0.42em;
   text-indent: 0.42em;
@@ -383,22 +472,30 @@ summary:focus-visible {
 }
 .intro-kicker {
   display: block;
-  margin-bottom: 18px;
+  margin: 6px 0 clamp(16px, 2.2vw, 26px);
+  padding-left: 14px;
+  border-left: 4px solid var(--color-accent);
   color: var(--color-accent);
-  font-size: 22px;
+  font-size: clamp(16px, 1.8vw, 23px);
+  font-weight: 900;
   line-height: 1.35;
 }
 .studio-credit {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
   padding: 8px 16px 8px 8px;
   color: var(--c-ink);
   background: var(--c-paper);
   border: 1px solid rgba(24, 32, 31, 0.16);
-  border-radius: 999px;
+  border-radius: 0;
   text-align: left;
+}
+.intro .studio-credit {
+  justify-self: start;
+  margin-top: clamp(20px, 3vw, 34px);
+  box-shadow: 7px 7px 0 rgb(217 255 98 / 0.28);
 }
 .studio-credit img {
   width: 36px;
@@ -429,72 +526,124 @@ summary:focus-visible {
   font-weight: 900;
   letter-spacing: 0.01em;
 }
+/* The art no longer sits in a framed card in the reading column; it *is* the
+   right column, filling the hero's height and running off the viewport edge.
+   The old 16/9 box with its max-height cap existed to keep the start button
+   above the fold underneath the picture -- the button is now beside it, so the
+   frame can take whatever height the hero has. */
 .intro-visual {
   position: relative;
-  width: min(760px, 100%);
-  margin: 20px auto 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   overflow: hidden;
   background: var(--color-ink);
-  border: 1px solid rgba(217, 255, 98, 0.34);
-  border-radius: 8px;
-  box-shadow: 0 24px 80px var(--c-black-a38);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 .intro-visual picture,
 .intro-visual img {
   display: block;
   width: 100%;
+  height: 100%;
 }
 .intro-visual img {
-  /* height:auto is load-bearing: the img carries width/height attributes, and
-     that presentational height otherwise wins over aspect-ratio and squares the
-     frame off, cropping the figures at the left and right edges away. */
-  height: auto;
-  aspect-ratio: 16 / 9;
   object-fit: cover;
-  /* The cap is what puts the start control in the first viewport on a desktop:
-     at 1366px the 16/9 frame is a 651px slab and the figcaption rides its bottom
-     edge. It is viewport-relative, not a width breakpoint, so a short laptop
-     screen crops too; at phone widths the art is already shorter and it never
-     binds. The offset keeps the two figures and the skyline in the band. */
-  max-height: min(38vh, 340px);
+  /* The offset keeps the two figures and the skyline in the band whatever
+     shape the column ends up. */
   object-position: center 34%;
+}
+/* Graded, not framed: the photo dissolves into the copy column on its left
+   edge and into the ink field at its foot, so the seam between the two halves
+   of the hero is a gradient rather than a border. */
+.intro-hero-art:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--c-ink-darkest), rgb(16 22 21 / 0) 38%),
+    linear-gradient(0deg, rgb(16 22 21 / 0.88), rgb(16 22 21 / 0) 54%),
+    linear-gradient(202deg, rgb(217 255 98 / 0.14), rgb(217 255 98 / 0) 44%);
 }
 .intro-visual figcaption {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 14px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  padding: clamp(14px, 1.8vw, 22px);
   color: var(--c-paper);
   background: rgba(24, 32, 31, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 7px;
+  border: 0;
+  border-top: 1px solid rgb(217 255 98 / 0.4);
+  border-radius: 0;
 }
 .intro-visual span {
   color: var(--c-acid);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 950;
+  letter-spacing: 0.14em;
 }
 .intro-visual b {
-  font-size: 14px;
-  line-height: 1.35;
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.4;
+}
+/* Protocol ticker -----------------------------------------------------------
+   Three lines of 10px caption riding the key visual is where copy goes to be
+   ignored. The same words as a full-bleed acid band cutting the page in two
+   are the second thing the eye lands on. The track holds two identical runs
+   and slides exactly half its width, so the loop has no seam; the global
+   reduced-motion rule parks it at the halfway point, which looks the same. */
+.intro-ticker {
+  position: relative;
+  overflow: hidden;
+  padding: 11px 0;
+  background: var(--c-acid);
+  border-bottom: 1px solid var(--c-acid-dark);
+}
+.intro-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: intro-ticker-run 32s linear infinite;
 }
 .intro-protocol-line {
-  color: var(--c-paper);
-  font-size: 10px;
+  flex: 0 0 auto;
+  padding-right: 42px;
+  color: var(--c-ink);
+  font-size: 12px;
   font-weight: 950;
-  letter-spacing: 0;
-  opacity: 0.82;
+  letter-spacing: 0.22em;
+  white-space: nowrap;
 }
+.intro-protocol-line:before {
+  content: "■ ";
+  color: var(--c-teal-deep);
+}
+@keyframes intro-ticker-run {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+/* `.intro p` is one of build-critical-css.mjs's probes, so it stays the base
+   rule every paragraph on the screen starts from. The premise under the
+   wordmark is the one that gets the display treatment, and it is addressed by
+   its place in the hero rather than by outranking every panel below. */
 .intro p {
-  margin-inline: auto;
-  max-width: 700px;
-  font-size: 20px;
+  max-width: 74ch;
   line-height: 1.7;
+}
+.intro-hero-copy > p {
+  max-width: 46ch;
+  color: var(--c-green-87);
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.75;
 }
 .start-panel,
 .start-priority,
@@ -512,7 +661,7 @@ summary:focus-visible {
   grid-template-columns: 1fr;
   align-items: stretch;
   gap: 14px;
-  width: min(960px, 100%);
+  width: min(1180px, 100%);
   margin: 16px auto 12px;
   padding: 18px;
   color: var(--c-paper);
@@ -527,30 +676,46 @@ summary:focus-visible {
 /* Intro drawers ------------------------------------------------------------
    Pre-start prose folds behind a closed <details> so the first viewport is the
    door to the first scene, not a reading list. The mechanics are the play
-   screen's .insight-drawer idiom -- flex summary, native marker off, a +/- pill
+   screen's .insight-drawer idiom -- flex summary, native marker off, a +/- box
    that flips on [open] -- restated here because base-intro-ranking.css owns the
    intro and play.css is imported after it, so an override could not reach.
    Native <details> supplies the expanded state to assistive tech; nothing here
-   hand-rolls aria-expanded. */
+   hand-rolls aria-expanded.
+
+   The drawers used to be seven floating rounded cards with 12px of ink between
+   them, which read as seven unrelated things. They are one manifest now: rows
+   with nothing but a hairline between them, a fixed label column so the codes
+   stack into a readable gutter, and a square marker at the right end. */
 .intro-drawer {
-  width: min(960px, 100%);
-  margin: 0 auto 12px;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  border-top: 1px solid rgb(217 255 98 / 0.22);
+}
+.intro-drawer:last-of-type {
+  border-bottom: 1px solid rgb(217 255 98 / 0.22);
 }
 .intro-drawer > summary {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px 12px;
-  min-height: 44px;
-  padding: 9px 14px;
+  gap: 4px 18px;
+  min-height: 64px;
+  padding: 15px clamp(12px, 2vw, 20px);
   color: var(--c-paper);
-  background: rgba(24, 32, 31, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-left: 6px solid var(--c-acid);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
   list-style: none;
   text-align: left;
+  transition:
+    background 0.16s ease,
+    padding-left 0.16s ease;
+}
+.intro-drawer > summary:hover,
+.intro-drawer > summary:focus-visible {
+  background: rgb(217 255 98 / 0.09);
+  padding-left: calc(clamp(12px, 2vw, 20px) + 10px);
 }
 .intro-drawer > summary::-webkit-details-marker {
   display: none;
@@ -558,50 +723,50 @@ summary:focus-visible {
 .intro-drawer > summary:before {
   content: "+";
   order: 2;
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   flex: 0 0 auto;
   margin-left: auto;
   color: var(--c-ink);
   background: var(--c-acid);
-  border-radius: 50%;
-  font-size: 19px;
+  border-radius: 0;
+  font-size: 23px;
   font-weight: 900;
-  line-height: 25px;
+  line-height: 33px;
   text-align: center;
 }
 .intro-drawer[open] > summary:before {
   content: "-";
 }
 .intro-drawer > summary span {
+  flex: 0 0 auto;
+  min-width: min(168px, 34vw);
   color: var(--c-acid);
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
+  font-weight: 950;
+  letter-spacing: 0.16em;
 }
 .intro-drawer > summary h2 {
   min-width: 0;
   margin: 0;
   color: var(--c-line-soft);
-  font-size: 15px;
+  font-size: clamp(15px, 1.5vw, 19px);
   font-weight: 800;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .intro-drawer[open] > summary {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  background: rgb(217 255 98 / 0.09);
 }
 .intro-drawer > :not(summary) {
   width: 100%;
-  margin: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  margin: 0 0 18px;
+  border-radius: 0;
 }
 .prestart-briefing {
   display: grid;
   gap: 12px;
-  width: min(960px, 100%);
+  width: min(1180px, 100%);
   margin: 0 auto 12px;
   padding: 16px;
   color: var(--c-paper);
@@ -893,7 +1058,7 @@ summary:focus-visible {
   font-weight: 800;
 }
 .quick-guide {
-  width: min(960px, 100%);
+  width: min(1180px, 100%);
   margin: 18px auto 0;
   padding: 16px;
   color: var(--color-ink);
@@ -903,7 +1068,7 @@ summary:focus-visible {
 .data-info-panel {
   display: grid;
   gap: 10px;
-  width: min(960px, 100%);
+  width: min(1180px, 100%);
   margin: 12px auto 0;
   padding: 14px;
   color: var(--color-ink);
@@ -946,44 +1111,84 @@ summary:focus-visible {
   font-size: 13px;
   line-height: 1.5;
 }
+/* Season roadmap -----------------------------------------------------------
+   Six equal tiles in a 3-up grid said the six cases are interchangeable. They
+   are not: they run in order, each one inherits the last one's log, and only
+   one of them is open. So the grid is gone and they are numbered dossier rows,
+   stacked, with the file number set in the gutter at display size. The number
+   is drawn from data-index through a ::before so nothing is added to what the
+   button announces. */
 .case-roadmap {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  width: min(960px, 100%);
-  margin: 10px auto 0;
+  grid-template-columns: 1fr;
+  gap: 0;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  border-top: 1px solid rgb(217 255 98 / 0.22);
 }
 .roadmap-heading {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 14px;
-  width: min(960px, 100%);
-  margin: 18px auto 0;
-  padding: 0 2px;
+  width: min(1180px, 100%);
+  margin: clamp(34px, 5vw, 64px) auto clamp(14px, 2vw, 22px);
+  padding: 0 clamp(12px, 2vw, 20px);
   color: var(--c-paper);
   text-align: left;
 }
 .roadmap-heading span {
+  flex: 0 0 auto;
   color: var(--c-acid);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: clamp(18px, 2.6vw, 34px);
+  font-weight: 950;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 .roadmap-heading b {
+  max-width: 46ch;
   color: var(--c-line-soft);
   font-size: 13px;
-  line-height: 1.4;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: right;
 }
 .case-card {
   display: grid;
+  grid-template-columns: clamp(58px, 8vw, 132px) minmax(0, 1fr);
   align-content: start;
-  min-height: 172px;
-  padding: 14px;
+  align-items: start;
+  column-gap: clamp(14px, 2.4vw, 32px);
+  min-height: 0;
+  padding: clamp(16px, 2.2vw, 28px) clamp(12px, 2vw, 20px);
   width: 100%;
   color: var(--c-line-soft);
-  background: rgba(24, 32, 31, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgb(217 255 98 / 0.22);
+  border-radius: 0;
+  transition:
+    background 0.16s ease,
+    padding-left 0.16s ease;
+}
+.case-card > * {
+  grid-column: 2;
+}
+.case-card:before {
+  content: attr(data-index);
+  grid-column: 1;
+  grid-row: 1 / -1;
+  align-self: start;
+  color: var(--c-acid-29);
+  font-size: clamp(40px, 6vw, 96px);
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.06em;
+  line-height: 0.78;
+}
+.case-card.active-case:hover,
+.case-card.complete-case:hover {
+  padding-left: calc(clamp(12px, 2vw, 20px) + 10px);
 }
 .case-card.active-case,
 .case-card.complete-case {
@@ -993,30 +1198,39 @@ summary:focus-visible {
   outline: 3px solid var(--c-paper);
   outline-offset: 4px;
 }
+/* Sealed rows stay on the field and go grey rather than turning into six white
+   slabs. Locked is the majority state on a first run, so it is the one that has
+   to recede. */
 .case-card[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 1;
-  color: var(--c-ink-muted);
-  background: rgba(250, 250, 250, 0.96);
-  border-color: var(--c-line-strong);
+  color: var(--c-gray-75);
+  background: transparent;
 }
 .case-card[aria-disabled="true"] span,
 .case-card[aria-disabled="true"] h2,
 .case-card[aria-disabled="true"] b,
 .case-card[aria-disabled="true"] p,
 .case-card[aria-disabled="true"] small {
-  color: var(--c-ink-muted);
+  color: var(--c-gray-75);
   -webkit-text-fill-color: currentColor;
 }
+.case-card[aria-disabled="true"]:before {
+  color: var(--c-acid-18);
+}
+/* The one row the player can open is the only filled thing in the list. */
 .case-card.active-case {
   color: var(--c-ink);
-  background: rgba(217, 255, 98, 0.94);
-  border-color: var(--c-acid);
+  background: var(--c-acid);
+  border-bottom-color: var(--c-acid);
+}
+.case-card.active-case:before {
+  color: var(--c-acid-51);
 }
 .case-card.complete-case {
   color: var(--c-paper);
   background: rgba(44, 74, 70, 0.94);
-  border-color: rgba(217, 255, 98, 0.5);
+  border-bottom-color: rgba(217, 255, 98, 0.5);
 }
 .case-card div {
   display: flex;
@@ -1036,13 +1250,14 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 7px;
+  padding: 4px 8px;
   color: var(--c-line-soft);
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 5px;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 900;
+  letter-spacing: 0.06em;
   line-height: 1.2;
   flex: 0 0 auto;
 }
@@ -1057,20 +1272,23 @@ summary:focus-visible {
   border-color: rgba(217, 255, 98, 0.28);
 }
 .case-card h2 {
-  margin: 12px 0 8px;
-  font-size: 20px;
-  line-height: 1.15;
+  margin: 10px 0 6px;
+  font-size: clamp(20px, 2.3vw, 30px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   overflow-wrap: anywhere;
 }
 .case-card b {
   display: block;
   margin-bottom: 8px;
-  font-size: 13px;
+  font-size: clamp(13px, 1.2vw, 15px);
 }
 .case-card p {
   margin: 0;
+  max-width: 76ch;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .case-result-mini {
@@ -1126,6 +1344,33 @@ summary:focus-visible {
   background: var(--c-acid);
   color: var(--c-ink);
   font-size: 15px;
+}
+/* The door. It is the only button in the hero and the only acid slab in the
+   copy column, so it is sized like a door and not like a form control: square,
+   offset-shadowed, and it steps into the shadow on press. */
+.intro-launch {
+  justify-self: start;
+  margin-top: clamp(22px, 3.2vw, 38px);
+}
+.intro-launch button {
+  height: auto;
+  min-height: 66px;
+  padding: 0 clamp(24px, 3vw, 44px);
+  border-radius: 0;
+  font-size: clamp(16px, 1.5vw, 20px);
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  box-shadow: 9px 9px 0 rgb(217 255 98 / 0.24);
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.intro-launch button:hover:not(:disabled) {
+  transform: translate3d(4px, 4px, 0);
+  box-shadow: 4px 4px 0 rgb(217 255 98 / 0.3);
+}
+.intro-launch button:disabled {
+  opacity: 0.55;
 }
 .consent-box {
   display: flex;
@@ -1243,12 +1488,13 @@ summary:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 16px;
-  padding: 14px;
+  margin: clamp(22px, 3.2vw, 38px) 0 0;
+  padding: clamp(14px, 1.8vw, 20px);
   color: var(--c-ink);
   background: var(--c-acid);
   border: 1px solid var(--c-acid-deep);
-  border-radius: 8px;
+  border-radius: 0;
+  box-shadow: 9px 9px 0 rgb(217 255 98 / 0.24);
 }
 .resume-panel div {
   display: grid;
@@ -1273,13 +1519,14 @@ summary:focus-visible {
   justify-content: center;
   gap: 8px;
   flex: 0 0 auto;
-  min-height: 42px;
-  padding: 0 13px;
+  min-height: 52px;
+  padding: 0 20px;
   color: var(--c-paper);
   background: var(--c-ink);
   border: 0;
-  border-radius: 6px;
-  font-weight: 900;
+  border-radius: 0;
+  font-size: 15px;
+  font-weight: 950;
 }
 .test-unlock {
   width: 100%;
@@ -1293,7 +1540,7 @@ summary:focus-visible {
   font-weight: 800;
 }
 .season-summary {
-  width: min(960px, 100%);
+  width: min(1180px, 100%);
   margin: 18px auto 0;
   padding: 16px;
   color: var(--c-ink);
@@ -1596,45 +1843,13 @@ summary:focus-visible {
   font-weight: 800;
 }
 
-/* Intro ownership overrides previously lived in the broader result layer. */
-.intro-shell {
-  background:
-    linear-gradient(105deg, var(--c-sky-06-a66), var(--c-teal-11-a46) 52%, var(--c-teal-25-a22)),
-    image-set(
-      url(/triggerlab-key-visual-960.webp) type("image/webp") 1x,
-      url(/triggerlab-key-visual.webp) type("image/webp") 2x,
-      url(/triggerlab-key-visual.jpg) type("image/jpeg") 1x
-    );
-  background-position: center;
-  background-size: cover;
-}
-.intro-shell:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.18;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(217, 255, 98, 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 255, 98, 0.18) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: linear-gradient(90deg, var(--c-black), transparent 78%);
-}
-.intro {
-  width: min(1100px, 100%);
-  text-align: center;
-}
-.intro > p {
-  margin-inline: auto;
-  max-width: 680px;
-  color: var(--c-green-87);
-  font-size: 17px;
-}
-.intro-visual {
-  width:calc(100% + 56px); margin:0 -28px;
-  border-color:var(--c-acid);border-radius:0;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
-}
+/* The intro's second home used to be here: a set of overrides that re-centred
+   the column, re-painted the shell with the key visual and re-framed the
+   figure, all of them outranking the definitions above. The redesign folded
+   every one of them into that single home, so `.intro-shell`, `.intro`,
+   `.intro > p` and `.intro-visual` are each now defined exactly once. What is
+   left below is the light-panel copy colours, which genuinely only apply
+   inside .data-info-panel. */
 .start-priority,
 .prestart-briefing,
 .quick-guide {
@@ -1754,34 +1969,83 @@ body {
     box-shadow 0.16s ease,
     background 0.16s ease;
 }
-.intro {
-  text-align: center;
-}
-.intro-visual {
-  margin-inline: auto;
-}
 .choice {
   color: #10241f;
   background: #fff;
   border-color: #31504a;
 }
 
-@media (max-width: 700px) {
-  /* The backdrop covers a 390px viewport here, so it takes the small pair
-     rather than the 1,672px original. */
-  .intro-shell {
-    background-image:
-      linear-gradient(105deg, var(--c-sky-06-a66), var(--c-teal-11-a46) 52%, var(--c-teal-25-a22)),
-      image-set(
-        url(/triggerlab-key-visual-480.webp) type("image/webp") 1x,
-        url(/triggerlab-key-visual-960.webp) type("image/webp") 2x,
-        url(/triggerlab-key-visual.jpg) type("image/jpeg") 1x
-      );
+/* Cold open, narrow ---------------------------------------------------------
+   The hero's two columns cannot both be columns on a phone, so the copy takes
+   the full width and the art becomes a band under it. Everything else on the
+   screen is already a single stack of full-width rows, which is the point of
+   the row layout: the roadmap does not have to change shape at all. */
+@media (max-width: 860px) {
+  .intro-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
   }
-}
-
-/* The intro column centres itself; it sat in result.css until the file split. */
-.intro h1,
-.intro > p {
-  margin-inline: auto;
+  /* The fixed music controls sit over this corner, so the brand row starts
+     below them rather than under them. */
+  .intro-hero-copy {
+    padding-top: 58px;
+  }
+  /* The whole intro has a phone height budget of four viewports
+     (tests/visual-regression.spec.js:400), and the art band and the tail
+     padding are the two places that pay for the rest of it. */
+  .intro-shell {
+    padding-bottom: 28px;
+  }
+  .intro-hero-art {
+    min-height: 54vw;
+    border-left: 0;
+    border-top: 1px solid rgb(217 255 98 / 0.28);
+  }
+  .intro-hero-art:after {
+    background:
+      linear-gradient(0deg, rgb(16 22 21 / 0.9), rgb(16 22 21 / 0) 58%),
+      linear-gradient(202deg, rgb(217 255 98 / 0.14), rgb(217 255 98 / 0) 44%);
+  }
+  /* The shared narrow-screen rule stacks every header row into full-width
+     buttons. That is right for the play screen's six-button topbar and wrong
+     for a three-chip brand row, which spent 150px of the first viewport on it.
+     These outrank it by specificity rather than by order, because
+     responsive.css is imported after this file. */
+  .intro .brand-row {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .intro .top-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    width: auto;
+  }
+  .intro .top-actions .ghost {
+    width: auto;
+  }
+  .case-card {
+    grid-template-columns: clamp(48px, 13vw, 72px) minmax(0, 1fr);
+  }
+  /* A wrapped flex row put the +/- box on a line of its own under the title.
+     Two rows and a fixed marker column keep it beside them. */
+  .intro-drawer > summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 34px;
+    align-items: center;
+  }
+  .intro-drawer > summary span,
+  .intro-drawer > summary h2 {
+    grid-column: 1;
+    min-width: 0;
+  }
+  .intro-drawer > summary:before {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    margin-left: 0;
+  }
+  .roadmap-heading b {
+    text-align: left;
+  }
 }

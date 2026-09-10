@@ -6,6 +6,17 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 
+const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
+// One loop of the marquee. Three copies is what makes the run wider than a
+// desktop viewport, so the -50% translate never exposes the seam.
+const tickerRun = (
+  <>
+    <small className="intro-protocol-line">{PROTOCOL_LINE}</small>
+    <small className="intro-protocol-line">{PROTOCOL_LINE}</small>
+    <small className="intro-protocol-line">{PROTOCOL_LINE}</small>
+  </>
+);
+
 export function IntroScreen({ view }) {
   const [openingBurst, setOpeningBurst] = useState(false);
   const openingBurstRef = useRef(false);
@@ -100,6 +111,12 @@ export function IntroScreen({ view }) {
         {renderErrorLogPanel()}
         {renderSaveStatus()}
         <section className="intro">
+          {/* The cold open is one asymmetric slab: the copy column carries the
+              wordmark, the premise and the only button on the page, and the art
+              column bleeds off the right edge instead of sitting in a framed
+              card in the middle of a centred stack. */}
+          <div className="intro-hero">
+            <div className="intro-hero-copy">
           <div className="brand-row">
             <span className="brand-mark">{gameTitle}</span>
             <div className="top-actions">
@@ -125,30 +142,49 @@ export function IntroScreen({ view }) {
           </div>
           <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
           <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
-          {/* The studio credit and the returning-player line sit below the key
-              visual on purpose: above it they spend the first viewport on an
-              attribution chip and a variable-height paragraph, and the second
-              one only exists for the players whose primary action is resume. */}
-          <figure className="intro-visual">
-            <picture>
-              <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
-              <source srcSet={heroArt.wide} type="image/webp" />
-              <img
-                src="/triggerlab-key-visual.jpg"
-                alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
-                width="1672"
-                height="941"
-                fetchPriority="high"
-              />
-            </picture>
-            <figcaption>
-              <span>TRIGGERLAB NIGHT SHIFT</span>
-              <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
-              <small className="intro-protocol-line">NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED</small>
-              {hasResumableSave ? resumePanel : <div className="start-input-row">{startFirstCaseButton}</div>}
-            </figcaption>
-          </figure>
+          {/* The premise reads directly under the wordmark, where the copy
+              column has room for it. It also keeps `.intro p` -- one of
+              build-critical-css.mjs's probes -- pointing at a rendered
+              element now that the briefing grid is folded away. */}
+          <p>
+            트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
+            사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
+          </p>
+          {hasResumableSave ? resumePanel : <div className="start-input-row intro-launch">{startFirstCaseButton}</div>}
           <StudioCredit />
+            </div>
+            <div className="intro-hero-art">
+              <figure className="intro-visual">
+                <picture>
+                  <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
+                  <source srcSet={heroArt.wide} type="image/webp" />
+                  <img
+                    src="/triggerlab-key-visual.jpg"
+                    alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                    width="1672"
+                    height="941"
+                    fetchPriority="high"
+                  />
+                </picture>
+                <figcaption>
+                  <span>TRIGGERLAB NIGHT SHIFT</span>
+                  <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+          {/* The protocol line was a 10px caption riding the key visual, where
+              nobody read it. As a full-bleed acid band cutting the page in two
+              it is the first thing the eye lands on after the wordmark. The
+              painted copies are duplicated for a seamless loop and hidden from
+              assistive tech; the single readable copy sits beside them. */}
+          <div className="intro-ticker">
+            <div className="intro-ticker-track" aria-hidden="true">
+              {tickerRun}
+              {tickerRun}
+            </div>
+            <span className="sr-only">{PROTOCOL_LINE}</span>
+          </div>
           {nextParticipantMessage && (
             <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
           )}
@@ -240,13 +276,6 @@ export function IntroScreen({ view }) {
             )}
           </div>
           </section>
-          {/* The premise reads directly under the door. It also keeps
-              `.intro p` -- one of build-critical-css.mjs's probes -- pointing at
-              a rendered element now that the briefing grid is folded away. */}
-          <p>
-            트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
-            사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
-          </p>
           {/* Pre-start prose folds behind closed native <details>. The element
               supplies the disclosure state, the button role and Enter/Space to
               assistive tech, so nothing here hand-rolls aria-expanded. */}
@@ -527,7 +556,7 @@ export function IntroScreen({ view }) {
             <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
           </div>
           <div className="case-roadmap">
-            {seasonCases.map((caseItem) => {
+            {seasonCases.map((caseItem, caseIndex) => {
               const savedResult = caseResults[caseItem.id]
                 ? normalizeCaseSummary(caseResults[caseItem.id])
                 : null;
@@ -543,6 +572,11 @@ export function IntroScreen({ view }) {
                   type="button"
                   key={caseItem.id}
                   blocked={!canOpenCase}
+                  /* The file number the row is stamped with. It is decoration
+                     drawn from a ::before, so the label the button announces is
+                     still the aria-label below and not a second reading of the
+                     index. */
+                  data-index={String(caseIndex + 1).padStart(2, "0")}
                   aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"

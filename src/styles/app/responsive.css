@@ -41,9 +41,6 @@
   .achievement-panel > div:last-child {
     grid-template-columns: 1fr;
   }
-  .case-roadmap {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .play-style-grid,
   .season-summary-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -189,7 +186,6 @@
   .decision-dock-actions button {
     flex: 1 1 0;
   }
-  .intro h1,
   .result-hero h1 {
     font-size: 42px;
   }
@@ -226,7 +222,6 @@
   .memo-panel ul,
   .observer-postmortem-grid,
   .result-grid,
-  .case-roadmap,
   .feedback-controls,
   .guide-grid,
   .game-hud,
@@ -340,15 +335,6 @@
   .echo-probe {
     align-items: stretch;
     flex-direction: column;
-  }
-  .intro-visual figcaption {
-    position: static;
-    align-items: flex-start;
-    flex-direction: column;
-    border-radius: 0;
-  }
-  .intro-visual img {
-    aspect-ratio: 16 / 9;
   }
   .scene-visual,
   .scene-visual img {

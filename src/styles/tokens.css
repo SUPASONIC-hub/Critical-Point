@@ -158,6 +158,13 @@
   --c-ink-08: rgb(21 21 21);
   --c-sky-08-a94: rgb(12 18 31 / 0.9411764705882353);
   --c-gray-61: rgb(139 152 173);
+  /* The roadmap's file numerals, flattened. They are acid ghosted into the
+     ground the row happens to have -- the ink field, the sealed row, the open
+     acid slab -- and they are opaque because a translucent `color` cannot be
+     contrast-tested. */
+  --c-acid-29: rgb(84 101 47);
+  --c-acid-18: rgb(48 59 33);
+  --c-acid-51: rgb(155 184 77);
 
   /* semantic aliases referenced by components */
   --color-ink: var(--c-ink);

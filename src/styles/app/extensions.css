@@ -1433,14 +1433,19 @@
   background: #315f43;
   border-radius: inherit;
 }
+/* This line sits inside the SEASON 1 drawer, directly on the intro's field --
+   not in a light panel, which is what the two dark greens here assumed. It read
+   at 2.7:1 against the ink ground and nobody caught it, because until the
+   redesign the ground was the key visual and the contrast audit skips text over
+   a photograph. */
 .play-style-unlock {
   margin: 10px 0;
-  color: #35654f;
+  color: var(--c-line-soft);
   font-size: 12px;
   line-height: 1.5;
 }
 .play-style-unlock strong {
-  color: #0e4b45;
+  color: var(--c-acid);
 }
 @media (max-width: 700px) {
   .chapter-dashboard > div:first-child {
