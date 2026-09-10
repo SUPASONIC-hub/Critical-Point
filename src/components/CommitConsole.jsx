@@ -58,6 +58,12 @@ export function CommitConsole({
         <span>CHOICE TEMPTATION · {temptation.label}</span>
         <p>{temptation.text}</p>
       </div>
+      {observerPreview && (
+        <div className="commit-observer-preview">
+          <span>OBSERVER PREVIEW · {observerPreview.tag.label}</span>
+          <p>{observerPreview.text}</p>
+        </div>
+      )}
       {targetLock && (
         <div className="commit-console-readout commit-target-lock" data-testid="commit-target-lock" aria-label="결정 목표 잠금">
           {Object.entries(targetLock).map(([key, item]) => (
@@ -80,12 +86,6 @@ export function CommitConsole({
               </div>
             ))}
           </dl>
-        )}
-        {observerPreview && (
-          <div className="commit-observer-preview">
-            <span>{observerPreview.tag.label}</span>
-            <p>{observerPreview.text}</p>
-          </div>
         )}
         <div className={`commit-console-effects${evidenceCount < 3 ? " is-hidden" : ""}`} aria-label="예상 자원 변화">
           <span>예상 자원</span>
