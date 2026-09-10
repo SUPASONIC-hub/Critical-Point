@@ -48,9 +48,16 @@ export function FreeTextReframeBox({
       <textarea
         value={freeText}
         onChange={(event) => updateFreeText(event.target.value)}
+        onKeyDown={(event) => {
+          if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && freeText.trim() && !freeTextBlockedByPrivacy && !isAdvancing) {
+            event.preventDefault();
+            choose(freeChoice);
+          }
+        }}
         maxLength={FREE_TEXT_MAX_LENGTH}
         placeholder="예: 누구를 새로 협상장에 부를지, 어떤 조건을 교환할지, 어떤 정보를 먼저 확인할지 적는다."
         aria-label="구조 재설계 자유입력"
+        aria-keyshortcuts="Control+Enter Meta+Enter"
         aria-describedby={freeTextBlockedByPrivacy ? "reframe-input-note reframe-privacy-warning" : "reframe-input-note"}
       />
       <p className="input-note" id="reframe-input-note">
