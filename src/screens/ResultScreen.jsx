@@ -39,7 +39,7 @@ export function ResultScreen({ view }) {
     },
   } = view;
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
-  const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0];
+  const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observerEndingRecord = observerPattern?.endingRecord ?? {
@@ -266,7 +266,7 @@ export function ResultScreen({ view }) {
               <strong>{judgmentProfile.label}</strong>
             </div>
             <p>{judgmentProfile.text}</p>
-            <small>{view.delayedConsequences?.at(-1)?.text ?? observerEndingRecord.title}</small>
+            <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
           </section>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">

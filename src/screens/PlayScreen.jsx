@@ -166,6 +166,7 @@ export function PlayScreen({ view }) {
             )}
             <p className="scene-body scene-critical">{node.text}</p>
             <p className="scene-dialogue">"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
+            <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
             <details className="scene-secondary">
               <summary>장면의 여운과 단서 보기</summary>
               <p className="scene-direction"><span className="story-label">왜 지금 결정해야 하나</span>{sceneDirection}</p>
@@ -176,7 +177,6 @@ export function PlayScreen({ view }) {
                 </p>
               )}
               <p className="scene-thought"><span className="story-label">속마음</span>'{speakerProfile.thought}'</p>
-              <p className="observer-whisper"><span className="story-label">관찰자 메모</span>{observerWhisper}</p>
               <p className="scene-secondary-note"><span className="story-label">다음 장면의 질문</span>{narrativeSpine.nextQuestion}</p>
             </details>
           </div>
