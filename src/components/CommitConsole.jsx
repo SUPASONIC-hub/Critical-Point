@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { LockKeyhole } from "lucide-react";
 
 import { playTargetLockCue } from "./AdaptiveMusic.jsx";
-import { isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
+import { getChoiceTemptation, isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
 
 export function CommitConsole({
   suspenseTier,
@@ -31,6 +31,7 @@ export function CommitConsole({
   if (!pendingChoice || !pendingChoiceRead || !pendingChoiceForecast) return null;
   const observerPreview = getObserverPreviewForChoice(pendingChoice.id);
   const targetLock = pendingChoiceRead.targetLock;
+  const temptation = getChoiceTemptation(pendingChoice);
 
   return (
     <section
@@ -52,6 +53,10 @@ export function CommitConsole({
         <span>
           압력 <b>{pendingChoiceForecast.afterRisk}</b>
         </span>
+      </div>
+      <div className="commit-observer-preview">
+        <span>CHOICE TEMPTATION · {temptation.label}</span>
+        <p>{temptation.text}</p>
       </div>
       {targetLock && (
         <div className="commit-console-readout commit-target-lock" data-testid="commit-target-lock" aria-label="결정 목표 잠금">

@@ -29,7 +29,7 @@ export function PlayScreen({ view }) {
     },
     scene: {
       node, sceneChallenge, narrativeSpine, sceneVisuals, speakerProfile, speakerPortrait,
-      resolvedNodeId, sceneDirection, latestBeat,
+      resolvedNodeId, sceneDirection, latestBeat, openingLegacy,
     },
     decision: {
       isAdvancing, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts,
@@ -161,6 +161,9 @@ export function PlayScreen({ view }) {
               the fold below. */}
           <div className="scene-story">
             <p className="scene-narration">{speakerProfile.appearance} {speakerProfile.gesture}</p>
+            {openingLegacy && (
+              <p className="observer-whisper"><span className="story-label">PREVIOUS STANDARD DETECTED</span>{openingLegacy.title}</p>
+            )}
             <p className="scene-body scene-critical">{node.text}</p>
             <p className="scene-dialogue">"{speakerProfile.line}" <span className="story-voice">({speakerProfile.voice})</span></p>
             <details className="scene-secondary">
