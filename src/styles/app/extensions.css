@@ -1217,8 +1217,8 @@
     padding-right: 12px;
   }
   .choice {
-    min-height: 108px;
-    padding: 13px;
+    min-height: 88px;
+    padding: 11px;
   }
   .ending-scene-profile {
     margin-left: 0;
@@ -2179,11 +2179,11 @@
 }
 
 @media (max-width: 768px) {
-  /* The console is over the page here, so every row it keeps is a choice card it
+  /* The console is over the page, so every row it keeps is a choice card it
      hides. The title said what the quote below it already says, and the two
      actions do not need a line each. */
-  .commit-console-heading {
-    display: none;
+  .commit-console-heading,.commit-observer-preview {
+    display:none;
   }
   .commit-console-actions {
     flex-direction: row-reverse;

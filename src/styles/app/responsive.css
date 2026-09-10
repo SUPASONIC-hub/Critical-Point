@@ -312,8 +312,9 @@
     grid-column: auto;
   }
   .game-board,
-  .status-board {
-    padding: 16px;
+  .status-board,
+  .choice-panel {
+    padding: 8px;
   }
   .decision-reveal-backdrop {
     align-items: end;
@@ -351,7 +352,7 @@
   }
   .scene-visual,
   .scene-visual img {
-    min-height: 180px;
+    min-height: 140px;
   }
   .narrative-spine-heading {
     align-items: flex-start;
