@@ -97,7 +97,7 @@ export function ChoiceList({
               <small hidden={pendingChoice?.id !== choice.id}>{temptation.text}</small>
             </span>
             <span className="choice-speech">"{speechifyChoice(choice)}"</span>
-            <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)}</span>
+            <span className="choice-dilemma">{describeChoiceDilemma(choice.effect)} · {riskLabel}</span>
             {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
             {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
             {showTacticalDetails && observerPreview && (
