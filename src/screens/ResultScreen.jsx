@@ -197,6 +197,7 @@ export function ResultScreen({ view }) {
             <div className="top-actions">
               <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)} aria-keyshortcuts="R">
                 <RefreshCcw size={16} />
+                <kbd className="shortcut-hint" aria-hidden="true">R</kbd>
                 이 사건 다시 도전
               </button>
               <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
@@ -334,7 +335,7 @@ export function ResultScreen({ view }) {
                 <small>{resultBridge}</small>
               </div>
               <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
-                <ChevronRight size={18} />
+                <ChevronRight size={18} /><kbd className="shortcut-hint" aria-hidden="true">N</kbd>
                 {nextCaseSignal.button}
               </button>
             </section>
