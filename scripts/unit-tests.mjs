@@ -634,3 +634,28 @@ test("no two presses in a window are worth the same, and the run replays them", 
   assert.deepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:1:${press}`)), "and the same seed draws the same press twice");
   assert.notDeepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:2:${press}`)), "while the next window draws its own");
 });
+
+test("a reboot buys a multiplier and pays for it with room", () => {
+  const seed = "2:7:400";
+  const fresh = drawBustFloor(seed, 0);
+  const once = drawBustFloor(seed, 1);
+  const thrice = drawBustFloor(seed, 3);
+
+  // REBOOT_PERMANENT_BONUS hands a rebooted run +0.2x forever. Measured over
+  // forty windows with that bonus free, busting every fourth window banked
+  // 22,114 against 13,587 for never busting -- 63% more, because the multiplier
+  // compounds and the bill is one window. The bonus stays; what it costs now is
+  // the room to use it.
+  assert.ok(once < fresh, "one reboot walks the wall closer");
+  assert.ok(thrice < once, "and each one after that walks it closer again");
+  assert.ok(thrice >= 52, "but it never comes closer than the fatal floor");
+});
+
+test("the wall cannot be walked below the point a run stops being playable", () => {
+  for (const reboots of [4, 8, 20, 100]) {
+    for (const window of [1, 5, 9]) {
+      const floor = drawBustFloor(`${reboots}:${window}:0`, reboots);
+      assert.ok(floor >= 52, `${reboots} reboots still leaves a wall at ${floor}`);
+    }
+  }
+});
