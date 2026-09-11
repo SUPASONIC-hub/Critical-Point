@@ -130,3 +130,24 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
   const revealTarget = afterReveal.gainTargets.find((value) => Math.abs(value - expectedRevealPeak) < 1e-5);
   expect(revealTarget).toBeCloseTo(expectedRevealPeak, 5);
 });
+
+test("muted player hears nothing when a decision is made", async ({ page }) => {
+  await installAudioProbe(page);
+  await seedMusicPreference(page, "false", "normal");
+  await page.goto("/");
+  await startFirstRun(page);
+
+  // The cues on the decision window are the ones the mute toggle used to miss:
+  // the juice layer opened a second AudioContext of its own and played through
+  // it, so `배경음 끄기` silenced the score and nothing else. Pressing a choice
+  // is the cheapest way to reach them -- `[data-juice]` is on the choice, the
+  // commit and the cancel alike.
+  await page.locator(".choices .choice").first().click();
+  await expect(page.getByTestId("commit-target-lock")).toBeVisible();
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+
+  const probe = await readProbe(page);
+  expect(probe.contexts, "a muted run must not open an AudioContext at all").toBe(0);
+  expect(probe.oscillators).toBe(0);
+});

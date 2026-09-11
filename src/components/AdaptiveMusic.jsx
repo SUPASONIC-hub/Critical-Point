@@ -498,6 +498,43 @@ export function playDecisionTick(remaining) {
   }
 }
 
+/**
+ * The gate every cue outside this module has to pass.
+ *
+ * The five cues above each open with the same three lines -- read the mute
+ * preference, read the volume preset, take the shared context -- and for a long
+ * time `juiceAudio` was the one cue source that opened with none of them. It
+ * built `new AudioContext()` of its own and an oscillator pool inside it, so
+ * `배경음 끄기` silenced the score and left the heartbeat, the hover and the
+ * commit thud playing over it, and a muted run still opened a second context:
+ * the exact thing this shared runtime was introduced to stop.
+ *
+ * Returning null rather than a muted node graph is the point. A caller that
+ * gets null is meant to do nothing at all -- building nodes and setting their
+ * gain to zero still costs a context, and a context is what the muted player
+ * asked not to have.
+ */
+export function acquireCueRuntime() {
+  try {
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return null;
+    // Deliberately does not build the runtime. `AdaptiveMusic` builds it on
+    // mount when the player has sound on, and `playOpeningAccent` builds it for
+    // the one gesture that can precede that. A cue firing before either is a
+    // cue with no run behind it yet, and it stays silent instead of racing them.
+    const context = audioRuntime.context;
+    if (!context) return null;
+    Promise.resolve(context.resume?.()).catch(() => {});
+    return {
+      context,
+      destination: audioRuntime.bus ?? audioRuntime.master ?? context.destination,
+      multiplier: volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier,
+    };
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+    return null;
+  }
+}
+
 export function AdaptiveMusic({ modeKey }) {
   const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
   const [volumePreset, setVolumePreset] = useState(() =>
