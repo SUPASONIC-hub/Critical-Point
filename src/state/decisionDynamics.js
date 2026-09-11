@@ -28,10 +28,6 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-export function getTimeDecay(seconds, windowSeconds = 45) {
-  return clamp(1 - seconds / windowSeconds, 0, 1);
-}
-
 export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
   const thresholdState = stressLevel >= 92 && riskDelta > 0 && !challengeMatch ? "bust" : stressLevel >= 78 ? "critical" : "building";

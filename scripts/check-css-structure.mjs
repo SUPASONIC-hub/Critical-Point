@@ -57,13 +57,18 @@ const fileBudgets = {
   // collapsed into one rule. The line count went up, the number of places you
   // have to read to know what the intro computes to went down.
   "base-intro-ranking.css": { lines: 2060, bytes: 48700 },
-  // extensions.css read 2193 / 45440 until the same pass, which repainted
-  // .play-style-unlock for the field it actually sits on.
-  "extensions.css": { lines: 2200, bytes: 45900 },
-  "play.css": { lines: 3560, bytes: 74960 },
+  // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
+  // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
+  // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
+  // out of four of these files. Nothing changed on screen; the sheets stopped
+  // describing surfaces that were deleted, in some cases two refactors ago.
+  "extensions.css": { lines: 2060, bytes: 44900 },
+  // play.css lost the most: the record-room pass removed the identity strip, the
+  // repeated scene question and the status board, and their rules stayed behind.
+  "play.css": { lines: 3290, bytes: 72600 },
   "recovery.css": { lines: 266, bytes: 5754 },
-  "responsive.css": { lines: 402, bytes: 8500 },
-  "result.css": { lines: 1390, bytes: 29800 },
+  "responsive.css": { lines: 380, bytes: 8400 },
+  "result.css": { lines: 1380, bytes: 30400 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

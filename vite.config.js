@@ -26,7 +26,9 @@ const CRITICAL_CSS_FILE = "src/styles/critical.generated.css";
  * blocking, then swaps it back on load. The full sheet still arrives, in the
  * same order with the same contents, so nothing about the settled cascade
  * changes -- which is what makes this safe where splitting the file per screen
- * was not (see the P-2 entries in docs/changelog/2026-09-03.md).
+ * was not: a per-screen split has to decide which sheet each shared selector
+ * belongs to, and the cascade answers that differently depending on which screen
+ * loaded first. This was measured twice before it was adopted.
  *
  * Generated-and-committed, like the responsive art variants, because the deploy
  * environment has no Playwright browser to measure with. The staleness guard

@@ -1,6 +1,22 @@
 import { expect, test } from "@playwright/test";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
+/**
+ * Resuming a seeded run is the one entry path in this file that pulls the
+ * `GameRuntime` lazy chunk cold -- `AppContent.jsx:35` splits it out, and its
+ * Suspense fallback (`:312`) is an empty `<main>`. Every other test here reaches
+ * the shell through a click, by which point the chunk is already resolved.
+ *
+ * On the dev server the whole suite shares, that first transform can outrun the
+ * 8s `expect` timeout while two workers are compiling, and the failure reads as
+ * `.game-shell` not existing -- which looks exactly like a broken resume and is
+ * really the fallback still on screen. The rest of this file already waits with
+ * `waitForSelector`, on the 60s test timeout; these two now agree with it.
+ */
+async function waitForShell(page) {
+  await page.waitForSelector(".game-shell");
+}
+
 const STORAGE_KEY = "trigger-prototype-v2";
 const EMPTY_TRIGGERS = {
   protection: 0,
@@ -36,7 +52,7 @@ async function startDebugNode(page, caseId, nodeId) {
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
     .toBe(nodeId);
-  await expect(page.locator(".game-shell")).toBeVisible();
+  await waitForShell(page);
 }
 
 function validSavedState(patch = {}) {
@@ -82,7 +98,7 @@ test("ordinary save keeps discovered clues and does not create recovery metadata
     discoveredClues: [{ id: "c1-hidden-ledger", title: "hidden ledger", text: "x" }],
   }));
   await page.goto("/?debug=1");
-  await expect(page.locator(".game-shell")).toBeVisible();
+  await waitForShell(page);
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: false })));
   await page.reload();
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);

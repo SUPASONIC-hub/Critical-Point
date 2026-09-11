@@ -1229,23 +1229,8 @@
 .status-board .resource b {
   color: var(--ink);
 }
-.status-board .speaker-card {
-  color: var(--ink);
-  background: var(--c-paper-soft);
-}
-.status-board .speaker-card strong {
-  color: var(--ink);
-}
-.status-board .speaker-card span {
-  color: var(--teal);
-}
-.status-board .speaker-card p,
 .status-board .status-note {
   color: var(--c-ink-muted);
-}
-.status-board .trigger-tags span {
-  color: var(--ink);
-  background: var(--c-paper-92);
 }
 
 /* ---------------------------------------------------------------------------

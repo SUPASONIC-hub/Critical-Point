@@ -98,13 +98,6 @@
   .clue-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .scene-challenge {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .scene-challenge p {
-    max-width: none;
-  }
   .narrative-spine-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -179,12 +172,6 @@
     align-items: stretch;
     flex-direction: column;
     bottom: max(8px, env(safe-area-inset-bottom));
-  }
-  .decision-dock-actions {
-    width: 100%;
-  }
-  .decision-dock-actions button {
-    flex: 1 1 0;
   }
   .result-hero h1 {
     font-size: 42px;

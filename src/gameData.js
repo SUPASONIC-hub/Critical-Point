@@ -1,6 +1,6 @@
 export { byEffectWeight, cognitionLabels, costWhenRising, initialResources, isResourceGain, triggerLabels } from "./gameConstants.js";
 export { boardChangePrompts, characterProfiles, choiceSubtexts, choiceVoiceLines } from "./gameDialogue.js";
-export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, nodeOrders, RESULT_NODE_IDS, seasonCasesBase } from "./gameCases.js";
+export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
 import { case02Nodes } from "./nodes/case02.js";
 import { case03Nodes } from "./nodes/case03.js";

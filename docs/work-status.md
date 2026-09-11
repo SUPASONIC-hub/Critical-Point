@@ -1,17 +1,22 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-09
+Last updated: 2026-09-11
 
 This file holds what is true now: the shape of the project, the rules a change
-has to keep, and the commands that prove it. What changed and why is in
-`docs/changelog/`.
+has to keep, and the commands that prove it. What changed and why is in `git
+log`: the commit messages here record the state that forced each change, not a
+list of the files it touched.
 
 ## Current State
 
 - Core verification passes with `npm run verify`.
-- The play screen is 2,370px on a 390x844 phone and the report 3,081px; they were
-  3,953px and 10,616px before the 2026-09-09 layout pass. Both numbers are held
-  by budget tests in `tests/visual-regression.spec.js`.
+- The play screen and the intro are held to phone reading budgets in
+  `tests/visual-regression.spec.js`: the play screen under 2,616px on a 390x844
+  phone with the choices starting above 1,435px, and the intro under 3,376px.
+  They are budgets, not measurements -- ratchet them down, never up. The play
+  screen was 5,775px before the first layout pass and 3,953px before the record
+  room. The report has no height budget; `.report-archive` carries its bulk and
+  priority 28 is what holds its shape.
 - The whole app shares the intro's night ground; panels stay light. Lime is the
   accent for the control that records a decision.
 - Fast CI checks and heavyweight E2E checks are split in GitHub Actions.
@@ -165,10 +170,10 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` is seventeen checks: lint, CSS format, unit and smoke
+`npm run verify:static` is nineteen checks: lint, CSS format, unit and smoke
 tests, encoding, text, CSS tokens, CSS structure, graph, dialogue, balance,
-endings, art, view contracts, constants, the runtime budget, the visual
-baselines and the Node pin. None of them needs a browser, which is what lets
+endings, art, view contracts, constants, the runtime budget, the export
+schema, the test storage keys, the visual baselines and the Node pin. None of them needs a browser, which is what lets
 the deploy build run them.
 
 Two artifacts are generated with a browser and committed, so a deploy needs no
