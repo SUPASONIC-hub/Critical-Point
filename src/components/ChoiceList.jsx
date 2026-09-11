@@ -85,7 +85,8 @@ export function ChoiceList({
             aria-label={`${speechifyChoice(choice)}${showTacticalDetails ? ` ${riskLabel}.` : "."} ${getChoiceSubtext(choice)}`}
           >
             <span className="choice-main">
-              <small aria-hidden="true">{choiceIndex + 1}</small>
+              {/* The key legend for `aria-keyshortcuts` above, not a number about the case. */}
+              <small className="choice-shortcut" aria-hidden="true">{choiceIndex + 1}</small>
               <Check size={16} />
               <small>{pendingChoice?.id === choice.id ? "검토 중" : "선택"}</small>
             </span>

@@ -84,6 +84,12 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
   // Five top-level blocks: the context drawer, the resource rail, the operator
   // brief drawer, the scene and the choice panel. The rail is the one place the
   // standing numbers are allowed to live, which is why the scan below skips it.
+  //
+  // It also skips `.choice-shortcut`, the 1-4 legend on the decision cards. Those
+  // digits say which key presses a choice -- they are the visible half of each
+  // button's `aria-keyshortcuts`, not something the player has to read and weigh.
+  // Counting them held this test red from `f66347e` onward, which is a guard
+  // measuring the wrong thing rather than a screen that got busier.
   const gameBoardBlockCount = await page.evaluate(() =>
     document.querySelectorAll(".game-board > section, .game-board > div, .game-board > details").length,
   );
@@ -93,7 +99,12 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
     const found = [];
     for (const element of document.querySelectorAll(".game-board *")) {
       if (element.closest("details:not([open])")) continue;
-      if (element.closest("[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action, .resource-rail")) continue;
+      if (
+        element.closest(
+          "[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action, .resource-rail, .choice-shortcut",
+        )
+      )
+        continue;
       const style = getComputedStyle(element);
       if (style.display === "none" || style.visibility === "hidden") continue;
       const own = Array.from(element.childNodes)
@@ -132,6 +143,12 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
   });
   expect(transparentText).toEqual([]);
 
+  // Priority 29 puts the deltas, the observer preview and the risk hint behind
+  // `전술 정보`. Closed, that means no exact number reaches the card at all --
+  // the screen's promise is that the scene is enough to judge on.
+  const closedChoiceText = await page.locator(".choices").innerText();
+  expect(closedChoiceText).not.toMatch(/[+-]\d/);
+
   const detailsToggle = page.locator(".tactical-toggle");
   if (await detailsToggle.isVisible().catch(() => false)) {
     await detailsToggle.click();
@@ -139,9 +156,15 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
 
   await expect(page.locator(".decision-forecast")).toHaveCount(0);
   await expect(page.locator(".choice-tactical").first()).toBeVisible();
-  const exposedPreChoiceText = await page.locator(".choices").innerText();
-  expect(exposedPreChoiceText).not.toMatch(/\b[ABC]\b/);
-  expect(exposedPreChoiceText).not.toMatch(/[+-]\d/);
+
+  // Open, `· 위험 +N` is the one number priority 29 hands over, so the closed
+  // scan cannot simply repeat -- asking for that number is what the gate is for.
+  // Everything else stays banned: the A/B/C labelling the cards dropped, a
+  // forecast panel in front of the choice, and any other signed figure, which is
+  // why the risk hint is subtracted by name rather than the check being relaxed.
+  const openedChoiceText = await page.locator(".choices").innerText();
+  expect(openedChoiceText).not.toMatch(/\b[ABC]\b/);
+  expect(openedChoiceText.replace(/위험 [+-]\d+/g, ""), openedChoiceText).not.toMatch(/[+-]\d/);
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {

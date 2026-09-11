@@ -128,10 +128,17 @@ has to keep, and the commands that prove it. What changed and why is in
     all gated on `showTacticalDetails`, because the screen promises the player
     can judge on the scene first and the chips used to render regardless. The
     risk hint went back behind the gate on 2026-09-10; it had been printing on
-    every card. That takes season-flow's standing-number scan from 10 to 6
-    against a budget of 5, and the last six are the case progress and the four
-    choice ordinals -- both legitimate UI, so the test stays red until someone
-    decides which of those leaves the board or that the budget was one too tight.
+    every card. Closed, a card carries no exact number at all; open, `· 위험 +N`
+    is the one figure the gate hands over, and season-flow asks for exactly that
+    -- it subtracts the risk hint by name rather than dropping the check, so any
+    other signed number appearing behind the gate still fails.
+    Settled on 2026-09-11, after the scan had held the test red since `f66347e`:
+    the four choice ordinals are the visible half of each button's
+    `aria-keyshortcuts`, not numbers about the case, so they carry
+    `.choice-shortcut` and the scan skips them. The board is back to the two
+    standing numbers `GameHeader` promises -- which case, and how far in --
+    against a budget of 5. The budget was not the thing that was wrong, so it
+    did not move.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most. Four lime fills on one screen is
