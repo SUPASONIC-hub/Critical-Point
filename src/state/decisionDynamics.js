@@ -508,7 +508,14 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       // 121.6, three times the amber band, so 14.15% of deaths showed no red
       // frame at all and 113 came straight out of the clear. The same skip that
       // was removed from the press had simply moved to the commit.
-      const penalty = Math.min(PUSH_STEP_MAX * 2, 16 + Math.max(0, riskDelta) * 3 + priorBacklash);
+      // Scaled to the room the run has left, not a flat number against a wall that
+      // moves. A constant 16 is a sixth of a fresh wall and a third of a walked-down
+      // one, so the same wrong answer went from survivable to fatal purely because
+      // of what had happened in earlier windows: at three debt a reader who missed
+      // the objective busted 100% of the time, having pressed nothing. The bill for
+      // a wrong answer should be the same size of thing wherever the wall is.
+      const roomScale = (Number(base.bustFloor) || BUST_FLOOR_MAX) / BUST_FLOOR_MAX;
+      const penalty = Math.min(PUSH_STEP_MAX * 2, (16 + Math.max(0, riskDelta) * 3 + priorBacklash) * roomScale);
       // Settle against the gauge the player owns, not against the total. Writing
       // `stressLevel` here and leaving `heldGauge` alone meant the next tick
       // recomputed `clockStress + heldGauge` and threw the relief away inside
