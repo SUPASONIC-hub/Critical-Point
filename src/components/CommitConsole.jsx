@@ -1,9 +1,40 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Flame, LockKeyhole } from "lucide-react";
 
 import { playChoicePreviewCue, playTargetLockCue } from "./AdaptiveMusic.jsx";
 import { getChoiceTemptation, isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
 import { applyRiskReward, requestPushHeld, usePressure } from "../state/decisionDynamics.js";
+
+/**
+ * Below this width the console is `position: fixed` so the confirm button opens
+ * under the thumb instead of 1,639px down the page -- and a `position: fixed`
+ * element is only fixed to the viewport while no ancestor carries a transform or
+ * a filter. Its ancestor is `.choice-panel`, which is the one part of the board
+ * the player is actually looking at and the only part the pressure shake was
+ * forced to leave alone to keep this panel from sliding off screen. `.is-slowmo`
+ * puts a `scale()` on the same element and springs the same trap in the last
+ * second of a window.
+ *
+ * Hoisting it to the body on exactly the widths where it is fixed ends the
+ * conflict rather than arbitrating it: the panel can shake with everything else,
+ * and the console is pinned to the viewport by an element nothing transforms.
+ * Above the breakpoint it is an in-flow grid inside the panel and stays there.
+ */
+const FIXED_CONSOLE_QUERY = "(max-width: 768px)";
+
+function useHoistedConsole() {
+  const [hoisted, setHoisted] = useState(() => globalThis.matchMedia?.(FIXED_CONSOLE_QUERY).matches ?? false);
+  useEffect(() => {
+    const query = globalThis.matchMedia?.(FIXED_CONSOLE_QUERY);
+    if (!query) return undefined;
+    const sync = () => setHoisted(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+  return hoisted;
+}
 
 export function CommitConsole({
   suspenseTier,
@@ -37,6 +68,7 @@ export function CommitConsole({
     previousStagedChoiceId.current = stagedChoiceId;
   }, [pendingRiskDelta, stagedChoiceId]);
 
+  const hoisted = useHoistedConsole();
   if (!pendingChoice || !pendingChoiceRead || !pendingChoiceForecast) return null;
   const observerPreview = getObserverPreviewForChoice(pendingChoice.id);
   const targetLock = pendingChoiceRead.targetLock;
@@ -46,7 +78,7 @@ export function CommitConsole({
   const pushMultiplier = pressure.isBlind ? 1 : pressure.rewardMultiplier;
   const pushedEffect = applyRiskReward(pendingChoiceRead.finalEffect, pushMultiplier);
 
-  return (
+  const console_ = (
     <section
       ref={commitConsoleRef}
       className={`commit-console ${suspenseTier.toLowerCase()}`}
@@ -161,4 +193,6 @@ export function CommitConsole({
       </div>
     </section>
   );
+
+  return hoisted && typeof document !== "undefined" ? createPortal(console_, document.body) : console_;
 }

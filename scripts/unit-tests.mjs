@@ -477,10 +477,53 @@ test("pushing raises the gauge and the pot the player is holding", () => {
   assert.ok(twice.heartbeatBpm > started.heartbeatBpm, "and the window gets louder with it");
 });
 
-test("pushing cannot bust on its own; the commit is still what settles the bet", () => {
+test("a push survives the next tick, which is the whole point of pressing it", () => {
+  // The sequence that cannot happen in a test that presses consecutively, and is
+  // the only sequence that happens in play: the clock ticks once per second, so
+  // every press is followed by one within 999ms. DECISION_TICK used to *assign*
+  // stressLevel from the burn curve with no term for what the player had bought,
+  // so four presses worth x2.16 became x1.00 on the next tick and the verb had a
+  // sub-second half-life.
   let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  for (let press = 0; press < 12; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 25 });
+  const clockOnly = state.stressLevel;
 
-  assert.equal(state.stressLevel, 100, "twelve presses saturate the gauge");
-  assert.equal(state.isBlind, false, "and none of them resolve anything");
+  for (let press = 0; press < 4; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  const pushed = state.stressLevel;
+  assert.equal(pushed, clockOnly + PUSH_STEP * 4, "four presses buy four steps");
+
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 24 });
+  assert.ok(state.stressLevel >= pushed, "and the tick may add to them, never erase them");
+  assert.ok(state.rewardMultiplier > 1, "so the pot the player bought is still there to cash");
+});
+
+test("the clock is a floor under the gauge, not the gauge itself", () => {
+  let held = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  held = reduceDecisionDynamics(held, { type: "DECISION_TICK", seconds: 40 });
+  held = reduceDecisionDynamics(held, { type: "PUSH_HELD" });
+
+  let idle = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  idle = reduceDecisionDynamics(idle, { type: "DECISION_TICK", seconds: 40 });
+
+  // Late in the window the burn is climbing on its own. A player who pressed has
+  // to stay ahead of one who did not, at every point on the curve, or pressing is
+  // a decoration on a countdown.
+  for (const seconds of [30, 20, 10, 3]) {
+    held = reduceDecisionDynamics(held, { type: "DECISION_TICK", seconds });
+    idle = reduceDecisionDynamics(idle, { type: "DECISION_TICK", seconds });
+    assert.ok(held.stressLevel > idle.stressLevel, `pressing still shows at ${seconds}s remaining`);
+  }
+});
+
+test("pressing far enough busts the run, and the bust is the player's own", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
+  assert.equal(state.isBlind, false, "the clock alone is nowhere near the line here");
+
+  for (let press = 0; press < 7; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 29 });
+
+  // Seven presses at 30 seconds remaining. Nothing about the clock did this.
+  assert.equal(state.isBlind, true, "greed reaches the line long before the deadline does");
+  assert.equal(state.heldGauge, 0, "and busting clears what they were holding");
 });

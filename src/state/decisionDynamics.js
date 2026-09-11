@@ -5,6 +5,12 @@ import { onDecisionTick, getDecisionSeconds } from "./decisionClock.js";
 export const DYNAMICS_INITIAL_STATE = Object.freeze({
   combo: 0,
   stressLevel: 0,
+  // The clock burn, and the gauge the player bought on top of it. They are kept
+  // apart because the tick recomputes its own term from scratch every second:
+  // folded into one number, every press was overwritten within 999ms and the
+  // one deliberate act in the loop had a sub-second half-life.
+  clockStress: 0,
+  heldGauge: 0,
   timeDecay: 0,
   hiddenChoice: null,
   environmentMode: "stable",
@@ -214,6 +220,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
 
   switch (type) {
     case "DECISION_STARTED": {
+      // A new window starts the player back at zero; the burn is the clock's again.
       const rebooting = base.thresholdState === "bust" || base.environmentMode === "blackout";
       const rebootCount = (Number(base.rebootCount) || 0) + (rebooting ? 1 : 0);
       // Derived from the count rather than incremented, so a ledger rebuilt from
@@ -242,7 +249,12 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const overtime = Math.max(0, -seconds);
       const burn = getDeathBurn(currentTicks);
       const heat = getComboBacklash(base.combo, burn);
-      const rawStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN;
+      const clockStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN;
+      // The clock is a floor under the gauge, not the gauge itself. Anything the
+      // player put there -- a press, a staged choice, a cancel -- rides on top of
+      // it and survives the next tick, which is what makes a bust theirs.
+      const heldGauge = clamp(Number(base.heldGauge) || 0, 0, 100);
+      const rawStress = clockStress + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
       const busted = rawStress >= 100;
       const justBusted = busted && base.thresholdState !== "bust";
@@ -252,6 +264,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       return {
         ...base,
         currentTicks,
+        clockStress,
+        heldGauge: busted ? 0 : heldGauge,
         timeDecay: Number(burn.toFixed(3)),
         heat: Number(heat.toFixed(2)),
         stressLevel,
@@ -283,12 +297,14 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
      * test stays where it is, on the commit, and nothing new can bust here.
      */
     case "PUSH_HELD": {
-      const stressLevel = clamp(base.stressLevel + PUSH_STEP, 0, 100);
+      const heldGauge = clamp((Number(base.heldGauge) || 0) + PUSH_STEP, 0, 100);
+      const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
       const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
       return {
         ...base,
         stressLevel,
+        heldGauge,
         isSlowMotion: slowMotion,
         ...fx,
         // The press has to land harder than the gauge alone would, or the first
@@ -300,13 +316,15 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
     }
 
     case "CHOICE_STAGED": {
-      const stressLevel = clamp(base.stressLevel + 2, 0, 100);
+      const heldGauge = clamp((Number(base.heldGauge) || 0) + 2, 0, 100);
+      const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
       const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
       return {
         ...base,
         hiddenChoice: event.choiceId ?? null,
         stressLevel,
+        heldGauge,
         isSlowMotion: slowMotion,
         ...fx,
         shakeIntensity: Math.max(4, fx.shakeIntensity),
@@ -360,7 +378,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
     }
 
     case "CHOICE_CANCELLED": {
-      const stressLevel = clamp(base.stressLevel + 3, 0, 100);
+      const heldGauge = clamp((Number(base.heldGauge) || 0) + 3, 0, 100);
+      const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion: false });
       return { ...base, hiddenChoice: null, stressLevel, isSlowMotion: false, ...fx, lastDelta: 0, lastEvent: type };
     }

@@ -52,15 +52,14 @@ function createShaker() {
     },
     sample(sustained, deltaMs) {
       trauma = Math.max(0, trauma - deltaMs / 520);
-      const level = Math.min(1, Math.max(trauma, sustained));
-      const shake = level * level;
+      const shake = Math.min(1, sustained + trauma) ** 2;
       seedX += deltaMs * 0.021;
       seedY += deltaMs * 0.017;
       // Two incommensurable sines per axis stand in for noise: cheap, and the
       // pattern does not repeat inside a decision window.
       const x = (Math.sin(seedX) + Math.sin(seedX * 2.37)) * 0.5;
       const y = (Math.sin(seedY * 1.13) + Math.sin(seedY * 2.91)) * 0.5;
-      return { x: x * shake, y: y * shake, level };
+      return { x: x * shake, y: y * shake };
     },
   };
 }
@@ -88,7 +87,7 @@ export function CriticalPointEngine({ active }) {
     const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     shaker.current = createShaker();
 
-    const written = { stress: "", vignette: "", shake: "", jitter: "", lift: "", tilt: "" };
+    const written = { stress: "", vignette: "", jitter: "", lift: "", tilt: "" };
     const write = (name, key, value) => {
       if (written[key] === value) return;
       written[key] = value;
@@ -98,6 +97,12 @@ export function CriticalPointEngine({ active }) {
     let frameId = 0;
     let lastFrame = 0;
     let paintedTone = "";
+    // A transform -- even an identity one -- promotes its element to a compositor
+    // layer and changes how text on it is antialiased. Left on permanently that
+    // is a 1792x1024 scene image held in layer memory for a whole session, and a
+    // play screen that renders differently from the one the baselines recorded.
+    // The class goes on only while the shell is actually moving.
+    let moving = false;
     // The heartbeat is scheduled against the audio clock, which is sample
     // accurate and does not stall when the compositor drops frames. Driving it
     // off `requestAnimationFrame` timestamps made the pulse stutter under
@@ -110,8 +115,8 @@ export function CriticalPointEngine({ active }) {
       lastFrame = time;
 
       const stress = state.stressLevel;
-      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.55);
-      const { x, y, level } = reducedMotion ? { x: 0, y: 0, level: 0 } : shaker.current.sample(sustained, deltaMs);
+      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62);
+      const { x, y } = reducedMotion ? { x: 0, y: 0 } : shaker.current.sample(sustained, deltaMs);
 
       if (stress >= 18) {
         const gap = 60000 / Math.max(40, state.heartbeatBpm);
@@ -127,7 +132,13 @@ export function CriticalPointEngine({ active }) {
 
       write("--decision-stress", "stress", (stress / 100).toFixed(2));
       write("--decision-vignette", "vignette", state.vignette.toFixed(3));
-      write("--decision-shake", "shake", level.toFixed(3));
+      const travel = Math.abs(x) * SHAKE_TRAVEL_PX;
+      const shouldMove = travel >= 0.05;
+      if (shouldMove !== moving) {
+        shell.classList.toggle("is-shaking", shouldMove);
+        moving = shouldMove;
+      }
+
       write("--decision-jitter", "jitter", `${(x * SHAKE_TRAVEL_PX).toFixed(2)}px`);
       write("--decision-lift", "lift", `${(y * SHAKE_TRAVEL_PX * 0.45).toFixed(2)}px`);
       write("--decision-tilt", "tilt", `${(x * SHAKE_TILT_DEG).toFixed(3)}deg`);
@@ -177,14 +188,13 @@ export function CriticalPointEngine({ active }) {
       for (const name of [
         "--decision-stress",
         "--decision-vignette",
-        "--decision-shake",
         "--decision-jitter",
         "--decision-lift",
         "--decision-tilt",
       ]) {
         root.style.removeProperty(name);
       }
-      shell.classList.remove("is-bust", "is-slowmo", "is-critical", "is-glitching");
+      shell.classList.remove("is-shaking", "is-bust", "is-slowmo", "is-critical", "is-glitching");
     };
   }, [active]);
 
