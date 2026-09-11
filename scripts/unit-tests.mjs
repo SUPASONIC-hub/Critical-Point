@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { getEndingVariant } from "../src/gameLogic.js";
 import { readFileSync } from "node:fs";
 
 import {
@@ -713,4 +714,33 @@ test("a streak survives the scene that earned it", () => {
   const carried = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
   assert.ok(carried.heat > 0, "so the backlash the streak borrowed against is real");
   assert.ok(carried.stressLevel > 0, "and it rides into the next window as gauge");
+});
+
+test("the ending reads what the run did with the gauge", () => {
+  // Six cycles built a bet the ending could not see. Paired seasons at x1.00 and
+  // x3.50 flipped 0 of 1000 endings, because `applyEffect` clamps at 100,
+  // `pressureAdaptScore` is already pinned in 71% of cases, and the season
+  // pressure is a max over 150 nodes -- three clamps in series, and the
+  // multiplier died in all of them. Same resources, same clues, below; only the
+  // push record differs.
+  const resources = { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 };
+  const discoveredClues = [{ id: "c1" }, { id: "c2" }, { id: "c3" }];
+  const entry = (rewardMultiplier, busted) => ({
+    threshold: { rewardMultiplier, busted },
+    environmentMode: busted ? "blackout" : "stable",
+    riskRewardEffect: {},
+  });
+  const endingFor = (log) => getEndingVariant({ resources, discoveredClues, log, seasonHumanCost: 20, peakRiskPressure: 18 }).id;
+
+  assert.equal(endingFor([entry(1, false), entry(1, false)]), "open-question", "a run that never pushed lands where it always did");
+  // Holding a high pot across a season without once crossing the wall is the
+  // thing this system asks for, and it buys a clue of slack on the ending that
+  // reads as having done the job properly.
+  assert.equal(endingFor([entry(2.8, false), entry(2.2, false)]), "open-oversight");
+  // And blowing up repeatedly is, in the collapse ending's own words, the season
+  // going past what there was time to carry.
+  assert.equal(endingFor([entry(3.1, true), entry(2, false), entry(2.9, true)]), "open-question", "two busts is not yet a collapse");
+  const wrecked = getEndingVariant({ resources, discoveredClues, log: [entry(3.1, true), entry(2, true), entry(2.9, true)], seasonHumanCost: 20, peakRiskPressure: 18 });
+  assert.equal(wrecked.id, "collapse");
+  assert.equal(wrecked.failure, true, "three busts closes the season as a failure");
 });

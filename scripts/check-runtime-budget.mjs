@@ -41,9 +41,12 @@ const BUDGETS = {
     importedNames: 12,
     hooks: {},
   },
+  // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
+  // reading the run's push record. The bet had been invisible to the ending for
+  // six cycles: paired seasons at x1.00 and x3.50 flipped 0 of 1000 endings.
   "src/gameLogic.js": {
-    lines: 1240,
-    importedNames: 17,
+    lines: 1262,
+    importedNames: 18,
     hooks: {},
   },
   "src/GameRuntime.jsx": {
