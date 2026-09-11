@@ -68,7 +68,12 @@ for (let run = 0; run < RUNS; run += 1) {
   // unnoticed while ordinary play busts six to sixteen times in forty-two
   // windows. A guard that cannot reach the branch is not guarding it.
   const seasonBusts = Math.floor(random() * 17);
-  const seasonBestMultiplier = 1 + random() * 2.6;
+  // Drawn together, because play does not draw them apart: the pot is earned by
+  // holding the gauge near the wall, which is the same act that crosses it. Drawn
+  // independently, this suite fired `heldTheLine` in 2.5% of seasons against the
+  // 0.0-0.6% the game produces, and certified a ten-point swing in open-oversight
+  // that no run can reach. Executing a branch is not guarding it.
+  const seasonBestMultiplier = 1 + (seasonBusts / 16) * 1.9 + random() * 0.7;
   const ending = getEndingVariant({
     resources: closing,
     discoveredClues: Array.from({ length: clueCount }, (_, index) => ({ id: `clue-${index}` })),

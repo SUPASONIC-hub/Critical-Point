@@ -770,3 +770,28 @@ test("the ending reads what the run did with the gauge", () => {
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true, "three busts closes the season as a failure");
 });
+
+test("the ending answers busts across the range play reaches, not at one step", () => {
+  // `Math.max(carried, bustPressure)` is flat in its smaller argument for the
+  // whole range that argument occupies. Carried pressure sits at p50 24, so a
+  // bust term of 2 apiece was worth nothing up to fifteen busts and everything at
+  // sixteen: one bust and fifteen produced identical endings in 100.0% of
+  // seasons. A cliff moved is still a cliff.
+  const base = {
+    resources: { trust: 58, legitimacy: 54, capital: 62, humanCost: 22, fatigue: 24, time: 46 },
+    discoveredClues: [{ id: "a" }, { id: "b" }],
+    seasonHumanCost: 30,
+    seasonBestMultiplier: 1.6,
+  };
+  const pressureAt = (seasonBusts, peakRiskPressure) =>
+    getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
+
+  // Held just under the line by the run's own strain, each bust pushes further in.
+  const near = 28;
+  assert.notEqual(pressureAt(0, near), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, near), "collapse", "ten busts on top of it does");
+  // And the step between is graded rather than absent: somewhere in here the
+  // answer changes, which is the whole point of the record being readable.
+  const answers = [0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, near));
+  assert.ok(new Set(answers).size > 1, "the ending moves somewhere inside the range play reaches");
+});

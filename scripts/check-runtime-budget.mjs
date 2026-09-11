@@ -45,7 +45,7 @@ const BUDGETS = {
   // reading the run's push record. The bet had been invisible to the ending for
   // six cycles: paired seasons at x1.00 and x3.50 flipped 0 of 1000 endings.
   "src/gameLogic.js": {
-    lines: 1292,
+    lines: 1300,
     importedNames: 18,
     hooks: {},
   },
