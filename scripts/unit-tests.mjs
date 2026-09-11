@@ -730,7 +730,18 @@ test("the ending reads what the run did with the gauge", () => {
     environmentMode: busted ? "blackout" : "stable",
     riskRewardEffect: {},
   });
-  const endingFor = (log) => getEndingVariant({ resources, discoveredClues, log, seasonHumanCost: 20, peakRiskPressure: 18 }).id;
+  // The ending reads the *season*, not the last case: the run log is cleared at
+  // every case start, so a record derived there would have counted one case of
+  // pressure history and called it a season -- five busts in cases one to five
+  // paying nothing, a clean season losing its grip only at the end collapsing.
+  // The strain arrives already aggregated, the way human cost and peak pressure
+  // already did.
+  const strainOf = (log) => {
+    const record = createPressureLedger(log);
+    return { seasonBusts: record.busts, seasonBestMultiplier: record.bestMultiplier };
+  };
+  const endingFor = (log) =>
+    getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, ...strainOf(log) }).id;
 
   assert.equal(endingFor([entry(1, false), entry(1, false)]), "open-question", "a run that never pushed lands where it always did");
   // Holding a high pot across a season without once crossing the wall is the
@@ -740,7 +751,13 @@ test("the ending reads what the run did with the gauge", () => {
   // And blowing up repeatedly is, in the collapse ending's own words, the season
   // going past what there was time to carry.
   assert.equal(endingFor([entry(3.1, true), entry(2, false), entry(2.9, true)]), "open-question", "two busts is not yet a collapse");
-  const wrecked = getEndingVariant({ resources, discoveredClues, log: [entry(3.1, true), entry(2, true), entry(2.9, true)], seasonHumanCost: 20, peakRiskPressure: 18 });
+  const wrecked = getEndingVariant({
+    resources,
+    discoveredClues,
+    seasonHumanCost: 20,
+    peakRiskPressure: 18,
+    ...strainOf([entry(3.1, true), entry(2, true), entry(2.9, true)]),
+  });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true, "three busts closes the season as a failure");
 });

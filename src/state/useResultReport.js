@@ -33,6 +33,8 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
   return {
     seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
     peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
+    seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
+    seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
   };
 }
 
