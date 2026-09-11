@@ -233,6 +233,7 @@ export function CriticalPointEngine({ active }) {
   return createPortal(
     <div className="decision-feedback-layer" aria-hidden="true">
       {pressure.combo > 0 && <span className="decision-combo">COMBO x{pressure.combo}</span>}
+      {pressure.heat >= 1 && <span className="decision-heat">HEAT +{Math.round(pressure.heat)}</span>}
       <span className="decision-push">
         PUSH {pressure.rewardMultiplier.toFixed(2)}x · {thresholdLabel}
       </span>

@@ -585,6 +585,7 @@ const PRESSURE_FIELDS = [
   "thresholdState",
   "environmentMode",
   "combo",
+  "heat",
   "rewardMultiplier",
   "vignette",
   "heartbeatBpm",
