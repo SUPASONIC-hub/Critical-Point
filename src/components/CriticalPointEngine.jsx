@@ -73,9 +73,9 @@ function createShaker() {
 }
 
 /** Peak travel in pixels at full trauma, and the tilt that rides with it. */
-const SHAKE_TRAVEL_PX = 14;
-const SHAKE_TILT_DEG = 0.55;
-const PARTICLE_LIFETIME_MS = 640;
+const SHAKE_TRAVEL_PX = 12;
+const SHAKE_TILT_DEG = 0.42;
+const PARTICLE_LIFETIME_MS = 560;
 const PARTICLE_COLORS = {
   choice: "217 255 98",
   forecast: "86 182 255",
@@ -230,7 +230,7 @@ export function CriticalPointEngine({ active }) {
           y,
           kind: target.dataset.juice,
           stress,
-          count: target.dataset.juice === "push" || target.dataset.juice === "commit" ? 16 : 9,
+        count: target.dataset.juice === "push" || target.dataset.juice === "commit" ? 13 : 7,
         });
         // Trauma instead of a class toggle. Re-triggering a CSS animation needs
         // a forced reflow (`void offsetWidth`) on every press; adding to the
@@ -271,7 +271,7 @@ export function CriticalPointEngine({ active }) {
         y: Math.max(64, globalThis.innerHeight * 0.18),
         kind: "threshold",
         stress: pressure.stressLevel,
-        count: 24,
+        count: 18,
       });
     }
     previousStress.current = pressure.stressLevel;

@@ -29,7 +29,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
     log, triggers, cognition, freeText, echo, nodeEnteredAt, protocolUsed,
     timerPenaltyCount, probeUsed, investigatedTargets, hypothesisDecisions,
-    isPausedSave, saveSlots,
+    dynamics, isPausedSave, saveSlots,
   } = state;
   const { pendingTelemetryRef } = refs;
   const {
@@ -45,7 +45,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
     makeEmptyScores, persistSuppressed, onSuppressSaves, formatSaveTime,
-    debugErrorKey, createRunId,
+    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics,
   } = config;
   function persist(nextState) {
     if (persistSuppressed()) return { storageSaved: false };
@@ -76,6 +76,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
       probeUsed,
       investigatedTargets,
       hypothesisDecisions,
+      dynamics: dynamics ?? null,
       paused: isPausedSave,
       savedAt: new Date().toISOString(),
     };
@@ -108,10 +109,11 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setResources(initialResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
     setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
     setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
+    resetDecisionDynamics?.();
     setDecisionReveal(null); setPendingChoice(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setFreeText(""); setNodeId("start"); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, paused: false, lastError: null });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null });
   }
 
   function resumeSavedGame() {

@@ -46,6 +46,20 @@ export function validateSavedStatePayload(state) {
   if (typeof state.currentCase !== "string") errors.push("invalid currentCase");
   if (typeof state.nodeId !== "string") errors.push("invalid nodeId");
   if (state.runId !== undefined && typeof state.runId !== "string") errors.push("invalid runId");
+  if (state.dynamics !== undefined && state.dynamics !== null) {
+    const dynamics = state.dynamics;
+    if (!dynamics || typeof dynamics !== "object" || Array.isArray(dynamics)) {
+      errors.push("invalid dynamics");
+    } else {
+      for (const key of ["combo", "stressLevel", "timeDecay", "rewardMultiplier", "heartbeatBpm", "shakeIntensity"]) {
+        if (typeof dynamics[key] !== "number" || !Number.isFinite(dynamics[key])) errors.push(`invalid dynamics.${key}`);
+      }
+      for (const key of ["thresholdState", "environmentMode"]) {
+        if (typeof dynamics[key] !== "string") errors.push(`invalid dynamics.${key}`);
+      }
+      if (!("hiddenChoice" in dynamics)) errors.push("invalid dynamics.hiddenChoice");
+    }
+  }
   if (Array.isArray(state.pendingTelemetry)) {
     for (const item of state.pendingTelemetry) {
       if (!item || typeof item !== "object" || typeof item.id !== "string" || typeof item.label !== "string" || validateTelemetryItem(item).length) {

@@ -50,6 +50,77 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
 });
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const NUMERIC_DYNAMICS_FIELDS = [
+  "combo",
+  "stressLevel",
+  "criticalFloor",
+  "overdriveFloor",
+  "clockStress",
+  "heldGauge",
+  "windowIndex",
+  "wallDebt",
+  "bustFloor",
+  "pressCount",
+  "timeDecay",
+  "rewardMultiplier",
+  "currentTicks",
+  "score",
+  "shakeIntensity",
+  "permanentMultiplier",
+  "cashedMultiplier",
+  "heat",
+  "vignette",
+  "heartbeatBpm",
+  "rebootCount",
+  "banked",
+  "lastDelta",
+];
+const BOOLEAN_DYNAMICS_FIELDS = ["isSlowMotion", "isBlind", "overdrive"];
+const ENVIRONMENT_MODES = new Set(["stable", "blackout", "reboot"]);
+const THRESHOLD_STATES = new Set(["idle", "building", "critical", "bust"]);
+
+export function normalizeDecisionDynamicsState(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return DYNAMICS_INITIAL_STATE;
+  const next = { ...DYNAMICS_INITIAL_STATE };
+  for (const field of NUMERIC_DYNAMICS_FIELDS) {
+    const numeric = Number(value[field]);
+    if (Number.isFinite(numeric)) next[field] = numeric;
+  }
+  for (const field of BOOLEAN_DYNAMICS_FIELDS) {
+    if (typeof value[field] === "boolean") next[field] = value[field];
+  }
+  next.combo = Math.max(0, Math.trunc(next.combo));
+  next.stressLevel = clamp(Math.round(next.stressLevel), 0, 100);
+  next.criticalFloor = clamp(Math.round(next.criticalFloor), 1, 100);
+  next.overdriveFloor = clamp(Math.round(next.overdriveFloor), 1, 100);
+  next.clockStress = clamp(next.clockStress, 0, 180);
+  next.heldGauge = clamp(next.heldGauge, 0, 140);
+  next.windowIndex = Math.max(0, Math.trunc(next.windowIndex));
+  next.wallDebt = clamp(Math.trunc(next.wallDebt), 0, MAX_WALL_DEBT);
+  next.bustFloor = clamp(Math.round(next.bustFloor), BUST_FLOOR_FATAL, BUST_FLOOR_MAX);
+  next.pressCount = Math.max(0, Math.trunc(next.pressCount));
+  next.timeDecay = clamp(next.timeDecay, 0, 1);
+  next.rewardMultiplier = clamp(next.rewardMultiplier, 1, 8);
+  next.currentTicks = Math.max(0, Math.trunc(next.currentTicks));
+  next.shakeIntensity = clamp(next.shakeIntensity, 0, 24);
+  next.permanentMultiplier = clamp(next.permanentMultiplier, 1, MAX_PERMANENT_MULTIPLIER);
+  next.cashedMultiplier = Math.max(0, next.cashedMultiplier);
+  next.heat = Math.max(0, next.heat);
+  next.vignette = clamp(next.vignette, 0, 1);
+  next.heartbeatBpm = clamp(Math.round(next.heartbeatBpm), 40, 180);
+  next.rebootCount = Math.max(0, Math.trunc(next.rebootCount));
+  next.banked = Math.max(0, Math.round(next.banked));
+  next.hiddenChoice = typeof value.hiddenChoice === "string" ? value.hiddenChoice : null;
+  next.environmentMode = ENVIRONMENT_MODES.has(value.environmentMode) ? value.environmentMode : DYNAMICS_INITIAL_STATE.environmentMode;
+  next.thresholdState = THRESHOLD_STATES.has(value.thresholdState) ? value.thresholdState : DYNAMICS_INITIAL_STATE.thresholdState;
+  next.lastEvent = typeof value.lastEvent === "string" ? value.lastEvent.slice(0, 48) : DYNAMICS_INITIAL_STATE.lastEvent;
+  return next;
+}
+
+export function serializeDecisionDynamicsState(value) {
+  const state = normalizeDecisionDynamicsState(value);
+  return Object.fromEntries(Object.keys(DYNAMICS_INITIAL_STATE).map((key) => [key, state[key]]));
+}
 
 /**
  * What one press of 밀어붙인다 buys, and why it is not a constant.
@@ -359,6 +430,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
   const anchorScore = Number.isFinite(incomingScore) ? incomingScore : Number(base.score) || 0;
 
   switch (type) {
+    case "RESET_DYNAMICS":
+      return normalizeDecisionDynamicsState(event.state);
+
     case "DECISION_STARTED": {
       // A new window starts the player back at zero; the burn is the clock's again.
       const rebooting = base.thresholdState === "bust" || base.environmentMode === "blackout";
@@ -697,21 +771,26 @@ export function requestPushHeld() {
   for (const listener of [...pushListeners]) listener();
 }
 
-export function useDecisionDynamics({ active = true } = {}) {
-  const [state, dispatch] = useReducer(reduceDecisionDynamics, DYNAMICS_INITIAL_STATE);
+export function useDecisionDynamics({ active = true, initialState = null } = {}) {
+  const restoredInitialState = initialState && typeof initialState === "object";
+  const [state, dispatch] = useReducer(
+    reduceDecisionDynamics,
+    initialState,
+    normalizeDecisionDynamicsState,
+  );
   useEffect(() => {
     publishPressure(state);
   }, [state]);
   useEffect(() => {
     if (!active) return undefined;
-    dispatch({ type: "DECISION_STARTED" });
+    if (!restoredInitialState) dispatch({ type: "DECISION_STARTED" });
     const unsubscribe = onDecisionTick(() => dispatch({ type: "DECISION_TICK", seconds: getDecisionSeconds() }));
     const unsubscribePush = onPushHeld(() => dispatch({ type: "PUSH_HELD" }));
-    dispatch({ type: "DECISION_TICK", seconds: getDecisionSeconds() });
+    if (!restoredInitialState) dispatch({ type: "DECISION_TICK", seconds: getDecisionSeconds() });
     return () => {
       unsubscribe();
       unsubscribePush();
     };
-  }, [active]);
+  }, [active, restoredInitialState]);
   return { dynamics: state, dynamicsSummary: createDynamicsSummary(state), dispatchDynamics: dispatch };
 }

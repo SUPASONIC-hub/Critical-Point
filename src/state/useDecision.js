@@ -3,11 +3,11 @@ import { createDecisionTargetLock } from "../viewModels/playChoiceViewModel.js";
 import { useState } from "react";
 import { resolveDecisionCommit, useDecisionDynamics } from "./decisionDynamics.js";
 
-export function useDecision({ active = true } = {}) {
+export function useDecision({ active = true, initialDynamics = null } = {}) {
   const [pendingChoice, setPendingChoice] = useState(null);
   const [decisionReveal, setDecisionReveal] = useState(null);
   const [decisionSeconds, setDecisionSeconds] = useState(45);
-  const { dynamics, dynamicsSummary, dispatchDynamics } = useDecisionDynamics({ active });
+  const { dynamics, dynamicsSummary, dispatchDynamics } = useDecisionDynamics({ active, initialState: initialDynamics });
 
   return {
     pendingChoice,

@@ -208,6 +208,7 @@ test("save state keys should include every required persisted field", () => {
       "probeUsed",
       "investigatedTargets",
       "hypothesisDecisions",
+      "dynamics",
       "paused",
       "savedAt",
     ],
@@ -271,6 +272,7 @@ test("v1 saves should migrate into the current schema", () => {
       protocolUsed: false,
       timerPenaltyCount: 0,
       probeUsed: false,
+      dynamics: null,
     },
     "v1 saves should migrate into the current schema",
   );

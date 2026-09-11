@@ -1864,7 +1864,7 @@
     bottom: max(8px, env(safe-area-inset-bottom));
     left: 8px;
     z-index: 14;
-    max-height: 72dvh;
+    max-height: 66dvh;
     overflow-y: auto;
     margin: 0;
     padding-bottom: calc(14px + env(safe-area-inset-bottom));
@@ -1879,7 +1879,7 @@
   /* Room for the panel that is now over the page rather than in it. Folded, it
      is about a fifth of the viewport instead of the 42% it took open. */
   .game-board.has-commit-console {
-    padding-bottom: 34dvh;
+    padding-bottom: 38dvh;
   }
 }
 .commit-console.unstable,

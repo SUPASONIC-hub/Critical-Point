@@ -106,6 +106,10 @@ import {
 } from "./state/savedState.js";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders, useDecision } from "./state/useDecision.js";
+import {
+  DYNAMICS_INITIAL_STATE,
+  serializeDecisionDynamicsState,
+} from "./state/decisionDynamics.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
@@ -243,7 +247,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const {
     pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
     dynamics, dynamicsSummary, dispatchDynamics, resolveCommit,
-  } = useDecision({ active: started });
+  } = useDecision({ active: started, initialDynamics: saved?.dynamics });
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
@@ -311,6 +315,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const commitConfirmRef = useRef(null);
   const visibilityPauseRef = useRef(null);
   const freeTextSaveTimerRef = useRef(null);
+  const restoredDynamicsStartRef = useRef(Boolean(saved?.dynamics && saved?.started));
 
   const {
     persist: persistenceApi,
@@ -331,7 +336,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
       discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
       freeText, echo, nodeEnteredAt, protocolUsed, timerPenaltyCount, probeUsed,
-      investigatedTargets, hypothesisDecisions, isPausedSave, saveSlots,
+      investigatedTargets, hypothesisDecisions, dynamics: serializeDecisionDynamicsState(dynamics),
+      isPausedSave, saveSlots,
     },
     refs: { pendingTelemetryRef },
     setters: {
@@ -346,6 +352,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       normalizePlayerName, initialResources, triggerLabels, cognitionLabels, makeEmptyScores,
       persistSuppressed, onSuppressSaves, formatSaveTime,
       debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
+      initialDynamics: DYNAMICS_INITIAL_STATE,
+      resetDecisionDynamics: () => dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE }),
     },
   });
   const persist = persistenceApi;
@@ -945,7 +953,11 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       setProbeUsed(false);
     });
     startDecisionWindow(DECISION_WINDOW_SECONDS);
-    dispatchDynamics({ type: "DECISION_STARTED" });
+    if (restoredDynamicsStartRef.current) {
+      restoredDynamicsStartRef.current = false;
+    } else {
+      dispatchDynamics({ type: "DECISION_STARTED" });
+    }
     return () => {
       cancelled = true;
       stopDecisionWindow();
@@ -1845,6 +1857,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setInvestigatedTargets({});
     setHypothesisDecisions({});
     setDecisionReveal(null);
+    dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE });
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     let resetErrorLogSaved = true;
@@ -1966,6 +1979,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setProtocolUsed(false);
     setTimerPenaltyCount(0);
     setProbeUsed(false);
+    dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE });
     setOpeningLegacy(null);
     setDecisionReveal(null);
     setPendingChoice(null);
@@ -1991,6 +2005,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         timerPenaltyCount: 0,
         probeUsed: false,
         openingLegacy: null,
+        dynamics: DYNAMICS_INITIAL_STATE,
         nodeEnteredAt: now,
       });
     }

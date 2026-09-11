@@ -59,6 +59,7 @@ export const SAVE_STATE_KEYS = [
   "probeUsed",
   "investigatedTargets",
   "hypothesisDecisions",
+  "dynamics",
   "paused",
   "savedAt",
 ];
@@ -119,6 +120,7 @@ export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSI
       protocolUsed: Boolean(state.protocolUsed),
       timerPenaltyCount: normalizeTimerPenaltyCount(state),
       probeUsed: Boolean(state.probeUsed),
+      dynamics: state.dynamics && typeof state.dynamics === "object" && !Array.isArray(state.dynamics) ? state.dynamics : null,
     };
   }
 
@@ -356,6 +358,7 @@ export function createRecoverySnapshot(snapshot) {
     protocolUsed: Boolean(snapshot.protocolUsed),
     timerPenaltyCount: normalizeTimerPenaltyCount(snapshot),
     probeUsed: Boolean(snapshot.probeUsed),
+    dynamics: snapshot.dynamics && typeof snapshot.dynamics === "object" && !Array.isArray(snapshot.dynamics) ? snapshot.dynamics : null,
     nodeEnteredAt: Number.isFinite(snapshot.nodeEnteredAt) ? snapshot.nodeEnteredAt : Date.now(),
     savedAt: typeof snapshot.savedAt === "string" ? snapshot.savedAt : new Date().toISOString(),
     lastError: snapshot.lastError ?? null,
