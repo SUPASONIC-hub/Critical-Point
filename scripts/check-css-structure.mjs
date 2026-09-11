@@ -63,9 +63,13 @@ const fileBudgets = {
   // out of four of these files. Nothing changed on screen; the sheets stopped
   // describing surfaces that were deleted, in some cases two refactors ago.
   "extensions.css": { lines: 2060, bytes: 44900 },
-  // play.css lost the most: the record-room pass removed the identity strip, the
-  // repeated scene question and the status board, and their rules stayed behind.
-  "play.css": { lines: 3290, bytes: 72600 },
+  // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
+  // the identity strip, the repeated scene question and the status board, and
+  // their rules stayed behind. It read 3290 / 72600 after that and moved back up
+  // for `.commit-push`, the control that raises the pot -- a surface that did not
+  // exist before, because until then the only way to push your luck was to sit
+  // still and let the clock do it.
+  "play.css": { lines: 3325, bytes: 74100 },
   "recovery.css": { lines: 266, bytes: 5754 },
   "responsive.css": { lines: 380, bytes: 8400 },
   "result.css": { lines: 1380, bytes: 30400 },

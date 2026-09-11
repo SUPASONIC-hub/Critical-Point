@@ -6,9 +6,11 @@ import {
   parseLocalRankingRows,
 } from "../src/state/useLocalRanking.js";
 import {
+  applyRiskReward,
   createPressureLedger,
   DYNAMICS_INITIAL_STATE,
   getPermanentMultiplier,
+  PUSH_STEP,
   reduceDecisionDynamics,
 } from "../src/state/decisionDynamics.js";
 import {
@@ -435,4 +437,50 @@ test("pressure ledger and the reducer agree on what a reboot is worth", () => {
 test("pressure ledger reads an empty log as a run that has not pushed yet", () => {
   const ledger = createPressureLedger([]);
   assert.deepEqual(ledger, { busts: 0, reboots: 0, bestMultiplier: 1, bonusPoints: 0, pushedDecisions: 0, permanentMultiplier: 1 });
+});
+
+test("the pot multiplies what the player gains, never what a choice costs them", () => {
+  // case01's accounting branch, the shape 255 of the 379 authored effects share:
+  // two resources rising as a gain, two rising as a cost.
+  const effect = { capital: 18, trust: -14, humanCost: 18, fatigue: 3 };
+  const pushed = applyRiskReward(effect, 3.3);
+
+  assert.equal(pushed.capital, 59, "a gain scales with the gauge the player held");
+  assert.equal(pushed.trust, -14, "a loss written negative is not discounted");
+  // The two that read backwards from the sign. Holding the gauge to 3.3x used to
+  // turn 18 dead into 59 -- the bet paying out in bodies on the one axis the
+  // story is about, while the comment above the function promised it could not.
+  assert.equal(pushed.humanCost, 18, "humanCost rising is the cost, so the pot does not raise it");
+  assert.equal(pushed.fatigue, 3, "fatigue rising is the cost, so the pot does not raise it");
+});
+
+test("a negative humanCost is the gain the pot is allowed to multiply", () => {
+  // Spending a turn protecting someone reads as humanCost below zero, and that
+  // is the payout a held gauge is supposed to enlarge.
+  const pushed = applyRiskReward({ humanCost: -6, fatigue: -2, capital: -10 }, 2);
+  assert.equal(pushed.humanCost, -12);
+  assert.equal(pushed.fatigue, -4);
+  assert.equal(pushed.capital, -10, "capital falling is still a cost and stays whole");
+});
+
+test("pushing raises the gauge and the pot the player is holding", () => {
+  const started = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  const once = reduceDecisionDynamics(started, { type: "PUSH_HELD" });
+  const twice = reduceDecisionDynamics(once, { type: "PUSH_HELD" });
+
+  assert.equal(once.stressLevel, started.stressLevel + PUSH_STEP);
+  assert.equal(twice.stressLevel, started.stressLevel + PUSH_STEP * 2);
+  // The pot is priced off the gauge, so the press has to be worth something the
+  // moment it lands -- the reason the button exists is that the number moves.
+  assert.ok(twice.rewardMultiplier > once.rewardMultiplier, "a second press pays more than the first");
+  assert.ok(once.rewardMultiplier > started.rewardMultiplier, "the first press pays more than not pressing");
+  assert.ok(twice.heartbeatBpm > started.heartbeatBpm, "and the window gets louder with it");
+});
+
+test("pushing cannot bust on its own; the commit is still what settles the bet", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  for (let press = 0; press < 12; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+
+  assert.equal(state.stressLevel, 100, "twelve presses saturate the gauge");
+  assert.equal(state.isBlind, false, "and none of them resolve anything");
 });

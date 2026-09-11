@@ -1,9 +1,9 @@
-import { DecisionFeedbackLayer } from "./DecisionFeedbackLayer.jsx";
+import { CriticalPointEngine } from "./CriticalPointEngine.jsx";
 
 export function DecisionRail({ pendingChoice }) {
   return (
     <>
-      <DecisionFeedbackLayer active />
+      <CriticalPointEngine active />
       <div className="decision-rail" aria-label="Decision phases">
         <span className="done">Scene read</span>
         <i aria-hidden="true" />

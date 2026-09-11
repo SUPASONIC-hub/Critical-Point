@@ -2021,6 +2021,42 @@
   color: var(--c-ink);
   background: var(--c-acid);
 }
+/* 밀어붙인다 raises the pot. Lime stays on 확정 -- priority 30 gives the accent
+   to the control that records a decision, and this one deliberately does not.
+   It reads as the danger family instead, and gets hotter as the gauge fills so
+   the button the player is about to press again is the one changing under
+   their hand. */
+.commit-push {
+  color: var(--c-danger-81);
+  background: var(--c-danger-14);
+  box-shadow: inset 0 0 0 1px var(--c-danger-deep), 0 0 calc(var(--decision-stress, 0) * 18px) rgb(255 138 112 / 0.42);
+}
+.commit-push b {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--c-danger-deep);
+  color: var(--c-danger-97);
+  font-variant-numeric: tabular-nums;
+  transform: scale(calc(1 + var(--decision-stress, 0) * 0.16));
+}
+.commit-push:disabled {
+  opacity: 0.5;
+  box-shadow: inset 0 0 0 1px var(--c-danger-deep);
+}
+/* Three controls where there were two. A button whose label wraps grows past
+   its 40px floor, the row grows with it, and the console pushes 확정 off the
+   bottom of a 375px-tall landscape screen -- which is what three layout tests
+   caught. The labels stay on one line, and the pot's own label folds away on
+   narrow screens: the flame and the multiplier still say what the button does,
+   and its aria-label carries the sentence for anyone not reading pixels. */
+.commit-console-actions button {
+  white-space: nowrap;
+}
+@media (max-width: 760px), (max-height: 460px) {
+  .commit-push-label {
+    display: none;
+  }
+}
 .decision-dock {
   position: sticky;
   bottom: 14px;

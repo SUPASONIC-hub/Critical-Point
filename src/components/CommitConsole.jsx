@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import { LockKeyhole } from "lucide-react";
+import { Flame, LockKeyhole } from "lucide-react";
 
 import { playChoicePreviewCue, playTargetLockCue } from "./AdaptiveMusic.jsx";
 import { getChoiceTemptation, isChoiceEffectGain } from "../viewModels/playChoiceViewModel.js";
-import { applyRiskReward, usePressure } from "../state/decisionDynamics.js";
+import { applyRiskReward, requestPushHeld, usePressure } from "../state/decisionDynamics.js";
 
 export function CommitConsole({
   suspenseTier,
@@ -119,6 +119,33 @@ export function CommitConsole({
       <div className="commit-console-actions">
         <button type="button" className="commit-cancel" data-juice="cancel" onClick={() => setPendingChoice(null)}>
           다시 고르기
+        </button>
+        {/*
+          The bet, made pressable. Everything else in this console describes a
+          choice the player has already made; this is the one control that
+          changes what the choice is worth, and it sits beside 확정 because the
+          question it asks -- once more, or bank it -- is the same question that
+          button answers.
+
+          It disables itself at the ceiling rather than disappearing: a control
+          that vanishes at the top of the curve takes the evidence of how far
+          they pushed with it.
+        */}
+        <button
+          type="button"
+          data-testid="commit-push"
+          data-juice="push"
+          className="commit-push"
+          disabled={pressure.stressLevel >= 100 || pressure.isBlind}
+          onClick={() => {
+            requestPushHeld();
+            playTargetLockCue();
+          }}
+          aria-label={`판돈을 올린다. 현재 배수 ${pressure.rewardMultiplier.toFixed(2)}배, 압력 ${pressure.stressLevel}퍼센트`}
+        >
+          <Flame size={16} />
+          <span className="commit-push-label">밀어붙인다</span>
+          <b>×{pressure.rewardMultiplier.toFixed(2)}</b>
         </button>
         <button
           ref={commitConfirmRef}

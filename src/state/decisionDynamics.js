@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useSyncExternalStore } from "react";
+import { isResourceGain } from "../gameConstants.js";
 import { onDecisionTick, getDecisionSeconds } from "./decisionClock.js";
 
 export const DYNAMICS_INITIAL_STATE = Object.freeze({
@@ -27,6 +28,9 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
 });
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+/** What one deliberate press of 밀어붙이기 buys, in gauge. */
+export const PUSH_STEP = 16;
 
 export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
@@ -101,6 +105,14 @@ const THRESHOLD_BUST_EFFECT = Object.freeze({ trust: -8, legitimacy: -8, fatigue
  * The pot, applied. Gains scale with the gauge the player is holding; costs are
  * never discounted, which is the entire shape of the bet.
  *
+ * "Gain" is not "positive". `humanCost` and `fatigue` are the two resources
+ * where a rising number is the loss, which is the entire reason
+ * `isResourceGain` exists -- and this function asked `value > 0` anyway. So the
+ * bet paid out backwards on the only axis the fiction is about: holding the
+ * gauge to 3.30x turned `humanCost: 18` into 59, and the comment directly above
+ * this one promised that could not happen. 255 of the 379 authored effect
+ * values are positive, so this was the common case, not an edge.
+ *
  * The commit console previews the same numbers this produces, so it lives here
  * rather than in either caller: the console was printing the raw effect while
  * the runtime committed the multiplied one, and every push the player held made
@@ -108,7 +120,7 @@ const THRESHOLD_BUST_EFFECT = Object.freeze({ trust: -8, legitimacy: -8, fatigue
  */
 export function applyRiskReward(effect = {}, multiplier = 1) {
   return Object.fromEntries(
-    Object.entries(effect).map(([key, value]) => [key, value > 0 ? Math.round(value * multiplier) : value]),
+    Object.entries(effect).map(([key, value]) => [key, isResourceGain(key, value) ? Math.round(value * multiplier) : value]),
   );
 }
 
@@ -253,6 +265,37 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...fx,
         permanentMultiplier,
         lastEvent: justBusted ? "BUST" : type,
+      };
+    }
+
+    /**
+     * The verb this whole system was missing.
+     *
+     * Stress only ever rose from the clock, from staging a choice (+2) and from
+     * cancelling one (+3) -- so "push your luck" was spelled "sit still and do
+     * not play," and a bust was the deadline arriving, an event with no author.
+     * Balatro's grip is that the player presses the button; the number they were
+     * reaching for is still on screen when it goes wrong, and they knew the last
+     * press was greedy while their thumb was moving.
+     *
+     * The press does not resolve anything. It buys gauge, the gauge prices the
+     * pot, and committing is still what settles the bet -- which is why the bust
+     * test stays where it is, on the commit, and nothing new can bust here.
+     */
+    case "PUSH_HELD": {
+      const stressLevel = clamp(base.stressLevel + PUSH_STEP, 0, 100);
+      const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
+      const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
+      return {
+        ...base,
+        stressLevel,
+        isSlowMotion: slowMotion,
+        ...fx,
+        // The press has to land harder than the gauge alone would, or the first
+        // one at low pressure moves nothing and reads as a dead button.
+        shakeIntensity: Math.max(7, fx.shakeIntensity),
+        lastDelta: stressLevel - base.stressLevel,
+        lastEvent: type,
       };
     }
 
@@ -423,6 +466,26 @@ export function usePressure() {
   return useSyncExternalStore(subscribePressure, getPressureSnapshot, getIdlePressure);
 }
 
+/**
+ * The press, delivered without threading a dispatcher through four components.
+ *
+ * The reducer lives in a `useReducer` inside the runtime, and the button that
+ * feeds it sits in the commit console, four prop hops away past a view contract
+ * that `check:views` pins. The clock already reaches the same reducer this way
+ * -- `onDecisionTick` -- so the press uses the road that is already built.
+ */
+const pushListeners = new Set();
+
+export function onPushHeld(listener) {
+  pushListeners.add(listener);
+  return () => pushListeners.delete(listener);
+}
+
+/** Ask the live decision window for one step of gauge. No-op between windows. */
+export function requestPushHeld() {
+  for (const listener of [...pushListeners]) listener();
+}
+
 export function useDecisionDynamics({ active = true } = {}) {
   const [state, dispatch] = useReducer(reduceDecisionDynamics, DYNAMICS_INITIAL_STATE);
   useEffect(() => {
@@ -432,8 +495,12 @@ export function useDecisionDynamics({ active = true } = {}) {
     if (!active) return undefined;
     dispatch({ type: "DECISION_STARTED" });
     const unsubscribe = onDecisionTick(() => dispatch({ type: "DECISION_TICK", seconds: getDecisionSeconds() }));
+    const unsubscribePush = onPushHeld(() => dispatch({ type: "PUSH_HELD" }));
     dispatch({ type: "DECISION_TICK", seconds: getDecisionSeconds() });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      unsubscribePush();
+    };
   }, [active]);
   return { dynamics: state, dynamicsSummary: createDynamicsSummary(state), dispatchDynamics: dispatch };
 }

@@ -60,8 +60,15 @@ export function DecisionClock() {
   // The pot the player is sitting on. It is the whole reason to hold, and it
   // was only ever legible in a HUD chip in the corner; the digit that makes
   // people hold or fold belongs next to the digit counting down.
+  //
+  // It used to hide below x1.15, which the death curve does not reach until
+  // 35.6s of a 45s window have gone -- so the one element in this game shaped
+  // like a growing pot was absent for 79% of every decision and arrived only
+  // once the answer was obvious. Watching it climb from x1.00 is the thing
+  // being bought here; a number that appears already large is a notification,
+  // not a temptation. It still goes away on a bust, where it means nothing.
   const cashMultiplier = pressure.rewardMultiplier;
-  const showCash = cashMultiplier >= 1.15 && !pressure.isBlind;
+  const showCash = !pressure.isBlind;
 
   return (
     <div
