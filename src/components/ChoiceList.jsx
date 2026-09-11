@@ -112,7 +112,17 @@ export function ChoiceList({
               )}
             </span>
             {!authorityGate.unlocked && <span className="choice-lock">LOCKED: {authorityGate.reason}</span>}
-            {challengeMatch && <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>}
+            {/*
+              Behind 전술 정보 with the rest of the tactical read. A challenge match
+              is the widest edge in the game -- it moves the bust line from 92 to 99,
+              four presses of room -- and printing it free on the card told the player
+              which script they were in before they touched 밀어붙인다. Priority 29
+              already says the tactical read is bought, not given; this was the one
+              piece of it being handed over.
+            */}
+            {showTacticalDetails && challengeMatch && (
+              <span className="challenge-match">{simplifyPlayerText(challengeMatch)}</span>
+            )}
             {showTacticalDetails && observerPreview && (
               <span className={`choice-observer-preview ${observerPreview.repeatsCurrentPattern ? "is-repeat" : "is-break"}`}>
                 <b>{observerPreview.tag.label}</b>

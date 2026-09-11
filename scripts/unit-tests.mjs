@@ -10,6 +10,7 @@ import {
   createPressureLedger,
   DYNAMICS_INITIAL_STATE,
   getPermanentMultiplier,
+  getPushYourLuckOutcome,
   PUSH_STEP,
   reduceDecisionDynamics,
 } from "../src/state/decisionDynamics.js";
@@ -526,4 +527,49 @@ test("pressing far enough busts the run, and the bust is the player's own", () =
   // Seven presses at 30 seconds remaining. Nothing about the clock did this.
   assert.equal(state.isBlind, true, "greed reaches the line long before the deadline does");
   assert.equal(state.heldGauge, 0, "and busting clears what they were holding");
+});
+
+test("a challenge match moves the bust line, it does not remove it", () => {
+  const matchedAtCap = getPushYourLuckOutcome({ stressLevel: 100, riskDelta: 3, challengeMatch: true });
+  const matchedBelow = getPushYourLuckOutcome({ stressLevel: 96, riskDelta: 3, challengeMatch: true });
+  const unmatched = getPushYourLuckOutcome({ stressLevel: 96, riskDelta: 3, challengeMatch: false });
+
+  // The edge is real and it is wide: four presses of room between 92 and 99.
+  assert.equal(matchedBelow.busted, false, "a match survives where a miss does not");
+  assert.equal(unmatched.busted, true);
+  // And it runs out, which is what keeps the last press a decision. When a match
+  // was total immunity the player could read the card and know, before pressing,
+  // that the bet could not be lost.
+  assert.equal(matchedAtCap.busted, true, "pressing past 99 busts even on a match");
+});
+
+test("a winning commit does not bust on the tick that follows it", () => {
+  // Five presses at ten seconds left, committed on a challenge match: the payout
+  // lands, and one second later the run used to blow up and halve the score it
+  // had just banked. CHOICE_COMMITTED adjusted `stressLevel` and left
+  // `heldGauge` untouched, so the next tick recomputed `clockStress + heldGauge`
+  // and threw the relief away -- punishing the correct read, after the fact.
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 10 });
+  for (let press = 0; press < 5; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+
+  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 2, challengeMatch: true, seconds: 10 });
+  assert.equal(committed.isBlind, false, "a match at this gauge is a win, not a bust");
+  const bankedScore = committed.score;
+
+  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 9 });
+  assert.equal(afterTick.isBlind, false, "and it is still a win one second later");
+  assert.equal(afterTick.score, bankedScore, "with the score it banked still banked");
+});
+
+test("relief earned on a commit survives the clock, the way a press does", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
+  for (let press = 0; press < 4; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  const held = state.heldGauge;
+
+  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 1, challengeMatch: true, seconds: 20 });
+  assert.ok(committed.heldGauge < held, "a match buys the gauge back down");
+  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 19 });
+  assert.ok(afterTick.heldGauge <= committed.heldGauge, "and the tick does not hand it back");
 });

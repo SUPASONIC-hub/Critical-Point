@@ -38,9 +38,29 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 /** What one deliberate press of 밀어붙이기 buys, in gauge. */
 export const PUSH_STEP = 16;
 
+/**
+ * Where the line is, and what a challenge match is worth.
+ *
+ * A match used to remove the line entirely -- `!challengeMatch` in the bust
+ * test -- and the badge that announces one renders on the card unconditionally
+ * (`ChoiceList.jsx`), outside `전술 정보`. Between them the player knew, for
+ * free and before touching the button, which of two scripts they were in: badge
+ * present, press to the ceiling and collect; badge absent, do not press. That is
+ * a lookup table, and a push-your-luck bet that resolves before the press is not
+ * a bet.
+ *
+ * The match now moves the line instead of deleting it. It is a real edge -- the
+ * difference between 92 and 99 is four presses of room -- and it still runs out,
+ * so the greedy read stays punishable and the last press is a decision either
+ * way.
+ */
+const BUST_FLOOR = 92;
+const MATCHED_BUST_FLOOR = 99;
+
 export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
-  const thresholdState = stressLevel >= 92 && riskDelta > 0 && !challengeMatch ? "bust" : stressLevel >= 78 ? "critical" : "building";
+  const bustFloor = challengeMatch ? MATCHED_BUST_FLOOR : BUST_FLOOR;
+  const thresholdState = stressLevel >= bustFloor && riskDelta > 0 ? "bust" : stressLevel >= 78 ? "critical" : "building";
   return {
     thresholdState,
     rewardMultiplier,
@@ -343,7 +363,15 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const relief = 12 + combo * 2;
       // A miss bills the streak it broke: the higher the combo, the worse the fall.
       const penalty = 16 + Math.max(0, riskDelta) * 3 + priorBacklash;
-      const rawStress = clamp(base.stressLevel + (challengeMatch ? heat - relief : penalty), 0, 140);
+      // Settle against the gauge the player owns, not against the total. Writing
+      // `stressLevel` here and leaving `heldGauge` alone meant the next tick
+      // recomputed `clockStress + heldGauge` and threw the relief away inside
+      // 999ms -- the same erasure the tick used to do to a press, one case further
+      // down this switch, and worse: it fired after the payout had already landed
+      // on screen, and it busted the player for the correct read.
+      const adjustment = challengeMatch ? heat - relief : penalty;
+      const heldGauge = clamp((Number(base.heldGauge) || 0) + adjustment, 0, 140);
+      const rawStress = (Number(base.clockStress) || 0) + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
       const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch });
       const busted = rawStress >= 100 || outcome.busted;
@@ -362,6 +390,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         cashedMultiplier,
         heat: busted ? 0 : Number(heat.toFixed(2)),
         stressLevel,
+        heldGauge: busted ? 0 : clamp(heldGauge, 0, 100),
         hiddenChoice: null,
         thresholdState: busted ? "bust" : stressLevel >= CRITICAL_FLOOR ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,

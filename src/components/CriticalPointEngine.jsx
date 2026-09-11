@@ -52,14 +52,15 @@ function createShaker() {
     },
     sample(sustained, deltaMs) {
       trauma = Math.max(0, trauma - deltaMs / 520);
-      const shake = Math.min(1, sustained + trauma) ** 2;
+      const level = Math.min(1, sustained + trauma);
+      const shake = level * level;
       seedX += deltaMs * 0.021;
       seedY += deltaMs * 0.017;
       // Two incommensurable sines per axis stand in for noise: cheap, and the
       // pattern does not repeat inside a decision window.
       const x = (Math.sin(seedX) + Math.sin(seedX * 2.37)) * 0.5;
       const y = (Math.sin(seedY * 1.13) + Math.sin(seedY * 2.91)) * 0.5;
-      return { x: x * shake, y: y * shake };
+      return { x: x * shake, y: y * shake, level };
     },
   };
 }
@@ -116,7 +117,7 @@ export function CriticalPointEngine({ active }) {
 
       const stress = state.stressLevel;
       const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62);
-      const { x, y } = reducedMotion ? { x: 0, y: 0 } : shaker.current.sample(sustained, deltaMs);
+      const { x, y, level } = reducedMotion ? { x: 0, y: 0, level: 0 } : shaker.current.sample(sustained, deltaMs);
 
       if (stress >= 18) {
         const gap = 60000 / Math.max(40, state.heartbeatBpm);
@@ -132,8 +133,7 @@ export function CriticalPointEngine({ active }) {
 
       write("--decision-stress", "stress", (stress / 100).toFixed(2));
       write("--decision-vignette", "vignette", state.vignette.toFixed(3));
-      const travel = Math.abs(x) * SHAKE_TRAVEL_PX;
-      const shouldMove = travel >= 0.05;
+      const shouldMove = level * SHAKE_TRAVEL_PX >= 0.05;
       if (shouldMove !== moving) {
         shell.classList.toggle("is-shaking", shouldMove);
         moving = shouldMove;
@@ -178,13 +178,13 @@ export function CriticalPointEngine({ active }) {
       }
     };
 
-    shell.addEventListener("pointerover", onInteraction);
-    shell.addEventListener("click", onInteraction);
+    document.addEventListener("pointerover", onInteraction);
+    document.addEventListener("click", onInteraction);
 
     return () => {
       window.cancelAnimationFrame(frameId);
-      shell.removeEventListener("pointerover", onInteraction);
-      shell.removeEventListener("click", onInteraction);
+      document.removeEventListener("pointerover", onInteraction);
+      document.removeEventListener("click", onInteraction);
       for (const name of [
         "--decision-stress",
         "--decision-vignette",
