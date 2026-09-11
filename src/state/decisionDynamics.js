@@ -327,8 +327,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       // it and survives the next tick, which is what makes a bust theirs.
       const heldGauge = clamp(Number(base.heldGauge) || 0, 0, 100);
       const rawStress = clockStress + heldGauge;
-      const stressLevel = clamp(Math.round(rawStress), 0, 100);
-      const busted = rawStress >= 100 || Boolean(base.isBlind);
+      const wall = Number(base.bustFloor) || BUST_FLOOR_MAX;
+      const busted = rawStress >= 100 || (heldGauge > 0 && rawStress >= wall) || Boolean(base.isBlind);
+      const stressLevel = base.isBlind ? base.stressLevel : clamp(Math.round(rawStress), 0, 100);
       const justBusted = busted && base.thresholdState !== "bust";
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const score = justBusted ? Math.floor(anchorScore * 0.5) : anchorScore;
@@ -337,7 +338,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...base,
         currentTicks,
         clockStress,
-        heldGauge: busted ? 0 : heldGauge,
+        heldGauge: busted ? Math.max(0, stressLevel - clockStress) : heldGauge,
         timeDecay: Number(burn.toFixed(3)),
         heat: Number(heat.toFixed(2)),
         stressLevel,
@@ -429,7 +430,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const rawStress = (Number(base.clockStress) || 0) + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
       const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
-      const busted = rawStress >= 100 || outcome.busted;
+      const busted = rawStress >= 100 || outcome.busted || Boolean(base.isBlind);
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const fx = projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion });
       // Price the commit off the gauge the player carried in, not the one left
@@ -445,7 +446,10 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         cashedMultiplier,
         heat: busted ? 0 : Number(heat.toFixed(2)),
         stressLevel,
-        heldGauge: busted ? 0 : clamp(heldGauge, 0, 100),
+        // Committing spends the gauge, win or lose: it is the act that settles the
+        // bet. Carrying it past the commit let the very next tick weigh it against
+        // the wall again and bust a player who had already been paid.
+        heldGauge: 0,
         hiddenChoice: null,
         thresholdState: busted ? "bust" : stressLevel >= CRITICAL_FLOOR ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,

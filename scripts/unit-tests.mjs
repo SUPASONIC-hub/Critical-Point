@@ -534,7 +534,10 @@ test("pressing far enough busts the run, and the bust is the player's own", () =
 
   // Seven presses at 30 seconds remaining. Nothing about the clock did this.
   assert.equal(state.isBlind, true, "greed reaches the line long before the deadline does");
-  assert.equal(state.heldGauge, 0, "and busting clears what they were holding");
+  // The window freezes rather than empties: the gauge, the multiplier and the
+  // vignette hold at the reading that busted, so the screen is not quietly
+  // recovering underneath the word BUST.
+  assert.ok(state.stressLevel >= state.bustFloor, "and the readout holds at the value that busted");
 });
 
 test("a challenge match moves the bust line, it does not remove it", () => {
