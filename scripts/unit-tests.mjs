@@ -659,3 +659,21 @@ test("the wall cannot be walked below the point a run stops being playable", () 
     }
   }
 });
+
+test("the ledger reports the reboots the reducer actually granted", () => {
+  // `permanentMultiplier` is the whole reward for busting, and the panel built to
+  // price it counted `entry.environmentMode === "reboot"` -- a value no commit
+  // can write, because DECISION_STARTED turns blackout into reboot before the
+  // next commit runs. A player two busts deep read x1, "리부트 0회", and a
+  // sentence telling them they had never blown up.
+  const log = [
+    { threshold: { rewardMultiplier: 2.4, busted: true }, environmentMode: "blackout", riskRewardEffect: {} },
+    { threshold: { rewardMultiplier: 1.2, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 6 } },
+    { threshold: { rewardMultiplier: 3.1, busted: true }, environmentMode: "blackout", riskRewardEffect: {} },
+  ];
+  const ledger = createPressureLedger(log);
+  assert.equal(ledger.busts, 2);
+  assert.equal(ledger.reboots, 2, "a reboot is what a bust becomes at the top of the next window");
+  assert.equal(ledger.permanentMultiplier, getPermanentMultiplier(2));
+  assert.ok(ledger.permanentMultiplier > 1, "and the panel can finally say the buff exists");
+});

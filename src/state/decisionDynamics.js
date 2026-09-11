@@ -122,10 +122,10 @@ export function drawBustFloor(seed, rebootCount = 0) {
   return Math.max(BUST_FLOOR_FATAL, drawn - cost);
 }
 
-export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false, bustFloor = BUST_FLOOR_MAX } = {}) {
+export function getPushYourLuckOutcome({ stressLevel = 0, challengeMatch = false, bustFloor = BUST_FLOOR_MAX } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
   const floor = challengeMatch ? Math.min(MATCH_FLOOR_CEILING, bustFloor + MATCH_FLOOR_BONUS) : bustFloor;
-  const thresholdState = stressLevel >= floor && riskDelta > 0 ? "bust" : stressLevel >= 78 ? "critical" : "building";
+  const thresholdState = stressLevel >= floor ? "bust" : stressLevel >= 78 ? "critical" : "building";
   return {
     thresholdState,
     rewardMultiplier,
@@ -161,7 +161,6 @@ export function getPermanentMultiplier(rebootCount = 0) {
  */
 export function createPressureLedger(log = []) {
   let busts = 0;
-  let reboots = 0;
   let bestMultiplier = 1;
   let bonusPoints = 0;
   let pushedDecisions = 0;
@@ -169,7 +168,6 @@ export function createPressureLedger(log = []) {
   for (const entry of log) {
     const multiplier = Number(entry?.threshold?.rewardMultiplier) || 1;
     if (entry?.threshold?.busted) busts += 1;
-    if (entry?.environmentMode === "reboot") reboots += 1;
     if (multiplier > bestMultiplier) bestMultiplier = multiplier;
     if (multiplier <= 1) continue;
     pushedDecisions += 1;
@@ -179,6 +177,16 @@ export function createPressureLedger(log = []) {
       if (value > 0) bonusPoints += value - Math.round(value / multiplier);
     }
   }
+
+  // A reboot is what a bust becomes at the top of the next window, so the log
+  // has exactly as many of one as the other. This used to count entries whose
+  // `environmentMode` read "reboot" -- a value no commit can ever write, because
+  // `DECISION_STARTED` turns blackout into reboot before the next commit runs
+  // and a second commit inside a busted window is still blackout. So the panel
+  // built to price the bust reported x1 and "리부트 0회" to a player who had just
+  // blown up twice, and told them, in the sentence below its own heading, that
+  // they had never blown up at all.
+  const reboots = busts;
 
   return {
     busts,
@@ -346,7 +354,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp(Number(base.heldGauge) || 0, 0, 100);
       const rawStress = clockStress + heldGauge;
       const wall = Number(base.bustFloor) || BUST_FLOOR_MAX;
-      const busted = rawStress >= 100 || (heldGauge > 0 && rawStress >= wall) || Boolean(base.isBlind);
+      const busted = rawStress >= wall || Boolean(base.isBlind);
       const stressLevel = base.isBlind ? base.stressLevel : clamp(Math.round(rawStress), 0, 100);
       const justBusted = busted && base.thresholdState !== "bust";
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
@@ -447,7 +455,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + adjustment, 0, 140);
       const rawStress = (Number(base.clockStress) || 0) + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
-      const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
+      const outcome = getPushYourLuckOutcome({ stressLevel, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
       const busted = rawStress >= 100 || outcome.busted || Boolean(base.isBlind);
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const fx = projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion });
