@@ -9,8 +9,11 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   // apart because the tick recomputes its own term from scratch every second:
   // folded into one number, every press was overwritten within 999ms and the
   // one deliberate act in the loop had a sub-second half-life.
-  criticalFloor: 88,
-  overdriveFloor: 77,
+  // BUST_FLOOR_MAX - PUSH_STEP_MAX and - PUSH_STEP_MAX * 2, written out because
+  // both constants are declared below this object. The widest wall, so the
+  // opening frame of a scene never claims more room than the drawn wall has.
+  criticalFloor: 75,
+  overdriveFloor: 54,
   clockStress: 0,
   heldGauge: 0,
   windowIndex: 0,
@@ -277,15 +280,27 @@ const COMBO_BACKLASH_K = 1.5;
  * `BUILDING` and `61%` and then the run ended. The player could not feel it
  * coming because nothing on screen was wired to the thing that was coming.
  */
-const CRITICAL_RATIO = 0.92;
-const OVERDRIVE_RATIO = 0.8;
-
+/*
+ * Measured in presses, not in percent.
+ *
+ * Ratios looked right and could not work. On an exponential burn the lead time
+ * a ratio buys is `ln(1/ratio)/k` -- a constant, the same 1.49s at a wall of 96
+ * and at a wall of 52, one or two frames at 1Hz. And a ratio band is a fraction
+ * of the wall, so the red band was `0.08 x wall` = 4 to 8 points: narrower than
+ * `PUSH_STEP_MIN` at all 45 wall values, which means a press could never land
+ * inside it. 15.3% of presses that crossed the wall skipped every warning band
+ * in one step, going BUILDING -> dead.
+ *
+ * The bands are widths in gauge now, sized to the thing that moves the gauge:
+ * red is one full press below the wall, amber is two. Whatever the wall is,
+ * a player standing in the clear cannot reach it without passing through both.
+ */
 function criticalFloorFor(wall) {
-  return Math.round((Number(wall) || BUST_FLOOR_MAX) * CRITICAL_RATIO);
+  return Math.max(1, Math.round((Number(wall) || BUST_FLOOR_MAX) - PUSH_STEP_MAX));
 }
 
 function overdriveFloorFor(wall) {
-  return Math.round((Number(wall) || BUST_FLOOR_MAX) * OVERDRIVE_RATIO);
+  return Math.max(1, Math.round((Number(wall) || BUST_FLOOR_MAX) - PUSH_STEP_MAX * 2));
 }
 const OVERTIME_BURN = 14;
 // The clock alone tops out just under bust: the last four points are always paid

@@ -619,8 +619,25 @@ export function getClueHypotheses(clues = []) {
  * never produces because its trust and legitimacy rise together; it compares the
  * two against each other instead.
  */
-/** What one bust adds to the season pressure the ending reads. */
-const BUST_SEASON_PRESSURE = 12;
+/**
+ * What one bust adds to the season pressure the ending reads.
+ *
+ * It was 12, taken as a `max` against the other two strain terms, and that made
+ * it a guillotine: one bust changed 0.0% of endings, two changed 0.0%, three
+ * changed 92.4% and forced SYSTEM COLLAPSE over every resource, clue and
+ * sentence six cases had earned. Harmless only while the record was being read
+ * off one case; once it aggregated across the season it fired in every real run,
+ * because ordinary play busts 6 to 16 times in 42 windows. Every policy that
+ * engaged with the mechanic at all collapsed, and the three rare endings went to
+ * zero -- under floors `check-endings.mjs` cannot see, because its simulator
+ * passes no bust data at all.
+ *
+ * Busts *add* to the strain now rather than replacing it, at a weight where a
+ * season full of them pushes a run toward collapse without deciding it alone.
+ */
+const BUST_SEASON_PRESSURE = 2;
+/** However many times a run blew up, the record cannot close a season by itself. */
+const BUST_PRESSURE_CAP = 40;
 /** The pot a run has to have held, without ever busting, to earn a clue of slack. */
 const HELD_LINE_MULTIPLIER = 2.5;
 
@@ -644,14 +661,26 @@ export function getEndingVariant({
   // going past what there was time to carry. It is priced as pressure because
   // that is the axis it belongs on, and because it makes a run that blew up
   // three times unable to close as though it had not.
-  const bustPressure = seasonBusts * BUST_SEASON_PRESSURE;
+  const bustPressure = Math.min(BUST_PRESSURE_CAP, seasonBusts * BUST_SEASON_PRESSURE);
   const closingPressure = getRiskPressure(resources);
-  const seasonPressure = Math.max(closingPressure, peakRiskPressure, bustPressure);
+  // The strain the run is carrying, and the strain plus what it did to get
+  // there. They are separate because the three character endings below ask what
+  // a run valued, not how hard it pushed: folding busts into their gate closed
+  // all three -- profitable-silence to 25 of 6000, cold-justice to 42,
+  // field-pact to 5, under floors of 50/50/10. A bust can collapse a season. It
+  // has no business deciding whether the season was about money or procedure.
+  const carriedPressure = Math.max(closingPressure, peakRiskPressure);
+  // Taken as a peer of the other two strain terms, not added to them: the season
+  // pressure a run carries clusters just under the 31 that closes it, so *any*
+  // constant added on top collapsed 37% to 75% of seasons. As a third term it
+  // only decides a season a run pushed relentlessly -- the weight puts the line
+  // at sixteen busts in forty-two windows, past every policy but the greediest.
+  const seasonPressure = Math.max(carriedPressure, bustPressure);
   const humanCost = Math.max(resources.humanCost ?? 0, seasonHumanCost);
   const trust = resources.trust ?? 0;
   const legitimacy = resources.legitimacy ?? 0;
   const capital = resources.capital ?? 0;
-  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = seasonPressure < 31 && humanCost < 90 && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
+  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < 31 && humanCost < 90 && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
   if (seasonPressure >= 31 || humanCost >= 90) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const clueBar = heldTheLine ? 3 : 4;

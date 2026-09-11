@@ -62,12 +62,21 @@ for (let run = 0; run < RUNS; run += 1) {
   const { closing, seasonHumanCost, peakRiskPressure } = playSeason();
   const clueCount = Math.floor(random() * 7);
   const freeTextCount = Math.floor(random() * 3);
+  // The push record, which this suite passed as nothing for as long as the
+  // ending has read it -- so 6000 seasons exercised `seasonBusts = 0` in every
+  // one, and a weighting that forced SYSTEM COLLAPSE on three busts went
+  // unnoticed while ordinary play busts six to sixteen times in forty-two
+  // windows. A guard that cannot reach the branch is not guarding it.
+  const seasonBusts = Math.floor(random() * 17);
+  const seasonBestMultiplier = 1 + random() * 2.6;
   const ending = getEndingVariant({
     resources: closing,
     discoveredClues: Array.from({ length: clueCount }, (_, index) => ({ id: `clue-${index}` })),
     log: Array.from({ length: freeTextCount }, () => ({ freeTextSuccess: true })),
     seasonHumanCost,
     peakRiskPressure,
+    seasonBusts,
+    seasonBestMultiplier,
   });
   seen.set(ending.id, (seen.get(ending.id) ?? 0) + 1);
 }

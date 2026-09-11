@@ -751,12 +751,17 @@ test("the ending reads what the run did with the gauge", () => {
   // And blowing up repeatedly is, in the collapse ending's own words, the season
   // going past what there was time to carry.
   assert.equal(endingFor([entry(3.1, true), entry(2, false), entry(2.9, true)]), "open-question", "two busts is not yet a collapse");
+  // Busts are a peer of the other strain terms at 2 apiece, so it takes sixteen
+  // of them in a season to close one on their own -- past every policy but the
+  // greediest. At 12 apiece three were enough, which forced SYSTEM COLLAPSE on
+  // ordinary play and took the three character endings under their floors.
   const wrecked = getEndingVariant({
     resources,
     discoveredClues,
     seasonHumanCost: 20,
     peakRiskPressure: 18,
-    ...strainOf([entry(3.1, true), entry(2, true), entry(2.9, true)]),
+    seasonBusts: 16,
+    seasonBestMultiplier: 3.1,
   });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true, "three busts closes the season as a failure");
