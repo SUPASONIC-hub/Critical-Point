@@ -10,6 +10,7 @@ import {
   createPressureLedger,
   DYNAMICS_INITIAL_STATE,
   getPermanentMultiplier,
+  drawBustFloor,
   getPushYourLuckOutcome,
   PUSH_STEP,
   reduceDecisionDynamics,
@@ -572,4 +573,43 @@ test("relief earned on a commit survives the clock, the way a press does", () =>
   assert.ok(committed.heldGauge < held, "a match buys the gauge back down");
   const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 19 });
   assert.ok(afterTick.heldGauge <= committed.heldGauge, "and the tick does not hand it back");
+});
+
+test("each window draws its own wall, and the same seed draws the same one", () => {
+  let state = DYNAMICS_INITIAL_STATE;
+  const floors = [];
+  for (let window = 0; window < 8; window++) {
+    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+    floors.push(state.bustFloor);
+  }
+  // A fixed wall next to a gauge printed every frame and a constant PUSH_STEP is
+  // arithmetic: stop one press short, every time, forever. The band is a press
+  // wide, so standing at 88 is a real question.
+  assert.ok(new Set(floors).size > 1, "the wall is not in the same place every window");
+  for (const floor of floors) {
+    assert.ok(floor >= 80 && floor <= 96, `${floor} sits inside the band`);
+  }
+  // Seeded, not random: replay links restore a scene from a seed and the balance
+  // suite replays thousands of seasons. Both need the same wall twice.
+  assert.deepEqual(floors, [1, 2, 3, 4, 5, 6, 7, 8].map((index) => drawBustFloor(`0:${index}:0`)));
+});
+
+test("a bust holds until the window ends instead of healing on the next tick", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 12 });
+  for (let press = 0; press < 6; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 11 });
+  assert.equal(state.isBlind, true, "six presses at twelve seconds reach the ceiling");
+
+  // Busting clears heldGauge, so the tick after it used to recompute from the
+  // clock alone and find nothing wrong -- the 420ms bust keyframe and the
+  // grayscale were gone before the player finished reading the word.
+  for (const seconds of [10, 9, 8]) {
+    state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds });
+    assert.equal(state.isBlind, true, `still busted at ${seconds}s remaining`);
+    assert.equal(state.thresholdState, "bust");
+  }
+
+  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+  assert.equal(next.isBlind, false, "and a new window is a clean one");
 });

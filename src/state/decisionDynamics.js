@@ -11,6 +11,8 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   // one deliberate act in the loop had a sub-second half-life.
   clockStress: 0,
   heldGauge: 0,
+  windowIndex: 0,
+  bustFloor: 96,
   timeDecay: 0,
   hiddenChoice: null,
   environmentMode: "stable",
@@ -41,26 +43,46 @@ export const PUSH_STEP = 16;
 /**
  * Where the line is, and what a challenge match is worth.
  *
- * A match used to remove the line entirely -- `!challengeMatch` in the bust
- * test -- and the badge that announces one renders on the card unconditionally
- * (`ChoiceList.jsx`), outside `전술 정보`. Between them the player knew, for
- * free and before touching the button, which of two scripts they were in: badge
- * present, press to the ceiling and collect; badge absent, do not press. That is
- * a lookup table, and a push-your-luck bet that resolves before the press is not
- * a bet.
+ * A match used to remove the line entirely, and the badge announcing one printed
+ * free on the card, so the player knew before touching the button which of two
+ * scripts they were in. The match moves the line now instead of deleting it.
  *
- * The match now moves the line instead of deleting it. It is a real edge -- the
- * difference between 92 and 99 is four presses of room -- and it still runs out,
- * so the greedy read stays punishable and the last press is a decision either
- * way.
+ * The line itself moves too, and that is the part that makes the press a bet
+ * rather than arithmetic. `PUSH_STEP` is a constant, the gauge is printed every
+ * frame as `STRESS {n}%`, and the multiplier is printed on the button -- with a
+ * fixed wall, a player could compute at any moment exactly how many presses were
+ * free and stop one short, every time, forever. A window draws its own floor
+ * from a band a press wide, so standing at 88 is a genuine question: the wall is
+ * somewhere in here, and the only way to find out is to commit.
+ *
+ * The draw is seeded, not random. Replay links restore a scene from a seed and
+ * the balance suite replays thousands of seasons; a `Math.random()` here would
+ * make both non-reproducible. Same seed, same wall.
  */
-const BUST_FLOOR = 92;
-const MATCHED_BUST_FLOOR = 99;
+const BUST_FLOOR_MIN = 80;
+const BUST_FLOOR_MAX = 96;
+const MATCH_FLOOR_BONUS = 6;
+const MATCH_FLOOR_CEILING = 99;
 
-export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false } = {}) {
+function hashSeed(seed) {
+  let hash = 2166136261;
+  for (const character of String(seed)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+/** The wall for one decision window. Stable for a given window, unknown to the player. */
+export function drawBustFloor(seed) {
+  const state = (Math.imul(hashSeed(seed) || 1, 1664525) + 1013904223) >>> 0;
+  return BUST_FLOOR_MIN + Math.round((state / 4294967296) * (BUST_FLOOR_MAX - BUST_FLOOR_MIN));
+}
+
+export function getPushYourLuckOutcome({ stressLevel = 0, riskDelta = 0, challengeMatch = false, bustFloor = BUST_FLOOR_MAX } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
-  const bustFloor = challengeMatch ? MATCHED_BUST_FLOOR : BUST_FLOOR;
-  const thresholdState = stressLevel >= bustFloor && riskDelta > 0 ? "bust" : stressLevel >= 78 ? "critical" : "building";
+  const floor = challengeMatch ? Math.min(MATCH_FLOOR_CEILING, bustFloor + MATCH_FLOOR_BONUS) : bustFloor;
+  const thresholdState = stressLevel >= floor && riskDelta > 0 ? "bust" : stressLevel >= 78 ? "critical" : "building";
   return {
     thresholdState,
     rewardMultiplier,
@@ -246,8 +268,13 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       // Derived from the count rather than incremented, so a ledger rebuilt from
       // the log lands on the same number this state is holding.
       const carried = rebooting ? getPermanentMultiplier(rebootCount) : permanentMultiplier;
+      // Every window draws its own wall. The counter is what makes two windows in
+      // one run differ; `rebootCount` and `banked` are what make two runs differ.
+      const windowIndex = (Number(base.windowIndex) || 0) + 1;
       return {
         ...DYNAMICS_INITIAL_STATE,
+        windowIndex,
+        bustFloor: drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`),
         environmentMode: rebooting ? "reboot" : "stable",
         permanentMultiplier: carried,
         rewardMultiplier: carried,
@@ -276,7 +303,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp(Number(base.heldGauge) || 0, 0, 100);
       const rawStress = clockStress + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
-      const busted = rawStress >= 100;
+      const busted = rawStress >= 100 || Boolean(base.isBlind);
       const justBusted = busted && base.thresholdState !== "bust";
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const score = justBusted ? Math.floor(anchorScore * 0.5) : anchorScore;
@@ -373,7 +400,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + adjustment, 0, 140);
       const rawStress = (Number(base.clockStress) || 0) + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
-      const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch });
+      const outcome = getPushYourLuckOutcome({ stressLevel, riskDelta, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
       const busted = rawStress >= 100 || outcome.busted;
       const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
       const fx = projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion });
