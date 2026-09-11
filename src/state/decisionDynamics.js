@@ -161,8 +161,11 @@ export function getEnvironmentEffect(environmentMode) {
  */
 export const REBOOT_PERMANENT_BONUS = 0.2;
 
+const MAX_PERMANENT_MULTIPLIER = 2;
+
 export function getPermanentMultiplier(rebootCount = 0) {
-  return Number((1 + Math.max(0, Number(rebootCount) || 0) * REBOOT_PERMANENT_BONUS).toFixed(2));
+  const earned = 1 + Math.max(0, Number(rebootCount) || 0) * REBOOT_PERMANENT_BONUS;
+  return Number(Math.min(MAX_PERMANENT_MULTIPLIER, earned).toFixed(2));
 }
 
 /**
@@ -276,7 +279,7 @@ export function resolveDecisionCommit({ dynamics, challengeMatch, riskDelta = 0,
  * barely move the gauge, the last two evaporate it.
  */
 const DECISION_WINDOW_SECONDS = 45;
-const DEATH_CURVE_K = 0.045;
+const DEATH_CURVE_K = 0.09;
 const DEATH_CURVE_SPAN = Math.exp(DEATH_CURVE_K * DECISION_WINDOW_SECONDS) - 1;
 const COMBO_BACKLASH_K = 3.4;
 /**
@@ -537,7 +540,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         // bet. Carrying it past the commit let the very next tick weigh it against
         // the wall again and bust a player who had already been paid.
         heldGauge: 0,
-        wallDebt: busted ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + 1) : Math.max(0, (Number(base.wallDebt) || 0) - 1),
+        wallDebt: busted
+          ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + (base.isBlind ? 0 : 1))
+          : Math.max(0, (Number(base.wallDebt) || 0) - 1),
         hiddenChoice: null,
         thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,

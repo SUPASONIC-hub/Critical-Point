@@ -17,10 +17,19 @@ import { playDecisionTick } from "./AdaptiveMusic.jsx";
  * the old ladder happened to sit at, so the copy still turns where it always did
  * and follows the curve if the curve ever moves. `overtime` still belongs to the
  * clock: the window has closed and the charge has started billing.
+ *
+ * The curve did move -- twice -- and these did not follow it, because a fraction
+ * of the burn is not a fixed point on the clock when the burn itself is
+ * reshaped. At k=0.045 they solved to 6.3s and 19.9s elapsed, so `마지막 10초`
+ * printed for twenty-five seconds of a forty-five second window and the reading
+ * tier shrank from twenty-six seconds to seven. They are recalibrated to the
+ * ladder they are named for: press at twenty seconds remaining, critical at ten.
+ * Whoever moves the curve next has to move these with it, and the arithmetic is
+ * `burn(45 - t)` against the current k.
  */
 const WINDOW_SECONDS = 45;
-const PRESS_BURN = 0.05;
-const CRITICAL_BURN = 0.22;
+const PRESS_BURN = 0.15;
+const CRITICAL_BURN = 0.4;
 
 function tierOf(seconds, burn, blind) {
   if (seconds <= 0 || blind) return "overtime";
