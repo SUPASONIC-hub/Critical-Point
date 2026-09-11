@@ -93,8 +93,6 @@ const BUST_FLOOR_MIN = 80;
 /** However many times a run has blown up, the wall never comes closer than this. */
 const BUST_FLOOR_FATAL = 52;
 const BUST_FLOOR_MAX = 96;
-const MATCH_FLOOR_BONUS = 6;
-const MATCH_FLOOR_CEILING = 99;
 
 function hashSeed(seed) {
   let hash = 2166136261;
@@ -127,9 +125,9 @@ export function drawBustFloor(seed, rebootCount = 0) {
   return Math.max(BUST_FLOOR_FATAL, drawn - cost);
 }
 
-export function getPushYourLuckOutcome({ stressLevel = 0, challengeMatch = false, bustFloor = BUST_FLOOR_MAX } = {}) {
+export function getPushYourLuckOutcome({ stressLevel = 0, bustFloor = BUST_FLOOR_MAX } = {}) {
   const rewardMultiplier = Number((1 + Math.pow(clamp(stressLevel, 0, 100) / 100, 2) * 2.5).toFixed(2));
-  const floor = challengeMatch ? Math.min(MATCH_FLOOR_CEILING, bustFloor + MATCH_FLOOR_BONUS) : bustFloor;
+  const floor = bustFloor;
   const thresholdState = stressLevel >= floor ? "bust" : stressLevel >= 78 ? "critical" : "building";
   return {
     thresholdState,
@@ -270,7 +268,7 @@ export function resolveDecisionCommit({ dynamics, challengeMatch, riskDelta = 0,
 const DECISION_WINDOW_SECONDS = 45;
 const DEATH_CURVE_K = 0.15;
 const DEATH_CURVE_SPAN = Math.exp(DEATH_CURVE_K * DECISION_WINDOW_SECONDS) - 1;
-const COMBO_BACKLASH_K = 1.5;
+const COMBO_BACKLASH_K = 3.4;
 /**
  * The warning lights, expressed against the wall rather than against 100.
  *
@@ -316,7 +314,7 @@ function getDeathBurn(elapsedTicks) {
 /** A streak is a loan: it multiplies the gauge it is riding on. */
 function getComboBacklash(combo, burn = 0) {
   const streak = Math.max(0, Number(combo) || 0);
-  return streak * streak * COMBO_BACKLASH_K * (1 + clamp(Number(burn) || 0, 0, 1));
+  return streak * COMBO_BACKLASH_K * (1 + clamp(Number(burn) || 0, 0, 1));
 }
 
 function readSeconds(event, fallback = DECISION_WINDOW_SECONDS) {
@@ -498,7 +496,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + adjustment, 0, 140);
       const rawStress = (Number(base.clockStress) || 0) + heldGauge;
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
-      const outcome = getPushYourLuckOutcome({ stressLevel, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
+      const outcome = getPushYourLuckOutcome({ stressLevel, bustFloor: Number(base.bustFloor) || 96 });
       const busted = rawStress >= 100 || outcome.busted || Boolean(base.isBlind);
       const slowMotion = !busted && stressLevel >= criticalFloorFor(base.bustFloor) && seconds <= 1;
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo, permanentMultiplier, busted, slowMotion });

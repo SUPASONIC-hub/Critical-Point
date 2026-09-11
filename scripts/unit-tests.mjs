@@ -541,18 +541,22 @@ test("pressing far enough busts the run, and the bust is the player's own", () =
   assert.ok(state.stressLevel >= state.bustFloor, "and the readout holds at the value that busted");
 });
 
-test("a challenge match moves the bust line, it does not remove it", () => {
-  const matchedAtCap = getPushYourLuckOutcome({ stressLevel: 100, riskDelta: 3, challengeMatch: true });
-  const matchedBelow = getPushYourLuckOutcome({ stressLevel: 96, riskDelta: 3, challengeMatch: true });
-  const unmatched = getPushYourLuckOutcome({ stressLevel: 96, riskDelta: 3, challengeMatch: false });
+test("a challenge match is safer because it vents, not because the wall moves", () => {
+  // It used to pay twice: vent 12 points off the gauge *and* push the wall 6
+  // further away. Across 21,600 matched commits at every reboot count, press
+  // count and commit time, that came to a bust rate of 0.0% against 16-18% on a
+  // miss -- and the card prints 목표 LOCKED before the player presses anything,
+  // so the free pass was announced in advance. The vent is the reward. The wall
+  // is the wall, for everyone.
+  const atWall = getPushYourLuckOutcome({ stressLevel: 90, bustFloor: 88 });
+  assert.equal(atWall.busted, true, "past the wall is past the wall");
 
-  // The edge is real and it is wide: four presses of room between 92 and 99.
-  assert.equal(matchedBelow.busted, false, "a match survives where a miss does not");
-  assert.equal(unmatched.busted, true);
-  // And it runs out, which is what keeps the last press a decision. When a match
-  // was total immunity the player could read the card and know, before pressing,
-  // that the bet could not be lost.
-  assert.equal(matchedAtCap.busted, true, "pressing past 99 busts even on a match");
+  const staged = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  const ticked = reduceDecisionDynamics(staged, { type: "DECISION_TICK", seconds: 12 });
+  const matched = reduceDecisionDynamics(ticked, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 12 });
+  const missed = reduceDecisionDynamics(ticked, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 4, seconds: 12 });
+  assert.ok(matched.stressLevel < missed.stressLevel, "reading the objective right buys gauge back");
+  assert.ok(matched.heldGauge <= ticked.heldGauge, "and it is the gauge that moves, not the line");
 });
 
 test("a winning commit does not bust on the tick that follows it", () => {
