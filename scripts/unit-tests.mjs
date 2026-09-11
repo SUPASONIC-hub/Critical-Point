@@ -11,8 +11,8 @@ import {
   DYNAMICS_INITIAL_STATE,
   getPermanentMultiplier,
   drawBustFloor,
+  drawPushStep,
   getPushYourLuckOutcome,
-  PUSH_STEP,
   reduceDecisionDynamics,
 } from "../src/state/decisionDynamics.js";
 import {
@@ -470,8 +470,15 @@ test("pushing raises the gauge and the pot the player is holding", () => {
   const once = reduceDecisionDynamics(started, { type: "PUSH_HELD" });
   const twice = reduceDecisionDynamics(once, { type: "PUSH_HELD" });
 
-  assert.equal(once.stressLevel, started.stressLevel + PUSH_STEP);
-  assert.equal(twice.stressLevel, started.stressLevel + PUSH_STEP * 2);
+  // A press buys a drawn amount, not a constant one, so the assertion is on the
+  // band rather than on a number: a fixed step put the gauge on a grid of six
+  // rungs and left the moving wall between two of them for most of a window.
+  const first = once.stressLevel - started.stressLevel;
+  const second = twice.stressLevel - once.stressLevel;
+  for (const step of [first, second]) {
+    assert.ok(step >= 11 && step <= 21, `${step} sits inside the press band`);
+  }
+  assert.ok(twice.stressLevel > once.stressLevel, "and each press moves the gauge further");
   // The pot is priced off the gauge, so the press has to be worth something the
   // moment it lands -- the reason the button exists is that the number moves.
   assert.ok(twice.rewardMultiplier > once.rewardMultiplier, "a second press pays more than the first");
@@ -492,7 +499,7 @@ test("a push survives the next tick, which is the whole point of pressing it", (
 
   for (let press = 0; press < 4; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
   const pushed = state.stressLevel;
-  assert.equal(pushed, clockOnly + PUSH_STEP * 4, "four presses buy four steps");
+  assert.ok(pushed >= clockOnly + 11 * 4 && pushed <= clockOnly + 21 * 4, "four presses buy four steps");
 
   state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 24 });
   assert.ok(state.stressLevel >= pushed, "and the tick may add to them, never erase them");
@@ -612,4 +619,15 @@ test("a bust holds until the window ends instead of healing on the next tick", (
 
   const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
   assert.equal(next.isBlind, false, "and a new window is a clean one");
+});
+
+test("no two presses in a window are worth the same, and the run replays them", () => {
+  const steps = [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:1:${press}`));
+  assert.ok(new Set(steps).size > 1, "a press is drawn, not a constant");
+  for (const step of steps) assert.ok(step >= 11 && step <= 21, `${step} sits inside the band`);
+  // The wall only mattered at one rung while the step was fixed at 16: the gauge
+  // could land on clockStress + 16n and nowhere else, and an 80-96 band sits
+  // between two of those rungs for most of a window.
+  assert.deepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:1:${press}`)), "and the same seed draws the same press twice");
+  assert.notDeepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:2:${press}`)), "while the next window draws its own");
 });

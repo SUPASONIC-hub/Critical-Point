@@ -13,6 +13,7 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   heldGauge: 0,
   windowIndex: 0,
   bustFloor: 96,
+  pressCount: 0,
   timeDecay: 0,
   hiddenChoice: null,
   environmentMode: "stable",
@@ -37,8 +38,32 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-/** What one deliberate press of 밀어붙이기 buys, in gauge. */
+/**
+ * What one press of 밀어붙인다 buys, and why it is not a constant.
+ *
+ * It was 16, and a constant step is what made the moving wall almost pointless:
+ * the gauge could only ever land on `clockStress + 16n`, a grid of six rungs, and
+ * a band of 80-96 sits between two of them for most of a window. Measured against
+ * a fixed wall at 92, a drawn wall changed the outcome of a press in 4% of
+ * windows at ten seconds elapsed and 17% at twenty. The uncertainty was real and
+ * almost never reachable.
+ *
+ * A press worth somewhere between 11 and 21 puts the gauge on a grid the player
+ * cannot see the rungs of, and the wall starts mattering everywhere rather than
+ * at one rung. Seeded on the window and the press index for the same reason the
+ * wall is: replay links and the six-thousand-season balance suite both have to
+ * draw the same numbers twice.
+ */
+const PUSH_STEP_MIN = 11;
+const PUSH_STEP_MAX = 21;
+
+/** The centre of the band, for callers that need one number to reason about. */
 export const PUSH_STEP = 16;
+
+export function drawPushStep(seed) {
+  const state = (Math.imul(hashSeed(seed) || 1, 1664525) + 1013904223) >>> 0;
+  return PUSH_STEP_MIN + Math.round((state / 4294967296) * (PUSH_STEP_MAX - PUSH_STEP_MIN));
+}
 
 /**
  * Where the line is, and what a challenge match is worth.
@@ -344,7 +369,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
      * test stays where it is, on the commit, and nothing new can bust here.
      */
     case "PUSH_HELD": {
-      const heldGauge = clamp((Number(base.heldGauge) || 0) + PUSH_STEP, 0, 100);
+      const pressCount = (Number(base.pressCount) || 0) + 1;
+      const step = drawPushStep(`${base.rebootCount}:${base.windowIndex}:${pressCount}`);
+      const heldGauge = clamp((Number(base.heldGauge) || 0) + step, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
       const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
@@ -352,6 +379,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...base,
         stressLevel,
         heldGauge,
+        pressCount,
         isSlowMotion: slowMotion,
         ...fx,
         // The press has to land harder than the gauge alone would, or the first
