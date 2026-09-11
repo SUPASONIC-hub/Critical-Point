@@ -17,6 +17,14 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   clockStress: 0,
   heldGauge: 0,
   windowIndex: 0,
+  // What the run owes the wall. A bust adds to it; a window closed without one
+  // pays it back down. `rebootCount` cannot do this job -- it is the permanent
+  // multiplier's counter and must only ever rise -- and using it to walk the wall
+  // down made the ratchet a one-way trip: measured over a 42-window season, one
+  // press committed with twenty seconds to spare busted 20 times and left the
+  // wall pinned at its fatal floor, because each bust made the next one likelier
+  // and nothing could undo it.
+  wallDebt: 0,
   bustFloor: 96,
   pressCount: 0,
   timeDecay: 0,
@@ -117,11 +125,13 @@ function hashSeed(seed) {
  * wall down towards the gauge instead of away from it.
  */
 const REBOOT_FLOOR_COST = 8;
+/** Past this the fatal floor clamps anyway, and more debt is only a longer climb back. */
+const MAX_WALL_DEBT = 6;
 
-export function drawBustFloor(seed, rebootCount = 0) {
+export function drawBustFloor(seed, wallDebt = 0) {
   const state = (Math.imul(hashSeed(seed) || 1, 1664525) + 1013904223) >>> 0;
   const drawn = BUST_FLOOR_MIN + Math.round((state / 4294967296) * (BUST_FLOOR_MAX - BUST_FLOOR_MIN));
-  const cost = Math.max(0, Number(rebootCount) || 0) * REBOOT_FLOOR_COST;
+  const cost = Math.max(0, Number(wallDebt) || 0) * REBOOT_FLOOR_COST;
   return Math.max(BUST_FLOOR_FATAL, drawn - cost);
 }
 
@@ -356,10 +366,12 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       // Every window draws its own wall. The counter is what makes two windows in
       // one run differ; `rebootCount` and `banked` are what make two runs differ.
       const windowIndex = (Number(base.windowIndex) || 0) + 1;
+      const wallDebt = Math.max(0, Number(base.wallDebt) || 0);
       return {
         ...DYNAMICS_INITIAL_STATE,
         windowIndex,
-        bustFloor: drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`, rebootCount),
+        wallDebt,
+        bustFloor: drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`, wallDebt),
         environmentMode: rebooting ? "reboot" : "stable",
         permanentMultiplier: carried,
         rewardMultiplier: carried,
@@ -406,6 +418,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         currentTicks,
         clockStress,
         heldGauge: busted ? Math.max(0, stressLevel - clockStress) : heldGauge,
+        wallDebt: justBusted ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + 1) : Number(base.wallDebt) || 0,
         timeDecay: Number(burn.toFixed(3)),
         heat: Number(heat.toFixed(2)),
         stressLevel,
@@ -524,6 +537,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         // bet. Carrying it past the commit let the very next tick weigh it against
         // the wall again and bust a player who had already been paid.
         heldGauge: 0,
+        wallDebt: busted ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + 1) : Math.max(0, (Number(base.wallDebt) || 0) - 1),
         hiddenChoice: null,
         thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
@@ -593,6 +607,7 @@ const PRESSURE_FIELDS = [
   "environmentMode",
   "combo",
   "heat",
+  "wallDebt",
   "rewardMultiplier",
   "vignette",
   "heartbeatBpm",

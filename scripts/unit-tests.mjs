@@ -796,3 +796,34 @@ test("the ending answers busts across the range play reaches, not at one step", 
   const answers = [0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, near));
   assert.ok(new Set(answers).size > 1, "the ending moves somewhere inside the range play reaches");
 });
+
+test("the wall is borrowed against, not spent forever", () => {
+  // Walking it down on `rebootCount` made the ratchet a one-way trip: the counter
+  // only rises, so one bust lowered the wall by 8 permanently and made the next
+  // bust likelier. Over a 42-window season, one press committed with twenty
+  // seconds to spare busted 20 times and finished pinned at the fatal floor.
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  const openWall = state.bustFloor;
+
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
+  for (let press = 0; press < 8; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 19 });
+  assert.equal(state.isBlind, true, "eight presses at twenty seconds is a bust");
+  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 2, seconds: 19 });
+  assert.ok(state.wallDebt > 0, "and it is charged to the room the run has left");
+
+  const borrowed = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+  assert.ok(borrowed.bustFloor < openWall + 1, "the next window opens with less room");
+
+  // Paid back by closing windows without one. `rebootCount` keeps rising for the
+  // permanent multiplier, which is a reward and must not decay; the debt is the
+  // part a run can work off.
+  let recovering = borrowed;
+  for (let window = 0; window < 4; window++) {
+    recovering = reduceDecisionDynamics(recovering, { type: "DECISION_TICK", seconds: 30 });
+    recovering = reduceDecisionDynamics(recovering, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 30 });
+    recovering = reduceDecisionDynamics(recovering, { type: "DECISION_STARTED" });
+  }
+  assert.equal(recovering.wallDebt, 0, "four clean windows clear what one bust borrowed");
+  assert.ok(recovering.rebootCount > 0, "while the multiplier the bust bought is kept");
+});
