@@ -242,7 +242,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   });
   const {
     pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
-    dynamicsSummary, dispatchDynamics, resolveCommit,
+    dynamics, dynamicsSummary, dispatchDynamics, resolveCommit,
   } = useDecision({ active: started });
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
@@ -644,10 +644,17 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         discoveredClues,
         currentCase,
         freeText,
-        currentChallengeStreak,
+        // The reducer's streak, not the log's. getGameplayStats counts matches
+        // inside the current case and startCase clears the log, so finishing a
+        // case on a three-match run opened the next one with COMBO x3 on the
+        // gauge chip and "NO CHAIN" on the choice card: two counters for one
+        // streak, disagreeing on screen. The reducer's is the one that prices
+        // the commit, so it is the one the card reads. Scoring keeps its
+        // per-case count, which is what a case summary is about.
+        currentChallengeStreak: dynamics.combo,
         resourceMeta,
       }),
-    [currentCase, currentChallengeStreak, discoveredClues, freeText, log, resources, riskPressure, sceneChallenge],
+    [currentCase, discoveredClues, dynamics.combo, freeText, log, resources, riskPressure, sceneChallenge],
   );
 
   const riskPressureDrivers = useMemo(() => getRiskPressureDrivers(resources), [resources]);
@@ -1308,6 +1315,13 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setEcho(entry.echo);
     setNodeEnteredAt(Date.now());
     startDecisionWindow(DECISION_WINDOW_SECONDS);
+    // Paired, the way the scene entry above pairs them. Resetting the clock and
+    // not the reducer handed the player a window whose burn started over while
+    // the gauge they had already bought rode through it -- a free vent, once a
+    // case, and a bigger one since the burn curve flattened and the clock became
+    // the larger share of the gauge. The protocol buys a fresh window; a fresh
+    // window is fresh on both.
+    dispatchDynamics({ type: "DECISION_STARTED" });
     setSaveStatus("위기 프로토콜 발동됨");
     persist({
       protocolUsed: true,

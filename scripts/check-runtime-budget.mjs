@@ -50,7 +50,7 @@ const BUDGETS = {
     hooks: {},
   },
   "src/GameRuntime.jsx": {
-    lines: 2259,
+    lines: 2280,
     importedNames: 167,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
