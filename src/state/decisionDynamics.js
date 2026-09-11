@@ -266,7 +266,7 @@ export function resolveDecisionCommit({ dynamics, challengeMatch, riskDelta = 0,
  * barely move the gauge, the last two evaporate it.
  */
 const DECISION_WINDOW_SECONDS = 45;
-const DEATH_CURVE_K = 0.15;
+const DEATH_CURVE_K = 0.045;
 const DEATH_CURVE_SPAN = Math.exp(DEATH_CURVE_K * DECISION_WINDOW_SECONDS) - 1;
 const COMBO_BACKLASH_K = 3.4;
 /**
@@ -485,7 +485,14 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heat = getComboBacklash(combo, base.timeDecay);
       const relief = 12 + combo * 2;
       // A miss bills the streak it broke: the higher the combo, the worse the fall.
-      const penalty = 16 + Math.max(0, riskDelta) * 3 + priorBacklash;
+      // Capped to the amber band. The bands are sized so that nothing can cross
+      // from clear to dead in one step -- that holds for the press, which is
+      // 21 at most against a 21-point red band. It did not hold here: with
+      // `priorBacklash = combo * 3.4 * (1 + timeDecay)` the miss penalty reached
+      // 121.6, three times the amber band, so 14.15% of deaths showed no red
+      // frame at all and 113 came straight out of the clear. The same skip that
+      // was removed from the press had simply moved to the commit.
+      const penalty = Math.min(PUSH_STEP_MAX * 2, 16 + Math.max(0, riskDelta) * 3 + priorBacklash);
       // Settle against the gauge the player owns, not against the total. Writing
       // `stressLevel` here and leaving `heldGauge` alone meant the next tick
       // recomputed `clockStress + heldGauge` and threw the relief away inside

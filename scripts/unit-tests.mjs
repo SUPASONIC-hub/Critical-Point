@@ -560,20 +560,21 @@ test("a challenge match is safer because it vents, not because the wall moves", 
 });
 
 test("a winning commit does not bust on the tick that follows it", () => {
-  // Five presses at ten seconds left, committed on a challenge match: the payout
-  // lands, and one second later the run used to blow up and halve the score it
-  // had just banked. CHOICE_COMMITTED adjusted `stressLevel` and left
+  // Two presses at twenty-five seconds left, committed on a challenge match: the
+  // payout lands, and one second later the run used to blow up and halve the
+  // score it had just banked. (Five presses at ten seconds was the original
+  // shape; under the flatter burn curve that is a real bust, not a win.) CHOICE_COMMITTED adjusted `stressLevel` and left
   // `heldGauge` untouched, so the next tick recomputed `clockStress + heldGauge`
   // and threw the relief away -- punishing the correct read, after the fact.
   let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 10 });
-  for (let press = 0; press < 5; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 25 });
+  for (let press = 0; press < 2; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
 
-  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 2, challengeMatch: true, seconds: 10 });
+  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 2, challengeMatch: true, seconds: 25 });
   assert.equal(committed.isBlind, false, "a match at this gauge is a win, not a bust");
   const bankedScore = committed.score;
 
-  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 9 });
+  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 24 });
   assert.equal(afterTick.isBlind, false, "and it is still a win one second later");
   assert.equal(afterTick.score, bankedScore, "with the score it banked still banked");
 });
