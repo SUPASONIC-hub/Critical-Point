@@ -12,12 +12,17 @@ import { acquireCueRuntime } from "./AdaptiveMusic.jsx";
  * every cue was the same sine with a different ramp on it, and a heartbeat that
  * is one sine is a beep.
  *
- * Nodes are built per cue now and stopped when they finish, which is what the
- * rest of the cues in `AdaptiveMusic` already do. The graph is small enough that
- * the allocation is cheaper than the style invalidation the same frame causes.
+ * The mixer below keeps a tiny pool of reusable voice lanes per AudioContext.
+ * Oscillators are still one-shot nodes, because Web Audio does not allow a
+ * stopped oscillator to be restarted, but every cue lands in a recycled gain /
+ * filter lane with its own busy clock. That gives rapid clicks, hovers and
+ * threshold hits somewhere stable to mix without opening another context or
+ * allocating a fresh bus for each gesture.
  */
 
 const PEAK_GAIN = { heartbeat: 0.055, threshold: 0.045, click: 0.025, hover: 0.018 };
+const POOL_SIZE = 12;
+const cuePools = new WeakMap();
 
 /**
  * Stress raises pitch and bite, never level. The loudness of the window is the
@@ -26,10 +31,44 @@ const PEAK_GAIN = { heartbeat: 0.055, threshold: 0.045, click: 0.025, hover: 0.0
  */
 function stressTuning(stress) {
   const normalized = Math.min(1, Math.max(0, stress / 100));
-  return { normalized, pitch: 1 + normalized * 0.35, bite: 0.4 + normalized * 0.6 };
+  return { normalized, pitch: 1 + normalized * 0.52, bite: 0.4 + normalized * 0.75 };
 }
 
-function playHeartbeat({ context, destination, multiplier }, stress) {
+function getCuePool(runtime) {
+  const { context, destination } = runtime;
+  let pool = cuePools.get(context);
+  if (pool?.destination === destination) return pool;
+
+  pool = {
+    cursor: 0,
+    destination,
+    lanes: Array.from({ length: POOL_SIZE }, () => {
+      const laneGain = context.createGain();
+      laneGain.gain.value = 1;
+      laneGain.connect(destination);
+      return { busyUntil: 0, input: laneGain };
+    }),
+  };
+  cuePools.set(context, pool);
+  return pool;
+}
+
+function acquireLane(runtime, duration = 0.2) {
+  const { context } = runtime;
+  const pool = getCuePool(runtime);
+  const now = context.currentTime;
+  let lane = pool.lanes.find((candidate) => candidate.busyUntil <= now);
+  if (!lane) {
+    lane = pool.lanes[pool.cursor % pool.lanes.length];
+    pool.cursor += 1;
+  }
+  lane.busyUntil = now + duration;
+  return lane.input;
+}
+
+function playHeartbeat(runtime, stress) {
+  const { context, multiplier } = runtime;
+  const destination = acquireLane(runtime, 0.42);
   const { normalized, pitch } = stressTuning(stress);
   const now = context.currentTime;
   const peak = PEAK_GAIN.heartbeat * multiplier;
@@ -65,8 +104,10 @@ function playHeartbeat({ context, destination, multiplier }, stress) {
   }
 }
 
-function playThreshold({ context, destination, multiplier }, stress) {
-  const { bite } = stressTuning(stress);
+function playThreshold(runtime, stress) {
+  const { context, multiplier } = runtime;
+  const destination = acquireLane(runtime, 0.48);
+  const { normalized, pitch, bite } = stressTuning(stress);
   const now = context.currentTime;
   const peak = PEAK_GAIN.threshold * multiplier;
 
@@ -75,8 +116,8 @@ function playThreshold({ context, destination, multiplier }, stress) {
   const filter = context.createBiquadFilter();
   filter.type = "bandpass";
   filter.Q.setValueAtTime(6 + bite * 8, now);
-  filter.frequency.setValueAtTime(420, now);
-  filter.frequency.exponentialRampToValueAtTime(1650, now + 0.22);
+  filter.frequency.setValueAtTime(420 * pitch, now);
+  filter.frequency.exponentialRampToValueAtTime((1650 + normalized * 720) * pitch, now + 0.22);
 
   const gain = context.createGain();
   gain.gain.setValueAtTime(0.0001, now);
@@ -89,7 +130,7 @@ function playThreshold({ context, destination, multiplier }, stress) {
   for (const detune of [-7, 7]) {
     const oscillator = context.createOscillator();
     oscillator.type = "sawtooth";
-    oscillator.frequency.setValueAtTime(174.61, now);
+    oscillator.frequency.setValueAtTime(174.61 * pitch, now);
     oscillator.detune.setValueAtTime(detune, now);
     oscillator.connect(filter);
     oscillator.start(now);
@@ -97,7 +138,9 @@ function playThreshold({ context, destination, multiplier }, stress) {
   }
 }
 
-function playTouch({ context, destination, multiplier }, kind, stress) {
+function playTouch(runtime, kind, stress) {
+  const { context, multiplier } = runtime;
+  const destination = acquireLane(runtime, kind === "click" ? 0.18 : 0.12);
   const { pitch, bite } = stressTuning(stress);
   const now = context.currentTime;
   const peak = PEAK_GAIN[kind] * multiplier;

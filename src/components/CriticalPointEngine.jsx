@@ -75,12 +75,56 @@ function createShaker() {
 /** Peak travel in pixels at full trauma, and the tilt that rides with it. */
 const SHAKE_TRAVEL_PX = 14;
 const SHAKE_TILT_DEG = 0.55;
+const PARTICLE_LIFETIME_MS = 640;
+const PARTICLE_COLORS = {
+  choice: "217 255 98",
+  forecast: "86 182 255",
+  push: "255 138 112",
+  commit: "255 78 78",
+  cancel: "176 191 178",
+  toggle: "217 255 98",
+  threshold: "255 78 78",
+  default: "217 255 98",
+};
+
+function getEventPoint(event) {
+  if (Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY)) {
+    return { x: event.clientX, y: event.clientY };
+  }
+  const rect = event?.target?.getBoundingClientRect?.();
+  if (!rect) return { x: globalThis.innerWidth / 2, y: globalThis.innerHeight / 2 };
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+function spawnParticles({ container, x, y, kind = "default", stress = 0, count = 10 }) {
+  if (!container || typeof document === "undefined") return;
+  const color = PARTICLE_COLORS[kind] ?? PARTICLE_COLORS.default;
+  const pressure = Math.min(1, Math.max(0, stress / 100));
+  const burst = count + Math.round(pressure * 8);
+  for (let index = 0; index < burst; index += 1) {
+    const particle = document.createElement("i");
+    const angle = (Math.PI * 2 * index) / burst + Math.random() * 0.55;
+    const distance = 20 + Math.random() * (34 + pressure * 34);
+    const size = 3 + Math.random() * 4 + pressure * 2;
+    particle.className = "decision-particle";
+    particle.style.setProperty("--particle-x", `${x}px`);
+    particle.style.setProperty("--particle-y", `${y}px`);
+    particle.style.setProperty("--particle-dx", `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty("--particle-dy", `${Math.sin(angle) * distance}px`);
+    particle.style.setProperty("--particle-size", `${size}px`);
+    particle.style.setProperty("--particle-color", color);
+    particle.style.setProperty("--particle-life", `${PARTICLE_LIFETIME_MS + Math.round(Math.random() * 180)}ms`);
+    container.append(particle);
+    window.setTimeout(() => particle.remove(), PARTICLE_LIFETIME_MS + 240);
+  }
+}
 
 export function CriticalPointEngine({ active }) {
   const pressure = usePressure();
   const pressureRef = useRef(pressure);
   const previousStress = useRef(pressure.stressLevel);
   const shaker = useRef(null);
+  const particleLayer = useRef(null);
 
   useEffect(() => {
     pressureRef.current = pressure;
@@ -179,6 +223,15 @@ export function CriticalPointEngine({ active }) {
       if (event.type === "pointerover") playJuiceCue("hover", stress);
       if (event.type === "click") {
         playJuiceCue("click", stress);
+        const { x, y } = getEventPoint(event);
+        spawnParticles({
+          container: particleLayer.current,
+          x,
+          y,
+          kind: target.dataset.juice,
+          stress,
+          count: target.dataset.juice === "push" || target.dataset.juice === "commit" ? 16 : 9,
+        });
         // Trauma instead of a class toggle. Re-triggering a CSS animation needs
         // a forced reflow (`void offsetWidth`) on every press; adding to the
         // shaker lands the same kick inside the frame loop that is already
@@ -212,6 +265,14 @@ export function CriticalPointEngine({ active }) {
     if (pressure.stressLevel >= glitchAt && previousStress.current < glitchAt) {
       playJuiceCue("threshold", pressure.stressLevel);
       shaker.current?.add(0.6);
+      spawnParticles({
+        container: particleLayer.current,
+        x: globalThis.innerWidth / 2,
+        y: Math.max(64, globalThis.innerHeight * 0.18),
+        kind: "threshold",
+        stress: pressure.stressLevel,
+        count: 24,
+      });
     }
     previousStress.current = pressure.stressLevel;
   }, [pressure.stressLevel, pressure.overdriveFloor]);
@@ -232,6 +293,7 @@ export function CriticalPointEngine({ active }) {
   // `:after` fell into. Both overlays hang off this element instead.
   return createPortal(
     <div className="decision-feedback-layer" aria-hidden="true">
+      <div ref={particleLayer} className="decision-particle-layer" />
       {pressure.combo > 0 && <span className="decision-combo">COMBO x{pressure.combo}</span>}
       {pressure.heat >= 1 && <span className="decision-heat">HEAT +{Math.round(pressure.heat)}</span>}
       {pressure.wallDebt > 0 && <span className="decision-debt">여유 -{pressure.wallDebt}</span>}

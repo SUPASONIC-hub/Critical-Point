@@ -30,6 +30,9 @@
 .decision-heat{padding:5px 7px;border:1px solid rgb(255 138 112/.5);background:rgb(45 30 28);color:var(--c-coral)}
 .decision-push{padding:5px 7px;border:1px solid rgb(217 255 98/.4);background:rgb(8 19 17);color:var(--c-acid);box-shadow:0 0 calc(var(--decision-stress,0) * 14px) rgb(217 255 98/.45)}
 .decision-feedback-layer:before{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opacity:var(--decision-vignette,0);background:radial-gradient(ellipse at center,transparent 42%,rgb(255 44 44/.55) 100%);transition:opacity .24s linear}
+.decision-particle-layer{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.decision-particle{position:absolute;left:0;top:0;width:var(--particle-size);height:var(--particle-size);border-radius:999px;background:rgb(var(--particle-color));box-shadow:0 0 18px rgb(var(--particle-color)/.8);transform:translate3d(var(--particle-x),var(--particle-y),0);animation:decision-particle-burst var(--particle-life) cubic-bezier(.12,.86,.22,1) forwards}
+.decision-particle::after{content:"";position:absolute;inset:34% -180%;background:linear-gradient(90deg,rgb(var(--particle-color)/.85),transparent);transform:rotate(18deg)}
 .game-shell.is-glitching .choice-question,.game-shell.is-glitching .decision-stress{animation:decision-glitch .28s steps(2,end) infinite}
 .game-shell.is-critical :is(.play-rail,.game-board){filter:saturate(1.25) contrast(1.08)}
 .game-shell.is-critical .decision-stress,.game-shell.is-critical .choice-question{animation:decision-glitch .16s steps(2,end) infinite}
@@ -39,7 +42,8 @@
 .game-shell.is-bust .choice-panel,.game-shell.is-bust~.commit-console{opacity:.35}
 @keyframes decision-glitch{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-1.5px,.5px,0) skewX(-1.5deg)}50%{transform:translate3d(1.5px,-.5px,0)}75%{transform:translate3d(-.5px,1px,0) skewX(1deg)}100%{transform:translate3d(0,0,0)}}
 @keyframes decision-bust{0%{transform:translate3d(0,0,0) scale(1)}20%{transform:translate3d(-9px,3px,0) scale(1.01)}45%{transform:translate3d(8px,-4px,0) scale(.995)}70%{transform:translate3d(-5px,2px,0)}100%{transform:translate3d(0,0,0) scale(1)}}
-@media(prefers-reduced-motion:reduce){.decision-feedback-layer:before{transition:none}.game-shell.is-bust :is(.play-rail,.game-board),.game-shell.is-glitching .choice-question,.game-shell.is-glitching .decision-stress,.game-shell.is-critical .decision-stress,.game-shell.is-critical .choice-question{animation:none}}
+@keyframes decision-particle-burst{0%{opacity:0;transform:translate3d(var(--particle-x),var(--particle-y),0) scale(.35)}18%{opacity:1}100%{opacity:0;transform:translate3d(calc(var(--particle-x) + var(--particle-dx)),calc(var(--particle-y) + var(--particle-dy)),0) scale(.05)}}
+@media(prefers-reduced-motion:reduce){.decision-feedback-layer:before{transition:none}.decision-particle{display:none}.game-shell.is-bust :is(.play-rail,.game-board),.game-shell.is-glitching .choice-question,.game-shell.is-glitching .decision-stress,.game-shell.is-critical .decision-stress,.game-shell.is-critical .choice-question{animation:none}}
 
 /* The two readouts the player actually stares at, wired to the same pressure.
    The rail reacts through --decision-stress alone: it inherits from .game-shell,
