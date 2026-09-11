@@ -9,6 +9,8 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   // apart because the tick recomputes its own term from scratch every second:
   // folded into one number, every press was overwritten within 999ms and the
   // one deliberate act in the loop had a sub-second half-life.
+  criticalFloor: 88,
+  overdriveFloor: 77,
   clockStress: 0,
   heldGauge: 0,
   windowIndex: 0,
@@ -266,8 +268,25 @@ const DECISION_WINDOW_SECONDS = 45;
 const DEATH_CURVE_K = 0.15;
 const DEATH_CURVE_SPAN = Math.exp(DEATH_CURVE_K * DECISION_WINDOW_SECONDS) - 1;
 const COMBO_BACKLASH_K = 1.5;
-const CRITICAL_FLOOR = 90;
-const OVERDRIVE_FLOOR = 78;
+/**
+ * The warning lights, expressed against the wall rather than against 100.
+ *
+ * They were constants -- CRITICAL at 90, OVERDRIVE at 78 -- while the wall is
+ * drawn in 80..96 and walks down 8 a reboot to a floor of 52. So from one reboot
+ * on, 100% of windows had their wall below the OVERDRIVE band: the gauge read
+ * `BUILDING` and `61%` and then the run ended. The player could not feel it
+ * coming because nothing on screen was wired to the thing that was coming.
+ */
+const CRITICAL_RATIO = 0.92;
+const OVERDRIVE_RATIO = 0.8;
+
+function criticalFloorFor(wall) {
+  return Math.round((Number(wall) || BUST_FLOOR_MAX) * CRITICAL_RATIO);
+}
+
+function overdriveFloorFor(wall) {
+  return Math.round((Number(wall) || BUST_FLOOR_MAX) * OVERDRIVE_RATIO);
+}
 const OVERTIME_BURN = 14;
 // The clock alone tops out just under bust: the last four points are always paid
 // by a combo you refused to cash or by overtime you chose to burn.
@@ -291,13 +310,15 @@ function readSeconds(event, fallback = DECISION_WINDOW_SECONDS) {
 }
 
 /** Every branch renders the same presentation payload from the same numbers. */
-function projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion }) {
+function projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion, bustFloor = BUST_FLOOR_MAX }) {
   const ratio = clamp(Number(stressLevel) || 0, 0, 100) / 100;
   return {
+    criticalFloor: criticalFloorFor(bustFloor),
+    overdriveFloor: overdriveFloorFor(bustFloor),
     rewardMultiplier: Number(((1 + Math.pow(ratio, 2) * 2.5) * permanentMultiplier).toFixed(2)),
     vignette: Number(Math.pow(ratio, 1.6).toFixed(3)),
     heartbeatBpm: Math.round(58 + ratio * 72 + Math.max(0, Number(combo) || 0) * 4),
-    overdrive: !busted && ratio * 100 >= OVERDRIVE_FLOOR,
+    overdrive: !busted && ratio * 100 >= overdriveFloorFor(bustFloor),
     shakeIntensity: busted ? 20 : slowMotion ? 8 : Math.round(ratio * 9),
   };
 }
@@ -330,6 +351,13 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         permanentMultiplier: carried,
         rewardMultiplier: carried,
         rebootCount,
+        // A streak is the one thing a window was supposed to inherit, and this
+        // branch spread the initial state over it -- so `combo` was 0 in every
+        // tick and every commit, `getComboBacklash` returned 0 forever,
+        // COMBO_BACKLASH_K was inert, the `heat` term in the burn was multiplied
+        // by zero, and the COMBO chip could only ever read x1. A reboot is still
+        // what breaks a streak; a new scene is not.
+        combo: rebooting ? 0 : Number(base.combo) || 0,
         banked: Number(base.banked) || 0,
         score: rebooting ? 0 : anchorScore,
         lastEvent: rebooting ? "REBOOT" : type,
@@ -357,9 +385,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const busted = rawStress >= wall || Boolean(base.isBlind);
       const stressLevel = base.isBlind ? base.stressLevel : clamp(Math.round(rawStress), 0, 100);
       const justBusted = busted && base.thresholdState !== "bust";
-      const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
+      const slowMotion = !busted && stressLevel >= criticalFloorFor(base.bustFloor) && seconds <= 1;
       const score = justBusted ? Math.floor(anchorScore * 0.5) : anchorScore;
-      const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted, slowMotion });
+      const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted, slowMotion });
       return {
         ...base,
         currentTicks,
@@ -369,7 +397,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         heat: Number(heat.toFixed(2)),
         stressLevel,
         combo: justBusted ? 0 : base.combo,
-        thresholdState: busted ? "bust" : stressLevel >= CRITICAL_FLOOR ? "critical" : stressLevel > 0 ? "building" : "idle",
+        thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : stressLevel > 0 ? "building" : "idle",
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : base.environmentMode,
         score,
         lastDelta: score - anchorScore,
@@ -400,8 +428,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const step = drawPushStep(`${base.rebootCount}:${base.windowIndex}:${pressCount}`);
       const heldGauge = clamp((Number(base.heldGauge) || 0) + step, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
-      const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
-      const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
+      const slowMotion = base.isSlowMotion && stressLevel >= criticalFloorFor(base.bustFloor);
+      const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
       return {
         ...base,
         stressLevel,
@@ -420,8 +448,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
     case "CHOICE_STAGED": {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + 2, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
-      const slowMotion = base.isSlowMotion && stressLevel >= CRITICAL_FLOOR;
-      const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
+      const slowMotion = base.isSlowMotion && stressLevel >= criticalFloorFor(base.bustFloor);
+      const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
       return {
         ...base,
         hiddenChoice: event.choiceId ?? null,
@@ -457,8 +485,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const stressLevel = clamp(Math.round(rawStress), 0, 100);
       const outcome = getPushYourLuckOutcome({ stressLevel, challengeMatch, bustFloor: Number(base.bustFloor) || 96 });
       const busted = rawStress >= 100 || outcome.busted || Boolean(base.isBlind);
-      const slowMotion = !busted && stressLevel >= CRITICAL_FLOOR && seconds <= 1;
-      const fx = projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion });
+      const slowMotion = !busted && stressLevel >= criticalFloorFor(base.bustFloor) && seconds <= 1;
+      const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo, permanentMultiplier, busted, slowMotion });
       // Price the commit off the gauge the player carried in, not the one left
       // after it vents. Cashing at 94% used to pay the post-vent multiplier,
       // which quietly made pushing your luck worth less than not pushing it.
@@ -477,7 +505,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         // the wall again and bust a player who had already been paid.
         heldGauge: 0,
         hiddenChoice: null,
-        thresholdState: busted ? "bust" : stressLevel >= CRITICAL_FLOOR ? "critical" : outcome.thresholdState,
+        thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
         score,
         banked: busted ? Number(base.banked) || 0 : (Number(base.banked) || 0) + payout,
@@ -494,7 +522,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
     case "CHOICE_CANCELLED": {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + 3, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
-      const fx = projectPressure({ stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion: false });
+      const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion: false });
       return { ...base, hiddenChoice: null, stressLevel, isSlowMotion: false, ...fx, lastDelta: 0, lastEvent: type };
     }
 
@@ -549,6 +577,8 @@ const PRESSURE_FIELDS = [
   "heartbeatBpm",
   "shakeIntensity",
   "overdrive",
+  "criticalFloor",
+  "overdriveFloor",
   "isSlowMotion",
   "isBlind",
   "lastDelta",

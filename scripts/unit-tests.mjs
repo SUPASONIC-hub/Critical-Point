@@ -677,3 +677,40 @@ test("the ledger reports the reboots the reducer actually granted", () => {
   assert.equal(ledger.permanentMultiplier, getPermanentMultiplier(2));
   assert.ok(ledger.permanentMultiplier > 1, "and the panel can finally say the buff exists");
 });
+
+test("the warning lights sit under the wall, wherever the wall has moved to", () => {
+  // They were constants -- CRITICAL at 90, OVERDRIVE at 78 -- while the wall is
+  // drawn in 80..96 and walks down 8 a reboot to 52. From one reboot on, 100% of
+  // windows had their wall below the OVERDRIVE band, so the gauge read BUILDING
+  // and 61% and then the run ended. A light wired above the thing it warns about
+  // does not merely fail to warn; it says safe.
+  let state = DYNAMICS_INITIAL_STATE;
+  for (let reboot = 0; reboot < 6; reboot++) {
+    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED", reboot: reboot > 0 });
+    const ticked = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
+    assert.ok(ticked.criticalFloor < state.bustFloor, `critical fires under a wall of ${state.bustFloor}`);
+    assert.ok(ticked.overdriveFloor < ticked.criticalFloor, "and overdrive fires under critical");
+  }
+});
+
+test("a streak survives the scene that earned it", () => {
+  // DECISION_STARTED spread the initial state over `combo`, so it was 0 in every
+  // tick and every commit: getComboBacklash returned 0 forever, COMBO_BACKLASH_K
+  // was inert, `heat` was multiplied by zero, and the COMBO chip could only read
+  // x1. A new scene is not what breaks a streak.
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  const combos = [];
+  for (let window = 0; window < 4; window++) {
+    state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
+    state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 20 });
+    combos.push(state.combo);
+    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+  }
+  assert.deepEqual(combos, [1, 2, 3, 4], "each matched window adds to the streak");
+  assert.ok(state.combo > 0, "and the next window opens still holding it");
+  // `heat` is derived per tick from the streak, so it is the first tick of the
+  // new window that prices what the streak borrowed.
+  const carried = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
+  assert.ok(carried.heat > 0, "so the backlash the streak borrowed against is real");
+  assert.ok(carried.stressLevel > 0, "and it rides into the next window as gauge");
+});

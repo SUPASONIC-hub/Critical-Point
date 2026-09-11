@@ -30,8 +30,15 @@ import { usePressure } from "../state/decisionDynamics.js";
  * is most of what this component allocates.
  */
 
-const CRITICAL_FLOOR = 90;
-const GLITCH_FLOOR = 80;
+/**
+ * The tone bands come from the reducer now, because they have to move with the
+ * wall. They were 90 and 80 here while the wall is drawn in 80..96 and walks
+ * down 8 a reboot to 52 -- so from one reboot on, every window in the game read
+ * BUILDING right up to the moment it ended. A warning light wired above the
+ * thing it is warning about is worse than no light: it actively says safe.
+ */
+const FALLBACK_CRITICAL = 88;
+const FALLBACK_GLITCH = 77;
 
 /**
  * Trauma, not a sine.
@@ -143,13 +150,15 @@ export function CriticalPointEngine({ active }) {
       write("--decision-lift", "lift", `${(y * SHAKE_TRAVEL_PX * 0.45).toFixed(2)}px`);
       write("--decision-tilt", "tilt", `${(x * SHAKE_TILT_DEG).toFixed(3)}deg`);
 
+      const criticalAt = state.criticalFloor ?? FALLBACK_CRITICAL;
+      const glitchAt = state.overdriveFloor ?? FALLBACK_GLITCH;
       const tone = state.isBlind
         ? "is-bust"
         : state.isSlowMotion
           ? "is-slowmo"
-          : stress >= CRITICAL_FLOOR
+          : stress >= criticalAt
             ? "is-critical"
-            : stress >= GLITCH_FLOOR
+            : stress >= glitchAt
               ? "is-glitching"
               : "";
       if (tone !== paintedTone) {
@@ -199,16 +208,17 @@ export function CriticalPointEngine({ active }) {
   }, [active]);
 
   useEffect(() => {
-    if (pressure.stressLevel >= GLITCH_FLOOR && previousStress.current < GLITCH_FLOOR) {
+    const glitchAt = pressure.overdriveFloor ?? FALLBACK_GLITCH;
+    if (pressure.stressLevel >= glitchAt && previousStress.current < glitchAt) {
       playJuiceCue("threshold", pressure.stressLevel);
       shaker.current?.add(0.6);
     }
     previousStress.current = pressure.stressLevel;
-  }, [pressure.stressLevel]);
+  }, [pressure.stressLevel, pressure.overdriveFloor]);
 
   const thresholdLabel = pressure.isBlind
     ? "BUST"
-    : pressure.stressLevel >= CRITICAL_FLOOR
+    : pressure.stressLevel >= (pressure.criticalFloor ?? FALLBACK_CRITICAL)
       ? "CRITICAL"
       : pressure.overdrive
         ? "OVERDRIVE"
