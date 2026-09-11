@@ -1,8 +1,9 @@
+import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 /**
- * Visual baseline coverage guardrail.
+ * Visual baseline coverage and freshness guardrail.
  *
  * `toHaveScreenshot` writes and reads `<name>{-project}-{platform}.png`, so a
  * baseline recorded on one platform is invisible to a run on another: Playwright
@@ -15,12 +16,15 @@ import path from "node:path";
  * the spec, the projects the npm script selects, and the platforms CI runs on --
  * and fails when a combination has no committed file. It also fails on a
  * baseline no screenshot call names any more, which is how a renamed test leaves
- * a stale PNG behind.
+ * a stale PNG behind, and -- further down -- on a CI baseline that a later commit
+ * re-recorded on one platform but not on this one.
  *
- * The Linux set was recorded on 2026-09-04 by the workflow's `update_baselines`
- * dispatch, from the same commit the Windows set was recorded on; the artifact
- * carried the Windows files back byte-identical, which is what proves the run
- * only added to them. This check joined `verify:static` at that point.
+ * The Linux set was first recorded on 2026-09-04 by the workflow's
+ * `update_baselines` dispatch, and this check joined `verify:static` then. It
+ * drifted anyway: by 2026-09-11 all six Linux baselines sat behind their Windows
+ * twins and the coverage loop still passed, so the visual job had been failing
+ * for a week with nothing upstream of it saying a word. That is the gap the
+ * freshness comparison at the bottom of this file closes.
  */
 
 const root = process.cwd();
@@ -130,6 +134,98 @@ for (const screenshot of screenshotNames) {
 for (const file of committed) {
   if (!expected.has(file)) {
     failures.push(`${path.relative(root, path.join(snapshotDir, file))} is not produced by any screenshot in ${specPath}.`);
+  }
+}
+
+/**
+ * Coverage is not freshness, and this directory can be fully covered while the
+ * comparison job still fails. The two platform sets are recorded by different
+ * hands: `win32` by whoever changed the UI, `linux` only by the workflow's
+ * `update_baselines` dispatch. So a commit that redraws a screen and re-records
+ * the Windows PNGs leaves the Linux PNGs describing the screen as it used to
+ * be, and the existence loop above waves it through -- which is exactly how the
+ * intro reached main with a Linux baseline several commits behind its Windows
+ * twin, and a green `verify:static` in front of a red visual job.
+ *
+ * Git history is the only evidence available here: the PNGs cannot be compared
+ * to each other (different renderers draw the same screen differently, which is
+ * the whole reason there are two sets) and cannot be compared to the source. So
+ * the rule is the weakest one that still holds: a CI baseline whose last commit
+ * is a *strict ancestor* of another platform's last commit for the same
+ * screenshot was left behind by that commit. Nothing here can catch a change
+ * that re-recorded neither platform -- that one is the comparison job's job.
+ */
+function git(...args) {
+  return execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+}
+
+let historyDepth = "full";
+try {
+  git("rev-parse", "--git-dir");
+  if (git("rev-parse", "--is-shallow-repository") === "true") historyDepth = "shallow";
+} catch {
+  historyDepth = "none";
+}
+
+if (historyDepth !== "full") {
+  // `actions/checkout` clones one commit deep unless told otherwise, and on a
+  // shallow clone every file's last commit is the tip: the comparison below
+  // would find no ancestors and report a clean bill of health it never earned.
+  // Saying so is the point -- a guardrail that quietly no-ops is worse than one
+  // that is absent, because the absent one is not on the checklist.
+  console.log(
+    `check:visual-baselines: freshness comparison skipped (git history is ${historyDepth} here). ` +
+      `Give the checkout \`fetch-depth: 0\` to run it.`,
+  );
+} else {
+  // A baseline being re-recorded right now is not stale, whatever its last
+  // commit says. This is the state the repository is in between the dispatch
+  // landing its PNGs and the commit that carries them.
+  const dirty = new Set(
+    git("status", "--porcelain", "--", path.relative(root, snapshotDir))
+      .split("\n")
+      .map((line) => line.slice(3).trim().replace(/^"|"$/g, ""))
+      .filter(Boolean)
+      .map((relative) => path.basename(relative)),
+  );
+
+  const lastCommit = new Map();
+  const commitOf = (name) => {
+    if (!lastCommit.has(name)) {
+      lastCommit.set(name, git("log", "-1", "--format=%H", "--", path.join(snapshotDir, name)));
+    }
+    return lastCommit.get(name);
+  };
+
+  const isAncestor = (older, newer) => {
+    if (!older || !newer || older === newer) return false;
+    try {
+      git("merge-base", "--is-ancestor", older, newer);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  for (const screenshot of screenshotNames) {
+    for (const project of projects) {
+      const recorded = KNOWN_PLATFORMS.map((platform) => ({
+        platform,
+        name: baselineName(screenshot, project, platform),
+      })).filter(({ name }) => committed.has(name) && !dirty.has(name));
+
+      for (const { platform, name } of recorded) {
+        if (!CI_PLATFORMS.includes(platform)) continue;
+        const behind = recorded.find((other) => other.name !== name && isAncestor(commitOf(name), commitOf(other.name)));
+        if (!behind) continue;
+        failures.push(
+          `${path.relative(root, path.join(snapshotDir, name))} is stale: ` +
+            `${behind.name} was re-recorded in a later commit (${commitOf(behind.name).slice(0, 7)}) ` +
+            `than this one (${commitOf(name).slice(0, 7)}), so the ${platform} run is comparing against the old screen. ` +
+            `Re-record it with the Visual Regression workflow's \`update_baselines\` dispatch input.`,
+        );
+      }
+    }
   }
 }
 

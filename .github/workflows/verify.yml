@@ -13,7 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # `check:visual-baselines` reads the log of each baseline PNG to tell a
+      # stale one from a current one. The default one-commit clone makes every
+      # file look equally fresh, and the check skips rather than lie.
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       # Node comes from .node-version, which is also what the Render build
       # reads. CI used to say `node-version: 24` while that file said 22.16.0,
       # so every check ran on a major the deploy never built with.
