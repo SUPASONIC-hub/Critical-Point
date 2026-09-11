@@ -136,9 +136,12 @@ has to keep, and the commands that prove it. What changed and why is in
     the four choice ordinals are the visible half of each button's
     `aria-keyshortcuts`, not numbers about the case, so they carry
     `.choice-shortcut` and the scan skips them. The board is back to the two
-    standing numbers `GameHeader` promises -- which case, and how far in --
-    against a budget of 5. The budget was not the thing that was wrong, so it
-    did not move.
+    standing numbers `GameHeader` promises -- which case, and how far in -- and
+    the budget was ratcheted from 5 to exactly that pair. It had read 5 while the
+    real count was 10 and then 6, so it had never once failed on the drift it
+    exists to catch; the slack, not the screen, was what let `f66347e` through.
+    Lower it when a number leaves the board, never raise it: a number that wants
+    back on has to take the place of one of the two, or live in the rail.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most. Four lime fills on one screen is

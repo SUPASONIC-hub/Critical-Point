@@ -116,7 +116,19 @@ test("play screen keeps choices compact, readable, and free of exact pre-choice 
     }
     return found;
   });
-  expect(standingNumbers.length, standingNumbers.join(" / ")).toBeLessThanOrEqual(5);
+  // The scan finds two: `사건` and `5`, the pair GameHeader commits to in its own
+  // comment -- which case, and how far in. The budget is that pair and nothing
+  // else. It read 5 while the real count was 10, then 6, so it never once failed
+  // on the drift it was supposed to catch; slack in a budget is just a guard that
+  // has not started working yet. Lower it when a number leaves the board, never
+  // raise it -- a number that wants back on has to take the place of one of these
+  // two, or live in the rail with the rest of the state.
+  //
+  // Scene prose is inside `.game-board`, so a digit written into the copy counts
+  // here too. That is not a false alarm to be absorbed by slack: it means the
+  // scene is stating a figure the player is meant to weigh, and the question is
+  // whether it belongs on the card or in the rail.
+  expect(standingNumbers.length, standingNumbers.join(" / ")).toBeLessThanOrEqual(2);
 
   const transparentText = await page.evaluate(() => {
     const targets = Array.from(
