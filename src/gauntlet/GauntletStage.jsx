@@ -145,6 +145,7 @@ export function GauntletStage({
   });
   const cashMutations = describeMutations(cashSchema);
   const bustMutations = describeMutations(bustSchema);
+  const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 구간에 닿을 수 있다"
     : `벽 구간까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))} 열기`;
@@ -317,6 +318,10 @@ export function GauntletStage({
             </span>
             <span>
               <Vault size={13} aria-hidden="true" /> 금고 <b>{formatNumber(run.vault)}</b>
+            </span>
+            <span className="gx-run-signal" data-testid="gauntlet-run-signal">
+              런 <b>연승 {run.streak}</b> · BUST <b>{run.busts}</b> · 최고 <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
           </div>
           <div className={`gx-clock${remaining <= 10 ? " is-late" : ""}`} role="timer" aria-label={`남은 시간 ${Math.ceil(remaining)}초`}>

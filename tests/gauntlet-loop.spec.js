@@ -68,6 +68,7 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
 
 test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
   await openTable(page, "case01", "start");
+  await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
   // Bank something first, so there is a pot for the wall to take.
   await page.locator(".choices .choice").first().click();
   await page.getByTestId("commit-push").click();
@@ -98,6 +99,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("protocol-breach")).toContainText("BLACKOUT");
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-face-down/);
+  await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 1");
   await expect(page.getByTestId("gauntlet-gauge")).toHaveText("22");
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
