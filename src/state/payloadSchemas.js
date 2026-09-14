@@ -61,13 +61,16 @@ export function validateSavedStatePayload(state) {
         "schemaFlux",
         "consequenceStack",
         "fractureTurns",
+        "nextPushMinStress",
+        "nextPushMaxStress",
+        "nextPushBustChance",
         "rewardMultiplier",
         "heartbeatBpm",
         "shakeIntensity",
       ]) {
         if (typeof dynamics[key] !== "number" || !Number.isFinite(dynamics[key])) errors.push(`invalid dynamics.${key}`);
       }
-      for (const key of ["thresholdState", "environmentMode", "decisionPhase"]) {
+      for (const key of ["thresholdState", "environmentMode", "decisionPhase", "nextPushRisk"]) {
         if (typeof dynamics[key] !== "string") errors.push(`invalid dynamics.${key}`);
       }
       if (!("hiddenChoice" in dynamics)) errors.push("invalid dynamics.hiddenChoice");

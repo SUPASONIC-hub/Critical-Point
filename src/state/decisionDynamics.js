@@ -26,6 +26,10 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   // and nothing could undo it.
   wallDebt: 0,
   bustFloor: 96,
+  nextPushMinStress: 11,
+  nextPushMaxStress: 21,
+  nextPushBustChance: 0,
+  nextPushRisk: "safe",
   pressCount: 0,
   timeDecay: 0,
   hiddenChoice: null,
@@ -67,6 +71,9 @@ const NUMERIC_DYNAMICS_FIELDS = [
   "windowIndex",
   "wallDebt",
   "bustFloor",
+  "nextPushMinStress",
+  "nextPushMaxStress",
+  "nextPushBustChance",
   "pressCount",
   "timeDecay",
   "hiddenChoiceAge",
@@ -92,6 +99,7 @@ const BOOLEAN_DYNAMICS_FIELDS = ["isSlowMotion", "isBlind", "overdrive"];
 const ENVIRONMENT_MODES = new Set(["stable", "blackout", "reboot", "fracture"]);
 const THRESHOLD_STATES = new Set(["idle", "building", "critical", "bust"]);
 const DECISION_PHASES = new Set(["reading", "hovering", "locked", "pushing", "critical", "rupture", "cooldown"]);
+const PUSH_RISK_TIERS = new Set(["safe", "heated", "critical", "volatile", "fatal"]);
 
 export function normalizeDecisionDynamicsState(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return DYNAMICS_INITIAL_STATE;
@@ -112,6 +120,9 @@ export function normalizeDecisionDynamicsState(value) {
   next.windowIndex = Math.max(0, Math.trunc(next.windowIndex));
   next.wallDebt = clamp(Math.trunc(next.wallDebt), 0, MAX_WALL_DEBT);
   next.bustFloor = clamp(Math.round(next.bustFloor), BUST_FLOOR_FATAL, BUST_FLOOR_MAX);
+  next.nextPushMinStress = clamp(Math.round(next.nextPushMinStress), 0, 100);
+  next.nextPushMaxStress = clamp(Math.round(next.nextPushMaxStress), 0, 100);
+  next.nextPushBustChance = clamp(next.nextPushBustChance, 0, 1);
   next.pressCount = Math.max(0, Math.trunc(next.pressCount));
   next.timeDecay = clamp(next.timeDecay, 0, 1);
   next.hiddenChoiceAge = clamp(next.hiddenChoiceAge, 0, 180);
@@ -134,8 +145,9 @@ export function normalizeDecisionDynamicsState(value) {
   next.decisionPhase = DECISION_PHASES.has(value.decisionPhase) ? value.decisionPhase : DYNAMICS_INITIAL_STATE.decisionPhase;
   next.environmentMode = ENVIRONMENT_MODES.has(value.environmentMode) ? value.environmentMode : DYNAMICS_INITIAL_STATE.environmentMode;
   next.thresholdState = THRESHOLD_STATES.has(value.thresholdState) ? value.thresholdState : DYNAMICS_INITIAL_STATE.thresholdState;
+  next.nextPushRisk = PUSH_RISK_TIERS.has(value.nextPushRisk) ? value.nextPushRisk : DYNAMICS_INITIAL_STATE.nextPushRisk;
   next.lastEvent = typeof value.lastEvent === "string" ? value.lastEvent.slice(0, 48) : DYNAMICS_INITIAL_STATE.lastEvent;
-  return next;
+  return withPushForecast(next);
 }
 
 export function serializeDecisionDynamicsState(value) {
@@ -407,6 +419,38 @@ function criticalFloorFor(wall) {
 function overdriveFloorFor(wall) {
   return Math.max(1, Math.round((Number(wall) || BUST_FLOOR_MAX) - PUSH_STEP_MAX * 2));
 }
+
+function projectNextPush(state) {
+  const wall = Number(state?.bustFloor) || BUST_FLOOR_MAX;
+  const floor = (Number(state?.clockStress) || 0) + (Number(state?.heldGauge) || 0);
+  const minStress = clamp(Math.round(floor + PUSH_STEP_MIN), 0, 100);
+  const maxStress = clamp(Math.round(floor + PUSH_STEP_MAX), 0, 100);
+  const rawMax = floor + PUSH_STEP_MAX;
+  const span = PUSH_STEP_MAX - PUSH_STEP_MIN + 1;
+  const bustChance = state?.isBlind || minStress >= wall
+    ? 1
+    : clamp((rawMax - wall + 1) / span, 0, 1);
+  const nextPushRisk = state?.isBlind || minStress >= wall
+    ? "fatal"
+    : maxStress >= wall
+      ? "volatile"
+      : maxStress >= criticalFloorFor(wall)
+        ? "critical"
+        : maxStress >= overdriveFloorFor(wall)
+          ? "heated"
+          : "safe";
+
+  return {
+    nextPushMinStress: minStress,
+    nextPushMaxStress: maxStress,
+    nextPushBustChance: Number(bustChance.toFixed(2)),
+    nextPushRisk,
+  };
+}
+
+function withPushForecast(state) {
+  return { ...state, ...projectNextPush(state) };
+}
 const OVERTIME_BURN = 14;
 // The clock alone tops out just under bust: the last four points are always paid
 // by a combo you refused to cash or by overtime you chose to burn.
@@ -480,7 +524,7 @@ function projectPressure({ stressLevel, combo, permanentMultiplier, busted, slow
 export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {}) {
   const base = { ...DYNAMICS_INITIAL_STATE, ...state };
   const type = event?.type;
-  if (!type) return base;
+  if (!type) return withPushForecast(base);
 
   const permanentMultiplier = Number(base.permanentMultiplier) || 1;
   const incomingScore = Number(event.score);
@@ -507,7 +551,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const fractureTurns = carriedFlux >= 22 ? Math.max(1, Number(base.fractureTurns) || 0) : Math.max(0, (Number(base.fractureTurns) || 0) - 1);
       const schemaPenalty = Math.round(carriedFlux / 28);
       const bustFloor = drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`, wallDebt);
-      return {
+      return withPushForecast({
         ...DYNAMICS_INITIAL_STATE,
         windowIndex,
         wallDebt,
@@ -529,7 +573,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         banked: Number(base.banked) || 0,
         score: rebooting ? 0 : anchorScore,
         lastEvent: rebooting ? "REBOOT" : type,
-      };
+      });
     }
 
     case "DECISION_TICK": {
@@ -564,7 +608,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const slowMotion = !busted && stressLevel >= criticalFloorFor(base.bustFloor) && seconds <= 1;
       const score = justBusted ? Math.floor(anchorScore * 0.5) : anchorScore;
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted, slowMotion });
-      return {
+      return withPushForecast({
         ...base,
         currentTicks,
         clockStress,
@@ -595,7 +639,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...fx,
         permanentMultiplier,
         lastEvent: justBusted ? "BUST" : type,
-      };
+      });
     }
 
     /**
@@ -619,7 +663,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const slowMotion = base.isSlowMotion && stressLevel >= criticalFloorFor(base.bustFloor);
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
-      return {
+      return withPushForecast({
         ...base,
         stressLevel,
         heldGauge,
@@ -634,7 +678,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         shakeIntensity: Math.max(7, fx.shakeIntensity),
         lastDelta: stressLevel - base.stressLevel,
         lastEvent: type,
-      };
+      });
     }
 
     case "CHOICE_STAGED": {
@@ -642,7 +686,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const slowMotion = base.isSlowMotion && stressLevel >= criticalFloorFor(base.bustFloor);
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion });
-      return {
+      return withPushForecast({
         ...base,
         hiddenChoice: event.choiceId ?? null,
         hiddenChoiceAge: 0,
@@ -655,7 +699,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         shakeIntensity: Math.max(4, fx.shakeIntensity),
         lastDelta: 0,
         lastEvent: type,
-      };
+      });
     }
 
     case "CHOICE_COMMITTED": {
@@ -717,7 +761,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const fractureTurns = schemaFlux >= 55
         ? Math.min(6, Math.max(2, Number(base.fractureTurns) || 0) + 1)
         : Math.max(0, (Number(base.fractureTurns) || 0) - 1);
-      return {
+      return withPushForecast({
         ...base,
         combo: busted ? 0 : combo,
         cashedMultiplier,
@@ -749,14 +793,14 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         shakeIntensity: busted ? 20 : Math.max(fx.shakeIntensity, challengeMatch ? 6 : 10),
         permanentMultiplier,
         lastEvent: busted ? "BUST" : type,
-      };
+      });
     }
 
     case "CHOICE_CANCELLED": {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + 3, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion: false });
-      return {
+      return withPushForecast({
         ...base,
         hiddenChoice: null,
         hiddenChoiceAge: 0,
@@ -768,11 +812,11 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...fx,
         lastDelta: 0,
         lastEvent: type,
-      };
+      });
     }
 
     default:
-      return { ...base, lastEvent: type };
+      return withPushForecast({ ...base, lastEvent: type });
   }
 }
 
@@ -789,6 +833,10 @@ export function createDynamicsSummary(state) {
     schemaFlux: Number(state.schemaFlux.toFixed(2)),
     consequenceStack: state.consequenceStack,
     fractureTurns: state.fractureTurns,
+    nextPushMinStress: state.nextPushMinStress,
+    nextPushMaxStress: state.nextPushMaxStress,
+    nextPushBustChance: state.nextPushBustChance,
+    nextPushRisk: state.nextPushRisk,
     environmentMode: state.environmentMode,
     thresholdState: state.thresholdState,
     rewardMultiplier: state.rewardMultiplier,
@@ -844,6 +892,10 @@ const PRESSURE_FIELDS = [
   "schemaFlux",
   "consequenceStack",
   "fractureTurns",
+  "nextPushMinStress",
+  "nextPushMaxStress",
+  "nextPushBustChance",
+  "nextPushRisk",
 ];
 
 function projectSnapshot(state) {

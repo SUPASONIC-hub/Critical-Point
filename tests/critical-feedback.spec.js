@@ -9,11 +9,14 @@ test("critical feedback emits particles, stays mobile-safe, and persists dynamic
   await page.locator(".choices .choice").first().click();
   const console = page.locator(".commit-console");
   await expect(console).toBeVisible();
+  await expect(page.getByTestId("commit-push-risk")).toContainText("NEXT PUSH");
   const consoleBox = await console.boundingBox();
   expect(consoleBox).not.toBeNull();
   expect(consoleBox.y + consoleBox.height).toBeLessThanOrEqual(844 + 2);
 
   await page.getByTestId("commit-push").click();
+  await expect(page.getByTestId("commit-push")).toHaveAttribute("data-risk", /safe|heated|critical|volatile|fatal/);
+  await expect(page.getByTestId("commit-push-risk")).toContainText(/stress window/);
   await expect(page.locator(".decision-particle")).not.toHaveCount(0);
   await expect(page.locator(".decision-feedback-layer")).toBeVisible();
   await expect(page.locator(".decision-fracture")).toBeVisible();
@@ -40,6 +43,10 @@ test("critical feedback emits particles, stays mobile-safe, and persists dynamic
   const savedAfterPush = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(typeof savedAfterPush.dynamics.hiddenChoice).toBe("string");
   expect(typeof savedAfterPush.dynamics.decisionPhase).toBe("string");
+  expect(typeof savedAfterPush.dynamics.nextPushRisk).toBe("string");
+  expect(typeof savedAfterPush.dynamics.nextPushBustChance).toBe("number");
+  expect(typeof savedAfterPush.dynamics.nextPushMinStress).toBe("number");
+  expect(typeof savedAfterPush.dynamics.nextPushMaxStress).toBe("number");
   expect(typeof savedAfterPush.dynamics.thresholdState).toBe("string");
   expect(typeof savedAfterPush.dynamics.environmentMode).toBe("string");
   expect(savedAfterPush.dynamics.hiddenChoiceAge).toBeGreaterThanOrEqual(1);

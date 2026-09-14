@@ -487,6 +487,21 @@ test("pushing raises the gauge and the pot the player is holding", () => {
   assert.ok(twice.heartbeatBpm > started.heartbeatBpm, "and the window gets louder with it");
 });
 
+test("the next push forecast warns before the wall is crossed", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  assert.equal(state.nextPushRisk, "safe");
+  assert.equal(state.nextPushMinStress, 11);
+  assert.equal(state.nextPushMaxStress, 21);
+  assert.equal(state.nextPushBustChance, 0);
+
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
+  for (let press = 0; press < 3; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+
+  assert.ok(["heated", "critical", "volatile", "fatal"].includes(state.nextPushRisk), `forecast escalates to ${state.nextPushRisk}`);
+  assert.ok(state.nextPushMaxStress >= state.overdriveFloor, "the forecast points at the warning band before the click");
+  assert.ok(state.nextPushBustChance >= 0 && state.nextPushBustChance <= 1, "the wall-cross chance is stored as a stable ratio");
+});
+
 test("a push survives the next tick, which is the whole point of pressing it", () => {
   // The sequence that cannot happen in a test that presses consecutively, and is
   // the only sequence that happens in play: the clock ticks once per second, so

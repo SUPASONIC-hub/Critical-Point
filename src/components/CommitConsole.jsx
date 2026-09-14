@@ -77,6 +77,16 @@ export function CommitConsole({
   // gains, so the raw effect stops being the truth the moment the gauge climbs.
   const pushMultiplier = pressure.isBlind ? 1 : pressure.rewardMultiplier;
   const pushedEffect = applyRiskReward(pendingChoiceRead.finalEffect, pushMultiplier);
+  const pushRiskTone = pressure.nextPushRisk ?? "safe";
+  const pushRiskLabel = {
+    safe: "SAFE PUSH",
+    heated: "HEAT BUILDING",
+    critical: "EDGE OF WALL",
+    volatile: "BUST RANGE",
+    fatal: "WALL HIT",
+  }[pushRiskTone] ?? "READING WALL";
+  const pushBustChance = Math.round((Number(pressure.nextPushBustChance) || 0) * 100);
+  const pushForecastWidth = Math.min(100, Number(pressure.nextPushMaxStress) || 0);
 
   const console_ = (
     <section
@@ -148,6 +158,16 @@ export function CommitConsole({
               ))}
         </div>
       </details>
+      <div className={`commit-push-risk ${pushRiskTone}`} data-testid="commit-push-risk" aria-label={`next push ${pushRiskLabel}`}>
+        <span>NEXT PUSH</span>
+        <strong>{pushRiskLabel}</strong>
+        <i aria-hidden="true">
+          <b style={{ width: `${pushForecastWidth}%` }} />
+        </i>
+        <small>
+          {pressure.nextPushMinStress}-{pressure.nextPushMaxStress}% stress window / {pushBustChance}% wall-cross
+        </small>
+      </div>
       <div className="commit-console-actions">
         <button type="button" className="commit-cancel" data-juice="cancel" onClick={() => setPendingChoice(null)}>
           다시 고르기
@@ -167,6 +187,7 @@ export function CommitConsole({
           type="button"
           data-testid="commit-push"
           data-juice="push"
+          data-risk={pushRiskTone}
           className="commit-push"
           disabled={pressure.stressLevel >= 100 || pressure.isBlind}
           onClick={() => {
