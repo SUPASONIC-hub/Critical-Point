@@ -56,23 +56,27 @@ const fileBudgets = {
   // late-overrides block at the foot of the file, and every one of those pairs
   // collapsed into one rule. The line count went up, the number of places you
   // have to read to know what the intro computes to went down.
-  "base-intro-ranking.css": { lines: 2060, bytes: 48700 },
+  "base-intro-ranking.css": { lines: 2000, bytes: 47400 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
   // out of four of these files. Nothing changed on screen; the sheets stopped
   // describing surfaces that were deleted, in some cases two refactors ago.
-  "extensions.css": { lines: 2060, bytes: 44900 },
+  "extensions.css": { lines: 1410, bytes: 29200 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
   // for `.commit-push`, the control that raises the pot -- a surface that did not
   // exist before, because until then the only way to push your luck was to sit
   // still and let the clock do it.
-  "play.css": { lines: 3325, bytes: 74100 },
+  // All of play.css went on 2026-09-14 with the board it styled: 3320 lines
+  // became the header, the reveal and the report panels that other screens
+  // still render, plus the gauntlet table. Every file below was ratcheted to
+  // what the same prune left in it.
+  "play.css": { lines: 1321, bytes: 24541 },
   "recovery.css": { lines: 266, bytes: 5754 },
-  "responsive.css": { lines: 380, bytes: 8400 },
-  "result.css": { lines: 1380, bytes: 30400 },
+  "responsive.css": { lines: 260, bytes: 5700 },
+  "result.css": { lines: 1225, bytes: 25700 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

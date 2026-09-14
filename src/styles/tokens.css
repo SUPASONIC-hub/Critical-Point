@@ -166,6 +166,23 @@
   --c-acid-18: rgb(48 59 33);
   --c-acid-51: rgb(155 184 77);
 
+  /* The gauntlet table. Felt for the ground, heat for the wall, chip blue for
+     what a card pays, acid for the one control that banks it. */
+  --c-gx-felt: rgb(8 14 13);
+  --c-gx-felt-raised: rgb(17 28 25);
+  --c-gx-felt-card: rgb(24 38 34);
+  --c-gx-line: rgb(52 74 68);
+  --c-gx-text-dim: rgb(163 180 174);
+  --c-gx-heat: rgb(255 56 56);
+  --c-gx-heat-deep: rgb(120 16 20);
+  --c-gx-heat-a55: rgb(255 56 56 / 0.55);
+  --c-gx-heat-a18: rgb(255 56 56 / 0.18);
+  --c-gx-ember: rgb(255 142 76);
+  --c-gx-chip: rgb(104 196 255);
+  --c-gx-band: rgb(255 56 56 / 0.28);
+  --c-gx-next: rgb(255 206 115 / 0.55);
+  --c-gx-shade: rgb(0 0 0 / 0.72);
+
   /* semantic aliases referenced by components */
   --color-ink: var(--c-ink);
   --color-ink-deep: var(--c-ink-deep);

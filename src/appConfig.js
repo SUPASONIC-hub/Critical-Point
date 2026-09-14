@@ -176,6 +176,69 @@ export function writeStoredValue(key, value) {
   }
 }
 
+/**
+ * The save, written with a revision.
+ *
+ * Every write stamps `saveRevision` one past the highest revision anyone has
+ * written, and each tab remembers the last revision it read or wrote. A tab
+ * whose in-memory run is older than the save -- another tab settled a window,
+ * or this tab sat on the intro while one did -- would otherwise write that old
+ * run straight back over the newer one: a bust erased by switching tabs, and a
+ * window reopened with its wall already known. `force` is for writers that have
+ * just read the save themselves (the shell, recovery, a fresh run).
+ */
+let knownSaveRevision = null;
+
+export function readSaveRevision() {
+  try {
+    const parsed = JSON.parse(readStoredValue(STORAGE_KEY, "null"));
+    return Math.max(0, Math.trunc(Number(parsed?.saveRevision) || 0));
+  } catch {
+    return 0;
+  }
+}
+
+/** Call when this tab loads its run from the save: it now knows that revision. */
+export function adoptSaveRevision() {
+  knownSaveRevision = readSaveRevision();
+  return knownSaveRevision;
+}
+
+export function writeSaveState(payload, { force = false } = {}) {
+  const storedRevision = readSaveRevision();
+  if (knownSaveRevision === null) knownSaveRevision = storedRevision;
+  if (!force && storedRevision > knownSaveRevision) return { saved: false, stale: true, revision: storedRevision };
+  const revision = Math.max(storedRevision, knownSaveRevision) + 1;
+  const saved = writeStoredValue(STORAGE_KEY, JSON.stringify({ ...payload, saveRevision: revision }));
+  if (saved) knownSaveRevision = revision;
+  return { saved, stale: false, revision };
+}
+
+/**
+ * Windows that have already been settled, kept apart from the save. A save can
+ * be rolled back -- a recovery slot, an old snapshot -- and a rolled-back save
+ * names a window whose wall has been seen. The table deals that window again
+ * under a fresh draw instead of replaying it.
+ */
+export const SETTLED_WINDOWS_STORAGE_KEY = "critical-point-settled-windows-v1";
+const SETTLED_WINDOWS_LIMIT = 400;
+
+export function readSettledWindowSeeds() {
+  try {
+    const parsed = JSON.parse(readStoredValue(SETTLED_WINDOWS_STORAGE_KEY, "[]"));
+    return Array.isArray(parsed) ? parsed.filter((seed) => typeof seed === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function recordSettledWindowSeed(seed) {
+  if (typeof seed !== "string" || !seed) return false;
+  const seeds = readSettledWindowSeeds().filter((existing) => existing !== seed);
+  seeds.push(seed);
+  return writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(seeds.slice(-SETTLED_WINDOWS_LIMIT)));
+}
+
 export function removeStoredValue(key) {
   try {
     const storage = globalThis.localStorage;

@@ -3,12 +3,13 @@ import { useMemo } from "react";
 import {
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
+  adoptSaveRevision,
   appendSaveSlot,
   getInvalidSavedStateKeys,
   isSavedStateShapeValid,
   parseCurrentSavedState,
   readStoredValue,
-  writeStoredValue,
+  writeSaveState,
 } from "../appConfig.js";
 import {
   createReplaySavedState,
@@ -25,6 +26,7 @@ export function useRuntimeSavedState(initialStartState) {
   return useMemo(() => {
     const replay = createReplaySavedState(replaySeed);
     const rawSaved = readStoredValue(STORAGE_KEY, "null");
+    adoptSaveRevision();
     const hasStoredSave =
       Boolean(replay) ||
       Boolean(initialStartState) ||
@@ -45,7 +47,7 @@ export function useRuntimeSavedState(initialStartState) {
     }
     const resumed = repaired.started && repaired.paused ? { ...repaired, paused: false } : repaired;
     if (resumed !== parsed) {
-      writeStoredValue(STORAGE_KEY, JSON.stringify(resumed));
+      writeSaveState(resumed, { force: true });
       appendSaveSlot(resumed);
     }
     return resumed;

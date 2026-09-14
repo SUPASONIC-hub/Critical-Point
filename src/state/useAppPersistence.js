@@ -13,6 +13,7 @@ import {
   SAVE_SLOT_STORAGE_KEY,
   SAVE_STATE_KEYS,
   STORAGE_KEY,
+  writeSaveState,
   writeStoredValue,
 } from "../appConfig.js";
 import {
@@ -37,7 +38,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setCompletedCases, setDiscoveredClues, setCaseResults, setPlaytestFeedback,
     setResources, setLog, setTriggers, setCognition, setProtocolUsed,
     setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
-    setHypothesisDecisions, setOpeningLegacy, setDecisionReveal, setPendingChoice,
+    setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
     setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
     setLocalErrorEntries, setSaveSlots,
@@ -45,9 +46,9 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
     makeEmptyScores, persistSuppressed, onSuppressSaves, formatSaveTime,
-    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics,
+    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave,
   } = config;
-  function persist(nextState) {
+  function persist(nextState, { force = false } = {}) {
     if (persistSuppressed()) return { storageSaved: false };
     const baseState = {
       saveSchemaVersion: SAVE_SCHEMA_VERSION,
@@ -92,7 +93,11 @@ export function useAppPersistence({ state, refs, setters, config }) {
       ...nextState,
     };
     const previousState = { started, currentCase, nodeId, completedCases };
-    const storageSaved = writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
+    const { saved: storageSaved, stale } = writeSaveState(payload, { force });
+    if (stale) {
+      onStaleSave?.();
+      return { ...payload, storageSaved: false, stale: true };
+    }
     if (storageSaved && shouldCaptureSaveSlot(previousState, payload)) appendSaveSlot(payload);
     if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
     return { ...payload, storageSaved };
@@ -110,10 +115,10 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
     setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
     resetDecisionDynamics?.();
-    setDecisionReveal(null); setPendingChoice(null); setLastRecoveredError(null);
+    setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setFreeText(""); setNodeId("start"); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {
@@ -179,7 +184,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
     if (!repaired || !isSavedStateShapeValid(repaired)) return;
     const nextState = normalizeSavedGameplayState({ ...repaired, paused: true, started: false, savedAt: new Date().toISOString() });
-    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(nextState))) {
+    if (!writeSaveState(nextState, { force: true }).saved) {
       recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
       setSaveStatus("Restore failed: browser storage is unavailable.");
       return;

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { cashStakedCard, dismissProtocolBreach } from "./helpers/gameFlow.js";
 
 /**
  * Guards against text the eye cannot read.
@@ -173,12 +174,12 @@ test("intro and scene text stays readable against its panel", async ({ page }) =
   }
 });
 
-test("the commit console and decision reveal stay readable", async ({ page }) => {
+test("the table and decision reveal stay readable", async ({ page }) => {
   await startAt(page, "case01", "start");
 
   await page.locator(".choices .choice").first().evaluate((button) => button.click());
-  await page.waitForSelector(".commit-console");
-  expect(await collect(page), "commit console").toEqual([]);
+  await page.waitForSelector(".gx-card.selected");
+  expect(await collect(page), "gauntlet table").toEqual([]);
 
   await page.getByTestId("commit-confirm").evaluate((button) => button.click());
   await page.waitForSelector("[data-testid='decision-next']");
@@ -192,10 +193,10 @@ test("the report and ending sequence stay readable", async ({ page }) => {
   for (let step = 0; step < 8; step += 1) {
     if (await page.locator(".result-page, .ending-sequence").first().isVisible().catch(() => false)) break;
     if (!(await page.locator(".choices .choice").count())) break;
+    await dismissProtocolBreach(page);
     await page.locator(".choices .choice").first().evaluate((button) => button.click());
-    const commit = page.getByTestId("commit-confirm");
-    if (await commit.isVisible().catch(() => false)) await commit.evaluate((button) => button.click());
-    await page.waitForTimeout(300);
+    await cashStakedCard(page);
+    await page.waitForSelector("[data-testid='decision-next']", { timeout: 5_000 }).catch(() => {});
     await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
     await page.waitForTimeout(250);
   }

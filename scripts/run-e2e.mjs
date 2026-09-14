@@ -149,6 +149,7 @@ try {
                   "tests/accessibility.spec.js",
                   "tests/audio-preference.spec.js",
                   "tests/contrast.spec.js",
+                  "tests/gauntlet-loop.spec.js",
                   "tests/save-integrity.spec.js",
                   "tests/season-flow.spec.js",
                   // The layout ratchets in this file are measurements, not

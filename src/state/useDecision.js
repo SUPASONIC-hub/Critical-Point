@@ -1,27 +1,4 @@
 import { applyEffect, getDiscoveryClue, getFreeTextSignals, getRiskPressure } from "../gameLogic.js";
-import { createDecisionTargetLock } from "../viewModels/playChoiceViewModel.js";
-import { useState } from "react";
-import { resolveDecisionCommit, useDecisionDynamics } from "./decisionDynamics.js";
-
-export function useDecision({ active = true, initialDynamics = null } = {}) {
-  const [pendingChoice, setPendingChoice] = useState(null);
-  const [decisionReveal, setDecisionReveal] = useState(null);
-  const [decisionSeconds, setDecisionSeconds] = useState(45);
-  const { dynamics, dynamicsSummary, dispatchDynamics } = useDecisionDynamics({ active, initialState: initialDynamics });
-
-  return {
-    pendingChoice,
-    setPendingChoice,
-    decisionReveal,
-    setDecisionReveal,
-    decisionSeconds,
-    setDecisionSeconds,
-    dynamics,
-    dynamicsSummary,
-    dispatchDynamics,
-    resolveCommit: (input) => resolveDecisionCommit({ ...input, dynamics }),
-  };
-}
 
 /**
  * Builds the per-render readers that score a choice before it is committed:
@@ -188,25 +165,6 @@ export function createChoiceReaders({
     };
   }
 
-  /**
-   * The read for the choice that is staged in the commit console. It is the
-   * effective read plus the target lock, because the lock needs the clue reveal
-   * the console never sees -- keeping them together is what lets the runtime
-   * hand the console one value instead of two.
-   */
-  function getPendingChoiceRead(choice, responseTimeSec) {
-    const read = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
-    return {
-      ...read,
-      targetLock: createDecisionTargetLock({
-        pendingChoiceRead: read,
-        sceneChallenge,
-        currentChallengeStreak,
-        hiddenEvidenceCandidate: getClueReveal(read.challengeMatch, read.finalRiskDelta, responseTimeSec),
-      }),
-    };
-  }
-
   return {
     getChallengeMatch,
     getTacticalRead,
@@ -214,6 +172,5 @@ export function createChoiceReaders({
     getFlowSurge,
     getClueReveal,
     getEffectiveChoiceRead,
-    getPendingChoiceRead,
   };
 }

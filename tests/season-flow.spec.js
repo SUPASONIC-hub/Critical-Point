@@ -9,6 +9,8 @@ import {
   resumeSavedRun,
   startFirstRun,
   startDebugNode as startDebugNodeFromHelper,
+  cashStakedCard,
+  dismissProtocolBreach,
 } from "./helpers/gameFlow.js";
 
 async function startDebugNode(page, caseId, nodeId) {
@@ -73,110 +75,44 @@ test("case flow has no unhandled browser runtime errors", async ({ page }) => {
   expect(runtimeErrors).toEqual([]);
 });
 
-test("play screen keeps choices compact, readable, and free of exact pre-choice forecasts", async ({ page }) => {
+test("the table shows the bet on every card and never a forecast of the next push", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
 
   await expect(page.locator(".game-shell")).toBeVisible();
-  await expect(page.locator(".decision-forecast")).toHaveCount(0);
-  await expect(page.locator(".choice-tradeoff, .choice-risk, .choice-impact, .choice-cognition")).toHaveCount(0);
+  await expect(page.locator(".decision-forecast, .commit-console, .record-room, .tactical-toggle")).toHaveCount(0);
 
-  // Five top-level blocks: the context drawer, the resource rail, the operator
-  // brief drawer, the scene and the choice panel. The rail is the one place the
-  // standing numbers are allowed to live, which is why the scan below skips it.
-  //
-  // It also skips `.choice-shortcut`, the 1-4 legend on the decision cards. Those
-  // digits say which key presses a choice -- they are the visible half of each
-  // button's `aria-keyshortcuts`, not something the player has to read and weigh.
-  // Counting them held this test red from `f66347e` onward, which is a guard
-  // measuring the wrong thing rather than a screen that got busier.
-  const gameBoardBlockCount = await page.evaluate(() =>
-    document.querySelectorAll(".game-board > section, .game-board > div, .game-board > details").length,
-  );
-  expect(gameBoardBlockCount).toBeLessThanOrEqual(5);
+  // A card says what it pays and what it burns, and nothing else. The chips and
+  // the burn are the bet; a temptation, an observer preview or a risk grade on
+  // top of them is the board this table replaced.
+  const cards = page.locator(".choices .choice:not(.gx-card-wild)");
+  const count = await cards.count();
+  expect(count).toBeGreaterThan(1);
+  for (let index = 0; index < count; index += 1) {
+    await expect(cards.nth(index).locator(".gx-card-chips")).toHaveText(/^\+\d+$/);
+    await expect(cards.nth(index).locator(".gx-card-burn")).not.toBeEmpty();
+  }
 
-  const standingNumbers = await page.evaluate(() => {
-    const found = [];
-    for (const element of document.querySelectorAll(".game-board *")) {
-      if (element.closest("details:not([open])")) continue;
-      if (
-        element.closest(
-          "[aria-disabled='true'], .chapter-dashboard, .chapter-console, .chapter-rail, .authority-action, .resource-rail, .choice-shortcut",
-        )
-      )
-        continue;
-      const style = getComputedStyle(element);
-      if (style.display === "none" || style.visibility === "hidden") continue;
-      const own = Array.from(element.childNodes)
-        .filter((node) => node.nodeType === 3)
-        .map((node) => node.textContent.trim())
-        .join(" ")
-        .trim();
-      if (own && /\d/.test(own)) found.push(own.slice(0, 40));
-    }
-    return found;
-  });
-  // The scan finds two: `사건` and `5`, the pair GameHeader commits to in its own
-  // comment -- which case, and how far in. The budget is that pair and nothing
-  // else. It read 5 while the real count was 10, then 6, so it never once failed
-  // on the drift it was supposed to catch; slack in a budget is just a guard that
-  // has not started working yet. Lower it when a number leaves the board, never
-  // raise it -- a number that wants back on has to take the place of one of these
-  // two, or live in the rail with the rest of the state.
-  //
-  // Scene prose is inside `.game-board`, so a digit written into the copy counts
-  // here too. That is not a false alarm to be absorbed by slack: it means the
-  // scene is stating a figure the player is meant to weigh, and the question is
-  // whether it belongs on the card or in the rail.
-  expect(standingNumbers.length, standingNumbers.join(" / ")).toBeLessThanOrEqual(2);
+  // The odds of the next push are the one number the table must not print: the
+  // band is drawn, the wall is not, and the heartbeat is the only instrument.
+  const tableText = await page.getByTestId("gauntlet-stage").innerText();
+  expect(tableText).not.toMatch(/%/);
+  expect(tableText).toMatch(/벽 \d+–\d+/);
 
-  const transparentText = await page.evaluate(() => {
-    const targets = Array.from(
-      document.querySelectorAll(
-        ".game-shell, .game-board, .choice-panel, .choices, .choice, .status-board, .decision-dock, .scene",
-      ),
-    );
-    return targets
+  const transparentText = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".game-shell, .gauntlet-stage, .gx-hud, .choices, .choice, .gx-actions button"))
       .filter((element) => {
         const text = element.textContent?.trim();
         if (!text) return false;
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
-        return (
-          rect.width > 0 &&
-          rect.height > 0 &&
-          style.display !== "none" &&
-          style.visibility !== "hidden" &&
-          (style.color === "transparent" || style.color === "rgba(0, 0, 0, 0)")
-        );
+        return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden" &&
+          (style.color === "transparent" || style.color === "rgba(0, 0, 0, 0)");
       })
       .map((element) => element.className || element.tagName)
-      .slice(0, 5);
-  });
+      .slice(0, 5),
+  );
   expect(transparentText).toEqual([]);
-
-  // Priority 29 puts the deltas, the observer preview and the risk hint behind
-  // `전술 정보`. Closed, that means no exact number reaches the card at all --
-  // the screen's promise is that the scene is enough to judge on.
-  const closedChoiceText = await page.locator(".choices").innerText();
-  expect(closedChoiceText).not.toMatch(/[+-]\d/);
-
-  const detailsToggle = page.locator(".tactical-toggle");
-  if (await detailsToggle.isVisible().catch(() => false)) {
-    await detailsToggle.click();
-  }
-
-  await expect(page.locator(".decision-forecast")).toHaveCount(0);
-  await expect(page.locator(".choice-tactical").first()).toBeVisible();
-
-  // Open, `· 위험 +N` is the one number priority 29 hands over, so the closed
-  // scan cannot simply repeat -- asking for that number is what the gate is for.
-  // Everything else stays banned: the A/B/C labelling the cards dropped, a
-  // forecast panel in front of the choice, and any other signed figure, which is
-  // why the risk hint is subtracted by name rather than the check being relaxed.
-  const openedChoiceText = await page.locator(".choices").innerText();
-  expect(openedChoiceText).not.toMatch(/\b[ABC]\b/);
-  expect(openedChoiceText.replace(/위험 [+-]\d+/g, ""), openedChoiceText).not.toMatch(/[+-]\d/);
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
@@ -315,18 +251,18 @@ test("representative branch choices advance without browser runtime errors", asy
     await startDebugNode(page, caseId, nodeId);
     await expect(page.locator(".game-shell")).toBeVisible();
 
+    await dismissProtocolBreach(page);
     if (choice.type === "free") {
+      await page.locator(".gx-card-wild").evaluate((button) => button.click());
       await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고, 원본 자료를 확인한 뒤 위험을 공개한다.");
-      await page.locator(".submit-reframe").evaluate((button) => button.click());
+      await cashStakedCard(page);
     } else {
       const fixedChoiceIndex = scene.choices
         .slice(0, choiceIndex + 1)
         .filter((candidate) => candidate.type !== "free").length - 1;
       await page.locator(".choices .choice").nth(fixedChoiceIndex).evaluate((button) => button.click());
-      // The commit console, not the dock: the dock is desktop-only now that the
-      // console is fixed to the viewport on a phone.
-      await expect(page.locator(".commit-console")).toBeVisible();
-      await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+      await expect(page.locator(".gx-card.selected")).toBeVisible();
+      await cashStakedCard(page);
     }
 
     await expect(page.getByTestId("decision-next")).toBeVisible();
@@ -350,14 +286,12 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
   await page.locator(".choices .choice").first().click();
+  await expect(page.locator(".gx-card.selected")).toBeVisible();
 
-  const targetLock = page.getByTestId("commit-target-lock");
-  await expect(targetLock).toBeVisible();
-  await expect(targetLock.locator(".commit-target-lock-row")).toHaveCount(3);
-  await expect(targetLock).toContainText("목표");
-  await expect(targetLock).toContainText("연속");
-  await expect(targetLock).toContainText("증거");
-  expect(await targetLock.innerText()).not.toMatch(/[+-]\d/);
+  const pushButton = page.getByTestId("commit-push");
+  const pushBox = await pushButton.boundingBox();
+  expect(pushBox).not.toBeNull();
+  expect(pushBox.y + pushBox.height).toBeLessThanOrEqual(page.viewportSize().height + 2);
 
   const commitButton = page.getByTestId("commit-confirm");
   await expect(commitButton).toBeVisible();
@@ -385,8 +319,9 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
 test("a successful free-text plan enters the case's hidden route", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case01", "payday");
+  await page.locator(".gx-card-wild").click();
   await page.locator(".reframe-box textarea").fill("직원과 고객의 조건을 공개하고 근거 로그와 위험 비용을 함께 검토한다");
-  await page.locator(".submit-reframe").click();
+  await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
   await page.getByTestId("decision-next").click({ force: true });
   await expect

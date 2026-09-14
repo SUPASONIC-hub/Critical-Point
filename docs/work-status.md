@@ -67,9 +67,11 @@ list of the files it touched.
     to gains only, or it starts inventing dominations that `check:balance` was
     written to catch. Read `npm run check:endings` afterwards -- bigger gains
     end seasons higher and thin out the endings that need a run to go badly.
-14. Keep per-second state out of the root. The decision countdown is an external
-    store (`src/state/decisionClock.js`) precisely because root state rebuilt the
-    whole play view once a second.
+14. Keep per-second state out of the root. A live decision window -- gauge,
+    clock, pushes, staked card -- is `useGauntletWindow` state inside the
+    stage, keyed by the window's seed, and the frame loop in `GauntletFx`
+    writes CSS variables rather than React state. The runtime only hears about
+    a window when it closes, through `resolveGauntlet`.
 15. Ship art at the width it is painted at. `src/responsiveArt.js` lists the
     images that have 480px and 960px variants and builds the `srcset` for them;
     `npm run check:art` fails when a variant is missing or has crept back up
@@ -118,35 +120,26 @@ list of the files it touched.
     someone who had muted. A cue that can only fire mid-run may bail when the
     shared `AudioContext` is missing; one that can fire on the first click has
     to build it inside the gesture instead.
-27. One decision, one screen. `PlayScreen.jsx` renders the scene, the clock,
-    the three standing resources and the choices; everything else belongs in
-    `RecordRoom.jsx`, behind one door. The phone budget in
-    `visual-regression.spec.js` is the ratchet -- the screen was 3,953px for one
-    of forty-two decisions before this rule existed. A new panel in front of the
-    choice is the change this rule exists to stop.
+27. One decision, one screen, with nothing scrolled. `PlayScreen.jsx` renders
+    the header and `GauntletStage`, and the stage renders the pot, the gauge,
+    one question, the hand and the two verbs. On a 390x844 phone all of it fits
+    the viewport; `visual-regression.spec.js` and `gauntlet-loop.spec.js` hold
+    that. The old board reached 3,953px for one of forty-two decisions and put a
+    record room, a commit console and a tactical drawer in front of the choice;
+    a new panel in front of the table is the change this rule exists to stop.
 28. The report is three acts. The ending, the rank and the next case are the
     first screen; `왜 이렇게 됐나` answers with three cards; everything else is
     inside `.report-archive`. It reached 10,616px on a phone -- twelve and a half
     screens as the reward for finishing -- by growing one named region at a time.
-29. Numbers stay behind `전술 정보`. The choice cards print the qualitative
-    trade-off; the resource deltas, the observer preview and the risk hint are
-    all gated on `showTacticalDetails`, because the screen promises the player
-    can judge on the scene first and the chips used to render regardless. The
-    risk hint went back behind the gate on 2026-09-10; it had been printing on
-    every card. Closed, a card carries no exact number at all; open, `· 위험 +N`
-    is the one figure the gate hands over, and season-flow asks for exactly that
-    -- it subtracts the risk hint by name rather than dropping the check, so any
-    other signed number appearing behind the gate still fails.
-    Settled on 2026-09-11, after the scan had held the test red since `f66347e`:
-    the four choice ordinals are the visible half of each button's
-    `aria-keyshortcuts`, not numbers about the case, so they carry
-    `.choice-shortcut` and the scan skips them. The board is back to the two
-    standing numbers `GameHeader` promises -- which case, and how far in -- and
-    the budget was ratcheted from 5 to exactly that pair. It had read 5 while the
-    real count was 10 and then 6, so it had never once failed on the drift it
-    exists to catch; the slack, not the screen, was what let `f66347e` through.
-    Lower it when a number leaves the board, never raise it: a number that wants
-    back on has to take the place of one of the two, or live in the rail.
+29. The table prints the bet and never the odds. A card shows its chips and the
+    axis it burns; the HUD shows the pot, the multiplier, the gauge and the band
+    the wall is drawn from. Nothing shows where the wall is inside that band or
+    the chance that the next push crosses it: the previous board printed an exact
+    bust percentage, and the best strategy became "press until it is not 0%".
+    The heartbeat is the one instrument pointed at the wall, and it reads a
+    seeded error of up to `TELL_ERROR`. `npm run check:pressure` is the ratchet:
+    the best heartbeat policy has to beat every blind one and stay under 60% of
+    what a player who could see the wall banks.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most. Four lime fills on one screen is
@@ -154,14 +147,23 @@ list of the files it touched.
 31. A phase is player copy. `node.phase` prints on the scene chip and in the
     mission strip, so it names a story beat -- never the function that generated
     the node. "CONNECTIVE SCENE" shipped for weeks.
-32. A roguelike buff the player cannot see is not a buff. The reducer banks
-    reboots, the permanent multiplier they buy and the resources the push
-    multiplier added; `PressureLedger` is where all three are read, mounted in
-    the record room mid-run and in `.report-archive` after it. It is rebuilt
-    from the decision log, never from reducer state -- the log survives a reload
-    and the reducer does not, so a ledger read off state would zero itself on a
-    resumed run. This is the decision the `ResultScreen` budget move (975 -> 977
-    lines, 13 -> 14 imports) was made for.
+32. Every decision breaks the next board in a way the player can read. A bust
+    wipes the case pot, strips the card's gains and deals BLACKOUT (cards face
+    down, the wall closer) and AFTERSHOCK (the gauge starts hot); a timeout adds
+    SILENCE (no heartbeat, 30s). Cashing hot deals HEAT DEBT, cashing without a
+    push deals COLD FEET (the richest card sealed until the gauge reaches 30),
+    two hot cashes in a row deal OVERCLOCK, and the axis a card burned hardest is
+    FRACTURED. The rules live in `buildNextSchema`; the protocol breach banner
+    names them as the window opens and the reveal names them before the player
+    walks into them. A mutation that changes a number on a report and not a rule
+    on the table does not belong in that list.
+33. A sealed card must be openable without busting on any board that did not
+    just bust: `SEAL_BREAK_GAUGE - 1 + stepMax < wallMin`. The e2e helpers push
+    until cash enables and rely on it; a unit test asserts it for every
+    non-bust schema.
+34. The run's table record is rebuilt from the decision log (`createGauntletLedger`),
+    never from live state, so a resumed save and a live run agree. The vault is
+    carried in each case summary as `gauntlet`.
 
 ## Verification Commands
 
@@ -170,9 +172,9 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` is nineteen checks: lint, CSS format, unit and smoke
+`npm run verify:static` is twenty checks: lint, CSS format, unit and smoke
 tests, encoding, text, CSS tokens, CSS structure, graph, dialogue, balance,
-endings, art, view contracts, constants, the runtime budget, the export
+the gauntlet loop simulation, endings, art, view contracts, constants, the runtime budget, the export
 schema, the test storage keys, the visual baselines and the Node pin. None of them needs a browser, which is what lets
 the deploy build run them.
 

@@ -44,19 +44,30 @@ const BUDGETS = {
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
   // reading the run's push record. The bet had been invisible to the ending for
   // six cycles: paired seasons at x1.00 and x3.50 flipped 0 of 1000 endings.
+  // 1300 -> 1310 when the ending started reading the vault (VAULT_SLACK).
   "src/gameLogic.js": {
-    lines: 1300,
+    lines: 1310,
     importedNames: 18,
     hooks: {},
   },
+  // GameRuntime read 2280 / 167 and PlayScreen 340 / 14 until 2026-09-14, when
+  // the gauntlet replaced the decision board. The commit console, the record
+  // room, the forecasts, the overtime bill and the reducer they all read went
+  // out together, and the play view went from 153 fields to 40.
+  // It moved back up 1800 -> 1830 in the second gauntlet cycle for the two
+  // handlers a critic's playtest proved missing: saving a touched window so a
+  // reload cannot undo a bust, and the blackout skip that lets a bust change
+  // the route instead of only the score.
+  // 1830 -> 1850 in the fourth cycle: the stale-save lock and the settled-window
+  // redeal, which close the last way a second tab could undo a bust.
   "src/GameRuntime.jsx": {
-    lines: 2280,
-    importedNames: 167,
+    lines: 1850,
+    importedNames: 148,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {
-    lines: 340,
-    importedNames: 14,
+    lines: 105,
+    importedNames: 3,
     hooks: {},
   },
   "src/screens/ResultScreen.jsx": {
@@ -68,8 +79,8 @@ const BUDGETS = {
 
 // One flat bag per screen is how the runtime hands a screen its data, and each
 // field is a value the runtime had to derive. The play screen's is the one that
-// grew: 153 fields across six groups.
-const VIEW_FIELD_BUDGETS = { intro: 82, play: 153, result: 112 };
+// grew, to 153 fields across six groups, before the gauntlet cut it to 40.
+const VIEW_FIELD_BUDGETS = { intro: 82, play: 44, result: 112 };
 
 function analyze(relative) {
   const source = readFileSync(path.join(root, relative), "utf8");

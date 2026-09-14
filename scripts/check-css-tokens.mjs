@@ -17,9 +17,14 @@ function readCssFiles(directory) {
 const styleFiles = [{ path: "src/styles/tokens.css", css: tokenCss }, ...readCssFiles("src/styles/app")];
 const allCss = styleFiles.map(({ css }) => css).join("\n");
 const failures = [];
+// Both moved on 2026-09-14 when the gauntlet replaced the old play board and
+// ~3,000 lines of its styles went with it: hex colours 233 -> 122 (budget
+// ratcheted 300 -> 130), var() uses 1,143 -> 728. The var() floor is a floor on
+// a sheet that got smaller, so it moved with the sheet; the ratio it protects
+// -- tokens over literals -- went from 4.9 to 6.0.
 const budgets = {
-  hardcodedHexColors: 300,
-  cssVariableUsages: 900,
+  hardcodedHexColors: 130,
+  cssVariableUsages: 700,
 };
 
 for (const [lineIndex, line] of tokenCss.split(/\r?\n/).entries()) {

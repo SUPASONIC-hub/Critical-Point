@@ -112,7 +112,7 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
 
   const beforeLock = await readProbe(page);
   await page.locator(".choices .choice").first().click();
-  await expect(page.getByTestId("commit-target-lock")).toBeVisible();
+  await expect(page.locator(".gx-card.selected")).toBeVisible();
 
   const afterLock = await readProbe(page);
   const expectedLockPeak = ACCENT_PEAK_GAIN * TARGET_LOCK_GAIN_RATIO * LOW_PRESET_MULTIPLIER;
@@ -139,11 +139,10 @@ test("muted player hears nothing when a decision is made", async ({ page }) => {
 
   // The cues on the decision window are the ones the mute toggle used to miss:
   // the juice layer opened a second AudioContext of its own and played through
-  // it, so `배경음 끄기` silenced the score and nothing else. Pressing a choice
-  // is the cheapest way to reach them -- `[data-juice]` is on the choice, the
-  // commit and the cancel alike.
+  // it, so `배경음 끄기` silenced the score and nothing else. Staking a card and
+  // cashing it reaches the table's cues: the heartbeat, the drone, the register.
   await page.locator(".choices .choice").first().click();
-  await expect(page.getByTestId("commit-target-lock")).toBeVisible();
+  await expect(page.locator(".gx-card.selected")).toBeVisible();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
 

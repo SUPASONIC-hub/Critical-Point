@@ -7,15 +7,29 @@ import {
   parseLocalRankingRows,
 } from "../src/state/useLocalRanking.js";
 import {
-  applyRiskReward,
-  createPressureLedger,
-  DYNAMICS_INITIAL_STATE,
-  getPermanentMultiplier,
-  drawBustFloor,
-  drawPushStep,
-  getPushYourLuckOutcome,
-  reduceDecisionDynamics,
-} from "../src/state/decisionDynamics.js";
+  applyGauntletEffect,
+  BASE_SCHEMA,
+  createGauntletLedger,
+  createWindow,
+  drawStep,
+  drawTellOffset,
+  drawWall,
+  getCardBurn,
+  getForcedCard,
+  getHeartbeatBpm,
+  getMultiplier,
+  getResourceMultiplier,
+  getSealedCardId,
+  normalizeRunState,
+  reduceWindow,
+  resolveWindow,
+  RUN_INITIAL_STATE,
+  SEAL_BREAK_GAUGE,
+  serializeRunState,
+  TELL_ERROR,
+  FRACTURE_MIN_BURN,
+  splitOpenSeed,
+} from "../src/gauntlet/gauntletEngine.js";
 import {
   createIntroView,
   createPlayView,
@@ -32,6 +46,10 @@ import { buildTelemetryPayload, getTelemetryStats, subscribeTelemetryStats } fro
 import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import {
+  adoptSaveRevision,
+  readSettledWindowSeeds,
+  recordSettledWindowSeed,
+  writeSaveState,
   createRecoverySnapshot,
   isSavedStateShapeValid,
   migrateSavedState,
@@ -86,7 +104,7 @@ test("a field nobody grouped should fail rather than ride along unread", () => {
 });
 test("play view should require resource ownership", () => {
   assert.throws(
-    () => createPlayView({ AdaptiveMusic() {}, renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", node: {}, fixedChoices: [], choose() {}, handleChoiceClick() {} }, {}),
+    () => createPlayView({ AdaptiveMusic() {}, renderDecisionReveal() {}, renderRecoveryNotice() {}, currentCase: "case01", node: {}, fixedChoices: [], resolveGauntlet() {} }, {}),
     /resources/,
     "play view should require resource ownership",
   );
@@ -100,10 +118,17 @@ test("result view should require transition actions", () => {
 });
 
 const playScreenSource = readFileSync("src/screens/PlayScreen.jsx", "utf8");
-test("fixed choices should use CommitConsole as the only confirmation surface", () => {
-  assert.match(playScreenSource, /<CommitConsole\b/, "the fixed-choice confirmation surface should remain CommitConsole");
-  assert.doesNotMatch(playScreenSource, /DecisionDock/, "the duplicate DecisionDock confirmation path should stay out of PlayScreen");
-  assert.doesNotMatch(playScreenSource, /<\/h2>`n\s*<p className="choice-question">/, "the choice heading should not print a literal `n artifact");
+test("the play screen is the gauntlet table and nothing in front of it", () => {
+  assert.match(playScreenSource, /<GauntletStage\b/, "the table is the play screen");
+  assert.doesNotMatch(playScreenSource, /CommitConsole|RecordRoom|ChoiceList|FreeTextReframeBox/, "none of the old board's panels come back");
+});
+
+const gauntletStageSource = readFileSync("src/gauntlet/GauntletStage.jsx", "utf8");
+test("the table never prints the odds of the next push", () => {
+  // A bust probability on screen turns the bet into a lookup: press until the
+  // number is not zero. The band and the heartbeat are the only instruments.
+  assert.doesNotMatch(gauntletStageSource, /bustChance|probability|wall-cross|%\s*</i);
+  assert.match(gauntletStageSource, /win\.status === "bust" && win\.cause !== "abandon" && \(\s*<span className="gx-gauge-wall"/, "the wall is drawn only once it has been hit, never for an abandoned window");
 });
 
 const migrated = migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] });
@@ -408,497 +433,280 @@ test("decision target lock marks a choice that misses the scene objective", () =
   assert.equal(lock.evidence.value, "NO SIGNAL");
 });
 
-test("pressure ledger rebuilds the run's push record from the decision log", () => {
-  const ledger = createPressureLedger([
-    { threshold: { rewardMultiplier: 1, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 4, time: -3 } },
-    { threshold: { rewardMultiplier: 2, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 12, time: -3 } },
-    { threshold: { rewardMultiplier: 2.85, busted: true }, environmentMode: "blackout", riskRewardEffect: { trust: 17 } },
-    { threshold: { rewardMultiplier: 1.2, busted: false }, environmentMode: "reboot", riskRewardEffect: { trust: 6 } },
+const card = (id, effect, extra = {}) => ({ id, label: id, effect, next: "x", ...extra });
+const liveWindow = (overrides = {}) => ({ ...createWindow({ schema: BASE_SCHEMA, seed: "unit" }), ...overrides });
+
+test("every push is worth at least x1.5, and the pot compounds", () => {
+  for (let gauge = 0; gauge <= 90; gauge += 1) {
+    const ratio = getMultiplier(gauge + BASE_SCHEMA.stepMin) / getMultiplier(gauge);
+    assert.ok(ratio >= 1.5, `a minimum push from ${gauge} should multiply the pot by at least 1.5, got ${ratio.toFixed(3)}`);
+  }
+  assert.equal(getMultiplier(0), 1);
+  assert.ok(getMultiplier(60) > 40);
+  assert.ok(getMultiplier(84) >= 128, "the hot end of the gauge is where the money is");
+});
+
+test("the same seed deals the same wall, the same steps and the same tell", () => {
+  const a = createWindow({ schema: BASE_SCHEMA, seed: "run:3:accounting" });
+  const b = createWindow({ schema: BASE_SCHEMA, seed: "run:3:accounting" });
+  assert.equal(a.wall, b.wall);
+  assert.equal(a.tellOffset, b.tellOffset);
+  assert.equal(drawStep(BASE_SCHEMA, "run:3:accounting", 2), drawStep(BASE_SCHEMA, "run:3:accounting", 2));
+  const walls = new Set(Array.from({ length: 200 }, (_, index) => drawWall(BASE_SCHEMA, `seed-${index}`)));
+  assert.ok(walls.size > 20, "walls are spread across the band, not parked on one value");
+  for (const wall of walls) assert.ok(wall >= BASE_SCHEMA.wallMin && wall <= BASE_SCHEMA.wallMax);
+});
+
+test("the heartbeat is an instrument, not an answer key", () => {
+  for (let index = 0; index < 300; index += 1) {
+    const offset = drawTellOffset(`tell-${index}`);
+    assert.ok(Math.abs(offset) <= TELL_ERROR, "the tell errs by at most the declared amount");
+  }
+  const offsets = new Set(Array.from({ length: 300 }, (_, index) => drawTellOffset(`tell-${index}`)));
+  assert.ok(offsets.size > 8, "and it does err: the offset is not a constant the player can subtract");
+  assert.ok(getHeartbeatBpm(80, 86) >= 120, "a gauge six under the wall races past 120");
+  assert.ok(getHeartbeatBpm(10, 86) < 75, "a cold gauge is a resting pulse");
+  assert.equal(getHeartbeatBpm(40, 45, true), getHeartbeatBpm(40, 95, true), "SILENCE takes the wall out of the pulse completely");
+});
+
+test("pushing into the wall busts on the press, and the press is the player's", () => {
+  let win = liveWindow({ wall: 40, gauge: 30 });
+  win = reduceWindow(win, { type: "PUSH" });
+  assert.equal(win.status, "bust");
+  assert.equal(win.cause, "push");
+  assert.equal(reduceWindow(win, { type: "PUSH" }), win, "a closed window ignores further input");
+});
+
+test("the clock creeps heat in after the read, and running it out is a bust", () => {
+  let win = liveWindow({ wall: 90 });
+  win = reduceWindow(win, { type: "TICK", delta: 1 });
+  assert.equal(win.gauge, 0, "the first seconds are for reading");
+  for (let second = 0; second < 10; second += 1) win = reduceWindow(win, { type: "TICK", delta: 1 });
+  assert.ok(win.gauge > 0, "then waiting costs heat");
+  for (let second = 0; second < 60 && win.status === "live"; second += 1) win = reduceWindow(win, { type: "TICK", delta: 1 });
+  assert.equal(win.status, "bust");
+  assert.equal(win.cause, "timeout");
+});
+
+test("cashing needs a staked card and an open seal", () => {
+  let win = liveWindow();
+  assert.equal(reduceWindow(win, { type: "CASH" }).status, "live", "nothing staked, nothing cashed");
+  win = reduceWindow(win, { type: "SELECT", id: "a" });
+  assert.equal(reduceWindow(win, { type: "CASH", locked: true }).status, "live", "a sealed card cannot be cashed");
+  assert.equal(reduceWindow(win, { type: "CASH" }).status, "cashed");
+});
+
+test("a bust strips every gain, keeps every cost, and wipes the case pot", () => {
+  const layoff = card("layoff", { capital: 18, trust: -14, humanCost: 18 });
+  assert.deepEqual(applyGauntletEffect(layoff.effect, { outcome: "bust" }), { capital: 0, trust: -14, humanCost: 18 });
+  assert.deepEqual(applyGauntletEffect({ humanCost: -6, fatigue: 4 }, { outcome: "bust" }), { humanCost: 0, fatigue: 4 }, "a falling humanCost is a gain, and it goes too");
+  const hot = applyGauntletEffect(layoff.effect, { outcome: "cash", gauge: 80 });
+  assert.equal(hot.capital, Math.round(18 * getResourceMultiplier(80)), "heat multiplies what the card gains");
+  assert.equal(hot.trust, -14, "and never what it costs");
+
+  const run = normalizeRunState({ runPot: 4800, vault: 900 });
+  const { verdict, nextRun } = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 71, wall: 70, pushes: 5 }, card: layoff });
+  assert.equal(verdict.pot, 0);
+  assert.equal(verdict.lostPot, 4800);
+  assert.equal(nextRun.runPot, 0, "everything since the last vault is gone");
+  assert.equal(nextRun.vault, 900, "the vault is the one thing a wall cannot reach");
+  assert.equal(nextRun.busts, 1);
+});
+
+test("a bust breaks the next board: face down, closer wall, heat carried in", () => {
+  const { nextRun } = resolveWindow({
+    run: RUN_INITIAL_STATE,
+    window: { status: "bust", cause: "push", gauge: 80, wall: 78, pushes: 4 },
+    card: card("a", { capital: 10, trust: -12 }),
+  });
+  const schema = nextRun.schema;
+  assert.equal(schema.faceDown, true);
+  assert.equal(schema.wallMin, BASE_SCHEMA.wallMin - 6);
+  assert.equal(schema.startGauge, 22);
+  assert.equal(schema.fracturedAxis, "trust");
+  assert.deepEqual(schema.mutations, ["blackout", "aftershock", "fracture"]);
+  const next = createWindow({ schema, seed: "next" });
+  assert.equal(next.gauge, 22, "the next window opens hot");
+});
+
+test("running out the clock also takes the heartbeat and fifteen seconds", () => {
+  const { nextRun } = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "bust", cause: "timeout", gauge: 20, wall: 80 }, card: card("a", { time: -5 }) });
+  assert.equal(nextRun.schema.sedated, true);
+  assert.equal(nextRun.schema.seconds, 30);
+  assert.ok(nextRun.schema.mutations.includes("silence"));
+});
+
+test("greed carries heat, timidity seals the best card, a streak overclocks", () => {
+  const rich = card("rich", { capital: 30, trust: -5 });
+  const greedy = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "cashed", gauge: 66, wall: 80, pushes: 5 }, card: rich });
+  assert.equal(greedy.nextRun.schema.seconds, BASE_SCHEMA.seconds - 12);
+  assert.equal(greedy.nextRun.schema.startGauge, 22);
+  assert.ok(greedy.nextRun.schema.mutations.includes("heatDebt"));
+
+  const timid = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "cashed", gauge: 3, wall: 80, pushes: 0 }, card: rich });
+  assert.equal(timid.nextRun.schema.sealHighest, true);
+  const hand = [card("small", { trust: 2, time: -1 }), card("big", { capital: 25, trust: -3 })];
+  assert.equal(getSealedCardId(hand, timid.nextRun.schema), "big", "the richest card is the one the cold feet lock");
+
+  let run = RUN_INITIAL_STATE;
+  for (let window = 0; window < 2; window += 1) {
+    run = resolveWindow({ run, window: { status: "cashed", gauge: 30, wall: 80, pushes: 3 }, card: rich }).nextRun;
+  }
+  assert.equal(run.streak, 2);
+  assert.ok(run.schema.mutations.includes("overclock"));
+  assert.equal(run.schema.chipsScale, 2);
+});
+
+test("the axis a card burned hardest is billed half again on the next board", () => {
+  const { nextRun } = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "cashed", gauge: 20, pushes: 1 }, card: card("a", { capital: 8, legitimacy: -10 }) });
+  const hurts = card("b", { trust: 4, legitimacy: -8 });
+  assert.deepEqual(getCardBurn(hurts, nextRun.schema), { key: "legitimacy", value: -12, fractured: true });
+  assert.equal(applyGauntletEffect(hurts.effect, { outcome: "cash", gauge: 0, fracturedAxis: "legitimacy" }).legitimacy, -12);
+});
+
+test("closing a case moves the pot into the vault and reboots the rules", () => {
+  const run = normalizeRunState({ runPot: 1200, vault: 50, schema: { ...BASE_SCHEMA, faceDown: true, mutations: ["blackout"] } });
+  const { verdict, nextRun } = resolveWindow({ run, window: { status: "cashed", gauge: 24, pushes: 2 }, card: card("a", { capital: 10 }), caseClosed: true });
+  assert.equal(verdict.secured, 1200 + verdict.pot);
+  assert.equal(nextRun.vault, 50 + verdict.secured);
+  assert.equal(nextRun.runPot, 0);
+  assert.equal(nextRun.schema.faceDown, false);
+  assert.deepEqual(nextRun.schema.mutations, ["reboot"]);
+});
+
+test("a sealed card can always be opened without busting on a board that did not just bust", () => {
+  for (const window of [
+    { status: "cashed", gauge: 3, pushes: 0 },
+    { status: "cashed", gauge: 70, pushes: 6 },
+  ]) {
+    const { nextRun } = resolveWindow({ run: normalizeRunState({ streak: 5 }), window, card: card("a", { capital: 9, trust: -2 }) });
+    const { schema } = nextRun;
+    assert.ok(SEAL_BREAK_GAUGE - 1 + schema.stepMax < schema.wallMin, "one push from just under the seal cannot reach the lowest wall");
+  }
+});
+
+test("a window touched and left is settled as a bust when the table reopens", () => {
+  const abandoned = createWindow({ schema: BASE_SCHEMA, seed: "left", abandoned: true });
+  const fresh = createWindow({ schema: BASE_SCHEMA, seed: "left" });
+  assert.equal(abandoned.status, "bust");
+  assert.equal(abandoned.cause, "abandon");
+  assert.equal(abandoned.wall, fresh.wall, "it is the same window, not a new draw");
+  assert.equal(abandoned.gauge, fresh.gauge, "and the gauge does not jump to the wall, which would print it");
+  assert.deepEqual(splitOpenSeed("run:3:start#tab-a"), { seed: "run:3:start", token: "tab-a" });
+  assert.equal(normalizeRunState({ openCardId: "x" }).openCardId, null, "a staked card is only kept alongside the window it was staked in");
+  const { verdict, nextRun } = resolveWindow({ run: normalizeRunState({ runPot: 700, openSeed: "left" }), window: abandoned, card: card("a", { trust: -11 }) });
+  assert.equal(verdict.lostPot, 700, "leaving the table costs what busting costs");
+  assert.equal(nextRun.openSeed, null, "and settling it closes the seed");
+  assert.ok(nextRun.schema.mutations.includes("blackout"));
+});
+
+test("the pulse always races on a hot gauge or a late clock, whatever the tell says", () => {
+  assert.ok(getHeartbeatBpm(80, 140) >= 120, "heat 80 is at least 120 even with the tell pointing far away");
+  assert.ok(getHeartbeatBpm(80, 140, true) >= 120, "and SILENCE cannot flatten what the gauge already shows");
+  assert.ok(getHeartbeatBpm(0, 90, false, 0.95) > 100, "an idle window running out is not a resting pulse");
+  assert.equal(getHeartbeatBpm(0, 90, false, 0), 60);
+});
+
+test("a scratch is not a fracture", () => {
+  const scratch = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "cashed", gauge: 20, pushes: 1 }, card: card("a", { capital: 8, trust: -(FRACTURE_MIN_BURN - 1) }) });
+  assert.equal(scratch.nextRun.schema.fracturedAxis, null);
+  assert.ok(!scratch.nextRun.schema.mutations.includes("fracture"));
+});
+
+test("a vault big enough buys the ending the same slack as holding the line", () => {
+  const base = {
+    resources: { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 },
+    discoveredClues: [{ id: "c1" }, { id: "c2" }, { id: "c3" }],
+    seasonHumanCost: 20,
+    peakRiskPressure: 18,
+    seasonBusts: 3,
+    seasonBestMultiplier: 64,
+  };
+  assert.equal(getEndingVariant(base).id, "open-question", "busts close the held-the-line door");
+  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 9000 }).id, "open-question", "a vault any steady player fills does not");
+  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 17000 }).id, "open-oversight", "a vault only a reader of the table fills opens it anyway");
+});
+
+test("a tab whose run is older than the save cannot write it back", () => {
+  const store = new Map();
+  const previous = globalThis.localStorage;
+  globalThis.localStorage = {
+    getItem: (key) => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => store.set(key, String(value)),
+    removeItem: (key) => store.delete(key),
+  };
+  try {
+    // Tab A loads the run.
+    assert.equal(writeSaveState({ runId: "r", dynamics: { busts: 0 } }, { force: true }).saved, true);
+    adoptSaveRevision();
+    // Tab B, in the same storage, settles a bust on top of it.
+    const bRevision = JSON.parse(store.get("trigger-prototype-v2")).saveRevision + 1;
+    store.set("trigger-prototype-v2", JSON.stringify({ runId: "r", dynamics: { busts: 1 }, saveRevision: bRevision }));
+    // Tab A's old copy -- a pagehide, a resume from the intro -- is refused.
+    const stale = writeSaveState({ runId: "r", dynamics: { busts: 0 } });
+    assert.equal(stale.stale, true);
+    assert.equal(JSON.parse(store.get("trigger-prototype-v2")).dynamics.busts, 1, "the other tab's bust survives");
+    // After reloading from storage, A writes again.
+    adoptSaveRevision();
+    assert.equal(writeSaveState({ runId: "r", dynamics: { busts: 1 } }).saved, true);
+
+    recordSettledWindowSeed("r:0:start");
+    recordSettledWindowSeed("r:0:start");
+    assert.deepEqual(readSettledWindowSeeds(), ["r:0:start"], "a settled window is recorded once, outside the save");
+  } finally {
+    globalThis.localStorage = previous;
+  }
+});
+
+test("the forced card is the one that costs the most", () => {
+  const hand = [card("mild", { trust: 3, time: -2 }), card("brutal", { capital: 10, humanCost: 20 }), { id: "free", type: "free" }];
+  assert.equal(getForcedCard(hand, BASE_SCHEMA).id, "brutal");
+});
+
+test("run state survives a save round trip and old saves normalise cleanly", () => {
+  const { nextRun } = resolveWindow({ run: RUN_INITIAL_STATE, window: { status: "bust", cause: "timeout", gauge: 40, wall: 60 }, card: card("a", { trust: -4 }) });
+  assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(nextRun)))), nextRun);
+  const legacy = normalizeRunState({ combo: 2, stressLevel: 88, bustFloor: 72, environmentMode: "fracture" });
+  assert.deepEqual(legacy, normalizeRunState(RUN_INITIAL_STATE), "a pre-gauntlet dynamics blob opens a clean table");
+});
+
+test("the table ledger rebuilds pot, busts and best multiplier from the log", () => {
+  const ledger = createGauntletLedger([
+    { threshold: { busted: false, potMultiplier: 32, pot: 1500, pushes: 4 } },
+    { threshold: { busted: true, potMultiplier: 0, lostPot: 1500, pushes: 6 } },
+    { isSystemEvent: true },
   ]);
-  assert.equal(ledger.busts, 1);
-  assert.equal(ledger.reboots, 1);
-  assert.equal(ledger.bestMultiplier, 2.85);
-  assert.equal(ledger.pushedDecisions, 3);
-  // 12 - round(12/2) = 6, 17 - round(17/2.85) = 11, 6 - round(6/1.2) = 1.
-  assert.equal(ledger.bonusPoints, 18);
-  assert.equal(ledger.permanentMultiplier, 1.2);
+  assert.deepEqual(ledger, { busts: 1, cashes: 1, bestMultiplier: 32, potBanked: 1500, potLost: 1500, pushes: 10 });
 });
 
-test("pressure ledger and the reducer agree on what a reboot is worth", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  const log = [];
-  for (let run = 0; run < 3; run += 1) {
-    state = { ...state, thresholdState: "bust", environmentMode: "blackout" };
-    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-    log.push({ threshold: { rewardMultiplier: 1, busted: true }, environmentMode: "reboot", riskRewardEffect: {} });
-  }
-  assert.equal(state.rebootCount, 3);
-  assert.equal(createPressureLedger(log).permanentMultiplier, state.permanentMultiplier);
-  assert.equal(state.permanentMultiplier, getPermanentMultiplier(3));
-});
-
-test("pressure ledger reads an empty log as a run that has not pushed yet", () => {
-  const ledger = createPressureLedger([]);
-  assert.deepEqual(ledger, { busts: 0, reboots: 0, bestMultiplier: 1, bonusPoints: 0, pushedDecisions: 0, permanentMultiplier: 1 });
-});
-
-test("the pot multiplies what the player gains, never what a choice costs them", () => {
-  // case01's accounting branch, the shape 255 of the 379 authored effects share:
-  // two resources rising as a gain, two rising as a cost.
-  const effect = { capital: 18, trust: -14, humanCost: 18, fatigue: 3 };
-  const pushed = applyRiskReward(effect, 3.3);
-
-  assert.equal(pushed.capital, 59, "a gain scales with the gauge the player held");
-  assert.equal(pushed.trust, -14, "a loss written negative is not discounted");
-  // The two that read backwards from the sign. Holding the gauge to 3.3x used to
-  // turn 18 dead into 59 -- the bet paying out in bodies on the one axis the
-  // story is about, while the comment above the function promised it could not.
-  assert.equal(pushed.humanCost, 18, "humanCost rising is the cost, so the pot does not raise it");
-  assert.equal(pushed.fatigue, 3, "fatigue rising is the cost, so the pot does not raise it");
-});
-
-test("a negative humanCost is the gain the pot is allowed to multiply", () => {
-  // Spending a turn protecting someone reads as humanCost below zero, and that
-  // is the payout a held gauge is supposed to enlarge.
-  const pushed = applyRiskReward({ humanCost: -6, fatigue: -2, capital: -10 }, 2);
-  assert.equal(pushed.humanCost, -12);
-  assert.equal(pushed.fatigue, -4);
-  assert.equal(pushed.capital, -10, "capital falling is still a cost and stays whole");
-});
-
-test("pushing raises the gauge and the pot the player is holding", () => {
-  const started = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  const once = reduceDecisionDynamics(started, { type: "PUSH_HELD" });
-  const twice = reduceDecisionDynamics(once, { type: "PUSH_HELD" });
-
-  // A press buys a drawn amount, not a constant one, so the assertion is on the
-  // band rather than on a number: a fixed step put the gauge on a grid of six
-  // rungs and left the moving wall between two of them for most of a window.
-  const first = once.stressLevel - started.stressLevel;
-  const second = twice.stressLevel - once.stressLevel;
-  for (const step of [first, second]) {
-    assert.ok(step >= 11 && step <= 21, `${step} sits inside the press band`);
-  }
-  assert.ok(twice.stressLevel > once.stressLevel, "and each press moves the gauge further");
-  // The pot is priced off the gauge, so the press has to be worth something the
-  // moment it lands -- the reason the button exists is that the number moves.
-  assert.ok(twice.rewardMultiplier > once.rewardMultiplier, "a second press pays more than the first");
-  assert.ok(once.rewardMultiplier > started.rewardMultiplier, "the first press pays more than not pressing");
-  assert.ok(twice.heartbeatBpm > started.heartbeatBpm, "and the window gets louder with it");
-});
-
-test("the next push forecast warns before the wall is crossed", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  assert.equal(state.nextPushRisk, "safe");
-  assert.equal(state.nextPushMinStress, 11);
-  assert.equal(state.nextPushMaxStress, 21);
-  assert.equal(state.nextPushBustChance, 0);
-
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
-  for (let press = 0; press < 3; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-
-  assert.ok(["heated", "critical", "volatile", "fatal"].includes(state.nextPushRisk), `forecast escalates to ${state.nextPushRisk}`);
-  assert.ok(state.nextPushMaxStress >= state.overdriveFloor, "the forecast points at the warning band before the click");
-  assert.ok(state.nextPushBustChance >= 0 && state.nextPushBustChance <= 1, "the wall-cross chance is stored as a stable ratio");
-});
-
-test("a push survives the next tick, which is the whole point of pressing it", () => {
-  // The sequence that cannot happen in a test that presses consecutively, and is
-  // the only sequence that happens in play: the clock ticks once per second, so
-  // every press is followed by one within 999ms. DECISION_TICK used to *assign*
-  // stressLevel from the burn curve with no term for what the player had bought,
-  // so four presses worth x2.16 became x1.00 on the next tick and the verb had a
-  // sub-second half-life.
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 25 });
-  const clockOnly = state.stressLevel;
-
-  for (let press = 0; press < 4; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  const pushed = state.stressLevel;
-  assert.ok(pushed >= clockOnly + 11 * 4 && pushed <= clockOnly + 21 * 4, "four presses buy four steps");
-
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 24 });
-  assert.ok(state.stressLevel >= pushed, "and the tick may add to them, never erase them");
-  assert.ok(state.rewardMultiplier > 1, "so the pot the player bought is still there to cash");
-});
-
-test("the clock is a floor under the gauge, not the gauge itself", () => {
-  let held = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  held = reduceDecisionDynamics(held, { type: "DECISION_TICK", seconds: 40 });
-  held = reduceDecisionDynamics(held, { type: "PUSH_HELD" });
-
-  let idle = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  idle = reduceDecisionDynamics(idle, { type: "DECISION_TICK", seconds: 40 });
-
-  // Late in the window the burn is climbing on its own. A player who pressed has
-  // to stay ahead of one who did not, at every point on the curve, or pressing is
-  // a decoration on a countdown.
-  for (const seconds of [30, 20, 10, 3]) {
-    held = reduceDecisionDynamics(held, { type: "DECISION_TICK", seconds });
-    idle = reduceDecisionDynamics(idle, { type: "DECISION_TICK", seconds });
-    assert.ok(held.stressLevel > idle.stressLevel, `pressing still shows at ${seconds}s remaining`);
-  }
-});
-
-test("staging a choice turns delay into visible stress", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 38 });
-  const idleStress = state.stressLevel;
-
-  state = reduceDecisionDynamics(state, { type: "CHOICE_STAGED", choiceId: "audit-route" });
-  assert.equal(state.hiddenChoice, "audit-route");
-  assert.equal(state.decisionPhase, "locked");
-
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 32 });
-  assert.ok(state.hiddenChoiceAge >= 6, "the hidden choice keeps ageing while the player hesitates");
-  assert.ok(state.hesitationCharge > 0, "hesitation is charged as its own state axis");
-  assert.ok(state.stressLevel > idleStress, "and it pushes the pressure readout up");
-});
-
-test("committing clears the hidden-choice delay axis", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "CHOICE_STAGED", choiceId: "audit-route" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 36 });
-  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 36 });
-
-  assert.equal(state.hiddenChoice, null);
-  assert.equal(state.hiddenChoiceAge, 0);
-  assert.equal(state.hesitationCharge, 0);
-  assert.equal(state.decisionPhase, "cooldown");
-});
-
-test("a rupture fractures the next decision schema", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
-  for (let press = 0; press < 8; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 8, seconds: 20 });
-
-  assert.equal(state.thresholdState, "bust");
-  assert.ok(state.schemaFlux >= 70, "rupture stores a consequence charge");
-  assert.ok(state.consequenceStack > 0, "the stack records that the run broke something");
-
-  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-  assert.equal(next.environmentMode, "reboot");
-  assert.ok(next.schemaFlux > 0, "the next room keeps part of the fracture");
-  assert.ok(next.bustFloor < DYNAMICS_INITIAL_STATE.bustFloor, "the next wall is closer than the clean opening wall");
-
-  const ticked = reduceDecisionDynamics(next, { type: "DECISION_TICK", seconds: 38 });
-  assert.ok(ticked.clockStress > reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_TICK", seconds: 38 }).clockStress);
-});
-
-test("a high-pressure clean commit can fracture the following turn", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
-  for (let press = 0; press < 3; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 10, seconds: 30 });
-
-  assert.notEqual(state.thresholdState, "bust");
-  assert.ok(state.schemaFlux >= 20, "a dangerous non-bust still damages the schema");
-
-  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-  assert.equal(next.environmentMode, "fracture");
-  assert.ok(next.fractureTurns > 0);
-});
-
-test("pressing far enough busts the run, and the bust is the player's own", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
-  assert.equal(state.isBlind, false, "the clock alone is nowhere near the line here");
-
-  for (let press = 0; press < 7; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 29 });
-
-  // Seven presses at 30 seconds remaining. Nothing about the clock did this.
-  assert.equal(state.isBlind, true, "greed reaches the line long before the deadline does");
-  // The window freezes rather than empties: the gauge, the multiplier and the
-  // vignette hold at the reading that busted, so the screen is not quietly
-  // recovering underneath the word BUST.
-  assert.ok(state.stressLevel >= state.bustFloor, "and the readout holds at the value that busted");
-});
-
-test("a challenge match is safer because it vents, not because the wall moves", () => {
-  // It used to pay twice: vent 12 points off the gauge *and* push the wall 6
-  // further away. Across 21,600 matched commits at every reboot count, press
-  // count and commit time, that came to a bust rate of 0.0% against 16-18% on a
-  // miss -- and the card prints 목표 LOCKED before the player presses anything,
-  // so the free pass was announced in advance. The vent is the reward. The wall
-  // is the wall, for everyone.
-  const atWall = getPushYourLuckOutcome({ stressLevel: 90, bustFloor: 88 });
-  assert.equal(atWall.busted, true, "past the wall is past the wall");
-
-  const staged = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  const ticked = reduceDecisionDynamics(staged, { type: "DECISION_TICK", seconds: 12 });
-  const matched = reduceDecisionDynamics(ticked, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 12 });
-  const missed = reduceDecisionDynamics(ticked, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 4, seconds: 12 });
-  assert.ok(matched.stressLevel < missed.stressLevel, "reading the objective right buys gauge back");
-  assert.ok(matched.heldGauge <= ticked.heldGauge, "and it is the gauge that moves, not the line");
-});
-
-test("a winning commit does not bust on the tick that follows it", () => {
-  // Two presses at twenty-five seconds left, committed on a challenge match: the
-  // payout lands, and one second later the run used to blow up and halve the
-  // score it had just banked. (Five presses at ten seconds was the original
-  // shape; under the flatter burn curve that is a real bust, not a win.) CHOICE_COMMITTED adjusted `stressLevel` and left
-  // `heldGauge` untouched, so the next tick recomputed `clockStress + heldGauge`
-  // and threw the relief away -- punishing the correct read, after the fact.
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 25 });
-  for (let press = 0; press < 2; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-
-  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 2, challengeMatch: true, seconds: 25 });
-  assert.equal(committed.isBlind, false, "a match at this gauge is a win, not a bust");
-  const bankedScore = committed.score;
-
-  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 24 });
-  assert.equal(afterTick.isBlind, false, "and it is still a win one second later");
-  assert.equal(afterTick.score, bankedScore, "with the score it banked still banked");
-});
-
-test("relief earned on a commit survives the clock, the way a press does", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
-  for (let press = 0; press < 4; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  const held = state.heldGauge;
-
-  const committed = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", riskDelta: 1, challengeMatch: true, seconds: 20 });
-  assert.ok(committed.heldGauge < held, "a match buys the gauge back down");
-  const afterTick = reduceDecisionDynamics(committed, { type: "DECISION_TICK", seconds: 19 });
-  assert.ok(afterTick.heldGauge <= committed.heldGauge, "and the tick does not hand it back");
-});
-
-test("each window draws its own wall, and the same seed draws the same one", () => {
-  let state = DYNAMICS_INITIAL_STATE;
-  const floors = [];
-  for (let window = 0; window < 8; window++) {
-    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-    floors.push(state.bustFloor);
-  }
-  // A fixed wall next to a gauge printed every frame and a constant PUSH_STEP is
-  // arithmetic: stop one press short, every time, forever. The band is a press
-  // wide, so standing at 88 is a real question.
-  assert.ok(new Set(floors).size > 1, "the wall is not in the same place every window");
-  for (const floor of floors) {
-    assert.ok(floor >= 80 && floor <= 96, `${floor} sits inside the band`);
-  }
-  // Seeded, not random: replay links restore a scene from a seed and the balance
-  // suite replays thousands of seasons. Both need the same wall twice.
-  assert.deepEqual(floors, [1, 2, 3, 4, 5, 6, 7, 8].map((index) => drawBustFloor(`0:${index}:0`)));
-});
-
-test("a bust holds until the window ends instead of healing on the next tick", () => {
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 12 });
-  for (let press = 0; press < 6; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 11 });
-  assert.equal(state.isBlind, true, "six presses at twelve seconds reach the ceiling");
-
-  // Busting clears heldGauge, so the tick after it used to recompute from the
-  // clock alone and find nothing wrong -- the 420ms bust keyframe and the
-  // grayscale were gone before the player finished reading the word.
-  for (const seconds of [10, 9, 8]) {
-    state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds });
-    assert.equal(state.isBlind, true, `still busted at ${seconds}s remaining`);
-    assert.equal(state.thresholdState, "bust");
-  }
-
-  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-  assert.equal(next.isBlind, false, "and a new window is a clean one");
-});
-
-test("no two presses in a window are worth the same, and the run replays them", () => {
-  const steps = [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:1:${press}`));
-  assert.ok(new Set(steps).size > 1, "a press is drawn, not a constant");
-  for (const step of steps) assert.ok(step >= 11 && step <= 21, `${step} sits inside the band`);
-  // The wall only mattered at one rung while the step was fixed at 16: the gauge
-  // could land on clockStress + 16n and nowhere else, and an 80-96 band sits
-  // between two of those rungs for most of a window.
-  assert.deepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:1:${press}`)), "and the same seed draws the same press twice");
-  assert.notDeepEqual(steps, [1, 2, 3, 4, 5, 6].map((press) => drawPushStep(`0:2:${press}`)), "while the next window draws its own");
-});
-
-test("a reboot buys a multiplier and pays for it with room", () => {
-  const seed = "2:7:400";
-  const fresh = drawBustFloor(seed, 0);
-  const once = drawBustFloor(seed, 1);
-  const thrice = drawBustFloor(seed, 3);
-
-  // REBOOT_PERMANENT_BONUS hands a rebooted run +0.2x forever. Measured over
-  // forty windows with that bonus free, busting every fourth window banked
-  // 22,114 against 13,587 for never busting -- 63% more, because the multiplier
-  // compounds and the bill is one window. The bonus stays; what it costs now is
-  // the room to use it.
-  assert.ok(once < fresh, "one reboot walks the wall closer");
-  assert.ok(thrice < once, "and each one after that walks it closer again");
-  assert.ok(thrice >= 52, "but it never comes closer than the fatal floor");
-});
-
-test("the wall cannot be walked below the point a run stops being playable", () => {
-  for (const reboots of [4, 8, 20, 100]) {
-    for (const window of [1, 5, 9]) {
-      const floor = drawBustFloor(`${reboots}:${window}:0`, reboots);
-      assert.ok(floor >= 52, `${reboots} reboots still leaves a wall at ${floor}`);
-    }
-  }
-});
-
-test("the ledger reports the reboots the reducer actually granted", () => {
-  // `permanentMultiplier` is the whole reward for busting, and the panel built to
-  // price it counted `entry.environmentMode === "reboot"` -- a value no commit
-  // can write, because DECISION_STARTED turns blackout into reboot before the
-  // next commit runs. A player two busts deep read x1, "리부트 0회", and a
-  // sentence telling them they had never blown up.
-  const log = [
-    { threshold: { rewardMultiplier: 2.4, busted: true }, environmentMode: "blackout", riskRewardEffect: {} },
-    { threshold: { rewardMultiplier: 1.2, busted: false }, environmentMode: "stable", riskRewardEffect: { trust: 6 } },
-    { threshold: { rewardMultiplier: 3.1, busted: true }, environmentMode: "blackout", riskRewardEffect: {} },
-  ];
-  const ledger = createPressureLedger(log);
-  assert.equal(ledger.busts, 2);
-  assert.equal(ledger.reboots, 2, "a reboot is what a bust becomes at the top of the next window");
-  assert.equal(ledger.permanentMultiplier, getPermanentMultiplier(2));
-  assert.ok(ledger.permanentMultiplier > 1, "and the panel can finally say the buff exists");
-});
-
-test("the warning lights sit under the wall, wherever the wall has moved to", () => {
-  // They were constants -- CRITICAL at 90, OVERDRIVE at 78 -- while the wall is
-  // drawn in 80..96 and walks down 8 a reboot to 52. From one reboot on, 100% of
-  // windows had their wall below the OVERDRIVE band, so the gauge read BUILDING
-  // and 61% and then the run ended. A light wired above the thing it warns about
-  // does not merely fail to warn; it says safe.
-  let state = DYNAMICS_INITIAL_STATE;
-  for (let reboot = 0; reboot < 6; reboot++) {
-    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED", reboot: reboot > 0 });
-    const ticked = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
-    assert.ok(ticked.criticalFloor < state.bustFloor, `critical fires under a wall of ${state.bustFloor}`);
-    assert.ok(ticked.overdriveFloor < ticked.criticalFloor, "and overdrive fires under critical");
-  }
-});
-
-test("a streak survives the scene that earned it", () => {
-  // DECISION_STARTED spread the initial state over `combo`, so it was 0 in every
-  // tick and every commit: getComboBacklash returned 0 forever, COMBO_BACKLASH_K
-  // was inert, `heat` was multiplied by zero, and the COMBO chip could only read
-  // x1. A new scene is not what breaks a streak.
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  const combos = [];
-  for (let window = 0; window < 4; window++) {
-    state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
-    state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 20 });
-    combos.push(state.combo);
-    state = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-  }
-  assert.deepEqual(combos, [1, 2, 3, 4], "each matched window adds to the streak");
-  assert.ok(state.combo > 0, "and the next window opens still holding it");
-  // `heat` is derived per tick from the streak, so it is the first tick of the
-  // new window that prices what the streak borrowed.
-  const carried = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
-  assert.ok(carried.heat > 0, "so the backlash the streak borrowed against is real");
-  assert.ok(carried.stressLevel > 0, "and it rides into the next window as gauge");
-});
-
-test("the ending reads what the run did with the gauge", () => {
-  // Six cycles built a bet the ending could not see. Paired seasons at x1.00 and
-  // x3.50 flipped 0 of 1000 endings, because `applyEffect` clamps at 100,
-  // `pressureAdaptScore` is already pinned in 71% of cases, and the season
-  // pressure is a max over 150 nodes -- three clamps in series, and the
-  // multiplier died in all of them. Same resources, same clues, below; only the
-  // push record differs.
+test("the ending reads what the run did at the table", () => {
   const resources = { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 };
   const discoveredClues = [{ id: "c1" }, { id: "c2" }, { id: "c3" }];
-  const entry = (rewardMultiplier, busted) => ({
-    threshold: { rewardMultiplier, busted },
-    environmentMode: busted ? "blackout" : "stable",
-    riskRewardEffect: {},
-  });
-  // The ending reads the *season*, not the last case: the run log is cleared at
-  // every case start, so a record derived there would have counted one case of
-  // pressure history and called it a season -- five busts in cases one to five
-  // paying nothing, a clean season losing its grip only at the end collapsing.
-  // The strain arrives already aggregated, the way human cost and peak pressure
-  // already did.
+  const entry = (potMultiplier, busted) => ({ threshold: { potMultiplier: busted ? 0 : potMultiplier, busted } });
   const strainOf = (log) => {
-    const record = createPressureLedger(log);
+    const record = createGauntletLedger(log);
     return { seasonBusts: record.busts, seasonBestMultiplier: record.bestMultiplier };
   };
   const endingFor = (log) =>
     getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, ...strainOf(log) }).id;
 
-  assert.equal(endingFor([entry(1, false), entry(1, false)]), "open-question", "a run that never pushed lands where it always did");
-  // Holding a high pot across a season without once crossing the wall is the
-  // thing this system asks for, and it buys a clue of slack on the ending that
-  // reads as having done the job properly.
-  assert.equal(endingFor([entry(2.8, false), entry(2.2, false)]), "open-oversight");
-  // And blowing up repeatedly is, in the collapse ending's own words, the season
-  // going past what there was time to carry.
-  assert.equal(endingFor([entry(3.1, true), entry(2, false), entry(2.9, true)]), "open-question", "two busts is not yet a collapse");
-  // Busts are a peer of the other strain terms at 2 apiece, so it takes sixteen
-  // of them in a season to close one on their own -- past every policy but the
-  // greediest. At 12 apiece three were enough, which forced SYSTEM COLLAPSE on
-  // ordinary play and took the three character endings under their floors.
-  const wrecked = getEndingVariant({
-    resources,
-    discoveredClues,
-    seasonHumanCost: 20,
-    peakRiskPressure: 18,
-    seasonBusts: 16,
-    seasonBestMultiplier: 3.1,
-  });
+  assert.equal(endingFor([entry(1, false), entry(1.5, false)]), "open-question", "a run that never pushed lands where it always did");
+  assert.equal(endingFor([entry(32, false), entry(8, false)]), "open-oversight", "a clean season that cashed hot earns a clue of slack");
+  assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 16, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
-  assert.equal(wrecked.failure, true, "three busts closes the season as a failure");
+  assert.equal(wrecked.failure, true);
 });
 
 test("the ending answers busts across the range play reaches, not at one step", () => {
-  // `Math.max(carried, bustPressure)` is flat in its smaller argument for the
-  // whole range that argument occupies. Carried pressure sits at p50 24, so a
-  // bust term of 2 apiece was worth nothing up to fifteen busts and everything at
-  // sixteen: one bust and fifteen produced identical endings in 100.0% of
-  // seasons. A cliff moved is still a cliff.
   const base = {
     resources: { trust: 58, legitimacy: 54, capital: 62, humanCost: 22, fatigue: 24, time: 46 },
     discoveredClues: [{ id: "a" }, { id: "b" }],
     seasonHumanCost: 30,
-    seasonBestMultiplier: 1.6,
+    seasonBestMultiplier: 4,
   };
-  const pressureAt = (seasonBusts, peakRiskPressure) =>
-    getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
-
-  // Held just under the line by the run's own strain, each bust pushes further in.
-  const near = 28;
-  assert.notEqual(pressureAt(0, near), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, near), "collapse", "ten busts on top of it does");
-  // And the step between is graded rather than absent: somewhere in here the
-  // answer changes, which is the whole point of the record being readable.
-  const answers = [0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, near));
-  assert.ok(new Set(answers).size > 1, "the ending moves somewhere inside the range play reaches");
-});
-
-test("the wall is borrowed against, not spent forever", () => {
-  // Walking it down on `rebootCount` made the ratchet a one-way trip: the counter
-  // only rises, so one bust lowered the wall by 8 permanently and made the next
-  // bust likelier. Over a 42-window season, one press committed with twenty
-  // seconds to spare busted 20 times and finished pinned at the fatal floor.
-  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
-  const openWall = state.bustFloor;
-
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
-  for (let press = 0; press < 8; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
-  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 19 });
-  assert.equal(state.isBlind, true, "eight presses at twenty seconds is a bust");
-  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 2, seconds: 19 });
-  assert.ok(state.wallDebt > 0, "and it is charged to the room the run has left");
-
-  const borrowed = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
-  assert.ok(borrowed.bustFloor < openWall + 1, "the next window opens with less room");
-
-  // Paid back by closing windows without one. `rebootCount` keeps rising for the
-  // permanent multiplier, which is a reward and must not decay; the debt is the
-  // part a run can work off.
-  let recovering = borrowed;
-  for (let window = 0; window < 4; window++) {
-    recovering = reduceDecisionDynamics(recovering, { type: "DECISION_TICK", seconds: 30 });
-    recovering = reduceDecisionDynamics(recovering, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 30 });
-    recovering = reduceDecisionDynamics(recovering, { type: "DECISION_STARTED" });
-  }
-  assert.equal(recovering.wallDebt, 0, "four clean windows clear what one bust borrowed");
-  assert.ok(recovering.rebootCount > 0, "while the multiplier the bust bought is kept");
+  const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
+  assert.notEqual(pressureAt(0, 28), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 28), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 28))).size > 1);
 });

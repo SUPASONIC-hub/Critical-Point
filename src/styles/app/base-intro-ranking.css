@@ -51,8 +51,7 @@ button:disabled {
   color: var(--c-ink-muted);
   -webkit-text-fill-color: currentColor;
 }
-button.case-card:disabled,
-button.choice:disabled {
+button.case-card:disabled {
   color: var(--c-ink-muted) !important;
   -webkit-text-fill-color: var(--c-ink-muted) !important;
 }
@@ -74,27 +73,6 @@ summary:focus-visible {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-.skip-link {
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 20;
-  padding: 9px 12px;
-  color: var(--color-ink);
-  background: var(--color-accent);
-  border: 2px solid var(--color-ink);
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 900;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-8px);
-}
-.skip-link:focus {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 .music-controls {
   position: fixed;
@@ -1076,8 +1054,7 @@ summary:focus-visible {
   border: 1px solid var(--color-line);
   border-radius: 8px;
 }
-.guide-heading,
-.play-help summary span {
+.guide-heading {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1327,8 +1304,7 @@ summary:focus-visible {
   border-radius: 6px;
 }
 .start-input-row button,
-.ghost,
-.choice {
+.ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1902,19 +1878,6 @@ summary:focus-visible {
   color: var(--c-ink-raised);
   background: var(--c-paper-muted);
 }
-.choice {
-  display: grid;
-  grid-template-columns: 1fr;
-  min-width: 0;
-  min-height: 48px;
-  padding: 10px 14px;
-  justify-content: flex-start;
-  text-align: left;
-  color: var(--c-ink);
-  background: var(--c-paper);
-  border: 1px solid var(--c-gray-81-2);
-  overflow-wrap: anywhere;
-}
 textarea {
   width: 100%;
   min-height: 110px;
@@ -1957,22 +1920,6 @@ body {
 .game-header {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--line);
-}
-.choice {
-  min-height: 96px;
-  border: 1px solid var(--c-line-strong);
-  background: var(--c-paper);
-  box-shadow: 0 5px var(--c-gray-86);
-  transition:
-    transform 0.16s ease,
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease;
-}
-.choice {
-  color: #10241f;
-  background: #fff;
-  border-color: #31504a;
 }
 
 /* Cold open, narrow ---------------------------------------------------------

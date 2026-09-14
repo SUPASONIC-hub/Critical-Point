@@ -1,101 +1,135 @@
 import { useEffect } from "react";
-import { ChevronRight, Sparkles } from "lucide-react";
+import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
 
+function formatNumber(value) {
+  return Math.round(Number(value) || 0).toLocaleString("en-US");
+}
+
+/**
+ * The verdict, then the bill, then what broke.
+ *
+ * This modal used to stack up to seven lime "SURGE" cards over every commit --
+ * including a bust -- and never once said the word. It says one thing first
+ * now: BUST, or the multiplier that was cashed. Under it, what the pot did,
+ * what the card paid and cost, and the rules the next board is dealt with. The
+ * last part is the point: the reveal is where the player reads the consequence
+ * before they walk into it.
+ */
 export function DecisionReveal({ view }) {
-  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, simplifyPlayerText, setDecisionReveal, resourceMeta } = view;
-  const revealTone = decisionReveal?.clue
-    ? "clue-found"
-    : decisionReveal?.suspenseEvent
-      ? "system-alert"
-      : decisionReveal?.cascade
-        ? "chain-reaction"
-        : decisionReveal?.streakBreak
-          ? "streak-break"
-          : "decision-locked";
+  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
+  const verdict = decisionReveal?.verdict ?? null;
+  const busted = verdict?.outcome === "bust";
   useEffect(() => {
     if (!decisionReveal) return;
-    playDecisionRevealCue(revealTone);
-  }, [decisionReveal, revealTone]);
+    playDecisionRevealCue(busted ? "system-alert" : decisionReveal.clue ? "clue-found" : "decision-locked");
+  }, [busted, decisionReveal]);
   if (!decisionReveal) return null;
-  // "열린 것" is what the choice bought, not what went up: 사람 피해 +11 belongs
-  // under 닫힌 것. Three entries fit, so they are the three that moved most.
   const effectEntries = Object.entries(decisionReveal.effect ?? {}).filter(([, value]) => value !== 0);
   const gains = effectEntries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
   const costs = effectEntries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
-  const archiveLine = decisionReveal.cascade
-    ? "이 선택은 사건 해결 로그가 아니라 허용선 표본으로 보관됩니다."
-    : decisionReveal.clue
-      ? "단서가 열린 순간, 이전 참가자의 기록과 같은 폴더에 묶였습니다."
-      : decisionReveal.streakBreak
-        ? "끊긴 연속 기록은 실패가 아니라 다음 압박을 조정하는 근거가 됩니다."
-        : "트리거랩은 결과보다 이 말을 고른 순서를 먼저 저장합니다.";
+  const nextMutations = verdict?.nextMutations ?? [];
+  const headline = !verdict
+    ? "DECISION"
+    : busted
+      ? "BUST"
+      : `×${verdict.multiplier >= 10 ? Math.round(verdict.multiplier) : verdict.multiplier}`;
+  const subline = !verdict
+    ? ""
+    : busted
+      ? verdict.cause === "timeout"
+        ? "시간이 먼저 끝났다. 망설임도 벽이다."
+        : verdict.cause === "abandon"
+          ? "걸어 둔 판을 두고 테이블을 떠났다. 떠난 판은 터진 판이다."
+          : `열기 ${verdict.gauge} — 벽은 ${verdict.wall}에 있었다.`
+      : `열기 ${verdict.gauge}에서 확정. 벽은 ${verdict.wall}에 있었다.`;
+
   return (
-    <div className="decision-reveal-backdrop" role="presentation">
-      <div className={`cinematic-burst ${revealTone}`} aria-hidden="true">
-        <div className="cinematic-vignette" />
-        <div className="impact-ring" />
-        <div className="impact-lines">
-          {Array.from({ length: 12 }, (_, index) => <i key={index} style={{ "--line-index": index }} />)}
-        </div>
-      </div>
+    <div className={`decision-reveal-backdrop${busted ? " is-bust" : ""}`} role="presentation">
       <section
         ref={decisionRevealRef}
-        className={`decision-reveal ${revealTone}${decisionReveal.cascade ? " cascade" : ""}${decisionReveal.suspenseEvent ? " suspense-twist" : ""}`}
+        className={`decision-reveal gx-reveal${busted ? " is-bust" : " is-cashed"}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="decision-reveal-title"
         onKeyDown={trapDecisionRevealFocus}
       >
-        <div className="cinematic-status">
-          <span className="cinematic-status-dot" />
-          <b>{decisionReveal.clue ? "NEW EVIDENCE" : decisionReveal.suspenseEvent ? "SYSTEM ALERT" : decisionReveal.cascade ? "CHAIN REACTION" : decisionReveal.streakBreak ? "STREAK BROKEN" : "DECISION LOCKED"}</b>
-          <span>{decisionReveal.clue ? "새 단서가 기록되었습니다" : "선택의 영향이 번지는 중"}</span>
+        <div className="gx-reveal-verdict">
+          {busted && <Skull size={34} aria-hidden="true" />}
+          <h2 id="decision-reveal-title">{headline}</h2>
+          <p>{subline}</p>
         </div>
-        <div className="decision-reveal-kicker">
-          <span>{decisionReveal.label}</span>
-          {decisionReveal.cascade && <strong>압박 연쇄</strong>}
-          {decisionReveal.suspenseEvent && <strong>반전 신호</strong>}
-        </div>
-        <h2 id="decision-reveal-title">{simplifyPlayerText(decisionReveal.title)}</h2>
-        <p className="decision-reveal-choice">"{decisionReveal.spokenChoice}"</p>
-        <p className="decision-reveal-archive">{archiveLine}</p>
-        {decisionReveal.observerTag && (
-          <div className={`decision-observer-tag tag-${decisionReveal.observerTag.id}`}>
-            <span>{decisionReveal.observerTag.label}</span>
-            <p>{decisionReveal.observerTag.text}</p>
+
+        {verdict && (
+          <div className="gx-reveal-pot" aria-label="판돈">
+            {busted ? (
+              <p className="gx-reveal-loss">
+                판돈 <b>{formatNumber(verdict.lostPot)}</b> → <b>0</b>
+              </p>
+            ) : (
+              <p className="gx-reveal-gain">
+                {verdict.chips} × {verdict.multiplier} = <b>+{formatNumber(verdict.pot)}</b>
+              </p>
+            )}
+            <p className="gx-reveal-bank">
+              {decisionReveal.caseClosed ? (
+                <>
+                  <Vault size={14} aria-hidden="true" /> 금고로 이동 <b>{formatNumber(verdict.secured)}</b> · 금고{" "}
+                  <b>{formatNumber(decisionReveal.vault)}</b>
+                </>
+              ) : (
+                <>
+                  걸려 있는 판돈 <b>{formatNumber(decisionReveal.runPot)}</b> · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
+                </>
+              )}
+            </p>
           </div>
         )}
-        <div className="decision-reveal-beat">
-          {renderSceneLines(decisionReveal.beat.split("\n").slice(-3).join("\n"))}
-        </div>
+
+        <p className="decision-reveal-choice">
+          {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
+        </p>
+
         <div className="decision-reveal-stakes" aria-label="선택으로 열린 것과 닫힌 것">
           <article>
-            <span>열린 것</span>
-            {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>판단 기준이 기록됨</b>}
+            <span>받은 것</span>
+            {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>{busted ? "없음 — 벽이 가져갔다" : "없음"}</b>}
           </article>
           <article>
-            <span>닫힌 것</span>
-            {costs.length > 0 ? costs.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>즉시 닫힌 자원 없음</b>}
-          </article>
-          <article>
-            <span>다음 잔향</span>
-            <b>{decisionReveal.nextTitle}</b>
+            <span>치른 것</span>
+            {costs.length > 0 ? costs.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>없음</b>}
           </article>
         </div>
-        <p className="decision-reveal-consequence">{decisionReveal.consequence}</p>
-        {decisionReveal.bonuses?.length > 0 && (
-          <div className="decision-bonus-stack" aria-label="이번 선택의 추가 신호와 보너스">
-            {decisionReveal.bonuses.map((bonus) => (
-              <div className={`decision-bonus ${bonus.tone ?? ""}`} key={bonus.label}>
-                <strong>{bonus.label}</strong>
-                <span>{bonus.text}</span>
-              </div>
-            ))}
+
+        {decisionReveal.skippedTitle && (
+          <p className="gx-reveal-skip" data-testid="blackout-skip">
+            <b>LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+          </p>
+        )}
+
+        {nextMutations.length > 0 && (
+          <div className="gx-reveal-mutations" data-testid="next-mutations" aria-label="다음 판의 규칙 변화">
+            <span>다음 판이 이렇게 부서진다</span>
+            <ul>
+              {nextMutations.map((mutation) => (
+                <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
+                  <b>{mutation.label}</b>
+                  <small>
+                    {mutation.title}
+                    {mutation.axis ? ` · ${resourceMeta?.[mutation.axis]?.label ?? mutation.axis}` : ""}
+                  </small>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
+
+        <div className="decision-reveal-beat">
+          {renderSceneLines(String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
+        </div>
+
         {decisionReveal.clue && (
           <div className="cinematic-clue-card">
             <Sparkles size={18} />
@@ -106,15 +140,15 @@ export function DecisionReveal({ view }) {
             </div>
           </div>
         )}
+
         <div className="decision-reveal-footer">
-          <span>다음 장면 · {decisionReveal.nextTitle}</span>
+          <span>다음 · {decisionReveal.nextTitle}</span>
           <button type="button" data-testid="decision-next" onClick={() => setDecisionReveal(null)} autoFocus>
-            다음 장면으로
+            {decisionReveal.caseClosed ? "사건 결과" : "다음 판"}
             <ChevronRight size={17} />
           </button>
         </div>
       </section>
     </div>
   );
-
 }

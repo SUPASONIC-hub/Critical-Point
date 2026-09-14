@@ -25,13 +25,10 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
       .debug-overlay,
       .music-controls,
       .music-toggle,
-      /* The decision window is a live countdown, so its bar and its read change
-         between captures. The header no longer prints it -- one clock, above the
-         choices -- but status-bar-timer and timer-card stay listed because the
-         record room's detailed read still uses the latter. */
-      .decision-clock,
-      .status-bar-timer,
-      .timer-card,
+      /* The window's countdown and the heartbeat read change between captures;
+         the heartbeat also depends on a seeded tell, not on layout. */
+      .gx-clock,
+      .gx-bpm,
       /* Regenerated per browser context, so it is eight glyphs of noise in
          every baseline that prints it. */
       [data-testid="session-code"] {
@@ -285,72 +282,28 @@ test("case result explains the ending signals", async ({ page }) => {
   await expect(page.locator(".ending-rationale")).toContainText("정당성");
 });
 
-// U-1: one decision used to be seven screens of scrolling on a phone, with the
-// resource board below the choices. Both are budgets, not pixel comparisons, so
-// they fail on a layout regression rather than on a font hint.
-test("mobile play screen keeps the decision reachable", async ({ page }) => {
+// U-1: one decision used to be seven screens of scrolling on a phone. On the
+// gauntlet table it is one: the pot, the gauge, every card and both verbs fit a
+// 390x844 viewport with nothing scrolled. A budget, not a pixel comparison, so it
+// fails on a layout regression rather than on a font hint.
+test("mobile play screen keeps the whole decision on one screen", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
-  // The debug overlay only exists in this harness, so it is not part of the budget.
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
-  const rail = page.locator(".resource-rail");
-  await expect(rail).toBeVisible();
-  const choicePanelTop = await page.locator("#choice-panel").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
-  // Budgets, not measurements: ratchet them down, never up. The screen was
-  // 5,775px with the choices starting around y=2,600 before the first layout
-  // pass, and 3,953px with the choices at y=1,535 before the record room.
-  expect(choicePanelTop).toBeLessThan(844 * 1.7);
-  const pageHeight = await page.evaluate(() => document.body.scrollHeight);
-  expect(pageHeight).toBeLessThan(844 * 3.1);
-  await page.locator("#choice-panel").scrollIntoViewIfNeeded();
-  await expect(rail).toBeInViewport();
-});
-
-// U-1: the console used to open 1,639px down an 844px screen and take 700ms of
-// smooth scrolling to arrive, so a tap during the scroll landed on whatever slid
-// past. It is fixed to the viewport on a phone now.
-test("mobile commit console opens inside the viewport", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.addInitScript(() => {
-    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  const layout = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll(".choices .choice")].map((card) => card.getBoundingClientRect().bottom);
+    return {
+      lastCard: Math.max(...cards),
+      actions: document.querySelector(".gx-actions").getBoundingClientRect().top,
+      pageHeight: document.body.scrollHeight,
+    };
   });
-  await startDebugNode(page, "case05", "c5_voice");
-  await expect(page.locator(".game-shell")).toBeVisible();
-  const track = await page.evaluate(async () => {
-    document.querySelector(".choices .choice").click();
-    const samples = [];
-    for (let frame = 0; frame < 30; frame += 1) {
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      const button = document.querySelector("[data-testid='commit-confirm']");
-      if (button) samples.push(Math.round(button.getBoundingClientRect().top));
-    }
-    return samples;
-  });
-  expect(track.length).toBeGreaterThan(0);
-  expect(track[0]).toBeLessThan(844);
-  expect(track.at(-1)).toBeLessThan(844);
-  // Only the open animation may move it, never a scroll chasing it down the page.
-  expect(Math.abs(track.at(-1) - track[0])).toBeLessThan(80);
-
-  // Every row the console keeps is a choice card it hides, so its footprint is
-  // a budget too: it was 356px and covered two cards including the selected one.
-  // 240 until 2026-09-09, when the target-lock chips added a row; the covered
-  // card count below is the harm the height was standing in for, and it went
-  // from one card to none over the same change.
-  const footprint = await page.evaluate(() => {
-    const box = document.querySelector(".commit-console").getBoundingClientRect();
-    const fullyCovered = [...document.querySelectorAll(".choices .choice")].filter((el) => {
-      const rect = el.getBoundingClientRect();
-      return rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1;
-    }).length;
-    return { height: Math.round(box.height), fullyCovered };
-  });
-  expect(footprint.height).toBeLessThan(260);
-  expect(footprint.fullyCovered).toBeLessThanOrEqual(1);
+  expect(layout.lastCard).toBeLessThanOrEqual(layout.actions);
+  expect(layout.pageHeight).toBeLessThanOrEqual(844 + 2);
 });
 
 test("intro mobile visual baseline @visual", async ({ page }, testInfo) => {

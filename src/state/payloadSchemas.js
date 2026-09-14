@@ -47,33 +47,18 @@ export function validateSavedStatePayload(state) {
   if (typeof state.nodeId !== "string") errors.push("invalid nodeId");
   if (state.runId !== undefined && typeof state.runId !== "string") errors.push("invalid runId");
   if (state.dynamics !== undefined && state.dynamics !== null) {
-    const dynamics = state.dynamics;
-    if (!dynamics || typeof dynamics !== "object" || Array.isArray(dynamics)) {
+    // The gauntlet run: pot, vault, and the rules the next window is dealt from.
+    const run = state.dynamics;
+    if (!run || typeof run !== "object" || Array.isArray(run)) {
       errors.push("invalid dynamics");
     } else {
-      for (const key of [
-        "combo",
-        "stressLevel",
-        "timeDecay",
-        "hiddenChoiceAge",
-        "hesitationCharge",
-        "responseTimeSec",
-        "schemaFlux",
-        "consequenceStack",
-        "fractureTurns",
-        "nextPushMinStress",
-        "nextPushMaxStress",
-        "nextPushBustChance",
-        "rewardMultiplier",
-        "heartbeatBpm",
-        "shakeIntensity",
-      ]) {
-        if (typeof dynamics[key] !== "number" || !Number.isFinite(dynamics[key])) errors.push(`invalid dynamics.${key}`);
+      for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge"]) {
+        if (typeof run[key] !== "number" || !Number.isFinite(run[key])) errors.push(`invalid dynamics.${key}`);
       }
-      for (const key of ["thresholdState", "environmentMode", "decisionPhase", "nextPushRisk"]) {
-        if (typeof dynamics[key] !== "string") errors.push(`invalid dynamics.${key}`);
+      if (typeof run.lastOutcome !== "string") errors.push("invalid dynamics.lastOutcome");
+      if (!run.schema || typeof run.schema !== "object" || !Array.isArray(run.schema.mutations)) {
+        errors.push("invalid dynamics.schema");
       }
-      if (!("hiddenChoice" in dynamics)) errors.push("invalid dynamics.hiddenChoice");
     }
   }
   if (Array.isArray(state.pendingTelemetry)) {

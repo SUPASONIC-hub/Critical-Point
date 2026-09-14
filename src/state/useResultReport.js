@@ -35,6 +35,11 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
     peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
     seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
+    // The vault is cumulative across the season, so the largest summary holds it,
+    // and it is read per case: a season total rises with every case played.
+    seasonVaultPerCase: summaries.length
+      ? summaries.reduce((vault, summary) => Math.max(vault, Number(summary.gauntlet?.vault) || 0), 0) / summaries.length
+      : 0,
   };
 }
 

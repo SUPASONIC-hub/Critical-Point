@@ -16,7 +16,9 @@ import {
   normalizeSavedText,
   parseErrorLog,
   parseRecoverySlots,
+  readSettledWindowSeeds,
   readStoredValue,
+  recordSettledWindowSeed,
   RECOVERY_CENTER_STORAGE_KEY,
   removeStoredValue,
   SAVE_SCHEMA_VERSION,
@@ -25,7 +27,6 @@ import {
   writeStoredValue,
 } from "./appConfig.js";
 import {
-  boardChangePrompts,
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
   CASE_START_NODES,
@@ -46,17 +47,13 @@ import {
 } from "./gameData.js";
 import {
   applyEffect,
-  addForecastUncertainty,
-  applySeededEffectVariation,
   anonymizeSensitiveText,
   buildSceneBeat,
   clamp,
-  createDecisionForecast,
   createCaseSummary,
   getDecisionFingerprint,
   getDecisionLedger,
   getAllDiscoveryClueIds,
-  getCaseDiscoveryClue,
   getAuthorityGate,
   getEndingVariant,
   getCaseOutcome,
@@ -64,25 +61,21 @@ import {
   getContinuityChallenge,
   detectPrivacySignals,
   explainResourceTradeoff,
-  getChoiceSubtext,
   getCounterfactualReport,
   getDramaticChoiceLabel,
   getEcho,
   getFreeTextSignals,
   getGameplayStats,
   getObservationLedger,
-  getObserverChoicePreview,
   getObserverPattern,
   getObserverTag,
   buildNarrativeSpine,
   getRiskPressure,
-  getRiskPressureDrivers,
   getSuspenseEvent,
   getSuspenseState,
   limitText,
   makeEmptyScores,
   scoreFreeText,
-  speechifyChoice,
 } from "./gameLogic.js";
 import {
   getSessionId,
@@ -93,7 +86,7 @@ import {
   telemetryEnabled,
 } from "./telemetry.js";
 import { getLeaderboardHeadline } from "./ranking.js";
-import { easyCognitionLabels, easyRiskLabels, simplifyPlayerText } from "./playerLanguage.js";
+import { easyCognitionLabels, simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import {
@@ -105,22 +98,26 @@ import {
   reportSilentFailure,
 } from "./state/savedState.js";
 import { useGameSaveState } from "./state/useGameSave.js";
-import { createChoiceReaders, useDecision } from "./state/useDecision.js";
+import { createChoiceReaders } from "./state/useDecision.js";
 import {
-  DYNAMICS_INITIAL_STATE,
-  serializeDecisionDynamicsState,
-} from "./state/decisionDynamics.js";
+  applyGauntletEffect,
+  BASE_SCHEMA,
+  BUST_EFFECT,
+  createRunSummary,
+  normalizeRunState,
+  resolveWindow,
+  RUN_INITIAL_STATE,
+  serializeRunState,
+} from "./gauntlet/gauntletEngine.js";
 import { createTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
-import { createGameEvent, reduceInvestigationState } from "./state/gameEvents.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
 import { buildPlaytestExport, downloadJson } from "./state/playtestExport.js";
 import { createClipboardActions, useClipboardStatus } from "./state/useClipboardStatus.js";
 import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js";
 import { useEndingSequence } from "./state/useEndingSequence.js";
 import { useStableEvent } from "./state/useStableEvent.js";
-import * as decisionClock from "./state/decisionClock.js";
 import { useCaseSystems } from "./state/useCaseSystems.js";
 import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
@@ -130,18 +127,13 @@ import { getEndingEpilogue } from "./featurePack.js";
 import {
   legacyProfiles,
   nextCaseSignals,
-  operatorBriefs,
   chapterRules,
-  playGuideItems,
-  playStyleOptions,
   resourceMeta,
-  sceneVisuals,
-  triggerLabSignals,
 } from "./appCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
 import { createRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
-import { createActiveBonus, createInheritedChallenge, createPressureCascade, createQuestSteps, createSceneChallenge, createSpeakerProfile, createStreakReward } from "./viewModels/sceneViewModels.js";
+import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import {
@@ -151,8 +143,6 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
   getOriginStartEffects,
-  getCharacterMemory,
-  getInvestigationOutcome,
 } from "./advancedSystems.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
@@ -182,10 +172,6 @@ export
 const caseSequence = CASE_SEQUENCE;
 
 
-/** The decision window, and how often overtime is billed once it closes. */
-const DECISION_WINDOW_SECONDS = 45;
-const OVERTIME_CHARGE_SECONDS = 15;
-
 let saveSuppressed = false;
 
 export function suppressSaves() {
@@ -214,10 +200,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
 
-  // Coarse only: the exact count lives in the decision clock so a per-second
-  // tick never reaches this render.
-  const decisionPhase = decisionClock.useDecisionPhase();
-
   const {
     runId, setRunId, playerName, setPlayerName, playStyle, setPlayStyle, openingLegacy, setOpeningLegacy,
     dataConsent, setDataConsent, started, setStarted, currentCase, setCurrentCase,
@@ -236,10 +218,13 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     cognitionDefaults: makeEmptyScores(cognitionLabels),
     normalizeText: (value) => normalizeSavedText(value, FREE_TEXT_MAX_LENGTH),
   });
-  const {
-    pendingChoice, setPendingChoice, decisionReveal, setDecisionReveal,
-    dynamics, dynamicsSummary, dispatchDynamics, resolveCommit,
-  } = useDecision({ active: started, initialDynamics: saved?.dynamics });
+  const [decisionReveal, setDecisionReveal] = useState(null);
+  // The run's gauntlet: pot, vault, and the rules the next window is dealt from.
+  // Saved under `dynamics`, the key the save format already reserves for it.
+  const [gauntletRun, setGauntletRun] = useState(() => normalizeRunState(saved?.dynamics));
+  // Set when this tab's run is older than the save: another tab moved on. The
+  // tab stops -- no table, no writes -- until it reloads from storage.
+  const [staleSave, setStaleSave] = useState(false);
   const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
@@ -247,8 +232,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     try { return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {}; } catch { return {}; }
   });
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
-  const [selectedInvestigation, setSelectedInvestigation] = useState("");
-  const [hypothesisAction, setHypothesisAction] = useState("");
   const [echo, setEcho] = useState(
     () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
   );
@@ -258,8 +241,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
-  const [showTacticalDetails, setShowTacticalDetails] = useState(false);
-  const [memoState, setMemoState] = useState({ nodeId: "", opened: false });
   const [showRanking, setShowRanking] = useState(false);
   const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
@@ -300,14 +281,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const telemetryRetryTimerRef = useRef(null);
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
-  const choiceButtonsRef = useRef(new Map());
-  const choiceHoldTimerRef = useRef(null);
-  const choiceHoldTriggeredRef = useRef(false);
-  const commitConsoleRef = useRef(null);
-  const commitConfirmRef = useRef(null);
   const visibilityPauseRef = useRef(null);
   const freeTextSaveTimerRef = useRef(null);
-  const restoredDynamicsStartRef = useRef(Boolean(saved?.dynamics && saved?.started));
 
   const {
     persist: persistenceApi,
@@ -328,7 +303,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
       discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
       freeText, echo, nodeEnteredAt, protocolUsed, timerPenaltyCount, probeUsed,
-      investigatedTargets, hypothesisDecisions, dynamics: serializeDecisionDynamicsState(dynamics),
+      investigatedTargets, hypothesisDecisions, dynamics: serializeRunState(gauntletRun),
       isPausedSave, saveSlots,
     },
     refs: { pendingTelemetryRef },
@@ -336,7 +311,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
       setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
       setCognition, setProtocolUsed, setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
-      setHypothesisDecisions, setOpeningLegacy, setDecisionReveal, setPendingChoice,
+      setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
       setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText, setNodeId,
       setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots,
     },
@@ -344,8 +319,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       normalizePlayerName, initialResources, triggerLabels, cognitionLabels, makeEmptyScores,
       persistSuppressed, onSuppressSaves, formatSaveTime,
       debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
-      initialDynamics: DYNAMICS_INITIAL_STATE,
-      resetDecisionDynamics: () => dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE }),
+      initialDynamics: RUN_INITIAL_STATE,
+      resetDecisionDynamics: () => setGauntletRun(RUN_INITIAL_STATE),
+      onStaleSave: () => setStaleSave(true),
     },
   });
   const persist = persistenceApi;
@@ -353,7 +329,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
     : "case01";
-  const activePlayStyle = playStyleOptions.find((style) => style.id === playStyle) ?? playStyleOptions[0];
   const operatorProfile = getOperatorProfile(operatorOrigin);
   function setOperatorOrigin(value) {
     const nextOrigin = getOperatorProfiles().some((profile) => profile.id === value) ? value : "courier";
@@ -385,15 +360,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
   const speakerProfile = createSpeakerProfile({ node });
   const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.webp";
-  const latestBeat = log.at(-1)?.sceneBeat ?? "";
-  const freeTextSignals = getFreeTextSignals(freeText);
-  const activeFreeTextSignalCount = freeTextSignals.filter((signal) => signal.active).length;
-  const freeTextPreview = freeText.trim() ? scoreFreeText(freeText) : null;
-  const memoOpened = memoState.nodeId === resolvedNodeId && memoState.opened;
-  const setMemoOpened = useStableEvent((opened) => {
-    setMemoState({ nodeId: resolvedNodeId, opened });
-  });
-  const evidenceCount = discoveredClues.length + (memoOpened ? 1 : 0) + (probeUsed ? 1 : 0) + activeFreeTextSignalCount;
   const localSeasonLeaderboardRow = useMemo(
     () =>
       caseResults.final && completedCases.includes("final")
@@ -464,9 +430,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     [adaptiveChoice, continuityMemoryChoice, node?.choices, relationshipChoice],
   );
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
-  const latestFreeTextSuccess = [...log].reverse().find(
-    (entry) => entry.caseId === fallbackCaseId && entry.freeTextSuccess && entry.freeText,
-  );
   const currentAverageResponseTime =
     log.length > 0
       ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
@@ -476,7 +439,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const suspenseState = getSuspenseState({
     riskPressure,
-    decisionSeconds: decisionPhase * decisionClock.DECISION_PHASE_SECONDS,
+    decisionSeconds: 45,
     log,
     currentCase,
   });
@@ -488,15 +451,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     riskTier,
     suspenseState,
   });
-  const primarySceneTrigger = node?.triggers?.[0] ?? "responsibility";
-  const primarySceneTriggerLabel = triggerLabels[primarySceneTrigger] ?? "책임";
-  const sceneDirection =
-    riskTier === "CRITICAL"
-      ? `${primarySceneTriggerLabel} 압박이 회의실의 말끝을 짧게 자른다. 누구도 먼저 편한 결론을 꺼내지 못한다.`
-      : riskTier === "UNSTABLE"
-        ? `${primarySceneTriggerLabel} 압박이 테이블 위에 얇게 깔린다. 대답은 가능하지만, 아직 비용의 이름이 다 불리지 않았다.`
-        : `${primarySceneTriggerLabel} 압박은 낮게 유지된다. 그래서 지금은 결론보다 전제를 바꾸기 좋은 순간이다.`;
-  const pressureCascade = useMemo(() => createPressureCascade({ log, resources, riskPressure }), [log, resources, riskPressure]);
   const gameplayStats = getGameplayStats(log, riskPressure);
   const observationLedger = getObservationLedger(log);
   const observerPattern = getObserverPattern(log);
@@ -512,47 +466,20 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const {
     achievementProgress,
     authorityState,
-    autonomousSignal,
     balanceSignals,
-    chapterTransitionBridge,
-    chapterUiModel,
-    characterState,
     clueCount,
     clueHypotheses,
     delayedConsequences,
-    dynamicMusicLayers,
-    evidenceCombinations,
-    evidenceContamination,
-    evidenceMetadata,
-    evidenceRepairPuzzle,
-    evidenceRepaired,
-    hypothesisActions,
-    hypothesisConflict,
-    hypothesisLockState,
-    interlude,
-    investigationTargets,
-    midBoss,
     operationsSnapshot,
     operatorReveal,
-    pastRunMemory,
-    playStyleUnlocks,
-    relationshipGraph,
-    relationshipQuest,
-    relationshipScene,
-    resourceChain,
-    rivalIntervention,
-    rivalResponse,
     seasonGoals,
-    selectedInvestigationOutcome,
-    setEvidenceRepaired,
-    timelineStamp,
   } = useCaseSystems({
     caseResults,
     completedCases,
     currentCase,
     discoveredClues,
     fallbackCaseId,
-    hypothesisAction,
+    hypothesisAction: "",
     localErrorEntries,
     localRankingRows,
     log,
@@ -565,7 +492,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     relationshipScores,
     resources,
     riskTier,
-    selectedInvestigation,
+    selectedInvestigation: "",
     speakerProfile,
   });
   // What this run left shut: clues never surfaced, and the far side of every fork.
@@ -619,21 +546,10 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     () => createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure }),
     [freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure],
   );
-  const echoProbeHint = {
-    "protect-trust": "힌트: 이번 장면에서는 가장 큰 성과보다 관계를 회복하는 말이 지난 사건의 신뢰를 이어갑니다.",
-    "repair-legitimacy": "힌트: 정당성을 올리는 선택을 먼저 골라야 지난 사건의 균열이 다음 장면을 삼키지 않습니다.",
-    "lower-risk": "힌트: 지금은 가장 큰 이득보다 위험 압력을 실제로 낮추는 선택이 오래 버팁니다.",
-    "use-reframe": "힌트: 사람, 조건, 순서 중 두 가지 이상을 다시 설계하면 선택지 밖 계획으로 인정됩니다.",
-    "avoid-risk": "힌트: 경쟁자의 속도를 따라가는 대신 위험을 유지하거나 낮추는 선택이 다음 장면을 엽니다.",
-    "find-cost": "힌트: 가장 좋아 보이는 선택이 누구에게 비용을 넘기는지 먼저 찾으십시오.",
-  }[sceneChallenge.id];
-  const echoProbeCost = playStyle === "mediator" ? "결정 시간 4초와 신뢰 1" : "결정 시간 8초와 피로 1";
   const {
-    getChallengeMatch,
     mergeEffects,
     getClueReveal,
     getEffectiveChoiceRead,
-    getPendingChoiceRead,
   } = useMemo(
     () =>
       createChoiceReaders({
@@ -644,70 +560,15 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         discoveredClues,
         currentCase,
         freeText,
-        // The reducer's streak, not the log's. getGameplayStats counts matches
-        // inside the current case and startCase clears the log, so finishing a
-        // case on a three-match run opened the next one with COMBO x3 on the
-        // gauge chip and "NO CHAIN" on the choice card: two counters for one
-        // streak, disagreeing on screen. The reducer's is the one that prices
-        // the commit, so it is the one the card reads. Scoring keeps its
-        // per-case count, which is what a case summary is about.
-        currentChallengeStreak: dynamics.combo,
+        currentChallengeStreak,
         resourceMeta,
       }),
-    [currentCase, discoveredClues, dynamics.combo, freeText, log, resources, riskPressure, sceneChallenge],
+    [currentCase, currentChallengeStreak, discoveredClues, freeText, log, resources, riskPressure, sceneChallenge],
   );
 
-  const riskPressureDrivers = useMemo(() => getRiskPressureDrivers(resources), [resources]);
-  const decisionForecasts = useMemo(
-    () =>
-      fixedChoices.map((choice) => {
-        const read = getEffectiveChoiceRead(choice, choice.effect, choice.cognition);
-        const forecast = addForecastUncertainty(
-          createDecisionForecast({ ...choice, effect: read.finalEffect }, resources),
-          evidenceCount,
-        );
-        return {
-          choice,
-          read,
-          forecast,
-          tacticalRead: read.tacticalRead,
-          observerPreview: getObserverChoicePreview({
-            choice,
-            read,
-            resources,
-            observerPattern,
-            responseTimeSec: Math.max(1, DECISION_WINDOW_SECONDS - decisionClock.getDecisionSeconds()),
-          }),
-        };
-      }),
-    [evidenceCount, fixedChoices, getEffectiveChoiceRead, observerPattern, resources],
-  );
-  const pressureLeader = riskPressureDrivers[0];
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
-  const pendingChoiceRead = pendingChoice
-    ? getPendingChoiceRead(pendingChoice, Math.max(1, DECISION_WINDOW_SECONDS - decisionClock.getDecisionSeconds()))
-    : null;
-  const pendingChoiceForecast = pendingChoiceRead
-    ? addForecastUncertainty(
-        createDecisionForecast({ ...pendingChoice, effect: pendingChoiceRead.finalEffect }, resources),
-        evidenceCount,
-      )
-    : null;
 
-  const formatForecastRisk = (forecast) => {
-    if (!forecast) return "NO FORECAST";
-    if (forecast.forecastPrecision === "precise") return formatRiskDelta(forecast.riskDelta);
-    return `${formatRiskDelta(forecast.riskDeltaMin)} ~ ${formatRiskDelta(forecast.riskDeltaMax)}`;
-  };
-
-  const questSteps = createQuestSteps({ challengeClearCount, currentChallengeStreak, freeTextCombo, log, reducedRiskCount });
-  const turnBriefItems = [
-    { label: "챌린지", value: sceneChallenge.title },
-    { label: "압력", value: `${riskTier} ${riskPressure}` },
-    { label: "버스트", value: `${momentumTier} ${momentumScore}` },
-    { label: "보너스", value: activeBonus },
-  ];
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
@@ -751,10 +612,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
   const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
   const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
-  const setPendingChoiceEvent = useStableEvent(setPendingChoice);
   const startCaseEvent = useStableEvent(startCase);
-  const chooseEvent = useStableEvent(choose);
-  const previewChoiceEvent = useStableEvent(previewChoice);
   useEffect(() => {
     const updateNetworkStatus = () => {
       const online = globalThis.navigator?.onLine !== false;
@@ -886,31 +744,15 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     closeRecoveryCenter: closeRecoveryCenterEvent,
   });
   useRuntimeChoiceShortcuts({
-    choose: chooseEvent,
     currentCase,
     decisionReveal,
-    fixedChoices,
     isAdvancing,
     isResult,
     nextCaseSignal,
-    pendingChoice,
-    previewChoice: previewChoiceEvent,
     saveCurrentGame: saveCurrentGameEvent,
-    setPendingChoice: setPendingChoiceEvent,
     startCase: startCaseEvent,
     started,
   });
-  useEffect(() => {
-    if (!pendingChoice) return;
-    window.requestAnimationFrame(() => {
-      // On a phone the console is fixed to the viewport, so there is nothing to
-      // scroll to; scrolling there was what made confirming feel slow.
-      if (!window.matchMedia?.("(max-width: 768px)").matches) {
-        commitConsoleRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "nearest" });
-      }
-      commitConfirmRef.current?.focus({ preventScroll: true });
-    });
-  }, [pendingChoice]);
   useEffect(() => {
     if (decisionReveal) {
       hadDecisionRevealRef.current = true;
@@ -922,7 +764,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }, [decisionReveal]);
   useEffect(() => () => {
     window.clearTimeout(freeTextSaveTimerRef.current);
-    window.clearTimeout(choiceHoldTimerRef.current);
   }, []);
 
   const musicModeKey = useMemo(() => {
@@ -935,26 +776,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       .replace(/^-|-$/g, "") || "scene";
       return `${riskTier.toLowerCase()}:${currentCase}:${phaseKey}:${node?.speaker ?? "voice"}:${musicRouteIndex}:${operatorOrigin}`;
   }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, operatorOrigin, resolvedNodeId, riskTier, started]);
-
-  useEffect(() => {
-    if (!started || isResult) return undefined;
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (cancelled) return;
-      setTimerPenaltyCount(0);
-      setProbeUsed(false);
-    });
-    decisionClock.startDecisionWindow(DECISION_WINDOW_SECONDS);
-    if (restoredDynamicsStartRef.current) {
-      restoredDynamicsStartRef.current = false;
-    } else {
-      dispatchDynamics({ type: "DECISION_STARTED" });
-    }
-    return () => {
-      cancelled = true;
-      decisionClock.stopDecisionWindow();
-    };
-  }, [currentCase, dispatchDynamics, isResult, resolvedNodeId, setProbeUsed, setTimerPenaltyCount, started]);
 
   useEffect(() => {
     if (!started || isResult) return undefined;
@@ -993,62 +814,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     };
   }, [persist, persistSuppressed, setIsPausedSave, started]);
 
-  // Overtime keeps charging. The window used to bill once and then let the
-  // player think for free, which staged pressure without ever applying it.
-  const chargeOvertime = useStableEvent(() => {
-    const decisionSeconds = decisionClock.getDecisionSeconds();
-    if (!started || isResult || decisionSeconds > 0) return;
-    const chargesDue = 1 + Math.floor(-decisionSeconds / OVERTIME_CHARGE_SECONDS);
-    if (chargesDue <= timerPenaltyCount) return;
-    const chargeIndex = timerPenaltyCount + 1;
-    const overtimeSeconds = -decisionSeconds;
-    const timeoutEffect = { time: -2 - chargeIndex, fatigue: 2 + chargeIndex };
-    const nextResources = applyEffect(resources, timeoutEffect);
-    const entry = {
-      nodeId: resolvedNodeId,
-      title: "TIMEOUT PRESSURE",
-      choice: chargeIndex === 1 ? "결정 윈도우 초과" : `결정 윈도우 초과 ${chargeIndex}차`,
-      spokenChoice: "잠깐. 늦어진 만큼의 비용도 기록하겠습니다.",
-      freeText: "",
-      effect: timeoutEffect,
-      triggers: ["fear", "responsibility"],
-      echo:
-        chargeIndex === 1
-          ? "결정을 늦추는 것도 하나의 결정입니다. 이제 줄어든 시간과 늘어난 피로를 감안하십시오."
-          : `${OVERTIME_CHARGE_SECONDS}초가 더 지났습니다. 기다리는 비용은 회차마다 커집니다.`,
-      sceneBeat: "에코: 결정 윈도우가 닫혔습니다.\n회의실: 아무도 당신을 대신해 결론을 내리지 않았지만, 기다린 비용은 이미 숫자로 남았습니다.",
-      challenge: { title: "시간 압박 버티기", matched: false, riskDelta: getRiskPressure(nextResources) - riskPressure },
-      tactical: null,
-      flowSurge: null,
-      tempoBonus: null,
-      instinctSurge: null,
-      note: `결정 윈도우 초과 비용 ${chargeIndex}차`,
-      responseTimeSec: 45 + overtimeSeconds,
-      resourcesBefore: resources,
-      resourcesAfter: nextResources,
-      isSystemEvent: true,
-    };
-    const nextLog = [...log, entry];
-    queueMicrotask(() => {
-      setTimerPenaltyCount(chargeIndex);
-      setResources(nextResources);
-      setLog(nextLog);
-      setEcho(entry.echo);
-      setSaveStatus(`결정 윈도우 초과 비용 ${chargeIndex}차 적용됨`);
-    });
-    persist({
-      timerPenaltyCount: chargeIndex,
-      resources: nextResources,
-      log: nextLog,
-      echo: entry.echo,
-    });
-  });
-
-  useEffect(() => {
-    if (!started || isResult) return undefined;
-    return decisionClock.onDecisionTick(chargeOvertime);
-  }, [chargeOvertime, isResult, started]);
-
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
   }
@@ -1062,10 +827,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
       sceneTitleRef.current?.focus({ preventScroll: true });
       setIsAdvancing(false);
-      setShowTacticalDetails(false);
-      setPendingChoiceEvent(null);
     });
-  }, [currentCase, isResult, nodeId, setPendingChoiceEvent, started]);
+  }, [currentCase, isResult, nodeId, started]);
 
   // Persistence, save slots and error-log state are owned by useAppPersistence.
   const startGame = persistenceStartGame;
@@ -1081,64 +844,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   function startRecoveryRoute() {
     setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
     startCase(currentCase);
-  }
-  function resolveHypothesisAction(action) {
-    if (!action?.effect) return;
-    const nextResources = applyEffect(resources, action.effect);
-    const entry = {
-      isSystemEvent: true,
-      nodeId: resolvedNodeId,
-      caseId: fallbackCaseId,
-      choiceId: `hypothesis-${action.id}`,
-      title: "HYPOTHESIS REVIEW",
-      choice: action.label,
-      effect: action.effect,
-      resourcesBefore: resources,
-      resourcesAfter: nextResources,
-    };
-    const event = createGameEvent("HYPOTHESIS_ACTION", { id: action.id, action: action.id });
-    const nextDecisions = reduceInvestigationState(hypothesisDecisions, event);
-    const nextLog = [...log, { ...entry, event }];
-    setHypothesisAction(action.id);
-    setHypothesisDecisions(nextDecisions);
-    setResources(nextResources);
-    setLog(nextLog);
-    persist({ resources: nextResources, log: nextLog, hypothesisDecisions: nextDecisions });
-    setSaveStatus(`${action.label}: ${action.text}`);
-  }
-  function investigateTarget(target) {
-    if (!target || target.locked) {
-      setSaveStatus("현재 권한으로는 이 조사 대상을 열 수 없습니다.");
-      return;
-    }
-    const outcome = getInvestigationOutcome(target, log.length);
-    const event = createGameEvent("INVESTIGATE", { id: target.id, result: outcome?.outcome });
-    const nextInvestigations = reduceInvestigationState(investigatedTargets, event);
-    setSelectedInvestigation(target.id);
-    setInvestigatedTargets(nextInvestigations);
-    const nextResources = applyEffect(resources, target.effect);
-    setResources(nextResources);
-    persist({ resources: nextResources, investigatedTargets: nextInvestigations });
-    setSaveStatus(`${target.label}: 조사가 기록되었습니다.`);
-  }
-  function repairEvidence() {
-    if (!evidenceRepairPuzzle || evidenceRepaired) return;
-    const nextResources = applyEffect(resources, evidenceRepairPuzzle.reward);
-    const nextLog = [...log, { isSystemEvent: true, choiceId: "evidence-repair", caseId: fallbackCaseId, resourcesBefore: resources, resourcesAfter: nextResources }];
-    setEvidenceRepaired(true);
-    setResources(nextResources);
-    setLog(nextLog);
-    persist({ resources: nextResources, log: nextLog });
-    setSaveStatus("증거 원본이 복구되었습니다.");
-  }
-  function counterRival(option) {
-    if (!option?.effect) return;
-    const nextResources = applyEffect(resources, option.effect);
-    const nextLog = [...log, { isSystemEvent: true, choiceId: `rival-${option.id}`, caseId: fallbackCaseId, resourcesBefore: resources, resourcesAfter: nextResources }];
-    setResources(nextResources);
-    setLog(nextLog);
-    persist({ resources: nextResources, log: nextLog });
-    setSaveStatus(`${option.label}: 라이벌 개입에 대응했습니다.`);
   }
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
@@ -1207,6 +912,14 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setHypothesisDecisions({});
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
+    // A case abandoned mid-run forfeits its pot. A case that closed has already
+    // moved its pot to the vault and dealt the REBOOT board; keep that banner.
+    const openingRun = normalizeRunState({
+      ...gauntletRun,
+      runPot: 0,
+      schema: gauntletRun.schema.mutations.includes("reboot") ? gauntletRun.schema : BASE_SCHEMA,
+    });
+    setGauntletRun(openingRun);
     resetEndingSequence();
     setEcho(openingEcho);
     setFreeText("");
@@ -1226,6 +939,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       probeUsed: false,
       openingLegacy: legacy,
       echo: openingEcho,
+      dynamics: serializeRunState(openingRun),
       nodeEnteredAt: Date.now(),
     });
   }
@@ -1242,98 +956,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       persist({ freeText: nextText });
       freeTextSaveTimerRef.current = null;
     }, 400);
-  }
-
-  function requestEchoProbe() {
-    if (probeUsed || isAdvancing || !echoProbeHint) return;
-    const probeSeconds = playStyle === "mediator" ? 4 : 8;
-    const probeEffect = playStyle === "mediator"
-      ? { time: -1, trust: 1 }
-      : { time: -1, fatigue: 1 };
-    const nextResources = applyEffect(resources, probeEffect);
-    const probeLine = `${echoProbeHint} 단, 힌트를 얻는 대가로 결정 시간 ${probeSeconds}초를 지불합니다.`;
-    const entry = {
-      nodeId: resolvedNodeId,
-      title: "ECHO PROBE",
-      choice: "에코에게 힌트 요청",
-      spokenChoice: "판단을 대신하지 말고, 어느 방향을 더 봐야 하는지만 말해.",
-      freeText: "",
-      effect: probeEffect,
-      triggers: ["curiosity", "inference"],
-      echo: probeLine,
-      sceneBeat: `당신: 에코에게 한 번 더 묻는다.\n에코: ${echoProbeHint}`,
-      challenge: null,
-      tactical: null,
-      flowSurge: null,
-      tempoBonus: null,
-      instinctSurge: null,
-      note: "장면당 1회 힌트 요청",
-      responseTimeSec: probeSeconds,
-      resourcesBefore: resources,
-      resourcesAfter: nextResources,
-      isSystemEvent: true,
-    };
-    const nextLog = [...log, entry];
-    setProbeUsed(true);
-    setResources(nextResources);
-    setLog(nextLog);
-    setEcho(probeLine);
-    decisionClock.spendDecisionSeconds(probeSeconds);
-    setSaveStatus(`에코 힌트 확보됨 · 결정 시간 ${probeSeconds}초 사용`);
-    persist({
-      probeUsed: true,
-      resources: nextResources,
-      log: nextLog,
-      echo: probeLine,
-    });
-  }
-
-  function activateCrisisProtocol() {
-    if (protocolUsed || riskPressure < 60 || isAdvancing) return;
-    const protocolEffect = { time: -4, capital: -2, legitimacy: 3, fatigue: 4 };
-    const nextResources = applyEffect(resources, protocolEffect);
-    const entry = {
-      nodeId: resolvedNodeId,
-      title: "CRISIS PROTOCOL",
-      choice: "위기 프로토콜 발동",
-      spokenChoice: "지금 구조를 바꾸고, 그 비용을 기록하겠습니다.",
-      freeText: "",
-      effect: protocolEffect,
-      triggers: ["responsibility", "order"],
-      echo: "프로토콜은 시간을 구하지 않습니다. 대신 누구에게 어떤 기준으로 개입했는지 남깁니다.",
-      sceneBeat: `에코: 위험 압력 ${riskPressure}에서 일반 절차를 유지할 여유가 사라졌습니다.\n당신: 위기 프로토콜을 발동한다. 시간과 현금을 더 내놓고, 판단 기준을 공개된 절차로 묶는다.`,
-      challenge: { title: "위기 압력 버티기", matched: true, riskDelta: getRiskPressure(nextResources) - riskPressure },
-      tactical: { grade: "A", gradeText: "공략 후보", reward: "구조 개입", cost: "TIME -4 · CAPITAL -2", gain: "LEGITIMACY +3" },
-      flowSurge: null,
-      tempoBonus: null,
-      note: "케이스당 1회 사용 가능한 구조 개입",
-      responseTimeSec: Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000)),
-      isSystemEvent: true,
-      resourcesBefore: resources,
-      resourcesAfter: nextResources,
-    };
-    const nextLog = [...log, entry];
-    setProtocolUsed(true);
-    setResources(nextResources);
-    setLog(nextLog);
-    setEcho(entry.echo);
-    setNodeEnteredAt(Date.now());
-    decisionClock.startDecisionWindow(DECISION_WINDOW_SECONDS);
-    // Paired, the way the scene entry above pairs them. Resetting the clock and
-    // not the reducer handed the player a window whose burn started over while
-    // the gauge they had already bought rode through it -- a free vent, once a
-    // case, and a bigger one since the burn curve flattened and the clock became
-    // the larger share of the gauge. The protocol buys a fresh window; a fresh
-    // window is fresh on both.
-    dispatchDynamics({ type: "DECISION_STARTED" });
-    setSaveStatus("위기 프로토콜 발동됨");
-    persist({
-      protocolUsed: true,
-      resources: nextResources,
-      log: nextLog,
-      echo: entry.echo,
-      nodeEnteredAt: Date.now(),
-    });
   }
 
   function buildCaseSummary(nextTriggers, nextCognition, nextLog, nextResources = resources) {
@@ -1354,10 +976,53 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
   }
 
-  function choose(choice) {
-    if (isAdvancing) return;
+  /**
+   * The table closed a window: settle it. `closedWindow` is the stage's final
+   * window -- cashed or bust -- and the verdict it produces is the only thing
+   * that prices the card. There are no side bonuses stacked on top: what the
+   * player sees on the table is what the resources receive.
+   */
+  function resolveGauntlet({ card, window: closedWindow, forced = false }) {
+    if (!card) return;
+    choose(card, closedWindow, forced);
+  }
+
+  /**
+   * The first touch on a window is saved before the window can be won or lost:
+   * a reload that finds this seed still open settles it as a bust. Without it,
+   * F5 during the bust slam put the player back at the same wall -- which the
+   * slam had just printed.
+   */
+  function reloadFromStorage() {
+    onSuppressSaves();
+    window.location.reload();
+  }
+
+  function markWindowTouched(openSeed, cardId = null) {
+    if (staleSave) return;
+    const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId });
+    setGauntletRun(touchedRun);
+    persist({ dynamics: serializeRunState(touchedRun) });
+  }
+
+  /**
+   * What a bust costs the story, not just the score. The room does not wait for
+   * an analyst who blew up: the scene the card led to plays out without them,
+   * and the table deals the one after it. Never onto a result -- a bust does not
+   * close a case -- and never off the authored graph.
+   */
+  function getBlackoutSkip(fromNodeId) {
+    const skippedNode = nodes[fromNodeId];
+    if (!skippedNode || Object.values(CASE_RESULT_NODES).includes(fromNodeId)) return null;
+    const onward = skippedNode.choices?.find((candidate) => candidate.type !== "free")?.next;
+    if (!onward || !nodes[onward] || Object.values(CASE_RESULT_NODES).includes(onward)) return null;
+    return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
+  }
+
+  function choose(choice, closedWindow = null, forced = false) {
+    if (isAdvancing || staleSave) return;
     const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
-    if (!authorityGate.unlocked) {
+    if (!authorityGate.unlocked && !forced) {
       setSaveStatus(`Choice locked: ${authorityGate.reason}`);
       return;
     }
@@ -1368,8 +1033,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     window.clearTimeout(freeTextSaveTimerRef.current);
     freeTextSaveTimerRef.current = null;
     setIsAdvancing(true);
-    setPendingChoice(null);
-    const responseTimeSec = Math.max(1, Math.round((Date.now() - nodeEnteredAt) / 1000));
+    const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
+    const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (Date.now() - nodeEnteredAt) / 1000));
     const free = choice.type === "free";
     const freeResult = free ? scoreFreeText(freeText) : null;
     const submittedFreeText = free ? freeText.trim() : "";
@@ -1378,6 +1043,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     const submittedPrivacySignals = free ? detectPrivacySignals(submittedFreeText) : [];
     const freeTextSuccess =
       free &&
+      windowState.status === "cashed" &&
       submittedSignalCount >= 3 &&
       !submittedPrivacySignals.some((signal) => signal.active);
     const freeTextBranchTarget = free && freeTextSuccess && currentCaseFreeTextSuccessCount === 0
@@ -1388,86 +1054,37 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     const {
       challengeMatch,
       tacticalRead,
-      flowSurge,
-      finalEffect: effect,
       finalRiskDelta: challengeRiskDelta,
     } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-    // One verdict for the turn: resolveCommit runs the real event through the
-    // reducer, so resources, screen and state machine cannot disagree about
-    // where the critical point was. The dispatch replays it into the store.
-    const { commitEvent, thresholdState, rewardMultiplier, riskRewardEffect, environmentEffect, thresholdEffect, environmentMode: committedEnvironment } =
-      resolveCommit({ challengeMatch, riskDelta: challengeRiskDelta, seconds: decisionClock.getDecisionSeconds(), effect });
-    dispatchDynamics(commitEvent);
-    const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
-    const instinctSurge = instinctChoice && challengeMatch
-      ? {
-          label: "INSTINCT SURGE",
-          text: "정보를 더 열어보지 않고 장면의 핵심 압박을 읽었습니다.",
-          effect: { trust: 3, fatigue: -2 },
-        }
-      : null;
-    const auditSurge = playStyle === "auditor" && showTacticalDetails && challengeMatch
-      ? {
-          label: "AUDIT SURGE",
-          text: "비용과 위험을 확인한 뒤, 설명 가능한 챌린지 선택을 완수했습니다.",
-          effect: { legitimacy: 2, fatigue: -1 },
-        }
-      : null;
-    const quickRead = responseTimeSec <= 12 && challengeMatch;
-    const tempoBonus = quickRead
-      ? { label: "QUICK READ", text: "장면의 핵심 압박을 빠르게 읽고, 망설임 없이 챌린지를 맞혔습니다.", effect: { trust: 1, fatigue: -1 } }
-      : responseTimeSec > DECISION_WINDOW_SECONDS
-        ? { label: "SILENCE CHARGED", text: "결정 창을 넘긴 망설임까지 판단 기록으로 남았습니다.", effect: {} }
-        : responseTimeSec >= 24
-          ? { label: "DELIBERATE READ", text: "오래 붙잡은 선택입니다. 관찰자는 확신보다 검토 시간을 먼저 기록합니다.", effect: {} }
-          : { label: "STEADY READ", text: "압박을 읽고 기록 가능한 속도로 결론을 닫았습니다.", effect: {} };
-    const streakBreak = currentChallengeStreak > 0 && !challengeMatch
-      ? {
-          label: "STREAK BROKEN",
-          text: `${currentChallengeStreak}연속 장면 목표가 끊겼습니다. 다음 장면부터 다시 흐름을 쌓을 수 있습니다.`,
-          tone: "break",
-        }
-      : null;
-    const streakReward = createStreakReward({ previousStreak: currentChallengeStreak, challengeMatch });
-    const clue = getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
+
+    const previousCaseId = caseSequence[caseSequence.indexOf(currentCase) - 1];
+    const branchBypass = getBranchDetourBypass(choice, {
+      resources,
+      previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
+    });
+    const plannedNode = freeTextBranchTarget ?? branchBypass ?? choice.next;
+    const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode) : null;
+    const nextNode = blackoutSkip?.nodeId ?? plannedNode;
+    const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
+    const { verdict, nextRun } = resolveWindow({ run: gauntletRun, window: windowState, card: choice, caseClosed });
+    if (windowState.seed) recordSettledWindowSeed(windowState.seed);
+    const busted = verdict.outcome === "bust";
+
+    const gauntletEffect = applyGauntletEffect(baseEffect, {
+      outcome: verdict.outcome,
+      gauge: verdict.gauge,
+      fracturedAxis: verdict.fracturedAxis,
+    });
+    const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
     const clueReward = clue
-      ? {
-          label: "EVIDENCE BONUS",
-          text: "숨은 단서를 확보해 정당성이 오르고 판단 피로가 줄었습니다.",
-          effect: { legitimacy: 2, fatigue: -1 },
-        }
+      ? { label: "EVIDENCE BONUS", text: "숨은 단서를 확보했다.", effect: { legitimacy: 2, fatigue: -1 } }
       : null;
-    const choiceSearchText = `${choice.id} ${choice.label}`.toLowerCase();
-    const prematureHypothesis =
-      clueHypotheses.length > 0 &&
-      clueHypotheses.some((hypothesis) => Number(hypothesis.confidence) < 75) &&
-      /expose|public|report|disclosure|공개|폭로|보고/.test(choiceSearchText)
-      ? {
-          label: "HYPOTHESIS CHALLENGED",
-          text: "증거가 덜 모인 가설을 공개선에 올렸습니다. 다음 장면에서 신뢰와 정당성이 흔들립니다.",
-          effect: { trust: -3, legitimacy: -2, fatigue: 3 },
-        }
-      : null;
-    const mergedEffect = mergeEffects(
-      riskRewardEffect,
-      ...(tempoBonus ? [tempoBonus.effect] : []),
-      ...(instinctSurge ? [instinctSurge.effect] : []),
-      ...(auditSurge ? [auditSurge.effect] : []),
-      ...(clueReward ? [clueReward.effect] : []),
-      ...(streakReward ? [streakReward.effect] : []),
-      ...(prematureHypothesis ? [prematureHypothesis.effect] : []),
-      environmentEffect,
-      thresholdEffect,
-    );
-    const finalEffect = applySeededEffectVariation(
-      mergedEffect,
-      `${sessionId}:${resolvedNodeId}:${choice.id}`,
-    );
-    const finalResourcesWithTempo = applyEffect(resources, finalEffect);
+    const finalEffect = mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? BUST_EFFECT : {});
+    const finalResources = applyEffect(resources, finalEffect);
     const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
       riskBefore: riskPressure,
-      riskAfter: getRiskPressure(finalResourcesWithTempo),
+      riskAfter: getRiskPressure(finalResources),
       currentCase,
       logLength: log.length,
     });
@@ -1501,9 +1118,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
           ? "evidence-turn"
           : freeTextBranchTarget
             ? "free-text"
-            : undefined,
+            : blackoutSkip
+              ? "blackout-skip"
+              : undefined,
+      skippedNodeId: blackoutSkip?.skippedNodeId,
       effect: finalEffect,
-      riskRewardEffect,
+      riskRewardEffect: gauntletEffect,
       cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
       echo: getEcho(choice.id, free ? freeText : ""),
@@ -1514,21 +1134,29 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         riskDelta: challengeRiskDelta,
       },
       tactical: tacticalRead,
-      flowSurge,
-      tempoBonus,
-      instinctSurge,
-      auditSurge,
+      flowSurge: null,
+      tempoBonus: null,
       clueReward,
-      prematureHypothesis,
-      threshold: { state: thresholdState, rewardMultiplier, busted: thresholdState === "bust" },
-      environmentMode: committedEnvironment,
-      streakBreak,
+      threshold: {
+        state: busted ? "bust" : "cash",
+        busted,
+        cause: verdict.cause,
+        forced,
+        gauge: verdict.gauge,
+        wall: verdict.wall,
+        pushes: verdict.pushes,
+        rewardMultiplier: busted ? 1 : verdict.resourceMultiplier,
+        potMultiplier: verdict.multiplier,
+        pot: verdict.pot,
+        lostPot: verdict.lostPot,
+      },
+      environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       suspenseEvent,
       clue,
       note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
-      resourcesAfter: finalResourcesWithTempo,
+      resourcesAfter: finalResources,
     };
     const entry = {
       ...entryBase,
@@ -1538,14 +1166,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     const nextLog = [...log, entry];
     const safeQuote = freeTextSuccess ? limitText(submittedFreeText, 140) : "";
     const nextEcho = safeQuote
-      ? `${entry.echo} 다음 장면은 당신이 남긴 문장 \u201c${safeQuote}\u201d을 기준으로 이어집니다.`
+      ? `${entry.echo} 다음 장면은 당신이 남긴 문장 “${safeQuote}”을 기준으로 이어집니다.`
       : entry.echo;
-    const previousCaseId = caseSequence[caseSequence.indexOf(currentCase) - 1];
-    const branchBypass = getBranchDetourBypass(choice, {
-      resources,
-      previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
-    });
-    const nextNode = freeTextBranchTarget ?? branchBypass ?? choice.next;
     appendTraceEvent({
       kind: "choose",
       caseId: currentCase,
@@ -1553,24 +1175,25 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       choiceId: choice.id,
       nextNodeId: nextNode,
       logLength: nextLog.length,
-      resources: finalResourcesWithTempo,
+      resources: finalResources,
     });
-    const nextCompletedCases = CASE_RESULT_NODES[currentCase] === nextNode
+    const nextCompletedCases = caseClosed
       ? Array.from(new Set([...completedCases, currentCase]))
       : completedCases;
     const completedNow = nextCompletedCases !== completedCases;
     const caseSummaryDraft = completedNow
-      ? buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResourcesWithTempo)
+      ? buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResources)
       : null;
     const caseSummary = completedNow
       ? {
           ...caseSummaryDraft,
           endingVariant: getEndingVariant({
-            resources: finalResourcesWithTempo,
+            resources: finalResources,
             discoveredClues: nextDiscoveredClues,
             log: nextLog,
             ...getSeasonStrain(caseResults, caseSummaryDraft),
           }),
+          gauntlet: createRunSummary(nextRun),
           runId,
           outcomeChoiceId: entry.choiceId,
           outcomeNodeId: entry.nodeId,
@@ -1627,11 +1250,11 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
           case_title: activeCaseMeta?.title ?? currentCase,
           completed_at: new Date().toISOString(),
           summary: caseSummary,
-          resources: finalResourcesWithTempo,
+          resources: finalResources,
           triggers: nextTriggers,
           cognition: nextCognition,
           decision_log: nextLog,
-          dynamics: { ...dynamicsSummary, responseTimeSec },
+          dynamics: { ...createRunSummary(nextRun), responseTimeSec },
         };
         setTelemetryStatus({
           tone: "pending",
@@ -1666,7 +1289,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         completedCaseCount: nextCompletedCases.length,
         cognition: nextCognition,
         decisionLog: nextLog,
-        resources: finalResourcesWithTempo,
+        resources: finalResources,
         runId,
         sessionCode,
         sessionId,
@@ -1696,7 +1319,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       }
     }
 
-    setResources(finalResourcesWithTempo);
+    setGauntletRun(nextRun);
+    setResources(finalResources);
     setTriggers(nextTriggers);
     setCognition(nextCognition);
     setLog(nextLog);
@@ -1707,51 +1331,22 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setCaseResults(nextCaseResults);
     setDiscoveredClues(nextDiscoveredClues);
     setNodeEnteredAt(Date.now());
-    const strongestCost = Object.entries(finalEffect)
-      .filter(([, value]) => value < 0)
-      .sort((a, b) => a[1] - b[1])[0];
-    // The moment a case closes is the only moment its hidden record can still
-    // be named. Leaving without one used to be silent.
-    const caseClue = getCaseDiscoveryClue(fallbackCaseId);
-    const closedCaseClue =
-      Object.values(CASE_RESULT_NODES).includes(nextNode) &&
-      caseClue &&
-      !nextDiscoveredClues.some((item) => item.id === caseClue.id)
-        ? caseClue
-        : null;
-    const cascade = finalResourcesWithTempo.humanCost >= 28 || getRiskPressure(finalResourcesWithTempo) >= 72;
     setDecisionReveal({
-      title: suspenseEvent?.title ?? (cascade ? "선택이 연쇄 반응을 일으켰습니다." : "선택의 잔향"),
-      label: suspenseEvent?.label ?? (cascade ? "CASCADE DETECTED" : "DECISION AFTERIMAGE"),
+      verdict,
+      forced,
+      caseClosed,
+      runPot: nextRun.runPot,
+      vault: nextRun.vault,
       spokenChoice: entry.spokenChoice,
       beat: entry.sceneBeat,
       effect: finalEffect,
-      consequence: suspenseEvent
-        ? suspenseEvent.text
-        : clue
-        ? `${clue.title}를 발견했습니다. 다음 사건에서 이 단서를 잊지 마십시오.`
-        : closedCaseClue
-        ? `이번 사건의 기록 하나가 닫혔습니다: ${closedCaseClue.title}. 마지막 사건에서 한 번은 다시 열 수 있습니다.`
-        : cascade
-        ? "당신의 말은 실행안으로 끝나지 않았습니다. 누군가의 행동을 바꾸고, 다음 장면의 압박을 앞당겼습니다."
-        : strongestCost
-          ? `${resourceMeta[strongestCost[0]]?.label ?? strongestCost[0]}의 감소분이 다음 장면의 숨은 질문으로 남습니다.`
-          : entry.challenge?.matched
-            ? "장면의 핵심을 읽어낸 대가로, 회의실은 당신의 기준을 기억하기 시작합니다."
-            : "결론은 닫혔지만, 말하지 않은 비용은 아직 닫히지 않았습니다.",
+      clue,
+      skippedTitle: blackoutSkip?.skippedTitle ?? null,
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
-      cascade,
-      observerTag: entry.observerTag,
-      streakBreak,
-          suspenseEvent,
-          clue,
-          bonuses: [flowSurge, tempoBonus, instinctSurge, auditSurge, clueReward, streakReward, streakBreak]
-            .filter(Boolean)
-            .map(({ label, text, effect, tone }) => ({ label, text, effect, tone })),
-        });
+    });
     persist({
-      resources: finalResourcesWithTempo,
+      resources: finalResources,
       triggers: nextTriggers,
       cognition: nextCognition,
       log: nextLog,
@@ -1763,43 +1358,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       freeText: "",
       timerPenaltyCount: 0,
       probeUsed: false,
+      dynamics: serializeRunState(nextRun),
       nodeEnteredAt: Date.now(),
     });
-  }
-
-  function previewChoice(choice) {
-    if (isAdvancing || choice.type === "free") return;
-    setPendingChoice(choice);
-    dispatchDynamics({ type: "CHOICE_STAGED", choiceId: choice.id });
-  }
-
-  function clearPendingChoice() {
-    setPendingChoice(null);
-    dispatchDynamics({ type: "CHOICE_CANCELLED" });
-  }
-
-  function beginChoiceHold(choice) {
-    if (isAdvancing || choice.type === "free") return;
-    window.clearTimeout(choiceHoldTimerRef.current);
-    choiceHoldTriggeredRef.current = false;
-    choiceHoldTimerRef.current = window.setTimeout(() => {
-      choiceHoldTriggeredRef.current = true;
-      choose(choice);
-      choiceHoldTimerRef.current = null;
-    }, 600);
-  }
-
-  function endChoiceHold() {
-    window.clearTimeout(choiceHoldTimerRef.current);
-    choiceHoldTimerRef.current = null;
-  }
-
-  function handleChoiceClick(choice) {
-    if (choiceHoldTriggeredRef.current) {
-      choiceHoldTriggeredRef.current = false;
-      return;
-    }
-    previewChoice(choice);
   }
 
   function reset() {
@@ -1849,7 +1410,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setInvestigatedTargets({});
     setHypothesisDecisions({});
     setDecisionReveal(null);
-    dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE });
+    setGauntletRun(RUN_INITIAL_STATE);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
     setFreeText("");
     let resetErrorLogSaved = true;
@@ -1971,10 +1532,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setProtocolUsed(false);
     setTimerPenaltyCount(0);
     setProbeUsed(false);
-    dispatchDynamics({ type: "RESET_DYNAMICS", state: DYNAMICS_INITIAL_STATE });
+    setGauntletRun(RUN_INITIAL_STATE);
     setOpeningLegacy(null);
     setDecisionReveal(null);
-    setPendingChoice(null);
     setFreeText("");
     setEcho(echoText);
     setShowErrorLog(false);
@@ -1997,7 +1557,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         timerPenaltyCount: 0,
         probeUsed: false,
         openingLegacy: null,
-        dynamics: DYNAMICS_INITIAL_STATE,
+        dynamics: serializeRunState(RUN_INITIAL_STATE),
         nodeEnteredAt: now,
       });
     }
@@ -2139,8 +1699,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const resultRank = gameplayRank;
   const rankingHeadline = getLeaderboardHeadline(leaderboard);
   const flowSurgeCount = log.filter((entry) => entry.flowSurge).length;
-  const streakGoal = currentChallengeStreak < 3 ? 3 : 5;
-  const streakRemaining = Math.max(0, streakGoal - currentChallengeStreak);
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
 
@@ -2182,14 +1740,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       ? `${nextCaseSignal.title}로 넘어가고 싶은 이유가 생겼나요?`
       : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
   ];
-  function getEchoChecks(currentNode) {
-    const memoChecks = (currentNode?.memo ?? []).slice(0, 2);
-    const triggerCheck = currentNode?.triggers?.[0]
-      ? `${triggerLabels[currentNode.triggers[0]]} 압박 때문에 생략한 근거가 있는지 확인`
-      : "방금 판단에서 빠진 이해관계자 확인";
-    return [...memoChecks, triggerCheck];
-  }
-
   function trapDecisionRevealFocus(event) {
     if (event.key !== "Tab") return;
     const focusable = Array.from(
@@ -2270,10 +1820,26 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} /></Suspense>;
   }
 
-  const playView = createPlayView(
-    { suspenseState, AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, simplifyPlayerText, caseObjectives, currentCase, node, triggerLabels, openingLegacy, operatorBriefs, chapterRules, relationshipScores, authorityState, pressureCascade, riskPressure, playGuideItems, sceneTitleRef, saveCurrentGame, reset, renderSaveStatus, progress, easyRiskLabels, riskTier, activeBonus, freeTextCombo, currentAverageResponseTime, log, observerPattern, clueCount, discoveredClues, currentChallengeStreak, momentumTier, streakGoal, streakRemaining, momentumScore, protocolUsed, isAdvancing, activateCrisisProtocol, decisionFingerprint, decisionLedger, resourceMeta, sceneChallenge, triggerLabSignals, narrativeSpine, questSteps, sceneVisuals, speakerProfile, speakerPortrait, latestFreeTextSuccess, resolvedNodeId, sceneDirection, latestBeat, renderSceneLines, setMemoOpened, echo, probeUsed, echoProbeCost, requestEchoProbe, getEchoChecks, pendingChoice, showTacticalDetails, setShowTacticalDetails, decisionForecasts, pressureLeader, previewChoice, evidenceCount, pendingChoiceRead, pendingChoiceForecast, commitConsoleRef, formatRiskDelta, formatForecastRisk, setPendingChoice: clearPendingChoice, commitConfirmRef, choose, fixedChoices, getEffectiveChoiceRead, getRiskPressure, getChallengeMatch, choiceButtonsRef, handleChoiceClick, beginChoiceHold, endChoiceHold, speechifyChoice, getChoiceSubtext, getDramaticChoiceLabel, explainResourceTradeoff, easyCognitionLabels, cognitionLabels, freeChoice, boardChangePrompts, updateFreeText, freeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals, anonymizeFreeText, activeFreeTextSignalCount, freeTextPreview, applyEffect, resources, playerName, activePlayStyle, turnBriefItems, completedCases, activeCaseMeta, debugToolsEnabled, fallbackCaseId, routeIndex, routeLength, silentFailureCount, copyReplayLink, copyDiagnosticTrace, operatorProfile, latestChoiceFeedback },
-    { clueHypotheses, chapterUiModel, relationshipQuest, relationshipGraph, autonomousSignal, timelineStamp, evidenceMetadata, hypothesisConflict, investigationTargets, investigateTarget, selectedInvestigationOutcome, evidenceContamination, hypothesisLockState, characterState, rivalResponse, evidenceRepairPuzzle, repairEvidence, rivalIntervention, counterRival, chapterTransitionBridge, operatorReveal, achievementProgress, resourceChain, midBoss, dynamicMusicLayers, characterMemory: getCharacterMemory(node?.speaker, log), evidenceCombinations, hypothesisActions, resolveHypothesisAction, delayedConsequences, playStyleUnlocks, interlude, balanceSignals, relationshipScene, pastRunMemory },
-  );
+  // A window already settled under this seed -- a rolled-back save brought it
+  // back -- is dealt again under a fresh draw, so its seen wall is not its wall.
+  function dealGauntletSeed(baseSeed) {
+    const settled = new Set(readSettledWindowSeeds());
+    let seed = baseSeed;
+    for (let redeal = 1; settled.has(seed) && redeal < 50; redeal += 1) seed = `${baseSeed}~${redeal}`;
+    return seed;
+  }
+  const playView = createPlayView({
+    AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus,
+    screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef,
+    node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
+    gauntletRun, gauntletSeed: dealGauntletSeed(`${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}`), resolveGauntlet,
+    isAdvancing, markWindowTouched, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage,
+    fixedChoices, clueCount,
+    freeChoice, freeText, updateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals,
+    anonymizeFreeText,
+    resources, resourceMeta, progress, saveCurrentGame, reset, routeIndex, routeLength,
+    debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
+  });
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;
 
 }

@@ -17,6 +17,7 @@ import {
   parseCurrentSavedState,
   readStoredValue,
   removeStoredValue,
+  writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
 import { CASE_RESULT_NODES, CASE_START_NODES } from "./gameCases.js";
@@ -74,7 +75,7 @@ function readCurrentSave() {
       nodeId: CASE_START_NODES[saved.currentCase] ?? "start",
     },
   };
-  writeStoredValue(STORAGE_KEY, JSON.stringify(repaired));
+  writeSaveState(repaired, { force: true });
   return repaired;
 }
 
@@ -224,7 +225,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   function persist(nextState) {
     const current = readCurrentSave() ?? createStartSave({ playerName, playStyle, dataConsent });
     const payload = { ...current, ...nextState, started: false, savedAt: new Date().toISOString() };
-    const storageSaved = writeStoredValue(STORAGE_KEY, JSON.stringify(payload));
+    const storageSaved = writeSaveState(payload, { force: true }).saved;
     if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
     return { ...payload, storageSaved };
   }
@@ -232,7 +233,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   function startGame() {
     const payload = createStartSave({ playerName, playStyle, dataConsent });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(payload))) {
+    if (!writeSaveState(payload, { force: true }).saved) {
       setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
       setInitialStartState(payload);
     }
@@ -248,7 +249,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   function persistResumedRun() {
     const current = readCurrentSave();
     if (!current) return;
-    if (!writeStoredValue(STORAGE_KEY, JSON.stringify(createResumedSave(current)))) {
+    if (!writeSaveState(createResumedSave(current), { force: true }).saved) {
       setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
     }
   }

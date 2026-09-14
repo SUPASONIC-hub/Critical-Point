@@ -28,23 +28,23 @@ export function useRuntimeOverlayShortcuts({
   }, [closeRecoveryCenter, decisionReveal, setDecisionReveal, setShowRanking, showErrorLog, showRanking]);
 }
 
+/**
+ * Session keys the runtime owns: save, and the result screen's retry and next.
+ * The table's own keys -- number to stake, Space to push, Enter to cash -- live
+ * with the table in `GauntletStage`, where the window they act on lives.
+ */
 export function useRuntimeChoiceShortcuts({
-  choose,
   currentCase,
   decisionReveal,
-  fixedChoices,
   isAdvancing,
   isResult,
   nextCaseSignal,
-  pendingChoice,
-  previewChoice,
   saveCurrentGame,
-  setPendingChoice,
   startCase,
   started,
 }) {
   useEffect(() => {
-    const handleChoiceShortcut = (event) => {
+    const handleShortcut = (event) => {
       if (!started || decisionReveal || isAdvancing) return;
       if (event.repeat) return;
       const target = event.target;
@@ -62,46 +62,9 @@ export function useRuntimeChoiceShortcuts({
       if (event.key.toLowerCase() === "p") {
         event.preventDefault();
         saveCurrentGame({ exit: event.shiftKey });
-        return;
       }
-      if (event.key === "Escape" && pendingChoice) {
-        event.preventDefault();
-        setPendingChoice(null);
-        return;
-      }
-      if ((event.key === "Enter" || event.key === " ") && pendingChoice) {
-        event.preventDefault();
-        choose(pendingChoice);
-        return;
-      }
-      if (fixedChoices.length > 1 && ["ArrowDown", "ArrowRight", "j", "J", "ArrowUp", "ArrowLeft", "k", "K"].includes(event.key)) {
-        event.preventDefault();
-        const currentIndex = pendingChoice ? fixedChoices.findIndex((choice) => choice.id === pendingChoice.id) : -1;
-        const direction = ["ArrowUp", "ArrowLeft", "k", "K"].includes(event.key) ? -1 : 1;
-        const nextIndex = (currentIndex + direction + fixedChoices.length) % fixedChoices.length;
-        previewChoice(fixedChoices[nextIndex]);
-        return;
-      }
-      const choiceIndex = Number(event.key) - 1;
-      if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || !fixedChoices[choiceIndex]) return;
-      event.preventDefault();
-      previewChoice(fixedChoices[choiceIndex]);
     };
-    window.addEventListener("keydown", handleChoiceShortcut);
-    return () => window.removeEventListener("keydown", handleChoiceShortcut);
-  }, [
-    choose,
-    currentCase,
-    decisionReveal,
-    fixedChoices,
-    isAdvancing,
-    isResult,
-    nextCaseSignal,
-    pendingChoice,
-    previewChoice,
-    saveCurrentGame,
-    setPendingChoice,
-    startCase,
-    started,
-  ]);
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [currentCase, decisionReveal, isAdvancing, isResult, nextCaseSignal, saveCurrentGame, startCase, started]);
 }

@@ -11,6 +11,7 @@ import {
   serializeError,
   STORAGE_KEY,
   TELEMETRY_QUEUE_TYPES,
+  writeSaveState,
   writeStoredValue,
 } from "../appConfig.js";
 import {
@@ -444,7 +445,7 @@ export function persistErrorRecovery(entry) {
         retryCount: sameRecoveryPoint ? (Number(previousError.retryCount) || 0) + 1 : 1,
       },
     };
-    writeStoredValue(STORAGE_KEY, JSON.stringify(recoveredSave));
+    writeSaveState(recoveredSave, { force: true });
     appendSaveSlot(recoveredSave);
   }
 }

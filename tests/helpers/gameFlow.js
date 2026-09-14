@@ -19,6 +19,29 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
 }
 
 /**
+ * The table's two verbs, for flows that only need to get past a decision.
+ *
+ * A card is staked by clicking it; the cash button enables once one is. A card
+ * the previous window sealed (COLD FEET) opens when the gauge reaches the seal,
+ * and the seal plus one push can never reach the lowest wall a board that did
+ * not just bust can draw -- so pushing until cash enables is always safe here.
+ * The protocol breach banner pauses the clock and is dismissed by any input.
+ */
+export async function dismissProtocolBreach(page) {
+  await page.evaluate(() => document.querySelector("[data-testid='protocol-breach']")?.click());
+}
+
+export async function cashStakedCard(page) {
+  const cash = page.getByTestId("commit-confirm");
+  for (let press = 0; press < 8; press += 1) {
+    if (await cash.isEnabled().catch(() => false)) break;
+    await page.getByTestId("commit-push").evaluate((button) => button.click());
+    await page.waitForTimeout(60);
+  }
+  await cash.evaluate((button) => button.click());
+}
+
+/**
  * The intro's entry path, in one place. Every spec that opens a run from the
  * intro goes through these so the locators live here and not in nine files.
  */
@@ -69,6 +92,7 @@ export async function chooseFirstAvailableChoice(page) {
     undefined,
     { timeout: 15_000 },
   );
+  await dismissProtocolBreach(page);
   const domAction = await page.evaluate(() => {
     const decisionNext = document.querySelector("[data-testid='decision-next']");
     if (decisionNext instanceof HTMLButtonElement) {
@@ -84,7 +108,7 @@ export async function chooseFirstAvailableChoice(page) {
     return "none";
   });
   if (domAction !== "choice") return;
-  await page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.click());
+  await cashStakedCard(page);
   await page.waitForFunction(
     () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice:not([aria-disabled='true'])") || document.querySelector(".result-page")),
     undefined,
@@ -96,18 +120,19 @@ export async function chooseFirstAvailableChoice(page) {
 export async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    await dismissProtocolBreach(page);
     if (choice.type === "free") {
+      await page.locator(".gx-card-wild").evaluate((button) => button.click());
       await page.locator(".reframe-box textarea").fill(
         "Separate people, evidence, and conditions before deciding the next step.",
         { timeout: ACTION_TIMEOUT_MS },
       );
-      await clickElement(page.locator(".submit-reframe"), `${scene.title}/${choice.id}`);
+      await cashStakedCard(page);
     } else {
       const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
       await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
-      if (!(await waitUntilVisible(page.getByTestId("commit-confirm"), 3_000))) continue;
       try {
-        await clickElement(page.getByTestId("commit-confirm"), `${scene.title}/${choice.id} confirm`);
+        await cashStakedCard(page);
       } catch (error) {
         if (await waitUntilVisible(page.getByTestId("decision-next"), 1_000)) break;
         if (attempt === 1) throw error;
@@ -198,13 +223,11 @@ export async function completeCurrentCase(page) {
     }
     const choice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
     await expect(choice).toBeVisible();
+    await dismissProtocolBreach(page);
     await choice.evaluate((button) => button.click());
-    const commitButton = page.getByTestId("commit-confirm");
-    if (await commitButton.isVisible().catch(() => false)) {
-      await commitButton.evaluate((button) => button.click());
-    }
+    await cashStakedCard(page);
     const nextButton = page.getByTestId("decision-next");
-    if (await nextButton.isVisible().catch(() => false)) {
+    if (await waitUntilVisible(nextButton, 5_000)) {
       await nextButton.evaluate((button) => button.click());
       await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
     }
