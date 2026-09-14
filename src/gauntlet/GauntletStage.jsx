@@ -62,6 +62,13 @@ function getRuleHeat({ mutations, schema }) {
   );
 }
 
+function getRuleObjective(mutations) {
+  if (!mutations.length) return "규칙 안정. 지금은 판돈과 벽만 읽으면 된다.";
+  if (mutations.some((mutation) => mutation.id === "reboot")) return "사건을 닫았다. 다음 결정은 기본 규칙으로 재부팅된다.";
+  const labels = mutations.map((mutation) => mutation.label).join(" / ");
+  return `${labels} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.`;
+}
+
 function getOverdriveCopy({ run, multiplier, cashMutations }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
   if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
@@ -168,6 +175,7 @@ export function GauntletStage({
   const bustMutations = describeMutations(bustSchema);
   const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
   const ruleHeat = getRuleHeat({ mutations, schema });
+  const ruleObjective = getRuleObjective(mutations);
   const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 구간에 닿을 수 있다"
@@ -373,6 +381,7 @@ export function GauntletStage({
                 </li>
               ))}
             </ul>
+            <p data-testid="active-rule-objective">{ruleObjective}</p>
           </section>
         )}
 
