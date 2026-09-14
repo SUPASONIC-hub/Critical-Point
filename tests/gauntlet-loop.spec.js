@@ -145,6 +145,9 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
   await expect(page.locator(".decision-reveal")).toHaveClass(/is-overdrive/);
   await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED");
   await expect(page.getByTestId("next-mutations")).toContainText("OVERCLOCK");
+  await page.getByTestId("decision-next").click();
+  await expect(page.getByTestId("active-mutations")).toContainText("OVERCLOCK");
+  await expect(page.getByTestId("overclock-card-boost").first()).toContainText("x2");
 });
 
 test("a second tab asks before it busts a bet another tab is holding", async ({ page, context }) => {

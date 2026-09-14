@@ -176,6 +176,7 @@ export function GauntletStage({
   const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
   const ruleHeat = getRuleHeat({ mutations, schema });
   const ruleObjective = getRuleObjective(mutations);
+  const overclockedBoard = schema.mutations.includes("overclock");
   const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 구간에 닿을 수 있다"
@@ -518,6 +519,11 @@ export function GauntletStage({
                 {burn?.fractured && !schema.faceDown && (
                   <span className="gx-card-rule-tax" data-testid="fracture-tax">
                     1.5x 청구 · {resourceMeta[burn.key]?.label ?? burn.key}
+                  </span>
+                )}
+                {overclockedBoard && !schema.faceDown && (
+                  <span className="gx-card-overclock" data-testid="overclock-card-boost">
+                    x2 칩 · 푸시 폭 증가
                   </span>
                 )}
                 {!gate.unlocked && <span className="gx-card-seal">LOCKED · {gate.reason}</span>}
