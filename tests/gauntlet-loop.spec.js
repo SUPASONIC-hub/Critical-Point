@@ -113,9 +113,11 @@ test("cashing without a single push seals the best card on the next board", asyn
   await page.locator(".choices .choice").first().click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("next-mutations")).toContainText("COLD FEET");
+  await expect(page.getByTestId("next-mutations")).toContainText("FRACTURE");
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("active-mutations")).toContainText("COLD FEET");
   await expect(page.getByTestId("active-rule-objective")).toContainText("금고로 넘겨라");
+  await expect(page.getByTestId("fracture-tax").first()).toContainText("1.5x");
   const sealed = page.locator(".gx-card.is-sealed");
   await expect(sealed).toHaveCount(1);
   await page.getByTestId("protocol-breach").click();

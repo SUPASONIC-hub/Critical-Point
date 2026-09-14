@@ -515,6 +515,11 @@ export function GauntletStage({
                     <Lock size={12} aria-hidden="true" /> 봉인 · 열기 {SEAL_BREAK_GAUGE}
                   </span>
                 )}
+                {burn?.fractured && !schema.faceDown && (
+                  <span className="gx-card-rule-tax" data-testid="fracture-tax">
+                    1.5x 청구 · {resourceMeta[burn.key]?.label ?? burn.key}
+                  </span>
+                )}
                 {!gate.unlocked && <span className="gx-card-seal">LOCKED · {gate.reason}</span>}
               </button>
             );
