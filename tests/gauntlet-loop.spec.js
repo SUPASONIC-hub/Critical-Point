@@ -123,6 +123,23 @@ test("cashing without a single push seals the best card on the next board", asyn
   await expect(page.getByTestId("commit-confirm")).toBeEnabled();
 });
 
+test("two hot cashouts trigger an overclock payout banner", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("OVERCLOCK READY");
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED");
+  await expect(page.getByTestId("next-mutations")).toContainText("OVERCLOCK");
+});
+
 test("a second tab asks before it busts a bet another tab is holding", async ({ page, context }) => {
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();

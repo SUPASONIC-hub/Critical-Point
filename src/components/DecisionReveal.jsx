@@ -63,6 +63,7 @@ export function DecisionReveal({ view }) {
   const costs = effectEntries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
   const nextMutations = verdict?.nextMutations ?? [];
+  const overclockMutation = nextMutations.find((mutation) => mutation.id === "overclock");
   const consequenceLines = createConsequenceLines({ verdict, busted, nextMutations });
   const headline = !verdict
     ? "DECISION"
@@ -129,6 +130,14 @@ export function DecisionReveal({ view }) {
                 </>
               )}
             </p>
+          </div>
+        )}
+
+        {overclockMutation && !busted && (
+          <div className="gx-reveal-overdrive" data-testid="overdrive-payout" aria-label="오버클럭 발동">
+            <span>OVERCLOCK TRIGGERED</span>
+            <b>{overclockMutation.title}</b>
+            <p>다음 판은 칩 2배로 시작하지만, 푸시 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
           </div>
         )}
 
