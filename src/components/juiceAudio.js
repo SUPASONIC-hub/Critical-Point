@@ -20,7 +20,7 @@ import { acquireCueRuntime } from "./AdaptiveMusic.jsx";
  * allocating a fresh bus for each gesture.
  */
 
-const PEAK_GAIN = { heartbeat: 0.055, threshold: 0.045, click: 0.025, hover: 0.018 };
+const PEAK_GAIN = { heartbeat: 0.055, threshold: 0.045, click: 0.025, hover: 0.018, phase: 0.028 };
 const POOL_SIZE = 12;
 const cuePools = new WeakMap();
 
@@ -166,6 +166,53 @@ function playTouch(runtime, kind, stress) {
   gain.connect(destination);
   oscillator.start(now);
   oscillator.stop(now + 0.13);
+}
+
+function playPhase(runtime, phase, stress) {
+  const { context, multiplier } = runtime;
+  const destination = acquireLane(runtime, phase === "rupture" ? 0.62 : 0.34);
+  const { normalized, pitch } = stressTuning(stress);
+  const now = context.currentTime;
+  const peak = PEAK_GAIN.phase * multiplier;
+  const phaseShape = {
+    reading: { type: "sine", start: 196, end: 261, filter: "lowpass", length: 0.16 },
+    locked: { type: "triangle", start: 329, end: 247, filter: "bandpass", length: 0.22 },
+    pushing: { type: "square", start: 392, end: 587, filter: "highpass", length: 0.14 },
+    critical: { type: "sawtooth", start: 466, end: 932, filter: "bandpass", length: 0.26 },
+    rupture: { type: "sawtooth", start: 880, end: 110, filter: "lowpass", length: 0.42 },
+    cooldown: { type: "sine", start: 392, end: 174, filter: "lowpass", length: 0.24 },
+  }[phase] ?? { type: "sine", start: 220, end: 330, filter: "lowpass", length: 0.16 };
+
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  const filter = context.createBiquadFilter();
+  const end = now + phaseShape.length;
+
+  oscillator.type = phaseShape.type;
+  oscillator.frequency.setValueAtTime(phaseShape.start * pitch, now);
+  oscillator.frequency.exponentialRampToValueAtTime(Math.max(40, phaseShape.end * pitch), end);
+  filter.type = phaseShape.filter;
+  filter.frequency.setValueAtTime(620 + normalized * 1180, now);
+  filter.Q.setValueAtTime(phase === "critical" || phase === "rupture" ? 11 : 4, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(peak * (phase === "rupture" ? 1.6 : 1), now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+  oscillator.connect(filter);
+  filter.connect(gain);
+  gain.connect(destination);
+  oscillator.start(now);
+  oscillator.stop(end + 0.02);
+}
+
+export function playDecisionPhaseCue(phase, stress = 0) {
+  const runtime = acquireCueRuntime();
+  if (!runtime) return;
+  try {
+    playPhase(runtime, phase, stress);
+  } catch {
+    // Audio is an enhancement; browsers may reject it during a gesture.
+  }
 }
 
 /**

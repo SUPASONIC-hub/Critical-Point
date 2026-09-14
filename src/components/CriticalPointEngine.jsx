@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { playJuiceCue } from "./juiceAudio.js";
+import { playDecisionPhaseCue, playJuiceCue } from "./juiceAudio.js";
 import { usePressure } from "../state/decisionDynamics.js";
 
 /**
@@ -123,6 +123,7 @@ export function CriticalPointEngine({ active }) {
   const pressure = usePressure();
   const pressureRef = useRef(pressure);
   const previousStress = useRef(pressure.stressLevel);
+  const previousPhase = useRef(pressure.decisionPhase);
   const shaker = useRef(null);
   const particleLayer = useRef(null);
 
@@ -139,7 +140,7 @@ export function CriticalPointEngine({ active }) {
     const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     shaker.current = createShaker();
 
-    const written = { stress: "", vignette: "", jitter: "", lift: "", tilt: "", drift: "", pulse: "" };
+    const written = { stress: "", vignette: "", jitter: "", lift: "", tilt: "", drift: "", pulse: "", flux: "" };
     const write = (name, key, value) => {
       if (written[key] === value) return;
       written[key] = value;
@@ -169,7 +170,8 @@ export function CriticalPointEngine({ active }) {
       const stress = state.stressLevel;
       const hesitation = Math.min(1, (Number(state.hesitationCharge) || 0) / 36);
       const lockedDelay = Math.min(1, (Number(state.hiddenChoiceAge) || 0) / 18);
-      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62 + hesitation * 0.22);
+      const flux = Math.min(1, (Number(state.schemaFlux) || 0) / 100);
+      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62 + hesitation * 0.22 + flux * 0.16);
       const { x, y, level } = reducedMotion ? { x: 0, y: 0, level: 0 } : shaker.current.sample(sustained, deltaMs);
 
       if (stress >= 18) {
@@ -188,6 +190,7 @@ export function CriticalPointEngine({ active }) {
       write("--decision-vignette", "vignette", state.vignette.toFixed(3));
       write("--decision-drift", "drift", reducedMotion ? "0" : Math.max(hesitation, lockedDelay).toFixed(3));
       write("--decision-pulse", "pulse", reducedMotion ? "0" : (Math.sin(time * 0.017) * 0.5 + 0.5).toFixed(3));
+      write("--decision-flux", "flux", reducedMotion ? "0" : flux.toFixed(3));
       const shouldMove = level * SHAKE_TRAVEL_PX >= 0.05;
       if (shouldMove !== moving) {
         shell.classList.toggle("is-shaking", shouldMove);
@@ -202,6 +205,8 @@ export function CriticalPointEngine({ active }) {
       const glitchAt = state.overdriveFloor ?? FALLBACK_GLITCH;
       const tone = state.isBlind
         ? "is-bust"
+        : state.environmentMode === "fracture"
+          ? "is-schema-fracture"
         : state.decisionPhase === "locked"
           ? "is-locked-pressure"
         : state.isSlowMotion
@@ -261,14 +266,19 @@ export function CriticalPointEngine({ active }) {
         "--decision-tilt",
         "--decision-drift",
         "--decision-pulse",
+        "--decision-flux",
       ]) {
         root.style.removeProperty(name);
       }
-      shell.classList.remove("is-shaking", "is-bust", "is-slowmo", "is-critical", "is-glitching", "is-locked-pressure");
+      shell.classList.remove("is-shaking", "is-bust", "is-slowmo", "is-critical", "is-glitching", "is-locked-pressure", "is-schema-fracture");
     };
   }, [active]);
 
   useEffect(() => {
+    if (pressure.decisionPhase !== previousPhase.current) {
+      playDecisionPhaseCue(pressure.decisionPhase, pressure.stressLevel);
+      previousPhase.current = pressure.decisionPhase;
+    }
     const glitchAt = pressure.overdriveFloor ?? FALLBACK_GLITCH;
     if (pressure.stressLevel >= glitchAt && previousStress.current < glitchAt) {
       playJuiceCue("threshold", pressure.stressLevel);
@@ -283,7 +293,7 @@ export function CriticalPointEngine({ active }) {
       });
     }
     previousStress.current = pressure.stressLevel;
-  }, [pressure.stressLevel, pressure.overdriveFloor]);
+  }, [pressure.decisionPhase, pressure.stressLevel, pressure.overdriveFloor]);
 
   const thresholdLabel = pressure.isBlind
     ? "BUST"
@@ -305,6 +315,7 @@ export function CriticalPointEngine({ active }) {
       {pressure.combo > 0 && <span className="decision-combo">COMBO x{pressure.combo}</span>}
       {pressure.heat >= 1 && <span className="decision-heat">HEAT +{Math.round(pressure.heat)}</span>}
       {pressure.hiddenChoiceAge > 0 && <span className="decision-hidden">HIDDEN +{Math.round(pressure.hiddenChoiceAge)}s</span>}
+      {pressure.schemaFlux > 0 && <span className="decision-fracture">FLUX {Math.round(pressure.schemaFlux)}%</span>}
       {pressure.wallDebt > 0 && <span className="decision-debt">여유 -{pressure.wallDebt}</span>}
       <span className="decision-push">
         PUSH {pressure.rewardMultiplier.toFixed(2)}x / {pressure.decisionPhase.toUpperCase()} / {thresholdLabel}

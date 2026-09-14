@@ -552,6 +552,39 @@ test("committing clears the hidden-choice delay axis", () => {
   assert.equal(state.decisionPhase, "cooldown");
 });
 
+test("a rupture fractures the next decision schema", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 20 });
+  for (let press = 0; press < 8; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 8, seconds: 20 });
+
+  assert.equal(state.thresholdState, "bust");
+  assert.ok(state.schemaFlux >= 70, "rupture stores a consequence charge");
+  assert.ok(state.consequenceStack > 0, "the stack records that the run broke something");
+
+  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+  assert.equal(next.environmentMode, "reboot");
+  assert.ok(next.schemaFlux > 0, "the next room keeps part of the fracture");
+  assert.ok(next.bustFloor < DYNAMICS_INITIAL_STATE.bustFloor, "the next wall is closer than the clean opening wall");
+
+  const ticked = reduceDecisionDynamics(next, { type: "DECISION_TICK", seconds: 38 });
+  assert.ok(ticked.clockStress > reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_TICK", seconds: 38 }).clockStress);
+});
+
+test("a high-pressure clean commit can fracture the following turn", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
+  for (let press = 0; press < 3; press++) state = reduceDecisionDynamics(state, { type: "PUSH_HELD" });
+  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: false, riskDelta: 10, seconds: 30 });
+
+  assert.notEqual(state.thresholdState, "bust");
+  assert.ok(state.schemaFlux >= 20, "a dangerous non-bust still damages the schema");
+
+  const next = reduceDecisionDynamics(state, { type: "DECISION_STARTED" });
+  assert.equal(next.environmentMode, "fracture");
+  assert.ok(next.fractureTurns > 0);
+});
+
 test("pressing far enough busts the run, and the bust is the player's own", () => {
   let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
   state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });

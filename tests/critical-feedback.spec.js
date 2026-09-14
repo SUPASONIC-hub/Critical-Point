@@ -16,6 +16,8 @@ test("critical feedback emits particles, stays mobile-safe, and persists dynamic
   await page.getByTestId("commit-push").click();
   await expect(page.locator(".decision-particle")).not.toHaveCount(0);
   await expect(page.locator(".decision-feedback-layer")).toBeVisible();
+  await expect(page.locator(".decision-fracture")).toBeVisible();
+  await expect.poll(async () => Number(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--decision-flux")))).toBeGreaterThan(0);
 
   await page.waitForFunction(() => {
     const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
@@ -43,6 +45,9 @@ test("critical feedback emits particles, stays mobile-safe, and persists dynamic
   expect(savedAfterPush.dynamics.hiddenChoiceAge).toBeGreaterThanOrEqual(1);
   expect(savedAfterPush.dynamics.hesitationCharge).toBeGreaterThan(0);
   expect(savedAfterPush.dynamics.responseTimeSec).toBeGreaterThanOrEqual(2);
+  expect(savedAfterPush.dynamics.schemaFlux).toBeGreaterThan(0);
+  expect(typeof savedAfterPush.dynamics.consequenceStack).toBe("number");
+  expect(typeof savedAfterPush.dynamics.fractureTurns).toBe("number");
   expect(savedAfterPush.dynamics.stressLevel).toBeGreaterThan(0);
   expect(savedAfterPush.dynamics.rewardMultiplier).toBeGreaterThanOrEqual(1);
 

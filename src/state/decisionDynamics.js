@@ -33,6 +33,9 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   hesitationCharge: 0,
   responseTimeSec: 0,
   decisionPhase: "reading",
+  schemaFlux: 0,
+  consequenceStack: 0,
+  fractureTurns: 0,
   environmentMode: "stable",
   thresholdState: "idle",
   rewardMultiplier: 1,
@@ -69,6 +72,9 @@ const NUMERIC_DYNAMICS_FIELDS = [
   "hiddenChoiceAge",
   "hesitationCharge",
   "responseTimeSec",
+  "schemaFlux",
+  "consequenceStack",
+  "fractureTurns",
   "rewardMultiplier",
   "currentTicks",
   "score",
@@ -83,7 +89,7 @@ const NUMERIC_DYNAMICS_FIELDS = [
   "lastDelta",
 ];
 const BOOLEAN_DYNAMICS_FIELDS = ["isSlowMotion", "isBlind", "overdrive"];
-const ENVIRONMENT_MODES = new Set(["stable", "blackout", "reboot"]);
+const ENVIRONMENT_MODES = new Set(["stable", "blackout", "reboot", "fracture"]);
 const THRESHOLD_STATES = new Set(["idle", "building", "critical", "bust"]);
 const DECISION_PHASES = new Set(["reading", "hovering", "locked", "pushing", "critical", "rupture", "cooldown"]);
 
@@ -111,6 +117,9 @@ export function normalizeDecisionDynamicsState(value) {
   next.hiddenChoiceAge = clamp(next.hiddenChoiceAge, 0, 180);
   next.hesitationCharge = clamp(next.hesitationCharge, 0, 36);
   next.responseTimeSec = clamp(next.responseTimeSec, 0, 240);
+  next.schemaFlux = clamp(next.schemaFlux, 0, 100);
+  next.consequenceStack = clamp(Math.trunc(next.consequenceStack), 0, 9);
+  next.fractureTurns = clamp(Math.trunc(next.fractureTurns), 0, 6);
   next.rewardMultiplier = clamp(next.rewardMultiplier, 1, 8);
   next.currentTicks = Math.max(0, Math.trunc(next.currentTicks));
   next.shakeIntensity = clamp(next.shakeIntensity, 0, 24);
@@ -231,7 +240,9 @@ export function getPushYourLuckOutcome({ stressLevel = 0, bustFloor = BUST_FLOOR
 }
 
 export function getEnvironmentEffect(environmentMode) {
-  return environmentMode === "blackout" ? { fatigue: 4, time: -3 } : {};
+  if (environmentMode === "blackout") return { fatigue: 4, time: -3 };
+  if (environmentMode === "fracture") return { trust: -2, legitimacy: -2, fatigue: 3, time: -2 };
+  return {};
 }
 
 /**
@@ -442,6 +453,16 @@ function getDecisionPhase({ hiddenChoice, pressCount, thresholdState, stressLeve
   return "reading";
 }
 
+function getConsequenceSurge({ busted, stressLevel, challengeMatch, riskDelta, schemaFlux }) {
+  if (busted) return 72;
+  const stress = clamp(Number(stressLevel) || 0, 0, 100);
+  const risk = Math.max(0, Number(riskDelta) || 0);
+  const dangerousRead = stress >= 72 || risk >= 6;
+  if (!dangerousRead) return challengeMatch ? -22 : -12;
+  const relief = challengeMatch ? 14 : 0;
+  return clamp((stress - 60) * 0.9 + risk * 3 + schemaFlux * 0.18 - relief, -24, 54);
+}
+
 /** Every branch renders the same presentation payload from the same numbers. */
 function projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion, bustFloor = BUST_FLOOR_MAX }) {
   const ratio = clamp(Number(stressLevel) || 0, 0, 100) / 100;
@@ -480,14 +501,23 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       // one run differ; `rebootCount` and `banked` are what make two runs differ.
       const windowIndex = (Number(base.windowIndex) || 0) + 1;
       const wallDebt = Math.max(0, Number(base.wallDebt) || 0);
+      const carriedFlux = rebooting
+        ? Math.max(25, (Number(base.schemaFlux) || 0) * 0.42)
+        : Math.max(0, (Number(base.schemaFlux) || 0) - 18);
+      const fractureTurns = carriedFlux >= 22 ? Math.max(1, Number(base.fractureTurns) || 0) : Math.max(0, (Number(base.fractureTurns) || 0) - 1);
+      const schemaPenalty = Math.round(carriedFlux / 28);
+      const bustFloor = drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`, wallDebt);
       return {
         ...DYNAMICS_INITIAL_STATE,
         windowIndex,
         wallDebt,
-        bustFloor: drawBustFloor(`${rebootCount}:${windowIndex}:${Number(base.banked) || 0}`, wallDebt),
-        environmentMode: rebooting ? "reboot" : "stable",
+        bustFloor: Math.max(BUST_FLOOR_FATAL, bustFloor - schemaPenalty),
+        environmentMode: rebooting ? "reboot" : carriedFlux >= 22 ? "fracture" : "stable",
         permanentMultiplier: carried,
         rewardMultiplier: carried,
+        schemaFlux: Number(carriedFlux.toFixed(2)),
+        consequenceStack: carriedFlux >= 22 ? Math.max(1, Number(base.consequenceStack) || 0) : 0,
+        fractureTurns,
         rebootCount,
         // A streak is the one thing a window was supposed to inherit, and this
         // branch spread the initial state over it -- so `combo` was 0 in every
@@ -519,7 +549,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         : Math.max(0, (Number(base.hesitationCharge) || 0) - tickDelta * 3.5);
       const burn = getDeathBurn(currentTicks);
       const heat = getComboBacklash(base.combo, burn);
-      const clockStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN + hesitationCharge;
+      const schemaFlux = clamp(Number(base.schemaFlux) || 0, 0, 100);
+      const schemaPressure = base.environmentMode === "fracture" ? schemaFlux * 0.085 : schemaFlux * 0.04;
+      const clockStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN + hesitationCharge + schemaPressure;
       // The clock is a floor under the gauge, not the gauge itself. Anything the
       // player put there -- a press, a staged choice, a cancel -- rides on top of
       // it and survives the next tick, which is what makes a bust theirs.
@@ -539,6 +571,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         hiddenChoiceAge,
         hesitationCharge: Number(hesitationCharge.toFixed(2)),
         responseTimeSec: Number(responseTimeSec.toFixed(2)),
+        schemaFlux,
         heldGauge: busted ? Math.max(0, stressLevel - clockStress) : heldGauge,
         wallDebt: justBusted ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + 1) : Number(base.wallDebt) || 0,
         timeDecay: Number(burn.toFixed(3)),
@@ -593,6 +626,7 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         pressCount,
         decisionPhase: stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : "pushing",
         hesitationCharge: getHesitationCharge(base.hiddenChoiceAge, base.responseTimeSec, pressCount),
+        schemaFlux: clamp((Number(base.schemaFlux) || 0) + 1.5, 0, 100),
         isSlowMotion: slowMotion,
         ...fx,
         // The press has to land harder than the gauge alone would, or the first
@@ -669,6 +703,20 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const cashedMultiplier = busted ? 0 : carried.rewardMultiplier;
       const payout = challengeMatch && !busted ? Math.round(BASE_PAYOUT * cashedMultiplier * (1 + combo * 0.35)) : 0;
       const score = busted ? Math.floor(anchorScore * 0.5) : anchorScore + payout;
+      const consequenceSurge = getConsequenceSurge({
+        busted,
+        stressLevel,
+        challengeMatch,
+        riskDelta,
+        schemaFlux: base.schemaFlux,
+      });
+      const schemaFlux = clamp((Number(base.schemaFlux) || 0) + consequenceSurge, 0, 100);
+      const consequenceStack = busted || schemaFlux >= 55
+        ? Math.min(9, (Number(base.consequenceStack) || 0) + 1)
+        : Math.max(0, (Number(base.consequenceStack) || 0) - 1);
+      const fractureTurns = schemaFlux >= 55
+        ? Math.min(6, Math.max(2, Number(base.fractureTurns) || 0) + 1)
+        : Math.max(0, (Number(base.fractureTurns) || 0) - 1);
       return {
         ...base,
         combo: busted ? 0 : combo,
@@ -686,9 +734,12 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         hiddenChoiceAge: 0,
         hesitationCharge: 0,
         responseTimeSec: Number(getResponseTime(seconds).toFixed(2)),
+        schemaFlux: Number(schemaFlux.toFixed(2)),
+        consequenceStack,
+        fractureTurns,
         decisionPhase: busted ? "rupture" : "cooldown",
         thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : outcome.thresholdState,
-        environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
+        environmentMode: busted ? "blackout" : schemaFlux >= 55 ? "fracture" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
         score,
         banked: busted ? Number(base.banked) || 0 : (Number(base.banked) || 0) + payout,
         lastDelta: score - anchorScore,
@@ -735,6 +786,9 @@ export function createDynamicsSummary(state) {
     hesitationCharge: Number(state.hesitationCharge.toFixed(2)),
     responseTimeSec: Number(state.responseTimeSec.toFixed(2)),
     decisionPhase: state.decisionPhase,
+    schemaFlux: Number(state.schemaFlux.toFixed(2)),
+    consequenceStack: state.consequenceStack,
+    fractureTurns: state.fractureTurns,
     environmentMode: state.environmentMode,
     thresholdState: state.thresholdState,
     rewardMultiplier: state.rewardMultiplier,
@@ -787,6 +841,9 @@ const PRESSURE_FIELDS = [
   "hesitationCharge",
   "responseTimeSec",
   "decisionPhase",
+  "schemaFlux",
+  "consequenceStack",
+  "fractureTurns",
 ];
 
 function projectSnapshot(state) {
