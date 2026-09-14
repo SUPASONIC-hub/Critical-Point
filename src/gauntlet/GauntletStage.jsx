@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
-import { STORAGE_KEY } from "../appConfig.js";
+import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   BASE_SCHEMA,
@@ -22,8 +22,6 @@ import { playBustCue, playCashCue, playMutationCue, playPushCue } from "./gauntl
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
-/** One per page load: tells this tab's hold on a window from another tab's. */
-const TAB_TOKEN = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const BREACH_AUTO_DISMISS_MS = 2600;
 
 function formatNumber(value) {
@@ -61,9 +59,15 @@ export function GauntletStage({
 }) {
   const schema = run?.schema ?? BASE_SCHEMA;
   const mutations = useMemo(() => describeMutations(schema), [schema]);
-  // Read once, at mount: a save that already names this window means the player
-  // touched it and left before it settled.
-  const [abandoned] = useState(() => splitOpenSeed(run?.openSeed).seed === seed);
+  const tabToken = getTabToken();
+  // Read once, at mount: a save that already names this window means a bet was
+  // placed on it and never settled. If this tab placed it, this is a reload and
+  // the bet settles as a bust at once. If another tab holds it, that tab may
+  // still be playing: ask before this tab takes the window and busts the bet.
+  const [hold] = useState(() => splitOpenSeed(run?.openSeed));
+  const abandoned = hold.seed === seed;
+  const heldByOtherTab = abandoned && hold.token !== tabToken;
+  const [claimed, setClaimed] = useState(!heldByOtherTab);
   // Another tab settled this window or took hold of it. This table stops: no
   // clock, no input, nothing to write over the other tab's result.
   const [lostToTab, setLostToTab] = useState(false);
@@ -72,7 +76,8 @@ export function GauntletStage({
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the breach wait until the player has read it.
   const locked = lostToTab || staleSave;
-  const hidden = isAdvancing || revealOpen || locked;
+  const awaitingClaim = heldByOtherTab && !claimed;
+  const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
   const paused = breachOpen || hidden;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned });
   const resolvedRef = useRef(false);
@@ -112,8 +117,16 @@ export function GauntletStage({
     if (!touched || abandoned || win.status !== "live") return;
     if (touchedRef.current === touchedCardId) return;
     touchedRef.current = touchedCardId;
-    onTouch?.(`${seed}#${TAB_TOKEN}`, touchedCardId);
-  }, [abandoned, onTouch, seed, touched, touchedCardId, win.status]);
+    onTouch?.(`${seed}#${tabToken}`, touchedCardId);
+  }, [abandoned, onTouch, seed, tabToken, touched, touchedCardId, win.status]);
+
+  // Taking a held window is a write of its own, before the settle: the other
+  // tab sees the hold change and locks rather than cashing into a window that
+  // is about to be settled here.
+  function claimHeldWindow() {
+    onTouch?.(`${seed}#${tabToken}`, run?.openCardId ?? null);
+    setClaimed(true);
+  }
 
   useEffect(() => {
     if (abandoned) return undefined;
@@ -128,16 +141,16 @@ export function GauntletStage({
       if (!saved) return;
       const hold = splitOpenSeed(saved.openSeed);
       const settledElsewhere = Number(saved.windowIndex) !== Number(run?.windowIndex);
-      const heldElsewhere = hold.seed === seed && hold.token !== TAB_TOKEN;
+      const heldElsewhere = hold.seed === seed && hold.token !== tabToken;
       if (settledElsewhere || heldElsewhere) setLostToTab(true);
     };
     globalThis.addEventListener("storage", onStorage);
     return () => globalThis.removeEventListener("storage", onStorage);
-  }, [abandoned, run?.windowIndex, seed]);
+  }, [abandoned, run?.windowIndex, seed, tabToken]);
 
   // A closed window settles once, after the slam has had time to land.
   useEffect(() => {
-    if (live || resolvedRef.current) return undefined;
+    if (live || resolvedRef.current || !claimed) return undefined;
     if (win.status === "bust") {
       playBustCue();
       setImpact({ amount: 1, at: Date.now() });
@@ -154,9 +167,10 @@ export function GauntletStage({
       onResolve({ card, window: win, forced: !staked });
     }, RESOLVE_DELAY_MS[win.status] ?? 900);
     return () => globalThis.clearTimeout(timer);
-    // The window closing is the only trigger; the card and pot are read as they stood.
+    // The window closing (or being claimed from another tab) is the only trigger;
+    // the card and pot are read as they stood.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [live]);
+  }, [live, claimed]);
 
   function select(id) {
     if (!live || isAdvancing || locked) return;
@@ -440,7 +454,7 @@ export function GauntletStage({
         </div>
       )}
 
-      {locked && win.status === "live" && (
+      {locked && (win.status === "live" || awaitingClaim) && (
         <div className="gx-breach gx-lost-tab" role="alert" data-testid="table-lost-to-tab">
           <span className="gx-breach-kicker">이 판은 다른 탭에서 잡혔다</span>
           <p>한 판은 한 테이블에서만 걸 수 있다. 이 탭의 판은 멈췄다.</p>
@@ -450,7 +464,25 @@ export function GauntletStage({
         </div>
       )}
 
-      {win.status !== "live" && (
+      {awaitingClaim && (
+        <div className="gx-breach gx-held-elsewhere" role="alertdialog" data-testid="table-held-elsewhere">
+          <span className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
+          <p>
+            다른 탭(또는 이전 세션)에서 카드를 걸어 둔 판입니다. 여기서 이어가면 그 판은 떠난 판으로 BUST 처리됩니다.
+            아직 그 탭에서 하는 중이면 그대로 두세요.
+          </p>
+          <div className="gx-held-actions">
+            <button type="button" className="ghost" data-testid="claim-held-window" onClick={claimHeldWindow}>
+              여기서 이어가기 · BUST 처리
+            </button>
+            <button type="button" className="ghost" data-testid="leave-held-window" onClick={() => setLostToTab(true)}>
+              그 탭에 두기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {win.status !== "live" && claimed && (
         <div className={`gx-slam gx-slam-${win.status}`} role="alert">
           {win.status === "bust" ? (
             <>

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { startDebugNode } from "./helpers/gameFlow.js";
+import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
@@ -114,6 +114,38 @@ test("cashing without a single push seals the best card on the next board", asyn
     await page.getByTestId("commit-push").click();
   }
   await expect(page.getByTestId("commit-confirm")).toBeEnabled();
+});
+
+test("a second tab asks before it busts a bet another tab is holding", async ({ page, context }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+
+  // A tab that only looks: it is asked, leaves the bet alone, and the first tab
+  // plays on without being locked.
+  const looker = await context.newPage();
+  await looker.goto("/?debug=1");
+  await looker.waitForSelector(".game-shell");
+  await expect(looker.getByTestId("table-held-elsewhere")).toBeVisible();
+  await looker.getByTestId("leave-held-window").click();
+  await looker.close();
+  await expect(page.getByTestId("table-lost-to-tab")).toHaveCount(0);
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.busts).toBe(0);
+
+  // A tab that takes over: the held bet settles as a bust and the first tab locks.
+  // The next board may or may not open with a breach banner, and it dismisses itself.
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  const taker = await context.newPage();
+  await taker.goto("/?debug=1");
+  await taker.waitForSelector(".game-shell");
+  await taker.getByTestId("claim-held-window").click();
+  await expect(taker.getByTestId("decision-next")).toBeVisible();
+  await expect(page.getByTestId("table-lost-to-tab")).toBeVisible();
+  expect((await readJsonStorage(taker, TEST_STORAGE_KEYS.save)).dynamics.busts).toBe(1);
+  await taker.close();
 });
 
 test("reduced motion keeps the bust and the heat, and loses only the shake", async ({ page }) => {

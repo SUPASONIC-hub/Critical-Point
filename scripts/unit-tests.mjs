@@ -29,6 +29,8 @@ import {
   TELL_ERROR,
   FRACTURE_MIN_BURN,
   splitOpenSeed,
+  isSaveAheadOf,
+  carryTableRecordIntoRestore,
 } from "../src/gauntlet/gauntletEngine.js";
 import {
   createIntroView,
@@ -656,6 +658,34 @@ test("a tab whose run is older than the save cannot write it back", () => {
   } finally {
     globalThis.localStorage = previous;
   }
+});
+
+test("only play this tab has not seen counts as a newer save", () => {
+  const mine = { runId: "r", dynamics: { windowIndex: 3, openSeed: "r:3:start#tab-a" } };
+  assert.equal(isSaveAheadOf({ runId: "r", dynamics: { windowIndex: 3, openSeed: "r:3:start#tab-a" } }, mine, "tab-a"), false, "another tab that only opened the game");
+  assert.equal(isSaveAheadOf({ runId: "r", dynamics: { windowIndex: 4 } }, mine, "tab-a"), true, "a window settled past this one");
+  assert.equal(isSaveAheadOf({ runId: "r", dynamics: { windowIndex: 3, openSeed: "r:3:start#tab-b" } }, mine, "tab-a"), true, "a window another tab has taken hold of");
+  assert.equal(isSaveAheadOf({ runId: "other", dynamics: { windowIndex: 0 } }, mine, "tab-a"), true, "a different run");
+  assert.equal(isSaveAheadOf({ runId: "r", dynamics: { windowIndex: 2 } }, mine, "tab-a"), false, "a save behind this tab is this tab's to write");
+});
+
+test("restoring a recovery slot keeps the busts settled since the slot", () => {
+  const bust = { nodeId: "payday", caseId: "case01", threshold: { busted: true, potMultiplier: 0, lostPot: 900, pushes: 5 } };
+  const cash = { nodeId: "accounting", caseId: "case01", threshold: { busted: false, potMultiplier: 12, pot: 900, pushes: 3 } };
+  const slot = { runId: "r", currentCase: "case01", log: [cash], resources: { trust: 50 }, dynamics: { windowIndex: 1, runPot: 900, busts: 0, cashes: 1 } };
+  const current = {
+    runId: "r",
+    currentCase: "case01",
+    log: [cash, bust],
+    dynamics: { windowIndex: 2, runPot: 0, busts: 1, cashes: 1, schema: { ...BASE_SCHEMA, faceDown: true, mutations: ["blackout"] } },
+  };
+  const restored = carryTableRecordIntoRestore(slot, current);
+  assert.equal(restored.dynamics.windowIndex, 2, "the window count never goes backwards, so the next wall is a new draw");
+  assert.equal(restored.dynamics.busts, 1);
+  assert.equal(restored.dynamics.runPot, 0, "the pot the bust wiped stays wiped");
+  assert.equal(restored.dynamics.schema.faceDown, true, "and the board it broke stays broken");
+  assert.equal(createGauntletLedger(restored.log).busts, 1, "the ledger the ending reads still sees the bust");
+  assert.equal(carryTableRecordIntoRestore(slot, { ...current, runId: "other" }), slot, "a slot from another run is left alone");
 });
 
 test("the forced card is the one that costs the most", () => {

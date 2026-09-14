@@ -498,6 +498,80 @@ export function splitOpenSeed(openSeed) {
   return index < 0 ? { seed: openSeed, token: null } : { seed: openSeed.slice(0, index), token: openSeed.slice(index + 1) };
 }
 
+/**
+ * Whether the stored save is ahead of the run this tab is about to write.
+ *
+ * A newer revision alone is not a conflict: another tab that only opened the
+ * game, resumed it, or looked at a held bet writes the same run back. What this
+ * tab must never write over is play it has not seen -- a different run, a
+ * window settled past this tab's, or a window another tab has taken hold of.
+ */
+export function isSaveAheadOf(stored, payload, tabToken) {
+  if (!stored || typeof stored !== "object") return false;
+  if (stored.runId !== payload?.runId) return true;
+  const storedRun = stored.dynamics ?? {};
+  const ownRun = payload?.dynamics ?? {};
+  const storedWindow = Number(storedRun.windowIndex) || 0;
+  const ownWindow = Number(ownRun.windowIndex) || 0;
+  if (storedWindow > ownWindow) return true;
+  if (storedWindow < ownWindow) return false;
+  const storedHold = splitOpenSeed(storedRun.openSeed);
+  if (!storedHold.seed) return false;
+  const ownHold = splitOpenSeed(ownRun.openSeed);
+  return storedHold.token !== tabToken && storedHold.token !== ownHold.token;
+}
+
+/**
+ * A recovery slot is a way back from a broken save, not a way back from the
+ * wall. Restoring one rolls the story back to the slot; the table record since
+ * the slot comes along. Busts settled after the slot stay in the log (as system
+ * entries the ledger and the ending read), the pot they wiped stays wiped, the
+ * board they broke stays broken, and the window count never goes backwards, so
+ * the next window is a fresh draw.
+ */
+export function carryTableRecordIntoRestore(restored, current) {
+  if (!restored || !current || restored.runId !== current.runId) return restored;
+  const restoredRun = normalizeRunState(restored.dynamics);
+  const currentRun = normalizeRunState(current.dynamics);
+  if (currentRun.windowIndex <= restoredRun.windowIndex) return restored;
+  const restoredLog = Array.isArray(restored.log) ? restored.log : [];
+  const currentLog = Array.isArray(current.log) ? current.log : [];
+  const sameCase = restored.currentCase === current.currentCase;
+  const lostBusts = sameCase
+    ? currentLog.slice(restoredLog.length).filter((entry) => entry?.threshold?.busted)
+    : [];
+  const bustedSince = currentRun.busts > restoredRun.busts;
+  const carried = lostBusts.map((entry) => ({
+    isSystemEvent: true,
+    nodeId: entry.nodeId,
+    caseId: entry.caseId,
+    choiceId: "table-record-carry",
+    title: "TABLE RECORD",
+    choice: "복구 전에 난 BUST",
+    effect: {},
+    threshold: entry.threshold,
+    resourcesBefore: restored.resources,
+    resourcesAfter: restored.resources,
+  }));
+  return {
+    ...restored,
+    log: [...restoredLog, ...carried],
+    dynamics: serializeRunState({
+      ...restoredRun,
+      windowIndex: currentRun.windowIndex,
+      busts: Math.max(restoredRun.busts, currentRun.busts),
+      cashes: Math.max(restoredRun.cashes, currentRun.cashes),
+      bestMultiplier: Math.max(restoredRun.bestMultiplier, currentRun.bestMultiplier),
+      runPot: bustedSince ? 0 : restoredRun.runPot,
+      streak: bustedSince ? 0 : restoredRun.streak,
+      schema: bustedSince ? currentRun.schema : restoredRun.schema,
+      lastOutcome: bustedSince ? "bust" : restoredRun.lastOutcome,
+      openSeed: null,
+      openCardId: null,
+    }),
+  };
+}
+
 /** The card the room plays for you when the window busts with nothing staged. */
 export function getForcedCard(choices = [], schema = BASE_SCHEMA) {
   const playable = choices.filter((choice) => choice && choice.type !== "free");

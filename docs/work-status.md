@@ -164,6 +164,24 @@ list of the files it touched.
 34. The run's table record is rebuilt from the decision log (`createGauntletLedger`),
     never from live state, so a resumed save and a live run agree. The vault is
     carried in each case summary as `gauntlet`.
+35. One table at a time, and nothing a tab writes can undo the wall. Saves go
+    through `writeSaveState`, which stamps a `saveRevision`; the runtime's
+    `persist` refuses a write when storage is ahead in play this tab has not
+    seen (`isSaveAheadOf`: another run, a window settled past this one, or a
+    window another tab holds) and locks the table instead. A newer revision on
+    its own is not a conflict -- a tab that only opened the game must not lock
+    the one playing. A touched window is saved as `<seed>#<tab token>`, the
+    token lives in sessionStorage, so a reload of the betting tab settles the
+    bet as a bust at once while a different tab is asked first
+    (`table-held-elsewhere`). Settled seeds are also recorded outside the save,
+    so a rolled-back save deals a fresh wall.
+36. A recovery slot rolls back the story, not the table. `restoreSaveSlot`
+    passes the slot through `carryTableRecordIntoRestore`: busts settled since
+    the slot stay in the log, the pot they wiped stays wiped, the board they
+    broke stays broken, and the window count never goes backwards.
+37. A bust skipping a scene must never be a shortcut. `check:pressure` plays a
+    policy that busts every window it can to reach the case's end sooner; it has
+    to bank under a quarter of the best blind policy.
 
 ## Verification Commands
 

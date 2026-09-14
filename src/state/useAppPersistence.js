@@ -1,6 +1,8 @@
 import {
   appendSaveSlot,
   ERROR_LOG_STORAGE_KEY,
+  getTabToken,
+  parseCurrentSavedState,
   isSavedStateShapeValid,
   RECOVERY_CENTER_STORAGE_KEY,
   RECOVERY_SLOT_SCHEMA_VERSION,
@@ -23,6 +25,9 @@ import {
   recordAppError,
   shouldCaptureSaveSlot,
 } from "./savedState.js";
+import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
+
+const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
 
 export function useAppPersistence({ state, refs, setters, config }) {
   const {
@@ -93,7 +98,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
       ...nextState,
     };
     const previousState = { started, currentCase, nodeId, completedCases };
-    const { saved: storageSaved, stale } = writeSaveState(payload, { force });
+    const { saved: storageSaved, stale } = writeSaveState(payload, { force, isAhead: isAheadOfThisTab });
     if (stale) {
       onStaleSave?.();
       return { ...payload, storageSaved: false, stale: true };
@@ -180,7 +185,8 @@ export function useAppPersistence({ state, refs, setters, config }) {
   }
 
   function restoreSaveSlot(slot) {
-    const restored = restoreRecoverySnapshot(slot?.snapshot);
+    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const restored = carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current);
     const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
     if (!repaired || !isSavedStateShapeValid(repaired)) return;
     const nextState = normalizeSavedGameplayState({ ...repaired, paused: true, started: false, savedAt: new Date().toISOString() });

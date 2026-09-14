@@ -204,10 +204,24 @@ export function adoptSaveRevision() {
   return knownSaveRevision;
 }
 
-export function writeSaveState(payload, { force = false } = {}) {
+/**
+ * `isAhead(stored, payload)` narrows what counts as a conflict once storage has
+ * moved past this tab. Without it any newer revision refuses the write, which is
+ * right for writers that know nothing about the run and wrong for the runtime:
+ * a second tab that only opened the game would lock the first.
+ */
+export function writeSaveState(payload, { force = false, isAhead = null } = {}) {
   const storedRevision = readSaveRevision();
   if (knownSaveRevision === null) knownSaveRevision = storedRevision;
-  if (!force && storedRevision > knownSaveRevision) return { saved: false, stale: true, revision: storedRevision };
+  if (!force && storedRevision > knownSaveRevision) {
+    let stored;
+    try {
+      stored = JSON.parse(readStoredValue(STORAGE_KEY, "null"));
+    } catch {
+      stored = null;
+    }
+    if (!isAhead || isAhead(stored, payload)) return { saved: false, stale: true, revision: storedRevision };
+  }
   const revision = Math.max(storedRevision, knownSaveRevision) + 1;
   const saved = writeStoredValue(STORAGE_KEY, JSON.stringify({ ...payload, saveRevision: revision }));
   if (saved) knownSaveRevision = revision;
@@ -221,6 +235,30 @@ export function writeSaveState(payload, { force = false } = {}) {
  * under a fresh draw instead of replaying it.
  */
 export const SETTLED_WINDOWS_STORAGE_KEY = "critical-point-settled-windows-v1";
+
+/**
+ * One token per browser tab. It lives in sessionStorage, which survives a reload
+ * of the same tab and is empty in a new one, so a reload of the tab that placed
+ * a bet can be told apart from a different tab opening the same run.
+ */
+export const TAB_TOKEN_SESSION_KEY = "critical-point-tab-token-v1";
+let fallbackTabToken = null;
+
+export function getTabToken() {
+  try {
+    const storage = globalThis.sessionStorage;
+    const existing = storage?.getItem(TAB_TOKEN_SESSION_KEY);
+    if (existing) return existing;
+    const created = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    storage?.setItem(TAB_TOKEN_SESSION_KEY, created);
+    if (storage) return created;
+    fallbackTabToken ??= created;
+    return fallbackTabToken;
+  } catch {
+    fallbackTabToken ??= `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return fallbackTabToken;
+  }
+}
 const SETTLED_WINDOWS_LIMIT = 400;
 
 export function readSettledWindowSeeds() {

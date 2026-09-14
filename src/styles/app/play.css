@@ -737,10 +737,12 @@
   border-color: var(--c-gx-line);
 }
 
-.gx-lost-tab p {
+.gx-lost-tab p,
+.gx-held-elsewhere p {
   margin: 0 0 8px;
   color: var(--c-paper);
   font-size: 13px;
+  line-height: 1.55;
 }
 
 .gx-reveal-skip {
@@ -881,7 +883,8 @@
 }
 
 .gx-breach ul,
-.gx-reveal-mutations ul {
+.gx-reveal-mutations ul,
+.gx-held-actions {
   display: grid;
   gap: 6px;
   margin: 0;
