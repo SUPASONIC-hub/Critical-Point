@@ -54,6 +54,7 @@ test("the whole decision is on one screen before anything is scrolled", async ({
 
 test("every push visibly compounds the pot, and the odds are never printed", async ({ page }) => {
   await openTable(page, "case01", "start");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("DORMANT");
   await page.locator(".choices .choice").first().click();
   const pot = page.getByTestId("gauntlet-pot");
   let previous = await readNumber(pot);
@@ -63,6 +64,7 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
     await expect.poll(() => readNumber(pot)).toBeGreaterThanOrEqual(Math.floor(previous * 1.5));
     previous = await readNumber(pot);
   }
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
   await expect(page.getByTestId("gauntlet-stage")).not.toContainText(/%/);
 });
 

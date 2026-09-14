@@ -50,6 +50,15 @@ function joinRules(items) {
   return items.map((item) => item.label).join(" / ");
 }
 
+function getOverdriveCopy({ run, multiplier, cashMutations }) {
+  const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
+  if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
+  if (run.streak > 0 && multiplier >= 4) return { label: "CHAIN LIVE", text: "한 번 더 x4+ 확정하면 오버클럭", progress: 75 };
+  if (run.streak > 0) return { label: "CHAIN HELD", text: "이번 판도 x4 이상으로 확정해야 이어진다", progress: 50 };
+  if (multiplier >= 4) return { label: "IGNITION", text: "확정하면 오버클럭 체인 1단계", progress: 35 };
+  return { label: "DORMANT", text: "x4 이상 확정부터 체인이 켜진다", progress: 12 };
+}
+
 /**
  * The table. One hand, one gauge, two verbs.
  *
@@ -146,6 +155,7 @@ export function GauntletStage({
   const cashMutations = describeMutations(cashSchema);
   const bustMutations = describeMutations(bustSchema);
   const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
+  const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 구간에 닿을 수 있다"
     : `벽 구간까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))} 열기`;
@@ -207,10 +217,10 @@ export function GauntletStage({
     if (live || resolvedRef.current || !claimed) return undefined;
     if (win.status === "bust") {
       playBustCue();
-      setImpact({ amount: 1, at: Date.now() });
+      setImpact({ amount: 1 });
     } else {
       playCashCue(multiplier);
-      setImpact({ amount: 0.35, at: Date.now() });
+      setImpact({ amount: 0.35 });
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
     const staked = selectedCard && !(wildSelected && wildBlocked) ? selectedCard : savedStake;
@@ -239,7 +249,7 @@ export function GauntletStage({
     const pushIndex = win.pushes + 1;
     dispatch({ type: "PUSH" });
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
-    setImpact({ amount: 0.28, at: Date.now() });
+    setImpact({ amount: 0.28 });
   }
 
   function cash() {
@@ -322,6 +332,10 @@ export function GauntletStage({
             <span className="gx-run-signal" data-testid="gauntlet-run-signal">
               런 <b>연승 {run.streak}</b> · BUST <b>{run.busts}</b> · 최고 <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
+            </span>
+            <span className="gx-overdrive" data-testid="gauntlet-overdrive">
+              <b>{overdrive.label}</b> {overdrive.text}
+              <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
             </span>
           </div>
           <div className={`gx-clock${remaining <= 10 ? " is-late" : ""}`} role="timer" aria-label={`남은 시간 ${Math.ceil(remaining)}초`}>
