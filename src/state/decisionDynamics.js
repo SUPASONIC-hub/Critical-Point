@@ -29,6 +29,10 @@ export const DYNAMICS_INITIAL_STATE = Object.freeze({
   pressCount: 0,
   timeDecay: 0,
   hiddenChoice: null,
+  hiddenChoiceAge: 0,
+  hesitationCharge: 0,
+  responseTimeSec: 0,
+  decisionPhase: "reading",
   environmentMode: "stable",
   thresholdState: "idle",
   rewardMultiplier: 1,
@@ -62,6 +66,9 @@ const NUMERIC_DYNAMICS_FIELDS = [
   "bustFloor",
   "pressCount",
   "timeDecay",
+  "hiddenChoiceAge",
+  "hesitationCharge",
+  "responseTimeSec",
   "rewardMultiplier",
   "currentTicks",
   "score",
@@ -78,6 +85,7 @@ const NUMERIC_DYNAMICS_FIELDS = [
 const BOOLEAN_DYNAMICS_FIELDS = ["isSlowMotion", "isBlind", "overdrive"];
 const ENVIRONMENT_MODES = new Set(["stable", "blackout", "reboot"]);
 const THRESHOLD_STATES = new Set(["idle", "building", "critical", "bust"]);
+const DECISION_PHASES = new Set(["reading", "hovering", "locked", "pushing", "critical", "rupture", "cooldown"]);
 
 export function normalizeDecisionDynamicsState(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return DYNAMICS_INITIAL_STATE;
@@ -100,6 +108,9 @@ export function normalizeDecisionDynamicsState(value) {
   next.bustFloor = clamp(Math.round(next.bustFloor), BUST_FLOOR_FATAL, BUST_FLOOR_MAX);
   next.pressCount = Math.max(0, Math.trunc(next.pressCount));
   next.timeDecay = clamp(next.timeDecay, 0, 1);
+  next.hiddenChoiceAge = clamp(next.hiddenChoiceAge, 0, 180);
+  next.hesitationCharge = clamp(next.hesitationCharge, 0, 36);
+  next.responseTimeSec = clamp(next.responseTimeSec, 0, 240);
   next.rewardMultiplier = clamp(next.rewardMultiplier, 1, 8);
   next.currentTicks = Math.max(0, Math.trunc(next.currentTicks));
   next.shakeIntensity = clamp(next.shakeIntensity, 0, 24);
@@ -111,6 +122,7 @@ export function normalizeDecisionDynamicsState(value) {
   next.rebootCount = Math.max(0, Math.trunc(next.rebootCount));
   next.banked = Math.max(0, Math.round(next.banked));
   next.hiddenChoice = typeof value.hiddenChoice === "string" ? value.hiddenChoice : null;
+  next.decisionPhase = DECISION_PHASES.has(value.decisionPhase) ? value.decisionPhase : DYNAMICS_INITIAL_STATE.decisionPhase;
   next.environmentMode = ENVIRONMENT_MODES.has(value.environmentMode) ? value.environmentMode : DYNAMICS_INITIAL_STATE.environmentMode;
   next.thresholdState = THRESHOLD_STATES.has(value.thresholdState) ? value.thresholdState : DYNAMICS_INITIAL_STATE.thresholdState;
   next.lastEvent = typeof value.lastEvent === "string" ? value.lastEvent.slice(0, 48) : DYNAMICS_INITIAL_STATE.lastEvent;
@@ -406,6 +418,30 @@ function readSeconds(event, fallback = DECISION_WINDOW_SECONDS) {
   return Number.isFinite(raw) ? raw : fallback;
 }
 
+function getResponseTime(seconds) {
+  return clamp(DECISION_WINDOW_SECONDS - Number(seconds), 0, 240);
+}
+
+function getTickDelta(previousResponseTime, responseTime) {
+  return clamp(responseTime - (Number(previousResponseTime) || 0), 0, 8);
+}
+
+function getHesitationCharge(hiddenChoiceAge, responseTime, pressCount) {
+  const age = Math.max(0, Number(hiddenChoiceAge) || 0);
+  const delay = Math.max(0, Number(responseTime) || 0) / DECISION_WINDOW_SECONDS;
+  const pushed = Math.max(0, Number(pressCount) || 0);
+  return clamp(Math.pow(age, 1.25) * 0.42 + delay * 5 + pushed * 0.6, 0, 36);
+}
+
+function getDecisionPhase({ hiddenChoice, pressCount, thresholdState, stressLevel, criticalFloor, overdriveFloor }) {
+  if (thresholdState === "bust") return "rupture";
+  if (stressLevel >= criticalFloor) return "critical";
+  if ((Number(pressCount) || 0) > 0) return "pushing";
+  if (hiddenChoice) return stressLevel >= overdriveFloor ? "critical" : "locked";
+  if (stressLevel > 0) return "hovering";
+  return "reading";
+}
+
 /** Every branch renders the same presentation payload from the same numbers. */
 function projectPressure({ stressLevel, combo, permanentMultiplier, busted, slowMotion, bustFloor = BUST_FLOOR_MAX }) {
   const ratio = clamp(Number(stressLevel) || 0, 0, 100) / 100;
@@ -475,9 +511,15 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const proposedTicks = Number(event.currentTicks ?? (seconds > 0 ? clockTicks : (Number(base.currentTicks) || 0) + 1));
       const currentTicks = Math.max(0, Number.isFinite(proposedTicks) ? proposedTicks : 0);
       const overtime = Math.max(0, -seconds);
+      const responseTimeSec = getResponseTime(seconds);
+      const tickDelta = getTickDelta(base.responseTimeSec, responseTimeSec);
+      const hiddenChoiceAge = base.hiddenChoice ? clamp((Number(base.hiddenChoiceAge) || 0) + tickDelta, 0, 180) : 0;
+      const hesitationCharge = base.hiddenChoice
+        ? getHesitationCharge(hiddenChoiceAge, responseTimeSec, base.pressCount)
+        : Math.max(0, (Number(base.hesitationCharge) || 0) - tickDelta * 3.5);
       const burn = getDeathBurn(currentTicks);
       const heat = getComboBacklash(base.combo, burn);
-      const clockStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN;
+      const clockStress = Math.min(TICK_BURN_CAP, burn * 100) + heat + overtime * OVERTIME_BURN + hesitationCharge;
       // The clock is a floor under the gauge, not the gauge itself. Anything the
       // player put there -- a press, a staged choice, a cancel -- rides on top of
       // it and survives the next tick, which is what makes a bust theirs.
@@ -494,6 +536,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         ...base,
         currentTicks,
         clockStress,
+        hiddenChoiceAge,
+        hesitationCharge: Number(hesitationCharge.toFixed(2)),
+        responseTimeSec: Number(responseTimeSec.toFixed(2)),
         heldGauge: busted ? Math.max(0, stressLevel - clockStress) : heldGauge,
         wallDebt: justBusted ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + 1) : Number(base.wallDebt) || 0,
         timeDecay: Number(burn.toFixed(3)),
@@ -501,6 +546,14 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         stressLevel,
         combo: justBusted ? 0 : base.combo,
         thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : stressLevel > 0 ? "building" : "idle",
+        decisionPhase: getDecisionPhase({
+          hiddenChoice: base.hiddenChoice,
+          pressCount: base.pressCount,
+          thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : stressLevel > 0 ? "building" : "idle",
+          stressLevel,
+          criticalFloor: criticalFloorFor(base.bustFloor),
+          overdriveFloor: overdriveFloorFor(base.bustFloor),
+        }),
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : base.environmentMode,
         score,
         lastDelta: score - anchorScore,
@@ -538,6 +591,8 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
         stressLevel,
         heldGauge,
         pressCount,
+        decisionPhase: stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : "pushing",
+        hesitationCharge: getHesitationCharge(base.hiddenChoiceAge, base.responseTimeSec, pressCount),
         isSlowMotion: slowMotion,
         ...fx,
         // The press has to land harder than the gauge alone would, or the first
@@ -556,6 +611,9 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       return {
         ...base,
         hiddenChoice: event.choiceId ?? null,
+        hiddenChoiceAge: 0,
+        hesitationCharge: getHesitationCharge(0, base.responseTimeSec, base.pressCount),
+        decisionPhase: stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : "locked",
         stressLevel,
         heldGauge,
         isSlowMotion: slowMotion,
@@ -625,6 +683,10 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
           ? Math.min(MAX_WALL_DEBT, (Number(base.wallDebt) || 0) + (base.isBlind ? 0 : 1))
           : Math.max(0, (Number(base.wallDebt) || 0) - 1),
         hiddenChoice: null,
+        hiddenChoiceAge: 0,
+        hesitationCharge: 0,
+        responseTimeSec: Number(getResponseTime(seconds).toFixed(2)),
+        decisionPhase: busted ? "rupture" : "cooldown",
         thresholdState: busted ? "bust" : stressLevel >= criticalFloorFor(base.bustFloor) ? "critical" : outcome.thresholdState,
         environmentMode: busted ? "blackout" : base.environmentMode === "blackout" ? "reboot" : outcome.environmentMode,
         score,
@@ -643,7 +705,19 @@ export function reduceDecisionDynamics(state = DYNAMICS_INITIAL_STATE, event = {
       const heldGauge = clamp((Number(base.heldGauge) || 0) + 3, 0, 100);
       const stressLevel = clamp(Math.round((Number(base.clockStress) || 0) + heldGauge), 0, 100);
       const fx = projectPressure({ bustFloor: Number(base.bustFloor) || BUST_FLOOR_MAX, stressLevel, combo: base.combo, permanentMultiplier, busted: base.isBlind, slowMotion: false });
-      return { ...base, hiddenChoice: null, stressLevel, isSlowMotion: false, ...fx, lastDelta: 0, lastEvent: type };
+      return {
+        ...base,
+        hiddenChoice: null,
+        hiddenChoiceAge: 0,
+        hesitationCharge: 0,
+        decisionPhase: "hovering",
+        heldGauge,
+        stressLevel,
+        isSlowMotion: false,
+        ...fx,
+        lastDelta: 0,
+        lastEvent: type,
+      };
     }
 
     default:
@@ -657,6 +731,10 @@ export function createDynamicsSummary(state) {
     stressLevel: state.stressLevel,
     timeDecay: Number(state.timeDecay.toFixed(3)),
     hiddenChoice: Boolean(state.hiddenChoice),
+    hiddenChoiceAge: Number(state.hiddenChoiceAge.toFixed(2)),
+    hesitationCharge: Number(state.hesitationCharge.toFixed(2)),
+    responseTimeSec: Number(state.responseTimeSec.toFixed(2)),
+    decisionPhase: state.decisionPhase,
     environmentMode: state.environmentMode,
     thresholdState: state.thresholdState,
     rewardMultiplier: state.rewardMultiplier,
@@ -705,6 +783,10 @@ const PRESSURE_FIELDS = [
   "isBlind",
   "lastDelta",
   "timeDecay",
+  "hiddenChoiceAge",
+  "hesitationCharge",
+  "responseTimeSec",
+  "decisionPhase",
 ];
 
 function projectSnapshot(state) {

@@ -51,10 +51,20 @@ export function validateSavedStatePayload(state) {
     if (!dynamics || typeof dynamics !== "object" || Array.isArray(dynamics)) {
       errors.push("invalid dynamics");
     } else {
-      for (const key of ["combo", "stressLevel", "timeDecay", "rewardMultiplier", "heartbeatBpm", "shakeIntensity"]) {
+      for (const key of [
+        "combo",
+        "stressLevel",
+        "timeDecay",
+        "hiddenChoiceAge",
+        "hesitationCharge",
+        "responseTimeSec",
+        "rewardMultiplier",
+        "heartbeatBpm",
+        "shakeIntensity",
+      ]) {
         if (typeof dynamics[key] !== "number" || !Number.isFinite(dynamics[key])) errors.push(`invalid dynamics.${key}`);
       }
-      for (const key of ["thresholdState", "environmentMode"]) {
+      for (const key of ["thresholdState", "environmentMode", "decisionPhase"]) {
         if (typeof dynamics[key] !== "string") errors.push(`invalid dynamics.${key}`);
       }
       if (!("hiddenChoice" in dynamics)) errors.push("invalid dynamics.hiddenChoice");

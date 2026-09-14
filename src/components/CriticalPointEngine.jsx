@@ -139,7 +139,7 @@ export function CriticalPointEngine({ active }) {
     const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     shaker.current = createShaker();
 
-    const written = { stress: "", vignette: "", jitter: "", lift: "", tilt: "" };
+    const written = { stress: "", vignette: "", jitter: "", lift: "", tilt: "", drift: "", pulse: "" };
     const write = (name, key, value) => {
       if (written[key] === value) return;
       written[key] = value;
@@ -167,7 +167,9 @@ export function CriticalPointEngine({ active }) {
       lastFrame = time;
 
       const stress = state.stressLevel;
-      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62);
+      const hesitation = Math.min(1, (Number(state.hesitationCharge) || 0) / 36);
+      const lockedDelay = Math.min(1, (Number(state.hiddenChoiceAge) || 0) / 18);
+      const sustained = state.isBlind ? 1 : Math.min(1, (state.shakeIntensity / 9) * 0.62 + hesitation * 0.22);
       const { x, y, level } = reducedMotion ? { x: 0, y: 0, level: 0 } : shaker.current.sample(sustained, deltaMs);
 
       if (stress >= 18) {
@@ -184,6 +186,8 @@ export function CriticalPointEngine({ active }) {
 
       write("--decision-stress", "stress", (stress / 100).toFixed(2));
       write("--decision-vignette", "vignette", state.vignette.toFixed(3));
+      write("--decision-drift", "drift", reducedMotion ? "0" : Math.max(hesitation, lockedDelay).toFixed(3));
+      write("--decision-pulse", "pulse", reducedMotion ? "0" : (Math.sin(time * 0.017) * 0.5 + 0.5).toFixed(3));
       const shouldMove = level * SHAKE_TRAVEL_PX >= 0.05;
       if (shouldMove !== moving) {
         shell.classList.toggle("is-shaking", shouldMove);
@@ -198,6 +202,8 @@ export function CriticalPointEngine({ active }) {
       const glitchAt = state.overdriveFloor ?? FALLBACK_GLITCH;
       const tone = state.isBlind
         ? "is-bust"
+        : state.decisionPhase === "locked"
+          ? "is-locked-pressure"
         : state.isSlowMotion
           ? "is-slowmo"
           : stress >= criticalAt
@@ -253,10 +259,12 @@ export function CriticalPointEngine({ active }) {
         "--decision-jitter",
         "--decision-lift",
         "--decision-tilt",
+        "--decision-drift",
+        "--decision-pulse",
       ]) {
         root.style.removeProperty(name);
       }
-      shell.classList.remove("is-shaking", "is-bust", "is-slowmo", "is-critical", "is-glitching");
+      shell.classList.remove("is-shaking", "is-bust", "is-slowmo", "is-critical", "is-glitching", "is-locked-pressure");
     };
   }, [active]);
 
@@ -296,9 +304,10 @@ export function CriticalPointEngine({ active }) {
       <div ref={particleLayer} className="decision-particle-layer" />
       {pressure.combo > 0 && <span className="decision-combo">COMBO x{pressure.combo}</span>}
       {pressure.heat >= 1 && <span className="decision-heat">HEAT +{Math.round(pressure.heat)}</span>}
+      {pressure.hiddenChoiceAge > 0 && <span className="decision-hidden">HIDDEN +{Math.round(pressure.hiddenChoiceAge)}s</span>}
       {pressure.wallDebt > 0 && <span className="decision-debt">여유 -{pressure.wallDebt}</span>}
       <span className="decision-push">
-        PUSH {pressure.rewardMultiplier.toFixed(2)}x · {thresholdLabel}
+        PUSH {pressure.rewardMultiplier.toFixed(2)}x / {pressure.decisionPhase.toUpperCase()} / {thresholdLabel}
       </span>
       <span className="decision-stress">STRESS {pressure.stressLevel}%</span>
     </div>,

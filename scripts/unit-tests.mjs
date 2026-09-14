@@ -525,6 +525,33 @@ test("the clock is a floor under the gauge, not the gauge itself", () => {
   }
 });
 
+test("staging a choice turns delay into visible stress", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 38 });
+  const idleStress = state.stressLevel;
+
+  state = reduceDecisionDynamics(state, { type: "CHOICE_STAGED", choiceId: "audit-route" });
+  assert.equal(state.hiddenChoice, "audit-route");
+  assert.equal(state.decisionPhase, "locked");
+
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 32 });
+  assert.ok(state.hiddenChoiceAge >= 6, "the hidden choice keeps ageing while the player hesitates");
+  assert.ok(state.hesitationCharge > 0, "hesitation is charged as its own state axis");
+  assert.ok(state.stressLevel > idleStress, "and it pushes the pressure readout up");
+});
+
+test("committing clears the hidden-choice delay axis", () => {
+  let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
+  state = reduceDecisionDynamics(state, { type: "CHOICE_STAGED", choiceId: "audit-route" });
+  state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 36 });
+  state = reduceDecisionDynamics(state, { type: "CHOICE_COMMITTED", challengeMatch: true, riskDelta: 0, seconds: 36 });
+
+  assert.equal(state.hiddenChoice, null);
+  assert.equal(state.hiddenChoiceAge, 0);
+  assert.equal(state.hesitationCharge, 0);
+  assert.equal(state.decisionPhase, "cooldown");
+});
+
 test("pressing far enough busts the run, and the bust is the player's own", () => {
   let state = reduceDecisionDynamics(DYNAMICS_INITIAL_STATE, { type: "DECISION_STARTED" });
   state = reduceDecisionDynamics(state, { type: "DECISION_TICK", seconds: 30 });
