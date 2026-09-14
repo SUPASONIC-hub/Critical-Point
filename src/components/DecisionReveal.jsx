@@ -7,6 +7,38 @@ function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
 }
 
+function formatMultiplier(value) {
+  return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;
+}
+
+function createConsequenceLines({ verdict, busted, nextMutations }) {
+  if (!verdict) return [];
+  const cause =
+    verdict.cause === "timeout"
+      ? "시계를 방치했다"
+      : verdict.cause === "abandon"
+        ? "걸어 둔 판을 떠났다"
+        : verdict.cause === "push"
+          ? "한 번 더 밀었다"
+          : "직접 확정했다";
+  const heatLine = busted
+    ? `열기 ${verdict.gauge} / 벽 ${verdict.wall}. 판돈 ${formatNumber(verdict.lostPot)}을 잃었다.`
+    : `열기 ${verdict.gauge}에서 ${formatMultiplier(verdict.multiplier)} 확정. 벽 ${verdict.wall}은 넘기지 않았다.`;
+  const nextRule = nextMutations.length > 0
+    ? nextMutations.map((mutation) => mutation.label).join(" / ")
+    : "기본 규칙으로 복귀";
+  const tableLine = busted
+    ? "다음 판은 회의실이 깨뜨린 규칙으로 시작한다."
+    : verdict.pushes === 0
+      ? "너무 일찍 멈춘 대가로 다음 판의 큰 카드가 잠길 수 있다."
+      : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+  return [
+    ["판정 원인", cause],
+    ["열기 기록", heatLine],
+    ["다음 판", `${nextRule}. ${tableLine}`],
+  ];
+}
+
 /**
  * The verdict, then the bill, then what broke.
  *
@@ -31,6 +63,7 @@ export function DecisionReveal({ view }) {
   const costs = effectEntries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
   const nextMutations = verdict?.nextMutations ?? [];
+  const consequenceLines = createConsequenceLines({ verdict, busted, nextMutations });
   const headline = !verdict
     ? "DECISION"
     : busted
@@ -61,6 +94,17 @@ export function DecisionReveal({ view }) {
           <h2 id="decision-reveal-title">{headline}</h2>
           <p>{subline}</p>
         </div>
+
+        {consequenceLines.length > 0 && (
+          <div className="gx-reveal-consequence" data-testid="consequence-ledger" aria-label="판정 후폭풍">
+            {consequenceLines.map(([label, text]) => (
+              <article key={label}>
+                <span>{label}</span>
+                <b>{text}</b>
+              </article>
+            ))}
+          </div>
+        )}
 
         {verdict && (
           <div className="gx-reveal-pot" aria-label="판돈">

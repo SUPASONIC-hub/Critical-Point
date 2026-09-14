@@ -72,6 +72,8 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await page.locator(".choices .choice").first().click();
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("consequence-ledger")).toContainText("판정 원인");
+  await expect(page.getByTestId("consequence-ledger")).toContainText("다음 판");
   await page.getByTestId("decision-next").click();
   const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(banked.dynamics.runPot).toBeGreaterThan(0);
@@ -84,6 +86,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
 
   const reveal = page.locator(".decision-reveal");
   await expect(reveal.locator("h2")).toHaveText("BUST");
+  await expect(page.getByTestId("consequence-ledger")).toContainText("판돈");
   await expect(reveal.locator(".decision-bonus")).toHaveCount(0);
   await expect(page.getByTestId("next-mutations")).toContainText("BLACKOUT");
 
