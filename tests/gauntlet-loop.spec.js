@@ -136,6 +136,7 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
   for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("OVERCLOCK READY");
   await page.getByTestId("commit-confirm").click();
+  await expect(page.locator(".decision-reveal")).toHaveClass(/is-overdrive/);
   await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED");
   await expect(page.getByTestId("next-mutations")).toContainText("OVERCLOCK");
 });

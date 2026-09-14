@@ -53,10 +53,11 @@ export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
+  const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   useEffect(() => {
     if (!decisionReveal) return;
-    playDecisionRevealCue(busted ? "system-alert" : decisionReveal.clue ? "clue-found" : "decision-locked");
-  }, [busted, decisionReveal]);
+    playDecisionRevealCue(busted ? "system-alert" : overclocked ? "chain-reaction" : decisionReveal.clue ? "clue-found" : "decision-locked");
+  }, [busted, decisionReveal, overclocked]);
   if (!decisionReveal) return null;
   const effectEntries = Object.entries(decisionReveal.effect ?? {}).filter(([, value]) => value !== 0);
   const gains = effectEntries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight).slice(0, 3);
@@ -84,7 +85,7 @@ export function DecisionReveal({ view }) {
     <div className={`decision-reveal-backdrop${busted ? " is-bust" : ""}`} role="presentation">
       <section
         ref={decisionRevealRef}
-        className={`decision-reveal gx-reveal${busted ? " is-bust" : " is-cashed"}`}
+        className={`decision-reveal gx-reveal${busted ? " is-bust" : " is-cashed"}${overclocked ? " is-overdrive" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="decision-reveal-title"
