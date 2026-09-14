@@ -120,6 +120,8 @@ test("cashing without a single push seals the best card on the next board", asyn
   await expect(page.getByTestId("fracture-tax").first()).toContainText("1.5x");
   const sealed = page.locator(".gx-card.is-sealed");
   await expect(sealed).toHaveCount(1);
+  await expect(page.getByTestId("sealed-card-lock")).toContainText("최고 칩 봉인");
+  await expect(page.getByTestId("sealed-card-lock")).toContainText("30");
   await page.getByTestId("protocol-breach").click();
   await sealed.click();
   await expect(page.getByTestId("commit-confirm")).toBeDisabled();

@@ -512,8 +512,8 @@ export function GauntletStage({
                   </span>
                 )}
                 {sealed && (
-                  <span className="gx-card-seal">
-                    <Lock size={12} aria-hidden="true" /> 봉인 · 열기 {SEAL_BREAK_GAUGE}
+                  <span className="gx-card-seal" data-testid="sealed-card-lock">
+                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 · 열기 {SEAL_BREAK_GAUGE}
                   </span>
                 )}
                 {burn?.fractured && !schema.faceDown && (
