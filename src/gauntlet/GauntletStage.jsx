@@ -50,6 +50,18 @@ function joinRules(items) {
   return items.map((item) => item.label).join(" / ");
 }
 
+function getRuleHeat({ mutations, schema }) {
+  return Math.min(
+    100,
+    mutations.length * 24
+      + (schema.faceDown ? 18 : 0)
+      + (schema.sedated ? 14 : 0)
+      + (schema.sealHighest ? 12 : 0)
+      + (schema.fracturedAxis ? 16 : 0)
+      + (schema.stepMin > BASE_SCHEMA.stepMin ? 16 : 0),
+  );
+}
+
 function getOverdriveCopy({ run, multiplier, cashMutations }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
   if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
@@ -155,6 +167,7 @@ export function GauntletStage({
   const cashMutations = describeMutations(cashSchema);
   const bustMutations = describeMutations(bustSchema);
   const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
+  const ruleHeat = getRuleHeat({ mutations, schema });
   const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 구간에 닿을 수 있다"
@@ -343,6 +356,25 @@ export function GauntletStage({
             <i style={{ width: `${(remaining / schema.seconds) * 100}%` }} />
           </div>
         </div>
+
+        {(mutations.length > 0 || ruleHeat > 0) && (
+          <section className="gx-active-rules" data-testid="active-mutations" aria-label="현재 적용 중인 변형 규칙">
+            <div>
+              <span>ACTIVE RULESET</span>
+              <b>{joinRules(mutations)}</b>
+              <small>{currentRules}</small>
+            </div>
+            <i aria-hidden="true"><em style={{ width: `${ruleHeat}%` }} /></i>
+            <ul>
+              {mutations.slice(0, 3).map((mutation) => (
+                <li key={mutation.id} className={`mut-${mutation.id}`}>
+                  <strong>{mutation.label}</strong>
+                  <small>{mutation.title}</small>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <div
           className="gx-gauge"

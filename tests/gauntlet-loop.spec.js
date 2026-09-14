@@ -100,6 +100,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
 
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("protocol-breach")).toContainText("BLACKOUT");
+  await expect(page.getByTestId("active-mutations")).toContainText("BLACKOUT");
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-face-down/);
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 1");
   await expect(page.getByTestId("gauntlet-gauge")).toHaveText("22");
@@ -112,6 +113,7 @@ test("cashing without a single push seals the best card on the next board", asyn
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("next-mutations")).toContainText("COLD FEET");
   await page.getByTestId("decision-next").click();
+  await expect(page.getByTestId("active-mutations")).toContainText("COLD FEET");
   const sealed = page.locator(".gx-card.is-sealed");
   await expect(sealed).toHaveCount(1);
   await page.getByTestId("protocol-breach").click();
