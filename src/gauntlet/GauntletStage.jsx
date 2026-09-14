@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
+import { AlertTriangle, Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
 import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   BASE_SCHEMA,
+  buildNextSchema,
   describeMutations,
+  FRACTURE_MIN_BURN,
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
@@ -30,6 +32,22 @@ function formatNumber(value) {
 
 function formatMultiplier(value) {
   return value >= 10 ? `×${Math.round(value)}` : `×${value.toFixed(1)}`;
+}
+
+function describeEffect(effect = {}, resourceMeta = {}) {
+  return Object.entries(effect)
+    .filter(([, value]) => Number(value) !== 0)
+    .map(([key, value]) => ({
+      key,
+      value: Number(value),
+      label: resourceMeta[key]?.label ?? key,
+    }))
+    .sort((left, right) => Math.abs(right.value) - Math.abs(left.value));
+}
+
+function joinRules(items) {
+  if (!items.length) return "기본 규칙";
+  return items.map((item) => item.label).join(" / ");
 }
 
 /**
@@ -100,6 +118,41 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
+  const selectedBurn = selectedCard ? getCardBurn(selectedCard, schema) : null;
+  const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
+  const visibleEffects = selectedEffects.slice(0, 4);
+  const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
+  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow));
+  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh));
+  const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
+  const cashSchema = buildNextSchema({
+    outcome: "cash",
+    cause: "cash",
+    gauge: win.gauge,
+    pushes: win.pushes,
+    streak: multiplier >= 4 ? run.streak + 1 : 0,
+    burnAxis: fractureAxis,
+    caseClosed: false,
+  });
+  const bustSchema = buildNextSchema({
+    outcome: "bust",
+    cause: "push",
+    gauge: Math.max(win.gauge, schema.wallMin),
+    pushes: win.pushes + 1,
+    streak: 0,
+    burnAxis: fractureAxis,
+    caseClosed: false,
+  });
+  const cashMutations = describeMutations(cashSchema);
+  const bustMutations = describeMutations(bustSchema);
+  const dangerLine = nextHigh >= schema.wallMin
+    ? "다음 푸시가 벽 구간에 닿을 수 있다"
+    : `벽 구간까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))} 열기`;
+  const currentRules = mutations.length
+    ? `${joinRules(mutations)} 적용 중`
+    : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
+      ? "숨은 규칙 적용 중"
+      : "규칙 안정";
 
   useEffect(() => {
     if (!breachOpen || hidden) return undefined;
@@ -327,9 +380,36 @@ export function GauntletStage({
             <details className="gx-brief">
               <summary>사건 브리핑</summary>
               <p>{scene.node.text}</p>
+              <ul>
+                <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
+                <li>이번 판 규칙: {currentRules}.</li>
+                <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
+              </ul>
             </details>
           </div>
         </header>
+
+        <section className="gx-situation" aria-label="현재 상황판">
+          <article className="gx-situation-card gx-situation-risk">
+            <span>현재 위험</span>
+            <b>{dangerLine}</b>
+            <small>
+              벽은 {schema.wallMin}–{schema.wallMax}, 심박 {schema.sedated ? "교란" : bpm}
+            </small>
+          </article>
+          <article className="gx-situation-card">
+            <span>확정하면</span>
+            <b>{selectedCard ? `+${formatNumber(livePot)} 판돈` : "카드 선택 필요"}</b>
+            <small>
+              다음 규칙: {joinRules(cashMutations)}
+            </small>
+          </article>
+          <article className="gx-situation-card">
+            <span>밀어붙이면</span>
+            <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : "배율만 상승"}</b>
+            <small>실패 시 판돈 {formatNumber(run.runPot)} → 0 / {joinRules(bustMutations)}</small>
+          </article>
+        </section>
 
         <div className="choices gx-hand" role="group" aria-label="카드">
           {cards.map((card, index) => {
@@ -361,6 +441,15 @@ export function GauntletStage({
                     {burn?.fractured && !schema.faceDown && <Zap size={11} aria-label="균열 축" />}
                   </b>
                 </span>
+                {selected && !schema.faceDown && (
+                  <span className="gx-card-preview">
+                    {describeEffect(card.effect, resourceMeta).slice(0, 3).map((effect) => (
+                      <i key={effect.key} className={effect.value > 0 ? "gain" : "cost"}>
+                        {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
+                      </i>
+                    ))}
+                  </span>
+                )}
                 {sealed && (
                   <span className="gx-card-seal">
                     <Lock size={12} aria-hidden="true" /> 봉인 · 열기 {SEAL_BREAK_GAUGE}
@@ -408,6 +497,20 @@ export function GauntletStage({
           </div>
         )}
       </div>
+
+      {selectedCard && !schema.faceDown && (
+        <aside className="gx-stake-strip" aria-label="선택한 카드의 상세 영향">
+          <AlertTriangle size={15} aria-hidden="true" />
+          <b>{selectedCard.label}</b>
+          {visibleEffects.map((effect) => (
+            <span key={effect.key} className={effect.value > 0 ? "gain" : "cost"}>
+              {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
+            </span>
+          ))}
+          {hiddenEffectCount > 0 && <span>외 {hiddenEffectCount}</span>}
+          <small>{selectedBurn ? `${resourceMeta[selectedBurn.key]?.label ?? selectedBurn.key} 소모가 다음 판 균열 후보` : "소모 없는 선택"}</small>
+        </aside>
+      )}
 
       <div className="gx-actions">
         <button
