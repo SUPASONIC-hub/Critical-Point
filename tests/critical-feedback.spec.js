@@ -17,11 +17,32 @@ test("critical feedback emits particles, stays mobile-safe, and persists dynamic
   await expect(page.locator(".decision-particle")).not.toHaveCount(0);
   await expect(page.locator(".decision-feedback-layer")).toBeVisible();
 
+  await page.waitForFunction(() => {
+    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
+    return (saved?.dynamics?.hiddenChoiceAge ?? 0) >= 1;
+  });
+  await expect(page.locator(".decision-hidden")).toBeVisible();
+  await expect(page.locator(".decision-push")).toContainText(/LOCKED|CRITICAL|RUPTURE/);
+  const hesitationReadout = await page.evaluate(() => ({
+    drift: Number(getComputedStyle(document.documentElement).getPropertyValue("--decision-drift")),
+    phase: JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.dynamics?.decisionPhase,
+    hiddenChoiceAge: JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.dynamics?.hiddenChoiceAge,
+    hesitationCharge: JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.dynamics?.hesitationCharge,
+  }));
+  expect(hesitationReadout.drift).toBeGreaterThan(0);
+  expect(["locked", "critical", "rupture"]).toContain(hesitationReadout.phase);
+  expect(hesitationReadout.hiddenChoiceAge).toBeGreaterThanOrEqual(1);
+  expect(hesitationReadout.hesitationCharge).toBeGreaterThan(0);
+
   await page.getByRole("button", { name: "저장", exact: true }).click();
   const savedAfterPush = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(typeof savedAfterPush.dynamics.hiddenChoice).toBe("string");
+  expect(typeof savedAfterPush.dynamics.decisionPhase).toBe("string");
   expect(typeof savedAfterPush.dynamics.thresholdState).toBe("string");
   expect(typeof savedAfterPush.dynamics.environmentMode).toBe("string");
+  expect(savedAfterPush.dynamics.hiddenChoiceAge).toBeGreaterThanOrEqual(1);
+  expect(savedAfterPush.dynamics.hesitationCharge).toBeGreaterThan(0);
+  expect(savedAfterPush.dynamics.responseTimeSec).toBeGreaterThanOrEqual(2);
   expect(savedAfterPush.dynamics.stressLevel).toBeGreaterThan(0);
   expect(savedAfterPush.dynamics.rewardMultiplier).toBeGreaterThanOrEqual(1);
 
