@@ -1,4 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+export function usePendingTelemetryRef(saved) {
+  return useRef(saved?.pendingTelemetry ?? []);
+}
 
 export function useRuntimeOverlayShortcuts({
   decisionReveal,

@@ -120,19 +120,11 @@ import { createClipboardActions, useClipboardStatus } from "./state/useClipboard
 import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js";
 import { useEndingSequence } from "./state/useEndingSequence.js";
 import { useStableEvent } from "./state/useStableEvent.js";
-import {
-  DECISION_PHASE_SECONDS,
-  getDecisionSeconds,
-  onDecisionTick,
-  spendDecisionSeconds,
-  startDecisionWindow,
-  stopDecisionWindow,
-  useDecisionPhase,
-} from "./state/decisionClock.js";
+import * as decisionClock from "./state/decisionClock.js";
 import { useCaseSystems } from "./state/useCaseSystems.js";
 import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
-import { useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
+import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { safeStringify } from "./state/diagnosticUtils.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import {
@@ -224,7 +216,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
 
   // Coarse only: the exact count lives in the decision clock so a per-second
   // tick never reaches this render.
-  const decisionPhase = useDecisionPhase();
+  const decisionPhase = decisionClock.useDecisionPhase();
 
   const {
     runId, setRunId, playerName, setPlayerName, playStyle, setPlayStyle, openingLegacy, setOpeningLegacy,
@@ -265,7 +257,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
-  const pendingTelemetryRef = useRef(saved?.pendingTelemetry ?? []);
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [showTacticalDetails, setShowTacticalDetails] = useState(false);
   const [memoState, setMemoState] = useState({ nodeId: "", opened: false });
@@ -300,6 +291,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const [telemetryRetryInfo, setTelemetryRetryInfo] = useState({ attempt: 0, nextRetryAt: "" });
   const [debugCaseId, setDebugCaseId] = useState("case05");
   const [debugNodeId, setDebugNodeId] = useState("c5_start");
+  const pendingTelemetryRef = usePendingTelemetryRef(saved);
   const debugCaseIdRef = useRef("case05");
   const debugNodeIdRef = useRef("c5_start");
   const debugCaseSelectRef = useRef(null);
@@ -484,7 +476,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const suspenseState = getSuspenseState({
     riskPressure,
-    decisionSeconds: decisionPhase * DECISION_PHASE_SECONDS,
+    decisionSeconds: decisionPhase * decisionClock.DECISION_PHASE_SECONDS,
     log,
     currentCase,
   });
@@ -684,7 +676,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
             read,
             resources,
             observerPattern,
-            responseTimeSec: Math.max(1, DECISION_WINDOW_SECONDS - getDecisionSeconds()),
+            responseTimeSec: Math.max(1, DECISION_WINDOW_SECONDS - decisionClock.getDecisionSeconds()),
           }),
         };
       }),
@@ -694,7 +686,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
   const pendingChoiceRead = pendingChoice
-    ? getPendingChoiceRead(pendingChoice, Math.max(1, DECISION_WINDOW_SECONDS - getDecisionSeconds()))
+    ? getPendingChoiceRead(pendingChoice, Math.max(1, DECISION_WINDOW_SECONDS - decisionClock.getDecisionSeconds()))
     : null;
   const pendingChoiceForecast = pendingChoiceRead
     ? addForecastUncertainty(
@@ -952,7 +944,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       setTimerPenaltyCount(0);
       setProbeUsed(false);
     });
-    startDecisionWindow(DECISION_WINDOW_SECONDS);
+    decisionClock.startDecisionWindow(DECISION_WINDOW_SECONDS);
     if (restoredDynamicsStartRef.current) {
       restoredDynamicsStartRef.current = false;
     } else {
@@ -960,7 +952,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     }
     return () => {
       cancelled = true;
-      stopDecisionWindow();
+      decisionClock.stopDecisionWindow();
     };
   }, [currentCase, dispatchDynamics, isResult, resolvedNodeId, setProbeUsed, setTimerPenaltyCount, started]);
 
@@ -1004,7 +996,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   // Overtime keeps charging. The window used to bill once and then let the
   // player think for free, which staged pressure without ever applying it.
   const chargeOvertime = useStableEvent(() => {
-    const decisionSeconds = getDecisionSeconds();
+    const decisionSeconds = decisionClock.getDecisionSeconds();
     if (!started || isResult || decisionSeconds > 0) return;
     const chargesDue = 1 + Math.floor(-decisionSeconds / OVERTIME_CHARGE_SECONDS);
     if (chargesDue <= timerPenaltyCount) return;
@@ -1054,7 +1046,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
 
   useEffect(() => {
     if (!started || isResult) return undefined;
-    return onDecisionTick(chargeOvertime);
+    return decisionClock.onDecisionTick(chargeOvertime);
   }, [chargeOvertime, isResult, started]);
 
   function getScrollBehavior() {
@@ -1286,7 +1278,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setResources(nextResources);
     setLog(nextLog);
     setEcho(probeLine);
-    spendDecisionSeconds(probeSeconds);
+    decisionClock.spendDecisionSeconds(probeSeconds);
     setSaveStatus(`에코 힌트 확보됨 · 결정 시간 ${probeSeconds}초 사용`);
     persist({
       probeUsed: true,
@@ -1326,7 +1318,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setLog(nextLog);
     setEcho(entry.echo);
     setNodeEnteredAt(Date.now());
-    startDecisionWindow(DECISION_WINDOW_SECONDS);
+    decisionClock.startDecisionWindow(DECISION_WINDOW_SECONDS);
     // Paired, the way the scene entry above pairs them. Resetting the clock and
     // not the reducer handed the player a window whose burn started over while
     // the gauge they had already bought rode through it -- a free vent, once a
@@ -1404,7 +1396,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     // reducer, so resources, screen and state machine cannot disagree about
     // where the critical point was. The dispatch replays it into the store.
     const { commitEvent, thresholdState, rewardMultiplier, riskRewardEffect, environmentEffect, thresholdEffect, environmentMode: committedEnvironment } =
-      resolveCommit({ challengeMatch, riskDelta: challengeRiskDelta, seconds: getDecisionSeconds(), effect });
+      resolveCommit({ challengeMatch, riskDelta: challengeRiskDelta, seconds: decisionClock.getDecisionSeconds(), effect });
     dispatchDynamics(commitEvent);
     const instinctChoice = playStyle === "instinct" && !showTacticalDetails;
     const instinctSurge = instinctChoice && challengeMatch
