@@ -4,22 +4,45 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: var(--color-ink-deep);
-  color: var(--c-paper-94);
+  color: var(--ui-text);
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgb(255 92 72 / 0.1), transparent 70%),
+    var(--ui-bg);
 }
 .error-panel {
-  width: min(100%, 520px);
-  padding: 32px;
-  border: 1px solid rgba(237, 242, 238, 0.18);
-  background: var(--color-ink);
-  box-shadow: var(--shadow-panel);
+  width: min(100%, 560px);
+  padding: clamp(24px, 5vw, 40px);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+}
+.error-panel .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-danger-81);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.error-panel .eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--ui-heat);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--ui-heat);
 }
 .error-panel h1 {
-  margin: 12px 0;
-  font-size: 1.75rem;
+  margin: 14px 0 10px;
+  font-size: clamp(24px, 4vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 .error-panel p {
-  color: var(--c-gray-75);
+  color: var(--ui-text-2);
   line-height: 1.7;
 }
 .error-actions {
@@ -28,6 +51,26 @@
   gap: 10px;
   margin-top: 24px;
 }
+.error-actions button {
+  min-height: 46px;
+  padding: 0 18px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border: 1px solid var(--ui-accent);
+  border-radius: var(--ui-radius-sm);
+  font-weight: 700;
+}
+.error-actions button.ghost {
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border-color: var(--ui-line-strong);
+}
+.error-actions button:disabled {
+  color: var(--ui-text-3);
+  background: var(--ui-surface-2);
+  border-color: var(--ui-line);
+  cursor: not-allowed;
+}
 * {
   box-sizing: border-box;
 }
@@ -35,7 +78,19 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-sans);
   font-size: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Hangul breaks between words, not between syllables: the result headline
+     used to wrap in the middle of a word on a phone. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+::selection {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
 }
 button,
 input,
@@ -74,6 +129,8 @@ summary:focus-visible {
   white-space: nowrap;
   border: 0;
 }
+/* The music controls are two glass pills pinned to the top-right corner of
+   every screen. They float, so each screen keeps that corner clear. */
 .music-controls {
   position: fixed;
   top: 16px;
@@ -91,15 +148,25 @@ summary:focus-visible {
   gap: 7px;
   pointer-events: auto;
   min-height: 38px;
-  padding: 0 10px;
-  color: var(--color-copy-soft);
-  background: rgba(24, 32, 31, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 0 12px;
+  color: var(--ui-text-2);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
-  box-shadow: 0 10px 28px var(--c-black-a24);
-  backdrop-filter: blur(10px);
+  box-shadow: var(--ui-shadow-1);
+  backdrop-filter: blur(14px) saturate(140%);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition:
+    color var(--ui-dur-fast) var(--ui-ease),
+    background var(--ui-dur-fast) var(--ui-ease),
+    border-color var(--ui-dur-fast) var(--ui-ease);
+}
+.music-toggle:hover,
+.music-volume-toggle:hover {
+  color: var(--ui-text);
+  border-color: rgb(255 255 255 / 0.3);
 }
 .music-volume-toggle {
   min-width: 74px;
@@ -109,9 +176,10 @@ summary:focus-visible {
   flex: 0 0 auto;
 }
 .music-toggle.active {
-  color: var(--color-ink);
-  background: var(--color-accent);
-  border-color: var(--color-accent-strong);
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
 }
 .music-toggle span {
   max-width: 58px;
@@ -123,112 +191,6 @@ summary:focus-visible {
   min-height: 100vh;
   padding: 28px;
   width: 100%;
-}
-/* Cold open ---------------------------------------------------------------
-   The intro is the only screen with no case file on it, so it stops pretending
-   to be one. The key visual used to be the page background *and* a framed card
-   in the middle of a centred column, so the photo competed with itself and
-   every panel below it floated on a blurred skyline. It now lives in exactly
-   one place -- the right half of the hero, bled off the edge -- and the ground
-   behind the rest of the page is a flat ink field with an acid hairline grid
-   and one diagonal slash. Flattening the ground is also what lets the contrast
-   audit read the intro at all: text over a photographic background is reported
-   separately and skipped, so half this screen was previously unmeasured.
-
-   Everything is left-anchored and square. No centred text, no rounded panels:
-   the intro reads as a dossier the player is about to open, and the only round
-   thing left on it is the studio credit's portrait. */
-.intro-shell {
-  display: block;
-  padding: 0 0 clamp(48px, 8vw, 104px);
-  background: var(--c-ink-darkest);
-  position: relative;
-  overflow: hidden;
-}
-/* The grid and the slash are the whole decoration budget. Both are masked so
-   they fade out under the reading column rather than tiling the page. */
-.intro-shell:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.55;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(217, 255, 98, 0.16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 255, 98, 0.16) 1px, transparent 1px);
-  background-size: 92px 92px;
-  mask-image: radial-gradient(128% 72% at 18% 0%, var(--c-black), transparent 74%);
-}
-.intro-shell:after {
-  content: "";
-  position: absolute;
-  top: -22vh;
-  right: -16vw;
-  width: 72vw;
-  height: 160vh;
-  transform: rotate(13deg);
-  background: linear-gradient(180deg, rgb(217 255 98 / 0.07), transparent 58%);
-  border-left: 1px solid rgb(217 255 98 / 0.22);
-  pointer-events: none;
-}
-/* The shell lost its padding to the full-bleed hero, so the two notices that
-   sit outside .intro carry their own inset. */
-.intro-shell > .save-status {
-  margin: 14px clamp(16px, 5vw, 72px);
-}
-.intro {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  padding-inline: clamp(16px, 5vw, 72px);
-  color: var(--c-paper);
-  text-align: left;
-}
-/* One corner radius for the whole cold open: none. Squaring the panels one at
-   a time would mean touching sixteen rules that have nothing else in common,
-   and the seventeenth panel added later would have to remember. `img` is
-   deliberately absent from the list, so the studio credit's portrait keeps its
-   circle -- it is the only round thing left on the screen. */
-.intro article,
-.intro button,
-.intro div,
-.intro figure,
-.intro input,
-.intro label,
-.intro section,
-.intro select,
-.intro small,
-.intro span,
-.intro summary,
-.intro textarea {
-  border-radius: 0;
-}
-/* Hero ---------------------------------------------------------------------
-   Two columns that do not agree: the copy is a 1.05fr reading measure, the art
-   is a 0.95fr slab that runs to the viewport edge. Both break out of .intro's
-   inset, which is why the negative margin here mirrors that padding exactly. */
-.intro-hero,
-.intro-ticker {
-  margin-inline: calc(-1 * clamp(16px, 5vw, 72px));
-}
-.intro-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  align-items: stretch;
-  min-height: min(80vh, 720px);
-  border-bottom: 1px solid rgb(217 255 98 / 0.28);
-}
-.intro-hero-copy {
-  display: grid;
-  align-content: center;
-  gap: 0;
-  min-width: 0;
-  padding: clamp(20px, 3.4vw, 46px) clamp(16px, 5vw, 72px) clamp(28px, 4vw, 54px);
-}
-.intro-hero-art {
-  position: relative;
-  min-width: 0;
-  border-left: 1px solid rgb(217 255 98 / 0.28);
 }
 .brand-row,
 .topbar,
@@ -255,11 +217,6 @@ summary:focus-visible {
 .ranking-page .topbar {
   padding-right: 224px;
 }
-.intro .brand-row {
-  padding-bottom: 14px;
-  margin-bottom: clamp(22px, 3.4vw, 40px);
-  border-bottom: 1px solid rgb(217 255 98 / 0.24);
-}
 .brand-mark,
 .case-chip {
   display: inline-flex;
@@ -270,25 +227,6 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0;
-}
-.intro .brand-mark,
-.intro .case-chip,
-.intro .top-actions .ghost {
-  border-radius: 0;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.intro .brand-mark {
-  color: var(--c-ink);
-  background: var(--c-acid);
-  border-color: var(--c-acid);
-}
-.intro .top-actions .ghost {
-  color: var(--c-acid);
-  background: transparent;
-  border: 1px solid rgb(217 255 98 / 0.45);
 }
 .brand-mark {
   /* The report's topbar is a flex row that let the wordmark shrink until it
@@ -302,39 +240,291 @@ summary:focus-visible {
   background: rgba(255, 255, 255, 0.14);
   color: inherit;
 }
-.result-hero h1 {
-  margin: 24px 0 12px;
-  margin-inline: auto;
-  max-width: 840px;
-  font-size: 64px;
-  line-height: 1;
+.game-header h1:focus {
+  outline: none;
+}
+.story-reveal span {
+  font-size: 12px;
+  font-weight: 900;
   letter-spacing: 0;
+  color: var(--color-accent);
+}
+.start-input-row input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--c-gray-68);
+  border-radius: 6px;
+}
+.start-input-row button,
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 800;
+}
+.start-input-row button {
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 22px;
+  background: var(--c-acid);
+  color: var(--c-ink);
+  font-size: 15px;
+}
+.data-status {
+  width: fit-content;
+  margin-top: 2px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+.data-status.ready {
+  color: var(--c-green-deep);
+  background: var(--c-mint-soft);
+}
+.data-status.local {
+  color: var(--c-warn-deep);
+  background: var(--c-cream-deep);
+}
+.privacy-note p,
+.input-note {
+  margin: 0;
+  color: var(--c-warn-deep);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+/* Cold open ---------------------------------------------------------------
+   The intro is a stage, not a dossier. The key visual is the backdrop of the
+   whole first viewport, graded into the ground on the reading side, and the
+   copy sits on top of it: brand pills, the wordmark, one line of premise, the
+   one glowing button on the page and three numbers that say what the game is.
+   Everything below the stage is the same glass system the table and the report
+   use -- rounded surfaces, hairline borders, one acid accent -- so the first
+   click does not change the genre.
+
+   The contrast audit reads text against its ancestors' painted backgrounds,
+   and the art is a sibling layer, not an ancestor, so hero copy is measured on
+   the ink ground. The grading below is what makes that measurement honest: the
+   reading column never sits on an ungraded part of the photograph. */
+.intro-shell {
+  position: relative;
+  display: block;
+  padding: 0 0 clamp(48px, 7vw, 96px);
+  overflow: hidden;
+  background: var(--ui-bg);
+}
+.intro-shell > .save-status {
+  margin: 14px var(--ui-gutter);
+}
+.intro {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-inline: var(--ui-gutter);
+  color: var(--ui-text);
+  text-align: left;
+}
+/* `.intro p` is one of build-critical-css.mjs's probes, so it stays the base
+   rule every paragraph on the screen starts from. */
+.intro p {
+  max-width: 74ch;
+  line-height: 1.7;
+}
+.intro-hero,
+.intro-ticker {
+  margin-inline: calc(-1 * var(--ui-gutter));
+}
+.intro-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  min-height: min(100svh, 940px);
+  overflow: hidden;
+}
+.intro-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.intro-visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ui-bg);
+}
+.intro-visual picture,
+.intro-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.intro-visual img {
+  object-fit: cover;
+  object-position: 72% 36%;
+  transform-origin: 70% 40%;
+  animation: intro-art-drift 28s ease-in-out infinite alternate;
+}
+@keyframes intro-art-drift {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1.5%, 0.5%, 0);
+  }
+}
+/* Graded, not framed: ink on the reading side, a floor of ink under the fold
+   and a lid of shade under the brand pills. */
+.intro-hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
+    linear-gradient(0deg, var(--ui-bg) 0%, rgb(6 9 10 / 0) 30%),
+    linear-gradient(180deg, rgb(6 9 10 / 0.7) 0%, rgb(6 9 10 / 0) 20%),
+    linear-gradient(90deg, var(--ui-bg) 0%, rgb(6 9 10 / 0.94) 28%, rgb(6 9 10 / 0.55) 52%, rgb(6 9 10 / 0.08) 78%);
+}
+.intro-visual figcaption {
+  position: absolute;
+  right: var(--ui-gutter);
+  bottom: clamp(44px, 6vw, 80px);
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  max-width: 300px;
+  padding: 14px 16px;
+  color: var(--ui-text);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-1);
+  backdrop-filter: blur(14px);
+}
+.intro-visual span {
+  color: var(--ui-accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.intro-visual b {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.intro-hero-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(100%, 840px);
+  min-width: 0;
+  padding: clamp(18px, 3vw, 32px) var(--ui-gutter) clamp(36px, 5vw, 60px);
+}
+.intro .brand-row {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: auto;
+  padding-bottom: clamp(32px, 7vh, 72px);
+}
+.intro .top-actions {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.intro .brand-mark,
+.ranking-page .brand-mark {
+  gap: 9px;
+  min-height: 34px;
+  padding: 0 14px 0 12px;
+  color: var(--ui-text);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.brand-mark-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  background: var(--ui-accent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px rgb(217 255 98 / 0.16),
+    0 0 12px var(--ui-accent);
+  animation: brand-dot-pulse 2.4s ease-in-out infinite;
+}
+@keyframes brand-dot-pulse {
+  50% {
+    box-shadow:
+      0 0 0 6px rgb(217 255 98 / 0),
+      0 0 18px var(--ui-accent);
+  }
+}
+.intro .top-actions .ghost {
+  min-height: 34px;
+  padding: 0 14px 0 11px;
+  gap: 6px;
+  color: var(--ui-text);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background var(--ui-dur-fast) var(--ui-ease),
+    border-color var(--ui-dur-fast) var(--ui-ease);
+}
+.intro .top-actions .ghost:hover {
+  background: var(--ui-surface-3);
+  border-color: rgb(255 255 255 / 0.3);
+}
+.intro .case-chip {
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--ui-text-2);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 /* Title lockup ------------------------------------------------------------
-   Heavy stacked caps with a thin chromatic flicker, sized off the viewport so
-   it stays the loudest thing on the intro at every width. The flicker and the
-   sweep are decoration only: both stop under prefers-reduced-motion, and the
-   readable copy is the element's own text, never a transparent fill. */
+   Heavy caps set tight in Pretendard, with a thin chromatic flicker. The flicker
+   and the charge are decoration only: both stop under prefers-reduced-motion,
+   and the readable copy is the element's own text, never a transparent fill. */
 .game-wordmark {
   display: grid;
   justify-items: start;
   gap: 0;
-  margin: 0 0 4px;
-  /* Sized off the copy column, not the viewport: it is the loudest thing on
-     the page and it is allowed to run to the column's edge. */
-  font-size: clamp(46px, 6.4vw, 118px);
-  font-weight: 900;
-  line-height: 0.78;
-  letter-spacing: -0.055em;
+  margin: 0;
+  font-size: clamp(40px, 6.1vw, 96px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
   text-transform: uppercase;
-  font-stretch: condensed;
 }
 .wordmark-line {
   position: relative;
   display: block;
-  color: var(--c-paper);
-  text-shadow: 0 6px 34px rgba(6, 10, 9, 0.72);
+  color: var(--ui-text);
+  text-shadow: 0 8px 40px rgb(0 0 0 / 0.6);
 }
 .wordmark-line::before,
 .wordmark-line::after {
@@ -356,38 +546,38 @@ summary:focus-visible {
   animation: wordmark-drift-b 6.7s steps(2, end) infinite;
 }
 .wordmark-line-accent {
-  color: var(--color-accent);
+  color: var(--ui-accent);
   text-shadow:
-    0 6px 34px rgba(6, 10, 9, 0.72),
-    0 0 46px rgb(217 255 98 / 0.35);
+    0 8px 40px rgb(0 0 0 / 0.6),
+    0 0 60px rgb(217 255 98 / 0.32);
 }
 .wordmark-rule {
   display: block;
-  width: 100%;
-  height: 10px;
-  margin: 16px 0 12px;
-  background: linear-gradient(90deg, var(--color-accent) 0 42%, rgb(217 255 98 / 0.06));
-  box-shadow: 0 0 22px rgb(217 255 98 / 0.4);
+  width: min(240px, 50%);
+  height: 3px;
+  margin: 20px 0 14px;
+  background: linear-gradient(90deg, var(--ui-accent), rgb(217 255 98 / 0));
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgb(217 255 98 / 0.45);
   transform-origin: left center;
   animation: wordmark-charge 4.4s ease-in-out infinite;
 }
 .wordmark-reading {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  color: var(--c-paper);
-  font-size: clamp(14px, 1.5vw, 19px);
+  gap: 10px;
+  color: var(--ui-text);
+  font-size: clamp(15px, 1.3vw, 18px);
   font-weight: 700;
-  letter-spacing: 0.42em;
-  text-indent: 0.42em;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
   text-transform: none;
 }
 .wordmark-reading i {
-  color: rgb(217 255 98 / 0.85);
+  color: var(--ui-text-3);
   font-style: normal;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em;
+  font-weight: 500;
+  letter-spacing: 0.2em;
 }
 
 @keyframes wordmark-drift-a {
@@ -439,167 +629,316 @@ summary:focus-visible {
   .wordmark-line::after {
     display: none;
   }
-  .wordmark-rule {
+  .wordmark-rule,
+  .intro-visual img,
+  .brand-mark-dot,
+  .intro-launch button::after {
     animation: none;
     transform: none;
   }
 }
-.game-header h1:focus,
-.result-hero h1:focus {
-  outline: none;
-}
 .intro-kicker {
-  display: block;
-  margin: 6px 0 clamp(16px, 2.2vw, 26px);
-  padding-left: 14px;
-  border-left: 4px solid var(--color-accent);
-  color: var(--color-accent);
-  font-size: clamp(16px, 1.8vw, 23px);
-  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 14px;
+  padding: 7px 14px 7px 11px;
+  color: var(--ui-text);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  font-size: clamp(13.5px, 1.2vw, 15.5px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.35;
+}
+.intro-kicker::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  flex: 0 0 auto;
+  background: var(--ui-accent);
+  border-radius: 999px;
+  box-shadow: 0 0 10px var(--ui-accent);
+}
+.intro-hero-copy > p {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: clamp(15px, 1.2vw, 17.5px);
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+/* The door. The only acid slab on the stage, lit from inside with a slow sweep
+   of light that stops under reduced motion. */
+.intro .intro-launch {
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: clamp(24px, 4vh, 40px);
+}
+.intro-launch button {
+  position: relative;
+  overflow: hidden;
+  height: auto;
+  min-height: 60px;
+  padding: 0 30px 0 24px;
+  gap: 10px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-radius: var(--ui-radius-sm);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 0 0 1px rgb(217 255 98 / 0.6),
+    0 12px 40px rgb(217 255 98 / 0.26),
+    inset 0 1px 0 rgb(255 255 255 / 0.5);
+  transition:
+    transform var(--ui-dur-fast) var(--ui-ease),
+    box-shadow var(--ui-dur) var(--ui-ease),
+    background var(--ui-dur-fast) var(--ui-ease);
+}
+.intro-launch button::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -40%;
+  width: 36%;
+  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.55), rgb(255 255 255 / 0));
+  transform: skewX(-18deg);
+  animation: intro-cta-shine 4.2s var(--ui-ease) infinite;
+  pointer-events: none;
+}
+@keyframes intro-cta-shine {
+  0%,
+  62% {
+    left: -40%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+.intro-launch button svg {
+  transition: transform var(--ui-dur) var(--ui-ease);
+}
+.intro-launch button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgb(228 255 142);
+  box-shadow:
+    0 0 0 1px rgb(217 255 98 / 0.8),
+    0 18px 50px rgb(217 255 98 / 0.36),
+    inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+.intro-launch button:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+.intro-launch button:active:not(:disabled) {
+  transform: translateY(0);
+}
+.intro-launch button:disabled {
+  opacity: 0.6;
+}
+.intro-briefing-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--ui-text);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
+  transition:
+    color var(--ui-dur-fast) var(--ui-ease),
+    text-decoration-color var(--ui-dur-fast) var(--ui-ease);
+}
+.intro-briefing-link:hover,
+.intro-briefing-link:focus-visible {
+  color: var(--ui-accent);
+  text-decoration-color: var(--ui-accent);
+}
+.intro-briefing-link:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.intro-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px clamp(22px, 3vw, 40px);
+  margin: clamp(28px, 5vh, 48px) 0 0;
+  padding: 0;
+}
+.intro-stats div {
+  display: grid;
+  gap: 4px;
+  padding-left: 14px;
+  border-left: 1px solid var(--ui-line-strong);
+}
+.intro-stats dt {
+  order: 2;
+  color: var(--ui-text-3);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.intro-stats dd {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: clamp(24px, 2.3vw, 32px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.intro-stats dd small {
+  margin-left: 2px;
+  color: var(--ui-text-2);
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 .studio-credit {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 0;
-  padding: 8px 16px 8px 8px;
-  color: var(--c-ink);
-  background: var(--c-paper);
-  border: 1px solid rgba(24, 32, 31, 0.16);
-  border-radius: 0;
+  margin: 0;
+  padding: 6px 16px 6px 6px;
+  color: var(--ui-text);
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
   text-align: left;
 }
 .intro .studio-credit {
-  justify-self: start;
-  margin-top: clamp(20px, 3vw, 34px);
-  box-shadow: 7px 7px 0 rgb(217 255 98 / 0.28);
+  margin-top: auto;
+  transform: translateY(clamp(12px, 3vh, 28px));
 }
 .studio-credit img {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   object-fit: cover;
   border-radius: 50%;
 }
 .studio-credit dl {
-  display: grid;
-  gap: 2px;
+  display: flex;
+  gap: 18px;
   margin: 0;
 }
 .studio-credit dl > div {
   display: grid;
-  grid-template-columns: 58px auto;
-  align-items: baseline;
-  gap: 8px;
+  gap: 1px;
 }
 .studio-credit dt {
-  color: var(--c-ink-muted);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  color: var(--ui-text-3);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 .studio-credit dd {
   margin: 0;
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.01em;
+  font-size: 13px;
+  font-weight: 700;
 }
-/* The art no longer sits in a framed card in the reading column; it *is* the
-   right column, filling the hero's height and running off the viewport edge.
-   The old 16/9 box with its max-height cap existed to keep the start button
-   above the fold underneath the picture -- the button is now beside it, so the
-   frame can take whatever height the hero has. */
-.intro-visual {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-  background: var(--color-ink);
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+/* The resume card replaces the door when a save exists. */
+.resume-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(100%, 580px);
+  margin: clamp(24px, 4vh, 40px) 0 0;
+  padding: 14px 14px 14px 20px;
+  color: var(--ui-text);
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-md);
+  box-shadow:
+    var(--ui-shadow-2),
+    0 0 48px rgb(217 255 98 / 0.08);
+  backdrop-filter: blur(16px);
 }
-.intro-visual picture,
-.intro-visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.intro-visual img {
-  object-fit: cover;
-  /* The offset keeps the two figures and the skyline in the band whatever
-     shape the column ends up. */
-  object-position: center 34%;
-}
-/* Graded, not framed: the photo dissolves into the copy column on its left
-   edge and into the ink field at its foot, so the seam between the two halves
-   of the hero is a gradient rather than a border. */
-.intro-hero-art:after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, var(--c-ink-darkest), rgb(16 22 21 / 0) 38%),
-    linear-gradient(0deg, rgb(16 22 21 / 0.88), rgb(16 22 21 / 0) 54%),
-    linear-gradient(202deg, rgb(217 255 98 / 0.14), rgb(217 255 98 / 0) 44%);
-}
-.intro-visual figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
+.resume-panel div {
   display: grid;
-  gap: 6px;
-  padding: clamp(14px, 1.8vw, 22px);
-  color: var(--c-paper);
-  background: rgba(24, 32, 31, 0.82);
-  border: 0;
-  border-top: 1px solid rgb(217 255 98 / 0.4);
-  border-radius: 0;
+  gap: 4px;
+  min-width: 0;
 }
-.intro-visual span {
-  color: var(--c-acid);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.14em;
+.resume-panel span {
+  color: var(--ui-accent);
+  font-size: 12px;
+  font-weight: 700;
 }
-.intro-visual b {
-  font-size: clamp(14px, 1.4vw, 17px);
+.resume-panel small {
+  color: var(--ui-text-3);
+  font-size: 12.5px;
+  font-weight: 500;
   line-height: 1.4;
 }
+.resume-panel strong {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.resume-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 0 22px 0 18px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 10px 32px rgb(217 255 98 / 0.24);
+  font-size: 16px;
+  font-weight: 700;
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+.resume-panel button:hover {
+  transform: translateY(-2px);
+}
 /* Protocol ticker -----------------------------------------------------------
-   Three lines of 10px caption riding the key visual is where copy goes to be
-   ignored. The same words as a full-bleed acid band cutting the page in two
-   are the second thing the eye lands on. The track holds two identical runs
-   and slides exactly half its width, so the loop has no seam; the global
-   reduced-motion rule parks it at the halfway point, which looks the same. */
+   A hairline marquee under the stage. The track holds two identical runs and
+   slides exactly half its width, so the loop has no seam; the global
+   reduced-motion rule parks it, which looks the same. */
 .intro-ticker {
   position: relative;
   overflow: hidden;
   padding: 11px 0;
-  background: var(--c-acid);
-  border-bottom: 1px solid var(--c-acid-dark);
+  background: var(--ui-bg-raised);
+  border-block: 1px solid var(--ui-line);
 }
 .intro-ticker-track {
   display: flex;
   width: max-content;
-  animation: intro-ticker-run 32s linear infinite;
+  animation: intro-ticker-run 40s linear infinite;
 }
 .intro-protocol-line {
   flex: 0 0 auto;
-  padding-right: 42px;
-  color: var(--c-ink);
-  font-size: 12px;
-  font-weight: 950;
+  padding-right: 48px;
+  color: var(--ui-text-3);
+  font-size: 11.5px;
+  font-weight: 600;
   letter-spacing: 0.22em;
   white-space: nowrap;
 }
-.intro-protocol-line:before {
-  content: "■ ";
-  color: var(--c-teal-deep);
+.intro-protocol-line::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 18px 2px 0;
+  background: var(--ui-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--ui-accent);
+  vertical-align: middle;
 }
 @keyframes intro-ticker-run {
   from {
@@ -609,19 +948,22 @@ summary:focus-visible {
     transform: translate3d(-50%, 0, 0);
   }
 }
-/* `.intro p` is one of build-critical-css.mjs's probes, so it stays the base
-   rule every paragraph on the screen starts from. The premise under the
-   wordmark is the one that gets the display treatment, and it is addressed by
-   its place in the hero rather than by outranking every panel below. */
-.intro p {
-  max-width: 74ch;
-  line-height: 1.7;
+
+/* Briefing ----------------------------------------------------------------
+   The setup card and the drawers are one section: a wide card with the call
+   sign, then the pre-start drawers tiled two-up. */
+.previous-participant-message {
+  width: min(var(--ui-page-max), 100%);
+  margin: clamp(32px, 5vw, 56px) auto 0;
+  padding: 14px 18px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-left: 3px solid var(--ui-accent);
+  border-radius: var(--ui-radius-sm);
 }
-.intro-hero-copy > p {
-  max-width: 46ch;
-  color: var(--c-green-87);
-  font-size: clamp(15px, 1.35vw, 18px);
-  line-height: 1.75;
+.intro p.previous-participant-message {
+  max-width: none;
 }
 .start-panel,
 .start-priority,
@@ -634,784 +976,611 @@ summary:focus-visible {
 .case-card {
   text-align: left;
 }
-.start-priority {
+.intro .start-priority {
   display: grid;
-  grid-template-columns: 1fr;
-  align-items: stretch;
-  gap: 14px;
-  width: min(1180px, 100%);
-  margin: 16px auto 12px;
-  padding: 18px;
-  color: var(--c-paper);
-  background:
-    linear-gradient(135deg, rgba(217, 255, 98, 0.12), transparent 38%),
-    rgba(10, 18, 17, 0.9);
-  border: 1px solid rgba(217, 255, 98, 0.55);
-  border-left: 6px solid var(--c-acid);
-  border-radius: 8px;
-  box-shadow: 0 24px 80px var(--c-black-a38);
-}
-/* Intro drawers ------------------------------------------------------------
-   Pre-start prose folds behind a closed <details> so the first viewport is the
-   door to the first scene, not a reading list. The mechanics are the play
-   screen's .insight-drawer idiom -- flex summary, native marker off, a +/- box
-   that flips on [open] -- restated here because base-intro-ranking.css owns the
-   intro and play.css is imported after it, so an override could not reach.
-   Native <details> supplies the expanded state to assistive tech; nothing here
-   hand-rolls aria-expanded.
-
-   The drawers used to be seven floating rounded cards with 12px of ink between
-   them, which read as seven unrelated things. They are one manifest now: rows
-   with nothing but a hairline between them, a fixed label column so the codes
-   stack into a readable gutter, and a square marker at the right end. */
-.intro-drawer {
-  width: min(1180px, 100%);
-  margin: 0 auto;
-  border-top: 1px solid rgb(217 255 98 / 0.22);
-}
-.intro-drawer:last-of-type {
-  border-bottom: 1px solid rgb(217 255 98 / 0.22);
-}
-.intro-drawer > summary {
-  display: flex;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  min-height: 64px;
-  padding: 15px clamp(12px, 2vw, 20px);
-  color: var(--c-paper);
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  cursor: pointer;
-  list-style: none;
-  text-align: left;
-  transition:
-    background 0.16s ease,
-    padding-left 0.16s ease;
+  gap: 20px clamp(24px, 4vw, 56px);
+  width: min(var(--ui-page-max), 100%);
+  margin: clamp(40px, 6vw, 80px) auto 14px;
+  padding: clamp(20px, 3vw, 32px);
+  color: var(--ui-text);
+  background:
+    radial-gradient(80% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%),
+    var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+  scroll-margin-top: 24px;
 }
-.intro-drawer > summary:hover,
-.intro-drawer > summary:focus-visible {
-  background: rgb(217 255 98 / 0.09);
-  padding-left: calc(clamp(12px, 2vw, 20px) + 10px);
-}
-.intro-drawer > summary::-webkit-details-marker {
-  display: none;
-}
-.intro-drawer > summary:before {
-  content: "+";
-  order: 2;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 auto;
-  margin-left: auto;
-  color: var(--c-ink);
-  background: var(--c-acid);
-  border-radius: 0;
-  font-size: 23px;
-  font-weight: 900;
-  line-height: 33px;
-  text-align: center;
-}
-.intro-drawer[open] > summary:before {
-  content: "-";
-}
-.intro-drawer > summary span {
-  flex: 0 0 auto;
-  min-width: min(168px, 34vw);
-  color: var(--c-acid);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.16em;
-}
-.intro-drawer > summary h2 {
-  min-width: 0;
-  margin: 0;
-  color: var(--c-line-soft);
-  font-size: clamp(15px, 1.5vw, 19px);
-  font-weight: 800;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-.intro-drawer[open] > summary {
-  background: rgb(217 255 98 / 0.09);
-}
-.intro-drawer > :not(summary) {
-  width: 100%;
-  margin: 0 0 18px;
-  border-radius: 0;
-}
-.prestart-briefing {
-  display: grid;
-  gap: 12px;
-  width: min(1180px, 100%);
-  margin: 0 auto 12px;
-  padding: 16px;
-  color: var(--c-paper);
-  background: rgba(24, 32, 31, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-left: 6px solid var(--c-teal-deep);
-  border-radius: 8px;
-  box-shadow: 0 18px 54px var(--c-black-a30);
-}
-.prestart-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-}
-.prestart-heading > div {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-.prestart-heading span,
-.prestart-grid span,
-.prestart-tutorial > span {
-  color: var(--c-acid);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-}
-.prestart-heading h2 {
-  margin: 0;
-  font-size: 22px;
-  line-height: 1.15;
-}
-.prestart-heading small {
-  max-width: 410px;
-  color: var(--c-line-soft);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.45;
-  text-align: right;
-}
-.prestart-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
-}
-.prestart-grid article {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  min-height: 118px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(217, 255, 98, 0.22);
-  border-radius: 7px;
-}
-.prestart-grid b {
-  color: var(--c-paper);
-  font-size: 15px;
-  line-height: 1.3;
-}
-.prestart-grid p {
-  margin: 0;
-  color: var(--c-line-soft);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.45;
-}
-.prestart-tutorial {
-  display: grid;
-  gap: 9px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-.prestart-tutorial > div {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-.prestart-tutorial article {
-  display: grid;
-  gap: 4px;
-  min-height: 70px;
-  padding: 10px;
-  color: var(--c-paper);
-  background: rgba(217, 255, 98, 0.08);
-  border: 1px solid rgba(217, 255, 98, 0.18);
-  border-radius: 6px;
-}
-.prestart-tutorial b {
-  color: var(--c-acid);
-  font-size: 12px;
-}
-.prestart-tutorial small {
-  color: var(--c-line-soft);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.35;
+.start-priority:focus {
+  outline: none;
 }
 .start-console-heading {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 0 0 14px;
-  border-bottom: 1px solid rgba(217, 255, 98, 0.24);
+  display: grid;
+  gap: 10px;
+  min-width: 0;
 }
 .start-console-heading > div {
   display: grid;
-  gap: 5px;
+  gap: 8px;
   min-width: 0;
 }
 .start-console-heading span {
-  color: var(--c-acid);
+  color: var(--ui-accent);
   font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-}
-/* The section label sits on the white start panel, so it takes the panel ink. */
-.start-section-heading span {
-  color: var(--color-muted);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 .start-console-heading h2 {
   margin: 0;
-  font-size: 28px;
-  line-height: 1.05;
+  font-size: clamp(26px, 2.8vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
 }
 .start-console-heading small {
-  max-width: 440px;
-  color: var(--c-line-soft);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.45;
-  text-align: right;
-}
-.start-console-section {
-  position: relative;
-  overflow: hidden;
-}
-.start-console-section:before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--c-acid);
-  opacity: 0.72;
-}
-.start-section-heading {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 14px;
-}
-.start-section-heading strong {
-  color: var(--c-ink);
-  font-size: 18px;
-  line-height: 1.25;
+  max-width: 40ch;
+  color: var(--ui-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 .start-panel {
   width: 100%;
   margin: 0;
-  padding: 18px 18px 18px 20px;
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--color-ink);
-  border: 1px solid rgba(217, 255, 98, 0.16);
-  border-radius: 8px;
+  padding: clamp(16px, 2vw, 22px);
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
 }
-.season-panel {
-  width: min(760px, 100%);
-  margin: 26px auto 0;
-  padding: 18px;
-  background: rgba(24, 32, 31, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-}
-.season-panel div {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.season-panel span,
-.case-card span,
-.story-reveal span {
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
-  color: var(--color-accent);
-}
-.season-panel strong {
-  font-size: 22px;
-  line-height: 1.35;
-}
-.season-panel p {
-  margin: 0;
-  font-size: 15px;
-}
-.play-style-panel {
-  width: 100%;
-  margin: 0;
-  padding: 16px 16px 16px 20px;
-  color: var(--c-ink);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(217, 255, 98, 0.16);
-  border-radius: 8px;
-  text-align: left;
-}
-.play-style-panel .panel-title-row {
-  align-items: center;
+.start-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
 }
-.play-style-panel .panel-title-row > div {
-  display: grid;
-  gap: 4px;
+.start-section-heading span {
+  order: 2;
+  color: var(--ui-text-3);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
-.play-style-panel .panel-title-row span {
-  color: var(--color-muted);
+.start-section-heading strong {
+  color: var(--ui-text);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+.start-panel label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ui-text-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.intro .start-panel .start-input-row {
+  gap: 10px;
+}
+.intro .start-panel .start-input-row input {
+  flex: 1 1 auto;
+  height: 52px;
+  padding: 0 16px;
+  color: var(--ui-text);
+  background: var(--ui-bg-raised);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  font-size: 16px;
+  transition:
+    border-color var(--ui-dur-fast) var(--ui-ease),
+    box-shadow var(--ui-dur-fast) var(--ui-ease);
+}
+.intro .start-panel .start-input-row input::placeholder {
+  color: var(--ui-text-3);
+}
+.intro .start-panel .start-input-row input:focus-visible {
+  outline: none;
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 4px var(--ui-accent-soft);
+}
+.intro .start-panel .start-input-row button {
+  height: 52px;
+  padding: 0 20px 0 16px;
+  color: var(--ui-text);
+  background: var(--ui-surface-4);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  font-weight: 700;
+}
+.intro .new-game-plus-button {
+  min-height: 48px;
+  margin-top: 12px;
+  color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.intro .new-game-plus-button:hover {
+  background: rgb(217 255 98 / 0.2);
+}
+.test-unlock {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 10px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-3);
+  border: 1px dashed var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+}
+.intro .past-run-memory {
+  width: min(var(--ui-page-max), 100%);
+  margin: 0 auto 14px;
+  padding: 16px 20px;
+  color: var(--ui-text);
+  background:
+    linear-gradient(90deg, rgb(217 255 98 / 0.08), transparent 60%),
+    var(--ui-surface-1);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-md);
+}
+.intro .past-run-memory span {
+  color: var(--ui-accent);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
-.play-style-panel h2 {
+.intro .past-run-memory p {
   margin: 0;
-  font-size: 18px;
+  color: var(--ui-text-2);
+  font-size: 14px;
 }
-.play-style-panel .panel-title-row small {
-  color: var(--color-muted);
-  font-size: 11px;
-  font-weight: 800;
-}
-.play-style-grid {
+
+/* Intro drawers ------------------------------------------------------------
+   Pre-start prose folds behind a closed <details> so the first viewport is the
+   door to the first scene, not a reading list. Native <details> supplies the
+   expanded state to assistive tech; nothing here hand-rolls aria-expanded.
+   Closed, they tile two-up; an open drawer takes the whole row so its cards
+   never read at half width. The marker is a round chevron drawn from two
+   pseudo-elements, which turns on [open]. */
+.intro-drawer-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 9px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 12px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 0 auto;
 }
-.play-style {
+.intro-drawer {
+  min-width: 0;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+  transition:
+    border-color var(--ui-dur) var(--ui-ease),
+    background var(--ui-dur) var(--ui-ease),
+    box-shadow var(--ui-dur) var(--ui-ease);
+}
+.intro-drawer:hover {
+  background: var(--ui-surface-2);
+  border-color: var(--ui-line-strong);
+}
+.intro-drawer[open] {
+  grid-column: 1 / -1;
+  background: var(--ui-surface-1);
+  border-color: var(--ui-line-accent);
+  box-shadow: var(--ui-shadow-2);
+}
+.intro-drawer > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-content: center;
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 5px;
+  min-height: 78px;
+  padding: 16px 18px 16px 20px;
+  color: var(--ui-text);
+  border-radius: inherit;
+  cursor: pointer;
+  list-style: none;
+  text-align: left;
+}
+.intro-drawer > summary::-webkit-details-marker {
+  display: none;
+}
+.intro-drawer > summary::before,
+.intro-drawer > summary::after {
+  content: "";
+  grid-column: 2;
+  grid-row: 1 / 3;
+  justify-self: center;
+  align-self: center;
+  transition:
+    transform var(--ui-dur) var(--ui-ease),
+    background var(--ui-dur-fast) var(--ui-ease),
+    border-color var(--ui-dur-fast) var(--ui-ease);
+}
+.intro-drawer > summary::before {
+  width: 36px;
+  height: 36px;
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 50%;
+}
+.intro-drawer > summary::after {
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: 2px solid var(--ui-text);
+  border-bottom: 2px solid var(--ui-text);
+  transform: rotate(45deg);
+}
+.intro-drawer > summary:hover::before {
+  border-color: var(--ui-line-accent);
+}
+.intro-drawer[open] > summary::before {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.intro-drawer[open] > summary::after {
+  margin-top: 4px;
+  border-color: var(--ui-accent-ink);
+  transform: rotate(-135deg);
+}
+.intro-drawer > summary span {
+  grid-column: 1;
+  min-width: 0;
+  color: var(--ui-accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.intro-drawer > summary h2 {
+  grid-column: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--ui-text);
+  font-size: clamp(15.5px, 1.3vw, 17px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+}
+.intro .intro-drawer > :not(summary) {
+  width: auto;
+  margin: 2px 20px 20px;
+}
+/* The drawers' contents were light case-file panels. Inside a glass drawer they
+   drop their own ground and become cards on the drawer's surface. */
+.intro .intro-drawer > .prestart-briefing,
+.intro .intro-drawer > .play-style-panel,
+.intro .intro-drawer > .operator-origin-panel,
+.intro .intro-drawer > .season-panel,
+.intro .intro-drawer > .season-goal-strip,
+.intro .intro-drawer > .quick-guide,
+.intro .intro-drawer > .data-info-panel {
+  padding: 0;
+  color: var(--ui-text);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.intro .panel-title-row {
+  margin-bottom: 14px;
+}
+.intro .intro-drawer .panel-title-row small,
+.prestart-heading small,
+.play-style-note,
+.intro .operator-origin-selected {
+  max-width: none;
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+  text-align: left;
+}
+.play-style-note,
+.intro .operator-origin-selected {
+  margin-top: 14px;
+  color: var(--ui-text-3);
+  font-size: 13px;
+}
+.prestart-briefing {
+  display: grid;
+  gap: 16px;
+}
+.prestart-heading {
+  display: block;
+}
+.prestart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.intro .play-style-grid,
+.intro .guide-grid,
+.intro .operator-origin-grid,
+.intro .season-goal-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 10px;
+}
+.prestart-grid article,
+.prestart-tutorial article,
+.intro .guide-grid article,
+.intro .season-goal-strip article {
   display: grid;
   align-content: start;
   gap: 6px;
   min-height: 0;
-  padding: 12px;
-  color: var(--c-ink-raised);
-  background: var(--color-paper-soft);
-  border: 1px solid var(--color-line);
-  border-radius: 7px;
-  text-align: left;
-}
-.play-style:hover,
-.play-style:focus-visible,
-.play-style.selected {
-  color: var(--c-ink);
-  background: var(--c-mint-pale);
-  border-color: var(--c-teal-deep);
-  box-shadow: inset 0 0 0 2px var(--c-mint-line);
-}
-.play-style.selected {
-  border-color: var(--c-teal-deep);
-  box-shadow:
-    inset 4px 0 var(--c-teal-deep),
-    inset 0 0 0 2px var(--c-mint-line);
-}
-.play-style > span {
-  color: var(--color-muted);
-  font-size: 11px;
-  font-weight: 900;
-}
-.play-style strong {
-  font-size: 15px;
-  line-height: 1.25;
-}
-.play-style p {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-.play-style small {
-  margin-top: auto;
-  color: var(--c-green);
-  font-size: 11px;
-  font-weight: 900;
-}
-.play-style-note {
-  margin: 10px 0 0;
-  color: var(--color-muted);
-  font-size: 12px;
-  font-weight: 800;
-}
-.quick-guide {
-  width: min(1180px, 100%);
-  margin: 18px auto 0;
   padding: 16px;
-  color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 8px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
 }
-.data-info-panel {
+.prestart-grid span,
+.prestart-tutorial > span {
+  color: var(--ui-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.prestart-grid b,
+.intro .guide-grid b,
+.intro .season-goal-strip b {
+  display: block;
+  margin: 0;
+  color: var(--ui-text);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+.prestart-grid p,
+.intro .guide-grid p,
+.intro .season-goal-strip small {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.prestart-tutorial {
   display: grid;
   gap: 10px;
-  width: min(1180px, 100%);
-  margin: 12px auto 0;
-  padding: 14px;
-  color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--color-line);
-  border-radius: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ui-line);
 }
-.guide-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 900;
-}
-.guide-heading {
-  margin-bottom: 12px;
-  color: var(--color-muted);
-}
-.guide-grid {
+.prestart-tutorial > div {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
-.guide-grid article {
-  min-height: 122px;
-  padding: 12px;
-  background: var(--color-paper-soft);
-  border: 1px solid var(--color-line);
-  border-radius: 6px;
-}
-.guide-grid b {
-  display: block;
-  margin-bottom: 7px;
-  font-size: 14px;
-}
-.guide-grid p {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-/* Season roadmap -----------------------------------------------------------
-   Six equal tiles in a 3-up grid said the six cases are interchangeable. They
-   are not: they run in order, each one inherits the last one's log, and only
-   one of them is open. So the grid is gone and they are numbered dossier rows,
-   stacked, with the file number set in the gutter at display size. The number
-   is drawn from data-index through a ::before so nothing is added to what the
-   button announces. */
-.case-roadmap {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  width: min(1180px, 100%);
-  margin: 0 auto;
-  border-top: 1px solid rgb(217 255 98 / 0.22);
-}
-.roadmap-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
-  width: min(1180px, 100%);
-  margin: clamp(34px, 5vw, 64px) auto clamp(14px, 2vw, 22px);
-  padding: 0 clamp(12px, 2vw, 20px);
-  color: var(--c-paper);
-  text-align: left;
-}
-.roadmap-heading span {
-  flex: 0 0 auto;
-  color: var(--c-acid);
-  font-size: clamp(18px, 2.6vw, 34px);
-  font-weight: 950;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-}
-.roadmap-heading b {
-  max-width: 46ch;
-  color: var(--c-line-soft);
+.prestart-tutorial b {
+  color: var(--ui-accent);
   font-size: 13px;
   font-weight: 700;
+}
+.prestart-tutorial small {
+  color: var(--ui-text-2);
+  font-size: 12.5px;
+  font-weight: 500;
   line-height: 1.5;
-  text-align: right;
 }
-.case-card {
-  display: grid;
-  grid-template-columns: clamp(58px, 8vw, 132px) minmax(0, 1fr);
-  align-content: start;
-  align-items: start;
-  column-gap: clamp(14px, 2.4vw, 32px);
-  min-height: 0;
-  padding: clamp(16px, 2.2vw, 28px) clamp(12px, 2vw, 20px);
-  width: 100%;
-  color: var(--c-line-soft);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid rgb(217 255 98 / 0.22);
-  border-radius: 0;
-  transition:
-    background 0.16s ease,
-    padding-left 0.16s ease;
+.season-panel p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 16px;
+  line-height: 1.75;
 }
-.case-card > * {
-  grid-column: 2;
+.intro .play-style-unlock {
+  color: var(--ui-text-2);
+  font-size: 13px;
 }
-.case-card:before {
-  content: attr(data-index);
-  grid-column: 1;
-  grid-row: 1 / -1;
-  align-self: start;
-  color: var(--c-acid-29);
-  font-size: clamp(40px, 6vw, 96px);
-  font-weight: 950;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.06em;
-  line-height: 0.78;
-}
-.case-card.active-case:hover,
-.case-card.complete-case:hover {
-  padding-left: calc(clamp(12px, 2vw, 20px) + 10px);
-}
-.case-card.active-case,
-.case-card.complete-case {
-  cursor: pointer;
-}
-.case-card:focus-visible {
-  outline: 3px solid var(--c-paper);
-  outline-offset: 4px;
-}
-/* Sealed rows stay on the field and go grey rather than turning into six white
-   slabs. Locked is the majority state on a first run, so it is the one that has
-   to recede. */
-.case-card[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 1;
-  color: var(--c-gray-75);
-  background: transparent;
-}
-.case-card[aria-disabled="true"] span,
-.case-card[aria-disabled="true"] h2,
-.case-card[aria-disabled="true"] b,
-.case-card[aria-disabled="true"] p,
-.case-card[aria-disabled="true"] small {
-  color: var(--c-gray-75);
-  -webkit-text-fill-color: currentColor;
-}
-.case-card[aria-disabled="true"]:before {
-  color: var(--c-acid-18);
-}
-/* The one row the player can open is the only filled thing in the list. */
-.case-card.active-case {
-  color: var(--c-ink);
-  background: var(--c-acid);
-  border-bottom-color: var(--c-acid);
-}
-.case-card.active-case:before {
-  color: var(--c-acid-51);
-}
-.case-card.complete-case {
-  color: var(--c-paper);
-  background: rgba(44, 74, 70, 0.94);
-  border-bottom-color: rgba(217, 255, 98, 0.5);
-}
-.case-card div {
+.guide-heading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  min-height: 20px;
-  min-width: 0;
-}
-.case-card.active-case span {
-  color: var(--c-teal-deep);
-}
-.case-card.complete-case span {
-  color: var(--c-acid);
-}
-.case-status-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  color: var(--c-line-soft);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 0;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
-  flex: 0 0 auto;
-}
-.active-case .case-status-chip {
-  color: var(--c-ink);
-  background: rgba(24, 32, 31, 0.08);
-  border-color: rgba(24, 32, 31, 0.18);
-}
-.complete-case .case-status-chip {
-  color: var(--c-paper);
-  background: rgba(217, 255, 98, 0.16);
-  border-color: rgba(217, 255, 98, 0.28);
-}
-.case-card h2 {
-  margin: 10px 0 6px;
-  font-size: clamp(20px, 2.3vw, 30px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-}
-.case-card b {
-  display: block;
-  margin-bottom: 8px;
-  font-size: clamp(13px, 1.2vw, 15px);
-}
-.case-card p {
-  margin: 0;
-  max-width: 76ch;
+  margin-bottom: 12px;
+  color: var(--ui-text-2);
   font-size: 13px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
+  font-weight: 600;
 }
-.case-result-mini {
-  display: block;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.4;
-}
-.case-lock-note {
-  display: block;
-  margin-top: 10px;
-  padding-top: 8px;
-  color: var(--c-line-soft);
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.4;
-}
-.active-case .case-result-mini {
-  border-top-color: rgba(44, 74, 70, 0.24);
-}
-.start-panel label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: 800;
-}
-.start-input-row input {
-  flex: 1;
-  min-width: 0;
-  height: 48px;
-  padding: 0 14px;
-  border: 1px solid var(--c-gray-68);
-  border-radius: 6px;
-}
-.start-input-row button,
-.ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 6px;
-  font-weight: 800;
-}
-.start-input-row button {
-  flex: 0 0 auto;
-  height: 48px;
-  padding: 0 22px;
-  background: var(--c-acid);
-  color: var(--c-ink);
-  font-size: 15px;
-}
-/* The door. It is the only button in the hero and the only acid slab in the
-   copy column, so it is sized like a door and not like a form control: square,
-   offset-shadowed, and it steps into the shadow on press. */
-.intro-launch {
-  justify-self: start;
-  margin-top: clamp(22px, 3.2vw, 38px);
-}
-.intro-launch button {
-  height: auto;
-  min-height: 66px;
-  padding: 0 clamp(24px, 3vw, 44px);
-  border-radius: 0;
-  font-size: clamp(16px, 1.5vw, 20px);
-  font-weight: 950;
-  letter-spacing: 0.02em;
-  box-shadow: 9px 9px 0 rgb(217 255 98 / 0.24);
+/* Selectable cards: the analyst protocol and the operator origin. */
+.intro .play-style,
+.intro .operator-origin {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-height: 0;
+  padding: 18px 18px 16px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+  box-shadow: none;
+  text-align: left;
   transition:
-    transform 0.14s ease,
-    box-shadow 0.14s ease;
+    transform var(--ui-dur-fast) var(--ui-ease),
+    border-color var(--ui-dur-fast) var(--ui-ease),
+    background var(--ui-dur-fast) var(--ui-ease),
+    box-shadow var(--ui-dur) var(--ui-ease);
 }
-.intro-launch button:hover:not(:disabled) {
-  transform: translate3d(4px, 4px, 0);
-  box-shadow: 4px 4px 0 rgb(217 255 98 / 0.3);
+.intro .play-style:hover,
+.intro .operator-origin:hover {
+  background: var(--ui-surface-3);
+  border-color: var(--ui-line-strong);
+  box-shadow: var(--ui-shadow-1);
+  transform: translateY(-2px);
 }
-.intro-launch button:disabled {
-  opacity: 0.55;
+.intro .play-style.selected,
+.intro .operator-origin.selected {
+  background:
+    linear-gradient(160deg, rgb(217 255 98 / 0.1), transparent 55%),
+    var(--ui-surface-2);
+  border-color: var(--ui-accent);
+  box-shadow:
+    0 0 0 1px var(--ui-accent),
+    0 12px 36px rgb(217 255 98 / 0.1);
+  transform: none;
+}
+.intro .play-style::after,
+.intro .operator-origin::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 50%;
+}
+.intro .play-style.selected::after,
+.intro .operator-origin.selected::after {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  box-shadow:
+    inset 0 0 0 4px var(--ui-surface-2),
+    0 0 12px rgb(217 255 98 / 0.5);
+}
+.intro .play-style > span,
+.intro .operator-origin > span {
+  padding-right: 28px;
+  color: var(--ui-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.intro .play-style strong,
+.intro .operator-origin strong {
+  color: var(--ui-text);
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.intro .play-style p,
+.intro .operator-origin p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.intro .play-style small,
+.intro .operator-origin small {
+  margin-top: 4px;
+  padding-top: 10px;
+  color: var(--ui-text-2);
+  border-top: 1px solid var(--ui-line);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.intro .operator-origin-panel {
+  display: grid;
+  gap: 0;
+}
+.intro .origin-prologue {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-left: 3px solid var(--ui-accent);
+  border-radius: var(--ui-radius-sm);
+}
+.intro .origin-prologue span {
+  color: var(--ui-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.intro .origin-prologue strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+.intro .origin-prologue p {
+  color: var(--ui-text-2);
+  font-size: 14px;
+}
+/* Data drawer: the consent box and the storage status, on glass. */
+.intro .data-info-panel {
+  display: grid;
+  gap: 10px;
 }
 .consent-box {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
-  margin-top: 14px;
-  padding: 12px;
-  background: var(--c-paper-soft);
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
+  padding: 16px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+  cursor: pointer;
 }
 .consent-box input {
   width: 18px;
   height: 18px;
   margin-top: 2px;
   flex: 0 0 auto;
-  accent-color: var(--c-teal-deep);
+  accent-color: var(--ui-accent);
 }
 .consent-box span {
   display: grid;
-  gap: 4px;
+  gap: 5px;
   min-width: 0;
 }
 .consent-box b {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
 }
 .consent-box small {
-  color: var(--c-ink-muted);
-  font-size: 12px;
+  color: var(--ui-text-2);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+.intro .data-status {
+  padding: 3px 9px;
+  font-size: 11.5px;
   font-weight: 700;
-  line-height: 1.45;
 }
-.data-status {
-  width: fit-content;
-  margin-top: 2px;
-  padding: 4px 7px;
-  border-radius: 999px;
-  font-weight: 900;
+.intro .data-status.ready {
+  color: var(--c-green-70);
+  background: rgb(34 99 71 / 0.35);
 }
-.data-status.ready {
-  color: var(--c-green-deep);
-  background: var(--c-mint-soft);
-}
-.data-status.local {
-  color: var(--c-warn-deep);
-  background: var(--c-cream-deep);
+.intro .data-status.local {
+  color: var(--c-amber);
+  background: rgb(255 206 115 / 0.12);
 }
 .db-status-panel {
   display: grid;
   gap: 8px;
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
+  padding: 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
 }
 .db-status-panel.ready {
-  background: var(--c-mint-soft);
-  border-color: var(--c-green-70);
+  border-color: rgb(156 203 180 / 0.34);
 }
 .db-status-panel.pending {
-  background: var(--c-amber-95);
-  border-color: var(--c-warn-soft);
-}
-.db-status-panel.local {
-  background: var(--c-paper-soft);
+  border-color: rgb(255 206 115 / 0.34);
 }
 .db-status-panel div {
   display: flex;
@@ -1421,147 +1590,107 @@ summary:focus-visible {
 }
 .db-status-panel span,
 .db-status-panel small {
-  color: var(--c-ink-muted);
+  color: var(--ui-text-3);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 600;
   line-height: 1.4;
 }
 .db-status-panel strong {
-  color: var(--c-ink);
+  color: var(--ui-text);
   font-size: 15px;
+  font-weight: 700;
   line-height: 1.35;
+}
+.db-status-panel.ready strong {
+  color: var(--c-green-70);
+}
+.db-status-panel.pending strong {
+  color: var(--c-amber);
 }
 .db-status-panel p {
   margin: 0;
-  color: var(--c-ink-raised);
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.45;
+  color: var(--ui-text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.55;
 }
 .privacy-note {
-  margin-top: 10px;
-  padding: 12px;
-  color: var(--c-ink-raised);
-  background: var(--c-amber-95);
-  border: 1px solid var(--c-warn-soft);
-  border-radius: 6px;
+  padding: 16px;
+  color: var(--ui-text);
+  background: rgb(255 206 115 / 0.06);
+  border: 1px solid rgb(255 206 115 / 0.22);
+  border-radius: var(--ui-radius-sm);
 }
 .privacy-note b {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  color: var(--c-amber);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.intro .privacy-note p {
+  color: var(--ui-text-2);
   font-size: 13px;
+  font-weight: 500;
 }
-.privacy-note p,
-.input-note {
-  margin: 0;
-  color: var(--c-warn-deep);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.5;
-}
-.resume-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin: clamp(22px, 3.2vw, 38px) 0 0;
-  padding: clamp(14px, 1.8vw, 20px);
-  color: var(--c-ink);
-  background: var(--c-acid);
-  border: 1px solid var(--c-acid-deep);
-  border-radius: 0;
-  box-shadow: 9px 9px 0 rgb(217 255 98 / 0.24);
-}
-.resume-panel div {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-.resume-panel span,
-.resume-panel small {
-  color: var(--c-teal-deep);
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.4;
-}
-.resume-panel strong {
-  font-size: 17px;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-.resume-panel button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex: 0 0 auto;
-  min-height: 52px;
-  padding: 0 20px;
-  color: var(--c-paper);
-  background: var(--c-ink);
-  border: 0;
-  border-radius: 0;
-  font-size: 15px;
-  font-weight: 950;
-}
-.test-unlock {
-  width: 100%;
-  min-height: 38px;
-  margin-top: 10px;
-  color: var(--c-ink-muted);
-  background: var(--c-paper-muted);
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 800;
-}
+
+/* Season log ----------------------------------------------------------------
+   Only printed once a case has closed. */
 .season-summary {
-  width: min(1180px, 100%);
-  margin: 18px auto 0;
-  padding: 16px;
-  color: var(--c-ink);
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 8px;
+  width: min(var(--ui-page-max), 100%);
+  margin: clamp(40px, 6vw, 72px) auto 0;
+  padding: clamp(18px, 2.4vw, 26px);
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-1);
 }
 .season-summary > div:first-child {
   display: grid;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .season-summary span {
-  font-size: 12px;
-  font-weight: 900;
-  color: var(--c-teal-deep);
+  color: var(--ui-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 .season-summary strong {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.35;
 }
 .season-summary-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 .season-summary-list article {
-  padding: 10px;
-  background: var(--c-paper-muted);
-  border-radius: 6px;
+  padding: 14px 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
 }
 .season-summary-list b,
 .season-summary-list small {
   display: block;
 }
 .season-summary-list small {
-  margin-top: 5px;
-  color: var(--c-ink-muted);
-  font-weight: 800;
+  margin-top: 6px;
+  color: var(--ui-text-3);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .season-journey {
   display: flex;
   align-items: stretch;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 14px;
 }
 .season-journey-card {
   display: grid;
@@ -1569,9 +1698,10 @@ summary:focus-visible {
   gap: 6px;
   flex: 1 1 230px;
   min-width: 0;
-  padding: 12px;
-  background: var(--c-ink);
-  border-radius: 6px;
+  padding: 14px 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
 }
 .season-journey-card-head {
   display: flex;
@@ -1581,37 +1711,277 @@ summary:focus-visible {
   gap: 6px;
 }
 .season-journey-card-head b {
-  color: var(--c-acid);
+  color: var(--ui-accent);
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 700;
 }
 .season-journey-card-head span {
-  color: var(--c-ink-faint);
-  font-size: 10px;
-  font-weight: 900;
+  color: var(--ui-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 .season-journey-card strong {
-  color: var(--c-paper);
-  font-size: 13px;
-  line-height: 1.35;
+  color: var(--ui-text);
+  font-size: 14px;
+  line-height: 1.4;
 }
 .season-journey-card p,
 .season-journey-card small {
   margin: 0;
-  color: var(--c-line-soft);
-  font-size: 11px;
-  font-weight: 750;
-  line-height: 1.5;
+  color: var(--ui-text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.55;
 }
 .season-journey-card small {
-  padding-top: 7px;
-  color: var(--c-acid);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 8px;
+  color: var(--ui-accent);
+  border-top: 1px solid var(--ui-line);
 }
 .season-journey-arrow {
   align-self: center;
-  color: var(--c-violet);
+  color: var(--ui-text-3);
 }
+
+/* Season roadmap -----------------------------------------------------------
+   Six case files as cards: three across on a wide screen, a swipeable rail on
+   a phone. The file number is drawn from data-index through a ::before, set
+   huge and dim behind the card's copy, so nothing is added to what the button
+   announces. The one case the player can open is the only card that glows. */
+.roadmap-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  width: min(var(--ui-page-max), 100%);
+  margin: clamp(64px, 9vw, 120px) auto 22px;
+  padding: 0;
+  color: var(--ui-text);
+  text-align: left;
+}
+.roadmap-heading span {
+  flex: 0 0 auto;
+  color: var(--ui-text);
+  font-size: clamp(30px, 3.6vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.roadmap-heading span::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-bottom: 18px;
+  background: var(--ui-accent);
+  border-radius: 999px;
+  box-shadow: 0 0 14px rgb(217 255 98 / 0.5);
+}
+.roadmap-heading b {
+  max-width: 42ch;
+  color: var(--ui-text-2);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: left;
+}
+.case-roadmap {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 0 auto;
+}
+.case-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 260px;
+  width: 100%;
+  padding: 22px 22px 20px;
+  overflow: hidden;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-1);
+  font: inherit;
+  transition:
+    transform var(--ui-dur) var(--ui-ease),
+    border-color var(--ui-dur) var(--ui-ease),
+    box-shadow var(--ui-dur) var(--ui-ease),
+    background var(--ui-dur) var(--ui-ease);
+}
+.case-card::before {
+  content: attr(data-index);
+  position: absolute;
+  right: 12px;
+  bottom: -22px;
+  z-index: -1;
+  color: var(--ui-surface-3);
+  font-size: 132px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  pointer-events: none;
+  transition: color var(--ui-dur) var(--ui-ease);
+}
+.case-card.active-case,
+.case-card.complete-case {
+  cursor: pointer;
+}
+.case-card.active-case:hover,
+.case-card.complete-case:hover {
+  transform: translateY(-4px);
+  border-color: var(--ui-line-strong);
+  box-shadow: var(--ui-shadow-2);
+}
+.case-card:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+.case-card div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  min-width: 0;
+}
+.case-card div > span {
+  color: var(--ui-text-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.case-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.case-card h2 {
+  margin: 22px 0 8px;
+  color: var(--ui-text);
+  font-size: clamp(21px, 1.9vw, 25px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.case-card b {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ui-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.case-card p {
+  display: -webkit-box;
+  margin: 0 0 18px;
+  overflow: hidden;
+  color: var(--ui-text-2);
+  font-size: 13.5px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.case-result-mini,
+.case-lock-note {
+  display: block;
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--ui-text-3);
+  border-top: 1px solid var(--ui-line);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+/* Sealed cards recede: flatter ground, a dashed edge, the copy one step down.
+   Locked is the majority state on a first run, so it is the one that has to
+   get out of the way. */
+.case-card[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 1;
+  background: var(--ui-bg-raised);
+  border-style: dashed;
+  border-color: var(--ui-line-strong);
+  box-shadow: none;
+}
+.case-card[aria-disabled="true"] h2 {
+  color: var(--ui-text-2);
+  -webkit-text-fill-color: currentColor;
+}
+.case-card[aria-disabled="true"] span,
+.case-card[aria-disabled="true"] b,
+.case-card[aria-disabled="true"] p,
+.case-card[aria-disabled="true"] small {
+  color: var(--ui-text-3);
+  -webkit-text-fill-color: currentColor;
+}
+.case-card[aria-disabled="true"]::before {
+  color: var(--ui-surface-2);
+}
+.case-card[aria-disabled="true"] .case-status-chip {
+  background: transparent;
+}
+.case-card.active-case {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%),
+    var(--ui-surface-1);
+  border-color: rgb(217 255 98 / 0.6);
+  box-shadow:
+    0 0 0 1px rgb(217 255 98 / 0.25),
+    0 20px 60px rgb(217 255 98 / 0.1);
+}
+.case-card.active-case::before {
+  color: rgb(40 50 30);
+}
+.case-card.active-case:hover {
+  border-color: var(--ui-accent);
+  box-shadow:
+    0 0 0 1px var(--ui-accent),
+    0 24px 70px rgb(217 255 98 / 0.16);
+}
+.active-case .case-status-chip {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.active-case .case-status-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--ui-accent-ink);
+  border-radius: 50%;
+}
+.case-card.complete-case {
+  border-color: rgb(104 196 255 / 0.3);
+}
+.complete-case .case-status-chip {
+  color: var(--ui-chip);
+  background: var(--ui-chip-soft);
+  border-color: rgb(104 196 255 / 0.3);
+}
+
+/* Ranking -------------------------------------------------------------------
+   The same glass system as the intro: a big headline, a status card with the
+   one acid button, and the board as a stack of row cards. The first three
+   positions are lit gold, silver and bronze; the player's own row glows acid. */
 .ranking-shell {
   width: min(1120px, 100%);
   margin: 0 auto;
@@ -1619,128 +1989,181 @@ summary:focus-visible {
 .ranking-page {
   width: min(1040px, 100%);
   margin: 0 auto;
-  padding: 12px 0 34px;
+  padding: 12px 0 48px;
+  color: var(--ui-text);
 }
 .ranking-page .topbar {
-  margin-bottom: 34px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: clamp(32px, 6vw, 64px);
+}
+.ranking-page .topbar .ghost {
+  min-height: 40px;
+  padding: 0 16px 0 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--ui-dur-fast) var(--ui-ease);
+}
+.ranking-page .topbar .ghost:hover {
+  background: var(--ui-surface-3);
 }
 .ranking-hero {
   max-width: 760px;
-  margin-bottom: 22px;
+  margin-bottom: 28px;
 }
 .ranking-hero > span,
 .ranking-status-bar > div > span,
 .ranking-table-heading span {
-  color: var(--c-teal-deep);
+  color: var(--ui-accent);
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 .ranking-hero h1 {
-  margin: 12px 0 10px;
-  color: var(--c-ink);
-  font-size: 60px;
-  line-height: 1;
+  margin: 14px 0 14px;
+  color: var(--ui-text);
+  font-size: clamp(38px, 5.6vw, 66px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  text-wrap: balance;
 }
 .ranking-hero p {
   margin: 0;
-  color: var(--c-ink-muted);
-  font-size: 17px;
-  font-weight: 800;
-  line-height: 1.65;
+  color: var(--ui-text-2);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
 }
 .ranking-status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  margin-bottom: 16px;
-  padding: 16px;
-  color: var(--c-paper);
-  background: var(--c-ink);
-  border: 1px solid var(--c-teal-deep);
-  border-radius: 8px;
+  margin-bottom: 14px;
+  padding: 20px 20px 20px 24px;
+  color: var(--ui-text);
+  background:
+    radial-gradient(90% 140% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%),
+    var(--ui-surface-1);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
 }
 .ranking-status-bar > div {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
 }
-.ranking-status-bar > div > span {
-  color: var(--c-acid);
-}
 .ranking-status-bar strong {
-  font-size: 19px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .ranking-status-bar p {
   margin: 0;
-  color: var(--c-ink-faint);
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.45;
+  color: var(--ui-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
 }
 .ranking-status-bar button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   flex: 0 0 auto;
-  min-height: 42px;
-  padding: 0 13px;
-  color: var(--c-ink);
-  background: var(--c-acid);
+  min-height: 48px;
+  padding: 0 20px 0 16px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
   border: 0;
-  border-radius: 6px;
-  font-weight: 900;
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 10px 32px rgb(217 255 98 / 0.22);
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+.ranking-status-bar button:hover {
+  transform: translateY(-2px);
 }
 .ranking-table-panel {
-  padding: 18px;
-  background: var(--c-paper);
-  border: 1px solid var(--c-line);
-  border-radius: 8px;
+  padding: clamp(16px, 2.4vw, 24px);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-1);
 }
 .ranking-table-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .ranking-table-heading h2 {
-  margin: 6px 0 0;
-  color: var(--c-ink);
+  margin: 8px 0 0;
+  color: var(--ui-text);
   font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 .ranking-table-heading small {
-  color: var(--c-ink-muted);
-  font-weight: 900;
+  color: var(--ui-text-3);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .ranking-list {
   display: grid;
-  gap: 7px;
+  gap: 10px;
 }
 .ranking-row {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 76px 110px 150px;
-  gap: 10px;
+  grid-template-columns: 58px minmax(0, 1fr) 76px 104px 150px;
+  gap: 14px;
   align-items: center;
-  min-height: 70px;
-  padding: 9px 11px;
-  background: var(--c-paper-dim);
-  border: 1px solid var(--c-line);
-  border-radius: 6px;
+  min-height: 84px;
+  padding: 14px 18px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+  transition:
+    border-color var(--ui-dur-fast) var(--ui-ease),
+    transform var(--ui-dur-fast) var(--ui-ease);
+}
+.ranking-row:hover {
+  border-color: var(--ui-line-strong);
+  transform: translateY(-1px);
 }
 .ranking-row.current-player {
-  background: var(--c-mint-soft);
-  border-color: var(--c-sage);
-  box-shadow: inset 4px 0 var(--c-green);
+  background:
+    linear-gradient(90deg, rgb(217 255 98 / 0.09), transparent 60%),
+    var(--ui-surface-2);
+  border-color: rgb(217 255 98 / 0.55);
+  box-shadow: inset 3px 0 var(--ui-accent);
 }
 .ranking-position {
-  color: var(--c-ink-muted);
-  font-size: 20px;
+  color: var(--ui-text-3);
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
 }
-.ranking-row:first-child .ranking-position {
-  color: var(--c-amber-39);
+.ranking-row:nth-child(1) .ranking-position {
+  color: var(--c-gx-relic);
+  text-shadow: 0 0 18px rgb(255 196 87 / 0.4);
+}
+.ranking-row:nth-child(2) .ranking-position {
+  color: rgb(214 222 228);
+}
+.ranking-row:nth-child(3) .ranking-position {
+  color: rgb(226 162 116);
 }
 .ranking-player,
 .ranking-stat,
@@ -1755,113 +2178,104 @@ summary:focus-visible {
   display: block;
 }
 .ranking-player b {
-  color: var(--c-ink);
-  font-size: 15px;
+  margin-bottom: 2px;
+  color: var(--ui-text);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   overflow-wrap: anywhere;
 }
-.ranking-player .season-complete-badge {
+.ranking-page .ranking-player .ranking-league-badge,
+.ranking-page .ranking-player .ranking-style-badge,
+.ranking-page .ranking-player .ranking-integrity-badge,
+.ranking-page .ranking-player .season-complete-badge {
   display: inline-flex;
-  margin-top: 4px;
-  padding: 3px 6px;
-  color: var(--c-teal-deep);
-  background: var(--c-acid);
-  font-size: 9px;
-  font-weight: 950;
-  letter-spacing: 0.1em;
+  align-items: center;
+  width: auto;
+  margin: 4px 6px 0 0;
+  padding: 2px 8px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+.ranking-page .ranking-player .ranking-integrity-badge.valid {
+  color: var(--c-green-70);
+  border-color: rgb(156 203 180 / 0.3);
+}
+.ranking-page .ranking-player .ranking-integrity-badge.invalid {
+  color: var(--c-danger-81);
+  border-color: rgb(255 176 159 / 0.3);
+}
+.ranking-page .ranking-player .season-complete-badge {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 .ranking-row.season-complete {
-  border-color: var(--c-teal-deep);
-  box-shadow: inset 4px 0 var(--c-acid);
+  border-color: var(--ui-line-accent);
 }
 .ranking-player small,
 .ranking-detail span {
-  margin-top: 4px;
-  color: var(--c-ink-muted);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.3;
+  margin-top: 6px;
+  color: var(--ui-text-3);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
   overflow-wrap: anywhere;
 }
 .ranking-stat {
-  padding-left: 10px;
-  border-left: 1px solid var(--c-line);
+  padding-left: 14px;
+  border-left: 1px solid var(--ui-line);
 }
 .ranking-stat span {
-  color: var(--c-ink-muted);
-  font-size: 10px;
-  font-weight: 900;
+  color: var(--ui-text-3);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 .ranking-stat b {
   margin-top: 3px;
-  color: var(--c-teal-deep);
-  font-size: 22px;
+  color: var(--ui-text);
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
 }
 .score-stat b {
-  color: var(--c-ink);
+  color: var(--ui-accent);
 }
 .ranking-detail {
   display: grid;
   gap: 3px;
   justify-items: end;
 }
+.ranking-page .ranking-detail span {
+  margin-top: 0;
+  font-variant-numeric: tabular-nums;
+}
 .ranking-footnote {
-  margin: 12px 2px 0;
-  color: var(--c-ink-muted);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.5;
+  margin: 16px 4px 0;
+  color: var(--ui-text-3);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 .ranking-empty {
   margin: 0;
-  padding: 34px 10px;
-  color: var(--c-ink-muted);
+  padding: 44px 16px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-2);
+  border: 1px dashed var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
   text-align: center;
-  font-weight: 800;
-}
-
-/* The intro's second home used to be here: a set of overrides that re-centred
-   the column, re-painted the shell with the key visual and re-framed the
-   figure, all of them outranking the definitions above. The redesign folded
-   every one of them into that single home, so `.intro-shell`, `.intro`,
-   `.intro > p` and `.intro-visual` are each now defined exactly once. What is
-   left below is the light-panel copy colours, which genuinely only apply
-   inside .data-info-panel. */
-.start-priority,
-.prestart-briefing,
-.quick-guide {
-  box-shadow: 0 16px 40px var(--c-mint-04-a16);
-}
-.start-panel,
-.play-style-panel {
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
-    0 10px 24px rgba(0, 0, 0, 0.18);
-}
-.data-info-panel .consent-box {
-  color: var(--c-ink);
-  background: var(--c-paper);
-  border-color: var(--c-gray-81-5);
-}
-.data-info-panel .consent-box b,
-.data-info-panel .db-status-panel strong {
-  color: var(--c-ink);
-}
-.data-info-panel .consent-box small {
-  color: var(--c-ink-soft);
-}
-.data-info-panel .db-status-panel p,
-.data-info-panel .db-status-panel small,
-.data-info-panel .db-status-panel span {
-  color: var(--c-ink-raised);
-}
-.data-info-panel .db-status-panel.ready strong {
-  color: var(--c-green-deep);
-}
-.data-info-panel .db-status-panel.pending strong {
-  color: var(--c-warn-deep);
-}
-.data-info-panel .db-status-panel.local strong {
-  color: var(--c-ink-soft);
+  font-weight: 500;
 }
 
 /* Rules gathered here from the later layers so this selector is defined in one file. */
@@ -1893,76 +2307,65 @@ textarea {
 }
 /* One ground for the whole game.
 
-   The intro opened on a night field and the play and result screens then opened
-   on a light grey gradient, so the first click changed the genre. The panels
-   stay light -- they are case files -- but they lie on the field the intro
-   already established, which is what makes the three screens one place. This is
-   the second `body` rule in this file on purpose: it is the one that wins, and
-   splitting the ground across both homes is how a page ends up with two.
-
-   The text colour stays dark ink: nearly all copy sits inside a light panel,
-   and the two surfaces that do not -- the intro and the scene card -- set their
-   own. `background-attachment: fixed` is deliberately absent; it repaints per
+   Ink, with two faint glows: acid from above, chip blue from the far corner.
+   This is the second `body` rule in this file on purpose: it is the one that
+   wins, and splitting the ground across both homes is how a page ends up with
+   two. `background-attachment: fixed` is deliberately absent; it repaints per
    viewport, which both janks a phone scroll and slices a full-page capture. */
 body {
-  color: var(--ink);
-  background:
-    radial-gradient(120% 80% at 50% -10%, var(--c-teal-25-a24), transparent 62%),
-    linear-gradient(168deg, var(--c-ink-deep), var(--c-ink) 46%, var(--c-ink-darkest));
-}
-.result-hero h1 {
-  margin-inline: 0;
-  max-width: 980px;
-  font-weight: 950;
-  letter-spacing: 0;
-  text-wrap: balance;
+  color: var(--ui-text);
+  background-color: var(--ui-bg);
+  background-image:
+    radial-gradient(90% 60% at 50% -12%, rgb(217 255 98 / 0.07), transparent 60%),
+    radial-gradient(70% 50% at 100% 100%, rgb(104 196 255 / 0.05), transparent 70%);
 }
 .game-header {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--line);
 }
 
-/* Cold open, narrow ---------------------------------------------------------
-   The hero's two columns cannot both be columns on a phone, so the copy takes
-   the full width and the art becomes a band under it. Everything else on the
-   screen is already a single stack of full-width rows, which is the point of
-   the row layout: the roadmap does not have to change shape at all. */
+/* Intro and ranking, narrower -------------------------------------------- */
+@media (max-width: 1180px) {
+  .intro-visual figcaption {
+    display: none;
+  }
+  .case-roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 860px) {
+  /* The stage turns portrait: the photograph fills the top of the screen and
+     fades to ink, and the copy settles onto the floor under it. */
   .intro-hero {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
-  /* The fixed music controls sit over this corner, so the brand row starts
-     below them rather than under them. */
-  .intro-hero-copy {
-    padding-top: 58px;
-  }
-  /* The whole intro has a phone height budget of four viewports
-     (tests/visual-regression.spec.js:400), and the art band and the tail
-     padding are the two places that pay for the rest of it. */
-  .intro-shell {
-    padding-bottom: 28px;
+    min-height: 100svh;
   }
   .intro-hero-art {
-    min-height: 54vw;
-    border-left: 0;
-    border-top: 1px solid rgb(217 255 98 / 0.28);
+    inset: 0 0 auto;
+    height: 82%;
   }
-  .intro-hero-art:after {
+  .intro-visual img {
+    object-position: 64% 30%;
+  }
+  .intro-hero-art::after {
     background:
-      linear-gradient(0deg, rgb(16 22 21 / 0.9), rgb(16 22 21 / 0) 58%),
-      linear-gradient(202deg, rgb(217 255 98 / 0.14), rgb(217 255 98 / 0) 44%);
+      linear-gradient(180deg, rgb(6 9 10 / 0.72) 0%, rgb(6 9 10 / 0.12) 20%, rgb(6 9 10 / 0.55) 48%, rgb(6 9 10 / 0.9) 72%, var(--ui-bg) 90%),
+      radial-gradient(80% 50% at 30% 70%, rgb(217 255 98 / 0.06), transparent 70%);
+  }
+  .intro-hero-copy {
+    width: 100%;
+    padding: 64px var(--ui-gutter) 28px;
+  }
+  .intro .studio-credit {
+    margin-top: 28px;
+    transform: none;
   }
   /* The shared narrow-screen rule stacks every header row into full-width
-     buttons. That is right for the play screen's six-button topbar and wrong
-     for a three-chip brand row, which spent 150px of the first viewport on it.
-     These outrank it by specificity rather than by order, because
+     buttons. That is right for the play screen's topbar and wrong for three
+     pills. These outrank it by specificity rather than by order, because
      responsive.css is imported after this file. */
   .intro .brand-row {
     align-items: center;
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
   }
   .intro .top-actions {
     flex-direction: row;
@@ -1972,27 +2375,81 @@ body {
   .intro .top-actions .ghost {
     width: auto;
   }
+  .intro .start-priority {
+    grid-template-columns: 1fr;
+  }
+  .intro-drawer-grid {
+    grid-template-columns: 1fr;
+  }
+  .prestart-grid,
+  .prestart-tutorial > div,
+  .season-summary-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  /* A phone reads the roadmap as a rail: one card and the edge of the next,
+     swiped sideways, instead of six screens of scrolling. The rail bleeds to
+     the viewport edge and snaps each card to the reading gutter. */
+  .case-roadmap {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82%, 330px);
+    width: auto;
+    margin-inline: calc(-1 * var(--ui-gutter));
+    padding: 4px var(--ui-gutter) 18px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--ui-gutter);
+    scrollbar-width: none;
+  }
+  .case-roadmap::-webkit-scrollbar {
+    display: none;
+  }
   .case-card {
-    grid-template-columns: clamp(48px, 13vw, 72px) minmax(0, 1fr);
+    min-height: 250px;
+    scroll-snap-align: start;
   }
-  /* A wrapped flex row put the +/- box on a line of its own under the title.
-     Two rows and a fixed marker column keep it beside them. */
-  .intro-drawer > summary {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 34px;
+  .roadmap-heading {
+    margin-top: 64px;
+  }
+}
+@media (max-width: 480px) {
+  .intro .case-chip {
+    display: none;
+  }
+  .intro .intro-launch {
+    width: 100%;
+  }
+  .intro-stats {
+    gap: 14px 20px;
+  }
+  .intro .start-priority {
+    padding: 18px;
+  }
+  .prestart-grid,
+  .prestart-tutorial > div,
+  .season-summary-list {
+    grid-template-columns: 1fr;
+  }
+  /* The back button and the brand pill stay one row of pills, dropped below
+     the music controls instead of stacked into full-width slabs under them. */
+  .ranking-page .topbar {
+    flex-direction: row;
     align-items: center;
+    padding-top: 50px;
   }
-  .intro-drawer > summary span,
-  .intro-drawer > summary h2 {
-    grid-column: 1;
-    min-width: 0;
+  .resume-panel {
+    flex-direction: column;
+    align-items: stretch;
   }
-  .intro-drawer > summary:before {
-    grid-column: 2;
-    grid-row: 1 / -1;
-    margin-left: 0;
+  .studio-credit dl {
+    gap: 14px;
   }
-  .roadmap-heading b {
-    text-align: left;
+}
+@media (max-width: 360px) {
+  .intro-kicker {
+    border-radius: var(--ui-radius-md);
   }
 }

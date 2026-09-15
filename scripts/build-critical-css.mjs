@@ -129,6 +129,17 @@ function buildCritical(css, ranges) {
   return parts.join("");
 }
 
+/**
+ * Widths of shrink-to-fit boxes and `ch` measures depend on the face that
+ * painted the text. Since the app ships Pretendard, a probe read while the woff2
+ * subsets were still arriving measured the fallback face on one pass and
+ * Pretendard on the other, and reported a "flash" that was only a race. Both
+ * passes read the settled face.
+ */
+async function settleFonts(page) {
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+}
+
 async function readComputed(page) {
   return page.evaluate(
     ([selectors, properties]) => {
@@ -192,6 +203,7 @@ try {
       await page.coverage.startCSSCoverage();
       await page.goto(baseUrl);
       await page.locator(".intro").waitFor();
+      await settleFonts(page);
       styles[viewport.name] = await readComputed(page);
       for (const entry of await page.coverage.stopCSSCoverage()) {
         if (entry.url.endsWith(measured.file)) ranges.push(...entry.ranges);
@@ -220,6 +232,7 @@ try {
       await page.route(`**/${shipped.file}`, (route) => route.abort());
       await page.goto(baseUrl);
       await page.locator(".intro").waitFor();
+      await settleFonts(page);
       const criticalOnly = await readComputed(page);
       for (const [selector, properties] of Object.entries(fullStyles[viewport.name])) {
         for (const [property, value] of Object.entries(properties)) {

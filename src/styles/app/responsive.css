@@ -27,13 +27,6 @@
   .result-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .rank-panel {
-    grid-template-columns: 130px minmax(0, 1fr);
-  }
-  .score-breakdown {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .achievement-panel > div:last-child {
     grid-template-columns: 1fr;
   }
@@ -64,9 +57,6 @@
   .session-panel {
     align-items: stretch;
     flex-direction: column;
-  }
-  .fingerprint-grid {
-    grid-template-columns: 1fr;
   }
   .counterfactual-list article {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -105,9 +95,6 @@
     align-items: stretch;
     flex-direction: column;
     bottom: max(8px, env(safe-area-inset-bottom));
-  }
-  .result-hero h1 {
-    font-size: 42px;
   }
   .brand-row,
   .topbar,
@@ -172,17 +159,6 @@
     grid-column: 2 / -1;
     grid-row: 3;
   }
-  .rank-panel,
-  .score-breakdown,
-  .outcome-panel {
-    grid-template-columns: 1fr;
-  }
-  .outcome-panel-mark {
-    padding-right: 0;
-    padding-bottom: 12px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(24, 32, 31, 0.2);
-  }
   .fingerprint-heading {
     align-items: stretch;
     flex-direction: column;
@@ -194,15 +170,6 @@
     grid-template-columns: 1fr;
   }
   .counterfactual-scene {
-    grid-column: auto;
-  }
-  .rank-mark {
-    min-height: 118px;
-  }
-  .rank-mark strong {
-    font-size: 64px;
-  }
-  .score-breakdown {
     grid-column: auto;
   }
   .game-board,

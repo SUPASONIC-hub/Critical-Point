@@ -252,22 +252,27 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               </button>
             </div>
           </div>
-          <div className="result-hero">
-            <p>{playerName}의 {activeCaseMeta?.label} 사고 활성 프로필</p>
-            <h1 ref={titleRef} tabIndex={-1}>
-              {currentCase === "final"
-                ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다."
-                : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}
-            </h1>
-          </div>
-          <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
-            <div>
-              <span>JUDGMENT PROFILE · </span>
-              <strong>{judgmentProfile.label}</strong>
+          {/* One composed header: whose record this is, what it found, the
+              grade it earned and the profile it files the player under. The
+              eyebrow used to open on a bare possessive when no name was set. */}
+          <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
+            <div className="result-hero-copy">
+              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 사고 활성 프로필</p>
+              <h1 ref={titleRef} tabIndex={-1}>
+                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 사고가 가장 오래 유지됐습니다.</>}
+              </h1>
+              <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
+                <div><span>JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
+                <p>{judgmentProfile.text}</p>
+                <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
+              </section>
             </div>
-            <p>{judgmentProfile.text}</p>
-            <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
-          </section>
+            <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
+              <span>CASE RANK</span>
+              <strong>{resultRank}</strong>
+              <small>{momentumTier} · {momentumScore} POINTS</small>
+            </div>
+          </div>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">
               <span>YOUR CONSEQUENCE</span>
@@ -278,6 +283,21 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               <p>{caseOutcome.text}</p>
             </div>
           </section>
+          {nextCaseSignal && (
+            <section className="next-case-panel">
+              <div>
+                <span>{nextCaseSignal.eyebrow} · CONTAMINATED BY YOUR LAST STANDARD</span>
+                <h2>{nextCaseSignal.title}</h2>
+                <p>{nextCaseSignal.premise}</p>
+                <p className="next-case-hook">{nextCaseSignal.hook}</p>
+                <small>{resultBridge}</small>
+              </div>
+              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
+                <ChevronRight size={18} /><kbd className="shortcut-hint" aria-hidden="true">N</kbd>
+                {nextCaseSignal.button}
+              </button>
+            </section>
+          )}
           {currentCase === "final" && endingVariant && (
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label="결말 변형">
               <span>{endingVariant.label}</span>
@@ -299,17 +319,10 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             </section>
           )}
           <section className={`rank-panel rank-${resultRank.toLowerCase()}`}>
-            <div className="rank-mark">
-              <span>CASE RANK</span>
-              <strong>{resultRank}</strong>
-            </div>
             <div className="rank-copy">
-              <span>{momentumTier} · {momentumScore} POINTS</span>
+              <span>SCORE BREAKDOWN · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
-              <p>
-                다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는
-                정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.
-              </p>
+              <p>다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는 정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
             </div>
             <div className="score-breakdown">
               {scoreBreakdown.map((item) => (
@@ -324,21 +337,6 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               ))}
             </div>
           </section>
-          {nextCaseSignal && (
-            <section className="next-case-panel">
-              <div>
-                <span>{nextCaseSignal.eyebrow} · CONTAMINATED BY YOUR LAST STANDARD</span>
-                <h2>{nextCaseSignal.title}</h2>
-                <p>{nextCaseSignal.premise}</p>
-                <p className="next-case-hook">{nextCaseSignal.hook}</p>
-                <small>{resultBridge}</small>
-              </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
-                <ChevronRight size={18} /><kbd className="shortcut-hint" aria-hidden="true">N</kbd>
-                {nextCaseSignal.button}
-              </button>
-            </section>
-          )}
           {/* Act two. The report used to answer "why" in twenty-five named
               regions spread over 10,616px; these are the three answers a player
               actually leaves with, and the archive below keeps the rest. */}
@@ -646,50 +644,32 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             <section className="report-section">
               <h2>Primary Trigger</h2>
               <strong>{triggerLabels[result.primary[0]]}</strong>
-              <p>
-                {result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다.
-                이후 선택 로그는 이 조건을 중심으로 다음 사건에 반영됩니다.
-              </p>
+              <p>{result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다. 이후 선택 로그는 이 조건을 중심으로 다음 사건에 반영됩니다.</p>
             </section>
             <section className="report-section">
               <h2>Secondary Trigger</h2>
               <strong>{triggerLabels[result.secondary[0]]}</strong>
-              <p>
-                첫 번째 조건을 보조한 압박입니다. 같은 선택 안에서도 명분과 비용이 이
-                방향으로 다시 흔들렸습니다.
-              </p>
+              <p>첫 번째 조건을 보조한 압박입니다. 같은 선택 안에서도 명분과 비용이 이 방향으로 다시 흔들렸습니다.</p>
             </section>
             <section className="report-section">
               <h2>Cognitive Acceleration</h2>
               <strong>{easyCognitionLabels[result.thinking[0]] ?? cognitionLabels[result.thinking[0]]}</strong>
-              <p>
-                로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로
-                한 번 더 버티거나 뒤집었습니다.
-              </p>
+              <p>로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
             </section>
             <section className="report-section">
               <h2>Free Text</h2>
               <strong>{result.freeCount}회</strong>
-              <p>
-                준비된 선택지 밖에서 조건을 다시 짠 횟수입니다. 0회라면 다음 테스트에서는
-                구조 재설계 유도가 충분했는지 확인해야 합니다.
-              </p>
+              <p>준비된 선택지 밖에서 조건을 다시 짠 횟수입니다. 0회라면 다음 테스트에서는 구조 재설계 유도가 충분했는지 확인해야 합니다.</p>
             </section>
             <section className="report-section">
               <h2>Avg Time</h2>
               <strong>{result.averageResponseTime}s</strong>
-              <p>
-                각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가
-                명확했거나 압박이 약했을 수 있습니다.
-              </p>
+              <p>각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가 명확했거나 압박이 약했을 수 있습니다.</p>
             </section>
             <section className="report-section wide-report">
               <h2>Longest Decision</h2>
               <strong>{result.longestDecision?.title ?? "없음"}</strong>
-              <p>
-                가장 오래 머문 국면입니다. 이 장면의 메모, 에코 반론, 선택지 비용이 실제
-                고민을 만들었는지 인터뷰에서 우선 확인합니다.
-              </p>
+              <p>가장 오래 머문 국면입니다. 이 장면의 메모, 에코 반론, 선택지 비용이 실제 고민을 만들었는지 인터뷰에서 우선 확인합니다.</p>
             </section>
           </div>
           <section className="route-atlas">
@@ -944,9 +924,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             <section className="story-reveal ending-reveal">
               <span>SEASON 1 COMPLETE · {endingProfile.tag}</span>
               <h2>{endingProfile.title}</h2>
-              <p>
-                {endingProfile.text} {finalAftermathEntry ? `마지막 후폭풍에서 "${finalAftermathEntry.choice}"을 선택했습니다.` : ""}
-              </p>
+              <p>{endingProfile.text} {finalAftermathEntry ? `마지막 후폭풍에서 "${finalAftermathEntry.choice}"을 선택했습니다.` : ""}</p>
               <div className="ending-clue-summary">
                 <strong>{clueCount}/6 숨은 단서 발견</strong>
                 <span>
@@ -960,10 +938,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             <section className="story-reveal">
               <span>NEXT CASE SIGNAL</span>
               <h2>다음 사건은 당신이 가장 강하게 반응한 조건을 중심으로 재구성됩니다.</h2>
-              <p>
-                트리거랩은 사건 해결 능력만 보지 않습니다. 어떤 압박이 들어왔을 때 당신이
-                더 오래 생각하고, 더 쉽게 원칙을 바꾸며, 더 많은 손실을 감수하는지 기록합니다.
-              </p>
+              <p>트리거랩은 사건 해결 능력만 보지 않습니다. 어떤 압박이 들어왔을 때 당신이 더 오래 생각하고, 더 쉽게 원칙을 바꾸며, 더 많은 손실을 감수하는지 기록합니다.</p>
             </section>
           )}
             </div>

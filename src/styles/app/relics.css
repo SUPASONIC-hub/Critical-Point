@@ -14,41 +14,45 @@
   place-items: center;
   overflow-y: auto;
   padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
-  background: var(--c-gx-shade);
+  background: rgb(4 7 8 / 0.74);
+  backdrop-filter: blur(12px) saturate(1.1);
 }
 
 .gx-draft-panel {
   width: 100%;
-  max-width: 520px;
-  padding: 16px;
-  border: 2px solid var(--c-gx-relic);
-  border-radius: 14px;
-  color: var(--c-paper);
-  background: var(--c-gx-felt);
+  max-width: 560px;
+  padding: 20px;
+  border: 1px solid var(--c-gx-relic-a30);
+  border-radius: var(--ui-radius-lg);
+  color: var(--ui-text);
+  background:
+    radial-gradient(90% 60% at 50% 0%, rgb(255 196 87 / 0.14), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
   box-shadow:
-    0 0 0 1px var(--c-gx-shade),
-    0 24px 60px var(--c-gx-shade),
-    0 0 42px var(--c-gx-relic-a30);
+    var(--ui-shadow-2),
+    0 0 60px var(--c-gx-relic-a30);
   animation: gx-draft-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .gx-draft-kicker {
   display: block;
   color: var(--c-gx-relic);
-  font: 900 11px/1.2 ui-monospace, monospace;
-  letter-spacing: 0.1em;
+  font: 800 11px/1.2 var(--font-sans);
+  letter-spacing: 0.14em;
 }
 
 .gx-draft-panel h2 {
-  margin: 6px 0 4px;
-  color: var(--c-paper);
-  font-size: clamp(19px, 5vw, 23px);
+  margin: 8px 0 6px;
+  color: var(--ui-text);
+  font-size: clamp(20px, 5vw, 25px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
   line-height: 1.25;
 }
 
 .gx-draft-lede {
-  margin: 0 0 12px;
-  color: var(--c-gx-text-dim);
+  margin: 0 0 16px;
+  color: var(--ui-text-2);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -74,11 +78,12 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 12px 14px 12px 10px;
-  border: 2px solid var(--c-gx-line);
-  border-radius: 12px;
-  color: var(--c-paper);
-  background: var(--c-gx-felt-card);
+  padding: 12px 16px 12px 12px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
+  color: var(--ui-text);
+  background: linear-gradient(160deg, var(--ui-surface-3), var(--ui-surface-2));
+  box-shadow: var(--ui-shadow-1);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -108,12 +113,14 @@
 .gx-relic-key {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 5px;
-  color: var(--c-gx-text-dim);
-  font: 900 11px/1 ui-monospace, monospace;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+  font: 700 11px/1 var(--font-sans);
 }
 
 .gx-relic-emblem {
@@ -140,8 +147,8 @@
 
 .gx-relic-copy b {
   color: var(--c-gx-relic);
-  font: 900 11px/1.2 ui-monospace, monospace;
-  letter-spacing: 0.08em;
+  font: 800 10px/1.2 var(--font-sans);
+  letter-spacing: 0.14em;
 }
 
 .is-rare .gx-relic-copy b {
@@ -150,11 +157,13 @@
 
 .gx-relic-copy strong {
   font-size: 16px;
-  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
 }
 
 .gx-relic-copy small {
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -167,7 +176,7 @@
   border-radius: 999px;
   color: var(--c-gx-felt);
   background: var(--c-gx-rare);
-  font: 900 10px/1.4 ui-monospace, monospace;
+  font: 800 10px/1.4 var(--font-sans);
   font-style: normal;
 }
 
@@ -190,11 +199,12 @@
 .gx-codex li {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 6px;
-  color: var(--c-gx-text-dim);
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 7px;
+  color: var(--ui-text-3);
+  background: var(--ui-surface-1);
 }
 
 .gx-codex li.is-open {
@@ -214,20 +224,21 @@
 
 .gx-codex-note {
   flex: 1 1 180px;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-3);
   font-size: 11px;
   line-height: 1.45;
 }
 
 .gauntlet-stage .gx-draft-skip {
   margin-left: auto;
-  padding: 8px 12px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 8px;
-  color: var(--c-gx-text-dim);
-  background: transparent;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-2);
+  background: var(--ui-surface-2);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* On the table: the season's relics as one wrapped line of the bank row. */
@@ -241,12 +252,14 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 1px 7px 1px 5px;
+  min-height: 22px;
+  padding: 1px 8px 1px 6px;
   border: 1px solid var(--c-gx-relic-a30);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--c-gx-relic);
+  background: rgb(255 196 87 / 0.08);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .gx-bank .gx-relic-chip.is-proc {
@@ -261,13 +274,16 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  border: 2px solid var(--c-gx-relic);
-  border-radius: 999px;
+  padding: 12px 18px;
+  border: 1px solid var(--c-gx-relic);
+  border-radius: var(--radius-pill);
   color: var(--c-gx-relic);
-  background: var(--c-gx-felt);
-  box-shadow: 0 0 40px var(--c-gx-relic-a30);
-  font: 900 14px/1 ui-monospace, monospace;
+  background: var(--ui-glass-strong);
+  box-shadow:
+    var(--ui-shadow-2),
+    0 0 40px var(--c-gx-relic-a30);
+  backdrop-filter: blur(14px);
+  font: 800 14px/1 var(--font-sans);
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
@@ -296,16 +312,15 @@
   margin: 10px 0;
   padding: 10px 12px;
   border: 1px solid var(--c-gx-rare);
-  border-left: 4px solid var(--c-gx-rare);
-  border-radius: 8px;
-  background: var(--c-gx-felt-raised);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-surface-1);
   box-shadow: 0 0 24px var(--c-gx-rare-a60);
   animation: gx-draft-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .gx-reveal-unlock span {
   color: var(--c-gx-rare);
-  font: 950 11px/1 ui-monospace, monospace;
+  font: 800 11px/1 var(--font-sans);
   letter-spacing: 0.08em;
 }
 
@@ -319,7 +334,7 @@
 
 .gx-reveal-unlock p {
   margin: 0;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
   font-size: 12px;
 }
 
@@ -327,10 +342,11 @@
   margin: 8px 0;
   padding: 8px 10px;
   border-left: 3px solid var(--c-gx-relic);
+  border-radius: var(--ui-radius-xs);
   color: var(--c-gx-relic);
-  background: var(--c-gx-felt-raised);
+  background: var(--ui-surface-1);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .pressure-ledger-relics {

@@ -227,8 +227,13 @@
   --bp-sm: 480px;
   --bp-md: 768px;
   --bp-lg: 1024px;
+  /* Pretendard ships with the app (src/main.jsx imports its dynamic subset), so
+     Hangul and Latin share one family, one x-height and one set of weights on
+     every platform instead of whatever the OS substitutes. */
   --font-sans:
-    Inter, Pretendard, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo",
+    "Malgun Gothic", "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
   --space-7: 32px;
   --text-on-dark: var(--c-green-95-2);
   --text-muted: var(--c-gray-75-4);
@@ -244,4 +249,47 @@
   --signal: var(--c-signal);
   --signal-soft: var(--c-danger-93);
   --teal: var(--c-teal);
+
+  /* The shared interface layer, 2026-09-15. Every screen used to invent its own
+     ground: square acid dossiers on the intro, felt on the table, white cards on
+     the result. These are the one set of surfaces, lines, radii and motion the
+     three screens now draw from, so a panel looks like the same object wherever
+     it sits. Surfaces step up in lightness; text steps down in emphasis and every
+     step clears 4.5:1 on --ui-surface-2. */
+  --ui-bg: rgb(6 9 10);
+  --ui-bg-raised: rgb(10 14 15);
+  --ui-surface-1: rgb(14 19 20);
+  --ui-surface-2: rgb(20 26 27);
+  --ui-surface-3: rgb(29 37 38);
+  --ui-surface-4: rgb(40 50 51);
+  --ui-glass: rgb(16 22 23 / 0.72);
+  --ui-glass-strong: rgb(12 17 18 / 0.88);
+  --ui-line: rgb(255 255 255 / 0.08);
+  --ui-line-strong: rgb(255 255 255 / 0.16);
+  --ui-line-accent: rgb(217 255 98 / 0.34);
+  --ui-text: rgb(242 246 243);
+  --ui-text-2: rgb(190 203 197);
+  --ui-text-3: rgb(142 158 152);
+  --ui-accent: var(--c-acid);
+  --ui-accent-ink: rgb(12 16 8);
+  --ui-accent-soft: rgb(217 255 98 / 0.12);
+  --ui-accent-glow: rgb(217 255 98 / 0.32);
+  --ui-heat: rgb(255 92 72);
+  --ui-heat-soft: rgb(255 92 72 / 0.14);
+  --ui-chip: rgb(104 196 255);
+  --ui-chip-soft: rgb(104 196 255 / 0.14);
+  --ui-radius-xs: 8px;
+  --ui-radius-sm: 12px;
+  --ui-radius-md: 16px;
+  --ui-radius-lg: 22px;
+  --ui-radius-xl: 30px;
+  --ui-shadow-1: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px rgb(0 0 0 / 0.28);
+  --ui-shadow-2: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px rgb(0 0 0 / 0.42);
+  --ui-shadow-glow: 0 0 0 1px rgb(217 255 98 / 0.5), 0 12px 40px rgb(217 255 98 / 0.22);
+  --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ui-dur-fast: 140ms;
+  --ui-dur: 240ms;
+  --ui-page-max: 1240px;
+  --ui-gutter: clamp(16px, 4.2vw, 56px);
 }

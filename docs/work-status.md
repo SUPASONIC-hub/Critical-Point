@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-11
+Last updated: 2026-09-15
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -17,8 +17,12 @@ list of the files it touched.
   screen was 5,775px before the first layout pass and 3,953px before the record
   room. The report has no height budget; `.report-archive` carries its bulk and
   priority 28 is what holds its shape.
-- The whole app shares the intro's night ground; panels stay light. Lime is the
-  accent for the control that records a decision.
+- The whole app shares one dark "night-shift glass" layer: the `--ui-*` tokens in
+  `src/styles/tokens.css` define the surfaces, lines, text steps, radii and
+  motion every screen draws from, and no screen paints a light panel on the
+  dark ground any more. Lime is the accent for the control that records a
+  decision. Type is Pretendard, shipped with the app (no font CDN), and Hangul
+  wraps with `word-break: keep-all`.
 - Fast CI checks and heavyweight E2E checks are split in GitHub Actions.
 - Visual regression is separated into `npm run test:visual` and a dedicated label-aware workflow.
 - Save/recovery, telemetry retry, season flow, accessibility, contrast, text integrity, graph schema, and visual baselines are covered by automated checks.

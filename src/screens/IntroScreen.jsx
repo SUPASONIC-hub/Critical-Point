@@ -117,48 +117,11 @@ export function IntroScreen({ view, renderers = {} }) {
         {renderErrorLogPanel()}
         {renderSaveStatus()}
         <section className="intro">
-          {/* The cold open is one asymmetric slab: the copy column carries the
-              wordmark, the premise and the only button on the page, and the art
-              column bleeds off the right edge instead of sitting in a framed
-              card in the middle of a centred stack. */}
+          {/* The cold open is one full-bleed stage: the key visual is the
+              backdrop of the whole first viewport, graded into the ground on
+              the reading side, and the copy column sits on top of it with the
+              wordmark, the premise and the only primary button on the page. */}
           <div className="intro-hero">
-            <div className="intro-hero-copy">
-          <div className="brand-row">
-            <span className="brand-mark">{gameTitle}</span>
-            <div className="top-actions">
-              <button className="ghost intro-ranking-button" type="button" onClick={() => onShowRanking(true)}>
-                <Trophy size={16} />
-                랭킹
-              </button>
-              {debugToolsEnabled && (
-                <button
-                  className="ghost intro-ranking-button"
-                  type="button"
-                  data-testid="open-error-log-from-header"
-                  aria-expanded={showErrorLog}
-                  aria-controls={showErrorLog ? "error-log-panel" : undefined}
-                  onClick={() => setShowErrorLog(true)}
-                >
-                  <AlertTriangle size={16} />
-                  에러 로그
-                </button>
-              )}
-              <span className="case-chip">{GAME_TITLE_READING} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
-            </div>
-          </div>
-          <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
-          <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
-          {/* The premise reads directly under the wordmark, where the copy
-              column has room for it. It also keeps `.intro p` -- one of
-              build-critical-css.mjs's probes -- pointing at a rendered
-              element now that the briefing grid is folded away. */}
-          <p>
-            트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
-            사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
-          </p>
-          {hasResumableSave ? resumePanel : <div className="start-input-row intro-launch">{startFirstCaseButton}</div>}
-          <StudioCredit />
-            </div>
             <div className="intro-hero-art">
               <figure className="intro-visual">
                 <picture>
@@ -178,10 +141,70 @@ export function IntroScreen({ view, renderers = {} }) {
                 </figcaption>
               </figure>
             </div>
+            <div className="intro-hero-copy">
+              <div className="brand-row">
+                <span className="brand-mark">
+                  <i className="brand-mark-dot" aria-hidden="true" />
+                  {gameTitle}
+                </span>
+                <div className="top-actions">
+                  <button className="ghost intro-ranking-button" type="button" onClick={() => onShowRanking(true)}>
+                    <Trophy size={15} />
+                    랭킹
+                  </button>
+                  {debugToolsEnabled && (
+                    <button
+                      className="ghost intro-ranking-button"
+                      type="button"
+                      data-testid="open-error-log-from-header"
+                      aria-expanded={showErrorLog}
+                      aria-controls={showErrorLog ? "error-log-panel" : undefined}
+                      onClick={() => setShowErrorLog(true)}
+                    >
+                      <AlertTriangle size={15} />
+                      에러 로그
+                    </button>
+                  )}
+                  <span className="case-chip">{GAME_TITLE_READING} / {simplifyPlayerText(activeCaseMeta?.title ?? gameTitle)}</span>
+                </div>
+              </div>
+              <GameWordmark label={gameTitle} reading={GAME_TITLE_READING} />
+              <strong className="intro-kicker">{GAME_SUBTITLE}</strong>
+              {/* The premise reads directly under the wordmark. It also keeps
+                  `.intro p` -- one of build-critical-css.mjs's probes --
+                  pointing at a rendered element. */}
+              <p>
+                트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
+                사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
+              </p>
+              {hasResumableSave ? (
+                resumePanel
+              ) : (
+                <div className="start-input-row intro-launch">
+                  {startFirstCaseButton}
+                  <a className="intro-briefing-link" href="#case-access-setup">
+                    브리핑 먼저 보기
+                  </a>
+                </div>
+              )}
+              <dl className="intro-stats">
+                <div>
+                  <dt>사건</dt>
+                  <dd>{String(seasonCases.length).padStart(2, "0")}</dd>
+                </div>
+                <div>
+                  <dt>판단 창</dt>
+                  <dd>45<small>초</small></dd>
+                </div>
+                <div>
+                  <dt>정답</dt>
+                  <dd>0</dd>
+                </div>
+              </dl>
+              <StudioCredit />
+            </div>
           </div>
-          {/* The protocol line was a 10px caption riding the key visual, where
-              nobody read it. As a full-bleed acid band cutting the page in two
-              it is the first thing the eye lands on after the wordmark. The
+          {/* The protocol line runs as a hairline marquee under the stage. The
               painted copies are duplicated for a seamless loop and hidden from
               assistive tech; the single readable copy sits beside them. */}
           <div className="intro-ticker">
@@ -277,9 +300,18 @@ export function IntroScreen({ view, renderers = {} }) {
             )}
           </div>
           </section>
+          {pastRunMemory && (
+            <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
+              <span>{pastRunMemory.label}</span>
+              <p>{pastRunMemory.text}</p>
+            </section>
+          )}
           {/* Pre-start prose folds behind closed native <details>. The element
               supplies the disclosure state, the button role and Enter/Space to
-              assistive tech, so nothing here hand-rolls aria-expanded. */}
+              assistive tech, so nothing here hand-rolls aria-expanded. The
+              drawers tile two-up on a wide screen and an open one takes the
+              whole row, so its contents never read at half width. */}
+          <div className="intro-drawer-grid">
           <details className="intro-drawer">
             <summary>
               <span>PRE-START BRIEFING</span>
@@ -402,12 +434,6 @@ export function IntroScreen({ view, renderers = {} }) {
             </section>
             </details>
           )}
-          {pastRunMemory && (
-            <section className="past-run-memory intro-memory" aria-label="NEW GAME+ 이전 기록">
-              <span>{pastRunMemory.label}</span>
-              <p>{pastRunMemory.text}</p>
-            </section>
-          )}
           <details className="intro-drawer">
             <summary>
               <h2>처음 플레이 가이드</h2>
@@ -508,6 +534,7 @@ export function IntroScreen({ view, renderers = {} }) {
             </div>
           </section>
           </details>
+          </div>
           {completedCaseResultList.length > 0 && (
             <section className="season-summary">
               <div>

@@ -3,11 +3,14 @@
 .debug-jump-panel {
   width: min(1120px, calc(100% - 32px));
   margin: 16px auto;
-  border: 1px solid rgba(255, 197, 90, 0.35);
-  background: var(--c-ink-10-a92);
+  border: 1px solid rgba(255, 197, 90, 0.3);
+  background:
+    linear-gradient(90deg, rgb(255 197 90 / 0.06), transparent 50%),
+    var(--ui-surface-1);
   color: var(--c-cream);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-2);
+  padding: 18px 20px;
 }
 .recovery-notice {
   display: flex;
@@ -64,12 +67,13 @@
 .error-log-actions button,
 .debug-jump-controls button,
 .debug-jump-controls select {
-  min-height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
+  min-height: 40px;
+  border: 1px solid var(--ui-line-strong);
+  background: var(--ui-surface-3);
   color: var(--c-cream);
-  border-radius: 6px;
-  padding: 0 12px;
+  border-radius: var(--ui-radius-xs);
+  padding: 0 14px;
+  font-weight: 600;
 }
 .recovery-actions button:not(.ghost),
 .debug-jump-controls button {

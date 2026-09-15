@@ -23,8 +23,8 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: var(--c-mint-09-a72);
-  backdrop-filter: blur(5px);
+  background: rgb(4 7 8 / 0.72);
+  backdrop-filter: blur(10px) saturate(1.1);
   overflow: auto;
 }
 
@@ -347,44 +347,183 @@
   padding: 7px 9px;
 }
 
-
-
 /* The gauntlet table ------------------------------------------------------
    One screen, no scroll on a phone: header, pot, gauge, question, hand, and a
-   fixed bar with the two verbs. Pressure arrives through four variables the
-   frame loop in GauntletFx writes on the root: --gx-heat (0-1, how close the
+   fixed dock with the three verbs. Pressure arrives through variables the frame
+   loop in GauntletFx writes on the root: --gx-heat (0-1, how close the
    heartbeat says the wall is), --gx-beat (a 0-1 pulse on every beat) and the
-   two shake offsets. Reduced motion zeroes the offsets and nothing else. */
+   two shake offsets. Reduced motion zeroes the offsets and nothing else.
+
+   2026-09-15, the night-shift glass pass: the table draws from the shared
+   --ui-* layer -- one set of surfaces, lines, radii and motion -- and keeps its
+   own heat, chip, beat and fever colours for what they mean. Type is Pretendard
+   with tabular figures; monospace is gone from every line a Korean word sits
+   on. On a wide screen the table is composed rather than stacked: the read pane
+   and the hand share the height between the header and a floating dock. */
 .game-shell {
+  --gx-maxw: 760px;
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   padding: 10px 12px calc(96px + env(safe-area-inset-bottom));
-  color: var(--c-paper);
+  color: var(--ui-text);
   background:
-    radial-gradient(ellipse at 50% 120%, var(--c-gx-heat-a18), transparent 60%),
-    var(--c-gx-felt);
+    radial-gradient(120% 60% at 50% 120%, var(--c-gx-heat-a18), transparent 62%),
+    radial-gradient(60% 45% at 0% 0%, rgb(94 234 255 / 0.05), transparent 70%),
+    radial-gradient(55% 40% at 100% 0%, rgb(217 255 98 / 0.04), transparent 70%),
+    var(--ui-bg);
 }
 
-.game-shell .game-header {
-  max-width: 760px;
+/* A felt weave under everything, faded out toward the edges. */
+.game-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(90% 70% at 50% 40%, var(--c-black), transparent 85%);
+}
+
+.game-shell > .save-status {
   margin: 0 auto 8px;
-  color: var(--c-paper);
+  border-radius: var(--ui-radius-sm);
 }
 
-.game-shell .game-header h1 {
-  color: var(--c-paper);
-  font-size: clamp(17px, 4.4vw, 22px);
+/* Header ------------------------------------------------------------------
+   Title and tools on one line, the case count and its progress under them. The
+   music controls float over the top-right corner, so the header keeps exactly
+   the room they take -- measured from the side gutter, not guessed per screen. */
+.gauntlet-shell .game-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title tools"
+    "status status";
+  align-items: center;
+  gap: 6px 10px;
+  max-width: var(--gx-maxw);
+  margin: 0 auto 10px;
+  padding: 0 max(0px, calc(112px - (100vw - var(--gx-maxw)) / 2)) 0 0;
+  color: var(--ui-text);
+  border-bottom: 0;
 }
 
-.game-shell .game-header .case-chip {
+.gauntlet-shell .game-header > div:first-child {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gauntlet-shell .game-header .case-chip {
+  flex: 0 0 auto;
+  min-height: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--radius-pill);
   color: var(--c-acid);
+  background: var(--ui-accent-soft);
+  font: 700 10px/1.2 var(--font-sans);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
-.game-shell .status-bar {
-  color: var(--c-gx-text-dim);
+.gauntlet-shell .game-header h1 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ui-text);
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.gauntlet-shell .top-actions.compact-actions {
+  grid-area: tools;
+  flex-direction: row;
+  gap: 4px;
+  width: auto;
+}
+
+.gauntlet-shell .top-actions.compact-actions button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 10px;
+  transition:
+    color var(--ui-dur-fast) linear,
+    border-color var(--ui-dur-fast) linear,
+    background var(--ui-dur-fast) linear;
+}
+
+.gauntlet-shell .top-actions.compact-actions button:hover {
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border-color: var(--ui-line-accent);
+}
+
+.gauntlet-shell .game-header .status-bar {
+  grid-area: status;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  color: var(--ui-text-2);
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gauntlet-shell .game-header .status-bar b {
+  color: var(--ui-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gauntlet-shell .status-bar-progress {
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  background: var(--ui-surface-3);
+  border-radius: var(--radius-pill);
+}
+
+.gauntlet-shell .status-bar-progress div {
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--c-acid-dark), var(--c-acid));
+  box-shadow: 0 0 12px var(--ui-accent-glow);
+}
+
+/* At the table the music controls are icons; their labels carry the state. */
+.gauntlet-shell .music-toggle span,
+.gauntlet-shell .music-volume-toggle span {
+  display: none;
+}
+
+.gauntlet-shell .music-toggle,
+.gauntlet-shell .music-volume-toggle {
+  justify-content: center;
+  width: 38px;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Stage ------------------------------------------------------------------- */
 .gauntlet-stage {
-  max-width: 760px;
+  max-width: var(--gx-maxw);
   margin: 0 auto;
 }
 
@@ -394,18 +533,32 @@
   transform: translate3d(var(--gx-shake-x, 0), var(--gx-shake-y, 0), 0);
 }
 
-.gx-hud {
+.gx-read {
   display: grid;
-  grid-template-columns: 1fr auto;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* HUD: the pot, the clock, the bank rail and the two live signals. */
+.gx-hud {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "pot clock"
-    "bank bank";
-  gap: 4px 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 10px;
-  background: var(--c-gx-felt-raised);
-  box-shadow: inset 0 0 calc(var(--gx-heat, 0) * 40px) var(--c-gx-heat-a18);
+    "bank bank"
+    "signals signals";
+  align-items: center;
+  gap: 6px 12px;
+  padding: 9px 11px 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
+  background:
+    radial-gradient(110% 130% at 0% 0%, rgb(217 255 98 / 0.06), transparent 55%),
+    linear-gradient(180deg, var(--c-gx-felt-raised), var(--ui-surface-1));
+  box-shadow:
+    var(--ui-shadow-1),
+    inset 0 0 calc(var(--gx-heat, 0) * 48px) var(--c-gx-heat-a18);
 }
 
 .gx-pot {
@@ -419,102 +572,252 @@
 }
 
 .gx-label {
-  color: var(--c-gx-text-dim);
-  font: 900 11px/1 ui-monospace, monospace;
-  letter-spacing: 0.14em;
+  color: var(--ui-text-3);
+  font: 700 11px/1 var(--font-sans);
+  letter-spacing: 0.16em;
 }
 
 .gx-pot-value {
-  color: var(--c-paper);
-  font: 950 clamp(30px, 9vw, 44px) / 1 ui-monospace, monospace;
+  color: var(--ui-text);
+  font: 800 clamp(32px, 9vw, 42px) / 1 var(--font-sans);
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 calc(8px + var(--gx-heat, 0) * 26px) var(--c-gx-heat-a55);
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 calc(10px + var(--gx-heat, 0) * 26px) var(--c-gx-heat-a55);
   transform: scale(calc(1 + var(--gx-beat, 0) * 0.03));
   transform-origin: left center;
 }
 
 .gx-pot-math {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 5px;
-  font: 900 15px/1 ui-monospace, monospace;
+  font: 750 14px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
 }
 
 .gx-pot-math i {
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-3);
   font-style: normal;
 }
 
+.gx-chips,
+.gx-mult,
+.gx-groove {
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+}
+
 .gx-chips {
-  padding: 3px 6px;
-  border-radius: 5px;
   color: var(--c-ink-deep);
   background: var(--c-gx-chip);
+  box-shadow: 0 0 14px rgb(104 196 255 / 0.28);
 }
 
 .gx-mult {
-  padding: 3px 6px;
-  border-radius: 5px;
   color: var(--c-paper);
   background: var(--c-gx-heat-deep);
+  box-shadow: inset 0 0 0 1px var(--c-gx-heat-a55);
 }
 
+.gx-groove {
+  color: var(--c-gx-felt);
+  background: var(--c-gx-beat);
+  font-size: 12px;
+}
+
+/* The clock is a ring that drains; the number sits in its hole. The ring is a
+   masked pseudo-element so the number's own ground stays the panel's. */
+.gx-clock {
+  --gx-ring: var(--c-acid);
+  grid-area: clock;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgb(217 255 98 / calc(0.06 + var(--gx-clock, 1) * 0.1));
+}
+
+.gx-clock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(var(--gx-ring) calc(var(--gx-clock, 1) * 360deg), var(--ui-surface-3) 0);
+  mask: radial-gradient(closest-side, transparent 80%, var(--c-black) 82%);
+}
+
+.gx-clock b {
+  position: relative;
+  font: 800 18px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.gx-clock i {
+  display: none;
+}
+
+.gx-clock.is-late {
+  --gx-ring: var(--c-gx-heat);
+  box-shadow: 0 0 calc(12px + var(--gx-beat, 0) * 16px) var(--c-gx-heat-a55);
+}
+
+.gx-clock.is-late b {
+  color: var(--c-danger-81);
+}
+
+/* Bank rail: every standing number as the same pill. */
 .gx-bank {
   grid-area: bank;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 14px;
-  color: var(--c-gx-text-dim);
-  font-size: 12px;
-  font-weight: 800;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
 }
 
-.gx-bank span {
+.gx-stat {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-.gx-bank b {
-  color: var(--c-paper);
-  font-variant-numeric: tabular-nums;
-}
-
-.gx-bank .gx-at-risk b {
-  color: var(--c-gx-ember);
-}
-
-.gx-focus-signal {
-  display: inline-grid;
-  grid-template-columns: auto auto minmax(74px, 1fr);
-  align-items: center;
-  gap: 4px 6px;
-  min-width: min(100%, 260px);
-  color: var(--c-gx-beat);
-}
-
-.gx-focus-signal small {
+  gap: 5px;
+  min-height: 24px;
+  padding: 2px 9px;
   overflow: hidden;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-3);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-pill);
   font-size: 11px;
-  text-overflow: ellipsis;
+  font-weight: 600;
   white-space: nowrap;
 }
 
+.gx-stat small {
+  font-size: 11px;
+}
+
+.gx-stat b {
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.gx-stat svg {
+  flex: 0 0 auto;
+}
+
+.gx-bank .gx-at-risk {
+  border-color: rgb(255 142 76 / 0.4);
+}
+
+.gx-bank .gx-at-risk b,
+.gx-bank .gx-at-risk svg {
+  color: var(--c-gx-ember);
+}
+
+.gx-run-signal b + small {
+  margin-left: 3px;
+}
+
+.gx-run-signal > i {
+  position: absolute;
+  inset: auto 9px 2px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--ui-line);
+}
+
+.gx-run-signal em,
+.gx-overdrive em,
+.gx-focus-signal em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.gx-run-signal em {
+  background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember), var(--c-gx-heat));
+}
+
+/* Signals: the overclock chain and the focus charge, each a line and a bar. */
+.gx-signals {
+  grid-area: signals;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 6px 14px;
+  padding-top: 7px;
+  border-top: 1px solid var(--ui-line);
+}
+
+.gx-overdrive,
+.gx-focus-signal {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+  color: var(--ui-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gx-overdrive {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.gx-overdrive > span,
+.gx-focus-signal small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gx-focus-signal small {
+  font-size: 11px;
+}
+
+.gx-overdrive b,
+.gx-focus-signal b {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.gx-overdrive b {
+  color: var(--c-acid);
+}
+
+.gx-overdrive.od-dormant b {
+  color: var(--ui-text-2);
+}
+
+.gx-overdrive > i,
 .gx-focus-signal > i {
   grid-column: 1 / -1;
   display: block;
   height: 3px;
   overflow: hidden;
-  border-radius: 99px;
-  background: var(--c-gx-line);
+  border-radius: var(--radius-pill);
+  background: var(--ui-surface-3);
 }
 
-.gx-focus-signal > i em {
-  display: block;
-  height: 100%;
+.gx-overdrive em {
+  background: linear-gradient(90deg, var(--c-violet), var(--c-acid), var(--c-gx-ember));
+  box-shadow: 0 0 10px var(--ui-accent-glow);
+}
+
+.gx-focus-signal {
+  color: var(--c-gx-beat);
+}
+
+.gx-focus-signal em {
   background: linear-gradient(90deg, var(--c-gx-beat), var(--c-gx-fever));
-  box-shadow: 0 0 14px var(--c-gx-beat-a45);
+  box-shadow: 0 0 12px var(--c-gx-beat-a45);
 }
 
 .gx-focus-signal.focus-deadeye b,
@@ -522,134 +825,219 @@
   color: var(--c-gx-fever);
 }
 
-.gx-focus-signal.is-jammed {
-  color: var(--c-gx-heat);
+.gx-focus-signal.is-jammed,
+.gx-focus-signal.is-jammed b {
+  color: var(--c-danger-81);
 }
 
-.gx-stance-mastery {
-  display: inline-grid;
-  grid-template-columns: minmax(120px, auto) minmax(82px, 1fr);
-  align-items: center;
-  gap: 3px 7px;
-  min-width: min(100%, 276px);
-  color: var(--c-gx-text-dim);
-}
-
-.gx-stance-mastery b {
-  color: var(--c-paper);
-  font-size: 11px;
-  letter-spacing: 0;
-}
-
-.gx-stance-mastery small {
-  overflow: hidden;
-  color: var(--c-gx-text-dim);
-  font-size: 10px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gx-stance-mastery > i {
-  grid-column: 1 / -1;
-  display: block;
-  height: 3px;
-  overflow: hidden;
-  border-radius: 99px;
-  background: var(--c-gx-line);
-}
-
-.gx-stance-mastery > i em {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--c-gx-heat), var(--c-gx-fever));
-  box-shadow: 0 0 12px var(--c-gx-heat-a55);
-}
-
-.gx-stance-mastery.mode-steady > i em {
-  background: linear-gradient(90deg, var(--c-gx-beat), var(--c-gx-chip));
-  box-shadow: 0 0 12px var(--c-gx-beat-a45);
-}
-
-.gx-stance-mastery.mode-expose > i em {
-  background: linear-gradient(90deg, var(--c-gx-fever), var(--c-paper));
-  box-shadow: 0 0 12px var(--c-gx-fever-a40);
-}
-
+/* Focus stance: a segmented control that also carries the season mastery. */
 .gx-focus-modes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
+  gap: 3px;
+  padding: 3px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: 13px;
 }
 
 .gx-focus-modes button {
+  --gx-mode: var(--c-danger-81);
+  position: relative;
   display: grid;
-  gap: 2px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 6px;
   min-width: 0;
-  min-height: 44px;
-  padding: 7px 8px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 7px;
-  color: var(--c-gx-text-dim);
-  background: var(--c-gx-felt-card);
+  min-height: 40px;
+  padding: 6px 9px 8px;
+  overflow: hidden;
+  color: var(--ui-text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
   text-align: left;
   cursor: pointer;
+  transition:
+    background var(--ui-dur-fast) linear,
+    border-color var(--ui-dur-fast) linear,
+    color var(--ui-dur-fast) linear;
+}
+
+.gx-focus-modes button.mode-steady {
+  --gx-mode: var(--c-gx-beat);
+}
+
+.gx-focus-modes button.mode-expose {
+  --gx-mode: var(--c-gx-fever);
+}
+
+.gx-focus-modes button:hover {
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
 }
 
 .gx-focus-modes button.active {
-  color: var(--c-gx-beat);
-  border-color: var(--c-gx-beat);
+  color: var(--gx-mode);
+  background: linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-2));
+  border-color: var(--gx-mode);
   box-shadow:
-    inset 0 0 18px var(--c-gx-beat-a45),
-    0 0 calc(var(--gx-beat-zone, 0) * 18px) var(--c-gx-beat-a45);
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 0 calc(4px + var(--gx-beat-zone, 0) * 18px) var(--c-gx-beat-a45);
 }
 
 .gx-focus-modes span {
   overflow: hidden;
-  font: 950 11px/1 ui-monospace, monospace;
+  font: 800 11px/1.1 var(--font-sans);
+  letter-spacing: 0.1em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.gx-focus-modes small {
-  display: -webkit-box;
-  overflow: hidden;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.25;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.gx-clock {
-  grid-area: clock;
-  display: grid;
-  justify-items: end;
-  gap: 4px;
-  min-width: 64px;
-}
-
-.gx-clock b {
-  font: 950 30px/1 ui-monospace, monospace;
+.gx-focus-modes em {
+  padding: 1px 6px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-3);
+  border-radius: var(--radius-pill);
+  font: 700 10px/1.4 var(--font-sans);
+  font-style: normal;
   font-variant-numeric: tabular-nums;
 }
 
-.gx-clock i {
+.gx-focus-modes .is-mastered em {
+  color: var(--c-gx-felt);
+  background: var(--c-gx-relic);
+}
+
+.gx-focus-modes small {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--ui-text-3);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-focus-modes i {
+  position: absolute;
+  inset: auto 9px 3px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--ui-line);
+}
+
+.gx-focus-modes i b {
   display: block;
-  height: 4px;
-  width: 100%;
-  border-radius: 99px;
-  background: var(--c-acid);
-  transition: width 0.1s linear;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gx-mode);
+  box-shadow: 0 0 8px var(--gx-mode);
 }
 
-.gx-clock.is-late b {
-  color: var(--c-gx-heat);
+/* Rules in force. */
+.gx-active-rules {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(90px, 0.45fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 8px 10px;
+  padding: 8px 11px;
+  border: 1px solid var(--c-gx-heat-a55);
+  border-radius: var(--ui-radius-sm);
+  background:
+    linear-gradient(90deg, rgb(255 56 56 / 0.16), transparent 70%),
+    var(--ui-surface-1);
+  box-shadow:
+    inset 3px 0 0 var(--c-gx-heat),
+    0 0 calc(var(--gx-heat, 0) * 24px) var(--c-gx-heat-a18);
 }
 
-.gx-clock.is-late i {
-  background: var(--c-gx-heat);
+.gx-active-rules div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
 }
 
+.gx-active-rules span {
+  color: var(--c-danger-81);
+  font: 800 10px/1 var(--font-sans);
+  letter-spacing: 0.12em;
+}
+
+.gx-active-rules b,
+.gx-active-rules small,
+.gx-active-rules li {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-active-rules b {
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.gx-active-rules small {
+  color: var(--ui-text-3);
+  font-size: 11px;
+}
+
+.gx-active-rules > i {
+  height: 5px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--ui-surface-3);
+}
+
+.gx-active-rules em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember), var(--c-gx-heat));
+  box-shadow: 0 0 14px var(--c-gx-heat-a55);
+}
+
+.gx-active-rules ul {
+  display: flex;
+  min-width: 0;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gx-active-rules li {
+  display: grid;
+  gap: 1px;
+  max-width: 150px;
+  padding: 4px 7px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-xs);
+}
+
+.gx-active-rules strong {
+  color: var(--c-acid);
+  font: 800 10px/1.1 var(--font-sans);
+  letter-spacing: 0.06em;
+}
+
+.gx-active-rules p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 6px;
+  color: var(--ui-text-2);
+  border-top: 1px solid var(--ui-line);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Gauge: a lit tube with a tick every ten, the wall's band and the next push. */
 .gx-gauge {
   display: grid;
   gap: 5px;
@@ -657,25 +1045,30 @@
 
 .gx-gauge-track {
   position: relative;
-  height: 26px;
+  height: 22px;
   overflow: hidden;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 7px;
-  background: var(--c-gx-felt-raised);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgb(255 255 255 / 0.06) calc(10% - 1px) 10%),
+    var(--ui-surface-1);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.55);
 }
 
 .gx-gauge-band {
   position: absolute;
   inset: 0 auto 0 0;
   background: repeating-linear-gradient(-45deg, var(--c-gx-band) 0 6px, transparent 6px 12px);
-  border-left: 2px dashed var(--c-gx-heat);
+  border-left: 2px solid var(--c-gx-heat);
+  box-shadow: inset 10px 0 18px -10px var(--c-gx-heat);
 }
 
 .gx-gauge-next {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: 3px auto 3px 0;
   z-index: 2;
   border-inline: 2px solid var(--c-amber);
+  border-radius: 4px;
   background: var(--c-gx-next);
 }
 
@@ -683,8 +1076,11 @@
   position: absolute;
   inset: 0 auto 0 0;
   z-index: 1;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
   background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember) 60%, var(--c-gx-heat));
-  box-shadow: 0 0 calc(var(--gx-heat, 0) * 24px) var(--c-gx-heat);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    0 0 calc(6px + var(--gx-heat, 0) * 24px) var(--c-gx-heat);
   transition: width 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -704,23 +1100,27 @@
   z-index: 3;
   width: 0;
   border-left: 2px solid var(--c-gx-chip);
+  box-shadow: 0 0 10px var(--c-gx-chip);
 }
 
 .gx-gauge-read {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--c-gx-text-dim);
-  font: 800 12px/1 ui-monospace, monospace;
+  padding-inline: 4px;
+  color: var(--ui-text-2);
+  font: 600 12px/1 var(--font-sans);
 }
 
 .gx-gauge-read b {
-  color: var(--c-paper);
+  color: var(--ui-text);
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
 .gx-band-label {
   color: var(--c-danger-81);
+  font-variant-numeric: tabular-nums;
 }
 
 .gx-bpm {
@@ -736,50 +1136,160 @@
   transform: scale(calc(1 + var(--gx-beat, 0) * 0.35));
 }
 
+/* The scene: who is asking and the one question. */
 .gx-scene {
   display: grid;
-  grid-template-columns: 44px 1fr;
+  grid-template-columns: 40px 1fr;
   gap: 10px;
   align-items: start;
+  padding-inline: 2px;
+}
+
+.gx-scene > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 8px;
+  min-width: 0;
 }
 
 .gx-portrait {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ui-line-strong);
   border-radius: 50%;
-  border: 2px solid var(--c-gx-line);
+  box-shadow: 0 0 0 3px var(--ui-surface-1);
   object-fit: cover;
 }
 
 .gx-speaker {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
   margin: 0;
-  color: var(--c-gx-text-dim);
+  overflow: hidden;
+  color: var(--ui-text-2);
   font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gx-speaker b {
-  color: var(--c-paper);
+  color: var(--ui-text);
+  font-weight: 700;
 }
 
 .gx-question {
+  grid-column: 1 / -1;
   margin: 2px 0 0;
-  color: var(--c-paper);
+  color: var(--ui-text);
   font-size: 15px;
-  font-weight: 850;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   line-height: 1.4;
 }
 
+.gx-brief {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.gx-brief[open] {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+
 .gx-brief summary {
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.gx-brief summary:hover {
+  color: var(--ui-text);
 }
 
 .gx-brief p {
   margin: 6px 0 0;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
   font-size: 13px;
   line-height: 1.6;
+}
+
+.gx-brief ul {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0;
+  padding: 0 0 0 16px;
+  color: var(--ui-text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Situation board: what the table does next, three one-line cells. */
+.gx-situation {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 6px;
+}
+
+.gx-situation-card {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+
+.gx-situation-card span {
+  color: var(--ui-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.gx-situation-card b,
+.gx-situation-card small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-situation-card b {
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.gx-situation-card small {
+  color: var(--ui-text-3);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.gx-situation-risk {
+  border-color: var(--c-gx-heat-a55);
+  box-shadow: inset 0 0 calc(8px + var(--gx-heat, 0) * 28px) var(--c-gx-heat-a18);
+}
+
+.gx-situation-risk b {
+  color: var(--c-danger-81);
+}
+
+/* The hand ------------------------------------------------------------------ */
+.gx-hand-head {
+  display: none;
 }
 
 .gx-hand {
@@ -794,30 +1304,45 @@
   align-content: space-between;
   gap: 8px;
   min-height: 104px;
-  padding: 10px 10px 9px;
-  border: 2px solid var(--c-gx-line);
-  border-radius: 10px;
-  color: var(--c-paper);
-  background: var(--c-gx-felt-card);
+  padding: 11px 11px 10px;
+  color: var(--ui-text);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 42%),
+    linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-1);
   text-align: left;
   cursor: pointer;
   transition:
-    transform 0.14s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.14s linear,
-    box-shadow 0.14s linear;
+    transform var(--ui-dur) var(--ui-ease),
+    border-color var(--ui-dur-fast) linear,
+    box-shadow var(--ui-dur) var(--ui-ease);
 }
 
-.gauntlet-stage .gx-card:hover,
 .gauntlet-stage .gx-card:focus-visible {
-  border-color: var(--c-gx-text-dim);
+  border-color: var(--ui-text-2);
 }
 
-.gauntlet-stage .gx-card.selected {
+@media (hover: hover) {
+  .gauntlet-stage .gx-card:not([aria-disabled="true"]):hover {
+    border-color: rgb(255 255 255 / 0.3);
+    box-shadow: var(--ui-shadow-2);
+    transform: translateY(-2px);
+  }
+}
+
+.gauntlet-stage .gx-card.selected,
+.gauntlet-stage .gx-card.selected:hover {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%),
+    linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
   border-color: var(--c-acid);
   box-shadow:
-    0 0 0 2px var(--c-acid),
-    0 10px 24px var(--c-gx-shade);
-  transform: translateY(-4px);
+    0 0 0 1px var(--c-acid),
+    0 14px 34px rgb(0 0 0 / 0.5),
+    0 0 30px rgb(217 255 98 / 0.18);
+  transform: translateY(-3px);
 }
 
 .gauntlet-stage .gx-card[aria-disabled="true"] {
@@ -826,39 +1351,81 @@
 
 .gx-card-key {
   position: absolute;
-  top: 6px;
+  top: 8px;
   right: 8px;
-  color: var(--c-gx-text-dim);
-  font: 900 11px/1 ui-monospace, monospace;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  color: var(--ui-text-3);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+  font: 700 11px/1 var(--font-sans);
+}
+
+.selected .gx-card-key {
+  color: var(--ui-accent-ink);
+  background: var(--c-acid);
+  border-color: var(--c-acid);
 }
 
 .gx-card-label {
-  padding-right: 14px;
+  padding-right: 26px;
   font-size: 14px;
-  font-weight: 850;
-  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.38;
 }
 
 .gx-card-stats {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  font: 900 12px/1 ui-monospace, monospace;
+  gap: 5px;
+  font: 700 12px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
 }
 
 .gx-card-chips {
-  padding: 3px 6px;
-  border-radius: 5px;
+  padding: 4px 8px;
   color: var(--c-ink-deep);
   background: var(--c-gx-chip);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 14px rgb(104 196 255 / 0.25);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .gx-card-burn {
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  padding: 3px 8px;
   color: var(--c-danger-81);
+  background: rgb(52 20 22 / 0.92);
+  border: 1px solid rgb(255 56 56 / 0.28);
+  border-radius: var(--radius-pill);
+  font-weight: 650;
+}
+
+.gx-card-stats .gx-card-rule-tax,
+.gx-card-stats .gx-card-overclock {
+  padding: 3px 6px;
+  color: var(--c-gx-ember);
+  background: rgb(255 142 76 / 0.12);
+  border: 1px solid var(--c-gx-ember);
+  border-radius: var(--radius-pill);
+  font: 800 10px/1.1 var(--font-sans);
+  font-style: normal;
+}
+
+.gx-card-stats .gx-card-overclock {
+  color: var(--c-acid);
+  background: rgb(217 255 98 / 0.1);
+  border-color: var(--c-acid);
 }
 
 .gauntlet-stage .gx-card.is-fractured {
@@ -872,39 +1439,15 @@
 
 .gauntlet-stage.is-face-down .gx-card.is-fractured {
   border-style: solid;
-  border-color: var(--c-gx-line);
-}
-
-.gx-lost-tab p,
-.gx-held-elsewhere p {
-  margin: 0 0 8px;
-  color: var(--c-paper);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.gx-reveal-skip {
-  margin: 10px 0 0;
-  padding: 8px 10px;
-  border-left: 3px solid var(--c-gx-heat);
-  color: var(--c-paper);
-  background: var(--c-gx-felt-raised);
-  font-size: 13px;
-}
-
-.gx-reveal-skip b {
-  margin-right: 6px;
-  color: var(--c-danger-81);
-  font: 900 11px/1 ui-monospace, monospace;
-}
-
-.gauntlet-shell .debug-overlay {
-  top: auto;
-  bottom: calc(92px + env(safe-area-inset-bottom));
+  border-color: var(--ui-line-strong);
 }
 
 .gauntlet-stage .gx-card.is-sealed {
-  background: repeating-linear-gradient(135deg, var(--c-gx-felt-card) 0 10px, var(--c-gx-felt-raised) 10px 20px);
+  background: repeating-linear-gradient(135deg, var(--c-gx-felt-card) 0 10px, var(--ui-surface-1) 10px 20px);
+}
+
+.gauntlet-stage .gx-card.locked-choice {
+  border-style: dashed;
 }
 
 .gx-card-seal {
@@ -913,11 +1456,48 @@
   gap: 4px;
   color: var(--c-gx-chip);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
+}
+
+.gx-card-seal[data-testid="sealed-card-lock"] {
+  justify-self: start;
+  padding: 3px 8px;
+  background: rgb(104 196 255 / 0.1);
+  border: 1px solid var(--c-gx-chip);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
 }
 
 .gauntlet-stage .gx-card-wild {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgb(108 101 173 / 0.3), transparent 60%),
+    linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
   border-color: var(--c-violet);
+}
+
+.gx-card-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gx-card-preview i {
+  padding: 2px 6px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border-radius: 6px;
+  font: 650 10px/1.3 var(--font-sans);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.gx-card-preview .gain {
+  color: var(--c-acid);
+}
+
+.gx-card-preview .cost {
+  color: var(--c-danger-81);
 }
 
 .gx-card-preview .gx-card-crack {
@@ -926,160 +1506,184 @@
 
 .gauntlet-stage.is-face-down .gx-card-chips,
 .gauntlet-stage.is-face-down .gx-card-burn {
-  color: var(--c-gx-text-dim);
-  background: var(--c-gx-felt-raised);
+  color: var(--ui-text-3);
+  background: var(--ui-surface-1);
+  border-color: var(--ui-line);
+  box-shadow: none;
 }
 
 .gx-wild textarea {
   width: 100%;
   min-height: 72px;
-  padding: 10px;
+  padding: 10px 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
   border: 1px solid var(--c-violet);
-  border-radius: 8px;
-  color: var(--c-paper);
-  background: var(--c-gx-felt-raised);
+  border-radius: var(--ui-radius-sm);
   font: inherit;
 }
 
+/* The dock ------------------------------------------------------------------
+   Push is heat, lock is the beat, cash is the one acid control on the table. */
 .gx-actions {
   position: fixed;
   inset: auto 0 0;
   z-index: 8;
   display: grid;
-  grid-template-columns: 1fr 0.86fr 1.16fr;
+  grid-template-columns: 1fr 0.8fr 1.2fr;
   gap: 8px;
   max-width: 760px;
   margin: 0 auto;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-  background: linear-gradient(transparent, var(--c-gx-felt) 30%);
+  background: linear-gradient(180deg, transparent, rgb(6 9 10 / 0.9) 30%);
 }
 
 .gx-actions button {
-  display: inline-flex;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 3px 7px;
+  min-width: 0;
   min-height: 60px;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 950;
+  padding: 6px 10px;
+  border-radius: var(--ui-radius-md);
+  font: 800 17px/1.1 var(--font-sans);
+  letter-spacing: -0.01em;
   cursor: pointer;
+  transition:
+    transform var(--ui-dur-fast) var(--ui-ease),
+    filter var(--ui-dur-fast) linear,
+    box-shadow var(--ui-dur) var(--ui-ease);
+}
+
+.gx-actions button:not(:disabled):hover {
+  filter: brightness(1.08);
+}
+
+.gx-actions button:not(:disabled):active {
+  transform: translateY(2px) scale(0.98);
+}
+
+.gx-actions button > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-actions button small {
+  padding: 2px 7px;
+  background: rgb(0 0 0 / 0.28);
+  border-radius: var(--radius-pill);
+  font: 700 11px/1.3 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .gauntlet-stage .gx-actions button:disabled {
-  border-color: var(--c-gx-line);
   color: var(--c-gx-text-dim);
   -webkit-text-fill-color: var(--c-gx-text-dim);
-  background: var(--c-gx-felt-card);
+  background: var(--ui-surface-2);
+  border-color: var(--ui-line-strong);
   box-shadow: none;
   cursor: not-allowed;
 }
 
 .gx-push {
-  position: relative;
-  border: 2px solid var(--c-gx-heat);
   color: var(--c-paper);
-  background: var(--c-gx-heat-deep);
+  background: linear-gradient(180deg, rgb(168 28 32), var(--c-gx-heat-deep));
+  border: 1px solid var(--c-gx-heat);
   box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    0 10px 26px rgb(120 16 20 / 0.45),
     0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55),
     0 0 0 calc(var(--gx-beat-zone, 0) * 3px) var(--c-gx-beat),
     0 0 calc(var(--gx-beat-zone, 0) * 22px) var(--c-gx-beat-a45);
 }
 
 .gx-focus {
-  position: relative;
   overflow: hidden;
-  border: 2px solid var(--c-gx-beat);
   color: var(--c-gx-beat);
-  background: var(--c-gx-felt-card);
+  background: linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-2));
+  border: 1px solid var(--c-gx-beat);
   box-shadow:
-    inset 0 0 calc(8px + var(--gx-beat-zone, 0) * 20px) var(--c-gx-beat-a45),
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    inset 0 0 calc(6px + var(--gx-beat-zone, 0) * 20px) var(--c-gx-beat-a45),
     0 0 calc(var(--gx-beat-zone, 0) * 24px) var(--c-gx-beat-a45);
 }
 
 .gx-focus.focus-locked,
 .gx-focus.focus-deadeye {
-  border-color: var(--c-gx-fever);
   color: var(--c-gx-fever);
+  border-color: var(--c-gx-fever);
 }
 
 .gx-focus.is-jammed {
-  border-color: var(--c-gx-heat);
   color: var(--c-paper);
   background: var(--c-gx-heat-deep);
+  border-color: var(--c-gx-heat);
 }
 
+/* The lock's approach frame closes onto the button on the beat, the same way
+   the push ring does. It used to be an ellipse drawn through the label. */
 .gx-focus-reticle {
   position: absolute;
-  inset: 8px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  opacity: calc(0.18 + var(--gx-beat-zone, 0) * 0.48);
-  transform: scale(calc(1.24 - var(--gx-beat-phase, 1) * 0.24));
+  inset: 5px;
+  border: 1px dashed currentColor;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: calc(0.16 + var(--gx-beat-zone, 0) * 0.5);
+  transform: scale(calc(1.08 - var(--gx-beat-phase, 1) * 0.08));
   will-change: transform, opacity;
 }
 
-.gx-focus-reticle::before,
-.gx-focus-reticle::after {
-  position: absolute;
-  content: "";
-  background: currentColor;
-  opacity: 0.65;
-}
-
-.gx-focus-reticle::before {
-  inset: 50% 6px auto;
-  height: 1px;
-}
-
-.gx-focus-reticle::after {
-  inset: 6px auto 6px 50%;
-  width: 1px;
-}
-
-.gx-focus small {
-  font: 800 11px/1 ui-monospace, monospace;
-}
-
-.gx-push small {
-  font: 800 11px/1 ui-monospace, monospace;
-}
-
-.gx-push:not(:disabled):active {
-  transform: translateY(2px) scale(0.98);
-}
-
 .gx-cash {
-  border: 2px solid var(--c-acid);
-  color: var(--c-ink-deep);
-  background: var(--c-acid);
+  color: var(--ui-accent-ink);
+  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid) 55%, var(--c-acid-deep));
+  border: 1px solid var(--c-acid);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 10px 30px rgb(217 255 98 / 0.22);
 }
 
 .gx-cash b {
-  font: 950 18px/1 ui-monospace, monospace;
+  font: 800 18px/1 var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 
+.gx-cash b:empty {
+  display: none;
+}
+
+/* Overlays -------------------------------------------------------------------- */
 .gx-breach {
   position: fixed;
   inset: 72px 12px auto;
   z-index: 12;
   max-width: 736px;
   margin: 0 auto;
-  padding: 12px 14px;
-  border: 2px solid var(--c-gx-heat);
-  border-radius: 10px;
-  background: var(--c-gx-felt);
-  box-shadow: 0 18px 48px var(--c-gx-shade);
+  padding: 14px 16px;
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--c-gx-heat);
+  border-radius: var(--ui-radius-lg);
+  box-shadow:
+    inset 4px 0 0 var(--c-gx-heat),
+    0 24px 60px var(--c-gx-shade),
+    0 0 40px var(--c-gx-heat-a18);
+  backdrop-filter: blur(16px) saturate(1.2);
   animation: gx-breach-in 0.32s steps(3, end) both;
   cursor: pointer;
 }
 
 .gx-breach-kicker {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--c-danger-81);
-  font: 900 11px/1.2 ui-monospace, monospace;
+  font: 800 11px/1.3 var(--font-sans);
   letter-spacing: 0.08em;
 }
 
@@ -1087,41 +1691,62 @@
 .gx-reveal-mutations ul,
 .gx-held-actions {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.gx-held-actions {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.gx-lost-tab p,
+.gx-held-elsewhere p {
+  margin: 0 0 10px;
+  color: var(--ui-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.gx-breach .ghost {
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+}
+
 .gx-mutation {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 2px 10px;
+  gap: 3px 10px;
   align-items: baseline;
 }
 
 .gx-mutation b {
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
   color: var(--c-paper);
   background: var(--c-gx-heat-deep);
-  font: 900 11px/1.3 ui-monospace, monospace;
+  border-radius: var(--radius-pill);
+  font: 800 10px/1.3 var(--font-sans);
+  letter-spacing: 0.06em;
 }
 
 .gx-mutation strong {
-  color: var(--c-paper);
+  color: var(--ui-text);
   font-size: 14px;
+  font-weight: 700;
 }
 
 .gx-mutation small {
   grid-column: 2;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
   font-size: 12px;
   line-height: 1.45;
 }
 
 .gx-mutation.mut-reboot b {
-  color: var(--c-ink-deep);
+  color: var(--ui-accent-ink);
   background: var(--c-acid);
 }
 
@@ -1132,22 +1757,25 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 8px;
+  gap: 10px;
   pointer-events: none;
   text-align: center;
 }
 
 .gx-slam strong {
-  font: 950 clamp(64px, 22vw, 160px) / 0.9 ui-monospace, monospace;
-  letter-spacing: -0.04em;
+  font: 900 clamp(64px, 22vw, 168px) / 0.9 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
 }
 
 .gx-slam span {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 14px;
   color: var(--c-paper);
-  font-weight: 900;
-  background: var(--c-gx-shade);
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  backdrop-filter: blur(10px);
 }
 
 .gx-slam-bust {
@@ -1196,63 +1824,140 @@
   opacity: 1;
 }
 
+.gauntlet-shell .debug-overlay {
+  top: auto;
+  bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+/* The reveal -----------------------------------------------------------------
+   A glass sheet over the table: the verdict big, then the ledger in rows. */
 .decision-reveal.gx-reveal {
-  color: var(--c-paper);
-  background: var(--c-gx-felt);
-  border: 2px solid var(--c-acid);
+  color: var(--ui-text);
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgb(217 255 98 / 0.1), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-lg);
+  box-shadow:
+    var(--ui-shadow-2),
+    0 0 60px rgb(217 255 98 / 0.08);
 }
 
 .decision-reveal.gx-reveal.is-bust {
-  border-color: var(--c-gx-heat);
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgb(255 56 56 / 0.18), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
+  border-color: var(--c-gx-heat-a55);
+}
+
+.gx-reveal.is-overdrive {
+  border-color: var(--c-gx-ember);
+  box-shadow:
+    0 20px 70px var(--c-gx-shade),
+    0 0 46px rgb(217 255 98 / 0.2);
 }
 
 .gx-reveal-verdict {
   display: grid;
   justify-items: center;
-  gap: 4px;
+  gap: 6px;
   text-align: center;
 }
 
 .gx-reveal-verdict h2 {
   margin: 0;
   color: var(--c-acid);
-  font: 950 clamp(48px, 14vw, 88px) / 0.95 ui-monospace, monospace;
+  font: 900 clamp(52px, 14vw, 92px) / 0.95 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+  text-shadow: 0 0 40px rgb(217 255 98 / 0.3);
 }
 
 .gx-reveal.is-bust .gx-reveal-verdict h2,
 .gx-reveal.is-bust .gx-reveal-verdict svg {
   color: var(--c-gx-heat);
+  text-shadow: 0 0 40px var(--c-gx-heat-a55);
 }
 
 .gx-reveal-verdict p {
   margin: 0;
-  color: var(--c-gx-text-dim);
-  font-weight: 800;
+  color: var(--ui-text-2);
+  font-weight: 600;
+}
+
+.gx-reveal-consequence {
+  display: grid;
+  gap: 0;
+  margin: 14px 0 10px;
+  padding: 4px 12px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+  box-shadow: inset 3px 0 0 var(--c-gx-heat);
+}
+
+.gx-reveal.is-cashed .gx-reveal-consequence {
+  box-shadow: inset 3px 0 0 var(--c-acid);
+}
+
+.gx-reveal-consequence article {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 0;
+}
+
+.gx-reveal-consequence article + article {
+  border-top: 1px solid var(--ui-line);
+}
+
+.gx-reveal-consequence span {
+  color: var(--c-danger-81);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gx-reveal.is-cashed .gx-reveal-consequence span {
+  color: var(--c-acid);
+}
+
+.gx-reveal-consequence b {
+  min-width: 0;
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .gx-reveal-pot {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   margin: 12px 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: var(--c-gx-felt-raised);
+  padding: 12px 14px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+  font-variant-numeric: tabular-nums;
   text-align: center;
-  font-family: ui-monospace, monospace;
 }
 
 .gx-reveal-pot p {
   margin: 0;
 }
 
+.gx-reveal-gain b,
+.gx-reveal-loss b {
+  font-size: 24px;
+  font-weight: 800;
+}
+
 .gx-reveal-gain b {
   color: var(--c-acid);
-  font-size: 22px;
 }
 
 .gx-reveal-loss b {
   color: var(--c-danger-81);
-  font-size: 22px;
 }
 
 .gx-reveal-bank {
@@ -1260,16 +1965,55 @@
   justify-content: center;
   align-items: center;
   gap: 4px;
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-3);
   font-size: 12px;
 }
 
 .gx-reveal-bank b {
-  color: var(--c-paper);
+  color: var(--ui-text);
+}
+
+.gx-reveal-overdrive {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, var(--ui-surface-1), rgb(217 255 98 / 0.08));
+  border: 1px solid var(--c-acid);
+  border-radius: var(--ui-radius-sm);
+  box-shadow:
+    inset 4px 0 0 var(--c-gx-ember),
+    0 0 24px rgb(217 255 98 / 0.16);
+}
+
+.gx-reveal-overdrive span {
+  color: var(--c-acid);
+  font: 800 11px/1 var(--font-sans);
+  letter-spacing: 0.1em;
+}
+
+.gx-reveal-overdrive b {
+  color: var(--ui-text);
+  font-size: 15px;
+}
+
+.gx-reveal-overdrive p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .gx-reveal .decision-reveal-choice {
-  color: var(--c-paper);
+  margin: 12px 0;
+  padding: 12px 14px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-left: 3px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-sm);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .gx-reveal .decision-reveal-stakes {
@@ -1280,238 +2024,169 @@
 
 .gx-reveal .decision-reveal-stakes article {
   display: grid;
-  gap: 3px;
-  padding: 8px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 8px;
+  gap: 4px;
+  min-height: 0;
+  padding: 10px 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
 }
 
 .gx-reveal .decision-reveal-stakes span {
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-3);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.gx-reveal .decision-reveal-stakes b {
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 650;
 }
 
 .gx-reveal-mutations {
   display: grid;
   gap: 8px;
   margin-top: 12px;
-  padding: 10px 12px;
-  border: 1px dashed var(--c-gx-heat);
-  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgb(255 56 56 / 0.06);
+  border: 1px dashed var(--c-gx-heat-a55);
+  border-radius: var(--ui-radius-sm);
 }
 
 .gx-reveal-mutations > span {
   color: var(--c-danger-81);
-  font: 900 12px/1 ui-monospace, monospace;
-}
-
-.gx-reveal .decision-reveal-beat p {
-  color: var(--c-gx-text-dim);
-}
-
-/* The header at the table: one row, and out from under the music controls
-   that float over the top-right corner. */
-.gauntlet-shell .game-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 4px 8px;
-  margin: 0 auto 8px;
-  padding: 0 0 6px;
-  border-bottom: 0;
-}
-
-.gauntlet-shell .game-header > div:first-child {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  padding-right: 196px;
-}
-
-.gauntlet-shell .game-header .case-chip {
-  min-height: 0;
-  padding: 2px 6px;
-  border: 1px solid var(--c-gx-line);
-  border-radius: 4px;
-  color: var(--c-acid);
-  background: transparent;
-  font: 900 10px/1.3 ui-monospace, monospace;
-  white-space: nowrap;
-}
-
-.gauntlet-shell .game-header h1 {
-  margin: 0;
-  overflow: hidden;
-  font-size: 16px;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gauntlet-shell .top-actions.compact-actions {
-  grid-column: 2;
-  grid-row: 2;
-  gap: 4px;
-}
-
-.gauntlet-shell .top-actions.compact-actions button {
-  min-height: 30px;
-  padding: 4px 7px;
-  color: var(--c-gx-text-dim);
-  background: var(--c-gx-felt-raised);
-  border: 1px solid var(--c-gx-line);
-}
-
-.gauntlet-shell .game-header .status-bar {
-  grid-column: 1;
-  grid-row: 2;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--c-gx-text-dim);
   font-size: 12px;
+  font-weight: 700;
 }
 
-.gauntlet-shell .game-header .status-bar b {
-  color: var(--c-paper);
-}
-
-.gauntlet-shell .status-bar-progress {
-  flex: 1;
-  height: 4px;
-  background: var(--c-gx-line);
-}
-
-.gauntlet-shell .status-bar-progress div {
-  background: var(--c-acid);
-}
-
-.gx-push span {
-  white-space: nowrap;
-}
-
-.gx-reveal .decision-reveal-choice {
-  margin: 10px 0;
-  padding: 10px 12px;
-  color: var(--c-paper);
-  background: var(--c-gx-felt-raised);
-  border-left: 3px solid var(--c-gx-line);
-  font-size: 15px;
-  font-weight: 850;
-}
-
-.gx-reveal .decision-reveal-stakes article {
-  color: var(--c-paper);
-  background: var(--c-gx-felt-raised);
-}
-
-.gx-reveal .decision-reveal-stakes b {
-  color: var(--c-paper);
+.gx-reveal-skip {
+  margin: 10px 0 0;
+  padding: 9px 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border-left: 3px solid var(--c-gx-heat);
+  border-radius: var(--ui-radius-xs);
   font-size: 13px;
 }
 
-.gx-reveal .decision-reveal-footer button {
-  color: var(--c-ink-deep);
-  background: var(--c-acid);
+.gx-reveal-skip b {
+  margin-right: 6px;
+  color: var(--c-danger-81);
+  font: 800 11px/1 var(--font-sans);
+  letter-spacing: 0.08em;
+}
+
+.gx-reveal .decision-reveal-beat p {
+  color: var(--ui-text-2);
 }
 
 .gx-reveal .decision-reveal-footer span {
-  color: var(--c-gx-text-dim);
+  color: var(--ui-text-2);
 }
 
-/* On a phone the header clears the music controls by width, not by height: it
-   used to push the whole table 40px down so the controls could float over an
-   empty band. The title takes the full row, and the case count and the three
-   icons share the second, both left of the controls. */
+.gx-reveal .decision-reveal-footer button {
+  min-height: 46px;
+  padding: 0 20px;
+  color: var(--ui-accent-ink);
+  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid));
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 10px 26px rgb(217 255 98 / 0.2);
+  font-weight: 800;
+}
+
+/* Phone ------------------------------------------------------------------------
+   Every pixel of height here is a card under the dock on some scene, so the
+   phone keeps the same objects and drops only padding, secondary copy and the
+   portrait on short screens. */
 @media (max-width: 480px) {
+  .game-shell {
+    padding-top: 8px;
+  }
+
+  .gauntlet-shell .game-header {
+    grid-template-areas:
+      "title title"
+      "status tools";
+    gap: 4px 8px;
+    margin-bottom: 8px;
+    padding-right: 96px;
+  }
+
   .gauntlet-shell .game-header .case-chip,
   .gauntlet-shell .status-bar-progress {
     display: none;
   }
 
-  .gauntlet-shell .game-header {
-    min-height: 50px;
-    padding-right: 104px;
-  }
-
   .gauntlet-shell .game-header > div:first-child {
     grid-column: 1 / -1;
-    padding-right: 0;
   }
 
   .gauntlet-shell .game-header h1 {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .gauntlet-shell .top-actions.compact-actions {
-    gap: 2px;
+    gap: 3px;
   }
 
   .gauntlet-shell .top-actions.compact-actions button {
+    width: 30px;
     min-height: 28px;
-    padding: 3px 6px;
+    border-radius: 8px;
   }
 
-  .gauntlet-shell .game-header .status-bar {
-    min-width: 0;
-    white-space: nowrap;
+  .gx-read,
+  .gx-table {
+    gap: 7px;
   }
 
-  .gx-actions button {
+  .gx-hud {
+    gap: 5px 10px;
+    padding: 7px 9px 6px;
+  }
+
+  .gx-pot {
+    gap: 2px 8px;
+  }
+
+  .gx-pot-math {
+    font-size: 13px;
+  }
+
+  .gx-chips,
+  .gx-mult,
+  .gx-groove {
+    padding: 3px 7px;
+  }
+
+  .gx-clock {
+    width: 44px;
+    height: 44px;
+  }
+
+  .gx-clock b {
     font-size: 16px;
   }
 
-  .gx-actions {
-    grid-template-columns: 1fr 0.78fr 1.06fr;
-    gap: 6px;
+  .gx-bank {
+    gap: 4px;
   }
 
-  .gx-focus span,
-  .gx-push span {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .gx-stat {
+    gap: 4px;
+    min-height: 22px;
+    padding: 1px 7px;
   }
 
-  .gauntlet-stage .gx-active-rules small {
+  .gx-stat svg {
     display: none;
   }
 
-  .gauntlet-stage .gx-active-rules p {
-    overflow: hidden;
-    padding-top: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  /* The rules panel on a phone: the rule names and their pressure bar on one
-     line, the way out on the next. The ACTIVE RULESET kicker is the panel. */
-  .gauntlet-stage .gx-active-rules {
-    grid-template-columns: minmax(0, 1fr) 56px;
-    gap: 3px 8px;
-    margin: 0;
-    padding: 5px 8px;
-  }
-
-  .gauntlet-stage .gx-active-rules > div > span {
-    display: none;
-  }
-
-  /* Relics sit beside the pot line as icons; the names are in their titles. */
   .gauntlet-stage .gx-bank .gx-relics {
-    flex-basis: auto;
-    order: 0;
-  }
-
-  .gauntlet-stage .gx-bank .gx-run-signal,
-  .gauntlet-stage .gx-bank .gx-overdrive {
-    order: 1;
+    gap: 3px;
   }
 
   .gauntlet-stage .gx-bank .gx-relic-chip {
@@ -1522,16 +2197,119 @@
     display: none;
   }
 
-  /* The rules panel says its rules once: the way out already starts with their
-     names, so on a phone it is that line and the pressure bar, side by side. */
-  .gauntlet-stage .gx-active-rules > div {
+  .gx-signals {
+    gap: 4px 10px;
+    padding-top: 5px;
+  }
+
+  .gx-overdrive,
+  .gx-focus-signal {
+    gap: 3px 5px;
+  }
+
+  .gx-focus-signal small {
+    display: none;
+  }
+
+  .gx-focus-modes {
+    gap: 2px;
+    padding: 2px;
+    border-radius: 11px;
+  }
+
+  .gx-focus-modes button {
+    min-height: 30px;
+    padding: 4px 7px 6px;
+    border-radius: 9px;
+  }
+
+  .gx-focus-modes span {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .gx-focus-modes em {
+    padding: 0 5px;
+    font-size: 9px;
+  }
+
+  .gx-focus-modes small {
+    display: none;
+  }
+
+  .gx-focus-modes i {
+    inset: auto 7px 2px;
+  }
+
+  .gx-gauge {
+    gap: 4px;
+  }
+
+  .gx-gauge-track {
+    height: 18px;
+  }
+
+  .gx-scene {
+    grid-template-columns: 34px 1fr;
+    gap: 8px;
+  }
+
+  .gx-portrait {
+    width: 34px;
+    height: 34px;
+    box-shadow: none;
+  }
+
+  .gx-question {
+    margin-top: 1px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .gx-situation {
+    gap: 4px;
+  }
+
+  .gx-situation-card {
+    gap: 2px;
+    padding: 5px 7px;
+    border-radius: 10px;
+  }
+
+  .gx-situation-card span {
+    font-size: 10px;
+  }
+
+  .gx-situation-card b {
+    font-size: 12px;
+  }
+
+  .gx-situation-card small {
+    font-size: 10px;
+  }
+
+  /* The rules panel on a phone: the way out and the pressure bar on one line.
+     The rule names are already the first words of the way out. */
+  .gauntlet-stage .gx-active-rules {
+    grid-template-columns: minmax(0, 1fr) 56px;
+    gap: 3px 8px;
+    padding: 5px 9px;
+  }
+
+  .gauntlet-stage .gx-active-rules > div,
+  .gauntlet-stage .gx-active-rules ul {
     display: none;
   }
 
   .gauntlet-stage .gx-active-rules p {
     grid-row: 1;
     grid-column: 1;
+    overflow: hidden;
+    padding-top: 0;
     border-top: 0;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .gauntlet-stage .gx-active-rules > i {
@@ -1541,50 +2319,52 @@
   }
 
   /* OVERCLOCK bills every card alike and the rules panel names it, so the
-     per-card badge is for a screen with room. The FRACTURE badge stays: it is
-     the one that tells cards apart. */
+     per-card badge is for a screen with room. FRACTURE stays: it tells cards
+     apart. */
   .gauntlet-stage .gx-card-stats .gx-card-overclock {
     display: none;
   }
 
-  .gauntlet-stage .gx-bank .gx-overdrive {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .gx-actions {
+    grid-template-columns: 1fr 0.78fr 1.12fr;
+    gap: 6px;
+    padding-inline: 10px;
   }
 
-  .gauntlet-stage .gx-bank .gx-focus-signal {
-    grid-template-columns: auto auto minmax(46px, 1fr);
-    min-width: 140px;
-  }
-
-  .gauntlet-stage .gx-bank .gx-focus-signal small {
-    display: none;
-  }
-
-  .gx-focus-modes {
-    gap: 4px;
-  }
-
-  .gx-focus-modes button {
-    min-height: 34px;
+  .gx-actions button {
+    min-height: 58px;
     padding: 5px 6px;
+    font-size: 16px;
+    border-radius: 14px;
   }
 
-  .gx-focus-modes small {
-    display: none;
+  .gx-actions button > svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .gauntlet-stage .gx-bank .gx-overdrive i {
-    display: none;
+  .gx-actions button small {
+    flex-basis: auto;
+    padding: 1px 6px;
+    font-size: 10px;
   }
 
-  /* At the table the music controls are icons; their labels carry the state. */
-  .gauntlet-shell .music-toggle span,
-  .gauntlet-shell .music-volume-toggle span {
-    display: none;
+  .gx-push > span,
+  .gx-focus > span {
+    flex: 0 1 auto;
+  }
+
+  .gx-push small,
+  .gx-focus small {
+    order: 3;
+  }
+
+  .gx-reveal-consequence article {
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+
+  .gx-reveal-consequence b {
+    font-size: 12px;
   }
 }
 
@@ -1601,49 +2381,84 @@
   .gx-question {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 14px;
+    font-size: 13px;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
 
   .gx-pot-value {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   .gauntlet-stage .gx-situation-card small {
     display: none;
   }
+
+  .gauntlet-shell .game-header {
+    margin-bottom: 6px;
+  }
+
+  .gx-read,
+  .gx-table {
+    gap: 6px;
+  }
+
+  .gx-hud {
+    padding: 6px 8px 5px;
+  }
+
+  .gx-focus-modes button {
+    min-height: 28px;
+    padding: 3px 7px 5px;
+  }
+
+  .gx-actions {
+    padding-block: 7px calc(7px + env(safe-area-inset-bottom));
+  }
+
+  .gx-actions button {
+    min-height: 52px;
+  }
 }
 
-.gx-read {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.gx-card-stats .gx-card-rule-tax,
-.gx-card-stats .gx-card-overclock {
-  padding: 2px 5px;
-  font-style: normal;
-}
-
-/* Every scene's hand above the action bar. A card is as tall as its words, not
-   104px; the odd card out of a two-column hand takes its row as one line; and a
-   wide screen deals three across, so five cards are two rows, not three. */
+/* Every scene's hand above the dock. A card is as tall as its words, not 104px;
+   the odd card out of a two-column hand takes its row as one line. */
 @media (max-width: 719px) {
   .gauntlet-stage .gx-card {
     gap: 6px;
     min-height: 0;
     padding: 8px 9px;
+    border-radius: 13px;
+  }
+
+  .gx-card-key {
+    top: 6px;
+    right: 6px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 5px;
+    font-size: 10px;
   }
 
   .gx-card-label {
     display: -webkit-box;
     overflow: hidden;
+    padding-right: 20px;
     font-size: 13px;
     line-height: 1.3;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
+  }
+
+  .gx-card-chips {
+    padding: 3px 7px;
+    font-size: 12px;
+  }
+
+  .gx-card-burn {
+    padding: 2px 7px;
+    font-size: 11px;
   }
 
   .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) {
@@ -1657,7 +2472,7 @@
   }
 
   .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) .gx-card-stats {
-    padding-right: 14px;
+    padding-right: 22px;
   }
 
   /* The staked card's detail is two lines at most; the rest is one tap away in
@@ -1668,45 +2483,325 @@
   }
 }
 
-/* A wide screen is two panes: what to read on the left, the hand on the right.
-   A 760px column on a 1366x768 laptop put a five-card hand under the action bar
-   on every board that carried a rule. */
-@media (min-width: 1100px) {
-  .gauntlet-stage,
-  .game-shell .game-header {
-    max-width: 1180px;
+@media (min-width: 720px) {
+  .game-shell {
+    display: flex;
+    flex-direction: column;
+    padding-top: 18px;
   }
 
-  .gx-table {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    align-items: start;
-    column-gap: 20px;
+  .gauntlet-shell .game-header {
+    width: 100%;
   }
 
-  .gx-table > .gx-read {
-    grid-row: 1 / span 2;
+  .gauntlet-stage {
+    flex: 1 1 auto;
+    display: grid;
+    align-content: center;
+    width: 100%;
   }
 
-  .gx-table > .gx-hand,
-  .gx-table > .gx-wild {
-    grid-column: 2;
+  .gauntlet-stage .gx-card {
+    min-height: 96px;
   }
 
   .gx-hand.hand-3,
   .gx-hand.hand-5,
   .gx-hand.hand-6 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gx-pot-value {
+    font-size: 48px;
+  }
+
+  .gx-clock {
+    width: 58px;
+    height: 58px;
+  }
+
+  .gx-clock b {
+    font-size: 21px;
+  }
+}
+
+/* A wide screen is two panes: what to read on the left, the hand on the right,
+   centred in the height between the header and a floating dock. Cards take a
+   share of that height so the hand reads as a spread of cards rather than a
+   list with a void under it. */
+@media (min-width: 1100px) {
+  .game-shell {
+    --gx-maxw: 1240px;
+    padding: 18px 28px calc(118px + env(safe-area-inset-bottom));
+  }
+
+  .gx-table {
+    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    column-gap: 28px;
+    row-gap: 10px;
+  }
+
+  .gx-table > .gx-read {
+    grid-row: 1 / -1;
+    gap: 10px;
+  }
+
+  .gx-table > .gx-hand-head,
+  .gx-table > .gx-hand,
+  .gx-table > .gx-wild {
+    grid-column: 2;
+  }
+
+  .gx-hand-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-height: 26px;
+    padding: 0 2px;
+    color: var(--ui-text-2);
+  }
+
+  .gx-hand-head > span {
+    color: var(--c-acid);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+
+  .gx-hand-head > b {
+    color: var(--ui-text);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .gx-hand-head small {
+    margin-left: auto;
+    font-size: 12px;
+  }
+
+  .gx-hand-head kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    color: var(--ui-text-2);
+    background: var(--ui-surface-2);
+    border: 1px solid var(--ui-line-strong);
+    border-radius: 6px;
+    box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+    font: 700 10px/1 var(--font-sans);
+  }
+
+  .gx-hand {
+    gap: 12px;
+    grid-auto-rows: clamp(118px, calc((100dvh - 330px) / 2), 232px);
+  }
+
+  .gx-hand.hand-3,
+  .gx-hand.hand-5,
+  .gx-hand.hand-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gauntlet-stage .gx-card {
+    gap: 10px;
+    min-height: 0;
+    padding: 16px 16px 14px;
+    border-radius: var(--ui-radius-lg);
+  }
+
+  .gx-card-key {
+    top: 12px;
+    right: 12px;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    font-size: 12px;
+  }
+
+  .gx-card-label {
+    padding-right: 32px;
+    font-size: 16px;
+    line-height: 1.42;
+  }
+
+  .gx-card-chips {
+    padding: 5px 10px;
+    font-size: 15px;
+  }
+
+  .gx-card-burn {
+    padding: 4px 9px;
+    font-size: 12px;
+  }
+
+  .gx-hud {
+    gap: 8px 16px;
+    padding: 14px 16px 12px;
+    border-radius: var(--ui-radius-lg);
+  }
+
+  .gx-pot-value {
+    font-size: 60px;
+  }
+
+  .gx-clock {
+    width: 72px;
+    height: 72px;
+  }
+
+  .gx-clock b {
+    font-size: 25px;
+  }
+
+  .gx-signals {
+    padding-top: 10px;
+  }
+
+  .gx-gauge-track {
+    height: 30px;
+  }
+
+  .gx-scene {
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
+    border: 1px solid var(--ui-line);
+    border-radius: var(--ui-radius-md);
+  }
+
+  .gx-portrait {
+    width: 48px;
+    height: 48px;
+  }
+
+  .gx-question {
+    font-size: 17px;
+  }
+
+  .gx-situation-card {
+    padding: 10px 12px;
+  }
+
+  .gx-actions {
+    inset: auto 0 14px;
+    grid-template-columns: minmax(0, 0.5fr) minmax(0, 0.44fr) minmax(0, 1.06fr);
+    gap: 10px;
+    width: calc(100% - 56px);
+    max-width: var(--gx-maxw);
+    padding: 10px;
+    background: var(--ui-glass-strong);
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--ui-radius-xl);
+    box-shadow: var(--ui-shadow-2);
+    backdrop-filter: blur(18px) saturate(1.3);
+  }
+
+  .gx-actions button {
+    min-height: 62px;
+    border-radius: var(--ui-radius-lg);
+    font-size: 18px;
+  }
+
+  .gauntlet-shell .debug-overlay {
+    bottom: calc(110px + env(safe-area-inset-bottom));
+  }
+}
+
+/* A laptop's height: the read pane gives up its secondary lines so all of it
+   stays above the dock. */
+@media (min-width: 1100px) and (max-height: 820px) {
+  .game-shell {
+    padding-top: 12px;
+  }
+
+  .gx-table > .gx-read {
+    gap: 8px;
+  }
+
+  .gx-hud {
+    gap: 6px 14px;
+    padding: 10px 14px 9px;
+  }
+
+  .gx-pot-value {
+    font-size: 46px;
+  }
+
+  .gx-clock {
+    width: 58px;
+    height: 58px;
+  }
+
+  .gx-clock b {
+    font-size: 21px;
+  }
+
+  .gx-signals {
+    padding-top: 7px;
+  }
+
+  .gauntlet-stage .gx-active-rules {
+    padding: 6px 11px;
+  }
+
+  .gauntlet-stage .gx-active-rules small,
+  .gauntlet-stage .gx-situation-card small,
+  .gx-focus-modes small {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-active-rules p {
+    padding-top: 4px;
+  }
+
+  .gx-gauge-track {
+    height: 22px;
+  }
+
+  .gx-scene {
+    grid-template-columns: 40px 1fr;
+    padding: 8px 12px;
+  }
+
+  .gx-portrait {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gx-question {
+    font-size: 16px;
+  }
+
+  .gx-situation-card {
+    padding: 7px 11px;
+  }
+
+  .gx-focus-modes button {
+    min-height: 34px;
+  }
+
+  .gx-hand {
+    gap: 10px;
+  }
+
+  .gx-actions button {
+    min-height: 56px;
   }
 }
 
 @keyframes gx-breach-in {
   0% {
     opacity: 0;
-    transform: translateX(-12px) skewX(-8deg);
+    transform: translateY(-10px) scale(0.98);
   }
   60% {
     opacity: 1;
-    transform: translateX(6px) skewX(4deg);
+    transform: translateY(3px);
   }
   100% {
     transform: none;
@@ -1747,22 +2842,24 @@
   position: absolute;
   inset: -4px;
   border: 3px solid var(--c-gx-beat);
-  border-radius: 15px;
+  border-radius: calc(var(--ui-radius-md) + 4px);
   pointer-events: none;
   opacity: calc(var(--gx-beat-live, 0) * (0.15 + var(--gx-beat-phase, 0) * 0.85));
-  transform: scale(calc(1.4 - var(--gx-beat-phase, 1) * 0.4));
+  /* 1.4 reached 60px past a wide desktop button and out of the dock; the
+     closing motion reads the same from 1.18 and stays on the table. */
+  transform: scale(calc(1.18 - var(--gx-beat-phase, 1) * 0.18));
   will-change: transform, opacity;
 }
 
-/* Over the button, not above it: the stake strip is fixed just above the action
-   bar and a call-out rising past the button's top would slide under it. */
+/* Over the button, not above it: a call-out rising past the button's top would
+   slide under the hand. */
 .gx-grade {
   position: absolute;
   top: 50%;
   left: 50%;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font: 950 15px/1.1 ui-monospace, monospace;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font: 900 15px/1.1 var(--font-sans);
   font-style: normal;
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -1778,28 +2875,20 @@
 }
 
 .gx-grade-good {
-  border: 1px solid var(--c-gx-beat);
   color: var(--c-gx-beat);
   background: var(--c-gx-felt);
+  border: 1px solid var(--c-gx-beat);
 }
 
 .gx-grade-miss {
-  border: 1px solid var(--c-gx-heat);
   color: var(--c-paper);
   background: var(--c-gx-heat-deep);
-}
-
-.gx-groove {
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--c-gx-felt);
-  background: var(--c-gx-beat);
-  font: 900 12px/1.2 ui-monospace, monospace;
+  border: 1px solid var(--c-gx-heat);
 }
 
 .gx-combo {
   position: absolute;
-  top: -4px;
+  top: -2px;
   right: 0;
   display: grid;
   justify-items: end;
@@ -1812,13 +2901,13 @@
 }
 
 .gx-combo b {
-  font: 950 30px/0.9 ui-monospace, monospace;
+  font: 900 28px/0.9 var(--font-sans);
   font-variant-numeric: tabular-nums;
   text-shadow: 0 0 calc(6px + var(--gx-combo, 0) * 2px) var(--c-gx-beat-a45);
 }
 
 .gx-combo small {
-  font: 900 10px/1.2 ui-monospace, monospace;
+  font: 800 10px/1.2 var(--font-sans);
   letter-spacing: 0.14em;
 }
 
@@ -1915,22 +3004,6 @@
   }
 }
 
-@media (min-width: 720px) {
-  .game-shell {
-    padding-top: 18px;
-  }
-
-  .gauntlet-stage .gx-card {
-    min-height: 92px;
-  }
-
-  .gx-hand.hand-3,
-  .gx-hand.hand-5,
-  .gx-hand.hand-6 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gx-table {
     transform: none;
@@ -1949,7 +3022,9 @@
   .gx-pot-value,
   .gx-bpm svg,
   .gx-beat-ring,
-  .gx-focus-reticle {
+  .gx-focus-reticle,
+  .gauntlet-stage .gx-card,
+  .gauntlet-stage .gx-card.selected {
     transform: none;
   }
 

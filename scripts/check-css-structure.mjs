@@ -41,11 +41,13 @@ const budgets = {
   // Selectors that still live in two files. Every one of these is a shared
   // prelude whose other selectors belong elsewhere, so splitting it would copy
   // declarations rather than remove them.
-  selectorsWithTwoHomes: 9,
+  // 9 -> 0 on 2026-09-15: the glass pass gave every leftover one home.
+  selectorsWithTwoHomes: 0,
   // A selector overridden later in the same file is ordinary CSS and readable in
   // one pass -- unlike the same override hiding in another file -- so this budget
   // is deliberately looser. It should still only go down.
-  repeatedInOneFile: 50,
+  // 50 -> 23 on 2026-09-15, ratcheted to what the glass pass left.
+  repeatedInOneFile: 23,
 };
 
 const fileBudgets = {
@@ -56,13 +58,20 @@ const fileBudgets = {
   // late-overrides block at the foot of the file, and every one of those pairs
   // collapsed into one rule. The line count went up, the number of places you
   // have to read to know what the intro computes to went down.
-  "base-intro-ranking.css": { lines: 2000, bytes: 47400 },
+  // 2000 / 47400 -> 2460 / 58400 on 2026-09-15 for the night-shift glass
+  // pass: the full-bleed hero with its stat row, the drawer grid, the roadmap
+  // card grid and phone rail, and a ranking screen with its own podium rows.
+  // The dossier's "square everything" reset went; rounded surfaces now come
+  // from the shared --ui-* tokens rather than per-rule literals.
+  "base-intro-ranking.css": { lines: 2460, bytes: 58400 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
   // out of four of these files. Nothing changed on screen; the sheets stopped
   // describing surfaces that were deleted, in some cases two refactors ago.
-  "extensions.css": { lines: 1410, bytes: 29200 },
+  // 1410 / 29200 -> 1430 / 29900 on 2026-09-15: the ending sequence's frame,
+  // beat card and witness cards moved onto the glass surfaces.
+  "extensions.css": { lines: 1430, bytes: 29900 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -89,12 +98,24 @@ const fileBudgets = {
   // segmented controls, active-mode glow, and mobile compaction.
   // 1916 / 37752 -> 1965 / 38879 for stance mastery: the season-level LOCK
   // progress rail in the gauntlet bank, with mode-colored bars and compact text.
-  "play.css": { lines: 1965, bytes: 38879 },
-  "recovery.css": { lines: 266, bytes: 5754 },
+  // 1965 / 38879 -> 3045 / 62300 on 2026-09-15 for the glass table: the
+  // drained clock ring, the ticked gauge tube, tactile cards with key hints and
+  // sealed/fractured/wild states, the mastery rail folded into the segmented
+  // stance control, the floating dock, the vertically composed wide table, and
+  // the five minified .gx-* lines that used to sit after app.css's imports and
+  // silently outrank this file. The phone table still fits all 149 scenes.
+  "play.css": { lines: 3045, bytes: 62300 },
+  "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
-  "relics.css": { lines: 460, bytes: 9400 },
-  "responsive.css": { lines: 260, bytes: 5700 },
-  "result.css": { lines: 1225, bytes: 25700 },
+  // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
+  "relics.css": { lines: 465, bytes: 9510 },
+  "responsive.css": { lines: 225, bytes: 5100 },
+  // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
+  // mixing white report cards into a dark page. The hero card and rank ring, the
+  // tool dock, the lead row, the metric tile grid, and dark surfaces for about
+  // twenty archive panels that each used to paint their own light ground; the
+  // table ledger's rules also moved here from the foot of app.css.
+  "result.css": { lines: 1750, bytes: 43100 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

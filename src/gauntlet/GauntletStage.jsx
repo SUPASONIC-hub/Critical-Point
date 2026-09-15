@@ -57,6 +57,12 @@ const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
 const GRADE_RANK = { miss: 0, good: 1, perfect: 2 };
 const monotonicNow = () => globalThis.performance?.now?.() ?? 0;
+// The stance profiles are written for the engine; the table speaks Korean.
+const FOCUS_MODE_COPY = {
+  strike: "판돈 배율 크게 · 헛박자 가혹",
+  steady: "보상 작게 · 락마다 테이블 냉각",
+  expose: "카드의 자원 효과 증폭",
+};
 
 /**
  * When the player pressed, not when the handler got to it. An input event's
@@ -195,7 +201,6 @@ export function GauntletStage({
   const focusModeProfile = getFocusModeProfile(win.focusMode);
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const activeStanceCount = stanceMastery[win.focusMode] ?? 0;
-  const activeStanceProgress = Math.min(100, (activeStanceCount / STANCE_MASTERY_GOAL) * 100);
   const livePot = Math.round(selectedChips * multiplier * grooveBonus * focusBonus.pot);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
@@ -553,14 +558,18 @@ export function GauntletStage({
             )}
           </div>
           <div className="gx-bank">
-            <span className={run.runPot > 0 ? "gx-at-risk" : ""}>
-              <Flame size={13} aria-hidden="true" /> 판돈 <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatNumber(bustKeeps) : formatNumber(run.runPot)}</b>
+            <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
+              <Flame size={13} aria-hidden="true" />
+              <small>판돈</small>
+              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatNumber(bustKeeps) : formatNumber(run.runPot)}</b>
             </span>
-            <span>
-              <Vault size={13} aria-hidden="true" /> 금고 <b>{formatNumber(run.vault)}</b>
+            <span className="gx-stat">
+              <Vault size={13} aria-hidden="true" />
+              <small>금고</small>
+              <b>{formatNumber(run.vault)}</b>
             </span>
-            <span className="gx-run-signal" data-testid="gauntlet-run-signal">
-              런 <b>연승 {run.streak}</b> · BUST <b>{run.busts}</b> · 최고 <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+            <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
+              <small>연승</small> <b>{run.streak}</b> <small>BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             {relics.length > 0 && (
@@ -577,23 +586,25 @@ export function GauntletStage({
                 ))}
               </span>
             )}
-            <span className="gx-overdrive" data-testid="gauntlet-overdrive">
-              <b>{overdrive.label}</b> {overdrive.text}
+          </div>
+          <div className="gx-signals">
+            <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
+              <b>{overdrive.label}</b> <span>{overdrive.text}</span>
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
             </span>
             <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b>{focusBonus.label} {Math.round(win.focus)}</b>
-              <small>{formatMultiplier(focusBonus.pot)} pot / {formatMultiplier(focusBonus.resource)} read</small>
+              <small>판돈 {formatMultiplier(focusBonus.pot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
-            <span className={`gx-stance-mastery mode-${win.focusMode}`} data-testid="gauntlet-stance-mastery">
-              <b>{focusModeProfile.label} MASTERY {activeStanceCount}/{STANCE_MASTERY_GOAL}</b>
-              <small>{stanceMastery.mastered.length ? `${stanceMastery.mastered.length} mastered` : "charged cashes build the season"}</small>
-              <i aria-hidden="true"><em style={{ width: `${activeStanceProgress}%` }} /></i>
-            </span>
           </div>
-          <div className={`gx-clock${remaining <= 10 ? " is-late" : ""}`} role="timer" aria-label={`남은 시간 ${Math.ceil(remaining)}초`}>
+          <div
+            className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
+            role="timer"
+            aria-label={`남은 시간 ${Math.ceil(remaining)}초`}
+            style={{ "--gx-clock": Math.max(0, Math.min(1, remaining / schema.seconds)) }}
+          >
             <b>{Math.ceil(remaining)}</b>
             <i style={{ width: `${(remaining / schema.seconds) * 100}%` }} />
           </div>
@@ -704,24 +715,41 @@ export function GauntletStage({
             </small>
           </article>
         </section>
-        <div className="gx-focus-modes" role="group" aria-label="Focus mode">
+        <div
+          className={`gx-focus-modes gx-stance-mastery mode-${win.focusMode}`}
+          role="group"
+          aria-label={`Focus mode · ${focusModeProfile.label} mastery ${activeStanceCount}/${STANCE_MASTERY_GOAL}`}
+          data-testid="gauntlet-stance-mastery"
+        >
           {FOCUS_MODES.map((mode) => {
             const profile = getFocusModeProfile(mode);
             const active = win.focusMode === mode;
+            const count = stanceMastery[mode] ?? 0;
+            const mastered = stanceMastery.mastered.includes(mode);
             return (
               <button
                 key={mode}
                 type="button"
-                className={active ? "active" : ""}
+                className={`mode-${mode}${active ? " active" : ""}${mastered ? " is-mastered" : ""}`}
                 aria-pressed={active}
                 onClick={() => setFocusMode(mode)}
               >
                 <span>{profile.label}</span>
-                <small>{profile.text}</small>
+                <em title="시즌 숙련: 차지한 채로 확정한 판">{mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}</em>
+                <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
+                <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
               </button>
             );
           })}
         </div>
+        </div>
+
+        <div className="gx-hand-head" aria-hidden="true">
+          <span>HAND</span>
+          <b>카드 {handSize}장</b>
+          <small>
+            <kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Enter</kbd> 확정
+          </small>
         </div>
 
         <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
@@ -867,11 +895,11 @@ export function GauntletStage({
           <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
           <span>LOCK</span>
-          <small>{focusModeProfile.label} {Math.round(win.focus)}/{FOCUS_MAX}</small>
+          <small>{focusModeProfile.label} {Math.round(win.focus)}</small>
           {win.lastFocusGrade && (
             <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">
               {FOCUS_COPY[win.lastFocusGrade]}
-              {win.focusCombo > 1 && win.lastFocusGrade !== "miss" ? ` 횞${win.focusCombo}` : ""}
+              {win.focusCombo > 1 && win.lastFocusGrade !== "miss" ? ` ×${win.focusCombo}` : ""}
             </em>
           )}
         </button>
