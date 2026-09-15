@@ -409,6 +409,39 @@ export function getFocusBonus(focus, mode = "strike") {
   };
 }
 
+export const STANCE_MASTERY_GOAL = 3;
+export const EMPTY_STANCE_MASTERY = Object.freeze({ strike: 0, steady: 0, expose: 0 });
+
+export function normalizeStanceMastery(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return FOCUS_MODES.reduce((mastery, mode) => {
+    mastery[mode] = clamp(Math.trunc(Number(source[mode]) || 0), 0, 99);
+    return mastery;
+  }, {});
+}
+
+function earnedStance(mode, charge, hits, outcome) {
+  return outcome === "cash" && FOCUS_MODES.includes(mode) && charge >= 70 && hits > 0;
+}
+
+export function advanceStanceMastery(mastery, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
+  const next = normalizeStanceMastery(mastery);
+  const mode = normalizeFocusMode(focusMode);
+  if (earnedStance(mode, focusCharge, focusHits, outcome)) next[mode] += 1;
+  return next;
+}
+
+export function getStanceMasteryProfile(mastery) {
+  const state = normalizeStanceMastery(mastery);
+  const leader = FOCUS_MODES.reduce((best, mode) => (state[mode] > state[best] ? mode : best), "strike");
+  return {
+    ...state,
+    leader,
+    total: FOCUS_MODES.reduce((sum, mode) => sum + state[mode], 0),
+    mastered: FOCUS_MODES.filter((mode) => state[mode] >= STANCE_MASTERY_GOAL),
+  };
+}
+
 /* --------------------------------------------------------------- window */
 
 export const TELL_ERROR = 18;
@@ -580,6 +613,7 @@ export const RUN_INITIAL_STATE = Object.freeze({
   focusHits: 0,
   focusPerfects: 0,
   focusMisses: 0,
+  stanceMastery: EMPTY_STANCE_MASTERY,
   runGroove: 0,
   grooveVault: 0,
   // The relics this season carries, the three a closed case is offering, and
@@ -611,6 +645,7 @@ export function normalizeRunState(value) {
   run.focusHits = Math.max(0, Math.trunc(run.focusHits));
   run.focusPerfects = Math.max(0, Math.trunc(run.focusPerfects));
   run.focusMisses = Math.max(0, Math.trunc(run.focusMisses));
+  run.stanceMastery = normalizeStanceMastery(source.stanceMastery);
   run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
   run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
   run.relics = normalizeRelicIds(source.relics);
@@ -625,7 +660,7 @@ export function normalizeRunState(value) {
 
 export function serializeRunState(value) {
   const run = normalizeRunState(value);
-  return { ...run, schema: { ...run.schema, mutations: [...run.schema.mutations] } };
+  return { ...run, stanceMastery: normalizeStanceMastery(run.stanceMastery), schema: { ...run.schema, mutations: [...run.schema.mutations] } };
 }
 
 /**
@@ -688,6 +723,21 @@ export const MUTATIONS = Object.freeze({
     label: "EXPOSED HAND",
     title: "The next board cannot hide the hand.",
     text: "A charged EXPOSE lock strips face-down and cold-feet seals from the next board.",
+  },
+  strikeMastery: {
+    label: "STRIKE MASTERY",
+    title: "Your season has learned to hit first.",
+    text: "Repeated charged STRIKE locks permanently thicken chips, with a small push-step tax.",
+  },
+  steadyMastery: {
+    label: "STEADY MASTERY",
+    title: "Your season has learned to hold the line.",
+    text: "Repeated charged STEADY locks cool every new board and buy a little more clock.",
+  },
+  exposeMastery: {
+    label: "EXPOSE MASTERY",
+    title: "Your season has learned to read the table.",
+    text: "Repeated charged EXPOSE locks weaken seals and eventually stop hidden boards from staying hidden.",
   },
 });
 
@@ -768,7 +818,7 @@ export function openCaseRun(run) {
 export const FRACTURE_MIN_BURN = 10;
 
 function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
-  if (outcome !== "cash" || focusCharge < 70 || focusHits <= 0) return schema;
+  if (!earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;
   const next = { ...schema, mutations: [...schema.mutations] };
   const addMutation = (id) => {
     if (!next.mutations.includes(id)) next.mutations.push(id);
@@ -795,8 +845,38 @@ function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 
   return next;
 }
 
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0 }) {
-  if (caseClosed) return applyRelics({ ...BASE_SCHEMA, mutations: ["reboot"] }, relics);
+function applyStanceMastery(schema, mastery = EMPTY_STANCE_MASTERY) {
+  const profile = getStanceMasteryProfile(mastery);
+  const next = { ...schema, mutations: [...schema.mutations] };
+  const addMutation = (id) => {
+    if (!next.mutations.includes(id)) next.mutations.push(id);
+  };
+  if (profile.strike >= STANCE_MASTERY_GOAL) {
+    next.chipsScale *= 1 + Math.min(0.18, profile.strike * 0.03);
+    next.stepMin += 1;
+    next.stepMax += 1;
+    addMutation("strikeMastery");
+  }
+  if (profile.steady >= STANCE_MASTERY_GOAL) {
+    next.startGauge = Math.max(0, next.startGauge - Math.min(12, profile.steady * 2));
+    next.seconds += Math.min(6, profile.steady);
+    next.wallMin += 1;
+    next.wallMax += 1;
+    addMutation("steadyMastery");
+  }
+  if (profile.expose >= STANCE_MASTERY_GOAL) {
+    next.sealBreak = Math.max(0, next.sealBreak - Math.min(8, profile.expose));
+    if (profile.expose >= STANCE_MASTERY_GOAL + 2) {
+      next.faceDown = false;
+      next.sealHighest = false;
+    }
+    addMutation("exposeMastery");
+  }
+  return next;
+}
+
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY }) {
+  if (caseClosed) return applyRelics(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery), relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     schema.faceDown = true;
@@ -832,7 +912,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyRelics(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), relics);
+  return applyRelics(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), stanceMastery), relics);
 }
 
 /**
@@ -853,6 +933,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
+  const stanceMastery = advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus * focusBonus.pot) : 0;
   const groovePot = pot - basePot;
@@ -881,6 +962,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     focusMode,
     focusCharge,
     focusHits,
+    stanceMastery,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -934,6 +1016,8 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       potMultiplier: focusBonus.pot,
       tier: focusBonus.tier,
       jammed: window?.jammed === true,
+      stanceEarned: earnedStance(focusMode, focusCharge, focusHits, outcome),
+      masteryCount: stanceMastery[focusMode],
     },
   };
   const nextRun = normalizeRunState({
@@ -954,6 +1038,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     focusHits: current.focusHits + verdict.focus.hits,
     focusPerfects: current.focusPerfects + verdict.focus.perfects,
     focusMisses: current.focusMisses + verdict.focus.misses,
+    stanceMastery,
     runGroove: caseClosed ? 0 : runGrooveAfter,
     grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
     relics,
@@ -1048,6 +1133,11 @@ export function carryTableRecordIntoRestore(restored, current) {
       focusHits: Math.max(restoredRun.focusHits, currentRun.focusHits),
       focusPerfects: Math.max(restoredRun.focusPerfects, currentRun.focusPerfects),
       focusMisses: Math.max(restoredRun.focusMisses, currentRun.focusMisses),
+      stanceMastery: normalizeStanceMastery({
+        strike: Math.max(restoredRun.stanceMastery.strike, currentRun.stanceMastery.strike),
+        steady: Math.max(restoredRun.stanceMastery.steady, currentRun.stanceMastery.steady),
+        expose: Math.max(restoredRun.stanceMastery.expose, currentRun.stanceMastery.expose),
+      }),
       // Relics are table record too: a rollback keeps what was drafted since and
       // cannot hand an INSURANCE payout back.
       relics: [...new Set([...restoredRun.relics, ...currentRun.relics])],
@@ -1090,6 +1180,7 @@ export function createGauntletLedger(log = []) {
   let focusMisses = 0;
   let bestFocusCombo = 0;
   const focusModes = { strike: 0, steady: 0, expose: 0 };
+  const stanceMastery = normalizeStanceMastery();
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
@@ -1115,6 +1206,9 @@ export function createGauntletLedger(log = []) {
     bestFocusCombo = Math.max(bestFocusCombo, Number(focus.maxCombo) || 0);
     const mode = normalizeFocusMode(focus.mode);
     focusModes[mode] += Number(focus.hits) || Number(focus.misses) || 0;
+    if (earnedStance(mode, Number(focus.charge) || 0, Number(focus.hits) || 0, threshold.busted ? "bust" : "cash")) {
+      stanceMastery[mode] += 1;
+    }
   }
   return {
     busts,
@@ -1133,6 +1227,7 @@ export function createGauntletLedger(log = []) {
     focusMisses,
     bestFocusCombo,
     focusModes,
+    stanceMastery,
   };
 }
 
@@ -1154,6 +1249,7 @@ export function createRunSummary(run) {
     focusHits: state.focusHits,
     focusPerfects: state.focusPerfects,
     focusMisses: state.focusMisses,
+    stanceMastery: normalizeStanceMastery(state.stanceMastery),
     grooveVault: state.grooveVault,
     relics: [...state.relics],
     mutations: [...state.schema.mutations],

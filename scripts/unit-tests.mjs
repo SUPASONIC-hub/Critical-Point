@@ -750,6 +750,7 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     focusMisses: 0,
     bestFocusCombo: 0,
     focusModes: { strike: 0, steady: 0, expose: 0 },
+    stanceMastery: { strike: 0, steady: 0, expose: 0 },
   });
 });
 
@@ -763,6 +764,7 @@ test("the table ledger rebuilds focus locks from the log", () => {
   assert.equal(ledger.focusMisses, 1);
   assert.equal(ledger.bestFocusCombo, 2);
   assert.deepEqual(ledger.focusModes, { strike: 0, steady: 1, expose: 2 });
+  assert.deepEqual(ledger.stanceMastery, { strike: 0, steady: 0, expose: 0 });
 });
 
 test("focus modes change the lock outcome and steady cools the gauge", () => {
@@ -802,6 +804,32 @@ test("charged focus modes carry their stance into the next board", () => {
   assert.ok(expose.mutations.includes("exposedHand"));
   assert.equal(expose.sealHighest, false);
   assert.ok(!expose.mutations.includes("coldFeet"));
+});
+
+test("stance mastery survives saves and reshapes future boards", () => {
+  const rich = card("rich", { capital: 30, trust: -5 });
+  let run = RUN_INITIAL_STATE;
+  for (let index = 0; index < 3; index += 1) {
+    run = resolveWindow({
+      run,
+      window: { status: "cashed", gauge: 35, wall: 80, pushes: 2, focus: 80, focusMode: "strike", focusHits: 2 },
+      card: rich,
+    }).nextRun;
+  }
+
+  assert.deepEqual(run.stanceMastery, { strike: 3, steady: 0, expose: 0 });
+  assert.ok(run.schema.mutations.includes("strikeMastery"));
+  assert.ok(run.schema.chipsScale > BASE_SCHEMA.chipsScale * 1.25, "mastery stacks on top of the active stance carry");
+
+  const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(run))));
+  assert.deepEqual(roundTrip.stanceMastery, run.stanceMastery);
+
+  const ledger = createGauntletLedger([
+    { threshold: { busted: false, focus: { mode: "strike", charge: 80, hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
+    { threshold: { busted: false, focus: { mode: "steady", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
+    { threshold: { busted: true, focus: { mode: "expose", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
+  ]);
+  assert.deepEqual(ledger.stanceMastery, { strike: 1, steady: 1, expose: 0 }, "only charged cashes build season mastery");
 });
 
 /* ---------------------------------------------------------------- tempo */

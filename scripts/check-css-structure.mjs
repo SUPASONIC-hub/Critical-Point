@@ -87,7 +87,9 @@ const fileBudgets = {
   // reticle handling.
   // 1858 / 36660 -> 1916 / 37752 for focus modes: STRIKE / STEADY / EXPOSE
   // segmented controls, active-mode glow, and mobile compaction.
-  "play.css": { lines: 1916, bytes: 37752 },
+  // 1916 / 37752 -> 1965 / 38879 for stance mastery: the season-level LOCK
+  // progress rail in the gauntlet bank, with mode-colored bars and compact text.
+  "play.css": { lines: 1965, bytes: 38879 },
   "recovery.css": { lines: 266, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   "relics.css": { lines: 460, bytes: 9400 },

@@ -526,6 +526,55 @@
   color: var(--c-gx-heat);
 }
 
+.gx-stance-mastery {
+  display: inline-grid;
+  grid-template-columns: minmax(120px, auto) minmax(82px, 1fr);
+  align-items: center;
+  gap: 3px 7px;
+  min-width: min(100%, 276px);
+  color: var(--c-gx-text-dim);
+}
+
+.gx-stance-mastery b {
+  color: var(--c-paper);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.gx-stance-mastery small {
+  overflow: hidden;
+  color: var(--c-gx-text-dim);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-stance-mastery > i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--c-gx-line);
+}
+
+.gx-stance-mastery > i em {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-gx-heat), var(--c-gx-fever));
+  box-shadow: 0 0 12px var(--c-gx-heat-a55);
+}
+
+.gx-stance-mastery.mode-steady > i em {
+  background: linear-gradient(90deg, var(--c-gx-beat), var(--c-gx-chip));
+  box-shadow: 0 0 12px var(--c-gx-beat-a45);
+}
+
+.gx-stance-mastery.mode-expose > i em {
+  background: linear-gradient(90deg, var(--c-gx-fever), var(--c-paper));
+  box-shadow: 0 0 12px var(--c-gx-fever-a40);
+}
+
 .gx-focus-modes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

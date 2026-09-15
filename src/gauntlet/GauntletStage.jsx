@@ -29,6 +29,8 @@ import {
   SEAL_BREAK_GAUGE,
   SLIP_SECONDS,
   splitOpenSeed,
+  getStanceMasteryProfile,
+  STANCE_MASTERY_GOAL,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -191,6 +193,9 @@ export function GauntletStage({
   const grooveBonus = getGrooveBonus(win.groove);
   const focusBonus = getFocusBonus(win.focus, win.focusMode);
   const focusModeProfile = getFocusModeProfile(win.focusMode);
+  const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
+  const activeStanceCount = stanceMastery[win.focusMode] ?? 0;
+  const activeStanceProgress = Math.min(100, (activeStanceCount / STANCE_MASTERY_GOAL) * 100);
   const livePot = Math.round(selectedChips * multiplier * grooveBonus * focusBonus.pot);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
@@ -225,6 +230,10 @@ export function GauntletStage({
     burnAxis: fractureAxis,
     caseClosed: false,
     relics,
+    focusMode: win.focusMode,
+    focusCharge: win.focus,
+    focusHits: win.focusHits,
+    stanceMastery: run.stanceMastery,
   });
   const bustSchema = buildNextSchema({
     outcome: "bust",
@@ -577,6 +586,11 @@ export function GauntletStage({
               <b>{focusBonus.label} {Math.round(win.focus)}</b>
               <small>{formatMultiplier(focusBonus.pot)} pot / {formatMultiplier(focusBonus.resource)} read</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
+            </span>
+            <span className={`gx-stance-mastery mode-${win.focusMode}`} data-testid="gauntlet-stance-mastery">
+              <b>{focusModeProfile.label} MASTERY {activeStanceCount}/{STANCE_MASTERY_GOAL}</b>
+              <small>{stanceMastery.mastered.length ? `${stanceMastery.mastered.length} mastered` : "charged cashes build the season"}</small>
+              <i aria-hidden="true"><em style={{ width: `${activeStanceProgress}%` }} /></i>
             </span>
           </div>
           <div className={`gx-clock${remaining <= 10 ? " is-late" : ""}`} role="timer" aria-label={`남은 시간 ${Math.ceil(remaining)}초`}>
