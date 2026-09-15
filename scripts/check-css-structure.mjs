@@ -79,6 +79,8 @@ const fileBudgets = {
   // opacity only -- so the phone's one-screen table did not get taller.
   "play.css": { lines: 1515, bytes: 28847 },
   "recovery.css": { lines: 266, bytes: 5754 },
+  // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
+  "relics.css": { lines: 460, bytes: 9400 },
   "responsive.css": { lines: 260, bytes: 5700 },
   "result.css": { lines: 1225, bytes: 25700 },
 };

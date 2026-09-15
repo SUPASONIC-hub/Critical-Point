@@ -5,10 +5,11 @@ import {
   getCloseness,
   getHeartbeatBpm,
   GROOVE_CAP,
-  normalizeRunState,
+  openCaseRun,
   reduceWindow,
   resolveWindow,
 } from "../src/gauntlet/gauntletEngine.js";
+import { RELIC_IDS } from "../src/gauntlet/relics.js";
 
 /**
  * The gauntlet's balance, measured.
@@ -29,15 +30,19 @@ import {
  * - the beat is a hand skill, not a second instrument: pushing on every beat
  *   busts exactly as often as not being graded at all, pays more but never more
  *   than the groove cap, and a player who slips every push banks no more than
- *   one who is never graded.
+ *   one who is never graded;
+ * - a relic bends a rule, it does not break the table: with every relic alone
+ *   and all of them together, the heartbeat still beats playing blind and still
+ *   stays far under a player who could see the wall, busting to skip still
+ *   loses, and no single relic lifts the best play by more than RELIC_LIFT_CAP.
  */
 
 const CASES = 1500;
 const WINDOWS_PER_CASE = 7;
 const card = { id: "sim", label: "sim", effect: { capital: 12, trust: 6, humanCost: 4 } };
 
-function playCase(caseIndex, decide, grade = null) {
-  let run = normalizeRunState({});
+function playCase(caseIndex, decide, grade = null, relics = []) {
+  let run = openCaseRun({ relics });
   let busts = 0;
   let mutatedAfterBust = 0;
   let played = 0;
@@ -65,13 +70,13 @@ function playCase(caseIndex, decide, grade = null) {
   return { vault: run.vault, busts, mutatedAfterBust, played };
 }
 
-function measure(label, decide, grade = null) {
+function measure(label, decide, grade = null, relics = [], cases = CASES) {
   let vault = 0;
   let busts = 0;
   let mutated = 0;
   let played = 0;
-  for (let caseIndex = 0; caseIndex < CASES; caseIndex += 1) {
-    const result = playCase(caseIndex, decide, grade);
+  for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
+    const result = playCase(caseIndex, decide, grade, relics);
     vault += result.vault;
     busts += result.busts;
     mutated += result.mutatedAfterBust;
@@ -79,9 +84,9 @@ function measure(label, decide, grade = null) {
   }
   return {
     label,
-    meanVault: Math.round(vault / CASES),
+    meanVault: Math.round(vault / cases),
     bustRate: Number((busts / Math.max(1, played)).toFixed(3)),
-    meanWindows: Number((played / CASES).toFixed(2)),
+    meanWindows: Number((played / cases).toFixed(2)),
     busts,
     mutated,
   };
@@ -148,6 +153,38 @@ assert.ok(
   onBeat.meanVault / bestHeartbeatSoFar.meanVault < bestHeartbeatSoFar.meanVault / Math.max(1, fixed.reduce((best, row) => Math.max(best, row.meanVault), 0)),
   "the beat must pay less than listening does: timing is the spice, reading the table is the game",
 );
+// Relics. Each set replays the policies that matter near the optimum on fewer
+// cases, and the invariants above are asserted again under it.
+const RELIC_CASES = 600;
+const RELIC_LIFT_CAP = 1.35;
+const relicSets = [[], ...RELIC_IDS.map((id) => [id]), RELIC_IDS];
+const bestOf = (list) => list.reduce((best, row) => (row.meanVault > best.meanVault ? row : best));
+const relicReport = relicSets.map((relics) => {
+  const name = relics.length === 0 ? "none" : relics.length === RELIC_IDS.length ? "all" : relics[0];
+  const blind = bestOf([40, 50, 60].map((target) => measure(`${name} heat ${target}`, (win) => win.gauge < target, null, relics, RELIC_CASES)));
+  const listen = bestOf([90, 100, 110].map((threshold) =>
+    measure(`${name} heartbeat < ${threshold}`, (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < threshold, null, relics, RELIC_CASES),
+  ));
+  const sees = measure(`${name} sees the wall`, (win) => win.gauge + win.schema.stepMax < win.wall, null, relics, RELIC_CASES);
+  const skip = measure(`${name} bust to skip`, (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), null, relics, RELIC_CASES);
+  return { name, relics, blind, listen, sees, skip };
+});
+const relicBaseline = relicReport[0];
+for (const row of relicReport) {
+  console.log(
+    `relic ${row.name.padEnd(12)} blind ${String(row.blind.meanVault).padStart(6)}  heartbeat ${String(row.listen.meanVault).padStart(6)}  sees ${String(row.sees.meanVault).padStart(6)}  skip ${String(row.skip.meanVault).padStart(5)}`,
+  );
+  assert.ok(row.listen.meanVault > row.blind.meanVault, `with ${row.name}, listening to the heartbeat must still beat playing blind`);
+  assert.ok(row.listen.meanVault < row.sees.meanVault * 0.6, `with ${row.name}, the heartbeat must not become an answer key: ${row.listen.meanVault} against ${row.sees.meanVault}`);
+  assert.ok(row.skip.meanVault < row.blind.meanVault * 0.25, `with ${row.name}, busting to skip must stay a loss: ${row.skip.meanVault} against ${row.blind.meanVault}`);
+  if (row.relics.length === 1) {
+    assert.ok(
+      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_LIFT_CAP,
+      `${row.name} is a win button: best play banks ${row.listen.meanVault} against ${relicBaseline.listen.meanVault} without it`,
+    );
+  }
+}
+
 const bustRows = rows.filter((row) => row.busts > 0);
 assert.ok(
   bustRows.every((row) => row.mutated > 0),

@@ -101,14 +101,14 @@ import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders } from "./state/useDecision.js";
 import {
   applyGauntletEffect,
-  BASE_SCHEMA,
   BUST_EFFECT,
   createRunSummary,
   normalizeRunState,
-  resolveWindow,
+  openCaseRun,
   RUN_INITIAL_STATE,
   serializeRunState,
 } from "./gauntlet/gauntletEngine.js";
+import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
@@ -224,6 +224,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   // The run's gauntlet: pot, vault, and the rules the next window is dealt from.
   // Saved under `dynamics`, the key the save format already reserves for it.
   const [gauntletRun, setGauntletRun] = useState(() => normalizeRunState(saved?.dynamics));
+  const relicTable = useRelicTable();
   // Set when this tab's run is older than the save: another tab moved on. The
   // tab stops -- no table, no writes -- until it reloads from storage.
   const [staleSave, setStaleSave] = useState(false);
@@ -897,13 +898,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setHypothesisDecisions({});
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
-    // A case abandoned mid-run forfeits its pot. A case that closed has already
-    // moved its pot to the vault and dealt the REBOOT board; keep that banner.
-    const openingRun = normalizeRunState({
-      ...gauntletRun,
-      runPot: 0,
-      schema: gauntletRun.schema.mutations.includes("reboot") ? gauntletRun.schema : BASE_SCHEMA,
-    });
+    // A closed case keeps its REBOOT board and its relic draft; an abandoned one forfeits its pot.
+    const openingRun = openCaseRun(gauntletRun);
     setGauntletRun(openingRun);
     resetEndingSequence();
     setEcho(openingEcho);
@@ -983,6 +979,14 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     window.location.reload();
   }
 
+  /** The relic a closed case drafted, or null to pass. The board on the table is re-dealt with it. */
+  function pickRelic(relicId = null) {
+    if (staleSave) return;
+    const pickedRun = relicTable.equip(gauntletRun, relicId);
+    setGauntletRun(pickedRun);
+    persist({ dynamics: serializeRunState(pickedRun) });
+  }
+
   function markWindowTouched(openSeed, cardId = null) {
     if (staleSave) return;
     const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId });
@@ -1051,7 +1055,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
-    const { verdict, nextRun } = resolveWindow({ run: gauntletRun, window: windowState, card: choice, caseClosed });
+    const { verdict, nextRun, unlockedRelics } = relicTable.settle({ run: gauntletRun, window: windowState, card: choice, caseClosed, offerRelics: currentCase !== "final" });
     if (windowState.seed) recordSettledWindowSeed(windowState.seed);
     const busted = verdict.outcome === "bust";
 
@@ -1059,6 +1063,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       outcome: verdict.outcome,
       gauge: verdict.gauge,
       fracturedAxis: verdict.fracturedAxis,
+      fractureRate: verdict.fractureRate,
     });
     const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
     const clueReward = clue
@@ -1332,6 +1337,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       skippedTitle: blackoutSkip?.skippedTitle ?? null,
       nextTitle: nodes[nextNode]?.title ?? "결과 화면",
       nextNode,
+      unlockedRelics,
     });
     persist({
       resources: finalResources,
@@ -1826,6 +1832,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
   });
-  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, reloadFromStorage, updateFreeText, anonymizeFreeText, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
+  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, reloadFromStorage, updateFreeText, anonymizeFreeText, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
 
 }

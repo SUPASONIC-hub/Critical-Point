@@ -3,6 +3,8 @@ import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
 import { subjectParticle } from "../playerLanguage.js";
+import { RELICS } from "../gauntlet/relics.js";
+import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 
 function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
@@ -43,6 +45,9 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     ["판정 원인", cause],
     ["열기 기록", heatLine],
     ...(beatLine ? [["박자 기록", beatLine]] : []),
+    ...(verdict.relicProcs?.length
+      ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
+      : []),
     ["다음 판", `${nextRule}. ${tableLine}`],
   ];
 }
@@ -120,7 +125,7 @@ export function DecisionReveal({ view }) {
           <div className="gx-reveal-pot" aria-label="판돈">
             {busted ? (
               <p className="gx-reveal-loss">
-                판돈 <b>{formatNumber(verdict.lostPot)}</b> → <b>0</b>
+                판돈 <b>{formatNumber((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatNumber(verdict.insuredPot ?? 0)}</b>
               </p>
             ) : (
               <p className="gx-reveal-gain">
@@ -142,6 +147,24 @@ export function DecisionReveal({ view }) {
               )}
             </p>
           </div>
+        )}
+
+        {decisionReveal.unlockedRelics?.length > 0 && (
+          <div className="gx-reveal-unlock" data-testid="relic-unlocked" aria-label="새로 해금한 도구">
+            <span>NEW RELIC UNLOCKED</span>
+            {decisionReveal.unlockedRelics.map((id) => (
+              <b key={id}>
+                <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
+              </b>
+            ))}
+            <p>도감에 들어갔다. 이제 사건이 닫힐 때마다 드래프트에 나올 수 있다.</p>
+          </div>
+        )}
+
+        {verdict?.relicOffer?.length > 0 && (
+          <p className="gx-reveal-draft" data-testid="relic-draft-notice">
+            사건이 닫혔다. 다음 사건의 첫 테이블에서 도구 {verdict.relicOffer.length}개 중 하나를 고른다.
+          </p>
         )}
 
         {overclockMutation && !busted && (

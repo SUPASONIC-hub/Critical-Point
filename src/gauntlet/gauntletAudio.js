@@ -373,3 +373,78 @@ export function playClockTick(remaining = 5) {
     oscillator.stop(now + 0.06);
   });
 }
+
+/* Relics ---------------------------------------------------------------- */
+
+/** A draft being dealt: three cards flicked onto felt, a beat apart. */
+export function playRelicDealCue(count = 3) {
+  withRuntime(({ context, destination, multiplier }) => {
+    const now = context.currentTime;
+    for (let index = 0; index < count; index += 1) {
+      const start = now + index * 0.09;
+      const flick = context.createBufferSource();
+      flick.buffer = getNoise(context);
+      const filter = context.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(1600 + index * 420, start);
+      filter.Q.setValueAtTime(2.2, start);
+      const gain = context.createGain();
+      envelope(gain, start, 0.12 * multiplier, 0.002, 0.07);
+      flick.connect(filter).connect(gain).connect(destination);
+      flick.start(start, 0.1 + index * 0.2, 0.1);
+    }
+  });
+}
+
+const EQUIP_SHIMMER = [880, 1108.73, 1318.51, 1760];
+
+/** A relic locked into the run: a heavy latch, then a shimmer climbing out of it. */
+export function playRelicEquipCue() {
+  withRuntime(({ context, destination, multiplier }) => {
+    const now = context.currentTime;
+    const latch = context.createOscillator();
+    const latchFilter = context.createBiquadFilter();
+    const latchGain = context.createGain();
+    latch.type = "square";
+    latch.frequency.setValueAtTime(130, now);
+    latch.frequency.exponentialRampToValueAtTime(52, now + 0.12);
+    latchFilter.type = "lowpass";
+    latchFilter.frequency.setValueAtTime(700, now);
+    envelope(latchGain, now, 0.16 * multiplier, 0.002, 0.16);
+    latch.connect(latchFilter).connect(latchGain).connect(destination);
+    latch.start(now);
+    latch.stop(now + 0.22);
+    for (let index = 0; index < EQUIP_SHIMMER.length; index += 1) {
+      const start = now + 0.08 + index * 0.05;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(EQUIP_SHIMMER[index], start);
+      envelope(gain, start, 0.055 * multiplier, 0.003, 0.42);
+      oscillator.connect(gain).connect(destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.46);
+    }
+  });
+}
+
+/** A relic doing its job mid-window: a quick bright ping, a fourth apart. */
+export function playRelicProcCue() {
+  withRuntime(({ context, destination, multiplier }) => {
+    const now = context.currentTime;
+    for (const [offset, frequency] of [
+      [0, 1318.51],
+      [0.07, 1760],
+    ]) {
+      const start = now + offset;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(frequency, start);
+      envelope(gain, start, 0.07 * multiplier, 0.002, 0.18);
+      oscillator.connect(gain).connect(destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.22);
+    }
+  });
+}

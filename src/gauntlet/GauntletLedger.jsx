@@ -1,4 +1,6 @@
 import { createGauntletLedger } from "./gauntletEngine.js";
+import { normalizeRelicIds, RELICS } from "./relics.js";
+import { RelicIcon } from "./RelicDraft.jsx";
 
 function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
@@ -12,6 +14,7 @@ function formatNumber(value) {
 export function GauntletLedger({ log = [], summary = null }) {
   const ledger = createGauntletLedger(log);
   const vault = Number(summary?.vault) || 0;
+  const relics = normalizeRelicIds(summary?.relics);
   const note = ledger.busts > 0
     ? `벽에 ${ledger.busts}번 부딪혀 판돈 ${formatNumber(ledger.potLost)}을 잃었다. 금고에 들어간 것만 남는다.`
     : ledger.cashes > 0
@@ -56,6 +59,16 @@ export function GauntletLedger({ log = [], summary = null }) {
         </article>
       </div>
       <p className="pressure-ledger-note">{note}</p>
+      {relics.length > 0 && (
+        <p className="pressure-ledger-relics" data-testid="ledger-relics">
+          <span>장착한 도구</span>
+          {relics.map((id) => (
+            <b key={id} title={RELICS[id].text}>
+              <RelicIcon id={id} size={12} /> {RELICS[id].name}
+            </b>
+          ))}
+        </p>
+      )}
     </section>
   );
 }

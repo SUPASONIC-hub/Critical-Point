@@ -26,9 +26,14 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
  * and the seal plus one push can never reach the lowest wall a board that did
  * not just bust can draw -- so pushing until cash enables is always safe here.
  * The protocol breach banner pauses the clock and is dismissed by any input.
+ * A relic draft holds the clock the same way at a case's first table; flows
+ * that only need to get past a decision pass on it.
  */
 export async function dismissProtocolBreach(page) {
-  await page.evaluate(() => document.querySelector("[data-testid='protocol-breach']")?.click());
+  await page.evaluate(() => {
+    document.querySelector("[data-testid='relic-skip']")?.click();
+    document.querySelector("[data-testid='protocol-breach']")?.click();
+  });
 }
 
 export async function cashStakedCard(page) {

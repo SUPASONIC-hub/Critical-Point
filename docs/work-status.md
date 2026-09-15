@@ -196,6 +196,27 @@ list of the files it touched.
     hand never banks more, and the beat must pay less over listening than
     listening pays over playing blind. The ending's vault slack reads the vault
     without `grooveVault`; the beat's own door is `BEAT_SLACK_COMBO`.
+39. Relics bend a rule; they never break the table. A closed case (not the
+    final one) drafts three relics from `getRelicPool` -- the defaults plus what
+    the codex unlocked -- seeded by its last window so a reload cannot reroll
+    them, and `openCaseRun` carries the offer to the next case's first table.
+    The draft is the one surface allowed in front of the table, only there, and
+    only because it is that screen's decision: it holds the clock, keys 1-3 take
+    a relic, Escape passes, and `dismissProtocolBreach` passes for flows that
+    only need to get past a decision. A pick re-deals the untouched window
+    (`REDEAL`) through the same `equipRelic` the runtime saves. The board
+    records the relics it was dealt (`schema.relics`), so `applyRelics` is
+    idempotent. A relic that softens a mutation names itself on the breach
+    (`softenedBy`). The codex (`critical-point-relic-codex-v1`, owned by
+    `useRelicTable`) outlives a reset, and feats unlock into it before that
+    case's draft is dealt. `check:pressure` replays every relic alone and all
+    together: listening must still beat blind play, stay under 0.6 of a
+    wall-seeing player, busting to skip must stay under a quarter of blind play,
+    and no single relic may lift best play past 1.35x. INSURANCE kept half the
+    pot until it put listening at 0.59 of the ceiling; it keeps a third. A
+    recovery slot keeps relics drafted since it and cannot return a spent
+    INSURANCE. REBOOT no longer takes the active-rules panel: the draft and the
+    reveal already say the case closed.
 
 ## Verification Commands
 

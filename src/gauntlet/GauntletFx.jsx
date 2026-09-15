@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { BEAT_GOOD, BEAT_GOOD_FLOOR_MS, getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
+import { getCloseness, getGoodWindowMs, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
 
 /**
@@ -28,14 +28,14 @@ import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio
 const SHAKE_PX = 11;
 const FX_VARIABLES = ["--gx-heat", "--gx-beat", "--gx-shake-x", "--gx-shake-y", "--gx-beat-phase", "--gx-beat-live", "--gx-beat-zone", "--gx-flash"];
 
-export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, grade = null, fever = false }) {
-  const stateRef = useRef({ window: liveWindow, paused });
+export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, grade = null, fever = false, wideBeat = false }) {
+  const stateRef = useRef({ window: liveWindow, paused, wideBeat });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
 
   useEffect(() => {
-    stateRef.current = { window: liveWindow, paused };
-  }, [liveWindow, paused]);
+    stateRef.current = { window: liveWindow, paused, wideBeat };
+  }, [liveWindow, paused, wideBeat]);
 
   useEffect(() => {
     if (!impact) return;
@@ -67,7 +67,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
     let droneAt = 0;
 
     const loop = (time) => {
-      const { window: win, paused: isPaused } = stateRef.current;
+      const { window: win, paused: isPaused, wideBeat: wide } = stateRef.current;
       const delta = last ? Math.min(64, time - last) : 16;
       last = time;
       const live = win.status === "live" && !isPaused;
@@ -115,7 +115,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
         const since = Math.max(0, now - clock.at);
         phase = Math.min(1, since / clock.period);
         const offset = Math.min(since, Math.max(0, clock.period - since));
-        zone = offset <= Math.max(clock.period * BEAT_GOOD, BEAT_GOOD_FLOOR_MS) ? 1 : 0;
+        zone = offset <= getGoodWindowMs(clock.period, wide) ? 1 : 0;
       }
 
       beat = Math.max(0, beat - delta / 260);

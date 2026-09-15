@@ -1,4 +1,5 @@
 import { isResourceGain } from "../gameConstants.js";
+import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE } from "./relics.js";
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
@@ -20,6 +21,10 @@ export const WINDOW_SECONDS = 45;
 export const READ_GRACE_SECONDS = 4;
 export const GAUGE_MAX = 100;
 const WALL_FLOOR = 38;
+/** The heat at which a COLD FEET seal opens, before LOCKPICK. */
+export const SEAL_BREAK_GAUGE = 30;
+/** What FRACTURE bills the cracked axis, before SPLINT. */
+export const FRACTURE_RATE = 1.5;
 
 export const BASE_SCHEMA = Object.freeze({
   seconds: WINDOW_SECONDS,
@@ -34,7 +39,12 @@ export const BASE_SCHEMA = Object.freeze({
   sedated: false,
   sealHighest: false,
   fracturedAxis: null,
+  fractureRate: FRACTURE_RATE,
+  sealBreak: SEAL_BREAK_GAUGE,
   mutations: [],
+  // The relics this board was dealt with. Kept on the board, not only on the
+  // run, so equipping one re-deals the rules once and never twice.
+  relics: [],
 });
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -124,7 +134,7 @@ export function getHeartbeatBpm(gauge, wall, sedated = false, urgency = 0) {
 export function normalizeSchema(value) {
   const source = value && typeof value === "object" ? value : {};
   const schema = { ...BASE_SCHEMA };
-  for (const key of ["seconds", "wallMin", "wallMax", "stepMin", "stepMax", "creep", "startGauge", "chipsScale"]) {
+  for (const key of ["seconds", "wallMin", "wallMax", "stepMin", "stepMax", "creep", "startGauge", "chipsScale", "fractureRate", "sealBreak"]) {
     const numeric = Number(source[key]);
     if (Number.isFinite(numeric)) schema[key] = numeric;
   }
@@ -143,6 +153,9 @@ export function normalizeSchema(value) {
   schema.creep = clamp(schema.creep, 0, 4);
   schema.startGauge = clamp(Math.round(schema.startGauge), 0, schema.wallMin - 8);
   schema.chipsScale = clamp(schema.chipsScale, 0.25, 4);
+  schema.fractureRate = clamp(schema.fractureRate, 1, 2);
+  schema.sealBreak = clamp(Math.round(schema.sealBreak), 0, SEAL_BREAK_GAUGE);
+  schema.relics = normalizeRelicIds(source.relics);
   return schema;
 }
 
@@ -163,8 +176,8 @@ export function getCardChips(choice, schema = BASE_SCHEMA) {
 
 /** What the card burns, with the fractured axis billed half again. */
 export function getCardBurn(choice, schema = BASE_SCHEMA) {
-  const { fracturedAxis } = normalizeSchema(schema);
-  const costs = Object.entries(applyFracture(choice?.effect ?? {}, fracturedAxis))
+  const { fracturedAxis, fractureRate } = normalizeSchema(schema);
+  const costs = Object.entries(applyFracture(choice?.effect ?? {}, fracturedAxis, fractureRate))
     .filter(([key, value]) => value !== 0 && !isResourceGain(key, value))
     .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a));
   if (!costs.length) return null;
@@ -172,11 +185,11 @@ export function getCardBurn(choice, schema = BASE_SCHEMA) {
   return { key, value, fractured: key === fracturedAxis };
 }
 
-function applyFracture(effect, fracturedAxis) {
+function applyFracture(effect, fracturedAxis, rate = FRACTURE_RATE) {
   if (!fracturedAxis) return { ...effect };
   return Object.fromEntries(
     Object.entries(effect).map(([key, value]) =>
-      key === fracturedAxis && value !== 0 && !isResourceGain(key, value) ? [key, Math.round(value * 1.5)] : [key, value],
+      key === fracturedAxis && value !== 0 && !isResourceGain(key, value) ? [key, Math.round(value * rate)] : [key, value],
     ),
   );
 }
@@ -194,15 +207,13 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
   return best.id;
 }
 
-export const SEAL_BREAK_GAUGE = 30;
-
 /**
  * The effect a resolved card actually applies. Gains ride the heat; costs on
  * the fractured axis are billed half again; a bust strips every gain and keeps
  * every cost, which is the entire shape of losing.
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null } = {}) {
-  const fractured = applyFracture(effect, fracturedAxis);
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE } = {}) {
+  const fractured = applyFracture(effect, fracturedAxis, fractureRate);
   if (outcome === "bust") {
     return Object.fromEntries(Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? 0 : value]));
   }
@@ -250,16 +261,27 @@ export const GROOVE_CAP = 0.5;
 export const FEVER_BONUS = 1.3;
 
 const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
+/** How much wider METRONOME makes both beat windows. */
+export const METRONOME_REACH = 1.5;
 
-/** Where a press landed against the beat: "perfect", "good", "miss", or null with no beat to read. */
-export function judgeBeat(sinceBeatMs, periodMs) {
+/** The GOOD window in milliseconds for a beat of this period. */
+export function getGoodWindowMs(periodMs, wide = false) {
+  return Math.max(periodMs * BEAT_GOOD, BEAT_GOOD_FLOOR_MS) * (wide ? METRONOME_REACH : 1);
+}
+
+/**
+ * Where a press landed against the beat: "perfect", "good", "miss", or null with
+ * no beat to read. `wide` is METRONOME.
+ */
+export function judgeBeat(sinceBeatMs, periodMs, wide = false) {
   const period = Number(periodMs);
   const since = Number(sinceBeatMs);
   if (!Number.isFinite(period) || period <= 0 || !Number.isFinite(since) || since < 0) return null;
   const phase = since % period;
   const offset = Math.min(phase, period - phase);
-  if (offset <= Math.max(period * BEAT_PERFECT, BEAT_PERFECT_FLOOR_MS)) return "perfect";
-  if (offset <= Math.max(period * BEAT_GOOD, BEAT_GOOD_FLOOR_MS)) return "good";
+  const reach = wide ? METRONOME_REACH : 1;
+  if (offset <= Math.max(period * BEAT_PERFECT, BEAT_PERFECT_FLOOR_MS) * reach) return "perfect";
+  if (offset <= getGoodWindowMs(period, wide)) return "good";
   return "miss";
 }
 
@@ -371,6 +393,12 @@ export function reduceWindow(window, event = {}) {
       // mashed push can never be a way to skip creep.
       return grade === "miss" ? advanceClock(pushed, SLIP_SECONDS) : pushed;
     }
+    case "REDEAL":
+      // A relic equipped before the window is touched re-deals it under the new
+      // rules. Once a card is staked, a push made or the clock started, the
+      // board is the board.
+      if (window.pushes > 0 || window.selectedId || window.elapsed > 0) return window;
+      return createWindow({ schema: event.schema, seed: window.seed, beatCombo: window.beatCombo });
     case "SELECT":
       return { ...window, selectedId: typeof event.id === "string" ? event.id : null };
     case "CASH": {
@@ -407,6 +435,11 @@ export const RUN_INITIAL_STATE = Object.freeze({
   bestCombo: 0,
   runGroove: 0,
   grooveVault: 0,
+  // The relics this season carries, the three a closed case is offering, and
+  // whether INSURANCE has already paid out in this case.
+  relics: [],
+  relicOffer: [],
+  insuranceSpent: false,
   schema: BASE_SCHEMA,
 });
 
@@ -429,6 +462,9 @@ export function normalizeRunState(value) {
   run.bestCombo = clamp(Math.trunc(run.bestCombo), run.beatCombo, 999);
   run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
   run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
+  run.relics = normalizeRelicIds(source.relics);
+  run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
+  run.insuranceSpent = source.insuranceSpent === true;
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -490,18 +526,83 @@ export const MUTATIONS = Object.freeze({
 });
 
 export function describeMutations(schema) {
-  const { mutations, fracturedAxis } = normalizeSchema(schema);
+  const { mutations, fracturedAxis, relics } = normalizeSchema(schema);
   return mutations
     .filter((id) => MUTATIONS[id])
-    .map((id) => ({ id, ...MUTATIONS[id], axis: id === "fracture" ? fracturedAxis : null }));
+    .map((id) => ({ id, ...MUTATIONS[id], axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) }));
+}
+
+/**
+ * Applies the relics a board has not been dealt with yet. Idempotent: the board
+ * records which relics it carries, so equipping one mid-season re-deals the
+ * rules once, never twice. HEAT SINK is applied where the debt is computed,
+ * because it needs the heat the debt is taken from.
+ */
+export function applyRelics(schema, relics = []) {
+  const board = normalizeSchema(schema);
+  const pending = normalizeRelicIds(relics).filter((id) => !board.relics.includes(id));
+  if (!pending.length) return board;
+  const next = { ...board, mutations: [...board.mutations], relics: [...board.relics, ...pending] };
+  for (const id of pending) {
+    if (id === "highRoller") {
+      next.chipsScale *= 1.3;
+      next.wallMin -= 4;
+      next.wallMax -= 4;
+    }
+    if (id === "lockpick") next.sealBreak = Math.min(next.sealBreak, 15);
+    if (id === "splint") next.fractureRate = Math.min(next.fractureRate, 1.25);
+    if (id === "stethoscope") next.sedated = false;
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, 11);
+  }
+  return normalizeSchema(next);
+}
+
+/** Three relics for a closed case, seeded by its last window so a reload cannot reroll them. */
+export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
+  return normalizeRelicIds(pool)
+    .filter((id) => !hasRelic(owned, id))
+    .map((id) => ({ id, order: seededUnit(`relic:${seed}:${id}`) }))
+    .sort((left, right) => left.order - right.order)
+    .slice(0, RELIC_OFFER_SIZE)
+    .map((entry) => entry.id);
+}
+
+/**
+ * Takes (or passes on) the relic a closed case offered. The board on the table
+ * is re-dealt with it at once; a pass clears the offer and changes nothing else.
+ */
+export function equipRelic(run, relicId = null) {
+  const current = normalizeRunState(run);
+  const picked = relicId && current.relicOffer.includes(relicId) ? relicId : null;
+  const relics = picked ? [...current.relics, picked] : current.relics;
+  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(current.schema, relics) });
+}
+
+/**
+ * The run a case opens with. A case that closed has already moved its pot to
+ * the vault and dealt the REBOOT board -- and its relic offer -- so both stay.
+ * A case abandoned mid-run forfeits its pot and opens on the base rules, with
+ * the season's relics applied.
+ */
+export function openCaseRun(run) {
+  const current = normalizeRunState(run);
+  const rebooted = current.schema.mutations.includes("reboot");
+  return normalizeRunState({
+    ...current,
+    runPot: 0,
+    runGroove: 0,
+    insuranceSpent: false,
+    relicOffer: rebooted ? current.relicOffer : [],
+    schema: rebooted ? current.schema : applyRelics(BASE_SCHEMA, current.relics),
+  });
 }
 
 /** Builds the next board from what just happened. */
 /** A burn smaller than this is a scratch, not a fracture. */
 export const FRACTURE_MIN_BURN = 10;
 
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed }) {
-  if (caseClosed) return normalizeSchema({ ...BASE_SCHEMA, mutations: ["reboot"] });
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [] }) {
+  if (caseClosed) return applyRelics({ ...BASE_SCHEMA, mutations: ["reboot"] }, relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     schema.faceDown = true;
@@ -516,8 +617,9 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     }
   } else {
     if (gauge >= 60) {
-      schema.startGauge = Math.round(gauge / 3);
-      schema.seconds -= 12;
+      const sink = hasRelic(relics, "heatSink");
+      schema.startGauge = Math.round(gauge / (sink ? 6 : 3));
+      schema.seconds -= sink ? 6 : 12;
       schema.mutations.push("heatDebt");
     }
     if (streak >= 2) {
@@ -536,15 +638,16 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return normalizeSchema(schema);
+  return applyRelics(schema, relics);
 }
 
 /**
  * Settles a closed window against the run. Returns the verdict the runtime logs
  * and the reveal prints, and the run state the next window is dealt from.
  */
-export function resolveWindow({ run, window, card, caseClosed = false }) {
+export function resolveWindow({ run, window, card, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL }) {
   const current = normalizeRunState(run);
+  const relics = current.relics;
   const outcome = window?.status === "cashed" ? "cash" : "bust";
   const cause = outcome === "cash" ? "cash" : window?.cause ?? "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
@@ -555,11 +658,16 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus) : 0;
   const groovePot = pot - basePot;
-  const lostPot = outcome === "bust" ? current.runPot : 0;
+  // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
+  // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
+  const insured = outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
+  const insuredPot = insured ? Math.floor(current.runPot / 3) : 0;
+  const lostPot = outcome === "bust" ? current.runPot - insuredPot : 0;
   const windowCombo = Math.max(0, Math.trunc(Number(window?.beatCombo) || 0));
-  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot : 0;
+  const encored = outcome === "bust" && hasRelic(relics, "encore") && windowCombo > 0;
+  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot : insured ? Math.floor(current.runGroove / 3) : 0;
   const streak = outcome === "cash" && multiplier >= 4 ? current.streak + 1 : 0;
-  const runPotAfter = outcome === "cash" ? current.runPot + pot : 0;
+  const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   const secured = caseClosed ? runPotAfter : 0;
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
@@ -571,7 +679,15 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
     streak,
     burnAxis: fractureAxis,
     caseClosed,
+    relics,
   });
+  const nextMutations = describeMutations(nextSchema);
+  const relicProcs = [
+    ...(insured ? ["insurance"] : []),
+    ...(encored ? ["encore"] : []),
+    ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
+  ];
+  const relicOffer = caseClosed && offerRelics ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
   const verdict = {
     outcome,
     cause,
@@ -584,9 +700,13 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
     resourceMultiplier: outcome === "cash" ? getResourceMultiplier(gauge) : 0,
     pot,
     lostPot,
+    insuredPot,
     secured,
     fracturedAxis: current.schema.fracturedAxis,
-    nextMutations: describeMutations(nextSchema),
+    fractureRate: current.schema.fractureRate,
+    nextMutations,
+    relicProcs,
+    relicOffer,
     tempo: {
       grade: typeof window?.lastGrade === "string" ? window.lastGrade : null,
       combo: windowCombo,
@@ -597,7 +717,7 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
       groove: reachedGroove,
       bonus: getGrooveBonus(reachedGroove),
       groovePot,
-      lostCombo: outcome === "bust" ? windowCombo : 0,
+      lostCombo: outcome === "bust" && !encored ? windowCombo : 0,
     },
   };
   const nextRun = normalizeRunState({
@@ -610,11 +730,15 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
     bestMultiplier: Math.max(current.bestMultiplier, multiplier || 1),
     lastOutcome: outcome,
     lastGauge: gauge,
-    // A cash carries the combo into the next window; the wall takes it with the pot.
-    beatCombo: outcome === "cash" ? windowCombo : 0,
+    // A cash carries the combo into the next window; the wall takes it with the
+    // pot, unless ENCORE holds it.
+    beatCombo: outcome === "cash" || encored ? windowCombo : 0,
     bestCombo: Math.max(current.bestCombo, verdict.tempo.maxCombo),
     runGroove: caseClosed ? 0 : runGrooveAfter,
     grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
+    relics,
+    relicOffer,
+    insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
     schema: nextSchema,
   });
   return { verdict, nextRun };
@@ -700,6 +824,11 @@ export function carryTableRecordIntoRestore(restored, current) {
       streak: bustedSince ? 0 : restoredRun.streak,
       beatCombo: bustedSince ? 0 : restoredRun.beatCombo,
       bestCombo: Math.max(restoredRun.bestCombo, currentRun.bestCombo),
+      // Relics are table record too: a rollback keeps what was drafted since and
+      // cannot hand an INSURANCE payout back.
+      relics: [...new Set([...restoredRun.relics, ...currentRun.relics])],
+      relicOffer: [],
+      insuranceSpent: restoredRun.insuranceSpent || currentRun.insuranceSpent,
       schema: bustedSince ? currentRun.schema : restoredRun.schema,
       lastOutcome: bustedSince ? "bust" : restoredRun.lastOutcome,
       openSeed: null,
@@ -779,6 +908,7 @@ export function createRunSummary(run) {
     beatCombo: state.beatCombo,
     bestCombo: state.bestCombo,
     grooveVault: state.grooveVault,
+    relics: [...state.relics],
     mutations: [...state.schema.mutations],
   };
 }

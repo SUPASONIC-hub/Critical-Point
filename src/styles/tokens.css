@@ -186,6 +186,10 @@
   --c-gx-beat-a45: rgb(94 234 255 / 0.45);
   --c-gx-fever: rgb(255 92 214);
   --c-gx-fever-a40: rgb(255 92 214 / 0.4);
+  --c-gx-relic: rgb(255 196 87);
+  --c-gx-relic-a30: rgb(255 196 87 / 0.3);
+  --c-gx-rare: rgb(190 146 255);
+  --c-gx-rare-a60: rgb(190 146 255 / 0.6);
 
   /* semantic aliases referenced by components */
   --color-ink: var(--c-ink);

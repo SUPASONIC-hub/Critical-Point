@@ -6,6 +6,8 @@ import {
   BASE_SCHEMA,
   buildNextSchema,
   describeMutations,
+  drawStep,
+  equipRelic,
   FEVER_BONUS,
   FRACTURE_MIN_BURN,
   GAUGE_MAX,
@@ -25,13 +27,26 @@ import {
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { GauntletFx } from "./GauntletFx.jsx";
-import { playBeatCue, playBustCue, playCashCue, playFeverCue, playMutationCue, playPushCue } from "./gauntletAudio.js";
+import {
+  playBeatCue,
+  playBustCue,
+  playCashCue,
+  playFeverCue,
+  playMutationCue,
+  playPushCue,
+  playRelicDealCue,
+  playRelicEquipCue,
+  playRelicProcCue,
+} from "./gauntletAudio.js";
+import { hasRelic, RELICS } from "./relics.js";
+import { RelicDraft, RelicIcon } from "./RelicDraft.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const BREACH_AUTO_DISMISS_MS = 2600;
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
+const GRADE_RANK = { miss: 0, good: 1, perfect: 2 };
 const monotonicNow = () => globalThis.performance?.now?.() ?? 0;
 
 /**
@@ -84,7 +99,6 @@ function getRuleHeat({ mutations, schema }) {
 
 function getRuleObjective(mutations) {
   if (!mutations.length) return "규칙 안정. 지금은 판돈과 벽만 읽으면 된다.";
-  if (mutations.some((mutation) => mutation.id === "reboot")) return "사건을 닫았다. 다음 결정은 기본 규칙으로 재부팅된다.";
   const labels = mutations.map((mutation) => mutation.label).join(" / ");
   return `${labels} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.`;
 }
@@ -118,6 +132,7 @@ export function GauntletStage({
   revealOpen,
   onResolve,
   onTouch,
+  onPickRelic,
   staleSave = false,
   onReload,
   freeInput,
@@ -137,7 +152,14 @@ export function GauntletStage({
   // Another tab settled this window or took hold of it. This table stops: no
   // clock, no input, nothing to write over the other tab's result.
   const [lostToTab, setLostToTab] = useState(false);
-  const [breachOpen, setBreachOpen] = useState(mutations.length > 0 && !abandoned);
+  const relics = run?.relics ?? [];
+  const relicOffer = run?.relicOffer ?? [];
+  const wideBeat = hasRelic(relics, "metronome");
+  // A closed case's draft takes the breach's place: REBOOT is what it replaces.
+  const draftPending = relicOffer.length > 0 && Boolean(onPickRelic) && !abandoned;
+  const [breachOpen, setBreachOpen] = useState(mutations.length > 0 && !abandoned && !draftPending);
+  const [equipped, setEquipped] = useState(null);
+  const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
   // Written by the frame loop on every beat; read here when a push is pressed.
@@ -147,13 +169,14 @@ export function GauntletStage({
   const locked = lostToTab || staleSave;
   const awaitingClaim = heldByOtherTab && !claimed;
   const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
-  const paused = breachOpen || hidden;
+  const draftOpen = draftPending && !hidden;
+  const paused = breachOpen || hidden || draftOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0 });
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
 
   const sealedId = useMemo(() => getSealedCardId(cards, schema), [cards, schema]);
-  const sealBroken = win.gauge >= SEAL_BREAK_GAUGE;
+  const sealBroken = win.gauge >= schema.sealBreak;
   const wildSelected = win.selectedId === "__wild__";
   const selectedCard = wildSelected ? freeChoice : cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
@@ -191,6 +214,7 @@ export function GauntletStage({
     streak: multiplier >= 4 ? run.streak + 1 : 0,
     burnAxis: fractureAxis,
     caseClosed: false,
+    relics,
   });
   const bustSchema = buildNextSchema({
     outcome: "bust",
@@ -200,12 +224,19 @@ export function GauntletStage({
     streak: 0,
     burnAxis: fractureAxis,
     caseClosed: false,
+    relics,
   });
   const cashMutations = describeMutations(cashSchema);
   const bustMutations = describeMutations(bustSchema);
+  // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
+  const bustKeeps = hasRelic(relics, "insurance") && !run.insuranceSpent ? Math.floor(run.runPot / 3) : 0;
   const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
-  const ruleHeat = getRuleHeat({ mutations, schema });
-  const ruleObjective = getRuleObjective(mutations);
+  // REBOOT is the rules resetting, not a rule bending the board. The draft and
+  // the reveal already say the case closed; a panel saying so again cost a
+  // phone 92px of the table at every case's first window.
+  const tableRules = mutations.filter((mutation) => mutation.id !== "reboot");
+  const ruleHeat = getRuleHeat({ mutations: tableRules, schema });
+  const ruleObjective = getRuleObjective(tableRules);
   const overclockedBoard = schema.mutations.includes("overclock");
   const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   const dangerLine = nextHigh >= schema.wallMin
@@ -216,6 +247,12 @@ export function GauntletStage({
     : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
       ? "숨은 규칙 적용 중"
       : "규칙 안정";
+
+  useEffect(() => {
+    if (draftOpen) playRelicDealCue(relicOffer.length);
+    // The deal plays once, when the draft first shows.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftOpen]);
 
   useEffect(() => {
     if (!breachOpen || hidden) return undefined;
@@ -286,24 +323,50 @@ export function GauntletStage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, claimed]);
 
+  /**
+   * Takes a drafted relic, or passes with null. The window on the table has not
+   * been touched -- the draft holds the clock -- so it is re-dealt at once under
+   * the rules the relic bends, from the same pure function the runtime saves.
+   */
+  function pickRelic(relicId) {
+    if (!draftOpen) return;
+    if (relicId) {
+      dispatch({ type: "REDEAL", schema: equipRelic(run, relicId).schema });
+      playRelicEquipCue();
+      setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1 }));
+    }
+    onPickRelic(relicId);
+  }
+
+  function pulseRelic(id) {
+    playRelicProcCue();
+    setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
+  }
+
   function select(id) {
-    if (!live || isAdvancing || locked) return;
+    if (!live || isAdvancing || locked || draftOpen) return;
     setBreachOpen(false);
     playTargetLockCue();
     dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
   }
 
   function push(event) {
-    if (locked || (!canPush && !(breachOpen && live))) return;
+    if (locked || draftOpen || (!canPush && !(breachOpen && live))) return;
     // Graded against the beat the frame loop last landed. With no beat on
     // screen -- the breach still up, the first pulse not yet in -- the press is
     // ungraded: no combo, no slip.
     const clock = beatClock.current;
-    const grade = breachOpen ? null : judgeBeat(pressedAt(event) - clock.at, clock.period);
+    const since = pressedAt(event) - clock.at;
+    const grade = breachOpen ? null : judgeBeat(since, clock.period, wideBeat);
     setBreachOpen(false);
     const pushIndex = win.pushes + 1;
     const scored = scoreBeat(win, grade);
+    const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
     dispatch({ type: "PUSH", grade });
+    if (wideBeat && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) pulseRelic("metronome");
+    if (sealedId && schema.sealBreak < SEAL_BREAK_GAUGE && win.gauge < schema.sealBreak && nextGauge >= schema.sealBreak && nextGauge < SEAL_BREAK_GAUGE) {
+      pulseRelic("lockpick");
+    }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
     playBeatCue(grade, scored.beatCombo);
     if (grooveBonus < FEVER_BONUS && getGrooveBonus(scored.groove) >= FEVER_BONUS) playFeverCue();
@@ -319,7 +382,7 @@ export function GauntletStage({
   // Keys: 1-9 stake a card, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, push, cash, cards, freeChoice };
+    keyActions.current = { select, push, cash, cards, freeChoice, draftOpen, relicOffer, pickRelic };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -328,6 +391,18 @@ export function GauntletStage({
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
       if (document.querySelector(".decision-reveal-backdrop")) return;
       const actions = keyActions.current;
+      if (actions.draftOpen) {
+        // The draft is the decision on screen: 1-3 take a relic, Escape passes,
+        // and nothing reaches the table behind it.
+        const pick = event.key === "Escape" ? null : actions.relicOffer[Number(event.key) - 1];
+        if (event.key === "Escape" || pick) {
+          event.preventDefault();
+          actions.pickRelic(pick ?? null);
+        } else if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+        }
+        return;
+      }
       if (event.key === " " || event.key.toLowerCase() === "w") {
         event.preventDefault();
         actions.push(event);
@@ -372,6 +447,7 @@ export function GauntletStage({
       <GauntletFx
         window={win}
         paused={paused}
+        wideBeat={wideBeat}
         impact={settleImpact ?? impact}
         flash={flash}
         beatClock={beatClock}
@@ -411,7 +487,7 @@ export function GauntletStage({
           </div>
           <div className="gx-bank">
             <span className={run.runPot > 0 ? "gx-at-risk" : ""}>
-              <Flame size={13} aria-hidden="true" /> 판돈 <b data-testid="gauntlet-run-pot">{win.status === "bust" ? 0 : formatNumber(run.runPot)}</b>
+              <Flame size={13} aria-hidden="true" /> 판돈 <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatNumber(bustKeeps) : formatNumber(run.runPot)}</b>
             </span>
             <span>
               <Vault size={13} aria-hidden="true" /> 금고 <b>{formatNumber(run.vault)}</b>
@@ -420,6 +496,20 @@ export function GauntletStage({
               런 <b>연승 {run.streak}</b> · BUST <b>{run.busts}</b> · 최고 <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
+            {relics.length > 0 && (
+              <span className="gx-relics" data-testid="gauntlet-relics" aria-label={`장착한 도구: ${relics.map((id) => RELICS[id].name).join(", ")}`}>
+                {relics.map((id) => (
+                  <b
+                    key={relicPulse?.id === id ? `${id}-${relicPulse.n}` : id}
+                    className={`gx-relic-chip relic-${id}${relicPulse?.id === id ? " is-proc" : ""}`}
+                    title={`${RELICS[id].label} · ${RELICS[id].text}`}
+                  >
+                    <RelicIcon id={id} size={12} />
+                    {RELICS[id].name}
+                  </b>
+                ))}
+              </span>
+            )}
             <span className="gx-overdrive" data-testid="gauntlet-overdrive">
               <b>{overdrive.label}</b> {overdrive.text}
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
@@ -431,16 +521,16 @@ export function GauntletStage({
           </div>
         </div>
 
-        {(mutations.length > 0 || ruleHeat > 0) && (
+        {(tableRules.length > 0 || ruleHeat > 0) && (
           <section className="gx-active-rules" data-testid="active-mutations" aria-label="현재 적용 중인 변형 규칙">
             <div>
               <span>ACTIVE RULESET</span>
-              <b>{joinRules(mutations)}</b>
+              <b>{joinRules(tableRules)}</b>
               <small>{currentRules}</small>
             </div>
             <i aria-hidden="true"><em style={{ width: `${ruleHeat}%` }} /></i>
             <ul>
-              {mutations.slice(0, 3).map((mutation) => (
+              {tableRules.slice(0, 3).map((mutation) => (
                 <li key={mutation.id} className={`mut-${mutation.id}`}>
                   <strong>{mutation.label}</strong>
                   <small>{mutation.title}</small>
@@ -472,7 +562,7 @@ export function GauntletStage({
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
-            <span className="gx-gauge-seal" style={{ left: `${SEAL_BREAK_GAUGE}%` }} hidden={!sealedId} />
+            <span className="gx-gauge-seal" style={{ left: `${schema.sealBreak}%` }} hidden={!sealedId} />
           </div>
           <div className="gx-gauge-read">
             <span>
@@ -533,7 +623,7 @@ export function GauntletStage({
           <article className="gx-situation-card">
             <span>밀어붙이면</span>
             <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : "배율만 상승"}</b>
-            <small>실패 시 판돈 {formatNumber(run.runPot)} → 0 / {joinRules(bustMutations)}</small>
+            <small>실패 시 판돈 {formatNumber(run.runPot)} → {formatNumber(bustKeeps)} / {joinRules(bustMutations)}</small>
           </article>
         </section>
 
@@ -578,7 +668,7 @@ export function GauntletStage({
                 )}
                 {sealed && (
                   <span className="gx-card-seal" data-testid="sealed-card-lock">
-                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 · 열기 {SEAL_BREAK_GAUGE}
+                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 · 열기 {schema.sealBreak}
                   </span>
                 )}
                 {burn?.fractured && !schema.faceDown && (
@@ -682,6 +772,18 @@ export function GauntletStage({
         </button>
       </div>
 
+      {draftOpen && (
+        <RelicDraft offer={relicOffer} owned={relics} onPick={pickRelic} onSkip={() => pickRelic(null)} />
+      )}
+
+      {equipped && (
+        <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
+          <RelicIcon id={equipped.id} size={18} />
+          <span>장착</span>
+          <b>{RELICS[equipped.id].label}</b>
+        </div>
+      )}
+
       {breachOpen && mutations.length > 0 && (
         <div className="gx-breach" role="status" data-testid="protocol-breach" onClick={() => setBreachOpen(false)}>
           <span className="gx-breach-kicker">PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다</span>
@@ -694,6 +796,11 @@ export function GauntletStage({
                   {mutation.axis ? ` · ${resourceMeta[mutation.axis]?.label ?? mutation.axis}` : ""}
                 </strong>
                 <small>{mutation.text}</small>
+                {mutation.softenedBy && (
+                  <em className="gx-mutation-relic">
+                    <RelicIcon id={mutation.softenedBy} size={11} /> {RELICS[mutation.softenedBy].softens.text}
+                  </em>
+                )}
               </li>
             ))}
           </ul>
@@ -740,7 +847,7 @@ export function GauntletStage({
                   : win.cause === "abandon"
                     ? "테이블을 떠났다"
                     : `벽은 ${win.wall}에 있었다`}{" "}
-                · 판돈 {formatNumber(run.runPot)} → 0
+                · 판돈 {formatNumber(run.runPot)} → {formatNumber(bustKeeps)}
               </span>
             </>
           ) : (

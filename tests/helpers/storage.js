@@ -6,6 +6,7 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   recoveryCenter: "critical-point-recovery-center-v1",
   saveSlots: "trigger-prototype-save-slots-v1",
   localRanking: "critical-point-local-ranking-v1",
+  relicCodex: "critical-point-relic-codex-v1",
   nextParticipantMessage: "critical-point-next-participant-message",
   forceRenderError: "critical-point-force-render-error",
   telemetryUrl: "critical-point-telemetry-url",

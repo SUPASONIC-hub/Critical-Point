@@ -93,6 +93,74 @@ test("a push on the heartbeat builds a combo the pot pays for, and a slip breaks
   expect(saved.log.at(-1).threshold.tempo.groovePot).toBeGreaterThan(0);
 });
 
+/** Closes case01 from its last scene with one push and a cash, and opens case02's first table. */
+async function closeCaseOneIntoDraft(page) {
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("relic-draft-notice")).toContainText("도구 3개");
+  await page.getByTestId("decision-next").click();
+  await page.locator(".next-case-panel button").click();
+  await expect(page.getByTestId("relic-draft")).toBeVisible();
+}
+
+test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await closeCaseOneIntoDraft(page);
+  const draft = page.getByTestId("relic-draft");
+  await expect(draft.getByTestId("relic-option")).toHaveCount(3);
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
+  const offered = await draft.getByTestId("relic-option").first().getAttribute("data-relic");
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.relicOffer).toHaveLength(3);
+  expect(saved.dynamics.relicOffer[0]).toBe(offered);
+
+  // The clock does not start behind the draft.
+  const before = await page.locator(".gx-clock b").textContent();
+  await page.waitForTimeout(1200);
+  await expect(page.locator(".gx-clock b")).toHaveText(before);
+
+  await page.keyboard.press("1");
+  await expect(draft).toHaveCount(0);
+  await expect(page.getByTestId("relic-equipped")).toBeVisible();
+  await expect(page.getByTestId("gauntlet-relics")).toBeVisible();
+  const equipped = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(equipped.dynamics.relics).toEqual([offered]);
+  expect(equipped.dynamics.relicOffer).toEqual([]);
+  expect(equipped.dynamics.schema.relics).toEqual([offered]);
+
+  // The relics cost the phone one line of the bank row, and the REBOOT board no
+  // longer spends a rules panel saying the rules reset -- so a case's first table
+  // with a relic is shorter than it was before relics existed.
+  await expect(page.getByTestId("active-mutations")).toHaveCount(0);
+  const layout = await page.evaluate(() => ({
+    relicRow: document.querySelector("[data-testid='gauntlet-relics']").getBoundingClientRect().height,
+    widest: Math.max(...[...document.querySelectorAll("body *")].map((element) => element.getBoundingClientRect().right)),
+    innerWidth,
+  }));
+  expect(layout.relicRow).toBeLessThanOrEqual(26);
+  expect(layout.widest).toBeLessThanOrEqual(layout.innerWidth + 1);
+
+  // A reload after the pick does not deal the draft again.
+  await page.reload();
+  await page.locator(".intro button, .game-shell").first().waitFor();
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([offered]);
+});
+
+test("passing on the draft carries nothing and the table plays on", async ({ page }) => {
+  await closeCaseOneIntoDraft(page);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  await expect(page.getByTestId("gauntlet-relics")).toHaveCount(0);
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.relics).toEqual([]);
+  expect(saved.dynamics.relicOffer).toEqual([]);
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await page.getByTestId("commit-push").click();
+  await expect(page.getByTestId("gauntlet-stage")).not.toHaveAttribute("data-gauge", "0");
+});
+
 test("the whole decision is on one screen before anything is scrolled", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openTable(page, "case01", "start");
