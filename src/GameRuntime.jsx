@@ -149,6 +149,7 @@ const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ R
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
 const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(({ ResultScreen }) => ({ default: ResultScreen })));
 const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScreen }) => ({ default: PlayScreen })));
+const nowMs = () => Date.now();
 
 const speakerPortraits = {
   "한서윤": "/portrait-han-seoyun.webp",
@@ -235,7 +236,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const [echo, setEcho] = useState(
     () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
   );
-  const [nodeEnteredAt, setNodeEnteredAt] = useState(() => saved?.nodeEnteredAt ?? Date.now());
+  const [nodeEnteredAt, setNodeEnteredAt] = useState(() => saved?.nodeEnteredAt ?? nowMs());
   const [isAdvancing, setIsAdvancing] = useState(false);
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
@@ -614,8 +615,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
   const startCaseEvent = useStableEvent(startCase);
   const resolveGauntletEvent = useStableEvent(resolveGauntlet);
-  const resetEvent = useStableEvent(reset);
-  const retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
+  const resetEvent = useStableEvent(reset), retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
   const startAtNodeEvent = useStableEvent(startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
   useEffect(() => {
     const updateNetworkStatus = () => {
@@ -785,11 +785,11 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     if (!started || isResult) return undefined;
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        visibilityPauseRef.current ??= Date.now();
+        visibilityPauseRef.current ??= nowMs();
         return;
       }
       if (visibilityPauseRef.current === null) return;
-      const pausedForMs = Date.now() - visibilityPauseRef.current;
+      const pausedForMs = nowMs() - visibilityPauseRef.current;
       visibilityPauseRef.current = null;
       const adjustedNodeEnteredAt = nodeEnteredAt + pausedForMs;
       setNodeEnteredAt(adjustedNodeEnteredAt);
@@ -927,7 +927,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     resetEndingSequence();
     setEcho(openingEcho);
     setFreeText("");
-    setNodeEnteredAt(Date.now());
+    setNodeEnteredAt(nowMs());
     persist({
       started: true,
       paused: false,
@@ -944,7 +944,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       openingLegacy: legacy,
       echo: openingEcho,
       dynamics: serializeRunState(openingRun),
-      nodeEnteredAt: Date.now(),
+      nodeEnteredAt: nowMs(),
     });
   }
 
@@ -1038,7 +1038,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     freeTextSaveTimerRef.current = null;
     setIsAdvancing(true);
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
-    const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (Date.now() - nodeEnteredAt) / 1000));
+    const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (nowMs() - nodeEnteredAt) / 1000));
     const free = choice.type === "free";
     const freeResult = free ? scoreFreeText(freeText) : null;
     const submittedFreeText = free ? freeText.trim() : "";
@@ -1274,7 +1274,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
           .catch((error) => {
             console.warn(error);
             queueTelemetry({
-              id: `case-${currentCase}-${Date.now()}`,
+              id: `case-${currentCase}-${nowMs()}`,
               type: "case",
               label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
               payload: caseTelemetryPayload,
@@ -1334,7 +1334,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     setCompletedCases(nextCompletedCases);
     setCaseResults(nextCaseResults);
     setDiscoveredClues(nextDiscoveredClues);
-    setNodeEnteredAt(Date.now());
+    setNodeEnteredAt(nowMs());
     setDecisionReveal({
       verdict,
       forced,
@@ -1363,7 +1363,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       timerPenaltyCount: 0,
       probeUsed: false,
       dynamics: serializeRunState(nextRun),
-      nodeEnteredAt: Date.now(),
+      nodeEnteredAt: nowMs(),
     });
   }
 
@@ -1420,7 +1420,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     let resetErrorLogSaved = true;
     if (failedResetKeys.length > 0) {
       resetErrorLogSaved = appendStoredErrorLog({
-        id: `reset-failed-${Date.now()}`,
+        id: `reset-failed-${nowMs()}`,
         occurredAt: new Date().toISOString(),
         error: {
           name: "StorageResetError",
@@ -1442,7 +1442,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     );
     setLastSavedAt("");
     setIsPausedSave(false);
-    setNodeEnteredAt(Date.now());
+    setNodeEnteredAt(nowMs());
     setTelemetryStatus({
       tone: telemetryEnabled && isOnline ? "ready" : "local",
       text: !isOnline
@@ -1472,7 +1472,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       return;
     }
     const retryLogSaved = appendStoredErrorLog({
-      id: `reset-retry-failed-${Date.now()}`,
+      id: `reset-retry-failed-${nowMs()}`,
       occurredAt: new Date().toISOString(),
       error: {
         name: "StorageResetRetryError",
@@ -1521,7 +1521,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       note: persistRun ? "debug-start" : "replay",
     });
     const allPreviousCases = caseSequence.slice(0, Math.max(0, caseSequence.indexOf(caseId)));
-    const now = Date.now();
+    const now = nowMs();
     const nextRunId = persistRun ? createRunId() : runId;
     if (persistRun) setRunId(nextRunId);
     setStarted(true);
@@ -1621,7 +1621,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       },
     });
     const prefix = includeDiagnostics ? "trigger-diagnostic" : "trigger-summary";
-    downloadJson(payload, `${prefix}-${Date.now()}.json`);
+    downloadJson(payload, `${prefix}-${nowMs()}.json`);
   }
 
   const { leaderboard, leaderboardStatus, leaderboardError } = useLeaderboard({
