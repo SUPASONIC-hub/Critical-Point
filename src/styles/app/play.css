@@ -484,6 +484,48 @@
   color: var(--c-gx-ember);
 }
 
+.gx-focus-signal {
+  display: inline-grid;
+  grid-template-columns: auto auto minmax(74px, 1fr);
+  align-items: center;
+  gap: 4px 6px;
+  min-width: min(100%, 260px);
+  color: var(--c-gx-beat);
+}
+
+.gx-focus-signal small {
+  overflow: hidden;
+  color: var(--c-gx-text-dim);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-focus-signal > i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--c-gx-line);
+}
+
+.gx-focus-signal > i em {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-gx-beat), var(--c-gx-fever));
+  box-shadow: 0 0 14px var(--c-gx-beat-a45);
+}
+
+.gx-focus-signal.focus-deadeye b,
+.gx-focus-signal.focus-locked b {
+  color: var(--c-gx-fever);
+}
+
+.gx-focus-signal.is-jammed {
+  color: var(--c-gx-heat);
+}
+
 .gx-clock {
   grid-area: clock;
   display: grid;
@@ -810,7 +852,7 @@
   inset: auto 0 0;
   z-index: 8;
   display: grid;
-  grid-template-columns: 1fr 1.25fr;
+  grid-template-columns: 1fr 0.86fr 1.16fr;
   gap: 8px;
   max-width: 760px;
   margin: 0 auto;
@@ -848,6 +890,61 @@
     0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55),
     0 0 0 calc(var(--gx-beat-zone, 0) * 3px) var(--c-gx-beat),
     0 0 calc(var(--gx-beat-zone, 0) * 22px) var(--c-gx-beat-a45);
+}
+
+.gx-focus {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--c-gx-beat);
+  color: var(--c-gx-beat);
+  background: var(--c-gx-felt-card);
+  box-shadow:
+    inset 0 0 calc(8px + var(--gx-beat-zone, 0) * 20px) var(--c-gx-beat-a45),
+    0 0 calc(var(--gx-beat-zone, 0) * 24px) var(--c-gx-beat-a45);
+}
+
+.gx-focus.focus-locked,
+.gx-focus.focus-deadeye {
+  border-color: var(--c-gx-fever);
+  color: var(--c-gx-fever);
+}
+
+.gx-focus.is-jammed {
+  border-color: var(--c-gx-heat);
+  color: var(--c-paper);
+  background: var(--c-gx-heat-deep);
+}
+
+.gx-focus-reticle {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: calc(0.18 + var(--gx-beat-zone, 0) * 0.48);
+  transform: scale(calc(1.24 - var(--gx-beat-phase, 1) * 0.24));
+  will-change: transform, opacity;
+}
+
+.gx-focus-reticle::before,
+.gx-focus-reticle::after {
+  position: absolute;
+  content: "";
+  background: currentColor;
+  opacity: 0.65;
+}
+
+.gx-focus-reticle::before {
+  inset: 50% 6px auto;
+  height: 1px;
+}
+
+.gx-focus-reticle::after {
+  inset: 6px auto 6px 50%;
+  width: 1px;
+}
+
+.gx-focus small {
+  font: 800 11px/1 ui-monospace, monospace;
 }
 
 .gx-push small {
@@ -1276,6 +1373,18 @@
     font-size: 16px;
   }
 
+  .gx-actions {
+    grid-template-columns: 1fr 0.78fr 1.06fr;
+    gap: 6px;
+  }
+
+  .gx-focus span,
+  .gx-push span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .gauntlet-stage .gx-active-rules small {
     display: none;
   }
@@ -1350,6 +1459,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .gauntlet-stage .gx-bank .gx-focus-signal {
+    grid-template-columns: auto auto minmax(46px, 1fr);
+    min-width: 140px;
+  }
+
+  .gauntlet-stage .gx-bank .gx-focus-signal small {
+    display: none;
   }
 
   .gauntlet-stage .gx-bank .gx-overdrive i {
@@ -1723,7 +1841,8 @@
 
   .gx-pot-value,
   .gx-bpm svg,
-  .gx-beat-ring {
+  .gx-beat-ring,
+  .gx-focus-reticle {
     transform: none;
   }
 

@@ -274,6 +274,42 @@ export function playBeatCue(grade, combo = 0) {
   });
 }
 
+export function playFocusCue(grade, charge = 0) {
+  if (grade !== "perfect" && grade !== "good" && grade !== "miss") return;
+  withRuntime(({ context, destination, multiplier }) => {
+    const now = context.currentTime;
+    const level = Math.min(1, Math.max(0, Number(charge) || 0));
+    if (grade === "miss") {
+      const noise = context.createBufferSource();
+      noise.buffer = getNoise(context);
+      const filter = context.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(620, now);
+      filter.frequency.exponentialRampToValueAtTime(190, now + 0.18);
+      filter.Q.setValueAtTime(6, now);
+      const gain = context.createGain();
+      envelope(gain, now, 0.11 * multiplier, 0.002, 0.16);
+      noise.connect(filter).connect(gain).connect(destination);
+      noise.start(now, Math.random() * 0.8, 0.22);
+      return;
+    }
+    const perfect = grade === "perfect";
+    const base = perfect ? 1760 : 1318.51;
+    for (let index = 0; index < (perfect ? 3 : 2); index += 1) {
+      const start = now + index * 0.045;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = perfect ? "sine" : "triangle";
+      oscillator.frequency.setValueAtTime(base * Math.pow(2, index / 12), start);
+      oscillator.frequency.exponentialRampToValueAtTime(base * (1.15 + level * 0.35), start + 0.18);
+      envelope(gain, start, (perfect ? 0.075 : 0.055) * multiplier, 0.003, 0.26);
+      oscillator.connect(gain).connect(destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.32);
+    }
+  });
+}
+
 const FEVER_CHORD = [659.25, 830.61, 987.77, 1318.51];
 
 /** FEVER: a filter sweep opening under a bright major chord. */

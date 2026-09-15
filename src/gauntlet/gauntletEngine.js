@@ -212,12 +212,12 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
  * the fractured axis are billed half again; a bust strips every gain and keeps
  * every cost, which is the entire shape of losing.
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE } = {}) {
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1 } = {}) {
   const fractured = applyFracture(effect, fracturedAxis, fractureRate);
   if (outcome === "bust") {
     return Object.fromEntries(Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? 0 : value]));
   }
-  const multiplier = getResourceMultiplier(gauge);
+  const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
   return Object.fromEntries(
     Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? Math.round(value * multiplier) : value]),
   );
@@ -259,6 +259,13 @@ export const GROOVE_RATE = 0.03;
 export const GROOVE_CAP = 0.5;
 /** The groove bonus at which the table goes into fever. */
 export const FEVER_BONUS = 1.3;
+export const FOCUS_MAX = 100;
+export const FOCUS_PERFECT_GAIN = 24;
+export const FOCUS_GOOD_GAIN = 13;
+export const FOCUS_MISS_HEAT = 4;
+export const FOCUS_MISS_SECONDS = 1.25;
+export const FOCUS_RESOURCE_RATE = 0.45;
+export const FOCUS_POT_RATE = 0.9;
 
 const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
 /** How much wider METRONOME makes both beat windows. */
@@ -307,6 +314,51 @@ export function getGrooveBonus(groove) {
   return round2(1 + Math.min(GROOVE_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
+export function scoreFocus({ focus = 0, focusCombo = 0 } = {}, grade = null) {
+  const charge = clamp(Math.round(Number(focus) || 0), 0, FOCUS_MAX);
+  const combo = Math.max(0, Math.trunc(Number(focusCombo) || 0));
+  if (grade === "perfect" || grade === "good") {
+    const nextCombo = combo + 1;
+    const baseGain = grade === "perfect" ? FOCUS_PERFECT_GAIN : FOCUS_GOOD_GAIN;
+    const chainGain = Math.min(12, nextCombo * 2);
+    return {
+      focus: clamp(charge + baseGain + chainGain, 0, FOCUS_MAX),
+      focusCombo: nextCombo,
+      focusHits: 1,
+      focusPerfects: grade === "perfect" ? 1 : 0,
+      focusMisses: 0,
+      jammed: false,
+    };
+  }
+  if (grade === "miss") {
+    return {
+      focus: Math.max(0, charge - 12),
+      focusCombo: 0,
+      focusHits: 0,
+      focusPerfects: 0,
+      focusMisses: 1,
+      jammed: true,
+    };
+  }
+  return {
+    focus: charge,
+    focusCombo: combo,
+    focusHits: 0,
+    focusPerfects: 0,
+    focusMisses: 0,
+    jammed: false,
+  };
+}
+
+export function getFocusBonus(focus) {
+  const charge = clamp(Number(focus) || 0, 0, FOCUS_MAX) / FOCUS_MAX;
+  return {
+    resource: round2(1 + charge * FOCUS_RESOURCE_RATE),
+    pot: round2(1 + charge * FOCUS_POT_RATE),
+    tier: charge >= 1 ? "deadeye" : charge >= 0.7 ? "locked" : charge >= 0.35 ? "traced" : "loose",
+  };
+}
+
 /* --------------------------------------------------------------- window */
 
 export const TELL_ERROR = 18;
@@ -337,7 +389,15 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     beatHits: 0,
     perfects: 0,
     slips: 0,
+    focus: 0,
+    focusCombo: 0,
+    maxFocusCombo: 0,
+    focusHits: 0,
+    focusPerfects: 0,
+    focusMisses: 0,
+    jammed: false,
     lastGrade: null,
+    lastFocusGrade: null,
   };
   // A window the player touched and then walked away from -- a reload, a tab
   // closed mid-bet -- is settled as a bust. Otherwise F5 undoes the wall.
@@ -386,12 +446,36 @@ export function reduceWindow(window, event = {}) {
         beatHits: (Number(window.beatHits) || 0) + (scored.points > 0 ? 1 : 0),
         perfects: (Number(window.perfects) || 0) + (grade === "perfect" ? 1 : 0),
         slips: (Number(window.slips) || 0) + (grade === "miss" ? 1 : 0),
+        jammed: false,
         lastGrade: grade,
       };
       if (gauge >= window.wall) return { ...pushed, status: "bust", cause: "push" };
       // A slip is paid in clock, and the clock creeps heat while it runs, so a
       // mashed push can never be a way to skip creep.
       return grade === "miss" ? advanceClock(pushed, SLIP_SECONDS) : pushed;
+    }
+    case "FOCUS": {
+      if (!window.selectedId) return window;
+      const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
+      const scored = scoreFocus(window, grade);
+      const focused = {
+        ...window,
+        focus: scored.focus,
+        focusCombo: scored.focusCombo,
+        maxFocusCombo: Math.max(Number(window.maxFocusCombo) || 0, scored.focusCombo),
+        focusHits: (Number(window.focusHits) || 0) + scored.focusHits,
+        focusPerfects: (Number(window.focusPerfects) || 0) + scored.focusPerfects,
+        focusMisses: (Number(window.focusMisses) || 0) + scored.focusMisses,
+        jammed: scored.jammed,
+        lastFocusGrade: grade,
+      };
+      if (grade !== "miss") return focused;
+      const heated = {
+        ...focused,
+        gauge: clamp(focused.gauge + FOCUS_MISS_HEAT, 0, GAUGE_MAX),
+      };
+      if (heated.gauge >= heated.wall) return { ...heated, gauge: heated.wall, status: "bust", cause: "focus" };
+      return advanceClock(heated, FOCUS_MISS_SECONDS);
     }
     case "REDEAL":
       // A relic equipped before the window is touched re-deals it under the new
@@ -433,6 +517,10 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // slack reads the vault without its groove: it rewards reading the table.
   beatCombo: 0,
   bestCombo: 0,
+  bestFocusCombo: 0,
+  focusHits: 0,
+  focusPerfects: 0,
+  focusMisses: 0,
   runGroove: 0,
   grooveVault: 0,
   // The relics this season carries, the three a closed case is offering, and
@@ -446,7 +534,7 @@ export const RUN_INITIAL_STATE = Object.freeze({
 export function normalizeRunState(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "runGroove", "grooveVault"]) {
+  for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "runGroove", "grooveVault"]) {
     const numeric = Number(source[key]);
     if (Number.isFinite(numeric)) run[key] = numeric;
   }
@@ -460,6 +548,10 @@ export function normalizeRunState(value) {
   run.lastGauge = clamp(run.lastGauge, 0, GAUGE_MAX);
   run.beatCombo = clamp(Math.trunc(run.beatCombo), 0, 999);
   run.bestCombo = clamp(Math.trunc(run.bestCombo), run.beatCombo, 999);
+  run.bestFocusCombo = clamp(Math.trunc(run.bestFocusCombo), 0, 999);
+  run.focusHits = Math.max(0, Math.trunc(run.focusHits));
+  run.focusPerfects = Math.max(0, Math.trunc(run.focusPerfects));
+  run.focusMisses = Math.max(0, Math.trunc(run.focusMisses));
   run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
   run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
   run.relics = normalizeRelicIds(source.relics);
@@ -655,8 +747,10 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const chips = card ? getCardChips(card, current.schema) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const grooveBonus = outcome === "cash" ? getGrooveBonus(reachedGroove) : 1;
+  const focusCharge = Math.max(0, Number(window?.focus) || 0);
+  const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge) : getFocusBonus(0);
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
-  const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus) : 0;
+  const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus * focusBonus.pot) : 0;
   const groovePot = pot - basePot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
@@ -719,6 +813,19 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       groovePot,
       lostCombo: outcome === "bust" && !encored ? windowCombo : 0,
     },
+    focus: {
+      charge: Math.round(focusCharge),
+      combo: Math.max(0, Math.trunc(Number(window?.focusCombo) || 0)),
+      maxCombo: Math.max(0, Math.trunc(Number(window?.maxFocusCombo) || 0)),
+      hits: Math.trunc(Number(window?.focusHits) || 0),
+      perfects: Math.trunc(Number(window?.focusPerfects) || 0),
+      misses: Math.trunc(Number(window?.focusMisses) || 0),
+      grade: typeof window?.lastFocusGrade === "string" ? window.lastFocusGrade : null,
+      resourceMultiplier: focusBonus.resource,
+      potMultiplier: focusBonus.pot,
+      tier: focusBonus.tier,
+      jammed: window?.jammed === true,
+    },
   };
   const nextRun = normalizeRunState({
     windowIndex: current.windowIndex + 1,
@@ -734,6 +841,10 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     // pot, unless ENCORE holds it.
     beatCombo: outcome === "cash" || encored ? windowCombo : 0,
     bestCombo: Math.max(current.bestCombo, verdict.tempo.maxCombo),
+    bestFocusCombo: Math.max(current.bestFocusCombo, verdict.focus.maxCombo),
+    focusHits: current.focusHits + verdict.focus.hits,
+    focusPerfects: current.focusPerfects + verdict.focus.perfects,
+    focusMisses: current.focusMisses + verdict.focus.misses,
     runGroove: caseClosed ? 0 : runGrooveAfter,
     grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
     relics,
@@ -824,6 +935,10 @@ export function carryTableRecordIntoRestore(restored, current) {
       streak: bustedSince ? 0 : restoredRun.streak,
       beatCombo: bustedSince ? 0 : restoredRun.beatCombo,
       bestCombo: Math.max(restoredRun.bestCombo, currentRun.bestCombo),
+      bestFocusCombo: Math.max(restoredRun.bestFocusCombo, currentRun.bestFocusCombo),
+      focusHits: Math.max(restoredRun.focusHits, currentRun.focusHits),
+      focusPerfects: Math.max(restoredRun.focusPerfects, currentRun.focusPerfects),
+      focusMisses: Math.max(restoredRun.focusMisses, currentRun.focusMisses),
       // Relics are table record too: a rollback keeps what was drafted since and
       // cannot hand an INSURANCE payout back.
       relics: [...new Set([...restoredRun.relics, ...currentRun.relics])],
@@ -861,6 +976,10 @@ export function createGauntletLedger(log = []) {
   let perfects = 0;
   let slips = 0;
   let grooveBanked = 0;
+  let focusHits = 0;
+  let focusPerfects = 0;
+  let focusMisses = 0;
+  let bestFocusCombo = 0;
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
@@ -871,12 +990,19 @@ export function createGauntletLedger(log = []) {
     potLost += Number(threshold.lostPot) || 0;
     pushes += Number(threshold.pushes) || 0;
     const tempo = threshold.tempo;
-    if (!tempo || typeof tempo !== "object") continue;
-    bestCombo = Math.max(bestCombo, Number(tempo.maxCombo) || 0);
-    beatHits += Number(tempo.hits) || 0;
-    perfects += Number(tempo.perfects) || 0;
-    slips += Number(tempo.slips) || 0;
-    grooveBanked += Number(tempo.groovePot) || 0;
+    if (tempo && typeof tempo === "object") {
+      bestCombo = Math.max(bestCombo, Number(tempo.maxCombo) || 0);
+      beatHits += Number(tempo.hits) || 0;
+      perfects += Number(tempo.perfects) || 0;
+      slips += Number(tempo.slips) || 0;
+      grooveBanked += Number(tempo.groovePot) || 0;
+    }
+    const focus = threshold.focus;
+    if (!focus || typeof focus !== "object") continue;
+    focusHits += Number(focus.hits) || 0;
+    focusPerfects += Number(focus.perfects) || 0;
+    focusMisses += Number(focus.misses) || 0;
+    bestFocusCombo = Math.max(bestFocusCombo, Number(focus.maxCombo) || 0);
   }
   return {
     busts,
@@ -890,6 +1016,10 @@ export function createGauntletLedger(log = []) {
     perfects,
     slips,
     grooveBanked,
+    focusHits,
+    focusPerfects,
+    focusMisses,
+    bestFocusCombo,
   };
 }
 
@@ -907,6 +1037,10 @@ export function createRunSummary(run) {
     lastGauge: Math.round(state.lastGauge),
     beatCombo: state.beatCombo,
     bestCombo: state.bestCombo,
+    bestFocusCombo: state.bestFocusCombo,
+    focusHits: state.focusHits,
+    focusPerfects: state.focusPerfects,
+    focusMisses: state.focusMisses,
     grooveVault: state.grooveVault,
     relics: [...state.relics],
     mutations: [...state.schema.mutations],

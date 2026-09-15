@@ -745,7 +745,22 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     perfects: 0,
     slips: 0,
     grooveBanked: 0,
+    focusHits: 0,
+    focusPerfects: 0,
+    focusMisses: 0,
+    bestFocusCombo: 0,
   });
+});
+
+test("the table ledger rebuilds focus locks from the log", () => {
+  const ledger = createGauntletLedger([
+    { threshold: { busted: false, focus: { hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
+    { threshold: { busted: true, focus: { hits: 0, perfects: 0, misses: 1, maxCombo: 0 } } },
+  ]);
+  assert.equal(ledger.focusHits, 2);
+  assert.equal(ledger.focusPerfects, 1);
+  assert.equal(ledger.focusMisses, 1);
+  assert.equal(ledger.bestFocusCombo, 2);
 });
 
 /* ---------------------------------------------------------------- tempo */

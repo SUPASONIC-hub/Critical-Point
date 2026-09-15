@@ -1064,6 +1064,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       gauge: verdict.gauge,
       fracturedAxis: verdict.fracturedAxis,
       fractureRate: verdict.fractureRate,
+      focusMultiplier: verdict.focus?.resourceMultiplier,
     });
     const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
     const clueReward = clue
@@ -1127,7 +1128,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       flowSurge: null,
       tempoBonus: verdict.tempo.groovePot > 0
         ? { label: "GROOVE", text: `박자 ${verdict.tempo.hits}회 · 최고 콤보 ${verdict.tempo.maxCombo} · 판돈 +${verdict.tempo.groovePot}` }
-        : null,
+        : verdict.focus?.charge > 0
+          ? { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 보상 ${verdict.focus.potMultiplier}x · 자원 ${verdict.focus.resourceMultiplier}x` }
+          : null,
       clueReward,
       threshold: {
         state: busted ? "bust" : "cash",
@@ -1137,11 +1140,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         gauge: verdict.gauge,
         wall: verdict.wall,
         pushes: verdict.pushes,
-        rewardMultiplier: busted ? 1 : verdict.resourceMultiplier,
+        rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
         lostPot: verdict.lostPot,
         tempo: verdict.tempo,
+        focus: verdict.focus,
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       suspenseEvent,

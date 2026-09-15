@@ -82,7 +82,10 @@ const fileBudgets = {
   // scene, the odd-card row, the two-pane wide table. A measurement found 42 of
   // 149 scenes hiding a card under the action bar on a phone; these rules are
   // what put all of them back above it.
-  "play.css": { lines: 1739, bytes: 34222 },
+  // 1739 / 34222 -> 1858 / 36660 for the FOCUS lock: the third verb in the
+  // gauntlet action bar, its HUD charge rail, mobile fit, and reduced-motion
+  // reticle handling.
+  "play.css": { lines: 1858, bytes: 36660 },
   "recovery.css": { lines: 266, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   "relics.css": { lines: 460, bytes: 9400 },

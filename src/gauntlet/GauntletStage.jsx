@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
+import { Crosshair, Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
 import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
@@ -9,10 +9,12 @@ import {
   drawStep,
   equipRelic,
   FEVER_BONUS,
+  FOCUS_MAX,
   FRACTURE_MIN_BURN,
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
+  getFocusBonus,
   getForcedCard,
   getGrooveBonus,
   getHeartbeatBpm,
@@ -21,6 +23,7 @@ import {
   getSealedCardId,
   judgeBeat,
   scoreBeat,
+  scoreFocus,
   SEAL_BREAK_GAUGE,
   SLIP_SECONDS,
   splitOpenSeed,
@@ -32,6 +35,7 @@ import {
   playBustCue,
   playCashCue,
   playFeverCue,
+  playFocusCue,
   playMutationCue,
   playPushCue,
   playRelicDealCue,
@@ -45,6 +49,7 @@ import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const BREACH_AUTO_DISMISS_MS = 2600;
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
+const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
 const GRADE_RANK = { miss: 0, good: 1, perfect: 2 };
 const monotonicNow = () => globalThis.performance?.now?.() ?? 0;
@@ -182,7 +187,8 @@ export function GauntletStage({
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
   const grooveBonus = getGrooveBonus(win.groove);
-  const livePot = Math.round(selectedChips * multiplier * grooveBonus);
+  const focusBonus = getFocusBonus(win.focus);
+  const livePot = Math.round(selectedChips * multiplier * grooveBonus * focusBonus.pot);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
   const comboTier = win.beatCombo >= 12 ? "blaze" : win.beatCombo >= 6 ? "hot" : win.beatCombo >= 3 ? "warm" : "cold";
@@ -196,6 +202,7 @@ export function GauntletStage({
   const sealedLock = selectedCard && selectedCard.id === sealedId && !sealBroken;
   const wildBlocked = wildSelected && (!freeInput.freeText.trim() || freeInput.freeTextBlockedByPrivacy);
   const canCash = live && !paused && Boolean(selectedCard) && !sealedLock && !wildBlocked;
+  const canFocus = canCash && win.focus < FOCUS_MAX;
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
@@ -203,8 +210,8 @@ export function GauntletStage({
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
-  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * grooveBonus);
-  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * grooveBonus);
+  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * grooveBonus * focusBonus.pot);
+  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * grooveBonus * focusBonus.pot);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
   const cashSchema = buildNextSchema({
     outcome: "cash",
@@ -377,15 +384,34 @@ export function GauntletStage({
     if (grade) setFlash({ amount: GRADE_FLASH[grade] });
   }
 
+  function focus(event) {
+    if (!canFocus) return;
+    const clock = beatClock.current;
+    const since = pressedAt(event) - clock.at;
+    const grade = breachOpen ? null : judgeBeat(since, clock.period, wideBeat);
+    setBreachOpen(false);
+    const scored = scoreFocus(win, grade);
+    dispatch({ type: "FOCUS", grade });
+    if (wideBeat && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) pulseRelic("metronome");
+    playFocusCue(grade, scored.focus / FOCUS_MAX);
+    if (grade === "miss") {
+      setImpact({ amount: 0.42 });
+      setFlash({ amount: GRADE_FLASH.miss });
+    } else if (grade) {
+      setImpact({ amount: 0.16 });
+      setFlash({ amount: grade === "perfect" ? 0.75 : 0.38 });
+    }
+  }
+
   function cash() {
     if (!canCash) return;
     dispatch({ type: "CASH", locked: sealedLock || wildBlocked });
   }
 
-  // Keys: 1-9 stake a card, Space pushes, Enter cashes.
+  // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, push, cash, cards, freeChoice, draftOpen, relicOffer, pickRelic };
+    keyActions.current = { select, focus, push, cash, cards, freeChoice, draftOpen, relicOffer, pickRelic };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -404,6 +430,11 @@ export function GauntletStage({
         } else if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
         }
+        return;
+      }
+      if (event.key.toLowerCase() === "e" || event.key === "Shift") {
+        event.preventDefault();
+        actions.focus(event);
         return;
       }
       if (event.key === " " || event.key.toLowerCase() === "w") {
@@ -520,6 +551,12 @@ export function GauntletStage({
             <span className="gx-overdrive" data-testid="gauntlet-overdrive">
               <b>{overdrive.label}</b> {overdrive.text}
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
+            </span>
+            <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
+              <Crosshair size={13} aria-hidden="true" />
+              <b>FOCUS {Math.round(win.focus)}</b>
+              <small>{formatMultiplier(focusBonus.pot)} pot / {formatMultiplier(focusBonus.resource)} read</small>
+              <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
           </div>
           <div className={`gx-clock${remaining <= 10 ? " is-late" : ""}`} role="timer" aria-label={`남은 시간 ${Math.ceil(remaining)}초`}>
@@ -763,6 +800,26 @@ export function GauntletStage({
             <em key={`grade-${win.pushes}`} className={`gx-grade gx-grade-${win.lastGrade}`} aria-hidden="true">
               {GRADE_COPY[win.lastGrade]}
               {win.lastGrade !== "miss" && win.beatCombo > 1 ? ` ×${win.beatCombo}` : ""}
+            </em>
+          )}
+        </button>
+        <button
+          type="button"
+          className={`gx-focus focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`}
+          data-testid="commit-focus"
+          onClick={focus}
+          disabled={!canFocus}
+          aria-keyshortcuts="E Shift"
+          aria-label={`Lock focus. Current focus ${Math.round(win.focus)}. Press on the beat to raise pot and resource multipliers.`}
+        >
+          <i className="gx-focus-reticle" aria-hidden="true" />
+          <Crosshair size={18} aria-hidden="true" />
+          <span>LOCK</span>
+          <small>{Math.round(win.focus)}/{FOCUS_MAX}</small>
+          {win.lastFocusGrade && (
+            <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">
+              {FOCUS_COPY[win.lastFocusGrade]}
+              {win.focusCombo > 1 && win.lastFocusGrade !== "miss" ? ` 횞${win.focusCombo}` : ""}
             </em>
           )}
         </button>
