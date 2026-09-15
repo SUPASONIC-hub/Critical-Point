@@ -29,6 +29,8 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
          the heartbeat also depends on a seeded tell, not on layout. */
       .gx-clock,
       .gx-bpm,
+      /* The situation board prints the same seeded pulse. */
+      .gx-situation-bpm,
       /* Regenerated per browser context, so it is eight glyphs of noise in
          every baseline that prints it. */
       [data-testid="session-code"] {

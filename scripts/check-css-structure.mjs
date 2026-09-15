@@ -77,7 +77,12 @@ const fileBudgets = {
   // on the push button, the grade call-outs, the combo badge, fever and the
   // flash layer. Every rule is an overlay -- absolute or fixed, transform and
   // opacity only -- so the phone's one-screen table did not get taller.
-  "play.css": { lines: 1515, bytes: 28847 },
+  // 1515 / 28847 -> 1739 / 34222 later the same day for the fit pass: the
+  // phone header, the compact rules panel and relic icons, the short-phone
+  // scene, the odd-card row, the two-pane wide table. A measurement found 42 of
+  // 149 scenes hiding a card under the action bar on a phone; these rules are
+  // what put all of them back above it.
+  "play.css": { lines: 1739, bytes: 34222 },
   "recovery.css": { lines: 266, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   "relics.css": { lines: 460, bytes: 9400 },

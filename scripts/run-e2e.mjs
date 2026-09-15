@@ -138,7 +138,7 @@ try {
       return;
     }
     const testArgs = runFullCoverage
-      ? ["playwright", "test", "tests/full-coverage.spec.js", "--project=chromium", "--workers=4", ...forwardedArgs]
+      ? ["playwright", "test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=4", ...forwardedArgs]
       : [
           "playwright",
           "test",

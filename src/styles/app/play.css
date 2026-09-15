@@ -784,6 +784,10 @@
   border-color: var(--c-violet);
 }
 
+.gx-card-preview .gx-card-crack {
+  color: var(--c-gx-ember);
+}
+
 .gauntlet-stage.is-face-down .gx-card-chips,
 .gauntlet-stage.is-face-down .gx-card-burn {
   color: var(--c-gx-text-dim);
@@ -1230,20 +1234,23 @@
   color: var(--c-gx-text-dim);
 }
 
+/* On a phone the header clears the music controls by width, not by height: it
+   used to push the whole table 40px down so the controls could float over an
+   empty band. The title takes the full row, and the case count and the three
+   icons share the second, both left of the controls. */
 @media (max-width: 480px) {
-  .gauntlet-shell .game-header > div:first-child {
-    padding-right: 150px;
-  }
-
-  .gauntlet-shell .game-header .case-chip {
+  .gauntlet-shell .game-header .case-chip,
+  .gauntlet-shell .status-bar-progress {
     display: none;
   }
 
   .gauntlet-shell .game-header {
-    padding-top: 40px;
+    min-height: 50px;
+    padding-right: 104px;
   }
 
   .gauntlet-shell .game-header > div:first-child {
+    grid-column: 1 / -1;
     padding-right: 0;
   }
 
@@ -1251,8 +1258,219 @@
     font-size: 14px;
   }
 
+  .gauntlet-shell .top-actions.compact-actions {
+    gap: 2px;
+  }
+
+  .gauntlet-shell .top-actions.compact-actions button {
+    min-height: 28px;
+    padding: 3px 6px;
+  }
+
+  .gauntlet-shell .game-header .status-bar {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
   .gx-actions button {
     font-size: 16px;
+  }
+
+  .gauntlet-stage .gx-active-rules small {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-active-rules p {
+    overflow: hidden;
+    padding-top: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* The rules panel on a phone: the rule names and their pressure bar on one
+     line, the way out on the next. The ACTIVE RULESET kicker is the panel. */
+  .gauntlet-stage .gx-active-rules {
+    grid-template-columns: minmax(0, 1fr) 56px;
+    gap: 3px 8px;
+    margin: 0;
+    padding: 5px 8px;
+  }
+
+  .gauntlet-stage .gx-active-rules > div > span {
+    display: none;
+  }
+
+  /* Relics sit beside the pot line as icons; the names are in their titles. */
+  .gauntlet-stage .gx-bank .gx-relics {
+    flex-basis: auto;
+    order: 0;
+  }
+
+  .gauntlet-stage .gx-bank .gx-run-signal,
+  .gauntlet-stage .gx-bank .gx-overdrive {
+    order: 1;
+  }
+
+  .gauntlet-stage .gx-bank .gx-relic-chip {
+    padding: 2px 4px;
+  }
+
+  .gauntlet-stage .gx-bank .gx-relic-name {
+    display: none;
+  }
+
+  /* The rules panel says its rules once: the way out already starts with their
+     names, so on a phone it is that line and the pressure bar, side by side. */
+  .gauntlet-stage .gx-active-rules > div {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-active-rules p {
+    grid-row: 1;
+    grid-column: 1;
+    border-top: 0;
+  }
+
+  .gauntlet-stage .gx-active-rules > i {
+    grid-row: 1;
+    grid-column: 2;
+    align-self: center;
+  }
+
+  /* OVERCLOCK bills every card alike and the rules panel names it, so the
+     per-card badge is for a screen with room. The FRACTURE badge stays: it is
+     the one that tells cards apart. */
+  .gauntlet-stage .gx-card-stats .gx-card-overclock {
+    display: none;
+  }
+
+  .gauntlet-stage .gx-bank .gx-overdrive {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gauntlet-stage .gx-bank .gx-overdrive i {
+    display: none;
+  }
+
+  /* At the table the music controls are icons; their labels carry the state. */
+  .gauntlet-shell .music-toggle span,
+  .gauntlet-shell .music-volume-toggle span {
+    display: none;
+  }
+}
+
+/* A short phone reads the scene without its portrait, in two lines of question. */
+@media (max-width: 480px) and (max-height: 760px) {
+  .gx-scene {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gx-portrait {
+    display: none;
+  }
+
+  .gx-question {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 14px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .gx-pot-value {
+    font-size: 30px;
+  }
+
+  .gauntlet-stage .gx-situation-card small {
+    display: none;
+  }
+}
+
+.gx-read {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gx-card-stats .gx-card-rule-tax,
+.gx-card-stats .gx-card-overclock {
+  padding: 2px 5px;
+  font-style: normal;
+}
+
+/* Every scene's hand above the action bar. A card is as tall as its words, not
+   104px; the odd card out of a two-column hand takes its row as one line; and a
+   wide screen deals three across, so five cards are two rows, not three. */
+@media (max-width: 719px) {
+  .gauntlet-stage .gx-card {
+    gap: 6px;
+    min-height: 0;
+    padding: 8px 9px;
+  }
+
+  .gx-card-label {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) > :not(.gx-card-label, .gx-card-stats, .gx-card-key) {
+    grid-column: 1 / -1;
+  }
+
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) .gx-card-stats {
+    padding-right: 14px;
+  }
+
+  /* The staked card's detail is two lines at most; the rest is one tap away in
+     the reveal. */
+  .gauntlet-stage .gx-card-preview {
+    max-height: 38px;
+    overflow: hidden;
+  }
+}
+
+/* A wide screen is two panes: what to read on the left, the hand on the right.
+   A 760px column on a 1366x768 laptop put a five-card hand under the action bar
+   on every board that carried a rule. */
+@media (min-width: 1100px) {
+  .gauntlet-stage,
+  .game-shell .game-header {
+    max-width: 1180px;
+  }
+
+  .gx-table {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: start;
+    column-gap: 20px;
+  }
+
+  .gx-table > .gx-read {
+    grid-row: 1 / span 2;
+  }
+
+  .gx-table > .gx-hand,
+  .gx-table > .gx-wild {
+    grid-column: 2;
+  }
+
+  .gx-hand.hand-3,
+  .gx-hand.hand-5,
+  .gx-hand.hand-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1478,7 +1696,13 @@
   }
 
   .gauntlet-stage .gx-card {
-    min-height: 116px;
+    min-height: 92px;
+  }
+
+  .gx-hand.hand-3,
+  .gx-hand.hand-5,
+  .gx-hand.hand-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

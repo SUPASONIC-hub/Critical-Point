@@ -122,9 +122,22 @@ list of the files it touched.
     to build it inside the gesture instead.
 27. One decision, one screen, with nothing scrolled. `PlayScreen.jsx` renders
     the header and `GauntletStage`, and the stage renders the pot, the gauge,
-    one question, the hand and the two verbs. On a 390x844 phone all of it fits
-    the viewport; `visual-regression.spec.js` and `gauntlet-loop.spec.js` hold
-    that. The old board reached 3,953px for one of forty-two decisions and put a
+    one question, the hand and the two verbs. The line that matters is the top
+    of the fixed action bar, not the bottom of the viewport: the old test
+    compared against the viewport, opened one scene, and stayed green while 42
+    of 149 scenes hid a card under the bar on a 390x844 phone, all 149 on a
+    360x740 one, and every five-card scene on a 1366x768 laptop. What holds it now:
+    on a 390x844 phone, a Pixel 7, a 1280x720 desktop and a 1366x768 laptop every
+    scene fits on every board -- fresh, sealed, overclocked with five relics --
+    with its last card staked (`gauntlet-loop.spec.js` holds the densest scenes
+    on each push; `layout-sweep.spec.js` walks all 149 in the weekly full
+    pass). A 360x740 phone fits every fresh board; a board carrying rules can
+    still push the wild card up to ~80px under the bar there, which is the known
+    gap. How it fits: a board rule that bills every card is a badge in the stats
+    row, never a line on each card; the staked card carries its own detail
+    instead of a strip fixed over the hand; the rules panel on a phone is one
+    line; a wide screen is two panes, reading on the left and the hand on the
+    right. The old board reached 3,953px for one of forty-two decisions and put a
     record room, a commit console and a tactical drawer in front of the choice;
     a new panel in front of the table is the change this rule exists to stop.
 28. The report is three acts. The ending, the rank and the next case are the

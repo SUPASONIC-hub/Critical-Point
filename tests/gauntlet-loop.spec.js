@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
 /**
  * The gauntlet's promises, in a browser.
@@ -161,26 +162,59 @@ test("passing on the draft carries nothing and the table plays on", async ({ pag
   await expect(page.getByTestId("gauntlet-stage")).not.toHaveAttribute("data-gauge", "0");
 });
 
-test("the whole decision is on one screen before anything is scrolled", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await openTable(page, "case01", "start");
-  const layout = await page.evaluate(() => {
-    const bottom = (selector) => document.querySelector(selector)?.getBoundingClientRect().bottom ?? Infinity;
-    const cards = [...document.querySelectorAll(".choices .choice")];
-    return {
-      cards: cards.length,
-      lastCard: Math.max(...cards.map((card) => card.getBoundingClientRect().bottom)),
-      pot: bottom("[data-testid='gauntlet-pot']"),
-      push: bottom("[data-testid='commit-push']"),
-      cash: bottom("[data-testid='commit-confirm']"),
-      widest: Math.max(...[...document.querySelectorAll("body *")].map((element) => element.getBoundingClientRect().right)),
-      innerHeight,
-      innerWidth,
-    };
-  });
-  expect(layout.cards).toBeGreaterThan(1);
-  for (const key of ["lastCard", "pot", "push", "cash"]) expect(layout[key], key).toBeLessThanOrEqual(layout.innerHeight);
-  expect(layout.widest).toBeLessThanOrEqual(layout.innerWidth + 1);
+/**
+ * One decision, one screen -- measured against the top of the action bar, on the
+ * densest scenes the game has, on the boards that make a card tallest.
+ *
+ * This test used to open case01's first scene on one phone and compare the last
+ * card to the bottom of the viewport, under the fixed bar. It stayed green while
+ * 42 of 149 scenes hid a card on that phone. `layout-sweep.spec.js` walks every
+ * scene in the weekly full pass; this holds the tightest ones on every push:
+ * the five-card scenes a sweep found tightest, a fresh board, a sealed board
+ * and an overclocked board carrying five relics, with the last card staked so
+ * its detail is open. The project's own screen (1280x720 desktop, Pixel 7) and
+ * a 390x844 phone must fit all of it.
+ */
+const DENSEST_SCENES = [["final", "f_start_owner"], ["case02", "c2_start_people"]];
+const BOARD_STATES = [
+  ["fresh board", null],
+  ["sealed board", { schema: SEALED_BOARD }],
+  ["overclocked board with five relics", { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics: FIVE_RELICS }],
+];
+
+async function expectHandAboveActionBar(page, label) {
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not(.gx-card-wild)").last().evaluate((card) => card.click());
+  const table = await measureTable(page);
+  expect(table.cards, label).toBeGreaterThan(3);
+  expect(table.lastCard, `${label}: last card ${table.lastCard - table.actionsTop}px under the action bar`).toBeLessThanOrEqual(table.actionsTop);
+  expect(table.widest, `${label}: wider than the screen`).toBeLessThanOrEqual(table.innerWidth + 1);
+  for (const control of ["commit-push", "commit-confirm", "gauntlet-pot"]) {
+    const box = await page.getByTestId(control).boundingBox();
+    expect(box.y + box.height, `${label}: ${control} on screen`).toBeLessThanOrEqual(page.viewportSize().height);
+  }
+}
+
+test("the densest decisions fit above the action bar on every board", async ({ page }) => {
+  test.setTimeout(240_000);
+  for (const size of [page.viewportSize(), LAYOUT_VIEWPORTS.phone]) {
+    await page.setViewportSize(size);
+    for (const [caseId, nodeId] of DENSEST_SCENES) {
+      for (const [board, state] of BOARD_STATES) {
+        if (state) await openBrokenBoard(page, caseId, nodeId, state);
+        else await startDebugNode(page, caseId, nodeId);
+        await expectHandAboveActionBar(page, `${caseId}/${nodeId} on a ${board} at ${size.width}x${size.height}`);
+      }
+    }
+  }
+});
+
+test("a small phone fits every fresh board's decision", async ({ page }) => {
+  // 360x740 holds a fresh board with the last card staked; a board carrying
+  // rules can still push the wild card under the bar there. See priority 27.
+  await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
+  await startDebugNode(page, "case01", "c1_final_system");
+  await expectHandAboveActionBar(page, "case01/c1_final_system on a fresh board at 360x740");
 });
 
 test("every push visibly compounds the pot, and the odds are never printed", async ({ page }) => {

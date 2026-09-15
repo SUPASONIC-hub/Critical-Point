@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
+import { Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
 import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
@@ -239,9 +239,12 @@ export function GauntletStage({
   const ruleObjective = getRuleObjective(tableRules);
   const overclockedBoard = schema.mutations.includes("overclock");
   const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
+  // The situation board is three one-line cells, so its copy is written to fit
+  // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin
-    ? "다음 푸시가 벽 구간에 닿을 수 있다"
-    : `벽 구간까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))} 열기`;
+    ? "다음 푸시가 벽 사정권"
+    : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
+  const handSize = cards.length + (freeChoice ? 1 : 0);
   const currentRules = mutations.length
     ? `${joinRules(mutations)} 적용 중`
     : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
@@ -456,6 +459,10 @@ export function GauntletStage({
       />
 
       <div className="gx-table">
+        {/* What the player reads before choosing. On a wide screen it is the left
+            pane and the hand is the right one, so the table is as tall as the
+            taller of the two rather than their sum. */}
+        <div className="gx-read">
         <div className="gx-hud">
           <div className="gx-pot" aria-live="off">
             <span className="gx-label">POT</span>
@@ -505,7 +512,7 @@ export function GauntletStage({
                     title={`${RELICS[id].label} · ${RELICS[id].text}`}
                   >
                     <RelicIcon id={id} size={12} />
-                    {RELICS[id].name}
+                    <span className="gx-relic-name">{RELICS[id].name}</span>
                   </b>
                 ))}
               </span>
@@ -610,24 +617,25 @@ export function GauntletStage({
             <span>현재 위험</span>
             <b>{dangerLine}</b>
             <small>
-              벽은 {schema.wallMin}–{schema.wallMax}, 심박 {schema.sedated ? "교란" : bpm}
+              벽 {schema.wallMin}–{schema.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
             </small>
           </article>
           <article className="gx-situation-card">
             <span>확정하면</span>
-            <b>{selectedCard ? `+${formatNumber(livePot)} 판돈` : "카드 선택 필요"}</b>
-            <small>
-              다음 규칙: {joinRules(cashMutations)}
-            </small>
+            <b>{selectedCard ? `+${formatNumber(livePot)}` : "카드를 먼저"}</b>
+            <small>다음: {joinRules(cashMutations)}</small>
           </article>
           <article className="gx-situation-card">
             <span>밀어붙이면</span>
             <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : "배율만 상승"}</b>
-            <small>실패 시 판돈 {formatNumber(run.runPot)} → {formatNumber(bustKeeps)} / {joinRules(bustMutations)}</small>
+            <small>
+              실패 {formatNumber(run.runPot)}→{formatNumber(bustKeeps)} · {joinRules(bustMutations)}
+            </small>
           </article>
         </section>
+        </div>
 
-        <div className="choices gx-hand" role="group" aria-label="카드">
+        <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
           {cards.map((card, index) => {
             const gate = getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
             const burn = getCardBurn(card, schema);
@@ -656,29 +664,42 @@ export function GauntletStage({
                         : "소모 없음"}
                     {burn?.fractured && !schema.faceDown && <Zap size={11} aria-label="균열 축" />}
                   </b>
+                  {/* A board rule that touches every card is a badge in the stats
+                      row, not a line of its own on every card: on an overclocked
+                      board those lines made each card 25px taller. The rules panel
+                      says what the rule is; the badge says which cards it bills. */}
+                  {burn?.fractured && !schema.faceDown && (
+                    <i className="gx-card-rule-tax" data-testid="fracture-tax" title={`균열: ${resourceMeta[burn.key]?.label ?? burn.key} 청구 ${schema.fractureRate}배`}>
+                      {schema.fractureRate}x
+                    </i>
+                  )}
+                  {overclockedBoard && !schema.faceDown && (
+                    <i className="gx-card-overclock" data-testid="overclock-card-boost" title="오버클럭: 칩 2배, 푸시 폭 증가">
+                      x2
+                    </i>
+                  )}
                 </span>
+                {/* The staked card carries its own detail. It used to be a strip
+                    fixed over the bottom of the hand, which covered the last row
+                    of cards the moment one was chosen. */}
                 {selected && !schema.faceDown && (
-                  <span className="gx-card-preview">
-                    {describeEffect(card.effect, resourceMeta).slice(0, 3).map((effect) => (
+                  <span className="gx-card-preview" aria-label="선택한 카드의 상세 영향">
+                    {visibleEffects.map((effect) => (
                       <i key={effect.key} className={effect.value > 0 ? "gain" : "cost"}>
                         {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
                       </i>
                     ))}
+                    {hiddenEffectCount > 0 && <i>외 {hiddenEffectCount}</i>}
+                    {fractureAxis && (
+                      <i className="gx-card-crack" data-testid="fracture-candidate">
+                        균열 후보 · {resourceMeta[fractureAxis]?.label ?? fractureAxis}
+                      </i>
+                    )}
                   </span>
                 )}
                 {sealed && (
                   <span className="gx-card-seal" data-testid="sealed-card-lock">
-                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 · 열기 {schema.sealBreak}
-                  </span>
-                )}
-                {burn?.fractured && !schema.faceDown && (
-                  <span className="gx-card-rule-tax" data-testid="fracture-tax">
-                    1.5x 청구 · {resourceMeta[burn.key]?.label ?? burn.key}
-                  </span>
-                )}
-                {overclockedBoard && !schema.faceDown && (
-                  <span className="gx-card-overclock" data-testid="overclock-card-boost">
-                    x2 칩 · 푸시 폭 증가
+                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 {schema.sealBreak}
                   </span>
                 )}
                 {!gate.unlocked && <span className="gx-card-seal">LOCKED · {gate.reason}</span>}
@@ -723,20 +744,6 @@ export function GauntletStage({
           </div>
         )}
       </div>
-
-      {selectedCard && !schema.faceDown && (
-        <aside className="gx-stake-strip" aria-label="선택한 카드의 상세 영향">
-          <AlertTriangle size={15} aria-hidden="true" />
-          <b>{selectedCard.label}</b>
-          {visibleEffects.map((effect) => (
-            <span key={effect.key} className={effect.value > 0 ? "gain" : "cost"}>
-              {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
-            </span>
-          ))}
-          {hiddenEffectCount > 0 && <span>외 {hiddenEffectCount}</span>}
-          <small>{selectedBurn ? `${resourceMeta[selectedBurn.key]?.label ?? selectedBurn.key} 소모가 다음 판 균열 후보` : "소모 없는 선택"}</small>
-        </aside>
-      )}
 
       <div className="gx-actions">
         <button
