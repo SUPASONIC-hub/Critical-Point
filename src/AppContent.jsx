@@ -172,7 +172,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
-  const pendingTelemetryRef = useMemo(() => ({ current: saved?.pendingTelemetry ?? [] }), [saved?.pendingTelemetry]);
+  const [pendingTelemetry, setPendingTelemetry] = useState(() => saved?.pendingTelemetry ?? []);
   const { localRankingRows } = useLocalRanking();
   const isOnline = globalThis.navigator?.onLine !== false;
   const { leaderboard, leaderboardStatus, leaderboardError } = useLeaderboard({
@@ -305,7 +305,8 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     persist,
     setShowRanking,
     setSaveStatus,
-    pendingTelemetryRef,
+    pendingTelemetry,
+    setPendingTelemetry,
     renderSaveStatus: () => (saveStatus ? <p className="save-status">{saveStatus}</p> : null),
   });
 

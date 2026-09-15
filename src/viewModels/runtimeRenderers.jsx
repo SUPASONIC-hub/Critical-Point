@@ -9,7 +9,7 @@ function getSceneLineType(line) {
   return "narration-line";
 }
 
-function renderSceneLines(text = "") {
+export function renderSceneLines(text = "") {
   return text.split("\n").map((line, index) => (
     <p className={getSceneLineType(line)} key={`${index}-${line.slice(0, 12)}`}>
       {line}
@@ -17,7 +17,7 @@ function renderSceneLines(text = "") {
   ));
 }
 
-export function createRuntimeRenderers({
+export function useRuntimeRenderers({
   decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
   lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
   setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup,

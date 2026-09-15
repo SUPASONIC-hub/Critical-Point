@@ -4,11 +4,13 @@ import { EndingSequence } from "../components/EndingSequence.jsx";
 import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
 import { isResourceGain } from "../gameConstants.js";
 
-export function ResultScreen({ view }) {
+export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
   const {
     common: {
-      AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel,
-      screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta, sceneTitleRef, renderSceneLines,
+      AdaptiveMusic, musicModeKey,
+      renderDecisionReveal: viewRenderDecisionReveal, renderRecoveryNotice: viewRenderRecoveryNotice, renderErrorLogPanel: viewRenderErrorLogPanel,
+      screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta, sceneTitleRef: viewSceneTitleRef,
+      renderSceneLines,
     },
     ending: {
       endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant, endingPreview,
@@ -31,14 +33,10 @@ export function ResultScreen({ view }) {
       activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback,
       feedbackStatus,
     },
-    actions: {
-      startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset,
-      nextCaseSignal, resultBridge,
-    },
-    debug: {
-      debugToolsEnabled, showErrorLog, setShowErrorLog,
-    },
+    actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
+    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog },
   } = view;
+  const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const titleRef = sceneTitleRef ?? viewSceneTitleRef;
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
@@ -256,7 +254,7 @@ export function ResultScreen({ view }) {
           </div>
           <div className="result-hero">
             <p>{playerName}의 {activeCaseMeta?.label} 사고 활성 프로필</p>
-            <h1 ref={sceneTitleRef} tabIndex={-1}>
+            <h1 ref={titleRef} tabIndex={-1}>
               {currentCase === "final"
                 ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다."
                 : `${triggerLabels[result.primary[0]]} 조건에서 사고가 가장 오래 유지됐습니다.`}

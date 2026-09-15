@@ -15,7 +15,7 @@ import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
  * when the network or storage refuses. Lifted out of App() unchanged; the state
  * it used to capture now arrives as an explicit argument.
  */
-export function createTelemetryQueue({
+export function useTelemetryQueue({
   pendingTelemetryRef,
   setPendingTelemetry,
   setTelemetryStatus,

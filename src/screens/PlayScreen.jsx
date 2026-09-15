@@ -9,24 +9,27 @@ import { GauntletStage } from "../gauntlet/GauntletStage.jsx";
  * scene's prose is one question and a folded briefing -- the choice is the
  * scene now, and it sits above the fold on a phone.
  */
-export function PlayScreen({ view }) {
+export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions = {} }) {
   const {
     common: {
-      AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel,
-      renderSaveStatus, screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef,
+      AdaptiveMusic, musicModeKey, renderDecisionReveal: viewRenderDecisionReveal, renderRecoveryNotice: viewRenderRecoveryNotice,
+      renderErrorLogPanel: viewRenderErrorLogPanel, renderSaveStatus: viewRenderSaveStatus, screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef: viewSceneTitleRef,
     },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId },
     gauntlet: {
-      gauntletRun, gauntletSeed, resolveGauntlet, isAdvancing, fixedChoices, clueCount, markWindowTouched,
-      decisionRevealOpen, staleSave, reloadFromStorage,
-    },
+      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount,
+      markWindowTouched: viewMarkWindowTouched, decisionRevealOpen, staleSave, reloadFromStorage: viewReloadFromStorage },
     freeInput: {
-      freeChoice, freeText, updateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy,
-      activePrivacySignals, anonymizeFreeText,
+      freeChoice, freeText, updateFreeText: viewUpdateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy,
+      activePrivacySignals, anonymizeFreeText: viewAnonymizeFreeText,
     },
-    status: { resources, resourceMeta, progress, saveCurrentGame, reset, routeIndex, routeLength },
-    debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace },
+    status: { resources, resourceMeta, progress, saveCurrentGame: viewSaveCurrentGame, reset: viewReset, routeIndex, routeLength },
+    debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: viewCopyReplayLink, copyDiagnosticTrace: viewCopyDiagnosticTrace },
   } = view;
+  const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
+  const saveCurrentGame = actions.saveCurrentGame ?? viewSaveCurrentGame; const resolveGauntlet = actions.resolveGauntlet ?? viewResolveGauntlet; const markWindowTouched = actions.markWindowTouched ?? viewMarkWindowTouched; const reloadFromStorage = actions.reloadFromStorage ?? viewReloadFromStorage;
+  const updateFreeText = actions.updateFreeText ?? viewUpdateFreeText; const anonymizeFreeText = actions.anonymizeFreeText ?? viewAnonymizeFreeText; const reset = actions.reset ?? viewReset; const copyReplayLink = actions.copyReplayLink ?? viewCopyReplayLink; const copyDiagnosticTrace = actions.copyDiagnosticTrace ?? viewCopyDiagnosticTrace;
+  const titleRef = sceneTitleRef ?? viewSceneTitleRef;
 
   return (
     <main className="shell game-shell gauntlet-shell">
@@ -40,7 +43,7 @@ export function PlayScreen({ view }) {
       <GameHeader
         node={node}
         simplify={simplifyPlayerText}
-        sceneTitleRef={sceneTitleRef}
+        sceneTitleRef={titleRef}
         onSave={() => saveCurrentGame()}
         onSaveAndExit={() => {
           // Leaving with a bet on the table settles it as a bust on resume; say so first.

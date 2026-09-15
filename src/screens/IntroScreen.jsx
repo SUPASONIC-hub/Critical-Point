@@ -17,14 +17,17 @@ const tickerRun = (
   </>
 );
 
-export function IntroScreen({ view }) {
+export function IntroScreen({ view, renderers = {} }) {
   const [openingBurst, setOpeningBurst] = useState(false);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
   const {
     common: {
-      AdaptiveMusic, musicModeKey, triggerLabels, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus,
+      AdaptiveMusic, musicModeKey, triggerLabels,
+      renderRecoveryNotice: viewRenderRecoveryNotice,
+      renderErrorLogPanel: viewRenderErrorLogPanel,
+      renderSaveStatus: viewRenderSaveStatus,
       GAME_TITLE, GAME_TITLE_READING, simplifyPlayerText, activeCaseMeta, nextParticipantMessage, GAME_SUBTITLE,
     },
     start: {
@@ -33,13 +36,13 @@ export function IntroScreen({ view }) {
       startGame, resumeSavedGame, activePlayStyle, newGamePlusUnlocked, startNewGamePlus,
     },
     telemetry: {
-      dataConsent, setDataConsent, pendingTelemetryRef, setTelemetryStatus, telemetryEnabled, isOnline,
+      dataConsent, setDataConsent, pendingTelemetry, setTelemetryStatus, telemetryEnabled, isOnline,
       telemetrySummary, sessionCode, setPendingTelemetry, setSaveStatus,
     },
     debug: {
-      debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest, debugCaseSelectRef,
-      debugCaseId, debugCaseIdRef, debugNodeOptions, debugNodeId, debugNodeIdRef, debugNodeSelectRef,
-      caseSequence, nodes, setDebugCaseId, setDebugNodeId, startDebugNode, nodeOrders,
+      debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest,
+      debugCaseId, debugNodeOptions, debugNodeId, caseSequence, nodes, setDebugCaseId, setDebugNodeId,
+      startDebugNode, nodeOrders,
     },
     season: {
       seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
@@ -51,6 +54,9 @@ export function IntroScreen({ view }) {
     },
   } = view;
   const Music = AdaptiveMusic;
+  const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice;
+  const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel;
+  const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
   const onShowRanking = view.common.setShowRanking;
   const gameTitle = GAME_TITLE;
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
@@ -232,14 +238,11 @@ export function IntroScreen({ view }) {
               </div>
               <div className="debug-jump-controls">
                 <select
-                  ref={debugCaseSelectRef}
                   data-testid="debug-case-select"
                   value={debugCaseId}
                   onChange={(event) => {
                     const nextCaseId = event.target.value;
                     const nextNodeOptions = nodeOrders[nextCaseId] ?? [];
-                    debugCaseIdRef.current = nextCaseId;
-                    debugNodeIdRef.current = nextNodeOptions[0] ?? "start";
                     setDebugCaseId(nextCaseId);
                     setDebugNodeId(nextNodeOptions[0] ?? "start");
                   }}
@@ -253,11 +256,9 @@ export function IntroScreen({ view }) {
                 </select>
                 <select
                   key={debugCaseId}
-                  ref={debugNodeSelectRef}
                   data-testid="debug-node-select"
-                  defaultValue={debugNodeId}
+                  value={debugNodeId}
                   onChange={(event) => {
-                    debugNodeIdRef.current = event.target.value;
                     setDebugNodeId(event.target.value);
                   }}
                   aria-label="디버그 장면 선택"
@@ -441,12 +442,11 @@ export function IntroScreen({ view }) {
                 onChange={(event) => {
                   const nextConsent = event.target.checked;
                   if (!nextConsent) {
-                    const previousQueue = pendingTelemetryRef.current;
+                    const previousQueue = pendingTelemetry;
                     const cleared = persist({ dataConsent: false, pendingTelemetry: [] });
                     if (!cleared.storageSaved) {
                       event.target.checked = true;
                       setDataConsent(true);
-                      pendingTelemetryRef.current = previousQueue;
                       setPendingTelemetry(previousQueue);
                       setSaveStatus("동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.");
                       setTelemetryStatus({
@@ -456,7 +456,6 @@ export function IntroScreen({ view }) {
                       return;
                     }
                     setDataConsent(false);
-                    pendingTelemetryRef.current = [];
                     setPendingTelemetry([]);
                     setTelemetryStatus({
                       tone: "local",
