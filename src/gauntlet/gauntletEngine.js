@@ -674,6 +674,21 @@ export const MUTATIONS = Object.freeze({
     title: "사건이 닫혔다",
     text: "판돈은 금고로 옮겨졌고, 규칙이 초기화됐다. 이제 잃을 수 없다.",
   },
+  strikeWake: {
+    label: "STRIKE WAKE",
+    title: "The next board wakes up richer and sharper.",
+    text: "A charged STRIKE lock raises the next hand's chips, but the push step grows with it.",
+  },
+  steadyLine: {
+    label: "STEADY LINE",
+    title: "The next board opens calmer.",
+    text: "A charged STEADY lock cools the starting gauge, buys time, and pushes the wall away.",
+  },
+  exposedHand: {
+    label: "EXPOSED HAND",
+    title: "The next board cannot hide the hand.",
+    text: "A charged EXPOSE lock strips face-down and cold-feet seals from the next board.",
+  },
 });
 
 export function describeMutations(schema) {
@@ -752,7 +767,35 @@ export function openCaseRun(run) {
 /** A burn smaller than this is a scratch, not a fracture. */
 export const FRACTURE_MIN_BURN = 10;
 
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [] }) {
+function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
+  if (outcome !== "cash" || focusCharge < 70 || focusHits <= 0) return schema;
+  const next = { ...schema, mutations: [...schema.mutations] };
+  const addMutation = (id) => {
+    if (!next.mutations.includes(id)) next.mutations.push(id);
+  };
+  if (focusMode === "strike") {
+    next.chipsScale *= 1.25;
+    next.stepMin += 2;
+    next.stepMax += 3;
+    addMutation("strikeWake");
+  } else if (focusMode === "steady") {
+    next.startGauge = Math.max(0, next.startGauge - 8);
+    next.seconds += 4;
+    next.wallMin += 3;
+    next.wallMax += 3;
+    addMutation("steadyLine");
+  } else if (focusMode === "expose") {
+    next.faceDown = false;
+    next.sealHighest = false;
+    next.sealBreak = Math.min(next.sealBreak, 10);
+    next.chipsScale = Math.max(next.chipsScale, BASE_SCHEMA.chipsScale);
+    next.mutations = next.mutations.filter((id) => id !== "coldFeet" && id !== "blackout");
+    addMutation("exposedHand");
+  }
+  return next;
+}
+
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0 }) {
   if (caseClosed) return applyRelics({ ...BASE_SCHEMA, mutations: ["reboot"] }, relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -789,7 +832,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyRelics(schema, relics);
+  return applyRelics(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), relics);
 }
 
 /**
@@ -809,6 +852,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
+  const focusHits = Math.trunc(Number(window?.focusHits) || 0);
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus * focusBonus.pot) : 0;
   const groovePot = pot - basePot;
@@ -834,6 +878,9 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     burnAxis: fractureAxis,
     caseClosed,
     relics,
+    focusMode,
+    focusCharge,
+    focusHits,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [

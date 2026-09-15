@@ -774,6 +774,36 @@ test("focus modes change the lock outcome and steady cools the gauge", () => {
   assert.ok(strike.focus > steady.focus, "strike charges faster than steady");
 });
 
+test("charged focus modes carry their stance into the next board", () => {
+  const rich = card("rich", { capital: 30, trust: -5 });
+  const strike = resolveWindow({
+    run: RUN_INITIAL_STATE,
+    window: { status: "cashed", gauge: 35, wall: 80, pushes: 2, focus: 80, focusMode: "strike", focusHits: 2 },
+    card: rich,
+  }).nextRun.schema;
+  assert.ok(strike.mutations.includes("strikeWake"));
+  assert.ok(strike.chipsScale > BASE_SCHEMA.chipsScale);
+  assert.ok(strike.stepMax > BASE_SCHEMA.stepMax);
+
+  const steady = resolveWindow({
+    run: RUN_INITIAL_STATE,
+    window: { status: "cashed", gauge: 72, wall: 90, pushes: 5, focus: 90, focusMode: "steady", focusHits: 3 },
+    card: rich,
+  }).nextRun.schema;
+  assert.ok(steady.mutations.includes("steadyLine"));
+  assert.ok(steady.startGauge < Math.round(72 / 3), "steady cools heat debt before the next board opens");
+  assert.ok(steady.wallMin > BASE_SCHEMA.wallMin);
+
+  const expose = resolveWindow({
+    run: RUN_INITIAL_STATE,
+    window: { status: "cashed", gauge: 4, wall: 80, pushes: 0, focus: 75, focusMode: "expose", focusHits: 2 },
+    card: rich,
+  }).nextRun.schema;
+  assert.ok(expose.mutations.includes("exposedHand"));
+  assert.equal(expose.sealHighest, false);
+  assert.ok(!expose.mutations.includes("coldFeet"));
+});
+
 /* ---------------------------------------------------------------- tempo */
 
 test("a press is graded against the beat it was closest to, with a floor for a racing pulse", () => {
