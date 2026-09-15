@@ -402,34 +402,27 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     (score, entry) => score + (entry.speaker === node?.speaker ? 8 : entry.speaker ? -1 : 0),
     0,
   );
-  const relationshipChoice = useMemo(
-    () =>
-      !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
-        ? {
-            id: `${fallbackCaseId}_relationship_bridge`,
-            label: "관계의 증언을 먼저 확보한다",
-            effect: { trust: 5, legitimacy: 2, fatigue: 2 },
-            next: node.choices[0].next,
-            cognition: { inference: 1, reframing: 1 },
-            branchId: "relationship-bridge",
-            requiredAuthority: "FIELD ACCESS",
-          }
-        : null,
-    [fallbackCaseId, isResult, log.length, node?.choices, speakerRelationship],
-  );
   const continuityMemoryChoice = useMemo(
     () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, caseResults }),
     [caseResults, fallbackCaseId, resolvedNodeId],
   );
-  const fixedChoices = useMemo(
-    () => [
-      ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
-      ...(continuityMemoryChoice ? [continuityMemoryChoice] : []),
-      ...(adaptiveChoice ? [adaptiveChoice] : []),
-      ...(relationshipChoice ? [relationshipChoice] : []),
-    ],
-    [adaptiveChoice, continuityMemoryChoice, node?.choices, relationshipChoice],
-  );
+  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
+    ? {
+        id: `${fallbackCaseId}_relationship_bridge`,
+        label: "관계의 증언을 먼저 확보한다",
+        effect: { trust: 5, legitimacy: 2, fatigue: 2 },
+        next: node.choices[0].next,
+        cognition: { inference: 1, reframing: 1 },
+        branchId: "relationship-bridge",
+        requiredAuthority: "FIELD ACCESS",
+      }
+    : null;
+  const fixedChoices = [
+    ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
+    ...(continuityMemoryChoice ? [continuityMemoryChoice] : []),
+    ...(adaptiveChoice ? [adaptiveChoice] : []),
+    ...(relationshipChoice ? [relationshipChoice] : []),
+  ];
   const freeChoice = node?.choices?.find((choice) => choice.type === "free");
   const currentAverageResponseTime =
     log.length > 0
@@ -537,35 +530,26 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     rank: gameplayRank,
   } = gameplayStats;
   const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, freeTextCombo, log });
-  // Memoised as a chain: the readers and the forecasts below are only worth
-  // memoising if the objects they key off keep their identity between renders.
   const inheritedChallenge = useMemo(
     () => createInheritedChallenge({ isOpeningNode, openingLegacy }),
     [isOpeningNode, openingLegacy],
   );
-  const sceneChallenge = useMemo(
-    () => createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure }),
-    [freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure],
-  );
+  const sceneChallenge = createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure });
   const {
     mergeEffects,
     getClueReveal,
     getEffectiveChoiceRead,
-  } = useMemo(
-    () =>
-      createChoiceReaders({
-        sceneChallenge,
-        resources,
-        log,
-        riskPressure,
-        discoveredClues,
-        currentCase,
-        freeText,
-        currentChallengeStreak,
-        resourceMeta,
-      }),
-    [currentCase, currentChallengeStreak, discoveredClues, freeText, log, resources, riskPressure, sceneChallenge],
-  );
+  } = createChoiceReaders({
+    sceneChallenge,
+    resources,
+    log,
+    riskPressure,
+    discoveredClues,
+    currentCase,
+    freeText,
+    currentChallengeStreak,
+    resourceMeta,
+  });
 
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
