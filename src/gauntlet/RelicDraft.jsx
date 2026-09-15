@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bandage, Fan, Gem, KeyRound, Lock, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
+import { Anchor, Bandage, Crosshair, Eye, Fan, Gem, KeyRound, Lock, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
 import { RELIC_IDS, RELICS } from "./relics.js";
 import { readRelicCodex } from "./useRelicTable.js";
 
@@ -13,6 +13,9 @@ const ICONS = {
   shield: ShieldCheck,
   gem: Gem,
   stethoscope: Stethoscope,
+  crosshair: Crosshair,
+  anchor: Anchor,
+  eye: Eye,
 };
 
 export function RelicIcon({ id, size = 14 }) {

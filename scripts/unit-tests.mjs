@@ -53,6 +53,7 @@ import {
   RELIC_IDS,
   RELIC_OFFER_SIZE,
   RELICS,
+  STANCE_RELIC_UNLOCK_COUNT,
 } from "../src/gauntlet/relics.js";
 import { parseRelicCodex } from "../src/gauntlet/useRelicTable.js";
 import {
@@ -1014,6 +1015,39 @@ test("relics bend the next board once, and equipping one never double-applies", 
   assert.equal(getCardBurn(hurts, { ...applyRelics(BASE_SCHEMA, ["splint"]), fracturedAxis: "trust" }).value, -10, "SPLINT bills 1.25x");
   assert.equal(getCardBurn(hurts, { ...BASE_SCHEMA, fracturedAxis: "trust" }).value, -12);
   assert.equal(applyGauntletEffect({ trust: -8 }, { outcome: "cash", fracturedAxis: "trust", fractureRate: 1.25 }).trust, -10);
+});
+
+test("stance relics unlock from mastery and bend their mastered board", () => {
+  const mastery = { strike: STANCE_RELIC_UNLOCK_COUNT, steady: STANCE_RELIC_UNLOCK_COUNT, expose: STANCE_RELIC_UNLOCK_COUNT };
+  const unlocks = getRelicUnlocks({ verdict: { outcome: "cash", multiplier: 1, tempo: {}, nextMutations: [] }, nextRun: { stanceMastery: mastery } }, []);
+  assert.deepEqual(unlocks.slice(-3), ["kineticGrip", "steadyAnchor", "glassLens"]);
+
+  const struck = resolveWindow({
+    run: normalizeRunState({ stanceMastery: { strike: STANCE_RELIC_UNLOCK_COUNT }, relics: ["kineticGrip"] }),
+    window: { status: "cashed", gauge: 35, wall: 80, pushes: 2, focus: 80, focusMode: "strike", focusHits: 2 },
+    card: card("a", { capital: 9 }),
+  }).nextRun.schema;
+  assert.ok(struck.mutations.includes("strikeMastery"));
+  assert.equal(struck.stepMin, BASE_SCHEMA.stepMin + 2, "KINETIC GRIP removes only the mastery tax, not STRIKE WAKE");
+
+  const steady = resolveWindow({
+    run: normalizeRunState({ stanceMastery: { steady: STANCE_RELIC_UNLOCK_COUNT }, relics: ["steadyAnchor"] }),
+    window: { status: "cashed", gauge: 20, wall: 80, pushes: 2 },
+    card: card("a", { capital: 9 }),
+  }).nextRun.schema;
+  assert.ok(steady.mutations.includes("steadyMastery"));
+  assert.equal(steady.startGauge, 0);
+  assert.equal(steady.seconds, BASE_SCHEMA.seconds + STANCE_RELIC_UNLOCK_COUNT + 2);
+
+  const exposed = resolveWindow({
+    run: normalizeRunState({ stanceMastery: { expose: STANCE_RELIC_UNLOCK_COUNT }, relics: ["glassLens"] }),
+    window: { status: "bust", cause: "push", gauge: 60 },
+    card: card("a", { capital: 9 }),
+  }).nextRun.schema;
+  assert.ok(exposed.mutations.includes("exposeMastery"));
+  assert.equal(exposed.faceDown, false);
+  assert.equal(exposed.sealHighest, false);
+  assert.equal(exposed.sealBreak, 8);
 });
 
 test("INSURANCE keeps a third of the pot once a case, and ENCORE keeps the combo", () => {

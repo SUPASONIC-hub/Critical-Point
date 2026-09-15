@@ -24,6 +24,8 @@ export const ENCORE_UNLOCK_COMBO = 8;
 export const INSURANCE_UNLOCK_LOSS = 5000;
 /** The cash multiplier that unlocks HIGH ROLLER. */
 export const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
+/** A stance relic opens when its stance has reshaped enough charged cashes. */
+export const STANCE_RELIC_UNLOCK_COUNT = 3;
 
 export const RELICS = Object.freeze({
   metronome: {
@@ -103,6 +105,33 @@ export const RELICS = Object.freeze({
     softens: { mutation: "silence", text: "청진기: 심박 유지" },
     unlock: { id: "silence", text: "SILENCE를 한 번 겪기" },
   },
+  kineticGrip: {
+    label: "KINETIC GRIP",
+    name: "Kinetic Grip",
+    icon: "crosshair",
+    text: "STRIKE MASTERY removes its push-step tax, and STRIKE WAKE wakes richer hands.",
+    proc: "STRIKE mastery locks into the season",
+    softens: { mutation: "strikeMastery", text: "KINETIC GRIP: step tax removed" },
+    unlock: { id: "strikeMastery", text: `STRIKE mastery ${STANCE_RELIC_UNLOCK_COUNT}` },
+  },
+  steadyAnchor: {
+    label: "STEADY ANCHOR",
+    name: "Steady Anchor",
+    icon: "anchor",
+    text: "STEADY MASTERY cools every new board harder and buys a little more clock.",
+    proc: "STEADY mastery locks into the season",
+    softens: { mutation: "steadyMastery", text: "STEADY ANCHOR: colder start, longer clock" },
+    unlock: { id: "steadyMastery", text: `STEADY mastery ${STANCE_RELIC_UNLOCK_COUNT}` },
+  },
+  glassLens: {
+    label: "GLASS LENS",
+    name: "Glass Lens",
+    icon: "eye",
+    text: "EXPOSE MASTERY reveals hidden boards sooner and drops the seal gauge lower.",
+    proc: "EXPOSE mastery locks into the season",
+    softens: { mutation: "exposeMastery", text: "GLASS LENS: hidden boards revealed" },
+    unlock: { id: "exposeMastery", text: `EXPOSE mastery ${STANCE_RELIC_UNLOCK_COUNT}` },
+  },
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
@@ -138,10 +167,14 @@ export function getRelicUnlocks({ verdict, nextRun } = {}, unlocked = []) {
   if (!verdict) return [];
   const earned = [];
   const maxCombo = Math.max(Number(verdict.tempo?.maxCombo) || 0, Number(nextRun?.bestCombo) || 0);
+  const mastery = nextRun?.stanceMastery && typeof nextRun.stanceMastery === "object" ? nextRun.stanceMastery : {};
   if (maxCombo >= ENCORE_UNLOCK_COMBO) earned.push("encore");
   if (verdict.outcome === "bust" && (Number(verdict.lostPot) || 0) + (Number(verdict.insuredPot) || 0) >= INSURANCE_UNLOCK_LOSS) earned.push("insurance");
   if (verdict.outcome === "cash" && (Number(verdict.multiplier) || 0) >= HIGH_ROLLER_UNLOCK_MULTIPLIER) earned.push("highRoller");
   if (Array.isArray(verdict.nextMutations) && verdict.nextMutations.some((mutation) => mutation.id === "silence")) earned.push("stethoscope");
+  if ((Number(mastery.strike) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("kineticGrip");
+  if ((Number(mastery.steady) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("steadyAnchor");
+  if ((Number(mastery.expose) || 0) >= STANCE_RELIC_UNLOCK_COUNT) earned.push("glassLens");
   return earned.filter((id) => !hasRelic(unlocked, id));
 }
 

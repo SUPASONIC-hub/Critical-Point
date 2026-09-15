@@ -769,6 +769,22 @@ export function applyRelics(schema, relics = []) {
     if (id === "splint") next.fractureRate = Math.min(next.fractureRate, 1.25);
     if (id === "stethoscope") next.sedated = false;
     if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, 11);
+    if (id === "kineticGrip") {
+      if (next.mutations.includes("strikeMastery")) {
+        next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
+        next.stepMax = Math.max(BASE_SCHEMA.stepMax, next.stepMax - 1);
+      }
+      if (next.mutations.includes("strikeWake")) next.chipsScale *= 1.08;
+    }
+    if (id === "steadyAnchor" && next.mutations.includes("steadyMastery")) {
+      next.startGauge = Math.max(0, next.startGauge - 4);
+      next.seconds += 2;
+    }
+    if (id === "glassLens" && next.mutations.includes("exposeMastery")) {
+      next.faceDown = false;
+      next.sealHighest = false;
+      next.sealBreak = Math.min(next.sealBreak, 8);
+    }
   }
   return normalizeSchema(next);
 }
