@@ -613,6 +613,10 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
   const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
   const startCaseEvent = useStableEvent(startCase);
+  const resolveGauntletEvent = useStableEvent(resolveGauntlet);
+  const resetEvent = useStableEvent(reset);
+  const retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
+  const startAtNodeEvent = useStableEvent(startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
   useEffect(() => {
     const updateNetworkStatus = () => {
       const online = globalThis.navigator?.onLine !== false;
@@ -843,7 +847,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }
   function startRecoveryRoute() {
     setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
-    startCase(currentCase);
+    startCaseEvent(currentCase);
   }
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
@@ -1766,10 +1770,10 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   } = createRuntimeRenderers({
     decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
     lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
-    setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup,
-    debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog,
+    setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup: retryStorageCleanupEvent,
+    debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
-    startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot,
+    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot,
   });
 
   if (showRanking && !started) {
@@ -1796,7 +1800,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
     hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase,
     newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
-    startGame, startCase, startNewGamePlus, resumeSavedGame, persist, setShowRanking,
+    startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame, persist, setShowRanking,
     setSaveStatus, setPendingTelemetry, setTelemetryStatus, pendingTelemetryRef,
     renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel,
     // The graph is loaded by the time the runtime shows the intro, so it fills
@@ -1813,7 +1817,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} /></Suspense>;
   }
   const resultView = createResultView(
-    { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog, copyReplayLink, reset, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
+    { AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: startCaseEvent, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, sceneTitleRef, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
     { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats },
   );
   if (isResult) {
@@ -1832,12 +1836,12 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     AdaptiveMusic, musicModeKey, renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus,
     screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
-    gauntletRun, gauntletSeed: dealGauntletSeed(`${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}`), resolveGauntlet,
+    gauntletRun, gauntletSeed: dealGauntletSeed(`${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}`), resolveGauntlet: resolveGauntletEvent,
     isAdvancing, markWindowTouched, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage,
     fixedChoices, clueCount,
     freeChoice, freeText, updateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals,
     anonymizeFreeText,
-    resources, resourceMeta, progress, saveCurrentGame, reset, routeIndex, routeLength,
+    resources, resourceMeta, progress, saveCurrentGame, reset: resetEvent, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink, copyDiagnosticTrace,
   });
   return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} /></Suspense>;

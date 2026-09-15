@@ -137,6 +137,10 @@ export function GauntletStage({
   const multiplier = getMultiplier(win.gauge);
   const livePot = Math.round(selectedChips * multiplier);
   const live = win.status === "live";
+  const settleImpact = useMemo(
+    () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
+    [claimed, live, win.status],
+  );
   const remaining = getRemainingSeconds(win);
   const tellWall = win.wall + (win.tellOffset ?? 0);
   const bpm = getHeartbeatBpm(win.gauge, tellWall, schema.sedated, win.elapsed / schema.seconds);
@@ -239,10 +243,8 @@ export function GauntletStage({
     if (live || resolvedRef.current || !claimed) return undefined;
     if (win.status === "bust") {
       playBustCue();
-      setImpact({ amount: 1 });
     } else {
       playCashCue(multiplier);
-      setImpact({ amount: 0.35 });
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
     const staked = selectedCard && !(wildSelected && wildBlocked) ? selectedCard : savedStake;
@@ -329,7 +331,7 @@ export function GauntletStage({
       data-status={win.status}
       aria-label="임계점 테이블"
     >
-      <GauntletFx window={win} paused={paused} impact={impact} />
+      <GauntletFx window={win} paused={paused} impact={settleImpact ?? impact} />
 
       <div className="gx-table">
         <div className="gx-hud">
