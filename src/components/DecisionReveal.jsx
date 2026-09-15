@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
+import { subjectParticle } from "../playerLanguage.js";
 
 function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
@@ -32,9 +33,16 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     : verdict.pushes === 0
       ? "너무 일찍 멈춘 대가로 다음 판의 큰 카드가 잠길 수 있다."
       : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+  const tempo = verdict.tempo;
+  const beatLine = !tempo || tempo.hits + tempo.slips === 0
+    ? null
+    : busted
+      ? `박자 ${tempo.hits}회 · 헛박자 ${tempo.slips}회. 벽이 콤보 ${tempo.lostCombo}도 가져갔다.`
+      : `박자 ${tempo.hits}회(PERFECT ${tempo.perfects}) · 헛박자 ${tempo.slips}회. 콤보 ${tempo.combo}${subjectParticle(String(tempo.combo))} 다음 판으로 이어진다.`;
   return [
     ["판정 원인", cause],
     ["열기 기록", heatLine],
+    ...(beatLine ? [["박자 기록", beatLine]] : []),
     ["다음 판", `${nextRule}. ${tableLine}`],
   ];
 }
@@ -116,7 +124,9 @@ export function DecisionReveal({ view }) {
               </p>
             ) : (
               <p className="gx-reveal-gain">
-                {verdict.chips} × {verdict.multiplier} = <b>+{formatNumber(verdict.pot)}</b>
+                {verdict.chips} × {verdict.multiplier}
+                {verdict.tempo?.groovePot > 0 && <span className="gx-reveal-groove"> × GROOVE {verdict.tempo.bonus.toFixed(2)}</span>} ={" "}
+                <b>+{formatNumber(verdict.pot)}</b>
               </p>
             )}
             <p className="gx-reveal-bank">

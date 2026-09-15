@@ -183,6 +183,20 @@ list of the files it touched.
     policy that busts every window it can to reach the case's end sooner; it has
     to bank under a quarter of the best blind policy.
 
+38. The heartbeat is also the table's rhythm, and the beat is a hand skill, never
+    a second instrument. A push is graded PERFECT, GOOD or SLIP against the beat
+    `GauntletFx` last sounded (`beatClock`, stamped with `performance.now()` when
+    the beat fires, compared to the input event's `timeStamp`). Timing never
+    moves the wall or the step: on-beat pushes build a combo and groove (the pot
+    rides `getGrooveBonus`, capped at x1.5), a slip breaks the combo and costs
+    `SLIP_SECONDS` of clock with creep, and groove never falls mid-window so the
+    pot on the table never shrinks. A cash carries the combo into the next
+    window; a bust takes it with the pot. `check:pressure` is the ratchet: a
+    perfectly timed hand busts exactly as often as an untimed one, a slipping
+    hand never banks more, and the beat must pay less over listening than
+    listening pays over playing blind. The ending's vault slack reads the vault
+    without `grooveVault`; the beat's own door is `BEAT_SLACK_COMBO`.
+
 ## Verification Commands
 
 ```bash

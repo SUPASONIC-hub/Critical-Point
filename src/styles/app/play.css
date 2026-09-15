@@ -409,6 +409,7 @@
 }
 
 .gx-pot {
+  position: relative;
   grid-area: pot;
   display: flex;
   align-items: baseline;
@@ -835,10 +836,14 @@
 }
 
 .gx-push {
+  position: relative;
   border: 2px solid var(--c-gx-heat);
   color: var(--c-paper);
   background: var(--c-gx-heat-deep);
-  box-shadow: 0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55);
+  box-shadow:
+    0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55),
+    0 0 0 calc(var(--gx-beat-zone, 0) * 3px) var(--c-gx-beat),
+    0 0 calc(var(--gx-beat-zone, 0) * 22px) var(--c-gx-beat-a45);
 }
 
 .gx-push small {
@@ -1288,6 +1293,185 @@
   }
 }
 
+/* The beat --------------------------------------------------------------
+   The push button is the timing target. --gx-beat-phase runs 0 -> 1 between
+   heartbeats, so the ring closes onto the button's border as the next beat
+   lands, and --gx-beat-zone lights the border while a press would land on it.
+   Everything here moves through transform and opacity: nothing lays out, so
+   the beat costs the compositor, not the page. Cyan is the beat and magenta
+   is fever; lime stays on the control that records a decision. */
+.gx-beat-ring {
+  position: absolute;
+  inset: -4px;
+  border: 3px solid var(--c-gx-beat);
+  border-radius: 15px;
+  pointer-events: none;
+  opacity: calc(var(--gx-beat-live, 0) * (0.15 + var(--gx-beat-phase, 0) * 0.85));
+  transform: scale(calc(1.4 - var(--gx-beat-phase, 1) * 0.4));
+  will-change: transform, opacity;
+}
+
+/* Over the button, not above it: the stake strip is fixed just above the action
+   bar and a call-out rising past the button's top would slide under it. */
+.gx-grade {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font: 950 15px/1.1 ui-monospace, monospace;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: gx-grade-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.gx-grade-perfect {
+  color: var(--c-gx-felt);
+  background: var(--c-gx-beat);
+  box-shadow: 0 0 24px var(--c-gx-beat);
+}
+
+.gx-grade-good {
+  border: 1px solid var(--c-gx-beat);
+  color: var(--c-gx-beat);
+  background: var(--c-gx-felt);
+}
+
+.gx-grade-miss {
+  border: 1px solid var(--c-gx-heat);
+  color: var(--c-paper);
+  background: var(--c-gx-heat-deep);
+}
+
+.gx-groove {
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--c-gx-felt);
+  background: var(--c-gx-beat);
+  font: 900 12px/1.2 ui-monospace, monospace;
+}
+
+.gx-combo {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  display: grid;
+  justify-items: end;
+  color: var(--c-gx-beat);
+  line-height: 1;
+  pointer-events: none;
+  transform-origin: 100% 0;
+  scale: calc(1 + var(--gx-combo, 0) * 0.045);
+  animation: gx-combo-pop 0.34s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.gx-combo b {
+  font: 950 30px/0.9 ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 calc(6px + var(--gx-combo, 0) * 2px) var(--c-gx-beat-a45);
+}
+
+.gx-combo small {
+  font: 900 10px/1.2 ui-monospace, monospace;
+  letter-spacing: 0.14em;
+}
+
+.gx-combo.combo-hot b,
+.gx-combo.combo-blaze b {
+  color: var(--c-gx-fever);
+  text-shadow: 0 0 22px var(--c-gx-fever-a40);
+}
+
+.gx-combo.combo-blaze small {
+  color: var(--c-gx-fever);
+}
+
+.gx-combo.is-broken {
+  color: var(--c-gx-text-dim);
+  animation-name: gx-combo-break;
+}
+
+.gauntlet-stage.is-fever .gx-hud {
+  border-color: var(--c-gx-fever);
+  box-shadow:
+    inset 0 0 32px var(--c-gx-fever-a40),
+    0 0 18px var(--c-gx-fever-a40);
+}
+
+.gauntlet-stage.is-fever .gx-pot-value {
+  color: var(--c-gx-beat);
+}
+
+.gx-fx-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, var(--c-gx-beat-a45), transparent 70%);
+  opacity: var(--gx-flash, 0);
+}
+
+.gx-fx-grade-miss .gx-fx-flash {
+  background: radial-gradient(ellipse at 50% 100%, var(--c-gx-heat-a55), transparent 70%);
+}
+
+.gx-fx-fever .gx-fx-border {
+  border-color: var(--c-gx-fever-a40);
+  border-width: 8px;
+  opacity: calc(0.55 + var(--gx-beat, 0) * 0.45);
+}
+
+@keyframes gx-grade-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -75%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -95%) scale(1);
+  }
+}
+
+@keyframes gx-grade-fade {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gx-combo-pop {
+  0% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes gx-combo-break {
+  0% {
+    transform: translateX(-6px) rotate(-6deg);
+  }
+  35% {
+    transform: translateX(5px) rotate(4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
 @media (min-width: 720px) {
   .game-shell {
     padding-top: 18px;
@@ -1314,7 +1498,17 @@
   }
 
   .gx-pot-value,
-  .gx-bpm svg {
+  .gx-bpm svg,
+  .gx-beat-ring {
     transform: none;
+  }
+
+  .gx-grade {
+    animation-name: gx-grade-fade;
+  }
+
+  .gx-combo {
+    scale: none;
+    animation: none;
   }
 }

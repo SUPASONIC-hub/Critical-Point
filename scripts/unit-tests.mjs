@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { getEndingVariant } from "../src/gameLogic.js";
+import { BEAT_SLACK_COMBO, getEndingVariant } from "../src/gameLogic.js";
+import { getSeasonStrain } from "../src/state/useResultReport.js";
 import { readFileSync } from "node:fs";
 
 import {
@@ -31,6 +32,13 @@ import {
   splitOpenSeed,
   isSaveAheadOf,
   carryTableRecordIntoRestore,
+  COMBO_POINT_CAP,
+  FEVER_BONUS,
+  getGrooveBonus,
+  GROOVE_CAP,
+  judgeBeat,
+  scoreBeat,
+  SLIP_SECONDS,
 } from "../src/gauntlet/gauntletEngine.js";
 import {
   createIntroView,
@@ -706,7 +714,124 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     { threshold: { busted: true, potMultiplier: 0, lostPot: 1500, pushes: 6 } },
     { isSystemEvent: true },
   ]);
-  assert.deepEqual(ledger, { busts: 1, cashes: 1, bestMultiplier: 32, potBanked: 1500, potLost: 1500, pushes: 10 });
+  assert.deepEqual(ledger, {
+    busts: 1,
+    cashes: 1,
+    bestMultiplier: 32,
+    potBanked: 1500,
+    potLost: 1500,
+    pushes: 10,
+    bestCombo: 0,
+    beatHits: 0,
+    perfects: 0,
+    slips: 0,
+    grooveBanked: 0,
+  });
+});
+
+/* ---------------------------------------------------------------- tempo */
+
+test("a press is graded against the beat it was closest to, with a floor for a racing pulse", () => {
+  assert.equal(judgeBeat(0, 1000), "perfect", "on the beat");
+  assert.equal(judgeBeat(960, 1000), "perfect", "just ahead of the next beat counts too");
+  assert.equal(judgeBeat(150, 1000), "good");
+  assert.equal(judgeBeat(500, 1000), "miss", "between beats is a slip");
+  assert.equal(judgeBeat(30, 316), "perfect", "at 190 bpm the perfect window keeps its millisecond floor");
+  assert.equal(judgeBeat(55, 316), "good");
+  assert.equal(judgeBeat(2150, 1000), "good", "a late frame still reads the beat it is nearest");
+  assert.equal(judgeBeat(100, 0), null, "no beat on screen, no grade");
+  assert.equal(judgeBeat(Number.NaN, 1000), null);
+});
+
+test("a combo earns groove, a slip breaks the combo and keeps the groove", () => {
+  let state = { beatCombo: 0, groove: 0 };
+  const earned = [];
+  for (const grade of ["good", "perfect", "perfect", "perfect", "perfect", "perfect"]) {
+    state = scoreBeat(state, grade);
+    earned.push(state.points);
+  }
+  assert.deepEqual(earned, [1, 3, 4, COMBO_POINT_CAP + 1, COMBO_POINT_CAP + 1, COMBO_POINT_CAP + 1], "points follow the combo up to the cap");
+  const slipped = scoreBeat(state, "miss");
+  assert.equal(slipped.beatCombo, 0);
+  assert.equal(slipped.groove, state.groove, "the pot on the table never shrinks mid-window");
+  assert.deepEqual(scoreBeat(state, null), { ...state, points: 0 }, "an ungraded press changes nothing");
+  assert.equal(getGrooveBonus(0), 1);
+  assert.equal(getGrooveBonus(10_000), 1 + GROOVE_CAP, "the groove is capped");
+  assert.ok(FEVER_BONUS > 1 && FEVER_BONUS <= 1 + GROOVE_CAP, "fever is reachable");
+});
+
+test("timing never moves the wall or the step, and a slip is paid in clock and creep", () => {
+  const base = liveWindow({ wall: 95, elapsed: 10 });
+  const plain = reduceWindow(base, { type: "PUSH" });
+  const perfect = reduceWindow(base, { type: "PUSH", grade: "perfect" });
+  const slip = reduceWindow(base, { type: "PUSH", grade: "miss" });
+  assert.equal(perfect.gauge, plain.gauge, "a perfect press draws the same step");
+  assert.equal(perfect.elapsed, plain.elapsed);
+  assert.equal(perfect.beatCombo, 1);
+  assert.equal(slip.elapsed, plain.elapsed + SLIP_SECONDS, "a slip costs clock");
+  assert.ok(slip.gauge > plain.gauge, "and the clock creeps heat while it runs, so a slip is never a way around creep");
+  assert.equal(slip.slips, 1);
+  const late = liveWindow({ wall: 95, elapsed: BASE_SCHEMA.seconds - 0.5 });
+  const timedOut = reduceWindow(late, { type: "PUSH", grade: "miss" });
+  assert.equal(timedOut.status, "bust");
+  assert.equal(timedOut.cause, "timeout", "a slip that runs the clock out is a timeout");
+  assert.equal(reduceWindow(liveWindow({ wall: 10, gauge: 5 }), { type: "PUSH", grade: "perfect" }).cause, "push", "the beat does not save a press into the wall");
+});
+
+test("the groove pays the pot, the combo rides a cash, and the wall takes both", () => {
+  const staked = card("a", { capital: 10, trust: -4 });
+  let win = reduceWindow(liveWindow({ wall: 95 }), { type: "SELECT", id: "a" });
+  for (const grade of ["perfect", "perfect", "good"]) win = reduceWindow(win, { type: "PUSH", grade });
+  const cashed = reduceWindow(win, { type: "CASH" });
+  const { verdict, nextRun } = resolveWindow({ run: RUN_INITIAL_STATE, window: cashed, card: staked });
+  const untimed = resolveWindow({ run: RUN_INITIAL_STATE, window: { ...cashed, groove: 0 }, card: staked }).verdict;
+  assert.ok(verdict.pot > untimed.pot, "the groove shows up in the pot");
+  assert.equal(verdict.tempo.groovePot, verdict.pot - untimed.pot);
+  assert.equal(verdict.multiplier, untimed.multiplier, "the heat multiplier belongs to the heat alone");
+  assert.equal(nextRun.beatCombo, 3, "a cash carries the combo into the next window");
+  assert.equal(nextRun.bestCombo, 3);
+  assert.equal(nextRun.runGroove, verdict.tempo.groovePot);
+  assert.equal(createWindow({ seed: "next", beatCombo: nextRun.beatCombo }).beatCombo, 3);
+
+  const busted = resolveWindow({ run: nextRun, window: { ...cashed, status: "bust", cause: "push" }, card: staked });
+  assert.equal(busted.nextRun.beatCombo, 0, "a bust takes the combo with the pot");
+  assert.equal(busted.nextRun.runGroove, 0);
+  assert.equal(busted.nextRun.bestCombo, 3, "the record of the combo stays");
+  assert.equal(busted.verdict.tempo.lostCombo, 3);
+
+  const closed = resolveWindow({ run: nextRun, window: cashed, card: staked, caseClosed: true });
+  assert.equal(closed.nextRun.grooveVault, nextRun.runGroove + closed.verdict.tempo.groovePot, "a closed case moves the groove share into the vault with the pot");
+  assert.ok(closed.nextRun.grooveVault <= closed.nextRun.vault);
+  const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closed.nextRun))));
+  assert.deepEqual(roundTrip, closed.nextRun, "the tempo record survives a save");
+});
+
+test("the ledger and the ending read the beat, and the vault slack does not count the groove", () => {
+  const ledger = createGauntletLedger([
+    { threshold: { busted: false, potMultiplier: 4, pot: 900, pushes: 3, tempo: { maxCombo: 5, hits: 3, perfects: 2, slips: 0, groovePot: 240 } } },
+    { threshold: { busted: true, potMultiplier: 0, lostPot: 900, pushes: 4, tempo: { maxCombo: 7, hits: 2, perfects: 1, slips: 2, groovePot: 0 } } },
+  ]);
+  assert.equal(ledger.bestCombo, 7);
+  assert.equal(ledger.beatHits, 5);
+  assert.equal(ledger.perfects, 3);
+  assert.equal(ledger.slips, 2);
+  assert.equal(ledger.grooveBanked, 240);
+
+  const base = {
+    resources: { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 },
+    discoveredClues: [{ id: "c1" }, { id: "c2" }, { id: "c3" }],
+    seasonHumanCost: 20,
+    peakRiskPressure: 18,
+    seasonBusts: 3,
+    seasonBestMultiplier: 64,
+  };
+  assert.equal(getEndingVariant({ ...base, seasonBestCombo: BEAT_SLACK_COMBO - 1 }).id, "open-question", "a combo a mashing hand can stumble into opens nothing");
+  assert.equal(getEndingVariant({ ...base, seasonBestCombo: BEAT_SLACK_COMBO }).id, "open-oversight", "a season that stayed on the beat earns the clue of slack");
+
+  const strain = getSeasonStrain({ case01: { gauntlet: { vault: 20000, grooveVault: 6000, bestCombo: 4 }, pushRecord: { bestCombo: 9, busts: 3, bestMultiplier: 64 } } });
+  assert.equal(strain.seasonVaultPerCase, 14000, "the vault slack is read without the groove");
+  assert.equal(strain.seasonBestCombo, 9);
+  assert.equal(getEndingVariant({ ...base, ...strain, seasonHumanCost: 20, peakRiskPressure: 18 }).id, "open-question", "groove alone cannot buy the vault door");
 });
 
 test("the ending reads what the run did at the table", () => {

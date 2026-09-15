@@ -6,25 +6,45 @@ import {
   BASE_SCHEMA,
   buildNextSchema,
   describeMutations,
+  FEVER_BONUS,
   FRACTURE_MIN_BURN,
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
   getForcedCard,
+  getGrooveBonus,
   getHeartbeatBpm,
   getMultiplier,
   getRemainingSeconds,
   getSealedCardId,
+  judgeBeat,
+  scoreBeat,
   SEAL_BREAK_GAUGE,
+  SLIP_SECONDS,
   splitOpenSeed,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { GauntletFx } from "./GauntletFx.jsx";
-import { playBustCue, playCashCue, playMutationCue, playPushCue } from "./gauntletAudio.js";
+import { playBeatCue, playBustCue, playCashCue, playFeverCue, playMutationCue, playPushCue } from "./gauntletAudio.js";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const BREACH_AUTO_DISMISS_MS = 2600;
+const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
+const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
+const monotonicNow = () => globalThis.performance?.now?.() ?? 0;
+
+/**
+ * When the player pressed, not when the handler got to it. An input event's
+ * timeStamp is on the same clock as the frame loop's beats, so a press made on
+ * the beat while the main thread was busy -- a slow phone, a render in flight --
+ * is still graded where the hand landed.
+ */
+function pressedAt(event) {
+  const now = monotonicNow();
+  const stamp = Number(event?.timeStamp);
+  return Number.isFinite(stamp) && stamp > 0 && stamp <= now ? stamp : now;
+}
 
 function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
@@ -119,13 +139,16 @@ export function GauntletStage({
   const [lostToTab, setLostToTab] = useState(false);
   const [breachOpen, setBreachOpen] = useState(mutations.length > 0 && !abandoned);
   const [impact, setImpact] = useState(null);
+  const [flash, setFlash] = useState(null);
+  // Written by the frame loop on every beat; read here when a push is pressed.
+  const beatClock = useRef({ at: 0, period: 0 });
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the breach wait until the player has read it.
   const locked = lostToTab || staleSave;
   const awaitingClaim = heldByOtherTab && !claimed;
   const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
   const paused = breachOpen || hidden;
-  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned });
+  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0 });
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
 
@@ -135,8 +158,11 @@ export function GauntletStage({
   const selectedCard = wildSelected ? freeChoice : cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
-  const livePot = Math.round(selectedChips * multiplier);
+  const grooveBonus = getGrooveBonus(win.groove);
+  const livePot = Math.round(selectedChips * multiplier * grooveBonus);
   const live = win.status === "live";
+  const fever = live && grooveBonus >= FEVER_BONUS;
+  const comboTier = win.beatCombo >= 12 ? "blaze" : win.beatCombo >= 6 ? "hot" : win.beatCombo >= 3 ? "warm" : "cold";
   const settleImpact = useMemo(
     () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
     [claimed, live, win.status],
@@ -154,8 +180,8 @@ export function GauntletStage({
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
-  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow));
-  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh));
+  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * grooveBonus);
+  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * grooveBonus);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
   const cashSchema = buildNextSchema({
     outcome: "cash",
@@ -244,7 +270,7 @@ export function GauntletStage({
     if (win.status === "bust") {
       playBustCue();
     } else {
-      playCashCue(multiplier);
+      playCashCue(multiplier, grooveBonus);
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
     const staked = selectedCard && !(wildSelected && wildBlocked) ? selectedCard : savedStake;
@@ -267,13 +293,22 @@ export function GauntletStage({
     dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
   }
 
-  function push() {
+  function push(event) {
     if (locked || (!canPush && !(breachOpen && live))) return;
+    // Graded against the beat the frame loop last landed. With no beat on
+    // screen -- the breach still up, the first pulse not yet in -- the press is
+    // ungraded: no combo, no slip.
+    const clock = beatClock.current;
+    const grade = breachOpen ? null : judgeBeat(pressedAt(event) - clock.at, clock.period);
     setBreachOpen(false);
     const pushIndex = win.pushes + 1;
-    dispatch({ type: "PUSH" });
+    const scored = scoreBeat(win, grade);
+    dispatch({ type: "PUSH", grade });
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
-    setImpact({ amount: 0.28 });
+    playBeatCue(grade, scored.beatCombo);
+    if (grooveBonus < FEVER_BONUS && getGrooveBonus(scored.groove) >= FEVER_BONUS) playFeverCue();
+    setImpact({ amount: grade === "miss" ? 0.5 : 0.28 });
+    if (grade) setFlash({ amount: GRADE_FLASH[grade] });
   }
 
   function cash() {
@@ -295,7 +330,7 @@ export function GauntletStage({
       const actions = keyActions.current;
       if (event.key === " " || event.key.toLowerCase() === "w") {
         event.preventDefault();
-        actions.push();
+        actions.push(event);
         return;
       }
       if (event.key === "Enter") {
@@ -325,13 +360,24 @@ export function GauntletStage({
 
   return (
     <section
-      className={`gauntlet-stage heat-${heatTier}${verdictClass}${schema.faceDown ? " is-face-down" : ""}${schema.sedated ? " is-sedated" : ""}`}
+      className={`gauntlet-stage heat-${heatTier}${verdictClass}${schema.faceDown ? " is-face-down" : ""}${schema.sedated ? " is-sedated" : ""}${fever ? " is-fever" : ""}`}
       data-testid="gauntlet-stage"
       data-gauge={Math.round(win.gauge)}
       data-status={win.status}
+      data-combo={win.beatCombo}
+      data-groove={win.groove}
+      data-last-grade={win.lastGrade ?? ""}
       aria-label="임계점 테이블"
     >
-      <GauntletFx window={win} paused={paused} impact={settleImpact ?? impact} />
+      <GauntletFx
+        window={win}
+        paused={paused}
+        impact={settleImpact ?? impact}
+        flash={flash}
+        beatClock={beatClock}
+        grade={win.lastGrade}
+        fever={fever}
+      />
 
       <div className="gx-table">
         <div className="gx-hud">
@@ -344,7 +390,24 @@ export function GauntletStage({
               <b className="gx-chips">{selectedChips || "—"}</b>
               <i>×</i>
               <b className="gx-mult" data-testid="gauntlet-multiplier">{formatMultiplier(multiplier)}</b>
+              {grooveBonus > 1 && (
+                <>
+                  <i>×</i>
+                  <b className="gx-groove" data-testid="gauntlet-groove">GROOVE {grooveBonus.toFixed(2)}</b>
+                </>
+              )}
             </span>
+            {(win.beatCombo > 0 || win.groove > 0) && (
+              <span
+                key={`combo-${win.pushes}`}
+                className={`gx-combo combo-${comboTier}${win.lastGrade === "miss" ? " is-broken" : ""}`}
+                data-testid="gauntlet-combo"
+                style={{ "--gx-combo": Math.min(win.beatCombo, 16) }}
+              >
+                <b>{win.beatCombo}</b>
+                <small>{fever ? "FEVER" : "COMBO"}</small>
+              </span>
+            )}
           </div>
           <div className="gx-bank">
             <span className={run.runPot > 0 ? "gx-at-risk" : ""}>
@@ -593,11 +656,18 @@ export function GauntletStage({
           onClick={push}
           disabled={!canPush}
           aria-keyshortcuts="Space"
-          aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${nextLow}에서 ${nextHigh}`}
+          aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${nextLow}에서 ${nextHigh}. 심박에 맞춰 누르면 콤보가 쌓인다`}
         >
+          <i className="gx-beat-ring" aria-hidden="true" />
           <Flame size={18} aria-hidden="true" />
           <span>밀어붙인다</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
+          {win.lastGrade && (
+            <em key={`grade-${win.pushes}`} className={`gx-grade gx-grade-${win.lastGrade}`} aria-hidden="true">
+              {GRADE_COPY[win.lastGrade]}
+              {win.lastGrade !== "miss" && win.beatCombo > 1 ? ` ×${win.beatCombo}` : ""}
+            </em>
+          )}
         </button>
         <button
           type="button"
@@ -676,7 +746,10 @@ export function GauntletStage({
           ) : (
             <>
               <strong>{formatMultiplier(multiplier)}</strong>
-              <span>+{formatNumber(livePot)}</span>
+              <span>
+                +{formatNumber(livePot)}
+                {grooveBonus > 1 ? ` · GROOVE ×${grooveBonus.toFixed(2)} · COMBO ${win.beatCombo}` : ""}
+              </span>
             </>
           )}
         </div>

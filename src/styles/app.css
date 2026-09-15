@@ -58,7 +58,7 @@
    .report-archive after it -- so it is styled once here rather than in the two
    files that own those surfaces. */
 .pressure-ledger{display:grid;gap:10px;padding:12px;border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-paper)}
-.pressure-ledger-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pressure-ledger-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .pressure-ledger-grid article{display:grid;gap:2px;padding:8px;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--c-paper-90)}
 .pressure-ledger-grid span{color:var(--c-ink-muted);font-size:10px;font-weight:800;letter-spacing:.04em}
 .pressure-ledger-grid b{font-size:19px;font-weight:950;font-variant-numeric:tabular-nums;line-height:1.1}

@@ -182,6 +182,10 @@
   --c-gx-band: rgb(255 56 56 / 0.28);
   --c-gx-next: rgb(255 206 115 / 0.55);
   --c-gx-shade: rgb(0 0 0 / 0.72);
+  --c-gx-beat: rgb(94 234 255);
+  --c-gx-beat-a45: rgb(94 234 255 / 0.45);
+  --c-gx-fever: rgb(255 92 214);
+  --c-gx-fever-a40: rgb(255 92 214 / 0.4);
 
   /* semantic aliases referenced by components */
   --color-ink: var(--c-ink);

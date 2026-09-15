@@ -652,6 +652,7 @@ const HELD_LINE_MULTIPLIER = 16;
  * heartbeat policy (about 20k), so it rewards reading the table, not playing.
  */
 const VAULT_SLACK_PER_CASE = 16000;
+export const BEAT_SLACK_COMBO = 12; // A hand that heard every beat: a random press lands about a third of them.
 
 export function getEndingVariant({
   resources = {},
@@ -661,7 +662,7 @@ export function getEndingVariant({
   peakRiskPressure = 0,
   seasonBusts = 0,
   seasonBestMultiplier = 1,
-  seasonVaultPerCase = 0,
+  seasonVaultPerCase = 0, seasonBestCombo = 0,
 } = {}) {
   // Two different questions: whether the season ever went past what could be
   // carried, and how quietly this last case ended.
@@ -702,7 +703,7 @@ export function getEndingVariant({
   const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < 31 && humanCost < 90 && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
   if (seasonPressure >= 31 || humanCost >= 90) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
-  const clueBar = heldTheLine || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
+  const clueBar = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
   if (discoveredClues.length >= clueBar && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
   if (discoveredClues.length >= clueBar && legitimacy >= 55) return { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false };
   if (freeTextCount >= 2 && trust >= 60) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신의 문장이 다음 참가자의 첫 단서가 됩니다.", failure: false };

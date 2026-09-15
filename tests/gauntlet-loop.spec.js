@@ -30,6 +30,69 @@ async function pushUntilBust(page) {
   await expect(stage).toHaveAttribute("data-status", "bust");
 }
 
+/**
+ * Presses push from inside the page at a chosen point of the beat the frame
+ * loop is drawing: "on" the frame a beat lands, "off" halfway to the next one.
+ * Reading the phase and clicking in the same frame is what makes the grade
+ * deterministic; a click sent from the test runner lands whenever it lands.
+ */
+async function pushAtBeat(page, where) {
+  return page.evaluate(
+    (mode) =>
+      new Promise((resolve) => {
+        const root = document.documentElement;
+        const button = document.querySelector("[data-testid='commit-push']");
+        const started = performance.now();
+        const check = () => {
+          const style = getComputedStyle(root);
+          const beating = style.getPropertyValue("--gx-beat-live").trim() === "1";
+          const phase = Number(style.getPropertyValue("--gx-beat-phase"));
+          const ready = beating && (mode === "on" ? phase <= 0.02 : phase >= 0.45 && phase <= 0.55);
+          if (ready) {
+            button.click();
+            resolve(true);
+          } else if (performance.now() - started > 8000) {
+            resolve(false);
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
+      }),
+    where,
+  );
+}
+
+test("a push on the heartbeat builds a combo the pot pays for, and a slip breaks it", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  const stage = page.getByTestId("gauntlet-stage");
+
+  expect(await pushAtBeat(page, "on")).toBe(true);
+  await expect(stage).toHaveAttribute("data-last-grade", /^(perfect|good)$/);
+  await expect(stage).toHaveAttribute("data-combo", "1");
+  expect(await pushAtBeat(page, "on")).toBe(true);
+  await expect(stage).toHaveAttribute("data-combo", "2");
+  await expect(page.getByTestId("gauntlet-combo")).toContainText("2");
+  await expect(page.getByTestId("gauntlet-groove")).toContainText("GROOVE");
+
+  expect(await pushAtBeat(page, "off")).toBe(true);
+  await expect(stage).toHaveAttribute("data-last-grade", "miss");
+  await expect(stage).toHaveAttribute("data-combo", "0");
+  await expect(stage).not.toHaveAttribute("data-groove", "0");
+  await expect(page.locator(".gx-grade-miss")).toContainText("SLIP");
+
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.locator(".gx-reveal-groove")).toContainText("GROOVE");
+  await expect(page.getByTestId("consequence-ledger")).toContainText("박자 기록");
+  await page.getByTestId("decision-next").click();
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.beatCombo).toBe(0);
+  expect(saved.dynamics.bestCombo).toBe(2);
+  expect(saved.log.at(-1).threshold.tempo.hits).toBe(2);
+  expect(saved.log.at(-1).threshold.tempo.groovePot).toBeGreaterThan(0);
+});
+
 test("the whole decision is on one screen before anything is scrolled", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openTable(page, "case01", "start");

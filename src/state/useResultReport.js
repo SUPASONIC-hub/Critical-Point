@@ -36,10 +36,19 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
     seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
     // The vault is cumulative across the season, so the largest summary holds it,
-    // and it is read per case: a season total rises with every case played.
+    // and it is read per case: a season total rises with every case played. The
+    // groove the beat added is taken back out -- the vault's slack rewards
+    // reading the table, and the beat has its own door below.
     seasonVaultPerCase: summaries.length
-      ? summaries.reduce((vault, summary) => Math.max(vault, Number(summary.gauntlet?.vault) || 0), 0) / summaries.length
+      ? summaries.reduce(
+        (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.grooveVault) || 0)),
+        0,
+      ) / summaries.length
       : 0,
+    seasonBestCombo: summaries.reduce(
+      (best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0),
+      0,
+    ),
   };
 }
 

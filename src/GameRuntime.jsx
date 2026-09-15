@@ -1120,7 +1120,9 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
       },
       tactical: tacticalRead,
       flowSurge: null,
-      tempoBonus: null,
+      tempoBonus: verdict.tempo.groovePot > 0
+        ? { label: "GROOVE", text: `박자 ${verdict.tempo.hits}회 · 최고 콤보 ${verdict.tempo.maxCombo} · 판돈 +${verdict.tempo.groovePot}` }
+        : null,
       clueReward,
       threshold: {
         state: busted ? "bust" : "cash",
@@ -1134,6 +1136,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
         lostPot: verdict.lostPot,
+        tempo: verdict.tempo,
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       suspenseEvent,

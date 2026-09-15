@@ -73,7 +73,11 @@ const fileBudgets = {
   // became the header, the reveal and the report panels that other screens
   // still render, plus the gauntlet table. Every file below was ratcheted to
   // what the same prune left in it.
-  "play.css": { lines: 1321, bytes: 24541 },
+  // 1321 / 24541 -> 1515 / 28847 on 2026-09-15 for the beat: the approach ring
+  // on the push button, the grade call-outs, the combo badge, fever and the
+  // flash layer. Every rule is an overlay -- absolute or fixed, transform and
+  // opacity only -- so the phone's one-screen table did not get taller.
+  "play.css": { lines: 1515, bytes: 28847 },
   "recovery.css": { lines: 266, bytes: 5754 },
   "responsive.css": { lines: 260, bytes: 5700 },
   "result.css": { lines: 1225, bytes: 25700 },

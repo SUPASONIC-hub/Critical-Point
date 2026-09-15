@@ -40,6 +40,16 @@ export function GauntletLedger({ log = [], summary = null }) {
           <small>밀어붙임 {ledger.pushes}회</small>
         </article>
         <article>
+          <span>최고 콤보</span>
+          <b className={ledger.bestCombo > 0 ? "gain" : ""}>{ledger.bestCombo}</b>
+          <small>PERFECT {ledger.perfects} · 헛박자 {ledger.slips}</small>
+        </article>
+        <article>
+          <span>그루브 판돈</span>
+          <b className={ledger.grooveBanked > 0 ? "gain" : ""}>{formatNumber(ledger.grooveBanked)}</b>
+          <small>박자 {ledger.beatHits}회</small>
+        </article>
+        <article>
           <span>잃은 판돈</span>
           <b className={ledger.potLost > 0 ? "cost" : ""}>{formatNumber(ledger.potLost)}</b>
           <small>번 판돈 {formatNumber(ledger.potBanked)}</small>

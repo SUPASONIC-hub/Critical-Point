@@ -214,6 +214,77 @@ export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, 
 
 export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8, time: -4 });
 
+/* ---------------------------------------------------------------- tempo */
+
+/**
+ * The beat. The heartbeat is the table's one honest instrument, so it is also
+ * the table's rhythm: a push landed on the beat is a push made while listening.
+ *
+ * Timing never moves the wall or the step. The odds stay the heartbeat's
+ * business and `check:pressure` holds that a perfectly timed player busts
+ * exactly as often as an untimed one. What timing moves is what the pot pays
+ * (groove) and what the clock costs (a slip).
+ *
+ * The windows are fractions of the beat with a floor in milliseconds, so a
+ * pulse racing at 190 bpm next to the wall still leaves a gap a hand can hit.
+ */
+export const BEAT_PERFECT = 0.07;
+export const BEAT_PERFECT_FLOOR_MS = 35;
+export const BEAT_GOOD = 0.18;
+export const BEAT_GOOD_FLOOR_MS = 60;
+/** An off-beat push costs this much clock, creep included. */
+export const SLIP_SECONDS = 1;
+/** Groove one push can earn from its combo, before a PERFECT's extra point. */
+export const COMBO_POINT_CAP = 4;
+/**
+ * Each groove point adds this much to the pot, up to GROOVE_CAP (x1.5). Sized
+ * so the beat is a spice and the read is the game: in `check:pressure` a hand
+ * that lands every push PERFECT banks 1.45x the best heartbeat policy, while
+ * listening to the heartbeat banks 1.55x the best blind one. At 0.04 / x2 the
+ * beat paid 1.81x -- past a player who could see the wall -- and timing had
+ * become the strategy.
+ */
+export const GROOVE_RATE = 0.03;
+export const GROOVE_CAP = 0.5;
+/** The groove bonus at which the table goes into fever. */
+export const FEVER_BONUS = 1.3;
+
+const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
+
+/** Where a press landed against the beat: "perfect", "good", "miss", or null with no beat to read. */
+export function judgeBeat(sinceBeatMs, periodMs) {
+  const period = Number(periodMs);
+  const since = Number(sinceBeatMs);
+  if (!Number.isFinite(period) || period <= 0 || !Number.isFinite(since) || since < 0) return null;
+  const phase = since % period;
+  const offset = Math.min(phase, period - phase);
+  if (offset <= Math.max(period * BEAT_PERFECT, BEAT_PERFECT_FLOOR_MS)) return "perfect";
+  if (offset <= Math.max(period * BEAT_GOOD, BEAT_GOOD_FLOOR_MS)) return "good";
+  return "miss";
+}
+
+/**
+ * One graded press against the running combo. A hit extends the combo and
+ * earns groove worth the combo's length (capped); a miss breaks the combo and
+ * keeps the groove, so the pot on the table never shrinks mid-window. An
+ * ungraded press -- no beat on screen yet -- changes neither.
+ */
+export function scoreBeat({ beatCombo = 0, groove = 0 } = {}, grade = null) {
+  const combo = Math.max(0, Math.trunc(Number(beatCombo) || 0));
+  const banked = Math.max(0, Number(groove) || 0);
+  if (grade === "perfect" || grade === "good") {
+    const nextCombo = combo + 1;
+    const points = Math.min(COMBO_POINT_CAP, nextCombo) + (grade === "perfect" ? 1 : 0);
+    return { beatCombo: nextCombo, groove: banked + points, points };
+  }
+  if (grade === "miss") return { beatCombo: 0, groove: banked, points: 0 };
+  return { beatCombo: combo, groove: banked, points: 0 };
+}
+
+export function getGrooveBonus(groove) {
+  return round2(1 + Math.min(GROOVE_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
+}
+
 /* --------------------------------------------------------------- window */
 
 export const TELL_ERROR = 18;
@@ -222,8 +293,9 @@ export function drawTellOffset(seed) {
   return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * TELL_ERROR);
 }
 
-export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false } = {}) {
+export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, beatCombo = 0 } = {}) {
   const normalized = normalizeSchema(schema);
+  const carriedCombo = clamp(Math.trunc(Number(beatCombo) || 0), 0, 999);
   const window = {
     seed: String(seed),
     schema: normalized,
@@ -236,6 +308,14 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     selectedId: null,
     status: "live",
     cause: null,
+    // The combo is carried in from the last cash; groove is earned here.
+    beatCombo: carriedCombo,
+    maxCombo: carriedCombo,
+    groove: 0,
+    beatHits: 0,
+    perfects: 0,
+    slips: 0,
+    lastGrade: null,
   };
   // A window the player touched and then walked away from -- a reload, a tab
   // closed mid-bet -- is settled as a bust. Otherwise F5 undoes the wall.
@@ -252,25 +332,44 @@ export function getRemainingSeconds(window) {
  * The live window. `TICK` carries elapsed seconds since the last tick; the
  * reducer owns the arithmetic so a slow frame and a fast one land the same.
  */
+function advanceClock(window, delta) {
+  const elapsed = window.elapsed + delta;
+  const creepFrom = Math.max(window.elapsed, READ_GRACE_SECONDS);
+  const creeping = Math.max(0, elapsed - creepFrom);
+  const gauge = clamp(window.gauge + creeping * window.schema.creep * (1 + window.pushes * 0.12), 0, GAUGE_MAX);
+  if (gauge >= window.wall) return { ...window, elapsed, gauge: window.wall, status: "bust", cause: "creep" };
+  if (elapsed >= window.schema.seconds) return { ...window, elapsed: window.schema.seconds, gauge, status: "bust", cause: "timeout" };
+  return { ...window, elapsed, gauge };
+}
+
 export function reduceWindow(window, event = {}) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
-    case "TICK": {
-      const delta = clamp(Number(event.delta) || 0, 0, 1);
-      const elapsed = window.elapsed + delta;
-      const creepFrom = Math.max(window.elapsed, READ_GRACE_SECONDS);
-      const creeping = Math.max(0, elapsed - creepFrom);
-      const gauge = clamp(window.gauge + creeping * window.schema.creep * (1 + window.pushes * 0.12), 0, GAUGE_MAX);
-      if (gauge >= window.wall) return { ...window, elapsed, gauge: window.wall, status: "bust", cause: "creep" };
-      if (elapsed >= window.schema.seconds) return { ...window, elapsed: window.schema.seconds, gauge, status: "bust", cause: "timeout" };
-      return { ...window, elapsed, gauge };
-    }
+    case "TICK":
+      return advanceClock(window, clamp(Number(event.delta) || 0, 0, 1));
     case "PUSH": {
       const pushes = window.pushes + 1;
       const step = drawStep(window.schema, window.seed, pushes);
       const gauge = clamp(window.gauge + step, 0, GAUGE_MAX);
-      if (gauge >= window.wall) return { ...window, pushes, lastStep: step, gauge, status: "bust", cause: "push" };
-      return { ...window, pushes, lastStep: step, gauge };
+      const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
+      const scored = scoreBeat(window, grade);
+      const pushed = {
+        ...window,
+        pushes,
+        lastStep: step,
+        gauge,
+        beatCombo: scored.beatCombo,
+        maxCombo: Math.max(Number(window.maxCombo) || 0, scored.beatCombo),
+        groove: scored.groove,
+        beatHits: (Number(window.beatHits) || 0) + (scored.points > 0 ? 1 : 0),
+        perfects: (Number(window.perfects) || 0) + (grade === "perfect" ? 1 : 0),
+        slips: (Number(window.slips) || 0) + (grade === "miss" ? 1 : 0),
+        lastGrade: grade,
+      };
+      if (gauge >= window.wall) return { ...pushed, status: "bust", cause: "push" };
+      // A slip is paid in clock, and the clock creeps heat while it runs, so a
+      // mashed push can never be a way to skip creep.
+      return grade === "miss" ? advanceClock(pushed, SLIP_SECONDS) : pushed;
     }
     case "SELECT":
       return { ...window, selectedId: typeof event.id === "string" ? event.id : null };
@@ -301,13 +400,20 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // The card staked in that window, so an abandoned window settles the card the
   // player chose rather than the worst one on the table.
   openCardId: null,
+  // The beat combo carried into the next window, the longest this run has
+  // held, and the groove share of the pot and the vault. The ending's vault
+  // slack reads the vault without its groove: it rewards reading the table.
+  beatCombo: 0,
+  bestCombo: 0,
+  runGroove: 0,
+  grooveVault: 0,
   schema: BASE_SCHEMA,
 });
 
 export function normalizeRunState(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge"]) {
+  for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "runGroove", "grooveVault"]) {
     const numeric = Number(source[key]);
     if (Number.isFinite(numeric)) run[key] = numeric;
   }
@@ -319,6 +425,10 @@ export function normalizeRunState(value) {
   run.cashes = Math.max(0, Math.trunc(run.cashes));
   run.bestMultiplier = clamp(run.bestMultiplier, 1, 512);
   run.lastGauge = clamp(run.lastGauge, 0, GAUGE_MAX);
+  run.beatCombo = clamp(Math.trunc(run.beatCombo), 0, 999);
+  run.bestCombo = clamp(Math.trunc(run.bestCombo), run.beatCombo, 999);
+  run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
+  run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -440,8 +550,14 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
   const chips = card ? getCardChips(card, current.schema) : 0;
-  const pot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
+  const reachedGroove = Math.max(0, Number(window?.groove) || 0);
+  const grooveBonus = outcome === "cash" ? getGrooveBonus(reachedGroove) : 1;
+  const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
+  const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus) : 0;
+  const groovePot = pot - basePot;
   const lostPot = outcome === "bust" ? current.runPot : 0;
+  const windowCombo = Math.max(0, Math.trunc(Number(window?.beatCombo) || 0));
+  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot : 0;
   const streak = outcome === "cash" && multiplier >= 4 ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : 0;
   const secured = caseClosed ? runPotAfter : 0;
@@ -471,6 +587,18 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
     secured,
     fracturedAxis: current.schema.fracturedAxis,
     nextMutations: describeMutations(nextSchema),
+    tempo: {
+      grade: typeof window?.lastGrade === "string" ? window.lastGrade : null,
+      combo: windowCombo,
+      maxCombo: Math.max(windowCombo, Math.trunc(Number(window?.maxCombo) || 0)),
+      hits: Math.trunc(Number(window?.beatHits) || 0),
+      perfects: Math.trunc(Number(window?.perfects) || 0),
+      slips: Math.trunc(Number(window?.slips) || 0),
+      groove: reachedGroove,
+      bonus: getGrooveBonus(reachedGroove),
+      groovePot,
+      lostCombo: outcome === "bust" ? windowCombo : 0,
+    },
   };
   const nextRun = normalizeRunState({
     windowIndex: current.windowIndex + 1,
@@ -482,6 +610,11 @@ export function resolveWindow({ run, window, card, caseClosed = false }) {
     bestMultiplier: Math.max(current.bestMultiplier, multiplier || 1),
     lastOutcome: outcome,
     lastGauge: gauge,
+    // A cash carries the combo into the next window; the wall takes it with the pot.
+    beatCombo: outcome === "cash" ? windowCombo : 0,
+    bestCombo: Math.max(current.bestCombo, verdict.tempo.maxCombo),
+    runGroove: caseClosed ? 0 : runGrooveAfter,
+    grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
     schema: nextSchema,
   });
   return { verdict, nextRun };
@@ -563,7 +696,10 @@ export function carryTableRecordIntoRestore(restored, current) {
       cashes: Math.max(restoredRun.cashes, currentRun.cashes),
       bestMultiplier: Math.max(restoredRun.bestMultiplier, currentRun.bestMultiplier),
       runPot: bustedSince ? 0 : restoredRun.runPot,
+      runGroove: bustedSince ? 0 : restoredRun.runGroove,
       streak: bustedSince ? 0 : restoredRun.streak,
+      beatCombo: bustedSince ? 0 : restoredRun.beatCombo,
+      bestCombo: Math.max(restoredRun.bestCombo, currentRun.bestCombo),
       schema: bustedSince ? currentRun.schema : restoredRun.schema,
       lastOutcome: bustedSince ? "bust" : restoredRun.lastOutcome,
       openSeed: null,
@@ -591,6 +727,11 @@ export function createGauntletLedger(log = []) {
   let potBanked = 0;
   let potLost = 0;
   let pushes = 0;
+  let bestCombo = 0;
+  let beatHits = 0;
+  let perfects = 0;
+  let slips = 0;
+  let grooveBanked = 0;
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
@@ -600,8 +741,27 @@ export function createGauntletLedger(log = []) {
     potBanked += Number(threshold.pot) || 0;
     potLost += Number(threshold.lostPot) || 0;
     pushes += Number(threshold.pushes) || 0;
+    const tempo = threshold.tempo;
+    if (!tempo || typeof tempo !== "object") continue;
+    bestCombo = Math.max(bestCombo, Number(tempo.maxCombo) || 0);
+    beatHits += Number(tempo.hits) || 0;
+    perfects += Number(tempo.perfects) || 0;
+    slips += Number(tempo.slips) || 0;
+    grooveBanked += Number(tempo.groovePot) || 0;
   }
-  return { busts, cashes, bestMultiplier: round2(bestMultiplier), potBanked, potLost, pushes };
+  return {
+    busts,
+    cashes,
+    bestMultiplier: round2(bestMultiplier),
+    potBanked,
+    potLost,
+    pushes,
+    bestCombo,
+    beatHits,
+    perfects,
+    slips,
+    grooveBanked,
+  };
 }
 
 export function createRunSummary(run) {
@@ -616,6 +776,9 @@ export function createRunSummary(run) {
     bestMultiplier: state.bestMultiplier,
     lastOutcome: state.lastOutcome,
     lastGauge: Math.round(state.lastGauge),
+    beatCombo: state.beatCombo,
+    bestCombo: state.bestCombo,
+    grooveVault: state.grooveVault,
     mutations: [...state.schema.mutations],
   };
 }
