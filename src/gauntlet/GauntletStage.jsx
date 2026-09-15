@@ -10,11 +10,13 @@ import {
   equipRelic,
   FEVER_BONUS,
   FOCUS_MAX,
+  FOCUS_MODES,
   FRACTURE_MIN_BURN,
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
   getFocusBonus,
+  getFocusModeProfile,
   getForcedCard,
   getGrooveBonus,
   getHeartbeatBpm,
@@ -187,7 +189,8 @@ export function GauntletStage({
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
   const grooveBonus = getGrooveBonus(win.groove);
-  const focusBonus = getFocusBonus(win.focus);
+  const focusBonus = getFocusBonus(win.focus, win.focusMode);
+  const focusModeProfile = getFocusModeProfile(win.focusMode);
   const livePot = Math.round(selectedChips * multiplier * grooveBonus * focusBonus.pot);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
@@ -360,6 +363,18 @@ export function GauntletStage({
     dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
   }
 
+  function setFocusMode(mode) {
+    if (!live || locked || draftOpen) return;
+    setBreachOpen(false);
+    playTargetLockCue();
+    dispatch({ type: "SET_FOCUS_MODE", mode });
+  }
+
+  function cycleFocusMode() {
+    const index = FOCUS_MODES.indexOf(win.focusMode);
+    setFocusMode(FOCUS_MODES[(index + 1) % FOCUS_MODES.length]);
+  }
+
   function push(event) {
     if (locked || draftOpen || (!canPush && !(breachOpen && live))) return;
     // Graded against the beat the frame loop last landed. With no beat on
@@ -411,7 +426,7 @@ export function GauntletStage({
   // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, focus, push, cash, cards, freeChoice, draftOpen, relicOffer, pickRelic };
+    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -435,6 +450,11 @@ export function GauntletStage({
       if (event.key.toLowerCase() === "e" || event.key === "Shift") {
         event.preventDefault();
         actions.focus(event);
+        return;
+      }
+      if (event.key.toLowerCase() === "q") {
+        event.preventDefault();
+        actions.cycleFocusMode();
         return;
       }
       if (event.key === " " || event.key.toLowerCase() === "w") {
@@ -554,7 +574,7 @@ export function GauntletStage({
             </span>
             <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
-              <b>FOCUS {Math.round(win.focus)}</b>
+              <b>{focusBonus.label} {Math.round(win.focus)}</b>
               <small>{formatMultiplier(focusBonus.pot)} pot / {formatMultiplier(focusBonus.resource)} read</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
@@ -670,6 +690,24 @@ export function GauntletStage({
             </small>
           </article>
         </section>
+        <div className="gx-focus-modes" role="group" aria-label="Focus mode">
+          {FOCUS_MODES.map((mode) => {
+            const profile = getFocusModeProfile(mode);
+            const active = win.focusMode === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                className={active ? "active" : ""}
+                aria-pressed={active}
+                onClick={() => setFocusMode(mode)}
+              >
+                <span>{profile.label}</span>
+                <small>{profile.text}</small>
+              </button>
+            );
+          })}
+        </div>
         </div>
 
         <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
@@ -815,7 +853,7 @@ export function GauntletStage({
           <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
           <span>LOCK</span>
-          <small>{Math.round(win.focus)}/{FOCUS_MAX}</small>
+          <small>{focusModeProfile.label} {Math.round(win.focus)}/{FOCUS_MAX}</small>
           {win.lastFocusGrade && (
             <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">
               {FOCUS_COPY[win.lastFocusGrade]}

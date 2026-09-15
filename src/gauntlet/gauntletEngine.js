@@ -266,6 +266,40 @@ export const FOCUS_MISS_HEAT = 4;
 export const FOCUS_MISS_SECONDS = 1.25;
 export const FOCUS_RESOURCE_RATE = 0.45;
 export const FOCUS_POT_RATE = 0.9;
+export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
+
+const FOCUS_MODE_PROFILES = Object.freeze({
+  strike: {
+    label: "STRIKE",
+    text: "Bigger pot lock, harsher jams.",
+    gainScale: 1.15,
+    missHeat: FOCUS_MISS_HEAT + 2,
+    missSeconds: FOCUS_MISS_SECONDS,
+    potRate: 1.15,
+    resourceRate: 0.32,
+    reliefPerHit: 0,
+  },
+  steady: {
+    label: "STEADY",
+    text: "Lower reward, every lock cools the table.",
+    gainScale: 0.9,
+    missHeat: Math.max(1, FOCUS_MISS_HEAT - 2),
+    missSeconds: FOCUS_MISS_SECONDS * 0.8,
+    potRate: 0.62,
+    resourceRate: 0.34,
+    reliefPerHit: 2,
+  },
+  expose: {
+    label: "EXPOSE",
+    text: "Amplifies the card's resource effect.",
+    gainScale: 1,
+    missHeat: FOCUS_MISS_HEAT,
+    missSeconds: FOCUS_MISS_SECONDS,
+    potRate: 0.78,
+    resourceRate: 0.72,
+    reliefPerHit: 0,
+  },
+});
 
 const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
 /** How much wider METRONOME makes both beat windows. */
@@ -314,19 +348,30 @@ export function getGrooveBonus(groove) {
   return round2(1 + Math.min(GROOVE_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
-export function scoreFocus({ focus = 0, focusCombo = 0 } = {}, grade = null) {
+export function normalizeFocusMode(value) {
+  return FOCUS_MODES.includes(value) ? value : "strike";
+}
+
+export function getFocusModeProfile(mode) {
+  return FOCUS_MODE_PROFILES[normalizeFocusMode(mode)];
+}
+
+export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}, grade = null) {
   const charge = clamp(Math.round(Number(focus) || 0), 0, FOCUS_MAX);
   const combo = Math.max(0, Math.trunc(Number(focusCombo) || 0));
+  const profile = getFocusModeProfile(focusMode);
   if (grade === "perfect" || grade === "good") {
     const nextCombo = combo + 1;
     const baseGain = grade === "perfect" ? FOCUS_PERFECT_GAIN : FOCUS_GOOD_GAIN;
     const chainGain = Math.min(12, nextCombo * 2);
+    const gained = Math.round((baseGain + chainGain) * profile.gainScale);
     return {
-      focus: clamp(charge + baseGain + chainGain, 0, FOCUS_MAX),
+      focus: clamp(charge + gained, 0, FOCUS_MAX),
       focusCombo: nextCombo,
       focusHits: 1,
       focusPerfects: grade === "perfect" ? 1 : 0,
       focusMisses: 0,
+      focusRelief: grade === "perfect" ? profile.reliefPerHit + 1 : profile.reliefPerHit,
       jammed: false,
     };
   }
@@ -337,6 +382,7 @@ export function scoreFocus({ focus = 0, focusCombo = 0 } = {}, grade = null) {
       focusHits: 0,
       focusPerfects: 0,
       focusMisses: 1,
+      focusRelief: 0,
       jammed: true,
     };
   }
@@ -346,15 +392,19 @@ export function scoreFocus({ focus = 0, focusCombo = 0 } = {}, grade = null) {
     focusHits: 0,
     focusPerfects: 0,
     focusMisses: 0,
+    focusRelief: 0,
     jammed: false,
   };
 }
 
-export function getFocusBonus(focus) {
+export function getFocusBonus(focus, mode = "strike") {
   const charge = clamp(Number(focus) || 0, 0, FOCUS_MAX) / FOCUS_MAX;
+  const profile = getFocusModeProfile(mode);
   return {
-    resource: round2(1 + charge * FOCUS_RESOURCE_RATE),
-    pot: round2(1 + charge * FOCUS_POT_RATE),
+    mode: normalizeFocusMode(mode),
+    label: profile.label,
+    resource: round2(1 + charge * profile.resourceRate),
+    pot: round2(1 + charge * profile.potRate),
     tier: charge >= 1 ? "deadeye" : charge >= 0.7 ? "locked" : charge >= 0.35 ? "traced" : "loose",
   };
 }
@@ -390,6 +440,7 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     perfects: 0,
     slips: 0,
     focus: 0,
+    focusMode: "strike",
     focusCombo: 0,
     maxFocusCombo: 0,
     focusHits: 0,
@@ -458,6 +509,7 @@ export function reduceWindow(window, event = {}) {
       if (!window.selectedId) return window;
       const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
       const scored = scoreFocus(window, grade);
+      const profile = getFocusModeProfile(window.focusMode);
       const focused = {
         ...window,
         focus: scored.focus,
@@ -469,14 +521,21 @@ export function reduceWindow(window, event = {}) {
         jammed: scored.jammed,
         lastFocusGrade: grade,
       };
-      if (grade !== "miss") return focused;
+      if (grade !== "miss") {
+        const cooled = scored.focusRelief > 0
+          ? { ...focused, gauge: clamp(focused.gauge - scored.focusRelief, 0, GAUGE_MAX) }
+          : focused;
+        return cooled;
+      }
       const heated = {
         ...focused,
-        gauge: clamp(focused.gauge + FOCUS_MISS_HEAT, 0, GAUGE_MAX),
+        gauge: clamp(focused.gauge + profile.missHeat, 0, GAUGE_MAX),
       };
       if (heated.gauge >= heated.wall) return { ...heated, gauge: heated.wall, status: "bust", cause: "focus" };
-      return advanceClock(heated, FOCUS_MISS_SECONDS);
+      return advanceClock(heated, profile.missSeconds);
     }
+    case "SET_FOCUS_MODE":
+      return { ...window, focusMode: normalizeFocusMode(event.mode) };
     case "REDEAL":
       // A relic equipped before the window is touched re-deals it under the new
       // rules. Once a card is staked, a push made or the clock started, the
@@ -748,7 +807,8 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const grooveBonus = outcome === "cash" ? getGrooveBonus(reachedGroove) : 1;
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
-  const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge) : getFocusBonus(0);
+  const focusMode = normalizeFocusMode(window?.focusMode);
+  const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus * focusBonus.pot) : 0;
   const groovePot = pot - basePot;
@@ -815,6 +875,8 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     },
     focus: {
       charge: Math.round(focusCharge),
+      mode: focusMode,
+      label: focusBonus.label,
       combo: Math.max(0, Math.trunc(Number(window?.focusCombo) || 0)),
       maxCombo: Math.max(0, Math.trunc(Number(window?.maxFocusCombo) || 0)),
       hits: Math.trunc(Number(window?.focusHits) || 0),
@@ -980,6 +1042,7 @@ export function createGauntletLedger(log = []) {
   let focusPerfects = 0;
   let focusMisses = 0;
   let bestFocusCombo = 0;
+  const focusModes = { strike: 0, steady: 0, expose: 0 };
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
@@ -1003,6 +1066,8 @@ export function createGauntletLedger(log = []) {
     focusPerfects += Number(focus.perfects) || 0;
     focusMisses += Number(focus.misses) || 0;
     bestFocusCombo = Math.max(bestFocusCombo, Number(focus.maxCombo) || 0);
+    const mode = normalizeFocusMode(focus.mode);
+    focusModes[mode] += Number(focus.hits) || Number(focus.misses) || 0;
   }
   return {
     busts,
@@ -1020,6 +1085,7 @@ export function createGauntletLedger(log = []) {
     focusPerfects,
     focusMisses,
     bestFocusCombo,
+    focusModes,
   };
 }
 

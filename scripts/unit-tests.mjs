@@ -749,18 +749,29 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     focusPerfects: 0,
     focusMisses: 0,
     bestFocusCombo: 0,
+    focusModes: { strike: 0, steady: 0, expose: 0 },
   });
 });
 
 test("the table ledger rebuilds focus locks from the log", () => {
   const ledger = createGauntletLedger([
-    { threshold: { busted: false, focus: { hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
-    { threshold: { busted: true, focus: { hits: 0, perfects: 0, misses: 1, maxCombo: 0 } } },
+    { threshold: { busted: false, focus: { mode: "expose", hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
+    { threshold: { busted: true, focus: { mode: "steady", hits: 0, perfects: 0, misses: 1, maxCombo: 0 } } },
   ]);
   assert.equal(ledger.focusHits, 2);
   assert.equal(ledger.focusPerfects, 1);
   assert.equal(ledger.focusMisses, 1);
   assert.equal(ledger.bestFocusCombo, 2);
+  assert.deepEqual(ledger.focusModes, { strike: 0, steady: 1, expose: 2 });
+});
+
+test("focus modes change the lock outcome and steady cools the gauge", () => {
+  const selected = reduceWindow(createWindow({ seed: "focus-mode" }), { type: "SELECT", id: "a" });
+  const steady = reduceWindow(reduceWindow({ ...selected, gauge: 20 }, { type: "SET_FOCUS_MODE", mode: "steady" }), { type: "FOCUS", grade: "perfect" });
+  const strike = reduceWindow(reduceWindow({ ...selected, gauge: 20 }, { type: "SET_FOCUS_MODE", mode: "strike" }), { type: "FOCUS", grade: "perfect" });
+  assert.equal(steady.focusMode, "steady");
+  assert.ok(steady.gauge < 20, "steady turns a clean lock into heat relief");
+  assert.ok(strike.focus > steady.focus, "strike charges faster than steady");
 });
 
 /* ---------------------------------------------------------------- tempo */

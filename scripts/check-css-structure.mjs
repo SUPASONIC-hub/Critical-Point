@@ -85,7 +85,9 @@ const fileBudgets = {
   // 1739 / 34222 -> 1858 / 36660 for the FOCUS lock: the third verb in the
   // gauntlet action bar, its HUD charge rail, mobile fit, and reduced-motion
   // reticle handling.
-  "play.css": { lines: 1858, bytes: 36660 },
+  // 1858 / 36660 -> 1916 / 37752 for focus modes: STRIKE / STEADY / EXPOSE
+  // segmented controls, active-mode glow, and mobile compaction.
+  "play.css": { lines: 1916, bytes: 37752 },
   "recovery.css": { lines: 266, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   "relics.css": { lines: 460, bytes: 9400 },
