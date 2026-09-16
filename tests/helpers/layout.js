@@ -1,4 +1,4 @@
-import { startDebugNode } from "./gameFlow.js";
+import { dismissProtocolBreach, startDebugNode } from "./gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./storage.js";
 
 /**
@@ -42,7 +42,7 @@ export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relic
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/");
   await page.locator(".choices .choice").first().waitFor();
-  await page.evaluate(() => document.querySelector("[data-testid='protocol-breach']")?.click());
+  await dismissProtocolBreach(page);
 }
 
 /** The heaviest board a card can be read on: every per-card rule chip at once. */

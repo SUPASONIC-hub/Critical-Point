@@ -161,6 +161,9 @@ async function startAt(page, caseId, nodeId) {
   await page.getByTestId("debug-node-select").selectOption(nodeId);
   await page.getByTestId("debug-start-node").click();
   await page.waitForSelector(".game-shell");
+  // The window opens on its reading beat with the clock held; contrast is
+  // measured on the live table.
+  await dismissProtocolBreach(page);
 }
 
 test("intro and scene text stays readable against its panel", async ({ page }) => {

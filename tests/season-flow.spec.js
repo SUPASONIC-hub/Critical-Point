@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import { nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
@@ -59,7 +59,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   expect(Array.isArray(diagnosticPayload.errorLog)).toBe(true);
   expect(Array.isArray(diagnosticPayload.saveSlots)).toBe(true);
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /책임을 맡은 사람의 실험|고쳐진 구조의 실험|이름을 남긴 뒤|TRIGGER LAB/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /이름을 올린 사람의 마지막 밤|원본을 넘긴 사람의 마지막 밤|아무에게도 말하지 않은 밤|인사평가 보조지표/ })).toBeVisible();
 });
 
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
@@ -121,9 +121,9 @@ test("the complete season can progress from case 01 to the final ending", async 
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");
 
-  for (let caseIndex = 0; caseIndex < 7; caseIndex += 1) {
+  for (let caseIndex = 0; caseIndex < CASE_SEQUENCE.length; caseIndex += 1) {
     await completeCurrentCase(page);
-    if (caseIndex < 6) {
+    if (caseIndex < CASE_SEQUENCE.length - 1) {
       const nextCaseButton = page.locator(".next-case-panel button");
       await expect(nextCaseButton).toBeVisible();
       await nextCaseButton.evaluate((button) => button.click());
@@ -870,7 +870,7 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
   expect(restored.resources).toEqual({ time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 });
   expect(Object.values(restored.triggers).every((value) => value === 0)).toBe(true);
   expect(Object.values(restored.cognition).every((value) => value === 0)).toBe(true);
-  await page.getByTestId("resume-save").click();
+  await resumeSavedRun(page);
   await expect(page.locator(".choices .choice").first()).toBeVisible();
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".choices .choice").first()).toBeVisible();
@@ -1388,11 +1388,11 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   await page.goto("/?debug=1");
   await openIntroDrawer(page, ".data-info-panel");
   await page.locator(".consent-box input").check({ force: true });
-  await startDebugNode(page, "case05", "c5_aftershock");
+  await startDebugNode(page, "case07", "c7_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /책임을 맡은 사람의 실험|고쳐진 구조의 실험|이름을 남긴 뒤|TRIGGER LAB/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /이름을 올린 사람의 마지막 밤|원본을 넘긴 사람의 마지막 밤|아무에게도 말하지 않은 밤|인사평가 보조지표/ })).toBeVisible();
 
   const savedBeforeFailureCallback = await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));

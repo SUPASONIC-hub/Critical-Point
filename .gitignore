@@ -10,3 +10,9 @@ debug.log
 # Windows matches this case-insensitively, so the public icon needs the negation.
 Profile.jpg
 !public/profile.jpg
+
+# Reference notes dropped in the working tree -- research input, not project
+# files. Anchored to the root so docs/ is unaffected, and written as a rule
+# rather than one filename so the next note does not have to be remembered.
+/*.md
+!/README.md

@@ -25,14 +25,28 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
  * the previous window sealed (COLD FEET) opens when the gauge reaches the seal,
  * and the seal plus one push can never reach the lowest wall a board that did
  * not just bust can draw -- so pushing until cash enables is always safe here.
- * The protocol breach banner pauses the clock and is dismissed by any input.
- * A relic draft holds the clock the same way at a case's first table; flows
- * that only need to get past a decision pass on it.
+ *
+ * Before either, clear whatever stands between the run and a live table: the relic draft, the
+ * protocol breach banner, and -- since the reading beat -- the table's own
+ * closed state. All three hold the clock, so a flow that does not pass them
+ * finds a board it cannot press. Idempotent, because most callers do not know
+ * which of the three is up.
  */
 export async function dismissProtocolBreach(page) {
+  // Best effort, not an assertion: give the stage a beat to paint so the clicks
+  // below have something to hit. It runs on every scene of every walk, so the
+  // ceiling is short -- at ACTION_TIMEOUT_MS a screen that legitimately has none
+  // of these on it stalled the caller for a minute and the suite began timing
+  // out in a different place each run.
+  await page
+    .locator(".choices .choice, .result-page, .ending-sequence")
+    .first()
+    .waitFor({ timeout: 6_000 })
+    .catch(() => {});
   await page.evaluate(() => {
     document.querySelector("[data-testid='relic-skip']")?.click();
     document.querySelector("[data-testid='protocol-breach']")?.click();
+    document.querySelector("[data-testid='open-table']")?.click();
   });
 }
 
@@ -53,11 +67,13 @@ export async function cashStakedCard(page) {
 export async function startFirstRun(page) {
   await clickElement(page.getByTestId("start-first-case"), "start first case");
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await dismissProtocolBreach(page);
 }
 
 export async function resumeSavedRun(page) {
   await clickElement(page.getByTestId("resume-save"), "resume saved run");
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await dismissProtocolBreach(page);
 }
 
 /** Pre-start prose sits in closed <details>; force one open to reach a control. */
@@ -72,6 +88,10 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
     navigate = true,
     resetStorage = true,
     expectGameShell = true,
+    // A window opens on its reading beat with the clock held, and almost every
+    // test is about the timed table behind it. Opening it here keeps that out
+    // of each spec; a test of the reading beat itself passes false.
+    openTable = true,
   } = options;
   if (navigate) await page.goto("/?debug=1");
   if (resetStorage) {
@@ -84,6 +104,7 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
   await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
   await page.getByTestId("debug-start-node").click();
   if (expectGameShell) await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  if (openTable) await dismissProtocolBreach(page);
 }
 
 export async function chooseFirstAvailableChoice(page) {
@@ -93,7 +114,7 @@ export async function chooseFirstAvailableChoice(page) {
     return;
   }
   await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice:not([aria-disabled='true'])")),
+    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice")),
     undefined,
     { timeout: 15_000 },
   );
@@ -226,9 +247,9 @@ export async function completeCurrentCase(page) {
       await dismissDecisionRevealIfPresent(page);
       return;
     }
+    await dismissProtocolBreach(page);
     const choice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
     await expect(choice).toBeVisible();
-    await dismissProtocolBreach(page);
     await choice.evaluate((button) => button.click());
     await cashStakedCard(page);
     const nextButton = page.getByTestId("decision-next");

@@ -157,6 +157,7 @@ test("passing on the draft carries nothing and the table plays on", async ({ pag
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.relics).toEqual([]);
   expect(saved.dynamics.relicOffer).toEqual([]);
+  await dismissProtocolBreach(page);
   await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
   await page.getByTestId("commit-push").click();
   await expect(page.getByTestId("gauntlet-stage")).not.toHaveAttribute("data-gauge", "0");
@@ -246,7 +247,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(banked.dynamics.runPot).toBeGreaterThan(0);
 
-  await page.getByTestId("protocol-breach").click();
+  await dismissProtocolBreach(page);
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   await expect(page.locator(".gx-slam-bust")).toContainText("BUST");
@@ -287,7 +288,7 @@ test("cashing without a single push seals the best card on the next board", asyn
   await expect(sealed).toHaveCount(1);
   await expect(page.getByTestId("sealed-card-lock")).toContainText("최고 칩 봉인");
   await expect(page.getByTestId("sealed-card-lock")).toContainText("30");
-  await page.getByTestId("protocol-breach").click();
+  await dismissProtocolBreach(page);
   await sealed.click();
   await expect(page.getByTestId("commit-confirm")).toBeDisabled();
   for (let press = 0; press < 6 && (await page.getByTestId("commit-confirm").isDisabled()); press += 1) {

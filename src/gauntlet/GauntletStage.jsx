@@ -186,7 +186,29 @@ export function GauntletStage({
   const awaitingClaim = heldByOtherTab && !claimed;
   const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
   const draftOpen = draftPending && !hidden;
-  const paused = breachOpen || hidden || draftOpen;
+  /**
+   * The window opens on a reading beat, with the clock held.
+   *
+   * The scene's story -- its lead, its body and its four case facts -- lives
+   * inside the briefing, and the briefing was folded shut while a 45-second
+   * clock ran. So reading cost clock, and the score's own 사고 리듬 band asks
+   * for 8 to 28 seconds of *deciding*: the two were competing for the same
+   * seconds and reading lost every time. Worse, `responseTimeSec` is the
+   * window's elapsed, so a run that read carefully and a run that skipped the
+   * text were indistinguishable in the one number this whole project exists to
+   * measure.
+   *
+   * Nothing about the table changed. The 45 seconds are still 45 seconds, the
+   * wall is still where it was, and the push-your-luck beat starts the moment
+   * the player says they are ready. Only the reading moved out from under the
+   * clock, which is also what makes the elapsed a decision time at last.
+   *
+   * Keyed by the window's seed, so a new table -- or a relic re-deal -- always
+   * comes back to the reading beat instead of inheriting the last one's state.
+   */
+  const [openedSeed, setOpenedSeed] = useState(null);
+  const tableOpen = openedSeed === seed;
+  const paused = breachOpen || hidden || draftOpen || !tableOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0 });
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
@@ -371,7 +393,12 @@ export function GauntletStage({
     setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
   }
 
+  function openTable() {
+    setOpenedSeed(seed);
+  }
+
   function select(id) {
+    if (!tableOpen) return;
     if (!live || isAdvancing || locked || draftOpen) return;
     setBreachOpen(false);
     playTargetLockCue();
@@ -441,7 +468,7 @@ export function GauntletStage({
   // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic };
+    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic, tableOpen, openTable };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -459,6 +486,15 @@ export function GauntletStage({
           actions.pickRelic(pick ?? null);
         } else if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
+        }
+        return;
+      }
+      // The reading beat has one control, and it is the same key that pushes:
+      // whatever the player's hand is already resting on opens the table.
+      if (!actions.tableOpen) {
+        if (event.key === " " || event.key === "Enter" || event.key.toLowerCase() === "w") {
+          event.preventDefault();
+          actions.openTable();
         }
         return;
       }
@@ -698,7 +734,10 @@ export function GauntletStage({
               <b>{scene.node.speaker}</b> · {scene.speakerRole}
             </p>
             <p className="gx-question">{scene.question}</p>
-            <details className="gx-brief">
+            {/* Remounted when the beat changes, so the reading beat opens it and
+                the timed table starts it closed -- and inside either beat the
+                player can still fold it as they like. */}
+            <details className="gx-brief" key={tableOpen ? "live" : "reading"} open={!tableOpen}>
               <summary>사건 브리핑</summary>
               {/* The room, before the words about it. Ten raster files cannot
                   cover 169 scenes, so the picture is drawn from the scene's own
@@ -799,7 +838,7 @@ export function GauntletStage({
                 key={card.id}
                 className={`choice gx-card${selected ? " selected" : ""}${sealed ? " is-sealed" : ""}${burn?.fractured ? " is-fractured" : ""}${gate.unlocked ? "" : " locked-choice"}`}
                 aria-pressed={selected}
-                aria-disabled={!gate.unlocked || !live || isAdvancing ? "true" : undefined}
+                aria-disabled={!gate.unlocked || !live || isAdvancing || !tableOpen ? "true" : undefined}
                 aria-keyshortcuts={String(index + 1)}
                 onClick={() => (gate.unlocked ? select(card.id) : null)}
               >
@@ -896,7 +935,23 @@ export function GauntletStage({
         )}
       </div>
 
-      <div className="gx-actions">
+      <div className={`gx-actions${tableOpen ? "" : " is-reading"}`}>
+        {!tableOpen && (
+          <button
+            type="button"
+            className="gx-open-table"
+            data-testid="open-table"
+            onClick={openTable}
+            aria-keyshortcuts="Space"
+            aria-label="판을 연다. 지금부터 시계가 흐르고 카드를 걸 수 있다"
+          >
+            <Flame size={18} aria-hidden="true" />
+            <span>판 열기</span>
+            <small>{schema.seconds}초 시작</small>
+          </button>
+        )}
+        {tableOpen && (
+          <>
         <button
           type="button"
           className="gx-push"
@@ -948,6 +1003,8 @@ export function GauntletStage({
           <span>{win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : selectedCard ? "확정" : "카드를 고른다"}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
         </button>
+          </>
+        )}
       </div>
 
       {draftOpen && (

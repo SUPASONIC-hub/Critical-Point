@@ -1176,7 +1176,11 @@
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  color: var(--ui-text-3);
+  /* --ui-text-3 was 4.16:1 here on a phone and the contrast pass caught it: the
+     shell paints a red vignette behind the table, and the dateline is the one
+     line of small text over the strongest part of it. This line says which room
+     and how much clock is left, so the step up is what it should have been. */
+  color: var(--ui-text-2);
   font-size: 11px;
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
@@ -3096,6 +3100,17 @@
 /* An SVG root is a replaced element, so an absolutely positioned one takes its
    own intrinsic width and ignores `right` -- which left the backdrop 360px wide
    inside a 328px header, 15px past a 360px phone. The width is stated. */
+.gx-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: -1;
+  width: 100%;
+  height: 108px;
+  background: linear-gradient(100deg, rgb(10 14 15 / 0.86), rgb(10 14 15 / 0.5) 60%, transparent 92%);
+  pointer-events: none;
+}
+
 .gx-plate-backdrop {
   position: absolute;
   inset: 0 auto auto 0;
@@ -3143,4 +3158,39 @@
 
 .gx-plate-tone-3 {
   --plate-ambient: var(--c-violet);
+}
+
+/* The reading beat. One control, full width, and it is the one that starts the
+   clock -- so it wears the accent for the same reason the cash button does:
+   priority 30 gives lime to the control that records a decision, and choosing
+   to start the 45 seconds is the first one the scene asks for. */
+.gx-actions.is-reading {
+  grid-template-columns: 1fr;
+}
+
+.gx-open-table {
+  color: var(--ui-accent-ink);
+  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid) 55%, var(--c-acid-deep));
+  border: 1px solid var(--c-acid);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 10px 30px rgb(217 255 98 / 0.22);
+}
+
+.gx-open-table small {
+  opacity: 0.72;
+}
+
+/* Nothing on the table is live yet, so the hand reads as paper rather than as
+   five things asking to be pressed. */
+.gauntlet-stage:has(.gx-actions.is-reading) .gx-hand .gx-card {
+  cursor: default;
+  opacity: 0.62;
+}
+
+/* The briefing is the point of this beat, so it gets room -- and because no
+   clock is running, this is the one state the table may scroll in. Priority 27
+   is a rule about a decision under time pressure; there is no decision here. */
+.gauntlet-stage:has(.gx-actions.is-reading) .gx-brief[open] {
+  max-height: none;
 }

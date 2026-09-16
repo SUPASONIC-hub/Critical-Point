@@ -54,7 +54,7 @@ await step("debug jump into a scene", async () => {
  * pushes until the cash button enables.
  */
 async function stakeAndCash(cardIndex = 0) {
-  await page.evaluate(() => document.querySelector("[data-testid='protocol-breach']")?.click());
+  await openTable();
   await page.locator(".choices .choice").nth(cardIndex).evaluate((b) => b.click());
   const cash = page.getByTestId("commit-confirm");
   for (let press = 0; press < 6 && !(await cash.isEnabled()); press += 1) {
@@ -64,7 +64,20 @@ async function stakeAndCash(cardIndex = 0) {
   await cash.evaluate((b) => b.click());
 }
 
+/**
+  * The window opens on a reading beat with the clock held, so every flow below
+  * starts the table before it can press anything on it.
+  */
+async function openTable() {
+  await page.evaluate(() => {
+    document.querySelector("[data-testid='relic-skip']")?.click();
+    document.querySelector("[data-testid='protocol-breach']")?.click();
+    document.querySelector("[data-testid='open-table']")?.click();
+  });
+}
+
 await step("stake a card on the table", async () => {
+  await openTable();
   await page.locator(".choices .choice").first().evaluate((b) => b.click());
   await page.waitForSelector(".gx-card.selected", { timeout: 8000 });
 });
@@ -116,6 +129,7 @@ await step("free-text scene accepts input", async () => {
   await page.getByTestId("debug-node-select").selectOption("c2_pressure");
   await page.getByTestId("debug-start-node").click();
   await page.waitForSelector(".game-shell", { timeout: 10000 });
+  await openTable();
   await page.locator(".gx-card-wild").evaluate((b) => b.click());
   await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고 원본 기록을 확인한 뒤 위험을 공개한다.");
   await page.waitForTimeout(500);

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { dismissProtocolBreach } from "./helpers/gameFlow.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
@@ -165,6 +166,7 @@ test("a clean scene transition does not manufacture an error log entry", async (
   await page.waitForSelector(".game-shell");
   await page.evaluate((key) => localStorage.removeItem(key), ERROR_LOG_KEY);
 
+  await dismissProtocolBreach(page);
   await page.locator(".choices .choice").first().evaluate((button) => button.click());
   await page.getByTestId("commit-confirm").evaluate((button) => button.click());
   await page.waitForSelector("[data-testid='decision-next']");

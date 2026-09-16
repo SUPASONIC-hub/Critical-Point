@@ -494,3 +494,42 @@ the live database when a migration fixes a runtime error.
     `src/responsiveArt.js` and rendered by nothing -- the endings reuse
     `scene-case01..05` and the three `ending-*` files, and no surface ever named
     this one. Deleted with its entry. `check:art` is 9 images now, not 10.
+
+51. Reading is not on the clock. A window used to open live: 45 seconds, heat
+    creeping after 4, and the scene's story -- its lead, its body and its four
+    case facts -- folded shut inside `사건 브리핑`, so opening it spent the
+    clock. The score's own 사고 리듬 band asks for 8 to 28 seconds of *deciding*
+    and the 즉답 패널티 charges anything under 2, which means the design was
+    asking for deliberation out of the same 45 seconds it made the player read
+    three paragraphs in. In practice the table taught the opposite of what the
+    project is about: do not read.
+
+    A window now opens on a reading beat. The briefing is open, the cards are
+    on the table but inert, and the only control is `판 열기`; `paused` already
+    ran through the stage for the relic draft and the breach banner, so holding
+    the clock here needed no new concept. Pressing it starts the same 45 seconds
+    against the same wall. Nothing about the table's balance moved, and nothing
+    in `check:pressure`, `check:balance` or `check:endings` changed.
+
+    It also fixes the measurement. `responseTimeSec` is the window's elapsed,
+    which only advances unpaused, so it is now decision time rather than reading
+    time plus decision time -- the number this whole repository exists to
+    collect was measuring two things at once and could not tell a careful reader
+    from someone who skipped the text.
+
+    What it cost, all of it in the harness: every flow that touches a table has
+    to open it first. `dismissProtocolBreach` is the one place that knows --
+    relic draft, breach banner, reading beat, all three hold the clock -- and
+    `startDebugNode`, `startFirstRun` and `resumeSavedRun` call it. Two ordering
+    bugs came out of that and are worth remembering: a wait for an *enabled*
+    card never returns during the reading beat, because every card is
+    `aria-disabled` until the table opens; and the best-effort wait inside
+    `dismissProtocolBreach` must stay short, because it runs on every scene of
+    every walk and at the 60-second action timeout the suite began timing out in
+    a different place each run.
+
+52. Priority 27 is a rule about a decision under time pressure. The reading beat
+    has no clock, so it is the one state the table may be taller than the screen
+    -- and the layout tests measure the timed board, which is what the rule
+    protects. That is why `startDebugNode` opens the table by default rather
+    than the specs each scrolling past a briefing.
