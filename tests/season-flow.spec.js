@@ -21,7 +21,7 @@ async function startDebugNode(page, caseId, nodeId) {
   });
 }
 
-test("case 06 browser flow can unlock and open the final case", async ({ page }) => {
+test("the last case before the finale can unlock and open it", async ({ page }) => {
   test.setTimeout(180_000);
   const dialogMessages = [];
   page.on("dialog", (dialog) => {
@@ -29,7 +29,7 @@ test("case 06 browser flow can unlock and open the final case", async ({ page })
     dialog.accept();
   });
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case06", "c6_aftershock");
+  await startDebugNode(page, "case07", "c7_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");

@@ -14,7 +14,6 @@ export const RESPONSIVE_ART = new Set([
   "/scene-case03.webp",
   "/scene-case04.webp",
   "/scene-case05.webp",
-  "/scene-final.webp",
   "/ending-final-archive.webp",
   "/ending-oversight-room.webp",
   "/ending-system-collapse.webp",

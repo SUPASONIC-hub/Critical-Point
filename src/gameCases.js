@@ -13,7 +13,7 @@
  * borrowed anything, 06 is what the chain does to the analyst in the next chair,
  * and the finale is the empty signature box the whole thing hangs from.
  */
-export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "final"];
+export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "final"];
 export const CASE_START_NODES = {
   case01: "start",
   case02: "c2_start",
@@ -21,6 +21,7 @@ export const CASE_START_NODES = {
   case04: "c4_start",
   case05: "c5_start",
   case06: "c6_start",
+  case07: "c7_start",
   final: "f_start",
 };
 export const CASE_RESULT_NODES = {
@@ -30,6 +31,7 @@ export const CASE_RESULT_NODES = {
   case04: "case04_result",
   case05: "case05_result",
   case06: "case06_result",
+  case07: "case07_result",
   final: "final_result",
 };
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
@@ -41,6 +43,7 @@ export const nodeOrders = {
   case04: ["c4_start", "c4_offer", "c4_leak", "c4_vote", "c4_final"],
   case05: ["c5_start", "c5_map", "c5_blame", "c5_collapse", "c5_final"],
   case06: ["c6_start", "c6_desk", "c6_logs", "c6_panel", "c6_final"],
+  case07: ["c7_start", "c7_ledger", "c7_counter", "c7_paper", "c7_final"],
   final: ["f_start", "f_archive", "f_confront", "f_choice"],
 };
 
@@ -51,6 +54,7 @@ export const caseObjectives = {
   case04: "은행의 상환 요구가 만들어 낸 3% 부족분을 어디까지 손댈지 정한다",
   case05: "악인이 없는 실패에서 책임과 개선 가능성을 구분한다",
   case06: "옆자리 동료의 붕괴에서 보호와 기록 중 무엇을 먼저 둘지 정한다",
+  case07: "발령까지 48시간 동안 무엇을 모으고, 그 대가를 누구에게 지울지 정한다",
   final: "플로우온 심사 보고서의 빈 서명란에 누구의 이름이 있어야 했는지 확정한다",
 };
 
@@ -108,6 +112,15 @@ export const seasonCasesBase = [
     status: "LOCKED",
     summary:
       "경쟁자 오진우가 무너진다. 그를 몰아붙인 압박 조건은 당신의 실험과 같은 번호를 쓰고 있었다.",
+  },
+  {
+    id: "case07",
+    label: "사건 07",
+    title: "되갚는 자리",
+    trigger: "부당함 / 신뢰 / 선택",
+    status: "LOCKED",
+    summary:
+      "징계가 아니라 인사다. 48시간 뒤면 당신은 240km 밖 지점에 있고, 파일은 여기 남는다. 그 48시간에 누가 손을 내미는지가 이 사건이다.",
   },
   {
     id: "final",

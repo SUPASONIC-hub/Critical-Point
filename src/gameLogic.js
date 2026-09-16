@@ -460,6 +460,11 @@ const discoveryClues = {
     title: "거울 프로필",
     text: "경쟁자의 실험 프로필이 당신 것과 같은 번호를 씁니다. 두 사람은 처음부터 한 실험의 양쪽이었습니다.",
   },
+  case07: {
+    id: "c7-drafted-first",
+    title: "먼저 쓰인 발령서",
+    text: "발령 기안일이 조사 개시보다 12일 앞섭니다. 이 인사는 사건의 결과가 아니라 사건보다 먼저 준비된 답입니다.",
+  },
   final: {
     id: "final-observer-key",
     title: "관찰자의 열쇠",
@@ -607,6 +612,23 @@ const HELD_LINE_MULTIPLIER = 16;
  */
 const COLLAPSE_HUMAN_COST = 15 * CASE_SEQUENCE.length;
 /**
+ * The collapse gate's other half, and the other thing a longer season moves.
+ *
+ * `peakRiskPressure` is a maximum taken over every case walk, so a season with
+ * one more case takes one more draw at it and finds a higher peak for exactly
+ * the same standard of play. `COLLAPSE_HUMAN_COST` and the bust rate were both
+ * derived from the sequence for that reason; this was still a flat 31, and
+ * adding 사건 07 moved collapse 31.6% -> 38.5% of 6000 seasons with no effect
+ * changed. Calibrated at seven cases, where 31 was measured, and lifted by one
+ * for each case past that -- the smallest step that holds the share.
+ */
+const COLLAPSE_PRESSURE_BASE = 31;
+const COLLAPSE_PRESSURE_BASE_CASES = 7;
+const COLLAPSE_PRESSURE_PER_CASE = 1;
+const COLLAPSE_PRESSURE =
+  COLLAPSE_PRESSURE_BASE +
+  COLLAPSE_PRESSURE_PER_CASE * Math.max(0, CASE_SEQUENCE.length - COLLAPSE_PRESSURE_BASE_CASES);
+/**
  * What the vault buys, per case. A season that banked this much a case has, in
  * the ending's own terms, done the job with room to spare, busts or not: it
  * earns the same clue of slack as holding the line. The bar sits above the best
@@ -669,8 +691,8 @@ export function getEndingVariant({
   const trust = resources.trust ?? 0;
   const legitimacy = resources.legitimacy ?? 0;
   const capital = resources.capital ?? 0;
-  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < 31 && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
-  if (seasonPressure >= 31 || humanCost >= COLLAPSE_HUMAN_COST) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
+  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < COLLAPSE_PRESSURE && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
+  if (seasonPressure >= COLLAPSE_PRESSURE || humanCost >= COLLAPSE_HUMAN_COST) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const clueBar = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
   if (discoveredClues.length >= clueBar && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
@@ -749,6 +771,11 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
       c6_after_open: { tag: "조건을 연 결말", title: "두 사람의 설정값을 같은 날 공개했다", text: "경쟁자는 피해자가 아니라 증인이 됐고, 당신도 같은 실험의 피험자로 기록됐습니다." },
       c6_after_name: { tag: "이름으로 닫은 결말", title: "옆자리의 이름으로 사건을 끝냈다", text: "가장 빠른 종결이었습니다. 그 방식은 이제 이 조직이 실패를 처리하는 표준 절차가 됩니다." },
     },
+    case07: {
+      c7_after_stand: { tag: "사람을 먼저 찾은 결말", title: "이름을 올린 사람들을 하루 만에 다 만났다", text: "문서는 한 줄도 나아가지 않았습니다. 대신 그 문서에 적힌 이름들이 무엇에 동의한 것인지 전부 알고 있게 됐습니다." },
+      c7_after_open: { tag: "원본을 넘긴 결말", title: "권한이 살아 있는 마지막 하루를 다 썼다", text: "외부 감사인은 원본을 받았습니다. 당신은 다음 날 06시 40분 기차에 없었고, 그 사실도 함께 기록됐습니다." },
+      c7_after_alone: { tag: "조용히 떠난 결말", title: "아무에게도 알리지 않고 짐을 쌌다", text: "소란은 없었습니다. 문서에 적힌 다른 이름들은 그대로 남았고, 그들은 당신이 어디 있는지 모릅니다." },
+    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
@@ -790,6 +817,11 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
       c6_after_open: { legitimacy: 9, humanCost: -4, fatigue: 6 },
       c6_after_name: { trust: -10, humanCost: 8, capital: 5 },
     },
+    case07: {
+      c7_after_stand: { trust: 9, capital: -5, fatigue: 6 },
+      c7_after_open: { legitimacy: 10, humanCost: -4, fatigue: 7 },
+      c7_after_alone: { trust: -11, humanCost: 7, capital: 6 },
+    },
   };
   return carryovers[caseId]?.[choiceId] ?? {};
 }
@@ -821,11 +853,16 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c5_after_system: { id: "use-reframe", title: "정확한 기록 의심하기", text: "당신이 또렷하게 만든 기록이 사람을 겨누고 있지 않은지 판을 뒤집어 확인해야 합니다." },
       c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 보너스를 만듭니다." },
     },
-    // Keyed on case 06's aftermath: the finale follows that case now.
+    case07: {
+      c6_after_stand: { id: "protect-trust", title: "지켜 준 자리를 청구서로 만들지 않기", text: "옆자리를 지킨 기준이 이번엔 당신을 향합니다. 그 기준을 스스로에게도 적용하는 선택을 찾아야 합니다." },
+      c6_after_open: { id: "find-cost", title: "공개가 비껴간 사람 찾기", text: "조건을 열었는데 실험은 남았습니다. 그 공개가 누구를 지나쳤는지 찾아야 보너스가 열립니다." },
+      c6_after_name: { id: "repair-legitimacy", title: "같은 절차를 내 이름으로 열기", text: "남의 이름으로 닫았던 절차가 이번에는 당신 차례입니다. 그 절차를 공정하게 되돌리는 선택이 압박을 낮춥니다." },
+    },
+    // Keyed on case 07's aftermath: the finale follows that case now.
     final: {
-      c6_after_stand: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
-      c6_after_open: { id: "use-reframe", title: "열어 둔 조건도 의심하기", text: "공개한 조건이 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c6_after_name: { id: "repair-legitimacy", title: "이름 뒤의 공정함 회복하기", text: "한 사람에게 모인 책임을 다시 나누고, 피해를 회복하는 선택을 찾아야 합니다." },
+      c7_after_stand: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
+      c7_after_open: { id: "use-reframe", title: "열어 둔 조건도 의심하기", text: "공개한 조건이 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c7_after_alone: { id: "repair-legitimacy", title: "침묵 뒤의 공정함 회복하기", text: "조용히 닫은 종결이 선례가 되지 않게, 피해를 회복하는 선택을 찾아야 합니다." },
     },
   };
   return challenges[caseId]?.[choiceId] ?? null;

@@ -3084,6 +3084,8 @@
   --plate-solid: var(--ui-surface-1);
   --plate-glow: var(--ui-surface-4);
   --plate-sheen: var(--ui-glass);
+  --plate-figure: var(--ui-bg);
+  --plate-ambient: var(--ui-surface-4);
   --plate-accent-chip: var(--ui-chip);
   --plate-accent-heat: var(--ui-heat);
 
@@ -3100,8 +3102,8 @@
   z-index: -1;
   width: 100%;
   height: 108px;
-  opacity: 0.62;
-  mask-image: linear-gradient(102deg, rgb(0 0 0 / 0.95), transparent 86%);
+  opacity: 0.78;
+  mask-image: linear-gradient(100deg, rgb(0 0 0), rgb(0 0 0 / 0.72) 58%, transparent 96%);
 }
 
 .gx-plate-panel {
@@ -3120,4 +3122,25 @@
   --plate-bg: var(--ui-bg);
   --plate-solid: var(--ui-bg);
   --plate-glow: var(--ui-surface-3);
+}
+
+/* Each building keeps one colour of light across every room inside it, so the
+   season's movement -- lab, client site, branch, bookshop -- is legible before
+   the dateline is read. These tint the ambient fills only: the accent stays
+   chip or heat, because that pair means "how much pressure is on this scene"
+   and has to mean the same thing in every building. */
+.gx-plate-tone-0 {
+  --plate-ambient: var(--ui-chip);
+}
+
+.gx-plate-tone-1 {
+  --plate-ambient: var(--c-amber);
+}
+
+.gx-plate-tone-2 {
+  --plate-ambient: var(--c-sage);
+}
+
+.gx-plate-tone-3 {
+  --plate-ambient: var(--c-violet);
 }

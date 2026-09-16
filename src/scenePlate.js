@@ -19,7 +19,7 @@
  */
 
 /** The rooms this season walks, reduced to what they look like. */
-export const PLATE_MOTIFS = ["skyline", "street", "floor", "control", "archive", "corridor", "hall", "desk"];
+export const PLATE_MOTIFS = ["skyline", "street", "floor", "control", "archive", "corridor", "hall", "counter", "desk"];
 
 /**
  * Which motif a room is, most specific first.
@@ -32,8 +32,9 @@ const MOTIF_RULES = [
   ["skyline", ["옥상", "33층", "그룹전략실"]],
   ["street", ["헌책방", "포장마차", "퇴근길"]],
   ["floor", ["풀필먼트", "야간조", "물류"]],
+  ["counter", ["창구", "지점", "객장"]],
   ["control", ["통제실", "시스템 지도", "배차석", "상황판"]],
-  ["archive", ["보관소", "자료실", "서버실", "기록실", "색인", "설계 로그", "승인 기록"]],
+  ["archive", ["보관소", "자료실", "서버실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
   ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
 ];
@@ -57,6 +58,24 @@ const PRESSURE_PHASES = new Set([
 
 /** Clocks that say the lights are off outside. */
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
+
+/**
+ * The buildings this season walks, in the order light was assigned to them.
+ *
+ * Every plate used to be lit the same grey, so 트리거랩 and 강서지점 read as the
+ * same room with different furniture. A building keeps one colour of light
+ * across every scene inside it, which is what makes the season's movement --
+ * lab, client, branch, bookshop -- legible at a glance instead of only in the
+ * dateline. The tone is the building's, not the case's, so a case that visits
+ * three buildings looks like it visited three buildings.
+ */
+const PLATE_TONES = 4;
+
+export function getPlateTone(place = "") {
+  const building = String(place).split("·")[0].trim();
+  if (!building) return 0;
+  return hashString(building) % PLATE_TONES;
+}
 
 function hashString(value) {
   let hash = 0x811c9dc5;
@@ -119,6 +138,7 @@ export function getScenePlate(node = {}, nodeId = "") {
   return {
     motif,
     seed,
+    tone: getPlateTone(place),
     accent: PRESSURE_PHASES.has(node.phase) ? "heat" : "chip",
     night: NIGHT_MARKERS.some((marker) => clock.includes(marker)),
   };

@@ -84,7 +84,7 @@ import {
   restoreRecoverySnapshot,
 } from "../src/appConfig.js";
 import { test } from "node:test";
-import { createPlateRandom, getPlateMotif, getScenePlate, PLATE_MOTIFS } from "../src/scenePlate.js";
+import { createPlateRandom, getPlateMotif, getPlateTone, getScenePlate, PLATE_MOTIFS } from "../src/scenePlate.js";
 import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
@@ -966,9 +966,16 @@ test("the ending answers busts across the range play reaches, not at one step", 
     seasonBestMultiplier: 4,
   };
   const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
-  assert.notEqual(pressureAt(0, 28), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 28), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 28))).size > 1);
+  // The sample strain moved 28 -> 29 when 사건 07 landed. Both halves of the
+  // collapse gate are derived from the season length -- the bust rate divides by
+  // it, the pressure threshold rises with it -- so an eight-case season prices a
+  // bust slightly lower and sets the line slightly higher, and the old sample sat
+  // under the new line with any number of busts. What the test is for is the
+  // shape, not the coordinate: clean does not collapse, enough busts does, and
+  // the answer in between is graded rather than a single step.
+  assert.notEqual(pressureAt(0, 29), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 29), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 29))).size > 1);
 });
 
 /* --------------------------------------------------------------- relics */
@@ -1145,6 +1152,7 @@ test("every scene draws a room, and always the same one", () => {
     assert.ok(motifs.has(plate.motif), `${nodeId} drew an unknown motif ${plate.motif}`);
     assert.equal(typeof plate.seed, "number");
     assert.ok(["chip", "heat"].includes(plate.accent), `${nodeId} asked for accent ${plate.accent}`);
+    assert.ok(Number.isInteger(plate.tone) && plate.tone >= 0 && plate.tone < 4, `${nodeId} asked for tone ${plate.tone}`);
     // A plate that redraws differently on a reload would make a resumed save
     // look like a different room, so the spec has to be a pure function of the
     // scene. The generator is checked too: same seed, same first three draws.
@@ -1168,5 +1176,10 @@ test("every scene draws a room, and always the same one", () => {
   assert.equal(getPlateMotif("트리거랩 기록 보관소 B2 · 이전 참가자 구역"), "archive");
   // A bid is worked in its waiting room, so 입찰 wins over 대기실.
   assert.equal(getPlateMotif("세움테크 입찰 대기실"), "hall");
+  // A branch is a counter hall even when only the building is named.
+  assert.equal(getPlateMotif("KD은행 강서지점"), "counter");
+  assert.equal(getPlateMotif("KD은행 강서지점 · 문서고"), "archive");
+  // One building, one colour of light, whichever room inside it the scene is in.
+  assert.equal(getPlateTone("KD은행 강서지점 · 4번 창구"), getPlateTone("KD은행 강서지점"));
   assert.equal(getPlateMotif(""), "desk");
 });

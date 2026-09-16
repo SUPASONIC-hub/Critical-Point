@@ -111,13 +111,13 @@ const fileBudgets = {
   // which every scene had carried since the graph was written and which had
   // never reached the DOM, so the briefing explained the table and not the
   // situation. One 11px row; the phone table still fits all 149 scenes.
-  // 3070 / 63000 -> 3125 / 64900 on 2026-09-16 for the scene plate: the
+  // 3070 / 63000 -> 3155 / 65700 on 2026-09-16 for the scene plate: the
   // `--plate-*` palette, a faded backdrop behind the scene header and a
   // readable copy inside the briefing. The drawing itself is SVG built in
   // `ScenePlate.jsx`, so this is the whole stylesheet cost of giving all 169
   // scenes a picture, and the backdrop is absolutely positioned so the table
   // keeps every pixel of the one screen priority 27 gives it.
-  "play.css": { lines: 3125, bytes: 64900 },
+  "play.css": { lines: 3155, bytes: 65700 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.

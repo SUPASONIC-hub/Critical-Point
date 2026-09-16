@@ -649,7 +649,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case06: { routeMemory: getRouteMemory([{ nodeId: "c6_route_system", choiceId: "c6_route_system_index", freeTextSuccess: true }]) } },
+      caseResults: { case07: { routeMemory: getRouteMemory([{ nodeId: "c7_route_system", choiceId: "c7_route_system_trace", freeTextSuccess: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -796,8 +796,8 @@ test("case 02 should have a people-led opening route", () => {
   assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 });
 test("the final act should have a system-led opening route", () => {
-  // Keyed on case 06's aftermath: that is the case the finale now follows.
-  assert.equal(caseOpeningRoutes.final.c6_after_open, "f_start_system", "the final act should have a system-led opening route");
+  // Keyed on case 07's aftermath: that is the case the finale now follows.
+  assert.equal(caseOpeningRoutes.final.c7_after_open, "f_start_system", "the final act should have a system-led opening route");
 });
 test("case 06 should open from case 05's aftermath", () => {
   assert.equal(caseOpeningRoutes.case06.c5_after_system, "c6_start_system", "case 06 should open from case 05's aftermath");
@@ -916,11 +916,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("42 generated scenes should expose 132 authored choices: three each across seven cases", () => {
+test("48 generated scenes should expose 150 authored choices: three each across eight cases", () => {
   assert.equal(
     generatedChoiceCount,
-    132,
-    "42 generated scenes should expose 132 authored choices: three each across seven cases",
+    150,
+    "48 generated scenes should expose 150 authored choices: three each across eight cases",
   );
 });
 
@@ -988,13 +988,16 @@ for (const caseId of CASE_SEQUENCE) {
     branchingNodes.length >= 1,
     `${caseId} should expose at least one playable branch`,
   );
-  if (["case01", "case02", "case03", "case04", "case05", "case06", "final"].includes(caseId)) {
+  // Every case in the season splits. The list this used to name was every case
+  // there was, so the else branch below was unreachable until 사건 07 landed and
+  // fell into it -- a case with four branching scenes failing a rule written for
+  // a case with one. There is no such case, so the rule is the same for all of
+  // them and the list is gone.
+  {
     assert.ok(
       branchingNodes.length > 1,
       `${caseId} should intentionally split its main route into different question paths`,
     );
-  } else {
-    assert.equal(branchingNodes.length, 1, `${caseId} should keep one authored mid-case branch`);
   }
 }
 for (const caseId of CASE_SEQUENCE) {

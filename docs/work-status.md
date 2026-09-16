@@ -440,3 +440,57 @@ the live database when a migration fixes a runtime error.
     gate's own message telling the reader to fix `readCaptureGeometry()`. The
     capture is what `toHaveScreenshot()` compares, so it is what decides; the DOM
     number stays in the attached diagnostics.
+
+48. 사건 07 is an eighth case, and the first one the analyst does not judge.
+    Six cases ask what will be given up and none of them let anything be taken
+    back, so the season ran on one register and reached the finale with nothing
+    but resentment to spend. 사건 07 is the beat that pays: the group answers
+    사건 06 with a posting rather than a dismissal -- no grounds needed, no
+    appeal, 48 hours -- and the analyst spends those hours asking four people
+    for the four things only they hold. Three of the four hand it over and every
+    one of them is charged for it. Its own room set arrived with it (감사팀 서고,
+    강서지점 창구, 회기동 헌책방), which is why the plate gained a `counter`
+    motif.
+
+    Adding it moved the same four kinds of key 사건 06 did -- `caseOpeningRoutes`
+    and `getContinuityChallenge` now read `c7_after_*` for the finale, the
+    `nextCaseSignals` chain gained a link, the branch-briefing clone block maps
+    `case07` to `c7_start`, and `AppContent`'s save-repair prefixes take `c7_` --
+    plus three that 사건 06 did not:
+    - `check-dialogue.mjs` counts generated scenes (42 -> 48) and `smoke-test`
+      counts their choices (132 -> 150). Both are per-case counts wearing a
+      literal, so a case adds to both.
+    - The collapse gate's pressure half was still a flat 31 while its human-cost
+      half and the bust rate were already derived from `CASE_SEQUENCE.length`.
+      `peakRiskPressure` is a maximum over case walks, so an eighth case takes an
+      eighth draw at it and collapse went 31.6% -> 38.5% of 6000 seasons with no
+      effect changed -- the same shape of drift priority 41 was written about.
+      `COLLAPSE_PRESSURE` now rises by one per case past seven, which puts it
+      back at 32.0%. Both halves being length-derived also prices a bust slightly
+      lower, so the unit test's sample strain moved 28 -> 29.
+    - A smoke assertion listed every case by name and sent the rest to an `else`
+      that expected exactly one branching scene. The list was every case there
+      was, so that branch had never run; 사건 07 fell into it with four branching
+      scenes. Every case in this season splits, so the list is gone.
+
+49. The plate draws rooms with people in them. The first version drew empty
+    architecture, which is wallpaper: the audit room and the archive were the
+    same grey box with different furniture, and the backdrop behind the speaker
+    read as texture rather than a place. Three changes fixed it, and all three
+    are still computed from the scene rather than shipped as art.
+    - Silhouettes, standing or seated, placed where the scene's speaker would be.
+      A room with one person in it stops being a diagram.
+    - Light belongs to the building, not the case. `getPlateTone` hashes the
+      segment of `place` before the `·`, so every room inside 트리거랩 is lit one
+      colour and every room inside 강서지점 another, and the season's movement is
+      visible before the dateline is read. The accent stays chip-or-heat in every
+      building, because that pair means "how much pressure is on this scene" and
+      cannot also mean "which building".
+    - The accent carries a radial halo, and the backdrop went from 0.62 to 0.78
+      opacity with the mask holding longer before it fades. `contrast.spec.js`
+      and the axe pass both still hold over it.
+
+50. `/scene-final.webp` and its two variants were promised to the browser by
+    `src/responsiveArt.js` and rendered by nothing -- the endings reuse
+    `scene-case01..05` and the three `ending-*` files, and no surface ever named
+    this one. Deleted with its entry. `check:art` is 9 images now, not 10.

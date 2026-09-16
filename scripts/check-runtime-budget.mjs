@@ -42,9 +42,13 @@ const BUDGETS = {
   // 2384 / 13 -> 2520 / 14 on 2026-09-16: 사건 06 is a seventh case, and its
   // aftermath, connective, reaction, side-door, hidden-route, evidence-turn and
   // opening tables all live in this file alongside the other six.
+  // 2520 / 14 -> 2740 / 15 on 2026-09-16: 사건 07 is an eighth, with the same
+  // seven tables again. This file is the season's data, so it grows once per
+  // case by roughly the same amount; the ratchet is here to catch logic moving
+  // in, not to cap the number of cases the season is allowed to have.
   "src/gameData.js": {
-    lines: 2520,
-    importedNames: 14,
+    lines: 2740,
+    importedNames: 15,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started

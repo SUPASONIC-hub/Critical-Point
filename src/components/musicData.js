@@ -114,6 +114,7 @@ export const chapterMotifs = {
   case04: { wave: "square", lift: 220, impact: 1.18 },
   case05: { wave: "triangle", lift: 480, impact: 1.24 },
   case06: { wave: "sine", lift: 392, impact: 1.12 },
+  case07: { wave: "triangle", lift: 415, impact: 1.16 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 
