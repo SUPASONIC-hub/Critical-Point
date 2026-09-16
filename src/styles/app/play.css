@@ -1138,11 +1138,15 @@
 
 /* The scene: who is asking and the one question. */
 .gx-scene {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: 10px;
   align-items: start;
+  overflow: hidden;
   padding-inline: 2px;
+  border-radius: var(--ui-radius-sm);
 }
 
 .gx-scene > div {
@@ -3063,4 +3067,57 @@
     scale: none;
     animation: none;
   }
+}
+
+/* The scene's room, drawn by `ScenePlate.jsx` from `place` and `phase`, and
+   printed twice. `backdrop` sits behind the scene header, absolutely positioned
+   and faded, so it costs the table none of the one screen priority 27 gives it;
+   `panel` is the readable copy inside the briefing, which is closed by default.
+   `--plate-*` is the only palette the drawing sees, so it follows the
+   night-shift tokens rather than carrying colours of its own, and none of them
+   is lime: priority 30 keeps that for the control that records a decision. */
+.gx-plate {
+  --plate-bg: var(--ui-bg-raised);
+  --plate-far: var(--ui-line-strong);
+  --plate-mid: var(--ui-text-3);
+  --plate-near: var(--ui-line-strong);
+  --plate-solid: var(--ui-surface-1);
+  --plate-glow: var(--ui-surface-4);
+  --plate-sheen: var(--ui-glass);
+  --plate-accent-chip: var(--ui-chip);
+  --plate-accent-heat: var(--ui-heat);
+
+  display: block;
+  background: var(--ui-bg-raised);
+}
+
+/* An SVG root is a replaced element, so an absolutely positioned one takes its
+   own intrinsic width and ignores `right` -- which left the backdrop 360px wide
+   inside a 328px header, 15px past a 360px phone. The width is stated. */
+.gx-plate-backdrop {
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: -1;
+  width: 100%;
+  height: 108px;
+  opacity: 0.62;
+  mask-image: linear-gradient(102deg, rgb(0 0 0 / 0.95), transparent 86%);
+}
+
+.gx-plate-panel {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 8px 0 2px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-xs);
+  aspect-ratio: 320 / 132;
+}
+
+/* A clock that reads after midnight loses the last of the ambient fill, so the
+   accent is the only thing left in the frame with light in it. */
+.gx-plate-night {
+  --plate-bg: var(--ui-bg);
+  --plate-solid: var(--ui-bg);
+  --plate-glow: var(--ui-surface-3);
 }

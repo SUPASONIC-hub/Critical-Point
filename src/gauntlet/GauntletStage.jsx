@@ -49,6 +49,7 @@ import {
 import { hasRelic, RELICS } from "./relics.js";
 import { RelicDraft, RelicIcon } from "./RelicDraft.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
+import { ScenePlate } from "../components/ScenePlate.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const BREACH_AUTO_DISMISS_MS = 2600;
@@ -668,6 +669,11 @@ export function GauntletStage({
         </div>
 
         <header className="gx-scene">
+          {/* The room, behind the words about it. Absolutely positioned and
+              faded, so it costs the table no height -- priority 27 is what that
+              costs nothing for -- while still being the first thing a player
+              sees. The readable copy of the same drawing is in the briefing. */}
+          <ScenePlate node={scene.node} nodeId={scene.nodeId} variant="backdrop" />
           <img
             className="gx-portrait"
             src={scene.speakerPortrait ?? "/speaker-profile-160.webp"}
@@ -694,6 +700,12 @@ export function GauntletStage({
             <p className="gx-question">{scene.question}</p>
             <details className="gx-brief">
               <summary>사건 브리핑</summary>
+              {/* The room, before the words about it. Ten raster files cannot
+                  cover 169 scenes, so the picture is drawn from the scene's own
+                  `place` and `phase` rather than shipped as art. Inside the
+                  closed briefing because priority 27 gives the table its height
+                  budget and a picture in front of the cards would spend it. */}
+              <ScenePlate node={scene.node} nodeId={scene.nodeId} />
               {scene.node.lead && <p className="gx-brief-lead">{scene.node.lead}</p>}
               <p>{scene.node.text}</p>
               {/* The case facts. Every scene has carried a `memo` since the graph

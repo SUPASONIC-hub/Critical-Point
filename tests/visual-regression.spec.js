@@ -141,14 +141,21 @@ async function expectCaptureGeometry(target, testInfo, screenshotName, options =
       contentType: "application/json",
     });
 
+    // The captured PNG is the geometry `toHaveScreenshot()` will compare, so it
+    // is the one that decides. A DOM reading that disagrees with a capture which
+    // still matches the baseline is this helper approximating, not the screen
+    // drifting: the document height is fractional, `scrollHeight` rounds it its
+    // own way, and the answer lands a pixel or two off what Chromium rasterises.
+    // That gap is invisible until a copy edit moves the intro onto a fractional
+    // height, and then it fails a run where nothing about the layout is wrong.
     expect(
-      actual,
+      captured,
       `${screenshotName} capture geometry changed: classification=${classification}; ` +
         `expected baseline ${baseline.width}x${baseline.height}, measured DOM ${actual.width}x${actual.height}, ` +
         `captured PNG ${captured.width}x${captured.height}. ` +
-        `If classification=layout, fix the rendered layout before refreshing baselines; ` +
-        `if classification=harness, fix readCaptureGeometry().`,
+        `Fix the rendered layout before refreshing baselines.`,
     ).toEqual(baseline);
+    return;
   }
 
   expect(

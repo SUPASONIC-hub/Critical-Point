@@ -387,3 +387,56 @@ the live database when a migration fixes a runtime error.
     made them was deleted; the `Profile.jpg` / `!public/profile.jpg` pair stays,
     because Windows matches that name case-insensitively and the app's icon
     would go with it. `npm run verify:static` is still twenty checks.
+
+46. Every scene has a picture, and none of them is a file. The season ships ten
+    raster images, six of which are reused as ending backdrops, so 169 scenes
+    shared none: the table named a room and drew nothing. Photographs do not
+    scale to that -- `check:art` caps a 480px variant at 26KB each, and a scene
+    rewritten into a different building would need its art re-cut. So the
+    picture is computed. `src/scenePlate.js` reads the two facts a scene already
+    states about itself, `place` and `phase`, and returns a motif plus a seed;
+    `src/components/ScenePlate.jsx` draws that as inline SVG. Eight motifs cover
+    the season -- skyline, street, floor, control, archive, corridor, hall, desk
+    -- and the seed decides which windows are lit, where the vanishing point
+    sits and which element takes the accent, so two scenes in one room differ and
+    a scene never differs from itself. `npm test` holds all three: every scene
+    resolves to a known motif, the spec is a pure function of the node, and no
+    motif exists that no scene reaches.
+    - A place names its building, then its room after a `·`. The room wins:
+      `돌봄 배차 복구 통제실 · 복도` is a corridor. When the room names nothing
+      the classifier knows, the building answers instead, which is what keeps
+      `기록 보관소 B2 · 이전 참가자 구역` in the archive.
+    - It prints twice. The backdrop sits behind the scene header, absolutely
+      positioned, cropped to the middle band of the frame and masked to fade
+      right, so it costs the table none of the one screen priority 27 gives it.
+      The readable copy is inside the briefing, which is closed by default.
+    - An SVG root is a replaced element, so an absolutely positioned one takes
+      its own intrinsic width and ignores `right`. `inset: 0 0 auto` therefore
+      left the backdrop 360px wide inside a 328px header -- 15px past a 360px
+      phone, which `gauntlet-loop.spec.js` caught and no other check would have.
+      The backdrop states `width: 100%` instead of relying on two offsets. The
+      panel needs no such guard: a closed `<details>` skips layout for its
+      contents, so the drawing inside it contributes no width at all.
+    - Colour is `--plate-*` only, mapped onto the night-shift tokens, and none of
+      it is lime: priority 30 keeps that for the control that records a decision.
+      The accent is `--ui-heat` on the pressure beats and `--ui-chip` elsewhere.
+    - It is `aria-hidden`. The room and the deadline are already text in the
+      dateline directly above it.
+
+47. A baseline is stale the moment a screen's copy changes, and nothing in
+    `verify:static` says so. `check:visual-baselines` only asserts that a file
+    exists per platform, so the story rewrite on 2026-09-16 shipped an intro
+    paragraph 40px taller than every committed screenshot and twenty green
+    checks said nothing. Re-record with `npm run test:visual -- --update-snapshots`
+    in the same pass that changes a screen, and remember that only `win32` can be
+    recorded from a Windows checkout -- `linux` needs the Visual Regression
+    workflow dispatched with `update_baselines`, which priority 19 already says.
+
+    The geometry gate in front of that comparison now asks the captured PNG, not
+    the DOM. It used to read `Math.ceil(scrollHeight)` and compare that to the
+    baseline's pixel height, which agreed only as long as the document height
+    stayed whole: the new intro copy made it fractional, the DOM read 2454, the
+    capture rasterised 2452, and a run where nothing had drifted failed with the
+    gate's own message telling the reader to fix `readCaptureGeometry()`. The
+    capture is what `toHaveScreenshot()` compares, so it is what decides; the DOM
+    number stays in the attached diagnostics.

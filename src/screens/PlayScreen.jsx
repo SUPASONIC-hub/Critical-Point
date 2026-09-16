@@ -77,7 +77,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
           anonymizeFreeText,
         }}
         scene={{
-          node,
+          node, nodeId: resolvedNodeId,
           speakerPortrait,
           speakerRole: speakerProfile.role,
           question: narrativeSpine.question,

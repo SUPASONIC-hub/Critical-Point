@@ -84,6 +84,7 @@ import {
   restoreRecoverySnapshot,
 } from "../src/appConfig.js";
 import { test } from "node:test";
+import { createPlateRandom, getPlateMotif, getScenePlate, PLATE_MOTIFS } from "../src/scenePlate.js";
 import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
@@ -1133,4 +1134,39 @@ test("relics are unlocked by feats, and a restore cannot hand an INSURANCE payou
   assert.deepEqual(carried.relics, ["insurance", "splint"]);
   assert.equal(carried.insuranceSpent, true);
   assert.deepEqual(carried.relicOffer, []);
+});
+
+test("every scene draws a room, and always the same one", () => {
+  const motifs = new Set(PLATE_MOTIFS);
+  const seen = new Map();
+  const used = new Set();
+  for (const [nodeId, node] of Object.entries(nodes)) {
+    const plate = getScenePlate(node, nodeId);
+    assert.ok(motifs.has(plate.motif), `${nodeId} drew an unknown motif ${plate.motif}`);
+    assert.equal(typeof plate.seed, "number");
+    assert.ok(["chip", "heat"].includes(plate.accent), `${nodeId} asked for accent ${plate.accent}`);
+    // A plate that redraws differently on a reload would make a resumed save
+    // look like a different room, so the spec has to be a pure function of the
+    // scene. The generator is checked too: same seed, same first three draws.
+    assert.deepEqual(getScenePlate(node, nodeId), plate, `${nodeId} is not deterministic`);
+    const draws = [0, 1, 2].map(() => createPlateRandom(plate.seed)());
+    assert.equal(new Set(draws).size, 1, "the same seed must open on the same value");
+    used.add(plate.motif);
+    const place = node.place ?? "";
+    const already = seen.get(place);
+    if (already) assert.equal(already, plate.motif, `${place} drew two different rooms`);
+    else seen.set(place, plate.motif);
+  }
+  // Every motif earns its place. One that nothing routes to is a drawing the
+  // player can never see and a branch nothing covers.
+  assert.deepEqual([...motifs].filter((motif) => !used.has(motif)), [], "a motif no scene reaches");
+
+  // The room after the separator outranks the building before it.
+  assert.equal(getPlateMotif("돌봄 배차 복구 통제실 · 복도"), "corridor");
+  assert.equal(getPlateMotif("돌봄 배차 복구 통제실 · 시스템 지도"), "control");
+  // ...unless it names nothing, in which case the building answers.
+  assert.equal(getPlateMotif("트리거랩 기록 보관소 B2 · 이전 참가자 구역"), "archive");
+  // A bid is worked in its waiting room, so 입찰 wins over 대기실.
+  assert.equal(getPlateMotif("세움테크 입찰 대기실"), "hall");
+  assert.equal(getPlateMotif(""), "desk");
 });
