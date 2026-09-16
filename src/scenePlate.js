@@ -19,7 +19,19 @@
  */
 
 /** The rooms this season walks, reduced to what they look like. */
-export const PLATE_MOTIFS = ["skyline", "street", "floor", "control", "archive", "corridor", "hall", "counter", "desk"];
+export const PLATE_MOTIFS = [
+  "skyline",
+  "street",
+  "floor",
+  "coast",
+  "gallery",
+  "control",
+  "archive",
+  "corridor",
+  "hall",
+  "counter",
+  "desk",
+];
 
 /**
  * Which motif a room is, most specific first.
@@ -27,11 +39,19 @@ export const PLATE_MOTIFS = ["skyline", "street", "floor", "control", "archive",
  * Order matters twice. `입찰 대기실` is a room you work a bid in, not a place
  * you wait, so 입찰 is tested before 대기실; `야간조 대기실` is the warehouse
  * floor, so 야간조 is tested before both.
+ *
+ * The shore and the gallery are places before they are rooms: a 펜션's office
+ * is still a room by the sea, and a 전시장 is a wall of canvases whatever
+ * building it is in. So both are tested before the counter and every generic
+ * room word -- a place that names a room after its `·` still gets that room,
+ * because the room segment is matched first.
  */
 const MOTIF_RULES = [
   ["skyline", ["옥상", "33층", "그룹전략실"]],
-  ["street", ["헌책방", "포장마차", "퇴근길"]],
+  ["street", ["헌책방", "포장마차", "퇴근길", "중앙시장", "골목", "주차장"]],
   ["floor", ["풀필먼트", "야간조", "물류"]],
+  ["coast", ["경포", "바닷가", "펜션", "해변", "항구", "방파제"]],
+  ["gallery", ["갤러리", "화랑", "전시장"]],
   ["counter", ["창구", "지점", "객장"]],
   ["control", ["통제실", "시스템 지도", "배차석", "상황판"]],
   ["archive", ["보관소", "자료실", "서버실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
@@ -54,6 +74,10 @@ const PRESSURE_PHASES = new Set([
   "THE OTHER CONDITION",
   "AFTERMATH",
   "LAST EVIDENCE",
+  "THE TRACE",
+  "THE BAIT",
+  "THE LEDGER",
+  "THE TIMING",
 ]);
 
 /** Clocks that say the lights are off outside. */

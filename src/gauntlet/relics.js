@@ -19,11 +19,11 @@
 
 export const RELIC_OFFER_SIZE = 3;
 /** The combo that unlocks ENCORE: a hand that has learned the beat. */
-export const ENCORE_UNLOCK_COMBO = 8;
+const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */
 export const INSURANCE_UNLOCK_LOSS = 5000;
 /** The cash multiplier that unlocks HIGH ROLLER. */
-export const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
+const HIGH_ROLLER_UNLOCK_MULTIPLIER = 64;
 /** A stance relic opens when its stance has reshaped enough charged cashes. */
 export const STANCE_RELIC_UNLOCK_COUNT = 3;
 

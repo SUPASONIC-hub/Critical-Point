@@ -7,12 +7,13 @@ const assetsDir = path.join(root, "dist", "assets");
 const budgets = [
   // GameRuntime read 450_000 until 2026-09-16, when every scene started carrying
   // its own question, room, clock and lead line (`src/nodes/sceneContext.js`),
-  // and 490_000 until 사건 06 added a seventh case, and 540_000 until 사건 07
-  // added an eighth. The chunk is
+  // and 490_000 until 사건 06 added a seventh case, 540_000 until 사건 07
+  // added an eighth, and 585_000 until 사건 08 and 09 added a ninth and tenth
+  // (with the scene plate's two new rooms and its motion layer). The chunk is
   // mostly the scene graph, so narrative that the player reads is exactly what
   // it is meant to weigh. Gzip is the number that reaches a phone and it stays
   // well inside its share.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 585_000 },
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 660_000 },
   { pattern: /^index-.*\.js$/, maxBytes: 120_000 },
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 75_000 },
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 60_000 },

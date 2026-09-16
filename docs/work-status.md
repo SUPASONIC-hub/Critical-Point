@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-16
+Last updated: 2026-09-16 (season expanded to ten cases)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -533,3 +533,94 @@ the live database when a migration fixes a runtime error.
     -- and the layout tests measure the timed board, which is what the rule
     protects. That is why `startDebugNode` opens the table by default rather
     than the specs each scrolling past a briefing.
+
+53. The season is ten cases, and its second act argues the thesis out loud.
+    The game started from one question -- not "how smart am I" but "when do I
+    get smart" -- and the claim that very different feelings wake the same
+    obsessive thinking and aim it somewhere different. Seven cases had shown
+    care and burden and never let a grudge think. 사건 08 「돈의 흔적」 is the
+    grudge's intelligence: the posting from 사건 07 lands the analyst on the one
+    counter a shell company's consulting fees pass through, and 오진우 follows
+    them on his father's line -- a man above you is still a man, wanting spends
+    money, money leaves a trail. 사건 09 「두 장의 손익계산서」 is care and
+    burden together: 플로우온 is back at 72 hours for liquidation, the founder's
+    son who refused the family business sits across the table for the bank that
+    wants it closed, and he takes no help he cannot write down. The case closes
+    on whether the sheet that rescues the company and the sheet that charges the
+    people who broke it go on the same table. Three people arrived with it
+    (나준혁, 권도현, 강태민; no portraits, so they fall back to
+    `/speaker-profile.webp`), plus a `revenge` trigger (복수) and interludes after
+    both cases.
+
+    Adding two cases moved the keys priority 48 lists, twice: node files and
+    `nodeOrders`, the aftermath and connective and reaction tables (now named
+    `lateSeason*`), the side-door plans, `dramaticRoutePlans`,
+    `evidenceTurnaroundPlans`, `continuityMemoryChoicePlans`, `caseOpeningRoutes`
+    (the finale reads `c9_after_*`), `branchOpeningCopy`, the clue, outcome,
+    carryover and continuity tables in `gameLogic.js`, `nextCaseSignals`,
+    `operatorBriefs`, `chapterRules`, `triggerLabSignals`, `chapterMotifs`,
+    `caseSetting` and every scene's context. The counts that wear a literal
+    moved too: `check-dialogue.mjs` 48 -> 60 generated scenes and `smoke-test`
+    150 -> 186 choices. The collapse gates are length-derived, so nothing was
+    retuned: collapse reads 34.2% of 6000 seasons (32.0% at eight cases). The two
+    unit samples that sit on a coordinate of that gate moved (16 -> 26 busts,
+    strain 29 -> 33), for the reason priority 48 already gives. The opening
+    clone's base scene is `CASE_START_NODES[caseId]`, not a ternary that had to
+    be extended per case.
+
+54. The report names what woke the thinking. `getThinkingMotive` groups the
+    run's trigger scores into four families -- 애정형 (affection, protection,
+    trust: rescue), 복수형 (revenge, injustice, competition, recognition:
+    correction), 책임형 (responsibility, order, reward, system: recovery) and
+    탐구형 (the rest: discovery) -- and `판단 DNA` prints the winner with the road
+    its thinking takes. A run with no record falls back to 책임형, the burden the
+    season opens with. It sits inside `.report-archive`, so priority 28's first
+    screen is unchanged.
+
+55. The plate moves. The far plane drifts, the accent's halo breathes and its
+    light flickers, the air carries dust by day and rain (outdoors) or slow
+    specks (indoors) after midnight, screen rooms get raster lines and a light
+    band every 7s, pressure beats get a slow red vignette, and the briefing copy
+    zooms and pans over 32s. Particle positions and timings come from a second
+    generator on the scene's seed, so a scene never differs from itself and the
+    existing drawings did not move. It is all transform or opacity inside the
+    SVG's own clipped viewport (priority 27 and the `width: 100%` rule hold),
+    none of it is lime (priority 30), and under reduced motion it stops on a
+    finished drawing. Two motifs arrived with 사건 08 and 09: `coast`
+    (경포/바닷가/펜션/해변/항구/방파제) and `gallery` (갤러리/화랑/전시장), tested
+    before the generic room words. `street` also answers 중앙시장, 골목 and
+    주차장 -- not 시장, which is inside 전시장 and turned the gallery into a street.
+    The play.css budget is 3360 / 70200.
+
+56. Priority 44's vocabulary rule applies to names as well as terms. New copy
+    uses the words a Korean bank uses today (승인, 작성일, 대출 -- 결재, 기안 and
+    여신 are at zero in `src/` and one of them had come back in 사건 07), and a
+    person or a company is named the way someone would be named now: 탁필성,
+    문기석, 권혁배, 권혁수, 서명철, 남궁철 and 한결은행 became 나준혁, 강태민,
+    권태호, 권승우, 배성준, 남궁현 and 브릿지은행. A rename keeps the old name's
+    last syllable shape -- a consonant ending for a consonant ending -- because
+    the particles already written after it (와/과, 은/는) agree with the old name,
+    and a vowel-for-consonant swap breaks every one of them silently. A term a
+    fifteen-year-old would not know is still unpacked in brackets the first
+    time it appears in a scene body: 채권단, 회생, 청산, 선순위 담보, 출자전환,
+    고용 승계, 배임, 횡령, 매출채권, 보전 신청, 정기검사, 담보 순위, 감정평가법인,
+    세무 대리인 and 휴면 법인 계좌 all do this once.
+
+57. A second sweep on 2026-09-16, same rule as priority 43: what nothing reads
+    goes. `src/state/savedState.js` no longer carries a copy of the eight
+    error-recovery functions; `errorRecovery.js` is the single source (the
+    intro shell loads it without the scene graph) and `savedState.js`
+    re-exports `recordAppError`, with the queue label settled on "에러 로그".
+    `GameRuntime` lost its second save-suppression flag and the two functions
+    behind it, which only defaults no render path reached could call.
+    `boardChangePrompts` had no reader. `docs/operations.md` had no link; its
+    deploy and retention notes are in the README now. Symbols used only inside
+    their own module lost `export`. Three hand-kept case lists that had fallen
+    behind the season were bugs, not style: the intro's unlock chain stopped at
+    사건 05 and opened the finale straight after it (06 and 07 never unlocked
+    through play), `unlockAllCasesForTest` stopped at 06, and 사건 07 opened on
+    사건 01's echo line because the intro-echo ternary stopped at 06. The unlock
+    is "the previous case in `seasonCasesBase` is complete" with a unit test,
+    the test unlock is `CASE_SEQUENCE` minus the finale, and the echoes are the
+    `caseIntroEchoes` table. `raise-choice-gains.mjs` had also stopped listing
+    cases at 05.

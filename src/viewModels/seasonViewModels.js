@@ -1,15 +1,16 @@
+/**
+ * A case opens when the case before it in the season is complete.
+ *
+ * This was a hand-written chain that stopped at 사건 05 and opened the finale
+ * straight after it, so 사건 06 and 07 only ever showed as open while being
+ * played. The order is the order `seasonCasesBase` lists the season in.
+ */
 export function createSeasonCases({ seasonCasesBase, completedCases, currentCase }) {
-  return seasonCasesBase.map((caseItem) => {
+  return seasonCasesBase.map((caseItem, index) => {
     const isCompleted = completedCases.includes(caseItem.id);
     const isCurrent = caseItem.id === currentCase;
-    const isUnlocked =
-      caseItem.id === "case01" ||
-      (caseItem.id === "case02" && completedCases.includes("case01")) ||
-      (caseItem.id === "case03" && completedCases.includes("case02")) ||
-      (caseItem.id === "case04" && completedCases.includes("case03")) ||
-      (caseItem.id === "case05" && completedCases.includes("case04")) ||
-      (caseItem.id === "final" && completedCases.includes("case05")) ||
-      isCurrent;
+    const previousCaseId = seasonCasesBase[index - 1]?.id;
+    const isUnlocked = index === 0 || completedCases.includes(previousCaseId) || isCurrent;
     return {
       ...caseItem,
       status: isCompleted ? "COMPLETE" : isCurrent ? "PLAYING" : isUnlocked ? "OPEN" : "LOCKED",
@@ -40,7 +41,7 @@ export function createLocalLeaderboardRows({
   ];
 }
 
-export function createSeasonCompletionSummary({ caseSummary, completedCaseCount }) {
+function createSeasonCompletionSummary({ caseSummary, completedCaseCount }) {
   return { ...caseSummary, seasonComplete: true, completedCaseCount };
 }
 

@@ -19,11 +19,11 @@ export function appendLocalRankingRowToRows(rows, row) {
   return [...rows, row].filter((item) => item && typeof item === "object" && item.case_id && item.summary).slice(-100);
 }
 
-export function readLocalRankingRows() {
+function readLocalRankingRows() {
   return parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]"));
 }
 
-export function writeLocalRankingRows(rows) {
+function writeLocalRankingRows(rows) {
   return writeStoredValue(LOCAL_RANKING_STORAGE_KEY, JSON.stringify(rows));
 }
 

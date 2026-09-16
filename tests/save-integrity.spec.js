@@ -22,6 +22,7 @@ const STORAGE_KEY = "trigger-prototype-v2";
 const EMPTY_TRIGGERS = {
   protection: 0,
   injustice: 0,
+  revenge: 0,
   responsibility: 0,
   competition: 0,
   reward: 0,

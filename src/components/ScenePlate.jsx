@@ -27,13 +27,22 @@ import { createPlateRandom, getScenePlate } from "../scenePlate.js";
 export function ScenePlate({ node, nodeId, variant = "panel" }) {
   const plate = getScenePlate(node, nodeId);
   const random = createPlateRandom(plate.seed);
+  // The air gets its own generator, so adding motes never moves a window the
+  // room already lit -- and it is still the scene's seed, so the rain on a
+  // resumed scene falls where it fell before.
+  const air = createPlateRandom((plate.seed ^ 0x9e3779b9) >>> 0);
   const draw = MOTIF_PAINTERS[plate.motif] ?? MOTIF_PAINTERS.desk;
   const accent = `var(--plate-accent-${plate.accent})`;
+  // Both copies print on one page, so every paint server is named per copy.
+  const id = `plate-${variant}-${plate.seed}`;
+  const screens = SCREEN_MOTIFS.has(plate.motif);
+  const heat = plate.accent === "heat";
   const className = [
     "gx-plate",
     `gx-plate-${variant}`,
     `gx-plate-${plate.motif}`,
     `gx-plate-tone-${plate.tone}`,
+    `gx-plate-${plate.accent}`,
     plate.night ? "gx-plate-night" : "",
   ]
     .filter(Boolean)
@@ -53,13 +62,46 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
       focusable="false"
     >
       <defs>
-        <radialGradient id={`plate-halo-${plate.seed}`}>
+        <radialGradient id={`${id}-halo`}>
           <stop offset="0%" stopColor={accent} stopOpacity="0.55" />
           <stop offset="100%" stopColor={accent} stopOpacity="0" />
         </radialGradient>
+        {screens && (
+          <>
+            <linearGradient id={`${id}-sweep`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+              <stop offset="85%" stopColor="var(--plate-ambient)" stopOpacity="0.32" />
+              <stop offset="100%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+            </linearGradient>
+            <pattern id={`${id}-lines`} width="4" height="3" patternUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="4" height="1" fill="var(--plate-ambient)" />
+            </pattern>
+          </>
+        )}
+        {heat && (
+          <radialGradient id={`${id}-vignette`} r="0.72">
+            <stop offset="45%" stopColor={accent} stopOpacity="0" />
+            <stop offset="100%" stopColor={accent} stopOpacity="0.5" />
+          </radialGradient>
+        )}
       </defs>
       <rect x="0" y="0" width="320" height="132" fill="var(--plate-bg)" />
-      {draw(random, accent, `url(#plate-halo-${plate.seed})`)}
+      {/* Everything that is the room moves as one, so the briefing copy can
+          push in slowly without the ground showing at an edge. */}
+      <g className="gx-plate-stage">
+        {draw(random, accent, `url(#${id}-halo)`)}
+        {paintAir(air, plate)}
+        {screens && (
+          <>
+            {/* A room lit by screens refreshes: faint raster lines, and one
+                band of light rolling down them every few seconds. */}
+            <rect x="0" y="0" width="320" height="132" fill={`url(#${id}-lines)`} opacity="0.07" />
+            <rect className="gx-plate-sweep" x="0" y="-26" width="320" height="26" fill={`url(#${id}-sweep)`} />
+          </>
+        )}
+      </g>
+      {/* A pressure beat closes in from the edges. */}
+      {heat && <rect className="gx-plate-vignette" x="0" y="0" width="320" height="132" fill={`url(#${id}-vignette)`} />}
       {/* A single sweep of light across the glass, so the plate sits on the same
           surface as every other panel instead of floating as a diagram. */}
       <rect x="0" y="0" width="320" height="132" fill="var(--plate-sheen)" opacity="0.35" />
@@ -67,13 +109,81 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
   );
 }
 
+/** Rooms whose light comes off a screen, which get the refresh sweep. */
+const SCREEN_MOTIFS = new Set(["control", "archive", "desk"]);
+
+/** Rooms with open sky over them, where a night can be raining. */
+const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
+
+/**
+ * What hangs in the room's air. By day it is dust catching the light; after
+ * midnight it is rain where there is sky and a few slow specks where there is
+ * a ceiling. Every position, speed and phase comes from the scene's own seed,
+ * and each element has a resting place and opacity, so with motion off the
+ * plate still reads as a finished drawing -- motes suspended, rain mid-fall.
+ */
+function paintAir(random, plate) {
+  const rain = plate.night && OUTDOOR_MOTIFS.has(plate.motif) && random() < 0.7;
+  if (rain) {
+    const drops = [];
+    for (let drop = 0; drop < 18; drop += 1) {
+      const x = span(random, -8, 334);
+      const y = span(random, -6, 118);
+      const length = span(random, 6, 12);
+      const timing = {
+        animationDuration: `${span(random, 0.8, 1.4).toFixed(2)}s`,
+        animationDelay: `-${span(random, 0, 1.4).toFixed(2)}s`,
+      };
+      drops.push(
+        <line key={`rain-${drop}`} x1={round(x)} y1={round(y)} x2={round(x - length * 0.3)} y2={round(y + length)} style={timing} />,
+      );
+    }
+    return (
+      <g className="gx-plate-air gx-plate-rain" stroke="var(--plate-mid)" strokeWidth="0.7" opacity="0.5">
+        {drops}
+      </g>
+    );
+  }
+  const night = plate.night;
+  const motes = [];
+  for (let mote = 0; mote < (night ? 6 : 12); mote += 1) {
+    const timing = {
+      animationDuration: `${span(random, night ? 18 : 10, night ? 28 : 18).toFixed(1)}s`,
+      animationDelay: `-${span(random, 0, 18).toFixed(1)}s`,
+    };
+    motes.push(
+      <circle
+        key={`mote-${mote}`}
+        cx={round(span(random, 8, 312))}
+        cy={round(span(random, 12, 98))}
+        r={round(span(random, 0.5, night ? 1 : 1.35))}
+        style={timing}
+      />,
+    );
+  }
+  return (
+    <g className="gx-plate-air gx-plate-motes" fill={night ? "var(--plate-mid)" : "var(--plate-ambient)"} opacity="0.7">
+      {motes}
+    </g>
+  );
+}
+
+function round(value) {
+  return Math.round(value * 10) / 10;
+}
+
 /** Jitter helper: a value in [min, max) from the scene's own generator. */
 function span(random, min, max) {
   return min + random() * (max - min);
 }
 
+/** The far plane drifts a few pixels over half a minute against the rest. */
 function far(children) {
-  return <g stroke="var(--plate-far)" fill="none" strokeWidth="1">{children}</g>;
+  return (
+    <g className="gx-plate-far" stroke="var(--plate-far)" fill="none" strokeWidth="1">
+      {children}
+    </g>
+  );
 }
 
 function mid(children) {
@@ -129,7 +239,12 @@ function seated(key, x, baseY, height) {
 
 /** A soft halo behind whatever the accent is, so the eye lands there first. */
 function halo(cx, cy, r, paint) {
-  return <circle cx={cx} cy={cy} r={r} fill={paint} />;
+  return <circle className="gx-plate-halo" cx={cx} cy={cy} r={r} fill={paint} />;
+}
+
+/** The one lit thing the room is for. Its light is live, so it flickers. */
+function mark(children) {
+  return <g className="gx-plate-accent">{children}</g>;
 }
 
 /** Windows at night from outside, and the ledge the analyst stands behind. */
@@ -158,7 +273,7 @@ function paintSkyline(random, accent, glow) {
       {mid(towers)}
       {lit(windows)}
       {accentAt && halo(accentAt.x, accentAt.y, 26, glow)}
-      {accentAt && <rect x={accentAt.x - 8} y={accentAt.y - 3} width="16" height="7" fill={accent} />}
+      {accentAt && mark(<rect x={accentAt.x - 8} y={accentAt.y - 3} width="16" height="7" fill={accent} />)}
       {near(
         <>
           <rect x="-4" y="108" width="328" height="28" />
@@ -199,7 +314,7 @@ function paintStreet(random, accent, glow) {
       {lit(<circle cx={lampX} cy="32" r="6" />)}
       {halo(lampX, 32, 22, glow)}
       {halo(windowX + 9, windowY + 6, 24, glow)}
-      <rect x={windowX} y={windowY} width="18" height="13" fill={accent} />
+      {mark(<rect x={windowX} y={windowY} width="18" height="13" fill={accent} />)}
       {people(
         <>
           {figure("walker", Math.round(span(random, 60, 110)), 116, 32)}
@@ -235,7 +350,7 @@ function paintFloor(random, accent, glow) {
       {far(<line x1="0" y1="84" x2="320" y2="84" />)}
       {mid(bays)}
       {crate && halo(crate.x + 7, crate.y + 6, 24, glow)}
-      {crate && <rect x={crate.x} y={crate.y} width="14" height="12" fill={accent} />}
+      {crate && mark(<rect x={crate.x} y={crate.y} width="14" height="12" fill={accent} />)}
       {near(
         <>
           <line x1="0" y1="100" x2="320" y2="100" />
@@ -281,7 +396,7 @@ function paintControl(random, accent, glow) {
       {mid(frames)}
       {lit(glowing)}
       {live && halo(live.x + 19, live.y + 9, 34, glow)}
-      {live && <rect x={live.x + 3} y={live.y + 3} width="32" height="12" fill={accent} />}
+      {live && mark(<rect x={live.x + 3} y={live.y + 3} width="32" height="12" fill={accent} />)}
       {near(
         <>
           <path d="M-4 132 L40 106 H280 L324 132 Z" />
@@ -327,7 +442,7 @@ function paintArchive(random, accent, glow) {
         </>,
       )}
       {halo(vanish, drawerY + 4, 28, glow)}
-      <rect x={vanish - 16} y={drawerY} width="32" height="8" fill={accent} />
+      {mark(<rect x={vanish - 16} y={drawerY} width="32" height="8" fill={accent} />)}
       {near(<path d="M-4 132 L30 96 H290 L324 132 Z" />)}
       {people(figure("reader", vanish - 42, 104, 40))}
     </>
@@ -363,7 +478,7 @@ function paintCorridor(random, accent, glow) {
       )}
       {mid(frames)}
       {open && halo(open.x + open.w / 2, open.y + open.h / 2, open.h * 0.9, glow)}
-      {open && <rect x={open.x} y={open.y} width={open.w} height={open.h} fill={accent} />}
+      {open && mark(<rect x={open.x} y={open.y} width={open.w} height={open.h} fill={accent} />)}
       {mid(<rect x={vanish - 18} y="58" width="36" height="16" />)}
       {people(figure("walker", vanish + Math.round(span(random, 26, 54)), 112, 46))}
     </>
@@ -397,7 +512,7 @@ function paintHall(random, accent, glow) {
         </>,
       )}
       {halo(vanish, 30, 44, glow)}
-      <rect x={vanish - 34} y="20" width="68" height="20" fill={accent} />
+      {mark(<rect x={vanish - 34} y="20" width="68" height="20" fill={accent} />)}
       {mid(chairs)}
       {near(<path d={`M18 132 L${vanish - 30} 58 H${vanish + 30} L302 132 Z`} />)}
       {people(sitters)}
@@ -422,7 +537,7 @@ function paintCounter(random, accent, glow) {
       {mid(windows)}
       {lit(<rect x="0" y="62" width="320" height="4" />)}
       {lamp && halo(lamp.x + 8, lamp.y + 5, 26, glow)}
-      {lamp && <rect x={lamp.x} y={lamp.y} width="16" height="10" fill={accent} />}
+      {lamp && mark(<rect x={lamp.x} y={lamp.y} width="16" height="10" fill={accent} />)}
       {near(
         <>
           <rect x="-4" y="74" width="328" height="16" />
@@ -474,7 +589,7 @@ function paintDesk(random, accent, glow) {
       {mid(
         <>
           <rect x={monitorX} y="14" width="96" height="60" />
-          <rect x={monitorX + 4} y="18" width="88" height="52" fill={accent} opacity="0.2" stroke="none" />
+          {mark(<rect x={monitorX + 4} y="18" width="88" height="52" fill={accent} opacity="0.2" stroke="none" />)}
           {lines}
           <path d={`M${monitorX + 40} 74 v8 h16 v-8`} />
           {papers}
@@ -492,7 +607,155 @@ function paintDesk(random, accent, glow) {
   );
 }
 
+/**
+ * The horizon, the sea running up to a railing, a pension with its lights on
+ * and a lighthouse at the end of the breakwater -- and someone on the deck
+ * looking out. The lit window in the pension is the accent; the boats on the
+ * horizon are only ambient.
+ */
+function paintCoast(random, accent, glow) {
+  const pensionX = Math.round(span(random, 14, 64));
+  const lighthouseX = Math.round(span(random, 238, 284));
+  const boats = [];
+  const boatCount = Math.round(span(random, 3, 6));
+  for (let boat = 0; boat < boatCount; boat += 1) {
+    boats.push(<rect key={`boat-${boat}`} x={Math.round(span(random, 110, 226))} y="55.5" width="3" height="1.6" />);
+  }
+  const sea = [];
+  for (let row = 0; row < 5; row += 1) {
+    const y = 64 + row * 8;
+    const dash = 10 + row * 7;
+    let x = -Math.round(span(random, 0, dash));
+    while (x < 320) {
+      sea.push(<line key={`sea-${row}-${x}`} x1={x} y1={y} x2={x + dash} y2={y} />);
+      x += dash + Math.round(span(random, 8, 22) + row * 4);
+    }
+  }
+  const windows = [];
+  const litIndex = Math.floor(random() * 6);
+  let accentAt = null;
+  for (let row = 0; row < 2; row += 1) {
+    for (let column = 0; column < 3; column += 1) {
+      const index = row * 3 + column;
+      const x = pensionX + 8 + column * 20;
+      const y = 50 + row * 17;
+      if (index === litIndex) accentAt = { x, y };
+      else if (random() > 0.4) windows.push(<rect key={`pw-${index}`} x={x} y={y} width="12" height="9" />);
+    }
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="58" x2="320" y2="58" />
+          <path d={`M${lighthouseX - 90} 58 Q${lighthouseX - 50} 44 ${lighthouseX - 12} 50 T320 52`} />
+        </>,
+      )}
+      {lit(boats)}
+      {mid(
+        <>
+          {sea}
+          <path d={`M${lighthouseX - 46} 84 L${lighthouseX - 8} 78 H324`} />
+          <path d={`M${lighthouseX - 6} 78 L${lighthouseX - 3} 42 H${lighthouseX + 3} L${lighthouseX + 6} 78 Z`} fill="var(--plate-solid)" />
+          <rect x={lighthouseX - 4} y="34" width="8" height="8" />
+          <path d={`M${lighthouseX - 5} 34 L${lighthouseX} 29 L${lighthouseX + 5} 34`} />
+          <rect x={pensionX} y="42" width="76" height="50" fill="var(--plate-solid)" />
+          <path d={`M${pensionX - 6} 43 L${pensionX + 38} 24 L${pensionX + 82} 43`} />
+        </>,
+      )}
+      {lit(
+        <>
+          <rect x={lighthouseX - 3} y="35" width="6" height="6" />
+          <path d={`M${lighthouseX - 3} 37 L${lighthouseX - 58} 30 L${lighthouseX - 58} 44 Z`} opacity="0.4" />
+          {windows}
+        </>,
+      )}
+      {accentAt && halo(accentAt.x + 6, accentAt.y + 4, 24, glow)}
+      {accentAt && mark(<rect x={accentAt.x} y={accentAt.y} width="12" height="9" fill={accent} />)}
+      {near(
+        <>
+          <rect x="-4" y="106" width="328" height="30" />
+          <line x1="0" y1="96" x2="320" y2="96" />
+          {[24, 104, 184, 264].map((post) => (
+            <line key={`post-${post}`} x1={post} y1="96" x2={post} y2="106" />
+          ))}
+        </>,
+      )}
+      {people(figure("shore", Math.round(span(random, 146, 206)), 108, 42))}
+    </>
+  );
+}
+
+/**
+ * A white wall of framed canvases under track lights, one of them lit hotter
+ * than the rest, and someone standing in front of it. The lit canvas is the
+ * accent; the other spots only wash the wall.
+ */
+function paintGallery(random, accent, glow) {
+  const count = Math.round(span(random, 3, 4.99));
+  const litFrame = Math.floor(random() * count);
+  const slot = 300 / count;
+  const frames = [];
+  const art = [];
+  const spots = [];
+  let hung = null;
+  for (let index = 0; index < count; index += 1) {
+    const width = Math.round(span(random, 40, Math.min(66, slot - 14)));
+    const height = Math.round(span(random, 32, 50));
+    const x = Math.round(10 + slot * index + (slot - width) / 2);
+    const y = Math.round(58 - height / 2 - 2);
+    const cx = x + width / 2;
+    frames.push(<rect key={`frame-${index}`} x={x} y={y} width={width} height={height} />);
+    frames.push(<rect key={`mat-${index}`} x={x + 4} y={y + 4} width={width - 8} height={height - 8} />);
+    spots.push(<path key={`spot-${index}`} d={`M${cx - 3} 14 L${cx - width * 0.62} ${y + height + 8} H${cx + width * 0.62} L${cx + 3} 14 Z`} />);
+    if (index === litFrame) {
+      hung = { x: x + 4, y: y + 4, w: width - 8, h: height - 8 };
+      continue;
+    }
+    // Something on each canvas, in the far weight, so a frame is a painting
+    // rather than an empty box.
+    if (random() > 0.5) art.push(<circle key={`art-${index}`} cx={cx} cy={y + height / 2} r={Math.min(width, height) * 0.2} />);
+    else art.push(<path key={`art-${index}`} d={`M${x + 8} ${y + height - 10} L${cx} ${y + 12} L${x + width - 8} ${y + height - 10}`} />);
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="10" x2="320" y2="10" />
+          <line x1="0" y1="96" x2="320" y2="96" />
+          {art}
+        </>,
+      )}
+      <g fill="var(--plate-ambient)" stroke="none" opacity="0.12">
+        {spots}
+      </g>
+      {mid(
+        <>
+          <line x1="6" y1="14" x2="314" y2="14" />
+          {frames}
+        </>,
+      )}
+      {hung && halo(hung.x + hung.w / 2, hung.y + hung.h / 2, Math.max(hung.w, hung.h) * 0.9, glow)}
+      {hung && mark(<rect x={hung.x} y={hung.y} width={hung.w} height={hung.h} fill={accent} opacity="0.55" />)}
+      {near(
+        <>
+          <path d="M-4 132 L22 104 H298 L324 132 Z" />
+          <rect x="118" y="112" width="84" height="7" />
+        </>,
+      )}
+      {people(
+        <>
+          {figure("viewer", hung ? Math.round(hung.x + hung.w / 2 + span(random, -8, 8)) : 160, 110, 42)}
+          {random() > 0.45 && figure("guest", Math.round(span(random, 24, 60)), 104, 30)}
+        </>,
+      )}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
+  coast: paintCoast,
+  gallery: paintGallery,
   skyline: paintSkyline,
   street: paintStreet,
   floor: paintFloor,

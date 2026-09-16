@@ -36,6 +36,9 @@ export function byEffectWeight([, a], [, b]) {
 export const triggerLabels = {
   protection: "보호",
   injustice: "부당함",
+  // The grudge. 사건 08 runs on it the way 사건 09 runs on affection: the season's
+  // claim is that both wake the same obsessive thinking and aim it differently.
+  revenge: "복수",
   responsibility: "책임",
   competition: "경쟁",
   reward: "보상",

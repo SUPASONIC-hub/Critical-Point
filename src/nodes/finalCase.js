@@ -1,7 +1,7 @@
 /**
  * FINAL -- the authored scenes of the closing case.
  *
- * Six cases judged other people's paperwork. This one opens the folder the lab
+ * Nine cases judged other people's paperwork. This one opens the folder the lab
  * was actually producing: an HR scoring appendix that tells the group which of
  * its employees will raise a hand, and under what pressure they stop. The man
  * who commissioned it is the man who left the signature box on 2023-0412 empty,
@@ -101,12 +101,13 @@ export const finalCaseNodes = {
     title: "당신의 조건",
     speaker: "윤상혁",
     text:
-      "그룹전략실 33층. 윤상혁 상무는 화내지 않습니다. 3년 전 그 서류를 직접 꺼내 서명란이 빈 3페이지를 펼쳐 놓습니다. '여기 이름을 안 넣은 건 실수가 아니라 설계였네. 이름이 없으면 책임도 없고, 책임이 없으면 다음 결정이 빨라지지.' 그리고 당신의 프로필을 옆에 놓습니다. '자네는 압박이 올라갈수록 더 깊이 생각하더군. 아주 귀한 성질이야. 그래서 이 방으로 부른 거고. 그런 사람을 어디에 둘지는 내가 정하네.'",
+      "그룹전략실 33층. 윤상혁 상무는 화내지 않습니다. 갤러리 이야기도, 해온파트너스 이야기도 이미 들었다고 합니다. 그는 3년 전 그 서류를 직접 꺼내 서명란이 빈 3페이지를 펼쳐 놓습니다. '여기 이름을 안 넣은 건 실수가 아니라 설계였네. 이름이 없으면 책임도 없고, 책임이 없으면 다음 결정이 빨라지지.' 그리고 당신의 프로필을 옆에 놓습니다. '자네는 압박이 올라갈수록 더 깊이 생각하더군. 아주 귀한 성질이야. 그래서 이 방으로 부른 거고. 그런 사람을 어디에 둘지는 내가 정하네.'",
     memo: [
       "당신의 주 반응 조건이 최종 보고서에 표시됨",
       "오진우 역시 별도 프로필을 받았음이 확인됨",
       "도윤하는 당사자 동의 없는 실험에 반대",
       "반재욱이 외부 감사용 사본을 이미 확보함",
+      "해온파트너스 흔적표가 그의 가족 명의로 이어짐",
     ],
     triggers: ["responsibility", "curiosity", "order", "protection"],
     choices: [
@@ -153,7 +154,7 @@ export const finalCaseNodes = {
     title: "내가 생각을 멈추지 않는 조건",
     speaker: "한서윤",
     text:
-      "시즌의 마지막 선택입니다. 당신은 자신의 조건을 약점으로만 볼 수도 있고, 도구로 쓸 수도 있습니다. 한서윤이 서랍에서 3년 묵은 봉투를 꺼내 책상에 올려놓습니다. 자기 사직서입니다. '어느 쪽을 고르든, 이번엔 저도 이름을 넣겠습니다.' 이제 그 조건을 모르는 척할 수는 없습니다.",
+      "시즌의 마지막 선택입니다. 당신을 가장 오래 멈추지 못하고 생각하게 만든 것은 무엇이었습니까. 사람을 살리고 싶은 마음이었는지, 되갚고 싶은 분노였는지, 떠맡은 책임이었는지. 그 조건은 약점도, 도구도 될 수 있습니다. 한서윤이 서랍에서 3년 묵은 봉투를 꺼내 책상에 올려놓습니다. 자기 사직서입니다. '어느 쪽을 고르든, 이번엔 저도 이름을 넣겠습니다.' 이제 그 조건을 모르는 척할 수는 없습니다.",
     memo: [
       "봉인: 악용 가능성을 줄이지만 활용도 막음",
       "개혁: 시스템을 남기되 감시와 동의를 붙임",

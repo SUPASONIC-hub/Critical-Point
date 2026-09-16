@@ -11,7 +11,7 @@ export function encodeReplaySeed(seed) {
   }
 }
 
-export function decodeReplaySeed(value) {
+function decodeReplaySeed(value) {
   if (!value) return null;
   try {
     const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");

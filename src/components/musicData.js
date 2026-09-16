@@ -115,6 +115,8 @@ export const chapterMotifs = {
   case05: { wave: "triangle", lift: 480, impact: 1.24 },
   case06: { wave: "sine", lift: 392, impact: 1.12 },
   case07: { wave: "triangle", lift: 415, impact: 1.16 },
+  case08: { wave: "sawtooth", lift: 540, impact: 1.22 },
+  case09: { wave: "sine", lift: 330, impact: 1.08 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 
@@ -125,6 +127,9 @@ export const speakerMotifs = {
   "오진우": { wave: "sawtooth", semitones: -5, pulse: 1.14 },
   "에코": { wave: "square", semitones: 7, pulse: 0.9 },
   "이민서": { wave: "triangle", semitones: 5, pulse: 0.96 },
+  "나준혁": { wave: "triangle", semitones: -3, pulse: 0.92 },
+  "권도현": { wave: "sine", semitones: -1, pulse: 1.02 },
+  "강태민": { wave: "sine", semitones: 2, pulse: 0.9 },
 };
 
 export const originMotifs = {

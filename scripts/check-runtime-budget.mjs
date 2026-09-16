@@ -46,9 +46,11 @@ const BUDGETS = {
   // seven tables again. This file is the season's data, so it grows once per
   // case by roughly the same amount; the ratchet is here to catch logic moving
   // in, not to cap the number of cases the season is allowed to have.
+  // 2740 / 15 -> 3120 / 17 on 2026-09-16: 사건 08 and 09, a ninth and tenth case,
+  // each with the same seven tables and one node file import.
   "src/gameData.js": {
-    lines: 2740,
-    importedNames: 15,
+    lines: 3120,
+    importedNames: 17,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
@@ -60,8 +62,11 @@ const BUDGETS = {
   // 1312 -> 1355 on 2026-09-16 for 사건 06's clue, outcomes, carryover and
   // continuity challenge, for re-keying the finale's tables onto it, and for
   // the two collapse gates that now read per case instead of per season.
+  // 1355 -> 1370 on 2026-09-16 for 사건 08 and 09's clues, outcomes, carryovers
+  // and continuity challenges, the finale's challenges re-keyed onto 사건 09, and
+  // `getThinkingMotive`, which names the feeling that woke the run's thinking.
   "src/gameLogic.js": {
-    lines: 1355,
+    lines: 1395,
     importedNames: 18,
     hooks: {},
   },
@@ -75,9 +80,12 @@ const BUDGETS = {
   // the route instead of only the score.
   // 1830 -> 1850 in the fourth cycle: the stale-save lock and the settled-window
   // redeal, which close the last way a second tab could undo a bust.
+  // 1850 / 148 -> 1800 / 149 on 2026-09-16: the case intro lines left the body
+  // as the `caseIntroEchoes` table (a ternary chain that had stopped at 사건 06),
+  // and the unreachable second save-suppression flag went with them.
   "src/GameRuntime.jsx": {
-    lines: 1850,
-    importedNames: 148,
+    lines: 1800,
+    importedNames: 149,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {

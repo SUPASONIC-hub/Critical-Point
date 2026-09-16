@@ -125,6 +125,7 @@ import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlaySho
 import { safeStringify } from "./state/diagnosticUtils.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import {
+  caseIntroEchoes,
   legacyProfiles,
   nextCaseSignals,
   chapterRules,
@@ -168,31 +169,16 @@ function isAlreadyRecordedConsoleError(text) {
   return text.startsWith("Critical Point render error") || text.includes("[silent:");
 }
 
-export
 const caseSequence = CASE_SEQUENCE;
 
-
-let saveSuppressed = false;
-
-export function suppressSaves() {
-  saveSuppressed = true;
-}
-
-export function resumeSaves() {
-  saveSuppressed = false;
-}
-
-export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, initialStartState = null } = {}) {
-  const persistSuppressed = useCallback(() => {
-    return saveControls?.isSuppressed?.() ?? saveSuppressed;
-  }, [saveControls]);
+// Save suppression has one owner, `AppContent`, which always passes both
+// `onSuppressSaves` and `saveControls`. This file used to keep a second flag and
+// a second pair of functions as defaults that no render path could reach.
+export function GameRuntime({ onSuppressSaves, saveControls, initialStartState = null } = {}) {
+  const persistSuppressed = useCallback(() => saveControls?.isSuppressed?.() ?? false, [saveControls]);
 
   const resumeRuntimeSaves = useCallback(() => {
-    if (saveControls?.resume) {
-      saveControls.resume();
-      return;
-    }
-    saveSuppressed = false;
+    saveControls?.resume?.();
   }, [saveControls]);
 
   const saved = useRuntimeSavedState(initialStartState);
@@ -811,20 +797,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
-    const introEcho =
-      caseId === "final"
-        ? "마지막 사건입니다. 에코는 더 이상 조언자처럼 말하지 않습니다. 당신의 조건이 어떻게 사용됐는지 직접 묻습니다."
-        : caseId === "case06"
-        ? "이번 사건의 핵심은 옆자리입니다. 에코는 바깥 조직에 쓰던 기준을 아는 사람에게도 세울 수 있는지 묻습니다."
-        : caseId === "case05"
-        ? "이번 사건의 핵심은 악인이 없는 실패입니다. 에코는 책임자를 찾고 싶은 충동과 구조를 끝까지 보려는 사고를 분리해 묻습니다."
-        : caseId === "case04"
-        ? "이번 사건의 핵심은 명분 있는 위반입니다. 에코는 좋은 결과가 규칙 훼손을 어디까지 정당화하는지 묻습니다."
-        : caseId === "case03"
-        ? "이번 사건의 핵심은 경쟁 압박입니다. 에코는 당신이 이기려는 순간 무엇을 덜 검증하는지 추적합니다."
-        : caseId === "case02"
-          ? "이번 사건의 핵심은 증거와 신뢰의 충돌입니다. 에코는 당신이 무엇을 믿고 싶은지와 무엇을 증명할 수 있는지를 분리해서 묻습니다."
-          : "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
+    const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes.case01;
     const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
     const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
     const startNode = caseOpeningRoutes[caseId]?.[previousResult?.outcomeChoiceId] ?? baseStartNode;
@@ -1469,7 +1442,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }
 
   function unlockAllCasesForTest() {
-    const allPlayableCases = ["case01", "case02", "case03", "case04", "case05", "case06"];
+    const allPlayableCases = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
     setCompletedCases(allPlayableCases);
     persist({ completedCases: allPlayableCases });
   }

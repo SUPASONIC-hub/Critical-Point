@@ -32,6 +32,10 @@ const FILES = [
   "src/nodes/case03.js",
   "src/nodes/case04.js",
   "src/nodes/case05.js",
+  "src/nodes/case06.js",
+  "src/nodes/case07.js",
+  "src/nodes/case08.js",
+  "src/nodes/case09.js",
   "src/nodes/finalCase.js",
   "src/gameData.js",
 ];

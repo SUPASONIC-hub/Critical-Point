@@ -102,7 +102,7 @@ function getDecisionLean(entry = {}) {
  * made under high pressure double. This is the axis that reads the choice
  * itself rather than how fast or how variably it was made.
  */
-export function getConsistencyScore(entries = []) {
+function getConsistencyScore(entries = []) {
   const leaning = entries.filter((entry) => getDecisionLean(entry) !== 0);
   // Nothing to read (an old save without effect vectors, or a run of pure
   // ties) is not evidence of inconsistency, so it scores neutral.
@@ -463,7 +463,17 @@ const discoveryClues = {
   case07: {
     id: "c7-drafted-first",
     title: "먼저 쓰인 발령서",
-    text: "발령 기안일이 조사 개시보다 12일 앞섭니다. 이 인사는 사건의 결과가 아니라 사건보다 먼저 준비된 답입니다.",
+    text: "발령서 작성일이 조사 개시보다 12일 앞섭니다. 이 인사는 사건의 결과가 아니라 사건보다 먼저 준비된 답입니다.",
+  },
+  case08: {
+    id: "c8-painting-dates",
+    title: "그림값의 날짜",
+    text: "그림값을 작품이 아니라 승인 일정으로 나누면 딱 떨어집니다. 이 갤러리는 그림을 판 것이 아니라 날짜를 팔았습니다.",
+  },
+  case09: {
+    id: "c9-bought-recovery",
+    title: "사 둔 회수율",
+    text: "청산이 유리하다는 숫자를 만든 감정평가법인이 흔적표와 같은 세무 대리인을 씁니다. 계산서도 누군가 주문할 수 있습니다.",
   },
   final: {
     id: "final-observer-key",
@@ -776,6 +786,16 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
       c7_after_open: { tag: "원본을 넘긴 결말", title: "권한이 살아 있는 마지막 하루를 다 썼다", text: "외부 감사인은 원본을 받았습니다. 당신은 다음 날 06시 40분 기차에 없었고, 그 사실도 함께 기록됐습니다." },
       c7_after_alone: { tag: "조용히 떠난 결말", title: "아무에게도 알리지 않고 짐을 쌌다", text: "소란은 없었습니다. 문서에 적힌 다른 이름들은 그대로 남았고, 그들은 당신이 어디 있는지 모릅니다." },
     },
+    case08: {
+      c8_after_law: { tag: "칼을 법에 맡긴 결말", title: "30년 만에 꺼낸 도장이 흔적표에 찍혔다", text: "복수는 느려졌고 증거는 단단해졌습니다. 오진우는 그 느림을 견디기 어려워했지만, 흔적표에는 이제 반박할 틈이 없습니다." },
+      c8_after_friend: { tag: "친구를 찾은 결말", title: "흔적표보다 먼저 오진우의 문을 두드렸다", text: "고시원 문이 열렸고 둘은 국밥을 먹었습니다. 칼은 아직 아무도 쓰지 않았고, 오진우는 처음으로 복수 말고 다른 계획을 말했습니다." },
+      c8_after_blade: { tag: "칼을 혼자 쥔 결말", title: "흔적표를 혼자 쥐고 기다렸다", text: "아무도 당신이 무엇을 가졌는지 모릅니다. 가장 강한 패를 쥐었지만, 그 패를 쓴 이유를 증언해 줄 사람도 없습니다." },
+    },
+    case09: {
+      c9_after_stay: { tag: "현장을 지킨 결말", title: "야간조의 컵라면이 식기 전에 합의서가 끝났다", text: "고용 승계 합의서의 마지막 서명까지 곁에 있었습니다. 영동지점에는 복귀 지연 사유서가 쌓였고, 풀필먼트센터 휴게실에는 당신 몫의 컵라면이 하나 더 생겼습니다." },
+      c9_after_court: { tag: "끝까지 설명한 결말", title: "살린 이유와 벌한 이유를 법정에서 말했다", text: "회사는 살아남았고, 장부를 부풀린 사람들은 법정에 섰습니다. 계산서 두 장이 같은 사건 번호 아래 묶였습니다." },
+      c9_after_return: { tag: "조용히 돌아간 결말", title: "결의 결과를 영동지점 텔레비전으로 들었다", text: "당신이 없는 자리에서도 결의는 났습니다. 강태민은 당신 몫으로 뜯어 둔 컵라면을 다음 날 아침에 혼자 먹었습니다." },
+    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
@@ -822,6 +842,16 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
       c7_after_open: { legitimacy: 10, humanCost: -4, fatigue: 7 },
       c7_after_alone: { trust: -11, humanCost: 7, capital: 6 },
     },
+    case08: {
+      c8_after_law: { legitimacy: 10, capital: -5, fatigue: 6 },
+      c8_after_friend: { trust: 9, humanCost: -3, fatigue: 7 },
+      c8_after_blade: { capital: 7, trust: -10, legitimacy: -4 },
+    },
+    case09: {
+      c9_after_stay: { trust: 10, humanCost: -4, fatigue: 7 },
+      c9_after_court: { legitimacy: 10, trust: 3, fatigue: 7 },
+      c9_after_return: { capital: 6, trust: -10, humanCost: 6 },
+    },
   };
   return carryovers[caseId]?.[choiceId] ?? {};
 }
@@ -858,11 +888,21 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c6_after_open: { id: "find-cost", title: "공개가 비껴간 사람 찾기", text: "조건을 열었는데 실험은 남았습니다. 그 공개가 누구를 지나쳤는지 찾아야 보너스가 열립니다." },
       c6_after_name: { id: "repair-legitimacy", title: "같은 절차를 내 이름으로 열기", text: "남의 이름으로 닫았던 절차가 이번에는 당신 차례입니다. 그 절차를 공정하게 되돌리는 선택이 압박을 낮춥니다." },
     },
-    // Keyed on case 07's aftermath: the finale follows that case now.
+    case08: {
+      c7_after_stand: { id: "protect-trust", title: "도와준 사람을 흔적에 묻히지 않기", text: "이름을 올려 준 사람들에게 다시 부탁하게 됩니다. 그들의 이름을 흔적표의 피해자로 만들지 않는 선택을 찾아야 합니다." },
+      c7_after_open: { id: "find-cost", title: "원본 뒤에 남은 돈 찾기", text: "원본은 감사인에게 갔지만 돈은 아직 움직입니다. 원본이 비껴간 흐름을 찾아야 보너스가 열립니다." },
+      c7_after_alone: { id: "repair-legitimacy", title: "혼자 본 것을 증거로 만들기", text: "아무도 모르게 내려온 조용함은 무기이자 약점입니다. 혼자 본 흔적을 공정한 기록으로 바꾸는 선택이 압박을 낮춥니다." },
+    },
+    case09: {
+      c8_after_law: { id: "find-cost", title: "느린 법이 놓친 사람 찾기", text: "수사는 시작됐지만 결의는 기다려 주지 않습니다. 기록이 구하지 못한 사람을 먼저 찾아야 보너스가 열립니다." },
+      c8_after_friend: { id: "protect-trust", title: "되찾은 친구를 계산서에 쓰지 않기", text: "오진우와 권도현은 동기입니다. 그 관계를 협상 도구로만 쓰지 않는 선택을 찾아야 합니다." },
+      c8_after_blade: { id: "use-reframe", title: "혼자 쥔 칼을 계산서로 바꾸기", text: "칼은 벌할 수는 있어도 살리지는 못합니다. 흔적표를 사람을 살리는 계산에 넣도록 판을 다시 짜야 합니다." },
+    },
+    // Keyed on case 09's aftermath: the finale follows that case now.
     final: {
-      c7_after_stand: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
-      c7_after_open: { id: "use-reframe", title: "열어 둔 조건도 의심하기", text: "공개한 조건이 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c7_after_alone: { id: "repair-legitimacy", title: "침묵 뒤의 공정함 회복하기", text: "조용히 닫은 종결이 선례가 되지 않게, 피해를 회복하는 선택을 찾아야 합니다." },
+      c9_after_stay: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "사람을 끝까지 포기하지 않은 기록이 이번에는 관찰 자료가 됩니다. 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
+      c9_after_court: { id: "use-reframe", title: "설명한 구조도 의심하기", text: "법정에서 연 구조가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c9_after_return: { id: "repair-legitimacy", title: "조용한 복귀 뒤의 공정함 회복하기", text: "조용히 돌아간 선택이 선례가 되지 않게, 피해를 회복하는 선택을 찾아야 합니다." },
     },
   };
   return challenges[caseId]?.[choiceId] ?? null;
@@ -907,6 +947,32 @@ export function getDecisionLedger(entries = [], resources = {}) {
   };
 }
 
+/**
+ * What woke the thinking, grouped the way the season argues it.
+ *
+ * The game began as a question -- not "how smart am I" but "when do I get
+ * smart" -- and its answer is that very different feelings wake the same
+ * obsessive thinking and point it somewhere different: care wants to rescue,
+ * a grudge wants to find the weak point, a burden wants the books to balance,
+ * and not knowing wants the structure. The report names the family whose
+ * triggers this run carried longest, and the road that family's thinking takes.
+ */
+const MOTIVE_FAMILIES = [
+  { id: "affection", label: "애정형", when: "살리고 싶은 사람이 보일 때", path: "애정 → 집념 → 끝까지 생각 → 구제", triggers: ["affection", "protection", "trust"] },
+  { id: "revenge", label: "복수형", when: "되갚고 싶은 부당함이 보일 때", path: "분노 → 집념 → 약점 추적 → 교정", triggers: ["revenge", "injustice", "competition", "recognition"] },
+  { id: "responsibility", label: "책임형", when: "떠맡은 것이 무너질 것 같을 때", path: "책임 → 집념 → 손익 계산 → 회생", triggers: ["responsibility", "order", "reward", "system"] },
+  { id: "curiosity", label: "탐구형", when: "아직 모르는 것이 남았을 때", path: "호기심 → 집념 → 구조 파악 → 발견", triggers: ["curiosity", "selfAwareness", "choice", "manipulation", "fear", "helplessness"] },
+];
+
+export function getThinkingMotive(triggerScores = {}) {
+  const scored = MOTIVE_FAMILIES.map((family) => ({
+    ...family,
+    score: family.triggers.reduce((sum, trigger) => sum + (Number(triggerScores[trigger]) || 0), 0),
+  }));
+  const { triggers: _triggers, ...motive } = scored.reduce((best, family) => (family.score > best.score ? family : best), scored[2]);
+  return motive;
+}
+
 export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {}, entries = [], resources = {} } = {}) {
   const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
   const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
@@ -949,6 +1015,7 @@ export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {
       ? Math.round((dominantTrigger[1] / Math.max(1, sortedTriggers.reduce((sum, [, value]) => sum + value, 0))) * 100)
       : 0,
     signature: [dominantTrigger[0], dominantCognition[0], mode.toLowerCase().replace("-", "_")],
+    motive: getThinkingMotive(triggerScores),
     ledger,
   };
 }
@@ -1283,7 +1350,7 @@ export function scoreFreeText(value) {
 }
 
 /** A reframe has to be a sentence, not a keyword list. */
-export const FREE_TEXT_SIGNAL_MIN_LENGTH = 24;
+const FREE_TEXT_SIGNAL_MIN_LENGTH = 24;
 
 export function getFreeTextSignals(value) {
   const text = String(value ?? "").trim();

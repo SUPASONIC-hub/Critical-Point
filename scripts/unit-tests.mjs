@@ -85,7 +85,7 @@ import {
 } from "../src/appConfig.js";
 import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateTone, getScenePlate, PLATE_MOTIFS } from "../src/scenePlate.js";
-import { describeChoiceDilemma, explainResourceTradeoff } from "../src/gameLogic.js";
+import { describeChoiceDilemma, explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
 import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
@@ -953,7 +953,9 @@ test("the ending reads what the run did at the table", () => {
   assert.equal(endingFor([entry(1, false), entry(1.5, false)]), "open-question", "a run that never pushed lands where it always did");
   assert.equal(endingFor([entry(32, false), entry(8, false)]), "open-oversight", "a clean season that cashed hot earns a clue of slack");
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 16, seasonBestMultiplier: 32 });
+  // 16 busts wrecked an eight-case season. Busts are read as a rate over the
+  // season's length, so a ten-case season needs 26 to carry the same strain.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 26, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -966,16 +968,17 @@ test("the ending answers busts across the range play reaches, not at one step", 
     seasonBestMultiplier: 4,
   };
   const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
-  // The sample strain moved 28 -> 29 when 사건 07 landed. Both halves of the
+  // The sample strain moved 28 -> 29 when 사건 07 landed, and 29 -> 33 when 사건 08
+  // and 09 did. Both halves of the
   // collapse gate are derived from the season length -- the bust rate divides by
   // it, the pressure threshold rises with it -- so an eight-case season prices a
   // bust slightly lower and sets the line slightly higher, and the old sample sat
   // under the new line with any number of busts. What the test is for is the
   // shape, not the coordinate: clean does not collapse, enough busts does, and
   // the answer in between is graded rather than a single step.
-  assert.notEqual(pressureAt(0, 29), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 29), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 29))).size > 1);
+  assert.notEqual(pressureAt(0, 33), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 33), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 33))).size > 1);
 });
 
 /* --------------------------------------------------------------- relics */
@@ -1179,7 +1182,34 @@ test("every scene draws a room, and always the same one", () => {
   // A branch is a counter hall even when only the building is named.
   assert.equal(getPlateMotif("KD은행 강서지점"), "counter");
   assert.equal(getPlateMotif("KD은행 강서지점 · 문서고"), "archive");
+  // The shore and the gallery are places first: a pension's office is still by
+  // the sea, and an exhibition hall is canvases whatever building it is in.
+  assert.equal(getPlateMotif("경포 해온 펜션 · 관리동"), "coast");
+  assert.equal(getPlateMotif("주문진 항구 방파제"), "coast");
+  assert.equal(getPlateMotif("청담 갤러리 온 · 전시장"), "gallery");
+  assert.equal(getPlateMotif("인사동 화랑 · 수장고 복도"), "corridor");
   // One building, one colour of light, whichever room inside it the scene is in.
   assert.equal(getPlateTone("KD은행 강서지점 · 4번 창구"), getPlateTone("KD은행 강서지점"));
   assert.equal(getPlateMotif(""), "desk");
+});
+
+/* ------------------------------------------------------- season and motive */
+
+test("a case opens when the case before it in the season is complete", async () => {
+  const { seasonCasesBase } = await import("../src/gameCases.js");
+  const { createSeasonCases: build } = await import("../src/viewModels/seasonViewModels.js");
+  const statusOf = (completedCases, id) => build({ seasonCasesBase, completedCases, currentCase: "" }).find((item) => item.id === id).status;
+  assert.equal(statusOf([], "case01"), "OPEN");
+  assert.equal(statusOf(["case01", "case02", "case03", "case04", "case05"], "case06"), "OPEN", "case 06 opens after case 05");
+  assert.equal(statusOf(["case01", "case02", "case03", "case04", "case05"], "final"), "LOCKED", "the finale no longer opens straight after case 05");
+  const allButFinal = seasonCasesBase.map((item) => item.id).filter((id) => id !== "final");
+  assert.equal(statusOf(allButFinal, "final"), "OPEN");
+});
+
+test("the report names the feeling that woke the thinking", () => {
+  assert.equal(getThinkingMotive({ affection: 6, protection: 4, revenge: 3 }).id, "affection");
+  assert.equal(getThinkingMotive({ revenge: 5, injustice: 4, affection: 2 }).id, "revenge");
+  assert.equal(getThinkingMotive({ responsibility: 9 }).label, "책임형");
+  assert.equal(getThinkingMotive({}).id, "responsibility", "a run with no record falls back to the burden it started with");
+  assert.ok(getThinkingMotive({ curiosity: 3 }).path.includes("집념"));
 });

@@ -1,5 +1,5 @@
 export { byEffectWeight, cognitionLabels, costWhenRising, initialResources, isResourceGain, triggerLabels } from "./gameConstants.js";
-export { boardChangePrompts, characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
+export { characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
 export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
 import { case02Nodes } from "./nodes/case02.js";
@@ -8,6 +8,8 @@ import { case04Nodes } from "./nodes/case04.js";
 import { case05Nodes } from "./nodes/case05.js";
 import { case06Nodes } from "./nodes/case06.js";
 import { case07Nodes } from "./nodes/case07.js";
+import { case08Nodes } from "./nodes/case08.js";
+import { case09Nodes } from "./nodes/case09.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
@@ -15,11 +17,6 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./
 
 /** Authored replies plus one for every scene the generators below add. */
 export const echoReplies = { ...authoredEchoReplies };
-
-
-
-
-
 
 /**
  * The authored scene graph, one file per case. Everything below this literal
@@ -34,6 +31,8 @@ export const nodes = {
   ...case05Nodes,
   ...case06Nodes,
   ...case07Nodes,
+  ...case08Nodes,
+  ...case09Nodes,
   ...finalCaseNodes,
 };
 
@@ -129,6 +128,32 @@ const aftermathNodes = {
       { id: "c7_after_alone", label: "아무에게도 알리지 않고 조용히 짐을 싼다", effect: { capital: 12, trust: -13, legitimacy: -5, humanCost: 8, fatigue: 3 }, next: "case07_result", cognition: { risk: 2 } },
     ],
   },
+  c8_aftershock: {
+    phase: "AFTERMATH",
+    title: "청산 등기 다음 날",
+    speaker: "나준혁",
+    text: "해온파트너스의 청산은 결국 등기됐습니다. 계좌는 닫혔고 흔적표는 당신 손에 남았습니다. 퇴근길, 나준혁 지점장이 오징어순대 한 접시를 시켜 놓고 말합니다. '나는 여기서 30년 동안 본점 사람들 욕만 했지, 뭘 해 본 적은 없어요. 그 반려된 세 건, 내가 도장 찍었던 거예요.' 그가 젓가락을 내려놓습니다. '이번엔 내 도장도 찍을게요.'",
+    memo: ["해온파트너스 법인 청산 등기 완료", "지점장이 과거 반려 서명을 스스로 밝힘", "오진우는 서울에서 연락이 끊김", "흔적표 원본은 당신과 반재욱 두 사람만 가짐"],
+    triggers: ["revenge", "responsibility", "affection"],
+    choices: [
+      { id: "c8_after_law", label: "지점장의 도장까지 받아 흔적표를 공식 기록으로 만든다", effect: { legitimacy: 14, trust: 5, capital: -7, fatigue: 7 }, next: "case08_result", cognition: { inference: 2, persistence: 1 } },
+      { id: "c8_after_friend", label: "연락이 끊긴 오진우부터 찾으러 서울로 올라간다", effect: { trust: 13, humanCost: -5, time: -8, fatigue: 8 }, next: "case08_result", cognition: { persistence: 2 } },
+      { id: "c8_after_blade", label: "흔적표를 혼자 쥐고 쓸 때를 기다린다", effect: { capital: 11, time: 6, trust: -12, legitimacy: -6, humanCost: 6, fatigue: 3 }, next: "case08_result", cognition: { risk: 2 } },
+    ],
+  },
+  c9_aftershock: {
+    phase: "AFTERMATH",
+    title: "야간조의 아침",
+    speaker: "강태민",
+    text: "결의가 끝난 다음 날 새벽 네 시, 플로우온 풀필먼트센터. 사건 01의 그날 밤 컵라면을 뜯어 주던 야간조 반장 강태민이 당신을 알아봅니다. '낮에 오라니까.' 그가 웃으며 컵라면 두 개에 물을 붓습니다. 회사 이름은 바뀔지 모르지만 오늘 새벽에도 상자는 옮겨집니다. 삼 분을 기다리는 동안 그가 묻습니다. '이제 어디로 가요.'",
+    memo: ["채권단 결의 결과가 현장에 공지됨", "야간조 38명 전원 출근", "권도현이 출근 명단 사본을 요청함", "영동지점 복귀 명령은 아직 유효"],
+    triggers: ["affection", "protection", "responsibility"],
+    choices: [
+      { id: "c9_after_stay", label: "고용 승계가 끝날 때까지 현장 합의 자리를 지킨다", effect: { trust: 14, humanCost: -6, capital: -6, fatigue: 8 }, next: "case09_result", cognition: { persistence: 2 } },
+      { id: "c9_after_court", label: "법정과 검사반에서 끝까지 증언하러 간다", effect: { legitimacy: 15, trust: 4, time: -6, fatigue: 8 }, next: "case09_result", cognition: { inference: 2, reframing: 1 } },
+      { id: "c9_after_return", label: "컵라면을 다 먹고 조용히 영동지점으로 돌아간다", effect: { capital: 11, time: 7, trust: -11, legitimacy: -5, humanCost: 7, fatigue: 2 }, next: "case09_result", cognition: { risk: 2 } },
+    ],
+  },
   f_aftershock: {
     phase: "LAST EVIDENCE",
     title: "당신의 선택이 사용되는 밤",
@@ -154,6 +179,8 @@ const aftermathRoutes = {
   c5_final: "c5_aftershock",
   c6_final: "c6_aftershock",
   c7_final: "c7_aftershock",
+  c8_final: "c8_aftershock",
+  c9_final: "c9_aftershock",
   f_choice: "f_aftershock",
 };
 
@@ -170,6 +197,8 @@ nodeOrders.case04.push("c4_aftershock");
 nodeOrders.case05.push("c5_aftershock");
 nodeOrders.case06.push("c6_aftershock");
 nodeOrders.case07.push("c7_aftershock");
+nodeOrders.case08.push("c8_aftershock");
+nodeOrders.case09.push("c9_aftershock");
 nodeOrders.final.push("f_aftershock");
 
 const connectiveScenes = [
@@ -194,7 +223,13 @@ const connectiveScenes = [
   ["c6_ledger", "c6_panel", "c6_final", "두 장의 프로필", "에코", "위원회 직전, 에코가 두 장의 프로필을 나란히 띄웁니다. 왼쪽은 오진우, 오른쪽은 당신입니다. 축소된 창과 늘어난 창이 같은 그래프의 위아래로 그려집니다. 에코가 말합니다. '둘 중 하나는 대조군입니다.'", ["두 프로필의 실험 번호가 동일", "대조군이 누구인지는 표시되지 않음", "위원회 시작까지 10분"], ["두 장을 함께 위원회에 낸다", "내 것만 빼고 그의 것을 낸다", "둘 다 덮고 사실관계로만 간다"]],
   ["c7_receipt", "c7_ledger", "c7_counter", "영수증", "반재욱", "택시비를 반으로 나누자며 반재욱이 영수증을 찢어 반쪽을 내밉니다. 마흔한 명을 자른 사람이 4,300원을 두고 실랑이를 합니다. '기록에 남길 수 없는 건 안 받습니다.' 그는 농담을 한 적이 없고, 이번에도 농담이 아닙니다.", ["반쪽 영수증에 그의 서명이 있음", "그는 아직 수첩을 가방에서 꺼내지 않음", "감사팀 서고 출입 기록은 이미 남았음"], ["그의 방식대로 반씩 나눠 적는다", "영수증을 받아 내 경비로 처리한다", "그냥 넘기고 시간을 아낀다"]],
   ["c7_teller", "c7_counter", "c7_paper", "창구 4번", "도윤하", "지점을 나오는 길에 4번 창구의 노년 행원이 도윤하를 부릅니다. '도 대리, 아직 그 말버릇 있네.' 3년 전 함께 앉아 있던 사람입니다. 그는 묻지도 않고 서랍에서 그해 목표표 사본을 꺼내 놓습니다. 자기 이름이 적힌 쪽을 접어서 밀어 줍니다.", ["4번 창구 행원은 당시 같은 팀", "사본은 지점 자체 보관본", "그는 내년이 정년"], ["접힌 쪽을 펴서 그의 이름도 함께 쓴다", "접힌 그대로 받아 이름은 가린다", "사본은 두고 원본 절차만 밟는다"]],
-  ["c7_ticket", "c7_paper", "c7_final", "기차표", "에코", "에코가 조용히 한 줄을 띄웁니다. 총무팀이 이미 발권한 편도 기차표. 발효일 06:40, 강릉행. 결재자 칸에는 이번에도 아무도 없습니다. '시스템은 당신이 갈 것이라고 계산했습니다. 계산은 대개 맞습니다.'", ["편도 기차표가 발효 전에 발권됨", "결재자 칸 공란", "표는 취소해도 기록은 남음"], ["표를 취소하고 그 기록을 증거로 남긴다", "표는 그대로 두고 자료를 먼저 보낸다", "표를 받아 두고 오늘은 아무 말도 안 한다"]],
+  ["c7_ticket", "c7_paper", "c7_final", "기차표", "에코", "에코가 조용히 한 줄을 띄웁니다. 총무팀이 이미 발권한 편도 기차표. 발효일 06:40, 강릉행. 승인자 칸에는 이번에도 아무도 없습니다. '시스템은 당신이 갈 것이라고 계산했습니다. 계산은 대개 맞습니다.'", ["편도 기차표가 발효 전에 발권됨", "승인자 칸 공란", "표는 취소해도 기록은 남음"], ["표를 취소하고 그 기록을 증거로 남긴다", "표는 그대로 두고 자료를 먼저 보낸다", "표를 받아 두고 오늘은 아무 말도 안 한다"]],
+  ["c8_sundae", "c8_trail", "c8_gallery", "오징어순대", "나준혁", "점심시간, 지점장이 시장 골목 오징어순대 집으로 당신을 데려갑니다. 그는 세 번 반려된 보고서 얘기는 한 마디도 하지 않고, 순대를 달걀물에 찍는 순서만 설명합니다. '서울 사람들은 이걸 그냥 먹어요. 그러니까 맛을 모르지.' 계산할 때 그가 영수증 뒷면에 전임자의 휴대폰 번호를 적어 줍니다.", ["전임자는 2년 전 명예퇴직", "지점장은 반려 사유를 기억한다고 말함", "영수증 뒷면에 적힌 번호 하나"], ["전임자에게 바로 전화를 걸어 사정을 듣는다", "번호는 받아 두고 반려 기록부터 확인한다", "오늘은 묻지 않고 순대 맛만 칭찬하고 넘어간다"]],
+  ["c8_mother", "c8_gallery", "c8_bait", "반찬통", "도윤하", "도윤하에게서 전화가 옵니다. 오진우의 어머니가 트리거랩 로비에 반찬통을 들고 찾아왔다고 합니다. 아들이 회사를 그만둔 걸 모르고, 요즘 밤마다 옛 서류를 뒤진다며 걱정합니다. '그 애 아버지도 그만두기 전에 꼭 저랬어요.' 도윤하가 조용히 묻습니다. '뭐라고 말씀드릴까요.'", ["어머니는 아들의 퇴사를 모름", "오진우의 아버지도 퇴직 직전 같은 행동을 보임", "도윤하는 거짓말은 하지 않겠다고 함"], ["오진우에게 전화해 어머니께 직접 말하게 한다", "회사 규정대로 퇴사 사실만 확인해 드린다", "잘 지낸다고만 전하고 반찬통은 대신 받아 둔다"]],
+  ["c8_clerks", "c8_bait", "c8_final", "도장 찍은 사람", "반재욱", "갤러리 온의 직원 둘이 퇴근길에 반재욱을 붙잡습니다. 그림값 송금 서류에 도장을 찍은 사람이 자기들이라고, 윗선이 무너지면 자기들 이름만 남는다고. 스물여섯, 스물아홉. 한 사람은 아직 수습 기간입니다. 반재욱이 수첩을 덮습니다. '내가 자른 마흔한 명이 대개 이 나이였습니다.'", ["송금 실무 도장은 직원 2명 명의", "한 명은 수습 3개월째", "두 사람은 협조 의사를 밝힘"], ["두 사람을 협조자로 보호할 방법부터 만든다", "진술서를 받고 절차대로 참고인으로 올린다", "실무자는 빼고 윗선의 흔적만 쓴다"]],
+  ["c9_calc", "c9_ledger", "c9_family", "계산기 두 대", "권도현", "카페 문이 닫힐 무렵, 권도현이 계산기를 하나 더 꺼냅니다. '각자 자기 입장에서 계산해 봅시다. 숫자가 같게 나오면 그때부터 믿겠습니다.' 둘이 20분 동안 말없이 두드립니다. 결과는 3억 차이. 권도현이 처음으로 웃습니다. '그 차이가 선의입니까, 실수입니까.'", ["두 계산 결과의 차이 3억", "차이는 직원 퇴직금 산정 방식에서 발생", "권도현은 차이의 이유를 요구함"], ["차이 3억을 직원 퇴직금 쪽으로 맞춘다", "산정 기준표를 꺼내 한 줄씩 대조한다", "차이는 반올림 오차로 처리하고 넘어간다"]],
+  ["c9_wedding", "c9_family", "c9_timing", "청첩장", "도윤하", "권도현의 휴대폰 잠금화면에 청첩장이 떠 있습니다. 다음 달, 혼주석 옆에 작은아버지 부부 자리가 이미 잡혀 있습니다. 도윤하가 그 화면을 보고 커피를 사러 나갔다가, 한참 뒤에 세 잔을 들고 들어옵니다. '제일 단 걸로 샀어요. 오늘은 그래도 되는 날 같아서요.'", ["권도현 결혼식 5주 뒤", "혼주석 배치에 권승우 부부 포함", "고발하면 결혼식 전에 기사가 날 수 있음"], ["결혼식 뒤로 고발 시점을 옮길 수 있는지 함께 따져 본다", "일정과 상관없이 고발 절차 시간표를 그대로 둔다", "그 얘기는 꺼내지 않고 오늘 일만 끝낸다"]],
+  ["c9_night", "c9_timing", "c9_final", "새벽 두 시의 사무실", "한서윤", "새벽 두 시, 트리거랩 4층. 한서윤이 진술서를 인쇄하다가 프린터 앞에서 멈춥니다. 오진우는 소파에서 잠들었고, 반재욱은 그 위에 자기 재킷을 덮어 줍니다. 도윤하는 컵라면 물을 올립니다. 한서윤이 작게 말합니다. '이 방에서 다섯 사람이 같은 편으로 앉아 있는 걸, 저는 처음 봅니다.'", ["한서윤 진술서 인쇄 완료", "검사반 제보 마감까지 7시간", "다섯 사람이 같은 파일을 보고 있음"], ["잠든 사람은 깨우지 않고 남은 일을 나눠 맡는다", "제보 서류를 체크리스트대로 한 번 더 검토한다", "오늘은 여기까지 하고 각자 집으로 보낸다"]],
   ["f_witness", "f_archive", "f_confront", "첫 번째 참가자", "도윤하", "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.", ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"], ["이전 참가자에게 먼저 알린다", "복제된 문장을 모두 증거로 수집한다", "실험을 멈추기 위해 서버를 닫는다"]],
   ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다", "실험을 이어가되 나를 다음 참가자로 등록한다"]],
 ];
@@ -318,7 +353,7 @@ const authoredSceneChoiceEffects = {
  * forward, so this is where `fatigue` comes back: handing the work on or
  * closing the file recovers you and charges someone else.
  */
-const case07ChoiceEffects = {
+const lateSeasonChoiceEffects = {
   // The connective scenes of case 07 trade in the same three shapes as the rest
   // of the season -- people first pays in cash or time, procedure first makes
   // someone wait, the shortcut gives fatigue back -- so the case reads as part
@@ -338,9 +373,39 @@ const case07ChoiceEffects = {
     { legitimacy: 5, trust: 6, time: -4, humanCost: 3, fatigue: 4 },
     { time: 6, capital: 5, trust: -7, humanCost: 4, fatigue: -3 },
   ],
+  c8_trail: [
+    { trust: 8, legitimacy: 4, capital: -5, time: -5, fatigue: 5 },
+    { legitimacy: 7, time: -4, humanCost: 3, fatigue: 4 },
+    { time: 6, capital: 5, trust: -6, humanCost: 4, fatigue: -3 },
+  ],
+  c8_gallery: [
+    { trust: 9, humanCost: -3, capital: -4, time: -5, fatigue: 5 },
+    { legitimacy: 6, time: -3, humanCost: 4, fatigue: 3 },
+    { time: 5, capital: 4, trust: -7, humanCost: 4, fatigue: -3 },
+  ],
+  c8_bait: [
+    { trust: 8, humanCost: -5, capital: -6, time: -4, fatigue: 5 },
+    { legitimacy: 8, time: -5, humanCost: 3, fatigue: 4 },
+    { time: 6, capital: 6, trust: -6, humanCost: 5, fatigue: -3 },
+  ],
+  c9_ledger: [
+    { trust: 9, humanCost: -4, capital: -7, time: -4, fatigue: 5 },
+    { legitimacy: 7, time: -6, humanCost: 3, fatigue: 4 },
+    { time: 6, capital: 6, trust: -7, humanCost: 4, fatigue: -3 },
+  ],
+  c9_family: [
+    { trust: 10, legitimacy: 3, capital: -5, time: -5, fatigue: 5 },
+    { legitimacy: 8, time: -4, humanCost: 4, fatigue: 3 },
+    { time: 5, capital: 5, trust: -6, humanCost: 3, fatigue: -3 },
+  ],
+  c9_timing: [
+    { trust: 9, legitimacy: 4, capital: -6, time: -5, fatigue: 6 },
+    { legitimacy: 8, time: -5, humanCost: 3, fatigue: 4 },
+    { time: 6, capital: 4, trust: -5, humanCost: 4, fatigue: -4 },
+  ],
 };
 
-const case07ReactionEffects = {
+const lateSeasonReactionEffects = {
   c7_receipt: [
     { trust: 8, legitimacy: 3, capital: -4, time: -5, fatigue: 4 },
     { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 },
@@ -355,6 +420,36 @@ const case07ReactionEffects = {
     { legitimacy: 8, trust: 4, capital: -6, time: -5, fatigue: 5 },
     { legitimacy: 6, time: -4, humanCost: 3, fatigue: 4 },
     { time: 6, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
+  ],
+  c8_sundae: [
+    { trust: 8, legitimacy: 3, capital: -4, time: -5, fatigue: 4 },
+    { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 },
+    { time: 5, capital: 5, trust: -6, humanCost: 4, fatigue: -3 },
+  ],
+  c8_mother: [
+    { trust: 9, humanCost: -3, capital: -4, time: -6, fatigue: 5 },
+    { legitimacy: 5, trust: 3, time: -3, humanCost: 4, fatigue: 3 },
+    { time: 6, capital: 4, trust: -7, humanCost: 3, fatigue: -3 },
+  ],
+  c8_clerks: [
+    { trust: 8, legitimacy: 4, humanCost: -4, time: -5, fatigue: 5 },
+    { legitimacy: 7, time: -4, humanCost: 3, fatigue: 4 },
+    { time: 6, capital: 5, trust: -6, humanCost: 5, fatigue: -3 },
+  ],
+  c9_calc: [
+    { trust: 9, humanCost: -5, capital: -6, time: -4, fatigue: 5 },
+    { legitimacy: 6, time: -5, humanCost: 3, fatigue: 3 },
+    { time: 5, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
+  ],
+  c9_wedding: [
+    { trust: 10, legitimacy: 2, capital: -3, time: -6, fatigue: 6 },
+    { legitimacy: 7, time: -3, humanCost: 3, fatigue: 3 },
+    { time: 6, capital: 4, trust: -7, humanCost: 3, fatigue: -3 },
+  ],
+  c9_night: [
+    { trust: 8, legitimacy: 5, capital: -5, time: -5, fatigue: 5 },
+    { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 },
+    { time: 5, capital: 5, trust: -6, humanCost: 4, fatigue: -4 },
   ],
 };
 
@@ -515,7 +610,7 @@ const authoredSceneReactionCopy = {
   f_dilemma: { voice: ["종료 조건을 참가자들과 함께 정하겠습니다.", "제가 혼자 버튼을 누르겠습니다.", "버튼을 숨기고 시스템을 지켜보겠습니다."], echo: ["함께 정한 종료 조건은 느리지만 다음 실험에도 남습니다.", "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.", "숨긴 버튼은 통제가 아니라 다음 관찰자의 권한이 됩니다."] },
 };
 
-const case07ChoiceCopy = {
+const lateSeasonChoiceCopy = {
   c7_ledger: {
     voice: ["4,300원도 기록이라며, 그의 방식대로 반씩 적는다.", "영수증을 받아 들고, 오늘 경비는 내가 지겠다고 한다.", "이런 데 쓸 시간이 없다며 그냥 넘긴다."],
     echo: ["반씩 적힌 기록은 아무도 빚지지 않게 합니다. 빚이 없으면 부탁도 없습니다.", "당신이 낸 경비는 그를 편하게 하고, 그 편함은 나중에 수첩을 꺼내기 어렵게 만듭니다.", "아낀 2분은 오늘 쓸모가 있고, 그가 왜 4,300원을 세는 사람인지는 끝내 모릅니다."],
@@ -528,9 +623,33 @@ const case07ChoiceCopy = {
     voice: ["표를 취소하고, 취소 기록까지 증거로 붙인다.", "표는 그대로 두고, 자료부터 밖으로 보낸다.", "표를 받아 두고, 오늘은 아무 말도 하지 않는다."],
     echo: ["취소 기록은 이 발령이 예정돼 있었다는 증거가 됩니다. 동시에 당신이 저항한다는 신고이기도 합니다.", "표를 두면 아무도 놀라지 않습니다. 자료는 그 틈으로 나갑니다.", "받아 둔 표는 오늘 조용합니다. 06:40에 그 조용함이 끝납니다."],
   },
+  c8_trail: {
+    voice: ["영수증 뒷면의 번호로, 전임자에게 바로 전화를 걸어 사정을 듣겠다고 한다.", "번호는 지갑에 넣어 두고, 반려 기록부터 확인하겠다고 한다.", "오늘은 묻지 않기로 하고, 순대 맛만 칭찬하고 넘어간다."],
+    echo: ["바로 건 전화는 사람을 먼저 엽니다. 준비되지 않은 사람의 말은 정확하지 않을 수 있습니다.", "기록부터 보면 질문이 날카로워집니다. 그 사이 전임자는 전화를 받을 이유를 잃을 수도 있습니다.", "묻지 않은 점심은 편합니다. 지점장이 번호를 적어 준 이유는 하루 더 설명되지 않습니다."],
+  },
+  c8_gallery: {
+    voice: ["오진우에게 전화해, 어머니께는 네가 직접 말하라고 한다.", "회사 규정대로, 퇴사 사실만 확인해 드리라고 한다.", "잘 지낸다고만 전하고, 반찬통은 우리가 대신 받아 두자고 한다."],
+    echo: ["직접 말하게 하면 그는 오늘 밤 복수 말고 다른 일을 하나 하게 됩니다. 전화를 받을지는 모릅니다.", "규정대로 확인하면 거짓말은 없습니다. 어머니는 로비에서 그 사실을 혼자 듣게 됩니다.", "대신 받은 반찬통은 오늘을 조용하게 합니다. 그 조용함은 오진우가 모르는 채로 쌓입니다."],
+  },
+  c8_bait: {
+    voice: ["도장을 찍은 두 사람을 협조자로 보호할 방법부터 만들겠다고 한다.", "진술서를 받고, 절차대로 참고인 명단에 올린다.", "실무자 이름은 빼고, 윗선의 흔적만 쓰겠다고 한다."],
+    echo: ["보호 장치를 먼저 만들면 두 사람은 끝까지 말합니다. 그 장치를 만드는 동안 청산 시계는 멈추지 않습니다.", "참고인으로 올리면 진술은 단단해집니다. 두 사람의 이름도 같은 문서에서 단단해집니다.", "실무자를 빼면 빠릅니다. 도장 찍힌 서류는 그래도 그들의 이름으로 남아 있습니다."],
+  },
+  c9_ledger: {
+    voice: ["차이 3억은 직원 퇴직금 쪽으로 맞추자고 한다.", "산정 기준표를 꺼내, 한 줄씩 대조해 보자고 한다.", "차이는 반올림 오차로 처리하고 넘어가자고 한다."],
+    echo: ["퇴직금 쪽으로 맞추면 선의라는 답이 됩니다. 권도현은 그 선의가 누구 돈으로 계산됐는지 물을 겁니다.", "한 줄씩 대조하면 실수라는 답이 나올 수 있습니다. 실수를 찾는 데 새벽 한 시간이 들어갑니다.", "오차로 넘기면 둘 다 편합니다. 3억은 사라지지 않고 누군가의 퇴직금 칸에서 빠집니다."],
+  },
+  c9_family: {
+    voice: ["결혼식 뒤로 고발 시점을 옮길 수 있는지, 권도현과 함께 따져 본다.", "일정과 상관없이, 고발 절차 시간표는 그대로 두자고 한다.", "청첩장 얘기는 꺼내지 않고, 오늘 일만 끝내자고 한다."],
+    echo: ["시점을 따져 보면 그는 혼자가 아닙니다. 옮긴 5주 동안 장부를 고칠 시간도 함께 생깁니다.", "시간표를 지키면 고발은 흔들리지 않습니다. 기사는 결혼식보다 먼저 나갈 수 있습니다.", "꺼내지 않으면 오늘은 끝납니다. 청첩장은 내일도 잠금화면에 있습니다."],
+  },
+  c9_timing: {
+    voice: ["잠든 사람은 깨우지 말자며, 남은 일을 나눠 맡는다.", "제보 서류를 체크리스트대로 한 번 더 검토하자고 한다.", "오늘은 여기까지라며, 각자 집으로 보낸다."],
+    echo: ["나눠 맡은 밤은 길어집니다. 아침에 깬 사람은 자기 몫이 끝나 있는 걸 봅니다.", "한 번 더 본 서류는 검사반에서 되돌아오지 않습니다. 마감까지 남은 7시간 중 두 시간이 여기에 들어갑니다.", "집에 간 사람들은 잠을 잡니다. 제보 서류는 아침에 한 사람이 혼자 마감합니다."],
+  },
 };
 
-const case07ReactionCopy = {
+const lateSeasonReactionCopy = {
   c7_receipt: {
     voice: ["빚을 지지 않겠다는 그의 방식에 맞춰, 수첩도 정식 절차로 받겠다고 한다.", "사적인 기록이니 사적으로 받겠다고, 조용히 가져간다.", "수첩 없이도 된다며, 그의 증언만 받겠다고 한다."],
     echo: ["정식 절차로 받으면 수첩은 증거가 되고, 그는 위반자가 됩니다. 둘 다 기록에 남습니다.", "조용히 받으면 그는 안전하고, 그 수첩은 법정에서 존재한 적이 없게 됩니다.", "증언만 받으면 날짜는 남지 않습니다. 남는 것은 한 사람의 기억입니다."],
@@ -543,12 +662,36 @@ const case07ReactionCopy = {
     voice: ["06:40에 실제로 역에 나가서, 가지 않는 장면을 기록으로 남긴다.", "표를 쓰고 내려가되, 자료 제출은 이미 끝내 둔다.", "표도 자료도 손대지 않고, 하루를 더 기다린다."],
     echo: ["가지 않는 장면은 강력합니다. 그 장면 이후 당신은 협상 대상이 아니라 사건이 됩니다.", "내려가면 소란은 없습니다. 자료는 이미 밖에 있고, 당신은 안에 없습니다.", "기다린 하루는 아무것도 바꾸지 않고, 권한 축소는 예정대로 발효됩니다."],
   },
+  c8_sundae: {
+    voice: ["전임자의 증언을 받아, 반려 경위서에 그대로 붙인다.", "증언은 받지 않고, 반려 승인 라인만 문서로 확인한다.", "과수원까지 끌어들이지 말자며, 고맙다고 하고 통화를 끝낸다."],
+    echo: ["증언이 붙은 경위서는 반려가 실수가 아니었음을 말합니다. 그는 4년 만에 다시 그 일의 당사자가 됩니다.", "승인 라인은 누가 막았는지 보여줍니다. 왜 막았는지는 문서에 없습니다.", "끝낸 통화는 그를 과수원에 남겨 둡니다. 세 번의 반려는 여전히 이유 없는 반려입니다."],
+  },
+  c8_mother: {
+    voice: ["반찬통을 들고, 오진우를 직접 찾아가겠다고 한다.", "반찬통은 택배로 보내고, 연락은 절차대로 하자고 한다.", "반찬통은 탕비실에 두고, 이 일에서 한발 물러서겠다고 한다."],
+    echo: ["직접 찾아가면 그는 문을 열 수도, 안 열 수도 있습니다. 반찬통은 어느 쪽이든 전달됩니다.", "택배는 정확하게 도착합니다. 누가 보냈는지는 송장에 적힌 이름 하나로만 남습니다.", "한발 물러서면 복수는 그 혼자의 일이 됩니다. 탕비실의 계란말이는 내일이면 식습니다."],
+  },
+  c8_clerks: {
+    voice: ["가장 적게 받은 두 사람의 이름이 가장 나중에 나오도록, 순서를 바꾼다.", "이름은 그대로 두고, 급여 대비 책임 비율을 옆에 붙인다.", "선명한 이름부터 써서, 수사를 빨리 열자고 한다."],
+    echo: ["순서를 바꾸면 흔적표는 위에서부터 읽힙니다. 위쪽은 흐려서, 읽는 사람이 더 오래 봐야 합니다.", "비율을 붙이면 숫자가 두 사람을 변호합니다. 법정은 비율보다 도장을 먼저 봅니다.", "선명한 이름은 수사를 빠르게 엽니다. 가장 먼저 불려 가는 사람은 수습 3개월째입니다."],
+  },
+  c9_calc: {
+    voice: ["열한 명의 퇴직금을, 고용 승계 조건에 못 박자고 한다.", "소멸 조항이 법적으로 맞는지, 근거부터 확인하자고 한다.", "퇴직금 3억은 승계 협상에서 쓸 양보 카드로 남겨 두자고 한다."],
+    echo: ["못 박은 3억은 회생안의 비용이 됩니다. 채권단은 그 3억을 회수율에서 뺍니다.", "법적 근거를 확인하면 싸움은 정확해집니다. 열한 명은 그 사이 결과를 기다립니다.", "양보 카드는 협상을 부드럽게 합니다. 카드로 쓰인 퇴직금은 누군가의 22년입니다."],
+  },
+  c9_wedding: {
+    voice: ["신부에게 직접 말할 수 있도록, 권도현 곁에 서겠다고 한다.", "결혼식과 무관하게, 법적 일정대로 가자고 한다.", "가족 일에는 끼어들지 않겠다고, 조용히 선을 긋는다."],
+    echo: ["곁에 서면 그는 말할 수 있습니다. 당신은 남의 결혼식에서 가장 불편한 손님이 됩니다.", "법적 일정은 흔들리지 않습니다. 권도현은 흔들리는 마음을 혼자 감당합니다.", "선을 그으면 당신은 계산서 밖에 남습니다. 그가 원한 게 그것인지는 모릅니다."],
+  },
+  c9_night: {
+    voice: ["반재욱이 찢어 준 한 장을, 결의 자료 맨 앞에 붙인다.", "수첩 한 장은 증거가 아니라며, 따로 보관해 둔다.", "감상은 나중에 하자며, 서류 마감부터 챙긴다."],
+    echo: ["맨 앞에 붙은 한 장은 채권단이 가장 먼저 읽습니다. 숫자가 아닌 줄이 결의 자료에 들어간 건 처음입니다.", "따로 둔 한 장은 누구에게도 설명할 필요가 없습니다. 그래서 오래 남습니다.", "마감은 지켜집니다. 반재욱은 창가에 조금 더 서 있다가 재킷 없이 퇴근합니다."],
+  },
 };
 
 function getAuthoredSceneEffects(sourceId, id) {
   const table = id.endsWith("_reaction")
-    ? { ...authoredSceneReactionEffects, ...case07ReactionEffects }
-    : { ...authoredSceneChoiceEffects, ...case07ChoiceEffects };
+    ? { ...authoredSceneReactionEffects, ...lateSeasonReactionEffects }
+    : { ...authoredSceneChoiceEffects, ...lateSeasonChoiceEffects };
   const effects = table[sourceId];
   if (!effects) {
     throw new Error(`Missing authored choice effects for generated scene source: ${sourceId} (${id})`);
@@ -558,8 +701,8 @@ function getAuthoredSceneEffects(sourceId, id) {
 
 function getAuthoredSceneCopy(sourceId, id) {
   const table = id.endsWith("_reaction")
-    ? { ...authoredSceneReactionCopy, ...case07ReactionCopy }
-    : { ...authoredSceneChoiceCopy, ...case07ChoiceCopy };
+    ? { ...authoredSceneReactionCopy, ...lateSeasonReactionCopy }
+    : { ...authoredSceneChoiceCopy, ...lateSeasonChoiceCopy };
   const copy = table[sourceId];
   if (!copy) {
     throw new Error(`Missing authored choice copy for generated scene source: ${sourceId} (${id})`);
@@ -615,6 +758,8 @@ const connectiveOrders = {
   case05: [["c5_map", "c5_pattern"], ["c5_blame", "c5_voice"], ["c5_collapse", "c5_verdict"]],
   case06: [["c6_desk", "c6_kitchen"], ["c6_logs", "c6_family"], ["c6_panel", "c6_ledger"]],
   case07: [["c7_ledger", "c7_receipt"], ["c7_counter", "c7_teller"], ["c7_paper", "c7_ticket"]],
+  case08: [["c8_trail", "c8_sundae"], ["c8_gallery", "c8_mother"], ["c8_bait", "c8_clerks"]],
+  case09: [["c9_ledger", "c9_calc"], ["c9_family", "c9_wedding"], ["c9_timing", "c9_night"]],
   final: [["f_archive", "f_witness"], ["f_confront", "f_dilemma"]],
 };
 
@@ -649,6 +794,12 @@ const reactionScenes = [
   ["c7_receipt_reaction", "c7_receipt", "c7_counter", "가방에서 나온 것", "반재욱", "영수증 문제가 끝나자 반재욱이 가방을 엽니다. 수첩은 비닐에 싸여 있습니다. 4년째 같은 비닐입니다. '이걸 어떻게 받을지는 당신이 정하십시오. 나는 어느 쪽이든 오늘 안에 사표를 씁니다.'", ["정식 절차로 접수한다", "사적으로 받아 그를 남긴다", "수첩 없이 증언만 받는다"]],
   ["c7_teller_reaction", "c7_teller", "c7_paper", "네 개의 이름", "도윤하", "목표표에는 그해 창구 담당 네 명의 이름이 있습니다. 도윤하가 그중 하나입니다. '제 이름은 제가 올릴게요. 나머지 세 사람은 저도 못 정합니다.'", ["네 사람에게 각자 정하게 한다", "한 사람만 남기고 지운다", "이름은 전부 지우고 숫자만 쓴다"]],
   ["c7_ticket_reaction", "c7_ticket", "c7_final", "06:40", "에코", "에코가 발권 기록 옆에 한 줄을 더 띄웁니다. '이 노선의 지난 3년 발권 기록 중 같은 패턴이 여섯 건 있습니다. 여섯 명 전원이 탑승했습니다.' 당신이 일곱 번째입니다.", ["역에 나가서 타지 않는다", "내려가되 자료는 먼저 보낸다", "하루를 더 기다린다"]],
+  ["c8_sundae_reaction", "c8_sundae", "c8_gallery", "전임자의 목소리", "나준혁", "전임자는 춘천에서 과수원을 합니다. 전화기 너머로 경운기 소리가 들립니다. '세 번 올렸어요. 세 번째 반려 때 인사 면담을 했고, 네 번째는 안 올렸죠. 그 사람들은 올리는 사람보다 반려하는 사람을 먼저 봐요.' 옆에서 듣던 나준혁 지점장이 조용히 커피잔을 내려놓습니다.", ["그의 증언을 받아 반려 경위서에 붙인다", "반려 승인 라인만 문서로 확인한다", "과수원까지 끌어들이지 않고 통화를 끝낸다"]],
+  ["c8_mother_reaction", "c8_mother", "c8_bait", "계란말이", "도윤하", "도윤하가 반찬통을 들고 4층으로 올라옵니다. 멸치볶음, 깻잎, 그리고 오진우가 어릴 때 좋아했다는 계란말이. 도윤하가 통을 열다 말고 웃습니다. '이거 우리가 먹으면 안 되겠죠.' 둘 다 한 조각씩 먹습니다. 그리고 도윤하가 말합니다. '복수를 하든 뭘 하든, 밥은 먹고 하게 해야죠.'", ["반찬통을 들고 오진우를 직접 찾아간다", "반찬통은 택배로 보내고 연락은 절차대로 한다", "반찬통은 탕비실에 두고 이 일에서 한발 물러선다"]],
+  ["c8_clerks_reaction", "c8_clerks", "c8_final", "수습 3개월", "에코", "에코가 두 직원의 급여 이체 내역을 띄웁니다. 수습 직원의 월급은 그가 도장을 찍은 그림값의 0.2%입니다. '흔적은 위로 올라갈수록 흐려지고, 아래로 내려올수록 이름이 선명해집니다. 이 표에서 가장 선명한 이름은 가장 적게 받은 사람입니다.'", ["두 사람의 이름을 가장 나중에 쓰도록 순서를 바꾼다", "이름은 그대로 두고 급여 대비 책임 비율을 붙인다", "선명한 이름부터 써서 수사를 빨리 연다"]],
+  ["c9_calc_reaction", "c9_calc", "c9_family", "3억의 이름", "에코", "에코가 3억의 내역을 띄웁니다. 차이는 22년 근속한 물류 직원 열한 명의 퇴직금 누적분입니다. 권도현의 계산에서는 승계 시 소멸, 당신의 계산에서는 지급. '같은 회사를 살리는 계산서 두 장이, 열한 명의 22년을 두고 갈라집니다.'", ["열한 명의 퇴직금을 승계 조건에 못 박는다", "소멸 조항의 법적 근거부터 확인한다", "승계 협상에서 쓸 양보 카드로 남겨 둔다"]],
+  ["c9_wedding_reaction", "c9_wedding", "c9_timing", "혼주석", "권도현", "권도현이 휴대폰을 뒤집어 놓습니다. '작은아버지가 혼주석에 앉는 걸 막으면 신부가 이유를 묻겠죠. 저는 그 이유를 말할 자신이 없습니다.' 그가 단 커피를 한 모금 마시고 얼굴을 찡그립니다. '그렇다고 등록금 받은 값으로 1,140명을 계산할 수도 없고요.'", ["신부에게 직접 말할 수 있도록 그의 곁에 선다", "결혼식과 무관하게 법적 일정대로 간다", "가족 일에는 끼어들지 않겠다고 선을 긋는다"]],
+  ["c9_night_reaction", "c9_night", "c9_final", "재킷", "반재욱", "반재욱이 재킷 없이 창가에 서서 말합니다. '나는 사람을 자르는 일을 20년 했습니다. 오늘 처음으로 사람을 남기는 서류를 씁니다.' 그가 수첩 마지막 장을 찢어 건넵니다. 마흔한 명의 이름 아래에 한 줄이 새로 적혀 있습니다. '1,140 -- 남김.'", ["그 한 장을 결의 자료 맨 앞에 붙인다", "수첩 한 장은 증거가 아니니 따로 보관한다", "감상은 나중에 하고 서류 마감부터 챙긴다"]],
   ["f_witness_reaction", "f_witness", "f_confront", "첫 참가자의 선택", "반재욱", "첫 참가자는 자신의 기록을 돌려달라고 요청합니다. 하지만 기록을 돌려주면 지금까지의 실험 전체가 흔들립니다.", ["기록을 돌려주고 실험을 다시 설명한다", "기록을 증거로 보관하고 동의를 요청한다", "기록을 삭제해 피해를 끝낸다"]],
   ["f_dilemma_reaction", "f_dilemma", "f_choice", "종료 버튼 앞에서", "에코", "종료 버튼 위에는 당신의 이름이 표시되어 있습니다. 누르는 순간 실험은 끝나지만, 책임도 당신에게 남습니다.", ["참가자들과 함께 종료 조건을 정한다", "내가 혼자 버튼을 누른다", "버튼을 숨기고 시스템을 지켜본다"]],
 ];
@@ -674,6 +825,12 @@ const authoredReactionMemos = {
   c7_receipt_reaction: ["빚지지 않는 사람에게 부탁하는 법", "사표가 먼저 나가는 순서"],
   c7_teller_reaction: ["자기 이름을 자기가 올릴 권리", "정년 한 해 앞의 증인"],
   c7_ticket_reaction: ["여섯 명이 전부 탄 노선", "타지 않는 장면의 값"],
+  c8_sundae_reaction: ["세 번 반려된 보고서의 네 번째", "올리는 사람보다 먼저 보이는 반려자"],
+  c8_mother_reaction: ["복수보다 먼저 먹어야 할 밥", "모르는 채로 걱정하는 가족"],
+  c8_clerks_reaction: ["가장 적게 받고 가장 선명한 이름", "흔적표를 읽는 순서"],
+  c9_calc_reaction: ["열한 명의 22년", "승계 조건에 못 박을 숫자"],
+  c9_wedding_reaction: ["혼주석에 앉을 사람", "말할 자신이 없는 이유"],
+  c9_night_reaction: ["자르는 서류와 남기는 서류", "결의 자료 맨 앞의 한 줄"],
   c6_family_reaction: ["오늘 답하지 않을 권한", "미룬 말에 붙는 이자"],
   c6_ledger_reaction: ["아는 쪽과 모르는 쪽", "위원회에 들어갈 문장"],
   f_witness_reaction: ["이전 참가자가 돌려받을 기록", "동의 없이 복제된 문장"],
@@ -910,7 +1067,7 @@ const authoredBranchScenes = {
  * player learns to pick. Both default to open when the context is missing, so
  * a debug jump or a fresh crawl still reaches the scenes.
  */
-export const case07BranchScenes = {
+const lateSeasonBranchScenes = {
   c7_branch_quota: {
     phase: "SIDE DOOR",
     title: "그해 목표표",
@@ -935,6 +1092,64 @@ export const case07BranchScenes = {
       { id: "c7_branch_quota_follow_a", label: "잘린 세 사람을 피해자로 함께 적는다", effect: { legitimacy: 10, trust: 9, capital: -7, humanCost: -8, fatigue: 7 }, next: "c7_paper", cognition: { reframing: 3 } },
       { id: "c7_branch_quota_follow_b", label: "이번 사건 범위만 남기고 과거는 접는다", effect: { legitimacy: 6, time: 5, humanCost: 5, fatigue: 3 }, next: "c7_paper", cognition: { risk: 1 } },
       { id: "c7_branch_quota_follow_c", label: "세 사람에게 먼저 연락해 의사를 묻는다", effect: { trust: 12, time: -9, legitimacy: 4, humanCost: -6, fatigue: 6 }, next: "c7_paper", cognition: { persistence: 2 } },
+    ],
+  },
+  // CASE 08's detour is the one place the trace points back into the lab: the
+  // paintings were "entertainment", and one of the people entertained signed the
+  // review box on 2023-0412. The case is about a grudge, so its side door is the
+  // moment the grudge finds someone the player likes.
+  c8_branch_ledger: {
+    phase: "SIDE DOOR",
+    title: "한서윤의 그림",
+    speaker: "한서윤",
+    text: "협력사 한 곳의 경비 장부에서 그림 구매가 '고객 접대비'로 처리돼 있습니다. 접대 상대 칸에 적힌 이름은 한서윤. 전화를 받은 그가 한참 말이 없다가 입을 엽니다. '그 그림, 제 사무실 벽에 3년째 걸려 있습니다. 승진 축하라고 받았어요. 그해에 제가 2023-0412 승인란 옆 검토란에 서명했습니다.'",
+    memo: ["협력사 장부: 그림 구매를 접대비로 처리", "수령인: 한서윤 (당시 차장)", "같은 해 한서윤이 2023-0412 검토란에 서명", "한서윤은 그림을 스스로 반납하겠다고 함"],
+    triggers: ["trust", "injustice", "affection"],
+    choices: [
+      { id: "c8_branch_ledger_a", label: "한서윤의 이름도 흔적표에 그대로 올린다", effect: { legitimacy: 11, trust: -7, humanCost: 4, fatigue: 5 }, next: "c8_branch_ledger_follow", cognition: { inference: 2 } },
+      { id: "c8_branch_ledger_b", label: "그가 스스로 신고할 시간을 준다", effect: { trust: 10, legitimacy: -4, time: -8, fatigue: 5 }, next: "c8_branch_ledger_follow", cognition: { reframing: 2 } },
+      { id: "c8_branch_ledger_c", label: "받은 사람이 아니라 준 쪽의 장부만 쓴다", effect: { capital: 7, time: 4, trust: 4, legitimacy: -6, humanCost: 3, fatigue: 2 }, next: "c8_branch_ledger_follow", cognition: { risk: 1 } },
+    ],
+  },
+  c8_branch_ledger_follow: {
+    phase: "SIDE DOOR",
+    title: "벽에서 내린 그림",
+    speaker: "한서윤",
+    text: "다음 날 아침, 한서윤이 포장한 그림을 들고 영동지점에 옵니다. 네 시간을 운전해 왔습니다. '제가 이걸 3년 동안 왜 못 내렸는지 아십니까. 좋아서요. 그림이 정말 좋아서.' 그가 처음으로 웃는데, 우는 얼굴과 구분이 되지 않습니다. 그림을 어디에 둘지가 남았습니다.",
+    memo: ["한서윤 자진 신고서 초안 작성", "그림 감정가는 판매가의 6%", "지점 금고에 보관하면 증거물 관리 기록이 남음"],
+    triggers: ["affection", "responsibility", "trust"],
+    choices: [
+      { id: "c8_branch_ledger_follow_a", label: "지점 금고에 증거물로 봉인한다", effect: { legitimacy: 10, trust: 4, capital: -6, time: -5, fatigue: 5 }, next: "c8_bait", cognition: { persistence: 1, inference: 1 } },
+      { id: "c8_branch_ledger_follow_b", label: "자진 신고서에 내 확인 서명을 함께 붙인다", effect: { trust: 12, legitimacy: 5, humanCost: -4, time: -9, fatigue: 7 }, next: "c8_bait", cognition: { reframing: 3 } },
+      { id: "c8_branch_ledger_follow_c", label: "그림은 돌려보내고 신고서만 받는다", effect: { time: 6, capital: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -3 }, next: "c8_bait", cognition: { risk: 1 } },
+    ],
+  },
+  // CASE 09's detour is the founder. The case argues in spreadsheets, so its
+  // side door is the one room where nobody can read one.
+  c9_branch_father: {
+    phase: "SIDE DOOR",
+    title: "요양병원 3층",
+    speaker: "권도현",
+    text: "권도현이 결정을 미루고 요양병원으로 갑니다. 당신도 따라갑니다. 창업주 권태호는 아들을 알아보지 못하고 당신에게 묻습니다. '자네가 새로 온 배차 담당인가. 야간조 애들 밥은 먹였나.' 권도현이 창밖을 봅니다. '아버지가 기억하는 회사는 1,140명이 아니라 서른 명일 때입니다. 그때는 이름을 다 외웠대요.'",
+    memo: ["창업주 권태호, 치매 진단 4년차", "창업 초기 직원 30명 중 11명이 아직 재직", "그 11명이 퇴직금 차이 3억의 당사자"],
+    triggers: ["affection", "protection", "responsibility"],
+    choices: [
+      { id: "c9_branch_father_a", label: "초기 직원 열한 명의 이름을 회생안 첫 장에 적는다", effect: { trust: 11, humanCost: -7, capital: -8, time: -5, fatigue: 6 }, next: "c9_branch_father_follow", cognition: { reframing: 2 } },
+      { id: "c9_branch_father_b", label: "감정은 접고 고발 여부를 오늘 안에 정하자고 한다", effect: { legitimacy: 9, time: 5, trust: -6, humanCost: 3, fatigue: 3 }, next: "c9_branch_father_follow", cognition: { risk: 1 } },
+      { id: "c9_branch_father_c", label: "그가 아버지 곁에 있도록 협상을 하루 대신 맡는다", effect: { trust: 9, legitimacy: 5, capital: -4, time: -9, fatigue: 8 }, next: "c9_branch_father_follow", cognition: { persistence: 2 } },
+    ],
+  },
+  c9_branch_father_follow: {
+    phase: "SIDE DOOR",
+    title: "서른 명의 사진",
+    speaker: "강태민",
+    text: "병원 주차장에서 야간조 반장 강태민이 기다리고 있습니다. 권도현이 불렀습니다. 강태민이 낡은 사진 한 장을 내밉니다. 창업 첫해, 트럭 두 대 앞에 선 서른 명. 맨 끝에 어린 권도현이 있습니다. '대표님 아들이 가업 안 잇는다고 했을 때 우리가 제일 좋아했어요. 저 사람은 우리처럼 살지 말라고.'",
+    memo: ["창업 첫해 사진: 직원 30명과 어린 권도현", "강태민은 초기 직원 11명 중 한 명", "권도현은 사진을 채권단 자료에 넣을지 망설임"],
+    triggers: ["affection", "trust", "responsibility"],
+    choices: [
+      { id: "c9_branch_father_follow_a", label: "사진을 채권단 자료 맨 뒤에 조용히 넣는다", effect: { trust: 10, legitimacy: 4, humanCost: -5, capital: -6, fatigue: 6 }, next: "c9_timing", cognition: { reframing: 3 } },
+      { id: "c9_branch_father_follow_b", label: "사진은 돌려주고 숫자로만 싸운다", effect: { legitimacy: 8, time: 4, trust: -4, humanCost: 3, fatigue: 3 }, next: "c9_timing", cognition: { inference: 1 } },
+      { id: "c9_branch_father_follow_c", label: "열한 명을 결의장에 직접 부른다", effect: { trust: 13, humanCost: -6, legitimacy: -3, time: -10, fatigue: 8 }, next: "c9_timing", cognition: { persistence: 2 } },
     ],
   },
 };
@@ -970,10 +1185,12 @@ const authoredBranchPlans = [
   ["case05", "c5_blame", 1, "c5_branch_owner", "c5_branch_owner_follow", "ruleNotYetClosed"],
   ["case06", "c6_logs", 1, "c6_branch_roof", "c6_branch_roof_follow"],
   ["case07", "c7_counter", 2, "c7_branch_quota", "c7_branch_quota_follow"],
+  ["case08", "c8_gallery", 1, "c8_branch_ledger", "c8_branch_ledger_follow"],
+  ["case09", "c9_family", 2, "c9_branch_father", "c9_branch_father_follow"],
   ["final", "f_confront", 0, "f_branch_witness", "f_branch_witness_follow"],
 ];
 
-Object.assign(authoredBranchScenes, case07BranchScenes);
+Object.assign(authoredBranchScenes, lateSeasonBranchScenes);
 
 authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) => {
   const source = nodes[sourceId];
@@ -1777,6 +1994,57 @@ const dramaticRoutePlans = {
       ["c", "표의 마지막 줄에 내 이름을 적어 남긴다", { legitimacy: 9, trust: 6, capital: -5, time: -6, humanCost: 3, fatigue: 8 }, { persistence: 2 }],
     ],
   },
+  case08: {
+    start: "c8_start",
+    result: "c8_aftershock",
+    defaultFree: "c8_route_system",
+    // Cases 06 and 07 have one person or one posting at their centre and no
+    // four-way split. So does this one: it is one trail, followed by one grudge.
+    choices: {},
+    system: {
+      route: "c8_route_system",
+      final: "c8_final_system_route",
+      title: "같은 주소의 일곱 법인",
+      speaker: "에코",
+      text: "준비된 보기 밖의 문장을 쓰자 법인 등기 이력이 열립니다. 해온파트너스와 같은 주소, 같은 세무 대리인(세금 신고를 대신해 주는 사무소), 같은 청산 시점을 가진 회사가 지난 6년간 일곱 곳입니다. 흔적은 한 줄이 아니라, 같은 손이 반복해서 그린 무늬였습니다.",
+      memo: ["같은 주소·같은 세무 대리인 법인 7곳", "모두 감사 착수 직전에 청산", "일곱 번째가 해온파트너스"],
+      routeChoices: [
+        ["c8_route_system_map", "일곱 법인의 흐름을 한 장의 지도로 잇는다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
+        ["c8_route_system_one", "지도는 접고 해온파트너스 한 곳만 판다", { time: 7, capital: 8, trust: -7, legitimacy: -6, humanCost: 4, fatigue: -4 }, { risk: 2 }],
+        ["c8_route_system_agent", "일곱 곳을 만든 세무 대리인을 먼저 찾아간다", { trust: 11, legitimacy: 5, capital: -7, humanCost: -6, time: -9, fatigue: 8 }, { reframing: 2 }],
+      ],
+    },
+    finalChoices: [
+      ["a", "일곱 법인을 하나의 무늬로 묶어 외부에 낸다", { legitimacy: 12, trust: 7, capital: -8, humanCost: -5, fatigue: 8 }, { reframing: 3 }],
+      ["b", "해온파트너스 한 건만 남기고 나머지는 덮는다", { capital: 9, time: 6, trust: -8, legitimacy: -7, humanCost: 6, fatigue: -4 }, { risk: 2 }],
+      ["c", "무늬의 마지막 칸에 내 조회 기록을 남긴다", { legitimacy: 9, trust: 6, capital: -5, time: -6, humanCost: 3, fatigue: 8 }, { persistence: 2 }],
+    ],
+  },
+  case09: {
+    start: "c9_start",
+    result: "c9_aftershock",
+    defaultFree: "c9_route_system",
+    // One rescue, two sheets of paper. The split is the table, not the route.
+    choices: {},
+    system: {
+      route: "c9_route_system",
+      final: "c9_final_system_route",
+      title: "세 번째 계산서",
+      speaker: "에코",
+      text: "준비된 보기 밖의 문장을 쓰자 에코가 세 번째 표를 엽니다. 채권단 누구도 작성하지 않은 계산서, 청산했을 때 1,140명의 가족이 치르는 비용입니다. 건강보험 전환, 학자금 연체, 협력사 연쇄 부도. 합계는 브릿지은행이 청산으로 더 돌려받는 금액의 2.3배입니다.",
+      memo: ["청산 때 가족·협력사가 치를 비용 추정: 더 돌려받는 금액의 2.3배", "채권단 계산서에는 이 칸이 없음", "추정치라 법적 구속력은 없음"],
+      routeChoices: [
+        ["c9_route_system_add", "세 번째 계산서를 채권단 공식 자료로 올린다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
+        ["c9_route_system_quiet", "표는 닫고 기존 두 장으로만 싸운다", { time: 7, capital: 8, trust: -7, legitimacy: -6, humanCost: 4, fatigue: -4 }, { risk: 2 }],
+        ["c9_route_system_families", "가족 대표들에게 이 표를 먼저 보여 준다", { trust: 12, legitimacy: 5, capital: -7, humanCost: -6, time: -9, fatigue: 8 }, { reframing: 2 }],
+      ],
+    },
+    finalChoices: [
+      ["a", "세 장의 계산서를 한 묶음으로 결의에 올린다", { legitimacy: 12, trust: 7, capital: -8, humanCost: -5, fatigue: 8 }, { reframing: 3 }],
+      ["b", "세 번째 표는 덮고 회수율로만 협상한다", { capital: 9, time: 6, trust: -8, legitimacy: -7, humanCost: 6, fatigue: -4 }, { risk: 2 }],
+      ["c", "세 번째 표 맨 아래에 작성자로 내 이름을 쓴다", { legitimacy: 9, trust: 6, capital: -5, time: -6, humanCost: 3, fatigue: 8 }, { persistence: 2 }],
+    ],
+  },
   final: {
     start: "f_start",
     result: "f_aftershock",
@@ -2190,18 +2458,56 @@ const evidenceTurnaroundPlans = {
     result: "c7_aftershock",
     sourceRoutes: ["c7_ledger", "c7_counter", "c7_paper", "c7_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 발령 기안일과 나란히 놓고, 순서가 맞는지 맞춰 본다.",
+    entryVoice: "모아 둔 단서를 발령서 작성일과 나란히 놓고, 순서가 맞는지 맞춰 본다.",
     entryEcho: "단서를 대면 이 발령은 결과가 아니라 예고편이 됩니다.",
-    title: "기안일이 먼저였다",
+    title: "작성일이 먼저였다",
     speaker: "반재욱",
-    text: "단서를 맞추자 순서가 드러납니다. 발령 기안일은 사건 06 개시보다 12일 앞서고, 그 12일 전에는 당신이 사건 05에서 예산 상한선의 출처를 물은 날이 있습니다. 조사가 시작돼서 발령이 난 것이 아니라, 질문이 시작돼서 발령이 준비된 것입니다.",
-    memo: ["기안일 = 상한선 출처 질문 다음 날", "사건 06은 발령 사유가 아니라 발령 명분", "같은 순서가 앞선 17건에서도 반복됨"],
+    text: "단서를 맞추자 순서가 드러납니다. 발령서 작성일은 사건 06 개시보다 12일 앞서고, 그 12일 전에는 당신이 사건 05에서 예산 상한선의 출처를 물은 날이 있습니다. 조사가 시작돼서 발령이 난 것이 아니라, 질문이 시작돼서 발령이 준비된 것입니다.",
+    memo: ["작성일 = 상한선 출처 질문 다음 날", "사건 06은 발령 사유가 아니라 발령 명분", "같은 순서가 앞선 17건에서도 반복됨"],
     triggers: ["injustice", "system", "selfAwareness"],
     entryEffect: { legitimacy: 4, trust: 3, time: -3, fatigue: 4 },
     choices: [
-      ["c7_evidence_turn_order", "질문한 날과 기안일을 나란히 붙여 제출한다", { legitimacy: 12, trust: 5, capital: -7, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 } ],
+      ["c7_evidence_turn_order", "질문한 날과 작성일을 나란히 붙여 제출한다", { legitimacy: 12, trust: 5, capital: -7, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 } ],
       ["c7_evidence_turn_hold", "순서는 알아 두고 이번엔 쓰지 않는다", { capital: 7, time: 5, trust: -5, legitimacy: -5, humanCost: 4, fatigue: -3 }, { risk: 2 }],
       ["c7_evidence_turn_share", "앞선 17명에게 이 순서를 먼저 알린다", { trust: 11, legitimacy: 6, capital: -6, humanCost: -6, fatigue: 7 }, { reframing: 2 }],
+    ],
+  },
+  case08: {
+    node: "c8_evidence_turn",
+    result: "c8_aftershock",
+    sourceRoutes: ["c8_trail", "c8_gallery", "c8_bait", "c8_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    entryVoice: "모아 둔 단서를 입금일 달력에 겹쳐, 돈이 움직인 날과 승인이 난 날을 맞춰 본다.",
+    entryEcho: "단서를 대면 자문료는 수수료가 아니라 승인의 영수증이 됩니다.",
+    title: "입금일과 승인일",
+    speaker: "반재욱",
+    text: "단서를 달력에 겹치자 규칙이 보입니다. 해온파트너스에 자문료가 들어온 열두 번의 날짜는 전부 KD은행이 세움테크와 브릿지은행 쪽에 유리한 승인을 낸 다음 영업일입니다. 3년 전 2023-0412의 담보 순위가 브릿지은행으로 넘어간 날도 그중 하나입니다.",
+    memo: ["입금 12회 = 승인 다음 영업일 12회", "2023-0412 담보 순위 변경일 포함", "우연으로 설명하기 어려운 일치"],
+    triggers: ["injustice", "revenge", "system"],
+    entryEffect: { legitimacy: 4, trust: 3, time: -3, fatigue: 4 },
+    choices: [
+      ["c8_evidence_turn_calendar", "달력 한 장으로 만들어 수사 의뢰서 첫 장에 붙인다", { legitimacy: 12, trust: 5, capital: -7, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 }],
+      ["c8_evidence_turn_hold", "달력은 쥐고 있다가 협상 자리에서 꺼낸다", { capital: 8, time: 5, trust: -5, legitimacy: -5, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+      ["c8_evidence_turn_share", "담보 순위에서 밀려난 채권자들에게 먼저 알린다", { trust: 11, legitimacy: 6, capital: -6, humanCost: -6, fatigue: 7 }, { reframing: 2 }],
+    ],
+  },
+  case09: {
+    node: "c9_evidence_turn",
+    result: "c9_aftershock",
+    sourceRoutes: ["c9_ledger", "c9_family", "c9_timing", "c9_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    entryVoice: "모아 둔 단서를 두 계산서 사이에 끼워, 어느 숫자가 어느 승인에서 왔는지 맞춰 본다.",
+    entryEcho: "단서를 대면 청산의 계산서는 중립적인 숫자가 아니라 누군가 사 둔 결론이 됩니다.",
+    title: "청산 회수율의 출처",
+    speaker: "오진우",
+    text: "단서를 맞추자 브릿지은행이 내민 청산 회수율 78%의 출처가 드러납니다. 담보 가치를 매긴 감정평가법인(부동산·설비 값을 매기는 회사)은 해온파트너스와 같은 세무 대리인(세금 신고를 대신해 주는 사무소)을 씁니다. 청산이 유리하다는 숫자 자체가, 흔적표의 같은 손에서 나왔습니다.",
+    memo: ["회수율 78%를 산정한 감정평가법인 = 해온과 같은 세무 대리인", "다시 평가하면 청산 회수율 64%로 하락 추정", "회생안이 청산보다 유리해질 수 있음"],
+    triggers: ["injustice", "system", "responsibility"],
+    entryEffect: { legitimacy: 4, trust: 3, time: -3, fatigue: 4 },
+    choices: [
+      ["c9_evidence_turn_reappraise", "담보 재평가를 요구해 회수율 숫자를 다시 쓴다", { legitimacy: 12, trust: 5, capital: -7, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 }],
+      ["c9_evidence_turn_hold", "출처는 알아 두고 결의장에서만 꺼낸다", { capital: 8, time: 5, trust: -5, legitimacy: -5, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+      ["c9_evidence_turn_share", "권도현에게 먼저 보여 주고 그의 이름으로 문제를 제기하게 한다", { trust: 11, legitimacy: 6, capital: -6, humanCost: -6, fatigue: 7 }, { reframing: 2 }],
     ],
   },
   final: {
@@ -2320,7 +2626,23 @@ const continuityMemoryChoicePlans = {
     evidenceNext: "c7_evidence_turn",
     routeLabel: "직전 사건에서 옆자리에 세운 기준을 내 발령에도 대 본다",
     systemLabel: "직전 자유응답 문장이 내 인사 기록에도 붙었는지 본다",
-    evidenceLabel: "직전 단서를 붙여 발령 기안일의 순서를 연다",
+    evidenceLabel: "직전 단서를 붙여 발령서 작성일의 순서를 연다",
+  },
+  case08: {
+    routeNext: "c8_branch_ledger",
+    systemNext: "c8_route_system",
+    evidenceNext: "c8_evidence_turn",
+    routeLabel: "직전 사건에서 이름을 올린 방식대로 흔적표에도 이름을 단다",
+    systemLabel: "직전 자유응답 문장이 법인 등기 서류에도 남았는지 본다",
+    evidenceLabel: "직전 단서를 붙여 입금일과 승인일을 맞춘다",
+  },
+  case09: {
+    routeNext: "c9_branch_father",
+    systemNext: "c9_route_system",
+    evidenceNext: "c9_evidence_turn",
+    routeLabel: "직전 사건의 흔적표를 권도현의 계산서 옆에 나란히 놓는다",
+    systemLabel: "직전 자유응답 문장이 채권단 자료에도 들어갔는지 본다",
+    evidenceLabel: "직전 단서를 붙여 청산 회수율의 출처를 연다",
   },
   final: {
     routeNext: "f_route_map",
@@ -2411,13 +2733,23 @@ export const caseOpeningRoutes = {
     c6_after_open: "c7_start_open",
     c6_after_name: "c7_start_name",
   },
-  // Keyed on case 07's aftermath, because that is the case the finale follows
-  // now. It read c5_after_* until case 06 was inserted, then c6_after_* until
-  // case 07 was.
+  case08: {
+    c7_after_stand: "c8_start_stand",
+    c7_after_open: "c8_start_open",
+    c7_after_alone: "c8_start_alone",
+  },
+  case09: {
+    c8_after_law: "c9_start_law",
+    c8_after_friend: "c9_start_friend",
+    c8_after_blade: "c9_start_blade",
+  },
+  // Keyed on the aftermath of the case the finale follows. It has moved every
+  // time a case was inserted in front of it: c5_after_*, c6_after_*, c7_after_*,
+  // and now c9_after_*.
   final: {
-    c7_after_stand: "f_start_owner",
-    c7_after_open: "f_start_system",
-    c7_after_alone: "f_start_name",
+    c9_after_stay: "f_start_owner",
+    c9_after_court: "f_start_system",
+    c9_after_return: "f_start_name",
   },
 };
 
@@ -2437,12 +2769,18 @@ const branchOpeningCopy = {
   c6_start_owner: ["내 책임부터 적은 뒤", "도윤하", "지난 사건에서 당신은 자기 결정부터 공개했습니다. 그 문장을 읽은 사람 중 하나가 옆자리에서 사흘째 나오지 않고 있습니다.", ["당신의 책임 문장이 사내에 회람됨", "오진우는 그 회람 직후 결근함", "위원회는 그 회람을 근거로 쓸 수 있음"]],
   c6_start_system: ["고친 구조가 부른 사람", "에코", "지난 사건에서 당신은 구조를 고쳤습니다. 새 기준은 승인자를 더 또렷하게 남겼고, 그 기록이 지금 한 사람을 정확히 가리킵니다.", ["새 승인 기록이 책임자를 특정함", "구조 개편은 실제로 작동 중", "정확한 기록이 가장 빠른 표적이 됨"]],
   c6_start_name: ["두 번째 이름", "반재욱", "지난 사건에서 당신은 책임자 한 사람을 세웠습니다. 조직은 그 방식이 효율적이라고 배웠고, 이번에는 그 방식을 옆자리에 적용하려 합니다.", ["지난 사건의 처리 방식이 선례가 됨", "같은 절차가 이미 준비돼 있음", "이번 대상은 당신이 아는 사람"]],
-  c7_start_stand: ["자리를 남긴 사람의 발령", "도윤하", "당신은 오진우가 돌아올 자리를 치우지 않았습니다. 그 다음 주, 치워진 것은 당신의 자리입니다. 발령서는 그가 결근한 날 이미 기안돼 있었습니다.", ["오진우의 자리는 아직 그대로", "당신의 발령서 기안일이 더 빠름", "같은 층에서 두 자리가 동시에 비게 됨"]],
+  c7_start_stand: ["자리를 남긴 사람의 발령", "도윤하", "당신은 오진우가 돌아올 자리를 치우지 않았습니다. 그 다음 주, 치워진 것은 당신의 자리입니다. 발령서는 그가 결근한 날 이미 작성돼 있었습니다.", ["오진우의 자리는 아직 그대로", "당신의 발령서 작성일이 더 빠름", "같은 층에서 두 자리가 동시에 비게 됨"]],
   c7_start_open: ["조건을 연 사람의 발령", "에코", "두 사람의 설정값을 같은 날 공개한 뒤, 실험은 멈추지 않고 담당자만 바뀌었습니다. 공개는 기록에 남았고, 공개한 사람은 240km 밖으로 갑니다.", ["설정값 공개 기록은 유효", "실험 자체는 중단되지 않음", "후임 분석관 배치가 이미 완료됨"]],
   c7_start_name: ["이름으로 닫은 사람의 발령", "반재욱", "당신은 한 사람의 이름으로 사건을 닫았습니다. 조직은 그 방식이 효율적이라고 배웠고, 이번에는 같은 방식으로 당신을 닫습니다. 다만 이번에는 이름조차 필요 없습니다. 자리만 옮기면 됩니다.", ["지난 종결 방식이 선례로 인용됨", "이번 처리에는 사유 고지가 없음", "같은 절차가 이미 준비돼 있었음"]],
-  f_start_owner: ["이름을 올린 사람의 마지막 밤", "도윤하", "당신은 도와준 사람들을 찾아다녔고, 그 이름들은 이미 문서에 있습니다. 트리거랩은 이제 더 직접적인 질문을 준비했습니다. 책임감은 누구에게 이용될 수 있는가.", ["당신의 책임 문장이 복제됨", "다음 참가자에게 같은 질문이 전송됨", "실험 설계자는 책임을 칭찬함"]],
-  f_start_system: ["원본을 넘긴 사람의 마지막 밤", "에코", "남은 하루로 외부 감사인에게 원본을 마저 넘겼습니다. 그래도 실험은 계속됐습니다. 이번에는 구조를 연 사람이 새로운 관찰 대상이 됩니다.", ["새 규칙이 참가자에게 적용됨", "감시 기록이 공개되지 않음", "동의 절차에 빈틈이 남음"]],
-  f_start_name: ["아무에게도 말하지 않은 밤", "반재욱", "당신은 조용히 짐을 쌌고, 사건은 그대로 닫혔습니다. 이제 트리거랩은 그 침묵을 근거로 더 큰 통제를 제안합니다.", ["침묵한 종결이 표준 절차로 인용됨", "도와준 사람들의 이름은 문서에 남음", "실험의 종료 권한이 당신에게 옴"]],
+  c8_start_stand: ["사람을 먼저 찾은 사람의 지점", "도윤하", "당신은 떠나기 전 이름을 올린 사람들을 한 명씩 만났습니다. 그중 셋이 영동지점으로 안부 문자를 보냅니다. 그리고 부임 9일째, 휴면 계좌 목록에서 이상한 법인 하나가 눈에 걸립니다.", ["이름을 올린 사람들과 연락이 이어짐", "해온파트너스 계좌에서 이상 흐름 발견", "법인 청산 등기까지 72시간"]],
+  c8_start_open: ["기차를 타지 않은 사람의 첫 출근", "나준혁", "당신은 06시 40분 기차에 없었고, 이틀 늦게 버스로 내려왔습니다. 지점장은 지각을 묻지 않고 자리를 내줍니다. 외부 감사인에게 넘긴 원본은 아직 답이 없고, 대신 이 지점의 휴면 계좌 하나가 답을 합니다.", ["지각 부임 기록이 인사 파일에 남음", "외부 감사인 회신 대기 중", "해온파트너스 계좌에서 이상 흐름 발견"]],
+  c8_start_alone: ["조용히 내려온 사람의 창구", "에코", "당신은 아무에게도 알리지 않고 내려왔습니다. 아무도 연락하지 않았고, 그래서 아무도 당신이 무엇을 보는지 모릅니다. 이번에는 그 조용함이 무기가 됩니다. 휴면 계좌 목록의 한 줄이 그 무기를 쓸 곳을 가리킵니다.", ["아무도 당신의 조회를 예상하지 않음", "해온파트너스 계좌에서 이상 흐름 발견", "혼자 쥔 자료는 증거 보관 기록이 없음"]],
+  c9_start_law: ["흔적을 기록으로 만든 사람의 72시간", "반재욱", "당신은 흔적표에 지점장 도장까지 받아 공식 기록으로 만들었습니다. 수사는 느리게 시작됐고, 그 사이 플로우온 채권단은 빠르게 청산 쪽으로 기울었습니다. 기록은 남았지만, 기록이 사람을 먼저 구하지는 않습니다.", ["수사 의뢰서 접수 완료, 착수 시점 미정", "채권단 결의 안건: 청산", "권도현이 기록 사본 열람을 요청함"]],
+  c9_start_friend: ["친구를 찾으러 간 사람의 72시간", "오진우", "당신은 연락이 끊긴 오진우를 찾아 서울로 올라왔습니다. 그는 고시원 방 벽에 흔적표를 붙여 놓고 있었습니다. 둘이 국밥을 먹은 다음 날, 플로우온 청산 안건이 채권단에 올라옵니다. '이번엔 같이 가죠. 복수 말고, 다른 거 하러.'", ["오진우가 추적 자료를 공동 보관으로 넘김", "채권단 결의 안건: 청산", "오진우와 권도현은 대학 동기"]],
+  c9_start_blade: ["칼을 혼자 쥔 사람의 72시간", "에코", "당신은 흔적표를 혼자 쥐고 기다렸고, 쓸 때가 왔습니다. 플로우온 청산 안건이 채권단에 올라왔고, 청산을 밀어붙이는 은행이 흔적표의 한 줄에 있습니다. 혼자 쥔 칼은 빠르지만, 누구도 그 칼이 공정했는지 증언해 주지 않습니다.", ["흔적표 원본은 당신 혼자 보관", "채권단 결의 안건: 청산", "칼의 쓰임새를 아는 사람이 없음"]],
+  f_start_owner: ["현장을 지킨 사람의 마지막 밤", "도윤하", "고용 승계 합의서에 마지막 서명이 끝난 밤, 당신은 트리거랩으로 돌아왔습니다. 사람을 끝까지 포기하지 않은 기록은 이미 폴더에 정리돼 있습니다. 트리거랩은 더 직접적인 질문을 준비했습니다. 그 집념은 누구에게 이용될 수 있는가.", ["당신의 보호 기록이 복제됨", "다음 참가자에게 같은 질문이 전송됨", "실험 설계자는 집념을 칭찬함"]],
+  f_start_system: ["증언을 마친 사람의 마지막 밤", "에코", "법정과 검사반에서 증언을 마쳤습니다. 재판과 제재 절차는 시작됐고, 그래도 실험은 계속됐습니다. 이번에는 구조를 연 사람이 새로운 관찰 대상이 됩니다.", ["재판·제재 절차 개시", "감시 기록이 공개되지 않음", "동의 절차에 빈틈이 남음"]],
+  f_start_name: ["조용히 돌아간 사람의 마지막 밤", "반재욱", "당신은 컵라면을 다 먹고 조용히 영동으로 돌아갔습니다. 결의 결과는 뉴스로 들었습니다. 이제 트리거랩은 그 침묵을 근거로 더 큰 통제를 제안합니다.", ["침묵한 복귀가 표준 절차로 인용됨", "도와준 사람들의 이름은 문서에 남음", "실험의 종료 권한이 당신에게 옴"]],
 };
 
 /**
@@ -2587,6 +2925,48 @@ const openingSignatureChoices = {
     voice: "남의 이름으로 열었던 절차를, 이번엔 내 이름을 넣어 다시 연다.",
     echo: "같은 절차에 자기 이름을 넣으면 그 절차가 무엇이었는지 처음으로 정확히 보입니다.",
   },
+  c8_start_stand: {
+    label: "안부 문자를 보낸 세 사람에게 계좌 추적을 도와 달라고 한다",
+    effect: { trust: 11, legitimacy: 3, capital: -5, time: -5, fatigue: 5 },
+    cognition: { reframing: 2 },
+    voice: "도와준 사람에게 또 부탁하는 게 염치없다는 걸 알면서, 세 사람에게 답장을 쓴다.",
+    echo: "두 번째 부탁은 첫 번째보다 무겁습니다. 받아 주는 사람은 이번에는 당신이 무엇을 쫓는지 압니다.",
+  },
+  c8_start_open: {
+    label: "외부 감사인에게 넘긴 원본에 이 계좌를 추가 자료로 붙인다",
+    effect: { legitimacy: 12, trust: 4, capital: -7, time: -4, fatigue: 5 },
+    cognition: { inference: 2 },
+    voice: "이미 열어 둔 감사 경로에, 계좌 내역을 추가 자료로 이어 붙인다.",
+    echo: "같은 경로로 두 번째 자료가 가면 감사인은 우연을 의심하지 않습니다. 보내는 사람의 이름도 두 번 기록됩니다.",
+  },
+  c8_start_alone: {
+    label: "아무에게도 말하지 않고 청산 전 마지막 입출금을 지켜본다",
+    effect: { capital: 9, legitimacy: 4, trust: -6, humanCost: 3, time: -3, fatigue: 4 },
+    cognition: { risk: 2 },
+    voice: "아무도 모르게, 청산 전에 마지막으로 돈이 움직이는 순간을 기다린다.",
+    echo: "지켜보는 사람이 없다고 믿는 돈은 가장 솔직하게 움직입니다. 그 순간을 본 사람도 당신 하나뿐입니다.",
+  },
+  c9_start_law: {
+    label: "접수된 수사 의뢰서를 채권단 참고 자료로 정식 제출한다",
+    effect: { legitimacy: 11, trust: 3, capital: -6, time: -5, fatigue: 5 },
+    cognition: { inference: 2 },
+    voice: "공식 기록으로 만든 흔적표를, 채권단 테이블에도 같은 문으로 올린다.",
+    echo: "수사 의뢰서가 채권단 자료에 붙으면 청산을 서두르는 쪽이 설명해야 합니다. 설명하는 동안 60시간은 줄어듭니다.",
+  },
+  c9_start_friend: {
+    label: "오진우에게 권도현을 먼저 만나 달라고 부탁한다",
+    effect: { trust: 12, legitimacy: -6, humanCost: -4, time: -7, fatigue: 6 },
+    cognition: { reframing: 2 },
+    voice: "대학 동기라는 말에 기대어, 오진우에게 권도현을 먼저 만나 달라고 한다.",
+    echo: "복수를 내려놓은 사람이 처음 맡은 일이 친구를 설득하는 일입니다. 실패하면 둘 다 조금 더 외로워집니다.",
+  },
+  c9_start_blade: {
+    label: "흔적표 한 줄을 권도현에게만 보여 주고 반응을 본다",
+    effect: { capital: 9, legitimacy: 3, trust: -5, humanCost: 3, time: -3, fatigue: 4 },
+    cognition: { risk: 2 },
+    voice: "칼끝만 조금 보이듯, 흔적표의 한 줄을 권도현 앞에 놓는다.",
+    echo: "한 줄만 보여 주면 상대는 나머지를 계산합니다. 권도현은 계산이 빠른 사람입니다.",
+  },
   f_start_name: {
     label: "지목했던 사람에게 이 실험의 기록을 먼저 돌려준다",
     effect: { trust: 9, humanCost: -6, legitimacy: -3, capital: -5, fatigue: 5 },
@@ -2598,7 +2978,7 @@ const openingSignatureChoices = {
 };
 
 Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
-  const baseNodeId = caseId === "case02" ? "c2_start" : caseId === "case03" ? "c3_start" : caseId === "case04" ? "c4_start" : caseId === "case05" ? "c5_start" : caseId === "case06" ? "c6_start" : caseId === "case07" ? "c7_start" : "f_start";
+  const baseNodeId = CASE_START_NODES[caseId];
   Object.values(routes).forEach((nodeId) => {
     const [title, speaker, text, memo] = branchOpeningCopy[nodeId];
     // The cloned choices are the same decisions, so they keep the base scene's

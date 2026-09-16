@@ -1,5 +1,5 @@
 /**
- * What each case is, and what all seven turn out to be.
+ * What each case is, and what all nine turn out to be.
  *
  * The season used to be an anthology: seven unrelated organisations, each with
  * its own crisis, strung together by a lab that watched the analyst react. That
@@ -11,9 +11,12 @@
  * the cover-up of its paperwork, 03 and 04 are the two places the bank tried to
  * move the loss to, 05 is where the loss finally lands on people who never
  * borrowed anything, 06 is what the chain does to the analyst in the next chair,
- * and the finale is the empty signature box the whole thing hangs from.
+ * 07 is the posting that was meant to end it, 08 follows the money the chain paid
+ * out to the man at the top of it, 09 goes back to 플로우온 to save it and charge
+ * the people who broke it on the same table, and the finale is the empty
+ * signature box the whole thing hangs from.
  */
-export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "final"];
+export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "final"];
 export const CASE_START_NODES = {
   case01: "start",
   case02: "c2_start",
@@ -22,6 +25,8 @@ export const CASE_START_NODES = {
   case05: "c5_start",
   case06: "c6_start",
   case07: "c7_start",
+  case08: "c8_start",
+  case09: "c9_start",
   final: "f_start",
 };
 export const CASE_RESULT_NODES = {
@@ -32,6 +37,8 @@ export const CASE_RESULT_NODES = {
   case05: "case05_result",
   case06: "case06_result",
   case07: "case07_result",
+  case08: "case08_result",
+  case09: "case09_result",
   final: "final_result",
 };
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
@@ -44,6 +51,8 @@ export const nodeOrders = {
   case05: ["c5_start", "c5_map", "c5_blame", "c5_collapse", "c5_final"],
   case06: ["c6_start", "c6_desk", "c6_logs", "c6_panel", "c6_final"],
   case07: ["c7_start", "c7_ledger", "c7_counter", "c7_paper", "c7_final"],
+  case08: ["c8_start", "c8_trail", "c8_gallery", "c8_bait", "c8_final"],
+  case09: ["c9_start", "c9_ledger", "c9_family", "c9_timing", "c9_final"],
   final: ["f_start", "f_archive", "f_confront", "f_choice"],
 };
 
@@ -55,6 +64,8 @@ export const caseObjectives = {
   case05: "악인이 없는 실패에서 책임과 개선 가능성을 구분한다",
   case06: "옆자리 동료의 붕괴에서 보호와 기록 중 무엇을 먼저 둘지 정한다",
   case07: "발령까지 48시간 동안 무엇을 모으고, 그 대가를 누구에게 지울지 정한다",
+  case08: "윤상혁에게 이어진 돈의 흔적을 복수가 아니라 증거로 남길 방법을 정한다",
+  case09: "플로우온을 살리는 계산서와 무너뜨린 사람을 벌하는 계산서를 한 테이블에 올린다",
   final: "플로우온 심사 보고서의 빈 서명란에 누구의 이름이 있어야 했는지 확정한다",
 };
 
@@ -121,6 +132,24 @@ export const seasonCasesBase = [
     status: "LOCKED",
     summary:
       "징계가 아니라 인사다. 48시간 뒤면 당신은 240km 밖 지점에 있고, 파일은 여기 남는다. 그 48시간에 누가 손을 내미는지가 이 사건이다.",
+  },
+  {
+    id: "case08",
+    label: "사건 08",
+    title: "돈의 흔적",
+    trigger: "복수 / 욕망 / 부당함",
+    status: "LOCKED",
+    summary:
+      "좌천된 지점의 휴면 계좌(오래 거래가 끊긴 계좌) 하나가 분기마다 자문료를 받아 서울의 갤러리로 보낸다. 사람은 욕망을 갖고, 욕망은 돈을 쓰고, 돈은 흔적을 남긴다.",
+  },
+  {
+    id: "case09",
+    label: "사건 09",
+    title: "두 장의 손익계산서",
+    trigger: "애정 / 책임 / 보상",
+    status: "LOCKED",
+    summary:
+      "플로우온이 다시 72시간 앞에 선다. 이번 안건은 청산(회사를 정리해 없애는 절차)이다. 회사를 살리는 계산서와 무너뜨린 사람을 벌하는 계산서를 한 테이블에 올려야 한다.",
   },
   {
     id: "final",

@@ -534,6 +534,14 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 <span>DECISION DNA</span>
                 <h2>{decisionFingerprint.modeTitle}</h2>
                 <p>{decisionFingerprint.modeText}</p>
+                {decisionFingerprint.motive ? (
+                  <p>
+                    <b>
+                      생각이 깨어나는 조건 · {decisionFingerprint.motive.label}
+                    </b>{" "}
+                    {decisionFingerprint.motive.when}. {decisionFingerprint.motive.path}
+                  </p>
+                ) : null}
               </div>
               <strong>{decisionFingerprint.mode}</strong>
             </div>

@@ -117,7 +117,12 @@ const fileBudgets = {
   // `ScenePlate.jsx`, so this is the whole stylesheet cost of giving all 169
   // scenes a picture, and the backdrop is absolutely positioned so the table
   // keeps every pixel of the one screen priority 27 gives it.
-  "play.css": { lines: 3210, bytes: 67400 },
+  // 3210 / 67400 -> 3360 / 70200 on 2026-09-16 for the plate's air: far-plane
+  // drift, a breathing halo and flickering accent, seeded dust or rain, a
+  // refresh sweep on screen rooms, a heat vignette on pressure beats and a slow
+  // push-in on the briefing copy. Transform and opacity only, clipped by the
+  // SVG's own viewport, and all of it parked under reduced motion.
+  "play.css": { lines: 3360, bytes: 70200 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.

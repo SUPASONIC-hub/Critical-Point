@@ -14,7 +14,7 @@ import {
 import { getSessionCode, getSessionId, saveErrorTelemetry, telemetryEnabled } from "../telemetry.js";
 import { appendTraceEvent, getTraceEvents } from "./trace.js";
 
-export function createSafeDomSnapshot(documentRef = globalThis.document) {
+function createSafeDomSnapshot(documentRef = globalThis.document) {
   try {
     const root = documentRef?.querySelector?.("#root");
     if (!root) return "";
@@ -44,7 +44,7 @@ export function getSavedRecoveryState() {
   return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : null;
 }
 
-export function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
+function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
   const saved = getSavedRecoveryState();
   const serialized = serializeError(error);
   const occurredAt = new Date().toISOString();
@@ -65,7 +65,7 @@ export function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtim
   };
 }
 
-export function persistErrorRecovery(entry) {
+function persistErrorRecovery(entry) {
   appendStoredErrorLog(entry);
   const saved = getSavedRecoveryState();
   if (!saved) return;
@@ -92,7 +92,7 @@ export function persistErrorRecovery(entry) {
   appendSaveSlot(recoveredSave);
 }
 
-export function createErrorTelemetryPayload(entry) {
+function createErrorTelemetryPayload(entry) {
   const sessionId = getSessionId();
   return {
     session_id: sessionId,
@@ -111,7 +111,7 @@ export function createErrorTelemetryPayload(entry) {
   };
 }
 
-export function queueSavedErrorTelemetry(entry) {
+function queueSavedErrorTelemetry(entry) {
   const saved = getSavedRecoveryState();
   if (!saved) return false;
   const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
@@ -121,7 +121,7 @@ export function queueSavedErrorTelemetry(entry) {
       id: entry.id,
       queuedAt: new Date().toISOString(),
       type: TELEMETRY_QUEUE_TYPES.includes("error") ? "error" : "case",
-      label: `${entry.context.currentCase} / ${entry.context.nodeId} error log`,
+      label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
       payload: createErrorTelemetryPayload(entry),
     },
   ];
@@ -135,7 +135,7 @@ export function queueSavedErrorTelemetry(entry) {
   );
 }
 
-export function reportErrorRecovery(entry) {
+function reportErrorRecovery(entry) {
   if (!telemetryEnabled) return;
   const saved = getSavedRecoveryState();
   if (!saved?.dataConsent) return;

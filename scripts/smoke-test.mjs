@@ -649,7 +649,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case07: { routeMemory: getRouteMemory([{ nodeId: "c7_route_system", choiceId: "c7_route_system_trace", freeTextSuccess: true }]) } },
+      caseResults: { case09: { routeMemory: getRouteMemory([{ nodeId: "c9_route_system", choiceId: "c9_route_system_add", freeTextSuccess: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -796,8 +796,12 @@ test("case 02 should have a people-led opening route", () => {
   assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 });
 test("the final act should have a system-led opening route", () => {
-  // Keyed on case 07's aftermath: that is the case the finale now follows.
-  assert.equal(caseOpeningRoutes.final.c7_after_open, "f_start_system", "the final act should have a system-led opening route");
+  // Keyed on case 09's aftermath: that is the case the finale now follows.
+  assert.equal(caseOpeningRoutes.final.c9_after_court, "f_start_system", "the final act should have a system-led opening route");
+});
+test("case 08 and case 09 should open from the aftermath before them", () => {
+  assert.equal(caseOpeningRoutes.case08.c7_after_open, "c8_start_open", "case 08 should open from case 07's aftermath");
+  assert.equal(caseOpeningRoutes.case09.c8_after_friend, "c9_start_friend", "case 09 should open from case 08's aftermath");
 });
 test("case 06 should open from case 05's aftermath", () => {
   assert.equal(caseOpeningRoutes.case06.c5_after_system, "c6_start_system", "case 06 should open from case 05's aftermath");
@@ -916,11 +920,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("48 generated scenes should expose 150 authored choices: three each across eight cases", () => {
+test("60 generated scenes should expose 186 authored choices: three each across ten cases", () => {
   assert.equal(
     generatedChoiceCount,
-    150,
-    "48 generated scenes should expose 150 authored choices: three each across eight cases",
+    186,
+    "60 generated scenes should expose 186 authored choices: three each across ten cases",
   );
 });
 
