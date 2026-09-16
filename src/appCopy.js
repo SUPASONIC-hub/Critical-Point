@@ -184,6 +184,18 @@ export const nextCaseSignals = {
   },
 };
 
+/**
+ * The next-case panel is the season's only case-to-case seam, and the one place
+ * a player can be told they are about to change buildings. `operatorBriefs` has
+ * carried that move and the reason for it since the copy was written and nothing
+ * ever read the table, so the report announced "사건 02" with no hint that it
+ * happens in a different organisation from the one just left. Merged here rather
+ * than in the runtime so the copy keeps one home.
+ */
+for (const signal of Object.values(nextCaseSignals)) {
+  Object.assign(signal, operatorBriefs[signal.caseId]);
+}
+
 export const playGuideItems = [
   {
     title: "에코",

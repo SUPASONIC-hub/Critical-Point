@@ -35,9 +35,11 @@ export function buildNarrativeSpine({
   const conflict = pressure
     ? `${pressure}이(가) ${node.phase ?? "현재 국면"}에서 충돌합니다.`
     : `${node.phase ?? "현재 국면"}의 전제가 흔들립니다.`;
-  const question = node.title
-    ? `${node.title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.`
-    : "지금 무엇을 먼저 지킬지 결정해야 합니다.";
+  // The one line of prose the table always shows, and it has to be the scene's
+  // own: this template ran for all 149 scenes, so every window asked the same
+  // thing under a different title. The template is only the net now.
+  const question = node.question
+    || (node.title ? `${node.title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.` : "지금 무엇을 먼저 지킬지 결정해야 합니다.");
   const consequence = suspenseState.tier === "REDLINE"
     ? "다음 선택은 사건의 결말이 아니라 당신의 허용선을 기록합니다."
     : riskTier === "CRITICAL"

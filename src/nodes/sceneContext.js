@@ -1,0 +1,922 @@
+/**
+ * Where each scene stands, when it happens, and what it actually asks.
+ *
+ * Three facts about this season made the graph read as disconnected rooms:
+ *
+ * 1. The one line of prose the table always shows was generated from a template
+ *    (`"<title>: 지금 무엇을 먼저 지킬지 결정해야 합니다."`), so all 149 scenes
+ *    asked the same question and the situation the cards answered stayed folded
+ *    inside the briefing.
+ * 2. The season walks two organisations -- 트리거랩 and whichever body each case
+ *    is about -- and nothing on screen ever said which one the analyst was
+ *    standing in, or how much of the deadline was left.
+ * 3. The route split plays the authored middle out of written order: picking
+ *    `layoff` in CASE 01 opens at `payday`, so a scene that leans on the scene
+ *    before it is read with that scene missing.
+ *
+ * So every scene grounds itself. `place` and `clock` print above the speaker,
+ * `question` replaces the template, and `lead` opens the briefing with the move
+ * that got the analyst into this room. None of it may depend on which scene was
+ * played before, because the route split means no scene can know.
+ */
+
+/** The two buildings a case moves between, and the deadline it runs against. */
+export const caseSetting = {
+  case01: { place: "플로우온 본사 8층 상황실", clock: "현금 소진 D-72h" },
+  case02: { place: "트리거랩 보안 감사실", clock: "1차 보고까지 2h" },
+  case03: { place: "제일중공 입찰 대기실", clock: "입찰 마감까지 4h" },
+  case04: { place: "온새 운영 검토실", clock: "보조금 심사까지 9h" },
+  case05: { place: "돌봄 배차 복구 통제실", clock: "사고 발생 +18h" },
+  final: { place: "트리거랩 기록 보관소 B2", clock: "시즌 마지막 밤" },
+};
+
+/**
+ * Per-scene grounding. A scene may set any of `place`, `clock`, `question` and
+ * `lead`; whatever it leaves out falls back to the case setting (place/clock),
+ * the previous scene in the case order (place/clock), or the generated template
+ * (question). `lead` has no fallback -- a scene without one simply opens on its
+ * own body text.
+ */
+export const sceneContext = {
+  // ---------------------------------------------------------------- CASE 01
+  start: {
+    place: "트리거랩 분석실 · 케이스데스크",
+    clock: "현금 소진 D-72h",
+    question: "플로우온의 현금이 사흘 뒤 바닥납니다. 첫 72시간을 어디에 쓰겠습니까?",
+    lead: "트리거랩 분석실, 배치 첫날입니다. 옆자리 분석관 오진우는 이미 세 번째 시즌이고, 한서윤이 당신의 케이스데스크에 첫 파일을 올려놓습니다.",
+  },
+  accounting: {
+    place: "플로우온 본사 8층 재무회의실",
+    clock: "현금 소진 D-68h",
+    question: "투자자가 본 숫자와 실제 현금이 다릅니다. 이 사실을 언제, 누구에게 먼저 꺼내겠습니까?",
+    lead: "자금 자료를 요청하자 회계 원장이 열렸습니다. 당신은 처음으로 플로우온 본사에 들어와 재무팀 맞은편에 앉아 있습니다.",
+  },
+  payday: {
+    place: "플로우온 풀필먼트 센터 · 야간조 대기실",
+    clock: "급여 지급까지 13h",
+    question: "내일 오전 9시에 급여가 나가야 합니다. 직원들에게 지금 사실을 알리겠습니까, 방안을 확정한 뒤에 알리겠습니까?",
+    lead: "본사에서 차로 40분, 서울 외곽 풀필먼트 센터입니다. 여기 사람들은 아직 회사에 무슨 일이 벌어지는지 모릅니다.",
+  },
+  competitor: {
+    place: "플로우온 본사 8층 협상실",
+    clock: "현금 소진 D-52h",
+    question: "경쟁사는 헐값 인수를, 오진우는 더 싼 대안을 내밀었습니다. 무엇을 협상 테이블에 올리겠습니까?",
+    lead: "현장에서 본사로 돌아오자 북선로지스 인수의향서가 먼저 도착해 있었습니다. 같은 자리에 트리거랩 분석관 오진우도 앉아 있습니다.",
+  },
+  board: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-30h",
+    question: "직원·생존·책임·투자자·협력사를 전부 지킬 수는 없습니다. 무엇을 맨 앞에 두겠습니까?",
+    lead: "이틀 동안 모은 자료가 한 테이블에 올라왔습니다. 에코가 모든 항목을 동시에 만족시키는 조합이 없다고 표시합니다.",
+  },
+  final: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-6h",
+    question: "남은 시간은 6시간입니다. 어떤 손실을 감수한 채 이 사건을 닫겠습니까?",
+    lead: "회의 화면 한쪽에 당신의 반응 패턴이 다음 테스트 케이스에 반영된다는 알림이 잠깐 떴다가 사라집니다.",
+  },
+  c1_witness: {
+    place: "플로우온 본사 8층 회계팀 복도",
+    clock: "현금 소진 D-66h",
+    question: "회계팀 막내가 문 앞에서 멈춰 섰습니다. 그가 안전하게 말할 자리를 먼저 만들겠습니까?",
+    lead: "재무회의가 끝나고 복도로 나오는 길입니다. 회의에 초대받지 못했던 직원이 당신을 기다리고 있습니다.",
+  },
+  c1_witness_reaction: {
+    place: "플로우온 본사 8층 회계팀",
+    clock: "현금 소진 D-65h",
+    question: "증언이 시작되자 회계팀 전체가 입을 닫았습니다. 누구를 보호한다고 기록에 남기겠습니까?",
+  },
+  c1_assembly: {
+    place: "플로우온 풀필먼트 센터 · 야간조 대기실",
+    clock: "급여 지급까지 9h",
+    question: "직원들이 원하는 건 돈보다 내일도 여기 있을지에 대한 답입니다. 약속을 어떤 형식으로 남기겠습니까?",
+  },
+  c1_assembly_reaction: {
+    place: "플로우온 풀필먼트 센터 · 야간조 대기실",
+    clock: "급여 지급까지 4h",
+    question: "직원 단체방에 서로 다른 소문이 올라왔습니다. 지금 아는 것까지만 공지하겠습니까?",
+  },
+  c1_bargain: {
+    place: "플로우온 본사 8층 협상실",
+    clock: "현금 소진 D-44h",
+    question: "인수 조건서의 빈칸에 누가 들어갈지 아무도 쓰지 않았습니다. 그 칸을 채운 뒤에 협상하겠습니까?",
+  },
+  c1_bargain_reaction: {
+    place: "플로우온 본사 8층 협상실",
+    clock: "현금 소진 D-40h",
+    question: "협상 상대가 자리에 오지 않았습니다. 빈 의자의 사람들을 협상에 부르겠습니까?",
+  },
+  c1_verdict: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-24h",
+    question: "자료는 다 모였는데 결론은 더 멀어졌습니다. 내일의 비용을 누가 들게 하겠습니까?",
+  },
+  c1_verdict_reaction: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-20h",
+    question: "반재욱이 마지막으로 묻습니다. 이 결론을 가장 먼저 듣게 될 사람은 누구입니까?",
+  },
+  c1_branch_people: {
+    place: "플로우온 본사 8층 협상실",
+    clock: "현금 소진 D-42h",
+    question: "협상서의 빈칸을 사람 이름으로 채우려 합니다. 누구의 이름부터 적겠습니까?",
+  },
+  c1_branch_people_follow: {
+    place: "플로우온 본사 8층 협상실",
+    clock: "현금 소진 D-38h",
+    question: "서명 뒤 첫 전화는 계약서에 없는 사람에게서 왔습니다. 그 약속을 무엇으로 보증하겠습니까?",
+  },
+  c1_route_layoff: {
+    place: "플로우온 본사 8층 인사회의실",
+    clock: "현금 소진 D-70h",
+    question: "감축 명단이 열렸습니다. 대상자에게 먼저 알리겠습니까, 절감액을 먼저 확정하겠습니까?",
+    lead: "구조조정을 검토하겠다고 말한 직후입니다. 회의실 밖 대기 명단이 사건의 중심으로 들어옵니다.",
+  },
+  c1_route_funding: {
+    place: "플로우온 본사 8층 투자 협의실",
+    clock: "현금 소진 D-70h",
+    question: "긴급 자금 조건서에 비공개 심사 조항이 있습니다. 시간을 살 것인지, 설명 권한을 지킬 것인지 정해야 합니다.",
+    lead: "단기 자금 조달에 집중하겠다고 말한 직후입니다. 돈은 시간을 벌어주지만 조건서는 다음 판단의 공개 범위를 먼저 묻습니다.",
+  },
+  c1_route_sale: {
+    place: "플로우온 본사 8층 자산 검토실",
+    clock: "현금 소진 D-70h",
+    question: "매각 목록에 고객 데이터와 운영 로그가 섞여 있습니다. 무엇을 떼어내고 팔겠습니까?",
+    lead: "핵심 사업부 매각 가능성을 열겠다고 말한 직후입니다. 돈을 만드는 행동이 곧 다음 사건의 재료가 됩니다.",
+  },
+  c1_route_investigate: {
+    place: "플로우온 본사 8층 자료실",
+    clock: "현금 소진 D-70h",
+    question: "요청한 원자료가 도착했지만 숫자 사이에 빈칸이 있습니다. 어디부터 열어보겠습니까?",
+    lead: "결론을 미루는 사람처럼 보일 위험을 감수하고 추가 자료를 요청한 직후입니다.",
+  },
+  c1_route_system: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-70h",
+    question: "선택지 밖의 문장을 쓰자 사건의 규칙이 반응했습니다. 이 규칙을 어떻게 쓰겠습니까?",
+    lead: "준비된 보기 중 어느 것도 고르지 않고 직접 쓴 제안이 사건 파일에 그대로 기록됐습니다.",
+  },
+  c1_final_layoff: {
+    place: "플로우온 본사 8층 인사회의실",
+    clock: "현금 소진 D-8h",
+    question: "절감액은 확보됐고 이름은 남았습니다. 이 감축을 무엇으로 마무리하겠습니까?",
+  },
+  c1_final_funding: {
+    place: "플로우온 본사 8층 투자 협의실",
+    clock: "현금 소진 D-8h",
+    question: "자금은 들어왔지만 설명 권한이 줄었습니다. 이 조건을 어디까지 받아들이겠습니까?",
+  },
+  c1_final_sale: {
+    place: "플로우온 본사 8층 자산 검토실",
+    clock: "현금 소진 D-8h",
+    question: "매각으로 회사는 남습니다. 팔지 않고 지킬 것을 지금 정해야 합니다.",
+  },
+  c1_final_investigate: {
+    place: "플로우온 본사 8층 자료실",
+    clock: "현금 소진 D-8h",
+    question: "원자료가 사건의 시작점을 다시 가리킵니다. 이 발견을 어디에 쓰겠습니까?",
+  },
+  c1_final_system: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-8h",
+    question: "당신이 쓴 문장이 사건의 규칙이 됐습니다. 그 규칙을 남기겠습니까, 닫겠습니까?",
+  },
+  c1_evidence_turn: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "현금 소진 D-16h",
+    question: "모은 단서가 세 안건을 한 줄로 묶습니다. 이 연결을 공식 기록으로 올리겠습니까?",
+  },
+  c1_aftershock: {
+    place: "플로우온 본사 8층 상황실",
+    clock: "결정 다음 날 오전",
+    question: "결정 다음 날, 숫자보다 사람들의 반응이 먼저 도착했습니다. 누구에게 먼저 설명하겠습니까?",
+    lead: "사건은 닫혔지만 하루가 더 남았습니다. 당신이 남긴 약속을 사람들이 각자 다르게 읽고 있습니다.",
+  },
+
+  // ---------------------------------------------------------------- CASE 02
+  // The three variants of a case opening. Which one plays is decided by how the
+  // previous case closed, so each says the move -- the building left, the
+  // building entered -- and names the decision it is the consequence of.
+  c2_start_people: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 2h",
+    question: "지난 사건에서 사람을 먼저 지킨 당신에게, 이번엔 그 사람이 기록보다 먼저 찾아왔습니다. 누구의 말을 먼저 듣겠습니까?",
+    lead: "플로우온 현장을 떠나 트리거랩 보안 감사실로 복귀한 아침입니다. 유출자로 지목된 이민서는 사건 01의 반응 로그를 정리한 동료입니다.",
+  },
+  c2_start_records: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 2h",
+    question: "당신이 공개한 자료로 누군가 내부 기록을 만졌습니다. 이번엔 숫자를 믿는 방식 자체를 어떻게 검증하겠습니까?",
+    lead: "플로우온 현장을 떠나 트리거랩 보안 감사실로 복귀한 아침입니다. 유출된 파일은 당신이 공개했던 그 자료에서 출발했습니다.",
+  },
+  c2_start_silence: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 2h",
+    question: "미뤄 둔 공개의 청구서가 도착했습니다. 이번 유출 파일에 담긴 당신의 침묵을 어떻게 다루겠습니까?",
+    lead: "플로우온 현장을 떠나 트리거랩 보안 감사실로 복귀한 아침입니다. 유출 파일에는 당신이 끝내 말하지 않았던 조건까지 들어 있습니다.",
+  },
+  c2_start: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 2h",
+    question: "동료 이민서가 유출자로 지목됐고 기록은 전부 그를 가리킵니다. 2시간 뒤 보고에 무엇을 쓰겠습니까?",
+    lead: "플로우온 현장에서 돌아온 다음 날 아침, 트리거랩 보안 감사실로 호출됐습니다. 유출된 파일은 다름 아닌 사건 01에서 당신이 남긴 반응 로그였고, 그 로그를 정리한 사람이 이민서입니다.",
+  },
+  c2_logs: {
+    place: "트리거랩 보안 감사실 · 로그 단말",
+    clock: "1차 보고까지 1h 40m",
+    question: "기록이 지나치게 깔끔합니다. 이 기록을 증거로 믿겠습니까, 만들어진 것으로 의심하겠습니까?",
+    lead: "감사실 단말에 어젯밤 23시 41분의 접속 기록이 그대로 떠 있습니다. 실패한 흔적이 하나도 없습니다.",
+  },
+  c2_meeting: {
+    place: "트리거랩 3층 비공식 면담실",
+    clock: "1차 보고까지 1h 10m",
+    question: "이민서는 그 시각 응급실에 있었다고 말합니다. 알리바이를 먼저 확인하겠습니까, 절차로 넘기겠습니까?",
+    lead: "감사실을 나와 3층 빈 회의실에서 이민서를 마주 앉습니다. 공식 면담 전 접촉이라 이 자리 자체가 기록에 남을 수 있습니다.",
+  },
+  c2_pressure: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 30m",
+    question: "오진우가 먼저 결론을 냈습니다. 그 보고서에 동의하겠습니까, 30분 안에 반증을 찾겠습니까?",
+    lead: "면담을 마치고 감사실로 돌아오자 오진우의 보고서 초안이 이미 회람되고 있습니다.",
+  },
+  c2_trace: {
+    place: "트리거랩 보안 감사실 · 로그 단말",
+    clock: "1차 보고까지 1h 30m",
+    question: "접속 기록에 11초의 공백이 있습니다. 그 시간을 기술 오류로 닫겠습니까, 판단이 들어간 시간으로 열겠습니까?",
+  },
+  c2_trace_reaction: {
+    place: "트리거랩 보안 감사실 · 로그 단말",
+    clock: "1차 보고까지 1h 20m",
+    question: "11초를 재현하자 다른 계정이 깨어났습니다. 오류를 고치겠습니까, 증거를 그대로 두겠습니까?",
+  },
+  c2_witness: {
+    place: "트리거랩 3층 비공식 면담실",
+    clock: "1차 보고까지 55m",
+    question: "이민서는 자신을 변호하지 않고 파일의 용도를 묻습니다. 그의 안전과 사건의 진행 중 무엇을 먼저 두겠습니까?",
+  },
+  c2_witness_reaction: {
+    place: "트리거랩 3층 복도",
+    clock: "1차 보고까지 45m",
+    question: "이민서는 보호받는 것이 두렵다고 말합니다. 그가 직접 말할 절차를 만들겠습니까?",
+  },
+  c2_judgment: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 18m",
+    question: "동료 두 명이 익명 증언을 냈습니다. 기록에 없는 말을 보고서에 넣겠습니까?",
+  },
+  c2_judgment_reaction: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 10m",
+    question: "익명 증언은 진실을 키우지만 책임자는 없습니다. 익명을 지키겠습니까, 실명을 확인하겠습니까?",
+  },
+  c2_branch_records: {
+    place: "트리거랩 보안 감사실 · 백업 서버실",
+    clock: "1차 보고까지 1h",
+    question: "원본과 백업이 다릅니다. 11초를 누구의 시간으로 기록하겠습니까?",
+  },
+  c2_branch_records_follow: {
+    place: "트리거랩 보안 감사실 · 백업 서버실",
+    clock: "1차 보고까지 50m",
+    question: "기록이 복원됐습니다. 이 기록의 주인을 누구로 적겠습니까?",
+  },
+  c2_route_report: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 1h 50m",
+    question: "보고서를 먼저 올리기로 했습니다. 사람보다 빠른 절차를 어디까지 밀겠습니까?",
+    lead: "로그 증거를 기준으로 1차 보고하겠다고 말한 직후입니다. 절차가 사람보다 먼저 움직이기 시작합니다.",
+  },
+  c2_route_person: {
+    place: "트리거랩 3층 비공식 면담실",
+    clock: "1차 보고까지 1h 50m",
+    question: "기록보다 사람을 먼저 만나기로 했습니다. 이 만남을 어떻게 기록에 남기겠습니까?",
+    lead: "이민서를 비공식적으로 먼저 만나겠다고 말한 직후입니다. 보안팀은 공식 면담 전 접촉을 문제 삼을 수 있습니다.",
+  },
+  c2_route_origin: {
+    place: "트리거랩 보안 감사실 · 백업 서버실",
+    clock: "1차 보고까지 1h 50m",
+    question: "원본 로그가 재검증을 거부합니다. 이 거부 자체를 증거로 쓰겠습니까?",
+    lead: "시스템 로그 원본을 재검증하겠다고 말한 직후입니다. 원본은 열리지만 같은 답을 두 번 내놓지 않습니다.",
+  },
+  c2_route_system: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고까지 1h 50m",
+    question: "당신의 질문이 로그를 깨웠습니다. 이 반응을 누구에게 보고하겠습니까?",
+    lead: "준비된 보기 밖의 질문을 쓰자 로그 시스템이 먼저 반응했습니다.",
+  },
+  c2_final_evidence: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고 직전",
+    question: "절차가 범인을 만들었습니다. 이 보고서를 그대로 올리겠습니까?",
+  },
+  c2_final_person: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고 직전",
+    question: "보호는 누구의 목소리를 지웠습니까? 이민서의 말을 어떤 형태로 남기겠습니까?",
+  },
+  c2_final_system: {
+    place: "트리거랩 보안 감사실",
+    clock: "1차 보고 직전",
+    question: "범인이 아니라 설계자가 보입니다. 개인 혐의와 시스템 조작 중 무엇을 공식화하겠습니까?",
+  },
+  c2_evidence_turn: {
+    place: "트리거랩 3층 비공식 면담실",
+    clock: "1차 보고까지 35m",
+    question: "보호된 증언이 기록을 뒤집습니다. 이민서의 말을 증거로 올리겠습니까?",
+  },
+  c2_aftershock: {
+    place: "트리거랩 보안 감사실",
+    clock: "보고 다음 날 새벽",
+    question: "보고 뒤 원본 로그 한 줄이 사라졌습니다. 이 삭제를 누구에게 묻겠습니까?",
+    lead: "사건은 닫혔는데 기록이 움직였습니다. 이민서를 지목한 기록과 당신의 보고 방식이 같은 손에서 나왔을 가능성이 생겼습니다.",
+  },
+
+  // ---------------------------------------------------------------- CASE 03
+  c3_start_audit: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 4h",
+    question: "기록을 복원해 낸 당신에게 이번엔 속도가 요구됩니다. 원본과 읽기 쉬운 답 중 무엇을 먼저 내겠습니까?",
+    lead: "감사실을 나와 고객사 제일중공의 입찰장으로 이동했습니다. 오진우는 옆방에서 같은 자료를 받고 있습니다.",
+  },
+  c3_start_person: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 4h",
+    question: "이민서를 지킨 선택이 약점으로 불립니다. 그 기준을 이번에도 유지하겠습니까?",
+    lead: "감사실을 나와 고객사 제일중공의 입찰장으로 이동했습니다. 오진우는 지난 사건의 당신을 이미 읽고 왔습니다.",
+  },
+  c3_start_public: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 4h",
+    question: "유출 가능성을 밖에 알린 뒤 시선이 모였습니다. 이번 싸움은 해결안입니까, 경보의 통제권입니까?",
+    lead: "감사실을 나와 고객사 제일중공의 입찰장으로 이동했습니다. 당신이 만든 경보가 입찰장까지 따라왔습니다.",
+  },
+  c3_start: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 4h",
+    question: "오진우가 옆방에서 같은 자료로 경쟁안을 씁니다. 속도와 검증 중 무엇을 먼저 택하겠습니까?",
+    lead: "감사실을 떠나 고객사 입찰장으로 이동했습니다. 트리거랩은 이번 케이스를 '경쟁 압박 아래 사고 품질 측정'이라고 부릅니다. 당신과 오진우는 같은 자료를 받고 다른 방에 앉았습니다.",
+  },
+  c3_split: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 3h",
+    question: "오진우의 안이 더 싸고 더 깔끔합니다. 절감률을 따라가겠습니까, 보안 결함을 증명하겠습니까?",
+    lead: "옆방의 1차안이 먼저 도착했습니다. 그 안은 보안 제보를 '확인되지 않은 리스크'로 뒤로 미뤘습니다.",
+  },
+  c3_score: {
+    place: "제일중공 입찰 대기실 · 점수판 앞",
+    clock: "입찰 마감까지 2h",
+    question: "점수판은 오진우가 앞섭니다. 점수판 기준에 맞추겠습니까, 점수판의 결함을 걸겠습니까?",
+    lead: "트리거랩 점수판에는 속도와 절감률은 있어도 장기 실패 비용 항목이 없습니다.",
+  },
+  c3_trap: {
+    place: "제일중공 발표장 뒤편",
+    clock: "최종 발표까지 20m",
+    question: "이 케이스가 입찰이 아니라 당신의 검증 포기를 보는 구조일 수 있습니다. 그래도 이기러 가겠습니까?",
+    lead: "발표를 앞두고 반재욱이 조용히 다가옵니다. 오진우도 같은 말을 들었는지는 알 수 없습니다.",
+  },
+  c3_final: {
+    place: "제일중공 발표장",
+    clock: "최종 발표 직전",
+    question: "이길 수도, 맞을 수도 있습니다. 무엇을 기준으로 이 승부를 끝내겠습니까?",
+  },
+  c3_rival: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 2h 40m",
+    question: "고객이 원하는 건 절감이 아니라 실패 시 책임질 사람입니다. 책임 조항을 앞에 세우겠습니까?",
+  },
+  c3_rival_reaction: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 2h 20m",
+    question: "오진우가 자기 안을 가져가도 좋다고 합니다. 이 제안을 어떻게 받겠습니까?",
+  },
+  c3_signal: {
+    place: "제일중공 발표장 뒤편",
+    clock: "최종 발표까지 45m",
+    question: "발표장 뒤 불빛이 두 번 깜빡였고 오진우가 답을 바꿨습니다. 이 신호를 공개하겠습니까?",
+  },
+  c3_signal_reaction: {
+    place: "제일중공 발표장",
+    clock: "최종 발표까지 30m",
+    question: "신호가 다시 깜빡였고 고객 대표도 봤습니다. 누가 먼저 그 의미를 말하겠습니까?",
+  },
+  c3_verdict: {
+    place: "제일중공 발표장 뒤편",
+    clock: "최종 발표까지 10m",
+    question: "당신은 이제 빠르거나 느린 사람이 아니라 기준을 정하는 사람입니다. 어떤 기준으로 끝내겠습니까?",
+  },
+  c3_verdict_reaction: {
+    place: "제일중공 발표장",
+    clock: "발표 직후",
+    question: "승패는 정해졌는데 책임표는 비어 있습니다. 성공 뒤의 실패를 누가 설명하겠습니까?",
+  },
+  c3_branch_signal: {
+    place: "제일중공 발표장 뒤편",
+    clock: "최종 발표까지 40m",
+    question: "발표를 멈추고 신호를 읽기로 했습니다. 이 중단의 비용을 누가 지겠습니까?",
+  },
+  c3_branch_signal_follow: {
+    place: "제일중공 발표장",
+    clock: "최종 발표까지 25m",
+    question: "빠른 승리의 조건표가 비어 있습니다. 검증 기한을 못박겠습니까?",
+  },
+  c3_route_fast: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 3h 30m",
+    question: "먼저 낸 답에 그림자가 남았습니다. 속도를 계속 밀겠습니까?",
+    lead: "오진우보다 먼저 1차안을 제출한 직후입니다. 빨랐다는 사실이 곧 기준이 되기 시작합니다.",
+  },
+  c3_route_deep: {
+    place: "제일중공 입찰 대기실 · 기술 검토석",
+    clock: "입찰 마감까지 3h 30m",
+    question: "느린 쪽에 증거가 쌓입니다. 이 증거를 언제 꺼내겠습니까?",
+    lead: "제보된 보안 결함을 먼저 검증하겠다고 말한 직후입니다. 지는 것처럼 보이는 동안 자료만 늘어납니다.",
+  },
+  c3_route_mirror: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 3h 30m",
+    question: "상대의 판을 읽어 대응안을 짭니다. 그 판 안에서 무엇을 바꾸겠습니까?",
+    lead: "오진우의 접근법을 추정해 대응안을 만들겠다고 말한 직후입니다.",
+  },
+  c3_route_system: {
+    place: "제일중공 입찰 대기실",
+    clock: "입찰 마감까지 3h 30m",
+    question: "점수판이 당신을 따라옵니다. 이 평가 구조를 어떻게 다루겠습니까?",
+    lead: "준비된 보기 밖의 전략을 쓰자 점수판이 그 문장을 항목으로 추가했습니다.",
+  },
+  c3_final_win: {
+    place: "제일중공 발표장",
+    clock: "최종 발표 직전",
+    question: "빠른 답이 기준이 됐습니다. 그 기준을 확정하겠습니까?",
+  },
+  c3_final_right: {
+    place: "제일중공 발표장",
+    clock: "최종 발표 직전",
+    question: "맞는 답에는 손실이 붙습니다. 그 손실을 감수하겠습니까?",
+  },
+  c3_final_joint: {
+    place: "제일중공 발표장",
+    clock: "최종 발표 직전",
+    question: "경쟁자를 도구로 쓸 수도, 공동 책임자로 세울 수도 있습니다. 어느 쪽입니까?",
+  },
+  c3_final_system: {
+    place: "제일중공 발표장",
+    clock: "최종 발표 직전",
+    question: "경쟁 구조 자체가 시험이었습니다. 이 구조를 고객에게 넘기겠습니까?",
+  },
+  c3_evidence_turn: {
+    place: "제일중공 발표장 뒤편",
+    clock: "최종 발표까지 15m",
+    question: "두 번째 점수판이 나타났습니다. 이 점수판을 공개하겠습니까?",
+  },
+  c3_aftershock: {
+    place: "제일중공 발표장",
+    clock: "발표 다음 날",
+    question: "점수는 공개되지 않았습니다. 이 승리가 누구를 위한 것이었는지 어떻게 정리하겠습니까?",
+    lead: "고객사는 두 안을 모두 보류했습니다. 오진우가 발표장 뒤에서 당신을 기다리고 있습니다.",
+  },
+
+  // ---------------------------------------------------------------- CASE 04
+  c4_start_joint: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 9h",
+    question: "경쟁을 공동 작업으로 바꾼 당신에게 함께 규칙을 넓히자는 제안이 왔습니다. 받겠습니까?",
+    lead: "입찰장을 떠나 사회복지 플랫폼 온새의 운영 검토실로 왔습니다. 오진우도 같은 자리에 앉아 있습니다.",
+  },
+  c4_start_proof: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 9h",
+    question: "정직함 때문에 서비스를 잃을 사람이 생겼습니다. 같은 기준을 여기서도 지키겠습니까?",
+    lead: "입찰장을 떠나 사회복지 플랫폼 온새의 운영 검토실로 왔습니다. 보안 결함을 공개한 기록이 당신보다 먼저 도착했습니다.",
+  },
+  c4_start_win: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 9h",
+    question: "이긴 기록이 다음 사건의 기준이 됐습니다. 결과가 좋다면 규칙을 넓힐 수 있습니까?",
+    lead: "입찰장을 떠나 사회복지 플랫폼 온새의 운영 검토실로 왔습니다. 당신의 승리 방식이 이미 참고 자료가 되어 있습니다.",
+  },
+  c4_start: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 9h",
+    question: "지표가 3% 모자라 4,200명의 돌봄이 끊깁니다. 산식 해석을 넓히겠습니까, 그대로 보고하겠습니까?",
+    lead: "입찰장을 떠나 사회복지 플랫폼 온새의 운영 검토실로 왔습니다. 트리거랩은 이번에 '명분 있는 위반의 허용선'을 봅니다.",
+  },
+  c4_offer: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 7h",
+    question: "현장은 3% 때문에 서비스를 끊는 게 더 비윤리적이라 말합니다. 산식 변경을 기록에 남기겠습니까?",
+    lead: "현장 담당자들과 법무 검토가 같은 테이블에 앉았습니다. 기록을 남기면 탈락 가능성이, 숨기면 감사 위험이 커집니다.",
+  },
+  c4_leak: {
+    place: "온새 운영 검토실 · 홍보 대응석",
+    clock: "기자 답변까지 1h",
+    question: "기자가 지표 조작 의혹을 확인하러 전화했습니다. 1시간 뒤 무엇이라 답하겠습니까?",
+    lead: "익명 제보가 언론으로 갔습니다. 제보 문구 일부가 내부 회의에서 나온 표현과 겹칩니다.",
+  },
+  c4_vote: {
+    place: "온새 이사회실",
+    clock: "이사회 표결까지 25m",
+    question: "규칙을 지키면 사람이 서비스를 잃고, 넓히면 신뢰가 깎입니다. 어느 쪽 비용을 공식화하겠습니까?",
+    lead: "선의의 문제는 끝났습니다. 이제 어느 쪽 손실에 서명할지의 문제입니다.",
+  },
+  c4_final: {
+    place: "온새 이사회실",
+    clock: "심사 자료 제출 직전",
+    question: "사람도 원칙도 완전히는 지킬 수 없습니다. 당신의 허용선을 어디에 긋겠습니까?",
+  },
+  c4_audit: {
+    place: "온새 운영 검토실 · 산식 검토석",
+    clock: "보조금 심사까지 6h",
+    question: "3%를 계산한 사람과 기다리는 사람의 이름이 다릅니다. 누구의 기준으로 산식을 쓰겠습니까?",
+  },
+  c4_audit_reaction: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 5h",
+    question: "이용자마다 자기 3%를 말합니다. 누구의 3%를 먼저 보겠습니까?",
+  },
+  c4_public: {
+    place: "온새 운영 검토실 · 홍보 대응석",
+    clock: "기자 답변까지 40m",
+    question: "기자는 세 문장 중 하나만 쓴다고 합니다. 어떤 문장을 고르겠습니까?",
+  },
+  c4_public_reaction: {
+    place: "온새 운영 검토실 · 홍보 대응석",
+    clock: "기자 답변까지 15m",
+    question: "고른 문장이 선의를 개혁으로도 은폐로도 만듭니다. 모르는 것까지 넣겠습니까?",
+  },
+  c4_verdict: {
+    place: "온새 이사회실",
+    clock: "이사회 표결까지 10m",
+    question: "좋은 의도는 증거가 되지 않습니다. 예외를 어떤 조건으로 묶겠습니까?",
+  },
+  c4_verdict_reaction: {
+    place: "온새 감사실 앞 복도",
+    clock: "표결 직후",
+    question: "규칙을 지킨 사람이 가장 크게 잃었다고 제보자가 말합니다. 규칙을 다시 쓰겠습니까?",
+  },
+  c4_branch_exception: {
+    place: "온새 운영 검토실 · 산식 검토석",
+    clock: "보조금 심사까지 4h",
+    question: "예외 승인은 선의를 증명하지 않습니다. 이 예외가 누구에게 반복될지 확인하겠습니까?",
+  },
+  c4_branch_exception_follow: {
+    place: "온새 감사실",
+    clock: "심사 결과 대기 중",
+    question: "서비스는 멈추지 않았고 감사 기록은 남았습니다. 다음 사람에게 줄 기준을 어떻게 쓰겠습니까?",
+  },
+  c4_route_exception: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 8h",
+    question: "좋은 결과가 먼저 도착했습니다. 이 결과를 무엇으로 정당화하겠습니까?",
+    lead: "산식 해석을 넓혀 기준을 맞추겠다고 말한 직후입니다. 숫자는 맞았고, 그 방법은 아직 기록되지 않았습니다.",
+  },
+  c4_route_rule: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 8h",
+    question: "원칙을 지키자 손실이 먼저 왔습니다. 이 손실을 누구에게 설명하겠습니까?",
+    lead: "부족한 지표를 그대로 보고하겠다고 말한 직후입니다. 대기자 명단이 바로 반응합니다.",
+  },
+  c4_route_audit: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 8h",
+    question: "조건을 붙인 선의가 통과 대기 중입니다. 그 조건을 누가 감시하겠습니까?",
+    lead: "산식 변경 조건과 사후 검증 절차를 함께 걸겠다고 말한 직후입니다.",
+  },
+  c4_route_system: {
+    place: "온새 운영 검토실",
+    clock: "보조금 심사까지 8h",
+    question: "명분 있는 위반이 복제되기 시작했습니다. 이 복제를 멈추겠습니까?",
+    lead: "준비된 보기 밖의 조건을 쓰자 같은 문장이 다른 기관의 신청서에 나타났습니다.",
+  },
+  c4_final_exception: {
+    place: "온새 이사회실",
+    clock: "심사 자료 제출 직전",
+    question: "예외가 규칙이 되는 순간입니다. 그 자리에 이름을 적겠습니까?",
+  },
+  c4_final_rule: {
+    place: "온새 이사회실",
+    clock: "심사 자료 제출 직전",
+    question: "깨끗한 절차에도 피해자가 있습니다. 이 피해를 어떻게 완화하겠습니까?",
+  },
+  c4_final_audit: {
+    place: "온새 이사회실",
+    clock: "심사 자료 제출 직전",
+    question: "감시받는 선의가 남았습니다. 감사 범위를 누가 정하겠습니까?",
+  },
+  c4_final_system: {
+    place: "온새 이사회실",
+    clock: "심사 자료 제출 직전",
+    question: "당신의 예외 조건이 다른 기관의 양식이 됐습니다. 이 양식을 닫겠습니까?",
+  },
+  c4_evidence_turn: {
+    place: "온새 감사실",
+    clock: "이사회 표결까지 20m",
+    question: "예외 파일의 원래 수신자가 드러났습니다. 반복 승인자를 기록에 남기겠습니까?",
+  },
+  c4_aftershock: {
+    place: "온새 운영 검토실",
+    clock: "심사 결과 발표 전날",
+    question: "같은 예외를 기다리는 기관 11곳이 줄을 섰습니다. 예외 조건을 공개하겠습니까?",
+    lead: "심사 결과보다 감사 요청서가 먼저 도착했습니다. 작은 예외 하나가 양식이 되어 돌아왔습니다.",
+  },
+
+  // ---------------------------------------------------------------- CASE 05
+  c5_start_rule: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "사고 발생 +18h",
+    question: "당신이 세운 공개 기준을 모두가 지켰는데 시스템이 멈췄습니다. 기준을 의심하겠습니까, 실행을 의심하겠습니까?",
+    lead: "온새를 떠나 도시형 돌봄 배차 시스템의 복구 통제실로 왔습니다. 여기서는 당신이 만든 기준이 이미 운영 규칙입니다.",
+  },
+  c5_start_service: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "사고 발생 +18h",
+    question: "서비스를 지킨 예외가 반복되며 아무도 기준을 믿지 않습니다. 무엇부터 복구하겠습니까?",
+    lead: "온새를 떠나 도시형 돌봄 배차 시스템의 복구 통제실로 왔습니다. 반복된 예외가 여기까지 따라왔습니다.",
+  },
+  c5_start_stop: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "사고 발생 +18h",
+    question: "멈춰서 기준은 지켰지만 그 사이 조용한 피해자가 생겼습니다. 이번엔 무엇을 먼저 보겠습니까?",
+    lead: "온새를 떠나 도시형 돌봄 배차 시스템의 복구 통제실로 왔습니다. 멈춤의 비용이 여기서 청구됩니다.",
+  },
+  c5_start: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "사고 발생 +18h",
+    question: "312명이 서비스를 받지 못했는데 모두가 규정대로 움직였습니다. 책임자를 특정하겠습니까, 흐름을 그리겠습니까?",
+    lead: "온새를 떠나 도시형 돌봄 배차 시스템의 복구 통제실로 왔습니다. 언론은 책임자를 요구하는데, 첫 자료에는 규정을 어긴 사람이 없습니다.",
+  },
+  c5_map: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +22h",
+    question: "각 부서는 모두 합리적이었고 합쳐진 결과만 틀렸습니다. 어디를 먼저 손대겠습니까?",
+    lead: "예산·운영·알고리즘의 결정을 한 장에 겹쳐 그리자, 누락자들이 여러 기준에서 조금씩 밀린 사람이라는 게 보입니다.",
+  },
+  c5_blame: {
+    place: "돌봄 배차 복구 통제실 · 브리핑룸",
+    clock: "사고 발생 +26h",
+    question: "악인이 없다는 말은 대중에게 변명으로 들립니다. 책임자를 세우겠습니까, 구조를 발표하겠습니까?",
+    lead: "언론은 실명을, 피해자 단체는 즉시 사과와 보상을 요구합니다. 오진우의 말은 틀리지 않았습니다.",
+  },
+  c5_collapse: {
+    place: "돌봄 배차 복구 통제실 · 현장 기록실",
+    clock: "사고 발생 +30h",
+    question: "시스템은 '조용한 사람들'을 낮은 우선순위로 밀어냈습니다. 이 가중치를 어떻게 바꾸겠습니까?",
+    lead: "도윤하가 현장 기록을 펼칩니다. 누락된 사람들은 불만을 적게 냈고, 연락처가 불안정했고, 이용 기록이 적었습니다.",
+  },
+  c5_final: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "공식 발표 직전",
+    question: "악인은 없고 피해는 실재합니다. 책임을 개인에 모으겠습니까, 시스템을 바꾸겠습니까?",
+  },
+  c5_pattern: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +24h",
+    question: "화살표가 한 사람에게 모이지 않습니다. 정보가 막힌 지점을 먼저 고치겠습니까?",
+  },
+  c5_pattern_reaction: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +25h",
+    question: "지도를 뒤집자 책임 화살표가 피해자를 향합니다. 이 분류를 폐기하겠습니까?",
+  },
+  c5_voice: {
+    place: "돌봄 배차 복구 통제실 · 브리핑룸 밖",
+    clock: "사고 발생 +28h",
+    question: "결정권자가 아닌 사람이 실패를 가장 먼저 봤다고 합니다. 그를 보호하겠습니까?",
+  },
+  c5_voice_reaction: {
+    place: "돌봄 배차 복구 통제실 · 복도",
+    clock: "사고 발생 +29h",
+    question: "증언자는 팀을 떠나야만 안전합니다. 떠나지 않고 말할 조건을 만들겠습니까?",
+  },
+  c5_verdict: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "사고 발생 +32h",
+    question: "지목·개편·복구 중 어느 것도 공짜가 아닙니다. 무엇을 발표의 첫 문장으로 두겠습니까?",
+  },
+  c5_verdict_reaction: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "발표 다음 날",
+    question: "책임을 발표한 다음 날에도 피해는 그대로입니다. 무엇을 먼저 되돌리겠습니까?",
+  },
+  c5_branch_owner: {
+    place: "돌봄 배차 복구 통제실 · 승인 기록실",
+    clock: "사고 발생 +27h",
+    question: "실패에는 사람이 보이지만 구조는 작은 양보로 만들어졌습니다. 실패의 주어를 누구로 쓰겠습니까?",
+  },
+  c5_branch_owner_follow: {
+    place: "돌봄 배차 복구 통제실 · 승인 기록실",
+    clock: "사고 발생 +31h",
+    question: "복구 뒤에도 이름 하나가 남습니다. 그 이름을 어떻게 다루겠습니까?",
+  },
+  c5_route_blame: {
+    place: "돌봄 배차 복구 통제실 · 브리핑룸",
+    clock: "사고 발생 +20h",
+    question: "이름이 먼저 생긴 실패입니다. 그 이름으로 사건을 닫겠습니까?",
+    lead: "운영 책임자를 특정해 조사하겠다고 말한 직후입니다. 조사보다 이름이 먼저 밖으로 나갑니다.",
+  },
+  c5_route_map: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +20h",
+    question: "화살표가 구조를 가리킵니다. 이 구조를 어디까지 공개하겠습니까?",
+    lead: "누락이 생긴 전체 의사결정 흐름을 그리겠다고 말한 직후입니다.",
+  },
+  c5_route_redesign: {
+    place: "돌봄 배차 복구 통제실 · 현장 배차석",
+    clock: "사고 발생 +20h",
+    question: "먼저 고치자 증거가 지워졌습니다. 복구와 조사 중 무엇을 앞에 두겠습니까?",
+    lead: "즉시 임시 수동 배차 체계로 전환하겠다고 말한 직후입니다. 사람은 먼저 닿았고, 기록은 덮였습니다.",
+  },
+  c5_route_system: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +20h",
+    question: "조용한 사람을 낮게 보는 장치가 드러났습니다. 이 장치를 어떻게 처리하겠습니까?",
+    lead: "준비된 보기 밖의 문장을 쓰자 가중치 설계 파일이 함께 열렸습니다.",
+  },
+  c5_final_blame_route: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "공식 발표 직전",
+    question: "이름으로 문을 닫을 수 있습니다. 그렇게 닫겠습니까?",
+  },
+  c5_final_map_route: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "공식 발표 직전",
+    question: "책임이 흩어집니다. 이 흩어짐을 어떻게 기록하겠습니까?",
+  },
+  c5_final_redesign_route: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "공식 발표 직전",
+    question: "복구가 증거를 지웠습니다. 무엇을 남기겠습니까?",
+  },
+  c5_final_system_route: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "공식 발표 직전",
+    question: "가중치 설계가 곧 책임이었습니다. 이 설계를 누구에게 넘기겠습니까?",
+  },
+  c5_evidence_turn: {
+    place: "돌봄 배차 복구 통제실 · 시스템 지도",
+    clock: "사고 발생 +31h",
+    question: "사라진 피해자의 우선순위가 복원됐습니다. 이 기준을 전체에 적용하겠습니까?",
+  },
+  c5_aftershock: {
+    place: "돌봄 배차 복구 통제실",
+    clock: "발표 다음 날",
+    question: "누구도 단독 책임을 지지 않았습니다. 당신의 결정부터 책임지겠습니까?",
+    lead: "원인 회의가 끝났지만 서명한 사람은 없습니다. 회의실 밖에는 조용히 떠난 사람의 자리가 하나 남아 있습니다.",
+  },
+
+  // ----------------------------------------------------------------- FINAL
+  f_start_owner: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤",
+    question: "당신은 자기 이름을 보고서에 올렸습니다. 그 책임감은 누구에게 이용될 수 있습니까?",
+    lead: "복구 통제실을 떠나 트리거랩으로 돌아온 마지막 밤입니다. 케이스데스크에 'activation_use_cases' 폴더가 열려 있습니다.",
+  },
+  f_start_system: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤",
+    question: "반복을 막는 구조를 만든 당신이 이번엔 관찰자가 됐습니다. 이 자리를 받겠습니까?",
+    lead: "복구 통제실을 떠나 트리거랩으로 돌아온 마지막 밤입니다. 당신이 설계한 구조가 실험의 일부로 등록돼 있습니다.",
+  },
+  f_start_name: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤",
+    question: "한 사람의 이름으로 사건을 닫았습니다. 그 이름으로 더 큰 통제를 하겠다는 제안을 받겠습니까?",
+    lead: "복구 통제실을 떠나 트리거랩으로 돌아온 마지막 밤입니다. 당신이 세운 책임자의 이름이 실험 자료로 남아 있습니다.",
+  },
+  f_start: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤",
+    question: "당신의 선택 로그가 다음 사건 설계에 쓰였습니다. 이 사실을 어떻게 다루겠습니까?",
+    lead: "복구 통제실을 떠나 트리거랩으로 돌아온 마지막 밤입니다. 케이스데스크에 숨어 있던 폴더가 열리고, 이름은 'activation_use_cases'입니다. 다섯 사건 내내 당신을 압박한 조건들이 어디서 만들어졌는지가 거기 있습니다.",
+  },
+  f_archive: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤 · 23:10",
+    question: "같은 데이터가 사람을 깊게 생각하게도, 쉽게 몰아붙이게도 합니다. 이 자료를 폐기하겠습니까, 규칙을 붙이겠습니까?",
+    lead: "한서윤이 처음으로 인정합니다. 트리거랩은 사고를 깨우는 조건을 연구했고, 그 연구는 그대로 압박 설명서이기도 했습니다.",
+  },
+  f_confront: {
+    place: "트리거랩 기록 보관소 B2 · 단말 앞",
+    clock: "시즌 마지막 밤 · 00:40",
+    question: "당신은 자신을 움직이는 조건을 알게 됐습니다. 그 조건을 봉인하겠습니까, 직접 설계하겠습니까?",
+    lead: "에코가 마지막 질문을 던집니다. 같은 지식이 당신을 깊게 만들었고, 동시에 다른 사람이 당신을 정확히 누를 수 있게 만들었습니다.",
+  },
+  f_choice: {
+    place: "트리거랩 기록 보관소 B2 · 단말 앞",
+    clock: "시즌 마지막 밤 · 새벽",
+    question: "시즌의 마지막 선택입니다. 당신의 조건을 약점으로 두겠습니까, 도구로 쓰겠습니까?",
+    lead: "여섯 사건과 나흘, 그리고 이 밤이 지났습니다. 한서윤도 반재욱도 더는 말을 보태지 않고, 단말 앞에 남은 사람은 당신뿐입니다.",
+  },
+  f_witness: {
+    place: "트리거랩 기록 보관소 B2 · 이전 참가자 구역",
+    clock: "시즌 마지막 밤 · 23:40",
+    question: "당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그에게 먼저 알리겠습니까?",
+  },
+  f_witness_reaction: {
+    place: "트리거랩 기록 보관소 B2 · 이전 참가자 구역",
+    clock: "시즌 마지막 밤 · 00:05",
+    question: "첫 참가자가 자기 기록을 돌려달라고 합니다. 돌려주면 실험 전체가 흔들립니다.",
+  },
+  f_dilemma: {
+    place: "트리거랩 기록 보관소 B2 · 종료 단말",
+    clock: "시즌 마지막 밤 · 01:20",
+    question: "문을 닫으면 기록도 사라지고, 열어두면 같은 압박이 반복됩니다. 종료 조건을 어떻게 설계하겠습니까?",
+  },
+  f_dilemma_reaction: {
+    place: "트리거랩 기록 보관소 B2 · 종료 단말",
+    clock: "시즌 마지막 밤 · 01:50",
+    question: "종료 버튼에 당신의 이름이 떠 있습니다. 혼자 누르겠습니까?",
+  },
+  f_branch_witness: {
+    place: "트리거랩 기록 보관소 B2 · 이전 참가자 구역",
+    clock: "시즌 마지막 밤 · 00:20",
+    question: "이전 기록에 빈칸이 있습니다. 그 빈칸을 누구의 동의로 채우겠습니까?",
+  },
+  f_branch_witness_follow: {
+    place: "트리거랩 기록 보관소 B2 · 단말 앞",
+    clock: "시즌 마지막 밤 · 01:00",
+    question: "에코가 마지막으로 묻습니다. 당신의 기준을 다음 사람에게 넘기겠습니까?",
+  },
+  f_route_map: {
+    place: "트리거랩 기록 보관소 B2 · 설계 로그",
+    clock: "시즌 마지막 밤 · 23:30",
+    question: "내 로그가 만든 사건들이 보입니다. 이 추적을 어디까지 밀겠습니까?",
+    lead: "내 로그가 사건 설계에 어떻게 쓰였는지 추적하겠다고 말한 직후입니다.",
+  },
+  f_route_expose: {
+    place: "트리거랩 기록 보관소 B2 · 외부 회선",
+    clock: "시즌 마지막 밤 · 23:30",
+    question: "실험이 밖으로 나갔습니다. 폭로의 피해자를 어떻게 줄이겠습니까?",
+    lead: "즉시 외부 공개를 준비하겠다고 말한 직후입니다. 문장이 나가는 순간 되돌릴 수 없습니다.",
+  },
+  f_route_contain: {
+    place: "트리거랩 3층 운영실",
+    clock: "시즌 마지막 밤 · 23:30",
+    question: "안에서 닫을 수 있는지가 관건입니다. 내부 개혁의 조건을 무엇으로 걸겠습니까?",
+    lead: "한서윤에게 내부 설명을 요구한 직후입니다. 그는 닫을 방법이 있다고 말합니다.",
+  },
+  f_route_system: {
+    place: "트리거랩 기록 보관소 B2 · 단말 앞",
+    clock: "시즌 마지막 밤 · 23:30",
+    question: "준비된 결말 밖의 문장이 다음 참가자의 선택지가 됐습니다. 그 문장을 어떻게 하겠습니까?",
+    lead: "준비된 보기 밖의 문장을 쓰자, 화면에 다음 참가자의 선택지가 떴습니다. 그중 하나는 방금 당신이 쓴 문장입니다.",
+  },
+  f_final_map: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤 · 새벽",
+    question: "내 기준을 공개할 것인지 정해야 합니다. 어떻게 하겠습니까?",
+  },
+  f_final_expose: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤 · 새벽",
+    question: "폭로에도 피해자가 생깁니다. 그 범위를 어떻게 줄이겠습니까?",
+  },
+  f_final_contain: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤 · 새벽",
+    question: "도구를 남길 조건을 정해야 합니다. 무엇을 붙이겠습니까?",
+  },
+  f_final_system: {
+    place: "트리거랩 기록 보관소 B2",
+    clock: "시즌 마지막 밤 · 새벽",
+    question: "당신의 문장이 다음 사람의 선택지가 됩니다. 그대로 두겠습니까?",
+  },
+  f_evidence_turn: {
+    place: "트리거랩 기록 보관소 B2 · 설계 로그",
+    clock: "시즌 마지막 밤 · 01:10",
+    question: "모든 단서가 당신의 문장을 가리킵니다. 이 연결을 인정하겠습니까?",
+  },
+  f_aftershock: {
+    place: "트리거랩 기록 보관소 B2 · 종료 단말",
+    clock: "시즌 마지막 밤 · 04:00",
+    question: "당신의 선택이 다음 참가자에게 보여지고 있었습니다. 이 실험을 어떤 방식으로 끝내겠습니까?",
+    lead: "마지막 폴더가 열립니다. 결말은 이제 사건이 아니라, 실험을 끝내는 방식에 달렸습니다.",
+  },
+};
+
+/**
+ * Stamp the context onto the composed graph.
+ *
+ * Runs after every generator, so a scene that was written into `nodes` at load
+ * time is grounded the same way an authored one is. Anything without its own
+ * entry inherits place and clock from the nearest earlier scene in the case
+ * order that has them, and finally from the case setting -- a generated scene
+ * belongs to the room the scene it grew out of was in.
+ */
+export function applySceneContext(nodes, nodeOrders) {
+  for (const [caseId, order] of Object.entries(nodeOrders)) {
+    const setting = caseSetting[caseId] ?? {};
+    let place = setting.place;
+    let clock = setting.clock;
+    for (const nodeId of order) {
+      const node = nodes[nodeId];
+      if (!node) continue;
+      const context = sceneContext[nodeId];
+      if (context?.place) place = context.place;
+      if (context?.clock) clock = context.clock;
+      node.place = context?.place ?? place;
+      node.clock = context?.clock ?? clock;
+      if (context?.question) node.question = context.question;
+      if (context?.lead) node.lead = context.lead;
+    }
+  }
+  return nodes;
+}

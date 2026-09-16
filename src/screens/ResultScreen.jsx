@@ -288,6 +288,12 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               <div>
                 <span>{nextCaseSignal.eyebrow} · CONTAMINATED BY YOUR LAST STANDARD</span>
                 <h2>{nextCaseSignal.title}</h2>
+                {nextCaseSignal.movement && (
+                  <p className="next-case-movement">
+                    <b>{nextCaseSignal.movement}</b>
+                    <span>{nextCaseSignal.reason}</span>
+                  </p>
+                )}
                 <p>{nextCaseSignal.premise}</p>
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>
                 <small>{resultBridge}</small>

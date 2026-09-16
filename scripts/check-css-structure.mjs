@@ -104,7 +104,12 @@ const fileBudgets = {
   // stance control, the floating dock, the vertically composed wide table, and
   // the five minified .gx-* lines that used to sit after app.css's imports and
   // silently outrank this file. The phone table still fits all 149 scenes.
-  "play.css": { lines: 3045, bytes: 62300 },
+  // 3045 / 62300 -> 3080 / 63200 on 2026-09-16 for the scene dateline: place and
+  // clock above the speaker, plus the briefing's lead line and the case memo --
+  // which every scene had carried since the graph was written and which had
+  // never reached the DOM, so the briefing explained the table and not the
+  // situation. One 11px row; the phone table still fits all 149 scenes.
+  "play.css": { lines: 3080, bytes: 63200 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
@@ -115,7 +120,10 @@ const fileBudgets = {
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
   // twenty archive panels that each used to paint their own light ground; the
   // table ledger's rules also moved here from the foot of app.css.
-  "result.css": { lines: 1750, bytes: 43100 },
+  // 1750 / 43100 -> 1772 / 43650 on 2026-09-16: the next-case panel says which
+  // building the season moves to and why, from the `operatorBriefs` table that
+  // had been written and never read.
+  "result.css": { lines: 1772, bytes: 43650 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

@@ -1162,9 +1162,32 @@
   object-fit: cover;
 }
 
-.gx-speaker {
+/* Place and clock, above the speaker: which room the analyst is standing in and
+   how much of the deadline is left. Row 1 costs nothing when a scene has neither. */
+.gx-dateline {
+  display: flex;
   grid-column: 1;
   grid-row: 1;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ui-text-3);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-dateline-clock::before {
+  margin-right: 6px;
+  color: var(--ui-line-strong);
+  content: "·";
+}
+
+.gx-speaker {
+  grid-column: 1;
+  grid-row: 2;
   min-width: 0;
   margin: 0;
   overflow: hidden;
@@ -1230,6 +1253,19 @@
   color: var(--ui-text-3);
   font-size: 12px;
   line-height: 1.45;
+}
+
+/* The scene's narration, then its facts -- both ahead of the table's numbers. */
+.gx-brief-lead {
+  color: var(--ui-text-3);
+  font-style: italic;
+}
+
+.gx-brief-memo {
+  padding-inline-start: 10px;
+  color: var(--ui-text-2);
+  border-left: 2px solid var(--ui-line);
+  list-style: none;
 }
 
 /* Situation board: what the table does next, three one-line cells. */

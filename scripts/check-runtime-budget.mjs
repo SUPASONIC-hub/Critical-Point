@@ -36,17 +36,22 @@ import { viewGroups } from "../src/viewModels/appViewModels.js";
 const root = process.cwd();
 
 const BUDGETS = {
+  // 2382 / 12 -> 2384 / 13 on 2026-09-16: the composed graph is handed to
+  // `applySceneContext`, so every scene -- authored or generated -- carries the
+  // room it happens in, the clock it runs against, and its own question.
   "src/gameData.js": {
-    lines: 2382,
-    importedNames: 12,
+    lines: 2384,
+    importedNames: 13,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
   // reading the run's push record. The bet had been invisible to the ending for
   // six cycles: paired seasons at x1.00 and x3.50 flipped 0 of 1000 endings.
   // 1300 -> 1310 when the ending started reading the vault (VAULT_SLACK).
+  // 1310 -> 1312 on 2026-09-16: `buildNarrativeSpine` prefers the scene's own
+  // question over the template that had been running for all 149 scenes.
   "src/gameLogic.js": {
-    lines: 1310,
+    lines: 1312,
     importedNames: 18,
     hooks: {},
   },

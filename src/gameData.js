@@ -7,6 +7,7 @@ import { case03Nodes } from "./nodes/case03.js";
 import { case04Nodes } from "./nodes/case04.js";
 import { case05Nodes } from "./nodes/case05.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
+import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./gameCases.js";
 
@@ -607,7 +608,7 @@ const authoredBranchScenes = {
   c2_branch_records: {
     phase: "SIDE DOOR",
     title: "11초를 누구의 시간으로 볼 것인가",
-    speaker: "반재현",
+    speaker: "반재욱",
     text: "기록 사이의 11초를 기술 오류로 닫을지, 누군가의 판단이 들어간 시간으로 열어둘지 선택해야 합니다.",
     memo: ["원본 로그의 공백", "접속 계정의 순서", "삭제 요청의 승인자"],
     triggers: ["curiosity", "trust"],
@@ -659,7 +660,7 @@ const authoredBranchScenes = {
   c4_branch_exception: {
     phase: "SIDE DOOR",
     title: "예외의 사용자를 확인하다",
-    speaker: "반재현",
+    speaker: "반재욱",
     text: "예외 승인은 선의를 증명하지 않습니다. 누구에게 반복될 수 있는지가 이 결정의 핵심입니다.",
     memo: ["예외 승인자", "서비스 이용자 수", "재사용 가능한 조건"],
     triggers: ["order", "injustice"],
@@ -672,7 +673,7 @@ const authoredBranchScenes = {
   c4_branch_exception_follow: {
     phase: "SIDE DOOR",
     title: "좋은 결과 뒤의 감사",
-    speaker: "윤서",
+    speaker: "한서윤",
     text: "서비스는 멈추지 않았지만 감사 기록은 남았습니다. 다음 사람에게 같은 예외를 허용할 기준이 필요합니다.",
     memo: ["감사 요청의 범위", "예외 승인 기록", "보상 기준의 공개 여부"],
     triggers: ["responsibility", "recognition"],
@@ -685,7 +686,7 @@ const authoredBranchScenes = {
   c5_branch_owner: {
     phase: "SIDE DOOR",
     title: "실패의 주어를 고르다",
-    speaker: "윤서",
+    speaker: "한서윤",
     text: "실패에는 사람이 보이지만, 시스템은 여러 번의 작은 양보로 만들어졌습니다.",
     memo: ["결정권자의 승인", "누락된 안전장치", "피해를 되돌릴 순서"],
     triggers: ["responsibility", "helplessness"],
@@ -1134,7 +1135,7 @@ const dramaticRoutePlans = {
         final: "c1_final_layoff",
         phase: "STAFF ROUTE",
         title: "숫자보다 먼저 도착한 얼굴들",
-        speaker: "아윤",
+        speaker: "도윤하",
         text: "인력 감축안을 고른 순간, 회의실 밖 대기 명단이 사건의 중심으로 들어옵니다. 절감액은 명확하지만 누가 빠졌을 때 조직이 어떤 약속을 잃는지는 아직 계산되지 않았습니다.",
         memo: ["핵심 담당자의 업무 인수표가 비어 있음", "감축 대상 중 내부 제보자가 포함됨", "절감액은 빠르게 확보되지만 신뢰 하락이 즉시 보임"],
         triggers: ["responsibility", "protection", "trust"],
@@ -1157,7 +1158,7 @@ const dramaticRoutePlans = {
         final: "c1_final_funding",
         phase: "CAPITAL ROUTE",
         title: "돈이 먼저 묻는 질문",
-        speaker: "반재",
+        speaker: "반재욱",
         text: "긴급 자금을 선택하자 투자 조건서의 숨은 문장이 열립니다. 자금은 시간을 벌어주지만 다음 의사결정의 공개 범위를 투자자가 제한할 수 있습니다.",
         memo: ["조건서에 비공개 심사 조항이 있음", "운영 시간은 확보되지만 설명 권한이 줄어듦", "투자자 승인 로그가 다음 케이스 증거가 될 수 있음"],
         triggers: ["reward", "order", "curiosity"],
@@ -1180,7 +1181,7 @@ const dramaticRoutePlans = {
         final: "c1_final_sale",
         phase: "SALE ROUTE",
         title: "팔 수 있는 것과 남겨야 하는 것",
-        speaker: "서서",
+        speaker: "한서윤",
         text: "자산 매각을 고르자 매각 목록에 고객 데이터와 내부 도구가 함께 올라와 있다는 사실이 드러납니다. 돈을 만드는 행동이 곧 다음 사건의 위험을 만들 수 있습니다.",
         memo: ["매각 목록에 운영 로그 사본이 포함됨", "고객 데이터 처리 기준이 불명확함", "빠른 현금화와 장기 신뢰가 충돌"],
         triggers: ["reward", "injustice", "responsibility"],
@@ -1882,7 +1883,7 @@ const evidenceTurnaroundPlans = {
     entryVoice: "확보한 단서를 꺼내, 이 예외가 정말 처음인지부터 확인한다.",
     entryEcho: "단서를 대면 예외는 판단이 아니라 반복으로 읽힙니다.",
     title: "예외 파일의 원래 수신자",
-    speaker: "반재",
+    speaker: "반재욱",
     text: "단서 조합은 예외 승인이 한 번의 선의가 아니라 미리 설계된 반복 절차였음을 보여줍니다. 질문은 허용 여부에서, 반복을 누가 승인했는지로 이동합니다.",
     memo: ["예외 파일 수신자가 여러 케이스에 반복 등장", "성과 지표가 예외 승인 뒤에 수정됨", "감사 권한 없이는 원본을 열 수 없음"],
     triggers: ["order", "responsibility", "system"],
@@ -2311,6 +2312,9 @@ Object.values(nodes).forEach((node) => {
     if (nodes[choice.next]?.phase?.endsWith(" ROUTE")) choice.routeSplit = true;
   });
 });
+
+// Last, so a generated scene is grounded like an authored one. See sceneContext.js.
+applySceneContext(nodes, nodeOrders);
 
 function getPlayableRoute(caseId) {
   const route = new Map();

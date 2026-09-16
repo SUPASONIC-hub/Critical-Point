@@ -174,8 +174,10 @@ export function IntroScreen({ view, renderers = {} }) {
                   `.intro p` -- one of build-critical-css.mjs's probes --
                   pointing at a rendered element. */}
               <p>
-                트리거랩의 신입 분석관이 되어 현재 한국의 기업·조직 위기를 검토합니다.
-                사건은 훈련처럼 시작되지만, 당신이 오래 붙잡은 조건은 다음 사건의 압력이 됩니다.
+                서울, 판단을 연구하는 트리거랩. 당신은 오늘 배치된 신입 전환 분석관이고,
+                케이스데스크에는 &lsquo;훈련용&rsquo;이라는 꼬리표가 붙은 실제 위기 파일 여섯 건이 차례로 열립니다.
+                플로우온의 72시간부터 마지막 밤의 기록 보관소까지, 당신이 오래 붙잡은 조건은
+                다음 사건의 압력이 되어 돌아옵니다.
               </p>
               {hasResumableSave ? (
                 resumePanel

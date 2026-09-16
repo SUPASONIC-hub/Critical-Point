@@ -678,13 +678,35 @@ export function GauntletStage({
             decoding="async"
           />
           <div>
+            {/* Where and when, before who. The season walks two buildings and six
+                cases, and the route split plays the authored middle out of
+                written order, so a scene that does not place itself leaves the
+                player asking which room this is and how they got here. */}
+            {(scene.node.place || scene.node.clock) && (
+              <p className="gx-dateline">
+                {scene.node.place && <span className="gx-dateline-place">{scene.node.place}</span>}
+                {scene.node.clock && <span className="gx-dateline-clock">{scene.node.clock}</span>}
+              </p>
+            )}
             <p className="gx-speaker">
               <b>{scene.node.speaker}</b> · {scene.speakerRole}
             </p>
             <p className="gx-question">{scene.question}</p>
             <details className="gx-brief">
               <summary>사건 브리핑</summary>
+              {scene.node.lead && <p className="gx-brief-lead">{scene.node.lead}</p>}
               <p>{scene.node.text}</p>
+              {/* The case facts. Every scene has carried a `memo` since the graph
+                  was written and none of them ever reached the DOM, so the
+                  briefing explained the table and never the situation the cards
+                  are answering. */}
+              {scene.node.memo?.length > 0 && (
+                <ul className="gx-brief-memo">
+                  {scene.node.memo.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
               <ul>
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>

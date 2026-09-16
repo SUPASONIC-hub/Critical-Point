@@ -836,9 +836,36 @@ test("every node is ordered, playable, and routes somewhere that exists", () => 
   });
 });
 
+/**
+ * The table shows one line of prose and it has to be the scene's own. It was
+ * generated from a template for every scene once, so all 149 windows asked
+ * "지금 무엇을 먼저 지킬지 결정해야 합니다" under a different title, and the
+ * situation the cards answered stayed folded inside the briefing. Place and
+ * clock are held to the same bar: the season walks two organisations and the
+ * route split plays the authored middle out of written order, so a scene that
+ * does not say where and when it is cannot be placed by the one before it.
+ */
+test("every scene says where it is, when it is, and what it asks", () => {
+  const templated = [];
+  Object.entries(nodes).forEach(([nodeId, node]) => {
+    assert.ok(node.place?.trim(), `${nodeId} should name the room it happens in`);
+    assert.ok(node.clock?.trim(), `${nodeId} should say how much of the deadline is left`);
+    assert.ok(node.question?.trim(), `${nodeId} should ask its own question`);
+    assert.ok(
+      node.question.length >= 20,
+      `${nodeId}: a question that short cannot carry the situation (${node.question})`,
+    );
+    if (node.question.includes("지금 무엇을 먼저 지킬지 결정해야 합니다")) templated.push(nodeId);
+  });
+  assert.deepEqual(templated, [], `these scenes fell back to the generated question: ${templated.join(", ")}`);
+
+  const questions = Object.values(nodes).map((node) => node.question);
+  assert.equal(new Set(questions).size, questions.length, "no two scenes may ask the identical question");
+});
+
 test("player language never rewrites authored copy", () => {
   Object.entries(nodes).forEach(([nodeId, node]) => {
-    [node.title, node.text, ...(node.memo ?? [])].forEach((copy) => {
+    [node.title, node.text, node.question, node.place, node.clock, node.lead, ...(node.memo ?? [])].filter(Boolean).forEach((copy) => {
       assert.equal(simplifyPlayerText(copy), copy, `${nodeId}: authored copy must not be rewritten by player language`);
     });
     node.choices.forEach((choice) => {

@@ -235,6 +235,27 @@ list of the files it touched.
     INSURANCE. REBOOT no longer takes the active-rules panel: the draft and the
     reveal already say the case closed.
 
+40. Every scene grounds itself, because no scene can rely on the one before it.
+    The route split opens a case at four different authored scenes, so picking
+    `layoff` in CASE 01 enters at `payday` with the accounting scene never
+    played. `src/nodes/sceneContext.js` is where a scene says which room it
+    happens in (`place`), how much of the deadline is left (`clock`), what it is
+    actually asking (`question`) and how the analyst got there (`lead`);
+    `applySceneContext` stamps the composed graph last, after every generator,
+    and a scene without its own entry inherits place and clock from the nearest
+    earlier scene in the case order. The visible line on the table is
+    `node.question` -- it was generated from one template for all 149 scenes, so
+    every window asked "지금 무엇을 먼저 지킬지 결정해야 합니다" under a
+    different title while the situation stayed folded inside the briefing, which
+    also never printed the `memo` the graph had carried since it was written.
+    `npm test` holds the bar: place, clock and a question of its own on every
+    scene, no two scenes asking the identical question, and no scene falling
+    back to the template. Season-level continuity is copy, not derivation --
+    `operatorBriefs` (the building the case moves to and why) is merged into
+    `nextCaseSignals` in `src/appCopy.js` so the case-to-case seam keeps one
+    home, and `getEndingEpilogue` answers all nine endings `getEndingVariant`
+    can return, not four.
+
 ## Verification Commands
 
 ```bash
