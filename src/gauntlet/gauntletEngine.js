@@ -264,8 +264,6 @@ export const FOCUS_PERFECT_GAIN = 24;
 export const FOCUS_GOOD_GAIN = 13;
 export const FOCUS_MISS_HEAT = 4;
 export const FOCUS_MISS_SECONDS = 1.25;
-export const FOCUS_RESOURCE_RATE = 0.45;
-export const FOCUS_POT_RATE = 0.9;
 export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
 
 const FOCUS_MODE_PROFILES = Object.freeze({

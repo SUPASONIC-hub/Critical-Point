@@ -309,8 +309,6 @@ function ensureAudioRuntime(volume) {
 
 const ACCENT_PEAK_GAIN = 0.045;
 const REVEAL_PEAK_GAIN = 0.035;
-const TICK_PEAK_GAIN = 0.02;
-const PREVIEW_PEAK_GAIN = 0.014;
 
 /**
  * The start button's confirmation tone.
@@ -387,35 +385,6 @@ export function playTargetLockCue() {
   }
 }
 
-export function playChoicePreviewCue(riskDelta = 0) {
-  try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
-    const context = audioRuntime.context;
-    if (!context) return;
-    Promise.resolve(context.resume?.()).catch(() => {});
-
-    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
-    const now = context.currentTime;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const risk = Number(riskDelta) || 0;
-    const startFrequency = risk > 0 ? 294 : risk < 0 ? 392 : 330;
-    const endFrequency = risk > 0 ? 330 : risk < 0 ? 494 : 392;
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(startFrequency, now);
-    oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + 0.08);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(PREVIEW_PEAK_GAIN * multiplier, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
-    oscillator.connect(gain);
-    gain.connect(audioRuntime.bus ?? audioRuntime.master ?? context.destination);
-    oscillator.start(now);
-    oscillator.stop(now + 0.12);
-  } catch {
-    // Audio is an enhancement; browsers may reject it during a gesture.
-  }
-}
-
 export function playDecisionRevealCue(tone = "decision-locked") {
   try {
     if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
@@ -454,45 +423,6 @@ export function playDecisionRevealCue(tone = "decision-locked") {
       oscillator.start(start);
       oscillator.stop(start + 0.22);
     });
-  } catch {
-    // Audio is an enhancement; browsers may reject it during a gesture.
-  }
-}
-
-/**
- * The last ten seconds of the decision window, as a heartbeat.
- *
- * `remaining` is the seconds left, so the pitch rises as the window closes and
- * the closing beat is a lower, longer thud. It is the smallest cue in the game
- * on purpose: it repeats up to eleven times per scene, forty-two scenes a run,
- * so it sits under the score rather than on top of it.
- */
-export function playDecisionTick(remaining) {
-  try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
-    const context = audioRuntime.context;
-    if (!context) return;
-
-    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
-    const overtime = remaining === "overtime";
-    const seconds = overtime ? 0 : Math.max(0, Math.min(10, Number(remaining) || 0));
-    const peak = TICK_PEAK_GAIN * multiplier * (overtime ? 1.4 : 1 + (10 - seconds) / 14);
-    const now = context.currentTime;
-    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
-
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = overtime ? "sine" : "triangle";
-    const base = overtime ? 58 : 96 + (10 - seconds) * 7;
-    oscillator.frequency.setValueAtTime(base, now);
-    oscillator.frequency.exponentialRampToValueAtTime(base * (overtime ? 0.7 : 0.86), now + 0.09);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(peak, now + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + (overtime ? 0.34 : 0.14));
-    oscillator.connect(gain);
-    gain.connect(destination);
-    oscillator.start(now);
-    oscillator.stop(now + (overtime ? 0.36 : 0.16));
   } catch {
     // Audio is an enhancement; browsers may reject it during a gesture.
   }

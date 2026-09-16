@@ -649,7 +649,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case05: { routeMemory: getRouteMemory([{ nodeId: "c5_route_system", choiceId: "c5_route_system_a", freeTextSuccess: true }]) } },
+      caseResults: { case06: { routeMemory: getRouteMemory([{ nodeId: "c6_route_system", choiceId: "c6_route_system_index", freeTextSuccess: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -796,7 +796,11 @@ test("case 02 should have a people-led opening route", () => {
   assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 });
 test("the final act should have a system-led opening route", () => {
-  assert.equal(caseOpeningRoutes.final.c5_after_system, "f_start_system", "the final act should have a system-led opening route");
+  // Keyed on case 06's aftermath: that is the case the finale now follows.
+  assert.equal(caseOpeningRoutes.final.c6_after_open, "f_start_system", "the final act should have a system-led opening route");
+});
+test("case 06 should open from case 05's aftermath", () => {
+  assert.equal(caseOpeningRoutes.case06.c5_after_system, "c6_start_system", "case 06 should open from case 05's aftermath");
 });
 test("branch openings should be real playable nodes", () => {
   assert.equal(nodes.c4_start_proof.phase, "BRANCH BRIEFING", "branch openings should be real playable nodes");
@@ -912,11 +916,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("36 generated scenes should expose 114 authored choices: three each, plus the case-specific fourth option on six connective scenes", () => {
+test("42 generated scenes should expose 132 authored choices: three each across seven cases", () => {
   assert.equal(
     generatedChoiceCount,
-    114,
-    "36 generated scenes should expose 114 authored choices: three each, plus the case-specific fourth option on six connective scenes",
+    132,
+    "42 generated scenes should expose 132 authored choices: three each across seven cases",
   );
 });
 
@@ -984,7 +988,7 @@ for (const caseId of CASE_SEQUENCE) {
     branchingNodes.length >= 1,
     `${caseId} should expose at least one playable branch`,
   );
-  if (["case01", "case02", "case03", "case04", "case05", "final"].includes(caseId)) {
+  if (["case01", "case02", "case03", "case04", "case05", "case06", "final"].includes(caseId)) {
     assert.ok(
       branchingNodes.length > 1,
       `${caseId} should intentionally split its main route into different question paths`,

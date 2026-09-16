@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -293,3 +293,54 @@ migrations as applied without executing them -- the schema had been applied by h
 the SQL editor. The history table therefore reflects what `link` inferred, not what the
 CLI ran. Always `db push` before trusting `migration list`, and verify behavior against
 the live database when a migration fixes a runtime error.
+
+41. The season is seven cases, and the tables that describe it are keyed, not
+    counted. 사건 06 (`src/nodes/case06.js`) sits between 사건 05 and the finale
+    and is the one case whose subject is inside 트리거랩 -- it collects the two
+    threads `c3_trap` and `f_confront` had left hanging about 오진우 having his
+    own pressure condition. Adding it moved four kinds of key: the finale's
+    `caseOpeningRoutes` and `getContinuityChallenge` now read `c6_after_*`
+    instead of `c5_after_*`; `nextCaseSignals.case05` points at 사건 06 and a new
+    `case06` entry points at the finale; the branch-briefing clone block maps
+    `case06` to `c6_start`; and `AppContent`'s save-repair prefixes take `c6_`.
+    Anything that counts the season now asks `CASE_SEQUENCE.length` -- the two
+    achievement goals and, more importantly, the two collapse gates. A flat
+    `humanCost >= 90` meant "15 a case" for six cases and silently became "12.9 a
+    case" at seven, and a raw bust count charged the player for the extra windows
+    a longer season deals: collapse went 22.8% -> 38.1% of 6000 seasons with no
+    effect changed. `COLLAPSE_HUMAN_COST` and `BUST_PRESSURE_BASE_CASES` in
+    `src/gameLogic.js` are what stop the next case from re-tuning the endings
+    behind the author's back. Case 06 deliberately has no four-way route split:
+    the other cases offer four strategies against an organisation, this one has a
+    single person in it, so the authored middle is the route and only the
+    free-text door opens another.
+
+42. The report has one screen with no bet on it. `seasonInterludes` in
+    `src/appCopy.js` is the beat between two cases -- a corridor, a text message,
+    a vending machine -- keyed by the case that just closed and merged onto
+    `nextCaseSignal` so the seam keeps one home. Six cases of sirens in one
+    register is the state it exists to break, and it is also where the season
+    plants what the cases cannot: 이민서 after 사건 02, 오진우 three cases before
+    his own. It renders above the next-case panel with a mood tint and no
+    control, so nothing on it can be played.
+
+43. The tree carries only what the game runs. A sweep on 2026-09-16 removed the
+    twenty-seven derivations `useCaseSystems` computed on every render and
+    `GameRuntime` never destructured -- a relationship graph, hypothesis actions,
+    investigation targets, a mid-boss, an evidence repair puzzle, a chapter
+    transfer record -- together with the twenty helpers behind them, the whole of
+    `src/characterSystems.js`, four choice-card formatters and two audio cues no
+    caller had, the `sceneVisuals` table, and roughly forty CSS rules for
+    components that no longer exist (the `--decision-*` FX block named a
+    `CriticalPointEngine` the repo does not contain). Two portraits went with the
+    speakers they belonged to: `반재현` and `윤서` were truncated spellings of
+    `반재욱` and `한서윤`, so those scenes had been narrated by the fallback
+    "사건 관계자" profile; `이민서` got the motif she was missing. Everything is
+    in the history if the game wants it back. What the sweep must not take: a
+    symbol referenced only by `scripts/unit-tests.mjs` or `scripts/smoke-test.mjs`
+    is load-bearing for `verify:static` (`createDecisionTargetLock`,
+    `getInvestigationOutcome`, `getDynamicMusicLayers`, `createGameEvent` and
+    about twenty more), and `topicParticle` stays because priority 10 tells
+    authors to reach for it. `src/state/errorRecovery.js` still duplicates eight
+    functions from `src/state/savedState.js` and both halves have importers, so
+    that one is a refactor, not a deletion.

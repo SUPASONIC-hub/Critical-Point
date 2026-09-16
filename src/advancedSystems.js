@@ -1,12 +1,3 @@
-const chapterUi = {
-  case01: { label: "FIELD DISPATCH", title: "배송망 생존 현황", accent: "#d9ff62", metrics: ["배송 지연", "지급 우선순위", "보호 대상"] },
-  case02: { label: "TRIGGER LAB", title: "실험 기록 검증", accent: "#8bd3c7", metrics: ["원본 보존", "진술 신뢰", "타임스탬프"] },
-  case03: { label: "COMPETITIVE ARENA", title: "점수판 뒤의 의도", accent: "#ffb36b", metrics: ["승률", "검증 기한", "공동 책임"] },
-  case04: { label: "POLICY ROOM", title: "예외 승인 감사", accent: "#f28f8f", metrics: ["예외 수", "보상 기준", "공개 범위"] },
-  case05: { label: "FAILURE ARCHIVE", title: "책임 공백 추적", accent: "#c5b7ff", metrics: ["책임자", "복구율", "재발 방지"] },
-  final: { label: "OBSERVER CORE", title: "당신의 기록을 판독", accent: "#e9f5b4", metrics: ["자기 인식", "개입 권한", "다음 기록"] },
-};
-
 const operatorProfiles = {
   courier: {
     id: "courier",
@@ -57,13 +48,6 @@ export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
   };
 }
 
-const relationshipQuests = {
-  "한서윤": { title: "서윤의 지급 명부", goal: "보호 대상의 이름을 지우지 않고 다음 기록으로 넘기기", reward: "human-record", threshold: 24 },
-  "반재욱": { title: "재욱의 원본 봉투", goal: "원본과 진술의 충돌을 함께 검증하기", reward: "evidence-reform", threshold: 24 },
-  "도윤하": { title: "윤하의 빈 자리", goal: "성과표에서 빠진 사람의 몫을 복원하기", reward: "field-pact", threshold: 24 },
-  "오진우": { title: "진우의 마지막 점수", goal: "승리보다 검증 기한을 먼저 확보하기", reward: "cold-justice", threshold: 24 },
-  "에코": { title: "에코의 금지된 질문", goal: "AI의 계산을 그대로 믿지 않고 질문의 주인을 찾기", reward: "open-oversight", threshold: 24 },
-};
 
 const endingScenes = {
   "open-oversight": { location: "OBSERVATORY / OPEN FLOOR", image: "/ending-oversight-room.webp", cue: "여러 개의 기록 창이 동시에 열립니다.", choice: "모든 참가자에게 기준 편집 권한을 넘긴다" },
@@ -76,16 +60,6 @@ const endingScenes = {
   collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", cue: "경보와 사람들의 호출이 한꺼번에 끊깁니다.", choice: "다음 플레이에서 압박을 분산할 기준을 남긴다" },
   "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.webp", cue: "다음 분석관의 출입증이 천천히 켜집니다.", choice: "답 대신 가장 위험한 질문을 인계한다" },
 };
-
-export function getChapterUiModel(caseId = "case01") {
-  return chapterUi[caseId] ?? chapterUi.case01;
-}
-
-export function getRelationshipQuest(speaker = "", score = 0) {
-  const quest = relationshipQuests[speaker];
-  if (!quest) return null;
-  return { ...quest, speaker, progress: Math.min(100, Math.round((score / quest.threshold) * 100)), unlocked: score >= quest.threshold };
-}
 
 export function getEndingSceneProfile(endingId = "open-question") {
   return endingScenes[endingId] ?? endingScenes["open-question"];
@@ -169,17 +143,6 @@ export function getEndingVisualClass(endingId = "open-question") {
   return `ending-visual-${String(endingId).replace(/[^a-z0-9-]/gi, "-")}`;
 }
 
-export function getInterlude(caseId = "case01", previousChoice = "") {
-  const interludes = {
-    case02: { label: "TRANSFER / 02", title: "배송망의 원본이 트리거랩으로 도착했습니다.", text: "당신은 장소를 바꾼 것이 아니라, 같은 기록을 다른 권한으로 다시 읽게 됩니다." },
-    case03: { label: "TRANSFER / 03", title: "감사 로그가 경쟁 점수판으로 변환됩니다.", text: "숫자는 달라졌지만 누가 손실을 감당했는지는 아직 같습니다." },
-    case04: { label: "TRANSFER / 04", title: "승리 기록이 정책 예외 문서로 넘어갑니다.", text: "좋은 결과가 규칙 위반을 지워주지는 않습니다." },
-    case05: { label: "TRANSFER / 05", title: "예외 문서에서 책임 공백이 발견됩니다.", text: "이제 문제는 누구를 탓할지가 아니라, 다음 실패를 막을 구조입니다." },
-    final: { label: "TRANSFER / FINAL", title: "모든 장소의 기록이 관찰자 코어에 모였습니다.", text: `당신이 남긴 ${previousChoice || "이전 선택"}이 이제 당신의 권한을 판독하는 자료가 됩니다.` },
-  };
-  return interludes[caseId] ?? null;
-}
-
 export function getSeasonGoals() {
   return [
     { id: "protect", label: "PROTECT SEASON", text: "인간 비용 45 이하로 시즌 완료" },
@@ -200,15 +163,6 @@ export function getBalanceSignals(log = []) {
     .map(([choiceId, count]) => ({ choiceId, share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
 }
 
-export function getRelationshipScene(quest = null, caseId = "case01") {
-  if (!quest?.unlocked) return null;
-  return {
-    title: `${quest.speaker} / PRIVATE CHANNEL`,
-    text: `${quest.speaker}가 공식 기록에 남기지 못했던 마지막 조건을 직접 건넵니다. 이 증언은 ${caseId}의 공개 범위를 바꿀 수 있습니다.`,
-    action: "증언을 원문 그대로 보존한다",
-  };
-}
-
 export function getPastRunMemory(memory = {}) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
   if (entries.length === 0) return null;
@@ -225,36 +179,6 @@ export function getOriginPrologue(origin = "courier") {
   return profiles[origin] ?? profiles.courier;
 }
 
-export function getRelationshipGraph(scores = []) {
-  return scores.map((item) => ({
-    ...item,
-    state: item.value >= 70 ? "ALLIED" : item.value >= 35 ? "NEGOTIATING" : "DISTANT",
-  }));
-}
-
-export function getEvidenceCombinations(discoveredClues = []) {
-  if (discoveredClues.length < 2) return [];
-  const pairs = [];
-  for (let index = 0; index < discoveredClues.length - 1; index += 2) {
-    const first = discoveredClues[index];
-    const second = discoveredClues[index + 1];
-    pairs.push({
-      id: `${first.id ?? index}-${second.id ?? index + 1}`,
-      title: "CROSS-REFERENCE FOUND",
-      text: `${first.title ?? "기록"} + ${second.title ?? "기록"}이 같은 책임 공백을 가리킵니다. 공개 전에 원본과 증언을 함께 확인할 수 있습니다.`,
-    });
-  }
-  return pairs;
-}
-
-export function getHypothesisActions(hypotheses = [], authority = {}) {
-  if (hypotheses.length === 0) return [];
-  return [
-    { id: "hold", label: "가설 보류", text: "증거를 더 모으고 공개 위험을 줄입니다.", effect: { fatigue: 1, legitimacy: 1 } },
-    { id: "investigate", label: "추가 조사", text: "관계자 질문으로 가설의 반증을 찾습니다.", effect: { time: -2, trust: 2 } },
-    ...(authority.level !== "OBSERVER" ? [{ id: "publish", label: "검증 공개", text: "현재 가설을 공개 검증선에 올립니다.", effect: { legitimacy: 4, trust: -2, fatigue: 3 } }] : []),
-  ];
-}
 
 export function getFailureCause(variant = {}, resources = {}) {
   if (!variant?.failure) return null;
@@ -315,53 +239,6 @@ export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {})
   };
 }
 
-export function getAutonomousSignals(caseId = "case01", log = []) {
-  const latest = log.at(-1);
-  const signals = {
-    case01: "현장팀이 지연 비용을 임시로 떠안고 다음 배송을 먼저 움직였습니다.",
-    case02: "증언자가 공개 범위를 스스로 줄여달라는 보호 요청을 남겼습니다.",
-    case03: "경쟁 상대가 당신의 기준표를 역산해 먼저 조건을 바꾸고 있습니다.",
-    case04: "심사관이 빈 승인 칸에 임시 책임자를 적어 절차를 계속 진행했습니다.",
-    case05: "복구팀이 당신의 이전 선택을 기준으로 우회 경로를 만들었습니다.",
-    final: "다음 분석관이 과거 기록을 읽고 아직 답하지 않은 질문을 표시했습니다.",
-  };
-  return { text: signals[caseId] ?? signals.case01, triggeredBy: latest?.choiceId ?? "opening" };
-}
-
-export function getEvidenceMetadata(clues = []) {
-  return clues.map((clue, index) => ({
-    ...clue,
-    sourceType: index % 3 === 0 ? "ORIGINAL LOG" : index % 3 === 1 ? "WITNESS" : "INFERENCE",
-    reliability: Math.max(42, 94 - index * 9),
-  }));
-}
-
-export function getHypothesisConflict(hypotheses = []) {
-  if (hypotheses.length < 2) return null;
-  return { title: "HYPOTHESIS CONFLICT", text: "기록이 사후 조작이라는 가설과 예외가 성과 측정의 일부였다는 가설은 동시에 확정할 수 없습니다. 하나를 공개하면 다른 하나의 신뢰도가 떨어집니다." };
-}
-
-export function getInvestigationTargets(caseId = "case01", authority = {}) {
-  const targets = {
-    case01: ["배송 지연 원본", "현장 관리자", "보상 승인표"],
-    case02: ["증언 보호 명부", "실험 원본", "접근 권한 로그"],
-    case03: ["경쟁 점수표", "검증 기한", "공동 책임자"],
-    case04: ["예외 승인서", "보상 기준", "공개 문안"],
-    case05: ["복구 기록", "책임 공백", "중단 조건"],
-    final: ["이전 런 기록", "관찰자 키", "종료 조건"],
-  };
-  return (targets[caseId] ?? targets.case01).map((label, index) => ({
-    id: `${caseId}-investigate-${index}`,
-    label,
-    locked: index === 2 && authority.level === "OBSERVER",
-    effect: index === 0 ? { time: -1, legitimacy: 1 } : index === 1 ? { trust: 2, fatigue: 1 } : { legitimacy: 2, fatigue: 2 },
-  }));
-}
-
-export function getTimelineStamp(caseId = "case01", logLength = 0) {
-  const base = { case01: "DAY 01 · 08:40", case02: "DAY 02 · 13:10", case03: "DAY 03 · 19:20", case04: "DAY 04 · 10:05", case05: "DAY 05 · 22:45", final: "DAY 06 · 00:15" }[caseId] ?? "SHIFT UNKNOWN";
-  return `${base} · +${logLength * 7} MIN`;
-}
 
 export function getRankingLeague(style = "FIELD DECIDER") {
   if (style.includes("RISK")) return "RISK LEAGUE";
@@ -375,44 +252,12 @@ export function getOriginEndingVariant(origin = "courier", endingId = "open-ques
   return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
 }
 
-export function getCharacterMemory(speaker = "", log = []) {
-  const entries = log.filter((entry) => entry?.speaker === speaker && !entry.isSystemEvent);
-  if (entries.length === 0) return null;
-  const last = entries.at(-1);
-  return { speaker, count: entries.length, lastChoice: last.choice, text: `${speaker}은(는) 이전에 당신이 '${last.choice}'을 선택한 일을 기억하고 있습니다.` };
-}
-
 export function getInvestigationOutcome(target, logLength = 0) {
   if (!target) return null;
   const outcomes = ["원본의 시간 순서가 복원되었습니다.", "목격자가 공개 범위를 재협상했습니다.", "기록과 실제 현장의 수치가 어긋납니다."];
   return { ...target, outcome: outcomes[(logLength + target.label.length) % outcomes.length], contaminated: (logLength + target.label.length) % 4 === 0 };
 }
 
-export function getEvidenceContamination(clues = [], log = []) {
-  const contaminated = clues.filter((clue, index) => (index + log.length) % 5 === 0);
-  return contaminated.length ? { count: contaminated.length, text: "일부 단서가 후속 기록과 충돌합니다. 원본 확인 없이 가설을 확정하면 오판 위험이 커집니다." } : null;
-}
-
-export function getHypothesisLockState(hypotheses = [], action = "") {
-  if (hypotheses.length < 2) return null;
-  return { locked: action === "publish", label: action === "publish" ? "COUNTER-HYPOTHESIS LOCKED" : "MULTIPLE HYPOTHESES OPEN", text: action === "publish" ? "공개한 가설과 반대 가설의 검증 경로가 잠겼습니다." : "가설을 확정하지 않으면 여러 조사 경로를 유지할 수 있습니다." };
-}
-
-export function getResourceChain(resources = {}) {
-  const fatigue = resources.fatigue ?? 0;
-  const trust = resources.trust ?? 0;
-  const time = resources.time ?? 0;
-  if (fatigue >= 35) return { tone: "fatigue", text: "피로가 높아 다음 선택의 신뢰도와 조사 성공률이 낮아집니다." };
-  if (trust <= 30) return { tone: "trust", text: "신뢰가 낮아 인물들이 원본 대신 방어적인 정보만 제공합니다." };
-  if (time <= 25) return { tone: "time", text: "시간이 부족해 조사 대상 하나를 포기해야 할 수 있습니다." };
-  return { tone: "stable", text: "현재 자원 균형이 유지되어 조사와 관계 회복을 함께 진행할 수 있습니다." };
-}
-
-export function getMidBoss(caseId = "case01", log = []) {
-  const bosses = { case01: "현장 운영 책임자", case02: "보호 명부 관리자", case03: "경쟁 기준 설계자", case04: "예외 승인 심사관", case05: "복구 프로토콜 관리자", final: "관찰자 코어" };
-  if (log.length < 3) return null;
-  return { title: `${bosses[caseId] ?? "기록 관리자"} / COUNTER-CLAIM`, text: "당신의 가설은 결과를 설명하지만, 책임의 방향까지 증명하지는 못한다고 반박합니다.", caseId };
-}
 
 export function getDynamicMusicLayers(riskTier = "CONTROLLED", caseId = "case01") {
   return { bass: riskTier === "CRITICAL" ? "deep-impact" : "measured-bass", lead: caseId === "final" ? "memory-motif" : "chapter-motif", transition: riskTier === "UNSTABLE" ? "short-rise" : "soft-crossfade" };

@@ -59,14 +59,6 @@ export const playStyleOptions = [
 ];
 
 
-export const sceneVisuals = {
-  case01: "/scene-case01.webp",
-  case02: "/scene-case02.webp",
-  case03: "/scene-case03.webp",
-  case04: "/scene-case04.webp",
-  case05: "/scene-case05.webp",
-  final: "/scene-final.webp",
-};
 
 export const operatorBriefs = {
   case01: {
@@ -89,9 +81,13 @@ export const operatorBriefs = {
     movement: "트리거랩 운영 검토실 → 현장 복구 통제실",
     reason: "규칙과 예외가 반복될 때 누가 책임을 떠안는지 직접 확인하기 위해",
   },
+  case06: {
+    movement: "현장 복구 통제실 → 트리거랩 4층 분석관실",
+    reason: "바깥 기관에 적용해 온 판단 기준이 자기 조직의 동료에게도 그대로 서는지 확인하기 위해",
+  },
   final: {
-    movement: "현장 복구 통제실 → 트리거랩 기록 보관소",
-    reason: "여섯 사건에 남은 반응 패턴과 자신의 트리거 사용 권한을 함께 검토하기 위해",
+    movement: "트리거랩 4층 분석관실 → 트리거랩 기록 보관소 B2",
+    reason: "여섯 사건에 남은 반응 패턴과, 이제 자기 이름이 걸린 프로필을 함께 검토하기 위해",
   },
 };
 
@@ -101,6 +97,7 @@ export const chapterRules = {
   case03: { label: "속도와 장기비용", rule: "가장 빠른 답이 가장 싼 실패를 뜻하지는 않습니다.", authority: "경쟁안의 평가 기준을 재설계" },
   case04: { label: "예외와 책임", rule: "성과를 위해 허용한 예외에는 반드시 이름과 종료 조건이 필요합니다.", authority: "예외 승인 조건과 감시 범위를 제안" },
   case05: { label: "규칙과 복구", rule: "반복을 막는 규칙이 현장의 피해를 키우지 않는지 확인합니다.", authority: "중단·복구·책임 배분 순서를 조정" },
+  case06: { label: "동료와 기록", rule: "옆자리 사람에게도 같은 기준을 세울 수 있는지 확인합니다.", authority: "내부 인사 자료의 공개 범위를 제안" },
   final: { label: "관찰과 선택", rule: "이제 사건이 아니라 당신의 반응 패턴이 실험의 대상입니다.", authority: "실험 데이터의 공개·폐기·계승을 선택" },
 };
 
@@ -173,6 +170,16 @@ export const nextCaseSignals = {
       "명분 있는 예외를 허용한 기록은 사라지지 않습니다. 다음 사건에서는 누구도 규칙을 어기지 않았는데도 피해가 생깁니다.",
   },
   case05: {
+    eyebrow: "NEXT CASE UNLOCKED",
+    caseId: "case06",
+    title: "사건 06 - 같은 방의 사람",
+    button: "사건 06 시작",
+    premise:
+      "경쟁 분석관 오진우가 사흘째 출근하지 않습니다. 이번 조사 대상은 바깥 기관이 아니라 당신 옆자리입니다.",
+    hook:
+      "악인이 없는 실패를 통과한 기준은 그대로 남습니다. 다음 사건은 그 기준을 당신이 아는 사람에게 적용할 수 있는지 묻습니다.",
+  },
+  case06: {
     eyebrow: "FINAL CASE UNLOCKED",
     caseId: "final",
     title: "마지막 사건 - 트리거랩의 진실",
@@ -185,6 +192,55 @@ export const nextCaseSignals = {
 };
 
 /**
+ * The beat between two cases, keyed by the case that just closed.
+ *
+ * Six cases of the same register is a hard read: every scene is a 45-second
+ * window with someone's job in it, and the report screen went straight from the
+ * rank to the next crisis. These sit on the report with no bet, no clock and no
+ * choice -- the one place in the season where the analyst is a person who ate
+ * something, got a text back, or stood in a corridor. They also carry the
+ * threads the cases cannot: 이민서 after 사건 02, 오진우 well before 사건 06.
+ */
+const seasonInterludes = {
+  case01: {
+    mood: "warm",
+    label: "막간 · 새벽 4시",
+    title: "야간조 반장이 컵라면을 하나 더 뜯었다",
+    text: "그는 아무 말도 묻지 않고 뜨거운 물을 부어 당신 앞에 놓았습니다. 삼 분을 같이 기다리는 동안 둘 다 아무 말도 하지 않았고, 그게 그날 가장 편한 삼 분이었습니다. 나가는 길에 그가 딱 한 마디 했습니다. '다음에 올 때는 낮에 오세요. 여기 낮에는 사람 사는 데 같습니다.'",
+  },
+  case02: {
+    mood: "quiet",
+    label: "막간 · 퇴근길",
+    title: "이민서에게서 문자가 한 통 왔다",
+    text: "'그날 응급실 접수증 사진, 혹시 필요하시면 보낼게요.' 그리고 30분 뒤에 한 통 더. '아니요, 필요 없으실 것 같아서요. 그냥 제가 갖고 있을게요.' 답장을 뭐라고 써야 할지 몰라서, 당신은 지하철 두 정거장을 지나칠 때까지 화면만 보고 있었습니다.",
+  },
+  case03: {
+    mood: "wry",
+    label: "막간 · 자판기 앞",
+    title: "오진우가 농담을 했다. 안 웃겼다",
+    text: "그는 커피 두 개를 뽑아 하나를 내밀며 말했습니다. '아까 발표, 제 쪽 폰트가 더 좋았습니다.' 당신이 아무 반응을 안 하자 그는 조금 당황한 얼굴로 덧붙였습니다. '농담입니다.' 그러고는 자기 커피를 들고 먼저 갔습니다. 그가 농담을 시도한 건 이번이 처음이었습니다.",
+  },
+  case04: {
+    mood: "grief",
+    label: "막간 · 온새 사무실",
+    title: "삐뚤빼뚤한 글씨의 편지가 도착했다",
+    text: "돌봄 서비스를 받던 이용자가 보낸 손편지였습니다. 맞춤법이 여러 군데 틀렸고, 마지막 줄은 '고맙습니다'가 아니라 '안 끊겨서 다행이에요'였습니다. 현장 담당자는 그 편지를 코팅해서 벽에 붙였습니다. 당신은 그 벽 앞에서 한참 서 있었습니다.",
+  },
+  case05: {
+    mood: "still",
+    label: "막간 · 통제실 소등 후",
+    title: "의자 하나가 끝까지 비어 있었다",
+    text: "복구 통제실의 불을 끄고 나오는데, 맨 끝 자리 의자가 책상 밖으로 조금 빠져 있었습니다. 누가 급하게 일어선 자리입니다. 경비원이 문을 잠그며 말했습니다. '저 자리 주인은 사흘째 안 나옵니다. 다른 층 사람이라던데.' 당신은 그때 그 말을 흘려들었습니다.",
+  },
+  case06: {
+    mood: "wry",
+    label: "막간 · 회사 앞 포장마차",
+    title: "반재욱이 술을 샀다. 그는 원래 안 마신다",
+    text: "그는 소주 한 병을 시켜놓고 자기 잔은 채우지 않았습니다. 수첩도 펴지 않았습니다. 한참 뒤에 그가 말했습니다. '나는 사람을 믿는 걸 일로 만들지 않으려고 이 직업을 골랐습니다.' 그리고 잔을 당신 쪽으로 밀었습니다. '오늘은 실패했습니다.'",
+  },
+};
+
+/**
  * The next-case panel is the season's only case-to-case seam, and the one place
  * a player can be told they are about to change buildings. `operatorBriefs` has
  * carried that move and the reason for it since the copy was written and nothing
@@ -192,8 +248,9 @@ export const nextCaseSignals = {
  * happens in a different organisation from the one just left. Merged here rather
  * than in the runtime so the copy keeps one home.
  */
-for (const signal of Object.values(nextCaseSignals)) {
+for (const [finishedCaseId, signal] of Object.entries(nextCaseSignals)) {
   Object.assign(signal, operatorBriefs[signal.caseId]);
+  signal.interlude = seasonInterludes[finishedCaseId] ?? null;
 }
 
 export const playGuideItems = [
@@ -221,5 +278,6 @@ export const triggerLabSignals = {
   case03: "관찰 항목: 경쟁 상황의 검증 생략, 속도 보상 반응, 점수판 민감도",
   case04: "관찰 항목: 좋은 결과를 위한 예외 허용선, 기록 은폐 저항, 공개 감사 선호",
   case05: "관찰 항목: 단일 책임 욕구, 구조 실패 인내, 조용한 피해자 감지",
+  case06: "관찰 항목: 동료 보호와 기록 사이의 선택, 내부 고발 저항, 자기 노출 허용선",
   final: "관찰 항목: 자기 조건 인식, 프로필 공개 범위, 시스템 존치 허용선",
 };

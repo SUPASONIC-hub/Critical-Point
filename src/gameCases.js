@@ -1,10 +1,11 @@
-export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "final"];
+export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "final"];
 export const CASE_START_NODES = {
   case01: "start",
   case02: "c2_start",
   case03: "c3_start",
   case04: "c4_start",
   case05: "c5_start",
+  case06: "c6_start",
   final: "f_start",
 };
 export const CASE_RESULT_NODES = {
@@ -13,6 +14,7 @@ export const CASE_RESULT_NODES = {
   case03: "case03_result",
   case04: "case04_result",
   case05: "case05_result",
+  case06: "case06_result",
   final: "final_result",
 };
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
@@ -23,6 +25,7 @@ export const nodeOrders = {
   case03: ["c3_start", "c3_split", "c3_score", "c3_trap", "c3_final"],
   case04: ["c4_start", "c4_offer", "c4_leak", "c4_vote", "c4_final"],
   case05: ["c5_start", "c5_map", "c5_blame", "c5_collapse", "c5_final"],
+  case06: ["c6_start", "c6_desk", "c6_logs", "c6_panel", "c6_final"],
   final: ["f_start", "f_archive", "f_confront", "f_choice"],
 };
 
@@ -32,6 +35,7 @@ export const caseObjectives = {
   case03: "오진우보다 빠른 결론이 아니라 더 견고한 판을 만든다",
   case04: "큰 성과를 위해 작은 규칙 위반을 어디까지 허용할지 정한다",
   case05: "악인이 없는 실패에서 책임과 개선 가능성을 구분한다",
+  case06: "옆자리 동료의 붕괴에서 보호와 기록 중 무엇을 먼저 둘지 정한다",
   final: "트리거랩의 실험 구조를 마주하고 자신의 트리거 사용 방식을 선택한다",
 };
 
@@ -75,6 +79,14 @@ export const seasonCasesBase = [
     trigger: "시스템 / 호기심 / 무력감",
     status: "LOCKED",
     summary: "명백한 악인은 없다. 모두가 합리적으로 움직였지만 시스템 전체가 실패한다.",
+  },
+  {
+    id: "case06",
+    label: "사건 06",
+    title: "같은 방의 사람",
+    trigger: "경쟁 / 애정 / 자기 인식",
+    status: "LOCKED",
+    summary: "경쟁자 오진우가 무너진다. 그를 무너뜨린 압박 조건은 당신의 실험과 같은 번호를 쓰고 있었다.",
   },
   {
     id: "final",

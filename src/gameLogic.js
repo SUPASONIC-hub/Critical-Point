@@ -1,5 +1,5 @@
 import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
-import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceSubtexts, choiceVoiceLines, costWhenRising, echoReplies, isResourceGain } from "./gameData.js";
+import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, costWhenRising, echoReplies, isResourceGain } from "./gameData.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
@@ -85,21 +85,6 @@ export function createDecisionForecast(choice = {}, resources = {}) {
 }
 
 // Keep the real forecast for game logic, but reveal only the precision earned by evidence.
-export function addForecastUncertainty(forecast = {}, evidenceCount = 0) {
-  const confidence = clamp(28 + Math.max(0, evidenceCount) * 14, 28, 84);
-  const spread = confidence >= 70 ? 0 : confidence >= 50 ? 5 : 9;
-  const riskDeltaMin = forecast.riskDelta - spread;
-  const riskDeltaMax = forecast.riskDelta + spread;
-  return {
-    ...forecast,
-    forecastConfidence: confidence,
-    riskDeltaMin,
-    riskDeltaMax,
-    afterRisk: spread === 0 ? forecast.afterRisk : `${forecast.afterRisk} (${riskDeltaMin}..${riskDeltaMax})`,
-    forecastPrecision: spread === 0 ? "precise" : spread <= 5 ? "directional" : "uncertain",
-  };
-}
-
 /**
  * Which way a decision leaned: toward the people in the scene, or toward the
  * position you are holding. Ties read as neither.
@@ -424,44 +409,6 @@ export function getObserverPattern(entries = []) {
   };
 }
 
-export function getObserverChoicePreview({
-  choice = {},
-  read = {},
-  resources = {},
-  observerPattern = {},
-  responseTimeSec = 12,
-} = {}) {
-  const entry = {
-    choiceId: choice.id,
-    choice: choice.label,
-    freeText: choice.type === "free" ? "preview" : "",
-    effect: read.finalEffect ?? choice.effect ?? {},
-    challenge: { riskDelta: read.finalRiskDelta ?? 0 },
-    responseTimeSec,
-    resourcesBefore: resources,
-    resourcesAfter: read.finalResources ?? applyEffect(resources, read.finalEffect ?? choice.effect ?? {}),
-  };
-  const tag = getObserverTag(entry);
-  const dominant = observerPattern?.dominant;
-  const repeatsCurrentPattern = Boolean(dominant && dominant === tag.id);
-  const patternPressure = repeatsCurrentPattern
-    ? "지금까지의 관찰 패턴을 더 굳힙니다."
-    : "현재 패턴을 흔들어 관찰자의 분류를 늦춥니다.";
-  const aftershock = {
-    compliance: "다음 장면은 더 빠른 결정을 요구하는 방향으로 좁아질 수 있습니다.",
-    defiance: "다음 장면은 예외 경로를 새 조건처럼 시험할 수 있습니다.",
-    opacity: "다음 장면은 말하지 않은 대상과 지워진 근거를 다시 묻습니다.",
-    sacrifice: "다음 장면은 누가 비용을 떠안았는지를 먼저 압박합니다.",
-    pattern: "다음 장면은 같은 기준을 반복하게 만드는 조용한 구조로 남습니다.",
-  }[tag.id] ?? "다음 장면은 이 판단의 말투를 기준으로 다시 배열됩니다.";
-
-  return {
-    tag,
-    repeatsCurrentPattern,
-    text: `${patternPressure} ${aftershock}`,
-  };
-}
-
 export function getObservationLedger(entries = []) {
   const playableEntries = entries.filter((entry) => !entry?.isSystemEvent);
   return playableEntries.reduce(
@@ -508,6 +455,11 @@ const discoveryClues = {
     title: "비어 있는 자리",
     text: "실패 보고서에는 이름이 하나 빠져 있습니다. 말하지 못한 사람이 시스템의 가장 큰 비용을 떠안았습니다.",
   },
+  case06: {
+    id: "c6-mirrored-profile",
+    title: "거울 프로필",
+    text: "경쟁자의 실험 프로필이 당신 것과 같은 번호를 씁니다. 두 사람은 처음부터 한 실험의 양쪽이었습니다.",
+  },
   final: {
     id: "final-observer-key",
     title: "관찰자의 열쇠",
@@ -516,10 +468,6 @@ const discoveryClues = {
 };
 
 /** The record each case hides, whether or not this run opened it. */
-export function getCaseDiscoveryClue(caseId = "case01") {
-  return discoveryClues[caseId] ?? null;
-}
-
 /**
  * A hidden record only opens on a decision that read the scene. It used to
  * need a fast or risky answer on top of that, which put the best ending behind
@@ -640,12 +588,24 @@ export function getClueHypotheses(clues = []) {
 const BUST_SEASON_PRESSURE = 0.4;
 /** However many times a run blew up, the record cannot close a season by itself. */
 const BUST_PRESSURE_CAP = 12;
+// The season length the bust pressure above was calibrated against.
+const BUST_PRESSURE_BASE_CASES = 6;
 /**
  * The pot a run has to have cashed, without ever busting, to earn a clue of
  * slack. The gauntlet's multiplier doubles every 12 heat, so x16 is a window
  * cashed at 48 -- inside two pushes of the lowest wall a fresh board can draw.
  */
 const HELD_LINE_MULTIPLIER = 16;
+/**
+ * The collapse gate, per case rather than per season.
+ *
+ * `seasonHumanCost` accumulates across every case, so a flat 90 meant "15 a case"
+ * while the season had six and silently tightened to "12.9 a case" the moment a
+ * seventh was written -- collapse went 22.8% -> 38.1% in 6000 seasons without a
+ * single effect changing. Derived from the sequence so adding a case cannot
+ * re-tune the endings behind the author's back.
+ */
+const COLLAPSE_HUMAN_COST = 15 * CASE_SEQUENCE.length;
 /**
  * What the vault buys, per case. A season that banked this much a case has, in
  * the ending's own terms, done the job with room to spare, busts or not: it
@@ -677,7 +637,14 @@ export function getEndingVariant({
   // going past what there was time to carry. It is priced as pressure because
   // that is the axis it belongs on, and because it makes a run that blew up
   // three times unable to close as though it had not.
-  const bustPressure = Math.min(BUST_PRESSURE_CAP, seasonBusts * BUST_SEASON_PRESSURE);
+  // Busts are read as a rate, not a count. A season plays one table per scene,
+  // so a seventh case hands the player more windows and therefore more busts for
+  // the same standard of play; a raw count would charge that as strain. Graded
+  // against the six-case season the 0.4 was measured on.
+  const bustPressure = Math.min(
+    BUST_PRESSURE_CAP,
+    seasonBusts * BUST_SEASON_PRESSURE * (BUST_PRESSURE_BASE_CASES / CASE_SEQUENCE.length),
+  );
   const closingPressure = getRiskPressure(resources);
   // The strain the run is carrying, and the strain plus what it did to get
   // there. They are separate because the three character endings below ask what
@@ -702,8 +669,8 @@ export function getEndingVariant({
   const trust = resources.trust ?? 0;
   const legitimacy = resources.legitimacy ?? 0;
   const capital = resources.capital ?? 0;
-  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < 31 && humanCost < 90 && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
-  if (seasonPressure >= 31 || humanCost >= 90) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
+  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < 31 && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
+  if (seasonPressure >= 31 || humanCost >= COLLAPSE_HUMAN_COST) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const clueBar = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
   if (discoveredClues.length >= clueBar && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
@@ -777,6 +744,11 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
       c5_after_system: { tag: "구조를 고친 결말", title: "범인 대신 반복을 멈추었다", text: "누구도 영웅이 되지 못했지만 같은 실패가 다시 일어날 길은 좁아졌습니다." },
       c5_after_name: { tag: "책임자를 지목한 결말", title: "한 사람의 이름으로 실패를 닫았다", text: "회의는 빨리 끝났지만, 말하지 못한 사람들의 기록은 아직 남아 있습니다." },
     },
+    case06: {
+      c6_after_stand: { tag: "자리를 남긴 결말", title: "돌아올 의자를 치우지 않았다", text: "사건은 오늘 닫히지 않았습니다. 대신 이 조직에서 무너진 사람이 돌아올 수 있다는 전례가 처음 생겼습니다." },
+      c6_after_open: { tag: "조건을 연 결말", title: "두 사람의 설정값을 같은 날 공개했다", text: "경쟁자는 피해자가 아니라 증인이 됐고, 당신도 같은 실험의 피험자로 기록됐습니다." },
+      c6_after_name: { tag: "이름으로 닫은 결말", title: "옆자리의 이름으로 사건을 끝냈다", text: "가장 빠른 종결이었습니다. 그 방식은 이제 이 조직이 실패를 처리하는 표준 절차가 됩니다." },
+    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
@@ -813,6 +785,11 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
       c5_after_system: { legitimacy: 8, capital: -4, fatigue: 5 },
       c5_after_name: { trust: -9, humanCost: 7, fatigue: 2 },
     },
+    case06: {
+      c6_after_stand: { trust: 8, capital: -5, fatigue: 6 },
+      c6_after_open: { legitimacy: 9, humanCost: -4, fatigue: 6 },
+      c6_after_name: { trust: -10, humanCost: 8, capital: 5 },
+    },
   };
   return carryovers[caseId]?.[choiceId] ?? {};
 }
@@ -839,10 +816,16 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c4_after_service: { id: "repair-legitimacy", title: "예외의 믿음 회복하기", text: "서비스를 지킨 뒤 흔들린 규칙의 믿음을 회복하는 선택이 보너스를 만듭니다." },
       c4_after_stop: { id: "protect-trust", title: "멈춤의 피해 보호하기", text: "감사를 위해 멈춘 서비스의 사람들을 먼저 보호해야 다음 사건을 버틸 수 있습니다." },
     },
+    case06: {
+      c5_after_owner: { id: "protect-trust", title: "책임을 사람에게 돌려주기", text: "자기 책임을 인정한 기준을 옆자리 사람에게도 똑같이 적용하는 선택을 찾아야 합니다." },
+      c5_after_system: { id: "use-reframe", title: "정확한 기록 의심하기", text: "당신이 또렷하게 만든 기록이 사람을 겨누고 있지 않은지 판을 뒤집어 확인해야 합니다." },
+      c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 보너스를 만듭니다." },
+    },
+    // Keyed on case 06's aftermath: the finale follows that case now.
     final: {
-      c5_after_owner: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
-      c5_after_system: { id: "use-reframe", title: "고친 구조도 의심하기", text: "새로 만든 구조가 다시 누군가를 관찰하지 않는지 판을 뒤집어 확인해야 합니다." },
-      c5_after_name: { id: "repair-legitimacy", title: "이름 뒤의 공정함 회복하기", text: "한 사람에게 모인 책임을 다시 나누고, 피해를 회복하는 선택을 찾아야 합니다." },
+      c6_after_stand: { id: "protect-trust", title: "책임을 혼자 갖지 않기", text: "자기 책임을 인정하되 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
+      c6_after_open: { id: "use-reframe", title: "열어 둔 조건도 의심하기", text: "공개한 조건이 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c6_after_name: { id: "repair-legitimacy", title: "이름 뒤의 공정함 회복하기", text: "한 사람에게 모인 책임을 다시 나누고, 피해를 회복하는 선택을 찾아야 합니다." },
     },
   };
   return challenges[caseId]?.[choiceId] ?? null;
@@ -1077,11 +1060,6 @@ export function getEcho(choiceId, freeText) {
 export function getDramaticChoiceLabel(choice) {
   if (choice.type === "free") return choice.label;
   return choiceVoiceLines[choice.id] ?? choice.label;
-}
-
-export function getChoiceSubtext(choice) {
-  const strongestCognition = Object.entries(choice.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0];
-  return choiceSubtexts[strongestCognition] ?? choiceSubtexts.default;
 }
 
 function getStrongestDelta(effect = {}) {

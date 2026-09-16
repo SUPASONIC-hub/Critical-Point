@@ -2948,15 +2948,6 @@
 }
 
 .gx-combo.combo-hot b,
-.gx-combo.combo-blaze b {
-  color: var(--c-gx-fever);
-  text-shadow: 0 0 22px var(--c-gx-fever-a40);
-}
-
-.gx-combo.combo-blaze small {
-  color: var(--c-gx-fever);
-}
-
 .gx-combo.is-broken {
   color: var(--c-gx-text-dim);
   animation-name: gx-combo-break;

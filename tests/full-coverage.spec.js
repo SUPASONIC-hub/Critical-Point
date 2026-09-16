@@ -118,7 +118,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
     }
     await expect(page.locator(".ending-sequence")).toBeVisible({ timeout: 8000 });
     const completed = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).completedCases;
-    expect(completed).toHaveLength(6);
+    expect(completed).toHaveLength(7);
     if (errors.length) throw new Error(errors.slice(0, 2).join("\n"));
   });
 }

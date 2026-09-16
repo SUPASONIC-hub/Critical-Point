@@ -17,14 +17,7 @@
   .shell {
     padding: 16px;
   }
-  .status-board {
-    position: static;
-    order: 2;
-  }
-  .game-board {
-    order: 1;
-  }
-  .result-grid {
+.result-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .achievement-panel > div:last-child {
@@ -64,10 +57,7 @@
   .counterfactual-scene {
     grid-column: 1 / -1;
   }
-  .reframe-signals ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .observer-postmortem-grid {
+.observer-postmortem-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -91,12 +81,7 @@
   .ranking-page .topbar {
     padding-right: 0;
   }
-  .decision-dock {
-    align-items: stretch;
-    flex-direction: column;
-    bottom: max(8px, env(safe-area-inset-bottom));
-  }
-  .brand-row,
+.brand-row,
   .topbar,
   .game-header,
   .start-input-row,
@@ -172,11 +157,6 @@
   .counterfactual-scene {
     grid-column: auto;
   }
-  .game-board,
-  .status-board,
-  .choice-panel {
-    padding: 8px;
-  }
   .decision-reveal-backdrop {
     align-items: end;
     padding: 12px;
@@ -200,10 +180,7 @@
   .panel-title-row {
     display: grid;
   }
-  .reframe-signals ul {
-    grid-template-columns: 1fr;
-  }
-  .delta-table article {
+.delta-table article {
     grid-template-columns: 1fr;
   }
   .delta-table article p {

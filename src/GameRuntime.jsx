@@ -158,8 +158,6 @@ const speakerPortraits = {
   "도윤하": "/portrait-do-yunha.webp",
   "오진우": "/portrait-oh-jinwoo.webp",
   "에코": "/portrait-echo.webp",
-  "반재현": "/portrait-ban-jaehyun.webp",
-  "윤서": "/portrait-yunseo.webp",
 };
 
 let consoleErrorHookBusy = false;
@@ -446,15 +444,6 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   const gameplayStats = getGameplayStats(log, riskPressure);
   const observationLedger = getObservationLedger(log);
   const observerPattern = getObserverPattern(log);
-  const relationshipScores = ["한서윤", "반재욱", "도윤하", "오진우", "에코"].map((name) => {
-    const appearances = log.filter((entry) => entry.speaker === name).length;
-    const recent = [...log].reverse().findIndex((entry) => entry.speaker === name);
-    return {
-      name,
-      value: Math.min(100, appearances * 18 + (recent >= 0 ? Math.max(0, 24 - recent * 3) : 0)),
-      active: node?.speaker === name,
-    };
-  });
   const {
     achievementProgress,
     authorityState,
@@ -468,24 +457,13 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   } = useCaseSystems({
     caseResults,
     completedCases,
-    currentCase,
     discoveredClues,
-    fallbackCaseId,
-    hypothesisAction: "",
     localErrorEntries,
     localRankingRows,
     log,
-    newGamePlusMemory,
-    newGamePlusUnlocked,
-    node,
     operatorOrigin,
     pendingTelemetry,
-    playStyle,
-    relationshipScores,
     resources,
-    riskTier,
-    selectedInvestigation: "",
-    speakerProfile,
   });
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
@@ -836,6 +814,8 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
     const introEcho =
       caseId === "final"
         ? "마지막 사건입니다. 에코는 더 이상 조언자처럼 말하지 않습니다. 당신의 조건이 어떻게 사용됐는지 직접 묻습니다."
+        : caseId === "case06"
+        ? "이번 사건의 핵심은 옆자리입니다. 에코는 바깥 조직에 쓰던 기준을 아는 사람에게도 세울 수 있는지 묻습니다."
         : caseId === "case05"
         ? "이번 사건의 핵심은 악인이 없는 실패입니다. 에코는 책임자를 찾고 싶은 충동과 구조를 끝까지 보려는 사고를 분리해 묻습니다."
         : caseId === "case04"
@@ -1489,7 +1469,7 @@ export function GameRuntime({ onSuppressSaves = suppressSaves, saveControls, ini
   }
 
   function unlockAllCasesForTest() {
-    const allPlayableCases = ["case01", "case02", "case03", "case04", "case05"];
+    const allPlayableCases = ["case01", "case02", "case03", "case04", "case05", "case06"];
     setCompletedCases(allPlayableCases);
     persist({ completedCases: allPlayableCases });
   }

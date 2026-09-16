@@ -283,6 +283,16 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               <p>{caseOutcome.text}</p>
             </div>
           </section>
+          {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
+              register is a hard read, and this is the one beat where the analyst
+              is a person rather than a decision. */}
+          {nextCaseSignal?.interlude && (
+            <section className={`interlude-panel mood-${nextCaseSignal.interlude.mood}`} aria-label="막간">
+              <span>{nextCaseSignal.interlude.label}</span>
+              <h2>{nextCaseSignal.interlude.title}</h2>
+              <p>{nextCaseSignal.interlude.text}</p>
+            </section>
+          )}
           {nextCaseSignal && (
             <section className="next-case-panel">
               <div>

@@ -39,9 +39,12 @@ const BUDGETS = {
   // 2382 / 12 -> 2384 / 13 on 2026-09-16: the composed graph is handed to
   // `applySceneContext`, so every scene -- authored or generated -- carries the
   // room it happens in, the clock it runs against, and its own question.
+  // 2384 / 13 -> 2520 / 14 on 2026-09-16: 사건 06 is a seventh case, and its
+  // aftermath, connective, reaction, side-door, hidden-route, evidence-turn and
+  // opening tables all live in this file alongside the other six.
   "src/gameData.js": {
-    lines: 2384,
-    importedNames: 13,
+    lines: 2520,
+    importedNames: 14,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
@@ -50,8 +53,11 @@ const BUDGETS = {
   // 1300 -> 1310 when the ending started reading the vault (VAULT_SLACK).
   // 1310 -> 1312 on 2026-09-16: `buildNarrativeSpine` prefers the scene's own
   // question over the template that had been running for all 149 scenes.
+  // 1312 -> 1355 on 2026-09-16 for 사건 06's clue, outcomes, carryover and
+  // continuity challenge, for re-keying the finale's tables onto it, and for
+  // the two collapse gates that now read per case instead of per season.
   "src/gameLogic.js": {
-    lines: 1312,
+    lines: 1355,
     importedNames: 18,
     hooks: {},
   },

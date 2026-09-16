@@ -113,6 +113,7 @@ export const chapterMotifs = {
   case03: { wave: "sawtooth", lift: 620, impact: 1.12 },
   case04: { wave: "square", lift: 220, impact: 1.18 },
   case05: { wave: "triangle", lift: 480, impact: 1.24 },
+  case06: { wave: "sine", lift: 392, impact: 1.12 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 
@@ -122,8 +123,7 @@ export const speakerMotifs = {
   "도윤하": { wave: "sine", semitones: 3, pulse: 1.08 },
   "오진우": { wave: "sawtooth", semitones: -5, pulse: 1.14 },
   "에코": { wave: "square", semitones: 7, pulse: 0.9 },
-  "반재현": { wave: "sawtooth", semitones: -7, pulse: 1.18 },
-  "윤서": { wave: "triangle", semitones: 5, pulse: 0.96 },
+  "이민서": { wave: "triangle", semitones: 5, pulse: 0.96 },
 };
 
 export const originMotifs = {

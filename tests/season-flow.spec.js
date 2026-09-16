@@ -21,7 +21,7 @@ async function startDebugNode(page, caseId, nodeId) {
   });
 }
 
-test("case 05 browser flow can unlock and open the final case", async ({ page }) => {
+test("case 06 browser flow can unlock and open the final case", async ({ page }) => {
   test.setTimeout(180_000);
   const dialogMessages = [];
   page.on("dialog", (dialog) => {
@@ -29,7 +29,7 @@ test("case 05 browser flow can unlock and open the final case", async ({ page })
     dialog.accept();
   });
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case05", "c5_aftershock");
+  await startDebugNode(page, "case06", "c6_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");
@@ -121,9 +121,9 @@ test("the complete season can progress from case 01 to the final ending", async 
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");
 
-  for (let caseIndex = 0; caseIndex < 6; caseIndex += 1) {
+  for (let caseIndex = 0; caseIndex < 7; caseIndex += 1) {
     await completeCurrentCase(page);
-    if (caseIndex < 5) {
+    if (caseIndex < 6) {
       const nextCaseButton = page.locator(".next-case-panel button");
       await expect(nextCaseButton).toBeVisible();
       await nextCaseButton.evaluate((button) => button.click());

@@ -71,7 +71,9 @@ const fileBudgets = {
   // describing surfaces that were deleted, in some cases two refactors ago.
   // 1410 / 29200 -> 1430 / 29900 on 2026-09-15: the ending sequence's frame,
   // beat card and witness cards moved onto the glass surfaces.
-  "extensions.css": { lines: 1430, bytes: 29900 },
+  // 1430 / 29900 -> 1370 / 28700 on 2026-09-16 when the chapter dashboard, the
+  // choice panel and the decision dock lost the last rules that named them.
+  "extensions.css": { lines: 1370, bytes: 28700 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -109,12 +111,12 @@ const fileBudgets = {
   // which every scene had carried since the graph was written and which had
   // never reached the DOM, so the briefing explained the table and not the
   // situation. One 11px row; the phone table still fits all 149 scenes.
-  "play.css": { lines: 3080, bytes: 63200 },
+  "play.css": { lines: 3070, bytes: 63000 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
   "relics.css": { lines: 465, bytes: 9510 },
-  "responsive.css": { lines: 225, bytes: 5100 },
+  "responsive.css": { lines: 200, bytes: 4700 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -123,7 +125,10 @@ const fileBudgets = {
   // 1750 / 43100 -> 1772 / 43650 on 2026-09-16: the next-case panel says which
   // building the season moves to and why, from the `operatorBriefs` table that
   // had been written and never read.
-  "result.css": { lines: 1772, bytes: 43650 },
+  // 1772 / 43650 -> 1815 / 44800 on 2026-09-16 for the 막간 panel: the beat
+  // between two cases, with a mood tint, on the report's only unpressured
+  // screen. Six cases in one register was the state this panel exists to break.
+  "result.css": { lines: 1815, bytes: 44800 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

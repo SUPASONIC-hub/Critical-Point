@@ -1767,3 +1767,44 @@
     animation: none;
   }
 }
+
+/* 막간. The season's only unpressured screen: no numbers, no button, a quiet
+   ground and one mood tint so the six cases do not read as one long siren. */
+.interlude-panel {
+  display: grid;
+  gap: 8px;
+  padding: clamp(18px, 2.2vw, 26px);
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-left: 3px solid var(--interlude-tint, var(--ui-line-strong));
+  border-radius: var(--ui-radius-lg);
+}
+
+.interlude-panel span {
+  color: var(--interlude-tint, var(--ui-text-3));
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.interlude-panel h2 {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: clamp(17px, 1.9vw, 21px);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.interlude-panel p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.interlude-panel.mood-warm { --interlude-tint: #f0b968; }
+.interlude-panel.mood-quiet { --interlude-tint: #8fb8d8; }
+.interlude-panel.mood-wry { --interlude-tint: #9fd6a8; }
+.interlude-panel.mood-grief { --interlude-tint: #d89ab0; }
+.interlude-panel.mood-still { --interlude-tint: #a9a4c4; }

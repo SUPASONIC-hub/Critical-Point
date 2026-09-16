@@ -793,14 +793,6 @@
   .season-goal-strip > span {
     grid-column: 1 / -1;
   }
-  .chapter-dashboard {
-    margin-left: -2px;
-    margin-right: -2px;
-  }
-  .choice-panel {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
   .ending-scene-profile {
     margin-left: 0;
     margin-right: 0;
@@ -853,42 +845,6 @@
     margin-left: 0;
     margin-right: 0;
   }
-}
-.chapter-dashboard {
-  display: grid;
-  gap: 10px;
-  margin: 14px 0;
-  padding: 14px 16px;
-  background: #10241f;
-  color: #fff;
-  border-left: 5px solid var(--chapter-accent, #d9ff62);
-  border-radius: 7px;
-}
-.chapter-dashboard > div:first-child {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-.chapter-dashboard span,
-.chapter-dashboard > div:first-child strong {
-  color: var(--chapter-accent, #d9ff62);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-}
-.chapter-dashboard > div:first-child strong {
-  font-size: 18px;
-  letter-spacing: 0;
-}
-.chapter-dashboard p {
-  margin: 0;
-  color: #d5e1d8;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.chapter-dashboard p strong {
-  color: #e9f5b4;
 }
 .delayed-consequence-strip {
   display: flex;
@@ -1010,10 +966,6 @@
   color: var(--c-acid);
 }
 @media (max-width: 700px) {
-  .chapter-dashboard > div:first-child {
-    display: grid;
-    gap: 5px;
-  }
   .delayed-consequence-strip {
     display: grid;
     gap: 4px;
@@ -1334,12 +1286,6 @@
   margin: 8px 0 0;
   font-size: 11px;
 }
-.authority-action button[aria-disabled="true"] {
-  color: #d5e1d8;
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.28);
-  cursor: not-allowed;
-}
 .ending-shell,
 .ending-shell *,
 .ending-sequence,
@@ -1363,9 +1309,6 @@
   color: var(--c-ink-muted);
 }
 .ending-axis-panel .panel-title-row span {
-  color: var(--c-line-soft);
-}
-.decision-dock > div:first-child > span {
   color: var(--c-line-soft);
 }
 .debug-overlay {
@@ -1419,7 +1362,4 @@
   /* The quick-confirm dock existed because the commit console was buried in the
      choice list. With the console fixed to the viewport they are the same bar in
      the same place, and the dock was landing on top of the confirm button. */
-  .decision-dock {
-    display: none;
-  }
 }

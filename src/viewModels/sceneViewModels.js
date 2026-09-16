@@ -21,40 +21,6 @@ export function createSpeakerProfile({ node }) {
   };
 }
 
-export function createPressureCascade({ log, resources, riskPressure }) {
-  const latest = log.at(-1);
-  const humanCost = resources.humanCost ?? 0;
-  const fatigue = resources.fatigue ?? 0;
-  const pressure = riskPressure;
-  if (pressure >= 72 || humanCost >= 28) {
-    return {
-      tone: "critical",
-      label: "PRESSURE CASCADE",
-      title: "숫자로 막던 문제가 사람의 반응으로 새고 있습니다.",
-      text: "다음 선택은 자원 하나만 움직이지 않습니다. 침묵한 사람, 떠날 사람, 기록을 들고 있는 사람이 동시에 반응합니다.",
-      cue: "가장 큰 성과보다 피해가 어디로 이동하는지 먼저 말해야 합니다.",
-    };
-  }
-  if (pressure >= 48 || fatigue >= 32) {
-    return {
-      tone: "unstable",
-      label: "AFTERSHOCK",
-      title: "직전 판단의 비용이 아직 회의실에 남아 있습니다.",
-      text: "다음 결론을 서두르면 방금 줄인 비용이 다른 이해관계자에게 옮겨갈 수 있습니다.",
-      cue: latest?.challenge?.matched
-        ? "챌린지를 맞혔어도, 남겨둔 비용까지 사라진 것은 아닙니다."
-        : "이번 장면은 정답보다 비용의 이동 경로를 확인해야 합니다.",
-    };
-  }
-  return {
-    tone: "stable",
-    label: "LOW SIGNAL",
-    title: "아직 방향을 바꿀 여지가 있습니다.",
-    text: "압박이 낮을 때는 빠른 결론보다 다음 사건에 남길 기준을 설계할 수 있습니다.",
-    cue: "지금 남기는 문장이 다음 장면의 출발점이 됩니다.",
-  };
-}
-
 export function createAuthorityState({ evidence, legitimacy, operatorOrigin, trust }) {
   const level = getAuthorityLevel({ clueCount: evidence, legitimacy, trust });
   const authorityProfile = getAuthorityProfile(operatorOrigin, level);
@@ -169,27 +135,4 @@ export function createSceneChallenge({ freeChoice, freeTextCombo, inheritedChall
             title: "숨은 비용 찾기",
             text: "가장 좋아 보이는 선택의 반대 비용을 확인하고 고릅니다.",
           });
-}
-
-export function createQuestSteps({ challengeClearCount, currentChallengeStreak, freeTextCombo, log, reducedRiskCount }) {
-  return [
-  {
-    title: "장면 챌린지",
-    value: `${challengeClearCount}/${Math.max(1, log.length)}`,
-    text: currentChallengeStreak > 0 ? `${currentChallengeStreak}연속 유지 중` : "이번 장면에서 다시 시작",
-    complete: currentChallengeStreak > 0,
-  },
-  {
-    title: "위험 압력 제어",
-    value: `${reducedRiskCount}`,
-    text: reducedRiskCount > 0 ? "하락 선택 기록됨" : "위험 하락 선택을 찾아야 함",
-    complete: reducedRiskCount > 0,
-  },
-  {
-    title: "판 바꾸기",
-    value: `${freeTextCombo}`,
-    text: freeTextCombo > 0 ? "선택지 밖 계획이 남음" : "구조 재설계 미사용",
-    complete: freeTextCombo > 0,
-  },
-  ];
 }

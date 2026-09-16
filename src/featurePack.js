@@ -1,35 +1,6 @@
-export function getEvidenceRepairPuzzle(clues = [], repaired = false) {
-  if (clues.length < 2) return null;
-  const source = clues.slice(-3).map((clue) => clue.title ?? clue.label ?? "UNKNOWN RECORD");
-  return {
-    title: repaired ? "EVIDENCE REPAIRED" : "EVIDENCE RECOVERY",
-    source,
-    repaired,
-    prompt: repaired ? "원본 타임라인이 복구되어 가설 비교에 사용할 수 있습니다." : "서로 충돌하는 기록 중 같은 시각과 출처를 가진 조각을 찾아 원본을 복구하세요.",
-    reward: { legitimacy: 3, trust: 2 },
-  };
-}
+import { CASE_SEQUENCE } from "./gameCases.js";
 
-export function getRivalIntervention({ log = [], resources = {}, caseId = "case01" } = {}) {
-  const pressure = Number(resources.fatigue ?? 0) + Math.max(0, 50 - Number(resources.trust ?? 50));
-  const active = pressure >= 35 || log.length >= 3;
-  return {
-    caseId,
-    active,
-    title: active ? "RIVAL INTERVENTION" : "RIVAL WATCH",
-    text: active ? "라이벌이 다음 공개 순서를 선점하려 합니다. 먼저 검증할 증거를 선택하세요." : "라이벌은 아직 관찰 중입니다. 다음 선택이 개입 시점을 결정합니다.",
-    options: active ? [{ id: "counter-proof", label: "증거 선점", effect: { legitimacy: 2, fatigue: 2 } }, { id: "counter-people", label: "증언 보호", effect: { trust: 3, time: -1 } }] : [],
-  };
-}
 
-export function getChapterTransitionBridge(previousCaseId, currentCaseId, previousResult = {}) {
-  if (!previousCaseId || previousCaseId === currentCaseId) return null;
-  return {
-    label: "TRANSFER RECORD",
-    title: `${previousCaseId.toUpperCase()} → ${currentCaseId.toUpperCase()}`,
-    text: `이전 사건의 ${previousResult.outcomeChoiceId ?? "미확정 결과"}가 다음 조직의 권한 검토 자료로 이관되었습니다. 장소가 바뀌어도 같은 기록의 책임이 이어집니다.`,
-  };
-}
 
 export function getOperatorReveal({ origin = "courier", completedCases = [] } = {}) {
   const count = completedCases.length;
@@ -64,7 +35,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "quiet-cover":
       "위험 곡선은 끝까지 평평했습니다. 무너진 것도 드러난 것도 없고, 'activation_use_cases' 폴더는 다시 잠겼습니다. 다음 플레이의 첫 단서는 당신이 열지 않은 문 뒤에 그대로 있습니다.",
     collapse:
-      "여섯 사건 중 셋이 정상화되지 못한 채 닫혔습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다. 다만 붕괴한 시스템의 잔해 속에서 다음 분석관에게만 보이는 복구 키 하나가 켜져 있습니다.",
+      "일곱 사건 중 셋이 정상화되지 못한 채 닫혔습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다. 다만 붕괴한 시스템의 잔해 속에서 다음 분석관에게만 보이는 복구 키 하나가 켜져 있습니다.",
   };
   return (
     epilogues[endingId] ||
@@ -73,10 +44,12 @@ export function getEndingEpilogue(endingId = "open-question") {
 }
 
 export function getAchievementProgress({ log = [], completedCases = [], caseResults = {} } = {}) {
+  // The two season-shaped goals read the sequence, so a new case cannot leave a
+  // badge that says 6/6 while the season has seven cases in it.
   return [
     { id: "people-first", label: "PEOPLE FIRST", value: log.filter((entry) => /protect|people|witness|person/.test(entry.choiceId ?? "")).length, goal: 3 },
-    { id: "full-audit", label: "FULL AUDIT", value: Object.keys(caseResults).length, goal: 6 },
-    { id: "route-keeper", label: "ROUTE KEEPER", value: completedCases.length, goal: 5 },
+    { id: "full-audit", label: "FULL AUDIT", value: Object.keys(caseResults).length, goal: CASE_SEQUENCE.length },
+    { id: "route-keeper", label: "ROUTE KEEPER", value: completedCases.length, goal: CASE_SEQUENCE.length - 1 },
   ].map((item) => ({ ...item, unlocked: item.value >= item.goal }));
 }
 

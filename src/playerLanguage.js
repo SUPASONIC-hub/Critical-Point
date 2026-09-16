@@ -100,8 +100,3 @@ export const easyCognitionLabels = {
   risk: "위험 다루기",
 };
 
-export const easyRiskLabels = {
-  CONTROLLED: "관리 가능",
-  UNSTABLE: "불안정",
-  CRITICAL: "매우 위험",
-};
