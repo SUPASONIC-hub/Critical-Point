@@ -121,6 +121,7 @@ import { useStableEvent } from "./state/useStableEvent.js";
 import { useCaseSystems } from "./state/useCaseSystems.js";
 import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
+import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { safeStringify } from "./state/diagnosticUtils.js";
 import { getEndingEpilogue } from "./featurePack.js";
@@ -532,7 +533,21 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
   const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
-  const saveCurrentGame = persistenceSaveCurrentGame;
+  const suspension = useWindowSuspension({
+    active: started && !isResult && !staleSave,
+    getRun: () => gauntletRun,
+    commitRun: (run) => {
+      setGauntletRun(run);
+      persist({ dynamics: serializeRunState(run) });
+    },
+  });
+  // Leaving on purpose keeps the table as it stands; see useWindowSuspension.
+  function saveCurrentGame(options = {}) {
+    const suspendedRun = options.exit ? suspension.suspendNow() : null;
+    if (!suspendedRun) return persistenceSaveCurrentGame(options);
+    setGauntletRun(suspendedRun);
+    return persistenceSaveCurrentGame({ ...options, dynamics: serializeRunState(suspendedRun) });
+  }
   const refreshLocalErrorLog = persistenceRefreshLocalErrorLog;
   const refreshSaveSlots = persistenceRefreshSaveSlots;
   const dismissRecoveryNotice = persistenceDismissRecoveryNotice;
@@ -942,7 +957,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   function markWindowTouched(openSeed, cardId = null) {
     if (staleSave) return;
-    const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId });
+    // Touching a window is also the end of any suspension it was resumed from.
+    const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId, suspended: null });
     setGauntletRun(touchedRun);
     persist({ dynamics: serializeRunState(touchedRun) });
   }
@@ -1789,6 +1805,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
   });
-  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, reloadFromStorage, updateFreeText, anonymizeFreeText, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
+  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, updateFreeText, anonymizeFreeText, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
 
 }

@@ -11,8 +11,8 @@ const TICK_BATCH_SECONDS = 0.1;
  * The clock stops while the tab is hidden and while `paused` -- the protocol
  * breach is on screen, or the runtime is already advancing.
  */
-export function useGauntletWindow({ schema, seed, paused, abandoned = false, beatCombo = 0 }) {
-  const [window_, dispatch] = useReducer(reduceWindow, { schema, seed, abandoned, beatCombo }, createWindow);
+export function useGauntletWindow({ schema, seed, paused, abandoned = false, beatCombo = 0, resume = null }) {
+  const [window_, dispatch] = useReducer(reduceWindow, { schema, seed, abandoned, beatCombo, resume }, createWindow);
   const live = window_.status === "live";
 
   useEffect(() => {

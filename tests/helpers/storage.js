@@ -5,7 +5,7 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   errorLog: "trigger-prototype-error-log-v1",
   recoveryCenter: "critical-point-recovery-center-v1",
   saveSlots: "trigger-prototype-save-slots-v1",
-  localRanking: "critical-point-local-ranking-v1",
+  localRanking: "critical-point-local-ranking-v2",
   relicCodex: "critical-point-relic-codex-v1",
   nextParticipantMessage: "critical-point-next-participant-message",
   forceRenderError: "critical-point-force-render-error",
@@ -13,6 +13,9 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   telemetryKey: "critical-point-telemetry-key",
   musicEnabled: "critical-point-music-enabled",
   musicVolume: "critical-point-music-volume",
+  cloudCode: "critical-point-cloud-code-v1",
+  cloudSync: "critical-point-cloud-sync-v1",
+  settledWindows: "critical-point-settled-windows-v1",
 });
 
 export async function clearGameStorage(page) {

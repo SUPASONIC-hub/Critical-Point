@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
+import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
@@ -189,6 +190,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   </a>
                 </div>
               )}
+              <CloudSavePanel />
               <dl className="intro-stats">
                 <div>
                   <dt>사건</dt>

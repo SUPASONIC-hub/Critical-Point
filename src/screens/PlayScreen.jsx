@@ -27,7 +27,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: viewCopyReplayLink, copyDiagnosticTrace: viewCopyDiagnosticTrace },
   } = view;
   const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
-  const saveCurrentGame = actions.saveCurrentGame ?? viewSaveCurrentGame; const resolveGauntlet = actions.resolveGauntlet ?? viewResolveGauntlet; const markWindowTouched = actions.markWindowTouched ?? viewMarkWindowTouched; const reloadFromStorage = actions.reloadFromStorage ?? viewReloadFromStorage; const pickRelic = actions.pickRelic;
+  const saveCurrentGame = actions.saveCurrentGame ?? viewSaveCurrentGame; const resolveGauntlet = actions.resolveGauntlet ?? viewResolveGauntlet; const markWindowTouched = actions.markWindowTouched ?? viewMarkWindowTouched; const reloadFromStorage = actions.reloadFromStorage ?? viewReloadFromStorage; const pickRelic = actions.pickRelic; const onSuspendable = actions.onSuspendable ?? null;
   const updateFreeText = actions.updateFreeText ?? viewUpdateFreeText; const anonymizeFreeText = actions.anonymizeFreeText ?? viewAnonymizeFreeText; const reset = actions.reset ?? viewReset; const copyReplayLink = actions.copyReplayLink ?? viewCopyReplayLink; const copyDiagnosticTrace = actions.copyDiagnosticTrace ?? viewCopyDiagnosticTrace;
   const titleRef = sceneTitleRef ?? viewSceneTitleRef;
 
@@ -45,12 +45,8 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         simplify={simplifyPlayerText}
         sceneTitleRef={titleRef}
         onSave={() => saveCurrentGame()}
-        onSaveAndExit={() => {
-          // Leaving with a bet on the table settles it as a bust on resume; say so first.
-          const betPlaced = gauntletRun.openSeed?.startsWith(`${gauntletSeed}#`);
-          if (betPlaced && typeof globalThis.confirm === "function" && !globalThis.confirm("걸어 둔 판을 두고 나가면 BUST로 처리됩니다. 나갈까요?")) return;
-          saveCurrentGame({ exit: true });
-        }}
+        // Leaving on purpose keeps a bet on the table exactly as it stands.
+        onSaveAndExit={() => saveCurrentGame({ exit: true })}
         onReset={reset}
         caseNumber={Math.max(1, CASE_SEQUENCE.indexOf(currentCase) + 1)}
         caseTotal={CASE_SEQUENCE.length}
@@ -69,7 +65,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         isAdvancing={isAdvancing}
         revealOpen={decisionRevealOpen}
         onResolve={resolveGauntlet}
-        onTouch={markWindowTouched} onPickRelic={pickRelic}
+        onTouch={markWindowTouched} onPickRelic={pickRelic} onSuspendable={onSuspendable}
         staleSave={staleSave}
         onReload={reloadFromStorage}
         freeInput={{

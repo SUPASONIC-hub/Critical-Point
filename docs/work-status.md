@@ -188,10 +188,13 @@ list of the files it touched.
     window another tab holds) and locks the table instead. A newer revision on
     its own is not a conflict -- a tab that only opened the game must not lock
     the one playing. A touched window is saved as `<seed>#<tab token>`, the
-    token lives in sessionStorage, so a reload of the betting tab settles the
-    bet as a bust at once while a different tab is asked first
-    (`table-held-elsewhere`). Settled seeds are also recorded outside the save,
-    so a rolled-back save deals a fresh wall.
+    token lives in sessionStorage, so a touched window found in the save with no
+    suspension beside it settles as a bust at once while a different tab is
+    asked first (`table-held-elsewhere`). Since priority 58 the page going away
+    writes a suspension first, so a reload of a *live* table keeps it; a table
+    that already hit its wall is never suspended, so nothing here can undo one.
+    Settled seeds are also recorded outside the save, so a rolled-back save
+    deals a fresh wall.
 36. A recovery slot rolls back the story, not the table. `restoreSaveSlot`
     passes the slot through `carryTableRecordIntoRestore`: busts settled since
     the slot stay in the log, the pot they wiped stays wiped, the board they
@@ -624,3 +627,57 @@ the live database when a migration fixes a runtime error.
     the test unlock is `CASE_SEQUENCE` minus the finale, and the echoes are the
     `caseIntroEchoes` table. `raise-choice-gains.mjs` had also stopped listing
     cases at 05.
+
+58. A table can be put down. Ten cases do not fit in one sitting, and a touched
+    window used to settle as a bust whenever the run came back without it -- a
+    phone reclaiming a background tab counted. Now leaving on purpose
+    (`저장 후 나가기`), the page going to the background, or `pagehide` writes the
+    live window's progress into the run as `dynamics.suspended`
+    (`useWindowSuspension`), and the stage deals the same seed on return with
+    that progress on top (`createWindow({ resume })`). What keeps it honest:
+    - The wall and the tell are dealt from the seed again and never read from
+      the save; `resumeWindow` clamps progress under the wall and the clock.
+    - Only a live window is suspended. A bust is closed the moment it happens,
+      so there is nothing to suspend and a reload still settles it.
+    - A snapshot taken because the page was hidden is cleared the instant the
+      page is visible again, before input can reach the table, so "hide, push
+      into the wall, reload" has nothing to reload into.
+    - A suspension carries the run's `windowIndex` and is dropped by
+      `normalizeRunState` once that window settles; the stage clears it on its
+      first hold write.
+    The exit confirm that warned a bet would bust is gone. `save-resume.spec.js`
+    holds the exit path and the reload path; `unit-tests.mjs` holds the tamper
+    and staleness cases.
+
+59. Saves follow the player, device first. `writeSaveState` fires
+    `SAVE_WRITTEN_EVENT` after every write that reached storage;
+    `src/cloudSave.js` (loaded by the intro shell, so no scene graph) marks the
+    save pending and uploads it a few seconds later when online, on the
+    `online` event, on a 30s retry, or on the next launch. The copy is filed
+    under a 12-symbol continuation code (no 0/O/1/I; 60 bits) shown in the
+    folded `다른 기기에서 이어하기` panel under the intro's primary action
+    (`CloudSavePanel`), with the settled-window seeds alongside so a loaded save
+    cannot replay a wall this device has seen. Loading a code writes the save
+    paused, merges the seeds and adopts the code, so both devices share one
+    copy; 이어하기 is still the player's own click. The server refuses an
+    upload older than what it holds, which the panel reports as a conflict with
+    "더 최근 저장 불러오기". Supabase not configured means device-only, said
+    plainly in the panel.
+
+60. The database follows the season. Migration
+    `20260916000000_ten_case_season_cloud_saves.sql` replaced every hand-kept
+    case list (three insert policies, three branches of
+    `validate_telemetry_insert`) with `is_season_case_id()`, which accepts any
+    `caseNN`: the live database had been refusing every case, feedback and
+    error row from 사건 06 on since 사건 06 existed. It added `cloud_saves`
+    (RLS on, no grants) behind `put_cloud_save` / `get_cloud_save`, security
+    definer, keyed by the code's SHA-256, 1.5MB cap. And it deleted the four
+    `season-final` rows so the ranking starts over on the ten-case season;
+    per-case telemetry was kept. The local board moved to
+    `critical-point-local-ranking-v2` and removes v1 on first read. Verified
+    against the live project with the anon key: the two functions work, the
+    table itself is refused, `public_rankings` is empty.
+
+61. The 10-case season walk in `season-flow.spec.js` has 300s, not 180s: at
+    ten cases it takes 2.7 minutes alone on the development machine, the same
+    on the commit before this pass, and ran out under a parallel suite.

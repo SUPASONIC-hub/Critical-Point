@@ -149,6 +149,7 @@ export function GauntletStage({
   onResolve,
   onTouch,
   onPickRelic,
+  onSuspendable = null,
   staleSave = false,
   onReload,
   freeInput,
@@ -162,7 +163,10 @@ export function GauntletStage({
   // the bet settles as a bust at once. If another tab holds it, that tab may
   // still be playing: ask before this tab takes the window and busts the bet.
   const [hold] = useState(() => splitOpenSeed(run?.openSeed));
-  const abandoned = hold.seed === seed;
+  // A window the player put down on purpose comes back as it stood, whichever
+  // tab or device picks it up; see useWindowSuspension.
+  const [resume] = useState(() => (run?.suspended?.seed === seed ? run.suspended.window : null));
+  const abandoned = hold.seed === seed && !resume;
   const heldByOtherTab = abandoned && hold.token !== tabToken;
   const [claimed, setClaimed] = useState(!heldByOtherTab);
   // Another tab settled this window or took hold of it. This table stops: no
@@ -209,7 +213,7 @@ export function GauntletStage({
   const [openedSeed, setOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
   const paused = breachOpen || hidden || draftOpen || !tableOpen;
-  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0 });
+  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0, resume });
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
 
@@ -322,6 +326,12 @@ export function GauntletStage({
     touchedRef.current = touchedCardId;
     onTouch?.(`${seed}#${tabToken}`, touchedCardId);
   }, [abandoned, onTouch, seed, tabToken, touched, touchedCardId, win.status]);
+
+  // What the runtime saves if the player leaves now: a touched, live window.
+  useEffect(() => {
+    onSuspendable?.(touched && live && !abandoned && !locked ? { seed, window: win } : null);
+  });
+  useEffect(() => () => onSuspendable?.(null), [onSuspendable]);
 
   // Taking a held window is a write of its own, before the settle: the other
   // tab sees the hold change and locks rather than cashing into a window that

@@ -63,7 +63,10 @@ const fileBudgets = {
   // card grid and phone rail, and a ranking screen with its own podium rows.
   // The dossier's "square everything" reset went; rounded surfaces now come
   // from the shared --ui-* tokens rather than per-rule literals.
-  "base-intro-ranking.css": { lines: 2460, bytes: 58400 },
+  // 2460 / 58400 -> 2540 / 60000 on 2026-09-16 for the folded 기기 간 이어하기
+  // panel under the intro's primary action (the continuation code, its status
+  // line and the load form).
+  "base-intro-ranking.css": { lines: 2540, bytes: 60000 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came

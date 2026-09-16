@@ -83,9 +83,12 @@ const BUDGETS = {
   // 1850 / 148 -> 1800 / 149 on 2026-09-16: the case intro lines left the body
   // as the `caseIntroEchoes` table (a ternary chain that had stopped at 사건 06),
   // and the unreachable second save-suppression flag went with them.
+  // 1800 / 149 -> 1815 / 150 the same day for leaving a table on purpose: the
+  // exit save hands the suspended window to the persistence hook, and the
+  // visibility and pagehide handling lives in `useWindowSuspension`, not here.
   "src/GameRuntime.jsx": {
-    lines: 1800,
-    importedNames: 149,
+    lines: 1815,
+    importedNames: 150,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {

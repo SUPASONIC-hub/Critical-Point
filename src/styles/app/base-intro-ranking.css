@@ -765,6 +765,82 @@ summary:focus-visible {
   outline-offset: 3px;
   border-radius: 4px;
 }
+/* 기기 간 이어하기: one folded line under the primary action. */
+.cloud-save-panel {
+  width: min(100%, 580px);
+  margin: 12px 0 0;
+  color: var(--ui-text-2);
+  font-size: 14px;
+}
+.cloud-save-panel summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ui-text);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 6px;
+}
+.cloud-save-panel[open] {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+}
+.cloud-save-panel p {
+  margin: 0;
+  line-height: 1.55;
+}
+.cloud-save-code,
+.cloud-save-load div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.cloud-save-code span,
+.cloud-save-load label {
+  color: var(--ui-text-3);
+  font-size: 12.5px;
+}
+.cloud-save-code strong {
+  color: var(--ui-text);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+.cloud-save-load {
+  display: grid;
+  gap: 6px;
+}
+.cloud-save-load input {
+  flex: 1 1 180px;
+  min-width: 0;
+  min-height: 44px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cloud-save-panel button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}
+.cloud-save-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cloud-save-status {
+  color: var(--ui-text-2);
+}
+.cloud-save-message {
+  color: var(--ui-heat);
+}
 .intro-stats {
   display: flex;
   flex-wrap: wrap;

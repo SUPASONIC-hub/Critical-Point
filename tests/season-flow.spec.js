@@ -116,7 +116,9 @@ test("the table shows the bet on every card and never a forecast of the next pus
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
-  test.setTimeout(180_000);
+  // Ten cases played scene by scene. 180s was set for eight and ran out under a
+  // parallel suite once the season grew.
+  test.setTimeout(300_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");
@@ -1471,7 +1473,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v1") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v2") || "[]").length))
     .toBeGreaterThan(0);
 });
 

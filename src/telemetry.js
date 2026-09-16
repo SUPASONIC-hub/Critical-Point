@@ -160,6 +160,18 @@ export async function checkTelemetryHealth() {
   };
 }
 
+/** One call to a Postgres function exposed through PostgREST. */
+export async function callSupabaseRpc(name, body = {}) {
+  if (!telemetryEnabled) return { skipped: true, data: null };
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: restHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw await createTelemetryError(response, `${name} failed`);
+  return { data: await response.json() };
+}
+
 export async function fetchLeaderboard(limit = 100) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 

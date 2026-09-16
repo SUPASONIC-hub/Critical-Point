@@ -448,7 +448,7 @@ export function drawTellOffset(seed) {
   return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * TELL_ERROR);
 }
 
-export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, beatCombo = 0 } = {}) {
+export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, beatCombo = 0, resume = null } = {}) {
   const normalized = normalizeSchema(schema);
   const carriedCombo = clamp(Math.trunc(Number(beatCombo) || 0), 0, 999);
   const window = {
@@ -481,11 +481,61 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     lastGrade: null,
     lastFocusGrade: null,
   };
+  // A window the player put down on purpose -- saved and left, or hid the tab --
+  // picks up exactly where it stood. The wall and the tell are dealt from the
+  // seed again, never read from the save, so a suspended window cannot carry a
+  // different wall in with it; only the player's own progress is restored.
+  if (resume) return resumeWindow(window, resume);
   // A window the player touched and then walked away from -- a reload, a tab
   // closed mid-bet -- is settled as a bust. Otherwise F5 undoes the wall.
   // The gauge stays where the window opened: an abandoned window must not
   // print the wall it was hiding, or a second tab becomes a way to read it.
   return abandoned ? { ...window, status: "bust", cause: "abandon" } : window;
+}
+
+const SUSPENDED_WINDOW_NUMBERS = [
+  "gauge", "pushes", "lastStep", "elapsed", "beatCombo", "maxCombo", "groove", "beatHits", "perfects", "slips",
+  "focus", "focusCombo", "maxFocusCombo", "focusHits", "focusPerfects", "focusMisses",
+];
+
+/**
+ * The part of a live window worth keeping when the player puts it down: their
+ * progress, never the wall. Tied to the run's window index, so a suspension
+ * left in a save stops meaning anything the moment that window settles.
+ */
+function normalizeSuspendedWindow(value, windowIndex) {
+  if (!value || typeof value !== "object" || typeof value.seed !== "string" || !value.seed) return null;
+  if (Number(value.windowIndex) !== windowIndex) return null;
+  const source = value.window && typeof value.window === "object" ? value.window : {};
+  const window = {};
+  for (const key of SUSPENDED_WINDOW_NUMBERS) {
+    const numeric = Number(source[key]);
+    if (Number.isFinite(numeric)) window[key] = numeric;
+  }
+  window.selectedId = typeof source.selectedId === "string" ? source.selectedId.slice(0, 200) : null;
+  window.focusMode = normalizeFocusMode(source.focusMode);
+  return { seed: value.seed.slice(0, 200), windowIndex, window };
+}
+
+/** What `normalizeSuspendedWindow` keeps of a live window, ready to save. */
+export function suspendWindow(window, windowIndex) {
+  if (!window || window.status !== "live") return null;
+  return normalizeSuspendedWindow({ seed: window.seed, windowIndex, window }, windowIndex);
+}
+
+function resumeWindow(window, resume) {
+  const restored = { ...window };
+  for (const key of SUSPENDED_WINDOW_NUMBERS) {
+    if (Number.isFinite(resume[key])) restored[key] = Math.max(0, resume[key]);
+  }
+  restored.pushes = Math.trunc(restored.pushes);
+  // Progress is clamped under the wall and the clock: a resumed window is always
+  // still live, and the first tick or push decides it the way it would have.
+  restored.gauge = clamp(restored.gauge, 0, Math.max(0, window.wall - 0.01));
+  restored.elapsed = clamp(restored.elapsed, 0, Math.max(0, window.schema.seconds - 0.1));
+  restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
+  restored.focusMode = normalizeFocusMode(resume.focusMode);
+  return restored;
 }
 
 export function getRemainingSeconds(window) {
@@ -602,6 +652,9 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // The card staked in that window, so an abandoned window settles the card the
   // player chose rather than the worst one on the table.
   openCardId: null,
+  // A live window the player put down on purpose, with their progress in it.
+  // See `normalizeSuspendedWindow`.
+  suspended: null,
   // The beat combo carried into the next window, the longest this run has
   // held, and the groove share of the pot and the vault. The ending's vault
   // slack reads the vault without its groove: it rewards reading the table.
@@ -653,6 +706,7 @@ export function normalizeRunState(value) {
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
   run.schema = normalizeSchema(source.schema);
+  run.suspended = normalizeSuspendedWindow(source.suspended, run.windowIndex);
   return run;
 }
 

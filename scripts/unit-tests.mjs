@@ -43,6 +43,7 @@ import {
   drawRelicOffer,
   equipRelic,
   openCaseRun,
+  suspendWindow,
 } from "../src/gauntlet/gauntletEngine.js";
 import {
   DEFAULT_RELIC_POOL,
@@ -1212,4 +1213,48 @@ test("the report names the feeling that woke the thinking", () => {
   assert.equal(getThinkingMotive({ responsibility: 9 }).label, "책임형");
   assert.equal(getThinkingMotive({}).id, "responsibility", "a run with no record falls back to the burden it started with");
   assert.ok(getThinkingMotive({ curiosity: 3 }).path.includes("집념"));
+});
+
+/* ------------------------------------------------------- suspended windows */
+
+test("a window put down on purpose comes back exactly as it stood", () => {
+  let window = createWindow({ schema: BASE_SCHEMA, seed: "suspend-seed" });
+  window = reduceWindow(window, { type: "SELECT", id: "card-a" });
+  window = reduceWindow(window, { type: "TICK", delta: 0.8 });
+  window = reduceWindow(window, { type: "PUSH" });
+  assert.equal(window.status, "live");
+  const run = normalizeRunState({ ...RUN_INITIAL_STATE, windowIndex: 4, suspended: suspendWindow(window, 4) });
+  assert.ok(run.suspended, "the suspension survives the run's normaliser");
+  const resumed = createWindow({ schema: BASE_SCHEMA, seed: "suspend-seed", resume: run.suspended.window });
+  for (const key of ["gauge", "pushes", "elapsed", "selectedId", "wall", "tellOffset"]) {
+    assert.equal(resumed[key], window[key], `${key} is restored`);
+  }
+  assert.deepEqual(reduceWindow(resumed, { type: "PUSH" }).gauge, reduceWindow(window, { type: "PUSH" }).gauge, "the next push lands the same");
+});
+
+test("a suspension cannot carry a wall, a bust or a settled window back in", () => {
+  const window = createWindow({ schema: BASE_SCHEMA, seed: "tamper-seed" });
+  const forged = createWindow({
+    schema: BASE_SCHEMA,
+    seed: "tamper-seed",
+    resume: { gauge: 999, elapsed: 999, pushes: 2, wall: 200, selectedId: null },
+  });
+  assert.equal(forged.wall, window.wall, "the wall is dealt from the seed, never read from the save");
+  assert.equal(forged.status, "live");
+  assert.ok(forged.gauge < forged.wall && forged.elapsed < BASE_SCHEMA.seconds);
+  assert.equal(suspendWindow({ ...window, status: "bust" }, 1), null, "a closed window is not suspended");
+  const stale = normalizeRunState({ ...RUN_INITIAL_STATE, windowIndex: 5, suspended: suspendWindow(window, 4) });
+  assert.equal(stale.suspended, null, "a suspension from an earlier window means nothing once it has settled");
+});
+
+/* ------------------------------------------------------------- cloud saves */
+
+test("a continuation code is twelve unambiguous symbols and reads back from any spelling", async () => {
+  const { createCloudCode, formatCloudCode, normalizeCloudCode } = await import("../src/cloudSave.js");
+  const code = createCloudCode((bytes) => bytes.map((_, index) => index * 37));
+  assert.match(code, /^[23456789A-HJ-NP-Z]{12}$/);
+  assert.equal(formatCloudCode(code).length, 14);
+  assert.equal(normalizeCloudCode(formatCloudCode(code).toLowerCase()), code, "dashes and case do not matter");
+  assert.equal(normalizeCloudCode("ABCD-EFGH-IJKL"), null, "I and O and 0 and 1 are never issued, so they cannot be typed in");
+  assert.equal(normalizeCloudCode("ABCD-EFGH"), null);
 });

@@ -141,12 +141,13 @@ export function useAppPersistence({ state, refs, setters, config }) {
     writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1"); removeStoredValue(debugErrorKey); window.location.reload();
   }
 
-  function saveCurrentGame({ exit = false } = {}) {
+  function saveCurrentGame({ exit = false, dynamics: suspendedDynamics = null } = {}) {
     const nextStarted = exit ? false : started;
     const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
-    const payload = persist({ started: nextStarted, paused: exit, nodeEnteredAt: nextNodeEnteredAt });
+    const payload = persist({ started: nextStarted, paused: exit, nodeEnteredAt: nextNodeEnteredAt, ...(suspendedDynamics ? { dynamics: suspendedDynamics } : {}) });
     if (payload.storageSaved) setLastSavedAt(payload.savedAt);
-    setIsPausedSave(exit); setSaveStatus(payload.storageSaved ? `저장됨 ${formatSaveTime(payload.savedAt)}` : "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+    const savedLine = suspendedDynamics ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
+    setIsPausedSave(exit); setSaveStatus(payload.storageSaved ? savedLine : "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
     if (exit) setStarted(false); else setNodeEnteredAt(nextNodeEnteredAt);
   }
 

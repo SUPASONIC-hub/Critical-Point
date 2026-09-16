@@ -13,6 +13,13 @@ export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-mes
 // error boundary's reload. Both files used to spell the string out for
 // themselves, which is one typo away from a boundary that can never be reset.
 export const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
+// Cloud saves (src/cloudSave.js): this device's continuation code, whether the
+// player turned uploading off, and which local save has reached the server.
+export const CLOUD_SAVE_CODE_KEY = "critical-point-cloud-code-v1";
+export const CLOUD_SAVE_ENABLED_KEY = "critical-point-cloud-enabled-v1";
+export const CLOUD_SAVE_SYNC_KEY = "critical-point-cloud-sync-v1";
+/** Fired on `globalThis` after every save that reached device storage. */
+export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
@@ -224,7 +231,13 @@ export function writeSaveState(payload, { force = false, isAhead = null } = {}) 
   }
   const revision = Math.max(storedRevision, knownSaveRevision) + 1;
   const saved = writeStoredValue(STORAGE_KEY, JSON.stringify({ ...payload, saveRevision: revision }));
-  if (saved) knownSaveRevision = revision;
+  if (saved) {
+    knownSaveRevision = revision;
+    // The device copy is the save; the cloud copy follows it (src/cloudSave.js).
+    if (typeof globalThis.dispatchEvent === "function" && typeof globalThis.CustomEvent === "function") {
+      globalThis.dispatchEvent(new CustomEvent(SAVE_WRITTEN_EVENT, { detail: { savedAt: payload?.savedAt ?? "" } }));
+    }
+  }
   return { saved, stale: false, revision };
 }
 
