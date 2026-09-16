@@ -174,10 +174,11 @@ export function IntroScreen({ view, renderers = {} }) {
                   `.intro p` -- one of build-critical-css.mjs's probes --
                   pointing at a rendered element. */}
               <p>
-                서울, 판단을 연구하는 트리거랩. 당신은 오늘 배치된 신입 전환 분석관이고,
-                케이스데스크에는 &lsquo;훈련용&rsquo;이라는 꼬리표가 붙은 실제 위기 파일 여섯 건이 차례로 열립니다.
-                플로우온의 72시간부터 마지막 밤의 기록 보관소까지, 당신이 오래 붙잡은 조건은
-                다음 사건의 압력이 되어 돌아옵니다.
+                3년 전 당신은 승인 서류 한 장에 혼자 반대 의견을 썼습니다. 대출은 그대로 나갔고,
+                당신은 KD금융그룹 지하의 판단 연구소 트리거랩으로 내려왔습니다. 오늘 케이스데스크에
+                올라온 첫 파일 표지에, 그때 그 대출번호가 지워지지 않고 남아 있습니다. 플로우온의
+                72시간부터 본사 33층의 빈 서명란까지 &mdash; 당신이 오래 붙잡은 조건은 다음 사건의
+                압력이 되어 돌아옵니다.
               </p>
               {hasResumableSave ? (
                 resumePanel

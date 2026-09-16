@@ -1,26 +1,26 @@
 const operatorProfiles = {
   courier: {
     id: "courier",
-    label: "FIELD COURIER",
-    title: "현장 배송망 출신 분석관",
-    authority: "현장 기록을 가장 먼저 보고, 사람에게 사실을 전달할 권한",
-    premise: "배송 지연과 파손 기록에서 시스템의 첫 번째 균열을 발견했습니다.",
+    label: "BRANCH DESK",
+    title: "지점 창구 출신 분석관",
+    authority: "현장 기록을 가장 먼저 보고, 고객에게 사실을 직접 전달할 권한",
+    premise: "창구에서 판 대출이 어떻게 끝나는지를 끝까지 본 사람이 몇 없었습니다. 당신이 그중 하나입니다.",
     permissions: ["현장 기록 열람", "당사자 인터뷰", "긴급 전달 요청"],
   },
   lab: {
     id: "lab",
-    label: "TRIGGER LAB",
-    title: "트리거랩 파견 분석관",
-    authority: "실험 기준과 검증 절차를 조정할 권한",
-    premise: "배송망의 이상 징후를 검증하기 위해 트리거랩이 직접 파견했습니다.",
-    permissions: ["실험 로그 열람", "검증 기준 제안", "보호 명부 요청"],
+    label: "CREDIT REVIEW",
+    title: "기업대출심사팀 출신 분석관",
+    authority: "심사 기준과 검증 절차를 조정할 권한",
+    premise: "승인 서류에 반대 의견을 한 줄 쓴 대가로 이 지하 분석실에 배치됐습니다.",
+    permissions: ["심사 기록 열람", "검증 기준 제안", "보호 명부 요청"],
   },
   public: {
     id: "public",
     label: "PUBLIC AUDITOR",
-    title: "독립 공익 감사관",
+    title: "금융감독 출신 파견 분석관",
     authority: "기록의 공개 범위와 피해 보호 순서를 조정할 권한",
-    premise: "외부 검증 요청을 받아 회사와 실험실 사이의 기록을 대조합니다.",
+    premise: "감독기관에서 이 그룹을 검사하다가, 그룹 안으로 자리를 옮겨 같은 기록을 다시 봅니다.",
     permissions: ["공개 범위 제안", "외부 검증 요청", "책임 기록 보존"],
   },
 };
@@ -172,9 +172,9 @@ export function getPastRunMemory(memory = {}) {
 
 export function getOriginPrologue(origin = "courier") {
   const profiles = {
-    courier: { title: "첫 번째 배송이 멈춘 밤", text: "당신은 배송 지연표의 작은 오차에서 시작했습니다. 누구도 문제라고 부르지 않은 기록이 첫 번째 권한을 열었습니다." },
-    lab: { title: "검증 요청서가 도착한 밤", text: "당신은 트리거랩의 검증 요청을 받고 파견되었습니다. 실험실은 답을 원하지만, 당신은 질문의 출처부터 확인해야 합니다." },
-    public: { title: "외부 감사가 시작된 밤", text: "당신은 외부 감사관으로 기록 사이의 공백을 조사합니다. 공개 권한은 크지만, 보호해야 할 사람도 함께 늘어납니다." },
+    courier: { title: "창구 마감이 늦어진 밤", text: "당신은 창구에서 직접 판 대출이 어떻게 끝나는지를 끝까지 본 사람입니다. 그 기억이 첫 번째 권한을 열었습니다." },
+    lab: { title: "반대 의견을 쓴 밤", text: "당신은 승인 서류에 혼자 반대 의견을 썼고, 다음 인사에서 이 지하로 내려왔습니다. 3년이 지나 같은 번호의 파일이 책상에 올라옵니다." },
+    public: { title: "검사 자료를 덮은 밤", text: "당신은 감독기관에서 이 그룹을 검사하다 안쪽으로 자리를 옮겼습니다. 공개 권한은 크지만, 보호해야 할 사람도 함께 늘어납니다." },
   };
   return profiles[origin] ?? profiles.courier;
 }
@@ -248,7 +248,7 @@ export function getRankingLeague(style = "FIELD DECIDER") {
 }
 
 export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
-  const labels = { courier: "현장 기록의 계승", lab: "검증 프로토콜의 계승", public: "공개 책임의 계승" };
+  const labels = { courier: "현장 기록의 계승", lab: "심사 기준의 계승", public: "공개 책임의 계승" };
   return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
 }
 
