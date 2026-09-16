@@ -134,8 +134,8 @@ list of the files it touched.
     on a 390x844 phone, a Pixel 7, a 1280x720 desktop and a 1366x768 laptop every
     scene fits on every board -- fresh, sealed, overclocked with five relics --
     with its last card staked (`gauntlet-loop.spec.js` holds the densest scenes
-    on each push; `layout-sweep.spec.js` walks all 149 in the weekly full
-    pass). A 360x740 phone fits every fresh board; a board carrying rules can
+    on each push; `layout-sweep.spec.js` walks every scene in the graph in the
+    weekly full pass). A 360x740 phone fits every fresh board; a board carrying rules can
     still push the wild card up to ~80px under the bar there, which is the known
     gap. How it fits: a board rule that bills every card is a badge in the stats
     row, never a line on each card; the staked card carries its own detail
@@ -344,3 +344,46 @@ the live database when a migration fixes a runtime error.
     authors to reach for it. `src/state/errorRecovery.js` still duplicates eight
     functions from `src/state/savedState.js` and both halves have importers, so
     that one is a refactor, not a deletion.
+
+44. The season is one chain, and its vocabulary is the one a Korean bank uses
+    now. Seven cases used to be an anthology of unrelated organisations, so
+    nothing learned in 사건 01 could be spent in 사건 04 and nothing in 사건 01
+    mattered. They now hang off a single bad loan -- KD은행's 310억 to 플로우온,
+    대출번호 2023-0412 -- which collapses in 01, is covered up in 02, is moved to
+    세움테크's books in 03 and onto 온새's care hours in 04, lands on 312 people
+    who never borrowed in 05, breaks the analyst in the next chair in 06, and is
+    finally traced to the empty signature box in the finale. The analyst is the
+    one who wrote the dissent on that loan three years ago and was transferred
+    into the lab for it, so 사건 01 is personal before the first card is staked.
+    Two people were added for the chain to be answerable: 윤상혁 (그룹전략실
+    상무, speaks `f_confront`) left the box empty, and 임경수 (퇴직 심사팀장,
+    speaks `c2_trace`) keeps the paper original the system no longer holds.
+    Neither has a portrait, so both fall back to `/speaker-profile.webp` the way
+    이민서 already did.
+
+    Two rules this bought, both about copy:
+    - No Japanese-style loan vocabulary. 여신, 융자, 품의서, 결재란, 상각,
+      기한이익 and 주채무계열 read as either a translation or a period piece;
+      the text says 대출, 심사 보고서, 서명란, 손실 처리 and spells out what a
+      clause does instead of naming it. Those words are at zero in `src/` and a
+      new one should not come back.
+    - A term a fifteen-year-old would not know is unpacked in brackets the first
+      time a player can see it, in the scene body rather than the folded memo:
+      부채비율, 산식, 엠바고, 유동성 위기 all do this once and never again.
+    Nothing structural moved -- choice ids, effects, cognition, triggers, the
+    graph and the nine endings are byte-identical, so `check:balance`,
+    `check:endings` and the ranking tiers are unaffected. What changed is
+    `speaker`, `title`, `text`, `memo`, `sceneContext`, `characterProfiles`,
+    `seasonCasesBase`, `nextCaseSignals`, `seasonInterludes`, `operatorProfiles`
+    and the intro premise.
+
+45. The repository carries only what a build, a check or a deploy reads. The
+    `.agents/` role scaffolding and `scripts/agent-cycle.mjs` were removed on
+    2026-09-16: nothing referenced them, no workflow ran them, and their local
+    run logs were already ignored. `report:pressure` went with them -- it was
+    byte-identical to `check:pressure`, not a variant of it, unlike
+    `report:endings` which passes `--report`. `.gitignore` lost `dist-map/`,
+    `.tmp-css/` and `.tmp/`, which no script has written since the tooling that
+    made them was deleted; the `Profile.jpg` / `!public/profile.jpg` pair stays,
+    because Windows matches that name case-insensitively and the app's icon
+    would go with it. `npm run verify:static` is still twenty checks.

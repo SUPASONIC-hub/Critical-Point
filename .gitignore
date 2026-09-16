@@ -1,14 +1,12 @@
 node_modules/
 dist/
-dist-map/
 test-results/
 playwright-report/
 debug.log
 .env
 .DS_Store
+.claude/worktrees/
+
+# Windows matches this case-insensitively, so the public icon needs the negation.
 Profile.jpg
 !public/profile.jpg
-.tmp-css/
-.tmp/
-.claude/worktrees/
-.agents/runs/

@@ -8,7 +8,7 @@ import { LAYOUT_VIEWPORTS, measureTable } from "./helpers/layout.js";
  * Every decision in the game, on every screen the table promises to fit.
  *
  * `gauntlet-loop.spec.js` holds the densest scenes on each push; this walks all
- * of them. It is slow -- 149 scenes at three sizes -- so it runs with the weekly
+ * of them. It is slow -- every scene in the graph at three sizes -- so it runs with the weekly
  * full-coverage pass (`npm run test:e2e:full`), not on every push. It was
  * written after a measurement found 42 of 149 scenes hiding a card under the
  * action bar on a 390x844 phone, all 149 on a 360x740 one, and every five-card
