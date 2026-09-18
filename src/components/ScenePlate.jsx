@@ -110,10 +110,17 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
 }
 
 /** Rooms whose light comes off a screen, which get the refresh sweep. */
-const SCREEN_MOTIFS = new Set(["control", "archive", "desk"]);
+const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby"]);
 
 /** Rooms with open sky over them, where a night can be raining. */
 const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
+
+/**
+ * Rooms seen through glass with weather on the other side of it. A taxi and a
+ * dawn café are interiors -- no rain falls on the player -- but both are mostly
+ * window, so the night outside runs down them instead of hanging as dust.
+ */
+const GLASS_MOTIFS = new Set(["transit", "cafe"]);
 
 /**
  * What hangs in the room's air. By day it is dust catching the light; after
@@ -123,7 +130,8 @@ const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
  * plate still reads as a finished drawing -- motes suspended, rain mid-fall.
  */
 function paintAir(random, plate) {
-  const rain = plate.night && OUTDOOR_MOTIFS.has(plate.motif) && random() < 0.7;
+  const rain =
+    plate.night && (OUTDOOR_MOTIFS.has(plate.motif) || GLASS_MOTIFS.has(plate.motif)) && random() < 0.7;
   if (rain) {
     const drops = [];
     for (let drop = 0; drop < 18; drop += 1) {
@@ -753,7 +761,265 @@ function paintGallery(random, accent, glow) {
   );
 }
 
+/**
+ * The back of a car. Two headrests fill the bottom of the frame, the windscreen
+ * runs away to a road whose lights are drawn as streaks rather than lamps, and
+ * the fare meter on the dash is the one lit thing -- which is the right accent,
+ * because in this season a taxi is always somebody paying to leave a building
+ * faster than they are allowed to.
+ */
+function paintTransit(random, accent, glow) {
+  const streaks = [];
+  for (let streak = 0; streak < 9; streak += 1) {
+    const y = span(random, 16, 52);
+    const x = span(random, 30, 250);
+    const length = span(random, 14, 44);
+    streaks.push(<line key={`streak-${streak}`} x1={round(x)} y1={round(y)} x2={round(x + length)} y2={round(y + length * 0.12)} />);
+  }
+  const meterX = Math.round(span(random, 176, 214));
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="58" x2="320" y2="58" />
+          <path d="M40 14 H280 L262 58 H58 Z" />
+        </>,
+      )}
+      {lit(streaks)}
+      {mid(
+        <>
+          {/* The dash, and the mirror the driver watches the passenger in. */}
+          <path d="M28 62 H292 L282 78 H38 Z" />
+          <rect x="138" y="20" width="44" height="11" />
+          <line x1="160" y1="31" x2="160" y2="38" />
+        </>,
+      )}
+      {halo(meterX + 9, 68, 22, glow)}
+      {mark(<rect x={meterX} y="64" width="18" height="9" fill={accent} />)}
+      {near(
+        <>
+          {/* Two headrests: the driver, and the seat the analyst is not in. */}
+          <path d="M-4 132 V96 Q-4 84 22 84 H82 Q108 84 108 96 V132 Z" />
+          <path d="M196 132 V92 Q196 80 222 80 H286 Q312 80 312 92 V132 Z" />
+          <line x1="150" y1="78" x2="150" y2="132" />
+        </>,
+      )}
+      {people(figure("driver", 54, 92, 26))}
+    </>
+  );
+}
+
+/**
+ * Books stacked the way a second-hand shop stacks them -- spines in uneven
+ * columns, a leaning pile on the floor, a stepladder nobody has folded -- with
+ * one ledger open on top of the pile under a bare bulb. The archive motif is
+ * boxes in perspective and reads as an institution filing things; this is the
+ * opposite room, where the record survived because somebody would not throw it
+ * away, and 임경수's 4년 of keeping the paper copy is that room.
+ */
+function paintBookshop(random, accent, glow) {
+  const spines = [];
+  for (let column = 0; column < 9; column += 1) {
+    const x = 8 + column * 34;
+    let y = 96;
+    while (y > span(random, 18, 42)) {
+      const height = Math.round(span(random, 6, 13));
+      const width = Math.round(span(random, 18, 30));
+      spines.push(<rect key={`spine-${column}-${y}`} x={x} y={y - height} width={width} height={height} />);
+      y -= height + 1;
+    }
+  }
+  const pileX = Math.round(span(random, 206, 244));
+  const bulbX = Math.round(span(random, 104, 152));
+  return (
+    <>
+      {far(<line x1="0" y1="14" x2="320" y2="14" />)}
+      {mid(spines)}
+      {lit(<circle cx={bulbX} cy="22" r="4" />)}
+      {mid(<line x1={bulbX} y1="0" x2={bulbX} y2="18" />)}
+      {halo(bulbX, 22, 30, glow)}
+      {near(
+        <>
+          {/* The leaning pile, and the ladder left where it was last climbed. */}
+          <path d={`M${pileX} 132 V104 L${pileX + 44} 100 V132 Z`} />
+          <line x1="44" y1="132" x2="58" y2="96" />
+          <line x1="76" y1="132" x2="66" y2="96" />
+          {[104, 114, 124].map((rung) => (
+            <line key={`rung-${rung}`} x1={50 + (132 - rung) * 0.34} y1={rung} x2={74 - (132 - rung) * 0.24} y2={rung} />
+          ))}
+        </>,
+      )}
+      {halo(pileX + 22, 100, 22, glow)}
+      {mark(<rect x={pileX + 6} y="94" width="32" height="8" fill={accent} />)}
+      {people(figure("keeper", Math.round(span(random, 140, 178)), 126, 44))}
+    </>
+  );
+}
+
+/**
+ * A café before it is properly open: a window wall with the street still dark
+ * behind it, two small round tables, and the machine behind the counter already
+ * lit. 사건 09 writes its ledger here at dawn, so the room has to read as the
+ * one place in the season where two people sit down without a building around
+ * them -- small furniture, a lot of glass, and nobody else in yet.
+ */
+function paintCafe(random, accent, glow) {
+  const mullions = [];
+  for (let bay = 1; bay < 5; bay += 1) {
+    mullions.push(<line key={`mullion-${bay}`} x1={bay * 64} y1="8" x2={bay * 64} y2="74" />);
+  }
+  const tableX = Math.round(span(random, 168, 206));
+  const machineX = Math.round(span(random, 22, 48));
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="8" x2="320" y2="8" />
+          <line x1="0" y1="74" x2="320" y2="74" />
+          {mullions}
+        </>,
+      )}
+      {mid(
+        <>
+          {/* The counter, and the shelf of cups behind it. */}
+          <path d="M-4 96 H92 V74 H-4 Z" />
+          <rect x={machineX} y="56" width="26" height="18" />
+          {/* Two tables: one the scene sits at, one nobody is at yet. */}
+          <line x1={tableX} y1="112" x2={tableX} y2="94" />
+          <ellipse cx={tableX} cy="92" rx="26" ry="6" />
+          <line x1="128" y1="104" x2="128" y2="90" />
+          <ellipse cx="128" cy="88" rx="18" ry="4.5" />
+        </>,
+      )}
+      {halo(machineX + 13, 62, 26, glow)}
+      {mark(<rect x={machineX + 4} y="58" width="18" height="8" fill={accent} />)}
+      {near(
+        <>
+          <line x1="0" y1="118" x2="320" y2="118" />
+          <path d="M-4 118 H324 V132 H-4 Z" />
+        </>,
+      )}
+      {people(
+        <>
+          {seated("ledger-a", tableX - 24, 100, 30)}
+          {seated("ledger-b", tableX + 24, 100, 30)}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * One bed, its rail up, a drip stand, a chair pulled close, and a window with
+ * the afternoon in it. Everything is low and horizontal: no perspective running
+ * away, no wall of screens, nothing converging. The season's other rooms are
+ * built to make a decision feel urgent, and this one is built so that it cannot
+ * -- which is the point of the room where the bill for all that urgency is paid.
+ */
+function paintWard(random, accent, glow) {
+  const windowX = Math.round(span(random, 196, 232));
+  const blinds = [];
+  for (let slat = 0; slat < 7; slat += 1) {
+    blinds.push(<line key={`slat-${slat}`} x1={windowX} y1={22 + slat * 7} x2={windowX + 84} y2={22 + slat * 7} />);
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="72" x2="320" y2="72" />
+          <rect x={windowX} y="18" width="84" height="54" />
+        </>,
+      )}
+      {lit(<rect x={windowX + 2} y="20" width="80" height="50" />)}
+      {far(blinds)}
+      {mid(
+        <>
+          {/* The bed, side on, with the rail raised. */}
+          <path d="M22 108 H176 V92 H22 Z" />
+          <path d="M22 92 V70 H34 V92" />
+          <line x1="46" y1="92" x2="46" y2="80" />
+          <line x1="166" y1="92" x2="166" y2="82" />
+          {[62, 82, 102, 122, 142].map((post) => (
+            <line key={`rail-${post}`} x1={post} y1="92" x2={post} y2="82" />
+          ))}
+          <line x1="46" y1="82" x2="166" y2="82" />
+          {/* The drip stand, and the chair somebody has been sitting in. */}
+          <line x1="190" y1="108" x2="190" y2="44" />
+          <path d="M182 108 H198" />
+          <path d="M196 116 H228 V100 H196 Z" />
+        </>,
+      )}
+      {halo(190, 50, 20, glow)}
+      {mark(<rect x="184" y="44" width="12" height="14" fill={accent} opacity="0.7" />)}
+      {near(
+        <>
+          <line x1="0" y1="118" x2="320" y2="118" />
+          <path d="M-4 118 H324 V132 H-4 Z" />
+        </>,
+      )}
+      {people(seated("visitor", 212, 100, 26))}
+    </>
+  );
+}
+
+/**
+ * The ground floor of a building you are being let into or kept out of: glass
+ * front, a long reception desk, a row of gates, and the company's name lit on
+ * the wall behind it. The lit sign is the accent because a lobby is the one room
+ * in this season whose entire function is to state whose building this is.
+ */
+function paintLobby(random, accent, glow) {
+  const gates = [];
+  for (let gate = 0; gate < 4; gate += 1) {
+    const x = 26 + gate * 42;
+    gates.push(<path key={`gate-${gate}`} d={`M${x} 118 V96 H${x + 22} V118`} />);
+  }
+  const signX = Math.round(span(random, 186, 214));
+  const columns = [];
+  for (let column = 1; column < 4; column += 1) {
+    columns.push(<line key={`col-${column}`} x1={column * 80} y1="4" x2={column * 80} y2="62" />);
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="4" x2="320" y2="4" />
+          <line x1="0" y1="62" x2="320" y2="62" />
+          {columns}
+        </>,
+      )}
+      {mid(
+        <>
+          {/* The wall the name hangs on, and the desk in front of it. */}
+          <rect x={signX - 34} y="20" width="104" height="34" />
+          <path d="M184 96 H320 V74 H184 Z" />
+          {gates}
+        </>,
+      )}
+      {halo(signX + 18, 37, 40, glow)}
+      {mark(<rect x={signX - 26} y="28" width="88" height="18" fill={accent} opacity="0.5" />)}
+      {near(
+        <>
+          <line x1="0" y1="118" x2="320" y2="118" />
+          <path d="M-4 118 H324 V132 H-4 Z" />
+        </>,
+      )}
+      {people(
+        <>
+          {seated("reception", 250, 74, 24)}
+          {figure("arriving", Math.round(span(random, 54, 108)), 116, 42)}
+        </>,
+      )}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
+  transit: paintTransit,
+  bookshop: paintBookshop,
+  cafe: paintCafe,
+  ward: paintWard,
+  lobby: paintLobby,
   coast: paintCoast,
   gallery: paintGallery,
   skyline: paintSkyline,

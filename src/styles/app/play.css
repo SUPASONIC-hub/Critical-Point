@@ -3139,25 +3139,41 @@
   --plate-glow: var(--ui-surface-3);
 }
 
-/* Each building keeps one colour of light across every room inside it, so the
-   season's movement -- lab, client site, branch, bookshop -- is legible before
-   the dateline is read. These tint the ambient fills only: the accent stays
-   chip or heat, because that pair means "how much pressure is on this scene"
-   and has to mean the same thing in every building. */
+/* Each organisation keeps one colour of light across every room inside it, so
+   the season's movement -- lab, client site, bank, care platform -- is legible
+   before the dateline is read. These tint the ambient fills only: the accent
+   stays chip or heat, because that pair means "how much pressure is on this
+   scene" and has to mean the same thing in every building.
+
+   The index comes from `PLATE_TONE_NAMES` in `scenePlate.js`, which names the
+   owner of the room. It used to be a hash of the place string, which gave
+   트리거랩 four colours and 플로우온 four more -- the lab changed colour sixteen
+   times without the player leaving it. Tone 0 is everywhere nobody in this
+   season employs: the market, the bookshop, the shore, the ward, the café. It
+   is the only warm white on the list on purpose, because being off the payroll
+   is the one relief the season offers. */
 .gx-plate-tone-0 {
-  --plate-ambient: var(--ui-chip);
+  --plate-ambient: var(--c-cream);
 }
 
 .gx-plate-tone-1 {
-  --plate-ambient: var(--c-amber);
+  --plate-ambient: var(--ui-chip);
 }
 
 .gx-plate-tone-2 {
-  --plate-ambient: var(--c-sage);
+  --plate-ambient: var(--c-amber);
 }
 
 .gx-plate-tone-3 {
   --plate-ambient: var(--c-violet);
+}
+
+.gx-plate-tone-4 {
+  --plate-ambient: var(--c-sage);
+}
+
+.gx-plate-tone-5 {
+  --plate-ambient: var(--c-coral);
 }
 
 /* The plate's air. Everything here is transform or opacity on a few dozen SVG

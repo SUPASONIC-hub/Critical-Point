@@ -22,11 +22,16 @@
 export const PLATE_MOTIFS = [
   "skyline",
   "street",
+  "transit",
   "floor",
   "coast",
   "gallery",
+  "bookshop",
+  "cafe",
+  "ward",
   "control",
   "archive",
+  "lobby",
   "corridor",
   "hall",
   "counter",
@@ -48,14 +53,23 @@ export const PLATE_MOTIFS = [
  */
 const MOTIF_RULES = [
   ["skyline", ["옥상", "33층", "그룹전략실"]],
-  ["street", ["헌책방", "포장마차", "퇴근길", "중앙시장", "골목", "주차장"]],
+  // The back of a car is not the road it is on. Tested before 도로 and 골목 so a
+  // scene that names both lands in the seat rather than on the street.
+  ["transit", ["택시", "뒷자리", "지하철", "전동차", "버스", "고속도로", "승강장", "기차"]],
+  // A bookshop's second floor is a room made of paper, not the alley outside it,
+  // so the interior is matched before 헌책방 reaches the street rule below.
+  ["bookshop", ["헌책방 2층", "책장", "장부 더미", "계단참"]],
+  ["ward", ["요양병원", "병실", "병동", "간호", "응급실", "침상"]],
+  ["cafe", ["카페", "찻집", "커피", "창가 자리"]],
+  ["street", ["헌책방", "포장마차", "퇴근길", "중앙시장", "골목", "주차장", "앞 도로", "횡단보도"]],
   ["floor", ["풀필먼트", "야간조", "물류"]],
   ["coast", ["경포", "바닷가", "펜션", "해변", "항구", "방파제"]],
   ["gallery", ["갤러리", "화랑", "전시장"]],
   ["counter", ["창구", "지점", "객장"]],
-  ["control", ["통제실", "시스템 지도", "배차석", "상황판"]],
+  ["control", ["통제실", "시스템 지도", "배차석", "상황판", "운영실"]],
   ["archive", ["보관소", "자료실", "서버실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
   ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
+  ["lobby", ["로비", "안내데스크", "출입 게이트"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
 ];
 
@@ -84,21 +98,55 @@ const PRESSURE_PHASES = new Set([
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
 
 /**
- * The buildings this season walks, in the order light was assigned to them.
+ * The organisations this season walks, and the colour of light in each.
  *
  * Every plate used to be lit the same grey, so 트리거랩 and 강서지점 read as the
- * same room with different furniture. A building keeps one colour of light
+ * same room with different furniture. An organisation keeps one colour of light
  * across every scene inside it, which is what makes the season's movement --
- * lab, client, branch, bookshop -- legible at a glance instead of only in the
- * dateline. The tone is the building's, not the case's, so a case that visits
- * three buildings looks like it visited three buildings.
+ * lab, client, bank, care platform -- legible at a glance instead of only in the
+ * dateline. The tone belongs to the organisation, not the case, so a case that
+ * visits three of them looks like it visited three.
+ *
+ * It used to be `hashString(place.split("·")[0]) % 4`, which reads as though it
+ * assigns one colour per building and does not: the text before the `·` is the
+ * building *and the room*, so `플로우온 본사 8층 상황실` and `플로우온 본사 8층
+ * 재무회의실` hash to different numbers. Measured over the season's 91 places
+ * that gave 트리거랩 four different colours, 플로우온 four, 온새 three and
+ * KD은행 two -- the lab alone changed colour sixteen times while standing
+ * still, which is the exact effect the tone exists to prevent. Naming the
+ * owners costs one table and makes the promise true.
+ *
+ * Order matters: 브릿지은행 is tested before the generic 은행 marker so the
+ * counterparty does not get the home bank's light, and the outside world is
+ * last so it only catches what no organisation claimed.
  */
-const PLATE_TONES = 4;
+const ORG_RULES = [
+  ["lab", ["트리거랩"]],
+  ["client", ["플로우온"]],
+  ["rival", ["세움테크", "브릿지은행", "넥스트마일"]],
+  ["bank", ["KD은행", "KD금융그룹", "은행"]],
+  ["care", ["온새", "돌봄"]],
+];
+
+/** Every organisation's light, plus the world outside them all at index 0. */
+export const PLATE_TONE_NAMES = ["outside", "lab", "client", "rival", "bank", "care"];
+
+/**
+ * Which light a place is lit by. Anything no organisation owns -- the bookshop,
+ * the market, the shore, the hospital, the café -- shares one tone on purpose:
+ * off the season's payroll is itself a place, and the player reads it as relief
+ * from the four corporate colours rather than as a sixth company.
+ */
+export function getPlateOrg(place = "") {
+  const text = String(place);
+  for (const [org, markers] of ORG_RULES) {
+    if (markers.some((marker) => text.includes(marker))) return org;
+  }
+  return "outside";
+}
 
 export function getPlateTone(place = "") {
-  const building = String(place).split("·")[0].trim();
-  if (!building) return 0;
-  return hashString(building) % PLATE_TONES;
+  return Math.max(0, PLATE_TONE_NAMES.indexOf(getPlateOrg(place)));
 }
 
 function hashString(value) {

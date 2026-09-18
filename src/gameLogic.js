@@ -475,6 +475,11 @@ const discoveryClues = {
     title: "사 둔 회수율",
     text: "청산이 유리하다는 숫자를 만든 감정평가법인이 흔적표와 같은 세무 대리인을 씁니다. 계산서도 누군가 주문할 수 있습니다.",
   },
+  case10: {
+    id: "c10-default-reason",
+    title: "사유란의 기본값",
+    text: "4년 전 병가 신청서에서 '업무상' 보기가 삭제됐습니다. 열아홉 명이 같은 문구를 쓴 건 열아홉 번의 선택이 아니라 선택지가 하나였기 때문입니다.",
+  },
   final: {
     id: "final-observer-key",
     title: "관찰자의 열쇠",
@@ -796,6 +801,11 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
       c9_after_court: { tag: "끝까지 설명한 결말", title: "살린 이유와 벌한 이유를 법정에서 말했다", text: "회사는 살아남았고, 장부를 부풀린 사람들은 법정에 섰습니다. 계산서 두 장이 같은 사건 번호 아래 묶였습니다." },
       c9_after_return: { tag: "조용히 돌아간 결말", title: "결의 결과를 영동지점 텔레비전으로 들었다", text: "당신이 없는 자리에서도 결의는 났습니다. 강태민은 당신 몫으로 뜯어 둔 컵라면을 다음 날 아침에 혼자 먹었습니다." },
     },
+    case10: {
+      c10_after_rest: { tag: "불을 끈 결말", title: "여섯 명이 처음으로 같은 시각에 퇴근했다", text: "34건이 월요일로 넘어갔고, 여섯 사람은 금요일 저녁을 돌려받았습니다. 오래 가는 일은 오래 갈 수 있는 속도로만 갑니다." },
+      c10_after_record: { tag: "제도로 남긴 결말", title: "분담표가 담당자 이름 없이도 도는 문서가 되었다", text: "표는 그룹 제도안으로 접수됐고, 사람이 바뀌어도 남게 됐습니다. 그 표를 누가 자기 성과로 인용할지는 아직 정해지지 않았습니다." },
+      c10_after_keep: { tag: "서랍에 남긴 결말", title: "212개의 이름이 여전히 한 사람의 손에 있다", text: "제도는 통과했고, 제도 밖의 이름들은 당신 서랍에 남았습니다. 보관자가 한 명뿐인 기록은 그 한 명과 함께 사라집니다." },
+    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
@@ -852,6 +862,11 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
       c9_after_court: { legitimacy: 10, trust: 3, fatigue: 7 },
       c9_after_return: { capital: 6, trust: -10, humanCost: 6 },
     },
+    case10: {
+      c10_after_rest: { trust: 8, humanCost: -5, fatigue: -8 },
+      c10_after_record: { legitimacy: 11, humanCost: 3, fatigue: 5 },
+      c10_after_keep: { capital: 5, trust: 6, legitimacy: -9 },
+    },
   };
   return carryovers[caseId]?.[choiceId] ?? {};
 }
@@ -898,11 +913,16 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c8_after_friend: { id: "protect-trust", title: "되찾은 친구를 계산서에 쓰지 않기", text: "오진우와 권도현은 동기입니다. 그 관계를 협상 도구로만 쓰지 않는 선택을 찾아야 합니다." },
       c8_after_blade: { id: "use-reframe", title: "혼자 쥔 칼을 계산서로 바꾸기", text: "칼은 벌할 수는 있어도 살리지는 못합니다. 흔적표를 사람을 살리는 계산에 넣도록 판을 다시 짜야 합니다." },
     },
-    // Keyed on case 09's aftermath: the finale follows that case now.
+    case10: {
+      c9_after_stay: { id: "find-cost", title: "이긴 판의 청구서 찾기", text: "1,140명은 지켰습니다. 그 열흘 동안 아무도 청구하지 않은 비용이 어디에 쌓였는지 먼저 찾아야 보너스가 열립니다." },
+      c9_after_court: { id: "use-reframe", title: "서식 없는 피해를 서식으로 만들기", text: "법정에서는 모든 피해에 서식이 있었습니다. 서식이 없어서 피해가 아닌 것이 된 쪽으로 판을 다시 짜야 합니다." },
+      c9_after_return: { id: "protect-trust", title: "하루 늦은 소식을 늦지 않게 만들기", text: "240km는 늘 한 박자 늦습니다. 사람에게 가장 먼저 닿는 선택을 찾아야 합니다." },
+    },
+    // Keyed on case 10's aftermath: the finale follows that case now.
     final: {
-      c9_after_stay: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "사람을 끝까지 포기하지 않은 기록이 이번에는 관찰 자료가 됩니다. 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
-      c9_after_court: { id: "use-reframe", title: "설명한 구조도 의심하기", text: "법정에서 연 구조가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c9_after_return: { id: "repair-legitimacy", title: "조용한 복귀 뒤의 공정함 회복하기", text: "조용히 돌아간 선택이 선례가 되지 않게, 피해를 회복하는 선택을 찾아야 합니다." },
+      c10_after_rest: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "사람이 끝나지 않게 하는 법을 아는 기록이 이번에는 관찰 자료가 됩니다. 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
+      c10_after_record: { id: "use-reframe", title: "내가 만든 제도도 의심하기", text: "사람을 대신하게 만든 절차가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c10_after_keep: { id: "repair-legitimacy", title: "혼자 쥔 명단의 공정함 회복하기", text: "한 사람만 가진 기록은 승계되지 않습니다. 212명이 당신 없이도 남을 방법을 찾아야 합니다." },
     },
   };
   return challenges[caseId]?.[choiceId] ?? null;

@@ -13,7 +13,10 @@ const budgets = [
   // mostly the scene graph, so narrative that the player reads is exactly what
   // it is meant to weigh. Gzip is the number that reaches a phone and it stays
   // well inside its share.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 660_000 },
+  // 660_000 -> 720_000 on 2026-09-18 for 사건 10, an eleventh case: twenty scenes
+  // of authored Korean prose plus its eleven data tables. The chunk is mostly
+  // the scene graph, so this is narrative the player reads.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 720_000 },
   { pattern: /^index-.*\.js$/, maxBytes: 120_000 },
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 75_000 },
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 60_000 },

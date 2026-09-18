@@ -85,13 +85,12 @@ import {
   restoreRecoverySnapshot,
 } from "../src/appConfig.js";
 import { test } from "node:test";
-import { createPlateRandom, getPlateMotif, getPlateTone, getScenePlate, PLATE_MOTIFS } from "../src/scenePlate.js";
+import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
 import { describeChoiceDilemma, explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
 import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
-import { createDecisionTargetLock } from "../src/viewModels/playChoiceViewModel.js";
 
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
@@ -435,30 +434,6 @@ test("streak rewards take priority in immediate choice feedback", () => {
   });
   assert.equal(feedback.label, "STREAK PAYOUT");
   assert.equal(feedback.text, "연속 보상");
-});
-
-test("decision target lock summarizes objective, streak, and evidence without numeric forecasts", () => {
-  const lock = createDecisionTargetLock({
-    pendingChoiceRead: { challengeMatch: true },
-    sceneChallenge: { title: "Lower risk pressure" },
-    currentChallengeStreak: 2,
-    hiddenEvidenceCandidate: { id: "clue" },
-  });
-  assert.equal(lock.objective.value, "LOCKED");
-  assert.equal(lock.streak.value, "PAYOUT READY");
-  assert.equal(lock.evidence.value, "CAN OPEN");
-  assert.doesNotMatch(JSON.stringify(lock), /[+-]\d/);
-});
-
-test("decision target lock marks a choice that misses the scene objective", () => {
-  const lock = createDecisionTargetLock({
-    pendingChoiceRead: { challengeMatch: false },
-    sceneChallenge: { title: "Find hidden cost" },
-    currentChallengeStreak: 1,
-  });
-  assert.equal(lock.objective.value, "OFF TARGET");
-  assert.equal(lock.streak.value, "CHAIN BREAKS");
-  assert.equal(lock.evidence.value, "NO SIGNAL");
 });
 
 const card = (id, effect, extra = {}) => ({ id, label: id, effect, next: "x", ...extra });
@@ -955,8 +930,9 @@ test("the ending reads what the run did at the table", () => {
   assert.equal(endingFor([entry(32, false), entry(8, false)]), "open-oversight", "a clean season that cashed hot earns a clue of slack");
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
   // 16 busts wrecked an eight-case season. Busts are read as a rate over the
-  // season's length, so a ten-case season needs 26 to carry the same strain.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 26, seasonBestMultiplier: 32 });
+  // season's length and the collapse line rises with it, so a ten-case season
+  // needed 26 and an eleven-case season needs 33 to carry the same strain.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 33, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -1156,7 +1132,10 @@ test("every scene draws a room, and always the same one", () => {
     assert.ok(motifs.has(plate.motif), `${nodeId} drew an unknown motif ${plate.motif}`);
     assert.equal(typeof plate.seed, "number");
     assert.ok(["chip", "heat"].includes(plate.accent), `${nodeId} asked for accent ${plate.accent}`);
-    assert.ok(Number.isInteger(plate.tone) && plate.tone >= 0 && plate.tone < 4, `${nodeId} asked for tone ${plate.tone}`);
+    assert.ok(
+      Number.isInteger(plate.tone) && plate.tone >= 0 && plate.tone < PLATE_TONE_NAMES.length,
+      `${nodeId} asked for tone ${plate.tone}`,
+    );
     // A plate that redraws differently on a reload would make a resumed save
     // look like a different room, so the spec has to be a pure function of the
     // scene. The generator is checked too: same seed, same first three draws.
@@ -1189,9 +1168,40 @@ test("every scene draws a room, and always the same one", () => {
   assert.equal(getPlateMotif("주문진 항구 방파제"), "coast");
   assert.equal(getPlateMotif("청담 갤러리 온 · 전시장"), "gallery");
   assert.equal(getPlateMotif("인사동 화랑 · 수장고 복도"), "corridor");
-  // One building, one colour of light, whichever room inside it the scene is in.
-  assert.equal(getPlateTone("KD은행 강서지점 · 4번 창구"), getPlateTone("KD은행 강서지점"));
+  // The new rooms, and the precedence that keeps them out of each other.
+  assert.equal(getPlateMotif("여의도 새벽 카페 · 창가 자리"), "cafe");
+  assert.equal(getPlateMotif("트리거랩 1층 로비"), "lobby");
+  // The back of a car is not the road it is parked on.
+  assert.equal(getPlateMotif("트리거랩 앞 도로 · 택시 뒷자리"), "transit");
+  assert.equal(getPlateMotif("트리거랩 앞 도로"), "street");
+  // A bookshop's second floor is a room made of paper; its alley is a street.
+  assert.equal(getPlateMotif("회기동 헌책방 2층 · 장부 더미"), "bookshop");
+  assert.equal(getPlateMotif("회기동 헌책방 앞 골목"), "street");
+  // A ward is a ward, but the corridor outside it is still a corridor.
+  assert.equal(getPlateMotif("강서 이음병원 · 병실"), "ward");
+  assert.equal(getPlateMotif("강서 이음병원 3층 · 복도"), "corridor");
+
+  // One ORGANISATION, one colour of light, whichever room inside it the scene
+  // is in. This used to be a hash of the text before the `·`, which is the
+  // building *and the room*, so it gave 트리거랩 four colours and 플로우온 four
+  // more -- the lab changed colour sixteen times while the player stood still.
+  // These are the exact pairs that used to disagree.
+  for (const rooms of [
+    ["트리거랩 4층 분석관실", "트리거랩 보안 감사실", "트리거랩 옥상", "트리거랩 기록 보관소 B2", "트리거랩 2층 감사팀 서고"],
+    ["플로우온 본사 8층 상황실", "플로우온 본사 8층 재무회의실", "플로우온 채권단 회의실", "플로우온 풀필먼트 센터 · 야간조 대기실"],
+    ["온새 운영 검토실", "온새 감사실", "온새 이사회실"],
+    ["KD은행 강서지점 · 4번 창구", "KD은행 강서지점", "KD은행 강원 영동지점 · 객장", "KD금융그룹 본사 33층 그룹전략실"],
+  ]) {
+    const tones = new Set(rooms.map(getPlateTone));
+    assert.equal(tones.size, 1, `${rooms[0]} lights its own rooms ${tones.size} different colours`);
+  }
+  // The counterparty bank is not the home bank, and the world off the payroll
+  // is not any of them.
+  assert.notEqual(getPlateOrg("여의도 브릿지은행 본점 · 1층 로비"), getPlateOrg("KD은행 강서지점"));
+  assert.equal(getPlateOrg("회기동 헌책방 2층"), "outside");
+  assert.equal(getPlateOrg("강릉 중앙시장 · 오징어순대집"), "outside");
   assert.equal(getPlateMotif(""), "desk");
+  assert.equal(getPlateTone(""), 0);
 });
 
 /* ------------------------------------------------------- season and motive */

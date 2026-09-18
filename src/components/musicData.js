@@ -117,6 +117,8 @@ export const chapterMotifs = {
   case07: { wave: "triangle", lift: 415, impact: 1.16 },
   case08: { wave: "sawtooth", lift: 540, impact: 1.22 },
   case09: { wave: "sine", lift: 330, impact: 1.08 },
+  // The bill, not the fight: the lowest lift and the softest impact in the season.
+  case10: { wave: "sine", lift: 240, impact: 0.96 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 

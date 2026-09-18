@@ -48,9 +48,13 @@ const BUDGETS = {
   // in, not to cap the number of cases the season is allowed to have.
   // 2740 / 15 -> 3120 / 17 on 2026-09-16: 사건 08 and 09, a ninth and tenth case,
   // each with the same seven tables and one node file import.
+  // 3120 / 17 -> 3320 / 18 on 2026-09-18: 사건 10 is an eleventh case, with the
+  // same seven tables and one node file import. It is the smallest per-case step
+  // yet (~190 lines) because the case has no four-way route split -- one
+  // handover, so `dramaticRoutePlans.case10.choices` is empty.
   "src/gameData.js": {
-    lines: 3120,
-    importedNames: 17,
+    lines: 3320,
+    importedNames: 18,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
@@ -65,8 +69,10 @@ const BUDGETS = {
   // 1355 -> 1370 on 2026-09-16 for 사건 08 and 09's clues, outcomes, carryovers
   // and continuity challenges, the finale's challenges re-keyed onto 사건 09, and
   // `getThinkingMotive`, which names the feeling that woke the run's thinking.
+  // 1395 -> 1420 on 2026-09-18: 사건 10's hidden clue, its three outcomes, their
+  // carryover and its continuity challenge. Four table rows per case, as before.
   "src/gameLogic.js": {
-    lines: 1395,
+    lines: 1420,
     importedNames: 18,
     hooks: {},
   },

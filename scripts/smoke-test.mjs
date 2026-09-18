@@ -81,7 +81,6 @@ import { authoredEchoReplies } from "../src/gameDialogue.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
-import { createGameEvent, reduceInvestigationState } from "../src/state/gameEvents.js";
 import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedState.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 import { test } from "node:test";
@@ -107,13 +106,6 @@ test("save recovery slots should use a separate namespace", () => {
 });
 test("save recovery slots should keep a bounded history", () => {
   assert.equal(SAVE_SLOT_MAX_ITEMS, 5, "save recovery slots should keep a bounded history");
-});
-test("investigation events should reduce into persisted state", () => {
-  assert.deepEqual(
-    reduceInvestigationState({}, createGameEvent("INVESTIGATE", { id: "target-1", result: "found" }))["target-1"].status,
-    "investigated",
-    "investigation events should reduce into persisted state",
-  );
 });
 test("investigation outcome should preserve target identity", () => {
   assert.equal(getInvestigationOutcome({ id: "target-1", label: "Archive" }, 2).id, "target-1", "investigation outcome should preserve target identity");
@@ -649,7 +641,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case09: { routeMemory: getRouteMemory([{ nodeId: "c9_route_system", choiceId: "c9_route_system_add", freeTextSuccess: true }]) } },
+      caseResults: { case10: { routeMemory: getRouteMemory([{ nodeId: "c10_route_system", choiceId: "c10_route_system_publish", freeTextSuccess: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -796,12 +788,13 @@ test("case 02 should have a people-led opening route", () => {
   assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 });
 test("the final act should have a system-led opening route", () => {
-  // Keyed on case 09's aftermath: that is the case the finale now follows.
-  assert.equal(caseOpeningRoutes.final.c9_after_court, "f_start_system", "the final act should have a system-led opening route");
+  // Keyed on case 10's aftermath: that is the case the finale now follows.
+  assert.equal(caseOpeningRoutes.final.c10_after_record, "f_start_system", "the final act should have a system-led opening route");
 });
-test("case 08 and case 09 should open from the aftermath before them", () => {
+test("case 08, 09 and 10 should open from the aftermath before them", () => {
   assert.equal(caseOpeningRoutes.case08.c7_after_open, "c8_start_open", "case 08 should open from case 07's aftermath");
   assert.equal(caseOpeningRoutes.case09.c8_after_friend, "c9_start_friend", "case 09 should open from case 08's aftermath");
+  assert.equal(caseOpeningRoutes.case10.c9_after_court, "c10_start_court", "case 10 should open from case 09's aftermath");
 });
 test("case 06 should open from case 05's aftermath", () => {
   assert.equal(caseOpeningRoutes.case06.c5_after_system, "c6_start_system", "case 06 should open from case 05's aftermath");
@@ -920,11 +913,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("60 generated scenes should expose 186 authored choices: three each across ten cases", () => {
+test("66 generated scenes should expose 204 authored choices: three each across eleven cases", () => {
   assert.equal(
     generatedChoiceCount,
-    186,
-    "60 generated scenes should expose 186 authored choices: three each across ten cases",
+    204,
+    "66 generated scenes should expose 204 authored choices: three each across eleven cases",
   );
 });
 

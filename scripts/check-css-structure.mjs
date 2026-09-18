@@ -125,7 +125,11 @@ const fileBudgets = {
   // refresh sweep on screen rooms, a heat vignette on pressure beats and a slow
   // push-in on the briefing copy. Transform and opacity only, clipped by the
   // SVG's own viewport, and all of it parked under reduced motion.
-  "play.css": { lines: 3360, bytes: 70200 },
+  // 3360 / 70200 -> 3400 / 71400 on 2026-09-18: the plate's light is now keyed to
+  // the organisation that owns the room rather than a hash of the room's name, so
+  // the four tone classes became six -- one per employer, plus one warm white for
+  // everywhere in the season that employs nobody.
+  "play.css": { lines: 3400, bytes: 71400 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.

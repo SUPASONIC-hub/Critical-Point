@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-16 (season expanded to ten cases)
+Last updated: 2026-09-18 (season expanded to eleven cases)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -681,3 +681,73 @@ the live database when a migration fixes a runtime error.
 61. The 10-case season walk in `season-flow.spec.js` has 300s, not 180s: at
     ten cases it takes 2.7 minutes alone on the development machine, the same
     on the commit before this pass, and ran out under a parallel suite.
+
+62. The season is eleven cases, and the eleventh one answers the objection the
+    other ten earn. Priority 53 gave the thesis its second act: 사건 08 is the
+    grudge's intelligence, 사건 09 is affection's and responsibility's. Both end
+    in a win, and both are exactly what the source conversation refused to
+    believe -- that someone can keep spending themselves on other people's
+    problems and not run out. 사건 10 「멈추지 못하는 사람」 agrees with the
+    objection instead of arguing with it. Ten days after 플로우온 is saved,
+    도윤하 -- who has counted, alone and off the books, all 1,740 people hurt by
+    the loan she sold at a branch counter -- collapses, and the list, never
+    registered as an official record, is due for automatic deletion in 96 hours.
+    The case asks what goodwill costs and who holds the invoice, not whether it
+    is good. Moving the list from one person to a procedure keeps it alive and
+    drops the 212 the rules were not written for; the last scene does not
+    resolve that trade.
+
+    What moved, beyond the eleven tables every case fills (priority 53 lists
+    them): `caseOpeningRoutes.final` and `getContinuityChallenge().final` re-key
+    from `c9_after_*` to `c10_after_*`, and the three `f_start_*` openings were
+    rewritten -- they narrated 사건 09's aftermaths and now narrate 사건 10's, so
+    the two heading regexes in `season-flow.spec.js` moved with them.
+
+    Numbers that had to move, and why:
+    - `check-dialogue.mjs` 60 -> 66 generated scenes, `smoke-test.mjs` 186 -> 204
+      authored choices. Three connective and three reaction scenes per case.
+    - `check-runtime-budget.mjs`: `gameData.js` 3120/17 -> 3320/18,
+      `gameLogic.js` 1395 -> 1420. `check-bundle-size.mjs`: GameRuntime
+      660_000 -> 720_000. `check-css-structure.mjs`: `play.css` 3360/70200 ->
+      3400/71400 for the two extra tone classes in priority 63.
+    - `unit-tests.mjs` collapse sample 26 -> 33 busts. Both halves of the
+      collapse gate derive from the season length, so an eleventh case prices a
+      bust lower (`x 6/11`) and sets the line higher (`31 + (11-7)`).
+    - The case was authored hotter than its neighbours: its mean peak risk
+      pressure measured 25.0 against a season mean of 18.5, and because
+      `peakRiskPressure` is a season-wide max, that alone took collapse from
+      34.2% to 46.7% of 6,000 random seasons. Its `time`, `fatigue` and
+      `capital` costs were scaled back until the case measured 20.7, next to
+      사건 08's 21.2 and 사건 09's 20.3, and collapse settled at 36.6%. A new
+      case has to be measured against the season, not just balanced inside
+      itself; `check:endings` passes either way, because it has no ceiling on
+      collapse.
+
+63. The plate's light belongs to the organisation, not to a hash. Priority 49
+    gave each building its own colour so the season's movement would be legible
+    before the dateline is read, and `getPlateTone` implemented it as
+    `hashString(place.split("·")[0]) % 4`. That text is the building *and the
+    room*, so `플로우온 본사 8층 상황실` and `플로우온 본사 8층 재무회의실`
+    hashed to different numbers. Measured over the season's 91 places it gave
+    트리거랩 four colours, 플로우온 four, 온새 three and KD은행 two -- the lab
+    changed colour sixteen times while the player stood still, which is the one
+    thing the tone exists to prevent. `ORG_RULES` now names the six owners
+    (lab, client, rival, bank, care, and `outside` for everywhere in the season
+    that employs nobody), and `unit-tests.mjs` asserts the exact room sets that
+    used to disagree.
+
+    Five rooms were added at the same time, because 24 distinct places were
+    falling through to the generic `desk`: `cafe`, `lobby`, `transit` (the back
+    of a car, tested before the road it is on), `bookshop` (a second floor made
+    of paper, tested before the alley outside it) and `ward`. That took the
+    fallback from 24 places to 17, and the 17 left are actually desks. Rain now
+    falls behind glass in `transit` and `cafe` as well as outdoors.
+
+64. A third sweep, same rule as priorities 43 and 57: `src/state/gameEvents.js`
+    (an event-sourcing sketch for an investigation system nothing dispatches)
+    and `src/viewModels/playChoiceViewModel.js` (`createDecisionTargetLock`, a
+    commit-console disclosure row no JSX renders and no CSS styles) had no
+    inbound reference from app code -- only from a test each, so the suite was
+    the only thing keeping them alive. Both are gone with their tests, and
+    `eslint.config.js` lost `dist-map/**`, `.tmp/**` and `.agents/runs/**`,
+    which priority 57 removed from `.gitignore` and missed here.
