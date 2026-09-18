@@ -1,7 +1,7 @@
 const rawUrl = process.env.DEPLOY_URL;
 
 if (!rawUrl) {
-  console.error("DEPLOY_URL is required, for example https://critical-point.onrender.com");
+  console.error("DEPLOY_URL is required, for example https://<your-service>.onrender.com");
   process.exit(1);
 }
 

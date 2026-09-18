@@ -25,6 +25,13 @@ jobs:
       - name: Check deployed app
         if: env.DEPLOY_URL != ''
         run: npm run check:deploy
+      # A skipped check reports the same green tick as a passed one, and this job
+      # is named "Deployed Smoke Check" -- so with the secret unset it read as
+      # evidence that a deployment had been verified when nothing had been
+      # fetched at all. An annotation is the only part of a run that survives
+      # into the checks list, so the skip says so there rather than in a log line
+      # nobody opens.
       - name: Explain skipped check
         if: env.DEPLOY_URL == ''
-        run: echo 'DEPLOY_URL secret is not configured; configure it to enable the deployed smoke check.'
+        run: |
+          echo "::warning title=No deployment was checked::DEPLOY_URL is not configured, so this job fetched nothing. It is green because it did no work, not because a deployed app passed. Set the DEPLOY_URL repository secret to turn the check on."

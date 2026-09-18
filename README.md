@@ -306,19 +306,41 @@ Render 배포는 `render.yaml`을 사용합니다.
 - Build: `npm ci --include=dev && npm run verify:static && npm run build`
 - Publish: `dist`
 
+### 자동 배포
+
+`render.yaml`의 `autoDeploy: true`는 자동 배포를 켜지 못합니다. 그 파일은 Blueprint 명세라서 Render가
+Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직접 만든 서비스는 대시보드 설정을 따릅니다.
+그래서 `Deploy latest commit`을 매번 손으로 눌러야 했습니다.
+
+자동으로 만드는 방법은 둘입니다. **둘 다 Render 대시보드에서 한 번은 손을 대야 합니다.**
+
+1. **`Deploy` 워크플로 쓰기 (권장).** Render 대시보드 → 서비스 → Settings → Deploy Hook에서 URL을
+   복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣습니다. 그러면 `Verify`가 초록으로 끝난 `main` 푸시마다
+   `.github/workflows/deploy.yml`이 배포를 겁니다. Render의 자체 자동 배포보다 안전한 이유는, Render
+   빌드는 `verify:static`까지만 돌지만 이 워크플로는 **e2e까지 통과한 커밋만** 내보내기 때문입니다.
+   시크릿이 없으면 배포를 걸지 않고 실행에 경고 주석을 남깁니다.
+2. **Render 자체 자동 배포.** 대시보드 → 서비스 → Settings → Auto-Deploy를 `Yes`로. 이건 CI 결과와
+   무관하게 푸시마다 배포합니다.
+
+어느 쪽도 켜지 않으면 **main이 초록인 것과 그 커밋이 배포된 것은 별개**입니다.
+
 `VITE_SUPABASE_URL`과 `VITE_SUPABASE_ANON_KEY`는 값 없이 선언되어 있으므로 Render 대시보드에서
 설정합니다. 없으면 앱은 텔레메트리와 원격 랭킹을 끈 채로 조용히 동작합니다. 서비스 롤 키는 Render에도
 브라우저에도 넣지 않습니다.
 
-배포가 끝나면 배포된 커밋이 최신 `main`인지 확인하고 스모크 검사를 돌립니다.
+배포가 끝나면 스모크 검사를 돌립니다. 이 검사는 사이트가 살아 있고 보안 헤더가 붙어 있는지만 봅니다.
+**어느 커밋이 배포됐는지는 확인하지 않으므로**, 최신 `main`이 나갔는지는 Render 대시보드의 배포 목록에서
+직접 봐야 합니다.
 
 ```powershell
-$env:DEPLOY_URL = "https://critical-point.onrender.com"
+$env:DEPLOY_URL = "https://<서비스-이름>.onrender.com"   # 실제 서비스 주소로 바꿔서
 npm run check:deploy
 ```
 
 저장소 시크릿 `DEPLOY_URL`을 추가하면 `Deployed Smoke Check` 워크플로가 `Verify` 뒤에 같은 검사를
-실행합니다(수동 실행도 가능).
+실행합니다(수동 실행도 가능). **시크릿이 없으면 이 워크플로는 아무것도 가져오지 않고 그대로 초록으로
+끝납니다** -- 일을 안 해서 초록인 것이지 배포가 검증된 것이 아니므로, 그 경우 실행에 경고 주석이
+붙습니다.
 
 ## 원격 랭킹 (선택)
 

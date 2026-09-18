@@ -44,11 +44,34 @@ async function pushAtBeat(page, where) {
         const root = document.documentElement;
         const button = document.querySelector("[data-testid='commit-push']");
         const started = performance.now();
+        // The FX loop has to be observably running before any of its variables
+        // can be trusted: `--gx-beat-live` is written each frame and left
+        // standing when the loop stops, so a single read of "1" is also what a
+        // stopped heartbeat looks like. Two differing phases prove it is ticking.
+        let framesSeen = 0;
+        let lastPhase = Number.NaN;
         const check = () => {
           const style = getComputedStyle(root);
           const beating = style.getPropertyValue("--gx-beat-live").trim() === "1";
           const phase = Number(style.getPropertyValue("--gx-beat-phase"));
-          const ready = beating && (mode === "on" ? phase <= 0.02 : phase >= 0.45 && phase <= 0.55);
+          const inZone = style.getPropertyValue("--gx-beat-zone").trim() === "1";
+          if (phase !== lastPhase) {
+            framesSeen += 1;
+            lastPhase = phase;
+          }
+          const live = beating && framesSeen >= 2;
+          // `--gx-beat-zone` is the app's own answer to "would a press land in
+          // the GOOD window right now", computed from the clock it grades with.
+          // This used to aim at `phase <= 0.02` instead, which is not the same
+          // target: phase clamps at 1 rather than wrapping, so it only sits
+          // that low for the first 2% of a period -- about 12ms of a 600ms beat,
+          // which is shorter than the 16.7ms frame this callback runs on. The
+          // window was therefore routinely stepped straight over on a loaded
+          // runner, and the reading that did catch it could already be a frame
+          // stale by the time the click was dispatched. The GOOD window is
+          // +/-18% of the period with a 60ms floor, so a frame of drift stays
+          // inside it.
+          const ready = live && (mode === "on" ? inZone : !inZone && phase >= 0.45 && phase <= 0.55);
           if (ready) {
             button.click();
             resolve(true);

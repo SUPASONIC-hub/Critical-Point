@@ -1,0 +1,44 @@
+name: Deploy
+
+# Deploying is a push-button in the Render dashboard until something presses it,
+# and `autoDeploy: true` in render.yaml does not press it: that file is a
+# Blueprint spec and only governs a service Render manages as one, so a service
+# created by hand keeps whatever its dashboard says. This workflow is the press.
+#
+# It hangs off Verify rather than off the push, so what reaches the site is a
+# commit whose full suite went green -- including the end-to-end tier, which the
+# Render build command does not run (it stops at `verify:static`). A push that
+# fails CI now cannot become a deployment.
+on:
+  workflow_run:
+    workflows: [Verify]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+    steps:
+      - name: Trigger Render deploy
+        if: env.RENDER_DEPLOY_HOOK != ''
+        run: |
+          set -euo pipefail
+          # The hook URL carries its own key, so it is the secret in full and
+          # never echoed. Only the status line is printed.
+          status=$(curl -fsS -w '%{http_code}' -o /tmp/deploy-response -X POST "$RENDER_DEPLOY_HOOK")
+          echo "Render accepted the deploy request (HTTP $status)."
+          echo "Commit: ${{ github.event.workflow_run.head_sha || github.sha }}"
+      # Same reason the smoke check announces its own skip: a job named "Deploy"
+      # reporting green without deploying anything is worse than no job at all.
+      - name: Explain skipped deploy
+        if: env.RENDER_DEPLOY_HOOK == ''
+        run: |
+          echo "::warning title=Nothing was deployed::RENDER_DEPLOY_HOOK is not configured, so no deploy was triggered and the site still serves whatever was last pushed by hand. Add the repository secret to turn automatic deploys on: Render dashboard -> the service -> Settings -> Deploy Hook -> copy the URL."
