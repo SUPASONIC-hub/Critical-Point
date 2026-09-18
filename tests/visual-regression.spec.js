@@ -5,6 +5,26 @@ import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 test.use({ colorScheme: "light" });
 
 async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
+  // Pretendard is shipped as ~90 dynamic subsets with `font-display: swap`, so a
+  // screen paints first in fallback metrics and relays itself when the subset
+  // carrying its glyphs arrives. Nothing here used to wait for that, and the
+  // window is small enough that the same screen settles before the capture on
+  // most runs and after it on some -- which is not a flake that shows up as
+  // noise, because the reflow is a real layout change. It cost a whole CI cycle
+  // to read: the Linux baseline and the Linux comparison of the same commit
+  // disagreed by 2,840 pixels, all of them the fourth choice card, whose box was
+  // two pixels taller in the recording than in the comparison because the
+  // recording captured it mid-relay while its row-mate had already settled.
+  //
+  // `document.fonts.ready` resolves once every face the document has asked for
+  // has loaded or failed, and the two frames after it are where the reflow it
+  // triggers actually lands. Both recording and comparison now capture the
+  // settled layout, so a baseline cannot be recorded in a state the comparison
+  // can never reproduce.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
