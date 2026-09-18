@@ -1,9 +1,34 @@
+# NOTHING IN THIS FILE REACHES THE LIVE SERVICE. Read that before trusting a
+# line of it.
+#
+# This is a Blueprint spec, and Render applies a Blueprint only to a service it
+# manages as one. The service actually serving the game was created by hand in
+# the dashboard, so it takes its settings from there and this file is inert --
+# kept because it is the written record of what the service is supposed to be,
+# and because a Blueprint-managed service would need it.
+#
+# Two of the settings below were measured against the live site on 2026-09-18
+# and neither was in effect:
+#
+#   autoDeploy  -- every release until then was someone pressing `Deploy latest
+#                  commit`. Deploys are automatic now because
+#                  `.github/workflows/deploy.yml` calls a Render deploy hook
+#                  after Verify goes green, not because of this line.
+#   headers     -- the site was serving `x-content-type-options` and nothing
+#                  else: no CSP, no Referrer-Policy, no Permissions-Policy, and
+#                  `/index.html` cached for five minutes rather than `no-cache`.
+#                  They were added to the dashboard by hand, and
+#                  `npm run check:deploy` is what noticed they were missing.
+#
+# So: change a value here and the live site does not move. Change it in the
+# dashboard too, and keep the two in step -- the README's 배포 section says how.
 services:
   - type: web
     runtime: static
     name: critical-point
     buildCommand: npm ci --include=dev && npm run verify:static && npm run build
     staticPublishPath: ./dist
+    # Inert here; the dashboard's Auto-Deploy setting is what decides. See above.
     autoDeploy: true
     # Declared here without values so the keys survive a service rebuild. Set
     # them in the Render dashboard; when they are missing the app silently runs
@@ -13,6 +38,9 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
+    # Mirrored by hand in the dashboard under Settings -> Headers. These five
+    # are the source of truth for what the site *should* send; `check:deploy`
+    # asserts three of them against what it actually sends.
     headers:
       # Vite fingerprints everything under assets/, so those files never change
       # behind a given name.
