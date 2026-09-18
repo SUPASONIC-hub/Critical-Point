@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-18 (season expanded to eleven cases)
+Last updated: 2026-09-18 (eleven cases, and a deploy that presses its own button)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -751,3 +751,81 @@ the live database when a migration fixes a runtime error.
     the only thing keeping them alive. Both are gone with their tests, and
     `eslint.config.js` lost `dist-map/**`, `.tmp/**` and `.agents/runs/**`,
     which priority 57 removed from `.gitignore` and missed here.
+
+65. A baseline waits for the font it is measured in. The Linux baseline and the
+    Linux comparison of the same commit disagreed by 2,840 pixels, all of them
+    the fourth choice card, whose box measured two pixels taller in the
+    recording than in the comparison while its row-mate matched exactly. The
+    scene's four choices are static data and the accessibility tree was
+    identical in both runs, so what differed was the layout, caught at two
+    different moments. Pretendard ships as ~90 dynamic subsets with
+    `font-display: swap`: a screen paints in fallback metrics and relays itself
+    when the subset carrying its glyphs lands. `stabilizeVisualPage` froze
+    animations, transitions, the clock and the heartbeat, and never waited for
+    that. It now awaits `document.fonts.ready` plus the two frames the reflow
+    lands in, so a baseline cannot be recorded in a state the comparison is
+    unable to reproduce. Re-recording the Windows set against it produced
+    byte-identical files -- the race only bites the CI container, where the font
+    cache is cold -- and the Linux re-record changed exactly one file, the one
+    that had been failing.
+
+    This is the shape of bug the whole visual tier exists to catch and could not
+    catch in itself: both halves were green in isolation, and only the pair
+    disagreed.
+
+66. Deploying presses its own button, and `render.yaml` presses nothing. That
+    file is a Blueprint spec, so Render applies it only to a service it manages
+    as one, and the service serving the game was created by hand in the
+    dashboard. Measured against the live site, two of its settings had never
+    been in effect:
+
+    - `autoDeploy: true` had never deployed anything. Every release until
+      2026-09-18 was a person pressing `Deploy latest commit`.
+    - The `headers` block was not being sent. The site answered with
+      `x-content-type-options` and nothing else: no CSP, no Referrer-Policy, no
+      Permissions-Policy, and an `index.html` cached for five minutes rather
+      than `no-cache`.
+
+    `.github/workflows/deploy.yml` is the press. It hangs off Verify rather than
+    off the push, so what reaches the site is a commit whose end-to-end tier
+    also went green -- which the Render build command never runs, stopping at
+    `verify:static`. Render's own Auto-Deploy would deploy every push regardless
+    of CI, which is why it is still off. The headers were mirrored into the
+    dashboard by hand; `render.yaml` carries a header saying it is inert, and
+    stays as the written record of what the service should be.
+
+    Two repository secrets now matter, and both were absent until this pass:
+    `RENDER_DEPLOY_HOOK` (the deploy hook URL, which carries its own key, so it
+    is the secret in full) and `DEPLOY_URL` (the site's address, which is not
+    secret). Without the first nothing deploys; without the second nothing is
+    checked.
+
+    `Deployed Smoke Check` is why the missing headers were found, and it is also
+    the reason they went unnoticed for so long. With `DEPLOY_URL` unset it took
+    an `if` branch that echoes a sentence and exits 0, so a job named for
+    checking a deployment reported a green tick having fetched nothing -- good
+    enough to make a reader conclude the latest commit was live. Both it and
+    the deploy job now raise a warning annotation when they skip, because an
+    annotation is the part of a run that reaches the checks list. A job that
+    cannot do its work should say so where the tick is, not in a log nobody
+    opens.
+
+67. The beat test aimed at a window shorter than a frame. `pushAtBeat` waited
+    for `--gx-beat-phase <= 0.02`, and that variable clamps at 1 instead of
+    wrapping, so it only sits that low for the first 2% of a period -- about
+    12ms of a 600ms beat, against the 16.7ms frame the callback polls on. The
+    window was stepped over whenever a runner was loaded, and a reading that did
+    catch it could be a frame stale before the click dispatched, which is how a
+    press the helper reported as landed produced no grade at all.
+
+    `--gx-beat-zone` is the app's own answer to whether a press lands in the
+    GOOD window, computed from the clock it grades with, and that window is
+    +/-18% of the period with a 60ms floor -- wide enough that a frame of drift
+    stays inside. The helper reads that instead, and waits to see the phase
+    actually change before trusting any of it, because a variable written every
+    frame and then abandoned reads live forever.
+
+    This test had been failing intermittently on main since at least 2026-09-16
+    (four red Verify runs on commits that had nothing to do with it). A timing
+    helper that samples a rendered variable and acts a frame later has to aim at
+    the middle of the tolerance, not its edge.
