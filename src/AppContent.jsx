@@ -62,6 +62,7 @@ function readCurrentSave() {
     case09: /^c9_/,
     case10: /^c10_/,
     case11: /^c11_/,
+    case12: /^c12_/,
     final: /^f_/,
   };
   const nodeMatchesCase =

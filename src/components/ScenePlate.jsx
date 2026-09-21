@@ -1088,6 +1088,28 @@ function paintFx(random, plate, id) {
       </g>,
     );
   }
+  if (plate.steam) {
+    const wisps = [];
+    for (let wisp = 0; wisp < 5; wisp += 1) {
+      const x = span(random, 40, 280);
+      const y = span(random, 58, 86);
+      wisps.push(
+        <path
+          key={`steam-${wisp}`}
+          d={`M${round(x)} ${round(y)} q-6 -10 0 -20 q6 -10 0 -20`}
+          style={{
+            animationDuration: `${span(random, 3.6, 5.8).toFixed(2)}s`,
+            animationDelay: `-${span(random, 0, 5).toFixed(2)}s`,
+          }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="steam" className="gx-plate-steam" stroke="var(--c-paper)" strokeWidth="2.2" fill="none" strokeLinecap="round">
+        {wisps}
+      </g>,
+    );
+  }
   if (plate.lightning) {
     layers.push(
       <rect
@@ -1218,6 +1240,149 @@ function paintNewsroom(random, accent, glow) {
   );
 }
 
+/**
+ * A rice-cake shop in a covered market: a striped awning, steamers stacked on
+ * the counter with trays in front, the owner behind them and a queue in front.
+ * The accent is the lamp over the steamers, the warmest light in the season.
+ */
+function paintMarket(random, accent, glow) {
+  const stacks = [];
+  for (let stack = 0; stack < 3; stack += 1) {
+    const x = 96 + stack * 44;
+    for (let tier = 0; tier < 3; tier += 1) {
+      stacks.push(<rect key={`st-${stack}-${tier}`} x={x} y={70 - tier * 9} width="34" height="8" />);
+    }
+  }
+  const trays = [];
+  for (let tray = 0; tray < 14; tray += 1) {
+    trays.push(<ellipse key={`cake-${tray}`} cx={round(92 + tray * 10.5)} cy="88" rx="3.4" ry="2.2" />);
+  }
+  const queue = Math.round(span(random, 2, 4));
+  const customers = [];
+  for (let person = 0; person < queue; person += 1) {
+    customers.push(figure(`q-${person}`, 250 + person * 20, 128, 38 - person * 3));
+  }
+  return (
+    <>
+      {far(
+        <>
+          <path d="M0 16 H320" />
+          <path d="M20 16 L10 40 M60 16 L50 40 M100 16 L90 40 M140 16 L130 40 M180 16 L170 40 M220 16 L210 40 M260 16 L250 40 M300 16 L290 40" />
+          <rect x="18" y="46" width="44" height="30" />
+        </>,
+      )}
+      {halo(146, 38, 50, glow)}
+      {mid(
+        <>
+          <path d="M70 16 Q160 34 250 16" />
+          {stacks}
+          <line x1="80" y1="92" x2="240" y2="92" />
+        </>,
+      )}
+      {lit(trays)}
+      {mark(<circle cx="146" cy="30" r="5" fill={accent} stroke="none" />)}
+      {people(seated("owner", 60, 96, 30))}
+      {near(<path d="M-4 96 H240 V132 H-4 Z" />)}
+      {people(customers)}
+    </>
+  );
+}
+
+/**
+ * A columbarium: a wall of glass niches, one of them lit by a candle, flowers
+ * on the ledge and two people standing in front of it -- a parent and a child
+ * in a school uniform. The candle is the accent and it is the only warm point
+ * in a room the tone keeps cool.
+ */
+function paintMemorial(random, accent, glow) {
+  const niches = [];
+  const litIndex = Math.round(span(random, 5, 9));
+  for (let row = 0; row < 3; row += 1) {
+    for (let col = 0; col < 5; col += 1) {
+      niches.push(<rect key={`n-${row}-${col}`} x={86 + col * 32} y={14 + row * 26} width="26" height="20" />);
+    }
+  }
+  const litX = 86 + (litIndex % 5) * 32;
+  const litY = 14 + Math.floor(litIndex / 5) * 26;
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="96" x2="320" y2="96" />
+          <rect x="20" y="10" width="40" height="70" />
+          <rect x="262" y="10" width="40" height="70" />
+        </>,
+      )}
+      {halo(litX + 13, litY + 10, 32, glow)}
+      {mid(
+        <>
+          {niches}
+          <line x1="80" y1="94" x2="252" y2="94" />
+          <path d="M112 94 l-4 -10 M116 94 l0 -12 M120 94 l4 -10" />
+        </>,
+      )}
+      {mark(
+        <>
+          <rect x={litX + 3} y={litY + 3} width="20" height="14" fill={accent} opacity="0.35" stroke="none" />
+          <path d={`M${litX + 13} ${litY + 15} q-3 -5 0 -9 q3 4 0 9 Z`} fill={accent} stroke="none" />
+        </>,
+      )}
+      {near(<path d="M-4 112 H324 V132 H-4 Z" />)}
+      {people(
+        <>
+          {figure("parent", 150, 124, 46)}
+          {figure("son", 178, 124, 40)}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * A machine floor stopped for a year: lathes under dust sheets, high windows
+ * the light comes in through, a calendar on the wall stuck on the month it
+ * stopped. One machine is uncovered and its work lamp is on -- the accent,
+ * and the only thing in the room that has moved.
+ */
+function paintFactory(random, accent, glow) {
+  const sheets = [];
+  for (let machine = 0; machine < 4; machine += 1) {
+    const x = 24 + machine * 58;
+    if (machine === 2) continue;
+    sheets.push(<path key={`sheet-${machine}`} d={`M${x} 104 Q${x + 4} 74 ${x + 22} 72 Q${x + 42} 74 ${x + 46} 104 Z`} />);
+  }
+  return (
+    <>
+      {far(
+        <>
+          <rect x="30" y="8" width="40" height="18" />
+          <rect x="140" y="8" width="40" height="18" />
+          <rect x="250" y="8" width="40" height="18" />
+          <line x1="0" y1="44" x2="320" y2="44" />
+          <rect x="276" y="52" width="24" height="26" />
+        </>,
+      )}
+      {mid(
+        <>
+          {sheets}
+          <rect x="140" y="82" width="48" height="22" />
+          <line x1="150" y1="82" x2="150" y2="68" />
+          <circle cx="176" cy="92" r="6" />
+        </>,
+      )}
+      {halo(150, 66, 34, glow)}
+      {mark(<path d="M144 62 H158 L154 68 H148 Z" fill={accent} stroke="none" />)}
+      {near(<path d="M-4 104 H324 V132 H-4 Z" />)}
+      {people(
+        <>
+          {figure("worker", 262, 124, 44)}
+          {figure("foreman", 292, 124, 40)}
+        </>,
+      )}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
   transit: paintTransit,
   bookshop: paintBookshop,
@@ -1235,6 +1400,9 @@ const MOTIF_PAINTERS = {
   hall: paintHall,
   chamber: paintChamber,
   newsroom: paintNewsroom,
+  market: paintMarket,
+  memorial: paintMemorial,
+  factory: paintFactory,
   counter: paintCounter,
   desk: paintDesk,
 };

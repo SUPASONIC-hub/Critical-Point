@@ -624,7 +624,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case11: { routeMemory: getRouteMemory([{ nodeId: "c11_route_system", choiceId: "c11_route_system_publish", freeTextSuccess: true }]) } },
+      caseResults: { case12: { routeMemory: getRouteMemory([{ nodeId: "c12_route_system", choiceId: "c12_route_system_publish", freeTextSuccess: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -771,14 +771,15 @@ test("case 02 should have a people-led opening route", () => {
   assert.equal(caseOpeningRoutes.case02.c1_after_people, "c2_start_people", "case 02 should have a people-led opening route");
 });
 test("the final act should have a system-led opening route", () => {
-  // Keyed on case 11's aftermath: that is the case the finale now follows.
-  assert.equal(caseOpeningRoutes.final.c11_after_record, "f_start_system", "the final act should have a system-led opening route");
+  // Keyed on case 12's aftermath: that is the case the finale now follows.
+  assert.equal(caseOpeningRoutes.final.c12_after_fund, "f_start_system", "the final act should have a system-led opening route");
 });
-test("case 08 through 11 should open from the aftermath before them", () => {
+test("case 08 through 12 should open from the aftermath before them", () => {
   assert.equal(caseOpeningRoutes.case08.c7_after_open, "c8_start_open", "case 08 should open from case 07's aftermath");
   assert.equal(caseOpeningRoutes.case09.c8_after_friend, "c9_start_friend", "case 09 should open from case 08's aftermath");
   assert.equal(caseOpeningRoutes.case10.c9_after_court, "c10_start_court", "case 10 should open from case 09's aftermath");
   assert.equal(caseOpeningRoutes.case11.c10_after_record, "c11_start_record", "case 11 should open from case 10's aftermath");
+  assert.equal(caseOpeningRoutes.case12.c11_after_summon, "c12_start_summon", "case 12 should open from case 11's aftermath");
 });
 test("case 06 should open from case 05's aftermath", () => {
   assert.equal(caseOpeningRoutes.case06.c5_after_system, "c6_start_system", "case 06 should open from case 05's aftermath");
@@ -897,11 +898,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("72 generated scenes should expose 222 authored choices: three each across twelve cases", () => {
+test("78 generated scenes should expose 240 authored choices: three each across thirteen cases", () => {
   assert.equal(
     generatedChoiceCount,
-    222,
-    "72 generated scenes should expose 222 authored choices: three each across twelve cases",
+    240,
+    "78 generated scenes should expose 240 authored choices: three each across thirteen cases",
   );
 });
 

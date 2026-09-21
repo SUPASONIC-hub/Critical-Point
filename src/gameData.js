@@ -12,6 +12,7 @@ import { case08Nodes } from "./nodes/case08.js";
 import { case09Nodes } from "./nodes/case09.js";
 import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
+import { case12Nodes } from "./nodes/case12.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
@@ -37,6 +38,7 @@ export const nodes = {
   ...case09Nodes,
   ...case10Nodes,
   ...case11Nodes,
+  ...case12Nodes,
   ...finalCaseNodes,
 };
 
@@ -184,6 +186,19 @@ const aftermathNodes = {
       { id: "c11_after_summon", label: "지금 바로 33층 면담에 응하겠다고 답한다", effect: { capital: 9, legitimacy: 5, trust: -7, humanCost: 5, fatigue: 6 }, next: "case11_result", cognition: { risk: 2 } },
     ],
   },
+  c12_aftershock: {
+    phase: "AFTERMATH",
+    title: "떡 돌리는 날",
+    speaker: "문가을",
+    text: "첫 배상금이 들어온 날, 가을떡방 앞에 줄이 섭니다. 문가을이 모임 사람들에게 떡을 한 상자씩 돌리고, 강태민은 상자를 나르고, 나준혁은 받는 사람마다 '추석 잘 쇠세요'를 서른 번째 반복합니다. 문하준이 교복 차림으로 와서 영수증을 한 장씩 정리하다가 권도현에게 '이거 왜 이렇게 적어요?'를 스무 번 묻습니다. 권도현은 스무 번 다 대답합니다. 해 질 무렵 문가을이 당신에게 마지막 상자를 내밉니다. '이건 남편 몫이에요. 당신이 대신 받아요.' 그때 휴대폰이 울립니다. 본사 33층 그룹전략실입니다. 윤상혁이, 이번에는 서명란 얘기를 하자고 합니다.",
+    memo: ["첫 배상 입금 확인", "떡 상자 1,021개 -- 모임 전원", "문하준, 영수증 정리 자원봉사", "33층 호출: 이번에는 서명란에 대해"],
+    triggers: ["affection", "trust", "choice"],
+    choices: [
+      { id: "c12_after_feast", label: "오늘은 떡집 셔터를 내릴 때까지 같이 떡을 돌린다", effect: { trust: 13, humanCost: -6, time: -3, capital: -2, fatigue: -8 }, next: "case12_result", cognition: { reframing: 2 } },
+      { id: "c12_after_fund", label: "212명이 들어갈 배상 기준 개정안부터 문서로 남긴다", effect: { legitimacy: 15, trust: 4, time: -5, capital: -3, fatigue: 5 }, next: "case12_result", cognition: { inference: 2, persistence: 1 } },
+      { id: "c12_after_meet", label: "마지막 상자를 들고 곧장 33층으로 간다", effect: { capital: 8, legitimacy: 6, trust: -7, humanCost: 5, fatigue: 6 }, next: "case12_result", cognition: { risk: 2 } },
+    ],
+  },
   f_aftershock: {
     phase: "LAST EVIDENCE",
     title: "당신의 선택이 사용되는 밤",
@@ -213,6 +228,7 @@ const aftermathRoutes = {
   c9_final: "c9_aftershock",
   c10_final: "c10_aftershock",
   c11_final: "c11_aftershock",
+  c12_final: "c12_aftershock",
   f_choice: "f_aftershock",
 };
 
@@ -233,6 +249,7 @@ nodeOrders.case08.push("c8_aftershock");
 nodeOrders.case09.push("c9_aftershock");
 nodeOrders.case10.push("c10_aftershock");
 nodeOrders.case11.push("c11_aftershock");
+nodeOrders.case12.push("c12_aftershock");
 nodeOrders.final.push("f_aftershock");
 
 const connectiveScenes = [
@@ -270,6 +287,9 @@ const connectiveScenes = [
   ["c11_press", "c11_script", "c11_rehearsal", "부재중 전화 스물세 통", "서하린", "밤 열 시, 리드라인 기자 서하린이 의원회관 앞 편의점으로 찾아옵니다. 당신 휴대폰에는 그의 부재중 전화가 스물세 통 쌓여 있습니다. 그가 컵라면 두 개에 물을 붓고 하나를 밀어 줍니다. '기사에 틀린 게 하나 있어요. 제보자가 그렇게 말해서 A씨를 여성이라고 썼거든요. 고칠까요, 그냥 둘까요? 그냥 두면 당신은 조금 더 숨을 수 있어요.' 편의점 직원이 두 사람을 번갈아 보다가, 텔레비전 볼륨을 슬쩍 줄입니다. 화면에는 그 기사가 나오고 있습니다.", ["기사 속 A씨의 성별이 틀리게 적힘", "그대로 두면 신원 추적이 며칠 늦어짐", "고치면 기사 신뢰도는 올라가고 당신은 드러남"], ["틀린 건 고쳐 달라고 하고 드러나는 쪽을 택한다", "국정감사 날까지만 그대로 두자고 부탁한다", "기사 내용은 기자 판단에 맡기고 선을 긋는다"]],
   ["c11_father", "c11_rehearsal", "c11_sign", "방청권 한 장", "오진우", "리허설이 끝나고 오진우가 계단참에서 휴대폰을 오래 봅니다. 국정감사 방청권(회의를 지켜볼 수 있는 입장권) 신청 명단에 '오상철'이라는 이름이 있습니다. 3년 전 승인을 하루 늦춰 지점에서 밀려난 그의 아버지입니다. 부자는 2년째 명절에도 통화하지 않았습니다. '아버지가 거길 왜 오시는지 모르겠어요. 제가 틀렸다는 걸 보러 오시는 건지, 자기가 옳았다는 걸 보러 오시는 건지.' 그가 웃으려다 그만둡니다.", ["방청 신청 명단에 오상철", "오진우 부자, 2년째 연락 없음", "오상철: 3년 전 승인을 하루 늦춘 지점장"], ["출석 전날 두 사람이 같이 밥을 먹게 자리를 만든다", "방청석 자리를 오진우 옆으로 바꿔 준다", "아버지 일은 오진우가 정하게 두고 묻지 않는다"]],
   ["c11_eve", "c11_sign", "c11_final", "여섯 시 사십 분", "도윤하", "출석 날 새벽 여섯 시 사십 분, 국회 앞 횡단보도. 도윤하가 보온병을 들고 먼저 와 있습니다. 강태민이 야간조를 마치고 형광 조끼 차림 그대로 합류하고, 나준혁은 단추를 새로 단 정장을 입고 와서 모두에게 보여 줍니다. 도윤하가 종이컵에 보리차를 따르다 손을 떱니다. '오늘 제 이름도 나올 거예요. 판 사람으로요. 괜찮아요. 3년 동안 그 말을 제일 많이 한 사람이 저니까.' 신호가 바뀌고, 아무도 먼저 건너지 않습니다.", ["참고인 출석 3시간 전", "도윤하: 판매 당사자로 언급될 가능성", "방청 신청 7명 전원 도착"], ["도윤하의 이름이 나오면 내가 먼저 받아서 답하겠다고 한다", "판 사람과 팔게 만든 구조를 나눠서 말하자고 정한다", "오늘은 도윤하가 방청석에 오지 않는 게 낫다고 말한다"]],
+  ["c12_line", "c12_mediation", "c12_market", "번호표 38번", "이민서", "설명회가 끝나고 분쟁조정 접수 창구 앞에 줄이 섭니다. 이민서가 자청해서 서류 작성을 돕습니다. 번호표 38번 할머니가 돋보기를 두고 왔다며 신청서를 내밉니다. 칸이 스물네 개입니다. 이민서가 한 칸씩 소리 내어 읽어 드리다가 '대출 약정 번호'에서 멈춥니다. 할머니는 그 번호를 받은 적이 없습니다. 아들 이름으로 받은 대출이었고, 아들은 연락이 끊겼습니다. 할머니가 웃으며 말합니다. '그럼 나는 피해자가 아닌가 봐요.'", ["접수 창구 대기 186명", "38번: 아들 명의 대출, 본인 서류 없음", "신청서 칸 24개 중 본인이 채울 수 있는 칸 9개"], ["서류 없는 사람도 낼 수 있는 진술서 양식을 따로 만든다", "할머니의 아들을 찾아 서류부터 받아 온다", "오늘은 서류 있는 사람부터 접수를 끝낸다"]],
+  ["c12_rival", "c12_market", "c12_memorial", "떡값", "권도현", "밤 열 시, 가게 셔터를 반쯤 내린 뒤 권도현이 문가을의 장부를 봅니다. 허락은 받았습니다. 받았다고 그는 주장합니다. 그가 계산기를 두드리다 멈춥니다. '사장님, 매달 80만 원이 비는데요.' 문가을이 떡을 썰며 대답하지 않습니다. 장부 뒷장에 이름 스물세 개가 있습니다. 모임 사람들 중 가게 문을 닫은 사람들이고, 그 사람들 몫의 떡은 한 번도 계산된 적이 없습니다. 권도현이 한참 있다가 그 장에 세로줄을 긋습니다. '이건 적자가 아니라 지출로 적읍시다. 칸 이름은 제가 정할게요.'", ["매달 80만 원 공짜 떡", "장부 뒷장 이름 23개 -- 문 닫은 가게 사장들", "권도현: 칸 이름을 붙이면 비용이 된다"], ["그 칸에 '연대비'라는 이름을 붙여 모임 회비로 나눈다", "배상금이 나오면 그 80만 원부터 메우자고 한다", "사장님의 방식이니 장부에는 손대지 않는다"]],
+  ["c12_letter", "c12_memorial", "c12_final", "부치지 못한 편지", "문가을", "봉안당 앞 벤치에서 편지를 엽니다. 날짜는 3년 전, 플로우온 대출이 실행된 다음 달입니다. '심사역님께. 거래 은행 창구에서 반대 의견이 한 건 있었다는 말을 들었습니다. 그게 누구인지는 모릅니다. 고맙습니다. 그 한 건 덕분에 저는 적어도 제가 미친 게 아니라는 걸 알았습니다. 다만 부탁이 하나 있습니다. 다음에는 끝까지 해 주십시오. 저 같은 사람은 끝까지 할 힘이 없습니다.' 문가을이 편지를 접습니다. '이걸 보낼까 말까 1년을 고민하다 쓰러졌어요.'", ["편지 날짜: 대출 실행 다음 달", "수신인: 반대 의견 작성자", "부탁: '다음에는 끝까지'"], ["편지를 조정위원회에 참고 자료로 낸다", "편지는 가족의 것이라며 돌려준다", "편지의 마지막 줄을 조정 발언의 첫 문장으로 쓴다"]],
   ["f_witness", "f_archive", "f_confront", "첫 번째 참가자", "도윤하", "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.", ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"], ["이전 참가자에게 먼저 알린다", "복제된 문장을 모두 증거로 수집한다", "실험을 멈추기 위해 서버를 닫는다"]],
   ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다", "실험을 이어가되 나를 다음 참가자로 등록한다"]],
 ];
@@ -473,6 +493,21 @@ const lateSeasonChoiceEffects = {
     { legitimacy: 10, trust: 4, time: -6, humanCost: 3, fatigue: 4 },
     { time: 5, capital: 4, trust: -8, humanCost: 5, fatigue: -3 },
   ],
+  c12_mediation: [
+    { trust: 12, legitimacy: 5, humanCost: -5, time: -6, capital: -3, fatigue: 5 },
+    { legitimacy: 6, trust: 3, time: -7, humanCost: 4, fatigue: 4 },
+    { time: 6, capital: 5, trust: -7, humanCost: 5, fatigue: -3 },
+  ],
+  c12_market: [
+    { trust: 11, legitimacy: 4, humanCost: -5, capital: -4, time: -4, fatigue: 4 },
+    { humanCost: -4, trust: 4, capital: -7, time: -2, fatigue: 2 },
+    { time: 5, capital: 5, trust: -6, humanCost: 4, fatigue: -4 },
+  ],
+  c12_memorial: [
+    { legitimacy: 10, trust: 5, humanCost: 3, time: -5, fatigue: 4 },
+    { trust: 9, humanCost: -5, legitimacy: -3, time: -2, fatigue: 3 },
+    { trust: 8, legitimacy: 7, capital: -5, time: -6, fatigue: 5 },
+  ],
 };
 
 const lateSeasonReactionEffects = {
@@ -549,6 +584,21 @@ const lateSeasonReactionEffects = {
   c11_eve: [
     { legitimacy: 11, trust: 5, capital: -6, time: -3, fatigue: 5 },
     { legitimacy: 7, trust: 3, time: -5, humanCost: 3, fatigue: 3 },
+    { time: 5, capital: 5, trust: 4, legitimacy: -7, humanCost: 3, fatigue: -3 },
+  ],
+  c12_line: [
+    { legitimacy: 10, trust: 5, capital: -6, time: -4, fatigue: 5 },
+    { trust: 8, humanCost: -5, time: -7, fatigue: 5 },
+    { time: 5, capital: 5, trust: -6, humanCost: 5, fatigue: -3 },
+  ],
+  c12_rival: [
+    { trust: 10, humanCost: -5, time: -4, fatigue: 4 },
+    { legitimacy: 6, trust: 3, capital: -4, time: -2, fatigue: 2 },
+    { time: 4, capital: 3, trust: -4, humanCost: 3, fatigue: -3 },
+  ],
+  c12_letter: [
+    { legitimacy: 11, trust: 5, capital: -6, time: -3, fatigue: 5 },
+    { trust: 7, humanCost: -4, legitimacy: 2, time: -5, fatigue: 3 },
     { time: 5, capital: 5, trust: 4, legitimacy: -7, humanCost: 3, fatigue: -3 },
   ],
 };
@@ -771,6 +821,18 @@ const lateSeasonChoiceCopy = {
     voice: ["도윤하의 이름이 나오면, 내가 먼저 받아서 답하겠다고 한다.", "판 사람과 팔게 만든 구조를, 나눠서 말하자고 정한다.", "오늘은 방청석에 오지 않는 게 낫다고, 도윤하에게 말한다."],
     echo: ["먼저 받으면 도윤하는 그 질문을 직접 듣지 않습니다. 대신 당신 답변 40초가 거기에 쓰입니다.", "나눠서 말하면 문장이 길어집니다. 긴 문장은 방송에서 잘립니다.", "오지 않으면 그는 안전합니다. 3년을 센 사람이 그 방에 없었다는 것도 기록에 남습니다."],
   },
+  c12_mediation: {
+    voice: ["서류 없는 사람도 낼 수 있는, 진술서 양식을 따로 만든다.", "할머니의 아들을 찾아, 서류부터 받아 오겠다고 한다.", "오늘은 서류 있는 사람부터 접수를 끝내자고 한다."],
+    echo: ["양식이 생기면 38번 할머니는 피해자가 됩니다. 그 양식을 위원회가 받아 줄지는 아직 모릅니다.", "아들을 찾으면 서류는 생깁니다. 할머니가 알고 싶지 않았던 소식도 함께 올 수 있습니다.", "줄은 줄어듭니다. 38번 할머니는 번호표를 쥔 채 집으로 돌아갑니다."],
+  },
+  c12_market: {
+    voice: ["그 칸에 '연대비'라는 이름을 붙여, 모임 회비로 나누자고 한다.", "배상금이 나오면, 그 80만 원부터 메우자고 한다.", "사장님의 방식이라며, 장부에는 손대지 않는다."],
+    echo: ["이름이 붙으면 23명은 빚진 사람이 아니라 회원이 됩니다. 문가을은 그 이름이 조금 쑥스럽다고 합니다.", "메우자는 말에 문가을이 웃습니다. '그 돈은 남편 몫이에요. 떡값으로 쓰면 그 사람이 좋아할 거예요.'", "장부는 그대로 남습니다. 80만 원은 다음 달에도 조용히 빕니다."],
+  },
+  c12_memorial: {
+    voice: ["편지를, 조정위원회에 참고 자료로 낸다.", "편지는 가족의 것이라며 문가을에게 돌려준다.", "편지의 마지막 줄을, 조정 발언의 첫 문장으로 쓰겠다고 한다."],
+    echo: ["자료가 된 편지는 위원들이 읽습니다. 그룹 측 변호사도 읽습니다.", "돌려받은 편지를 문가을이 가방 제일 안쪽에 넣습니다. 그 편지는 이제 아무 절차에도 쓰이지 않습니다.", "첫 문장이 '다음에는 끝까지'가 되면 회의실이 조용해집니다. 그 조용함이 누구에게 유리할지는 모릅니다."],
+  },
 };
 
 const lateSeasonReactionCopy = {
@@ -833,6 +895,18 @@ const lateSeasonReactionCopy = {
   c11_eve: {
     voice: ["질의 첫 1분에, 취소 공지부터 꺼낸다.", "의원실에 먼저 넘겨서, 의원이 묻게 한다.", "사유서는 건드리지 않고, 내 이야기에만 집중한다."],
     echo: ["첫 1분에 꺼내면 방의 공기가 바뀝니다. 남은 6분은 전부 그 빈 의자를 위한 시간이 됩니다.", "의원이 물으면 무게가 실립니다. 그 질문이 누구의 공이 될지는 의원실이 정합니다.", "당신 이야기는 온전히 남습니다. 사라진 일정은 다음 날 기사 한 줄로만 나옵니다."],
+  },
+  c12_line: {
+    voice: ["'그 임직원'을 조항에서 빼라고 요구한다.", "조항이 무슨 뜻인지, 모임 전원에게 먼저 설명한다.", "배상이 급하다며, 조항은 문제 삼지 않는다."],
+    echo: ["한 단어를 빼자고 하면 그룹 측 변호사가 처음으로 목소리를 높입니다. 그 단어가 가장 비싼 단어였다는 뜻입니다.", "설명을 들은 1,021명 중 몇 명은 서명을 망설입니다. 망설이는 동안 추석은 다가옵니다.", "조항은 그대로 통과합니다. 국정감사에서 불린 이름은 법정에서는 다시 불리지 않습니다."],
+  },
+  c12_rival: {
+    voice: ["그 복수에 나도 한 칸 끼워 달라고 한다.", "복수 말고 제도로 갚게 하자고, 문가을을 설득한다.", "오늘은 떡이나 먹자며, 아무 말도 보태지 않는다."],
+    echo: ["끼워 주면 당신 몫의 칸이 생깁니다. 문가을이 칸 이름을 '반대 의견'이라고 적습니다.", "제도는 오래 갑니다. 문가을은 제도가 자기 남편에게 한 일을 기억합니다.", "떡은 맛있습니다. 권도현이 두 개째를 집습니다."],
+  },
+  c12_letter: {
+    voice: ["한서윤과 함께, 조정위원회에 간다.", "가족이 원하는지 먼저 묻고 정하자고 한다.", "오늘은 한서윤을 말리고, 혼자 간다."],
+    echo: ["함께 가면 반대한 사람과 반려한 사람이 유족 앞에 나란히 섭니다. 문가을은 둘 중 누구를 먼저 볼지 정해야 합니다.", "물으면 문가을이 하루를 생각합니다. 그리고 '그 사람 얼굴을 보고 싶어요'라고 답합니다.", "혼자 가면 회의는 조용합니다. 한서윤은 그날 밤 편지 사진을 오래 봅니다."],
   },
 };
 
@@ -910,6 +984,7 @@ const connectiveOrders = {
   case09: [["c9_ledger", "c9_calc"], ["c9_family", "c9_wedding"], ["c9_timing", "c9_night"]],
   case10: [["c10_locker", "c10_ward"], ["c10_claim", "c10_pills"], ["c10_relay", "c10_ledger"]],
   case11: [["c11_script", "c11_press"], ["c11_rehearsal", "c11_father"], ["c11_sign", "c11_eve"]],
+  case12: [["c12_mediation", "c12_line"], ["c12_market", "c12_rival"], ["c12_memorial", "c12_letter"]],
   final: [["f_archive", "f_witness"], ["f_confront", "f_dilemma"]],
 };
 
@@ -956,6 +1031,9 @@ const reactionScenes = [
   ["c11_press_reaction", "c11_press", "c11_rehearsal", "검색어 3위", "에코", "에코가 지난 48시간의 검색 기록을 띄웁니다. 'KD은행 A씨'가 검색어 3위이고, 연관 검색어에 도윤하의 이름이 있습니다. 강서지점 실적 1위 표창 사진이 퍼졌고, 댓글 1,200개 중 공감을 가장 많이 받은 문장은 '판 사람도 공범 아닌가요'입니다. '당신이 드러나지 않는 동안, 사람들은 드러난 얼굴을 대신 찾습니다.'", ["도윤하에게 먼저 알리고 대응을 같이 정한다", "표창 사진을 퍼뜨린 계정부터 확인한다", "댓글은 보지 말자고 하고 출석 준비에만 집중한다"]],
   ["c11_father_reaction", "c11_father", "c11_sign", "늦춘 하루", "오진우", "오상철이 먼저 전화를 걸어왔습니다. 오진우가 스피커를 켭니다. 쉰 목소리가 한참 망설이다 말합니다. '그날 하루 늦춘 거, 나는 아직도 잘했다고 생각한다. 그런데 그게 너한테 3년 동안 무슨 뜻이었는지는 한 번도 안 물어봤더라.' 오진우가 대답하지 못하고 휴대폰을 당신 쪽으로 밉니다. 통화 시간이 1분, 2분 넘어갑니다.", ["휴대폰을 오진우 손에 다시 쥐여 준다", "당신이 대신 인사하고 출석 날 뵙자고 한다", "잠깐 자리를 비켜 두 사람만 남긴다"]],
   ["c11_eve_reaction", "c11_eve", "c11_final", "불출석 사유서", "에코", "국회 게시판에 윤상혁의 불출석 사유서(증인이 나오지 못하는 이유를 적어 내는 문서)가 올라옵니다. 사유는 '싱가포르 투자 설명회 참석'. 에코가 한 줄을 겹쳐 띄웁니다. 그 설명회 주최 측의 공지입니다. '행사는 주최 측 사정으로 취소되었습니다.' 공지 날짜는 사흘 전입니다. '사유서는 이미 사라진 일정 위에 쓰였습니다. 이 사실을 언제 말하느냐가 7분의 모양을 정합니다.'", ["질의 첫 1분에 취소 공지부터 꺼낸다", "의원실에 먼저 넘겨 의원이 묻게 한다", "사유서는 건드리지 않고 내 이야기에만 집중한다"]],
+  ["c12_line_reaction", "c12_line", "c12_market", "부제소 조항", "에코", "에코가 자율 배상안 합의서의 조항을 띄웁니다. 제7조 부제소 합의. 서명한 사람은 이 대출과 관련해 그룹과 계열사, '그 임직원'을 상대로 어떤 소송도 내지 않습니다. 에코가 '그 임직원'에 밑줄을 긋습니다. '이 한 단어에 윤상혁이 들어갑니다. 1,528명이 서명하면, 국정감사(국회가 공개적으로 따져 묻는 자리)에서 불린 그 이름은 민사로는 다시 불리지 않습니다.'", ["'그 임직원'을 조항에서 빼라고 요구한다", "조항의 뜻을 모임 전원에게 먼저 설명한다", "배상이 급하니 조항은 문제 삼지 않는다"]],
+  ["c12_rival_reaction", "c12_rival", "c12_memorial", "공짜 떡", "문가을", "문가을이 장부를 덮고 웃습니다. '공짜 떡은 제 복수예요. 은행은 우리한테 이자를 받았잖아요. 저는 이 사람들한테 아무것도 안 받을 거예요. 그게 제가 이기는 방법이에요.' 권도현이 계산기를 내려놓고 떡 하나를 집어 먹습니다. 한참 씹다가 말합니다. '이건 제 장부에 적을 칸이 없네요. 처음 있는 일입니다.'", ["그 복수에 나도 한 칸 끼워 달라고 한다", "복수 말고 제도로 갚게 하자고 설득한다", "오늘은 떡이나 먹자며 아무 말도 보태지 않는다"]],
+  ["c12_letter_reaction", "c12_letter", "c12_final", "같은 날", "한서윤", "편지 사진을 받은 한서윤이 밤늦게 전화를 겁니다. '편지 날짜요. 제가 당신 반대 의견을 반려한 그다음 달이에요. 이분은 반대 의견이 있었다는 것까지는 들었는데, 그게 반려됐다는 건 몰랐던 거예요.' 수화기 너머가 한참 조용합니다. '제가 조정위원회에 같이 가도 될까요. 거기서 이분 가족한테 제 이름을 말하고 싶어요.'", ["한서윤과 함께 조정위원회에 간다", "가족이 원하는지 먼저 묻고 정한다", "오늘은 한서윤을 말리고 혼자 간다"]],
   ["f_witness_reaction", "f_witness", "f_confront", "첫 참가자의 선택", "반재욱", "첫 참가자는 자신의 기록을 돌려달라고 요청합니다. 하지만 기록을 돌려주면 지금까지의 실험 전체가 흔들립니다.", ["기록을 돌려주고 실험을 다시 설명한다", "기록을 증거로 보관하고 동의를 요청한다", "기록을 삭제해 피해를 끝낸다"]],
   ["f_dilemma_reaction", "f_dilemma", "f_choice", "종료 버튼 앞에서", "에코", "종료 버튼 위에는 당신의 이름이 표시되어 있습니다. 누르는 순간 실험은 끝나지만, 책임도 당신에게 남습니다.", ["참가자들과 함께 종료 조건을 정한다", "내가 혼자 버튼을 누른다", "버튼을 숨기고 시스템을 지켜본다"]],
 ];
@@ -993,6 +1071,9 @@ const authoredReactionMemos = {
   c11_press_reaction: ["연관 검색어에 오른 도윤하", "공감 1위 댓글: 판 사람도 공범"],
   c11_father_reaction: ["3년 만의 부자 통화", "잘했다는 말과 묻지 못한 말"],
   c11_eve_reaction: ["사라진 일정 위에 쓰인 사유서", "7분 중 언제 꺼낼지"],
+  c12_line_reaction: ["'그 임직원'이라는 한 단어", "서명하면 다시 불리지 않는 이름"],
+  c12_rival_reaction: ["아무것도 받지 않는 복수", "장부에 적을 칸이 없는 떡"],
+  c12_letter_reaction: ["반려 다음 달에 쓴 편지", "가족 앞에서 말할 이름"],
   c6_family_reaction: ["오늘 답하지 않을 권한", "미룬 말에 붙는 이자"],
   c6_ledger_reaction: ["아는 쪽과 모르는 쪽", "위원회에 들어갈 문장"],
   f_witness_reaction: ["이전 참가자가 돌려받을 기록", "동의 없이 복제된 문장"],
@@ -1315,6 +1396,35 @@ const lateSeasonBranchScenes = {
       { id: "c10_branch_home_follow_c", label: "도윤하가 깨면 이 얘기부터 해 주기로 한다", effect: { trust: 11, humanCost: -7, time: 5, legitimacy: -4, fatigue: -3 }, next: "c10_ward", cognition: { persistence: 2 } },
     ],
   },
+  // CASE 12's detour is the factory. The case argues over a compensation
+  // standard; the side door is the machine floor the standard is about, where
+  // nothing has moved in a year.
+  c12_branch_factory: {
+    phase: "SIDE DOOR",
+    title: "멈춘 공장",
+    speaker: "강태민",
+    text: "1년째 셔터가 내려진 공장 안에 선반 여섯 대가 비닐을 쓴 채 서 있습니다. 문가을이 열쇠를 건네며 '저는 못 들어가겠어요'라고 해서 강태민과 둘이 들어왔습니다. 벽에 걸린 달력은 부도가 난 달에 멈춰 있고, 작업대에는 '납품 D-3'이라고 적힌 쪽지가 그대로 붙어 있습니다. 강태민이 비닐 하나를 걷고 선반을 한참 봅니다. '이거 아직 살아 있어요. 기름만 치면 돼요.' 공장 밖에는 이 공장에서 일하던 기술자 일곱 명 중 셋이 와서 기다리고 있습니다.",
+    memo: ["선반 6대 -- 보존 상태 양호", "전 직원 7명 중 3명이 재가동을 원함", "공장 명의: 문가을, 담보로 잡혀 있음", "배상금으로 재가동 초기 비용 충당 가능"],
+    triggers: ["affection", "trust", "responsibility"],
+    choices: [
+      { id: "c12_branch_factory_a", label: "기술자 세 명과 재가동 계획부터 같이 세운다", effect: { trust: 12, legitimacy: 5, capital: -7, time: -6, fatigue: 5 }, next: "c12_branch_factory_follow", cognition: { reframing: 2 } },
+      { id: "c12_branch_factory_b", label: "공장은 정리하고 배상금은 가족 생활비로 쓰자고 한다", effect: { capital: 9, time: 5, trust: -6, humanCost: 4, fatigue: -3 }, next: "c12_branch_factory_follow", cognition: { risk: 1 } },
+      { id: "c12_branch_factory_c", label: "담보가 어떻게 잡혔는지 대출 서류부터 확인한다", effect: { legitimacy: 11, time: -6, humanCost: 3, trust: 3, fatigue: 4 }, next: "c12_branch_factory_follow", cognition: { inference: 2 } },
+    ],
+  },
+  c12_branch_factory_follow: {
+    phase: "SIDE DOOR",
+    title: "다시 켜는 선반",
+    speaker: "강태민",
+    text: "강태민이 기름을 치고 전원을 올립니다. 선반이 한 번 헛돌다가, 1년 만에 낮고 고른 소리를 냅니다. 밖에서 기다리던 기술자 셋이 문간까지 들어와 소리만 듣습니다. 가장 나이 많은 김 반장이 말합니다. '사장님 없이 우리끼리 돌리려면 협동조합(일하는 사람들이 함께 소유하고 운영하는 회사)밖에 없어요. 근데 우리 셋은 대출이 안 나와요. 신용이 다 깨져서.' 강태민이 장갑을 벗어 조끼 주머니에 꽂습니다. '대출은 원래 이런 사람들 쓰라고 있는 거 아니에요?'",
+    memo: ["선반 1대 정상 가동 확인", "협동조합 설립 최소 인원 5명", "기술자 3명 모두 신용등급 하락", "문하준이 공장 이름을 지어 오겠다고 함"],
+    triggers: ["trust", "responsibility", "injustice"],
+    choices: [
+      { id: "c12_branch_factory_follow_a", label: "협동조합 설립을 돕고 강태민을 네 번째 조합원으로 부른다", effect: { trust: 13, legitimacy: 5, capital: -8, time: -6, fatigue: 5 }, next: "c12_line", cognition: { reframing: 3 } },
+      { id: "c12_branch_factory_follow_b", label: "신용이 깨진 사람도 받을 수 있는 대출 조건을 은행에 제안한다", effect: { legitimacy: 12, trust: 5, time: -7, humanCost: 3, fatigue: 5 }, next: "c12_line", cognition: { inference: 2 } },
+      { id: "c12_branch_factory_follow_c", label: "재가동은 조정이 끝난 뒤로 미루고 전원을 내린다", effect: { time: 6, capital: 6, trust: -7, humanCost: 4, fatigue: -3 }, next: "c12_line", cognition: { risk: 1 } },
+    ],
+  },
   // CASE 11's detour is the newsroom. The case argues in scripts and camera
   // time; the side door is the one room where the evidence is on paper and a
   // cat is allowed to edit it.
@@ -1409,6 +1519,7 @@ const authoredBranchPlans = [
   ["case09", "c9_family", 2, "c9_branch_father", "c9_branch_father_follow"],
   ["case10", "c10_locker", 1, "c10_branch_home", "c10_branch_home_follow"],
   ["case11", "c11_script", 1, "c11_branch_newsroom", "c11_branch_newsroom_follow"],
+  ["case12", "c12_mediation", 2, "c12_branch_factory", "c12_branch_factory_follow"],
   ["final", "f_confront", 0, "f_branch_witness", "f_branch_witness_follow"],
 ];
 
@@ -2319,6 +2430,32 @@ const dramaticRoutePlans = {
       ["c", "내년 국정감사에 스스로 다시 나오겠다고 약속한다", { legitimacy: 8, trust: 8, capital: -5, time: -7, humanCost: 3, fatigue: 9 }, { persistence: 2 }],
     ],
   },
+  case12: {
+    start: "c12_start",
+    result: "c12_aftershock",
+    defaultFree: "c12_route_system",
+    // One standard, many people. Like 사건 10 and 11 the case is a single line;
+    // the split is whose names the standard ends up holding.
+    choices: {},
+    system: {
+      route: "c12_route_system",
+      final: "c12_final_system_route",
+      title: "합의서의 문장",
+      speaker: "에코",
+      text: "준비된 보기 밖의 문장을 쓰자 에코가 지난 10년 금융회사들이 내놓은 자율 배상안 47건을 엽니다. 그중 43건에 부제소 합의(앞으로 이 일로 소송하지 않겠다는 약속)가 붙어 있었습니다. 서명한 사람 가운데 나중에 더 큰 피해가 드러난 경우가 11건이었지만, 다시 소송할 수 있었던 사람은 한 명도 없었습니다. '배상금은 사과가 아니라 조용함을 사는 값으로 학습되어 있습니다. 가격표가 붙은 적은 없습니다.'",
+      memo: ["자율 배상안 47건 중 부제소 합의 43건", "추가 피해가 드러난 11건 -- 재소송 0건", "이 통계는 어떤 조정 자료에도 인용된 적 없음"],
+      routeChoices: [
+        ["c12_route_system_publish", "통계를 조정위원회와 모임에 동시에 공개한다", { legitimacy: 11, trust: 6, capital: -6, time: -8, fatigue: 5 }, { inference: 2, persistence: 1 }],
+        ["c12_route_system_price", "부제소 조항에 따로 값을 매겨 배상금에 더하라고 요구한다", { capital: 6, legitimacy: 8, trust: 3, time: -7, humanCost: 3, fatigue: 6 }, { reframing: 2 }],
+        ["c12_route_system_drop", "통계는 덮고 조정 일정대로 간다", { time: 8, capital: 7, trust: -7, legitimacy: -7, humanCost: 4, fatigue: -5 }, { risk: 2 }],
+      ],
+    },
+    finalChoices: [
+      ["a", "부제소 조항에 기한을 두어 5년 뒤에는 효력이 끝나게 한다", { legitimacy: 13, trust: 7, capital: -8, humanCost: -5, fatigue: 7 }, { reframing: 3 }],
+      ["b", "조항은 그대로 두고 배상금만 올린다", { capital: 9, time: 7, trust: -6, legitimacy: -8, humanCost: 5, fatigue: -5 }, { risk: 2 }],
+      ["c", "서명하지 않은 사람들을 위한 소송 기금을 따로 만든다", { legitimacy: 8, trust: 9, capital: -7, time: -7, humanCost: 3, fatigue: 8 }, { persistence: 2 }],
+    ],
+  },
   final: {
     start: "f_start",
     result: "f_aftershock",
@@ -2822,6 +2959,25 @@ const evidenceTurnaroundPlans = {
       ["c11_evidence_turn_share", "한서윤에게 먼저 보여 주고 그가 어떻게 할지 고르게 한다", { trust: 12, legitimacy: 7, capital: -7, humanCost: -7, fatigue: 8 }, { reframing: 2 }],
     ],
   },
+  case12: {
+    node: "c12_evidence_turn",
+    result: "c12_aftershock",
+    sourceRoutes: ["c12_mediation", "c12_market", "c12_memorial", "c12_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    entryVoice: "모아 둔 단서를 배상 재원 공시 옆에 놓고, 300억이 어느 계정에서 나오는지 맞춰 본다.",
+    entryEcho: "단서를 대면 배상금이 누구의 주머니에서 나오는지, 그리고 누구의 주머니에서는 안 나오는지 보입니다.",
+    title: "배상금의 주소",
+    speaker: "반재욱",
+    text: "단서를 맞추자 자율 배상안 재원의 회계 처리가 열립니다. 300억 중 210억은 올해 직원 성과급 삭감분이고, 90억은 '브랜드 신뢰 회복 광고비' 계정입니다. 해온파트너스로 나갔던 자문료를 되찾아 온 돈은 0원입니다. 반재욱이 수첩을 덮습니다. '돈을 가져간 사람은 한 푼도 안 내고, 돈을 안 가져간 직원들이 배상을 합니다. 그리고 그 배상에는 광고비라는 이름이 붙어 있습니다.'",
+    memo: ["재원 210억: 직원 성과급 삭감", "재원 90억: 광고비 계정", "해온파트너스 자문료 환수: 0원"],
+    triggers: ["injustice", "system", "order"],
+    entryEffect: { legitimacy: 5, trust: 3, time: -4, fatigue: 4 },
+    choices: [
+      ["c12_evidence_turn_reclaim", "자문료 환수분을 재원에 넣기 전에는 조정에 응하지 않는다", { legitimacy: 13, trust: 6, capital: -8, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
+      ["c12_evidence_turn_hold", "회계 처리는 알아 두고 조정위원회 마지막 날 꺼낸다", { capital: 9, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
+      ["c12_evidence_turn_share", "성과급이 깎인 직원들에게 먼저 이 사실을 알린다", { trust: 12, legitimacy: 7, capital: -7, humanCost: -7, fatigue: 8 }, { reframing: 2 }],
+    ],
+  },
   final: {
     node: "f_evidence_turn",
     // Same reason the last case's route finals stop at f_choice: the clue
@@ -2972,6 +3128,14 @@ const continuityMemoryChoicePlans = {
     systemLabel: "직전 자유응답 문장이 그룹 입장문에도 인용됐는지 본다",
     evidenceLabel: "직전 단서를 붙여 반대 의견서의 폐기 기록을 연다",
   },
+  case12: {
+    routeNext: "c12_branch_factory",
+    systemNext: "c12_route_system",
+    evidenceNext: "c12_evidence_turn",
+    routeLabel: "직전 사건의 출석 준비 역할표로 피해자 모임 일을 나눈다",
+    systemLabel: "직전 자유응답 문장이 배상안 보도자료에도 인용됐는지 본다",
+    evidenceLabel: "직전 단서를 붙여 배상 재원의 회계 처리를 연다",
+  },
   final: {
     routeNext: "f_route_map",
     systemNext: "f_route_system",
@@ -3083,11 +3247,16 @@ export const caseOpeningRoutes = {
   },
   // Keyed on the aftermath of the case the finale follows. It has moved every
   // time a case was inserted in front of it: c5_after_*, c6_after_*, c7_after_*,
-  // c9_after_*, c10_after_*, and now c11_after_*.
+  case12: {
+    c11_after_toast: "c12_start_toast",
+    c11_after_record: "c12_start_record",
+    c11_after_summon: "c12_start_summon",
+  },
+  // c9_after_*, c10_after_*, c11_after_*, and now c12_after_*.
   final: {
-    c11_after_toast: "f_start_owner",
-    c11_after_record: "f_start_system",
-    c11_after_summon: "f_start_name",
+    c12_after_feast: "f_start_owner",
+    c12_after_fund: "f_start_system",
+    c12_after_meet: "f_start_name",
   },
 };
 
@@ -3122,9 +3291,12 @@ const branchOpeningCopy = {
   c11_start_rest: ["불을 끈 사람의 기사", "한서윤", "여섯 명을 정시에 퇴근시킨 그 주말 이후 3주, 분담표는 느리지만 멈추지 않고 돌았습니다. 그리고 월요일 새벽 여섯 시, 리드라인에 기사가 올라옵니다. 쉬어 본 사람들은 이번 주를 버틸 힘이 있습니다. 문제는 그 힘을 누구 이름으로 쓰느냐입니다.", ["분담표 3주 처리 102건", "리드라인 기사: 익명의 반대 의견 작성자 A씨", "출석까지 5일"]],
   c11_start_record: ["제도를 남긴 사람의 기사", "에코", "분담표가 그룹 제도안으로 접수된 지 3주 뒤, 그룹 홍보실이 그 제도안을 '선제적 피해 구제 모범 사례'로 보도자료에 넣었습니다. 같은 날 새벽 리드라인 기사가 올라왔습니다. 당신이 만든 제도가 이제 그룹이 당신을 반박하는 근거가 됐습니다.", ["그룹 보도자료: 분담표를 모범 사례로 인용", "리드라인 기사: 익명의 반대 의견 작성자 A씨", "출석까지 5일"]],
   c11_start_keep: ["서랍을 닫지 않은 사람의 기사", "반재욱", "212명의 명단은 아직 당신 서랍에 있습니다. 리드라인 기사가 올라온 날, 그룹 법무팀은 '비공식 명단을 보관한 직원'을 조사하겠다고 공지합니다. 서랍 속 명단이 이제 당신을 겨누는 증거가 될 수 있습니다.", ["법무팀 공지: 비공식 명단 보유 직원 조사", "212명 명단 개인 보관 중", "출석까지 5일"]],
-  f_start_owner: ["끝까지 같이 먹은 사람의 마지막 밤", "도윤하", "포장마차 불이 꺼질 때까지 휴대폰은 엎어져 있었습니다. 다음 날 아침 당신은 33층보다 트리거랩에 먼저 들렀습니다. 동료들과 함께 버틴 기록은 이미 폴더에 정리돼 있고, 트리거랩은 더 직접적인 질문을 준비했습니다. 함께 버티는 힘은 누구에게 가장 쓸모 있는가.", ["당신의 연대 기록이 복제됨", "다음 참가자에게 같은 질문이 전송됨", "실험 설계자는 팀워크를 칭찬함"]],
-  f_start_system: ["속기록을 연 사람의 마지막 밤", "에코", "국정감사(국회가 공개적으로 따져 묻는 자리)의 속기록(오간 말을 그대로 적은 공식 기록) 전문이 공개됐습니다. 말은 기록이 됐고 누구나 읽을 수 있게 됐습니다. 그래도 실험은 계속됐습니다. 이번에는 기록을 연 사람이 새로운 관찰 대상이 됩니다.", ["속기록 전문 공개", "그룹은 발언 일부를 반박 자료로 인용함", "동의 절차에 빈틈이 남음"]],
-  f_start_name: ["호출에 응한 사람의 마지막 밤", "반재욱", "당신은 포장마차를 먼저 나와 33층 호출에 응하겠다고 답했습니다. 윤상혁은 면담을 하루 미뤘고, 그 하루 동안 트리거랩은 당신의 응답 속도를 근거로 더 큰 통제를 제안합니다.", ["33층 면담이 하루 연기됨", "당신의 즉답 기록이 평가 자료로 인용됨", "실험의 종료 권한이 당신에게 옴"]],
+  c12_start_toast: ["같이 먹은 사람들의 배상안", "도윤하", "포장마차의 그 밤을 같이 보낸 여섯 사람은 2주 동안 한 번도 흩어지지 않았습니다. 그리고 그룹이 300억 자율 배상안을 발표합니다. 받는 사람은 다시는 소송하지 않겠다고 서명해야 합니다. 여섯 사람이 동시에 같은 줄을 가리킵니다.", ["자율 배상안 300억 -- 부제소 합의 조건", "피해자 모임 대표 문가을이 면담 요청", "여섯 명 전원 이번 주 일정 비움"]],
+  c12_start_record: ["속기록을 연 사람의 배상안", "에코", "공개된 속기록(오간 말을 그대로 적은 공식 기록)을 피해자 모임이 한 줄씩 읽었습니다. 2주 뒤 그룹은 300억 자율 배상안을 발표했고, 보도자료에는 당신의 국정감사(국회가 공개적으로 따져 묻는 자리) 발언 한 줄이 '진정성 있는 문제 제기'라며 인용돼 있습니다. 당신의 문장이 배상안의 홍보 문구가 됐습니다.", ["자율 배상안 300억 -- 부제소 합의 조건", "보도자료에 당신의 발언 인용", "피해자 모임이 속기록 전문을 공유함"]],
+  c12_start_summon: ["33층에 다녀온 사람의 배상안", "반재욱", "33층 면담은 12분 만에 끝났습니다. 윤상혁은 당신에게 아무것도 묻지 않았고, 서명란 얘기도 꺼내지 않았습니다. 2주 뒤 그룹이 300억 자율 배상안을 발표합니다. 발표문의 문장 몇 개가 그날 윤상혁이 한 말과 똑같습니다.", ["33층 면담 12분 -- 질문 0개", "자율 배상안 300억 -- 부제소 합의 조건", "발표문과 면담 발언의 문장이 일치"]],
+  f_start_owner: ["떡을 돌린 사람의 마지막 밤", "도윤하", "가을떡방 셔터가 내려갈 때까지 떡을 돌렸습니다. 다음 날 아침 당신은 33층보다 트리거랩에 먼저 들렀습니다. 피해자들과 함께 버틴 기록은 이미 폴더에 정리돼 있고, 트리거랩은 더 직접적인 질문을 준비했습니다. 사람을 끝까지 떠나지 않는 힘은 누구에게 가장 쓸모 있는가.", ["당신의 연대 기록이 복제됨", "다음 참가자에게 같은 질문이 전송됨", "실험 설계자는 공감 능력을 칭찬함"]],
+  f_start_system: ["기준을 고친 사람의 마지막 밤", "에코", "212명이 들어갈 배상 기준 개정안이 문서로 접수됐습니다. 사람이 기준 안으로 들어왔고, 그래도 실험은 계속됐습니다. 이번에는 기준을 고친 사람이 새로운 관찰 대상이 됩니다.", ["배상 기준 개정안 접수", "그룹은 개정안 일부를 모범 사례로 인용함", "동의 절차에 빈틈이 남음"]],
+  f_start_name: ["33층에 먼저 간 사람의 마지막 밤", "반재욱", "당신은 마지막 떡 상자를 들고 곧장 33층으로 갔습니다. 윤상혁은 상자를 받지 않았고, 대신 하루를 달라고 했습니다. 그 하루 동안 트리거랩은 당신의 걸음 속도를 근거로 더 큰 통제를 제안합니다.", ["33층 면담이 하루 연기됨", "당신의 즉각 대응 기록이 평가 자료로 인용됨", "실험의 종료 권한이 당신에게 옴"]],
 };
 
 /**
@@ -3352,6 +3524,27 @@ const openingSignatureChoices = {
     cognition: { persistence: 2 },
     voice: "조사가 시작되기 전에, 서랍의 212명 명단을 도윤하에게 돌려준다.",
     echo: "돌려주면 당신 서랍은 비고, 조사는 빈 서랍을 봅니다. 그 명단의 무게는 다시 한 사람에게 갑니다.",
+  },
+  c12_start_toast: {
+    label: "여섯 명이 가리킨 그 줄을 들고 다 같이 피해자 모임에 간다",
+    effect: { trust: 11, humanCost: -5, capital: -4, time: -6, fatigue: 3 },
+    cognition: { reframing: 2 },
+    voice: "여섯 명이 가리킨 그 줄을 들고, 다 같이 피해자 모임에 간다.",
+    echo: "여섯 명이 한꺼번에 오면 모임 사람들은 긴장합니다. 은행 사람 여섯이 떡집에 들어서는 건 처음 보는 장면입니다.",
+  },
+  c12_start_record: {
+    label: "보도자료에 인용된 내 발언을 빼 달라고 공식 요청한다",
+    effect: { legitimacy: 12, trust: -3, capital: -5, time: -5, fatigue: 4 },
+    cognition: { inference: 2 },
+    voice: "보도자료에 인용된 내 발언을, 빼 달라고 공식 요청한다.",
+    echo: "요청은 기록으로 남습니다. 그룹은 인용을 빼고, 그 자리에 '일부 참고인'이라는 말을 넣습니다.",
+  },
+  c12_start_summon: {
+    label: "발표문과 면담 발언이 같은 문장이라는 걸 모임에 먼저 알린다",
+    effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
+    cognition: { persistence: 2 },
+    voice: "발표문과 면담 발언이 같은 문장이라는 걸, 모임에 먼저 알린다.",
+    echo: "알리면 모임은 배상안을 다시 읽습니다. 다시 읽은 사람 중 몇은 그래도 서명하겠다고 합니다. 추석이 코앞입니다.",
   },
   f_start_name: {
     label: "지목했던 사람에게 이 실험의 기록을 먼저 돌려준다",

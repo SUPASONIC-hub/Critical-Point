@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-21 (사건 11, the plain-language guard, and the plate's effects layer)
+Last updated: 2026-09-21 (사건 12, the victims' side of the chain, and a second ranking reset)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -979,3 +979,30 @@ the live database when a migration fixes a runtime error.
     draws them instead -- a back-lit silhouette tinted from the name, with the
     initial -- and `speaker-profile.webp` and its 160px variant were deleted
     with the fallback that was their only reader.
+
+73. The season is thirteen cases, and the thirteenth walks into the lives the
+    loan landed on. For twelve cases the 1,740 were a number -- counted,
+    cited, split into a relay table -- and never a room. 사건 12 「1,740번째
+    사람」 answers the hearing with a 300억 voluntary compensation fund that
+    comes with a 부제소 합의, and goes to the people it is for: 문가을, who runs
+    a rice-cake shop in 망원시장 and leads the victims' group, and whose husband
+    ran the supplier 가온정밀 and died the year after. The range is deliberate:
+    a room of 340 asking why the dissent did not stop it, a 추석 rush on the
+    steamers, an anniversary at a columbarium with a letter addressed to "the
+    reviewer who wrote the dissent", and the day the first payment lands. It
+    closes on whether the 212 from 사건 10 are inside the compensation standard.
+
+    Same shape as 사건 10 and 11. The finale re-keyed a fourth time, to
+    `c12_after_*`, and the `f_start_*` openings and the heading regexes moved
+    again. Numbers that moved: generated scenes 72 -> 78, authored generated
+    choices 222 -> 240; `gameData.js` 3500/19 -> 3700/20, `gameLogic.js` 1420 ->
+    1460; collapse samples 40 -> 49 busts and strain 35 -> 36; the season walk's
+    timeout 420s -> 480s. Collapse moved 32.6% -> 29.0% of 6,000 random seasons.
+    Three rooms were added to the plate (`market`, `memorial`, `factory`), the
+    public tone took in 금융감독원, high-windowed rooms get daylight rays, and
+    rooms with something on the boil get steam. The glossary gained 분쟁조정,
+    부제소 합의, 집단소송 and 협동조합.
+
+    The ranking was reset again the same day, by the rule priority 70 set:
+    `20260921020000_thirteen_case_season_ranking_reset.sql` and the local key
+    `critical-point-local-ranking-v4`, which retires v1 through v3.

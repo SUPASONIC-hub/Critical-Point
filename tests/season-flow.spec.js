@@ -29,7 +29,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
     dialog.accept();
   });
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case11", "c11_aftershock");
+  await startDebugNode(page, "case12", "c12_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");
@@ -59,7 +59,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   expect(Array.isArray(diagnosticPayload.errorLog)).toBe(true);
   expect(Array.isArray(diagnosticPayload.saveSlots)).toBe(true);
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /끝까지 같이 먹은 사람의 마지막 밤|속기록을 연 사람의 마지막 밤|호출에 응한 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /떡을 돌린 사람의 마지막 밤|기준을 고친 사람의 마지막 밤|33층에 먼저 간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 });
 
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
@@ -116,11 +116,12 @@ test("the table shows the bet on every card and never a forecast of the next pus
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
-  // Twelve cases played scene by scene. 180s was set for eight and ran out under
+  // Thirteen cases played scene by scene. 180s was set for eight and ran out under
   // a parallel suite once the season grew; 300s was set for ten, which took 2.7
   // minutes alone. Each case adds roughly 16 seconds to the walk. 360s -> 420s
-  // when every scene gained a briefing page to close before its table.
-  test.setTimeout(420_000);
+  // when every scene gained a briefing page to close before its table, and
+  // 420s -> 480s for the thirteenth case.
+  test.setTimeout(480_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");
@@ -1201,11 +1202,18 @@ test("error boundary clear save failure does not reload", async ({ page }) => {
 test("pending telemetry retries after a failed Supabase response", async ({ page }) => {
   let requestCount = 0;
   const postBodies = [];
+  // Only table writes are telemetry. The cloud-save RPC fires a few seconds
+  // after load on the same host, and when it landed between the two telemetry
+  // attempts it took slot [1] -- or took the scripted 500 -- and the test
+  // failed about one run in six without the retry being wrong.
   await page.route("https://e2e.supabase.co/**", async (route) => {
-    requestCount += 1;
-    if (route.request().method() === "POST") postBodies.push(route.request().postDataJSON());
+    const telemetryWrite = route.request().method() === "POST" && !route.request().url().includes("/rpc/");
+    if (telemetryWrite) {
+      requestCount += 1;
+      postBodies.push(route.request().postDataJSON());
+    }
     await route.fulfill({
-      status: postBodies.length === 1 ? 500 : 201,
+      status: telemetryWrite && postBodies.length === 1 ? 500 : 201,
       contentType: "application/json",
       body: "{}",
     });
@@ -1392,11 +1400,11 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   await page.goto("/?debug=1");
   await openIntroDrawer(page, ".data-info-panel");
   await page.locator(".consent-box input").check({ force: true });
-  await startDebugNode(page, "case11", "c11_aftershock");
+  await startDebugNode(page, "case12", "c12_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /끝까지 같이 먹은 사람의 마지막 밤|속기록을 연 사람의 마지막 밤|호출에 응한 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /떡을 돌린 사람의 마지막 밤|기준을 고친 사람의 마지막 밤|33층에 먼저 간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 
   const savedBeforeFailureCallback = await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
@@ -1475,7 +1483,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v3") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v4") || "[]").length))
     .toBeGreaterThan(0);
 });
 

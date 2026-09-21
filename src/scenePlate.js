@@ -36,6 +36,9 @@ export const PLATE_MOTIFS = [
   "hall",
   "chamber",
   "newsroom",
+  "market",
+  "memorial",
+  "factory",
   "counter",
   "desk",
 ];
@@ -75,7 +78,13 @@ const MOTIF_RULES = [
   // the generic hall so 정무위원회 회의실 does not fall into 회의실.
   ["chamber", ["정무위원회 회의실", "국정감사장", "참고인석", "증인석", "본회의장"]],
   ["newsroom", ["편집국", "보도국"]],
-  ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
+  // The places the loan landed. A shop in a covered market, a columbarium, and
+  // a machine floor nobody has switched on in a year -- each tested before the
+  // street and floor rules that would otherwise swallow them.
+  ["market", ["떡방", "떡집", "망원시장"]],
+  ["memorial", ["추모공원", "봉안당", "납골당"]],
+  ["factory", ["공단", "공장", "선반"]],
+  ["hall", ["입찰", "발표장", "설명회장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
   ["lobby", ["로비", "안내데스크", "출입 게이트"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
 ];
@@ -106,6 +115,12 @@ const FLASH_MOTIFS = new Set(["chamber", "newsroom"]);
 
 /** Rooms open to the sky, where daylight comes in as rays and a storm as lightning. */
 const SKY_MOTIFS = new Set(["skyline", "street", "coast"]);
+
+/** Rooms lit through high windows: daylight comes in as rays, but no storm reaches in. */
+const SHAFT_MOTIFS = new Set(["factory", "memorial"]);
+
+/** Rooms with something on the boil. */
+const STEAM_MOTIFS = new Set(["market", "cafe"]);
 
 /** Clocks that say the lights are off outside. */
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
@@ -139,7 +154,7 @@ const ORG_RULES = [
   ["rival", ["노바웍스", "브릿지은행", "넥스트마일"]],
   // The public: the legislature and the press. Nobody on the season's payroll
   // owns these rooms, but they are not off it either -- everyone is watching.
-  ["public", ["국회", "리드라인"]],
+  ["public", ["국회", "리드라인", "금융감독원"]],
   ["bank", ["KD은행", "KD금융그룹", "은행"]],
   ["care", ["온새", "돌봄"]],
 ];
@@ -234,7 +249,8 @@ export function getScenePlate(node = {}, nodeId = "") {
     // is being photographed, open sky by day lets light in, and a night under
     // pressure outdoors gets its storm.
     flash: FLASH_MOTIFS.has(motif) || getPlateOrg(place) === "public",
-    rays: !night && SKY_MOTIFS.has(motif),
+    rays: !night && (SKY_MOTIFS.has(motif) || SHAFT_MOTIFS.has(motif)),
+    steam: STEAM_MOTIFS.has(motif),
     lightning: night && SKY_MOTIFS.has(motif) && PRESSURE_PHASES.has(node.phase),
   };
 }

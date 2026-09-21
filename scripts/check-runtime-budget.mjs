@@ -55,9 +55,11 @@ const BUDGETS = {
   // 3320 / 18 -> 3500 / 19 on 2026-09-21: 사건 11 is a twelfth case, the same
   // shape as 사건 10 -- one line to the hearing, no route split -- plus a third
   // re-key of the finale's openings.
+  // 3500 / 19 -> 3700 / 20 later the same day: 사건 12, a thirteenth case of the
+  // same shape, and a fourth re-key.
   "src/gameData.js": {
-    lines: 3500,
-    importedNames: 19,
+    lines: 3700,
+    importedNames: 20,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
@@ -74,8 +76,9 @@ const BUDGETS = {
   // `getThinkingMotive`, which names the feeling that woke the run's thinking.
   // 1395 -> 1420 on 2026-09-18: 사건 10's hidden clue, its three outcomes, their
   // carryover and its continuity challenge. Four table rows per case, as before.
+  // 1420 -> 1460 on 2026-09-21 for 사건 11 and 12, the same four rows each.
   "src/gameLogic.js": {
-    lines: 1420,
+    lines: 1460,
     importedNames: 18,
     hooks: {},
   },

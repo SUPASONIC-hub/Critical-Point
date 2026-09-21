@@ -898,9 +898,9 @@ test("the ending reads what the run did at the table", () => {
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
   // 16 busts wrecked an eight-case season. Busts are read as a rate over the
   // season's length and the collapse line rises with it, so a ten-case season
-  // needed 26, an eleven-case season 33, and a twelve-case season needs 40 to
-  // carry the same strain.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 40, seasonBestMultiplier: 32 });
+  // needed 26, an eleven-case season 33, a twelve-case season 40, and a
+  // thirteen-case season needs 49 to carry the same strain.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 49, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -914,16 +914,16 @@ test("the ending answers busts across the range play reaches, not at one step", 
   };
   const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
   // The sample strain moved 28 -> 29 when 사건 07 landed, 29 -> 33 when 사건 08
-  // and 09 did, and 33 -> 35 when 사건 11 did. Both halves of the
+  // and 09 did, 33 -> 35 when 사건 11 did, and 35 -> 36 when 사건 12 did. Both halves of the
   // collapse gate are derived from the season length -- the bust rate divides by
   // it, the pressure threshold rises with it -- so an eight-case season prices a
   // bust slightly lower and sets the line slightly higher, and the old sample sat
   // under the new line with any number of busts. What the test is for is the
   // shape, not the coordinate: clean does not collapse, enough busts does, and
   // the answer in between is graded rather than a single step.
-  assert.notEqual(pressureAt(0, 35), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 35), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 35))).size > 1);
+  assert.notEqual(pressureAt(0, 36), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 36), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 36))).size > 1);
 });
 
 /* --------------------------------------------------------------- relics */
@@ -1172,6 +1172,11 @@ test("every scene draws a room, and always the same one", () => {
   // works in a newsroom. Both belong to the public, which is nobody's bank.
   assert.equal(getPlateMotif("국회 본관 정무위원회 회의실 · 참고인석"), "chamber");
   assert.equal(getPlateMotif("망원동 리드라인 편집국"), "newsroom");
+  // The places the loan landed, each ahead of the street and floor rules.
+  assert.equal(getPlateMotif("망원시장 가을떡방 · 계산대"), "market");
+  assert.equal(getPlateMotif("인천 추모공원 · 벤치"), "memorial");
+  assert.equal(getPlateMotif("인천 남동공단 가온정밀 · 공장"), "factory");
+  assert.equal(getScenePlate({ place: "망원시장 가을떡방" }, "x").steam, true);
   assert.equal(getPlateOrg("국회 의원회관 7층 · 정무위원회 의원실"), "public");
   assert.notEqual(getPlateOrg("망원동 리드라인 편집국"), getPlateOrg("KD은행 강서지점"));
   // Effects are facts the scene states: a watched room flashes, open sky by day

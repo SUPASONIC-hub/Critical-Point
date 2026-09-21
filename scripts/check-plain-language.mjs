@@ -38,6 +38,7 @@ const COPY_FILES = [
   "src/nodes/case09.js",
   "src/nodes/case10.js",
   "src/nodes/case11.js",
+  "src/nodes/case12.js",
   "src/nodes/finalCase.js",
   "src/nodes/sceneContext.js",
   "src/gameData.js",
@@ -93,6 +94,10 @@ const GLOSSARY = [
   "속기록",
   "정정보도",
   "공익신고",
+  "분쟁조정",
+  "부제소 합의",
+  "집단소송",
+  "협동조합",
 ];
 
 const failures = [];

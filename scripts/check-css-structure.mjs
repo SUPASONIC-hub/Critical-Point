@@ -135,7 +135,9 @@ const fileBudgets = {
   // 3335 / 69500 -> 3405 / 70900 on 2026-09-21 for the plate's effects layer:
   // camera flashes in the rooms the public watches, daylight rays, a storm's
   // lightning, and the tone for the legislature and the press.
-  "play.css": { lines: 3405, bytes: 70900 },
+  // 3405 / 70900 -> 3425 / 71200 later the same day for steam over the market
+  // and café plates.
+  "play.css": { lines: 3425, bytes: 71200 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken

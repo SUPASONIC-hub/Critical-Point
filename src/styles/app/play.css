@@ -3234,6 +3234,11 @@
   animation: gx-plate-ray 11s ease-in-out infinite alternate;
 }
 
+.gx-plate-steam > path {
+  opacity: 0;
+  animation: gx-plate-steam 4.6s ease-out infinite;
+}
+
 .gx-plate-lightning {
   opacity: 0;
   animation: gx-plate-lightning 7.5s linear infinite;
@@ -3360,6 +3365,20 @@
   }
 }
 
+@keyframes gx-plate-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
 @keyframes gx-plate-lightning {
   0%,
   90%,
@@ -3394,6 +3413,7 @@
 
   .gx-plate-sweep,
   .gx-plate-flashes,
+  .gx-plate-steam,
   .gx-plate-lightning {
     opacity: 0;
   }

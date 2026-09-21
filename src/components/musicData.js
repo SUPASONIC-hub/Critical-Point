@@ -121,6 +121,8 @@ export const chapterMotifs = {
   case10: { wave: "sine", lift: 240, impact: 0.96 },
   // The room everyone watches: bright and exposed, the camera flash in the motif.
   case11: { wave: "triangle", lift: 620, impact: 1.26 },
+  // The people it landed on: warm and low, a market and a memorial.
+  case12: { wave: "sine", lift: 300, impact: 1.04 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 

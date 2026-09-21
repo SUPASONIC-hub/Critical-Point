@@ -16,13 +16,14 @@ const budgets = [
   // 660_000 -> 720_000 on 2026-09-18 for 사건 10, an eleventh case: twenty scenes
   // of authored Korean prose plus its eleven data tables. The chunk is mostly
   // the scene graph, so this is narrative the player reads.
-  // 720_000 -> 760_000 on 2026-09-21 for 사건 11, a twelfth case, on the same
-  // terms.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 760_000 },
+  // 720_000 -> 760_000 on 2026-09-21 for 사건 11, a twelfth case, and
+  // 760_000 -> 800_000 the same day for 사건 12, a thirteenth, on the same terms.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 800_000 },
   { pattern: /^index-.*\.js$/, maxBytes: 120_000 },
   // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
-  // its effects layer and the drawn speaker portrait.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 78_000 },
+  // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
+  // day for the market, memorial and factory painters and the steam layer.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 81_000 },
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 60_000 },
   { pattern: /^index-.*\.css$/, maxBytes: 200_000 },
 ];
