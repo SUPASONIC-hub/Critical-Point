@@ -2,10 +2,12 @@ import { useState } from "react";
 
 import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConfig.js";
 
-// v1 held rows from the five-case season. The ranking started over when the
-// season became ten cases, so v1 is never read and is removed on first load.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v2";
-const RETIRED_LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v1";
+// v1 held rows from the five-case season and v2 from the eleven-case one. The
+// ranking starts over each time the season changes length (ten cases on
+// 2026-09-18, twelve on 2026-09-21), so retired keys are never read and are
+// removed on first load.
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v3";
+const RETIRED_LOCAL_RANKING_STORAGE_KEYS = ["critical-point-local-ranking-v1", "critical-point-local-ranking-v2"];
 
 export function parseLocalRankingRows(rawValue) {
   try {
@@ -23,7 +25,7 @@ export function appendLocalRankingRowToRows(rows, row) {
 }
 
 function readLocalRankingRows() {
-  removeStoredValue(RETIRED_LOCAL_RANKING_STORAGE_KEY);
+  RETIRED_LOCAL_RANKING_STORAGE_KEYS.forEach((key) => removeStoredValue(key));
   return parseLocalRankingRows(readStoredValue(LOCAL_RANKING_STORAGE_KEY, "[]"));
 }
 

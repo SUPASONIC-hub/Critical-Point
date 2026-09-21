@@ -940,6 +940,12 @@ the live database when a migration fixes a runtime error.
     itself (priority 62's lesson): collapse moved 36.6% -> 32.6% of 6,000 random
     seasons, so it is not the hottest case.
 
+    The ranking started over with it, the same way it did for the ten-case
+    season: `20260921010000_twelve_case_season_ranking_reset.sql` deletes the
+    `season-final` rows (per-case telemetry stays), and the local board moved to
+    `critical-point-local-ranking-v3`, removing v1 and v2 on first read. Any
+    later change to the season's length should do both.
+
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     (`scripts/check-plain-language.mjs`) holds the two promises the README
     makes about words. The Japanese-era loan vocabulary (여신, 융자, 품의, 기안,

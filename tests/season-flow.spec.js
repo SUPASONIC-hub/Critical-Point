@@ -1475,7 +1475,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v2") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v3") || "[]").length))
     .toBeGreaterThan(0);
 });
 
