@@ -4,6 +4,7 @@ import { hashSeed } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
+import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 
 const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
 
@@ -134,7 +135,7 @@ export function SceneBriefing({
 
           <figure className="gx-panel gx-panel-speaker">
             <div className="gx-speaker-frame">
-              <img src={portrait} alt="" width="240" height="240" decoding="async" />
+              <SpeakerPortrait name={node.speaker} src={portrait} size={240} />
             </div>
             <figcaption className="gx-speaker-tag">
               <b>{node.speaker}</b>

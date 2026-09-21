@@ -52,9 +52,12 @@ const BUDGETS = {
   // same seven tables and one node file import. It is the smallest per-case step
   // yet (~190 lines) because the case has no four-way route split -- one
   // handover, so `dramaticRoutePlans.case10.choices` is empty.
+  // 3320 / 18 -> 3500 / 19 on 2026-09-21: 사건 11 is a twelfth case, the same
+  // shape as 사건 10 -- one line to the hearing, no route split -- plus a third
+  // re-key of the finale's openings.
   "src/gameData.js": {
-    lines: 3320,
-    importedNames: 18,
+    lines: 3500,
+    importedNames: 19,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started

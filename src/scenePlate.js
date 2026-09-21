@@ -34,6 +34,8 @@ export const PLATE_MOTIFS = [
   "lobby",
   "corridor",
   "hall",
+  "chamber",
+  "newsroom",
   "counter",
   "desk",
 ];
@@ -68,6 +70,11 @@ const MOTIF_RULES = [
   ["counter", ["창구", "지점", "객장"]],
   ["control", ["통제실", "시스템 지도", "배차석", "상황판", "운영실"]],
   ["archive", ["보관소", "자료실", "서버실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
+  // A 국정감사 room is a hall with a raised dais and a witness table, and it is
+  // the one room in the season where the cameras are the point. Tested before
+  // the generic hall so 정무위원회 회의실 does not fall into 회의실.
+  ["chamber", ["정무위원회 회의실", "국정감사장", "참고인석", "증인석", "본회의장"]],
+  ["newsroom", ["편집국", "보도국"]],
   ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
   ["lobby", ["로비", "안내데스크", "출입 게이트"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
@@ -93,6 +100,12 @@ const PRESSURE_PHASES = new Set([
   "THE LEDGER",
   "THE TIMING",
 ]);
+
+/** Rooms where someone is always taking a picture. */
+const FLASH_MOTIFS = new Set(["chamber", "newsroom"]);
+
+/** Rooms open to the sky, where daylight comes in as rays and a storm as lightning. */
+const SKY_MOTIFS = new Set(["skyline", "street", "coast"]);
 
 /** Clocks that say the lights are off outside. */
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
@@ -123,13 +136,16 @@ const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"]
 const ORG_RULES = [
   ["lab", ["트리거랩"]],
   ["client", ["플로우온"]],
-  ["rival", ["세움테크", "브릿지은행", "넥스트마일"]],
+  ["rival", ["노바웍스", "브릿지은행", "넥스트마일"]],
+  // The public: the legislature and the press. Nobody on the season's payroll
+  // owns these rooms, but they are not off it either -- everyone is watching.
+  ["public", ["국회", "리드라인"]],
   ["bank", ["KD은행", "KD금융그룹", "은행"]],
   ["care", ["온새", "돌봄"]],
 ];
 
 /** Every organisation's light, plus the world outside them all at index 0. */
-export const PLATE_TONE_NAMES = ["outside", "lab", "client", "rival", "bank", "care"];
+export const PLATE_TONE_NAMES = ["outside", "lab", "client", "rival", "bank", "care", "public"];
 
 /**
  * Which light a place is lit by. Anything no organisation owns -- the bookshop,
@@ -207,11 +223,18 @@ export function getScenePlate(node = {}, nodeId = "") {
   const clock = String(node.clock ?? "");
   const motif = getPlateMotif(place);
   const seed = hashString(`${nodeId}:${place}`);
+  const night = NIGHT_MARKERS.some((marker) => clock.includes(marker));
   return {
     motif,
     seed,
     tone: getPlateTone(place),
     accent: PRESSURE_PHASES.has(node.phase) ? "heat" : "chip",
-    night: NIGHT_MARKERS.some((marker) => clock.includes(marker)),
+    night,
+    // The effects layer. Each is a fact the scene already states: a public room
+    // is being photographed, open sky by day lets light in, and a night under
+    // pressure outdoors gets its storm.
+    flash: FLASH_MOTIFS.has(motif) || getPlateOrg(place) === "public",
+    rays: !night && SKY_MOTIFS.has(motif),
+    lightning: night && SKY_MOTIFS.has(motif) && PRESSURE_PHASES.has(node.phase),
   };
 }

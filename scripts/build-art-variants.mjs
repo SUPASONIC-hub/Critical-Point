@@ -13,7 +13,6 @@ import { RESPONSIVE_ART } from "../src/responsiveArt.js";
 
 const WIDTHS = [480, 960];
 const QUALITY = 0.82;
-const PORTRAIT_FALLBACK = ["/speaker-profile.webp", 160];
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
@@ -44,7 +43,6 @@ async function encode(src, width) {
 for (const src of RESPONSIVE_ART) {
   for (const width of WIDTHS) await encode(src, width);
 }
-await encode(...PORTRAIT_FALLBACK);
 
 await browser.close();
 console.log(`Wrote ${written} variants at quality ${QUALITY}. Run npm run check:art to confirm the budgets.`);

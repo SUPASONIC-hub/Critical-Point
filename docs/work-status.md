@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-21 (the reading beat becomes a timed graphic-novel briefing page)
+Last updated: 2026-09-21 (사건 11, the plain-language guard, and the plate's effects layer)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -270,8 +270,8 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` is twenty checks: lint, CSS format, unit and smoke
-tests, encoding, text, CSS tokens, CSS structure, graph, dialogue, balance,
+`npm run verify:static` is twenty-one checks: lint, CSS format, unit and smoke
+tests, encoding, text, plain language, CSS tokens, CSS structure, graph, dialogue, balance,
 the gauntlet loop simulation, endings, art, view contracts, constants, the runtime budget, the export
 schema, the test storage keys, the visual baselines and the Node pin. None of them needs a browser, which is what lets
 the deploy build run them.
@@ -357,7 +357,7 @@ the live database when a migration fixes a runtime error.
     nothing learned in 사건 01 could be spent in 사건 04 and nothing in 사건 01
     mattered. They now hang off a single bad loan -- KD은행's 310억 to 플로우온,
     대출번호 2023-0412 -- which collapses in 01, is covered up in 02, is moved to
-    세움테크's books in 03 and onto 온새's care hours in 04, lands on 312 people
+    노바웍스's books in 03 and onto 온새's care hours in 04, lands on 312 people
     who never borrowed in 05, breaks the analyst in the next chair in 06, and is
     finally traced to the empty signature box in the finale. The analyst is the
     one who wrote the dissent on that loan three years ago and was transferred
@@ -365,8 +365,8 @@ the live database when a migration fixes a runtime error.
     Two people were added for the chain to be answerable: 윤상혁 (그룹전략실
     상무, speaks `f_confront`) left the box empty, and 임경수 (퇴직 심사팀장,
     speaks `c2_trace`) keeps the paper original the system no longer holds.
-    Neither has a portrait, so both fall back to `/speaker-profile.webp` the way
-    이민서 already did.
+    Neither has a portrait; see priority 72 for how an unpainted speaker is
+    drawn.
 
     Two rules this bought, both about copy:
     - No Japanese-style loan vocabulary. 여신, 융자, 품의서, 결재란, 상각,
@@ -566,8 +566,7 @@ the live database when a migration fixes a runtime error.
     wants it closed, and he takes no help he cannot write down. The case closes
     on whether the sheet that rescues the company and the sheet that charges the
     people who broke it go on the same table. Three people arrived with it
-    (나준혁, 권도현, 강태민; no portraits, so they fall back to
-    `/speaker-profile.webp`), plus a `revenge` trigger (복수) and interludes after
+    (나준혁, 권도현, 강태민; no portraits -- priority 72 draws them), plus a `revenge` trigger (복수) and interludes after
     both cases.
 
     Adding two cases moved the keys priority 48 lists, twice: node files and
@@ -915,3 +914,62 @@ the live database when a migration fixes a runtime error.
     `.ps1`/`.cmd` pair that cmd.exe cannot always find from a POSIX PATH, and
     the easy fix for that -- `shell: true` -- would put a player's sentence on
     a command line.
+
+70. The season is twelve cases, and the twelfth room is the first one anybody
+    outside can see into. Ten cases were decided behind doors, and the man at
+    the top of the chain -- 윤상혁 -- never had to stand in any of them. 사건 11
+    「모두가 보는 방」 makes the loan a news story (탐사보도 매체 리드라인, 기자
+    서하린), calls the analyst to a 국정감사 as a 참고인 (보좌관 차지원 holds
+    the seven minutes), and calls 윤상혁 as a witness who does not come. It is
+    also the season's widest emotional range on purpose: anger at two scripts
+    that each end on a sentence the analyst cannot prove, the first laughter
+    in eleven cases at a mock hearing on apple crates, 한서윤's confession that
+    she signed the rejection, 오진우 and his father at one table, and a
+    포장마차 night that ends with the 33rd floor's call the finale answers.
+
+    Same shape as 사건 10 -- one line to the room, no route split, so
+    `dramaticRoutePlans.case11.choices` is empty -- and the same tables priority
+    53 lists. The finale re-keyed a third time: `caseOpeningRoutes.final` and
+    `getContinuityChallenge().final` now read `c11_after_*`, the three
+    `f_start_*` openings narrate 사건 11's aftermaths, and the heading regexes in
+    `season-flow.spec.js` moved with them. Numbers that moved: generated scenes
+    66 -> 72 and authored generated choices 204 -> 222; `gameData.js` budget
+    3320/18 -> 3500/19; the collapse samples 33 -> 40 busts and strain 33 -> 35,
+    because both halves of the collapse gate derive from the season length.
+    The case was measured against the season rather than only balanced inside
+    itself (priority 62's lesson): collapse moved 36.6% -> 32.6% of 6,000 random
+    seasons, so it is not the hottest case.
+
+71. Plain language is a check, not a habit. `npm run check:plain-language`
+    (`scripts/check-plain-language.mjs`) holds the two promises the README
+    makes about words. The Japanese-era loan vocabulary (여신, 융자, 품의, 기안,
+    결재, 금번, 익일, 불입, 수순) is banned from every file that carries player
+    copy -- it had crept back once, "개정을 기안한 부서" in 사건 10. And every
+    term in its glossary must carry a (plain explanation) at the first place a
+    player can read it in each case: every case can be entered on its own, and
+    a case can open on its default scene or on an opening variant, so each
+    opening that uses a term explains it, and the rest of the case explains it
+    at first use unless every opening already did. Only narration (lead and
+    body) is checked; labels and memos lean on it. A term matches at a word
+    start only -- 우선순위 is not 선순위. Its first run found 22 gaps in cases
+    01, 05, 08, 09 and 10; they were filled, not allowlisted. Add a term to the
+    glossary rather than explaining it once by hand. Names follow the same
+    rule by review: 세움테크 read as dated and is now 노바웍스 (same vowel ending,
+    so every particle after it still agrees).
+
+72. A plate has an effects layer, and a speaker without a portrait is drawn.
+    `getScenePlate` returns three more facts the scene already states: `flash`
+    (the rooms the public watches -- the new `chamber` and `newsroom` motifs and
+    anything the new `public` organisation owns, 국회 and 리드라인), `rays`
+    (open sky by day) and `lightning` (open sky at night under pressure).
+    `ScenePlate.jsx` draws them in `paintFx` from the scene's own seed, over a
+    static film grain every plate carries, and all of it is transform or
+    opacity; with motion reduced the flashes and lightning are not shown. A
+    broken board's briefing splash arrives with a red/cyan glitch done with
+    `filter` so the plate's own push-in keeps its transform. `chamber` is tested
+    before `hall`, because 정무위원회 회의실 contains 회의실.
+    Seven speakers had no painted portrait and all fell back to one stock photo,
+    so 나준혁, 권도현, 서하린 and 차지원 wore the same face. `SpeakerPortrait`
+    draws them instead -- a back-lit silhouette tinted from the name, with the
+    initial -- and `speaker-profile.webp` and its 160px variant were deleted
+    with the fallback that was their only reader.

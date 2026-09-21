@@ -78,6 +78,25 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
             </pattern>
           </>
         )}
+        {plate.flash && (
+          <radialGradient id={`${id}-flash`}>
+            <stop offset="0%" stopColor="var(--c-paper)" stopOpacity="0.95" />
+            <stop offset="35%" stopColor="var(--c-paper)" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="var(--c-paper)" stopOpacity="0" />
+          </radialGradient>
+        )}
+        {plate.rays && (
+          <linearGradient id={`${id}-ray`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--plate-ambient)" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+          </linearGradient>
+        )}
+        {/* Film grain: one static noise field over every plate, so the drawing
+            reads as a printed frame rather than a vector diagram. */}
+        <filter id={`${id}-grain`} x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed={plate.seed % 97} stitchTiles="stitch" />
+          <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0" />
+        </filter>
         {heat && (
           <radialGradient id={`${id}-vignette`} r="0.72">
             <stop offset="45%" stopColor={accent} stopOpacity="0" />
@@ -100,17 +119,19 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
           </>
         )}
       </g>
+      {paintFx(air, plate, id)}
       {/* A pressure beat closes in from the edges. */}
       {heat && <rect className="gx-plate-vignette" x="0" y="0" width="320" height="132" fill={`url(#${id}-vignette)`} />}
       {/* A single sweep of light across the glass, so the plate sits on the same
           surface as every other panel instead of floating as a diagram. */}
       <rect x="0" y="0" width="320" height="132" fill="var(--plate-sheen)" opacity="0.35" />
+      <rect className="gx-plate-grain" x="0" y="0" width="320" height="132" filter={`url(#${id}-grain)`} opacity="0.07" />
     </svg>
   );
 }
 
 /** Rooms whose light comes off a screen, which get the refresh sweep. */
-const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby"]);
+const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby", "newsroom"]);
 
 /** Rooms with open sky over them, where a night can be raining. */
 const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
@@ -1014,6 +1035,189 @@ function paintLobby(random, accent, glow) {
   );
 }
 
+
+/**
+ * Light that happens *to* the room rather than being part of it. Every one of
+ * these is a fact the scene already states (see `getScenePlate`): a room the
+ * public is watching goes off in camera flashes, open sky by day comes in as
+ * slanted rays, and a night under pressure outdoors gets its storm. Positions
+ * and timing are seeded, so a scene flashes in the same places every time, and
+ * with motion reduced the flashes and the lightning are simply not drawn.
+ */
+function paintFx(random, plate, id) {
+  const layers = [];
+  if (plate.rays) {
+    const origin = span(random, 40, 280);
+    const rays = [];
+    for (let ray = 0; ray < 3; ray += 1) {
+      const x = origin + (ray - 1) * span(random, 34, 52);
+      const width = span(random, 14, 26);
+      rays.push(
+        <polygon
+          key={`ray-${ray}`}
+          points={`${round(x)},0 ${round(x + width)},0 ${round(x + width + 60)},132 ${round(x + 30)},132`}
+          style={{ animationDelay: `-${span(random, 0, 9).toFixed(1)}s` }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="rays" className="gx-plate-rays" fill={`url(#${id}-ray)`}>
+        {rays}
+      </g>,
+    );
+  }
+  if (plate.flash) {
+    const bulbs = [];
+    for (let bulb = 0; bulb < 6; bulb += 1) {
+      bulbs.push(
+        <circle
+          key={`flash-${bulb}`}
+          cx={round(span(random, 16, 304))}
+          cy={round(span(random, 18, 84))}
+          r={round(span(random, 9, 18))}
+          style={{
+            animationDuration: `${span(random, 3.2, 6.4).toFixed(2)}s`,
+            animationDelay: `-${span(random, 0, 6).toFixed(2)}s`,
+          }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="flash" className="gx-plate-flashes" fill={`url(#${id}-flash)`}>
+        {bulbs}
+      </g>,
+    );
+  }
+  if (plate.lightning) {
+    layers.push(
+      <rect
+        key="lightning"
+        className="gx-plate-lightning"
+        x="0"
+        y="0"
+        width="320"
+        height="132"
+        fill="var(--plate-mid)"
+        style={{ animationDelay: `-${span(random, 0, 7).toFixed(1)}s` }}
+      />,
+    );
+  }
+  return layers;
+}
+
+/**
+ * A 국정감사 room: the members' dais curving across the back wall with a
+ * nameplate at every seat, cameras on tripods at both sides, and the witness
+ * table in front. The accent is the chair nobody sat in -- the one the season
+ * has been walking toward -- lit where the witness should be.
+ */
+function paintChamber(random, accent, glow) {
+  const seats = Math.round(span(random, 7, 9));
+  const members = [];
+  const plates = [];
+  for (let seat = 0; seat < seats; seat += 1) {
+    const t = seat / (seats - 1);
+    const x = Math.round(44 + t * 232);
+    const y = Math.round(48 - Math.sin(t * Math.PI) * 12);
+    plates.push(<rect key={`np-${seat}`} x={x - 6} y={y + 2} width="12" height="4" />);
+    if (random() < 0.8) members.push(seated(`m-${seat}`, x, y, 13));
+  }
+  const emptyX = Math.round(span(random, 214, 240));
+  return (
+    <>
+      {far(
+        <>
+          <circle cx="160" cy="18" r="9" />
+          <circle cx="160" cy="18" r="5" />
+          <path d="M28 58 Q160 22 292 58" />
+          <line x1="0" y1="64" x2="320" y2="64" />
+        </>,
+      )}
+      {mid(
+        <>
+          {plates}
+          <path d="M24 64 Q160 30 296 64" />
+          {/* Cameras on tripods, left and right. */}
+          <path d="M18 104 L26 80 L34 104 M26 80 V70" />
+          <rect x="18" y="62" width="18" height="10" />
+          <path d="M286 104 L294 80 L302 104 M294 80 V70" />
+          <rect x="284" y="62" width="18" height="10" />
+          <line x1="160" y1="64" x2="100" y2="132" />
+          <line x1="160" y1="64" x2="220" y2="132" />
+        </>,
+      )}
+      {people(members)}
+      {halo(emptyX + 9, 92, 30, glow)}
+      {near(
+        <>
+          <rect x="96" y="100" width="112" height="14" />
+          <path d="M140 100 V90 l6 -4" />
+          <rect x={emptyX} y="84" width="18" height="24" />
+        </>,
+      )}
+      {mark(<rect x={emptyX + 3} y="87" width="12" height="10" fill={accent} opacity="0.85" stroke="none" />)}
+      {people(seated("witness", 152, 102, 26))}
+    </>
+  );
+}
+
+/**
+ * A newsroom at night: a wall of monitors with the breaking-news ticker running
+ * under it, two rows of desks with their own screens, reporters bent over them,
+ * and the office cat asleep on the nearest keyboard. The ticker is the accent:
+ * it is what the room exists to put out.
+ */
+function paintNewsroom(random, accent, glow) {
+  const screens = [];
+  for (let row = 0; row < 2; row += 1) {
+    for (let col = 0; col < 4; col += 1) {
+      screens.push(<rect key={`wall-${row}-${col}`} x={88 + col * 37} y={10 + row * 20} width="33" height="17" />);
+    }
+  }
+  const desks = [];
+  const reporters = [];
+  for (let desk = 0; desk < 4; desk += 1) {
+    const x = Math.round(30 + desk * 72 + span(random, -6, 6));
+    desks.push(<rect key={`desk-${desk}`} x={x} y="84" width="46" height="6" />);
+    desks.push(<rect key={`mon-${desk}`} x={x + 12} y="70" width="20" height="13" />);
+    if (desk !== 2 || random() < 0.5) reporters.push(seated(`r-${desk}`, x + 22, 88, 20));
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="56" x2="320" y2="56" />
+          <rect x="8" y="12" width="60" height="36" />
+          <rect x="252" y="12" width="60" height="36" />
+        </>,
+      )}
+      {halo(160, 54, 70, glow)}
+      {mid(
+        <>
+          {screens}
+          {desks}
+        </>,
+      )}
+      {lit(
+        <>
+          <rect x="92" y="14" width="25" height="9" />
+          <rect x="166" y="34" width="25" height="9" />
+        </>,
+      )}
+      {mark(<rect x="84" y="51" width="156" height="7" fill={accent} stroke="none" />)}
+      {people(reporters)}
+      {near(
+        <>
+          <path d="M-4 108 H324 V132 H-4 Z" />
+          {/* The office cat, asleep on the front desk. */}
+          <path d="M248 108 q0 -9 11 -9 q10 0 11 9 Z" />
+          <path d="M252 101 l2 -5 l3 4 M262 100 l3 -4 l2 5" />
+        </>,
+      )}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
   transit: paintTransit,
   bookshop: paintBookshop,
@@ -1029,6 +1233,8 @@ const MOTIF_PAINTERS = {
   archive: paintArchive,
   corridor: paintCorridor,
   hall: paintHall,
+  chamber: paintChamber,
+  newsroom: paintNewsroom,
   counter: paintCounter,
   desk: paintDesk,
 };

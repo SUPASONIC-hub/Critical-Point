@@ -29,7 +29,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
     dialog.accept();
   });
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case10", "c10_aftershock");
+  await startDebugNode(page, "case11", "c11_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");
@@ -59,7 +59,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   expect(Array.isArray(diagnosticPayload.errorLog)).toBe(true);
   expect(Array.isArray(diagnosticPayload.saveSlots)).toBe(true);
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /불을 끈 사람의 마지막 밤|제도를 남긴 사람의 마지막 밤|서랍을 닫지 않은 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /끝까지 같이 먹은 사람의 마지막 밤|속기록을 연 사람의 마지막 밤|호출에 응한 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 });
 
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
@@ -116,7 +116,7 @@ test("the table shows the bet on every card and never a forecast of the next pus
 });
 
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
-  // Eleven cases played scene by scene. 180s was set for eight and ran out under
+  // Twelve cases played scene by scene. 180s was set for eight and ran out under
   // a parallel suite once the season grew; 300s was set for ten, which took 2.7
   // minutes alone. Each case adds roughly 16 seconds to the walk. 360s -> 420s
   // when every scene gained a briefing page to close before its table.
@@ -1392,11 +1392,11 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   await page.goto("/?debug=1");
   await openIntroDrawer(page, ".data-info-panel");
   await page.locator(".consent-box input").check({ force: true });
-  await startDebugNode(page, "case10", "c10_aftershock");
+  await startDebugNode(page, "case11", "c11_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /불을 끈 사람의 마지막 밤|제도를 남긴 사람의 마지막 밤|서랍을 닫지 않은 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /끝까지 같이 먹은 사람의 마지막 밤|속기록을 연 사람의 마지막 밤|호출에 응한 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 
   const savedBeforeFailureCallback = await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));

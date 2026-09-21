@@ -898,8 +898,9 @@ test("the ending reads what the run did at the table", () => {
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
   // 16 busts wrecked an eight-case season. Busts are read as a rate over the
   // season's length and the collapse line rises with it, so a ten-case season
-  // needed 26 and an eleven-case season needs 33 to carry the same strain.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 33, seasonBestMultiplier: 32 });
+  // needed 26, an eleven-case season 33, and a twelve-case season needs 40 to
+  // carry the same strain.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 40, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -912,17 +913,17 @@ test("the ending answers busts across the range play reaches, not at one step", 
     seasonBestMultiplier: 4,
   };
   const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
-  // The sample strain moved 28 -> 29 when 사건 07 landed, and 29 -> 33 when 사건 08
-  // and 09 did. Both halves of the
+  // The sample strain moved 28 -> 29 when 사건 07 landed, 29 -> 33 when 사건 08
+  // and 09 did, and 33 -> 35 when 사건 11 did. Both halves of the
   // collapse gate are derived from the season length -- the bust rate divides by
   // it, the pressure threshold rises with it -- so an eight-case season prices a
   // bust slightly lower and sets the line slightly higher, and the old sample sat
   // under the new line with any number of busts. What the test is for is the
   // shape, not the coordinate: clean does not collapse, enough busts does, and
   // the answer in between is graded rather than a single step.
-  assert.notEqual(pressureAt(0, 33), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 33), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 33))).size > 1);
+  assert.notEqual(pressureAt(0, 35), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 35), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 35))).size > 1);
 });
 
 /* --------------------------------------------------------------- relics */
@@ -1125,7 +1126,7 @@ test("every scene draws a room, and always the same one", () => {
   // ...unless it names nothing, in which case the building answers.
   assert.equal(getPlateMotif("트리거랩 기록 보관소 B2 · 이전 참가자 구역"), "archive");
   // A bid is worked in its waiting room, so 입찰 wins over 대기실.
-  assert.equal(getPlateMotif("세움테크 입찰 대기실"), "hall");
+  assert.equal(getPlateMotif("노바웍스 입찰 대기실"), "hall");
   // A branch is a counter hall even when only the building is named.
   assert.equal(getPlateMotif("KD은행 강서지점"), "counter");
   assert.equal(getPlateMotif("KD은행 강서지점 · 문서고"), "archive");
@@ -1167,6 +1168,18 @@ test("every scene draws a room, and always the same one", () => {
   assert.notEqual(getPlateOrg("여의도 브릿지은행 본점 · 1층 로비"), getPlateOrg("KD은행 강서지점"));
   assert.equal(getPlateOrg("회기동 헌책방 2층"), "outside");
   assert.equal(getPlateOrg("강릉 중앙시장 · 오징어순대집"), "outside");
+  // The hearing room is a chamber, not the generic 회의실 hall, and the press
+  // works in a newsroom. Both belong to the public, which is nobody's bank.
+  assert.equal(getPlateMotif("국회 본관 정무위원회 회의실 · 참고인석"), "chamber");
+  assert.equal(getPlateMotif("망원동 리드라인 편집국"), "newsroom");
+  assert.equal(getPlateOrg("국회 의원회관 7층 · 정무위원회 의원실"), "public");
+  assert.notEqual(getPlateOrg("망원동 리드라인 편집국"), getPlateOrg("KD은행 강서지점"));
+  // Effects are facts the scene states: a watched room flashes, open sky by day
+  // lets light in, and only a pressured night outdoors gets lightning.
+  assert.equal(getScenePlate({ place: "국회 본관 정무위원회 회의실 · 참고인석" }, "x").flash, true);
+  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "오후 3시" }, "x").rays, true);
+  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00", phase: "HEARING" }, "x").lightning, true);
+  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00" }, "x").lightning, false);
   assert.equal(getPlateMotif(""), "desk");
   assert.equal(getPlateTone(""), 0);
 });

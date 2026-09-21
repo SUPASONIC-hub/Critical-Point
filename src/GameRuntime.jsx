@@ -344,7 +344,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
   const speakerProfile = createSpeakerProfile({ node });
-  const speakerPortrait = speakerPortraits[node?.speaker] ?? "/speaker-profile.webp";
+  const speakerPortrait = speakerPortraits[node?.speaker] ?? null; // unpainted speakers are drawn by SpeakerPortrait
   const localSeasonLeaderboardRow = useMemo(
     () =>
       caseResults.final && completedCases.includes("final")

@@ -52,6 +52,7 @@ import { RelicDraft, RelicIcon } from "./RelicDraft.jsx";
 import { SceneBriefing } from "./SceneBriefing.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
+import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
@@ -726,15 +727,7 @@ export function GauntletStage({
               costs nothing for -- while still being the first thing a player
               sees. The readable copy of the same drawing is in the briefing. */}
           <ScenePlate node={scene.node} nodeId={scene.nodeId} variant="backdrop" />
-          <img
-            className="gx-portrait"
-            src={scene.speakerPortrait ?? "/speaker-profile-160.webp"}
-            alt=""
-            width="44"
-            height="44"
-            loading="lazy"
-            decoding="async"
-          />
+          <SpeakerPortrait className="gx-portrait" name={scene.node.speaker} src={scene.speakerPortrait} size={44} />
           <div>
             {/* Where and when, before who. The season walks two buildings and six
                 cases, and the route split plays the authored middle out of
@@ -1020,7 +1013,7 @@ export function GauntletStage({
         <SceneBriefing
           node={scene.node}
           nodeId={scene.nodeId}
-          portrait={scene.speakerPortrait ?? "/speaker-profile.webp"}
+          portrait={scene.speakerPortrait}
           speakerRole={scene.speakerRole}
           question={scene.question}
           readSeconds={readSeconds}

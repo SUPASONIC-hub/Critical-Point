@@ -3175,6 +3175,13 @@
   --plate-ambient: var(--c-coral);
 }
 
+/* The public -- the legislature and the press -- is lit pale periwinkle: close
+   to the cold of the corporate rooms, but lighter than any of them, because
+   these are the rooms with the windows open. */
+.gx-plate-tone-6 {
+  --plate-ambient: var(--c-sky-86);
+}
+
 /* The plate's air. Everything here is transform or opacity on a few dozen SVG
    nodes, all clipped by the SVG's own viewport, so none of it can widen the
    header or move a card. The far plane drifts against the room, the accent's
@@ -3210,6 +3217,26 @@
 
 .gx-plate-vignette {
   animation: gx-plate-pulse 4.2s ease-in-out infinite;
+}
+
+/* The effects layer. Camera flashes pop and fade at seeded moments, daylight
+   rays sway a few degrees, and a stormy night lights the whole frame twice in
+   quick succession every few seconds. Opacity and transform only. */
+.gx-plate-flashes > circle {
+  opacity: 0;
+  animation: gx-plate-flashbulb 4.6s ease-out infinite;
+}
+
+.gx-plate-rays > polygon {
+  opacity: 0.55;
+  transform-box: view-box;
+  transform-origin: 160px 0;
+  animation: gx-plate-ray 11s ease-in-out infinite alternate;
+}
+
+.gx-plate-lightning {
+  opacity: 0;
+  animation: gx-plate-lightning 7.5s linear infinite;
 }
 
 .gx-plate-heat .gx-plate-halo {
@@ -3308,6 +3335,47 @@
   }
 }
 
+@keyframes gx-plate-flashbulb {
+  0%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  88% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes gx-plate-ray {
+  from {
+    opacity: 0.35;
+    transform: rotate(-3deg);
+  }
+  to {
+    opacity: 0.7;
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes gx-plate-lightning {
+  0%,
+  90%,
+  93%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 0.55;
+  }
+  94.5% {
+    opacity: 0.35;
+  }
+}
+
 @keyframes gx-plate-push {
   from {
     transform: scale(1.02);
@@ -3324,7 +3392,9 @@
     animation: none;
   }
 
-  .gx-plate-sweep {
+  .gx-plate-sweep,
+  .gx-plate-flashes,
+  .gx-plate-lightning {
     opacity: 0;
   }
 }

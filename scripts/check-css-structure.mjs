@@ -132,10 +132,15 @@ const fileBudgets = {
   // 3400 / 71400 -> 3335 / 69500 on 2026-09-21: the reading beat moved off the
   // table into its own page (briefing.css), and the in-table open button, the
   // dimmed hand and the unfolded briefing went with it.
-  "play.css": { lines: 3335, bytes: 69500 },
+  // 3335 / 69500 -> 3405 / 70900 on 2026-09-21 for the plate's effects layer:
+  // camera flashes in the rooms the public watches, daylight rays, a storm's
+  // lightning, and the tone for the legislature and the press.
+  "play.css": { lines: 3405, bytes: 70900 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
-  "briefing.css": { lines: 635, bytes: 13200 },
+  // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
+  // board's splash panel arrives with.
+  "briefing.css": { lines: 670, bytes: 14100 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.

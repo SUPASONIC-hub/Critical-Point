@@ -226,6 +226,36 @@
   color: var(--c-gx-heat);
 }
 
+/* A board the last decision broke arrives glitched: the splash splits into a
+   red and a cyan copy that jitter back together, the way a signal does when it
+   is being interfered with. Filter only, so the plate's own push-in keeps its
+   transform. */
+.is-broken .gx-panel-splash .gx-plate {
+  animation: gx-splash-glitch 2.8s steps(1, end) infinite;
+}
+
+@keyframes gx-splash-glitch {
+  0%,
+  100% {
+    filter: none;
+  }
+  4% {
+    filter: drop-shadow(3px 0 0 rgb(255 56 56 / 0.7)) drop-shadow(-3px 0 0 rgb(80 220 255 / 0.6));
+  }
+  8% {
+    filter: drop-shadow(-2px 1px 0 rgb(255 56 56 / 0.6)) drop-shadow(2px -1px 0 rgb(80 220 255 / 0.5));
+  }
+  12% {
+    filter: none;
+  }
+  52% {
+    filter: drop-shadow(1px 0 0 rgb(255 56 56 / 0.5)) drop-shadow(-1px 0 0 rgb(80 220 255 / 0.4));
+  }
+  55% {
+    filter: none;
+  }
+}
+
 /* The speaker, with speed lines behind them and the scene's question in a balloon. */
 .gx-panel-speaker {
   grid-area: speaker;
@@ -251,7 +281,8 @@
   transform: rotate(-3deg);
 }
 
-.gx-speaker-frame img {
+.gx-speaker-frame img,
+.gx-speaker-frame svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -627,7 +658,8 @@
   .gx-panel,
   .gx-balloon,
   .gx-sfx,
-  .gx-comic-timer.is-late {
+  .gx-comic-timer.is-late,
+  .is-broken .gx-panel-splash .gx-plate {
     animation: none;
   }
 }
