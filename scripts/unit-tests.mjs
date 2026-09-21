@@ -1268,3 +1268,77 @@ test("a continuation code is twelve unambiguous symbols and reads back from any 
   assert.equal(normalizeCloudCode("ABCD-EFGH-IJKL"), null, "I and O and 0 and 1 are never issued, so they cannot be typed in");
   assert.equal(normalizeCloudCode("ABCD-EFGH"), null);
 });
+
+/* -------------------------------------------------- free-input enrichment */
+
+test("a model answer is taken apart field by field, and a bad field loses only itself", async () => {
+  const { normalizeAnalysis, parseAnalysisJson } = await import("../src/freeTextAnalysis.js");
+
+  const good = normalizeAnalysis(
+    parseAnalysisJson(`{
+      "analysis": {
+        "reframe": 74, "grounding": 61, "detected_trigger": "responsibility",
+        "confidence": 0.8, "trigger_reason": "장부를 먼저 맞춘다", "injection_attempt": false
+      },
+      "rule_alteration": { "fracture_target": "trust", "system_comment": "절차는 지켰군요. 사람은요?" },
+      "ending_weight": { "toward": "cold-justice", "delta": 0.3, "reason": "절차 우선" }
+    }`),
+  );
+  assert.equal(good.reframe, 74);
+  assert.equal(good.trigger, "responsibility");
+  assert.equal(good.fractureTarget, "trust");
+  assert.equal(good.endingToward, "cold-justice");
+
+  // Numbers as strings, a trigger that is not one of the four, an ending the
+  // season does not have, and a fracture target the free-text effect cannot
+  // move. Everything sound in the same answer has to survive them.
+  const partial = normalizeAnalysis({
+    analysis: { reframe: "88", grounding: 999, detected_trigger: "정의형", confidence: 0.9 },
+    rule_alteration: { fracture_target: "humanCost", system_comment: "기록은 남습니다." },
+    ending_weight: { toward: "구제형오버클럭", delta: 5 },
+  });
+  assert.equal(partial.reframe, 88, "a numeric string is still a number");
+  assert.equal(partial.grounding, 100, "out of range is clamped, not dropped");
+  assert.equal(partial.trigger, null);
+  assert.equal(partial.confidence, null, "no trigger means no confidence to weigh");
+  assert.equal(partial.fractureTarget, null, "자유입력은 사람 피해를 움직이지 않는다");
+  assert.equal(partial.endingToward, null);
+  assert.equal(partial.endingDelta, null);
+  assert.equal(partial.systemComment, "기록은 남습니다.");
+
+  assert.equal(normalizeAnalysis({ analysis: {}, ending_weight: {} }), null, "valid JSON holding nothing is not a result");
+  assert.deepEqual(parseAnalysisJson('여기 결과입니다: {"analysis":{"reframe":5}}'), { analysis: { reframe: 5 } }, "a preamble is off-contract but survivable");
+  assert.equal(parseAnalysisJson("죄송하지만 분석할 수 없습니다."), null, "prose with no object at all is not a result");
+  assert.equal(parseAnalysisJson('```json\n{"analysis":{"reframe":10}}\n```').analysis.reframe, 10, "a fence is off-contract but survivable");
+  assert.equal(parseAnalysisJson("[1,2]"), null, "an array is not an analysis");
+});
+
+test("a trigger with no confidence still gets one, and a comment is cut to the frame it fits", async () => {
+  const { normalizeAnalysis } = await import("../src/freeTextAnalysis.js");
+  const result = normalizeAnalysis({
+    analysis: { detected_trigger: "revenge", reframe: 40 },
+    rule_alteration: { system_comment: "가".repeat(80) },
+  });
+  assert.equal(result.confidence, 0.5, "the run-level tally needs a weight for every vote");
+  assert.equal(result.systemComment.length, 40);
+  assert.equal(result.injectionAttempt, false, "absent is not true");
+});
+
+test("an analysis telemetry item passes the queue's shape rules and carries no prose", async () => {
+  const { validateTelemetryItem } = await import("../src/state/payloadSchemas.js");
+  const payload = {
+    session_id: "session-12345678",
+    session_code: "ABCD1234",
+    run_id: "run-1",
+    case_id: "case07",
+    node_id: "c7_ask_archive",
+    choice_id: "free",
+    analysis: { trigger: "affection", confidence: 0.7, systemComment: "그 사람은 이제 당신 이름을 압니다." },
+  };
+  assert.deepEqual(validateTelemetryItem({ type: "analysis", payload }), []);
+  assert.deepEqual(
+    validateTelemetryItem({ type: "analysis", payload: { ...payload, freeText: "고용 승계를 조건으로 겁니다" } }),
+    ["payload contains private fields"],
+    "the analysis is what the model said about the sentence, never the sentence",
+  );
+});

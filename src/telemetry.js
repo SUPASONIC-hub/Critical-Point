@@ -120,6 +120,16 @@ export function saveErrorTelemetry(payload, eventId = null) {
   return insertRow("app_error_logs", payload, "Error log save failed", eventId);
 }
 
+/**
+ * The model's reading of a free-input card. It lands after the card resolved,
+ * which is too late for the `decision_log` of the case row when the card was
+ * that case's last, so it travels on its own. The player's sentence is not part
+ * of it.
+ */
+export function saveAnalysisTelemetry(payload, eventId = null) {
+  return insertRow("free_text_analyses", payload, "Analysis save failed", eventId);
+}
+
 async function checkTelemetryTable(tableName) {
   if (!telemetryEnabled) return { table: tableName, ok: false, skipped: true };
 

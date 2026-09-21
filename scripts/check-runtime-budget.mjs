@@ -92,9 +92,15 @@ const BUDGETS = {
   // 1800 / 149 -> 1815 / 150 the same day for leaving a table on purpose: the
   // exit save hands the suspended window to the persistence hook, and the
   // visibility and pagehide handling lives in `useWindowSuspension`, not here.
+  // 1815 / 150 -> 1830 / 151 on 2026-09-21 for the free-input LLM reading. The
+  // request, its abort and the entry patch live in `useFreeTextEnrichment`, so
+  // what stayed here is only what the submit handler alone knows: which entry
+  // was just written, whether consent and the privacy signals allow the
+  // sentence off the device, and the effect the regex scorer had already
+  // applied. Fifteen lines is that call and the three aborts on run reset.
   "src/GameRuntime.jsx": {
-    lines: 1815,
-    importedNames: 150,
+    lines: 1830,
+    importedNames: 151,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
   "src/screens/PlayScreen.jsx": {

@@ -124,6 +124,7 @@ import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
 import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { safeStringify } from "./state/diagnosticUtils.js";
+import { useFreeTextEnrichment } from "./state/useFreeTextEnrichment.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import {
   caseIntroEchoes,
@@ -570,6 +571,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setSaveStatus,
     setLastSavedAt,
   });
+  const { enrichEntry, abortEnrichment } = useFreeTextEnrichment(setLog, { sessionId, sessionCode, runId, queueTelemetry });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
   const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
@@ -856,6 +858,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setCurrentCase(caseId);
     setNodeId(startNode);
     setResources(openingResources);
+    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
@@ -1290,6 +1293,20 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setTriggers(nextTriggers);
     setCognition(nextCognition);
     setLog(nextLog);
+    // Two gates before a player's own sentence leaves the device. Consent is
+    // the same one telemetry asks for; the privacy signals are the check that
+    // already refuses to quote this text back into the next scene, and text too
+    // sensitive to echo locally is text too sensitive to send.
+    if (free && submittedFreeText && dataConsent && !submittedPrivacySignals.some((signal) => signal.active)) {
+      enrichEntry(nextLog.length - 1, { caseId: fallbackCaseId, nodeId: resolvedNodeId, choiceId: choice.id }, {
+        freeText: submittedFreeText,
+        caseId: fallbackCaseId,
+        stageName: activeCaseMeta?.label ?? "",
+        presentedOptions: (node.choices ?? []).filter((item) => item.type !== "free").map((item) => item.label),
+        resources,
+        appliedEffect: finalEffect,
+      });
+    }
     setEcho(nextEcho);
     setFreeText("");
     setNodeId(nextNode);
@@ -1367,6 +1384,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLastRecoveredError(null);
     setNodeId("start");
     setResources(initialResources);
+    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
@@ -1492,6 +1510,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setCompletedCases(allPreviousCases);
     setNodeId(nextNodeId);
     setResources(initialResources);
+    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));

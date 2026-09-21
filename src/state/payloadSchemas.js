@@ -17,7 +17,7 @@ export function validatePlaytestExport(payload, { includeDiagnostics = false } =
   return errors;
 }
 
-const TELEMETRY_TYPES = new Set(["case", "feedback", "error"]);
+const TELEMETRY_TYPES = new Set(["case", "feedback", "error", "analysis"]);
 const PRIVATE_TELEMETRY_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment", "spokenChoice"]);
 
 function containsPrivateTelemetryKey(value) {

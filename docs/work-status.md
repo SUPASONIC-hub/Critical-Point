@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-18 (eleven cases, and a deploy that presses its own button)
+Last updated: 2026-09-21 (the free-input card gets a second reader, run offline)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -829,3 +829,74 @@ the live database when a migration fixes a runtime error.
     (four red Verify runs on commits that had nothing to do with it). A timing
     helper that samples a rendered variable and acts a frame later has to aim at
     the middle of the tolerance, not its edge.
+
+68. The free-input card now has an LLM reading alongside the regex one, and the
+    regex one did not move. `scoreFreeText` still decides the resource effect,
+    the cognition axes, the three-signal success gate and the branch target,
+    all inside the submit handler, because that handler is synchronous and the
+    betting window it runs under is a stopwatch -- a card that pauses for a
+    network round trip after the player commits is a card that broke. The model
+    is asked only for what can arrive late: the trigger vote and its
+    confidence, the headquarters line, the ending weight, and two scores the
+    result screen reads at the end of the run. If nothing comes back the entry
+    keeps `llmEnriched: false` and there is nothing to undo, which is why the
+    regex scorer is the default path rather than the fallback.
+
+    Three things the prompt was originally written to do, it cannot. It cannot
+    judge the two-second penalty: it never sees a response time, and
+    `exploitPenalty` excludes free-text entries anyway. It cannot own "rhythm":
+    `rhythmScore` is a stopwatch and the model was being asked to score prose,
+    so the prose axis is called `grounding` and feeds `reflectionScore`
+    instead. And it cannot name 사람 피해 as a fracture target, because
+    `scoreFreeText` never writes `humanCost` -- billing 1.5x on a number the
+    card cannot move bills nothing.
+
+    The key lives in `supabase/functions/analyze-free-text`, not the bundle:
+    this is a static site and the browser holds only the anon key. The player's
+    sentence leaves the device only with telemetry consent and only when
+    `detectPrivacySignals` is clear -- text the game already refuses to quote
+    back into the next scene is text it refuses to send.
+
+    The reading reaches telemetry two ways, and the second exists because of
+    when it lands. A card enriched now is part of the `log` state, so the next
+    card's `decision_log` carries it -- every card but the last one of a case,
+    which is still in flight when that case's row is written. `free_text_analyses`
+    takes that one on its own row. The table holds no player prose and
+    `free_text` must never become a column on it: what is stored is what the
+    model said about the sentence, not the sentence. It is insert-only under the
+    same `validate_telemetry_insert` trigger as every other telemetry table --
+    that trigger's `if/elsif` chain names three tables and falls through to the
+    shared session-id and rate-limit checks for a fourth, which is the whole
+    reason this table needs no new validation of its own. It also means the
+    analysis rows spend the same 120-per-hour budget as case telemetry.
+
+69. The second reader runs offline, not live. The project has no Anthropic key
+    -- the account is shared and provisioning one is a permission question, not
+    a budget one (a card costs about half a cent on Haiku) -- so
+    `VITE_ENABLE_LIVE_ANALYSIS` defaults to false and the browser makes no call
+    at all. Without that flag every free-input card would spend a Supabase
+    function invocation to be told 503.
+
+    `npm run analyze:free-text` does the reading instead: it pulls collected
+    `decision_log` entries with the service-role key (fetched from the linked
+    project at run time, never stored), runs each card through Claude Code in
+    headless mode -- which authenticates as the person at the keyboard rather
+    than as a key the project would have to own -- and writes JSONL plus a
+    summary to `analysis-out/`, which is gitignored because it holds player
+    sentences. What it gives up is the in-game reaction; what it keeps is
+    everything the prompt was written to learn.
+
+    Two things this cost. The prompt moved to
+    `supabase/functions/analyze-free-text/prompt.js` so the edge function and
+    the batch runner read one copy -- a prompt that drifts makes the batch
+    numbers say nothing about the live ones. And the assistant prefill that
+    forced the opening brace is gone: it works on Haiku and returns a 400 on
+    Sonnet 5, Opus 5 and the whole 4.6+ family, so it would have turned a
+    one-word model swap into an outage. The client's parser tolerates a
+    preamble instead.
+
+    The runner spawns the published `claude` executable directly with
+    `shell: false` and sends the prompt over stdin. The Windows npm shim is a
+    `.ps1`/`.cmd` pair that cmd.exe cannot always find from a POSIX PATH, and
+    the easy fix for that -- `shell: true` -- would put a player's sentence on
+    a command line.

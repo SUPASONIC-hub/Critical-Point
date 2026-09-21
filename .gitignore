@@ -16,3 +16,6 @@ Profile.jpg
 # rather than one filename so the next note does not have to be remembered.
 /*.md
 !/README.md
+
+# Output of npm run analyze:free-text -- contains player sentences.
+analysis-out/
