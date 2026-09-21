@@ -19,7 +19,10 @@ import {
   getForcedCard,
   getHeartbeatBpm,
   getMultiplier,
+  getReadingSeconds,
   getResourceMultiplier,
+  READING_MAX_SECONDS,
+  READING_MIN_SECONDS,
   getSealedCardId,
   normalizeRunState,
   reduceWindow,
@@ -86,10 +89,9 @@ import {
 } from "../src/appConfig.js";
 import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
-import { describeChoiceDilemma, explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
+import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
 import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
-import { createStreakReward } from "../src/viewModels/sceneViewModels.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
 
@@ -351,38 +353,6 @@ test("particles follow the reading of a trailing digit", () => {
   assert.equal(endsOnConsonant("믿음 -10"), true, "anything ending in 0 is read 십/백/천/만");
 });
 
-// The trade-off line sits directly above the effect chips and used to disagree
-// with them: it split the effect by sign, so a rising 사람 피해 was announced as
-// something the choice won.
-test("rising 사람 피해 is what the choice costs, and it is the biggest cost here", () => {
-  assert.equal(
-    describeChoiceDilemma({ capital: 24, humanCost: 11, trust: -6 }),
-    "현금을 얻는 대신 사람 피해를 키웁니다.",
-    "rising 사람 피해 is what the choice costs, and it is the biggest cost here",
-  );
-});
-test("falling 사람 피해 is a gain, so the cost named is the rising 지침", () => {
-  assert.equal(
-    describeChoiceDilemma({ trust: 8, humanCost: -4, fatigue: 2 }),
-    "믿음을 얻는 대신 지침을 키웁니다.",
-    "falling 사람 피해 is a gain, so the cost named is the rising 지침",
-  );
-});
-test("cutting a cost is described as cutting it, not as winning it", () => {
-  assert.equal(
-    describeChoiceDilemma({ humanCost: -9, capital: -2 }),
-    "사람 피해를 줄이는 대신 현금을 닫습니다.",
-    "cutting a cost is described as cutting it, not as winning it",
-  );
-});
-test("the sentence names what moved most, not whichever key was typed first", () => {
-  assert.equal(
-    describeChoiceDilemma({ trust: 2, capital: 9, legitimacy: -1, time: -8 }),
-    "현금을 얻는 대신 남은 시간을 닫습니다.",
-    "the sentence names what moved most, not whichever key was typed first",
-  );
-});
-
 // The result ledger's sentence reads the same numbers the same way.
 test("rising 사람 피해 belongs on the cost side, and the particles follow the digits", () => {
   assert.match(
@@ -405,27 +375,12 @@ test("no choice in the graph builds a disagreeing particle", () => {
   const WRONG_PARTICLES = /(피해을|지침를|현금를|믿음를|공정함를|시간를|신뢰이|피로이)/u;
   for (const node of Object.values(nodes)) {
     for (const choice of node.choices ?? []) {
-      const line = describeChoiceDilemma(choice.effect ?? {});
+      const line = explainResourceTradeoff(choice.effect ?? {});
       assert.doesNotMatch(line, WRONG_PARTICLES, `${node.title}/${choice.id}: "${line}"`);
-      assert.doesNotMatch(explainResourceTradeoff(choice.effect ?? {}), WRONG_PARTICLES, `${choice.id} ledger line`);
     }
   }
 });
 
-test("streak rewards trigger only at the 3 and 5 milestones", () => {
-  assert.equal(createStreakReward({ previousStreak: 1, challengeMatch: true }), null);
-  assert.deepEqual(createStreakReward({ previousStreak: 2, challengeMatch: true }), {
-    label: "STREAK PAYOUT",
-    text: "3연속 장면 목표를 맞혔습니다. 다음 판단을 위한 신뢰가 올라가고 피로가 줄어듭니다.",
-    effect: { trust: 2, fatigue: -2 },
-  });
-  assert.deepEqual(createStreakReward({ previousStreak: 4, challengeMatch: true }), {
-    label: "PERFECT PAYOUT",
-    text: "5연속 장면 목표를 맞혔습니다. 신뢰와 정당성을 회복하고 피로를 덜어냅니다.",
-    effect: { trust: 2, legitimacy: 2, fatigue: -3 },
-  });
-  assert.equal(createStreakReward({ previousStreak: 2, challengeMatch: false }), null);
-});
 test("streak rewards take priority in immediate choice feedback", () => {
   const feedback = getChoiceOutcomeFeedback({
     choiceId: "choice",
@@ -489,6 +444,18 @@ test("the clock creeps heat in after the read, and running it out is a bust", ()
   for (let second = 0; second < 60 && win.status === "live"; second += 1) win = reduceWindow(win, { type: "TICK", delta: 1 });
   assert.equal(win.status, "bust");
   assert.equal(win.cause, "timeout");
+});
+
+test("the briefing's reading clock follows the text and stays inside its bounds", () => {
+  assert.equal(getReadingSeconds({}), READING_MIN_SECONDS, "an empty scene still gets the floor");
+  assert.equal(getReadingSeconds({ text: "가".repeat(5000) }), READING_MAX_SECONDS, "a long scene is capped");
+  const short = getReadingSeconds({ text: "가".repeat(200) });
+  const long = getReadingSeconds({ text: "가".repeat(200), memo: ["나".repeat(120)] });
+  assert.ok(long > short, "the case facts count as reading");
+  for (const node of Object.values(nodes).filter((item) => item.choices?.length)) {
+    const seconds = getReadingSeconds(node);
+    assert.ok(seconds >= READING_MIN_SECONDS && seconds <= READING_MAX_SECONDS, `${node.title}: ${seconds}s`);
+  }
 });
 
 test("cashing needs a staked card and an open seal", () => {

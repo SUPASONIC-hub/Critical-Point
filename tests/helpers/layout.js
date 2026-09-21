@@ -31,8 +31,8 @@ export async function measureTable(page) {
  * Opens a scene on a board the player has broken, with the rules and relics
  * given. The save is written from a static page on the same origin: leaving the
  * table persists its live state on the way out, which would overwrite a save
- * written while it was still open. The breach banner is dismissed so the table
- * is read, not the banner.
+ * written while it was still open. The briefing page is closed so the table
+ * is read, not the page.
  */
 export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0 } = {}) {
   await startDebugNode(page, caseId, nodeId);

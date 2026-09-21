@@ -156,7 +156,9 @@ test("a closed case deals a relic draft that holds the clock and re-deals the ta
 
   // The relics cost the phone one line of the bank row, and the REBOOT board no
   // longer spends a rules panel saying the rules reset -- so a case's first table
-  // with a relic is shorter than it was before relics existed.
+  // with a relic is shorter than it was before relics existed. Measured on the
+  // table, so the briefing page the pick re-deals into is closed first.
+  await dismissProtocolBreach(page);
   await expect(page.getByTestId("active-mutations")).toHaveCount(0);
   const layout = await page.evaluate(() => ({
     relicRow: document.querySelector("[data-testid='gauntlet-relics']").getBoundingClientRect().height,
@@ -360,7 +362,7 @@ test("a second tab asks before it busts a bet another tab is holding", async ({ 
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.busts).toBe(0);
 
   // A tab that takes over: the held bet settles as a bust and the first tab locks.
-  // The next board may or may not open with a breach banner, and it dismisses itself.
+  // The next board opens on its briefing page, which may carry a breach panel.
   await dismissProtocolBreach(page);
   await page.locator(".choices .choice").first().click();
   const taker = await context.newPage();
@@ -385,4 +387,33 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-bust/);
   await expect(page.locator(".gx-slam-bust")).toBeVisible();
   await expect(page.locator(".gx-fx-bust")).toHaveCount(1);
+});
+
+test("the briefing page holds the clock, stakes a card from the page, and opens the table when it runs out", async ({ page }) => {
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible();
+  await expect(briefing.getByRole("dialog")).toBeVisible();
+  await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
+  await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
+  const timer = page.getByTestId("reading-timer");
+  const first = Number(await timer.locator("b").textContent());
+  expect(first).toBeGreaterThanOrEqual(12);
+  await expect.poll(async () => Number(await timer.locator("b").textContent())).toBeLessThan(first);
+  // The table's own clock has not moved while the page was up.
+  await expect(page.locator(".gx-clock b")).toHaveText("45");
+
+  // A card picked on the page opens the table with that card on it.
+  const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").textContent();
+  await briefing.getByTestId("briefing-card").nth(1).click();
+  await expect(briefing).toHaveCount(0);
+  await expect(page.locator(".choices .choice.selected .gx-card-label")).toHaveText(label);
+  await expect(page.getByTestId("commit-push")).toBeEnabled();
+
+  // Left alone, a page runs out and the table opens with nothing staked.
+  await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.getByTestId("commit-push")).toBeEnabled();
+  await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
 });

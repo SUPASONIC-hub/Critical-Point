@@ -118,8 +118,9 @@ test("the table shows the bet on every card and never a forecast of the next pus
 test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
   // Eleven cases played scene by scene. 180s was set for eight and ran out under
   // a parallel suite once the season grew; 300s was set for ten, which took 2.7
-  // minutes alone. Each case adds roughly 16 seconds to the walk.
-  test.setTimeout(360_000);
+  // minutes alone. Each case adds roughly 16 seconds to the walk. 360s -> 420s
+  // when every scene gained a briefing page to close before its table.
+  test.setTimeout(420_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");

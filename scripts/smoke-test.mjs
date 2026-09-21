@@ -42,7 +42,6 @@ import {
   normalizeFeedback,
   normalizePlayerName,
   normalizeSavedText,
-  parseSavedState,
   parseRecoverySlots,
   readStoredValue,
   RECOVERY_SLOT_SCHEMA_VERSION,
@@ -80,7 +79,7 @@ import {
 import { authoredEchoReplies } from "../src/gameDialogue.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
-import { getDynamicMusicLayers, getInvestigationOutcome, getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
+import { getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
 import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedState.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 import { test } from "node:test";
@@ -106,12 +105,6 @@ test("save recovery slots should use a separate namespace", () => {
 });
 test("save recovery slots should keep a bounded history", () => {
   assert.equal(SAVE_SLOT_MAX_ITEMS, 5, "save recovery slots should keep a bounded history");
-});
-test("investigation outcome should preserve target identity", () => {
-  assert.equal(getInvestigationOutcome({ id: "target-1", label: "Archive" }, 2).id, "target-1", "investigation outcome should preserve target identity");
-});
-test("critical final scenes should use impact music layers", () => {
-  assert.equal(getDynamicMusicLayers("CRITICAL", "final").bass, "deep-impact", "critical final scenes should use impact music layers");
 });
 test("valid rankings should pass integrity checks", () => {
   assert.equal(getRankingIntegrity({ runId: "run-1", completedAt: "2026-01-01", summary: { rank: "S", burstScore: 88 } }).valid, true, "valid rankings should pass integrity checks");
@@ -240,13 +233,6 @@ test("feedback restores only bounded text fields", () => {
     "feedback restores only bounded text fields",
   );
 });
-test("matching save schemas should be restored", () => {
-  assert.deepEqual(
-    parseSavedState(JSON.stringify({ saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false }), SAVE_SCHEMA_VERSION),
-    { saveSchemaVersion: SAVE_SCHEMA_VERSION, started: false },
-    "matching save schemas should be restored",
-  );
-});
 test("v1 saves should migrate into the current schema", () => {
   assert.deepEqual(
     migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] }),
@@ -276,11 +262,8 @@ test("future save schemas should not be restored", () => {
     "future save schemas should not be restored",
   );
 });
-test("old save schemas should be ignored", () => {
-  assert.equal(parseSavedState('{"saveSchemaVersion":1}', SAVE_SCHEMA_VERSION), null, "old save schemas should be ignored");
-});
 test("corrupt saves should be ignored", () => {
-  assert.equal(parseSavedState("not-json", SAVE_SCHEMA_VERSION), null, "corrupt saves should be ignored");
+  assert.equal(parseCurrentSavedState("not-json", SAVE_SCHEMA_VERSION), null, "corrupt saves should be ignored");
 });
 test("matching recovery slot schemas should be restored", () => {
   assert.equal(

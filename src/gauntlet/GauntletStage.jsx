@@ -21,6 +21,7 @@ import {
   getGrooveBonus,
   getHeartbeatBpm,
   getMultiplier,
+  getReadingSeconds,
   getRemainingSeconds,
   getSealedCardId,
   judgeBeat,
@@ -48,11 +49,11 @@ import {
 } from "./gauntletAudio.js";
 import { hasRelic, RELICS } from "./relics.js";
 import { RelicDraft, RelicIcon } from "./RelicDraft.jsx";
+import { SceneBriefing } from "./SceneBriefing.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
-const BREACH_AUTO_DISMISS_MS = 2600;
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
 const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
@@ -177,7 +178,6 @@ export function GauntletStage({
   const wideBeat = hasRelic(relics, "metronome");
   // A closed case's draft takes the breach's place: REBOOT is what it replaces.
   const draftPending = relicOffer.length > 0 && Boolean(onPickRelic) && !abandoned;
-  const [breachOpen, setBreachOpen] = useState(mutations.length > 0 && !abandoned && !draftPending);
   const [equipped, setEquipped] = useState(null);
   const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
@@ -185,35 +185,30 @@ export function GauntletStage({
   // Written by the frame loop on every beat; read here when a push is pressed.
   const beatClock = useRef({ at: 0, period: 0 });
   // The previous verdict is still on screen while the next table mounts under
-  // it; the clock and the breach wait until the player has read it.
+  // it; the clock and the briefing wait until the player has read it.
   const locked = lostToTab || staleSave;
   const awaitingClaim = heldByOtherTab && !claimed;
   const hidden = isAdvancing || revealOpen || locked || awaitingClaim;
   const draftOpen = draftPending && !hidden;
   /**
-   * The window opens on a reading beat, with the clock held.
+   * The window opens on the briefing page, with the table's clock held.
    *
-   * The scene's story -- its lead, its body and its four case facts -- lives
-   * inside the briefing, and the briefing was folded shut while a 45-second
-   * clock ran. So reading cost clock, and the score's own 사고 리듬 band asks
-   * for 8 to 28 seconds of *deciding*: the two were competing for the same
-   * seconds and reading lost every time. Worse, `responseTimeSec` is the
-   * window's elapsed, so a run that read carefully and a run that skipped the
-   * text were indistinguishable in the one number this whole project exists to
-   * measure.
-   *
-   * Nothing about the table changed. The 45 seconds are still 45 seconds, the
-   * wall is still where it was, and the push-your-luck beat starts the moment
-   * the player says they are ready. Only the reading moved out from under the
-   * clock, which is also what makes the elapsed a decision time at last.
+   * Reading used to cost clock: the scene's story sat in a folded briefing
+   * while 45 seconds ran, and the score's own 사고 리듬 band asks for 8 to 28
+   * seconds of *deciding*. So the story is told first, as a page of its own
+   * (`SceneBriefing`) with a reading clock sized to its text, and the table's
+   * 45 seconds start when that page closes -- by the player opening the table,
+   * staking a card from the page, or the reading clock running out.
    *
    * Keyed by the window's seed, so a new table -- or a relic re-deal -- always
-   * comes back to the reading beat instead of inheriting the last one's state.
+   * comes back to the briefing instead of inheriting the last one's state.
    */
   const [openedSeed, setOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
-  const paused = breachOpen || hidden || draftOpen || !tableOpen;
+  const paused = hidden || draftOpen || !tableOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0, resume });
+  const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
+  const readSeconds = useMemo(() => getReadingSeconds({ ...scene.node, question: scene.question }), [scene.node, scene.question]);
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
 
@@ -309,11 +304,10 @@ export function GauntletStage({
   }, [draftOpen]);
 
   useEffect(() => {
-    if (!breachOpen || hidden) return undefined;
-    playMutationCue(mutations.length);
-    const timer = globalThis.setTimeout(() => setBreachOpen(false), BREACH_AUTO_DISMISS_MS);
-    return () => globalThis.clearTimeout(timer);
-  }, [breachOpen, hidden, mutations.length]);
+    if (briefingOpen && mutations.length > 0) playMutationCue(mutations.length);
+    // The breach sounds once, when the briefing that carries it first shows.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [briefingOpen]);
 
   // A stake or a push is written to the save before anything can be won or lost
   // in this window, with the card staked. Reading alone is not a touch, so a
@@ -403,21 +397,31 @@ export function GauntletStage({
     setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
   }
 
-  function openTable() {
+  function isCardOpen(card) {
+    return getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy }).unlocked;
+  }
+
+  /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
+  function openTable(cardId = null) {
+    if (!briefingOpen) return;
+    const card = cards.find((item) => item.id === cardId);
+    if (card && !isCardOpen(card)) return;
     setOpenedSeed(seed);
+    if (card || (cardId === "__wild__" && freeChoice)) {
+      playTargetLockCue();
+      dispatch({ type: "SELECT", id: cardId });
+    }
   }
 
   function select(id) {
     if (!tableOpen) return;
     if (!live || isAdvancing || locked || draftOpen) return;
-    setBreachOpen(false);
     playTargetLockCue();
     dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
   }
 
   function setFocusMode(mode) {
     if (!live || locked || draftOpen) return;
-    setBreachOpen(false);
     playTargetLockCue();
     dispatch({ type: "SET_FOCUS_MODE", mode });
   }
@@ -428,14 +432,13 @@ export function GauntletStage({
   }
 
   function push(event) {
-    if (locked || draftOpen || (!canPush && !(breachOpen && live))) return;
+    if (locked || draftOpen || !canPush) return;
     // Graded against the beat the frame loop last landed. With no beat on
-    // screen -- the breach still up, the first pulse not yet in -- the press is
-    // ungraded: no combo, no slip.
+    // screen yet -- the first pulse not in -- the press is ungraded: no combo,
+    // no slip.
     const clock = beatClock.current;
     const since = pressedAt(event) - clock.at;
-    const grade = breachOpen ? null : judgeBeat(since, clock.period, wideBeat);
-    setBreachOpen(false);
+    const grade = judgeBeat(since, clock.period, wideBeat);
     const pushIndex = win.pushes + 1;
     const scored = scoreBeat(win, grade);
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
@@ -455,8 +458,7 @@ export function GauntletStage({
     if (!canFocus) return;
     const clock = beatClock.current;
     const since = pressedAt(event) - clock.at;
-    const grade = breachOpen ? null : judgeBeat(since, clock.period, wideBeat);
-    setBreachOpen(false);
+    const grade = judgeBeat(since, clock.period, wideBeat);
     const scored = scoreFocus(win, grade);
     dispatch({ type: "FOCUS", grade });
     if (wideBeat && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) pulseRelic("metronome");
@@ -478,7 +480,7 @@ export function GauntletStage({
   // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic, tableOpen, openTable };
+    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -499,15 +501,19 @@ export function GauntletStage({
         }
         return;
       }
-      // The reading beat has one control, and it is the same key that pushes:
-      // whatever the player's hand is already resting on opens the table.
-      if (!actions.tableOpen) {
-        if (event.key === " " || event.key === "Enter" || event.key.toLowerCase() === "w") {
+      // The briefing opens the table on the key that pushes -- whatever the
+      // player's hand is already resting on -- and a card key opens it with
+      // that card staked.
+      if (actions.briefingOpen) {
+        const index = Number(event.key) - 1;
+        const cardId = actions.cards[index]?.id ?? (index === actions.cards.length && actions.freeChoice ? "__wild__" : null);
+        if (event.key === " " || event.key === "Enter" || event.key.toLowerCase() === "w" || cardId) {
           event.preventDefault();
-          actions.openTable();
+          actions.openTable(cardId);
         }
         return;
       }
+      if (!actions.tableOpen) return;
       if (event.key.toLowerCase() === "e" || event.key === "Shift") {
         event.preventDefault();
         actions.focus(event);
@@ -744,10 +750,9 @@ export function GauntletStage({
               <b>{scene.node.speaker}</b> · {scene.speakerRole}
             </p>
             <p className="gx-question">{scene.question}</p>
-            {/* Remounted when the beat changes, so the reading beat opens it and
-                the timed table starts it closed -- and inside either beat the
-                player can still fold it as they like. */}
-            <details className="gx-brief" key={tableOpen ? "live" : "reading"} open={!tableOpen}>
+            {/* The briefing page told this story before the clock started; this
+                folded copy is for looking something up while it runs. */}
+            <details className="gx-brief">
               <summary>사건 브리핑</summary>
               {/* The room, before the words about it. Ten raster files cannot
                   cover 169 scenes, so the picture is drawn from the scene's own
@@ -945,23 +950,7 @@ export function GauntletStage({
         )}
       </div>
 
-      <div className={`gx-actions${tableOpen ? "" : " is-reading"}`}>
-        {!tableOpen && (
-          <button
-            type="button"
-            className="gx-open-table"
-            data-testid="open-table"
-            onClick={openTable}
-            aria-keyshortcuts="Space"
-            aria-label="판을 연다. 지금부터 시계가 흐르고 카드를 걸 수 있다"
-          >
-            <Flame size={18} aria-hidden="true" />
-            <span>판 열기</span>
-            <small>{schema.seconds}초 시작</small>
-          </button>
-        )}
-        {tableOpen && (
-          <>
+      <div className="gx-actions">
         <button
           type="button"
           className="gx-push"
@@ -1013,8 +1002,6 @@ export function GauntletStage({
           <span>{win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : selectedCard ? "확정" : "카드를 고른다"}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
         </button>
-          </>
-        )}
       </div>
 
       {draftOpen && (
@@ -1029,27 +1016,24 @@ export function GauntletStage({
         </div>
       )}
 
-      {breachOpen && mutations.length > 0 && (
-        <div className="gx-breach" role="status" data-testid="protocol-breach" onClick={() => setBreachOpen(false)}>
-          <span className="gx-breach-kicker">PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다</span>
-          <ul>
-            {mutations.map((mutation) => (
-              <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
-                <b>{mutation.label}</b>
-                <strong>
-                  {mutation.title}
-                  {mutation.axis ? ` · ${resourceMeta[mutation.axis]?.label ?? mutation.axis}` : ""}
-                </strong>
-                <small>{mutation.text}</small>
-                {mutation.softenedBy && (
-                  <em className="gx-mutation-relic">
-                    <RelicIcon id={mutation.softenedBy} size={11} /> {RELICS[mutation.softenedBy].softens.text}
-                  </em>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {briefingOpen && (
+        <SceneBriefing
+          node={scene.node}
+          nodeId={scene.nodeId}
+          portrait={scene.speakerPortrait ?? "/speaker-profile.webp"}
+          speakerRole={scene.speakerRole}
+          question={scene.question}
+          readSeconds={readSeconds}
+          tableSeconds={schema.seconds}
+          cards={cards}
+          freeChoice={freeChoice}
+          isCardOpen={isCardOpen}
+          sealedId={sealBroken ? null : sealedId}
+          selectedId={win.selectedId}
+          mutations={mutations}
+          resourceMeta={resourceMeta}
+          onOpen={openTable}
+        />
       )}
 
       {locked && (win.status === "live" || awaitingClaim) && (

@@ -99,16 +99,6 @@ export function normalizeFeedback(value) {
   };
 }
 
-export function parseSavedState(raw, schemaVersion) {
-  try {
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-    return parsed.saveSchemaVersion === schemaVersion ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSION) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return null;
   const sourceVersion = Number(state.saveSchemaVersion ?? 1);

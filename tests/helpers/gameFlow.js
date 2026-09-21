@@ -26,11 +26,10 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
  * and the seal plus one push can never reach the lowest wall a board that did
  * not just bust can draw -- so pushing until cash enables is always safe here.
  *
- * Before either, clear whatever stands between the run and a live table: the relic draft, the
- * protocol breach banner, and -- since the reading beat -- the table's own
- * closed state. All three hold the clock, so a flow that does not pass them
- * finds a board it cannot press. Idempotent, because most callers do not know
- * which of the three is up.
+ * Before either, clear whatever stands between the run and a live table: the
+ * relic draft, then the briefing page (which also carries the protocol breach).
+ * Both hold the clock, so a flow that does not pass them finds a board it
+ * cannot press. Idempotent, because most callers do not know which is up.
  */
 export async function dismissProtocolBreach(page) {
   // Best effort, not an assertion: give the stage a beat to paint so the clicks
@@ -45,7 +44,6 @@ export async function dismissProtocolBreach(page) {
     .catch(() => {});
   await page.evaluate(() => {
     document.querySelector("[data-testid='relic-skip']")?.click();
-    document.querySelector("[data-testid='protocol-breach']")?.click();
     document.querySelector("[data-testid='open-table']")?.click();
   });
 }
@@ -88,9 +86,9 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
     navigate = true,
     resetStorage = true,
     expectGameShell = true,
-    // A window opens on its reading beat with the clock held, and almost every
+    // A window opens on its briefing page with the clock held, and almost every
     // test is about the timed table behind it. Opening it here keeps that out
-    // of each spec; a test of the reading beat itself passes false.
+    // of each spec; a test of the briefing page itself passes false.
     openTable = true,
   } = options;
   if (navigate) await page.goto("/?debug=1");

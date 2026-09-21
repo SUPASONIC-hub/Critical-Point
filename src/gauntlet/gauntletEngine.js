@@ -21,6 +21,27 @@ export const WINDOW_SECONDS = 45;
 export const READ_GRACE_SECONDS = 4;
 export const GAUGE_MAX = 100;
 const WALL_FLOOR = 38;
+/**
+ * The briefing before the table has a clock of its own. It is sized to what
+ * the scene asks the player to read -- lead, body, case facts and question --
+ * at a brisk Korean reading pace, with a floor so a short scene still lands and
+ * a ceiling so a long one is still a squeeze. When it runs out the table opens
+ * on its own; the player can open it, or stake a card, any time before that.
+ */
+export const READING_MIN_SECONDS = 12;
+export const READING_MAX_SECONDS = 35;
+const READING_CHARS_PER_SECOND = 16;
+const READING_SETTLE_SECONDS = 6;
+
+export function getReadingSeconds(node = {}) {
+  const chars = [node.lead, node.text, node.question, ...(node.memo ?? [])]
+    .filter(Boolean)
+    .join("")
+    .replace(/\s+/g, "").length;
+  const seconds = Math.round(READING_SETTLE_SECONDS + chars / READING_CHARS_PER_SECOND);
+  return Math.max(READING_MIN_SECONDS, Math.min(READING_MAX_SECONDS, seconds));
+}
+
 /** The heat at which a COLD FEET seal opens, before LOCKPICK. */
 export const SEAL_BREAK_GAUGE = 30;
 /** What FRACTURE bills the cracked axis, before SPLINT. */

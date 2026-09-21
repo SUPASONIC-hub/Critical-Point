@@ -252,17 +252,6 @@ export function getOriginEndingVariant(origin = "courier", endingId = "open-ques
   return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
 }
 
-export function getInvestigationOutcome(target, logLength = 0) {
-  if (!target) return null;
-  const outcomes = ["원본의 시간 순서가 복원되었습니다.", "목격자가 공개 범위를 재협상했습니다.", "기록과 실제 현장의 수치가 어긋납니다."];
-  return { ...target, outcome: outcomes[(logLength + target.label.length) % outcomes.length], contaminated: (logLength + target.label.length) % 4 === 0 };
-}
-
-
-export function getDynamicMusicLayers(riskTier = "CONTROLLED", caseId = "case01") {
-  return { bass: riskTier === "CRITICAL" ? "deep-impact" : "measured-bass", lead: caseId === "final" ? "memory-motif" : "chapter-motif", transition: riskTier === "UNSTABLE" ? "short-rise" : "soft-crossfade" };
-}
-
 export function getAftermath(endingId = "open-question", origin = "courier") {
   return { title: "AFTERMATH / NEXT SHIFT", text: `${origin} 출신 분석관의 선택 이후, ${endingId} 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
 }

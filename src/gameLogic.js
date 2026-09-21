@@ -1,5 +1,5 @@
 import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
-import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, costWhenRising, echoReplies, isResourceGain } from "./gameData.js";
+import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
@@ -1199,37 +1199,6 @@ function describeDelta(delta) {
   const label = easyResourceLabels[key] ?? key;
   if (isResourceGain(key, value)) return `${label}${subjectParticle(label)} 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.`;
   return `${label}${subjectParticle(label)} 대가로 남는다. 누군가는 그 몫을 자기 자리에서 떠안게 된다.`;
-}
-
-/**
- * The one-line trade-off printed above a choice's effect chips. It reads the
- * numbers the way the chips do -- a rising 사람 피해 is what the choice costs,
- * not what it wins -- and names the resource that actually moved rather than
- * whichever key the effect object happens to list first.
- */
-export function describeChoiceDilemma(effect = {}) {
-  const entries = Object.entries(effect).filter(([, value]) => value !== 0);
-  const gains = entries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight);
-  const costs = entries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight);
-  // Cutting a cost is not "winning" it and letting one run is not "closing" it,
-  // so the verb follows the resource as well as the direction.
-  const name = ([key]) => easyResourceLabels[key] ?? key;
-  const won = ([key]) => (costWhenRising.has(key) ? "줄이는" : "얻는");
-  const paid = ([key]) => (costWhenRising.has(key) ? "키웁니다" : "닫습니다");
-  if (gains.length > 0 && costs.length > 0) {
-    const gain = name(gains[0]);
-    const cost = name(costs[0]);
-    return `${gain}${objectParticle(gain)} ${won(gains[0])} 대신 ${cost}${objectParticle(cost)} ${paid(costs[0])}.`;
-  }
-  if (gains.length > 0) {
-    const gain = name(gains[0]);
-    return `${gain}${objectParticle(gain)} ${won(gains[0])} 선택이지만, 관찰자는 그 이유를 기록합니다.`;
-  }
-  if (costs.length > 0) {
-    const cost = name(costs[0]);
-    return `${cost}${objectParticle(cost)} 먼저 ${costWhenRising.has(costs[0][0]) ? "키우고" : "닫고"} 다음 장면의 문을 엽니다.`;
-  }
-  return "숫자는 조용하지만, 이 말은 판단 순서를 남깁니다.";
 }
 
 export function explainResourceTradeoff(effect = {}) {

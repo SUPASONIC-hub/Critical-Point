@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-21 (the free-input card gets a second reader, run offline)
+Last updated: 2026-09-21 (the reading beat becomes a timed graphic-novel briefing page)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -144,6 +144,9 @@ list of the files it touched.
     right. The old board reached 3,953px for one of forty-two decisions and put a
     record room, a commit console and a tactical drawer in front of the choice;
     a new panel in front of the table is the change this rule exists to stop.
+    The briefing page (priority 51) is not a panel on the table: it is a modal
+    that holds the clock, closes before the first press, and the table under it
+    is exactly the one these measurements hold.
 28. The report is three acts. The ending, the rank and the next case are the
     first screen; `왜 이렇게 됐나` answers with three cards; everything else is
     inside `.report-archive`. It reached 10,616px on a phone -- twelve and a half
@@ -220,8 +223,9 @@ list of the files it touched.
     final one) drafts three relics from `getRelicPool` -- the defaults plus what
     the codex unlocked -- seeded by its last window so a reload cannot reroll
     them, and `openCaseRun` carries the offer to the next case's first table.
-    The draft is the one surface allowed in front of the table, only there, and
-    only because it is that screen's decision: it holds the clock, keys 1-3 take
+    The draft and the briefing page (priority 51) are the only surfaces allowed
+    in front of the table; the draft is there only because it is that screen's
+    decision: it holds the clock, keys 1-3 take
     a relic, Escape passes, and `dismissProtocolBreach` passes for flows that
     only need to get past a decision. A pick re-deals the untouched window
     (`REDEAL`) through the same `equipRelic` the runtime saves. The board
@@ -412,7 +416,8 @@ the live database when a migration fixes a runtime error.
     - It prints twice. The backdrop sits behind the scene header, absolutely
       positioned, cropped to the middle band of the frame and masked to fade
       right, so it costs the table none of the one screen priority 27 gives it.
-      The readable copy is inside the briefing, which is closed by default.
+      The readable copies are the splash panel of the briefing page and the
+      table's folded briefing.
     - An SVG root is a replaced element, so an absolutely positioned one takes
       its own intrinsic width and ignores `right`. `inset: 0 0 auto` therefore
       left the backdrop 360px wide inside a 328px header -- 15px past a 360px
@@ -507,12 +512,21 @@ the live database when a migration fixes a runtime error.
     three paragraphs in. In practice the table taught the opposite of what the
     project is about: do not read.
 
-    A window now opens on a reading beat. The briefing is open, the cards are
-    on the table but inert, and the only control is `판 열기`; `paused` already
-    ran through the stage for the relic draft and the breach banner, so holding
-    the clock here needed no new concept. Pressing it starts the same 45 seconds
-    against the same wall. Nothing about the table's balance moved, and nothing
-    in `check:pressure`, `check:balance` or `check:endings` changed.
+    A window now opens on the briefing page (`SceneBriefing.jsx`, styled in
+    `briefing.css`): a modal page of a graphic novel -- the room as a splash
+    panel with its place/clock caption and a sound effect, the speaker's
+    portrait with the scene's question in a balloon, the lead and body as
+    caption boxes, the memo as a pinned case file, and the protocol breach as a
+    red panel when the last decision broke this board (the floating breach
+    banner is gone; `data-testid="protocol-breach"` now names that panel). The
+    page has its own reading clock, `getReadingSeconds(node)`: 6s plus one second
+    per 16 characters, clamped to 12-35s. When it runs out the table opens by
+    itself; `판 열기`/Space opens it sooner, and a card button or number key on
+    the page opens it with that card already staked (`openTable(cardId)` goes
+    through the same authority gate as a click on the table). The table's 45
+    seconds stay paused the whole time the page is up, so nothing about the
+    table's balance moved, and nothing in `check:pressure`, `check:balance` or
+    `check:endings` changed.
 
     It also fixes the measurement. `responseTimeSec` is the window's elapsed,
     which only advances unpaused, so it is now decision time rather than reading
@@ -522,20 +536,21 @@ the live database when a migration fixes a runtime error.
 
     What it cost, all of it in the harness: every flow that touches a table has
     to open it first. `dismissProtocolBreach` is the one place that knows --
-    relic draft, breach banner, reading beat, all three hold the clock -- and
+    relic draft and briefing page both hold the clock -- and
     `startDebugNode`, `startFirstRun` and `resumeSavedRun` call it. Two ordering
     bugs came out of that and are worth remembering: a wait for an *enabled*
-    card never returns during the reading beat, because every card is
+    card never returns while the briefing page is up, because every card is
     `aria-disabled` until the table opens; and the best-effort wait inside
     `dismissProtocolBreach` must stay short, because it runs on every scene of
     every walk and at the 60-second action timeout the suite began timing out in
     a different place each run.
 
-52. Priority 27 is a rule about a decision under time pressure. The reading beat
-    has no clock, so it is the one state the table may be taller than the screen
-    -- and the layout tests measure the timed board, which is what the rule
-    protects. That is why `startDebugNode` opens the table by default rather
-    than the specs each scrolling past a briefing.
+52. Priority 27 is a rule about a decision under time pressure. The briefing
+    page holds the table's clock and scrolls inside itself on a phone, so it is
+    the one surface that may be taller than the screen -- and the layout tests
+    measure the timed board, which is what the rule protects. That is why
+    `startDebugNode` opens the table by default rather than the specs each
+    reading past a briefing.
 
 53. The season is ten cases, and its second act argues the thesis out loud.
     The game started from one question -- not "how smart am I" but "when do I

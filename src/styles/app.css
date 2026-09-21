@@ -12,7 +12,8 @@
      responsive          the media blocks, which span every screen
      recovery            the recovery and error surfaces
      extensions          late overrides that must outrank everything above
-     relics              the relic draft, the relic chips and the unlock notices */
+     relics              the relic draft, the relic chips and the unlock notices
+     briefing            the graphic-novel briefing page in front of each table */
 @import "./app/base-intro-ranking.css";
 @import "./app/play.css";
 @import "./app/result.css";
@@ -20,5 +21,6 @@
 @import "./app/recovery.css";
 @import "./app/extensions.css";
 @import "./app/relics.css";
+@import "./app/briefing.css";
 
 .opening-burst{position:fixed;inset:0;z-index:60;display:grid;place-items:center;overflow:hidden;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));color:var(--c-paper);background:radial-gradient(60% 60% at 50% 50%,rgb(217 255 98/.1),transparent 70%),linear-gradient(90deg,rgb(6 9 10/.95),rgb(6 9 10/.78)),url(/triggerlab-key-visual-960.webp) center/cover;animation:opening-burst-in .18s ease-out both}.opening-burst-grid{position:absolute;inset:0;opacity:.4;background-image:linear-gradient(rgb(217 255 98/.18) 1px,transparent 1px),linear-gradient(90deg,rgb(217 255 98/.18) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(90deg,var(--c-black),transparent 82%);animation:opening-burst-grid .86s steps(4,end) both}.opening-burst-panel{position:relative;display:grid;gap:12px;width:min(860px,100%);padding:clamp(24px,6vw,68px);border:1px solid var(--ui-line-accent);border-radius:var(--ui-radius-xl);background:var(--ui-glass-strong);backdrop-filter:blur(18px);box-shadow:var(--ui-shadow-2),0 0 90px rgb(217 255 98/.14);text-align:left;animation:opening-burst-panel .86s cubic-bezier(.2,.8,.2,1) both}.opening-burst-panel span{color:var(--c-acid);font-size:11.5px;font-weight:700;letter-spacing:.16em}.opening-burst-panel strong{max-width:12em;font-size:clamp(30px,5vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1.08}.opening-burst-panel i{width:min(280px,70%);height:5px;background:var(--c-acid);box-shadow:0 0 24px rgb(217 255 98/.7);animation:opening-burst-charge .86s ease-out both}@keyframes opening-burst-in{from{opacity:0}to{opacity:1}}@keyframes opening-burst-grid{from{transform:translateX(-12%)}to{transform:translateX(0)}}@keyframes opening-burst-panel{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}@keyframes opening-burst-charge{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}@media(prefers-reduced-motion:reduce){.opening-burst,.opening-burst-grid,.opening-burst-panel,.opening-burst-panel i{animation:none}}

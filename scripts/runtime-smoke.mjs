@@ -65,13 +65,12 @@ async function stakeAndCash(cardIndex = 0) {
 }
 
 /**
-  * The window opens on a reading beat with the clock held, so every flow below
+  * The window opens on its briefing page with the clock held, so every flow below
   * starts the table before it can press anything on it.
   */
 async function openTable() {
   await page.evaluate(() => {
     document.querySelector("[data-testid='relic-skip']")?.click();
-    document.querySelector("[data-testid='protocol-breach']")?.click();
     document.querySelector("[data-testid='open-table']")?.click();
   });
 }

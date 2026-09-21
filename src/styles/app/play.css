@@ -1720,7 +1720,6 @@
     0 0 40px var(--c-gx-heat-a18);
   backdrop-filter: blur(16px) saturate(1.2);
   animation: gx-breach-in 0.32s steps(3, end) both;
-  cursor: pointer;
 }
 
 .gx-breach-kicker {
@@ -1731,7 +1730,7 @@
   letter-spacing: 0.08em;
 }
 
-.gx-breach ul,
+.gx-panel-breach ul,
 .gx-reveal-mutations ul,
 .gx-held-actions {
   display: grid;
@@ -3328,39 +3327,4 @@
   .gx-plate-sweep {
     opacity: 0;
   }
-}
-
-/* The reading beat. One control, full width, and it is the one that starts the
-   clock -- so it wears the accent for the same reason the cash button does:
-   priority 30 gives lime to the control that records a decision, and choosing
-   to start the 45 seconds is the first one the scene asks for. */
-.gx-actions.is-reading {
-  grid-template-columns: 1fr;
-}
-
-.gx-open-table {
-  color: var(--ui-accent-ink);
-  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid) 55%, var(--c-acid-deep));
-  border: 1px solid var(--c-acid);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.5),
-    0 10px 30px rgb(217 255 98 / 0.22);
-}
-
-.gx-open-table small {
-  opacity: 0.72;
-}
-
-/* Nothing on the table is live yet, so the hand reads as paper rather than as
-   five things asking to be pressed. */
-.gauntlet-stage:has(.gx-actions.is-reading) .gx-hand .gx-card {
-  cursor: default;
-  opacity: 0.62;
-}
-
-/* The briefing is the point of this beat, so it gets room -- and because no
-   clock is running, this is the one state the table may scroll in. Priority 27
-   is a rule about a decision under time pressure; there is no decision here. */
-.gauntlet-stage:has(.gx-actions.is-reading) .gx-brief[open] {
-  max-height: none;
 }
