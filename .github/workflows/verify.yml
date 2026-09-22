@@ -51,7 +51,9 @@ jobs:
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.labels.*.name, 'e2e')
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # 25 -> 45 on 2026-09-22: the twenty-five-case season walk alone takes ~11
+    # minutes, and the suite around it ~22; the job was cancelled mid-run at 25.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
       # One Node version for CI and the Render build: .node-version.

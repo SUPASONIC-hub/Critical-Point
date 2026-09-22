@@ -1051,7 +1051,8 @@ the live database when a migration fixes a runtime error.
     240 -> 456; `gameData.js` 3700/20 -> 3600/21 (it shrank); GameRuntime chunk
     800KB -> 1.52MB (prose), the intro chunk 120KB -> 105KB (the case copy moved
     out of `appCopy.js` into `caseCopy.js`, which only the runtime loads),
-    PlayScreen 81KB -> 92KB; the season walk 480s -> 720s. The collapse gate's
+    PlayScreen 81KB -> 92KB; the season walk 480s -> 1200s (it takes ~11 minutes
+    alone), and the Verify e2e job 25 -> 45 minutes, which it had outgrown. The collapse gate's
     per-case lift now stops at thirteen (`COLLAPSE_PRESSURE_CEILING_CASES`): a
     maximum grows with the log of the draws and the bust term is a rate, so the
     straight line put the gate at 49 and collapse at 0.5% of 6000 seasons.
