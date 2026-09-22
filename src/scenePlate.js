@@ -39,6 +39,12 @@ export const PLATE_MOTIFS = [
   "market",
   "memorial",
   "factory",
+  "studio",
+  "auditorium",
+  "server",
+  "orchard",
+  "trading",
+  "school",
   "counter",
   "desk",
 ];
@@ -57,6 +63,17 @@ export const PLATE_MOTIFS = [
  * because the room segment is matched first.
  */
 const MOTIF_RULES = [
+  // The rooms the season's second half walks into. A set with lights on stands,
+  // a hall that faces a stage, a room of racks, an orchard, a trading floor and
+  // a school gate -- each named before the generic rules that would take it:
+  // 서버실 is not the archive, 대강당's 무대 is not a meeting table, and a
+  // 교문 in the snow is not the street.
+  ["studio", ["스튜디오", "촬영장", "세트장", "크로마키"]],
+  ["auditorium", ["대강당", "주주총회장", "강당", "금융 교실", "설명회장"]],
+  ["server", ["서버실", "데이터센터", "전산실"]],
+  ["orchard", ["과수원", "감귤밭", "귤밭", "귤 창고", "농장"]],
+  ["trading", ["운용실", "트레이딩룸", "딜링룸"]],
+  ["school", ["교문", "고사장", "학교 앞", "운동장"]],
   ["skyline", ["옥상", "33층", "그룹전략실"]],
   // The back of a car is not the road it is on. Tested before 도로 and 골목 so a
   // scene that names both lands in the seat rather than on the street.
@@ -72,7 +89,7 @@ const MOTIF_RULES = [
   ["gallery", ["갤러리", "화랑", "전시장"]],
   ["counter", ["창구", "지점", "객장"]],
   ["control", ["통제실", "시스템 지도", "배차석", "상황판", "운영실"]],
-  ["archive", ["보관소", "자료실", "서버실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
+  ["archive", ["보관소", "자료실", "기록실", "서고", "색인", "설계 로그", "승인 기록"]],
   // A 국정감사 room is a hall with a raised dais and a witness table, and it is
   // the one room in the season where the cameras are the point. Tested before
   // the generic hall so 정무위원회 회의실 does not fall into 회의실.
@@ -84,7 +101,7 @@ const MOTIF_RULES = [
   ["market", ["떡방", "떡집", "망원시장"]],
   ["memorial", ["추모공원", "봉안당", "납골당"]],
   ["factory", ["공단", "공장", "선반"]],
-  ["hall", ["입찰", "발표장", "설명회장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
+  ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
   ["lobby", ["로비", "안내데스크", "출입 게이트"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
 ];
@@ -114,7 +131,19 @@ const PRESSURE_PHASES = new Set([
 const FLASH_MOTIFS = new Set(["chamber", "newsroom"]);
 
 /** Rooms open to the sky, where daylight comes in as rays and a storm as lightning. */
-const SKY_MOTIFS = new Set(["skyline", "street", "coast"]);
+const SKY_MOTIFS = new Set(["skyline", "street", "coast", "orchard", "school"]);
+
+/** Rooms where snow can be seen falling: open sky, or mostly window. */
+const SNOW_MOTIFS = new Set([...SKY_MOTIFS, "transit", "cafe", "memorial"]);
+
+/** Rooms lit from the rig above: the light is the point of the room. */
+const SPOT_MOTIFS = new Set(["studio", "auditorium"]);
+
+/** Rooms where machines blink at each other all night. */
+const LED_MOTIFS = new Set(["server", "trading", "control"]);
+
+/** A city seen at night, out of focus: the lights become discs. */
+const BOKEH_MOTIFS = new Set(["skyline", "street"]);
 
 /** Rooms lit through high windows: daylight comes in as rays, but no storm reaches in. */
 const SHAFT_MOTIFS = new Set(["factory", "memorial"]);
@@ -124,6 +153,31 @@ const STEAM_MOTIFS = new Set(["market", "cafe"]);
 
 /** Clocks that say the lights are off outside. */
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
+
+/**
+ * Clocks that say it is winter. The season runs from 추석 to the next March, so
+ * the middle cases stand in snow; a month is read as a whole word so 11월 is not
+ * 1월 and 12월 is.
+ */
+const WINTER_MARKERS = ["첫눈", "눈발", "눈 오는", "폭설", "함박눈", "한파"];
+const WINTER_MONTH = /(^|[^0-9])(12|1|2)월/;
+
+/**
+ * The feeling a scene runs on, read from its first trigger, as a colour grade
+ * laid over the drawing: warm when it is about people, hot when it is about a
+ * wrong, cold when it is about being afraid or used. Everything else is left
+ * ungraded so the organisation's light is what the eye reads.
+ */
+const MOOD_TRIGGERS = [
+  ["warm", ["affection", "protection", "trust"]],
+  ["hot", ["injustice", "revenge", "competition"]],
+  ["cold", ["fear", "helplessness", "manipulation"]],
+];
+
+export function getPlateMood(triggers = []) {
+  const first = triggers?.[0];
+  return MOOD_TRIGGERS.find(([, keys]) => keys.includes(first))?.[0] ?? "none";
+}
 
 /**
  * The organisations this season walks, and the colour of light in each.
@@ -239,6 +293,7 @@ export function getScenePlate(node = {}, nodeId = "") {
   const motif = getPlateMotif(place);
   const seed = hashString(`${nodeId}:${place}`);
   const night = NIGHT_MARKERS.some((marker) => clock.includes(marker));
+  const winter = WINTER_MARKERS.some((marker) => clock.includes(marker)) || WINTER_MONTH.test(clock);
   return {
     motif,
     seed,
@@ -251,6 +306,14 @@ export function getScenePlate(node = {}, nodeId = "") {
     flash: FLASH_MOTIFS.has(motif) || getPlateOrg(place) === "public",
     rays: !night && (SKY_MOTIFS.has(motif) || SHAFT_MOTIFS.has(motif)),
     steam: STEAM_MOTIFS.has(motif),
-    lightning: night && SKY_MOTIFS.has(motif) && PRESSURE_PHASES.has(node.phase),
+    // Winter replaces the rain: a cold clock over open sky or glass snows,
+    // night or day, and a storm does not break over snow.
+    snow: winter && SNOW_MOTIFS.has(motif),
+    lightning: night && !winter && SKY_MOTIFS.has(motif) && PRESSURE_PHASES.has(node.phase),
+    spot: SPOT_MOTIFS.has(motif),
+    leds: LED_MOTIFS.has(motif),
+    bokeh: night && BOKEH_MOTIFS.has(motif),
+    ticker: motif === "trading",
+    mood: getPlateMood(node.triggers),
   };
 }

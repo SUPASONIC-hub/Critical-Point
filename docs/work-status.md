@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-21 (사건 12, the victims' side of the chain, and a second ranking reset)
+Last updated: 2026-09-22 (사건 13-24, cases as packs, the plate's second effects layer, a third ranking reset)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1006,3 +1006,77 @@ the live database when a migration fixes a runtime error.
     The ranking was reset again the same day, by the rule priority 70 set:
     `20260921020000_thirteen_case_season_ranking_reset.sql` and the local key
     `critical-point-local-ranking-v4`, which retires v1 through v3.
+
+74. The season is twenty-five cases, and a case is one file. Adding a case used
+    to mean editing some twenty tables across `gameData.js`, `gameLogic.js`,
+    `gameDialogue.js` and `sceneContext.js` (priority 53 lists them). From
+    사건 12 on, a case is a pack: `src/nodes/caseNN.js` exports its five
+    authored scenes and one object with a field per table -- aftermath,
+    connective and reaction scenes with their effects and copy, the side door,
+    the hidden route, the evidence turn, the memory choice, the three openings
+    keyed on the previous case's aftermath, voice and echo lines, new people,
+    the setting and every scene's context, the clue, the outcomes, carryovers
+    and continuity challenges. `src/nodes/casePacks.js` lists the packs and the
+    module that owns each table merges the field. 사건 12 was moved into that
+    shape first and the composed graph compared byte for byte against the
+    commit before (scenes, orders, lines, openings, outcomes): identical.
+    What is still written by hand per case is small and lives where the intro
+    can read it: `CASE_SEQUENCE`, start/result nodes, `nodeOrders`,
+    objectives and `seasonCasesBase` in `gameCases.js`; the teaser,
+    interlude, chapter rule, operator brief and intro echo in `caseCopy.js`;
+    the lab signal in `appCopy.js`; the music motif. `AppContent`'s save
+    repair and `check-plain-language`'s file list now derive from the case id
+    and the folder instead of naming every case.
+
+    사건 13-24 are two acts. 3막 「사슬은 반복된다」 (13-18): the group stages
+    reform while moving loss onto new people the same way, and each case closes
+    one colleague's arc -- 13 「혁신의 얼굴」 (a reform committee wants the
+    dissenter as its face; 백아린 arrives), 14 「착한 펀드」 (an ESG fund sells
+    the group's bad loans to retirees; 도윤하), 15 「정규직 심사」 (이민서's
+    permanent job for a signed confession, on her brother's 수능 day), 16
+    「무인 창고」 (robots leased in, the night shift out; 강태민), 17 「수첩의
+    이름들」 (반재욱's notebook of the 47 he let go), 18 「스카우트」
+    (브릿지은행 offers 오진우 the knife). 4막 「설계자」 (19-24) turns to the lab
+    itself: 19 「종이의 무게」 (임경수's paper originals before demolition), 20
+    「에코의 업데이트」 (에코 replaced by an engine trained on the analysts'
+    reactions), 21 「첫 번째 참가자」 (the lab's first participant on Jeju), 22
+    「인턴 문하준」 (the engine refuses 끝까지정밀), 23 「주주총회」 (one-share
+    shareholders against 윤상혁's board seat), 24 「마지막 출근」 (the lab is
+    dissolved and the signature box is handed over). The finale re-keyed a
+    fifth time, to `c24_after_*`, with new `f_start_*` openings. Every new
+    case was written to a bible that requires anger, laughter, sorrow and joy,
+    and checked by a pack validator before it was wired in.
+
+    Numbers that moved: generated scenes 78 -> 150, authored generated choices
+    240 -> 456; `gameData.js` 3700/20 -> 3600/21 (it shrank); GameRuntime chunk
+    800KB -> 1.52MB (prose), the intro chunk 120KB -> 105KB (the case copy moved
+    out of `appCopy.js` into `caseCopy.js`, which only the runtime loads),
+    PlayScreen 81KB -> 92KB; the season walk 480s -> 720s. The collapse gate's
+    per-case lift now stops at thirteen (`COLLAPSE_PRESSURE_CEILING_CASES`): a
+    maximum grows with the log of the draws and the bust term is a rate, so the
+    straight line put the gate at 49 and collapse at 0.5% of 6000 seasons.
+    Held at 37 the nine endings read within a few points of the thirteen-case
+    season (collapse 29.0% -> 26.4%). The unit samples moved to 94 busts and
+    strain 36.5 for the same reason priority 62 gives.
+
+    Words: the glossary grew from 29 to 98 terms, and every one is explained
+    in parentheses at its first narrated use in each case, including 8 terms
+    the pass over cases 01-12 found (상환, 담보 순위, 부도, 자문료, 계열사,
+    풀필먼트, 인사위원회, 발령). Evidence-turn entry costs vary per case so the
+    unique-effect floor (70%) holds.
+
+    The plate gained six rooms -- studio, auditorium, server, orchard, trading,
+    school -- and a second effects layer, in its own `plate.css` (moved out of
+    `play.css`, imported right after it): snow on a winter clock (12/1/2월,
+    첫눈, 한파…) instead of rain, stage light from the rig, blinking LEDs,
+    night bokeh over a city, a price board, a near plane that sways against the
+    far one, a colour grade from the scene's first trigger (warm, hot, cold)
+    and a light leak across the briefing copy. Reduced motion stops all of it
+    and hides the leak. `설명회장` is an auditorium now, not a meeting table.
+
+    The ranking was reset by priority 70's rule:
+    `20260922000000_twenty_five_case_season_ranking_reset.sql` and the local key
+    `critical-point-local-ranking-v5`, which retires v1 through v4.
+    `docs/free-input-analysis-prompt.md` was deleted: it was a second copy of
+    `supabase/functions/analyze-free-text/prompt.js`, which calls itself the
+    one copy, and nothing read it.

@@ -50,24 +50,19 @@ export function resumeSaves() {
 function readCurrentSave() {
   const saved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
   if (!saved?.currentCase || !saved?.nodeId) return saved;
-  const casePrefixes = {
-    case01: /^(start|accounting|payday|competitor|board|final|result|c1_)/,
-    case02: /^c2_/,
-    case03: /^c3_/,
-    case04: /^c4_/,
-    case05: /^c5_/,
-    case06: /^c6_/,
-    case07: /^c7_/,
-    case08: /^c8_/,
-    case09: /^c9_/,
-    case10: /^c10_/,
-    case11: /^c11_/,
-    case12: /^c12_/,
-    final: /^f_/,
-  };
+  // Case 01 predates the `cN_` prefix and the finale uses `f_`; every other
+  // case is `c<number>_`, so the map does not need a line per case.
+  const casePrefix =
+    saved.currentCase === "case01"
+      ? /^(start|accounting|payday|competitor|board|final|result|c1_)/
+      : saved.currentCase === "final"
+        ? /^f_/
+        : /^case\d+$/.test(saved.currentCase)
+          ? new RegExp(`^c${Number(saved.currentCase.slice(4))}_`)
+          : null;
   const nodeMatchesCase =
     saved.nodeId === CASE_RESULT_NODES[saved.currentCase] ||
-    Boolean(casePrefixes[saved.currentCase]?.test(saved.nodeId));
+    Boolean(casePrefix?.test(saved.nodeId));
   if (nodeMatchesCase) return saved;
   const repaired = {
     ...saved,

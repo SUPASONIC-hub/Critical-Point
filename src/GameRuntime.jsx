@@ -126,13 +126,8 @@ import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlaySho
 import { safeStringify } from "./state/diagnosticUtils.js";
 import { useFreeTextEnrichment } from "./state/useFreeTextEnrichment.js";
 import { getEndingEpilogue } from "./featurePack.js";
-import {
-  caseIntroEchoes,
-  legacyProfiles,
-  nextCaseSignals,
-  chapterRules,
-  resourceMeta,
-} from "./appCopy.js";
+import { resourceMeta } from "./appCopy.js";
+import { caseIntroEchoes, chapterRules, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";

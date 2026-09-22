@@ -20,7 +20,7 @@
  * with a condition, and the finale is the empty signature box the whole thing
  * hangs from.
  */
-export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10", "case11", "case12", "final"];
+export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10", "case11", "case12", "case13", "case14", "case15", "case16", "case17", "case18", "case19", "case20", "case21", "case22", "case23", "case24", "final"];
 export const CASE_START_NODES = {
   case01: "start",
   case02: "c2_start",
@@ -34,6 +34,18 @@ export const CASE_START_NODES = {
   case10: "c10_start",
   case11: "c11_start",
   case12: "c12_start",
+  case13: "c13_start",
+  case14: "c14_start",
+  case15: "c15_start",
+  case16: "c16_start",
+  case17: "c17_start",
+  case18: "c18_start",
+  case19: "c19_start",
+  case20: "c20_start",
+  case21: "c21_start",
+  case22: "c22_start",
+  case23: "c23_start",
+  case24: "c24_start",
   final: "f_start",
 };
 export const CASE_RESULT_NODES = {
@@ -49,6 +61,18 @@ export const CASE_RESULT_NODES = {
   case10: "case10_result",
   case11: "case11_result",
   case12: "case12_result",
+  case13: "case13_result",
+  case14: "case14_result",
+  case15: "case15_result",
+  case16: "case16_result",
+  case17: "case17_result",
+  case18: "case18_result",
+  case19: "case19_result",
+  case20: "case20_result",
+  case21: "case21_result",
+  case22: "case22_result",
+  case23: "case23_result",
+  case24: "case24_result",
   final: "final_result",
 };
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
@@ -66,6 +90,18 @@ export const nodeOrders = {
   case10: ["c10_start", "c10_locker", "c10_claim", "c10_relay", "c10_final"],
   case11: ["c11_start", "c11_script", "c11_rehearsal", "c11_sign", "c11_final"],
   case12: ["c12_start", "c12_mediation", "c12_market", "c12_memorial", "c12_final"],
+  case13: ["c13_start", "c13_studio", "c13_market", "c13_lab", "c13_final"],
+  case14: ["c14_start", "c14_counter", "c14_desk", "c14_class", "c14_final"],
+  case15: ["c15_start", "c15_form", "c15_rooftop", "c15_gate", "c15_final"],
+  case16: ["c16_start", "c16_duel", "c16_review", "c16_roof", "c16_final"],
+  case17: ["c17_start", "c17_truck", "c17_office", "c17_legal", "c17_final"],
+  case18: ["c18_start", "c18_lounge", "c18_party", "c18_table", "c18_final"],
+  case19: ["c19_start", "c19_shelves", "c19_ward", "c19_labels", "c19_final"],
+  case20: ["c20_start", "c20_server", "c20_datacenter", "c20_farewell", "c20_final"],
+  case21: ["c21_start", "c21_inn", "c21_orchard", "c21_breakwater", "c21_final"],
+  case22: ["c22_start", "c22_counter", "c22_factory", "c22_roleplay", "c22_final"],
+  case23: ["c23_start", "c23_proxy", "c23_advisor", "c23_backstage", "c23_final"],
+  case24: ["c24_start", "c24_desks", "c24_rooftop", "c24_farewell", "c24_final"],
   final: ["f_start", "f_archive", "f_confront", "f_choice"],
 };
 
@@ -82,6 +118,18 @@ export const caseObjectives = {
   case10: "한 사람의 집념으로 버티던 명단을 부서지지 않는 구조로 옮기면서, 그 구조에서 밀려나는 사람을 어떻게 할지 정한다",
   case11: "모두가 보는 방에서, 3년 전 사라진 반대 의견을 누가 지웠는지 말할지 그리고 그 말에 누구의 이름을 걸지 정한다",
   case12: "조건이 붙은 배상금 앞에서, 서류가 없는 212명까지 배상 기준에 넣을지와 그 대가를 누가 치를지 정한다",
+  case13: "혁신위원회의 얼굴이 되어 달라는 제안 앞에서, 212명의 배상 기준과 동료들의 자리를 대가로 '과거는 정리됐다'는 문장을 읽을지 정한다",
+  case14: "착한 이름을 단 펀드가 손실을 은퇴자에게 옮기기 전에, 판매를 멈출지 고칠지 돈의 길을 쫓을지 정하십시오.",
+  case15: "이민서의 정규직 전환과 11초의 진실 사이에서, 그의 선택을 대신하지 않고 곁에 선다.",
+  case16: "로봇 120대가 들어오는 리스 앞에서, 야간조 80명이 나가는 문을 문자 한 통이 아닌 길로 바꿀 수 있을지와 그 대가를 누가 치를지 정한다",
+  case17: "47명의 이름이 적힌 수첩을 법원에 낼지, 이름의 주인들에게 돌려줄지, 태울지 정하고 그 대가를 누가 치를지 정한다",
+  case18: "KD를 벨 수 있는 칼과 함께 온 스카우트 앞에서, 오진우를 붙잡을지 조건을 걸어 보낼지 매각 자체를 막을지, 그리고 그 대가를 매각 묶음 속 누가 치를지 정한다",
+  case19: "철거 전 72시간 안에 40년 치 종이 원본을 옮기고, 그 종이가 누구의 이름으로 어디에 남을지 정한다",
+  case20: "자정 교체 전에, 에코가 남긴 판단 원칙과 동의 없이 쓰인 반응 기록의 주인을 지킨다",
+  case21: "자기 반응이 실험 자료였다는 걸 모르는 첫 번째 참가자에게, 무엇을 언제 알릴지와 그 기록을 누가 지킬지 정한다",
+  case22: "죽은 사람의 이름으로 거절된 공장의 대출 앞에서, 한 곳을 사람의 서명으로 지금 살릴지, 같은 규칙에 걸린 41곳을 늦게 다 다시 보게 할지 정한다",
+  case23: "한 주씩 모은 3,118명의 표와 1분의 발언으로, 윤상혁의 사내이사 선임을 막을지 서명란 실명제와 바꿀지 기록으로만 남길지 정한다",
+  case24: "트리거랩이 해체되는 일주일 동안, 흩어지는 사람들과 옮겨지는 기록 중 무엇을 먼저 지킬지 정합니다.",
   final: "플로우온 심사 보고서의 빈 서명란에 누구의 이름이 있어야 했는지 확정한다",
 };
 
@@ -193,6 +241,114 @@ export const seasonCasesBase = [
     status: "LOCKED",
     summary:
       "그룹이 300억 자율 배상안을 내놓는다. 조건은 다시는 소송하지 않겠다는 서명이다. 처음으로 피해자들의 가게와 공장과 추모공원으로 간다.",
+  },
+  {
+    id: "case13",
+    label: "사건 13",
+    title: "혁신의 얼굴",
+    trigger: "분노 / 웃음 / 연대",
+    status: "LOCKED",
+    summary:
+      "국정감사(국회가 공개적으로 따져 묻는 자리) 뒤 여론을 돌리려는 그룹이 혁신위원회를 만들고, 반대 의견을 쓴 당신에게 광고의 얼굴이 되어 달라고 한다. 대본의 마지막 문장은 '과거는 모두 정리되었습니다'다.",
+  },
+  {
+    id: "case14",
+    label: "사건 14",
+    title: "착한 펀드",
+    trigger: "분노 / 웃음 / 슬픔 / 기쁨",
+    status: "LOCKED",
+    summary:
+      "그룹이 은행 창구에서 은퇴자에게 '상생 펀드'를 팝니다. 펀드가 사들이는 것은 그룹의 부실채권과 플로우온 대출의 남은 조각이고, 판매 대본에는 도윤하가 3년 전 쓰던 문장이 그대로 있습니다.",
+  },
+  {
+    id: "case15",
+    label: "사건 15",
+    title: "정규직 심사",
+    trigger: "기쁨 / 분노 / 웃음 / 슬픔",
+    status: "LOCKED",
+    summary:
+      "3년차 계약직 이민서에게 정규직 전환 제안이 옵니다. 조건은 유출 소동 때 사라진 11초를 자기 실수로 인정하는 확인서 서명이고, 면접 날은 동생의 수능 날입니다.",
+  },
+  {
+    id: "case16",
+    label: "사건 16",
+    title: "무인 창고",
+    trigger: "분노 / 웃음 / 애도 / 기쁨",
+    status: "LOCKED",
+    summary:
+      "플로우온 풀필먼트센터가 리스로 물류 로봇 120대를 들이고, 야간조 80명은 새벽 문자 한 통으로 계약 종료를 통보받는다. 첫 새벽에 컵라면을 뜯어 주던 강태민의 사건이다.",
+  },
+  {
+    id: "case17",
+    label: "사건 17",
+    title: "수첩의 이름들",
+    trigger: "책임 / 웃음 / 애도",
+    status: "LOCKED",
+    summary:
+      "그룹 법무팀이 반재욱의 수첩을 회사 기록물이라며 당신의 징계 증거로 쓰려 한다. 넘기기 전에, 그가 20년 동안 내보낸 47명을 한 명씩 찾아간다.",
+  },
+  {
+    id: "case18",
+    label: "사건 18",
+    title: "스카우트",
+    trigger: "경쟁 / 웃음 / 애정",
+    status: "LOCKED",
+    summary:
+      "브릿지은행이 KD은행의 부실채권(돌려받기 어려워진 대출) 묶음을 사들이려 하고, 그 팀장 자리를 오진우에게 내민다. 연봉 두 배, 그리고 KD를 벨 수 있는 칼이다.",
+  },
+  {
+    id: "case19",
+    label: "사건 19",
+    title: "종이의 무게",
+    trigger: "웃음 / 분노 / 슬픔 / 기쁨",
+    status: "LOCKED",
+    summary:
+      "전산에 없는 원본이 있는 회기동 헌책방 2층이 철거됩니다. 철거일은 국회의 자료 보존 기간 사흘 전으로 당겨졌고, 종이의 주인 임경수는 병원에 있습니다.",
+  },
+  {
+    id: "case20",
+    label: "사건 20",
+    title: "에코의 업데이트",
+    trigger: "슬픔 / 웃음 / 분노 / 기쁨",
+    status: "LOCKED",
+    summary:
+      "에코가 새 AI 심사 엔진 노아로 교체되고 판단 기록은 초기화됩니다. 그런데 노아는 바로 그 기록으로, 동의 없이 배웠습니다.",
+  },
+  {
+    id: "case21",
+    label: "사건 21",
+    title: "첫 번째 참가자",
+    trigger: "기쁨 / 웃음 / 슬픔 / 분노",
+    status: "LOCKED",
+    summary:
+      "노아가 배운 기록의 맨 아래 줄에, 당신보다 먼저 트리거랩을 거친 사람의 이름이 있다. 그는 지금 제주 구좌에서 귤 창고를 고친 게스트하우스를 하고, 자기 반응이 실험 자료였다는 걸 모른다.",
+  },
+  {
+    id: "case22",
+    label: "사건 22",
+    title: "인턴 문하준",
+    trigger: "기쁨 / 분노 / 애도",
+    status: "LOCKED",
+    summary:
+      "문하준이 겨울방학 인턴으로 강서지점에 온다. 같은 주, 어머니와 기술자들이 다시 연 공장 끝까지정밀의 시설자금(기계나 설비를 사는 데 쓰는 돈) 신청을 AI 심사 엔진 노아가 0.8초 만에 거절한다. 사유는 세상을 떠난 아버지의 이름이다.",
+  },
+  {
+    id: "case23",
+    label: "사건 23",
+    title: "주주총회",
+    trigger: "분노 / 웃음 / 연대",
+    status: "LOCKED",
+    summary:
+      "윤상혁을 사내이사(회사 경영에 직접 참여하는 이사)로 올리는 정기 주주총회가 열린다. 한 주씩 산 3,118명이 위임장을 들고 여의도 대강당 뒷줄을 채운다. 발언 시간은 1분이다.",
+  },
+  {
+    id: "case24",
+    label: "사건 24",
+    title: "마지막 출근",
+    trigger: "분노 / 웃음 / 슬픔 / 기쁨",
+    status: "LOCKED",
+    summary:
+      "주주총회 사흘 뒤 월요일, 트리거랩 해체 공지가 뜹니다. 사유는 '성과 없음'. 마지막 일주일 동안 책상이 하나씩 비고, 옥상에서 한서윤이 절반만 고백하고, 33층에서 백아린이 봉투 하나를 건넵니다.",
   },
   {
     id: "final",

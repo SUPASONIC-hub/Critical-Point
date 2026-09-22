@@ -137,7 +137,14 @@ const fileBudgets = {
   // lightning, and the tone for the legislature and the press.
   // 3405 / 70900 -> 3425 / 71200 later the same day for steam over the market
   // and café plates.
-  "play.css": { lines: 3425, bytes: 71200 },
+  // 3425 / 71200 -> 3075 / 63400 on 2026-09-22, when the scene plate moved out
+  // to plate.css with the second half of the season's rooms and effects (bytes
+  // counted with CRLF endings, as a Windows checkout has them).
+  "play.css": { lines: 3075, bytes: 66400 },
+  // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
+  // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
+  // the price board, the near-plane sway, the mood grade, the light leak).
+  "plate.css": { lines: 500, bytes: 11300 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken

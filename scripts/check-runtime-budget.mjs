@@ -57,9 +57,13 @@ const BUDGETS = {
   // re-key of the finale's openings.
   // 3500 / 19 -> 3700 / 20 later the same day: 사건 12, a thirteenth case of the
   // same shape, and a fourth re-key.
+  // 3700 / 20 -> 3600 / 21 on 2026-09-22: cases arrive as packs
+  // (`src/nodes/casePacks.js`), so 사건 12 moved out and 13-24 never came in;
+  // the file shrank and lost the case12 import but took the pack list and
+  // `characterProfiles`, which the packs merge into.
   "src/gameData.js": {
-    lines: 3700,
-    importedNames: 20,
+    lines: 3600,
+    importedNames: 21,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started

@@ -44,6 +44,8 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
     `gx-plate-tone-${plate.tone}`,
     `gx-plate-${plate.accent}`,
     plate.night ? "gx-plate-night" : "",
+    plate.snow ? "gx-plate-winter" : "",
+    plate.mood !== "none" ? `gx-plate-mood-${plate.mood}` : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -97,6 +99,33 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
           <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed={plate.seed % 97} stitchTiles="stitch" />
           <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0" />
         </filter>
+        {plate.spot && (
+          <linearGradient id={`${id}-spot`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--c-paper)" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="var(--c-paper)" stopOpacity="0" />
+          </linearGradient>
+        )}
+        {plate.bokeh && (
+          <radialGradient id={`${id}-bokeh`}>
+            <stop offset="0%" stopColor="var(--plate-ambient)" stopOpacity="0.55" />
+            <stop offset="70%" stopColor="var(--plate-ambient)" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+          </radialGradient>
+        )}
+        {plate.mood !== "none" && (
+          <linearGradient id={`${id}-grade`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--plate-grade)" stopOpacity="0.55" />
+            <stop offset="60%" stopColor="var(--plate-grade)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="var(--plate-grade)" stopOpacity="0" />
+          </linearGradient>
+        )}
+        {variant === "panel" && (
+          <linearGradient id={`${id}-leak`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+            <stop offset="50%" stopColor="var(--plate-ambient)" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="var(--plate-ambient)" stopOpacity="0" />
+          </linearGradient>
+        )}
         {heat && (
           <radialGradient id={`${id}-vignette`} r="0.72">
             <stop offset="45%" stopColor={accent} stopOpacity="0" />
@@ -120,6 +149,11 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
         )}
       </g>
       {paintFx(air, plate, id)}
+      {/* The feeling the scene runs on, as a grade from the top-left corner. */}
+      {plate.mood !== "none" && <rect className="gx-plate-grade" x="0" y="0" width="320" height="132" fill={`url(#${id}-grade)`} />}
+      {/* The readable copy in the briefing catches a slow light leak across the
+          frame, the way a printed page catches a window. */}
+      {variant === "panel" && <rect className="gx-plate-leak" x="-120" y="0" width="120" height="132" fill={`url(#${id}-leak)`} />}
       {/* A pressure beat closes in from the edges. */}
       {heat && <rect className="gx-plate-vignette" x="0" y="0" width="320" height="132" fill={`url(#${id}-vignette)`} />}
       {/* A single sweep of light across the glass, so the plate sits on the same
@@ -131,7 +165,7 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
 }
 
 /** Rooms whose light comes off a screen, which get the refresh sweep. */
-const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby", "newsroom"]);
+const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby", "newsroom", "server", "trading"]);
 
 /** Rooms with open sky over them, where a night can be raining. */
 const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
@@ -151,6 +185,29 @@ const GLASS_MOTIFS = new Set(["transit", "cafe"]);
  * plate still reads as a finished drawing -- motes suspended, rain mid-fall.
  */
 function paintAir(random, plate) {
+  if (plate.snow) {
+    // Snow falls slower than rain and wanders; a flake is a dot, not a streak.
+    const flakes = [];
+    for (let flake = 0; flake < 26; flake += 1) {
+      flakes.push(
+        <circle
+          key={`snow-${flake}`}
+          cx={round(span(random, -6, 326))}
+          cy={round(span(random, -4, 120))}
+          r={round(span(random, 0.6, 1.7))}
+          style={{
+            animationDuration: `${span(random, 5.5, 10).toFixed(2)}s`,
+            animationDelay: `-${span(random, 0, 10).toFixed(2)}s`,
+          }}
+        />,
+      );
+    }
+    return (
+      <g className="gx-plate-air gx-plate-snow" fill="var(--c-paper)" opacity="0.8">
+        {flakes}
+      </g>
+    );
+  }
   const rain =
     plate.night && (OUTDOOR_MOTIFS.has(plate.motif) || GLASS_MOTIFS.has(plate.motif)) && random() < 0.7;
   if (rain) {
@@ -219,8 +276,13 @@ function mid(children) {
   return <g stroke="var(--plate-mid)" fill="none" strokeWidth="1.4">{children}</g>;
 }
 
+/** The near plane sways a pixel or two against the far one, so the room has depth. */
 function near(children) {
-  return <g stroke="var(--plate-near)" fill="var(--plate-solid)" strokeWidth="1.6">{children}</g>;
+  return (
+    <g className="gx-plate-near" stroke="var(--plate-near)" fill="var(--plate-solid)" strokeWidth="1.6">
+      {children}
+    </g>
+  );
 }
 
 /** The ambient light of the building, used for anything lit but not important. */
@@ -1110,6 +1172,87 @@ function paintFx(random, plate, id) {
       </g>,
     );
   }
+  if (plate.spot) {
+    // Two cones from the rig, swinging slowly across the stage.
+    const cones = [];
+    for (let cone = 0; cone < 2; cone += 1) {
+      const x = cone === 0 ? span(random, 60, 120) : span(random, 200, 260);
+      cones.push(
+        <polygon
+          key={`spot-${cone}`}
+          points={`${round(x - 4)},0 ${round(x + 4)},0 ${round(x + 38)},118 ${round(x - 38)},118`}
+          style={{ animationDelay: `-${span(random, 0, 12).toFixed(1)}s`, transformOrigin: `${round(x)}px 0px` }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="spot" className="gx-plate-spots" fill={`url(#${id}-spot)`}>
+        {cones}
+      </g>,
+    );
+  }
+  if (plate.bokeh) {
+    // A city out of focus: lit windows and headlights become soft discs.
+    const discs = [];
+    for (let disc = 0; disc < 8; disc += 1) {
+      discs.push(
+        <circle
+          key={`bokeh-${disc}`}
+          cx={round(span(random, 10, 310))}
+          cy={round(span(random, 14, 80))}
+          r={round(span(random, 6, 15))}
+          style={{
+            animationDuration: `${span(random, 6, 11).toFixed(2)}s`,
+            animationDelay: `-${span(random, 0, 11).toFixed(2)}s`,
+          }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="bokeh" className="gx-plate-bokeh" fill={`url(#${id}-bokeh)`}>
+        {discs}
+      </g>,
+    );
+  }
+  if (plate.leds) {
+    // Status lights on a seeded rhythm, each on its own clock.
+    const leds = [];
+    for (let led = 0; led < 16; led += 1) {
+      leds.push(
+        <rect
+          key={`led-${led}`}
+          x={round(span(random, 14, 306))}
+          y={round(span(random, 10, 96))}
+          width="2.2"
+          height="1.6"
+          style={{
+            animationDuration: `${span(random, 0.9, 2.6).toFixed(2)}s`,
+            animationDelay: `-${span(random, 0, 2.6).toFixed(2)}s`,
+          }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="leds" className="gx-plate-leds" fill="var(--plate-accent-chip)">
+        {leds}
+      </g>,
+    );
+  }
+  if (plate.ticker) {
+    // A price board running right to left along the top of the floor.
+    const cells = [];
+    let x = 0;
+    while (x < 640) {
+      const width = Math.round(span(random, 8, 22));
+      cells.push(<rect key={`tick-${x}`} x={x} y="3" width={width} height="3" />);
+      x += width + Math.round(span(random, 5, 12));
+    }
+    layers.push(
+      <g key="ticker" className="gx-plate-ticker" fill="var(--plate-ambient)">
+        {cells}
+      </g>,
+    );
+  }
   if (plate.lightning) {
     layers.push(
       <rect
@@ -1383,7 +1526,308 @@ function paintFactory(random, accent, glow) {
   );
 }
 
+/**
+ * An advertising set: a curved cyclorama wall, two lights on stands with their
+ * softboxes, the camera on its tripod, the director's chair, and one person on
+ * the tape mark. The accent is the red tally lamp -- the room exists to be
+ * recorded, and that lamp says whether it is.
+ */
+function paintStudio(random, accent, glow) {
+  const markX = Math.round(span(random, 138, 176));
+  const cameraX = Math.round(span(random, 236, 262));
+  return (
+    <>
+      {far(
+        <>
+          <path d="M18 8 H302 V70 Q302 94 278 96 H42 Q18 94 18 70 Z" />
+          <line x1="0" y1="100" x2="320" y2="100" />
+        </>,
+      )}
+      {lit(<path d="M26 14 H294 V68 Q294 88 274 90 H46 Q26 88 26 68 Z" opacity="0.28" />)}
+      {mid(
+        <>
+          {/* Two lights on stands, softboxes angled at the mark. */}
+          <path d="M48 110 L60 50 L72 110 M60 50 V40" />
+          <path d="M44 22 L78 30 L74 44 L40 36 Z" fill="var(--plate-solid)" />
+          <path d="M270 110 L282 54 L294 110 M282 54 V44" />
+          <path d="M264 26 L298 22 L300 38 L266 42 Z" fill="var(--plate-solid)" />
+          {/* The tape mark on the floor. */}
+          <path d={`M${markX - 10} 106 h20 M${markX} 101 v10`} />
+        </>,
+      )}
+      {halo(cameraX + 12, 58, 20, glow)}
+      {near(
+        <>
+          {/* Camera on its tripod, and the chair nobody is sitting in. */}
+          <path d={`M${cameraX - 8} 132 L${cameraX + 6} 78 L${cameraX + 20} 132 M${cameraX + 6} 78 V70`} />
+          <rect x={cameraX - 6} y="56" width="26" height="14" />
+          <rect x={cameraX + 20} y="59" width="8" height="8" />
+          <path d="M150 132 V118 H182 V132 M146 110 H186" />
+        </>,
+      )}
+      {mark(<circle cx={cameraX + 12} cy="59" r="2.4" fill={accent} stroke="none" />)}
+      {people(figure("talent", markX, 104, 44))}
+    </>
+  );
+}
+
+/**
+ * A hall facing a stage: a screen over a lectern, the rows seen from the back
+ * as heads and shoulders, the aisle running down the middle. The accent is the
+ * lamp on the lectern -- whoever stands there has the room, for as long as the
+ * chair lets them.
+ */
+function paintAuditorium(random, accent, glow) {
+  const rows = [];
+  for (let row = 0; row < 4; row += 1) {
+    const y = 88 + row * 12;
+    const count = 7 + row;
+    const step = 300 / count;
+    for (let seat = 0; seat < count; seat += 1) {
+      const x = 10 + step * seat + step / 2;
+      if (Math.abs(x - 160) < 12) continue;
+      if (random() < 0.2) continue;
+      rows.push(seated(`seat-${row}-${seat}`, Math.round(x), y + 10, round(11 + row * 2.6)));
+    }
+  }
+  return (
+    <>
+      {far(
+        <>
+          <rect x="84" y="10" width="152" height="48" />
+          <line x1="0" y1="72" x2="320" y2="72" />
+          <path d="M20 72 L40 60 H280 L300 72" />
+        </>,
+      )}
+      {lit(<rect x="88" y="14" width="144" height="40" opacity="0.5" />)}
+      {halo(160, 58, 30, glow)}
+      {mid(
+        <>
+          <path d="M148 72 V62 H172 V72" />
+          <line x1="160" y1="62" x2="160" y2="54" />
+        </>,
+      )}
+      {mark(<rect x="152" y="63" width="16" height="3" fill={accent} stroke="none" />)}
+      {people(
+        <>
+          {figure("speaker", 176, 72, 20)}
+          {rows}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * A server room: two rows of racks running away to a vanishing point, cable
+ * trays overhead, the cold aisle between them. One rack's status panel is the
+ * accent -- in a room with no one in it, that panel is who is talking.
+ */
+function paintServer(random, accent, glow) {
+  const vanish = Math.round(span(random, 146, 176));
+  const racks = [];
+  for (let rack = 0; rack < 5; rack += 1) {
+    const depth = rack / 5.5;
+    const leftX = Math.round(10 + (vanish - 40 - 10) * depth);
+    const rightX = Math.round(310 - (310 - vanish - 40) * depth);
+    const top = Math.round(12 + 34 * depth);
+    const bottom = Math.round(122 - 40 * depth);
+    const width = Math.round(34 * (1 - depth * 0.7));
+    racks.push(<rect key={`lr-${rack}`} x={leftX} y={top} width={width} height={bottom - top} />);
+    racks.push(<rect key={`rr-${rack}`} x={rightX - width} y={top} width={width} height={bottom - top} />);
+    for (let slot = 1; slot < 5; slot += 1) {
+      const y = round(top + ((bottom - top) / 5) * slot);
+      racks.push(<line key={`ls-${rack}-${slot}`} x1={leftX} y1={y} x2={leftX + width} y2={y} />);
+      racks.push(<line key={`rs-${rack}-${slot}`} x1={rightX - width} y1={y} x2={rightX} y2={y} />);
+    }
+  }
+  const panelX = Math.round(span(random, 20, 40));
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="6" x2="320" y2="6" />
+          <line x1="0" y1="12" x2={vanish} y2="46" />
+          <line x1="320" y1="12" x2={vanish} y2="46" />
+          <line x1="0" y1="132" x2={vanish} y2="84" />
+          <line x1="320" y1="132" x2={vanish} y2="84" />
+        </>,
+      )}
+      {mid(racks)}
+      {halo(panelX + 7, 40, 22, glow)}
+      {mark(<rect x={panelX} y="34" width="14" height="10" fill={accent} stroke="none" />)}
+      {people(figure("admin", vanish + Math.round(span(random, 6, 22)), 104, 34))}
+    </>
+  );
+}
+
+/**
+ * A 제주 orchard in winter: basalt walls, rounded trees heavy with fruit, an
+ * oreum on the horizon, a storehouse with its door open. The accent is the lit
+ * storehouse door -- where the season's people end up sitting after the picking.
+ * The fruit is amber on purpose: the one warm crop in a cold month.
+ */
+function paintOrchard(random, accent, glow) {
+  const trees = [];
+  const fruit = [];
+  for (let tree = 0; tree < 6; tree += 1) {
+    const x = Math.round(24 + tree * 46 + span(random, -6, 6));
+    const y = Math.round(78 + (tree % 2) * 6);
+    const r = Math.round(span(random, 15, 20));
+    trees.push(<circle key={`tree-${tree}`} cx={x} cy={y} r={r} />);
+    trees.push(<line key={`trunk-${tree}`} x1={x} y1={y + r} x2={x} y2={y + r + 8} />);
+    for (let orange = 0; orange < 5; orange += 1) {
+      fruit.push(
+        <circle
+          key={`o-${tree}-${orange}`}
+          cx={round(x + span(random, -r * 0.7, r * 0.7))}
+          cy={round(y + span(random, -r * 0.6, r * 0.6))}
+          r="1.8"
+        />,
+      );
+    }
+  }
+  const houseX = Math.round(span(random, 238, 262));
+  return (
+    <>
+      {far(
+        <>
+          <path d="M0 54 Q60 30 120 50 Q170 62 220 44 Q270 30 320 48" />
+          <line x1="0" y1="58" x2="320" y2="58" />
+        </>,
+      )}
+      {mid(
+        <>
+          {trees}
+          <rect x={houseX} y="36" width="56" height="30" fill="var(--plate-solid)" />
+          <path d={`M${houseX - 4} 38 L${houseX + 28} 26 L${houseX + 60} 38`} />
+        </>,
+      )}
+      <g fill="var(--c-amber)" stroke="none" opacity="0.85">
+        {fruit}
+      </g>
+      {halo(houseX + 14, 54, 20, glow)}
+      {mark(<rect x={houseX + 8} y="46" width="12" height="18" fill={accent} stroke="none" opacity="0.8" />)}
+      {near(
+        <>
+          {/* The basalt wall, stones drawn as a lumpy line. */}
+          <path d="M-4 112 Q10 104 24 110 Q38 102 52 110 Q66 104 80 110 Q94 102 108 110 Q122 104 136 110 Q150 102 164 110 Q178 104 192 110 Q206 102 220 110 Q234 104 248 110 Q262 102 276 110 Q290 104 304 110 Q318 102 324 110 V132 H-4 Z" />
+          <rect x="30" y="100" width="22" height="12" />
+          <rect x="34" y="90" width="22" height="10" />
+        </>,
+      )}
+      {people(
+        <>
+          {figure("picker", Math.round(span(random, 120, 170)), 108, 34)}
+          {figure("helper", Math.round(span(random, 190, 220)), 110, 30)}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * A trading floor: rows of desks each carrying a bank of screens, a chart wall
+ * with a line running across it, and the price board along the ceiling (the
+ * effects layer runs it). The accent is the one candle on the chart that fell.
+ */
+function paintTrading(random, accent, glow) {
+  const screens = [];
+  for (let desk = 0; desk < 4; desk += 1) {
+    const x = 22 + desk * 72;
+    for (let screen = 0; screen < 3; screen += 1) {
+      screens.push(<rect key={`scr-${desk}-${screen}`} x={x + screen * 17} y="72" width="15" height="11" />);
+    }
+    screens.push(<rect key={`desk-${desk}`} x={x - 4} y="84" width="58" height="5" />);
+  }
+  const points = [];
+  let y = span(random, 30, 44);
+  for (let step = 0; step <= 12; step += 1) {
+    y = Math.max(16, Math.min(52, y + span(random, -7, 7)));
+    points.push(`${40 + step * 20},${round(y)}`);
+  }
+  const dropX = 40 + Math.round(span(random, 4, 10)) * 20;
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="10" x2="320" y2="10" />
+          <rect x="30" y="12" width="260" height="46" />
+        </>,
+      )}
+      <g fill="none" stroke="var(--plate-ambient)" strokeWidth="1.4" opacity="0.7">
+        <polyline points={points.join(" ")} />
+      </g>
+      {halo(dropX, 40, 18, glow)}
+      {mark(<rect x={dropX - 3} y="30" width="6" height="18" fill={accent} stroke="none" />)}
+      {mid(screens)}
+      {near(<path d="M-4 104 H324 V132 H-4 Z" />)}
+      {people(
+        <>
+          {seated("trader-a", 48, 104, 26)}
+          {seated("trader-b", 192, 104, 26)}
+          {figure("manager", 270, 106, 36)}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * A school gate on exam morning: two pillars and the gate between them, the
+ * building behind with its clock, a crowd along the fence holding signs. The
+ * accent is the clock face -- the whole morning is counted on it.
+ */
+function paintSchool(random, accent, glow) {
+  const windows = [];
+  for (let row = 0; row < 3; row += 1) {
+    for (let column = 0; column < 8; column += 1) {
+      if (column === 3 || column === 4) continue;
+      windows.push(<rect key={`sw-${row}-${column}`} x={60 + column * 26} y={22 + row * 14} width="16" height="8" />);
+    }
+  }
+  const fans = [];
+  const signs = [];
+  const count = Math.round(span(random, 3, 5));
+  for (let sign = 0; sign < count; sign += 1) {
+    const x = Math.round(span(random, 16, 100) + (sign % 2) * 190);
+    fans.push(figure(`fan-${sign}`, x, 126, 30));
+    signs.push(<rect key={`sign-${sign}`} x={x - 9} y="88" width="18" height="10" />);
+  }
+  return (
+    <>
+      {far(
+        <>
+          <rect x="52" y="14" width="216" height="52" />
+          <line x1="0" y1="70" x2="320" y2="70" />
+        </>,
+      )}
+      {lit(windows)}
+      {halo(160, 30, 20, glow)}
+      {mark(<circle cx="160" cy="30" r="7" fill={accent} stroke="none" opacity="0.85" />)}
+      {mid(
+        <>
+          <rect x="112" y="60" width="14" height="48" fill="var(--plate-solid)" />
+          <rect x="194" y="60" width="14" height="48" fill="var(--plate-solid)" />
+          <line x1="126" y1="104" x2="194" y2="104" />
+          <line x1="0" y1="96" x2="112" y2="96" />
+          <line x1="208" y1="96" x2="320" y2="96" />
+        </>,
+      )}
+      {people(fans)}
+      {mid(<g fill="var(--plate-solid)">{signs}</g>)}
+      {near(<path d="M-4 126 H324 V132 H-4 Z" />)}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
+  studio: paintStudio,
+  auditorium: paintAuditorium,
+  server: paintServer,
+  orchard: paintOrchard,
+  trading: paintTrading,
+  school: paintSchool,
   transit: paintTransit,
   bookshop: paintBookshop,
   cafe: paintCafe,

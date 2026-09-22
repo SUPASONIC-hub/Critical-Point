@@ -898,9 +898,10 @@ test("the ending reads what the run did at the table", () => {
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
   // 16 busts wrecked an eight-case season. Busts are read as a rate over the
   // season's length and the collapse line rises with it, so a ten-case season
-  // needed 26, an eleven-case season 33, a twelve-case season 40, and a
-  // thirteen-case season needs 49 to carry the same strain.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 49, seasonBestMultiplier: 32 });
+  // needed 26, an eleven-case season 33, a twelve-case season 40, a
+  // thirteen-case season 49, and a twenty-five-case season 94: the bust rate
+  // divides by the season length and the gate stopped rising at thirteen.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 94, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -914,16 +915,16 @@ test("the ending answers busts across the range play reaches, not at one step", 
   };
   const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
   // The sample strain moved 28 -> 29 when 사건 07 landed, 29 -> 33 when 사건 08
-  // and 09 did, 33 -> 35 when 사건 11 did, and 35 -> 36 when 사건 12 did. Both halves of the
+  // and 09 did, 33 -> 35 when 사건 11 did, 35 -> 36 when 사건 12 did, and 36 -> 36.5 when 사건 13-24 did. Both halves of the
   // collapse gate are derived from the season length -- the bust rate divides by
   // it, the pressure threshold rises with it -- so an eight-case season prices a
   // bust slightly lower and sets the line slightly higher, and the old sample sat
   // under the new line with any number of busts. What the test is for is the
   // shape, not the coordinate: clean does not collapse, enough busts does, and
   // the answer in between is graded rather than a single step.
-  assert.notEqual(pressureAt(0, 36), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 36), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 36))).size > 1);
+  assert.notEqual(pressureAt(0, 36.5), "collapse", "a clean season at this strain does not collapse");
+  assert.equal(pressureAt(10, 36.5), "collapse", "ten busts on top of it does");
+  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 36.5))).size > 1);
 });
 
 /* --------------------------------------------------------------- relics */

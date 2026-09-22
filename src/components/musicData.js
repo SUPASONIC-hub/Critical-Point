@@ -123,6 +123,18 @@ export const chapterMotifs = {
   case11: { wave: "triangle", lift: 620, impact: 1.26 },
   // The people it landed on: warm and low, a market and a memorial.
   case12: { wave: "sine", lift: 300, impact: 1.04 },
+  case13: { wave: "triangle", lift: 420, impact: 1.08 },
+  case14: { wave: "triangle", lift: 420, impact: 1.05 },
+  case15: { wave: "triangle", lift: 440, impact: 1.05 },
+  case16: { wave: "triangle", lift: 420, impact: 1.08 },
+  case17: { wave: "triangle", lift: 360, impact: 1.05 },
+  case18: { wave: "triangle", lift: 520, impact: 1.1 },
+  case19: { wave: "triangle", lift: 360, impact: 1.1 },
+  case20: { wave: "sine", lift: 520, impact: 1.05 },
+  case21: { wave: "triangle", lift: 330, impact: 0.95 },
+  case22: { wave: "triangle", lift: 360, impact: 1.1 },
+  case23: { wave: "triangle", lift: 520, impact: 1.2 },
+  case24: { wave: "triangle", lift: 420, impact: 1.2 },
   final: { wave: "sawtooth", lift: 760, impact: 1.32 },
 };
 

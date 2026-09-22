@@ -1,5 +1,5 @@
 import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
-import { byEffectWeight, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
+import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
@@ -429,6 +429,11 @@ export function getObservationLedger(entries = []) {
   );
 }
 
+/** One table a case pack fills, keyed by case like the literals it joins. */
+function packTable(field) {
+  return Object.fromEntries(CASE_PACKS.map((pack) => [pack.id, pack[field]]));
+}
+
 const discoveryClues = {
   case01: {
     id: "c1-hidden-ledger",
@@ -485,17 +490,13 @@ const discoveryClues = {
     title: "다섯 시간 열두 분",
     text: "반려 서명은 18:02, 폐기 처리는 23:14였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
   },
-  case12: {
-    id: "c12-fund-source",
-    title: "배상금의 주소",
-    text: "300억 중 210억은 직원 성과급 삭감분, 90억은 광고비 계정이었습니다. 돈을 가져간 쪽에서 되찾아 온 돈은 0원이었습니다.",
-  },
   final: {
     id: "final-observer-key",
     title: "관찰자의 열쇠",
     text: "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다.",
   },
 };
+Object.assign(discoveryClues, packTable("clue"));
 
 /** The record each case hides, whether or not this run opened it. */
 /**
@@ -646,13 +647,21 @@ const COLLAPSE_HUMAN_COST = 15 * CASE_SEQUENCE.length;
  * adding 사건 07 moved collapse 31.6% -> 38.5% of 6000 seasons with no effect
  * changed. Calibrated at seven cases, where 31 was measured, and lifted by one
  * for each case past that -- the smallest step that holds the share.
+ *
+ * The lift stops at thirteen. A maximum grows with the log of the draws, not
+ * linearly, and the bust term shrinks as the season lengthens (it is a rate),
+ * so the straight line overshot once the season doubled: at twenty-five cases a
+ * gate of 49 let collapse through in 32 of 6000 seasons, against 29.0% at
+ * thirteen. Held at 37 it reads about a quarter of seasons again.
  */
 const COLLAPSE_PRESSURE_BASE = 31;
 const COLLAPSE_PRESSURE_BASE_CASES = 7;
+const COLLAPSE_PRESSURE_CEILING_CASES = 13;
 const COLLAPSE_PRESSURE_PER_CASE = 1;
 const COLLAPSE_PRESSURE =
   COLLAPSE_PRESSURE_BASE +
-  COLLAPSE_PRESSURE_PER_CASE * Math.max(0, CASE_SEQUENCE.length - COLLAPSE_PRESSURE_BASE_CASES);
+  COLLAPSE_PRESSURE_PER_CASE *
+    Math.max(0, Math.min(CASE_SEQUENCE.length, COLLAPSE_PRESSURE_CEILING_CASES) - COLLAPSE_PRESSURE_BASE_CASES);
 /**
  * What the vault buys, per case. A season that banked this much a case has, in
  * the ending's own terms, done the job with room to spare, busts or not: it
@@ -821,17 +830,13 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
       c11_after_record: { tag: "기록으로 남긴 결말", title: "잘리지 않은 7분이 누구나 읽는 문서가 되었다", text: "속기록 전문이 공개됐습니다. 당신이 더듬은 12초도, 그룹이 인용할 한 문장도 그대로 남았습니다." },
       c11_after_summon: { tag: "바로 응한 결말", title: "포장마차를 먼저 나와 33층으로 향했다", text: "당신은 가장 먼저 호출에 답했습니다. 테이블에는 떡볶이 한 접시와 당신 몫의 빈 의자가 남았습니다." },
     },
-    case12: {
-      c12_after_feast: { tag: "떡을 돌린 결말", title: "셔터가 내려갈 때까지 1,021개의 상자를 돌렸다", text: "첫 배상금이 들어온 날, 피해자 모임 전원이 떡 한 상자씩을 받았습니다. 마지막 상자는 문성호 대표 몫으로 당신이 받았습니다." },
-      c12_after_fund: { tag: "기준을 고친 결말", title: "212명이 들어갈 칸이 문서로 생겼다", text: "배상 기준 개정안이 접수됐습니다. 서류가 없어서 피해자가 아니었던 사람들이, 처음으로 칸을 가졌습니다." },
-      c12_after_meet: { tag: "먼저 올라간 결말", title: "마지막 떡 상자를 들고 33층에 먼저 갔다", text: "당신은 떡집 앞 줄을 두고 33층으로 향했습니다. 로비 보안요원만 떡을 하나 얻어 먹었습니다." },
-    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
       f_after_burn: { tag: "폐기한 결말", title: "모든 기록을 태우고 빈 화면을 남겼다", text: "누구도 다시 이용할 수 없게 했지만, 무엇을 잃었는지 증명할 기록도 사라졌습니다." },
     },
   };
+  Object.assign(outcomes, packTable("outcomes"));
   return outcomes[caseId]?.[choiceId] ?? { tag: "기록되지 않은 결말", title: "아직 닫히지 않은 결과", text: "이번 선택의 파장은 다음 기록에 남아 있습니다." };
 }
 
@@ -892,12 +897,8 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
       c11_after_record: { legitimacy: 12, trust: 2, fatigue: 5 },
       c11_after_summon: { capital: 6, legitimacy: 4, trust: -8 },
     },
-    case12: {
-      c12_after_feast: { trust: 9, humanCost: -5, fatigue: -8 },
-      c12_after_fund: { legitimacy: 12, trust: 2, fatigue: 5 },
-      c12_after_meet: { capital: 6, legitimacy: 4, trust: -8 },
-    },
   };
+  Object.assign(carryovers, packTable("carryovers"));
   return carryovers[caseId]?.[choiceId] ?? {};
 }
 
@@ -953,18 +954,14 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c10_after_record: { id: "use-reframe", title: "빼앗긴 제도를 되찾기", text: "당신이 만든 제도가 그룹의 모범 사례가 됐습니다. 그 제도가 누구의 것인지 판을 다시 짜야 보너스가 열립니다." },
       c10_after_keep: { id: "repair-legitimacy", title: "서랍 속 명단을 떳떳하게 만들기", text: "조사는 서랍을 겨눕니다. 212명의 이름을 숨긴 기록이 아니라 지킨 기록으로 바꾸는 선택을 찾아야 합니다." },
     },
-    case12: {
-      c11_after_toast: { id: "protect-trust", title: "같이 먹은 사람들과 같이 가기", text: "여섯 명은 흩어지지 않았습니다. 피해자들 앞에 혼자가 아니라 여섯이 서는 선택을 찾아야 보너스가 열립니다." },
-      c11_after_record: { id: "use-reframe", title: "홍보 문구가 된 내 문장 되찾기", text: "당신의 발언이 배상안 보도자료에 인용됐습니다. 그 문장이 누구를 위한 것인지 판을 다시 짜야 합니다." },
-      c11_after_summon: { id: "repair-legitimacy", title: "12분 면담의 공정함 회복하기", text: "먼저 올라간 면담은 아무것도 남기지 않았습니다. 피해자들에게 그 12분을 설명할 수 있는 선택을 찾아야 합니다." },
-    },
-    // Keyed on case 12's aftermath: the finale follows that case now.
+    // Keyed on case 24's aftermath: the finale follows that case now.
     final: {
-      c12_after_feast: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "사람이 끝나지 않게 하는 법을 아는 기록이 이번에는 관찰 자료가 됩니다. 다른 참가자의 선택권까지 빼앗지 않는 방법을 찾아야 합니다." },
-      c12_after_fund: { id: "use-reframe", title: "내가 고친 기준도 의심하기", text: "사람을 대신하게 만든 절차가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c12_after_meet: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "한 사람만 가진 기록은 승계되지 않습니다. 212명이 당신 없이도 남을 방법을 찾아야 합니다." },
+      c24_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "마지막 밤까지 곁에 남은 기록이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 동료들의 선택권까지 빼앗지 않는 방법을 찾아야 보너스가 열립니다." },
+      c24_after_record: { id: "use-reframe", title: "내가 쓴 요청서도 의심하기", text: "봉인을 풀어 달라는 절차가 40분 만에 승인됐습니다. 그 절차가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c24_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 통제 확대의 근거가 됐습니다. 동료들과 백아린이 당신 없이도 지켜질 방법을 찾아야 합니다." },
     },
   };
+  Object.assign(challenges, packTable("continuityChallenges"));
   return challenges[caseId]?.[choiceId] ?? null;
 }
 
