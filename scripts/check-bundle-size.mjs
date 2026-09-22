@@ -22,18 +22,25 @@ const budgets = [
   // 270 scenes of authored prose and their tables, plus the case copy that moved
   // here from the intro chunk (`src/caseCopy.js`). ~440KB gzip reaches a phone
   // after the intro has painted and the first click, never before it.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 1_520_000 },
+  // 1_520_000 -> 3_000_000 later the same day for 사건 25-49, twenty-five more
+  // cases: ~530 scenes of prose and their tables. ~860KB gzip, still loaded only
+  // after the intro has painted and the player has clicked.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_000_000 },
   // 120_000 -> 105_000 on 2026-09-22: the per-case teasers, interludes and
   // chapter rules left for the runtime chunk, so the intro lost 44KB it never
   // showed even while twelve cases were added to them.
-  { pattern: /^index-.*\.js$/, maxBytes: 105_000 },
+  // 105_000 -> 125_000 later the same day: the season list the intro draws now
+  // carries 49 case titles, summaries and objectives (`gameCases.js`).
+  { pattern: /^index-.*\.js$/, maxBytes: 125_000 },
   // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
   // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
   // day for the market, memorial and factory painters and the steam layer.
   // 81_000 -> 92_000 on 2026-09-22 for six more rooms (studio, auditorium,
   // server room, orchard, trading floor, school gate) and the second effects
   // layer (snow, stage light, LEDs, bokeh, the price board, the mood grade).
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 92_000 },
+  // 92_000 -> 100_000 later the same day for four more rooms (construction site,
+  // courtroom, airport, call centre) and the seasonal effects layer.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 100_000 },
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 60_000 },
   { pattern: /^index-.*\.css$/, maxBytes: 200_000 },
 ];

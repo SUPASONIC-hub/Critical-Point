@@ -29,7 +29,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
     dialog.accept();
   });
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case24", "c24_aftershock");
+  await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");
@@ -59,7 +59,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   expect(Array.isArray(diagnosticPayload.errorLog)).toBe(true);
   expect(Array.isArray(diagnosticPayload.saveSlots)).toBe(true);
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|봉인을 풀어 달라고 쓴 사람의 마지막 밤|33층으로 곧장 간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|모든 기록을 묶은 사람의 마지막 밤|곧장 올라간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 });
 
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
@@ -120,9 +120,10 @@ test("the complete season can progress from case 01 to the final ending", async 
   // under a parallel suite once the season grew; 300s was set for ten, which took
   // 2.7 minutes alone. Each case adds roughly 16 seconds to the walk. 360s -> 420s
   // when every scene gained a briefing page to close before its table, 420s ->
-  // 480s for the thirteenth case, and 480s -> 1200s for cases 13-24 (720s ran
-  // out under the parallel suite with the walk still advancing).
-  test.setTimeout(1_200_000);
+  // 480s for the thirteenth case, 480s -> 1200s for cases 13-24 (720s ran out
+  // under the parallel suite with the walk still advancing), and 1200s -> 2700s
+  // for cases 25-49: fifty cases take about twice the twenty-five-case walk.
+  test.setTimeout(2_700_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
   await startDebugNode(page, "case01", "payday");
@@ -1401,11 +1402,11 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
   await page.goto("/?debug=1");
   await openIntroDrawer(page, ".data-info-panel");
   await page.locator(".consent-box input").check({ force: true });
-  await startDebugNode(page, "case24", "c24_aftershock");
+  await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
-  await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|봉인을 풀어 달라고 쓴 사람의 마지막 밤|33층으로 곧장 간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|모든 기록을 묶은 사람의 마지막 밤|곧장 올라간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 
   const savedBeforeFailureCallback = await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
@@ -1484,7 +1485,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v5") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v6") || "[]").length))
     .toBeGreaterThan(0);
 });
 

@@ -100,6 +100,16 @@ function criticalCss() {
 
 export default defineConfig({
   plugins: [react(), criticalCss()],
+  // The dev server compiles a module the first time it is asked for. Fifty
+  // cases are fifty large data modules, and compiling them on the first scene
+  // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
+  // never has, landing inside the e2e render budgets. They are compiled when
+  // the server starts instead.
+  server: {
+    warmup: {
+      clientFiles: ["./src/GameRuntime.jsx", "./src/gameData.js", "./src/nodes/*.js"],
+    },
+  },
   build: {
     rollupOptions: {
       output: {

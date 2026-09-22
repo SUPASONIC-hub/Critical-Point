@@ -45,6 +45,10 @@ export const PLATE_MOTIFS = [
   "orchard",
   "trading",
   "school",
+  "construction",
+  "courtroom",
+  "airport",
+  "callcenter",
   "counter",
   "desk",
 ];
@@ -68,13 +72,20 @@ const MOTIF_RULES = [
   // a school gate -- each named before the generic rules that would take it:
   // 서버실 is not the archive, 대강당's 무대 is not a meeting table, and a
   // 교문 in the snow is not the street.
-  ["studio", ["스튜디오", "촬영장", "세트장", "크로마키"]],
+  // The season's last stretch: a half-built tower, a courtroom, an airport and
+  // a call centre. A 법정 is named before the hearing room so a trial is not a
+  // 국정감사, and a 콜센터's rows of headsets are not a wall of screens.
+  ["construction", ["공사 현장", "타워크레인", "현장 사무소", "골조"]],
+  ["courtroom", ["법정", "재판정"]],
+  ["airport", ["공항", "출국장", "탑승구", "입국장"]],
+  ["callcenter", ["콜센터", "상담석"]],
+  ["studio", ["스튜디오", "촬영장", "세트장", "크로마키", "방송국"]],
   ["auditorium", ["대강당", "주주총회장", "강당", "금융 교실", "설명회장"]],
   ["server", ["서버실", "데이터센터", "전산실"]],
   ["orchard", ["과수원", "감귤밭", "귤밭", "귤 창고", "농장"]],
   ["trading", ["운용실", "트레이딩룸", "딜링룸"]],
   ["school", ["교문", "고사장", "학교 앞", "운동장"]],
-  ["skyline", ["옥상", "33층", "그룹전략실"]],
+  ["skyline", ["옥상", "33층", "그룹전략실", "루프탑", "마리나"]],
   // The back of a car is not the road it is on. Tested before 도로 and 골목 so a
   // scene that names both lands in the seat rather than on the street.
   ["transit", ["택시", "뒷자리", "지하철", "전동차", "버스", "고속도로", "승강장", "기차"]],
@@ -94,12 +105,12 @@ const MOTIF_RULES = [
   // the one room in the season where the cameras are the point. Tested before
   // the generic hall so 정무위원회 회의실 does not fall into 회의실.
   ["chamber", ["정무위원회 회의실", "국정감사장", "참고인석", "증인석", "본회의장"]],
-  ["newsroom", ["편집국", "보도국"]],
+  ["newsroom", ["편집국", "보도국", "편집실"]],
   // The places the loan landed. A shop in a covered market, a columbarium, and
   // a machine floor nobody has switched on in a year -- each tested before the
   // street and floor rules that would otherwise swallow them.
   ["market", ["떡방", "떡집", "망원시장"]],
-  ["memorial", ["추모공원", "봉안당", "납골당"]],
+  ["memorial", ["추모공원", "봉안당", "납골당", "장례식장", "빈소"]],
   ["factory", ["공단", "공장", "선반"]],
   ["hall", ["입찰", "발표장", "이사회", "위원회실", "회의실", "협의실", "협상실", "상황실", "브리핑룸"]],
   ["lobby", ["로비", "안내데스크", "출입 게이트"]],
@@ -131,7 +142,7 @@ const PRESSURE_PHASES = new Set([
 const FLASH_MOTIFS = new Set(["chamber", "newsroom"]);
 
 /** Rooms open to the sky, where daylight comes in as rays and a storm as lightning. */
-const SKY_MOTIFS = new Set(["skyline", "street", "coast", "orchard", "school"]);
+const SKY_MOTIFS = new Set(["skyline", "street", "coast", "orchard", "school", "construction"]);
 
 /** Rooms where snow can be seen falling: open sky, or mostly window. */
 const SNOW_MOTIFS = new Set([...SKY_MOTIFS, "transit", "cafe", "memorial"]);
@@ -161,6 +172,29 @@ const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"]
  */
 const WINTER_MARKERS = ["첫눈", "눈발", "눈 오는", "폭설", "함박눈", "한파"];
 const WINTER_MONTH = /(^|[^0-9])(12|1|2)월/;
+
+/**
+ * The other seasons the second year walks through, each read off the clock
+ * the same way winter is: blossom in April, the monsoon in July, heat haze in
+ * August, fireworks on a festival night, leaves in September, and the full
+ * moon over 추석. A month is a whole word here too.
+ */
+const SEASON_MARKERS = {
+  petals: { words: ["벚꽃", "꽃잎"], month: /(^|[^0-9])4월/ },
+  monsoon: { words: ["장마", "폭우", "태풍"] },
+  haze: { words: ["폭염", "열대야"] },
+  fireworks: { words: ["불꽃", "축제"] },
+  leaves: { words: ["낙엽", "단풍"], month: /(^|[^0-9])9월/ },
+  moon: { words: ["추석", "보름달", "한가위"] },
+};
+
+function readSeason(clock, key) {
+  const { words, month } = SEASON_MARKERS[key];
+  return words.some((word) => clock.includes(word)) || Boolean(month?.test(clock));
+}
+
+/** Rooms with open sky or a window on it, where the weather is visible. */
+const WEATHER_MOTIFS = new Set(["skyline", "street", "coast", "orchard", "school", "construction", "transit", "cafe", "memorial", "airport"]);
 
 /**
  * The feeling a scene runs on, read from its first trigger, as a colour grade
@@ -315,5 +349,14 @@ export function getScenePlate(node = {}, nodeId = "") {
     bokeh: night && BOKEH_MOTIFS.has(motif),
     ticker: motif === "trading",
     mood: getPlateMood(node.triggers),
+    // The second year's seasons, each only where there is sky to see it in.
+    // The monsoon falls by day as well as night and takes the storm's place;
+    // fireworks and the moon need a night; haze needs the heat outdoors.
+    petals: !winter && WEATHER_MOTIFS.has(motif) && readSeason(clock, "petals"),
+    monsoon: WEATHER_MOTIFS.has(motif) && readSeason(clock, "monsoon"),
+    haze: !night && WEATHER_MOTIFS.has(motif) && readSeason(clock, "haze"),
+    fireworks: night && SKY_MOTIFS.has(motif) && readSeason(clock, "fireworks"),
+    leaves: WEATHER_MOTIFS.has(motif) && readSeason(clock, "leaves"),
+    moon: night && SKY_MOTIFS.has(motif) && readSeason(clock, "moon"),
   };
 }

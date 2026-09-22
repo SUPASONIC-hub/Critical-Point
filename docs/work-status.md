@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-22 (사건 13-24, cases as packs, the plate's second effects layer, a third ranking reset)
+Last updated: 2026-09-22 (사건 25-49, a fifty-case season, the plate seasons, a fourth ranking reset)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1081,3 +1081,47 @@ the live database when a migration fixes a runtime error.
     `docs/free-input-analysis-prompt.md` was deleted: it was a second copy of
     `supabase/functions/analyze-free-text/prompt.js`, which calls itself the
     one copy, and nothing read it.
+
+75. The season is fifty cases. 사건 25-49 are four more acts between 사건 24 and
+    the finale: 5막 「흩어진 자리」 (25-30: 윤상혁 promoted to KD캐피탈, the team
+    scattered, a stalled PF site, a credit-union run, an insurer's call centre,
+    Singapore, the lab's records sold to a hiring-score company), 6막 「조사」
+    (31-36: the regulator, a prosecutors' raid, a whistleblower's week, 윤상혁's
+    daughter, the monsoon, the chairman's offer to pin it all on one man), 7막
+    「기록의 전쟁」 (37-42: the leak, the class action, a documentary, the
+    fitness score, a second hearing, a night of fireworks at 경포), and 8막
+    「서명」 (43-49: the board, the verdict, 임경수's last page, 에코 restored, a
+    second 추석, a new loan the analyst can sign, and the call to the 33rd
+    floor). The finale re-keyed a sixth time, to `c49_after_*`.
+
+    Written by 25 parallel authors to a second bible (volume 1's rules plus the
+    new rooms, seasons, fixed evidence entry costs and a softer fast column),
+    each pack clean in the pack validator before wiring. Parallel authors reuse
+    example names, so a continuity pass made one person per name: 채이안 is the
+    KD캐피탈 위험관리부장, 도건우 the group crisis-TF lead, 석재우 the CEO office's
+    chief of staff; the rest were renamed, and KD캐피탈's floors were fixed
+    (위험관리부 12층, 대표이사실 20층). Future parallel writing should hand out
+    names, not examples.
+
+    Numbers that moved: generated scenes 150 -> 300, authored generated choices
+    456 -> 906; GameRuntime chunk 1.52MB -> 3MB (about 860KB gzip), intro chunk
+    105KB -> 125KB (the season list), PlayScreen 92KB -> 100KB; the season walk
+    1200s -> 2700s and the Verify e2e job 45 -> 80 minutes. The collapse gate
+    needed nothing: with its lift capped at thirteen it reads 25.5% at fifty
+    cases; only the two unit samples moved (188 busts, strain 36.8). The
+    glossary is 189 terms; a second pass explained its new terms in cases 01-49.
+
+    The plate gained four rooms (`construction`, `courtroom` -- tested before the
+    hearing room, so a 법정 is not a 국정감사 -- `airport`, `callcenter`), and
+    장례식장/빈소, 방송국, 편집실 and 루프탑/마리나 joined existing rooms. A third
+    effects layer reads the second year's seasons off the clock: blossom (4월,
+    벚꽃), the monsoon (장마, 폭우: heavy rain by day too, with rings in the
+    puddles), heat haze, festival fireworks, leaves (9월, 낙엽) and the 추석
+    moon, drawn behind the room so buildings stand in front of it. Clear nights
+    (fireworks, moon) never draw the random night rain. No scene written before
+    this pass states any of those seasons, so no existing plate or baseline
+    changed.
+
+    README now describes every case from 01, and the ranking was reset by
+    priority 70's rule: `20260922010000_fifty_case_season_ranking_reset.sql` and
+    `critical-point-local-ranking-v6`, which retires v1 through v5.

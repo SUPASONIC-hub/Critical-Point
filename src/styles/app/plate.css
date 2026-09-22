@@ -476,6 +476,89 @@
   }
 }
 
+/* The third layer: the second year's seasons, read off the clock (see
+   getScenePlate). Blossom and leaves drift down and turn, the monsoon opens
+   rings in the puddles, heat wavers over the ground, fireworks open over the
+   water, and the 추석 moon glows behind the room. Transform and opacity only. */
+.gx-plate-drift > * {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gx-plate-tumble 9s linear infinite;
+}
+
+.gx-plate-ripples > ellipse {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: gx-plate-ripple 1.6s ease-out infinite;
+}
+
+.gx-plate-haze > rect {
+  opacity: 0.05;
+  animation: gx-plate-waver 4s ease-in-out infinite alternate;
+}
+
+.gx-plate-fireworks > g {
+  opacity: 0;
+  animation: gx-plate-burst 4.5s ease-out infinite;
+}
+
+.gx-plate-moon {
+  animation: gx-plate-breathe 9s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes gx-plate-tumble {
+  from {
+    opacity: 0;
+    transform: translate(0, -10px) rotate(0deg);
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-14px, 42px) rotate(260deg);
+  }
+}
+
+@keyframes gx-plate-ripple {
+  from {
+    opacity: 0.8;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes gx-plate-waver {
+  from {
+    transform: translate(-6px, 0) scaleY(1);
+  }
+  to {
+    transform: translate(6px, -1px) scaleY(1.6);
+  }
+}
+
+@keyframes gx-plate-burst {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  12% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gx-plate *,
   .gx-plate .gx-plate-air > *,
@@ -487,7 +570,9 @@
   .gx-plate-flashes,
   .gx-plate-steam,
   .gx-plate-lightning,
-  .gx-plate-leak {
+  .gx-plate-leak,
+  .gx-plate-fireworks,
+  .gx-plate-ripples {
     opacity: 0;
   }
 }

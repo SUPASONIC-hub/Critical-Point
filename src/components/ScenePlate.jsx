@@ -137,6 +137,15 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
       {/* Everything that is the room moves as one, so the briefing copy can
           push in slowly without the ground showing at an edge. */}
       <g className="gx-plate-stage">
+        {/* The 추석 moon hangs behind the room, so the buildings stand in front
+            of it. Placed from the seed without drawing on either generator, so
+            no existing plate moves. */}
+        {plate.moon && (
+          <g className="gx-plate-moon">
+            <circle cx={40 + (plate.seed % 240)} cy="20" r="17" fill="var(--c-cream)" opacity="0.14" />
+            <circle cx={40 + (plate.seed % 240)} cy="20" r="9" fill="var(--c-cream)" opacity="0.9" />
+          </g>
+        )}
         {draw(random, accent, `url(#${id}-halo)`)}
         {paintAir(air, plate)}
         {screens && (
@@ -208,14 +217,17 @@ function paintAir(random, plate) {
       </g>
     );
   }
+  // The monsoon rains by day as well as by night, harder, and always.
   const rain =
-    plate.night && (OUTDOOR_MOTIFS.has(plate.motif) || GLASS_MOTIFS.has(plate.motif)) && random() < 0.7;
+    plate.monsoon ||
+    // A fireworks night and the 추석 moon are clear skies, so they never rain.
+    (plate.night && !plate.fireworks && !plate.moon && (OUTDOOR_MOTIFS.has(plate.motif) || GLASS_MOTIFS.has(plate.motif)) && random() < 0.7);
   if (rain) {
     const drops = [];
-    for (let drop = 0; drop < 18; drop += 1) {
+    for (let drop = 0; drop < (plate.monsoon ? 34 : 18); drop += 1) {
       const x = span(random, -8, 334);
       const y = span(random, -6, 118);
-      const length = span(random, 6, 12);
+      const length = span(random, plate.monsoon ? 10 : 6, plate.monsoon ? 18 : 12);
       const timing = {
         animationDuration: `${span(random, 0.8, 1.4).toFixed(2)}s`,
         animationDelay: `-${span(random, 0, 1.4).toFixed(2)}s`,
@@ -224,10 +236,33 @@ function paintAir(random, plate) {
         <line key={`rain-${drop}`} x1={round(x)} y1={round(y)} x2={round(x - length * 0.3)} y2={round(y + length)} style={timing} />,
       );
     }
+    // Puddles on the ground, each opening one ring after another.
+    const ripples = [];
+    if (plate.monsoon) {
+      for (let ripple = 0; ripple < 7; ripple += 1) {
+        ripples.push(
+          <ellipse
+            key={`ripple-${ripple}`}
+            cx={round(span(random, 16, 304))}
+            cy={round(span(random, 116, 128))}
+            rx="7"
+            ry="1.6"
+            style={{ animationDelay: `-${span(random, 0, 1.6).toFixed(2)}s` }}
+          />,
+        );
+      }
+    }
     return (
-      <g className="gx-plate-air gx-plate-rain" stroke="var(--plate-mid)" strokeWidth="0.7" opacity="0.5">
-        {drops}
-      </g>
+      <>
+        <g className="gx-plate-air gx-plate-rain" stroke="var(--plate-mid)" strokeWidth={plate.monsoon ? 0.9 : 0.7} opacity={plate.monsoon ? 0.65 : 0.5}>
+          {drops}
+        </g>
+        {ripples.length > 0 && (
+          <g className="gx-plate-air gx-plate-ripples" stroke="var(--plate-mid)" strokeWidth="0.6" fill="none">
+            {ripples}
+          </g>
+        )}
+      </>
     );
   }
   const night = plate.night;
@@ -1253,6 +1288,99 @@ function paintFx(random, plate, id) {
       </g>,
     );
   }
+  if (plate.petals || plate.leaves) {
+    // April blossom and September leaves: the same drift, a different shape
+    // and colour. Each piece tumbles on its own clock.
+    const pieces = [];
+    for (let piece = 0; piece < 16; piece += 1) {
+      const x = round(span(random, -4, 320));
+      const y = round(span(random, -6, 110));
+      const turn = Math.round(span(random, 0, 360));
+      pieces.push(
+        plate.petals ? (
+          <ellipse
+            key={`petal-${piece}`}
+            cx={x}
+            cy={y}
+            rx="1.9"
+            ry="1.1"
+            transform={`rotate(${turn} ${x} ${y})`}
+            style={{ animationDuration: `${span(random, 6, 11).toFixed(2)}s`, animationDelay: `-${span(random, 0, 11).toFixed(2)}s` }}
+          />
+        ) : (
+          <path
+            key={`leaf-${piece}`}
+            d={`M${x} ${y} q2.6 -2.6 5 0 q-2.4 2.6 -5 0 Z`}
+            transform={`rotate(${turn} ${x} ${y})`}
+            style={{ animationDuration: `${span(random, 7, 12).toFixed(2)}s`, animationDelay: `-${span(random, 0, 12).toFixed(2)}s` }}
+          />
+        ),
+      );
+    }
+    layers.push(
+      <g key="drift" className="gx-plate-drift" fill={plate.petals ? "var(--c-coral)" : "var(--c-amber)"} opacity="0.75">
+        {pieces}
+      </g>,
+    );
+  }
+  if (plate.haze) {
+    // Heat off the ground: three bands of air wavering near the floor line.
+    const bands = [];
+    for (let band = 0; band < 3; band += 1) {
+      bands.push(
+        <rect
+          key={`haze-${band}`}
+          x="-20"
+          y={round(84 + band * 11 + span(random, -2, 2))}
+          width="360"
+          height="5"
+          rx="2.5"
+          style={{ animationDelay: `-${span(random, 0, 4).toFixed(2)}s` }}
+        />,
+      );
+    }
+    layers.push(
+      <g key="haze" className="gx-plate-haze" fill="var(--c-paper)">
+        {bands}
+      </g>,
+    );
+  }
+  if (plate.fireworks) {
+    // Three bursts over the water, each a ring of sparks that opens and fades.
+    const colours = ["var(--c-amber)", "var(--c-coral)", "var(--c-sky-86)"];
+    const bursts = [];
+    for (let burst = 0; burst < 3; burst += 1) {
+      const cx = round(span(random, 40, 280));
+      const cy = round(span(random, 14, 46));
+      const sparks = [];
+      for (let spark = 0; spark < 12; spark += 1) {
+        const angle = (spark / 12) * Math.PI * 2;
+        sparks.push(
+          <line
+            key={`s-${spark}`}
+            x1={round(cx + Math.cos(angle) * 4)}
+            y1={round(cy + Math.sin(angle) * 4)}
+            x2={round(cx + Math.cos(angle) * 13)}
+            y2={round(cy + Math.sin(angle) * 13)}
+          />,
+        );
+      }
+      bursts.push(
+        <g
+          key={`burst-${burst}`}
+          stroke={colours[burst]}
+          style={{ animationDelay: `-${span(random, 0, 4.5).toFixed(2)}s`, transformOrigin: `${cx}px ${cy}px` }}
+        >
+          {sparks}
+        </g>,
+      );
+    }
+    layers.push(
+      <g key="fireworks" className="gx-plate-fireworks" strokeWidth="1.2" strokeLinecap="round">
+        {bursts}
+      </g>,
+    );
+  }
   if (plate.lightning) {
     layers.push(
       <rect
@@ -1821,7 +1949,202 @@ function paintSchool(random, accent, glow) {
   );
 }
 
+/**
+ * A building that stopped at its concrete frame: floor slabs and columns with
+ * nothing between them, a tower crane over it with its hook hanging, a site
+ * office box at the fence. The accent is the one lamp in the crane cab --
+ * somebody is still up there.
+ */
+function paintConstruction(random, accent, glow) {
+  const floors = Math.round(span(random, 5, 7));
+  const slabs = [];
+  for (let floor = 0; floor < floors; floor += 1) {
+    const y = 104 - floor * 13;
+    slabs.push(<line key={`slab-${floor}`} x1="40" y1={y} x2="178" y2={y} />);
+  }
+  const columns = [];
+  for (let column = 0; column < 5; column += 1) {
+    const x = 44 + column * 33;
+    columns.push(<line key={`col-${column}`} x1={x} y1={104 - (floors - 1) * 13} x2={x} y2="104" />);
+  }
+  const mastX = Math.round(span(random, 212, 236));
+  return (
+    <>
+      {far(<line x1="0" y1="104" x2="320" y2="104" />)}
+      {mid(
+        <>
+          {slabs}
+          {columns}
+          {/* The crane: mast, jib, counter-jib, the hook line. */}
+          <line x1={mastX} y1="104" x2={mastX} y2="10" />
+          <line x1={mastX - 6} y1="104" x2={mastX - 6} y2="10" />
+          <line x1={mastX - 96} y1="12" x2={mastX + 40} y2="12" />
+          <line x1={mastX - 70} y1="12" x2={mastX - 70} y2="46" />
+          <rect x={mastX - 74} y="46" width="8" height="5" />
+          <rect x={mastX + 26} y="13" width="14" height="8" fill="var(--plate-solid)" />
+        </>,
+      )}
+      {halo(mastX - 3, 18, 18, glow)}
+      {mark(<rect x={mastX - 9} y="14" width="9" height="7" fill={accent} stroke="none" />)}
+      {near(
+        <>
+          <rect x="250" y="94" width="56" height="26" />
+          <line x1="-4" y1="120" x2="324" y2="120" />
+          {[20, 70, 120, 170, 220].map((post) => (
+            <line key={`fence-${post}`} x1={post} y1="108" x2={post} y2="120" />
+          ))}
+          <line x1="0" y1="108" x2="240" y2="108" />
+        </>,
+      )}
+      {people(
+        <>
+          {figure("foreman", 132, 118, 30)}
+          {figure("buyer", 160, 120, 28)}
+        </>,
+      )}
+    </>
+  );
+}
+
+/**
+ * A courtroom: the bench raised across the back with three judges' chairs,
+ * the national emblem over it, counsel tables left and right, the public
+ * benches in front of the player. The accent is the lamp on the bench -- the
+ * one place in the season where the last word is not anyone's in the story.
+ */
+function paintCourtroom(random, accent, glow) {
+  const benches = [];
+  for (let row = 0; row < 2; row += 1) {
+    for (let seat = 0; seat < 6; seat += 1) {
+      if (random() < 0.3) continue;
+      benches.push(seated(`pub-${row}-${seat}`, 28 + seat * 52 + row * 10, 124 + row * 6, 14 + row * 2));
+    }
+  }
+  return (
+    <>
+      {far(
+        <>
+          <circle cx="160" cy="14" r="7" />
+          <line x1="0" y1="54" x2="320" y2="54" />
+        </>,
+      )}
+      {mid(
+        <>
+          <rect x="70" y="30" width="180" height="24" fill="var(--plate-solid)" />
+          {[120, 160, 200].map((x) => (
+            <rect key={`judge-${x}`} x={x - 7} y="18" width="14" height="12" />
+          ))}
+          <rect x="24" y="72" width="70" height="10" />
+          <rect x="226" y="72" width="70" height="10" />
+          <rect x="146" y="66" width="28" height="18" />
+        </>,
+      )}
+      {people(
+        <>
+          {seated("judge", 160, 30, 16)}
+          {seated("counsel-a", 58, 72, 18)}
+          {seated("counsel-b", 262, 72, 18)}
+          {figure("witness", 160, 84, 22)}
+        </>,
+      )}
+      {halo(160, 34, 26, glow)}
+      {mark(<rect x="150" y="32" width="20" height="4" fill={accent} stroke="none" />)}
+      {near(<path d="M-4 112 H324 V132 H-4 Z" />)}
+      {people(benches)}
+    </>
+  );
+}
+
+/**
+ * An airport departure hall: the glass wall with a plane on the apron behind
+ * it, the departures board, a row of seats, a traveller with a suitcase. The
+ * board is the accent: in this season a flight is always somebody leaving
+ * before a question reaches them.
+ */
+function paintAirport(random, accent, glow) {
+  const rows = [];
+  for (let row = 0; row < 4; row += 1) {
+    rows.push(<line key={`dep-${row}`} x1="212" y1={22 + row * 6} x2={212 + Math.round(span(random, 40, 76))} y2={22 + row * 6} />);
+  }
+  const planeX = Math.round(span(random, 40, 110));
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="8" x2="320" y2="8" />
+          <line x1="0" y1="70" x2="320" y2="70" />
+          {[64, 128, 192, 256].map((x) => (
+            <line key={`glass-${x}`} x1={x} y1="8" x2={x} y2="70" />
+          ))}
+          {/* The plane on the apron, side on. */}
+          <path d={`M${planeX} 56 H${planeX + 78} Q${planeX + 88} 56 ${planeX + 88} 60 Q${planeX + 88} 62 ${planeX + 78} 62 H${planeX} Z`} />
+          <path d={`M${planeX + 34} 58 L${planeX + 22} 48 H${planeX + 30} L${planeX + 48} 58`} />
+          <path d={`M${planeX + 4} 56 L${planeX} 44 H${planeX + 8} L${planeX + 16} 56`} />
+        </>,
+      )}
+      {mid(<rect x="206" y="16" width="92" height="30" fill="var(--plate-solid)" />)}
+      {lit(rows)}
+      {halo(252, 31, 34, glow)}
+      {mark(<rect x="210" y="19" width="30" height="4" fill={accent} stroke="none" />)}
+      {near(
+        <>
+          <path d="M-4 104 H324 V132 H-4 Z" />
+          {[40, 62, 84, 106].map((x) => (
+            <rect key={`seat-${x}`} x={x} y="94" width="18" height="10" />
+          ))}
+        </>,
+      )}
+      {people(
+        <>
+          {figure("traveller", Math.round(span(random, 160, 196)), 104, 40)}
+          {seated("waiting", 71, 94, 18)}
+        </>,
+      )}
+      {mid(<rect x={Math.round(span(random, 200, 214))} y="88" width="12" height="16" />)}
+    </>
+  );
+}
+
+/**
+ * A call centre: rows of low partitions, a headset at every seat, a wall
+ * board counting calls waiting. The accent is that counter -- the number the
+ * room is run by, and the reason nobody here gets to finish a sentence.
+ */
+function paintCallcenter(random, accent, glow) {
+  const rows = [];
+  const agents = [];
+  for (let row = 0; row < 3; row += 1) {
+    const y = 76 + row * 16;
+    const scale = 1 - row * -0.12;
+    rows.push(<line key={`part-${row}`} x1="10" y1={y} x2="310" y2={y} />);
+    for (let seat = 0; seat < 6; seat += 1) {
+      const x = Math.round(26 + seat * 52 + (row % 2) * 14);
+      rows.push(<line key={`div-${row}-${seat}`} x1={x - 22} y1={y - 8} x2={x - 22} y2={y} />);
+      if (random() < 0.85) agents.push(seated(`agent-${row}-${seat}`, x, y, round(14 * scale)));
+    }
+  }
+  return (
+    <>
+      {far(
+        <>
+          <line x1="0" y1="10" x2="320" y2="10" />
+          <rect x="120" y="16" width="80" height="30" />
+        </>,
+      )}
+      {halo(160, 31, 32, glow)}
+      {mark(<rect x="128" y="22" width="64" height="18" fill={accent} opacity="0.55" stroke="none" />)}
+      {mid(rows)}
+      {people(agents)}
+      {near(<path d="M-4 124 H324 V132 H-4 Z" />)}
+    </>
+  );
+}
+
 const MOTIF_PAINTERS = {
+  construction: paintConstruction,
+  courtroom: paintCourtroom,
+  airport: paintAirport,
+  callcenter: paintCallcenter,
   studio: paintStudio,
   auditorium: paintAuditorium,
   server: paintServer,

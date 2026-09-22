@@ -954,11 +954,11 @@ export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}
       c10_after_record: { id: "use-reframe", title: "빼앗긴 제도를 되찾기", text: "당신이 만든 제도가 그룹의 모범 사례가 됐습니다. 그 제도가 누구의 것인지 판을 다시 짜야 보너스가 열립니다." },
       c10_after_keep: { id: "repair-legitimacy", title: "서랍 속 명단을 떳떳하게 만들기", text: "조사는 서랍을 겨눕니다. 212명의 이름을 숨긴 기록이 아니라 지킨 기록으로 바꾸는 선택을 찾아야 합니다." },
     },
-    // Keyed on case 24's aftermath: the finale follows that case now.
+    // Keyed on case 49's aftermath: the finale follows that case now.
     final: {
-      c24_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "마지막 밤까지 곁에 남은 기록이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 동료들의 선택권까지 빼앗지 않는 방법을 찾아야 보너스가 열립니다." },
-      c24_after_record: { id: "use-reframe", title: "내가 쓴 요청서도 의심하기", text: "봉인을 풀어 달라는 절차가 40분 만에 승인됐습니다. 그 절차가 다시 누군가를 관찰하는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c24_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 통제 확대의 근거가 됐습니다. 동료들과 백아린이 당신 없이도 지켜질 방법을 찾아야 합니다." },
+      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "보름달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾아야 보너스가 열립니다." },
+      c49_after_record: { id: "use-reframe", title: "내가 묶은 폴더도 의심하기", text: "마흔아홉 사건을 묶은 공개 준비 폴더가 관찰 자료 1번이 됐습니다. 그 폴더가 다시 누군가를 재는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
+      c49_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 후임 관리자 추천 사유가 됐습니다. 골목에 남은 동료들이 당신 없이도 지켜질 방법을 찾아야 합니다." },
     },
   };
   Object.assign(challenges, packTable("continuityChallenges"));

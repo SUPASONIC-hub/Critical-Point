@@ -53,7 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     # 25 -> 45 on 2026-09-22: the twenty-five-case season walk alone takes ~11
     # minutes, and the suite around it ~22; the job was cancelled mid-run at 25.
-    timeout-minutes: 45
+    # 45 -> 80 the same day for the fifty-case season, whose walk is ~22 minutes.
+    timeout-minutes: 80
     steps:
       - uses: actions/checkout@v5
       # One Node version for CI and the Render build: .node-version.

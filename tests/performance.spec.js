@@ -16,6 +16,12 @@ test("result route should become usable within the render budget", async ({ page
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
   });
+  // One visit first, so the dev server has compiled the fifty case modules
+  // before the clock starts: this budget is the app's render, not Vite's first
+  // compile of each file, which the production bundle never pays. Cold, that
+  // compile alone put this route at 4.1-4.7s; warm it measures ~2.4s.
+  await page.goto("/?debug=1");
+  await page.getByTestId("debug-case-select").waitFor();
   await page.goto("/?debug=1");
   await page.evaluate(() => performance.mark("result-start"));
   await page.getByTestId("debug-case-select").selectOption("case01");

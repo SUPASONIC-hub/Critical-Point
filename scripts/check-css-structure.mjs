@@ -144,7 +144,9 @@ const fileBudgets = {
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
-  "plate.css": { lines: 500, bytes: 11300 },
+  // 500 / 11300 -> 590 / 13100 later on 2026-09-22 for the seasons of the second
+  // year: blossom, the monsoon's puddles, heat haze, fireworks, leaves, the moon.
+  "plate.css": { lines: 590, bytes: 13100 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
