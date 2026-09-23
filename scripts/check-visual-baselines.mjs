@@ -150,10 +150,17 @@ for (const file of committed) {
  * Git history is the only evidence available here: the PNGs cannot be compared
  * to each other (different renderers draw the same screen differently, which is
  * the whole reason there are two sets) and cannot be compared to the source. So
- * the rule is the weakest one that still holds: a CI baseline whose last commit
- * is a *strict ancestor* of another platform's last commit for the same
- * screenshot was left behind by that commit. Nothing here can catch a change
- * that re-recorded neither platform -- that one is the comparison job's job.
+ * the rule is the weakest one that still holds: a CI platform whose whole set
+ * was last touched before another platform's set was left behind by that
+ * commit. Nothing here can catch a change that re-recorded neither platform --
+ * that one is the comparison job's job.
+ *
+ * The unit is the platform's set, not the file, because that is the unit the
+ * `update_baselines` dispatch records in: it runs every screenshot and commits
+ * whichever PNGs changed. A screen that happens to render byte-identically on
+ * the runner produces no commit for its file, so a per-file rule called that
+ * file stale for ever after -- which it was not; it had just been re-recorded
+ * and found already correct. 프롤로그 and the board each tripped that.
  */
 function git(...args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
@@ -207,24 +214,40 @@ if (historyDepth !== "full") {
     }
   };
 
-  for (const screenshot of screenshotNames) {
-    for (const project of projects) {
-      const recorded = KNOWN_PLATFORMS.map((platform) => ({
-        platform,
-        name: baselineName(screenshot, project, platform),
-      })).filter(({ name }) => committed.has(name) && !dirty.has(name));
-
-      for (const { platform, name } of recorded) {
-        if (!CI_PLATFORMS.includes(platform)) continue;
-        const behind = recorded.find((other) => other.name !== name && isAncestor(commitOf(name), commitOf(other.name)));
-        if (!behind) continue;
-        failures.push(
-          `${path.relative(root, path.join(snapshotDir, name))} is stale: ` +
-            `${behind.name} was re-recorded in a later commit (${commitOf(behind.name).slice(0, 7)}) ` +
-            `than this one (${commitOf(name).slice(0, 7)}), so the ${platform} run is comparing against the old screen. ` +
-            `Re-record it with the Visual Regression workflow's \`update_baselines\` dispatch input.`,
-        );
+  // The newest commit of a platform's set: the one no other commit in the set
+  // is a descendant of. A set nothing has been committed for has none.
+  function newestOf(platform) {
+    const names = [];
+    for (const screenshot of screenshotNames) {
+      for (const project of projects) {
+        const name = baselineName(screenshot, project, platform);
+        if (committed.has(name) && !dirty.has(name)) names.push(name);
       }
+    }
+    let newest = null;
+    for (const name of names) {
+      const commit = commitOf(name);
+      if (!commit) continue;
+      if (!newest || isAncestor(newest.commit, commit)) newest = { commit, name };
+    }
+    return newest;
+  }
+
+  const newestByPlatform = new Map(KNOWN_PLATFORMS.map((platform) => [platform, newestOf(platform)]));
+
+  for (const platform of CI_PLATFORMS) {
+    const mine = newestByPlatform.get(platform);
+    if (!mine) continue;
+    for (const other of KNOWN_PLATFORMS) {
+      const theirs = other === platform ? null : newestByPlatform.get(other);
+      if (!theirs || !isAncestor(mine.commit, theirs.commit)) continue;
+      failures.push(
+        `The ${platform} baselines are stale: the newest is ${mine.name} at ${mine.commit.slice(0, 7)}, ` +
+          `but ${other} was re-recorded later (${theirs.name} at ${theirs.commit.slice(0, 7)}), ` +
+          `so the ${platform} run is comparing against the old screens. ` +
+          `Re-record them with the Visual Regression workflow's \`update_baselines\` dispatch input.`,
+      );
+      break;
     }
   }
 }
