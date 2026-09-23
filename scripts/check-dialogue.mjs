@@ -55,7 +55,7 @@ const CLEARLY_BETTER = 0.34;
 const generated = Object.entries(nodes).filter(
   ([, node]) => node.phase === "OFF THE RECORD" || node.phase === "THE ROOM AFTER",
 );
-assert.ok(generated.length === 300, `expected 300 generated scenes, found ${generated.length}`);
+assert.ok(generated.length === 330, `expected 330 generated scenes, found ${generated.length}`);
 
 const failures = [];
 let checked = 0;

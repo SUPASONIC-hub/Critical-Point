@@ -904,6 +904,14 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
 
 export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}) {
   const challenges = {
+    // 사건 01 follows the 프롤로그 now, so it has a predecessor for the first
+    // time: what the analyst carried down to 트리거랩 is what the first table
+    // asks them to put down.
+    case01: {
+      p5_after_hold: { id: "protect-trust", title: "벽의 이름을 오늘의 이름과 잇기", text: "3년 동안 벽에 붙여 둔 열한 개의 이름은 기억이지 기록이 아닙니다. 오늘 72시간 안에서 그 이름들이 누구를 가리키는지 보여 주는 선택을 찾아야 보너스가 열립니다." },
+      p5_after_record: { id: "use-reframe", title: "다시 묶인 매듭을 되찾기", text: "B2의 상자는 당신이 묶은 매듭이 아닙니다. 남겨 둔 기록이 누구의 손을 거쳤는지 판을 뒤집어 확인해야 합니다." },
+      p5_after_alone: { id: "repair-legitimacy", title: "기억을 증거로 바꾸기", text: "가방을 비우고 시작한 3년이 지금 증명할 것을 하나도 남기지 않았습니다. 이번에는 적히는 쪽을 고르는 선택이 압박을 낮춥니다." },
+    },
     case02: {
       c1_after_people: { id: "protect-trust", title: "보호를 기록으로 만들기", text: "지난 사건처럼 사람을 먼저 보되, 이번에는 보호의 근거까지 기록해야 보너스를 얻습니다." },
       c1_after_numbers: { id: "find-cost", title: "숫자 뒤의 사람 찾기", text: "공개한 숫자가 누구에게 어떤 부담을 옮겼는지 찾아야 다음 선택의 보너스가 열립니다." },

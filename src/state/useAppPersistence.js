@@ -26,6 +26,7 @@ import {
   shouldCaptureSaveSlot,
 } from "./savedState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
+import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
 
@@ -114,7 +115,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     const emptyTriggers = makeEmptyScores(triggerLabels);
     const emptyCognition = makeEmptyScores(cognitionLabels);
     setRunId(nextRunId);
-    setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase("case01");
+    setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase(SEASON_ENTRY_CASE);
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
     setResources(initialResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
     setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
@@ -122,8 +123,8 @@ export function useAppPersistence({ state, refs, setters, config }) {
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    setFreeText(""); setNodeId("start"); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: "case01", completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: "start", freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    setFreeText(""); setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {

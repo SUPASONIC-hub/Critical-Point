@@ -25,13 +25,18 @@ const budgets = [
   // 1_520_000 -> 3_000_000 later the same day for 사건 25-49, twenty-five more
   // cases: ~530 scenes of prose and their tables. ~860KB gzip, still loaded only
   // after the intro has painted and the player has clicked.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_000_000 },
+  // 3_000_000 -> 3_300_000 on 2026-09-23 for the 프롤로그: five cases in front
+  // of 사건 01, ~110 scenes of prose and their tables. Still loaded only after
+  // the intro has painted and the player has clicked.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_300_000 },
   // 120_000 -> 105_000 on 2026-09-22: the per-case teasers, interludes and
   // chapter rules left for the runtime chunk, so the intro lost 44KB it never
   // showed even while twelve cases were added to them.
   // 105_000 -> 125_000 later the same day: the season list the intro draws now
   // carries 49 case titles, summaries and objectives (`gameCases.js`).
-  { pattern: /^index-.*\.js$/, maxBytes: 125_000 },
+  // 125_000 -> 132_000 on 2026-09-23: the season list the intro draws carries
+  // five more titles, summaries and objectives.
+  { pattern: /^index-.*\.js$/, maxBytes: 132_000 },
   // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
   // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
   // day for the market, memorial and factory painters and the steam layer.

@@ -9,6 +9,7 @@ import {
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
   CASE_START_NODES,
+  SEASON_ENTRY_CASE,
   cognitionLabels,
   initialResources,
   nodeOrders,
@@ -36,7 +37,7 @@ function isNodeValidForCase(caseId, nodeId) {
 
 export function repairSavedRoute(state) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return null;
-  const currentCase = isKnownCaseId(state.currentCase) ? state.currentCase : "case01";
+  const currentCase = isKnownCaseId(state.currentCase) ? state.currentCase : SEASON_ENTRY_CASE;
   const nodeId = isNodeValidForCase(currentCase, state.nodeId) ? state.nodeId : CASE_START_NODES[currentCase];
   if (currentCase === state.currentCase && nodeId === state.nodeId) return state;
   reportSilentFailure("route-repair", { from: state.nodeId, to: nodeId, currentCase });

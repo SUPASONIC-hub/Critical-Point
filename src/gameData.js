@@ -1,6 +1,6 @@
 export { byEffectWeight, cognitionLabels, costWhenRising, initialResources, isResourceGain, triggerLabels } from "./gameConstants.js";
 export { characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
-export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
+export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseAftermathNodeId, caseDisplayCode, caseNodePattern, caseNodePrefix, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
 import { case02Nodes } from "./nodes/case02.js";
 import { case03Nodes } from "./nodes/case03.js";
@@ -3080,6 +3080,15 @@ export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", case
 }
 
 export const caseOpeningRoutes = {
+  // 사건 01 had no openings while it was the season's door. The 프롤로그 put
+  // five cases in front of it, so what the analyst carried down to 트리거랩
+  // three years ago is what they are holding when 한서윤 slides the training
+  // file across the desk.
+  case01: {
+    p5_after_hold: "c1_start_hold",
+    p5_after_record: "c1_start_record",
+    p5_after_alone: "c1_start_alone",
+  },
   case02: {
     c1_after_people: "c2_start_people",
     c1_after_numbers: "c2_start_records",
@@ -3146,6 +3155,9 @@ CASE_PACKS.forEach((pack) => {
 });
 
 const branchOpeningCopy = {
+  c1_start_hold: ["벽에 3년 붙어 있던 이름들", "한서윤", "트리거랩 첫날 책상 앞 벽에 붙인 종이는 테이프를 세 번 갈아 붙이는 동안 그대로 있었습니다. 그 아래에서 3년을 앉아 있다가 오늘 아침 한서윤이 서류철 하나를 내밉니다. 훈련용 사례라고 합니다. 표지 밑단에 인쇄가 조금 남아 있는데, 대출번호 2023-0412입니다. 당신은 벽의 이름들을 등 뒤에 두고 그 서류철을 폅니다. 안에는 플로우온의 현금이 72시간 뒤 바닥난다고 적혀 있습니다. 3년 전 당신이 멈추려던 회사가, 지금 멈추는 중입니다.", ["책상 앞 벽 -- 3년간 붙어 있던 이름 열한 개", "훈련용 사례 표지 밑단: 2023-0412", "플로우온 현금 소진까지 72h"]],
+  c1_start_record: ["B2에서 3년 만에 올라온 상자", "한서윤", "3년 전 사본과 날짜 메모를 넣어 둔 B2의 그 상자는 계절이 바뀌어도 온도가 같은 방에서 매듭 그대로 있었습니다. 오늘 아침 한서윤이 훈련용 사례라며 서류철을 내밀었을 때, 당신은 표지 밑단의 2023-0412를 먼저 읽고 B2로 내려갔습니다. 상자는 열려 있었습니다. 매듭이 당신이 묶은 매듭이 아닙니다. 올라와서 서류철을 펴자 플로우온의 현금이 72시간 뒤 바닥난다고 적혀 있습니다. 당신이 3년 전에 쓴 숫자와 오늘 아침의 숫자가 같은 줄에서 만납니다.", ["B2 상자 -- 매듭이 다시 묶여 있음", "훈련용 사례 표지 밑단: 2023-0412", "플로우온 현금 소진까지 72h"]],
+  c1_start_alone: ["아무것도 들고 오지 않은 3년", "한서윤", "3년 전 가방을 비우고 빈 책상 하나로 시작했습니다. 그 뒤로 사건이 쌓였고, 당신은 이 층을 지하라고 부르는 사람이 되었습니다. 오늘 아침 한서윤이 훈련용 사례라며 서류철을 내밉니다. 표지 밑단에 2023-0412가 남아 있는데, 당신에게는 그 번호와 맞춰 볼 종이가 한 장도 없습니다. 기억만 있습니다. 서류철을 펴자 플로우온의 현금이 72시간 뒤 바닥난다고 적혀 있고, 당신은 자기 기억이 증거가 되지 않는다는 것을 알고 있습니다.", ["3년 전 기록 -- 보관본 없음", "훈련용 사례 표지 밑단: 2023-0412", "플로우온 현금 소진까지 72h"]],
   c2_start_people: ["보호받은 사람의 다음 사건", "도윤하", "이민서가 유출자로 지목됐습니다. 하지만 당신은 지난 사건에서 사람의 목소리를 먼저 남겼습니다. 이번에는 그 목소리가 기록보다 먼저 당신을 찾아옵니다.", ["익명 증언 요청이 이미 들어옴", "이민서는 당신에게 직접 연락함", "보안팀은 보호 조치를 문제 삼음"]],
   c2_start_records: ["공개된 숫자의 다음 사건", "반재욱", "지난 사건에서 현금 흐름을 공개한 뒤, 누군가가 그 공개 자료를 이용해 내부 기록을 조작했습니다. 이번에는 숫자를 믿는 방식 자체가 시험됩니다.", ["공개 자료의 복사본이 세 개 존재", "유출 파일에 공개 수치가 포함됨", "기록 관리자는 책임을 부인함"]],
   c2_start_silence: ["침묵의 청구서", "한서윤", "지난 사건에서 공개를 늦춘 대가는 조용히 쌓였습니다. 이번 사건의 유출 파일에는 당신이 말하지 않았던 조건까지 담겨 있습니다.", ["유출 파일에 비공개 회의 문장 포함", "이민서가 가장 먼저 의심받음", "외부 기업은 이미 다음 행동을 준비함"]],
@@ -3190,6 +3202,27 @@ const branchOpeningCopy = {
  * fourth option that only exists because of what the last case ended on.
  */
 const openingSignatureChoices = {
+  c1_start_hold: {
+    label: "벽의 이름들과 이 서류철의 번호가 같은 사건인지 먼저 확인한다",
+    effect: { trust: 7, legitimacy: 6, time: -5, capital: -3, fatigue: 5 },
+    cognition: { persistence: 2 },
+    voice: "벽의 이름들과 이 서류철의 번호가, 같은 사건인지 먼저 확인한다.",
+    echo: "맞춰 보면 3년 전 그 회사가 맞습니다. 확인하는 데 쓴 시간만큼 72시간이 줄어듭니다.",
+  },
+  c1_start_record: {
+    label: "B2 상자의 매듭이 언제 다시 묶였는지부터 묻는다",
+    effect: { legitimacy: 8, trust: 4, time: -6, capital: -2, fatigue: 5 },
+    cognition: { inference: 2 },
+    voice: "B2 상자의 매듭이 언제 다시 묶였는지부터 묻는다.",
+    echo: "물으면 열람 기록이 나옵니다. 기록에는 당신 사번도 한 줄 있습니다. 당신이 내려가지 않은 날짜입니다.",
+  },
+  c1_start_alone: {
+    label: "기억만 있다는 사실을 한서윤에게 먼저 말한다",
+    effect: { trust: 9, legitimacy: -3, humanCost: -3, time: -3, capital: -2, fatigue: 4 },
+    cognition: { reframing: 2 },
+    voice: "기억만 있다는 사실을, 한서윤에게 먼저 말한다.",
+    echo: "말하면 한서윤이 화면을 한 칸 내립니다. 그리고 '그럼 이번에는 적어 두세요'라고 합니다. 증명할 것이 없다는 걸 그도 압니다.",
+  },
   c2_start_people: {
     label: "지난 사건에서 보호한 사람에게 먼저 연락한다",
     effect: { trust: 8, humanCost: -4, legitimacy: -2, time: -5, fatigue: 4 },

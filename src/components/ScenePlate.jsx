@@ -44,6 +44,8 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
     `gx-plate-tone-${plate.tone}`,
     `gx-plate-${plate.accent}`,
     plate.night ? "gx-plate-night" : "",
+    plate.dusk ? "gx-plate-dusk" : "",
+    plate.pressure ? "gx-plate-closing" : "",
     plate.snow ? "gx-plate-winter" : "",
     plate.mood !== "none" ? `gx-plate-mood-${plate.mood}` : "",
   ]
@@ -126,6 +128,14 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
             <stop offset="100%" stopColor="var(--plate-ambient)" stopOpacity="0" />
           </linearGradient>
         )}
+        {plate.dusk && (
+          /* The last of the day, coming in low from one side of the room. */
+          <linearGradient id={`${id}-dusk`} x1="0" y1="0" x2="1" y2="0.35">
+            <stop offset="0%" stopColor="var(--c-amber)" stopOpacity="0.34" />
+            <stop offset="42%" stopColor="var(--c-coral)" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="var(--c-violet)" stopOpacity="0.1" />
+          </linearGradient>
+        )}
         {heat && (
           <radialGradient id={`${id}-vignette`} r="0.72">
             <stop offset="45%" stopColor={accent} stopOpacity="0" />
@@ -158,6 +168,9 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
         )}
       </g>
       {paintFx(air, plate, id)}
+      {/* The sun on its way out, laid across the room before the mood grade so
+          the hour reads under the feeling rather than over it. */}
+      {plate.dusk && <rect className="gx-plate-sundown" x="0" y="0" width="320" height="132" fill={`url(#${id}-dusk)`} />}
       {/* The feeling the scene runs on, as a grade from the top-left corner. */}
       {plate.mood !== "none" && <rect className="gx-plate-grade" x="0" y="0" width="320" height="132" fill={`url(#${id}-grade)`} />}
       {/* The readable copy in the briefing catches a slow light leak across the
@@ -263,6 +276,37 @@ function paintAir(random, plate) {
           </g>
         )}
       </>
+    );
+  }
+  if (plate.paper) {
+    // A room made of documents keeps a few of them in the air: small sheets,
+    // each turning on its own axis, slower than dust and never in a hurry. They
+    // are quadrilaterals rather than rectangles so a sheet reads as one seen at
+    // an angle, and the resting rotation is the drawing you get with motion off.
+    const sheets = [];
+    for (let sheet = 0; sheet < 7; sheet += 1) {
+      const x = round(span(random, 14, 300));
+      const y = round(span(random, 16, 104));
+      const width = round(span(random, 4.5, 8));
+      const height = round(width * span(random, 1.1, 1.45));
+      const lean = round(span(random, -0.9, 0.9));
+      sheets.push(
+        <polygon
+          key={`sheet-${sheet}`}
+          points={`${x},${y} ${round(x + width)},${round(y + lean)} ${round(x + width - lean)},${round(y + height)} ${round(x - lean)},${round(y + height - lean)}`}
+          transform={`rotate(${round(span(random, -28, 28))} ${x} ${y})`}
+          style={{
+            animationDuration: `${span(random, 16, 26).toFixed(1)}s`,
+            animationDelay: `-${span(random, 0, 26).toFixed(1)}s`,
+            transformOrigin: `${x}px ${y}px`,
+          }}
+        />,
+      );
+    }
+    return (
+      <g className="gx-plate-air gx-plate-paper" fill="var(--c-paper)" opacity="0.32">
+        {sheets}
+      </g>
     );
   }
   const night = plate.night;

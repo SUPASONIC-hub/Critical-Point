@@ -108,14 +108,23 @@ const BUDGETS = {
   // was just written, whether consent and the privacy signals allow the
   // sentence off the device, and the effect the regex scorer had already
   // applied. Fifteen lines is that call and the three aborts on run reset.
+  // 1830 / 151 -> 1832 / 154 on 2026-09-23 for the 프롤로그. Three of the
+  // runtime's fallbacks were the literal "case01" and one built the aftermath
+  // node id by swapping "case" for "c" -- both true only while 사건 01 was the
+  // first case and every case was `caseNN`. They now read `SEASON_ENTRY_CASE`,
+  // `SEASON_ENTRY_NODE` and `caseAftermathNodeId` from `gameCases.js`, which is
+  // three imported names bought by deleting four assumptions.
   "src/GameRuntime.jsx": {
-    lines: 1830,
-    importedNames: 151,
+    lines: 1832,
+    importedNames: 154,
     hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
   },
+  // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
+  // label rather than its position, because the 프롤로그 sits in front of
+  // 사건 01 and a position counter printed "사건 6" over 사건 01.
   "src/screens/PlayScreen.jsx": {
-    lines: 105,
-    importedNames: 3,
+    lines: 111,
+    importedNames: 4,
     hooks: {},
   },
   "src/screens/ResultScreen.jsx": {

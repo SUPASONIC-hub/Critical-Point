@@ -6,6 +6,7 @@ import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
+import { caseDisplayCode } from "../gameCases.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -329,17 +330,17 @@ export function IntroScreen({ view, renderers = {} }) {
               <article>
                 <span>첫 사건</span>
                 <b>{seasonCasesBase[0].title}</b>
-                <p>{caseObjectives.case01}</p>
+                <p>{caseObjectives[seasonCasesBase[0].id]}</p>
               </article>
               <article>
                 <span>관찰 목표</span>
-                <b>손실 배분 순서</b>
-                <p>{triggerLabSignals.case01}</p>
+                <b>멈추지 못하는 지점</b>
+                <p>{triggerLabSignals[seasonCasesBase[0].id]}</p>
               </article>
               <article>
                 <span>다음 압박</span>
                 <b>기록은 다음 사건으로 이동한다</b>
-                <p>오래 붙잡은 조건이 CASE 02의 신뢰와 증거 충돌로 이어집니다.</p>
+                <p>프롤로그에서 남긴 것이 3년 뒤 사건 01의 첫 장면을 정합니다.</p>
               </article>
             </div>
             {tutorialSteps && (
@@ -586,7 +587,7 @@ export function IntroScreen({ view, renderers = {} }) {
             <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
           </div>
           <div className="case-roadmap">
-            {seasonCases.map((caseItem, caseIndex) => {
+            {seasonCases.map((caseItem) => {
               const savedResult = caseResults[caseItem.id]
                 ? normalizeCaseSummary(caseResults[caseItem.id])
                 : null;
@@ -605,8 +606,10 @@ export function IntroScreen({ view, renderers = {} }) {
                   /* The file number the row is stamped with. It is decoration
                      drawn from a ::before, so the label the button announces is
                      still the aria-label below and not a second reading of the
-                     index. */
-                  data-index={String(caseIndex + 1).padStart(2, "0")}
+                     index. It is the case's own code rather than its place in
+                     the list: the 프롤로그 sits in front of 사건 01, so a
+                     position counter stamped 사건 01 with "06". */
+                  data-index={caseDisplayCode(caseItem.id)}
                   aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
                   className={
                     caseItem.status === "PLAYING" || caseItem.status === "OPEN"
@@ -645,7 +648,7 @@ export function IntroScreen({ view, renderers = {} }) {
           <div className="opening-burst" data-testid="opening-burst" role="status" aria-live="polite" aria-label="첫 사건으로 진입 중">
             <div className="opening-burst-grid" aria-hidden="true" />
             <div className="opening-burst-panel">
-              <span>CREATIVITY BURST / CASE 01 ACCESS</span>
+              <span>CREATIVITY BURST / {`CASE ${caseDisplayCode(seasonCasesBase[0].id)}`} ACCESS</span>
               <strong>첫 판단 조건 동기화 중</strong>
               <i aria-hidden="true" />
             </div>

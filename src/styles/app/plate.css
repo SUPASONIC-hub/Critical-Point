@@ -559,10 +559,81 @@
   }
 }
 
+/* The hour between day and night. The wash is drawn in the SVG; what belongs
+   here is what the hour does to the room -- the far plane warms and lifts, and
+   the whole drawing sits a shade lower in contrast, the way a room does when
+   the light stops coming from overhead. */
+.gx-plate-dusk .gx-plate-far {
+  opacity: 0.86;
+}
+
+.gx-plate-sundown {
+  mix-blend-mode: soft-light;
+}
+
+/* Paper turns, it does not fall. A sheet keeps its place in the room and rolls
+   on its own axis, so a still frame is a sheet caught mid-turn rather than a
+   sheet halfway to the floor. */
+.gx-plate-paper > polygon {
+  animation: gx-plate-turn 20s ease-in-out infinite;
+}
+
+@keyframes gx-plate-turn {
+  0% {
+    transform: rotate(-14deg) scale(0.92);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: rotate(16deg) scale(1.06);
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(-14deg) scale(0.92);
+    opacity: 0.6;
+  }
+}
+
+/* A pressure beat is drawn as well as shaded. The edge vignette says the room
+   is closing; these two say which way. The far wall steps back and dims, the
+   near silhouette steps up -- so the reader is pushed into the scene rather
+   than only ringed in red. Both are transforms on planes that already move, so
+   nothing new is composited and reduced motion freezes them where they rest. */
+.gx-plate-closing .gx-plate-far {
+  transform: scale(0.97);
+  opacity: 0.72;
+}
+
+.gx-plate-closing .gx-plate-near {
+  transform: scale(1.03) translateY(1px);
+}
+
+/* The briefing pushes in; the table's backdrop only breathes. It is a band
+   behind live copy, so it moves half as far over twice as long -- enough that
+   the header is not a still image under a running clock, not enough to pull
+   the eye off the card it sits behind. */
+.gx-plate-backdrop .gx-plate-stage {
+  transform-box: view-box;
+  transform-origin: 160px 54px;
+  animation: gx-plate-breathe-wide 48s ease-in-out infinite alternate;
+}
+
+@keyframes gx-plate-breathe-wide {
+  from {
+    transform: scale(1.01);
+  }
+
+  to {
+    transform: scale(1.05) translateX(-3px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gx-plate *,
   .gx-plate .gx-plate-air > *,
-  .gx-plate-panel .gx-plate-stage {
+  .gx-plate-panel .gx-plate-stage,
+  .gx-plate-backdrop .gx-plate-stage {
     animation: none;
   }
 

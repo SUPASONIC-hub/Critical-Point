@@ -1,3 +1,5 @@
+import { caseDisplayCode } from "./gameCases.js";
+
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
 export function applyEffect(resources, effect = {}) {
@@ -120,7 +122,7 @@ export function getSuspenseState({ riskPressure = 0, decisionSeconds = 45, log =
       cue: "다음 화면을 믿기 전에 기록을 의심할 것",
     },
   }[tier];
-  const caseCode = currentCase === "final" ? "F" : currentCase.replace("case", "");
+  const caseCode = caseDisplayCode(currentCase);
   return { score, tier, caseCode, ...signals };
 }
 

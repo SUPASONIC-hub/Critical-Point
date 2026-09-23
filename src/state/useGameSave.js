@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
+
 export function useGameSaveState({ saved, initialRunId, initialResources, triggerDefaults, cognitionDefaults, normalizeText }) {
   const [runId, setRunId] = useState(() => saved?.runId || initialRunId);
   const [playerName, setPlayerName] = useState(() => saved?.playerName ?? "");
@@ -7,12 +9,12 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
   const [openingLegacy, setOpeningLegacy] = useState(saved?.openingLegacy ?? null);
   const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
   const [started, setStarted] = useState(saved?.started ?? false);
-  const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? "case01");
+  const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? SEASON_ENTRY_CASE);
   const [completedCases, setCompletedCases] = useState(saved?.completedCases ?? []);
   const [discoveredClues, setDiscoveredClues] = useState(saved?.discoveredClues ?? []);
   const [caseResults, setCaseResults] = useState(saved?.caseResults ?? {});
   const [playtestFeedback, setPlaytestFeedback] = useState(saved?.playtestFeedback ?? {});
-  const [nodeId, setNodeId] = useState(saved?.nodeId ?? "start");
+  const [nodeId, setNodeId] = useState(saved?.nodeId ?? SEASON_ENTRY_NODE);
   const [resources, setResources] = useState(saved?.resources ?? initialResources);
   const [log, setLog] = useState(saved?.log ?? []);
   const [triggers, setTriggers] = useState(saved?.triggers ?? triggerDefaults);

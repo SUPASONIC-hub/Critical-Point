@@ -42,8 +42,9 @@ async function fresh() {
 await step("intro loads", fresh);
 
 await step("debug jump into a scene", async () => {
-  await page.getByTestId("debug-case-select").selectOption("case01");
-  await page.getByTestId("debug-node-select").selectOption("start");
+  // The season's first case, so the smoke run walks the door the player uses.
+  await page.getByTestId("debug-case-select").selectOption("prologue01");
+  await page.getByTestId("debug-node-select").selectOption("p1_start");
   await page.getByTestId("debug-start-node").click();
   await page.waitForSelector(".game-shell", { timeout: 10000 });
 });

@@ -20,7 +20,7 @@ import {
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
-import { CASE_RESULT_NODES, CASE_START_NODES } from "./gameCases.js";
+import { CASE_RESULT_NODES, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseNodePattern } from "./gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
@@ -50,23 +50,14 @@ export function resumeSaves() {
 function readCurrentSave() {
   const saved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
   if (!saved?.currentCase || !saved?.nodeId) return saved;
-  // Case 01 predates the `cN_` prefix and the finale uses `f_`; every other
-  // case is `c<number>_`, so the map does not need a line per case.
-  const casePrefix =
-    saved.currentCase === "case01"
-      ? /^(start|accounting|payday|competitor|board|final|result|c1_)/
-      : saved.currentCase === "final"
-        ? /^f_/
-        : /^case\d+$/.test(saved.currentCase)
-          ? new RegExp(`^c${Number(saved.currentCase.slice(4))}_`)
-          : null;
+  const casePrefix = caseNodePattern(saved.currentCase);
   const nodeMatchesCase =
     saved.nodeId === CASE_RESULT_NODES[saved.currentCase] ||
     Boolean(casePrefix?.test(saved.nodeId));
   if (nodeMatchesCase) return saved;
   const repaired = {
     ...saved,
-    nodeId: CASE_START_NODES[saved.currentCase] ?? "start",
+    nodeId: CASE_START_NODES[saved.currentCase] ?? SEASON_ENTRY_NODE,
     paused: true,
     lastError: {
       id: `repair-${Date.now()}`,
@@ -74,7 +65,7 @@ function readCurrentSave() {
       source: "save-integrity",
       message: "Saved route was repaired before resume.",
       currentCase: saved.currentCase,
-      nodeId: CASE_START_NODES[saved.currentCase] ?? "start",
+      nodeId: CASE_START_NODES[saved.currentCase] ?? SEASON_ENTRY_NODE,
     },
   };
   writeSaveState(repaired, { force: true });
@@ -116,12 +107,12 @@ function createStartSave({ playerName, playStyle, dataConsent }) {
     openingLegacy: null,
     dataConsent,
     started: true,
-    currentCase: "case01",
+    currentCase: SEASON_ENTRY_CASE,
     completedCases: [],
     discoveredClues: [],
     caseResults: {},
     playtestFeedback: {},
-    nodeId: "start",
+    nodeId: SEASON_ENTRY_NODE,
     resources: initialResources,
     log: [],
     triggers: makeEmptyScores(triggerLabels),
@@ -296,7 +287,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     log: Array.isArray(saved?.log) ? saved.log : [],
     caseResults: saved?.caseResults ?? {},
     completedCases: saved?.completedCases ?? [],
-    currentCase: saved?.currentCase ?? "case01",
+    currentCase: saved?.currentCase ?? SEASON_ENTRY_CASE,
     newGamePlusUnlocked: readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true",
     newGamePlusMemory: readNewGamePlusMemory(),
     nextParticipantMessage: readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""),

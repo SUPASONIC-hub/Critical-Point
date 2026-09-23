@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
@@ -123,10 +123,15 @@ test("the complete season can progress from case 01 to the final ending", async 
   // 480s for the thirteenth case, 480s -> 1200s for cases 13-24 (720s ran out
   // under the parallel suite with the walk still advancing), and 1200s -> 2700s
   // for cases 25-49: fifty cases take about twice the twenty-five-case walk.
-  test.setTimeout(2_700_000);
+  // 2700s -> 3000s for the 프롤로그's five cases at the head of the walk.
+  test.setTimeout(3_000_000);
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
-  await startDebugNode(page, "case01", "payday");
+  // The walk is the whole season, so it opens on the season's own door. It
+  // entered at 사건 01 while that was the door, and kept doing so after the
+  // 프롤로그 moved in front of it -- which meant advancing 55 times from case
+  // six and running off the end of the sequence.
+  await startDebugNode(page, CASE_SEQUENCE[0], CASE_START_NODES[CASE_SEQUENCE[0]]);
 
   for (let caseIndex = 0; caseIndex < CASE_SEQUENCE.length; caseIndex += 1) {
     await completeCurrentCase(page);
@@ -163,8 +168,10 @@ test("hero entry opens the first scene in one click", async ({ page }) => {
 
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.started).toBe(true);
-  expect(saved.currentCase).toBe("case01");
-  expect(saved.nodeId).toBe("start");
+  // The season opens on the 프롤로그, and nothing here names it: the door is
+  // whatever CASE_SEQUENCE puts first.
+  expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);
+  expect(saved.nodeId).toBe(CASE_START_NODES[CASE_SEQUENCE[0]]);
   // No form was filled: the run carries the default call sign, which is what
   // makes the one-click open possible.
   expect(saved.playerName).toBe("분석관");
@@ -524,7 +531,7 @@ test("starting a fresh game clears stale recovery guidance", async ({ page }) =>
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.lastError).toBeNull();
-  expect(saved.currentCase).toBe("case01");
+  expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);
 });
 
 test("error log replay jumps to the captured scene", async ({ page }) => {
@@ -1485,7 +1492,7 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v6") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v7") || "[]").length))
     .toBeGreaterThan(0);
 });
 

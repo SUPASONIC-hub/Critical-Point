@@ -24,7 +24,7 @@
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
-import { CASE_SEQUENCE, CASE_START_NODES, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, CASE_START_NODES, caseNodePrefix, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 
 // Every case file is copy, so the list reads the folder rather than naming each
 // case: a new case was once added and its file left off this list.
@@ -268,11 +268,15 @@ for (const file of COPY_FILES) {
   }
 }
 
-const CASE_PREFIX = { case01: /^(start$|c1_|payday$|competitor$)/, final: /^f_/ };
+// Which nodes belong to a case. Derived from the id's digits until the
+// 프롤로그 arrived: `Number("ogue01")` is NaN, so `prologue01` matched nothing
+// and the hidden route and evidence turn of all five cases -- the scenes that
+// are not in `nodeOrders` -- went unchecked. `caseNodePrefix` is the one place
+// that mapping lives now.
+const CASE_PREFIX = { case01: /^(start$|c1_|payday$|competitor$)/ };
 for (const caseId of CASE_SEQUENCE) {
   if (CASE_PREFIX[caseId]) continue;
-  const number = Number(caseId.slice(4));
-  CASE_PREFIX[caseId] = new RegExp(`^c${number}_`);
+  CASE_PREFIX[caseId] = new RegExp(`^${caseNodePrefix(caseId)}_`);
 }
 
 function narration(node = {}) {

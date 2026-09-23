@@ -10,7 +10,18 @@
  * that owns the table (`gameData.js`, `gameLogic.js`, `sceneContext.js`). The
  * season order still lives in `CASE_SEQUENCE`; this list only says which cases
  * carry their own tables.
+ *
+ * The 프롤로그 is five packs of the same shape, and they are listed first
+ * because that is the order they play in -- though this list does not decide
+ * that either. They are what 사건 01 used to begin without: the loan review the
+ * analyst dissented on, who rejected it, who sold it at a counter, and the day
+ * the dissent became a posting to 트리거랩.
  */
+import { prologue01 } from "./prologue01.js";
+import { prologue02 } from "./prologue02.js";
+import { prologue03 } from "./prologue03.js";
+import { prologue04 } from "./prologue04.js";
+import { prologue05 } from "./prologue05.js";
 import { case12 } from "./case12.js";
 import { case13 } from "./case13.js";
 import { case14 } from "./case14.js";
@@ -51,6 +62,11 @@ import { case48 } from "./case48.js";
 import { case49 } from "./case49.js";
 
 export const CASE_PACKS = [
+  prologue01,
+  prologue02,
+  prologue03,
+  prologue04,
+  prologue05,
   case12,
   case13,
   case14,

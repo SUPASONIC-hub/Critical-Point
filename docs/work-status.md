@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-22 (사건 25-49, a fifty-case season, the plate seasons, a fourth ranking reset)
+Last updated: 2026-09-23 (the 프롤로그, a fifty-five-case season, a data-driven season door, the plate's dusk and paper, a fifth ranking reset)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1125,3 +1125,59 @@ the live database when a migration fixes a runtime error.
     README now describes every case from 01, and the ranking was reset by
     priority 70's rule: `20260922010000_fifty_case_season_ranking_reset.sql` and
     `critical-point-local-ranking-v6`, which retires v1 through v5.
+
+76. The season opens on the 프롤로그, and the door is data. 프롤로그 01-05 are
+    five packs in front of 사건 01: the 수습 case that makes someone who cannot
+    walk past a number that does not add up (and the 180% line that becomes
+    제7조), the 310억 review and the dissent, 한서윤 rejecting it 28 minutes
+    before the committee opens and saying why -- her own dissent, twelve years
+    earlier -- 도윤하 selling that loan at counter 4 with a 3-minute script
+    against a 22-page prospectus, and the posting with a blank reason box.
+    프롤로그 05's aftermath keys 사건 01's three openings (`c1_start_hold`,
+    `c1_start_record`, `c1_start_alone`), so what the analyst carried down to
+    트리거랩 three years earlier is what they are holding when 한서윤 slides
+    the training file across the desk. 사건 01 had no `caseOpeningRoutes` entry
+    before this, because it had no predecessor.
+
+    The entry point was the literal pair `("case01", "start")` in six places --
+    `createStartSave`, the runtime's `startGame`, and the saved-state defaults --
+    plus three `?? "case01"` fallbacks, an aftermath id built by swapping "case"
+    for "c", and a node-id regex that returned `null` for any id not matching
+    `^case\d+$` (which the shell reads as "this save is broken", repairing away
+    the player's position on every resume). `src/gameCases.js` owns all of it
+    now: `SEASON_ENTRY_CASE`, `SEASON_ENTRY_NODE`, `caseNodePrefix`,
+    `caseNodePattern`, `caseAftermathNodeId` and `caseDisplayCode`. No file
+    names the season's first case any more, and the tests do not either.
+
+    The header stamp is the case's own label, not its position: a position
+    counter printed "사건 6" over 사건 01's title. The progress line still
+    measures position (1/55).
+
+    `is_season_case_id` matched `^case[0-9]{2}$` only, so every 프롤로그 row --
+    telemetry and cloud save alike -- would have been rejected server side for
+    the first five cases of every run. `20260923000000_prologue_case_ids_and_
+    ranking_reset.sql` adds `^prologue[0-9]{2}$` and resets the ranking in the
+    same migration; the local board is on `critical-point-local-ranking-v7`,
+    retiring v6. That is priority 70's rule for the fifth time.
+
+    The plate gained the hour the light switch missed. `night` was a boolean, so
+    the 18시 회의, the 퇴근길 and the shutter coming down on a 객장 all drew full
+    daylight: `dusk` reads those clocks and lays a low warm gradient across the
+    room in `soft-light`. `paper` puts a few slow-turning sheets in the rooms
+    this story is made of documents in (archive, desk, counter, courtroom,
+    chamber, lobby) -- the one motif that says what the room is for without a
+    caption. `closing` draws a pressure beat instead of only shading it: the far
+    plane steps back and dims, the near one steps up. And the backdrop breathes
+    now (48s, half the panel's travel) rather than standing still under a running
+    clock. All four are transforms and opacity on planes that already move, and
+    each has a resting state, so reduced motion still gets a finished drawing.
+
+    Budgets moved for content, not for slack: GameRuntime 3.0MB -> 3.3MB, the
+    intro chunk 125KB -> 132KB (five more titles), plate.css 590/13100 ->
+    665/15400, GameRuntime 151 -> 154 imported names and PlayScreen 105/3 ->
+    111/4. Generated scenes are 330 and their authored lines 996. The collapse
+    gate reads the season length, so its unit sample moved 188 -> 207 busts.
+    The glossary is unchanged at 189 terms; `check:plain-language` passes across
+    all 55 cases, which is what holds the 프롤로그 to the same two promises --
+    no Japanese-era banking words, and every hard term explained in parentheses
+    at its first use in the case.

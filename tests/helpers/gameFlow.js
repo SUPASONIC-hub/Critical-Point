@@ -42,10 +42,21 @@ export async function dismissProtocolBreach(page) {
     .first()
     .waitFor({ timeout: 6_000 })
     .catch(() => {});
-  await page.evaluate(() => {
-    document.querySelector("[data-testid='relic-skip']")?.click();
-    document.querySelector("[data-testid='open-table']")?.click();
-  });
+  // The two are never mounted at once -- `briefingOpen` is false while the draft
+  // is up -- so one pass could only ever clear the first of them. It skipped the
+  // draft, React mounted the briefing behind it, and the caller then asserted on
+  // a table whose cards were all still disabled. Clearing one at a time until
+  // neither is there is what this function always claimed to do.
+  for (let pass = 0; pass < 4; pass += 1) {
+    const cleared = await page.evaluate(() => {
+      const gate = document.querySelector("[data-testid='relic-skip'], [data-testid='open-table']");
+      if (!gate) return false;
+      gate.click();
+      return true;
+    });
+    if (!cleared) return;
+    await page.waitForTimeout(120);
+  }
 }
 
 export async function cashStakedCard(page) {

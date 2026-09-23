@@ -108,6 +108,14 @@ export const musicModes = {
 };
 
 export const chapterMotifs = {
+  // The 프롤로그 is three years earlier and two floors up, before any of this
+  // was a chain: the lowest lifts and the softest impacts in the season, rising
+  // only as the 반려 and the counter close the door.
+  prologue01: { wave: "sine", lift: 180, impact: 0.88 },
+  prologue02: { wave: "triangle", lift: 280, impact: 0.98 },
+  prologue03: { wave: "sine", lift: 220, impact: 1.06 },
+  prologue04: { wave: "triangle", lift: 320, impact: 0.96 },
+  prologue05: { wave: "sine", lift: 200, impact: 1.02 },
   case01: { wave: "sine", lift: 80, impact: 0.94 },
   case02: { wave: "triangle", lift: 360, impact: 1.04 },
   case03: { wave: "sawtooth", lift: 620, impact: 1.12 },

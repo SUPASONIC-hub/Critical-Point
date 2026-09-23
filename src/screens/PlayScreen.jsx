@@ -1,5 +1,5 @@
 import { GameHeader } from "../components/GameHeader.jsx";
-import { CASE_SEQUENCE } from "../gameData.js";
+import { CASE_SEQUENCE, seasonCasesBase } from "../gameData.js";
 import { GauntletStage } from "../gauntlet/GauntletStage.jsx";
 
 /**
@@ -48,6 +48,11 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         // Leaving on purpose keeps a bet on the table exactly as it stands.
         onSaveAndExit={() => saveCurrentGame({ exit: true })}
         onReset={reset}
+        /* The stamp is the case's own label, not its place in the list. The
+           프롤로그 sits in front of 사건 01, so a position counter would read
+           "사건 6" over 사건 01's own title. The position is still what the
+           progress line measures. */
+        caseLabel={seasonCasesBase.find((caseItem) => caseItem.id === currentCase)?.label ?? ""}
         caseNumber={Math.max(1, CASE_SEQUENCE.indexOf(currentCase) + 1)}
         caseTotal={CASE_SEQUENCE.length}
         progress={progress}

@@ -902,11 +902,11 @@ test("every generated scene choice has authored copy and a distinct effect", () 
     });
   });
 });
-test("300 generated scenes should expose 906 authored choices: three each across fifty cases", () => {
+test("330 generated scenes should expose 996 authored choices: three each across fifty-five cases", () => {
   assert.equal(
     generatedChoiceCount,
-    906,
-    "300 generated scenes should expose 906 authored choices: three each across fifty cases",
+    996,
+    "330 generated scenes should expose 996 authored choices: three each across fifty-five cases",
   );
 });
 

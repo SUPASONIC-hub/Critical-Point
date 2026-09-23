@@ -1,3 +1,5 @@
+import { caseDisplayCode } from "./gameCases.js";
+
 const operatorProfiles = {
   courier: {
     id: "courier",
@@ -72,7 +74,7 @@ export function getDelayedConsequences(log = [], caseResults = {}) {
       caseId,
       source: result.outcomeChoiceId,
       visible: log.some((entry) => entry?.caseId !== caseId && entry?.continuitySource === result.outcomeChoiceId),
-      text: `CASE ${caseId.replace("case", "")}의 ${result.outcomeChoiceId} 선택이 다음 사건의 기준으로 남아 있습니다.`,
+      text: `CASE ${caseDisplayCode(caseId)}의 ${result.outcomeChoiceId} 선택이 다음 사건의 기준으로 남아 있습니다.`,
     }));
 }
 

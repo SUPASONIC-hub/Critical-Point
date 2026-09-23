@@ -20,8 +20,13 @@
  * with a condition, and the finale is the empty signature box the whole thing
  * hangs from.
  */
-export const CASE_SEQUENCE = ["case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10", "case11", "case12", "case13", "case14", "case15", "case16", "case17", "case18", "case19", "case20", "case21", "case22", "case23", "case24", "case25", "case26", "case27", "case28", "case29", "case30", "case31", "case32", "case33", "case34", "case35", "case36", "case37", "case38", "case39", "case40", "case41", "case42", "case43", "case44", "case45", "case46", "case47", "case48", "case49", "final"];
+export const CASE_SEQUENCE = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10", "case11", "case12", "case13", "case14", "case15", "case16", "case17", "case18", "case19", "case20", "case21", "case22", "case23", "case24", "case25", "case26", "case27", "case28", "case29", "case30", "case31", "case32", "case33", "case34", "case35", "case36", "case37", "case38", "case39", "case40", "case41", "case42", "case43", "case44", "case45", "case46", "case47", "case48", "case49", "final"];
 export const CASE_START_NODES = {
+  prologue01: "p1_start",
+  prologue02: "p2_start",
+  prologue03: "p3_start",
+  prologue04: "p4_start",
+  prologue05: "p5_start",
   case01: "start",
   case02: "c2_start",
   case03: "c3_start",
@@ -74,6 +79,11 @@ export const CASE_START_NODES = {
   final: "f_start",
 };
 export const CASE_RESULT_NODES = {
+  prologue01: "prologue01_result",
+  prologue02: "prologue02_result",
+  prologue03: "prologue03_result",
+  prologue04: "prologue04_result",
+  prologue05: "prologue05_result",
   case01: "result",
   case02: "case02_result",
   case03: "case03_result",
@@ -127,7 +137,60 @@ export const CASE_RESULT_NODES = {
 };
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
 
+/**
+ * Where a new run begins.
+ *
+ * It was the literal pair `("case01", "start")` in six places -- the shell's
+ * `createStartSave`, the runtime's `startGame`, and the saved-state defaults --
+ * so the season order lived in `CASE_SEQUENCE` while the door lived in string
+ * literals. The 프롤로그 is the first case now, and nothing about that is a
+ * literal any more: the season's first case is whatever `CASE_SEQUENCE` says.
+ */
+export const SEASON_ENTRY_CASE = CASE_SEQUENCE[0];
+export const SEASON_ENTRY_NODE = CASE_START_NODES[SEASON_ENTRY_CASE];
+
+/**
+ * Which node ids belong to a case.
+ *
+ * Three surfaces derived this from the id's digits (`c${Number(id.slice(4))}_`),
+ * which works only while every case is `caseNN` with `cN_` nodes. 사건 01
+ * predates the prefix and the finale uses `f_`, so both were already special
+ * cases; the 프롤로그 is `prologueNN` with `pN_` nodes and would have returned
+ * `null` -- which the shell reads as "this save is broken" and repairs, throwing
+ * away the player's position on every resume.
+ */
+export function caseNodePrefix(caseId = "") {
+  if (caseId === "final") return "f";
+  if (/^prologue\d+$/.test(caseId)) return `p${Number(caseId.slice(8))}`;
+  if (/^case\d+$/.test(caseId)) return `c${Number(caseId.slice(4))}`;
+  return "";
+}
+
+export function caseNodePattern(caseId = "") {
+  // 사건 01 predates the prefix: its scenes are bare nouns.
+  if (caseId === "case01") return /^(start|accounting|payday|competitor|board|final|result|c1_)/;
+  const prefix = caseNodePrefix(caseId);
+  return prefix ? new RegExp(`^${prefix}_`) : null;
+}
+
+/** The scene a case closes on, before its result screen. */
+export function caseAftermathNodeId(caseId = "") {
+  return `${caseNodePrefix(caseId)}_aftershock`;
+}
+
+/** The short code a case is stamped with: `P1`, `07`, `F`. */
+export function caseDisplayCode(caseId = "") {
+  if (caseId === "final") return "F";
+  if (/^prologue\d+$/.test(caseId)) return `P${Number(caseId.slice(8))}`;
+  return caseId.replace("case", "");
+}
+
 export const nodeOrders = {
+  prologue01: ["p1_start", "p1_counter", "p1_mentor", "p1_review", "p1_final"],
+  prologue02: ["p2_start", "p2_site", "p2_model", "p2_draft", "p2_final"],
+  prologue03: ["p3_start", "p3_committee", "p3_corridor", "p3_archive", "p3_final"],
+  prologue04: ["p4_start", "p4_window", "p4_quota", "p4_visit", "p4_final"],
+  prologue05: ["p5_start", "p5_notice", "p5_basement", "p5_echo", "p5_final"],
   case01: ["start", "accounting", "payday", "competitor", "board", "final"],
   case02: ["c2_start", "c2_logs", "c2_meeting", "c2_pressure", "c2_final"],
   case03: ["c3_start", "c3_split", "c3_score", "c3_trap", "c3_final"],
@@ -181,6 +244,11 @@ export const nodeOrders = {
 };
 
 export const caseObjectives = {
+  prologue01: "수습 마지막 과제에서 찾아낸 4,000만 원의 빈 줄을, 사수 이름으로 넘길지 내 이름으로 남길지 그냥 넘어갈지 정합니다.",
+  prologue02: "부채비율 179.6%가 어떻게 만들어졌는지 알아낸 뒤, 310억 대출에 대한 반대 의견서를 혼자 쓸지 함께 쓸지 누그러뜨릴지 정합니다.",
+  prologue03: "한 문장으로 반려된 반대 의견서 앞에서, 재심을 걸지 사본을 남길지 상사의 말을 믿을지 정합니다.",
+  prologue04: "내가 막으려던 대출이 창구에서 상품으로 팔리는 것을 보고, 판 사람을 지킬지 판매 방식을 보고할지 못 본 것으로 할지 정합니다.",
+  prologue05: "사유 칸이 빈 발령서 한 장으로 트리거랩에 내려가는 날, 무엇을 들고 들어갈지 정합니다.",
   case01: "3년 전 당신이 반대했던 그 대출의 마지막 72시간을 어떻게 닫을지 정한다",
   case02: "조작된 접속 기록이 가리키는 사람과 그 기록을 만든 손 중 어느 쪽을 먼저 보고할지 정한다",
   case03: "오진우보다 빠른 결론이 아니라, 3년 뒤에도 무너지지 않는 판을 만든다",
@@ -234,6 +302,51 @@ export const caseObjectives = {
 };
 
 export const seasonCasesBase = [
+  {
+    id: "prologue01",
+    label: "프롤로그 01",
+    title: "수습 딱지",
+    trigger: "인정 / 책임 / 경쟁",
+    status: "PLAYABLE",
+    summary:
+      "2022년 가을, 수습 3개월차의 마지막 과제. 요약표의 부채 합계가 항목 합보다 4,000만 원 적고, 그 한 줄을 넣으면 지점이 스스로 승인할 수 있는 선을 넘습니다. 3년 뒤 제7조가 되는 숫자를, 당신은 여기서 처음 만납니다.",
+  },
+  {
+    id: "prologue02",
+    label: "프롤로그 02",
+    title: "2023-0412",
+    trigger: "책임 / 호기심 / 부당함",
+    status: "LOCKED",
+    summary:
+      "2023년 4월, 물류 플랫폼 플로우온에 나갈 310억. 실사에서 매출을 장부에 올리는 시점이 4주 당겨진 것이 드러나고, 실제 부채비율은 184.2%입니다. 그 대출을 즉시 회수할 수 있게 만든 제7조를 써 넣은 곳은 당신의 팀입니다.",
+  },
+  {
+    id: "prologue03",
+    label: "프롤로그 03",
+    title: "반려",
+    trigger: "부당함 / 신뢰 / 무력감",
+    status: "LOCKED",
+    summary:
+      "개회 28분 전, 한서윤 과장이 당신의 반대 의견서를 팀 검토 단계에서 반려합니다. 회의실에서는 한 문장으로 끝나고 열한 개 안건이 마흔일곱 분에 처리됩니다. 복도에서 그는 12년 전 자기가 쓴 의견서 이야기를 합니다.",
+  },
+  {
+    id: "prologue04",
+    label: "프롤로그 04",
+    title: "4번 창구",
+    trigger: "보호 / 공감 / 부끄러움",
+    status: "LOCKED",
+    summary:
+      "승인 두 시간 뒤, 그 대출은 창구의 상품이 됩니다. 강서지점 4번 창구의 도윤하는 3분 12초짜리 대본으로 팔고, 그가 파는 사람들은 그가 이름을 아는 사람들입니다. 당신이 온 이유는 '판매 적정성 사후 점검'이라는 이름의 잡무입니다.",
+  },
+  {
+    id: "prologue05",
+    label: "프롤로그 05",
+    title: "지하 4층",
+    trigger: "무력감 / 자기인식 / 시스템",
+    status: "LOCKED",
+    summary:
+      "2023년 7월, 인사 제2023-1187호. 사유 칸도 제안자 칸도 비어 있습니다. 합정동 옛 전산센터 4층, 모두가 지하 4층이라 부르는 방에서 에코가 첫 질문을 합니다. 그리고 3년이 지납니다.",
+  },
   {
     id: "case01",
     label: "사건 01",

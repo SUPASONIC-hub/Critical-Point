@@ -166,6 +166,28 @@ const STEAM_MOTIFS = new Set(["market", "cafe"]);
 const NIGHT_MARKERS = ["새벽", "마지막 밤", "23:", "00:", "02:", "소등"];
 
 /**
+ * Clocks at the end of the working day.
+ *
+ * Light was a switch -- day or night -- and most of this season happens in the
+ * hour the switch misses: the 18시 회의, the 퇴근길, the shutter coming down on
+ * a 객장. Those scenes drew full daylight and read like mid-morning. A dusk
+ * clock takes the sun down to the far edge of the room instead, so the same
+ * drawing is lit from the side and throws a long shadow across its floor.
+ */
+const DUSK_MARKERS = ["노을", "해질", "해 질", "저녁", "퇴근", "일몰", "땅거미", "17:", "18:", "19:", "20:"];
+
+/**
+ * Rooms made of paper, where a sheet is always in the air.
+ *
+ * This season is a story about documents -- an opinion that was not filed, a
+ * signature box left blank, a notebook of names -- and the rooms those
+ * documents live in were drawn as furniture with nothing moving in them. A few
+ * loose sheets turning slowly in the light is the one motif that says what the
+ * room is for without a caption.
+ */
+const PAPER_MOTIFS = new Set(["archive", "desk", "counter", "courtroom", "chamber", "lobby"]);
+
+/**
  * Clocks that say it is winter. The season runs from 추석 to the next March, so
  * the middle cases stand in snow; a month is read as a whole word so 11월 is not
  * 1월 and 12월 is.
@@ -328,12 +350,21 @@ export function getScenePlate(node = {}, nodeId = "") {
   const seed = hashString(`${nodeId}:${place}`);
   const night = NIGHT_MARKERS.some((marker) => clock.includes(marker));
   const winter = WINTER_MARKERS.some((marker) => clock.includes(marker)) || WINTER_MONTH.test(clock);
+  const pressure = PRESSURE_PHASES.has(node.phase);
   return {
     motif,
     seed,
     tone: getPlateTone(place),
-    accent: PRESSURE_PHASES.has(node.phase) ? "heat" : "chip",
+    accent: pressure ? "heat" : "chip",
     night,
+    // The hour between the two: lit from the side, with the day nearly gone.
+    // Night wins, because a clock that says both is past the switch already.
+    dusk: !night && DUSK_MARKERS.some((marker) => clock.includes(marker)),
+    // Paper hangs where paper is kept, and never in weather that would take it.
+    paper: PAPER_MOTIFS.has(motif),
+    // A pressure beat is drawn, not only shaded: the far wall steps back and
+    // the near one steps up, so the room closes on the reader.
+    pressure,
     // The effects layer. Each is a fact the scene already states: a public room
     // is being photographed, open sky by day lets light in, and a night under
     // pressure outdoors gets its storm.

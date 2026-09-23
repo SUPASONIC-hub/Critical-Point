@@ -146,7 +146,11 @@ const fileBudgets = {
   // the price board, the near-plane sway, the mood grade, the light leak).
   // 500 / 11300 -> 590 / 13100 later on 2026-09-22 for the seasons of the second
   // year: blossom, the monsoon's puddles, heat haze, fireworks, leaves, the moon.
-  "plate.css": { lines: 590, bytes: 13100 },
+  // 590 / 13100 -> 665 / 15000 on 2026-09-23 for the hour the light switch
+  // missed (dusk), the paper that turns in the rooms made of paper, the near and
+  // far planes closing on a pressure beat, and the backdrop breathing behind the
+  // table instead of standing still under a running clock.
+  "plate.css": { lines: 665, bytes: 15400 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken

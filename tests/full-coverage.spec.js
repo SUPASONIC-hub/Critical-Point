@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { CASE_SEQUENCE, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, CASE_START_NODES, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 import {
   ACTION_TIMEOUT_MS,
   chooseSceneChoice,
@@ -98,7 +98,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
     collectRuntimeErrors(page, errors);
     const random = createSeededRandom(seed);
 
-    await startDebugNode(page, "case01", "start");
+    await startDebugNode(page, CASE_SEQUENCE[0], CASE_START_NODES[CASE_SEQUENCE[0]]);
     for (let index = 0; index < CASE_SEQUENCE.length; index += 1) {
       const caseId = CASE_SEQUENCE[index];
       await completeCase(page, random);
@@ -118,7 +118,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
     }
     await expect(page.locator(".ending-sequence")).toBeVisible({ timeout: 8000 });
     const completed = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).completedCases;
-    expect(completed).toHaveLength(7);
+    expect(completed).toHaveLength(CASE_SEQUENCE.length);
     if (errors.length) throw new Error(errors.slice(0, 2).join("\n"));
   });
 }
@@ -129,7 +129,7 @@ test("saved state survives reload stress during complete season @full", async ({
   collectRuntimeErrors(page, errors);
   const random = createSeededRandom(20260828);
 
-  await startDebugNode(page, "case01", "start");
+  await startDebugNode(page, CASE_SEQUENCE[0], CASE_START_NODES[CASE_SEQUENCE[0]]);
   for (let index = 0; index < CASE_SEQUENCE.length; index += 1) {
     const before = await page.evaluate(() => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));

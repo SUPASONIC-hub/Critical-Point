@@ -899,10 +899,10 @@ test("the ending reads what the run did at the table", () => {
   // 16 busts wrecked an eight-case season. Busts are read as a rate over the
   // season's length and the collapse line rises with it, so a ten-case season
   // needed 26, an eleven-case season 33, a twelve-case season 40, a
-  // thirteen-case season 49, a twenty-five-case season 94 and a fifty-case
-  // season 188: the bust rate divides by the season length and the gate
-  // stopped rising at thirteen.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 188, seasonBestMultiplier: 32 });
+  // thirteen-case season 49, a twenty-five-case season 94, a fifty-case season
+  // 188 and a fifty-five-case season 207: the bust rate divides by the season
+  // length and the gate stopped rising at thirteen.
+  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 207, seasonBestMultiplier: 32 });
   assert.equal(wrecked.id, "collapse");
   assert.equal(wrecked.failure, true);
 });
@@ -1197,7 +1197,10 @@ test("a case opens when the case before it in the season is complete", async () 
   const { seasonCasesBase } = await import("../src/gameCases.js");
   const { createSeasonCases: build } = await import("../src/viewModels/seasonViewModels.js");
   const statusOf = (completedCases, id) => build({ seasonCasesBase, completedCases, currentCase: "" }).find((item) => item.id === id).status;
-  assert.equal(statusOf([], "case01"), "OPEN");
+  // The 프롤로그 is the season's door now, so 사건 01 is locked until it closes.
+  assert.equal(statusOf([], "prologue01"), "OPEN");
+  assert.equal(statusOf([], "case01"), "LOCKED", "사건 01 waits for the 프롤로그");
+  assert.equal(statusOf(["prologue01", "prologue02", "prologue03", "prologue04", "prologue05"], "case01"), "OPEN", "사건 01 opens after 프롤로그 05");
   assert.equal(statusOf(["case01", "case02", "case03", "case04", "case05"], "case06"), "OPEN", "case 06 opens after case 05");
   assert.equal(statusOf(["case01", "case02", "case03", "case04", "case05"], "final"), "LOCKED", "the finale no longer opens straight after case 05");
   const allButFinal = seasonCasesBase.map((item) => item.id).filter((id) => id !== "final");

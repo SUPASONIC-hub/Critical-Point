@@ -17,6 +17,7 @@ export function GameHeader({
   onSave,
   onSaveAndExit,
   onReset,
+  caseLabel,
   caseNumber,
   caseTotal,
   progress,
@@ -48,7 +49,9 @@ export function GameHeader({
       {/* Layer 1 keeps exactly two standing numbers: which case, and how far in. */}
       <div className="status-bar" aria-label="현재 진행 상태">
         <span>
-          사건 <b>{caseNumber}</b>/{caseTotal}
+          {caseLabel ? <b>{caseLabel}</b> : <>사건 <b>{caseNumber}</b></>}
+          <i aria-hidden="true"> · </i>
+          {caseNumber}/{caseTotal}
         </span>
         <div
           className="status-bar-progress"

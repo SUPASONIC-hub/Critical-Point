@@ -30,6 +30,9 @@ import {
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
   CASE_START_NODES,
+  SEASON_ENTRY_CASE,
+  SEASON_ENTRY_NODE,
+  caseAftermathNodeId,
   caseObjectives,
   caseOpeningRoutes,
   cognitionLabels,
@@ -308,23 +311,23 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
-    : "case01";
+    : SEASON_ENTRY_CASE;
   const operatorProfile = getOperatorProfile(operatorOrigin);
   function setOperatorOrigin(value) {
     const nextOrigin = getOperatorProfiles().some((profile) => profile.id === value) ? value : "courier";
     setOperatorOriginState(nextOrigin);
     writeStoredValue(OPERATOR_ORIGIN_KEY, nextOrigin);
   }
-  const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders.case01;
+  const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders[SEASON_ENTRY_CASE];
   const debugNodeOptions = nodeOrders[debugCaseId] ?? nodeOrders.case05;
-  const fallbackNodeId = activeNodeOrder[0] ?? "start";
+  const fallbackNodeId = activeNodeOrder[0] ?? SEASON_ENTRY_NODE;
   const resolvedNodeId = nodes[nodeId] ? nodeId : fallbackNodeId;
   const branchOpeningNodeIds = new Set([
     CASE_START_NODES[fallbackCaseId],
     ...Object.values(caseOpeningRoutes[fallbackCaseId] ?? {}),
   ]);
   const isOpeningNode = branchOpeningNodeIds.has(resolvedNodeId);
-  const node = nodes[resolvedNodeId] ?? nodes.start;
+  const node = nodes[resolvedNodeId] ?? nodes[SEASON_ENTRY_NODE];
   const isResult = Object.values(CASE_RESULT_NODES).includes(nodeId);
   const {
     endingStep,
@@ -360,7 +363,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const currentCaseFreeTextSuccessCount = freeTextSuccessEntries.filter(
     (entry) => entry.caseId === fallbackCaseId,
   ).length;
-  const aftermathNodeId = fallbackCaseId === "final" ? "f_aftershock" : `${fallbackCaseId.replace("case", "c")}_aftershock`;
+  const aftermathNodeId = caseAftermathNodeId(fallbackCaseId);
   const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseFreeTextSuccessCount >= 2;
   const adaptiveChoice = useMemo(
     () =>
@@ -809,7 +812,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
-    const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes.case01;
+    const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
     const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
     const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
     const startNode = caseOpeningRoutes[caseId]?.[previousResult?.outcomeChoiceId] ?? baseStartNode;
@@ -838,7 +841,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     const openingEcho = previousOutcome
       ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
       : introEcho;
-    const originEffect = caseId === "case01" && !previousResult ? getOriginStartEffects(operatorOrigin) : {};
+    // The origin bonus is the run's opening hand, so it belongs to the season's
+    // first case -- which is the 프롤로그 now, not 사건 01.
+    const originEffect = caseId === SEASON_ENTRY_CASE && !previousResult ? getOriginStartEffects(operatorOrigin) : {};
     const openingResources = applyEffect(previousResult ? applyEffect(initialResources, openingEffect) : initialResources, originEffect);
     appendTraceEvent({
       kind: "case-start",
