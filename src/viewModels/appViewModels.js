@@ -36,7 +36,7 @@ export const viewGroups = {
   intro: {
     common: [
       "AdaptiveMusic", "musicModeKey", "renderRecoveryNotice", "renderErrorLogPanel", "renderSaveStatus",
-      "setShowRanking", "GAME_TITLE", "GAME_TITLE_READING", "GAME_SUBTITLE", "simplifyPlayerText",
+      "setShowRanking", "setShowBoard", "GAME_TITLE", "GAME_TITLE_READING", "GAME_SUBTITLE", "simplifyPlayerText",
       "activeCaseMeta", "nextParticipantMessage", "triggerLabels",
     ],
     start: [
@@ -115,12 +115,8 @@ export const viewGroups = {
     ],
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId"],
     gauntlet: [
-      "gauntletRun", "gauntletSeed", "resolveGauntlet", "isAdvancing", "fixedChoices", "clueCount", "markWindowTouched",
+      "gauntletRun", "gauntletSeed", "resolveGauntlet", "isAdvancing", "fixedChoices", "clueCount", "reframeChoice", "markWindowTouched",
       "decisionRevealOpen", "staleSave", "reloadFromStorage",
-    ],
-    freeInput: [
-      "freeChoice", "freeText", "updateFreeText", "FREE_TEXT_MAX_LENGTH", "freeTextBlockedByPrivacy",
-      "activePrivacySignals", "anonymizeFreeText",
     ],
     status: ["resources", "resourceMeta", "progress", "saveCurrentGame", "reset", "routeIndex", "routeLength"],
     debug: [

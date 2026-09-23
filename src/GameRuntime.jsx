@@ -10,7 +10,6 @@ import {
   NEW_GAME_PLUS_KEY,
   NEW_GAME_PLUS_MEMORY_KEY,
   OPERATOR_ORIGIN_KEY,
-  FREE_TEXT_MAX_LENGTH,
   normalizeFeedback,
   normalizePlayerName,
   normalizeSavedText,
@@ -36,7 +35,7 @@ import {
   caseObjectives,
   caseOpeningRoutes,
   cognitionLabels,
-  freeTextRouteNodes,
+  reframeRouteNodes,
   initialResources,
   nodeOrders,
   nodes,
@@ -50,7 +49,6 @@ import {
 } from "./gameData.js";
 import {
   applyEffect,
-  anonymizeSensitiveText,
   buildSceneBeat,
   clamp,
   createCaseSummary,
@@ -67,7 +65,8 @@ import {
   getCounterfactualReport,
   getDramaticChoiceLabel,
   getEcho,
-  getFreeTextSignals,
+  REFRAME_COGNITION,
+  REFRAME_EFFECT,
   getGameplayStats,
   getObservationLedger,
   getObserverPattern,
@@ -78,7 +77,6 @@ import {
   getSuspenseState,
   limitText,
   makeEmptyScores,
-  scoreFreeText,
 } from "./gameLogic.js";
 import {
   getSessionId,
@@ -116,6 +114,7 @@ import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
 import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
+import { useBoard } from "./state/useBoard.js";
 import { buildPlaytestExport, downloadJson } from "./state/playtestExport.js";
 import { createClipboardActions, useClipboardStatus } from "./state/useClipboardStatus.js";
 import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js";
@@ -127,7 +126,6 @@ import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
 import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { safeStringify } from "./state/diagnosticUtils.js";
-import { useFreeTextEnrichment } from "./state/useFreeTextEnrichment.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
 import { caseIntroEchoes, chapterRules, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
@@ -147,6 +145,7 @@ import {
 } from "./advancedSystems.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
 const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(({ ResultScreen }) => ({ default: ResultScreen })));
 const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScreen }) => ({ default: PlayScreen })));
@@ -192,7 +191,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     completedCases, setCompletedCases, discoveredClues, setDiscoveredClues,
     caseResults, setCaseResults, playtestFeedback, setPlaytestFeedback, nodeId, setNodeId,
     resources, setResources, log, setLog, triggers, setTriggers, cognition, setCognition,
-    freeText, setFreeText, lastSavedAt, setLastSavedAt, isPausedSave, setIsPausedSave,
+    lastSavedAt, setLastSavedAt, isPausedSave, setIsPausedSave,
     pendingTelemetry, setPendingTelemetry, protocolUsed, setProtocolUsed,
     timerPenaltyCount, setTimerPenaltyCount, probeUsed, setProbeUsed,
     investigatedTargets, setInvestigatedTargets, hypothesisDecisions, setHypothesisDecisions,
@@ -202,7 +201,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     initialResources,
     triggerDefaults: makeEmptyScores(triggerLabels),
     cognitionDefaults: makeEmptyScores(cognitionLabels),
-    normalizeText: (value) => normalizeSavedText(value, FREE_TEXT_MAX_LENGTH),
   });
   const [decisionReveal, setDecisionReveal] = useState(null);
   // The run's gauntlet: pot, vault, and the rules the next window is dealt from.
@@ -229,6 +227,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const [saveStatus, setSaveStatus] = useState("");
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
+  const [showBoard, setShowBoard] = useState(false);
   const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
   const [telemetryStatus, setTelemetryStatus] = useState({
@@ -265,7 +264,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
   const visibilityPauseRef = useRef(null);
-  const freeTextSaveTimerRef = useRef(null);
 
   const {
     persist: persistenceApi,
@@ -285,7 +283,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     state: {
       runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
       discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
-      freeText, echo, nodeEnteredAt, protocolUsed, timerPenaltyCount, probeUsed,
+      echo, nodeEnteredAt, protocolUsed, timerPenaltyCount, probeUsed,
       investigatedTargets, hypothesisDecisions, dynamics: serializeRunState(gauntletRun),
       isPausedSave, saveSlots,
     },
@@ -295,7 +293,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
       setCognition, setProtocolUsed, setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
       setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
-      setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText, setNodeId,
+      setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setNodeId,
       setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots,
     },
     config: {
@@ -356,21 +354,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         : null,
     [caseResults.final, completedCases, playerName, runId, sessionCode],
   );
-  const privacySignals = detectPrivacySignals(freeText);
-  const activePrivacySignals = privacySignals.filter((signal) => signal.active);
-  const freeTextBlockedByPrivacy = activePrivacySignals.length > 0;
-  const freeTextSuccessEntries = log.filter((entry) => entry.freeTextSuccess);
-  const currentCaseFreeTextSuccessCount = freeTextSuccessEntries.filter(
+  const reframeEntries = log.filter((entry) => entry.reframeOpenedRoute);
+  const currentCaseReframeCount = reframeEntries.filter(
     (entry) => entry.caseId === fallbackCaseId,
   ).length;
   const aftermathNodeId = caseAftermathNodeId(fallbackCaseId);
-  const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseFreeTextSuccessCount >= 2;
+  const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseReframeCount >= 2;
   const adaptiveChoice = useMemo(
     () =>
       adaptiveChoiceUnlocked
         ? {
             id: `${fallbackCaseId}_adaptive_reframe`,
-            label: "앞서 남긴 문장을 공개 기준으로 삼는다",
+            label: "앞서 다시 짠 판을 공개 기준으로 삼는다",
             effect: { legitimacy: 7, trust: 5, fatigue: 4 },
             next: node?.choices?.[0]?.next ?? "result",
             cognition: { reframing: 2, persistence: 1 },
@@ -400,12 +395,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       }
     : null;
   const fixedChoices = [
-    ...(node?.choices?.filter((choice) => choice.type !== "free") ?? []),
+    ...(node?.choices?.filter((choice) => choice.type !== "reframe") ?? []),
     ...(continuityMemoryChoice ? [continuityMemoryChoice] : []),
     ...(adaptiveChoice ? [adaptiveChoice] : []),
     ...(relationshipChoice ? [relationshipChoice] : []),
   ];
-  const freeChoice = node?.choices?.find((choice) => choice.type === "free");
+  const reframeChoice = node?.choices?.find((choice) => choice.type === "reframe");
   const currentAverageResponseTime =
     log.length > 0
       ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
@@ -459,12 +454,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     0,
   );
   const unopenedRecordCount = unopenedClueCount + unopenedBranchCount;
-  // The quiet beat shows the player their own words: a free-text line that
-  // cleared the privacy check, otherwise the last thing they chose to say.
-  const endingQuietLine =
-    [...log].reverse().find((entry) => entry.freeTextSuccess && entry.freeText)?.freeText ??
-    [...log].reverse().find((entry) => entry.spokenChoice)?.spokenChoice ??
-    "";
+  // The quiet beat shows the player their own words -- which are now always a
+  // line they picked rather than one they typed.
+  const endingQuietLine = [...log].reverse().find((entry) => entry.spokenChoice)?.spokenChoice ?? "";
   const decisionLedger = getDecisionLedger(log, resources);
   const decisionFingerprint = getDecisionFingerprint({
     triggerScores: triggers,
@@ -477,7 +469,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     [log],
   );
   const {
-    freeCount: freeTextCombo,
+    reframeCount: reframeCombo,
     reducedRiskCount,
     challengeClearCount,
     currentChallengeStreak,
@@ -491,12 +483,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     momentumTier,
     rank: gameplayRank,
   } = gameplayStats;
-  const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, freeTextCombo, log });
+  const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log });
   const inheritedChallenge = useMemo(
     () => createInheritedChallenge({ isOpeningNode, openingLegacy }),
     [isOpeningNode, openingLegacy],
   );
-  const sceneChallenge = createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure });
+  const sceneChallenge = createSceneChallenge({ reframeChoice, reframeCombo, inheritedChallenge, node, riskPressure });
   const {
     mergeEffects,
     getClueReveal,
@@ -508,7 +500,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     riskPressure,
     discoveredClues,
     currentCase,
-    freeText,
     currentChallengeStreak,
     resourceMeta,
   });
@@ -569,7 +560,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setSaveStatus,
     setLastSavedAt,
   });
-  const { enrichEntry, abortEnrichment } = useFreeTextEnrichment(setLog, { sessionId, sessionCode, runId, queueTelemetry });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
   const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
@@ -727,9 +717,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     hadDecisionRevealRef.current = false;
     window.requestAnimationFrame(() => sceneTitleRef.current?.focus({ preventScroll: true }));
   }, [decisionReveal]);
-  useEffect(() => () => {
-    window.clearTimeout(freeTextSaveTimerRef.current);
-  }, []);
 
   const musicModeKey = useMemo(() => {
     if (!started) return "intro:menu";
@@ -858,7 +845,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setCurrentCase(caseId);
     setNodeId(startNode);
     setResources(openingResources);
-    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
@@ -874,7 +860,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setGauntletRun(openingRun);
     resetEndingSequence();
     setEcho(openingEcho);
-    setFreeText("");
     setNodeEnteredAt(nowMs());
     persist({
       started: true,
@@ -885,7 +870,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       log: [],
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
-      freeText: "",
       protocolUsed: false,
       timerPenaltyCount: 0,
       probeUsed: false,
@@ -896,20 +880,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     });
   }
 
-  function anonymizeFreeText() {
-    updateFreeText(anonymizeSensitiveText(freeText));
-  }
-
-  function updateFreeText(value) {
-    const nextText = limitText(value, FREE_TEXT_MAX_LENGTH);
-    setFreeText(nextText);
-    window.clearTimeout(freeTextSaveTimerRef.current);
-    freeTextSaveTimerRef.current = window.setTimeout(() => {
-      persist({ freeText: nextText });
-      freeTextSaveTimerRef.current = null;
-    }, 400);
-  }
-
   function buildCaseSummary(nextTriggers, nextCognition, nextLog, nextResources = resources) {
     return createCaseSummary(nextTriggers, nextCognition, nextLog, {
       resources: nextResources,
@@ -918,8 +888,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
 
-  function getFreeTextBranchTarget(caseId, fromNodeId) {
-    const dramaticRoute = freeTextRouteNodes[caseId];
+  /**
+   * Where 판을 다시 짠다 leads.
+   *
+   * It used to lead nowhere unless a typed sentence scored three of four
+   * keyword signals, which meant the case's whole authored hidden route hung
+   * off a regex the player could not see. The card is an ordinary card now:
+   * taking it opens the route, once per case, and the three concrete options
+   * waiting there are the decision. What the sentence used to buy, the card's
+   * own price buys.
+   */
+  function getReframeTarget(caseId, fromNodeId) {
+    const dramaticRoute = reframeRouteNodes[caseId];
     if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) {
       return dramaticRoute;
     }
@@ -991,27 +971,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       reportSilentFailure("bad-next", { from: resolvedNodeId, choiceId: choice.id, next: choice.next });
       return;
     }
-    window.clearTimeout(freeTextSaveTimerRef.current);
-    freeTextSaveTimerRef.current = null;
     setIsAdvancing(true);
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
     const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (nowMs() - nodeEnteredAt) / 1000));
-    const free = choice.type === "free";
-    const freeResult = free ? scoreFreeText(freeText) : null;
-    const submittedFreeText = free ? freeText.trim() : "";
-    const submittedSignals = free ? getFreeTextSignals(submittedFreeText) : [];
-    const submittedSignalCount = submittedSignals.filter((signal) => signal.active).length;
-    const submittedPrivacySignals = free ? detectPrivacySignals(submittedFreeText) : [];
-    const freeTextSuccess =
-      free &&
-      windowState.status === "cashed" &&
-      submittedSignalCount >= 3 &&
-      !submittedPrivacySignals.some((signal) => signal.active);
-    const freeTextBranchTarget = free && freeTextSuccess && currentCaseFreeTextSuccessCount === 0
-      ? getFreeTextBranchTarget(currentCase, resolvedNodeId)
+    const reframe = choice.type === "reframe";
+    // A reframe that busts is still a reframe the player paid for, but it does
+    // not open a door: the wall took the window before the new board was laid.
+    const reframeOpenedRoute = reframe && windowState.status === "cashed";
+    const reframeTarget = reframeOpenedRoute && currentCaseReframeCount === 0
+      ? getReframeTarget(currentCase, resolvedNodeId)
       : null;
-    const baseEffect = free ? freeResult.effect : choice.effect;
-    const cognitiveEffect = free ? freeResult.cognition : choice.cognition;
+    const baseEffect = reframe ? REFRAME_EFFECT : choice.effect;
+    const cognitiveEffect = reframe ? REFRAME_COGNITION : choice.cognition;
     const {
       challengeMatch,
       tacticalRead,
@@ -1023,7 +994,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       resources,
       previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
     });
-    const plannedNode = freeTextBranchTarget ?? branchBypass ?? choice.next;
+    const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
     const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
@@ -1038,7 +1009,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       fractureRate: verdict.fractureRate,
       focusMultiplier: verdict.focus?.resourceMultiplier,
     });
-    const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, freeTextSuccess);
+    const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, reframeOpenedRoute);
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: "숨은 단서를 확보했다.", effect: { legitimacy: 2, fatigue: -1 } }
       : null;
@@ -1055,7 +1026,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     const nextCognition = { ...cognition };
 
     node.triggers.forEach((trigger) => {
-      nextTriggers[trigger] = (nextTriggers[trigger] ?? 0) + (free ? 10 : 6);
+      nextTriggers[trigger] = (nextTriggers[trigger] ?? 0) + (reframe ? 10 : 6);
     });
     Object.entries(cognitiveEffect ?? {}).forEach(([key, value]) => {
       nextCognition[key] = (nextCognition[key] ?? 0) + value;
@@ -1070,17 +1041,16 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       chapterRule: chapterRules[currentCase]?.label ?? "",
       choice: choice.label,
       spokenChoice: getDramaticChoiceLabel(choice),
-      freeText: submittedFreeText,
-      freeTextSignalCount: submittedSignalCount,
-      freeTextSuccess,
-      freeTextBranchId: freeTextBranchTarget,
+      reframe,
+      reframeOpenedRoute,
+      reframeBranchId: reframeTarget,
       continuityMemory: Boolean(choice.continuityMemory),
       routeChangeKind: choice.continuityMemory
         ? "memory"
         : String(choice.id ?? "").includes("evidence_turn")
           ? "evidence-turn"
-          : freeTextBranchTarget
-            ? "free-text"
+          : reframeTarget
+            ? "reframe"
             : blackoutSkip
               ? "blackout-skip"
               : undefined,
@@ -1089,8 +1059,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       riskRewardEffect: gauntletEffect,
       cognition: cognitiveEffect ?? {},
       triggers: node.triggers,
-      echo: getEcho(choice.id, free ? freeText : ""),
-      sceneBeat: buildSceneBeat(node, choice, free ? freeText : "", finalEffect),
+      echo: getEcho(choice.id),
+      sceneBeat: buildSceneBeat(node, choice, finalEffect),
       challenge: {
         title: sceneChallenge.title,
         matched: challengeMatch,
@@ -1122,7 +1092,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       suspenseEvent,
       clue,
-      note: freeResult?.note ?? "",
       responseTimeSec,
       resourcesBefore: resources,
       resourcesAfter: finalResources,
@@ -1133,9 +1102,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     };
 
     const nextLog = [...log, entry];
-    const safeQuote = freeTextSuccess ? limitText(submittedFreeText, 140) : "";
-    const nextEcho = safeQuote
-      ? `${entry.echo} 다음 장면은 당신이 남긴 문장 “${safeQuote}”을 기준으로 이어집니다.`
+    const nextEcho = reframeTarget
+      ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
       : entry.echo;
     appendTraceEvent({
       kind: "choose",
@@ -1293,22 +1261,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setTriggers(nextTriggers);
     setCognition(nextCognition);
     setLog(nextLog);
-    // Two gates before a player's own sentence leaves the device. Consent is
-    // the same one telemetry asks for; the privacy signals are the check that
-    // already refuses to quote this text back into the next scene, and text too
-    // sensitive to echo locally is text too sensitive to send.
-    if (free && submittedFreeText && dataConsent && !submittedPrivacySignals.some((signal) => signal.active)) {
-      enrichEntry(nextLog.length - 1, { caseId: fallbackCaseId, nodeId: resolvedNodeId, choiceId: choice.id }, {
-        freeText: submittedFreeText,
-        caseId: fallbackCaseId,
-        stageName: activeCaseMeta?.label ?? "",
-        presentedOptions: (node.choices ?? []).filter((item) => item.type !== "free").map((item) => item.label),
-        resources,
-        appliedEffect: finalEffect,
-      });
-    }
     setEcho(nextEcho);
-    setFreeText("");
     setNodeId(nextNode);
     setCompletedCases(nextCompletedCases);
     setCaseResults(nextCaseResults);
@@ -1339,7 +1292,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
       discoveredClues: nextDiscoveredClues,
-      freeText: "",
       timerPenaltyCount: 0,
       probeUsed: false,
       dynamics: serializeRunState(nextRun),
@@ -1384,7 +1336,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLastRecoveredError(null);
     setNodeId("start");
     setResources(initialResources);
-    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
@@ -1396,7 +1347,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setDecisionReveal(null);
     setGauntletRun(RUN_INITIAL_STATE);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
-    setFreeText("");
     let resetErrorLogSaved = true;
     if (failedResetKeys.length > 0) {
       resetErrorLogSaved = appendStoredErrorLog({
@@ -1510,7 +1460,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setCompletedCases(allPreviousCases);
     setNodeId(nextNodeId);
     setResources(initialResources);
-    abortEnrichment();
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
@@ -1520,7 +1469,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setGauntletRun(RUN_INITIAL_STATE);
     setOpeningLegacy(null);
     setDecisionReveal(null);
-    setFreeText("");
     setEcho(echoText);
     setShowErrorLog(false);
     setNodeEnteredAt(now);
@@ -1536,8 +1484,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         log: [],
         triggers: makeEmptyScores(triggerLabels),
         cognition: makeEmptyScores(cognitionLabels),
-        freeText: "",
-        echo: echoText,
+          echo: echoText,
         protocolUsed: false,
         timerPenaltyCount: 0,
         probeUsed: false,
@@ -1589,7 +1536,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         challengeClearCount,
         reducedRiskCount,
         currentChallengeStreak,
-        freeTextCombo,
+        reframeCombo,
         riskPressure,
         riskTier,
         activeBonus,
@@ -1614,6 +1561,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     localLeaderboardRows,
     localSeasonLeaderboardRow,
   });
+  const board = useBoard({ showBoard, isOnline });
 
   const { copySessionCode, copyDiagnosticTrace, copyReplayLink } = createClipboardActions({
     flashCopyStatus,
@@ -1721,7 +1669,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const achievementBadges = createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier });
   const feedbackPrompts = [
     `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
-    result.freeCount > 0
+    result.reframeCount > 0
       ? "구조 재설계 입력이 선택지 밖의 계획처럼 느껴졌나요?"
       : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
     nextCaseSignal
@@ -1778,6 +1726,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       </Suspense>
     );
   }
+
+  if (showBoard && !started) {
+    return (
+      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+        <BoardScreen {...board} Music={AdaptiveMusic} gameTitle={GAME_TITLE} onClose={() => setShowBoard(false)} />
+      </Suspense>
+    );
+  }
   const introView = createIntroViewModel({
     AdaptiveMusic,
     playerName, setPlayerName, playStyle, setPlayStyle, dataConsent, setDataConsent,
@@ -1785,6 +1741,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase,
     newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
     startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame, persist, setShowRanking,
+    setShowBoard,
     setSaveStatus, pendingTelemetry, setPendingTelemetry: replacePendingTelemetry, setTelemetryStatus,
     runtime: {
       node, progress, seasonJourney, nodes, nodeOrders,
@@ -1818,12 +1775,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
     gauntletRun, gauntletSeed: dealGauntletSeed(`${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}`), resolveGauntlet: renderNothing,
     isAdvancing, markWindowTouched: renderNothing, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage: renderNothing,
-    fixedChoices, clueCount,
-    freeChoice, freeText, updateFreeText: renderNothing, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals,
-    anonymizeFreeText: renderNothing,
+    fixedChoices, clueCount, reframeChoice,
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
   });
-  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, updateFreeText, anonymizeFreeText, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
+  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
 
 }

@@ -156,15 +156,11 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await dismissProtocolBreach(page);
-    if (choice.type === "free") {
+    if (choice.type === "reframe") {
       await page.locator(".gx-card-wild").evaluate((button) => button.click());
-      await page.locator(".reframe-box textarea").fill(
-        "Separate people, evidence, and conditions before deciding the next step.",
-        { timeout: ACTION_TIMEOUT_MS },
-      );
       await cashStakedCard(page);
     } else {
-      const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "free").length - 1;
+      const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "reframe").length - 1;
       await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
       try {
         await cashStakedCard(page);

@@ -36,7 +36,14 @@ const budgets = [
   // carries 49 case titles, summaries and objectives (`gameCases.js`).
   // 125_000 -> 132_000 on 2026-09-23: the season list the intro draws carries
   // five more titles, summaries and objectives.
-  { pattern: /^index-.*\.js$/, maxBytes: 132_000 },
+  // 132_000 -> 134_000 on 2026-09-23 for the 참가자 게시판. What lands here is
+  // only the shell's half -- `useBoard` and the `showBoard` branch; the screen
+  // itself is a 4KB lazy chunk. The hook reads its two privacy regexes from
+  // `src/privacyText.js` rather than `gameLogic.js` precisely to keep this
+  // number where it is: importing them from gameLogic measured at 3,130_000,
+  // because gameData.js merges the case packs at module scope and rollup cannot
+  // shake that out.
+  { pattern: /^index-.*\.js$/, maxBytes: 134_000 },
   // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
   // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
   // day for the market, memorial and factory painters and the steam layer.

@@ -6,7 +6,7 @@ import {
   STORAGE_KEY,
   writeStoredValue,
 } from "../appConfig.js";
-import { saveAnalysisTelemetry, saveCaseTelemetry, saveErrorTelemetry, saveFeedbackTelemetry } from "../telemetry.js";
+import { saveCaseTelemetry, saveErrorTelemetry, saveFeedbackTelemetry } from "../telemetry.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
 import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
 
@@ -72,7 +72,6 @@ export function useTelemetryQueue({
     if (item.type === "case") return saveCaseTelemetry(item.payload, item.id);
     if (item.type === "feedback") return saveFeedbackTelemetry(item.payload, item.id);
     if (item.type === "error") return saveErrorTelemetry(item.payload, item.id);
-    if (item.type === "analysis") return saveAnalysisTelemetry(item.payload, item.id);
     throw new Error(`Unknown telemetry item type: ${item.type}`);
   }
 

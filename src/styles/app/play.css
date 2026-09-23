@@ -1556,17 +1556,6 @@
   box-shadow: none;
 }
 
-.gx-wild textarea {
-  width: 100%;
-  min-height: 72px;
-  padding: 10px 12px;
-  color: var(--ui-text);
-  background: var(--ui-surface-1);
-  border: 1px solid var(--c-violet);
-  border-radius: var(--ui-radius-sm);
-  font: inherit;
-}
-
 /* The dock ------------------------------------------------------------------
    Push is heat, lock is the beat, cash is the one acid control on the table. */
 .gx-actions {
@@ -2592,8 +2581,7 @@
   }
 
   .gx-table > .gx-hand-head,
-  .gx-table > .gx-hand,
-  .gx-table > .gx-wild {
+  .gx-table > .gx-hand {
     grid-column: 2;
   }
 

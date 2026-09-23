@@ -237,7 +237,7 @@ test("the densest decisions fit above the action bar on every board", async ({ p
 
 test("a small phone fits every fresh board's decision", async ({ page }) => {
   // 360x740 holds a fresh board with the last card staked; a board carrying
-  // rules can still push the wild card under the bar there. See priority 27.
+  // rules can still push the reframe card under the bar there. See priority 27.
   await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
   await startDebugNode(page, "case01", "c1_final_system");
   await expectHandAboveActionBar(page, "case01/c1_final_system on a fresh board at 360x740");

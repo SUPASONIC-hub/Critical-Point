@@ -17,18 +17,14 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
     },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId },
     gauntlet: {
-      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount,
+      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount, reframeChoice,
       markWindowTouched: viewMarkWindowTouched, decisionRevealOpen, staleSave, reloadFromStorage: viewReloadFromStorage },
-    freeInput: {
-      freeChoice, freeText, updateFreeText: viewUpdateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy,
-      activePrivacySignals, anonymizeFreeText: viewAnonymizeFreeText,
-    },
     status: { resources, resourceMeta, progress, saveCurrentGame: viewSaveCurrentGame, reset: viewReset, routeIndex, routeLength },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: viewCopyReplayLink, copyDiagnosticTrace: viewCopyDiagnosticTrace },
   } = view;
   const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
   const saveCurrentGame = actions.saveCurrentGame ?? viewSaveCurrentGame; const resolveGauntlet = actions.resolveGauntlet ?? viewResolveGauntlet; const markWindowTouched = actions.markWindowTouched ?? viewMarkWindowTouched; const reloadFromStorage = actions.reloadFromStorage ?? viewReloadFromStorage; const pickRelic = actions.pickRelic; const onSuspendable = actions.onSuspendable ?? null;
-  const updateFreeText = actions.updateFreeText ?? viewUpdateFreeText; const anonymizeFreeText = actions.anonymizeFreeText ?? viewAnonymizeFreeText; const reset = actions.reset ?? viewReset; const copyReplayLink = actions.copyReplayLink ?? viewCopyReplayLink; const copyDiagnosticTrace = actions.copyDiagnosticTrace ?? viewCopyDiagnosticTrace;
+  const reset = actions.reset ?? viewReset; const copyReplayLink = actions.copyReplayLink ?? viewCopyReplayLink; const copyDiagnosticTrace = actions.copyDiagnosticTrace ?? viewCopyDiagnosticTrace;
   const titleRef = sceneTitleRef ?? viewSceneTitleRef;
 
   return (
@@ -63,7 +59,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         seed={gauntletSeed}
         run={gauntletRun}
         cards={fixedChoices}
-        freeChoice={freeChoice}
+        reframeChoice={reframeChoice}
         resources={resources}
         resourceMeta={resourceMeta}
         clueCount={clueCount}
@@ -73,10 +69,6 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         onTouch={markWindowTouched} onPickRelic={pickRelic} onSuspendable={onSuspendable}
         staleSave={staleSave}
         onReload={reloadFromStorage}
-        freeInput={{
-          freeText, updateFreeText, FREE_TEXT_MAX_LENGTH, freeTextBlockedByPrivacy, activePrivacySignals,
-          anonymizeFreeText,
-        }}
         scene={{
           node, nodeId: resolvedNodeId,
           speakerPortrait,

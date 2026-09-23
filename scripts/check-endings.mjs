@@ -44,7 +44,7 @@ function playSeason() {
     const seen = new Set();
     while (nodeId && !seen.has(nodeId) && !resultNodeIds.has(nodeId)) {
       seen.add(nodeId);
-      const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "free");
+      const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe");
       if (choices.length === 0) break;
       const choice = choices[Math.floor(random() * choices.length)];
       resources = applyEffect(resources, choice.effect ?? {});
@@ -61,7 +61,7 @@ const seen = new Map();
 for (let run = 0; run < RUNS; run += 1) {
   const { closing, seasonHumanCost, peakRiskPressure } = playSeason();
   const clueCount = Math.floor(random() * 7);
-  const freeTextCount = Math.floor(random() * 3);
+  const reframeRouteCount = Math.floor(random() * 3);
   // The push record, which this suite passed as nothing for as long as the
   // ending has read it -- so 6000 seasons exercised `seasonBusts = 0` in every
   // one, and a weighting that forced SYSTEM COLLAPSE on three busts went
@@ -77,7 +77,7 @@ for (let run = 0; run < RUNS; run += 1) {
   const ending = getEndingVariant({
     resources: closing,
     discoveredClues: Array.from({ length: clueCount }, (_, index) => ({ id: `clue-${index}` })),
-    log: Array.from({ length: freeTextCount }, () => ({ freeTextSuccess: true })),
+    log: Array.from({ length: reframeRouteCount }, () => ({ reframeOpenedRoute: true })),
     seasonHumanCost,
     peakRiskPressure,
     seasonBusts,

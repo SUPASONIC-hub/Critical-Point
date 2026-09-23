@@ -36,7 +36,7 @@ for (const order of Object.values(nodeOrders)) {
     if (seenNodes.has(nodeId)) continue;
     seenNodes.add(nodeId);
     for (const choice of nodes[nodeId]?.choices ?? []) {
-      if (choice.type === "free") continue;
+      if (choice.type === "reframe") continue;
       playableChoices.push({ nodeId, choice });
     }
   }
@@ -75,7 +75,7 @@ const humanCostCoverage =
 for (const caseId of CASE_SEQUENCE) {
   const caseEffects = [...new Set(nodeOrders[caseId])]
     .flatMap((nodeId) => nodes[nodeId]?.choices ?? [])
-    .filter((choice) => choice.type !== "free")
+    .filter((choice) => choice.type !== "reframe")
     .map((choice) => choice.effect ?? {});
   const coverage = caseEffects.filter((effect) => (effect.humanCost ?? 0) !== 0).length / caseEffects.length;
   if (coverage < HUMAN_COST_COVERAGE_FLOOR) {
@@ -97,7 +97,7 @@ if (uniqueRatio < UNIQUE_EFFECT_FLOOR) {
 //    loses on every axis is a card nobody reading the numbers has a reason to
 //    turn over, and this is how one gets added without anyone noticing.
 for (const nodeId of new Set(Object.values(nodeOrders).flat())) {
-  const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "free");
+  const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe");
   for (const choice of choices) {
     const effect = choice.effect ?? {};
     const dominator = choices.find((other) => {
@@ -124,7 +124,7 @@ function walkCase(caseId, columnIndex) {
   const seen = new Set();
   while (nodeId && !seen.has(nodeId) && !resultNodeIds.has(nodeId)) {
     seen.add(nodeId);
-    const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "free");
+    const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe");
     if (choices.length === 0) break;
     const choice = choices[Math.min(columnIndex, choices.length - 1)];
     resources = applyEffect(resources, choice.effect ?? {});

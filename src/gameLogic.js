@@ -156,7 +156,7 @@ export function getCognitionSpread(types = []) {
 export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   if (entries.length === 0) {
     return {
-      freeCount: 0,
+      reframeCount: 0,
       reducedRiskCount: 0,
       challengeClearCount: 0,
       currentChallengeStreak: 0,
@@ -174,7 +174,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   }
   const playableEntries = entries.filter((entry) => !entry.isSystemEvent);
   const scoredEntries = playableEntries.length > 0 ? playableEntries : entries;
-  const freeCount = scoredEntries.filter((entry) => entry.freeText).length;
+  const reframeCount = scoredEntries.filter((entry) => entry.reframe).length;
   const reducedRiskCount = scoredEntries.filter(
     (entry) =>
       entry.resourcesBefore &&
@@ -227,21 +227,19 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
     ),
   );
   const consistencyScore = getConsistencyScore(scoredEntries);
-  const freeTextSignalScore = entries.reduce((sum, entry) => {
-    if (!entry.freeText) return sum;
-    const activeSignals = getFreeTextSignals(entry.freeText).filter((signal) => signal.active).length;
-    return sum + Math.min(24, activeSignals * 6 + Math.min(6, Math.floor(entry.freeText.trim().length / 35)));
-  }, 0);
-  // Opening a hidden record is the other way a player shows their working, and
-  // it is the only one available to someone who never uses free text -- who
-  // otherwise started this axis at zero.
+  // Showing your working, on the three surfaces that show it. A reframe that
+  // actually opened the case's hidden route counts double the one that was
+  // taken and lost to the wall, because the route is the reading the card was
+  // for. This axis used to be scored from the keywords in a typed sentence,
+  // which rewarded writing the four magic words over making the decision.
+  const routesOpened = scoredEntries.filter((entry) => entry.reframeOpenedRoute).length;
   const recordsOpened = scoredEntries.filter((entry) => entry.clue).length;
   const reflectionScore = Math.round(
-    clamp(freeTextSignalScore + freeCount * 8 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
+    clamp(reframeCount * 10 + routesOpened * 12 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
   const exploitPenalty = Math.min(
     18,
-    entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.freeText).length * 5,
+    entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
   // What the score is for: holding a line under pressure. Response rhythm still
@@ -261,7 +259,7 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   );
 
   return {
-    freeCount,
+    reframeCount,
     reducedRiskCount,
     challengeClearCount,
     currentChallengeStreak,
@@ -284,7 +282,7 @@ export function getObserverTag(entry = {}) {
     : entry.challenge?.riskDelta ?? 0;
   const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
   const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
-  if (entry.freeText || entry.freeTextSuccess) {
+  if (entry.reframe) {
     return {
       id: "defiance",
       label: "거부 표본",
@@ -388,7 +386,7 @@ export function getObserverPattern(entries = []) {
     ? {
         label: "전환점 기록",
         title: `${turningPoint.observerTag.label}이 익숙한 패턴을 끊었습니다.`,
-        text: `“${turningPoint.freeText || turningPoint.spokenChoice || turningPoint.choice}” 이후 관찰자는 같은 사람을 같은 방식으로 분류할 수 없게 됐습니다.`,
+        text: `“${turningPoint.spokenChoice || turningPoint.choice}” 이후 관찰자는 같은 사람을 같은 방식으로 분류할 수 없게 됐습니다.`,
       }
     : null;
 
@@ -418,8 +416,8 @@ export function getObservationLedger(entries = []) {
         : entry.challenge?.riskDelta ?? 0;
       const choiceText = `${entry.choiceId ?? ""} ${entry.choice ?? ""}`.toLowerCase();
       const next = { ...ledger };
-      if (!entry.freeText && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
-      if (entry.freeText || riskDelta > 6) next.defiance += 1;
+      if (!entry.reframe && Number(entry.responseTimeSec) <= 2 && riskDelta <= 0) next.compliance += 1;
+      if (entry.reframe || riskDelta > 6) next.defiance += 1;
       if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) next.opacity += 1;
       const humanCostDelta = (entry.resourcesAfter?.humanCost ?? 0) - (entry.resourcesBefore?.humanCost ?? 0);
       if (humanCostDelta > 0) next.sacrifice += 1;
@@ -512,14 +510,14 @@ export function getDiscoveryClue({
   riskDelta = 0,
   responseTimeSec = 45,
   logLength = 0,
-  freeTextSuccess = false,
+  reframeOpenedRoute = false,
   discoveredClueIds = [],
 } = {}) {
   const qualifies =
     logLength >= 1 &&
     ((challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12 || riskDelta <= -2)) ||
-      (freeTextSuccess && challengeMatch) ||
-      (freeTextSuccess && riskDelta <= -2));
+      (reframeOpenedRoute && challengeMatch) ||
+      (reframeOpenedRoute && riskDelta <= -2));
   if (!qualifies) return null;
   const own = discoveryClues[currentCase];
   if (own && !discoveredClueIds.includes(own.id)) return own;
@@ -725,13 +723,13 @@ export function getEndingVariant({
   const trust = resources.trust ?? 0;
   const legitimacy = resources.legitimacy ?? 0;
   const capital = resources.capital ?? 0;
-  const freeTextCount = log.filter((entry) => entry?.freeTextSuccess).length; const lowerPriorityEndingsOpen = carriedPressure < COLLAPSE_PRESSURE && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && freeTextCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
+  const reframeRouteCount = log.filter((entry) => entry?.reframeOpenedRoute).length; const lowerPriorityEndingsOpen = carriedPressure < COLLAPSE_PRESSURE && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && reframeRouteCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
   if (seasonPressure >= COLLAPSE_PRESSURE || humanCost >= COLLAPSE_HUMAN_COST) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const clueBar = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
   if (discoveredClues.length >= clueBar && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
   if (discoveredClues.length >= clueBar && legitimacy >= 55) return { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false };
-  if (freeTextCount >= 2 && trust >= 60) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신의 문장이 다음 참가자의 첫 단서가 됩니다.", failure: false };
+  if (reframeRouteCount >= 2 && trust >= 60) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false };
   if (capital >= 60 && trust < 45) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false };
   if (legitimacy >= 65 && trust < 50) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false };
   if (trust - legitimacy >= 10) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
@@ -1042,12 +1040,12 @@ export function getDecisionFingerprint({ triggerScores = {}, cognitionScores = {
   const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
   const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
   const ledger = getDecisionLedger(entries, resources);
-  const freeCount = entries.filter((entry) => entry.freeText).length;
+  const reframeCount = entries.filter((entry) => entry.reframe).length;
   const challengeCount = entries.filter((entry) => entry.challenge?.matched).length;
   const dominantTrigger = sortedTriggers[0] ?? ["responsibility", 0];
   const dominantCognition = sortedCognition[0] ?? ["persistence", 0];
   const guardianScore = Math.max(0, -(ledger.totals.humanCost ?? 0)) + challengeCount * 2;
-  const disruptorScore = freeCount * 4 + Math.max(0, ledger.totals.legitimacy ?? 0) * 0.2;
+  const disruptorScore = reframeCount * 4 + Math.max(0, ledger.totals.legitimacy ?? 0) * 0.2;
   const fatigueBonus = (ledger.totals.fatigue ?? 0) < 0 ? 6 : 0;
   const stabilizerScore = ledger.riskDrops * 3 - ledger.riskRises + fatigueBonus;
   const mode = guardianScore >= Math.max(disruptorScore, stabilizerScore)
@@ -1089,7 +1087,7 @@ export function getCounterfactualReport(entries = [], sceneMap = {}) {
   return entries
     .map((entry) => {
       const scene = sceneMap[entry.nodeId];
-      const choices = scene?.choices?.filter((choice) => choice.type !== "free" && choice.effect) ?? [];
+      const choices = scene?.choices?.filter((choice) => choice.type !== "reframe" && choice.effect) ?? [];
       if (choices.length < 2) return null;
       const beforeResources = entry.resourcesBefore ?? {};
       const forecasts = choices
@@ -1119,10 +1117,10 @@ export function getCounterfactualReport(entries = [], sceneMap = {}) {
 
 /** The three shapes of "how the last case was shaken" the next opening reads. */
 export function getRouteMemory(entries = []) {
-  const trail = (entry) => `${entry?.nodeId ?? ""} ${entry?.choiceId ?? ""} ${entry?.freeTextBranchId ?? ""}`;
+  const trail = (entry) => `${entry?.nodeId ?? ""} ${entry?.choiceId ?? ""} ${entry?.reframeBranchId ?? ""}`;
   return {
     evidenceTurn: entries.some((entry) => trail(entry).includes("evidence_turn")),
-    systemRoute: entries.some((entry) => entry?.freeTextSuccess || trail(entry).includes("route_system")),
+    systemRoute: entries.some((entry) => entry?.reframeOpenedRoute || trail(entry).includes("route_system")),
     routeSplit: entries.some((entry) => trail(entry).includes("_route_")),
   };
 }
@@ -1141,7 +1139,7 @@ export function createCaseSummary(
     primary: sortedTriggers[0] ?? ["responsibility", 0],
     secondary: sortedTriggers[1] ?? ["protection", 0],
     thinking: sortedCognition[0] ?? ["persistence", 0],
-    freeCount: stats.freeCount,
+    reframeCount: stats.reframeCount,
     averageResponseTime:
       entries.length > 0
         ? Math.round(
@@ -1186,48 +1184,12 @@ export function createCaseSummary(
   return summary;
 }
 
-const emailPatternSource = String.raw`[^\s@,.;:!?]+@[^\s@,.;:!?]+\.[^\s@,.;:!?]+`;
-const phonePatternSource = String.raw`01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}`;
-const organizationPatternSource = String.raw`((주식회사|\(주\))\s*[가-힣A-Za-z0-9]+?(?=(과|와|에|에서|에게|으로|로|은|는|이|가|을|를|,|\.|\s|$))|[가-힣A-Za-z0-9]+(회사|그룹|은행|전자|건설|테크|랩스|코퍼레이션|inc\.?|llc))`;
-
-const emailPattern = new RegExp(emailPatternSource);
-const phonePattern = new RegExp(phonePatternSource);
-const organizationPattern = new RegExp(organizationPatternSource, "i");
-
-export function detectPrivacySignals(text = "") {
-  return [
-    { label: "이메일", active: emailPattern.test(text) },
-    { label: "전화번호", active: phonePattern.test(text) },
-    { label: "회사·조직명", active: organizationPattern.test(text) },
-  ];
-}
-
-export function anonymizeSensitiveText(text = "") {
-  return text
-    .replace(new RegExp(emailPatternSource, "g"), "익명 이메일")
-    .replace(new RegExp(phonePatternSource, "g"), "익명 연락처")
-    .replace(new RegExp(organizationPatternSource, "gi"), "익명 조직");
-}
-
-export function getEcho(choiceId, freeText) {
-  if (freeText) {
-    const text = freeText.toLowerCase();
-    if (text.includes("협상") || text.includes("분할") || text.includes("조건")) {
-      return "조건을 나누는 방식은 유효합니다. 다만 각 이해관계자가 왜 그 조건을 받아들여야 하는지까지 설계해야 합니다.";
-    }
-    if (text.includes("직원") || text.includes("급여") || text.includes("보호")) {
-      return "보호 대상을 명확히 본 점은 좋습니다. 같은 기준을 협력사 직원에게도 적용하면 비용은 어디로 이동합니까?";
-    }
-    if (text.includes("공개") || text.includes("책임") || text.includes("회계")) {
-      return "책임을 전면에 세우면 정당성은 올라갑니다. 그러나 당장 회사가 무너지면 책임 규명의 실익도 줄어들 수 있습니다.";
-    }
-    return "선택지 밖의 제안은 판을 넓힙니다. 이제 그 방법의 비용, 반대자, 실패 조건을 구체화해야 합니다.";
-  }
+export function getEcho(choiceId) {
   return echoReplies[choiceId] ?? echoReplies.default;
 }
 
 export function getDramaticChoiceLabel(choice) {
-  if (choice.type === "free") return choice.label;
+  if (choice.type === "reframe") return choice.label;
   return choiceVoiceLines[choice.id] ?? choice.label;
 }
 
@@ -1330,7 +1292,7 @@ function getSpokenStem(label) {
   return `${head}${SPOKEN_L_STEMS[label.slice(-2, -1)] ?? stemSyllable}`;
 }
 
-export function buildSceneBeat(node, choice, freeText, effect = {}) {
+export function buildSceneBeat(node, choice, effect = {}) {
   const profile = characterProfiles[node?.speaker] ?? {
     appearance: "정돈되지 않은 자료 더미 앞에 사건 관계자가 앉아 있다.",
     thought: "이 선택은 아직 끝나지 않았다.",
@@ -1338,9 +1300,7 @@ export function buildSceneBeat(node, choice, freeText, effect = {}) {
     voice: "상황을 확인하는 말투로 반응한다.",
     line: "그 판단을 계속 밀고 갈 수 있습니까?",
   };
-  const said = choice.type === "free"
-    ? `"${freeText.trim()}"`
-    : `"${speechifyChoice(choice)}"`;
+  const said = `"${speechifyChoice(choice)}"`;
   const deltaLine = describeDelta(getStrongestDelta(effect));
   const speakerName = node?.speaker ?? "상대";
 
@@ -1354,74 +1314,19 @@ export function buildSceneBeat(node, choice, freeText, effect = {}) {
   ].join("\n");
 }
 
-export function scoreFreeText(value) {
-  const text = value.trim();
-  if (!text) return { effect: {}, cognition: {}, note: "" };
-  const signals = getFreeTextSignals(text);
-  const hasStakeholder = signals.some((signal) => signal.id === "stakeholder" && signal.active);
-  const hasTradeoff = signals.some((signal) => signal.id === "tradeoff" && signal.active);
-  const hasInfo = signals.some((signal) => signal.id === "info" && signal.active);
-  const hasRisk = signals.some((signal) => signal.id === "risk" && signal.active);
-  const depth = Math.min(3, Math.floor(text.length / 45));
+/**
+ * What 판을 다시 짠다 costs and what it sharpens.
+ *
+ * It used to be computed from the sentence the player typed: four keyword
+ * buckets decided the resources and the cognition, which meant a card's price
+ * was a regex the player could not read. The card is one card now, so it has
+ * one price -- paid in the two axes a reframe actually spends, time and the
+ * fatigue of doing the thinking, against the standing it buys.
+ */
+export const REFRAME_EFFECT = { time: -6, trust: 3, legitimacy: 3, fatigue: 5 };
+export const REFRAME_COGNITION = { reframing: 3, inference: 1 };
 
-  return {
-    effect: {
-      time: hasInfo ? -4 : -2,
-      trust: hasStakeholder ? 4 : 1,
-      legitimacy: hasRisk ? 4 : 1,
-      capital: hasTradeoff ? 5 : 0,
-      fatigue: 5,
-    },
-    cognition: {
-      reframing: 1 + (hasTradeoff ? 2 : 0),
-      inference: (hasInfo ? 2 : 0) + (hasStakeholder ? 1 : 0),
-      risk: hasRisk ? 2 : 0,
-      persistence: depth,
-    },
-    note:
-      "자유입력은 새로운 이해관계자, 조건 재구성, 추가 정보 요청, 위험 명시 여부를 기준으로 반영했습니다.",
-  };
-}
-
-/** A reframe has to be a sentence, not a keyword list. */
-const FREE_TEXT_SIGNAL_MIN_LENGTH = 24;
-
-export function getFreeTextSignals(value) {
-  const text = String(value ?? "").trim();
-  // One keyword per bucket used to be enough, so eight characters -- one word
-  // per bucket -- lit every signal and took the full reflection score. A signal
-  // now needs a written sentence around it.
-  const clauses = text
-    .split(/[.!?\n]|(?:다|요|음|함)(?=\s|$)/)
-    .filter((part) => part.trim().length >= 6).length;
-  const written = text.length >= FREE_TEXT_SIGNAL_MIN_LENGTH && clauses >= 1;
-  return [
-    {
-      id: "stakeholder",
-      label: "이해관계자",
-      active: written && /(직원|협력사|투자자|경쟁사|고객|CFO|임원|피해자|기자|보안팀|현장)/i.test(text),
-      hint: "누가 영향을 받는지",
-    },
-    {
-      id: "tradeoff",
-      label: "교환 조건",
-      active: written && /(대신|하지만|조건|분할|우선|동시에|단계|교환|협상|묶어|연기|승계)/i.test(text),
-      hint: "무엇을 얻고 잃는지",
-    },
-    {
-      id: "info",
-      label: "근거 확인",
-      active: written && /(확인|조사|자료|공시|계약|근거|회의록|숫자|로그|원본|검증)/i.test(text),
-      hint: "무엇을 더 확인할지",
-    },
-    {
-      id: "risk",
-      label: "위험 명시",
-      active: written && clauses >= 2 && /(위험|손실|비용|실패|법적|평판|시간|유출|무고|중단|이탈)/i.test(text),
-      hint: "실패하면 어디가 무너지는지",
-    },
-  ];
-}
-
-// Both live in appConfig.js so the pre-start shell can use them without the graph.
+// Both live in appConfig.js, and the privacy patterns in privacyText.js, so the
+// pre-start shell can use them without pulling in the scene graph.
 export { limitText, makeEmptyScores };
+export { anonymizeSensitiveText, detectPrivacySignals } from "./privacyText.js";

@@ -189,17 +189,17 @@ const snapshot = createRecoverySnapshot({
   saveSchemaVersion: 2,
   currentCase: "case01",
   nodeId: "start",
-  log: [{ nodeId: "start", freeText: "private", spokenChoice: "private" }],
+  log: [{ nodeId: "start", spokenChoice: "private" }],
   pendingTelemetry: [{ id: "pending", type: "case", label: "pending", payload: {} }],
 });
 test("recovery snapshots should omit telemetry queues", () => {
   assert.equal(snapshot.pendingTelemetry.length, 0, "recovery snapshots should omit telemetry queues");
 });
-test("recovery snapshots should omit free text", () => {
-  assert.equal("freeText" in snapshot.log[0], false, "recovery snapshots should omit free text");
+test("recovery snapshots should omit the spoken line", () => {
+  assert.equal("spokenChoice" in snapshot.log[0], false, "recovery snapshots should omit the spoken line");
 });
-test("restored recovery saves should start with empty free text", () => {
-  assert.equal(restoreRecoverySnapshot(snapshot).freeText, "", "restored recovery saves should start with empty free text");
+test("restored recovery saves should not carry a draft", () => {
+  assert.equal("freeText" in restoreRecoverySnapshot(snapshot), false, "the save format has no free-text draft any more");
 });
 test("valid recovery slots should restore", () => {
   assert.equal(
@@ -212,7 +212,7 @@ test("valid recovery slots should restore", () => {
 const exportInput = {
   run: { currentCase: "case01", summary: { rank: "A" } },
   gameplay: { rank: "A", momentumScore: 71 },
-  diagnostics: { playerName: "tester", log: [{ freeText: "private" }], sessionId: "session-1" },
+  diagnostics: { playerName: "tester", log: [{ comment: "private" }], sessionId: "session-1" },
 };
 const summaryExport = buildPlaytestExport({ ...exportInput, includeDiagnostics: false });
 test("default export should be the shareable summary", () => {
@@ -237,8 +237,8 @@ test("diagnostic export should include an error log array", () => {
 test("playtest exports should omit private text and names", () => {
   const serializedSummary = JSON.stringify(summaryExport);
   const serializedDiagnostics = JSON.stringify(diagnosticExport);
-  assert.equal(serializedSummary.includes("private"), false, "summary export must not contain free text");
-  assert.equal(serializedDiagnostics.includes("private"), false, "diagnostic export must not contain free text");
+  assert.equal(serializedSummary.includes("private"), false, "summary export must not contain player prose");
+  assert.equal(serializedDiagnostics.includes("private"), false, "diagnostic export must not contain player prose");
   assert.equal(serializedDiagnostics.includes("tester"), false, "diagnostic export must not contain player names");
 });
 test("diagnostic stringify should fall back for circular values", () => {
@@ -255,7 +255,7 @@ test("playtest export schema should reject missing and private summary fields", 
 });
 test("telemetry schema should reject private fields and unknown types", () => {
   assert.deepEqual(validateTelemetryItem({ type: "unknown", payload: {} }), ["invalid type unknown"]);
-  assert.deepEqual(validateTelemetryItem({ type: "case", payload: { nested: { freeText: "private" } } }), ["payload contains private fields"]);
+  assert.deepEqual(validateTelemetryItem({ type: "case", payload: { nested: { comment: "private" } } }), ["payload contains private fields"]);
   assert.deepEqual(validateTelemetryItem({ type: "error", payload: { source: "test" } }), []);
 });
 test("telemetry queue policy should expire old items and cap retained items", () => {
@@ -661,7 +661,7 @@ test("restoring a recovery slot keeps the busts settled since the slot", () => {
 });
 
 test("the forced card is the one that costs the most", () => {
-  const hand = [card("mild", { trust: 3, time: -2 }), card("brutal", { capital: 10, humanCost: 20 }), { id: "free", type: "free" }];
+  const hand = [card("mild", { trust: 3, time: -2 }), card("brutal", { capital: 10, humanCost: 20 }), { id: "reframe", type: "reframe" }];
   assert.equal(getForcedCard(hand, BASE_SCHEMA).id, "brutal");
 });
 
@@ -1259,76 +1259,3 @@ test("a continuation code is twelve unambiguous symbols and reads back from any 
   assert.equal(normalizeCloudCode("ABCD-EFGH"), null);
 });
 
-/* -------------------------------------------------- free-input enrichment */
-
-test("a model answer is taken apart field by field, and a bad field loses only itself", async () => {
-  const { normalizeAnalysis, parseAnalysisJson } = await import("../src/freeTextAnalysis.js");
-
-  const good = normalizeAnalysis(
-    parseAnalysisJson(`{
-      "analysis": {
-        "reframe": 74, "grounding": 61, "detected_trigger": "responsibility",
-        "confidence": 0.8, "trigger_reason": "장부를 먼저 맞춘다", "injection_attempt": false
-      },
-      "rule_alteration": { "fracture_target": "trust", "system_comment": "절차는 지켰군요. 사람은요?" },
-      "ending_weight": { "toward": "cold-justice", "delta": 0.3, "reason": "절차 우선" }
-    }`),
-  );
-  assert.equal(good.reframe, 74);
-  assert.equal(good.trigger, "responsibility");
-  assert.equal(good.fractureTarget, "trust");
-  assert.equal(good.endingToward, "cold-justice");
-
-  // Numbers as strings, a trigger that is not one of the four, an ending the
-  // season does not have, and a fracture target the free-text effect cannot
-  // move. Everything sound in the same answer has to survive them.
-  const partial = normalizeAnalysis({
-    analysis: { reframe: "88", grounding: 999, detected_trigger: "정의형", confidence: 0.9 },
-    rule_alteration: { fracture_target: "humanCost", system_comment: "기록은 남습니다." },
-    ending_weight: { toward: "구제형오버클럭", delta: 5 },
-  });
-  assert.equal(partial.reframe, 88, "a numeric string is still a number");
-  assert.equal(partial.grounding, 100, "out of range is clamped, not dropped");
-  assert.equal(partial.trigger, null);
-  assert.equal(partial.confidence, null, "no trigger means no confidence to weigh");
-  assert.equal(partial.fractureTarget, null, "자유입력은 사람 피해를 움직이지 않는다");
-  assert.equal(partial.endingToward, null);
-  assert.equal(partial.endingDelta, null);
-  assert.equal(partial.systemComment, "기록은 남습니다.");
-
-  assert.equal(normalizeAnalysis({ analysis: {}, ending_weight: {} }), null, "valid JSON holding nothing is not a result");
-  assert.deepEqual(parseAnalysisJson('여기 결과입니다: {"analysis":{"reframe":5}}'), { analysis: { reframe: 5 } }, "a preamble is off-contract but survivable");
-  assert.equal(parseAnalysisJson("죄송하지만 분석할 수 없습니다."), null, "prose with no object at all is not a result");
-  assert.equal(parseAnalysisJson('```json\n{"analysis":{"reframe":10}}\n```').analysis.reframe, 10, "a fence is off-contract but survivable");
-  assert.equal(parseAnalysisJson("[1,2]"), null, "an array is not an analysis");
-});
-
-test("a trigger with no confidence still gets one, and a comment is cut to the frame it fits", async () => {
-  const { normalizeAnalysis } = await import("../src/freeTextAnalysis.js");
-  const result = normalizeAnalysis({
-    analysis: { detected_trigger: "revenge", reframe: 40 },
-    rule_alteration: { system_comment: "가".repeat(80) },
-  });
-  assert.equal(result.confidence, 0.5, "the run-level tally needs a weight for every vote");
-  assert.equal(result.systemComment.length, 40);
-  assert.equal(result.injectionAttempt, false, "absent is not true");
-});
-
-test("an analysis telemetry item passes the queue's shape rules and carries no prose", async () => {
-  const { validateTelemetryItem } = await import("../src/state/payloadSchemas.js");
-  const payload = {
-    session_id: "session-12345678",
-    session_code: "ABCD1234",
-    run_id: "run-1",
-    case_id: "case07",
-    node_id: "c7_ask_archive",
-    choice_id: "free",
-    analysis: { trigger: "affection", confidence: 0.7, systemComment: "그 사람은 이제 당신 이름을 압니다." },
-  };
-  assert.deepEqual(validateTelemetryItem({ type: "analysis", payload }), []);
-  assert.deepEqual(
-    validateTelemetryItem({ type: "analysis", payload: { ...payload, freeText: "고용 승계를 조건으로 겁니다" } }),
-    ["payload contains private fields"],
-    "the analysis is what the model said about the sentence, never the sentence",
-  );
-});

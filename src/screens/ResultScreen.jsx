@@ -39,7 +39,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
   const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const titleRef = sceneTitleRef ?? viewSceneTitleRef;
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
-  const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.freeTextSuccess || entry.freeTextBranchId);
+  const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.reframeOpenedRoute || entry.reframeBranchId);
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observerEndingRecord = observerPattern?.endingRecord ?? {
     label: "패턴 표본",
@@ -105,7 +105,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
   const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { label: "PROTECT", value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)), text: "사람과 현장의 피해를 얼마나 줄였는가" },
-    { label: "EXPOSE", value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.freeCount ?? 0) * 8)), text: "구조와 숨은 비용을 얼마나 드러냈는가" },
+    { label: "EXPOSE", value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.reframeCount ?? 0) * 8)), text: "구조와 숨은 비용을 얼마나 드러냈는가" },
     { label: "HANDOFF", value: Math.min(100, Math.round((result.cognitionScore ?? 0) * 0.7 + (observerPattern?.turningPoint ? 24 : 0))), text: "다음 참가자에게 선택지를 얼마나 남겼는가" },
   ];
   // The doors this run walked past, named. The counts alone ("기록 3개 미열람")
@@ -122,7 +122,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
   const witnessRecords = [
     firstRouteEntry && { id: "first", label: "처음 남긴 말", tag: firstRouteEntry.observerTag?.label, text: firstRouteEntry.spokenChoice || firstRouteEntry.choice },
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
-    branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.freeText || branchRouteEntry.spokenChoice || branchRouteEntry.choice },
+    branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
   const observerRouteRecords = routeTimeline
     .filter((entry) => entry.observerTag)
@@ -681,9 +681,9 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               <p>로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
             </section>
             <section className="report-section">
-              <h2>Free Text</h2>
-              <strong>{result.freeCount}회</strong>
-              <p>준비된 선택지 밖에서 조건을 다시 짠 횟수입니다. 0회라면 다음 테스트에서는 구조 재설계 유도가 충분했는지 확인해야 합니다.</p>
+              <h2>Reframe</h2>
+              <strong>{result.reframeCount}회</strong>
+              <p>준비된 선택지를 고르는 대신 판을 다시 연 횟수입니다. 0회라면 다음 테스트에서는 구조 재설계 유도가 충분했는지 확인해야 합니다.</p>
             </section>
             <section className="report-section">
               <h2>Avg Time</h2>
@@ -720,11 +720,11 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                       {entry.clue && <b className="route-clue">단서 발견</b>}
                       {entry.routeChangeKind === "memory" && <b className="route-memory">MEMORY</b>}
                       {entry.routeChangeKind === "evidence-turn" && <b className="route-turnaround">EVIDENCE TURN</b>}
-                      {entry.routeChangeKind === "free-text" && <b className="route-system">FREE TEXT</b>}
+                      {entry.routeChangeKind === "reframe" && <b className="route-system">REFRAME</b>}
                       {entry.observerTag && <b className="route-observer">{entry.observerTag.label}</b>}
                     </div>
                     <strong>{entry.title}</strong>
-                    <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
+                    <p>{entry.spokenChoice || entry.choice}</p>
                   </div>
                 </article>
               ))}
@@ -873,7 +873,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <b>{entry.title}</b>
-                  <p>{entry.freeText || entry.spokenChoice || entry.choice}</p>
+                  <p>{entry.spokenChoice || entry.choice}</p>
                   {entry.challenge && (
                     <div className="history-challenge">
                       {entry.tactical && (

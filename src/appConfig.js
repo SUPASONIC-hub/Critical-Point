@@ -18,6 +18,11 @@ export const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 export const CLOUD_SAVE_CODE_KEY = "critical-point-cloud-code-v1";
 export const CLOUD_SAVE_ENABLED_KEY = "critical-point-cloud-enabled-v1";
 export const CLOUD_SAVE_SYNC_KEY = "critical-point-cloud-sync-v1";
+// 참가자 게시판 (src/state/useBoard.js): the nickname the player publishes on
+// the board, kept on the device so the form is typed once rather than every
+// visit. Nothing else about the board is stored locally -- the posts are the
+// server's copy.
+export const BOARD_NICKNAME_KEY = "critical-point-board-nickname-v1";
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
 
@@ -36,8 +41,12 @@ export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 2;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
 export const PLAYER_NAME_MAX_LENGTH = 24;
-export const FREE_TEXT_MAX_LENGTH = 600;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
+// The board's post length, mirroring the 2-300 bound the table's trigger
+// enforces (supabase/migrations/20260923010000_add_board_posts.sql). The
+// nickname reuses PLAYER_NAME_MAX_LENGTH above, which is the same 24 the
+// trigger checks.
+export const BOARD_POST_MAX_LENGTH = 300;
 export const TELEMETRY_QUEUE_TYPES = ["case", "feedback", "error"];
 export const SAVE_STATE_KEYS = [
   "saveSchemaVersion",
@@ -57,7 +66,6 @@ export const SAVE_STATE_KEYS = [
   "log",
   "triggers",
   "cognition",
-  "freeText",
   "echo",
   "nodeEnteredAt",
   "pendingTelemetry",
@@ -476,7 +484,6 @@ export function restoreRecoverySnapshot(snapshot) {
   return {
     ...saveSnapshot,
     saveSchemaVersion: SAVE_SCHEMA_VERSION,
-    freeText: "",
     pendingTelemetry: [],
   };
 }

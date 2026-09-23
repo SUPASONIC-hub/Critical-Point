@@ -71,7 +71,7 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
 export function createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier }) {
   return [
   { title: `Burst ${momentumTier}`, text: `사고 버스트 ${momentumScore}점을 기록했습니다.` },
-  result.freeCount > 0
+  result.reframeCount > 0
     ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
     : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },
   result.averageResponseTime >= 20

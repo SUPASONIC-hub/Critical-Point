@@ -2639,11 +2639,12 @@ function registerRouteBodies(caseId, plan) {
 Object.entries(routeBodyPlans).forEach(([caseId, plan]) => registerRouteBodies(caseId, plan));
 
 /**
- * Where the first successful free-text answer of a case lands. It lives next to
- * the route plans so the runtime and the graph check read one map instead of
- * two copies that can drift apart.
+ * Where the first 판을 다시 짠다 of a case lands. It lives next to the route
+ * plans so the runtime and the graph check read one map instead of two copies
+ * that can drift apart. The route used to be reachable only by typing a
+ * sentence that scored three of four keyword buckets; the card reaches it now.
  */
-export const freeTextRouteNodes = {
+export const reframeRouteNodes = {
   case02: "c2_route_system",
   ...Object.fromEntries(Object.entries(dramaticRoutePlans).map(([caseId, plan]) => [caseId, plan.defaultFree])),
 };
@@ -3481,8 +3482,8 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
       const signatureId = `${nodeId}_signature`;
       choiceVoiceLines[signatureId] = signature.voice;
       echoReplies[signatureId] = signature.echo;
-      const routed = clonedChoices.find((choice) => choice.type !== "free") ?? clonedChoices[0];
-      // Before the free-input option, which stays last on every scene.
+      const routed = clonedChoices.find((choice) => choice.type !== "reframe") ?? clonedChoices[0];
+      // Before the 판을 다시 짠다 card, which stays last on every scene.
       clonedChoices.splice(clonedChoices.length - 1, 0, {
         id: signatureId,
         label: signature.label,

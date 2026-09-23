@@ -66,7 +66,15 @@ const fileBudgets = {
   // 2460 / 58400 -> 2540 / 60000 on 2026-09-16 for the folded 기기 간 이어하기
   // panel under the intro's primary action (the continuation code, its status
   // line and the load form).
-  "base-intro-ranking.css": { lines: 2540, bytes: 60000 },
+  // 2540 / 60000 -> 2840 / 66900 on 2026-09-23 for the 참가자 게시판. It is a
+  // second public page with the ranking's frame -- page, topbar, hero, status
+  // card, row-card stack -- plus the one surface the ranking has no equivalent
+  // of: a composer, with two fields and their counters, the privacy call-out and
+  // its 익명화 button, the submit row's disabled state, and the off-screen
+  // honeypot. The rules sit beside the ranking's because they share the frame;
+  // splitting them into a file of their own would copy those five blocks rather
+  // than remove them.
+  "base-intro-ranking.css": { lines: 2840, bytes: 66900 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came

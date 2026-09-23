@@ -2354,6 +2354,303 @@ summary:focus-visible {
   font-weight: 500;
 }
 
+/* Board ---------------------------------------------------------------------
+   참가자 게시판, built out of the ranking's parts: the same page frame, the same
+   status card, the same row-card stack. What is new is the composer, which is
+   the only form in the app whose text another player reads, so it carries the
+   counters, the privacy call-out and the hidden honeypot field. */
+.board-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.board-page {
+  width: min(880px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 48px;
+  color: var(--ui-text);
+}
+.board-page .topbar {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: clamp(28px, 5vw, 56px);
+}
+.board-page .topbar .ghost {
+  min-height: 40px;
+  padding: 0 16px 0 12px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.board-page .brand-mark {
+  color: var(--ui-text-3);
+}
+.board-hero {
+  max-width: 720px;
+  margin-bottom: 26px;
+}
+.board-hero > span,
+.board-status-bar > div > span,
+.board-list-heading span {
+  color: var(--ui-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.board-hero h1 {
+  margin: 14px 0;
+  color: var(--ui-text);
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+  text-wrap: balance;
+}
+.board-hero p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+}
+.board-status-bar {
+  margin-bottom: 14px;
+  padding: 18px 22px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+}
+.board-status-bar > div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.board-status-bar strong {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.board-status-bar p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+.board-composer {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: clamp(16px, 2.4vw, 24px);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-1);
+}
+.board-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.board-field > span {
+  color: var(--ui-text-2);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.board-field input,
+.board-field textarea {
+  width: 100%;
+  margin-top: 0;
+  padding: 12px 14px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.board-field textarea {
+  min-height: 116px;
+  resize: vertical;
+}
+.board-field input:focus-visible,
+.board-field textarea:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+.board-field small {
+  color: var(--ui-text-3);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* The honeypot. Off-screen rather than display:none, because a field that is
+   not laid out is one a script can also tell to skip. */
+.board-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.board-privacy-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-md);
+}
+.board-privacy-notice p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.board-privacy-notice .ghost {
+  min-height: 36px;
+  padding: 0 14px;
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.board-composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.board-composer-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 0 22px 0 18px;
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+.board-composer-actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.board-composer-actions button:disabled {
+  color: var(--ui-text-3);
+  background: var(--ui-surface-3);
+  cursor: not-allowed;
+}
+.board-post-status {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.board-list-panel {
+  padding: clamp(16px, 2.4vw, 24px);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-1);
+}
+.board-list-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.board-list-heading h2 {
+  margin: 8px 0 0;
+  color: var(--ui-text);
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.board-list-heading small {
+  color: var(--ui-text-3);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.board-list {
+  display: grid;
+  gap: 10px;
+}
+.board-post {
+  padding: 14px 18px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+}
+.board-post-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.board-post-head b {
+  color: var(--ui-text);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.board-post-head span {
+  flex: 0 0 auto;
+  color: var(--ui-text-3);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.board-post p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.board-empty {
+  margin: 0;
+  padding: 44px 16px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-2);
+  border: 1px dashed var(--ui-line-strong);
+  border-radius: var(--ui-radius-md);
+  text-align: center;
+  font-weight: 500;
+}
+.board-footnote {
+  margin: 16px 4px 0;
+  color: var(--ui-text-3);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
 /* Rules gathered here from the later layers so this selector is defined in one file. */
 .game-header {
   align-items: flex-start;

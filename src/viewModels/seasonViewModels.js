@@ -102,7 +102,7 @@ export function normalizeCaseSummary(summary) {
     primary: summary?.primary ?? ["responsibility", 0],
     secondary: summary?.secondary ?? ["protection", 0],
     thinking: summary?.thinking ?? ["persistence", 0],
-    freeCount: summary?.freeCount ?? 0,
+    reframeCount: summary?.reframeCount ?? 0,
     averageResponseTime: summary?.averageResponseTime ?? 0,
     challengeClearCount: summary?.challengeClearCount ?? 0,
     reducedRiskCount: summary?.reducedRiskCount ?? 0,

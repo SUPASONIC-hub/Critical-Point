@@ -15,6 +15,7 @@ import {
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
+  REFRAME_CARD_ID,
   getFocusBonus,
   getFocusModeProfile,
   getForcedCard,
@@ -142,7 +143,7 @@ export function GauntletStage({
   seed,
   run,
   cards,
-  freeChoice,
+  reframeChoice,
   resources,
   resourceMeta,
   clueCount,
@@ -154,7 +155,6 @@ export function GauntletStage({
   onSuspendable = null,
   staleSave = false,
   onReload,
-  freeInput,
   scene,
 }) {
   const schema = run?.schema ?? BASE_SCHEMA;
@@ -215,8 +215,8 @@ export function GauntletStage({
 
   const sealedId = useMemo(() => getSealedCardId(cards, schema), [cards, schema]);
   const sealBroken = win.gauge >= schema.sealBreak;
-  const wildSelected = win.selectedId === "__wild__";
-  const selectedCard = wildSelected ? freeChoice : cards.find((card) => card.id === win.selectedId) ?? null;
+  const reframeSelected = win.selectedId === REFRAME_CARD_ID;
+  const selectedCard = reframeSelected ? reframeChoice : cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
   const grooveBonus = getGrooveBonus(win.groove);
@@ -236,8 +236,7 @@ export function GauntletStage({
   const tellWall = win.wall + (win.tellOffset ?? 0);
   const bpm = getHeartbeatBpm(win.gauge, tellWall, schema.sedated, win.elapsed / schema.seconds);
   const sealedLock = selectedCard && selectedCard.id === sealedId && !sealBroken;
-  const wildBlocked = wildSelected && (!freeInput.freeText.trim() || freeInput.freeTextBlockedByPrivacy);
-  const canCash = live && !paused && Boolean(selectedCard) && !sealedLock && !wildBlocked;
+  const canCash = live && !paused && Boolean(selectedCard) && !sealedLock;
   const canFocus = canCash && win.focus < FOCUS_MAX;
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
@@ -291,7 +290,7 @@ export function GauntletStage({
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 사정권"
     : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
-  const handSize = cards.length + (freeChoice ? 1 : 0);
+  const handSize = cards.length + (reframeChoice ? 1 : 0);
   const currentRules = mutations.length
     ? `${joinRules(mutations)} 적용 중`
     : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
@@ -314,7 +313,7 @@ export function GauntletStage({
   // in this window, with the card staked. Reading alone is not a touch, so a
   // save and exit taken before the bet is placed resumes a fresh window.
   const touched = win.pushes > 0 || Boolean(win.selectedId);
-  const touchedCardId = win.selectedId && win.selectedId !== "__wild__" ? win.selectedId : null;
+  const touchedCardId = win.selectedId && win.selectedId !== REFRAME_CARD_ID ? win.selectedId : null;
   useEffect(() => {
     if (!touched || abandoned || win.status !== "live") return;
     if (touchedRef.current === touchedCardId) return;
@@ -365,7 +364,7 @@ export function GauntletStage({
       playCashCue(multiplier, grooveBonus);
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
-    const staked = selectedCard && !(wildSelected && wildBlocked) ? selectedCard : savedStake;
+    const staked = selectedCard ?? savedStake;
     const card = staked ?? getForcedCard(cards, schema);
     const timer = globalThis.setTimeout(() => {
       if (resolvedRef.current) return;
@@ -408,7 +407,7 @@ export function GauntletStage({
     const card = cards.find((item) => item.id === cardId);
     if (card && !isCardOpen(card)) return;
     setOpenedSeed(seed);
-    if (card || (cardId === "__wild__" && freeChoice)) {
+    if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });
     }
@@ -475,13 +474,13 @@ export function GauntletStage({
 
   function cash() {
     if (!canCash) return;
-    dispatch({ type: "CASH", locked: sealedLock || wildBlocked });
+    dispatch({ type: "CASH", locked: sealedLock });
   }
 
   // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
   const keyActions = useRef({});
   useEffect(() => {
-    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, freeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable };
+    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable };
   });
   useEffect(() => {
     const onKey = (event) => {
@@ -507,7 +506,7 @@ export function GauntletStage({
       // that card staked.
       if (actions.briefingOpen) {
         const index = Number(event.key) - 1;
-        const cardId = actions.cards[index]?.id ?? (index === actions.cards.length && actions.freeChoice ? "__wild__" : null);
+        const cardId = actions.cards[index]?.id ?? (index === actions.cards.length && actions.reframeChoice ? REFRAME_CARD_ID : null);
         if (event.key === " " || event.key === "Enter" || event.key.toLowerCase() === "w" || cardId) {
           event.preventDefault();
           actions.openTable(cardId);
@@ -541,9 +540,9 @@ export function GauntletStage({
       if (card) {
         event.preventDefault();
         actions.select(card.id);
-      } else if (index === actions.cards.length && actions.freeChoice) {
+      } else if (index === actions.cards.length && actions.reframeChoice) {
         event.preventDefault();
-        actions.select("__wild__");
+        actions.select(REFRAME_CARD_ID);
       }
     };
     globalThis.addEventListener("keydown", onKey);
@@ -904,43 +903,24 @@ export function GauntletStage({
               </button>
             );
           })}
-          {freeChoice && (
+          {reframeChoice && (
             <button
               type="button"
-              className={`choice gx-card gx-card-wild${wildSelected ? " selected" : ""}`}
-              aria-pressed={wildSelected}
+              className={`choice gx-card gx-card-wild${reframeSelected ? " selected" : ""}`}
+              aria-pressed={reframeSelected}
               aria-disabled={!live || isAdvancing ? "true" : undefined}
               aria-keyshortcuts={String(cards.length + 1)}
-              onClick={() => select("__wild__")}
+              onClick={() => select(REFRAME_CARD_ID)}
             >
               <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>
-              <span className="gx-card-label">직접 말한다</span>
+              <span className="gx-card-label">{reframeChoice.label}</span>
               <span className="gx-card-stats">
-                <b className="gx-card-chips">WILD +{getCardChips(freeChoice, schema)}</b>
-                <b className="gx-card-burn">문장이 곧 조건</b>
+                <b className="gx-card-chips">WILD +{getCardChips(reframeChoice, schema)}</b>
+                <b className="gx-card-burn">이 판을 다시 연다</b>
               </span>
             </button>
           )}
         </div>
-
-        {wildSelected && (
-          <div className="reframe-box gx-wild">
-            <textarea
-              value={freeInput.freeText}
-              maxLength={freeInput.FREE_TEXT_MAX_LENGTH}
-              onChange={(event) => freeInput.updateFreeText(event.target.value)}
-              placeholder="사람, 조건, 순서를 바꾸는 한 문장. 시계는 멈추지 않는다."
-              aria-label="직접 말할 문장"
-              autoFocus
-            />
-            {freeInput.freeTextBlockedByPrivacy && (
-              <p className="privacy-warning">
-                실명·연락처로 보이는 표현: {freeInput.activePrivacySignals.map((signal) => signal.label).join(", ")}
-                <button type="button" className="ghost" onClick={freeInput.anonymizeFreeText}>익명화</button>
-              </p>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="gx-actions">
@@ -1019,7 +999,7 @@ export function GauntletStage({
           readSeconds={readSeconds}
           tableSeconds={schema.seconds}
           cards={cards}
-          freeChoice={freeChoice}
+          reframeChoice={reframeChoice}
           isCardOpen={isCardOpen}
           sealedId={sealBroken ? null : sealedId}
           selectedId={win.selectedId}

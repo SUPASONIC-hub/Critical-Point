@@ -1,5 +1,5 @@
 const SUMMARY_REQUIRED_KEYS = ["saveSchemaVersion", "exportedAt", "exportMode", "currentCase", "summary", "gameplay"];
-const SUMMARY_PRIVATE_KEYS = ["playerName", "freeText", "comment", "sessionId", "log", "errorLog", "saveSlots", "trace"];
+const SUMMARY_PRIVATE_KEYS = ["playerName", "comment", "sessionId", "log", "errorLog", "saveSlots", "trace"];
 
 export function validatePlaytestExport(payload, { includeDiagnostics = false } = {}) {
   const errors = [];
@@ -17,8 +17,8 @@ export function validatePlaytestExport(payload, { includeDiagnostics = false } =
   return errors;
 }
 
-const TELEMETRY_TYPES = new Set(["case", "feedback", "error", "analysis"]);
-const PRIVATE_TELEMETRY_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment", "spokenChoice"]);
+const TELEMETRY_TYPES = new Set(["case", "feedback", "error"]);
+const PRIVATE_TELEMETRY_KEYS = new Set(["playerName", "comment", "feedbackComment", "spokenChoice"]);
 
 function containsPrivateTelemetryKey(value) {
   if (Array.isArray(value)) return value.some(containsPrivateTelemetryKey);

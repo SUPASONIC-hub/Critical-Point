@@ -1,7 +1,5 @@
 import {
-  FREE_TEXT_MAX_LENGTH,
   normalizeFeedback,
-  normalizeSavedText,
   SAVE_SCHEMA_VERSION,
   TELEMETRY_QUEUE_TYPES,
 } from "../appConfig.js";
@@ -162,10 +160,11 @@ function normalizeSavedLogEntry(entry) {
     choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",
     choice: typeof entry.choice === "string" ? entry.choice : "",
     spokenChoice: typeof entry.spokenChoice === "string" ? entry.spokenChoice : "",
-    freeText: normalizeSavedText(entry.freeText, FREE_TEXT_MAX_LENGTH),
-    freeTextBranchId: typeof entry.freeTextBranchId === "string" ? entry.freeTextBranchId : "",
+    reframe: Boolean(entry.reframe),
+    reframeOpenedRoute: Boolean(entry.reframeOpenedRoute),
+    reframeBranchId: typeof entry.reframeBranchId === "string" ? entry.reframeBranchId : "",
     continuityMemory: Boolean(entry.continuityMemory),
-    routeChangeKind: ["memory", "evidence-turn", "free-text"].includes(entry.routeChangeKind) ? entry.routeChangeKind : "",
+    routeChangeKind: ["memory", "evidence-turn", "reframe"].includes(entry.routeChangeKind) ? entry.routeChangeKind : "",
     effect: normalizeSavedEffect(entry.effect),
     cognition: normalizeSavedEffect(entry.cognition),
     triggers: Array.isArray(entry.triggers) ? entry.triggers.filter((trigger) => typeof trigger === "string") : [],
@@ -196,7 +195,7 @@ function normalizeSavedCaseSummaryShape(summary) {
     primary: tuple(summary.primary, ["responsibility", 0]),
     secondary: tuple(summary.secondary, ["protection", 0]),
     thinking: tuple(summary.thinking, ["persistence", 0]),
-    freeCount: Number.isFinite(summary.freeCount) ? summary.freeCount : 0,
+    reframeCount: Number.isFinite(summary.reframeCount) ? summary.reframeCount : 0,
     averageResponseTime: Number.isFinite(summary.averageResponseTime) ? summary.averageResponseTime : 0,
     challengeClearCount: Number.isFinite(summary.challengeClearCount) ? summary.challengeClearCount : 0,
     reducedRiskCount: Number.isFinite(summary.reducedRiskCount) ? summary.reducedRiskCount : 0,
@@ -310,7 +309,6 @@ export function createReplaySavedState(seed) {
         title: nodes[entry.nodeId]?.title ?? "",
         choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",
         choice: choice?.label ?? "",
-        freeText: "",
         effect: {},
         cognition: {},
         triggers: [],
@@ -337,7 +335,6 @@ export function createReplaySavedState(seed) {
     log: replayLog,
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
-    freeText: "",
     echo: "재현 링크로 복원된 장면입니다.",
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],
@@ -363,7 +360,7 @@ export function getRouteMarker(entry) {
   const scene = nodes[nodeId];
   if (entry?.routeChangeKind === "memory" || entry?.continuityMemory) return { label: "이전 선택 귀환", tone: "memory" };
   if (entry?.routeChangeKind === "evidence-turn" || nodeId.includes("evidence_turn") || String(entry?.choiceId ?? "").includes("evidence_turn")) return { label: "단서 역전", tone: "turnaround" };
-  if (entry?.routeChangeKind === "free-text" || entry?.freeTextBranchId) return { label: "문장 분기", tone: "system" };
+  if (entry?.routeChangeKind === "reframe" || entry?.reframeBranchId) return { label: "판 다시 짜기", tone: "system" };
   if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
   if (nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
   if (nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };

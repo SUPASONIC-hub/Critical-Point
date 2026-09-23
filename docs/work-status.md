@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-23 (the 프롤로그, a fifty-five-case season, a data-driven season door, the plate's dusk and paper, a fifth ranking reset)
+Last updated: 2026-09-23 (the 프롤로그 and a fifty-five-case season; the free-input card replaced by 판을 다시 짠다; a 참가자 게시판)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1181,3 +1181,73 @@ the live database when a migration fixes a runtime error.
     all 55 cases, which is what holds the 프롤로그 to the same two promises --
     no Japanese-era banking words, and every hard term explained in parentheses
     at its first use in the case.
+
+77. 판을 다시 짠다 is a card, not a text box. The wild card used to open a
+    textarea, and what it bought was decided by `getFreeTextSignals`: four
+    keyword buckets over the typed sentence, three of which had to light for the
+    case's hidden route to open. The player could not see that rule, so the
+    route -- a whole authored stretch per case -- hung off a regex, and the best
+    strategy was to write the magic words rather than to make the decision.
+
+    The card now routes into `reframeRouteNodes[caseId]` on a cash, once per
+    case, where the three authored options already waiting there are the
+    decision. Its price is one constant pair, `REFRAME_EFFECT` and
+    `REFRAME_COGNITION`, instead of a score computed from the prose. The type is
+    `"reframe"` and the id is `reframe`; `REFRAME_CARD_ID` in `gauntletEngine.js`
+    is the id the table selects it by, which was the bare string `"__wild__"` in
+    five places.
+
+    Everything the sentence used to feed still runs, keyed on what the player
+    did rather than what they wrote: `entry.reframe` (took the card),
+    `entry.reframeOpenedRoute` (and it opened), `reframeCount` in the summary,
+    `reflectionScore` (reframes, routes opened, challenges cleared, records
+    opened -- no keyword score), the 거부 표본 observer tag, `getRouteMemory`'s
+    `systemRoute`, the BOARD BREAKER style, and the HUMAN RECORD ending, which is
+    still the only one that needs two of them. A save from before this carries
+    `freeText` and `freeTextSuccess`; `normalizeSavedLogEntry` simply does not
+    read them any more, so an old save loads with those runs' reframes
+    uncounted rather than failing.
+
+    What went with it: `src/freeTextAnalysis.js`, `src/state/useFreeTextEnrichment.js`,
+    `supabase/functions/analyze-free-text/` (the only edge function),
+    `scripts/analyze-free-text-batch.mjs`, the `analyze:free-text` script, the
+    `VITE_ENABLE_LIVE_ANALYSIS` flag, `saveAnalysisTelemetry`, the `"analysis"`
+    telemetry type, `FREE_TEXT_MAX_LENGTH`, the `freeText` save key, the
+    `freeInput` view slice, and the textarea with its privacy gate. The
+    `free_text_analyses` table stays in the schema as history; nothing writes to
+    it. GameRuntime lost 47 lines and 2 imports, PlayScreen 8 lines, gameLogic 74.
+
+78. The privacy patterns have one home, and it is not `gameLogic.js`. The
+    참가자 게시판 needs `detectPrivacySignals` in the pre-start shell, and
+    `gameLogic.js` imports `gameData.js`, which merges the case packs at module
+    scope -- a side effect rollup cannot shake out. Importing them from there
+    measured +3.0MB on the entry chunk (132KB -> 3,130KB): the whole season
+    downloaded before the intro paints, for two regexes. They live in
+    `src/privacyText.js`, a leaf module, and `gameLogic.js` re-exports them for
+    the runtime surfaces that already read them from there. `appConfig.js`
+    carries `limitText` and `makeEmptyScores` for the same reason.
+
+79. 참가자 게시판: a nickname, 300 characters, and no account. It is the only
+    place in the app where player prose is published under a name -- every
+    ranking row is 익명 분석관 and the handoff note never leaves the device --
+    so the anti-spam is on the table, in
+    `20260923010000_add_board_posts.sql`: shape (2-24 / 2-300, not whitespace),
+    no links, one post per 30 seconds and ten per hour per writer under a
+    `board:` key in `telemetry_rate_limits`, a duplicate body within six hours
+    accepted and dropped (`return null`, so a retry sees success), and a unique
+    `event_id`. Reading is an RLS row filter plus a column grant, the pattern
+    priority 25 argues for: `session_id`, `event_id` and `hidden` are invisible
+    to anon, so two posts cannot be tied to one device. `hidden` is the
+    moderation handle and nothing in the app writes it.
+
+    The client mirrors every server rule so a player is told before the round
+    trip, and adds two things a bot fails and a human never sees: an off-screen
+    honeypot field, and a refusal to submit within three seconds of the form
+    first rendering. All four defences were exercised against the deployed
+    database before this shipped -- link and short-body refused, duplicate
+    silently dropped, second post inside 30 seconds refused.
+
+    `purge_old_telemetry` now returns a fourth count. Adding a column to a
+    `returns table` changes the row type, which `create or replace` refuses with
+    42P13, so the migration drops the function first. The argument list is
+    unchanged, so any schedule calling it needs no edit.

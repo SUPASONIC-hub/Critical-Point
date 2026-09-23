@@ -115,7 +115,7 @@ await step("play through to a result page", async () => {
   }
 });
 
-await step("free-text scene accepts input", async () => {
+await step("판을 다시 짠다 opens the case's hidden route", async () => {
   await page.goto(`${url}/?debug=1`);
   await page.evaluate(() => {
     try {
@@ -131,8 +131,7 @@ await step("free-text scene accepts input", async () => {
   await page.waitForSelector(".game-shell", { timeout: 10000 });
   await openTable();
   await page.locator(".gx-card-wild").evaluate((b) => b.click());
-  await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고 원본 기록을 확인한 뒤 위험을 공개한다.");
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(300);
 });
 
 await browser.close();

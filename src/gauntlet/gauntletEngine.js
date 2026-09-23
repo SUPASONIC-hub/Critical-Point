@@ -182,12 +182,19 @@ export function normalizeSchema(value) {
 
 /* ------------------------------------------------------------------ cards */
 
-/** What the wild card -- a sentence the player writes -- is worth before heat. */
+/**
+ * The id the table gives 판을 다시 짠다, and what it is worth before heat.
+ *
+ * The card is not dealt from the scene's hand -- it is the one card every scene
+ * has -- so it needs an id the hand cannot collide with. It was the bare string
+ * "__wild__" spelled out in four places in the stage and one in the briefing.
+ */
+export const REFRAME_CARD_ID = "__reframe__";
 export const WILD_CARD_CHIPS = 24;
 
 /** Chips: what a card is worth before heat. The sum of what it gains. */
 export function getCardChips(choice, schema = BASE_SCHEMA) {
-  if (choice?.type === "free") return Math.round(WILD_CARD_CHIPS * normalizeSchema(schema).chipsScale);
+  if (choice?.type === "reframe") return Math.round(WILD_CARD_CHIPS * normalizeSchema(schema).chipsScale);
   const effect = choice?.effect ?? {};
   const gains = Object.entries(effect)
     .filter(([key, value]) => isResourceGain(key, value))
@@ -219,7 +226,7 @@ function applyFracture(effect, fracturedAxis, rate = FRACTURE_RATE) {
 export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
   const normalized = normalizeSchema(schema);
   if (!normalized.sealHighest) return null;
-  const playable = choices.filter((choice) => choice && choice.type !== "free");
+  const playable = choices.filter((choice) => choice && choice.type !== "reframe");
   if (playable.length < 2) return null;
   let best = playable[0];
   for (const choice of playable) {
@@ -1242,7 +1249,7 @@ export function carryTableRecordIntoRestore(restored, current) {
 
 /** The card the room plays for you when the window busts with nothing staged. */
 export function getForcedCard(choices = [], schema = BASE_SCHEMA) {
-  const playable = choices.filter((choice) => choice && choice.type !== "free");
+  const playable = choices.filter((choice) => choice && choice.type !== "reframe");
   if (!playable.length) return null;
   const weight = (choice) => Math.abs(getCardBurn(choice, schema)?.value ?? 0);
   return playable.reduce((worst, choice) => (weight(choice) > weight(worst) ? choice : worst), playable[0]);

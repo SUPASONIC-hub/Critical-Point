@@ -1,4 +1,4 @@
-import { applyEffect, getDiscoveryClue, getFreeTextSignals, getRiskPressure } from "../gameLogic.js";
+import { applyEffect, getDiscoveryClue, getRiskPressure } from "../gameLogic.js";
 
 /**
  * Builds the per-render readers that score a choice before it is committed:
@@ -15,7 +15,6 @@ export function createChoiceReaders({
   riskPressure,
   discoveredClues,
   currentCase,
-  freeText,
   currentChallengeStreak,
   resourceMeta,
 }) {
@@ -124,13 +123,13 @@ export function createChoiceReaders({
     return null;
   }
 
-  function getClueReveal(challengeMatch, riskDelta, responseTimeSec, freeTextSuccess = false) {
+  function getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute = false) {
     const clue = getDiscoveryClue({
       currentCase,
       challengeMatch,
       riskDelta,
       responseTimeSec,
-      freeTextSuccess,
+      reframeOpenedRoute,
       logLength: log.length,
       discoveredClueIds: discoveredClues.map((item) => item.id),
     });
@@ -141,8 +140,8 @@ export function createChoiceReaders({
     const baseResources = applyEffect(resources, baseEffect);
     const baseRiskDelta = getRiskPressure(baseResources) - riskPressure;
     const challengeMatch =
-      choice.type === "free"
-        ? sceneChallenge.id === "use-reframe" && getFreeTextSignals(freeText).filter((signal) => signal.active).length >= 2
+      choice.type === "reframe"
+        ? sceneChallenge.id === "use-reframe"
         : Boolean(getChallengeMatch(choice, baseRiskDelta));
     const tacticalRead = getTacticalRead(
       { ...choice, effect: baseEffect, cognition: cognitiveEffect },

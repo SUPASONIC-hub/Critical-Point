@@ -37,7 +37,6 @@ import {
   FEEDBACK_COMMENT_MAX_LENGTH,
   PLAYER_NAME_MAX_LENGTH,
   copyText,
-  FREE_TEXT_MAX_LENGTH,
   isSavedStateShapeValid,
   normalizeFeedback,
   normalizePlayerName,
@@ -184,7 +183,6 @@ test("save state keys should include every required persisted field", () => {
       "log",
       "triggers",
       "cognition",
-      "freeText",
       "echo",
       "nodeEnteredAt",
       "pendingTelemetry",
@@ -204,9 +202,6 @@ test("save state keys cover every key the shape validator reads", () => {
   ["completedCases", "discoveredClues", "log", "pendingTelemetry", "caseResults", "playtestFeedback", "resources", "triggers", "cognition", "currentCase", "nodeId"].forEach((key) => {
     assert.ok(SAVE_STATE_KEYS.includes(key), `save state keys should cover shape validator key ${key}`);
   });
-});
-test("free text should keep a bounded log length", () => {
-  assert.equal(FREE_TEXT_MAX_LENGTH, 600, "free text should keep a bounded log length");
 });
 test("feedback comments should keep a bounded log length", () => {
   assert.equal(FEEDBACK_COMMENT_MAX_LENGTH, 600, "feedback comments should keep a bounded log length");
@@ -440,12 +435,11 @@ const safeErrorContext = createSafeErrorContext(
     nodeId: "c5_voice",
     started: true,
     completedCases: ["case01"],
-    freeText: "민감한 자유입력",
-    log: [{ nodeId: "c5_voice", choiceId: "choice-1", freeText: "민감한 로그 전문", spokenChoice: "전체 문장" }],
+    log: [{ nodeId: "c5_voice", choiceId: "choice-1", spokenChoice: "전체 문장" }],
   },
   "react-render",
 );
-test("error contexts should keep reproduction metadata without free text or full choice text", () => {
+test("error contexts should keep reproduction metadata without full choice text", () => {
   assert.deepEqual(
     safeErrorContext,
     {
@@ -458,11 +452,11 @@ test("error contexts should keep reproduction metadata without free text or full
       lastChoiceId: "choice-1",
       lastNodeId: "c5_voice",
     },
-    "error contexts should keep reproduction metadata without free text or full choice text",
+    "error contexts should keep reproduction metadata without full choice text",
   );
 });
-test("error contexts must not include free text", () => {
-  assert.equal("freeText" in safeErrorContext, false, "error contexts must not include free text");
+test("error contexts must not include the spoken line", () => {
+  assert.equal("spokenChoice" in safeErrorContext, false, "error contexts must not include the spoken line");
 });
 test("error log writes should degrade gracefully without browser storage", () => {
   assert.equal(
@@ -491,20 +485,18 @@ const recoverySnapshot = createRecoverySnapshot({
   resources: {},
   triggers: {},
   cognition: {},
-  freeText: "private free text",
   log: Array.from({ length: 24 }, (_, index) => ({
     nodeId: `node-${index}`,
     choiceId: `choice-${index}`,
-    freeText: "private log text",
     spokenChoice: "private spoken text",
     sceneBeat: "private scene beat",
   })),
 });
-test("recovery snapshots should not duplicate free text", () => {
-  assert.equal("freeText" in recoverySnapshot, false, "recovery snapshots should not duplicate free text");
+test("recovery snapshots should not duplicate the run's prose", () => {
+  assert.equal("spokenChoice" in recoverySnapshot, false, "recovery snapshots should not duplicate the run's prose");
 });
-test("recovery snapshot log entries should not keep free text", () => {
-  assert.equal("freeText" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep free text");
+test("recovery snapshot log entries should not keep the spoken line", () => {
+  assert.equal("spokenChoice" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep the spoken line");
 });
 test("recovery snapshot log entries should not keep spoken text", () => {
   assert.equal("spokenChoice" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep spoken text");
@@ -525,8 +517,8 @@ const restoredRecoverySnapshot = restoreRecoverySnapshot(recoverySnapshot);
 test("recovery snapshots should restore to current save schema", () => {
   assert.equal(restoredRecoverySnapshot.saveSchemaVersion, SAVE_SCHEMA_VERSION, "recovery snapshots should restore to current save schema");
 });
-test("recovered saves should use empty free text", () => {
-  assert.equal(restoredRecoverySnapshot.freeText, "", "recovered saves should use empty free text");
+test("recovered saves carry no free-text draft", () => {
+  assert.equal("freeText" in restoredRecoverySnapshot, false, "the save format has no free-text draft any more");
 });
 test("recovered saves should not keep recovery slot schema metadata", () => {
   assert.equal("recoverySlotSchemaVersion" in restoredRecoverySnapshot, false, "recovered saves should not keep recovery slot schema metadata");
@@ -624,7 +616,7 @@ test("previous free-text routes should add a next-case memory choice into the hi
     getContinuityMemoryChoice({
       caseId: "final",
       nodeId: CASE_START_NODES.final,
-      caseResults: { case49: { routeMemory: getRouteMemory([{ nodeId: "c49_route_system", freeTextSuccess: true }]) } },
+      caseResults: { case49: { routeMemory: getRouteMemory([{ nodeId: "c49_route_system", reframeOpenedRoute: true }]) } },
     }).next,
     "f_route_system",
     "previous free-text routes should add a next-case memory choice into the hidden system route",
@@ -681,7 +673,7 @@ test("save normalization should preserve route-change markers for the result atl
       triggers: {},
       cognition: {},
       nodeId: "c3_start",
-      log: [{ nodeId: "c3_start", routeChangeKind: "memory", continuityMemory: true, freeTextBranchId: "c3_route_system" }],
+      log: [{ nodeId: "c3_start", routeChangeKind: "memory", continuityMemory: true, reframeBranchId: "c3_route_system" }],
     }).log[0].routeChangeKind,
     "memory",
     "save normalization should preserve route-change markers for the result atlas",
@@ -872,7 +864,7 @@ const allChoiceIds = new Set(Object.values(nodes).flatMap((node) => node.choices
 // Free-text choices are spoken in the player's own words, so they have no
 // authored line to check.
 const authoredChoiceIds = new Set(
-  Object.values(nodes).flatMap((node) => node.choices.filter((choice) => choice.type !== "free").map((choice) => choice.id)),
+  Object.values(nodes).flatMap((node) => node.choices.filter((choice) => choice.type !== "reframe").map((choice) => choice.id)),
 );
 for (const choiceId of authoredChoiceIds) {
   assert.ok(choiceVoiceLines[choiceId], `${choiceId} should have authored voice copy`);
@@ -913,7 +905,7 @@ test("330 generated scenes should expose 996 authored choices: three each across
 const fixedChoiceFallbacks = CASE_SEQUENCE.flatMap((caseId) =>
   [...new Set(nodeOrders[caseId])].flatMap((nodeId) =>
     nodes[nodeId].choices
-      .filter((choice) => choice.type !== "free")
+      .filter((choice) => choice.type !== "reframe")
       .filter((choice) => !choiceVoiceLines[choice.id] || !echoReplies[choice.id])
       .map((choice) => `${nodeId}/${choice.id}`),
   ),
@@ -932,7 +924,7 @@ function simulateCaseRoute(caseId, startNodeId = CASE_START_NODES[caseId], choic
     if (cursor === CASE_RESULT_NODES[caseId]) return visited;
     const node = nodes[cursor];
     assert.ok(node, `${caseId} route reached missing node ${cursor}`);
-    const playableChoices = node.choices.filter((choice) => choice.type !== "free");
+    const playableChoices = node.choices.filter((choice) => choice.type !== "reframe");
     assert.ok(playableChoices.length > 0, `${cursor} should have fixed choices for automated route simulation`);
     const choice = playableChoices[Math.min(choiceIndex, playableChoices.length - 1)];
     visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
@@ -1042,7 +1034,7 @@ function simulateRandomCaseRoute(caseId, startNodeId, random) {
     if (cursor === CASE_RESULT_NODES[caseId]) return visited;
     const node = nodes[cursor];
     assert.ok(node, `${caseId} random route reached missing node ${cursor}`);
-    const playableChoices = node.choices.filter((choice) => choice.type !== "free");
+    const playableChoices = node.choices.filter((choice) => choice.type !== "reframe");
     assert.ok(playableChoices.length > 0, `${cursor} should have fixed choices for random simulation`);
     const choice = playableChoices[Math.floor(random() * playableChoices.length)];
     visited.push({ nodeId: cursor, choiceId: choice.id, next: choice.next });
@@ -1208,7 +1200,7 @@ const fingerprint = getDecisionFingerprint({
   triggerScores: { responsibility: 12, protection: 8, curiosity: 2 },
   cognitionScores: { reframing: 4, inference: 2 },
   entries: [
-    { freeText: "조건을 다시 설계한다", challenge: { matched: true }, effect: { humanCost: -6 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
+    { reframe: true, challenge: { matched: true }, effect: { humanCost: -6 }, resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
   ],
   resources: recoveredResources,
 });
@@ -1259,7 +1251,7 @@ const leaderboard = buildLeaderboard([
     player_name: "첫 분석관",
     case_id: "case01",
     case_title: "CASE 01",
-    summary: { rank: "A", momentumScore: 72, primary: ["responsibility", 4], averageResponseTime: 18, freeCount: 1 },
+    summary: { rank: "A", momentumScore: 72, primary: ["responsibility", 4], averageResponseTime: 18, reframeCount: 1 },
   },
   {
     run_id: "run-alpha-1",
@@ -1267,7 +1259,7 @@ const leaderboard = buildLeaderboard([
     player_name: "첫 분석관",
     case_id: "final",
     case_title: "FINAL",
-    summary: { rank: "S", momentumScore: 88, primary: ["curiosity", 5], averageResponseTime: 21, freeCount: 2 },
+    summary: { rank: "S", momentumScore: 88, primary: ["curiosity", 5], averageResponseTime: 21, reframeCount: 2 },
   },
   {
     run_id: "run-beta-1",
@@ -1275,7 +1267,7 @@ const leaderboard = buildLeaderboard([
     player_name: "두 번째 분석관",
     case_id: "case02",
     case_title: "CASE 02",
-    summary: { rank: "A", momentumScore: 80, primary: ["trust", 4], averageResponseTime: 15, freeCount: 0 },
+    summary: { rank: "A", momentumScore: 80, primary: ["trust", 4], averageResponseTime: 15, reframeCount: 0 },
   },
 ]);
 test("leaderboard should keep one best record per run", () => {
@@ -1334,7 +1326,6 @@ const gameplayStats = getGameplayStats(
   [
     {
       responseTimeSec: 14,
-      freeText: "",
       cognition: { inference: 2, risk: 1 },
       challenge: { matched: true },
       effect: { trust: 6, humanCost: -3, capital: -5 },
@@ -1343,7 +1334,7 @@ const gameplayStats = getGameplayStats(
     },
     {
       responseTimeSec: 21,
-      freeText: "이해관계자를 다시 묶어 조건부 협상안을 제안한다.",
+      reframe: true,
       cognition: { reframing: 3, persistence: 1 },
       challenge: { matched: true },
       effect: { trust: 7, humanCost: -4, time: -6 },
@@ -1352,7 +1343,6 @@ const gameplayStats = getGameplayStats(
     },
     {
       responseTimeSec: 9,
-      freeText: "",
       cognition: { ethics: 2 },
       challenge: { matched: false },
       effect: { trust: 5, humanCost: -2, capital: -4 },
@@ -1363,8 +1353,8 @@ const gameplayStats = getGameplayStats(
   getRiskPressure(initialResources),
 );
 
-test("free text count should be tracked", () => {
-  assert.equal(gameplayStats.freeCount, 1, "free text count should be tracked");
+test("reframe count should be tracked", () => {
+  assert.equal(gameplayStats.reframeCount, 1, "reframe count should be tracked");
 });
 test("risk reductions should be tracked", () => {
   assert.equal(gameplayStats.reducedRiskCount, 1, "risk reductions should be tracked");
@@ -1410,7 +1400,7 @@ test("sample gameplay should map to B rank under the burst algorithm", () => {
 });
 const observationLedger = getObservationLedger([
   { responseTimeSec: 1, choiceId: "audit", resourcesBefore: riskyResources, resourcesAfter: recoveredResources },
-  { freeText: "조건과 근거를 다시 묶는다", choiceId: "reframe", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 28 } },
+  { reframe: true, choiceId: "reframe", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 28 } },
   { choice: "침묵을 유지한다", resourcesBefore: recoveredResources, resourcesAfter: { ...recoveredResources, humanCost: 32 } },
 ]);
 test("observation ledger should be deterministic and hidden during play", () => {
@@ -1486,7 +1476,6 @@ const caseSummary = createCaseSummary(
     {
       title: "빠른 결정",
       responseTimeSec: 8,
-      freeText: "",
       challenge: { matched: false },
       resourcesBefore: initialResources,
       resourcesAfter: initialResources,
@@ -1494,7 +1483,7 @@ const caseSummary = createCaseSummary(
     {
       title: "오래 고민한 결정",
       responseTimeSec: 24,
-      freeText: "조건부 협상으로 이해관계자를 다시 묶는다.",
+      reframe: true,
       challenge: { matched: true },
       resourcesBefore: riskyResources,
       resourcesAfter: recoveredResources,
@@ -1513,7 +1502,7 @@ test("case summary should track strongest cognition", () => {
   assert.deepEqual(caseSummary.thinking, ["risk", 5], "case summary should track strongest cognition");
 });
 test("case summary should include gameplay stats", () => {
-  assert.equal(caseSummary.freeCount, 1, "case summary should include gameplay stats");
+  assert.equal(caseSummary.reframeCount, 1, "case summary should include gameplay stats");
 });
 test("case summary should average response time", () => {
   assert.equal(caseSummary.averageResponseTime, 16, "case summary should average response time");
@@ -1530,7 +1519,7 @@ test("empty gameplay stats should stay stable", () => {
   assert.deepEqual(
     getGameplayStats(),
     {
-      freeCount: 0,
+      reframeCount: 0,
       reducedRiskCount: 0,
       challengeClearCount: 0,
       currentChallengeStreak: 0,
@@ -1572,7 +1561,7 @@ for (const [label, spoken] of [
 }
 for (const node of Object.values(nodes)) {
   for (const choice of node.choices) {
-    if (choice.type === "free") continue;
+    if (choice.type === "reframe") continue;
     assert.ok(
       !speechifyChoice(choice).endsWith("이 방향으로 가겠습니다."),
       `${choice.id} falls back to the pasted-in spoken line: ${choice.label}`,

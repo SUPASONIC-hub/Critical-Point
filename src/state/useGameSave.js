@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 
-export function useGameSaveState({ saved, initialRunId, initialResources, triggerDefaults, cognitionDefaults, normalizeText }) {
+export function useGameSaveState({ saved, initialRunId, initialResources, triggerDefaults, cognitionDefaults }) {
   const [runId, setRunId] = useState(() => saved?.runId || initialRunId);
   const [playerName, setPlayerName] = useState(() => saved?.playerName ?? "");
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
@@ -19,7 +19,6 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
   const [log, setLog] = useState(saved?.log ?? []);
   const [triggers, setTriggers] = useState(saved?.triggers ?? triggerDefaults);
   const [cognition, setCognition] = useState(saved?.cognition ?? cognitionDefaults);
-  const [freeText, setFreeText] = useState(() => normalizeText(saved?.freeText));
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
   const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
@@ -46,7 +45,6 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
     log, setLog,
     triggers, setTriggers,
     cognition, setCognition,
-    freeText, setFreeText,
     lastSavedAt, setLastSavedAt,
     isPausedSave, setIsPausedSave,
     pendingTelemetry, setPendingTelemetry,

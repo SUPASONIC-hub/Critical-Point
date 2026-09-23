@@ -5,7 +5,7 @@ import {
   CASE_START_NODES,
   caseOpeningRoutes,
   cognitionLabels,
-  freeTextRouteNodes,
+  reframeRouteNodes,
   getContinuityMemoryChoice,
   initialResources,
   nodeOrders,
@@ -72,7 +72,7 @@ for (const [nodeId, node] of Object.entries(nodes)) {
     if (choice.next && !nodes[choice.next] && !resultNodeIds.has(choice.next)) {
       failures.push(`${nodeId}/${choice.id} routes to missing node ${choice.next}`);
     }
-    if (choice.type !== undefined && !["fixed", "free"].includes(choice.type)) {
+    if (choice.type !== undefined && !["fixed", "reframe"].includes(choice.type)) {
       failures.push(`${nodeId}/${choice.id} uses unknown choice type ${choice.type}`);
     }
     checkNumberMap(`${nodeId}/${choice.id ?? "unknown"}`, "effect", choice.effect, resourceKeys);
@@ -102,11 +102,11 @@ function getCaseEntryNodes(caseId) {
   // A first successful free-text answer jumps to the case's hidden route, and
   // a previous case's log can add a memory choice on the opening screen. Both
   // are real ways in, so neither counts as an orphan.
-  if (freeTextRouteNodes[caseId]) entries.push(freeTextRouteNodes[caseId]);
+  if (reframeRouteNodes[caseId]) entries.push(reframeRouteNodes[caseId]);
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
   for (const previousEntry of [
     { nodeId: "prev_evidence_turn", choiceId: "prev_evidence_turn" },
-    { freeTextSuccess: true, nodeId: "prev", choiceId: "prev" },
+    { reframeOpenedRoute: true, nodeId: "prev", choiceId: "prev" },
     { nodeId: "prev_route_split", choiceId: "prev" },
   ]) {
     const memoryChoice = getContinuityMemoryChoice({

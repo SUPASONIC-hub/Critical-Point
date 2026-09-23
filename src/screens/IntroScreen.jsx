@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react";
-import { AlertTriangle, ChevronRight, Info, LockKeyhole, Sparkles, Trophy } from "lucide-react";
+import { AlertTriangle, ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
@@ -60,6 +60,7 @@ export function IntroScreen({ view, renderers = {} }) {
   const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel;
   const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
   const onShowRanking = view.common.setShowRanking;
+  const onShowBoard = view.common.setShowBoard;
   const gameTitle = GAME_TITLE;
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
 
@@ -153,6 +154,10 @@ export function IntroScreen({ view, renderers = {} }) {
                   <button className="ghost intro-ranking-button" type="button" onClick={() => onShowRanking(true)}>
                     <Trophy size={15} />
                     랭킹
+                  </button>
+                  <button className="ghost intro-ranking-button" type="button" onClick={() => onShowBoard(true)}>
+                    <MessagesSquare size={15} />
+                    게시판
                   </button>
                   {debugToolsEnabled && (
                     <button
@@ -553,7 +558,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <span>{triggerLabels[caseItem.result.primary[0]]}</span>
                     <small>
                       RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}s · 자유입력{" "}
-                      {caseItem.result.freeCount}
+                      {caseItem.result.reframeCount}
                     </small>
                   </article>
                 ))}
@@ -636,7 +641,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   {savedResult && (
                     <small className="case-result-mini">
                       RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 자유입력{" "}
-                      {savedResult.freeCount}
+                      {savedResult.reframeCount}
                     </small>
                   )}
                 </GuardedButton>

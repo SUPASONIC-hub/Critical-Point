@@ -208,7 +208,7 @@ export function getPlayReport(summary = {}, log = []) {
   return {
     decisions: entries.length,
     clues: summary.challengeClearCount ?? 0,
-    dominantStyle: summary.freeCount > summary.challengeClearCount ? "BOARD BREAKER" : summary.pressureAdaptScore >= summary.reflectionScore ? "RISK CUTTER" : "SYSTEM THINKER",
+    dominantStyle: summary.reframeCount > summary.challengeClearCount ? "BOARD BREAKER" : summary.pressureAdaptScore >= summary.reflectionScore ? "RISK CUTTER" : "SYSTEM THINKER",
     route: entries.map((entry) => entry.choiceId).filter(Boolean).slice(-8),
   };
 }

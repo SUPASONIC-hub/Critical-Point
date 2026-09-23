@@ -34,7 +34,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase,
     completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
-    log, triggers, cognition, freeText, echo, nodeEnteredAt, protocolUsed,
+    log, triggers, cognition, echo, nodeEnteredAt, protocolUsed,
     timerPenaltyCount, probeUsed, investigatedTargets, hypothesisDecisions,
     dynamics, isPausedSave, saveSlots,
   } = state;
@@ -45,7 +45,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setResources, setLog, setTriggers, setCognition, setProtocolUsed,
     setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
     setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
-    setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setFreeText,
+    setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
     setLocalErrorEntries, setSaveSlots,
   } = setters;
@@ -74,7 +74,6 @@ export function useAppPersistence({ state, refs, setters, config }) {
       log,
       triggers,
       cognition,
-      freeText,
       echo,
       nodeEnteredAt,
       pendingTelemetry: pendingTelemetryRef.current,
@@ -123,8 +122,8 @@ export function useAppPersistence({ state, refs, setters, config }) {
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    setFreeText(""); setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, freeText: "", nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {

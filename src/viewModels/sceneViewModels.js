@@ -38,7 +38,7 @@ export function createAuthorityState({ evidence, legitimacy, operatorOrigin, tru
   };
 }
 
-export function createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, freeTextCombo, log }) {
+export function createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log }) {
   return log.at(-1)?.title === "CRISIS PROTOCOL"
     ? "구조 개입"
     : log.at(-1)?.streakReward
@@ -49,7 +49,7 @@ export function createActiveBonus({ currentAverageResponseTime, currentChallenge
         ? "AUDIT SURGE"
       : log.at(-1)?.tempoBonus
         ? "QUICK READ"
-        : freeTextCombo >= 2
+        : reframeCombo >= 2
           ? "판 바꾸기 보너스"
           : currentChallengeStreak >= 2
             ? "연속 챌린지 보너스"
@@ -91,7 +91,7 @@ export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {
     : null;
 }
 
-export function createSceneChallenge({ freeChoice, freeTextCombo, inheritedChallenge, node, riskPressure }) {
+export function createSceneChallenge({ reframeChoice, reframeCombo, inheritedChallenge, node, riskPressure }) {
   return inheritedChallenge ??
   (riskPressure >= 35
     ? {
@@ -99,7 +99,7 @@ export function createSceneChallenge({ freeChoice, freeTextCombo, inheritedChall
         title: "위험 압력 낮추기",
         text: "예상 위험이 내려가는 선택을 찾으면 압박 관리 보너스가 붙습니다.",
       }
-    : freeTextCombo === 0 && freeChoice
+    : reframeCombo === 0 && reframeChoice
       ? {
           id: "use-reframe",
           title: "판 바꾸기 시도",

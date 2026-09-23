@@ -266,14 +266,13 @@ test("representative branch choices advance without browser runtime errors", asy
     await expect(page.locator(".game-shell")).toBeVisible();
 
     await dismissProtocolBreach(page);
-    if (choice.type === "free") {
+    if (choice.type === "reframe") {
       await page.locator(".gx-card-wild").evaluate((button) => button.click());
-      await page.locator(".reframe-box textarea").fill("직원과 협력사 조건을 분리하고, 원본 자료를 확인한 뒤 위험을 공개한다.");
       await cashStakedCard(page);
     } else {
       const fixedChoiceIndex = scene.choices
         .slice(0, choiceIndex + 1)
-        .filter((candidate) => candidate.type !== "free").length - 1;
+        .filter((candidate) => candidate.type !== "reframe").length - 1;
       await page.locator(".choices .choice").nth(fixedChoiceIndex).evaluate((button) => button.click());
       await expect(page.locator(".gx-card.selected")).toBeVisible();
       await cashStakedCard(page);
@@ -327,14 +326,14 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 });
 
-// An answer nobody wrote a button for is supposed to buy a scene nobody else
-// sees: the case's hidden route. It used to land on the shared branch detour,
-// which the fixed choices could also reach, so the reward was invisible.
-test("a successful free-text plan enters the case's hidden route", async ({ page }) => {
+// 판을 다시 짠다 buys a scene nobody else sees: the case's hidden route. It used
+// to land on the shared branch detour, which the fixed choices could also reach,
+// so the reward was invisible -- and it used to be gated on a typed sentence
+// scoring three of four keyword buckets, which the player could not see either.
+test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case01", "payday");
   await page.locator(".gx-card-wild").click();
-  await page.locator(".reframe-box textarea").fill("직원과 고객의 조건을 공개하고 근거 로그와 위험 비용을 함께 검토한다");
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
   await page.getByTestId("decision-next").click({ force: true });
@@ -880,7 +879,6 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
   const restored = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(restored.currentCase).toBe("case05");
   expect(restored.nodeId).toBe("c5_voice");
-  expect(restored.freeText).toBe("");
   expect(restored.resources).toEqual({ time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 });
   expect(Object.values(restored.triggers).every((value) => value === 0)).toBe(true);
   expect(Object.values(restored.cognition).every((value) => value === 0)).toBe(true);

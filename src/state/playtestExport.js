@@ -10,7 +10,7 @@ import { getTraceEvents } from "./trace.js";
 import { validatePlaytestExport } from "./payloadSchemas.js";
 
 const REVOKE_DELAY_MS = 1000;
-const PRIVATE_EXPORT_KEYS = new Set(["freeText", "playerName", "comment", "feedbackComment"]);
+const PRIVATE_EXPORT_KEYS = new Set(["playerName", "comment", "feedbackComment"]);
 
 function sanitizeDiagnosticValue(value) {
   if (Array.isArray(value)) return value.map(sanitizeDiagnosticValue);

@@ -61,7 +61,7 @@ const failures = [];
 let checked = 0;
 
 for (const [nodeId, node] of generated) {
-  const authored = (node.choices ?? []).filter((choice) => choice.type !== "free");
+  const authored = (node.choices ?? []).filter((choice) => choice.type !== "reframe");
   // Only the voice line is checked. It is the sentence the player is quoted as
   // saying, so it has to restate the button they pressed. The echo is the reply
   // that pushes back on it, and a good one argues from what the choice gave up

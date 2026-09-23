@@ -76,7 +76,6 @@ function validSavedState(patch = {}) {
     triggers: EMPTY_TRIGGERS,
     cognition: EMPTY_COGNITION,
     log: [],
-    freeText: "",
     echo: "E2E",
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],

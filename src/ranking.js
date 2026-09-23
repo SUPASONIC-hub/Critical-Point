@@ -25,8 +25,8 @@ function normalizeEntry(row = {}) {
   const runId = row.run_id ?? summary.runId ?? "";
   const reflectionScore = Number(summary.reflectionScore) || 0;
   const pressureAdaptScore = Number(summary.pressureAdaptScore) || 0;
-  const freeCount = Number(summary.freeCount) || 0;
-  const style = freeCount > 0 && reflectionScore >= pressureAdaptScore
+  const reframeCount = Number(summary.reframeCount) || 0;
+  const style = reframeCount > 0 && reflectionScore >= pressureAdaptScore
     ? "BOARD BREAKER"
     : pressureAdaptScore >= reflectionScore + 12
       ? "RISK CUTTER"
@@ -53,7 +53,7 @@ function normalizeEntry(row = {}) {
     score: Number.isFinite(parsedScore) ? parsedScore : null,
     trigger: summary.primary?.[0] ?? "responsibility",
     averageResponseTime: Number(summary.averageResponseTime) || 0,
-    freeCount,
+    reframeCount,
     reflectionScore,
     pressureAdaptScore,
     cognitionScore: Number(summary.cognitionScore) || 0,

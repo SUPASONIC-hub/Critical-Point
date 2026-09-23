@@ -149,10 +149,12 @@ test("saved state survives reload stress during complete season @full", async ({
       await page.locator('[aria-keyshortcuts="P"]').click();
       await assertReloadRoundTrip(page, before);
     }
-    const textarea = page.locator(".reframe-box textarea");
-    if (index === 2 && await textarea.isVisible().catch(() => false)) {
-      await textarea.fill("Reload stress ".repeat(20));
-      const typed = await page.evaluate(() => {
+    // The reframe card is the one card every scene has, so staking it is the
+    // third reload this walk takes: a table with a card on it has to survive one.
+    const reframeCard = page.locator(".gx-card-wild");
+    if (index === 2 && await reframeCard.isVisible().catch(() => false)) {
+      await reframeCard.evaluate((button) => button.click());
+      const staked = await page.evaluate(() => {
         const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
         return {
           currentCase: saved.currentCase,
@@ -161,7 +163,7 @@ test("saved state survives reload stress during complete season @full", async ({
           clueCount: saved.discoveredClues.length,
         };
       });
-      await assertReloadRoundTrip(page, typed);
+      await assertReloadRoundTrip(page, staked);
     }
     await completeCase(page, random);
     if (index < CASE_SEQUENCE.length - 1) {

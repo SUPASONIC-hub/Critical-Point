@@ -27,6 +27,7 @@ import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
+import { useBoard } from "./state/useBoard.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
 import { getOperatorProfiles } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
@@ -36,6 +37,7 @@ import { recordAppError } from "./state/errorRecovery.js";
 const GameRuntime = lazy(() => import("./GameRuntime.jsx").then(({ GameRuntime }) => ({ default: GameRuntime })));
 const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
 
 let saveSuppressed = false;
 
@@ -117,7 +119,6 @@ function createStartSave({ playerName, playStyle, dataConsent }) {
     log: [],
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
-    freeText: "",
     echo: "",
     nodeEnteredAt: now,
     pendingTelemetry: [],
@@ -158,6 +159,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   );
   const [initialStartState, setInitialStartState] = useState(null);
   const [showRanking, setShowRanking] = useState(false);
+  const [showBoard, setShowBoard] = useState(false);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [dataConsent, setDataConsent] = useState(Boolean(saved?.dataConsent));
@@ -174,6 +176,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     localLeaderboardRows: localRankingRows,
     localSeasonLeaderboardRow: null,
   });
+  const board = useBoard({ showBoard, isOnline });
 
   const saveControls = useMemo(
     () => ({
@@ -210,6 +213,19 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
           sessionCode={sessionCode}
           triggerLabels={triggerLabels}
           onClose={() => setShowRanking(false)}
+        />
+      </Suspense>
+    );
+  }
+
+  if (showBoard) {
+    return (
+      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+        <BoardScreen
+          {...board}
+          Music={AdaptiveMusic}
+          gameTitle={GAME_TITLE}
+          onClose={() => setShowBoard(false)}
         />
       </Suspense>
     );
@@ -297,6 +313,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     resumeSavedGame,
     persist,
     setShowRanking,
+    setShowBoard,
     setSaveStatus,
     pendingTelemetry,
     setPendingTelemetry,

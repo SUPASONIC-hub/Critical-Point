@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Flame, Lock, TriangleAlert } from "lucide-react";
-import { hashSeed } from "./gauntletEngine.js";
+import { hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
@@ -48,7 +48,7 @@ export function SceneBriefing({
   readSeconds,
   tableSeconds,
   cards,
-  freeChoice,
+  reframeChoice,
   isCardOpen,
   sealedId,
   selectedId,
@@ -190,7 +190,7 @@ export function SceneBriefing({
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">
-            카드를 고르면 그 카드를 건 채로 판이 열린다 · <kbd>1</kbd>–<kbd>{cards.length + (freeChoice ? 1 : 0)}</kbd>
+            카드를 고르면 그 카드를 건 채로 판이 열린다 · <kbd>1</kbd>–<kbd>{cards.length + (reframeChoice ? 1 : 0)}</kbd>
           </p>
           <div className="gx-comic-cards" role="group" aria-label="바로 걸 카드">
             {cards.map((card, index) => {
@@ -211,16 +211,16 @@ export function SceneBriefing({
                 </button>
               );
             })}
-            {freeChoice && (
+            {reframeChoice && (
               <button
                 type="button"
-                className={`gx-comic-card is-wild${selectedId === "__wild__" ? " selected" : ""}`}
+                className={`gx-comic-card is-wild${selectedId === REFRAME_CARD_ID ? " selected" : ""}`}
                 data-testid="briefing-card"
                 aria-keyshortcuts={String(cards.length + 1)}
-                onClick={() => onOpen("__wild__")}
+                onClick={() => onOpen(REFRAME_CARD_ID)}
               >
                 <kbd>{cards.length + 1}</kbd>
-                <span>직접 말한다</span>
+                <span>{reframeChoice.label}</span>
               </button>
             )}
           </div>

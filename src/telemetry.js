@@ -182,6 +182,43 @@ export async function callSupabaseRpc(name, body = {}) {
   return { data: await response.json() };
 }
 
+/**
+ * A post on the 참가자 게시판.
+ *
+ * Every other write here is telemetry the player never reads back, so it goes
+ * through `insertRow` with `return=minimal`. A board post is the opposite: the
+ * writer wants to see it appear, and the server can refuse it for reasons the
+ * writer can fix (too fast, a link, too short). So it keeps the raise message
+ * rather than a generic label, and the caller prints it.
+ */
+export async function saveBoardPost(payload, eventId = null) {
+  if (!telemetryEnabled) return { skipped: true };
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/board_posts`, {
+    method: "POST",
+    headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal,resolution=ignore-duplicates" }),
+    body: JSON.stringify(buildTelemetryPayload(payload, eventId)),
+  });
+  if (!response.ok) throw await createTelemetryError(response, "Board post failed");
+  return { saved: true };
+}
+
+export async function fetchBoardPosts(limit = 50) {
+  if (!telemetryEnabled) return { skipped: true, rows: [] };
+
+  const query = new URLSearchParams({
+    select: "id,nickname,body,created_at",
+    order: "created_at.desc",
+    limit: String(limit),
+  });
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/board_posts?${query.toString()}`, {
+    headers: restHeaders(),
+  });
+
+  if (!response.ok) throw new Error(`Board fetch failed: ${response.status}`);
+
+  return { rows: await response.json() };
+}
+
 export async function fetchLeaderboard(limit = 100) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
