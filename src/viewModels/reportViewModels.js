@@ -36,7 +36,7 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
     note: "압박이 올라간 장면에서도 같은 방향을 지켰는지 봅니다. 버스트 점수에서 가장 큰 몫입니다.",
   },
   {
-    label: "사고 리듬",
+    label: "생각 리듬",
     value: rhythmScore,
     text: `${rhythmScore}점`,
     note: "즉답이나 방치가 아니라, 압박을 읽고 결론까지 밀어낸 시간대입니다. 점수 비중은 가장 작습니다.",
@@ -70,7 +70,7 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
 
 export function createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier }) {
   return [
-  { title: `Burst ${momentumTier}`, text: `사고 버스트 ${momentumScore}점을 기록했습니다.` },
+  { title: `Burst ${momentumTier}`, text: `생각 버스트 ${momentumScore}점을 기록했습니다.` },
   result.reframeCount > 0
     ? { title: "Board Breaker", text: "선택지 밖에서 판을 다시 짰습니다." }
     : { title: "Route Follower", text: "주어진 선택지 안에서 비용을 비교했습니다." },

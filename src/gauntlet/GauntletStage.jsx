@@ -195,7 +195,7 @@ export function GauntletStage({
    * The window opens on the briefing page, with the table's clock held.
    *
    * Reading used to cost clock: the scene's story sat in a folded briefing
-   * while 45 seconds ran, and the score's own 사고 리듬 band asks for 8 to 28
+   * while 45 seconds ran, and the score's own 생각 리듬 band asks for 8 to 28
    * seconds of *deciding*. So the story is told first, as a page of its own
    * (`SceneBriefing`) with a reading clock sized to its text, and the table's
    * 45 seconds start when that page closes -- by the player opening the table,

@@ -74,7 +74,9 @@ const fileBudgets = {
   // honeypot. The rules sit beside the ranking's because they share the frame;
   // splitting them into a file of their own would copy those five blocks rather
   // than remove them.
-  "base-intro-ranking.css": { lines: 2840, bytes: 66900 },
+  // 2840 / 66900 -> 2875 / 67800 on 2026-09-23 for the 게시판 pill's glint in
+  // the intro header: accent rim, glow and light sweep, and their two keyframes.
+  "base-intro-ranking.css": { lines: 2875, bytes: 67800 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came

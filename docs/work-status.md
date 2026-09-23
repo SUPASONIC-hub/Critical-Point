@@ -506,7 +506,7 @@ the live database when a migration fixes a runtime error.
 51. Reading is not on the clock. A window used to open live: 45 seconds, heat
     creeping after 4, and the scene's story -- its lead, its body and its four
     case facts -- folded shut inside `사건 브리핑`, so opening it spent the
-    clock. The score's own 사고 리듬 band asks for 8 to 28 seconds of *deciding*
+    clock. The score's own 생각 리듬 band asks for 8 to 28 seconds of *deciding*
     and the 즉답 패널티 charges anything under 2, which means the design was
     asking for deliberation out of the same 45 seconds it made the player read
     three paragraphs in. In practice the table taught the opposite of what the

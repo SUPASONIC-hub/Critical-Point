@@ -1659,11 +1659,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
   const rankLine =
     resultRank === "S"
-      ? "사고 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다."
+      ? "생각 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다."
       : resultRank === "A"
         ? "정답을 고른 것이 아니라, 압박 속에서 판단 패턴이 선명하게 드러났습니다."
         : resultRank === "B"
-          ? "사건은 통과했습니다. 다음 플레이에서는 다른 사고 방식으로 흔들어볼 여지가 있습니다."
+          ? "사건은 통과했습니다. 다음 플레이에서는 다른 생각 방식으로 흔들어볼 여지가 있습니다."
           : "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
   const scoreBreakdown = createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore });
   const achievementBadges = createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier });

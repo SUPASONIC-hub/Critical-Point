@@ -494,6 +494,46 @@ summary:focus-visible {
   background: var(--ui-surface-3);
   border-color: rgb(255 255 255 / 0.3);
 }
+/* The board is the one place players talk to each other, so it is the one
+   header pill that glints: an accent rim, a slow glow and a light sweep. All
+   decoration -- it stops under prefers-reduced-motion like the CTA shine. */
+.intro .top-actions .intro-board-button {
+  position: relative;
+  overflow: hidden;
+  color: var(--ui-accent);
+  border-color: var(--ui-line-accent);
+  box-shadow: 0 0 14px rgb(217 255 98 / 0.22);
+  animation: board-glow 2.4s ease-in-out infinite;
+}
+.intro .top-actions .intro-board-button::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 45%;
+  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.6), rgb(255 255 255 / 0));
+  transform: skewX(-18deg);
+  animation: board-shine 2.8s var(--ui-ease) infinite;
+  pointer-events: none;
+}
+.intro .top-actions .intro-board-button:hover {
+  border-color: var(--ui-accent);
+}
+@keyframes board-glow {
+  50% {
+    box-shadow:
+      0 0 0 3px rgb(217 255 98 / 0.12),
+      0 0 22px rgb(217 255 98 / 0.45);
+  }
+}
+@keyframes board-shine {
+  0%,
+  55% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
 .intro .case-chip {
   min-height: 34px;
   padding: 0 12px;
@@ -632,7 +672,9 @@ summary:focus-visible {
   .wordmark-rule,
   .intro-visual img,
   .brand-mark-dot,
-  .intro-launch button::after {
+  .intro-launch button::after,
+  .intro .top-actions .intro-board-button,
+  .intro .top-actions .intro-board-button::after {
     animation: none;
     transform: none;
   }

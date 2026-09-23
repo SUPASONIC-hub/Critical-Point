@@ -25,10 +25,10 @@ export function RankingScreen({
           </div>
           <header className="ranking-hero">
             <span>PUBLIC SIGNAL BOARD</span>
-            <h1>어디서 사고가 터졌는가</h1>
+            <h1>어디서 생각이 가장 크게 확장됐는가</h1>
             <p>
               완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
-              압박 속에서 사고 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
+              압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
             </p>
           </header>
           <section className="ranking-status-bar">

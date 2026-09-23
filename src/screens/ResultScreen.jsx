@@ -257,9 +257,9 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
               eyebrow used to open on a bare possessive when no name was set. */}
           <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
             <div className="result-hero-copy">
-              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 사고 활성 프로필</p>
+              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필</p>
               <h1 ref={titleRef} tabIndex={-1}>
-                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 사고가 가장 오래 유지됐습니다.</>}
+                {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
               </h1>
               <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
                 <div><span>JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
@@ -338,7 +338,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             <div className="rank-copy">
               <span>SCORE BREAKDOWN · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
-              <p>다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는 정답 여부보다 사고가 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
+              <p>다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
             </div>
             <div className="score-breakdown">
               {scoreBreakdown.map((item) => (
@@ -678,7 +678,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             <section className="report-section">
               <h2>Cognitive Acceleration</h2>
               <strong>{easyCognitionLabels[result.thinking[0]] ?? cognitionLabels[result.thinking[0]]}</strong>
-              <p>로그상 가장 자주 사용된 사고 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
+              <p>로그상 가장 자주 사용된 생각 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
             </section>
             <section className="report-section">
               <h2>Reframe</h2>

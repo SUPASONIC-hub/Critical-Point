@@ -69,7 +69,7 @@ export function createChoiceReaders({
     const gain = biggestGain
       ? `${resourceMeta[biggestGain[0]]?.label ?? biggestGain[0]} +${biggestGain[1]}`
       : cognitionGain > 0
-        ? `사고 가속 +${cognitionGain}`
+        ? `생각 가속 +${cognitionGain}`
         : "관망";
 
     return { grade, gradeText, reward, cost, gain };

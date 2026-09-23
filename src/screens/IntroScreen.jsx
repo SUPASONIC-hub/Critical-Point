@@ -155,7 +155,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <Trophy size={15} />
                     랭킹
                   </button>
-                  <button className="ghost intro-ranking-button" type="button" onClick={() => onShowBoard(true)}>
+                  <button className="ghost intro-ranking-button intro-board-button" type="button" onClick={() => onShowBoard(true)}>
                     <MessagesSquare size={15} />
                     게시판
                   </button>
@@ -421,7 +421,7 @@ export function IntroScreen({ view, renderers = {} }) {
           <details className="intro-drawer">
             <summary>
               <span>SEASON 1</span>
-              <h2>사고를 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
+              <h2>생각을 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
             </summary>
             <div className="season-panel">
               <p>
