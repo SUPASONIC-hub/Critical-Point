@@ -38,9 +38,12 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
-    # Mirrored by hand in the dashboard under Settings -> Headers. These five
-    # are the source of truth for what the site *should* send; `check:deploy`
-    # asserts three of them against what it actually sends.
+    # Mirrored by hand in the dashboard under Settings -> Headers. These are
+    # the source of truth for what the site *should* send; `check:deploy`
+    # asserts three of them against what it actually sends, and the CSP by
+    # value (scripts/deploy-policy.mjs), not just by presence.
+    # `node scripts/check-deploy.mjs --offline` checks the value below and the
+    # built dist/index.html without a network.
     headers:
       # Vite fingerprints everything under assets/, so those files never change
       # behind a given name.
@@ -59,6 +62,14 @@ services:
       - path: /*
         name: Permissions-Policy
         value: camera=(), microphone=(), geolocation=()
+      # script-src is 'self' only: the built page has no inline script and no
+      #   inline handler (the critical-CSS loader used to be an onload=).
+      # style-src keeps 'unsafe-inline' for the inlined critical CSS block and
+      #   React's style attributes; styles cannot run code.
+      # img-src/font-src: every image and the Pretendard subsets ship with the
+      #   app. data: stays for fonts/images small enough for Vite to inline.
+      # connect-src: the Supabase REST API. Narrow it to the project's own
+      #   https://<ref>.supabase.co when setting it in the dashboard.
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self' https://*.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data: https:"
+        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://*.supabase.co; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'"

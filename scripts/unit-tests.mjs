@@ -75,6 +75,8 @@ import { validatePlaytestExport, validateSavedStatePayload, validateTelemetryIte
 import { buildTelemetryPayload, getTelemetryStats, subscribeTelemetryStats } from "../src/telemetry.js";
 import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
+import { boardTextHasContact, boardTextHasLink } from "../src/state/useBoard.js";
+import { cspProblems, inlineScriptProblems, parseCsp, readRenderYamlCsp } from "./deploy-policy.mjs";
 import {
   adoptSaveRevision,
   readSettledWindowSeeds,
@@ -279,6 +281,67 @@ test("telemetry payload should carry the queue identity without mutating the sou
   const payload = { case_id: "case01" };
   assert.deepEqual(buildTelemetryPayload(payload, "event-1"), { case_id: "case01", event_id: "event-1" });
   assert.deepEqual(payload, { case_id: "case01" });
+});
+test("an event_id stamped when the payload was built wins over the queue id", () => {
+  assert.equal(buildTelemetryPayload({ case_id: "case01", event_id: "built" }, "queued").event_id, "built");
+  assert.equal("event_id" in buildTelemetryPayload({ case_id: "case01" }), false);
+});
+
+// ---- ranking rows as public_rankings now serves them (20260928000000)
+test("a remote ranking row is read by its server score and short run tag", () => {
+  const [entry] = buildLeaderboard([
+    { run_tag: "4E5F6A7B", case_id: "season-final", completed_at: "2026-09-28T00:00:00Z", score: "91.5", summary: { rank: "S", burstScore: 12, seasonComplete: true } },
+  ]);
+  assert.equal(entry.score, 91.5);
+  assert.equal(entry.runLabel, "RUN 4E5F6A7B");
+  assert.equal(entry.integrity.valid, true);
+});
+test("this browser's copy of a run replaces its remote row, so the current run stays marked", () => {
+  const runId = "0f8e7d6c-1111-4222-8333-123a4e5f6a7b";
+  const board = buildLeaderboard([
+    { run_tag: "4E5F6A7B", case_id: "season-final", completed_at: "2026-09-28T00:00:00Z", score: 80, summary: { rank: "A", seasonComplete: true } },
+    { local: true, run_id: runId, case_id: "season-final", completed_at: "2026-09-28T00:00:00Z", summary: { rank: "A", burstScore: 80, seasonComplete: true } },
+  ]);
+  assert.equal(board.length, 1);
+  assert.equal(board[0].runId, runId);
+});
+
+// ---- the board's client-side mirror of the trigger's filters (20260928010000)
+test("board link filter catches what the old one let through", () => {
+  for (const text of ["spam-site.xyz", "visit spam.com now", "example . com", "example[.]me", "discord.gg/abc", "스팸닷컴", "go to promo.link", "https://x.y"]) {
+    assert.equal(boardTextHasLink(text), true, text);
+  }
+  for (const text of ["Thanks. Me too.", "3.5점 정도였어요.", "좋았어요. 다음 사건도 기대됩니다", "사건 01 너무 어려웠다"]) {
+    assert.equal(boardTextHasLink(text), false, text);
+  }
+});
+test("board contact filter catches Korean phone numbers and e-mail", () => {
+  for (const text of ["010-1234-5678", "01012345678", "02 123 4567", "+82 10 1234 5678", "메일 a.b@example.org"]) {
+    assert.equal(boardTextHasContact(text), true, text);
+  }
+  for (const text of ["사건 12에서 3,000점", "2026년 9월 28일"]) {
+    assert.equal(boardTextHasContact(text), false, text);
+  }
+});
+
+// ---- deploy policy (scripts/deploy-policy.mjs), offline
+test("the CSP render.yaml declares allows no inline script and no wildcard origin", () => {
+  const csp = readRenderYamlCsp(readFileSync("render.yaml", "utf8"));
+  assert.ok(csp, "render.yaml declares a CSP");
+  assert.deepEqual(cspProblems(csp), []);
+  assert.deepEqual(parseCsp(csp).get("script-src"), ["'self'"]);
+});
+test("a CSP is judged by its value, not its presence", () => {
+  assert.ok(cspProblems("default-src 'self'; script-src 'self' 'unsafe-inline'").some((p) => p.includes("unsafe-inline")));
+  assert.ok(cspProblems("default-src *").length > 0);
+  assert.ok(cspProblems("script-src 'self'; img-src https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'").some((p) => p.startsWith("img-src")));
+});
+test("inline scripts and handlers in built HTML are reported", () => {
+  const clean = '<script type="module" crossorigin src="/assets/index.js"></script><style id="critical-css">a{}</style>';
+  assert.deepEqual(inlineScriptProblems(clean), []);
+  assert.equal(inlineScriptProblems(`<link rel="stylesheet" href="/a.css" media="print" onload="this.media='all'">`).length, 1);
+  assert.equal(inlineScriptProblems("<script>window.x = 1</script>").length, 1);
+  assert.deepEqual(inlineScriptProblems('<script type="application/ld+json">{"a":1}</script>'), []);
 });
 test("telemetry stats subscriptions should unsubscribe cleanly", () => {
   let notifications = 0;

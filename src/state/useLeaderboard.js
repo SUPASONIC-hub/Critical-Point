@@ -6,7 +6,10 @@ import { fetchLeaderboard } from "../telemetry.js";
 /**
  * Owns the ranking table shown by the ranking screen: remote rows merged with
  * this browser's own completed runs, plus the status/error copy that explains
- * which of the two the player is looking at.
+ * which of the two the player is looking at. The remote rows are the server's
+ * best-scored completed seasons (`fetchLeaderboard`), identified by run tag
+ * only; `buildLeaderboard` matches this browser's copy of a run to its remote
+ * row by that tag.
  *
  * Extracted from AppContent() unchanged; it only ever reads local rows and
  * never writes game state.

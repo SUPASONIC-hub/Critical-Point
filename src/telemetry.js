@@ -69,25 +69,37 @@ function restHeaders(extra = {}) {
   };
 }
 
+/**
+ * One POST, idempotent on `event_id`.
+ *
+ * Every table here has `unique (event_id)`, so a retry of a row that already
+ * landed is refused with 23505, which PostgREST answers 409 -- and that is the
+ * answer a retry was hoping for, so it counts as delivered. The write carries
+ * no `on_conflict`/`resolution` preference on purpose: an ON CONFLICT target
+ * needs SELECT on its column, and anon may not read `event_id` (see
+ * 20260928030000_converge_data_api_grants.sql).
+ */
+async function postOnce(table, body, failureLabel) {
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
+    body: JSON.stringify(body),
+  });
+  if (response.status === 409) return { saved: true, duplicate: true };
+  if (!response.ok) throw await createTelemetryError(response, failureLabel);
+  return { saved: true };
+}
+
 async function insertRow(table, payload, failureLabel, eventId = null) {
   if (!telemetryEnabled) return { skipped: true };
   telemetryStats.attempted += 1;
   publishTelemetryStats();
 
   try {
-    const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
-      method: "POST",
-      headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal,resolution=ignore-duplicates" }),
-      body: JSON.stringify(buildTelemetryPayload(payload, eventId)),
-    });
-
-    if (!response.ok) {
-      throw await createTelemetryError(response, failureLabel);
-    }
-
+    const result = await postOnce(table, buildTelemetryPayload(payload, eventId), failureLabel);
     telemetryStats.saved += 1;
     publishTelemetryStats();
-    return { saved: true };
+    return result;
   } catch (error) {
     telemetryStats.failed += 1;
     publishTelemetryStats();
@@ -95,8 +107,14 @@ async function insertRow(table, payload, failureLabel, eventId = null) {
   }
 }
 
+/**
+ * The payload as posted. A caller that stamped its own `event_id` when it built
+ * the payload keeps it; otherwise the queue item's id is the identity, so a row
+ * queued by an older build still dedupes on retry.
+ */
 export function buildTelemetryPayload(payload, eventId = null) {
-  return eventId ? { ...payload, event_id: eventId } : payload;
+  const identity = payload?.event_id ?? eventId;
+  return identity ? { ...payload, event_id: identity } : payload;
 }
 
 export function getTelemetryStats() {
@@ -118,16 +136,6 @@ export function saveFeedbackTelemetry(payload, eventId = null) {
 
 export function saveErrorTelemetry(payload, eventId = null) {
   return insertRow("app_error_logs", payload, "Error log save failed", eventId);
-}
-
-/**
- * The model's reading of a free-input card. It lands after the card resolved,
- * which is too late for the `decision_log` of the case row when the card was
- * that case's last, so it travels on its own. The player's sentence is not part
- * of it.
- */
-export function saveAnalysisTelemetry(payload, eventId = null) {
-  return insertRow("free_text_analyses", payload, "Analysis save failed", eventId);
 }
 
 async function checkTelemetryTable(tableName) {
@@ -186,20 +194,14 @@ export async function callSupabaseRpc(name, body = {}) {
  * A post on the 참가자 게시판.
  *
  * Every other write here is telemetry the player never reads back, so it goes
- * through `insertRow` with `return=minimal`. A board post is the opposite: the
- * writer wants to see it appear, and the server can refuse it for reasons the
- * writer can fix (too fast, a link, too short). So it keeps the raise message
- * rather than a generic label, and the caller prints it.
+ * through `insertRow` and its delivery counters. A board post is the opposite:
+ * the writer wants to see it appear, and the server can refuse it for reasons
+ * the writer can fix (too fast, a link, too short). So it skips the counters,
+ * the error carries the server's raise message, and the caller prints it.
  */
 export async function saveBoardPost(payload, eventId = null) {
   if (!telemetryEnabled) return { skipped: true };
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/board_posts`, {
-    method: "POST",
-    headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal,resolution=ignore-duplicates" }),
-    body: JSON.stringify(buildTelemetryPayload(payload, eventId)),
-  });
-  if (!response.ok) throw await createTelemetryError(response, "Board post failed");
-  return { saved: true };
+  return postOnce("board_posts", buildTelemetryPayload(payload, eventId), "Board post failed");
 }
 
 export async function fetchBoardPosts(limit = 50) {
@@ -219,12 +221,18 @@ export async function fetchBoardPosts(limit = 50) {
   return { rows: await response.json() };
 }
 
+/**
+ * The best completed seasons, best first. The server orders by its own `score`
+ * column, so what reaches the client is the top of the table -- not the most
+ * recent rows, which a flood of fresh ones could fill. `run_tag` is the short
+ * run label; the full run id and the session code are not public.
+ */
 export async function fetchLeaderboard(limit = 100) {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
 
   const query = new URLSearchParams({
-    select: "run_id,session_code,player_name,case_id,case_title,completed_at,summary",
-    order: "completed_at.desc",
+    select: "run_tag,player_name,case_id,case_title,completed_at,summary,score",
+    order: "score.desc.nullslast,completed_at.asc",
     limit: String(limit),
   });
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_rankings?${query.toString()}`, {
