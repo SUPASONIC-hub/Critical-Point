@@ -114,22 +114,44 @@ const BUDGETS = {
   // first case and every case was `caseNN`. They now read `SEASON_ENTRY_CASE`,
   // `SEASON_ENTRY_NODE` and `caseAftermathNodeId` from `gameCases.js`, which is
   // three imported names bought by deleting four assumptions.
+  // 1832 / 154 -> 1300 / 120 on 2026-09-27, and every hook budget down with
+  // it. choose() -- 340 lines with its ranking row and telemetry -- is
+  // `useChoiceCommit`; the log-derived readouts are memoised in `useRunReadout`
+  // instead of recomputed on each render; the report's copy is in
+  // `useResultReport`; the reset's key list is `runStorageReset`; and the page
+  // lifecycle is one handler in `useWindowSuspension`. Measured 1281 / 116 and
+  // 23 / 9 / 6 / 6.
   "src/GameRuntime.jsx": {
-    lines: 1832,
-    importedNames: 154,
-    hooks: { useState: 24, useMemo: 18, useEffect: 12, useRef: 18 },
+    lines: 1300,
+    importedNames: 120,
+    hooks: { useState: 23, useMemo: 10, useEffect: 7, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
   // label rather than its position, because the 프롤로그 sits in front of
   // 사건 01 and a position counter printed "사건 6" over 사건 01.
+  // 111 -> 100 on 2026-09-27: ratcheted to what it measures (98).
   "src/screens/PlayScreen.jsx": {
-    lines: 111,
+    lines: 100,
     importedNames: 4,
     hooks: {},
   },
+  // 977 / 14 -> 400 / 10 on 2026-09-27: the third act of the report,
+  // `.report-archive`, is `ReportArchive.jsx`. Measured 379 / 9.
   "src/screens/ResultScreen.jsx": {
-    lines: 977,
-    importedNames: 14,
+    lines: 400,
+    importedNames: 10,
+    hooks: {},
+  },
+  "src/screens/ReportArchive.jsx": {
+    lines: 640,
+    importedNames: 7,
+    hooks: {},
+  },
+  // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to
+  // `useTableKeys` and its forecast derivations to `tableReadout`. Measured 917.
+  "src/gauntlet/GauntletStage.jsx": {
+    lines: 930,
+    importedNames: 68,
     hooks: {},
   },
 };
