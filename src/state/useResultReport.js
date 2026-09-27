@@ -16,10 +16,74 @@ import {
   getTelemetryDashboardSnapshot,
 } from "../advancedSystems.js";
 import { getFailureRecovery } from "../featurePack.js";
-import { createCaseSummary, getCaseOutcome, getEndingVariant } from "../gameLogic.js";
-import { createEndingProfile } from "../viewModels/reportViewModels.js";
+import { caseAftermathNodeId, triggerLabels } from "../gameData.js";
+import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover } from "../gameLogic.js";
+import { easyResourceLabels } from "../playerLanguage.js";
+import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
+import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { getRouteMarker } from "./savedState.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
+
+const RANK_LINES = {
+  S: "생각 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다.",
+  A: "정답을 고른 것이 아니라, 압박 속에서 판단 패턴이 선명하게 드러났습니다.",
+  B: "사건은 통과했습니다. 다음 플레이에서는 다른 생각 방식으로 흔들어볼 여지가 있습니다.",
+};
+const RANK_LINE_FALLBACK = "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
+
+/**
+ * The copy the report prints around the numbers: the season so far, the rank's
+ * one line, the score's parts, the badges and the three feedback questions.
+ * They sat at the bottom of the runtime's body and were rebuilt on every render
+ * of every scene.
+ */
+function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result, riskTier }) {
+  const seasonJourney = useMemo(
+    () =>
+      createCompletedCaseResultList(caseResults).map((caseItem) => ({
+        ...caseItem,
+        outcome: getCaseOutcome({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
+        carryover: getOutcomeCarryover({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
+      })),
+    [caseResults],
+  );
+  return useMemo(() => {
+    const {
+      challengeClearCount, cognitionScore, consistencyScore, currentChallengeStreak, exploitPenalty,
+      momentumScore, momentumTier, pressureAdaptScore, rank, reducedRiskCount, reflectionScore, rhythmScore,
+    } = gameplayStats;
+    const primaryTrigger = triggerLabels[result.primary[0]];
+    return {
+      seasonJourney,
+      resultRank: rank,
+      rankLine: RANK_LINES[rank] ?? RANK_LINE_FALLBACK,
+      resultBridge: result.longestDecision
+        ? `${primaryTrigger} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
+        : `${primaryTrigger} 압박이 다음 사건의 시작 조건으로 기록됩니다.`,
+      scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }),
+      achievementBadges: createAchievementBadges({
+        challengeClearCount,
+        currentChallengeStreak,
+        // Only saves from before the flow surge was retired carry one.
+        flowSurgeCount: log.filter((entry) => entry.flowSurge).length,
+        momentumScore,
+        momentumTier,
+        reducedRiskCount,
+        result,
+        riskTier,
+      }),
+      feedbackPrompts: [
+        `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
+        result.reframeCount > 0
+          ? "구조 재설계 입력이 선택지 밖의 계획처럼 느껴졌나요?"
+          : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
+        nextCaseSignal
+          ? `다음 사건 「${nextCaseSignal.title}」까지 이어서 보고 싶은 이유가 생겼나요?`
+          : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
+      ],
+    };
+  }, [gameplayStats, log, nextCaseSignal, result, riskTier, seasonJourney]);
+}
 
 /**
  * What the season has cost so far, for the closing ruling.
@@ -72,14 +136,17 @@ export function useResultReport({
   currentCase,
   discoveredClues,
   fallbackCaseId,
+  gameplayStats,
   localErrorEntries,
   localRankingRows,
   log,
+  nextCaseSignal,
   operatorOrigin,
   operatorProfile,
   pendingTelemetry,
   resolvedNodeId,
   resources,
+  riskTier,
   runId,
   triggers,
 }) {
@@ -108,10 +175,15 @@ export function useResultReport({
 
   const finalEndingEntry = [...log].reverse().find((entry) => entry.nodeId === "f_choice");
   const finalAftermathEntry = [...log].reverse().find((entry) => entry.nodeId === "f_aftershock");
-  const outcomeNodeId = currentCase === "final" ? "f_aftershock" : `${currentCase}_aftershock`;
+  // Every case closes on its own aftermath scene, and its id carries the case's
+  // node prefix (`p1`, `c1`, `f`), never the case id itself.
+  const outcomeNodeId = caseAftermathNodeId(currentCase);
   const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
 
+  const reportCopy = useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result, riskTier });
+
   return {
+    ...reportCopy,
     result,
     endingVariant,
     rankingComparison,
@@ -119,7 +191,12 @@ export function useResultReport({
     finalEndingEntry,
     finalAftermathEntry,
     latestChoiceFeedback: getChoiceOutcomeFeedback(log.at(-1)),
-    endingPreview: { ...getEndingPreview(endingVariant), rationale: [`신뢰 ${resources.trust ?? 0}`, `정당성 ${resources.legitimacy ?? 0}`, `자본 ${resources.capital ?? 0}`, `단서 ${discoveredClues.length}`] },
+    endingPreview: { ...getEndingPreview(endingVariant), rationale: [
+      `${easyResourceLabels.trust} ${resources.trust ?? 0}`,
+      `${easyResourceLabels.legitimacy} ${resources.legitimacy ?? 0}`,
+      `${easyResourceLabels.capital} ${resources.capital ?? 0}`,
+      `단서 ${discoveredClues.length}`,
+    ] },
     failureRecovery: getFailureRecovery(endingVariant, resources),
     endingCause: getFailureCause(endingVariant, resources),
     endingAtmosphere: getEndingAtmosphere(endingVariant.id),

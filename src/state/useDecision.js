@@ -1,12 +1,15 @@
 import { applyEffect, getDiscoveryClue, getRiskPressure } from "../gameLogic.js";
+import { byEffectWeight, isResourceGain } from "../gameConstants.js";
 
 /**
  * Builds the per-render readers that score a choice before it is committed:
- * challenge match, tactical read, flow surge, clue reveal and the combined
- * "effective read" the play screen and the commit console both use.
+ * whether it answers the scene's challenge, the tactical grade the report
+ * prints beside it, and the clue it may surface.
  *
- * These were inline closures in App(); the behaviour is unchanged, the state
- * they read is now passed in explicitly instead of captured.
+ * The read used to fold a "flow surge" bonus into the risk it reported while
+ * the commit never applied that bonus, so the logged risk delta and the clue
+ * roll were computed from resources the player never received. The read is now
+ * the card's own effect and nothing else.
  */
 export function createChoiceReaders({
   sceneChallenge,
@@ -15,29 +18,30 @@ export function createChoiceReaders({
   riskPressure,
   discoveredClues,
   currentCase,
-  currentChallengeStreak,
   resourceMeta,
 }) {
-  function getChallengeMatch(choice, riskDelta) {
-    if (sceneChallenge.id === "protect-trust" && (choice.effect?.trust ?? 0) > 0) return "신뢰 회복 후보";
-    if (sceneChallenge.id === "repair-legitimacy" && (choice.effect?.legitimacy ?? 0) > 0) return "정당성 회복 후보";
-    if (sceneChallenge.id === "lower-risk" && riskDelta < 0) return "챌린지 후보";
-    if (sceneChallenge.id === "avoid-risk" && riskDelta <= 0) return "챌린지 후보";
-    if (sceneChallenge.id === "find-cost" && Object.values(choice.effect ?? {}).some((value) => value < 0)) {
-      return "비용 확인됨";
-    }
-    return "";
+  // Gains and costs are read with `isResourceGain`, never by sign: fatigue and
+  // human cost rising is a cost (maintenance priority 9).
+  function splitEffect(effect = {}) {
+    const entries = Object.entries(effect).filter(([, value]) => Number(value) !== 0);
+    return {
+      gains: entries.filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight),
+      costs: entries.filter(([key, value]) => !isResourceGain(key, value)).sort(byEffectWeight),
+    };
   }
 
-  function getTacticalRead(choice, riskDelta, challengeMatch) {
-    const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
-    const biggestCost = effectEntries
-      .filter(([, value]) => value < 0)
-      .sort((a, b) => a[1] - b[1])[0];
-    const biggestGain = effectEntries
-      .filter(([, value]) => value > 0)
-      .sort((a, b) => b[1] - a[1])[0];
-    const cognitionGain = Object.values(choice.cognition ?? {}).reduce((sum, value) => sum + value, 0);
+  function matchesChallenge(effect, riskDelta) {
+    if (sceneChallenge.id === "protect-trust") return isResourceGain("trust", effect.trust ?? 0);
+    if (sceneChallenge.id === "repair-legitimacy") return isResourceGain("legitimacy", effect.legitimacy ?? 0);
+    if (sceneChallenge.id === "lower-risk") return riskDelta < 0;
+    if (sceneChallenge.id === "avoid-risk") return riskDelta <= 0;
+    if (sceneChallenge.id === "find-cost") return splitEffect(effect).costs.length > 0;
+    return false;
+  }
+
+  function getTacticalRead(effect, cognition, riskDelta, challengeMatch) {
+    const { gains, costs } = splitEffect(effect);
+    const cognitionGain = Object.values(cognition ?? {}).reduce((sum, value) => sum + value, 0);
     const grade =
       challengeMatch && riskDelta < 0
         ? "S"
@@ -63,11 +67,10 @@ export function createChoiceReaders({
           : riskDelta === 0
             ? "압력 유지"
             : `위험 압력 +${riskDelta}`;
-    const cost = biggestCost
-      ? `${resourceMeta[biggestCost[0]]?.label ?? biggestCost[0]} ${biggestCost[1]}`
-      : "즉시 손실 낮음";
-    const gain = biggestGain
-      ? `${resourceMeta[biggestGain[0]]?.label ?? biggestGain[0]} +${biggestGain[1]}`
+    const formatEntry = ([key, value]) => `${resourceMeta[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
+    const cost = costs[0] ? formatEntry(costs[0]) : "즉시 손실 낮음";
+    const gain = gains[0]
+      ? formatEntry(gains[0])
       : cognitionGain > 0
         ? `생각 가속 +${cognitionGain}`
         : "관망";
@@ -84,45 +87,6 @@ export function createChoiceReaders({
     }, {});
   }
 
-  function getFlowSurge(tacticalRead, challengeMatch, riskDelta) {
-    if (currentChallengeStreak >= 4 && challengeMatch) {
-      return {
-        label: "PERFECT RUN",
-        text: "다섯 번째 연속 공략이 맞물렸습니다. 팀의 신뢰와 정당성이 최고 흐름에 들어갑니다.",
-        effect: { trust: 3, legitimacy: 3, fatigue: -3 },
-      };
-    }
-    if (currentChallengeStreak >= 2 && challengeMatch) {
-      return {
-        label: "STREAK BREAKTHROUGH",
-        text: "세 번째 연속 공략이 맞물렸습니다. 팀의 신뢰가 붙고 판단 피로가 회복됩니다.",
-        effect: { trust: 2, legitimacy: 2, fatigue: -2 },
-      };
-    }
-    if (tacticalRead.grade === "S") {
-      return {
-        label: "FLOW SURGE",
-        text: "챌린지와 위험 제어가 동시에 맞물려 회의실의 지지가 붙었습니다.",
-        effect: { trust: 2, legitimacy: 2, fatigue: -3 },
-      };
-    }
-    if (tacticalRead.grade === "A" && challengeMatch) {
-      return {
-        label: "CHALLENGE SURGE",
-        text: "장면 목표를 정확히 찔러 다음 선택의 피로가 줄었습니다.",
-        effect: { trust: 1, legitimacy: 1, fatigue: -2 },
-      };
-    }
-    if (riskDelta < 0) {
-      return {
-        label: "PRESSURE DROP",
-        text: "위험 압력을 낮춘 덕분에 판단 여력이 조금 회복됐습니다.",
-        effect: { fatigue: -1 },
-      };
-    }
-    return null;
-  }
-
   function getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute = false) {
     const clue = getDiscoveryClue({
       currentCase,
@@ -136,40 +100,14 @@ export function createChoiceReaders({
     return clue && !discoveredClues.some((item) => item.id === clue.id) ? clue : null;
   }
 
-  function getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect) {
-    const baseResources = applyEffect(resources, baseEffect);
-    const baseRiskDelta = getRiskPressure(baseResources) - riskPressure;
+  /** The card's own effect, read against the scene's challenge. `riskDelta` is what the log and the clue roll use. */
+  function getEffectiveChoiceRead(choice, baseEffect = {}, cognitiveEffect = {}) {
+    const riskDelta = getRiskPressure(applyEffect(resources, baseEffect)) - riskPressure;
     const challengeMatch =
-      choice.type === "reframe"
-        ? sceneChallenge.id === "use-reframe"
-        : Boolean(getChallengeMatch(choice, baseRiskDelta));
-    const tacticalRead = getTacticalRead(
-      { ...choice, effect: baseEffect, cognition: cognitiveEffect },
-      baseRiskDelta,
-      challengeMatch,
-    );
-    const flowSurge = getFlowSurge(tacticalRead, challengeMatch, baseRiskDelta);
-    const finalEffect = flowSurge ? mergeEffects(baseEffect, flowSurge.effect) : baseEffect;
-    const finalResources = applyEffect(resources, finalEffect);
-    const finalRiskDelta = getRiskPressure(finalResources) - riskPressure;
-
-    return {
-      baseRiskDelta,
-      challengeMatch,
-      tacticalRead,
-      flowSurge,
-      finalEffect,
-      finalResources,
-      finalRiskDelta,
-    };
+      choice.type === "reframe" ? sceneChallenge.id === "use-reframe" : matchesChallenge(baseEffect, riskDelta);
+    const tacticalRead = getTacticalRead(baseEffect, cognitiveEffect, riskDelta, challengeMatch);
+    return { challengeMatch, tacticalRead, riskDelta };
   }
 
-  return {
-    getChallengeMatch,
-    getTacticalRead,
-    mergeEffects,
-    getFlowSurge,
-    getClueReveal,
-    getEffectiveChoiceRead,
-  };
+  return { mergeEffects, getClueReveal, getEffectiveChoiceRead };
 }
