@@ -12,7 +12,7 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, collectCharset } from "./font-charset.mjs"
 
 // Past this the one-file subset has stopped paying for itself against the
 // dynamic subset it replaced (~537KB for the intro alone). Ratchet down, never up.
-const MAX_FONT_BYTES = 300_000;
+const MAX_FONT_BYTES = 283_500;
 
 let built;
 try {

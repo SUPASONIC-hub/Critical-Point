@@ -1,3 +1,4 @@
+/* global document -- the drawing runs inside the page, through page.evaluate. */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 
