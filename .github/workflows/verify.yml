@@ -1,43 +1,68 @@
 name: Verify
 
+# Actions are pinned to a full commit SHA, with the tag it was cut from in a
+# comment. A tag can be moved to other code after review; a SHA cannot.
+# Dependabot (.github/dependabot.yml) proposes the bumps.
+
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    # `labeled` is here only so that adding the `e2e` label starts the e2e
+    # tier; see the job conditions for what a label event runs.
+    types: [opened, synchronize, reopened, labeled]
   push:
     branches:
       - main
       - master
 
+permissions:
+  contents: read
+
+# A new push to a pull request supersedes the run for the previous one. Pushes
+# to main are never cancelled: each is a deploy candidate (deploy.yml runs after
+# this workflow). A label event gets its own group, so adding `e2e` does not
+# cancel the code run that is already verifying the same commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && '-label' || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify-quick:
+    # Adding a label changes no code, so it does not re-run the quick tier.
+    if: github.event.action != 'labeled'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      # `check:visual-baselines` reads the log of each baseline PNG to tell a
-      # stale one from a current one. The default one-commit clone makes every
-      # file look equally fresh, and the check skips rather than lie.
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       # Node comes from .node-version, which is also what the Render build
       # reads. CI used to say `node-version: 24` while that file said 22.16.0,
       # so every check ran on a major the deploy never built with.
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: browsers
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      # verify:static, the production build, the bundle budget, and the runtime
+      # smoke against that build served by `vite preview`.
       - run: npm run verify:quick
-      - name: Summarize bundle and test budgets
-        if: always()
-        run: |
-          echo '### Verification summary' >> "$GITHUB_STEP_SUMMARY"
-          npm run check:bundle >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
-          npm run check:export-schema >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+      # The @prod-tagged specs against the same production build: the debug
+      # tools are compiled out of it, so these play from the intro.
+      - run: npm run test:e2e:preview
       - name: Upload Playwright diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: quick-playwright-diagnostics
           path: |
@@ -47,32 +72,53 @@ jobs:
           retention-days: 7
 
   verify-e2e:
+    # Every push, and a pull request carrying the `e2e` label. On the label
+    # event itself only when the label added is `e2e`.
     if: >-
       github.event_name != 'pull_request' ||
-      contains(github.event.pull_request.labels.*.name, 'e2e')
+      (contains(github.event.pull_request.labels.*.name, 'e2e') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'e2e'))
     runs-on: ubuntu-latest
-    # 25 -> 45 on 2026-09-22: the twenty-five-case season walk alone takes ~11
-    # minutes, and the suite around it ~22; the job was cancelled mid-run at 25.
-    # 45 -> 80 the same day for the fifty-case season, whose walk is ~22 minutes.
-    timeout-minutes: 80
+    # The suite used to be one job that grew with the season: 25 -> 45 -> 80
+    # minutes, most of it one test walking all fifty-five cases. The walk is now
+    # eight segments that Playwright can hand to different shards, and the
+    # uninterrupted walk moved to the weekly Full Coverage workflow. Each shard
+    # takes roughly a third of the suite.
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       # One Node version for CI and the Render build: .node-version.
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run verify:e2e
-      - name: Summarize E2E result
-        if: always()
-        run: echo 'E2E suite completed; see the Playwright artifact for detailed results.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: browsers
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/3
+      - name: Performance budgets
+        if: matrix.shard == 1
+        run: npm run test:performance
       - name: Upload E2E diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: e2e-playwright-diagnostics
+          name: e2e-playwright-diagnostics-${{ matrix.shard }}
           path: |
             test-results
             playwright-report

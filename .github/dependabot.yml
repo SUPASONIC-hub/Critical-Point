@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # Workflow actions are pinned to commit SHAs; this keeps the SHAs (and the
+  # `# vX.Y.Z` comments beside them) moving. One pull request a week.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Minor and patch releases of the tools, together.
+      dev-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+        exclude-patterns: ["@playwright/test"]
+      runtime:
+        dependency-type: production
+        update-types: [minor, patch]
+    ignore:
+      # @playwright/test moves only together with the Playwright container in
+      # visual-regression.yml and scripts/run-e2e.mjs and a re-recorded set of
+      # baselines; `npm run check:visual-baselines` fails when they disagree.
+      # A lone bump would always be red, so it is left to a person.
+      - dependency-name: "@playwright/test"
+      # Major versions change APIs; they are a deliberate upgrade, not a weekly one.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

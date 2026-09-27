@@ -2,7 +2,8 @@ name: Visual Regression
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    # `labeled` so that adding the `visual` label starts this; see the job condition.
+    types: [opened, synchronize, reopened, labeled]
   push:
     branches:
       - main
@@ -16,44 +17,40 @@ on:
   schedule:
     - cron: "43 3 * * 2"
 
+# Read-only by default. Only `push-baselines` below writes, and only on a
+# dispatch that asked for it: a labelled pull request -- whose code is not
+# reviewed yet -- runs with a token that cannot push.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && '-label' || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   visual-regression:
     if: >-
       github.event_name != 'pull_request' ||
-      contains(github.event.pull_request.labels.*.name, 'visual')
+      (contains(github.event.pull_request.labels.*.name, 'visual') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'visual'))
     runs-on: ubuntu-latest
     # Screenshots are compared byte-for-byte against a committed baseline, so the
     # thing that renders them has to be pinned as tightly as the code is. The
     # runner image is not: `ubuntu-latest` changes its font packages underneath
-    # us. This tag is checked against the locked playwright version by
-    # `npm run check:visual-baselines`.
-    container: mcr.microsoft.com/playwright:v1.62.1-noble
+    # us. Pinned by digest as well as tag, since a tag can be re-pushed. The
+    # version is checked against the locked playwright version by
+    # `npm run check:visual-baselines`, and `npm run test:visual:docker` runs
+    # the same image on a desktop.
+    container: mcr.microsoft.com/playwright:v1.62.1-noble@sha256:dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e
     timeout-minutes: 20
-    permissions:
-      contents: write
     steps:
-      # `check:visual-baselines` reads the log of each baseline PNG to tell a
-      # stale one from a current one. The default one-commit clone makes every
-      # file look equally fresh, and the check skips rather than lie.
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       # One Node version for CI and the Render build: .node-version.
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-
-      # Every step below runs as root inside the container against a worktree
-      # owned by the host runner's uid. `actions/checkout` does mark it safe --
-      # under a HOME it discards the moment it finishes -- so from here on git
-      # denies there is a repository at all. That cost the baseline freshness
-      # comparison (it skips rather than lie about a tree it cannot read) and
-      # killed the push step with `fatal: not in a git directory`, exit 128,
-      # after a full recording run had already finished.
-      - name: Let git read the checkout it was handed
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # Fails in seconds with the name of the missing file. Without it a missing
       # baseline set surfaces as five screenshot timeouts and no explanation.
@@ -69,31 +66,20 @@ jobs:
         if: ${{ inputs.update_baselines }}
         run: npm run test:visual -- --update-snapshots
 
-      - name: Push recorded baselines
+      # The recording job has no write access; it hands the PNGs to the job
+      # that does.
+      - name: Hand the recorded baselines on
         if: ${{ inputs.update_baselines }}
-        # The Playwright container's default shell is dash, which has no
-        # `pipefail`, so `set -euo pipefail` aborted this step before it ran a
-        # single line -- after the baselines had already been recorded.
-        shell: bash
-        env:
-          BRANCH: visual-baselines/${{ github.run_id }}
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A tests
-          if git diff --cached --quiet; then
-            echo "Baselines already match this runner; nothing to push."
-            exit 0
-          fi
-          git checkout -b "$BRANCH"
-          git commit -m "Record visual baselines on $(node -p 'process.platform')"
-          git push origin "$BRANCH"
-          echo "Baselines pushed to $BRANCH. Open a pull request from it." >> "$GITHUB_STEP_SUMMARY"
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: recorded-baselines
+          path: tests/visual-regression.spec.js-snapshots/*-linux.png
+          if-no-files-found: error
+          retention-days: 3
 
-      - name: Upload visual diagnostics
+      - name: Upload visual regression diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: visual-regression-diagnostics
           path: |
@@ -102,3 +88,37 @@ jobs:
             tests/visual-regression.spec.js-snapshots
           if-no-files-found: ignore
           retention-days: 14
+
+  push-baselines:
+    needs: visual-regression
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # The only job in the repository's workflows that can write, and it runs no
+    # project code: it checks out, drops in the PNGs the container recorded,
+    # and pushes them to a fresh branch for a pull request.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: recorded-baselines
+          path: tests/visual-regression.spec.js-snapshots
+      - name: Push recorded baselines
+        shell: bash
+        env:
+          BRANCH: visual-baselines/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tests/visual-regression.spec.js-snapshots
+          if git diff --cached --quiet; then
+            echo "Baselines already match this runner; nothing to push."
+            exit 0
+          fi
+          git checkout -b "$BRANCH"
+          git commit -m "Record visual baselines in the Playwright container"
+          git push origin "$BRANCH"
+          echo "Baselines pushed to $BRANCH. Open a pull request from it." >> "$GITHUB_STEP_SUMMARY"
