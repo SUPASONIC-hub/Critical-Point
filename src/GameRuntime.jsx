@@ -1,6 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  appendStoredErrorLog,
   createRunId,
   debugToolsEnabled,
   DEBUG_RENDER_CRASH_KEY,
@@ -15,12 +14,9 @@ import {
   normalizeSavedText,
   parseErrorLog,
   parseRecoverySlots,
-  readSettledWindowSeeds,
   readStoredValue,
-  recordSettledWindowSeed,
   RECOVERY_CENTER_STORAGE_KEY,
   removeStoredValue,
-  SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
   STORAGE_KEY,
   writeStoredValue,
@@ -32,15 +28,11 @@ import {
   SEASON_ENTRY_CASE,
   SEASON_ENTRY_NODE,
   caseAftermathNodeId,
-  caseObjectives,
   caseOpeningRoutes,
   cognitionLabels,
-  reframeRouteNodes,
   initialResources,
   nodeOrders,
   nodes,
-  getBranchDetourBypass,
-  getCaseBranchNodes,
   getContinuityMemoryChoice,
   getCaseRouteLength,
   getNodeRouteIndex,
@@ -49,39 +41,18 @@ import {
 } from "./gameData.js";
 import {
   applyEffect,
-  buildSceneBeat,
   clamp,
-  createCaseSummary,
-  getDecisionFingerprint,
-  getDecisionLedger,
-  getAllDiscoveryClueIds,
-  getAuthorityGate,
-  getEndingVariant,
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
   detectPrivacySignals,
   explainResourceTradeoff,
-  getCounterfactualReport,
-  getDramaticChoiceLabel,
-  getEcho,
-  REFRAME_COGNITION,
-  REFRAME_EFFECT,
-  getGameplayStats,
-  getObservationLedger,
-  getObserverPattern,
-  getObserverTag,
-  buildNarrativeSpine,
-  getRiskPressure,
-  getSuspenseEvent,
-  getSuspenseState,
   limitText,
   makeEmptyScores,
 } from "./gameLogic.js";
 import {
   getSessionId,
   getSessionCode,
-  saveCaseTelemetry,
   checkTelemetryHealth,
   getTelemetryStats,
   telemetryEnabled,
@@ -90,20 +61,14 @@ import { getLeaderboardHeadline } from "./ranking.js";
 import { easyCognitionLabels, simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
-import {
-  appendTraceEvent,
-  getTraceEvents,
-} from "./state/trace.js";
-import {
-  recordAppError,
-  reportSilentFailure,
-} from "./state/savedState.js";
+import { appendTraceEvent } from "./state/trace.js";
+import { recordAppError } from "./state/savedState.js";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders } from "./state/useDecision.js";
+import { useChoiceCommit } from "./state/useChoiceCommit.js";
+import { useRunReadout } from "./state/useRunReadout.js";
+import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
 import {
-  applyGauntletEffect,
-  BUST_EFFECT,
-  createRunSummary,
   normalizeRunState,
   openCaseRun,
   RUN_INITIAL_STATE,
@@ -112,7 +77,7 @@ import {
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
-import { LOCAL_RANKING_STORAGE_KEY, useLocalRanking } from "./state/useLocalRanking.js";
+import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
 import { useBoard } from "./state/useBoard.js";
 import { buildPlaytestExport, downloadJson } from "./state/playtestExport.js";
@@ -121,19 +86,18 @@ import { createFeedbackActions, useFeedbackStatus } from "./state/useFeedback.js
 import { useEndingSequence } from "./state/useEndingSequence.js";
 import { useStableEvent } from "./state/useStableEvent.js";
 import { useCaseSystems } from "./state/useCaseSystems.js";
-import { getSeasonStrain, useResultReport } from "./state/useResultReport.js";
+import { useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
 import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { safeStringify } from "./state/diagnosticUtils.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
-import { caseIntroEchoes, chapterRules, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
+import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
-import { createCompletedCaseResultList, createIntroViewModel } from "./viewModels/introViewModel.js";
+import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
-import { createAchievementBadges, createScoreBreakdown } from "./viewModels/reportViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import {
   getEndingSceneProfile,
@@ -221,7 +185,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
   );
   const [nodeEnteredAt, setNodeEnteredAt] = useState(() => saved?.nodeEnteredAt ?? nowMs());
-  const [isAdvancing, setIsAdvancing] = useState(false);
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
@@ -263,7 +226,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const telemetryRetryTimerRef = useRef(null);
   const hadDecisionRevealRef = useRef(false);
   const decisionRevealRef = useRef(null);
-  const visibilityPauseRef = useRef(null);
 
   const {
     persist: persistenceApi,
@@ -354,7 +316,56 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         : null,
     [caseResults.final, completedCases, playerName, runId, sessionCode],
   );
-  const reframeEntries = log.filter((entry) => entry.reframeOpenedRoute);
+  const {
+    achievementProgress,
+    authorityState,
+    balanceSignals,
+    clueCount,
+    clueHypotheses,
+    delayedConsequences,
+    operationsSnapshot,
+    operatorReveal,
+    seasonGoals,
+  } = useCaseSystems({
+    caseResults,
+    completedCases,
+    discoveredClues,
+    localErrorEntries,
+    localRankingRows,
+    log,
+    operatorOrigin,
+    pendingTelemetry,
+    resources,
+  });
+  const {
+    counterfactualReport,
+    currentAverageResponseTime,
+    decisionFingerprint,
+    decisionLedger,
+    endingQuietLine,
+    gameplayStats,
+    gauntletSeed,
+    narrativeSpine,
+    observationLedger,
+    observerPattern,
+    reframeEntries,
+    riskPressure,
+    riskTier,
+    silentFailureCount,
+    unopenedBranchCount,
+    unopenedClueCount,
+    unopenedRecordCount,
+  } = useRunReadout({
+    log,
+    resources,
+    triggers,
+    cognition,
+    node,
+    currentCase,
+    clueCount,
+    seedBase: started && !isResult ? `${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}` : null,
+    debugTools: debugToolsEnabled,
+  });
   const currentCaseReframeCount = reframeEntries.filter(
     (entry) => entry.caseId === fallbackCaseId,
   ).length;
@@ -401,73 +412,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     ...(relationshipChoice ? [relationshipChoice] : []),
   ];
   const reframeChoice = node?.choices?.find((choice) => choice.type === "reframe");
-  const currentAverageResponseTime =
-    log.length > 0
-      ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
-      : 0;
-  const riskPressure = getRiskPressure(resources);
-  const riskTier =
-    riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
-  const suspenseState = getSuspenseState({
-    riskPressure,
-    decisionSeconds: 45,
-    log,
-    currentCase,
-  });
-  const narrativeSpine = buildNarrativeSpine({
-    caseObjective: caseObjectives[currentCase],
-    node,
-    log,
-    triggerLabels,
-    riskTier,
-    suspenseState,
-  });
-  const gameplayStats = getGameplayStats(log, riskPressure);
-  const observationLedger = getObservationLedger(log);
-  const observerPattern = getObserverPattern(log);
-  const {
-    achievementProgress,
-    authorityState,
-    balanceSignals,
-    clueCount,
-    clueHypotheses,
-    delayedConsequences,
-    operationsSnapshot,
-    operatorReveal,
-    seasonGoals,
-  } = useCaseSystems({
-    caseResults,
-    completedCases,
-    discoveredClues,
-    localErrorEntries,
-    localRankingRows,
-    log,
-    operatorOrigin,
-    pendingTelemetry,
-    resources,
-  });
-  // What this run left shut: clues never surfaced, and the far side of every fork.
-  const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
-  const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
-  const unopenedBranchCount = getCaseBranchNodes().reduce(
-    (total, branch) => total + branch.nextIds.filter((nodeId) => !visitedNodeIds.has(nodeId)).length,
-    0,
-  );
-  const unopenedRecordCount = unopenedClueCount + unopenedBranchCount;
-  // The quiet beat shows the player their own words -- which are now always a
-  // line they picked rather than one they typed.
-  const endingQuietLine = [...log].reverse().find((entry) => entry.spokenChoice)?.spokenChoice ?? "";
-  const decisionLedger = getDecisionLedger(log, resources);
-  const decisionFingerprint = getDecisionFingerprint({
-    triggerScores: triggers,
-    cognitionScores: cognition,
-    entries: log,
-    resources,
-  });
-  const counterfactualReport = useMemo(
-    () => getCounterfactualReport(log, nodes),
-    [log],
-  );
   const {
     reframeCount: reframeCombo,
     reducedRiskCount,
@@ -481,7 +425,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     exploitPenalty,
     momentumScore,
     momentumTier,
-    rank: gameplayRank,
   } = gameplayStats;
   const activeBonus = createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log });
   const inheritedChallenge = useMemo(
@@ -489,24 +432,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     [isOpeningNode, openingLegacy],
   );
   const sceneChallenge = createSceneChallenge({ reframeChoice, reframeCombo, inheritedChallenge, node, riskPressure });
-  const {
-    mergeEffects,
-    getClueReveal,
-    getEffectiveChoiceRead,
-  } = createChoiceReaders({
+  const choiceReaders = createChoiceReaders({
     sceneChallenge,
     resources,
     log,
     riskPressure,
     discoveredClues,
     currentCase,
-    currentChallengeStreak,
     resourceMeta,
   });
 
   const formatRiskDelta = (value) =>
     value > 0 ? `+${value}` : value < 0 ? `${value}` : "유지";
-
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
@@ -523,16 +460,39 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const resumeSavedGame = persistenceResumeSavedGame;
   const pauseAfterRecovery = persistencePauseAfterRecovery;
   const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
+  // The page going away, coming back, or being hidden; see useWindowSuspension.
+  // One write per event, carrying everything that event changed.
   const suspension = useWindowSuspension({
+    started,
     active: started && !isResult && !staleSave,
     getRun: () => gauntletRun,
-    commitRun: (run) => {
-      setGauntletRun(run);
-      persist({ dynamics: serializeRunState(run) });
+    commit: ({ run = null, pausedForMs = 0, paused } = {}) => {
+      const patch = {};
+      if (run) {
+        setGauntletRun(run);
+        patch.dynamics = serializeRunState(run);
+      }
+      if (pausedForMs > 0) {
+        patch.nodeEnteredAt = nodeEnteredAt + pausedForMs;
+        setNodeEnteredAt(patch.nodeEnteredAt);
+      }
+      if (paused && !persistSuppressed() && readStoredValue(STORAGE_KEY, null) !== null) patch.paused = true;
+      if (Object.keys(patch).length > 0) persist(patch);
+    },
+    onPageShow: () => {
+      setIsPausedSave(false);
+      persist({ paused: false });
     },
   });
-  // Leaving on purpose keeps the table as it stands; see useWindowSuspension.
+  // Leaving on purpose keeps the table as it stands. A window that has closed
+  // and is still on its slam has not been handed to the runtime yet: leaving
+  // then would drop the verdict and bring the hold back as a bust, so the
+  // table has to settle first.
   function saveCurrentGame(options = {}) {
+    if (options.exit && suspension.isSettling()) {
+      setSaveStatus("판정이 끝나는 중입니다. 결과가 나온 뒤에 나갈 수 있습니다.");
+      return null;
+    }
     const suspendedRun = options.exit ? suspension.suspendNow() : null;
     if (!suspendedRun) return persistenceSaveCurrentGame(options);
     setGauntletRun(suspendedRun);
@@ -559,6 +519,21 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     telemetryRetryAttemptRef,
     setSaveStatus,
     setLastSavedAt,
+  });
+  const { choose, isAdvancing, releaseAdvance } = useChoiceCommit({
+    currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
+    caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
+    sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
+    playerName, activeCaseMeta, dataConsent, staleSave, clueCount,
+    readers: choiceReaders, persist, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
+    onSeasonFinal: () => {
+      setNewGamePlusUnlocked(true);
+      writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+    },
+    setters: {
+      setGauntletRun, setResources, setTriggers, setCognition, setLog, setEcho, setNodeId,
+      setCompletedCases, setCaseResults, setDiscoveredClues, setNodeEnteredAt, setDecisionReveal,
+    },
   });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
@@ -715,8 +690,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     }
     if (!hadDecisionRevealRef.current) return;
     hadDecisionRevealRef.current = false;
+    // A commit whose next scene is the scene it left never re-runs the scene
+    // effect below, so the reveal closing is what hands the table back.
+    releaseAdvance();
     window.requestAnimationFrame(() => sceneTitleRef.current?.focus({ preventScroll: true }));
-  }, [decisionReveal]);
+  }, [decisionReveal, releaseAdvance]);
 
   const musicModeKey = useMemo(() => {
     if (!started) return "intro:menu";
@@ -729,43 +707,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       return `${riskTier.toLowerCase()}:${currentCase}:${phaseKey}:${node?.speaker ?? "voice"}:${musicRouteIndex}:${operatorOrigin}`;
   }, [currentCase, endingStep, fallbackCaseId, isResult, node?.phase, node?.speaker, operatorOrigin, resolvedNodeId, riskTier, started]);
 
-  useEffect(() => {
-    if (!started || isResult) return undefined;
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        visibilityPauseRef.current ??= nowMs();
-        return;
-      }
-      if (visibilityPauseRef.current === null) return;
-      const pausedForMs = nowMs() - visibilityPauseRef.current;
-      visibilityPauseRef.current = null;
-      const adjustedNodeEnteredAt = nodeEnteredAt + pausedForMs;
-      setNodeEnteredAt(adjustedNodeEnteredAt);
-      persist({ nodeEnteredAt: adjustedNodeEnteredAt });
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [isResult, nodeEnteredAt, persist, started]);
-
-  useEffect(() => {
-    const handlePageHide = () => {
-      if (!started || persistSuppressed()) return;
-      if (readStoredValue(STORAGE_KEY, null) === null) return;
-      persist({ paused: true });
-    };
-    const handlePageShow = (event) => {
-      if (!started || !event.persisted) return;
-      setIsPausedSave(false);
-      persist({ paused: false });
-    };
-    window.addEventListener("pagehide", handlePageHide);
-    window.addEventListener("pageshow", handlePageShow);
-    return () => {
-      window.removeEventListener("pagehide", handlePageHide);
-      window.removeEventListener("pageshow", handlePageShow);
-    };
-  }, [persist, persistSuppressed, setIsPausedSave, started]);
-
   function getScrollBehavior() {
     return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
   }
@@ -775,11 +716,17 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       firstRenderRef.current = false;
       return;
     }
+    // A commit sets the next scene and opens the reveal in one render. The
+    // reveal is a modal that takes focus; the scene title behind it waits for
+    // the reveal to close (the effect above) instead of stealing focus now.
+    const revealOpen = Boolean(decisionReveal);
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
-      sceneTitleRef.current?.focus({ preventScroll: true });
-      setIsAdvancing(false);
+      if (!revealOpen) sceneTitleRef.current?.focus({ preventScroll: true });
+      releaseAdvance();
     });
+    // Keyed on where the player is, not on the reveal: the reveal is read once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCase, isResult, nodeId, started]);
 
   // Persistence, save slots and error-log state are owned by useAppPersistence.
@@ -806,8 +753,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     const previousOutcome = previousResult?.outcomeChoiceId
       ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : null;
+    // The outcome and carryover tables are keyed by the case that produced the
+    // outcome; the continuity challenges are keyed by the case they open
+    // (`case01: { p5_after_hold, ... }`). Looking them up under the previous
+    // case found nothing, so no authored challenge ever reached a table.
     const continuityChallenge = previousResult?.outcomeChoiceId
-      ? getContinuityChallenge({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
+      ? getContinuityChallenge({ caseId, choiceId: previousResult.outcomeChoiceId })
       : null;
     const carryoverEffect = previousResult?.outcomeChoiceId
       ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
@@ -880,34 +831,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     });
   }
 
-  function buildCaseSummary(nextTriggers, nextCognition, nextLog, nextResources = resources) {
-    return createCaseSummary(nextTriggers, nextCognition, nextLog, {
-      resources: nextResources,
-      schemaVersion: SAVE_SCHEMA_VERSION,
-    });
-  }
-
-
-  /**
-   * Where 판을 다시 짠다 leads.
-   *
-   * It used to lead nowhere unless a typed sentence scored three of four
-   * keyword signals, which meant the case's whole authored hidden route hung
-   * off a regex the player could not see. The card is an ordinary card now:
-   * taking it opens the route, once per case, and the three concrete options
-   * waiting there are the decision. What the sentence used to buy, the card's
-   * own price buys.
-   */
-  function getReframeTarget(caseId, fromNodeId) {
-    const dramaticRoute = reframeRouteNodes[caseId];
-    if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) {
-      return dramaticRoute;
-    }
-    const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
-    if (!branch || branch.nodeId === fromNodeId) return null;
-    return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
-  }
-
   /**
    * The table closed a window: settle it. `closedWindow` is the stage's final
    * window -- cashed or bust -- and the verdict it produces is the only thing
@@ -919,12 +842,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     choose(card, closedWindow, forced);
   }
 
-  /**
-   * The first touch on a window is saved before the window can be won or lost:
-   * a reload that finds this seed still open settles it as a bust. Without it,
-   * F5 during the bust slam put the player back at the same wall -- which the
-   * slam had just printed.
-   */
+  /** Another tab moved the run on: this tab stops writing and reloads what storage holds. */
   function reloadFromStorage() {
     onSuppressSaves();
     window.location.reload();
@@ -938,365 +856,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     persist({ dynamics: serializeRunState(pickedRun) });
   }
 
+  /**
+   * The first touch on a window is saved before the window can be won or lost:
+   * a reload that finds this seed still open settles it as a bust. Without it,
+   * F5 during the bust slam put the player back at the same wall -- which the
+   * slam had just printed.
+   */
   function markWindowTouched(openSeed, cardId = null) {
     if (staleSave) return;
     // Touching a window is also the end of any suspension it was resumed from.
     const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId, suspended: null });
     setGauntletRun(touchedRun);
     persist({ dynamics: serializeRunState(touchedRun) });
-  }
-
-  /**
-   * What a bust costs the story, not just the score. The room does not wait for
-   * an analyst who blew up: the scene the card led to plays out without them,
-   * and the table deals the one after it. Never onto a result -- a bust does not
-   * close a case -- and never off the authored graph.
-   */
-  function getBlackoutSkip(fromNodeId) {
-    const skippedNode = nodes[fromNodeId];
-    if (!skippedNode || Object.values(CASE_RESULT_NODES).includes(fromNodeId)) return null;
-    const onward = skippedNode.choices?.find((candidate) => candidate.type !== "free")?.next;
-    if (!onward || !nodes[onward] || Object.values(CASE_RESULT_NODES).includes(onward)) return null;
-    return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
-  }
-
-  function choose(choice, closedWindow = null, forced = false) {
-    if (isAdvancing || staleSave) return;
-    const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
-    if (!authorityGate.unlocked && !forced) {
-      setSaveStatus(`Choice locked: ${authorityGate.reason}`);
-      return;
-    }
-    if (!nodes[choice.next] && !Object.values(CASE_RESULT_NODES).includes(choice.next)) {
-      reportSilentFailure("bad-next", { from: resolvedNodeId, choiceId: choice.id, next: choice.next });
-      return;
-    }
-    setIsAdvancing(true);
-    const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
-    const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (nowMs() - nodeEnteredAt) / 1000));
-    const reframe = choice.type === "reframe";
-    // A reframe that busts is still a reframe the player paid for, but it does
-    // not open a door: the wall took the window before the new board was laid.
-    const reframeOpenedRoute = reframe && windowState.status === "cashed";
-    const reframeTarget = reframeOpenedRoute && currentCaseReframeCount === 0
-      ? getReframeTarget(currentCase, resolvedNodeId)
-      : null;
-    const baseEffect = reframe ? REFRAME_EFFECT : choice.effect;
-    const cognitiveEffect = reframe ? REFRAME_COGNITION : choice.cognition;
-    const {
-      challengeMatch,
-      tacticalRead,
-      finalRiskDelta: challengeRiskDelta,
-    } = getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-
-    const previousCaseId = caseSequence[caseSequence.indexOf(currentCase) - 1];
-    const branchBypass = getBranchDetourBypass(choice, {
-      resources,
-      previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
-    });
-    const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-    const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode) : null;
-    const nextNode = blackoutSkip?.nodeId ?? plannedNode;
-    const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
-    const { verdict, nextRun, unlockedRelics } = relicTable.settle({ run: gauntletRun, window: windowState, card: choice, caseClosed, offerRelics: currentCase !== "final" });
-    if (windowState.seed) recordSettledWindowSeed(windowState.seed);
-    const busted = verdict.outcome === "bust";
-
-    const gauntletEffect = applyGauntletEffect(baseEffect, {
-      outcome: verdict.outcome,
-      gauge: verdict.gauge,
-      fracturedAxis: verdict.fracturedAxis,
-      fractureRate: verdict.fractureRate,
-      focusMultiplier: verdict.focus?.resourceMultiplier,
-    });
-    const clue = busted ? null : getClueReveal(challengeMatch, challengeRiskDelta, responseTimeSec, reframeOpenedRoute);
-    const clueReward = clue
-      ? { label: "EVIDENCE BONUS", text: "숨은 단서를 확보했다.", effect: { legitimacy: 2, fatigue: -1 } }
-      : null;
-    const finalEffect = mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? BUST_EFFECT : {});
-    const finalResources = applyEffect(resources, finalEffect);
-    const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
-    const suspenseEvent = getSuspenseEvent({
-      riskBefore: riskPressure,
-      riskAfter: getRiskPressure(finalResources),
-      currentCase,
-      logLength: log.length,
-    });
-    const nextTriggers = { ...triggers };
-    const nextCognition = { ...cognition };
-
-    node.triggers.forEach((trigger) => {
-      nextTriggers[trigger] = (nextTriggers[trigger] ?? 0) + (reframe ? 10 : 6);
-    });
-    Object.entries(cognitiveEffect ?? {}).forEach(([key, value]) => {
-      nextCognition[key] = (nextCognition[key] ?? 0) + value;
-    });
-
-    const entryBase = {
-      nodeId: resolvedNodeId,
-      caseId: fallbackCaseId,
-      speaker: node.speaker,
-      choiceId: choice.id,
-      title: node.title,
-      chapterRule: chapterRules[currentCase]?.label ?? "",
-      choice: choice.label,
-      spokenChoice: getDramaticChoiceLabel(choice),
-      reframe,
-      reframeOpenedRoute,
-      reframeBranchId: reframeTarget,
-      continuityMemory: Boolean(choice.continuityMemory),
-      routeChangeKind: choice.continuityMemory
-        ? "memory"
-        : String(choice.id ?? "").includes("evidence_turn")
-          ? "evidence-turn"
-          : reframeTarget
-            ? "reframe"
-            : blackoutSkip
-              ? "blackout-skip"
-              : undefined,
-      skippedNodeId: blackoutSkip?.skippedNodeId,
-      effect: finalEffect,
-      riskRewardEffect: gauntletEffect,
-      cognition: cognitiveEffect ?? {},
-      triggers: node.triggers,
-      echo: getEcho(choice.id),
-      sceneBeat: buildSceneBeat(node, choice, finalEffect),
-      challenge: {
-        title: sceneChallenge.title,
-        matched: challengeMatch,
-        riskDelta: challengeRiskDelta,
-      },
-      tactical: tacticalRead,
-      flowSurge: null,
-      tempoBonus: verdict.tempo.groovePot > 0
-        ? { label: "GROOVE", text: `박자 ${verdict.tempo.hits}회 · 최고 콤보 ${verdict.tempo.maxCombo} · 판돈 +${verdict.tempo.groovePot}` }
-        : verdict.focus?.charge > 0
-          ? { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 보상 ${verdict.focus.potMultiplier}x · 자원 ${verdict.focus.resourceMultiplier}x` }
-          : null,
-      clueReward,
-      threshold: {
-        state: busted ? "bust" : "cash",
-        busted,
-        cause: verdict.cause,
-        forced,
-        gauge: verdict.gauge,
-        wall: verdict.wall,
-        pushes: verdict.pushes,
-        rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
-        potMultiplier: verdict.multiplier,
-        pot: verdict.pot,
-        lostPot: verdict.lostPot,
-        tempo: verdict.tempo,
-        focus: verdict.focus,
-      },
-      environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
-      suspenseEvent,
-      clue,
-      responseTimeSec,
-      resourcesBefore: resources,
-      resourcesAfter: finalResources,
-    };
-    const entry = {
-      ...entryBase,
-      observerTag: getObserverTag(entryBase),
-    };
-
-    const nextLog = [...log, entry];
-    const nextEcho = reframeTarget
-      ? `${entry.echo} 다음 장면은 당신이 다시 짠 판을 기준으로 이어집니다.`
-      : entry.echo;
-    appendTraceEvent({
-      kind: "choose",
-      caseId: currentCase,
-      nodeId: resolvedNodeId,
-      choiceId: choice.id,
-      nextNodeId: nextNode,
-      logLength: nextLog.length,
-      resources: finalResources,
-    });
-    const nextCompletedCases = caseClosed
-      ? Array.from(new Set([...completedCases, currentCase]))
-      : completedCases;
-    const completedNow = nextCompletedCases !== completedCases;
-    const caseSummaryDraft = completedNow
-      ? buildCaseSummary(nextTriggers, nextCognition, nextLog, finalResources)
-      : null;
-    const caseSummary = completedNow
-      ? {
-          ...caseSummaryDraft,
-          endingVariant: getEndingVariant({
-            resources: finalResources,
-            discoveredClues: nextDiscoveredClues,
-            log: nextLog,
-            ...getSeasonStrain(caseResults, caseSummaryDraft),
-          }),
-          gauntlet: createRunSummary(nextRun),
-          runId,
-          outcomeChoiceId: entry.choiceId,
-          outcomeNodeId: entry.nodeId,
-          completedAt: new Date().toISOString(),
-        }
-      : null;
-    const nextCaseResults = completedNow
-      ? {
-          ...caseResults,
-          [currentCase]: caseSummary,
-        }
-      : caseResults;
-
-    if (completedNow && caseSummary) {
-      if (currentCase === "final") {
-        setNewGamePlusUnlocked(true);
-        writeStoredValue(NEW_GAME_PLUS_KEY, "true");
-      }
-      const localRankingRow = {
-        local: true,
-        run_id: runId,
-        session_code: sessionCode,
-        player_name: playerName || "현재 분석관",
-        case_id: currentCase,
-        case_title: activeCaseMeta?.title ?? currentCase,
-        completed_at: caseSummary.completedAt,
-        summary: caseSummary,
-      };
-      const { saved: localRankingSaved } = appendLocalRankingRow(localRankingRow);
-      if (!localRankingSaved) {
-        setSaveStatus("Local ranking save failed: browser storage is unavailable.");
-        recordAppError(new Error("Local ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
-      }
-    }
-
-    if (completedNow && caseSummary) {
-      if (!telemetryEnabled) {
-        setTelemetryStatus({
-          tone: "local",
-          text: "원격 저장 미설정. 이 케이스 로그는 로컬과 JSON 내보내기에만 남습니다.",
-        });
-      } else if (!dataConsent) {
-        setTelemetryStatus({
-          tone: "local",
-          text: "데이터 제공 동의가 없어 원격 저장을 건너뛰었습니다.",
-        });
-      } else {
-        const caseTelemetryPayload = {
-          session_id: sessionId,
-          run_id: runId,
-          session_code: sessionCode,
-          player_name: "익명 분석관",
-          case_id: currentCase,
-          case_title: activeCaseMeta?.title ?? currentCase,
-          completed_at: new Date().toISOString(),
-          summary: caseSummary,
-          resources: finalResources,
-          triggers: nextTriggers,
-          cognition: nextCognition,
-          decision_log: nextLog,
-          dynamics: { ...createRunSummary(nextRun), responseTimeSec },
-        };
-        setTelemetryStatus({
-          tone: "pending",
-          text: "케이스 로그를 원격 저장하는 중입니다.",
-        });
-        saveCaseTelemetry(caseTelemetryPayload)
-          .then(() => {
-            setTelemetryStatus({
-              tone: "success",
-              text: "케이스 로그가 원격 저장됐습니다.",
-            });
-          })
-          .catch((error) => {
-            console.warn(error);
-            queueTelemetry({
-              id: `case-${currentCase}-${nowMs()}`,
-              type: "case",
-              label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
-              payload: caseTelemetryPayload,
-            });
-            setTelemetryStatus({
-              tone: "error",
-              text: "원격 저장에 실패했습니다. 로컬 대기열에 보관했으니 결과 화면에서 재시도할 수 있습니다.",
-            });
-          });
-      }
-    }
-
-    if (completedNow && caseSummary && currentCase === "final" && nextCompletedCases.length === CASE_SEQUENCE.length) {
-      const seasonTelemetryPayload = seasonViewModels.createSeasonTelemetryPayload({
-        caseSummary,
-        completedCaseCount: nextCompletedCases.length,
-        cognition: nextCognition,
-        decisionLog: nextLog,
-        resources: finalResources,
-        runId,
-        sessionCode,
-        sessionId,
-        triggers: nextTriggers,
-      });
-      const seasonLocalRankingRow = seasonViewModels.createSeasonLeaderboardRow({
-        caseSummary,
-        completedCaseCount: nextCompletedCases.length,
-        playerName,
-        runId,
-        sessionCode,
-      });
-      const { saved: seasonRankingSaved } = appendLocalRankingRow(seasonLocalRankingRow);
-      if (!seasonRankingSaved) {
-        setSaveStatus("Season ranking save failed: browser storage is unavailable.");
-        recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
-      }
-      if (telemetryEnabled && dataConsent) {
-        saveCaseTelemetry(seasonTelemetryPayload).catch(() => {
-          queueTelemetry({
-            id: `season-final-${runId}`,
-            type: "case",
-            label: "SEASON 01 COMPLETE",
-            payload: seasonTelemetryPayload,
-          });
-        });
-      }
-    }
-
-    setGauntletRun(nextRun);
-    setResources(finalResources);
-    setTriggers(nextTriggers);
-    setCognition(nextCognition);
-    setLog(nextLog);
-    setEcho(nextEcho);
-    setNodeId(nextNode);
-    setCompletedCases(nextCompletedCases);
-    setCaseResults(nextCaseResults);
-    setDiscoveredClues(nextDiscoveredClues);
-    setNodeEnteredAt(nowMs());
-    setDecisionReveal({
-      verdict,
-      forced,
-      caseClosed,
-      runPot: nextRun.runPot,
-      vault: nextRun.vault,
-      spokenChoice: entry.spokenChoice,
-      beat: entry.sceneBeat,
-      effect: finalEffect,
-      clue,
-      skippedTitle: blackoutSkip?.skippedTitle ?? null,
-      nextTitle: nodes[nextNode]?.title ?? "결과 화면",
-      nextNode,
-      unlockedRelics,
-    });
-    persist({
-      resources: finalResources,
-      triggers: nextTriggers,
-      cognition: nextCognition,
-      log: nextLog,
-      echo: nextEcho,
-      nodeId: nextNode,
-      completedCases: nextCompletedCases,
-      caseResults: nextCaseResults,
-      discoveredClues: nextDiscoveredClues,
-      timerPenaltyCount: 0,
-      probeUsed: false,
-      dynamics: serializeRunState(nextRun),
-      nodeEnteredAt: nowMs(),
-    });
   }
 
   function reset() {
@@ -1307,15 +878,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       return;
     }
     onSuppressSaves();
-    const resetStorageResults = [
-      ["trigger-prototype", removeStoredValue("trigger-prototype")],
-      [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
-      [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
-      [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
-      [LOCAL_RANKING_STORAGE_KEY, removeStoredValue(LOCAL_RANKING_STORAGE_KEY)],
-    ];
+    const failedResetKeys = clearRunStorage();
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    const failedResetKeys = resetStorageResults.filter(([, removed]) => !removed).map(([key]) => key);
     setPlayerName("");
     setOperatorOriginState("courier");
     removeStoredValue(OPERATOR_ORIGIN_KEY);
@@ -1323,7 +887,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setPlayStyle("instinct");
     setDataConsent(false);
     setStarted(false);
-    setCurrentCase("case01");
+    setCurrentCase(SEASON_ENTRY_CASE);
     setCompletedCases([]);
     setOpeningLegacy(null);
     setCaseResults({});
@@ -1334,7 +898,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLocalErrorEntries([]);
     setSaveSlots([]);
     setLastRecoveredError(null);
-    setNodeId("start");
+    setNodeId(SEASON_ENTRY_NODE);
     setResources(initialResources);
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
@@ -1347,24 +911,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setDecisionReveal(null);
     setGauntletRun(RUN_INITIAL_STATE);
     setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
-    let resetErrorLogSaved = true;
-    if (failedResetKeys.length > 0) {
-      resetErrorLogSaved = appendStoredErrorLog({
-        id: `reset-failed-${nowMs()}`,
-        occurredAt: new Date().toISOString(),
-        error: {
-          name: "StorageResetError",
-          message: "Some browser storage keys could not be removed during reset.",
-          stack: "",
-        },
-        context: {
-          source: "reset",
-          currentCase,
-          nodeId,
-          failedStorageKeys: failedResetKeys,
-        },
-      });
-    }
+    const resetErrorLogSaved = failedResetKeys.length === 0
+      || logStorageResetFailure({ source: "reset", failedStorageKeys: failedResetKeys, currentCase, nodeId });
     setSaveStatus(
       failedResetKeys.length === 0
         ? ""
@@ -1385,14 +933,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   function retryStorageCleanup() {
-    const cleanupResults = [
-      ["trigger-prototype", removeStoredValue("trigger-prototype")],
-      [STORAGE_KEY, removeStoredValue(STORAGE_KEY)],
-      [ERROR_LOG_STORAGE_KEY, removeStoredValue(ERROR_LOG_STORAGE_KEY)],
-      [SAVE_SLOT_STORAGE_KEY, removeStoredValue(SAVE_SLOT_STORAGE_KEY)],
-      [LOCAL_RANKING_STORAGE_KEY, removeStoredValue(LOCAL_RANKING_STORAGE_KEY)],
-    ];
-    const failedKeys = cleanupResults.filter(([, removed]) => !removed).map(([key]) => key);
+    const failedKeys = clearRunStorage();
     if (failedKeys.length === 0) {
       setLocalErrorEntries([]);
       clearLocalRankingRows();
@@ -1401,21 +942,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       setSaveStatus("브라우저 저장소 정리를 완료했습니다.");
       return;
     }
-    const retryLogSaved = appendStoredErrorLog({
-      id: `reset-retry-failed-${nowMs()}`,
-      occurredAt: new Date().toISOString(),
-      error: {
-        name: "StorageResetRetryError",
-        message: "Some browser storage keys could not be removed during reset retry.",
-        stack: "",
-      },
-      context: {
-        source: "reset-retry",
-        currentCase,
-        nodeId,
-        failedStorageKeys: failedKeys,
-      },
-    });
+    const retryLogSaved = logStorageResetFailure({ source: "reset-retry", failedStorageKeys: failedKeys, currentCase, nodeId });
     setSaveStatus(`저장소 정리 재시도 실패: ${failedKeys.join(", ")}${retryLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`);
   }
 
@@ -1575,6 +1102,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   });
 
   const {
+    achievementBadges,
     aftermath,
     authorityReview,
     caseOutcome,
@@ -1584,16 +1112,22 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     endingProfile,
     endingVariant,
     failureRecovery,
+    feedbackPrompts,
     finalAftermathEntry,
     finalEndingEntry,
     latestChoiceFeedback,
     originEndingVariant,
     playReport,
+    rankLine,
     rankingComparison,
     rankingIntegrity,
     replayDiagnostics,
     result,
+    resultBridge,
+    resultRank,
     routeTimeline,
+    scoreBreakdown,
+    seasonJourney,
     telemetryDashboard,
     telemetryStats,
   } = useResultReport({
@@ -1603,38 +1137,27 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     currentCase,
     discoveredClues,
     fallbackCaseId,
+    gameplayStats,
     localErrorEntries,
     localRankingRows,
     log,
+    nextCaseSignal,
     operatorOrigin,
     operatorProfile,
     pendingTelemetry,
     resolvedNodeId,
     resources,
+    riskTier,
     runId,
     triggers,
   });
 
   const routeLength = getCaseRouteLength(fallbackCaseId);
   const routeIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
-  const debugTrace = getTraceEvents();
-  const silentFailureCount = debugTrace.filter((event) => event.kind === "error" && String(event.note ?? "").startsWith("silent-")).length;
   const progress = isResult
     ? 100
     : Math.round(((Math.max(0, routeIndex) + 1) / Math.max(1, routeLength)) * 100);
-  const completedCaseResultList = createCompletedCaseResultList(caseResults);
-  const seasonJourney = completedCaseResultList.map((caseItem) => ({
-    ...caseItem,
-    outcome: getCaseOutcome({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
-    carryover: getOutcomeCarryover({ caseId: caseItem.id, choiceId: caseItem.result.outcomeChoiceId }),
-  }));
-  const resultBridge =
-    result.longestDecision
-      ? `${triggerLabels[result.primary[0]]} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
-      : `${triggerLabels[result.primary[0]]} 압박이 다음 사건의 시작 조건으로 기록됩니다.`;
-  const resultRank = gameplayRank;
   const rankingHeadline = getLeaderboardHeadline(leaderboard);
-  const flowSurgeCount = log.filter((entry) => entry.flowSurge).length;
   const feedbackPrivacySignals = detectPrivacySignals(currentFeedback.comment);
   const activeFeedbackPrivacySignals = feedbackPrivacySignals.filter((signal) => signal.active);
 
@@ -1657,25 +1180,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const screenReaderStatus = isResult
     ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
     : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
-  const rankLine =
-    resultRank === "S"
-      ? "생각 리듬, 관점 전환, 압박 회복이 동시에 솟았습니다."
-      : resultRank === "A"
-        ? "정답을 고른 것이 아니라, 압박 속에서 판단 패턴이 선명하게 드러났습니다."
-        : resultRank === "B"
-          ? "사건은 통과했습니다. 다음 플레이에서는 다른 생각 방식으로 흔들어볼 여지가 있습니다."
-          : "사건은 통과했지만 버스트 신호는 아직 약합니다. 즉답보다 근거, 비용, 회복 경로를 더 남겨보세요.";
-  const scoreBreakdown = createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore });
-  const achievementBadges = createAchievementBadges({ challengeClearCount, currentChallengeStreak, flowSurgeCount, momentumScore, momentumTier, reducedRiskCount, result, riskTier });
-  const feedbackPrompts = [
-    `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
-    result.reframeCount > 0
-      ? "구조 재설계 입력이 선택지 밖의 계획처럼 느껴졌나요?"
-      : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
-    nextCaseSignal
-      ? `${nextCaseSignal.title}로 넘어가고 싶은 이유가 생겼나요?`
-      : "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
-  ];
   function trapDecisionRevealFocus(event) {
     if (event.key !== "Tab") return;
     const focusable = Array.from(
@@ -1761,19 +1265,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} /></Suspense>;
   }
 
-  // A window already settled under this seed -- a rolled-back save brought it
-  // back -- is dealt again under a fresh draw, so its seen wall is not its wall.
-  function dealGauntletSeed(baseSeed) {
-    const settled = new Set(readSettledWindowSeeds());
-    let seed = baseSeed;
-    for (let redeal = 1; settled.has(seed) && redeal < 50; redeal += 1) seed = `${baseSeed}~${redeal}`;
-    return seed;
-  }
   const playView = createPlayView({
     AdaptiveMusic, musicModeKey, renderDecisionReveal: renderNothing, renderRecoveryNotice: renderNothing, renderErrorLogPanel: renderNothing, renderSaveStatus: renderNothing,
     screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef: null,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
-    gauntletRun, gauntletSeed: dealGauntletSeed(`${runId}:${gauntletRun.windowIndex}:${resolvedNodeId}`), resolveGauntlet: renderNothing,
+    gauntletRun, gauntletSeed, resolveGauntlet: renderNothing,
     isAdvancing, markWindowTouched: renderNothing, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage: renderNothing,
     fixedChoices, clueCount, reframeChoice,
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,

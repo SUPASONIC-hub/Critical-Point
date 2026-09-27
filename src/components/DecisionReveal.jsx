@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, isResourceGain } from "../gameConstants.js";
-import { subjectParticle } from "../playerLanguage.js";
+import { objectParticle, subjectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 
@@ -24,9 +24,12 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
         : verdict.cause === "push"
           ? "한 번 더 밀었다"
           : "직접 확정했다";
+  // The particle agrees with the number as it is read aloud (priority 10).
+  const lostPot = formatNumber(verdict.lostPot);
+  const wall = String(verdict.wall);
   const heatLine = busted
-    ? `열기 ${verdict.gauge} / 벽 ${verdict.wall}. 판돈 ${formatNumber(verdict.lostPot)}을 잃었다.`
-    : `열기 ${verdict.gauge}에서 ${formatMultiplier(verdict.multiplier)} 확정. 벽 ${verdict.wall}은 넘기지 않았다.`;
+    ? `열기 ${verdict.gauge} / 벽 ${wall}. 판돈 ${lostPot}${objectParticle(lostPot)} 잃었다.`
+    : `열기 ${verdict.gauge}에서 ${formatMultiplier(verdict.multiplier)} 확정. 벽 ${wall}${topicParticle(wall)} 넘기지 않았다.`;
   const nextRule = nextMutations.length > 0
     ? nextMutations.map((mutation) => mutation.label).join(" / ")
     : "기본 규칙으로 복귀";

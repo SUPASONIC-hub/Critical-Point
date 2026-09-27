@@ -1,3 +1,5 @@
+import { createTelemetryEventId } from "../state/telemetryEventId.js";
+
 /**
  * A case opens when the case before it in the season is complete.
  *
@@ -76,6 +78,8 @@ export function createSeasonTelemetryPayload({
   triggers,
 }) {
   return {
+    // Minted here, once: a failed send is queued with this same payload.
+    event_id: createTelemetryEventId(),
     session_id: sessionId,
     run_id: runId,
     session_code: sessionCode,

@@ -18,7 +18,7 @@ export function readRelicCodex() {
   return parseRelicCodex(readStoredValue(RELIC_CODEX_STORAGE_KEY, "{}"));
 }
 
-export function writeRelicCodex(codex) {
+function writeRelicCodex(codex) {
   return writeStoredValue(RELIC_CODEX_STORAGE_KEY, JSON.stringify({ unlocked: normalizeRelicIds(codex?.unlocked) }));
 }
 

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Anchor, Bandage, Crosshair, Eye, Fan, Gem, KeyRound, Lock, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
 import { RELIC_IDS, RELICS } from "./relics.js";
 import { readRelicCodex } from "./useRelicTable.js";
+import { useDialogFocus } from "./useDialogFocus.js";
 
 const ICONS = {
   timer: Timer,
@@ -31,20 +32,19 @@ export function RelicIcon({ id, size = 14 }) {
  * that screen: the clock does not start until it is answered, and nothing
  * behind it can be staked or pushed. Keys 1-3 take a relic and Escape passes,
  * the same keys the hand uses, so a keyboard player never reaches for the
- * mouse. The codex strip underneath is the season's collection -- what is
+ * mouse; Tab stays inside the draft and Enter takes the focused relic. The codex strip underneath is the season's collection -- what is
  * carried, what is unlocked, and the next feat that opens a locked one.
  */
 export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
   const [codex] = useState(readRelicCodex);
+  const dialogRef = useRef(null);
   const firstOption = useRef(null);
-  useEffect(() => {
-    firstOption.current?.focus({ preventScroll: true });
-  }, []);
+  const trapTab = useDialogFocus(dialogRef, firstOption);
   const unlockedCount = RELIC_IDS.filter((id) => !RELICS[id].unlock || codex.unlocked.includes(id)).length;
   const nextLocked = RELIC_IDS.find((id) => RELICS[id].unlock && !codex.unlocked.includes(id));
 
   return (
-    <div className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft">
+    <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
       <div className="gx-draft-panel">
         <span className="gx-draft-kicker">CASE CLOSED · RELIC DRAFT</span>
         <h2 id="gx-draft-title">다음 사건에 가져갈 도구 하나</h2>

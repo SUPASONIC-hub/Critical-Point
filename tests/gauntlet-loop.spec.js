@@ -41,7 +41,8 @@ async function pushAtBeat(page, where) {
   return page.evaluate(
     (mode) =>
       new Promise((resolve) => {
-        const root = document.documentElement;
+        // The FX loop writes its variables on the stage, not the document.
+        const root = document.querySelector("[data-testid='gauntlet-stage']");
         const button = document.querySelector("[data-testid='commit-push']");
         const started = performance.now();
         // The FX loop has to be observably running before any of its variables
@@ -380,8 +381,8 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
   for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
-  await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.documentElement).getPropertyValue("--gx-heat")))).toBeGreaterThan(0);
-  const shake = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--gx-shake-x").trim());
+  await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-heat")))).toBeGreaterThan(0);
+  const shake = await page.evaluate(() => getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-shake-x").trim());
   expect(["", "0.00px", "-0.00px"]).toContain(shake);
   await pushUntilBust(page);
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-bust/);

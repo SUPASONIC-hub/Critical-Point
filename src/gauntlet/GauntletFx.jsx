@@ -7,8 +7,14 @@ import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio
  * The body of the window: vignette, heartbeat, drone, shake -- and the beat.
  *
  * Everything is driven from one animation frame that reads the live window
- * through a ref and writes CSS variables on the document root, so the overlay
- * and the table inherit the same numbers without a React render per frame.
+ * through a ref and writes CSS variables, so the overlay and the table read
+ * the same numbers without a React render per frame.
+ *
+ * The variables are written on the two elements that read them: the stage
+ * (`stageRef`) and this overlay, which is portalled to the body. They used to
+ * be written on the document root, where every one of up to eight changes a
+ * frame invalidated style for the whole page -- intro chrome, header, the
+ * music controls -- not just the table that reads them.
  *
  * The heartbeat is also the table's rhythm. This loop owns when each beat
  * lands and writes it into `beatClock` -- a ref the stage reads when a push is
@@ -21,17 +27,20 @@ import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio
  * Reduced motion removes travel -- the shake and the ring's closing scale --
  * and nothing else. The red closes in, the beat still thumps the vignette's
  * opacity, the bust still floods the screen: colour and sound are not motion.
+ * The preference is followed live, not read once at mount.
  *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
  */
 const SHAKE_PX = 11;
 const FX_VARIABLES = ["--gx-heat", "--gx-beat", "--gx-shake-x", "--gx-shake-y", "--gx-beat-phase", "--gx-beat-live", "--gx-beat-zone", "--gx-flash"];
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
-export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, grade = null, fever = false, wideBeat = false }) {
+export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, stageRef, grade = null, fever = false, wideBeat = false }) {
   const stateRef = useRef({ window: liveWindow, paused, wideBeat });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
+  const overlayRef = useRef(null);
 
   useEffect(() => {
     stateRef.current = { window: liveWindow, paused, wideBeat };
@@ -49,15 +58,20 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
-    const root = document.documentElement;
-    const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    const motionQuery = globalThis.matchMedia?.(REDUCED_MOTION) ?? null;
+    let reducedMotion = motionQuery?.matches ?? false;
+    const onMotionChange = (event) => {
+      reducedMotion = event.matches;
+    };
+    motionQuery?.addEventListener?.("change", onMotionChange);
     const drone = startTensionDrone();
     const clock = beatClock?.current ?? { at: 0, period: 0 };
     const written = {};
+    const targets = () => [stageRef?.current, overlayRef.current].filter(Boolean);
     const write = (name, value) => {
       if (written[name] === value) return;
       written[name] = value;
-      root.style.setProperty(name, value);
+      for (const element of targets()) element.style.setProperty(name, value);
     };
     let frame = 0;
     let last = 0;
@@ -140,9 +154,12 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
 
     return () => {
       globalThis.cancelAnimationFrame(frame);
+      motionQuery?.removeEventListener?.("change", onMotionChange);
       drone.stop();
       clock.period = 0;
-      for (const name of FX_VARIABLES) root.style.removeProperty(name);
+      for (const element of targets()) {
+        for (const name of FX_VARIABLES) element.style.removeProperty(name);
+      }
     };
     // The loop reads everything live through refs; it mounts once per window.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -150,7 +167,11 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
 
   if (typeof document === "undefined") return null;
   return createPortal(
-    <div className={`gx-fx gx-fx-${liveWindow.status}${grade ? ` gx-fx-grade-${grade}` : ""}${fever ? " gx-fx-fever" : ""}`} aria-hidden="true">
+    <div
+      ref={overlayRef}
+      className={`gx-fx gx-fx-${liveWindow.status}${grade ? ` gx-fx-grade-${grade}` : ""}${fever ? " gx-fx-fever" : ""}`}
+      aria-hidden="true"
+    >
       <div className="gx-fx-vignette" />
       <div className="gx-fx-border" />
       <div className="gx-fx-flash" />

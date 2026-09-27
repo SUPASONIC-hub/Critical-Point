@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { createPlateRandom, getScenePlate } from "../scenePlate.js";
 
 /**
@@ -24,7 +25,7 @@ import { createPlateRandom, getScenePlate } from "../scenePlate.js";
  * It is `aria-hidden`. The room and the deadline are already text in the
  * dateline directly above, so announcing them again from a picture is noise.
  */
-export function ScenePlate({ node, nodeId, variant = "panel" }) {
+function ScenePlateDrawing({ node, nodeId, variant = "panel" }) {
   const plate = getScenePlate(node, nodeId);
   const random = createPlateRandom(plate.seed);
   // The air gets its own generator, so adding motes never moves a window the
@@ -185,6 +186,18 @@ export function ScenePlate({ node, nodeId, variant = "panel" }) {
     </svg>
   );
 }
+
+/**
+ * The drawing is a pure function of the scene and the variant, and it is the
+ * most expensive thing on the table: a few hundred SVG nodes built from a
+ * seeded generator. The stage re-renders ten times a second while its clock
+ * runs, so the plate only redraws when the scene it draws changes. `node` is
+ * the graph's own object, so identity is the right comparison for it.
+ */
+export const ScenePlate = memo(
+  ScenePlateDrawing,
+  (previous, next) => previous.node === next.node && previous.nodeId === next.nodeId && previous.variant === next.variant,
+);
 
 /** Rooms whose light comes off a screen, which get the refresh sweep. */
 const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby", "newsroom", "server", "trading"]);

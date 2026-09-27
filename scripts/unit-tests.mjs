@@ -155,10 +155,12 @@ test("the play screen is the gauntlet table and nothing in front of it", () => {
 });
 
 const gauntletStageSource = readFileSync("src/gauntlet/GauntletStage.jsx", "utf8");
+const tableReadoutSource = readFileSync("src/gauntlet/tableReadout.js", "utf8");
 test("the table never prints the odds of the next push", () => {
   // A bust probability on screen turns the bet into a lookup: press until the
   // number is not zero. The band and the heartbeat are the only instruments.
   assert.doesNotMatch(gauntletStageSource, /bustChance|probability|wall-cross|%\s*</i);
+  assert.doesNotMatch(tableReadoutSource, /bustChance|probability|wall-cross/i, "the table's readout derives no odds either");
   assert.match(gauntletStageSource, /win\.status === "bust" && win\.cause !== "abandon" && \(\s*<span className="gx-gauge-wall"/, "the wall is drawn only once it has been hit, never for an abandoned window");
 });
 

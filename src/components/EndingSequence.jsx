@@ -34,7 +34,20 @@ export function EndingSequence({
       <picture>
         {endingArt && <source media={PHONE_ART_MEDIA} srcSet={endingArt.phone} type="image/webp" />}
         {endingArt && <source srcSet={endingArt.wide} type="image/webp" />}
-        <img className="ending-visual" src={endingImage} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        {/* The full-bleed hero of the season's last screen, so it is fetched
+            first rather than lazily. Every ending plate is painted at
+            1672x941; the dimensions let the box be laid out before it lands. */}
+        <img
+          className="ending-visual"
+          src={endingImage}
+          alt=""
+          aria-hidden="true"
+          width={1672}
+          height={941}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
       </picture>
       <div className="ending-visual-scrim" aria-hidden="true" />
       <h1 className="sr-only">Season complete</h1>

@@ -1,6 +1,7 @@
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
+import { objectParticle } from "../playerLanguage.js";
 
 function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
@@ -15,8 +16,9 @@ export function GauntletLedger({ log = [], summary = null }) {
   const ledger = createGauntletLedger(log);
   const vault = Number(summary?.vault) || 0;
   const relics = normalizeRelicIds(summary?.relics);
+  const potLost = formatNumber(ledger.potLost);
   const note = ledger.busts > 0
-    ? `벽에 ${ledger.busts}번 부딪혀 판돈 ${formatNumber(ledger.potLost)}을 잃었다. 금고에 들어간 것만 남는다.`
+    ? `벽에 ${ledger.busts}번 부딪혀 판돈 ${potLost}${objectParticle(potLost)} 잃었다. 금고에 들어간 것만 남는다.`
     : ledger.cashes > 0
       ? "한 번도 터지지 않았다. 더 밀 수 있었는지는 벽만 안다."
       : "아직 테이블에 앉지 않았다.";
