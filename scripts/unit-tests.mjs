@@ -76,6 +76,7 @@ import { buildTelemetryPayload, getTelemetryStats, subscribeTelemetryStats } fro
 import { pruneTelemetryQueue, TELEMETRY_QUEUE_MAX_ITEMS } from "../src/state/telemetryQueuePolicy.js";
 import { buildLeaderboard } from "../src/ranking.js";
 import { boardTextHasContact, boardTextHasLink } from "../src/state/useBoard.js";
+import { cspProblems, inlineScriptProblems, parseCsp, readRenderYamlCsp } from "./deploy-policy.mjs";
 import {
   adoptSaveRevision,
   readSettledWindowSeeds,
@@ -323,6 +324,25 @@ test("board contact filter catches Korean phone numbers and e-mail", () => {
   }
 });
 
+// ---- deploy policy (scripts/deploy-policy.mjs), offline
+test("the CSP render.yaml declares allows no inline script and no wildcard origin", () => {
+  const csp = readRenderYamlCsp(readFileSync("render.yaml", "utf8"));
+  assert.ok(csp, "render.yaml declares a CSP");
+  assert.deepEqual(cspProblems(csp), []);
+  assert.deepEqual(parseCsp(csp).get("script-src"), ["'self'"]);
+});
+test("a CSP is judged by its value, not its presence", () => {
+  assert.ok(cspProblems("default-src 'self'; script-src 'self' 'unsafe-inline'").some((p) => p.includes("unsafe-inline")));
+  assert.ok(cspProblems("default-src *").length > 0);
+  assert.ok(cspProblems("script-src 'self'; img-src https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'").some((p) => p.startsWith("img-src")));
+});
+test("inline scripts and handlers in built HTML are reported", () => {
+  const clean = '<script type="module" crossorigin src="/assets/index.js"></script><style id="critical-css">a{}</style>';
+  assert.deepEqual(inlineScriptProblems(clean), []);
+  assert.equal(inlineScriptProblems(`<link rel="stylesheet" href="/a.css" media="print" onload="this.media='all'">`).length, 1);
+  assert.equal(inlineScriptProblems("<script>window.x = 1</script>").length, 1);
+  assert.deepEqual(inlineScriptProblems('<script type="application/ld+json">{"a":1}</script>'), []);
+});
 test("telemetry stats subscriptions should unsubscribe cleanly", () => {
   let notifications = 0;
   const unsubscribe = subscribeTelemetryStats(() => { notifications += 1; });
