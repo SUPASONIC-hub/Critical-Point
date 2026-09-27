@@ -61,3 +61,23 @@ export const cognitionLabels = {
   reframing: "판 바꾸기",
   risk: "위험 다루기",
 };
+
+/**
+ * The ending's gates a player is told about: the report's failure advice and
+ * the season goals quote these rather than numbers of their own. The rest of
+ * the ruling's gates live beside `getEndingVariant`. Placed against the
+ * season `npm run report:endings` replays (55 cases, about 490 windows).
+ */
+export const ENDING_GATES = Object.freeze({
+  // Collapse is harm: the mean human cost a case closed on (season p50 about 6;
+  // spending people for position closes near 25, putting them first at 0) --
+  collapseHarmPerCase: 20,
+  // -- or overreach people paid for: a fifth of the windows busted (about the
+  // season's p85) while cases still closed on half that harm.
+  collapseBustRate: 0.2,
+  collapseOverreachHarm: 10,
+  // The record endings ask for nine in ten of the cases' records (p10 is about 0.93).
+  clueRate: 0.9,
+  // OPEN OVERSIGHT's trust, on the season's mean closing value (p50 77).
+  oversightTrust: 85,
+});

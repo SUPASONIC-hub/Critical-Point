@@ -48,5 +48,35 @@ for (const file of files) {
   }
 }
 
+/**
+ * Rule 10: a particle after an interpolation has to agree with whatever is
+ * interpolated, so it is never written into the template. "사람 피해 ${n}를"
+ * reads 사람 피해 7를 the day n is 7, and "${label}이(가)" gives up and prints
+ * both. The helpers in playerLanguage.js choose one; this catches a template
+ * that skipped them. Particles that never change -- 의, 에, 에서, 까지, 만큼 --
+ * are fine after anything.
+ */
+const BAKED_PARTICLE = /\}(을|를|이|가|은|는|으로|로|과|와)(?=[\s.,!?'"”’)]|$)|\S\((을|를|이|가|은|는|으|과|와)\)/u;
+// Surfaces that still bake one, each owned by another part of the game and
+// reported to it on 2026-09-27. Take a file off this list when it is fixed; a
+// new file never goes on it.
+const PENDING_PARTICLE_FIXES = new Set([
+  "src/components/DecisionReveal.jsx",
+  "src/gauntlet/GauntletLedger.jsx",
+  "src/ranking.js",
+  "src/viewModels/sceneViewModels.js",
+]);
+for (const file of files) {
+  const relative = path.relative(root, file).split(path.sep).join("/");
+  if (PENDING_PARTICLE_FIXES.has(relative)) continue;
+  const text = fs.readFileSync(file, "utf8");
+  for (const candidate of collectStrings(text)) {
+    // One-line templates only: the string collector also pairs backticks across
+    // comments, which spans lines and is not a string at all.
+    if (candidate.value.includes("\n") ||!/[가-힣]/.test(candidate.value) || !candidate.value.includes("${") || !BAKED_PARTICLE.test(candidate.value)) continue;
+    failures.push(`${path.relative(root, file)}:${lineNumberFor(text, candidate.index)} bakes a Korean particle after an interpolation; use playerLanguage.js`);
+  }
+}
+
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(`Text integrity check passed for ${files.length} source files.`);

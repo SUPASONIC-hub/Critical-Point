@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
-import { BEAT_SLACK_COMBO, getEndingVariant } from "../src/gameLogic.js";
-import { getSeasonStrain } from "../src/state/useResultReport.js";
+import { BEAT_SLACK_COMBO, getEndingVariant, getSeasonStrain, isPeopleFirstEffect } from "../src/gameLogic.js";
 import { readFileSync } from "node:fs";
 
 import {
@@ -92,7 +91,8 @@ import {
 import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
 import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
-import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { directionParticle, endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { nativeKoreanCount } from "../src/featurePack.js";
 import { nodes } from "../src/gameData.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
@@ -463,6 +463,28 @@ test("particles follow the reading of a trailing digit", () => {
   assert.equal(objectParticle("현금 +7"), "을", "7 is read 칠, which ends on a consonant");
   assert.equal(endsOnConsonant("믿음 -10"), true, "anything ending in 0 is read 십/백/천/만");
 });
+// 로 / 으로 has a third case: a word that ends on ㄹ takes 로, like a vowel.
+test("direction particles take 로 after a vowel or ㄹ and 으로 after any other consonant", () => {
+  assert.equal(directionParticle("사람 피해"), "로", "a vowel");
+  assert.equal(directionParticle("서울"), "로", "ㄹ takes 로");
+  assert.equal(directionParticle("공정함"), "으로", "ㅁ takes 으로");
+  assert.equal(directionParticle("현금 +1"), "로", "1 is read 일");
+  assert.equal(directionParticle("현금 +7"), "로", "7 is read 칠");
+  assert.equal(directionParticle("현금 +8"), "로", "8 is read 팔");
+  assert.equal(directionParticle("현금 +3"), "으로", "3 is read 삼");
+  assert.equal(directionParticle("현금 +6"), "으로", "6 is read 육");
+  assert.equal(directionParticle("현금 +2"), "로", "2 is read 이");
+  assert.equal(directionParticle("공정함 40"), "으로", "40 is read 사십");
+  assert.equal(directionParticle("x"), "으로", "a Latin letter is read as ending on a consonant, as the other particles read it");
+});
+test("a count in front of a counter is read the native way", () => {
+  assert.equal(nativeKoreanCount(49), "마흔아홉");
+  assert.equal(nativeKoreanCount(20), "스무");
+  assert.equal(nativeKoreanCount(21), "스물한");
+  assert.equal(nativeKoreanCount(12), "열두");
+  assert.equal(nativeKoreanCount(1), "한");
+  assert.equal(nativeKoreanCount(120), "120", "past 99 a person writes the digits");
+});
 
 // The result ledger's sentence reads the same numbers the same way.
 test("rising 사람 피해 belongs on the cost side, and the particles follow the digits", () => {
@@ -670,6 +692,16 @@ test("a sealed card can always be opened without busting on a board that did not
   }
 });
 
+test("late in the season the band's top comes down and the clock creeps hotter, never the lowest wall", () => {
+  const early = resolveWindow({ run: normalizeRunState({ windowIndex: 10 }), window: { status: "cashed", gauge: 40, pushes: 3 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
+  const late = resolveWindow({ run: normalizeRunState({ windowIndex: 460, streak: 5, relics: RELIC_IDS }), window: { status: "cashed", gauge: 70, pushes: 6 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
+  assert.equal(early.wallMax, BASE_SCHEMA.wallMax, "the first hundred windows play the base band");
+  assert.ok(late.wallMax < BASE_SCHEMA.wallMax, "late windows draw from a lower band");
+  assert.ok(late.creep > BASE_SCHEMA.creep);
+  assert.ok(late.sealBreak - 1 + late.stepMax < late.wallMin, "the sealed-card rule holds on the season's hardest board");
+  assert.equal(openCaseRun({ windowIndex: 460 }).schema.wallMax, BASE_SCHEMA.wallMax - 8, "an abandoned case reopens on the same lean");
+});
+
 test("a window touched and left is settled as a bust when the table reopens", () => {
   const abandoned = createWindow({ schema: BASE_SCHEMA, seed: "left", abandoned: true });
   const fresh = createWindow({ schema: BASE_SCHEMA, seed: "left" });
@@ -698,18 +730,31 @@ test("a scratch is not a fracture", () => {
   assert.ok(!scratch.nextRun.schema.mutations.includes("fracture"));
 });
 
+/**
+ * A whole season, as `getSeasonStrain` reads it: 55 cases and 490 windows,
+ * standing that would open OPEN OVERSIGHT if the records were there, and 47 of
+ * 55 records -- between the plain bar (0.9) and the bar with slack (0.8).
+ */
+const seasonAtTheBar = {
+  resources: { trust: 62, legitimacy: 58, capital: 70, humanCost: 4, fatigue: 30, time: 40 },
+  discoveredClues: Array.from({ length: 47 }, (_, index) => ({ id: `c${index}` })),
+  log: [{ choiceId: "f_after_witness" }],
+  casesPlayed: 55,
+  seasonWindows: 490,
+  sustainedPressure: 20,
+  seasonReframeRoutes: 8,
+  seasonResources: { trust: 88, legitimacy: 84, capital: 90, humanCost: 4, fatigue: 25, time: 50 },
+  seasonHumanCost: 55 * 4,
+  peakRiskPressure: 30,
+  seasonBusts: 3,
+  seasonBestMultiplier: 64,
+};
+
 test("a vault big enough buys the ending the same slack as holding the line", () => {
-  const base = {
-    resources: { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 },
-    discoveredClues: [{ id: "c1" }, { id: "c2" }, { id: "c3" }],
-    seasonHumanCost: 20,
-    peakRiskPressure: 18,
-    seasonBusts: 3,
-    seasonBestMultiplier: 64,
-  };
+  const base = seasonAtTheBar;
   assert.equal(getEndingVariant(base).id, "open-question", "busts close the held-the-line door");
-  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 9000 }).id, "open-question", "a vault any steady player fills does not");
-  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 17000 }).id, "open-oversight", "a vault only a reader of the table fills opens it anyway");
+  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 15000 }).id, "open-question", "a vault any steady player fills does not");
+  assert.equal(getEndingVariant({ ...base, seasonVaultPerCase: 20000 }).id, "open-oversight", "a vault only a reader of the table fills opens it anyway");
 });
 
 test("a tab whose run is older than the save cannot write it back", () => {
@@ -976,67 +1021,84 @@ test("the ledger and the ending read the beat, and the vault slack does not coun
   assert.equal(ledger.slips, 2);
   assert.equal(ledger.grooveBanked, 240);
 
-  const base = {
-    resources: { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 },
-    discoveredClues: [{ id: "c1" }, { id: "c2" }, { id: "c3" }],
-    seasonHumanCost: 20,
-    peakRiskPressure: 18,
-    seasonBusts: 3,
-    seasonBestMultiplier: 64,
-  };
+  const base = seasonAtTheBar;
   assert.equal(getEndingVariant({ ...base, seasonBestCombo: BEAT_SLACK_COMBO - 1 }).id, "open-question", "a combo a mashing hand can stumble into opens nothing");
   assert.equal(getEndingVariant({ ...base, seasonBestCombo: BEAT_SLACK_COMBO }).id, "open-oversight", "a season that stayed on the beat earns the clue of slack");
 
   const strain = getSeasonStrain({ case01: { gauntlet: { vault: 20000, grooveVault: 6000, bestCombo: 4 }, pushRecord: { bestCombo: 9, busts: 3, bestMultiplier: 64 } } });
   assert.equal(strain.seasonVaultPerCase, 14000, "the vault slack is read without the groove");
   assert.equal(strain.seasonBestCombo, 9);
-  assert.equal(getEndingVariant({ ...base, ...strain, seasonHumanCost: 20, peakRiskPressure: 18 }).id, "open-question", "groove alone cannot buy the vault door");
+  const { casesPlayed: _cases, seasonWindows: _windows, sustainedPressure: _sustained, seasonReframeRoutes: _reframes, seasonResources: _resources, ...tableOnly } = strain;
+  assert.equal(getEndingVariant({ ...base, ...tableOnly, seasonHumanCost: base.seasonHumanCost, peakRiskPressure: 30 }).id, "open-question", "groove alone cannot buy the vault door");
 });
 
 test("the ending reads what the run did at the table", () => {
-  const resources = { trust: 62, legitimacy: 58, capital: 70, humanCost: 20, fatigue: 30, time: 40 };
-  const discoveredClues = [{ id: "c1" }, { id: "c2" }, { id: "c3" }];
   const entry = (potMultiplier, busted) => ({ threshold: { potMultiplier: busted ? 0 : potMultiplier, busted } });
   const strainOf = (log) => {
     const record = createGauntletLedger(log);
     return { seasonBusts: record.busts, seasonBestMultiplier: record.bestMultiplier };
   };
-  const endingFor = (log) =>
-    getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, ...strainOf(log) }).id;
+  const endingFor = (log) => getEndingVariant({ ...seasonAtTheBar, ...strainOf(log) }).id;
 
   assert.equal(endingFor([entry(1, false), entry(1.5, false)]), "open-question", "a run that never pushed lands where it always did");
   assert.equal(endingFor([entry(32, false), entry(8, false)]), "open-oversight", "a clean season that cashed hot earns a clue of slack");
   assert.equal(endingFor([entry(64, true), entry(32, false)]), "open-question", "one bust takes that slack back");
-  // 16 busts wrecked an eight-case season. Busts are read as a rate over the
-  // season's length and the collapse line rises with it, so a ten-case season
-  // needed 26, an eleven-case season 33, a twelve-case season 40, a
-  // thirteen-case season 49, a twenty-five-case season 94, a fifty-case season
-  // 188 and a fifty-five-case season 207: the bust rate divides by the season
-  // length and the gate stopped rising at thirteen.
-  const wrecked = getEndingVariant({ resources, discoveredClues, seasonHumanCost: 20, peakRiskPressure: 18, seasonBusts: 207, seasonBestMultiplier: 32 });
-  assert.equal(wrecked.id, "collapse");
-  assert.equal(wrecked.failure, true);
 });
 
-test("the ending answers busts across the range play reaches, not at one step", () => {
-  const base = {
-    resources: { trust: 58, legitimacy: 54, capital: 62, humanCost: 22, fatigue: 24, time: 46 },
-    discoveredClues: [{ id: "a" }, { id: "b" }],
-    seasonHumanCost: 30,
-    seasonBestMultiplier: 4,
-  };
-  const pressureAt = (seasonBusts, peakRiskPressure) => getEndingVariant({ ...base, peakRiskPressure, seasonBusts }).id;
-  // The sample strain moved 28 -> 29 when 사건 07 landed, 29 -> 33 when 사건 08
-  // and 09 did, 33 -> 35 when 사건 11 did, 35 -> 36 when 사건 12 did, 36 -> 36.5 when 사건 13-24 did, and 36.5 -> 36.8 when 사건 25-49 did. Both halves of the
-  // collapse gate are derived from the season length -- the bust rate divides by
-  // it, the pressure threshold rises with it -- so an eight-case season prices a
-  // bust slightly lower and sets the line slightly higher, and the old sample sat
-  // under the new line with any number of busts. What the test is for is the
-  // shape, not the coordinate: clean does not collapse, enough busts does, and
-  // the answer in between is graded rather than a single step.
-  assert.notEqual(pressureAt(0, 36.8), "collapse", "a clean season at this strain does not collapse");
-  assert.equal(pressureAt(10, 36.8), "collapse", "ten busts on top of it does");
-  assert.ok(new Set([0, 2, 4, 6, 8, 10].map((busts) => pressureAt(busts, 36.8))).size > 1);
+test("collapse is harm, not heat: people paid, or the wall was hit again and again while they did", () => {
+  const season = (harmPerCase, seasonBusts, sustainedPressure = 20) => getEndingVariant({
+    ...seasonAtTheBar,
+    seasonHumanCost: harmPerCase * 55,
+    seasonBusts,
+    sustainedPressure,
+    peakRiskPressure: sustainedPressure + 15,
+  });
+  // A season that put people first pays in time and fatigue, so its cases run
+  // hot. That is not a collapse, however hot and however many busts.
+  assert.notEqual(season(0, 150, 45).id, "collapse", "putting people first at full heat is not a collapse");
+  assert.equal(season(25, 0).id, "collapse", "cases that closed on people's cost are");
+  assert.equal(season(25, 0).failure, true);
+  // Between the two, overreach decides it: the same harm is graded by how often
+  // the season pushed into the wall.
+  assert.notEqual(season(12, 20).id, "collapse", "moderate harm with a steady table holds");
+  assert.equal(season(12, 110).id, "collapse", "moderate harm with a quarter of the windows busted does not");
+  assert.ok(new Set([0, 40, 80, 120].map((busts) => season(12, busts).id)).size > 1, "graded, not a single step");
+});
+
+test("the finale answers: burning every record closes the endings made of records", () => {
+  const withFinale = (choiceId) => getEndingVariant({ ...seasonAtTheBar, discoveredClues: Array.from({ length: 55 }, (_, index) => ({ id: `c${index}` })), log: [{ choiceId }] }).id;
+  assert.equal(withFinale("f_after_witness"), "open-oversight");
+  assert.equal(withFinale("f_after_control"), "open-oversight");
+  assert.equal(withFinale("f_after_burn"), "quiet-cover", "no record survives the burn to build oversight on");
+});
+
+test("the season's standing is the mean of what its cases closed on", () => {
+  const summary = (trust, legitimacy, capital, humanCost, peak, routes) => ({
+    finalResources: { trust, legitimacy, capital, humanCost, fatigue: 20, time: 50 },
+    finalHumanCost: humanCost,
+    peakRiskPressure: peak,
+    reframeRouteCount: routes,
+    pushRecord: { busts: 1, cashes: 8, bestMultiplier: 12, bestCombo: 0 },
+  });
+  const strain = getSeasonStrain({ a: summary(80, 60, 90, 2, 10, 1), b: summary(60, 100, 100, 6, 20, 0), c: summary(70, 80, 95, 4, 40, 2) });
+  assert.deepEqual(strain.seasonResources, { time: 50, capital: 95, trust: 70, legitimacy: 80, humanCost: 4, fatigue: 20 });
+  assert.equal(strain.casesPlayed, 3);
+  assert.equal(strain.seasonWindows, 27);
+  assert.equal(strain.seasonReframeRoutes, 3);
+  assert.equal(strain.sustainedPressure, 40, "the pressure cases typically peaked at, not the one worst walk");
+  // A summary saved before any of that has only what it had.
+  const old = getSeasonStrain({ a: { finalHumanCost: 3, peakRiskPressure: 20, reframeCount: 2 } });
+  assert.equal(old.seasonResources, null);
+  assert.equal(old.seasonReframeRoutes, 2);
+  assert.ok(getEndingVariant({ resources: { trust: 70, legitimacy: 60, capital: 90 }, discoveredClues: [], log: [], ...old }).id);
+});
+
+test("PEOPLE FIRST counts decisions whose largest gain went to people", () => {
+  assert.equal(isPeopleFirstEffect({ trust: 8, capital: -4 }), true);
+  assert.equal(isPeopleFirstEffect({ humanCost: -6, legitimacy: 3 }), true);
+  assert.equal(isPeopleFirstEffect({ humanCost: 6, capital: 9 }), false, "a rising human cost is a cost, not care");
+  assert.equal(isPeopleFirstEffect({ legitimacy: 10, trust: 4 }), false);
+  assert.equal(isPeopleFirstEffect({}), false);
 });
 
 /* --------------------------------------------------------------- relics */
@@ -1322,7 +1384,9 @@ test("the report names the feeling that woke the thinking", () => {
   assert.equal(getThinkingMotive({ affection: 6, protection: 4, revenge: 3 }).id, "affection");
   assert.equal(getThinkingMotive({ revenge: 5, injustice: 4, affection: 2 }).id, "revenge");
   assert.equal(getThinkingMotive({ responsibility: 9 }).label, "책임형");
-  assert.equal(getThinkingMotive({}).id, "responsibility", "a run with no record falls back to the burden it started with");
+  assert.equal(getThinkingMotive({}).id, "mixed", "a run with no record is not named after a burden it never carried");
+  assert.equal(getThinkingMotive({ affection: 6, revenge: 6 }).label, "복합형", "a tie at the top names no one family");
+  assert.equal(getThinkingMotive({ affection: 6, revenge: 6 }).id, getThinkingMotive({ revenge: 6, affection: 6 }).id, "and does not depend on key order");
   assert.ok(getThinkingMotive({ curiosity: 3 }).path.includes("집념"));
 });
 

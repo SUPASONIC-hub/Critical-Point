@@ -14,19 +14,22 @@ import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
-import { authoredEchoReplies, characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
-import { CASE_PACKS } from "./nodes/casePacks.js";
+import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
+import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
+import { isResourceGain } from "./gameConstants.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./gameCases.js";
 
-export { CASE_PACKS };
+/**
+ * Everything below rewires the graph in place: aftermath, connective, reaction,
+ * branch and route scenes overwrite `choice.next`, splice choices in and retire
+ * nodes. It used to do that to the objects the case files export, so importing
+ * `src/nodes/case20.js` after this module handed back a scene whose `next` was
+ * not the one written in the file. It works on copies now; the authored modules
+ * stay exactly as they read.
+ */
+const CASE_PACKS = structuredClone(AUTHORED_CASE_PACKS);
 
-// A case pack's lines and people join the authored tables before anything below
-// copies or reads them.
-for (const pack of CASE_PACKS) {
-  Object.assign(choiceVoiceLines, pack.voiceLines);
-  Object.assign(authoredEchoReplies, pack.echoReplies);
-  Object.assign(characterProfiles, pack.characterProfiles);
-}
+export { CASE_PACKS };
 
 /** Authored replies plus one for every scene the generators below add. */
 export const echoReplies = { ...authoredEchoReplies };
@@ -36,7 +39,7 @@ export const echoReplies = { ...authoredEchoReplies };
  * grows the graph at load time -- aftermath, connective, reaction and branch
  * scenes are written into `nodes` -- so the composed object stays mutable.
  */
-export const nodes = {
+export const nodes = structuredClone({
   ...case01Nodes,
   ...case02Nodes,
   ...case03Nodes,
@@ -50,7 +53,7 @@ export const nodes = {
   ...case11Nodes,
   ...Object.assign({}, ...CASE_PACKS.map((pack) => pack.nodes)),
   ...finalCaseNodes,
-};
+});
 
 const aftermathNodes = {
   c1_aftershock: {
@@ -214,44 +217,20 @@ const aftermathNodes = {
 CASE_PACKS.forEach((pack) => Object.assign(aftermathNodes, pack.aftermath));
 Object.assign(nodes, aftermathNodes);
 
-const aftermathRoutes = {
-  final: "c1_aftershock",
-  c2_final: "c2_aftershock",
-  c3_final: "c3_aftershock",
-  c4_final: "c4_aftershock",
-  c5_final: "c5_aftershock",
-  c6_final: "c6_aftershock",
-  c7_final: "c7_aftershock",
-  c8_final: "c8_aftershock",
-  c9_final: "c9_aftershock",
-  c10_final: "c10_aftershock",
-  c11_final: "c11_aftershock",
-  f_choice: "f_aftershock",
-};
-
-CASE_PACKS.forEach(({ aftermathRoute: [finalId, aftershockId] }) => {
-  aftermathRoutes[finalId] = aftershockId;
-});
-
-Object.entries(aftermathRoutes).forEach(([nodeId, nextNode]) => {
+// [case, the scene that closes it, its aftermath]: 사건 01-11 and the finale by
+// hand, the packs from their own `aftermathRoute`.
+const aftermathRoutes = [
+  ["case01", "final", "c1_aftershock"],
+  ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
+  ...CASE_PACKS.map(({ id, aftermathRoute: [finalId, aftershockId] }) => [id, finalId, aftershockId]),
+  ["final", "f_choice", "f_aftershock"],
+];
+aftermathRoutes.forEach(([caseId, nodeId, nextNode]) => {
   nodes[nodeId].choices.forEach((choice) => {
     choice.next = nextNode;
   });
+  nodeOrders[caseId].push(nextNode);
 });
-
-nodeOrders.case01.push("c1_aftershock");
-nodeOrders.case02.push("c2_aftershock");
-nodeOrders.case03.push("c3_aftershock");
-nodeOrders.case04.push("c4_aftershock");
-nodeOrders.case05.push("c5_aftershock");
-nodeOrders.case06.push("c6_aftershock");
-nodeOrders.case07.push("c7_aftershock");
-nodeOrders.case08.push("c8_aftershock");
-nodeOrders.case09.push("c9_aftershock");
-nodeOrders.case10.push("c10_aftershock");
-nodeOrders.case11.push("c11_aftershock");
-CASE_PACKS.forEach((pack) => nodeOrders[pack.id].push(pack.aftermathRoute[1]));
-nodeOrders.final.push("f_aftershock");
 
 const connectiveScenes = [
   ["c1_witness", "accounting", "payday", "누가 179.6을 만들었나", "반재욱", "회계팀 막내가 회의실 문 앞에서 멈춰 섰습니다. 장부가 틀렸다고 말하지는 않습니다. 대신 그 숫자를 만들던 날 회의실에 은행 사람이 앉아 있었다고 말합니다. 명함은 못 받았습니다.", ["원본 파일은 세 번 저장됨", "막내 직원은 회의 초대를 받지 못함", "재무책임자의 지시는 구두로만 남음", "그날 회의 참석자 명단에 외부인 1명 누락"], ["직원을 보호하며 증언할 자리를 만든다", "원본 파일을 먼저 잠가 증거를 보존한다", "말이 퍼지기 전에 CFO와 비공개로 합의한다"]],
@@ -884,9 +863,35 @@ function getAuthoredSceneCopy(sourceId, id) {
   return copy;
 }
 
-// The fourth option each case adds is a reframe of the case itself, so it
-// reads as its own cognitive move rather than another risk call.
-const connectiveCognitions = [{ persistence: 1 }, { inference: 1 }, { risk: 1 }, { reframing: 2 }];
+/**
+ * Which way of thinking a generated choice exercises, read from the choice.
+ *
+ * It was read from the column -- connective scenes ran persistence / inference
+ * / risk / reframing, reaction scenes reframing / inference / risk -- so a
+ * player who always took the second card was an "inference" player by
+ * construction. Now the label's verb decides: each way of thinking has phrases
+ * that do it (checking a record, redrawing the terms, staying with someone,
+ * moving before it is safe), and the axis the card gains most on is worth half
+ * a phrase. Ties go to the axis, then the order below. Reframing is worth 2, as
+ * the fourth card always was; the rest 1. Choice ids are untouched.
+ */
+const COGNITION_CUES = {
+  reframing: ["다시 짜", "판을", "바꾼다", "바꿔", "구조", "제안", "조건", "규칙", "새로", "설계", "합친다", "첫 문장", "기준을", "뒤집", "등록"],
+  inference: ["확인", "대조", "맞춰 본", "따져", "묻는다", "물어", "출처", "기록", "문서", "적어", "원본", "보존", "증거", "자료", "조사", "추적", "찾", "검토", "공식", "지적", "이의", "설명"],
+  persistence: ["끝까지", "곁", "옆에", "같이", "함께", "지킨다", "기다", "버틴", "남는다", "남아", "밤새", "듣는다", "만난다", "앉", "한 분씩", "한 명씩"],
+  risk: ["바로", "즉시", "당장", "일단", "빠르게", "조용히", "넘긴다", "넘어간", "빼", "덮", "못 본", "몰래", "서둘", "먼저 치", "그대로 두"],
+};
+const COGNITION_ORDER = ["reframing", "inference", "persistence", "risk"];
+const AXIS_COGNITION = { trust: "persistence", humanCost: "persistence", fatigue: "persistence", legitimacy: "inference", capital: "risk", time: "risk" };
+
+function inferChoiceCognition(label = "", effect = {}) {
+  const [axis] = Object.entries(effect).filter(([key, value]) => isResourceGain(key, value)).sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))[0] ?? [];
+  const axisType = AXIS_COGNITION[axis];
+  const score = (type) =>
+    COGNITION_CUES[type].reduce((sum, cue) => sum + (label.includes(cue) ? 2 : 0), 0) + (type === axisType ? 1 : 0);
+  const type = COGNITION_ORDER.reduce((best, candidate) => (score(candidate) > score(best) ? candidate : best), axisType ?? COGNITION_ORDER[0]);
+  return { [type]: type === "reframing" ? 2 : 1 };
+}
 
 function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, labels]) {
   const source = nodes[sourceId];
@@ -913,7 +918,7 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
         label,
         effect: effects[index],
         next: nextId,
-        cognition: connectiveCognitions[index] ?? { reframing: 2 },
+        cognition: inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -1053,7 +1058,7 @@ function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) 
         label,
         effect: effects[index],
         next: nextId,
-        cognition: index === 0 ? { reframing: 1 } : index === 1 ? { inference: 1 } : { risk: 1 },
+        cognition: inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -1584,9 +1589,9 @@ const case02RouteNodes = {
     title: "당신의 질문이 로그를 깨운다",
     speaker: "에코",
     text:
-      "준비된 선택지 밖의 문장을 남기자, 보안 로그 한 줄이 새로 열립니다. 이 사건은 이민서의 혐의가 아니라 플레이어의 판단 문장을 복제하는 실험일 수 있습니다.",
+      "준비된 선택지 밖으로 판을 다시 짜자, 보안 로그 한 줄이 새로 열립니다. 이 사건은 이민서의 혐의가 아니라 분석관의 판단을 복제하는 실험일 수 있습니다.",
     memo: [
-      "자유입력 문장이 테스트 데이터와 대조됨",
+      "다시 짠 판이 테스트 데이터와 대조됨",
       "사건 01의 선택 문장 일부가 유출 파일과 일치",
       "에코는 이 경로를 공식 절차에 남기지 않음",
     ],
@@ -1906,7 +1911,7 @@ const dramaticRoutePlans = {
       title: "선택지 밖에서 발견한 첫 규칙",
       speaker: "에코",
       text: "준비된 답이 아닌 문장을 입력하자 화면은 절감, 자금, 매각(사업이나 자산을 팔아 돈을 마련하는 것)을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
-      memo: ["자유입력이 숨은 공통 원인 경로를 엶", "모든 해결책이 같은 기준표를 통과함", "플레이어 문장이 다음 질문의 기준으로 기록됨"],
+      memo: ["다시 짠 판이 숨은 공통 원인 경로를 엶", "모든 해결책이 같은 기준표를 통과함", "분석관의 판단이 다음 질문의 기준으로 기록됨"],
       routeChoices: [
         ["c1_route_system_trace", "기준표를 누가 언제 고쳤는지부터 되짚는다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
         ["c1_route_system_use", "기준표는 그대로 두고 가장 빠른 안건을 밀어붙인다", { capital: 9, time: 6, trust: -6, legitimacy: -5, humanCost: 4, fatigue: -4 }, { risk: 2 }],
@@ -2000,7 +2005,7 @@ const dramaticRoutePlans = {
       title: "점수판이 당신을 따라온다",
       speaker: "에코",
       text: "준비된 전략 밖의 말을 남기자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
-      memo: ["자유입력 문장이 새 평가 항목으로 변환됨", "오진우 점수도 동시에 재계산됨", "고객 화면에는 변경 사유가 보이지 않음"],
+      memo: ["다시 짠 판이 새 평가 항목으로 변환됨", "오진우 점수도 동시에 재계산됨", "고객 화면에는 변경 사유가 보이지 않음"],
       routeChoices: [
         ["c3_route_system_read", "새로 생긴 평가 항목이 어디서 왔는지 추적한다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
         ["c3_route_system_ride", "바뀐 점수판을 그대로 타고 우위를 굳힌다", { capital: 9, time: 6, trust: -7, legitimacy: -5, humanCost: 4, fatigue: -4 }, { risk: 2 }],
@@ -2207,7 +2212,7 @@ const dramaticRoutePlans = {
     defaultFree: "c6_route_system",
     // No four-way split here on purpose. The other cases offer four strategies
     // against an organisation; this one has a single person in it, so the
-    // authored middle is the route and only the free-text door opens a new one.
+    // authored middle is the route and only the 판을 다시 짠다 card opens a new one.
     choices: {},
     system: {
       route: "c6_route_system",
@@ -2234,7 +2239,7 @@ const dramaticRoutePlans = {
     defaultFree: "c7_route_system",
     // Like case 06, no four-way split. The case is 48 hours of asking people
     // for things, not four strategies against an institution, so the authored
-    // middle is the route and only the free-text door opens another.
+    // middle is the route and only the 판을 다시 짠다 card opens another.
     choices: {},
     system: {
       route: "c7_route_system",
@@ -2443,7 +2448,7 @@ const dramaticRoutePlans = {
       title: "마지막 선택지가 당신을 부른다",
       speaker: "에코",
       text: "준비된 결말 밖의 문장을 쓰자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 쓴 문장입니다.",
-      memo: ["자유입력 문장이 다음 참가자 선택지로 변환됨", "삭제 전송과 공개 전송이 동시에 대기 중", "종료 권한은 아직 당신에게 있음"],
+      memo: ["다시 짠 판이 다음 참가자 선택지로 변환됨", "삭제 전송과 공개 전송이 동시에 대기 중", "종료 권한은 아직 당신에게 있음"],
       routeChoices: [
         ["f_route_system_read", "내 문장이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
         ["f_route_system_send", "확인하지 않고 전송 대기열을 그대로 둔다", { capital: 7, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
@@ -2530,8 +2535,8 @@ function registerDramaticRoutePlan(caseId, plan) {
     phase: "LAST CALL",
     title: "준비된 결말 밖에서",
     speaker: plan.system.speaker,
-    text: "준비된 선택지 밖의 문장은 사건의 규칙을 직접 건드립니다. 이제 플레이어의 문장이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
-    memo: ["자유입력은 새 질문으로 기록됨", "실험자는 그 문장을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+    text: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
+    memo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     choices: makeFinalChoices(plan, plan.system.final),
   };
@@ -3037,7 +3042,7 @@ CASE_PACKS.forEach((pack) => {
  * start clears the log, so the log-based version of this could never find
  * anything and the choice never once appeared in a played season.
  */
-export function getContinuityMemoryChoice({ caseId = "case01", nodeId = "", caseResults = {} } = {}) {
+export function getContinuityMemoryChoice({ caseId = CASE_SEQUENCE[0], nodeId = "", caseResults = {} } = {}) {
   const plan = continuityMemoryChoicePlans[caseId];
   if (!plan) return null;
   const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);

@@ -295,14 +295,14 @@ export const chapterRules = {
 export const legacyProfiles = {
   S: {
     label: "CLEAR SIGNAL",
-    title: "이전 판단의 신뢰가 다음 사건을 받칩니다.",
-    text: "직전 케이스에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 신뢰와 정당성을 품고 시작합니다.",
+    title: "이전 판단이 쌓은 믿음이 다음 사건을 받칩니다.",
+    text: "직전 케이스에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 믿음과 공정함을 품고 시작합니다.",
     effect: { trust: 4, legitimacy: 3 },
   },
   A: {
     label: "STABLE HAND",
     title: "이전 판단의 균형이 남아 있습니다.",
-    text: "대부분의 압박을 통제했습니다. 다음 사건은 약간의 신뢰와 정당성을 가진 채 열립니다.",
+    text: "대부분의 압박을 통제했습니다. 다음 사건은 약간의 믿음과 공정함을 가진 채 열립니다.",
     effect: { trust: 2, legitimacy: 1 },
   },
   B: {
@@ -314,7 +314,7 @@ export const legacyProfiles = {
   C: {
     label: "OPEN WOUND",
     title: "지난 판단의 균열이 아직 닫히지 않았습니다.",
-    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 정당성과 피로가 불리하게 출발합니다.",
+    text: "압박을 낮추지 못한 흔적이 다음 사건의 첫 질문이 됩니다. 공정함과 지침이 불리하게 출발합니다.",
     effect: { legitimacy: -2, fatigue: 4 },
   },
 };

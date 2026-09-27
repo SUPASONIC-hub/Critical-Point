@@ -84,6 +84,26 @@ export function topicParticle(word) {
   return endsOnConsonant(word) ? "은" : "는";
 }
 
+/**
+ * 로 or 으로. The one particle with a third case: a word that ends on ㄹ takes
+ * 로 like a vowel does (서울로, 1로 -- 일), everything else that ends on a
+ * consonant takes 으로 (공정함으로, 3으로 -- 삼, 10으로 -- 십).
+ */
+const DIGIT_ENDS_ON_RIEUL = [false, true, false, false, false, false, false, true, true, false];
+
+export function directionParticle(word = "") {
+  const lastChar = String(word).trim().at(-1);
+  if (!lastChar) return "으로";
+  if (lastChar >= "0" && lastChar <= "9") {
+    const digit = Number(lastChar);
+    return !DIGIT_ENDS_ON_CONSONANT[digit] || DIGIT_ENDS_ON_RIEUL[digit] ? "로" : "으로";
+  }
+  const code = lastChar.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return "으로";
+  const jong = (code - 0xac00) % 28;
+  return jong === 0 || jong === 8 ? "로" : "으로";
+}
+
 export const easyResourceLabels = {
   time: "남은 시간",
   capital: "현금",

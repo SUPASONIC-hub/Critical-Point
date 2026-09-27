@@ -1,5 +1,5 @@
 /**
- * What each case is, and what all twelve turn out to be.
+ * What each case is, and what all of them turn out to be.
  *
  * The season used to be an anthology: seven unrelated organisations, each with
  * its own crisis, strung together by a lab that watched the analyst react. That
@@ -7,7 +7,7 @@
  * used in 사건 04, so nothing in 사건 01 mattered.
  *
  * They are now one chain. A single bad loan -- the 310억 KD은행 lent 플로우온
- * three years ago -- runs under all seven: 사건 01 is the loan collapsing, 02 is
+ * three years ago -- runs under every one of them: 사건 01 is the loan collapsing, 02 is
  * the cover-up of its paperwork, 03 and 04 are the two places the bank tried to
  * move the loss to, 05 is where the loss finally lands on people who never
  * borrowed anything, 06 is what the chain does to the analyst in the next chair,
@@ -18,7 +18,8 @@
  * into -- a 국정감사 with the man at the top of the chain summoned and absent --
  * 12 walks into the lives the loan landed on, where a compensation fund comes
  * with a condition, and the finale is the empty signature box the whole thing
- * hangs from.
+ * hangs from. The 프롤로그 before 사건 01 and 사건 13-49 after 12 are links of the
+ * same chain; README walks every one.
  */
 export const CASE_SEQUENCE = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02", "case03", "case04", "case05", "case06", "case07", "case08", "case09", "case10", "case11", "case12", "case13", "case14", "case15", "case16", "case17", "case18", "case19", "case20", "case21", "case22", "case23", "case24", "case25", "case26", "case27", "case28", "case29", "case30", "case31", "case32", "case33", "case34", "case35", "case36", "case37", "case38", "case39", "case40", "case41", "case42", "case43", "case44", "case45", "case46", "case47", "case48", "case49", "final"];
 export const CASE_START_NODES = {
