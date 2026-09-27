@@ -2,12 +2,61 @@ import { useState } from "react";
 
 import { FEEDBACK_COMMENT_MAX_LENGTH } from "../appConfig.js";
 import { anonymizeSensitiveText, limitText } from "../gameLogic.js";
-import { saveFeedbackTelemetry, telemetryEnabled } from "../telemetry.js";
+import { telemetryEnabled } from "../telemetry.js";
+import { createTelemetryEventId } from "./payloadSchemas.js";
+import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 
 export function useFeedbackStatus() {
   const [feedbackStatus, setFeedbackStatus] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   return { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback };
+}
+
+/**
+ * Typing a comment wrote the whole save -- stringify, revision bump, cloud
+ * notice -- on every keystroke. The comment is state at once and reaches the
+ * save once typing pauses, or with the next save of any kind, which carries it
+ * anyway. The write goes through the newest render's `persist`: an older one
+ * would write that render's run back over whatever happened since.
+ */
+const FEEDBACK_PERSIST_DELAY_MS = 800;
+const pendingFeedbackWrite = { timer: null, persist: null };
+
+function cancelFeedbackWrite() {
+  globalThis.clearTimeout(pendingFeedbackWrite.timer);
+  pendingFeedbackWrite.timer = null;
+  pendingFeedbackWrite.persist = null;
+}
+
+function scheduleFeedbackWrite(persist) {
+  globalThis.clearTimeout(pendingFeedbackWrite.timer);
+  pendingFeedbackWrite.persist = persist;
+  pendingFeedbackWrite.timer = globalThis.setTimeout(() => {
+    const latestPersist = pendingFeedbackWrite.persist;
+    cancelFeedbackWrite();
+    latestPersist?.({});
+  }, FEEDBACK_PERSIST_DELAY_MS);
+}
+
+/**
+ * The row `playtest_feedback` takes: the session, the case, and the answers in
+ * its `feedback` jsonb. `event_id` is minted here, once, so a retry from the
+ * queue names the same row as the first attempt.
+ */
+function createFeedbackTelemetryPayload({ sessionId, sessionCode, caseId, caseTitle, feedback }) {
+  return {
+    event_id: createTelemetryEventId(),
+    session_id: sessionId,
+    session_code: sessionCode,
+    case_id: caseId,
+    feedback: {
+      caseTitle,
+      submittedAt: feedback.savedAt,
+      clarity: Number(feedback.clarity) || null,
+      difficulty: Number(feedback.difficulty) || null,
+      comment: feedback.comment.trim() || null,
+    },
+  };
 }
 
 /**
@@ -32,6 +81,9 @@ export function createFeedbackActions({
   activeCaseMeta,
   queueTelemetry,
 }) {
+  // A write waiting on the typing pause always runs with this render's persist.
+  if (pendingFeedbackWrite.timer) pendingFeedbackWrite.persist = persist;
+
   function updateCurrentFeedback(patch) {
     const normalizedPatch =
       typeof patch.comment === "string"
@@ -43,6 +95,13 @@ export function createFeedbackActions({
     };
     setPlaytestFeedback(nextFeedback);
     setFeedbackStatus("");
+    const onlyText = Object.keys(normalizedPatch).every((key) => key === "comment");
+    if (onlyText) {
+      scheduleFeedbackWrite(persist);
+      return;
+    }
+    // A rating is one click: it is written now, with the comment as it stands.
+    cancelFeedbackWrite();
     persist({ playtestFeedback: nextFeedback });
   }
 
@@ -68,6 +127,7 @@ export function createFeedbackActions({
     };
     const nextFeedback = { ...playtestFeedback, [currentCase]: feedback };
     setPlaytestFeedback(nextFeedback);
+    cancelFeedbackWrite();
     persist({ playtestFeedback: nextFeedback });
 
     if (!telemetryEnabled || !dataConsent) {
@@ -80,28 +140,25 @@ export function createFeedbackActions({
       return;
     }
 
-    const feedbackTelemetryPayload = {
-      session_id: sessionId,
-      session_code: sessionCode,
-      case_id: currentCase,
-      case_title: activeCaseMeta?.title ?? currentCase,
-      submitted_at: savedAt,
-      clarity_score: Number(feedback.clarity) || null,
-      difficulty_score: Number(feedback.difficulty) || null,
-      comment: feedback.comment.trim() || null,
+    const item = {
+      id: `feedback-${currentCase}-${Date.now()}`,
+      type: "feedback",
+      label: `${activeCaseMeta?.label ?? currentCase} 피드백`,
+      payload: createFeedbackTelemetryPayload({
+        sessionId,
+        sessionCode,
+        caseId: currentCase,
+        caseTitle: activeCaseMeta?.title ?? currentCase,
+        feedback,
+      }),
     };
 
     try {
-      await saveFeedbackTelemetry(feedbackTelemetryPayload);
+      await sendTelemetryItem(item);
       setFeedbackStatus("피드백을 저장했습니다.");
     } catch (error) {
       console.warn(error);
-      queueTelemetry({
-        id: `feedback-${currentCase}-${Date.now()}`,
-        type: "feedback",
-        label: `${activeCaseMeta?.label ?? currentCase} 피드백`,
-        payload: feedbackTelemetryPayload,
-      });
+      queueTelemetry(item);
       setFeedbackStatus("로컬에는 저장했습니다. 원격 저장 실패분은 대기열에 보관했습니다.");
     } finally {
       setIsSubmittingFeedback(false);

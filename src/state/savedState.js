@@ -1,8 +1,4 @@
-import {
-  normalizeFeedback,
-  SAVE_SCHEMA_VERSION,
-  TELEMETRY_QUEUE_TYPES,
-} from "../appConfig.js";
+import { normalizeFeedback, SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import {
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
@@ -16,6 +12,7 @@ import {
 } from "../gameData.js";
 import { makeEmptyScores } from "../gameLogic.js";
 import { recordAppError } from "./errorRecovery.js";
+import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
 // The error log, its telemetry and the recovery save have one implementation,
 // in `errorRecovery.js`, which the intro shell can load without the scene graph.
@@ -106,30 +103,52 @@ export function normalizeSavedGameplayState(state) {
   };
 }
 
-function areSavedValuesEquivalent(left, right) {
-  try {
-    return JSON.stringify(left) === JSON.stringify(right);
-  } catch {
-    return left === right;
+/**
+ * A key the save never wrote reads as its default, so filling one in is not a
+ * repair. Comparing whole entries as JSON called every ordinary reload a
+ * repair: `choose()` writes `routeChangeKind: undefined`, which JSON drops, and
+ * the normalizer answered with "" -- so each mid-run reload raised the recovery
+ * notice, forced a save write and spent a recovery slot. A value that is present
+ * and gets replaced or dropped is a repair; nothing else is.
+ */
+function isMissingSavedValue(value) {
+  return value === undefined || value === null;
+}
+
+function isSavedValueRepaired(original, normalized) {
+  if (isMissingSavedValue(original)) return false;
+  if (Array.isArray(normalized)) {
+    if (!Array.isArray(original) || original.length !== normalized.length) return true;
+    return normalized.some((item, index) => isSavedValueRepaired(original[index], item));
   }
+  if (normalized && typeof normalized === "object") {
+    if (!original || typeof original !== "object" || Array.isArray(original)) return true;
+    const dropped = Object.keys(original).some(
+      (key) => !isMissingSavedValue(original[key]) && !Object.hasOwn(normalized, key),
+    );
+    return dropped || Object.keys(normalized).some((key) => isSavedValueRepaired(original[key], normalized[key]));
+  }
+  return !Object.is(original, normalized);
 }
 
 function normalizeSavedArray(value, normalizeItem) {
   if (!Array.isArray(value)) return { value: [], changed: true };
   let changed = false;
-  const next = value
-    .map((item) => {
-      const normalized = normalizeItem(item);
-      if (!areSavedValuesEquivalent(normalized, item)) changed = true;
-      return normalized;
-    })
-    .filter((item) => {
-      const keep = item !== null;
-      if (!keep) changed = true;
-      return keep;
-    });
-  if (next.length !== value.length) changed = true;
-  return { value: next, changed };
+  let copied = false;
+  const next = [];
+  value.forEach((item) => {
+    const normalized = normalizeItem(item);
+    if (normalized === null) {
+      changed = true;
+      return;
+    }
+    if (normalized !== item) {
+      copied = true;
+      if (isSavedValueRepaired(item, normalized)) changed = true;
+    }
+    next.push(normalized);
+  });
+  return { value: changed || copied ? next : value, changed };
 }
 
 function normalizeSavedPlainObject(value) {
@@ -142,6 +161,10 @@ function normalizeSavedEffect(value) {
     Object.entries(source).filter(([, effectValue]) => Number.isFinite(effectValue)),
   );
 }
+
+// Every kind `choose()` in GameRuntime.jsx writes. "blackout-skip" was missing,
+// so a bust that skipped a scene lost its marker on the next reload.
+const ROUTE_CHANGE_KINDS = ["memory", "evidence-turn", "reframe", "blackout-skip"];
 
 function normalizeSavedLogEntry(entry) {
   if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
@@ -164,7 +187,7 @@ function normalizeSavedLogEntry(entry) {
     reframeOpenedRoute: Boolean(entry.reframeOpenedRoute),
     reframeBranchId: typeof entry.reframeBranchId === "string" ? entry.reframeBranchId : "",
     continuityMemory: Boolean(entry.continuityMemory),
-    routeChangeKind: ["memory", "evidence-turn", "reframe"].includes(entry.routeChangeKind) ? entry.routeChangeKind : "",
+    routeChangeKind: ROUTE_CHANGE_KINDS.includes(entry.routeChangeKind) ? entry.routeChangeKind : "",
     effect: normalizeSavedEffect(entry.effect),
     cognition: normalizeSavedEffect(entry.cognition),
     triggers: Array.isArray(entry.triggers) ? entry.triggers.filter((trigger) => typeof trigger === "string") : [],
@@ -225,34 +248,41 @@ function normalizeSavedObjectMap(value, normalizeItem) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return { value: {}, changed: true };
   let changed = false;
   const next = {};
+  let copied = false;
   Object.entries(value).forEach(([key, item]) => {
     const normalized = normalizeItem(item, key);
-    if (!areSavedValuesEquivalent(normalized, item)) changed = true;
-    if (normalized !== null) next[key] = normalized;
+    if (normalized === null) {
+      changed = true;
+      return;
+    }
+    if (normalized !== item) {
+      copied = true;
+      if (isSavedValueRepaired(item, normalized)) changed = true;
+    }
+    next[key] = normalized;
   });
-  if (Object.keys(next).length !== Object.keys(value).length) changed = true;
-  return { value: next, changed };
+  return { value: changed || copied ? next : value, changed };
 }
 
+/**
+ * Items that can never be sent are dropped, not held against the save: a queue
+ * is the network's backlog, and losing one row of it is not a damaged run.
+ */
 function normalizeSavedTelemetryQueue(value) {
   if (!Array.isArray(value)) return { value: [], changed: true };
-  const next = value.filter(
-    (item) =>
-      item &&
-      typeof item === "object" &&
-      !Array.isArray(item) &&
-      typeof item.id === "string" &&
-      TELEMETRY_QUEUE_TYPES.includes(item.type) &&
-      typeof item.label === "string" &&
-      item.payload &&
-      typeof item.payload === "object" &&
-      !Array.isArray(item.payload),
-  );
-  return { value: next, changed: next.length !== value.length };
+  const next = sanitizeTelemetryQueue(value);
+  const unchanged = next.length === value.length && next.every((item, index) => item === value[index]);
+  return { value: unchanged ? value : next, changed: false };
 }
 
-export function normalizeSavedNestedState(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
+/**
+ * The nested half of a save, normalised. Returns the same object when nothing
+ * was repaired and nothing needed filling, a copy with defaults filled in when
+ * something was only missing, and a paused copy carrying `lastError` when a
+ * present value had to be replaced or dropped.
+ */
+function normalizeNestedState(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return { value: null, repaired: false };
 
   const normalizedCompletedCases = normalizeSavedArray(
     state.completedCases,
@@ -269,33 +299,53 @@ export function normalizeSavedNestedState(state) {
     (feedback, caseId) => (isKnownCaseId(caseId) ? normalizeFeedback(feedback) : null),
   );
   const normalizedTelemetry = normalizeSavedTelemetryQueue(state.pendingTelemetry);
-  const changed =
-    normalizedCompletedCases.changed ||
-    normalizedDiscoveredClues.changed ||
-    normalizedLog.changed ||
-    normalizedCaseResults.changed ||
-    normalizedFeedback.changed ||
-    normalizedTelemetry.changed;
-
-  if (!changed) return state;
-  return {
-    ...state,
-    completedCases: normalizedCompletedCases.value,
-    discoveredClues: normalizedDiscoveredClues.value,
-    log: normalizedLog.value,
-    caseResults: normalizedCaseResults.value,
-    playtestFeedback: normalizedFeedback.value,
-    pendingTelemetry: normalizedTelemetry.value,
-    paused: true,
-    lastError: state.lastError ?? {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved nested gameplay data was repaired before resume.",
-      currentCase: state.currentCase,
-      nodeId: state.nodeId,
-    },
+  const fields = {
+    completedCases: normalizedCompletedCases,
+    discoveredClues: normalizedDiscoveredClues,
+    log: normalizedLog,
+    caseResults: normalizedCaseResults,
+    playtestFeedback: normalizedFeedback,
+    pendingTelemetry: normalizedTelemetry,
   };
+  const repaired = Object.values(fields).some((field) => field.changed);
+  const filled = Object.entries(fields).some(([key, field]) => field.value !== state[key]);
+  if (!repaired && !filled) return { value: state, repaired: false };
+  const next = { ...state };
+  Object.entries(fields).forEach(([key, field]) => {
+    next[key] = field.value;
+  });
+  if (!repaired) return { value: next, repaired: false };
+  return {
+    value: {
+      ...next,
+      paused: true,
+      lastError: state.lastError ?? {
+        id: `repair-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        source: "save-integrity",
+        message: "Saved nested gameplay data was repaired before resume.",
+        currentCase: state.currentCase,
+        nodeId: state.nodeId,
+      },
+    },
+    repaired: true,
+  };
+}
+
+export function normalizeSavedNestedState(state) {
+  return normalizeNestedState(state).value;
+}
+
+/**
+ * The one repair every reader of the save runs: route, metrics, then nested
+ * data. `repaired` is true only when a present value was replaced or dropped,
+ * which is what earns a recovery notice, a write and a recovery slot.
+ */
+export function repairSavedState(state) {
+  const routed = repairSavedRoute(state);
+  const measured = normalizeSavedGameplayState(routed);
+  const nested = normalizeNestedState(measured);
+  return { state: nested.value, repaired: routed !== state || measured !== routed || nested.repaired };
 }
 
 export function createReplaySavedState(seed) {
@@ -319,7 +369,7 @@ export function createReplaySavedState(seed) {
       };
     });
   return {
-    schemaVersion: SAVE_SCHEMA_VERSION,
+    saveSchemaVersion: SAVE_SCHEMA_VERSION,
     playerName: "",
     playStyle: "instinct",
     dataConsent: false,
@@ -370,7 +420,35 @@ export function getRouteMarker(entry) {
   return { label: "핵심 판단", tone: "decision" };
 }
 
+/**
+ * Reading a save must not write one. `recordAppError` writes the error log, the
+ * save's `lastError` and a recovery slot, so a normaliser that reports while a
+ * component derives its state would write storage from inside a render. The
+ * reports made during `collectSilentFailures` are held and handed back, and the
+ * caller sends them with `reportSilentFailures` from an effect.
+ */
+let deferredSilentFailures = null;
+
+export function collectSilentFailures(run) {
+  const previous = deferredSilentFailures;
+  const failures = [];
+  deferredSilentFailures = failures;
+  try {
+    return { value: run(), failures };
+  } finally {
+    deferredSilentFailures = previous;
+  }
+}
+
+export function reportSilentFailures(failures = []) {
+  failures.forEach(({ code, detail }) => reportSilentFailure(code, detail));
+}
+
 export function reportSilentFailure(code, detail = {}) {
+  if (deferredSilentFailures) {
+    deferredSilentFailures.push({ code, detail });
+    return null;
+  }
   const error = new Error(`[silent:${code}] ${JSON.stringify(detail)}`);
   error.name = "SilentRouteFailure";
   recordAppError(error, {}, `silent-${code}`);

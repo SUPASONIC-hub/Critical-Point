@@ -1,4 +1,4 @@
-import { validateSavedStatePayload } from "./state/payloadSchemas.js";
+import { sanitizeTelemetryQueue, validateSavedStatePayload } from "./state/payloadSchemas.js";
 
 export const STORAGE_KEY = "trigger-prototype-v2";
 export const ERROR_LOG_STORAGE_KEY = "trigger-prototype-error-log-v1";
@@ -47,7 +47,6 @@ export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
 // nickname reuses PLAYER_NAME_MAX_LENGTH above, which is the same 24 the
 // trigger checks.
 export const BOARD_POST_MAX_LENGTH = 300;
-export const TELEMETRY_QUEUE_TYPES = ["case", "feedback", "error"];
 export const SAVE_STATE_KEYS = [
   "saveSchemaVersion",
   "runId",
@@ -136,7 +135,15 @@ export function parseCurrentSavedState(raw, schemaVersion = SAVE_SCHEMA_VERSION)
   try {
     const parsed = JSON.parse(raw);
     const migrated = migrateSavedState(parsed, schemaVersion);
-    return migrated?.saveSchemaVersion === schemaVersion ? migrated : null;
+    if (migrated?.saveSchemaVersion !== schemaVersion) return null;
+    // A queued telemetry item that can never be sent is dropped here rather than
+    // failing the shape check, which would throw the whole run away with it.
+    if (!Array.isArray(migrated.pendingTelemetry)) return migrated;
+    const pendingTelemetry = sanitizeTelemetryQueue(migrated.pendingTelemetry);
+    const unchanged =
+      pendingTelemetry.length === migrated.pendingTelemetry.length &&
+      pendingTelemetry.every((item, index) => item === migrated.pendingTelemetry[index]);
+    return unchanged ? migrated : { ...migrated, pendingTelemetry };
   } catch {
     return null;
   }
@@ -194,7 +201,22 @@ export function writeStoredValue(key, value) {
  */
 let knownSaveRevision = null;
 
-export function readSaveRevision() {
+/**
+ * A replay link opens someone's captured scene on this device. Nothing it does
+ * is this player's run, so while it is open no write reaches the save: it used
+ * to replace whatever run the viewer had with the linked scene.
+ */
+let replaySession = false;
+
+export function setReplaySession(active) {
+  replaySession = Boolean(active);
+}
+
+export function isReplaySession() {
+  return replaySession;
+}
+
+function readSaveRevision() {
   try {
     const parsed = JSON.parse(readStoredValue(STORAGE_KEY, "null"));
     return Math.max(0, Math.trunc(Number(parsed?.saveRevision) || 0));
@@ -216,6 +238,7 @@ export function adoptSaveRevision() {
  * a second tab that only opened the game would lock the first.
  */
 export function writeSaveState(payload, { force = false, isAhead = null } = {}) {
+  if (replaySession) return { saved: false, stale: false, replay: true, revision: knownSaveRevision ?? 0 };
   const storedRevision = readSaveRevision();
   if (knownSaveRevision === null) knownSaveRevision = storedRevision;
   if (!force && storedRevision > knownSaveRevision) {
@@ -422,27 +445,17 @@ export function parseRecoverySlots(raw, schemaVersion = RECOVERY_SLOT_SCHEMA_VER
   }
 }
 
-function createRecoveryLogEntry(entry) {
-  if (!entry || typeof entry !== "object" || Array.isArray(entry)) return {};
-  return {
-    nodeId: normalizeSavedText(entry.nodeId),
-    title: normalizeSavedText(entry.title, 120),
-    choiceId: normalizeSavedText(entry.choiceId),
-    choice: normalizeSavedText(entry.choice, 160),
-    effect: entry.effect && typeof entry.effect === "object" && !Array.isArray(entry.effect) ? entry.effect : {},
-    triggers: Array.isArray(entry.triggers) ? entry.triggers : [],
-    responseTimeSec: Number.isFinite(entry.responseTimeSec) ? entry.responseTimeSec : 0,
-    isSystemEvent: Boolean(entry.isSystemEvent),
-    challenge: entry.challenge && typeof entry.challenge === "object" && !Array.isArray(entry.challenge)
-      ? {
-          title: normalizeSavedText(entry.challenge.title, 120),
-          matched: Boolean(entry.challenge.matched),
-          riskDelta: Number.isFinite(entry.challenge.riskDelta) ? entry.challenge.riskDelta : 0,
-        }
-      : null,
-  };
-}
+const isPlainObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
+/**
+ * A recovery slot is the save as it stood, so restoring one is exact. It used
+ * to keep the last twenty log entries with most of their fields stripped --
+ * `caseId`, `threshold`, `resourcesBefore/After` among them -- which lost the
+ * busts a restore has to carry forward (`carryTableRecordIntoRestore` indexes
+ * the current log by the restored log's length) and the evidence the next
+ * choice reads. The run's own queue and feedback stay out: restoring a slot
+ * keeps the ones the current save holds (useAppPersistence.restoreSaveSlot).
+ */
 export function createRecoverySnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
   return {
@@ -465,11 +478,13 @@ export function createRecoverySnapshot(snapshot) {
     triggers: snapshot.triggers && typeof snapshot.triggers === "object" && !Array.isArray(snapshot.triggers) ? snapshot.triggers : {},
     cognition: snapshot.cognition && typeof snapshot.cognition === "object" && !Array.isArray(snapshot.cognition) ? snapshot.cognition : {},
     echo: normalizeSavedText(snapshot.echo, 900),
-    log: Array.isArray(snapshot.log) ? snapshot.log.slice(-20).map(createRecoveryLogEntry) : [],
+    log: Array.isArray(snapshot.log) ? snapshot.log.filter(isPlainObject) : [],
     pendingTelemetry: [],
     protocolUsed: Boolean(snapshot.protocolUsed),
     timerPenaltyCount: normalizeTimerPenaltyCount(snapshot),
     probeUsed: Boolean(snapshot.probeUsed),
+    investigatedTargets: isPlainObject(snapshot.investigatedTargets) ? snapshot.investigatedTargets : {},
+    hypothesisDecisions: isPlainObject(snapshot.hypothesisDecisions) ? snapshot.hypothesisDecisions : {},
     dynamics: snapshot.dynamics && typeof snapshot.dynamics === "object" && !Array.isArray(snapshot.dynamics) ? snapshot.dynamics : null,
     nodeEnteredAt: Number.isFinite(snapshot.nodeEnteredAt) ? snapshot.nodeEnteredAt : Date.now(),
     savedAt: typeof snapshot.savedAt === "string" ? snapshot.savedAt : new Date().toISOString(),
@@ -489,7 +504,7 @@ export function restoreRecoverySnapshot(snapshot) {
 }
 
 export function appendSaveSlot(snapshot) {
-  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return false;
+  if (replaySession || !isPlainObject(snapshot)) return false;
   const recoverySnapshot = createRecoverySnapshot(snapshot);
   if (!recoverySnapshot) return false;
   const existing = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"));
@@ -502,13 +517,17 @@ export function appendSaveSlot(snapshot) {
     completedCases: recoverySnapshot.completedCases,
     snapshot: recoverySnapshot,
   };
-  return writeStoredValue(
-    SAVE_SLOT_STORAGE_KEY,
-    JSON.stringify({
-      recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION,
-      slots: [slot, ...slots].slice(0, SAVE_SLOT_MAX_ITEMS),
-    }),
-  );
+  // Slots hold whole logs now, so a full storage drops the oldest slots rather
+  // than the newest one.
+  const candidates = [slot, ...slots].slice(0, SAVE_SLOT_MAX_ITEMS);
+  for (let count = candidates.length; count > 0; count -= 1) {
+    const written = writeStoredValue(
+      SAVE_SLOT_STORAGE_KEY,
+      JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: candidates.slice(0, count) }),
+    );
+    if (written) return true;
+  }
+  return false;
 }
 
 export async function copyText(value) {

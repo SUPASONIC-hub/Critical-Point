@@ -18,20 +18,95 @@ export function validatePlaytestExport(payload, { includeDiagnostics = false } =
 }
 
 const TELEMETRY_TYPES = new Set(["case", "feedback", "error"]);
-const PRIVATE_TELEMETRY_KEYS = new Set(["playerName", "comment", "feedbackComment", "spokenChoice"]);
+// Keys whose value is something the player typed or is called. `spokenChoice`
+// used to be on this list, but it is the card's authored line, and every
+// decision_log entry carries one -- so every queued case row failed its retry.
+const PRIVATE_TELEMETRY_KEYS = new Set(["playerName", "comment", "feedbackComment"]);
+// A feedback row exists to carry the comment the player wrote and sent under
+// the consent box; it is the one place a comment may travel.
+const ALLOWED_PRIVATE_KEYS = { feedback: new Set(["comment"]) };
+const NO_ALLOWED_KEYS = new Set();
 
-function containsPrivateTelemetryKey(value) {
-  if (Array.isArray(value)) return value.some(containsPrivateTelemetryKey);
+/** An empty value discloses nothing, so the check reads values, not key presence. */
+function isDisclosingValue(value) {
+  if (value === undefined || value === null || value === false) return false;
+  return typeof value === "string" ? value.trim().length > 0 : true;
+}
+
+function containsPrivateTelemetryValue(value, allowedKeys) {
+  if (Array.isArray(value)) return value.some((entry) => containsPrivateTelemetryValue(entry, allowedKeys));
   if (!value || typeof value !== "object") return false;
-  return Object.entries(value).some(([key, entry]) => PRIVATE_TELEMETRY_KEYS.has(key) || containsPrivateTelemetryKey(entry));
+  return Object.entries(value).some(
+    ([key, entry]) =>
+      (PRIVATE_TELEMETRY_KEYS.has(key) && !allowedKeys.has(key) && isDisclosingValue(entry)) ||
+      containsPrivateTelemetryValue(entry, allowedKeys),
+  );
+}
+
+/**
+ * The idempotency key a telemetry row is sent with. It is minted once, when the
+ * payload is built, so the first send and every retry name the same row and the
+ * server's unique index on `event_id` drops the duplicates.
+ */
+export function createTelemetryEventId() {
+  return globalThis.crypto?.randomUUID?.() ?? `event-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 }
 
 export function validateTelemetryItem(item) {
   const errors = [];
   if (!TELEMETRY_TYPES.has(item?.type)) errors.push(`invalid type ${item?.type}`);
   if (!item?.payload || typeof item.payload !== "object" || Array.isArray(item.payload)) errors.push("payload must be an object");
-  if (containsPrivateTelemetryKey(item?.payload)) errors.push("payload contains private fields");
+  if (item?.payload?.event_id !== undefined && (typeof item.payload.event_id !== "string" || !item.payload.event_id)) {
+    errors.push("invalid event_id");
+  }
+  if (containsPrivateTelemetryValue(item?.payload, ALLOWED_PRIVATE_KEYS[item?.type] ?? NO_ALLOWED_KEYS)) {
+    errors.push("payload contains private fields");
+  }
   return errors;
+}
+
+/**
+ * A feedback row queued before the payload matched the table: it named columns
+ * (`case_title`, `clarity_score`, ...) that `playtest_feedback` never had, so it
+ * could only ever fail. It is rewritten into the row the table takes.
+ */
+function migrateQueuedFeedbackPayload(item) {
+  const payload = item.payload;
+  if (item.type !== "feedback" || !payload || typeof payload !== "object" || Array.isArray(payload)) return item;
+  if (payload.feedback && typeof payload.feedback === "object" && !Array.isArray(payload.feedback)) return item;
+  return {
+    ...item,
+    payload: {
+      event_id: typeof payload.event_id === "string" && payload.event_id ? payload.event_id : item.id,
+      session_id: payload.session_id,
+      session_code: payload.session_code,
+      case_id: payload.case_id,
+      feedback: {
+        caseTitle: payload.case_title ?? payload.case_id ?? "",
+        submittedAt: payload.submitted_at ?? "",
+        clarity: payload.clarity_score ?? null,
+        difficulty: payload.difficulty_score ?? null,
+        comment: payload.comment ?? null,
+      },
+    },
+  };
+}
+
+function isQueueItemShape(item) {
+  return Boolean(item) && typeof item === "object" && !Array.isArray(item) && typeof item.id === "string" && typeof item.label === "string";
+}
+
+/**
+ * The saved retry queue with every item that can never be sent dropped. One bad
+ * item used to fail the whole save's validation: the runtime threw the run away
+ * on reload, the queue could no longer be written, and a cloud copy was refused.
+ */
+export function sanitizeTelemetryQueue(queue) {
+  if (!Array.isArray(queue)) return [];
+  return queue
+    .filter(isQueueItemShape)
+    .map(migrateQueuedFeedbackPayload)
+    .filter((item) => validateTelemetryItem(item).length === 0);
 }
 
 export function validateSavedStatePayload(state) {
@@ -63,7 +138,7 @@ export function validateSavedStatePayload(state) {
   }
   if (Array.isArray(state.pendingTelemetry)) {
     for (const item of state.pendingTelemetry) {
-      if (!item || typeof item !== "object" || typeof item.id !== "string" || typeof item.label !== "string" || validateTelemetryItem(item).length) {
+      if (!isQueueItemShape(item) || validateTelemetryItem(item).length) {
         errors.push("invalid pendingTelemetry item");
       }
     }

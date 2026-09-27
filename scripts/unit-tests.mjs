@@ -195,8 +195,8 @@ const snapshot = createRecoverySnapshot({
 test("recovery snapshots should omit telemetry queues", () => {
   assert.equal(snapshot.pendingTelemetry.length, 0, "recovery snapshots should omit telemetry queues");
 });
-test("recovery snapshots should omit the spoken line", () => {
-  assert.equal("spokenChoice" in snapshot.log[0], false, "recovery snapshots should omit the spoken line");
+test("recovery snapshots keep log entries whole", () => {
+  assert.deepEqual(snapshot.log[0], { nodeId: "start", spokenChoice: "private" }, "a slot restores the entry it saved");
 });
 test("restored recovery saves should not carry a draft", () => {
   assert.equal("freeText" in restoreRecoverySnapshot(snapshot), false, "the save format has no free-text draft any more");

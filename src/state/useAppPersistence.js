@@ -2,6 +2,7 @@ import {
   appendSaveSlot,
   ERROR_LOG_STORAGE_KEY,
   getTabToken,
+  isReplaySession,
   parseCurrentSavedState,
   isSavedStateShapeValid,
   RECOVERY_CENTER_STORAGE_KEY,
@@ -14,21 +15,36 @@ import {
   SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
   SAVE_STATE_KEYS,
+  setReplaySession,
   STORAGE_KEY,
   writeSaveState,
   writeStoredValue,
 } from "../appConfig.js";
 import {
   normalizeSavedGameplayState,
-  normalizeSavedNestedState,
-  repairSavedRoute,
   recordAppError,
+  repairSavedState,
   shouldCaptureSaveSlot,
 } from "./savedState.js";
+import { clearReplayFromLocation } from "./trace.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
+
+// What a refused write says. Each names why nothing was written: the old code
+// printed the storage-unavailable line for all three, which sent a player whose
+// other tab was simply ahead looking for a browser permission problem.
+const SAVE_UNAVAILABLE_MESSAGE = "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.";
+const SAVE_STALE_MESSAGE = "다른 탭에서 이 진행이 더 앞서 있어 이 탭의 진행은 기록하지 않았습니다. 새로고침하면 최신 진행을 불러옵니다.";
+const SAVE_REPLAY_MESSAGE = "재현 링크로 연 장면이라 진행을 기록하지 않습니다. 내 저장은 그대로 남아 있습니다.";
+
+/** Ends a replay: the tab writes its saves again and a reload opens the player's own. */
+function leaveReplaySession() {
+  if (!isReplaySession()) return;
+  setReplaySession(false);
+  clearReplayFromLocation();
+}
 
 export function useAppPersistence({ state, refs, setters, config }) {
   const {
@@ -98,17 +114,24 @@ export function useAppPersistence({ state, refs, setters, config }) {
       ...nextState,
     };
     const previousState = { started, currentCase, nodeId, completedCases };
-    const { saved: storageSaved, stale } = writeSaveState(payload, { force, isAhead: isAheadOfThisTab });
-    if (stale) {
+    const result = writeSaveState(payload, { force, isAhead: isAheadOfThisTab });
+    if (result.stale) {
       onStaleSave?.();
+      setSaveStatus(SAVE_STALE_MESSAGE);
       return { ...payload, storageSaved: false, stale: true };
     }
-    if (storageSaved && shouldCaptureSaveSlot(previousState, payload)) appendSaveSlot(payload);
-    if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
-    return { ...payload, storageSaved };
+    if (result.replay) {
+      setSaveStatus(SAVE_REPLAY_MESSAGE);
+      return { ...payload, storageSaved: false, replay: true };
+    }
+    if (result.saved && shouldCaptureSaveSlot(previousState, payload)) appendSaveSlot(payload);
+    if (!result.saved) setSaveStatus(SAVE_UNAVAILABLE_MESSAGE);
+    return { ...payload, storageSaved: result.saved };
   }
 
   function startGame() {
+    // A run of one's own ends a replay; from here the tab writes its save again.
+    leaveReplaySession();
     const name = normalizePlayerName(playerName) || "분석관";
     const nextRunId = createRunId();
     const emptyTriggers = makeEmptyScores(triggerLabels);
@@ -137,17 +160,22 @@ export function useAppPersistence({ state, refs, setters, config }) {
 
   function startFreshAfterRecovery() {
     onSuppressSaves();
+    leaveReplaySession();
     if (!removeStoredValue(STORAGE_KEY)) { setSaveStatus("저장본을 초기화하지 못했습니다."); return; }
     writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1"); removeStoredValue(debugErrorKey); window.location.reload();
   }
 
   function saveCurrentGame({ exit = false, dynamics: suspendedDynamics = null } = {}) {
-    const nextStarted = exit ? false : started;
     const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
-    const payload = persist({ started: nextStarted, paused: exit, nodeEnteredAt: nextNodeEnteredAt, ...(suspendedDynamics ? { dynamics: suspendedDynamics } : {}) });
+    const payload = persist({ started: exit ? false : started, paused: exit, nodeEnteredAt: nextNodeEnteredAt, ...(suspendedDynamics ? { dynamics: suspendedDynamics } : {}) });
+    // Another tab is ahead: nothing was written, so leaving would drop this
+    // tab onto an intro that offers a run the save no longer holds. The table
+    // is already locked (onStaleSave) and persist has said why.
+    if (payload.stale) return;
     if (payload.storageSaved) setLastSavedAt(payload.savedAt);
     const savedLine = suspendedDynamics ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
-    setIsPausedSave(exit); setSaveStatus(payload.storageSaved ? savedLine : "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
+    setIsPausedSave(exit);
+    setSaveStatus(payload.storageSaved ? savedLine : payload.replay ? SAVE_REPLAY_MESSAGE : SAVE_UNAVAILABLE_MESSAGE);
     if (exit) setStarted(false); else setNodeEnteredAt(nextNodeEnteredAt);
   }
 
@@ -188,9 +216,22 @@ export function useAppPersistence({ state, refs, setters, config }) {
   function restoreSaveSlot(slot) {
     const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
     const restored = carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current);
-    const repaired = normalizeSavedNestedState(normalizeSavedGameplayState(repairSavedRoute(restored)));
-    if (!repaired || !isSavedStateShapeValid(repaired)) return;
-    const nextState = normalizeSavedGameplayState({ ...repaired, paused: true, started: false, savedAt: new Date().toISOString() });
+    const { state: repaired } = repairSavedState(restored);
+    if (!repaired || !isSavedStateShapeValid(repaired)) {
+      setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
+      return;
+    }
+    // A slot rolls back the story, not the network's backlog or the feedback
+    // the player already wrote: both are kept from the current save.
+    const nextState = normalizeSavedGameplayState({
+      ...repaired,
+      playtestFeedback: isSavedStateShapeValid(current) ? current.playtestFeedback : repaired.playtestFeedback,
+      pendingTelemetry: isSavedStateShapeValid(current) ? current.pendingTelemetry : repaired.pendingTelemetry,
+      paused: true,
+      started: false,
+      savedAt: new Date().toISOString(),
+    });
+    leaveReplaySession();
     if (!writeSaveState(nextState, { force: true }).saved) {
       recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
       setSaveStatus("Restore failed: browser storage is unavailable.");

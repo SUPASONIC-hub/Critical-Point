@@ -50,7 +50,8 @@ export function buildPlaytestExport({ includeDiagnostics = false, run, gameplay,
     ...payload,
     ...sanitizeDiagnosticValue(diagnostics),
     errorLog: Array.isArray(localErrorLog?.entries) ? localErrorLog.entries : [],
-    saveSlots: Array.isArray(localSaveSlots?.slots) ? localSaveSlots.slots : [],
+    // Slots hold the whole save now, name and all, so they go through the same filter.
+    saveSlots: Array.isArray(localSaveSlots?.slots) ? sanitizeDiagnosticValue(localSaveSlots.slots) : [],
     trace: getTraceEvents(),
   };
   const errors = validatePlaytestExport(diagnosticPayload, { includeDiagnostics: true });

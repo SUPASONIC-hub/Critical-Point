@@ -51,7 +51,6 @@ import {
   SAVE_SLOT_STORAGE_KEY,
   serializeError,
   STORAGE_KEY,
-  TELEMETRY_QUEUE_TYPES,
   writeStoredValue,
   createSafeErrorContext,
   createRecoverySnapshot,
@@ -80,6 +79,7 @@ import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 import { getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
 import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedState.js";
+import { validateTelemetryItem } from "../src/state/payloadSchemas.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 import { test } from "node:test";
 
@@ -160,7 +160,10 @@ test("result view contracts should include case transition actions", () => {
   );
 });
 test("pending telemetry should only accept supported queue types", () => {
-  assert.deepEqual(TELEMETRY_QUEUE_TYPES, ["case", "feedback", "error"], "pending telemetry should only accept supported queue types");
+  for (const type of ["case", "feedback", "error"]) {
+    assert.deepEqual(validateTelemetryItem({ type, payload: {} }), [], `${type} rows are queueable`);
+  }
+  assert.deepEqual(validateTelemetryItem({ type: "analysis", payload: {} }), ["invalid type analysis"], "pending telemetry should only accept supported queue types");
 });
 test("save state keys should include every required persisted field", () => {
   assert.deepEqual(
@@ -495,14 +498,16 @@ const recoverySnapshot = createRecoverySnapshot({
 test("recovery snapshots should not duplicate the run's prose", () => {
   assert.equal("spokenChoice" in recoverySnapshot, false, "recovery snapshots should not duplicate the run's prose");
 });
-test("recovery snapshot log entries should not keep the spoken line", () => {
-  assert.equal("spokenChoice" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep the spoken line");
-});
-test("recovery snapshot log entries should not keep spoken text", () => {
-  assert.equal("spokenChoice" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep spoken text");
-});
-test("recovery snapshot log entries should not keep scene beats", () => {
-  assert.equal("sceneBeat" in recoverySnapshot.log.at(-1), false, "recovery snapshot log entries should not keep scene beats");
+// A slot is the save as it stood, so restoring one is exact: the table record a
+// restore carries forward is indexed by the restored log's length
+// (carryTableRecordIntoRestore), and a stripped entry loses its threshold.
+test("recovery snapshot log entries keep every field", () => {
+  assert.deepEqual(recoverySnapshot.log.at(-1), {
+    nodeId: "node-23",
+    choiceId: "choice-23",
+    spokenChoice: "private spoken text",
+    sceneBeat: "private scene beat",
+  });
 });
 test("recovery snapshots should not duplicate telemetry queues", () => {
   assert.equal(recoverySnapshot.pendingTelemetry.length, 0, "recovery snapshots should not duplicate telemetry queues");
@@ -510,8 +515,8 @@ test("recovery snapshots should not duplicate telemetry queues", () => {
 test("recovery snapshots should not duplicate playtest feedback", () => {
   assert.deepEqual(recoverySnapshot.playtestFeedback, {}, "recovery snapshots should not duplicate playtest feedback");
 });
-test("recovery snapshots should keep only a bounded log tail", () => {
-  assert.equal(recoverySnapshot.log.length, 20, "recovery snapshots should keep only a bounded log tail");
+test("recovery snapshots keep the whole log", () => {
+  assert.equal(recoverySnapshot.log.length, 24, "a tail of the log restores a run whose indices no longer line up");
 });
 const restoredRecoverySnapshot = restoreRecoverySnapshot(recoverySnapshot);
 test("recovery snapshots should restore to current save schema", () => {
