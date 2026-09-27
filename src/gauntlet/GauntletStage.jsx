@@ -95,6 +95,7 @@ export function GauntletStage({
   resources,
   resourceMeta,
   clueCount,
+  casesOpened = 0,
   isAdvancing,
   revealOpen,
   onResolve,
@@ -314,7 +315,7 @@ export function GauntletStage({
   }
 
   function isCardOpen(card) {
-    return getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy }).unlocked;
+    return getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }).unlocked;
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
@@ -682,7 +683,7 @@ export function GauntletStage({
 
         <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
           {cards.map((card, index) => {
-            const gate = getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
+            const gate = getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened });
             const burn = getCardBurn(card, schema);
             const chips = getCardChips(card, schema);
             const selected = win.selectedId === card.id;

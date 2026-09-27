@@ -10,7 +10,7 @@ import {
   nodes,
   triggerLabels,
 } from "../gameData.js";
-import { makeEmptyScores } from "../gameLogic.js";
+import { getOutcomeChoiceId, makeEmptyScores } from "../gameLogic.js";
 import { recordAppError } from "./errorRecovery.js";
 import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
@@ -231,7 +231,8 @@ function normalizeSavedCaseSummaryShape(summary) {
     momentumScore: Number.isFinite(summary.momentumScore) ? summary.momentumScore : 0,
     momentumTier: typeof summary.momentumTier === "string" ? summary.momentumTier : "BUILDING",
     rank: typeof summary.rank === "string" ? summary.rank : "C",
-    outcomeChoiceId: typeof summary.outcomeChoiceId === "string" ? summary.outcomeChoiceId : null,
+    // A save written before bridge closings were mapped still names the bridge.
+    outcomeChoiceId: typeof summary.outcomeChoiceId === "string" ? getOutcomeChoiceId(summary.outcomeChoiceId, nodes[summary.outcomeNodeId]) : null,
     outcomeNodeId: typeof summary.outcomeNodeId === "string" ? summary.outcomeNodeId : null,
     // The next case's opening reads this to decide which memory choice to
     // offer, so a corrupted value must not reach the choice builder. A save

@@ -73,6 +73,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
   const streak = run?.streak ?? 0;
   const { gauge, pushes, focusMode, focus, focusHits } = win;
   const stanceMastery = run?.stanceMastery;
+  // The board after this window is the season's next one, and it leans in on
+  // the schedule `resolveWindow` applies (`getSeasonEscalation`).
+  const windowIndex = (Number(run?.windowIndex) || 0) + 1;
 
   const cashMutations = useMemo(
     () =>
@@ -89,8 +92,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
         focusCharge: focus,
         focusHits,
         stanceMastery,
+        windowIndex,
       })),
-    [focus, focusHits, focusMode, fractureAxis, gauge, hot, pushes, relics, stanceMastery, streak],
+    [focus, focusHits, focusMode, fractureAxis, gauge, hot, pushes, relics, stanceMastery, streak, windowIndex],
   );
   const bustMutations = useMemo(
     () =>
@@ -103,8 +107,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
         burnAxis: fractureAxis,
         caseClosed: false,
         relics: relics ?? [],
+        windowIndex,
       })),
-    [fractureAxis, gauge, pushes, relics, schema.wallMin],
+    [fractureAxis, gauge, pushes, relics, schema.wallMin, windowIndex],
   );
 
   return useMemo(() => {

@@ -1,4 +1,5 @@
 import { getRankingIntegrity, getRankingLeague } from "./advancedSystems.js";
+import { subjectParticle } from "./playerLanguage.js";
 
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
 
@@ -129,8 +130,10 @@ export function getLeaderboardHeadline(entries = []) {
     };
   }
   const leader = entries[0];
+  // The particle follows the name; a parenthesised style is not read aloud.
+  const leaderLabel = leader.isLocal ? leader.name : `${leader.name} (${leader.style})`;
   return {
-    title: `${leader.isLocal ? leader.name : `${leader.name} (${leader.style})`}이(가) 현재 기준선을 세웠습니다.`,
+    title: `${leaderLabel}${subjectParticle(leader.name)} 현재 기준선을 세웠습니다.`,
     text: `${leader.caseTitle}에서 ${leader.score}점과 ${leader.rank} 랭크를 기록했습니다.`,
   };
 }

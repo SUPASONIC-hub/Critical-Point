@@ -18,6 +18,7 @@ import {
   createCaseSummary,
   getAuthorityGate,
   getCaseOutcome,
+  getCasesOpened,
   getContinuityChallenge,
   getEndingVariant,
   getGameplayStats,
@@ -205,13 +206,11 @@ function playSeason(seasonIndex, archetype) {
     const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
     const outcomeId = previousResult?.outcomeChoiceId;
     const startNode = caseOpeningRoutes[caseId]?.[outcomeId] ?? CASE_START_NODES[caseId];
-    // The continuity table is keyed by the case that opens, which is how the
-    // runtime reads it once its lookup is fixed (it passed the previous case).
+    // The continuity table is keyed by the case that opens, as the runtime reads it.
     const continuityChallenge = outcomeId ? getContinuityChallenge({ caseId, choiceId: outcomeId }) : null;
     const carryover = outcomeId ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: outcomeId }) : {};
     const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
-    // The season's wear is what the runtime adds to the opening once it reads
-    // `getSeasonWear` (requested alongside the continuity fix).
+    // The season's wear, which `GameRuntime.startCase` adds to the opening too.
     const openingEffect = mergeEffects(baseLegacy?.effect ?? {}, carryover, getSeasonWear(caseId));
     const openingLegacy = previousResult
       ? { ...baseLegacy, effect: openingEffect, continuity: getCaseOutcome({ caseId: previousCaseId, choiceId: outcomeId }), continuityChallenge }
@@ -243,7 +242,7 @@ function playSeason(seasonIndex, archetype) {
         resourceMeta,
       });
       const memoryChoice = getContinuityMemoryChoice({ caseId, nodeId, caseResults });
-      const standing = { clueCount: discoveredClues.length, trust: resources.trust, legitimacy: resources.legitimacy };
+      const standing = { clueCount: discoveredClues.length, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened: getCasesOpened(caseId) };
       const fixed = [...node.choices.filter((choice) => choice.type !== "reframe"), ...(memoryChoice ? [memoryChoice] : [])]
         .filter((choice) => getAuthorityGate(choice, standing).unlocked);
       const takeReframe = reframeChoice && caseReframes === 0 && random() < policy.reframe;

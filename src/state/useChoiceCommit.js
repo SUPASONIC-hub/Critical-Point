@@ -11,6 +11,8 @@ import {
   getEcho,
   getEndingVariant,
   getObserverTag,
+  getOutcomeChoiceId,
+  getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
   REFRAME_COGNITION,
@@ -23,7 +25,6 @@ import { saveCaseTelemetry, telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { appendTraceEvent } from "./trace.js";
-import { getSeasonStrain } from "./useResultReport.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 
 /**
@@ -329,7 +330,7 @@ export function useChoiceCommit(context) {
         }),
         gauntlet: createRunSummary(nextRun),
         runId,
-        outcomeChoiceId: entry.choiceId,
+        outcomeChoiceId: getOutcomeChoiceId(entry.choiceId, node),
         outcomeNodeId: entry.nodeId,
         completedAt: new Date().toISOString(),
       };
@@ -382,9 +383,14 @@ export function useChoiceCommit(context) {
   }
 
   function choose(choice, closedWindow = null, forced = false) {
-    const { staleSave, clueCount, resources, resolvedNodeId, setSaveStatus } = context;
+    const { staleSave, clueCount, casesOpened, resources, resolvedNodeId, setSaveStatus } = context;
     if (committingRef.current || isAdvancing || staleSave) return;
-    const authorityGate = getAuthorityGate(choice, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy });
+    const authorityGate = getAuthorityGate(choice, {
+      clueCount,
+      trust: resources.trust,
+      legitimacy: resources.legitimacy,
+      casesOpened,
+    });
     if (!authorityGate.unlocked && !forced) {
       setSaveStatus(`Choice locked: ${authorityGate.reason}`);
       return;

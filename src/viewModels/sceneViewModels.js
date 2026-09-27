@@ -1,6 +1,6 @@
 import { characterProfiles } from "../gameDialogue.js";
 import { getAuthorityProfile } from "../advancedSystems.js";
-import { AUTHORITY_THRESHOLDS, getAuthorityLevel } from "../gameLogic.js";
+import { AUTHORITY_THRESHOLDS, getAuthorityClueThresholds, getAuthorityLevel } from "../gameLogic.js";
 import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
 
 /**
@@ -22,10 +22,12 @@ export function createSpeakerProfile({ node }) {
   };
 }
 
-export function createAuthorityState({ evidence, legitimacy, operatorOrigin, trust }) {
-  const level = getAuthorityLevel({ clueCount: evidence, legitimacy, trust });
+export function createAuthorityState({ casesOpened = 0, evidence, legitimacy, operatorOrigin, trust }) {
+  const level = getAuthorityLevel({ clueCount: evidence, legitimacy, trust, casesOpened });
   const authorityProfile = getAuthorityProfile(operatorOrigin, level);
-  const { oversightClues, oversightLegitimacy, fieldClues, fieldTrust } = AUTHORITY_THRESHOLDS;
+  // The clue counts the gate asks for grow with the cases opened; quote those.
+  const { oversightLegitimacy, fieldTrust } = AUTHORITY_THRESHOLDS;
+  const { oversightClues, fieldClues } = getAuthorityClueThresholds(casesOpened);
   return {
     level,
     evidence,

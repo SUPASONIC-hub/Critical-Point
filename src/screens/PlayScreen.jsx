@@ -17,7 +17,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
     },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId },
     gauntlet: {
-      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount, reframeChoice,
+      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice,
       markWindowTouched: viewMarkWindowTouched, decisionRevealOpen, staleSave, reloadFromStorage: viewReloadFromStorage },
     status: { resources, resourceMeta, progress, saveCurrentGame: viewSaveCurrentGame, reset: viewReset, routeIndex, routeLength },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: viewCopyReplayLink, copyDiagnosticTrace: viewCopyDiagnosticTrace },
@@ -63,6 +63,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
         resources={resources}
         resourceMeta={resourceMeta}
         clueCount={clueCount}
+        casesOpened={casesOpened}
         isAdvancing={isAdvancing}
         revealOpen={decisionRevealOpen}
         onResolve={resolveGauntlet}

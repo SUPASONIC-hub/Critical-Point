@@ -12,7 +12,7 @@ import {
   nodes,
   triggerLabels,
 } from "../src/gameData.js";
-import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover } from "../src/gameLogic.js";
+import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getOutcomeChoiceId } from "../src/gameLogic.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
 import { case01Nodes } from "../src/nodes/case01.js";
 import { case02Nodes } from "../src/nodes/case02.js";
@@ -240,6 +240,18 @@ CASE_SEQUENCE.forEach((caseId, index) => {
     if (!nextCaseId) continue;
     if (Object.keys(getOutcomeCarryover({ caseId, choiceId })).length === 0) failures.push(`${caseId}/${choiceId} carries nothing into ${nextCaseId}`);
     if (!getContinuityChallenge({ caseId: nextCaseId, choiceId })) failures.push(`${nextCaseId} has no continuity challenge for ${caseId}/${choiceId}`);
+  }
+  // The runtime's own two choices, 판 공개 기준 and 관계의 증언, go where a
+  // scene's first choice goes, so on a closing scene they close the case under
+  // ids no table knows. The case records the choice they stand in for, and
+  // that has to be one of the outcomes checked above.
+  for (const nodeId of nodeOrders[caseId] ?? []) {
+    const first = nodes[nodeId]?.choices?.[0];
+    if (!first || first.next !== resultNodeId) continue;
+    for (const bridge of ["adaptive_reframe", "relationship_bridge"]) {
+      const standIn = getOutcomeChoiceId(`${caseId}_${bridge}`, nodes[nodeId]);
+      if (!outcomeIds.has(standIn)) failures.push(`${caseId}_${bridge} closes ${caseId} at ${nodeId} as ${standIn}, which is not one of its outcomes`);
+    }
   }
   // An opening route keyed on an outcome the previous case cannot produce is a
   // door nobody reaches.

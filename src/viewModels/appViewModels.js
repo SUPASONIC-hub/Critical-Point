@@ -115,7 +115,7 @@ export const viewGroups = {
     ],
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId"],
     gauntlet: [
-      "gauntletRun", "gauntletSeed", "resolveGauntlet", "isAdvancing", "fixedChoices", "clueCount", "reframeChoice", "markWindowTouched",
+      "gauntletRun", "gauntletSeed", "resolveGauntlet", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice", "markWindowTouched",
       "decisionRevealOpen", "staleSave", "reloadFromStorage",
     ],
     status: ["resources", "resourceMeta", "progress", "saveCurrentGame", "reset", "routeIndex", "routeLength"],

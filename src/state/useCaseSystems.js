@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { getBalanceSignals, getDelayedConsequences, getSeasonGoals } from "../advancedSystems.js";
 import { getAchievementProgress, getOperationsSnapshot, getOperatorReveal } from "../featurePack.js";
-import { getClueHypotheses } from "../gameLogic.js";
+import { getCasesOpened, getClueHypotheses } from "../gameLogic.js";
 import { createAuthorityState } from "../viewModels/sceneViewModels.js";
 
 /**
@@ -21,6 +21,7 @@ import { createAuthorityState } from "../viewModels/sceneViewModels.js";
  * read them. They are in the history if the game ever wants them back.
  */
 export function useCaseSystems({
+  caseId,
   caseResults,
   completedCases,
   discoveredClues,
@@ -34,15 +35,19 @@ export function useCaseSystems({
   const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
   const seasonGoals = getSeasonGoals();
   const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
+  // The authority gate asks for a share of the cases opened so far, so every
+  // reader of it -- the badge, the table, the commit -- passes the same count.
+  const casesOpened = getCasesOpened(caseId);
   const authorityState = useMemo(
     () =>
       createAuthorityState({
+        casesOpened,
         evidence: discoveredClues.length,
         legitimacy: resources.legitimacy ?? 0,
         operatorOrigin,
         trust: resources.trust ?? 0,
       }),
-    [discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust],
+    [casesOpened, discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust],
   );
   const clueCount = discoveredClues.length;
   const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
@@ -59,6 +64,7 @@ export function useCaseSystems({
     achievementProgress,
     authorityState,
     balanceSignals,
+    casesOpened,
     clueCount,
     clueHypotheses,
     delayedConsequences,

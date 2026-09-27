@@ -1421,7 +1421,7 @@ const branchConditions = {
     // protects people and follows procedure pays in hours instead, and had no
     // way in: case 04's detour was unreachable for exactly the run that plays
     // the case as written. The third disjunct is that run's receipt.
-    label: "이미 누군가 비용을 치른 뒤에만 열립니다 (피해, 정당성, 또는 시간)",
+    label: "이미 누군가 비용을 치른 뒤에만 열립니다 (사람 피해, 공정함, 또는 남은 시간)",
     test: ({ resources } = {}) =>
       (resources?.humanCost ?? 0) >= 6 ||
       (resources?.legitimacy ?? 100) <= 45 ||

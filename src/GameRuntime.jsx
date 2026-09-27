@@ -45,6 +45,7 @@ import {
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
+  getSeasonWear,
   detectPrivacySignals,
   explainResourceTradeoff,
   limitText,
@@ -320,6 +321,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     achievementProgress,
     authorityState,
     balanceSignals,
+    casesOpened,
     clueCount,
     clueHypotheses,
     delayedConsequences,
@@ -327,6 +329,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     operatorReveal,
     seasonGoals,
   } = useCaseSystems({
+    caseId: fallbackCaseId,
     caseResults,
     completedCases,
     discoveredClues,
@@ -524,7 +527,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
     caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
     sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
-    playerName, activeCaseMeta, dataConsent, staleSave, clueCount,
+    playerName, activeCaseMeta, dataConsent, staleSave, clueCount, casesOpened,
     readers: choiceReaders, persist, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
     onSeasonFinal: () => {
       setNewGamePlusUnlocked(true);
@@ -764,10 +767,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
       : {};
     const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
+    // What the season has worn down is added on top, as check:endings replays it.
     const openingEffect = { ...(baseLegacy?.effect ?? {}) };
-    Object.entries(carryoverEffect).forEach(([key, value]) => {
+    [carryoverEffect, getSeasonWear(caseId)].forEach((effect) => Object.entries(effect).forEach(([key, value]) => {
       openingEffect[key] = (openingEffect[key] ?? 0) + value;
-    });
+    }));
     const legacy = previousResult
       ? {
           ...baseLegacy,
@@ -1271,7 +1275,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
     gauntletRun, gauntletSeed, resolveGauntlet: renderNothing,
     isAdvancing, markWindowTouched: renderNothing, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage: renderNothing,
-    fixedChoices, clueCount, reframeChoice,
+    fixedChoices, clueCount, casesOpened, reframeChoice,
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
   });

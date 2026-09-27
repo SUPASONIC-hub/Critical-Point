@@ -16,8 +16,8 @@ import {
   getTelemetryDashboardSnapshot,
 } from "../advancedSystems.js";
 import { getFailureRecovery } from "../featurePack.js";
-import { caseAftermathNodeId, triggerLabels } from "../gameData.js";
-import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover } from "../gameLogic.js";
+import { caseAftermathNodeId, nodes, triggerLabels } from "../gameData.js";
+import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
@@ -86,37 +86,6 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
 }
 
 /**
- * What the season has cost so far, for the closing ruling.
- *
- * Every case starts from the same resources, so the last case alone never
- * reaches the thresholds the ending is written against. This adds up the human
- * cost each case ended on and takes the highest pressure any case reached.
- */
-export function getSeasonStrain(caseResults = {}, pending = null) {
-  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
-  return {
-    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
-    peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
-    seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
-    seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
-    // The vault is cumulative across the season, so the largest summary holds it,
-    // and it is read per case: a season total rises with every case played. The
-    // groove the beat added is taken back out -- the vault's slack rewards
-    // reading the table, and the beat has its own door below.
-    seasonVaultPerCase: summaries.length
-      ? summaries.reduce(
-        (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.grooveVault) || 0)),
-        0,
-      ) / summaries.length
-      : 0,
-    seasonBestCombo: summaries.reduce(
-      (best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0),
-      0,
-    ),
-  };
-}
-
-/**
  * Everything the closing report reads, derived in one place.
  *
  * These are pure functions of the run: the case summary, which of the nine
@@ -160,10 +129,16 @@ export function useResultReport({
       }),
     [triggers, cognition, log, resources],
   );
+  // The season as `check:endings` replays it: the case summaries so far
+  // (the closing case's included once it has closed) and the run's own log.
+  const seasonStrain = useMemo(() => getSeasonStrain(caseResults), [caseResults]);
   const endingVariant = useMemo(
-    () => getEndingVariant({ resources, discoveredClues, log, ...getSeasonStrain(caseResults) }),
-    [caseResults, discoveredClues, log, resources],
+    () => getEndingVariant({ resources, discoveredClues, log, ...seasonStrain }),
+    [discoveredClues, log, resources, seasonStrain],
   );
+  // What the ruling read: the standing the season's cases closed on on average,
+  // or the last case's when no summary carries one.
+  const standing = seasonStrain.seasonResources ?? resources;
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   const routeTimeline = useMemo(
     () =>
@@ -192,9 +167,9 @@ export function useResultReport({
     finalAftermathEntry,
     latestChoiceFeedback: getChoiceOutcomeFeedback(log.at(-1)),
     endingPreview: { ...getEndingPreview(endingVariant), rationale: [
-      `${easyResourceLabels.trust} ${resources.trust ?? 0}`,
-      `${easyResourceLabels.legitimacy} ${resources.legitimacy ?? 0}`,
-      `${easyResourceLabels.capital} ${resources.capital ?? 0}`,
+      `${easyResourceLabels.trust} ${standing.trust ?? 0}`,
+      `${easyResourceLabels.legitimacy} ${standing.legitimacy ?? 0}`,
+      `${easyResourceLabels.capital} ${standing.capital ?? 0}`,
       `단서 ${discoveredClues.length}`,
     ] },
     failureRecovery: getFailureRecovery(endingVariant, resources),
@@ -223,7 +198,7 @@ export function useResultReport({
       choiceId: log.at(-1)?.choiceId,
       pending: pendingTelemetry.length,
     }),
-    caseOutcome: getCaseOutcome({ caseId: currentCase, choiceId: outcomeEntry?.choiceId }),
+    caseOutcome: getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) }),
     endingProfile: createEndingProfile({ finalEndingEntry }),
   };
 }
