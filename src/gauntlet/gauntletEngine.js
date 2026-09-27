@@ -905,7 +905,7 @@ export function openCaseRun(run) {
     runGroove: 0,
     insuranceSpent: false,
     relicOffer: rebooted ? current.relicOffer : [],
-    schema: rebooted ? current.schema : applyRelics(BASE_SCHEMA, current.relics),
+    schema: rebooted ? current.schema : applyRelics(applySeasonEscalation(BASE_SCHEMA, current.windowIndex), current.relics),
   });
 }
 
@@ -971,8 +971,38 @@ function applyStanceMastery(schema, mastery = EMPTY_STANCE_MASTERY) {
   return next;
 }
 
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY }) {
-  if (caseClosed) return applyRelics(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery), relics);
+/**
+ * The season leans in. A case late in the season used to play on exactly the
+ * board the 프롤로그 did, and with the authored effects drifting slightly
+ * smaller as the season went on, per-case peak pressure fell from 19-21 in the
+ * first act to 14-16 from 사건 20 on: the fiftieth case was the easiest.
+ *
+ * Every `ESCALATION_STEP_WINDOWS` windows the run has played, the top of the
+ * wall's band comes down by `ESCALATION_WALL_STEP` and the clock creeps a little
+ * hotter, up to `ESCALATION_MAX_STEPS` steps -- about the length of a season.
+ * Only the top of the band moves, so the lowest wall a board can draw, and with
+ * it the sealed-card rule (`sealBreak - 1 + stepMax < wallMin`), is untouched,
+ * and the band on the HUD still says exactly where the wall can be. It is read
+ * off `windowIndex`, which a save carries and a restore never rolls back.
+ */
+export const ESCALATION_STEP_WINDOWS = 100;
+export const ESCALATION_MAX_STEPS = 4;
+const ESCALATION_WALL_STEP = 2;
+const ESCALATION_CREEP_STEP = 0.03;
+
+export function getSeasonEscalation(windowIndex = 0) {
+  const steps = clamp(Math.floor((Number(windowIndex) || 0) / ESCALATION_STEP_WINDOWS), 0, ESCALATION_MAX_STEPS);
+  return { steps, wallMax: -steps * ESCALATION_WALL_STEP, creep: round2(steps * ESCALATION_CREEP_STEP) };
+}
+
+function applySeasonEscalation(schema, windowIndex) {
+  const { steps, wallMax, creep } = getSeasonEscalation(windowIndex);
+  if (steps === 0) return schema;
+  return { ...schema, wallMax: Math.max(schema.wallMin, schema.wallMax + wallMax), creep: round2(schema.creep + creep) };
+}
+
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0 }) {
+  if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery), windowIndex), relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     schema.faceDown = true;
@@ -1008,7 +1038,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyRelics(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), stanceMastery), relics);
+  return applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), stanceMastery), windowIndex), relics);
 }
 
 /**
@@ -1059,6 +1089,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     focusCharge,
     focusHits,
     stanceMastery,
+    windowIndex: current.windowIndex + 1,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [

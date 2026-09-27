@@ -12,7 +12,7 @@ import {
   nodes,
   triggerLabels,
 } from "../src/gameData.js";
-import { applyEffect, getAuthorityLevel } from "../src/gameLogic.js";
+import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover } from "../src/gameLogic.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
 import { case01Nodes } from "../src/nodes/case01.js";
 import { case02Nodes } from "../src/nodes/case02.js";
@@ -200,7 +200,7 @@ for (const caseId of CASE_SEQUENCE) {
     const clues = caseIndex + (standing.depth >= 1 ? 1 : 0);
     for (const choice of nodes[nodeId].choices ?? []) {
       if (!choice.requiredAuthority) continue;
-      const reachable = getAuthorityLevel({ clueCount: clues, trust: standing.trust, legitimacy: standing.legitimacy });
+      const reachable = getAuthorityLevel({ clueCount: clues, trust: standing.trust, legitimacy: standing.legitimacy, casesOpened: caseIndex + 1 });
       const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
       if ((levels[reachable] ?? 0) < (levels[choice.requiredAuthority] ?? 99)) {
         failures.push(
@@ -211,6 +211,50 @@ for (const caseId of CASE_SEQUENCE) {
     }
   }
 }
+
+/**
+ * Every way a case can close has to carry into the next one.
+ *
+ * A case closes on whichever choice leads to its result node, and that choice's
+ * id is the case's outcome: the runtime reads the outcome and the carryover
+ * with the case that closed, and the continuity challenge and the opening route
+ * with the case that opens next -- `getContinuityChallenge({ caseId: <next
+ * case>, choiceId })`. The continuity table was read with the closed case for
+ * a while, and every lookup came back empty without anything failing, because
+ * a missing challenge is a legal `null`. So the tables are walked here the way
+ * the runtime reads them, and an outcome that falls through any of them fails.
+ */
+const UNRECORDED_OUTCOME = getCaseOutcome({ caseId: "__none__", choiceId: "__none__" }).title;
+CASE_SEQUENCE.forEach((caseId, index) => {
+  const nextCaseId = CASE_SEQUENCE[index + 1];
+  const resultNodeId = CASE_RESULT_NODES[caseId];
+  const outcomeIds = new Set(
+    (nodeOrders[caseId] ?? [])
+      .flatMap((nodeId) => nodes[nodeId]?.choices ?? [])
+      .filter((choice) => choice.next === resultNodeId && choice.type !== "reframe")
+      .map((choice) => choice.id),
+  );
+  if (outcomeIds.size === 0) failures.push(`${caseId} has no choice that closes it`);
+  for (const choiceId of outcomeIds) {
+    if (getCaseOutcome({ caseId, choiceId }).title === UNRECORDED_OUTCOME) failures.push(`${caseId}/${choiceId} closes the case with no outcome written`);
+    if (!nextCaseId) continue;
+    if (Object.keys(getOutcomeCarryover({ caseId, choiceId })).length === 0) failures.push(`${caseId}/${choiceId} carries nothing into ${nextCaseId}`);
+    if (!getContinuityChallenge({ caseId: nextCaseId, choiceId })) failures.push(`${nextCaseId} has no continuity challenge for ${caseId}/${choiceId}`);
+  }
+  // An opening route keyed on an outcome the previous case cannot produce is a
+  // door nobody reaches.
+  const previousCaseId = CASE_SEQUENCE[index - 1];
+  if (!previousCaseId) return;
+  const previousOutcomes = new Set(
+    (nodeOrders[previousCaseId] ?? [])
+      .flatMap((nodeId) => nodes[nodeId]?.choices ?? [])
+      .filter((choice) => choice.next === CASE_RESULT_NODES[previousCaseId])
+      .map((choice) => choice.id),
+  );
+  for (const outcomeId of Object.keys(caseOpeningRoutes[caseId] ?? {})) {
+    if (!previousOutcomes.has(outcomeId)) failures.push(`${caseId} opens on ${outcomeId}, which ${previousCaseId} never closes on`);
+  }
+});
 
 /**
  * A case file says where each choice goes, and the file has to be right.

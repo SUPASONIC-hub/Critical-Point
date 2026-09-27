@@ -120,23 +120,32 @@ test("telemetry dashboard snapshots should derive stable counts", () => {
     "telemetry dashboard snapshots should derive stable counts",
   );
 });
+// A full season as the ending reads it: the standing each case closed on, averaged.
+const endingSeason = (seasonResources, clues = 55) => ({
+  resources: { ...initialResources },
+  discoveredClues: Array.from({ length: clues }, (_, index) => ({ id: `clue-${index}` })),
+  log: [{ choiceId: "f_after_witness" }],
+  casesPlayed: 55,
+  seasonWindows: 490,
+  sustainedPressure: 20,
+  seasonReframeRoutes: 5,
+  seasonHumanCost: 55 * 3,
+  seasonResources: { time: 50, fatigue: 25, humanCost: 3, ...seasonResources },
+});
 test("ending variant should prefer open oversight when evidence and trust are high", () => {
   assert.equal(
-    getEndingVariant({
-      resources: { ...initialResources, trust: 70, legitimacy: 70, humanCost: 5, fatigue: 10 },
-      discoveredClues: Array.from({ length: 5 }, (_, index) => ({ id: `clue-${index}` })),
-      log: [],
-    }).id,
+    getEndingVariant(endingSeason({ trust: 90, legitimacy: 88, capital: 90 })).id,
     "open-oversight",
     "ending variant should prefer open oversight when evidence and trust are high",
   );
 });
 test("rare ending thresholds should stay reachable without overriding evidence endings", () => {
-  const base = { ...initialResources, humanCost: 5, fatigue: 10 };
-  assert.equal(getEndingVariant({ resources: { ...base, capital: 55, trust: 47 }, log: [] }).id, "profitable-silence");
-  assert.equal(getEndingVariant({ resources: { ...base, legitimacy: 60, trust: 54 }, log: [] }).id, "cold-justice");
-  assert.equal(getEndingVariant({ resources: { ...base, trust: 58, legitimacy: 50 }, log: [] }).id, "field-pact");
-  assert.equal(getEndingVariant({ resources: { ...base, capital: 55, trust: 47, legitimacy: 55 }, discoveredClues: Array.from({ length: 4 }, () => ({})), log: [] }).id, "evidence-reform");
+  assert.equal(getEndingVariant(endingSeason({ capital: 100, trust: 30, legitimacy: 50 })).id, "profitable-silence");
+  assert.equal(getEndingVariant(endingSeason({ capital: 85, trust: 78, legitimacy: 96 })).id, "cold-justice");
+  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 92, legitimacy: 70 })).id, "field-pact");
+  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 80, legitimacy: 90 })).id, "evidence-reform");
+  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 80, legitimacy: 90 }, 35)).id, "open-question", "the record endings need the season's records");
+  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 80, legitimacy: 90 }, 20)).id, "quiet-cover", "and with most of them unopened the truth is still asleep");
 });
 test("intro view contracts should fail fast when required fields are omitted", () => {
   assert.throws(
@@ -1556,6 +1565,18 @@ for (const [label, spoken] of [
   ["열람권을 준다", "열람권을 주겠습니다."],
   ["기준을 다시 쓴다", "기준을 다시 쓰겠습니다."],
   ["확인하지 않는다", "확인하지 않겠습니다."],
+  // ㄹ stems, whose ㄹ the present tense drops.
+  ["그 이유를 안다", "그 이유를 알겠습니다."],
+  ["하루를 번다", "하루를 벌겠습니다."],
+  ["한 집씩 다시 돈다", "한 집씩 다시 돌겠습니다."],
+  ["현장으로 차를 몬다", "현장으로 차를 몰겠습니다."],
+  ["리본은 제자리에 단다", "리본은 제자리에 달겠습니다."],
+  ["문제만 일정대로 푼다", "문제만 일정대로 풀겠습니다."],
+  ["옆에서 떡을 썬다", "옆에서 떡을 썰겠습니다."],
+  ["회의를 연다", "회의를 열겠습니다."],
+  // And a vowel stem that only looks like one.
+  ["한 곳만 판다", "한 곳만 파겠습니다."],
+  ["저녁을 산다", "저녁을 사겠습니다."],
 ]) {
   assert.equal(speechifyChoice({ label }), spoken, `${label} should be spoken, not appended to`);
 }

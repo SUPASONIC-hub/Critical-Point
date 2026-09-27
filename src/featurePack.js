@@ -1,4 +1,5 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
+import { isPeopleFirstEffect } from "./gameLogic.js";
 
 
 
@@ -43,12 +44,29 @@ export function getEndingEpilogue(endingId = "open-question") {
   );
 }
 
+/**
+ * PEOPLE FIRST counts the season's decisions whose largest gain went to the
+ * people in the scene (`isPeopleFirstEffect`). It used to match
+ * /protect|people|witness|person/ on the choice id -- and generated scenes are
+ * `<scene>_choice_N`, so every choice in a scene called `c1_witness` counted --
+ * and it read only the case on screen, whose log the next case clears. Closed
+ * cases now carry their count in their summary; the case being played is
+ * counted from its log. The bar is three such decisions a case, across the
+ * season: a player who leads with people clears it, one who weighs everything
+ * evenly about half the time, and nobody by accident.
+ */
+const PEOPLE_FIRST_PER_CASE = 3;
+
 export function getAchievementProgress({ log = [], completedCases = [], caseResults = {} } = {}) {
+  const closed = caseResults ?? {};
+  const peopleFirst =
+    Object.values(closed).reduce((sum, summary) => sum + (Number(summary?.peopleFirstCount) || 0), 0) +
+    log.filter((entry) => entry && !entry.isSystemEvent && !closed[entry.caseId] && isPeopleFirstEffect(entry.effect)).length;
   // The two season-shaped goals read the sequence, so a new case cannot leave a
   // badge that says 6/6 while the season has seven cases in it.
   return [
-    { id: "people-first", label: "PEOPLE FIRST", value: log.filter((entry) => /protect|people|witness|person/.test(entry.choiceId ?? "")).length, goal: 3 },
-    { id: "full-audit", label: "FULL AUDIT", value: Object.keys(caseResults).length, goal: CASE_SEQUENCE.length },
+    { id: "people-first", label: "PEOPLE FIRST", value: peopleFirst, goal: PEOPLE_FIRST_PER_CASE * CASE_SEQUENCE.length },
+    { id: "full-audit", label: "FULL AUDIT", value: Object.keys(closed).length, goal: CASE_SEQUENCE.length },
     { id: "route-keeper", label: "ROUTE KEEPER", value: completedCases.length, goal: CASE_SEQUENCE.length - 1 },
   ].map((item) => ({ ...item, unlocked: item.value >= item.goal }));
 }

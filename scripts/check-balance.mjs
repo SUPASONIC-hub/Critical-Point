@@ -158,6 +158,33 @@ for (const caseId of CASE_SEQUENCE) {
   }
 }
 
+/**
+ * The way of thinking a generated card exercises is read from the card, not
+ * its column (`inferChoiceCognition` in gameData.js). When it was the column,
+ * every card in a column was the same type, so a player who always took the
+ * second card was an inference player by construction. Columns are still
+ * written to a shape -- people first, procedure second, speed third -- so they
+ * lean, but no column may be one type throughout again.
+ */
+const MAX_COLUMN_COGNITION_SHARE = 0.9;
+const columnCognition = new Map();
+for (const node of Object.values(nodes)) {
+  node.choices.forEach((choice, index) => {
+    if (!/_choice_\d+$/.test(choice.id ?? "")) return;
+    const [type] = Object.entries(choice.cognition ?? {}).sort((a, b) => b[1] - a[1])[0] ?? [];
+    const counts = columnCognition.get(index) ?? new Map();
+    counts.set(type, (counts.get(type) ?? 0) + 1);
+    columnCognition.set(index, counts);
+  });
+}
+for (const [index, counts] of columnCognition) {
+  const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+  const [type, count] = [...counts].sort((a, b) => b[1] - a[1])[0];
+  if (total >= 20 && count / total > MAX_COLUMN_COGNITION_SHARE) {
+    failures.push(`generated column ${index + 1} is ${type} in ${count} of ${total} cards: cognition is being read from the position again`);
+  }
+}
+
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(
   `Balance checks passed (${playableChoices.length} choices, ` +

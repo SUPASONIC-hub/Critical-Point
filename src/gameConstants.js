@@ -61,3 +61,55 @@ export const cognitionLabels = {
   reframing: "판 바꾸기",
   risk: "위험 다루기",
 };
+
+/**
+ * The closing ruling's gates, read by `getEndingVariant` and by every surface
+ * that tells a player what would have changed it -- the failure objectives quote
+ * these numbers rather than their own. Each is placed against the season as
+ * `npm run report:endings` replays it (55 cases, about 490 windows), and the
+ * comment says where.
+ */
+export const ENDING_GATES = Object.freeze({
+  // Collapse is harm: the mean human cost a case closed on. Season p50 is about
+  // 6; a player who spends people for position closes near 25, one who puts
+  // people first at 0.
+  collapseHarmPerCase: 20,
+  // Or overreach that people paid for: this share of windows busted (about the
+  // season's p85) while the cases still closed on half that harm.
+  collapseBustRate: 0.2,
+  collapseOverreachHarm: 10,
+  // The record endings ask for nine in ten of the cases' records, or eight in
+  // ten with slack earned at the table. The season's p10 is about 0.93, so the
+  // bar bites on a run that let whole cases go by unread.
+  clueRate: 0.9,
+  clueRateWithSlack: 0.8,
+  // Under half the records, the truth is still asleep (QUIET COVER), as it is
+  // in a season whose cases typically peaked under 12 (season p25 about 13).
+  quietClueRate: 0.5,
+  quietSustainedPressure: 12,
+  // HUMAN RECORD: a reframed route in seven cases of ten (season p75 about 0.75).
+  humanRecordReframeRate: 0.7,
+  // Standing, on the season's mean closing values. Season p50s: trust 77,
+  // legitimacy 78, capital 93; legitimacy stays above 95 only for a run that
+  // chases procedure, capital at 100 only for one that chases money.
+  oversightTrust: 85,
+  oversightLegitimacy: 82,
+  reformLegitimacy: 86,
+  recordTrust: 75,
+  silenceCapital: 97,
+  silenceTrust: 45,
+  coldLegitimacy: 88,
+  // Legitimacy this far ahead of trust is procedure that left its people behind;
+  // trust this far ahead of legitimacy is a pact made outside the procedure.
+  coldGap: 12,
+  pactGap: 15,
+  // Slack at the table buys the lower record bar. A season that never busted
+  // and cashed at x16 (heat 44 at `DOUBLING_HEAT` 11 -- two pushes from the
+  // lowest wall a fresh board draws), a combo of 12 (a random press lands about
+  // a third of the beats), or a vault of 19,500 a case: between the best blind
+  // (about 15.4k) and best heartbeat (about 24.6k) policies `check:pressure`
+  // measures at nine windows a case. It was 16,000 when that was measured at 7.
+  heldLineMultiplier: 16,
+  beatSlackCombo: 12,
+  vaultSlackPerCase: 19500,
+});

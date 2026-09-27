@@ -1,4 +1,4 @@
-import { caseDisplayCode } from "./gameCases.js";
+import { caseDisplayCode, SEASON_ENTRY_CASE } from "./gameCases.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -91,7 +91,7 @@ export function getRiskPressureDrivers(resources = {}) {
     .sort((a, b) => b.pressure - a.pressure);
 }
 
-export function getSuspenseState({ riskPressure = 0, decisionSeconds = 45, log = [], currentCase = "case01" } = {}) {
+export function getSuspenseState({ riskPressure = 0, decisionSeconds = 45, log = [], currentCase = SEASON_ENTRY_CASE } = {}) {
   const urgency = Math.round(clamp((45 - decisionSeconds) * 0.7, 0, 32));
   const accumulated = Math.min(20, log.length * 4);
   const score = clamp(Math.round(riskPressure + urgency + accumulated), 0, 100);
@@ -126,7 +126,7 @@ export function getSuspenseState({ riskPressure = 0, decisionSeconds = 45, log =
   return { score, tier, caseCode, ...signals };
 }
 
-export function getSuspenseEvent({ riskBefore = 0, riskAfter = 0, currentCase = "case01", logLength = 0 } = {}) {
+export function getSuspenseEvent({ riskBefore = 0, riskAfter = 0, currentCase = SEASON_ENTRY_CASE, logLength = 0 } = {}) {
   if (riskBefore < 70 && riskAfter >= 70) {
     return {
       id: "protocol-awake",
@@ -145,7 +145,8 @@ export function getSuspenseEvent({ riskBefore = 0, riskAfter = 0, currentCase = 
       tone: "unstable",
     };
   }
-  if (logLength >= 3 && riskAfter >= 42 && currentCase !== "case01") {
+  // Not in the season's first case: there is no earlier pattern yet to lock.
+  if (logLength >= 3 && riskAfter >= 42 && currentCase !== SEASON_ENTRY_CASE) {
     return {
       id: "pattern-lock",
       label: "PATTERN LOCK",

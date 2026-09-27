@@ -1,5 +1,6 @@
 import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
+import { ENDING_GATES } from "./gameConstants.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
@@ -496,16 +497,18 @@ const discoveryClues = {
 };
 Object.assign(discoveryClues, packTable("clue"));
 
-/** The record each case hides, whether or not this run opened it. */
 /**
+ * The record each case hides, whether or not this run opened it.
+ *
  * A hidden record only opens on a decision that read the scene. It used to
  * need a fast or risky answer on top of that, which put the best ending behind
- * a gate most runs failed without ever being told. A free-text answer that
- * landed, or a decision that pulled pressure back down, now qualify too, and
- * the last case can reopen the earliest record this run left shut.
+ * a gate most runs failed without ever being told. A 판을 다시 짠다 that opened
+ * the case's hidden route, or a decision that pulled pressure back down, now
+ * qualify too, and the last case can reopen the earliest record this run left
+ * shut.
  */
 export function getDiscoveryClue({
-  currentCase = "case01",
+  currentCase = CASE_SEQUENCE[0],
   challengeMatch = false,
   riskDelta = 0,
   responseTimeSec = 45,
@@ -537,7 +540,7 @@ export function getAllDiscoveryClueIds() {
   })?.id).filter(Boolean);
 }
 
-// These systems are derived from the run log, so old saves gain the new
+/// These systems are derived from the run log, so old saves gain the new
 // mechanics without a migration or a reset.
 /**
  * One reading of the player's standing, for both the gate and the HUD that
@@ -545,23 +548,34 @@ export function getAllDiscoveryClueIds() {
  * oversight at five records while the gate opened at four, so the panel was
  * quoting a threshold the game did not use.
  *
- * Four of the season's six records, not five. Five allowed exactly one miss
- * across a season whose records could not be recovered once a case closed.
+ * The counts were written for a season of six records ("four of six"). The
+ * season has one record per case now -- 55 of them -- so four was met in the
+ * 프롤로그 and never meant anything again. Given how many cases the run has
+ * opened, oversight asks for a share of them (`oversightClueRate`), never fewer
+ * than the old four; without it, the counts stand as a floor.
  */
-export const AUTHORITY_THRESHOLDS = { oversightClues: 4, oversightLegitimacy: 55, fieldClues: 2, fieldTrust: 55 };
+export const AUTHORITY_THRESHOLDS = { oversightClues: 4, oversightClueRate: 0.6, oversightLegitimacy: 55, fieldClues: 2, fieldTrust: 55 };
 
-export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0 } = {}) {
-  const { oversightClues, oversightLegitimacy, fieldClues, fieldTrust } = AUTHORITY_THRESHOLDS;
+/** The clue counts the gate actually asks for, once the run has opened `casesOpened` cases. */
+export function getAuthorityClueThresholds(casesOpened = 0) {
+  const { oversightClues, oversightClueRate, fieldClues } = AUTHORITY_THRESHOLDS;
+  const opened = Math.max(0, Math.trunc(Number(casesOpened) || 0));
+  return { oversightClues: Math.max(oversightClues, Math.ceil(opened * oversightClueRate)), fieldClues };
+}
+
+export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0, casesOpened = 0 } = {}) {
+  const { oversightLegitimacy, fieldTrust } = AUTHORITY_THRESHOLDS;
+  const { oversightClues, fieldClues } = getAuthorityClueThresholds(casesOpened);
   if (clueCount >= oversightClues && legitimacy >= oversightLegitimacy) return "OVERSIGHT";
   if (clueCount >= fieldClues || trust >= fieldTrust) return "FIELD ACCESS";
   return "OBSERVER";
 }
 
-export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0 } = {}) {
+export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0, casesOpened = 0 } = {}) {
   const required = choice.requiredAuthority;
   if (!required) return { unlocked: true, required: "", reason: "" };
   const levels = { OBSERVER: 0, "FIELD ACCESS": 1, OVERSIGHT: 2 };
-  const current = getAuthorityLevel({ clueCount, trust, legitimacy });
+  const current = getAuthorityLevel({ clueCount, trust, legitimacy, casesOpened });
   const unlocked = (levels[current] ?? 0) >= (levels[required] ?? 99);
   return {
     unlocked,
@@ -569,6 +583,31 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
     current,
     reason: unlocked ? "권한이 확인되었습니다." : `${required} 권한과 단서가 더 필요합니다.`,
   };
+}
+
+/**
+ * What the records a run opened add up to. Only cases 01-05 and the finale had
+ * a hypothesis, so 49 of the season's records fed nothing here. Each act has one
+ * now, formed at two thirds of its records and surer the more it holds; the
+ * three first-act pairings stay, as they name something more specific.
+ */
+const ACT_HYPOTHESES = [
+  { id: "act-0", from: "prologue01", to: "prologue05", title: "빈칸은 처음부터 비워 두었다", text: "수습 과제의 한 줄, 반려된 의견서, 사유 칸이 빈 발령서가 같은 방식으로 비어 있습니다. 누군가 채우지 않기로 정한 칸입니다." },
+  { id: "act-1", from: "case01", to: "case07", title: "손실은 사라지지 않고 옮겨졌다", text: "310억의 손실이 다른 회사의 장부로, 돌봄 시간으로, 옆자리 동료로 옮겨 간 기록이 한 줄로 이어집니다." },
+  { id: "act-2", from: "case08", to: "case12", title: "숫자가 먼저 정해지고 근거가 뒤따랐다", text: "그림값의 날짜, 사 둔 회수율, 사유란의 기본값이 모두 결론을 먼저 정해 두고 계산을 나중에 맞춘 흔적입니다." },
+  { id: "act-3", from: "case13", to: "case18", title: "개혁은 같은 방식을 다시 썼다", text: "개혁안의 기록에서도 위에서 밀어붙이고 서명란은 비워 두는 방식이 그대로 반복됩니다." },
+  { id: "act-4", from: "case19", to: "case24", title: "실험은 지배구조의 일부였다", text: "트리거랩의 반응 기록이 그룹의 인사 서류와 지배구조 문서로 이어집니다. 관찰은 연구가 아니라 선발이었습니다." },
+  { id: "act-5", from: "case25", to: "case30", title: "흩어진 자리마다 같은 고리가 있다", text: "사람들이 흩어진 곳마다 같은 사슬의 새 고리가 보입니다. 자리를 옮긴 것은 사람이지 방식이 아니었습니다." },
+  { id: "act-6", from: "case31", to: "case36", title: "책임은 한 사람에게 모이도록 짜였다", text: "조사가 시작되자 기록은 모두 한 사람의 서명으로 모입니다. 그 모양은 우연이 아니라 설계입니다." },
+  { id: "act-7", from: "case37", to: "case42", title: "기록의 주인이 결론의 주인이다", text: "법정과 방송과 국회가 다툰 것은 사실이 아니라 기록을 누가 쥐느냐였습니다." },
+  { id: "act-8", from: "case43", to: "case49", title: "빈 서명란은 비운 사람이 채워야 한다", text: "마지막 기록들은 모두 같은 칸을 가리킵니다. 비워 둔 사람이 채우지 않으면, 가장 늦게 온 사람의 이름으로 닫힙니다." },
+];
+
+function getActClueIds(from, to) {
+  const start = CASE_SEQUENCE.indexOf(from);
+  const end = CASE_SEQUENCE.indexOf(to);
+  if (start < 0 || end < start) return [];
+  return CASE_SEQUENCE.slice(start, end + 1).map((caseId) => discoveryClues[caseId]?.id).filter(Boolean);
 }
 
 export function getClueHypotheses(clues = []) {
@@ -583,92 +622,136 @@ export function getClueHypotheses(clues = []) {
   if (ids.has("c5-empty-seat") && ids.has("final-observer-key")) {
     hypotheses.push({ id: "observer-operator", title: "관찰자는 외부인이 아니었다", text: "비어 있는 책임 자리와 관찰자 키가 주인공의 이전 기록을 연결합니다.", confidence: 84 });
   }
+  for (const act of ACT_HYPOTHESES) {
+    const actIds = getActClueIds(act.from, act.to);
+    if (actIds.length === 0) continue;
+    const held = actIds.filter((id) => ids.has(id)).length;
+    if (held * 3 < actIds.length * 2) continue;
+    hypotheses.push({ id: act.id, title: act.title, text: act.text, confidence: Math.round(50 + (held / actIds.length) * 40) });
+  }
   return hypotheses;
 }
 
 /**
- * Which ending the run earned.
+ * Which ending the run earned, read off the season rather than its last case.
  *
- * Two of the nine used to be unreachable. `collapse` asked for pressure 82 or
- * humanCost 70, but resources reset at the start of every case, so a single case
- * peaked at 33 and 31 across 4,000 random runs -- the season's only failure
- * ending could not happen. It reads the season now: the human cost every case
- * ended on, added up, and the highest pressure any single case reached.
- * `field-pact` asked for high trust with low legitimacy, which the final case
- * never produces because its trust and legitimacy rise together; it compares the
- * two against each other instead.
+ * Replayed through the runtime's own resolve path (`check:endings`), the gates
+ * tuned for six cases closed 55 as SYSTEM COLLAPSE 67% of the time and OPEN
+ * OVERSIGHT 30%, and five endings never: every season held more than four
+ * records, so "fewer than four" was always shut; putting people first peaked
+ * over the collapse line in 96% of seasons, because paying for people in time
+ * and fatigue raises pressure; the finale's legitimacy closed at 100 and its
+ * capital over 55 almost always; and burning every record could still close
+ * as OPEN OVERSIGHT. So the ending reads the season's mean standing
+ * (`seasonResources`), rates rather than counts, collapse as harm rather than
+ * heat, and the finale's own answer. The gates are `ENDING_GATES`.
  */
+const {
+  collapseHarmPerCase: COLLAPSE_HARM_PER_CASE,
+  collapseBustRate: COLLAPSE_BUST_RATE,
+  collapseOverreachHarm: COLLAPSE_OVERREACH_HARM,
+  heldLineMultiplier: HELD_LINE_MULTIPLIER,
+  vaultSlackPerCase: VAULT_SLACK_PER_CASE,
+  clueRate: CLUE_RATE_BAR,
+  clueRateWithSlack: CLUE_RATE_SLACK_BAR,
+  quietClueRate: QUIET_CLUE_RATE,
+  quietSustainedPressure: QUIET_SUSTAINED_PRESSURE,
+  humanRecordReframeRate: HUMAN_RECORD_REFRAME_RATE,
+  oversightTrust: OVERSIGHT_TRUST,
+  oversightLegitimacy: OVERSIGHT_LEGITIMACY,
+  reformLegitimacy: REFORM_LEGITIMACY,
+  recordTrust: RECORD_TRUST,
+  silenceCapital: SILENCE_CAPITAL,
+  silenceTrust: SILENCE_TRUST,
+  coldLegitimacy: COLD_LEGITIMACY,
+  coldGap: COLD_GAP,
+  pactGap: PACT_GAP,
+} = ENDING_GATES;
+export const BEAT_SLACK_COMBO = ENDING_GATES.beatSlackCombo;
+
+const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
+
 /**
- * What one bust adds to the season pressure the ending reads.
- *
- * It was 12, taken as a `max` against the other two strain terms, and that made
- * it a guillotine: one bust changed 0.0% of endings, two changed 0.0%, three
- * changed 92.4% and forced SYSTEM COLLAPSE over every resource, clue and
- * sentence six cases had earned. Harmless only while the record was being read
- * off one case; once it aggregated across the season it fired in every real run,
- * because ordinary play busts 6 to 16 times in 42 windows. Every policy that
- * engaged with the mechanic at all collapsed, and the three rare endings went to
- * zero -- under floors `check-endings.mjs` cannot see, because its simulator
- * passes no bust data at all.
- *
- * Busts *add* to the strain now rather than replacing it, at a weight where a
- * season full of them pushes a run toward collapse without deciding it alone.
+ * A decision that put the people in the scene first: the largest thing it
+ * gained, by size, was their trust or a smaller human cost. Read from the
+ * effect, never from the choice id -- generated scenes are `<scene>_choice_N`,
+ * so an id pattern counted every choice in a scene called `c1_witness`.
  */
-const BUST_SEASON_PRESSURE = 0.4;
-/** However many times a run blew up, the record cannot close a season by itself. */
-const BUST_PRESSURE_CAP = 12;
-// The season length the bust pressure above was calibrated against.
-const BUST_PRESSURE_BASE_CASES = 6;
+export function isPeopleFirstEffect(effect = {}) {
+  const [largest] = Object.entries(effect ?? {})
+    .filter(([key, value]) => Number.isFinite(value) && isResourceGain(key, value))
+    .sort(byEffectWeight);
+  return Boolean(largest) && (largest[0] === "trust" || largest[0] === "humanCost");
+}
+
+const mean = (values) => (values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0);
+const quantile = (values, share) => {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(share * sorted.length))];
+};
+
 /**
- * The pot a run has to have cashed, without ever busting, to earn a clue of
- * slack. The gauntlet's multiplier doubles every 12 heat, so x16 is a window
- * cashed at 48 -- inside two pushes of the lowest wall a fresh board can draw.
+ * The season so far, for the closing ruling: one reading of the case summaries
+ * that the runtime, the report and `check:endings` share. The last six fields
+ * are the record the ending always read; the rest read cases and windows, the
+ * pressure cases *typically* peaked at (p75, not the one worst walk), reframed
+ * routes, and the mean standing cases closed on. Older summaries contribute
+ * nothing to fields they lack, and the ending falls back to the last case.
  */
-const HELD_LINE_MULTIPLIER = 16;
-/**
- * The collapse gate, per case rather than per season.
- *
- * `seasonHumanCost` accumulates across every case, so a flat 90 meant "15 a case"
- * while the season had six and silently tightened to "12.9 a case" the moment a
- * seventh was written -- collapse went 22.8% -> 38.1% in 6000 seasons without a
- * single effect changing. Derived from the sequence so adding a case cannot
- * re-tune the endings behind the author's back.
- */
-const COLLAPSE_HUMAN_COST = 15 * CASE_SEQUENCE.length;
-/**
- * The collapse gate's other half, and the other thing a longer season moves.
- *
- * `peakRiskPressure` is a maximum taken over every case walk, so a season with
- * one more case takes one more draw at it and finds a higher peak for exactly
- * the same standard of play. `COLLAPSE_HUMAN_COST` and the bust rate were both
- * derived from the sequence for that reason; this was still a flat 31, and
- * adding 사건 07 moved collapse 31.6% -> 38.5% of 6000 seasons with no effect
- * changed. Calibrated at seven cases, where 31 was measured, and lifted by one
- * for each case past that -- the smallest step that holds the share.
- *
- * The lift stops at thirteen. A maximum grows with the log of the draws, not
- * linearly, and the bust term shrinks as the season lengthens (it is a rate),
- * so the straight line overshot once the season doubled: at twenty-five cases a
- * gate of 49 let collapse through in 32 of 6000 seasons, against 29.0% at
- * thirteen. Held at 37 it reads about a quarter of seasons again.
- */
-const COLLAPSE_PRESSURE_BASE = 31;
-const COLLAPSE_PRESSURE_BASE_CASES = 7;
-const COLLAPSE_PRESSURE_CEILING_CASES = 13;
-const COLLAPSE_PRESSURE_PER_CASE = 1;
-const COLLAPSE_PRESSURE =
-  COLLAPSE_PRESSURE_BASE +
-  COLLAPSE_PRESSURE_PER_CASE *
-    Math.max(0, Math.min(CASE_SEQUENCE.length, COLLAPSE_PRESSURE_CEILING_CASES) - COLLAPSE_PRESSURE_BASE_CASES);
-/**
- * What the vault buys, per case. A season that banked this much a case has, in
- * the ending's own terms, done the job with room to spare, busts or not: it
- * earns the same clue of slack as holding the line. The bar sits above the best
- * blind policy in `check:pressure` (about 13k a case) and under the best
- * heartbeat policy (about 20k), so it rewards reading the table, not playing.
- */
-const VAULT_SLACK_PER_CASE = 16000;
-export const BEAT_SLACK_COMBO = 12; // A hand that heard every beat: a random press lands about a third of them.
+export function getSeasonStrain(caseResults = {}, pending = null) {
+  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
+  const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
+  const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
+  const seasonResources = closings.length
+    ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0)))]))
+    : null;
+  return {
+    casesPlayed: summaries.length,
+    seasonWindows: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0) + (Number(summary.pushRecord?.cashes) || 0), 0),
+    sustainedPressure: Math.round(quantile(peaks, 0.75)),
+    seasonReframeRoutes: summaries.reduce(
+      (sum, summary) => sum + (Number(summary.reframeRouteCount ?? summary.reframeCount) || 0),
+      0,
+    ),
+    seasonResources,
+    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
+    peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
+    seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
+    seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
+    // The vault is cumulative across the season, so the largest summary holds it,
+    // and it is read per case: a season total rises with every case played. The
+    // groove the beat added is taken back out -- the vault's slack rewards
+    // reading the table, and the beat has its own door.
+    seasonVaultPerCase: summaries.length
+      ? summaries.reduce(
+        (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.grooveVault) || 0)),
+        0,
+      ) / summaries.length
+      : 0,
+    seasonBestCombo: summaries.reduce(
+      (best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0),
+      0,
+    ),
+  };
+}
+
+/** The finale's own answer, read off its log: "witness", "control", "burn", or null before it. */
+export function getFinaleOutcome(log = []) {
+  const entry = [...(log ?? [])].reverse().find((item) => /^f_after_(witness|control|burn)$/.test(item?.choiceId ?? ""));
+  return entry ? entry.choiceId.slice("f_after_".length) : null;
+}
+
+const ENDINGS = {
+  collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true },
+  "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false },
+  "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false },
+  "human-record": { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false },
+  "profitable-silence": { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false },
+  "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false },
+  "field-pact": { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false },
+  "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "다음 플레이에서는 숨겨진 단서를 우선 추적해야 합니다.", failure: false },
+};
 
 export function getEndingVariant({
   resources = {},
@@ -678,63 +761,57 @@ export function getEndingVariant({
   peakRiskPressure = 0,
   seasonBusts = 0,
   seasonBestMultiplier = 1,
-  seasonVaultPerCase = 0, seasonBestCombo = 0,
+  seasonVaultPerCase = 0,
+  seasonBestCombo = 0,
+  casesPlayed = 0,
+  seasonWindows = 0,
+  sustainedPressure,
+  seasonReframeRoutes,
+  seasonResources = null,
 } = {}) {
-  // Two different questions: whether the season ever went past what could be
-  // carried, and how quietly this last case ended.
-  // What the run did with the gauge, read off the same log the rest of this
-  // function reads. The push record existed for six cycles and reached nothing:
-  // paired seasons at x1.00 and x3.50 flipped 0 of 1000 endings, because three
-  // clamps in series ate the multiplier before any threshold here could see it.
-  // A bet whose outcome the ending cannot read is a visual effect.
-  // A bust is, in this game's own words for the collapse ending, the season
-  // going past what there was time to carry. It is priced as pressure because
-  // that is the axis it belongs on, and because it makes a run that blew up
-  // three times unable to close as though it had not.
-  // Busts are read as a rate, not a count. A season plays one table per scene,
-  // so a seventh case hands the player more windows and therefore more busts for
-  // the same standard of play; a raw count would charge that as strain. Graded
-  // against the six-case season the 0.4 was measured on.
-  const bustPressure = Math.min(
-    BUST_PRESSURE_CAP,
-    seasonBusts * BUST_SEASON_PRESSURE * (BUST_PRESSURE_BASE_CASES / CASE_SEQUENCE.length),
-  );
-  const closingPressure = getRiskPressure(resources);
-  // The strain the run is carrying, and the strain plus what it did to get
-  // there. They are separate because the three character endings below ask what
-  // a run valued, not how hard it pushed: folding busts into their gate closed
-  // all three -- profitable-silence to 25 of 6000, cold-justice to 42,
-  // field-pact to 5, under floors of 50/50/10. A bust can collapse a season. It
-  // has no business deciding whether the season was about money or procedure.
-  const carriedPressure = Math.max(closingPressure, peakRiskPressure);
-  // Added to the strain, not raced against it. `Math.max` is flat in its smaller
-  // argument across the whole range that argument occupies: carried pressure sits
-  // at p10 20 / p50 24 / p90 30, so a bust term of `2 x busts` contributed exactly
-  // nothing until it passed 31, and then decided the season by itself. Measured,
-  // one bust and fifteen produced identical endings in 100.0% of seasons and the
-  // sixteenth flipped 87% of them. Moving 12 to 2 moved the cliff and kept its
-  // shape.
-  //
-  // At 0.4 a bust the response is graded across the range play reaches: one bust
-  // against fifteen now differs in 37.4% of seasons, and collapse runs 8.6% at
-  // none, 16.4% at six -- the normal player's count -- and 45.9% at fifteen.
-  const seasonPressure = carriedPressure + bustPressure;
-  const humanCost = Math.max(resources.humanCost ?? 0, seasonHumanCost);
-  const trust = resources.trust ?? 0;
-  const legitimacy = resources.legitimacy ?? 0;
-  const capital = resources.capital ?? 0;
-  const reframeRouteCount = log.filter((entry) => entry?.reframeOpenedRoute).length; const lowerPriorityEndingsOpen = carriedPressure < COLLAPSE_PRESSURE && humanCost < COLLAPSE_HUMAN_COST && discoveredClues.length < 4 && reframeRouteCount < 2; if (lowerPriorityEndingsOpen && capital >= 55 && trust < 48) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false }; if (lowerPriorityEndingsOpen && legitimacy >= 60 && trust < 55) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false }; if (lowerPriorityEndingsOpen && trust - legitimacy >= 8) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
-  if (seasonPressure >= COLLAPSE_PRESSURE || humanCost >= COLLAPSE_HUMAN_COST) return { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true };
+  // A caller that still passes only the old six fields (a report built before
+  // `getSeasonStrain` moved here) reads as a whole season with the last case
+  // standing in for its closing values.
+  const cases = Math.max(1, Number(casesPlayed) || CASE_SEQUENCE.length);
+  const standing = seasonResources ?? resources;
+  const trust = Number(standing.trust) || 0;
+  const legitimacy = Number(standing.legitimacy) || 0;
+  const capital = Number(standing.capital) || 0;
+  const harm = Math.max(Number(seasonHumanCost) || 0, Number(resources.humanCost) || 0) / cases;
+  const bustRate = seasonWindows > 0 ? seasonBusts / seasonWindows : 0;
+  const sustained = Number.isFinite(sustainedPressure) ? sustainedPressure : Math.max(Number(peakRiskPressure) || 0, getRiskPressure(resources));
+  const reframeRoutes = Number.isFinite(seasonReframeRoutes)
+    ? seasonReframeRoutes
+    : log.filter((entry) => entry?.reframeOpenedRoute).length;
+  const reframeRate = reframeRoutes / cases;
+  const clueRate = discoveredClues.length / cases;
+  const finale = getFinaleOutcome(log);
+
+  if (harm >= COLLAPSE_HARM_PER_CASE || (harm >= COLLAPSE_OVERREACH_HARM && bustRate >= COLLAPSE_BUST_RATE)) return ENDINGS.collapse;
+
+  const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= COLD_GAP;
+  const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST;
+  const pact = trust - legitimacy >= PACT_GAP;
+  // Burning every record closes the endings made of records. What is left is
+  // what the season valued, or a quiet it bought by burning.
+  if (finale === "burn") {
+    if (silent) return ENDINGS["profitable-silence"];
+    if (cold) return ENDINGS["cold-justice"];
+    if (pact) return ENDINGS["field-pact"];
+    return ENDINGS["quiet-cover"];
+  }
+
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
-  const clueBar = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE ? 3 : 4;
-  if (discoveredClues.length >= clueBar && legitimacy >= 55 && trust >= 60) return { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false };
-  if (discoveredClues.length >= clueBar && legitimacy >= 55) return { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false };
-  if (reframeRouteCount >= 2 && trust >= 60) return { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false };
-  if (capital >= 60 && trust < 45) return { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false };
-  if (legitimacy >= 65 && trust < 50) return { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false };
-  if (trust - legitimacy >= 10) return { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false };
-  if (closingPressure <= 20 && discoveredClues.length <= 1) return { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "다음 플레이에서는 숨겨진 단서를 우선 추적해야 합니다.", failure: false };
-  return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost });
+  const slack = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
+  const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
+  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];
+  if (cold) return ENDINGS["cold-justice"];
+  if (recordsOpen && legitimacy >= REFORM_LEGITIMACY) return ENDINGS["evidence-reform"];
+  if (silent) return ENDINGS["profitable-silence"];
+  if (pact) return ENDINGS["field-pact"];
+  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE) return ENDINGS["quiet-cover"];
+  return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
 }
 
 /**
@@ -771,7 +848,7 @@ function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
   };
 }
 
-export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
+export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const outcomes = {
     case01: {
       c1_after_people: { tag: "사람을 먼저 세운 결말", title: "급여명세서보다 먼저 이름을 불렀다", text: "직원과 협력사는 당신의 결정을 완전히 믿지는 않지만, 적어도 누가 비용을 떠안는지 알게 됐습니다. 다음 사건은 사람을 보호한 대가로 더 느리게 시작됩니다." },
@@ -838,7 +915,7 @@ export function getCaseOutcome({ caseId = "case01", choiceId = "" } = {}) {
   return outcomes[caseId]?.[choiceId] ?? { tag: "기록되지 않은 결말", title: "아직 닫히지 않은 결과", text: "이번 선택의 파장은 다음 기록에 남아 있습니다." };
 }
 
-export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
+export function getOutcomeCarryover({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const carryovers = {
     case01: {
       c1_after_people: { trust: 6, humanCost: -3, fatigue: 4 },
@@ -900,7 +977,29 @@ export function getOutcomeCarryover({ caseId = "case01", choiceId = "" } = {}) {
   return carryovers[caseId]?.[choiceId] ?? {};
 }
 
-export function getContinuityChallenge({ caseId = "case01", choiceId = "" } = {}) {
+/**
+ * What the season has worn down by the time a case opens. Every case opened on
+ * the same resources, and later cases move numbers a little less (a choice's
+ * summed effect drifts 28 -> 25), so per-case peak pressure fell from 15-18 in
+ * 1-2막 to 12-14 from 사건 20 on. The opening now carries wear linear in the
+ * case's place in the sequence -- none for the first, `SEASON_WEAR` for the
+ * finale -- in the two axes a long season spends. The table leans in on the
+ * same schedule (`getSeasonEscalation`).
+ */
+export const SEASON_WEAR = Object.freeze({ fatigue: 14, time: -8 });
+
+export function getSeasonWear(caseId = "") {
+  const index = CASE_SEQUENCE.indexOf(caseId);
+  if (index <= 0) return {};
+  const share = index / Math.max(1, CASE_SEQUENCE.length - 1);
+  return Object.fromEntries(
+    Object.entries(SEASON_WEAR)
+      .map(([key, value]) => [key, Math.round(value * share)])
+      .filter(([, value]) => value !== 0),
+  );
+}
+
+export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const challenges = {
     // 사건 01 follows the 프롤로그 now, so it has a predecessor for the first
     // time: what the analyst carried down to 트리거랩 is what the first table
@@ -988,15 +1087,14 @@ export function getDecisionLedger(entries = [], resources = {}) {
     });
   const riskRises = riskDeltas.filter((value) => value > 0).length;
   const riskDrops = riskDeltas.filter((value) => value < 0).length;
+  // Direction comes from `isResourceGain`, never the sign: a falling human cost
+  // is a recovery, and it used to be reported as the run's strongest cost.
   const strongestCost = Object.entries(totals)
-    .filter(([, value]) => value < 0)
-    .sort((a, b) => a[1] - b[1])[0] ?? null;
+    .filter(([key, value]) => value !== 0 && !isResourceGain(key, value))
+    .sort(byEffectWeight)[0] ?? null;
   const strongestRecovery = Object.entries(totals)
-    .filter(([key, value]) => (key === "humanCost" || key === "fatigue" ? value < 0 : value > 0))
-    .sort((a, b) => {
-      const score = ([key, value]) => key === "humanCost" || key === "fatigue" ? -value : value;
-      return score(b) - score(a);
-    })[0] ?? null;
+    .filter(([key, value]) => isResourceGain(key, value))
+    .sort(byEffectWeight)[0] ?? null;
 
   return {
     totals,
@@ -1027,12 +1125,23 @@ const MOTIVE_FAMILIES = [
   { id: "curiosity", label: "탐구형", when: "아직 모르는 것이 남았을 때", path: "호기심 → 집념 → 구조 파악 → 발견", triggers: ["curiosity", "selfAwareness", "choice", "manipulation", "fear", "helplessness"] },
 ];
 
+/**
+ * No one family carried the run: an empty record, or two families tied at the
+ * top. The reduce used to start from 책임형 and only move on a strictly higher
+ * score, so every tie and every empty run was named 책임형 -- a verdict the run
+ * never gave.
+ */
+const MIXED_MOTIVE = { id: "mixed", label: "복합형", when: "한 가지 감정이 혼자 생각을 깨우지 않았을 때", path: "여러 감정 → 집념 → 끝까지 생각 → 다시 읽기" };
+
 export function getThinkingMotive(triggerScores = {}) {
   const scored = MOTIVE_FAMILIES.map((family) => ({
     ...family,
     score: family.triggers.reduce((sum, trigger) => sum + (Number(triggerScores[trigger]) || 0), 0),
   }));
-  const { triggers: _triggers, ...motive } = scored.reduce((best, family) => (family.score > best.score ? family : best), scored[2]);
+  const top = Math.max(...scored.map((family) => family.score));
+  const leaders = scored.filter((family) => family.score === top);
+  if (top <= 0 || leaders.length > 1) return { ...MIXED_MOTIVE, score: Math.max(0, top) };
+  const { triggers: _triggers, ...motive } = leaders[0];
   return motive;
 }
 
@@ -1163,6 +1272,15 @@ export function createCaseSummary(
     // resources reset at every case start, one case alone never reaches the
     // thresholds the closing ruling is written against.
     finalHumanCost: resources.humanCost ?? 0,
+    // What the case closed on, so the ending can read the season's standing
+    // rather than only the finale's, which starts from the same resources as
+    // every other case.
+    finalResources: Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Number(resources[key]) || 0])),
+    // Reframes that opened the case's hidden route, and decisions whose largest
+    // gain went to the people in the scene. Both used to be read off the last
+    // case's log only, which the next case clears.
+    reframeRouteCount: entries.filter((entry) => entry?.reframeOpenedRoute).length,
+    peopleFirstCount: entries.filter((entry) => !entry?.isSystemEvent && isPeopleFirstEffect(entry?.effect)).length,
     pushRecord: createGauntletLedger(entries),
     peakRiskPressure: entries.reduce(
       (peak, entry) => (entry.resourcesAfter ? Math.max(peak, getRiskPressure(entry.resourcesAfter)) : peak),
@@ -1276,9 +1394,17 @@ export function speechifyChoice(choice) {
  * Korean plain present tense is the stem plus 는다 after a consonant and ㄴ
  * after a vowel, so both are reversible: strip 는다, or strip the ㄴ off the
  * last syllable. The one thing the shape cannot tell us is a ㄹ stem, where the
- * ㄹ dropped when the ending went on (만들다 -> 만든다), so those are named.
+ * ㄹ dropped when the ending went on (만들다 -> 만든다), so those are named, by
+ * the syllable before 다 -- the only thing the lookup reads (a two-syllable key
+ * such as 만든 never matched; 든 covers it). 연다 has its own row above.
+ *
+ * Only syllables that are a ㄹ stem in every label the season has are listed:
+ * 안다 is 알다 (알겠습니다, not 아겠습니다), 번다 벌다, 돈다 돌다, 몬다 몰다,
+ * 단다 달다, 푼다 풀다, 썬다 썰다. 판 is not: the one label that ends on it
+ * ("한 곳만 판다") is 파다, which the ㄹ row turned into 팔겠습니다. 산다 (사다 /
+ * 살다) and 운다 (메우다 / 울다) are ambiguous and read as vowel stems.
  */
-const SPOKEN_L_STEMS = { 만든: "만들", 건: "걸", 연: "열", 든: "들", 민: "밀", 판: "팔" };
+const SPOKEN_L_STEMS = { 건: "걸", 든: "들", 민: "밀", 안: "알", 번: "벌", 돈: "돌", 몬: "몰", 단: "달", 푼: "풀", 썬: "썰" };
 
 function getSpokenStem(label) {
   if (label.endsWith("는다")) return label.slice(0, -2);

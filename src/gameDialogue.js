@@ -12,6 +12,7 @@
  * the one a Korean bank actually uses today, and anything a fifteen-year-old
  * would not know is unpacked in brackets the first time it appears.
  */
+import { CASE_PACKS } from "./nodes/casePacks.js";
 export const characterProfiles = {
   한서윤: {
     role: "트리거랩 실장 · KD은행 기업금융전략팀 차장",
@@ -1335,3 +1336,13 @@ export const authoredEchoReplies = {
   c11_after_record: "속기록은 잘리지 않습니다. 당신이 더듬은 12초도, 그룹이 인용할 한 문장도 그대로 남습니다.",
   c11_after_summon: "바로 응하면 주도권을 쥔 것처럼 보입니다. 33층은 당신이 얼마나 빨리 오는지부터 기록합니다.",
 };
+
+// A case pack's people and lines join these tables here, where the tables live,
+// so a module that reads them -- the scene view reads `characterProfiles`
+// directly -- sees the whole season however its imports happen to be ordered.
+// This ran in gameData.js, so a reader that loaded first saw 사건 01-11 only.
+for (const pack of CASE_PACKS) {
+  Object.assign(choiceVoiceLines, pack.voiceLines);
+  Object.assign(authoredEchoReplies, pack.echoReplies);
+  Object.assign(characterProfiles, pack.characterProfiles);
+}
