@@ -1808,3 +1808,319 @@
 .interlude-panel.mood-wry { --interlude-tint: #9fd6a8; }
 .interlude-panel.mood-grief { --interlude-tint: #d89ab0; }
 .interlude-panel.mood-still { --interlude-tint: #a9a4c4; }
+/* Rules that lived in extensions.css, the old "late overrides" file, until
+   2026-09-27. Nothing between here and where they sat sets the same property on
+   an element they can match at the same specificity, so they compute exactly
+   as they did there; the computed style of every element on the intro, the
+   table, the reveal and the report was compared before and after the move. */
+.observation-panel {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(217, 255, 98, 0.24);
+  border-radius: 8px;
+  background: rgb(24 32 31 / 0.72);
+}
+.ending-shell .ending-sequence {
+  position: relative;
+  min-height: min(680px, calc(100dvh - 48px));
+  margin-bottom: 32px;
+  padding: clamp(28px, 6vw, 72px);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-xl);
+  box-shadow:
+    var(--ui-shadow-2),
+    0 0 90px rgb(217 255 98 / 0.08);
+}
+.ending-sequence-header {
+  position: absolute;
+  top: 24px;
+  left: clamp(28px, 6vw, 72px);
+  right: clamp(28px, 6vw, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(217, 255, 98, 0.28);
+  text-align: left;
+}
+.ending-shell .ending-beat {
+  min-height: 300px;
+  align-content: center;
+  gap: 26px;
+}
+.ending-shell .ending-beat > span {
+  font-size: 14px;
+  letter-spacing: 0.16em;
+}
+.ending-shell .ending-beat blockquote {
+  max-width: 780px;
+  font-size: clamp(34px, 5vw, 68px);
+  font-weight: 900;
+  line-height: 1.15;
+}
+.ending-shell .ending-quiet-line {
+  max-width: 680px;
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 800;
+  line-height: 1.5;
+}
+.ending-shell .ending-message-beat label {
+  font-size: 18px;
+}
+.ending-shell .ending-message-beat textarea {
+  min-height: 130px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 17px;
+}
+.ending-shell .ending-beat button:hover {
+  transform: translateY(-2px);
+}
+.ending-shell .ending-quiet-skip {
+  background: var(--ui-glass);
+  color: var(--ui-text-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+.telemetry-explanation {
+  margin: 8px 0 0;
+  color: var(--c-amber);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+@media (max-width: 480px) {
+  .ending-shell .ending-sequence {
+    min-height: calc(100dvh - 32px);
+    padding: 70px 18px 28px;
+  }
+  .ending-sequence-header {
+    top: 18px;
+    left: 18px;
+    right: auto;
+    max-width: calc(100% - 200px);
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ending-shell .ending-beat blockquote {
+    font-size: 34px;
+  }
+}
+.ending-beat blockquote {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.35;
+}
+.ending-quiet-line {
+  max-width: 34rem;
+  margin: 0 auto;
+  font-size: 20px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.ending-quiet-skip {
+  margin-top: 2rem;
+  color: var(--color-white-soft);
+  background: none;
+  border: 1px solid var(--color-overlay-line);
+  font-size: 13px;
+}
+.ending-message-beat {
+  text-align: left;
+}
+.ending-message-beat label {
+  width: 100%;
+  color: var(--color-accent);
+  font-weight: 800;
+}
+.ending-message-beat textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  color: var(--color-white);
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  resize: vertical;
+}
+.observation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.observation-grid b {
+  color: var(--color-white);
+  font-size: 22px;
+}
+.observer-turning-record {
+  background: rgb(217 255 98 / 0.1) !important;
+  border-color: var(--c-acid) !important;
+}
+.final-report-locked {
+  display: block;
+  min-height: 1px;
+}
+.ending-twist-card {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  padding: 18px 20px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(217, 255, 98, 0.28);
+  border-radius: var(--ui-radius-md);
+}
+.ending-twist-card h2 {
+  margin: 0;
+  color: var(--color-white);
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.22;
+}
+.ending-shell .ending-sequence {
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(92px, 12vw, 132px) clamp(18px, 5vw, 72px) clamp(30px, 5vw, 64px);
+  background: var(--ui-bg);
+}
+.ending-visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+/* The music toggles float over this bar's right end, so it keeps that end
+   clear rather than printing SEASON COMPLETE underneath them. */
+.ending-sequence-header {
+  z-index: 1;
+  padding: 10px min(196px, max(16px, calc(100vw - 600px))) 10px 16px;
+  background: var(--ui-glass);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-md);
+  backdrop-filter: blur(14px);
+}
+.ending-shell .ending-beat {
+  position: relative;
+  z-index: 1;
+  width: min(980px, 100%);
+  min-height: 0;
+  padding: clamp(20px, 3.4vw, 36px);
+  background: var(--ui-glass-strong);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+  backdrop-filter: blur(16px);
+}
+.ending-shell .ending-beat blockquote {
+  max-width: 900px;
+  text-wrap: balance;
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.48);
+}
+.ending-shell .ending-twist-card {
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+.route-break,
+.route-atlas-meta .route-break {
+  color: var(--color-white);
+  background: var(--c-danger-deep);
+  border-color: var(--c-danger-deep);
+}
+.ending-axis-grid article > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ending-axis-grid i {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+}
+.ending-axis-grid em {
+  display: block;
+  height: 100%;
+  background: var(--c-acid);
+  border-radius: inherit;
+}
+.ending-variant-panel.failure {
+  border-left-color: #d06b5f;
+}
+.ending-variant-panel h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.3;
+}
+@media (max-width: 700px) {
+  .season-goal-strip > span {
+    grid-column: 1 / -1;
+  }
+  .ending-scene-profile {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+.ranking-comparison > div {
+  display: grid;
+  grid-template-columns: 84px 1fr 32px;
+  gap: 8px;
+  align-items: center;
+}
+.ranking-comparison i {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  background: #d5e1d8;
+  border-radius: 4px;
+}
+.ranking-comparison em {
+  display: block;
+  height: 100%;
+  background: #315f43;
+  border-radius: inherit;
+}
+.failure-cause {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.play-report-panel > div,
+.telemetry-dashboard-panel > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.play-report-panel article b {
+  font-size: 16px;
+}
+.telemetry-dashboard-panel div {
+  align-items: center;
+}
+.ranking-integrity.valid {
+  color: #315f43;
+}
+.ranking-integrity.invalid {
+  color: #7b2d2d;
+  background: #fff0e8;
+  border-color: #c45d3f;
+}
+.replay-diagnostics {
+  margin: 12px 0;
+  padding: 10px 12px;
+  background: #f4f8f1;
+  border: 1px solid #8ca49b;
+  color: #173b34;
+}
+.ending-axis-panel .panel-title-row span {
+  color: var(--c-line-soft);
+}
