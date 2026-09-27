@@ -201,25 +201,16 @@ export function getOriginPrologue(origin = "courier") {
 
 /**
  * Why the season collapsed, from the door it came through (`variant.cause`,
- * set by `getEndingVariant`). An ending saved before the cause was recorded
- * falls back to the largest cost the last case closed on.
+ * set by `getEndingVariant`, which the report always computes fresh). It used
+ * to guess from the last case's resources and blame 판단 피로 or the clock.
  */
-export function getFailureCause(variant = {}, resources = {}) {
+export function getFailureCause(variant = {}) {
   if (!variant?.failure) return null;
-  const cause = variant.cause;
-  if (cause?.id === "overreach") {
-    return { id: "overreach", value: percent(cause.bustRate), text: `판의 ${percent(cause.bustRate)}%가 벽에 닿았고, 그동안 사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${cause.harmPerCase}씩 남았습니다.`, recovery: "심박이 빨라지면 확정하십시오. 터진 판의 비용은 사람에게 넘어갑니다." };
-  }
-  if (cause?.id === "harm") {
-    return { id: "human-cost", value: cause.harmPerCase, text: `사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${cause.harmPerCase}${directionParticle(String(cause.harmPerCase))} 닫혔습니다.`, recovery: `${HARM}${objectParticle(HARM)} 줄이는 카드를 먼저 고르십시오.` };
-  }
-  const candidates = [
-    ["human-cost", resources.humanCost ?? 0, `${HARM}${subjectParticle(HARM)} 누적되었습니다.`],
-    ["fatigue", resources.fatigue ?? 0, `${easyResourceLabels.fatigue}${subjectParticle(easyResourceLabels.fatigue)} 선택의 폭을 좁혔습니다.`],
-    ["risk", resources.time ?? 0, "시간 압박이 위험한 지름길을 만들었습니다."],
-  ];
-  const [id, value, text] = candidates.sort((a, b) => b[1] - a[1])[0];
-  return { id, value, text, recovery: id === "human-cost" ? "관계 회복을 먼저 선택하십시오." : id === "fatigue" ? "한 장면을 멈추고 기록을 정리하십시오." : "공개 전에 위험 경로를 하나 줄이십시오." };
+  const { id = "harm", harmPerCase = 0, bustRate = 0 } = variant.cause ?? {};
+  const harm = `사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${harmPerCase}${directionParticle(String(harmPerCase))} 닫혔습니다.`;
+  return id === "overreach"
+    ? { id, value: percent(bustRate), text: `판의 ${percent(bustRate)}%가 벽에 닿았고, ${harm}`, recovery: "심박이 빨라지면 확정하십시오." }
+    : { id: "human-cost", value: harmPerCase, text: harm, recovery: `${HARM}${objectParticle(HARM)} 줄이는 카드를 먼저 고르십시오.` };
 }
 
 export function getEndingAtmosphere(endingId = "open-question") {
@@ -298,7 +289,7 @@ export function getRankingIntegrity(entry = {}) {
   return {
     valid: Boolean(entry.runId && entry.completedAt && summary.rank),
     label: entry.runId ? "RUN LINKED" : "RUN ID MISSING",
-    text: entry.runId ? "한 번의 플레이 기록으로 묶여 집계됩니다. 서버가 검증한 기록은 아닙니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
+    text: entry.runId ? "한 플레이로 묶인 기록입니다. 서버 검증은 없습니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
   };
 }
 

@@ -644,30 +644,24 @@ export function getClueHypotheses(clues = []) {
  * capital over 55 almost always; and burning every record could still close
  * as OPEN OVERSIGHT. So the ending reads the season's mean standing
  * (`seasonResources`), rates rather than counts, collapse as harm rather than
- * heat, and the finale's own answer. The gates are `ENDING_GATES`.
+ * heat, and the finale's own answer.
  */
-const {
-  collapseHarmPerCase: COLLAPSE_HARM_PER_CASE,
-  collapseBustRate: COLLAPSE_BUST_RATE,
-  collapseOverreachHarm: COLLAPSE_OVERREACH_HARM,
-  heldLineMultiplier: HELD_LINE_MULTIPLIER,
-  vaultSlackPerCase: VAULT_SLACK_PER_CASE,
-  clueRate: CLUE_RATE_BAR,
-  clueRateWithSlack: CLUE_RATE_SLACK_BAR,
-  quietClueRate: QUIET_CLUE_RATE,
-  quietSustainedPressure: QUIET_SUSTAINED_PRESSURE,
-  humanRecordReframeRate: HUMAN_RECORD_REFRAME_RATE,
-  oversightTrust: OVERSIGHT_TRUST,
-  oversightLegitimacy: OVERSIGHT_LEGITIMACY,
-  reformLegitimacy: REFORM_LEGITIMACY,
-  recordTrust: RECORD_TRUST,
-  silenceCapital: SILENCE_CAPITAL,
-  silenceTrust: SILENCE_TRUST,
-  coldLegitimacy: COLD_LEGITIMACY,
-  coldGap: COLD_GAP,
-  pactGap: PACT_GAP,
-} = ENDING_GATES;
-export const BEAT_SLACK_COMBO = ENDING_GATES.beatSlackCombo;
+// The rest of the gates, on the season's mean closing values (p50s: trust 77,
+// legitimacy 78, capital 93; legitimacy stays over 95 only chasing procedure,
+// capital at 100 only chasing money). Slack at the table buys the lower record
+// bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a combo of 12, or
+// 19,500 a case banked -- between the best blind (15.4k) and heartbeat (24.6k)
+// play check:pressure measures at nine windows a case (16,000 when it was 7).
+const { collapseHarmPerCase: COLLAPSE_HARM_PER_CASE, collapseBustRate: COLLAPSE_BUST_RATE, collapseOverreachHarm: COLLAPSE_OVERREACH_HARM, clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES;
+const CLUE_RATE_SLACK_BAR = 0.8;
+const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
+const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
+const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten (p75 0.75)
+const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
+const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
+const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
+const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
+export const BEAT_SLACK_COMBO = 12;
 
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 

@@ -1,7 +1,7 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { isPeopleFirstEffect } from "./gameLogic.js";
-import { easyResourceLabels, nativeKoreanCount, objectParticle } from "./playerLanguage.js";
+import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
 
 
 
@@ -10,6 +10,24 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
   if (count < 2) return { level: 0, title: "OPERATOR FILE / SEALED", text: "주인공의 과거 권한은 아직 봉인되어 있습니다." };
   if (count < 4) return { level: 1, title: "OPERATOR FILE / PARTIAL", text: `${origin} 출신 기록관이 단순 관찰자가 아니라 기준을 설계한 인물이었다는 흔적이 남습니다.` };
   return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 어떤 사건을 기록할지 정해온 설계자였습니다." };
+}
+
+// Kept here, not in playerLanguage.js, which ships in the intro chunk: only the
+// report reads a count this way.
+/**
+ * A count read the native Korean way, as it sits in front of a counter:
+ * 한 건, 스무 명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
+ */
+const NATIVE_UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
+const NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
+
+export function nativeKoreanCount(count = 0) {
+  const value = Math.trunc(Number(count) || 0);
+  if (value <= 0 || value > 99) return String(value);
+  const tens = Math.floor(value / 10);
+  const units = value % 10;
+  if (value === 20) return "스무";
+  return `${NATIVE_TENS[tens]}${NATIVE_UNITS[units]}`;
 }
 
 /**

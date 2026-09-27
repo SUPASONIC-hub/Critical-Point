@@ -104,22 +104,6 @@ export function directionParticle(word = "") {
   return jong === 0 || jong === 8 ? "로" : "으로";
 }
 
-/**
- * A count read the native Korean way, as it sits in front of a counter:
- * 한 건, 스무 명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
- */
-const NATIVE_UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
-const NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
-
-export function nativeKoreanCount(count = 0) {
-  const value = Math.trunc(Number(count) || 0);
-  if (value <= 0 || value > 99) return String(value);
-  const tens = Math.floor(value / 10);
-  const units = value % 10;
-  if (value === 20) return "스무";
-  return `${NATIVE_TENS[tens]}${NATIVE_UNITS[units]}`;
-}
-
 export const easyResourceLabels = {
   time: "남은 시간",
   capital: "현금",

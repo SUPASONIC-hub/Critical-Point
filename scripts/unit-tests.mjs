@@ -89,7 +89,8 @@ import {
 import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
 import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
-import { directionParticle, endsOnConsonant, nativeKoreanCount, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { directionParticle, endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { nativeKoreanCount } from "../src/featurePack.js";
 import { nodes } from "../src/gameData.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
