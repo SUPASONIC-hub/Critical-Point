@@ -29,6 +29,18 @@ export function getReplaySeedFromLocation() {
   }
 }
 
+/** Drops the replay seed from the address bar, so a reload opens the player's own save. */
+export function clearReplayFromLocation() {
+  try {
+    const url = new URL(globalThis.location.href);
+    if (!url.searchParams.has(REPLAY_QUERY_KEY)) return;
+    url.searchParams.delete(REPLAY_QUERY_KEY);
+    globalThis.history?.replaceState(globalThis.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+  } catch {
+    // No location or history (tests, embedded frames): nothing to clear.
+  }
+}
+
 export function getTraceEvents() {
   try {
     const parsed = JSON.parse(sessionStorage.getItem(TRACE_STORAGE_KEY) || "[]");

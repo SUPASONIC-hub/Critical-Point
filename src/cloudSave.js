@@ -8,15 +8,22 @@ import {
   readStoredValue,
   SAVE_SCHEMA_VERSION,
   SAVE_WRITTEN_EVENT,
+  setReplaySession,
   SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
+import { clearReplayFromLocation } from "./state/trace.js";
 import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
 
 /**
  * Saves that follow the player to another device, and survive being offline.
+ *
+ * Nothing here runs until the player turns 온라인 저장 on in CloudSavePanel;
+ * `main.jsx` installs the sync only for a device that already opted in, and
+ * the upload leaves out the name, feedback comments and the telemetry queue
+ * (`createCloudSavePayload`).
  *
  * The device is always written first -- `writeSaveState` is still the save, and
  * a run never waits on a network. Every write that reaches device storage fires
@@ -85,14 +92,43 @@ export function getCloudCode() {
   return created;
 }
 
+/**
+ * Off until the player turns it on. It used to be on by default, so every
+ * visitor's run went to the server before anyone had asked -- beside a consent
+ * box that promised the name stays on the device.
+ */
 export function isCloudSaveEnabled() {
-  return cloudSaveAvailable && readStoredValue(CLOUD_SAVE_ENABLED_KEY, "1") !== "0";
+  return cloudSaveAvailable && readStoredValue(CLOUD_SAVE_ENABLED_KEY, "0") === "1";
 }
 
 export function setCloudSaveEnabled(enabled) {
   writeStoredValue(CLOUD_SAVE_ENABLED_KEY, enabled ? "1" : "0");
-  if (enabled) scheduleUpload(0);
-  else publish({ phase: "disabled", message: "" });
+  if (enabled) {
+    installCloudSync();
+    scheduleUpload(0);
+  } else {
+    globalThis.clearTimeout(uploadTimer);
+    publish({ phase: "disabled", message: "" });
+  }
+}
+
+/**
+ * What leaves the device: the run, and nothing the player typed or is called.
+ * The name, the feedback comments and the telemetry queue (which only exists
+ * under the separate research consent) stay local. A restore fills them back
+ * from the device it lands on (`applyCloudSave`).
+ */
+export function createCloudSavePayload(save) {
+  const { pendingTelemetry: _queue, playerName: _name, ...run } = save;
+  const feedback = save.playtestFeedback && typeof save.playtestFeedback === "object" && !Array.isArray(save.playtestFeedback)
+    ? save.playtestFeedback
+    : {};
+  return {
+    ...run,
+    playtestFeedback: Object.fromEntries(
+      Object.entries(feedback).map(([caseId, entry]) => [caseId, { ...entry, comment: "" }]),
+    ),
+  };
 }
 
 function readSync() {
@@ -145,7 +181,7 @@ export function flushCloudSave() {
   inFlight = callSupabaseRpc("put_cloud_save", {
     p_code: getCloudCode(),
     p_saved_at: save.savedAt,
-    p_payload: { save, settledWindows: readSettledWindowSeeds() },
+    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
   })
     .then(({ data }) => {
       if (data?.accepted === false) {
@@ -208,7 +244,12 @@ export async function fetchCloudSave(codeInput) {
   if (!cloudSaveAvailable) throw new Error("이 배포에는 온라인 저장 서버가 설정되어 있지 않습니다.");
   if (isOffline()) throw new Error("오프라인이라 불러올 수 없습니다. 연결된 뒤 다시 시도하세요.");
   const { data } = await callSupabaseRpc("get_cloud_save", { p_code: code });
-  const save = parseCurrentSavedState(JSON.stringify(data?.payload?.save ?? null), SAVE_SCHEMA_VERSION);
+  // Uploads leave out the name and the queue, so a copy is whole without them.
+  const remote = data?.payload?.save;
+  const filled = remote && typeof remote === "object" && !Array.isArray(remote)
+    ? { pendingTelemetry: [], playtestFeedback: {}, ...remote }
+    : null;
+  const save = parseCurrentSavedState(JSON.stringify(filled), SAVE_SCHEMA_VERSION);
   if (!save || !isSavedStateShapeValid(save)) return null;
   const settledWindows = Array.isArray(data.payload.settledWindows)
     ? data.payload.settledWindows.filter((seed) => typeof seed === "string")
@@ -224,7 +265,22 @@ export async function fetchCloudSave(codeInput) {
 export function applyCloudSave({ code, save, settledWindows = [] }) {
   const settled = [...new Set([...readSettledWindowSeeds(), ...settledWindows])].slice(-SETTLED_WINDOWS_LIMIT);
   writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(settled));
-  const written = writeSaveState({ ...save, started: false, paused: true }, { force: true });
+  // The name, the research consent and its queue never travel; this device
+  // keeps its own. Loading a copy is the player's own act, so it ends a replay.
+  const local = readLocalSave();
+  setReplaySession(false);
+  clearReplayFromLocation();
+  const written = writeSaveState(
+    {
+      ...save,
+      playerName: typeof local?.playerName === "string" ? local.playerName : "",
+      dataConsent: Boolean(local?.dataConsent),
+      pendingTelemetry: Array.isArray(local?.pendingTelemetry) && local?.dataConsent ? local.pendingTelemetry : [],
+      started: false,
+      paused: true,
+    },
+    { force: true },
+  );
   if (!written.saved) return false;
   writeStoredValue(CLOUD_SAVE_CODE_KEY, code);
   writeSync({ pending: "", synced: save.savedAt });
@@ -243,7 +299,7 @@ export function describeCloudPhase(phase) {
       offline: "오프라인 · 기기에 저장해 두었고, 연결되면 자동으로 올립니다.",
       conflict: "다른 기기에 더 최근 저장이 있습니다. 아래에서 불러올 수 있습니다.",
       error: "온라인 저장에 실패했습니다. 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.",
-      disabled: "온라인 저장을 껐습니다. 이 기기에만 저장합니다.",
+      disabled: "온라인 저장이 꺼져 있습니다. 이 기기에만 저장합니다.",
       unavailable: "이 배포에는 온라인 저장 서버가 없어 이 기기에만 저장합니다.",
     }[phase] ?? ""
   );

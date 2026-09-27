@@ -37,8 +37,9 @@ function hasLocalRun() {
  */
 export function CloudSavePanel() {
   const status = useSyncExternalStore(subscribeCloudSave, getCloudSaveSnapshot, getCloudSaveSnapshot);
-  const [code] = useState(() => (cloudSaveAvailable ? getCloudCode() : ""));
   const [enabled, setEnabled] = useState(isCloudSaveEnabled);
+  // The code is minted when the player opts in, not on the first visit.
+  const [code, setCode] = useState(() => (enabled ? getCloudCode() : ""));
   const [input, setInput] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,31 +77,40 @@ export function CloudSavePanel() {
   }
 
   function toggle(event) {
-    setEnabled(event.target.checked);
-    setCloudSaveEnabled(event.target.checked);
+    const next = event.target.checked;
+    if (next && !code) setCode(getCloudCode());
+    setEnabled(next);
+    setCloudSaveEnabled(next);
   }
 
   return (
     <details className="cloud-save-panel" data-testid="cloud-save-panel">
       <summary>다른 기기에서 이어하기</summary>
       <p>
-        진행은 이 기기에 먼저 저장되고, 인터넷이 연결되면 자동으로 온라인에도 올라갑니다. 판을 걸어 둔 채로
-        나가도 그 판 그대로 보관됩니다. 다른 기기에서는 아래 코드를 입력하면 멈춘 자리에서 이어집니다.
+        진행은 이 기기에만 저장됩니다. 온라인 저장을 켜면 그때부터 진행 기록(사건, 판단 로그, 자원)이
+        이어하기 코드 아래 온라인에도 올라가고, 다른 기기에서 그 코드를 입력하면 멈춘 자리에서 이어집니다.
+        이름과 피드백 내용은 올리지 않습니다.
       </p>
       {cloudSaveAvailable ? (
         <>
-          <div className="cloud-save-code">
-            <span>내 이어하기 코드</span>
-            <strong data-testid="cloud-save-code">{formatCloudCode(code)}</strong>
-            <button type="button" className="ghost" onClick={copyCode}>
-              <Copy size={15} aria-hidden="true" />
-              복사
-            </button>
-          </div>
+          <label className="cloud-save-toggle">
+            <input type="checkbox" checked={enabled} onChange={toggle} data-testid="cloud-save-toggle" />
+            온라인 저장 사용
+          </label>
+          {enabled && (
+            <div className="cloud-save-code">
+              <span>내 이어하기 코드</span>
+              <strong data-testid="cloud-save-code">{formatCloudCode(code)}</strong>
+              <button type="button" className="ghost" onClick={copyCode}>
+                <Copy size={15} aria-hidden="true" />
+                복사
+              </button>
+            </div>
+          )}
           <p className="cloud-save-status" role="status" data-testid="cloud-save-status">
             {enabled ? describeCloudPhase(status.phase) : describeCloudPhase("disabled")}
           </p>
-          {status.phase === "conflict" && (
+          {enabled && status.phase === "conflict" && (
             <button type="button" className="ghost" onClick={() => load(code)} disabled={busy}>
               <CloudDownload size={15} aria-hidden="true" />
               더 최근 저장 불러오기
@@ -128,10 +138,6 @@ export function CloudSavePanel() {
               </button>
             </div>
           </form>
-          <label className="cloud-save-toggle">
-            <input type="checkbox" checked={enabled} onChange={toggle} />
-            온라인 저장 사용
-          </label>
           {enabled && status.phase !== "synced" && (
             <button type="button" className="ghost cloud-save-now" onClick={() => flushCloudSave()} disabled={busy}>
               지금 올리기

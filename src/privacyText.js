@@ -2,9 +2,9 @@
  * The privacy patterns, in a module with no dependencies.
  *
  * These three regexes and the two functions over them were written in
- * `gameLogic.js`, which is where the free-input card and the feedback panel read
- * them from. Both of those live in the runtime chunk, which already carries the
- * season, so importing them from there costs that chunk nothing.
+ * `gameLogic.js`, which is where the feedback panel reads them from. It lives in
+ * the runtime chunk, which already carries the season, so importing them from
+ * there costs that chunk nothing.
  *
  * The 참가자 게시판 is the first surface outside the runtime that needs the same
  * check, and it sits in the pre-start shell. `gameLogic.js` imports `gameData.js`,

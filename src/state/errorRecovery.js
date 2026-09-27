@@ -7,11 +7,11 @@ import {
   SAVE_SCHEMA_VERSION,
   serializeError,
   STORAGE_KEY,
-  TELEMETRY_QUEUE_TYPES,
   writeSaveState,
-  writeStoredValue,
 } from "../appConfig.js";
-import { getSessionCode, getSessionId, saveErrorTelemetry, telemetryEnabled } from "../telemetry.js";
+import { getSessionCode, getSessionId, telemetryEnabled } from "../telemetry.js";
+import { createTelemetryEventId } from "./payloadSchemas.js";
+import { pruneTelemetryQueue, sendTelemetryItem } from "./telemetryQueuePolicy.js";
 import { appendTraceEvent, getTraceEvents } from "./trace.js";
 
 function createSafeDomSnapshot(documentRef = globalThis.document) {
@@ -88,13 +88,14 @@ function persistErrorRecovery(entry) {
       retryCount: sameRecoveryPoint ? (Number(previousError.retryCount) || 0) + 1 : 1,
     },
   };
-  writeSaveState(recoveredSave, { force: true });
-  appendSaveSlot(recoveredSave);
+  if (writeSaveState(recoveredSave, { force: true }).saved) appendSaveSlot(recoveredSave);
 }
 
+/** `event_id` is minted with the row, so a retry from the queue names the same row. */
 function createErrorTelemetryPayload(entry) {
   const sessionId = getSessionId();
   return {
+    event_id: createTelemetryEventId(),
     session_id: sessionId,
     session_code: getSessionCode(sessionId),
     occurred_at: entry.occurredAt,
@@ -111,37 +112,36 @@ function createErrorTelemetryPayload(entry) {
   };
 }
 
-function queueSavedErrorTelemetry(entry) {
+/**
+ * A failed error row joins the save's retry queue. It is written through
+ * `writeSaveState` like every other save write, and not over a save another tab
+ * has moved on since this tab last wrote: that tab's queue is its own.
+ */
+function queueSavedErrorTelemetry(entry, payload) {
   const saved = getSavedRecoveryState();
-  if (!saved) return false;
+  if (!saved?.dataConsent) return false;
   const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
-  const nextQueue = [
+  const nextQueue = pruneTelemetryQueue([
     ...pendingTelemetry.filter((item) => item.id !== entry.id),
     {
       id: entry.id,
       queuedAt: new Date().toISOString(),
-      type: TELEMETRY_QUEUE_TYPES.includes("error") ? "error" : "case",
+      type: "error",
       label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
-      payload: createErrorTelemetryPayload(entry),
+      payload,
     },
-  ];
-  return writeStoredValue(
-    STORAGE_KEY,
-    JSON.stringify({
-      ...saved,
-      pendingTelemetry: nextQueue,
-      savedAt: entry.occurredAt,
-    }),
-  );
+  ]);
+  return writeSaveState({ ...saved, pendingTelemetry: nextQueue, savedAt: entry.occurredAt }, { isAhead: () => true }).saved;
 }
 
 function reportErrorRecovery(entry) {
   if (!telemetryEnabled) return;
   const saved = getSavedRecoveryState();
   if (!saved?.dataConsent) return;
-  saveErrorTelemetry(createErrorTelemetryPayload(entry)).catch((telemetryError) => {
+  const item = { id: entry.id, type: "error", label: "error", payload: createErrorTelemetryPayload(entry) };
+  sendTelemetryItem(item).catch((telemetryError) => {
     console.warn("Critical Point error telemetry failed", telemetryError);
-    queueSavedErrorTelemetry(entry);
+    queueSavedErrorTelemetry(entry, item.payload);
   });
 }
 

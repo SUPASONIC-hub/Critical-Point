@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
@@ -20,10 +20,11 @@ import {
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
-import { CASE_RESULT_NODES, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseNodePattern } from "./gameCases.js";
+import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "./gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
+import { IntroScreen, loadGameRuntime, prefetchGameRuntime, queueRuntimeStartAction } from "./screens/IntroScreen.jsx";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
@@ -34,10 +35,15 @@ import { GAME_TITLE } from "./appCopy.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 
-const GameRuntime = lazy(() => import("./GameRuntime.jsx").then(({ GameRuntime }) => ({ default: GameRuntime })));
-const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
+// The intro is the first thing painted, so it ships in the entry chunk: lazy()
+// put a second round trip between the page and its first screen. The runtime
+// stays lazy and starts downloading while the intro is read (see below).
+const GameRuntime = lazy(() => loadGameRuntime().then(({ GameRuntime }) => ({ default: GameRuntime })));
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
+
+// How long the intro waits for an idle moment before it fetches the runtime anyway.
+const RUNTIME_PREFETCH_TIMEOUT_MS = 4000;
 
 let saveSuppressed = false;
 
@@ -49,29 +55,25 @@ export function resumeSaves() {
   saveSuppressed = false;
 }
 
-function readCurrentSave() {
-  const saved = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-  if (!saved?.currentCase || !saved?.nodeId) return saved;
-  const casePrefix = caseNodePattern(saved.currentCase);
-  const nodeMatchesCase =
-    saved.nodeId === CASE_RESULT_NODES[saved.currentCase] ||
-    Boolean(casePrefix?.test(saved.nodeId));
-  if (nodeMatchesCase) return saved;
-  const repaired = {
-    ...saved,
-    nodeId: CASE_START_NODES[saved.currentCase] ?? SEASON_ENTRY_NODE,
-    paused: true,
-    lastError: {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved route was repaired before resume.",
-      currentCase: saved.currentCase,
-      nodeId: CASE_START_NODES[saved.currentCase] ?? SEASON_ENTRY_NODE,
-    },
-  };
-  writeSaveState(repaired, { force: true });
-  return repaired;
+/** What a lazy screen shows while its chunk arrives: a status, not a blank page. */
+function ScreenLoading() {
+  return (
+    <main className="shell screen-loading" aria-busy="true">
+      <p className="save-status" role="status">
+        장면을 불러오는 중입니다.
+      </p>
+    </main>
+  );
+}
+
+/**
+ * The save as the shell reads it. It repairs nothing: which scene a case may
+ * resume at is a question for the scene graph, and the runtime's
+ * `repairSavedState` answers it when the run is opened. The shell used to keep
+ * a second, looser rule of its own and write its answer back.
+ */
+function readShellSave() {
+  return parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
 }
 
 function reportInvalidShellSave(saved) {
@@ -83,12 +85,6 @@ function reportInvalidShellSave(saved) {
   })}`);
   error.name = "SilentRouteFailure";
   recordAppError(error, {}, "silent-save-shape");
-}
-
-function readShellSave() {
-  const saved = readCurrentSave();
-  reportInvalidShellSave(saved);
-  return saved;
 }
 
 function readNewGamePlusMemory() {
@@ -144,6 +140,21 @@ function createResumedSave(current) {
   };
 }
 
+/** Whether the browser says it is online, kept current by its events. */
+function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
+  useEffect(() => {
+    const update = () => setIsOnline(globalThis.navigator?.onLine !== false);
+    globalThis.addEventListener("online", update);
+    globalThis.addEventListener("offline", update);
+    return () => {
+      globalThis.removeEventListener("online", update);
+      globalThis.removeEventListener("offline", update);
+    };
+  }, []);
+  return isOnline;
+}
+
 export function AppContent({ onSuppressSaves = suppressSaves }) {
   const replaySeed = useMemo(() => getReplaySeedFromLocation(), []);
   const saved = useMemo(() => readShellSave(), []);
@@ -169,7 +180,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const [pendingTelemetry, setPendingTelemetry] = useState(() => saved?.pendingTelemetry ?? []);
   const { localRankingRows } = useLocalRanking();
-  const isOnline = globalThis.navigator?.onLine !== false;
+  const isOnline = useOnlineStatus();
   const { leaderboard, leaderboardStatus, leaderboardError } = useLeaderboard({
     showRanking,
     isOnline,
@@ -187,9 +198,25 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     [],
   );
 
+  // Reported once, after the first paint, rather than from inside a render.
+  useEffect(() => {
+    reportInvalidShellSave(saved);
+  }, [saved]);
+
+  // The intro is up; fetch the runtime while the player reads it.
+  useEffect(() => {
+    if (runtimeActive) return undefined;
+    if (typeof globalThis.requestIdleCallback === "function") {
+      const handle = globalThis.requestIdleCallback(prefetchGameRuntime, { timeout: RUNTIME_PREFETCH_TIMEOUT_MS });
+      return () => globalThis.cancelIdleCallback?.(handle);
+    }
+    const handle = globalThis.setTimeout(prefetchGameRuntime, RUNTIME_PREFETCH_TIMEOUT_MS / 2);
+    return () => globalThis.clearTimeout(handle);
+  }, [runtimeActive]);
+
   if (runtimeActive) {
     return (
-      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+      <Suspense fallback={<ScreenLoading />}>
         <GameRuntime
           onSuppressSaves={onSuppressSaves}
           saveControls={saveControls}
@@ -201,7 +228,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
 
   if (showRanking) {
     return (
-      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+      <Suspense fallback={<ScreenLoading />}>
         <RankingScreen
           Music={AdaptiveMusic}
           gameTitle={GAME_TITLE}
@@ -220,7 +247,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
 
   if (showBoard) {
     return (
-      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+      <Suspense fallback={<ScreenLoading />}>
         <BoardScreen
           {...board}
           Music={AdaptiveMusic}
@@ -232,7 +259,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   }
 
   function persist(nextState) {
-    const current = readCurrentSave() ?? createStartSave({ playerName, playStyle, dataConsent });
+    const current = readShellSave() ?? createStartSave({ playerName, playStyle, dataConsent });
     const payload = { ...current, ...nextState, started: false, savedAt: new Date().toISOString() };
     const storageSaved = writeSaveState(payload, { force: true }).saved;
     if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
@@ -250,13 +277,32 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     setRuntimeActive(true);
   }
 
+  // A case card and NEW GAME+ keep the season they were pressed on. The shell
+  // writes the preferences typed here into the save (without starting it), then
+  // hands the press to the runtime, which performs it with the scene graph.
+  function handOverToRuntime(action) {
+    const name = normalizePlayerName(playerName);
+    persist({ ...(name ? { playerName: name } : {}), playStyle, dataConsent });
+    queueRuntimeStartAction(action);
+    resumeSaves();
+    setRuntimeActive(true);
+  }
+
+  function startCase(caseId) {
+    handOverToRuntime({ type: "case", caseId });
+  }
+
+  function startNewGamePlus() {
+    handOverToRuntime({ type: "new-game-plus" });
+  }
+
   // GameRuntime reads `started` from the save, so a paused save handed to it
   // unchanged renders the intro a second time and 이어하기 takes two clicks.
   // The shell has to write the resume itself, the way the runtime's own
   // resumeSavedGame does. persist() cannot be reused: it clamps started to
   // false, which is the whole point of that clamp for preference writes.
   function persistResumedRun() {
-    const current = readCurrentSave();
+    const current = readShellSave();
     if (!current) return;
     if (!writeSaveState(createResumedSave(current), { force: true }).saved) {
       setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
@@ -308,8 +354,8 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     newGamePlusMemory: readNewGamePlusMemory(),
     nextParticipantMessage: readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""),
     startGame,
-    startCase: startGame,
-    startNewGamePlus: startGame,
+    startCase,
+    startNewGamePlus,
     resumeSavedGame,
     persist,
     setShowRanking,
@@ -320,9 +366,5 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     renderSaveStatus: () => (saveStatus ? <p className="save-status">{saveStatus}</p> : null),
   });
 
-  return (
-    <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
-      <IntroScreen view={introView} />
-    </Suspense>
-  );
+  return <IntroScreen view={introView} />;
 }

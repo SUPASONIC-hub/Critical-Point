@@ -43,7 +43,11 @@ const budgets = [
   // number where it is: importing them from gameLogic measured at 3,130_000,
   // because gameData.js merges the case packs at module scope and rollup cannot
   // shake that out.
-  { pattern: /^index-.*\.js$/, maxBytes: 134_000 },
+  // 134_000 -> 160_000 on 2026-09-27: the intro screen moved into this chunk.
+  // It was a 24KB lazy chunk that the entry had to fetch before it could paint
+  // anything, one more round trip in front of the first screen; the bytes to
+  // first paint are the same, now in one request. Its separate chunk is gone.
+  { pattern: /^index-.*\.js$/, maxBytes: 160_000 },
   // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
   // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
   // day for the market, memorial and factory painters and the steam layer.
