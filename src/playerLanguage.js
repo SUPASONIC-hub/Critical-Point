@@ -1,3 +1,4 @@
+/** @type {Array<[RegExp, string]>} */
 const phraseReplacements = [
   [/\bPLAYABLE\b/gi, "시작 가능"],
   [/\bLOCKED\b/gi, "잠김"],
