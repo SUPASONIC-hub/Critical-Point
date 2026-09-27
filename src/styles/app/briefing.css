@@ -226,33 +226,51 @@
   color: var(--c-gx-heat);
 }
 
-/* A board the last decision broke arrives glitched: the splash splits into a
-   red and a cyan copy that jitter back together, the way a signal does when it
-   is being interfered with. Filter only, so the plate's own push-in keeps its
-   transform. */
-.is-broken .gx-panel-splash .gx-plate {
+/* A board the last decision broke arrives glitched: a red and a cyan fringe
+   split the splash at its edges and jitter back together, the way a signal does
+   when it is being interfered with. It used to be a drop-shadow filter on the
+   plate, which repainted the drawing at every step and, because the plate is
+   opaque and fills the panel, landed almost entirely outside the clip. The
+   fringe is its own layer, moved by opacity and transform only, and the
+   plate keeps its push-in. */
+.is-broken .gx-panel-splash::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  opacity: 0;
+  box-shadow:
+    inset 3px 0 0 rgb(255 56 56 / 0.7),
+    inset -3px 0 0 rgb(80 220 255 / 0.6);
+  pointer-events: none;
   animation: gx-splash-glitch 2.8s steps(1, end) infinite;
 }
 
 @keyframes gx-splash-glitch {
   0%,
   100% {
-    filter: none;
+    opacity: 0;
+    transform: none;
   }
   4% {
-    filter: drop-shadow(3px 0 0 rgb(255 56 56 / 0.7)) drop-shadow(-3px 0 0 rgb(80 220 255 / 0.6));
+    opacity: 1;
+    transform: none;
   }
+  /* The two colours trade sides and slip a pixel. */
   8% {
-    filter: drop-shadow(-2px 1px 0 rgb(255 56 56 / 0.6)) drop-shadow(2px -1px 0 rgb(80 220 255 / 0.5));
+    opacity: 0.85;
+    transform: translateY(1px) scaleX(-1);
   }
   12% {
-    filter: none;
+    opacity: 0;
+    transform: none;
   }
   52% {
-    filter: drop-shadow(1px 0 0 rgb(255 56 56 / 0.5)) drop-shadow(-1px 0 0 rgb(80 220 255 / 0.4));
+    opacity: 0.6;
+    transform: none;
   }
   55% {
-    filter: none;
+    opacity: 0;
+    transform: none;
   }
 }
 
@@ -659,7 +677,7 @@
   .gx-balloon,
   .gx-sfx,
   .gx-comic-timer.is-late,
-  .is-broken .gx-panel-splash .gx-plate {
+  .is-broken .gx-panel-splash::before {
     animation: none;
   }
 }

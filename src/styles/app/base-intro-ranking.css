@@ -1,6 +1,6 @@
 /* Application styles. Colors resolve through src/styles/tokens.css. */
 .error-screen {
-  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -77,7 +77,11 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100svh;
+  /* viewport-fit=cover lets the page reach under a notch; in landscape the
+     notch is on a side, and these keep the content out from under it. Zero on
+     every screen without one. */
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
   font-family: var(--font-sans);
   font-size: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -103,12 +107,12 @@ button {
 }
 button:disabled {
   opacity: 1;
-  color: var(--c-ink-muted);
+  color: var(--ui-text-3);
   -webkit-text-fill-color: currentColor;
 }
 button.case-card:disabled {
-  color: var(--c-ink-muted) !important;
-  -webkit-text-fill-color: var(--c-ink-muted) !important;
+  color: var(--ui-text-3) !important;
+  -webkit-text-fill-color: var(--ui-text-3) !important;
 }
 button:focus-visible,
 input:focus-visible,
@@ -188,7 +192,7 @@ summary:focus-visible {
   white-space: nowrap;
 }
 .shell {
-  min-height: 100vh;
+  min-height: 100svh;
   padding: 28px;
   width: 100%;
 }
@@ -232,7 +236,7 @@ summary:focus-visible {
   /* The report's topbar is a flex row that let the wordmark shrink until it
      broke across two lines next to six buttons. */
   flex: 0 0 auto;
-  background: var(--color-ink);
+  background: var(--ui-surface-2);
   color: var(--c-paper);
   white-space: nowrap;
 }
@@ -457,22 +461,48 @@ summary:focus-visible {
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+/* The dot breathes: its halo ring grows out and fades while the glow widens.
+   Both live on pseudo-elements and move by transform and opacity, so the pulse
+   is composited instead of repainting a box-shadow every frame. */
 .brand-mark-dot {
+  position: relative;
   width: 7px;
   height: 7px;
   flex: 0 0 auto;
   background: var(--ui-accent);
   border-radius: 50%;
-  box-shadow:
-    0 0 0 3px rgb(217 255 98 / 0.16),
-    0 0 12px var(--ui-accent);
-  animation: brand-dot-pulse 2.4s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--ui-accent);
 }
-@keyframes brand-dot-pulse {
+.brand-mark-dot::before,
+.brand-mark-dot::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: 2.4s ease-in-out infinite;
+}
+/* The 3px ring; at the peak it reaches 6px and has faded out. */
+.brand-mark-dot::before {
+  inset: -3px;
+  background: rgb(217 255 98 / 0.16);
+  animation-name: brand-dot-ring;
+}
+/* The wider 18px glow, faded in over the dot's own 12px one. */
+.brand-mark-dot::after {
+  inset: 0;
+  opacity: 0;
+  box-shadow: 0 0 18px var(--ui-accent);
+  animation-name: brand-dot-glow;
+}
+@keyframes brand-dot-ring {
   50% {
-    box-shadow:
-      0 0 0 6px rgb(217 255 98 / 0),
-      0 0 18px var(--ui-accent);
+    opacity: 0;
+    transform: scale(1.4615);
+  }
+}
+@keyframes brand-dot-glow {
+  50% {
+    opacity: 1;
   }
 }
 .intro .top-actions .ghost {
@@ -518,6 +548,10 @@ summary:focus-visible {
 .intro .top-actions .intro-board-button:hover {
   border-color: var(--ui-accent);
 }
+/* The one infinite animation left on a paint property. The pill clips its own
+   sweep with overflow: hidden, and that clip would also cut off a glow drawn by
+   a pseudo-element, so the glow stays the pill's own box-shadow. It is a 34px
+   pill, and it stops under reduced motion. */
 @keyframes board-glow {
   50% {
     box-shadow:
@@ -525,13 +559,15 @@ summary:focus-visible {
       0 0 22px rgb(217 255 98 / 0.45);
   }
 }
+/* The sweep travels from left -60% to 130% of the pill, 190% of its width,
+   which is 422.2% of the band's own 45%. Moved by transform so it composites. */
 @keyframes board-shine {
   0%,
   55% {
-    left: -60%;
+    transform: translateX(0) skewX(-18deg);
   }
   100% {
-    left: 130%;
+    transform: translateX(422.22%) skewX(-18deg);
   }
 }
 .intro .case-chip {
@@ -671,7 +707,8 @@ summary:focus-visible {
   }
   .wordmark-rule,
   .intro-visual img,
-  .brand-mark-dot,
+  .brand-mark-dot::before,
+  .brand-mark-dot::after,
   .intro-launch button::after,
   .intro .top-actions .intro-board-button,
   .intro .top-actions .intro-board-button::after {
@@ -751,13 +788,14 @@ summary:focus-visible {
   animation: intro-cta-shine 4.2s var(--ui-ease) infinite;
   pointer-events: none;
 }
+/* left -40% to 130% of the button is 170% of it, 472.2% of the band's 36%. */
 @keyframes intro-cta-shine {
   0%,
   62% {
-    left: -40%;
+    transform: translateX(0) skewX(-18deg);
   }
   100% {
-    left: 130%;
+    transform: translateX(472.22%) skewX(-18deg);
   }
 }
 .intro-launch button svg {

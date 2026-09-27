@@ -76,7 +76,11 @@ const fileBudgets = {
   // than remove them.
   // 2840 / 66900 -> 2875 / 67800 on 2026-09-23 for the 게시판 pill's glint in
   // the intro header: accent rim, glow and light sweep, and their two keyframes.
-  "base-intro-ranking.css": { lines: 2875, bytes: 67800 },
+  // 2875 / 67800 -> 2910 / 69400 on 2026-09-27: the intro's infinite
+  // decorations (the brand dot's pulse, the CTA and board-pill sweeps) moved
+  // off box-shadow and left onto pseudo-elements that animate transform and
+  // opacity, and body keeps content out from under a landscape notch.
+  "base-intro-ranking.css": { lines: 2910, bytes: 69400 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
@@ -150,7 +154,9 @@ const fileBudgets = {
   // 3425 / 71200 -> 3075 / 63400 on 2026-09-22, when the scene plate moved out
   // to plate.css with the second half of the season's rooms and effects (bytes
   // counted with CRLF endings, as a Windows checkout has them).
-  "play.css": { lines: 3075, bytes: 66400 },
+  // 3075 -> 3100 lines on 2026-09-27: the bust flash became two opacity layers
+  // instead of an animated viewport background.
+  "play.css": { lines: 3100, bytes: 66400 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -165,12 +171,17 @@ const fileBudgets = {
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
   // board's splash panel arrives with.
-  "briefing.css": { lines: 670, bytes: 14100 },
+  // 670 / 14100 -> 685 / 14400 on 2026-09-27: the glitch moved off a filter on
+  // the plate onto its own fringe layer.
+  "briefing.css": { lines: 685, bytes: 14400 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
-  "relics.css": { lines: 465, bytes: 9510 },
-  "responsive.css": { lines: 200, bytes: 4700 },
+  // 465 / 9510 -> 482 / 9950 on 2026-09-27: the proc glow is a layer faded by
+  // opacity rather than an animated box-shadow.
+  "relics.css": { lines: 482, bytes: 9950 },
+  // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
+  "responsive.css": { lines: 204, bytes: 4800 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about

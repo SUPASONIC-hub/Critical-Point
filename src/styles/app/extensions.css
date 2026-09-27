@@ -285,7 +285,7 @@
 .decision-reveal-stakes span {
   color: var(--c-teal-deep);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .decision-reveal-stakes b {
@@ -329,7 +329,7 @@
   color: var(--color-accent);
   border-top: 1px solid rgba(217, 255, 98, 0.18);
   font-size: 12px;
-  font-weight: 950;
+  font-weight: 900;
   line-height: 1.5;
 }
 .ending-witness-log {
@@ -351,14 +351,14 @@
 .ending-witness-log span {
   color: var(--color-accent);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-witness-log small {
   display: block;
   color: var(--c-acid);
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.06em;
 }
 .ending-witness-log b {
@@ -380,7 +380,7 @@
 .ending-archive-blueprint span {
   color: var(--color-accent);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ending-archive-blueprint strong {
@@ -480,7 +480,7 @@
 .ending-coda span {
   color: var(--color-accent);
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ending-coda strong {
@@ -508,7 +508,7 @@
 .observer-pattern-card span {
   color: var(--c-acid);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .observer-pattern-card strong {
@@ -563,7 +563,7 @@
 .ending-coda > span {
   color: var(--c-acid);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-coda strong {
@@ -588,7 +588,7 @@
   border: 1px solid rgba(41, 92, 87, 0.22);
   border-radius: 4px;
   font-size: 9px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.06em;
   vertical-align: middle;
 }
@@ -623,7 +623,7 @@
 .ending-axis-grid span {
   color: var(--c-acid);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-axis-grid b {
@@ -672,7 +672,7 @@
 .ending-variant-panel > span {
   color: #e9f5b4;
   font-size: 11px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ending-variant-panel h2 {
@@ -701,7 +701,7 @@
   background: #d9ff62;
   border: 1px solid #315f43;
   border-radius: 6px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.04em;
 }
 .new-game-plus-button:hover {
@@ -710,7 +710,7 @@
 .balance-report > span {
   color: #35654f;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .season-goal-strip {
@@ -729,7 +729,7 @@
   align-self: center;
   color: #35654f;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .season-goal-strip article {
@@ -811,7 +811,7 @@
 .past-run-memory span {
   color: #0e4b45;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .past-run-memory p {
@@ -859,7 +859,7 @@
 }
 .delayed-consequence-strip span {
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .delayed-consequence-strip p {
@@ -881,7 +881,7 @@
 .ending-scene-profile span {
   color: #d9ff62;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ending-scene-profile strong {
@@ -925,7 +925,7 @@
 }
 .ranking-comparison > span {
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ranking-comparison > div {
@@ -1012,7 +1012,7 @@
 .operator-origin > span {
   color: #35654f;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .operator-origin strong {
@@ -1052,7 +1052,7 @@
 .ending-preview-panel span {
   color: #d9ff62;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-preview-panel strong {
@@ -1086,7 +1086,7 @@
 .telemetry-dashboard-panel > span {
   color: #35654f;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .origin-prologue span {
@@ -1207,7 +1207,7 @@
 }
 .authority-review-panel span {
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .authority-review-panel span {
@@ -1266,7 +1266,7 @@
 .aftermath-panel span {
   color: #d9ff62;
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 .aftermath-panel p {
@@ -1306,7 +1306,7 @@
   color: #4f605b;
 }
 .achievement-panel > span {
-  color: var(--c-ink-muted);
+  color: var(--ui-text-3);
 }
 .ending-axis-panel .panel-title-row span {
   color: var(--c-line-soft);
