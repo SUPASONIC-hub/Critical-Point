@@ -90,6 +90,8 @@ test("a save made offline is uploaded when the connection comes back", async ({ 
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ accepted: true }) });
   });
   await useMockSupabase(page);
+  // Online save is opt-in: this device turned it on before the run.
+  await page.addInitScript((key) => localStorage.setItem(key, "1"), TEST_STORAGE_KEYS.cloudEnabled);
   // A controlled clock, so "nothing was sent" is proved over a known span of
   // the page's own timers rather than 3.5 wall-clock seconds of hoping.
   await page.clock.install();

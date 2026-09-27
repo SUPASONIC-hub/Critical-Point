@@ -26,7 +26,9 @@ services:
   - type: web
     runtime: static
     name: critical-point
-    buildCommand: npm ci --include=dev && npm run verify:static && npm run build
+    # Only a commit whose Verify run went green is deployed (deploy.yml), so the
+    # static checks are not run a second time here.
+    buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: ./dist
     # Inert here; the dashboard's Auto-Deploy setting is what decides. See above.
     autoDeploy: true

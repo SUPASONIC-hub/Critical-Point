@@ -162,8 +162,30 @@ function absoluteSiteUrls() {
   };
 }
 
+/**
+ * Name the commit a build came from, so the deploy smoke job can wait for the
+ * release it pressed rather than check whichever one is still live. Render sets
+ * `RENDER_GIT_COMMIT` on every build; a local build has none and writes nothing,
+ * which keeps `dist/index.html` byte-identical for the e2e preview probe.
+ */
+function buildShaMeta() {
+  return {
+    name: "build-sha-meta",
+    apply: "build",
+    transformIndexHtml: {
+      order: "post",
+      handler(html) {
+        const sha = (process.env.RENDER_GIT_COMMIT || "").trim();
+        if (!/^[0-9a-f]{7,40}$/.test(sha)) return html;
+        return html.replace("</head>", `    <meta name="build-sha" content="${sha}" />
+  </head>`);
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), criticalCss(), absoluteSiteUrls()],
+  plugins: [react(), criticalCss(), absoluteSiteUrls(), buildShaMeta()],
   // The dev server compiles a module the first time it is asked for. Fifty
   // cases are fifty large data modules, and compiling them on the first scene
   // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle

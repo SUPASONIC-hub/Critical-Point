@@ -86,7 +86,6 @@ export function createSeasonTelemetryPayload({
     player_name: "익명 분석관",
     case_id: "season-final",
     case_title: "SEASON 01 COMPLETE",
-    completed_at: new Date().toISOString(),
     summary: createSeasonCompletionSummary({ caseSummary, completedCaseCount }),
     resources,
     triggers,

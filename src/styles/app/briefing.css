@@ -87,6 +87,9 @@
   border: 3px solid var(--c-black);
   box-shadow: 4px 4px 0 var(--c-black);
   transform: rotate(2deg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .gx-comic-timer b {
@@ -118,6 +121,13 @@
 .gx-comic-timer.is-late i {
   background: var(--c-paper);
 }
+
+.gx-comic-timer.is-held {
+  color: var(--ui-text);
+  background: var(--ui-surface-2);
+  animation: none;
+}
+
 
 /* Panels ---------------------------------------------------------------------- */
 .gx-comic-grid {

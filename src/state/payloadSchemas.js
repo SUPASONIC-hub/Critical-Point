@@ -48,9 +48,7 @@ function containsPrivateTelemetryValue(value, allowedKeys) {
  * payload is built, so the first send and every retry name the same row and the
  * server's unique index on `event_id` drops the duplicates.
  */
-export function createTelemetryEventId() {
-  return globalThis.crypto?.randomUUID?.() ?? `event-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-}
+export { createTelemetryEventId } from "./telemetryEventId.js";
 
 export function validateTelemetryItem(item) {
   const errors = [];

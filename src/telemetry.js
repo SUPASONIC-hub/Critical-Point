@@ -42,7 +42,9 @@ async function createTelemetryError(response, fallbackMessage) {
     // A body is optional; fall back to the status code alone.
   }
   const suffix = detail ? `: ${detail}` : "";
-  return new Error(`${fallbackMessage}: ${response.status}${suffix}`);
+  const error = new Error(`${fallbackMessage}: ${response.status}${suffix}`);
+  error.status = response.status;
+  return error;
 }
 
 export function getSessionId() {

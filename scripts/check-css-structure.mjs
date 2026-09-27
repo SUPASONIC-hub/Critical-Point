@@ -184,7 +184,9 @@ const fileBudgets = {
   // board's splash panel arrives with.
   // 670 / 14100 -> 685 / 14400 on 2026-09-27: the glitch moved off a filter on
   // the plate onto its own fringe layer.
-  "briefing.css": { lines: 685, bytes: 14400 },
+  // 685 / 14400 -> 700 / 14600 the same day: the reading clock became a button
+  // that holds, and its held state.
+  "briefing.css": { lines: 700, bytes: 14600 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.

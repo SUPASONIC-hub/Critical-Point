@@ -27,6 +27,13 @@ function withEventId(item) {
  * it, whose `dataConsent` was the one from before the player unticked the box,
  * so a revoked consent kept sending on every backoff tick.
  */
+const RETRYABLE_CLIENT_STATUSES = new Set([408, 425, 429]);
+
+function isPermanentRefusal(error) {
+  const status = Number(error?.status);
+  return status >= 400 && status < 500 && !RETRYABLE_CLIENT_STATUSES.has(status);
+}
+
 export function useTelemetryQueue({
   pendingTelemetryRef,
   setPendingTelemetry,
@@ -124,7 +131,10 @@ export function useTelemetryQueue({
         await sendTelemetryItem(item);
       } catch (error) {
         console.warn(error);
-        failedItems.push(item);
+        // A 4xx other than timeout/too-early/rate-limit is the server refusing
+        // the row itself (a season-final for a run with missing case rows, a
+        // payload over its cap). Sending it again for seven days changes nothing.
+        if (!isPermanentRefusal(error)) failedItems.push(item);
       }
     }
     retryingRef.current = false;

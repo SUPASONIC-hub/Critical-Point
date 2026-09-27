@@ -116,7 +116,6 @@ export function useChoiceCommit(context) {
         player_name: "익명 분석관",
         case_id: currentCase,
         case_title: activeCaseMeta?.title ?? currentCase,
-        completed_at: new Date().toISOString(),
         summary: caseSummary,
         resources: finalResources,
         triggers: nextTriggers,
