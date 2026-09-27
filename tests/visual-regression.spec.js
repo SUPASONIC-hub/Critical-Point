@@ -307,8 +307,8 @@ test("case result explains the ending signals", async ({ page }) => {
   });
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
-  await expect(page.locator(".ending-rationale")).toContainText("신뢰");
-  await expect(page.locator(".ending-rationale")).toContainText("정당성");
+  await expect(page.locator(".ending-rationale")).toContainText("믿음");
+  await expect(page.locator(".ending-rationale")).toContainText("공정함");
 });
 
 // U-1: one decision used to be seven screens of scrolling on a phone. On the
