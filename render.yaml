@@ -68,7 +68,7 @@ services:
       #   inline handler (the critical-CSS loader used to be an onload=).
       # style-src keeps 'unsafe-inline' for the inlined critical CSS block and
       #   React's style attributes; styles cannot run code.
-      # img-src/font-src: every image and the Pretendard subsets ship with the
+      # img-src/font-src: every image and the one Pretendard subset ship with the
       #   app. data: stays for fonts/images small enough for Vite to inline.
       # connect-src: the Supabase REST API. Narrow it to the project's own
       #   https://<ref>.supabase.co when setting it in the dashboard.

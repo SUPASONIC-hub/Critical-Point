@@ -36,10 +36,9 @@
 --    than refused, because an error log that is refused is lost.
 --
 -- 5. `event_id` gets a full `unique` constraint (NULLs still never conflict), so
---    the client can send `on_conflict=event_id` with
---    `resolution=ignore-duplicates` and a retried item is a no-op, not a 409.
---    The partial indexes from 20260907000000 cannot be named as an ON CONFLICT
---    target, which is why they go.
+--    a retried item that already landed is refused with a 409, which the client
+--    counts as delivered. It does not send `on_conflict=event_id`: an ON
+--    CONFLICT target needs SELECT on that column, and anon must not read it.
 --
 -- 6. `unique (run_id, case_id)` replaces the check-then-insert dedupe, which
 --    two concurrent retries could both pass. Duplicates already in the table

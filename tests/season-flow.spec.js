@@ -652,6 +652,13 @@ test("corrupt saved route is repaired before resume", async ({ page }) => {
     );
   });
   await page.reload();
+  // The runtime is the one place a save is repaired (the shell cannot see the
+  // scene graph), and it does so once its chunk has loaded -- wait for that.
+  await expect
+    .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")))).nodeId, {
+      timeout: 30_000,
+    })
+    .toBe("c5_start");
   const repaired = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(repaired.currentCase).toBe("case05");
   expect(repaired.nodeId).toBe("c5_start");
