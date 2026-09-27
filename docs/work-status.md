@@ -1251,3 +1251,17 @@ the live database when a migration fixes a runtime error.
     `returns table` changes the row type, which `create or replace` refuses with
     42P13, so the migration drops the function first. The argument list is
     unchanged, so any schedule calling it needs no edit.
+
+80. Every table the Data API serves has its grants written down. From
+    2026-10-30 Supabase stops granting anon, authenticated and service_role
+    privileges on new `public` tables automatically, and a migration replay
+    (`supabase db reset`, a preview branch, a new project) counts as new.
+    `playtest_sessions`, `playtest_feedback`, `app_error_logs` and
+    `free_text_analyses` had anon insert policies but relied on the automatic
+    grant for the privilege itself, so a fresh database would have refused
+    every telemetry write with 42501 -- silently, because the queue swallows
+    failures. `20260927000000_explicit_data_api_grants.sql` grants anon
+    `insert` only (these tables are write-only by design) and service_role
+    `all` on every table; it is a no-op on the live database. Any new table
+    must carry its own grants in the migration that creates it, the way
+    `board_posts` does.
