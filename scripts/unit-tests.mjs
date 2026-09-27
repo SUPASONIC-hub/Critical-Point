@@ -89,7 +89,7 @@ import {
 import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
 import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
-import { endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
+import { directionParticle, endsOnConsonant, nativeKoreanCount, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nodes } from "../src/gameData.js";
 import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
@@ -350,6 +350,28 @@ test("particles follow the reading of a trailing digit", () => {
   assert.equal(objectParticle("현금 +2"), "를", "2 is read 이, which ends on a vowel");
   assert.equal(objectParticle("현금 +7"), "을", "7 is read 칠, which ends on a consonant");
   assert.equal(endsOnConsonant("믿음 -10"), true, "anything ending in 0 is read 십/백/천/만");
+});
+// 로 / 으로 has a third case: a word that ends on ㄹ takes 로, like a vowel.
+test("direction particles take 로 after a vowel or ㄹ and 으로 after any other consonant", () => {
+  assert.equal(directionParticle("사람 피해"), "로", "a vowel");
+  assert.equal(directionParticle("서울"), "로", "ㄹ takes 로");
+  assert.equal(directionParticle("공정함"), "으로", "ㅁ takes 으로");
+  assert.equal(directionParticle("현금 +1"), "로", "1 is read 일");
+  assert.equal(directionParticle("현금 +7"), "로", "7 is read 칠");
+  assert.equal(directionParticle("현금 +8"), "로", "8 is read 팔");
+  assert.equal(directionParticle("현금 +3"), "으로", "3 is read 삼");
+  assert.equal(directionParticle("현금 +6"), "으로", "6 is read 육");
+  assert.equal(directionParticle("현금 +2"), "로", "2 is read 이");
+  assert.equal(directionParticle("공정함 40"), "으로", "40 is read 사십");
+  assert.equal(directionParticle("x"), "으로", "a Latin letter is read as ending on a consonant, as the other particles read it");
+});
+test("a count in front of a counter is read the native way", () => {
+  assert.equal(nativeKoreanCount(49), "마흔아홉");
+  assert.equal(nativeKoreanCount(20), "스무");
+  assert.equal(nativeKoreanCount(21), "스물한");
+  assert.equal(nativeKoreanCount(12), "열두");
+  assert.equal(nativeKoreanCount(1), "한");
+  assert.equal(nativeKoreanCount(120), "120", "past 99 a person writes the digits");
 });
 
 // The result ledger's sentence reads the same numbers the same way.

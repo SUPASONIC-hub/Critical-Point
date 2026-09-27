@@ -1,4 +1,5 @@
 import { caseDisplayCode, SEASON_ENTRY_CASE } from "./gameCases.js";
+import { easyResourceLabels } from "./playerLanguage.js";
 
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
@@ -57,30 +58,32 @@ export function getRiskPressure(resources = {}) {
   );
 }
 
+// Named with the labels the rest of the game prints (rule 9): these said
+// 현금 압박 / 인적 비용 / 판단 피로 beside chips that say 현금 / 사람 피해 / 지침.
 export function getRiskPressureDrivers(resources = {}) {
   const nextResources = { ...riskDefaults, ...resources };
   const drivers = [
     {
       id: "time",
-      label: "시간 부족",
+      label: easyResourceLabels.time,
       value: Math.max(0, 72 - nextResources.time),
       pressure: Math.max(0, 72 - nextResources.time) * 0.3,
     },
     {
       id: "capital",
-      label: "현금 압박",
+      label: easyResourceLabels.capital,
       value: Math.max(0, 100 - nextResources.capital),
       pressure: Math.max(0, 100 - nextResources.capital) * 0.25,
     },
     {
       id: "humanCost",
-      label: "인적 비용",
+      label: easyResourceLabels.humanCost,
       value: nextResources.humanCost,
       pressure: nextResources.humanCost * 0.25,
     },
     {
       id: "fatigue",
-      label: "판단 피로",
+      label: easyResourceLabels.fatigue,
       value: nextResources.fatigue,
       pressure: nextResources.fatigue * 0.2,
     },

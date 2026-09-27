@@ -1,5 +1,7 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
+import { ENDING_GATES } from "./gameConstants.js";
 import { isPeopleFirstEffect } from "./gameLogic.js";
+import { easyResourceLabels, nativeKoreanCount, objectParticle } from "./playerLanguage.js";
 
 
 
@@ -13,12 +15,15 @@ export function getOperatorReveal({ origin = "courier", completedCases = [] } = 
 /**
  * What the season left behind, months after the last night.
  *
- * `getEndingVariant` resolves nine endings and four of them had an epilogue, so
- * five seasons closed on the same fallback sentence -- the run's last words were
- * the one line that knew nothing about the run. Each one now follows the same
- * shape: the season's own places and people first, the analyst second, the door
- * the next participant walks through last.
+ * `getEndingVariant` resolves nine endings. Eight have an epilogue here, and
+ * OPEN QUESTION closes on the fallback, which is written for it -- once, only
+ * four had one, and five seasons in nine closed on a line that knew nothing
+ * about the run. Each follows the same shape: the season's own places and
+ * people first, the analyst second, the door the next participant walks
+ * through last. Counts are read off the season, not written into the copy.
  */
+const NUMBERED_CASES = CASE_SEQUENCE.filter((caseId) => /^case\d+$/.test(caseId)).length;
+
 export function getEndingEpilogue(endingId = "open-question") {
   const epilogues = {
     "open-oversight":
@@ -26,7 +31,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "evidence-reform":
       "보호 명부와 감사 로그가 하나의 절차로 묶였습니다. 이민서는 자기 기록의 열람 권한을 가진 첫 번째 직원이 됐고, 돌봄 배차의 가중치표에는 '조용한 이용자' 항목이 새로 생겼습니다. 다음 사건은 이제 공개된 예외가 아니라 아직 숨어 있는 예외에서 시작됩니다.",
     "human-record":
-      "당신이 선택지 밖에 써넣은 문장들이 그대로 보관소에 남았습니다. 현장 사람들은 그 기록을 읽고 자기 이름을 되찾는 작업을 이어가고, 플로우온에서 잘린 야간조 열여덟 명 중 아홉 명이 자기 사건 파일을 열람했습니다. 다음 참가자의 첫 단서는 정답이 아니라 당신의 문장입니다.",
+      "당신이 다시 짠 판들이 그대로 보관소에 남았습니다. 현장 사람들은 그 기록을 읽고 자기 이름을 되찾는 작업을 이어가고, 플로우온에서 잘린 야간조 열여덟 명 중 아홉 명이 자기 사건 파일을 열람했습니다. 다음 참가자의 첫 단서는 정답이 아니라 당신이 바꿔 놓은 판입니다.",
     "profitable-silence":
       "장부는 살아남았습니다. 플로우온은 인수되지 않았고 온새의 서비스도 끊기지 않았지만, 어느 회의실에서도 같은 질문이 다시 나오지 않습니다. 트리거랩의 다음 참가자는 당신의 로그를 '가장 효율적인 침묵'이라는 이름의 표본으로 받습니다.",
     "cold-justice":
@@ -36,7 +41,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "quiet-cover":
       "위험 곡선은 끝까지 평평했습니다. 무너진 것도 드러난 것도 없고, '인사평가_보조지표' 폴더는 다시 잠겼습니다. 다음 플레이의 첫 단서는 당신이 열지 않은 문 뒤에 그대로 있습니다.",
     collapse:
-      "마흔아홉 사건 중 열두 건이 정상화되지 못한 채 닫혔습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다. 다만 붕괴한 시스템의 잔해 속에서 다음 분석관에게만 보이는 복구 키 하나가 켜져 있습니다.",
+      `${nativeKoreanCount(NUMBERED_CASES)} 사건 가운데 여러 건이 정상화되지 못한 채 닫혔습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다. 다만 붕괴한 시스템의 잔해 속에서 다음 분석관에게만 보이는 복구 키 하나가 켜져 있습니다.`,
   };
   return (
     epilogues[endingId] ||
@@ -71,10 +76,21 @@ export function getAchievementProgress({ log = [], completedCases = [], caseResu
   ].map((item) => ({ ...item, unlocked: item.value >= item.goal }));
 }
 
+/**
+ * What the next season has to do differently, from the gate that closed this
+ * one. It promised a hidden choice for fewer investigations and a later rival
+ * for protecting a witness -- neither exists. Each line now names the collapse
+ * gate (`ENDING_GATES`) and nothing the game does not do.
+ */
 export function getFailureRecovery(ending = {}, resources = {}) {
   if (!ending.failure) return null;
-  const key = Number(resources.fatigue ?? 0) > 30 ? "fatigue" : Number(resources.trust ?? 50) < 35 ? "trust" : "timing";
-  return { key, title: "RECOVERY ROUTE AVAILABLE", text: key === "fatigue" ? "다음 실행에서 조사 횟수를 줄이면 숨겨진 선택지가 열립니다." : key === "trust" ? "다음 실행에서 증언 보호를 먼저 선택하면 라이벌 개입이 늦춰집니다." : "다음 실행에서 첫 공개를 한 박자 늦추면 다른 엔딩 조건을 확인할 수 있습니다." };
+  const harm = easyResourceLabels.humanCost;
+  const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
+  const key = ending.cause?.id ?? (Number(resources.humanCost) > 0 ? "harm" : "overreach");
+  const text = key === "overreach"
+    ? `다음 시즌에는 터진 판을 전체의 ${Math.round(collapseBustRate * 100)}% 아래로 줄이거나, 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseOverreachHarm} 아래로 닫으면 무너지지 않습니다.`
+    : `다음 시즌에는 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseHarmPerCase} 아래로 닫으면 무너지지 않습니다.`;
+  return { key, title: "RECOVERY ROUTE", text };
 }
 
 export function getOperationsSnapshot({ errors = [], pending = [], rankings = [], caseResults = {} } = {}) {

@@ -34,10 +34,10 @@ export function buildNarrativeSpine({
     ? `직전 장면에서 “${last.spokenChoice || last.choice || "판단"}”를 남겼습니다.`
     : caseObjective || "첫 번째 사건의 문이 열렸습니다.";
   const conflict = pressure
-    ? `${pressure}이(가) ${node.phase ?? "현재 국면"}에서 충돌합니다.`
+    ? `${pressure}${subjectParticle(pressure)} ${node.phase ?? "현재 국면"}에서 충돌합니다.`
     : `${node.phase ?? "현재 국면"}의 전제가 흔들립니다.`;
   // The one line of prose the table always shows, and it has to be the scene's
-  // own: this template ran for all 149 scenes, so every window asked the same
+  // own: this template ran for every scene there was (149 then), so every window asked the same
   // thing under a different title. The template is only the net now.
   const question = node.question
     || (node.title ? `${node.title}: 지금 무엇을 먼저 지킬지 결정해야 합니다.` : "지금 무엇을 먼저 지킬지 결정해야 합니다.");
@@ -381,12 +381,12 @@ export function getObserverPattern(entries = []) {
   const escalationText = repeatedTail
     ? "같은 표본이 연속으로 닫혀 관찰자가 당신의 기준을 확신하기 시작했습니다."
     : latest
-      ? `${latest.label}이 최근 기록으로 남아 다음 질문의 말투를 바꿉니다.`
+      ? `${latest.label}${subjectParticle(latest.label)} 최근 기록으로 남아 다음 질문의 말투를 바꿉니다.`
       : "아직 관찰자는 확정된 기준을 만들지 못했습니다.";
   const turningPointRecord = turningPoint
     ? {
         label: "전환점 기록",
-        title: `${turningPoint.observerTag.label}이 익숙한 패턴을 끊었습니다.`,
+        title: `${turningPoint.observerTag.label}${subjectParticle(turningPoint.observerTag.label)} 익숙한 패턴을 끊었습니다.`,
         text: `“${turningPoint.spokenChoice || turningPoint.choice}” 이후 관찰자는 같은 사람을 같은 방식으로 분류할 수 없게 됐습니다.`,
       }
     : null;
@@ -748,7 +748,7 @@ const ENDINGS = {
   "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false },
   "human-record": { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false },
   "profitable-silence": { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 신뢰가 함께 기록되었습니다.", failure: false },
-  "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "정당성은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false },
+  "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "공정함은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false },
   "field-pact": { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false },
   "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "다음 플레이에서는 숨겨진 단서를 우선 추적해야 합니다.", failure: false },
 };
@@ -787,7 +787,10 @@ export function getEndingVariant({
   const clueRate = discoveredClues.length / cases;
   const finale = getFinaleOutcome(log);
 
-  if (harm >= COLLAPSE_HARM_PER_CASE || (harm >= COLLAPSE_OVERREACH_HARM && bustRate >= COLLAPSE_BUST_RATE)) return ENDINGS.collapse;
+  // The collapse says which door it came through, so the report's advice can
+  // quote the gate that closed rather than a number of its own.
+  const overreach = harm >= COLLAPSE_OVERREACH_HARM && bustRate >= COLLAPSE_BUST_RATE;
+  if (harm >= COLLAPSE_HARM_PER_CASE || overreach) return { ...ENDINGS.collapse, cause: { id: harm >= COLLAPSE_HARM_PER_CASE ? "harm" : "overreach", harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
 
   const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= COLD_GAP;
   const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST;
@@ -815,37 +818,16 @@ export function getEndingVariant({
 }
 
 /**
- * The fallback, which a quarter of runs reach. It used to be one line for all of
- * them, which read as "none of the above" rather than as a conclusion, so it
- * names the thing the run actually ended holding.
+ * The fallback. It used to be one line for all of its runs, which read as "none
+ * of the above", so it names what the run ended holding. The numbers are the
+ * season's means, and a particle after a number is chosen for it (rule 10).
  */
 function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
   const held = Math.max(trust, legitimacy, capital);
-  if (held === trust) {
-    return {
-      id: "open-question",
-      label: "OPEN QUESTION",
-      title: "답은 못 냈지만, 당신에게 말을 거는 사람은 남았다.",
-      text: `사람 피해 ${humanCost}를 남긴 채 문을 닫았습니다. 다음 참가자는 당신을 아는 사람들에게서 시작합니다.`,
-      failure: false,
-    };
-  }
-  if (held === legitimacy) {
-    return {
-      id: "open-question",
-      label: "OPEN QUESTION",
-      title: "절차는 남았고, 그 절차가 무엇을 위한 것인지는 남지 않았다.",
-      text: `공정함 ${legitimacy}로 끝났지만 이유를 적어둔 문서는 없습니다. 다음 사람은 규칙만 물려받습니다.`,
-      failure: false,
-    };
-  }
-  return {
-    id: "open-question",
-    label: "OPEN QUESTION",
-    title: "장부는 버텼고, 질문은 그대로 넘어갔다.",
-    text: `현금 ${capital}을 지킨 대신 닫히지 않은 기록이 남았습니다. 다음 플레이에서 다른 권한으로 열립니다.`,
-    failure: false,
-  };
+  const open = (title, text) => ({ id: "open-question", label: "OPEN QUESTION", title, text, failure: false });
+  if (held === trust) return open("답은 못 냈지만, 당신에게 말을 거는 사람은 남았다.", `사건마다 사람 피해 ${humanCost}${objectParticle(String(humanCost))} 남긴 채 문을 닫았습니다. 다음 참가자는 당신을 아는 사람들에게서 시작합니다.`);
+  if (held === legitimacy) return open("절차는 남았고, 그 절차가 무엇을 위한 것인지는 남지 않았다.", `공정함은 ${legitimacy}에서 멈췄고 이유를 적어둔 문서는 없습니다. 다음 사람은 규칙만 물려받습니다.`);
+  return open("장부는 버텼고, 질문은 그대로 넘어갔다.", `현금 ${capital}${objectParticle(String(capital))} 지킨 대신 닫히지 않은 기록이 남았습니다. 다음 플레이에서 다른 권한으로 열립니다.`);
 }
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {

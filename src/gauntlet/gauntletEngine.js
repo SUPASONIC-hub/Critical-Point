@@ -297,7 +297,7 @@ export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
 const FOCUS_MODE_PROFILES = Object.freeze({
   strike: {
     label: "STRIKE",
-    text: "Bigger pot lock, harsher jams.",
+    text: "더 큰 판돈을 잠그지만, 헛치면 더 크게 막힌다.",
     gainScale: 1.15,
     missHeat: FOCUS_MISS_HEAT + 2,
     missSeconds: FOCUS_MISS_SECONDS,
@@ -307,7 +307,7 @@ const FOCUS_MODE_PROFILES = Object.freeze({
   },
   steady: {
     label: "STEADY",
-    text: "Lower reward, every lock cools the table.",
+    text: "보상은 작지만, LOCK마다 판이 식는다.",
     gainScale: 0.9,
     missHeat: Math.max(1, FOCUS_MISS_HEAT - 2),
     missSeconds: FOCUS_MISS_SECONDS * 0.8,
@@ -317,7 +317,7 @@ const FOCUS_MODE_PROFILES = Object.freeze({
   },
   expose: {
     label: "EXPOSE",
-    text: "Amplifies the card's resource effect.",
+    text: "카드의 자원 효과를 키운다.",
     gainScale: 1,
     missHeat: FOCUS_MISS_HEAT,
     missSeconds: FOCUS_MISS_SECONDS,
@@ -791,33 +791,33 @@ export const MUTATIONS = Object.freeze({
   },
   strikeWake: {
     label: "STRIKE WAKE",
-    title: "The next board wakes up richer and sharper.",
-    text: "A charged STRIKE lock raises the next hand's chips, but the push step grows with it.",
+    title: "다음 판이 더 두껍게 깨어난다",
+    text: "STRIKE로 채운 LOCK. 다음 판은 칩이 1.25배지만, 한 번 밀 때 오르는 열도 커진다.",
   },
   steadyLine: {
     label: "STEADY LINE",
-    title: "The next board opens calmer.",
-    text: "A charged STEADY lock cools the starting gauge, buys time, and pushes the wall away.",
+    title: "다음 판이 식은 채 열린다",
+    text: "STEADY로 채운 LOCK. 다음 판은 열기 8 낮게 시작하고 시간이 4초 늘며, 벽이 3 멀어진다.",
   },
   exposedHand: {
     label: "EXPOSED HAND",
-    title: "The next board cannot hide the hand.",
-    text: "A charged EXPOSE lock strips face-down and cold-feet seals from the next board.",
+    title: "다음 판은 패를 숨기지 못한다",
+    text: "EXPOSE로 채운 LOCK. 다음 판은 카드가 뒤집히지 않고, COLD FEET 봉인도 풀린다.",
   },
   strikeMastery: {
     label: "STRIKE MASTERY",
-    title: "Your season has learned to hit first.",
-    text: "Repeated charged STRIKE locks permanently thicken chips, with a small push-step tax.",
+    title: "시즌이 먼저 치는 법을 익혔다",
+    text: "STRIKE LOCK을 거듭 채운 결과. 새 판마다 칩이 두꺼워지고, 밀 때 오르는 열이 1 늘어난다.",
   },
   steadyMastery: {
     label: "STEADY MASTERY",
-    title: "Your season has learned to hold the line.",
-    text: "Repeated charged STEADY locks cool every new board and buy a little more clock.",
+    title: "시즌이 버티는 법을 익혔다",
+    text: "STEADY LOCK을 거듭 채운 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
   },
   exposeMastery: {
     label: "EXPOSE MASTERY",
-    title: "Your season has learned to read the table.",
-    text: "Repeated charged EXPOSE locks weaken seals and eventually stop hidden boards from staying hidden.",
+    title: "시즌이 판을 읽는 법을 익혔다",
+    text: "EXPOSE LOCK을 거듭 채운 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",
   },
 });
 

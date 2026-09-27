@@ -84,6 +84,42 @@ export function topicParticle(word) {
   return endsOnConsonant(word) ? "은" : "는";
 }
 
+/**
+ * 로 or 으로. The one particle with a third case: a word that ends on ㄹ takes
+ * 로 like a vowel does (서울로, 1로 -- 일), everything else that ends on a
+ * consonant takes 으로 (공정함으로, 3으로 -- 삼, 10으로 -- 십).
+ */
+const DIGIT_ENDS_ON_RIEUL = [false, true, false, false, false, false, false, true, true, false];
+
+export function directionParticle(word = "") {
+  const lastChar = String(word).trim().at(-1);
+  if (!lastChar) return "으로";
+  if (lastChar >= "0" && lastChar <= "9") {
+    const digit = Number(lastChar);
+    return !DIGIT_ENDS_ON_CONSONANT[digit] || DIGIT_ENDS_ON_RIEUL[digit] ? "로" : "으로";
+  }
+  const code = lastChar.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return "으로";
+  const jong = (code - 0xac00) % 28;
+  return jong === 0 || jong === 8 ? "로" : "으로";
+}
+
+/**
+ * A count read the native Korean way, as it sits in front of a counter:
+ * 한 건, 스무 명, 마흔아홉 사건. Past 99 it is written in digits, as a person would.
+ */
+const NATIVE_UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
+const NATIVE_TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
+
+export function nativeKoreanCount(count = 0) {
+  const value = Math.trunc(Number(count) || 0);
+  if (value <= 0 || value > 99) return String(value);
+  const tens = Math.floor(value / 10);
+  const units = value % 10;
+  if (value === 20) return "스무";
+  return `${NATIVE_TENS[tens]}${NATIVE_UNITS[units]}`;
+}
+
 export const easyResourceLabels = {
   time: "남은 시간",
   capital: "현금",

@@ -1,4 +1,9 @@
 import { caseDisplayCode } from "./gameCases.js";
+import { ENDING_GATES } from "./gameConstants.js";
+import { directionParticle, easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
+
+const HARM = easyResourceLabels.humanCost;
+const percent = (share) => Math.round(share * 100);
 
 const operatorProfiles = {
   courier: {
@@ -74,7 +79,8 @@ export function getDelayedConsequences(log = [], caseResults = {}) {
       caseId,
       source: result.outcomeChoiceId,
       visible: log.some((entry) => entry?.caseId !== caseId && entry?.continuitySource === result.outcomeChoiceId),
-      text: `CASE ${caseDisplayCode(caseId)}의 ${result.outcomeChoiceId} 선택이 다음 사건의 기준으로 남아 있습니다.`,
+      // The outcome id is a key, not copy: it used to print as `c1_after_people`.
+      text: `CASE ${caseDisplayCode(caseId)}의 마지막 선택이 다음 사건의 기준으로 남아 있습니다.`,
     }));
 }
 
@@ -89,9 +95,18 @@ export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false)
   return { ...base, newGamePlus: newGamePlus ? "과거 플레이 기록을 참조하는 숨은 선택지" : "최종 기록을 완료하면 NEW GAME+ 해금" };
 }
 
+/**
+ * What would have kept the season standing, quoted from the gate that closed
+ * it (`ENDING_GATES`). It promised "risk pressure under 60, human cost under
+ * 50, three clues" -- none of which the collapse gate has ever read.
+ */
 export function getFailureObjectives(variant = {}) {
   if (!variant.failure) return [];
-  return ["위험 압력을 60 이하로 유지", "인간 비용 50 이하로 종료", "단서 3개 이상 확보"];
+  const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
+  return [
+    `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${collapseHarmPerCase} 아래로 닫기`,
+    `터진 판을 전체의 ${percent(collapseBustRate)}% 아래로 줄이거나, ${HARM}${objectParticle(HARM)} 평균 ${collapseOverreachHarm} 아래로 닫기`,
+  ];
 }
 
 export function getTutorialSteps() {
@@ -147,9 +162,11 @@ export function getEndingVisualClass(endingId = "open-question") {
 
 export function getSeasonGoals() {
   return [
-    { id: "protect", label: "PROTECT SEASON", text: "인간 비용 45 이하로 시즌 완료" },
-    { id: "evidence", label: "EVIDENCE SEASON", text: "숨은 단서 5개 이상 확보" },
-    { id: "trust", label: "TRUST SEASON", text: "관계 퀘스트 3개 이상 완료" },
+    // Read from the ending's gates, in the labels the chips print. These were
+    // six-case numbers ("단서 5개") and a 관계 퀘스트 the game never counted.
+    { id: "protect", label: "PROTECT SEASON", text: `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${ENDING_GATES.collapseHarmPerCase} 아래로 닫고 시즌 완료` },
+    { id: "evidence", label: "EVIDENCE SEASON", text: `사건 기록의 ${percent(ENDING_GATES.clueRate)}% 이상 열기` },
+    { id: "trust", label: "TRUST SEASON", text: `${easyResourceLabels.trust}${objectParticle(easyResourceLabels.trust)} 사건마다 평균 ${ENDING_GATES.oversightTrust} 이상으로 지키기` },
   ];
 }
 
@@ -169,7 +186,7 @@ export function getPastRunMemory(memory = {}) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
   if (entries.length === 0) return null;
   const [caseId, result] = entries.at(-1);
-  return { caseId, choice: result.outcomeChoiceId, label: "PAST RUN MEMORY", text: `이전 기록에서 ${caseId}의 ${result.outcomeChoiceId} 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
+  return { caseId, choice: result.outcomeChoiceId, label: "PAST RUN MEMORY", text: `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
 }
 
 export function getOriginPrologue(origin = "courier") {
@@ -182,11 +199,23 @@ export function getOriginPrologue(origin = "courier") {
 }
 
 
+/**
+ * Why the season collapsed, from the door it came through (`variant.cause`,
+ * set by `getEndingVariant`). An ending saved before the cause was recorded
+ * falls back to the largest cost the last case closed on.
+ */
 export function getFailureCause(variant = {}, resources = {}) {
   if (!variant?.failure) return null;
+  const cause = variant.cause;
+  if (cause?.id === "overreach") {
+    return { id: "overreach", value: percent(cause.bustRate), text: `판의 ${percent(cause.bustRate)}%가 벽에 닿았고, 그동안 사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${cause.harmPerCase}씩 남았습니다.`, recovery: "심박이 빨라지면 확정하십시오. 터진 판의 비용은 사람에게 넘어갑니다." };
+  }
+  if (cause?.id === "harm") {
+    return { id: "human-cost", value: cause.harmPerCase, text: `사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${cause.harmPerCase}${directionParticle(String(cause.harmPerCase))} 닫혔습니다.`, recovery: `${HARM}${objectParticle(HARM)} 줄이는 카드를 먼저 고르십시오.` };
+  }
   const candidates = [
-    ["human-cost", resources.humanCost ?? 0, "사람의 비용이 누적되었습니다."],
-    ["fatigue", resources.fatigue ?? 0, "판단 피로가 선택의 폭을 좁혔습니다."],
+    ["human-cost", resources.humanCost ?? 0, `${HARM}${subjectParticle(HARM)} 누적되었습니다.`],
+    ["fatigue", resources.fatigue ?? 0, `${easyResourceLabels.fatigue}${subjectParticle(easyResourceLabels.fatigue)} 선택의 폭을 좁혔습니다.`],
     ["risk", resources.time ?? 0, "시간 압박이 위험한 지름길을 만들었습니다."],
   ];
   const [id, value, text] = candidates.sort((a, b) => b[1] - a[1])[0];
@@ -237,7 +266,7 @@ export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {})
     text: level === "OVERSIGHT"
       ? "당신은 기록을 읽는 사람에서 종료 조건을 제안하는 사람으로 이동했습니다. 이제 권한의 결과도 책임져야 합니다."
       : `현재 권한은 ${level}입니다. ${result.challengeClearCount ?? 0}개의 검증 신호와 관계 기록이 다음 심사의 근거가 됩니다.`,
-    next: level === "OBSERVER" ? "증거와 관계자 신뢰를 확보하십시오." : level === "FIELD ACCESS" ? "정당성과 보호 비용을 함께 관리하십시오." : "공개 이후의 피해 복구까지 설계하십시오.",
+    next: level === "OBSERVER" ? "증거와 관계자의 믿음을 확보하십시오." : level === "FIELD ACCESS" ? "공정함과 사람 피해를 함께 관리하십시오." : "공개 이후의 피해 복구까지 설계하십시오.",
   };
 }
 
@@ -258,9 +287,19 @@ export function getAftermath(endingId = "open-question", origin = "courier") {
   return { title: "AFTERMATH / NEXT SHIFT", text: `${origin} 출신 분석관의 선택 이후, ${endingId} 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
 }
 
+/**
+ * Whether a ranking row is well formed: a run id, a completion time, a rank.
+ * It used to call any row with a run id "RUN VERIFIED", but nothing on the
+ * server checks a run -- the id is written by the same client that writes the
+ * score. The label says what is true: the row is tied to one run.
+ */
 export function getRankingIntegrity(entry = {}) {
   const summary = entry.summary ?? {};
-  return { valid: Boolean(entry.runId && entry.completedAt && summary.rank), label: entry.runId ? "RUN VERIFIED" : "RUN ID MISSING", text: entry.runId ? "독립 런으로 집계된 기록입니다." : "런 식별자가 없어 임시 로컬 기록으로 처리됩니다." };
+  return {
+    valid: Boolean(entry.runId && entry.completedAt && summary.rank),
+    label: entry.runId ? "RUN LINKED" : "RUN ID MISSING",
+    text: entry.runId ? "한 번의 플레이 기록으로 묶여 집계됩니다. 서버가 검증한 기록은 아닙니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
+  };
 }
 
 export function getReplayDiagnostics({ runId = "", caseId = "", nodeId = "", choiceId = "", pending = 0 } = {}) {
