@@ -106,7 +106,7 @@ export function BoardScreen({
               <div className="board-privacy-notice">
                 <p>
                   <ShieldAlert size={15} />
-                  {activeBoardPrivacySignals.map((signal) => signal.label).join(", ")}로 보이는 표현이 있습니다.
+                  개인 정보로 보이는 표현이 있습니다: {activeBoardPrivacySignals.map((signal) => signal.label).join(", ")}.
                   익명화한 뒤에 올릴 수 있습니다.
                 </p>
                 <button type="button" className="ghost" onClick={() => anonymizeBoardBody()}>

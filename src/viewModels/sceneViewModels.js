@@ -1,6 +1,7 @@
 import { characterProfiles } from "../gameDialogue.js";
 import { getAuthorityProfile } from "../advancedSystems.js";
 import { AUTHORITY_THRESHOLDS, getAuthorityLevel } from "../gameLogic.js";
+import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
 
 /**
  * Derived scene state. Each of these reads a handful of run values and returns
@@ -31,9 +32,9 @@ export function createAuthorityState({ evidence, legitimacy, operatorOrigin, tru
     permissions: authorityProfile.permissions,
     origin: authorityProfile,
     locked: level === "OBSERVER"
-      ? `단서 ${fieldClues}개 또는 신뢰 ${fieldTrust}가 필요합니다.`
+      ? `단서 ${fieldClues}개, 또는 ${easyResourceLabels.trust} ${fieldTrust}${subjectParticle(String(fieldTrust))} 필요합니다.`
       : level === "FIELD ACCESS"
-        ? `정당성 ${oversightLegitimacy}와 단서 ${oversightClues}개를 모으면 감독 권한이 열립니다.`
+        ? `${easyResourceLabels.legitimacy} ${oversightLegitimacy}, 단서 ${oversightClues}개를 모으면 감독 권한이 열립니다.`
         : "감독 권한이 열려 최종 종료 조건을 제안할 수 있습니다.",
   };
 }
@@ -73,17 +74,17 @@ export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {
                 : "find-cost",
         title:
           openingLegacy.label === "CLEAR SIGNAL"
-            ? "신뢰를 다음 장면에 넘기기"
+            ? "믿음을 다음 장면에 넘기기"
             : openingLegacy.label === "OPEN WOUND"
-              ? "정당성 균열 봉합하기"
+              ? "공정함의 균열 봉합하기"
               : openingLegacy.label === "UNFINISHED COST"
                 ? "남은 비용 줄이기"
                 : "이전 판단의 비용 확인하기",
         text:
           openingLegacy.label === "CLEAR SIGNAL"
-            ? "이전 케이스에서 얻은 신뢰를 잃지 않는 선택이 다음 압박의 문을 엽니다."
+            ? "이전 케이스에서 얻은 믿음을 잃지 않는 선택이 다음 압박의 문을 엽니다."
             : openingLegacy.label === "OPEN WOUND"
-              ? "정당성을 회복하는 선택으로 지난 사건의 균열을 먼저 봉합해야 합니다."
+              ? "공정함을 회복하는 선택으로 지난 사건의 균열을 먼저 봉합해야 합니다."
               : openingLegacy.label === "UNFINISHED COST"
                 ? "지난 사건에서 넘어온 비용을 줄이면 이번 장면의 회복 보너스가 붙습니다."
                 : "이전 판단이 남긴 숨은 비용을 찾아야 다음 사건의 기준을 다시 세울 수 있습니다.",

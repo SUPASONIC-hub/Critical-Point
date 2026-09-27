@@ -17,10 +17,13 @@ const VIEW_FACTORIES = {
   createResultView: "result",
   createPlayView: "play",
 };
+// A screen may hand its view to a part of itself; the report's third act,
+// `ReportArchive`, reads the result view directly, so its reads are checked
+// with the screen's.
 const SCREEN_FILES = {
-  intro: "src/screens/IntroScreen.jsx",
-  result: "src/screens/ResultScreen.jsx",
-  play: "src/screens/PlayScreen.jsx",
+  intro: ["src/screens/IntroScreen.jsx"],
+  result: ["src/screens/ResultScreen.jsx", "src/screens/ReportArchive.jsx"],
+  play: ["src/screens/PlayScreen.jsx"],
 };
 
 function parseFile(file) {
@@ -188,23 +191,25 @@ for (const [screen, groups] of Object.entries(viewGroups)) {
   const unwired = schemaFields.filter((field) => !providedSet.has(field));
   if (unwired.length > 0) problems.push(`${screen}: grouped but never provided -- ${unwired.join(", ")}`);
 
-  const reads = readScreenReads(SCREEN_FILES[screen], groupNames);
-  for (const field of reads.flat) {
-    if (!grouped.has(field) && !groupNames.includes(field)) {
-      problems.push(`${SCREEN_FILES[screen]}: reads view.${field}, which no group provides`);
+  for (const screenFile of SCREEN_FILES[screen]) {
+    const reads = readScreenReads(screenFile, groupNames);
+    for (const field of reads.flat) {
+      if (!grouped.has(field) && !groupNames.includes(field)) {
+        problems.push(`${screenFile}: reads view.${field}, which no group provides`);
+      }
     }
-  }
-  for (const [group, fields] of reads.grouped) {
-    if (!groups[group]) {
-      problems.push(`${SCREEN_FILES[screen]}: reads group "${group}", which the ${screen} view does not define`);
-      continue;
-    }
-    for (const field of fields) {
-      if (!groups[group].includes(field)) {
-        const actual = groupNames.find((name) => groups[name].includes(field));
-        problems.push(
-          `${SCREEN_FILES[screen]}: reads ${group}.${field}, but ${field} ${actual ? `lives in "${actual}"` : "is not in the view"}`,
-        );
+    for (const [group, fields] of reads.grouped) {
+      if (!groups[group]) {
+        problems.push(`${screenFile}: reads group "${group}", which the ${screen} view does not define`);
+        continue;
+      }
+      for (const field of fields) {
+        if (!groups[group].includes(field)) {
+          const actual = groupNames.find((name) => groups[name].includes(field));
+          problems.push(
+            `${screenFile}: reads ${group}.${field}, but ${field} ${actual ? `lives in "${actual}"` : "is not in the view"}`,
+          );
+        }
       }
     }
   }
