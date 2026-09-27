@@ -13,6 +13,19 @@ import {
   triggerLabels,
 } from "../src/gameData.js";
 import { applyEffect, getAuthorityLevel } from "../src/gameLogic.js";
+import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
+import { case01Nodes } from "../src/nodes/case01.js";
+import { case02Nodes } from "../src/nodes/case02.js";
+import { case03Nodes } from "../src/nodes/case03.js";
+import { case04Nodes } from "../src/nodes/case04.js";
+import { case05Nodes } from "../src/nodes/case05.js";
+import { case06Nodes } from "../src/nodes/case06.js";
+import { case07Nodes } from "../src/nodes/case07.js";
+import { case08Nodes } from "../src/nodes/case08.js";
+import { case09Nodes } from "../src/nodes/case09.js";
+import { case10Nodes } from "../src/nodes/case10.js";
+import { case11Nodes } from "../src/nodes/case11.js";
+import { finalCaseNodes } from "../src/nodes/finalCase.js";
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const orderedNodeIds = new Set(Object.values(nodeOrders).flat());
@@ -194,6 +207,40 @@ for (const caseId of CASE_SEQUENCE) {
           `${caseId}/${nodeId}/${choice.id} asks for ${choice.requiredAuthority}, ` +
             `but the best run reaches it with ${clues} clues, trust ${standing.trust}, legitimacy ${standing.legitimacy}`,
         );
+      }
+    }
+  }
+}
+
+/**
+ * A case file says where each choice goes, and the file has to be right.
+ *
+ * `gameData.js` rewires the graph at load -- a connective, reaction, branch or
+ * route scene takes over the choices that led past it -- and until 2026-09-27
+ * it did so by overwriting the `next` each file had written: 880 of the 1,488
+ * `next:` values in `src/nodes/` pointed somewhere no run ever went. Those are
+ * gone, and a choice whose route a generator decides carries no `next` at all.
+ * A `next` that is written must be the one the built graph uses. Scenes a route
+ * plan retires are skipped: they never enter the graph.
+ */
+const authoredSources = [
+  ...[case01Nodes, case02Nodes, case03Nodes, case04Nodes, case05Nodes, case06Nodes, case07Nodes, case08Nodes, case09Nodes, case10Nodes, case11Nodes, finalCaseNodes]
+    .map((table) => ({ owner: "authored", table })),
+  ...AUTHORED_CASE_PACKS.flatMap((pack) => [
+    { owner: pack.id, table: pack.nodes },
+    { owner: pack.id, table: pack.aftermath },
+    { owner: pack.id, table: pack.branchScenes },
+  ]),
+];
+for (const { owner, table } of authoredSources) {
+  for (const [nodeId, node] of Object.entries(table ?? {})) {
+    const built = nodes[nodeId];
+    if (!built) continue;
+    for (const choice of node.choices ?? []) {
+      if (!("next" in choice)) continue;
+      const builtChoice = built.choices.find((candidate) => candidate.id === choice.id);
+      if (builtChoice && builtChoice.next !== choice.next) {
+        failures.push(`${owner}/${nodeId}/${choice.id} is written to go to ${choice.next}, but the built graph sends it to ${builtChoice.next}; drop the dead next`);
       }
     }
   }

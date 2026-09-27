@@ -15,8 +15,18 @@ import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
-import { CASE_PACKS } from "./nodes/casePacks.js";
+import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./gameCases.js";
+
+/**
+ * Everything below rewires the graph in place: aftermath, connective, reaction,
+ * branch and route scenes overwrite `choice.next`, splice choices in and retire
+ * nodes. It used to do that to the objects the case files export, so importing
+ * `src/nodes/case20.js` after this module handed back a scene whose `next` was
+ * not the one written in the file. It works on copies now; the authored modules
+ * stay exactly as they read.
+ */
+const CASE_PACKS = structuredClone(AUTHORED_CASE_PACKS);
 
 export { CASE_PACKS };
 
@@ -36,7 +46,7 @@ export const echoReplies = { ...authoredEchoReplies };
  * grows the graph at load time -- aftermath, connective, reaction and branch
  * scenes are written into `nodes` -- so the composed object stays mutable.
  */
-export const nodes = {
+export const nodes = structuredClone({
   ...case01Nodes,
   ...case02Nodes,
   ...case03Nodes,
@@ -50,7 +60,7 @@ export const nodes = {
   ...case11Nodes,
   ...Object.assign({}, ...CASE_PACKS.map((pack) => pack.nodes)),
   ...finalCaseNodes,
-};
+});
 
 const aftermathNodes = {
   c1_aftershock: {
