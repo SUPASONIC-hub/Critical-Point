@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
@@ -18,6 +18,47 @@ const tickerRun = (
     <small className="intro-protocol-line">{PROTOCOL_LINE}</small>
   </>
 );
+
+/**
+ * The runtime chunk, loaded once. The pre-start shell renders this screen from
+ * the entry chunk and the runtime behind it is the largest download in the
+ * app, so it starts loading while the player reads (AppContent, on idle) or
+ * reaches for the button, rather than after the click.
+ */
+let gameRuntimeModule = null;
+
+export function loadGameRuntime() {
+  gameRuntimeModule ??= import("../GameRuntime.jsx").catch((error) => {
+    gameRuntimeModule = null;
+    throw error;
+  });
+  return gameRuntimeModule;
+}
+
+export function prefetchGameRuntime() {
+  loadGameRuntime().catch(() => {});
+}
+
+/**
+ * A case card or NEW GAME+ pressed on the pre-start shell. Opening a case needs
+ * the scene graph and NEW GAME+ has to record its memory first, and only the
+ * runtime can do either, so the shell hands the press over: it mounts the
+ * runtime, whose own copy of this screen performs it once, through the same
+ * `startCase` / `startNewGamePlus` a press inside the runtime calls. The shell
+ * used to answer both with a fresh season, which wiped the completed cases.
+ */
+const START_ACTION_TTL_MS = 60_000;
+let pendingStartAction = null;
+
+export function queueRuntimeStartAction(action) {
+  pendingStartAction = { ...action, queuedAt: Date.now() };
+}
+
+function takeRuntimeStartAction() {
+  const action = pendingStartAction;
+  pendingStartAction = null;
+  return action && Date.now() - action.queuedAt < START_ACTION_TTL_MS ? action : null;
+}
 
 export function IntroScreen({ view, renderers = {} }) {
   const [openingBurst, setOpeningBurst] = useState(false);
@@ -63,6 +104,12 @@ export function IntroScreen({ view, renderers = {} }) {
   const onShowBoard = view.common.setShowBoard;
   const gameTitle = GAME_TITLE;
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
+  // Before paint, so the handed-over press never flashes this screen first.
+  useLayoutEffect(() => {
+    const action = takeRuntimeStartAction();
+    if (action?.type === "case") startCase(action.caseId);
+    else if (action?.type === "new-game-plus") startNewGamePlus();
+  }, [startCase, startNewGamePlus]);
 
   function beginOpeningBurst(callback) {
     if (openingBurstRef.current) return;
@@ -86,7 +133,14 @@ export function IntroScreen({ view, renderers = {} }) {
   // deliberate act. Rendering it in both places at once would make every
   // strict-mode locator in the suite ambiguous.
   const startFirstCaseButton = (
-    <button type="button" data-testid="start-first-case" onClick={startNewRun} disabled={openingBurst}>
+    <button
+      type="button"
+      data-testid="start-first-case"
+      onClick={startNewRun}
+      onPointerEnter={prefetchGameRuntime}
+      onFocus={prefetchGameRuntime}
+      disabled={openingBurst}
+    >
       <ChevronRight size={18} />
       첫 케이스 시작
     </button>
@@ -107,7 +161,13 @@ export function IntroScreen({ view, renderers = {} }) {
           {progress === null ? "" : ` · 진행률 ${progress}%`}
         </small>
       </div>
-      <button type="button" data-testid="resume-save" onClick={resumeSavedGame}>
+      <button
+        type="button"
+        data-testid="resume-save"
+        onClick={resumeSavedGame}
+        onPointerEnter={prefetchGameRuntime}
+        onFocus={prefetchGameRuntime}
+      >
         <ChevronRight size={18} />
         이어하기
       </button>
@@ -247,7 +307,14 @@ export function IntroScreen({ view, renderers = {} }) {
                 value={playerName}
                 maxLength={PLAYER_NAME_MAX_LENGTH}
                 onChange={(event) => setPlayerName(limitText(event.target.value, PLAYER_NAME_MAX_LENGTH))}
-                onKeyDown={(event) => event.key === "Enter" && startNewRun()}
+                onKeyDown={(event) => {
+                  // Enter also confirms a Hangul syllable in the IME; that press
+                  // is the name being typed, not a request to start. And with a
+                  // save on the device Enter starts nothing: overwriting a run
+                  // takes the button, not a key pressed while typing a name.
+                  if (event.key !== "Enter" || event.nativeEvent.isComposing || event.keyCode === 229) return;
+                  if (!hasResumableSave) startNewRun();
+                }}
                 placeholder="이름을 입력하세요"
               />
               {hasResumableSave && startFirstCaseButton}
@@ -516,7 +583,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>플레이테스트 데이터 제공 동의</b>
                 <small>
                   {telemetryEnabled
-                    ? "케이스 결과, 선택 로그, 응답 시간, 자유입력 내용이 연구용으로 저장됩니다. 이름은 원격 저장하지 않습니다."
+                    ? "케이스 결과, 선택 로그, 응답 시간, 보낸 피드백이 연구용으로 저장됩니다. 이름은 원격 저장하지 않습니다."
                     : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
@@ -537,9 +604,10 @@ export function IntroScreen({ view, renderers = {} }) {
             <div className="privacy-note">
               <b>데이터 안내</b>
               <p>
-                이름은 원격 저장하지 않습니다. 자유입력과 피드백에는 실명, 연락처,
-                회사명처럼 개인이나 조직을 식별할 수 있는 정보는 쓰지 마세요. 삭제 요청은
-                결과 화면의 8자리 세션 코드로 처리합니다.
+                이름은 원격 저장하지 않습니다. 피드백에는 실명, 연락처, 회사명처럼 개인이나
+                조직을 식별할 수 있는 정보는 쓰지 마세요. 다른 기기에서 이어하기를 위한 온라인
+                저장은 이 동의와 별개로, 직접 켤 때만 진행 기록을 올리며 이름과 피드백 내용은
+                올리지 않습니다. 삭제 요청은 결과 화면의 8자리 세션 코드로 처리합니다.
               </p>
             </div>
           </section>
@@ -557,7 +625,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <b>{caseItem.label}</b>
                     <span>{triggerLabels[caseItem.result.primary[0]]}</span>
                     <small>
-                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}s · 자유입력{" "}
+                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}s · 판 다시 짜기{" "}
                       {caseItem.result.reframeCount}
                     </small>
                   </article>
@@ -640,7 +708,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   )}
                   {savedResult && (
                     <small className="case-result-mini">
-                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 자유입력{" "}
+                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 판 다시 짜기{" "}
                       {savedResult.reframeCount}
                     </small>
                   )}
