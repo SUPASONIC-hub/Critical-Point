@@ -7,13 +7,26 @@ name: Deploy
 #
 # It hangs off Verify rather than off the push, so what reaches the site is a
 # commit whose full suite went green -- including the end-to-end tier, which the
-# Render build command does not run (it stops at `verify:static`). A push that
-# fails CI now cannot become a deployment.
+# Render build command does not run. A push that fails CI cannot become a
+# deployment.
+#
+# The smoke check of the live site is the second job here, not a workflow of
+# its own. It used to be a separate workflow on the same `workflow_run` trigger,
+# so it started the moment Verify finished -- racing the deploy it was meant to
+# check and, nearly always, passing against the previous release.
 on:
   workflow_run:
     workflows: [Verify]
     types: [completed]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time, and never cancelled halfway: a newer run waits.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -24,11 +37,28 @@ jobs:
        github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      triggered: ${{ steps.trigger.outputs.triggered }}
+      before: ${{ steps.before.outputs.signature }}
     env:
       RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
     steps:
+      # What the site serves before the deploy, so the smoke job can tell the
+      # new release from the old one. See the smoke job for what is compared.
+      - name: Record what is live now
+        id: before
+        if: env.DEPLOY_URL != ''
+        shell: bash
+        run: |
+          set -uo pipefail
+          html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
+          signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
+          echo "signature=$signature" >> "$GITHUB_OUTPUT"
       - name: Trigger Render deploy
+        id: trigger
         if: env.RENDER_DEPLOY_HOOK != ''
+        shell: bash
         run: |
           set -euo pipefail
           # The hook URL carries its own key, so it is the secret in full and
@@ -36,9 +66,82 @@ jobs:
           status=$(curl -fsS -w '%{http_code}' -o /tmp/deploy-response -X POST "$RENDER_DEPLOY_HOOK")
           echo "Render accepted the deploy request (HTTP $status)."
           echo "Commit: ${{ github.event.workflow_run.head_sha || github.sha }}"
+          echo "triggered=true" >> "$GITHUB_OUTPUT"
       # Same reason the smoke check announces its own skip: a job named "Deploy"
       # reporting green without deploying anything is worse than no job at all.
       - name: Explain skipped deploy
         if: env.RENDER_DEPLOY_HOOK == ''
         run: |
           echo "::warning title=Nothing was deployed::RENDER_DEPLOY_HOOK is not configured, so no deploy was triggered and the site still serves whatever was last pushed by hand. Add the repository secret to turn automatic deploys on: Render dashboard -> the service -> Settings -> Deploy Hook -> copy the URL."
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    # Render's static builds take a few minutes; the wait below gives up at 20.
+    timeout-minutes: 30
+    env:
+      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      BEFORE: ${{ needs.deploy.outputs.before }}
+      TRIGGERED: ${{ needs.deploy.outputs.triggered }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          # The wait compares commits: the live build may be a later push.
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci --ignore-scripts
+        if: env.DEPLOY_URL != ''
+      # The strict signal is a `<meta name="build-sha">` in index.html naming
+      # the commit the build came from: the job then waits until the site serves
+      # this commit or a later one. Until the build writes that tag, the
+      # fallback is that index.html -- or its ETag / Last-Modified -- differs
+      # from what was live before the deploy was pressed.
+      - name: Wait for the new release to go live
+        if: env.DEPLOY_URL != '' && env.TRIGGERED == 'true'
+        shell: bash
+        run: |
+          set -uo pipefail
+          deadline=$(( $(date +%s) + 1200 ))
+          while :; do
+            html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
+            live=$(printf '%s' "$html" | grep -oE '<meta name="build-sha" content="[0-9a-f]{7,40}"' | grep -oE '[0-9a-f]{7,40}' | head -1 || true)
+            if [ -n "$live" ]; then
+              if [ "$live" = "$EXPECTED_SHA" ] || git merge-base --is-ancestor "$EXPECTED_SHA" "$live" 2>/dev/null; then
+                echo "The site serves $live, which contains $EXPECTED_SHA."
+                break
+              fi
+              echo "Still serving $live."
+            elif [ -n "$html" ]; then
+              signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
+              if [ "$signature" != "$BEFORE" ]; then
+                echo "index.html changed since the deploy was pressed; checking the new release."
+                break
+              fi
+              echo "Still serving the release from before the deploy."
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "::error title=Deploy never went live::After 20 minutes $DEPLOY_URL still serves the release from before the deploy of $EXPECTED_SHA. Check the Render dashboard's deploy log."
+              exit 1
+            fi
+            sleep 20
+          done
+      - name: Check deployed app
+        if: env.DEPLOY_URL != ''
+        run: npm run check:deploy
+      - name: Explain unobserved deploy
+        if: env.DEPLOY_URL != '' && env.TRIGGERED != 'true'
+        run: |
+          echo "::warning title=Checked the site as it was::No deploy was triggered by this run, so the check above ran against whatever release the site already served."
+      # A skipped check reports the same green tick as a passed one, so with the
+      # secret unset this job would read as evidence that a deployment had been
+      # verified when nothing had been fetched at all. An annotation is the only
+      # part of a run that survives into the checks list.
+      - name: Explain skipped check
+        if: env.DEPLOY_URL == ''
+        run: |
+          echo "::warning title=No deployment was checked::DEPLOY_URL is not configured, so this job fetched nothing. It is green because it did no work, not because a deployed app passed. Set the DEPLOY_URL repository secret to turn the check on."

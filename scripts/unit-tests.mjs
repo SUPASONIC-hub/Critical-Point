@@ -156,12 +156,58 @@ test("the play screen is the gauntlet table and nothing in front of it", () => {
 
 const gauntletStageSource = readFileSync("src/gauntlet/GauntletStage.jsx", "utf8");
 const tableReadoutSource = readFileSync("src/gauntlet/tableReadout.js", "utf8");
-test("the table never prints the odds of the next push", () => {
+test("the table never prints the odds of the next push", async () => {
   // A bust probability on screen turns the bet into a lookup: press until the
   // number is not zero. The band and the heartbeat are the only instruments.
   assert.doesNotMatch(gauntletStageSource, /bustChance|probability|wall-cross|%\s*</i);
   assert.doesNotMatch(tableReadoutSource, /bustChance|probability|wall-cross/i, "the table's readout derives no odds either");
-  assert.match(gauntletStageSource, /win\.status === "bust" && win\.cause !== "abandon" && \(\s*<span className="gx-gauge-wall"/, "the wall is drawn only once it has been hit, never for an abandoned window");
+  // Read on the syntax tree, not as text: the wall element has to render only
+  // under a guard that requires a bust and rules out an abandoned window --
+  // however the guard is ordered, wrapped or formatted.
+  const { parse } = await import("espree");
+  const ast = parse(gauntletStageSource, { ecmaVersion: "latest", sourceType: "module", ecmaFeatures: { jsx: true } });
+  const guards = [];
+  (function visit(node, ancestors) {
+    if (!node || typeof node.type !== "string") return;
+    const isWall =
+      node.type === "JSXElement" &&
+      node.openingElement.attributes.some(
+        (attribute) => attribute.name?.name === "className" && /(?:^|\s)gx-gauge-wall(?:\s|$)/.test(attribute.value?.value ?? ""),
+      );
+    if (isWall) {
+      const conditions = ancestors
+        .filter((ancestor) => ancestor.type === "LogicalExpression" && ancestor.operator === "&&")
+        .map((ancestor) => ancestor.left);
+      guards.push(conditions);
+    }
+    for (const [key, value] of Object.entries(node)) {
+      if (key === "loc" || key === "range") continue;
+      if (Array.isArray(value)) value.forEach((child) => visit(child, [...ancestors, node]));
+      else if (value && typeof value === "object") visit(value, [...ancestors, node]);
+    }
+  })(ast, []);
+  const compares = (condition, property, operator, literal) => {
+    const flat = [];
+    (function collect(node) {
+      if (node?.type === "LogicalExpression" && node.operator === "&&") {
+        collect(node.left);
+        collect(node.right);
+      } else if (node) flat.push(node);
+    })(condition);
+    return flat.some(
+      (node) =>
+        node.type === "BinaryExpression" &&
+        node.operator === operator &&
+        [node.left, node.right].some((side) => side.type === "MemberExpression" && side.property.name === property) &&
+        [node.left, node.right].some((side) => side.type === "Literal" && side.value === literal),
+    );
+  };
+  assert.equal(guards.length, 1, "the gauge draws exactly one wall element");
+  assert.ok(
+    guards[0].some((condition) => compares(condition, "status", "===", "bust")) &&
+      guards[0].some((condition) => compares(condition, "cause", "!==", "abandon")),
+    "the wall is drawn only once it has been hit, never for an abandoned window",
+  );
 });
 
 const migrated = migrateSavedState({ saveSchemaVersion: 1, currentCase: "case01", nodeId: "start", completedCases: [], log: [] });

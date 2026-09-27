@@ -12,17 +12,22 @@ export default defineConfig({
    * runs one worker there.
    */
   workers: process.env.CI ? undefined : 3,
+  // A `test.only` left in a spec would quietly turn the CI run into one test.
+  forbidOnly: !!process.env.CI,
+  // On CI: an HTML report for the uploaded artifact, annotations on the PR, and
+  // the plain list in the log. Locally the list alone.
+  reporter: process.env.CI ? [["html", { open: "never" }], ["github"], ["list"]] : "list",
   timeout: 60_000,
   expect: {
     timeout: 8_000,
   },
   /**
    * The platform token is the reason a baseline recorded on Windows cannot be
-   * compared against a run on Linux: font rasterisation genuinely differs, so
-   * one shared baseline would either fail constantly or need a budget wide
-   * enough to hide a moved block. Keeping the token is correct; what it costs
-   * is that every platform CI runs on needs its own committed baseline, which
-   * `npm run check:visual-baselines` is the ratchet for.
+   * compared against a run on Linux: font rasterisation genuinely differs. Only
+   * the `linux` set is committed, recorded in the pinned Playwright container
+   * (the Visual Regression workflow, or `npm run test:visual:docker` locally);
+   * a `-win32` file from a desktop run is gitignored and refused by
+   * `npm run check:visual-baselines`.
    *
    * Spelled out rather than left to the default so that it is greppable from
    * the file names, which is how the missing Linux set went unnoticed.

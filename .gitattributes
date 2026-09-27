@@ -1,0 +1,13 @@
+# Every text file in the repository is stored with LF, and is checked out with
+# LF on every platform too. Without this, a Windows clone under
+# `core.autocrlf=true` wrote CRLF into the working tree, and the checks that
+# measure files in bytes (`check:css-structure`'s per-sheet budgets) measured a
+# different file there than on the Linux CI runner.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+*.mp3 binary
+*.ogg binary

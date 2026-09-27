@@ -1,9 +1,12 @@
-import { STORAGE_KEY } from "../../src/appConfig.js";
+import { RECOVERY_CENTER_STORAGE_KEY, STORAGE_KEY } from "../../src/appConfig.js";
 
+// Every value here has to be a key the app itself reads or writes;
+// `npm run check:test-storage` fails on one it does not (recoveryCenter named a
+// key nothing used until that check could see it).
 export const TEST_STORAGE_KEYS = Object.freeze({
   save: STORAGE_KEY,
   errorLog: "trigger-prototype-error-log-v1",
-  recoveryCenter: "critical-point-recovery-center-v1",
+  recoveryCenter: RECOVERY_CENTER_STORAGE_KEY,
   saveSlots: "trigger-prototype-save-slots-v1",
   localRanking: "critical-point-local-ranking-v7",
   relicCodex: "critical-point-relic-codex-v1",

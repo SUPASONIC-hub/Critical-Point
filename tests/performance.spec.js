@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("intro should become usable within the navigation budget", async ({ page }) => {
+test("intro should become usable within the navigation budget", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => performance.mark("navigation-start"));
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".intro-shell")).toBeVisible();

@@ -61,7 +61,7 @@ test("all scene-choice pairs advance without runtime errors @full", async ({ pag
           await startDebugNode(page, caseId, nodeId);
           await chooseSceneChoice(page, scene, choiceIndex);
           await page.waitForSelector(".game-shell, .result-page, .ending-reveal", { timeout: 8000 });
-          if (await page.locator(".error-screen").isVisible().catch(() => false)) {
+          if (await page.locator(".error-screen").isVisible()) {
             failures.push(`${caseId}/${nodeId}/${choice.id}: error screen visible`);
           }
           if (errors.length) failures.push(`${caseId}/${nodeId}/${choice.id}: ${errors.slice(0, 2).join(" | ")}`);
@@ -110,7 +110,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
         const expectedStart = caseOpeningRoutes[nextCaseId]?.[saved.caseResults[caseId].outcomeChoiceId];
         const nextCaseButton = page.locator(".next-case-panel button");
         await expect(nextCaseButton).toBeVisible({ timeout: 8000 });
-        await nextCaseButton.evaluate((button) => button.click());
+        await nextCaseButton.click();
         await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
         const afterTransition = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
         if (expectedStart) expect(afterTransition.nodeId).toBe(expectedStart);
@@ -152,8 +152,8 @@ test("saved state survives reload stress during complete season @full", async ({
     // The reframe card is the one card every scene has, so staking it is the
     // third reload this walk takes: a table with a card on it has to survive one.
     const reframeCard = page.locator(".gx-card-wild");
-    if (index === 2 && await reframeCard.isVisible().catch(() => false)) {
-      await reframeCard.evaluate((button) => button.click());
+    if (index === 2 && await reframeCard.isVisible()) {
+      await reframeCard.click();
       const staked = await page.evaluate(() => {
         const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
         return {
@@ -167,7 +167,7 @@ test("saved state survives reload stress during complete season @full", async ({
     }
     await completeCase(page, random);
     if (index < CASE_SEQUENCE.length - 1) {
-      await page.locator(".next-case-panel button").evaluate((button) => button.click());
+      await page.locator(".next-case-panel button").click();
       await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
     }
   }

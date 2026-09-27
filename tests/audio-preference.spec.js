@@ -75,7 +75,7 @@ function readProbe(page) {
   return page.evaluate(() => ({ ...window.__audioProbe, gainTargets: [...window.__audioProbe.gainTargets] }));
 }
 
-test("muted player hears nothing when the first case starts", async ({ page }) => {
+test("muted player hears nothing when the first case starts", { tag: "@prod" }, async ({ page }) => {
   await installAudioProbe(page);
   await seedMusicPreference(page, "false", "normal");
   await page.goto("/");
@@ -91,7 +91,7 @@ test("muted player hears nothing when the first case starts", async ({ page }) =
   expect(probe.oscillators).toBe(0);
 });
 
-test("music player hears the accent at the chosen volume preset", async ({ page }) => {
+test("music player hears the accent at the chosen volume preset", { tag: "@prod" }, async ({ page }) => {
   await installAudioProbe(page);
   await seedMusicPreference(page, "true", "low");
   await page.goto("/");
@@ -131,7 +131,7 @@ test("music player hears the accent at the chosen volume preset", async ({ page 
   expect(revealTarget).toBeCloseTo(expectedRevealPeak, 5);
 });
 
-test("muted player hears nothing when a decision is made", async ({ page }) => {
+test("muted player hears nothing when a decision is made", { tag: "@prod" }, async ({ page }) => {
   await installAudioProbe(page);
   await seedMusicPreference(page, "false", "normal");
   await page.goto("/");

@@ -134,7 +134,7 @@ test("start fresh from recovery clears the saved run and returns to intro", asyn
   }));
   await page.goto("/?debug=1");
   await expect(page.locator(".recovery-notice")).toBeVisible();
-  await page.getByTestId("start-fresh-after-recovery").evaluate((button) => button.click());
+  await page.getByTestId("start-fresh-after-recovery").click();
   await expect
     .poll(async () => page.evaluate(() => localStorage.getItem("trigger-prototype-v2")).catch(() => "navigating"))
     .toBeNull();
@@ -167,10 +167,10 @@ test("a clean scene transition does not manufacture an error log entry", async (
   await page.evaluate((key) => localStorage.removeItem(key), ERROR_LOG_KEY);
 
   await dismissProtocolBreach(page);
-  await page.locator(".choices .choice").first().evaluate((button) => button.click());
-  await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-confirm").click();
   await page.waitForSelector("[data-testid='decision-next']");
-  await page.getByTestId("decision-next").evaluate((button) => button.click());
+  await page.getByTestId("decision-next").click();
   await page.waitForSelector(".game-shell");
 
   expect(await readErrorSources(page)).toEqual([]);
