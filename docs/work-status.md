@@ -270,10 +270,10 @@ npm run verify
 npm run test:visual
 ```
 
-`npm run verify:static` is twenty-one checks: lint, CSS format, unit and smoke
+`npm run verify:static` is twenty-two checks: lint, CSS format, unit and smoke
 tests, encoding, text, plain language, CSS tokens, CSS structure, graph, dialogue, balance,
 the gauntlet loop simulation, endings, art, view contracts, constants, the runtime budget, the export
-schema, the test storage keys, the visual baselines and the Node pin. None of them needs a browser, which is what lets
+schema, the test storage keys, the visual baselines, the Node pin and the Data API grants. None of them needs a browser, which is what lets
 the deploy build run them.
 
 Two artifacts are generated with a browser and committed, so a deploy needs no
@@ -1265,3 +1265,12 @@ the live database when a migration fixes a runtime error.
     `all` on every table; it is a no-op on the live database. Any new table
     must carry its own grants in the migration that creates it, the way
     `board_posts` does.
+
+    `npm run check:grants` (in `verify:static`) keeps it that way. It replays
+    every migration into PGlite -- Postgres in-process, no Docker -- with the
+    API roles and no automatic table grants, then fails on a table with RLS
+    off, a table service_role cannot read and write, or a policy aimed at anon
+    or authenticated whose privilege was never granted. It also runs the
+    client's own writes, reads and RPCs as anon, and the reads that must stay
+    refused. Leaving the grants migration out makes it fail on all four
+    telemetry tables, which is the bug it was written for.
