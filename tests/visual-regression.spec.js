@@ -358,7 +358,7 @@ for (const viewport of [
   { name: "narrow phone", width: 320, height: 844 },
   { name: "large phone", width: 412, height: 915 },
 ]) {
-  test(`intro start controls stay reachable on ${viewport.name}`, async ({ page }) => {
+  test(`intro start controls stay reachable on ${viewport.name}`, { tag: "@prod" }, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.goto("/");
     const startButton = page.getByTestId("start-first-case");
@@ -379,7 +379,7 @@ for (const viewport of [
 // Budget, not a measurement: ratchet it down, never up. The intro was 6,687px on
 // a 390x844 screen -- 7.9 viewports -- against 3,953px for the play screen it was
 // supposed to be the door to.
-test("intro fits a phone reading budget", async ({ page }) => {
+test("intro fits a phone reading budget", { tag: "@prod" }, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();

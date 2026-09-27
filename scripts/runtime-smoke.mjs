@@ -1,6 +1,12 @@
 /**
  * Fast runtime check: load every screen once and fail on any page error.
  * Catches ReferenceErrors from refactors that a bundler build cannot see.
+ *
+ * It runs against the production build (`npm run test:runtime`, which serves
+ * dist/ with `vite preview`) as well as the dev server (`test:runtime:dev`).
+ * Debug tools are compiled out of the production build, so there the run
+ * enters through the intro's own start button -- which opens the same first
+ * case the debug jump names -- and uses the tables that case deals.
  */
 import { chromium } from "@playwright/test";
 
@@ -14,6 +20,10 @@ page.on("console", (m) => {
   if (m.type() === "error") errors.push(`console: ${m.text().slice(0, 200)}`);
 });
 page.on("crash", () => errors.push("PAGE CRASHED"));
+
+const TIMEOUT = 10_000;
+// A cold dev server transforms the whole app on first load; give navigation room.
+page.setDefaultNavigationTimeout(60_000);
 
 async function step(label, fn) {
   const before = errors.length;
@@ -36,102 +46,127 @@ async function fresh() {
     }
   });
   await page.goto(`${url}/?debug=1`);
-  await page.waitForSelector(".intro-shell", { timeout: 10000 });
+  await page.waitForSelector(".intro-shell", { timeout: TIMEOUT });
 }
 
-await step("intro loads", fresh);
+let debugTools = false;
 
-await step("debug jump into a scene", async () => {
-  // The season's first case, so the smoke run walks the door the player uses.
-  await page.getByTestId("debug-case-select").selectOption("prologue01");
-  await page.getByTestId("debug-node-select").selectOption("p1_start");
-  await page.getByTestId("debug-start-node").click();
-  await page.waitForSelector(".game-shell", { timeout: 10000 });
+await step("intro loads", async () => {
+  await fresh();
+  debugTools = (await page.getByTestId("debug-case-select").count()) > 0;
+  console.log(`      (${debugTools ? "debug tools present" : "no debug tools: production build"})`);
+});
+
+await step(debugTools ? "debug jump into a scene" : "start the first case from the intro", async () => {
+  if (debugTools) {
+    // The season's first case, so the smoke run walks the door the player uses.
+    await page.getByTestId("debug-case-select").selectOption("prologue01");
+    await page.getByTestId("debug-node-select").selectOption("p1_start");
+    await page.getByTestId("debug-start-node").click();
+  } else {
+    await page.getByTestId("start-first-case").click();
+  }
+  await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
 });
 
 /**
- * Stake a card and cash it. A sealed card opens once the gauge reaches the seal,
- * which is always reachable without crossing the lowest wall, so the helper
- * pushes until the cash button enables.
+ * The window opens on its briefing page with the clock held (and, between
+ * cases, behind a relic draft), so every flow below clears those first. They
+ * are never mounted at once; clear one, then look again.
  */
-async function stakeAndCash(cardIndex = 0) {
-  await openTable();
-  await page.locator(".choices .choice").nth(cardIndex).evaluate((b) => b.click());
-  const cash = page.getByTestId("commit-confirm");
-  for (let press = 0; press < 6 && !(await cash.isEnabled()); press += 1) {
-    await page.getByTestId("commit-push").evaluate((b) => b.click());
-    await page.waitForTimeout(80);
+const GATES = "[data-testid='relic-skip'], [data-testid='open-table']";
+async function openTable() {
+  const gate = page.locator(GATES).first();
+  await page.locator(".choices .choice, .result-page").first().waitFor();
+  for (let pass = 0; pass < 4 && (await gate.isVisible()); pass += 1) {
+    const cleared = await gate.getAttribute("data-testid");
+    // dispatchEvent: the gates animate in and never read as "stable" to click().
+    await gate.dispatchEvent("click");
+    // Settled: that gate is gone, and either the next one is up or the table is live.
+    await page.waitForFunction(
+      ({ cleared, gates }) =>
+        !document.querySelector(`[data-testid='${cleared}']`) &&
+        Boolean(
+          document.querySelector(gates) ||
+            document.querySelector(".choices .choice:not([aria-disabled='true'])") ||
+            document.querySelector(".result-page"),
+        ),
+      { cleared, gates: GATES },
+    );
   }
-  await cash.evaluate((b) => b.click());
 }
 
 /**
-  * The window opens on its briefing page with the clock held, so every flow below
-  * starts the table before it can press anything on it.
-  */
-async function openTable() {
-  await page.evaluate(() => {
-    document.querySelector("[data-testid='relic-skip']")?.click();
-    document.querySelector("[data-testid='open-table']")?.click();
-  });
+ * Stake a card and cash it. A sealed card opens once the gauge reaches the seal,
+ * which is always reachable without crossing the lowest wall, so this pushes
+ * until the cash button enables.
+ */
+async function stakeAndCash(cardIndex = 0) {
+  await openTable();
+  await page.locator(".choices .choice").nth(cardIndex).click();
+  const cash = page.getByTestId("commit-confirm");
+  for (let press = 0; press < 6 && !(await cash.isEnabled()); press += 1) {
+    await page.getByTestId("commit-push").click();
+  }
+  await cash.click();
 }
 
 await step("stake a card on the table", async () => {
   await openTable();
-  await page.locator(".choices .choice").first().evaluate((b) => b.click());
+  await page.locator(".choices .choice").first().click();
   await page.waitForSelector(".gx-card.selected", { timeout: 8000 });
 });
 
 await step("push raises the gauge", async () => {
-  await page.getByTestId("commit-push").evaluate((b) => b.click());
-  await page.waitForFunction(() => Number(document.querySelector("[data-testid='gauntlet-gauge']")?.textContent) > 0, undefined, { timeout: 4000 });
+  await page.getByTestId("commit-push").click();
+  await page.waitForFunction(() => Number(document.querySelector("[data-testid='gauntlet-gauge']")?.textContent) > 0, undefined, {
+    timeout: 4000,
+  });
 });
 
 await step("cash and reveal", async () => {
-  await page.getByTestId("commit-confirm").evaluate((b) => b.click());
-  await page.waitForSelector("[data-testid='decision-next']", { timeout: 10000 });
-  await page.getByTestId("decision-next").evaluate((b) => b.click());
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
   await page.waitForSelector(".game-shell", { timeout: 8000 });
 });
 
 await step("open every drawer", async () => {
   await page.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
-  await page.waitForTimeout(400);
+  // Opening a drawer mounts what it holds; give that a frame to throw.
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 });
 
 await step("reload restores the run", async () => {
   await page.reload();
-  await page.waitForSelector(".game-shell", { timeout: 10000 });
+  await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
 });
 
 await step("play through to a result page", async () => {
-  for (let i = 0; i < 14; i += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) return;
-    if (!(await page.locator(".choices .choice").count())) return;
+  const result = page.locator(".result-page");
+  for (let i = 0; i < 14 && !(await result.isVisible()); i += 1) {
+    if (!(await page.locator(".choices .choice").count())) break;
     await stakeAndCash(0);
-    await page.waitForSelector("[data-testid='decision-next']", { timeout: 10000 });
-    await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
-    await page.waitForTimeout(200);
+    await page.getByTestId("decision-next").click();
+    await page.locator(".choices .choice, .result-page").first().waitFor();
   }
 });
 
 await step("판을 다시 짠다 opens the case's hidden route", async () => {
-  await page.goto(`${url}/?debug=1`);
-  await page.evaluate(() => {
-    try {
-      localStorage.clear();
-    } catch {
-      // Storage can be blocked; the smoke run does not depend on it.
-    }
-  });
-  await page.goto(`${url}/?debug=1`);
-  await page.getByTestId("debug-case-select").selectOption("case02");
-  await page.getByTestId("debug-node-select").selectOption("c2_pressure");
-  await page.getByTestId("debug-start-node").click();
-  await page.waitForSelector(".game-shell", { timeout: 10000 });
+  if (debugTools) {
+    await fresh();
+    await page.getByTestId("debug-case-select").selectOption("case02");
+    await page.getByTestId("debug-node-select").selectOption("c2_pressure");
+    await page.getByTestId("debug-start-node").click();
+  } else {
+    // No jump in this build: start a fresh run, whose first table deals the
+    // wild card as well.
+    await fresh();
+    await page.getByTestId("start-first-case").click();
+  }
+  await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
   await openTable();
-  await page.locator(".gx-card-wild").evaluate((b) => b.click());
-  await page.waitForTimeout(300);
+  await page.locator(".gx-card-wild").click();
+  await page.waitForSelector(".gx-card-wild.selected, .gx-card.selected", { timeout: 8000 });
 });
 
 await browser.close();

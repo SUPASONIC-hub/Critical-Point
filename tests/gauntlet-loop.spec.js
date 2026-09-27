@@ -131,6 +131,8 @@ async function closeCaseOneIntoDraft(page) {
 
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  // Installed before the page loads so the clock proof below controls time.
+  await page.clock.install();
   await closeCaseOneIntoDraft(page);
   const draft = page.getByTestId("relic-draft");
   await expect(draft.getByTestId("relic-option")).toHaveCount(3);
@@ -140,9 +142,10 @@ test("a closed case deals a relic draft that holds the clock and re-deals the ta
   expect(saved.dynamics.relicOffer).toHaveLength(3);
   expect(saved.dynamics.relicOffer[0]).toBe(offered);
 
-  // The clock does not start behind the draft.
+  // The clock does not start behind the draft: 1.2s of the page's own timers
+  // and frames run, on a controlled clock, and the readout has not moved.
   const before = await page.locator(".gx-clock b").textContent();
-  await page.waitForTimeout(1200);
+  await page.clock.runFor(1_200);
   await expect(page.locator(".gx-clock b")).toHaveText(before);
 
   await page.keyboard.press("1");
@@ -210,7 +213,10 @@ const BOARD_STATES = [
 
 async function expectHandAboveActionBar(page, label) {
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
-  await page.locator(".choices .choice:not(.gx-card-wild)").last().evaluate((card) => card.click());
+  // dispatchEvent, not click(): whether this card is under the action bar is
+  // what the test measures, and a real click on a covered card would wait out
+  // the timeout instead of reporting how far under it sits.
+  await page.locator(".choices .choice:not(.gx-card-wild)").last().dispatchEvent("click");
   const table = await measureTable(page);
   expect(table.cards, label).toBeGreaterThan(3);
   expect(table.lastCard, `${label}: last card ${table.lastCard - table.actionsTop}px under the action bar`).toBeLessThanOrEqual(table.actionsTop);

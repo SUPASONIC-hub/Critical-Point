@@ -33,7 +33,7 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
   const decisionNext = page.getByTestId("decision-next");
-  if (await decisionNext.isVisible().catch(() => false)) await decisionNext.click();
+  if (await decisionNext.isVisible()) await decisionNext.click();
   await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
   const playDownloadPromise = page.waitForEvent("download");
   await page.getByTestId("export-play-log").click();
@@ -115,38 +115,71 @@ test("the table shows the bet on every card and never a forecast of the next pus
   expect(transparentText).toEqual([]);
 });
 
-test("the complete season can progress from case 01 to the final ending", async ({ page }) => {
-  // Twenty-five cases played scene by scene. 180s was set for eight and ran out
-  // under a parallel suite once the season grew; 300s was set for ten, which took
-  // 2.7 minutes alone. Each case adds roughly 16 seconds to the walk. 360s -> 420s
-  // when every scene gained a briefing page to close before its table, 420s ->
-  // 480s for the thirteenth case, 480s -> 1200s for cases 13-24 (720s ran out
-  // under the parallel suite with the walk still advancing), and 1200s -> 2700s
-  // for cases 25-49: fifty cases take about twice the twenty-five-case walk.
-  // 2700s -> 3000s for the 프롤로그's five cases at the head of the walk.
-  test.setTimeout(3_000_000);
+/**
+ * Walk CASE_SEQUENCE[from..to) case by case from a fresh save, and prove the
+ * last case hands over to the next one -- or, at the end of the season, to the
+ * ending. Seconds per case: ~25 on CI.
+ */
+async function walkSeason(page, from, to) {
   await page.goto("/?debug=1");
   await page.getByTestId("unlock-all-cases").click();
-  // The walk is the whole season, so it opens on the season's own door. It
-  // entered at 사건 01 while that was the door, and kept doing so after the
-  // 프롤로그 moved in front of it -- which meant advancing 55 times from case
-  // six and running off the end of the sequence.
-  await startDebugNode(page, CASE_SEQUENCE[0], CASE_START_NODES[CASE_SEQUENCE[0]]);
+  await startDebugNode(page, CASE_SEQUENCE[from], CASE_START_NODES[CASE_SEQUENCE[from]]);
 
-  for (let caseIndex = 0; caseIndex < CASE_SEQUENCE.length; caseIndex += 1) {
+  for (let caseIndex = from; caseIndex < to; caseIndex += 1) {
     await completeCurrentCase(page);
     if (caseIndex < CASE_SEQUENCE.length - 1) {
       const nextCaseButton = page.locator(".next-case-panel button");
       await expect(nextCaseButton).toBeVisible();
-      await nextCaseButton.evaluate((button) => button.click());
+      await nextCaseButton.click();
       await expect(page.locator(".game-shell")).toBeVisible();
+      await expect
+        .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2"))))?.currentCase)
+        .toBe(CASE_SEQUENCE[caseIndex + 1]);
     }
   }
 
-  await expect(page.locator(".ending-sequence")).toBeVisible();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
-  expect(saved.currentCase).toBe("final");
-  expect(saved.completedCases).toContain("final");
+  if (to === CASE_SEQUENCE.length) {
+    await expect(page.locator(".ending-sequence")).toBeVisible();
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+    expect(saved.currentCase).toBe("final");
+    expect(saved.completedCases).toContain("final");
+  }
+}
+
+/**
+ * The season in segments, each started from a fresh save at its first case.
+ * One test for the whole season took ~22 minutes for fifty cases, on one
+ * worker, and gated every deploy; a segment is a few minutes, and the
+ * parallel mode below lets Playwright hand segments to different workers and
+ * different CI shards. Together they play every case and every hand-over.
+ * What they cannot show -- resources and flags carried across the whole run --
+ * is the uninterrupted walk below, which runs weekly.
+ */
+const WALK_SEGMENT_CASES = 7;
+test.describe("season walk in segments", () => {
+  test.describe.configure({ mode: "parallel" });
+  // The walk proves the season's flow, which does not depend on the viewport;
+  // the phone layouts are held by their own tests. Walking it twice doubled
+  // the longest part of the suite.
+  test.skip(({ isMobile }) => isMobile, "the season flow is walked once, on desktop");
+  for (let from = 0; from < CASE_SEQUENCE.length; from += WALK_SEGMENT_CASES) {
+    const to = Math.min(from + WALK_SEGMENT_CASES, CASE_SEQUENCE.length);
+    const last = to === CASE_SEQUENCE.length ? "the ending" : CASE_SEQUENCE[to];
+    test(`${CASE_SEQUENCE[from]} through ${CASE_SEQUENCE[to - 1]} hands over to ${last}`, { tag: "@season-segment" }, async ({ page }) => {
+      test.setTimeout((to - from) * 90_000);
+      await walkSeason(page, from, to);
+    });
+  }
+});
+
+test("the complete season can progress from case 01 to the final ending", { tag: "@season-full" }, async ({ page }) => {
+  // The whole season in one run: `npm run test:e2e:season`, weekly in Full
+  // Coverage. Each case adds roughly 25 seconds; fifty-five take ~24 minutes.
+  // The walk opens on the season's own door, CASE_SEQUENCE[0] -- it once
+  // entered at 사건 01 after the 프롤로그 moved in front of it, and ran off the
+  // end of the sequence.
+  test.setTimeout(3_000_000);
+  await walkSeason(page, 0, CASE_SEQUENCE.length);
 });
 
 // Was "hero entry guides to setup without starting a fresh run" until 2026-09-09.
@@ -155,7 +188,7 @@ test("the complete season can progress from case 01 to the final ending", async 
 // and keeps the guarantee the old assertion stood in for: the second test seeds
 // an actual resumable run and proves the hero leaves it byte-identical, which
 // the old test could not do because it ran with empty storage.
-test("hero entry opens the first scene in one click", async ({ page }) => {
+test("hero entry opens the first scene in one click", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
@@ -177,7 +210,7 @@ test("hero entry opens the first scene in one click", async ({ page }) => {
   expect(saved.playerName).toBe("분석관");
 });
 
-test("hero entry resumes a saved run without clobbering it", async ({ page }) => {
+test("hero entry resumes a saved run without clobbering it", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",
@@ -228,7 +261,7 @@ test("hero entry resumes a saved run without clobbering it", async ({ page }) =>
 // A preference write goes through persist(), which materialises a full save
 // when none exists. That save must not turn the hero into a resume button for
 // a run that never happened.
-test("a consent tick does not turn the hero into a resume button", async ({ page }) => {
+test("a consent tick does not turn the hero into a resume button", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto("/");
   await openIntroDrawer(page, ".data-info-panel");
@@ -267,19 +300,19 @@ test("representative branch choices advance without browser runtime errors", asy
 
     await dismissProtocolBreach(page);
     if (choice.type === "reframe") {
-      await page.locator(".gx-card-wild").evaluate((button) => button.click());
+      await page.locator(".gx-card-wild").click();
       await cashStakedCard(page);
     } else {
       const fixedChoiceIndex = scene.choices
         .slice(0, choiceIndex + 1)
         .filter((candidate) => candidate.type !== "reframe").length - 1;
-      await page.locator(".choices .choice").nth(fixedChoiceIndex).evaluate((button) => button.click());
+      await page.locator(".choices .choice").nth(fixedChoiceIndex).click();
       await expect(page.locator(".gx-card.selected")).toBeVisible();
       await cashStakedCard(page);
     }
 
     await expect(page.getByTestId("decision-next")).toBeVisible();
-    await page.getByTestId("decision-next").evaluate((button) => button.click());
+    await page.getByTestId("decision-next").click();
     await expect(page.locator(".game-shell, .result-page, .ending-reveal").first()).toBeVisible();
   }
 
@@ -352,7 +385,7 @@ test("landscape mobile keeps decision actions within the viewport", async ({ pag
   const commitBox = await commitButton.boundingBox();
   expect(commitBox).not.toBeNull();
   expect(commitBox.y + commitBox.height).toBeLessThanOrEqual(375 + 2);
-  await commitButton.evaluate((button) => button.click());
+  await commitButton.click();
   const nextButton = page.getByTestId("decision-next");
   await expect(nextButton).toBeVisible();
   const nextBox = await nextButton.boundingBox();
@@ -1457,7 +1490,7 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   // Reduced motion drops the eight-second hold, so the skip control only
   // appears when the hold is actually running.
   const quietSkip = page.locator(".ending-quiet-skip");
-  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
+  if (await quietSkip.isVisible()) await quietSkip.click();
   await expect(page.getByTestId("ending-next")).toBeVisible();
   await page.getByTestId("ending-next").click();
   await expect(page.locator(".ending-step-2 textarea")).toBeVisible();
@@ -1481,7 +1514,7 @@ test("completed case is retained in the local ranking after leaving the ending",
     await page.locator(".ending-sequence button").click();
   }
   const quietSkip = page.locator(".ending-quiet-skip");
-  if (await quietSkip.isVisible().catch(() => false)) await quietSkip.click();
+  if (await quietSkip.isVisible()) await quietSkip.click();
   await page.getByTestId("ending-next").click();
   await page.locator(".ending-step-2 textarea").fill("랭킹 저장 확인");
   await page.locator(".ending-step-2 button").click();

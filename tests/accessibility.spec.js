@@ -7,7 +7,7 @@ async function expectNoA11yViolations(page) {
   expect(results.violations).toEqual([]);
 }
 
-test("intro screen has no structural accessibility violations", async ({ page }) => {
+test("intro screen has no structural accessibility violations", { tag: "@prod" }, async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
   await expectNoA11yViolations(page);

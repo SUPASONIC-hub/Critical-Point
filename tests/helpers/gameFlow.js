@@ -31,42 +31,79 @@ export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
  * Both hold the clock, so a flow that does not pass them finds a board it
  * cannot press. Idempotent, because most callers do not know which is up.
  */
+const TABLE_GATES = "[data-testid='relic-skip'], [data-testid='open-table']";
+
 export async function dismissProtocolBreach(page) {
   // Best effort, not an assertion: give the stage a beat to paint so the clicks
   // below have something to hit. It runs on every scene of every walk, so the
   // ceiling is short -- at ACTION_TIMEOUT_MS a screen that legitimately has none
   // of these on it stalled the caller for a minute and the suite began timing
   // out in a different place each run.
+  //
+  // "Painted" is the next screen, not the one on its way out: right after a
+  // reveal's next button the old table is still in the DOM for a frame, and
+  // looking for a gate then found none and returned with the briefing about to
+  // mount -- so the caller clicked a card on a held table and nothing happened.
   await page
-    .locator(".choices .choice, .result-page, .ending-sequence")
-    .first()
-    .waitFor({ timeout: 6_000 })
-    .catch(() => {});
+    .waitForFunction(
+      (gates) =>
+        Boolean(document.querySelector(".result-page, .ending-sequence")) ||
+        (!document.querySelector(".decision-reveal-backdrop") &&
+          Boolean(document.querySelector(gates) || document.querySelector(".choices .choice:not([aria-disabled='true'])"))),
+      TABLE_GATES,
+      { timeout: 6_000 },
+    )
+    .then(
+      () => true,
+      () => false,
+    );
   // The two are never mounted at once -- `briefingOpen` is false while the draft
   // is up -- so one pass could only ever clear the first of them. It skipped the
   // draft, React mounted the briefing behind it, and the caller then asserted on
   // a table whose cards were all still disabled. Clearing one at a time until
   // neither is there is what this function always claimed to do.
-  for (let pass = 0; pass < 4; pass += 1) {
-    const cleared = await page.evaluate(() => {
-      const gate = document.querySelector("[data-testid='relic-skip'], [data-testid='open-table']");
-      if (!gate) return false;
-      gate.click();
-      return true;
-    });
-    if (!cleared) return;
-    await page.waitForTimeout(120);
+  const gate = page.locator(TABLE_GATES).first();
+  for (let pass = 0; pass < 4 && (await gate.isVisible()); pass += 1) {
+    const cleared = await gate.getAttribute("data-testid");
+    // dispatchEvent, not click(): the draft and the briefing slide in and keep
+    // animating, so Playwright never finds the button "stable" and a real click
+    // waits forever -- which is why this used to be an evaluate(el => el.click()).
+    await gate.dispatchEvent("click");
+    // Settled means: the gate just pressed is gone, and either the next one
+    // is up or the table is live. It used to be a fixed 120ms pause, which was
+    // either wasted or -- on a slow frame -- not enough for the briefing to
+    // mount behind the draft, so the loop ended with the table still held.
+    await page.waitForFunction(
+      ({ cleared, gates }) =>
+        !document.querySelector(`[data-testid='${cleared}']`) &&
+        Boolean(
+          document.querySelector(gates) ||
+            document.querySelector(".choices .choice:not([aria-disabled='true'])") ||
+            document.querySelector(".result-page, .ending-sequence"),
+        ),
+      { cleared, gates: TABLE_GATES },
+      { timeout: TRANSITION_TIMEOUT_MS },
+    );
   }
 }
 
+/**
+ * Push until the cash button enables, then cash. Each push is followed by a
+ * wait for the gauge to move rather than a fixed pause, so the next press
+ * never lands on a board still animating the last one.
+ */
 export async function cashStakedCard(page) {
   const cash = page.getByTestId("commit-confirm");
-  for (let press = 0; press < 8; press += 1) {
-    if (await cash.isEnabled().catch(() => false)) break;
-    await page.getByTestId("commit-push").evaluate((button) => button.click());
-    await page.waitForTimeout(60);
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(cash).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  for (let press = 0; press < 8 && !(await cash.isEnabled()); press += 1) {
+    const gauge = await stage.getAttribute("data-gauge");
+    await page.getByTestId("commit-push").click();
+    await expect
+      .poll(async () => (await cash.isEnabled()) || (await stage.getAttribute("data-gauge")) !== gauge, { timeout: 5_000 })
+      .toBe(true);
   }
-  await cash.evaluate((button) => button.click());
+  await cash.click();
 }
 
 /**
@@ -112,44 +149,32 @@ export async function startDebugNode(page, caseId, nodeId, options = {}) {
   await expect(page.getByTestId("debug-case-select")).toHaveValue(caseId);
   await expect(page.getByTestId("debug-node-select")).toHaveValue(nodeId);
   await page.getByTestId("debug-start-node").click();
-  if (expectGameShell) await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  if (expectGameShell) await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   if (openTable) await dismissProtocolBreach(page);
 }
 
 export async function chooseFirstAvailableChoice(page) {
   const decisionNext = page.getByTestId("decision-next");
-  if (await decisionNext.isVisible().catch(() => false)) {
-    await decisionNext.evaluate((button) => button.click());
+  const result = page.locator(".result-page");
+  if (await decisionNext.isVisible()) {
+    await decisionNext.click();
     return;
   }
-  await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".result-page") || document.querySelector(".choices .choice")),
-    undefined,
-    { timeout: 15_000 },
-  );
+  await expect(decisionNext.or(result).or(page.locator(".choices .choice")).first()).toBeVisible({ timeout: 15_000 });
   await dismissProtocolBreach(page);
-  const domAction = await page.evaluate(() => {
-    const decisionNext = document.querySelector("[data-testid='decision-next']");
-    if (decisionNext instanceof HTMLButtonElement) {
-      decisionNext.click();
-      return "advanced";
-    }
-    if (document.querySelector(".result-page")) return "result";
-    const firstChoice = document.querySelector(".choices .choice:not([aria-disabled='true'])");
-    if (firstChoice instanceof HTMLButtonElement) {
-      firstChoice.click();
-      return "choice";
-    }
-    return "none";
-  });
-  if (domAction !== "choice") return;
+  if (await decisionNext.isVisible()) {
+    await decisionNext.click();
+    return;
+  }
+  if (await result.count()) return;
+  const firstChoice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
+  if (!(await firstChoice.count())) return;
+  await firstChoice.click();
   await cashStakedCard(page);
-  await page.waitForFunction(
-    () => Boolean(document.querySelector("[data-testid='decision-next']") || document.querySelector(".choices .choice:not([aria-disabled='true'])") || document.querySelector(".result-page")),
-    undefined,
-    { timeout: 15_000 },
-  );
-  await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
+  await expect(
+    decisionNext.or(result).or(page.locator(".choices .choice:not([aria-disabled='true'])")).first(),
+  ).toBeVisible({ timeout: 15_000 });
+  if (await decisionNext.isVisible()) await decisionNext.click();
 }
 
 export async function chooseSceneChoice(page, scene, choiceIndex) {
@@ -157,7 +182,7 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await dismissProtocolBreach(page);
     if (choice.type === "reframe") {
-      await page.locator(".gx-card-wild").evaluate((button) => button.click());
+      await page.locator(".gx-card-wild").click();
       await cashStakedCard(page);
     } else {
       const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "reframe").length - 1;
@@ -171,10 +196,7 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
       }
     }
 
-    if (
-      await page.locator(".result-page").isVisible().catch(() => false) ||
-      await page.locator(".ending-reveal").isVisible().catch(() => false)
-    ) return;
+    if (await page.locator(".result-page, .ending-reveal").first().isVisible()) return;
     if (await waitUntilVisible(page.getByTestId("decision-next"))) break;
     if (attempt === 1) throw new Error(`${scene.title}/${choice.id} did not open decision reveal`);
   }
@@ -191,11 +213,11 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
       { timeout: 2_000 },
     ).then(() => true).catch(() => false);
     if (!transitioned) throw error;
-    await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
+    await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
     return;
   }
 
-  await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
   await page.waitForFunction(
     ({ nextNodeId, nextTitle }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
@@ -213,7 +235,7 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
 
 export async function completeCase(page, random) {
   for (let step = 0; step < 80; step += 1) {
-    if (await page.locator(".result-page").isVisible().catch(() => false)) return;
+    if (await page.locator(".result-page").isVisible()) return;
     await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
     const { nodeId } = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
     const scene = nodes[nodeId];
@@ -228,8 +250,8 @@ export async function completeCase(page, random) {
 export async function dismissDecisionRevealIfPresent(page) {
   const reveal = page.locator(".decision-reveal-backdrop");
   const revealNext = reveal.getByTestId("decision-next");
-  if (!(await revealNext.isVisible().catch(() => false))) return;
-  await revealNext.evaluate((button) => button.click());
+  if (!(await revealNext.isVisible())) return;
+  await revealNext.click();
   await expect(reveal).toHaveCount(0);
 }
 
@@ -255,12 +277,15 @@ export async function completeCurrentCase(page) {
     await dismissProtocolBreach(page);
     const choice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
     await expect(choice).toBeVisible();
-    await choice.evaluate((button) => button.click());
+    await choice.click();
     await cashStakedCard(page);
     const nextButton = page.getByTestId("decision-next");
-    if (await waitUntilVisible(nextButton, 5_000)) {
-      await nextButton.evaluate((button) => button.click());
-      await page.locator(".decision-reveal-backdrop").waitFor({ state: "detached", timeout: TRANSITION_TIMEOUT_MS }).catch(() => {});
+    // The reveal can take a while on a loaded machine; wait for it or for the
+    // report, rather than 5s and then walking on with the reveal still up.
+    await expect(nextButton.or(page.locator(".result-page, .ending-sequence")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    if (await nextButton.isVisible()) {
+      await nextButton.click();
+      await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
     }
     if (await page.locator(".result-page, .ending-sequence").count()) {
       await dismissDecisionRevealIfPresent(page);

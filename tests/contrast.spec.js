@@ -138,11 +138,35 @@ const COLLECT = () => {
 
 const openDrawers = (page) => page.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
 
+/**
+ * Colours are read once the screen has stopped changing: every drawer open
+ * (opening one can mount another), and every finite animation and transition
+ * finished. It used to be two fixed pauses of 200 and 150ms, which measured a
+ * fading panel mid-fade whenever a frame ran slow. Infinite animations -- the
+ * heartbeat, the gauge glow -- never finish and are left running.
+ */
+async function settle(page) {
+  await expect
+    .poll(async () => {
+      await openDrawers(page);
+      return page.evaluate(() => [...document.querySelectorAll("details")].every((details) => details.open));
+    })
+    .toBe(true);
+  await page.evaluate(async () => {
+    const finite = () =>
+      document.getAnimations().filter((animation) => {
+        const timing = animation.effect?.getComputedTiming();
+        return animation.playState === "running" && timing && Number.isFinite(timing.endTime);
+      });
+    for (let round = 0; round < 5 && finite().length; round += 1) {
+      await Promise.all(finite().map((animation) => animation.finished.catch(() => undefined)));
+    }
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+}
+
 async function collect(page) {
-  await openDrawers(page);
-  await page.waitForTimeout(200);
-  await openDrawers(page);
-  await page.waitForTimeout(150);
+  await settle(page);
   return page.evaluate(COLLECT);
 }
 
@@ -180,11 +204,11 @@ test("intro and scene text stays readable against its panel", async ({ page }) =
 test("the table and decision reveal stay readable", async ({ page }) => {
   await startAt(page, "case01", "start");
 
-  await page.locator(".choices .choice").first().evaluate((button) => button.click());
+  await page.locator(".choices .choice").first().click();
   await page.waitForSelector(".gx-card.selected");
   expect(await collect(page), "gauntlet table").toEqual([]);
 
-  await page.getByTestId("commit-confirm").evaluate((button) => button.click());
+  await page.getByTestId("commit-confirm").click();
   await page.waitForSelector("[data-testid='decision-next']");
   expect(await collect(page), "decision reveal").toEqual([]);
 });
@@ -193,22 +217,33 @@ test("the report and ending sequence stay readable", async ({ page }) => {
   test.setTimeout(90_000);
   await startAt(page, "final", "f_aftershock");
 
+  // Play the last scenes until the report or the ending is up. The loop used to
+  // end quietly when it ran out of steps, and the checks below then measured
+  // whatever screen it had stopped on; reaching the target is now asserted.
+  const finished = page.locator(".result-page, .ending-sequence").first();
+  const liveChoice = page.locator(".choices .choice:not([aria-disabled='true'])").first();
+  const next = page.getByTestId("decision-next");
   for (let step = 0; step < 8; step += 1) {
-    if (await page.locator(".result-page, .ending-sequence").first().isVisible().catch(() => false)) break;
-    if (!(await page.locator(".choices .choice").count())) break;
     await dismissProtocolBreach(page);
-    await page.locator(".choices .choice").first().evaluate((button) => button.click());
+    await expect(finished.or(liveChoice).first()).toBeVisible();
+    if (await finished.isVisible()) break;
+    await liveChoice.click();
     await cashStakedCard(page);
-    await page.waitForSelector("[data-testid='decision-next']", { timeout: 5_000 }).catch(() => {});
-    await page.evaluate(() => document.querySelector("[data-testid='decision-next']")?.click());
-    await page.waitForTimeout(250);
+    await expect(next.or(finished).first()).toBeVisible();
+    if (await next.isVisible()) {
+      await next.click();
+      await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0);
+    }
   }
+  await expect(finished, "the walk reached the report or the ending").toBeVisible();
 
   for (let step = 0; step < 4; step += 1) {
     expect(await collect(page), `ending step ${step}`).toEqual([]);
-    const next = page.locator(".ending-sequence button").first();
-    if (!(await next.isVisible().catch(() => false))) break;
-    await next.evaluate((button) => button.click());
-    await page.waitForTimeout(400);
+    const advance = page.locator(".ending-sequence button").first();
+    if (!(await advance.isVisible())) break;
+    const before = await page.locator(".ending-sequence").innerText();
+    await advance.click();
+    // The next step is a new screen of text, not a pause.
+    await expect.poll(() => page.locator(".ending-sequence, .result-page").first().innerText()).not.toBe(before);
   }
 });

@@ -19,3 +19,14 @@ Profile.jpg
 
 # Output of npm run analyze:free-text -- contains player sentences.
 analysis-out/
+
+# `eslint --cache` (npm run lint) keeps its per-file results here.
+.eslintcache
+# `npm run test:coverage` output, if a reporter is pointed at a file.
+coverage/
+
+# Visual baselines are recorded in the pinned Playwright container only (npm run
+# test:visual:docker, or the Visual Regression dispatch). A set rendered on a
+# Windows desktop is never compared by anything, so it is never committed.
+tests/visual-regression.spec.js-snapshots/*-win32.png
+tests/visual-regression.spec.js-snapshots/*-darwin.png

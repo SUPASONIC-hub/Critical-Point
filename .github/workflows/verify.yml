@@ -54,12 +54,11 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      # verify:static, the production build, the bundle budget, and the runtime
-      # smoke against that build served by `vite preview`.
+      # verify:static, the production build, the bundle budget, then the
+      # runtime smoke and the @prod-tagged specs against that build served by
+      # `vite preview` -- the build that deploys, with the debug tools compiled
+      # out, so those play from the intro.
       - run: npm run verify:quick
-      # The @prod-tagged specs against the same production build: the debug
-      # tools are compiled out of it, so these play from the intro.
-      - run: npm run test:e2e:preview
       - name: Upload Playwright diagnostics
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

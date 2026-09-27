@@ -76,7 +76,12 @@ function run(name) {
     child.stdout.on("data", (chunk) => chunks.push(chunk));
     child.stderr.on("data", (chunk) => chunks.push(chunk));
     const finish = (code) =>
-      resolve({ name, code, output: Buffer.concat(chunks).toString("utf8").trimEnd(), ms: Date.now() - startedAt });
+      resolve({
+        name,
+        code,
+        output: Buffer.concat(chunks).toString("utf8").replace(/\r\n?/g, "\n").trimEnd(),
+        ms: Date.now() - startedAt,
+      });
     child.on("error", (error) => {
       chunks.push(Buffer.from(String(error)));
       finish(1);

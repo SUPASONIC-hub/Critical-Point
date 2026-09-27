@@ -68,11 +68,14 @@ test("a save made offline is uploaded when the connection comes back", async ({ 
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ accepted: true }) });
   });
   await useMockSupabase(page);
+  // A controlled clock, so "nothing was sent" is proved over a known span of
+  // the page's own timers rather than 3.5 wall-clock seconds of hoping.
+  await page.clock.install();
   await startDebugNode(page, "case02", "c2_logs");
   await context.setOffline(true);
   const offlineUploads = uploads.length;
   await page.getByRole("button", { name: "저장", exact: true }).click();
-  await page.waitForTimeout(3_500);
+  await page.clock.runFor(10_000);
   expect(uploads.length, "nothing leaves the device while offline").toBe(offlineUploads);
   const sync = await readJsonStorage(page, TEST_STORAGE_KEYS.cloudSync);
   expect(sync.pending, "the device remembers a save is waiting").toBeTruthy();

@@ -1,64 +1,103 @@
-import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { parse } from "espree";
 
 /**
- * Visual baseline coverage and freshness guardrail.
+ * Visual baseline coverage guardrail.
  *
  * `toHaveScreenshot` writes and reads `<name>{-project}-{platform}.png`, so a
- * baseline recorded on one platform is invisible to a run on another: Playwright
- * reports the snapshot as missing and, under CI, fails. The repository held only
- * the `win32` set while the Visual Regression workflow ran on `ubuntu-latest`,
- * so that job could not have passed once -- and nothing said so, because the
- * screenshots themselves were never the thing being compared.
+ * baseline recorded on one platform is invisible to a run on another. Baselines
+ * are recorded and compared in one place only: the pinned Playwright container
+ * (`mcr.microsoft.com/playwright:vX.Y.Z-noble`), which is Linux. The Visual
+ * Regression workflow runs in it, and `npm run test:visual:docker` runs the
+ * same image on a desktop. So the committed set is `linux` and nothing else.
+ *
+ * There used to be a `win32` set as well, recorded on whichever Windows desktop
+ * changed the UI. Nothing ever compared it -- CI only runs Linux -- and a
+ * freshness rule then failed `verify:static` whenever it was re-recorded ahead
+ * of the Linux set. One platform removes both the dead weight and the rule.
  *
  * This walks the same three inputs Playwright does -- the screenshot names in
- * the spec, the projects the npm script selects, and the platforms CI runs on --
- * and fails when a combination has no committed file. It also fails on a
- * baseline no screenshot call names any more, which is how a renamed test leaves
- * a stale PNG behind, and -- further down -- on a CI baseline that a later commit
- * re-recorded on one platform but not on this one.
- *
- * The Linux set was first recorded on 2026-09-04 by the workflow's
- * `update_baselines` dispatch, and this check joined `verify:static` then. It
- * drifted anyway: by 2026-09-11 all six Linux baselines sat behind their Windows
- * twins and the coverage loop still passed, so the visual job had been failing
- * for a week with nothing upstream of it saying a word. That is the gap the
- * freshness comparison at the bottom of this file closes.
+ * the spec, the projects the npm script selects, and the platform -- and fails
+ * when a combination has no committed file, when a committed file is not
+ * produced by any screenshot (a renamed test leaves one behind), and when a
+ * baseline for another platform is sitting in the directory.
  */
 
 const root = process.cwd();
+const PLATFORM = "linux";
+const IMAGE = /mcr\.microsoft\.com\/playwright:v(\d+\.\d+\.\d+)(?:-[a-z]+)?(?:@sha256:[0-9a-f]{64})?/;
 
-// The platforms the workflows record baselines on. `linux` is the Playwright
-// container the Visual Regression job runs in; `win32` is where they are
-// authored today. Adding a runner here without committing its baselines is
-// exactly the failure this file exists to catch, so the list is the contract.
-const CI_PLATFORMS = ["linux"];
-const KNOWN_PLATFORMS = ["darwin", "linux", "win32"];
-
+const failures = [];
 const packageJson = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
-const visualScript = packageJson.scripts?.["test:visual"] ?? "";
+const lockVersion = JSON.parse(readFileSync(path.join(root, "package-lock.json"), "utf8")).packages?.[
+  "node_modules/@playwright/test"
+]?.version;
 
-const specPath = visualScript.match(/(tests\/[\w.-]+\.spec\.js)/)?.[1];
-if (!specPath) {
+/** The spec path and the `--project` names an npm script selects, in either `--project x` or `--project=x` form. */
+function readScript(name) {
+  const script = packageJson.scripts?.[name] ?? "";
+  const tokens = script.match(/"[^"]*"|'[^']*'|\S+/g)?.map((token) => token.replace(/^["']|["']$/g, "")) ?? [];
+  const spec = tokens.find((token) => /^tests\/[\w./-]+\.spec\.js$/.test(token));
+  const projects = [];
+  tokens.forEach((token, index) => {
+    if (token.startsWith("--project=")) projects.push(token.slice("--project=".length));
+    else if (token === "--project" && tokens[index + 1]) projects.push(tokens[index + 1]);
+  });
+  return { script, spec, projects };
+}
+
+const visual = readScript("test:visual");
+if (!visual.spec) {
   console.error("check:visual-baselines could not find a spec path in the `test:visual` script.");
   process.exit(1);
 }
-
-const projects = [...visualScript.matchAll(/--project=([\w-]+)/g)].map((match) => match[1]);
-if (projects.length === 0) {
-  console.error(`check:visual-baselines found no --project in \`test:visual\`; baseline names depend on it.`);
+if (visual.projects.length === 0) {
+  console.error("check:visual-baselines found no --project in `test:visual`; baseline names depend on it.");
   process.exit(1);
 }
+const docker = readScript("test:visual:docker");
+if (!docker.script) {
+  failures.push("package.json has no `test:visual:docker` script, so baselines cannot be recorded off CI in the pinned image.");
+} else if (docker.spec !== visual.spec || docker.projects.join() !== visual.projects.join()) {
+  failures.push("`test:visual:docker` must select the same spec and projects as `test:visual`.");
+}
 
-const specSource = readFileSync(path.join(root, specPath), "utf8");
-const screenshotNames = [...specSource.matchAll(/toHaveScreenshot\(\s*"([^"]+)"/g)].map((match) => match[1]);
+/**
+ * Screenshot names come from the spec's syntax tree, not a regex over its text,
+ * so single quotes, backticks without substitutions, and line breaks inside the
+ * call all read the same. A name built at run time cannot be checked here and
+ * is reported rather than skipped.
+ */
+const specSource = readFileSync(path.join(root, visual.spec), "utf8");
+const screenshotNames = [];
+function visit(node) {
+  if (!node || typeof node.type !== "string") return;
+  if (
+    node.type === "CallExpression" &&
+    node.callee.type === "MemberExpression" &&
+    !node.callee.computed &&
+    node.callee.property.name === "toHaveScreenshot"
+  ) {
+    const [first] = node.arguments;
+    if (first?.type === "Literal" && typeof first.value === "string") screenshotNames.push(first.value);
+    else if (first?.type === "TemplateLiteral" && first.expressions.length === 0) screenshotNames.push(first.quasis[0].value.cooked);
+    else if (first && first.type !== "ObjectExpression") {
+      failures.push(`${visual.spec}:${node.loc.start.line} names its screenshot at run time; give it a literal name.`);
+    }
+  }
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) value.forEach(visit);
+    else if (value && typeof value === "object" && value !== node.loc) visit(value);
+  }
+}
+visit(parse(specSource, { ecmaVersion: "latest", sourceType: "module", loc: true }));
 if (screenshotNames.length === 0) {
-  console.error(`check:visual-baselines found no toHaveScreenshot() calls in ${specPath}.`);
+  console.error(`check:visual-baselines found no toHaveScreenshot() calls in ${visual.spec}.`);
   process.exit(1);
 }
 
-const snapshotDir = path.join(root, `${specPath}-snapshots`);
+const snapshotDir = path.join(root, `${visual.spec}-snapshots`);
 let committed;
 try {
   committed = new Set(readdirSync(snapshotDir).filter((entry) => entry.endsWith(".png")));
@@ -67,27 +106,15 @@ try {
   process.exit(1);
 }
 
-function baselineName(screenshot, project, platform) {
+function baselineName(screenshot, project) {
   const extension = path.extname(screenshot);
-  const stem = screenshot.slice(0, -extension.length);
-  return `${stem}-${project}-${platform}${extension}`;
+  return `${screenshot.slice(0, -extension.length)}-${project}-${PLATFORM}${extension}`;
 }
-
-const expected = new Set();
-for (const screenshot of screenshotNames) {
-  for (const project of projects) {
-    for (const platform of KNOWN_PLATFORMS) expected.add(baselineName(screenshot, project, platform));
-  }
-}
-
-const failures = [];
 
 /**
- * The comparison only means anything if the browser that records the baseline
- * is the browser that reads it, so the workflow pins a Playwright container tag
- * and package.json pins the matching library version. A caret on either side
- * lets them drift apart, and the symptom would be a screenshot diff nobody can
- * explain.
+ * The recording browser has to be the comparing browser: the workflow's
+ * container tag, the docker script's tag and the locked library all name one
+ * Playwright version.
  */
 const workflowPath = ".github/workflows/visual-regression.yml";
 let workflowSource = "";
@@ -96,159 +123,51 @@ try {
 } catch {
   failures.push(`${workflowPath} is missing: nothing records the baselines this file requires.`);
 }
-if (workflowSource) {
-  const containerVersion = workflowSource.match(/mcr\.microsoft\.com\/playwright:v([\d.]+)/)?.[1];
-  const lockVersion = JSON.parse(readFileSync(path.join(root, "package-lock.json"), "utf8"))
-    .packages?.["node_modules/@playwright/test"]?.version;
-  if (!containerVersion) {
-    failures.push(`${workflowPath} names no Playwright container image; the runner's fonts would be unpinned.`);
-  } else if (containerVersion !== lockVersion) {
+// The docker script hands its arguments to the e2e runner, which owns the image name.
+const runnerPath = "scripts/run-e2e.mjs";
+const dockerSource = /run-e2e\.mjs/.test(docker.script) ? readFileSync(path.join(root, runnerPath), "utf8") : docker.script;
+for (const [where, source] of [
+  [workflowPath, workflowSource],
+  [/run-e2e\.mjs/.test(docker.script) ? `${runnerPath} (--docker)` : "the test:visual:docker script", dockerSource],
+]) {
+  if (!source) continue;
+  const version = source.match(IMAGE)?.[1];
+  if (!version) {
+    failures.push(`${where} names no mcr.microsoft.com/playwright image; the renderer's fonts would be unpinned.`);
+  } else if (version !== lockVersion) {
     failures.push(
-      `${workflowPath} runs playwright:v${containerVersion} but package-lock.json has ${lockVersion}. ` +
+      `${where} runs playwright:v${version} but package-lock.json has ${lockVersion}. ` +
         `The recorded and compared browsers have to be the same build.`,
     );
   }
-  const declaredPlatforms = /container:\s*mcr\.microsoft\.com\/playwright:/.test(workflowSource) ? ["linux"] : [];
-  for (const platform of CI_PLATFORMS) {
-    if (!declaredPlatforms.includes(platform)) {
-      failures.push(`CI_PLATFORMS names ${platform}, but ${workflowPath} does not run on it.`);
-    }
-  }
+}
+if (workflowSource && !/^\s*container:\s*(?:image:\s*)?mcr\.microsoft\.com\/playwright:/m.test(workflowSource)) {
+  failures.push(`${workflowPath} does not run its jobs in the Playwright container, so it would not render on ${PLATFORM}.`);
 }
 
+const expected = new Set();
 for (const screenshot of screenshotNames) {
-  for (const project of projects) {
-    for (const platform of CI_PLATFORMS) {
-      const name = baselineName(screenshot, project, platform);
-      if (!committed.has(name)) {
-        failures.push(
-          `${path.relative(root, path.join(snapshotDir, name))} is missing: ` +
-            `the Visual Regression workflow runs on ${platform} and will report this screenshot as absent. ` +
-            `Record it with the workflow's \`update_baselines\` dispatch input.`,
-        );
-      }
+  for (const project of visual.projects) {
+    const name = baselineName(screenshot, project);
+    expected.add(name);
+    if (!committed.has(name)) {
+      failures.push(
+        `${path.relative(root, path.join(snapshotDir, name))} is missing. Record it in the pinned image: ` +
+          "`npm run test:visual:docker -- --update-snapshots`, or the Visual Regression workflow's `update_baselines` dispatch.",
+      );
     }
   }
 }
 
 for (const file of committed) {
-  if (!expected.has(file)) {
-    failures.push(`${path.relative(root, path.join(snapshotDir, file))} is not produced by any screenshot in ${specPath}.`);
-  }
-}
-
-/**
- * Coverage is not freshness, and this directory can be fully covered while the
- * comparison job still fails. The two platform sets are recorded by different
- * hands: `win32` by whoever changed the UI, `linux` only by the workflow's
- * `update_baselines` dispatch. So a commit that redraws a screen and re-records
- * the Windows PNGs leaves the Linux PNGs describing the screen as it used to
- * be, and the existence loop above waves it through -- which is exactly how the
- * intro reached main with a Linux baseline several commits behind its Windows
- * twin, and a green `verify:static` in front of a red visual job.
- *
- * Git history is the only evidence available here: the PNGs cannot be compared
- * to each other (different renderers draw the same screen differently, which is
- * the whole reason there are two sets) and cannot be compared to the source. So
- * the rule is the weakest one that still holds: a CI platform whose whole set
- * was last touched before another platform's set was left behind by that
- * commit. Nothing here can catch a change that re-recorded neither platform --
- * that one is the comparison job's job.
- *
- * The unit is the platform's set, not the file, because that is the unit the
- * `update_baselines` dispatch records in: it runs every screenshot and commits
- * whichever PNGs changed. A screen that happens to render byte-identically on
- * the runner produces no commit for its file, so a per-file rule called that
- * file stale for ever after -- which it was not; it had just been re-recorded
- * and found already correct. 프롤로그 and the board each tripped that.
- */
-function git(...args) {
-  return execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-}
-
-let historyDepth = "full";
-try {
-  git("rev-parse", "--git-dir");
-  if (git("rev-parse", "--is-shallow-repository") === "true") historyDepth = "shallow";
-} catch {
-  historyDepth = "none";
-}
-
-if (historyDepth !== "full") {
-  // `actions/checkout` clones one commit deep unless told otherwise, and on a
-  // shallow clone every file's last commit is the tip: the comparison below
-  // would find no ancestors and report a clean bill of health it never earned.
-  // Saying so is the point -- a guardrail that quietly no-ops is worse than one
-  // that is absent, because the absent one is not on the checklist.
-  console.log(
-    `check:visual-baselines: freshness comparison skipped (git history is ${historyDepth} here). ` +
-      `Give the checkout \`fetch-depth: 0\` to run it.`,
-  );
-} else {
-  // A baseline being re-recorded right now is not stale, whatever its last
-  // commit says. This is the state the repository is in between the dispatch
-  // landing its PNGs and the commit that carries them.
-  const dirty = new Set(
-    git("status", "--porcelain", "--", path.relative(root, snapshotDir))
-      .split("\n")
-      .map((line) => line.slice(3).trim().replace(/^"|"$/g, ""))
-      .filter(Boolean)
-      .map((relative) => path.basename(relative)),
-  );
-
-  const lastCommit = new Map();
-  const commitOf = (name) => {
-    if (!lastCommit.has(name)) {
-      lastCommit.set(name, git("log", "-1", "--format=%H", "--", path.join(snapshotDir, name)));
-    }
-    return lastCommit.get(name);
-  };
-
-  const isAncestor = (older, newer) => {
-    if (!older || !newer || older === newer) return false;
-    try {
-      git("merge-base", "--is-ancestor", older, newer);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  // The newest commit of a platform's set: the one no other commit in the set
-  // is a descendant of. A set nothing has been committed for has none.
-  function newestOf(platform) {
-    const names = [];
-    for (const screenshot of screenshotNames) {
-      for (const project of projects) {
-        const name = baselineName(screenshot, project, platform);
-        if (committed.has(name) && !dirty.has(name)) names.push(name);
-      }
-    }
-    let newest = null;
-    for (const name of names) {
-      const commit = commitOf(name);
-      if (!commit) continue;
-      if (!newest || isAncestor(newest.commit, commit)) newest = { commit, name };
-    }
-    return newest;
-  }
-
-  const newestByPlatform = new Map(KNOWN_PLATFORMS.map((platform) => [platform, newestOf(platform)]));
-
-  for (const platform of CI_PLATFORMS) {
-    const mine = newestByPlatform.get(platform);
-    if (!mine) continue;
-    for (const other of KNOWN_PLATFORMS) {
-      const theirs = other === platform ? null : newestByPlatform.get(other);
-      if (!theirs || !isAncestor(mine.commit, theirs.commit)) continue;
-      failures.push(
-        `The ${platform} baselines are stale: the newest is ${mine.name} at ${mine.commit.slice(0, 7)}, ` +
-          `but ${other} was re-recorded later (${theirs.name} at ${theirs.commit.slice(0, 7)}), ` +
-          `so the ${platform} run is comparing against the old screens. ` +
-          `Re-record them with the Visual Regression workflow's \`update_baselines\` dispatch input.`,
-      );
-      break;
-    }
+  if (expected.has(file)) continue;
+  if (/-(?:win32|darwin)\.png$/.test(file)) {
+    failures.push(
+      `${path.relative(root, path.join(snapshotDir, file))} was rendered outside the Playwright container. ` +
+        `Only ${PLATFORM} baselines are compared; delete it (it is gitignored) and record with \`npm run test:visual:docker\`.`,
+    );
+  } else {
+    failures.push(`${path.relative(root, path.join(snapshotDir, file))} is not produced by any screenshot in ${visual.spec}.`);
   }
 }
 
@@ -257,6 +176,6 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Visual baseline checks passed (${screenshotNames.length} screenshots x ${projects.length} project(s) x ${CI_PLATFORMS.length} CI platform(s)).`,
+    `Visual baseline checks passed (${screenshotNames.length} screenshots x ${visual.projects.length} project(s), ${PLATFORM} only).`,
   );
 }
