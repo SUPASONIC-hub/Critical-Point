@@ -1,5 +1,6 @@
 import { readStoredValue, writeStoredValue } from "./appConfig.js";
 
+/** @type {Partial<ImportMetaEnv>} */
 const viteEnv = import.meta.env ?? {};
 const localTelemetryConfigEnabled = viteEnv.DEV || viteEnv.VITE_ENABLE_DEBUG_TOOLS === "true";
 const localTelemetryUrl = localTelemetryConfigEnabled ? readStoredValue("critical-point-telemetry-url", "") : "";
@@ -42,9 +43,7 @@ async function createTelemetryError(response, fallbackMessage) {
     // A body is optional; fall back to the status code alone.
   }
   const suffix = detail ? `: ${detail}` : "";
-  const error = new Error(`${fallbackMessage}: ${response.status}${suffix}`);
-  error.status = response.status;
-  return error;
+  return Object.assign(new Error(`${fallbackMessage}: ${response.status}${suffix}`), { status: response.status });
 }
 
 export function getSessionId() {

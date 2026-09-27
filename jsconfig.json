@@ -9,11 +9,12 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "lib": ["es2023", "dom"],
-    "types": [],
+    "types": ["vite/client"],
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
   "files": [
+    "src/vite-env.d.ts",
     "src/gameConstants.js",
     "src/privacyText.js",
     "src/ranking.js",
