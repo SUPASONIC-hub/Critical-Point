@@ -60,7 +60,7 @@
     "verify:full": "npm run verify && npm run test:e2e:full && npm run test:e2e:season"
   },
   "dependencies": {
-    "lucide-react": "^0.468.0",
+    "lucide-react": "^0.577.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
