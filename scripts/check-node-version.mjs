@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { parse as parseYaml } from "yaml";
 
 /**
  * Node version single-home guardrail.
@@ -13,8 +14,8 @@ import path from "node:path";
  * that every place able to choose a Node version defers to it: each
  * `actions/setup-node` step through `node-version-file`, `render.yaml` by not
  * declaring an override, and `package.json` by not claiming a different major.
- * It also fails on a job that runs npm with no setup-node at all, which is the
- * quiet version of the same bug -- that job takes whatever the runner image
+ * It also fails on a job that runs npm with no setup-node before it, which is
+ * the quiet version of the same bug -- that job takes whatever the runner image
  * happens to ship.
  */
 
@@ -39,9 +40,10 @@ if (!/^\d+\.\d+\.\d+$/.test(pin)) {
 const pinnedMajor = pin.split(".")[0];
 
 /**
- * Workflow steps are matched by line rather than parsed: the repository has no
- * YAML dependency, and the two keys this cares about are unambiguous in a file
- * that `actions/setup-node` already has to keep flat.
+ * Workflows are parsed as YAML rather than matched line by line: a step in flow
+ * style (`with: { node-version: 24 }`), a quoted key, or a job at an unusual
+ * indent all mean the same thing to the runner, and have to mean the same thing
+ * here.
  */
 const workflowDir = path.join(root, ".github", "workflows");
 let workflowFiles = [];
@@ -54,58 +56,44 @@ if (workflowFiles.length === 0 && !failures.length) {
   failures.push(`.github/workflows has no workflow files; the pin is unverified.`);
 }
 
-/** The `jobs:` entries of one workflow, as `{ name, body }`, by indentation. */
-function splitJobs(source) {
-  const lines = source.split(/\r?\n/);
-  const start = lines.findIndex((line) => /^jobs:\s*$/.test(line));
-  if (start === -1) return [];
-  const jobs = [];
-  let current = null;
-  for (const line of lines.slice(start + 1)) {
-    const header = line.match(/^ {2}([\w-]+):\s*$/);
-    if (header) {
-      current = { name: header[1], body: [] };
-      jobs.push(current);
-      continue;
-    }
-    // A line back at column zero has left the `jobs:` block entirely.
-    if (/^\S/.test(line)) break;
-    current?.body.push(line);
-  }
-  return jobs.map((job) => ({ name: job.name, body: job.body.join("\n") }));
-}
+const isSetupNode = (step) => typeof step?.uses === "string" && /^actions\/setup-node@/.test(step.uses);
+const runsNode = (step) => typeof step?.run === "string" && /\b(npm|npx|node)\b/.test(step.run);
 
 for (const file of workflowFiles) {
   const rel = `.github/workflows/${file}`;
-  const source = readFileSync(path.join(workflowDir, file), "utf8");
-
-  for (const line of source.split(/\r?\n/)) {
-    const inline = line.match(/^\s*node-version:\s*(.+?)\s*$/);
-    if (inline) {
-      failures.push(
-        `${rel} names Node inline as \`node-version: ${inline[1]}\`. ` +
-          `Use \`node-version-file: ${PIN_FILE}\` so CI and the Render build cannot disagree.`,
-      );
-    }
-    const fromFile = line.match(/^\s*node-version-file:\s*(.+?)\s*$/);
-    if (fromFile && fromFile[1] !== PIN_FILE) {
-      failures.push(`${rel} reads Node from ${fromFile[1]}; ${PIN_FILE} is the one the Render build reads.`);
-    }
+  let workflow;
+  try {
+    workflow = parseYaml(readFileSync(path.join(workflowDir, file), "utf8"));
+  } catch (error) {
+    failures.push(`${rel} is not valid YAML: ${String(error.message).split("\n")[0]}`);
+    continue;
   }
-
-  const setupSteps = source.match(/uses:\s*actions\/setup-node@/g)?.length ?? 0;
-  const pinnedSteps = source.match(new RegExp(`node-version-file:\\s*${PIN_FILE.replace(".", "\\.")}`, "g"))?.length ?? 0;
-  if (setupSteps !== pinnedSteps) {
-    failures.push(
-      `${rel} has ${setupSteps} setup-node step(s) but ${pinnedSteps} reading ${PIN_FILE}. Every one of them has to.`,
-    );
-  }
-
-  for (const job of splitJobs(source)) {
-    const runsNode = /^\s*(-\s*)?run:.*\b(npm|npx|node)\b/m.test(job.body);
-    if (runsNode && !/uses:\s*actions\/setup-node@/.test(job.body)) {
+  for (const [jobName, job] of Object.entries(workflow?.jobs ?? {})) {
+    // A job that calls a reusable workflow has no steps of its own.
+    const steps = Array.isArray(job?.steps) ? job.steps : [];
+    for (const step of steps.filter(isSetupNode)) {
+      const inline = step.with?.["node-version"];
+      if (inline !== undefined) {
+        failures.push(
+          `${rel} job \`${jobName}\` names Node inline as \`node-version: ${inline}\`. ` +
+            `Use \`node-version-file: ${PIN_FILE}\` so CI and the Render build cannot disagree.`,
+        );
+      }
+      const fromFile = step.with?.["node-version-file"];
+      if (fromFile !== PIN_FILE) {
+        failures.push(
+          fromFile
+            ? `${rel} job \`${jobName}\` reads Node from ${fromFile}; ${PIN_FILE} is the one the Render build reads.`
+            : `${rel} job \`${jobName}\` has a setup-node step that does not read ${PIN_FILE}. Every one of them has to.`,
+        );
+      }
+    }
+    const firstNode = steps.findIndex(runsNode);
+    const firstSetup = steps.findIndex(isSetupNode);
+    if (firstNode !== -1 && (firstSetup === -1 || firstSetup > firstNode)) {
       failures.push(
-        `${rel} job \`${job.name}\` runs npm without a setup-node step, so it takes whatever Node the runner image ships.`,
+        `${rel} job \`${jobName}\` runs npm ${firstSetup === -1 ? "with no setup-node step" : "before its setup-node step"}, ` +
+          `so it takes whatever Node the runner image ships.`,
       );
     }
   }
@@ -117,18 +105,35 @@ for (const file of workflowFiles) {
  * the pin's side.
  */
 try {
-  const renderYaml = readFileSync(path.join(root, "render.yaml"), "utf8");
-  if (/^\s*-?\s*key:\s*NODE_VERSION\s*$/m.test(renderYaml)) {
-    failures.push(`render.yaml declares NODE_VERSION, which overrides ${PIN_FILE} for the deploy build.`);
+  const render = parseYaml(readFileSync(path.join(root, "render.yaml"), "utf8"));
+  for (const service of render?.services ?? []) {
+    if ((service.envVars ?? []).some((variable) => variable?.key === "NODE_VERSION")) {
+      failures.push(`render.yaml declares NODE_VERSION for ${service.name}, which overrides ${PIN_FILE} for the deploy build.`);
+    }
   }
-} catch {
+} catch (error) {
   // A repository without render.yaml simply has no second place to disagree.
+  if (error?.code !== "ENOENT") failures.push(`render.yaml could not be read: ${String(error.message).split("\n")[0]}`);
 }
 
+/**
+ * engines.node has to admit the pinned version and no other major: `>=24 <25`
+ * or `^24.20.0` pass, `>=22` does not (it would bless a Node 22 install).
+ */
 const packageJson = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
 const engines = packageJson.engines?.node;
-if (engines && !engines.includes(pinnedMajor)) {
-  failures.push(`package.json engines.node is "${engines}" but ${PIN_FILE} pins ${pin}. They have to name the same major.`);
+if (engines) {
+  const majors = [...engines.matchAll(/(\d+)(?:\.\d+){0,2}/g)].map((match) => match[1]);
+  const upper = engines.match(/<\s*(\d+)/)?.[1];
+  const admitsOnlyPinnedMajor =
+    majors.includes(pinnedMajor) &&
+    (/^\s*[\^~]/.test(engines) || upper === String(Number(pinnedMajor) + 1) || /^\s*\d+(?:\.\d+){0,2}\s*$/.test(engines));
+  if (!admitsOnlyPinnedMajor) {
+    failures.push(
+      `package.json engines.node is "${engines}" but ${PIN_FILE} pins ${pin}. ` +
+        `It has to name that major and no other, e.g. ">=${pinnedMajor} <${Number(pinnedMajor) + 1}".`,
+    );
+  }
 }
 
 if (failures.length) {
