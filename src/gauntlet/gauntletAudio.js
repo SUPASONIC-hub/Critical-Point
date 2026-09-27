@@ -1,4 +1,4 @@
-import { acquireCueRuntime } from "../components/AdaptiveMusic.jsx";
+import { acquireCueRuntime, isSoundMuted } from "../components/AdaptiveMusic.jsx";
 
 /**
  * The gauntlet's sound. Every cue goes through `acquireCueRuntime`, so a muted
@@ -105,7 +105,10 @@ export function startTensionDrone() {
         if (stopped) return;
         const now = context.currentTime;
         const read = sedated ? 0.35 : closeness;
-        master.gain.setTargetAtTime((0.012 + read * read * 0.07) * multiplier, now, 0.25);
+        // The drone runs for the whole window, so it is the one voice that can
+        // outlive a mute pressed after it started.
+        const level = isSoundMuted() ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
+        master.gain.setTargetAtTime(level, now, 0.25);
         filter.frequency.setTargetAtTime(120 + read * 1400, now, 0.3);
         voices[2].detune.setTargetAtTime(read * 60, now, 0.4);
       },

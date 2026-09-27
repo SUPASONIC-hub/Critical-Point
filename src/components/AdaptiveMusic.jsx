@@ -287,11 +287,38 @@ function playNoiseSweep(context, destination, duration = 0.7, gainValue = 0.02, 
  */
 const audioRuntime = { context: null, master: null, bus: null, drive: null };
 
+/**
+ * A hidden tab is silent. The score's interval and the table's drone kept
+ * sounding from a background tab -- the drone is a set of running
+ * oscillators, not a scheduled cue, so nothing about the page being hidden
+ * stopped it. The one shared context is suspended while the page is hidden,
+ * which stops every voice on it at once, and resumed when it is shown again
+ * unless the player has muted in the meantime. Installed once, with the
+ * context.
+ */
+function followPageVisibility(context) {
+  if (typeof document === "undefined") return;
+  let suspendedForHidden = false;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (context.state !== "running") return;
+      suspendedForHidden = true;
+      Promise.resolve(context.suspend?.()).catch(() => {});
+      return;
+    }
+    if (!suspendedForHidden) return;
+    suspendedForHidden = false;
+    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    Promise.resolve(context.resume?.()).catch(() => {});
+  });
+}
+
 function ensureAudioRuntime(volume) {
   if (!audioRuntime.context) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return null;
     audioRuntime.context = new AudioContextClass();
+    followPageVisibility(audioRuntime.context);
   }
   const context = audioRuntime.context;
   if (!audioRuntime.master) {
@@ -444,6 +471,11 @@ export function playDecisionRevealCue(tone = "decision-locked") {
  * gain to zero still costs a context, and a context is what the muted player
  * asked not to have.
  */
+/** Whether the player has sound off. For a voice that outlives the cue that started it. */
+export function isSoundMuted() {
+  return readStoredValue(MUSIC_PREF_KEY, "true") === "false";
+}
+
 export function acquireCueRuntime() {
   try {
     if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return null;
@@ -452,7 +484,9 @@ export function acquireCueRuntime() {
     // the one gesture that can precede that. A cue firing before either is a
     // cue with no run behind it yet, and it stays silent instead of racing them.
     const context = audioRuntime.context;
-    if (!context) return null;
+    // A hidden page is suspended on purpose (followPageVisibility); a cue that
+    // fires then must not wake the context back up behind the player's back.
+    if (!context || globalThis.document?.hidden) return null;
     Promise.resolve(context.resume?.()).catch(() => {});
     return {
       context,
@@ -561,15 +595,36 @@ export function AdaptiveMusic({ modeKey }) {
     }
 
     pulseRef.current = pulse;
+
+    // Browsers start a context suspended until the page has had a gesture, so
+    // the first input anywhere unblocks it. These listeners come off the
+    // moment the context runs: left on, every tap called resume() on a running
+    // context and struck an extra step off the grid (two per tap, pointerdown
+    // and touchstart) and re-rendered the controls.
+    const unblockEvents = ["pointerdown", "keydown", "touchstart"];
+    function detachUnblockers() {
+      for (const type of unblockEvents) window.removeEventListener(type, resumeAfterAutoplayBlock);
+    }
     async function resumeAudio() {
+      const wasRunning = context.state === "running";
       try {
         await context.resume?.();
-        setAudioState(context.state === "running" ? "running" : "blocked");
-        if (context.state === "running") pulse();
       } catch (error) {
         console.warn("Audio resume blocked", error);
         setAudioState("blocked");
+        return;
       }
+      const running = context.state === "running";
+      setAudioState(running ? "running" : "blocked");
+      if (!running) return;
+      detachUnblockers();
+      // A step only for the transition into sound. The interval already
+      // carries the bar while the context runs.
+      if (!wasRunning) pulse();
+    }
+    function resumeAfterAutoplayBlock() {
+      if (document.hidden) return;
+      resumeAudio();
     }
 
     resumeRef.current = resumeAudio;
@@ -577,23 +632,25 @@ export function AdaptiveMusic({ modeKey }) {
       setAudioState(context.state === "running" ? "running" : context.state === "closed" ? "off" : "blocked");
     };
 
-    function resumeAfterAutoplayBlock() {
-      resumeAudio();
+    if (context.state !== "running") {
+      window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
+      window.addEventListener("keydown", resumeAfterAutoplayBlock);
+      window.addEventListener("touchstart", resumeAfterAutoplayBlock, { passive: true });
     }
 
-    window.addEventListener("pointerdown", resumeAfterAutoplayBlock, { passive: true });
-    window.addEventListener("keydown", resumeAfterAutoplayBlock);
-    window.addEventListener("touchstart", resumeAfterAutoplayBlock, { passive: true });
-
     audioRuntime.master.gain.setTargetAtTime(volumeRef.current, context.currentTime, 0.2);
-    pulse();
-    resumeAudio();
+    // A context that is already running (the score carried over from the last
+    // screen) plays the first step now; a suspended one plays it when it resumes.
+    if (context.state === "running") {
+      pulse();
+      queueMicrotask(() => setAudioState("running"));
+    } else if (!document.hidden) {
+      resumeAudio();
+    }
     timerRef.current = window.setInterval(pulse, modeRef.current.interval);
     return () => {
       window.clearInterval(timerRef.current);
-      window.removeEventListener("pointerdown", resumeAfterAutoplayBlock);
-      window.removeEventListener("keydown", resumeAfterAutoplayBlock);
-      window.removeEventListener("touchstart", resumeAfterAutoplayBlock);
+      detachUnblockers();
       if (pulseRef.current === pulse) pulseRef.current = null;
     };
   }, [enabled]);
