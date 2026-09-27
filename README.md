@@ -541,6 +541,7 @@ npm run test:e2e:season # 시즌 전체를 끊지 않고 한 번에 걷기 (주�
 Windows·macOS에서 찍힌 베이스라인은 무시(gitignore)되고 커밋하면 `check:visual-baselines`가 거절합니다.
 
 PR에서 무거운 검사는 라벨로 켭니다. `e2e` 라벨은 e2e 티어를, `visual` 라벨은 시각 회귀를 돌립니다.
+Dependabot PR은 라벨 없이도 e2e와 시각 회귀를 모두 돕니다(의존성 업데이트가 게임을 깨뜨리기 가장 쉬운 변경이라서).
 저장소의 텍스트 파일은 모든 플랫폼에서 LF로 체크아웃됩니다(`.gitattributes`, `.editorconfig`). 바이트로
 재는 예산이 Windows에서 CRLF를 재던 문제 때문입니다.
 
@@ -717,7 +718,7 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 여덟 구간(`@season-segment`)으로 나눠 걷고, GitHub Actions는 기본 e2e를 샤드 세 개에 나눠 push마다
 돌립니다. 끊지 않는 연속 걷기(`npm run test:e2e:season`)와 전체 경로 검증(`npm run test:e2e:full`)은
 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 수행합니다. PR에서는 `verify:quick`만 돌고, e2e는
-push 또는 `e2e` 라벨, 시각 회귀는 `visual` 라벨·주간 실행·수동 실행에서 돕니다.
+push·`e2e` 라벨·Dependabot PR, 시각 회귀는 `visual` 라벨·Dependabot PR·주간 실행·수동 실행에서 돕니다.
 
 워크플로의 액션은 전부 커밋 SHA로 고정하고 옆 주석에 태그를 적습니다. 버전 올리기는 Dependabot(npm과
 액션, 매주, 묶어서; 메이저 버전과 `@playwright/test`는 제외 — Playwright는 시각 회귀 컨테이너와 함께

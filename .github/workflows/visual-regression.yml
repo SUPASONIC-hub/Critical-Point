@@ -29,8 +29,11 @@ concurrency:
 
 jobs:
   visual-regression:
+    # Dependabot pull requests compare too: an icon or font package bump shows
+    # up as pixels before it shows up anywhere else.
     if: >-
       github.event_name != 'pull_request' ||
+      (github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'labeled') ||
       (contains(github.event.pull_request.labels.*.name, 'visual') &&
        (github.event.action != 'labeled' || github.event.label.name == 'visual'))
     runs-on: ubuntu-latest

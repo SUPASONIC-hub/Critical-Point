@@ -671,9 +671,13 @@ Still open, on purpose:
     animates a paint property. A number that has to rise is a decision worth
     writing here, not a constant worth editing quietly.
 82. Actions are pinned by commit SHA with the tag in a comment, and Dependabot
-    (npm and actions, weekly, grouped; majors and `@playwright/test` ignored,
-    since Playwright moves with the visual-regression container) proposes
-    bumps. Workflows run with `contents: read`; only the job that pushes
+    (npm and actions, weekly, grouped; npm majors and `@playwright/test`
+    ignored, since Playwright moves with the visual-regression container)
+    proposes bumps, with no labels. A Dependabot pull request runs the e2e
+    shards and the visual comparison by its author, not by a label: its
+    default labels used to arrive as four `labeled` events whose skipped and
+    cancelled runs buried the one that checked the code, and a dependency bump
+    is the change most likely to break the running game. Workflows run with `contents: read`; only the job that pushes
     recorded baselines may write. Concurrency groups cancel superseded pull
     request runs, never a push to main, and never a deploy. The `supabase` CLI
     is a pinned devDependency, so `npx supabase` runs that version.

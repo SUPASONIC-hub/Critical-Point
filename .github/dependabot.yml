@@ -1,9 +1,15 @@
 version: 2
+# `labels: []` on each entry: Dependabot's default labels arrive as separate
+# `labeled` events right after the pull request opens, and each one started a
+# Verify and a Visual Regression run that skipped or cancelled itself, burying
+# the one run that checked the code under a column of grey. The workflows key
+# Dependabot pull requests on their author, not on a label.
 updates:
   # Workflow actions are pinned to commit SHAs; this keeps the SHAs (and the
   # `# vX.Y.Z` comments beside them) moving. One pull request a week.
   - package-ecosystem: github-actions
     directory: /
+    labels: []
     schedule:
       interval: weekly
       day: monday
@@ -13,6 +19,7 @@ updates:
 
   - package-ecosystem: npm
     directory: /
+    labels: []
     schedule:
       interval: weekly
       day: monday

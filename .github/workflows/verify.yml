@@ -71,10 +71,14 @@ jobs:
           retention-days: 7
 
   verify-e2e:
-    # Every push, and a pull request carrying the `e2e` label. On the label
-    # event itself only when the label added is `e2e`.
+    # Every push; a pull request carrying the `e2e` label (on the label event
+    # itself only when the label added is `e2e`); and every Dependabot pull
+    # request, because a dependency bump is the change most likely to break the
+    # running game while the static tier stays green. Nothing here reads a
+    # secret, so it runs the same on a Dependabot pull request.
     if: >-
       github.event_name != 'pull_request' ||
+      (github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'labeled') ||
       (contains(github.event.pull_request.labels.*.name, 'e2e') &&
        (github.event.action != 'labeled' || github.event.label.name == 'e2e'))
     runs-on: ubuntu-latest
