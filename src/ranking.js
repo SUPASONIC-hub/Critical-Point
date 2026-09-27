@@ -18,11 +18,27 @@ function parseSummary(summary) {
   return summary;
 }
 
+/**
+ * The short run label, computed the way the `run_tag` column is
+ * (20260928000000): the last eight letters and digits, upper-cased. Remote rows
+ * carry only this -- the full run id is not public -- so it is also what a
+ * local row and its own remote copy are matched on.
+ */
+function getRunTag(runId) {
+  return String(runId ?? "").replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCase();
+}
+
+function readScore(row, summary) {
+  const serverScore = row.score === null || row.score === undefined || row.score === "" ? NaN : Number(row.score);
+  return Number.isFinite(serverScore) ? serverScore : Number(summary.burstScore ?? summary.momentumScore);
+}
+
 function normalizeEntry(row = {}) {
   const summary = parseSummary(row.summary);
   const rank = normalizeRank(summary.rank);
-  const parsedScore = Number(summary.burstScore ?? summary.momentumScore);
+  const parsedScore = readScore(row, summary);
   const runId = row.run_id ?? summary.runId ?? "";
+  const runTag = row.run_tag || getRunTag(runId);
   const reflectionScore = Number(summary.reflectionScore) || 0;
   const pressureAdaptScore = Number(summary.pressureAdaptScore) || 0;
   const reframeCount = Number(summary.reframeCount) || 0;
@@ -34,10 +50,11 @@ function normalizeEntry(row = {}) {
         ? "SYSTEM THINKER"
         : "FIELD DECIDER";
   const isLocal = Boolean(row.local);
-  const runLabel = runId ? `RUN ${String(runId).slice(-8).toUpperCase()}` : "LOCAL RUN";
+  const runLabel = runTag ? `RUN ${runTag}` : "LOCAL RUN";
   return {
-    id: `${runId || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
+    id: `${runTag || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
     runId,
+    runTag,
     runLabel,
     sessionCode: row.session_code ?? "LOCAL",
     isLocal,
@@ -59,7 +76,7 @@ function normalizeEntry(row = {}) {
     cognitionScore: Number(summary.cognitionScore) || 0,
     style,
     league: getRankingLeague(style),
-    integrity: getRankingIntegrity({ runId, completedAt: row.completed_at, summary }),
+    integrity: getRankingIntegrity({ runId: runId || runTag, completedAt: row.completed_at, summary }),
     seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
     summary,
   };
@@ -74,14 +91,17 @@ export function buildLeaderboard(rows = [], limit = 50) {
     entry.score > current.score ||
     (entry.score === current.score && rankWeight[entry.rank] > rankWeight[current.rank]);
   normalized.forEach((entry) => {
-    const key = entry.runId || entry.id;
+    const key = entry.runTag || entry.id;
     const current = bestByRun.get(key);
     // A completed season always beats a partial one; within the same tier the
     // better score wins, so duplicate submissions of one run cannot pin the
-    // leaderboard to whichever row happened to arrive first.
+    // leaderboard to whichever row happened to arrive first. On a tie this
+    // browser's own copy wins: it is the one that knows the full run id, which
+    // is how the ranking screen marks the player's current run.
     const shouldReplace = !current ||
       (entry.seasonComplete && !current.seasonComplete) ||
-      (entry.seasonComplete === current.seasonComplete && outranks(entry, current));
+      (entry.seasonComplete === current.seasonComplete &&
+        (outranks(entry, current) || (entry.isLocal && !current.isLocal && !outranks(current, entry))));
     if (shouldReplace) {
       bestByRun.set(key, entry);
     }

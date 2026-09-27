@@ -42,8 +42,42 @@ const BOARD_POST_INTERVAL_MS = 30000;
  * longer than that to find the box; a script does not need any of it.
  */
 const BOARD_DWELL_MS = 3000;
-/** The trigger's link test, written the same way so the two agree. */
-const BOARD_LINK_PATTERN = /(https?:\/\/|www\.|[a-z0-9-]+\.(com|net|org|io|kr|co|xyz|top|ru|cn)\b)/i;
+/**
+ * The trigger's tests (`board_text_has_link`, `board_text_has_contact` and
+ * `clean_board_text` in 20260928010000), written the same way so the two agree.
+ * The server applies them to the nickname as well as the body, so this does too.
+ */
+const BOARD_LINK_TLDS =
+  "com|net|org|io|kr|co|xyz|top|ru|cn|me|ly|gg|app|link|site|online|shop|store|info|biz|tv|to|cc|be|us|uk|jp|de|fr|in|ai|dev|so|la|page|club|live|fun|icu|vip|win|pro|sh|ws|tk|ml|ga|cf|gq|gl|im|am|fm|one|click|lol|bio|zip|mov|pw|su|ooo|asia|cloud|space|website|tech|world|today|news|blog|xn--[a-z0-9-]+";
+const BOARD_LINK_PATTERN = new RegExp(String.raw`(https?:|hxxps?:|www\.|닷\s*컴|[a-z0-9-]+(\.|\s+dot\s+)(${BOARD_LINK_TLDS})\b)`);
+const BOARD_SPACED_LINK_PATTERN = /[a-z0-9-]+\.\s+(com|net|org|xyz|io|kr)\b/;
+const BOARD_EMAIL_PATTERN = /[^\s@]+@[^\s@]+\.[a-z]{2,}/i;
+const BOARD_PHONE_PATTERN =
+  /(^|[^0-9])(\+?82[-.\s]?1[016789]|01[016789]|0[2-6][0-9]?|070|050[0-9]?)[-.\s)]{0,2}[0-9]{3,4}[-.\s]?[0-9]{4}([^0-9]|$)/;
+// eslint-disable-next-line no-control-regex -- control characters are exactly what this strips
+const BOARD_INVISIBLE_PATTERN = /[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF]/g;
+
+/** Invisible characters out, Unicode spaces trimmed from both ends. */
+function cleanBoardText(value) {
+  return String(value ?? "").replace(BOARD_INVISIBLE_PATTERN, "").trim();
+}
+
+function visibleLength(value) {
+  return value.replace(/\s/g, "").length;
+}
+
+export function boardTextHasLink(value) {
+  const folded = String(value ?? "")
+    .toLowerCase()
+    .replace(/\s*(\[\.\]|\(\.\)|\[dot\]|\(dot\)|\{dot\}|。|．|｡)\s*/g, ".")
+    .replace(/([a-z0-9-])\s+\.\s*([a-z])/g, "$1.$2");
+  return BOARD_LINK_PATTERN.test(folded) || BOARD_SPACED_LINK_PATTERN.test(folded);
+}
+
+export function boardTextHasContact(value) {
+  const text = String(value ?? "");
+  return BOARD_EMAIL_PATTERN.test(text) || BOARD_PHONE_PATTERN.test(text);
+}
 
 function normalizeBoardPost(row = {}) {
   return {
@@ -61,7 +95,9 @@ function normalizeBoardPost(row = {}) {
  */
 function describeBoardFailure(error, isOnline) {
   const message = error instanceof Error ? error.message : "";
+  if (/nickname must not contain a link/.test(message)) return "이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.";
   if (/must not contain a link/.test(message)) return "링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.";
+  if (/must not contain contact details/.test(message)) return "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.";
   if (/at least 30 seconds apart/.test(message)) return "글은 30초에 한 번만 올릴 수 있습니다. 잠시 뒤에 다시 눌러 주세요.";
   if (/rate limit exceeded/.test(message)) return "한 시간에 열 번까지만 올릴 수 있습니다. 시간을 두고 다시 찾아와 주세요.";
   if (/nickname must be/.test(message)) return "이름은 2자 이상 24자 이하로 적어 주세요.";
@@ -122,12 +158,12 @@ export function useBoard({ showBoard, isOnline }) {
   }, [boardReloadToken, isOnline, showBoard]);
 
   const activeBoardPrivacySignals = detectPrivacySignals(boardBody).filter((signal) => signal.active);
-  const trimmedBoardNickname = boardNickname.trim();
-  const trimmedBoardBody = boardBody.trim();
+  const trimmedBoardNickname = cleanBoardText(boardNickname.replace(/\s+/g, " "));
+  const trimmedBoardBody = cleanBoardText(boardBody);
   const canSubmitBoardPost =
     !isPostingToBoard &&
-    trimmedBoardNickname.length >= BOARD_NICKNAME_MIN_LENGTH &&
-    trimmedBoardBody.length >= BOARD_POST_MIN_LENGTH &&
+    visibleLength(trimmedBoardNickname) >= BOARD_NICKNAME_MIN_LENGTH &&
+    visibleLength(trimmedBoardBody) >= BOARD_POST_MIN_LENGTH &&
     activeBoardPrivacySignals.length === 0;
 
   function setBoardNickname(value) {
@@ -157,11 +193,11 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardPostStatus("게시판이 열린 지 얼마 되지 않았습니다. 잠깐 읽어 보고 다시 눌러 주세요.");
       return;
     }
-    if (trimmedBoardNickname.length < BOARD_NICKNAME_MIN_LENGTH) {
+    if (visibleLength(trimmedBoardNickname) < BOARD_NICKNAME_MIN_LENGTH) {
       setBoardPostStatus("이름은 2자 이상 24자 이하로 적어 주세요.");
       return;
     }
-    if (trimmedBoardBody.length < BOARD_POST_MIN_LENGTH) {
+    if (visibleLength(trimmedBoardBody) < BOARD_POST_MIN_LENGTH) {
       setBoardPostStatus("글은 2자 이상 300자 이하로 적어 주세요.");
       return;
     }
@@ -169,8 +205,16 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardPostStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 올려 주세요.");
       return;
     }
-    if (BOARD_LINK_PATTERN.test(trimmedBoardBody)) {
+    if (boardTextHasLink(trimmedBoardNickname)) {
+      setBoardPostStatus("이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.");
+      return;
+    }
+    if (boardTextHasLink(trimmedBoardBody)) {
       setBoardPostStatus("링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.");
+      return;
+    }
+    if (boardTextHasContact(trimmedBoardNickname) || boardTextHasContact(trimmedBoardBody)) {
+      setBoardPostStatus("전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.");
       return;
     }
     const sinceLastPost = Date.now() - lastBoardPostAt;
@@ -183,9 +227,11 @@ export function useBoard({ showBoard, isOnline }) {
     setIsPostingToBoard(true);
     writeStoredValue(BOARD_NICKNAME_KEY, trimmedBoardNickname);
     const sessionId = getSessionId();
-    // One id per submit, so a queue or a double click that sends the same post
-    // twice lands once: `board_posts.event_id` is unique.
-    const eventId = `board-${sessionId}-${Date.now()}`;
+    // One id per submit, so a double click that sends the same post twice lands
+    // once: `board_posts.event_id` is unique. Random rather than derived from
+    // the session, so the id could never tie two posts to one device.
+    const eventId =
+      globalThis.crypto?.randomUUID?.() ?? `board-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 
     try {
       const { skipped = false } = await saveBoardPost(
