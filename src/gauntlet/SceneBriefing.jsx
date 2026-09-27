@@ -3,6 +3,7 @@ import { Flame, Lock, TriangleAlert } from "lucide-react";
 import { hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
+import { useDialogFocus } from "./useDialogFocus.js";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 
@@ -38,6 +39,16 @@ function splitCaptions(text = "") {
  *
  * The page holds the table's clock the whole time it is up; its own countdown
  * is the only thing ticking, and it stops while the browser tab is hidden.
+ *
+ * The countdown is also a button. A reading clock that opens the table by
+ * itself is a time limit on reading, and a player who reads slowly -- or with
+ * a screen reader -- needs a way to stop it (WCAG 2.2.1): pressing the clock
+ * holds it until it is pressed again. It is part of the page, not a panel in
+ * front of the table, so priority 27 is untouched.
+ *
+ * It renders once a second, not once a frame: the bar under the number is a
+ * CSS variable the loop writes on the element, and the number only changes
+ * when a whole second has gone.
  */
 export function SceneBriefing({
   node,
@@ -56,17 +67,17 @@ export function SceneBriefing({
   resourceMeta,
   onOpen,
 }) {
-  const [left, setLeft] = useState(readSeconds);
+  const [shown, setShown] = useState(() => Math.ceil(readSeconds));
+  const [held, setHeld] = useState(false);
+  const heldRef = useRef(false);
   const onOpenRef = useRef(onOpen);
   const dialogRef = useRef(null);
+  const timerRef = useRef(null);
+  const trapTab = useDialogFocus(dialogRef);
 
   useEffect(() => {
     onOpenRef.current = onOpen;
   });
-
-  useEffect(() => {
-    dialogRef.current?.focus({ preventScroll: true });
-  }, []);
 
   useEffect(() => {
     let frame = 0;
@@ -74,11 +85,12 @@ export function SceneBriefing({
     let last = monotonicNow();
     const loop = () => {
       const now = monotonicNow();
-      if (!document.hidden) spent += Math.min(0.25, (now - last) / 1000);
+      if (!document.hidden && !heldRef.current) spent += Math.min(0.25, (now - last) / 1000);
       last = now;
       const remaining = Math.max(0, readSeconds - spent);
-      // Tenths are all the page shows; an unchanged value skips the render.
-      setLeft(Math.ceil(remaining * 10) / 10);
+      timerRef.current?.style.setProperty("--read-left", Math.max(0, Math.min(1, remaining / readSeconds)).toFixed(3));
+      // Whole seconds are all the page prints; an unchanged value skips the render.
+      setShown(Math.ceil(remaining));
       if (remaining <= 0) {
         onOpenRef.current(null);
         return;
@@ -89,11 +101,15 @@ export function SceneBriefing({
     return () => globalThis.cancelAnimationFrame(frame);
   }, [readSeconds]);
 
+  function toggleHold() {
+    heldRef.current = !heldRef.current;
+    setHeld(heldRef.current);
+  }
+
   const broken = mutations.length > 0;
   const sfx = pickSfx(nodeId, broken);
   const captions = splitCaptions(node.text);
-  const shown = Math.ceil(left);
-  const late = left <= 5;
+  const late = !held && shown <= 5;
 
   return (
     <div className="gx-comic" data-testid="scene-briefing">
@@ -104,21 +120,24 @@ export function SceneBriefing({
         aria-modal="true"
         aria-labelledby="gx-comic-title"
         tabIndex={-1}
+        onKeyDown={trapTab}
       >
         <header className="gx-comic-top">
           <p className="gx-comic-kicker">{node.phase}</p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
-          <div
-            className={`gx-comic-timer${late ? " is-late" : ""}`}
-            role="timer"
-            aria-label={`읽는 시간 ${shown}초 남음`}
+          <button
+            type="button"
+            ref={timerRef}
+            className={`gx-comic-timer${late ? " is-late" : ""}${held ? " is-held" : ""}`}
+            aria-pressed={held}
+            aria-label={held ? `읽는 시간 멈춤, ${shown}초 남음. 누르면 다시 흐른다` : `읽는 시간 ${shown}초 남음. 누르면 멈춘다`}
             data-testid="reading-timer"
-            style={{ "--read-left": Math.max(0, Math.min(1, left / readSeconds)) }}
+            onClick={toggleHold}
           >
             <b>{shown}</b>
-            <small>초 뒤 판이 열린다</small>
+            <small>{held ? "멈춤 · 누르면 다시 흐른다" : "초 뒤 판이 열린다 · 누르면 멈춤"}</small>
             <i aria-hidden="true" />
-          </div>
+          </button>
         </header>
 
         <div className="gx-comic-grid">

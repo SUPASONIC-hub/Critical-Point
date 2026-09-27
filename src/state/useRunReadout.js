@@ -20,7 +20,7 @@ import { getTraceEvents } from "./trace.js";
  * A window already settled under this seed -- a rolled-back save brought it
  * back -- is dealt again under a fresh draw, so its seen wall is not its wall.
  */
-export function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
+function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
   const settled = new Set(settledSeeds);
   let seed = baseSeed;
   for (let redeal = 1; settled.has(seed) && redeal < 50; redeal += 1) seed = `${baseSeed}~${redeal}`;

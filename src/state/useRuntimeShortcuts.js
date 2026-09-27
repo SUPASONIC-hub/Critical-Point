@@ -46,7 +46,9 @@ export function useRuntimeChoiceShortcuts({
   useEffect(() => {
     const handleShortcut = (event) => {
       if (!started || decisionReveal || isAdvancing) return;
-      if (event.repeat) return;
+      // Ctrl/Cmd+R is the browser's reload and Ctrl+P its print dialog; a
+      // modified key is never one of the game's.
+      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
       if (isResult) {

@@ -44,6 +44,28 @@ test("leaving with a bet on the table keeps the table as it stood", async ({ pag
     .toBeNull();
 });
 
+// A window that has closed is on its slam for most of a second before the
+// verdict is committed. Leaving then used to drop the verdict and bring the
+// hold back as a bust, so a cash became a BUST; the exit now waits.
+test("leaving during the verdict slam keeps the verdict", async ({ page }) => {
+  await startDebugNode(page, "case02", "c2_logs");
+  await stakeAndPush(page);
+  const cash = page.getByTestId("commit-confirm");
+  for (let press = 0; press < 8 && !(await cash.isEnabled()); press += 1) {
+    await page.getByTestId("commit-push").evaluate((button) => button.click());
+  }
+  await page.evaluate(async () => {
+    document.querySelector("[data-testid='commit-confirm']").click();
+    // Let the closed window render and report itself before leaving.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 30))));
+    [...document.querySelectorAll("button")].find((button) => button.getAttribute("aria-label") === "저장 후 나가기")?.click();
+  });
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.busts).toBe(0);
+  expect(saved.dynamics.suspended ?? null).toBeNull();
+});
+
 // The page going away (a reload, a phone reclaiming the tab) keeps a live
 // table too. What it can never keep is a table that already hit the wall: a
 // closed window is not suspended, so the bust stands (unit-tests.mjs).

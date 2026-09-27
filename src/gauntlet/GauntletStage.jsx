@@ -4,14 +4,11 @@ import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   BASE_SCHEMA,
-  buildNextSchema,
-  describeMutations,
   drawStep,
   equipRelic,
   FEVER_BONUS,
   FOCUS_MAX,
   FOCUS_MODES,
-  FRACTURE_MIN_BURN,
   GAUGE_MAX,
   getCardBurn,
   getCardChips,
@@ -35,6 +32,8 @@ import {
   STANCE_MASTERY_GOAL,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
+import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { useTableKeys } from "./useTableKeys.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import {
   playBeatCue,
@@ -80,57 +79,6 @@ function pressedAt(event) {
   return Number.isFinite(stamp) && stamp > 0 && stamp <= now ? stamp : now;
 }
 
-function formatNumber(value) {
-  return Math.round(Number(value) || 0).toLocaleString("en-US");
-}
-
-function formatMultiplier(value) {
-  return value >= 10 ? `×${Math.round(value)}` : `×${value.toFixed(1)}`;
-}
-
-function describeEffect(effect = {}, resourceMeta = {}) {
-  return Object.entries(effect)
-    .filter(([, value]) => Number(value) !== 0)
-    .map(([key, value]) => ({
-      key,
-      value: Number(value),
-      label: resourceMeta[key]?.label ?? key,
-    }))
-    .sort((left, right) => Math.abs(right.value) - Math.abs(left.value));
-}
-
-function joinRules(items) {
-  if (!items.length) return "기본 규칙";
-  return items.map((item) => item.label).join(" / ");
-}
-
-function getRuleHeat({ mutations, schema }) {
-  return Math.min(
-    100,
-    mutations.length * 24
-      + (schema.faceDown ? 18 : 0)
-      + (schema.sedated ? 14 : 0)
-      + (schema.sealHighest ? 12 : 0)
-      + (schema.fracturedAxis ? 16 : 0)
-      + (schema.stepMin > BASE_SCHEMA.stepMin ? 16 : 0),
-  );
-}
-
-function getRuleObjective(mutations) {
-  if (!mutations.length) return "규칙 안정. 지금은 판돈과 벽만 읽으면 된다.";
-  const labels = mutations.map((mutation) => mutation.label).join(" / ");
-  return `${labels} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.`;
-}
-
-function getOverdriveCopy({ run, multiplier, cashMutations }) {
-  const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
-  if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
-  if (run.streak > 0 && multiplier >= 4) return { label: "CHAIN LIVE", text: "한 번 더 x4+ 확정하면 오버클럭", progress: 75 };
-  if (run.streak > 0) return { label: "CHAIN HELD", text: "이번 판도 x4 이상으로 확정해야 이어진다", progress: 50 };
-  if (multiplier >= 4) return { label: "IGNITION", text: "확정하면 오버클럭 체인 1단계", progress: 35 };
-  return { label: "DORMANT", text: "x4 이상 확정부터 체인이 켜진다", progress: 12 };
-}
-
 /**
  * The table. One hand, one gauge, two verbs.
  *
@@ -158,7 +106,6 @@ export function GauntletStage({
   scene,
 }) {
   const schema = run?.schema ?? BASE_SCHEMA;
-  const mutations = useMemo(() => describeMutations(schema), [schema]);
   const tabToken = getTabToken();
   // Read once, at mount: a save that already names this window means a bet was
   // placed on it and never settled. If this tab placed it, this is a reload and
@@ -185,6 +132,7 @@ export function GauntletStage({
   const [flash, setFlash] = useState(null);
   // Written by the frame loop on every beat; read here when a push is pressed.
   const beatClock = useRef({ at: 0, period: 0 });
+  const stageRef = useRef(null);
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the briefing wait until the player has read it.
   const locked = lostToTab || staleSave;
@@ -241,61 +189,25 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
-  const selectedBurn = selectedCard ? getCardBurn(selectedCard, schema) : null;
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
   const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * grooveBonus * focusBonus.pot);
   const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * grooveBonus * focusBonus.pot);
-  const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
-  const cashSchema = buildNextSchema({
-    outcome: "cash",
-    cause: "cash",
-    gauge: win.gauge,
-    pushes: win.pushes,
-    streak: multiplier >= 4 ? run.streak + 1 : 0,
-    burnAxis: fractureAxis,
-    caseClosed: false,
-    relics,
-    focusMode: win.focusMode,
-    focusCharge: win.focus,
-    focusHits: win.focusHits,
-    stanceMastery: run.stanceMastery,
-  });
-  const bustSchema = buildNextSchema({
-    outcome: "bust",
-    cause: "push",
-    gauge: Math.max(win.gauge, schema.wallMin),
-    pushes: win.pushes + 1,
-    streak: 0,
-    burnAxis: fractureAxis,
-    caseClosed: false,
-    relics,
-  });
-  const cashMutations = describeMutations(cashSchema);
-  const bustMutations = describeMutations(bustSchema);
-  // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
-  const bustKeeps = hasRelic(relics, "insurance") && !run.insuranceSpent ? Math.floor(run.runPot / 3) : 0;
-  const runTension = Math.min(100, run.busts * 24 + run.streak * 16 + Math.min(40, Math.log10(Math.max(1, run.runPot)) * 11));
-  // REBOOT is the rules resetting, not a rule bending the board. The draft and
-  // the reveal already say the case closed; a panel saying so again cost a
-  // phone 92px of the table at every case's first window.
-  const tableRules = mutations.filter((mutation) => mutation.id !== "reboot");
-  const ruleHeat = getRuleHeat({ mutations: tableRules, schema });
-  const ruleObjective = getRuleObjective(tableRules);
+  const {
+    mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension,
+  } = useTableForecast({ schema, run, win, selectedCard, multiplier });
   const overclockedBoard = schema.mutations.includes("overclock");
-  const overdrive = getOverdriveCopy({ run, multiplier, cashMutations });
   // The situation board is three one-line cells, so its copy is written to fit
   // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 사정권"
     : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
-  const currentRules = mutations.length
-    ? `${joinRules(mutations)} 적용 중`
-    : schema.faceDown || schema.sedated || schema.sealHighest || schema.fracturedAxis
-      ? "숨은 규칙 적용 중"
-      : "규칙 안정";
+  // The folded briefing on the table draws its own copy of the plate; nothing
+  // is drawn into it until the player opens it.
+  const [briefOpen, setBriefOpen] = useState(false);
 
   useEffect(() => {
     if (draftOpen) playRelicDealCue(relicOffer.length);
@@ -322,8 +234,11 @@ export function GauntletStage({
   }, [abandoned, onTouch, seed, tabToken, touched, touchedCardId, win.status]);
 
   // What the runtime saves if the player leaves now: a touched, live window.
+  // A closed window still on its slam is `settling` -- it has a verdict the
+  // runtime has not committed yet, so leaving is refused until it has.
   useEffect(() => {
-    onSuspendable?.(touched && live && !abandoned && !locked ? { seed, window: win } : null);
+    const settling = !live && claimed && !resolvedRef.current;
+    onSuspendable?.(settling ? { settling: true } : touched && live && !abandoned && !locked ? { seed, window: win } : null);
   });
   useEffect(() => () => onSuspendable?.(null), [onSuspendable]);
 
@@ -369,6 +284,7 @@ export function GauntletStage({
     const timer = globalThis.setTimeout(() => {
       if (resolvedRef.current) return;
       resolvedRef.current = true;
+      onSuspendable?.(null);
       onResolve({ card, window: win, forced: !staked });
     }, RESOLVE_DELAY_MS[win.status] ?? 900);
     return () => globalThis.clearTimeout(timer);
@@ -477,77 +393,7 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
-  // Keys: 1-9 stake a card, E/Shift locks focus, Space pushes, Enter cashes.
-  const keyActions = useRef({});
-  useEffect(() => {
-    keyActions.current = { select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable };
-  });
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.repeat || event.defaultPrevented) return;
-      const target = event.target;
-      if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
-      if (document.querySelector(".decision-reveal-backdrop")) return;
-      const actions = keyActions.current;
-      if (actions.draftOpen) {
-        // The draft is the decision on screen: 1-3 take a relic, Escape passes,
-        // and nothing reaches the table behind it.
-        const pick = event.key === "Escape" ? null : actions.relicOffer[Number(event.key) - 1];
-        if (event.key === "Escape" || pick) {
-          event.preventDefault();
-          actions.pickRelic(pick ?? null);
-        } else if (event.key === " " || event.key === "Enter") {
-          event.preventDefault();
-        }
-        return;
-      }
-      // The briefing opens the table on the key that pushes -- whatever the
-      // player's hand is already resting on -- and a card key opens it with
-      // that card staked.
-      if (actions.briefingOpen) {
-        const index = Number(event.key) - 1;
-        const cardId = actions.cards[index]?.id ?? (index === actions.cards.length && actions.reframeChoice ? REFRAME_CARD_ID : null);
-        if (event.key === " " || event.key === "Enter" || event.key.toLowerCase() === "w" || cardId) {
-          event.preventDefault();
-          actions.openTable(cardId);
-        }
-        return;
-      }
-      if (!actions.tableOpen) return;
-      if (event.key.toLowerCase() === "e" || event.key === "Shift") {
-        event.preventDefault();
-        actions.focus(event);
-        return;
-      }
-      if (event.key.toLowerCase() === "q") {
-        event.preventDefault();
-        actions.cycleFocusMode();
-        return;
-      }
-      if (event.key === " " || event.key.toLowerCase() === "w") {
-        event.preventDefault();
-        actions.push(event);
-        return;
-      }
-      if (event.key === "Enter") {
-        event.preventDefault();
-        actions.cash();
-        return;
-      }
-      const index = Number(event.key) - 1;
-      if (!Number.isInteger(index) || index < 0) return;
-      const card = actions.cards[index];
-      if (card) {
-        event.preventDefault();
-        actions.select(card.id);
-      } else if (index === actions.cards.length && actions.reframeChoice) {
-        event.preventDefault();
-        actions.select(REFRAME_CARD_ID);
-      }
-    };
-    globalThis.addEventListener("keydown", onKey);
-    return () => globalThis.removeEventListener("keydown", onKey);
-  }, []);
+  useTableKeys({ select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
@@ -556,6 +402,7 @@ export function GauntletStage({
 
   return (
     <section
+      ref={stageRef}
       className={`gauntlet-stage heat-${heatTier}${verdictClass}${schema.faceDown ? " is-face-down" : ""}${schema.sedated ? " is-sedated" : ""}${fever ? " is-fever" : ""}`}
       data-testid="gauntlet-stage"
       data-gauge={Math.round(win.gauge)}
@@ -572,6 +419,7 @@ export function GauntletStage({
         impact={settleImpact ?? impact}
         flash={flash}
         beatClock={beatClock}
+        stageRef={stageRef}
         grade={win.lastGrade}
         fever={fever}
       />
@@ -744,14 +592,14 @@ export function GauntletStage({
             <p className="gx-question">{scene.question}</p>
             {/* The briefing page told this story before the clock started; this
                 folded copy is for looking something up while it runs. */}
-            <details className="gx-brief">
+            <details className="gx-brief" onToggle={(event) => setBriefOpen(event.currentTarget.open)}>
               <summary>사건 브리핑</summary>
               {/* The room, before the words about it. Ten raster files cannot
                   cover 169 scenes, so the picture is drawn from the scene's own
                   `place` and `phase` rather than shipped as art. Inside the
                   closed briefing because priority 27 gives the table its height
                   budget and a picture in front of the cards would spend it. */}
-              <ScenePlate node={scene.node} nodeId={scene.nodeId} />
+              {briefOpen && <ScenePlate node={scene.node} nodeId={scene.nodeId} />}
               {scene.node.lead && <p className="gx-brief-lead">{scene.node.lead}</p>}
               <p>{scene.node.text}</p>
               {/* The case facts. Every scene has carried a `memo` since the graph
@@ -950,7 +798,7 @@ export function GauntletStage({
           data-testid="commit-focus"
           onClick={focus}
           disabled={!canFocus}
-          aria-keyshortcuts="E Shift"
+          aria-keyshortcuts="E"
           aria-label={`Lock focus. Current focus ${Math.round(win.focus)}. Press on the beat to raise pot and resource multipliers.`}
         >
           <i className="gx-focus-reticle" aria-hidden="true" />
