@@ -37,6 +37,7 @@ export const CHECKS = [
   "check:css-structure",
   "format:check",
   "check:art",
+  "check:fonts",
   "check:export-schema",
   "check:test-storage",
   "check:visual-baselines",

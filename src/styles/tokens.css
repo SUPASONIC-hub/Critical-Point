@@ -3,7 +3,22 @@
    what they are: colour family, lightness and alpha.
    Add new colours here, not inline. */
 
+/* The one font file: Pretendard Variable (OFL-1.1) cut down to the characters
+   the source can print, across its whole weight axis. `npm run build:fonts`
+   writes it and `npm run check:fonts` fails when the copy gains a character it
+   does not carry. index.html preloads the same file. Text outside it -- a
+   nickname with a syllable the copy never uses -- falls through to the system
+   Hangul face named after it in --font-sans. */
+@font-face {
+  font-family: "Critical Point Sans";
+  font-style: normal;
+  font-weight: 45 920;
+  font-display: swap;
+  src: url("../assets/fonts/pretendard-cp.woff2") format("woff2");
+}
+
 :root {
+  color-scheme: dark;
   /* palette */
   --c-ink: rgb(24 32 31);
   --c-ink-deep: rgb(16 23 22);
@@ -18,33 +33,22 @@
   --c-amber: rgb(255 206 115);
   --c-focus-ring: rgb(138 180 255);
   --c-ink-raised: rgb(36 48 46);
-  --c-mint-pale: rgb(238 247 243);
   --c-teal-deep: rgb(44 74 70);
-  --c-mint-line: rgb(190 214 204);
-  --c-green: rgb(34 99 71);
   --c-green-deep: rgb(29 78 63);
   --c-mint-soft: rgb(223 244 234);
   --c-warn-deep: rgb(106 84 32);
-  --c-warn-soft: rgb(235 217 159);
   --c-paper-muted: rgb(238 241 237);
-  --c-ink-faint: rgb(185 198 193);
   --c-violet: rgb(108 101 173);
   --c-paper-dim: rgb(244 246 243);
   --c-sage: rgb(117 167 121);
   --c-danger: rgb(167 67 50);
-  --c-ink-soft: rgb(62 74 69);
   --c-coral: rgb(255 138 112);
   --c-danger-deep: rgb(122 47 34);
   --c-blush: rgb(245 222 216);
-  --c-ink-darkest: rgb(16 22 21);
   --c-acid-pale: rgb(239 248 215);
-  --c-paper-raised: rgb(248 251 247);
-  --c-paper-tint: rgb(247 250 246);
   --c-acid-dark: rgb(159 202 53);
-  --c-signal: rgb(255 118 95);
   --c-teal: rgb(41 92 87);
   --c-black: rgb(0 0 0);
-  --c-line-strong: rgb(203 216 207);
   --c-cream-deep: rgb(255 240 191);
   --c-cream: rgb(247 241 227);
 
@@ -53,125 +57,27 @@
      -2 or -3 marks a near-identical neighbour that has not been merged, because
      merging it would change what renders. */
   --c-danger-81: rgb(255 176 159);
-  --c-paper-94: rgb(237 242 238);
-  --c-gray-75: rgb(184 196 190);
-  --c-black-a24: rgb(0 0 0 / 0.23921568627450981);
-  --c-sky-07-a72: rgb(10 17 24 / 0.72);
-  --c-teal-10-a50: rgb(16 29 36 / 0.5);
-  --c-teal-25-a24: rgb(44 74 84 / 0.24);
-  --c-black-a38: rgb(0 0 0 / 0.3803921568627451);
   --c-gray-68: rgb(169 176 170);
   --c-green-70: rgb(156 203 180);
-  --c-amber-95: rgb(255 248 230);
-  --c-amber-39: rgb(176 132 24);
-  --c-gray-37: rgb(78 111 103);
-  --c-gray-81: rgb(201 212 201);
-  --c-mint-43: rgb(90 130 117);
-  --c-green-96: rgb(244 247 242);
-  --c-amber-72: rgb(214 201 152);
-  --c-coral-44: rgb(177 124 45);
-  --c-amber-96: rgb(255 249 233);
-  --c-danger-73: rgb(215 165 155);
-  --c-danger-97: rgb(255 241 238);
-  --c-mint-30: rgb(61 94 85);
-  --c-ink-13: rgb(36 35 30);
   --c-danger-14: rgb(45 30 28);
-  --c-ink-06: rgb(14 19 18);
-  --c-mint-09-a72: rgb(16 28 25 / 0.7215686274509804);
-  --c-danger-63-a30: rgb(255 91 68 / 0.30196078431372547);
-  --c-danger-63-a12: rgb(255 91 68 / 0.12156862745098039);
   --c-amber-99: rgb(255 253 248);
   --c-amber-78: rgb(212 205 187);
   --c-black-a28: rgb(0 0 0 / 0.2784313725490196);
-  --c-coral-97: rgb(255 247 242);
-  --c-ink-12: rgb(26 36 33);
   --c-green-94: rgb(237 244 238);
-  --c-coral-84: rgb(226 215 202);
-  --c-acid-31-a14: rgb(99 123 35 / 0.1411764705882353);
   --c-paper-90: rgb(226 232 225);
   --c-danger-73-2: rgb(224 160 147);
-  --c-danger-45: rgb(168 79 63);
-  --c-coral-89: rgb(255 215 200);
-  --c-coral-94: rgb(255 233 225);
-  --c-green-95: rgb(236 249 239);
-  --c-sky-25: rgb(52 48 78);
-  --c-sky-91-a92: rgb(214 208 255 / 0.9215686274509803);
   --c-sky-77: rgb(169 161 232);
-  --c-amber-98: rgb(255 253 244);
-  --c-amber-31: rgb(139 100 20);
-  --c-amber-47: rgb(196 154 44);
-  --c-amber-37: rgb(123 106 66);
-  --c-sky-97: rgb(243 242 255);
   --c-sky-86: rgb(203 199 239);
-  --c-green-12: rgb(18 45 33);
   --c-acid-72: rgb(184 230 138);
-  --c-coral-97-2: rgb(255 245 240);
-  --c-gray-81-2: rgb(203 211 204);
-  --c-green-93: rgb(230 244 235);
-  --c-green-75: rgb(175 210 188);
-  --c-danger-96: rgb(255 240 235);
-  --c-green-61: rgb(128 183 158);
-  --c-paper-92: rgb(232 238 233);
-  --c-acid-21-a14: rgb(54 79 26 / 0.1411764705882353);
-  --c-mint-70: rgb(155 200 182);
-  --c-green-79: rgb(184 217 201);
-  --c-danger-49: rgb(180 91 72);
-  --c-gray-75-2: rgb(183 201 188);
-  --c-gray-75-3: rgb(184 196 187);
-  --c-danger-39: rgb(155 61 46);
-  --c-danger-91: rgb(248 222 216);
-  --c-green-95-2: rgb(237 245 239);
-  --c-gray-75-4: rgb(184 201 191);
-  --c-green-96-2: rgb(244 251 240);
-  --c-ink-11: rgb(23 33 31);
-  --c-mint-06: rgb(11 18 18);
-  --c-paper-93: rgb(233 239 234);
   --c-gray-81-3: rgb(201 213 205);
-  --c-danger-93: rgb(255 226 218);
-  --c-paper-88: rgb(220 230 223);
-  --c-sky-06-a66: rgb(8 15 22 / 0.66);
-  --c-teal-11-a46: rgb(14 32 40 / 0.46);
-  --c-teal-25-a22: rgb(40 78 88 / 0.22);
-  --c-green-87: rgb(216 229 220);
-  --c-mint-04-a16: rgb(4 18 17 / 0.1607843137254902);
-  --c-mint-04-a22: rgb(4 18 17 / 0.2196078431372549);
-  --c-green-97: rgb(244 250 245);
-  --c-green-93-2: rgb(234 241 235);
-  --c-mint-13-a14: rgb(17 47 43 / 0.1411764705882353);
-  --c-mint-14-a10: rgb(23 48 41 / 0.10196078431372549);
-  --c-gray-86: rgb(215 225 217);
-  --c-gray-76: rgb(185 205 189);
-  --c-acid-31-a16: rgb(99 123 35 / 0.1607843137254902);
-  --c-green-95-3: rgb(238 247 239);
-  --c-green-89: rgb(220 235 225);
-  --c-coral-97-3: rgb(255 244 239);
-  --c-mint-15-a18: rgb(25 49 42 / 0.1803921568627451);
-  --c-danger-32: rgb(125 46 36);
-  --c-danger-85: rgb(240 201 191);
-  --c-green-88: rgb(219 230 220);
-  --c-green-28: rgb(49 95 59);
-  --c-green-94-2: rgb(237 243 238);
-  --c-gray-58: rgb(140 156 146);
-  --c-gray-75-5: rgb(185 200 189);
-  --c-gray-81-5: rgb(199 213 202);
-  --c-ink-10-a92: rgb(22 24 30 / 0.9215686274509803);
   --c-ink-08: rgb(21 21 21);
   --c-sky-08-a94: rgb(12 18 31 / 0.9411764705882353);
   --c-gray-61: rgb(139 152 173);
-  /* The roadmap's file numerals, flattened. They are acid ghosted into the
-     ground the row happens to have -- the ink field, the sealed row, the open
-     acid slab -- and they are opaque because a translucent `color` cannot be
-     contrast-tested. */
-  --c-acid-29: rgb(84 101 47);
-  --c-acid-18: rgb(48 59 33);
-  --c-acid-51: rgb(155 184 77);
-
   /* The gauntlet table. Felt for the ground, heat for the wall, chip blue for
      what a card pays, acid for the one control that banks it. */
   --c-gx-felt: rgb(8 14 13);
   --c-gx-felt-raised: rgb(17 28 25);
   --c-gx-felt-card: rgb(24 38 34);
-  --c-gx-line: rgb(52 74 68);
   --c-gx-text-dim: rgb(163 180 174);
   --c-gx-heat: rgb(255 56 56);
   --c-gx-heat-deep: rgb(120 16 20);
@@ -198,56 +104,27 @@
   --color-paper-soft: var(--c-paper-soft);
   --color-line: var(--c-line);
   --color-muted: var(--c-ink-muted);
-  --color-copy-soft: var(--c-line-soft);
   --color-accent: var(--c-acid);
-  --color-accent-strong: var(--c-acid-deep);
-  --color-info: var(--c-sky);
-  --color-warning: var(--c-amber);
-  --color-danger: var(--c-danger-81);
   --color-white: var(--c-paper);
   --color-white-soft: rgba(255, 255, 255, 0.68);
-  --color-white-muted: rgba(255, 255, 255, 0.36);
-  --color-overlay: rgba(24, 32, 31, 0.82);
   --color-overlay-soft: rgba(255, 255, 255, 0.08);
   --color-overlay-line: rgba(255, 255, 255, 0.22);
   --color-focus: var(--c-focus-ring);
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
   --font-body: 16px;
   --font-label: 12px;
   --font-title: 22px;
-  --radius-sm: 6px;
   --radius-md: 8px;
   --radius-pill: 999px;
   --shadow-panel: 0 18px 46px rgba(25, 49, 42, 0.12);
-  --bp-sm: 480px;
-  --bp-md: 768px;
-  --bp-lg: 1024px;
-  /* Pretendard ships with the app (src/main.jsx imports its dynamic subset), so
+  /* Pretendard ships with the app (the @font-face at the top of this file), so
      Hangul and Latin share one family, one x-height and one set of weights on
      every platform instead of whatever the OS substitutes. */
   --font-sans:
-    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo",
+    "Critical Point Sans", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo",
     "Malgun Gothic", "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
-  --space-7: 32px;
-  --text-on-dark: var(--c-green-95-2);
-  --text-muted: var(--c-gray-75-4);
-  --surface-soft: var(--c-paper-raised);
-  --surface-hover: var(--c-green-96-2);
-  --ink: var(--c-ink-11);
-  --ink-deep: var(--c-mint-06);
-  --paper: var(--c-paper-tint);
-  --paper-muted: var(--c-paper-93);
   --line: var(--c-gray-81-3);
-  --acid: var(--c-acid);
   --acid-dark: var(--c-acid-dark);
-  --signal: var(--c-signal);
-  --signal-soft: var(--c-danger-93);
   --teal: var(--c-teal);
 
   /* The shared interface layer, 2026-09-15. Every screen used to invent its own

@@ -2,64 +2,63 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
+/**
+ * Bundle and first-paint budgets.
+ *
+ * Every budget here ratchets DOWN, never up. Until 2026-09-27 each one sat at
+ * 97-99.7% of its chunk because every change that grew a chunk also raised its
+ * number, which made the check a record of sizes rather than a limit on them.
+ * They were re-baselined that day to the measured size plus about 5% -- room for
+ * an ordinary change, not for a new feature -- and the history of the old
+ * numbers is in `git log -p` of this file. A change that needs more than the
+ * headroom has to take the weight out somewhere else, or say in its commit why
+ * the cold path is worth more now.
+ *
+ * Raw bytes are what the browser parses; gzip is what reaches a phone. Both are
+ * checked, gzip at 40% of the raw budget unless a budget names its own.
+ */
+
 const root = process.cwd();
-const assetsDir = path.join(root, "dist", "assets");
+const distDir = path.join(root, "dist");
+const assetsDir = path.join(distDir, "assets");
+
 const budgets = [
-  // GameRuntime read 450_000 until 2026-09-16, when every scene started carrying
-  // its own question, room, clock and lead line (`src/nodes/sceneContext.js`),
-  // and 490_000 until 사건 06 added a seventh case, 540_000 until 사건 07
-  // added an eighth, and 585_000 until 사건 08 and 09 added a ninth and tenth
-  // (with the scene plate's two new rooms and its motion layer). The chunk is
-  // mostly the scene graph, so narrative that the player reads is exactly what
-  // it is meant to weigh. Gzip is the number that reaches a phone and it stays
-  // well inside its share.
-  // 660_000 -> 720_000 on 2026-09-18 for 사건 10, an eleventh case: twenty scenes
-  // of authored Korean prose plus its eleven data tables. The chunk is mostly
-  // the scene graph, so this is narrative the player reads.
-  // 720_000 -> 760_000 on 2026-09-21 for 사건 11, a twelfth case, and
-  // 760_000 -> 800_000 the same day for 사건 12, a thirteenth, on the same terms.
-  // 800_000 -> 1_520_000 on 2026-09-22 for 사건 13-24, twelve cases at once: some
-  // 270 scenes of authored prose and their tables, plus the case copy that moved
-  // here from the intro chunk (`src/caseCopy.js`). ~440KB gzip reaches a phone
-  // after the intro has painted and the first click, never before it.
-  // 1_520_000 -> 3_000_000 later the same day for 사건 25-49, twenty-five more
-  // cases: ~530 scenes of prose and their tables. ~860KB gzip, still loaded only
-  // after the intro has painted and the player has clicked.
-  // 3_000_000 -> 3_300_000 on 2026-09-23 for the 프롤로그: five cases in front
-  // of 사건 01, ~110 scenes of prose and their tables. Still loaded only after
-  // the intro has painted and the player has clicked.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_300_000 },
-  // 120_000 -> 105_000 on 2026-09-22: the per-case teasers, interludes and
-  // chapter rules left for the runtime chunk, so the intro lost 44KB it never
-  // showed even while twelve cases were added to them.
-  // 105_000 -> 125_000 later the same day: the season list the intro draws now
-  // carries 49 case titles, summaries and objectives (`gameCases.js`).
-  // 125_000 -> 132_000 on 2026-09-23: the season list the intro draws carries
-  // five more titles, summaries and objectives.
-  // 132_000 -> 134_000 on 2026-09-23 for the 참가자 게시판. What lands here is
-  // only the shell's half -- `useBoard` and the `showBoard` branch; the screen
-  // itself is a 4KB lazy chunk. The hook reads its two privacy regexes from
-  // `src/privacyText.js` rather than `gameLogic.js` precisely to keep this
-  // number where it is: importing them from gameLogic measured at 3,130_000,
-  // because gameData.js merges the case packs at module scope and rollup cannot
-  // shake that out.
-  // 134_000 -> 160_000 on 2026-09-27: the intro screen moved into this chunk.
-  // It was a 24KB lazy chunk that the entry had to fetch before it could paint
-  // anything, one more round trip in front of the first screen; the bytes to
-  // first paint are the same, now in one request. Its separate chunk is gone.
-  { pattern: /^index-.*\.js$/, maxBytes: 160_000 },
-  // 75_000 -> 78_000 on 2026-09-21: the plate's chamber and newsroom painters,
-  // its effects layer and the drawn speaker portrait; 78_000 -> 81_000 the same
-  // day for the market, memorial and factory painters and the steam layer.
-  // 81_000 -> 92_000 on 2026-09-22 for six more rooms (studio, auditorium,
-  // server room, orchard, trading floor, school gate) and the second effects
-  // layer (snow, stage light, LEDs, bokeh, the price board, the mood grade).
-  // 92_000 -> 100_000 later the same day for four more rooms (construction site,
-  // courtroom, airport, call centre) and the seasonal effects layer.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 100_000 },
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 60_000 },
-  { pattern: /^index-.*\.css$/, maxBytes: 200_000 },
+  // The scene graph: fifty-five cases of authored prose and their tables. It
+  // loads after the intro has painted and the player has clicked, never before.
+  // 3,200,014 bytes / 935,327 gzip on 2026-09-27.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_360_000, maxGzip: 982_000 },
+  // The shell: what the intro needs to boot, now including the intro screen
+  // itself, which stopped being a lazy chunk the entry had to fetch before it
+  // could paint. 161,674 / 57,486 on 2026-09-27.
+  { pattern: /^index-.*.js$/, maxBytes: 169_800, maxGzip: 60_400 },
+  // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_400, maxGzip: 32_600 },
+  // 44,024 / 13,638 on 2026-09-27.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },
+  // The whole stylesheet (the intro's share is also inlined; see
+  // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
+  // tokens went; 196,510 / 35,448 after.
+  { pattern: /^index-.*\.css$/, maxBytes: 206_300, maxGzip: 37_300 },
+  // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
+  // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
+  // dynamic subsets, of which the intro alone pulled ~537KB.
+  { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 283_500, compressed: true },
 ];
+
+/**
+ * The cold path: every byte a first visit on a phone waits on before the intro
+ * can paint its hero -- the HTML, each script and stylesheet the HTML links,
+ * the preloaded font, and the key visual the phone's `<picture>` picks at 2x
+ * (what index.html preloads for it). Measured as transfer bytes: gzip for text,
+ * raw for the font and the image.
+ *
+ * 490,643 bytes on 2026-09-27, down from ~776KB: ~537KB of font subsets became
+ * one 270KB file, and a retina phone stopped fetching the -480 preload and
+ * then the -960 the picture actually used. 494,937 once the old dynamic-subset
+ * font stylesheet stopped being imported and the intro joined the entry chunk.
+ */
+const FIRST_PAINT_BUDGET = 515_000;
+const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 
 let files;
 try {
@@ -79,12 +78,50 @@ for (const budget of budgets) {
   }
   const assetPath = path.join(assetsDir, file);
   const bytes = statSync(assetPath).size;
-  const gzipBytes = gzipSync(readFileSync(assetPath)).length;
-  const gzipBudget = Math.ceil(budget.maxBytes * 0.4);
-  reported.push(`${file}: ${bytes} bytes raw / ${gzipBytes} bytes gzip`);
   if (bytes > budget.maxBytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.maxBytes} byte budget.`);
+  if (budget.compressed) {
+    reported.push(`${file}: ${bytes} bytes`);
+    continue;
+  }
+  const gzipBytes = gzipSync(readFileSync(assetPath)).length;
+  const gzipBudget = budget.maxGzip ?? Math.ceil(budget.maxBytes * 0.4);
+  reported.push(`${file}: ${bytes} bytes raw / ${gzipBytes} bytes gzip`);
   if (gzipBytes > gzipBudget) failures.push(`${file} is ${gzipBytes} gzip bytes, over the ${gzipBudget} gzip budget.`);
 }
+
+// First paint.
+const html = readFileSync(path.join(distDir, "index.html"), "utf8");
+const coldAssets = new Set();
+for (const match of html.matchAll(/<(?:script|link)\b[^>]*>/g)) {
+  const tag = match[0];
+  if (/<link\b/.test(tag) && !/\brel="(?:stylesheet|modulepreload|preload)"/.test(tag)) continue;
+  if (/\brel="preload"/.test(tag) && !/\bas="font"/.test(tag)) continue;
+  const url = tag.match(/\b(?:src|href)="\/(assets\/[^"]+)"/)?.[1];
+  if (url) coldAssets.add(url);
+}
+const transfer = (relative) => {
+  const buffer = readFileSync(path.join(distDir, relative));
+  return /\.(woff2|webp|png|jpe?g)$/.test(relative) ? buffer.length : gzipSync(buffer).length;
+};
+let firstPaint = gzipSync(Buffer.from(html)).length;
+const parts = [`index.html ${firstPaint}`];
+for (const asset of coldAssets) {
+  const bytes = transfer(asset);
+  firstPaint += bytes;
+  parts.push(`${path.basename(asset)} ${bytes}`);
+}
+try {
+  const image = transfer(FIRST_PAINT_IMAGE);
+  firstPaint += image;
+  parts.push(`${FIRST_PAINT_IMAGE} ${image}`);
+} catch {
+  failures.push(`dist/${FIRST_PAINT_IMAGE} is missing; the intro preloads it.`);
+}
+if (!coldAssets.size) failures.push("dist/index.html links no /assets/ files; the first-paint budget measured nothing.");
+if (firstPaint > FIRST_PAINT_BUDGET) {
+  failures.push(`The first paint transfers ${firstPaint} bytes, over the ${FIRST_PAINT_BUDGET} byte budget (${parts.join(", ")}).`);
+}
+reported.push(`first paint ${firstPaint} bytes (${parts.join(", ")})`);
 
 if (failures.length) {
   console.error(failures.join("\n"));

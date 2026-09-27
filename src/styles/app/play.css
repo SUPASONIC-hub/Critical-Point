@@ -55,7 +55,7 @@
 .cinematic-clue-card span {
   color: var(--c-teal-deep);
   font-size: 10px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0.08em;
 }
 
@@ -105,7 +105,7 @@
   background: var(--c-green-94);
   border-left: 4px solid var(--c-teal-deep);
   font-size: 20px;
-  font-weight: 950;
+  font-weight: 900;
   line-height: 1.45;
 }
 
@@ -117,7 +117,7 @@
 
 .decision-reveal-beat p {
   margin: 0;
-  color: var(--c-ink-muted);
+  color: var(--ui-text-2);
   font-size: 13px;
   line-height: 1.65;
 }
@@ -128,7 +128,7 @@
 }
 
 .decision-reveal-footer {
-  color: var(--c-ink-muted);
+  color: var(--ui-text-3);
   font-size: 12px;
   font-weight: 850;
 }
@@ -327,7 +327,7 @@
 
 .game-header h1 {
   font-size: 42px;
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: 0;
   text-wrap: balance;
 }
@@ -350,9 +350,13 @@
 /* The gauntlet table ------------------------------------------------------
    One screen, no scroll on a phone: header, pot, gauge, question, hand, and a
    fixed dock with the three verbs. Pressure arrives through variables the frame
-   loop in GauntletFx writes on the root: --gx-heat (0-1, how close the
-   heartbeat says the wall is), --gx-beat (a 0-1 pulse on every beat) and the
-   two shake offsets. Reduced motion zeroes the offsets and nothing else.
+   loop in GauntletFx writes: --gx-heat (0-1, how close the heartbeat says the
+   wall is), --gx-beat (a 0-1 pulse on every beat) and the two shake offsets.
+   It writes them on `.gauntlet-stage` and on the portalled `.gx-fx`, not on
+   the document root, so a frame restyles those two subtrees rather than the
+   whole page. Every reader therefore sits inside one of them and carries its
+   own `var(--gx-*, fallback)` -- there is no :root default to inherit. Reduced
+   motion zeroes the offsets and nothing else.
 
    2026-09-15, the night-shift glass pass: the table draws from the shared
    --ui-* layer -- one set of surfaces, lines, radii and motion -- and keeps its
@@ -1812,7 +1816,30 @@
 
 .gx-slam-bust {
   color: var(--c-paper);
-  background: var(--c-gx-heat-a55);
+  background: var(--c-gx-heat-a18);
+}
+
+/* The bust flashes paper, burns to full heat and settles to an 18% wash. The
+   two flashes are layers over that wash, faded by opacity, so the whole-screen
+   flash is composited rather than repainting the viewport's background every
+   frame. They sit under the slam's own text (z-index -1 in its stacking context). */
+.gx-slam-bust::before,
+.gx-slam-bust::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gx-slam-bust::before {
+  background: var(--c-gx-heat);
+  animation: gx-bust-heat 1.2s ease-out both;
+}
+
+.gx-slam-bust::after {
+  background: var(--c-paper);
   animation: gx-bust-flash 1.2s ease-out both;
 }
 
@@ -2841,13 +2868,21 @@
 
 @keyframes gx-bust-flash {
   0% {
-    background: var(--c-paper);
+    opacity: 1;
   }
+  12%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gx-bust-heat {
+  0%,
   12% {
-    background: var(--c-gx-heat);
+    opacity: 1;
   }
   100% {
-    background: var(--c-gx-heat-a18);
+    opacity: 0;
   }
 }
 
@@ -3037,8 +3072,12 @@
   }
 
   .gx-slam-bust {
-    animation: none;
     background: var(--c-gx-heat-a55);
+  }
+
+  .gx-slam-bust::before,
+  .gx-slam-bust::after {
+    animation: none;
   }
 
   .gx-pot-value,
@@ -3058,4 +3097,57 @@
     scale: none;
     animation: none;
   }
+}
+
+/* Rules that lived in extensions.css, the old "late overrides" file, until
+   2026-09-27. Nothing between here and where they sat sets the same property on
+   an element they can match at the same specificity, so they compute exactly
+   as they did there; the computed style of every element on the intro, the
+   table, the reveal and the report was compared before and after the move. */.debug-overlay {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  /* Under the commit console. A developer tool must not sit on top of the
+     button the player is trying to press -- it was intercepting the tap. */
+  z-index: 10;
+  width: min(360px, calc(100vw - 32px));
+  padding: 12px;
+  border: 1px solid rgba(138, 180, 255, 0.45);
+  border-radius: 8px;
+  background: var(--c-sky-08-a94);
+  color: var(--color-white-soft);
+  box-shadow: 0 10px 32px rgb(0 0 0 / 0.3);
+  font:
+    12px/1.4 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+}
+.debug-overlay-heading,
+.debug-overlay dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.debug-overlay-heading {
+  margin-bottom: 8px;
+  color: var(--color-focus);
+}
+.debug-overlay .ghost {
+  min-height: 30px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+.decision-reveal-stakes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0;
+}
+.debug-overlay {
+  pointer-events: none;
+}
+.debug-overlay button,
+.debug-overlay select {
+  pointer-events: auto;
 }

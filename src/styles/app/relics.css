@@ -263,7 +263,20 @@
 }
 
 .gx-bank .gx-relic-chip.is-proc {
+  position: relative;
   animation: gx-relic-proc 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+/* The proc's glow is a layer faded by opacity, not an animated box-shadow. */
+.gx-bank .gx-relic-chip.is-proc::after {
+  position: absolute;
+  inset: -1px;
+  content: "";
+  border-radius: inherit;
+  opacity: 0;
+  box-shadow: 0 0 18px var(--c-gx-relic);
+  pointer-events: none;
+  animation: gx-relic-proc-glow 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
 .gx-equip-toast {
@@ -359,7 +372,7 @@
 }
 
 .pressure-ledger-relics span {
-  color: var(--c-ink-muted);
+  color: var(--ui-text-3);
   font-size: 10px;
   font-weight: 800;
 }
@@ -401,10 +414,15 @@
   }
   30% {
     transform: scale(1.35) rotate(-4deg);
-    box-shadow: 0 0 18px var(--c-gx-relic);
   }
   100% {
     transform: none;
+  }
+}
+
+@keyframes gx-relic-proc-glow {
+  30% {
+    opacity: 1;
   }
 }
 
@@ -447,7 +465,8 @@
   .gx-draft-panel,
   .gx-draft-hand li,
   .gx-reveal-unlock,
-  .gx-bank .gx-relic-chip.is-proc {
+  .gx-bank .gx-relic-chip.is-proc,
+  .gx-bank .gx-relic-chip.is-proc::after {
     animation: none;
   }
 

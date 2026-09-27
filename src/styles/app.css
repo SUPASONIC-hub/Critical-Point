@@ -12,7 +12,10 @@
      result              the result screen
      responsive          the media blocks, which span every screen
      recovery            the recovery and error surfaces
-     extensions          late overrides that must outrank everything above
+     extensions          what is left of the late overrides: 148 rules that still
+                         tie a rule above them on specificity and win by order
+                         (80 moved to their surfaces on 2026-09-27); nothing
+                         new goes here
      relics              the relic draft, the relic chips and the unlock notices
      briefing            the graphic-novel briefing page in front of each table */
 @import "./app/base-intro-ranking.css";

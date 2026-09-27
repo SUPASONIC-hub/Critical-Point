@@ -76,7 +76,13 @@ const fileBudgets = {
   // than remove them.
   // 2840 / 66900 -> 2875 / 67800 on 2026-09-23 for the 게시판 pill's glint in
   // the intro header: accent rim, glow and light sweep, and their two keyframes.
-  "base-intro-ranking.css": { lines: 2875, bytes: 67800 },
+  // 2875 / 67800 -> 2910 / 69400 on 2026-09-27: the intro's infinite
+  // decorations (the brand dot's pulse, the CTA and board-pill sweeps) moved
+  // off box-shadow and left onto pseudo-elements that animate transform and
+  // opacity, and body keeps content out from under a landscape notch.
+  // 2910 / 69400 -> 3030 / 72300 the same day: 21 rules for the intro's
+  // prestart and origin panels moved here out of extensions.css.
+  "base-intro-ranking.css": { lines: 3030, bytes: 72300 },
   // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
   // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
   // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
@@ -86,7 +92,14 @@ const fileBudgets = {
   // beat card and witness cards moved onto the glass surfaces.
   // 1430 / 29900 -> 1370 / 28700 on 2026-09-16 when the chapter dashboard, the
   // choice panel and the decision dock lost the last rules that named them.
-  "extensions.css": { lines: 1370, bytes: 28700 },
+  // 1370 / 28700 -> 891 / 17900 on 2026-09-27: 80 of its 228 rules moved
+  // into the surface files that own them. Each move was checked two ways: no
+  // rule it jumped over sets an overlapping property at the same specificity
+  // on an element both can match, and the computed style of every element on
+  // the intro, ranking, board, briefing, table, reveal, ending and report, at
+  // a desktop, a phone and a reduced-motion phone, came out identical. What is
+  // left still ties a rule in an earlier file and wins by coming later.
+  "extensions.css": { lines: 891, bytes: 17900 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -150,7 +163,11 @@ const fileBudgets = {
   // 3425 / 71200 -> 3075 / 63400 on 2026-09-22, when the scene plate moved out
   // to plate.css with the second half of the season's rooms and effects (bytes
   // counted with CRLF endings, as a Windows checkout has them).
-  "play.css": { lines: 3075, bytes: 66400 },
+  // 3075 -> 3100 lines on 2026-09-27: the bust flash became two opacity layers
+  // instead of an animated viewport background.
+  // 3100 -> 3155 the same day: seven rules for the reveal's stakes and the
+  // chapter panels moved here out of extensions.css.
+  "play.css": { lines: 3155, bytes: 66400 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -165,12 +182,17 @@ const fileBudgets = {
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
   // board's splash panel arrives with.
-  "briefing.css": { lines: 670, bytes: 14100 },
+  // 670 / 14100 -> 685 / 14400 on 2026-09-27: the glitch moved off a filter on
+  // the plate onto its own fringe layer.
+  "briefing.css": { lines: 685, bytes: 14400 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
-  "relics.css": { lines: 465, bytes: 9510 },
-  "responsive.css": { lines: 200, bytes: 4700 },
+  // 465 / 9510 -> 482 / 9950 on 2026-09-27: the proc glow is a layer faded by
+  // opacity rather than an animated box-shadow.
+  "relics.css": { lines: 482, bytes: 9950 },
+  // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
+  "responsive.css": { lines: 204, bytes: 4800 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -182,7 +204,9 @@ const fileBudgets = {
   // 1772 / 43650 -> 1815 / 44800 on 2026-09-16 for the 막간 panel: the beat
   // between two cases, with a mood tint, on the report's only unpressured
   // screen. Six cases in one register was the state this panel exists to break.
-  "result.css": { lines: 1815, bytes: 44800 },
+  // 1815 / 44800 -> 2130 / 52100 on 2026-09-27: 52 rules for the ending
+  // sequence and the report's panels moved here out of extensions.css.
+  "result.css": { lines: 2130, bytes: 52100 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

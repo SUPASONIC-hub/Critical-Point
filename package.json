@@ -29,6 +29,9 @@
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
     "build:critical": "node scripts/build-critical-css.mjs",
+    "build:fonts": "node scripts/build-fonts.mjs",
+    "check:fonts": "node scripts/check-fonts.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
     "raise:gains": "node scripts/raise-choice-gains.mjs",
     "check:views": "node scripts/check-view-contracts.mjs",
     "check:constants": "node scripts/check-shared-constants.mjs",
@@ -58,7 +61,6 @@
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
-    "pretendard": "^1.3.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -72,7 +74,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "espree": "^11.2.0",
     "globals": "^17.12.0",
+    "pretendard": "^1.3.9",
     "prettier": "^3.9.9",
+    "subset-font": "^2.9.0",
     "supabase": "2.118.0",
     "typescript": "7.0.2",
     "vite": "^7.0.0",
