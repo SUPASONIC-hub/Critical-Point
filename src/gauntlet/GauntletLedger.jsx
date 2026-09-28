@@ -1,11 +1,8 @@
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
+import { formatNumber } from "./tableReadout.js";
 import { objectParticle } from "../playerLanguage.js";
-
-function formatNumber(value) {
-  return Math.round(Number(value) || 0).toLocaleString("en-US");
-}
 
 /**
  * The case's table record: what went into the vault, what the walls took, and
@@ -65,8 +62,9 @@ export function GauntletLedger({ log = [], summary = null }) {
         <p className="pressure-ledger-relics" data-testid="ledger-relics">
           <span>장착한 도구</span>
           {relics.map((id) => (
-            <b key={id} title={RELICS[id].text}>
+            <b key={id}>
               <RelicIcon id={id} size={12} /> {RELICS[id].name}
+              <span className="sr-only">: {RELICS[id].text}</span>
             </b>
           ))}
         </p>

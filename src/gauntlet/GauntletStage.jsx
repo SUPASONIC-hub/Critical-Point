@@ -1,28 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Crosshair, Flame, HeartPulse, Lock, RefreshCcw, Skull, Vault, Zap } from "lucide-react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   BASE_SCHEMA,
+  createOpenSeed,
   drawStep,
   equipRelic,
   FEVER_BONUS,
   FOCUS_MAX,
   FOCUS_MODES,
   GAUGE_MAX,
-  getCardBurn,
   getCardChips,
   REFRAME_CARD_ID,
   getFocusBonus,
   getFocusModeProfile,
   getForcedCard,
   getGrooveBonus,
+  getHandBonus,
   getHeartbeatBpm,
   getMultiplier,
   getReadingSeconds,
   getRemainingSeconds,
   getSealedCardId,
-  judgeBeat,
   scoreBeat,
   scoreFocus,
   SEAL_BREAK_GAUGE,
@@ -34,7 +34,10 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
+import { gradePress } from "./timing.js";
 import { GauntletFx } from "./GauntletFx.jsx";
+import { GauntletHand } from "./GauntletHand.jsx";
+import { RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
 import {
   playBeatCue,
   playBustCue,
@@ -47,8 +50,8 @@ import {
   playRelicEquipCue,
   playRelicProcCue,
 } from "./gauntletAudio.js";
-import { hasRelic, RELICS } from "./relics.js";
-import { RelicDraft, RelicIcon } from "./RelicDraft.jsx";
+import { hasRelic } from "./relics.js";
+import { RelicDraft } from "./RelicDraft.jsx";
 import { SceneBriefing } from "./SceneBriefing.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
@@ -58,26 +61,12 @@ const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
 const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
-const GRADE_RANK = { miss: 0, good: 1, perfect: 2 };
-const monotonicNow = () => globalThis.performance?.now?.() ?? 0;
 // The stance profiles are written for the engine; the table speaks Korean.
 const FOCUS_MODE_COPY = {
   strike: "판돈 배율 크게 · 헛박자 가혹",
   steady: "보상 작게 · 락마다 테이블 냉각",
   expose: "카드의 자원 효과 증폭",
 };
-
-/**
- * When the player pressed, not when the handler got to it. An input event's
- * timeStamp is on the same clock as the frame loop's beats, so a press made on
- * the beat while the main thread was busy -- a slow phone, a render in flight --
- * is still graded where the hand landed.
- */
-function pressedAt(event) {
-  const now = monotonicNow();
-  const stamp = Number(event?.timeStamp);
-  return Number.isFinite(stamp) && stamp > 0 && stamp <= now ? stamp : now;
-}
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -133,6 +122,11 @@ export function GauntletStage({
   const [flash, setFlash] = useState(null);
   // Written by the frame loop on every beat; read here when a push is pressed.
   const beatClock = useRef({ at: 0, period: 0 });
+  // When the pointer last went down on a timed button: a click is graded there.
+  const pointerDownAt = useRef(0);
+  const notePointer = (event) => {
+    pointerDownAt.current = event.timeStamp;
+  };
   const stageRef = useRef(null);
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the briefing wait until the player has read it.
@@ -156,24 +150,34 @@ export function GauntletStage({
   const [openedSeed, setOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
   const paused = hidden || draftOpen || !tableOpen;
-  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, beatCombo: run?.beatCombo ?? 0, resume });
+  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
   const readSeconds = useMemo(() => getReadingSeconds({ ...scene.node, question: scene.question }), [scene.node, scene.question]);
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
+  const closedRef = useRef(false);
 
   const sealedId = useMemo(() => getSealedCardId(cards, schema), [cards, schema]);
   const sealBroken = win.gauge >= schema.sealBreak;
+  const getGate = (card) => getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened });
+  const isCardOpen = (card) => getGate(card).unlocked;
   const reframeSelected = win.selectedId === REFRAME_CARD_ID;
-  const selectedCard = reframeSelected ? reframeChoice : cards.find((card) => card.id === win.selectedId) ?? null;
+  // A card the run has no authority for is not staked, whatever the window
+  // says: a save written while the number keys could still stake one resumes
+  // with it selected.
+  const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
+  const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
   const grooveBonus = getGrooveBonus(win.groove);
+  const handBonus = getHandBonus(win.groove, win.focus, win.focusMode);
   const focusBonus = getFocusBonus(win.focus, win.focusMode);
+  // What LOCK is adding to the pot, under the cap it shares with the groove.
+  const lockPot = handBonus / grooveBonus;
   const focusModeProfile = getFocusModeProfile(win.focusMode);
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const activeStanceCount = stanceMastery[win.focusMode] ?? 0;
-  const livePot = Math.round(selectedChips * multiplier * grooveBonus * focusBonus.pot);
+  const livePot = Math.round(selectedChips * multiplier * handBonus);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
   const comboTier = win.beatCombo >= 12 ? "blaze" : win.beatCombo >= 6 ? "hot" : win.beatCombo >= 3 ? "warm" : "cold";
@@ -190,22 +194,25 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
+  // Said once at ten seconds and once at five; the timer itself is silent to a
+  // screen reader, and the tick that marks the last five is sound.
+  const clockCall = !live || paused || remaining > 10 ? "" : remaining > 5 ? "10초 남았다" : "5초 남았다";
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
-  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * grooveBonus * focusBonus.pot);
-  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * grooveBonus * focusBonus.pot);
+  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * handBonus);
+  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
   const {
     mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier });
-  const overclockedBoard = schema.mutations.includes("overclock");
   // The situation board is three one-line cells, so its copy is written to fit
   // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin
     ? "다음 푸시가 벽 사정권"
     : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
+  const handBlocked = !live || isAdvancing || !tableOpen;
   // The folded briefing on the table draws its own copy of the plate; nothing
   // is drawn into it until the player opens it.
   const [briefOpen, setBriefOpen] = useState(false);
@@ -226,13 +233,26 @@ export function GauntletStage({
   // in this window, with the card staked. Reading alone is not a touch, so a
   // save and exit taken before the bet is placed resumes a fresh window.
   const touched = win.pushes > 0 || Boolean(win.selectedId);
-  const touchedCardId = win.selectedId && win.selectedId !== REFRAME_CARD_ID ? win.selectedId : null;
+  const touchedCardId = selectedCard && !reframeSelected ? selectedCard.id : null;
   useEffect(() => {
     if (!touched || abandoned || win.status !== "live") return;
     if (touchedRef.current === touchedCardId) return;
     touchedRef.current = touchedCardId;
-    onTouch?.(`${seed}#${tabToken}`, touchedCardId);
+    onTouch?.(createOpenSeed(seed, tabToken), touchedCardId);
   }, [abandoned, onTouch, seed, tabToken, touched, touchedCardId, win.status]);
+
+  // A bust is written before it is painted. The slam prints the wall, and the
+  // verdict is not committed until the slam has landed: a window that closed on
+  // its first touch -- the clock ran out on a table nobody had staked, or the
+  // first push went straight into the wall -- had left no hold behind, so F5
+  // under the slam dealt the same seed again with the wall known. A layout
+  // effect runs before the browser paints, so by the time the wall is on screen
+  // the save already says this window is closed, and how.
+  useLayoutEffect(() => {
+    if (abandoned || locked || win.status !== "bust" || closedRef.current) return;
+    closedRef.current = true;
+    onTouch?.(createOpenSeed(seed, tabToken, win.cause), touchedCardId);
+  }, [abandoned, locked, onTouch, seed, tabToken, touchedCardId, win.cause, win.status]);
 
   // What the runtime saves if the player leaves now: a touched, live window.
   // A closed window still on its slam is `settling` -- it has a verdict the
@@ -247,7 +267,7 @@ export function GauntletStage({
   // tab sees the hold change and locks rather than cashing into a window that
   // is about to be settled here.
   function claimHeldWindow() {
-    onTouch?.(`${seed}#${tabToken}`, run?.openCardId ?? null);
+    onTouch?.(createOpenSeed(seed, tabToken, hold.closedAs), run?.openCardId ?? null);
     setClaimed(true);
   }
 
@@ -280,7 +300,10 @@ export function GauntletStage({
       playCashCue(multiplier, grooveBonus);
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
-    const staked = selectedCard ?? savedStake;
+    // The runtime refuses a card the run has no authority for unless the room
+    // played it, and a refused window never settles. So a locked card is never
+    // handed over as the player's: the room plays its own.
+    const staked = selectedCard ?? (savedStake && isCardOpen(savedStake) ? savedStake : null);
     const card = staked ?? getForcedCard(cards, schema);
     const timer = globalThis.setTimeout(() => {
       if (resolvedRef.current) return;
@@ -314,10 +337,6 @@ export function GauntletStage({
     setRelicPulse((previous) => ({ id, n: (previous?.n ?? 0) + 1 }));
   }
 
-  function isCardOpen(card) {
-    return getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }).unlocked;
-  }
-
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
   function openTable(cardId = null) {
     if (!briefingOpen) return;
@@ -330,9 +349,13 @@ export function GauntletStage({
     }
   }
 
+  // One gate for the click and the key. The card's button checked the run's
+  // authority and the number key did not, so pressing 3 staked the card that
+  // read LOCKED -- and the window it closed could never be settled.
   function select(id) {
-    if (!tableOpen) return;
-    if (!live || isAdvancing || locked || draftOpen) return;
+    if (handBlocked || locked || draftOpen) return;
+    const card = cards.find((item) => item.id === id);
+    if (card ? !isCardOpen(card) : !(id === REFRAME_CARD_ID && reframeChoice)) return;
     playTargetLockCue();
     dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
   }
@@ -353,15 +376,13 @@ export function GauntletStage({
     // Graded against the beat the frame loop last landed. With no beat on
     // screen yet -- the first pulse not in -- the press is ungraded: no combo,
     // no slip.
-    const clock = beatClock.current;
-    const since = pressedAt(event) - clock.at;
-    const grade = judgeBeat(since, clock.period, wideBeat);
+    const { grade, widened } = gradePress(event, pointerDownAt, beatClock.current, wideBeat);
     const pushIndex = win.pushes + 1;
     const scored = scoreBeat(win, grade);
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
     dispatch({ type: "PUSH", grade });
-    if (wideBeat && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) pulseRelic("metronome");
-    if (sealedId && schema.sealBreak < SEAL_BREAK_GAUGE && win.gauge < schema.sealBreak && nextGauge >= schema.sealBreak && nextGauge < SEAL_BREAK_GAUGE) {
+    if (widened) pulseRelic("metronome");
+    if (sealedId && hasRelic(relics, "lockpick") && win.gauge < schema.sealBreak && nextGauge >= schema.sealBreak && nextGauge < SEAL_BREAK_GAUGE) {
       pulseRelic("lockpick");
     }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
@@ -373,12 +394,10 @@ export function GauntletStage({
 
   function focus(event) {
     if (!canFocus) return;
-    const clock = beatClock.current;
-    const since = pressedAt(event) - clock.at;
-    const grade = judgeBeat(since, clock.period, wideBeat);
+    const { grade, widened } = gradePress(event, pointerDownAt, beatClock.current, wideBeat);
     const scored = scoreFocus(win, grade);
     dispatch({ type: "FOCUS", grade });
-    if (wideBeat && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) pulseRelic("metronome");
+    if (widened) pulseRelic("metronome");
     playFocusCue(grade, scored.focus / FOCUS_MAX);
     if (grade === "miss") {
       setImpact({ amount: 0.42 });
@@ -474,20 +493,7 @@ export function GauntletStage({
               <small>연승</small> <b>{run.streak}</b> <small>BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
-            {relics.length > 0 && (
-              <span className="gx-relics" data-testid="gauntlet-relics" aria-label={`장착한 도구: ${relics.map((id) => RELICS[id].name).join(", ")}`}>
-                {relics.map((id) => (
-                  <b
-                    key={relicPulse?.id === id ? `${id}-${relicPulse.n}` : id}
-                    className={`gx-relic-chip relic-${id}${relicPulse?.id === id ? " is-proc" : ""}`}
-                    title={`${RELICS[id].label} · ${RELICS[id].text}`}
-                  >
-                    <RelicIcon id={id} size={12} />
-                    <span className="gx-relic-name">{RELICS[id].name}</span>
-                  </b>
-                ))}
-              </span>
-            )}
+            <RelicChips relics={relics} pulse={relicPulse} />
           </div>
           <div className="gx-signals">
             <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
@@ -497,7 +503,7 @@ export function GauntletStage({
             <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b>{focusBonus.label} {Math.round(win.focus)}</b>
-              <small>판돈 {formatMultiplier(focusBonus.pot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
+              <small>판돈 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
           </div>
@@ -508,8 +514,8 @@ export function GauntletStage({
             style={{ "--gx-clock": Math.max(0, Math.min(1, remaining / schema.seconds)) }}
           >
             <b>{Math.ceil(remaining)}</b>
-            <i style={{ width: `${(remaining / schema.seconds) * 100}%` }} />
           </div>
+          <span className="sr-only" role="status">{clockCall}</span>
         </div>
 
         {(tableRules.length > 0 || ruleHeat > 0) && (
@@ -549,7 +555,7 @@ export function GauntletStage({
                 style={{ left: `${nextLow}%`, width: `${Math.max(0.5, nextHigh - nextLow)}%` }}
               />
             )}
-            <span className="gx-gauge-fill" style={{ width: `${win.gauge}%` }} />
+            <span className="gx-gauge-fill" style={{ transform: `scaleX(${Math.min(1, win.gauge / GAUGE_MAX)})` }} />
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -618,6 +624,7 @@ export function GauntletStage({
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
                 <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
+                {briefOpen && <TableGlossary mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
               </ul>
             </details>
           </div>
@@ -647,7 +654,7 @@ export function GauntletStage({
         <div
           className={`gx-focus-modes gx-stance-mastery mode-${win.focusMode}`}
           role="group"
-          aria-label={`Focus mode · ${focusModeProfile.label} mastery ${activeStanceCount}/${STANCE_MASTERY_GOAL}`}
+          aria-label={`자세 · ${focusModeProfile.label} 숙련 ${activeStanceCount}/${STANCE_MASTERY_GOAL}`}
           data-testid="gauntlet-stance-mastery"
         >
           {FOCUS_MODES.map((mode) => {
@@ -664,7 +671,10 @@ export function GauntletStage({
                 onClick={() => setFocusMode(mode)}
               >
                 <span>{profile.label}</span>
-                <em title="시즌 숙련: 차지한 채로 확정한 판">{mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}</em>
+                <em title="시즌 숙련: 차지한 채로 확정한 판">
+                  <span className="sr-only">시즌 숙련 </span>
+                  {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}
+                </em>
                 <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
                 <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
               </button>
@@ -677,99 +687,26 @@ export function GauntletStage({
           <span>HAND</span>
           <b>카드 {handSize}장</b>
           <small>
-            <kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Enter</kbd> 확정
+            <kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Q</kbd> 자세 · <kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장
           </small>
         </div>
 
-        <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label="카드">
-          {cards.map((card, index) => {
-            const gate = getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened });
-            const burn = getCardBurn(card, schema);
-            const chips = getCardChips(card, schema);
-            const selected = win.selectedId === card.id;
-            const sealed = card.id === sealedId && !sealBroken;
-            return (
-              <button
-                type="button"
-                key={card.id}
-                className={`choice gx-card${selected ? " selected" : ""}${sealed ? " is-sealed" : ""}${burn?.fractured ? " is-fractured" : ""}${gate.unlocked ? "" : " locked-choice"}`}
-                aria-pressed={selected}
-                aria-disabled={!gate.unlocked || !live || isAdvancing || !tableOpen ? "true" : undefined}
-                aria-keyshortcuts={String(index + 1)}
-                onClick={() => (gate.unlocked ? select(card.id) : null)}
-              >
-                <span className="gx-card-key" aria-hidden="true">{index + 1}</span>
-                <span className="gx-card-label">{card.label}</span>
-                <span className="gx-card-stats">
-                  <b className="gx-card-chips">{schema.faceDown ? "▒▒" : `+${chips}`}</b>
-                  <b className="gx-card-burn">
-                    {schema.faceDown
-                      ? "▒▒▒▒"
-                      : burn
-                        ? `${resourceMeta[burn.key]?.label ?? burn.key} ${burn.value > 0 ? "+" : ""}${burn.value}`
-                        : "소모 없음"}
-                    {burn?.fractured && !schema.faceDown && <Zap size={11} aria-label="균열 축" />}
-                  </b>
-                  {/* A board rule that touches every card is a badge in the stats
-                      row, not a line of its own on every card: on an overclocked
-                      board those lines made each card 25px taller. The rules panel
-                      says what the rule is; the badge says which cards it bills. */}
-                  {burn?.fractured && !schema.faceDown && (
-                    <i className="gx-card-rule-tax" data-testid="fracture-tax" title={`균열: ${resourceMeta[burn.key]?.label ?? burn.key} 청구 ${schema.fractureRate}배`}>
-                      {schema.fractureRate}x
-                    </i>
-                  )}
-                  {overclockedBoard && !schema.faceDown && (
-                    <i className="gx-card-overclock" data-testid="overclock-card-boost" title="오버클럭: 칩 2배, 푸시 폭 증가">
-                      x2
-                    </i>
-                  )}
-                </span>
-                {/* The staked card carries its own detail. It used to be a strip
-                    fixed over the bottom of the hand, which covered the last row
-                    of cards the moment one was chosen. */}
-                {selected && !schema.faceDown && (
-                  <span className="gx-card-preview" aria-label="선택한 카드의 상세 영향">
-                    {visibleEffects.map((effect) => (
-                      <i key={effect.key} className={effect.value > 0 ? "gain" : "cost"}>
-                        {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
-                      </i>
-                    ))}
-                    {hiddenEffectCount > 0 && <i>외 {hiddenEffectCount}</i>}
-                    {fractureAxis && (
-                      <i className="gx-card-crack" data-testid="fracture-candidate">
-                        균열 후보 · {resourceMeta[fractureAxis]?.label ?? fractureAxis}
-                      </i>
-                    )}
-                  </span>
-                )}
-                {sealed && (
-                  <span className="gx-card-seal" data-testid="sealed-card-lock">
-                    <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 {schema.sealBreak}
-                  </span>
-                )}
-                {!gate.unlocked && <span className="gx-card-seal">LOCKED · {gate.reason}</span>}
-              </button>
-            );
-          })}
-          {reframeChoice && (
-            <button
-              type="button"
-              className={`choice gx-card gx-card-wild${reframeSelected ? " selected" : ""}`}
-              aria-pressed={reframeSelected}
-              aria-disabled={!live || isAdvancing ? "true" : undefined}
-              aria-keyshortcuts={String(cards.length + 1)}
-              onClick={() => select(REFRAME_CARD_ID)}
-            >
-              <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>
-              <span className="gx-card-label">{reframeChoice.label}</span>
-              <span className="gx-card-stats">
-                <b className="gx-card-chips">WILD +{getCardChips(reframeChoice, schema)}</b>
-                <b className="gx-card-burn">이 판을 다시 연다</b>
-              </span>
-            </button>
-          )}
-        </div>
+        <GauntletHand
+          cards={cards}
+          reframeChoice={reframeChoice}
+          schema={schema}
+          resourceMeta={resourceMeta}
+          selectedId={reframeSelected ? REFRAME_CARD_ID : selectedCard?.id ?? null}
+          sealedId={sealedId}
+          sealBroken={sealBroken}
+          blocked={handBlocked}
+          isCardOpen={isCardOpen}
+          getLockReason={(card) => getGate(card).reason}
+          visibleEffects={visibleEffects}
+          hiddenEffectCount={hiddenEffectCount}
+          fractureAxis={fractureAxis}
+          onSelect={select}
+        />
       </div>
 
       <div className="gx-actions">
@@ -777,10 +714,11 @@ export function GauntletStage({
           type="button"
           className="gx-push"
           data-testid="commit-push"
+          onPointerDown={notePointer}
           onClick={push}
           disabled={!canPush}
-          aria-keyshortcuts="Space"
-          aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${nextLow}에서 ${nextHigh}. 심박에 맞춰 누르면 콤보가 쌓인다`}
+          aria-keyshortcuts="Space W"
+          aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${Math.round(nextLow)}에서 ${Math.round(nextHigh)}. 심박에 맞춰 누르면 콤보가 쌓인다`}
         >
           <i className="gx-beat-ring" aria-hidden="true" />
           <Flame size={18} aria-hidden="true" />
@@ -797,10 +735,11 @@ export function GauntletStage({
           type="button"
           className={`gx-focus focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`}
           data-testid="commit-focus"
+          onPointerDown={notePointer}
           onClick={focus}
           disabled={!canFocus}
           aria-keyshortcuts="E"
-          aria-label={`Lock focus. Current focus ${Math.round(win.focus)}. Press on the beat to raise pot and resource multipliers.`}
+          aria-label={`락을 건다. 지금 차지 ${Math.round(win.focus)}. 심박에 맞춰 누르면 판돈과 자원 배율이 오른다`}
         >
           <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
@@ -830,14 +769,6 @@ export function GauntletStage({
         <RelicDraft offer={relicOffer} owned={relics} onPick={pickRelic} onSkip={() => pickRelic(null)} />
       )}
 
-      {equipped && (
-        <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
-          <RelicIcon id={equipped.id} size={18} />
-          <span>장착</span>
-          <b>{RELICS[equipped.id].label}</b>
-        </div>
-      )}
-
       {briefingOpen && (
         <SceneBriefing
           node={scene.node}
@@ -858,60 +789,15 @@ export function GauntletStage({
         />
       )}
 
-      {locked && (win.status === "live" || awaitingClaim) && (
-        <div className="gx-breach gx-lost-tab" role="alert" data-testid="table-lost-to-tab">
-          <span className="gx-breach-kicker">이 판은 다른 탭에서 잡혔다</span>
-          <p>한 판은 한 테이블에서만 걸 수 있다. 이 탭의 판은 멈췄다.</p>
-          <button type="button" className="ghost" onClick={() => (onReload ? onReload() : globalThis.location.reload())}>
-            <RefreshCcw size={14} aria-hidden="true" /> 다시 불러오기
-          </button>
-        </div>
-      )}
-
-      {awaitingClaim && (
-        <div className="gx-breach gx-held-elsewhere" role="alertdialog" data-testid="table-held-elsewhere">
-          <span className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
-          <p>
-            다른 탭(또는 이전 세션)에서 카드를 걸어 둔 판입니다. 여기서 이어가면 그 판은 떠난 판으로 BUST 처리됩니다.
-            아직 그 탭에서 하는 중이면 그대로 두세요.
-          </p>
-          <div className="gx-held-actions">
-            <button type="button" className="ghost" data-testid="claim-held-window" onClick={claimHeldWindow}>
-              여기서 이어가기 · BUST 처리
-            </button>
-            <button type="button" className="ghost" data-testid="leave-held-window" onClick={() => setLostToTab(true)}>
-              그 탭에 두기
-            </button>
-          </div>
-        </div>
-      )}
-
-      {win.status !== "live" && claimed && (
-        <div className={`gx-slam gx-slam-${win.status}`} role="alert">
-          {win.status === "bust" ? (
-            <>
-              <Skull size={56} aria-hidden="true" />
-              <strong>BUST</strong>
-              <span>
-                {win.cause === "timeout"
-                  ? "시간이 먼저 끝났다"
-                  : win.cause === "abandon"
-                    ? "테이블을 떠났다"
-                    : `벽은 ${win.wall}에 있었다`}{" "}
-                · 판돈 {formatNumber(run.runPot)} → {formatNumber(bustKeeps)}
-              </span>
-            </>
-          ) : (
-            <>
-              <strong>{formatMultiplier(multiplier)}</strong>
-              <span>
-                +{formatNumber(livePot)}
-                {grooveBonus > 1 ? ` · GROOVE ×${grooveBonus.toFixed(2)} · COMBO ${win.beatCombo}` : ""}
-              </span>
-            </>
-          )}
-        </div>
-      )}
+      <TableNotices
+        equipped={equipped}
+        lost={locked && (win.status === "live" || awaitingClaim)}
+        held={awaitingClaim}
+        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, grooveBonus, runPot: run.runPot, bustKeeps } : null}
+        onReload={onReload}
+        onClaim={claimHeldWindow}
+        onLeave={() => setLostToTab(true)}
+      />
     </section>
   );
 }

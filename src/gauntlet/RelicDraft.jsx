@@ -86,6 +86,10 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
               return (
                 <li key={id} className={state} title={locked ? `잠김 · ${RELICS[id].unlock.text}` : `${RELICS[id].label} · ${RELICS[id].name}`}>
                   {locked ? <Lock size={12} aria-hidden="true" /> : <RelicIcon id={id} size={12} />}
+                  {/* The strip is icons; what each one is was only in its tooltip. */}
+                  <span className="sr-only">
+                    {locked ? `잠김, ${RELICS[id].unlock.text}` : `${RELICS[id].name}${owned.includes(id) ? ", 장착" : ""}`}
+                  </span>
                 </li>
               );
             })}
