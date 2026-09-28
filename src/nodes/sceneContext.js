@@ -1593,6 +1593,10 @@ export function applySceneContext(nodes, nodeOrders) {
       node.clock = context?.clock ?? clock;
       if (context?.question) node.question = context.question;
       if (context?.lead) node.lead = context.lead;
+      // Whether the room is closing in is a fact about the scene, like its
+      // room and its clock, so a scene may state it here and overrule the
+      // graph build's own reading (`pressureBeats` in gameData.js).
+      if (typeof context?.pressure === "boolean") node.pressure = context.pressure;
     }
   }
   return nodes;

@@ -715,7 +715,7 @@ for (const [routeId, finalId] of [
 for (const caseId of CASE_SEQUENCE) {
   const asked = new Map();
   for (const nodeId of new Set(nodeOrders[caseId])) {
-    if (nodes[nodeId]?.phase !== "LAST CALL") continue;
+    if (nodes[nodeId]?.kind !== "routeFinal") continue;
     const question = nodes[nodeId].choices.map((choice) => choice.label).join(" | ");
     assert.ok(!asked.has(question), `${nodeId} closes on the same question as ${asked.get(question)}`);
     asked.set(question, nodeId);
@@ -890,7 +890,7 @@ for (const choiceId of Object.keys(authoredEchoReplies)) {
 }
 
 const authoredGeneratedScenes = Object.values(nodes).filter(
-  (node) => node.phase === "OFF THE RECORD" || node.phase === "THE ROOM AFTER",
+  (node) => node.kind === "connective" || node.kind === "reaction",
 );
 const generatedChoiceCount = authoredGeneratedScenes.reduce((total, node) => total + node.choices.length, 0);
 test("every generated scene choice has authored copy and a distinct effect", () => {
