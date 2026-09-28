@@ -18,11 +18,16 @@ export const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 export const CLOUD_SAVE_CODE_KEY = "critical-point-cloud-code-v1";
 export const CLOUD_SAVE_ENABLED_KEY = "critical-point-cloud-enabled-v1";
 export const CLOUD_SAVE_SYNC_KEY = "critical-point-cloud-sync-v1";
+/** How long the server keeps a copy after its last upload (`purge_old_telemetry`). */
+export const CLOUD_SAVE_RETENTION_DAYS = 180;
 // 참가자 게시판 (src/state/useBoard.js): the nickname the player publishes on
 // the board, kept on the device so the form is typed once rather than every
 // visit. Nothing else about the board is stored locally -- the posts are the
 // server's copy.
 export const BOARD_NICKNAME_KEY = "critical-point-board-nickname-v1";
+// The id the board files this device's posts under; apart from the telemetry
+// session id on purpose (getBoardWriterId in src/telemetry.js).
+export const BOARD_WRITER_ID_KEY = "critical-point-board-id-v1";
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
 
@@ -293,7 +298,7 @@ export function getTabToken() {
     return fallbackTabToken;
   }
 }
-const SETTLED_WINDOWS_LIMIT = 400;
+export const SETTLED_WINDOWS_LIMIT = 400;
 
 export function readSettledWindowSeeds() {
   try {

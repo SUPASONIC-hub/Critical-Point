@@ -12,7 +12,7 @@ import {
 // from gameLogic.js: this hook is reached from the pre-start shell, and
 // gameLogic.js drags the whole season into the entry chunk. See privacyText.js.
 import { anonymizeSensitiveText, detectPrivacySignals } from "../privacyText.js";
-import { fetchBoardPosts, getSessionId, saveBoardPost } from "../telemetry.js";
+import { fetchBoardPosts, getBoardWriterId, saveBoardPost } from "../telemetry.js";
 
 /**
  * Owns the 참가자 게시판: the posts the board screen lists, and the one the
@@ -43,14 +43,23 @@ const BOARD_POST_INTERVAL_MS = 30000;
  */
 const BOARD_DWELL_MS = 3000;
 /**
- * The trigger's tests (`board_text_has_link`, `board_text_has_contact` and
- * `clean_board_text` in 20260928010000), written the same way so the two agree.
- * The server applies them to the nickname as well as the body, so this does too.
+ * The trigger's tests (`board_text_has_link` in 20260929020000,
+ * `board_text_has_contact` and `clean_board_text` in 20260928010000), written
+ * the same way so the two agree, and held to one list of cases
+ * (tests/fixtures/board-filter-cases.json) so they keep agreeing. The server
+ * applies them to the nickname as well as the body, so this does too.
+ *
+ * A TLD ends where the name ends -- `(?![a-z0-9-])` -- rather than at a word
+ * boundary. A boundary is ASCII here and follows the database's locale there,
+ * so `spam.com으로`, a domain with its particle attached, was a link in the
+ * browser and prose on the server. The label before the dot may be Hangul.
  */
 const BOARD_LINK_TLDS =
-  "com|net|org|io|kr|co|xyz|top|ru|cn|me|ly|gg|app|link|site|online|shop|store|info|biz|tv|to|cc|be|us|uk|jp|de|fr|in|ai|dev|so|la|page|club|live|fun|icu|vip|win|pro|sh|ws|tk|ml|ga|cf|gq|gl|im|am|fm|one|click|lol|bio|zip|mov|pw|su|ooo|asia|cloud|space|website|tech|world|today|news|blog|xn--[a-z0-9-]+";
-const BOARD_LINK_PATTERN = new RegExp(String.raw`(https?:|hxxps?:|www\.|닷\s*컴|[a-z0-9-]+(\.|\s+dot\s+)(${BOARD_LINK_TLDS})\b)`);
-const BOARD_SPACED_LINK_PATTERN = /[a-z0-9-]+\.\s+(com|net|org|xyz|io|kr)\b/;
+  "com|net|org|io|kr|co|xyz|top|ru|cn|me|ly|gg|app|link|site|online|shop|store|info|biz|tv|to|cc|be|us|uk|jp|de|fr|in|ai|dev|so|la|page|club|live|fun|icu|vip|win|pro|sh|ws|tk|ml|ga|cf|gq|gl|im|am|fm|one|click|lol|bio|zip|mov|pw|su|ooo|asia|cloud|space|website|tech|world|today|news|blog|한국|xn--[a-z0-9-]+";
+const BOARD_LINK_PATTERN = new RegExp(
+  String.raw`(https?:|hxxps?:|www\.|닷\s*컴|[a-z0-9가-힣-]+(\.|\s+dot\s+)(${BOARD_LINK_TLDS})(?![a-z0-9-]))`,
+);
+const BOARD_SPACED_LINK_PATTERN = /[a-z0-9-]+\.\s+(com|net|org|xyz|io|kr)(?![a-z0-9-])/;
 const BOARD_EMAIL_PATTERN = /[^\s@]+@[^\s@]+\.[a-z]{2,}/i;
 const BOARD_PHONE_PATTERN =
   /(^|[^0-9])(\+?82[-.\s]?1[016789]|01[016789]|0[2-6][0-9]?|070|050[0-9]?)[-.\s)]{0,2}[0-9]{3,4}[-.\s]?[0-9]{4}([^0-9]|$)/;
@@ -79,6 +88,33 @@ export function boardTextHasContact(value) {
   return BOARD_EMAIL_PATTERN.test(text) || BOARD_PHONE_PATTERN.test(text);
 }
 
+/**
+ * Why a post cannot go up as written, or null. The order is the trigger's, so
+ * a post that breaks two rules is refused for the same one on both sides.
+ */
+export function getBoardPostRefusal(nickname, body) {
+  const name = cleanBoardText(String(nickname ?? "").replace(/\s+/g, " "));
+  const text = cleanBoardText(body);
+  if (name.length < BOARD_NICKNAME_MIN_LENGTH || name.length > PLAYER_NAME_MAX_LENGTH || visibleLength(name) < BOARD_NICKNAME_MIN_LENGTH) {
+    return "nickname-characters";
+  }
+  if (text.length < BOARD_POST_MIN_LENGTH || text.length > BOARD_POST_MAX_LENGTH || visibleLength(text) < BOARD_POST_MIN_LENGTH) {
+    return "body-characters";
+  }
+  if (boardTextHasLink(name)) return "nickname-link";
+  if (boardTextHasLink(text)) return "body-link";
+  if (boardTextHasContact(name) || boardTextHasContact(text)) return "contact";
+  return null;
+}
+
+const BOARD_REFUSAL_COPY = {
+  "nickname-characters": "이름은 2자 이상 24자 이하로 적어 주세요.",
+  "body-characters": "글은 2자 이상 300자 이하로 적어 주세요.",
+  "nickname-link": "이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.",
+  "body-link": "링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.",
+  contact: "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.",
+};
+
 function normalizeBoardPost(row = {}) {
   return {
     id: row.id,
@@ -94,14 +130,17 @@ function normalizeBoardPost(row = {}) {
  * can raise has a sentence here; anything else falls back to the general one.
  */
 function describeBoardFailure(error, isOnline) {
-  const message = error instanceof Error ? error.message : "";
-  if (/nickname must not contain a link/.test(message)) return "이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.";
-  if (/must not contain a link/.test(message)) return "링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.";
-  if (/must not contain contact details/.test(message)) return "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.";
+  const message = `${error?.serverMessage ?? ""} ${error instanceof Error ? error.message : ""}`;
+  if (/nickname must not contain a link/.test(message)) return BOARD_REFUSAL_COPY["nickname-link"];
+  if (/must not contain a link/.test(message)) return BOARD_REFUSAL_COPY["body-link"];
+  if (/must not contain contact details/.test(message)) return BOARD_REFUSAL_COPY.contact;
+  // Someone else on the same network wrote the same words. That used to be
+  // answered with "글을 올렸습니다" for a post that was stored nowhere.
+  if (/repeats a recent post/.test(message)) return "같은 글이 조금 전에 올라와 있습니다. 표현을 바꿔 다시 올려 주세요.";
   if (/at least 30 seconds apart/.test(message)) return "글은 30초에 한 번만 올릴 수 있습니다. 잠시 뒤에 다시 눌러 주세요.";
   if (/rate limit exceeded/.test(message)) return "한 시간에 열 번까지만 올릴 수 있습니다. 시간을 두고 다시 찾아와 주세요.";
-  if (/nickname must be/.test(message)) return "이름은 2자 이상 24자 이하로 적어 주세요.";
-  if (/post must be/.test(message)) return "글은 2자 이상 300자 이하로 적어 주세요.";
+  if (/nickname must be/.test(message)) return BOARD_REFUSAL_COPY["nickname-characters"];
+  if (/post must be/.test(message)) return BOARD_REFUSAL_COPY["body-characters"];
   if (!isOnline) return "오프라인이라 글을 올리지 못했습니다. 연결된 뒤에 다시 눌러 주세요.";
   return "글을 올리지 못했습니다. 잠시 뒤에 다시 눌러 주세요.";
 }
@@ -148,7 +187,7 @@ export function useBoard({ showBoard, isOnline }) {
         setBoardStatus(isOnline ? "error" : "local");
         setBoardError(
           isOnline
-            ? "게시판을 불러오지 못했습니다. 잠시 뒤에 다시 열어 주세요."
+            ? "게시판을 불러오지 못했습니다. 아래에서 다시 불러올 수 있습니다."
             : "오프라인이라 게시판을 불러오지 못했습니다. 연결되면 다시 열립니다.",
         );
       });
@@ -160,7 +199,11 @@ export function useBoard({ showBoard, isOnline }) {
   const activeBoardPrivacySignals = detectPrivacySignals(boardBody).filter((signal) => signal.active);
   const trimmedBoardNickname = cleanBoardText(boardNickname.replace(/\s+/g, " "));
   const trimmedBoardBody = cleanBoardText(boardBody);
+  // The composer is for a board that answered. It used to stay open with no
+  // server in reach, and said so only after the player had written the post.
+  const canWriteBoardPost = boardStatus === "ready";
   const canSubmitBoardPost =
+    canWriteBoardPost &&
     !isPostingToBoard &&
     visibleLength(trimmedBoardNickname) >= BOARD_NICKNAME_MIN_LENGTH &&
     visibleLength(trimmedBoardBody) >= BOARD_POST_MIN_LENGTH &&
@@ -180,8 +223,12 @@ export function useBoard({ showBoard, isOnline }) {
     setBoardBody(anonymizeSensitiveText(boardBody));
   }
 
+  function reloadBoard() {
+    setBoardReloadToken((token) => token + 1);
+  }
+
   async function submitBoardPost() {
-    if (isPostingToBoard) return;
+    if (isPostingToBoard || !canWriteBoardPost) return;
     // The honeypot is answered with a success the board never receives. A script
     // that is told it failed tries again; one that is told it worked moves on.
     if (boardHoneypot.trim().length > 0) {
@@ -193,28 +240,13 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardPostStatus("게시판이 열린 지 얼마 되지 않았습니다. 잠깐 읽어 보고 다시 눌러 주세요.");
       return;
     }
-    if (visibleLength(trimmedBoardNickname) < BOARD_NICKNAME_MIN_LENGTH) {
-      setBoardPostStatus("이름은 2자 이상 24자 이하로 적어 주세요.");
-      return;
-    }
-    if (visibleLength(trimmedBoardBody) < BOARD_POST_MIN_LENGTH) {
-      setBoardPostStatus("글은 2자 이상 300자 이하로 적어 주세요.");
-      return;
-    }
     if (activeBoardPrivacySignals.length > 0) {
       setBoardPostStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 올려 주세요.");
       return;
     }
-    if (boardTextHasLink(trimmedBoardNickname)) {
-      setBoardPostStatus("이름에는 링크를 넣을 수 없습니다. 이름을 바꿔 다시 올려 주세요.");
-      return;
-    }
-    if (boardTextHasLink(trimmedBoardBody)) {
-      setBoardPostStatus("링크가 들어간 글은 올릴 수 없습니다. 링크를 빼고 다시 올려 주세요.");
-      return;
-    }
-    if (boardTextHasContact(trimmedBoardNickname) || boardTextHasContact(trimmedBoardBody)) {
-      setBoardPostStatus("전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.");
+    const refusal = getBoardPostRefusal(boardNickname, boardBody);
+    if (refusal) {
+      setBoardPostStatus(BOARD_REFUSAL_COPY[refusal]);
       return;
     }
     const sinceLastPost = Date.now() - lastBoardPostAt;
@@ -226,7 +258,8 @@ export function useBoard({ showBoard, isOnline }) {
 
     setIsPostingToBoard(true);
     writeStoredValue(BOARD_NICKNAME_KEY, trimmedBoardNickname);
-    const sessionId = getSessionId();
+    // The board's own id, never the telemetry session's: see getBoardWriterId.
+    const sessionId = getBoardWriterId();
     // One id per submit, so a double click that sends the same post twice lands
     // once: `board_posts.event_id` is unique. Random rather than derived from
     // the session, so the id could never tie two posts to one device.
@@ -245,7 +278,7 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardBodyState("");
       setLastBoardPostAt(Date.now());
       setBoardPostStatus("글을 올렸습니다.");
-      setBoardReloadToken((token) => token + 1);
+      reloadBoard();
     } catch (error) {
       console.warn(error);
       setBoardPostStatus(describeBoardFailure(error, isOnline));
@@ -271,9 +304,11 @@ export function useBoard({ showBoard, isOnline }) {
     setBoardHoneypot,
     boardPostStatus,
     isPostingToBoard,
+    canWriteBoardPost,
     canSubmitBoardPost,
     activeBoardPrivacySignals,
     anonymizeBoardBody,
     submitBoardPost,
+    reloadBoard,
   };
 }

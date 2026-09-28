@@ -1,0 +1,35 @@
+{
+  "about": "What the 참가자 게시판 refuses and accepts. One list, read by both copies of the rules: scripts/check-grants.mjs posts each case to the trigger (supabase/migrations), and tests/unit/board-filter.test.mjs gives each to the browser's copy (src/state/useBoard.js). `reason` is what the refusal is about: link, contact, or characters (too few visible ones).",
+  "refused": [
+    { "label": "a link in the nickname", "nickname": "spam-site.xyz", "body": "평범한 본문입니다", "reason": "link" },
+    { "label": "a bare domain", "nickname": "점검", "body": "visit spam.com now", "reason": "link" },
+    { "label": "a spaced dot", "nickname": "점검", "body": "example . com 으로 오세요", "reason": "link" },
+    { "label": "a bracketed dot", "nickname": "점검", "body": "example[.]me 로 오세요", "reason": "link" },
+    { "label": "a .gg link", "nickname": "점검", "body": "discord.gg/abc 들어오세요", "reason": "link" },
+    { "label": "닷컴", "nickname": "점검", "body": "스팸닷컴 으로 오세요", "reason": "link" },
+    { "label": "a domain with a particle attached", "nickname": "점검", "body": "spam.com으로 오세요", "reason": "link" },
+    { "label": "a domain with a topic particle attached", "nickname": "점검", "body": "후기는 example.kr에서 보세요", "reason": "link" },
+    { "label": "a domain ending the sentence in Korean", "nickname": "점검", "body": "주소는 my-shop.store입니다", "reason": "link" },
+    { "label": "a Hangul label", "nickname": "점검", "body": "스팸가게.com 구경 오세요", "reason": "link" },
+    { "label": "a Hangul label with a particle attached", "nickname": "점검", "body": "할인가게.kr에서 팝니다", "reason": "link" },
+    { "label": "a Hangul domain", "nickname": "점검", "body": "예시.한국 으로 오세요", "reason": "link" },
+    { "label": "a punycode domain", "nickname": "점검", "body": "가게.xn--3e0b707e 로 오세요", "reason": "link" },
+    { "label": "a scheme alone", "nickname": "점검", "body": "hxxp://어딘가 로 오세요", "reason": "link" },
+    { "label": "a spelled-out dot", "nickname": "점검", "body": "example dot com 입니다", "reason": "link" },
+    { "label": "a Korean mobile number", "nickname": "점검", "body": "연락주세요 010-1234-5678", "reason": "contact" },
+    { "label": "a mobile number with a particle attached", "nickname": "점검", "body": "01012345678로 연락 주세요", "reason": "contact" },
+    { "label": "an e-mail address, whose domain is a link first", "nickname": "점검", "body": "메일 someone@example.org", "reason": "link" },
+    { "label": "an e-mail address on a domain the link filter does not list", "nickname": "점검", "body": "메일 someone@example.museum 으로 주세요", "reason": "contact" },
+    { "label": "an e-mail address in the nickname", "nickname": "me@example.museum", "body": "평범한 본문입니다", "reason": "contact" },
+    { "label": "a whitespace-only body", "nickname": "점검", "body": "\u3000\u200B\n\t\u00A0", "reason": "characters" },
+    { "label": "a zero-width nickname", "nickname": "\u200B\u200B\u200B", "body": "평범한 본문입니다", "reason": "characters" },
+    { "label": "a one-character body", "nickname": "점검", "body": "가", "reason": "characters" }
+  ],
+  "accepted": [
+    { "label": "ordinary prose with a sentence break", "nickname": "점검", "body": "Thanks. Me too. 3.5점 정도였어요." },
+    { "label": "a Korean sentence break followed by English", "nickname": "점검", "body": "끝까지 했습니다. Korea 지점 이야기가 남네요." },
+    { "label": "a version number", "nickname": "점검", "body": "사건 12.5 같은 느낌이었어요" },
+    { "label": "an amount and a percentage", "nickname": "점검", "body": "310억, 179.6%라는 숫자가 계속 떠오릅니다" },
+    { "label": "an ellipsis", "nickname": "점검", "body": "그 서명란... 아직도 생각납니다" }
+  ]
+}

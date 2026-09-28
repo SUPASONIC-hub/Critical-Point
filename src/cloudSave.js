@@ -9,13 +9,14 @@ import {
   SAVE_SCHEMA_VERSION,
   SAVE_WRITTEN_EVENT,
   setReplaySession,
+  SETTLED_WINDOWS_LIMIT,
   SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
 import { clearReplayFromLocation } from "./state/trace.js";
-import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
+import { callSupabaseRpc, isMissingRpc, telemetryEnabled } from "./telemetry.js";
 
 /**
  * Saves that follow the player to another device, and survive being offline.
@@ -33,19 +34,34 @@ import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
  * tick, or the next launch sends it.
  *
  * The copy is filed under a continuation code the player can read off one
- * device and type into another. The server keeps one copy per code and refuses
- * an upload older than the one it holds (`put_cloud_save`), so a phone that was
- * offline all morning cannot overwrite the evening's play on a laptop; this
- * module reports that as a conflict and offers the newer copy instead.
+ * device and type into another, and two devices are ordered by lineage, not by
+ * the clock. The server counts every accepted write (`revision`); an upload
+ * names the revision it was built on, and is refused when the stored copy has
+ * moved past it. It used to be ordered by the save's own timestamp, which
+ * every local write stamps with the present -- so a phone that had fallen two
+ * hours behind replaced the laptop's evening with one decision, or with a
+ * telemetry-queue write that was no play at all.
  *
- * This file must not import the scene graph: the intro shell loads it.
+ * A refusal is a conflict, and a conflict stays: nothing uploads again until
+ * the player either loads the copy the server holds or says, in so many words,
+ * that this device's progress should replace it.
+ *
+ * The client is deployed before the migration it was written for
+ * (20260929030000), so each new call falls back to the one the older database
+ * answers: no `peek_cloud_save` means this device's own bookkeeping decides,
+ * and no `p_expected_revision` means the put is sent the old way.
+ *
+ * This file must not import the scene graph: the intro loads it, when the
+ * fold is opened or the device has opted in (`main.jsx`), and it is not part
+ * of what a visitor who never turns online save on downloads. The one thing it
+ * needs from the table -- carrying busts across a restore -- is fetched when a
+ * copy is actually loaded.
  */
 
 const CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const CODE_LENGTH = 12;
 const UPLOAD_DELAY_MS = 2500;
 const RETRY_INTERVAL_MS = 30000;
-const SETTLED_WINDOWS_LIMIT = 400;
 
 export const cloudSaveAvailable = telemetryEnabled;
 
@@ -54,6 +70,9 @@ const listeners = new Set();
 let uploadTimer = null;
 let inFlight = null;
 let installed = false;
+// Whether this page load has asked the server what it holds. Asked once: the
+// answer can only change through an upload, and an upload is refused if it did.
+let remoteChecked = false;
 
 function publish(next) {
   snapshot = Object.freeze({ ...snapshot, ...next });
@@ -131,15 +150,31 @@ export function createCloudSavePayload(save) {
   };
 }
 
+function toRevision(value) {
+  if (typeof value !== "number" && typeof value !== "string") return null;
+  const revision = value === "" ? NaN : Number(value);
+  return Number.isInteger(revision) && revision >= 0 ? revision : null;
+}
+
+/**
+ * This device's bookkeeping: `pending` is the local save still to upload,
+ * `synced` the one the server last accepted and `revision` the count it gave
+ * back for it, and `conflict` what the server said it holds when it refused.
+ */
 function readSync() {
   try {
     const parsed = JSON.parse(readStoredValue(CLOUD_SAVE_SYNC_KEY, "{}"));
+    const conflict = parsed?.conflict && typeof parsed.conflict === "object" && !Array.isArray(parsed.conflict)
+      ? { savedAt: typeof parsed.conflict.savedAt === "string" ? parsed.conflict.savedAt : "", revision: toRevision(parsed.conflict.revision) }
+      : null;
     return {
       pending: typeof parsed?.pending === "string" ? parsed.pending : "",
       synced: typeof parsed?.synced === "string" ? parsed.synced : "",
+      revision: toRevision(parsed?.revision),
+      conflict,
     };
   } catch {
-    return { pending: "", synced: "" };
+    return { pending: "", synced: "", revision: null, conflict: null };
   }
 }
 
@@ -160,44 +195,152 @@ function isOffline() {
   return globalThis.navigator?.onLine === false;
 }
 
-/** Upload the device's newest save if the server does not have it yet. */
-export function flushCloudSave() {
+function sameInstant(left, right) {
+  const a = Date.parse(left);
+  const b = Date.parse(right);
+  return Number.isFinite(a) && a === b;
+}
+
+/** A sentence this module wrote for the player, as opposed to one a server raised. */
+function cloudError(text) {
+  return Object.assign(new Error(text), { userFacing: true });
+}
+
+/**
+ * The server refuses in English, because a Postgres function raises the
+ * message and it also answers `curl`. The panel used to print that text -- the
+ * status line and up to 500 characters of JSON -- under the player's save.
+ */
+export function describeCloudFailure(error) {
+  if (error?.userFacing) return error.message;
+  const text = `${error?.serverMessage ?? ""} ${error instanceof Error ? error.message : ""}`;
+  const status = Number(error?.status) || 0;
+  if (/code limit/.test(text)) return "오늘 이 네트워크에서 새로 만들 수 있는 이어하기 코드를 모두 썼습니다. 내일 다시 켜 주세요. 이 기기 저장은 안전합니다.";
+  if (status === 429 || /rate limit/.test(text)) return "온라인 저장 요청이 너무 잦습니다. 잠시 뒤에 다시 시도합니다. 이 기기 저장은 안전합니다.";
+  if (/invalid cloud save code/.test(text)) return "이어하기 코드는 12자리 영문·숫자입니다.";
+  if (/invalid cloud save payload/.test(text)) return "진행 기록이 온라인 저장 한도보다 커서 올리지 못했습니다. 이 기기 저장은 안전합니다.";
+  if (isOffline() || status === 0) return "온라인 저장 서버에 연결하지 못했습니다. 연결을 확인한 뒤 다시 시도해 주세요.";
+  return "온라인 저장에 실패했습니다. 이 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.";
+}
+
+function holdConflict({ savedAt = "", revision = null } = {}) {
+  writeSync({ conflict: { savedAt: String(savedAt ?? ""), revision: toRevision(revision) } });
+  publish({ phase: "conflict", remoteSavedAt: String(savedAt ?? ""), message: "" });
+}
+
+/**
+ * What the server holds for this code: `{ savedAt, revision }`, `null` when it
+ * holds nothing, `undefined` when it cannot say (a database without
+ * `peek_cloud_save`, or no answer at all).
+ */
+async function peekRemote() {
+  try {
+    const { data } = await callSupabaseRpc("peek_cloud_save", { p_code: getCloudCode() });
+    if (data === null) return null;
+    // An answer with no revision in it is not an answer to this question.
+    const revision = toRevision(data?.revision);
+    return revision === null ? undefined : { savedAt: String(data.saved_at ?? ""), revision };
+  } catch (error) {
+    if (!isMissingRpc(error)) console.warn("Critical Point cloud save could not be checked", error);
+    return undefined;
+  }
+}
+
+/** One put. A database without `p_expected_revision` gets the call it knows. */
+async function putRemote(save, expectedRevision) {
+  const body = {
+    p_code: getCloudCode(),
+    p_saved_at: save.savedAt,
+    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
+  };
+  if (expectedRevision === null) return (await callSupabaseRpc("put_cloud_save", body)).data;
+  try {
+    return (await callSupabaseRpc("put_cloud_save", { ...body, p_expected_revision: expectedRevision })).data;
+  } catch (error) {
+    if (!isMissingRpc(error)) throw error;
+    return (await callSupabaseRpc("put_cloud_save", body)).data;
+  }
+}
+
+/**
+ * The revision the next upload is built on, or a conflict. With no revision on
+ * record (a device that opted in before revisions were sent) the server's copy
+ * counts as this device's own only when its time is the time of the save this
+ * device last had accepted.
+ */
+async function resolveExpectedRevision(sync, { overwrite }) {
+  if (sync.revision !== null && !overwrite && remoteChecked) return { expected: sync.revision };
+  const remote = await peekRemote();
+  remoteChecked = true;
+  if (remote === undefined) return { expected: overwrite ? null : sync.revision };
+  if (remote === null) return { expected: 0 };
+  if (overwrite) return { expected: remote.revision };
+  const own = sync.revision !== null ? remote.revision === sync.revision : Boolean(sync.synced) && sameInstant(remote.savedAt, sync.synced);
+  if (own) return { expected: remote.revision };
+  return { conflict: remote };
+}
+
+async function upload(save, pending, { overwrite }) {
+  const sync = readSync();
+  const upToDate = !pending && sync.synced === save.savedAt;
+  if (upToDate && remoteChecked && !overwrite) {
+    publish({ phase: "synced", syncedAt: sync.synced });
+    return true;
+  }
+  const { expected, conflict } = await resolveExpectedRevision(sync, { overwrite });
+  if (conflict) {
+    holdConflict(conflict);
+    return false;
+  }
+  // The server holds what this device last sent, and nothing has changed here.
+  if (upToDate && !overwrite && expected !== 0) {
+    if (expected !== null) writeSync({ revision: expected });
+    publish({ phase: "synced", syncedAt: sync.synced });
+    return true;
+  }
+  publish({ phase: "syncing", message: "" });
+  const data = await putRemote(save, expected ?? null);
+  if (data?.accepted === false) {
+    holdConflict({ savedAt: data.saved_at, revision: data.revision });
+    return false;
+  }
+  // A write that landed while this one was in flight is still pending.
+  const latest = readSync().pending;
+  const stillPending = latest && latest !== pending && latest !== save.savedAt ? latest : "";
+  writeSync({ pending: stillPending, synced: save.savedAt, revision: toRevision(data?.revision), conflict: null });
+  publish({ phase: stillPending ? "pending" : "synced", syncedAt: save.savedAt, remoteSavedAt: "", message: "" });
+  if (stillPending) scheduleUpload(UPLOAD_DELAY_MS);
+  return true;
+}
+
+/**
+ * Upload the device's newest save if the server does not have it yet.
+ * `overwrite` is the player's own answer to a conflict: this device's progress
+ * replaces what the server holds.
+ */
+export function flushCloudSave({ overwrite = false } = {}) {
   if (!isCloudSaveEnabled()) {
     publish({ phase: cloudSaveAvailable ? "disabled" : "unavailable" });
     return Promise.resolve(false);
   }
   const save = readLocalSave();
-  const { pending, synced } = readSync();
-  if (!save || (!pending && synced === save.savedAt)) {
-    publish({ phase: save ? "synced" : "idle", syncedAt: synced });
-    return Promise.resolve(Boolean(save));
+  if (!save) {
+    publish({ phase: "idle" });
+    return Promise.resolve(false);
+  }
+  const { pending, conflict } = readSync();
+  if (conflict && !overwrite) {
+    publish({ phase: "conflict", remoteSavedAt: conflict.savedAt });
+    return Promise.resolve(false);
   }
   if (isOffline()) {
     publish({ phase: "offline" });
     return Promise.resolve(false);
   }
   if (inFlight) return inFlight;
-  publish({ phase: "syncing", message: "" });
-  inFlight = callSupabaseRpc("put_cloud_save", {
-    p_code: getCloudCode(),
-    p_saved_at: save.savedAt,
-    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
-  })
-    .then(({ data }) => {
-      if (data?.accepted === false) {
-        writeSync({ pending: "" });
-        publish({ phase: "conflict", remoteSavedAt: String(data.saved_at ?? "") });
-        return false;
-      }
-      // A write that landed while this one was in flight is still pending.
-      if (readSync().pending === pending || readSync().pending === save.savedAt) writeSync({ pending: "" });
-      writeSync({ synced: save.savedAt });
-      publish({ phase: readSync().pending ? "pending" : "synced", syncedAt: save.savedAt, remoteSavedAt: "" });
-      if (readSync().pending) scheduleUpload(UPLOAD_DELAY_MS);
-      return true;
-    })
+  inFlight = upload(save, pending, { overwrite })
     .catch((error) => {
-      publish({ phase: isOffline() ? "offline" : "error", message: error instanceof Error ? error.message : "" });
+      publish({ phase: isOffline() ? "offline" : "error", message: describeCloudFailure(error) });
       return false;
     })
     .finally(() => {
@@ -224,25 +367,32 @@ export function installCloudSync() {
   globalThis.addEventListener(SAVE_WRITTEN_EVENT, (event) => {
     if (!isCloudSaveEnabled()) return;
     writeSync({ pending: String(event?.detail?.savedAt ?? "") || new Date().toISOString() });
+    // A conflict is not replaced by "곧 올립니다": nothing uploads until it is settled.
+    if (readSync().conflict) return;
     publish({ phase: isOffline() ? "offline" : "pending" });
     scheduleUpload();
   });
   globalThis.addEventListener("online", () => scheduleUpload(0));
   globalThis.addEventListener("offline", () => {
-    if (readSync().pending) publish({ phase: "offline" });
+    if (readSync().pending && !readSync().conflict) publish({ phase: "offline" });
   });
   globalThis.setInterval(() => {
-    if (readSync().pending && !isOffline()) flushCloudSave();
+    if (readSync().pending && !readSync().conflict && !isOffline()) flushCloudSave();
   }, RETRY_INTERVAL_MS);
   scheduleUpload(1000);
+}
+
+/** Whether uploads are stopped on a conflict the player has not settled. */
+export function hasCloudConflict() {
+  return isCloudSaveEnabled() && Boolean(readSync().conflict);
 }
 
 /** Reads the copy filed under a code. Returns null when there is none. */
 export async function fetchCloudSave(codeInput) {
   const code = normalizeCloudCode(codeInput);
-  if (!code) throw new Error("이어하기 코드는 12자리 영문·숫자입니다.");
-  if (!cloudSaveAvailable) throw new Error("이 배포에는 온라인 저장 서버가 설정되어 있지 않습니다.");
-  if (isOffline()) throw new Error("오프라인이라 불러올 수 없습니다. 연결된 뒤 다시 시도하세요.");
+  if (!code) throw cloudError("이어하기 코드는 12자리 영문·숫자입니다.");
+  if (!cloudSaveAvailable) throw cloudError("이 배포에는 온라인 저장 서버가 설정되어 있지 않습니다.");
+  if (isOffline()) throw cloudError("오프라인이라 불러올 수 없습니다. 연결된 뒤 다시 시도하세요.");
   const { data } = await callSupabaseRpc("get_cloud_save", { p_code: code });
   // Uploads leave out the name and the queue, so a copy is whole without them.
   const remote = data?.payload?.save;
@@ -254,25 +404,31 @@ export async function fetchCloudSave(codeInput) {
   const settledWindows = Array.isArray(data.payload.settledWindows)
     ? data.payload.settledWindows.filter((seed) => typeof seed === "string")
     : [];
-  return { code, save, settledWindows, savedAt: String(data.saved_at ?? save.savedAt ?? "") };
+  return { code, save, settledWindows, savedAt: String(data.saved_at ?? save.savedAt ?? ""), revision: toRevision(data.revision) };
 }
 
 /**
  * Makes a fetched copy this device's save, and this device's code the one it
  * was filed under, so the two devices keep one save between them. The run opens
  * paused on the intro, so 이어하기 is still the player's own click.
+ *
+ * A copy of the run this device is already playing is a restore like any other
+ * (priority 36): it rolls the story back, not the table. Without that, turning
+ * uploads off, busting, and loading one's own code was a way back from the wall.
  */
-export function applyCloudSave({ code, save, settledWindows = [] }) {
+export async function applyCloudSave({ code, save, settledWindows = [], revision = null }) {
   const settled = [...new Set([...readSettledWindowSeeds(), ...settledWindows])].slice(-SETTLED_WINDOWS_LIMIT);
   writeStoredValue(SETTLED_WINDOWS_STORAGE_KEY, JSON.stringify(settled));
   // The name, the research consent and its queue never travel; this device
   // keeps its own. Loading a copy is the player's own act, so it ends a replay.
   const local = readLocalSave();
+  const { carryTableRecordIntoRestore } = await import("./gauntlet/gauntletEngine.js");
+  const restored = carryTableRecordIntoRestore(save, local);
   setReplaySession(false);
   clearReplayFromLocation();
   const written = writeSaveState(
     {
-      ...save,
+      ...restored,
       playerName: typeof local?.playerName === "string" ? local.playerName : "",
       dataConsent: Boolean(local?.dataConsent),
       pendingTelemetry: Array.isArray(local?.pendingTelemetry) && local?.dataConsent ? local.pendingTelemetry : [],
@@ -283,9 +439,33 @@ export function applyCloudSave({ code, save, settledWindows = [] }) {
   );
   if (!written.saved) return false;
   writeStoredValue(CLOUD_SAVE_CODE_KEY, code);
-  writeSync({ pending: "", synced: save.savedAt });
-  publish({ phase: "synced", syncedAt: save.savedAt, remoteSavedAt: "" });
+  // What was carried across is this device's and not the server's yet, so the
+  // copy is only "in step" when nothing had to be carried.
+  const carried = restored !== save;
+  writeSync({ pending: carried ? restored.savedAt ?? "" : "", synced: carried ? "" : save.savedAt, revision: toRevision(revision), conflict: null });
+  remoteChecked = toRevision(revision) !== null;
+  publish({ phase: carried ? "pending" : "synced", syncedAt: carried ? "" : save.savedAt, remoteSavedAt: "", message: "" });
   return true;
+}
+
+/**
+ * Takes the online copy back. "unsupported" is a database from before
+ * `delete_cloud_save`; the copy then ages out on its own.
+ */
+export async function deleteCloudSave() {
+  if (!cloudSaveAvailable) return { deleted: false, unsupported: true };
+  const code = normalizeCloudCode(readStoredValue(CLOUD_SAVE_CODE_KEY, ""));
+  if (!code) return { deleted: false };
+  if (isOffline()) throw cloudError("오프라인이라 온라인 사본을 지울 수 없습니다. 연결된 뒤 다시 시도하세요.");
+  try {
+    const { data } = await callSupabaseRpc("delete_cloud_save", { p_code: code });
+    writeSync({ pending: "", synced: "", revision: null, conflict: null });
+    remoteChecked = false;
+    return { deleted: data === true };
+  } catch (error) {
+    if (isMissingRpc(error)) return { deleted: false, unsupported: true };
+    throw error;
+  }
 }
 
 /** The one status line each phase prints. */
@@ -297,7 +477,7 @@ export function describeCloudPhase(phase) {
       syncing: "온라인에 올리는 중입니다.",
       synced: "기기와 온라인 모두 최신입니다.",
       offline: "오프라인 · 기기에 저장해 두었고, 연결되면 자동으로 올립니다.",
-      conflict: "다른 기기에 더 최근 저장이 있습니다. 아래에서 불러올 수 있습니다.",
+      conflict: "다른 기기에서 저장한 진행이 온라인에 있어 올리기를 멈췄습니다. 아래에서 어느 쪽을 남길지 골라 주세요.",
       error: "온라인 저장에 실패했습니다. 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.",
       disabled: "온라인 저장이 꺼져 있습니다. 이 기기에만 저장합니다.",
       unavailable: "이 배포에는 온라인 저장 서버가 없어 이 기기에만 저장합니다.",

@@ -42,9 +42,10 @@ services:
         sync: false
     # Mirrored by hand in the dashboard under Settings -> Headers. These are
     # the source of truth for what the site *should* send; `check:deploy`
-    # asserts three of them against what it actually sends, and the CSP by
-    # value (scripts/deploy-policy.mjs), not just by presence.
-    # `node scripts/check-deploy.mjs --offline` checks the value below and the
+    # asserts them against what it actually sends -- each security header by
+    # value, the CSP by value (scripts/deploy-policy.mjs), and the cache policy
+    # of the page and of one fingerprinted asset.
+    # `node scripts/check-deploy.mjs --offline` checks the values below and the
     # built dist/index.html without a network.
     headers:
       # Vite fingerprints everything under assets/, so those files never change
@@ -52,18 +53,43 @@ services:
       - path: /assets/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
+      # The page is the one file that names the fingerprinted ones, so it is
+      # asked for again on every visit. Both spellings: a browser asks for `/`,
+      # and a rule for /index.html alone was measured not to cover it.
+      - path: /
+        name: Cache-Control
+        value: no-cache
       - path: /index.html
         name: Cache-Control
         value: no-cache
+      - path: /manifest.webmanifest
+        name: Content-Type
+        value: application/manifest+json
       - path: /*
         name: X-Content-Type-Options
         value: nosniff
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      # Two years, the length browsers' preload lists ask for. No `preload`:
+      # that is a promise about the whole registrable domain, and on
+      # *.onrender.com the domain is not ours to promise for.
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=63072000; includeSubDomains
+      - path: /*
+        name: Cross-Origin-Opener-Policy
+        value: same-origin
+      # Scripts, styles and the font are for this origin only. Not on `/*`: the
+      # key visual is what a link preview on another site shows.
+      - path: /assets/*
+        name: Cross-Origin-Resource-Policy
+        value: same-origin
+      # Everything the game has no use for, off by name. Sound is Web Audio and
+      # needs no permission; autoplay and fullscreen are left to the browser.
       - path: /*
         name: Permissions-Policy
-        value: camera=(), microphone=(), geolocation=()
+        value: accelerometer=(), bluetooth=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), serial=(), usb=(), xr-spatial-tracking=()
       # script-src is 'self' only: the built page has no inline script and no
       #   inline handler (the critical-CSS loader used to be an onload=).
       # style-src keeps 'unsafe-inline' for the inlined critical CSS block and
