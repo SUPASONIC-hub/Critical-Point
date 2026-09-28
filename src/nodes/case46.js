@@ -20,7 +20,7 @@
  * read it.
  *
  * The range: the comedy of a reunion in which 에코's first question is how many
- * new jokes 강태민 has made, and 권도현 says "흑자" for the second time in the
+ * new jokes 강태민 has made, and 권도현 says "흑자" for the third time in the
  * season; the anger of a disposal order with a confirmer and no approver; the
  * grief of telling a machine that 임경수 is not coming, and of 에코 naming the one
  * person its three years of objections never counted -- the analyst; the joy of
@@ -241,7 +241,7 @@ export const case46 = {
   aftermath: {
     c46_aftershock: {
       phase: "AFTERMATH",
-      title: "두 번째 흑자",
+      title: "세 번째 흑자",
       speaker: "문가을",
       text: "밤 8시, 시험 서버실. 트럭은 18시에 떠났고, 무엇이 실렸고 무엇이 남았는지는 당신이 정한 대로입니다. 연시우가 비워 둔 선반에 '점검 중' 팻말을 걸고 컵라면 물을 올립니다. 나준혁은 믹스커피 한 잔을 더 타서 아무도 앉지 않은 의자 앞에 놓습니다. 임경수 몫입니다. 강태민은 오늘 에코에게 다 들려주지 못한 농담을 수첩에 옮겨 적고, 권도현은 하루 비용을 정리하다 '전기요금 1만 2천 원'에서 펜을 멈춥니다. '이 가격이면, 흑자입니다.' 그의 입에서 세 번째입니다. 이민서는 노트북의 'echo_fragment' 폴더 이름을 한참 봅니다. 그때 문가을에게서 문자가 옵니다. '말로 하지 말고 와서 떡이나 쪄요. 올해는 찜기가 여섯 대예요.' 1년 전과 같은 문장에 한 줄이 늘었습니다.",
       memo: ["파쇄 업체 18시 출발", "권도현 계산서: '흑자' -- 세 번째", "나준혁: 빈 의자 앞 믹스커피 한 잔", "문가을: 1년 전과 같은 문장 + 찜기 여섯 대"],
@@ -644,7 +644,7 @@ export const case46 = {
     c46_aftershock: {
       place: "판교 KD데이터랩 데이터센터 · 시험 서버실",
       clock: "9월 19일 · 20시",
-      question: "빈 의자 앞의 커피와 두 번째 흑자, 그리고 1년 전과 같은 문자가 한꺼번에 왔습니다. 이 밤을 어떻게 닫겠습니까?",
+      question: "빈 의자 앞의 커피와 세 번째 흑자, 그리고 1년 전과 같은 문자가 한꺼번에 왔습니다. 이 밤을 어떻게 닫겠습니까?",
     },
   },
   clue: {
