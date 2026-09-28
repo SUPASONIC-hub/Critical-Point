@@ -185,12 +185,15 @@ const offBeat = measure("off every beat", listening, "miss");
 // Each stance is played blind, listening and seeing the wall, so the heartbeat
 // is compared like for like, and once more by a hand that charges STEADY -- the
 // stance that cools the gauge -- and changes to STRIKE to cash.
-const locking = (label, decide, lock) => measure(label, decide, "perfect", [], CASES, lock);
+// The listening hand is compared with the untimed one above, so it plays the
+// same cases; the blind and wall-seeing hands are only its brackets.
+const BRACKET_CASES = 500;
+const locking = (label, decide, lock, cases = CASES) => measure(label, decide, "perfect", [], cases, lock);
 const lockReport = FOCUS_MODES.map((mode) => ({
   mode,
-  blind: bestOfRows([40, 50, 60].map((target) => locking(`${mode} lock, heat ${target}`, (win) => win.gauge < target, { mode }))),
+  blind: bestOfRows([40, 50, 60].map((target) => locking(`${mode} lock, heat ${target}`, (win) => win.gauge < target, { mode }, BRACKET_CASES))),
   listen: locking(`${mode} lock, listening`, listening, { mode }),
-  sees: locking(`${mode} lock, sees the wall`, (win) => win.gauge + win.schema.stepMax < win.wall, { mode }),
+  sees: locking(`${mode} lock, sees the wall`, (win) => win.gauge + win.schema.stepMax < win.wall, { mode }, BRACKET_CASES),
 }));
 const swapped = locking("steady lock, cashed as strike", listening, { mode: "steady", cashAs: "strike" });
 
