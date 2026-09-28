@@ -209,6 +209,8 @@ function stopProcess(child) {
 const DEFAULT_SPECS = [
   "tests/accessibility.spec.js",
   "tests/audio-preference.spec.js",
+  "tests/board-ranking.spec.js",
+  "tests/cloud-save.spec.js",
   "tests/contrast.spec.js",
   "tests/gauntlet-loop.spec.js",
   "tests/save-integrity.spec.js",

@@ -31,9 +31,11 @@ import { isPermanentRefusal } from "./telemetryBatch.js";
 import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
-// A player in the middle of a case is told here, where the save speaks.
-const CLOUD_CONFLICT_MESSAGE =
-  "온라인 저장이 멈췄습니다. 다른 기기에서 저장한 진행이 온라인에 있습니다. 이 기기에는 계속 저장되며, 시작 화면의 '다른 기기에서 이어하기'에서 어느 쪽을 남길지 고를 수 있습니다.";
+// A player in the middle of a case is told here, where the save speaks: once a
+// page load and in one line, because the line sits on the play screen and
+// priority 27 gives that screen to the table.
+const CLOUD_CONFLICT_MESSAGE = "온라인 저장이 멈췄습니다. 이 기기에는 저장됩니다. 시작 화면의 '다른 기기에서 이어하기'에서 확인해 주세요.";
+let cloudConflictSaid = false;
 
 /**
  * Where 판을 다시 짠다 leads: the case's authored hidden route, once per case,
@@ -421,7 +423,10 @@ export function useChoiceCommit(context) {
     if (written?.stale || written?.replay) return;
     if (windowState.seed) recordSettledWindowSeed(windowState.seed);
     if (closedCase) recordClosedCase(closedCase);
-    if (hasCloudConflict()) context.setSaveStatus(CLOUD_CONFLICT_MESSAGE);
+    if (!cloudConflictSaid && hasCloudConflict()) {
+      cloudConflictSaid = true;
+      context.setSaveStatus(CLOUD_CONFLICT_MESSAGE);
+    }
   }
 
   function choose(choice, closedWindow = null, forced = false) {
