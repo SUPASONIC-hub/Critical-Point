@@ -14,21 +14,41 @@ import { acquireCueRuntime, isSoundMuted } from "../components/AdaptiveMusic.jsx
  *
  * The heartbeat is not decoration. Its tempo is read off the distance to the
  * real wall, so a player who listens knows more than a player who reads.
+ *
+ * A one-shot cue is scheduled only on a context that is running.
+ * `acquireCueRuntime` asks a suspended one to resume, which takes effect later;
+ * until then its clock stands still, and every beat scheduled against it piled
+ * up at the same `currentTime` and sounded at once when the context woke. The
+ * drone is a standing voice, not a schedule, so it may be built while the
+ * context is still waking.
  */
 
-function cueRuntime() {
+function standingRuntime() {
   const runtime = acquireCueRuntime();
   return runtime ? { ...runtime, destination: runtime.context.destination } : null;
 }
 
+function cueRuntime() {
+  const runtime = standingRuntime();
+  return runtime?.context.state === "running" ? runtime : null;
+}
+
 function withRuntime(play) {
   const runtime = cueRuntime();
-  if (!runtime) return;
+  if (!runtime) return null;
   try {
     play(runtime);
+    return runtime;
   } catch {
     // Audio is an enhancement; a browser may refuse it mid-gesture.
+    return null;
   }
+}
+
+/** How long after it is scheduled a sound reaches the ear, in milliseconds. Zero when the platform does not say. */
+function getOutputLatencyMs(context) {
+  const seconds = (Number(context?.baseLatency) || 0) + (Number(context?.outputLatency) || 0);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 0;
 }
 
 function envelope(gain, start, peak, attack, release) {
@@ -47,9 +67,13 @@ function getNoise(context) {
   return noiseBuffer;
 }
 
-/** Lub-dub. Louder and brighter as the wall closes in. */
+/**
+ * Lub-dub. Louder and brighter as the wall closes in. Returns how late the beat
+ * will be heard, so the table can grade a press against the beat that reached
+ * the player rather than the one that left the scheduler; zero when silent.
+ */
 export function playHeartbeat(closeness = 0) {
-  withRuntime(({ context, destination, multiplier }) => {
+  const runtime = withRuntime(({ context, destination, multiplier }) => {
     const now = context.currentTime;
     // 0.19 at rest is 0.156 on the default preset: audible under the score.
     const level = (0.19 + closeness * 0.13) * multiplier;
@@ -72,6 +96,7 @@ export function playHeartbeat(closeness = 0) {
       oscillator.stop(start + 0.24);
     }
   });
+  return getOutputLatencyMs(runtime?.context);
 }
 
 /**
@@ -80,7 +105,7 @@ export function playHeartbeat(closeness = 0) {
  * the caller never branches.
  */
 export function startTensionDrone() {
-  const runtime = cueRuntime();
+  const runtime = standingRuntime();
   if (!runtime) return { set() {}, stop() {} };
   try {
     const { context, destination, multiplier } = runtime;
@@ -100,14 +125,21 @@ export function startTensionDrone() {
     });
     filter.connect(master).connect(destination);
     let stopped = false;
+    let muted = false;
+    let mutedAt = -Infinity;
     return {
       set(closeness = 0, sedated = false) {
         if (stopped) return;
         const now = context.currentTime;
         const read = sedated ? 0.35 : closeness;
         // The drone runs for the whole window, so it is the one voice that can
-        // outlive a mute pressed after it started.
-        const level = isSoundMuted() ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
+        // outlive a mute pressed after it started. The preference is in storage,
+        // and the stage drives this ten times a second: it is read once a second.
+        if (now - mutedAt >= 1) {
+          muted = isSoundMuted();
+          mutedAt = now;
+        }
+        const level = muted ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
         master.gain.setTargetAtTime(level, now, 0.25);
         filter.frequency.setTargetAtTime(120 + read * 1400, now, 0.3);
         voices[2].detune.setTargetAtTime(read * 60, now, 0.4);

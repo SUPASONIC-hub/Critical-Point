@@ -764,7 +764,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
     // A closed case keeps its REBOOT board and its relic draft; an abandoned one forfeits its pot.
-    const openingRun = openCaseRun(gauntletRun);
+    // A case that already has a summary is played again as practice for the table.
+    const openingRun = openCaseRun(gauntletRun, { replayOf: caseResults[caseId] ?? null });
     setGauntletRun(openingRun);
     resetEndingSequence();
     setEcho(openingEcho);

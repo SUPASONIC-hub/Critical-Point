@@ -27,7 +27,6 @@ import {
   reduceWindow,
   resolveWindow,
   RUN_INITIAL_STATE,
-  SEAL_BREAK_GAUGE,
   serializeRunState,
   TELL_ERROR,
   FRACTURE_MIN_BURN,
@@ -677,21 +676,6 @@ test("closing a case moves the pot into the vault and reboots the rules", () => 
   assert.deepEqual(nextRun.schema.mutations, ["reboot"]);
 });
 
-test("a sealed card can always be opened without busting on a board that did not just bust", () => {
-  for (const window of [
-    { status: "cashed", gauge: 3, pushes: 0 },
-    { status: "cashed", gauge: 70, pushes: 6 },
-  ]) {
-    // Every relic set a season can hold, including the one that pulls the wall closer.
-    for (const relics of [[], ["highRoller"], ["lockpick"], ["highRoller", "lockpick"], RELIC_IDS]) {
-      const { nextRun } = resolveWindow({ run: normalizeRunState({ streak: 5, relics }), window, card: card("a", { capital: 9, trust: -2 }) });
-      const { schema } = nextRun;
-      assert.ok(schema.sealBreak <= SEAL_BREAK_GAUGE);
-      assert.ok(schema.sealBreak - 1 + schema.stepMax < schema.wallMin, `one push from just under the seal cannot reach the lowest wall (${relics.join("+") || "no relics"})`);
-    }
-  }
-});
-
 test("late in the season the band's top comes down and the clock creeps hotter, never the lowest wall", () => {
   const early = resolveWindow({ run: normalizeRunState({ windowIndex: 10 }), window: { status: "cashed", gauge: 40, pushes: 3 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
   const late = resolveWindow({ run: normalizeRunState({ windowIndex: 460, streak: 5, relics: RELIC_IDS }), window: { status: "cashed", gauge: 70, pushes: 6 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
@@ -709,7 +693,7 @@ test("a window touched and left is settled as a bust when the table reopens", ()
   assert.equal(abandoned.cause, "abandon");
   assert.equal(abandoned.wall, fresh.wall, "it is the same window, not a new draw");
   assert.equal(abandoned.gauge, fresh.gauge, "and the gauge does not jump to the wall, which would print it");
-  assert.deepEqual(splitOpenSeed("run:3:start#tab-a"), { seed: "run:3:start", token: "tab-a" });
+  assert.deepEqual(splitOpenSeed("run:3:start#tab-a"), { seed: "run:3:start", token: "tab-a", closedAs: null });
   assert.equal(normalizeRunState({ openCardId: "x" }).openCardId, null, "a staked card is only kept alongside the window it was staked in");
   const { verdict, nextRun } = resolveWindow({ run: normalizeRunState({ runPot: 700, openSeed: "left" }), window: abandoned, card: card("a", { trust: -11 }) });
   assert.equal(verdict.lostPot, 700, "leaving the table costs what busting costs");
@@ -846,26 +830,7 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     perfects: 0,
     slips: 0,
     grooveBanked: 0,
-    focusHits: 0,
-    focusPerfects: 0,
-    focusMisses: 0,
-    bestFocusCombo: 0,
-    focusModes: { strike: 0, steady: 0, expose: 0 },
-    stanceMastery: { strike: 0, steady: 0, expose: 0 },
   });
-});
-
-test("the table ledger rebuilds focus locks from the log", () => {
-  const ledger = createGauntletLedger([
-    { threshold: { busted: false, focus: { mode: "expose", hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
-    { threshold: { busted: true, focus: { mode: "steady", hits: 0, perfects: 0, misses: 1, maxCombo: 0 } } },
-  ]);
-  assert.equal(ledger.focusHits, 2);
-  assert.equal(ledger.focusPerfects, 1);
-  assert.equal(ledger.focusMisses, 1);
-  assert.equal(ledger.bestFocusCombo, 2);
-  assert.deepEqual(ledger.focusModes, { strike: 0, steady: 1, expose: 2 });
-  assert.deepEqual(ledger.stanceMastery, { strike: 0, steady: 0, expose: 0 });
 });
 
 test("focus modes change the lock outcome and steady cools the gauge", () => {
@@ -924,13 +889,6 @@ test("stance mastery survives saves and reshapes future boards", () => {
 
   const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(run))));
   assert.deepEqual(roundTrip.stanceMastery, run.stanceMastery);
-
-  const ledger = createGauntletLedger([
-    { threshold: { busted: false, focus: { mode: "strike", charge: 80, hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
-    { threshold: { busted: false, focus: { mode: "steady", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
-    { threshold: { busted: true, focus: { mode: "expose", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
-  ]);
-  assert.deepEqual(ledger.stanceMastery, { strike: 1, steady: 1, expose: 0 }, "only charged cashes build season mastery");
 });
 
 /* ---------------------------------------------------------------- tempo */

@@ -126,21 +126,23 @@ export function getRankingComparison(summary = {}) {
   ];
 }
 
+/** What each ending is called in a sentence. An ending's id is a key, never copy. */
+const ENDING_NAMES = {
+  "open-oversight": "공개와 개입",
+  "evidence-reform": "증거와 개혁",
+  "human-record": "사람과 기록",
+  "profitable-silence": "성과와 침묵",
+  "cold-justice": "절차와 책임",
+  "field-pact": "현장과 협약",
+  "quiet-cover": "보호와 은폐",
+  collapse: "압박과 붕괴",
+  "open-question": "질문과 계승",
+};
+
 export function getEndingPreview(ending = {}) {
   if (!ending?.id) return null;
-  const labels = {
-    "open-oversight": "공개와 개입",
-    "evidence-reform": "증거와 개혁",
-    "human-record": "사람과 기록",
-    "profitable-silence": "성과와 침묵",
-    "cold-justice": "절차와 책임",
-    "field-pact": "현장과 협약",
-    "quiet-cover": "보호와 은폐",
-    collapse: "압박과 붕괴",
-    "open-question": "질문과 계승",
-  };
   return {
-    label: labels[ending.id] ?? "미확정 경로",
+    label: ENDING_NAMES[ending.id] ?? "미확정 경로",
     text: ending.failure ? "현재 선택 패턴이 시스템 붕괴 쪽으로 기울고 있습니다." : "현재 선택 패턴이 이 엔딩의 조건을 강화하고 있습니다.",
   };
 }
@@ -271,11 +273,14 @@ export function getRankingLeague(style = "FIELD DECIDER") {
 
 export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
   const labels = { courier: "현장 기록의 계승", lab: "심사 기준의 계승", public: "공개 책임의 계승" };
-  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
+  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
+  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 '${ending}'의 결과가 다르게 읽힙니다.` };
 }
 
+// Both of these printed their keys: "courier 출신 분석관의 선택 이후, open-question 경로는".
 export function getAftermath(endingId = "open-question", origin = "courier") {
-  return { title: "AFTERMATH / NEXT SHIFT", text: `${origin} 출신 분석관의 선택 이후, ${endingId} 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
+  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
+  return { title: "AFTERMATH / NEXT SHIFT", text: `${getOperatorProfile(origin).title}의 선택 이후, '${ending}' 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
 }
 
 /**

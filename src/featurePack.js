@@ -1,14 +1,17 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { isPeopleFirstEffect } from "./gameLogic.js";
-import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
+import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
+import { getOperatorProfile } from "./advancedSystems.js";
 
 
 
 export function getOperatorReveal({ origin = "courier", completedCases = [] } = {}) {
   const count = completedCases.length;
   if (count < 2) return { level: 0, title: "OPERATOR FILE / SEALED", text: "주인공의 과거 권한은 아직 봉인되어 있습니다." };
-  if (count < 4) return { level: 1, title: "OPERATOR FILE / PARTIAL", text: `${origin} 출신 기록관이 단순 관찰자가 아니라 기준을 설계한 인물이었다는 흔적이 남습니다.` };
+  // The origin is a key (`courier`); the profile holds what it is called.
+  const who = getOperatorProfile(origin).title;
+  if (count < 4) return { level: 1, title: "OPERATOR FILE / PARTIAL", text: `${who}${subjectParticle(who)} 단순 관찰자가 아니라 기준을 설계한 인물이었다는 흔적이 남습니다.` };
   return { level: 2, title: "OPERATOR FILE / OPENED", text: "당신은 사건을 처리하는 사람인 동시에, 어떤 사건을 기록할지 정해온 설계자였습니다." };
 }
 

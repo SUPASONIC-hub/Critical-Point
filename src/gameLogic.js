@@ -1,4 +1,4 @@
-import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
+import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
@@ -12,7 +12,6 @@ import {
 
 export {
   applyEffect,
-  applySeededEffectVariation,
   clamp,
   getRiskPressure,
   getRiskPressureDrivers,
@@ -63,7 +62,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
   const afterRisk = getRiskPressure(afterResources);
   const riskDelta = afterRisk - beforeRisk;
   const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
-  const scoreDelta = ([key, value]) => (key === "humanCost" || key === "fatigue" ? -value : value);
+  const scoreDelta = ([key, value]) => (isResourceGain(key, value) ? Math.abs(value) : -Math.abs(value));
   const biggestGain = effectEntries
     .filter((entry) => scoreDelta(entry) > 0)
     .sort((a, b) => scoreDelta(b) - scoreDelta(a))[0];
@@ -238,9 +237,11 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const reflectionScore = Math.round(
     clamp(reframeCount * 10 + routesOpened * 12 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
+  // Scored decisions only: a TABLE RECORD entry a slot restore carried in has no
+  // response time, and each one used to read as a two-second click.
   const exploitPenalty = Math.min(
     18,
-    entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
+    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
   // What the score is for: holding a line under pressure. Response rhythm still
@@ -710,7 +711,9 @@ const quantile = (values, share) => {
  * nothing to fields they lack, and the ending falls back to the last case.
  */
 export function getSeasonStrain(caseResults = {}, pending = null) {
-  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
+  // A replayed case is in both: the summary it is about to replace, and the one pending.
+  const closed = Object.entries(caseResults ?? {}).filter(([caseId]) => caseId !== pending?.caseId).map(([, summary]) => summary);
+  const summaries = [...closed, pending].filter(Boolean);
   const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
   const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
   const seasonResources = closings.length
@@ -1237,6 +1240,7 @@ export function createCaseSummary(
   const stats = getGameplayStats(entries, getRiskPressure(resources));
   const summary = {
     schemaVersion,
+    caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
     primary: sortedTriggers[0] ?? ["responsibility", 0],
     secondary: sortedTriggers[1] ?? ["protection", 0],
     thinking: sortedCognition[0] ?? ["persistence", 0],
@@ -1273,7 +1277,7 @@ export function createCaseSummary(
     // case's log only, which the next case clears.
     reframeRouteCount: entries.filter((entry) => entry?.reframeOpenedRoute).length,
     peopleFirstCount: entries.filter((entry) => !entry?.isSystemEvent && isPeopleFirstEffect(entry?.effect)).length,
-    pushRecord: createGauntletLedger(entries),
+    pushRecord: createTableRecord(entries),
     peakRiskPressure: entries.reduce(
       (peak, entry) => (entry.resourcesAfter ? Math.max(peak, getRiskPressure(entry.resourcesAfter)) : peak),
       getRiskPressure(resources),

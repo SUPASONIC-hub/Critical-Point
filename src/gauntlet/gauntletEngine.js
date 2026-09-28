@@ -1,5 +1,39 @@
-import { isResourceGain } from "../gameConstants.js";
+import { clamp, isResourceGain } from "../gameConstants.js";
+import { objectParticle } from "../playerLanguage.js";
 import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE } from "./relics.js";
+import {
+  AFTERSHOCK_START,
+  BLACKOUT_WALL_SHIFT,
+  COLD_BLOOD_START,
+  COLD_FEET_CHIPS,
+  FRACTURE_RATE,
+  GLASS_LENS_SEAL,
+  HEAT_DEBT_GAUGE,
+  HEAT_DEBT_SECONDS,
+  HEAT_DEBT_SHARE,
+  HEAT_SINK_SECONDS,
+  HEAT_SINK_SHARE,
+  HIGH_ROLLER_CHIPS,
+  HIGH_ROLLER_WALL,
+  HOT_CASH_MULTIPLIER,
+  INSURANCE_SHARE,
+  KINETIC_GRIP_CHIPS,
+  LOCKPICK_SEAL,
+  METRONOME_REACH,
+  OVERCLOCK_CHIPS,
+  OVERCLOCK_STREAK,
+  SEAL_BREAK_GAUGE,
+  SILENCE_SECONDS,
+  SPLINT_RATE,
+  STEADY_ANCHOR_COOL,
+  STEADY_ANCHOR_SECONDS,
+  STEADY_LINE_COOL,
+  STEADY_LINE_SECONDS,
+  STEADY_LINE_WALL,
+  STRIKE_WAKE_CHIPS,
+} from "./tableRules.js";
+
+export { FRACTURE_RATE, HOT_CASH_MULTIPLIER, METRONOME_REACH, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
@@ -24,12 +58,17 @@ const WALL_FLOOR = 38;
 /**
  * The briefing before the table has a clock of its own. It is sized to what
  * the scene asks the player to read -- lead, body, case facts and question --
- * at a brisk Korean reading pace, with a floor so a short scene still lands and
- * a ceiling so a long one is still a squeeze. When it runs out the table opens
- * on its own; the player can open it, or stake a card, any time before that.
+ * at a brisk Korean reading pace, with a floor so a short scene still lands.
+ * When it runs out the table opens on its own; the player can open it, or
+ * stake a card, any time before that.
+ *
+ * The ceiling sits above the longest scene in the season (690 characters, 49
+ * seconds). At 35 it cut 86 scenes short -- the longest would have had to be
+ * read at 24 characters a second, half again the pace this function assumes --
+ * and the table opened by itself on a page nobody could have finished.
  */
 export const READING_MIN_SECONDS = 12;
-export const READING_MAX_SECONDS = 35;
+export const READING_MAX_SECONDS = 50;
 const READING_CHARS_PER_SECOND = 16;
 const READING_SETTLE_SECONDS = 6;
 
@@ -41,11 +80,6 @@ export function getReadingSeconds(node = {}) {
   const seconds = Math.round(READING_SETTLE_SECONDS + chars / READING_CHARS_PER_SECOND);
   return Math.max(READING_MIN_SECONDS, Math.min(READING_MAX_SECONDS, seconds));
 }
-
-/** The heat at which a COLD FEET seal opens, before LOCKPICK. */
-export const SEAL_BREAK_GAUGE = 30;
-/** What FRACTURE bills the cracked axis, before SPLINT. */
-export const FRACTURE_RATE = 1.5;
 
 export const BASE_SCHEMA = Object.freeze({
   seconds: WINDOW_SECONDS,
@@ -68,8 +102,13 @@ export const BASE_SCHEMA = Object.freeze({
   relics: [],
 });
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const round2 = (value) => Math.round(value * 100) / 100;
+/**
+ * Halves round away from zero on both sides. `Math.round` sends -7.5 to -7 and
+ * 7.5 to 8, so a fractured trust -5 was billed -7 while a fatigue +5 was billed
+ * 8, and a falling 사람 피해 rode the heat one point short of a rising 믿음.
+ */
+const roundAway = (value) => Math.sign(value) * Math.round(Math.abs(value));
 
 export function hashSeed(seed) {
   let hash = 2166136261;
@@ -130,8 +169,11 @@ export function getResourceMultiplier(gauge) {
  * could see the wall banks, at 18 it banks 57% and still beats every blind
  * policy by half again.
  */
+/** How far from the wall the heartbeat starts to hear it. */
+const TELL_SPAN = 44;
+
 export function getCloseness(gauge, wall) {
-  return clamp(1 - ((Number(wall) || GAUGE_MAX) - (Number(gauge) || 0)) / 44, 0, 1);
+  return clamp(1 - ((Number(wall) || GAUGE_MAX) - (Number(gauge) || 0)) / TELL_SPAN, 0, 1);
 }
 
 /**
@@ -175,7 +217,13 @@ export function normalizeSchema(value) {
   schema.startGauge = clamp(Math.round(schema.startGauge), 0, schema.wallMin - 8);
   schema.chipsScale = clamp(schema.chipsScale, 0.25, 4);
   schema.fractureRate = clamp(schema.fractureRate, 1, 2);
-  schema.sealBreak = clamp(Math.round(schema.sealBreak), 0, SEAL_BREAK_GAUGE);
+  // Priority 33, held here because every board ends here: one push from just
+  // under the seal must not be able to reach the lowest wall. It used to hold
+  // only by the modifiers happening to leave room, and HIGH ROLLER's closer wall
+  // under OVERCLOCK and STRIKE WAKE's wider push left none (29 + 24 against a
+  // wall that can sit at 52). The seal opens earlier on such a board; the push
+  // and the wall stay what their rules made them.
+  schema.sealBreak = clamp(Math.round(schema.sealBreak), 0, Math.min(SEAL_BREAK_GAUGE, Math.max(0, schema.wallMin - schema.stepMax)));
   schema.relics = normalizeRelicIds(source.relics);
   return schema;
 }
@@ -217,7 +265,7 @@ function applyFracture(effect, fracturedAxis, rate = FRACTURE_RATE) {
   if (!fracturedAxis) return { ...effect };
   return Object.fromEntries(
     Object.entries(effect).map(([key, value]) =>
-      key === fracturedAxis && value !== 0 && !isResourceGain(key, value) ? [key, Math.round(value * rate)] : [key, value],
+      key === fracturedAxis && value !== 0 && !isResourceGain(key, value) ? [key, roundAway(value * rate)] : [key, value],
     ),
   );
 }
@@ -247,7 +295,7 @@ export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, 
   }
   const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
   return Object.fromEntries(
-    Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? Math.round(value * multiplier) : value]),
+    Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? roundAway(value * multiplier) : value]),
   );
 }
 
@@ -328,8 +376,6 @@ const FOCUS_MODE_PROFILES = Object.freeze({
 });
 
 const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
-/** How much wider METRONOME makes both beat windows. */
-export const METRONOME_REACH = 1.5;
 
 /** The GOOD window in milliseconds for a beat of this period. */
 export function getGoodWindowMs(periodMs, wide = false) {
@@ -338,13 +384,17 @@ export function getGoodWindowMs(periodMs, wide = false) {
 
 /**
  * Where a press landed against the beat: "perfect", "good", "miss", or null with
- * no beat to read. `wide` is METRONOME.
+ * no beat to read. `wide` is METRONOME. `sinceBeatMs` may be negative: a
+ * press up to one beat ahead of the stamp is read against the beat it preceded.
  */
 export function judgeBeat(sinceBeatMs, periodMs, wide = false) {
   const period = Number(periodMs);
   const since = Number(sinceBeatMs);
-  if (!Number.isFinite(period) || period <= 0 || !Number.isFinite(since) || since < 0) return null;
-  const phase = since % period;
+  // A press stamped just before the beat it was aimed at -- the hand landed, then
+  // the frame that sounds the beat ran -- is early by that much, not ungraded.
+  // Further back than one beat there is no beat to have aimed at.
+  if (!Number.isFinite(period) || period <= 0 || !Number.isFinite(since) || since < -period) return null;
+  const phase = ((since % period) + period) % period;
   const offset = Math.min(phase, period - phase);
   const reach = wide ? METRONOME_REACH : 1;
   if (offset <= Math.max(period * BEAT_PERFECT, BEAT_PERFECT_FLOOR_MS) * reach) return "perfect";
@@ -423,6 +473,22 @@ export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } =
   };
 }
 
+/**
+ * What the hand can add to a pot, the beat and LOCK together: the groove's own
+ * cap. LOCK used to multiply on top of the groove with no ceiling of its own --
+ * STRIKE at full charge was x2.15, x3.2 with a full groove -- and
+ * `check:pressure`, which had only ever played hands that never locked, measured
+ * a hand that locked and pushed on the beat at 3.5 times the best listening
+ * policy and nearly twice a player who could see the wall. Timing had become
+ * the strategy. The stances still differ in how fast they reach the cap, in
+ * what they do to the card's resources, and in the board they carry forward.
+ */
+export const HAND_CAP = 1 + GROOVE_CAP;
+
+export function getHandBonus(groove, focus, mode = "strike") {
+  return round2(Math.min(HAND_CAP, getGrooveBonus(groove) * getFocusBonus(focus, mode).pot));
+}
+
 export function getFocusBonus(focus, mode = "strike") {
   const charge = clamp(Number(focus) || 0, 0, FOCUS_MAX) / FOCUS_MAX;
   const profile = getFocusModeProfile(mode);
@@ -446,8 +512,11 @@ export function normalizeStanceMastery(value) {
   }, {});
 }
 
+/** The charge a cash has to hold for its stance to count: toward mastery, and into the next board. */
+export const STANCE_CHARGE = 70;
+
 function earnedStance(mode, charge, hits, outcome) {
-  return outcome === "cash" && FOCUS_MODES.includes(mode) && charge >= 70 && hits > 0;
+  return outcome === "cash" && FOCUS_MODES.includes(mode) && charge >= STANCE_CHARGE && hits > 0;
 }
 
 export function advanceStanceMastery(mastery, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
@@ -476,7 +545,10 @@ export function drawTellOffset(seed) {
   return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * TELL_ERROR);
 }
 
-export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, beatCombo = 0, resume = null } = {}) {
+/** The ways a window can bust on the table, as a hold written at closure records them. */
+const CLOSED_CAUSES = new Set(["push", "creep", "timeout", "focus"]);
+
+export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, closedAs = null, beatCombo = 0, resume = null } = {}) {
   const normalized = normalizeSchema(schema);
   const carriedCombo = clamp(Math.trunc(Number(beatCombo) || 0), 0, 999);
   const window = {
@@ -518,7 +590,10 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
   // closed mid-bet -- is settled as a bust. Otherwise F5 undoes the wall.
   // The gauge stays where the window opened: an abandoned window must not
   // print the wall it was hiding, or a second tab becomes a way to read it.
-  return abandoned ? { ...window, status: "bust", cause: "abandon" } : window;
+  // A window that had already bust when the page went away (`closedAs`) comes
+  // back the same way, and keeps what it bust on: running out the clock still
+  // deals SILENCE, whether or not the page was reloaded under the slam.
+  return abandoned ? { ...window, status: "bust", cause: "abandon", closedAs: CLOSED_CAUSES.has(closedAs) ? closedAs : null } : window;
 }
 
 const SUSPENDED_WINDOW_NUMBERS = [
@@ -643,8 +718,14 @@ export function reduceWindow(window, event = {}) {
       if (heated.gauge >= heated.wall) return { ...heated, gauge: heated.wall, status: "bust", cause: "focus" };
       return advanceClock(heated, profile.missSeconds);
     }
-    case "SET_FOCUS_MODE":
-      return { ...window, focusMode: normalizeFocusMode(event.mode) };
+    case "SET_FOCUS_MODE": {
+      // A charge belongs to the stance that built it. Changing stance used to
+      // keep it, so a hand cooled the gauge with STEADY locks and cashed them as
+      // STRIKE: the relief of one stance and the payout and carry of another.
+      const focusMode = normalizeFocusMode(event.mode);
+      if (focusMode === normalizeFocusMode(window.focusMode)) return window;
+      return { ...window, focusMode, focus: 0, focusCombo: 0, jammed: false, lastFocusGrade: null };
+    }
     case "REDEAL":
       // A relic equipped before the window is touched re-deals it under the new
       // rules. Once a card is staked, a push made or the clock started, the
@@ -700,8 +781,29 @@ export const RUN_INITIAL_STATE = Object.freeze({
   relics: [],
   relicOffer: [],
   insuranceSpent: false,
+  // Set while a case that already closed is being played again: the table
+  // record as it stood when the replay opened. See `openCaseRun`.
+  practice: null,
   schema: BASE_SCHEMA,
 });
+
+const PRACTICE_RECORD_KEYS = ["busts", "cashes", "bestMultiplier", "potBanked", "potLost", "pushes", "bestCombo", "beatHits", "perfects", "slips", "grooveBanked"];
+
+function normalizePractice(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const vault = Math.max(0, Math.round(Number(value.vault) || 0));
+  const source = value.record && typeof value.record === "object" ? value.record : null;
+  return {
+    vault,
+    grooveVault: clamp(Math.round(Number(value.grooveVault) || 0), 0, vault),
+    relics: normalizeRelicIds(value.relics),
+    relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
+    stanceMastery: normalizeStanceMastery(value.stanceMastery),
+    bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
+    bestCombo: clamp(Math.trunc(Number(value.bestCombo) || 0), 0, 999),
+    record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
+  };
+}
 
 export function normalizeRunState(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
@@ -730,6 +832,7 @@ export function normalizeRunState(value) {
   run.relics = normalizeRelicIds(source.relics);
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
   run.insuranceSpent = source.insuranceSpent === true;
+  run.practice = normalizePractice(source.practice);
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -740,7 +843,12 @@ export function normalizeRunState(value) {
 
 export function serializeRunState(value) {
   const run = normalizeRunState(value);
-  return { ...run, stanceMastery: normalizeStanceMastery(run.stanceMastery), schema: { ...run.schema, mutations: [...run.schema.mutations] } };
+  return {
+    ...run,
+    stanceMastery: normalizeStanceMastery(run.stanceMastery),
+    practice: run.practice ? { ...run.practice, relics: [...run.practice.relics], relicOffer: [...run.practice.relicOffer] } : null,
+    schema: { ...run.schema, mutations: [...run.schema.mutations] },
+  };
 }
 
 /**
@@ -752,37 +860,37 @@ export const MUTATIONS = Object.freeze({
   blackout: {
     label: "BLACKOUT",
     title: "카드가 뒤집혔다",
-    text: "임계점을 넘긴 대가. 다음 판은 카드의 칩과 소모가 가려지고, 벽이 6 가까워진다.",
+    text: `임계점을 넘긴 대가. 다음 판은 카드의 칩과 소모가 가려지고, 벽이 ${BLACKOUT_WALL_SHIFT} 가까워진다.`,
   },
   aftershock: {
     label: "AFTERSHOCK",
     title: "여진이 남았다",
-    text: "게이지가 22에서 시작한다. 방금 터진 열이 아직 식지 않았다.",
+    text: `게이지가 ${AFTERSHOCK_START}에서 시작한다. 방금 터진 열이 아직 식지 않았다.`,
   },
   silence: {
     label: "SILENCE",
     title: "심장이 거짓말을 한다",
-    text: "시간을 흘려보낸 대가. 다음 판은 심박이 벽을 알려주지 않고, 결정 시간이 30초다.",
+    text: `시간을 흘려보낸 대가. 다음 판은 심박이 벽을 알려주지 않고, 결정 시간이 ${SILENCE_SECONDS}초다.`,
   },
   heatDebt: {
     label: "HEAT DEBT",
     title: "탐욕은 열을 남긴다",
-    text: "높은 배율로 확정한 대가. 이번 열의 3분의 1을 안고 시작하고, 12초를 잃는다.",
+    text: `높은 배율로 확정한 대가. 이번 열의 ${HEAT_DEBT_SHARE}분의 1을 안고 시작하고, ${HEAT_DEBT_SECONDS}초를 잃는다.`,
   },
   overclock: {
     label: "OVERCLOCK",
     title: "판돈이 두 배로 뛴다",
-    text: "연속으로 x4 이상을 챙겼다. 칩이 두 배지만, 한 번 밀 때 오르는 열도 커진다.",
+    text: `연속으로 x${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
   },
   coldFeet: {
     label: "COLD FEET",
     title: "가장 좋은 카드가 봉인됐다",
-    text: "밀지 않고 확정한 대가. 가장 비싼 카드는 게이지 30을 넘겨야 열리고, 칩이 줄어든다.",
+    text: `밀지 않고 확정한 대가. 가장 비싼 카드는 게이지 ${SEAL_BREAK_GAUGE}${objectParticle(String(SEAL_BREAK_GAUGE))} 넘겨야 열리고, 칩이 줄어든다.`,
   },
   fracture: {
     label: "FRACTURE",
     title: "균열이 난 축",
-    text: "방금 가장 크게 태운 축. 다음 판에서 그 축을 태우는 카드는 1.5배로 청구된다.",
+    text: `방금 가장 크게 태운 축. 다음 판에서 그 축을 태우는 카드는 ${FRACTURE_RATE}배로 청구된다.`,
   },
   reboot: {
     label: "REBOOT",
@@ -792,12 +900,12 @@ export const MUTATIONS = Object.freeze({
   strikeWake: {
     label: "STRIKE WAKE",
     title: "다음 판이 더 두껍게 깨어난다",
-    text: "STRIKE로 채운 LOCK. 다음 판은 칩이 1.25배지만, 한 번 밀 때 오르는 열도 커진다.",
+    text: `STRIKE로 채운 LOCK. 다음 판은 칩이 ${STRIKE_WAKE_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
   },
   steadyLine: {
     label: "STEADY LINE",
     title: "다음 판이 식은 채 열린다",
-    text: "STEADY로 채운 LOCK. 다음 판은 열기 8 낮게 시작하고 시간이 4초 늘며, 벽이 3 멀어진다.",
+    text: `STEADY로 채운 LOCK. 다음 판은 열기 ${STEADY_LINE_COOL} 낮게 시작하고 시간이 ${STEADY_LINE_SECONDS}초 늘며, 벽이 ${STEADY_LINE_WALL} 멀어진다.`,
   },
   exposedHand: {
     label: "EXPOSED HAND",
@@ -841,29 +949,29 @@ export function applyRelics(schema, relics = []) {
   const next = { ...board, mutations: [...board.mutations], relics: [...board.relics, ...pending] };
   for (const id of pending) {
     if (id === "highRoller") {
-      next.chipsScale *= 1.3;
-      next.wallMin -= 4;
-      next.wallMax -= 4;
+      next.chipsScale *= HIGH_ROLLER_CHIPS;
+      next.wallMin -= HIGH_ROLLER_WALL;
+      next.wallMax -= HIGH_ROLLER_WALL;
     }
-    if (id === "lockpick") next.sealBreak = Math.min(next.sealBreak, 15);
-    if (id === "splint") next.fractureRate = Math.min(next.fractureRate, 1.25);
+    if (id === "lockpick") next.sealBreak = Math.min(next.sealBreak, LOCKPICK_SEAL);
+    if (id === "splint") next.fractureRate = Math.min(next.fractureRate, SPLINT_RATE);
     if (id === "stethoscope") next.sedated = false;
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, 11);
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, COLD_BLOOD_START);
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
         next.stepMax = Math.max(BASE_SCHEMA.stepMax, next.stepMax - 1);
       }
-      if (next.mutations.includes("strikeWake")) next.chipsScale *= 1.08;
+      if (next.mutations.includes("strikeWake")) next.chipsScale *= KINETIC_GRIP_CHIPS;
     }
     if (id === "steadyAnchor" && next.mutations.includes("steadyMastery")) {
-      next.startGauge = Math.max(0, next.startGauge - 4);
-      next.seconds += 2;
+      next.startGauge = Math.max(0, next.startGauge - STEADY_ANCHOR_COOL);
+      next.seconds += STEADY_ANCHOR_SECONDS;
     }
     if (id === "glassLens" && next.mutations.includes("exposeMastery")) {
       next.faceDown = false;
       next.sealHighest = false;
-      next.sealBreak = Math.min(next.sealBreak, 8);
+      next.sealBreak = Math.min(next.sealBreak, GLASS_LENS_SEAL);
     }
   }
   return normalizeSchema(next);
@@ -890,22 +998,55 @@ export function equipRelic(run, relicId = null) {
   return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(current.schema, relics) });
 }
 
+/** What a practice run borrowed, handed back. */
+function endPractice(run) {
+  if (!run.practice) return run;
+  const { record: _record, ...held } = run.practice;
+  return { ...run, ...held, practice: null };
+}
+
 /**
  * The run a case opens with. A case that closed has already moved its pot to
  * the vault and dealt the REBOOT board -- and its relic offer -- so both stay.
  * A case abandoned mid-run forfeits its pot and opens on the base rules, with
- * the season's relics applied.
+ * the season's relics and the stances it has mastered applied.
+ *
+ * A case that already has a summary (`replayOf`) opens as practice. Playing a
+ * closed case again used to bank a second pot into the vault, draft a second
+ * relic and add to mastery every time, so the vault the ending reads per case
+ * could be filled by repeating one. The replay plays the same table and keeps
+ * none of it: the vault, the relics, the mastery and any draft still waiting
+ * are remembered here and handed back when the replay closes or is left, and
+ * the summary keeps the table record of the case's first close.
  */
-export function openCaseRun(run) {
-  const current = normalizeRunState(run);
+export function openCaseRun(run, { replayOf = null } = {}) {
+  const opened = normalizeRunState(run);
+  const current = endPractice(opened);
   const rebooted = current.schema.mutations.includes("reboot");
+  // A replay left half way hands back the draft it was holding, like the rest.
+  const offer = rebooted || opened.practice ? current.relicOffer : [];
+  const practice = replayOf
+    ? {
+        vault: current.vault,
+        grooveVault: current.grooveVault,
+        relics: current.relics,
+        relicOffer: offer,
+        stanceMastery: current.stanceMastery,
+        bestMultiplier: current.bestMultiplier,
+        bestCombo: current.bestCombo,
+        record: replayOf.pushRecord ?? null,
+      }
+    : null;
   return normalizeRunState({
     ...current,
     runPot: 0,
     runGroove: 0,
     insuranceSpent: false,
-    relicOffer: rebooted ? current.relicOffer : [],
-    schema: rebooted ? current.schema : applyRelics(applySeasonEscalation(BASE_SCHEMA, current.windowIndex), current.relics),
+    practice,
+    relicOffer: practice ? [] : offer,
+    schema: rebooted
+      ? current.schema
+      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery), current.windowIndex), current.relics),
   });
 }
 
@@ -920,22 +1061,23 @@ function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 
     if (!next.mutations.includes(id)) next.mutations.push(id);
   };
   if (focusMode === "strike") {
-    next.chipsScale *= 1.25;
+    next.chipsScale *= STRIKE_WAKE_CHIPS;
     next.stepMin += 2;
     next.stepMax += 3;
     addMutation("strikeWake");
   } else if (focusMode === "steady") {
-    next.startGauge = Math.max(0, next.startGauge - 8);
-    next.seconds += 4;
-    next.wallMin += 3;
-    next.wallMax += 3;
+    next.startGauge = Math.max(0, next.startGauge - STEADY_LINE_COOL);
+    next.seconds += STEADY_LINE_SECONDS;
+    next.wallMin += STEADY_LINE_WALL;
+    next.wallMax += STEADY_LINE_WALL;
     addMutation("steadyLine");
   } else if (focusMode === "expose") {
-    next.faceDown = false;
+    // Only a cash carries a stance, and a cash never deals BLACKOUT, so the
+    // seal is all there is to lift.
     next.sealHighest = false;
     next.sealBreak = Math.min(next.sealBreak, 10);
     next.chipsScale = Math.max(next.chipsScale, BASE_SCHEMA.chipsScale);
-    next.mutations = next.mutations.filter((id) => id !== "coldFeet" && id !== "blackout");
+    next.mutations = next.mutations.filter((id) => id !== "coldFeet");
     addMutation("exposedHand");
   }
   return next;
@@ -1006,31 +1148,31 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     schema.faceDown = true;
-    schema.wallMin -= 6;
-    schema.wallMax -= 6;
-    schema.startGauge = 22;
+    schema.wallMin -= BLACKOUT_WALL_SHIFT;
+    schema.wallMax -= BLACKOUT_WALL_SHIFT;
+    schema.startGauge = AFTERSHOCK_START;
     schema.mutations.push("blackout", "aftershock");
     if (cause === "timeout") {
       schema.sedated = true;
-      schema.seconds = 30;
+      schema.seconds = SILENCE_SECONDS;
       schema.mutations.push("silence");
     }
   } else {
-    if (gauge >= 60) {
+    if (gauge >= HEAT_DEBT_GAUGE) {
       const sink = hasRelic(relics, "heatSink");
-      schema.startGauge = Math.round(gauge / (sink ? 6 : 3));
-      schema.seconds -= sink ? 6 : 12;
+      schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
+      schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");
     }
-    if (streak >= 2) {
-      schema.chipsScale *= 2;
+    if (streak >= OVERCLOCK_STREAK) {
+      schema.chipsScale *= OVERCLOCK_CHIPS;
       schema.stepMin += 4;
       schema.stepMax += 6;
       schema.mutations.push("overclock");
     }
     if (pushes === 0) {
       schema.sealHighest = true;
-      schema.chipsScale *= 0.6;
+      schema.chipsScale *= COLD_FEET_CHIPS;
       schema.mutations.push("coldFeet");
     }
   }
@@ -1049,31 +1191,45 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const current = normalizeRunState(run);
   const relics = current.relics;
   const outcome = window?.status === "cashed" ? "cash" : "bust";
-  const cause = outcome === "cash" ? "cash" : window?.cause ?? "push";
+  // A window that bust and was then reloaded under its slam comes back as left;
+  // what it bust on is what breaks the next board.
+  const cause = outcome === "cash" ? "cash" : (window?.cause === "abandon" && window?.closedAs) || window?.cause || "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
   const chips = card ? getCardChips(card, current.schema) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
-  const grooveBonus = outcome === "cash" ? getGrooveBonus(reachedGroove) : 1;
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
+  const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode) : 1;
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
-  const stanceMastery = advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
+  // Practice builds no mastery, so it cannot be repeated into a stance relic either.
+  const stanceMastery = current.practice
+    ? current.stanceMastery
+    : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
-  const pot = outcome === "cash" ? Math.round(chips * multiplier * grooveBonus * focusBonus.pot) : 0;
-  const groovePot = pot - basePot;
+  const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus) : 0;
+  // The hand's share of the pot, told apart: what the beat earned, and what
+  // LOCK added on top of it under the cap. It was one number called groove, so
+  // a cash with no beat in it printed "GROOVE · 박자 0회".
+  const groovePot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * getGrooveBonus(reachedGroove))) - basePot : 0;
+  const focusPot = pot - basePot - groovePot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
   const insured = outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
-  const insuredPot = insured ? Math.floor(current.runPot / 3) : 0;
+  const insuredPot = insured ? Math.floor(current.runPot / INSURANCE_SHARE) : 0;
   const lostPot = outcome === "bust" ? current.runPot - insuredPot : 0;
   const windowCombo = Math.max(0, Math.trunc(Number(window?.beatCombo) || 0));
   const encored = outcome === "bust" && hasRelic(relics, "encore") && windowCombo > 0;
-  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot : insured ? Math.floor(current.runGroove / 3) : 0;
-  const streak = outcome === "cash" && multiplier >= 4 ? current.streak + 1 : 0;
+  // `runGroove` is the hand's whole share, beat and LOCK: the ending's vault
+  // slack reads the vault without it, and neither is reading the table.
+  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
+  const streak = outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
-  const secured = caseClosed ? runPotAfter : 0;
+  // A practice run closes a case the table has already been paid for: nothing
+  // moves to the vault, and the next case is dealt what the season held before.
+  const practice = caseClosed ? current.practice : null;
+  const secured = caseClosed && !practice ? runPotAfter : 0;
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
   const nextSchema = buildNextSchema({
@@ -1084,11 +1240,11 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     streak,
     burnAxis: fractureAxis,
     caseClosed,
-    relics,
+    relics: practice?.relics ?? relics,
     focusMode,
     focusCharge,
     focusHits,
-    stanceMastery,
+    stanceMastery: practice?.stanceMastery ?? stanceMastery,
     windowIndex: current.windowIndex + 1,
   });
   const nextMutations = describeMutations(nextSchema);
@@ -1097,10 +1253,13 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     ...(encored ? ["encore"] : []),
     ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
   ];
-  const relicOffer = caseClosed && offerRelics ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
+  const relicOffer = practice
+    ? practice.relicOffer
+    : caseClosed && offerRelics ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
   const verdict = {
     outcome,
     cause,
+    practice: Boolean(practice),
     gauge: Math.round(gauge),
     wall: Number(window?.wall) || 0,
     pushes: Number(window?.pushes) || 0,
@@ -1128,6 +1287,9 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       bonus: getGrooveBonus(reachedGroove),
       groovePot,
       lostCombo: outcome === "bust" && !encored ? windowCombo : 0,
+      // Carried on the closing entry of a replayed case, where the summary's
+      // table record is read from (`createTableRecord`).
+      ...(practice?.record ? { firstRecord: practice.record } : {}),
     },
     focus: {
       charge: Math.round(focusCharge),
@@ -1140,14 +1302,17 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       misses: Math.trunc(Number(window?.focusMisses) || 0),
       grade: typeof window?.lastFocusGrade === "string" ? window.lastFocusGrade : null,
       resourceMultiplier: focusBonus.resource,
-      potMultiplier: focusBonus.pot,
+      // What LOCK added to this pot, after the hand's cap.
+      potMultiplier: round2(handBonus / (outcome === "cash" ? getGrooveBonus(reachedGroove) : 1)),
+      pot: focusPot,
       tier: focusBonus.tier,
       jammed: window?.jammed === true,
-      stanceEarned: earnedStance(focusMode, focusCharge, focusHits, outcome),
+      stanceEarned: !current.practice && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
     },
   };
-  const nextRun = normalizeRunState({
+  const settled = {
+    practice: current.practice,
     windowIndex: current.windowIndex + 1,
     runPot: caseClosed ? 0 : runPotAfter,
     vault: current.vault + secured,
@@ -1172,19 +1337,35 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     relicOffer,
     insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
     schema: nextSchema,
-  });
-  return { verdict, nextRun };
+  };
+  return { verdict, nextRun: normalizeRunState(practice ? endPractice(settled) : settled) };
 }
 
 /**
  * Who holds a window. The saved `openSeed` is `<window seed>#<tab token>`: the
  * seed says which window was touched, the token says which tab touched it, so
  * a second tab on the same window can be told apart from a reload of the first.
+ * A window that closed before it was settled adds `~<cause>` (`createOpenSeed`).
  */
 export function splitOpenSeed(openSeed) {
-  if (typeof openSeed !== "string" || !openSeed) return { seed: null, token: null };
+  if (typeof openSeed !== "string" || !openSeed) return { seed: null, token: null, closedAs: null };
   const index = openSeed.lastIndexOf("#");
-  return index < 0 ? { seed: openSeed, token: null } : { seed: openSeed.slice(0, index), token: openSeed.slice(index + 1) };
+  if (index < 0) return { seed: openSeed, token: null, closedAs: null };
+  const [token, closedAs = null] = openSeed.slice(index + 1).split(CLOSED_MARK);
+  return { seed: openSeed.slice(0, index), token, closedAs: CLOSED_CAUSES.has(closedAs) ? closedAs : null };
+}
+
+/**
+ * The hold a tab writes on a window. `closedAs` is set when the window has
+ * already bust: the table writes that before the slam is painted, so a reload
+ * under the slam -- with the wall on screen -- finds the window closed rather
+ * than fresh. A window nobody touched used to leave no hold at all, and timing
+ * out and pressing F5 dealt the same wall again with the answer known.
+ */
+const CLOSED_MARK = "~";
+
+export function createOpenSeed(seed, tabToken, closedAs = null) {
+  return `${seed}#${tabToken}${CLOSED_CAUSES.has(closedAs) ? `${CLOSED_MARK}${closedAs}` : ""}`;
 }
 
 /**
@@ -1302,12 +1483,6 @@ export function createGauntletLedger(log = []) {
   let perfects = 0;
   let slips = 0;
   let grooveBanked = 0;
-  let focusHits = 0;
-  let focusPerfects = 0;
-  let focusMisses = 0;
-  let bestFocusCombo = 0;
-  const focusModes = { strike: 0, steady: 0, expose: 0 };
-  const stanceMastery = normalizeStanceMastery();
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
@@ -1325,17 +1500,6 @@ export function createGauntletLedger(log = []) {
       slips += Number(tempo.slips) || 0;
       grooveBanked += Number(tempo.groovePot) || 0;
     }
-    const focus = threshold.focus;
-    if (!focus || typeof focus !== "object") continue;
-    focusHits += Number(focus.hits) || 0;
-    focusPerfects += Number(focus.perfects) || 0;
-    focusMisses += Number(focus.misses) || 0;
-    bestFocusCombo = Math.max(bestFocusCombo, Number(focus.maxCombo) || 0);
-    const mode = normalizeFocusMode(focus.mode);
-    focusModes[mode] += Number(focus.hits) || Number(focus.misses) || 0;
-    if (earnedStance(mode, Number(focus.charge) || 0, Number(focus.hits) || 0, threshold.busted ? "bust" : "cash")) {
-      stanceMastery[mode] += 1;
-    }
   }
   return {
     busts,
@@ -1349,13 +1513,17 @@ export function createGauntletLedger(log = []) {
     perfects,
     slips,
     grooveBanked,
-    focusHits,
-    focusPerfects,
-    focusMisses,
-    bestFocusCombo,
-    focusModes,
-    stanceMastery,
   };
+}
+
+/**
+ * The table record a case summary keeps. A replayed case keeps the record its
+ * first close wrote: the replay is practice, and a clean second walk must not
+ * take a bust out of the season the ending reads.
+ */
+export function createTableRecord(log = []) {
+  const first = log.findLast((entry) => entry?.threshold?.tempo?.firstRecord)?.threshold.tempo.firstRecord;
+  return first ? { ...createGauntletLedger([]), ...first } : createGauntletLedger(log);
 }
 
 export function createRunSummary(run) {
