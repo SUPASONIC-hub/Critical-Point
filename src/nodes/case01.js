@@ -3,7 +3,7 @@
  *
  * The file on the desk is not a training case. It is 대출번호 2023-0412, the one
  * loan the analyst refused to sign off three years ago, and the refusal is why
- * they now work in a basement lab instead of 기업대출심사팀. Everything the
+ * they now work in a basement lab instead of 기업금융전략팀. Everything the
  * season later uncovers is already physically present here: the contract clause
  * that forced the accounting change, the bank that wrote it, and the signature
  * box nobody filled in.
@@ -14,9 +14,9 @@ export const case01Nodes = {
     title: "72 HOURS",
     speaker: "한서윤",
     text:
-      "플로우온은 수도권 당일배송망을 운영하는 물류 플랫폼입니다. 투자금 입금이 취소됐고 현금은 72시간 뒤 바닥납니다. 한서윤은 이것을 훈련용 사례라고 설명했습니다. 그런데 표지 아래쪽에 대출번호가 지워지지 않고 남아 있습니다. 2023-0412. 3년 전 KD은행 기업대출심사팀에서 그 건에 혼자 반대 의견을 쓴 사람이 당신입니다.",
+      "플로우온은 수도권 당일배송망을 운영하는 물류 플랫폼입니다. 투자금 입금이 취소됐고 현금은 72시간 뒤 바닥납니다. 한서윤은 이것을 훈련용 사례라고 설명했습니다. 그런데 표지 아래쪽에 대출번호가 지워지지 않고 남아 있습니다. 2023-0412. 3년 전 KD은행 기업금융전략팀에서 그 건에 혼자 반대 의견을 쓴 사람이 당신입니다.",
     memo: [
-      "직원 126명, 대금 못 받은 협력사 14곳",
+      "직원 1,260명, 대금 못 받은 협력사 14곳",
       "주거래 은행: KD은행 (대출 잔액 310억)",
       "3년 전 심사 의견: 반대 1건 -- 작성자 본인",
       "그 의견서는 지금 사내 시스템에서 검색되지 않음",
