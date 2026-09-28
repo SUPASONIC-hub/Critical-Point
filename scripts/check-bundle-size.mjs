@@ -62,18 +62,18 @@ const budgets = [
   // plus 5%: the same day's other changes are what they have to hold.
   // The lucide icons the screens import, tree-shaken. 13,711 / 4,900, with the
   // icons the board's states and the recovery controls added.
-  { pattern: /^icons-vendor-.*.js$/, maxBytes: 14_400, maxGzip: 5_150 },
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 14_400, maxGzip: 5_150 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
-  { pattern: /^BoardScreen-.*.js$/, maxBytes: 5_560, maxGzip: 2_350 },
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_560, maxGzip: 2_350 },
   // 3,860 / 1,759, with rows typed before they are rendered.
-  { pattern: /^RankingScreen-.*.js$/, maxBytes: 4_060, maxGzip: 1_850 },
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_060, maxGzip: 1_850 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
-  { pattern: /^cloudSave-.*.js$/, maxBytes: 10_010, maxGzip: 3_970 },
-  { pattern: /^CloudSavePanelBody-.*.js$/, maxBytes: 4_740, maxGzip: 1_990 },
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_010, maxGzip: 3_970 },
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_740, maxGzip: 1_990 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
-  { pattern: /^gauntletEngine-.*.js$/, maxBytes: 35_720, maxGzip: 13_520 },
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_720, maxGzip: 13_520 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
