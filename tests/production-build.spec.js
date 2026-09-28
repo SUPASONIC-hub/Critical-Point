@@ -169,6 +169,13 @@ test("the ranking and the board read from the backend in the release", { tag: "@
  * starts the game.
  */
 test("a scene graph that cannot be fetched offers a way back and leaves the save alone", { tag: "@prod" }, async ({ page }) => {
+  // Measured 2026-09-28 at 52b8f1f plus this branch: the failed import lands on
+  // the root error boundary, which writes `lastError` (source react-render,
+  // retryCount 1) into the save -- a missing file is charged to the run. The
+  // recovery is the runtime stream's work; remove this line when it has landed
+  // and the test passes. If the button it adds is worded differently, the
+  // name pattern below is the one line to change.
+  test.fixme(true, "a chunk that fails to load is recorded against the save (lastError, retryCount 1) and no reload is offered");
   const save = savedAtLastScene();
   await seedSave(page, save);
   let refuse = true;

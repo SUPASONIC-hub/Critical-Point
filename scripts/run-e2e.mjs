@@ -19,6 +19,9 @@ import path from "node:path";
  *               test by test so `--shard` spreads them
  *   --skip-segments  the default list without those segments; CI runs the two
  *               halves as separate jobs
+ *   --webkit    the WebKit project (iPhone 14) instead of the two Chromium
+ *               ones. It is not part of a default run yet: see the note on
+ *               DEFAULT_PROJECTS
  *   --list      load every spec and list its tests, against no server. A spec
  *               that cannot be loaded fails here, on the push, instead of in
  *               the weekly tier where nobody is looking
@@ -36,7 +39,7 @@ import path from "node:path";
 const PLAYWRIGHT_IMAGE =
   "mcr.microsoft.com/playwright:v1.62.1-noble@sha256:dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e";
 
-const MODE_FLAGS = ["--full", "--runtime", "--preview", "--season", "--docker", "--segments", "--skip-segments", "--list"];
+const MODE_FLAGS = ["--full", "--runtime", "--preview", "--season", "--docker", "--segments", "--skip-segments", "--list", "--webkit"];
 const argv = process.argv.slice(2);
 const has = (flag) => argv.includes(flag);
 const runFullCoverage = has("--full");
@@ -252,8 +255,26 @@ const DEFAULT_SPECS = [
 ];
 
 // The specs the production build can run: everything tagged @prod, which
-// enters from the intro or from a seeded save rather than the debug jump.
-const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/performance.spec.js", "tests/production-build.spec.js"];
+// enters from the intro or from a seeded save rather than the debug jump. The
+// performance budgets are not in this list: they are timings, and a timing
+// taken while two other workers play the game measures the other workers.
+// `npm run test:performance` runs them alone.
+const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js"];
+
+/**
+ * A default run is the two Chromium projects. The WebKit project was added on
+ * 2026-09-28 and has only been run on a desktop that was busy with other work,
+ * where it could not be told apart from a slow machine: until it has a clean
+ * run behind it, it is asked for by name (`--webkit`, `npm run
+ * test:e2e:webkit`) and runs in the weekly workflow, so that an unproven
+ * browser cannot hold a deploy. An explicit `--project` is taken as given.
+ */
+const hasExplicitProject = forwardedArgs.some((arg) => arg === "--project" || arg.startsWith("--project="));
+const DEFAULT_PROJECTS = hasExplicitProject
+  ? []
+  : has("--webkit")
+    ? ["--project=webkit"]
+    : ["--project=chromium", "--project=mobile-chromium"];
 
 // A test that passed on its retry is a test that failed once. `--retries=1`
 // alone reports it green; the reporter names it in the log, in an annotation
@@ -292,7 +313,7 @@ function playwrightArgs() {
         // walk in the weekly one; the default run takes the measurements and
         // the per-segment walks.
         [...DEFAULT_SPECS, "--grep-invert", skipSegments ? "@visual|@season-full|@season-segment" : "@visual|@season-full"];
-  return ["test", ...selection, ...(process.env.CI ? ["--workers=1", "--retries=1", "--fully-parallel"] : []), ...REPORTERS, ...forwardedArgs];
+  return ["test", ...selection, ...DEFAULT_PROJECTS, ...(process.env.CI ? ["--workers=1", "--retries=1", "--fully-parallel"] : []), ...REPORTERS, ...forwardedArgs];
 }
 
 /**

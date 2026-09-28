@@ -91,7 +91,11 @@ test("muted player hears nothing when the first case starts", { tag: "@prod" }, 
   expect(probe.oscillators).toBe(0);
 });
 
-test("music player hears the accent at the chosen volume preset", { tag: "@prod" }, async ({ page }) => {
+test("music player hears the accent at the chosen volume preset", { tag: "@prod" }, async ({ page, browserName }) => {
+  // Playwright's WebKit build for Windows ships without Web Audio: the app
+  // says so itself ("이 브라우저는 배경음을 지원하지 않습니다"). Where the browser
+  // has no audio there is no accent to hear; on Linux and macOS this runs.
+  test.skip(browserName === "webkit" && process.platform === "win32", "this WebKit build has no Web Audio");
   await installAudioProbe(page);
   await seedMusicPreference(page, "true", "low");
   await page.goto("/");
