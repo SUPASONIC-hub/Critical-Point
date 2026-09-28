@@ -14,6 +14,7 @@ import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
+import { createPlateRandom, hashString } from "./scenePlate.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
 import { isResourceGain } from "./gameConstants.js";
@@ -41,6 +42,26 @@ export { CASE_PACKS };
 
 /** Authored replies plus one for every scene the generators below add. */
 export const echoReplies = { ...authoredEchoReplies };
+
+/**
+ * What the generators supplied because nobody had written it: a closing scene
+ * every hidden route shared, and the line and the reply of a choice that had
+ * neither. A route is playable the moment it is wired, which is what the net
+ * is for -- but a net nobody looks at is how one scene came to close 54 of the
+ * season's 55 hidden routes. `check:graph` counts what is still standing on it.
+ */
+export const fallbackCopy = { scenes: [], voice: [], echo: [] };
+
+function fallBackOn(choiceId, voice, echo) {
+  if (!choiceVoiceLines[choiceId]) {
+    choiceVoiceLines[choiceId] = voice;
+    fallbackCopy.voice.push(choiceId);
+  }
+  if (!echoReplies[choiceId]) {
+    echoReplies[choiceId] = echo;
+    fallbackCopy.echo.push(choiceId);
+  }
+}
 
 /**
  * A scene a table names has to be in the graph. The generators used to skip a
@@ -2568,13 +2589,22 @@ function registerDramaticRoutePlan(caseId, plan) {
       next: plan.system.final,
     })),
   };
+  // The hidden route closes on its own scene when the case has written one
+  // (`finalTitle`, `finalText`, `finalMemo` on `system`), and on this one when
+  // it has not.
+  const written = Boolean(plan.system.finalTitle && plan.system.finalText && plan.system.finalMemo?.length);
+  if (!written) fallbackCopy.scenes.push(plan.system.final);
   nodes[plan.system.final] = {
     phase: "LAST CALL",
     kind: "routeFinal",
-    title: "준비된 결말 밖에서",
+    title: written ? plan.system.finalTitle : "준비된 결말 밖에서",
     speaker: plan.system.speaker,
-    text: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
-    memo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+    text: written
+      ? plan.system.finalText
+      : "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
+    memo: written
+      ? plan.system.finalMemo
+      : ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     choices: makeFinalChoices(plan, plan.system.final),
   };
@@ -2585,8 +2615,7 @@ function registerDramaticRoutePlan(caseId, plan) {
   // written yet, so a new route is playable the moment it is wired.
   [...Object.values(plan.choices).flatMap((route) => [route.route, route.final]), plan.system.route, plan.system.final].forEach((nodeId) => {
     nodes[nodeId].choices.forEach((choice) => {
-      choiceVoiceLines[choice.id] ??= choice.label;
-      echoReplies[choice.id] ??= `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`;
+      fallBackOn(choice.id, choice.label, `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`);
     });
   });
 }
@@ -2957,8 +2986,7 @@ function registerEvidenceTurnaround(caseId, plan) {
   const insertIndex = resultIndex >= 0 ? resultIndex : order.length;
   if (!order.includes(plan.node)) order.splice(insertIndex, 0, plan.node);
   nodes[plan.node].choices.forEach((choice) => {
-    choiceVoiceLines[choice.id] ??= choice.label;
-    echoReplies[choice.id] ??= `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`;
+    fallBackOn(choice.id, choice.label, `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`);
   });
   // Every route offers the turnaround under one label, but what the clue
   // overturns differs per case, so the copy is written per case, not per route.
@@ -3609,8 +3637,41 @@ for (const [caseId, order] of Object.entries(nodeOrders)) {
   }
 }
 
-// Last, so a generated scene is grounded like an authored one. See sceneContext.js.
+// So a generated scene is grounded like an authored one. See sceneContext.js.
 applySceneContext(nodes, nodeOrders);
+
+/**
+ * The order a scene deals its cards in.
+ *
+ * Every scene was written people first, procedure second, speed third, and
+ * dealt in the order it was written: the first card's largest gain was 믿음 in
+ * 212 of the 215 scenes the packs author, the second's 공정함 in 213, and the
+ * third card of 323 of the 330 generated scenes gave 지침 back. By the third
+ * case a player could play a column without reading a card.
+ *
+ * So the deal is shuffled, last, after every rule that names a card by its
+ * position has run (the branch plan's column, the signature card's slot). The
+ * shuffle is seeded on the scene id alone: a scene never deals differently
+ * from itself, on a reload or in another run, and nothing in a save names a
+ * card by where it sat -- a choice is looked up by its id.
+ *
+ * 판을 다시 짠다 and the evidence turn keep the slots they were given; the
+ * table and its tests find them there.
+ */
+for (const [nodeId, scene] of Object.entries(nodes)) {
+  const dealt = scene.choices.map((choice, index) => (choice.type === "reframe" || choice.id.endsWith("_evidence_turn") ? -1 : index)).filter((index) => index >= 0);
+  if (dealt.length < 2) continue;
+  const random = createPlateRandom(hashString(`deal:${nodeId}`));
+  const order = [...dealt];
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(random() * (index + 1));
+    [order[index], order[swap]] = [order[swap], order[index]];
+  }
+  const cards = order.map((index) => scene.choices[index]);
+  dealt.forEach((slot, index) => {
+    scene.choices[slot] = cards[index];
+  });
+}
 
 function getPlayableRoute(caseId) {
   const route = new Map();
