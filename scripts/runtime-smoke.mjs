@@ -30,14 +30,26 @@ async function step(label, fn) {
   try {
     await fn();
   } catch (e) {
-    errors.push(`${label}: THREW ${String(e).split("\n")[0]}`);
+    // "Timeout exceeded" says a selector never came; what was on screen instead
+    // is what explains it.
+    const screen = await page
+      .evaluate(() => {
+        const main = document.querySelector("main, .error-screen");
+        const ids = [...document.querySelectorAll("[data-testid]")].map((element) => element.getAttribute("data-testid"));
+        return `${main?.className || "no <main>"} [${[...new Set(ids)].slice(0, 12).join(", ")}]`;
+      })
+      .catch(() => "the page could not be read");
+    errors.push(`${label}: THREW ${String(e).split("\n")[0]} -- on screen: ${screen}`);
   }
   const added = errors.slice(before);
   console.log(`${added.length ? "FAIL" : "ok  "}  ${label}${added.length ? " -> " + added[0] : ""}`);
 }
 
 async function fresh() {
-  await page.goto(`${url}/?debug=1`);
+  // Storage is cleared from a static file on the same origin, not from the
+  // app: a run that is on screen saves itself as the page goes away, which put
+  // the save straight back after it had been cleared from inside the game.
+  await page.goto(`${url}/profile.jpg`);
   await page.evaluate(() => {
     try {
       localStorage.clear();
@@ -69,6 +81,8 @@ await step(debugTools ? "debug jump into a scene" : "start the first case from t
   await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
 });
 
+const readSave = () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null"));
+
 /**
  * The window opens on its briefing page with the clock held (and, between
  * cases, behind a relic draft), so every flow below clears those first. They
@@ -80,8 +94,11 @@ async function openTable() {
   await page.locator(".choices .choice, .result-page").first().waitFor();
   for (let pass = 0; pass < 4 && (await gate.isVisible()); pass += 1) {
     const cleared = await gate.getAttribute("data-testid");
-    // dispatchEvent: the gates animate in and never read as "stable" to click().
-    await gate.dispatchEvent("click");
+    // A real click, where the pointer lands: a gate that is covered, off screen
+    // or not taking pointer events has to fail here, as it would for a player.
+    // This used to be a synthetic event, which reaches a button whatever is in
+    // front of it.
+    await gate.click({ timeout: TIMEOUT });
     // Settled: that gate is gone, and either the next one is up or the table is live.
     await page.waitForFunction(
       ({ cleared, gates }) =>
@@ -143,12 +160,18 @@ await step("reload restores the run", async () => {
 
 await step("play through to a result page", async () => {
   const result = page.locator(".result-page");
-  for (let i = 0; i < 14 && !(await result.isVisible()); i += 1) {
-    if (!(await page.locator(".choices .choice").count())) break;
+  // A case deals about nine tables; thirty is room for the longest route.
+  for (let i = 0; i < 30 && !(await result.isVisible()); i += 1) {
     await stakeAndCash(0);
     await page.getByTestId("decision-next").click();
     await page.locator(".choices .choice, .result-page").first().waitFor();
   }
+  // The walk used to end without looking: fourteen steps or a missing card
+  // both left the loop, and the step passed on whatever screen that was.
+  await result.waitFor({ timeout: TIMEOUT });
+  const saved = await readSave();
+  if (!saved?.completedCases?.length) throw new Error("the result page is up but the save records no completed case");
+  if (!(await page.getByTestId("export-play-log").isVisible())) throw new Error("the result page has no report actions");
 });
 
 await step("판을 다시 짠다 opens the case's hidden route", async () => {
@@ -166,7 +189,21 @@ await step("판을 다시 짠다 opens the case's hidden route", async () => {
   await page.waitForSelector(".game-shell", { timeout: TIMEOUT });
   await openTable();
   await page.locator(".gx-card-wild").click();
-  await page.waitForSelector(".gx-card-wild.selected, .gx-card.selected", { timeout: 8000 });
+  await page.waitForSelector(".gx-card-wild.selected", { timeout: 8000 });
+  // Staking the card opens nothing. The route opens on the cash, and the save
+  // is where it says so.
+  const before = (await readSave())?.nodeId;
+  const cash = page.getByTestId("commit-confirm");
+  for (let press = 0; press < 6 && !(await cash.isEnabled()); press += 1) {
+    await page.getByTestId("commit-push").click();
+  }
+  await cash.click();
+  await page.getByTestId("decision-next").click();
+  await page.locator(".choices .choice").first().waitFor();
+  const saved = await readSave();
+  const entry = saved?.log?.at(-1);
+  if (!entry?.reframeOpenedRoute) throw new Error(`the reframe card was cashed and the log does not record a route opening (${JSON.stringify(entry?.choiceId)})`);
+  if (!saved.nodeId || saved.nodeId === before) throw new Error(`the run is still on ${before}`);
 });
 
 await browser.close();

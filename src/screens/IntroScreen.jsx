@@ -219,7 +219,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <MessagesSquare size={15} />
                     게시판
                   </button>
-                  {debugToolsEnabled && (
+                  {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                     <button
                       className="ghost intro-ranking-button"
                       type="button"
@@ -325,12 +325,12 @@ export function IntroScreen({ view, renderers = {} }) {
                 NEW GAME+ 시작
               </button>
             )}
-            {debugToolsEnabled && (
+            {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
               <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
                 테스트용 전체 케이스 열기
               </button>
             )}
-            {debugToolsEnabled && (
+            {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
             <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
               <div>
                 <span>DEBUG JUMP</span>

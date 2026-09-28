@@ -30,13 +30,18 @@ export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
  * Debug tooling is on in a build that asks for it, and in a dev server visited
  * with ?debug=1. The shell reads it to decide whether the runtime mounts at once;
  * the runtime reads it to draw the console. One definition so the two agree.
+ *
+ * `__CP_DEBUG_BUILD__` is a constant the bundler writes (vite.config.js): true
+ * on the dev server and in a build that asked for the tools, false in a
+ * release. A screen puts it in front of this flag where it draws a debug
+ * panel, because a flag that arrives through the view is one the bundler has
+ * to ship the panel for; the constant lets it drop the panel. Node, which runs
+ * the unit tests, has no such constant and no debug console either.
  */
 export const debugToolsEnabled =
-  (import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
-  Boolean(
-    (import.meta.env ?? {}).DEV &&
-      new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1",
-  );
+  (typeof __CP_DEBUG_BUILD__ === "undefined" ? false : __CP_DEBUG_BUILD__) &&
+  ((import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
+    new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 2;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;

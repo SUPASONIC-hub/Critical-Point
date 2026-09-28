@@ -2,6 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
+  // Playwright's default pattern also takes `*.test.mjs`, which is what the
+  // node:test files under tests/unit are called: it imported them, and they
+  // ran as a side effect of being listed.
+  testMatch: "**/*.spec.js",
   /**
    * Playwright's local default is half the core count, which on an 18-core
    * laptop is nine Chromium instances per project. The suite is bound by memory

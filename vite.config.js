@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
+import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { leafRuleTexts, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 
@@ -184,8 +185,78 @@ function buildShaMeta() {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), criticalCss(), absoluteSiteUrls(), buildShaMeta()],
+/**
+ * `vite preview` sends what `render.yaml` says the site sends.
+ *
+ * The production build is tested through `vite preview`, which on its own sends
+ * no Content-Security-Policy at all -- so a page that the live policy would
+ * block (an inline script a plugin added, a fetch to an origin `connect-src`
+ * does not name) passed every tier and first failed in a player's browser.
+ * The headers are read from `render.yaml` rather than written down again here:
+ * that file is the record the dashboard is copied from, and a second copy is a
+ * second thing to forget.
+ *
+ * Render matches a header's `path` as a glob, and its `/index.html` rule is
+ * meant for the page however it was asked for, so `/` takes it too.
+ *
+ * One value differs, on purpose. `connect-src` names the project's own
+ * Supabase origin; the e2e build has none, and talks to the address the specs
+ * stub (`E2E_BACKEND_ORIGIN`, `.env.e2e`). Any `*.supabase.co` source is
+ * replaced by exactly that origin, so the tests run under a policy as narrow
+ * as the narrowest one the dashboard can hold.
+ */
+const E2E_BACKEND_ORIGIN = "https://e2e.supabase.co";
+
+function readRenderHeaders() {
+  const spec = parseYaml(readFileSync("render.yaml", "utf8"));
+  const rules = (spec?.services ?? []).flatMap((service) => service?.headers ?? []);
+  return rules
+    .filter((rule) => typeof rule?.path === "string" && typeof rule?.name === "string")
+    .map((rule) => ({
+      name: rule.name,
+      value: String(rule.value ?? ""),
+      matches: new RegExp(`^${rule.path.split("*").map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*")}$`),
+    }));
+}
+
+function renderHeaders() {
+  return {
+    name: "render-headers",
+    configurePreviewServer(server) {
+      const rules = readRenderHeaders();
+      if (!rules.some((rule) => rule.name.toLowerCase() === "content-security-policy")) {
+        throw new Error("render.yaml declares no Content-Security-Policy, so the preview would test the build without one.");
+      }
+      server.middlewares.use((request, response, next) => {
+        const pathname = new URL(request.url ?? "/", "http://preview.invalid").pathname;
+        const asked = pathname === "/" ? "/index.html" : pathname;
+        for (const rule of rules) {
+          if (!rule.matches.test(asked)) continue;
+          const value =
+            rule.name.toLowerCase() === "content-security-policy"
+              ? rule.value.replace(/https:\/\/[^\s;]*\.supabase\.co/g, E2E_BACKEND_ORIGIN)
+              : rule.value;
+          response.setHeader(rule.name, value);
+        }
+        next();
+      });
+    },
+  };
+}
+
+export default defineConfig(({ command, mode }) => ({
+  plugins: [react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), renderHeaders()],
+  // The debug console -- the case jump, unlock-all, the forced render error --
+  // is dead code in a release, and this constant is how the bundler is told.
+  // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
+  // nothing can fold: the expression and every panel behind it shipped to
+  // players, switched off by a runtime check. A build that asks for the tools
+  // (`VITE_ENABLE_DEBUG_TOOLS=true`) still gets them.
+  define: {
+    __CP_DEBUG_BUILD__: JSON.stringify(
+      command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
+    ),
+  },
   // The dev server compiles a module the first time it is asked for. Fifty
   // cases are fifty large data modules, and compiling them on the first scene
   // made that scene take 4.7s to open against 0.7s warm -- a cost the bundle
@@ -206,4 +277,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

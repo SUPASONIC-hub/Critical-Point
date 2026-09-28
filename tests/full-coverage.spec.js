@@ -13,7 +13,12 @@ import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 test.use({ actionTimeout: ACTION_TIMEOUT_MS });
 test.describe.configure({ mode: "parallel" });
 
-test.beforeEach(async (_fixtures, testInfo) => {
+// Playwright reads the first parameter's source to learn which fixtures a hook
+// wants, and refuses anything that is not a destructuring pattern -- at load
+// time, for the whole invocation. `_fixtures` here kept this file and the
+// layout sweep beside it from running for four weekly passes.
+// eslint-disable-next-line no-empty-pattern
+test.beforeEach(async ({}, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "full coverage runs only once");
 });
 
