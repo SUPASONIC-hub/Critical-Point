@@ -13,12 +13,10 @@ import { case09Nodes } from "./nodes/case09.js";
 import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
-import { applySceneContext } from "./nodes/sceneContext.js";
-import { createPlateRandom, hashString } from "./scenePlate.js";
+import { createRouteReaders, finishSceneGraph, inferChoiceCognition } from "./nodes/sceneBuild.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
-import { isResourceGain } from "./gameConstants.js";
-import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES, RESULT_NODE_IDS } from "./gameCases.js";
+import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES } from "./gameCases.js";
 
 /**
  * Everything below rewires the graph in place: aftermath, connective, reaction,
@@ -31,10 +29,9 @@ import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES, RESULT_NODE_IDS } 
 const CASE_PACKS = structuredClone(AUTHORED_CASE_PACKS);
 
 /**
- * Every scene of each case, in play order: the authored scenes plus everything
- * the generators below add. A copy, for the same reason the packs are: eight
- * sites here push, splice and unshift into it, and the authored table is
- * exported by a module the intro shell loads before this one.
+ * Every scene of each case, in play order. A copy, like the packs: the
+ * generators below grow it, and the authored table belongs to a module the
+ * intro shell loads before this one.
  */
 export const nodeOrders = structuredClone(authoredNodeOrders);
 
@@ -44,11 +41,9 @@ export { CASE_PACKS };
 export const echoReplies = { ...authoredEchoReplies };
 
 /**
- * What the generators supplied because nobody had written it: a closing scene
- * every hidden route shared, and the line and the reply of a choice that had
- * neither. A route is playable the moment it is wired, which is what the net
- * is for -- but a net nobody looks at is how one scene came to close 54 of the
- * season's 55 hidden routes. `check:graph` counts what is still standing on it.
+ * What the generators supplied because nobody had written it: the closing
+ * scene the hidden routes share, and the line and reply of a choice that had
+ * neither. `check:graph` counts what is still standing on this net.
  */
 export const fallbackCopy = { scenes: [], voice: [], echo: [] };
 
@@ -63,11 +58,7 @@ function fallBackOn(choiceId, voice, echo) {
   }
 }
 
-/**
- * A scene a table names has to be in the graph. The generators used to skip a
- * source they could not find, so a mistyped id dropped a whole scene -- and
- * every choice that should have led to it -- without a word.
- */
+/** A scene a table names has to be in the graph; a generator that skipped a mistyped id dropped the scene in silence. */
 function sceneOf(nodeId, owner) {
   const scene = nodes[nodeId];
   if (!scene) throw new Error(`${owner} names the scene "${nodeId}", which the graph does not have`);
@@ -257,10 +248,8 @@ const aftermathNodes = {
 CASE_PACKS.forEach((pack) => Object.assign(aftermathNodes, pack.aftermath));
 for (const [nodeId, scene] of Object.entries(aftermathNodes)) nodes[nodeId] = { ...scene, kind: "aftermath" };
 
-// [case, the scene that closes it, its aftermath]: 사건 06-11 and the finale by
-// hand, the packs from their own `aftermathRoute`. 사건 01-05 have no single
-// closing scene -- each route closes on its own final, which
-// `registerDramaticRoutePlan` points at the aftermath -- so theirs is null.
+// [case, the scene that closes it, its aftermath]. 사건 01-05 close on their
+// routes' own finals (`registerDramaticRoutePlan`), so they name no scene.
 const aftermathRoutes = [
   ...[1, 2, 3, 4, 5].map((index) => [`case0${index}`, null, `c${index}_aftershock`]),
   ...[6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
@@ -269,11 +258,8 @@ const aftermathRoutes = [
 ];
 aftermathRoutes.forEach(([caseId, nodeId, nextNode]) => {
   if (nodeId) {
-    const closing = sceneOf(nodeId, `${caseId} aftermath route`);
-    closing.kind = "decision";
-    closing.choices.forEach((choice) => {
-      choice.next = nextNode;
-    });
+    const closing = Object.assign(sceneOf(nodeId, `${caseId} aftermath route`), { kind: "decision" });
+    closing.choices.forEach((choice) => { choice.next = nextNode; });
   }
   nodeOrders[caseId].push(nextNode);
 });
@@ -909,36 +895,6 @@ function getAuthoredSceneCopy(sourceId, id) {
   return copy;
 }
 
-/**
- * Which way of thinking a generated choice exercises, read from the choice.
- *
- * It was read from the column -- connective scenes ran persistence / inference
- * / risk / reframing, reaction scenes reframing / inference / risk -- so a
- * player who always took the second card was an "inference" player by
- * construction. Now the label's verb decides: each way of thinking has phrases
- * that do it (checking a record, redrawing the terms, staying with someone,
- * moving before it is safe), and the axis the card gains most on is worth half
- * a phrase. Ties go to the axis, then the order below. Reframing is worth 2, as
- * the fourth card always was; the rest 1. Choice ids are untouched.
- */
-const COGNITION_CUES = {
-  reframing: ["다시 짜", "판을", "바꾼다", "바꿔", "구조", "제안", "조건", "규칙", "새로", "설계", "합친다", "첫 문장", "기준을", "뒤집", "등록"],
-  inference: ["확인", "대조", "맞춰 본", "따져", "묻는다", "물어", "출처", "기록", "문서", "적어", "원본", "보존", "증거", "자료", "조사", "추적", "찾", "검토", "공식", "지적", "이의", "설명"],
-  persistence: ["끝까지", "곁", "옆에", "같이", "함께", "지킨다", "기다", "버틴", "남는다", "남아", "밤새", "듣는다", "만난다", "앉", "한 분씩", "한 명씩"],
-  risk: ["바로", "즉시", "당장", "일단", "빠르게", "조용히", "넘긴다", "넘어간", "빼", "덮", "못 본", "몰래", "서둘", "먼저 치", "그대로 두"],
-};
-const COGNITION_ORDER = ["reframing", "inference", "persistence", "risk"];
-const AXIS_COGNITION = { trust: "persistence", humanCost: "persistence", fatigue: "persistence", legitimacy: "inference", capital: "risk", time: "risk" };
-
-function inferChoiceCognition(label = "", effect = {}) {
-  const [axis] = Object.entries(effect).filter(([key, value]) => isResourceGain(key, value)).sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))[0] ?? [];
-  const axisType = AXIS_COGNITION[axis];
-  const score = (type) =>
-    COGNITION_CUES[type].reduce((sum, cue) => sum + (label.includes(cue) ? 2 : 0), 0) + (type === axisType ? 1 : 0);
-  const type = COGNITION_ORDER.reduce((best, candidate) => (score(candidate) > score(best) ? candidate : best), axisType ?? COGNITION_ORDER[0]);
-  return { [type]: type === "reframing" ? 2 : 1 };
-}
-
 function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, labels]) {
   const source = sceneOf(sourceId, `connective scene ${id}`);
   const effects = getAuthoredSceneEffects(sourceId, id);
@@ -1507,9 +1463,8 @@ for (const pack of CASE_PACKS) {
 
 authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) => {
   const source = sceneOf(sourceId, `${caseId} branch plan`);
-  for (const branchId of [firstId, secondId]) {
-    if (!authoredBranchScenes[branchId]) throw new Error(`${caseId} branch plan names the scene "${branchId}", which no branch table writes`);
-  }
+  const unwritten = [firstId, secondId].find((branchId) => !authoredBranchScenes[branchId]);
+  if (unwritten) throw new Error(`${caseId} branch plan names the scene "${unwritten}", which no branch table writes`);
   if (!source.choices[choiceIndex] || source.choices[choiceIndex].type === "reframe") {
     throw new Error(`${caseId} branch plan puts its detour on card ${choiceIndex + 1} of ${sourceId}, which is not a card that scene deals`);
   }
@@ -2534,6 +2489,12 @@ function makeFinalChoices(plan, finalId, choices = plan.finalChoices) {
   }));
 }
 
+const SHARED_ROUTE_CLOSING = {
+  finalTitle: "준비된 결말 밖에서",
+  finalText: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
+  finalMemo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+};
+
 function registerDramaticRoutePlan(caseId, plan) {
   const order = nodeOrders[caseId];
   Object.entries(plan.choices).forEach(([choiceId, route]) => {
@@ -2589,22 +2550,18 @@ function registerDramaticRoutePlan(caseId, plan) {
       next: plan.system.final,
     })),
   };
-  // The hidden route closes on its own scene when the case has written one
-  // (`finalTitle`, `finalText`, `finalMemo` on `system`), and on this one when
-  // it has not.
+  // The hidden route closes on the scene its case wrote (`finalTitle`,
+  // `finalText`, `finalMemo` on `system`), or on the shared one below.
   const written = Boolean(plan.system.finalTitle && plan.system.finalText && plan.system.finalMemo?.length);
+  const closing = written ? plan.system : SHARED_ROUTE_CLOSING;
   if (!written) fallbackCopy.scenes.push(plan.system.final);
   nodes[plan.system.final] = {
     phase: "LAST CALL",
     kind: "routeFinal",
-    title: written ? plan.system.finalTitle : "준비된 결말 밖에서",
+    title: closing.finalTitle,
     speaker: plan.system.speaker,
-    text: written
-      ? plan.system.finalText
-      : "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
-    memo: written
-      ? plan.system.finalMemo
-      : ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+    text: closing.finalText,
+    memo: closing.finalMemo,
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     choices: makeFinalChoices(plan, plan.system.final),
   };
@@ -3571,128 +3528,12 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   nodeOrders[caseId].unshift(...Object.values(routes));
 });
 
-/**
- * The play screen badges a choice that changes the question -- memory, evidence
- * turn, authority, adaptive, branch detour -- but the main split had no mark on
- * it. The four buttons on a case briefing send the player down four different
- * routes with four different endings, and they looked like ordinary choices.
- * Tagged from the graph, after every route is wired, so it cannot fall out of
- * step with where the choices actually go.
- */
-Object.values(nodes).forEach((node) => {
-  node.choices.forEach((choice) => {
-    if (nodes[choice.next]?.kind === "route") choice.routeSplit = true;
-  });
-});
+// Last: what each scene is, where it happens, and the order it deals its
+// cards in. See nodes/sceneBuild.js.
+finishSceneGraph(nodes, nodeOrders);
 
-/**
- * The scenes between a case's briefing and its decision where the room closes
- * in: someone pushes back, a clock runs out, a document turns on the analyst.
- * The plate draws these hot (scenePlate.js).
- *
- * This was a list of phase strings inside the plate, so a scene was under
- * pressure when its chip happened to read "TRAP" or "HEARING" -- player copy
- * doing a key's job. 사건 13-49 name their scenes after what is in them ("THE
- * SET", "FINE PRINT"), none of which was on the list, so from 사건 13 on only
- * the decision and the aftermath ever drew hot, whatever the story was doing.
- * A scene says it here, by id, and a pack can say it for its own scenes with
- * `pressure` in its scene context.
- */
-const pressureBeats = new Set([
-  "p1_review", "p2_model", "p3_committee", "p4_quota",
-  "board", "c2_pressure", "c3_trap", "c4_leak", "c4_vote", "c5_blame", "c5_collapse",
-  "c6_logs", "c6_panel", "c8_trail", "c8_bait", "c9_ledger", "c9_timing", "c10_claim",
-  "c11_script", "c12_mediation",
-  "c13_studio", "c14_desk", "c15_form", "c15_gate", "c16_review", "c17_legal", "c18_lounge",
-  "c19_labels", "c20_datacenter", "c23_backstage", "c24_rooftop", "c25_notice",
-  "c26_crane", "c26_tower", "c27_queue", "c27_offer", "c28_headset", "c28_factory",
-  "c29_marina", "c30_leaving", "c31_archive", "c32_boxes", "c32_room", "c33_room",
-  "c34_seminar", "c35_sandbag", "c35_noah", "c36_table", "c36_father", "c37_takedown",
-  "c37_source", "c38_gallery", "c38_witness", "c39_cut", "c40_demo", "c41_corridor",
-  "c41_chamber", "c42_karaoke", "c43_corridor", "c44_court", "c45_wreath", "c46_cage",
-  "c48_engine", "c49_crosswalk",
-  "f_confront",
-]);
-for (const nodeId of pressureBeats) sceneOf(nodeId, "pressureBeats");
-
-/** A decision is always under pressure: the case's own, a route's, and what follows it. */
-const PRESSURE_KINDS = new Set(["decision", "routeFinal", "aftermath"]);
-
-/**
- * What every scene knows about itself that is not copy: the case it belongs
- * to, what kind of scene it is, and whether it is a pressure beat. `phase` is
- * printed on the scene chip and nothing reads it as a key any more.
- *
- * `kind` is one of briefing, opening, scene, connective, reaction, branch,
- * route, routeFinal, evidence, decision, aftermath. The generators set theirs
- * as they build; what is left is what the case files wrote.
- */
-for (const [caseId, order] of Object.entries(nodeOrders)) {
-  for (const nodeId of new Set(order)) {
-    const scene = sceneOf(nodeId, `${caseId} order`);
-    if (scene.caseId && scene.caseId !== caseId) throw new Error(`${nodeId} is listed in both ${scene.caseId} and ${caseId}`);
-    scene.caseId = caseId;
-    scene.kind ??= nodeId === CASE_START_NODES[caseId] ? "briefing" : "scene";
-    scene.pressure = PRESSURE_KINDS.has(scene.kind) || pressureBeats.has(nodeId);
-  }
-}
-
-// So a generated scene is grounded like an authored one. See sceneContext.js.
-applySceneContext(nodes, nodeOrders);
-
-/**
- * The order a scene deals its cards in.
- *
- * Every scene was written people first, procedure second, speed third, and
- * dealt in the order it was written: the first card's largest gain was 믿음 in
- * 212 of the 215 scenes the packs author, the second's 공정함 in 213, and the
- * third card of 323 of the 330 generated scenes gave 지침 back. By the third
- * case a player could play a column without reading a card.
- *
- * So the deal is shuffled, last, after every rule that names a card by its
- * position has run (the branch plan's column, the signature card's slot). The
- * shuffle is seeded on the scene id alone: a scene never deals differently
- * from itself, on a reload or in another run, and nothing in a save names a
- * card by where it sat -- a choice is looked up by its id.
- *
- * 판을 다시 짠다 and the evidence turn keep the slots they were given; the
- * table and its tests find them there.
- */
-for (const [nodeId, scene] of Object.entries(nodes)) {
-  const dealt = scene.choices.map((choice, index) => (choice.type === "reframe" || choice.id.endsWith("_evidence_turn") ? -1 : index)).filter((index) => index >= 0);
-  if (dealt.length < 2) continue;
-  const random = createPlateRandom(hashString(`deal:${nodeId}`));
-  const order = [...dealt];
-  for (let index = order.length - 1; index > 0; index -= 1) {
-    const swap = Math.floor(random() * (index + 1));
-    [order[index], order[swap]] = [order[swap], order[index]];
-  }
-  const cards = order.map((index) => scene.choices[index]);
-  dealt.forEach((slot, index) => {
-    scene.choices[slot] = cards[index];
-  });
-}
-
-function getPlayableRoute(caseId) {
-  const route = new Map();
-  const queue = [
-    CASE_START_NODES[caseId],
-    ...Object.values(caseOpeningRoutes[caseId] ?? {}),
-  ].filter(Boolean).map((nodeId) => ({ nodeId, depth: 0 }));
-  const seen = new Set();
-  while (queue.length > 0) {
-    const { nodeId, depth } = queue.shift();
-    if (!nodeId || seen.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
-    seen.add(nodeId);
-    route.set(nodeId, depth);
-    for (const choice of nodes[nodeId]?.choices ?? []) {
-      if (choice.next && !seen.has(choice.next) && !RESULT_NODE_IDS.has(choice.next)) {
-        queue.push({ nodeId: choice.next, depth: depth + 1 });
-      }
-    }
-  }
-  return route;
-}
+// How far into a case a scene sits; see nodes/sceneBuild.js.
+export const { getCaseRouteLength, getNodeRouteIndex } = createRouteReaders(nodes, caseOpeningRoutes);
 
 /**
  * The one authored mid-case fork per case, with the scenes each side leads to.
@@ -3726,15 +3567,4 @@ export function getBranchDetourBypass(choice = {}, context = {}) {
   const condition = branchConditions[choice.branchCondition];
   if (!condition || !choice.branchBypass) return null;
   return condition.test(context) ? null : choice.branchBypass;
-}
-
-export function getCaseRouteLength(caseId) {
-  const route = getPlayableRoute(caseId);
-  return Math.max(1, ...route.values()) + 1;
-}
-
-export function getNodeRouteIndex(caseId, nodeId) {
-  const branchStartIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
-  if (branchStartIds.has(nodeId)) return 0;
-  return getPlayableRoute(caseId).get(nodeId) ?? -1;
 }
