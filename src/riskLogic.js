@@ -1,7 +1,8 @@
 import { caseDisplayCode, SEASON_ENTRY_CASE } from "./gameCases.js";
+import { clamp } from "./gameConstants.js";
 import { easyResourceLabels } from "./playerLanguage.js";
 
-export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
+export { clamp };
 
 export function applyEffect(resources, effect = {}) {
   const next = { ...resources };
@@ -10,35 +11,6 @@ export function applyEffect(resources, effect = {}) {
     next[key] = clamp((next[key] ?? 0) + value, 0, max);
   });
   return next;
-}
-
-function hashSeed(seed = "") {
-  let hash = 2166136261;
-  for (const character of String(seed)) {
-    hash ^= character.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-export function applySeededEffectVariation(effect = {}, seed = "", variation = 0.15) {
-  const safeVariation = Math.min(1, Math.max(0, Number(variation) || 0));
-  if (!seed || safeVariation === 0) return { ...effect };
-  let state = hashSeed(seed) || 1;
-  const nextRandom = () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    return state / 4294967296;
-  };
-
-  return Object.fromEntries(
-    Object.entries(effect).map(([key, value]) => {
-      const numericValue = Number(value);
-      if (!Number.isFinite(numericValue) || numericValue === 0) return [key, value];
-      const multiplier = 1 - safeVariation + nextRandom() * safeVariation * 2;
-      const variedValue = Math.round(numericValue * multiplier);
-      return [key, variedValue === 0 ? Math.sign(numericValue) : variedValue];
-    }),
-  );
 }
 
 const riskDefaults = {
@@ -94,10 +66,12 @@ export function getRiskPressureDrivers(resources = {}) {
     .sort((a, b) => b.pressure - a.pressure);
 }
 
-export function getSuspenseState({ riskPressure = 0, decisionSeconds = 45, log = [], currentCase = SEASON_ENTRY_CASE } = {}) {
-  const urgency = Math.round(clamp((45 - decisionSeconds) * 0.7, 0, 32));
+// The clock used to add urgency here, read off `decisionSeconds`. The one caller
+// passed the table's full 45 every time -- the window's clock lives in the stage
+// and never reaches the runtime -- so the term was always zero.
+export function getSuspenseState({ riskPressure = 0, log = [], currentCase = SEASON_ENTRY_CASE } = {}) {
   const accumulated = Math.min(20, log.length * 4);
-  const score = clamp(Math.round(riskPressure + urgency + accumulated), 0, 100);
+  const score = clamp(Math.round(riskPressure + accumulated), 0, 100);
   const tier = score >= 78 ? "REDLINE" : score >= 52 ? "UNSTABLE" : score >= 28 ? "WATCH" : "QUIET";
   const signals = {
     QUIET: {

@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import {
   anonymizeSensitiveText,
   applyEffect,
-  applySeededEffectVariation,
   createDecisionForecast,
   createCaseSummary,
   getCounterfactualReport,
@@ -1107,7 +1106,7 @@ test("risk pressure drivers should be sorted by pressure contribution", () => {
   );
 });
 
-const suspenseWatch = getSuspenseState({ riskPressure: 20, decisionSeconds: 35, log: [{}, {}], currentCase: "case02" });
+const suspenseWatch = getSuspenseState({ riskPressure: 20, log: [{}, {}], currentCase: "case02" });
 test("suspense state should escalate into watch tier", () => {
   assert.equal(suspenseWatch.tier, "WATCH", "suspense state should escalate into watch tier");
 });
@@ -1145,26 +1144,6 @@ test("resource effects should clamp to resource caps", () => {
     applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
     { ...initialResources, time: 72, fatigue: 100 },
     "resource effects should clamp to resource caps",
-  );
-});
-const seededEffect = applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice");
-test("seeded effect variation should be deterministic", () => {
-  assert.deepEqual(
-    seededEffect,
-    applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice"),
-    "seeded effect variation should be deterministic",
-  );
-});
-test("seeded effect variation stays within plus or minus 15 percent", () => {
-  Object.values(seededEffect).forEach((value) => {
-    assert.ok(Math.abs(value) >= 8 && Math.abs(value) <= 12, "seeded effect variation should stay within plus or minus 15 percent");
-  });
-});
-test("missing seeds should preserve authored effects", () => {
-  assert.deepEqual(
-    applySeededEffectVariation({ trust: 10 }, "", 0.15),
-    { trust: 10 },
-    "missing seeds should preserve authored effects",
   );
 });
 

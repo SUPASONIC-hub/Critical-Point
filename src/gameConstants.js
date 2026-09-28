@@ -7,6 +7,9 @@ export const initialResources = {
   fatigue: 10,
 };
 
+/** One clamp for the rules, the risk readout and the table: `riskLogic.js` and the engine each kept their own. */
+export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
+
 /**
  * The two resources where a rising number is the loss. Colour, arrows and the
  * balance guardrail all read direction from here rather than from the sign.
