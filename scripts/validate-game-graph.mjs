@@ -12,6 +12,7 @@ import {
   nodes,
   triggerLabels,
 } from "../src/gameData.js";
+import { characterProfileCollisions, getCharacterProfile } from "../src/gameDialogue.js";
 import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getOutcomeChoiceId } from "../src/gameLogic.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
 import { case01Nodes } from "../src/nodes/case01.js";
@@ -301,5 +302,32 @@ for (const { owner, table } of authoredSources) {
   }
 }
 
+/**
+ * Everyone who speaks has a card, and one name is one person.
+ *
+ * A speaker with no profile printed "사건 관계자" over a stock description --
+ * 노아 did, in 26 scenes -- and two packs introducing the same name silently
+ * gave the earlier case the later one's person: 프롤로그 05 showed a 경포 펜션
+ * 사장 at a desk in 합정동.
+ */
+const PROFILE_FIELDS = ["role", "stance", "job", "appearance", "thought", "gesture", "voice", "line"];
+for (const collision of characterProfileCollisions) {
+  failures.push(`${collision} introduces someone the season already has a profile for; one person per name, and a change of role goes in characterOverrides`);
+}
+const speakersChecked = new Set();
+for (const [nodeId, node] of Object.entries(nodes)) {
+  if (!node.speaker) continue;
+  const profile = getCharacterProfile(node.speaker, node.caseId);
+  if (!profile) {
+    failures.push(`${nodeId} is spoken by ${node.speaker}, who has no character profile`);
+    continue;
+  }
+  speakersChecked.add(node.speaker);
+  for (const field of PROFILE_FIELDS) {
+    if (!isNonEmptyString(profile[field])) failures.push(`${node.speaker} (${node.caseId}) has no ${field}`);
+  }
+}
+if (speakersChecked.size === 0) failures.push("no speaker was checked against a profile");
+
 assert.deepEqual(failures, [], failures.join("\n"));
-console.log("Game graph checks passed");
+console.log(`Game graph checks passed (${Object.keys(nodes).length} scenes, ${speakersChecked.size} speakers)`);

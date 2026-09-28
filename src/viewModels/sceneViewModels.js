@@ -1,4 +1,4 @@
-import { characterProfiles } from "../gameDialogue.js";
+import { getCharacterProfile } from "../gameDialogue.js";
 import { getAuthorityProfile } from "../advancedSystems.js";
 import { AUTHORITY_THRESHOLDS, getAuthorityClueThresholds, getAuthorityLevel } from "../gameLogic.js";
 import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
@@ -9,8 +9,10 @@ import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
  * live here rather than in the middle of AppContent's render.
  */
 
+// The scene knows its case (the graph build stamps it), and who someone is
+// depends on the case: see `getCharacterProfile`.
 export function createSpeakerProfile({ node }) {
-  return characterProfiles[node?.speaker] ?? {
+  return getCharacterProfile(node?.speaker, node?.caseId) ?? {
   role: "사건 관계자",
   stance: "상황 설명",
   job: "현재 국면의 핵심 정보를 전달한다.",
