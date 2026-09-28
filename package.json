@@ -44,6 +44,7 @@
     "check:visual-baselines": "node scripts/check-visual-baselines.mjs",
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
+    "check:canon": "node scripts/check-canon.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
     "check:deploy:offline": "node scripts/check-deploy.mjs --offline",

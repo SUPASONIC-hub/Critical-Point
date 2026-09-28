@@ -9,7 +9,7 @@ const unusedVars = [
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**"],
+    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**"],
   },
   js.configs.recommended,
   {

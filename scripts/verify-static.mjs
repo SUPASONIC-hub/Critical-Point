@@ -45,6 +45,7 @@ export const CHECKS = [
   "check:visual-baselines",
   "check:node",
   "check:grants",
+  "check:canon",
 ];
 
 const root = process.cwd();

@@ -54,17 +54,19 @@ export function useRuntimeChoiceShortcuts({
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      // Read off the physical key, as the table's letters are (useTableKeys):
+      // with a Hangul layout active `event.key` is ㄱ, ㅜ or ㅔ, not r, n or p.
       if (isResult) {
-        if (event.key.toLowerCase() === "r") {
+        if (event.code === "KeyR") {
           event.preventDefault();
           startCase(currentCase);
-        } else if (event.key.toLowerCase() === "n" && nextCaseSignal) {
+        } else if (event.code === "KeyN" && nextCaseSignal) {
           event.preventDefault();
           startCase(nextCaseSignal.caseId);
         }
         return;
       }
-      if (event.key.toLowerCase() === "p") {
+      if (event.code === "KeyP") {
         event.preventDefault();
         saveCurrentGame({ exit: event.shiftKey });
       }
