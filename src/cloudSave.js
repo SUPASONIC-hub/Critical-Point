@@ -51,17 +51,17 @@ import { callSupabaseRpc, isMissingRpc, telemetryEnabled } from "./telemetry.js"
  * answers: no `peek_cloud_save` means this device's own bookkeeping decides,
  * and no `p_expected_revision` means the put is sent the old way.
  *
- * This file must not import the scene graph: the intro shell loads it. The one
- * thing it needs from the table -- carrying busts across a restore -- is
- * fetched when a copy is actually loaded.
+ * This file must not import the scene graph: the intro loads it, when the
+ * fold is opened or the device has opted in (`main.jsx`), and it is not part
+ * of what a visitor who never turns online save on downloads. The one thing it
+ * needs from the table -- carrying busts across a restore -- is fetched when a
+ * copy is actually loaded.
  */
 
 const CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const CODE_LENGTH = 12;
 const UPLOAD_DELAY_MS = 2500;
 const RETRY_INTERVAL_MS = 30000;
-/** The server keeps a copy this long after its last upload (`purge_old_telemetry`). */
-export const CLOUD_SAVE_RETENTION_DAYS = 180;
 
 export const cloudSaveAvailable = telemetryEnabled;
 

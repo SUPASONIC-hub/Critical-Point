@@ -9,7 +9,8 @@ import {
   writeSaveState,
 } from "../appConfig.js";
 import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem } from "./payloadSchemas.js";
-import { pruneTelemetryQueue, sendTelemetryBatch } from "./telemetryQueuePolicy.js";
+import { sendTelemetryBatch } from "./telemetryBatch.js";
+import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
 // in GameRuntime) get one when they are queued, so every retry reuses it.
@@ -27,7 +28,7 @@ function withEventId(item) {
  * it, whose `dataConsent` was the one from before the player unticked the box,
  * so a revoked consent kept sending on every backoff tick.
  *
- * The pass over the queue is `sendTelemetryBatch` (telemetryQueuePolicy.js):
+ * The pass over the queue is `sendTelemetryBatch` (telemetryBatch.js):
  * what a failure means, which rows wait, and where the batch stops.
  */
 // A wait the server asked for is not a network blip, so the backoff runs on

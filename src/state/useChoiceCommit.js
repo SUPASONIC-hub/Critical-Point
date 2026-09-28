@@ -27,7 +27,8 @@ import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../vie
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
-import { isPermanentRefusal, sendTelemetryItem } from "./telemetryQueuePolicy.js";
+import { isPermanentRefusal } from "./telemetryBatch.js";
+import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks.

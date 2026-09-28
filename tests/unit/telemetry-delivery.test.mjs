@@ -11,7 +11,7 @@ import { installBrowser, missingFunction, ok, refusal } from "./helpers/browser.
 const browser = installBrowser();
 const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
 const telemetry = await import("../../src/telemetry.js");
-const policy = await import("../../src/state/telemetryQueuePolicy.js");
+const policy = { ...(await import("../../src/state/telemetryQueuePolicy.js")), ...(await import("../../src/state/telemetryBatch.js")) };
 
 const caseItem = (runId, caseId, extra = {}) => ({
   id: `case-${runId}-${caseId}`,

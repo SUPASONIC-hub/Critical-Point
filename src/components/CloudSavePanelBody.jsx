@@ -3,8 +3,6 @@ import { CloudDownload, CloudUpload, Copy, Trash2 } from "lucide-react";
 
 import {
   applyCloudSave,
-  CLOUD_SAVE_RETENTION_DAYS,
-  cloudSaveAvailable,
   deleteCloudSave,
   describeCloudFailure,
   describeCloudPhase,
@@ -18,7 +16,7 @@ import {
   setCloudSaveEnabled,
   subscribeCloudSave,
 } from "../cloudSave.js";
-import { CLOUD_SAVE_CODE_KEY, readStoredValue, STORAGE_KEY } from "../appConfig.js";
+import { CLOUD_SAVE_CODE_KEY, CLOUD_SAVE_RETENTION_DAYS, readStoredValue, STORAGE_KEY } from "../appConfig.js";
 
 function hasLocalRun() {
   try {
@@ -32,20 +30,18 @@ function hasLocalRun() {
 const confirmed = (question) => typeof globalThis.confirm !== "function" || globalThis.confirm(question);
 
 /**
- * 기기 간 이어하기, folded under the intro's primary action.
+ * What is inside 다른 기기에서 이어하기 once it has been opened: the switch, the
+ * code, the status and the two ways out of a conflict. `CloudSavePanel.jsx` is
+ * the fold around it, and loads this the first time it is opened.
  *
- * It is folded because priority 24 gives the first viewport one button and
- * the intro a reading budget; it sits right under that button because the
- * player who needs it is holding a different device than the one they played
- * on. It owns its own state -- the sync status comes from `cloudSave.js`, not
- * from the intro view -- so the pre-start shell and the runtime draw it the
- * same way.
+ * It owns its own state -- the sync status comes from `cloudSave.js`, not from
+ * the intro view -- so the pre-start shell and the runtime draw it the same way.
  *
  * A conflict offers both ways out, side by side, because neither is the safe
  * default: the copy online may be the evening's play, or it may be the phone
  * that was left behind.
  */
-export function CloudSavePanel() {
+export function CloudSavePanelBody() {
   const status = useSyncExternalStore(subscribeCloudSave, getCloudSaveSnapshot, getCloudSaveSnapshot);
   const [enabled, setEnabled] = useState(isCloudSaveEnabled);
   // The code is minted when the player opts in, not on the first visit.
@@ -125,16 +121,7 @@ export function CloudSavePanel() {
   }
 
   return (
-    <details className="cloud-save-panel" data-testid="cloud-save-panel">
-      <summary>다른 기기에서 이어하기</summary>
-      <p>
-        진행은 이 기기에만 저장됩니다. 온라인 저장을 켜면 그때부터 진행 기록(사건, 판단 로그, 자원)이
-        이어하기 코드 아래 온라인에도 올라가고, 다른 기기에서 그 코드를 입력하면 멈춘 자리에서 이어집니다.
-        이름과 피드백 내용은 올리지 않습니다. 올린 기록은 마지막으로 올린 날부터 {CLOUD_SAVE_RETENTION_DAYS}일 동안
-        보관한 뒤 지우며, 그 전에도 여기서 지울 수 있습니다.
-      </p>
-      {cloudSaveAvailable ? (
-        <>
+    <>
           <label className="cloud-save-toggle">
             <input type="checkbox" checked={enabled} onChange={toggle} data-testid="cloud-save-toggle" />
             온라인 저장 사용
@@ -201,15 +188,11 @@ export function CloudSavePanel() {
               온라인에 올린 기록 지우기
             </button>
           )}
-        </>
-      ) : (
-        <p className="cloud-save-status" role="status">{describeCloudPhase("unavailable")}</p>
-      )}
       {message && (
         <p className="cloud-save-message" role="alert">
           {message}
         </p>
       )}
-    </details>
+    </>
   );
 }
