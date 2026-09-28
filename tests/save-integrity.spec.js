@@ -117,6 +117,7 @@ test("clearing the saved run before navigation does not resurrect it", async ({ 
 });
 
 test("start fresh from recovery clears the saved run and returns to intro", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.addInitScript((saved) => {
     if (sessionStorage.getItem("save-integrity-seeded")) return;
     sessionStorage.setItem("save-integrity-seeded", "1");

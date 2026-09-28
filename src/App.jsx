@@ -79,8 +79,8 @@ export class AppErrorBoundary extends Component {
 
   render() {
     const forcedDebugError = debugToolsEnabled && readStoredValue(DEBUG_RENDER_CRASH_KEY) === "1";
-    const retryCount = this.state.retryCount ?? readRetryCount();
     if (!this.state.hasError && !forcedDebugError) return this.props.children;
+    const retryCount = this.state.retryCount ?? readRetryCount();
 
     return (
       <main className="error-screen">
