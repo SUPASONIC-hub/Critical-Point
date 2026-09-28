@@ -23,8 +23,11 @@ on:
 permissions:
   contents: read
 
+# A label event has a group named by its label. With one group for every label,
+# adding `e2e` after `visual` cancelled the comparison `visual` had started, and
+# then skipped every job here because the label was not `visual`.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && '-label' || '' }}
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && format('-label-{0}', github.event.label.name) || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:

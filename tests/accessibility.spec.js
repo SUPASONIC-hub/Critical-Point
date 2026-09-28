@@ -48,7 +48,20 @@ test("case result report keeps keyboard focus on an actionable control", async (
   await firstButton.focus();
   await expect(firstButton).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.locator(".result-page :focus")).toBeVisible();
+  // Focus moved, and to something a key can act on. `:focus` being visible
+  // was all this asked, which the button it started on satisfied too.
+  const focused = await page.evaluate(() => {
+    const element = document.activeElement;
+    const first = document.querySelector(".result-page button");
+    return {
+      inReport: Boolean(element?.closest(".result-page")),
+      moved: element !== first,
+      actionable: Boolean(element?.matches("button, a[href], input, select, textarea, summary, [tabindex]:not([tabindex='-1'])")),
+      disabled: Boolean(element?.disabled),
+      visible: Boolean(element?.getClientRects().length),
+    };
+  });
+  expect(focused).toEqual({ inReport: true, moved: true, actionable: true, disabled: false, visible: true });
 });
 
 test("final ending report has no structural accessibility violations", async ({ page }) => {
@@ -71,7 +84,9 @@ test("error log and save slot panels have no structural accessibility violations
     localStorage.setItem(
       "trigger-prototype-error-log-v1",
       JSON.stringify({
-        schemaVersion: 1,
+        // The key the app reads. It was `schemaVersion` here, so the log parsed
+        // to nothing and the audit below was of an empty panel.
+        saveSchemaVersion: 1,
         entries: [
           {
             id: "a11y-error",
@@ -122,6 +137,9 @@ test("error log and save slot panels have no structural accessibility violations
   await page.getByTestId("open-error-log-from-header").click();
   await expect(page.getByTestId("error-log-panel")).toBeVisible();
   await expect(page.getByTestId("save-slot-panel")).toBeVisible();
+  // The panels have something in them: the seeded error and the seeded slot.
+  await expect(page.getByTestId("error-log-panel")).toContainText("A11y panel check");
+  await expect(page.getByTestId("save-slot-panel").getByRole("button").first()).toBeVisible();
   await expectNoA11yViolations(page);
 });
 

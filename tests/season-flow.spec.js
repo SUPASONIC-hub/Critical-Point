@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "./helpers/network.js";
+import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
@@ -1534,7 +1534,7 @@ test("completed case is retained in the local ranking after leaving the ending",
     .toBeGreaterThan(0);
 });
 
-test("a replay link restores the captured scene in a fresh context", async ({ page, context }) => {
+test("a replay link restores the captured scene in a fresh context", async ({ page, browser, baseURL }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case04", "c4_vote");
   await chooseFirstAvailableChoice(page);
@@ -1553,24 +1553,55 @@ test("a replay link restores the captured scene in a fresh context", async ({ pa
   // The player copies this link from the debug panel; build it with the same
   // encoder so the test does not depend on a headless clipboard.
   await expect(page.getByTestId("copy-replay-link")).toBeVisible();
-  const replayUrl = `/?${REPLAY_QUERY_KEY}=${encodeReplaySeed({
+  const replayUrl = `/?debug=1&${REPLAY_QUERY_KEY}=${encodeReplaySeed({
     currentCase: before.currentCase,
     nodeId: before.nodeId,
     resources: before.resources,
     log: before.log,
   })}`;
 
-  const fresh = await context.newPage();
-  await fresh.goto(replayUrl);
-  await fresh.waitForSelector(".game-shell");
+  // Someone else's browser: its own storage, with nothing in it. This used to
+  // be a second page of the same context, which shares storage with the first
+  // -- and a replay never writes the save, so what the test read back as the
+  // replay's state was the save of the run that made the link. A link that
+  // decoded to nothing still opened that run and passed.
+  const viewer = await browser.newContext({ baseURL });
+  const strays = await guardNetwork(viewer);
+  try {
+    const fresh = await viewer.newPage();
+    await fresh.goto(replayUrl);
+    await expect(fresh.locator(".game-shell")).toBeVisible();
 
-  const after = await fresh.evaluate(() => {
-    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
-    return { nodeId: saved.nodeId, currentCase: saved.currentCase, resources: saved.resources };
-  });
+    // What is on screen is the scene the link names, with the resources it carries.
+    await expect(fresh.locator(".game-header h1")).toHaveText(nodes[before.nodeId].title);
+    const overlay = fresh.getByTestId("debug-overlay");
+    await expect(overlay).toContainText(`${before.currentCase} / ${before.nodeId}`);
+    for (const [key, value] of Object.entries(before.resources)) {
+      await expect(overlay).toContainText(`${key}:${value}`);
+    }
 
-  expect(after.nodeId).toBe(before.nodeId);
-  expect(after.currentCase).toBe(before.currentCase);
-  expect(after.resources).toEqual(before.resources);
-  await fresh.close();
+    // And opening it saved nothing: the viewer has no run of their own now.
+    const stored = await fresh.evaluate(() => ({
+      save: localStorage.getItem("trigger-prototype-v2"),
+      slots: localStorage.getItem("trigger-prototype-save-slots-v1"),
+    }));
+    expect(stored).toEqual({ save: null, slots: null });
+    expectNoStrayRequests(strays);
+  } finally {
+    await viewer.close();
+  }
+});
+
+test("a replay link that decodes to nothing opens no scene", async ({ browser, baseURL }) => {
+  const viewer = await browser.newContext({ baseURL });
+  await guardNetwork(viewer);
+  try {
+    const fresh = await viewer.newPage();
+    await fresh.goto(`/?${REPLAY_QUERY_KEY}=not-a-seed`);
+    await expect(fresh.locator(".intro")).toBeVisible();
+    await expect(fresh.locator(".game-shell")).toHaveCount(0);
+    expect(await fresh.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).toBeNull();
+  } finally {
+    await viewer.close();
+  }
 });
