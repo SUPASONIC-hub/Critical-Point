@@ -137,8 +137,10 @@ summary:focus-visible {
    every screen. They float, so each screen keeps that corner clear. */
 .music-controls {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  /* Fixed, so the body's own inset padding does not reach it: under a notch
+     or a rounded corner it keeps clear by itself. */
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
   z-index: 30;
   display: inline-flex;
   align-items: center;

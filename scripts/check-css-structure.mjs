@@ -177,7 +177,9 @@ const fileBudgets = {
   // the plate onto its own fringe layer.
   // 685 / 14400 -> 700 / 14600 the same day: the reading clock became a button
   // that holds, and its held state.
-  "briefing.css": { lines: 700, bytes: 14600 },
+  // 700 / 14600 -> 705 / 14900 on 2026-09-28: the reading clock keeps its
+  // caption on a phone, stacked under the number.
+  "briefing.css": { lines: 705, bytes: 14900 },
   "recovery.css": { lines: 270, bytes: 5754 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
@@ -185,7 +187,9 @@ const fileBudgets = {
   // opacity rather than an animated box-shadow.
   "relics.css": { lines: 482, bytes: 9950 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
-  "responsive.css": { lines: 204, bytes: 4800 },
+  // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
+  // edge on every bar's track and a system colour on its fill.
+  "responsive.css": { lines: 240, bytes: 5850 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
