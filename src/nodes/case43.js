@@ -196,7 +196,7 @@ export const case43Nodes = {
       "사외이사 7표 개표: 찬성 4 · 반대 3",
       "남은 표: 서도경 회장 1 · 5표면 가결",
       "결의문 마지막 줄: '책임 규명은 마무리'",
-      "이 선택은 마지막 사건의 서명란으로 이어짐",
+      "이 선택은 33층의 빈 서명란으로 이어짐",
     ],
     triggers: ["choice", "injustice", "responsibility"],
     choices: [
@@ -476,7 +476,7 @@ export const case43 = {
     c43_route_system_publish: "10년 치 의사록 통계를, 은채원과 표세린에게 동시에 보낸다.",
     c43_route_system_line: "결의문의 마지막 줄만 따로 떼어, 공개 질의로 묻는다.",
     c43_route_system_drop: "통계는 넣어 두고, 표 계산에 집중한다.",
-    c43_final_system_route_a: "해임 결의에 종결 문구를 못 쓰게 하는, 이사회 규정을 제안한다.",
+    c43_final_system_route_a: "해임 결의에 종결 문구를 못 쓰게 하는 이사회 규정을, 제안한다.",
     c43_final_system_route_b: "규정은 그대로 두고, 이번 해임만 먼저 통과시킨다.",
     c43_final_system_route_c: "사외이사의 반대표와 그 뒤 재선임 여부를, 해마다 공개하게 한다.",
     c43_evidence_turn_reveal: "두 장의 보도자료를, 개회 전에 사외이사 전원에게 보낸다.",

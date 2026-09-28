@@ -20,7 +20,7 @@ export const case05Nodes = {
       "서비스 누락: 312명",
       "현장 직원은 안내서대로 처리",
       "배차 시스템은 승인된 기준대로 작동",
-      "예산 상한선의 출처: 사건 04의 상환 조건표",
+      "예산 상한선의 출처: 온새의 상환 조건표",
     ],
     triggers: ["responsibility", "curiosity", "order"],
     choices: [

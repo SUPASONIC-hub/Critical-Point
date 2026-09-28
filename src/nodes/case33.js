@@ -480,7 +480,7 @@ export const case33 = {
     c33_route_system_drop: "통계는 덮고, 147일을 줄이는 합의 쪽으로 기운다.",
     c33_final_system_route_a: "신고자를 고소한 회사가, 결론까지 신고자 소송비를 대게 하는 규칙을 제안한다.",
     c33_final_system_route_b: "규칙은 두고, 백아린의 위로금만 두 배로 올려 받는다.",
-    c33_final_system_route_c: "고소당한 신고자들이 함께 쓰는, 공동 변호 기금을 만든다.",
+    c33_final_system_route_c: "고소당한 신고자들이 함께 쓰는 공동 변호 기금을, 만든다.",
     c33_evidence_turn_file: "점수 화면과 고소장 생성일을, 보호조치 신청서에 붙여 낸다.",
     c33_evidence_turn_hold: "점수 기록은 쥐고 있다가, 합의 자리에서 처음 꺼낸다.",
     c33_evidence_turn_warn: "점수가 매겨진 다른 직원들에게, 이 사실부터 알린다.",

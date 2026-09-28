@@ -198,7 +198,7 @@ export const case17Nodes = {
       "10:00 인사위원회 -- 수첩을 안 내면 문서제출명령 심문",
       "제출 반대 17명, 상관없음 12명, 닿지 않음 3명, 사망 1명",
       "수첩 표지: 서아의 별 스티커 12개",
-      "이 선택은 시즌 마지막 사건의 서명란으로 이어짐",
+      "이 선택은 33층의 빈 서명란으로 이어짐",
     ],
     triggers: ["choice", "responsibility", "trust"],
     choices: [
@@ -318,7 +318,7 @@ export const case17 = {
       echo: ["스물두 집을 먼저 돌면 순서가 바뀝니다. 수첩 첫 장부터 기다리던 사람 몇은 한 주를 더 기다립니다.", "요구는 공문으로 남습니다. 법무팀은 숫자를 지우는 대신 '가족 사항 별첨'이라는 칸을 새로 만듭니다.", "순서는 지켜집니다. 스물두 개의 숫자는 올해도 한 살씩 늘어납니다."],
     },
     c17_unreached: {
-      voice: ["대답 못 하는 사람을 동의로 세는, 그 각주부터 공개한다.", "각주의 근거를, 법무팀에 공식 질의서로 묻는다.", "각주는 인사위원회 당일에 반박하기로 하고, 넘어간다."],
+      voice: ["대답 못 하는 사람을 동의로 세는 그 각주부터, 공개한다.", "각주의 근거를, 법무팀에 공식 질의서로 묻는다.", "각주는 인사위원회 당일에 반박하기로 하고, 넘어간다."],
       echo: ["공개하면 리드라인이 각주 사진을 올립니다. 법무팀은 초안이 어떻게 샜는지부터 조사합니다.", "질의서는 답을 받을 권리를 만듭니다. 답이 오는 날짜는 인사위원회 다음 날로 잡힙니다.", "넘어가면 각주는 그대로 인쇄됩니다. 네 사람은 종이 위에서 동의합니다."],
     },
     c17_name: {
@@ -403,7 +403,7 @@ export const case17 = {
     entryEffect: { legitimacy: 5, trust: 2, time: -3, fatigue: 5 },
     choices: [
       ["c17_evidence_turn_fill", "수첩의 '지시한 사람' 칸에 처음으로 그 번호를 적는다", { legitimacy: 12, trust: 7, capital: -7, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
-      ["c17_evidence_turn_hold", "번호는 알아 두고 마지막 사건까지 아껴 둔다", { capital: 9, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
+      ["c17_evidence_turn_hold", "번호는 알아 두고 33층에 오르는 날까지 아껴 둔다", { capital: 9, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
       ["c17_evidence_turn_tell", "정태오에게 그 번호의 주인을 먼저 알려 준다", { trust: 12, legitimacy: 6, capital: -6, humanCost: -7, fatigue: 8 }, { reframing: 2 }],
     ],
   },
@@ -482,7 +482,7 @@ export const case17 = {
     c17_final_system_route_b: "규칙은 그대로 두고, 받아 적은 사람들의 징계 기록만 지운다.",
     c17_final_system_route_c: "말로 받은 지시를 적어 둔 직원을, 보호하는 규정을 만든다.",
     c17_evidence_turn_fill: "수첩의 '지시한 사람' 칸에, 처음으로 그 번호를 적는다.",
-    c17_evidence_turn_hold: "번호는 알아 두고, 마지막 사건까지 아껴 둔다.",
+    c17_evidence_turn_hold: "번호는 알아 두고, 33층에 오르는 날까지 아껴 둔다.",
     c17_evidence_turn_tell: "정태오에게, 그 번호의 주인을 먼저 알려 준다.",
   },
   echoReplies: {
@@ -518,7 +518,7 @@ export const case17 = {
     c17_final_system_route_b: "기록을 지우면 39명의 이름이 깨끗해집니다. 다음 해에도 누군가는 불러 준 말을 받아 적고, 그 손이 잘립니다.",
     c17_final_system_route_c: "보호 규정이 생기면 받아 적는 일이 곧 증거를 남기는 일이 됩니다. 규정을 믿고 적을 사람이 몇이나 될지는 모릅니다.",
     c17_evidence_turn_fill: "번호를 적으면 20년 비어 있던 칸이 처음으로 채워집니다. 반재욱의 펜이 그 네 자리에서 오래 멈춥니다.",
-    c17_evidence_turn_hold: "아껴 두면 번호는 마지막 사건의 카드가 됩니다. 그동안 정태오는 자기 해고를 부른 전화가 누구 것인지 모릅니다.",
+    c17_evidence_turn_hold: "아껴 두면 번호는 33층에서 꺼낼 카드가 됩니다. 그동안 정태오는 자기 해고를 부른 전화가 누구 것인지 모릅니다.",
     c17_evidence_turn_tell: "알려 주면 정태오가 한참 꼬치를 뒤집지 않습니다. 그리고 묻습니다. '그 사람, 지금도 거기 있어요?'",
   },
   characterProfiles: {

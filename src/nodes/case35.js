@@ -197,7 +197,7 @@ export const case35Nodes = {
       "특별 창구: 38건 사람 재심사 -- 3주",
       "금융감독원 민원: 전국 재해 대출 기준 -- 수개월",
       "학습 데이터 동의서: 서명 시 사흘 안에 대출",
-      "이 선택은 사건 36의 한남동 식탁으로 이어짐",
+      "이 선택은 한남동 식탁으로 이어짐",
     ],
     triggers: ["choice", "injustice", "protection"],
     choices: [
@@ -476,7 +476,7 @@ export const case35 = {
     c35_after_record: "노아가 거절한 수해 대출 312건을, 문서로 정리해 준법감시팀에 낸다.",
     c35_after_rush: "비가 그치자마자 거절 기록을 들고, 곧장 검찰청으로 간다.",
     c35_route_system_publish: "한 바퀴 도는 설명을, 상인들과 언론에 그대로 공개한다.",
-    c35_route_system_rule: "재해 대출은 반드시 사람 심사를 거치게 하는, 규칙을 요구한다.",
+    c35_route_system_rule: "재해 대출은 반드시 사람 심사를 거치게 하는 규칙을, 요구한다.",
     c35_route_system_drop: "캡처는 덮어 두고, 거절 건을 하나씩 따로 푼다.",
     c35_final_system_route_a: "재해 대출 거절에는, 원인을 거슬러 묻는 칸을 반드시 넣게 한다.",
     c35_final_system_route_b: "노아의 결과는 두고, 그룹 기부금으로 피해를 메운다.",

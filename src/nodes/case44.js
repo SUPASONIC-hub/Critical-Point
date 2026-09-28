@@ -476,7 +476,7 @@ export const case44 = {
     c44_after_record: "판결문 전문을 받아, 모임용 쉬운 해설본부터 쓴다.",
     c44_after_rush: "곧장 검찰청으로 가서, 나은호와 항소 이유를 짠다.",
     c44_route_system_publish: "통계를, 서하린과 모임에 동시에 공개한다.",
-    c44_route_system_rule: "처벌불원서에 이사회 결의와 실명 서명을 요구하는, 제도안을 낸다.",
+    c44_route_system_rule: "처벌불원서에 이사회 결의와 실명 서명을 요구하는 제도안을, 낸다.",
     c44_route_system_drop: "통계는 덮어 두고, 선고만 기다린다.",
     c44_final_system_route_a: "회사가 용서할 때, 피해를 떠안은 직원들의 동의를 거치게 하자고 제안한다.",
     c44_final_system_route_b: "제도는 그대로 두고, 이번 판결만 받아들인다.",

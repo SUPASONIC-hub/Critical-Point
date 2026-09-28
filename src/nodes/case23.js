@@ -192,7 +192,7 @@ export const case23Nodes = {
       "발언 시간: 1인 1분",
       "미리 들어온 표 기준 찬성 53%",
       "1주 주주 약 2,400명 입장 -- 뒷줄 입석 포함",
-      "이 선택은 마지막 사건의 서명란으로 이어짐",
+      "이 선택은 33층의 빈 서명란으로 이어짐",
     ],
     triggers: ["choice", "injustice", "trust"],
     choices: [
@@ -473,7 +473,7 @@ export const case23 = {
     c23_route_system_send: "10년 치 통계를, 의결권 자문사와 기관들에 보낸다.",
     c23_route_system_minutes: "올해 의사록에는 발언 전문을 남기라고, 주주 서한을 낸다.",
     c23_route_system_drop: "통계는 넣어 두고, 표 모으기에 집중한다.",
-    c23_final_system_route_a: "후보 추천서에 반대 의견 처리 이력을 적게 하는, 규정을 제안한다.",
+    c23_final_system_route_a: "후보 추천서에 반대 의견 처리 이력을 적게 하는 규정을, 제안한다.",
     c23_final_system_route_b: "올해는 표만 세고, 규정은 내년 주주총회로 미룬다.",
     c23_final_system_route_c: "소액주주 발언을 모아, 따로 공개 의사록을 만든다.",
     c23_evidence_turn_disclose: "현황표를 주주총회장에서 공개하고, 직원 표의 무효를 주장한다.",
