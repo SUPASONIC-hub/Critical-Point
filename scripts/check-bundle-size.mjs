@@ -32,8 +32,8 @@ const budgets = [
   // could paint. 161,674 / 57,486 on 2026-09-27.
   { pattern: /^index-.*.js$/, maxBytes: 169_800, maxGzip: 60_400 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
-  // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, the one budget that
-  // rose in the audit pass. What it bought is the table being playable and
+  // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
+  // fixes from the audit. What it bought is the table being playable and
   // honest for more people: one gate for a card's click and its key, a bust
   // written before its slam is painted, Space and Enter left to the control
   // the keyboard walked to, presses graded where the pointer went down and
