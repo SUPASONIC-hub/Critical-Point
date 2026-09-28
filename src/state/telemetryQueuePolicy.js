@@ -103,3 +103,42 @@ export function isHeldBehindCaseRow(item, waiting) {
   const run = runOf(item);
   return waiting.some((other) => other !== item && !isSeasonRow(other) && runOf(other) !== null && runOf(other) === run);
 }
+
+/**
+ * One pass over the queue. `kept` is what stays queued, in the order it was
+ * queued; `aborted` means `canSend` said no part-way (consent unticked, the
+ * connection gone), and the caller leaves the queue as it stands.
+ *
+ * Here rather than in the hook so it can be run without a renderer.
+ */
+export async function sendTelemetryBatch(items, { canSend = () => true, send = sendTelemetryItem } = {}) {
+  const batch = Array.isArray(items) ? items : [];
+  const ordered = planTelemetryBatch(batch);
+  const waiting = [];
+  let stopped = false;
+  for (const [index, item] of ordered.entries()) {
+    if (stopped) {
+      waiting.push(item);
+      continue;
+    }
+    // The player can untick consent while a send is in flight: stop there.
+    if (!canSend()) return { kept: batch, aborted: true };
+    // A ranking row waits for its run's case rows: the ones that failed just
+    // now, and the ones still ahead of it in this batch.
+    if (isHeldBehindCaseRow(item, [...waiting, ...ordered.slice(index + 1)])) {
+      waiting.push(item);
+      continue;
+    }
+    try {
+      await send(item);
+    } catch (error) {
+      console.warn(error);
+      const failure = classifyTelemetryFailure(error);
+      // "permanent" is the server refusing the row itself (a payload over its
+      // cap, a run that cannot rank). Sending it again changes nothing.
+      if (failure !== "permanent") waiting.push(item);
+      if (failure === "pace" || failure === "unreachable") stopped = true;
+    }
+  }
+  return { kept: batch.filter((item) => waiting.includes(item)), aborted: false };
+}

@@ -9,13 +9,7 @@ import {
   writeSaveState,
 } from "../appConfig.js";
 import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem } from "./payloadSchemas.js";
-import {
-  classifyTelemetryFailure,
-  isHeldBehindCaseRow,
-  planTelemetryBatch,
-  pruneTelemetryQueue,
-  sendTelemetryItem,
-} from "./telemetryQueuePolicy.js";
+import { pruneTelemetryQueue, sendTelemetryBatch } from "./telemetryQueuePolicy.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
 // in GameRuntime) get one when they are queued, so every retry reuses it.
@@ -33,10 +27,8 @@ function withEventId(item) {
  * it, whose `dataConsent` was the one from before the player unticked the box,
  * so a revoked consent kept sending on every backoff tick.
  *
- * What a failure means is `classifyTelemetryFailure`'s to say. The batch stops
- * at the first send the server did not answer, or answered "too fast": the
- * rest would fail the same way, and each used to take its own ten seconds to
- * find that out.
+ * The pass over the queue is `sendTelemetryBatch` (telemetryQueuePolicy.js):
+ * what a failure means, which rows wait, and where the batch stops.
  */
 // A wait the server asked for is not a network blip, so the backoff runs on
 // past a minute: a ranking row a day early would otherwise ask 1,440 times.
@@ -127,37 +119,7 @@ export function useTelemetryQueue({
       text: `대기 중인 원격 저장 ${retryBatch.length}건을 다시 전송하는 중입니다.`,
     });
 
-    const failedItems = [];
-    let aborted = false;
-    let stopped = false;
-    const ordered = planTelemetryBatch(retryBatch);
-    for (const [index, item] of ordered.entries()) {
-      if (stopped) {
-        failedItems.push(item);
-        continue;
-      }
-      // The player can untick consent while a send is in flight: stop there.
-      if (!canSend()) {
-        aborted = true;
-        break;
-      }
-      // A ranking row waits for its run's case rows: the ones that failed just
-      // now, and the ones still ahead of it in this batch.
-      if (isHeldBehindCaseRow(item, [...failedItems, ...ordered.slice(index + 1)])) {
-        failedItems.push(item);
-        continue;
-      }
-      try {
-        await sendTelemetryItem(item);
-      } catch (error) {
-        console.warn(error);
-        const failure = classifyTelemetryFailure(error);
-        // "permanent" is the server refusing the row itself (a payload over
-        // its cap, a run that cannot rank). Sending it again changes nothing.
-        if (failure !== "permanent") failedItems.push(item);
-        if (failure === "pace" || failure === "unreachable") stopped = true;
-      }
-    }
+    const { kept, aborted } = await sendTelemetryBatch(retryBatch, { canSend });
     retryingRef.current = false;
     setIsRetryingTelemetry(false);
     if (aborted) {
@@ -168,9 +130,7 @@ export function useTelemetryQueue({
 
     const retryIds = new Set(retryBatch.map((item) => item.id));
     const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
-    // In the order they were queued, whatever order they were sent in.
-    const keptIds = new Set(failedItems.map((item) => item.id));
-    const nextQueue = pruneTelemetryQueue([...retryBatch.filter((item) => keptIds.has(item.id)), ...newlyQueuedItems]);
+    const nextQueue = pruneTelemetryQueue([...kept, ...newlyQueuedItems]);
     const queueCommitted = commitPendingTelemetryQueue(nextQueue);
     if (queueCommitted && nextQueue.length === 0) {
       telemetryRetryAttemptRef.current = 0;
