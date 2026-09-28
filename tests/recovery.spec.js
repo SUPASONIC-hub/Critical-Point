@@ -170,7 +170,7 @@ test("one render crash is one failed attempt, and the retry is still offered", a
 
   // The second failure from the same save is where retrying stops.
   await page.getByTestId("error-retry").click();
-  await expect(page.getByTestId("error-retry")).toBeDisabled();
+  await page.waitForSelector("[data-testid=error-retry][disabled]");
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).lastError.retryCount).toBe(2);
   const slotsAfter = await readJsonStorage(page, TEST_STORAGE_KEYS.saveSlots);
   expect(slotsAfter.slots.filter((slot) => slot.nodeId === "c5_voice")).toHaveLength(1);
@@ -196,7 +196,7 @@ test("a screen whose file is gone offers a reload and charges nothing to the sav
   await expect(page.getByTestId("chunk-reload-panel")).toHaveCount(0);
 });
 
-test("a save this build cannot read is kept, and the recovery centre opens on the slots", async ({ page }) => {
+test("a save this build cannot read is kept, and the recovery centre opens on the slots", { tag: "@prod" }, async ({ page }) => {
   const fromANewerBuild = JSON.stringify({ ...savedRun(), saveSchemaVersion: 99 });
   await seedOnce(page, {
     save: fromANewerBuild,
@@ -248,7 +248,7 @@ test("focus stays inside the briefing page a fresh scene opens on", async ({ pag
   expect(await focusIsInside(page, "[data-testid='scene-briefing']")).toBe(true);
 });
 
-test("Escape closes 랭킹 and 게시판 and gives focus back to what opened them", async ({ page }) => {
+test("Escape closes 랭킹 and 게시판 and gives focus back to what opened them", { tag: "@prod" }, async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector(".intro");
   for (const opener of [".intro-ranking-button:not(.intro-board-button)", ".intro-board-button"]) {
@@ -286,7 +286,7 @@ test("replaying a closed case asks first, by key and by button", async ({ page }
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log).toEqual([]);
 });
 
-test("the intro's start button and the roadmap card deal the same opening hand", async ({ page }) => {
+test("the intro's start button deals the origin's opening hand", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("critical-point-operator-origin", "public"));
   await page.goto("/");
   await page.getByTestId("start-first-case").click();
