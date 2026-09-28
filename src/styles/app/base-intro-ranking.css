@@ -137,8 +137,10 @@ summary:focus-visible {
    every screen. They float, so each screen keeps that corner clear. */
 .music-controls {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  /* Fixed, so the body's own inset padding does not reach it: under a notch
+     or a rounded corner it keeps clear by itself. */
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
   z-index: 30;
   display: inline-flex;
   align-items: center;
@@ -248,18 +250,10 @@ summary:focus-visible {
   outline: none;
 }
 .story-reveal span {
-  font-size: 12px;
   font-weight: 900;
-  letter-spacing: 0;
-  color: var(--color-accent);
 }
 .start-input-row input {
-  flex: 1;
   min-width: 0;
-  height: 48px;
-  padding: 0 14px;
-  border: 1px solid var(--c-gray-68);
-  border-radius: 6px;
 }
 .start-input-row button,
 .ghost {
@@ -273,32 +267,20 @@ summary:focus-visible {
 }
 .start-input-row button {
   flex: 0 0 auto;
-  height: 48px;
-  padding: 0 22px;
-  background: var(--c-acid);
-  color: var(--c-ink);
   font-size: 15px;
 }
 .data-status {
   width: fit-content;
   margin-top: 2px;
-  padding: 4px 7px;
   border-radius: 999px;
-  font-weight: 900;
 }
 .data-status.ready {
   color: var(--c-green-deep);
   background: var(--c-mint-soft);
 }
-.data-status.local {
-  color: var(--c-warn-deep);
-  background: var(--c-cream-deep);
-}
 .privacy-note p,
 .input-note {
   margin: 0;
-  color: var(--c-warn-deep);
-  font-size: 12px;
   font-weight: 800;
   line-height: 1.5;
 }
@@ -2733,10 +2715,6 @@ summary:focus-visible {
 
 /* Rules gathered here from the later layers so this selector is defined in one file. */
 .game-header {
-  align-items: flex-start;
-  margin-bottom: 22px;
-}
-.game-header {
   flex-wrap: wrap;
 }
 .ghost {
@@ -2771,10 +2749,6 @@ body {
   background-image:
     radial-gradient(90% 60% at 50% -12%, rgb(217 255 98 / 0.07), transparent 60%),
     radial-gradient(70% 50% at 100% 100%, rgb(104 196 255 / 0.05), transparent 70%);
-}
-.game-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
 }
 
 /* Intro and ranking, narrower -------------------------------------------- */
@@ -2911,91 +2885,7 @@ body {
    an element they can match at the same specificity, so they compute exactly
    as they did there; the computed style of every element on the intro, the
    table, the reveal and the report was compared before and after the move. */
-.new-game-plus-button:hover {
-  background: #e9f5b4;
-}
-/* This line sits inside the SEASON 1 drawer, directly on the intro's field --
-   not in a light panel, which is what the two dark greens here assumed. It read
-   at 2.7:1 against the ink ground and nobody caught it, because until the
-   redesign the ground was the key visual and the contrast audit skips text over
-   a photograph. */
-.play-style-unlock {
-  margin: 10px 0;
-  color: var(--c-line-soft);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.operator-origin-panel {
-  display: grid;
-  gap: 14px;
-  margin: 18px 0;
-  padding: 18px;
-  background: #f5f8f1;
-  border: 1px solid #8ca49b;
-  border-left: 5px solid #315f43;
-  border-radius: 7px;
-}
-.operator-origin-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-.operator-origin {
-  display: grid;
-  gap: 7px;
-  min-height: 170px;
-  padding: 14px;
-  text-align: left;
-  color: #173b34;
-  background: #fff;
-  border: 1px solid #c7d8cd;
-  border-radius: 6px;
-}
-.operator-origin:hover,
-.operator-origin.selected {
-  border-color: #315f43;
-  box-shadow: 0 0 0 2px rgba(49, 95, 67, 0.16);
-  transform: translateY(-1px);
-}
-.operator-origin.selected {
-  background: #edf5dc;
-  box-shadow:
-    inset 4px 0 #315f43,
-    0 0 0 2px rgba(49, 95, 67, 0.16);
-}
-.operator-origin-selected {
-  margin: 0;
-  color: #315f43;
-  font-size: 12px;
-  font-weight: 900;
-}
-@media (max-width: 700px) {
-  .operator-origin-grid {
-    grid-template-columns: 1fr;
-  }
-  .operator-origin {
-    min-height: 0;
-  }
-}
-.origin-prologue {
-  display: grid;
-  gap: 4px;
-  padding: 12px;
-  background: #10241f;
-  color: #fff;
-  border-left: 4px solid #d9ff62;
-  border-radius: 5px;
-}
-.operator-origin-panel .panel-title-row h2 {
-  color: #173b34;
-}
-.operator-origin-panel .panel-title-row > small {
-  color: #4f605b;
-}
 @media (max-width: 860px) {
-  .start-priority {
-    grid-template-columns: 1fr;
-  }
   .prestart-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -3018,12 +2908,42 @@ body {
   }
 }
 @media (max-width: 520px) {
-  .start-priority,
-  .prestart-briefing {
-    padding: 12px;
-  }
   .prestart-grid,
   .prestart-tutorial > div {
     grid-template-columns: 1fr;
+  }
+}
+/* The last of extensions.css, retired on 2026-09-28, in the order they had. */
+.screen-loading {
+  min-height: 100dvh;
+}
+.new-game-plus-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.past-run-memory {
+  display: grid;
+  gap: 7px;
+}
+.past-run-memory p {
+  line-height: 1.55;
+}
+.play-style-unlock strong {
+  color: var(--c-acid);
+}
+.operator-origin p,
+.operator-origin small {
+  margin: 0;
+}
+.origin-prologue p {
+  margin: 0;
+  line-height: 1.5;
+}
+@media (max-width: 520px) {
+  .start-console-heading h2 {
+    font-size: 23px;
   }
 }

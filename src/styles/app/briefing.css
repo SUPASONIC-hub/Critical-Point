@@ -608,12 +608,18 @@
       "breach";
   }
 
+  /* The caption stays on a phone, in three short lines beside the number, so
+     the clock is no taller than it was: it is the only place the page says
+     the table opens by itself and that a tap holds the clock. Hidden, the
+     timer was a bare number. */
   .gx-comic-timer {
+    align-items: center;
     min-width: 0;
   }
 
   .gx-comic-timer small {
-    display: none;
+    max-width: 6.5em;
+    font-size: 9.5px;
   }
 
   .gx-panel-splash {

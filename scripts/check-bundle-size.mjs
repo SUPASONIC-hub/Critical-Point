@@ -46,8 +46,9 @@ const budgets = [
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
-  // tokens went; 196,510 / 35,448 after.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_300, maxGzip: 37_300 },
+  // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
+  // declarations that never won a cascade were cut and extensions.css retired.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_300 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.

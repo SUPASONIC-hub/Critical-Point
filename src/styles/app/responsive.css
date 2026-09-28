@@ -63,8 +63,8 @@
 }
 @media (max-width: 480px) {
   .music-controls {
-    top: 10px;
-    right: 10px;
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
   }
   .music-toggle,
   .music-volume-toggle {
@@ -199,5 +199,38 @@
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
     transition-delay: 0s !important;
+  }
+}
+/* Forced colours (Windows High Contrast) repaint every background colour as
+   the canvas, so a bar drawn as a filled box vanishes and only its number is
+   left. The tracks get an edge and the fills a system colour; gradients are
+   images and survive on their own. */
+@media (forced-colors: active) {
+  .gx-gauge-track,
+  .gx-clock,
+  .status-bar-progress,
+  .bar-track,
+  .score-breakdown div,
+  .ranking-comparison i,
+  .ending-axis-grid i {
+    border: 1px solid CanvasText;
+  }
+  .gx-gauge-fill,
+  .status-bar-progress div,
+  .bar-track div,
+  .score-breakdown i,
+  .ranking-comparison em,
+  .ending-axis-grid em {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .gx-gauge-band {
+    forced-color-adjust: none;
+    background: repeating-linear-gradient(-45deg, CanvasText 0 2px, transparent 2px 8px);
+    border-left: 2px solid CanvasText;
+  }
+  .gx-gauge-wall {
+    forced-color-adjust: none;
+    background: CanvasText;
   }
 }
