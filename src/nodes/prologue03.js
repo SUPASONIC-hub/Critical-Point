@@ -408,7 +408,7 @@ export const prologue03 = {
     sourceRoutes: ["p3_committee", "p3_corridor", "p3_archive", "p3_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "반려 처리 기록을 펴 놓고 단서를 시각 순으로 늘어놓아, 그 한 문장이 몇 시에 만들어졌는지 맞춰 본다.",
-    entryEcho: "단서를 대면 반려의 시각이 열립니다. 결정한 시각과 통보한 시각은 다를 수 있습니다.",
+    entryEcho: "시각 순으로 늘어놓으면 반려가 눌린 때가 나옵니다. 결정한 시각과 통보한 시각은 다를 수 있습니다.",
     entryLabel: "반려 단추가 눌린 시각과 그 앞의 통화 기록을 연다",
     title: "28분",
     speaker: "반재욱",
@@ -428,7 +428,7 @@ export const prologue03 = {
     evidenceNext: "p3_evidence_turn",
     routeLabel: "복도에서 들은 12년 전 이야기가 어디서 시작됐는지 따라가 본다",
     systemLabel: "선반 사이에서 새로 짠 판이 지난 10년 묶음에도 있었는지 찾아본다",
-    evidenceLabel: "직전 단서를 붙여 반려가 몇 시에 눌렸는지 연다",
+    evidenceLabel: "제7조 회람 명단을 들고 반려가 몇 시에 눌렸는지 확인한다",
     systemEcho: "찾아보면 있습니다. 같은 조항을 센 사람은 당신이 처음이지만, 돌려보낸 의견서를 묶어 둔 끈은 맨 아래 칸에 서른네 개입니다.",
     evidenceEcho: "회람 확인란의 사번들을 반려 기록에 대면 시각 하나가 나옵니다. 개회보다 이르고, 열한 쪽을 읽기에는 짧습니다.",
   },
@@ -642,7 +642,7 @@ export const prologue03 = {
     p3_final_system_route: {
       place: "본점 지하 1층 기록 보관실 · 맨 아래 칸",
       clock: "4월 27일 목요일 · 19시",
-      question: "부속 의견이 사라지는 방식을 하나만 바꿀 수 있다면, 무엇을 바꾸겠습니까?",
+      question: "임경수가 끈을 매지 않고 기다립니다. 서른다섯 번째 묶음이 되기 전에 무엇을 하겠습니까?",
     },
     p3_evidence_turn: {
       place: "본점 8층 복도 · 처리 기록 출력대",

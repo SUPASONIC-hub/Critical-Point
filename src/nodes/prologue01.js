@@ -403,7 +403,7 @@ export const prologue01 = {
     sourceRoutes: ["p1_counter", "p1_mentor", "p1_review", "p1_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "요약표 양식 옆에 단서를 펴 놓고, 이 양식을 누가 만들고 누가 승인했는지 맞춰 본다.",
-    entryEcho: "단서를 대면 양식의 배포 기록이 열립니다. 만든 손과 승인한 손이 같은 문서 안에 있지 않을 수 있습니다.",
+    entryEcho: "양식 번호를 따라가면 배포 기록이 나옵니다. 만든 손과 승인한 손이 한 문서 안에 있지 않을 수 있습니다.",
     entryLabel: "요약표 양식을 배포하라고 승인한 문서를 찾아 연다",
     title: "양식을 만든 사람",
     speaker: "반재욱",
@@ -423,7 +423,7 @@ export const prologue01 = {
     evidenceNext: "p1_evidence_turn",
     routeLabel: "지난주에 본 지점 서류의 빈칸부터 정해린 대표에게 다시 확인한다",
     systemLabel: "새로 짠 판의 조건이 양식 개정 요청에도 남았는지 본다",
-    evidenceLabel: "모아 둔 단서를 붙여 요약표 양식을 누가 승인했는지 연다",
+    evidenceLabel: "쥐고 있는 단서로 요약표 양식의 승인자를 찾는다",
   },
   // The season's first case. There is no previous chapter to arrive from, so
   // the briefing has one opening and no signature move.
@@ -589,7 +589,7 @@ export const prologue01 = {
     p1_final_system_route: {
       place: "본점 8층 기록 보관실 · 창가",
       clock: "2022년 10월 20일 목요일 · 22시",
-      question: "오차가 남는 방식을 하나만 바꿀 수 있다면, 무엇을 바꾸겠습니까?",
+      question: "내일 아침이면 스물여덟 번째 줄이 생깁니다. 그 줄을 어느 쪽에 붙이겠습니까?",
     },
     p1_evidence_turn: {
       place: "본점 12층 · 문서 관리 단말",

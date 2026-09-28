@@ -399,7 +399,7 @@ export const prologue05 = {
     sourceRoutes: ["p5_notice", "p5_basement", "p5_echo", "p5_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "통지서를 책상에 펴고 단서를 날짜대로 얹어, 이 종이를 누가 언제 만들었는지 맞춰 본다.",
-    entryEcho: "단서를 대면 통지서의 원안 기록이 열립니다. 사유 칸이 빈 것과 사유가 없는 것은 다른 이야기입니다.",
+    entryEcho: "날짜대로 얹으면 통지서의 원안 기록이 열립니다. 사유 칸이 빈 것과 사유가 없는 것은 다른 이야기입니다.",
     entryLabel: "인사 통지서의 원안 파일을 만든 계정을 연다",
     title: "반려 세 시간 뒤",
     speaker: "반재욱",
@@ -419,7 +419,7 @@ export const prologue05 = {
     evidenceNext: "p5_evidence_turn",
     routeLabel: "4번 창구에서 본 것을 기록 보관실의 종이 원본과 나란히 놓는다",
     systemLabel: "상담실에서 새로 짠 판이 이번 통지서에도 옮겨졌는지 본다",
-    evidenceLabel: "직전 단서를 붙여 통지서의 원안을 누가 만들었는지 연다",
+    evidenceLabel: "대본을 만든 계정을 통지서 원안에서도 찾아본다",
     systemEcho: "통지서에는 옮겨진 것이 없습니다. 사유 칸도 제안자 칸도 비어 있습니다. 그 빈칸을 읽은 1번 단말이 30년치 통지서를 한꺼번에 엽니다.",
     evidenceEcho: "대본이 만들어진 시각을 통지서 원안에 대면 날짜가 하나 더 나옵니다. 점검보다 여섯 주 이릅니다.",
   },
@@ -643,7 +643,7 @@ export const prologue05 = {
     p5_final_system_route: {
       place: "연구랩 4층 분석관실 · 케이스데스크 1번",
       clock: "7월 24일 월요일 · 22시",
-      question: "이 형태를 하나만 바꿀 수 있다면, 무엇을 바꾸겠습니까?",
+      question: "이름 없는 단말이 이 계산을 저장할지 묻습니다. 무엇이라고 답하겠습니까?",
     },
     p5_evidence_turn: {
       place: "연구랩 4층 분석관실 · 접속 기록",

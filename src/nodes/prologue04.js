@@ -402,7 +402,7 @@ export const prologue04 = {
     sourceRoutes: ["p4_window", "p4_quota", "p4_visit", "p4_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "3분 대본을 서랍에서 꺼내 단서와 포개고, 이 한 장을 누가 언제 만들었는지 맞춰 본다.",
-    entryEcho: "단서를 대면 대본의 작성 기록이 열립니다. 파는 손과 문장을 고른 손은 같은 층에 있지 않습니다.",
+    entryEcho: "파일 이름을 열면 대본의 작성 기록이 따라 나옵니다. 파는 손과 문장을 고른 손은 같은 층에 있지 않습니다.",
     entryLabel: "창구 대본 파일이 만들어진 계정과 시각을 연다",
     title: "대본을 만든 손",
     speaker: "반재욱",
@@ -422,7 +422,7 @@ export const prologue04 = {
     evidenceNext: "p4_evidence_turn",
     routeLabel: "직전 사건에서 배운 손버릇대로 4번 창구 서랍부터 열어 본다",
     systemLabel: "맨 아래 칸에서 새로 짠 판을 창구 응대 대본 옆에 놓아 본다",
-    evidenceLabel: "직전 단서를 붙여 3분 대본을 누가 언제 만들었는지 연다",
+    evidenceLabel: "반려 시각을 3분 대본에 대어 누가 언제 만들었는지 본다",
     systemEcho: "놓아 보면 대본에는 돌려보낼 의견을 적는 칸이 처음부터 없습니다. 오진우가 보낸 전국 판매 기록에도 같은 자리가 비어 있습니다.",
     evidenceEcho: "반려 시각을 대본에 대면 작성 기록이 열립니다. 의견서가 돌아오기도 전에 팔 문장은 이미 골라져 있었습니다.",
   },
@@ -646,7 +646,7 @@ export const prologue04 = {
     p4_final_system_route: {
       place: "KD은행 강서지점 · 빈 상담실",
       clock: "2023년 5월 15일 · 18시 30분",
-      question: "이 판매에서 딱 하나만 바꿀 수 있다면, 무엇을 바꾸겠습니까?",
+      question: "표에 없던 칸을 당신이 연필로 그려 넣었습니다. 이 칸을 누구에게 보이겠습니까?",
     },
     p4_evidence_turn: {
       place: "KD은행 강서지점 · 문서 서버 접속 기록",

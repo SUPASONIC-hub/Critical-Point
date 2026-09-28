@@ -398,7 +398,7 @@ export const prologue02 = {
     sourceRoutes: ["p2_site", "p2_model", "p2_draft", "p2_route_system"],
     requiredAuthority: "FIELD ACCESS",
     entryVoice: "제7조 초안을 가운데 두고 단서를 둘러놓은 뒤, 이 조항을 누가 요청했는지 맞춰 본다.",
-    entryEcho: "단서를 대면 초안의 회람 기록이 열립니다. 조항을 쓴 손과 조항을 시킨 손이 다를 수 있습니다.",
+    entryEcho: "초안을 거슬러 가면 회람 기록이 열립니다. 조항을 쓴 손과 조항을 시킨 손이 다를 수 있습니다.",
     entryLabel: "제7조 초안이 팀 안을 돌던 회람 기록을 연다",
     title: "회람 확인란 여섯 줄",
     speaker: "반재욱",
@@ -418,7 +418,7 @@ export const prologue02 = {
     evidenceNext: "p2_evidence_turn",
     routeLabel: "지난가을 강서지점에서 만난 사람들과 이번 현장 순서를 맞춰 본다",
     systemLabel: "지난가을 보관실에서 새로 짠 판을 제7조 초안 옆에 펴 본다",
-    evidenceLabel: "직전 단서를 붙여 조항을 누가 요청했는지 연다",
+    evidenceLabel: "빈 승인자 칸을 제7조 초안 옆에 놓고 누가 요청했는지 읽는다",
     systemEcho: "펴 보면 두 장의 생김새가 닮았습니다. 가을에는 말로만 보고한 오차가 묶여 있었고, 이번 선반에는 토씨까지 같은 조항이 묶여 있습니다.",
     evidenceEcho: "빈 승인자 칸을 제7조 초안에 대면 회람 확인란이 나옵니다. 이번에는 칸이 비어 있지 않고, 맨 끝 줄이 낯익습니다.",
   },
@@ -642,7 +642,7 @@ export const prologue02 = {
     p2_final_system_route: {
       place: "본점 8층 기록 보관실 · 선반 사이",
       clock: "2023년 4월 17일 월요일 · 22시",
-      question: "이 조항이 쓰이는 방식을 하나만 바꿀 수 있다면, 무엇을 바꾸겠습니까?",
+      question: "같은 조항이 마흔일곱 번 쓰였습니다. 한 건의 이야기로 내겠습니까, 마흔일곱 건의 이야기로 내겠습니까?",
     },
     p2_evidence_turn: {
       place: "본점 6층 심사실 · 문서 이력 화면",
