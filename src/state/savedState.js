@@ -11,6 +11,7 @@ import {
   triggerLabels,
 } from "../gameData.js";
 import { getOutcomeChoiceId, makeEmptyScores } from "../gameLogic.js";
+import { serializeRunState } from "../gauntlet/gauntletEngine.js";
 import { recordAppError } from "./errorRecovery.js";
 import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
@@ -338,15 +339,57 @@ export function normalizeSavedNestedState(state) {
 }
 
 /**
- * The one repair every reader of the save runs: route, metrics, then nested
- * data. `repaired` is true only when a present value was replaced or dropped,
- * which is what earns a recovery notice, a write and a recovery slot.
+ * The table's record, brought to the shape this build deals from. The save
+ * validator asks for the current fields, so a run saved before one of them
+ * existed -- the decision board's blob from before the gauntlet, a table from
+ * before relics -- failed validation and the whole save was discarded on load:
+ * a returning player found a fresh intro. `normalizeRunState` is the engine's
+ * own reading of an older record, and the runtime already ran it; it ran after
+ * the validator had thrown the save away.
+ *
+ * Filling in a field the record never had is not a repair (see
+ * `isMissingSavedValue`). Replacing or dropping one it did have is.
+ */
+function normalizeSavedDynamics(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return { value: state, repaired: false };
+  const saved = state.dynamics;
+  if (isMissingSavedValue(saved)) return { value: state, repaired: false };
+  const current = serializeRunState(saved);
+  if (JSON.stringify(current) === JSON.stringify(saved)) return { value: state, repaired: false };
+  if (!isSavedValueRepaired(saved, current)) return { value: { ...state, dynamics: current }, repaired: false };
+  return {
+    value: {
+      ...state,
+      dynamics: current,
+      paused: true,
+      lastError: state.lastError ?? {
+        id: `repair-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        source: "save-integrity",
+        message: "이전 버전에서 저장한 판 기록을 지금 형식으로 고쳐서 불러왔습니다.",
+        currentCase: state.currentCase,
+        nodeId: state.nodeId,
+      },
+    },
+    repaired: true,
+  };
+}
+
+/**
+ * The one repair every reader of the save runs: route, metrics, nested data,
+ * then the table's record. `repaired` is true only when a present value was
+ * replaced or dropped, which is what earns a recovery notice, a write and a
+ * recovery slot.
  */
 export function repairSavedState(state) {
   const routed = repairSavedRoute(state);
   const measured = normalizeSavedGameplayState(routed);
   const nested = normalizeNestedState(measured);
-  return { state: nested.value, repaired: routed !== state || measured !== routed || nested.repaired };
+  const dealt = normalizeSavedDynamics(nested.value);
+  return {
+    state: dealt.value,
+    repaired: routed !== state || measured !== routed || nested.repaired || dealt.repaired,
+  };
 }
 
 export function createReplaySavedState(seed) {

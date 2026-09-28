@@ -3,16 +3,21 @@ import {
   appendStoredErrorLog,
   createSafeErrorContext,
   parseCurrentSavedState,
+  parseRecoverySlots,
   readStoredValue,
   SAVE_SCHEMA_VERSION,
+  SAVE_SLOT_STORAGE_KEY,
   serializeError,
   STORAGE_KEY,
   writeSaveState,
 } from "../appConfig.js";
 import { getSessionCode, getSessionId, telemetryEnabled } from "../telemetry.js";
 import { createTelemetryEventId } from "./payloadSchemas.js";
-import { pruneTelemetryQueue, sendTelemetryItem } from "./telemetryQueuePolicy.js";
+import { pruneTelemetryQueue, sendTelemetryItem, TELEMETRY_QUEUE_MAX_ITEMS } from "./telemetryQueuePolicy.js";
 import { appendTraceEvent, getTraceEvents } from "./trace.js";
+
+/** The source the root error boundary records under: a screen that failed to draw. */
+export const RENDER_CRASH_SOURCE = "react-render";
 
 function createSafeDomSnapshot(documentRef = globalThis.document) {
   try {
@@ -65,6 +70,25 @@ function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
   };
 }
 
+/**
+ * A slot is a place to go back to, and five copies of the scene that keeps
+ * crashing are one place. The error path used to add a slot for every recorded
+ * error, so three attempts at a broken scene pushed out every slot from before
+ * it and left nothing to roll back to. One slot at the broken point is kept --
+ * it is the only slot a first-case crash has -- and no second one.
+ */
+function hasSlotAtRecoveryPoint(saved) {
+  const slots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
+  const logLength = Array.isArray(saved.log) ? saved.log.length : 0;
+  return slots.some(
+    (slot) =>
+      slot.snapshot.runId === (typeof saved.runId === "string" ? saved.runId : "") &&
+      slot.currentCase === saved.currentCase &&
+      slot.nodeId === saved.nodeId &&
+      slot.snapshot.log.length === logLength,
+  );
+}
+
 function persistErrorRecovery(entry) {
   appendStoredErrorLog(entry);
   const saved = getSavedRecoveryState();
@@ -74,6 +98,10 @@ function persistErrorRecovery(entry) {
   const sameRecoveryPoint =
     previousError?.currentCase === entry.context.currentCase &&
     previousError?.nodeId === entry.context.nodeId;
+  // What the boundary's retry button counts is screens that failed to draw from
+  // this save. A console line or a rejected promise at the same scene is logged
+  // but is not a failed attempt, and must not spend one.
+  const earlierCrashes = sameRecoveryPoint ? Number(previousError.retryCount) || 0 : 0;
   const recoveredSave = {
     ...saved,
     savedAt: entry.occurredAt,
@@ -85,10 +113,12 @@ function persistErrorRecovery(entry) {
       message: entry.error.message,
       currentCase: entry.context.currentCase,
       nodeId: entry.context.nodeId,
-      retryCount: sameRecoveryPoint ? (Number(previousError.retryCount) || 0) + 1 : 1,
+      retryCount: earlierCrashes + (entry.context.source === RENDER_CRASH_SOURCE ? 1 : 0),
     },
   };
-  if (writeSaveState(recoveredSave, { force: true }).saved) appendSaveSlot(recoveredSave);
+  // This edits the stored save, not the run this tab holds (see writeSaveState).
+  if (!writeSaveState(recoveredSave, { sideChannel: true }).saved) return;
+  if (!hasSlotAtRecoveryPoint(recoveredSave)) appendSaveSlot(recoveredSave);
 }
 
 /** `event_id` is minted with the row, so a retry from the queue names the same row. */
@@ -113,24 +143,36 @@ function createErrorTelemetryPayload(entry) {
 }
 
 /**
+ * The rows queued here since the runtime last asked. The runtime keeps the
+ * queue in memory and writes that copy with every save, so a row this file
+ * wrote into storage was gone at the next decision: only an error followed by a
+ * reload ever reached the server. The runtime's save folds these in by id.
+ */
+const queuedSinceLastSave = [];
+
+export function takeQueuedErrorTelemetry() {
+  return queuedSinceLastSave.splice(0);
+}
+
+/**
  * A failed error row joins the save's retry queue. It is written through
  * `writeSaveState` like every other save write, and not over a save another tab
  * has moved on since this tab last wrote: that tab's queue is its own.
  */
-function queueSavedErrorTelemetry(entry, payload) {
+export function queueSavedErrorTelemetry(entry, payload) {
   const saved = getSavedRecoveryState();
   if (!saved?.dataConsent) return false;
   const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
-  const nextQueue = pruneTelemetryQueue([
-    ...pendingTelemetry.filter((item) => item.id !== entry.id),
-    {
-      id: entry.id,
-      queuedAt: new Date().toISOString(),
-      type: "error",
-      label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
-      payload,
-    },
-  ]);
+  const item = {
+    id: entry.id,
+    queuedAt: new Date().toISOString(),
+    type: "error",
+    label: `${entry.context.currentCase} / ${entry.context.nodeId} 에러 로그`,
+    payload,
+  };
+  queuedSinceLastSave.push(item);
+  queuedSinceLastSave.splice(0, Math.max(0, queuedSinceLastSave.length - TELEMETRY_QUEUE_MAX_ITEMS));
+  const nextQueue = pruneTelemetryQueue([...pendingTelemetry.filter((queued) => queued.id !== entry.id), item]);
   return writeSaveState({ ...saved, pendingTelemetry: nextQueue, savedAt: entry.occurredAt }, { isAhead: () => true }).saved;
 }
 
@@ -145,7 +187,26 @@ function reportErrorRecovery(entry) {
   });
 }
 
+/**
+ * One failure, one record. A render crash reaches this file more than once --
+ * React reports it, the boundary that caught it reports it, a boundary that
+ * passed it up reports it again -- and each record used to add one to the
+ * retry count, so the first crash at a scene arrived already at the limit and
+ * the only button left was the one that wipes the save.
+ */
+const recordedErrors = new WeakMap();
+
 export function recordAppError(error, errorInfo = {}, source = "runtime") {
+  const known = error instanceof Error ? recordedErrors.get(error) : null;
+  // A crash first seen as a console line still has to count as a crash.
+  const crashSeenAsSomethingElse = source === RENDER_CRASH_SOURCE && known?.context.source !== RENDER_CRASH_SOURCE;
+  if (known && !crashSeenAsSomethingElse) return known;
+  const entry = recordNewAppError(error, errorInfo, source);
+  if (error instanceof Error) recordedErrors.set(error, entry);
+  return entry;
+}
+
+function recordNewAppError(error, errorInfo, source) {
   const saved = getSavedRecoveryState();
   appendTraceEvent({
     kind: "error",

@@ -776,6 +776,7 @@ test("corrupt error log entries are filtered before the diagnostics panel render
 });
 
 test("restoring a corrupt recovery slot repairs nested data before resume", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     const snapshot = {
@@ -840,6 +841,7 @@ test("storage write failure does not block scene start", async ({ page }) => {
 });
 
 test("recovery slot can be restored and deleted from debug panel", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -929,6 +931,7 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
 });
 
 test("recovery slot delete failure keeps the slot visible", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -982,6 +985,7 @@ test("recovery slot delete failure keeps the slot visible", async ({ page }) => 
 });
 
 test("recovery slot restore repairs invalid saved route before writing", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1029,6 +1033,7 @@ test("recovery slot restore repairs invalid saved route before writing", async (
 });
 
 test("error log clear failure keeps the log visible", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1178,6 +1183,7 @@ test("repeated render errors block the retry loop and preserve recovery choices"
 });
 
 test("error boundary can clear the current saved state", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1209,6 +1215,7 @@ test("error boundary can clear the current saved state", async ({ page }) => {
 });
 
 test("error boundary clear save failure does not reload", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",

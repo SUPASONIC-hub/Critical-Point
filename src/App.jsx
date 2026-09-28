@@ -11,7 +11,8 @@ import {
   writeStoredValue,
 } from "./appConfig.js";
 import { AppContent, resumeSaves, suppressSaves } from "./AppContent.jsx";
-import { getSavedRecoveryState, recordAppError } from "./state/errorRecovery.js";
+import { confirmAction } from "./state/confirmAction.js";
+import { getSavedRecoveryState, recordAppError, RENDER_CRASH_SOURCE } from "./state/errorRecovery.js";
 
 // Two failed reloads from the same save is where retrying stops being a retry.
 // The sentence is written once because the panel prints it twice: as the message
@@ -20,32 +21,47 @@ import { getSavedRecoveryState, recordAppError } from "./state/errorRecovery.js"
 const RETRY_BLOCKED_MESSAGE = "같은 저장 지점에서 오류가 반복되어 재시도를 중단했습니다.";
 const MAX_RETRIES_FROM_ONE_SAVE = 2;
 
+const readRetryCount = () => Number(getSavedRecoveryState()?.lastError?.retryCount) || 0;
+
+/**
+ * What React is told to do with an error a boundary caught (`main.jsx`). Its
+ * default is a bare `console.error(error)`, which the runtime's console hook
+ * read as a second failure and recorded beside the boundary's own record. The
+ * line is still printed, under the prefix that hook knows to leave alone.
+ */
+export function logCaughtRenderError(error) {
+  console.error("Critical Point render error", error);
+}
+
 export function App() {
   return <AppContent onSuppressSaves={suppressSaves} />;
 }
 
 export class AppErrorBoundary extends Component {
-  state = { hasError: false, recoveryMessage: "" };
+  state = { hasError: false, recoveryMessage: "", retryCount: null };
 
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("Critical Point render error", error);
     try {
-      recordAppError(error, errorInfo, "react-render");
+      recordAppError(error, errorInfo, RENDER_CRASH_SOURCE);
     } catch (recoveryError) {
       console.warn("Critical Point recovery logging failed", recoveryError);
     }
+    // The panel is first drawn before this runs, from the count as it stood
+    // before this crash was recorded. Read it again now, so the button the
+    // player sees is the one the count allows.
+    this.setState({ retryCount: readRetryCount() });
   }
 
   reload({ clearSave = false } = {}) {
-    const retryCount = Number(getSavedRecoveryState()?.lastError?.retryCount) || 0;
-    if (!clearSave && retryCount >= MAX_RETRIES_FROM_ONE_SAVE) {
+    if (!clearSave && readRetryCount() >= MAX_RETRIES_FROM_ONE_SAVE) {
       this.setState({ recoveryMessage: RETRY_BLOCKED_MESSAGE });
       return;
     }
+    if (clearSave && !confirmAction("저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다.")) return;
 
     if (clearSave) suppressSaves();
     if (clearSave && !removeStoredValue(STORAGE_KEY)) {
@@ -63,8 +79,8 @@ export class AppErrorBoundary extends Component {
 
   render() {
     const forcedDebugError = debugToolsEnabled && readStoredValue(DEBUG_RENDER_CRASH_KEY) === "1";
-    const retryCount = Number(getSavedRecoveryState()?.lastError?.retryCount) || 0;
     if (!this.state.hasError && !forcedDebugError) return this.props.children;
+    const retryCount = this.state.retryCount ?? readRetryCount();
 
     return (
       <main className="error-screen">
