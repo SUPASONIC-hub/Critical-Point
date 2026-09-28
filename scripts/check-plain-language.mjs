@@ -10,6 +10,10 @@
  *    ("개정을 기안한 부서"). They are banned from every file that holds player
  *    copy.
  *
+ *    The same files are read for what the game said while 판을 다시 짠다 was
+ *    a text box (`RETIRED_PHRASES`): nothing is typed any more, so no scene
+ *    may describe a sentence the player wrote.
+ *
  * 2. A hard word is explained, in parentheses, the first time a player can read
  *    it in a case. Every case can be entered on its own (the debug jump, a
  *    resumed save, a route split), so "first" is per case, not per season. A
@@ -25,6 +29,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, CASE_START_NODES, caseNodePrefix, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
+import { BANNED, RETIRED_PHRASES, findBannedWords, findRetiredPhrases } from "./plain-language-rules.mjs";
 
 // Every case file is copy, so the list reads the folder rather than naming each
 // case: a new case was once added and its file left off this list.
@@ -43,18 +48,13 @@ const COPY_FILES = [
   "src/advancedSystems.js",
 ];
 
-/** Japanese-era banking words, with what the season says instead. */
-const BANNED = {
-  여신: "대출",
-  융자: "대출",
-  품의: "승인 요청",
-  기안: "작성",
-  결재: "승인",
-  금번: "이번",
-  익일: "다음 날",
-  불입: "납입",
-  수순: "순서",
-};
+// Copy a screen prints about the game itself. It never held a bank word, so
+// the banned list does not read it; it did describe the text box.
+const SCREEN_COPY_FILES = [
+  "src/viewModels/sceneViewModels.js",
+  "src/viewModels/reportViewModels.js",
+  "src/state/useResultReport.js",
+];
 
 /**
  * Words a player outside a bank has to be told. Everyday words that happen to
@@ -257,14 +257,14 @@ const failures = [];
 
 for (const file of COPY_FILES) {
   const text = readFileSync(file, "utf8");
-  for (const [word, instead] of Object.entries(BANNED)) {
-    // A Hangul neighbour on the left means the letters are part of another
-    // word (정당해 is not 당해), so only a word start counts.
-    const pattern = new RegExp(`(^|[^가-힣])${word}`, "g");
-    for (const match of text.matchAll(pattern)) {
-      const line = text.slice(0, match.index).split("\n").length;
-      failures.push(`${file}:${line} uses "${word}" -- write "${instead}"`);
-    }
+  for (const { word, instead, line } of findBannedWords(text)) {
+    failures.push(`${file}:${line} uses "${word}" -- write "${instead}"`);
+  }
+}
+for (const file of [...COPY_FILES, ...SCREEN_COPY_FILES]) {
+  const text = readFileSync(file, "utf8");
+  for (const { word, instead, line } of findRetiredPhrases(text)) {
+    failures.push(`${file}:${line} still describes the text box ("${word}") -- the card is staked, not typed: "${instead}"`);
   }
 }
 
@@ -324,4 +324,4 @@ for (const caseId of CASE_SEQUENCE) {
 }
 
 assert.deepEqual(failures, [], failures.join("\n"));
-console.log(`Plain-language check passed (${Object.keys(BANNED).length} banned words, ${GLOSSARY.length} glossary terms across ${CASE_SEQUENCE.length} cases).`);
+console.log(`Plain-language check passed (${Object.keys(BANNED).length} banned words, ${Object.keys(RETIRED_PHRASES).length} retired phrases, ${GLOSSARY.length} glossary terms across ${CASE_SEQUENCE.length} cases).`);
