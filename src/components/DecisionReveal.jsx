@@ -64,6 +64,9 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  * what the card paid and cost, and the rules the next board is dealt with. The
  * last part is the point: the reveal is where the player reads the consequence
  * before they walk into it.
+ *
+ * Each block is a named group: an `aria-label` on a bare `div` names nothing,
+ * because an element with no role has no name to give.
  */
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
@@ -114,7 +117,7 @@ export function DecisionReveal({ view }) {
         </div>
 
         {consequenceLines.length > 0 && (
-          <div className="gx-reveal-consequence" data-testid="consequence-ledger" aria-label="판정 후폭풍">
+          <div className="gx-reveal-consequence" data-testid="consequence-ledger" role="group" aria-label="판정 후폭풍">
             {consequenceLines.map(([label, text]) => (
               <article key={label}>
                 <span>{label}</span>
@@ -125,7 +128,7 @@ export function DecisionReveal({ view }) {
         )}
 
         {verdict && (
-          <div className="gx-reveal-pot" aria-label="판돈">
+          <div className="gx-reveal-pot" role="group" aria-label="판돈">
             {busted ? (
               <p className="gx-reveal-loss">
                 판돈 <b>{formatNumber((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatNumber(verdict.insuredPot ?? 0)}</b>
@@ -153,7 +156,7 @@ export function DecisionReveal({ view }) {
         )}
 
         {decisionReveal.unlockedRelics?.length > 0 && (
-          <div className="gx-reveal-unlock" data-testid="relic-unlocked" aria-label="새로 해금한 도구">
+          <div className="gx-reveal-unlock" data-testid="relic-unlocked" role="group" aria-label="새로 해금한 도구">
             <span>NEW RELIC UNLOCKED</span>
             {decisionReveal.unlockedRelics.map((id) => (
               <b key={id}>
@@ -171,7 +174,7 @@ export function DecisionReveal({ view }) {
         )}
 
         {overclockMutation && !busted && (
-          <div className="gx-reveal-overdrive" data-testid="overdrive-payout" aria-label="오버클럭 발동">
+          <div className="gx-reveal-overdrive" data-testid="overdrive-payout" role="group" aria-label="오버클럭 발동">
             <span>OVERCLOCK TRIGGERED</span>
             <b>{overclockMutation.title}</b>
             <p>다음 판은 칩 2배로 시작하지만, 푸시 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
@@ -182,7 +185,7 @@ export function DecisionReveal({ view }) {
           {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
         </p>
 
-        <div className="decision-reveal-stakes" aria-label="선택으로 열린 것과 닫힌 것">
+        <div className="decision-reveal-stakes" role="group" aria-label="선택으로 열린 것과 닫힌 것">
           <article>
             <span>받은 것</span>
             {gains.length > 0 ? gains.map((entry) => <b key={entry[0]}>{formatEffect(entry)}</b>) : <b>{busted ? "없음 — 벽이 가져갔다" : "없음"}</b>}
@@ -200,7 +203,7 @@ export function DecisionReveal({ view }) {
         )}
 
         {nextMutations.length > 0 && (
-          <div className="gx-reveal-mutations" data-testid="next-mutations" aria-label="다음 판의 규칙 변화">
+          <div className="gx-reveal-mutations" data-testid="next-mutations" role="group" aria-label="다음 판의 규칙 변화">
             <span>다음 판이 이렇게 부서진다</span>
             <ul>
               {nextMutations.map((mutation) => (

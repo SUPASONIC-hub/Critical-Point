@@ -50,7 +50,10 @@ export function EndingSequence({
         />
       </picture>
       <div className="ending-visual-scrim" aria-hidden="true" />
-      <h1 className="sr-only">Season complete</h1>
+      {/* The screen's heading while the report under it is still shut. Once the
+          report opens (step 3) its own h1 is the page's, and a second one here
+          gave the final screen two. */}
+      {endingStep < 3 && <h1 className="sr-only">시즌 완료</h1>}
       <div className="ending-sequence-header">
         <span>SEASON 01 / FINAL RECORD</span>
         <strong>SEASON COMPLETE</strong>
