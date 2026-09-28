@@ -54,7 +54,7 @@ export function inferChoiceCognition(label = "", effect = {}) {
  * A scene says it here, by id, and a pack can say it for its own scenes with
  * `pressure` in its scene context.
  */
-const pressureBeats = new Set([
+export const pressureBeats = new Set([
   "p1_review", "p2_model", "p3_committee", "p4_quota",
   "board", "c2_pressure", "c3_trap", "c4_leak", "c4_vote", "c5_blame", "c5_collapse",
   "c6_logs", "c6_panel", "c8_trail", "c8_bait", "c9_ledger", "c9_timing", "c10_claim",
@@ -83,9 +83,6 @@ const PRESSURE_KINDS = new Set(["decision", "routeFinal", "aftermath"]);
  * as they build; what is left is what the case files wrote.
  */
 function stampSceneFacts(nodes, nodeOrders) {
-  for (const nodeId of pressureBeats) {
-    if (!nodes[nodeId]) throw new Error(`pressureBeats names the scene "${nodeId}", which the graph does not have`);
-  }
   for (const [caseId, order] of Object.entries(nodeOrders)) {
     for (const nodeId of new Set(order)) {
       const scene = nodes[nodeId];
