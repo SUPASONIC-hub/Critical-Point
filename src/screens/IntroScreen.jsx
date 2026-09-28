@@ -192,7 +192,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   <source srcSet={heroArt.wide} type="image/webp" />
                   <img
                     src="/triggerlab-key-visual.jpg"
-                    alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                    alt="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
                     width="1672"
                     height="941"
                     fetchPriority="high"
