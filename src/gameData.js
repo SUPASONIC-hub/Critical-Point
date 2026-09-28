@@ -2534,10 +2534,10 @@ function registerDramaticRoutePlan(caseId, plan) {
   };
   nodes[plan.system.final] = {
     phase: "LAST CALL",
-    title: "준비된 결말 밖에서",
+    title: plan.system.finalTitle ?? "준비된 결말 밖에서",
     speaker: plan.system.speaker,
-    text: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
-    memo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+    text: plan.system.finalText ?? "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
+    memo: plan.system.finalMemo ?? ["다시 짠 판은 새 질문으로 기록됨", "막지 않으면 같은 구조가 반복됨"],
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     choices: makeFinalChoices(plan, plan.system.final),
   };
@@ -2916,7 +2916,7 @@ function registerEvidenceTurnaround(caseId, plan) {
     if (!nodes[routeId]?.choices || nodes[routeId].choices.some((choice) => choice.id === `${routeId}_evidence_turn`)) return;
     nodes[routeId].choices.push({
       id: `${routeId}_evidence_turn`,
-      label: "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
+      label: plan.entryLabel ?? "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
       effect: plan.entryEffect,
       cognition: { inference: 2, reframing: 1 },
       next: plan.node,
@@ -3036,6 +3036,7 @@ const continuityMemoryChoicePlans = {
   },
 };
 coreCards.lay(coreCards.memoryEchoes, (caseId) => continuityMemoryChoicePlans[caseId]);
+coreCards.fileMemoryEchoes(continuityMemoryChoicePlans, echoReplies);
 
 CASE_PACKS.forEach((pack) => {
   continuityMemoryChoicePlans[pack.id] = pack.memoryPlan;
