@@ -1,7 +1,10 @@
+import { readStoredValue, SAVE_BACKUP_STORAGE_KEY } from "../appConfig.js";
 
 export function ErrorLogPanel({ view }) {
-  const { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot } = view;
+  const { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup } = view;
   if (!showErrorLog || (!debugToolsEnabled && !showRecoveryCenter)) return null;
+  // The copy kept of a save this build could not read (useRuntimeSavedState).
+  const hasSaveBackup = Boolean(restoreSaveBackup) && readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) !== null;
   return (
     <section id="error-log-panel" className="error-log-panel" aria-label="로컬 에러 로그" data-testid="error-log-panel">
       <div className="panel-title-row">
@@ -11,10 +14,10 @@ export function ErrorLogPanel({ view }) {
         </div>
         <div className="error-log-actions">
           <button type="button" onClick={copyDiagnosticTrace}>
-            Copy trace
+            기록 복사
           </button>
           <button type="button" onClick={() => exportPlaytestLog({ includeDiagnostics: true })}>
-            Export diagnostics
+            진단 파일 저장
           </button>
           <button type="button" onClick={refreshLocalErrorLog}>
             새로고침
@@ -108,6 +111,21 @@ export function ErrorLogPanel({ view }) {
             새로고침
           </button>
         </div>
+        {hasSaveBackup && (
+          <div className="save-slot-list">
+            <article data-testid="save-backup">
+              <div>
+                <strong>읽지 못한 저장본</strong>
+                <small>이 버전이 읽지 못해 따로 보관한 저장본입니다.</small>
+              </div>
+              <div className="save-slot-actions">
+                <button type="button" data-testid="restore-save-backup" onClick={restoreSaveBackup}>
+                  다시 읽기
+                </button>
+              </div>
+            </article>
+          </div>
+        )}
         {saveSlots.length === 0 ? (
           <p className="error-log-empty">저장된 복구 슬롯이 없습니다.</p>
         ) : (

@@ -4,11 +4,16 @@ export function usePendingTelemetryRef(saved) {
   return useRef(saved?.pendingTelemetry ?? []);
 }
 
+/**
+ * Escape closes what is in front: the reveal, else the recovery centre. 랭킹 and
+ * 게시판 close on Escape too, in `useOverlayScreens`, which the pre-start shell
+ * shares; while one of them is up (`screenOpen`) the key is theirs, so one press
+ * does not also close the recovery centre underneath.
+ */
 export function useRuntimeOverlayShortcuts({
   decisionReveal,
   setDecisionReveal,
-  showRanking,
-  setShowRanking,
+  screenOpen,
   showErrorLog,
   closeRecoveryCenter,
 }) {
@@ -17,15 +22,13 @@ export function useRuntimeOverlayShortcuts({
       if (event.key !== "Escape") return;
       if (decisionReveal) {
         setDecisionReveal(null);
-      } else if (showRanking) {
-        setShowRanking(false);
-      } else if (showErrorLog) {
+      } else if (showErrorLog && !screenOpen) {
         closeRecoveryCenter();
       }
     };
     window.addEventListener("keydown", closeOverlay);
     return () => window.removeEventListener("keydown", closeOverlay);
-  }, [closeRecoveryCenter, decisionReveal, setDecisionReveal, setShowRanking, showErrorLog, showRanking]);
+  }, [closeRecoveryCenter, decisionReveal, screenOpen, setDecisionReveal, showErrorLog]);
 }
 
 /**

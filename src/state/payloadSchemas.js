@@ -107,7 +107,7 @@ export function sanitizeTelemetryQueue(queue) {
     .filter((item) => validateTelemetryItem(item).length === 0);
 }
 
-export function validateSavedStatePayload(state) {
+export function validateSavedStatePayload(state, { dynamics: checkDynamics = true } = {}) {
   const errors = [];
   if (!state || typeof state !== "object" || Array.isArray(state)) return ["state must be an object"];
   for (const key of ["completedCases", "discoveredClues", "log", "pendingTelemetry"]) {
@@ -119,7 +119,7 @@ export function validateSavedStatePayload(state) {
   if (typeof state.currentCase !== "string") errors.push("invalid currentCase");
   if (typeof state.nodeId !== "string") errors.push("invalid nodeId");
   if (state.runId !== undefined && typeof state.runId !== "string") errors.push("invalid runId");
-  if (state.dynamics !== undefined && state.dynamics !== null) {
+  if (checkDynamics && state.dynamics !== undefined && state.dynamics !== null) {
     // The gauntlet run: pot, vault, and the rules the next window is dealt from.
     const run = state.dynamics;
     if (!run || typeof run !== "object" || Array.isArray(run)) {

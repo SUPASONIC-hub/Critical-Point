@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
@@ -8,27 +8,34 @@ import {
   RECOVERY_CENTER_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
+  backUpUnreadableSave,
+  claimTabToken,
   createRunId,
   debugToolsEnabled,
   makeEmptyScores,
   normalizePlayerName,
   getInvalidSavedStateKeys,
+  hasRecoverySlots,
   isSavedStateShapeValid,
   parseCurrentSavedState,
   readStoredValue,
+  readUnreadableSave,
   removeStoredValue,
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "./gameCases.js";
-import { cognitionLabels, initialResources, triggerLabels } from "./gameConstants.js";
+import { cognitionLabels, triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
+import { LazyScreen } from "./components/LazyScreen.jsx";
 import { IntroScreen, loadGameRuntime, prefetchGameRuntime, queueRuntimeStartAction } from "./screens/IntroScreen.jsx";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
 import { useBoard } from "./state/useBoard.js";
+import { useOverlayScreens } from "./state/useOverlayScreens.js";
+import { createOpeningResources } from "./state/openingState.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
 import { getOperatorProfiles } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
@@ -38,7 +45,11 @@ import { recordAppError } from "./state/errorRecovery.js";
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
 // stays lazy and starts downloading while the intro is read (see below).
-const GameRuntime = lazy(() => loadGameRuntime().then(({ GameRuntime }) => ({ default: GameRuntime })));
+// The runtime is what deals the table, and the table reads this tab's token, so
+// it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
+const GameRuntime = lazy(() =>
+  Promise.all([loadGameRuntime(), claimTabToken()]).then(([{ GameRuntime }]) => ({ default: GameRuntime })),
+);
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
 
@@ -55,17 +66,6 @@ export function resumeSaves() {
   saveSuppressed = false;
 }
 
-/** What a lazy screen shows while its chunk arrives: a status, not a blank page. */
-function ScreenLoading() {
-  return (
-    <main className="shell screen-loading" aria-busy="true">
-      <p className="save-status" role="status">
-        장면을 불러오는 중입니다.
-      </p>
-    </main>
-  );
-}
-
 /**
  * The save as the shell reads it. It repairs nothing: which scene a case may
  * resume at is a question for the scene graph, and the runtime's
@@ -76,8 +76,12 @@ function readShellSave() {
   return parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
 }
 
+// The table's record is left out: an older one is brought up to date by the
+// runtime's repair, and is not a fault until that has been tried.
+const isShellSaveValid = (saved) => isSavedStateShapeValid(saved, { dynamics: false });
+
 function reportInvalidShellSave(saved) {
-  if (!saved || isSavedStateShapeValid(saved)) return;
+  if (!saved || isShellSaveValid(saved)) return;
   const error = new Error(`[silent:save-shape] ${JSON.stringify({
     currentCase: saved?.currentCase,
     nodeId: saved?.nodeId,
@@ -95,7 +99,19 @@ function readNewGamePlusMemory() {
   }
 }
 
-function createStartSave({ playerName, playStyle, dataConsent }) {
+/**
+ * Whether the save in storage is one the player should be shown the recovery
+ * centre for: it is there, this build cannot use it as it stands, and there are
+ * slots to go back to. The shell has no recovery centre of its own, so it hands
+ * over to the runtime, which keeps a copy of the save before anything writes
+ * over it (useRuntimeSavedState).
+ */
+function needsRecovery(saved) {
+  const unusable = saved ? !isShellSaveValid(saved) : readUnreadableSave() !== null;
+  return unusable && hasRecoverySlots();
+}
+
+function createStartSave({ playerName, playStyle, dataConsent, operatorOrigin }) {
   const now = Date.now();
   return {
     saveSchemaVersion: SAVE_SCHEMA_VERSION,
@@ -111,7 +127,7 @@ function createStartSave({ playerName, playStyle, dataConsent }) {
     caseResults: {},
     playtestFeedback: {},
     nodeId: SEASON_ENTRY_NODE,
-    resources: initialResources,
+    resources: createOpeningResources(operatorOrigin),
     log: [],
     triggers: makeEmptyScores(triggerLabels),
     cognition: makeEmptyScores(cognitionLabels),
@@ -166,11 +182,12 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
       Boolean(replaySeed) ||
       Boolean(saved?.started) ||
       Boolean(saved?.lastError) ||
-      Boolean(saved?.dataConsent && saved?.pendingTelemetry?.length > 0),
+      Boolean(saved?.dataConsent && saved?.pendingTelemetry?.length > 0) ||
+      needsRecovery(saved),
   );
   const [initialStartState, setInitialStartState] = useState(null);
-  const [showRanking, setShowRanking] = useState(false);
-  const [showBoard, setShowBoard] = useState(false);
+  const { showRanking, showBoard, setShowRanking, setShowBoard } = useOverlayScreens();
+  const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [dataConsent, setDataConsent] = useState(Boolean(saved?.dataConsent));
@@ -201,6 +218,9 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   // Reported once, after the first paint, rather than from inside a render.
   useEffect(() => {
     reportInvalidShellSave(saved);
+    // A save that would not read is kept before a preference typed on this
+    // screen, or a new run started from it, is written in its place.
+    if (!saved) backUpUnreadableSave(readUnreadableSave());
   }, [saved]);
 
   // The intro is up; fetch the runtime while the player reads it.
@@ -216,19 +236,19 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
 
   if (runtimeActive) {
     return (
-      <Suspense fallback={<ScreenLoading />}>
+      <LazyScreen>
         <GameRuntime
           onSuppressSaves={onSuppressSaves}
           saveControls={saveControls}
           initialStartState={initialStartState}
         />
-      </Suspense>
+      </LazyScreen>
     );
   }
 
   if (showRanking) {
     return (
-      <Suspense fallback={<ScreenLoading />}>
+      <LazyScreen>
         <RankingScreen
           Music={AdaptiveMusic}
           gameTitle={GAME_TITLE}
@@ -241,25 +261,25 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
           triggerLabels={triggerLabels}
           onClose={() => setShowRanking(false)}
         />
-      </Suspense>
+      </LazyScreen>
     );
   }
 
   if (showBoard) {
     return (
-      <Suspense fallback={<ScreenLoading />}>
+      <LazyScreen>
         <BoardScreen
           {...board}
           Music={AdaptiveMusic}
           gameTitle={GAME_TITLE}
           onClose={() => setShowBoard(false)}
         />
-      </Suspense>
+      </LazyScreen>
     );
   }
 
   function persist(nextState) {
-    const current = readShellSave() ?? createStartSave({ playerName, playStyle, dataConsent });
+    const current = readShellSave() ?? createStartSave({ playerName, playStyle, dataConsent, operatorOrigin });
     const payload = { ...current, ...nextState, started: false, savedAt: new Date().toISOString() };
     const storageSaved = writeSaveState(payload, { force: true }).saved;
     if (!storageSaved) setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
@@ -267,7 +287,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   }
 
   function startGame() {
-    const payload = createStartSave({ playerName, playStyle, dataConsent });
+    const payload = createStartSave({ playerName, playStyle, dataConsent, operatorOrigin });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     if (!writeSaveState(payload, { force: true }).saved) {
       setSaveStatus("브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.");
@@ -351,7 +371,9 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     completedCases: saved?.completedCases ?? [],
     currentCase: saved?.currentCase ?? SEASON_ENTRY_CASE,
     newGamePlusUnlocked: readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true",
-    newGamePlusMemory: readNewGamePlusMemory(),
+    // Read once: it is every case summary of a finished season, and this
+    // object is rebuilt on each keystroke in the name field.
+    newGamePlusMemory,
     nextParticipantMessage: readStoredValue(NEXT_PARTICIPANT_MESSAGE_KEY, ""),
     startGame,
     startCase,

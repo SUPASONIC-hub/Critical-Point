@@ -1,0 +1,57 @@
+{
+  "era": "v1 -- the prototype, before saves carried a schema version",
+  "writtenBy": "persist() in src/main.jsx at 2fab6b1 (2026-08-14), the commit before 9f6367c",
+  "save": {
+    "playerName": "분석관",
+    "dataConsent": false,
+    "started": true,
+    "currentCase": "case01",
+    "completedCases": [],
+    "caseResults": {},
+    "playtestFeedback": {},
+    "nodeId": "payday",
+    "resources": { "time": 60, "capital": 92, "trust": 54, "legitimacy": 47, "humanCost": 6, "fatigue": 18 },
+    "log": [
+      {
+        "nodeId": "start",
+        "title": "72시간",
+        "choice": "핵심 인력만 남기고 구조조정을 시작한다",
+        "spokenChoice": "핵심 인력만 남기고 구조조정을 시작합니다.",
+        "freeText": "",
+        "effect": { "time": -6, "capital": 4, "trust": -3, "humanCost": 6 },
+        "triggers": ["responsibility", "fear"],
+        "echo": "사람을 줄여 시간을 샀습니다.",
+        "sceneBeat": "회의실의 공기가 한 번 식었습니다.",
+        "challenge": { "title": "72시간 안에 현금 지키기", "matched": true, "riskDelta": -2 },
+        "note": "",
+        "responseTimeSec": 14,
+        "resourcesBefore": { "time": 72, "capital": 100, "trust": 50, "legitimacy": 50, "humanCost": 0, "fatigue": 10 },
+        "resourcesAfter": { "time": 66, "capital": 100, "trust": 47, "legitimacy": 50, "humanCost": 6, "fatigue": 10 }
+      },
+      {
+        "nodeId": "accounting",
+        "title": "장부의 시점",
+        "choice": "매출 인식 시점을 그대로 둔다",
+        "spokenChoice": "장부는 손대지 않겠습니다.",
+        "freeText": "",
+        "effect": { "time": -6, "capital": -8, "trust": 7, "legitimacy": -3, "fatigue": 8 },
+        "triggers": ["order", "trust"],
+        "echo": "숫자를 고치지 않은 값은 현금으로 치렀습니다.",
+        "sceneBeat": "재무책임자가 펜을 내려놓았습니다.",
+        "challenge": { "title": "장부를 지키기", "matched": false, "riskDelta": 3 },
+        "note": "",
+        "responseTimeSec": 22,
+        "resourcesBefore": { "time": 66, "capital": 100, "trust": 47, "legitimacy": 50, "humanCost": 6, "fatigue": 10 },
+        "resourcesAfter": { "time": 60, "capital": 92, "trust": 54, "legitimacy": 47, "humanCost": 6, "fatigue": 18 }
+      }
+    ],
+    "triggers": {
+      "protection": 0, "injustice": 0, "responsibility": 1, "competition": 0, "reward": 0, "curiosity": 0,
+      "order": 1, "trust": 1, "affection": 0, "recognition": 0, "fear": 1
+    },
+    "cognition": { "persistence": 1, "inference": 1, "reframing": 0, "risk": 0 },
+    "echo": "숫자를 고치지 않은 값은 현금으로 치렀습니다.",
+    "nodeEnteredAt": 1755150000000
+  },
+  "expect": { "currentCase": "case01", "nodeId": "payday", "logLength": 2, "repaired": true }
+}

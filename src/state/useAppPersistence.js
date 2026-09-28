@@ -12,6 +12,7 @@ import {
   readStoredValue,
   removeStoredValue,
   restoreRecoverySnapshot,
+  SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
   SAVE_STATE_KEYS,
@@ -27,10 +28,20 @@ import {
   shouldCaptureSaveSlot,
 } from "./savedState.js";
 import { clearReplayFromLocation } from "./trace.js";
+import { confirmAction } from "./confirmAction.js";
+import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
+import { createOpeningResources } from "./openingState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
+
+// Asked before a control throws progress away, the way 초기화 asks.
+const CONFIRM_START_FRESH = "저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다.";
+const CONFIRM_RESTORE_SLOT = "이 복구 지점으로 되돌릴까요? 그 뒤의 이야기 진행은 사라집니다.";
+const CONFIRM_DELETE_SLOT = "이 복구 지점을 지울까요? 지운 뒤에는 되돌릴 수 없습니다.";
+const CONFIRM_CLEAR_ERROR_LOG = "오류 기록을 모두 지울까요?";
+const CONFIRM_RESTORE_BACKUP = "읽지 못했던 저장본을 다시 읽어 지금 진행 대신 불러올까요?";
 
 // What a refused write says. Each names why nothing was written: the old code
 // printed the storage-unavailable line for all three, which sent a player whose
@@ -63,13 +74,25 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
     setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
-    setLocalErrorEntries, setSaveSlots,
+    setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
   } = setters;
   const {
-    normalizePlayerName, initialResources, triggerLabels, cognitionLabels,
-    makeEmptyScores, persistSuppressed, onSuppressSaves, formatSaveTime,
-    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave,
+    normalizePlayerName, triggerLabels, cognitionLabels,
+    makeEmptyScores, persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime,
+    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin,
   } = config;
+
+  /** The queue as the next save should hold it: this tab's, plus rows the error path queued in storage. */
+  function foldQueuedErrorTelemetry() {
+    const queued = takeQueuedErrorTelemetry();
+    const known = new Set(pendingTelemetryRef.current.map((item) => item.id));
+    const added = queued.filter((item) => !known.has(item.id));
+    if (added.length === 0) return pendingTelemetryRef.current;
+    pendingTelemetryRef.current = [...pendingTelemetryRef.current, ...added];
+    setPendingTelemetry?.(pendingTelemetryRef.current);
+    return pendingTelemetryRef.current;
+  }
+
   function persist(nextState, { force = false } = {}) {
     if (persistSuppressed()) return { storageSaved: false };
     const baseState = {
@@ -92,7 +115,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
       cognition,
       echo,
       nodeEnteredAt,
-      pendingTelemetry: pendingTelemetryRef.current,
+      pendingTelemetry: foldQueuedErrorTelemetry(),
       protocolUsed,
       timerPenaltyCount,
       probeUsed,
@@ -136,17 +159,18 @@ export function useAppPersistence({ state, refs, setters, config }) {
     const nextRunId = createRunId();
     const emptyTriggers = makeEmptyScores(triggerLabels);
     const emptyCognition = makeEmptyScores(cognitionLabels);
+    const openingResources = createOpeningResources(operatorOrigin);
     setRunId(nextRunId);
     setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase(SEASON_ENTRY_CASE);
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
-    setResources(initialResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
+    setResources(openingResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
     setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
     setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: initialResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {
@@ -159,9 +183,12 @@ export function useAppPersistence({ state, refs, setters, config }) {
   }
 
   function startFreshAfterRecovery() {
+    if (!confirmAction(CONFIRM_START_FRESH)) return;
     onSuppressSaves();
     leaveReplaySession();
-    if (!removeStoredValue(STORAGE_KEY)) { setSaveStatus("저장본을 초기화하지 못했습니다."); return; }
+    // Nothing was removed and nothing reloads, so the run on screen goes on and
+    // has to be saved again: the suppression used to outlive the failure.
+    if (!removeStoredValue(STORAGE_KEY)) { onResumeSaves?.(); setSaveStatus("저장본을 초기화하지 못했습니다."); return; }
     writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1"); removeStoredValue(debugErrorKey); window.location.reload();
   }
 
@@ -195,9 +222,10 @@ export function useAppPersistence({ state, refs, setters, config }) {
   function closeRecoveryCenter() { setShowErrorLog(false); setShowRecoveryCenter(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
 
   function clearLocalErrorLog() {
+    if (!confirmAction(CONFIRM_CLEAR_ERROR_LOG)) return;
     if (!removeStoredValue(ERROR_LOG_STORAGE_KEY)) {
       recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
-      setSaveStatus("Error log clear failed: browser storage is unavailable.");
+      setSaveStatus("오류 기록을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.");
       refreshLocalErrorLog();
       return;
     }
@@ -205,25 +233,42 @@ export function useAppPersistence({ state, refs, setters, config }) {
   }
 
   function deleteSaveSlot(slotId) {
+    if (!confirmAction(CONFIRM_DELETE_SLOT)) return;
     const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
     if (!writeStoredValue(SAVE_SLOT_STORAGE_KEY, JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: nextSlots }))) {
       recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
-      setSaveStatus("Delete failed: browser storage is unavailable."); return;
+      setSaveStatus("복구 지점을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다."); return;
     }
     setSaveSlots(nextSlots);
   }
 
-  function restoreSaveSlot(slot) {
-    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-    const restored = carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current);
-    const { state: repaired } = repairSavedState(restored);
-    if (!repaired || !isSavedStateShapeValid(repaired)) {
-      setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
-      return;
+  /**
+   * Writes a save over the current one and reloads into it. Saves are
+   * suppressed first: the reload fires `pagehide`, whose handler saves the run
+   * this tab still holds in memory, and that run is the one being replaced. A
+   * slot restored in the middle of play used to be written, overwritten by that
+   * save, and reloaded into the scene the player was trying to leave.
+   */
+  function replaceSaveAndReload(nextState, { source, what, failure }) {
+    onSuppressSaves();
+    leaveReplaySession();
+    if (!writeSaveState(nextState, { force: true }).saved) {
+      onResumeSaves?.();
+      recordAppError(new Error(`${what} failed because local storage could not be written.`), {}, source);
+      setSaveStatus(failure);
+      return false;
     }
-    // A slot rolls back the story, not the network's backlog or the feedback
+    window.location.reload();
+    return true;
+  }
+
+  /** A slot, or any save text, made into the paused save a reload will open. */
+  function createRestoredSave(restored, current) {
+    const { state: repaired } = repairSavedState(restored);
+    if (!repaired || !isSavedStateShapeValid(repaired)) return null;
+    // A restore rolls back the story, not the network's backlog or the feedback
     // the player already wrote: both are kept from the current save.
-    const nextState = normalizeSavedGameplayState({
+    return normalizeSavedGameplayState({
       ...repaired,
       playtestFeedback: isSavedStateShapeValid(current) ? current.playtestFeedback : repaired.playtestFeedback,
       pendingTelemetry: isSavedStateShapeValid(current) ? current.pendingTelemetry : repaired.pendingTelemetry,
@@ -231,14 +276,45 @@ export function useAppPersistence({ state, refs, setters, config }) {
       started: false,
       savedAt: new Date().toISOString(),
     });
-    leaveReplaySession();
-    if (!writeSaveState(nextState, { force: true }).saved) {
-      recordAppError(new Error("Save slot restore failed because local storage could not be written."), {}, "save-slot-restore");
-      setSaveStatus("Restore failed: browser storage is unavailable.");
-      return;
-    }
-    window.location.reload();
   }
 
-  return { persist, startGame, resumeSavedGame, pauseAfterRecovery, startFreshAfterRecovery, saveCurrentGame, refreshLocalErrorLog, refreshSaveSlots, dismissRecoveryNotice, closeRecoveryCenter, clearLocalErrorLog, deleteSaveSlot, restoreSaveSlot };
+  function restoreSaveSlot(slot) {
+    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const nextState = createRestoredSave(carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current), current);
+    if (!nextState) {
+      setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
+      return;
+    }
+    if (!confirmAction(CONFIRM_RESTORE_SLOT)) return;
+    replaceSaveAndReload(nextState, {
+      source: "save-slot-restore",
+      what: "Save slot restore",
+      failure: "복구 지점을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+    });
+  }
+
+  /**
+   * The save this build could not read when it was found (`backUpUnreadableSave`),
+   * read again. A newer build may read what an older one could not, which is the
+   * rolled-back deploy the copy is kept for.
+   */
+  function restoreSaveBackup() {
+    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const backup = parseCurrentSavedState(readStoredValue(SAVE_BACKUP_STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+    const nextState = backup ? createRestoredSave(backup, current) : null;
+    if (!nextState) {
+      setSaveStatus("보관한 저장본은 이 버전에서도 읽을 수 없습니다. 지우지 않고 그대로 둡니다.");
+      return;
+    }
+    if (!confirmAction(CONFIRM_RESTORE_BACKUP)) return;
+    const restored = replaceSaveAndReload(nextState, {
+      source: "save-backup-restore",
+      what: "Save backup restore",
+      failure: "보관한 저장본을 불러오지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.",
+    });
+    // It is the save now; the kept copy has done what it was kept for.
+    if (restored) removeStoredValue(SAVE_BACKUP_STORAGE_KEY);
+  }
+
+  return { persist, startGame, resumeSavedGame, pauseAfterRecovery, startFreshAfterRecovery, saveCurrentGame, refreshLocalErrorLog, refreshSaveSlots, dismissRecoveryNotice, closeRecoveryCenter, clearLocalErrorLog, deleteSaveSlot, restoreSaveSlot, restoreSaveBackup };
 }
