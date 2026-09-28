@@ -165,47 +165,4 @@ export const case03Nodes = {
       },
     ],
   },
-  c3_final: {
-    phase: "FINAL DECISION",
-    title: "이기는 것과 맞는 것",
-    speaker: "한서윤",
-    text:
-      "최종 발표 직전입니다. 당신은 오진우를 이길 수 있고, 고객을 설득할 수도 있습니다. 한서윤이 복도에서 휴대폰을 내려놓으며 말합니다. '방금 그룹전략실에서 연락이 왔습니다. 오늘 결과를 두 사람 이름으로 따로 올리라고 합니다. 누가 이겼는지가 아니라, 두 사람이 어떻게 달랐는지를 올리라고요.' 이기는 것과 맞는 것 중 무엇이 기록될지 정해야 합니다.",
-    memo: [
-      "고객사는 숫자가 좋은 안을 원함",
-      "보안 결함은 아직 완전히 증명되지 않음",
-      "오진우는 공동 발표 의사가 있음",
-      "결과는 두 사람의 차이 형태로 그룹전략실에 보고됨",
-    ],
-    triggers: ["competition", "recognition", "responsibility", "curiosity"],
-    choices: [
-      {
-        id: "final_win",
-        label: "오진우를 이기는 독자안을 발표한다",
-        effect: { capital: 15, trust: -5, legitimacy: -4, humanCost: 6, fatigue: 2 },
-        next: "case03_result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "final_right",
-        label: "보안 리스크를 중심으로 느리지만 견고한 안을 낸다",
-        effect: { capital: -6, trust: 5, legitimacy: 8, humanCost: -5, fatigue: 4 },
-        next: "case03_result",
-        cognition: { persistence: 2, inference: 2 },
-      },
-      {
-        id: "final_joint",
-        label: "오진우와 공동안을 만들고 경쟁 구조를 무력화한다",
-        effect: { capital: 6, trust: 11, legitimacy: 4, fatigue: 4 },
-        next: "case03_result",
-        cognition: { reframing: 3, risk: 1 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "case03_result",
-      },
-    ],
-  },
 };

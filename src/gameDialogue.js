@@ -12,6 +12,7 @@
  * the one a Korean bank actually uses today, and anything a fifteen-year-old
  * would not know is unpacked in brackets the first time it appears.
  */
+import { CASE_SEQUENCE } from "./gameCases.js";
 import { CASE_PACKS } from "./nodes/casePacks.js";
 export const characterProfiles = {
   한서윤: {
@@ -144,7 +145,86 @@ export const characterProfiles = {
     voice: "판단을 대신하지 않고, 말하지 않은 전제와 숨은 피해자를 끌어낸다.",
     line: "방금 판단에서 빠진 사람을 다시 계산하십시오.",
   },
+  노아: {
+    role: "KD데이터랩 AI 심사 엔진 · 에코의 후임",
+    stance: "속도 · 점수 · 학습된 관행",
+    job: "1초도 걸리지 않아 판단하고, 무엇을 보고 배웠는지는 물어야만 말한다.",
+    appearance: "파란 불이 흐르는 서버 선반, 업무 창 구석의 작은 입력 칸, 1,412줄짜리 학습 데이터 목록.",
+    thought: "나는 이 은행이 해 온 대로 판단한다. 해 온 일이 옳았는지는 학습 목록에 없었다.",
+    gesture: "노아는 망설이지 않는다. 질문이 끝나기 전에 근거 항목과 가중치가 화면에 펼쳐진다.",
+    voice: "감정 없이 숫자로 답하고, 자기 판단을 '학습되어 있습니다'라는 말로 설명한다.",
+    line: "그 기준은 제가 만든 것이 아닙니다. 그렇게 학습되어 있습니다.",
+  },
 };
+
+/**
+ * Who someone is depends on when you meet them.
+ *
+ * A profile used to be looked up by name alone, so the speaker card printed one
+ * role for the whole season: in the 프롤로그, set in 2022-23, 한서윤 was already
+ * 트리거랩 실장 of a lab that did not exist yet and 윤상혁 already the 상무 he
+ * became later; after 사건 25 everyone was still at the desk the lab's closing
+ * took from them. Only the role moves. The way someone holds a pen does not
+ * change with the posting, so everything else stays the profile's own.
+ *
+ * A later row wins, so a span inside a span is written after it.
+ */
+const characterRoleSpans = [
+  {
+    from: "prologue01",
+    to: "prologue05",
+    roles: {
+      오진우: "KD은행 기업금융전략팀 대리 · 당신의 사수",
+      한서윤: "KD은행 기업금융전략팀 과장",
+      윤상혁: "KD은행 기업금융전략팀장",
+      임경수: "KD은행 기업대출심사팀장",
+      도윤하: "KD은행 강서지점 4번 창구 · 입행 3년차",
+    },
+  },
+  {
+    from: "case08",
+    to: "case08",
+    roles: { 오진우: "전 트리거랩 분석관 · 사직 후 혼자 추적 중" },
+  },
+  {
+    // 트리거랩 is dissolved at the end of 사건 24 and the six are posted apart.
+    from: "case25",
+    to: "final",
+    roles: {
+      한서윤: "대기발령 중 · 전 트리거랩 실장",
+      도윤하: "KD은행 강서지점 창구 · 전 트리거랩 현장 담당",
+      오진우: "브릿지은행 팀장 · 전 트리거랩 분석관",
+      이민서: "KD데이터랩 데이터사업팀 · 전 트리거랩 데이터 기록 담당",
+      반재욱: "KD금융그룹 감사팀 조사역 · 지방 순회 중",
+      윤상혁: "KD캐피탈 대표이사 · 전 그룹전략실 상무",
+    },
+  },
+  {
+    // The board removes him on 9월 7일, in 사건 43.
+    from: "case44",
+    to: "final",
+    roles: { 윤상혁: "이사회에서 해임된 전 사내이사 · 자문료 배임 사건 피고인" },
+  },
+];
+
+/** What a pack says about someone for the length of its own case: `characterOverrides`. */
+const packCharacterOverrides = {};
+
+/** A name two packs both introduce. One person per name; `check:graph` fails on any. */
+export const characterProfileCollisions = [];
+
+export function getCharacterProfile(name, caseId) {
+  const profile = characterProfiles[name];
+  if (!profile) return null;
+  const position = CASE_SEQUENCE.indexOf(caseId);
+  if (position < 0) return profile;
+  const role = characterRoleSpans.reduce(
+    (current, span) =>
+      span.roles[name] && position >= CASE_SEQUENCE.indexOf(span.from) && position <= CASE_SEQUENCE.indexOf(span.to) ? span.roles[name] : current,
+    profile.role,
+  );
+  return { ...profile, role, ...packCharacterOverrides[caseId]?.[name] };
+}
 export const choiceVoiceLines = {
   // CASE 07. The season's one case where the analyst asks instead of decides,
   // so the lines are spoken to a person in the room rather than to a document.
@@ -784,7 +864,7 @@ export const authoredEchoReplies = {
   funding:
     "단기 자금은 가장 깔끔해 보입니다. 다만 회계 인식 문제가 드러나면 새 자금은 책임 회피로 보일 수 있습니다.",
   start_sale:
-    "핵심 사업부 매각은 생존 가능성을 높입니다. 하지만 넥스트마일가 이 상황을 이용하고 있다는 점도 무시할 수 없습니다.",
+    "핵심 사업부 매각은 생존 가능성을 높입니다. 하지만 넥스트마일이 이 상황을 이용하고 있다는 점도 무시할 수 없습니다.",
   accounting_disclosure:
     "투명성은 신뢰를 회복할 수 있습니다. 동시에 투자 협상은 즉시 중단될 수 있습니다. 이 손실을 감당할 준비가 있습니까?",
   accounting_delay:
@@ -1344,5 +1424,12 @@ export const authoredEchoReplies = {
 for (const pack of CASE_PACKS) {
   Object.assign(choiceVoiceLines, pack.voiceLines);
   Object.assign(authoredEchoReplies, pack.echoReplies);
-  Object.assign(characterProfiles, pack.characterProfiles);
+  for (const [name, profile] of Object.entries(pack.characterProfiles ?? {})) {
+    // A pack introduces its own people. Someone the season already knows is
+    // not introduced twice: what changes for them in this case goes in
+    // `characterOverrides`, which holds for this case only.
+    if (characterProfiles[name]) characterProfileCollisions.push(`${name} (${pack.id})`);
+    else characterProfiles[name] = profile;
+  }
+  if (pack.characterOverrides) packCharacterOverrides[pack.id] = pack.characterOverrides;
 }

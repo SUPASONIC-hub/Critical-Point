@@ -165,47 +165,4 @@ export const case02Nodes = {
       },
     ],
   },
-  c2_final: {
-    phase: "FINAL DECISION",
-    title: "증거와 사람 사이",
-    speaker: "한서윤",
-    text:
-      "완전한 진실은 아직 없습니다. 하지만 보고는 지금 올라가야 합니다. 한서윤이 서류를 밀어 놓으며 말합니다. '하나만 알고 쓰십시오. 이 보고서는 감사팀이 아니라 그룹전략실로 먼저 올라갑니다. 거기 상무가 3년 전 기업금융전략팀장이었습니다.' 기록을 믿을지, 사람의 맥락을 더 팔지, 둘 다 흔드는 제3의 가능성을 공식화할지 정해야 합니다.",
-    memo: [
-      "이민서 징계 여부는 1차 보고에 크게 좌우됨",
-      "유출된 파일은 서명란이 빈 보고서 3페이지",
-      "보고 경로: 감사팀이 아니라 그룹전략실 먼저",
-      "그룹전략실 윤상혁 상무 = 3년 전 기업금융전략팀장",
-    ],
-    triggers: ["trust", "injustice", "responsibility", "curiosity"],
-    choices: [
-      {
-        id: "final_evidence",
-        label: "기록 증거 중심으로 보고한다",
-        effect: { trust: -12, legitimacy: 8, humanCost: 8, fatigue: 2 },
-        next: "case02_result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "final_person",
-        label: "이민서 보호와 추가 검증 필요성을 보고한다",
-        effect: { trust: 11, legitimacy: -4, fatigue: 4 },
-        next: "case02_result",
-        cognition: { persistence: 2, inference: 1 },
-      },
-      {
-        id: "c2_final_final_system",
-        label: "개인 혐의보다 시스템 조작 가능성을 공식화한다",
-        effect: { time: -6, trust: 3, legitimacy: 3, fatigue: 4 },
-        next: "case02_result",
-        cognition: { reframing: 3, inference: 2 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "case02_result",
-      },
-    ],
-  },
 };

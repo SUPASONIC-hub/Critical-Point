@@ -94,12 +94,6 @@ export const sceneContext = {
     question: "직원·생존·책임·투자자·협력사를 전부 지킬 수는 없습니다. 무엇을 맨 앞에 두겠습니까?",
     lead: "이틀 동안 모은 자료가 한 테이블에 올라왔습니다. 에코가 모든 항목을 동시에 만족시키는 조합이 없다고 표시합니다.",
   },
-  final: {
-    place: "플로우온 본사 8층 상황실",
-    clock: "현금 소진 D-6h",
-    question: "남은 시간은 6시간입니다. 어떤 손실을 감수한 채 이 사건을 닫겠습니까?",
-    lead: "회의 화면 한쪽에 당신의 반응 패턴이 다음 테스트 케이스에 반영된다는 알림이 잠깐 떴다가 사라집니다.",
-  },
   c1_witness: {
     place: "플로우온 본사 8층 회계팀 복도",
     clock: "현금 소진 D-66h",
@@ -399,11 +393,6 @@ export const sceneContext = {
     question: "이 케이스가 입찰이 아니라 당신의 검증 포기를 보는 구조일 수 있습니다. 그래도 이기러 가겠습니까?",
     lead: "발표를 앞두고 반재욱이 조용히 다가옵니다. 오진우도 같은 말을 들었는지는 알 수 없습니다.",
   },
-  c3_final: {
-    place: "노바웍스 발표장",
-    clock: "최종 발표 직전",
-    question: "이길 수도, 맞을 수도 있습니다. 무엇을 기준으로 이 승부를 끝내겠습니까?",
-  },
   c3_rival: {
     place: "노바웍스 입찰 대기실",
     clock: "입찰 마감까지 2h 40m",
@@ -543,11 +532,6 @@ export const sceneContext = {
     question: "규칙을 지키면 사람이 서비스를 잃고, 넓히면 신뢰가 깎입니다. 어느 쪽 비용을 공식화하겠습니까?",
     lead: "선의의 문제는 끝났습니다. 이제 어느 쪽 손실에 서명할지의 문제입니다.",
   },
-  c4_final: {
-    place: "온새 이사회실",
-    clock: "심사 자료 제출 직전",
-    question: "사람도 원칙도 완전히는 지킬 수 없습니다. 당신의 허용선을 어디에 긋겠습니까?",
-  },
   c4_audit: {
     place: "온새 운영 검토실 · 산식 검토석",
     clock: "지원금 심사까지 6h",
@@ -686,11 +670,6 @@ export const sceneContext = {
     clock: "사고 발생 +30h",
     question: "시스템은 '조용한 사람들'을 낮은 우선순위로 밀어냈습니다. 이 가중치를 어떻게 바꾸겠습니까?",
     lead: "도윤하가 현장 기록을 펼칩니다. 누락된 사람들은 불만을 적게 냈고, 연락처가 불안정했고, 이용 기록이 적었습니다.",
-  },
-  c5_final: {
-    place: "돌봄 배차 복구 통제실",
-    clock: "공식 발표 직전",
-    question: "악인은 없고 피해는 실재합니다. 책임을 개인에 모으겠습니까, 시스템을 바꾸겠습니까?",
   },
   c5_pattern: {
     place: "돌봄 배차 복구 통제실 · 시스템 지도",
@@ -1614,6 +1593,10 @@ export function applySceneContext(nodes, nodeOrders) {
       node.clock = context?.clock ?? clock;
       if (context?.question) node.question = context.question;
       if (context?.lead) node.lead = context.lead;
+      // Whether the room is closing in is a fact about the scene, like its
+      // room and its clock, so a scene may state it here and overrule the
+      // graph build's own reading (`pressureBeats` in gameData.js).
+      if (typeof context?.pressure === "boolean") node.pressure = context.pressure;
     }
   }
   return nodes;

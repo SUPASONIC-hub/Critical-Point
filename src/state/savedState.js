@@ -455,12 +455,12 @@ export function getRouteMarker(entry) {
   if (entry?.routeChangeKind === "memory" || entry?.continuityMemory) return { label: "이전 선택 귀환", tone: "memory" };
   if (entry?.routeChangeKind === "evidence-turn" || nodeId.includes("evidence_turn") || String(entry?.choiceId ?? "").includes("evidence_turn")) return { label: "단서 역전", tone: "turnaround" };
   if (entry?.routeChangeKind === "reframe" || entry?.reframeBranchId) return { label: "판 다시 짜기", tone: "system" };
-  if (scene?.phase === "BRANCH BRIEFING") return { label: "분기 시작", tone: "branch" };
-  if (nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
-  if (nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
-  if (["WITNESS", "TRACE", "ASSEMBLY", "BARGAIN", "AUDIT", "PUBLIC", "PATTERN", "VOICE", "DILEMMA"].some((phase) => scene?.phase?.includes(phase))) {
-    return { label: "증거 추적", tone: "evidence" };
-  }
+  // A scene is read by its kind; the id is the fallback for a log entry whose
+  // scene has since left the graph.
+  if (scene?.kind === "opening") return { label: "분기 시작", tone: "branch" };
+  if (scene?.kind === "aftermath" || nodeId.includes("aftershock")) return { label: "후폭풍", tone: "aftermath" };
+  if (scene?.kind === "reaction" || nodeId.includes("reaction")) return { label: "즉시 반응", tone: "reaction" };
+  if (scene?.kind === "connective") return { label: "증거 추적", tone: "evidence" };
   return { label: "핵심 판단", tone: "decision" };
 }
 

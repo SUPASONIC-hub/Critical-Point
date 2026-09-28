@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import {
+  byEffectWeight,
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
   CASE_START_NODES,
   costWhenRising,
   initialResources,
+  isResourceGain,
   nodeOrders,
   nodes,
 } from "../src/gameData.js";
@@ -117,78 +119,134 @@ for (const nodeId of new Set(Object.values(nodeOrders).flat())) {
   }
 }
 
-/** Walk one case picking the same column every time. Cases reset resources. */
-function walkCase(caseId, columnIndex) {
+/** The axis a card gains most on, or null when it gains nothing. */
+function topGainAxis(choice) {
+  const [axis] = Object.entries(choice.effect ?? {}).filter(([key, value]) => isResourceGain(key, value)).sort(byEffectWeight)[0] ?? [];
+  return axis ?? null;
+}
+
+/**
+ * The three ways of playing the cards are written to: the person in the room,
+ * the record, the clock. A habit takes, in every scene, the card that pays it
+ * most -- what walking one column did while the columns were dealt in the
+ * order they were written.
+ */
+const HABITS = {
+  "people first": ["trust", "humanCost"],
+  "procedure first": ["legitimacy"],
+  "speed first": ["capital", "time"],
+};
+
+function habitScore(choice, axes) {
+  return axes.reduce((sum, key) => {
+    const value = choice.effect?.[key] ?? 0;
+    return sum + (isResourceGain(key, value) ? Math.abs(value) : -Math.abs(value));
+  }, 0);
+}
+
+/** Walk one case on one habit. Cases reset resources. */
+function walkCase(caseId, axes) {
   let resources = { ...initialResources };
   let nodeId = CASE_START_NODES[caseId];
   const seen = new Set();
   while (nodeId && !seen.has(nodeId) && !resultNodeIds.has(nodeId)) {
     seen.add(nodeId);
-    const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe");
+    const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe" && !choice.requiredAuthority);
     if (choices.length === 0) break;
-    const choice = choices[Math.min(columnIndex, choices.length - 1)];
+    // Ties go to the card whose id sorts first, never to where it was dealt.
+    const choice = [...choices].sort((a, b) => habitScore(b, axes) - habitScore(a, axes) || a.id.localeCompare(b.id))[0];
     resources = applyEffect(resources, choice.effect ?? {});
     nodeId = choice.next;
   }
   return resources;
 }
 
-// 5. No column may be dominated: ending a case at least as well on every
-//    resource and better on one means the other column was simply the right
+// 5. No habit may be dominated: ending a case at least as well on every
+//    resource and better on one means the other habit was simply the right
 //    answer, which is the free lunch this whole file exists to prevent. Stated
 //    as domination rather than "strictly best on something" because resources
-//    cap at 100, and two columns both reaching the cap is a tie, not a trap.
-const COLUMNS = [0, 1, 2];
+//    cap at 100, and two habits both reaching the cap is a tie, not a trap.
+//    This walked columns until the deal was shuffled (gameData.js); a column
+//    is no longer a way of playing, so the walk asks the cards.
 for (const caseId of CASE_SEQUENCE) {
-  const outcomes = COLUMNS.map((columnIndex) => walkCase(caseId, columnIndex));
-  for (const columnIndex of COLUMNS) {
-    const mine = outcomes[columnIndex];
-    const dominator = COLUMNS.find(
-      (other) =>
-        other !== columnIndex &&
-        RESOURCE_KEYS.every((key) => !isBetter(key, mine[key], outcomes[other][key])) &&
-        RESOURCE_KEYS.some((key) => isBetter(key, outcomes[other][key], mine[key])),
+  const outcomes = Object.entries(HABITS).map(([habit, axes]) => [habit, walkCase(caseId, axes)]);
+  for (const [habit, mine] of outcomes) {
+    const dominator = outcomes.find(
+      ([other, theirs]) =>
+        other !== habit &&
+        RESOURCE_KEYS.every((key) => !isBetter(key, mine[key], theirs[key])) &&
+        RESOURCE_KEYS.some((key) => isBetter(key, theirs[key], mine[key])),
     );
-    if (dominator !== undefined) {
+    if (dominator) {
       failures.push(
-        `${caseId}: column ${columnIndex + 1} is dominated by column ${dominator + 1} ` +
-          `(${RESOURCE_KEYS.map((key) => `${key} ${mine[key]}/${outcomes[dominator][key]}`).join(", ")})`,
+        `${caseId}: playing ${habit} is dominated by playing ${dominator[0]} ` +
+          `(${RESOURCE_KEYS.map((key) => `${key} ${mine[key]}/${dominator[1][key]}`).join(", ")})`,
       );
     }
   }
 }
 
 /**
+ * Where a card sits must say nothing about what it is.
+ *
  * The way of thinking a generated card exercises is read from the card, not
- * its column (`inferChoiceCognition` in gameData.js). When it was the column,
- * every card in a column was the same type, so a player who always took the
- * second card was an inference player by construction. Columns are still
- * written to a shape -- people first, procedure second, speed third -- so they
- * lean, but no column may be one type throughout again.
+ * its column (`inferChoiceCognition` in gameData.js), and the axis a card gains
+ * most on is whatever its author gave it -- but every scene was written in one
+ * order, so the first card's top gain was 믿음 in 99% of the scenes the packs
+ * author and a player could pick a column instead of a card. The deal is
+ * shuffled per scene now; this holds the result. Measured on the table as it
+ * is dealt, over every scene: no column may be one way of thinking in more
+ * than 90% of the generated cards, and no column may carry one axis as its top
+ * gain in more than half of its cards.
  */
 const MAX_COLUMN_COGNITION_SHARE = 0.9;
+const MAX_COLUMN_AXIS_SHARE = 0.5;
 const columnCognition = new Map();
-for (const node of Object.values(nodes)) {
-  node.choices.forEach((choice, index) => {
+const columnAxis = new Map();
+const tally = (table, index, key) => {
+  const counts = table.get(index) ?? new Map();
+  counts.set(key, (counts.get(key) ?? 0) + 1);
+  table.set(index, counts);
+};
+for (const nodeId of new Set(Object.values(nodeOrders).flat())) {
+  const dealt = (nodes[nodeId]?.choices ?? []).filter((choice) => choice.type !== "reframe");
+  dealt.forEach((choice, index) => {
+    // The evidence turn is one card under one label in a slot of its own; it is
+    // not part of the hand the shuffle deals.
+    if (choice.id.endsWith("_evidence_turn")) return;
+    const axis = topGainAxis(choice);
+    if (axis) tally(columnAxis, index, axis);
     if (!/_choice_\d+$/.test(choice.id ?? "")) return;
     const [type] = Object.entries(choice.cognition ?? {}).sort((a, b) => b[1] - a[1])[0] ?? [];
-    const counts = columnCognition.get(index) ?? new Map();
-    counts.set(type, (counts.get(type) ?? 0) + 1);
-    columnCognition.set(index, counts);
+    tally(columnCognition, index, type);
   });
 }
-for (const [index, counts] of columnCognition) {
+const leaderOf = (counts) => {
   const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
-  const [type, count] = [...counts].sort((a, b) => b[1] - a[1])[0];
-  if (total >= 20 && count / total > MAX_COLUMN_COGNITION_SHARE) {
-    failures.push(`generated column ${index + 1} is ${type} in ${count} of ${total} cards: cognition is being read from the position again`);
+  const [key, count] = [...counts].sort((a, b) => b[1] - a[1])[0];
+  return { key, count, total, share: count / total };
+};
+for (const [index, counts] of columnCognition) {
+  const { key, count, total, share } = leaderOf(counts);
+  if (total >= 20 && share > MAX_COLUMN_COGNITION_SHARE) {
+    failures.push(`generated column ${index + 1} is ${key} in ${count} of ${total} cards: cognition is being read from the position again`);
   }
 }
+const columnAxisReport = [];
+for (const [index, counts] of [...columnAxis].sort((a, b) => a[0] - b[0])) {
+  const { key, count, total, share } = leaderOf(counts);
+  if (total < 20) continue;
+  columnAxisReport.push(`column ${index + 1}: ${key} ${(share * 100).toFixed(0)}%`);
+  if (share > MAX_COLUMN_AXIS_SHARE) {
+    failures.push(`column ${index + 1} gains most on ${key} in ${count} of ${total} cards: the position gives the card away`);
+  }
+}
+assert.ok(columnAxisReport.length >= 3, "the column check measured fewer than three columns");
 
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(
   `Balance checks passed (${playableChoices.length} choices, ` +
     `${(uniqueRatio * 100).toFixed(0)}% unique effects, ` +
     `humanCost on ${(humanCostCoverage * 100).toFixed(0)}%, ` +
-    `${fatigueRecovery} fatigue recoveries)`,
+    `${fatigueRecovery} fatigue recoveries; top gain by ${columnAxisReport.join(", ")})`,
 );

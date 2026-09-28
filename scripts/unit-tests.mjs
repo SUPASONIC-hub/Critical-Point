@@ -1316,7 +1316,7 @@ test("every scene draws a room, and always the same one", () => {
   // lets light in, and only a pressured night outdoors gets lightning.
   assert.equal(getScenePlate({ place: "국회 본관 정무위원회 회의실 · 참고인석" }, "x").flash, true);
   assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "오후 3시" }, "x").rays, true);
-  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00", phase: "HEARING" }, "x").lightning, true);
+  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00", pressure: true }, "x").lightning, true);
   assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00" }, "x").lightning, false);
   assert.equal(getPlateMotif(""), "desk");
   assert.equal(getPlateTone(""), 0);
