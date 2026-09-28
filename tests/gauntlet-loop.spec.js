@@ -130,6 +130,31 @@ async function closeCaseOneIntoDraft(page) {
   await expect(page.getByTestId("relic-draft")).toBeVisible();
 }
 
+/**
+ * The two gates in front of every table, pressed the way a finger presses
+ * them: the pointer goes down at a point on the screen, and whatever is there
+ * takes it. Every other test gets past these through a helper; this is the one
+ * place that proves a player can.
+ */
+async function pressAt(page, locator) {
+  await expect(locator).toBeVisible();
+  const box = await locator.boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+}
+
+test("the briefing's open button and the draft's pass button take a pointer", async ({ page }) => {
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await pressAt(page, page.getByTestId("open-table"));
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  await expect(page.locator(".choices .choice:not([aria-disabled='true'])").first()).toBeVisible();
+
+  await closeCaseOneIntoDraft(page);
+  await pressAt(page, page.getByTestId("relic-skip"));
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([]);
+});
+
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   // Installed before the page loads so the clock proof below controls time.
