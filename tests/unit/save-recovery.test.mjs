@@ -18,6 +18,7 @@ import {
 } from "../../src/appConfig.js";
 import { getOriginStartEffects } from "../../src/advancedSystems.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameConstants.js";
+import { applyEffect } from "../../src/riskLogic.js";
 import { isChunkLoadError, reloadForMissingChunk } from "../../src/state/chunkReload.js";
 import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
@@ -276,10 +277,8 @@ test("an error row queued in storage is handed to the runtime's queue once", () 
 test("every way into the season deals the same opening hand", () => {
   for (const origin of ["courier", "lab", "public", "somewhere-else"]) {
     const dealt = createOpeningResources(origin);
-    for (const [key, value] of Object.entries(getOriginStartEffects(origin))) {
-      const ceiling = key === "time" ? 72 : 100;
-      assert.equal(dealt[key], Math.min(ceiling, Math.max(0, initialResources[key] + value)), `${origin}: ${key}`);
-    }
+    // What the runtime's own effect arithmetic makes of the same origin.
+    assert.deepEqual(dealt, applyEffect(initialResources, getOriginStartEffects(origin)), origin);
     assert.equal(dealt.time, initialResources.time);
     assert.equal(dealt.humanCost, initialResources.humanCost);
   }
