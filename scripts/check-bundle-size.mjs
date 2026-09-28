@@ -32,7 +32,16 @@ const budgets = [
   // could paint. 161,674 / 57,486 on 2026-09-27.
   { pattern: /^index-.*.js$/, maxBytes: 169_800, maxGzip: 60_400 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_400, maxGzip: 32_600 },
+  // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, the one budget that
+  // rose in the audit pass. What it bought is the table being playable and
+  // honest for more people: one gate for a card's click and its key, a bust
+  // written before its slam is painted, Space and Enter left to the control
+  // the keyboard walked to, presses graded where the pointer went down and
+  // when the beat reached the ear, names a screen reader and a phone can read
+  // for what only a tooltip said, and frame-loop variables that no longer
+  // restyle the whole table. Measured 103,738 / 34,105. It is not on the first
+  // paint: the chunk loads after the player has started a run.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_300 },
   // 44,024 / 13,638 on 2026-09-27.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },
   // The whole stylesheet (the intro's share is also inlined; see

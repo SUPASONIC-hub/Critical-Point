@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 
-import { isResourceGain } from "../gameConstants.js";
+import { formatNumber, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
 
-export function formatNumber(value) {
-  return Math.round(Number(value) || 0).toLocaleString("en-US");
-}
+export { formatNumber };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the

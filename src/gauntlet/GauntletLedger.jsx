@@ -1,7 +1,7 @@
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatNumber } from "./tableReadout.js";
+import { formatNumber } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
 
 /**

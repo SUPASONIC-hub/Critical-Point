@@ -10,6 +10,11 @@ export const initialResources = {
 /** One clamp for the rules, the risk readout and the table: `riskLogic.js` and the engine each kept their own. */
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
+/** A whole number with thousands separators, as every pot, vault and ledger line prints it. */
+export function formatNumber(value) {
+  return Math.round(Number(value) || 0).toLocaleString("en-US");
+}
+
 /**
  * The two resources where a rising number is the loss. Colour, arrows and the
  * balance guardrail all read direction from here rather than from the sign.
