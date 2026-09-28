@@ -1020,14 +1020,17 @@ function endPractice(run) {
  * the summary keeps the table record of the case's first close.
  */
 export function openCaseRun(run, { replayOf = null } = {}) {
-  const current = endPractice(normalizeRunState(run));
+  const opened = normalizeRunState(run);
+  const current = endPractice(opened);
   const rebooted = current.schema.mutations.includes("reboot");
+  // A replay left half way hands back the draft it was holding, like the rest.
+  const offer = rebooted || opened.practice ? current.relicOffer : [];
   const practice = replayOf
     ? {
         vault: current.vault,
         grooveVault: current.grooveVault,
         relics: current.relics,
-        relicOffer: rebooted ? current.relicOffer : [],
+        relicOffer: offer,
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
         bestCombo: current.bestCombo,
@@ -1040,7 +1043,7 @@ export function openCaseRun(run, { replayOf = null } = {}) {
     runGroove: 0,
     insuranceSpent: false,
     practice,
-    relicOffer: rebooted && !practice ? current.relicOffer : [],
+    relicOffer: practice ? [] : offer,
     schema: rebooted
       ? current.schema
       : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery), current.windowIndex), current.relics),
@@ -1200,7 +1203,10 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
   const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode) : 1;
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
-  const stanceMastery = advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
+  // Practice builds no mastery, so it cannot be repeated into a stance relic either.
+  const stanceMastery = current.practice
+    ? current.stanceMastery
+    : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus) : 0;
   // The hand's share of the pot, told apart: what the beat earned, and what
@@ -1301,7 +1307,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       pot: focusPot,
       tier: focusBonus.tier,
       jammed: window?.jammed === true,
-      stanceEarned: earnedStance(focusMode, focusCharge, focusHits, outcome),
+      stanceEarned: !current.practice && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
     },
   };
