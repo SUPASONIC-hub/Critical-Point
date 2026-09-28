@@ -195,15 +195,8 @@
   outline: none;
 }
 .judgment-profile-panel {
-  display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
   max-width: 720px;
-  padding: 14px 16px 14px 18px;
-  background: rgb(0 0 0 / 0.22);
-  border: 1px solid var(--ui-line);
-  border-left: 3px solid var(--c-coral);
-  border-radius: var(--ui-radius-sm);
 }
 .judgment-profile-panel > div {
   display: flex;
@@ -225,8 +218,6 @@
 .judgment-profile-panel p,
 .judgment-profile-panel small {
   margin: 0;
-  color: var(--ui-text-2);
-  font-size: 14px;
   line-height: 1.6;
 }
 .judgment-profile-panel small {
@@ -1813,18 +1804,10 @@
    an element they can match at the same specificity, so they compute exactly
    as they did there; the computed style of every element on the intro, the
    table, the reveal and the report was compared before and after the move. */
-.observation-panel {
-  margin: 18px 0;
-  padding: 18px;
-  border: 1px solid rgba(217, 255, 98, 0.24);
-  border-radius: 8px;
-  background: rgb(24 32 31 / 0.72);
-}
 .ending-shell .ending-sequence {
   position: relative;
   min-height: min(680px, calc(100dvh - 48px));
   margin-bottom: 32px;
-  padding: clamp(28px, 6vw, 72px);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-xl);
   box-shadow:
@@ -1840,12 +1823,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(217, 255, 98, 0.28);
   text-align: left;
 }
 .ending-shell .ending-beat {
-  min-height: 300px;
   align-content: center;
   gap: 26px;
 }
@@ -1854,7 +1834,6 @@
   letter-spacing: 0.16em;
 }
 .ending-shell .ending-beat blockquote {
-  max-width: 780px;
   font-size: clamp(34px, 5vw, 68px);
   font-weight: 900;
   line-height: 1.15;
@@ -1884,22 +1863,16 @@
   box-shadow: none;
 }
 .telemetry-explanation {
-  margin: 8px 0 0;
-  color: var(--c-amber);
-  font-size: 12px;
   font-weight: 800;
-  line-height: 1.5;
 }
 @media (max-width: 480px) {
   .ending-shell .ending-sequence {
     min-height: calc(100dvh - 32px);
-    padding: 70px 18px 28px;
   }
   .ending-sequence-header {
     top: 18px;
     left: 18px;
     right: auto;
-    max-width: calc(100% - 200px);
     align-items: flex-start;
     flex-direction: column;
     gap: 6px;
@@ -1910,15 +1883,6 @@
 }
 .ending-beat blockquote {
   margin: 0;
-  font-size: 34px;
-  line-height: 1.35;
-}
-.ending-quiet-line {
-  max-width: 34rem;
-  margin: 0 auto;
-  font-size: 20px;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
 }
 .ending-quiet-skip {
   margin-top: 2rem;
@@ -1937,10 +1901,8 @@
 }
 .ending-message-beat textarea {
   width: 100%;
-  min-height: 90px;
   padding: 12px;
   color: var(--color-white);
-  background: var(--ui-glass-strong);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-sm);
   resize: vertical;
@@ -1965,10 +1927,8 @@
 .ending-twist-card {
   display: grid;
   gap: 12px;
-  max-width: 760px;
   padding: 18px 20px;
   text-align: left;
-  background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(217, 255, 98, 0.28);
   border-radius: var(--ui-radius-md);
 }
@@ -1989,8 +1949,6 @@
   inset: 0;
   z-index: -2;
   width: 100%;
-  min-width: 100%;
-  max-width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
@@ -2043,30 +2001,18 @@
   display: block;
   height: 6px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 4px;
 }
 .ending-axis-grid em {
   display: block;
   height: 100%;
-  background: var(--c-acid);
-  border-radius: inherit;
-}
-.ending-variant-panel.failure {
-  border-left-color: #d06b5f;
 }
 .ending-variant-panel h2 {
   margin: 0;
-  font-size: 24px;
   line-height: 1.3;
 }
 @media (max-width: 700px) {
   .season-goal-strip > span {
     grid-column: 1 / -1;
-  }
-  .ending-scene-profile {
-    margin-left: 0;
-    margin-right: 0;
   }
 }
 .ranking-comparison > div {
@@ -2079,18 +2025,13 @@
   display: block;
   height: 7px;
   overflow: hidden;
-  background: #d5e1d8;
-  border-radius: 4px;
 }
 .ranking-comparison em {
   display: block;
   height: 100%;
-  background: #315f43;
-  border-radius: inherit;
 }
 .failure-cause {
   flex-basis: 100%;
-  margin: 4px 0 0;
   font-size: 11px;
   line-height: 1.5;
 }
@@ -2106,20 +2047,10 @@
 .telemetry-dashboard-panel div {
   align-items: center;
 }
-.ranking-integrity.valid {
-  color: #315f43;
-}
 .ranking-integrity.invalid {
   color: #7b2d2d;
   background: #fff0e8;
   border-color: #c45d3f;
-}
-.replay-diagnostics {
-  margin: 12px 0;
-  padding: 10px 12px;
-  background: #f4f8f1;
-  border: 1px solid #8ca49b;
-  color: #173b34;
 }
 .ending-axis-panel .panel-title-row span {
   color: var(--c-line-soft);
