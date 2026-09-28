@@ -273,7 +273,11 @@ for (const file of onDisk) {
   }
   const lines = css.split(/\r?\n/).length;
   if (lines > budget.lines) failures.push(`${file} is ${lines} lines, over the ${budget.lines} budget.`);
-  if (css.length > budget.bytes) failures.push(`${file} is ${css.length} bytes, over the ${budget.bytes} budget.`);
+  // Bytes, as the budget is named and as the bundle is served. `css.length`
+  // counts UTF-16 units, which undercounts every Korean character in a comment
+  // or a `content` string by two.
+  const bytes = Buffer.byteLength(css, "utf8");
+  if (bytes > budget.bytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.bytes} budget.`);
 }
 
 const rules = readRules();

@@ -16,6 +16,10 @@ export const LAYOUT_VIEWPORTS = Object.freeze({
 export async function measureTable(page) {
   return page.evaluate(() => {
     const cards = [...document.querySelectorAll(".choices .choice")];
+    // No hand is not a hand that fits: Math.max() of nothing is -Infinity, which
+    // sits above any action bar, so an empty table used to pass every row.
+    if (!cards.length) throw new Error("the table has no cards to measure");
+    if (!document.querySelector(".gx-actions")) throw new Error("the table has no action bar to measure against");
     const bottom = Math.max(...cards.map((card) => card.getBoundingClientRect().bottom));
     return {
       cards: cards.length,

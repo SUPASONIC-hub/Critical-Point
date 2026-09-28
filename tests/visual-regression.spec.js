@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
@@ -262,7 +262,10 @@ test("case result desktop visual baseline @visual", async ({ page }, testInfo) =
   });
 });
 
-test("case result mobile layout stays within the viewport", async ({ page }) => {
+test("case result mobile layout stays within the viewport", { tag: "@layout" }, async ({ page, browserName }) => {
+  // A whole case is played to reach the report, against a dev server that
+  // hands WebKit its modules one at a time.
+  test.slow(browserName === "webkit");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
@@ -315,7 +318,7 @@ test("case result explains the ending signals", async ({ page }) => {
 // gauntlet table it is one: the pot, the gauge, every card and both verbs fit a
 // 390x844 viewport with nothing scrolled. A budget, not a pixel comparison, so it
 // fails on a layout regression rather than on a font hint.
-test("mobile play screen keeps the whole decision on one screen", async ({ page }) => {
+test("mobile play screen keeps the whole decision on one screen", { tag: "@layout" }, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });

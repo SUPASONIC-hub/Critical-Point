@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -130,6 +130,31 @@ async function closeCaseOneIntoDraft(page) {
   await expect(page.getByTestId("relic-draft")).toBeVisible();
 }
 
+/**
+ * The two gates in front of every table, pressed the way a finger presses
+ * them: the pointer goes down at a point on the screen, and whatever is there
+ * takes it. Every other test gets past these through a helper; this is the one
+ * place that proves a player can.
+ */
+async function pressAt(page, locator) {
+  await expect(locator).toBeVisible();
+  const box = await locator.boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+}
+
+test("the briefing's open button and the draft's pass button take a pointer", async ({ page }) => {
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await pressAt(page, page.getByTestId("open-table"));
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  await expect(page.locator(".choices .choice:not([aria-disabled='true'])").first()).toBeVisible();
+
+  await closeCaseOneIntoDraft(page);
+  await pressAt(page, page.getByTestId("relic-skip"));
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.relics).toEqual([]);
+});
+
 test("a closed case deals a relic draft that holds the clock and re-deals the table", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   // Installed before the page loads so the clock proof below controls time.
@@ -228,21 +253,39 @@ async function expectHandAboveActionBar(page, label) {
   }
 }
 
-test("the densest decisions fit above the action bar on every board", async ({ page }) => {
-  test.setTimeout(240_000);
-  for (const size of [page.viewportSize(), LAYOUT_VIEWPORTS.phone]) {
-    await page.setViewportSize(size);
-    for (const [caseId, nodeId] of DENSEST_SCENES) {
-      for (const [board, state] of BOARD_STATES) {
-        if (state) await openBrokenBoard(page, caseId, nodeId, state);
-        else await startDebugNode(page, caseId, nodeId);
-        await expectHandAboveActionBar(page, `${caseId}/${nodeId} on a ${board} at ${size.width}x${size.height}`);
-      }
+async function expectDensestScenesFit(page, size) {
+  await page.setViewportSize(size);
+  for (const [caseId, nodeId] of DENSEST_SCENES) {
+    for (const [board, state] of BOARD_STATES) {
+      if (state) await openBrokenBoard(page, caseId, nodeId, state);
+      else await startDebugNode(page, caseId, nodeId);
+      await expectHandAboveActionBar(page, `${caseId}/${nodeId} on a ${board} at ${size.width}x${size.height}`);
     }
   }
+}
+
+test("the densest decisions fit above the action bar on every board", { tag: "@layout" }, async ({ page, browserName }) => {
+  test.setTimeout(browserName === "webkit" ? 720_000 : 240_000);
+  // The WebKit project's own screen is 390x664 -- what Safari leaves of an
+  // iPhone 14 once its bars are drawn -- which is shorter than any screen
+  // priority 27 names. It has the test below to itself; here WebKit measures
+  // the phone the rule promises.
+  const sizes = browserName === "webkit" ? [LAYOUT_VIEWPORTS.phone] : [page.viewportSize(), LAYOUT_VIEWPORTS.phone];
+  for (const size of sizes) await expectDensestScenesFit(page, size);
 });
 
-test("a small phone fits every fresh board's decision", async ({ page }) => {
+test("the densest decisions fit the screen Safari leaves on an iPhone 14", { tag: "@layout" }, async ({ page, browserName }) => {
+  test.skip(browserName !== "webkit", "the other projects measure their own screens in the test above");
+  test.fixme(
+    true,
+    "390x664: the last card of final/f_start_owner sits 59px under the action bar on a fresh board. " +
+      "Measured 2026-09-28 when the WebKit project was added; priority 27 promises 390x844, and Safari with its bars drawn is shorter.",
+  );
+  test.setTimeout(240_000);
+  await expectDensestScenesFit(page, page.viewportSize());
+});
+
+test("a small phone fits every fresh board's decision", { tag: "@layout" }, async ({ page }) => {
   // 360x740 holds a fresh board with the last card staked; a board carrying
   // rules can still push the reframe card under the bar there. See priority 27.
   await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
@@ -398,6 +441,10 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
 });
 
 test("the briefing page holds the clock, stakes a card from the page, and opens the table when it runs out", async ({ page }) => {
+  // The page's own clock, driven from here. This test used to wait on the wall
+  // clock -- up to twenty seconds for a reading time that is twelve to
+  // thirty-five, so a longer scene body would have failed it.
+  await page.clock.install();
   await startDebugNode(page, "case01", "start", { openTable: false });
   const briefing = page.getByTestId("scene-briefing");
   await expect(briefing).toBeVisible();
@@ -407,7 +454,8 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   const timer = page.getByTestId("reading-timer");
   const first = Number(await timer.locator("b").textContent());
   expect(first).toBeGreaterThanOrEqual(12);
-  await expect.poll(async () => Number(await timer.locator("b").textContent())).toBeLessThan(first);
+  await page.clock.runFor(3_000);
+  expect(Number(await timer.locator("b").textContent())).toBeLessThan(first);
   // The table's own clock has not moved while the page was up.
   await expect(page.locator(".gx-clock b")).toHaveText("45");
 
@@ -421,7 +469,12 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   // Left alone, a page runs out and the table opens with nothing staked.
   await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
-  await expect(page.getByTestId("scene-briefing")).toHaveCount(0, { timeout: 20_000 });
+  const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
+  expect(reading).toBeLessThanOrEqual(35);
+  await page.clock.runFor((reading - 2) * 1000);
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await page.clock.runFor(4_000);
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
   await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
 });

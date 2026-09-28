@@ -188,7 +188,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 <Link2 size={16} />
                 리플레이 링크
               </button>
-              {debugToolsEnabled && (
+              {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                 <button
                   type="button"
                   className="ghost"
@@ -204,7 +204,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 <Download size={16} />
                 공유 요약
               </button>
-              {debugToolsEnabled && (
+              {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                 <button
                   className="ghost"
                   type="button"

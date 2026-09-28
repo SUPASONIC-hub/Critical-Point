@@ -322,7 +322,11 @@ test("telemetry queue policy should expire old items and cap retained items", ()
 test("telemetry queue items should have stable identities for retry deduplication", () => {
   const item = { id: "case-case01-123", type: "case", payload: { case_id: "case01" } };
   assert.equal(validateTelemetryItem(item).length, 0);
-  assert.equal(item.id, "case-case01-123", "the queue id is the retry idempotency key");
+  // The id is the retry's idempotency key, so nothing on the way to a send may
+  // re-mint it: not the queue's pruning, and not the payload built from it.
+  const [kept] = pruneTelemetryQueue([{ ...item, queuedAt: new Date().toISOString() }]);
+  assert.equal(kept.id, item.id);
+  assert.equal(buildTelemetryPayload(item.payload, kept.id).event_id, item.id);
 });
 test("telemetry payload should carry the queue identity without mutating the source", () => {
   const payload = { case_id: "case01" };
@@ -390,13 +394,15 @@ test("inline scripts and handlers in built HTML are reported", () => {
   assert.equal(inlineScriptProblems("<script>window.x = 1</script>").length, 1);
   assert.deepEqual(inlineScriptProblems('<script type="application/ld+json">{"a":1}</script>'), []);
 });
-test("telemetry stats subscriptions should unsubscribe cleanly", () => {
-  let notifications = 0;
-  const unsubscribe = subscribeTelemetryStats(() => { notifications += 1; });
+// What can be said without a backend: Node has no VITE_SUPABASE_URL, so nothing
+// here ever publishes. This used to count notifications after unsubscribing
+// and assert there were none, which was true of a listener nothing had called.
+test("telemetry stats hand back an unsubscribe and a three-counter snapshot", () => {
+  const unsubscribe = subscribeTelemetryStats(() => {});
   assert.equal(typeof unsubscribe, "function");
-  unsubscribe();
+  assert.equal(unsubscribe(), true, "the listener was registered, so removing it reports that it was there");
+  assert.equal(unsubscribe(), false, "and it is gone afterwards");
   assert.deepEqual(Object.keys(getTelemetryStats()).sort(), ["attempted", "failed", "saved"]);
-  assert.equal(notifications, 0);
 });
 test("saved state validation should use the shared payload schema", () => {
   const state = { currentCase: "case01", nodeId: "start", completedCases: [], discoveredClues: [], log: [], pendingTelemetry: [], caseResults: {}, playtestFeedback: {}, resources: {}, triggers: {}, cognition: {} };
@@ -1241,8 +1247,10 @@ test("every scene draws a room, and always the same one", () => {
     // look like a different room, so the spec has to be a pure function of the
     // scene. The generator is checked too: same seed, same first three draws.
     assert.deepEqual(getScenePlate(node, nodeId), plate, `${nodeId} is not deterministic`);
-    const draws = [0, 1, 2].map(() => createPlateRandom(plate.seed)());
-    assert.equal(new Set(draws).size, 1, "the same seed must open on the same value");
+    const [first, second] = [createPlateRandom(plate.seed), createPlateRandom(plate.seed)];
+    const draws = [0, 1, 2].map(() => [first(), second()]);
+    assert.ok(draws.every(([one, other]) => one === other), "the same seed must draw the same three values");
+    assert.equal(new Set(draws.map(([one]) => one)).size, 3, "and they are three draws, not one repeated");
     used.add(plate.motif);
     const place = node.place ?? "";
     const already = seen.get(place);

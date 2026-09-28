@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { cashStakedCard, dismissProtocolBreach } from "./helpers/gameFlow.js";
 
 /**

@@ -7,6 +7,9 @@ interface ImportMetaEnv {
   readonly VITE_ENABLE_DEBUG_TOOLS?: string;
 }
 
+// Written by the bundler (`define` in vite.config.js); absent under Node.
+declare const __CP_DEBUG_BUILD__: boolean;
+
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
