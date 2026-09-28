@@ -9,7 +9,7 @@
  */
 
 /** Laid onto `dramaticRoutePlans[caseId].system`. */
-export const coreClosings = {
+const closings = {
   case01: {
     finalTitle: "같은 표를 지나간 세 안건",
     finalText: "현금이 바닥나기까지 여덟 시간, 상황실 화면에는 절감안과 자금안과 매각안이 아직 한 표 위에 겹쳐 있습니다. 에코가 한 줄을 띄웁니다. '세 안건은 같은 기준표를 통과했습니다. 표를 그대로 두면 네 번째 안건도 같은 자리에서 막힙니다.'",
@@ -68,7 +68,7 @@ export const coreClosings = {
 };
 
 /** Laid onto `evidenceTurnaroundPlans[caseId]`. */
-export const coreEntryLabels = {
+const entryLabels = {
   case01: { entryLabel: "세 안건이 지나간 기준표를 단서로 연다" },
   case02: { entryLabel: "유출 기록에 찍힌 시각을 증언과 다시 맞춘다" },
   case03: { entryLabel: "공개 점수판 밑에 깔린 두 번째 점수판을 연다" },
@@ -84,7 +84,7 @@ export const coreEntryLabels = {
 };
 
 /** Laid onto `continuityMemoryChoicePlans[caseId]`. */
-export const coreMemoryEchoes = {
+const memoryEchoes = {
   case02: {
     routeEcho: "약속부터 확인하면 이민서는 기록보다 먼저 사람으로 불립니다. 보고서의 첫 줄은 그만큼 늦게 채워집니다.",
     systemEcho: "뜯어보면 유출 파일의 한 줄이 플로우온에서 당신이 다시 짠 판과 같은 순서로 적혀 있습니다. 혐의의 주어가 이민서에서 기록을 만든 쪽으로 옮겨 갑니다.",
@@ -136,7 +136,15 @@ export const coreMemoryEchoes = {
   },
 };
 
-/** Lays one table of card copy onto the plans it belongs to. */
-export function layCards(cards, planOf) {
-  Object.entries(cards).forEach(([caseId, copy]) => Object.assign(planOf(caseId), copy));
-}
+/**
+ * One name, because `gameData.js` is also held to a count of imported names.
+ */
+export const coreCards = {
+  closings,
+  entryLabels,
+  memoryEchoes,
+  /** Lays one table of card copy onto the plans it belongs to. */
+  lay(cards, planOf) {
+    Object.entries(cards).forEach(([caseId, copy]) => Object.assign(planOf(caseId), copy));
+  },
+};

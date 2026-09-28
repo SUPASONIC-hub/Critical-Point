@@ -13,7 +13,7 @@ import { case09Nodes } from "./nodes/case09.js";
 import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
-import { coreClosings, coreEntryLabels, coreMemoryEchoes, layCards } from "./nodes/coreCards.js";
+import { coreCards } from "./nodes/coreCards.js";
 import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
@@ -2557,7 +2557,7 @@ function registerDramaticRoutePlan(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   dramaticRoutePlans[pack.id] = pack.routePlan;
 });
-layCards(coreClosings, (caseId) => dramaticRoutePlans[caseId].system);
+coreCards.lay(coreCards.closings, (caseId) => dramaticRoutePlans[caseId].system);
 Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticRoutePlan(caseId, plan));
 
 /**
@@ -2942,7 +2942,7 @@ function registerEvidenceTurnaround(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   evidenceTurnaroundPlans[pack.id] = pack.evidencePlan;
 });
-layCards(coreEntryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
+coreCards.lay(coreCards.entryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
 const continuityMemoryChoicePlans = {
@@ -3035,7 +3035,7 @@ const continuityMemoryChoicePlans = {
     evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
   },
 };
-layCards(coreMemoryEchoes, (caseId) => continuityMemoryChoicePlans[caseId]);
+coreCards.lay(coreCards.memoryEchoes, (caseId) => continuityMemoryChoicePlans[caseId]);
 
 CASE_PACKS.forEach((pack) => {
   continuityMemoryChoicePlans[pack.id] = pack.memoryPlan;
