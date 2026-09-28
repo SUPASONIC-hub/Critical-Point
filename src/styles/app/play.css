@@ -2920,7 +2920,8 @@
    2026-09-27. Nothing between here and where they sat sets the same property on
    an element they can match at the same specificity, so they compute exactly
    as they did there; the computed style of every element on the intro, the
-   table, the reveal and the report was compared before and after the move. */.debug-overlay {
+   table, the reveal and the report was compared before and after the move. */
+.debug-overlay {
   position: fixed;
   right: 16px;
   /* Under the commit console. A developer tool must not sit on top of the

@@ -2883,11 +2883,6 @@ body {
    an element they can match at the same specificity, so they compute exactly
    as they did there; the computed style of every element on the intro, the
    table, the reveal and the report was compared before and after the move. */
-/* This line sits inside the SEASON 1 drawer, directly on the intro's field --
-   not in a light panel, which is what the two dark greens here assumed. It read
-   at 2.7:1 against the ink ground and nobody caught it, because until the
-   redesign the ground was the key visual and the contrast audit skips text over
-   a photograph. */
 @media (max-width: 860px) {
   .prestart-heading {
     align-items: flex-start;
@@ -2926,23 +2921,6 @@ body {
   justify-content: center;
   gap: 8px;
   width: 100%;
-}
-.season-goal-strip {
-  align-items: stretch;
-}
-.season-goal-strip > span {
-  align-self: center;
-}
-.season-goal-strip article {
-  display: grid;
-  gap: 3px;
-}
-.season-goal-strip b {
-  font-size: 10px;
-}
-.season-goal-strip small {
-  font-size: 11px;
-  line-height: 1.35;
 }
 .past-run-memory {
   display: grid;

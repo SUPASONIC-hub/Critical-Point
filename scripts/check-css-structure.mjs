@@ -1,7 +1,7 @@
 /**
  * CSS structure check.
  *
- * The five files under src/styles/app are a cascade, so the same selector can
+ * The files under src/styles/app are a cascade, so the same selector can
  * legitimately appear in an earlier file and again in a later one that has to
  * outrank it. That freedom is also how a selector ends up with three homes and
  * nobody can say what it computes to without replaying the import order by hand.
@@ -47,7 +47,8 @@ const budgets = {
   // one pass -- unlike the same override hiding in another file -- so this budget
   // is deliberately looser. It should still only go down.
   // 50 -> 23 on 2026-09-15, ratcheted to what the glass pass left.
-  repeatedInOneFile: 23,
+  // 23 -> 11 on 2026-09-28, to what it measures.
+  repeatedInOneFile: 11,
 };
 
 const fileBudgets = {
@@ -82,24 +83,10 @@ const fileBudgets = {
   // opacity, and body keeps content out from under a landscape notch.
   // 2910 / 69400 -> 3030 / 72300 the same day: 21 rules for the intro's
   // prestart and origin panels moved here out of extensions.css.
-  "base-intro-ranking.css": { lines: 3030, bytes: 72300 },
-  // extensions.css read 2193 / 45440 until the 2026-09-10 pass, which repainted
-  // .play-style-unlock for the field it actually sits on, and 2200 / 45900 until
-  // 2026-09-11, when 85 selectors naming classes no JSX renders any more came
-  // out of four of these files. Nothing changed on screen; the sheets stopped
-  // describing surfaces that were deleted, in some cases two refactors ago.
-  // 1410 / 29200 -> 1430 / 29900 on 2026-09-15: the ending sequence's frame,
-  // beat card and witness cards moved onto the glass surfaces.
-  // 1430 / 29900 -> 1370 / 28700 on 2026-09-16 when the chapter dashboard, the
-  // choice panel and the decision dock lost the last rules that named them.
-  // 1370 / 28700 -> 891 / 17900 on 2026-09-27: 80 of its 228 rules moved
-  // into the surface files that own them. Each move was checked two ways: no
-  // rule it jumped over sets an overlapping property at the same specificity
-  // on an element both can match, and the computed style of every element on
-  // the intro, ranking, board, briefing, table, reveal, ending and report, at
-  // a desktop, a phone and a reduced-motion phone, came out identical. What is
-  // left still ties a rule in an earlier file and wins by coming later.
-  "extensions.css": { lines: 891, bytes: 17900 },
+  // 3030 / 72300 -> 2990 / 71400 on 2026-09-28: the light operator-origin
+  // panel and the first draft of the start row went (69 declarations a dark
+  // rule always overrode), and eight rules came home from extensions.css.
+  "base-intro-ranking.css": { lines: 2990, bytes: 71400 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -167,7 +154,11 @@ const fileBudgets = {
   // instead of an animated viewport background.
   // 3100 -> 3155 the same day: seven rules for the reveal's stakes and the
   // chapter panels moved here out of extensions.css.
-  "play.css": { lines: 3155, bytes: 66400 },
+  // 3155 / 66400 -> 3040 / 63700 on 2026-09-28: the light decision reveal and
+  // the play header's first draft went (69 declarations that never won), the
+  // report's panel rules at the head of the file moved to result.css, and
+  // seven rules came home from extensions.css.
+  "play.css": { lines: 3040, bytes: 63700 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -208,7 +199,13 @@ const fileBudgets = {
   // screen. Six cases in one register was the state this panel exists to break.
   // 1815 / 44800 -> 2130 / 52100 on 2026-09-27: 52 rules for the ending
   // sequence and the report's panels moved here out of extensions.css.
-  "result.css": { lines: 2130, bytes: 52100 },
+  // 2130 / 52100 -> 2560 / 60800 on 2026-09-28, the one budget that rose:
+  // extensions.css was retired and 80 of the 95 rules it had left belong to
+  // the ending sequence and the report's panels, and the report rules that sat
+  // at the head of play.css came here too. The nine sheets together went from
+  // 11,492 lines / 257,177 bytes to 10,767 / 242,536 in the same pass, with
+  // 514 declarations that never won a cascade deleted.
+  "result.css": { lines: 2560, bytes: 60800 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

@@ -764,9 +764,7 @@
   padding: 4px 16px 16px;
   color: var(--ui-text);
 }
-/* Every panel in the archive is the same inner surface. Several of them are
-   styled in play.css and extensions.css for other screens too, so the archive
-   scope is what makes them agree here. */
+/* Every panel in the archive is the same inner surface. */
 .report-archive-body > :is(section, p, details, .result-grid),
 .report-archive-body .result-grid > section {
   margin: 0;
@@ -1590,10 +1588,10 @@
   color: var(--c-danger-81);
   background: var(--ui-heat-soft);
 }
-/* The season's extension panels are styled in extensions.css for the dark
-   ending shell and, in places, for the light case files they used to sit
-   among. On the report they are one inner surface; the .result-page scope is
-   what lets this outrank those without a second home for any selector. */
+/* The season's extension panels are one inner surface on the report. Their
+   own rules, further down, set only what differs from panel to panel; the
+   .result-page scope and the tag in each name are what let this outrank them
+   from above. */
 .result-page :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel, section.operator-reveal-panel, section.operations-snapshot, section.observation-panel, section.ending-scene-profile, section.ending-preview-panel, section.authority-review-panel, p.origin-ending-note, section.failure-objectives, section.play-report-panel, section.telemetry-dashboard-panel, p.ranking-integrity, section.aftermath-panel, details.replay-diagnostics, section.delayed-consequence-strip, section.ranking-comparison, section.season-goal-strip, section.balance-report, section.ending-axis-panel, p.telemetry-stats) {
   display: grid;
   gap: 8px;
@@ -1693,8 +1691,8 @@
 }
 
 /* The final report stays shut until the ending sequence hands it over. The
-   scoped panel rules above would otherwise out-specify extensions.css's
-   `.final-report-locked > *` and paint the report under the sequence. */
+   scoped panel rules above set `display` on the same panels, so this names
+   the tags to outrank them. */
 .result-page.final-report-locked > :is(div, section, details, p) {
   display: none;
 }
@@ -2398,6 +2396,24 @@
 }
 .ending-variant-panel small {
   font-size: 12px;
+}
+/* Also the intro's season goals; the report is where the strip has its home. */
+.season-goal-strip {
+  align-items: stretch;
+}
+.season-goal-strip > span {
+  align-self: center;
+}
+.season-goal-strip article {
+  display: grid;
+  gap: 3px;
+}
+.season-goal-strip b {
+  font-size: 10px;
+}
+.season-goal-strip small {
+  font-size: 11px;
+  line-height: 1.35;
 }
 .balance-report p {
   font-size: 12px;
