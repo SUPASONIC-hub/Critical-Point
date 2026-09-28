@@ -389,7 +389,8 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
   await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-heat")))).toBeGreaterThan(0);
   const shake = await page.evaluate(() => getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-shake-x").trim());
-  expect(["", "0.00px", "-0.00px"]).toContain(shake);
+  // Registered as a length, so the computed value is the number, however it was written.
+  expect(Math.abs(Number.parseFloat(shake) || 0)).toBe(0);
   await pushUntilBust(page);
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-bust/);
   await expect(page.locator(".gx-slam-bust")).toBeVisible();
