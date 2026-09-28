@@ -450,7 +450,7 @@ export const case40 = {
     // CASE 40. A score that punishes the pause. Every line is spoken by someone
     // whose own pause is in the model, so none of them may sound certain.
     c40_start_visit: "숫자보다 사람이 먼저라며, 문하준과 함께 그 가게 점장부터 직접 찾아간다.",
-    c40_start_claim: "탈락 통보에 적힌 점수의, 산정 근거부터 청구한다.",
+    c40_start_claim: "탈락 통보에 적힌 점수의 산정 근거부터, 청구한다.",
     c40_start_post: "탈락 문자를 캡처해서, 오늘 밤 인터넷에 공개한다.",
     c40_demo_rehear: "문하준의 점수를, 사람 면접으로 다시 보게 해 달라고 한다.",
     c40_demo_source: "학습 데이터가 누구의 기록인지, 출처부터 따진다.",

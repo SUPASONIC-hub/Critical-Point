@@ -195,7 +195,7 @@ export const case39Nodes = {
       "가처분: 09:20 기각",
       "사장실: 90분이면 가을 개편 때 시간대 폐지",
       "외장 하드 두 개 -- 70분 / 90분",
-      "이 선택은 시즌의 '빈 서명란'과 같은 칸을 묻는다",
+      "이 선택은 3년 전의 '빈 서명란'과 같은 칸을 묻는다",
     ],
     triggers: ["choice", "injustice", "responsibility"],
     choices: [

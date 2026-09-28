@@ -341,7 +341,7 @@ export const case32 = {
       title: "대기실의 이민서",
       speaker: "이민서",
       text: "휴식 시간, 복도 끝 대기실에 이민서가 앉아 있습니다. KD데이터랩에 남아 있던 트리거랩 기록 사본 때문에 그도 증언하러 불려 왔습니다. 무릎 위의 출석 요구서가 구겨져 있습니다. '아까 수사관님이 물었어요. 기록 보관 담당이 누구였냐고요. 저였잖아요.' 그가 웃으려다 맙니다. '3년 전에도 기록이 저를 가리켰어요. 사라진 11초요. 그때는 계약직이라 정리하기 쉬웠고요.' 벽시계 분침이 한 칸 넘어갑니다. 이민서의 차례까지 20분 남았습니다.",
-      memo: ["이민서 출석 사유: KD데이터랩의 트리거랩 기록 사본", "수사관 질문: '기록 보관 담당자는 누구였나'", "사건 02 '사라진 11초' 이후 3년", "이민서 조사까지 20분"],
+      memo: ["이민서 출석 사유: KD데이터랩의 트리거랩 기록 사본", "수사관 질문: '기록 보관 담당자는 누구였나'", "유출 소동의 '사라진 11초' 이후 3년", "이민서 조사까지 20분"],
       triggers: ["protection", "fear", "trust"],
       choices: [
         { id: "c32_branch_waiting_a", label: "이민서 조사에 같이 들어갈 수 있는지 검사에게 묻는다", effect: { trust: 12, legitimacy: 3, capital: -5, time: -6, fatigue: 5 }, next: "c32_branch_waiting_follow", cognition: { reframing: 2 } },
@@ -480,7 +480,7 @@ export const case32 = {
     c32_route_system_warn: "상자에 이름이 많은 실무자 동료들에게, 먼저 알린다.",
     c32_route_system_drop: "통계는 덮고, 오늘 조사 일정대로 간다.",
     c32_final_system_route_a: "결정한 사람의 서명 흔적부터 찾도록, 수사 순서를 바꾸자고 한다.",
-    c32_final_system_route_b: "실무자 동료들의 처벌만 낮춰 주는, 협조를 약속한다.",
+    c32_final_system_route_b: "실무자 동료들의 처벌만 낮춰 주는 협조를, 약속한다.",
     c32_final_system_route_c: "이름이 많은 실무자들을 위해, 변호 기금을 같이 모은다.",
     c32_evidence_turn_hand: "반출 기록을, 오늘 밤 나은호 검사에게 그대로 넘긴다.",
     c32_evidence_turn_hold: "반출 기록은 쥐고 있다가, 신분이 정해질 때 꺼낸다.",

@@ -17,7 +17,7 @@ const operatorProfiles = {
   lab: {
     id: "lab",
     label: "CREDIT REVIEW",
-    title: "기업대출심사팀 출신 분석관",
+    title: "기업금융전략팀 출신 분석관",
     authority: "심사 기준과 검증 절차를 조정할 권한",
     premise: "승인 서류에 반대 의견을 한 줄 쓴 대가로 이 지하 분석실에 배치됐습니다.",
     permissions: ["심사 기록 열람", "검증 기준 제안", "보호 명부 요청"],

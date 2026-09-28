@@ -487,7 +487,7 @@ const discoveryClues = {
   case11: {
     id: "c11-two-timestamps",
     title: "다섯 시간 열두 분",
-    text: "반려 서명은 18:02, 폐기 처리는 23:14였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
+    text: "반려 서명은 13:32, 폐기 처리는 18:44였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
   },
   final: {
     id: "final-observer-key",
