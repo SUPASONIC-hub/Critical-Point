@@ -1,4 +1,16 @@
-import { ArrowLeft, Send, ShieldAlert } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { ArrowLeft, RotateCw, Send, ShieldAlert } from "lucide-react";
+
+// What the list says in place of posts, by what the board is doing. "Nothing
+// here yet" is only true of a board that answered: it used to be printed
+// under BOARD OFFLINE as well, inviting a first post nobody could send.
+const BOARD_LIST_COPY = {
+  idle: "글을 불러오는 중입니다.",
+  loading: "글을 불러오는 중입니다.",
+  error: "글을 불러오지 못했습니다.",
+  local: "지금은 게시판에 연결되어 있지 않습니다.",
+  ready: "아직 남겨진 글이 없습니다. 첫 글을 남겨보세요.",
+};
 
 /**
  * 참가자 게시판.
@@ -27,14 +39,24 @@ export function BoardScreen({
   setBoardHoneypot,
   boardPostStatus,
   isPostingToBoard,
+  canWriteBoardPost,
   canSubmitBoardPost,
   activeBoardPrivacySignals,
   anonymizeBoardBody,
   submitBoardPost,
+  reloadBoard,
   nicknameMaxLength,
   bodyMaxLength,
   onClose,
 }) {
+  // The screen replaces the page under the player's hands, so it takes focus
+  // itself (see RankingScreen).
+  const headingRef = useRef(null);
+  useEffect(() => {
+    headingRef.current?.focus({ preventScroll: true });
+  }, []);
+  const isBoardBusy = boardStatus === "loading" || boardStatus === "idle";
+
   return (
       <main className="shell board-shell">
         <Music modeKey="intro" />
@@ -48,21 +70,29 @@ export function BoardScreen({
           </div>
           <header className="board-hero">
             <span>PARTICIPANT BOARD</span>
-            <h1>남겨두고 가는 말</h1>
+            <h1 ref={headingRef} tabIndex={-1}>남겨두고 가는 말</h1>
             <p>
               이름 하나와 짧은 글이면 충분합니다. 여기 적은 이름과 글은 다른 참가자에게 그대로 보입니다.
               점수도 순위도 붙지 않습니다. 사건을 지나온 사람이 다음 사람에게 남기는 자리입니다.
             </p>
           </header>
-          <section className="board-status-bar">
-            <div>
-              <span>{boardStatus === "ready" ? "REMOTE BOARD" : "BOARD OFFLINE"}</span>
-              <strong>{boardStatus === "ready" ? `${boardPosts.length}개의 글` : "글을 주고받을 수 없습니다"}</strong>
+          <section className="board-status-bar" aria-busy={isBoardBusy}>
+            <div role="status">
+              <span>{boardStatus === "ready" ? "REMOTE BOARD" : isBoardBusy ? "CONNECTING" : "BOARD OFFLINE"}</span>
+              <strong>
+                {boardStatus === "ready" ? `${boardPosts.length}개의 글` : isBoardBusy ? "게시판에 연결하는 중입니다" : "글을 주고받을 수 없습니다"}
+              </strong>
               <p>
                 {boardError ||
                   "이름과 글은 공개됩니다. 연락처나 소속처럼 본인을 특정할 수 있는 내용은 적지 말아 주세요."}
               </p>
             </div>
+            {(boardStatus === "error" || boardStatus === "local") && (
+              <button type="button" className="ghost" data-testid="board-retry" onClick={() => reloadBoard()}>
+                <RotateCw size={16} aria-hidden="true" />
+                다시 불러오기
+              </button>
+            )}
           </section>
           <section className="board-composer" aria-label="글 남기기">
             <label className="board-field">
@@ -72,6 +102,7 @@ export function BoardScreen({
                 value={boardNickname}
                 maxLength={nicknameMaxLength}
                 placeholder="게시판에 보일 이름"
+                disabled={!canWriteBoardPost}
                 onChange={(event) => setBoardNickname(event.target.value)}
               />
               <small>{boardNickname.trim().length}/{nicknameMaxLength}자 · 이 이름은 공개됩니다</small>
@@ -83,6 +114,7 @@ export function BoardScreen({
                 value={boardBody}
                 maxLength={bodyMaxLength}
                 placeholder="사건을 지나며 남은 생각을 적어 주세요. 링크는 올릴 수 없습니다."
+                disabled={!canWriteBoardPost}
                 onChange={(event) => setBoardBody(event.target.value)}
               />
               <small>{boardBody.length}/{bodyMaxLength}자</small>
@@ -119,7 +151,11 @@ export function BoardScreen({
                 <Send size={16} />
                 {isPostingToBoard ? "올리는 중" : "글 남기기"}
               </button>
-              {boardPostStatus && <p className="board-post-status">{boardPostStatus}</p>}
+              {/* Always in the page, so what it comes to say is announced: a
+                  live region that mounts with its text already in it is not. */}
+              <p className="board-post-status" role="status" aria-live="polite" data-testid="board-post-status">
+                {canWriteBoardPost || isBoardBusy ? boardPostStatus : "게시판에 연결된 뒤에 글을 남길 수 있습니다."}
+              </p>
             </div>
           </section>
           <section className="board-list-panel" aria-label="참가자 글">
@@ -128,12 +164,10 @@ export function BoardScreen({
                 <span>PARTICIPANT VOICES</span>
                 <h2>먼저 지나간 사람들</h2>
               </div>
-              <small>{boardPosts.length}개의 글</small>
+              {boardStatus === "ready" && <small>{boardPosts.length}개의 글</small>}
             </div>
-            {boardStatus === "loading" ? (
-              <p className="board-empty">글을 불러오는 중입니다.</p>
-            ) : boardPosts.length === 0 ? (
-              <p className="board-empty">아직 남겨진 글이 없습니다. 첫 글을 남겨보세요.</p>
+            {boardStatus !== "ready" || boardPosts.length === 0 ? (
+              <p className="board-empty" data-testid="board-list-state">{BOARD_LIST_COPY[boardStatus] ?? BOARD_LIST_COPY.local}</p>
             ) : (
               <div className="board-list">
                 {boardPosts.map((post) => (

@@ -1,4 +1,4 @@
-import { readStoredValue, writeStoredValue } from "./appConfig.js";
+import { BOARD_WRITER_ID_KEY, readStoredValue, writeStoredValue } from "./appConfig.js";
 
 /** @type {Partial<ImportMetaEnv>} */
 const viteEnv = import.meta.env ?? {};
@@ -35,6 +35,12 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
+/**
+ * A refusal, with the parts a caller decides on kept apart from the sentence:
+ * `status` is the HTTP status, `code` is PostgREST's or Postgres's own
+ * (`PGRST202`, `P0001`, `PT429`), and `serverMessage` is the text the trigger
+ * raised. The message still carries all of it for the console.
+ */
 async function createTelemetryError(response, fallbackMessage) {
   let detail = "";
   try {
@@ -42,19 +48,66 @@ async function createTelemetryError(response, fallbackMessage) {
   } catch {
     // A body is optional; fall back to the status code alone.
   }
+  let body = null;
+  try {
+    body = detail ? JSON.parse(detail) : null;
+  } catch {
+    // Not JSON (a gateway's page, a truncated body): the status decides.
+  }
   const suffix = detail ? `: ${detail}` : "";
-  return Object.assign(new Error(`${fallbackMessage}: ${response.status}${suffix}`), { status: response.status });
+  return Object.assign(new Error(`${fallbackMessage}: ${response.status}${suffix}`), {
+    status: response.status,
+    code: typeof body?.code === "string" ? body.code : "",
+    serverMessage: typeof body?.message === "string" ? body.message : "",
+  });
 }
+
+/**
+ * Whether the server has no such function, or none that takes those arguments.
+ * The client ships before the migration it was written for, so a new RPC is
+ * called with a fallback for the database that has not got it yet.
+ */
+export function isMissingRpc(error) {
+  return (
+    error?.code === "PGRST202" ||
+    (Number(error?.status) === 404 && /could not find the function/i.test(String(error?.serverMessage ?? error?.message ?? "")))
+  );
+}
+
+function createRandomId(prefix) {
+  return globalThis.crypto?.randomUUID?.() ?? `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+// With storage unavailable every call used to mint a new id, so the shell, the
+// runtime and each error row carried different ones and the per-session limits
+// counted every request as a new device. One id per page load at the least.
+let fallbackSessionId = null;
 
 export function getSessionId() {
   const key = "critical-point-session-id";
   const existing = readStoredValue(key);
   if (existing) return existing;
+  if (fallbackSessionId) return fallbackSessionId;
 
-  const next =
-    globalThis.crypto?.randomUUID?.() ??
-    `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  writeStoredValue(key, next);
+  const next = createRandomId("session");
+  if (!writeStoredValue(key, next)) fallbackSessionId = next;
+  return next;
+}
+
+/**
+ * The id a board post is written under. The board publishes a nickname, so it
+ * does not share the id telemetry and the ranking use: with one id for both,
+ * whoever reads the tables can put a name to a device's anonymous rows.
+ */
+let fallbackBoardWriterId = null;
+
+export function getBoardWriterId() {
+  const existing = readStoredValue(BOARD_WRITER_ID_KEY);
+  if (existing) return existing;
+  if (fallbackBoardWriterId) return fallbackBoardWriterId;
+
+  const next = createRandomId("board");
+  if (!writeStoredValue(BOARD_WRITER_ID_KEY, next)) fallbackBoardWriterId = next;
   return next;
 }
 
@@ -217,7 +270,7 @@ export async function fetchBoardPosts(limit = 50) {
     headers: restHeaders(),
   });
 
-  if (!response.ok) throw new Error(`Board fetch failed: ${response.status}`);
+  if (!response.ok) throw await createTelemetryError(response, "Board fetch failed");
 
   return { rows: await response.json() };
 }
@@ -240,9 +293,7 @@ export async function fetchLeaderboard(limit = 100) {
     headers: restHeaders(),
   });
 
-  if (!response.ok) {
-    throw new Error(`Leaderboard fetch failed: ${response.status}`);
-  }
+  if (!response.ok) throw await createTelemetryError(response, "Leaderboard fetch failed");
 
   return { rows: await response.json() };
 }

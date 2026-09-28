@@ -82,7 +82,7 @@ begin
   end if;
 
   -- The nickname is one line: any run of whitespace inside it is one space.
-  v_nickname := public.clean_board_text(regexp_replace(coalesce(new.nickname, ''), '[\s 　]+', ' ', 'g'));
+  v_nickname := public.clean_board_text(regexp_replace(coalesce(new.nickname, ''), '[\s\u00A0\u3000]+', ' ', 'g'));
   v_body := public.clean_board_text(new.body);
 
   if length(v_nickname) not between 2 and 24 or public.board_visible_length(v_nickname) < 2 then

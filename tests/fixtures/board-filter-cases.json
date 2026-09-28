@@ -21,8 +21,8 @@
     { "label": "an e-mail address, whose domain is a link first", "nickname": "점검", "body": "메일 someone@example.org", "reason": "link" },
     { "label": "an e-mail address on a domain the link filter does not list", "nickname": "점검", "body": "메일 someone@example.museum 으로 주세요", "reason": "contact" },
     { "label": "an e-mail address in the nickname", "nickname": "me@example.museum", "body": "평범한 본문입니다", "reason": "contact" },
-    { "label": "a whitespace-only body", "nickname": "점검", "body": "　​\n\t ", "reason": "characters" },
-    { "label": "a zero-width nickname", "nickname": "​​​", "body": "평범한 본문입니다", "reason": "characters" },
+    { "label": "a whitespace-only body", "nickname": "점검", "body": "\u3000\u200B\n\t\u00A0", "reason": "characters" },
+    { "label": "a zero-width nickname", "nickname": "\u200B\u200B\u200B", "body": "평범한 본문입니다", "reason": "characters" },
     { "label": "a one-character body", "nickname": "점검", "body": "가", "reason": "characters" }
   ],
   "accepted": [
