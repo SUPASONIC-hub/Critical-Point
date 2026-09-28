@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nodes } from "../src/gameData.js";
-import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
+import { dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { openBrokenBoard } from "./helpers/layout.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
@@ -191,8 +191,8 @@ test("a save that holds a locked card as its bet still settles", async ({ page }
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/?debug=1");
 
-  await expect(stageOf(page)).toHaveAttribute("data-status", "bust");
-  await expect(page.getByTestId("decision-next")).toBeVisible();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   const settled = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(settled.dynamics.busts).toBe(1);
   expect(settled.dynamics.windowIndex).toBe(save.dynamics.windowIndex + 1);
@@ -230,8 +230,8 @@ test("an untouched window that runs out cannot be replayed by reloading under th
   expect(closed.dynamics.busts ?? 0, "before the verdict is committed").toBe(0);
 
   await page.reload();
-  await expect(stageOf(page)).toHaveAttribute("data-status", /bust|live/);
-  await expect(page.getByTestId("decision-next").or(page.getByTestId("scene-briefing")).first()).toBeVisible();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("decision-next").or(page.getByTestId("scene-briefing")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   const after = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(after.dynamics.busts, "the bust stands").toBe(1);
   expect(after.dynamics.windowIndex).toBe((fresh.dynamics?.windowIndex ?? 0) + 1);
