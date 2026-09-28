@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 async function expectNoA11yViolations(page) {

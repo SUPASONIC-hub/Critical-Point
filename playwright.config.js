@@ -41,7 +41,13 @@ export default defineConfig({
     // `npm run test:e2e` asks the OS for a free port and passes it here, so the
     // fallback only applies when a dev server is started by hand on 5197.
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1:5197",
-    trace: "on-first-retry",
+    // Kept when a test fails, on every path. `on-first-retry` recorded nothing
+    // unless there was a retry, and only the default CI run has retries: a
+    // failure twenty minutes into the season walk, or anywhere on a desktop,
+    // left a line of text and nothing to look at.
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     permissions: ["clipboard-read", "clipboard-write"],
   },
   projects: [
@@ -52,6 +58,21 @@ export default defineConfig({
     {
       name: "mobile-chromium",
       use: { ...devices["Pixel 7"] },
+    },
+    // Safari's engine, on the phone most players hold. It runs what differs
+    // there rather than the whole suite twice over: the tests that play the
+    // production build from the intro (@prod), and the measurements of what
+    // fits on one screen (@layout) -- the fixed action bar under iOS viewport
+    // units is the thing priority 27 promises and Chromium cannot show.
+    {
+      name: "webkit",
+      grep: /@prod|@layout/,
+      // WebKit takes the dev server's modules one request at a time and is
+      // about three times slower to a first scene than Chromium is.
+      timeout: 180_000,
+      // The clipboard permissions above are Chromium's names; WebKit refuses
+      // a context that asks for them.
+      use: { ...devices["iPhone 14"], permissions: [] },
     },
   ],
 });

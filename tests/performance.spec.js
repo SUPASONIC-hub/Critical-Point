@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 
 test("intro should become usable within the navigation budget", { tag: "@prod" }, async ({ page }) => {
   await page.addInitScript(() => performance.mark("navigation-start"));

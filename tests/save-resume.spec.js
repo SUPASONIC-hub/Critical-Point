@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { dismissProtocolBreach, resumeSavedRun, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
