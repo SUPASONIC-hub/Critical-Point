@@ -167,13 +167,6 @@ export function caseNodePrefix(caseId = "") {
   return "";
 }
 
-export function caseNodePattern(caseId = "") {
-  // 사건 01 predates the prefix: its scenes are bare nouns.
-  if (caseId === "case01") return /^(start|accounting|payday|competitor|board|final|result|c1_)/;
-  const prefix = caseNodePrefix(caseId);
-  return prefix ? new RegExp(`^${prefix}_`) : null;
-}
-
 /** The scene a case closes on, before its result screen. */
 export function caseAftermathNodeId(caseId = "") {
   return `${caseNodePrefix(caseId)}_aftershock`;
@@ -186,17 +179,24 @@ export function caseDisplayCode(caseId = "") {
   return caseId.replace("case", "");
 }
 
-export const nodeOrders = {
+/**
+ * The scenes each case file writes, in the order they are written. The graph
+ * build (gameData.js) grows its own copy -- aftermath, connective, reaction,
+ * branch and route scenes -- and exports that as `nodeOrders`; this table stays
+ * as authored, because this module is in the entry chunk and must read the same
+ * before and after the runtime chunk loads.
+ */
+export const authoredNodeOrders = {
   prologue01: ["p1_start", "p1_counter", "p1_mentor", "p1_review", "p1_final"],
   prologue02: ["p2_start", "p2_site", "p2_model", "p2_draft", "p2_final"],
   prologue03: ["p3_start", "p3_committee", "p3_corridor", "p3_archive", "p3_final"],
   prologue04: ["p4_start", "p4_window", "p4_quota", "p4_visit", "p4_final"],
   prologue05: ["p5_start", "p5_notice", "p5_basement", "p5_echo", "p5_final"],
-  case01: ["start", "accounting", "payday", "competitor", "board", "final"],
-  case02: ["c2_start", "c2_logs", "c2_meeting", "c2_pressure", "c2_final"],
-  case03: ["c3_start", "c3_split", "c3_score", "c3_trap", "c3_final"],
-  case04: ["c4_start", "c4_offer", "c4_leak", "c4_vote", "c4_final"],
-  case05: ["c5_start", "c5_map", "c5_blame", "c5_collapse", "c5_final"],
+  case01: ["start", "accounting", "payday", "competitor", "board"],
+  case02: ["c2_start", "c2_logs", "c2_meeting", "c2_pressure"],
+  case03: ["c3_start", "c3_split", "c3_score", "c3_trap"],
+  case04: ["c4_start", "c4_offer", "c4_leak", "c4_vote"],
+  case05: ["c5_start", "c5_map", "c5_blame", "c5_collapse"],
   case06: ["c6_start", "c6_desk", "c6_logs", "c6_panel", "c6_final"],
   case07: ["c7_start", "c7_ledger", "c7_counter", "c7_paper", "c7_final"],
   case08: ["c8_start", "c8_trail", "c8_gallery", "c8_bait", "c8_final"],

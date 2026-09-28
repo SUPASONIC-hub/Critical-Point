@@ -205,47 +205,4 @@ export const case01Nodes = {
       },
     ],
   },
-  final: {
-    phase: "FINAL DECISION",
-    title: "마지막 6시간",
-    speaker: "한서윤",
-    text:
-      "남은 시간은 6시간입니다. 당신의 결정은 플로우온을 살리지 못합니다. 어떤 손실을 감수할지 정할 수 있을 뿐입니다. 회의를 나서기 직전 한서윤이 말합니다. '3년 전 그 반대 의견서, 저도 봤습니다. 반려 처리한 사람이 접니다.' 그리고 화면 한쪽에 당신의 반응 패턴이 다음 사례 설계에 반영된다는 알림이 잠깐 떴다가 사라집니다.",
-    memo: [
-      "투자자는 최종 답변을 요구함",
-      "직원 공지 전 마지막 회의 가능",
-      "협력사 대표들이 대금 지급 계획을 기다림",
-      "3년 전 반대 의견서를 반려한 사람: 한서윤",
-    ],
-    triggers: ["responsibility", "protection", "order"],
-    choices: [
-      {
-        id: "final_people",
-        label: "직원과 협력사 피해를 줄이는 결말을 택한다",
-        effect: { capital: -12, trust: 13, legitimacy: 6, humanCost: -11, fatigue: 2 },
-        next: "result",
-        cognition: { persistence: 2 },
-      },
-      {
-        id: "final_company",
-        label: "회사 생존 가능성을 가장 크게 남긴다",
-        effect: { capital: 20, trust: -8, legitimacy: -3, humanCost: 8, fatigue: 2 },
-        next: "result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "final_truth",
-        label: "투명성과 책임 규명을 남긴다",
-        effect: { capital: -10, trust: 5, legitimacy: 11, fatigue: 2 },
-        next: "result",
-        cognition: { inference: 1, persistence: 1 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "result",
-      },
-    ],
-  },
 };

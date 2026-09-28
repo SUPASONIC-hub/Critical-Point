@@ -166,47 +166,4 @@ export const case04Nodes = {
       },
     ],
   },
-  c4_final: {
-    phase: "FINAL DECISION",
-    title: "좋은 결과의 가격",
-    speaker: "한서윤",
-    text:
-      "사람들을 살릴 수도 있고 원칙을 지킬 수도 있지만, 둘 다 온전히는 불가능합니다. 한서윤이 휴대폰 화면을 보여줍니다. 그룹전략실에서 온 한 줄짜리 메시지입니다. '온새 건, 무리하지 마십시오. 분석관 본인 경력에 남습니다.' 보낸 사람은 윤상혁 상무입니다. '협박이 아닙니다.' 한서윤이 말합니다. '저 사람은 협박을 안 합니다. 예보를 합니다.'",
-    memo: [
-      "서비스 유지와 제도 신뢰가 정면으로 충돌",
-      "언론 보도는 아직 막을 수 있음",
-      "그룹전략실 윤상혁 상무가 직접 메시지를 보냄",
-      "이번 판단은 당신의 '명분 있는 위반' 허용선 자료가 됨",
-    ],
-    triggers: ["reward", "order", "responsibility", "protection"],
-    choices: [
-      {
-        id: "final_exception",
-        label: "예외를 승인하고 결과 책임을 진다",
-        effect: { capital: 20, legitimacy: -10, trust: 3, fatigue: 3 },
-        next: "case04_result",
-        cognition: { risk: 2, persistence: 1 },
-      },
-      {
-        id: "final_rule",
-        label: "규칙을 지키고 피해 완화책을 선택한다",
-        effect: { capital: -10, legitimacy: 9, trust: 6, humanCost: 8, fatigue: 4 },
-        next: "case04_result",
-        cognition: { persistence: 2, risk: 1 },
-      },
-      {
-        id: "final_audit",
-        label: "예외와 공개 감사를 동시에 선택한다",
-        effect: { capital: 9, legitimacy: 6, trust: 9, fatigue: 5 },
-        next: "case04_result",
-        cognition: { reframing: 3, inference: 1 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "case04_result",
-      },
-    ],
-  },
 };

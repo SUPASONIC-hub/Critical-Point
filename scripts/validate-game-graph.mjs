@@ -276,8 +276,7 @@ CASE_SEQUENCE.forEach((caseId, index) => {
  * it did so by overwriting the `next` each file had written: 880 of the 1,488
  * `next:` values in `src/nodes/` pointed somewhere no run ever went. Those are
  * gone, and a choice whose route a generator decides carries no `next` at all.
- * A `next` that is written must be the one the built graph uses. Scenes a route
- * plan retires are skipped: they never enter the graph.
+ * A `next` that is written must be the one the built graph uses.
  */
 const authoredSources = [
   ...[case01Nodes, case02Nodes, case03Nodes, case04Nodes, case05Nodes, case06Nodes, case07Nodes, case08Nodes, case09Nodes, case10Nodes, case11Nodes, finalCaseNodes]

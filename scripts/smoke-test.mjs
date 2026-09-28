@@ -710,9 +710,6 @@ for (const [routeId, finalId] of [
     assert.notEqual(choice.next, finalId, `${routeId} should open an authored scene before ${finalId}`);
   }
 }
-test("route finals should have retired the old shared case finals", () => {
-  assert.ok(!nodes.final && !nodes.c2_final && !nodes.c5_final, "route finals should have retired the old shared case finals");
-});
 // Four routes closing on four scenes that ask the same three questions is the
 // same convergence the split was meant to remove, one scene later.
 for (const caseId of CASE_SEQUENCE) {

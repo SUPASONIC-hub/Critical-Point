@@ -1,6 +1,6 @@
 export { byEffectWeight, cognitionLabels, costWhenRising, initialResources, isResourceGain, triggerLabels } from "./gameConstants.js";
 export { characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
-export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseAftermathNodeId, caseDisplayCode, caseNodePattern, caseNodePrefix, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
+export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseAftermathNodeId, caseDisplayCode, caseNodePrefix, caseObjectives, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
 import { case02Nodes } from "./nodes/case02.js";
 import { case03Nodes } from "./nodes/case03.js";
@@ -17,7 +17,7 @@ import { applySceneContext } from "./nodes/sceneContext.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
 import { isResourceGain } from "./gameConstants.js";
-import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./gameCases.js";
+import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES, RESULT_NODE_IDS } from "./gameCases.js";
 
 /**
  * Everything below rewires the graph in place: aftermath, connective, reaction,
@@ -29,10 +29,29 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./
  */
 const CASE_PACKS = structuredClone(AUTHORED_CASE_PACKS);
 
+/**
+ * Every scene of each case, in play order: the authored scenes plus everything
+ * the generators below add. A copy, for the same reason the packs are: eight
+ * sites here push, splice and unshift into it, and the authored table is
+ * exported by a module the intro shell loads before this one.
+ */
+export const nodeOrders = structuredClone(authoredNodeOrders);
+
 export { CASE_PACKS };
 
 /** Authored replies plus one for every scene the generators below add. */
 export const echoReplies = { ...authoredEchoReplies };
+
+/**
+ * A scene a table names has to be in the graph. The generators used to skip a
+ * source they could not find, so a mistyped id dropped a whole scene -- and
+ * every choice that should have led to it -- without a word.
+ */
+function sceneOf(nodeId, owner) {
+  const scene = nodes[nodeId];
+  if (!scene) throw new Error(`${owner} names the scene "${nodeId}", which the graph does not have`);
+  return scene;
+}
 
 /**
  * The authored scene graph, one file per case. Everything below this literal
@@ -217,18 +236,22 @@ const aftermathNodes = {
 CASE_PACKS.forEach((pack) => Object.assign(aftermathNodes, pack.aftermath));
 Object.assign(nodes, aftermathNodes);
 
-// [case, the scene that closes it, its aftermath]: 사건 01-11 and the finale by
-// hand, the packs from their own `aftermathRoute`.
+// [case, the scene that closes it, its aftermath]: 사건 06-11 and the finale by
+// hand, the packs from their own `aftermathRoute`. 사건 01-05 have no single
+// closing scene -- each route closes on its own final, which
+// `registerDramaticRoutePlan` points at the aftermath -- so theirs is null.
 const aftermathRoutes = [
-  ["case01", "final", "c1_aftershock"],
-  ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
+  ...[1, 2, 3, 4, 5].map((index) => [`case0${index}`, null, `c${index}_aftershock`]),
+  ...[6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
   ...CASE_PACKS.map(({ id, aftermathRoute: [finalId, aftershockId] }) => [id, finalId, aftershockId]),
   ["final", "f_choice", "f_aftershock"],
 ];
 aftermathRoutes.forEach(([caseId, nodeId, nextNode]) => {
-  nodes[nodeId].choices.forEach((choice) => {
-    choice.next = nextNode;
-  });
+  if (nodeId) {
+    sceneOf(nodeId, `${caseId} aftermath route`).choices.forEach((choice) => {
+      choice.next = nextNode;
+    });
+  }
   nodeOrders[caseId].push(nextNode);
 });
 
@@ -236,19 +259,19 @@ const connectiveScenes = [
   ["c1_witness", "accounting", "payday", "누가 179.6을 만들었나", "반재욱", "회계팀 막내가 회의실 문 앞에서 멈춰 섰습니다. 장부가 틀렸다고 말하지는 않습니다. 대신 그 숫자를 만들던 날 회의실에 은행 사람이 앉아 있었다고 말합니다. 명함은 못 받았습니다.", ["원본 파일은 세 번 저장됨", "막내 직원은 회의 초대를 받지 못함", "재무책임자의 지시는 구두로만 남음", "그날 회의 참석자 명단에 외부인 1명 누락"], ["직원을 보호하며 증언할 자리를 만든다", "원본 파일을 먼저 잠가 증거를 보존한다", "말이 퍼지기 전에 CFO와 비공개로 합의한다"]],
   ["c1_assembly", "payday", "competitor", "급여일 전의 약속", "도윤하", "급여일 아침을 버티려면 돈만 필요한 것이 아닙니다. 직원들은 회사가 무엇을 숨기고 있는지보다, 내일도 자신이 이곳에 있을지 알고 싶어 합니다.", ["야간조 대표가 공동 공지를 요구함", "협력사 세 곳이 같은 지급 기준을 요구함", "임원진은 개인 보수를 먼저 공개하길 꺼림"], ["직원 대표와 함께 공개 약속을 만든다", "지급 순서를 숫자로 고정한다", "임원진만 아는 임시 합의를 만든다", "임원 보수를 먼저 깎아 줄 돈을 마련한다"]],
   ["c1_bargain", "competitor", "board", "팔리지 않은 자리", "오진우", "넥스트마일의 협상안에는 빈칸이 하나 있습니다. 인수하지 않을 사업부, 남겨질 직원, 협력사 중 누가 그 빈칸을 채울지 아무도 쓰지 않았습니다.", ["인수 조건에 책임 주체가 없음", "협력사는 매각보다 지급 보장을 원함", "오진우는 승률을 높이는 문장만 골라냄"], ["빈칸을 채운 뒤에만 협상한다", "가장 약한 쪽의 조건부터 반영한다", "빈칸을 남겨 빠르게 사인한다"]],
-  ["c1_verdict", "board", "final", "판결이 아닌 선택", "에코", "모든 자료가 테이블 위에 올라왔지만 결론은 더 멀어졌습니다. 이제 당신의 선택은 회사를 설명하는 문장이 아니라, 누가 내일의 비용을 들 것인지 정하는 문장입니다.", ["직원·협력사·투자자의 요구가 동시에 도착함", "한쪽을 살리면 다른 쪽의 신뢰가 줄어듦", "반응 패턴이 다음 사건으로 전송될 예정"], ["가장 약한 사람의 손실부터 줄인다", "살아남을 돈을 먼저 확보한다", "결정의 책임과 근거를 모두 공개한다"]],
+  ["c1_verdict", "board", "c1_final_funding", "판결이 아닌 선택", "에코", "모든 자료가 테이블 위에 올라왔지만 결론은 더 멀어졌습니다. 이제 당신의 선택은 회사를 설명하는 문장이 아니라, 누가 내일의 비용을 들 것인지 정하는 문장입니다.", ["직원·협력사·투자자의 요구가 동시에 도착함", "한쪽을 살리면 다른 쪽의 신뢰가 줄어듦", "반응 패턴이 다음 사건으로 전송될 예정"], ["가장 약한 사람의 손실부터 줄인다", "살아남을 돈을 먼저 확보한다", "결정의 책임과 근거를 모두 공개한다"]],
   ["c2_trace", "c2_logs", "c2_meeting", "사라진 11초", "임경수", "퇴직한 전 심사팀장이 헌책방 2층에서 끈으로 묶은 서류를 풀어 놓습니다. 접속 기록에는 11초의 빈틈이 있고, 그 11초에 바뀐 페이지가 그의 종이 사본에는 그대로 남아 있습니다. '전산은 고치면 그만이지만 종이는 태워야 하거든. 태운 자리는 표가 나고.'", ["종이 사본에만 남은 3페이지 하단", "이민서 계정은 빈틈 직전에 사용됨", "보안팀은 빈틈을 단순 오류라고 주장함", "임경수는 이 사본을 4년째 보관 중"], ["11초를 기술적으로 재현한다", "이민서에게 그 시간의 행동을 묻는다", "오류로 처리하고 보고 시간을 지킨다"]],
   ["c2_witness", "c2_meeting", "c2_pressure", "이민서의 침묵", "도윤하", "이민서는 자신을 변호하지 않습니다. 대신 누가 그 파일을 받았는지보다, 왜 하필 서명란이 빈 3페이지만 정리하라는 지시가 내려왔는지부터 물어봅니다.", ["스캔 정리 지시는 구두로만 내려옴", "지시받은 범위는 3페이지 한 장뿐", "이민서는 그 페이지를 읽지 않고 처리함", "재계약 심사까지 2주"], ["이민서의 안전을 먼저 확보한다", "파일의 이동 경로만 추적한다", "침묵을 의심 신호로 기록한다", "이민서와 조건을 걸고 거래한다"]],
-  ["c2_judgment", "c2_pressure", "c2_final", "보고서 밖의 사람", "한서윤", "보안팀은 결론을 요구하지만, 이민서의 동료들은 보고서에 없는 사실을 알고 있습니다. 공식 기록과 사람의 기억 중 하나만 고를 수는 없습니다.", ["동료 두 명이 익명 증언을 제출함", "1차 보고 마감까지 18분", "외부 기업은 유출 사실을 부인함"], ["익명 증언을 공식 부록으로 붙인다", "기록에 없는 정보는 보류한다", "외부 기업과 먼저 대면한다"]],
+  ["c2_judgment", "c2_pressure", "c2_final_evidence", "보고서 밖의 사람", "한서윤", "보안팀은 결론을 요구하지만, 이민서의 동료들은 보고서에 없는 사실을 알고 있습니다. 공식 기록과 사람의 기억 중 하나만 고를 수는 없습니다.", ["동료 두 명이 익명 증언을 제출함", "1차 보고 마감까지 18분", "외부 기업은 유출 사실을 부인함"], ["익명 증언을 공식 부록으로 붙인다", "기록에 없는 정보는 보류한다", "외부 기업과 먼저 대면한다"]],
   ["c3_rival", "c3_split", "c3_score", "같은 자료, 다른 목적", "오진우", "오진우는 당신의 자료에 없는 숫자를 들고 왔습니다. 고객이 실제로 원하는 것은 비용 절감이 아니라 실패했을 때 책임질 사람이라는 사실입니다.", ["고객사는 책임 조항을 비공개로 요구함", "경쟁안은 책임을 하청사로 넘김", "보안팀은 발표에서 빠져 있음"], ["책임 조항을 앞에 세운다", "비용표부터 다시 계산한다", "오진우에게 없는 숫자의 출처를 묻는다"]],
   ["c3_signal", "c3_score", "c3_trap", "관객석의 신호", "에코", "발표장 뒤편의 불이 두 번 깜빡였습니다. 고객 신호인지 트리거랩의 시험인지 알 수 없지만, 오진우는 그 신호를 보고 답을 바꿉니다.", ["불빛은 보안 경고와 같은 주기임", "고객 대표는 신호를 부인함", "오진우의 응답 시간이 비정상적으로 짧아짐"], ["신호를 공개 질문으로 바꾼다", "발표를 멈추고 보안부터 확인한다", "상대보다 먼저 결론을 밀어붙인다", "오진우와 신호의 해석을 나눠 갖는다"]],
-  ["c3_verdict", "c3_trap", "c3_final", "승부의 끝에서", "한서윤", "당신은 이제 오진우보다 빠르거나 느린 사람이 아닙니다. 어떤 기준으로 승부를 끝낼지 정하는 사람입니다.", ["고객사는 오늘 안에 결론을 원함", "보안 결함은 아직 완전 증명 전", "공동 발표를 하면 책임은 나뉨"], ["검증을 끝낸 뒤 발표한다", "공동 책임으로 발표한다", "불확실성을 숨기고 승리를 확정한다"]],
+  ["c3_verdict", "c3_trap", "c3_final_joint", "승부의 끝에서", "한서윤", "당신은 이제 오진우보다 빠르거나 느린 사람이 아닙니다. 어떤 기준으로 승부를 끝낼지 정하는 사람입니다.", ["고객사는 오늘 안에 결론을 원함", "보안 결함은 아직 완전 증명 전", "공동 발표를 하면 책임은 나뉨"], ["검증을 끝낸 뒤 발표한다", "공동 책임으로 발표한다", "불확실성을 숨기고 승리를 확정한다"]],
   ["c4_audit", "c4_offer", "c4_leak", "3%의 주인", "반재욱", "부족한 3%는 단순한 숫자가 아니었습니다. 그 숫자를 만든 결정과, 그 숫자 때문에 서비스를 잃는 사람의 이름이 서로 다른 서류에 적혀 있습니다. 한쪽 서류의 서명란은 비어 있습니다.", ["계산 공식에는 현장 업무가 빠져 있음", "심사 기준은 2년 전 자료에 고정됨", "상환 일정 변경 요청서의 서명란은 공란", "서비스 이용자 대표가 발언을 요청함"], ["이용자 대표의 기준을 반영한다", "산식 변경 이력을 남긴다", "3%를 조용히 보정한다"]],
   ["c4_public", "c4_leak", "c4_vote", "기자가 기다리는 문장", "도윤하", "기자는 아직 기사를 쓰지 않았습니다. 다만 당신이 어떤 표현을 선택하는지에 따라 내일의 제목이 정해질 것이라고 말합니다.", ["제보 메일은 내부에서 시작됨", "온새는 서비스 중단을 막고 싶어 함", "심사관은 공개 설명을 요구함"], ["사실과 모르는 것을 함께 공개한다", "서비스 이용자 피해를 먼저 알린다", "기사에 나갈 표현을 최소화한다", "기사 시점을 늦추는 대신 전량 공개를 약속한다"]],
-  ["c4_verdict", "c4_vote", "c4_final", "선의의 증거", "에코", "좋은 의도는 증거가 되지 않습니다. 하지만 좋은 결과만을 위해 규칙을 늘리면, 다음 사람은 그 규칙을 이용할 수 있습니다.", ["이사회는 오늘 결정을 요구함", "감사 자료는 공개 가능함", "서비스 이용자 4,200명이 결과를 기다림"], ["예외를 공개된 조건으로 묶는다", "규칙을 지키고 서비스를 포기한다", "결과가 좋다면 기록은 나중에 설명한다"]],
+  ["c4_verdict", "c4_vote", "c4_final_rule", "선의의 증거", "에코", "좋은 의도는 증거가 되지 않습니다. 하지만 좋은 결과만을 위해 규칙을 늘리면, 다음 사람은 그 규칙을 이용할 수 있습니다.", ["이사회는 오늘 결정을 요구함", "감사 자료는 공개 가능함", "서비스 이용자 4,200명이 결과를 기다림"], ["예외를 공개된 조건으로 묶는다", "규칙을 지키고 서비스를 포기한다", "결과가 좋다면 기록은 나중에 설명한다"]],
   ["c5_pattern", "c5_map", "c5_blame", "실패가 움직인 경로", "반재욱", "지도 위의 화살표가 한 사람에게 모이지 않습니다. 모든 화살표가 서로의 합리적인 선택을 통과해 같은 곳에 도착했습니다.", ["각 팀은 다른 팀의 정보를 보지 못함", "가장 먼저 위험을 말한 기록이 누락됨", "책임표에는 승인자만 남아 있음"], ["정보가 막힌 지점을 먼저 고친다", "승인자에게 책임을 집중한다", "피해가 큰 부서부터 보상한다"]],
   ["c5_voice", "c5_blame", "c5_collapse", "이름 없는 증언", "도윤하", "누군가가 회의실 밖에서 말합니다. 자신은 결정권자가 아니었지만, 실패를 가장 먼저 보았다고 합니다.", ["증언자는 기록에서 빠져 있음", "말하면 팀 전체가 조사받을 수 있음", "피해자들은 책임자 이름보다 회복을 요구함"], ["증언자를 보호하고 기록을 복원한다", "공식 책임자 발표를 먼저 한다", "보상안을 만들고 조사를 미룬다", "증언자의 고용을 내 권한으로 보장한다"]],
-  ["c5_verdict", "c5_collapse", "c5_final", "책임의 모양", "한서윤", "실패를 설명하는 방법은 세 가지입니다. 사람을 지목하거나, 구조를 고치거나, 피해를 먼저 되돌리는 것. 어느 것도 공짜는 아닙니다.", ["개선 예산은 한정됨", "책임 발표를 기다리는 언론", "피해 복구팀이 즉시 출범할 수 있음"], ["내 결정부터 공개한다", "반복을 막는 구조에 투자한다", "피해 복구를 가장 먼저 시작한다"]],
+  ["c5_verdict", "c5_collapse", "c5_final_redesign_route", "책임의 모양", "한서윤", "실패를 설명하는 방법은 세 가지입니다. 사람을 지목하거나, 구조를 고치거나, 피해를 먼저 되돌리는 것. 어느 것도 공짜는 아닙니다.", ["개선 예산은 한정됨", "책임 발표를 기다리는 언론", "피해 복구팀이 즉시 출범할 수 있음"], ["내 결정부터 공개한다", "반복을 막는 구조에 투자한다", "피해 복구를 가장 먼저 시작한다"]],
   ["c6_kitchen", "c6_desk", "c6_logs", "탕비실의 세 사람", "도윤하", "탕비실에서 반재욱이 오진우의 머그컵을 씻고 있습니다. '증거물 아닙니까' 하고 도윤하가 묻자 그는 '커피 자국은 증거가 아닙니다' 하고 답합니다. 셋 다 웃지 않지만, 아무도 먼저 나가지 않습니다.", ["그를 아는 사람이 생각보다 많음", "머그컵은 결국 씻겼음", "위원회 자료는 아직 한 줄도 쓰지 못함"], ["여기서 나눈 이야기를 자료에 넣는다", "이 자리는 기록 밖에 두고 자료는 따로 쓴다", "자리를 끝내고 각자 일로 돌아간다"]],
   ["c6_family", "c6_logs", "c6_panel", "누나의 전화", "한서윤", "오진우의 누나가 회사로 전화했습니다. 동생이 승진했다고 들었는데 축하 자리를 언제 하느냐고 묻습니다. 그 승진은 사건 03 직후의 일이고, 그때부터 그의 결정 창이 줄기 시작했습니다.", ["가족은 아무것도 모름", "승진 시점과 조건 변경 시점이 같음", "통화는 30초 만에 끝났음"], ["가족에게 사실대로 알린다", "회사 공식 창구로 안내한다", "지금은 아무 말도 하지 않는다"]],
   ["c6_ledger", "c6_panel", "c6_final", "두 장의 프로필", "에코", "위원회 직전, 에코가 두 장의 프로필을 나란히 띄웁니다. 왼쪽은 오진우, 오른쪽은 당신입니다. 축소된 창과 늘어난 창이 같은 그래프의 위아래로 그려집니다. 에코가 말합니다. '둘 중 하나는 대조군입니다.'", ["두 프로필의 실험 번호가 동일", "대조군이 누구인지는 표시되지 않음", "위원회 시작까지 10분"], ["두 장을 함께 위원회에 낸다", "내 것만 빼고 그의 것을 낸다", "둘 다 덮고 사실관계로만 간다"]],
@@ -960,19 +983,19 @@ const reactionScenes = [
   ["c1_witness_reaction", "c1_witness", "payday", "증언 뒤의 침묵", "한서윤", "증언이 시작되자 회계팀 전체가 말을 멈췄습니다. 누구를 보호하느냐에 따라 내일의 보고서가 완전히 달라집니다.", ["증언자를 보호하고 팀 전체에 기준을 설명한다", "증언을 문서로만 남기고 회의를 끝낸다", "CFO에게 먼저 반응할 기회를 준다"]],
   ["c1_assembly_reaction", "c1_assembly", "competitor", "급여일의 첫 문자", "에코", "첫 급여가 입금되기 전, 직원 단체방에 서로 다른 소문이 올라왔습니다. 정정할수록 더 많은 질문이 생깁니다.", ["사실과 아직 모르는 것을 함께 알린다", "입금 확인 뒤에 한 번에 공지한다", "소문을 만든 사람을 먼저 찾는다"]],
   ["c1_bargain_reaction", "c1_bargain", "board", "협상장의 빈 의자", "도윤하", "협상 상대가 자리에 오지 않았습니다. 그 빈 의자는 인수에서 제외될 사람들의 자리처럼 보입니다.", ["빈 의자의 사람들을 협상에 부른다", "조건표를 먼저 완성해 협상을 이어간다", "상대가 돌아올 때까지 침묵한다"]],
-  ["c1_verdict_reaction", "c1_verdict", "final", "결론 전 마지막 질문", "반재욱", "모두가 당신에게 결론을 요구하지만, 반재욱은 마지막으로 묻습니다. 이 결론을 가장 먼저 듣게 될 사람은 누구입니까.", ["가장 큰 피해를 받는 사람에게 먼저 설명한다", "투자자에게 근거부터 제출한다", "회의록에 책임자만 남긴다"]],
+  ["c1_verdict_reaction", "c1_verdict", "c1_final_funding", "결론 전 마지막 질문", "반재욱", "모두가 당신에게 결론을 요구하지만, 반재욱은 마지막으로 묻습니다. 이 결론을 가장 먼저 듣게 될 사람은 누구입니까.", ["가장 큰 피해를 받는 사람에게 먼저 설명한다", "투자자에게 근거부터 제출한다", "회의록에 책임자만 남긴다"]],
   ["c2_trace_reaction", "c2_trace", "c2_meeting", "11초 뒤의 접속", "에코", "빈틈을 재현하자 다른 계정이 깨어났습니다. 오류를 고치면 진실도 함께 사라질 수 있습니다.", ["기록을 보존한 채 접근을 막는다", "계정을 따라가 원인을 확인한다", "전체 시스템을 초기화한다"]],
   ["c2_witness_reaction", "c2_witness", "c2_pressure", "보호받은 사람의 말", "반재욱", "이민서는 처음으로 자신이 보호받는 것이 두렵다고 말합니다. 보호는 때로 의심받을 기회를 빼앗습니다.", ["이민서가 직접 말할 수 있는 절차를 만든다", "대신 진술해 위험을 줄인다", "보호를 해제하고 조사에 맡긴다"]],
-  ["c2_judgment_reaction", "c2_judgment", "c2_final", "익명성의 가격", "도윤하", "익명 증언을 붙이면 진실은 커지지만, 누구도 그 책임을 지지 않습니다. 보고서의 문장 하나가 사람들의 이름을 바꿀 수 있습니다.", ["익명성을 지키며 증언의 한계를 쓴다", "실명을 확인한 뒤 보고한다", "증언을 빼고 기록만 제출한다"]],
+  ["c2_judgment_reaction", "c2_judgment", "c2_final_evidence", "익명성의 가격", "도윤하", "익명 증언을 붙이면 진실은 커지지만, 누구도 그 책임을 지지 않습니다. 보고서의 문장 하나가 사람들의 이름을 바꿀 수 있습니다.", ["익명성을 지키며 증언의 한계를 쓴다", "실명을 확인한 뒤 보고한다", "증언을 빼고 기록만 제출한다"]],
   ["c3_rival_reaction", "c3_rival", "c3_score", "경쟁자의 제안", "오진우", "오진우는 자신의 안을 훔쳐도 좋다고 말합니다. 대신 당신이 그 안을 어떻게 바꾸는지 보고 싶다고 합니다.", ["공동 검증 조건을 제안한다", "자료 출처를 따져 협상을 멈춘다", "상대의 안을 이용해 먼저 제출한다"]],
   ["c3_signal_reaction", "c3_signal", "c3_trap", "두 번 깜빡인 불", "한서윤", "신호가 다시 깜빡였습니다. 이번에는 고객 대표도 보았습니다. 하지만 누구도 먼저 그 의미를 말하지 않습니다.", ["모두 앞에서 신호의 의미를 질문한다", "발표를 계속하며 신호를 기록한다", "신호를 무시하고 점수부터 확보한다"]],
-  ["c3_verdict_reaction", "c3_verdict", "c3_final", "승부 뒤의 책임표", "에코", "누가 이겼는지는 이미 결정됐지만 책임표는 비어 있습니다. 성공한 뒤의 실패를 누가 설명할지 정해야 합니다.", ["책임표를 공동으로 작성한다", "내 이름을 가장 위에 적는다", "성과가 난 뒤에 책임을 논의한다"]],
+  ["c3_verdict_reaction", "c3_verdict", "c3_final_joint", "승부 뒤의 책임표", "에코", "누가 이겼는지는 이미 결정됐지만 책임표는 비어 있습니다. 성공한 뒤의 실패를 누가 설명할지 정해야 합니다.", ["책임표를 공동으로 작성한다", "내 이름을 가장 위에 적는다", "성과가 난 뒤에 책임을 논의한다"]],
   ["c4_audit_reaction", "c4_audit", "c4_leak", "3%를 본 사람들", "도윤하", "이용자 대표들이 각자의 3%를 말하기 시작했습니다. 숫자를 맞추는 일은 쉬웠지만, 누구의 3%를 먼저 볼지는 어려웠습니다.", ["가장 취약한 이용자부터 기준을 세운다", "전체 평균을 기준으로 삼는다", "심사관의 기준만 따른다"]],
   ["c4_public_reaction", "c4_public", "c4_vote", "기사의 제목", "반재욱", "기자는 세 문장 중 하나만 쓸 수 있다고 합니다. 어떤 문장을 고르느냐에 따라 선의는 개혁이 되거나 은폐가 됩니다.", ["모르는 부분까지 포함한 문장을 고른다", "서비스가 유지된다는 결과를 강조한다", "논란을 만들 표현을 모두 뺀다"]],
-  ["c4_verdict_reaction", "c4_verdict", "c4_final", "감사실의 문", "에코", "감사실 문 앞에 서자 내부 자료를 넘긴 사람이 나타났습니다. 그는 규칙을 지킨 사람이 가장 큰 피해를 보았다고 말합니다.", ["자료를 공개하고 규칙을 다시 쓴다", "제보자를 보호한 뒤 내부에서 해결한다", "문을 닫고 심사 결과를 기다린다"]],
+  ["c4_verdict_reaction", "c4_verdict", "c4_final_rule", "감사실의 문", "에코", "감사실 문 앞에 서자 내부 자료를 넘긴 사람이 나타났습니다. 그는 규칙을 지킨 사람이 가장 큰 피해를 보았다고 말합니다.", ["자료를 공개하고 규칙을 다시 쓴다", "제보자를 보호한 뒤 내부에서 해결한다", "문을 닫고 심사 결과를 기다린다"]],
   ["c5_pattern_reaction", "c5_pattern", "c5_blame", "화살표를 거꾸로", "에코", "지도를 뒤집자 피해자에게 책임 화살표가 향했습니다. 누군가 만든 분류 방식이 실패를 더 오래 유지하고 있었습니다.", ["분류 방식을 폐기하고 다시 듣는다", "가장 큰 승인자만 조사한다", "기존 지도를 유지한 채 보완한다"]],
   ["c5_voice_reaction", "c5_voice", "c5_collapse", "말할 수 있는 조건", "한서윤", "증언자는 말할 준비가 됐지만, 팀을 떠나야만 안전합니다. 진실을 얻는 대신 조직을 잃을 수 있습니다.", ["떠나지 않아도 말할 수 있게 보호한다", "증언 뒤에 즉시 조직을 바꾼다", "조직을 지키기 위해 증언을 보류한다"]],
-  ["c5_verdict_reaction", "c5_verdict", "c5_final", "책임의 다음 날", "도윤하", "책임을 발표한 다음 날에도 피해는 그대로였습니다. 누군가를 지목한 말보다, 무엇을 되돌릴지가 더 급해졌습니다.", ["피해 복구를 발표의 첫 문장으로 둔다", "책임자의 사과를 먼저 받는다", "개선 계획이 완성될 때까지 침묵한다"]],
+  ["c5_verdict_reaction", "c5_verdict", "c5_final_redesign_route", "책임의 다음 날", "도윤하", "책임을 발표한 다음 날에도 피해는 그대로였습니다. 누군가를 지목한 말보다, 무엇을 되돌릴지가 더 급해졌습니다.", ["피해 복구를 발표의 첫 문장으로 둔다", "책임자의 사과를 먼저 받는다", "개선 계획이 완성될 때까지 침묵한다"]],
   ["c6_kitchen_reaction", "c6_kitchen", "c6_logs", "씻어 둔 컵", "반재욱", "반재욱이 컵을 엎어 말려 둔 자리에 포스트잇을 붙입니다. '쓰지 마시오'가 아니라 '오진우'라고만 적혀 있습니다. 그는 그게 무슨 뜻이냐는 질문에 답하지 않습니다.", ["이름표를 그대로 둔다", "자리 정리 절차를 함께 연다", "오늘 안에 자리를 비운다"]],
   ["c6_family_reaction", "c6_family", "c6_panel", "축하 자리", "도윤하", "누나가 회식 날짜를 다시 물어왔습니다. 도윤하가 조용히 말합니다. '거짓말을 하라는 게 아니라, 오늘은 대답하지 말라는 겁니다.' 그 말이 맞는지는 아무도 모릅니다.", ["오늘은 답하지 않는다", "회사 공식 창구가 답하게 한다", "지금 사실대로 전한다"]],
   ["c6_ledger_reaction", "c6_ledger", "c6_final", "대조군", "에코", "에코는 어느 쪽이 대조군인지 끝내 말하지 않습니다. 대신 한 줄을 띄웁니다. '대조군은 실험을 모르는 쪽입니다.' 당신은 지금 알고 있습니다.", ["내 프로필까지 함께 올린다", "두 장 다 봉인한다", "아는 것을 쓰지 않고 넘어간다"]],
@@ -1125,9 +1148,9 @@ const authoredBranchScenes = {
     memo: ["복원 시각", "진술 순서", "보고서에 남길 원문"],
     triggers: ["injustice", "responsibility"],
     choices: [
-      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 7, legitimacy: 4, capital: -5, time: -4, fatigue: 5 }, next: "c2_final", cognition: { reframing: 1 } },
-      { id: "c2_branch_records_follow_b", label: "원문을 첨부해 외부 검증을 연다", effect: { legitimacy: 9, capital: -5, time: -4 }, next: "c2_final", cognition: { inference: 2 } },
-      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -4 }, next: "c2_final", cognition: { risk: 1 } },
+      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 7, legitimacy: 4, capital: -5, time: -4, fatigue: 5 }, next: "c2_final_system", cognition: { reframing: 1 } },
+      { id: "c2_branch_records_follow_b", label: "원문을 첨부해 외부 검증을 연다", effect: { legitimacy: 9, capital: -5, time: -4 }, next: "c2_final_system", cognition: { inference: 2 } },
+      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -4 }, next: "c2_final_system", cognition: { risk: 1 } },
     ],
   },
   c3_branch_signal: {
@@ -1151,9 +1174,9 @@ const authoredBranchScenes = {
     memo: ["승리 발표의 수혜자", "검증되지 않은 보안 항목", "다음 계약의 조건"],
     triggers: ["competition", "order"],
     choices: [
-      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 8, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "c3_final", cognition: { persistence: 1 } },
-      { id: "c3_branch_signal_follow_b", label: "공동 책임자를 발표한다", effect: { trust: 8, capital: -4, legitimacy: 4 }, next: "c3_final", cognition: { reframing: 1 } },
-      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 8, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -3 }, next: "c3_final", cognition: { risk: 1 } },
+      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 8, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "c3_final_system", cognition: { persistence: 1 } },
+      { id: "c3_branch_signal_follow_b", label: "공동 책임자를 발표한다", effect: { trust: 8, capital: -4, legitimacy: 4 }, next: "c3_final_system", cognition: { reframing: 1 } },
+      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 8, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -3 }, next: "c3_final_system", cognition: { risk: 1 } },
     ],
   },
   c4_branch_exception: {
@@ -1177,9 +1200,9 @@ const authoredBranchScenes = {
     memo: ["감사 요청의 범위", "예외 승인 기록", "보상 기준의 공개 여부"],
     triggers: ["responsibility", "recognition"],
     choices: [
-      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 8, trust: 6, time: -6, capital: -6, fatigue: 2 }, next: "c4_final", cognition: { inference: 1 } },
-      { id: "c4_branch_exception_follow_b", label: "감사 범위를 이용자 대표와 정한다", effect: { trust: 8, capital: -4, fatigue: 4 }, next: "c4_final", cognition: { reframing: 2 } },
-      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 6, legitimacy: -6, humanCost: 4, fatigue: -3 }, next: "c4_final", cognition: { risk: 1 } },
+      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 8, trust: 6, time: -6, capital: -6, fatigue: 2 }, next: "c4_final_system", cognition: { inference: 1 } },
+      { id: "c4_branch_exception_follow_b", label: "감사 범위를 이용자 대표와 정한다", effect: { trust: 8, capital: -4, fatigue: 4 }, next: "c4_final_system", cognition: { reframing: 2 } },
+      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 6, legitimacy: -6, humanCost: 4, fatigue: -3 }, next: "c4_final_system", cognition: { risk: 1 } },
     ],
   },
   c5_branch_owner: {
@@ -1203,9 +1226,9 @@ const authoredBranchScenes = {
     memo: ["복구된 사람", "재발 방지 소유자", "공개할 책임 범위"],
     triggers: ["protection", "responsibility"],
     choices: [
-      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 7, legitimacy: 7, capital: -7, fatigue: 5 }, next: "c5_final", cognition: { inference: 1 } },
-      { id: "c5_branch_owner_follow_b", label: "재발 방지 장치에 예산을 고정한다", effect: { capital: -8, legitimacy: 8, humanCost: -3 }, next: "c5_final", cognition: { persistence: 2 } },
-      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 6, trust: -6, legitimacy: -4, humanCost: 5, fatigue: -4 }, next: "c5_final", cognition: { risk: 1 } },
+      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 7, legitimacy: 7, capital: -7, fatigue: 5 }, next: "c5_final_system_route", cognition: { inference: 1 } },
+      { id: "c5_branch_owner_follow_b", label: "재발 방지 장치에 예산을 고정한다", effect: { capital: -8, legitimacy: 8, humanCost: -3 }, next: "c5_final_system_route", cognition: { persistence: 2 } },
+      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 6, trust: -6, legitimacy: -4, humanCost: 5, fatigue: -4 }, next: "c5_final_system_route", cognition: { risk: 1 } },
     ],
   },
   c6_branch_roof: {
@@ -2573,9 +2596,7 @@ Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticR
  * middle questions.
  */
 const routeBodyPlans = {
-  // CASE 02 already walks its authored middle; only its old shared final, which
-  // the three route finals replaced, is still sitting in the graph unreachable.
-  case02: { retire: ["c2_final"] },
+  // CASE 02 already walks its authored middle (registerCase02DramaticRoutes).
   case01: {
     routes: {
       c1_route_investigate: { entry: "accounting", tail: "c1_witness_reaction", final: "c1_final_investigate" },
@@ -2584,7 +2605,6 @@ const routeBodyPlans = {
       c1_route_funding: { entry: "board", tail: "c1_verdict_reaction", final: "c1_final_funding" },
       c1_route_system: { entry: "c1_branch_people", tail: "c1_branch_people_follow", final: "c1_final_system" },
     },
-    retire: ["final"],
   },
   case03: {
     routes: {
@@ -2593,7 +2613,6 @@ const routeBodyPlans = {
       c3_route_mirror: { entry: "c3_trap", tail: "c3_verdict_reaction", final: "c3_final_joint" },
       c3_route_system: { entry: "c3_branch_signal", tail: "c3_branch_signal_follow", final: "c3_final_system" },
     },
-    retire: ["c3_final"],
   },
   case04: {
     routes: {
@@ -2602,7 +2621,6 @@ const routeBodyPlans = {
       c4_route_rule: { entry: "c4_vote", tail: "c4_verdict_reaction", final: "c4_final_rule" },
       c4_route_system: { entry: "c4_branch_exception", tail: "c4_branch_exception_follow", final: "c4_final_system" },
     },
-    retire: ["c4_final"],
   },
   case05: {
     routes: {
@@ -2611,7 +2629,6 @@ const routeBodyPlans = {
       c5_route_redesign: { entry: "c5_collapse", tail: "c5_verdict_reaction", final: "c5_final_redesign_route" },
       c5_route_system: { entry: "c5_branch_owner", tail: "c5_branch_owner_follow", final: "c5_final_system_route" },
     },
-    retire: ["c5_final"],
   },
   final: {
     routes: {
@@ -2628,16 +2645,14 @@ const routeBodyPlans = {
 
 function registerRouteBodies(caseId, plan) {
   Object.entries(plan.routes ?? {}).forEach(([routeId, body]) => {
-    nodes[routeId].choices.forEach((choice) => { choice.next = body.entry; });
-    nodes[body.tail].choices.forEach((choice) => { choice.next = body.final; });
+    sceneOf(body.entry, `${caseId} route body`);
+    sceneOf(body.final, `${caseId} route body`);
+    sceneOf(routeId, `${caseId} route body`).choices.forEach((choice) => { choice.next = body.entry; });
+    sceneOf(body.tail, `${caseId} route body`).choices.forEach((choice) => { choice.next = body.final; });
   });
   Object.entries(plan.rewire ?? {}).forEach(([nodeId, next]) => {
-    nodes[nodeId].choices.forEach((choice) => { choice.next = next; });
-  });
-  (plan.retire ?? []).forEach((nodeId) => {
-    delete nodes[nodeId];
-    const index = nodeOrders[caseId].indexOf(nodeId);
-    if (index >= 0) nodeOrders[caseId].splice(index, 1);
+    sceneOf(next, `${caseId} route rewire`);
+    sceneOf(nodeId, `${caseId} route rewire`).choices.forEach((choice) => { choice.next = next; });
   });
 }
 
