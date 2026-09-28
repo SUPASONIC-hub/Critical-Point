@@ -112,7 +112,7 @@ for (const [caseId, routes] of Object.entries(caseOpeningRoutes)) {
  */
 function getCaseEntryNodes(caseId) {
   const entries = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})];
-  // A first successful free-text answer jumps to the case's hidden route, and
+  // The first 판을 다시 짠다 cashed in a case jumps to its hidden route, and
   // a previous case's log can add a memory choice on the opening screen. Both
   // are real ways in, so neither counts as an orphan.
   if (reframeRouteNodes[caseId]) entries.push(reframeRouteNodes[caseId]);

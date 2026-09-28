@@ -106,7 +106,7 @@ export function createSceneChallenge({ reframeChoice, reframeCombo, inheritedCha
       ? {
           id: "use-reframe",
           title: "판 바꾸기 시도",
-          text: "구조 재설계에서 반영 기준 2개 이상을 채우면 보너스 조건이 열립니다.",
+          text: "'판을 다시 짠다' 카드를 걸고 벽에 닿기 전에 확정하면 이 사건의 숨은 경로가 열립니다.",
         }
       : (node?.triggers ?? []).includes("competition")
         ? {

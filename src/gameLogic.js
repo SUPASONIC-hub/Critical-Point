@@ -1012,7 +1012,7 @@ export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "
       c2_after_public: { id: "lower-risk", title: "경보의 위험 낮추기", text: "공개 이후 커진 위험을 낮추는 선택이 다음 사건의 기준이 됩니다." },
     },
     case04: {
-      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업의 빈 책임을 사람·조건·순서로 다시 설계하면 보너스가 열립니다." },
+      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업에서 비어 있던 책임 칸이 누구 것인지 드러나도록 판을 다시 짜야 합니다." },
       c3_after_proof: { id: "repair-legitimacy", title: "정직함의 피해 줄이기", text: "증거를 공개한 뒤 생긴 피해를 줄이면서 공정함을 유지해야 합니다." },
       c3_after_win: { id: "find-cost", title: "승리의 숨은 대가 찾기", text: "좋은 결과 뒤에 남은 규칙 위반의 대가를 먼저 찾으면 다음 압박을 통제할 수 있습니다." },
     },

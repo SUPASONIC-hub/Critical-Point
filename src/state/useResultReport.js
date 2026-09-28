@@ -75,7 +75,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
       feedbackPrompts: [
         `${result.longestDecision?.title ?? "가장 오래 머문 장면"}에서 실제로 멈칫한 이유가 있었나요?`,
         result.reframeCount > 0
-          ? "구조 재설계 입력이 선택지 밖의 계획처럼 느껴졌나요?"
+          ? "판을 다시 짜서 열린 경로가 보기에 없던 길처럼 느껴졌나요?"
           : "구조 재설계를 쓰지 않았다면, 기존 선택지가 충분히 답처럼 보였나요?",
         nextCaseSignal
           ? `다음 사건 「${nextCaseSignal.title}」까지 이어서 보고 싶은 이유가 생겼나요?`
