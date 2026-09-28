@@ -9,7 +9,13 @@ import {
   writeSaveState,
 } from "../appConfig.js";
 import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem } from "./payloadSchemas.js";
-import { pruneTelemetryQueue, sendTelemetryItem } from "./telemetryQueuePolicy.js";
+import {
+  classifyTelemetryFailure,
+  isHeldBehindCaseRow,
+  planTelemetryBatch,
+  pruneTelemetryQueue,
+  sendTelemetryItem,
+} from "./telemetryQueuePolicy.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
 // in GameRuntime) get one when they are queued, so every retry reuses it.
@@ -26,13 +32,15 @@ function withEventId(item) {
  * retry timer used to call the `scheduleTelemetryRetry` of the render that set
  * it, whose `dataConsent` was the one from before the player unticked the box,
  * so a revoked consent kept sending on every backoff tick.
+ *
+ * What a failure means is `classifyTelemetryFailure`'s to say. The batch stops
+ * at the first send the server did not answer, or answered "too fast": the
+ * rest would fail the same way, and each used to take its own ten seconds to
+ * find that out.
  */
-const RETRYABLE_CLIENT_STATUSES = new Set([408, 425, 429]);
-
-function isPermanentRefusal(error) {
-  const status = Number(error?.status);
-  return status >= 400 && status < 500 && !RETRYABLE_CLIENT_STATUSES.has(status);
-}
+// A wait the server asked for is not a network blip, so the backoff runs on
+// past a minute: a ranking row a day early would otherwise ask 1,440 times.
+const RETRY_DELAY_CAP_MS = 5 * 60_000;
 
 export function useTelemetryQueue({
   pendingTelemetryRef,
@@ -121,20 +129,33 @@ export function useTelemetryQueue({
 
     const failedItems = [];
     let aborted = false;
-    for (const item of retryBatch) {
+    let stopped = false;
+    const ordered = planTelemetryBatch(retryBatch);
+    for (const [index, item] of ordered.entries()) {
+      if (stopped) {
+        failedItems.push(item);
+        continue;
+      }
       // The player can untick consent while a send is in flight: stop there.
       if (!canSend()) {
         aborted = true;
         break;
       }
+      // A ranking row waits for its run's case rows: the ones that failed just
+      // now, and the ones still ahead of it in this batch.
+      if (isHeldBehindCaseRow(item, [...failedItems, ...ordered.slice(index + 1)])) {
+        failedItems.push(item);
+        continue;
+      }
       try {
         await sendTelemetryItem(item);
       } catch (error) {
         console.warn(error);
-        // A 4xx other than timeout/too-early/rate-limit is the server refusing
-        // the row itself (a season-final for a run with missing case rows, a
-        // payload over its cap). Sending it again for seven days changes nothing.
-        if (!isPermanentRefusal(error)) failedItems.push(item);
+        const failure = classifyTelemetryFailure(error);
+        // "permanent" is the server refusing the row itself (a payload over
+        // its cap, a run that cannot rank). Sending it again changes nothing.
+        if (failure !== "permanent") failedItems.push(item);
+        if (failure === "pace" || failure === "unreachable") stopped = true;
       }
     }
     retryingRef.current = false;
@@ -147,7 +168,9 @@ export function useTelemetryQueue({
 
     const retryIds = new Set(retryBatch.map((item) => item.id));
     const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
-    const nextQueue = pruneTelemetryQueue([...failedItems, ...newlyQueuedItems]);
+    // In the order they were queued, whatever order they were sent in.
+    const keptIds = new Set(failedItems.map((item) => item.id));
+    const nextQueue = pruneTelemetryQueue([...retryBatch.filter((item) => keptIds.has(item.id)), ...newlyQueuedItems]);
     const queueCommitted = commitPendingTelemetryQueue(nextQueue);
     if (queueCommitted && nextQueue.length === 0) {
       telemetryRetryAttemptRef.current = 0;
@@ -173,7 +196,7 @@ export function useTelemetryQueue({
     if (!canSend() || pendingTelemetryRef.current.length === 0 || retryingRef.current) return;
     if (telemetryRetryTimerRef.current) return;
     const attempt = immediate ? 0 : telemetryRetryAttemptRef.current + 1;
-    const delayMs = immediate ? 0 : Math.min(60_000, 2_000 * 2 ** Math.max(0, attempt - 1));
+    const delayMs = immediate ? 0 : Math.min(RETRY_DELAY_CAP_MS, 2_000 * 2 ** Math.max(0, Math.min(attempt, 12) - 1));
     const nextRetryAt = new Date(Date.now() + delayMs).toISOString();
     telemetryRetryAttemptRef.current = attempt;
     setTelemetryRetryInfo({ attempt, nextRetryAt });

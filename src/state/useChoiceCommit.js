@@ -21,11 +21,18 @@ import {
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, serializeRunState } from "../gauntlet/gauntletEngine.js";
-import { saveCaseTelemetry, telemetryEnabled } from "../telemetry.js";
+import { hasCloudConflict } from "../cloudSave.js";
+import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
+import { isPermanentRefusal, sendTelemetryItem } from "./telemetryQueuePolicy.js";
+
+// Uploads stop on a conflict, and the panel that explains it is on the intro.
+// A player in the middle of a case is told here, where the save speaks.
+const CLOUD_CONFLICT_MESSAGE =
+  "온라인 저장이 멈췄습니다. 다른 기기에서 저장한 진행이 온라인에 있습니다. 이 기기에는 계속 저장되며, 시작 화면의 '다른 기기에서 이어하기'에서 어느 쪽을 남길지 고를 수 있습니다.";
 
 /**
  * Where 판을 다시 짠다 leads: the case's authored hidden route, once per case,
@@ -89,6 +96,8 @@ export function useChoiceCommit(context) {
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
     if (currentCase === "final") onSeasonFinal();
+    // How the case row fared: "delivered", "queued" for a retry, or "refused".
+    let caseDelivery = Promise.resolve("refused");
     const { saved: localRankingSaved } = appendLocalRankingRow({
       local: true,
       run_id: runId,
@@ -125,24 +134,33 @@ export function useChoiceCommit(context) {
         dynamics: { ...createRunSummary(nextRun), responseTimeSec },
       };
       setTelemetryStatus({ tone: "pending", text: "케이스 로그를 원격 저장하는 중입니다." });
-      saveCaseTelemetry(caseTelemetryPayload, caseTelemetryPayload.event_id)
+      const caseItem = {
+        id: `case-${caseTelemetryPayload.event_id}`,
+        type: "case",
+        label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
+        payload: caseTelemetryPayload,
+      };
+      // `sendTelemetryItem` runs the privacy check before the first send, the
+      // same one a retry from the queue gets (priority 61).
+      caseDelivery = sendTelemetryItem(caseItem)
         .then(() => {
           setTelemetryStatus({ tone: "success", text: "케이스 로그가 원격 저장됐습니다." });
+          return "delivered";
         })
         .catch((error) => {
           console.warn(error);
+          if (isPermanentRefusal(error)) {
+            setTelemetryStatus({ tone: "error", text: "서버가 이 케이스 로그를 받지 않았습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
+            return "refused";
+          }
           // Queued with the payload it was built with, event id included, so a
           // retry of a send that did land writes nothing new.
-          queueTelemetry({
-            id: `case-${caseTelemetryPayload.event_id}`,
-            type: "case",
-            label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
-            payload: caseTelemetryPayload,
-          });
+          queueTelemetry(caseItem);
           setTelemetryStatus({
             tone: "error",
             text: "원격 저장에 실패했습니다. 로컬 대기열에 보관했으니 결과 화면에서 재시도할 수 있습니다.",
           });
+          return "queued";
         });
     }
 
@@ -170,12 +188,26 @@ export function useChoiceCommit(context) {
       recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
     }
     if (telemetryEnabled && dataConsent) {
-      saveCaseTelemetry(seasonTelemetryPayload, seasonTelemetryPayload.event_id).catch(() => {
-        queueTelemetry({
-          id: `season-final-${runId}`,
-          type: "case",
-          label: "SEASON 01 COMPLETE",
-          payload: seasonTelemetryPayload,
+      const seasonItem = {
+        id: `season-final-${runId}`,
+        type: "case",
+        label: "SEASON 01 COMPLETE",
+        payload: seasonTelemetryPayload,
+      };
+      // The server takes a ranking row only once the run's last case row has
+      // landed. The two used to leave together and race; when the ranking row
+      // won, it was refused. It now goes after the case row has an answer:
+      // behind it in the queue when the case row is waiting there, and not at
+      // all when the server refused the case row, since the run cannot rank.
+      caseDelivery.then((outcome) => {
+        if (outcome === "refused") return;
+        if (outcome === "queued") {
+          queueTelemetry(seasonItem);
+          return;
+        }
+        sendTelemetryItem(seasonItem).catch((error) => {
+          console.warn(error);
+          if (!isPermanentRefusal(error)) queueTelemetry(seasonItem);
         });
       });
     }
@@ -210,7 +242,6 @@ export function useChoiceCommit(context) {
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
     const { verdict, nextRun, unlockedRelics } = relicTable.settle({ run: gauntletRun, window: windowState, card: choice, caseClosed, offerRelics: currentCase !== "final" });
-    if (windowState.seed) recordSettledWindowSeed(windowState.seed);
     const busted = verdict.outcome === "bust";
 
     const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -315,6 +346,7 @@ export function useChoiceCommit(context) {
     const nextCompletedCases = caseClosed ? Array.from(new Set([...completedCases, currentCase])) : completedCases;
     const completedNow = nextCompletedCases !== completedCases;
     let nextCaseResults = caseResults;
+    let closedCase = null;
     if (completedNow) {
       const caseSummaryDraft = createCaseSummary(nextTriggers, nextCognition, nextLog, {
         resources: finalResources,
@@ -335,7 +367,7 @@ export function useChoiceCommit(context) {
         completedAt: new Date().toISOString(),
       };
       nextCaseResults = { ...caseResults, [currentCase]: caseSummary };
-      recordClosedCase({ caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec });
+      closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };
     }
 
     const enteredAt = Date.now();
@@ -365,7 +397,7 @@ export function useChoiceCommit(context) {
       nextNode,
       unlockedRelics,
     });
-    persist({
+    const written = persist({
       resources: finalResources,
       triggers: nextTriggers,
       cognition: nextCognition,
@@ -380,6 +412,15 @@ export function useChoiceCommit(context) {
       dynamics: serializeRunState(nextRun),
       nodeEnteredAt: enteredAt,
     });
+    // Everything that leaves this tab's own state waits for the save to say
+    // whose run this is. A tab another tab has moved past is refused by
+    // `persist` and locks its table -- and it used to have sent the case row,
+    // the ranking row and the settled seed of a decision nobody kept by then.
+    // A replay is not this player's run either.
+    if (written?.stale || written?.replay) return;
+    if (windowState.seed) recordSettledWindowSeed(windowState.seed);
+    if (closedCase) recordClosedCase(closedCase);
+    if (hasCloudConflict()) context.setSaveStatus(CLOUD_CONFLICT_MESSAGE);
   }
 
   function choose(choice, closedWindow = null, forced = false) {
