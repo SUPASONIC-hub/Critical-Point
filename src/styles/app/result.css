@@ -1,3 +1,84 @@
+/* The report's own panels. These sat at the head of play.css, between the
+   decision reveal and the play header, until 2026-09-28; they come first here
+   so everything below that overrides them still does. `.panel-title-row` is
+   also the title row of the intro's drawers and the recovery centre. */
+.panel-title-row span {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--font-label);
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.report-section p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.bars-panel h2,
+.history h2,
+.report-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+
+.panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.panel-title-row h2 {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+.fingerprint-heading span,
+.fingerprint-grid span {
+  color: var(--c-acid);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.privacy-warning {
+  margin-top: 10px;
+  padding: 11px 12px;
+  color: var(--c-danger-deep);
+  background: var(--c-blush);
+  border: 1px solid var(--c-danger-73-2);
+  border-radius: 6px;
+}
+
+.privacy-warning strong {
+  display: block;
+  font-size: 13px;
+}
+
+.privacy-warning p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.privacy-warning button {
+  min-height: 34px;
+  margin-top: 9px;
+  padding: 0 10px;
+  color:var(--c-paper);
+  background: var(--c-danger-deep);
+  border: 0;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 /* Result screen -------------------------------------------------------------
    The report reads as three acts on one night ground: a composed header (whose
    record, what it found, the grade), the lead row (what it cost, where it goes
@@ -2047,11 +2128,386 @@
 .telemetry-dashboard-panel div {
   align-items: center;
 }
-.ranking-integrity.invalid {
-  color: #7b2d2d;
-  background: #fff0e8;
-  border-color: #c45d3f;
-}
 .ending-axis-panel .panel-title-row span {
   color: var(--c-line-soft);
+}
+/* The last of extensions.css, which was retired on 2026-09-28. Each rule keeps
+   the order it had there. One needed its place in the cascade rather than a
+   home: `.ending-shell` tied `.shell` in responsive.css and won by coming
+   later, so it names both classes now. */
+.ending-sequence {
+  display: grid;
+  margin: 0 auto 24px;
+  place-items: center;
+  color: var(--color-white);
+  text-align: center;
+}
+.shell.ending-shell {
+  padding-top: 24px;
+}
+.ending-sequence-header span {
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+.ending-sequence-header strong {
+  color: var(--color-white-soft);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.ending-shell .ending-beat button {
+  min-height: 52px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-accent);
+  color: var(--ui-accent-ink);
+  box-shadow: var(--ui-shadow-glow);
+  font-size: 16px;
+  font-weight: 800;
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
+}
+@media (max-width: 480px) {
+  .ending-sequence-header strong {
+    display: none;
+  }
+}
+.ending-beat {
+  display: grid;
+  justify-items: center;
+}
+.ending-beat span {
+  color: var(--color-accent);
+  font-weight: 900;
+}
+.ending-quiet-beat p {
+  min-height: 2em;
+  margin: 0;
+  color: var(--color-white-soft);
+}
+.observation-grid article {
+  display: grid;
+  gap: 6px;
+}
+.observation-grid span {
+  color: var(--color-accent);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.ending-twist-card p {
+  margin: 0;
+  color: var(--color-white-soft);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.75;
+}
+.ending-twist-card small {
+  display: block;
+  padding-top: 10px;
+  color: var(--color-accent);
+  border-top: 1px solid rgba(217, 255, 98, 0.18);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+.ending-witness-log {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 8px;
+}
+.ending-witness-log article {
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  padding: 11px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--ui-radius-sm);
+}
+.ending-witness-log span {
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.ending-witness-log small {
+  display: block;
+  color: var(--c-acid);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+.ending-witness-log b {
+  color: var(--color-white);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.ending-archive-blueprint {
+  display: grid;
+  gap: 8px;
+  width: min(760px, 100%);
+  padding: 14px 16px;
+  text-align: left;
+  border: 1px solid rgba(217, 255, 98, 0.34);
+  border-radius: var(--ui-radius-md);
+}
+.ending-archive-blueprint span {
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.ending-archive-blueprint strong {
+  color: var(--color-white);
+  font-size: 15px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.ending-archive-blueprint p {
+  margin: 0;
+  color: var(--color-white-soft);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.ending-visual-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(5, 13, 10, 0.58), rgba(5, 13, 10, 0.28) 36%, rgba(5, 13, 10, 0.82)),
+    radial-gradient(circle at 50% 45%, rgba(217, 255, 98, 0.16), transparent 54%);
+}
+.ending-witness-log {
+  width: min(980px, 100%);
+}
+.ending-witness-log article,
+.ending-archive-blueprint {
+  background: rgba(7, 19, 15, 0.72);
+  backdrop-filter: blur(10px);
+}
+.ending-step-1 .ending-beat,
+.ending-step-2 .ending-beat,
+.ending-step-3 .ending-beat {
+  width: min(760px, 100%);
+}
+.ending-coda {
+  width: min(820px, 100%);
+}
+.ending-coda strong {
+  color: var(--color-white);
+}
+.observer-pattern-card {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 14px;
+}
+.observer-pattern-card span {
+  color: var(--c-acid);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.observer-pattern-card strong {
+  font-size: 16px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.observer-pattern-card p {
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 768px) {
+  .ending-witness-log {
+    grid-template-columns: 1fr;
+  }
+  .ending-witness-log article {
+    min-height: auto;
+  }
+}
+.ending-coda {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 16px 17px;
+  color: var(--c-paper);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-accent);
+  border-left: 3px solid var(--c-coral);
+  border-radius: var(--ui-radius-md);
+  text-align: left;
+}
+.ending-coda > span {
+  color: var(--c-acid);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.ending-coda strong {
+  font-size: 18px;
+  line-height: 1.45;
+}
+.ending-coda p {
+  margin: 0;
+  color: var(--c-line-soft);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.6;
+}
+.ending-axis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.ending-axis-grid article {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+.ending-axis-grid span {
+  color: var(--c-acid);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.ending-axis-grid b {
+  font-size: 22px;
+  color: var(--c-paper);
+}
+.ending-axis-grid p {
+  margin: 0;
+  color: var(--c-line-soft);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+@media (max-width: 700px) {
+  .ending-axis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.ending-variant-panel p,
+.ending-variant-panel small {
+  line-height: 1.6;
+}
+.ending-variant-panel small {
+  font-size: 12px;
+}
+.balance-report p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.ending-visual-profitable-silence .ending-visual {
+  filter: saturate(0.45) contrast(1.15) brightness(0.7);
+}
+.ending-visual-cold-justice .ending-visual {
+  filter: hue-rotate(145deg) saturate(0.7) brightness(0.8);
+}
+.ending-visual-field-pact .ending-visual {
+  filter: hue-rotate(-35deg) saturate(1.25) brightness(1.05);
+}
+.failure-objectives button {
+  margin-left: auto;
+}
+@media (max-width: 700px) {
+  .failure-objectives button {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+.delayed-consequence-strip {
+  align-items: baseline;
+}
+.delayed-consequence-strip p {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.ending-scene-profile strong {
+  font-size: 19px;
+  line-height: 1.4;
+}
+.ending-scene-profile p {
+  font-size: 13px;
+}
+.failure-objectives {
+  flex-wrap: wrap;
+  align-items: center;
+}
+.failure-objectives span {
+  font-size: 12px;
+  font-weight: 850;
+}
+.ranking-comparison b,
+.ranking-comparison small {
+  font-size: 11px;
+}
+.ending-preview-panel strong {
+  font-size: 17px;
+}
+.ending-preview-panel p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.play-report-panel article {
+  display: grid;
+  gap: 2px;
+  min-width: 74px;
+}
+.play-report-panel article small,
+.telemetry-dashboard-panel small {
+  font-size: 10px;
+}
+.play-report-panel p {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.telemetry-dashboard-panel b {
+  font-size: 18px;
+}
+.ending-palette-warm .ending-visual {
+  filter: sepia(0.28) saturate(1.2) brightness(1.02);
+}
+.ending-palette-mint .ending-visual {
+  filter: hue-rotate(35deg) saturate(1.1);
+}
+.ending-palette-redline .ending-visual {
+  filter: hue-rotate(-25deg) saturate(1.45) contrast(1.2);
+}
+.ending-palette-lime .ending-visual {
+  filter: saturate(1.35) brightness(1.08);
+}
+.authority-review-panel strong {
+  font-size: 15px;
+  line-height: 1.45;
+}
+.authority-review-panel p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.aftermath-panel p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.replay-diagnostics p {
+  font-size: 11px;
+}
+.ending-shell,
+.ending-shell *,
+.ending-sequence,
+.ending-beat,
+.ending-witness-log,
+.ending-archive-blueprint {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.achievement-panel > span {
+  color: var(--ui-text-3);
 }

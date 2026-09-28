@@ -1,6 +1,6 @@
 /* Application styles. Colors resolve through src/styles/tokens.css.
 
-   These files are a cascade, not five independent screens: each one can
+   These files are a cascade, not independent screens: each one can
    override the ones above it, and several do on purpose. Put a rule in the file
    that owns the selector -- scripts/check-css-structure.mjs fails the build when
    a selector picks up a second home -- and reach for a later file only when the
@@ -12,10 +12,6 @@
      result              the result screen
      responsive          the media blocks, which span every screen
      recovery            the recovery and error surfaces
-     extensions          what is left of the late overrides: 148 rules that still
-                         tie a rule above them on specificity and win by order
-                         (80 moved to their surfaces on 2026-09-27); nothing
-                         new goes here
      relics              the relic draft, the relic chips and the unlock notices
      briefing            the graphic-novel briefing page in front of each table */
 @import "./app/base-intro-ranking.css";
@@ -24,7 +20,6 @@
 @import "./app/result.css";
 @import "./app/responsive.css";
 @import "./app/recovery.css";
-@import "./app/extensions.css";
 @import "./app/relics.css";
 @import "./app/briefing.css";
 

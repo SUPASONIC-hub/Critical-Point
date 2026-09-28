@@ -2916,3 +2916,54 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* The last of extensions.css, retired on 2026-09-28, in the order they had. */
+.screen-loading {
+  min-height: 100dvh;
+}
+.new-game-plus-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.season-goal-strip {
+  align-items: stretch;
+}
+.season-goal-strip > span {
+  align-self: center;
+}
+.season-goal-strip article {
+  display: grid;
+  gap: 3px;
+}
+.season-goal-strip b {
+  font-size: 10px;
+}
+.season-goal-strip small {
+  font-size: 11px;
+  line-height: 1.35;
+}
+.past-run-memory {
+  display: grid;
+  gap: 7px;
+}
+.past-run-memory p {
+  line-height: 1.55;
+}
+.play-style-unlock strong {
+  color: var(--c-acid);
+}
+.operator-origin p,
+.operator-origin small {
+  margin: 0;
+}
+.origin-prologue p {
+  margin: 0;
+  line-height: 1.5;
+}
+@media (max-width: 520px) {
+  .start-console-heading h2 {
+    font-size: 23px;
+  }
+}
