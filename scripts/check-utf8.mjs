@@ -3,7 +3,11 @@ import path from "node:path";
 
 const root = process.cwd();
 const decoder = new TextDecoder("utf-8", { fatal: true });
-const extensions = new Set([".js", ".jsx", ".mjs", ".sql", ".json", ".css"]);
+const extensions = new Set([".js", ".jsx", ".mjs", ".sql", ".json", ".css", ".html", ".webmanifest", ".yml", ".yaml"]);
+// The page itself, the manifest and the specs all carry Korean text, and none
+// of them was read: only src, scripts and supabase were walked.
+const ROOTS = ["src", "scripts", "supabase", "tests", ".github"];
+const ROOT_FILES = ["index.html", "public/manifest.webmanifest", "render.yaml", "package.json"];
 const files = [];
 
 function visit(directory) {
@@ -14,7 +18,8 @@ function visit(directory) {
   }
 }
 
-for (const relativeRoot of ["src", "scripts", "supabase"]) visit(path.join(root, relativeRoot));
+for (const relativeRoot of ROOTS) visit(path.join(root, relativeRoot));
+for (const file of ROOT_FILES) files.push(path.join(root, file));
 const failures = [];
 for (const file of files) {
   try {

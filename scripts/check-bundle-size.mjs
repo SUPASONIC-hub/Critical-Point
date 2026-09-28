@@ -30,7 +30,7 @@ const budgets = [
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
-  { pattern: /^index-.*.js$/, maxBytes: 169_800, maxGzip: 60_400 },
+  { pattern: /^index-.*\.js$/, maxBytes: 169_800, maxGzip: 60_400 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_400, maxGzip: 32_600 },
   // 44,024 / 13,638 on 2026-09-27.
@@ -43,7 +43,29 @@ const budgets = [
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
   { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 283_500, compressed: true },
+  // The chunks below had no budget until 2026-09-28: the list named six files
+  // and the build emits eleven, so a new 400KB lazy screen would have passed a
+  // check described as a ratchet on every chunk. Measured that day, plus 5%.
+  // React and the scheduler. 221,715 / 68,975. It moves only with a React bump.
+  { pattern: /^react-vendor-.*\.js$/, maxBytes: 232_800, maxGzip: 72_400 },
+  // The lucide icons the screens import, tree-shaken. 13,063 / 4,703.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 13_700, maxGzip: 4_900 },
+  // 4,316 / 1,813.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 4_500, maxGzip: 1_900 },
+  // 3,743 / 1,674.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 3_900, maxGzip: 1_750 },
+  // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
+  { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
+
+/**
+ * What a release must not carry. The debug console -- the case jump, the
+ * unlock-all button, the overlay -- is compiled out of a build that did not ask
+ * for it (`debugBuild`, src/appConfig.js). It used to ship switched off, and a
+ * `VITE_ENABLE_DEBUG_TOOLS=true` left in the build environment would have
+ * switched it on for every visitor with every check green.
+ */
+const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP"];
 
 /**
  * The cold path: every byte a first visit on a phone waits on before the intro
@@ -70,18 +92,34 @@ try {
 
 const failures = [];
 const reported = [];
+const budgeted = new Set();
 for (const budget of budgets) {
-  const file = files.find((name) => budget.pattern.test(name));
-  if (!file) {
-    failures.push(`no bundle matched ${budget.pattern}`);
-    continue;
+  // Every match, not the first: a second `index-*.js` would otherwise ride in
+  // unmeasured behind the one the list happened to return first.
+  const matches = files.filter((name) => budget.pattern.test(name));
+  if (!matches.length) failures.push(`no bundle matched ${budget.pattern}`);
+  for (const file of matches) {
+    budgeted.add(file);
+    checkBudget(file, budget);
   }
+}
+for (const file of files) {
+  if (!budgeted.has(file)) failures.push(`${file} has no size budget. Every file the build emits into dist/assets needs one.`);
+}
+for (const file of files.filter((name) => name.endsWith(".js"))) {
+  const source = readFileSync(path.join(assetsDir, file), "utf8");
+  for (const marker of MUST_NOT_SHIP) {
+    if (source.includes(marker)) failures.push(`${file} contains "${marker}": the debug tools are in this build.`);
+  }
+}
+
+function checkBudget(file, budget) {
   const assetPath = path.join(assetsDir, file);
   const bytes = statSync(assetPath).size;
   if (bytes > budget.maxBytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.maxBytes} byte budget.`);
   if (budget.compressed) {
     reported.push(`${file}: ${bytes} bytes`);
-    continue;
+    return;
   }
   const gzipBytes = gzipSync(readFileSync(assetPath)).length;
   const gzipBudget = budget.maxGzip ?? Math.ceil(budget.maxBytes * 0.4);

@@ -1,0 +1,65 @@
+{
+  "/triggerlab-key-visual.webp": {
+    "original": "111d8931b542ef4b33f51c811ea6ca964041e711b5054feaf1707725bb2dba53",
+    "variants": {
+      "480": "e3bb4f49bfc1176af58bb2aa011eefc6fbb5449dcf0b615dfce6f56834a2be86",
+      "960": "93b02385b314a872fde2ab545ceb8ce30dbb261247f492952f806bb5302776db"
+    }
+  },
+  "/scene-case01.webp": {
+    "original": "f453f3e208801af0070ce020fca75f2c7ed5ff1afd6d16f11b22008eb5eb71fd",
+    "variants": {
+      "480": "a7029bc291b327897571b40ddc356fa732701fa7fb72e23e688fea8fa1b23350",
+      "960": "da224bd78f78bdfc5c21912da960fa2a9f07ae64dec4f56f93b8feae8312fb81"
+    }
+  },
+  "/scene-case02.webp": {
+    "original": "4068f12fb790bfa18b346143a7850c2053e80a821b2739a0d6154167dd0a289a",
+    "variants": {
+      "480": "df34d1d0f1464daaa066f29e19c43e4420ba5ac1c7f9190683a98d2e9b59aaaa",
+      "960": "a482e777b2f0a0f6ffc95a3d526767f2730d082d5f4924ed09d76d9e5fb96114"
+    }
+  },
+  "/scene-case03.webp": {
+    "original": "005f8e7bceeb8eb22a534b3dbef1af6449d1c32e3e518db58a72a08fd6ebf81c",
+    "variants": {
+      "480": "9bbb6c2f5ae4c5ba04eb482f7a8124e109ba215bb51c531eea76adf62ebf55da",
+      "960": "7cdd6ef22417ce2fb870f822312e350ca36975ac601134904f0f3c28a131c9a1"
+    }
+  },
+  "/scene-case04.webp": {
+    "original": "fcd744130795271408a150a97714694e130c70d656fd8b06d036098f4579e332",
+    "variants": {
+      "480": "713b7a6543db08174e86762ec2692156484712bd91740c6008869e6999db4c41",
+      "960": "aa30a6d35c10df5c0a93bad80096dc94a7dc3dab6b0b7c639686369165f4ae4b"
+    }
+  },
+  "/scene-case05.webp": {
+    "original": "6876dffee3e9a4ad3c6650a51eef2221cc41a324a22591b4744b1f090db741cd",
+    "variants": {
+      "480": "246ed852f43d87a2534a1cb49506d461532df87a84772ca99964c147946d50e2",
+      "960": "23e04f9d9c5f8ca96849f8ce583ed7463d31e19cdd5120ff629c4094c9a5e61c"
+    }
+  },
+  "/ending-final-archive.webp": {
+    "original": "cc5ab1e1c96c561f9e117228889410226c498ebe530d74a0fdab72fd3e297260",
+    "variants": {
+      "480": "63e3931fb3ee18ed6e4dbce933748ea50098f08c2051c6fc363f94bca9531453",
+      "960": "cb17a2f5870f1137d50ddba522165963d4e4cba7a7a7f4f0923d930fd7e23dfe"
+    }
+  },
+  "/ending-oversight-room.webp": {
+    "original": "d25571996a9ec322e7037619cf2c046b409d2efec7c8cc0f11588e6cfd681c1e",
+    "variants": {
+      "480": "36876af6b31c62f640e2c8625b314ccab1487bf2822f788b9a18ea6a29314201",
+      "960": "420d39bb2e3743598325a0315466002f2ba1fd849058b9b610429c53b9e83cba"
+    }
+  },
+  "/ending-system-collapse.webp": {
+    "original": "8be7bfbded64f89675b65cebed66750da976f5ae23730691440553def758a3cf",
+    "variants": {
+      "480": "5b13217817c7e198ec98954839c83408aeaf644357656c92b15264cb65fc296a",
+      "960": "9723f0b2bd637b1adb6e7414170b3a907909f89dc054d3ecf1fe699db24f2745"
+    }
+  }
+}

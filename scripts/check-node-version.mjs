@@ -136,9 +136,30 @@ if (engines) {
   }
 }
 
+/**
+ * The Node this check itself is running on. Every other assertion here is
+ * about what the files say; this one is about the machine. On CI a mismatch is
+ * a failure, because there `setup-node` was told to install the pin and did
+ * not. On a desktop it is a warning: the checks that gate a merge run on CI's
+ * Node whatever the desktop has, and failing here would turn `verify:static`
+ * red on a machine that is one patch release behind.
+ */
+const running = process.versions.node;
+const warnings = [];
+if (running !== pin) {
+  const message =
+    `This is Node ${running}; ${PIN_FILE} pins ${pin}, which is what CI and the Render build run. ` +
+    (running.split(".")[0] === pinnedMajor
+      ? `Same major, so the checks here are expected to agree with CI's; install ${pin} to be certain.`
+      : `That is a different major: results here do not predict CI's.`);
+  if (process.env.CI) failures.push(message);
+  else warnings.push(message);
+}
+
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
 } else {
   console.log(`Node version checks passed (${pin} from ${PIN_FILE}, ${workflowFiles.length} workflow(s) reading it).`);
+  for (const warning of warnings) console.warn(`warning: ${warning}`);
 }

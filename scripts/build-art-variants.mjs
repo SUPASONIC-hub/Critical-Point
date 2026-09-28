@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { RESPONSIVE_ART } from "../src/responsiveArt.js";
+import { ART_LOCK, hashBytes, hashFile } from "./art-lock.mjs";
 
 /**
  * Regenerate the responsive art variants.
@@ -8,7 +9,10 @@ import { RESPONSIVE_ART } from "../src/responsiveArt.js";
  * The browser is the encoder: each original is decoded, drawn to a canvas at the
  * target width and read back as webp. Playwright is already a devDependency, so
  * this needs no image toolchain, and `npm run check:art` is what tells you to
- * run it -- it fails when a variant is missing or has crept back up in weight.
+ * run it -- it fails when a variant is missing or has crept back up in weight,
+ * and when an original is not the file its variants were cut from. That last
+ * one is what `art-variants.lock.json` is for (see art-lock.mjs); this script
+ * writes it.
  */
 
 const WIDTHS = [480, 960];
@@ -17,6 +21,7 @@ const QUALITY = 0.82;
 const browser = await chromium.launch();
 const page = await browser.newPage();
 let written = 0;
+const lock = Object.fromEntries([...RESPONSIVE_ART].map((src) => [src, { original: hashFile(`public${src}`), variants: {} }]));
 
 async function encode(src, width) {
   const source = `data:image/webp;base64,${readFileSync(`public${src}`).toString("base64")}`;
@@ -37,6 +42,7 @@ async function encode(src, width) {
   const out = `public${src.replace(/\.webp$/, "")}-${width}.webp`;
   writeFileSync(out, bytes);
   written += 1;
+  lock[src].variants[width] = hashBytes(bytes);
   console.log(`${out.padEnd(46)} ${String(Math.round(bytes.length / 1024)).padStart(4)} KB`);
 }
 
@@ -45,4 +51,5 @@ for (const src of RESPONSIVE_ART) {
 }
 
 await browser.close();
+writeFileSync(ART_LOCK, `${JSON.stringify(lock, null, 2)}\n`, "utf8");
 console.log(`Wrote ${written} variants at quality ${QUALITY}. Run npm run check:art to confirm the budgets.`);
