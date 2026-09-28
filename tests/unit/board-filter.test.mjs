@@ -10,7 +10,7 @@ import { boardTextHasContact, boardTextHasLink, getBoardPostRefusal } from "../.
  * two used to keep a list each, and agreed only on the cases someone had
  * thought to write down twice.
  */
-const cases = JSON.parse(readFileSync(new URL("../fixtures/board-filter-cases.json", import.meta.url), "utf8"));
+const cases = JSON.parse(readFileSync(new globalThis.URL("../fixtures/board-filter-cases.json", import.meta.url), "utf8"));
 
 const REASON_OF = {
   "nickname-characters": "characters",
