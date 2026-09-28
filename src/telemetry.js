@@ -87,10 +87,11 @@ export function getSessionId() {
   const key = "critical-point-session-id";
   const existing = readStoredValue(key);
   if (existing) return existing;
-  if (fallbackSessionId) return fallbackSessionId;
 
-  const next = createRandomId("session");
-  if (!writeStoredValue(key, next)) fallbackSessionId = next;
+  // The same id is offered to storage again each time, so it is kept once
+  // storage comes back.
+  const next = fallbackSessionId ?? createRandomId("session");
+  fallbackSessionId = writeStoredValue(key, next) ? null : next;
   return next;
 }
 
@@ -104,10 +105,9 @@ let fallbackBoardWriterId = null;
 export function getBoardWriterId() {
   const existing = readStoredValue(BOARD_WRITER_ID_KEY);
   if (existing) return existing;
-  if (fallbackBoardWriterId) return fallbackBoardWriterId;
 
-  const next = createRandomId("board");
-  if (!writeStoredValue(BOARD_WRITER_ID_KEY, next)) fallbackBoardWriterId = next;
+  const next = fallbackBoardWriterId ?? createRandomId("board");
+  fallbackBoardWriterId = writeStoredValue(BOARD_WRITER_ID_KEY, next) ? null : next;
   return next;
 }
 
