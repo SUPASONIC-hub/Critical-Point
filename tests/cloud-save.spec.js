@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 import { cashStakedCard, dismissProtocolBreach, resumeSavedRun } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -8,7 +8,7 @@ import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
  * loads when its fold is opened, and the two ways out of a conflict.
  */
 
-const SUPABASE = "https://e2e.supabase.co";
+const SUPABASE = BACKEND_ORIGIN;
 const CODE = "ABCDEFGH2345";
 
 const json = (body, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });

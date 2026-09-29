@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 
 import { BOARD_WRITER_ID_KEY } from "../src/appConfig.js";
 
@@ -7,7 +7,7 @@ import { BOARD_WRITER_ID_KEY } from "../src/appConfig.js";
  * ranking. Neither had a browser test of its own -- the board none at all.
  */
 
-const SUPABASE = "https://e2e.supabase.co";
+const SUPABASE = BACKEND_ORIGIN;
 
 async function useMockSupabase(page) {
   await page.addInitScript((url) => {

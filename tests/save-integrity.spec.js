@@ -1,4 +1,5 @@
 import { expect, test } from "./helpers/network.js";
+import { acceptConfirms } from "./helpers/dialogs.js";
 import { dismissProtocolBreach } from "./helpers/gameFlow.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -117,7 +118,7 @@ test("clearing the saved run before navigation does not resurrect it", async ({ 
 });
 
 test("start fresh from recovery clears the saved run and returns to intro", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.addInitScript((saved) => {
     if (sessionStorage.getItem("save-integrity-seeded")) return;
     sessionStorage.setItem("save-integrity-seeded", "1");

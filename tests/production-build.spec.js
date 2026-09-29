@@ -1,4 +1,5 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { CHUNK_RELOAD_SESSION_KEY } from "../src/appConfig.js";
 import { cashStakedCard, collectRuntimeErrors, dismissProtocolBreach, resumeSavedRun } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { savedAtLastScene, seedSave } from "./helpers/seededSave.js";
@@ -165,27 +166,51 @@ test("the ranking and the board read from the backend in the release", { tag: "@
 
 /**
  * A tab left open across a deploy asks for chunks the new release no longer
- * has. The scene graph is the first one a player asks for, on the click that
- * starts the game.
+ * has. The scene graph (the GameRuntime chunk) is the first one: the intro
+ * prefetches it on idle, and 이어하기 mounts it.
+ *
+ * What the release does about it (src/state/chunkReload.js, LazyScreen.jsx):
+ *   1. the first failed import raises `vite:preloadError`, and the tab reloads
+ *      itself once, leaving a marker in sessionStorage;
+ *   2. a second failure inside a minute is not reloaded again: it reaches the
+ *      LazyScreen around the runtime, which shows `chunk-reload-panel` with a
+ *      새로고침 button (`chunk-reload`) instead of handing it to the root
+ *      boundary, so nothing is written to the save.
  */
-test("a scene graph that cannot be fetched offers a way back and leaves the save alone", { tag: "@prod" }, async ({ page }) => {
-  // Measured 2026-09-28 at 52b8f1f plus this branch: the failed import lands on
-  // the root error boundary, which writes `lastError` (source react-render,
-  // retryCount 1) into the save -- a missing file is charged to the run. The
-  // recovery is the runtime stream's work; remove this line when it has landed
-  // and the test passes. If the button it adds is worded differently, the
-  // name pattern below is the one line to change.
-  test.fixme(true, "a chunk that fails to load is recorded against the save (lastError, retryCount 1) and no reload is offered");
+test("a scene graph that cannot be fetched reloads once, then offers 새로고침 and leaves the save alone", { tag: "@prod" }, async ({ page }) => {
   const save = savedAtLastScene();
   await seedSave(page, save);
   let refuse = true;
-  await page.route("**/assets/GameRuntime-*.js", (route) => (refuse ? route.abort("failed") : route.continue()));
+  let refusals = 0;
+  await page.route("**/assets/GameRuntime-*.js", (route) => {
+    if (!refuse) return route.continue();
+    refusals += 1;
+    return route.abort("failed");
+  });
   await page.goto("/");
+
+  // The idle prefetch is refused, the tab reloads itself, and the reloaded
+  // intro's prefetch is refused too -- this time without a reload. Waiting for
+  // both keeps the 이어하기 press off the page that is about to go away.
+  await expect
+    .poll(() => refusals, { message: "the runtime chunk was asked for on both loads", timeout: 20_000 })
+    .toBeGreaterThanOrEqual(2);
+  await expect(page.locator(".intro")).toBeVisible();
+  expect(
+    await page.evaluate((key) => sessionStorage.getItem(key), CHUNK_RELOAD_SESSION_KEY),
+    "the automatic reload left its marker",
+  ).not.toBeNull();
+
   await page.getByTestId("resume-save").click();
 
-  // The player is told, and offered a reload: not left on a blank screen.
-  const reload = page.getByRole("button", { name: /다시 불러오기|새로고침|다시 시도/ });
-  await expect(reload.first()).toBeVisible({ timeout: 15_000 });
+  // The player is told, and offered a reload: not left on a blank screen, and
+  // not on the root error screen that charges the failure to the run.
+  const panel = page.getByTestId("chunk-reload-panel");
+  await expect(panel).toBeVisible({ timeout: 15_000 });
+  await expect(panel.getByRole("heading")).toHaveText("화면을 다시 받아야 합니다.");
+  const reload = panel.getByRole("button", { name: "새로고침", exact: true });
+  await expect(reload).toHaveAttribute("data-testid", "chunk-reload");
+  await expect(page.getByTestId("error-start-fresh")).toHaveCount(0);
 
   // The save is the run, untouched: no error charged to it, no retry counted,
   // still resumable.
@@ -196,7 +221,7 @@ test("a scene graph that cannot be fetched offers a way back and leaves the save
 
   // And the way back works once the chunk can be had.
   refuse = false;
-  await reload.first().click();
+  await reload.click();
   await expect(page.locator(".intro, .game-shell").first()).toBeVisible();
   if (await page.getByTestId("resume-save").isVisible()) await resumeSavedRun(page);
   await expect(page.locator(".game-shell")).toBeVisible();
