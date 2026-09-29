@@ -1181,8 +1181,7 @@
   cursor: pointer;
   transition:
     transform var(--ui-dur) var(--ui-ease),
-    border-color var(--ui-dur-fast) linear,
-    box-shadow var(--ui-dur) var(--ui-ease);
+    border-color var(--ui-dur-fast) linear;
 }
 
 .gauntlet-stage .gx-card:focus-visible {
@@ -1409,8 +1408,7 @@
   cursor: pointer;
   transition:
     transform var(--ui-dur-fast) var(--ui-ease),
-    filter var(--ui-dur-fast) linear,
-    box-shadow var(--ui-dur) var(--ui-ease);
+    filter var(--ui-dur-fast) linear;
 }
 
 .gx-actions button:not(:disabled):hover {

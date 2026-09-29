@@ -509,9 +509,7 @@
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  transition:
-    transform var(--ui-dur-fast) var(--ui-ease),
-    box-shadow var(--ui-dur) var(--ui-ease);
+  transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
 .next-case-panel button:hover {
   transform: translateY(-2px);
