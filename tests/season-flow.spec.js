@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
+import { acceptConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
@@ -23,11 +24,7 @@ async function startDebugNode(page, caseId, nodeId) {
 
 test("the last case before the finale can unlock and open it", async ({ page }) => {
   test.setTimeout(180_000);
-  const dialogMessages = [];
-  page.on("dialog", (dialog) => {
-    dialogMessages.push(dialog.message());
-    dialog.accept();
-  });
+  const dialogMessages = acceptConfirms(page);
   await page.goto("/?debug=1");
   await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
@@ -776,7 +773,7 @@ test("corrupt error log entries are filtered before the diagnostics panel render
 });
 
 test("restoring a corrupt recovery slot repairs nested data before resume", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     const snapshot = {
@@ -841,7 +838,7 @@ test("storage write failure does not block scene start", async ({ page }) => {
 });
 
 test("recovery slot can be restored and deleted from debug panel", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -931,7 +928,7 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
 });
 
 test("recovery slot delete failure keeps the slot visible", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -985,7 +982,7 @@ test("recovery slot delete failure keeps the slot visible", async ({ page }) => 
 });
 
 test("recovery slot restore repairs invalid saved route before writing", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1033,7 +1030,7 @@ test("recovery slot restore repairs invalid saved route before writing", async (
 });
 
 test("error log clear failure keeps the log visible", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1071,7 +1068,7 @@ test("error log clear failure keeps the log visible", async ({ page }) => {
 });
 
 test("reset clears progress, error logs, and recovery slots", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1121,7 +1118,7 @@ test("reset clears progress, error logs, and recovery slots", async ({ page }) =
 });
 
 test("reset failure records failed storage keys", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
@@ -1183,7 +1180,7 @@ test("repeated render errors block the retry loop and preserve recovery choices"
 });
 
 test("error boundary can clear the current saved state", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1215,7 +1212,7 @@ test("error boundary can clear the current saved state", async ({ page }) => {
 });
 
 test("error boundary clear save failure does not reload", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",

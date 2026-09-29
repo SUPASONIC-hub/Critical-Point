@@ -1,4 +1,5 @@
 import { expect, test } from "./helpers/network.js";
+import { acceptConfirms } from "./helpers/dialogs.js";
 import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -76,7 +77,7 @@ const focusIsInside = (page, selector) =>
   page.evaluate((target) => Boolean(document.querySelector(target)?.contains(document.activeElement)), selector);
 
 test("a recovery slot restored in the middle of play is the run that comes back", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+  acceptConfirms(page);
   const slotSnapshot = savedRun({ nodeId: "c5_start", started: true, runId: "run-recovery-e2e" });
   await seedOnce(page, {
     save: savedRun({
