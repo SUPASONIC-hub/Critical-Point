@@ -137,11 +137,16 @@ const AUTHORED_DEALS = new Set([]);
  *
  * 판을 다시 짠다 and the evidence turn keep the slots they were given; the
  * table and its tests find them there.
+ *
+ * `leadChoiceId` keeps the card that was written first. The runtime's own
+ * cards (the adaptive reframe, the relationship bridge) follow that card's
+ * `next`, as they did when it was always `choices[0]`.
  */
 function dealScenes(nodes) {
   for (const [nodeId, scene] of Object.entries(nodes)) {
-    if (AUTHORED_DEALS.has(nodeId)) continue;
     const dealt = scene.choices.map((choice, index) => (choice.type === "reframe" || choice.id.endsWith("_evidence_turn") ? -1 : index)).filter((index) => index >= 0);
+    if (dealt.length > 0) scene.leadChoiceId = scene.choices[dealt[0]].id;
+    if (AUTHORED_DEALS.has(nodeId)) continue;
     if (dealt.length < 2) continue;
     const random = createPlateRandom(hashString(`deal:${nodeId}`));
     const order = [...dealt];

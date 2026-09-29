@@ -370,6 +370,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   ).length;
   const aftermathNodeId = caseAftermathNodeId(fallbackCaseId);
   const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseReframeCount >= 2;
+  // The card the scene was written to lead with, wherever the deal put it.
+  const leadChoice = node?.choices?.find((choice) => choice.id === node.leadChoiceId) ?? node?.choices?.[0];
   const adaptiveChoice = useMemo(
     () =>
       adaptiveChoiceUnlocked
@@ -377,13 +379,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
             id: `${fallbackCaseId}_adaptive_reframe`,
             label: "앞서 다시 짠 판을 공개 기준으로 삼는다",
             effect: { legitimacy: 7, trust: 5, fatigue: 4 },
-            next: node?.choices?.[0]?.next ?? "result",
+            next: leadChoice?.next ?? "result",
             cognition: { reframing: 2, persistence: 1 },
             adaptive: true,
             requiredAuthority: "FIELD ACCESS",
           }
         : null,
-    [adaptiveChoiceUnlocked, fallbackCaseId, node?.choices],
+    [adaptiveChoiceUnlocked, fallbackCaseId, leadChoice?.next],
   );
   const speakerRelationship = log.reduce(
     (score, entry) => score + (entry.speaker === node?.speaker ? 8 : entry.speaker ? -1 : 0),
@@ -393,12 +395,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, caseResults }),
     [caseResults, fallbackCaseId, resolvedNodeId],
   );
-  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
+  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && leadChoice
     ? {
         id: `${fallbackCaseId}_relationship_bridge`,
         label: "관계의 증언을 먼저 확보한다",
         effect: { trust: 5, legitimacy: 2, fatigue: 2 },
-        next: node.choices[0].next,
+        next: leadChoice.next,
         cognition: { inference: 1, reframing: 1 },
         branchId: "relationship-bridge",
         requiredAuthority: "FIELD ACCESS",

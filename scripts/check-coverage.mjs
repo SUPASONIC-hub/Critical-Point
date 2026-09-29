@@ -90,17 +90,36 @@ const summary = (run.stdout ?? "").split(/\r?\n/).filter((line) => /^ℹ (tests|
 console.log(summary.map((line) => line.replace(/^ℹ /, "")).join(", "));
 
 const percent = (hit, found) => (found === 0 ? 100 : (hit / found) * 100);
-const measured = new Map();
+// Each test file runs in its own process, and each process that loaded a
+// module writes its own record of it. Keeping the last record read made a
+// module's number depend on which process finished last -- cloudSave.js read
+// anywhere from 41% to 62% on the same tree. A line, function or branch counts
+// as covered when any process covered it.
+const hits = new Map();
+const entries = (record, key) => [...record.matchAll(new RegExp(`^${key}:(.+)$`, "gm"))].map((match) => match[1].trim());
 for (const record of readFileSync(REPORT_FILE, "utf8").split("end_of_record")) {
   const file = record.match(/^SF:(.+)$/m)?.[1]?.trim().replace(/\\/g, "/");
   if (!file) continue;
-  const count = (key) => Number(record.match(new RegExp(`^${key}:(\\d+)$`, "m"))?.[1] ?? 0);
-  measured.set(file, {
-    lines: [count("LH"), count("LF")],
-    functions: [count("FNH"), count("FNF")],
-    branches: [count("BRH"), count("BRF")],
-  });
+  if (!hits.has(file)) hits.set(file, { lines: new Map(), functions: new Map(), branches: new Map() });
+  const merged = hits.get(file);
+  const note = (table, key, count) => table.set(key, (table.get(key) ?? 0) + (Number(count) || 0));
+  for (const entry of entries(record, "DA")) {
+    const [line, count] = entry.split(",");
+    note(merged.lines, line, count);
+  }
+  for (const entry of entries(record, "FNDA")) {
+    const comma = entry.indexOf(",");
+    note(merged.functions, entry.slice(comma + 1), entry.slice(0, comma));
+  }
+  for (const entry of entries(record, "BRDA")) {
+    const parts = entry.split(",");
+    note(merged.branches, parts.slice(0, 3).join(","), parts[3] === "-" ? 0 : parts[3]);
+  }
 }
+const covered = (table) => [[...table.values()].filter((count) => count > 0).length, table.size];
+const measured = new Map(
+  [...hits].map(([file, merged]) => [file, { lines: covered(merged.lines), functions: covered(merged.functions), branches: covered(merged.branches) }]),
+);
 
 const logic = sourceModules().filter((file) => !isData(file)).sort();
 const loaded = logic.filter((file) => measured.has(file));

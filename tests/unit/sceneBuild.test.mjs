@@ -75,6 +75,18 @@ test("the deal is a shuffle of the scene's own cards, and the fixed slots stay p
   assert.ok(moved > byId.size / 2, `only ${moved} of ${byId.size} authored scenes deal in a new order`);
 });
 
+test("a scene remembers the card it was written to lead with, wherever the deal put it", () => {
+  const byId = new Map(CASE_PACKS.flatMap((pack) => Object.entries(pack.nodes)));
+  let away = 0;
+  for (const [nodeId, authored] of byId) {
+    const lead = authored.choices.find((choice) => choice.type !== "reframe" && !choice.id.endsWith("_evidence_turn"));
+    if (!lead) continue;
+    assert.equal(nodes[nodeId].leadChoiceId, lead.id, `${nodeId} lost its lead card`);
+    if (nodes[nodeId].choices[0].id !== lead.id) away += 1;
+  }
+  assert.ok(away > 0, "no deal moved a lead card, so this test proves nothing");
+});
+
 test("the same scene always deals the same way", () => {
   const build = () => {
     const graph = {
