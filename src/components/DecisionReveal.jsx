@@ -1,14 +1,10 @@
 import { useEffect } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
-import { byEffectWeight, isResourceGain } from "../gameConstants.js";
+import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.js";
 import { objectParticle, subjectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
-
-function formatNumber(value) {
-  return Math.round(Number(value) || 0).toLocaleString("en-US");
-}
 
 function formatMultiplier(value) {
   return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;

@@ -431,12 +431,10 @@ const CHALLENGE_MET_BY = {
   "lower-risk": () => true,
   "avoid-risk": () => true,
 };
-// Openings whose challenge no card on them can meet today. 사건 01 opens on a
-// scene with no 판을 다시 짠다 card and no card that gains 공정함 after an
-// opening carried in alone, so two of its three challenges are bonuses nobody
-// can earn. The fix is a line of `getContinuityChallenge` (gameLogic.js); an
-// entry that is no longer needed fails, so this list only shrinks.
-const UNMEETABLE_CHALLENGES = new Set(["case01/c1_start_record", "case01/c1_start_alone"]);
+// Openings whose challenge no card on them can meet. Empty since 2026-09-29,
+// when 사건 01's two were rewritten for the cards those openings deal; an entry
+// that is no longer needed fails, so this list only shrinks.
+const UNMEETABLE_CHALLENGES = new Set([]);
 const unmeetableFound = new Set();
 const decisionSource = fs.readFileSync(new URL("../src/state/useDecision.js", import.meta.url), "utf8");
 for (const id of Object.keys(CHALLENGE_MET_BY)) {
