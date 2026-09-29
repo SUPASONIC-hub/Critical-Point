@@ -110,10 +110,6 @@ button:disabled {
   color: var(--ui-text-3);
   -webkit-text-fill-color: currentColor;
 }
-button.case-card:disabled {
-  color: var(--ui-text-3) !important;
-  -webkit-text-fill-color: var(--ui-text-3) !important;
-}
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -1974,9 +1970,31 @@ summary:focus-visible {
   border-color: var(--ui-line-strong);
   box-shadow: var(--ui-shadow-2);
 }
-.case-card:focus-visible {
+/* The card's one control is the button in its heading; the ring goes round
+   the card it opens, not round the title's line box. */
+.case-card:has(.case-card-open:focus-visible) {
   outline: 3px solid var(--ui-accent);
   outline-offset: 3px;
+}
+.case-card-open {
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: inherit;
+  -webkit-text-fill-color: inherit;
+}
+.case-card-open:focus-visible {
+  outline: none;
+}
+/* The whole card is what a pointer presses. */
+.case-card-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 .case-card div {
   display: flex;
@@ -2046,7 +2064,7 @@ summary:focus-visible {
 /* Sealed cards recede: flatter ground, a dashed edge, the copy one step down.
    Locked is the majority state on a first run, so it is the one that has to
    get out of the way. */
-.case-card[aria-disabled="true"] {
+.case-card.locked-case {
   cursor: not-allowed;
   opacity: 1;
   background: var(--ui-bg-raised);
@@ -2054,21 +2072,21 @@ summary:focus-visible {
   border-color: var(--ui-line-strong);
   box-shadow: none;
 }
-.case-card[aria-disabled="true"] h2 {
+.case-card.locked-case h2 {
   color: var(--ui-text-2);
   -webkit-text-fill-color: currentColor;
 }
-.case-card[aria-disabled="true"] span,
-.case-card[aria-disabled="true"] b,
-.case-card[aria-disabled="true"] p,
-.case-card[aria-disabled="true"] small {
+.case-card.locked-case span,
+.case-card.locked-case b,
+.case-card.locked-case p,
+.case-card.locked-case small {
   color: var(--ui-text-3);
   -webkit-text-fill-color: currentColor;
 }
-.case-card[aria-disabled="true"]::before {
+.case-card.locked-case::before {
   color: var(--ui-surface-2);
 }
-.case-card[aria-disabled="true"] .case-status-chip {
+.case-card.locked-case .case-status-chip {
   background: transparent;
 }
 .case-card.active-case {

@@ -681,10 +681,13 @@ export function IntroScreen({ view, renderers = {} }) {
                 if (canOpenCase) startCaseRun(caseItem.id);
               }
               return (
-                <GuardedButton
-                  type="button"
+                /* A card is an article with a heading, and the heading holds
+                   the one control: a <button> may only hold phrasing content,
+                   and a card built as one button put a heading, a paragraph
+                   and a block inside it. The button's ::after covers the card,
+                   so the whole card is still what a pointer presses. */
+                <article
                   key={caseItem.id}
-                  blocked={!canOpenCase}
                   /* The file number the row is stamped with. It is decoration
                      drawn from a ::before, so the label the button announces is
                      still the aria-label below and not a second reading of the
@@ -692,15 +695,13 @@ export function IntroScreen({ view, renderers = {} }) {
                      the list: the 프롤로그 sits in front of 사건 01, so a
                      position counter stamped 사건 01 with "06". */
                   data-index={caseDisplayCode(caseItem.id)}
-                  aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
-                  className={
-                    caseItem.status === "PLAYING" || caseItem.status === "OPEN"
-                      ? "case-card active-case"
-                      : caseItem.status === "COMPLETE"
-                        ? "case-card complete-case"
-                        : "case-card"
-                  }
-                  onClick={openCaseFromCard}
+                  className={[
+                    "case-card",
+                    caseItem.status === "PLAYING" || caseItem.status === "OPEN" ? "active-case" : caseItem.status === "COMPLETE" ? "complete-case" : "",
+                    canOpenCase ? "" : "locked-case",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   <div>
                     <span>{caseItem.label}</span>
@@ -709,7 +710,17 @@ export function IntroScreen({ view, renderers = {} }) {
                       {getCaseStatusText(caseItem.status)}
                     </small>
                   </div>
-                  <h2>{simplifyPlayerText(caseItem.title)}</h2>
+                  <h2>
+                    <GuardedButton
+                      type="button"
+                      className="case-card-open"
+                      blocked={!canOpenCase}
+                      aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
+                      onClick={openCaseFromCard}
+                    >
+                      {simplifyPlayerText(caseItem.title)}
+                    </GuardedButton>
+                  </h2>
                   <b>{simplifyPlayerText(caseItem.trigger)}</b>
                   <p>{simplifyPlayerText(caseItem.summary)}</p>
                   {caseItem.status === "LOCKED" && (
@@ -721,7 +732,7 @@ export function IntroScreen({ view, renderers = {} }) {
                       {savedResult.reframeCount}
                     </small>
                   )}
-                </GuardedButton>
+                </article>
               );
             })}
           </div>
