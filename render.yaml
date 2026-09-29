@@ -13,7 +13,8 @@
 #   autoDeploy  -- every release until then was someone pressing `Deploy latest
 #                  commit`. Deploys are automatic now because
 #                  `.github/workflows/deploy.yml` calls a Render deploy hook
-#                  after Verify goes green, not because of this line.
+#                  after Verify goes green; the dashboard's own Auto-Deploy is
+#                  off (see below).
 #   headers     -- the site was serving `x-content-type-options` and nothing
 #                  else: no CSP, no Referrer-Policy, no Permissions-Policy, and
 #                  `/index.html` cached for five minutes rather than `no-cache`.
@@ -30,8 +31,14 @@ services:
     # static checks are not run a second time here.
     buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: ./dist
-    # Inert here; the dashboard's Auto-Deploy setting is what decides. See above.
-    autoDeploy: true
+    # Off, and it has to stay off. Inert here -- the dashboard decides -- but
+    # this is the record of the dashboard: Render's own Auto-Deploy builds every
+    # push to main before Verify has run. deploy.yml presses the deploy hook
+    # with `ref=<the verified commit>`, and Render turns Auto-Deploy off by
+    # itself when a service is deployed at a named commit ("Auto-Deploy has
+    # been disabled to prevent accidental deploys"). That notice is the
+    # intended state, not a setting to undo.
+    autoDeploy: false
     # Declared here without values so the keys survive a service rebuild. Set
     # them in the Render dashboard; when they are missing the app silently runs
     # with telemetry and the remote leaderboard switched off.

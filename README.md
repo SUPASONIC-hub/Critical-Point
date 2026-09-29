@@ -781,13 +781,16 @@ og·canonical 주소를 절대 주소로 만듭니다. 페이지는 `viewport-fi
 
 ### 자동 배포
 
-`render.yaml`의 `autoDeploy: true`는 자동 배포를 켜지 못합니다. 그 파일은 Blueprint 명세라서 Render가
+`render.yaml`의 설정은 실제 서비스에 적용되지 않습니다. 그 파일은 Blueprint 명세라서 Render가
 Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직접 만든 서비스는 대시보드 설정을 따릅니다.
 헤더도 마찬가지라 대시보드에 손으로 옮겨 두어야 합니다.
 
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난
-`main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다.
+`main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다
+(`render.yaml`에도 `autoDeploy: false`로 기록). 훅은 검증된 커밋을 `ref=`로 지정해 부르고, Render는 특정
+커밋으로 배포된 서비스의 Auto-Deploy를 스스로 끄며 대시보드에 "Auto-Deploy has been disabled to prevent
+accidental deploys"라고 표시합니다. 이것이 의도한 상태이니 다시 켜지 마십시오.
 시크릿이 없으면 배포를 걸지 않고 실행에 경고 주석을 남깁니다.
 
 같은 워크플로의 두 번째 job(`needs: deploy`)이 배포된 사이트를 확인합니다. 저장소 시크릿 `DEPLOY_URL`이
