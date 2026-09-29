@@ -1,12 +1,20 @@
 import { caseDisplayCode, SEASON_ENTRY_CASE } from "./gameCases.js";
-import { clamp } from "./gameConstants.js";
+import { clamp, initialResources } from "./gameConstants.js";
 import { easyResourceLabels } from "./playerLanguage.js";
 
 export { clamp };
 
+/**
+ * Adds an effect to the six resources. A key that is not one of them is left
+ * out rather than added: a misspelt resource used to become a seventh one
+ * that nothing printed, and a value that is not a number would have made
+ * that resource NaN for the rest of the run. check:graph catches both in the
+ * authored data; this keeps a run whole when something slips past it.
+ */
 export function applyEffect(resources, effect = {}) {
   const next = { ...resources };
-  Object.entries(effect).forEach(([key, value]) => {
+  Object.entries(effect ?? {}).forEach(([key, value]) => {
+    if (!Object.hasOwn(initialResources, key) || !Number.isFinite(value)) return;
     const max = key === "time" ? 72 : 100;
     next[key] = clamp((next[key] ?? 0) + value, 0, max);
   });

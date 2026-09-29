@@ -19,7 +19,7 @@ globalThis.localStorage = local;
 
 const appConfig = await import("../../src/appConfig.js");
 const { clamp, formatNumber } = await import("../../src/gameConstants.js");
-const { getSuspenseEvent } = await import("../../src/riskLogic.js");
+const { applyEffect, getSuspenseEvent } = await import("../../src/riskLogic.js");
 const { SEASON_ENTRY_CASE } = await import("../../src/gameCases.js");
 const chunkReload = await import("../../src/state/chunkReload.js");
 const { FX_READERS, FX_VARIABLES, registerFxVariables } = await import("../../src/gauntlet/fxVariables.js");
@@ -45,6 +45,13 @@ test("formatNumber rounds and groups by thousands, and reads junk as zero", () =
   assert.equal(formatNumber("abc"), "0");
   assert.equal(clamp(140), 100);
   assert.equal(clamp(-3, 0, 10), 0);
+});
+
+test("an effect moves only the six resources, within their bounds", () => {
+  const start = { time: 70, capital: 50, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 };
+  const next = applyEffect(start, { time: 10, trust: -80, capitol: 5, fatigue: "3", legitimacy: Number.NaN });
+  assert.deepEqual(next, { ...start, time: 72, trust: 0 });
+  assert.deepEqual(applyEffect(start, null), start);
 });
 
 test("pattern lock fires after the season's first case, never inside it", () => {

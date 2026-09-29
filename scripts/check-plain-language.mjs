@@ -28,7 +28,7 @@
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
-import { CASE_SEQUENCE, CASE_START_NODES, caseNodePrefix, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, CASE_START_NODES, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
 import { BANNED, RETIRED_PHRASES, findBannedWords, findRetiredPhrases } from "./plain-language-rules.mjs";
 
 // Every case file is copy, so the list reads the folder rather than naming each
@@ -268,16 +268,10 @@ for (const file of [...COPY_FILES, ...SCREEN_COPY_FILES]) {
   }
 }
 
-// Which nodes belong to a case. Derived from the id's digits until the
-// 프롤로그 arrived: `Number("ogue01")` is NaN, so `prologue01` matched nothing
-// and the hidden route and evidence turn of all five cases -- the scenes that
-// are not in `nodeOrders` -- went unchecked. `caseNodePrefix` is the one place
-// that mapping lives now.
-const CASE_PREFIX = { case01: /^(start$|c1_|payday$|competitor$)/ };
-for (const caseId of CASE_SEQUENCE) {
-  if (CASE_PREFIX[caseId]) continue;
-  CASE_PREFIX[caseId] = new RegExp(`^${caseNodePrefix(caseId)}_`);
-}
+// Which nodes belong to a case: the graph stamps every scene with its case
+// (`finishSceneGraph`). This used to be read off the id -- digits first, which
+// left the 프롤로그 unchecked, then a prefix per case with its own regex for
+// 사건 01 -- and a third copy of that mapping could only drift.
 
 function narration(node = {}) {
   return [node.lead, node.text].filter(Boolean).join(" ");
@@ -302,11 +296,10 @@ function firstUse(ids, term) {
 }
 
 for (const caseId of CASE_SEQUENCE) {
-  const prefix = CASE_PREFIX[caseId];
   const openings = [...new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})])].filter((id) => nodes[id]);
   const authored = (nodeOrders[caseId] ?? []).filter((id) => nodes[id] && !openings.includes(id));
   const rest = Object.keys(nodes)
-    .filter((id) => prefix.test(id) && !openings.includes(id) && !authored.includes(id))
+    .filter((id) => nodes[id].caseId === caseId && !openings.includes(id) && !authored.includes(id))
     .sort();
   const body = [...authored, ...rest];
   for (const term of GLOSSARY) {
