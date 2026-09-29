@@ -57,7 +57,7 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
     label: "구조 재설계",
     value: reflectionScore,
     text: `${reflectionScore}점`,
-    note: "선택지 밖에서 이해관계자, 조건, 근거, 실패 가능성을 구체화한 정도입니다.",
+    note: "판을 다시 짜 숨은 경로를 열고, 장면 챌린지를 맞히고, 숨은 기록을 찾아낸 정도입니다.",
   },
   {
     label: "즉답 패널티",

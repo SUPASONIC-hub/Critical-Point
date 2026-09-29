@@ -13,7 +13,8 @@ import { case09Nodes } from "./nodes/case09.js";
 import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
-import { createRouteReaders, finishSceneGraph, inferChoiceCognition } from "./nodes/sceneBuild.js";
+import { coreCards } from "./nodes/coreCards.js";
+import * as sceneBuild from "./nodes/sceneBuild.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
 import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES } from "./gameCases.js";
@@ -920,7 +921,7 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
         label,
         effect: effects[index],
         next: nextId,
-        cognition: inferChoiceCognition(label, effects[index]),
+        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -1062,7 +1063,7 @@ function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) 
         label,
         effect: effects[index],
         next: nextId,
-        cognition: inferChoiceCognition(label, effects[index]),
+        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -1920,7 +1921,7 @@ const dramaticRoutePlans = {
       final: "c1_final_system",
       title: "선택지 밖에서 발견한 첫 규칙",
       speaker: "에코",
-      text: "준비된 답이 아닌 문장을 입력하자 화면은 절감, 자금, 매각(사업이나 자산을 팔아 돈을 마련하는 것)을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
+      text: "세 안건 가운데 하나를 거는 대신 셋을 한 표에 놓고 보자고 하자 화면은 절감, 자금, 매각(사업이나 자산을 팔아 돈을 마련하는 것)을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
       memo: ["다시 짠 판이 숨은 공통 원인 경로를 엶", "모든 해결책이 같은 기준표를 통과함", "분석관의 판단이 다음 질문의 기준으로 기록됨"],
       routeChoices: [
         ["c1_route_system_trace", "기준표를 누가 언제 고쳤는지부터 되짚는다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2014,7 +2015,7 @@ const dramaticRoutePlans = {
       final: "c3_final_system",
       title: "점수판이 당신을 따라온다",
       speaker: "에코",
-      text: "준비된 전략 밖의 말을 남기자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
+      text: "오진우와 겨루는 대신 무엇으로 점수를 매기는지부터 묻자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
       memo: ["다시 짠 판이 새 평가 항목으로 변환됨", "오진우 점수도 동시에 재계산됨", "고객 화면에는 변경 사유가 보이지 않음"],
       routeChoices: [
         ["c3_route_system_read", "새로 생긴 평가 항목이 어디서 왔는지 추적한다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2108,8 +2109,8 @@ const dramaticRoutePlans = {
       final: "c4_final_system",
       title: "명분 있는 위반의 복제",
       speaker: "에코",
-      text: "자유로운 제안을 남기자 트리거랩 화면에 '명분 있는 위반 허용선'이 표시됩니다. 당신의 선의는 다음 기관이 규칙을 넘는 안내문으로 바뀔 수 있습니다.",
-      memo: ["제안 문장이 예외 승인 모델에 기록됨", "다음 기관 시뮬레이션이 자동 생성됨", "피해자 명단은 아직 입력되지 않음"],
+      text: "산식을 넓힐지 말지를 고르는 대신 어디까지 넘어도 되는지부터 정하자고 하자 트리거랩 화면에 '명분 있는 위반 허용선'이 표시됩니다. 당신의 선의는 다음 기관이 규칙을 넘는 안내문으로 바뀔 수 있습니다.",
+      memo: ["다시 짠 판이 예외 승인 모델에 기록됨", "다음 기관 시뮬레이션이 자동 생성됨", "피해자 명단은 아직 입력되지 않음"],
       routeChoices: [
         ["c4_route_system_limit", "허용선 문장에 사용 한도부터 적어 넣는다", { legitimacy: 9, trust: 4, capital: -5, time: -6, fatigue: 6 }, { persistence: 2, inference: 1 }],
         ["c4_route_system_ship", "허용선은 그대로 두고 이번 승인부터 끝낸다", { capital: 9, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
@@ -2202,7 +2203,7 @@ const dramaticRoutePlans = {
       final: "c5_final_system_route",
       title: "조용한 사람을 낮게 보는 장치",
       speaker: "에코",
-      text: "준비된 선택지 밖의 복구안을 내자, 알고리즘(판단 순서를 정해 둔 계산 규칙)의 숨은 가중치가 보입니다. 시스템은 도움을 크게 요구하지 못하는 사람을 낮은 우선순위로 배웠습니다.",
+      text: "책임자를 세울지 복구부터 할지 정하기 전에 누가 먼저 밀렸는지부터 묻자, 알고리즘(판단 순서를 정해 둔 계산 규칙)의 숨은 가중치가 보입니다. 시스템은 도움을 크게 요구하지 못하는 사람을 낮은 우선순위로 배웠습니다.",
       memo: ["불만 제기 빈도가 보호 가중치에 역으로 작용", "가족 연락처 불안정이 낮은 신뢰도로 처리됨", "조용한 피해자는 모델 학습에서 누락됨"],
       routeChoices: [
         ["c5_route_system_audit", "가중치가 학습한 자료부터 열어 본다", { legitimacy: 9, trust: 3, capital: -4, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2229,7 +2230,7 @@ const dramaticRoutePlans = {
       final: "c6_final_system_route",
       title: "실험 번호가 같은 두 사람",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 실험 색인이 열립니다. 오진우와 당신의 프로필은 서로 다른 조건이 아니라, 한 실험의 위쪽 선과 아래쪽 선이었습니다.",
+      text: "오진우 한 사람의 책임을 따지는 대신 두 사람의 조건을 나란히 놓자고 하자 실험 색인이 열립니다. 오진우와 당신의 프로필은 서로 다른 조건이 아니라, 한 실험의 위쪽 선과 아래쪽 선이었습니다.",
       memo: ["두 프로필의 실험 번호가 동일", "조건 변경 시점이 서로 맞물려 있음", "색인에는 다음 참가자 칸이 비어 있음"],
       routeChoices: [
         ["c6_route_system_index", "색인 전체를 열어 다음 참가자 칸을 확인한다", { legitimacy: 9, trust: 4, capital: -5, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2256,7 +2257,7 @@ const dramaticRoutePlans = {
       final: "c7_final_system_route",
       title: "발령 기록부",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 인사 발령(근무지를 옮기라는 인사 명령) 기록부가 열립니다. 최근 4년간 승인란이 빈 채 그대로 시행된 발령은 열아홉 건이고, 그중 열일곱 명이 같은 부서를 거쳐 갔습니다. 당신은 열여덟 번째가 아니라, 같은 표의 한 줄입니다.",
+      text: "내 발령(근무지를 옮기라는 인사 명령) 한 건을 다투는 대신 같은 모양의 발령이 몇 건인지부터 묻자 인사 발령 기록부가 열립니다. 최근 4년간 승인란이 빈 채 그대로 시행된 발령은 열아홉 건이고, 그중 열일곱 명이 같은 부서를 거쳐 갔습니다. 당신은 열여덟 번째가 아니라, 같은 표의 한 줄입니다.",
       memo: ["승인란 공란 발령 19건", "17명이 기업금융전략팀 경유", "표의 마지막 줄은 아직 비어 있음"],
       routeChoices: [
         ["c7_route_system_trace", "열아홉 건을 전부 따라가 표를 완성한다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2282,7 +2283,7 @@ const dramaticRoutePlans = {
       final: "c8_final_system_route",
       title: "같은 주소의 일곱 법인",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 법인 등기(회사의 주소와 대표를 나라 장부에 올린 기록) 이력이 열립니다. 해온파트너스와 같은 주소, 같은 세무 대리인(세금 신고를 대신해 주는 사무소), 같은 청산(회사를 정리해 없애는 절차) 시점을 가진 회사가 지난 6년간 일곱 곳입니다. 흔적은 한 줄이 아니라, 같은 손이 반복해서 그린 무늬였습니다.",
+      text: "해온파트너스 한 곳을 쫓는 대신 같은 주소를 쓴 회사가 더 있는지부터 묻자 법인 등기(회사의 주소와 대표를 나라 장부에 올린 기록) 이력이 열립니다. 해온파트너스와 같은 주소, 같은 세무 대리인(세금 신고를 대신해 주는 사무소), 같은 청산(회사를 정리해 없애는 절차) 시점을 가진 회사가 지난 6년간 일곱 곳입니다. 흔적은 한 줄이 아니라, 같은 손이 반복해서 그린 무늬였습니다.",
       memo: ["같은 주소·같은 세무 대리인 법인 7곳", "모두 감사 착수 직전에 청산", "일곱 번째가 해온파트너스"],
       routeChoices: [
         ["c8_route_system_map", "일곱 법인의 흐름을 한 장의 지도로 잇는다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2307,7 +2308,7 @@ const dramaticRoutePlans = {
       final: "c9_final_system_route",
       title: "세 번째 계산서",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 세 번째 표를 엽니다. 채권단(돈을 빌려준 금융회사들의 협의체) 누구도 작성하지 않은 계산서, 청산(회사를 정리해 없애는 절차)했을 때 1,140명의 가족이 치르는 비용입니다. 건강보험 전환, 학자금 연체(갚을 날짜를 넘긴 빚), 협력사 연쇄 부도(빚을 갚지 못해 회사가 쓰러지는 일). 합계는 브릿지은행이 청산으로 더 돌려받는 금액의 2.3배입니다.",
+      text: "살리는 계산서와 벌하는 계산서 옆에 아무도 세지 않은 비용을 놓자고 하자 에코가 세 번째 표를 엽니다. 채권단(돈을 빌려준 금융회사들의 협의체) 누구도 작성하지 않은 계산서, 청산(회사를 정리해 없애는 절차)했을 때 1,140명의 가족이 치르는 비용입니다. 건강보험 전환, 학자금 연체(갚을 날짜를 넘긴 빚), 협력사 연쇄 부도(빚을 갚지 못해 회사가 쓰러지는 일). 합계는 브릿지은행이 청산으로 더 돌려받는 금액의 2.3배입니다.",
       memo: ["청산 때 가족·협력사가 치를 비용 추정: 더 돌려받는 금액의 2.3배", "채권단 계산서에는 이 칸이 없음", "추정치라 법적 구속력은 없음"],
       routeChoices: [
         ["c9_route_system_add", "세 번째 계산서를 채권단 공식 자료로 올린다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2333,7 +2334,7 @@ const dramaticRoutePlans = {
       final: "c10_final_system_route",
       title: "소진율",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 한 번도 집계된 적 없는 지표를 만듭니다. 지난 6년간 고객 피해를 자발적으로 추적한 직원 34명. 그중 29명이 3년 안에 퇴직하거나 장기 병가에 들어갔습니다. 평균 지속 기간은 2년 7개월입니다. '선의는 이 조직에서 평균 31개월 만에 소모됩니다. 아무도 이 숫자를 재지 않았습니다. 재면 관리 대상이 되니까요.'",
+      text: "도윤하 한 사람의 병가를 따지는 대신 같은 일을 하던 사람들이 얼마나 버텼는지 묻자 에코가 한 번도 집계된 적 없는 지표를 만듭니다. 지난 6년간 고객 피해를 자발적으로 추적한 직원 34명. 그중 29명이 3년 안에 퇴직하거나 장기 병가에 들어갔습니다. 평균 지속 기간은 2년 7개월입니다. '선의는 이 조직에서 평균 31개월 만에 소모됩니다. 아무도 이 숫자를 재지 않았습니다. 재면 관리 대상이 되니까요.'",
       memo: ["자발적 피해 추적자 34명 중 29명이 3년 내 이탈", "평균 지속 31개월 -- 도윤하는 36개월째", "이 지표는 어떤 보고서에도 존재한 적 없음"],
       routeChoices: [
         ["c10_route_system_publish", "소진율을 그룹 공식 지표로 등록시킨다", { legitimacy: 11, trust: 5, capital: -7, time: -9, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2359,7 +2360,7 @@ const dramaticRoutePlans = {
       final: "c11_final_system_route",
       title: "확인해 보겠습니다",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 지난 10년 정무위원회 국정감사(국회가 1년에 한 번 정부와 금융회사의 일을 공개적으로 따져 묻는 자리)의 속기록(회의에서 오간 말을 그대로 적은 공식 기록) 1,812건을 엽니다. 금융회사 참고인(증언할 의무는 없지만 사실을 설명하러 나오는 사람)이 받은 질문은 7,430개, 가장 많이 나온 답은 '확인해 보겠습니다'로 2,114번입니다. 그 약속 가운데 다음 해 국정감사에서 확인 결과가 실제로 보고된 건 3%입니다. '이 방은 진실을 묻는 곳이 아니라, 1년 동안 미룰 수 있는 문장을 고르는 곳으로 학습되어 있습니다.'",
+      text: "두 대본 가운데 하나를 고르는 대신 이 방에서 답이 어떻게 미뤄져 왔는지 묻자 에코가 지난 10년 정무위원회 국정감사(국회가 1년에 한 번 정부와 금융회사의 일을 공개적으로 따져 묻는 자리)의 속기록(회의에서 오간 말을 그대로 적은 공식 기록) 1,812건을 엽니다. 금융회사 참고인(증언할 의무는 없지만 사실을 설명하러 나오는 사람)이 받은 질문은 7,430개, 가장 많이 나온 답은 '확인해 보겠습니다'로 2,114번입니다. 그 약속 가운데 다음 해 국정감사에서 확인 결과가 실제로 보고된 건 3%입니다. '이 방은 진실을 묻는 곳이 아니라, 1년 동안 미룰 수 있는 문장을 고르는 곳으로 학습되어 있습니다.'",
       memo: ["지난 10년 속기록 1,812건", "'확인해 보겠습니다' 2,114번 -- 이행 보고 3%", "이 통계는 어떤 보고서에도 인용된 적 없음"],
       routeChoices: [
         ["c11_route_system_publish", "통계를 서하린에게 넘겨 기사로 만든다", { legitimacy: 10, trust: 6, capital: -6, time: -8, fatigue: 5 }, { inference: 2, persistence: 1 }],
@@ -2457,17 +2458,17 @@ const dramaticRoutePlans = {
       final: "f_final_system",
       title: "마지막 선택지가 당신을 부른다",
       speaker: "에코",
-      text: "준비된 결말 밖의 문장을 쓰자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 쓴 문장입니다.",
+      text: "봉인도 개혁도 폭로도 걸지 않고 판을 다시 짜자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 다시 짠 판입니다.",
       memo: ["다시 짠 판이 다음 참가자 선택지로 변환됨", "삭제 전송과 공개 전송이 동시에 대기 중", "종료 권한은 아직 당신에게 있음"],
       routeChoices: [
-        ["f_route_system_read", "내 문장이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
+        ["f_route_system_read", "내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
         ["f_route_system_send", "확인하지 않고 전송 대기열을 그대로 둔다", { capital: 7, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
         ["f_route_system_warn", "다음 참가자에게 이 화면을 먼저 보여준다", { trust: 9, legitimacy: 6, capital: -5, humanCost: -5, fatigue: 7 }, { reframing: 2 }],
       ],
     },
     finalChoices: [
-      ["a", "내 문장이 다음 선택지가 되지 못하게 막는다", { legitimacy: 8, trust: 4, capital: -5, time: -6, humanCost: -5, fatigue: 7 }, { persistence: 2 }],
-      ["b", "내 문장을 남기되 바꿀 수 있는 빈칸을 붙인다", { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 }, { reframing: 3 }],
+      ["a", "내가 다시 짠 판이 다음 선택지가 되지 못하게 막는다", { legitimacy: 8, trust: 4, capital: -5, time: -6, humanCost: -5, fatigue: 7 }, { persistence: 2 }],
+      ["b", "다시 짠 판은 남기되 바꿀 수 있는 빈칸을 붙인다", { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 }, { reframing: 3 }],
       ["c", "다음 참가자에게 모든 원본을 넘기고 끝낸다", { legitimacy: 22, trust: 6, capital: 0, humanCost: 4, time: -6, fatigue: 8 }, { risk: 1, inference: 1 }],
     ],
   },
@@ -2580,6 +2581,7 @@ function registerDramaticRoutePlan(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   dramaticRoutePlans[pack.id] = pack.routePlan;
 });
+coreCards.lay(coreCards.closings, (caseId) => dramaticRoutePlans[caseId].system);
 Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticRoutePlan(caseId, plan));
 
 /**
@@ -2682,8 +2684,8 @@ const evidenceTurnaroundPlans = {
     // instead, where trust reaches 67-82 and a clue has had time to arrive.
     sourceRoutes: ["c1_final_layoff", "c1_final_funding", "c1_final_sale", "c1_final_investigate", "c1_final_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 펼쳐, 이 안건들이 같은 표에서 나왔는지부터 확인한다.",
-    entryEcho: "단서를 대면 세 해결책이 하나의 원인으로 묶입니다.",
+    entryVoice: "세 안건의 계산 근거를 단서 위에 펼쳐, 셋이 같은 표에서 나왔는지 가늠한다.",
+    entryEcho: "계산 근거를 펼치면 세 해결책이 하나의 원인으로 묶입니다.",
     title: "첫 단서가 세 안건을 한 줄로 묶는다",
     speaker: "에코",
     text: "확보한 단서를 대조하자 감축, 자금, 매각이 서로 다른 해결책이 아니라 같은 누락 기준표의 결과라는 사실이 보입니다. 이제 무엇을 고를지가 아니라 기준표를 누가 다시 쓸지가 사건의 결론입니다.",
@@ -2701,8 +2703,8 @@ const evidenceTurnaroundPlans = {
     result: "c2_aftershock",
     sourceRoutes: ["c2_route_report", "c2_route_person", "c2_route_origin", "c2_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 사건이 정말 한 사람의 일인지부터 되묻는다.",
-    entryEcho: "단서를 대면 혐의의 주어가 사람에서 기록으로 옮겨 갑니다.",
+    entryVoice: "유출 파일의 시각을 단서의 증언 시각과 맞세워, 이 일이 정말 한 사람의 짓인지 되묻는다.",
+    entryEcho: "두 시각을 맞세우면 혐의의 주어가 사람에서 기록으로 옮겨 갑니다.",
     title: "보호된 증언이 기록을 뒤집는다",
     speaker: "이민서",
     text: "앞서 얻은 단서를 붙이자 유출 파일의 시간이 맞지 않습니다. 누가 말했는지보다 누가 말할 수 없게 만들었는지가 새 질문으로 떠오릅니다.",
@@ -2720,8 +2722,8 @@ const evidenceTurnaroundPlans = {
     result: "c3_aftershock",
     sourceRoutes: ["c3_route_fast", "c3_route_deep", "c3_route_mirror", "c3_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 점수판이 하나뿐인지부터 확인한다.",
-    entryEcho: "단서를 대면 승부의 기준이 승부보다 먼저 문제가 됩니다.",
+    entryVoice: "고객에게 보인 점수판을 단서에 비추어, 점수판이 정말 하나뿐인지 캔다.",
+    entryEcho: "단서에 비추면 승부의 기준이 승부보다 먼저 문제가 됩니다.",
     title: "두 번째 점수판",
     speaker: "오진우",
     text: "단서를 대조하자 고객에게 보이는 점수판과 내부 심사용 점수판이 다르다는 사실이 드러납니다. 이제 승패보다 어느 점수판을 진짜 계약 기준으로 인정할지가 문제입니다.",
@@ -2739,8 +2741,8 @@ const evidenceTurnaroundPlans = {
     result: "c4_aftershock",
     sourceRoutes: ["c4_route_exception", "c4_route_rule", "c4_route_audit", "c4_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 예외가 정말 처음인지부터 확인한다.",
-    entryEcho: "단서를 대면 예외는 판단이 아니라 반복으로 읽힙니다.",
+    entryVoice: "예외 승인 기록을 단서와 수신자별로 나눠, 이 예외가 정말 처음인지 가린다.",
+    entryEcho: "수신자별로 나누면 예외는 판단이 아니라 반복으로 읽힙니다.",
     title: "예외 파일의 원래 수신자",
     speaker: "반재욱",
     text: "단서 조합은 예외 승인이 한 번의 선의가 아니라 미리 설계된 반복 절차였음을 보여줍니다. 질문은 허용 여부에서, 반복을 누가 승인했는지로 이동합니다.",
@@ -2758,8 +2760,8 @@ const evidenceTurnaroundPlans = {
     result: "c5_aftershock",
     sourceRoutes: ["c5_route_blame", "c5_route_map", "c5_route_redesign", "c5_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 누가 지도에서 먼저 지워졌는지부터 확인한다.",
-    entryEcho: "단서를 대면 실패의 피해자 목록이 먼저 바뀝니다.",
+    entryVoice: "실패 지도에서 빠진 이름을 단서로 짚어, 누가 먼저 지워졌는지 되살핀다.",
+    entryEcho: "빠진 이름을 짚으면 실패의 피해자 목록이 먼저 바뀝니다.",
     title: "사라진 피해자의 우선순위",
     speaker: "한서윤",
     text: "지금까지의 단서가 겹치자 조용한 피해자가 매번 낮은 우선순위로 밀린 이유가 보입니다. 책임자를 찾는 질문은 피해자가 시스템에서 어떻게 사라졌는지로 바뀝니다.",
@@ -2777,8 +2779,8 @@ const evidenceTurnaroundPlans = {
     result: "c6_aftershock",
     sourceRoutes: ["c6_desk", "c6_logs", "c6_panel", "c6_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 펼쳐, 그의 조건이 언제부터 바뀌었는지 날짜로 맞춰 본다.",
-    entryEcho: "단서를 대면 그의 속도는 성격이 아니라 일정표가 됩니다.",
+    entryVoice: "그의 결정 창이 줄어든 날을 단서의 날짜와 한 줄에 놓아, 조건이 언제부터 바뀌었는지 센다.",
+    entryEcho: "한 줄에 놓으면 그의 속도는 성격이 아니라 일정표가 됩니다.",
     title: "조건이 바뀐 날짜들",
     speaker: "에코",
     text: "단서를 맞추자 그의 결정 창이 줄어든 날짜가 전부 당신이 검증을 택한 다음 날이라는 사실이 드러납니다. 두 사람은 경쟁한 것이 아니라, 서로의 조건이 되어 있었습니다.",
@@ -2796,8 +2798,8 @@ const evidenceTurnaroundPlans = {
     result: "c7_aftershock",
     sourceRoutes: ["c7_ledger", "c7_counter", "c7_paper", "c7_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 발령서 작성일과 나란히 놓고, 순서가 맞는지 맞춰 본다.",
-    entryEcho: "단서를 대면 이 발령은 결과가 아니라 예고편이 됩니다.",
+    entryVoice: "발령서 작성일을 단서의 날짜들 사이에 끼워, 무엇이 먼저였는지 순서를 세운다.",
+    entryEcho: "순서를 세우면 이 발령은 결과가 아니라 예고편이 됩니다.",
     title: "작성일이 먼저였다",
     speaker: "반재욱",
     text: "단서를 맞추자 순서가 드러납니다. 발령서 작성일은 오진우 조사 개시보다 12일 앞서고, 그 12일 전에는 당신이 배차 사고 건에서 예산 상한선의 출처를 물은 날이 있습니다. 조사가 시작돼서 발령이 난 것이 아니라, 질문이 시작돼서 발령이 준비된 것입니다.",
@@ -2815,8 +2817,8 @@ const evidenceTurnaroundPlans = {
     result: "c8_aftershock",
     sourceRoutes: ["c8_trail", "c8_gallery", "c8_bait", "c8_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 입금일 달력에 겹쳐, 돈이 움직인 날과 승인이 난 날을 맞춰 본다.",
-    entryEcho: "단서를 대면 자문료는 수수료가 아니라 승인의 영수증이 됩니다.",
+    entryVoice: "자문료 입금일을 단서와 한 달력에 겹쳐, 돈이 움직인 날과 승인이 난 날의 간격을 잰다.",
+    entryEcho: "간격을 재면 자문료는 수수료가 아니라 승인의 영수증이 됩니다.",
     title: "입금일과 승인일",
     speaker: "반재욱",
     text: "단서를 달력에 겹치자 규칙이 보입니다. 해온파트너스에 자문료가 들어온 열두 번의 날짜는 전부 KD은행이 노바웍스와 브릿지은행 쪽에 유리한 승인을 낸 다음 영업일입니다. 3년 전 2023-0412의 담보 순위(돈을 떼일 때 누가 먼저 돌려받느냐의 순서)가 브릿지은행으로 넘어간 날도 그중 하나입니다.",
@@ -2834,8 +2836,8 @@ const evidenceTurnaroundPlans = {
     result: "c9_aftershock",
     sourceRoutes: ["c9_ledger", "c9_family", "c9_timing", "c9_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 두 계산서 사이에 끼워, 어느 숫자가 어느 승인에서 왔는지 맞춰 본다.",
-    entryEcho: "단서를 대면 청산의 계산서는 중립적인 숫자가 아니라 누군가 사 둔 결론이 됩니다.",
+    entryVoice: "두 계산서의 숫자를 단서의 흔적표와 짝지어, 어느 숫자가 어느 승인에서 왔는지 거슬러 오른다.",
+    entryEcho: "숫자를 짝지으면 청산의 계산서는 중립적인 숫자가 아니라 누군가 사 둔 결론이 됩니다.",
     title: "청산 회수율의 출처",
     speaker: "오진우",
     text: "단서를 맞추자 브릿지은행이 내민 청산 회수율(빌려준 돈을 돌려받는 비율) 78%의 출처가 드러납니다. 담보 가치를 매긴 감정평가법인(부동산·설비 값을 매기는 회사)은 해온파트너스와 같은 세무 대리인(세금 신고를 대신해 주는 사무소)을 씁니다. 청산이 유리하다는 숫자 자체가, 흔적표의 같은 손에서 나왔습니다.",
@@ -2853,8 +2855,8 @@ const evidenceTurnaroundPlans = {
     result: "c10_aftershock",
     sourceRoutes: ["c10_locker", "c10_claim", "c10_relay", "c10_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 인사 기록 옆에 놓고, 병가 사유란이 언제부터 같은 문구였는지 맞춰 본다.",
-    entryEcho: "단서를 대면 '개인 사정'은 각자의 선택이 아니라 누군가 정해 둔 서식의 기본값이 됩니다.",
+    entryVoice: "열아홉 명의 병가 신청서를 단서 곁에 쌓아, 사유란이 언제부터 같은 문구였는지 넘겨 센다.",
+    entryEcho: "신청서를 쌓으면 '개인 사정'은 각자의 선택이 아니라 누군가 정해 둔 서식의 기본값이 됩니다.",
     title: "사유란의 기본값",
     speaker: "반재욱",
     text: "단서를 맞추자 인사 서식의 개정 이력이 열립니다. 4년 전, 병가 신청서의 사유란에서 '업무상'이라는 보기가 삭제되고 '개인 사정'이 기본값으로 바뀌었습니다. 개정안을 작성한 부서는 기업금융전략팀입니다. 열아홉 명이 같은 문구를 쓴 건 열아홉 번의 선택이 아니라, 선택지가 하나뿐이었기 때문입니다.",
@@ -2872,8 +2874,8 @@ const evidenceTurnaroundPlans = {
     result: "c11_aftershock",
     sourceRoutes: ["c11_script", "c11_rehearsal", "c11_sign", "c11_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 3년 전 승인 시스템 기록 옆에 놓고, 반대 의견서의 상태가 언제 바뀌었는지 맞춰 본다.",
-    entryEcho: "단서를 대면 반려한 손과 지운 손이 같은 손이 아니었다는 게 드러납니다.",
+    entryVoice: "3년 전 승인 시스템의 변경 기록을 단서로 불러, 반대 의견서의 상태가 바뀐 시각을 잡는다.",
+    entryEcho: "변경 기록을 부르면 반려한 손과 지운 손이 같은 손이 아니었다는 게 드러납니다.",
     title: "다섯 시간 열두 분",
     speaker: "반재욱",
     text: "단서를 맞추자 3년 전 승인 시스템의 변경 기록이 열립니다. 한서윤의 반려 서명은 오후 1시 32분. 그런데 반대 의견서가 '보관'에서 '폐기'로 바뀐 건 저녁 6시 44분이고, 바꾼 계정은 당시 기업금융전략팀장 윤상혁입니다. 반려한 사람과 지운 사람은 다른 사람이었습니다. 반재욱이 수첩에 두 시각을 나란히 적습니다. '다섯 시간 열두 분. 그 사이에 누가 무엇을 결심했는지가 이 사건입니다.'",
@@ -2893,8 +2895,8 @@ const evidenceTurnaroundPlans = {
     result: "f_choice",
     sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
     requiredAuthority: "OVERSIGHT",
-    entryVoice: "확보한 단서를 꺼내, 이 선택지들이 어디서 왔는지부터 확인한다.",
-    entryEcho: "단서를 대면 마지막 질문을 누가 냈는지가 드러납니다.",
+    entryVoice: "마지막 선택지들을 단서의 원본과 맞추어, 이 문장들이 어디서 왔는지 밝힌다.",
+    entryEcho: "원본과 맞추면 마지막 질문을 누가 냈는지가 드러납니다.",
     title: "모든 단서가 당신의 문장을 가리킨다",
     speaker: "에코",
     text: "감독 권한으로 원본을 열자 사건의 공통점이 사람이 아니라 질문 문장이라는 사실이 드러납니다. 최종 선택은 데이터를 공개할지가 아니라, 당신의 판단 양식을 다음 참가자에게 물려줄지입니다.",
@@ -2932,7 +2934,7 @@ function registerEvidenceTurnaround(caseId, plan) {
     if (route.choices.some((choice) => choice.id === `${routeId}_evidence_turn`)) return;
     route.choices.push({
       id: `${routeId}_evidence_turn`,
-      label: "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
+      label: plan.entryLabel ?? "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
       effect: plan.entryEffect,
       cognition: { inference: 2, reframing: 1 },
       next: plan.node,
@@ -2957,6 +2959,7 @@ function registerEvidenceTurnaround(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   evidenceTurnaroundPlans[pack.id] = pack.evidencePlan;
 });
+coreCards.lay(coreCards.entryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
 const continuityMemoryChoicePlans = {
@@ -2965,94 +2968,96 @@ const continuityMemoryChoicePlans = {
     systemNext: "c2_route_system",
     evidenceNext: "c2_evidence_turn",
     routeLabel: "직전 사건의 남은 약속을 이민서에게 먼저 확인한다",
-    systemLabel: "직전 자유응답 문장이 유출 파일에 복제됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 유출 파일의 전제를 뒤집는다",
+    systemLabel: "플로우온에서 다시 짠 판이 유출 파일에 복제됐는지 뜯어본다",
+    evidenceLabel: "숨은 급여표의 작성자를 유출 파일의 시각 옆에 세운다",
   },
   case03: {
     routeNext: "c3_route_mirror",
     systemNext: "c3_route_system",
     evidenceNext: "c3_evidence_turn",
     routeLabel: "직전 사건의 보호 결정을 경쟁자의 계약서에 대조한다",
-    systemLabel: "직전 자유응답 문장이 점수판에 반영됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 두 번째 점수판을 연다",
+    systemLabel: "감사실에서 다시 짠 판이 점수판 항목에 올랐는지 훑는다",
+    evidenceLabel: "어긋난 시간을 단서 삼아 점수판 뒤의 평가표를 찾는다",
   },
   case04: {
     routeNext: "c4_route_audit",
     systemNext: "c4_route_system",
     evidenceNext: "c4_evidence_turn",
     routeLabel: "직전 사건의 점수 기준을 예외 승인표에 대조한다",
-    systemLabel: "직전 자유응답 문장이 예외 사유로 쓰였는지 본다",
-    evidenceLabel: "직전 단서를 붙여 예외 파일의 원래 수신자를 연다",
+    systemLabel: "입찰장에서 다시 짠 판이 예외 사유서에 끌려 들어갔는지 읽는다",
+    evidenceLabel: "두 번째 점수판의 작성자를 예외 파일의 수신자 칸에 견준다",
   },
   case05: {
     routeNext: "c5_route_map",
     systemNext: "c5_route_system",
     evidenceNext: "c5_evidence_turn",
     routeLabel: "직전 사건의 예외 조건을 실패 지도에 겹쳐 본다",
-    systemLabel: "직전 자유응답 문장이 복구 우선순위에 들어갔는지 본다",
-    evidenceLabel: "직전 단서를 붙여 사라진 피해자 기준을 연다",
+    systemLabel: "온새에서 다시 짠 판이 복구 우선순위표에 섞였는지 살펴본다",
+    evidenceLabel: "예외 파일에 되풀이된 이름을 복구 순번표에서 찾는다",
   },
   case06: {
     routeNext: "c6_branch_roof",
     systemNext: "c6_route_system",
     evidenceNext: "c6_evidence_turn",
     routeLabel: "직전 사건에서 세운 책임 기준을 옆자리 사람에게도 적용해 본다",
-    systemLabel: "직전 자유응답 문장이 그의 조건표에도 쓰였는지 본다",
-    evidenceLabel: "직전 단서를 붙여 그의 조건이 바뀐 날짜를 연다",
+    systemLabel: "통제실에서 다시 짠 판이 그의 조건표에 기준선으로 갔는지 확인한다",
+    evidenceLabel: "비어 있는 자리의 날짜를 그의 조건이 바뀐 날들과 포갠다",
   },
   case07: {
     routeNext: "c7_branch_quota",
     systemNext: "c7_route_system",
     evidenceNext: "c7_evidence_turn",
     routeLabel: "직전 사건에서 옆자리에 세운 기준을 내 발령에도 대 본다",
-    systemLabel: "직전 자유응답 문장이 내 인사 기록에도 붙었는지 본다",
-    evidenceLabel: "직전 단서를 붙여 발령서 작성일의 순서를 연다",
+    systemLabel: "오진우 곁에서 다시 짠 판이 내 인사 기록에 따라붙었는지 들춘다",
+    evidenceLabel: "거울 프로필의 실험 번호를 발령서 작성일 옆에 적는다",
   },
   case08: {
     routeNext: "c8_branch_ledger",
     systemNext: "c8_route_system",
     evidenceNext: "c8_evidence_turn",
     routeLabel: "직전 사건에서 이름을 올린 방식대로 흔적표에도 이름을 단다",
-    systemLabel: "직전 자유응답 문장이 법인 등기 서류에도 남았는지 본다",
-    evidenceLabel: "직전 단서를 붙여 입금일과 승인일을 맞춘다",
+    systemLabel: "발령 앞에서 다시 짠 판이 법인 등기 서류에 흔적을 남겼는지 더듬는다",
+    evidenceLabel: "먼저 쓰인 발령서의 작성일을 자문료 입금일과 나란히 적는다",
   },
   case09: {
     routeNext: "c9_branch_father",
     systemNext: "c9_route_system",
     evidenceNext: "c9_evidence_turn",
     routeLabel: "직전 사건의 흔적표를 권도현의 계산서 옆에 나란히 놓는다",
-    systemLabel: "직전 자유응답 문장이 채권단 자료에도 들어갔는지 본다",
-    evidenceLabel: "직전 단서를 붙여 청산 회수율의 출처를 연다",
+    systemLabel: "영동지점에서 다시 짠 판이 채권단 자료에 자리를 얻었는지 찾는다",
+    evidenceLabel: "그림값의 날짜를 청산 계산서의 작성일에 겹친다",
   },
   case10: {
     routeNext: "c10_branch_home",
     systemNext: "c10_route_system",
     evidenceNext: "c10_evidence_turn",
     routeLabel: "직전 사건의 계산서 양식을 이번 분담표에 그대로 대 본다",
-    systemLabel: "직전 자유응답 문장이 인사 기록에도 인용됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 병가 사유란의 개정 이력을 연다",
+    systemLabel: "채권단 앞에서 다시 짠 판이 인사 기록에 옮겨 적혔는지 가린다",
+    evidenceLabel: "사 둔 회수율을 만든 손을 병가 서식의 개정 이력에서 찾는다",
   },
   case11: {
     routeNext: "c11_branch_newsroom",
     systemNext: "c11_route_system",
     evidenceNext: "c11_evidence_turn",
     routeLabel: "직전 사건의 분담표를 출석 준비 역할표로 그대로 쓴다",
-    systemLabel: "직전 자유응답 문장이 그룹 입장문에도 인용됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 반대 의견서의 폐기 기록을 연다",
+    systemLabel: "분담표 앞에서 다시 짠 판이 그룹 입장문에 옮겨졌는지 대 본다",
+    evidenceLabel: "사유란의 기본값을 바꾼 부서를 반대 의견서의 폐기 기록에서 찾아본다",
   },
   final: {
     routeNext: "f_route_map",
     systemNext: "f_route_system",
     evidenceNext: "f_evidence_turn",
     routeLabel: "직전 사건의 실패 지도를 내 선택 기록에 겹쳐 본다",
-    systemLabel: "직전 자유응답 문장이 다음 참가자의 선택지가 됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 모든 선택 문장의 원본을 연다",
+    systemLabel: "보름달 아래에서 다시 짠 판이 다음 참가자의 선택지로 넘어갔는지 비춰 본다",
+    evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
   },
 };
+coreCards.lay(coreCards.memoryEchoes, (caseId) => continuityMemoryChoicePlans[caseId]);
 
 CASE_PACKS.forEach((pack) => {
   continuityMemoryChoicePlans[pack.id] = pack.memoryPlan;
 });
+coreCards.fileMemoryEchoes(continuityMemoryChoicePlans, echoReplies);
 
 /**
  * Reads the previous case's recorded route memory, not the run log: a case
@@ -3530,10 +3535,10 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
 
 // Last: what each scene is, where it happens, and the order it deals its
 // cards in. See nodes/sceneBuild.js.
-finishSceneGraph(nodes, nodeOrders);
+sceneBuild.finishSceneGraph(nodes, nodeOrders);
 
 // How far into a case a scene sits; see nodes/sceneBuild.js.
-export const { getCaseRouteLength, getNodeRouteIndex } = createRouteReaders(nodes, caseOpeningRoutes);
+export const { getCaseRouteLength, getNodeRouteIndex } = sceneBuild.createRouteReaders(nodes, caseOpeningRoutes);
 
 /**
  * The one authored mid-case fork per case, with the scenes each side leads to.
