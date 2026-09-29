@@ -757,7 +757,6 @@ summary:focus-visible {
     inset 0 1px 0 rgb(255 255 255 / 0.5);
   transition:
     transform var(--ui-dur-fast) var(--ui-ease),
-    box-shadow var(--ui-dur) var(--ui-ease),
     background var(--ui-dur-fast) var(--ui-ease);
 }
 .intro-launch button::after {
@@ -1213,9 +1212,7 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-sm);
   font-size: 16px;
-  transition:
-    border-color var(--ui-dur-fast) var(--ui-ease),
-    box-shadow var(--ui-dur-fast) var(--ui-ease);
+  transition: border-color var(--ui-dur-fast) var(--ui-ease);
 }
 .intro .start-panel .start-input-row input::placeholder {
   color: var(--ui-text-3);
@@ -1303,8 +1300,7 @@ summary:focus-visible {
   border-radius: var(--ui-radius-md);
   transition:
     border-color var(--ui-dur) var(--ui-ease),
-    background var(--ui-dur) var(--ui-ease),
-    box-shadow var(--ui-dur) var(--ui-ease);
+    background var(--ui-dur) var(--ui-ease);
 }
 .intro-drawer:hover {
   background: var(--ui-surface-2);
@@ -1552,8 +1548,7 @@ summary:focus-visible {
   transition:
     transform var(--ui-dur-fast) var(--ui-ease),
     border-color var(--ui-dur-fast) var(--ui-ease),
-    background var(--ui-dur-fast) var(--ui-ease),
-    box-shadow var(--ui-dur) var(--ui-ease);
+    background var(--ui-dur-fast) var(--ui-ease);
 }
 .intro .play-style:hover,
 .intro .operator-origin:hover {
@@ -1952,7 +1947,6 @@ summary:focus-visible {
   transition:
     transform var(--ui-dur) var(--ui-ease),
     border-color var(--ui-dur) var(--ui-ease),
-    box-shadow var(--ui-dur) var(--ui-ease),
     background var(--ui-dur) var(--ui-ease);
 }
 .case-card::before {

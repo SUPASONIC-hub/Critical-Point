@@ -89,8 +89,7 @@
   cursor: pointer;
   transition:
     transform 0.15s ease-out,
-    border-color 0.15s ease-out,
-    box-shadow 0.15s ease-out;
+    border-color 0.15s ease-out;
 }
 
 .gauntlet-stage .gx-relic-card:hover,

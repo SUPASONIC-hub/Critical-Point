@@ -36,20 +36,16 @@
   --c-teal-deep: rgb(44 74 70);
   --c-green-deep: rgb(29 78 63);
   --c-mint-soft: rgb(223 244 234);
-  --c-warn-deep: rgb(106 84 32);
   --c-paper-muted: rgb(238 241 237);
   --c-violet: rgb(108 101 173);
-  --c-paper-dim: rgb(244 246 243);
   --c-sage: rgb(117 167 121);
   --c-danger: rgb(167 67 50);
   --c-coral: rgb(255 138 112);
   --c-danger-deep: rgb(122 47 34);
   --c-blush: rgb(245 222 216);
-  --c-acid-pale: rgb(239 248 215);
   --c-acid-dark: rgb(159 202 53);
   --c-teal: rgb(41 92 87);
   --c-black: rgb(0 0 0);
-  --c-cream-deep: rgb(255 240 191);
   --c-cream: rgb(247 241 227);
 
   /* Shades outside the role palette above, named for what they are: colour
@@ -60,16 +56,10 @@
   --c-gray-68: rgb(169 176 170);
   --c-green-70: rgb(156 203 180);
   --c-danger-14: rgb(45 30 28);
-  --c-amber-99: rgb(255 253 248);
-  --c-amber-78: rgb(212 205 187);
-  --c-black-a28: rgb(0 0 0 / 0.2784313725490196);
-  --c-green-94: rgb(237 244 238);
-  --c-paper-90: rgb(226 232 225);
   --c-danger-73-2: rgb(224 160 147);
   --c-sky-77: rgb(169 161 232);
   --c-sky-86: rgb(203 199 239);
   --c-acid-72: rgb(184 230 138);
-  --c-gray-81-3: rgb(201 213 205);
   --c-ink-08: rgb(21 21 21);
   --c-sky-08-a94: rgb(12 18 31 / 0.9411764705882353);
   --c-gray-61: rgb(139 152 173);
@@ -98,24 +88,16 @@
   --c-gx-rare-a60: rgb(190 146 255 / 0.6);
 
   /* semantic aliases referenced by components */
-  --color-ink: var(--c-ink);
-  --color-ink-deep: var(--c-ink-deep);
-  --color-paper: var(--c-paper);
-  --color-paper-soft: var(--c-paper-soft);
   --color-line: var(--c-line);
   --color-muted: var(--c-ink-muted);
   --color-accent: var(--c-acid);
   --color-white: var(--c-paper);
   --color-white-soft: rgba(255, 255, 255, 0.68);
-  --color-overlay-soft: rgba(255, 255, 255, 0.08);
   --color-overlay-line: rgba(255, 255, 255, 0.22);
   --color-focus: var(--c-focus-ring);
   --font-body: 16px;
   --font-label: 12px;
-  --font-title: 22px;
-  --radius-md: 8px;
   --radius-pill: 999px;
-  --shadow-panel: 0 18px 46px rgba(25, 49, 42, 0.12);
   /* Pretendard ships with the app (the @font-face at the top of this file), so
      Hangul and Latin share one family, one x-height and one set of weights on
      every platform instead of whatever the OS substitutes. */
@@ -123,9 +105,6 @@
     "Critical Point Sans", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo",
     "Malgun Gothic", "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
-  --line: var(--c-gray-81-3);
-  --acid-dark: var(--c-acid-dark);
-  --teal: var(--c-teal);
 
   /* The shared interface layer, 2026-09-15. Every screen used to invent its own
      ground: square acid dossiers on the intro, felt on the table, white cards on
