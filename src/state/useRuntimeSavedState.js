@@ -26,9 +26,17 @@ import { getReplaySeedFromLocation } from "./trace.js";
 
 // A replay link is read once per page load. While it is open the tab writes
 // nothing to the save (appConfig.writeSaveState); starting a run of one's own
-// ends it (useAppPersistence.startGame).
-const replayState = createReplaySavedState(getReplaySeedFromLocation());
-if (replayState) setReplaySession(true);
+// ends it (useAppPersistence.startGame). It is read at the first render, not
+// at import: the scenes it names are checked against the season, and the
+// season's cases arrive after this module does (state/caseArrival.js).
+let replayState;
+function readReplayState() {
+  if (replayState === undefined) {
+    replayState = createReplaySavedState(getReplaySeedFromLocation());
+    if (replayState) setReplaySession(true);
+  }
+  return replayState;
+}
 
 /**
  * What the runtime starts from, derived without touching storage. The writes
@@ -36,7 +44,7 @@ if (replayState) setReplaySession(true);
  * silent-failure reports -- are returned as a plan for the effect to carry out.
  */
 function deriveRuntimeSave(initialStartState) {
-  const replay = isReplaySession() ? replayState : null;
+  const replay = readReplayState() && isReplaySession() ? replayState : null;
   const rawSaved = readStoredValue(STORAGE_KEY, "null");
   const hasStoredSave =
     Boolean(replay) ||

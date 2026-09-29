@@ -49,10 +49,13 @@ import { loadedChunk } from "./state/chunkReload.js";
 // The runtime is what deals the table, and the table reads this tab's token, so
 // it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
 // A first visit mounts once the season's first case has arrived; a device with
-// a save, once every case has (state/caseArrival.js).
+// a save, or a page opened from a replay link, once every case has
+// (state/caseArrival.js): both name scenes anywhere in the season.
 const GameRuntime = lazy(() =>
   Promise.all([loadGameRuntime(), claimTabToken()]).then(async ([runtime]) => {
-    await runtime.prepareGameRuntime({ hasSave: readStoredValue(STORAGE_KEY, null) !== null });
+    await runtime.prepareGameRuntime({
+      hasSave: readStoredValue(STORAGE_KEY, null) !== null || Boolean(getReplaySeedFromLocation()),
+    });
     return { default: runtime.GameRuntime };
   }),
 );
