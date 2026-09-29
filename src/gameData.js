@@ -2945,7 +2945,7 @@ CASE_PACKS.forEach((pack) => {
 coreCards.lay(coreCards.entryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
-const continuityMemoryChoicePlans = {
+export const continuityMemoryChoicePlans = {
   case02: {
     routeNext: "c2_route_person",
     systemNext: "c2_route_system",

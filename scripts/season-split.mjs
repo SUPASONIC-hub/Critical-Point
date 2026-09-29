@@ -27,6 +27,9 @@ import { pathToFileURL } from "node:url";
  */
 export const SPLIT_TABLES = ["nodes", "echoReplies", "choiceVoiceLines", "sceneContext"];
 
+/** The fields of a case pack that `gameLogic.js` reads (its `packTable`), all small. */
+export const PACK_LOGIC_FIELDS = ["clue", "outcomes", "carryovers", "continuityChallenges"];
+
 export async function loadSeasonTables() {
   const [data, dialogue, context] = await Promise.all([
     import("../src/gameData.js"),
@@ -35,6 +38,20 @@ export async function loadSeasonTables() {
   ]);
   return {
     caseSequence: data.CASE_SEQUENCE,
+    // What every case needs from the start, small enough to ship whole: the
+    // orders and openings, the memory-card plans, each case's fork, the people,
+    // and the pack fields the rules read.
+    index: {
+      nodeOrders: data.nodeOrders,
+      caseOpeningRoutes: data.caseOpeningRoutes,
+      reframeRouteNodes: data.reframeRouteNodes,
+      memoryPlans: data.continuityMemoryChoicePlans,
+      caseBranchNodes: data.getCaseBranchNodes(),
+      characterProfiles: dialogue.characterProfiles,
+      roleSpans: dialogue.characterRoleSpans,
+      characterOverrides: dialogue.packCharacterOverrides,
+      packs: data.CASE_PACKS.map((pack) => Object.fromEntries([["id", pack.id], ...PACK_LOGIC_FIELDS.map((field) => [field, pack[field]])])),
+    },
     tables: {
       nodes: data.nodes,
       echoReplies: data.echoReplies,
@@ -75,6 +92,21 @@ export function mergeSeason({ cases, shared }) {
 }
 
 /**
+ * What the app is shipped: the index with the one shared reply added, and for
+ * each case its scenes, replies and voice lines. The scene context is left
+ * out -- it is already built into the scenes -- and so is nothing else.
+ */
+export function buildRuntimeData(season) {
+  const { cases, shared } = splitSeason(season);
+  return {
+    index: { ...season.index, sharedEcho: shared.echoReplies },
+    cases: Object.fromEntries(
+      Object.entries(cases).map(([caseId, bucket]) => [caseId, { nodes: bucket.nodes, echoReplies: bucket.echoReplies, choiceVoiceLines: bucket.choiceVoiceLines }]),
+    ),
+  };
+}
+
+/**
  * Objects reachable from two different top-level keys, by the property they
  * sit under: a JSON copy would give each key its own. The generators reuse one
  * `triggers` list and one `effect` / `cognition` object across scenes; nothing
@@ -102,11 +134,13 @@ const gz = (value) => gzipSync(JSON.stringify(value)).length;
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const season = await loadSeasonTables();
-  const { cases, shared } = splitSeason(season);
+  const { shared } = splitSeason(season);
   const whole = gz(season.tables);
-  const sizes = Object.entries(cases).map(([caseId, bucket]) => [caseId, gz(bucket)]);
+  console.log(`The index every case needs: ${(gz(season.index) / 1024).toFixed(1)}KB gzip.`);
+  const shipped = buildRuntimeData(season);
+  const sizes = Object.entries(shipped.cases).map(([caseId, bucket]) => [caseId, gz(bucket)]);
   const largest = [...sizes].sort((a, b) => b[1] - a[1]).slice(0, 3);
   console.log(`The four tables: ${(whole / 1024).toFixed(0)}KB gzip in one piece.`);
-  console.log(`First case (${sizes[0][0]}): ${(sizes[0][1] / 1024).toFixed(1)}KB gzip. Largest: ${largest.map(([id, size]) => `${id} ${(size / 1024).toFixed(1)}KB`).join(", ")}.`);
+  console.log(`Shipped per case (no scene context). First case (${sizes[0][0]}): ${(sizes[0][1] / 1024).toFixed(1)}KB gzip. Largest: ${largest.map(([id, size]) => `${id} ${(size / 1024).toFixed(1)}KB`).join(", ")}.`);
   console.log(`Shared (no case): ${SPLIT_TABLES.map((table) => `${table} ${Object.keys(shared[table]).length}`).join(", ")}.`);
 }
