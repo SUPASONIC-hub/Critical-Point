@@ -11,31 +11,41 @@ import { isChunkLoadError, reloadForMissingChunk } from "./chunkReload.js";
  * behind the table. A device holding any save waits for all of them, as it
  * always has: repairing a save reads the scenes of every case it closed, and a
  * repair that could not find them would rewrite what it read.
+ *
+ * `createCaseArrival` takes the store so the waiting can be tested against one
+ * that is slow or fails; the app uses the one bound to gameData below.
  */
-export async function prepareGameRuntime({ hasSave }) {
-  if (hasSave) {
-    await ensureAllCases();
-    return;
+export function createCaseArrival(store, { reload = reloadForMissingChunk } = {}) {
+  async function prepareGameRuntime({ hasSave }) {
+    if (hasSave) {
+      await store.ensureAllCases();
+      return;
+    }
+    await store.ensureCase(SEASON_ENTRY_CASE);
+    // Behind the first table. A case still missing when it is opened is
+    // fetched then (whenCaseReady).
+    store.ensureAllCases().catch(() => {});
   }
-  await ensureCase(SEASON_ENTRY_CASE);
-  // Behind the first table. A case still missing when it is opened is
-  // fetched then (whenCaseReady).
-  ensureAllCases().catch(() => {});
+
+  /**
+   * Runs `open` once `caseId` has arrived: now, when it already has (always,
+   * in practice, a few seconds into a run), or when it lands. A case that
+   * cannot be fetched because a deploy replaced its file is the missing-chunk
+   * case, and reloads like any other. Returns the arrival, for a caller that
+   * wants to know.
+   */
+  function whenCaseReady(caseId, open) {
+    if (store.isCaseLoaded(caseId)) {
+      open();
+      return Promise.resolve();
+    }
+    return store.ensureCase(caseId).then(open, (error) => {
+      if (isChunkLoadError(error) && reload()) return;
+      throw error;
+    });
+  }
+
+  return { prepareGameRuntime, whenCaseReady };
 }
 
-/**
- * Runs `open` once `caseId` has arrived: now, when it already has (always, in
- * practice, a few seconds into a run), or when it lands. A case that cannot be
- * fetched because a deploy replaced its file is the missing-chunk case, and
- * reloads like any other.
- */
-export function whenCaseReady(caseId, open) {
-  if (isCaseLoaded(caseId)) {
-    open();
-    return;
-  }
-  ensureCase(caseId).then(open, (error) => {
-    if (isChunkLoadError(error) && reloadForMissingChunk()) return;
-    throw error;
-  });
-}
+export const { prepareGameRuntime, whenCaseReady } = createCaseArrival({ ensureAllCases, ensureCase, isCaseLoaded });

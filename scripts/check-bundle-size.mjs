@@ -23,10 +23,16 @@ const distDir = path.join(root, "dist");
 const assetsDir = path.join(distDir, "assets");
 
 const budgets = [
-  // The scene graph: fifty-five cases of authored prose and their tables. It
+  // The runtime: the table, the rules and the index every case needs. It
   // loads after the intro has painted and the player has clicked, never before.
-  // 3,200,014 bytes / 935,327 gzip on 2026-09-27.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 3_360_000, maxGzip: 982_000 },
+  // 3,200,014 bytes / 935,327 gzip on 2026-09-27, with all fifty-five cases in
+  // it; 524,788 / 167,683 on 2026-09-29, when each case became a chunk of its
+  // own (scripts/vite-season-data.mjs).
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 551_000, maxGzip: 176_100 },
+  // One case: its scenes, replies and voice lines. A first visit fetches the
+  // season's first one before the table and the rest behind it. The largest,
+  // case01, was 79,679 / 19,176 on 2026-09-29.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 84_000, maxGzip: 20_200 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
