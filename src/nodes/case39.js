@@ -410,10 +410,8 @@ export const case39 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c39_branch_sales",
     systemNext: "c39_route_system",
     evidenceNext: "c39_evidence_turn",
-    routeLabel: "직전 변론의 방청 노트로 인터뷰이들의 순서를 다시 짠다",
     systemLabel: "원고석에서 새로 짠 판이 다큐 자막 어디에 실렸는지 되감아 본다",
     evidenceLabel: "상자 118번의 작성 부서를 '참고 의견'의 문서 속성과 맞댄다",
     systemEcho: "자막을 되감아도 당신의 판은 나오지 않습니다. 대신 잘릴 구간의 표시가 나옵니다. 에코가 그렇게 표시된 대목들을 10년 치로 모읍니다.",

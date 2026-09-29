@@ -408,10 +408,8 @@ export const case12 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c12_branch_factory",
     systemNext: "c12_route_system",
     evidenceNext: "c12_evidence_turn",
-    routeLabel: "직전 사건의 출석 준비 역할표로 피해자 모임 일을 나눈다",
     systemLabel: "참고인석을 앞두고 새로 짠 판이 배상안 보도자료에 어떻게 옮겨졌는지 읽는다",
     evidenceLabel: "폐기 기록을 들고 배상금이 어디서 나왔는지 장부를 넘긴다",
     systemEcho: "읽어 보면 보도자료는 당신의 판에서 기한과 날짜를 뺀 나머지만 실었습니다. 에코가 그 옆에 같은 조건이 붙었던 배상안들을 띄웁니다.",

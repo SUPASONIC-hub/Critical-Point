@@ -412,10 +412,8 @@ export const case35 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c35_branch_cellar",
     systemNext: "c35_route_system",
     evidenceNext: "c35_evidence_turn",
-    routeLabel: "직전 사건의 수첩처럼, 물에 젖기 전에 남길 종이부터 고른다",
     systemLabel: "데이터센터에서 판을 새로 짠 것처럼 노아에게도 이유의 이유를 끝까지 묻는다",
     evidenceLabel: "'보관 X'의 날짜를 재해 가중치 요청서의 빈 승인란에 대 본다",
     systemEcho: "끝까지 물으면 노아의 답이 한 바퀴를 돕니다. 세 번째 질문에서 처음으로 1초 넘게 걸립니다.",

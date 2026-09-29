@@ -415,10 +415,8 @@ export const case46 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c46_branch_fragment",
     systemNext: "c46_route_system",
     evidenceNext: "c46_evidence_turn",
-    routeLabel: "직전 사건의 조문객 명부로 복원을 도울 사람을 모은다",
     systemLabel: "접객실 구석에서 새로 짠 판이 폐기 승인서 사유란에 끼어 있는지 들여다본다",
     evidenceLabel: "지운 동의가 남은 뒷장을 설계 로그의 승인자 칸과 겹쳐 놓는다",
     systemEcho: "사유란을 읽어도 새로 짠 판의 말투는 묻어 있지 않습니다. 류세아가 같은 서식으로 내려온 문서를 10년 치로 검색합니다.",

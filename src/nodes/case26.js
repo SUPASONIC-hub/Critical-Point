@@ -411,10 +411,8 @@ export const case26 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c26_branch_frame",
     systemNext: "c26_route_system",
     evidenceNext: "c26_evidence_turn",
-    routeLabel: "직전 사건의 여섯 명 단체방에 평택 현장 사진부터 올린다",
     systemLabel: "업무 앱에서 새로 짠 판이 KD캐피탈 의견서 양식에 끼어들었는지 본다",
     evidenceLabel: "3월 14일 의사록을 르하임 고덕의 사업비 명세서 옆에 편다",
     systemEcho: "양식에는 끼어들 자리가 없습니다. 작성자 칸에 당신 이름이 먼저 인쇄돼 있을 뿐입니다. 노아가 같은 양식으로 연장된 대출 마흔한 건을 엽니다.",

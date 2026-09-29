@@ -409,10 +409,8 @@ export const case19 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c19_branch_bookshop",
     systemNext: "c19_route_system",
     evidenceNext: "c19_evidence_turn",
-    routeLabel: "직전 사건의 송년회 단톡방으로 헌책방 짐을 나를 사람을 한 명씩 부른다",
     systemLabel: "직전 사건의 매각 묶음 명세처럼 KD리얼티의 공정표도 겹쳐 본다",
     evidenceLabel: "거래 조건 7번을 들고 철거 날짜를 당긴 부서를 확인한다",
     systemEcho: "겹쳐 보면 철거일이 당겨진 건물이 이곳 하나가 아닙니다. 에코가 기록 보관처가 있던 일곱 곳에 표시를 합니다.",

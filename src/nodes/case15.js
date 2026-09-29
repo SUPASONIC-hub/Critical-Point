@@ -411,10 +411,8 @@ export const case15 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c15_branch_roof",
     systemNext: "c15_route_system",
     evidenceNext: "c15_evidence_turn",
-    routeLabel: "직전 사건의 판매 대본 대조법으로 확인서 문장을 한 줄씩 읽는다",
     systemLabel: "창구 앞에서 새로 짠 판을 혁신위원회 보도자료와 맞대어 본다",
     evidenceLabel: "매입 명세서의 빈칸을 확인서 파일의 작성 부서 칸에 대 본다",
     systemEcho: "맞대어 보면 보도자료는 판의 결론만 옮기고 누가 책임지는지는 옮기지 않았습니다. 에코가 개인 실수로 닫힌 사고 보고서를 연도별로 엽니다.",

@@ -411,10 +411,8 @@ export const case20 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c20_branch_disk",
     systemNext: "c20_route_system",
     evidenceNext: "c20_evidence_turn",
-    routeLabel: "직전 사건의 312상자 목록으로 에코가 배운 원본 디스크를 찾는다",
     systemLabel: "철거 전에 새로 짠 판이 노아의 학습 목록 몇 번째 줄인지 센다",
     evidenceLabel: "관찰 연구비 예산서를 반응 기록 이전 계약서와 나란히 편다",
     systemEcho: "세어 보면 1,208번째 줄입니다. 에코가 그 줄을 읽고 나서 자기 교체 승인서의 '영향받는 사람' 칸으로 넘어갑니다.",

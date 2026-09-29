@@ -412,10 +412,8 @@ export const case17 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c17_branch_pencil",
     systemNext: "c17_route_system",
     evidenceNext: "c17_evidence_turn",
-    routeLabel: "직전 사건의 야간조 교대표처럼 47명을 나눠 찾아간다",
     systemLabel: "승인위원회를 앞두고 새로 짠 판을 법무팀 의견서에서 가려낸다",
     evidenceLabel: "요청자 없는 확약을 정태오 업무 수첩의 귀퉁이에 대 본다",
     systemEcho: "가려내면 의견서는 당신의 판을 '개입'이라는 낱말로 바꿔 적었습니다. 에코가 감사 보고서 20년 치를 그 낱말 옆에 쌓습니다.",

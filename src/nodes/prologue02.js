@@ -413,10 +413,8 @@ export const prologue02 = {
     ],
   },
   memoryPlan: {
-    routeNext: "p2_branch_supplier",
     systemNext: "p2_route_system",
     evidenceNext: "p2_evidence_turn",
-    routeLabel: "지난가을 강서지점에서 만난 사람들과 이번 현장 순서를 맞춰 본다",
     systemLabel: "지난가을 보관실에서 새로 짠 판을 제7조 초안 옆에 펴 본다",
     evidenceLabel: "빈 승인자 칸을 제7조 초안 옆에 놓고 누가 요청했는지 읽는다",
     systemEcho: "펴 보면 두 장의 생김새가 닮았습니다. 가을에는 말로만 보고한 오차가 묶여 있었고, 이번 선반에는 토씨까지 같은 조항이 묶여 있습니다.",

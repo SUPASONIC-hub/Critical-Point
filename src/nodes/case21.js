@@ -408,10 +408,8 @@ export const case21 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c21_branch_rind",
     systemNext: "c21_route_system",
     evidenceNext: "c21_evidence_turn",
-    routeLabel: "직전 사건의 에코 송별 명단으로 제주에 갈 사람을 정한다",
     systemLabel: "자정 전에 새로 짠 판을 노아의 학습 목록에서 찾아낸다",
     evidenceLabel: "반응 기록의 단가표를 1기 운영 명세서에 대 본다",
     systemEcho: "찾아내기 전에 노아가 먼저 답합니다. 당신의 판과 가장 닮은 기록의 주인은 당신이 아니라고 합니다.",

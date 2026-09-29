@@ -411,10 +411,8 @@ export const case47 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c47_branch_screen",
     systemNext: "c47_route_system",
     evidenceNext: "c47_evidence_turn",
-    routeLabel: "직전 사건에서 되살린 판단 기록을 들고 31명의 판정 화면을 연다",
     systemLabel: "시험 서버실에서 새로 짠 판을 돌아온 에코가 기억하는지 물어본다",
     evidenceLabel: "빈칸 옆의 점이 찍힌 날들을 2차 배상 재원의 집행표와 한 줄에 세운다",
     systemEcho: "에코는 기억합니다. 그리고 그 판 옆에 남은 계산 하나를 꺼냅니다. 서류 없는 사람을 배상에 넣은 기준이 몇 번 있었는지입니다.",

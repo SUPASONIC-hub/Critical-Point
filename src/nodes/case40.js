@@ -410,10 +410,8 @@ export const case40 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c40_branch_bakery",
     systemNext: "c40_route_system",
     evidenceNext: "c40_evidence_turn",
-    routeLabel: "직전 사건에서 만난 인터뷰이 연락망으로 탈락자들을 찾는다",
     systemLabel: "편집실에서 새로 짠 판이 핏스코어 설명서 문항에 섞였는지 가려 본다",
     evidenceLabel: "반론용 사본이 돌아온 길을 핏스코어에 들어간 돈의 길에 겹쳐 본다",
     systemEcho: "설명서 어디에도 새로 짠 판은 실리지 않았습니다. 문항마다 망설인 시간을 재는 칸이 있을 뿐입니다. 류세아가 그 칸으로 떨어진 사람들을 다시 묶습니다.",

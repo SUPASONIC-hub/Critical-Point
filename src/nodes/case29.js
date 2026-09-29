@@ -409,10 +409,8 @@ export const case29 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c29_branch_mailbox",
     systemNext: "c29_route_system",
     evidenceNext: "c29_evidence_turn",
-    routeLabel: "직전 사건의 콜센터 통화 기록으로 팔려 갈 채무자 이름을 먼저 맞춰 본다",
     systemLabel: "분석 단말에서 새로 짠 판이 매각 계약서 문구에 들어갔는지 대조한다",
     evidenceLabel: "대본 4번의 주문서를 매각가가 마지막에 깎인 자리에 대 본다",
     systemEcho: "계약서 본문에는 없습니다. 노아가 본문 대신 지난 거래들을 엽니다. 묶어서 판 뒤에 채무자에게 간 연락의 횟수와, 판 쪽 임원이 옮겨 간 자리입니다.",

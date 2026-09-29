@@ -411,10 +411,8 @@ export const case38 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c38_branch_hallway",
     systemNext: "c38_route_system",
     evidenceNext: "c38_evidence_turn",
-    routeLabel: "직전 사건에서 함께 읽은 유출 기록으로 증언 준비를 나눈다",
     systemLabel: "데이터센터에서 새로 짠 판이 그룹 쪽 서면의 첨부에 끼어 있는지 넘겨 본다",
     evidenceLabel: "정렬된 유출의 증인 순서를 피고가 없다고 한 서류 목록 곁에 편다",
     systemEcho: "첨부 17번까지 넘겨도 당신의 판은 없고 당신의 망설임만 있습니다. 이민서가 서면이 떼어 내려는 212명 쪽으로 표를 돌립니다.",

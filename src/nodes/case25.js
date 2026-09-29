@@ -408,10 +408,8 @@ export const case25 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c25_branch_boxes",
     systemNext: "c25_route_system",
     evidenceNext: "c25_evidence_turn",
-    routeLabel: "직전 사건의 송별회 연락망으로 33층 이삿짐 소식을 먼저 돌린다",
     systemLabel: "직전 해체 공지의 빈 사유 칸이 영전 공지에도 있는지 본다",
     evidenceLabel: "직전 수신 기록을 붙여 KD캐피탈 이사회 날짜를 맞춘다",
     systemEcho: "영전 공지에도 같은 칸이 비어 있습니다. 노아가 빈 사유 칸이 달린 공지를 열네 장 더 찾아냅니다.",

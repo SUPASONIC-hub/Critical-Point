@@ -407,10 +407,8 @@ export const case23 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c23_branch_newsroom",
     systemNext: "c23_route_system",
     evidenceNext: "c23_evidence_turn",
-    routeLabel: "직전 사건의 끝까지정밀 소식을 실은 리드라인 편집국으로 위임장을 받으러 간다",
     systemLabel: "시험 단말 앞에서 새로 짠 판이 노아 도입 성과 자료에 실렸는지 넘겨 본다",
     evidenceLabel: "R-17의 명단을 직원 주주 위임장 현황표와 견준다",
     systemEcho: "넘겨 보면 당신의 판은 성과 자료에 한 줄로 줄어 실렸습니다. 에코가 한 줄로 줄어든 말들이 더 있다며 10년 치 의사록을 엽니다.",

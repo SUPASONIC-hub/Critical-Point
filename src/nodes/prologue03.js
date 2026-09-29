@@ -423,10 +423,8 @@ export const prologue03 = {
     ],
   },
   memoryPlan: {
-    routeNext: "p3_branch_closed",
     systemNext: "p3_route_system",
     evidenceNext: "p3_evidence_turn",
-    routeLabel: "복도에서 들은 12년 전 이야기가 어디서 시작됐는지 따라가 본다",
     systemLabel: "선반 사이에서 새로 짠 판이 지난 10년 묶음에도 있었는지 찾아본다",
     evidenceLabel: "제7조 회람 명단을 들고 반려가 몇 시에 눌렸는지 확인한다",
     systemEcho: "찾아보면 있습니다. 같은 조항을 센 사람은 당신이 처음이지만, 돌려보낸 의견서를 묶어 둔 끈은 맨 아래 칸에 서른네 개입니다.",

@@ -412,10 +412,8 @@ export const case44 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c44_branch_seal",
     systemNext: "c44_route_system",
     evidenceNext: "c44_evidence_turn",
-    routeLabel: "직전 사건의 사외이사 표 계산표로 방청석 자리를 나눈다",
     systemLabel: "이사회 전날 새로 짠 판이 그룹 입장문에 되풀이됐는지 읽어 내려간다",
     evidenceLabel: "두 장의 보도자료가 쓰인 날짜를 배상금 장부의 계정 변경일 위에 올린다",
     systemEcho: "입장문을 끝까지 읽어도 판이 옮겨 간 흔적은 없습니다. 이민서가 그 대신 회사가 용서한 재판들을 10년 치로 검색합니다.",

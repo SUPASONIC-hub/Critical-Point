@@ -408,10 +408,8 @@ export const case13 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c13_branch_extras",
     systemNext: "c13_route_system",
     evidenceNext: "c13_evidence_turn",
-    routeLabel: "직전 사건의 떡 상자 명단과 광고 속 '피해자' 배역을 대조한다",
     systemLabel: "조정 전날 새로 짠 판이 혁신위원회 계획서 어디에 들어갔는지 짚는다",
     evidenceLabel: "직전 단서의 광고비 계정을 혁신위원회 예산서에 붙인다",
     systemEcho: "짚어 보면 계획서에는 당신의 판에서 온 말이 제목에만 남았습니다. 에코가 사고 뒤에 세워진 위원회 스물세 곳을 그 밑에 답니다.",

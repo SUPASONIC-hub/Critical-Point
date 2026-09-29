@@ -414,10 +414,8 @@ export const case45 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c45_branch_ribbon",
     systemNext: "c45_route_system",
     evidenceNext: "c45_evidence_turn",
-    routeLabel: "직전 사건의 방청석 자리표로 빈소 조문 당번을 나눈다",
     systemLabel: "책장 앞에서 새로 짠 판이 법무팀의 반환 요구서에 옮겨 붙었는지 살핀다",
     evidenceLabel: "도장만 있는 용서의 빈 서명 칸을 무죄 네 건의 여백과 한 화면에 띄운다",
     systemEcho: "요구서는 돌려 달라는 문서의 목록뿐이고, 판이 옮겨 붙을 자리는 없습니다. 이민서가 이런 요구서가 언제 도착해 왔는지 날짜를 모읍니다.",

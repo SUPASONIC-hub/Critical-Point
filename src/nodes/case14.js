@@ -406,10 +406,8 @@ export const case14 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c14_branch_tape",
     systemNext: "c14_route_system",
     evidenceNext: "c14_evidence_turn",
-    routeLabel: "직전 사건 촬영장의 배역표로 미스터리 쇼퍼 역할을 나눈다",
     systemLabel: "생중계를 앞두고 새로 짠 판이 펀드 광고 문구로 옮겨 갔는지 살핀다",
     evidenceLabel: "직전 단서의 예산 코드를 펀드 매입 명세서에 대 본다",
     systemEcho: "광고는 당신의 판에서 조건을 버리고 따뜻한 말만 가져갔습니다. 에코가 이름이 따뜻했던 상품 아홉 건을 불러 세웁니다.",

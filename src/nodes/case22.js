@@ -408,10 +408,8 @@ export const case22 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c22_branch_shop",
     systemNext: "c22_route_system",
     evidenceNext: "c22_evidence_turn",
-    routeLabel: "직전 사건 느린섬에서 짠 귤 따기 조 편성으로 조합 일손을 나눈다",
     systemLabel: "귤 창고에서 새로 짠 판이 노아의 설명 문구에 섞였는지 가려 읽는다",
     evidenceLabel: "1기 주간표를 들고 노아가 이름을 배운 목록을 찾는다",
     systemEcho: "가려 읽을 것도 없습니다. 노아의 설명에는 당신의 판도, 다른 누구의 판단도 없습니다. 지난 거절이 이번 거절의 이유로 적혀 있을 뿐입니다.",

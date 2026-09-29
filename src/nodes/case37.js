@@ -413,10 +413,8 @@ export const case37 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c37_branch_rooftop",
     systemNext: "c37_route_system",
     evidenceNext: "c37_evidence_turn",
-    routeLabel: "직전 사건 식탁에서 돌아온 트럭 안의 연락으로 유출 대응을 나눈다",
     systemLabel: "식사 날 새벽에 새로 짠 판이 유출 파일의 판정 칸에도 찍혔는지 훑어본다",
     evidenceLabel: "네 번째 의자가 차려진 식탁의 시각을 유출 파일의 작성 시각과 겹친다",
     systemEcho: "판정 칸에 찍힌 것은 당신의 판이 아니라 점수입니다. 노아가 그 점수를 밖에서 누가 달라고 하는지 요청 기록을 엽니다.",

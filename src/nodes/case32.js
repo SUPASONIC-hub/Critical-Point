@@ -413,10 +413,8 @@ export const case32 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c32_branch_waiting",
     systemNext: "c32_route_system",
     evidenceNext: "c32_evidence_turn",
-    routeLabel: "직전 사건에서 밤을 같이 새운 동료들에게 오늘 조사 일정을 먼저 돌린다",
     systemLabel: "검사 기간에 새로 짠 판이 압수 목록의 분류 기준으로 쓰였는지 맞춰 본다",
     evidenceLabel: "연장의 날짜를 33층 문서 반출 기록과 나란히 놓는다",
     systemEcho: "압수 목록은 상자를 이름으로 분류했습니다. 당신 이름이 붙은 상자가 가장 많습니다. 노아가 상자 속 이름의 수와 재판에 넘겨진 사람을 나란히 셉니다.",

@@ -417,10 +417,8 @@ export const case34 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c34_branch_study",
     systemNext: "c34_route_system",
     evidenceNext: "c34_evidence_turn",
-    routeLabel: "직전 사건에서 백아린 곁을 지킨 방식대로 윤서진과 서재 문을 연다",
     systemLabel: "심사 단말에서 새로 짠 판이 그룹 문서 관리 기록에 남았는지 거슬러 본다",
     evidenceLabel: "신고보다 먼저 온 점수를 반대 의견이 지워진 날의 기록에 대 본다",
     systemEcho: "기록에는 당신의 판보다 먼저 지워진 것들이 남아 있습니다. 이민서가 보존 기간이 0년으로 바뀐 반대 의견을 한 줄씩 셉니다.",

@@ -407,10 +407,8 @@ export const case24 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c24_branch_server",
     systemNext: "c24_route_system",
     evidenceNext: "c24_evidence_turn",
-    routeLabel: "직전 사건의 1주 주주 연락망으로 해체 소식을 먼저 돌린다",
     systemLabel: "총회 전날 새로 짠 판이 해체 공지 문구에 비쳤는지 들여다본다",
     evidenceLabel: "빨간 점의 명단을 해체 결정 문서의 첨부에 대 본다",
     systemEcho: "들여다보면 공지에는 아무것도 비치지 않습니다. 네 글자 사유뿐입니다. 에코가 같은 네 글자를 받은 조직들을 한 줄씩 부릅니다.",

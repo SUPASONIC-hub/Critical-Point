@@ -411,10 +411,8 @@ export const case36 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c36_branch_annex",
     systemNext: "c36_route_system",
     evidenceNext: "c36_evidence_turn",
-    routeLabel: "직전 사건의 수해 복구 명단에서 식탁에 가져갈 이름을 고른다",
     systemLabel: "서버실에서 새로 짠 판이 쇄신 발표문 초안에 옮겨졌는지 읽어 낸다",
     evidenceLabel: "빈 승인란의 요청서를 준법감시인 임명 기록 옆에 놓는다",
     systemEcho: "발표문 초안에는 이름이 하나뿐이고, 당신의 판은 없습니다. 노아가 이름 하나로 닫힌 사고들을 20년 치로 늘어놓습니다.",

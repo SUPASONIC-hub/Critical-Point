@@ -408,10 +408,8 @@ export const case27 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c27_branch_vault",
     systemNext: "c27_route_system",
     evidenceNext: "c27_evidence_turn",
-    routeLabel: "직전 사건의 평택 현장 연락망으로 새봄신협 금고 사정부터 듣는다",
     systemLabel: "심사 단말에서 새로 짠 판의 말투가 소문 캡처에 묻어 있는지 읽는다",
     evidenceLabel: "사업비 명세서의 한 줄을 캡처 속 대화방 기록에 대 본다",
     systemEcho: "캡처의 말은 당신의 판과 닮은 데가 없습니다. 말투가 닮은 쪽은 사내 메신저입니다. 노아가 출처를 모르는 소문으로 시작된 인출 사태들을 불러옵니다.",

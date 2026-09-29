@@ -414,10 +414,8 @@ export const prologue05 = {
     ],
   },
   memoryPlan: {
-    routeNext: "p5_branch_archive",
     systemNext: "p5_route_system",
     evidenceNext: "p5_evidence_turn",
-    routeLabel: "4번 창구에서 본 것을 기록 보관실의 종이 원본과 나란히 놓는다",
     systemLabel: "상담실에서 새로 짠 판이 이번 통지서에도 옮겨졌는지 본다",
     evidenceLabel: "대본을 만든 계정을 통지서 원안에서도 찾아본다",
     systemEcho: "통지서에는 옮겨진 것이 없습니다. 사유 칸도 제안자 칸도 비어 있습니다. 그 빈칸을 읽은 1번 단말이 30년치 통지서를 한꺼번에 엽니다.",

@@ -3004,50 +3004,38 @@ const continuityMemoryChoicePlans = {
     evidenceLabel: "비어 있는 자리의 날짜를 그의 조건이 바뀐 날들과 포갠다",
   },
   case07: {
-    routeNext: "c7_branch_quota",
     systemNext: "c7_route_system",
     evidenceNext: "c7_evidence_turn",
-    routeLabel: "직전 사건에서 옆자리에 세운 기준을 내 발령에도 대 본다",
     systemLabel: "오진우 곁에서 다시 짠 판이 내 인사 기록에 따라붙었는지 들춘다",
     evidenceLabel: "거울 프로필의 실험 번호를 발령서 작성일 옆에 적는다",
   },
   case08: {
-    routeNext: "c8_branch_ledger",
     systemNext: "c8_route_system",
     evidenceNext: "c8_evidence_turn",
-    routeLabel: "직전 사건에서 이름을 올린 방식대로 흔적표에도 이름을 단다",
     systemLabel: "발령 앞에서 다시 짠 판이 법인 등기 서류에 흔적을 남겼는지 더듬는다",
     evidenceLabel: "먼저 쓰인 발령서의 작성일을 자문료 입금일과 나란히 적는다",
   },
   case09: {
-    routeNext: "c9_branch_father",
     systemNext: "c9_route_system",
     evidenceNext: "c9_evidence_turn",
-    routeLabel: "직전 사건의 흔적표를 권도현의 계산서 옆에 나란히 놓는다",
     systemLabel: "영동지점에서 다시 짠 판이 채권단 자료에 자리를 얻었는지 찾는다",
     evidenceLabel: "그림값의 날짜를 청산 계산서의 작성일에 겹친다",
   },
   case10: {
-    routeNext: "c10_branch_home",
     systemNext: "c10_route_system",
     evidenceNext: "c10_evidence_turn",
-    routeLabel: "직전 사건의 계산서 양식을 이번 분담표에 그대로 대 본다",
     systemLabel: "채권단 앞에서 다시 짠 판이 인사 기록에 옮겨 적혔는지 가린다",
     evidenceLabel: "사 둔 회수율을 만든 손을 병가 서식의 개정 이력에서 찾는다",
   },
   case11: {
-    routeNext: "c11_branch_newsroom",
     systemNext: "c11_route_system",
     evidenceNext: "c11_evidence_turn",
-    routeLabel: "직전 사건의 분담표를 출석 준비 역할표로 그대로 쓴다",
     systemLabel: "분담표 앞에서 다시 짠 판이 그룹 입장문에 옮겨졌는지 대 본다",
     evidenceLabel: "사유란의 기본값을 바꾼 부서를 반대 의견서의 폐기 기록에서 찾아본다",
   },
   final: {
-    routeNext: "f_route_map",
     systemNext: "f_route_system",
     evidenceNext: "f_evidence_turn",
-    routeLabel: "직전 사건의 실패 지도를 내 선택 기록에 겹쳐 본다",
     systemLabel: "보름달 아래에서 다시 짠 판이 다음 참가자의 선택지로 넘어갔는지 비춰 본다",
     evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
   },
@@ -3096,7 +3084,9 @@ export function getContinuityMemoryChoice({ caseId = CASE_SEQUENCE[0], nodeId = 
       continuityMemory: true,
     };
   }
-  if (!memory.routeSplit) return null;
+  // Only 사건 02-06 write a route card: a route split is a walk down a route
+  // that is not the hidden one, and only 사건 01-05 have such routes.
+  if (!memory.routeSplit || !plan.routeLabel) return null;
   return {
     id: `${caseId}_memory_route`,
     label: plan.routeLabel,

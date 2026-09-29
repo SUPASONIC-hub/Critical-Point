@@ -417,10 +417,8 @@ export const prologue04 = {
     ],
   },
   memoryPlan: {
-    routeNext: "p4_branch_drawer",
     systemNext: "p4_route_system",
     evidenceNext: "p4_evidence_turn",
-    routeLabel: "직전 사건에서 배운 손버릇대로 4번 창구 서랍부터 열어 본다",
     systemLabel: "맨 아래 칸에서 새로 짠 판을 창구 응대 대본 옆에 놓아 본다",
     evidenceLabel: "반려 시각을 3분 대본에 대어 누가 언제 만들었는지 본다",
     systemEcho: "놓아 보면 대본에는 돌려보낼 의견을 적는 칸이 처음부터 없습니다. 오진우가 보낸 전국 판매 기록에도 같은 자리가 비어 있습니다.",

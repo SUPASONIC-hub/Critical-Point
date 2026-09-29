@@ -205,6 +205,20 @@ for (const caseId of CASE_SEQUENCE) {
   }
 }
 if (memoryCards.length === 0) failures.push("no memory card was read: getContinuityMemoryChoice answered null for every case");
+// A card no run can be dealt is copy nobody reads, and a kind of memory the
+// previous case can hand on with no card for it is a card nobody wrote.
+for (const field of unreachableMemoryFields) failures.push(`${field}: the previous case never hands this memory on; delete the card's label and next from the plan`);
+// 사건 01 deals no memory card: what the 프롤로그 handed on picks which of its
+// three openings it starts on (caseOpeningRoutes.case01).
+const OPENS_ON_WHAT_WAS_HANDED_ON = new Set(["case01"]);
+CASE_SEQUENCE.forEach((caseId, index) => {
+  const previousCaseId = CASE_SEQUENCE[index - 1];
+  if (!previousCaseId || OPENS_ON_WHAT_WAS_HANDED_ON.has(caseId)) return;
+  const written = new Set(getMemoryCards(caseId).map((entry) => entry.kind));
+  for (const kind of memoryKindsByCase[previousCaseId]) {
+    if (!written.has(kind)) failures.push(`${caseId}: ${previousCaseId} can hand on ${kind}, and the plan deals no card for it`);
+  }
+});
 
 function getCaseEntryNodes(caseId) {
   const entries = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})];
@@ -659,7 +673,3 @@ console.log(
 );
 console.log(`Continuity challenges no card can meet: ${[...unmeetableFound].join(", ") || "none"}.`);
 console.log(`Generated copy still in play: ${fallbackReport}.`);
-console.log(
-  `Memory cards no run can be dealt: ${unreachableMemoryFields.length} (${unreachableMemoryFields.filter((field) => field.endsWith(".routeSplit")).length} routeLabel/routeNext pairs; ` +
-    `only a case with a route that is not the hidden one hands a route split on).`,
-);

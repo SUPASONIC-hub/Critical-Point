@@ -410,10 +410,8 @@ export const case16 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c16_branch_locker",
     systemNext: "c16_route_system",
     evidenceNext: "c16_evidence_turn",
-    routeLabel: "직전 사건의 교문 앞 응원단 명단으로 야간조를 한 명씩 찾아간다",
     systemLabel: "면접 전에 새로 짠 판이 리스 심사 보고서의 어느 칸으로 갔는지 찾는다",
     evidenceLabel: "확인서를 만든 부서를 인력 정리 조항의 이력에서 찾는다",
     systemEcho: "찾아보면 보고서 어느 칸에도 없습니다. 의견란은 여섯 글자로 줄어 있고, 에코가 그 빈자리에서 자동화 리스 서른일곱 건을 꺼냅니다.",

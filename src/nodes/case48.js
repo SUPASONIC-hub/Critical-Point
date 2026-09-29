@@ -420,10 +420,8 @@ export const case48 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c48_branch_riders",
     systemNext: "c48_route_system",
     evidenceNext: "c48_evidence_turn",
-    routeLabel: "직전 사건의 떡방 명단처럼 라이더 명단부터 이름으로 센다",
     systemLabel: "떡방에서 새로 짠 판이 이번 서명지의 칸 어딘가에 남았는지 세어 본다",
     evidenceLabel: "남는 22억이 가려던 곳을 투자 계약서의 목차에 없는 쪽과 견주어 읽는다",
     systemEcho: "서명지에는 칸이 다섯 개뿐이고, 판이 들어갈 칸은 따로 없습니다. 에코가 그 다섯 칸이 10년 동안 어떻게 채워졌는지 셉니다.",

@@ -421,10 +421,8 @@ export const case49 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c49_branch_columbarium",
     systemNext: "c49_route_system",
     evidenceNext: "c49_evidence_turn",
-    routeLabel: "직전 사건의 심사위원회 사람들과 오늘의 배웅 순서를 나눈다",
     systemLabel: "기록실에서 새로 짠 판이 후임 관리자 지정서에 적혔는지 찾아 읽는다",
     evidenceLabel: "41%가 적힌 두 쪽의 자문역 이름을 지정서의 작성 기록에 비춘다",
     systemEcho: "지정서에는 당신의 판 대신 당신의 이름이 올라 있습니다. 에코가 그렇게 이름이 적힌 칸들을 처음부터 모읍니다.",

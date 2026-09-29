@@ -412,10 +412,8 @@ export const case28 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c28_branch_market",
     systemNext: "c28_route_system",
     evidenceNext: "c28_evidence_turn",
-    routeLabel: "직전 사건의 번호표 명단처럼 거절 통지서를 받은 사람들을 한 명씩 찾는다",
     systemLabel: "전무실에서 새로 짠 판이 KD생명 상담 대본으로 건너갔는지 짚어 본다",
     evidenceLabel: "새봄신협 정리안을 대본 4번의 개정 이력과 견주어 읽는다",
     systemEcho: "대본에는 건너온 것이 없습니다. 열네 번 나오는 낱말은 전부 '거절'입니다. 에코가 그 대본으로 끝난 통화들의 길이를 잽니다.",

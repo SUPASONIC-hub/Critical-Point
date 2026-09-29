@@ -412,10 +412,8 @@ export const case33 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c33_branch_storage",
     systemNext: "c33_route_system",
     evidenceNext: "c33_evidence_turn",
-    routeLabel: "직전 사건의 27번 상자 메모로 백아린의 상자부터 정리한다",
     systemLabel: "빈 12층에서 새로 짠 판이 고소장 문구로 옮겨 적혔는지 읽어 본다",
     evidenceLabel: "27번 상자의 반출 시각을 고소장이 만들어진 날과 견준다",
     systemEcho: "고소장에 적힌 것은 판이 아니라 날짜입니다. 노아가 신고한 사람들이 고소당한 날짜와 버틴 날수를 표로 만듭니다.",

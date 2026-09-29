@@ -409,10 +409,8 @@ export const case18 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c18_branch_dataroom",
     systemNext: "c18_route_system",
     evidenceNext: "c18_evidence_turn",
-    routeLabel: "직전 사건의 수첩 방식대로 매각 묶음 속 이름을 한 명씩 적어 본다",
     systemLabel: "수첩을 두고 새로 짠 판이 브릿지의 후보자 평가표에 실렸는지 확인한다",
     evidenceLabel: "내선 번호의 주인을 매각 계약서 부속 합의서에서 찾는다",
     systemEcho: "확인하면 평가표에 실린 것은 판이 아니라 숫자입니다. 소수점까지 트리거랩의 반응 기록과 같고, 에코가 두 숫자에 밑줄을 긋습니다.",

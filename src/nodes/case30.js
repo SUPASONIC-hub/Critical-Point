@@ -410,10 +410,8 @@ export const case30 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c30_branch_fitscore",
     systemNext: "c30_route_system",
     evidenceNext: "c30_evidence_turn",
-    routeLabel: "직전 사건의 싱가포르 동선표로 핏스코어 설명회 일정을 맞춘다",
     systemLabel: "탑승구 앞에서 새로 짠 판이 데이터 계약서 용도 칸에 적혔는지 확인해 본다",
     evidenceLabel: "우편함 214번을 핏스코어의 주주 명단과 나란히 놓는다",
     systemEcho: "용도 칸에 적힌 것은 '조직 적합도 모델 개발' 한 줄입니다. 당신의 판은 거기 없고, 당신의 반응 기록이 제공 대상 칸에 있습니다. 노아가 같은 식으로 맺은 계약 서른여덟 건을 엽니다.",

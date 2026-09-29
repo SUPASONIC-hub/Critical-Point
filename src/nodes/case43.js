@@ -410,10 +410,8 @@ export const case43 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c43_branch_witness",
     systemNext: "c43_route_system",
     evidenceNext: "c43_evidence_turn",
-    routeLabel: "직전 사건의 경포 단체 사진을 넘기다 백아린에게 먼저 전화를 건다",
     systemLabel: "경포에서 새로 짠 판이 해임안 설명서에 베껴졌는지 대조한다",
     evidenceLabel: "주소가 받는 벌의 작성일을 홍보실 보도자료 폴더의 날짜와 포갠다",
     systemEcho: "설명서는 당신의 판을 베끼지 않았습니다. 2023년 이야기도 한 줄 없습니다. 노아가 빠진 줄을 찾으려고 10년 치 회의 기록을 폅니다.",

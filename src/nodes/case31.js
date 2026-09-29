@@ -409,10 +409,8 @@ export const case31 = {
     ],
   },
   memoryPlan: {
-    routeNext: "c31_branch_site",
     systemNext: "c31_route_system",
     evidenceNext: "c31_evidence_turn",
-    routeLabel: "직전 사건의 단체방 역할 분담으로 평택 현장 확인에 사람을 붙인다",
     systemLabel: "노아 단말에서 새로 짠 판이 검사 요구 목록에 흔적을 남겼는지 훑는다",
     evidenceLabel: "'이상 없음' 한 줄을 들고 연장 날짜와 매각 일정을 하루씩 맞춘다",
     systemEcho: "요구 목록에는 흔적이 없습니다. 남은 것은 승인 기록 쪽입니다. 노아가 자기 권고가 뒤집힌 네 번을 승인한 계정과 함께 띄웁니다.",
