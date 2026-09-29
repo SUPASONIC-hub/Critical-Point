@@ -1,4 +1,5 @@
 import { FileText, RefreshCcw, Save } from "lucide-react";
+import { useAccessibility } from "../state/accessibilitySettings.js";
 
 /**
  * Scene identity and the run's two standing numbers.
@@ -22,6 +23,8 @@ export function GameHeader({
   caseTotal,
   progress,
 }) {
+  // With the single-key shortcuts off (the comfort setting), P is not one.
+  const { letterKeys } = useAccessibility();
   return (
     <header className="game-header">
       <div>
@@ -29,20 +32,20 @@ export function GameHeader({
         <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
       </div>
       <div className="top-actions compact-actions">
-        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts="P" aria-label="저장" title="저장">
+        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts={letterKeys ? "P" : undefined} aria-label="저장" title="저장">
           <Save size={16} />
         </button>
         <button
           type="button"
           className="ghost"
           onClick={onSaveAndExit}
-          aria-keyshortcuts="Shift+P"
+          aria-keyshortcuts={letterKeys ? "Shift+P" : undefined}
           aria-label="저장 후 나가기"
           title="저장 후 나가기"
         >
           <FileText size={16} />
         </button>
-        <button type="button" className="ghost" onClick={onReset} aria-label="초기화" title="초기화">
+        <button type="button" className="ghost header-reset" onClick={onReset} aria-label="초기화" title="초기화">
           <RefreshCcw size={16} />
         </button>
       </div>

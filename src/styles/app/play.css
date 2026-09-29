@@ -2007,9 +2007,28 @@
   }
 
   .gauntlet-shell .top-actions.compact-actions button {
+    position: relative;
     width: 30px;
     min-height: 28px;
     border-radius: 8px;
+  }
+
+  /* The drawn button stays 30x28 so the header keeps its one row; what the
+     finger has to hit is 44px tall, and as wide as the gap to its neighbour
+     allows without two targets overlapping. 초기화 sits apart: it is the one
+     that throws the run away (it asks first, too). */
+  .gauntlet-shell .top-actions.compact-actions button::before {
+    content: "";
+    position: absolute;
+    inset: -8px -1.5px;
+  }
+
+  .gauntlet-shell .top-actions.compact-actions .header-reset {
+    margin-left: 9px;
+  }
+
+  .gauntlet-shell .top-actions.compact-actions .header-reset::before {
+    left: -6px;
   }
 
   .gx-read,
