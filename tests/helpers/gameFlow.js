@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect } from "./network.js";
 import { nodes } from "../../src/gameData.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
