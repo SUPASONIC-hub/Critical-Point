@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 const isTextField = (target) =>
   target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']");
@@ -73,6 +74,10 @@ export function useTableKeys(actions) {
       if (document.querySelector(".decision-reveal-backdrop")) return;
       const current = actionsRef.current;
       const key = event.key;
+      // Single-character keys off (the comfort setting, WCAG 2.1.4): a letter,
+      // a digit or a jamo does nothing. Space, Enter and Escape are not
+      // character keys and stay.
+      if (!getAccessibility().letterKeys && key.length === 1 && key !== " ") return;
       const letter = letterOf(event);
       const activation = key === " " || key === "Enter";
 

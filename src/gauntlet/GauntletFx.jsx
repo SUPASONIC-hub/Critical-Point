@@ -4,6 +4,7 @@ import { getCloseness, getGoodWindowMs, getHeartbeatBpm, getRemainingSeconds } f
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
 import { FX_READERS, FX_VARIABLES, registerFxVariables } from "./fxVariables.js";
 import { monotonicNow } from "./timing.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
  * The body of the window: vignette, heartbeat, drone, shake -- and the beat.
@@ -194,7 +195,10 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       impactRef.current = Math.max(0, impactRef.current - delta / 480);
       flashRef.current = Math.max(0, flashRef.current - delta / 240);
       const trauma = Math.min(1, impactRef.current + (live ? Math.pow(felt, 3) * 0.45 : 0));
-      const shake = reducedMotion ? 0 : trauma * trauma;
+      // The comfort setting turns the body down whatever the OS says: no shake,
+      // and the grade flash at a third.
+      const calm = getAccessibility().calmEffects;
+      const shake = reducedMotion || calm ? 0 : trauma * trauma;
       const x = (Math.sin(time * 0.071) + Math.sin(time * 0.137)) * 0.5 * shake * SHAKE_PX;
       const y = (Math.sin(time * 0.089) + Math.sin(time * 0.173)) * 0.5 * shake * SHAKE_PX * 0.6;
 
@@ -205,7 +209,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       write("--gx-beat-phase", reducedMotion ? "1" : phase.toFixed(2));
       write("--gx-beat-live", beating ? "1" : "0");
       write("--gx-beat-zone", zone ? "1" : "0");
-      write("--gx-flash", flashRef.current.toFixed(2));
+      write("--gx-flash", (calm ? flashRef.current / 3 : flashRef.current).toFixed(2));
       frame = globalThis.requestAnimationFrame(loop);
     };
     frame = globalThis.requestAnimationFrame(loop);

@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { App, AppErrorBoundary, logCaughtRenderError } from "./App.jsx";
 import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue } from "./appConfig.js";
+import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installChunkReload } from "./state/chunkReload.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
@@ -11,6 +12,8 @@ if (readStoredValue(CLOUD_SAVE_ENABLED_KEY, "0") === "1") {
 }
 
 installChunkReload();
+// Before the first paint: a still intro must not start moving and then stop.
+applyAccessibilityToDocument();
 // Started here so the answer is usually in before the runtime chunk is.
 claimTabToken();
 

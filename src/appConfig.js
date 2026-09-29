@@ -37,6 +37,9 @@ export const SAVE_BACKUP_STORAGE_KEY = "critical-point-unreadable-save-v1";
 // sessionStorage: when this tab last reloaded itself because a lazy chunk was
 // gone (a deploy replaced the hashed files under an open tab).
 export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
+// The player's comfort settings: table time, the reading clock, flashes,
+// single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
+export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

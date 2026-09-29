@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { getAccessibility } from "./accessibilitySettings.js";
 
 export function usePendingTelemetryRef(saved) {
   return useRef(saved?.pendingTelemetry ?? []);
@@ -52,6 +53,8 @@ export function useRuntimeChoiceShortcuts({
       // Ctrl/Cmd+R is the browser's reload and Ctrl+P its print dialog; a
       // modified key is never one of the game's.
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      // P, R and N are single-character shortcuts; the comfort setting turns them off.
+      if (!getAccessibility().letterKeys) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
       // Read off the physical key, as the table's letters are (useTableKeys):

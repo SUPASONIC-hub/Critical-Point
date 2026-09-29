@@ -1238,6 +1238,7 @@ export function createCaseSummary(
   const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
   const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
   const stats = getGameplayStats(entries, getRiskPressure(resources));
+  const assistTime = entries.reduce((slowest, entry) => Math.max(slowest, Number(entry?.assistTime) || 1), 1);
   const summary = {
     schemaVersion,
     caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
@@ -1264,6 +1265,9 @@ export function createCaseSummary(
     momentumScore: stats.momentumScore,
     momentumTier: stats.momentumTier,
     rank: stats.rank,
+    // The slowest table clock any decision of the case was played on, when the
+    // comfort setting slowed it; absent on a case played at the table's pace.
+    ...(assistTime > 1 ? { assistTime } : {}),
     // Carried so the ending can read the season rather than the last case: with
     // resources reset at every case start, one case alone never reaches the
     // thresholds the closing ruling is written against.

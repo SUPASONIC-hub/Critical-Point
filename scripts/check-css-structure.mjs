@@ -210,6 +210,8 @@ const fileBudgets = {
   // 11,492 lines / 257,177 bytes to 10,767 / 242,536 in the same pass, with
   // 514 declarations that never won a cascade deleted.
   "result.css": { lines: 2560, bytes: 60800 },
+  // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
+  "comfort.css": { lines: 140, bytes: 3800 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

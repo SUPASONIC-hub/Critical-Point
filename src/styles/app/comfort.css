@@ -1,0 +1,131 @@
+/* What the player turned down (src/state/accessibilitySettings.js), and the
+   panel on the intro where they did. The two settings CSS answers to are
+   attributes on <html>, set before the first paint: data-calm-effects and
+   data-still-intro. Each does what the matching prefers-reduced-motion block
+   does, for a player whose operating system does not say so -- and the calm
+   one also turns the heat down, which no OS setting asks for. Last in the
+   cascade so a tie on specificity goes to the player. */
+
+/* The settings panel, a card on the intro drawer's surface like its siblings. */
+.intro .intro-drawer > .accessibility-panel {
+  display: grid;
+  gap: 10px;
+  padding: 0 20px 20px;
+  color: var(--ui-text);
+}
+.accessibility-time {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+.accessibility-time legend {
+  float: left;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.accessibility-time p {
+  clear: both;
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.accessibility-time > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.accessibility-time label,
+.accessibility-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.accessibility-time label {
+  align-items: center;
+  padding: 0 14px;
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.accessibility-time label:has(input:checked) {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.accessibility-toggle {
+  padding: 12px 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+.accessibility-panel input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--ui-accent);
+}
+.accessibility-toggle span {
+  display: grid;
+  gap: 3px;
+}
+.accessibility-toggle b {
+  font-size: 13.5px;
+}
+.accessibility-toggle small {
+  color: var(--ui-text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* A ranking row whose run slowed the table's clock. */
+.ranking-detail .ranking-assist {
+  color: var(--ui-accent);
+  font-weight: 700;
+}
+
+/* Calm effects: the table's body. The shake and the flash are written by the
+   frame loop, which reads the setting too (GauntletFx.jsx); these are the
+   parts CSS owns. The vignette and the edge keep telling the heat, at under
+   half the amplitude, and the bust is the settled wash without its two
+   full-screen flashes. */
+:root[data-calm-effects] .gx-table {
+  transform: none;
+}
+:root[data-calm-effects] .gx-fx-vignette {
+  opacity: calc(var(--gx-heat, 0) * 0.3);
+}
+:root[data-calm-effects] .gx-fx-border {
+  opacity: calc(var(--gx-heat, 0) * var(--gx-heat, 0) * 0.4);
+}
+:root[data-calm-effects] .gx-fx-bust .gx-fx-vignette {
+  opacity: 0.4;
+}
+:root[data-calm-effects] .gx-slam-bust::before,
+:root[data-calm-effects] .gx-slam-bust::after,
+:root[data-calm-effects] .gx-breach,
+:root[data-calm-effects] .gx-slam-cashed strong {
+  animation: none;
+}
+
+/* A still intro: the ticker, the drifting art, the wordmark's glitch copies,
+   the dot's rings and the buttons' shine stop where they rest. */
+:root[data-still-intro] .intro-shell *,
+:root[data-still-intro] .intro-shell *::before,
+:root[data-still-intro] .intro-shell *::after {
+  animation: none;
+}
+:root[data-still-intro] .wordmark-line::before,
+:root[data-still-intro] .wordmark-line::after {
+  display: none;
+}

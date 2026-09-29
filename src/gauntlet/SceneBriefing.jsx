@@ -7,6 +7,7 @@ import { monotonicNow } from "./timing.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise.
@@ -67,8 +68,9 @@ export function SceneBriefing({
   onOpen,
 }) {
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
-  const [held, setHeld] = useState(false);
-  const heldRef = useRef(false);
+  // Held from the start when the player asked for a reading clock that waits.
+  const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
+  const heldRef = useRef(held);
   const onOpenRef = useRef(onOpen);
   const dialogRef = useRef(null);
   const timerRef = useRef(null);

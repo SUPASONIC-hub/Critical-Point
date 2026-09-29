@@ -94,6 +94,10 @@ function normalizeEntry(input = {}) {
     trigger: toTrigger(Array.isArray(summary.primary) ? summary.primary[0] : undefined),
     averageResponseTime: toCount(summary.averageResponseTime),
     reframeCount,
+    // The table clock ran this many times slower for this run (the comfort
+    // setting). 1 when the run did not use it, or the server has not been told
+    // to publish the key yet.
+    assistTime: [1.5, 2].includes(Number(summary.assistTime)) ? Number(summary.assistTime) : 1,
     reflectionScore,
     pressureAdaptScore,
     cognitionScore: toCount(summary.cognitionScore),

@@ -25,6 +25,7 @@ import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
+import { getAccessibility } from "./accessibilitySettings.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { isPermanentRefusal } from "./telemetryBatch.js";
@@ -325,6 +326,9 @@ export function useChoiceCommit(context) {
         focus: verdict.focus,
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
+      // The table clock ran this many times slower (the comfort setting); the
+      // case summary and the ranking row carry it.
+      ...(getAccessibility().tableTime > 1 ? { assistTime: getAccessibility().tableTime } : {}),
       suspenseEvent,
       clue,
       responseTimeSec,
@@ -369,6 +373,12 @@ export function useChoiceCommit(context) {
         outcomeNodeId: entry.nodeId,
         completedAt: new Date().toISOString(),
       };
+      // The ranking publishes the run's final case row, so the finale carries
+      // the slowest table clock of the whole season, not only its own.
+      if (currentCase === "final") {
+        const seasonAssist = Object.values(caseResults).reduce((slowest, result) => Math.max(slowest, Number(result?.assistTime) || 1), caseSummary.assistTime ?? 1);
+        if (seasonAssist > 1) caseSummary.assistTime = seasonAssist;
+      }
       nextCaseResults = { ...caseResults, [currentCase]: caseSummary };
       closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };
     }

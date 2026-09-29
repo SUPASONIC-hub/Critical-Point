@@ -2,6 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
+import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
@@ -485,6 +486,13 @@ export function IntroScreen({ view, renderers = {} }) {
             </section>
             </details>
           )}
+          <details className="intro-drawer">
+            <summary>
+              <span>ACCESSIBILITY</span>
+              <h2>편의 설정</h2>
+            </summary>
+            <AccessibilityPanel />
+          </details>
           <details className="intro-drawer">
             <summary>
               <span>SEASON 1</span>

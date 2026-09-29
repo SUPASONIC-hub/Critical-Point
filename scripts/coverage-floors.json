@@ -3,7 +3,7 @@
   "total": {
     "lines": 84,
     "functions": 82,
-    "branches": 72
+    "branches": 73
   },
   "files": {
     "src/advancedSystems.js": 58,
@@ -12,7 +12,7 @@
     "src/endingCopy.js": 100,
     "src/featurePack.js": 60,
     "src/gameConstants.js": 100,
-    "src/gameLogic.js": 85,
+    "src/gameLogic.js": 86,
     "src/gauntlet/fxVariables.js": 100,
     "src/gauntlet/gauntletEngine.js": 96,
     "src/gauntlet/relics.js": 100,
@@ -25,6 +25,7 @@
     "src/ranking.js": 96,
     "src/riskLogic.js": 100,
     "src/scenePlate.js": 100,
+    "src/state/accessibilitySettings.js": 97,
     "src/state/chunkReload.js": 96,
     "src/state/confirmAction.js": 100,
     "src/state/diagnosticUtils.js": 100,
