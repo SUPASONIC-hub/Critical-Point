@@ -204,6 +204,12 @@ test("a missing chunk is told apart from other errors", () => {
   assert.equal(chunkReload.isChunkLoadError("dynamically imported module"), false);
 });
 
+test("an import that resolved to nothing is a missing chunk, not a fault in the run", () => {
+  const module = { Screen: () => null };
+  assert.equal(chunkReload.loadedChunk(module), module);
+  assert.throws(() => chunkReload.loadedChunk(undefined), (error) => chunkReload.isChunkLoadError(error));
+});
+
 test("the tab reloads once for a missing chunk, then leaves it to the panel", () => {
   session.removeItem(appConfig.CHUNK_RELOAD_SESSION_KEY);
   let reloads = 0;

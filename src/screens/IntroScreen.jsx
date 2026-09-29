@@ -8,6 +8,7 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
+import { loadedChunk } from "../state/chunkReload.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -29,7 +30,7 @@ const tickerRun = (
 let gameRuntimeModule = null;
 
 export function loadGameRuntime() {
-  gameRuntimeModule ??= import("../GameRuntime.jsx").catch((error) => {
+  gameRuntimeModule ??= import("../GameRuntime.jsx").then(loadedChunk).catch((error) => {
     gameRuntimeModule = null;
     throw error;
   });

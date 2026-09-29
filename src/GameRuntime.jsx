@@ -110,12 +110,13 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
 } from "./advancedSystems.js";
+import { loadedChunk } from "./state/chunkReload.js";
 
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
-const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
-const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(({ ResultScreen }) => ({ default: ResultScreen })));
-const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScreen }) => ({ default: PlayScreen })));
+const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(loadedChunk).then(({ IntroScreen }) => ({ default: IntroScreen })));
+const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
+const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
 const renderNothing = () => null;
 

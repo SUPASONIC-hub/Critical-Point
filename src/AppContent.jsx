@@ -41,6 +41,7 @@ import { getOperatorProfiles } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
+import { loadedChunk } from "./state/chunkReload.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
@@ -50,8 +51,8 @@ import { recordAppError } from "./state/errorRecovery.js";
 const GameRuntime = lazy(() =>
   Promise.all([loadGameRuntime(), claimTabToken()]).then(([{ GameRuntime }]) => ({ default: GameRuntime })),
 );
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
+const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
 
 // How long the intro waits for an idle moment before it fetches the runtime anyway.
 const RUNTIME_PREFETCH_TIMEOUT_MS = 4000;

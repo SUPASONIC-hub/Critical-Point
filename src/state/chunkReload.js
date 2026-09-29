@@ -35,6 +35,21 @@ function reloadedRecently(now) {
   }
 }
 
+/**
+ * What a dynamic import resolved to, or the missing-chunk error when it
+ * resolved to nothing. When the preload handler below takes a failure (and
+ * prevents its default), Vite's preload helper does not throw: the import
+ * resolves to `undefined`, and the `({ Screen }) => ...` after it threw a
+ * TypeError the root boundary recorded against the save -- while the page was
+ * already reloading for the very chunk that was missing.
+ */
+export function loadedChunk(module) {
+  if (module) return module;
+  const error = new Error("Loading chunk failed: the import resolved to nothing.");
+  error.name = "ChunkLoadError";
+  throw error;
+}
+
 /** Reloads for a missing chunk unless this tab just did. Returns whether it reloaded. */
 export function reloadForMissingChunk({ now = Date.now(), reload = () => globalThis.location.reload() } = {}) {
   if (reloadedRecently(now)) return false;
