@@ -57,18 +57,16 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
         visibility: hidden !important;
       }
       /* Debug-only chrome, taken out of the flow rather than blanked. The
-         ?debug=1 entry turns all four on in the harness (tests/helpers/gameFlow.js:27,
-         src/appConfig.js:22) and nothing turns them on for a player, so leaving
-         their boxes behind would bake vertical space no player can ever see into
-         the two result baselines: 96px of diagnostics blocks on both, plus 100px
-         of buttons on mobile, where src/styles/app/responsive.css:196-212 stacks
-         .top-actions into full-width rows. Neither debug button has a class of
-         its own; aria-expanded is the error-log disclosure's only signature in
-         this row (src/screens/ResultScreen.jsx:208) and the export button
-         carries a testid (:224). The expectMasked guard below is what keeps
-         those two selectors honest. */
-      .telemetry-stats,
-      .replay-diagnostics,
+         ?debug=1 entry turns these buttons on in the harness
+         (tests/helpers/gameFlow.js:27, src/appConfig.js:22) and nothing turns
+         them on for a player, so leaving their boxes behind would bake 100px no
+         player can ever see into the mobile result baseline, where
+         src/styles/app/responsive.css:196-212 stacks .top-actions into
+         full-width rows. Neither button has a class of its own; aria-expanded
+         is the error-log disclosure's only signature in this row
+         (src/screens/ResultScreen.jsx:208) and the export button carries a
+         testid (:224). The expectMasked guard below is what keeps those two
+         selectors honest. */
       .result-page .top-actions button[aria-expanded],
       .result-page .top-actions [data-testid="export-diagnostic-log"] {
         display: none !important;
@@ -85,11 +83,11 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
   }
 }
 
-// The four selectors the display:none block above has to keep hitting on a
-// result capture. Intro and play captures never render them.
+// The selectors the display:none block above has to keep hitting on a result
+// capture. Intro and play captures never render them. The telemetry and replay
+// diagnostics are in the report archive, which the captures leave closed and
+// which draws nothing until it is opened (src/screens/ReportArchive.jsx).
 const RESULT_MASK_SELECTORS = [
-  ".telemetry-stats",
-  ".replay-diagnostics",
   ".result-page .top-actions button[aria-expanded]",
   '.result-page .top-actions [data-testid="export-diagnostic-log"]',
 ];
@@ -310,6 +308,7 @@ test("case result explains the ending signals", async ({ page }) => {
   });
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
+  await page.locator("details.report-archive > summary").click();
   await expect(page.locator(".ending-rationale")).toContainText("믿음");
   await expect(page.locator(".ending-rationale")).toContainText("공정함");
 });

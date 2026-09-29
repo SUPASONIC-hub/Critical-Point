@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Copy, MessageSquareText, Sparkles } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
@@ -14,8 +15,15 @@ import { isResourceGain } from "../gameConstants.js";
  * It reads the same `view` the result screen does; `check:view-contracts`
  * reads this file as part of the result screen. The two values the first acts
  * also print are passed in rather than derived twice.
+ *
+ * The body is drawn only while the archive is open. It is most of the result
+ * page's DOM -- the ledger, every log row, the route map -- and a closed
+ * `<details>` still built all of it on every render for a player who never
+ * opens it. Nothing in it keeps state of its own: the feedback form is
+ * controlled from `view`, so closing and reopening loses nothing.
  */
 export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
+  const [open, setOpen] = useState(false);
   const {
     common: { currentCase, renderSceneLines },
     ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile },
@@ -46,11 +54,12 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
     }));
   const observerTurningPoint = observerPattern?.turningPoint;
   return (
-    <details className="report-archive">
+    <details className="report-archive" onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary>
         <span>전체 기록</span>
         <b>랭크 근거, 판단 DNA, 경로 지도, 관찰 장부, 선택 로그</b>
       </summary>
+      {open && (
       <div className="report-archive-body">
     <GauntletLedger log={log} summary={caseResults?.[currentCase]?.gauntlet} />
     {currentCase === "final" && view.operatorReveal && (
@@ -618,6 +627,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
       </section>
     )}
       </div>
+      )}
     </details>
   );
 }
