@@ -59,6 +59,20 @@ Still open, on purpose:
   Sunday, and 사건 49's 화요일 is still to be reconciled with the rest.
 - Many voice lines are the card's label with a comma put into it (about 2,500
   when stream F2 counted them), not a line of their own.
+- The `GameRuntime` chunk carries all 55 cases (3.26MB, 0.96MB gzip) before the
+  first scene. Loading a case's pack when it is reached would save about 680KB
+  gzip there, but a pack is merged at import into tables owned by four modules
+  (`gameData.js`, `gameDialogue.js`, `gameLogic.js`, `sceneContext.js`), and
+  some of those tables reach across cases (a case's memory cards and openings
+  are keyed by the previous case's closings). The change is: a
+  `registerCase(pack)` the top-level loops become, `casePacks.js` as a
+  `caseId -> () => import(...)` map, the places that assume the whole graph
+  (`savedState.js`, `useChoiceCommit.js`, `useRunReadout.js`, the debug node
+  picker, `gameLogic.js` reading the next case's pack on the result screen)
+  awaiting their case, and every content check calling `loadAllCases()` first.
+  `nodes/sceneBuild.js` is where the final build steps already live. Left out
+  of the 2026-09 fix pass on purpose: it is a change to the whole build of the
+  graph and needs the season walk to prove it.
 
 ## Maintenance Priorities
 
