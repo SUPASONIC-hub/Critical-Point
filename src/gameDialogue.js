@@ -187,6 +187,20 @@ const characterRoleSpans = [
     roles: { 오진우: "전 트리거랩 분석관 · 사직 후 혼자 추적 중" },
   },
   {
+    // The analyst finds him in a 고시원 in 사건 09 and he comes back to the team;
+    // the rivalry the default role describes ended in 사건 08.
+    from: "case09",
+    to: "case24",
+    roles: { 오진우: "트리거랩 분석관 · 한 번 떠났다 돌아온 동료" },
+  },
+  {
+    // Whether she signs in 사건 15, and so becomes 정규직, is the player's
+    // choice, so from 사건 16 on the card does not say which she is.
+    from: "case16",
+    to: "case24",
+    roles: { 이민서: "트리거랩 데이터 기록 담당" },
+  },
+  {
     // 트리거랩 is dissolved at the end of 사건 24 and the six are posted apart.
     from: "case25",
     to: "final",

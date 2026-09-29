@@ -676,6 +676,6 @@ export const case47 = {
   continuityChallenges: {
     c46_after_warm: { id: "protect-trust", title: "헌책방의 밤을 떡방까지 잇기", text: "이민서 곁에 남았던 밤, 떡방에 가겠다는 답이 열한 개 올라왔습니다. 31명 앞에 열한 명이 같이 서면 믿음은 그 수만큼 무거워집니다." },
     c46_after_record: { id: "use-reframe", title: "비어 있는 판정 이유 칸 채우기", text: "'빈칸 옆의 점을 읽는 법'을 쓴 사람 앞에 이유 칸이 빈 판정 31건이 왔습니다. 판을 다시 짜는 카드로 그 빈칸에 사람의 문장을 들입니다." },
-    c46_after_rush: { id: "repair-legitimacy", title: "떡 약속만 남긴 사람의 늦은 답", text: "떡 약속만 남겨 두고 검찰청으로 갔고, 단체방에 답하지 않은 사람은 당신 하나입니다. 늦게 온 만큼 31명의 이야기를 순서대로 받아 적어야 공정함에 닿습니다." },
+    c46_after_rush: { id: "repair-legitimacy", title: "읽지 않은 문자의 늦은 답", text: "문가을의 문자를 읽지 않은 채 KD캐피탈 사무실로 갔고, 단체방에 답하지 않은 사람은 당신 하나입니다. 늦게 온 만큼 31명의 이야기를 순서대로 받아 적어야 공정함에 닿습니다." },
   },
 };
