@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-29 (the audit fix pass merged 2026-09-28/29: saves that survive a crash, a restore, a stale tab and an older build; one x1.5 cap on the hand; cloud saves ordered by lineage and addresses kept as salted hashes; one canon for the loan; every hidden route, closing and dealt card reply written case by case; comfort settings on the intro)
+Last updated: 2026-09-29 (the audit fix pass merged 2026-09-28/29: saves that survive a crash, a restore, a stale tab and an older build; one x1.5 cap on the hand; cloud saves ordered by lineage and addresses kept as salted hashes; one canon for the loan; every hidden route, closing and dealt card reply written case by case; comfort settings on the intro; then the season fetched a case at a time)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -35,6 +35,8 @@ list of the files it touched.
 - Five comfort settings sit in a folded drawer on the intro's setup console:
   table time, a reading clock that waits, calm effects, no letter keys, a
   still intro (priority 87).
+- The app fetches the season a case at a time: the first scene needs the
+  index and one case chunk, not all 55 cases (priority 88).
 - Fast CI checks and the heavyweight e2e tier are split in GitHub Actions; the
   e2e tier runs on three shards, and the uninterrupted season walk and full
   coverage run weekly. Visual regression has its own label-aware workflow and
@@ -59,20 +61,6 @@ Still open, on purpose:
   Sunday, and 사건 49's 화요일 is still to be reconciled with the rest.
 - Many voice lines are the card's label with a comma put into it (about 2,500
   when stream F2 counted them), not a line of their own.
-- The `GameRuntime` chunk carries all 55 cases (3.26MB, 0.96MB gzip) before the
-  first scene. Loading a case's pack when it is reached would save about 680KB
-  gzip there, but a pack is merged at import into tables owned by four modules
-  (`gameData.js`, `gameDialogue.js`, `gameLogic.js`, `sceneContext.js`), and
-  some of those tables reach across cases (a case's memory cards and openings
-  are keyed by the previous case's closings). The change is: a
-  `registerCase(pack)` the top-level loops become, `casePacks.js` as a
-  `caseId -> () => import(...)` map, the places that assume the whole graph
-  (`savedState.js`, `useChoiceCommit.js`, `useRunReadout.js`, the debug node
-  picker, `gameLogic.js` reading the next case's pack on the result screen)
-  awaiting their case, and every content check calling `loadAllCases()` first.
-  `nodes/sceneBuild.js` is where the final build steps already live. Left out
-  of the 2026-09 fix pass on purpose: it is a change to the whole build of the
-  graph and needs the season walk to prove it.
 
 ## Maintenance Priorities
 
@@ -934,6 +922,41 @@ Still open, on purpose:
     `data-calm-effects` and `data-still-intro`, set in `main.jsx` before the
     first paint; their rules are `comfort.css`, the last sheet, with a budget
     of its own.
+88. The app build fetches the season a case at a time; Node reads it whole.
+    `scripts/vite-season-data.mjs` runs `scripts/season-split.mjs --emit-json`
+    once at build time and serves `virtual:season` (the store,
+    `src/seasonRuntime.js`, with the index every case needs: orders, openings,
+    memory-card plans, each case's fork, the people, the pack fields
+    `gameLogic.js` reads) and one `virtual:season-case/<caseId>` chunk per
+    case (its scenes, replies and voice lines, 15-19KB gzip). In the app build
+    only, imports of `gameData.js` and `gameDialogue.js` are swapped for
+    `src/runtime/*.app.js`, which answer the same names from the store;
+    GameRuntime went from 3.26MB / 960KB gzip to 525KB / 169KB. The rules
+    that read the season's tables take them as arguments
+    (`src/seasonRules.js`), so both sides run the same code, and
+    `tests/unit/season-runtime.test.mjs` holds the store to `gameData.js`
+    table by table and rule by rule.
+    - The store's tables are the same objects, filled as cases arrive, so a
+      reader stays synchronous. Only code that opens a case waits for it.
+    - `src/state/caseArrival.js` decides the waiting. A first visit mounts once
+      `SEASON_ENTRY_CASE` has arrived and fetches the rest behind the table. A
+      device holding any save waits for every case: repairing a save reads the
+      scenes of every case it closed, and a repair that could not find them
+      would rewrite what it read. A page opened from a replay link waits for
+      every case too, and reads the link at the runtime's first render, not
+      at import, since the scenes it names are checked against the season.
+      `startCase` and the debug start go through
+      `whenCaseReady`; a case file a deploy removed reloads like any missing
+      chunk (priority 86).
+    - A new reader of `nodes`, `echoReplies` or `choiceVoiceLines` that can run
+      before its case is open must wait with `whenCaseReady` or read only the
+      index. The real `gameData.js` answers `ensureCase`, `ensureAllCases` and
+      `isCaseLoaded` at once, so a unit test will not catch a missing wait;
+      the dev server and `test:e2e:preview` will.
+    - In the dev server a change under `src/nodes/` or to the modules the
+      season is built from drops the built data and reloads the page.
+    - `check:bundle` holds GameRuntime at 551,000 / 176,100 bytes and every
+      case chunk to one budget, 84,000 / 20,200 (case01 is the largest).
 
 ## Verification Commands
 

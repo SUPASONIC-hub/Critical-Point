@@ -1,8 +1,8 @@
 {
   "//": "npm run test:coverage. Floors under the unit tests, as measured; they only rise. Rewrite with `node scripts/check-coverage.mjs --update`.",
   "total": {
-    "lines": 84,
-    "functions": 82,
+    "lines": 85,
+    "functions": 83,
     "branches": 73
   },
   "files": {
@@ -25,8 +25,11 @@
     "src/ranking.js": 96,
     "src/riskLogic.js": 100,
     "src/scenePlate.js": 100,
+    "src/seasonRules.js": 100,
+    "src/seasonRuntime.js": 100,
     "src/state/accessibilitySettings.js": 97,
-    "src/state/chunkReload.js": 96,
+    "src/state/caseArrival.js": 100,
+    "src/state/chunkReload.js": 97,
     "src/state/confirmAction.js": 100,
     "src/state/diagnosticUtils.js": 100,
     "src/state/errorRecovery.js": 80,
@@ -52,6 +55,8 @@
     "src/gauntlet/useGauntletWindow.js",
     "src/gauntlet/useTableKeys.js",
     "src/responsiveArt.js",
+    "src/runtime/gameData.app.js",
+    "src/runtime/gameDialogue.app.js",
     "src/state/runStorageReset.js",
     "src/state/useAppPersistence.js",
     "src/state/useCaseSystems.js",

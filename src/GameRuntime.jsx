@@ -111,6 +111,8 @@ import {
   getOperatorProfiles,
 } from "./advancedSystems.js";
 import { loadedChunk } from "./state/chunkReload.js";
+import { whenCaseReady } from "./state/caseArrival.js";
+export { prepareGameRuntime } from "./state/caseArrival.js";
 
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
@@ -701,7 +703,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   function startRecoveryRoute() {
     if (openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
   }
+  // A case the season has not fetched yet is opened when it lands (caseArrival.js).
   function startCase(caseId) {
+    whenCaseReady(caseId, () => startCaseNow(caseId));
+  }
+  function startCaseNow(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
     const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
     const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
@@ -989,7 +995,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   function startDebugNode() {
-    startAtNode(debugCaseId, debugNodeId);
+    whenCaseReady(debugCaseId, () => startAtNode(debugCaseId, debugNodeId));
   }
 
   function exportPlaytestLog({ includeDiagnostics = false } = {}) {

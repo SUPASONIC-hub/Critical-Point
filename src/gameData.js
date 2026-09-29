@@ -15,9 +15,10 @@ import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
 import { coreCards } from "./nodes/coreCards.js";
 import * as sceneBuild from "./nodes/sceneBuild.js";
+import * as seasonRules from "./seasonRules.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
-import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES } from "./gameCases.js";
+import { authoredNodeOrders, CASE_START_NODES } from "./gameCases.js";
 
 /**
  * Everything below rewires the graph in place: aftermath, connective, reaction,
@@ -1418,24 +1419,6 @@ const lateSeasonBranchScenes = {
   },
 };
 
-const branchConditions = {
-  costAlreadyPaid: {
-    // Two disjuncts read "someone was hurt" and "the record slipped", which is
-    // the harm-first and the procedure-first way of paying. A player who
-    // protects people and follows procedure pays in hours instead, and had no
-    // way in: case 04's detour was unreachable for exactly the run that plays
-    // the case as written. The third disjunct is that run's receipt.
-    label: "이미 누군가 비용을 치른 뒤에만 열립니다 (사람 피해, 공정함, 또는 남은 시간)",
-    test: ({ resources } = {}) =>
-      (resources?.humanCost ?? 0) >= 6 ||
-      (resources?.legitimacy ?? 100) <= 45 ||
-      (resources?.time ?? 100) <= 44,
-  },
-  ruleNotYetClosed: {
-    label: "직전 사건을 규칙으로 닫지 않았을 때만 열립니다",
-    test: ({ previousOutcomeChoiceId } = {}) => previousOutcomeChoiceId !== "c4_after_rule",
-  },
-};
 
 // caseId, source scene, which column carries the detour, the two detour scenes,
 // and the optional condition that has to hold for the detour to open. The
@@ -2962,7 +2945,7 @@ CASE_PACKS.forEach((pack) => {
 coreCards.lay(coreCards.entryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
-const continuityMemoryChoicePlans = {
+export const continuityMemoryChoicePlans = {
   case02: {
     routeNext: "c2_route_person",
     systemNext: "c2_route_system",
@@ -3047,54 +3030,9 @@ CASE_PACKS.forEach((pack) => {
 });
 coreCards.fileMemoryEchoes(continuityMemoryChoicePlans, echoReplies);
 
-/**
- * Reads the previous case's recorded route memory, not the run log: a case
- * start clears the log, so the log-based version of this could never find
- * anything and the choice never once appeared in a played season.
- */
-export function getContinuityMemoryChoice({ caseId = CASE_SEQUENCE[0], nodeId = "", caseResults = {} } = {}) {
-  const plan = continuityMemoryChoicePlans[caseId];
-  if (!plan) return null;
-  const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
-  if (!openingNodes.has(nodeId)) return null;
-  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
-  const memory = previousCaseId ? caseResults?.[previousCaseId]?.routeMemory : null;
-  if (!memory) return null;
-  if (memory.evidenceTurn) {
-    return {
-      id: `${caseId}_memory_evidence`,
-      label: plan.evidenceLabel,
-      effect: { legitimacy: 6, trust: 3, time: -5, fatigue: 5 },
-      cognition: { inference: 2, reframing: 1 },
-      next: plan.evidenceNext,
-      // No authority check here. This choice only exists because the previous
-      // case's turnaround was actually walked, and that is the credential --
-      // asking for FIELD ACCESS on top of it locked the case 02 opening behind
-      // two clues the player could not yet hold.
-      continuityMemory: true,
-    };
-  }
-  if (memory.systemRoute) {
-    return {
-      id: `${caseId}_memory_system`,
-      label: plan.systemLabel,
-      effect: { legitimacy: 5, trust: 2, time: -4, fatigue: 4 },
-      cognition: { reframing: 2 },
-      next: plan.systemNext,
-      continuityMemory: true,
-    };
-  }
-  // Only 사건 02-06 write a route card: a route split is a walk down a route
-  // that is not the hidden one, and only 사건 01-05 have such routes.
-  if (!memory.routeSplit || !plan.routeLabel) return null;
-  return {
-    id: `${caseId}_memory_route`,
-    label: plan.routeLabel,
-    effect: { trust: 5, legitimacy: 4, time: -3, fatigue: 4 },
-    cognition: { persistence: 1, inference: 1 },
-    next: plan.routeNext,
-    continuityMemory: true,
-  };
+/** Reads the previous case's recorded route memory; see seasonRules.js. */
+export function getContinuityMemoryChoice(args) {
+  return seasonRules.readContinuityMemoryChoice({ plans: continuityMemoryChoicePlans, openingRoutes: caseOpeningRoutes }, args);
 }
 
 export const caseOpeningRoutes = {
@@ -3527,39 +3465,21 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
 // cards in. See nodes/sceneBuild.js.
 sceneBuild.finishSceneGraph(nodes, nodeOrders);
 
-// How far into a case a scene sits; see nodes/sceneBuild.js.
-export const { getCaseRouteLength, getNodeRouteIndex } = sceneBuild.createRouteReaders(nodes, caseOpeningRoutes);
+// How far into a case a scene sits; see seasonRules.js.
+export const { getCaseRouteLength, getNodeRouteIndex } = seasonRules.createRouteReaders(nodes, caseOpeningRoutes);
 
-/**
- * The one authored mid-case fork per case, with the scenes each side leads to.
- * Derived from the graph so adding a branch needs no second list.
- */
+/** The one authored mid-case fork per case; see seasonRules.js. */
 export function getCaseBranchNodes() {
-  return CASE_SEQUENCE.map((caseId) => {
-    const nodeId = [...new Set(nodeOrders[caseId])].find((id) => {
-      const scene = nodes[id];
-      if (!scene) return false;
-      return scene.choices.some((choice) => choice.branchId);
-    });
-    if (!nodeId) return null;
-    return {
-      caseId,
-      nodeId,
-      nextIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.next))],
-      // Named separately from nextIds: the detour is no longer always the first
-      // route out of the fork, because it is no longer always on the first column.
-      detourIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.branchId).filter(Boolean))],
-    };
-  }).filter(Boolean);
+  return seasonRules.readCaseBranchNodes(nodes, nodeOrders);
 }
 
+export const { getBranchDetourBypass } = seasonRules;
+
 /**
- * Where a gated detour choice actually goes on this run. Returns the bypass
- * route when the condition does not hold, and null when the choice routes
- * normally, so callers can write `detour ?? choice.next`.
+ * Every case is here already. The app build reads src/runtime/gameData.app.js
+ * instead, where cases arrive one at a time; these keep the two the same shape
+ * so the code that opens a case can await its arrival in either.
  */
-export function getBranchDetourBypass(choice = {}, context = {}) {
-  const condition = branchConditions[choice.branchCondition];
-  if (!condition || !choice.branchBypass) return null;
-  return condition.test(context) ? null : choice.branchBypass;
-}
+export const ensureCase = () => Promise.resolve();
+export const ensureAllCases = () => Promise.resolve();
+export const isCaseLoaded = () => true;

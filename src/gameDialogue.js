@@ -12,7 +12,7 @@
  * the one a Korean bank actually uses today, and anything a fifteen-year-old
  * would not know is unpacked in brackets the first time it appears.
  */
-import { CASE_SEQUENCE } from "./gameCases.js";
+import { readCharacterProfile } from "./seasonRules.js";
 import { CASE_PACKS } from "./nodes/casePacks.js";
 export const characterProfiles = {
   한서윤: {
@@ -169,7 +169,7 @@ export const characterProfiles = {
  *
  * A later row wins, so a span inside a span is written after it.
  */
-const characterRoleSpans = [
+export const characterRoleSpans = [
   {
     from: "prologue01",
     to: "prologue05",
@@ -222,22 +222,13 @@ const characterRoleSpans = [
 ];
 
 /** What a pack says about someone for the length of its own case: `characterOverrides`. */
-const packCharacterOverrides = {};
+export const packCharacterOverrides = {};
 
 /** A name two packs both introduce. One person per name; `check:graph` fails on any. */
 export const characterProfileCollisions = [];
 
 export function getCharacterProfile(name, caseId) {
-  const profile = characterProfiles[name];
-  if (!profile) return null;
-  const position = CASE_SEQUENCE.indexOf(caseId);
-  if (position < 0) return profile;
-  const role = characterRoleSpans.reduce(
-    (current, span) =>
-      span.roles[name] && position >= CASE_SEQUENCE.indexOf(span.from) && position <= CASE_SEQUENCE.indexOf(span.to) ? span.roles[name] : current,
-    profile.role,
-  );
-  return { ...profile, role, ...packCharacterOverrides[caseId]?.[name] };
+  return readCharacterProfile({ profiles: characterProfiles, roleSpans: characterRoleSpans, overrides: packCharacterOverrides }, name, caseId);
 }
 export const choiceVoiceLines = {
   // CASE 07. The season's one case where the analyst asks instead of decides,
