@@ -137,8 +137,10 @@ const BUDGETS = {
   },
   // 977 / 14 -> 400 / 10 on 2026-09-27: the third act of the report,
   // `.report-archive`, is `ReportArchive.jsx`. Measured 379 / 9.
+  // 400 -> 340 on 2026-09-29: the verdicts, afterglows and axis copy are
+  // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   "src/screens/ResultScreen.jsx": {
-    lines: 400,
+    lines: 340,
     importedNames: 10,
     hooks: {},
   },
