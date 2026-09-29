@@ -191,8 +191,22 @@ test("hero entry opens the first scene in one click", { tag: "@prod" }, async ({
   await expect(page.locator(".intro")).toBeVisible();
   await expect(page.locator(".choices .choice")).toHaveCount(0);
 
+  // The burst is on screen for 860ms, and on a CI runner the click itself can
+  // take most of that: hovering the button starts parsing the runtime chunk.
+  // Polling for it after the click raced it (and lost on every run of
+  // 2026-09-29), so the page records whether it was ever drawn.
+  await page.evaluate(() => {
+    window.__openingBurstSeen = false;
+    const observer = new MutationObserver(() => {
+      if (document.querySelector("[data-testid='opening-burst']")) {
+        window.__openingBurstSeen = true;
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
   await page.getByTestId("start-first-case").click();
-  await expect(page.getByTestId("opening-burst")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__openingBurstSeen), { message: "the opening burst was never drawn" }).toBe(true);
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
   await expect(page.locator(".choices .choice").first()).toBeVisible();
 
