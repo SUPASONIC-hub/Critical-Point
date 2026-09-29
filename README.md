@@ -757,8 +757,8 @@ push·`e2e` 라벨·Dependabot PR, 시각 회귀는 `visual` 라벨·Dependabot 
   받습니다). 폰트 CDN도, 여러 조각으로 나뉜 동적 서브셋도 없습니다. **새 문구를 쓰면 이 명령을 다시
   돌리십시오** — `npm run check:fonts`는 원고에 폰트에 없는 글자가 있으면 실패합니다. `pretendard`
   패키지는 원본 TTF를 주는 개발 의존성일 뿐입니다. 굵기는 900까지만 씁니다.
-- `npm run build:icons` — 앱 아이콘(`public/icons/`)과 `public/manifest.webmanifest`(테마 색
-  `#06090a`).
+- `npm run build:icons` — 앱 아이콘(`public/icons/`)을 제작자 그림 `public/profile.jpg`에서 크기별로
+  잘라 만듭니다. 파비콘은 이 그림입니다. `public/manifest.webmanifest`의 테마 색은 `#06090a`.
 
 예산은 내리기만 하고 올리지 않습니다. `npm run check:bundle`은 청크마다의 크기에 더해 **첫 페인트**
 전체(HTML, 그것이 거는 스크립트·스타일시트, 미리 받는 폰트, 휴대폰이 고르는 키 비주얼)의 전송 바이트를
