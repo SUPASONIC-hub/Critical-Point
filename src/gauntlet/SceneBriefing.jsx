@@ -3,11 +3,11 @@ import { Flame, Lock, TriangleAlert } from "lucide-react";
 import { hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
+import { monotonicNow } from "./timing.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
-
-const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise.
@@ -68,8 +68,9 @@ export function SceneBriefing({
   onOpen,
 }) {
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
-  const [held, setHeld] = useState(false);
-  const heldRef = useRef(false);
+  // Held from the start when the player asked for a reading clock that waits.
+  const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
+  const heldRef = useRef(held);
   const onOpenRef = useRef(onOpen);
   const dialogRef = useRef(null);
   const timerRef = useRef(null);
@@ -182,7 +183,7 @@ export function SceneBriefing({
           )}
 
           {broken && (
-            <div className="gx-panel gx-panel-breach" role="status" data-testid="protocol-breach">
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach">
               <p className="gx-breach-kicker">
                 <TriangleAlert size={14} aria-hidden="true" /> PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다
               </p>
@@ -226,7 +227,12 @@ export function SceneBriefing({
                 >
                   <kbd>{index + 1}</kbd>
                   <span>{card.label}</span>
-                  {(card.id === sealedId || !open) && <Lock size={12} aria-label={open ? "봉인" : "잠김"} />}
+                  {(card.id === sealedId || !open) && (
+                    <>
+                      <Lock size={12} aria-hidden="true" />
+                      <span className="sr-only">{open ? "봉인" : "잠김"}</span>
+                    </>
+                  )}
                 </button>
               );
             })}
@@ -248,7 +254,7 @@ export function SceneBriefing({
             className="gx-open-table"
             data-testid="open-table"
             onClick={() => onOpen(null)}
-            aria-keyshortcuts="Space"
+            aria-keyshortcuts="Space Enter W"
             aria-label="판을 연다. 지금부터 시계가 흐르고 카드를 걸 수 있다"
           >
             <Flame size={18} aria-hidden="true" />

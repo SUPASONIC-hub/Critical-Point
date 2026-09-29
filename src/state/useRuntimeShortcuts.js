@@ -1,14 +1,20 @@
 import { useEffect, useRef } from "react";
+import { getAccessibility } from "./accessibilitySettings.js";
 
 export function usePendingTelemetryRef(saved) {
   return useRef(saved?.pendingTelemetry ?? []);
 }
 
+/**
+ * Escape closes what is in front: the reveal, else the recovery centre. 랭킹 and
+ * 게시판 close on Escape too, in `useOverlayScreens`, which the pre-start shell
+ * shares; while one of them is up (`screenOpen`) the key is theirs, so one press
+ * does not also close the recovery centre underneath.
+ */
 export function useRuntimeOverlayShortcuts({
   decisionReveal,
   setDecisionReveal,
-  showRanking,
-  setShowRanking,
+  screenOpen,
   showErrorLog,
   closeRecoveryCenter,
 }) {
@@ -17,15 +23,13 @@ export function useRuntimeOverlayShortcuts({
       if (event.key !== "Escape") return;
       if (decisionReveal) {
         setDecisionReveal(null);
-      } else if (showRanking) {
-        setShowRanking(false);
-      } else if (showErrorLog) {
+      } else if (showErrorLog && !screenOpen) {
         closeRecoveryCenter();
       }
     };
     window.addEventListener("keydown", closeOverlay);
     return () => window.removeEventListener("keydown", closeOverlay);
-  }, [closeRecoveryCenter, decisionReveal, setDecisionReveal, setShowRanking, showErrorLog, showRanking]);
+  }, [closeRecoveryCenter, decisionReveal, screenOpen, setDecisionReveal, showErrorLog]);
 }
 
 /**
@@ -49,19 +53,23 @@ export function useRuntimeChoiceShortcuts({
       // Ctrl/Cmd+R is the browser's reload and Ctrl+P its print dialog; a
       // modified key is never one of the game's.
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      // P, R and N are single-character shortcuts; the comfort setting turns them off.
+      if (!getAccessibility().letterKeys) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      // Read off the physical key, as the table's letters are (useTableKeys):
+      // with a Hangul layout active `event.key` is ㄱ, ㅜ or ㅔ, not r, n or p.
       if (isResult) {
-        if (event.key.toLowerCase() === "r") {
+        if (event.code === "KeyR") {
           event.preventDefault();
           startCase(currentCase);
-        } else if (event.key.toLowerCase() === "n" && nextCaseSignal) {
+        } else if (event.code === "KeyN" && nextCaseSignal) {
           event.preventDefault();
           startCase(nextCaseSignal.caseId);
         }
         return;
       }
-      if (event.key.toLowerCase() === "p") {
+      if (event.code === "KeyP") {
         event.preventDefault();
         saveCurrentGame({ exit: event.shiftKey });
       }

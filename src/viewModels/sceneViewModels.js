@@ -1,4 +1,4 @@
-import { characterProfiles } from "../gameDialogue.js";
+import { getCharacterProfile } from "../gameDialogue.js";
 import { getAuthorityProfile } from "../advancedSystems.js";
 import { AUTHORITY_THRESHOLDS, getAuthorityClueThresholds, getAuthorityLevel } from "../gameLogic.js";
 import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
@@ -9,8 +9,10 @@ import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
  * live here rather than in the middle of AppContent's render.
  */
 
+// The scene knows its case (the graph build stamps it), and who someone is
+// depends on the case: see `getCharacterProfile`.
 export function createSpeakerProfile({ node }) {
-  return characterProfiles[node?.speaker] ?? {
+  return getCharacterProfile(node?.speaker, node?.caseId) ?? {
   role: "사건 관계자",
   stance: "상황 설명",
   job: "현재 국면의 핵심 정보를 전달한다.",
@@ -106,7 +108,7 @@ export function createSceneChallenge({ reframeChoice, reframeCombo, inheritedCha
       ? {
           id: "use-reframe",
           title: "판 바꾸기 시도",
-          text: "구조 재설계에서 반영 기준 2개 이상을 채우면 보너스 조건이 열립니다.",
+          text: "'판을 다시 짠다' 카드를 걸고 벽에 닿기 전에 확정하면 이 사건의 숨은 경로가 열립니다.",
         }
       : (node?.triggers ?? []).includes("competition")
         ? {

@@ -1,14 +1,20 @@
 import { useMemo } from "react";
 
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn } from "./gauntletEngine.js";
+import { formatNumber, isResourceGain } from "../gameConstants.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
 import { hasRelic } from "./relics.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
 
-export function formatNumber(value) {
-  return Math.round(Number(value) || 0).toLocaleString("en-US");
-}
+export { formatNumber };
 
+/**
+ * Rounded down, because the table's rules read the multiplier as a floor: the
+ * chain asks for x4 and HIGH ROLLER's feat for x64. Rounded to nearest, a
+ * x3.95 printed "×4.0" and a cash on it started no chain.
+ */
 export function formatMultiplier(value) {
-  return value >= 10 ? `×${Math.round(value)}` : `×${value.toFixed(1)}`;
+  const multiplier = Number(value) || 0;
+  return multiplier >= 10 ? `×${Math.floor(multiplier)}` : `×${(Math.floor(multiplier * 10 + 1e-9) / 10).toFixed(1)}`;
 }
 
 export function describeEffect(effect = {}, resourceMeta = {}) {
@@ -18,6 +24,8 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
       key,
       value: Number(value),
       label: resourceMeta[key]?.label ?? key,
+      // Priority 9: whether it was good for the run, never the sign.
+      gain: isResourceGain(key, Number(value)),
     }))
     .sort((left, right) => Math.abs(right.value) - Math.abs(left.value));
 }
@@ -60,18 +68,23 @@ function getOverdriveCopy({ streak, hot, cashMutations }) {
  *
  * The stage renders ten times a second while the clock runs, and it used to
  * build both next boards and describe both of their mutation lists on every
- * one of those renders. The clock is not an input to any of it: these read the
- * gauge, the pushes, the focus charge and the staked card, which move only
- * when the player does something.
+ * one of those renders. The clock is not an input to any of it, and neither is
+ * the gauge as a number -- creep moves that every tick, which is what kept
+ * rebuilding both boards ten times a second after this was first memoised. The
+ * next board asks three things of the heat: is the cash hot enough for the
+ * chain, is it hot enough to carry a debt, and has the stance been charged.
  */
 export function useTableForecast({ schema, run, win, selectedCard, multiplier }) {
   const mutations = useMemo(() => describeMutations(schema), [schema]);
   const relics = run?.relics;
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
-  const hot = multiplier >= 4;
+  const hot = multiplier >= HOT_CASH_MULTIPLIER;
   const streak = run?.streak ?? 0;
-  const { gauge, pushes, focusMode, focus, focusHits } = win;
+  const { focusMode } = win;
+  const indebted = win.gauge >= HEAT_DEBT_GAUGE;
+  const pushed = win.pushes > 0;
+  const stanceEarned = win.focus >= STANCE_CHARGE && win.focusHits > 0;
   const stanceMastery = run?.stanceMastery;
   // The board after this window is the season's next one, and it leans in on
   // the schedule `resolveWindow` applies (`getSeasonEscalation`).
@@ -82,34 +95,34 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
       describeMutations(buildNextSchema({
         outcome: "cash",
         cause: "cash",
-        gauge,
-        pushes,
+        gauge: indebted ? HEAT_DEBT_GAUGE : 0,
+        pushes: pushed ? 1 : 0,
         streak: hot ? streak + 1 : 0,
         burnAxis: fractureAxis,
         caseClosed: false,
         relics: relics ?? [],
         focusMode,
-        focusCharge: focus,
-        focusHits,
+        focusCharge: stanceEarned ? STANCE_CHARGE : 0,
+        focusHits: stanceEarned ? 1 : 0,
         stanceMastery,
         windowIndex,
       })),
-    [focus, focusHits, focusMode, fractureAxis, gauge, hot, pushes, relics, stanceMastery, streak, windowIndex],
+    [focusMode, fractureAxis, hot, indebted, pushed, relics, stanceEarned, stanceMastery, streak, windowIndex],
   );
   const bustMutations = useMemo(
     () =>
       describeMutations(buildNextSchema({
         outcome: "bust",
         cause: "push",
-        gauge: Math.max(gauge, schema.wallMin),
-        pushes: pushes + 1,
+        gauge: schema.wallMin,
+        pushes: 1,
         streak: 0,
         burnAxis: fractureAxis,
         caseClosed: false,
         relics: relics ?? [],
         windowIndex,
       })),
-    [fractureAxis, gauge, pushes, relics, schema.wallMin, windowIndex],
+    [fractureAxis, relics, schema.wallMin, windowIndex],
   );
 
   return useMemo(() => {
@@ -132,7 +145,7 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
       bustMutations,
       overdrive: getOverdriveCopy({ streak, hot, cashMutations }),
       // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
-      bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / 3) : 0,
+      bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
   }, [bustMutations, cashMutations, fractureAxis, hot, mutations, relics, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);

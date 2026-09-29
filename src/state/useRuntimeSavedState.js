@@ -5,7 +5,9 @@ import {
   STORAGE_KEY,
   adoptSaveRevision,
   appendSaveSlot,
+  backUpUnreadableSave,
   getInvalidSavedStateKeys,
+  hasRecoverySlots,
   isReplaySession,
   isSavedStateShapeValid,
   parseCurrentSavedState,
@@ -49,7 +51,11 @@ function deriveRuntimeSave(initialStartState) {
     const invalid = hasStoredSave
       ? { currentCase: repaired?.currentCase, nodeId: repaired?.nodeId, invalidKeys: getInvalidSavedStateKeys(repaired) }
       : null;
-    return { saved: null, failures, invalid, write: false, slot: false };
+    // The player's own save, there and unusable: broken text, a schema newer
+    // than this build, or a shape the repair could not mend. It opened as a
+    // fresh intro, and the first write from that intro replaced it.
+    const unreadable = !replay && !initialStartState && hasStoredSave ? rawSaved : null;
+    return { saved: null, failures, invalid, write: false, slot: false, unreadable, recover: Boolean(unreadable) && hasRecoverySlots() };
   }
   const resumed = repaired.started && repaired.paused ? { ...repaired, paused: false } : repaired;
   return {
@@ -60,9 +66,15 @@ function deriveRuntimeSave(initialStartState) {
     write: !replay && (result.repaired || resumed !== repaired),
     // A slot is for a save that needed repair, not for every reload.
     slot: !replay && result.repaired,
+    unreadable: null,
+    recover: false,
   };
 }
 
+/**
+ * `recoverUnreadableSave` asks the runtime to open on the recovery centre: the
+ * stored save could not be used and there are slots to go back to.
+ */
 export function useRuntimeSavedState(initialStartState) {
   const derived = useMemo(() => {
     const next = deriveRuntimeSave(initialStartState);
@@ -78,9 +90,10 @@ export function useRuntimeSavedState(initialStartState) {
     appliedRef.current = derived;
     reportSilentFailures(derived.failures);
     if (derived.invalid) reportSilentFailure("save-shape", derived.invalid);
+    if (derived.unreadable) backUpUnreadableSave(derived.unreadable);
     if (derived.write) writeSaveState(derived.saved, { force: true });
     if (derived.slot) appendSaveSlot(derived.saved);
   }, [derived]);
 
-  return derived.saved;
+  return { saved: derived.saved, recoverUnreadableSave: derived.recover };
 }

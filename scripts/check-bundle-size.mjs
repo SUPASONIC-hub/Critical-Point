@@ -30,20 +30,63 @@ const budgets = [
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
-  { pattern: /^index-.*.js$/, maxBytes: 169_800, maxGzip: 60_400 },
+  { pattern: /^index-.*\.js$/, maxBytes: 169_800, maxGzip: 60_400 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
-  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 102_400, maxGzip: 32_600 },
+  // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
+  // fixes from the audit. What it bought is the table being playable and
+  // honest for more people: one gate for a card's click and its key, a bust
+  // written before its slam is painted, Space and Enter left to the control
+  // the keyboard walked to, presses graded where the pointer went down and
+  // when the beat reached the ear, names a screen reader and a phone can read
+  // for what only a tooltip said, and frame-loop variables that no longer
+  // restyle the whole table. Measured 103,738 / 34,105. It is not on the first
+  // paint: the chunk loads after the player has started a run.
+  { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_300 },
   // 44,024 / 13,638 on 2026-09-27.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
-  // tokens went; 196,510 / 35,448 after.
-  { pattern: /^index-.*\.css$/, maxBytes: 206_300, maxGzip: 37_300 },
+  // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
+  // declarations that never won a cascade were cut and extensions.css retired.
+  { pattern: /^index-.*\.css$/, maxBytes: 194_400, maxGzip: 35_300 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
   { pattern: /^pretendard-cp-.*\.woff2$/, maxBytes: 283_500, compressed: true },
+  // The chunks below had no budget until 2026-09-28: the list named six files
+  // and the build emits eleven, so a new 400KB lazy screen would have passed a
+  // check described as a ratchet on every chunk. Measured that day, plus 5%.
+  // React and the scheduler. 221,715 / 68,975. It moves only with a React bump.
+  { pattern: /^react-vendor-.*\.js$/, maxBytes: 232_800, maxGzip: 72_400 },
+  // The four budgets below were first written against the tree before the
+  // 2026-09-28 fix pass and are set here against the tree after it, measured
+  // plus 5%: the same day's other changes are what they have to hold.
+  // The lucide icons the screens import, tree-shaken. 13,711 / 4,900, with the
+  // icons the board's states and the recovery controls added.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 14_400, maxGzip: 5_150 },
+  // 5,293 / 2,232, with the board's loading, error and retry states.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_560, maxGzip: 2_350 },
+  // 3,860 / 1,759, with rows typed before they are rendered.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_060, maxGzip: 1_850 },
+  // Online save, which left the entry chunk: a device that never turned it on
+  // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_010, maxGzip: 3_970 },
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_740, maxGzip: 1_990 },
+  // The table's engine, shared by the shell's save repair and the runtime, so
+  // the bundler gives it a chunk of its own. 34,010 / 12,870.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_720, maxGzip: 13_520 },
+  // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
+  { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
+
+/**
+ * What a release must not carry. The debug console -- the case jump, the
+ * unlock-all button, the overlay -- is compiled out of a build that did not ask
+ * for it (`debugBuild`, src/appConfig.js). It used to ship switched off, and a
+ * `VITE_ENABLE_DEBUG_TOOLS=true` left in the build environment would have
+ * switched it on for every visitor with every check green.
+ */
+const MUST_NOT_SHIP = ["debug-case-select", "debug-node-select", "debug-start-node", "unlock-all-cases", "debug-overlay", "DEBUG JUMP"];
 
 /**
  * The cold path: every byte a first visit on a phone waits on before the intro
@@ -70,18 +113,34 @@ try {
 
 const failures = [];
 const reported = [];
+const budgeted = new Set();
 for (const budget of budgets) {
-  const file = files.find((name) => budget.pattern.test(name));
-  if (!file) {
-    failures.push(`no bundle matched ${budget.pattern}`);
-    continue;
+  // Every match, not the first: a second `index-*.js` would otherwise ride in
+  // unmeasured behind the one the list happened to return first.
+  const matches = files.filter((name) => budget.pattern.test(name));
+  if (!matches.length) failures.push(`no bundle matched ${budget.pattern}`);
+  for (const file of matches) {
+    budgeted.add(file);
+    checkBudget(file, budget);
   }
+}
+for (const file of files) {
+  if (!budgeted.has(file)) failures.push(`${file} has no size budget. Every file the build emits into dist/assets needs one.`);
+}
+for (const file of files.filter((name) => name.endsWith(".js"))) {
+  const source = readFileSync(path.join(assetsDir, file), "utf8");
+  for (const marker of MUST_NOT_SHIP) {
+    if (source.includes(marker)) failures.push(`${file} contains "${marker}": the debug tools are in this build.`);
+  }
+}
+
+function checkBudget(file, budget) {
   const assetPath = path.join(assetsDir, file);
   const bytes = statSync(assetPath).size;
   if (bytes > budget.maxBytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.maxBytes} byte budget.`);
   if (budget.compressed) {
     reported.push(`${file}: ${bytes} bytes`);
-    continue;
+    return;
   }
   const gzipBytes = gzipSync(readFileSync(assetPath)).length;
   const gzipBudget = budget.maxGzip ?? Math.ceil(budget.maxBytes * 0.4);

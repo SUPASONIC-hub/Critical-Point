@@ -19,7 +19,9 @@ import os from "node:os";
 import path from "node:path";
 
 export const CHECKS = [
-  "test",
+  // The unit tests, run once, with the coverage floors read off the same run
+  // (scripts/check-coverage.mjs). `npm test` is the same tests without them.
+  "test:coverage",
   "lint",
   "check:pressure",
   "check:endings",
@@ -43,6 +45,7 @@ export const CHECKS = [
   "check:visual-baselines",
   "check:node",
   "check:grants",
+  "check:canon",
 ];
 
 const root = process.cwd();
@@ -55,10 +58,22 @@ if (missing.length) {
 
 const argv = process.argv.slice(2);
 const only = argv.filter((arg) => !arg.startsWith("--"));
+// A name that matches nothing used to select nothing: `verify:static --
+// chekc:types` ran zero checks, printed "0/0 passed" and exited 0.
+const unknown = only.filter((name) => !CHECKS.includes(name));
+if (unknown.length) {
+  console.error(`verify:static has no check named ${unknown.join(", ")}. The checks are: ${CHECKS.join(", ")}.`);
+  process.exit(1);
+}
 const selected = only.length ? CHECKS.filter((name) => only.includes(name)) : CHECKS;
 const jobsArg = argv.find((arg) => arg.startsWith("--jobs="));
 const poolSize = Math.max(1, Number(jobsArg?.slice(7)) || Math.min(selected.length, os.availableParallelism?.() ?? os.cpus().length));
 const inCi = Boolean(process.env.CI);
+// The slowest check takes about half a minute. One that has not finished in
+// five has hung, and without a limit it held the whole run until the job's own
+// timeout, with nothing in the log to say which check it was.
+const timeoutArg = argv.find((arg) => arg.startsWith("--timeout="));
+const timeoutMs = Math.max(1, Number(timeoutArg?.slice(10)) || 300) * 1000;
 
 // What `npm run` would add: the local binaries first on PATH. The key is looked
 // up case-insensitively because Windows spells it `Path`.
@@ -69,6 +84,13 @@ const env = {
   FORCE_COLOR: process.env.FORCE_COLOR ?? (process.stdout.isTTY ? "1" : "0"),
 };
 
+// `shell: true` makes the child a shell, and the check its grandchild; killing
+// the shell alone leaves the check running on Windows.
+function stop(child) {
+  if (process.platform === "win32") spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  else child.kill("SIGKILL");
+}
+
 function run(name) {
   return new Promise((resolve) => {
     const startedAt = Date.now();
@@ -76,13 +98,23 @@ function run(name) {
     const child = spawn(scripts[name], { cwd: root, env, shell: true, stdio: ["ignore", "pipe", "pipe"] });
     child.stdout.on("data", (chunk) => chunks.push(chunk));
     child.stderr.on("data", (chunk) => chunks.push(chunk));
-    const finish = (code) =>
+    let settled = false;
+    const timer = setTimeout(() => {
+      chunks.push(Buffer.from(`\n${name} did not finish within ${timeoutMs / 1000}s and was stopped.`));
+      stop(child);
+      finish(124);
+    }, timeoutMs);
+    const finish = (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
       resolve({
         name,
         code,
         output: Buffer.concat(chunks).toString("utf8").replace(/\r\n?/g, "\n").trimEnd(),
         ms: Date.now() - startedAt,
       });
+    };
     child.on("error", (error) => {
       chunks.push(Buffer.from(String(error)));
       finish(1);
@@ -106,6 +138,11 @@ function report(result) {
   }
   console.log(header);
   if (showBody && result.output) console.log(result.output.replace(/^/gm, "  | "));
+  // A check that passed with something to say still says it: a line it printed
+  // as `warning:` is shown, where the rest of a passing check's output is not.
+  else if (/^warning:/im.test(result.output)) {
+    console.log(result.output.split("\n").filter((line) => /^warning:/i.test(line)).join("\n").replace(/^/gm, "  | "));
+  }
 }
 
 const startedAt = Date.now();

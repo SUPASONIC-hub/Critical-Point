@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   createRunId,
   debugToolsEnabled,
@@ -48,7 +48,6 @@ import {
   getSeasonWear,
   detectPrivacySignals,
   explainResourceTradeoff,
-  limitText,
   makeEmptyScores,
 } from "./gameLogic.js";
 import {
@@ -62,8 +61,11 @@ import { getLeaderboardHeadline } from "./ranking.js";
 import { easyCognitionLabels, simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
+import { LazyScreen } from "./components/LazyScreen.jsx";
 import { appendTraceEvent } from "./state/trace.js";
-import { recordAppError } from "./state/savedState.js";
+import { confirmAction } from "./state/confirmAction.js";
+import { createOpeningResources } from "./state/openingState.js";
+import { focusSceneTitle } from "./state/sceneFocus.js";
 import { useGameSaveState } from "./state/useGameSave.js";
 import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
@@ -91,7 +93,8 @@ import { useResultReport } from "./state/useResultReport.js";
 import { useRuntimeSavedState } from "./state/useRuntimeSavedState.js";
 import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
-import { safeStringify } from "./state/diagnosticUtils.js";
+import { useOverlayScreens } from "./state/useOverlayScreens.js";
+import { useRuntimeErrorCapture } from "./state/useRuntimeErrorCapture.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
 import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
@@ -106,14 +109,14 @@ import {
   getEndingVisualClass,
   getOperatorProfile,
   getOperatorProfiles,
-  getOriginStartEffects,
 } from "./advancedSystems.js";
+import { loadedChunk } from "./state/chunkReload.js";
 
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(({ BoardScreen }) => ({ default: BoardScreen })));
-const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(({ IntroScreen }) => ({ default: IntroScreen })));
-const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(({ ResultScreen }) => ({ default: ResultScreen })));
-const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(({ PlayScreen }) => ({ default: PlayScreen })));
+const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(loadedChunk).then(({ IntroScreen }) => ({ default: IntroScreen })));
+const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
+const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
 const renderNothing = () => null;
 
@@ -124,14 +127,6 @@ const speakerPortraits = {
   "오진우": "/portrait-oh-jinwoo.webp",
   "에코": "/portrait-echo.webp",
 };
-
-let consoleErrorHookBusy = false;
-
-// The error boundary and reportSilentFailure already write their own entries,
-// so skip their console output instead of logging the same failure twice.
-function isAlreadyRecordedConsoleError(text) {
-  return text.startsWith("Critical Point render error") || text.includes("[silent:");
-}
 
 const caseSequence = CASE_SEQUENCE;
 
@@ -145,7 +140,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     saveControls?.resume?.();
   }, [saveControls]);
 
-  const saved = useRuntimeSavedState(initialStartState);
+  const { saved, recoverUnreadableSave } = useRuntimeSavedState(initialStartState);
   const sessionId = useMemo(() => getSessionId(), []);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
@@ -190,8 +185,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
   const [isRetryingTelemetry, setIsRetryingTelemetry] = useState(false);
-  const [showRanking, setShowRanking] = useState(false);
-  const [showBoard, setShowBoard] = useState(false);
+  const { showRanking, showBoard, setShowRanking, setShowBoard } = useOverlayScreens();
   const { localRankingRows, appendLocalRankingRow, clearLocalRankingRows } = useLocalRanking();
   const [isOnline, setIsOnline] = useState(() => globalThis.navigator?.onLine !== false);
   const [telemetryStatus, setTelemetryStatus] = useState({
@@ -204,8 +198,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
   const [lastRecoveredError, setLastRecoveredError] = useState(saved?.lastError ?? null);
-  const [showRecoveryCenter, setShowRecoveryCenter] = useState(() => readStoredValue(RECOVERY_CENTER_STORAGE_KEY, "") === "1");
-  const [showErrorLog, setShowErrorLog] = useState(() => readStoredValue(RECOVERY_CENTER_STORAGE_KEY, "") === "1");
+  // Asked for by the last page (a reset that reloaded), or by a save that could not be read.
+  const openOnRecovery = () => recoverUnreadableSave || readStoredValue(RECOVERY_CENTER_STORAGE_KEY, "") === "1";
+  const [showRecoveryCenter, setShowRecoveryCenter] = useState(openOnRecovery);
+  const [showErrorLog, setShowErrorLog] = useState(openOnRecovery);
   const [localErrorEntries, setLocalErrorEntries] = useState(() => {
     const rawErrorLog = readStoredValue(ERROR_LOG_STORAGE_KEY, "null");
     const localErrorLog = parseErrorLog(rawErrorLog);
@@ -242,6 +238,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     clearLocalErrorLog: persistenceClearLocalErrorLog,
     deleteSaveSlot: persistenceDeleteSaveSlot,
     restoreSaveSlot: persistenceRestoreSaveSlot,
+    restoreSaveBackup,
   } = useAppPersistence({
     state: {
       runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
@@ -257,11 +254,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       setCognition, setProtocolUsed, setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
       setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
       setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setNodeId,
-      setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots,
+      setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
     },
     config: {
-      normalizePlayerName, initialResources, triggerLabels, cognitionLabels, makeEmptyScores,
-      persistSuppressed, onSuppressSaves, formatSaveTime,
+      normalizePlayerName, operatorOrigin, triggerLabels, cognitionLabels, makeEmptyScores,
+      persistSuppressed, onSuppressSaves, onResumeSaves: resumeRuntimeSaves, formatSaveTime,
       debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
       initialDynamics: RUN_INITIAL_STATE,
       resetDecisionDynamics: () => setGauntletRun(RUN_INITIAL_STATE),
@@ -374,6 +371,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   ).length;
   const aftermathNodeId = caseAftermathNodeId(fallbackCaseId);
   const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseReframeCount >= 2;
+  // The card the scene was written to lead with, wherever the deal put it.
+  const leadChoice = node?.choices?.find((choice) => choice.id === node.leadChoiceId) ?? node?.choices?.[0];
   const adaptiveChoice = useMemo(
     () =>
       adaptiveChoiceUnlocked
@@ -381,13 +380,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
             id: `${fallbackCaseId}_adaptive_reframe`,
             label: "앞서 다시 짠 판을 공개 기준으로 삼는다",
             effect: { legitimacy: 7, trust: 5, fatigue: 4 },
-            next: node?.choices?.[0]?.next ?? "result",
+            next: leadChoice?.next ?? "result",
             cognition: { reframing: 2, persistence: 1 },
             adaptive: true,
             requiredAuthority: "FIELD ACCESS",
           }
         : null,
-    [adaptiveChoiceUnlocked, fallbackCaseId, node?.choices],
+    [adaptiveChoiceUnlocked, fallbackCaseId, leadChoice?.next],
   );
   const speakerRelationship = log.reduce(
     (score, entry) => score + (entry.speaker === node?.speaker ? 8 : entry.speaker ? -1 : 0),
@@ -397,12 +396,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     () => getContinuityMemoryChoice({ caseId: fallbackCaseId, nodeId: resolvedNodeId, caseResults }),
     [caseResults, fallbackCaseId, resolvedNodeId],
   );
-  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && node?.choices?.[0]
+  const relationshipChoice = !isResult && log.length >= 2 && speakerRelationship >= 16 && leadChoice
     ? {
         id: `${fallbackCaseId}_relationship_bridge`,
         label: "관계의 증언을 먼저 확보한다",
         effect: { trust: 5, legitimacy: 2, fatigue: 2 },
-        next: node.choices[0].next,
+        next: leadChoice.next,
         cognition: { inference: 1, reframing: 1 },
         branchId: "relationship-bridge",
         requiredAuthority: "FIELD ACCESS",
@@ -454,7 +453,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     !started &&
     currentCase &&
     nodeId &&
-    (isPausedSave || Boolean(saveStatus) || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
+    (isPausedSave || Boolean(lastSavedAt && (log.length > 0 || completedCases.length > 0)));
   const localLeaderboardRows = useMemo(
     () => seasonViewModels.createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
@@ -542,7 +541,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
   const closeRecoveryCenterEvent = useStableEvent(closeRecoveryCenter);
   const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
-  const startCaseEvent = useStableEvent(startCase);
+  const startCaseEvent = useStableEvent(startCase), openCaseEvent = useStableEvent(openCase);
   const resolveGauntletEvent = useStableEvent(resolveGauntlet);
   const resetEvent = useStableEvent(reset), retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
   const startAtNodeEvent = useStableEvent(startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
@@ -614,65 +613,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       cancelled = true;
     };
   }, [isOnline]);
-  useEffect(() => {
-    const handleWindowError = (event) => {
-      const entry = recordAppError(event.error ?? event.message, {}, "window-error");
-      setLastRecoveredError({
-        id: entry.id,
-        occurredAt: entry.occurredAt,
-        source: entry.context.source,
-        message: entry.error.message,
-        currentCase: entry.context.currentCase,
-        nodeId: entry.context.nodeId,
-      });
-      refreshLocalErrorLogEvent();
-    };
-    const handleUnhandledRejection = (event) => {
-      const entry = recordAppError(event.reason, {}, "unhandled-rejection");
-      setLastRecoveredError({
-        id: entry.id,
-        occurredAt: entry.occurredAt,
-        source: entry.context.source,
-        message: entry.error.message,
-        currentCase: entry.context.currentCase,
-        nodeId: entry.context.nodeId,
-      });
-      refreshLocalErrorLogEvent();
-    };
-    const originalConsoleError = console.error;
-    console.error = (...args) => {
-      originalConsoleError.apply(console, args);
-      if (consoleErrorHookBusy) return;
-      const text = args
-        .map((arg) => (arg instanceof Error ? arg.message : typeof arg === "string" ? arg : safeStringify(arg)))
-        .join(" ")
-        .trim();
-      if (!text || isAlreadyRecordedConsoleError(text)) return;
-      consoleErrorHookBusy = true;
-      try {
-        const consoleError = args.find((arg) => arg instanceof Error) ?? new Error(limitText(text, 400));
-        consoleError.name = "ConsoleError";
-        recordAppError(consoleError, {}, "console-error");
-        refreshLocalErrorLogEvent();
-      } catch {
-        // Never let diagnostics break the console itself.
-      } finally {
-        consoleErrorHookBusy = false;
-      }
-    };
-    window.addEventListener("error", handleWindowError);
-    window.addEventListener("unhandledrejection", handleUnhandledRejection);
-    return () => {
-      console.error = originalConsoleError;
-      window.removeEventListener("error", handleWindowError);
-      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
-    };
-  }, [refreshLocalErrorLogEvent]);
+  useRuntimeErrorCapture({ onRecovered: setLastRecoveredError, onLogged: refreshLocalErrorLogEvent });
   useRuntimeOverlayShortcuts({
     decisionReveal,
     setDecisionReveal,
-    showRanking,
-    setShowRanking,
+    screenOpen: showRanking || showBoard,
     showErrorLog,
     closeRecoveryCenter: closeRecoveryCenterEvent,
   });
@@ -683,7 +628,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     isResult,
     nextCaseSignal,
     saveCurrentGame: saveCurrentGameEvent,
-    startCase: startCaseEvent,
+    startCase: openCaseEvent,
     started,
   });
   useEffect(() => {
@@ -696,7 +641,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // A commit whose next scene is the scene it left never re-runs the scene
     // effect below, so the reveal closing is what hands the table back.
     releaseAdvance();
-    window.requestAnimationFrame(() => sceneTitleRef.current?.focus({ preventScroll: true }));
+    window.requestAnimationFrame(() => focusSceneTitle(sceneTitleRef));
   }, [decisionReveal, releaseAdvance]);
 
   const musicModeKey = useMemo(() => {
@@ -725,7 +670,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     const revealOpen = Boolean(decisionReveal);
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
-      if (!revealOpen) sceneTitleRef.current?.focus({ preventScroll: true });
+      if (!revealOpen) focusSceneTitle(sceneTitleRef);
       releaseAdvance();
     });
     // Keyed on where the player is, not on the reveal: the reveal is read once.
@@ -743,9 +688,18 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setSaveStatus("NEW GAME+ 기록 모드로 시작합니다. 숨겨진 권한과 추가 단서를 추적하세요.");
     startGame();
   }
+  /**
+   * A case opened from the result page, by button or by key. Opening the one
+   * that just closed starts it over and throws its record away, so that asks
+   * first: `R` did it on one keypress, while the report was being read.
+   */
+  function openCase(caseId) {
+    if (caseId === currentCase && !confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워집니다.")) return false;
+    startCase(caseId);
+    return true;
+  }
   function startRecoveryRoute() {
-    setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
-    startCaseEvent(currentCase);
+    if (openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
   }
   function startCase(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];
@@ -785,8 +739,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       : introEcho;
     // The origin bonus is the run's opening hand, so it belongs to the season's
     // first case -- which is the 프롤로그 now, not 사건 01.
-    const originEffect = caseId === SEASON_ENTRY_CASE && !previousResult ? getOriginStartEffects(operatorOrigin) : {};
-    const openingResources = applyEffect(previousResult ? applyEffect(initialResources, openingEffect) : initialResources, originEffect);
+    const seasonOpening = caseId === SEASON_ENTRY_CASE && !previousResult;
+    const openingResources = seasonOpening
+      ? createOpeningResources(operatorOrigin)
+      : previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
     appendTraceEvent({
       kind: "case-start",
       caseId,
@@ -811,7 +767,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
     // A closed case keeps its REBOOT board and its relic draft; an abandoned one forfeits its pot.
-    const openingRun = openCaseRun(gauntletRun);
+    // A case that already has a summary is played again as practice for the table.
+    const openingRun = openCaseRun(gauntletRun, { replayOf: caseResults[caseId] ?? null });
     setGauntletRun(openingRun);
     resetEndingSequence();
     setEcho(openingEcho);
@@ -1213,12 +1170,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup: retryStorageCleanupEvent,
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
-    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot,
+    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup,
   });
 
   if (showRanking && !started) {
     return (
-      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+      <LazyScreen quiet>
       <RankingScreen
         Music={AdaptiveMusic}
         gameTitle={GAME_TITLE}
@@ -1231,15 +1188,15 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         triggerLabels={triggerLabels}
         onClose={() => setShowRanking(false)}
       />
-      </Suspense>
+      </LazyScreen>
     );
   }
 
   if (showBoard && !started) {
     return (
-      <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}>
+      <LazyScreen quiet>
         <BoardScreen {...board} Music={AdaptiveMusic} gameTitle={GAME_TITLE} onClose={() => setShowBoard(false)} />
-      </Suspense>
+      </LazyScreen>
     );
   }
   const introView = createIntroViewModel({
@@ -1259,14 +1216,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     },
   });
   if (!started) {
-    return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><IntroScreen view={introView} renderers={{ renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel }} /></Suspense>;
+    return <LazyScreen quiet><IntroScreen view={introView} renderers={{ renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel }} /></LazyScreen>;
   }
   const resultView = createResultView(
-    { AdaptiveMusic, musicModeKey, renderDecisionReveal: renderNothing, renderRecoveryNotice: renderNothing, renderErrorLogPanel: renderNothing, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: startCaseEvent, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, sceneTitleRef: null, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
+    { AdaptiveMusic, musicModeKey, renderDecisionReveal: renderNothing, renderRecoveryNotice: renderNothing, renderErrorLogPanel: renderNothing, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, sceneTitleRef: null, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
     { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats },
   );
   if (isResult) {
-    return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} /></Suspense>;
+    return <LazyScreen quiet><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} /></LazyScreen>;
   }
 
   const playView = createPlayView({
@@ -1279,6 +1236,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
   });
-  return <Suspense fallback={<main className="shell screen-loading" aria-busy="true" />}><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></Suspense>;
+  return <LazyScreen quiet><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></LazyScreen>;
 
 }

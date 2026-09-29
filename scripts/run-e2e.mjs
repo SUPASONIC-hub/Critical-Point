@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createServer } from "node:net";
 import path from "node:path";
 
@@ -15,6 +15,16 @@ import path from "node:path";
  *   --runtime   scripts/runtime-smoke.mjs instead of Playwright
  *   --full      the weekly full-coverage and layout-sweep specs
  *   --season    the continuous season walk (@season-full), case 1 to the ending
+ *   --segments  only the season walk in segments (@season-segment), split
+ *               test by test so `--shard` spreads them
+ *   --skip-segments  the default list without those segments; CI runs the two
+ *               halves as separate jobs
+ *   --webkit    the WebKit project (iPhone 14) instead of the two Chromium
+ *               ones. It is not part of a default run yet: see the note on
+ *               DEFAULT_PROJECTS
+ *   --list      load every spec and list its tests, against no server. A spec
+ *               that cannot be loaded fails here, on the push, instead of in
+ *               the weekly tier where nobody is looking
  *   --docker    re-run this command inside the pinned Playwright container, so
  *               screenshots are rendered by the same fonts and browser build
  *               that CI records baselines with. Needs Docker.
@@ -29,13 +39,15 @@ import path from "node:path";
 const PLAYWRIGHT_IMAGE =
   "mcr.microsoft.com/playwright:v1.62.1-noble@sha256:dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e";
 
-const MODE_FLAGS = ["--full", "--runtime", "--preview", "--season", "--docker"];
+const MODE_FLAGS = ["--full", "--runtime", "--preview", "--season", "--docker", "--segments", "--skip-segments", "--list", "--webkit"];
 const argv = process.argv.slice(2);
 const has = (flag) => argv.includes(flag);
 const runFullCoverage = has("--full");
 const runRuntimeSmoke = has("--runtime");
 const usePreview = has("--preview");
 const runSeasonWalk = has("--season");
+const runSegments = has("--segments");
+const skipSegments = has("--skip-segments");
 const forwardedArgs = argv.filter((arg) => !MODE_FLAGS.includes(arg));
 const hasExplicitTestTarget = forwardedArgs.some((arg) => arg.endsWith(".spec.js") || arg.startsWith("tests/"));
 const root = process.cwd();
@@ -65,6 +77,34 @@ function exitCodeOf(child) {
       resolve(1);
     });
   });
+}
+
+if (has("--list")) {
+  // Every spec in tests/, not the default list: the specs outside it are the
+  // ones this exists for. `full-coverage.spec.js` failed to load for four
+  // weekly runs in a row, and took the layout sweep in the same invocation
+  // down with it, while every push stayed green.
+  const listing = spawnCommand("npx", ["playwright", "test", "--list", ...forwardedArgs], { stdio: ["ignore", "pipe", "pipe"] });
+  let output = "";
+  listing.stdout.on("data", (chunk) => (output += chunk));
+  listing.stderr.on("data", (chunk) => (output += chunk));
+  const code = await exitCodeOf(listing);
+  const total = output.match(/Total: (\d+) tests? in (\d+) files?/);
+  const specs = readdirSync(path.join(root, "tests")).filter((entry) => entry.endsWith(".spec.js"));
+  if (code !== 0 || !total || Number(total[2]) !== specs.length) {
+    // Playwright prints the listing and the load errors together; the listing
+    // is a thousand lines and the error is the five that matter.
+    const listed = new Set([...output.matchAll(/› ([\w.-]+\.spec\.js):/g)].map((match) => match[1]));
+    const unloaded = specs.filter((spec) => !listed.has(spec));
+    console.error(output.split(/\r?\n/).filter((line) => !/^\s+\[[\w-]+\] ›/.test(line)).join("\n").trim());
+    console.error(
+      `\nplaywright --list: ${total ? `${total[2]} of ${specs.length} spec files loaded` : "no listing"}` +
+        `${unloaded.length ? `; not loaded: ${unloaded.join(", ")}` : ""}.`,
+    );
+    process.exit(code || 1);
+  }
+  console.log(`Every spec loads: ${total[1]} tests in ${total[2]} files.`);
+  process.exit(0);
 }
 
 if (has("--docker")) {
@@ -161,10 +201,7 @@ async function waitForServer(url, isRunning, timeoutMs = 30_000) {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
     if (!isRunning()) {
-      throw new Error(
-        `The server exited before it served ${url}. ` +
-          `Something else is probably holding that port -- \`--strictPort\` makes vite exit instead of moving.`,
-      );
+      throw new Error(`The server exited before it served ${url}. What it said on the way out is below.`);
     }
     try {
       const response = await fetch(url);
@@ -209,44 +246,112 @@ function stopProcess(child) {
 const DEFAULT_SPECS = [
   "tests/accessibility.spec.js",
   "tests/audio-preference.spec.js",
+  "tests/board-ranking.spec.js",
+  "tests/cloud-save.spec.js",
   "tests/contrast.spec.js",
   "tests/gauntlet-loop.spec.js",
+  "tests/recovery.spec.js",
   "tests/save-integrity.spec.js",
   "tests/save-resume.spec.js",
   "tests/season-flow.spec.js",
   "tests/visual-regression.spec.js",
 ];
 
+// The specs the production build can run: everything tagged @prod, which
+// enters from the intro or from a seeded save rather than the debug jump. The
+// performance budgets are not in this list: they are timings, and a timing
+// taken while two other workers play the game measures the other workers.
+// `npm run test:performance` runs them alone.
+const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js"];
+
+/**
+ * A default run is the two Chromium projects. The WebKit project was added on
+ * 2026-09-28 and has only been run on a desktop that was busy with other work,
+ * where it could not be told apart from a slow machine: until it has a clean
+ * run behind it, it is asked for by name (`--webkit`, `npm run
+ * test:e2e:webkit`) and runs in the weekly workflow, so that an unproven
+ * browser cannot hold a deploy. An explicit `--project` is taken as given.
+ */
+const hasExplicitProject = forwardedArgs.some((arg) => arg === "--project" || arg.startsWith("--project="));
+const DEFAULT_PROJECTS = hasExplicitProject
+  ? []
+  : has("--webkit")
+    ? ["--project=webkit"]
+    : ["--project=chromium", "--project=mobile-chromium"];
+
+// A test that passed on its retry is a test that failed once. `--retries=1`
+// alone reports it green; the reporter names it in the log, in an annotation
+// and in the job summary.
+const REPORTERS = process.env.CI
+  ? ["--reporter=html,github,list,./tests/helpers/flaky-reporter.js"]
+  : ["--reporter=list,./tests/helpers/flaky-reporter.js"];
+
 function playwrightArgs() {
   if (runFullCoverage) {
-    return ["test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=4", ...forwardedArgs];
+    // Test by test, so `--shard` spreads the per-case walks: a shard by file
+    // would hand one runner all of full-coverage.spec.js.
+    return ["test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=4", "--fully-parallel", ...REPORTERS, ...forwardedArgs];
   }
   if (runSeasonWalk) {
     // One uninterrupted walk, case 1 to the ending, carrying every resource
     // and flag across all the cases. The per-segment walks that run on every
     // push start each segment from a fresh save, so this is the only test that
     // proves the season holds together end to end. Weekly (Full Coverage).
-    return ["test", "tests/season-flow.spec.js", "--grep", "@season-full", "--project=chromium", ...forwardedArgs];
+    return ["test", "tests/season-flow.spec.js", "--grep", "@season-full", "--project=chromium", ...REPORTERS, ...forwardedArgs];
+  }
+  if (runSegments) {
+    // Playwright shards by file unless the run is fully parallel, and the
+    // segments are one file: all eight landed on one of three shards and that
+    // shard took 17 minutes of a 24-minute suite.
+    return [
+      "test", "tests/season-flow.spec.js", "--grep", "@season-segment", "--project=chromium", "--fully-parallel",
+      ...(process.env.CI ? ["--workers=1", "--retries=1"] : []), ...REPORTERS, ...forwardedArgs,
+    ];
   }
   const selection = hasExplicitTestTarget
     ? []
     : usePreview
-      ? [...DEFAULT_SPECS, "tests/performance.spec.js", "--grep", "@prod"]
+      ? [...PREVIEW_SPECS, "--grep", "@prod"]
       : // Raster comparison stays in its own workflow and the continuous season
         // walk in the weekly one; the default run takes the measurements and
         // the per-segment walks.
-        [...DEFAULT_SPECS, "--grep-invert", "@visual|@season-full"];
-  return ["test", ...selection, ...(process.env.CI ? ["--workers=1", "--retries=1"] : []), ...forwardedArgs];
+        [...DEFAULT_SPECS, "--grep-invert", skipSegments ? "@visual|@season-full|@season-segment" : "@visual|@season-full"];
+  return ["test", ...selection, ...DEFAULT_PROJECTS, ...(process.env.CI ? ["--workers=1", "--retries=1", "--fully-parallel"] : []), ...REPORTERS, ...forwardedArgs];
 }
 
+/**
+ * The server's own output is held, not shown: a passing run has nothing in it
+ * worth reading. It used to be thrown away (`stdio: "ignore"`), so a vite that
+ * died on a config error was reported as "something else is probably holding
+ * that port", which it never was.
+ */
+const serverLog = [];
+function holdOutput(stream) {
+  stream?.on("data", (chunk) => {
+    serverLog.push(chunk.toString("utf8"));
+    if (serverLog.length > 400) serverLog.splice(0, serverLog.length - 400);
+  });
+}
+
+// The server this run starts never talks to a real backend. A developer's
+// `.env.local` naming the live project would otherwise win over the address
+// the specs stub (src/telemetry.js reads VITE_SUPABASE_URL first), and the
+// telemetry, ranking and board tests would write to the production database.
+// The dev server reads .env files at start, and an empty variable in the
+// environment takes precedence over them.
+const serverEnv = { VITE_SUPABASE_URL: "", VITE_SUPABASE_ANON_KEY: "", VITE_ENABLE_DEBUG_TOOLS: "" };
+
 const server = usePreview
-  ? spawnCommand("npx", ["vite", "preview", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "ignore" })
-  : spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: "ignore" });
+  ? spawnCommand("npx", ["vite", "preview", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: ["ignore", "pipe", "pipe"], env: serverEnv })
+  : spawnCommand("npx", ["vite", "--host", "127.0.0.1", "--port", String(port), "--strictPort"], { stdio: ["ignore", "pipe", "pipe"], env: serverEnv });
+holdOutput(server.stdout);
+holdOutput(server.stderr);
 let serverRunning = true;
 server.on("exit", () => {
   serverRunning = false;
 });
-server.on("error", () => {
+server.on("error", (error) => {
+  serverLog.push(String(error));
   serverRunning = false;
 });
 
@@ -261,6 +366,8 @@ try {
   exitCode = await exitCodeOf(child);
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
+  const said = serverLog.join("").trim();
+  console.error(said ? `--- ${usePreview ? "vite preview" : "vite"} output ---\n${said}` : "The server printed nothing before it stopped.");
 } finally {
   await stopProcess(server);
 }

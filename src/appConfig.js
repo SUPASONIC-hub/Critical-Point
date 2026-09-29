@@ -18,25 +18,45 @@ export const DEBUG_RENDER_CRASH_KEY = "critical-point-force-render-error";
 export const CLOUD_SAVE_CODE_KEY = "critical-point-cloud-code-v1";
 export const CLOUD_SAVE_ENABLED_KEY = "critical-point-cloud-enabled-v1";
 export const CLOUD_SAVE_SYNC_KEY = "critical-point-cloud-sync-v1";
+/** How long the server keeps a copy after its last upload (`purge_old_telemetry`). */
+export const CLOUD_SAVE_RETENTION_DAYS = 180;
 // 참가자 게시판 (src/state/useBoard.js): the nickname the player publishes on
 // the board, kept on the device so the form is typed once rather than every
 // visit. Nothing else about the board is stored locally -- the posts are the
 // server's copy.
 export const BOARD_NICKNAME_KEY = "critical-point-board-nickname-v1";
+// The id the board files this device's posts under; apart from the telemetry
+// session id on purpose (getBoardWriterId in src/telemetry.js).
+export const BOARD_WRITER_ID_KEY = "critical-point-board-id-v1";
 /** Fired on `globalThis` after every save that reached device storage. */
 export const SAVE_WRITTEN_EVENT = "critical-point:save-written";
+// The raw text of a save this build could not read -- broken JSON, or a schema
+// newer than the build after a rolled-back deploy. Kept until the player has a
+// readable save again, so the next write is not what destroys it.
+export const SAVE_BACKUP_STORAGE_KEY = "critical-point-unreadable-save-v1";
+// sessionStorage: when this tab last reloaded itself because a lazy chunk was
+// gone (a deploy replaced the hashed files under an open tab).
+export const CHUNK_RELOAD_SESSION_KEY = "critical-point-chunk-reload-v1";
+// The player's comfort settings: table time, the reading clock, flashes,
+// single-key shortcuts, the intro's motion (src/state/accessibilitySettings.js).
+export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
  * with ?debug=1. The shell reads it to decide whether the runtime mounts at once;
  * the runtime reads it to draw the console. One definition so the two agree.
+ *
+ * `__CP_DEBUG_BUILD__` is a constant the bundler writes (vite.config.js): true
+ * on the dev server and in a build that asked for the tools, false in a
+ * release. A screen puts it in front of this flag where it draws a debug
+ * panel, because a flag that arrives through the view is one the bundler has
+ * to ship the panel for; the constant lets it drop the panel. Node, which runs
+ * the unit tests, has no such constant and no debug console either.
  */
 export const debugToolsEnabled =
-  (import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
-  Boolean(
-    (import.meta.env ?? {}).DEV &&
-      new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1",
-  );
+  (typeof __CP_DEBUG_BUILD__ === "undefined" ? false : __CP_DEBUG_BUILD__) &&
+  ((import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
+    new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 export const SAVE_SLOT_MAX_ITEMS = 5;
 export const SAVE_SCHEMA_VERSION = 2;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
@@ -149,8 +169,13 @@ export function parseCurrentSavedState(raw, schemaVersion = SAVE_SCHEMA_VERSION)
   }
 }
 
-export function isSavedStateShapeValid(state) {
-  return validateSavedStatePayload(state).length === 0;
+/**
+ * `dynamics: false` is for the pre-start shell, which reads the save without
+ * repairing it: the table record is brought up to date by the runtime's repair,
+ * so an older one is not the shell's to call invalid.
+ */
+export function isSavedStateShapeValid(state, options) {
+  return validateSavedStatePayload(state, options).length === 0;
 }
 
 export function getInvalidSavedStateKeys(state) {
@@ -216,9 +241,18 @@ export function isReplaySession() {
   return replaySession;
 }
 
+// `writeSaveState` puts the revision last, so it can be read off the end of the
+// stored text. A save is ~125KB by the end of a season and every write used to
+// parse all of it to read this one number.
+const SAVE_REVISION_TAIL = /"saveRevision":(\d+)\}\s*$/;
+
 function readSaveRevision() {
+  const raw = readStoredValue(STORAGE_KEY, "null");
+  const tail = typeof raw === "string" ? SAVE_REVISION_TAIL.exec(raw.slice(-40)) : null;
+  if (tail) return Math.max(0, Math.trunc(Number(tail[1]) || 0));
+  // Written by an older build, or by hand: the revision is wherever it is.
   try {
-    const parsed = JSON.parse(readStoredValue(STORAGE_KEY, "null"));
+    const parsed = JSON.parse(raw);
     return Math.max(0, Math.trunc(Number(parsed?.saveRevision) || 0));
   } catch {
     return 0;
@@ -232,16 +266,74 @@ export function adoptSaveRevision() {
 }
 
 /**
+ * A save this build cannot use, as the text storage holds: not JSON, not an
+ * object, or written under a schema newer than the build (a deploy rolled
+ * back). `null` when there is no save or the save reads.
+ */
+export function readUnreadableSave() {
+  const raw = readStoredValue(STORAGE_KEY, null);
+  if (typeof raw !== "string" || raw === "" || raw === "null") return null;
+  return parseCurrentSavedState(raw, SAVE_SCHEMA_VERSION) ? null : raw;
+}
+
+/** Keeps the text of an unusable save where the next write will not reach it. */
+export function backUpUnreadableSave(raw) {
+  if (typeof raw !== "string" || !raw || readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) === raw) return false;
+  return writeStoredValue(SAVE_BACKUP_STORAGE_KEY, raw);
+}
+
+export function hasRecoverySlots() {
+  return (parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots.length ?? 0) > 0;
+}
+
+/**
+ * Makes room for the save when storage is full. The save is the one thing a
+ * player cannot get back, so what is less important goes first: the kept copy
+ * of an unreadable save, every recovery slot but the newest, then that one,
+ * then the error log. A step answers whether it freed anything, and the write
+ * is tried again only when it did.
+ */
+const SAVE_EVICTIONS = [
+  () => readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) !== null && removeStoredValue(SAVE_BACKUP_STORAGE_KEY),
+  () => {
+    const slots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
+    if (slots.length <= 1) return false;
+    return writeStoredValue(
+      SAVE_SLOT_STORAGE_KEY,
+      JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: slots.slice(0, 1) }),
+    );
+  },
+  () => readStoredValue(SAVE_SLOT_STORAGE_KEY, null) !== null && removeStoredValue(SAVE_SLOT_STORAGE_KEY),
+  () => readStoredValue(ERROR_LOG_STORAGE_KEY, null) !== null && removeStoredValue(ERROR_LOG_STORAGE_KEY),
+];
+
+function writeSaveText(text) {
+  if (writeStoredValue(STORAGE_KEY, text)) return { saved: true, evicted: false };
+  for (const evict of SAVE_EVICTIONS) {
+    if (evict() && writeStoredValue(STORAGE_KEY, text)) return { saved: true, evicted: true };
+  }
+  return { saved: false, evicted: false };
+}
+
+/**
  * `isAhead(stored, payload)` narrows what counts as a conflict once storage has
  * moved past this tab. Without it any newer revision refuses the write, which is
  * right for writers that know nothing about the run and wrong for the runtime:
  * a second tab that only opened the game would lock the first.
+ *
+ * `sideChannel` is for a writer that edits the stored save in place and knows
+ * nothing about the run in memory (the error recovery). It writes the way
+ * `force` does, but moves this tab's known revision only when the tab was level
+ * with storage before the write. A tab that was already behind stays behind: a
+ * force write used to bring it level, so the stale tab's next ordinary save
+ * skipped the conflict check and wrote its old run over the other tab's.
  */
-export function writeSaveState(payload, { force = false, isAhead = null } = {}) {
+export function writeSaveState(payload, { force = false, sideChannel = false, isAhead = null } = {}) {
   if (replaySession) return { saved: false, stale: false, replay: true, revision: knownSaveRevision ?? 0 };
   const storedRevision = readSaveRevision();
   if (knownSaveRevision === null) knownSaveRevision = storedRevision;
-  if (!force && storedRevision > knownSaveRevision) {
+  const behind = storedRevision > knownSaveRevision;
+  if (!force && !sideChannel && behind) {
     let stored;
     try {
       stored = JSON.parse(readStoredValue(STORAGE_KEY, "null"));
@@ -251,15 +343,16 @@ export function writeSaveState(payload, { force = false, isAhead = null } = {}) 
     if (!isAhead || isAhead(stored, payload)) return { saved: false, stale: true, revision: storedRevision };
   }
   const revision = Math.max(storedRevision, knownSaveRevision) + 1;
-  const saved = writeStoredValue(STORAGE_KEY, JSON.stringify({ ...payload, saveRevision: revision }));
+  const { saveRevision: _previous, ...run } = payload ?? {};
+  const { saved, evicted } = writeSaveText(JSON.stringify({ ...run, saveRevision: revision }));
   if (saved) {
-    knownSaveRevision = revision;
+    if (!(sideChannel && behind)) knownSaveRevision = revision;
     // The device copy is the save; the cloud copy follows it (src/cloudSave.js).
     if (typeof globalThis.dispatchEvent === "function" && typeof globalThis.CustomEvent === "function") {
       globalThis.dispatchEvent(new CustomEvent(SAVE_WRITTEN_EVENT, { detail: { savedAt: payload?.savedAt ?? "" } }));
     }
   }
-  return { saved, stale: false, revision };
+  return { saved, stale: false, revision, evicted };
 }
 
 /**
@@ -293,7 +386,73 @@ export function getTabToken() {
     return fallbackTabToken;
   }
 }
-const SETTLED_WINDOWS_LIMIT = 400;
+
+/**
+ * One token, one live tab. A browser that copies a tab -- "Duplicate tab", or a
+ * window opened from this one -- copies its sessionStorage too, token included,
+ * and the copy then reads as a reload of the original: it would settle the
+ * window the original is still playing as a bust. So a tab that starts with a
+ * token already in storage asks whether anyone is holding it, and takes a new
+ * one when a live tab answers. A reload asks too and hears nothing, because the
+ * page that held the token is the one that went away.
+ *
+ * The answer is a message round trip, so it is awaited before the runtime
+ * mounts (AppContent) rather than before the first paint.
+ */
+const TAB_TOKEN_CHANNEL = "critical-point-tab-token";
+const TAB_TOKEN_CLAIM_MS = 80;
+let tabTokenClaim = null;
+
+function readStoredTabToken() {
+  try {
+    return globalThis.sessionStorage?.getItem(TAB_TOKEN_SESSION_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function claimTabToken() {
+  if (tabTokenClaim) return tabTokenClaim;
+  const inherited = readStoredTabToken();
+  let channel = null;
+  try {
+    channel = typeof globalThis.BroadcastChannel === "function" ? new globalThis.BroadcastChannel(TAB_TOKEN_CHANNEL) : null;
+  } catch {
+    channel = null;
+  }
+  if (!channel) {
+    tabTokenClaim = Promise.resolve(false);
+    return tabTokenClaim;
+  }
+  let claiming = inherited !== null;
+  tabTokenClaim = new Promise((resolve) => {
+    const settle = (replaced) => {
+      if (!claiming) return;
+      claiming = false;
+      resolve(replaced);
+    };
+    channel.onmessage = (event) => {
+      const { type, token } = event.data ?? {};
+      if (type === "claim" && !claiming && token === readStoredTabToken()) channel.postMessage({ type: "held", token });
+      if (type !== "held" || !claiming || token !== inherited) return;
+      try {
+        globalThis.sessionStorage?.removeItem(TAB_TOKEN_SESSION_KEY);
+      } catch {
+        // No storage to clear: getTabToken falls back to a token of its own.
+      }
+      getTabToken();
+      settle(true);
+    };
+    if (!claiming) {
+      resolve(false);
+      return;
+    }
+    channel.postMessage({ type: "claim", token: inherited });
+    globalThis.setTimeout(() => settle(false), TAB_TOKEN_CLAIM_MS);
+  });
+  return tabTokenClaim;
+}
+export const SETTLED_WINDOWS_LIMIT = 400;
 
 export function readSettledWindowSeeds() {
   try {

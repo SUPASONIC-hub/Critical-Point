@@ -1,4 +1,5 @@
 import { getRankingIntegrity, getRankingLeague } from "./advancedSystems.js";
+import { triggerLabels } from "./gameConstants.js";
 import { subjectParticle } from "./playerLanguage.js";
 
 const rankWeight = { S: 4, A: 3, B: 2, C: 1 };
@@ -7,17 +8,31 @@ function normalizeRank(value) {
   return typeof value === "string" && Object.hasOwn(rankWeight, value) ? value : "C";
 }
 
+const isPlainObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
 function parseSummary(summary) {
-  if (!summary) return {};
-  if (typeof summary === "string") {
-    try {
-      return JSON.parse(summary);
-    } catch {
-      return {};
-    }
+  if (typeof summary !== "string") return isPlainObject(summary) ? summary : {};
+  try {
+    const parsed = JSON.parse(summary);
+    return isPlainObject(parsed) ? parsed : {};
+  } catch {
+    return {};
   }
-  return summary;
 }
+
+/**
+ * A remote row is whatever someone posted: the server types what it publishes
+ * from 20260929010000 on, and rows from before that are as they were sent.
+ * Every field the ranking screen prints is brought to its type here, so no row
+ * can put an object where React expects text -- one such row in the top
+ * hundred took the screen down for every visitor.
+ */
+const toText = (value, fallback = "") => (typeof value === "string" ? value : typeof value === "number" ? String(value) : fallback);
+const toCount = (value) => {
+  const number = typeof value === "number" || typeof value === "string" ? Number(value) : NaN;
+  return Number.isFinite(number) && number > 0 ? number : 0;
+};
+const toTrigger = (value) => (typeof value === "string" && Object.hasOwn(triggerLabels, value) ? value : "responsibility");
 
 /**
  * The short run label, computed the way the `run_tag` column is
@@ -30,19 +45,23 @@ function getRunTag(runId) {
 }
 
 function readScore(row, summary) {
-  const serverScore = row.score === null || row.score === undefined || row.score === "" ? NaN : Number(row.score);
-  return Number.isFinite(serverScore) ? serverScore : Number(summary.burstScore ?? summary.momentumScore);
+  const toScore = (value) => (typeof value === "number" || (typeof value === "string" && value.trim() !== "") ? Number(value) : NaN);
+  const serverScore = toScore(row.score);
+  if (Number.isFinite(serverScore)) return serverScore;
+  const burst = toScore(summary.burstScore);
+  return Number.isFinite(burst) ? burst : toScore(summary.momentumScore);
 }
 
-function normalizeEntry(row = {}) {
+function normalizeEntry(input = {}) {
+  const row = isPlainObject(input) ? input : {};
   const summary = parseSummary(row.summary);
   const rank = normalizeRank(summary.rank);
   const parsedScore = readScore(row, summary);
-  const runId = row.run_id ?? summary.runId ?? "";
-  const runTag = row.run_tag || getRunTag(runId);
-  const reflectionScore = Number(summary.reflectionScore) || 0;
-  const pressureAdaptScore = Number(summary.pressureAdaptScore) || 0;
-  const reframeCount = Number(summary.reframeCount) || 0;
+  const runId = toText(row.run_id) || toText(summary.runId);
+  const runTag = toText(row.run_tag) || getRunTag(runId);
+  const reflectionScore = toCount(summary.reflectionScore);
+  const pressureAdaptScore = toCount(summary.pressureAdaptScore);
+  const reframeCount = toCount(summary.reframeCount);
   const style = reframeCount > 0 && reflectionScore >= pressureAdaptScore
     ? "BOARD BREAKER"
     : pressureAdaptScore >= reflectionScore + 12
@@ -50,35 +69,42 @@ function normalizeEntry(row = {}) {
       : reflectionScore >= 55
         ? "SYSTEM THINKER"
         : "FIELD DECIDER";
-  const isLocal = Boolean(row.local);
+  const isLocal = row.local === true;
   const runLabel = runTag ? `RUN ${runTag}` : "LOCAL RUN";
+  const caseId = toText(row.case_id);
+  const completedAt = toText(row.completed_at);
+  const localName = (toText(row.player_name) || "현재 분석관").slice(0, 24);
   return {
-    id: `${runTag || row.session_code || "local"}-${row.case_id ?? "case"}-${row.completed_at ?? "latest"}`,
+    id: `${runTag || toText(row.session_code) || "local"}-${caseId || "case"}-${completedAt || "latest"}`,
     runId,
     runTag,
     runLabel,
-    sessionCode: row.session_code ?? "LOCAL",
+    sessionCode: toText(row.session_code) || "LOCAL",
     isLocal,
-    name: isLocal ? String(row.player_name || "현재 분석관").slice(0, 24) : "익명 분석관",
+    name: isLocal ? localName : "익명 분석관",
     // Every remote row carries the same anonymous name, so the row is headed by
     // what the run did and identified by its own run label instead.
-    headline: isLocal ? String(row.player_name || "현재 분석관").slice(0, 24) : style,
+    headline: isLocal ? localName : style,
     handle: isLocal ? runLabel : `${runLabel} · 익명`,
-    caseId: row.case_id ?? "case01",
-    caseTitle: row.case_title ?? row.case_id ?? "CASE",
-    completedAt: row.completed_at ?? "",
+    caseId: caseId || "case01",
+    caseTitle: (toText(row.case_title) || caseId || "CASE").slice(0, 80),
+    completedAt,
     rank,
     score: Number.isFinite(parsedScore) ? parsedScore : null,
-    trigger: summary.primary?.[0] ?? "responsibility",
-    averageResponseTime: Number(summary.averageResponseTime) || 0,
+    trigger: toTrigger(Array.isArray(summary.primary) ? summary.primary[0] : undefined),
+    averageResponseTime: toCount(summary.averageResponseTime),
     reframeCount,
+    // The table clock ran this many times slower for this run (the comfort
+    // setting). 1 when the run did not use it, or the server has not been told
+    // to publish the key yet.
+    assistTime: [1.5, 2].includes(Number(summary.assistTime)) ? Number(summary.assistTime) : 1,
     reflectionScore,
     pressureAdaptScore,
-    cognitionScore: Number(summary.cognitionScore) || 0,
+    cognitionScore: toCount(summary.cognitionScore),
     style,
     league: getRankingLeague(style),
-    integrity: getRankingIntegrity({ runId: runId || runTag, completedAt: row.completed_at, summary }),
-    seasonComplete: row.case_id === "season-final" || summary.seasonComplete === true,
+    integrity: getRankingIntegrity({ runId: runId || runTag, completedAt, summary: { rank: toText(summary.rank) } }),
+    seasonComplete: caseId === "season-final" || summary.seasonComplete === true,
     summary,
   };
 }

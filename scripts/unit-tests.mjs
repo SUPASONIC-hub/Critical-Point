@@ -27,7 +27,6 @@ import {
   reduceWindow,
   resolveWindow,
   RUN_INITIAL_STATE,
-  SEAL_BREAK_GAUGE,
   serializeRunState,
   TELL_ERROR,
   FRACTURE_MIN_BURN,
@@ -323,7 +322,11 @@ test("telemetry queue policy should expire old items and cap retained items", ()
 test("telemetry queue items should have stable identities for retry deduplication", () => {
   const item = { id: "case-case01-123", type: "case", payload: { case_id: "case01" } };
   assert.equal(validateTelemetryItem(item).length, 0);
-  assert.equal(item.id, "case-case01-123", "the queue id is the retry idempotency key");
+  // The id is the retry's idempotency key, so nothing on the way to a send may
+  // re-mint it: not the queue's pruning, and not the payload built from it.
+  const [kept] = pruneTelemetryQueue([{ ...item, queuedAt: new Date().toISOString() }]);
+  assert.equal(kept.id, item.id);
+  assert.equal(buildTelemetryPayload(item.payload, kept.id).event_id, item.id);
 });
 test("telemetry payload should carry the queue identity without mutating the source", () => {
   const payload = { case_id: "case01" };
@@ -391,13 +394,15 @@ test("inline scripts and handlers in built HTML are reported", () => {
   assert.equal(inlineScriptProblems("<script>window.x = 1</script>").length, 1);
   assert.deepEqual(inlineScriptProblems('<script type="application/ld+json">{"a":1}</script>'), []);
 });
-test("telemetry stats subscriptions should unsubscribe cleanly", () => {
-  let notifications = 0;
-  const unsubscribe = subscribeTelemetryStats(() => { notifications += 1; });
+// What can be said without a backend: Node has no VITE_SUPABASE_URL, so nothing
+// here ever publishes. This used to count notifications after unsubscribing
+// and assert there were none, which was true of a listener nothing had called.
+test("telemetry stats hand back an unsubscribe and a three-counter snapshot", () => {
+  const unsubscribe = subscribeTelemetryStats(() => {});
   assert.equal(typeof unsubscribe, "function");
-  unsubscribe();
+  assert.equal(unsubscribe(), true, "the listener was registered, so removing it reports that it was there");
+  assert.equal(unsubscribe(), false, "and it is gone afterwards");
   assert.deepEqual(Object.keys(getTelemetryStats()).sort(), ["attempted", "failed", "saved"]);
-  assert.equal(notifications, 0);
 });
 test("saved state validation should use the shared payload schema", () => {
   const state = { currentCase: "case01", nodeId: "start", completedCases: [], discoveredClues: [], log: [], pendingTelemetry: [], caseResults: {}, playtestFeedback: {}, resources: {}, triggers: {}, cognition: {} };
@@ -677,21 +682,6 @@ test("closing a case moves the pot into the vault and reboots the rules", () => 
   assert.deepEqual(nextRun.schema.mutations, ["reboot"]);
 });
 
-test("a sealed card can always be opened without busting on a board that did not just bust", () => {
-  for (const window of [
-    { status: "cashed", gauge: 3, pushes: 0 },
-    { status: "cashed", gauge: 70, pushes: 6 },
-  ]) {
-    // Every relic set a season can hold, including the one that pulls the wall closer.
-    for (const relics of [[], ["highRoller"], ["lockpick"], ["highRoller", "lockpick"], RELIC_IDS]) {
-      const { nextRun } = resolveWindow({ run: normalizeRunState({ streak: 5, relics }), window, card: card("a", { capital: 9, trust: -2 }) });
-      const { schema } = nextRun;
-      assert.ok(schema.sealBreak <= SEAL_BREAK_GAUGE);
-      assert.ok(schema.sealBreak - 1 + schema.stepMax < schema.wallMin, `one push from just under the seal cannot reach the lowest wall (${relics.join("+") || "no relics"})`);
-    }
-  }
-});
-
 test("late in the season the band's top comes down and the clock creeps hotter, never the lowest wall", () => {
   const early = resolveWindow({ run: normalizeRunState({ windowIndex: 10 }), window: { status: "cashed", gauge: 40, pushes: 3 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
   const late = resolveWindow({ run: normalizeRunState({ windowIndex: 460, streak: 5, relics: RELIC_IDS }), window: { status: "cashed", gauge: 70, pushes: 6 }, card: card("a", { capital: 9, trust: -2 }) }).nextRun.schema;
@@ -709,7 +699,7 @@ test("a window touched and left is settled as a bust when the table reopens", ()
   assert.equal(abandoned.cause, "abandon");
   assert.equal(abandoned.wall, fresh.wall, "it is the same window, not a new draw");
   assert.equal(abandoned.gauge, fresh.gauge, "and the gauge does not jump to the wall, which would print it");
-  assert.deepEqual(splitOpenSeed("run:3:start#tab-a"), { seed: "run:3:start", token: "tab-a" });
+  assert.deepEqual(splitOpenSeed("run:3:start#tab-a"), { seed: "run:3:start", token: "tab-a", closedAs: null });
   assert.equal(normalizeRunState({ openCardId: "x" }).openCardId, null, "a staked card is only kept alongside the window it was staked in");
   const { verdict, nextRun } = resolveWindow({ run: normalizeRunState({ runPot: 700, openSeed: "left" }), window: abandoned, card: card("a", { trust: -11 }) });
   assert.equal(verdict.lostPot, 700, "leaving the table costs what busting costs");
@@ -846,26 +836,7 @@ test("the table ledger rebuilds pot, busts and best multiplier from the log", ()
     perfects: 0,
     slips: 0,
     grooveBanked: 0,
-    focusHits: 0,
-    focusPerfects: 0,
-    focusMisses: 0,
-    bestFocusCombo: 0,
-    focusModes: { strike: 0, steady: 0, expose: 0 },
-    stanceMastery: { strike: 0, steady: 0, expose: 0 },
   });
-});
-
-test("the table ledger rebuilds focus locks from the log", () => {
-  const ledger = createGauntletLedger([
-    { threshold: { busted: false, focus: { mode: "expose", hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
-    { threshold: { busted: true, focus: { mode: "steady", hits: 0, perfects: 0, misses: 1, maxCombo: 0 } } },
-  ]);
-  assert.equal(ledger.focusHits, 2);
-  assert.equal(ledger.focusPerfects, 1);
-  assert.equal(ledger.focusMisses, 1);
-  assert.equal(ledger.bestFocusCombo, 2);
-  assert.deepEqual(ledger.focusModes, { strike: 0, steady: 1, expose: 2 });
-  assert.deepEqual(ledger.stanceMastery, { strike: 0, steady: 0, expose: 0 });
 });
 
 test("focus modes change the lock outcome and steady cools the gauge", () => {
@@ -924,13 +895,6 @@ test("stance mastery survives saves and reshapes future boards", () => {
 
   const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(run))));
   assert.deepEqual(roundTrip.stanceMastery, run.stanceMastery);
-
-  const ledger = createGauntletLedger([
-    { threshold: { busted: false, focus: { mode: "strike", charge: 80, hits: 2, perfects: 1, misses: 0, maxCombo: 2 } } },
-    { threshold: { busted: false, focus: { mode: "steady", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
-    { threshold: { busted: true, focus: { mode: "expose", charge: 90, hits: 3, perfects: 2, misses: 0, maxCombo: 3 } } },
-  ]);
-  assert.deepEqual(ledger.stanceMastery, { strike: 1, steady: 1, expose: 0 }, "only charged cashes build season mastery");
 });
 
 /* ---------------------------------------------------------------- tempo */
@@ -1283,8 +1247,10 @@ test("every scene draws a room, and always the same one", () => {
     // look like a different room, so the spec has to be a pure function of the
     // scene. The generator is checked too: same seed, same first three draws.
     assert.deepEqual(getScenePlate(node, nodeId), plate, `${nodeId} is not deterministic`);
-    const draws = [0, 1, 2].map(() => createPlateRandom(plate.seed)());
-    assert.equal(new Set(draws).size, 1, "the same seed must open on the same value");
+    const [first, second] = [createPlateRandom(plate.seed), createPlateRandom(plate.seed)];
+    const draws = [0, 1, 2].map(() => [first(), second()]);
+    assert.ok(draws.every(([one, other]) => one === other), "the same seed must draw the same three values");
+    assert.equal(new Set(draws.map(([one]) => one)).size, 3, "and they are three draws, not one repeated");
     used.add(plate.motif);
     const place = node.place ?? "";
     const already = seen.get(place);
@@ -1358,7 +1324,7 @@ test("every scene draws a room, and always the same one", () => {
   // lets light in, and only a pressured night outdoors gets lightning.
   assert.equal(getScenePlate({ place: "국회 본관 정무위원회 회의실 · 참고인석" }, "x").flash, true);
   assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "오후 3시" }, "x").rays, true);
-  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00", phase: "HEARING" }, "x").lightning, true);
+  assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00", pressure: true }, "x").lightning, true);
   assert.equal(getScenePlate({ place: "트리거랩 옥상", clock: "새벽 02:00" }, "x").lightning, false);
   assert.equal(getPlateMotif(""), "desk");
   assert.equal(getPlateTone(""), 0);

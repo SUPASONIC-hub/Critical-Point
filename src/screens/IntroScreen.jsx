@@ -2,11 +2,13 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
+import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
+import { loadedChunk } from "../state/chunkReload.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -28,7 +30,7 @@ const tickerRun = (
 let gameRuntimeModule = null;
 
 export function loadGameRuntime() {
-  gameRuntimeModule ??= import("../GameRuntime.jsx").catch((error) => {
+  gameRuntimeModule ??= import("../GameRuntime.jsx").then(loadedChunk).catch((error) => {
     gameRuntimeModule = null;
     throw error;
   });
@@ -192,7 +194,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   <source srcSet={heroArt.wide} type="image/webp" />
                   <img
                     src="/triggerlab-key-visual.jpg"
-                    alt="해질 녁 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
+                    alt="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
                     width="1672"
                     height="941"
                     fetchPriority="high"
@@ -219,7 +221,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <MessagesSquare size={15} />
                     게시판
                   </button>
-                  {debugToolsEnabled && (
+                  {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
                     <button
                       className="ghost intro-ranking-button"
                       type="button"
@@ -325,12 +327,12 @@ export function IntroScreen({ view, renderers = {} }) {
                 NEW GAME+ 시작
               </button>
             )}
-            {debugToolsEnabled && (
+            {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
               <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
                 테스트용 전체 케이스 열기
               </button>
             )}
-            {debugToolsEnabled && (
+            {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
             <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
               <div>
                 <span>DEBUG JUMP</span>
@@ -487,6 +489,13 @@ export function IntroScreen({ view, renderers = {} }) {
           )}
           <details className="intro-drawer">
             <summary>
+              <span>ACCESSIBILITY</span>
+              <h2>편의 설정</h2>
+            </summary>
+            <AccessibilityPanel />
+          </details>
+          <details className="intro-drawer">
+            <summary>
               <span>SEASON 1</span>
               <h2>생각을 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
             </summary>
@@ -583,7 +592,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>플레이테스트 데이터 제공 동의</b>
                 <small>
                   {telemetryEnabled
-                    ? "케이스 결과, 선택 로그, 응답 시간, 보낸 피드백이 연구용으로 저장됩니다. 이름은 원격 저장하지 않습니다."
+                    ? "케이스 결과, 선택 로그, 응답 시간, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다."
                     : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
@@ -672,10 +681,13 @@ export function IntroScreen({ view, renderers = {} }) {
                 if (canOpenCase) startCaseRun(caseItem.id);
               }
               return (
-                <GuardedButton
-                  type="button"
+                /* A card is an article with a heading, and the heading holds
+                   the one control: a <button> may only hold phrasing content,
+                   and a card built as one button put a heading, a paragraph
+                   and a block inside it. The button's ::after covers the card,
+                   so the whole card is still what a pointer presses. */
+                <article
                   key={caseItem.id}
-                  blocked={!canOpenCase}
                   /* The file number the row is stamped with. It is decoration
                      drawn from a ::before, so the label the button announces is
                      still the aria-label below and not a second reading of the
@@ -683,15 +695,13 @@ export function IntroScreen({ view, renderers = {} }) {
                      the list: the 프롤로그 sits in front of 사건 01, so a
                      position counter stamped 사건 01 with "06". */
                   data-index={caseDisplayCode(caseItem.id)}
-                  aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
-                  className={
-                    caseItem.status === "PLAYING" || caseItem.status === "OPEN"
-                      ? "case-card active-case"
-                      : caseItem.status === "COMPLETE"
-                        ? "case-card complete-case"
-                        : "case-card"
-                  }
-                  onClick={openCaseFromCard}
+                  className={[
+                    "case-card",
+                    caseItem.status === "PLAYING" || caseItem.status === "OPEN" ? "active-case" : caseItem.status === "COMPLETE" ? "complete-case" : "",
+                    canOpenCase ? "" : "locked-case",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   <div>
                     <span>{caseItem.label}</span>
@@ -700,7 +710,17 @@ export function IntroScreen({ view, renderers = {} }) {
                       {getCaseStatusText(caseItem.status)}
                     </small>
                   </div>
-                  <h2>{simplifyPlayerText(caseItem.title)}</h2>
+                  <h2>
+                    <GuardedButton
+                      type="button"
+                      className="case-card-open"
+                      blocked={!canOpenCase}
+                      aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
+                      onClick={openCaseFromCard}
+                    >
+                      {simplifyPlayerText(caseItem.title)}
+                    </GuardedButton>
+                  </h2>
                   <b>{simplifyPlayerText(caseItem.trigger)}</b>
                   <p>{simplifyPlayerText(caseItem.summary)}</p>
                   {caseItem.status === "LOCKED" && (
@@ -712,7 +732,7 @@ export function IntroScreen({ view, renderers = {} }) {
                       {savedResult.reframeCount}
                     </small>
                   )}
-                </GuardedButton>
+                </article>
               );
             })}
           </div>

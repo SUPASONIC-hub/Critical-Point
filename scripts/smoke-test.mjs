@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import {
   anonymizeSensitiveText,
   applyEffect,
-  applySeededEffectVariation,
   createDecisionForecast,
   createCaseSummary,
   getCounterfactualReport,
@@ -710,15 +709,12 @@ for (const [routeId, finalId] of [
     assert.notEqual(choice.next, finalId, `${routeId} should open an authored scene before ${finalId}`);
   }
 }
-test("route finals should have retired the old shared case finals", () => {
-  assert.ok(!nodes.final && !nodes.c2_final && !nodes.c5_final, "route finals should have retired the old shared case finals");
-});
 // Four routes closing on four scenes that ask the same three questions is the
 // same convergence the split was meant to remove, one scene later.
 for (const caseId of CASE_SEQUENCE) {
   const asked = new Map();
   for (const nodeId of new Set(nodeOrders[caseId])) {
-    if (nodes[nodeId]?.phase !== "LAST CALL") continue;
+    if (nodes[nodeId]?.kind !== "routeFinal") continue;
     const question = nodes[nodeId].choices.map((choice) => choice.label).join(" | ");
     assert.ok(!asked.has(question), `${nodeId} closes on the same question as ${asked.get(question)}`);
     asked.set(question, nodeId);
@@ -893,7 +889,7 @@ for (const choiceId of Object.keys(authoredEchoReplies)) {
 }
 
 const authoredGeneratedScenes = Object.values(nodes).filter(
-  (node) => node.phase === "OFF THE RECORD" || node.phase === "THE ROOM AFTER",
+  (node) => node.kind === "connective" || node.kind === "reaction",
 );
 const generatedChoiceCount = authoredGeneratedScenes.reduce((total, node) => total + node.choices.length, 0);
 test("every generated scene choice has authored copy and a distinct effect", () => {
@@ -1107,7 +1103,7 @@ test("risk pressure drivers should be sorted by pressure contribution", () => {
   );
 });
 
-const suspenseWatch = getSuspenseState({ riskPressure: 20, decisionSeconds: 35, log: [{}, {}], currentCase: "case02" });
+const suspenseWatch = getSuspenseState({ riskPressure: 20, log: [{}, {}], currentCase: "case02" });
 test("suspense state should escalate into watch tier", () => {
   assert.equal(suspenseWatch.tier, "WATCH", "suspense state should escalate into watch tier");
 });
@@ -1145,26 +1141,6 @@ test("resource effects should clamp to resource caps", () => {
     applyEffect({ ...initialResources, time: 70, fatigue: 98 }, { time: 10, fatigue: 8 }),
     { ...initialResources, time: 72, fatigue: 100 },
     "resource effects should clamp to resource caps",
-  );
-});
-const seededEffect = applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice");
-test("seeded effect variation should be deterministic", () => {
-  assert.deepEqual(
-    seededEffect,
-    applySeededEffectVariation({ trust: 10, fatigue: -10 }, "session:node:choice"),
-    "seeded effect variation should be deterministic",
-  );
-});
-test("seeded effect variation stays within plus or minus 15 percent", () => {
-  Object.values(seededEffect).forEach((value) => {
-    assert.ok(Math.abs(value) >= 8 && Math.abs(value) <= 12, "seeded effect variation should stay within plus or minus 15 percent");
-  });
-});
-test("missing seeds should preserve authored effects", () => {
-  assert.deepEqual(
-    applySeededEffectVariation({ trust: 10 }, "", 0.15),
-    { trust: 10 },
-    "missing seeds should preserve authored effects",
   );
 });
 

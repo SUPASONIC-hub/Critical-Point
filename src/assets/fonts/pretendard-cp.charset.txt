@@ -553,6 +553,7 @@ ae7b 깻
 aebc 꺼
 aebe 꺾
 aecd 껍
+aecf 껏
 aed0 껐
 aed1 껑
 aed8 께
@@ -561,6 +562,7 @@ af08 꼈
 af2c 꼬
 af2d 꼭
 af3c 꼼
+af3d 꼽
 af42 꽂
 af43 꽃
 af49 꽉
@@ -606,6 +608,7 @@ b0ac 났
 b0ad 낭
 b0ae 낮
 b0af 낯
+b0b1 낱
 b0b3 낳
 b0b4 내
 b0b8 낸
@@ -665,6 +668,7 @@ b290 느
 b294 는
 b298 늘
 b299 늙
+b2a0 늠
 b2a5 능
 b2a6 늦
 b2ac 늬
@@ -681,6 +685,7 @@ b2e6 닦
 b2e8 단
 b2eb 닫
 b2ec 달
+b2ed 닭
 b2ee 닮
 b2f3 닳
 b2f4 담
@@ -1513,6 +1518,7 @@ d0e0 탠
 d0ec 탬
 d0ed 탭
 d0f0 탰
+d0f1 탱
 d130 터
 d131 턱
 d134 턴

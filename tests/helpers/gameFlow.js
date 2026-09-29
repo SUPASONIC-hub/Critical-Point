@@ -1,9 +1,14 @@
-import { expect } from "@playwright/test";
-import { nodes } from "../../src/gameData.js";
+import { expect } from "./network.js";
+import { SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
+import { getCaseBranchNodes, nodes, reframeRouteNodes } from "../../src/gameData.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
-export const ACTION_TIMEOUT_MS = 60_000;
-export const TRANSITION_TIMEOUT_MS = 60_000;
+// Both sit under the test timeout (playwright.config.js, 60s). At 60s each the
+// test died first, with Playwright's own "Test timeout exceeded", and the
+// message `clickElement` had ready -- which control, in which scene -- was never
+// printed.
+export const ACTION_TIMEOUT_MS = 20_000;
+export const TRANSITION_TIMEOUT_MS = 30_000;
 
 export async function clickElement(locator, label) {
   try {
@@ -11,6 +16,39 @@ export async function clickElement(locator, label) {
   } catch (error) {
     const message = String(error).split("\n")[0];
     throw new Error(`${label} click failed: ${message}`, { cause: error });
+  }
+}
+
+/**
+ * A pointer click on a control that does not hold still. The briefing's and
+ * the draft's buttons breathe, and in WebKit Playwright never finds them
+ * "stable", so an ordinary click() waits out its timeout. The checks click()
+ * would have made are made here instead -- visible, enabled, and the thing
+ * under the pointer -- and then the pointer is pressed where the control is. A
+ * control that is covered, or that does not take pointer events, fails with
+ * the name of what the pointer would have hit.
+ */
+export async function clickThroughMotion(locator, label) {
+  await expect(locator, `${label} is not visible`).toBeVisible({ timeout: ACTION_TIMEOUT_MS });
+  await expect(locator, `${label} is disabled`).toBeEnabled({ timeout: ACTION_TIMEOUT_MS });
+  // Not scrollIntoViewIfNeeded(): that waits for stillness too.
+  await locator.evaluate((element) => element.scrollIntoView({ block: "nearest", inline: "nearest" }));
+  await expect
+    .poll(
+      () =>
+        locator.evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+          if (hit && (hit === element || element.contains(hit))) return "";
+          return hit ? `the pointer lands on <${hit.tagName.toLowerCase()} class="${hit.getAttribute("class") ?? ""}">` : "the control is off screen";
+        }),
+      { message: `${label} cannot be pressed`, timeout: 5_000 },
+    )
+    .toBe("");
+  try {
+    await locator.click({ force: true, timeout: ACTION_TIMEOUT_MS });
+  } catch (error) {
+    throw new Error(`${label} click failed: ${String(error).split("\n")[0]}`, { cause: error });
   }
 }
 
@@ -65,10 +103,12 @@ export async function dismissProtocolBreach(page) {
   const gate = page.locator(TABLE_GATES).first();
   for (let pass = 0; pass < 4 && (await gate.isVisible()); pass += 1) {
     const cleared = await gate.getAttribute("data-testid");
-    // dispatchEvent, not click(): the draft and the briefing slide in and keep
-    // animating, so Playwright never finds the button "stable" and a real click
-    // waits forever -- which is why this used to be an evaluate(el => el.click()).
-    await gate.dispatchEvent("click");
+    // The pointer, where it lands. This was a synthetic event for a long time,
+    // because the gates keep moving and click() waits for stillness -- but a
+    // synthetic event reaches a button that is covered, off screen or not
+    // taking pointer events. Every test passes through here, so every test
+    // would have passed with the gate unusable.
+    await clickThroughMotion(gate, `table gate ${cleared}`);
     // Settled means: the gate just pressed is gone, and either the next one
     // is up or the table is live. It used to be a fixed 120ms pause, which was
     // either wasted or -- on a slow frame -- not enough for the briefing to
@@ -177,45 +217,59 @@ export async function chooseFirstAvailableChoice(page) {
   if (await decisionNext.isVisible()) await decisionNext.click();
 }
 
+/**
+ * Where committing `choice` sends the run, as useChoiceCommit decides it.
+ *
+ * A 판을 다시 짠다 card does not follow its own `next`. Cashed (and the helper
+ * always cashes), the first one that opens a route in a case jumps to the
+ * case's authored hidden route (`reframeRouteNodes`), or -- in a case without
+ * one, or when the scene already is that route -- to the far side of the
+ * case's first fork. A later reframe in the same case, or one with nowhere to
+ * go, falls back to `choice.next`. "In the same case" is counted the way the
+ * runtime counts it: log entries with `reframeOpenedRoute` whose caseId is the
+ * run's case, or the season's entry case when the save names none it knows.
+ */
+function reframeTargetFor(caseId, fromNodeId) {
+  const dramaticRoute = reframeRouteNodes[caseId];
+  if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
+  const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
+  if (!branch || branch.nodeId === fromNodeId) return null;
+  return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
+}
+
+function expectedNextNode(saved, choice) {
+  if (choice.type !== "reframe" || !saved) return choice.next;
+  const currentCase = saved.currentCase;
+  const countedCase = seasonCasesBase.some((caseItem) => caseItem.id === currentCase) ? currentCase : SEASON_ENTRY_CASE;
+  const reframesOpened = (saved.log ?? []).filter((entry) => entry?.reframeOpenedRoute && entry.caseId === countedCase).length;
+  if (reframesOpened > 0) return choice.next;
+  return reframeTargetFor(currentCase, saved.nodeId) ?? choice.next;
+}
+
 export async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await dismissProtocolBreach(page);
-    if (choice.type === "reframe") {
-      await page.locator(".gx-card-wild").click();
-      await cashStakedCard(page);
-    } else {
-      const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "reframe").length - 1;
-      await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
-      try {
-        await cashStakedCard(page);
-      } catch (error) {
-        if (await waitUntilVisible(page.getByTestId("decision-next"), 1_000)) break;
-        if (attempt === 1) throw error;
-        continue;
-      }
-    }
-
-    if (await page.locator(".result-page, .ending-reveal").first().isVisible()) return;
-    if (await waitUntilVisible(page.getByTestId("decision-next"))) break;
-    if (attempt === 1) throw new Error(`${scene.title}/${choice.id} did not open decision reveal`);
+  await dismissProtocolBreach(page);
+  // Read before the commit rewrites it: the jump depends on the log as it
+  // stood when the card was cashed.
+  const nextNodeId = expectedNextNode(await readJsonStorage(page, TEST_STORAGE_KEYS.save), choice);
+  if (choice.type === "reframe") {
+    await clickElement(page.locator(".gx-card-wild"), `${scene.title}/${choice.id}`);
+  } else {
+    const fixedIndex = scene.choices.slice(0, choiceIndex + 1).filter((candidate) => candidate.type !== "reframe").length - 1;
+    await clickElement(page.locator(".choices .choice").nth(fixedIndex), `${scene.title}/${choice.id}`);
   }
+  // One attempt. A second one used to follow when the reveal did not open,
+  // and it clicked the same card again -- which unstakes it.
+  await cashStakedCard(page);
+  const reveal = page.getByTestId("decision-next");
+  const closed = page.locator(".result-page, .ending-reveal").first();
+  await expect(reveal.or(closed).first(), `${scene.title}/${choice.id} did not open the decision reveal`).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  if (!(await reveal.isVisible())) return;
 
-  try {
-    await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
-  } catch (error) {
-    const transitioned = await page.waitForFunction(
-      ({ nextNodeId }) => {
-        const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
-        return saved?.nodeId === nextNodeId || Boolean(document.querySelector(".result-page, .ending-reveal"));
-      },
-      { nextNodeId: choice.next },
-      { timeout: 2_000 },
-    ).then(() => true).catch(() => false);
-    if (!transitioned) throw error;
-    await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
-    return;
-  }
+  // A click that fails is a failure. It used to be forgiven when the save had
+  // moved on anyway, which is the case worth hearing about: the run advanced
+  // and the button the player advances it with could not be pressed.
+  await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
 
   await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
   await page.waitForFunction(
@@ -228,7 +282,7 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
         Boolean(document.querySelector(".result-page, .ending-reveal"))
       );
     },
-    { nextNodeId: choice.next, nextTitle: nodes[choice.next]?.title ?? "" },
+    { nextNodeId, nextTitle: nodes[nextNodeId]?.title ?? "" },
     { timeout: TRANSITION_TIMEOUT_MS },
   );
 }

@@ -1,18 +1,26 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import {
   CASE_RESULT_NODES,
   CASE_SEQUENCE,
   CASE_START_NODES,
+  caseNodePrefix,
   caseOpeningRoutes,
   cognitionLabels,
+  echoReplies,
+  fallbackCopy,
   reframeRouteNodes,
   getContinuityMemoryChoice,
   initialResources,
+  isResourceGain,
   nodeOrders,
   nodes,
   triggerLabels,
 } from "../src/gameData.js";
-import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getOutcomeChoiceId } from "../src/gameLogic.js";
+import { characterProfileCollisions, getCharacterProfile } from "../src/gameDialogue.js";
+import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getOutcomeChoiceId, getRouteMemory, REFRAME_COGNITION, REFRAME_EFFECT } from "../src/gameLogic.js";
+import { pressureBeats } from "../src/nodes/sceneBuild.js";
+import { sceneContext } from "../src/nodes/sceneContext.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
 import { case01Nodes } from "../src/nodes/case01.js";
 import { case02Nodes } from "../src/nodes/case02.js";
@@ -110,24 +118,116 @@ for (const [caseId, routes] of Object.entries(caseOpeningRoutes)) {
  * every orphan was still a valid scene. So walk each case the way a player
  * does and fail on anything the walk cannot reach or cannot leave.
  */
-function getCaseEntryNodes(caseId) {
-  const entries = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})];
-  // A first successful free-text answer jumps to the case's hidden route, and
-  // a previous case's log can add a memory choice on the opening screen. Both
-  // are real ways in, so neither counts as an orphan.
-  if (reframeRouteNodes[caseId]) entries.push(reframeRouteNodes[caseId]);
+const MEMORY_KINDS = ["evidenceTurn", "systemRoute", "routeSplit"];
+const onlyMemory = (kind) => Object.fromEntries(MEMORY_KINDS.map((key) => [key, key === kind]));
+
+/**
+ * What a case can hand the next one, read the way the runtime reads it: every
+ * decision the case offers, put through `getRouteMemory` one at a time.
+ *
+ * A route split is a walk down a route that is not the hidden one, and only
+ * 사건 01-05 and the finale have such routes -- every case since closes on one
+ * line. So `routeLabel` and `routeNext` can be reached in the five cases that
+ * follow 사건 01-05, and in no other.
+ */
+const memoryKindsByCase = {};
+function walkMemoryKinds(caseId, memoryEntries = []) {
+  const kinds = new Set();
+  const seen = new Set();
+  const queue = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})].map((nodeId) => ({ nodeId, log: onlyMemory(null) }));
+  while (queue.length > 0) {
+    const { nodeId, log } = queue.shift();
+    const state = `${nodeId}|${MEMORY_KINDS.map((kind) => Number(log[kind])).join("")}`;
+    if (seen.has(state)) continue;
+    seen.add(state);
+    if (nodeId === CASE_RESULT_NODES[caseId]) {
+      // The card the next case deals reads the log in this order.
+      const kind = MEMORY_KINDS.find((candidate) => log[candidate]);
+      if (kind) kinds.add(kind);
+      continue;
+    }
+    if (!nodes[nodeId]) continue;
+    const cards = [...nodes[nodeId].choices, ...memoryEntries.filter((entry) => entry.from.has(nodeId)).map((entry) => entry.card)];
+    for (const choice of cards) {
+      const reframed = choice.type === "reframe" && Boolean(reframeRouteNodes[caseId]) && nodeId !== reframeRouteNodes[caseId];
+      const entry = getRouteMemory([{ nodeId, choiceId: choice.id, reframeOpenedRoute: reframed }]);
+      queue.push({
+        nodeId: reframed ? reframeRouteNodes[caseId] : choice.next,
+        log: Object.fromEntries(MEMORY_KINDS.map((kind) => [kind, log[kind] || entry[kind]])),
+      });
+    }
+  }
+  return kinds;
+}
+
+/**
+ * The card a case's opening deals because of what the previous case did.
+ *
+ * This asked `getContinuityMemoryChoice` with a `log`, which the function
+ * stopped reading when it moved to the case summaries: every call came back
+ * null, a null is a legal answer, and no memory card's target was checked from
+ * that day on. It is asked with `caseResults` now, once per kind of memory,
+ * and the count of cards it actually read is asserted below.
+ */
+const memoryCards = [];
+const unreachableMemoryFields = [];
+function getMemoryCards(caseId) {
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
-  for (const previousEntry of [
-    { nodeId: "prev_evidence_turn", choiceId: "prev_evidence_turn" },
-    { reframeOpenedRoute: true, nodeId: "prev", choiceId: "prev" },
-    { nodeId: "prev_route_split", choiceId: "prev" },
-  ]) {
-    const memoryChoice = getContinuityMemoryChoice({
+  if (!previousCaseId) return [];
+  return MEMORY_KINDS.flatMap((kind) => {
+    const card = getContinuityMemoryChoice({
       caseId,
       nodeId: CASE_START_NODES[caseId],
-      log: [{ caseId: previousCaseId, ...previousEntry }],
+      caseResults: { [previousCaseId]: { routeMemory: onlyMemory(kind) } },
     });
-    if (memoryChoice?.next) entries.push(memoryChoice.next);
+    if (!card) return [];
+    return [{ caseId, kind, card, reachable: memoryKindsByCase[previousCaseId].has(kind) }];
+  });
+}
+// In season order, because the memory card a case is dealt is itself a way
+// through that case.
+for (const caseId of CASE_SEQUENCE) {
+  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+  const openings = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
+  const dealt = previousCaseId ? getMemoryCards(caseId).filter((entry) => entry.reachable).map((entry) => ({ ...entry, from: openings })) : [];
+  memoryKindsByCase[caseId] = walkMemoryKinds(caseId, dealt);
+}
+for (const caseId of CASE_SEQUENCE) {
+  for (const entry of getMemoryCards(caseId)) {
+    const { kind, card, reachable } = entry;
+    memoryCards.push(entry);
+    if (!reachable) unreachableMemoryFields.push(`${caseId}.${kind}`);
+    if (!isNonEmptyString(card.label)) failures.push(`${caseId} has a ${kind} memory card with no label`);
+    if (!nodes[card.next]) failures.push(`${caseId}'s ${kind} memory card leads to ${card.next}, which the graph does not have`);
+    else if (nodes[card.next].caseId !== caseId) failures.push(`${caseId}'s ${kind} memory card leads to ${card.next}, a scene of ${nodes[card.next].caseId}`);
+    checkNumberMap(`${caseId}/${card.id}`, "effect", card.effect, resourceKeys);
+    checkNumberMap(`${caseId}/${card.id}`, "cognition", card.cognition, cognitionKeys);
+  }
+}
+if (memoryCards.length === 0) failures.push("no memory card was read: getContinuityMemoryChoice answered null for every case");
+// A card no run can be dealt is copy nobody reads, and a kind of memory the
+// previous case can hand on with no card for it is a card nobody wrote.
+for (const field of unreachableMemoryFields) failures.push(`${field}: the previous case never hands this memory on; delete the card's label and next from the plan`);
+// 사건 01 deals no memory card: what the 프롤로그 handed on picks which of its
+// three openings it starts on (caseOpeningRoutes.case01).
+const OPENS_ON_WHAT_WAS_HANDED_ON = new Set(["case01"]);
+CASE_SEQUENCE.forEach((caseId, index) => {
+  const previousCaseId = CASE_SEQUENCE[index - 1];
+  if (!previousCaseId || OPENS_ON_WHAT_WAS_HANDED_ON.has(caseId)) return;
+  const written = new Set(getMemoryCards(caseId).map((entry) => entry.kind));
+  for (const kind of memoryKindsByCase[previousCaseId]) {
+    if (!written.has(kind)) failures.push(`${caseId}: ${previousCaseId} can hand on ${kind}, and the plan deals no card for it`);
+  }
+});
+
+function getCaseEntryNodes(caseId) {
+  const entries = [CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})];
+  // 판을 다시 짠다 jumps to the case's hidden route, and what the previous case
+  // did can add a memory card on the opening screen. Both are real ways in, so
+  // neither counts as an orphan.
+  if (reframeRouteNodes[caseId]) entries.push(reframeRouteNodes[caseId]);
+  for (const { card, reachable } of getMemoryCards(caseId)) {
+    if (reachable) entries.push(card.next);
   }
   return entries.filter(Boolean);
 }
@@ -276,8 +376,7 @@ CASE_SEQUENCE.forEach((caseId, index) => {
  * it did so by overwriting the `next` each file had written: 880 of the 1,488
  * `next:` values in `src/nodes/` pointed somewhere no run ever went. Those are
  * gone, and a choice whose route a generator decides carries no `next` at all.
- * A `next` that is written must be the one the built graph uses. Scenes a route
- * plan retires are skipped: they never enter the graph.
+ * A `next` that is written must be the one the built graph uses.
  */
 const authoredSources = [
   ...[case01Nodes, case02Nodes, case03Nodes, case04Nodes, case05Nodes, case06Nodes, case07Nodes, case08Nodes, case09Nodes, case10Nodes, case11Nodes, finalCaseNodes]
@@ -302,5 +401,275 @@ for (const { owner, table } of authoredSources) {
   }
 }
 
+/**
+ * A scene's context is keyed by the scene's id, and a key that names no scene
+ * is copy nobody reads: four entries outlived the scenes they were written for.
+ */
+for (const nodeId of Object.keys(sceneContext)) {
+  if (!nodes[nodeId]) failures.push(`sceneContext.${nodeId} grounds a scene the graph does not have`);
+}
+for (const nodeId of pressureBeats) {
+  if (!nodes[nodeId]) failures.push(`pressureBeats names ${nodeId}, a scene the graph does not have`);
+}
+
+/**
+ * What a case carries into the next is an effect like any other, and
+ * `applyEffect` adds whatever key it is handed: a misspelt resource becomes a
+ * seventh resource nothing prints. The scenes' effects are checked above; the
+ * carryovers and the card the runtime deals itself are checked here.
+ */
+checkNumberMap("REFRAME_EFFECT", "effect", REFRAME_EFFECT, resourceKeys);
+checkNumberMap("REFRAME_COGNITION", "cognition", REFRAME_COGNITION, cognitionKeys);
+for (const caseId of CASE_SEQUENCE) {
+  for (const nodeId of new Set(nodeOrders[caseId] ?? [])) {
+    for (const choice of nodes[nodeId]?.choices ?? []) {
+      if (choice.next !== CASE_RESULT_NODES[caseId]) continue;
+      checkNumberMap(`${caseId}/${choice.id}`, "carryover", getOutcomeCarryover({ caseId, choiceId: choice.id }), resourceKeys);
+    }
+  }
+}
+
+/**
+ * A continuity challenge is met by a card, so its id has to be one the table
+ * knows how to match (`matchesChallenge` in useDecision.js) and the opening it
+ * lands on has to deal a card that can meet it. An id nobody matches is a
+ * bonus nobody can earn, and the id is a free string in fifty-five tables.
+ */
+const CHALLENGE_MET_BY = {
+  "protect-trust": (choice) => isResourceGain("trust", choice.effect?.trust ?? 0),
+  "repair-legitimacy": (choice) => isResourceGain("legitimacy", choice.effect?.legitimacy ?? 0),
+  "find-cost": (choice) => Object.entries(choice.effect ?? {}).some(([key, value]) => value !== 0 && !isResourceGain(key, value)),
+  "use-reframe": (choice) => choice.type === "reframe",
+  // Risk moves against the resources the run arrives with, which no table
+  // knows; the id is checked, the card is not.
+  "lower-risk": () => true,
+  "avoid-risk": () => true,
+};
+// Openings whose challenge no card on them can meet. Empty since 2026-09-29,
+// when 사건 01's two were rewritten for the cards those openings deal; an entry
+// that is no longer needed fails, so this list only shrinks.
+const UNMEETABLE_CHALLENGES = new Set([]);
+const unmeetableFound = new Set();
+const decisionSource = fs.readFileSync(new URL("../src/state/useDecision.js", import.meta.url), "utf8");
+for (const id of Object.keys(CHALLENGE_MET_BY)) {
+  if (!decisionSource.includes(`"${id}"`)) failures.push(`the table no longer matches the challenge id ${id} (useDecision.js)`);
+}
+let challengesChecked = 0;
+CASE_SEQUENCE.forEach((caseId, index) => {
+  const previousCaseId = CASE_SEQUENCE[index - 1];
+  if (!previousCaseId) return;
+  for (const nodeId of new Set(nodeOrders[previousCaseId] ?? [])) {
+    for (const closing of nodes[nodeId]?.choices ?? []) {
+      if (closing.next !== CASE_RESULT_NODES[previousCaseId] || closing.type === "reframe") continue;
+      const challenge = getContinuityChallenge({ caseId, choiceId: closing.id });
+      if (!challenge) continue;
+      challengesChecked += 1;
+      const met = CHALLENGE_MET_BY[challenge.id];
+      if (!met) {
+        failures.push(`${caseId} answers ${closing.id} with the challenge "${challenge.id}", which no card can meet`);
+        continue;
+      }
+      const openingId = caseOpeningRoutes[caseId]?.[closing.id] ?? CASE_START_NODES[caseId];
+      if (!(nodes[openingId]?.choices ?? []).some(met)) {
+        unmeetableFound.add(`${caseId}/${openingId}`);
+        if (!UNMEETABLE_CHALLENGES.has(`${caseId}/${openingId}`)) failures.push(`${caseId} opens ${openingId} with the challenge "${challenge.id}", and no card there can meet it`);
+      }
+    }
+  }
+});
+if (challengesChecked === 0) failures.push("no continuity challenge was checked");
+for (const known of UNMEETABLE_CHALLENGES) {
+  if (!unmeetableFound.has(known)) failures.push(`${known} can meet its challenge now; take it off UNMEETABLE_CHALLENGES`);
+}
+
+/**
+ * The pack validator: what a case file has to be before it is wired in.
+ *
+ * A pack is one object with a field per table, and the tables are matched to
+ * each other by id and by position. Every pack has the same shape -- five
+ * authored scenes, an aftermath, three connective and three reaction scenes, a
+ * side door of two, a hidden route and its close, an evidence turn and (after
+ * the first case) three openings -- so the shape is checked rather than
+ * trusted, and a key two packs both write is a failure rather than whichever
+ * one was merged last.
+ */
+const PACK_KEYS = [
+  "id", "nodes", "aftermath", "aftermathRoute", "connectiveScenes", "connectiveOrder", "choiceEffects", "choiceCopy",
+  "reactionScenes", "reactionEffects", "reactionCopy", "reactionMemos", "branchPlan", "branchScenes", "routePlan",
+  "evidencePlan", "memoryPlan", "openingRoutes", "openingCopy", "openingSignatures", "voiceLines", "echoReplies",
+  "characterProfiles", "setting", "sceneContext", "clue", "outcomes", "carryovers", "continuityChallenges",
+];
+const OPTIONAL_PACK_KEYS = ["characterOverrides"];
+const sameKeys = (left, right) => left.length === right.length && [...left].sort().join() === [...right].sort().join();
+const keyOwners = new Map();
+function claim(table, key, packId) {
+  const owner = keyOwners.get(`${table}:${key}`);
+  if (owner) failures.push(`${packId}.${table}.${key} is also written by ${owner}`);
+  else keyOwners.set(`${table}:${key}`, packId);
+}
+// What 사건 01-11 and the finale write by hand is claimed first, so a pack
+// cannot take a scene id they already use.
+for (const [nodeId, node] of Object.entries(nodes)) {
+  if (!AUTHORED_CASE_PACKS.some((pack) => pack.id === node.caseId)) claim("scene", nodeId, node.caseId);
+}
+
+AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
+  const fail = (message) => failures.push(`pack ${pack.id}: ${message}`);
+  const keys = Object.keys(pack).filter((key) => !OPTIONAL_PACK_KEYS.includes(key));
+  const missing = PACK_KEYS.filter((key) => !keys.includes(key));
+  const extra = keys.filter((key) => !PACK_KEYS.includes(key));
+  if (missing.length) fail(`is missing ${missing.join(", ")}`);
+  if (extra.length) fail(`has fields no module reads: ${extra.join(", ")}`);
+  if (missing.length) return;
+  if (!CASE_SEQUENCE.includes(pack.id)) fail("is not a case of the season");
+
+  const prefix = `${caseNodePrefix(pack.id)}_`;
+  const previousPrefix = `${caseNodePrefix(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(pack.id) - 1] ?? "")}_`;
+  const hasOpenings = CASE_SEQUENCE.indexOf(pack.id) > 0;
+  const connectiveIds = pack.connectiveScenes.map(([id]) => id);
+  const reactionIds = pack.reactionScenes.map(([id]) => id);
+  const openingIds = Object.values(pack.openingRoutes);
+  const sceneIds = [
+    ...Object.keys(pack.nodes), ...Object.keys(pack.aftermath), ...connectiveIds, ...reactionIds, ...Object.keys(pack.branchScenes),
+    pack.routePlan.system.route, pack.routePlan.system.final,
+    ...Object.values(pack.routePlan.choices).flatMap((route) => [route.route, route.final]),
+    pack.evidencePlan.node, ...openingIds,
+  ];
+  const expectedScenes = hasOpenings ? 20 : 17;
+  if (sceneIds.length !== expectedScenes) fail(`writes ${sceneIds.length} scenes, not ${expectedScenes}`);
+  if (Object.keys(pack.nodes).length !== 5) fail(`authors ${Object.keys(pack.nodes).length} scenes, not 5`);
+  if (pack.connectiveScenes.length !== 3 || pack.reactionScenes.length !== 3) fail("does not have three connective and three reaction scenes");
+  if (Object.keys(pack.branchScenes).length !== 2) fail("does not have a side door of two scenes");
+  if (openingIds.length !== (hasOpenings ? 3 : 0)) fail(`has ${openingIds.length} openings`);
+  for (const sceneId of sceneIds) {
+    if (!sceneId?.startsWith(prefix)) fail(`the scene ${sceneId} does not carry the case's prefix ${prefix}`);
+    else claim("scene", sceneId, pack.id);
+    if (nodes[sceneId] && nodes[sceneId].caseId !== pack.id) fail(`the scene ${sceneId} was built into ${nodes[sceneId].caseId}`);
+    if (!nodes[sceneId]) fail(`the scene ${sceneId} never reached the graph`);
+  }
+
+  // Generated scenes: labels, effects, voice and echo are four lists matched
+  // by position, under the id of the scene they follow.
+  const generatedFamilies = [
+    ["connectiveScenes", pack.connectiveScenes, pack.choiceEffects, pack.choiceCopy, 7],
+    ["reactionScenes", pack.reactionScenes, pack.reactionEffects, pack.reactionCopy, 6],
+  ];
+  for (const [family, scenes, effects, copy, labelsAt] of generatedFamilies) {
+    const sources = scenes.map(([, sourceId]) => sourceId);
+    if (!sameKeys(Object.keys(effects), sources)) fail(`${family}: the effects table is keyed ${Object.keys(effects).join(", ")}, the scenes follow ${sources.join(", ")}`);
+    if (!sameKeys(Object.keys(copy), sources)) fail(`${family}: the copy table is keyed ${Object.keys(copy).join(", ")}, the scenes follow ${sources.join(", ")}`);
+    for (const scene of scenes) {
+      const [id, sourceId, nextId] = scene;
+      const labels = scene[labelsAt];
+      if (!sceneIds.includes(sourceId)) fail(`${id} follows ${sourceId}, which the pack does not write`);
+      if (!sceneIds.includes(nextId)) fail(`${id} leads to ${nextId}, which the pack does not write`);
+      if (!Array.isArray(labels)) {
+        fail(`${id} has no list of labels in position ${labelsAt + 1}`);
+        continue;
+      }
+      const lengths = { labels: labels.length, effects: effects[sourceId]?.length, voice: copy[sourceId]?.voice?.length, echo: copy[sourceId]?.echo?.length };
+      if (new Set(Object.values(lengths)).size !== 1) fail(`${id}: ${Object.entries(lengths).map(([name, length]) => `${length} ${name}`).join(", ")}`);
+    }
+  }
+  if (JSON.stringify(pack.connectiveOrder) !== JSON.stringify(pack.connectiveScenes.map(([id, sourceId]) => [sourceId, id]))) {
+    fail("connectiveOrder does not repeat the connective scenes in order");
+  }
+  if (!sameKeys(Object.keys(pack.reactionMemos), reactionIds)) fail("reactionMemos is not keyed by the reaction scenes");
+
+  // The side door: the card it hangs on has to be one the scene deals.
+  const [branchSource, branchIndex, branchFirst, branchSecond] = pack.branchPlan;
+  const branchCard = pack.nodes[branchSource]?.choices?.[branchIndex];
+  if (!branchCard || branchCard.type === "reframe") fail(`branchPlan hangs the side door on card ${branchIndex + 1} of ${branchSource}, which is not a card that scene deals`);
+  if (!sameKeys(Object.keys(pack.branchScenes), [branchFirst, branchSecond])) fail("branchPlan and branchScenes name different scenes");
+
+  // Openings are keyed on how the previous case closed.
+  if (!sameKeys(Object.keys(pack.openingCopy), openingIds)) fail("openingCopy is not keyed by the openings");
+  if (!sameKeys(Object.keys(pack.openingSignatures), openingIds)) fail("openingSignatures is not keyed by the openings");
+  if (!sameKeys(Object.keys(pack.continuityChallenges), Object.keys(pack.openingRoutes)) && hasOpenings) fail("continuityChallenges and openingRoutes are keyed on different outcomes");
+  for (const outcomeId of Object.keys(pack.openingRoutes)) {
+    if (!outcomeId.startsWith(previousPrefix)) fail(`the opening for ${outcomeId} is not keyed on the previous case`);
+  }
+
+  // How the case closes.
+  const closingIds = Object.values(pack.aftermath).flatMap((scene) => scene.choices.map((choice) => choice.id));
+  if (!sameKeys(Object.keys(pack.outcomes), closingIds)) fail("outcomes is not keyed by the aftermath's choices");
+  if (!sameKeys(Object.keys(pack.carryovers), closingIds)) fail("carryovers is not keyed by the aftermath's choices");
+  for (const [outcomeId, carryover] of Object.entries(pack.carryovers)) checkNumberMap(`pack ${pack.id}/${outcomeId}`, "carryover", carryover, resourceKeys);
+  if (!pack.clue?.id?.startsWith(`${caseNodePrefix(pack.id)}-`)) fail(`the clue ${pack.clue?.id} does not carry the case's prefix`);
+  else claim("clue", pack.clue.id, pack.id);
+
+  // Every key a table is looked up by belongs to this case, and to no other.
+  const choiceIds = new Set(sceneIds.flatMap((sceneId) => (nodes[sceneId]?.choices ?? []).map((choice) => choice.id)));
+  for (const table of ["voiceLines", "echoReplies"]) {
+    for (const key of Object.keys(pack[table])) {
+      claim(table, key, pack.id);
+      if (!choiceIds.has(key)) fail(`${table}.${key} is a line for a choice the case does not offer`);
+    }
+  }
+  for (const key of Object.keys(pack.sceneContext)) {
+    claim("sceneContext", key, pack.id);
+    if (!sceneIds.includes(key)) fail(`sceneContext.${key} grounds a scene the pack does not write`);
+  }
+  for (const sceneId of sceneIds) {
+    if (!pack.sceneContext[sceneId]) fail(`${sceneId} has no scene context`);
+  }
+  if (AUTHORED_CASE_PACKS.findIndex((other) => other.id === pack.id) !== packIndex) fail("is listed twice");
+});
+
+/**
+ * What is still standing on generated copy. Every hidden route closes on a
+ * scene its case wrote, every reply is authored, and every memory card a run
+ * can be dealt answers in its own words (2026-09-29), so any of those coming
+ * back is a failure. A choice with no voice line speaks its own label, which is
+ * authored if plain; that count is held where it stands and may only fall.
+ */
+const VOICE_FALLBACK_CEILING = 54;
+const memoryCardsWithoutReply = memoryCards.filter(({ card }) => !echoReplies[card.id]);
+for (const nodeId of fallbackCopy.scenes) failures.push(`${nodeId} closes a hidden route on the shared scene; write finalTitle, finalText and finalMemo on its plan`);
+for (const choiceId of fallbackCopy.echo) failures.push(`${choiceId} answers with a generated reply; give it an authored echo`);
+for (const { caseId, kind, card, reachable } of memoryCardsWithoutReply) {
+  if (reachable) failures.push(`${card.id} (${caseId}, ${kind}) can be dealt and takes the default reply; give its plan a ${kind === "evidenceTurn" ? "evidenceEcho" : kind === "systemRoute" ? "systemEcho" : "routeEcho"}`);
+}
+if (fallbackCopy.voice.length > VOICE_FALLBACK_CEILING) {
+  failures.push(`${fallbackCopy.voice.length} choices speak their own label, over the ${VOICE_FALLBACK_CEILING} left on 2026-09-29; write their voice lines`);
+}
+const fallbackReport =
+  `${fallbackCopy.scenes.length} hidden routes close on the shared scene, ` +
+  `${fallbackCopy.echo.length} choices answer with a generated reply and ${fallbackCopy.voice.length} speak their own label, ` +
+  `${memoryCardsWithoutReply.length} of ${memoryCards.length} memory cards take the default reply ` +
+  `(${memoryCardsWithoutReply.filter(({ reachable }) => reachable).length} of them on cards a run can be dealt)`;
+
+/**
+ * Everyone who speaks has a card, and one name is one person.
+ *
+ * A speaker with no profile printed "사건 관계자" over a stock description --
+ * 노아 did, in 26 scenes -- and two packs introducing the same name silently
+ * gave the earlier case the later one's person: 프롤로그 05 showed a 경포 펜션
+ * 사장 at a desk in 합정동.
+ */
+const PROFILE_FIELDS = ["role", "stance", "job", "appearance", "thought", "gesture", "voice", "line"];
+for (const collision of characterProfileCollisions) {
+  failures.push(`${collision} introduces someone the season already has a profile for; one person per name, and a change of role goes in characterOverrides`);
+}
+const speakersChecked = new Set();
+for (const [nodeId, node] of Object.entries(nodes)) {
+  if (!node.speaker) continue;
+  const profile = getCharacterProfile(node.speaker, node.caseId);
+  if (!profile) {
+    failures.push(`${nodeId} is spoken by ${node.speaker}, who has no character profile`);
+    continue;
+  }
+  speakersChecked.add(node.speaker);
+  for (const field of PROFILE_FIELDS) {
+    if (!isNonEmptyString(profile[field])) failures.push(`${node.speaker} (${node.caseId}) has no ${field}`);
+  }
+}
+if (speakersChecked.size === 0) failures.push("no speaker was checked against a profile");
+
 assert.deepEqual(failures, [], failures.join("\n"));
-console.log("Game graph checks passed");
+console.log(
+  `Game graph checks passed (${Object.keys(nodes).length} scenes, ${AUTHORED_CASE_PACKS.length} packs, ${speakersChecked.size} speakers, ` +
+    `${memoryCards.length} memory cards, ${challengesChecked} continuity challenges).`,
+);
+console.log(`Continuity challenges no card can meet: ${[...unmeetableFound].join(", ") || "none"}.`);
+console.log(`Generated copy still in play: ${fallbackReport}.`);

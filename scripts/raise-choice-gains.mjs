@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { parse } from "espree";
 import { costWhenRising } from "../src/gameConstants.js";
 
@@ -26,19 +26,46 @@ import { costWhenRising } from "../src/gameConstants.js";
  * Run with --dry to list what would change.
  */
 
-const FILES = [
-  "src/nodes/case01.js",
-  "src/nodes/case02.js",
-  "src/nodes/case03.js",
-  "src/nodes/case04.js",
-  "src/nodes/case05.js",
-  "src/nodes/case06.js",
-  "src/nodes/case07.js",
-  "src/nodes/case08.js",
-  "src/nodes/case09.js",
-  "src/nodes/finalCase.js",
+/**
+ * Where the authored effects are: every case file, and the tables in
+ * gameData.js. The case files are read from the folder. They used to be a list
+ * of eleven names written here when the season was ten cases long; by the time
+ * it was fifty-five the list still said eleven, so a run would have raised the
+ * first nine cases and the finale by a tenth, left forty-six cases where they
+ * were, and printed a success line.
+ */
+const CASE_DIR = "src/nodes";
+const AUTHORED = [
+  ...readdirSync(CASE_DIR)
+    .filter((entry) => entry.endsWith(".js"))
+    .sort()
+    .map((entry) => `${CASE_DIR}/${entry}`),
   "src/gameData.js",
 ];
+
+/**
+ * Files that hold an object shaped like an effect and are not raised, each with
+ * the reason. Anything else under src/ that holds one stops the run: a new home
+ * for authored effects has to be added above, or named here, by someone who
+ * looked.
+ */
+const NOT_AUTHORED = {
+  "src/advancedSystems.js": "what an operator's origin starts a run with, applied once",
+  "src/gauntlet/gauntletEngine.js": "what the table itself bills on a bust, tuned by check:pressure",
+  "src/caseCopy.js": "what a NEW GAME+ rank carries into the next run, not what a choice gives",
+  "src/gameConstants.js": "the resources a run starts with",
+  "src/gameLogic.js": "carryovers for 사건 01-11, season wear and the reframe card's price: consequences and rules, read by check:endings",
+  "src/riskLogic.js": "defaults for a pressure reading, not an effect",
+  "src/state/useChoiceCommit.js": "the clue bonus, one rule for every scene",
+};
+
+/**
+ * A carryover is what a case's close does to the next case's opening, not what
+ * a choice gives. The ones for 사건 01-11 live in gameLogic.js and were never
+ * raised; a pack keeps its own beside its scenes, and they are left alone here
+ * so that every case is treated the same.
+ */
+const NOT_RAISED_TABLES = new Set(["carryovers"]);
 
 const RESOURCE_KEYS = new Set(["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"]);
 const RATE = Number(process.argv.find((arg) => arg.startsWith("--rate="))?.split("=")[1] ?? "0.1");
@@ -73,22 +100,21 @@ function isEffectObject(node) {
   });
 }
 
-let totalRaised = 0;
-let totalEffects = 0;
-
-for (const file of FILES) {
+/** Every effect object in a file, with the gains it holds. */
+function readEffects(file) {
   const source = readFileSync(file, "utf8");
   const program = parse(source, { ecmaVersion: "latest", sourceType: "module", range: true, loc: true });
-
   const edits = [];
+  let effects = 0;
   const walk = (node) => {
     if (!node || typeof node !== "object") return;
     if (Array.isArray(node)) {
       node.forEach(walk);
       return;
     }
+    if (node.type === "Property" && !node.computed && NOT_RAISED_TABLES.has(propertyName(node))) return;
     if (isEffectObject(node)) {
-      totalEffects += 1;
+      effects += 1;
       for (const property of node.properties) {
         const key = propertyName(property);
         const { value } = numericLiteral(property.value);
@@ -106,6 +132,53 @@ for (const file of FILES) {
     }
   };
   walk(program.body);
+  return { source, edits, effects };
+}
+
+function sourceFiles(directory = "src") {
+  const found = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const relative = `${directory}/${entry.name}`;
+    if (entry.isDirectory()) found.push(...sourceFiles(relative));
+    else if (entry.name.endsWith(".js")) found.push(relative);
+  }
+  return found;
+}
+
+// Before anything is written: is every file that holds effects accounted for?
+const authored = new Set(AUTHORED);
+const unaccounted = [];
+for (const file of sourceFiles()) {
+  if (authored.has(file) || file in NOT_AUTHORED) continue;
+  const { effects } = readEffects(file);
+  if (effects > 0) unaccounted.push(`${file} (${effects} effect objects)`);
+}
+const gone = Object.keys(NOT_AUTHORED).filter((file) => {
+  try {
+    return readEffects(file).effects === 0;
+  } catch {
+    return true;
+  }
+});
+if (unaccounted.length || gone.length) {
+  if (unaccounted.length) {
+    console.error(
+      `These files hold effect objects and this script would have left them out:\n  ${unaccounted.join("\n  ")}\n` +
+        `Add each to AUTHORED, or to NOT_AUTHORED with the reason it is not raised.`,
+    );
+  }
+  if (gone.length) console.error(`NOT_AUTHORED names files that hold no effect object any more: ${gone.join(", ")}. Remove them.`);
+  process.exit(1);
+}
+
+let totalRaised = 0;
+let totalEffects = 0;
+let filesWithEffects = 0;
+
+for (const file of AUTHORED) {
+  const { source, edits, effects } = readEffects(file);
+  totalEffects += effects;
+  if (effects > 0) filesWithEffects += 1;
 
   if (dryRun) {
     console.log(`${file}: ${edits.length} gains would rise`);
@@ -120,9 +193,12 @@ for (const file of FILES) {
   for (const edit of edits.sort((a, b) => b.range[0] - a.range[0])) {
     next = next.slice(0, edit.range[0]) + edit.text + next.slice(edit.range[1]);
   }
-  writeFileSync(file, next, "utf8");
+  if (next !== source) writeFileSync(file, next, "utf8");
   console.log(`${file}: raised ${edits.length} gains`);
   totalRaised += edits.length;
 }
 
-console.log(`${dryRun ? "Would raise" : "Raised"} ${totalRaised} gains across ${totalEffects} effects at ${RATE * 100}% (floor 1).`);
+console.log(
+  `${dryRun ? "Would raise" : "Raised"} ${totalRaised} gains across ${totalEffects} effects in ${filesWithEffects} of ${AUTHORED.length} files ` +
+    `at ${RATE * 100}% (floor 1).`,
+);

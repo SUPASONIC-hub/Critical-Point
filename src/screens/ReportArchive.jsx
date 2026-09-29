@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Copy, MessageSquareText, Sparkles } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
@@ -14,8 +15,15 @@ import { isResourceGain } from "../gameConstants.js";
  * It reads the same `view` the result screen does; `check:view-contracts`
  * reads this file as part of the result screen. The two values the first acts
  * also print are passed in rather than derived twice.
+ *
+ * The body is drawn only while the archive is open. It is most of the result
+ * page's DOM -- the ledger, every log row, the route map -- and a closed
+ * `<details>` still built all of it on every render for a player who never
+ * opens it. Nothing in it keeps state of its own: the feedback form is
+ * controlled from `view`, so closing and reopening loses nothing.
  */
 export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
+  const [open, setOpen] = useState(false);
   const {
     common: { currentCase, renderSceneLines },
     ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile },
@@ -46,11 +54,12 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
     }));
   const observerTurningPoint = observerPattern?.turningPoint;
   return (
-    <details className="report-archive">
+    <details className="report-archive" onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary>
         <span>전체 기록</span>
         <b>랭크 근거, 판단 DNA, 경로 지도, 관찰 장부, 선택 로그</b>
       </summary>
+      {open && (
       <div className="report-archive-body">
     <GauntletLedger log={log} summary={caseResults?.[currentCase]?.gauntlet} />
     {currentCase === "final" && view.operatorReveal && (
@@ -137,10 +146,10 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
         <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
       </section>
     )}
-    {debugToolsEnabled && telemetryStats && <p className="telemetry-stats" role="status">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
+    {__CP_DEBUG_BUILD__ && debugToolsEnabled && telemetryStats && <p className="telemetry-stats" role="status">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
     {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`} role="status"><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
     {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
-    {debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary>REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
+    {__CP_DEBUG_BUILD__ && debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary>REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
     {view.delayedConsequences?.length > 0 && (
       <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">
         <span>CONSEQUENCE CHAIN</span>
@@ -618,6 +627,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
       </section>
     )}
       </div>
+      )}
     </details>
   );
 }

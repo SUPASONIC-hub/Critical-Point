@@ -4,6 +4,11 @@ name: Full Coverage
 # `verify:full`, which re-ran all of Verify (static checks, build, the whole
 # e2e suite) before getting to anything of its own. Verify already runs on
 # every push to main, so this runs only what Verify does not.
+#
+# It failed every week from 2026-08-31 to 2026-09-21 and nobody saw: a
+# scheduled run has no pull request to turn red and no commit to be pinned to.
+# The last job here opens an issue when any of the others fails, and adds to
+# the one already open the week after.
 
 on:
   workflow_dispatch:
@@ -15,12 +20,39 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 jobs:
   full-coverage:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Every scene-choice pair of every case, a handful of seeded seasons, the
+    # reload walk and the layout sweep: about 170 tests, one a case for the
+    # pairs and one a case for the sweep, split test by test over the shards.
+    #
+    # How the numbers were chosen. The season is 1,129 scenes and 4,206
+    # scene-choice pairs (counted from nodeOrders). The only timings taken so
+    # far are from a desktop that was running other suites at the same time,
+    # 2026-09-28, one worker: 60 pairs in 24.2 minutes (24s a pair, several of
+    # them 30s timeouts) and 51 layout measurements in 6.1 minutes (7s each).
+    # CI's own figure for walking a case is 25s for about 9 tables, so a pair,
+    # which also pays for a fresh page, is put at 6s and a measurement at 3s:
+    #
+    #   pairs    4,206 x 6s            = 7.0 h
+    #   sweep    1,129 x 3 sizes x 3s  = 2.8 h
+    #   seasons  4 x 55 cases x 25s    = 1.5 h
+    #   reload   55 cases x 30s        = 0.5 h
+    #                                   ------
+    #                                    11.8 h of one browser
+    #
+    # Twelve shards of four workers is about 30 minutes a shard if four
+    # workers do the work of two, which is what a four-core runner gives a
+    # browser suite. The limit is three times that. Re-size both from the
+    # first run that finishes: the durations are in each shard's log.
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # One Node version for CI and the Render build: .node-version.
@@ -42,13 +74,12 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      # Every scene of every case, and the layout sweep.
-      - run: npm run test:e2e:full
+      - run: npm run test:e2e:full -- --shard=${{ matrix.shard }}/12
       - name: Upload full coverage diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: full-coverage-diagnostics
+          name: full-coverage-diagnostics-${{ matrix.shard }}
           path: |
             test-results
             playwright-report
@@ -93,3 +124,73 @@ jobs:
             playwright-report
           if-no-files-found: ignore
           retention-days: 14
+
+  webkit:
+    runs-on: ubuntu-latest
+    # Safari's engine on an iPhone 14, against the production build: the @prod
+    # tests and the @layout measurements. Weekly, not on every push, until it
+    # has a clean run behind it (scripts/run-e2e.mjs, DEFAULT_PROJECTS); then it
+    # belongs in Verify.
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-webkit
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps webkit
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps webkit
+      - run: npm run build:e2e
+      - run: npm run test:e2e:webkit
+      - name: Upload WebKit diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: webkit-diagnostics
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+  report:
+    # A red run with nobody watching is a green run. This job is the only one
+    # here that can write, it writes issues and nothing else, and it runs no
+    # project code: it does not check the repository out.
+    needs: [full-coverage, season-walk, webkit]
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the issue
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: Full Coverage is failing
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RESULTS: "full-coverage: ${{ needs.full-coverage.result }}, season-walk: ${{ needs.season-walk.result }}, webkit: ${{ needs.webkit.result }}"
+        run: |
+          set -euo pipefail
+          body=$(printf 'The weekly Full Coverage run failed on %s at %s.\n\n%s\n\n%s\n' "$(date -u +%F)" "$GITHUB_SHA" "$RESULTS" "$RUN_URL")
+          existing=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title --jq "map(select(.title == \"$TITLE\")) | .[0].number // empty")
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+            echo "Added to issue #$existing."
+          else
+            gh issue create --title "$TITLE" --body "$body"
+          fi

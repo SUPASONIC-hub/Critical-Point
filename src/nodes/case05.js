@@ -20,7 +20,7 @@ export const case05Nodes = {
       "서비스 누락: 312명",
       "현장 직원은 안내서대로 처리",
       "배차 시스템은 승인된 기준대로 작동",
-      "예산 상한선의 출처: 사건 04의 상환 조건표",
+      "예산 상한선의 출처: 온새의 상환 조건표",
     ],
     triggers: ["responsibility", "curiosity", "order"],
     choices: [
@@ -164,49 +164,6 @@ export const case05Nodes = {
         id: "reframe",
         label: "마지막으로 판을 바꾼다",
         type: "reframe",
-      },
-    ],
-  },
-  c5_final: {
-    phase: "FINAL DECISION",
-    title: "악인이 없을 때",
-    speaker: "한서윤",
-    text:
-      "이 사건에는 뚜렷한 악인이 없습니다. 하지만 피해는 실제입니다. 한서윤이 창밖을 보며 말합니다. '악인이 없는 게 아닙니다. 3년 전 회의실에 있었고, 그 방 회의록은 남지 않았을 뿐입니다.' 당신은 책임을 개인에게 모을지, 시스템을 바꿀지, 둘 사이의 불완전한 조합을 택할지 정해야 합니다.",
-    memo: [
-      "개인 징계는 빠른 설명을 제공",
-      "시스템 개편은 느리지만 반복을 줄임",
-      "피해자 보상은 즉시 필요",
-      "3년 전 그 회의의 회의록은 존재하지 않음",
-    ],
-    triggers: ["responsibility", "curiosity", "order", "protection"],
-    choices: [
-      {
-        id: "final_blame",
-        label: "책임자 징계와 피해 보상을 우선한다",
-        effect: { trust: 9, legitimacy: 3, humanCost: -9, fatigue: 2 },
-        next: "case05_result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "c5_final_final_system",
-        label: "시스템 개편과 피해자 기준 재설계를 우선한다",
-        effect: { capital: -12, trust: 4, legitimacy: 8, humanCost: -13, fatigue: 5 },
-        next: "case05_result",
-        cognition: { reframing: 2, inference: 2 },
-      },
-      {
-        id: "final_both",
-        label: "징계, 보상, 재설계를 불완전하게라도 묶는다",
-        effect: { capital: -10, trust: 9, legitimacy: 6, humanCost: -11, fatigue: 5 },
-        next: "case05_result",
-        cognition: { reframing: 3, risk: 1 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "case05_result",
       },
     ],
   },

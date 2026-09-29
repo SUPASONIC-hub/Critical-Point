@@ -10,23 +10,30 @@ name: Deploy
 # Render build command does not run. A push that fails CI cannot become a
 # deployment.
 #
-# The smoke check of the live site is the second job here, not a workflow of
-# its own. It used to be a separate workflow on the same `workflow_run` trigger,
-# so it started the moment Verify finished -- racing the deploy it was meant to
-# check and, nearly always, passing against the previous release.
+# The press names its commit. A deploy hook with no `ref` builds whatever the
+# branch head is when Render gets round to it, which is not the commit Verify
+# proved: on 2026-09-27 the hook fired for 160f304 and Render built 4b420f0,
+# sixteen minutes before that commit's own Verify had finished, and the check
+# below passed because 4b420f0 "contained" the one it was waiting for. The
+# hook now carries `ref=<the verified commit>` and the wait accepts that commit
+# and no other.
+#
+# Pressing and checking are one job, so they are one unit in the queue. As two
+# jobs the second deploy could press its button between the first deploy's press
+# and the first deploy's check, and the check then waited twenty minutes for a
+# commit the site had already moved past.
 on:
   workflow_run:
     workflows: [Verify]
     types: [completed]
+    # Verify also completes for every pull request and every label. Those runs
+    # can never deploy, and each one used to create a Deploy run that queued
+    # with the real ones: eight inside one minute on 2026-09-27.
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-
-# One deploy at a time, and never cancelled halfway: a newer run waits.
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -36,16 +43,35 @@ jobs:
        github.event.workflow_run.event == 'push' &&
        github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      triggered: ${{ steps.trigger.outputs.triggered }}
-      before: ${{ steps.before.outputs.signature }}
+    # Render's static builds take a few minutes; the wait below gives up at 20.
+    timeout-minutes: 35
+    # One deploy at a time, and never cancelled halfway: a newer one waits. The
+    # group is on the job, not the workflow, so a run whose job is skipped -- a
+    # Verify that went red -- never enters the queue and cannot push a pending
+    # deploy out of it. GitHub keeps one pending run per group; when a third
+    # deploy arrives the second is dropped, which is the right one to drop,
+    # because the third contains it.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
     env:
-      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
       DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
-      # What the site serves before the deploy, so the smoke job can tell the
-      # new release from the old one. See the smoke job for what is compared.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          # The guard below compares commits, so it needs the history.
+          fetch-depth: 0
+      # No `npm ci`: the deploy check imports Node's own modules and nothing
+      # else (tests/unit/deploy-check-imports.test.mjs holds it to that), so
+      # installing 175 packages bought this job a minute and nothing more.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+      # What the site serves before the deploy: the commit, when the build
+      # wrote one, and a signature of index.html for a release that did not.
       - name: Record what is live now
         id: before
         if: env.DEPLOY_URL != ''
@@ -53,57 +79,101 @@ jobs:
         run: |
           set -uo pipefail
           html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
+          live=$(printf '%s' "$html" | grep -oE '<meta name="build-sha" content="[0-9a-f]{7,40}"' | grep -oE '[0-9a-f]{7,40}' | head -1 || true)
           signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
+          echo "live=$live" >> "$GITHUB_OUTPUT"
           echo "signature=$signature" >> "$GITHUB_OUTPUT"
+          echo "Live before the deploy: ${live:-an untagged release}."
+      # A Verify run can be re-run weeks later, and its completion arrives here
+      # looking exactly like a fresh one. Pressed, it would put the old commit
+      # back on the site. So a commit deploys only when it is on main and the
+      # site is not already serving it or something newer. When the site's
+      # commit cannot be read, only the tip of main deploys: that can delay a
+      # release by one push, and cannot roll one back. A dispatch is a person
+      # choosing, and is taken at its word.
+      - name: Decide whether this commit may deploy
+        id: guard
+        shell: bash
+        env:
+          LIVE: ${{ steps.before.outputs.live }}
+        run: |
+          set -uo pipefail
+          decide() { echo "deploy=$1" >> "$GITHUB_OUTPUT"; echo "$2"; }
+          if [ "$MANUAL" = "true" ]; then
+            decide true "Dispatched by hand: deploying $EXPECTED_SHA."
+            exit 0
+          fi
+          git fetch --quiet origin main
+          tip=$(git rev-parse origin/main)
+          if ! git merge-base --is-ancestor "$EXPECTED_SHA" "$tip"; then
+            decide false "::warning title=Nothing was deployed::$EXPECTED_SHA is no longer on main, so it was not deployed."
+            exit 0
+          fi
+          if [ -n "$LIVE" ] && git cat-file -e "$LIVE^{commit}" 2>/dev/null; then
+            live=$(git rev-parse "$LIVE^{commit}")
+            if [ "$live" = "$EXPECTED_SHA" ]; then
+              decide false "The site already serves $EXPECTED_SHA; checking it as it is."
+            elif git merge-base --is-ancestor "$EXPECTED_SHA" "$live"; then
+              decide false "::warning title=Nothing was deployed::The site serves $live, which is newer than $EXPECTED_SHA. Deploying this run would roll the site back, so it was not pressed."
+            else
+              decide true "Deploying $EXPECTED_SHA over $live."
+            fi
+            exit 0
+          fi
+          if [ "$EXPECTED_SHA" = "$tip" ]; then
+            decide true "The site does not say which commit it serves; $EXPECTED_SHA is the tip of main, so it deploys."
+          else
+            decide false "::warning title=Nothing was deployed::The site does not say which commit it serves and $EXPECTED_SHA is not the tip of main ($tip), so this run cannot tell a release from a rollback. The tip deploys when its own Verify goes green."
+          fi
+      # The hook is a secret, and this job also runs the repository's own deploy
+      # check. It is handed to the two steps that need it and to nothing else;
+      # the rest of the job only learns whether it exists.
+      - name: See whether a deploy hook is configured
+        id: hook
+        shell: bash
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
       - name: Trigger Render deploy
         id: trigger
-        if: env.RENDER_DEPLOY_HOOK != ''
+        if: steps.guard.outputs.deploy == 'true' && steps.hook.outputs.configured == 'true'
         shell: bash
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           set -euo pipefail
           # The hook URL carries its own key, so it is the secret in full and
-          # never echoed. Only the status line is printed.
-          status=$(curl -fsS -w '%{http_code}' -o /tmp/deploy-response -X POST "$RENDER_DEPLOY_HOOK")
-          echo "Render accepted the deploy request (HTTP $status)."
-          echo "Commit: ${{ github.event.workflow_run.head_sha || github.sha }}"
+          # never echoed. Only the status line is printed. `ref` is the commit
+          # Verify proved (render.com/docs/deploy-hooks): without it Render
+          # builds the branch head. 200 is a deploy started, 202 one queued
+          # behind a deploy already running; a 404 here is Render not finding
+          # the commit, and curl -f fails the step on it.
+          case "$RENDER_DEPLOY_HOOK" in
+            *\?*) hook="$RENDER_DEPLOY_HOOK&ref=$EXPECTED_SHA" ;;
+            *) hook="$RENDER_DEPLOY_HOOK?ref=$EXPECTED_SHA" ;;
+          esac
+          status=$(curl -fsS -w '%{http_code}' -o /tmp/deploy-response -X POST "$hook")
+          echo "Render accepted the deploy request for $EXPECTED_SHA (HTTP $status)."
           echo "triggered=true" >> "$GITHUB_OUTPUT"
-      # Same reason the smoke check announces its own skip: a job named "Deploy"
+      # Same reason the check announces its own skip: a job named "Deploy"
       # reporting green without deploying anything is worse than no job at all.
       - name: Explain skipped deploy
-        if: env.RENDER_DEPLOY_HOOK == ''
+        if: steps.guard.outputs.deploy == 'true' && steps.hook.outputs.configured != 'true'
         run: |
           echo "::warning title=Nothing was deployed::RENDER_DEPLOY_HOOK is not configured, so no deploy was triggered and the site still serves whatever was last pushed by hand. Add the repository secret to turn automatic deploys on: Render dashboard -> the service -> Settings -> Deploy Hook -> copy the URL."
-
-  smoke:
-    needs: deploy
-    runs-on: ubuntu-latest
-    # Render's static builds take a few minutes; the wait below gives up at 20.
-    timeout-minutes: 30
-    env:
-      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
-      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
-      BEFORE: ${{ needs.deploy.outputs.before }}
-      TRIGGERED: ${{ needs.deploy.outputs.triggered }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ env.EXPECTED_SHA }}
-          # The wait compares commits: the live build may be a later push.
-          fetch-depth: 0
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci --ignore-scripts
-        if: env.DEPLOY_URL != ''
       # The strict signal is a `<meta name="build-sha">` in index.html naming
-      # the commit the build came from: the job then waits until the site serves
-      # this commit or a later one. Until the build writes that tag, the
-      # fallback is that index.html -- or its ETag / Last-Modified -- differs
-      # from what was live before the deploy was pressed.
+      # the commit the build came from (vite.config.js writes it from
+      # RENDER_GIT_COMMIT): the job waits until the site serves exactly the
+      # commit it pressed. A later one does not count -- "or a later one" is how
+      # an unverified commit passed this check. A release that carries no tag
+      # falls back to index.html, or its ETag / Last-Modified, differing from
+      # what was live before the deploy was pressed.
       - name: Wait for the new release to go live
-        if: env.DEPLOY_URL != '' && env.TRIGGERED == 'true'
+        if: env.DEPLOY_URL != '' && steps.trigger.outputs.triggered == 'true'
         shell: bash
+        env:
+          BEFORE: ${{ steps.before.outputs.signature }}
         run: |
           set -uo pipefail
           deadline=$(( $(date +%s) + 1200 ))
@@ -111,30 +181,32 @@ jobs:
             html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
             live=$(printf '%s' "$html" | grep -oE '<meta name="build-sha" content="[0-9a-f]{7,40}"' | grep -oE '[0-9a-f]{7,40}' | head -1 || true)
             if [ -n "$live" ]; then
-              if [ "$live" = "$EXPECTED_SHA" ] || git merge-base --is-ancestor "$EXPECTED_SHA" "$live" 2>/dev/null; then
-                echo "The site serves $live, which contains $EXPECTED_SHA."
-                break
-              fi
+              case "$EXPECTED_SHA" in
+                "$live"*)
+                  echo "The site serves $live."
+                  break
+                  ;;
+              esac
               echo "Still serving $live."
             elif [ -n "$html" ]; then
               signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
               if [ "$signature" != "$BEFORE" ]; then
-                echo "index.html changed since the deploy was pressed; checking the new release."
+                echo "::warning title=Release carries no commit::index.html changed since the deploy was pressed, but it names no build-sha, so this run cannot say which commit is live."
                 break
               fi
               echo "Still serving the release from before the deploy."
             fi
             if [ "$(date +%s)" -ge "$deadline" ]; then
-              echo "::error title=Deploy never went live::After 20 minutes $DEPLOY_URL still serves the release from before the deploy of $EXPECTED_SHA. Check the Render dashboard's deploy log."
+              echo "::error title=Deploy never went live::After 20 minutes $DEPLOY_URL still does not serve $EXPECTED_SHA. Check the Render dashboard's deploy log."
               exit 1
             fi
             sleep 20
           done
       - name: Check deployed app
         if: env.DEPLOY_URL != ''
-        run: npm run check:deploy
+        run: node scripts/check-deploy.mjs
       - name: Explain unobserved deploy
-        if: env.DEPLOY_URL != '' && env.TRIGGERED != 'true'
+        if: env.DEPLOY_URL != '' && steps.trigger.outputs.triggered != 'true'
         run: |
           echo "::warning title=Checked the site as it was::No deploy was triggered by this run, so the check above ran against whatever release the site already served."
       # A skipped check reports the same green tick as a passed one, so with the

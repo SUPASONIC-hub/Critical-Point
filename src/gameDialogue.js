@@ -12,6 +12,7 @@
  * the one a Korean bank actually uses today, and anything a fifteen-year-old
  * would not know is unpacked in brackets the first time it appears.
  */
+import { CASE_SEQUENCE } from "./gameCases.js";
 import { CASE_PACKS } from "./nodes/casePacks.js";
 export const characterProfiles = {
   한서윤: {
@@ -75,7 +76,7 @@ export const characterProfiles = {
     line: "자네 판단이 틀렸다고 한 적은 없네. 다만 그 판단이 설 자리는 내가 정하지.",
   },
   임경수: {
-    role: "KD은행 기업대출심사팀장 출신 · 퇴직 4년차",
+    role: "KD은행 기업대출심사팀장 출신 · 퇴직 2년차",
     stance: "원본 · 절차 · 오래된 빚",
     job: "지워진 기록이 원래 어디에 있었는지 알려준다.",
     appearance: "팔꿈치가 닳은 카디건, 끈으로 묶은 종이 심사 보고서, 전산에는 남지 않은 도장 자국.",
@@ -144,7 +145,100 @@ export const characterProfiles = {
     voice: "판단을 대신하지 않고, 말하지 않은 전제와 숨은 피해자를 끌어낸다.",
     line: "방금 판단에서 빠진 사람을 다시 계산하십시오.",
   },
+  노아: {
+    role: "KD데이터랩 AI 심사 엔진 · 에코의 후임",
+    stance: "속도 · 점수 · 학습된 관행",
+    job: "1초도 걸리지 않아 판단하고, 무엇을 보고 배웠는지는 물어야만 말한다.",
+    appearance: "파란 불이 흐르는 서버 선반, 업무 창 구석의 작은 입력 칸, 1,412줄짜리 학습 데이터 목록.",
+    thought: "나는 이 은행이 해 온 대로 판단한다. 해 온 일이 옳았는지는 학습 목록에 없었다.",
+    gesture: "노아는 망설이지 않는다. 질문이 끝나기 전에 근거 항목과 가중치가 화면에 펼쳐진다.",
+    voice: "감정 없이 숫자로 답하고, 자기 판단을 '학습되어 있습니다'라는 말로 설명한다.",
+    line: "그 기준은 제가 만든 것이 아닙니다. 그렇게 학습되어 있습니다.",
+  },
 };
+
+/**
+ * Who someone is depends on when you meet them.
+ *
+ * A profile used to be looked up by name alone, so the speaker card printed one
+ * role for the whole season: in the 프롤로그, set in 2022-23, 한서윤 was already
+ * 트리거랩 실장 of a lab that did not exist yet and 윤상혁 already the 상무 he
+ * became later; after 사건 25 everyone was still at the desk the lab's closing
+ * took from them. Only the role moves. The way someone holds a pen does not
+ * change with the posting, so everything else stays the profile's own.
+ *
+ * A later row wins, so a span inside a span is written after it.
+ */
+const characterRoleSpans = [
+  {
+    from: "prologue01",
+    to: "prologue05",
+    roles: {
+      오진우: "KD은행 기업금융전략팀 대리 · 당신의 사수",
+      한서윤: "KD은행 기업금융전략팀 과장",
+      윤상혁: "KD은행 기업금융전략팀장",
+      임경수: "KD은행 기업대출심사팀장",
+      도윤하: "KD은행 강서지점 4번 창구 · 입행 3년차",
+    },
+  },
+  {
+    from: "case08",
+    to: "case08",
+    roles: { 오진우: "전 트리거랩 분석관 · 사직 후 혼자 추적 중" },
+  },
+  {
+    // The analyst finds him in a 고시원 in 사건 09 and he comes back to the team;
+    // the rivalry the default role describes ended in 사건 08.
+    from: "case09",
+    to: "case24",
+    roles: { 오진우: "트리거랩 분석관 · 한 번 떠났다 돌아온 동료" },
+  },
+  {
+    // Whether she signs in 사건 15, and so becomes 정규직, is the player's
+    // choice, so from 사건 16 on the card does not say which she is.
+    from: "case16",
+    to: "case24",
+    roles: { 이민서: "트리거랩 데이터 기록 담당" },
+  },
+  {
+    // 트리거랩 is dissolved at the end of 사건 24 and the six are posted apart.
+    from: "case25",
+    to: "final",
+    roles: {
+      한서윤: "대기발령 중 · 전 트리거랩 실장",
+      도윤하: "KD은행 강서지점 창구 · 전 트리거랩 현장 담당",
+      오진우: "브릿지은행 팀장 · 전 트리거랩 분석관",
+      이민서: "KD데이터랩 데이터사업팀 · 전 트리거랩 데이터 기록 담당",
+      반재욱: "KD금융그룹 감사팀 조사역 · 지방 순회 중",
+      윤상혁: "KD캐피탈 대표이사 · 전 그룹전략실 상무",
+    },
+  },
+  {
+    // The board removes him on 9월 7일, in 사건 43.
+    from: "case44",
+    to: "final",
+    roles: { 윤상혁: "이사회에서 해임된 전 사내이사 · 자문료 배임 사건 피고인" },
+  },
+];
+
+/** What a pack says about someone for the length of its own case: `characterOverrides`. */
+const packCharacterOverrides = {};
+
+/** A name two packs both introduce. One person per name; `check:graph` fails on any. */
+export const characterProfileCollisions = [];
+
+export function getCharacterProfile(name, caseId) {
+  const profile = characterProfiles[name];
+  if (!profile) return null;
+  const position = CASE_SEQUENCE.indexOf(caseId);
+  if (position < 0) return profile;
+  const role = characterRoleSpans.reduce(
+    (current, span) =>
+      span.roles[name] && position >= CASE_SEQUENCE.indexOf(span.from) && position <= CASE_SEQUENCE.indexOf(span.to) ? span.roles[name] : current,
+    profile.role,
+  );
+  return { ...profile, role, ...packCharacterOverrides[caseId]?.[name] };
+}
 export const choiceVoiceLines = {
   // CASE 07. The season's one case where the analyst asks instead of decides,
   // so the lines are spoken to a person in the room rather than to a document.
@@ -350,7 +444,7 @@ export const choiceVoiceLines = {
   f_start_expose: "안에서 해결될 일이 아니라며, 밖으로 낼 자료를 정리한다.",
   c5_map_blame: "놓친 신호에 이름이 있다며, 그 자리를 먼저 부른다.",
   c5_blame_blame: "기다리는 사람들에게 줄 답이 필요하다며, 징계와 보상을 함께 낸다.",
-  c5_collapse_blame: "사람을 바꾸고 교육을 붙이는, 가장 익숙한 답을 고른다.",
+  c5_collapse_blame: "사람을 바꾸고 교육을 붙이는 가장 익숙한 답을, 고른다.",
   c5_map_map: "빠진 사람들이 서로 닮았는지부터 확인한다.",
   c5_blame_map: "한 사람으로 끝날 일이 아니라며, 구조를 문장의 주어로 세운다.",
   c5_collapse_map: "누가 먼저 무너졌는지를 기준으로, 표 전체를 다시 만든다.",
@@ -550,11 +644,11 @@ export const choiceVoiceLines = {
   f_final_contain_a: "남길 조건을 정할 사람은 참가자라고 보고, 운영위에 도구를 넘긴다.",
   f_final_contain_b: "조건을 정하기 전에 멈춰야 한다고 보고, 동의 절차를 처음부터 다시 받는다.",
   f_final_contain_c: "판단을 남기지 않겠다는 듯, 구조와 사용 기록을 전부 공개 기록으로 넘긴다.",
-  f_route_system_read: "내 문장이 어떤 버튼이 됐는지 끝까지 읽는다.",
+  f_route_system_read: "내가 다시 짠 판이 어떤 버튼이 됐는지 끝까지 읽는다.",
   f_route_system_send: "확인하지 않는 편이 낫다고 판단하고, 대기열을 그대로 둔다.",
   f_route_system_warn: "다음 사람이 알고 고르게 하려고, 이 화면을 먼저 보여준다.",
-  f_final_system_a: "내 말이 남의 질문이 되는 것을 막겠다고, 복제를 끊는다.",
-  f_final_system_b: "문장은 남기되, 고쳐 쓸 수 있는 빈칸을 함께 붙인다.",
+  f_final_system_a: "내 판단이 남의 질문이 되는 것을 막겠다고, 복제를 끊는다.",
+  f_final_system_b: "판은 남기되, 고쳐 쓸 수 있는 빈칸을 함께 붙인다.",
   f_final_system_c: "판단을 물려주는 대신 자료를 물려주고, 여기서 끝낸다.",
   f_evidence_turn_burn: "내 문장까지 포함해, 실험 원본을 전부 태운다.",
   f_evidence_turn_seed: "내 문장을 답이 아니라 경고문으로 바꿔, 다음 사람에게 남긴다.",
@@ -706,7 +800,7 @@ export const authoredEchoReplies = {
   c9_ledger_honest: "당신 칸이 채워지면 권도현은 제안을 읽기 시작합니다. 잃을 것을 적은 종이는 나중에 누구든 볼 수 있습니다.",
   c9_ledger_price: "보상을 적으면 거래가 됩니다. 거래는 동정보다 믿을 만하고, 동정보다 차갑습니다.",
   c9_ledger_blank: "비워 둔 칸은 선의처럼 보입니다. 권도현에게는 계산하지 않은 사람의 약속처럼 보입니다.",
-  c9_family_charge: "고발은 179.6억에 이름을 붙입니다. 같은 날 권도현은 가족 재판의 증인이 됩니다.",
+  c9_family_charge: "고발은 179.6%에 이름을 붙입니다. 같은 날 권도현은 가족 재판의 증인이 됩니다.",
   c9_family_restore: "개인 재산으로 메운 피해는 빨리 돌아옵니다. 장부를 부풀린 사람은 법정에 서지 않습니다.",
   c9_family_choice: "그에게 맡기면 결정은 그의 것이 됩니다. 그 결정을 기다리는 동안 결의 시각은 다가옵니다.",
   c9_timing_strike: "착수 전날 밤의 제보는 첫날의 검사를 바꿉니다. 같은 부서의 권도현도 첫날부터 조사 대상 옆에 앉습니다.",
@@ -773,9 +867,9 @@ export const authoredEchoReplies = {
   c6_panel_both:
     "놓친 것과 걸린 것을 같은 장에 쓰면 어느 쪽도 변명이 되지 않습니다. 대신 어느 쪽도 그를 구하지 않습니다.",
   c6_final_person:
-    "이름을 빼면 오늘은 아무도 무너지지 않습니다. 닫히지 않은 사건 05는 다음 사람의 책상으로 갑니다.",
+    "이름을 빼면 오늘은 아무도 무너지지 않습니다. 닫히지 않은 배차 사고 건은 다음 사람의 책상으로 갑니다.",
   c6_final_record:
-    "설정값이 열리면 실험은 조사 대상이 됩니다. 그 조사에서 가장 먼저 읽히는 것은 당신의 시즌입니다.",
+    "설정값이 열리면 실험은 조사 대상이 됩니다. 그 조사에서 가장 먼저 읽히는 것은 당신의 1년입니다.",
   c6_final_close:
     "세운 이름 하나로 사건은 오늘 닫힙니다. 그 이름은 내일부터 이 조직이 실패를 처리하는 방식이 됩니다.",
 
@@ -784,7 +878,7 @@ export const authoredEchoReplies = {
   funding:
     "단기 자금은 가장 깔끔해 보입니다. 다만 회계 인식 문제가 드러나면 새 자금은 책임 회피로 보일 수 있습니다.",
   start_sale:
-    "핵심 사업부 매각은 생존 가능성을 높입니다. 하지만 넥스트마일가 이 상황을 이용하고 있다는 점도 무시할 수 없습니다.",
+    "핵심 사업부 매각은 생존 가능성을 높입니다. 하지만 넥스트마일이 이 상황을 이용하고 있다는 점도 무시할 수 없습니다.",
   accounting_disclosure:
     "투명성은 신뢰를 회복할 수 있습니다. 동시에 투자 협상은 즉시 중단될 수 있습니다. 이 손실을 감당할 준비가 있습니까?",
   accounting_delay:
@@ -1261,7 +1355,7 @@ export const authoredEchoReplies = {
   f_route_map_open: "공개하면 모든 케이스의 전제가 흔들립니다. 흔들려야 다시 세울 수 있습니다.",
   f_route_map_delete: "내 기록만 지운 사람은, 남의 기록을 지울 이유도 만들 수 있습니다.",
   f_route_map_return: "돌려주려면 동의 절차를 처음부터 다시 밟아야 합니다.",
-  f_final_map_a: "목록이 나오면 이 시즌의 사건들이 다시 읽힙니다.",
+  f_final_map_a: "목록이 나오면 지나온 사건들이 다시 읽힙니다.",
   f_final_map_b: "삭제 권한이 넘어가면 증거도 함께 사라질 수 있습니다. 그것도 그들의 선택입니다.",
   f_final_map_c: "전부를 넘기면 당신은 판단에서 빠지고, 판단할 사람이 생깁니다.",
   f_route_expose_redact: "익명화에는 시간이 듭니다. 그 시간에 서버는 계속 닫힙니다.",
@@ -1277,7 +1371,7 @@ export const authoredEchoReplies = {
   f_final_contain_b: "처음부터 받는 동의는 오래 걸리고, 이 실험을 처음으로 정당하게 만듭니다.",
   f_final_contain_c: "전부 공개되면 도구는 통제되지 않습니다. 대신 숨겨지지도 않습니다.",
   f_route_system_read: "읽고 나면 다음 참가자의 화면을 모른 척할 수 없습니다.",
-  f_route_system_send: "확인하지 않은 문장도 전송됩니다. 모른다는 사실은 기록되지 않습니다.",
+  f_route_system_send: "확인하지 않은 판도 전송됩니다. 모른다는 사실은 기록되지 않습니다.",
   f_route_system_warn: "보여주는 순간 당신도 실험의 일부였다는 사실이 함께 넘어갑니다.",
   f_final_system_a: "끊으면 다음 참가자는 자유로워지고, 무엇이 있었는지도 모릅니다.",
   f_final_system_b: "빈칸이 있으면 복제는 상속이 됩니다. 지우는 것보다 오래 남습니다.",
@@ -1335,6 +1429,52 @@ export const authoredEchoReplies = {
   c11_after_toast: "엎어 둔 휴대폰은 밤새 울립니다. 아무도 뒤집지 않습니다. 떡볶이는 식기 전에 다 먹습니다.",
   c11_after_record: "속기록은 잘리지 않습니다. 당신이 더듬은 12초도, 그룹이 인용할 한 문장도 그대로 남습니다.",
   c11_after_summon: "바로 응하면 주도권을 쥔 것처럼 보입니다. 33층은 당신이 얼마나 빨리 오는지부터 기록합니다.",
+  // 사건 06-11. The hidden route and its close answered with the scene's title and one stock sentence; these are the replies.
+  c6_route_system_index: "끝까지 열면 다음 참가자 칸에는 이름 대신 조건만 먼저 적혀 있습니다. 누가 앉든 같은 실험이 이어진다는 뜻입니다.",
+  c6_route_system_quiet: "색인을 닫으면 위원회는 예정대로 열립니다. 두 사람이 한 실험의 위아래 줄이었다는 사실은 그 방에 들어가지 못합니다.",
+  c6_route_system_pair: "같이 보자고 하면 오진우는 자기 줄보다 당신 줄을 먼저 읽습니다. 한참 뒤에 그가 말합니다. '그럼 제가 빨랐던 게 아니네요.'",
+  c6_final_system_route_a: "한 기록으로 내면 두 사람은 경쟁자가 아니라 같은 실험의 증인이 됩니다. 오진우가 감추고 싶어 한 속도의 이유도 그 기록에 함께 실립니다.",
+  c6_final_system_route_b: "조용히 끝내면 이번 위원회는 짧아집니다. 비어 있는 칸은 비어 있는 채로 다음 사람을 기다립니다.",
+  c6_final_system_route_c: "이름을 적으면 색인은 당신을 다음 참가자로 읽습니다. 그 칸에 앉을 뻔한 누군가는 자기가 비켜 갔다는 것을 끝내 모릅니다.",
+  c6_evidence_turn_pair: "대조표가 제출되면 위원회는 날짜부터 읽습니다. 그의 창이 줄어든 날마다 당신의 선택이 하루 앞에 적혀 있습니다.",
+  c6_evidence_turn_shield: "당신 쪽을 가리면 표에는 그의 줄어든 시간만 남습니다. 누구 때문에 줄었는지는 빈칸이 됩니다.",
+  c6_evidence_turn_hand: "먼저 건네면 오진우가 날짜를 손가락으로 하나씩 짚습니다. 위원회에 낼지 말지는 이제 그가 정합니다.",
+  c7_route_system_trace: "전부 따라가면 열아홉 장이 한 장의 표가 됩니다. 표를 완성하는 데 남은 시간의 절반이 들어갑니다.",
+  c7_route_system_quiet: "표를 닫으면 당신의 발령은 한 건의 인사로 돌아갑니다. 같은 모양의 발령들은 서로를 모르는 채 남습니다.",
+  c7_route_system_call: "연락하면 몇 사람은 전화를 끊고, 몇 사람은 오래 말합니다. 그들은 자기 발령이 표의 한 줄이었다는 것을 처음 듣습니다.",
+  c7_final_system_route_a: "한 문서가 되면 빈 승인란은 실수가 아니라 방식으로 읽힙니다. 열아홉 명의 이름도 그 문서와 함께 밖으로 나갑니다.",
+  c7_final_system_route_b: "당신의 발령은 취소될 수 있습니다. 같은 표의 다른 줄들은 취소된 줄이 있었다는 것도 모릅니다.",
+  c7_final_system_route_c: "이름을 적으면 표의 빈 줄이 채워집니다. 다음에 이 표를 여는 사람은 마지막 줄에서 당신을 먼저 만납니다.",
+  c8_route_system_map: "한 장으로 이으면 일곱 회사가 한 사람의 필체처럼 보입니다. 지도를 그리는 동안 청산 등기의 시계도 같이 갑니다.",
+  c8_route_system_one: "한 곳만 파면 자료는 빨리 모입니다. 앞선 여섯 곳은 이번에도 서로 상관없는 회사로 남습니다.",
+  c8_route_system_agent: "찾아가면 세무 대리인은 일곱 곳 모두 의뢰받은 대로 했다고 말합니다. 누가 의뢰했는지는 그의 장부에 있습니다.",
+  c8_final_system_route_a: "무늬로 묶이면 해온파트너스는 사건이 아니라 일곱 번째 사례가 됩니다. 받는 쪽은 첫 번째부터 다시 읽어야 합니다.",
+  c8_final_system_route_b: "한 건만 남기면 설명은 짧아집니다. 같은 손이 여덟 번째 회사를 만들 때 막아설 기록은 없습니다.",
+  c8_final_system_route_c: "조회 기록을 남기면 이 무늬를 본 사람이 있었다는 사실이 남습니다. 그 사람이 누구인지도 함께 남습니다.",
+  c9_route_system_add: "공식 자료가 되면 채권단은 그 숫자를 반박해야 합니다. 반박하려면 먼저 읽어야 합니다.",
+  c9_route_system_quiet: "두 장으로만 싸우면 회의는 회수율의 말로 끝납니다. 1,140명의 비용은 이번에도 회의록 밖에 있습니다.",
+  c9_route_system_families: "먼저 보여 주면 가족들은 자기 집 숫자를 표에서 찾습니다. 몇 사람은 추정치가 실제보다 적다며 고쳐 줍니다.",
+  c9_final_system_route_a: "한 묶음이 되면 살리는 값과 벌하는 값 옆에 치르는 값이 섭니다. 채권단은 세 번째 장에서 가장 오래 멈춥니다.",
+  c9_final_system_route_b: "회수율로만 말하면 협상은 빨라집니다. 표에 적혔던 비용은 청구서가 되어 집집마다 따로 갑니다.",
+  c9_final_system_route_c: "이름을 쓰면 추정치를 책임질 사람이 생깁니다. 숫자가 틀린 날 가장 먼저 불려 갈 사람도 당신입니다.",
+  c10_route_system_publish: "등록되면 소진율은 분기마다 집계됩니다. 집계를 어느 부서가 맡을지는 그룹이 정합니다.",
+  c10_route_system_hide: "개인 건으로 가면 심의는 한 사람의 병력만 봅니다. 앞서 떠난 스물아홉 명은 이번에도 각자의 사정으로 남습니다.",
+  c10_route_system_reach: "연락하면 떠난 사람들이 비슷한 말을 합니다. 그만둔 게 아니라 더는 못 한 거라고. 받아 적는 데 밤이 여럿 들어갑니다.",
+  c10_final_system_route_a: "한 묶음이 되면 명단을 지키는 제도에 사람을 지키는 숫자가 붙습니다. 승인하는 쪽은 그 숫자부터 빼자고 할 것입니다.",
+  c10_final_system_route_b: "분담표는 통과합니다. 여섯 사람이 나눠 든 무게가 얼마 만에 닳는지는 아무도 재지 않습니다.",
+  c10_final_system_route_c: "이름을 미리 적으면 당신도 세는 사람이 아니라 세어지는 사람이 됩니다. 도윤하가 그 줄을 보고 한참 말이 없습니다.",
+  c10_evidence_turn_restore: "요구가 접수되면 인사부는 보기를 왜 지웠는지부터 답해야 합니다. 그 질문은 개정안을 쓴 부서로 넘어갑니다.",
+  c10_evidence_turn_hold: "심의장에서 꺼내면 가장 크게 울립니다. 그때까지 도윤하의 신청서는 '개인 사정' 칸에 놓여 있습니다.",
+  c10_evidence_turn_share: "알리면 열아홉 명이 자기 신청서를 다시 꺼냅니다. 스스로 고른 줄 알았던 문구가 하나뿐인 보기였다는 것을 처음 봅니다.",
+  c11_route_system_publish: "넘기면 기사는 출석 전에 나갑니다. 의원들은 자기 방의 통계를 기사로 먼저 읽고 회의장에 들어옵니다.",
+  c11_route_system_pledge: "쓰지 않기로 하면 모르는 것은 모른다고 말해야 합니다. 40초짜리 답변에서 그 말은 생각보다 길게 들립니다.",
+  c11_route_system_drop: "틀을 따르면 답변은 매끄럽습니다. 속기록에는 '확인해 보겠습니다'가 한 번 더 적힙니다.",
+  c11_final_system_route_a: "날짜를 붙이면 약속은 속기록에 기한과 함께 남습니다. 그날 가장 먼저 전화를 받는 사람은 당신입니다.",
+  c11_final_system_route_b: "질문은 넘어갑니다. 통계는 부록에 실리고, 부록을 여는 사람은 내년 국정감사를 준비하는 보좌관쯤입니다.",
+  c11_final_system_route_c: "약속하면 방이 잠깐 조용해집니다. 제 발로 다시 오겠다는 참고인의 말은 그 방의 속기록에서 찾기 어렵습니다.",
+  c11_evidence_turn_submit: "동시에 넘기면 어느 쪽도 먼저 묻을 수 없습니다. 두 시각 사이의 빈 시간이 내일 질의의 첫 질문이 됩니다.",
+  c11_evidence_turn_hold: "참고인석에서 꺼내면 카메라 열두 대가 그 종이를 찍습니다. 그 전까지 한서윤은 자기가 지운 사람으로 남아 있습니다.",
+  c11_evidence_turn_share: "먼저 보여 주면 한서윤이 두 시각을 오래 봅니다. 3년 동안 자기가 지웠다고 믿어 온 것이 반려까지였다는 것을 처음 압니다.",
 };
 
 // A case pack's people and lines join these tables here, where the tables live,
@@ -1344,5 +1484,12 @@ export const authoredEchoReplies = {
 for (const pack of CASE_PACKS) {
   Object.assign(choiceVoiceLines, pack.voiceLines);
   Object.assign(authoredEchoReplies, pack.echoReplies);
-  Object.assign(characterProfiles, pack.characterProfiles);
+  for (const [name, profile] of Object.entries(pack.characterProfiles ?? {})) {
+    // A pack introduces its own people. Someone the season already knows is
+    // not introduced twice: what changes for them in this case goes in
+    // `characterOverrides`, which holds for this case only.
+    if (characterProfiles[name]) characterProfileCollisions.push(`${name} (${pack.id})`);
+    else characterProfiles[name] = profile;
+  }
+  if (pack.characterOverrides) packCharacterOverrides[pack.id] = pack.characterOverrides;
 }

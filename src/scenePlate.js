@@ -9,7 +9,7 @@
  *
  * So the plate is computed. `getScenePlate` reads the two facts the scene
  * already states about itself -- `place`, which says what kind of room this is,
- * and `phase`, which says how much pressure is on it -- and returns a spec that
+ * and `pressure`, which says whether it is closing in -- and returns a spec that
  * `ScenePlate.jsx` draws as inline SVG. No bytes are downloaded, `check:art`
  * has nothing new to police, and a scene that is rewritten into a different
  * building draws its new building on the next render.
@@ -116,27 +116,6 @@ const MOTIF_RULES = [
   ["lobby", ["로비", "안내데스크", "출입 게이트"]],
   ["corridor", ["복도", "탕비실", "엘리베이터", "대기실", "면담실"]],
 ];
-
-/** Beats where the room is closing in. Everything else reads cool. */
-const PRESSURE_PHASES = new Set([
-  "BREAK THE BOARD",
-  "COUNTER PRESSURE",
-  "TRAP",
-  "LEAK",
-  "PUBLIC PRESSURE",
-  "COLLAPSE",
-  "BOARD VOTE",
-  "HEARING",
-  "CONFRONTATION",
-  "FINAL DECISION",
-  "THE OTHER CONDITION",
-  "AFTERMATH",
-  "LAST EVIDENCE",
-  "THE TRACE",
-  "THE BAIT",
-  "THE LEDGER",
-  "THE TIMING",
-]);
 
 /** Rooms where someone is always taking a picture. */
 const FLASH_MOTIFS = new Set(["chamber", "newsroom"]);
@@ -290,7 +269,8 @@ export function getPlateTone(place = "") {
   return Math.max(0, PLATE_TONE_NAMES.indexOf(getPlateOrg(place)));
 }
 
-function hashString(value) {
+/** FNV-1a over a string: the seed every per-scene generator starts from. */
+export function hashString(value) {
   let hash = 0x811c9dc5;
   for (let index = 0; index < value.length; index += 1) {
     hash ^= value.charCodeAt(index);
@@ -350,7 +330,8 @@ export function getScenePlate(node = {}, nodeId = "") {
   const seed = hashString(`${nodeId}:${place}`);
   const night = NIGHT_MARKERS.some((marker) => clock.includes(marker));
   const winter = WINTER_MARKERS.some((marker) => clock.includes(marker)) || WINTER_MONTH.test(clock);
-  const pressure = PRESSURE_PHASES.has(node.phase);
+  // Set by the graph build, not read off the chip: `phase` is player copy.
+  const pressure = node.pressure === true;
   return {
     motif,
     seed,
@@ -374,7 +355,7 @@ export function getScenePlate(node = {}, nodeId = "") {
     // Winter replaces the rain: a cold clock over open sky or glass snows,
     // night or day, and a storm does not break over snow.
     snow: winter && SNOW_MOTIFS.has(motif),
-    lightning: night && !winter && SKY_MOTIFS.has(motif) && PRESSURE_PHASES.has(node.phase),
+    lightning: night && !winter && SKY_MOTIFS.has(motif) && pressure,
     spot: SPOT_MOTIFS.has(motif),
     leds: LED_MOTIFS.has(motif),
     bokeh: night && BOKEH_MOTIFS.has(motif),

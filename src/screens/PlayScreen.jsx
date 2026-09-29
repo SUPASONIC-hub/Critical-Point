@@ -77,7 +77,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
           question: narrativeSpine.question,
         }}
       />
-      {debugToolsEnabled && (
+      {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
         <aside className="debug-overlay" data-testid="debug-overlay" aria-label="개발자 진행 추적">
           <div className="debug-overlay-heading">
             <span>DEBUG</span>

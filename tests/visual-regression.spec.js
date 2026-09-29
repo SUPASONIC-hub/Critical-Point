@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
@@ -57,18 +57,16 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
         visibility: hidden !important;
       }
       /* Debug-only chrome, taken out of the flow rather than blanked. The
-         ?debug=1 entry turns all four on in the harness (tests/helpers/gameFlow.js:27,
-         src/appConfig.js:22) and nothing turns them on for a player, so leaving
-         their boxes behind would bake vertical space no player can ever see into
-         the two result baselines: 96px of diagnostics blocks on both, plus 100px
-         of buttons on mobile, where src/styles/app/responsive.css:196-212 stacks
-         .top-actions into full-width rows. Neither debug button has a class of
-         its own; aria-expanded is the error-log disclosure's only signature in
-         this row (src/screens/ResultScreen.jsx:208) and the export button
-         carries a testid (:224). The expectMasked guard below is what keeps
-         those two selectors honest. */
-      .telemetry-stats,
-      .replay-diagnostics,
+         ?debug=1 entry turns these buttons on in the harness
+         (tests/helpers/gameFlow.js:27, src/appConfig.js:22) and nothing turns
+         them on for a player, so leaving their boxes behind would bake 100px no
+         player can ever see into the mobile result baseline, where
+         src/styles/app/responsive.css:196-212 stacks .top-actions into
+         full-width rows. Neither button has a class of its own; aria-expanded
+         is the error-log disclosure's only signature in this row
+         (src/screens/ResultScreen.jsx:208) and the export button carries a
+         testid (:224). The expectMasked guard below is what keeps those two
+         selectors honest. */
       .result-page .top-actions button[aria-expanded],
       .result-page .top-actions [data-testid="export-diagnostic-log"] {
         display: none !important;
@@ -85,11 +83,11 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
   }
 }
 
-// The four selectors the display:none block above has to keep hitting on a
-// result capture. Intro and play captures never render them.
+// The selectors the display:none block above has to keep hitting on a result
+// capture. Intro and play captures never render them. The telemetry and replay
+// diagnostics are in the report archive, which the captures leave closed and
+// which draws nothing until it is opened (src/screens/ReportArchive.jsx).
 const RESULT_MASK_SELECTORS = [
-  ".telemetry-stats",
-  ".replay-diagnostics",
   ".result-page .top-actions button[aria-expanded]",
   '.result-page .top-actions [data-testid="export-diagnostic-log"]',
 ];
@@ -262,7 +260,10 @@ test("case result desktop visual baseline @visual", async ({ page }, testInfo) =
   });
 });
 
-test("case result mobile layout stays within the viewport", async ({ page }) => {
+test("case result mobile layout stays within the viewport", { tag: "@layout" }, async ({ page, browserName }) => {
+  // A whole case is played to reach the report, against a dev server that
+  // hands WebKit its modules one at a time.
+  test.slow(browserName === "webkit");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
@@ -307,6 +308,7 @@ test("case result explains the ending signals", async ({ page }) => {
   });
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
+  await page.locator("details.report-archive > summary").click();
   await expect(page.locator(".ending-rationale")).toContainText("믿음");
   await expect(page.locator(".ending-rationale")).toContainText("공정함");
 });
@@ -315,7 +317,7 @@ test("case result explains the ending signals", async ({ page }) => {
 // gauntlet table it is one: the pot, the gauge, every card and both verbs fit a
 // 390x844 viewport with nothing scrolled. A budget, not a pixel comparison, so it
 // fails on a layout regression rather than on a font hint.
-test("mobile play screen keeps the whole decision on one screen", async ({ page }) => {
+test("mobile play screen keeps the whole decision on one screen", { tag: "@layout" }, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });

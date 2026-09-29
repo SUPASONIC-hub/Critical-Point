@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 const isTextField = (target) =>
   target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']");
@@ -10,11 +11,26 @@ const isTextField = (target) =>
 // briefing page, unreachable from the keyboard.
 const isDialogButton = (target, selector) => target instanceof HTMLElement && target.matches(`${selector} button`);
 
+// Anything that answers Space or Enter on its own once it has focus.
+const isControl = (target) => target instanceof HTMLElement && Boolean(target.closest("button, summary, a[href], [role='button']"));
+
 function cardIdForKey(key, cards, reframeChoice) {
   const index = Number(key) - 1;
   if (!Number.isInteger(index) || index < 0) return null;
   if (cards[index]) return cards[index].id;
   return index === cards.length && reframeChoice ? REFRAME_CARD_ID : null;
+}
+
+/**
+ * The letter a key stands for, read off where the key is rather than what it
+ * types. `event.key` follows the layout: with a Hangul layout on, W, E and Q
+ * arrive as ㅈ, ㄷ and ㅂ, and push, lock and stance did nothing for a player
+ * typing in the language the game is written in. `event.code` is the key
+ * itself. A keyboard that reports no code falls back to the character.
+ */
+function letterOf(event) {
+  const code = String(event.code ?? "");
+  return /^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : String(event.key ?? "").toLowerCase();
 }
 
 /**
@@ -26,6 +42,16 @@ function cardIdForKey(key, cards, reframeChoice) {
  * the browser's. Bare Shift used to lock focus too, which meant Shift+P --
  * save and leave -- first fired a lock, and a lock off the beat is a JAM.
  *
+ * Space and Enter belong to whatever the keyboard walked to. The table used to
+ * take them from every focused control: a player who tabbed to 저장, the music
+ * toggle or a card and pressed Space pushed instead -- which can bust -- and
+ * Enter cashed the staked card, so a card could not be staked with Tab at all.
+ * When focus got where it is by Tab, the control answers and the table stays
+ * out of it. When a pointer left it there -- a card was clicked, and the hand
+ * is back on the keys -- Space still pushes and Enter still cashes.
+ * `:focus-visible` cannot tell the two apart: Chromium turns it on for a
+ * pointer-focused button at the first key press, so the walk is tracked here.
+ *
  * The handler is installed once and reads the stage's current actions through
  * a ref, so it never sees a stale window.
  */
@@ -36,13 +62,23 @@ export function useTableKeys(actions) {
   });
 
   useEffect(() => {
+    let walked = false;
+    const onPointer = () => {
+      walked = false;
+    };
     const onKey = (event) => {
+      if (event.key === "Tab") walked = true;
       if (event.repeat || event.defaultPrevented) return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (isTextField(event.target)) return;
       if (document.querySelector(".decision-reveal-backdrop")) return;
       const current = actionsRef.current;
       const key = event.key;
+      // Single-character keys off (the comfort setting, WCAG 2.1.4): a letter,
+      // a digit or a jamo does nothing. Space, Enter and Escape are not
+      // character keys and stay.
+      if (!getAccessibility().letterKeys && key.length === 1 && key !== " ") return;
+      const letter = letterOf(event);
       const activation = key === " " || key === "Enter";
 
       if (current.draftOpen) {
@@ -64,7 +100,7 @@ export function useTableKeys(actions) {
       if (current.briefingOpen) {
         if (activation && isDialogButton(event.target, ".gx-comic")) return;
         const cardId = cardIdForKey(key, current.cards, current.reframeChoice);
-        if (activation || key.toLowerCase() === "w" || cardId) {
+        if (activation || letter === "w" || cardId) {
           event.preventDefault();
           current.openTable(cardId);
         }
@@ -72,14 +108,14 @@ export function useTableKeys(actions) {
       }
 
       if (!current.tableOpen) return;
-      const lower = key.toLowerCase();
-      if (lower === "e") {
+      if (activation && walked && isControl(event.target)) return;
+      if (letter === "e") {
         event.preventDefault();
         current.focus(event);
-      } else if (lower === "q") {
+      } else if (letter === "q") {
         event.preventDefault();
         current.cycleFocusMode();
-      } else if (key === " " || lower === "w") {
+      } else if (key === " " || letter === "w") {
         event.preventDefault();
         current.push(event);
       } else if (key === "Enter") {
@@ -93,6 +129,10 @@ export function useTableKeys(actions) {
       }
     };
     globalThis.addEventListener("keydown", onKey);
-    return () => globalThis.removeEventListener("keydown", onKey);
+    globalThis.addEventListener("pointerdown", onPointer, true);
+    return () => {
+      globalThis.removeEventListener("keydown", onKey);
+      globalThis.removeEventListener("pointerdown", onPointer, true);
+    };
   }, []);
 }

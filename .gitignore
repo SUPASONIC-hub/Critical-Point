@@ -3,7 +3,12 @@ dist/
 test-results/
 playwright-report/
 debug.log
-.env
+# Vite reads .env, .env.local, .env.<mode> and .env.<mode>.local, and the README
+# tells a developer to create .env.local -- which `.env` alone did not cover.
+# The two that are committed hold placeholders, not keys.
+.env*
+!.env.example
+!.env.e2e
 .DS_Store
 .claude/worktrees/
 

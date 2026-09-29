@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/network.js";
 import { writeFileSync } from "node:fs";
 import { CASE_SEQUENCE } from "../src/gameData.js";
 import { startDebugNode } from "./helpers/gameFlow.js";

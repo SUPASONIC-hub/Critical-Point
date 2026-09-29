@@ -55,6 +55,29 @@ export function cspProblems(value) {
 }
 
 /**
+ * Hosts written with a wildcard, where the page is allowed to send data.
+ *
+ * `connect-src https://*.supabase.co` names every project on the platform, so
+ * a script that did get to run could post a player's save to a project of its
+ * own and the policy would wave it through. `render.yaml` has to say it that
+ * way -- the project's address is not in the repository -- so this is asked of
+ * the live header, which the dashboard is meant to have narrowed, and only
+ * reported for the file.
+ */
+export function wildcardHostProblems(value) {
+  const csp = parseCsp(value);
+  const problems = [];
+  for (const name of ["connect-src", "form-action"]) {
+    for (const source of csp.get(name) ?? []) {
+      if (source.includes("*") && source !== "*") {
+        problems.push(`${name} names a wildcard host (${source}); name the one origin the app calls`);
+      }
+    }
+  }
+  return problems;
+}
+
+/**
  * Inline script the policy above would block -- which, once `'unsafe-inline'`
  * is gone, means a page that silently stops working rather than an XSS hole.
  * Data blocks (`application/json`, `application/ld+json`) are not executed and
@@ -82,4 +105,104 @@ export function inlineScriptProblems(html) {
 export function readRenderYamlCsp(yaml) {
   const match = /name:\s*Content-Security-Policy\s*\n\s*value:\s*(["']?)(.+?)\1\s*$/im.exec(String(yaml ?? ""));
   return match ? match[2] : null;
+}
+
+/** Every header `render.yaml` declares: `[{ path, name, value }]`, names lower-cased. */
+export function readRenderYamlHeaders(yaml) {
+  const headers = [];
+  const pattern = /-\s*path:\s*(\S+)\s*\n\s*name:\s*(\S+)\s*\n\s*value:\s*(["']?)(.+?)\3\s*$/gim;
+  for (const match of String(yaml ?? "").matchAll(pattern)) {
+    headers.push({ path: match[1], name: match[2].toLowerCase(), value: match[4] });
+  }
+  return headers;
+}
+
+/** The headers every page is served with, and what each has to say. */
+const SITE_HEADERS = [
+  ["x-content-type-options", (value) => (/^nosniff$/i.test(value.trim()) ? null : "is not nosniff")],
+  ["referrer-policy", (value) => (/unsafe-url|no-referrer-when-downgrade/i.test(value) ? "sends the full address to other origins" : null)],
+  ["content-security-policy", () => null],
+  // A browser that has seen this asks for https from then on. A year at least:
+  // anything shorter lapses between two visits of an occasional player.
+  ["strict-transport-security", (value) => {
+    const seconds = Number(/max-age\s*=\s*"?(\d+)/i.exec(value)?.[1] ?? 0);
+    return seconds >= 31536000 ? null : `max-age is ${seconds}s; a year (31536000) at least`;
+  }],
+  // A page that opened this one, or that this one opened, gets no handle on it.
+  ["cross-origin-opener-policy", (value) => (/^same-origin(-allow-popups)?$/i.test(value.trim()) ? null : "is not same-origin")],
+  // What the app has no use for, switched off by name: a script that ran would
+  // have to ask, and the browser would refuse.
+  ["permissions-policy", (value) => {
+    const off = new Set([...value.matchAll(/([a-z-]+)\s*=\s*\(\s*\)/gi)].map((match) => match[1].toLowerCase()));
+    const missing = ["camera", "microphone", "geolocation", "payment", "usb"].filter((feature) => !off.has(feature));
+    return missing.length ? `leaves ${missing.join(", ")} on` : null;
+  }],
+];
+
+/** `getHeader(name)` returns the served value or null. Every header that is missing or says too little. */
+export function siteHeaderProblems(getHeader) {
+  const problems = [];
+  for (const [name, judge] of SITE_HEADERS) {
+    const value = getHeader(name);
+    if (!value) {
+      problems.push(`${name} is missing`);
+      continue;
+    }
+    const problem = judge(String(value));
+    if (problem) problems.push(`${name} ${problem}`);
+  }
+  return problems;
+}
+
+const maxAge = (value, directive) => {
+  const match = new RegExp(`(?:^|[,\\s])${directive}\\s*=\\s*"?(\\d+)`, "i").exec(String(value ?? ""));
+  return match ? Number(match[1]) : null;
+};
+
+/**
+ * The shell must be asked for again on every visit, by the browser and by any
+ * cache in between: it is the one file that names the fingerprinted ones, so a
+ * stale copy points at assets a deploy has already replaced.
+ */
+export function shellCacheProblems(value) {
+  const text = String(value ?? "").toLowerCase();
+  if (!text.trim()) return ["the page is served with no Cache-Control"];
+  if (/\bno-store\b/.test(text)) return [];
+  const problems = [];
+  const browser = maxAge(text, "max-age");
+  const shared = maxAge(text, "s-maxage");
+  if (!/\bno-cache\b/.test(text) && browser !== 0) problems.push(`the page may be reused without asking (${value}); serve no-cache`);
+  if (shared !== null && shared > 0) problems.push(`the page is held by shared caches for ${shared}s (${value}), so a deploy is not seen until then`);
+  return problems;
+}
+
+/** A fingerprinted file never changes behind its name, so it is kept for a year and never asked about. */
+export function assetCacheProblems(value) {
+  const text = String(value ?? "").toLowerCase();
+  const browser = maxAge(text, "max-age");
+  const problems = [];
+  if (browser === null || browser < 31536000) problems.push(`a fingerprinted asset is kept for ${browser ?? 0}s (${value || "no Cache-Control"}); serve max-age=31536000`);
+  if (!/\bimmutable\b/.test(text)) problems.push(`a fingerprinted asset is not immutable (${value || "no Cache-Control"}), so every visit asks about it again`);
+  return problems;
+}
+
+/** The first fingerprinted file the page links, as a path: `/assets/index-abc123.js`. */
+export function firstAssetPath(html) {
+  const match = /\b(?:src|href)\s*=\s*["'](?:https?:\/\/[^"'/]+)?(\/assets\/[^"'?#]+-[A-Za-z0-9_-]{6,}\.(?:js|css|woff2))["']/i.exec(String(html ?? ""));
+  return match ? match[1] : null;
+}
+
+/**
+ * What `render.yaml` has to declare, so the written record and the checks
+ * agree on what the dashboard is meant to be set to.
+ */
+export function renderYamlHeaderProblems(yaml) {
+  const headers = readRenderYamlHeaders(yaml);
+  const find = (path, name) => headers.find((header) => header.path === path && header.name === name)?.value ?? null;
+  const problems = siteHeaderProblems((name) => find("/*", name)).map((problem) => `/*: ${problem}`);
+  for (const path of ["/", "/index.html"]) {
+    problems.push(...shellCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
+  }
+  problems.push(...assetCacheProblems(find("/assets/*", "cache-control")).map((problem) => `/assets/*: ${problem}`));
+  return problems;
 }

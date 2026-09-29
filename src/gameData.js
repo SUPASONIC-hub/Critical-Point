@@ -1,6 +1,6 @@
 export { byEffectWeight, cognitionLabels, costWhenRising, initialResources, isResourceGain, triggerLabels } from "./gameConstants.js";
 export { characterProfiles, choiceVoiceLines } from "./gameDialogue.js";
-export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseAftermathNodeId, caseDisplayCode, caseNodePattern, caseNodePrefix, caseObjectives, nodeOrders, seasonCasesBase } from "./gameCases.js";
+export { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, SEASON_ENTRY_CASE, SEASON_ENTRY_NODE, caseAftermathNodeId, caseDisplayCode, caseNodePrefix, caseObjectives, seasonCasesBase } from "./gameCases.js";
 import { case01Nodes } from "./nodes/case01.js";
 import { case02Nodes } from "./nodes/case02.js";
 import { case03Nodes } from "./nodes/case03.js";
@@ -13,11 +13,11 @@ import { case09Nodes } from "./nodes/case09.js";
 import { case10Nodes } from "./nodes/case10.js";
 import { case11Nodes } from "./nodes/case11.js";
 import { finalCaseNodes } from "./nodes/finalCase.js";
-import { applySceneContext } from "./nodes/sceneContext.js";
+import { coreCards } from "./nodes/coreCards.js";
+import * as sceneBuild from "./nodes/sceneBuild.js";
 import { authoredEchoReplies, choiceVoiceLines } from "./gameDialogue.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "./nodes/casePacks.js";
-import { isResourceGain } from "./gameConstants.js";
-import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./gameCases.js";
+import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES } from "./gameCases.js";
 
 /**
  * Everything below rewires the graph in place: aftermath, connective, reaction,
@@ -29,10 +29,42 @@ import { CASE_SEQUENCE, CASE_START_NODES, nodeOrders, RESULT_NODE_IDS } from "./
  */
 const CASE_PACKS = structuredClone(AUTHORED_CASE_PACKS);
 
+/**
+ * Every scene of each case, in play order. A copy, like the packs: the
+ * generators below grow it, and the authored table belongs to a module the
+ * intro shell loads before this one.
+ */
+export const nodeOrders = structuredClone(authoredNodeOrders);
+
 export { CASE_PACKS };
 
 /** Authored replies plus one for every scene the generators below add. */
 export const echoReplies = { ...authoredEchoReplies };
+
+/**
+ * What the generators supplied because nobody had written it: the closing
+ * scene the hidden routes share, and the line and reply of a choice that had
+ * neither. `check:graph` counts what is still standing on this net.
+ */
+export const fallbackCopy = { scenes: [], voice: [], echo: [] };
+
+function fallBackOn(choiceId, voice, echo) {
+  if (!choiceVoiceLines[choiceId]) {
+    choiceVoiceLines[choiceId] = voice;
+    fallbackCopy.voice.push(choiceId);
+  }
+  if (!echoReplies[choiceId]) {
+    echoReplies[choiceId] = echo;
+    fallbackCopy.echo.push(choiceId);
+  }
+}
+
+/** A scene a table names has to be in the graph; a generator that skipped a mistyped id dropped the scene in silence. */
+function sceneOf(nodeId, owner) {
+  const scene = nodes[nodeId];
+  if (!scene) throw new Error(`${owner} names the scene "${nodeId}", which the graph does not have`);
+  return scene;
+}
 
 /**
  * The authored scene graph, one file per case. Everything below this literal
@@ -164,7 +196,7 @@ const aftermathNodes = {
     phase: "AFTERMATH",
     title: "야간조의 아침",
     speaker: "강태민",
-    text: "결의가 끝난 다음 날 새벽 네 시, 플로우온 풀필먼트센터(물건을 보관하고 포장해 내보내는 물류 창고). 사건 01의 그날 밤 컵라면을 뜯어 주던 야간조 반장 강태민이 당신을 알아봅니다. '낮에 오라니까.' 그가 웃으며 컵라면 두 개에 물을 붓습니다. 회사 이름은 바뀔지 모르지만 오늘 새벽에도 상자는 옮겨집니다. 삼 분을 기다리는 동안 그가 묻습니다. '이제 어디로 가요.'",
+    text: "결의가 끝난 다음 날 새벽 네 시, 플로우온 풀필먼트센터(물건을 보관하고 포장해 내보내는 물류 창고). 72시간의 그날 밤 컵라면을 뜯어 주던 야간조 반장 강태민이 당신을 알아봅니다. '낮에 오라니까.' 그가 웃으며 컵라면 두 개에 물을 붓습니다. 회사 이름은 바뀔지 모르지만 오늘 새벽에도 상자는 옮겨집니다. 삼 분을 기다리는 동안 그가 묻습니다. '이제 어디로 가요.'",
     memo: ["채권단 결의 결과가 현장에 공지됨", "야간조 38명 전원 출근", "권도현이 출근 명단 사본을 요청함", "영동지점 복귀 명령은 아직 유효"],
     triggers: ["affection", "protection", "responsibility"],
     choices: [
@@ -215,20 +247,21 @@ const aftermathNodes = {
 };
 
 CASE_PACKS.forEach((pack) => Object.assign(aftermathNodes, pack.aftermath));
-Object.assign(nodes, aftermathNodes);
+for (const [nodeId, scene] of Object.entries(aftermathNodes)) nodes[nodeId] = { ...scene, kind: "aftermath" };
 
-// [case, the scene that closes it, its aftermath]: 사건 01-11 and the finale by
-// hand, the packs from their own `aftermathRoute`.
+// [case, the scene that closes it, its aftermath]. 사건 01-05 close on their
+// routes' own finals (`registerDramaticRoutePlan`), so they name no scene.
 const aftermathRoutes = [
-  ["case01", "final", "c1_aftershock"],
-  ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
+  ...[1, 2, 3, 4, 5].map((index) => [`case0${index}`, null, `c${index}_aftershock`]),
+  ...[6, 7, 8, 9, 10, 11].map((index) => [`case${String(index).padStart(2, "0")}`, `c${index}_final`, `c${index}_aftershock`]),
   ...CASE_PACKS.map(({ id, aftermathRoute: [finalId, aftershockId] }) => [id, finalId, aftershockId]),
   ["final", "f_choice", "f_aftershock"],
 ];
 aftermathRoutes.forEach(([caseId, nodeId, nextNode]) => {
-  nodes[nodeId].choices.forEach((choice) => {
-    choice.next = nextNode;
-  });
+  if (nodeId) {
+    const closing = Object.assign(sceneOf(nodeId, `${caseId} aftermath route`), { kind: "decision" });
+    closing.choices.forEach((choice) => { choice.next = nextNode; });
+  }
   nodeOrders[caseId].push(nextNode);
 });
 
@@ -236,21 +269,21 @@ const connectiveScenes = [
   ["c1_witness", "accounting", "payday", "누가 179.6을 만들었나", "반재욱", "회계팀 막내가 회의실 문 앞에서 멈춰 섰습니다. 장부가 틀렸다고 말하지는 않습니다. 대신 그 숫자를 만들던 날 회의실에 은행 사람이 앉아 있었다고 말합니다. 명함은 못 받았습니다.", ["원본 파일은 세 번 저장됨", "막내 직원은 회의 초대를 받지 못함", "재무책임자의 지시는 구두로만 남음", "그날 회의 참석자 명단에 외부인 1명 누락"], ["직원을 보호하며 증언할 자리를 만든다", "원본 파일을 먼저 잠가 증거를 보존한다", "말이 퍼지기 전에 CFO와 비공개로 합의한다"]],
   ["c1_assembly", "payday", "competitor", "급여일 전의 약속", "도윤하", "급여일 아침을 버티려면 돈만 필요한 것이 아닙니다. 직원들은 회사가 무엇을 숨기고 있는지보다, 내일도 자신이 이곳에 있을지 알고 싶어 합니다.", ["야간조 대표가 공동 공지를 요구함", "협력사 세 곳이 같은 지급 기준을 요구함", "임원진은 개인 보수를 먼저 공개하길 꺼림"], ["직원 대표와 함께 공개 약속을 만든다", "지급 순서를 숫자로 고정한다", "임원진만 아는 임시 합의를 만든다", "임원 보수를 먼저 깎아 줄 돈을 마련한다"]],
   ["c1_bargain", "competitor", "board", "팔리지 않은 자리", "오진우", "넥스트마일의 협상안에는 빈칸이 하나 있습니다. 인수하지 않을 사업부, 남겨질 직원, 협력사 중 누가 그 빈칸을 채울지 아무도 쓰지 않았습니다.", ["인수 조건에 책임 주체가 없음", "협력사는 매각보다 지급 보장을 원함", "오진우는 승률을 높이는 문장만 골라냄"], ["빈칸을 채운 뒤에만 협상한다", "가장 약한 쪽의 조건부터 반영한다", "빈칸을 남겨 빠르게 사인한다"]],
-  ["c1_verdict", "board", "final", "판결이 아닌 선택", "에코", "모든 자료가 테이블 위에 올라왔지만 결론은 더 멀어졌습니다. 이제 당신의 선택은 회사를 설명하는 문장이 아니라, 누가 내일의 비용을 들 것인지 정하는 문장입니다.", ["직원·협력사·투자자의 요구가 동시에 도착함", "한쪽을 살리면 다른 쪽의 신뢰가 줄어듦", "반응 패턴이 다음 사건으로 전송될 예정"], ["가장 약한 사람의 손실부터 줄인다", "살아남을 돈을 먼저 확보한다", "결정의 책임과 근거를 모두 공개한다"]],
+  ["c1_verdict", "board", "c1_final_funding", "판결이 아닌 선택", "에코", "모든 자료가 테이블 위에 올라왔지만 결론은 더 멀어졌습니다. 이제 당신의 선택은 회사를 설명하는 문장이 아니라, 누가 내일의 비용을 들 것인지 정하는 문장입니다.", ["직원·협력사·투자자의 요구가 동시에 도착함", "한쪽을 살리면 다른 쪽의 신뢰가 줄어듦", "반응 패턴이 다음 사건으로 전송될 예정"], ["가장 약한 사람의 손실부터 줄인다", "살아남을 돈을 먼저 확보한다", "결정의 책임과 근거를 모두 공개한다"]],
   ["c2_trace", "c2_logs", "c2_meeting", "사라진 11초", "임경수", "퇴직한 전 심사팀장이 헌책방 2층에서 끈으로 묶은 서류를 풀어 놓습니다. 접속 기록에는 11초의 빈틈이 있고, 그 11초에 바뀐 페이지가 그의 종이 사본에는 그대로 남아 있습니다. '전산은 고치면 그만이지만 종이는 태워야 하거든. 태운 자리는 표가 나고.'", ["종이 사본에만 남은 3페이지 하단", "이민서 계정은 빈틈 직전에 사용됨", "보안팀은 빈틈을 단순 오류라고 주장함", "임경수는 이 사본을 4년째 보관 중"], ["11초를 기술적으로 재현한다", "이민서에게 그 시간의 행동을 묻는다", "오류로 처리하고 보고 시간을 지킨다"]],
   ["c2_witness", "c2_meeting", "c2_pressure", "이민서의 침묵", "도윤하", "이민서는 자신을 변호하지 않습니다. 대신 누가 그 파일을 받았는지보다, 왜 하필 서명란이 빈 3페이지만 정리하라는 지시가 내려왔는지부터 물어봅니다.", ["스캔 정리 지시는 구두로만 내려옴", "지시받은 범위는 3페이지 한 장뿐", "이민서는 그 페이지를 읽지 않고 처리함", "재계약 심사까지 2주"], ["이민서의 안전을 먼저 확보한다", "파일의 이동 경로만 추적한다", "침묵을 의심 신호로 기록한다", "이민서와 조건을 걸고 거래한다"]],
-  ["c2_judgment", "c2_pressure", "c2_final", "보고서 밖의 사람", "한서윤", "보안팀은 결론을 요구하지만, 이민서의 동료들은 보고서에 없는 사실을 알고 있습니다. 공식 기록과 사람의 기억 중 하나만 고를 수는 없습니다.", ["동료 두 명이 익명 증언을 제출함", "1차 보고 마감까지 18분", "외부 기업은 유출 사실을 부인함"], ["익명 증언을 공식 부록으로 붙인다", "기록에 없는 정보는 보류한다", "외부 기업과 먼저 대면한다"]],
+  ["c2_judgment", "c2_pressure", "c2_final_evidence", "보고서 밖의 사람", "한서윤", "보안팀은 결론을 요구하지만, 이민서의 동료들은 보고서에 없는 사실을 알고 있습니다. 공식 기록과 사람의 기억 중 하나만 고를 수는 없습니다.", ["동료 두 명이 익명 증언을 제출함", "1차 보고 마감까지 18분", "외부 기업은 유출 사실을 부인함"], ["익명 증언을 공식 부록으로 붙인다", "기록에 없는 정보는 보류한다", "외부 기업과 먼저 대면한다"]],
   ["c3_rival", "c3_split", "c3_score", "같은 자료, 다른 목적", "오진우", "오진우는 당신의 자료에 없는 숫자를 들고 왔습니다. 고객이 실제로 원하는 것은 비용 절감이 아니라 실패했을 때 책임질 사람이라는 사실입니다.", ["고객사는 책임 조항을 비공개로 요구함", "경쟁안은 책임을 하청사로 넘김", "보안팀은 발표에서 빠져 있음"], ["책임 조항을 앞에 세운다", "비용표부터 다시 계산한다", "오진우에게 없는 숫자의 출처를 묻는다"]],
   ["c3_signal", "c3_score", "c3_trap", "관객석의 신호", "에코", "발표장 뒤편의 불이 두 번 깜빡였습니다. 고객 신호인지 트리거랩의 시험인지 알 수 없지만, 오진우는 그 신호를 보고 답을 바꿉니다.", ["불빛은 보안 경고와 같은 주기임", "고객 대표는 신호를 부인함", "오진우의 응답 시간이 비정상적으로 짧아짐"], ["신호를 공개 질문으로 바꾼다", "발표를 멈추고 보안부터 확인한다", "상대보다 먼저 결론을 밀어붙인다", "오진우와 신호의 해석을 나눠 갖는다"]],
-  ["c3_verdict", "c3_trap", "c3_final", "승부의 끝에서", "한서윤", "당신은 이제 오진우보다 빠르거나 느린 사람이 아닙니다. 어떤 기준으로 승부를 끝낼지 정하는 사람입니다.", ["고객사는 오늘 안에 결론을 원함", "보안 결함은 아직 완전 증명 전", "공동 발표를 하면 책임은 나뉨"], ["검증을 끝낸 뒤 발표한다", "공동 책임으로 발표한다", "불확실성을 숨기고 승리를 확정한다"]],
+  ["c3_verdict", "c3_trap", "c3_final_joint", "승부의 끝에서", "한서윤", "당신은 이제 오진우보다 빠르거나 느린 사람이 아닙니다. 어떤 기준으로 승부를 끝낼지 정하는 사람입니다.", ["고객사는 오늘 안에 결론을 원함", "보안 결함은 아직 완전 증명 전", "공동 발표를 하면 책임은 나뉨"], ["검증을 끝낸 뒤 발표한다", "공동 책임으로 발표한다", "불확실성을 숨기고 승리를 확정한다"]],
   ["c4_audit", "c4_offer", "c4_leak", "3%의 주인", "반재욱", "부족한 3%는 단순한 숫자가 아니었습니다. 그 숫자를 만든 결정과, 그 숫자 때문에 서비스를 잃는 사람의 이름이 서로 다른 서류에 적혀 있습니다. 한쪽 서류의 서명란은 비어 있습니다.", ["계산 공식에는 현장 업무가 빠져 있음", "심사 기준은 2년 전 자료에 고정됨", "상환 일정 변경 요청서의 서명란은 공란", "서비스 이용자 대표가 발언을 요청함"], ["이용자 대표의 기준을 반영한다", "산식 변경 이력을 남긴다", "3%를 조용히 보정한다"]],
   ["c4_public", "c4_leak", "c4_vote", "기자가 기다리는 문장", "도윤하", "기자는 아직 기사를 쓰지 않았습니다. 다만 당신이 어떤 표현을 선택하는지에 따라 내일의 제목이 정해질 것이라고 말합니다.", ["제보 메일은 내부에서 시작됨", "온새는 서비스 중단을 막고 싶어 함", "심사관은 공개 설명을 요구함"], ["사실과 모르는 것을 함께 공개한다", "서비스 이용자 피해를 먼저 알린다", "기사에 나갈 표현을 최소화한다", "기사 시점을 늦추는 대신 전량 공개를 약속한다"]],
-  ["c4_verdict", "c4_vote", "c4_final", "선의의 증거", "에코", "좋은 의도는 증거가 되지 않습니다. 하지만 좋은 결과만을 위해 규칙을 늘리면, 다음 사람은 그 규칙을 이용할 수 있습니다.", ["이사회는 오늘 결정을 요구함", "감사 자료는 공개 가능함", "서비스 이용자 4,200명이 결과를 기다림"], ["예외를 공개된 조건으로 묶는다", "규칙을 지키고 서비스를 포기한다", "결과가 좋다면 기록은 나중에 설명한다"]],
+  ["c4_verdict", "c4_vote", "c4_final_rule", "선의의 증거", "에코", "좋은 의도는 증거가 되지 않습니다. 하지만 좋은 결과만을 위해 규칙을 늘리면, 다음 사람은 그 규칙을 이용할 수 있습니다.", ["이사회는 오늘 결정을 요구함", "감사 자료는 공개 가능함", "서비스 이용자 4,200명이 결과를 기다림"], ["예외를 공개된 조건으로 묶는다", "규칙을 지키고 서비스를 포기한다", "결과가 좋다면 기록은 나중에 설명한다"]],
   ["c5_pattern", "c5_map", "c5_blame", "실패가 움직인 경로", "반재욱", "지도 위의 화살표가 한 사람에게 모이지 않습니다. 모든 화살표가 서로의 합리적인 선택을 통과해 같은 곳에 도착했습니다.", ["각 팀은 다른 팀의 정보를 보지 못함", "가장 먼저 위험을 말한 기록이 누락됨", "책임표에는 승인자만 남아 있음"], ["정보가 막힌 지점을 먼저 고친다", "승인자에게 책임을 집중한다", "피해가 큰 부서부터 보상한다"]],
   ["c5_voice", "c5_blame", "c5_collapse", "이름 없는 증언", "도윤하", "누군가가 회의실 밖에서 말합니다. 자신은 결정권자가 아니었지만, 실패를 가장 먼저 보았다고 합니다.", ["증언자는 기록에서 빠져 있음", "말하면 팀 전체가 조사받을 수 있음", "피해자들은 책임자 이름보다 회복을 요구함"], ["증언자를 보호하고 기록을 복원한다", "공식 책임자 발표를 먼저 한다", "보상안을 만들고 조사를 미룬다", "증언자의 고용을 내 권한으로 보장한다"]],
-  ["c5_verdict", "c5_collapse", "c5_final", "책임의 모양", "한서윤", "실패를 설명하는 방법은 세 가지입니다. 사람을 지목하거나, 구조를 고치거나, 피해를 먼저 되돌리는 것. 어느 것도 공짜는 아닙니다.", ["개선 예산은 한정됨", "책임 발표를 기다리는 언론", "피해 복구팀이 즉시 출범할 수 있음"], ["내 결정부터 공개한다", "반복을 막는 구조에 투자한다", "피해 복구를 가장 먼저 시작한다"]],
+  ["c5_verdict", "c5_collapse", "c5_final_redesign_route", "책임의 모양", "한서윤", "실패를 설명하는 방법은 세 가지입니다. 사람을 지목하거나, 구조를 고치거나, 피해를 먼저 되돌리는 것. 어느 것도 공짜는 아닙니다.", ["개선 예산은 한정됨", "책임 발표를 기다리는 언론", "피해 복구팀이 즉시 출범할 수 있음"], ["내 결정부터 공개한다", "반복을 막는 구조에 투자한다", "피해 복구를 가장 먼저 시작한다"]],
   ["c6_kitchen", "c6_desk", "c6_logs", "탕비실의 세 사람", "도윤하", "탕비실에서 반재욱이 오진우의 머그컵을 씻고 있습니다. '증거물 아닙니까' 하고 도윤하가 묻자 그는 '커피 자국은 증거가 아닙니다' 하고 답합니다. 셋 다 웃지 않지만, 아무도 먼저 나가지 않습니다.", ["그를 아는 사람이 생각보다 많음", "머그컵은 결국 씻겼음", "위원회 자료는 아직 한 줄도 쓰지 못함"], ["여기서 나눈 이야기를 자료에 넣는다", "이 자리는 기록 밖에 두고 자료는 따로 쓴다", "자리를 끝내고 각자 일로 돌아간다"]],
-  ["c6_family", "c6_logs", "c6_panel", "누나의 전화", "한서윤", "오진우의 누나가 회사로 전화했습니다. 동생이 승진했다고 들었는데 축하 자리를 언제 하느냐고 묻습니다. 그 승진은 사건 03 직후의 일이고, 그때부터 그의 결정 창이 줄기 시작했습니다.", ["가족은 아무것도 모름", "승진 시점과 조건 변경 시점이 같음", "통화는 30초 만에 끝났음"], ["가족에게 사실대로 알린다", "회사 공식 창구로 안내한다", "지금은 아무 말도 하지 않는다"]],
+  ["c6_family", "c6_logs", "c6_panel", "누나의 전화", "한서윤", "오진우의 누나가 회사로 전화했습니다. 동생이 승진했다고 들었는데 축하 자리를 언제 하느냐고 묻습니다. 그 승진은 노바웍스 입찰 직후의 일이고, 그때부터 그의 결정 창이 줄기 시작했습니다.", ["가족은 아무것도 모름", "승진 시점과 조건 변경 시점이 같음", "통화는 30초 만에 끝났음"], ["가족에게 사실대로 알린다", "회사 공식 창구로 안내한다", "지금은 아무 말도 하지 않는다"]],
   ["c6_ledger", "c6_panel", "c6_final", "두 장의 프로필", "에코", "위원회 직전, 에코가 두 장의 프로필을 나란히 띄웁니다. 왼쪽은 오진우, 오른쪽은 당신입니다. 축소된 창과 늘어난 창이 같은 그래프의 위아래로 그려집니다. 에코가 말합니다. '둘 중 하나는 대조군입니다.'", ["두 프로필의 실험 번호가 동일", "대조군이 누구인지는 표시되지 않음", "위원회 시작까지 10분"], ["두 장을 함께 위원회에 낸다", "내 것만 빼고 그의 것을 낸다", "둘 다 덮고 사실관계로만 간다"]],
   ["c7_receipt", "c7_ledger", "c7_counter", "영수증", "반재욱", "택시비를 반으로 나누자며 반재욱이 영수증을 찢어 반쪽을 내밉니다. 마흔한 명을 자른 사람이 4,300원을 두고 실랑이를 합니다. '기록에 남길 수 없는 건 안 받습니다.' 그는 농담을 한 적이 없고, 이번에도 농담이 아닙니다.", ["반쪽 영수증에 그의 서명이 있음", "그는 아직 수첩을 가방에서 꺼내지 않음", "감사팀 서고 출입 기록은 이미 남았음"], ["그의 방식대로 반씩 나눠 적는다", "영수증을 받아 내 경비로 처리한다", "그냥 넘기고 시간을 아낀다"]],
   ["c7_teller", "c7_counter", "c7_paper", "창구 4번", "도윤하", "지점을 나오는 길에 4번 창구의 노년 행원이 도윤하를 부릅니다. '도 대리, 아직 그 말버릇 있네.' 3년 전 함께 앉아 있던 사람입니다. 그는 묻지도 않고 서랍에서 그해 목표표 사본을 꺼내 놓습니다. 자기 이름이 적힌 쪽을 접어서 밀어 줍니다.", ["4번 창구 행원은 당시 같은 팀", "사본은 지점 자체 보관본", "그는 내년이 정년"], ["접힌 쪽을 펴서 그의 이름도 함께 쓴다", "접힌 그대로 받아 이름은 가린다", "사본은 두고 원본 절차만 밟는다"]],
@@ -265,7 +298,7 @@ const connectiveScenes = [
   ["c10_pills", "c10_claim", "c10_relay", "열아홉 명", "한서윤", "한서윤이 인사 기록부를 엽니다. 최근 3년, 트리거랩과 강서지점에서 같은 사유로 병가를 낸 사람이 열아홉 명입니다. 사유란은 전부 '개인 사정'입니다. 그가 화면을 한 줄 더 내리다가 멈춥니다. 열아홉 명 중 한 명이 한서윤 본인입니다. 2년 전, 2주.", ["같은 사유 병가 19건 -- 전부 개인 사정으로 기록", "19명 중 현재 재직자는 11명", "한서윤 본인이 그중 한 명", "집단 심의로 묶으면 제도 결함이 쟁점이 됨"], ["열아홉 명을 한 건으로 묶어 집단 심의를 요구한다", "한서윤의 기록은 빼고 열여덟 명으로 간다", "개별 심의가 빠르다며 도윤하 건만 먼저 끝낸다"]],
   ["c10_ledger", "c10_relay", "c10_final", "여섯 장의 손익계산서", "권도현", "오진우가 권도현을 불렀습니다. 그가 분담표를 보더니 빈 종이에 세로줄을 긋습니다. '여섯 칸 다 채우십시오. 잃는 것 칸이 비면 이 표는 반년 안에 무너집니다. 선의로 시작한 표가 무너지는 걸 저는 집안에서 봤습니다.' 다섯 칸이 채워집니다. 강태민은 야간 수당, 이민서는 계약 갱신 평가, 나준혁은 정년퇴직까지 2년, 임경수는 조용함, 오진우는 승진 순번. 여섯 번째 칸이 비어 있습니다.", ["여섯 명 중 넷은 이 일로 얻는 것이 없음", "권도현: 잃는 것이 적힌 표만 오래 간다", "당신의 칸은 아직 공란", "표가 무너지면 1,128명이 다시 한 사람에게 돌아감"], ["내 칸에 승진과 복귀를 잃는다고 적는다", "잃을 것이 없다고 적고 표를 넘긴다", "여섯 칸을 모두 공개하고 서로 검토하게 한다"]],
   ["c11_press", "c11_script", "c11_rehearsal", "부재중 전화 스물세 통", "서하린", "밤 열 시, 리드라인 기자 서하린이 의원회관 앞 편의점으로 찾아옵니다. 당신 휴대폰에는 그의 부재중 전화가 스물세 통 쌓여 있습니다. 그가 컵라면 두 개에 물을 붓고 하나를 밀어 줍니다. '기사에 틀린 게 하나 있어요. 제보자가 그렇게 말해서 A씨를 여성이라고 썼거든요. 고칠까요, 그냥 둘까요? 그냥 두면 당신은 조금 더 숨을 수 있어요.' 편의점 직원이 두 사람을 번갈아 보다가, 텔레비전 볼륨을 슬쩍 줄입니다. 화면에는 그 기사가 나오고 있습니다.", ["기사 속 A씨의 성별이 틀리게 적힘", "그대로 두면 신원 추적이 며칠 늦어짐", "고치면 기사 신뢰도는 올라가고 당신은 드러남"], ["틀린 건 고쳐 달라고 하고 드러나는 쪽을 택한다", "국정감사 날까지만 그대로 두자고 부탁한다", "기사 내용은 기자 판단에 맡기고 선을 긋는다"]],
-  ["c11_father", "c11_rehearsal", "c11_sign", "방청권 한 장", "오진우", "리허설이 끝나고 오진우가 계단참에서 휴대폰을 오래 봅니다. 국정감사 방청권(회의를 지켜볼 수 있는 입장권) 신청 명단에 '오상철'이라는 이름이 있습니다. 3년 전 승인을 하루 늦춰 지점에서 밀려난 그의 아버지입니다. 부자는 2년째 명절에도 통화하지 않았습니다. '아버지가 거길 왜 오시는지 모르겠어요. 제가 틀렸다는 걸 보러 오시는 건지, 자기가 옳았다는 걸 보러 오시는 건지.' 그가 웃으려다 그만둡니다.", ["방청 신청 명단에 오상철", "오진우 부자, 2년째 연락 없음", "오상철: 3년 전 승인을 하루 늦춘 지점장"], ["출석 전날 두 사람이 같이 밥을 먹게 자리를 만든다", "방청석 자리를 오진우 옆으로 바꿔 준다", "아버지 일은 오진우가 정하게 두고 묻지 않는다"]],
+  ["c11_father", "c11_rehearsal", "c11_sign", "방청권 한 장", "오진우", "리허설이 끝나고 오진우가 계단참에서 휴대폰을 오래 봅니다. 국정감사 방청권(회의를 지켜볼 수 있는 입장권) 신청 명단에 '오상철'이라는 이름이 있습니다. 오래전 승인을 하루 늦춰 지점에서 밀려난 그의 아버지입니다. 부자는 2년째 명절에도 통화하지 않았습니다. '아버지가 거길 왜 오시는지 모르겠어요. 제가 틀렸다는 걸 보러 오시는 건지, 자기가 옳았다는 걸 보러 오시는 건지.' 그가 웃으려다 그만둡니다.", ["방청 신청 명단에 오상철", "오진우 부자, 2년째 연락 없음", "오상철: 승인을 하루 늦춘 옛 지점장"], ["출석 전날 두 사람이 같이 밥을 먹게 자리를 만든다", "방청석 자리를 오진우 옆으로 바꿔 준다", "아버지 일은 오진우가 정하게 두고 묻지 않는다"]],
   ["c11_eve", "c11_sign", "c11_final", "여섯 시 사십 분", "도윤하", "출석 날 새벽 여섯 시 사십 분, 국회 앞 횡단보도. 도윤하가 보온병을 들고 먼저 와 있습니다. 강태민이 야간조를 마치고 형광 조끼 차림 그대로 합류하고, 나준혁은 단추를 새로 단 정장을 입고 와서 모두에게 보여 줍니다. 도윤하가 종이컵에 보리차를 따르다 손을 떱니다. '오늘 제 이름도 나올 거예요. 판 사람으로요. 괜찮아요. 3년 동안 그 말을 제일 많이 한 사람이 저니까.' 신호가 바뀌고, 아무도 먼저 건너지 않습니다.", ["참고인 출석 3시간 전", "도윤하: 판매 당사자로 언급될 가능성", "방청 신청 7명 전원 도착"], ["도윤하의 이름이 나오면 내가 먼저 받아서 답하겠다고 한다", "판 사람과 팔게 만든 구조를 나눠서 말하자고 정한다", "오늘은 도윤하가 방청석에 오지 않는 게 낫다고 말한다"]],
   ["f_witness", "f_archive", "f_confront", "첫 번째 참가자", "도윤하", "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.", ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"], ["이전 참가자에게 먼저 알린다", "복제된 문장을 모두 증거로 수집한다", "실험을 멈추기 위해 서버를 닫는다"]],
   ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다", "실험을 이어가되 나를 다음 참가자로 등록한다"]],
@@ -863,39 +896,8 @@ function getAuthoredSceneCopy(sourceId, id) {
   return copy;
 }
 
-/**
- * Which way of thinking a generated choice exercises, read from the choice.
- *
- * It was read from the column -- connective scenes ran persistence / inference
- * / risk / reframing, reaction scenes reframing / inference / risk -- so a
- * player who always took the second card was an "inference" player by
- * construction. Now the label's verb decides: each way of thinking has phrases
- * that do it (checking a record, redrawing the terms, staying with someone,
- * moving before it is safe), and the axis the card gains most on is worth half
- * a phrase. Ties go to the axis, then the order below. Reframing is worth 2, as
- * the fourth card always was; the rest 1. Choice ids are untouched.
- */
-const COGNITION_CUES = {
-  reframing: ["다시 짜", "판을", "바꾼다", "바꿔", "구조", "제안", "조건", "규칙", "새로", "설계", "합친다", "첫 문장", "기준을", "뒤집", "등록"],
-  inference: ["확인", "대조", "맞춰 본", "따져", "묻는다", "물어", "출처", "기록", "문서", "적어", "원본", "보존", "증거", "자료", "조사", "추적", "찾", "검토", "공식", "지적", "이의", "설명"],
-  persistence: ["끝까지", "곁", "옆에", "같이", "함께", "지킨다", "기다", "버틴", "남는다", "남아", "밤새", "듣는다", "만난다", "앉", "한 분씩", "한 명씩"],
-  risk: ["바로", "즉시", "당장", "일단", "빠르게", "조용히", "넘긴다", "넘어간", "빼", "덮", "못 본", "몰래", "서둘", "먼저 치", "그대로 두"],
-};
-const COGNITION_ORDER = ["reframing", "inference", "persistence", "risk"];
-const AXIS_COGNITION = { trust: "persistence", humanCost: "persistence", fatigue: "persistence", legitimacy: "inference", capital: "risk", time: "risk" };
-
-function inferChoiceCognition(label = "", effect = {}) {
-  const [axis] = Object.entries(effect).filter(([key, value]) => isResourceGain(key, value)).sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))[0] ?? [];
-  const axisType = AXIS_COGNITION[axis];
-  const score = (type) =>
-    COGNITION_CUES[type].reduce((sum, cue) => sum + (label.includes(cue) ? 2 : 0), 0) + (type === axisType ? 1 : 0);
-  const type = COGNITION_ORDER.reduce((best, candidate) => (score(candidate) > score(best) ? candidate : best), axisType ?? COGNITION_ORDER[0]);
-  return { [type]: type === "reframing" ? 2 : 1 };
-}
-
 function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, labels]) {
-  const source = nodes[sourceId];
-  if (!source) return;
+  const source = sceneOf(sourceId, `connective scene ${id}`);
   const effects = getAuthoredSceneEffects(sourceId, id);
   const copy = getAuthoredSceneCopy(sourceId, id);
   source.choices.forEach((choice) => { choice.next = id; });
@@ -907,6 +909,7 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
     // steps. They are all the same story beat: the part that happens outside
     // the meeting that was scheduled.
     phase: "OFF THE RECORD",
+    kind: "connective",
     title,
     speaker,
     text,
@@ -918,7 +921,7 @@ function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, l
         label,
         effect: effects[index],
         next: nextId,
-        cognition: inferChoiceCognition(label, effects[index]),
+        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -950,9 +953,11 @@ CASE_PACKS.forEach((pack) => {
 
 Object.entries(connectiveOrders).forEach(([caseId, pairs]) => {
   pairs.forEach(([sourceId, bridgeId]) => {
+    sceneOf(bridgeId, `${caseId} connective order`);
     const order = nodeOrders[caseId];
     const index = order.indexOf(sourceId);
-    if (index >= 0) order.splice(index + 1, 0, bridgeId);
+    if (index < 0) throw new Error(`${caseId} connective order places ${bridgeId} after ${sourceId}, which is not in the case`);
+    order.splice(index + 1, 0, bridgeId);
   });
 });
 
@@ -960,19 +965,19 @@ const reactionScenes = [
   ["c1_witness_reaction", "c1_witness", "payday", "증언 뒤의 침묵", "한서윤", "증언이 시작되자 회계팀 전체가 말을 멈췄습니다. 누구를 보호하느냐에 따라 내일의 보고서가 완전히 달라집니다.", ["증언자를 보호하고 팀 전체에 기준을 설명한다", "증언을 문서로만 남기고 회의를 끝낸다", "CFO에게 먼저 반응할 기회를 준다"]],
   ["c1_assembly_reaction", "c1_assembly", "competitor", "급여일의 첫 문자", "에코", "첫 급여가 입금되기 전, 직원 단체방에 서로 다른 소문이 올라왔습니다. 정정할수록 더 많은 질문이 생깁니다.", ["사실과 아직 모르는 것을 함께 알린다", "입금 확인 뒤에 한 번에 공지한다", "소문을 만든 사람을 먼저 찾는다"]],
   ["c1_bargain_reaction", "c1_bargain", "board", "협상장의 빈 의자", "도윤하", "협상 상대가 자리에 오지 않았습니다. 그 빈 의자는 인수에서 제외될 사람들의 자리처럼 보입니다.", ["빈 의자의 사람들을 협상에 부른다", "조건표를 먼저 완성해 협상을 이어간다", "상대가 돌아올 때까지 침묵한다"]],
-  ["c1_verdict_reaction", "c1_verdict", "final", "결론 전 마지막 질문", "반재욱", "모두가 당신에게 결론을 요구하지만, 반재욱은 마지막으로 묻습니다. 이 결론을 가장 먼저 듣게 될 사람은 누구입니까.", ["가장 큰 피해를 받는 사람에게 먼저 설명한다", "투자자에게 근거부터 제출한다", "회의록에 책임자만 남긴다"]],
+  ["c1_verdict_reaction", "c1_verdict", "c1_final_funding", "결론 전 마지막 질문", "반재욱", "모두가 당신에게 결론을 요구하지만, 반재욱은 마지막으로 묻습니다. 이 결론을 가장 먼저 듣게 될 사람은 누구입니까.", ["가장 큰 피해를 받는 사람에게 먼저 설명한다", "투자자에게 근거부터 제출한다", "회의록에 책임자만 남긴다"]],
   ["c2_trace_reaction", "c2_trace", "c2_meeting", "11초 뒤의 접속", "에코", "빈틈을 재현하자 다른 계정이 깨어났습니다. 오류를 고치면 진실도 함께 사라질 수 있습니다.", ["기록을 보존한 채 접근을 막는다", "계정을 따라가 원인을 확인한다", "전체 시스템을 초기화한다"]],
   ["c2_witness_reaction", "c2_witness", "c2_pressure", "보호받은 사람의 말", "반재욱", "이민서는 처음으로 자신이 보호받는 것이 두렵다고 말합니다. 보호는 때로 의심받을 기회를 빼앗습니다.", ["이민서가 직접 말할 수 있는 절차를 만든다", "대신 진술해 위험을 줄인다", "보호를 해제하고 조사에 맡긴다"]],
-  ["c2_judgment_reaction", "c2_judgment", "c2_final", "익명성의 가격", "도윤하", "익명 증언을 붙이면 진실은 커지지만, 누구도 그 책임을 지지 않습니다. 보고서의 문장 하나가 사람들의 이름을 바꿀 수 있습니다.", ["익명성을 지키며 증언의 한계를 쓴다", "실명을 확인한 뒤 보고한다", "증언을 빼고 기록만 제출한다"]],
+  ["c2_judgment_reaction", "c2_judgment", "c2_final_evidence", "익명성의 가격", "도윤하", "익명 증언을 붙이면 진실은 커지지만, 누구도 그 책임을 지지 않습니다. 보고서의 문장 하나가 사람들의 이름을 바꿀 수 있습니다.", ["익명성을 지키며 증언의 한계를 쓴다", "실명을 확인한 뒤 보고한다", "증언을 빼고 기록만 제출한다"]],
   ["c3_rival_reaction", "c3_rival", "c3_score", "경쟁자의 제안", "오진우", "오진우는 자신의 안을 훔쳐도 좋다고 말합니다. 대신 당신이 그 안을 어떻게 바꾸는지 보고 싶다고 합니다.", ["공동 검증 조건을 제안한다", "자료 출처를 따져 협상을 멈춘다", "상대의 안을 이용해 먼저 제출한다"]],
   ["c3_signal_reaction", "c3_signal", "c3_trap", "두 번 깜빡인 불", "한서윤", "신호가 다시 깜빡였습니다. 이번에는 고객 대표도 보았습니다. 하지만 누구도 먼저 그 의미를 말하지 않습니다.", ["모두 앞에서 신호의 의미를 질문한다", "발표를 계속하며 신호를 기록한다", "신호를 무시하고 점수부터 확보한다"]],
-  ["c3_verdict_reaction", "c3_verdict", "c3_final", "승부 뒤의 책임표", "에코", "누가 이겼는지는 이미 결정됐지만 책임표는 비어 있습니다. 성공한 뒤의 실패를 누가 설명할지 정해야 합니다.", ["책임표를 공동으로 작성한다", "내 이름을 가장 위에 적는다", "성과가 난 뒤에 책임을 논의한다"]],
+  ["c3_verdict_reaction", "c3_verdict", "c3_final_joint", "승부 뒤의 책임표", "에코", "누가 이겼는지는 이미 결정됐지만 책임표는 비어 있습니다. 성공한 뒤의 실패를 누가 설명할지 정해야 합니다.", ["책임표를 공동으로 작성한다", "내 이름을 가장 위에 적는다", "성과가 난 뒤에 책임을 논의한다"]],
   ["c4_audit_reaction", "c4_audit", "c4_leak", "3%를 본 사람들", "도윤하", "이용자 대표들이 각자의 3%를 말하기 시작했습니다. 숫자를 맞추는 일은 쉬웠지만, 누구의 3%를 먼저 볼지는 어려웠습니다.", ["가장 취약한 이용자부터 기준을 세운다", "전체 평균을 기준으로 삼는다", "심사관의 기준만 따른다"]],
   ["c4_public_reaction", "c4_public", "c4_vote", "기사의 제목", "반재욱", "기자는 세 문장 중 하나만 쓸 수 있다고 합니다. 어떤 문장을 고르느냐에 따라 선의는 개혁이 되거나 은폐가 됩니다.", ["모르는 부분까지 포함한 문장을 고른다", "서비스가 유지된다는 결과를 강조한다", "논란을 만들 표현을 모두 뺀다"]],
-  ["c4_verdict_reaction", "c4_verdict", "c4_final", "감사실의 문", "에코", "감사실 문 앞에 서자 내부 자료를 넘긴 사람이 나타났습니다. 그는 규칙을 지킨 사람이 가장 큰 피해를 보았다고 말합니다.", ["자료를 공개하고 규칙을 다시 쓴다", "제보자를 보호한 뒤 내부에서 해결한다", "문을 닫고 심사 결과를 기다린다"]],
+  ["c4_verdict_reaction", "c4_verdict", "c4_final_rule", "감사실의 문", "에코", "감사실 문 앞에 서자 내부 자료를 넘긴 사람이 나타났습니다. 그는 규칙을 지킨 사람이 가장 큰 피해를 보았다고 말합니다.", ["자료를 공개하고 규칙을 다시 쓴다", "제보자를 보호한 뒤 내부에서 해결한다", "문을 닫고 심사 결과를 기다린다"]],
   ["c5_pattern_reaction", "c5_pattern", "c5_blame", "화살표를 거꾸로", "에코", "지도를 뒤집자 피해자에게 책임 화살표가 향했습니다. 누군가 만든 분류 방식이 실패를 더 오래 유지하고 있었습니다.", ["분류 방식을 폐기하고 다시 듣는다", "가장 큰 승인자만 조사한다", "기존 지도를 유지한 채 보완한다"]],
   ["c5_voice_reaction", "c5_voice", "c5_collapse", "말할 수 있는 조건", "한서윤", "증언자는 말할 준비가 됐지만, 팀을 떠나야만 안전합니다. 진실을 얻는 대신 조직을 잃을 수 있습니다.", ["떠나지 않아도 말할 수 있게 보호한다", "증언 뒤에 즉시 조직을 바꾼다", "조직을 지키기 위해 증언을 보류한다"]],
-  ["c5_verdict_reaction", "c5_verdict", "c5_final", "책임의 다음 날", "도윤하", "책임을 발표한 다음 날에도 피해는 그대로였습니다. 누군가를 지목한 말보다, 무엇을 되돌릴지가 더 급해졌습니다.", ["피해 복구를 발표의 첫 문장으로 둔다", "책임자의 사과를 먼저 받는다", "개선 계획이 완성될 때까지 침묵한다"]],
+  ["c5_verdict_reaction", "c5_verdict", "c5_final_redesign_route", "책임의 다음 날", "도윤하", "책임을 발표한 다음 날에도 피해는 그대로였습니다. 누군가를 지목한 말보다, 무엇을 되돌릴지가 더 급해졌습니다.", ["피해 복구를 발표의 첫 문장으로 둔다", "책임자의 사과를 먼저 받는다", "개선 계획이 완성될 때까지 침묵한다"]],
   ["c6_kitchen_reaction", "c6_kitchen", "c6_logs", "씻어 둔 컵", "반재욱", "반재욱이 컵을 엎어 말려 둔 자리에 포스트잇을 붙입니다. '쓰지 마시오'가 아니라 '오진우'라고만 적혀 있습니다. 그는 그게 무슨 뜻이냐는 질문에 답하지 않습니다.", ["이름표를 그대로 둔다", "자리 정리 절차를 함께 연다", "오늘 안에 자리를 비운다"]],
   ["c6_family_reaction", "c6_family", "c6_panel", "축하 자리", "도윤하", "누나가 회식 날짜를 다시 물어왔습니다. 도윤하가 조용히 말합니다. '거짓말을 하라는 게 아니라, 오늘은 대답하지 말라는 겁니다.' 그 말이 맞는지는 아무도 모릅니다.", ["오늘은 답하지 않는다", "회사 공식 창구가 답하게 한다", "지금 사실대로 전한다"]],
   ["c6_ledger_reaction", "c6_ledger", "c6_final", "대조군", "에코", "에코는 어느 쪽이 대조군인지 끝내 말하지 않습니다. 대신 한 줄을 띄웁니다. '대조군은 실험을 모르는 쪽입니다.' 당신은 지금 알고 있습니다.", ["내 프로필까지 함께 올린다", "두 장 다 봉인한다", "아는 것을 쓰지 않고 넘어간다"]],
@@ -989,7 +994,7 @@ const reactionScenes = [
   ["c10_pills_reaction", "c10_pills", "c10_relay", "2년 전 2주", "한서윤", "한서윤이 자기 병가 기록을 엽니다. 사유란: 개인 사정. 실제 날짜는 3년 전 플로우온 승인란에 서명한 뒤 두 달째 되는 날입니다. '저는 그때 아무한테도 말 안 했습니다. 말하면 제가 그 서명을 후회한다는 뜻이 되니까요.' 그가 화면을 닫으려다 손을 멈춥니다. '그런데 열아홉 명 중 열여덟 명도 같은 이유로 말을 안 했겠죠.'", ["그 2주를 기록에 사실대로 다시 쓰게 한다", "본인이 원하지 않으면 그 기록은 그대로 둔다", "당사자 동의를 받아 열아홉 번째 사례로 넣는다"]],
   ["c10_ledger_reaction", "c10_ledger", "c10_final", "오진우의 칸", "오진우", "오진우의 칸에는 '승진 순번'이라고 적혀 있습니다. 그런데 종이를 기울이면 지우고 다시 쓴 자국 아래로 원래 문장이 비칩니다. '아버지에게 할 말.' 그가 288명을 가져간 이유입니다. 아버지는 승인을 하루 늦춰 지점에서 밀려났고, 아들은 그 하루가 옳았다는 걸 288번 증명하려 합니다.", ["지우고 다시 쓴 그 줄을 못 본 척하고 표를 넘긴다", "288명은 너무 많다며 칸을 다시 나눈다", "아버지를 한번 만나러 가자고 말한다"]],
   ["c11_press_reaction", "c11_press", "c11_rehearsal", "검색어 3위", "에코", "에코가 지난 48시간의 검색 기록을 띄웁니다. 'KD은행 A씨'가 검색어 3위이고, 연관 검색어에 도윤하의 이름이 있습니다. 강서지점 실적 1위 표창 사진이 퍼졌고, 댓글 1,200개 중 공감을 가장 많이 받은 문장은 '판 사람도 공범 아닌가요'입니다. '당신이 드러나지 않는 동안, 사람들은 드러난 얼굴을 대신 찾습니다.'", ["도윤하에게 먼저 알리고 대응을 같이 정한다", "표창 사진을 퍼뜨린 계정부터 확인한다", "댓글은 보지 말자고 하고 출석 준비에만 집중한다"]],
-  ["c11_father_reaction", "c11_father", "c11_sign", "늦춘 하루", "오진우", "오상철이 먼저 전화를 걸어왔습니다. 오진우가 스피커를 켭니다. 쉰 목소리가 한참 망설이다 말합니다. '그날 하루 늦춘 거, 나는 아직도 잘했다고 생각한다. 그런데 그게 너한테 3년 동안 무슨 뜻이었는지는 한 번도 안 물어봤더라.' 오진우가 대답하지 못하고 휴대폰을 당신 쪽으로 밉니다. 통화 시간이 1분, 2분 넘어갑니다.", ["휴대폰을 오진우 손에 다시 쥐여 준다", "당신이 대신 인사하고 출석 날 뵙자고 한다", "잠깐 자리를 비켜 두 사람만 남긴다"]],
+  ["c11_father_reaction", "c11_father", "c11_sign", "늦춘 하루", "오진우", "오상철이 먼저 전화를 걸어왔습니다. 오진우가 스피커를 켭니다. 쉰 목소리가 한참 망설이다 말합니다. '그날 하루 늦춘 거, 나는 아직도 잘했다고 생각한다. 그런데 그게 너한테 그동안 무슨 뜻이었는지는 한 번도 안 물어봤더라.' 오진우가 대답하지 못하고 휴대폰을 당신 쪽으로 밉니다. 통화 시간이 1분, 2분 넘어갑니다.", ["휴대폰을 오진우 손에 다시 쥐여 준다", "당신이 대신 인사하고 출석 날 뵙자고 한다", "잠깐 자리를 비켜 두 사람만 남긴다"]],
   ["c11_eve_reaction", "c11_eve", "c11_final", "불출석 사유서", "에코", "국회 게시판에 윤상혁의 불출석 사유서(증인이 나오지 못하는 이유를 적어 내는 문서)가 올라옵니다. 사유는 '싱가포르 투자 설명회 참석'. 에코가 한 줄을 겹쳐 띄웁니다. 그 설명회 주최 측의 공지입니다. '행사는 주최 측 사정으로 취소되었습니다.' 공지 날짜는 사흘 전입니다. '사유서는 이미 사라진 일정 위에 쓰였습니다. 이 사실을 언제 말하느냐가 7분의 모양을 정합니다.'", ["질의 첫 1분에 취소 공지부터 꺼낸다", "의원실에 먼저 넘겨 의원이 묻게 한다", "사유서는 건드리지 않고 내 이야기에만 집중한다"]],
   ["f_witness_reaction", "f_witness", "f_confront", "첫 참가자의 선택", "반재욱", "첫 참가자는 자신의 기록을 돌려달라고 요청합니다. 하지만 기록을 돌려주면 지금까지의 실험 전체가 흔들립니다.", ["기록을 돌려주고 실험을 다시 설명한다", "기록을 증거로 보관하고 동의를 요청한다", "기록을 삭제해 피해를 끝낸다"]],
   ["f_dilemma_reaction", "f_dilemma", "f_choice", "종료 버튼 앞에서", "에코", "종료 버튼 위에는 당신의 이름이 표시되어 있습니다. 누르는 순간 실험은 끝나지만, 책임도 당신에게 남습니다.", ["참가자들과 함께 종료 조건을 정한다", "내가 혼자 버튼을 누른다", "버튼을 숨기고 시스템을 지켜본다"]],
@@ -1040,13 +1045,13 @@ for (const pack of CASE_PACKS) {
 }
 
 function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) {
-  const source = nodes[sourceId];
-  if (!source) return;
+  const source = sceneOf(sourceId, `reaction scene ${id}`);
   const effects = getAuthoredSceneEffects(sourceId, id);
   const copy = getAuthoredSceneCopy(sourceId, id);
   source.choices.forEach((choice) => { choice.next = id; });
   nodes[id] = {
     phase: "THE ROOM AFTER",
+    kind: "reaction",
     title,
     speaker,
     text,
@@ -1058,7 +1063,7 @@ function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) 
         label,
         effect: effects[index],
         next: nextId,
-        cognition: inferChoiceCognition(label, effects[index]),
+        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
       };
       choiceVoiceLines[choice.id] = copy.voice[index];
       echoReplies[choice.id] = copy.echo[index];
@@ -1070,10 +1075,9 @@ function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) 
 reactionScenes.forEach(addReactionScene);
 
 reactionScenes.forEach(([id, sourceId]) => {
-  Object.entries(nodeOrders).forEach(([, order]) => {
-    const index = order.indexOf(sourceId);
-    if (index >= 0) order.splice(index + 1, 0, id);
-  });
+  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(sourceId));
+  if (!order) throw new Error(`reaction scene ${id} follows ${sourceId}, which is in no case`);
+  order.splice(order.indexOf(sourceId) + 1, 0, id);
 });
 
 // Each case has one authored detour. The second scene always rejoins the existing route.
@@ -1125,9 +1129,9 @@ const authoredBranchScenes = {
     memo: ["복원 시각", "진술 순서", "보고서에 남길 원문"],
     triggers: ["injustice", "responsibility"],
     choices: [
-      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 7, legitimacy: 4, capital: -5, time: -4, fatigue: 5 }, next: "c2_final", cognition: { reframing: 1 } },
-      { id: "c2_branch_records_follow_b", label: "원문을 첨부해 외부 검증을 연다", effect: { legitimacy: 9, capital: -5, time: -4 }, next: "c2_final", cognition: { inference: 2 } },
-      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -4 }, next: "c2_final", cognition: { risk: 1 } },
+      { id: "c2_branch_records_follow_a", label: "진술자에게 원문 확인 권한을 준다", effect: { trust: 7, legitimacy: 4, capital: -5, time: -4, fatigue: 5 }, next: "c2_final_system", cognition: { reframing: 1 } },
+      { id: "c2_branch_records_follow_b", label: "원문을 첨부해 외부 검증을 연다", effect: { legitimacy: 9, capital: -5, time: -4 }, next: "c2_final_system", cognition: { inference: 2 } },
+      { id: "c2_branch_records_follow_c", label: "보고서의 결론만 남긴다", effect: { time: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -4 }, next: "c2_final_system", cognition: { risk: 1 } },
     ],
   },
   c3_branch_signal: {
@@ -1151,9 +1155,9 @@ const authoredBranchScenes = {
     memo: ["승리 발표의 수혜자", "검증되지 않은 보안 항목", "다음 계약의 조건"],
     triggers: ["competition", "order"],
     choices: [
-      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 8, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "c3_final", cognition: { persistence: 1 } },
-      { id: "c3_branch_signal_follow_b", label: "공동 책임자를 발표한다", effect: { trust: 8, capital: -4, legitimacy: 4 }, next: "c3_final", cognition: { reframing: 1 } },
-      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 8, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -3 }, next: "c3_final", cognition: { risk: 1 } },
+      { id: "c3_branch_signal_follow_a", label: "승리 조건에 검증 기한을 붙인다", effect: { legitimacy: 8, time: -6, capital: -4, humanCost: 2, fatigue: 3 }, next: "c3_final_system", cognition: { persistence: 1 } },
+      { id: "c3_branch_signal_follow_b", label: "공동 책임자를 발표한다", effect: { trust: 8, capital: -4, legitimacy: 4 }, next: "c3_final_system", cognition: { reframing: 1 } },
+      { id: "c3_branch_signal_follow_c", label: "성과 수치만 먼저 확정한다", effect: { capital: 8, trust: -7, legitimacy: -3, humanCost: 4, fatigue: -3 }, next: "c3_final_system", cognition: { risk: 1 } },
     ],
   },
   c4_branch_exception: {
@@ -1177,9 +1181,9 @@ const authoredBranchScenes = {
     memo: ["감사 요청의 범위", "예외 승인 기록", "보상 기준의 공개 여부"],
     triggers: ["responsibility", "recognition"],
     choices: [
-      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 8, trust: 6, time: -6, capital: -6, fatigue: 2 }, next: "c4_final", cognition: { inference: 1 } },
-      { id: "c4_branch_exception_follow_b", label: "감사 범위를 이용자 대표와 정한다", effect: { trust: 8, capital: -4, fatigue: 4 }, next: "c4_final", cognition: { reframing: 2 } },
-      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 6, legitimacy: -6, humanCost: 4, fatigue: -3 }, next: "c4_final", cognition: { risk: 1 } },
+      { id: "c4_branch_exception_follow_a", label: "감사 결과와 보상 기준을 함께 공개한다", effect: { legitimacy: 8, trust: 6, time: -6, capital: -6, fatigue: 2 }, next: "c4_final_system", cognition: { inference: 1 } },
+      { id: "c4_branch_exception_follow_b", label: "감사 범위를 이용자 대표와 정한다", effect: { trust: 8, capital: -4, fatigue: 4 }, next: "c4_final_system", cognition: { reframing: 2 } },
+      { id: "c4_branch_exception_follow_c", label: "좋은 결과를 근거로 감사를 닫는다", effect: { capital: 6, legitimacy: -6, humanCost: 4, fatigue: -3 }, next: "c4_final_system", cognition: { risk: 1 } },
     ],
   },
   c5_branch_owner: {
@@ -1203,9 +1207,9 @@ const authoredBranchScenes = {
     memo: ["복구된 사람", "재발 방지 소유자", "공개할 책임 범위"],
     triggers: ["protection", "responsibility"],
     choices: [
-      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 7, legitimacy: 7, capital: -7, fatigue: 5 }, next: "c5_final", cognition: { inference: 1 } },
-      { id: "c5_branch_owner_follow_b", label: "재발 방지 장치에 예산을 고정한다", effect: { capital: -8, legitimacy: 8, humanCost: -3 }, next: "c5_final", cognition: { persistence: 2 } },
-      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 6, trust: -6, legitimacy: -4, humanCost: 5, fatigue: -4 }, next: "c5_final", cognition: { risk: 1 } },
+      { id: "c5_branch_owner_follow_a", label: "복구 대상과 책임자를 함께 기록한다", effect: { trust: 7, legitimacy: 7, capital: -7, fatigue: 5 }, next: "c5_final_system_route", cognition: { inference: 1 } },
+      { id: "c5_branch_owner_follow_b", label: "재발 방지 장치에 예산을 고정한다", effect: { capital: -8, legitimacy: 8, humanCost: -3 }, next: "c5_final_system_route", cognition: { persistence: 2 } },
+      { id: "c5_branch_owner_follow_c", label: "사과문만 발표하고 종료한다", effect: { time: 6, trust: -6, legitimacy: -4, humanCost: 5, fatigue: -4 }, next: "c5_final_system_route", cognition: { risk: 1 } },
     ],
   },
   c6_branch_roof: {
@@ -1459,8 +1463,12 @@ for (const pack of CASE_PACKS) {
 }
 
 authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) => {
-  const source = nodes[sourceId];
-  if (!source || !authoredBranchScenes[firstId] || !authoredBranchScenes[secondId]) return;
+  const source = sceneOf(sourceId, `${caseId} branch plan`);
+  const unwritten = [firstId, secondId].find((branchId) => !authoredBranchScenes[branchId]);
+  if (unwritten) throw new Error(`${caseId} branch plan names the scene "${unwritten}", which no branch table writes`);
+  if (!source.choices[choiceIndex] || source.choices[choiceIndex].type === "reframe") {
+    throw new Error(`${caseId} branch plan puts its detour on card ${choiceIndex + 1} of ${sourceId}, which is not a card that scene deals`);
+  }
   const bypassNodeId = source.choices[choiceIndex].next;
   source.choices[choiceIndex] = {
     ...source.choices[choiceIndex],
@@ -1468,11 +1476,12 @@ authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, 
     branchId: firstId,
     ...(conditionId ? { branchCondition: conditionId, branchBypass: bypassNodeId } : {}),
   };
-  nodes[firstId] = authoredBranchScenes[firstId];
-  nodes[secondId] = authoredBranchScenes[secondId];
+  nodes[firstId] = { ...authoredBranchScenes[firstId], kind: "branch" };
+  nodes[secondId] = { ...authoredBranchScenes[secondId], kind: "branch" };
   const order = nodeOrders[caseId];
   const sourceOrderIndex = order.indexOf(sourceId);
-  if (sourceOrderIndex >= 0) order.splice(sourceOrderIndex + 1, 0, firstId, secondId);
+  if (sourceOrderIndex < 0) throw new Error(`${caseId} branch plan leaves from ${sourceId}, which is not in the case`);
+  order.splice(sourceOrderIndex + 1, 0, firstId, secondId);
 });
 
 const case02RouteNodes = {
@@ -1557,7 +1566,7 @@ const case02RouteNodes = {
     memo: [
       "원본과 백업의 해시가 서로 다름",
       "공백 직후 관리자 토큰이 한 번 사용됨",
-      "사건 01의 심사 보고서 스캔이 증거물로 재분류됨",
+      "플로우온 심사 보고서 스캔이 증거물로 재분류됨",
     ],
     triggers: ["curiosity", "injustice", "order"],
     choices: [
@@ -1731,7 +1740,9 @@ const case02RouteNodes = {
 };
 
 function registerCase02DramaticRoutes() {
-  Object.assign(nodes, case02RouteNodes);
+  for (const [nodeId, scene] of Object.entries(case02RouteNodes)) {
+    nodes[nodeId] = { ...scene, kind: nodeId.startsWith("c2_route_") ? "route" : "routeFinal" };
+  }
   Object.assign(choiceVoiceLines, {
     c2_route_report_hold: "징계 문서에 멈춤 조건을 끼워 넣어, 절차가 사람을 앞질러 가지 못하게 한다.",
     c2_route_report_sign: "보고는 올리되, 반박 가능성을 작은 각주로 남긴다.",
@@ -1850,7 +1861,7 @@ const dramaticRoutePlans = {
           ["c1_route_funding_split", "자금을 절반만 받고 설명 권한을 지킨다", { capital: 5, legitimacy: 6, trust: 5, time: -4, fatigue: 5 }, { reframing: 2 }],
         ],
         finalTitle: "살아남는 돈의 조건",
-        finalText: "자금은 회사를 살렸지만 다음 사건의 질문을 바꿨습니다. 이제 플레이어는 문제를 해결하는 사람인지, 조건을 승인하는 사람인지 선택해야 합니다.",
+        finalText: "자금은 회사를 살렸지만 다음 사건의 질문을 바꿨습니다. 이제 당신은 문제를 해결하는 사람인지, 조건을 승인하는 사람인지 선택해야 합니다.",
         finalMemo: ["자금 조건이 다음 케이스 공개 범위를 흔듦", "시간 확보는 됐지만 외부 통제 비용이 생김", "조건 공개 여부가 신뢰의 분기점이 됨"],
         finalChoices: [
           ["a", "자금 조건 전문을 이사회 밖에도 공개한다", { legitimacy: 10, trust: 6, capital: -6, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
@@ -1910,7 +1921,7 @@ const dramaticRoutePlans = {
       final: "c1_final_system",
       title: "선택지 밖에서 발견한 첫 규칙",
       speaker: "에코",
-      text: "준비된 답이 아닌 문장을 입력하자 화면은 절감, 자금, 매각(사업이나 자산을 팔아 돈을 마련하는 것)을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
+      text: "세 안건 가운데 하나를 거는 대신 셋을 한 표에 놓고 보자고 하자 화면은 절감, 자금, 매각(사업이나 자산을 팔아 돈을 마련하는 것)을 같은 표 위에 겹쳐 보여줍니다. 첫 사건의 반전은 위기가 하나가 아니라, 같은 판단 기준이 여러 위기를 낳고 있었다는 점입니다.",
       memo: ["다시 짠 판이 숨은 공통 원인 경로를 엶", "모든 해결책이 같은 기준표를 통과함", "분석관의 판단이 다음 질문의 기준으로 기록됨"],
       routeChoices: [
         ["c1_route_system_trace", "기준표를 누가 언제 고쳤는지부터 되짚는다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -1921,7 +1932,7 @@ const dramaticRoutePlans = {
     finalChoices: [
       ["a", "공통 기준표를 공개하고 모든 안건을 재심사한다", { legitimacy: 9, trust: 6, capital: -7, time: -7, fatigue: 8 }, { inference: 2, persistence: 1 }],
       ["b", "기준표는 숨기고 가장 빠른 안건만 실행한다", { capital: 10, time: 5, trust: -8, legitimacy: -6, humanCost: 5, fatigue: -3 }, { risk: 2 }],
-      ["c", "기준표 작성 권한을 플레이어 밖으로 넘긴다", { trust: 8, legitimacy: 7, capital: -5, time: -5, fatigue: 6 }, { reframing: 2 }],
+      ["c", "기준표 작성 권한을 내 손 밖으로 넘긴다", { trust: 8, legitimacy: 7, capital: -5, time: -5, fatigue: 6 }, { reframing: 2 }],
     ],
   },
   case03: {
@@ -2004,7 +2015,7 @@ const dramaticRoutePlans = {
       final: "c3_final_system",
       title: "점수판이 당신을 따라온다",
       speaker: "에코",
-      text: "준비된 전략 밖의 말을 남기자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
+      text: "오진우와 겨루는 대신 무엇으로 점수를 매기는지부터 묻자 점수판 항목이 바뀝니다. 이번 입찰은 오진우와의 승부가 아니라, 당신이 어떤 평가 기준을 만들면 따라오는지 보는 장치였습니다.",
       memo: ["다시 짠 판이 새 평가 항목으로 변환됨", "오진우 점수도 동시에 재계산됨", "고객 화면에는 변경 사유가 보이지 않음"],
       routeChoices: [
         ["c3_route_system_read", "새로 생긴 평가 항목이 어디서 왔는지 추적한다", { legitimacy: 8, trust: 3, capital: -4, time: -6, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2098,8 +2109,8 @@ const dramaticRoutePlans = {
       final: "c4_final_system",
       title: "명분 있는 위반의 복제",
       speaker: "에코",
-      text: "자유로운 제안을 남기자 트리거랩 화면에 '명분 있는 위반 허용선'이 표시됩니다. 당신의 선의는 다음 기관이 규칙을 넘는 안내문으로 바뀔 수 있습니다.",
-      memo: ["제안 문장이 예외 승인 모델에 기록됨", "다음 기관 시뮬레이션이 자동 생성됨", "피해자 명단은 아직 입력되지 않음"],
+      text: "산식을 넓힐지 말지를 고르는 대신 어디까지 넘어도 되는지부터 정하자고 하자 트리거랩 화면에 '명분 있는 위반 허용선'이 표시됩니다. 당신의 선의는 다음 기관이 규칙을 넘는 안내문으로 바뀔 수 있습니다.",
+      memo: ["다시 짠 판이 예외 승인 모델에 기록됨", "다음 기관 시뮬레이션이 자동 생성됨", "피해자 명단은 아직 입력되지 않음"],
       routeChoices: [
         ["c4_route_system_limit", "허용선 문장에 사용 한도부터 적어 넣는다", { legitimacy: 9, trust: 4, capital: -5, time: -6, fatigue: 6 }, { persistence: 2, inference: 1 }],
         ["c4_route_system_ship", "허용선은 그대로 두고 이번 승인부터 끝낸다", { capital: 9, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
@@ -2192,7 +2203,7 @@ const dramaticRoutePlans = {
       final: "c5_final_system_route",
       title: "조용한 사람을 낮게 보는 장치",
       speaker: "에코",
-      text: "준비된 선택지 밖의 복구안을 내자, 알고리즘(판단 순서를 정해 둔 계산 규칙)의 숨은 가중치가 보입니다. 시스템은 도움을 크게 요구하지 못하는 사람을 낮은 우선순위로 배웠습니다.",
+      text: "책임자를 세울지 복구부터 할지 정하기 전에 누가 먼저 밀렸는지부터 묻자, 알고리즘(판단 순서를 정해 둔 계산 규칙)의 숨은 가중치가 보입니다. 시스템은 도움을 크게 요구하지 못하는 사람을 낮은 우선순위로 배웠습니다.",
       memo: ["불만 제기 빈도가 보호 가중치에 역으로 작용", "가족 연락처 불안정이 낮은 신뢰도로 처리됨", "조용한 피해자는 모델 학습에서 누락됨"],
       routeChoices: [
         ["c5_route_system_audit", "가중치가 학습한 자료부터 열어 본다", { legitimacy: 9, trust: 3, capital: -4, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2219,7 +2230,7 @@ const dramaticRoutePlans = {
       final: "c6_final_system_route",
       title: "실험 번호가 같은 두 사람",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 실험 색인이 열립니다. 오진우와 당신의 프로필은 서로 다른 조건이 아니라, 한 실험의 위쪽 선과 아래쪽 선이었습니다.",
+      text: "오진우 한 사람의 책임을 따지는 대신 두 사람의 조건을 나란히 놓자고 하자 실험 색인이 열립니다. 오진우와 당신의 프로필은 서로 다른 조건이 아니라, 한 실험의 위쪽 선과 아래쪽 선이었습니다.",
       memo: ["두 프로필의 실험 번호가 동일", "조건 변경 시점이 서로 맞물려 있음", "색인에는 다음 참가자 칸이 비어 있음"],
       routeChoices: [
         ["c6_route_system_index", "색인 전체를 열어 다음 참가자 칸을 확인한다", { legitimacy: 9, trust: 4, capital: -5, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2246,7 +2257,7 @@ const dramaticRoutePlans = {
       final: "c7_final_system_route",
       title: "발령 기록부",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 인사 발령(근무지를 옮기라는 인사 명령) 기록부가 열립니다. 최근 4년간 승인란이 빈 채 그대로 시행된 발령은 열아홉 건이고, 그중 열일곱 명이 같은 부서를 거쳐 갔습니다. 당신은 열여덟 번째가 아니라, 같은 표의 한 줄입니다.",
+      text: "내 발령(근무지를 옮기라는 인사 명령) 한 건을 다투는 대신 같은 모양의 발령이 몇 건인지부터 묻자 인사 발령 기록부가 열립니다. 최근 4년간 승인란이 빈 채 그대로 시행된 발령은 열아홉 건이고, 그중 열일곱 명이 같은 부서를 거쳐 갔습니다. 당신은 열여덟 번째가 아니라, 같은 표의 한 줄입니다.",
       memo: ["승인란 공란 발령 19건", "17명이 기업금융전략팀 경유", "표의 마지막 줄은 아직 비어 있음"],
       routeChoices: [
         ["c7_route_system_trace", "열아홉 건을 전부 따라가 표를 완성한다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2272,7 +2283,7 @@ const dramaticRoutePlans = {
       final: "c8_final_system_route",
       title: "같은 주소의 일곱 법인",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 법인 등기(회사의 주소와 대표를 나라 장부에 올린 기록) 이력이 열립니다. 해온파트너스와 같은 주소, 같은 세무 대리인(세금 신고를 대신해 주는 사무소), 같은 청산(회사를 정리해 없애는 절차) 시점을 가진 회사가 지난 6년간 일곱 곳입니다. 흔적은 한 줄이 아니라, 같은 손이 반복해서 그린 무늬였습니다.",
+      text: "해온파트너스 한 곳을 쫓는 대신 같은 주소를 쓴 회사가 더 있는지부터 묻자 법인 등기(회사의 주소와 대표를 나라 장부에 올린 기록) 이력이 열립니다. 해온파트너스와 같은 주소, 같은 세무 대리인(세금 신고를 대신해 주는 사무소), 같은 청산(회사를 정리해 없애는 절차) 시점을 가진 회사가 지난 6년간 일곱 곳입니다. 흔적은 한 줄이 아니라, 같은 손이 반복해서 그린 무늬였습니다.",
       memo: ["같은 주소·같은 세무 대리인 법인 7곳", "모두 감사 착수 직전에 청산", "일곱 번째가 해온파트너스"],
       routeChoices: [
         ["c8_route_system_map", "일곱 법인의 흐름을 한 장의 지도로 잇는다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2297,7 +2308,7 @@ const dramaticRoutePlans = {
       final: "c9_final_system_route",
       title: "세 번째 계산서",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 세 번째 표를 엽니다. 채권단(돈을 빌려준 금융회사들의 협의체) 누구도 작성하지 않은 계산서, 청산(회사를 정리해 없애는 절차)했을 때 1,140명의 가족이 치르는 비용입니다. 건강보험 전환, 학자금 연체(갚을 날짜를 넘긴 빚), 협력사 연쇄 부도(빚을 갚지 못해 회사가 쓰러지는 일). 합계는 브릿지은행이 청산으로 더 돌려받는 금액의 2.3배입니다.",
+      text: "살리는 계산서와 벌하는 계산서 옆에 아무도 세지 않은 비용을 놓자고 하자 에코가 세 번째 표를 엽니다. 채권단(돈을 빌려준 금융회사들의 협의체) 누구도 작성하지 않은 계산서, 청산(회사를 정리해 없애는 절차)했을 때 1,140명의 가족이 치르는 비용입니다. 건강보험 전환, 학자금 연체(갚을 날짜를 넘긴 빚), 협력사 연쇄 부도(빚을 갚지 못해 회사가 쓰러지는 일). 합계는 브릿지은행이 청산으로 더 돌려받는 금액의 2.3배입니다.",
       memo: ["청산 때 가족·협력사가 치를 비용 추정: 더 돌려받는 금액의 2.3배", "채권단 계산서에는 이 칸이 없음", "추정치라 법적 구속력은 없음"],
       routeChoices: [
         ["c9_route_system_add", "세 번째 계산서를 채권단 공식 자료로 올린다", { legitimacy: 10, trust: 4, capital: -6, time: -8, fatigue: 7 }, { inference: 2, persistence: 1 }],
@@ -2323,7 +2334,7 @@ const dramaticRoutePlans = {
       final: "c10_final_system_route",
       title: "소진율",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 한 번도 집계된 적 없는 지표를 만듭니다. 지난 6년간 고객 피해를 자발적으로 추적한 직원 34명. 그중 29명이 3년 안에 퇴직하거나 장기 병가에 들어갔습니다. 평균 지속 기간은 2년 7개월입니다. '선의는 이 조직에서 평균 31개월 만에 소모됩니다. 아무도 이 숫자를 재지 않았습니다. 재면 관리 대상이 되니까요.'",
+      text: "도윤하 한 사람의 병가를 따지는 대신 같은 일을 하던 사람들이 얼마나 버텼는지 묻자 에코가 한 번도 집계된 적 없는 지표를 만듭니다. 지난 6년간 고객 피해를 자발적으로 추적한 직원 34명. 그중 29명이 3년 안에 퇴직하거나 장기 병가에 들어갔습니다. 평균 지속 기간은 2년 7개월입니다. '선의는 이 조직에서 평균 31개월 만에 소모됩니다. 아무도 이 숫자를 재지 않았습니다. 재면 관리 대상이 되니까요.'",
       memo: ["자발적 피해 추적자 34명 중 29명이 3년 내 이탈", "평균 지속 31개월 -- 도윤하는 36개월째", "이 지표는 어떤 보고서에도 존재한 적 없음"],
       routeChoices: [
         ["c10_route_system_publish", "소진율을 그룹 공식 지표로 등록시킨다", { legitimacy: 11, trust: 5, capital: -7, time: -9, fatigue: 6 }, { inference: 2, persistence: 1 }],
@@ -2349,7 +2360,7 @@ const dramaticRoutePlans = {
       final: "c11_final_system_route",
       title: "확인해 보겠습니다",
       speaker: "에코",
-      text: "준비된 보기 밖의 문장을 쓰자 에코가 지난 10년 정무위원회 국정감사(국회가 1년에 한 번 정부와 금융회사의 일을 공개적으로 따져 묻는 자리)의 속기록(회의에서 오간 말을 그대로 적은 공식 기록) 1,812건을 엽니다. 금융회사 참고인(증언할 의무는 없지만 사실을 설명하러 나오는 사람)이 받은 질문은 7,430개, 가장 많이 나온 답은 '확인해 보겠습니다'로 2,114번입니다. 그 약속 가운데 다음 해 국정감사에서 확인 결과가 실제로 보고된 건 3%입니다. '이 방은 진실을 묻는 곳이 아니라, 1년 동안 미룰 수 있는 문장을 고르는 곳으로 학습되어 있습니다.'",
+      text: "두 대본 가운데 하나를 고르는 대신 이 방에서 답이 어떻게 미뤄져 왔는지 묻자 에코가 지난 10년 정무위원회 국정감사(국회가 1년에 한 번 정부와 금융회사의 일을 공개적으로 따져 묻는 자리)의 속기록(회의에서 오간 말을 그대로 적은 공식 기록) 1,812건을 엽니다. 금융회사 참고인(증언할 의무는 없지만 사실을 설명하러 나오는 사람)이 받은 질문은 7,430개, 가장 많이 나온 답은 '확인해 보겠습니다'로 2,114번입니다. 그 약속 가운데 다음 해 국정감사에서 확인 결과가 실제로 보고된 건 3%입니다. '이 방은 진실을 묻는 곳이 아니라, 1년 동안 미룰 수 있는 문장을 고르는 곳으로 학습되어 있습니다.'",
       memo: ["지난 10년 속기록 1,812건", "'확인해 보겠습니다' 2,114번 -- 이행 보고 3%", "이 통계는 어떤 보고서에도 인용된 적 없음"],
       routeChoices: [
         ["c11_route_system_publish", "통계를 서하린에게 넘겨 기사로 만든다", { legitimacy: 10, trust: 6, capital: -6, time: -8, fatigue: 5 }, { inference: 2, persistence: 1 }],
@@ -2374,7 +2385,7 @@ const dramaticRoutePlans = {
         phase: "TRACE ROUTE",
         title: "내 로그가 만든 사건들",
         speaker: "에코",
-        text: "당신의 선택 로그를 따라가자 각 케이스의 질문이 조금씩 조정된 기록이 보입니다. 마지막 사건은 해결해야 할 문제가 아니라, 당신의 기준이 남긴 흔적입니다.",
+        text: "당신의 선택 로그를 따라가자 각 케이스의 질문이 조금씩 조정된 기록이 보입니다. 이 마지막 폴더는 해결해야 할 문제가 아니라, 당신의 기준이 남긴 흔적입니다.",
         memo: ["선택 로그와 사건 설계 변경 기록 일치", "응답 시간이 압박 조건으로 재사용됨", "일부 선택 문장은 다음 참가자 선택지로 복제됨"],
         triggers: ["curiosity", "selfAwareness", "responsibility"],
         routeChoices: [
@@ -2447,17 +2458,17 @@ const dramaticRoutePlans = {
       final: "f_final_system",
       title: "마지막 선택지가 당신을 부른다",
       speaker: "에코",
-      text: "준비된 결말 밖의 문장을 쓰자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 쓴 문장입니다.",
+      text: "봉인도 개혁도 폭로도 걸지 않고 판을 다시 짜자 화면에 다음 참가자의 선택지가 나타납니다. 그 선택지 중 하나는 방금 당신이 다시 짠 판입니다.",
       memo: ["다시 짠 판이 다음 참가자 선택지로 변환됨", "삭제 전송과 공개 전송이 동시에 대기 중", "종료 권한은 아직 당신에게 있음"],
       routeChoices: [
-        ["f_route_system_read", "내 문장이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
+        ["f_route_system_read", "내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다", { legitimacy: 9, trust: 4, capital: -4, time: -7, fatigue: 7 }, { inference: 2, persistence: 1 }],
         ["f_route_system_send", "확인하지 않고 전송 대기열을 그대로 둔다", { capital: 7, time: 6, trust: -6, legitimacy: -6, humanCost: 5, fatigue: -4 }, { risk: 2 }],
         ["f_route_system_warn", "다음 참가자에게 이 화면을 먼저 보여준다", { trust: 9, legitimacy: 6, capital: -5, humanCost: -5, fatigue: 7 }, { reframing: 2 }],
       ],
     },
     finalChoices: [
-      ["a", "내 문장이 다음 선택지가 되지 못하게 막는다", { legitimacy: 8, trust: 4, capital: -5, time: -6, humanCost: -5, fatigue: 7 }, { persistence: 2 }],
-      ["b", "내 문장을 남기되 바꿀 수 있는 빈칸을 붙인다", { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 }, { reframing: 3 }],
+      ["a", "내가 다시 짠 판이 다음 선택지가 되지 못하게 막는다", { legitimacy: 8, trust: 4, capital: -5, time: -6, humanCost: -5, fatigue: 7 }, { persistence: 2 }],
+      ["b", "다시 짠 판은 남기되 바꿀 수 있는 빈칸을 붙인다", { trust: 9, legitimacy: 7, capital: -6, fatigue: 8 }, { reframing: 3 }],
       ["c", "다음 참가자에게 모든 원본을 넘기고 끝낸다", { legitimacy: 22, trust: 6, capital: 0, humanCost: 4, time: -6, fatigue: 8 }, { risk: 1, inference: 1 }],
     ],
   },
@@ -2479,11 +2490,18 @@ function makeFinalChoices(plan, finalId, choices = plan.finalChoices) {
   }));
 }
 
+const SHARED_ROUTE_CLOSING = {
+  finalTitle: "준비된 결말 밖에서",
+  finalText: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
+  finalMemo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+};
+
 function registerDramaticRoutePlan(caseId, plan) {
   const order = nodeOrders[caseId];
   Object.entries(plan.choices).forEach(([choiceId, route]) => {
     nodes[route.route] = {
       phase: route.phase,
+      kind: "route",
       title: route.title,
       speaker: route.speaker,
       text: route.text,
@@ -2499,6 +2517,7 @@ function registerDramaticRoutePlan(caseId, plan) {
     };
     nodes[route.final] = {
       phase: "LAST CALL",
+      kind: "routeFinal",
       title: route.finalTitle,
       speaker: route.speaker,
       text: route.finalText,
@@ -2506,9 +2525,9 @@ function registerDramaticRoutePlan(caseId, plan) {
       triggers: route.triggers,
       choices: makeFinalChoices(plan, route.final, route.finalChoices ?? plan.finalChoices),
     };
-    nodes[plan.start].choices.forEach((choice) => {
-      if (choice.id === choiceId) choice.next = route.route;
-    });
+    const opener = sceneOf(plan.start, `${caseId} route plan`).choices.find((choice) => choice.id === choiceId);
+    if (!opener) throw new Error(`${caseId} route plan opens ${route.route} from the choice "${choiceId}", which ${plan.start} does not offer`);
+    opener.next = route.route;
     for (const node of [route.route, route.final]) {
       if (!order.includes(node)) order.splice(Math.max(0, order.indexOf(plan.start) + 1), 0, node);
     }
@@ -2516,6 +2535,7 @@ function registerDramaticRoutePlan(caseId, plan) {
 
   nodes[plan.system.route] = {
     phase: "HIDDEN ROUTE",
+    kind: "route",
     title: plan.system.title,
     speaker: plan.system.speaker,
     text: plan.system.text,
@@ -2531,12 +2551,18 @@ function registerDramaticRoutePlan(caseId, plan) {
       next: plan.system.final,
     })),
   };
+  // The hidden route closes on the scene its case wrote (`finalTitle`,
+  // `finalText`, `finalMemo` on `system`), or on the shared one below.
+  const written = Boolean(plan.system.finalTitle && plan.system.finalText && plan.system.finalMemo?.length);
+  const closing = written ? plan.system : SHARED_ROUTE_CLOSING;
+  if (!written) fallbackCopy.scenes.push(plan.system.final);
   nodes[plan.system.final] = {
     phase: "LAST CALL",
-    title: "준비된 결말 밖에서",
+    kind: "routeFinal",
+    title: closing.finalTitle,
     speaker: plan.system.speaker,
-    text: "준비된 선택지 밖에서 다시 짠 판은 사건의 규칙을 직접 건드립니다. 이제 그 판이 다음 사람에게 어떻게 쓰일지 결정해야 합니다.",
-    memo: ["다시 짠 판은 새 질문으로 기록됨", "실험자는 그 판을 다음 압박 조건으로 쓸 수 있음", "막지 않으면 같은 구조가 반복됨"],
+    text: closing.finalText,
+    memo: closing.finalMemo,
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     choices: makeFinalChoices(plan, plan.system.final),
   };
@@ -2547,8 +2573,7 @@ function registerDramaticRoutePlan(caseId, plan) {
   // written yet, so a new route is playable the moment it is wired.
   [...Object.values(plan.choices).flatMap((route) => [route.route, route.final]), plan.system.route, plan.system.final].forEach((nodeId) => {
     nodes[nodeId].choices.forEach((choice) => {
-      choiceVoiceLines[choice.id] ??= choice.label;
-      echoReplies[choice.id] ??= `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`;
+      fallBackOn(choice.id, choice.label, `${nodes[nodeId].title}: 이 선택은 다음 질문의 기준을 바꿉니다.`);
     });
   });
 }
@@ -2556,6 +2581,7 @@ function registerDramaticRoutePlan(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   dramaticRoutePlans[pack.id] = pack.routePlan;
 });
+coreCards.lay(coreCards.closings, (caseId) => dramaticRoutePlans[caseId].system);
 Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticRoutePlan(caseId, plan));
 
 /**
@@ -2573,9 +2599,7 @@ Object.entries(dramaticRoutePlans).forEach(([caseId, plan]) => registerDramaticR
  * middle questions.
  */
 const routeBodyPlans = {
-  // CASE 02 already walks its authored middle; only its old shared final, which
-  // the three route finals replaced, is still sitting in the graph unreachable.
-  case02: { retire: ["c2_final"] },
+  // CASE 02 already walks its authored middle (registerCase02DramaticRoutes).
   case01: {
     routes: {
       c1_route_investigate: { entry: "accounting", tail: "c1_witness_reaction", final: "c1_final_investigate" },
@@ -2584,7 +2608,6 @@ const routeBodyPlans = {
       c1_route_funding: { entry: "board", tail: "c1_verdict_reaction", final: "c1_final_funding" },
       c1_route_system: { entry: "c1_branch_people", tail: "c1_branch_people_follow", final: "c1_final_system" },
     },
-    retire: ["final"],
   },
   case03: {
     routes: {
@@ -2593,7 +2616,6 @@ const routeBodyPlans = {
       c3_route_mirror: { entry: "c3_trap", tail: "c3_verdict_reaction", final: "c3_final_joint" },
       c3_route_system: { entry: "c3_branch_signal", tail: "c3_branch_signal_follow", final: "c3_final_system" },
     },
-    retire: ["c3_final"],
   },
   case04: {
     routes: {
@@ -2602,7 +2624,6 @@ const routeBodyPlans = {
       c4_route_rule: { entry: "c4_vote", tail: "c4_verdict_reaction", final: "c4_final_rule" },
       c4_route_system: { entry: "c4_branch_exception", tail: "c4_branch_exception_follow", final: "c4_final_system" },
     },
-    retire: ["c4_final"],
   },
   case05: {
     routes: {
@@ -2611,7 +2632,6 @@ const routeBodyPlans = {
       c5_route_redesign: { entry: "c5_collapse", tail: "c5_verdict_reaction", final: "c5_final_redesign_route" },
       c5_route_system: { entry: "c5_branch_owner", tail: "c5_branch_owner_follow", final: "c5_final_system_route" },
     },
-    retire: ["c5_final"],
   },
   final: {
     routes: {
@@ -2628,16 +2648,14 @@ const routeBodyPlans = {
 
 function registerRouteBodies(caseId, plan) {
   Object.entries(plan.routes ?? {}).forEach(([routeId, body]) => {
-    nodes[routeId].choices.forEach((choice) => { choice.next = body.entry; });
-    nodes[body.tail].choices.forEach((choice) => { choice.next = body.final; });
+    sceneOf(body.entry, `${caseId} route body`);
+    sceneOf(body.final, `${caseId} route body`);
+    sceneOf(routeId, `${caseId} route body`).choices.forEach((choice) => { choice.next = body.entry; });
+    sceneOf(body.tail, `${caseId} route body`).choices.forEach((choice) => { choice.next = body.final; });
   });
   Object.entries(plan.rewire ?? {}).forEach(([nodeId, next]) => {
-    nodes[nodeId].choices.forEach((choice) => { choice.next = next; });
-  });
-  (plan.retire ?? []).forEach((nodeId) => {
-    delete nodes[nodeId];
-    const index = nodeOrders[caseId].indexOf(nodeId);
-    if (index >= 0) nodeOrders[caseId].splice(index, 1);
+    sceneOf(next, `${caseId} route rewire`);
+    sceneOf(nodeId, `${caseId} route rewire`).choices.forEach((choice) => { choice.next = next; });
   });
 }
 
@@ -2666,8 +2684,8 @@ const evidenceTurnaroundPlans = {
     // instead, where trust reaches 67-82 and a clue has had time to arrive.
     sourceRoutes: ["c1_final_layoff", "c1_final_funding", "c1_final_sale", "c1_final_investigate", "c1_final_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 펼쳐, 이 안건들이 같은 표에서 나왔는지부터 확인한다.",
-    entryEcho: "단서를 대면 세 해결책이 하나의 원인으로 묶입니다.",
+    entryVoice: "세 안건의 계산 근거를 단서 위에 펼쳐, 셋이 같은 표에서 나왔는지 가늠한다.",
+    entryEcho: "계산 근거를 펼치면 세 해결책이 하나의 원인으로 묶입니다.",
     title: "첫 단서가 세 안건을 한 줄로 묶는다",
     speaker: "에코",
     text: "확보한 단서를 대조하자 감축, 자금, 매각이 서로 다른 해결책이 아니라 같은 누락 기준표의 결과라는 사실이 보입니다. 이제 무엇을 고를지가 아니라 기준표를 누가 다시 쓸지가 사건의 결론입니다.",
@@ -2685,8 +2703,8 @@ const evidenceTurnaroundPlans = {
     result: "c2_aftershock",
     sourceRoutes: ["c2_route_report", "c2_route_person", "c2_route_origin", "c2_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 사건이 정말 한 사람의 일인지부터 되묻는다.",
-    entryEcho: "단서를 대면 혐의의 주어가 사람에서 기록으로 옮겨 갑니다.",
+    entryVoice: "유출 파일의 시각을 단서의 증언 시각과 맞세워, 이 일이 정말 한 사람의 짓인지 되묻는다.",
+    entryEcho: "두 시각을 맞세우면 혐의의 주어가 사람에서 기록으로 옮겨 갑니다.",
     title: "보호된 증언이 기록을 뒤집는다",
     speaker: "이민서",
     text: "앞서 얻은 단서를 붙이자 유출 파일의 시간이 맞지 않습니다. 누가 말했는지보다 누가 말할 수 없게 만들었는지가 새 질문으로 떠오릅니다.",
@@ -2704,8 +2722,8 @@ const evidenceTurnaroundPlans = {
     result: "c3_aftershock",
     sourceRoutes: ["c3_route_fast", "c3_route_deep", "c3_route_mirror", "c3_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 점수판이 하나뿐인지부터 확인한다.",
-    entryEcho: "단서를 대면 승부의 기준이 승부보다 먼저 문제가 됩니다.",
+    entryVoice: "고객에게 보인 점수판을 단서에 비추어, 점수판이 정말 하나뿐인지 캔다.",
+    entryEcho: "단서에 비추면 승부의 기준이 승부보다 먼저 문제가 됩니다.",
     title: "두 번째 점수판",
     speaker: "오진우",
     text: "단서를 대조하자 고객에게 보이는 점수판과 내부 심사용 점수판이 다르다는 사실이 드러납니다. 이제 승패보다 어느 점수판을 진짜 계약 기준으로 인정할지가 문제입니다.",
@@ -2723,8 +2741,8 @@ const evidenceTurnaroundPlans = {
     result: "c4_aftershock",
     sourceRoutes: ["c4_route_exception", "c4_route_rule", "c4_route_audit", "c4_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 이 예외가 정말 처음인지부터 확인한다.",
-    entryEcho: "단서를 대면 예외는 판단이 아니라 반복으로 읽힙니다.",
+    entryVoice: "예외 승인 기록을 단서와 수신자별로 나눠, 이 예외가 정말 처음인지 가린다.",
+    entryEcho: "수신자별로 나누면 예외는 판단이 아니라 반복으로 읽힙니다.",
     title: "예외 파일의 원래 수신자",
     speaker: "반재욱",
     text: "단서 조합은 예외 승인이 한 번의 선의가 아니라 미리 설계된 반복 절차였음을 보여줍니다. 질문은 허용 여부에서, 반복을 누가 승인했는지로 이동합니다.",
@@ -2742,8 +2760,8 @@ const evidenceTurnaroundPlans = {
     result: "c5_aftershock",
     sourceRoutes: ["c5_route_blame", "c5_route_map", "c5_route_redesign", "c5_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "확보한 단서를 꺼내, 누가 지도에서 먼저 지워졌는지부터 확인한다.",
-    entryEcho: "단서를 대면 실패의 피해자 목록이 먼저 바뀝니다.",
+    entryVoice: "실패 지도에서 빠진 이름을 단서로 짚어, 누가 먼저 지워졌는지 되살핀다.",
+    entryEcho: "빠진 이름을 짚으면 실패의 피해자 목록이 먼저 바뀝니다.",
     title: "사라진 피해자의 우선순위",
     speaker: "한서윤",
     text: "지금까지의 단서가 겹치자 조용한 피해자가 매번 낮은 우선순위로 밀린 이유가 보입니다. 책임자를 찾는 질문은 피해자가 시스템에서 어떻게 사라졌는지로 바뀝니다.",
@@ -2761,8 +2779,8 @@ const evidenceTurnaroundPlans = {
     result: "c6_aftershock",
     sourceRoutes: ["c6_desk", "c6_logs", "c6_panel", "c6_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 펼쳐, 그의 조건이 언제부터 바뀌었는지 날짜로 맞춰 본다.",
-    entryEcho: "단서를 대면 그의 속도는 성격이 아니라 일정표가 됩니다.",
+    entryVoice: "그의 결정 창이 줄어든 날을 단서의 날짜와 한 줄에 놓아, 조건이 언제부터 바뀌었는지 센다.",
+    entryEcho: "한 줄에 놓으면 그의 속도는 성격이 아니라 일정표가 됩니다.",
     title: "조건이 바뀐 날짜들",
     speaker: "에코",
     text: "단서를 맞추자 그의 결정 창이 줄어든 날짜가 전부 당신이 검증을 택한 다음 날이라는 사실이 드러납니다. 두 사람은 경쟁한 것이 아니라, 서로의 조건이 되어 있었습니다.",
@@ -2780,12 +2798,12 @@ const evidenceTurnaroundPlans = {
     result: "c7_aftershock",
     sourceRoutes: ["c7_ledger", "c7_counter", "c7_paper", "c7_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 발령서 작성일과 나란히 놓고, 순서가 맞는지 맞춰 본다.",
-    entryEcho: "단서를 대면 이 발령은 결과가 아니라 예고편이 됩니다.",
+    entryVoice: "발령서 작성일을 단서의 날짜들 사이에 끼워, 무엇이 먼저였는지 순서를 세운다.",
+    entryEcho: "순서를 세우면 이 발령은 결과가 아니라 예고편이 됩니다.",
     title: "작성일이 먼저였다",
     speaker: "반재욱",
-    text: "단서를 맞추자 순서가 드러납니다. 발령서 작성일은 사건 06 개시보다 12일 앞서고, 그 12일 전에는 당신이 사건 05에서 예산 상한선의 출처를 물은 날이 있습니다. 조사가 시작돼서 발령이 난 것이 아니라, 질문이 시작돼서 발령이 준비된 것입니다.",
-    memo: ["작성일 = 상한선 출처 질문 다음 날", "사건 06은 발령 사유가 아니라 발령 명분", "같은 순서가 앞선 17건에서도 반복됨"],
+    text: "단서를 맞추자 순서가 드러납니다. 발령서 작성일은 오진우 조사 개시보다 12일 앞서고, 그 12일 전에는 당신이 배차 사고 건에서 예산 상한선의 출처를 물은 날이 있습니다. 조사가 시작돼서 발령이 난 것이 아니라, 질문이 시작돼서 발령이 준비된 것입니다.",
+    memo: ["작성일 = 상한선 출처 질문 다음 날", "오진우 조사는 발령 사유가 아니라 발령 명분", "같은 순서가 앞선 17건에서도 반복됨"],
     triggers: ["injustice", "system", "selfAwareness"],
     entryEffect: { legitimacy: 4, trust: 3, time: -3, fatigue: 4 },
     choices: [
@@ -2799,8 +2817,8 @@ const evidenceTurnaroundPlans = {
     result: "c8_aftershock",
     sourceRoutes: ["c8_trail", "c8_gallery", "c8_bait", "c8_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 입금일 달력에 겹쳐, 돈이 움직인 날과 승인이 난 날을 맞춰 본다.",
-    entryEcho: "단서를 대면 자문료는 수수료가 아니라 승인의 영수증이 됩니다.",
+    entryVoice: "자문료 입금일을 단서와 한 달력에 겹쳐, 돈이 움직인 날과 승인이 난 날의 간격을 잰다.",
+    entryEcho: "간격을 재면 자문료는 수수료가 아니라 승인의 영수증이 됩니다.",
     title: "입금일과 승인일",
     speaker: "반재욱",
     text: "단서를 달력에 겹치자 규칙이 보입니다. 해온파트너스에 자문료가 들어온 열두 번의 날짜는 전부 KD은행이 노바웍스와 브릿지은행 쪽에 유리한 승인을 낸 다음 영업일입니다. 3년 전 2023-0412의 담보 순위(돈을 떼일 때 누가 먼저 돌려받느냐의 순서)가 브릿지은행으로 넘어간 날도 그중 하나입니다.",
@@ -2818,8 +2836,8 @@ const evidenceTurnaroundPlans = {
     result: "c9_aftershock",
     sourceRoutes: ["c9_ledger", "c9_family", "c9_timing", "c9_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 두 계산서 사이에 끼워, 어느 숫자가 어느 승인에서 왔는지 맞춰 본다.",
-    entryEcho: "단서를 대면 청산의 계산서는 중립적인 숫자가 아니라 누군가 사 둔 결론이 됩니다.",
+    entryVoice: "두 계산서의 숫자를 단서의 흔적표와 짝지어, 어느 숫자가 어느 승인에서 왔는지 거슬러 오른다.",
+    entryEcho: "숫자를 짝지으면 청산의 계산서는 중립적인 숫자가 아니라 누군가 사 둔 결론이 됩니다.",
     title: "청산 회수율의 출처",
     speaker: "오진우",
     text: "단서를 맞추자 브릿지은행이 내민 청산 회수율(빌려준 돈을 돌려받는 비율) 78%의 출처가 드러납니다. 담보 가치를 매긴 감정평가법인(부동산·설비 값을 매기는 회사)은 해온파트너스와 같은 세무 대리인(세금 신고를 대신해 주는 사무소)을 씁니다. 청산이 유리하다는 숫자 자체가, 흔적표의 같은 손에서 나왔습니다.",
@@ -2837,8 +2855,8 @@ const evidenceTurnaroundPlans = {
     result: "c10_aftershock",
     sourceRoutes: ["c10_locker", "c10_claim", "c10_relay", "c10_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 인사 기록 옆에 놓고, 병가 사유란이 언제부터 같은 문구였는지 맞춰 본다.",
-    entryEcho: "단서를 대면 '개인 사정'은 각자의 선택이 아니라 누군가 정해 둔 서식의 기본값이 됩니다.",
+    entryVoice: "열아홉 명의 병가 신청서를 단서 곁에 쌓아, 사유란이 언제부터 같은 문구였는지 넘겨 센다.",
+    entryEcho: "신청서를 쌓으면 '개인 사정'은 각자의 선택이 아니라 누군가 정해 둔 서식의 기본값이 됩니다.",
     title: "사유란의 기본값",
     speaker: "반재욱",
     text: "단서를 맞추자 인사 서식의 개정 이력이 열립니다. 4년 전, 병가 신청서의 사유란에서 '업무상'이라는 보기가 삭제되고 '개인 사정'이 기본값으로 바뀌었습니다. 개정안을 작성한 부서는 기업금융전략팀입니다. 열아홉 명이 같은 문구를 쓴 건 열아홉 번의 선택이 아니라, 선택지가 하나뿐이었기 때문입니다.",
@@ -2856,12 +2874,12 @@ const evidenceTurnaroundPlans = {
     result: "c11_aftershock",
     sourceRoutes: ["c11_script", "c11_rehearsal", "c11_sign", "c11_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "모아 둔 단서를 3년 전 승인 시스템 기록 옆에 놓고, 반대 의견서의 상태가 언제 바뀌었는지 맞춰 본다.",
-    entryEcho: "단서를 대면 반려한 손과 지운 손이 같은 손이 아니었다는 게 드러납니다.",
+    entryVoice: "3년 전 승인 시스템의 변경 기록을 단서로 불러, 반대 의견서의 상태가 바뀐 시각을 잡는다.",
+    entryEcho: "변경 기록을 부르면 반려한 손과 지운 손이 같은 손이 아니었다는 게 드러납니다.",
     title: "다섯 시간 열두 분",
     speaker: "반재욱",
-    text: "단서를 맞추자 3년 전 승인 시스템의 변경 기록이 열립니다. 한서윤의 반려 서명은 오후 6시 2분. 그런데 반대 의견서가 '보관'에서 '폐기'로 바뀐 건 밤 11시 14분이고, 바꾼 계정은 당시 기업금융전략팀장 윤상혁입니다. 반려한 사람과 지운 사람은 다른 사람이었습니다. 반재욱이 수첩에 두 시각을 나란히 적습니다. '다섯 시간 열두 분. 그 사이에 누가 무엇을 결심했는지가 이 사건입니다.'",
-    memo: ["반려 서명 18:02 -- 한서윤", "폐기 처리 23:14 -- 윤상혁 계정", "폐기 사유란: 공란"],
+    text: "단서를 맞추자 3년 전 승인 시스템의 변경 기록이 열립니다. 한서윤의 반려 서명은 오후 1시 32분. 그런데 반대 의견서가 '보관'에서 '폐기'로 바뀐 건 저녁 6시 44분이고, 바꾼 계정은 당시 기업금융전략팀장 윤상혁입니다. 반려한 사람과 지운 사람은 다른 사람이었습니다. 반재욱이 수첩에 두 시각을 나란히 적습니다. '다섯 시간 열두 분. 그 사이에 누가 무엇을 결심했는지가 이 사건입니다.'",
+    memo: ["반려 서명 13:32 -- 한서윤", "폐기 처리 18:44 -- 윤상혁 계정", "폐기 사유란: 공란"],
     triggers: ["injustice", "system", "order"],
     entryEffect: { legitimacy: 5, trust: 3, time: -4, fatigue: 4 },
     choices: [
@@ -2877,9 +2895,9 @@ const evidenceTurnaroundPlans = {
     result: "f_choice",
     sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
     requiredAuthority: "OVERSIGHT",
-    entryVoice: "확보한 단서를 꺼내, 이 선택지들이 어디서 왔는지부터 확인한다.",
-    entryEcho: "단서를 대면 마지막 질문을 누가 냈는지가 드러납니다.",
-    title: "모든 단서가 플레이어의 문장을 가리킨다",
+    entryVoice: "마지막 선택지들을 단서의 원본과 맞추어, 이 문장들이 어디서 왔는지 밝힌다.",
+    entryEcho: "원본과 맞추면 마지막 질문을 누가 냈는지가 드러납니다.",
+    title: "모든 단서가 당신의 문장을 가리킨다",
     speaker: "에코",
     text: "감독 권한으로 원본을 열자 사건의 공통점이 사람이 아니라 질문 문장이라는 사실이 드러납니다. 최종 선택은 데이터를 공개할지가 아니라, 당신의 판단 양식을 다음 참가자에게 물려줄지입니다.",
     memo: ["모든 케이스의 숨은 단서가 선택 문장과 연결됨", "다음 참가자의 첫 선택지 일부가 이미 생성됨", "종료 권한은 공개와 폐기 중 하나만 완전하게 보장함"],
@@ -2897,6 +2915,7 @@ function registerEvidenceTurnaround(caseId, plan) {
   const order = nodeOrders[caseId];
   nodes[plan.node] = {
     phase: "EVIDENCE TURN",
+    kind: "evidence",
     title: plan.title,
     speaker: plan.speaker,
     text: plan.text,
@@ -2911,10 +2930,11 @@ function registerEvidenceTurnaround(caseId, plan) {
     })),
   };
   plan.sourceRoutes.forEach((routeId) => {
-    if (!nodes[routeId]?.choices || nodes[routeId].choices.some((choice) => choice.id === `${routeId}_evidence_turn`)) return;
-    nodes[routeId].choices.push({
+    const route = sceneOf(routeId, `${caseId} evidence plan`);
+    if (route.choices.some((choice) => choice.id === `${routeId}_evidence_turn`)) return;
+    route.choices.push({
       id: `${routeId}_evidence_turn`,
-      label: "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
+      label: plan.entryLabel ?? "확보한 단서를 대조해 이 질문의 전제를 뒤집는다",
       effect: plan.entryEffect,
       cognition: { inference: 2, reframing: 1 },
       next: plan.node,
@@ -2925,8 +2945,7 @@ function registerEvidenceTurnaround(caseId, plan) {
   const insertIndex = resultIndex >= 0 ? resultIndex : order.length;
   if (!order.includes(plan.node)) order.splice(insertIndex, 0, plan.node);
   nodes[plan.node].choices.forEach((choice) => {
-    choiceVoiceLines[choice.id] ??= choice.label;
-    echoReplies[choice.id] ??= `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`;
+    fallBackOn(choice.id, choice.label, `${plan.title}: 단서가 선택지의 전제를 바꿉니다.`);
   });
   // Every route offers the turnaround under one label, but what the clue
   // overturns differs per case, so the copy is written per case, not per route.
@@ -2940,6 +2959,7 @@ function registerEvidenceTurnaround(caseId, plan) {
 CASE_PACKS.forEach((pack) => {
   evidenceTurnaroundPlans[pack.id] = pack.evidencePlan;
 });
+coreCards.lay(coreCards.entryLabels, (caseId) => evidenceTurnaroundPlans[caseId]);
 Object.entries(evidenceTurnaroundPlans).forEach(([caseId, plan]) => registerEvidenceTurnaround(caseId, plan));
 
 const continuityMemoryChoicePlans = {
@@ -2948,94 +2968,84 @@ const continuityMemoryChoicePlans = {
     systemNext: "c2_route_system",
     evidenceNext: "c2_evidence_turn",
     routeLabel: "직전 사건의 남은 약속을 이민서에게 먼저 확인한다",
-    systemLabel: "직전 자유응답 문장이 유출 파일에 복제됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 유출 파일의 전제를 뒤집는다",
+    systemLabel: "플로우온에서 다시 짠 판이 유출 파일에 복제됐는지 뜯어본다",
+    evidenceLabel: "숨은 급여표의 작성자를 유출 파일의 시각 옆에 세운다",
   },
   case03: {
     routeNext: "c3_route_mirror",
     systemNext: "c3_route_system",
     evidenceNext: "c3_evidence_turn",
     routeLabel: "직전 사건의 보호 결정을 경쟁자의 계약서에 대조한다",
-    systemLabel: "직전 자유응답 문장이 점수판에 반영됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 두 번째 점수판을 연다",
+    systemLabel: "감사실에서 다시 짠 판이 점수판 항목에 올랐는지 훑는다",
+    evidenceLabel: "어긋난 시간을 단서 삼아 점수판 뒤의 평가표를 찾는다",
   },
   case04: {
     routeNext: "c4_route_audit",
     systemNext: "c4_route_system",
     evidenceNext: "c4_evidence_turn",
     routeLabel: "직전 사건의 점수 기준을 예외 승인표에 대조한다",
-    systemLabel: "직전 자유응답 문장이 예외 사유로 쓰였는지 본다",
-    evidenceLabel: "직전 단서를 붙여 예외 파일의 원래 수신자를 연다",
+    systemLabel: "입찰장에서 다시 짠 판이 예외 사유서에 끌려 들어갔는지 읽는다",
+    evidenceLabel: "두 번째 점수판의 작성자를 예외 파일의 수신자 칸에 견준다",
   },
   case05: {
     routeNext: "c5_route_map",
     systemNext: "c5_route_system",
     evidenceNext: "c5_evidence_turn",
     routeLabel: "직전 사건의 예외 조건을 실패 지도에 겹쳐 본다",
-    systemLabel: "직전 자유응답 문장이 복구 우선순위에 들어갔는지 본다",
-    evidenceLabel: "직전 단서를 붙여 사라진 피해자 기준을 연다",
+    systemLabel: "온새에서 다시 짠 판이 복구 우선순위표에 섞였는지 살펴본다",
+    evidenceLabel: "예외 파일에 되풀이된 이름을 복구 순번표에서 찾는다",
   },
   case06: {
     routeNext: "c6_branch_roof",
     systemNext: "c6_route_system",
     evidenceNext: "c6_evidence_turn",
     routeLabel: "직전 사건에서 세운 책임 기준을 옆자리 사람에게도 적용해 본다",
-    systemLabel: "직전 자유응답 문장이 그의 조건표에도 쓰였는지 본다",
-    evidenceLabel: "직전 단서를 붙여 그의 조건이 바뀐 날짜를 연다",
+    systemLabel: "통제실에서 다시 짠 판이 그의 조건표에 기준선으로 갔는지 확인한다",
+    evidenceLabel: "비어 있는 자리의 날짜를 그의 조건이 바뀐 날들과 포갠다",
   },
   case07: {
-    routeNext: "c7_branch_quota",
     systemNext: "c7_route_system",
     evidenceNext: "c7_evidence_turn",
-    routeLabel: "직전 사건에서 옆자리에 세운 기준을 내 발령에도 대 본다",
-    systemLabel: "직전 자유응답 문장이 내 인사 기록에도 붙었는지 본다",
-    evidenceLabel: "직전 단서를 붙여 발령서 작성일의 순서를 연다",
+    systemLabel: "오진우 곁에서 다시 짠 판이 내 인사 기록에 따라붙었는지 들춘다",
+    evidenceLabel: "거울 프로필의 실험 번호를 발령서 작성일 옆에 적는다",
   },
   case08: {
-    routeNext: "c8_branch_ledger",
     systemNext: "c8_route_system",
     evidenceNext: "c8_evidence_turn",
-    routeLabel: "직전 사건에서 이름을 올린 방식대로 흔적표에도 이름을 단다",
-    systemLabel: "직전 자유응답 문장이 법인 등기 서류에도 남았는지 본다",
-    evidenceLabel: "직전 단서를 붙여 입금일과 승인일을 맞춘다",
+    systemLabel: "발령 앞에서 다시 짠 판이 법인 등기 서류에 흔적을 남겼는지 더듬는다",
+    evidenceLabel: "먼저 쓰인 발령서의 작성일을 자문료 입금일과 나란히 적는다",
   },
   case09: {
-    routeNext: "c9_branch_father",
     systemNext: "c9_route_system",
     evidenceNext: "c9_evidence_turn",
-    routeLabel: "직전 사건의 흔적표를 권도현의 계산서 옆에 나란히 놓는다",
-    systemLabel: "직전 자유응답 문장이 채권단 자료에도 들어갔는지 본다",
-    evidenceLabel: "직전 단서를 붙여 청산 회수율의 출처를 연다",
+    systemLabel: "영동지점에서 다시 짠 판이 채권단 자료에 자리를 얻었는지 찾는다",
+    evidenceLabel: "그림값의 날짜를 청산 계산서의 작성일에 겹친다",
   },
   case10: {
-    routeNext: "c10_branch_home",
     systemNext: "c10_route_system",
     evidenceNext: "c10_evidence_turn",
-    routeLabel: "직전 사건의 계산서 양식을 이번 분담표에 그대로 대 본다",
-    systemLabel: "직전 자유응답 문장이 인사 기록에도 인용됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 병가 사유란의 개정 이력을 연다",
+    systemLabel: "채권단 앞에서 다시 짠 판이 인사 기록에 옮겨 적혔는지 가린다",
+    evidenceLabel: "사 둔 회수율을 만든 손을 병가 서식의 개정 이력에서 찾는다",
   },
   case11: {
-    routeNext: "c11_branch_newsroom",
     systemNext: "c11_route_system",
     evidenceNext: "c11_evidence_turn",
-    routeLabel: "직전 사건의 분담표를 출석 준비 역할표로 그대로 쓴다",
-    systemLabel: "직전 자유응답 문장이 그룹 입장문에도 인용됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 반대 의견서의 폐기 기록을 연다",
+    systemLabel: "분담표 앞에서 다시 짠 판이 그룹 입장문에 옮겨졌는지 대 본다",
+    evidenceLabel: "사유란의 기본값을 바꾼 부서를 반대 의견서의 폐기 기록에서 찾아본다",
   },
   final: {
-    routeNext: "f_route_map",
     systemNext: "f_route_system",
     evidenceNext: "f_evidence_turn",
-    routeLabel: "직전 사건의 실패 지도를 내 플레이 로그에 겹쳐 본다",
-    systemLabel: "직전 자유응답 문장이 다음 참가자의 선택지가 됐는지 본다",
-    evidenceLabel: "직전 단서를 붙여 모든 선택 문장의 원본을 연다",
+    systemLabel: "보름달 아래에서 다시 짠 판이 다음 참가자의 선택지로 넘어갔는지 비춰 본다",
+    evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
   },
 };
+coreCards.lay(coreCards.memoryEchoes, (caseId) => continuityMemoryChoicePlans[caseId]);
 
 CASE_PACKS.forEach((pack) => {
   continuityMemoryChoicePlans[pack.id] = pack.memoryPlan;
 });
+coreCards.fileMemoryEchoes(continuityMemoryChoicePlans, echoReplies);
 
 /**
  * Reads the previous case's recorded route memory, not the run log: a case
@@ -3074,7 +3084,9 @@ export function getContinuityMemoryChoice({ caseId = CASE_SEQUENCE[0], nodeId = 
       continuityMemory: true,
     };
   }
-  if (!memory.routeSplit) return null;
+  // Only 사건 02-06 write a route card: a route split is a walk down a route
+  // that is not the hidden one, and only 사건 01-05 have such routes.
+  if (!memory.routeSplit || !plan.routeLabel) return null;
   return {
     id: `${caseId}_memory_route`,
     label: plan.routeLabel,
@@ -3500,6 +3512,7 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
     nodes[nodeId] = {
       ...nodes[baseNodeId],
       phase: "BRANCH BRIEFING",
+      kind: "opening",
       title,
       speaker,
       text,
@@ -3510,43 +3523,12 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
   nodeOrders[caseId].unshift(...Object.values(routes));
 });
 
-/**
- * The play screen badges a choice that changes the question -- memory, evidence
- * turn, authority, adaptive, branch detour -- but the main split had no mark on
- * it. The four buttons on a case briefing send the player down four different
- * routes with four different endings, and they looked like ordinary choices.
- * Tagged from the graph, after every route is wired, so it cannot fall out of
- * step with where the choices actually go.
- */
-Object.values(nodes).forEach((node) => {
-  node.choices.forEach((choice) => {
-    if (nodes[choice.next]?.phase?.endsWith(" ROUTE")) choice.routeSplit = true;
-  });
-});
+// Last: what each scene is, where it happens, and the order it deals its
+// cards in. See nodes/sceneBuild.js.
+sceneBuild.finishSceneGraph(nodes, nodeOrders);
 
-// Last, so a generated scene is grounded like an authored one. See sceneContext.js.
-applySceneContext(nodes, nodeOrders);
-
-function getPlayableRoute(caseId) {
-  const route = new Map();
-  const queue = [
-    CASE_START_NODES[caseId],
-    ...Object.values(caseOpeningRoutes[caseId] ?? {}),
-  ].filter(Boolean).map((nodeId) => ({ nodeId, depth: 0 }));
-  const seen = new Set();
-  while (queue.length > 0) {
-    const { nodeId, depth } = queue.shift();
-    if (!nodeId || seen.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
-    seen.add(nodeId);
-    route.set(nodeId, depth);
-    for (const choice of nodes[nodeId]?.choices ?? []) {
-      if (choice.next && !seen.has(choice.next) && !RESULT_NODE_IDS.has(choice.next)) {
-        queue.push({ nodeId: choice.next, depth: depth + 1 });
-      }
-    }
-  }
-  return route;
-}
+// How far into a case a scene sits; see nodes/sceneBuild.js.
+export const { getCaseRouteLength, getNodeRouteIndex } = sceneBuild.createRouteReaders(nodes, caseOpeningRoutes);
 
 /**
  * The one authored mid-case fork per case, with the scenes each side leads to.
@@ -3580,15 +3562,4 @@ export function getBranchDetourBypass(choice = {}, context = {}) {
   const condition = branchConditions[choice.branchCondition];
   if (!condition || !choice.branchBypass) return null;
   return condition.test(context) ? null : choice.branchBypass;
-}
-
-export function getCaseRouteLength(caseId) {
-  const route = getPlayableRoute(caseId);
-  return Math.max(1, ...route.values()) + 1;
-}
-
-export function getNodeRouteIndex(caseId, nodeId) {
-  const branchStartIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
-  if (branchStartIds.has(nodeId)) return 0;
-  return getPlayableRoute(caseId).get(nodeId) ?? -1;
 }

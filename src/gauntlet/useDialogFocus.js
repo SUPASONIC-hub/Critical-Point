@@ -11,12 +11,30 @@ const FOCUSABLE = "button:not([disabled]), [href], input:not([disabled]), select
  * On mount this focuses `initialRef` (or the dialog), remembers what had focus
  * before, and hands focus back to it on unmount if it is still on the page.
  * The returned handler goes on the dialog's `onKeyDown` and keeps Tab inside.
+ *
+ * Focus is taken again for the first few frames if something takes it away.
+ * The runtime focuses the scene's title a frame after a scene changes, which
+ * is a frame after these pages mount: focus landed on the heading behind the
+ * page, the trap -- a key handler on the dialog -- never ran, and Tab walked
+ * the covered table.
  */
+const SETTLE_FRAMES = 4;
+
 export function useDialogFocus(dialogRef, initialRef = null) {
   useEffect(() => {
     const previous = document.activeElement;
-    (initialRef?.current ?? dialogRef.current)?.focus({ preventScroll: true });
+    const take = () => (initialRef?.current ?? dialogRef.current)?.focus({ preventScroll: true });
+    take();
+    let frame = 0;
+    let frames = 0;
+    const settle = () => {
+      if (dialogRef.current && !dialogRef.current.contains(document.activeElement)) take();
+      frames += 1;
+      if (frames < SETTLE_FRAMES) frame = globalThis.requestAnimationFrame(settle);
+    };
+    frame = globalThis.requestAnimationFrame(settle);
     return () => {
+      globalThis.cancelAnimationFrame(frame);
       if (previous instanceof HTMLElement && previous !== document.body && previous.isConnected) {
         previous.focus({ preventScroll: true });
       }

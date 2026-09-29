@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export function RankingScreen({
@@ -12,6 +13,14 @@ export function RankingScreen({
   triggerLabels,
   onClose,
 }) {
+  // The screen replaces the page under the player's hands, so it takes focus
+  // itself: without this a keyboard or screen-reader user was left on <body>,
+  // with nothing said about where they now were.
+  const headingRef = useRef(null);
+  useEffect(() => {
+    headingRef.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
       <main className="shell ranking-shell">
         <Music modeKey="intro" />
@@ -25,7 +34,7 @@ export function RankingScreen({
           </div>
           <header className="ranking-hero">
             <span>PUBLIC SIGNAL BOARD</span>
-            <h1>어디서 생각이 가장 크게 확장됐는가</h1>
+            <h1 ref={headingRef} tabIndex={-1}>어디서 생각이 가장 크게 확장됐는가</h1>
             <p>
               완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
               압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
@@ -67,7 +76,8 @@ export function RankingScreen({
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
                       {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
-                      <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? entry.trigger}</small>
+                      {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
+                      <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? triggerLabels.responsibility}</small>
                     </div>
                     <div className="ranking-stat">
                       <span>RANK</span>
@@ -81,6 +91,7 @@ export function RankingScreen({
                       <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
                       <span>평균 {entry.averageResponseTime}s</span>
                       <span>판 다시 짜기 {entry.reframeCount}</span>
+                      {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                     </div>
                   </article>
                   );

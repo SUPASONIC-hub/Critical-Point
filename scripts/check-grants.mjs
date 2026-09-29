@@ -36,8 +36,10 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *      unnoticed: the check sent columns that existed, the client did not.
  *   3. The refusals the server is there for: forged times, a ranking row for a
  *      run nobody played, a second one, a board flood, a spoofed forwarding
- *      header, a cloud save dated in the future, and every privilege 20260928
- *      revoked.
+ *      header, a cloud save dated in the future, a stale device writing over
+ *      a newer save, and every privilege 20260928 revoked.
+ *   4. The limits themselves: each hourly and daily budget is driven to its
+ *      edge, because a limit nobody has run is a number in a comment.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -136,6 +138,46 @@ for (const { tablename, policyname, cmd, roles } of policies) {
           `Grant it in the migration that creates the table.`,
       );
     }
+  }
+}
+
+// No function is an RPC by accident. A function in `public` is executable by
+// PUBLIC unless a migration says otherwise, and PostgREST serves every one the
+// caller may execute, so a helper a trigger calls becomes an unmetered endpoint.
+// The list is what the client calls and what a policy needs (20260929040000).
+const CLIENT_FUNCTIONS = {
+  anon: ["delete_cloud_save", "get_cloud_save", "is_season_case_id", "peek_cloud_save", "put_cloud_save"],
+  authenticated: [],
+};
+{
+  const { rows } = await db.query(`
+    select p.proname as name, pg_get_function_identity_arguments(p.oid) as args,
+           has_function_privilege('anon', p.oid, 'execute') as anon,
+           has_function_privilege('authenticated', p.oid, 'execute') as authenticated,
+           has_function_privilege('service_role', p.oid, 'execute') as service_role
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+    order by 1, 2
+  `);
+  if (rows.length === 0) failures.push("no functions were found in public; the execute rule checked nothing.");
+  for (const fn of rows) {
+    for (const role of ["anon", "authenticated"]) {
+      const listed = CLIENT_FUNCTIONS[role].includes(fn.name);
+      if (fn[role] && !listed) {
+        failures.push(
+          `public.${fn.name}(${fn.args}) is executable by ${role}, so it is an RPC anyone can call. ` +
+            `Add \`revoke all on function public.${fn.name}(${fn.args}) from public, anon, authenticated;\` to the migration that creates it.`,
+        );
+      }
+      if (!fn[role] && listed) {
+        failures.push(`public.${fn.name}(${fn.args}) is not executable by ${role}, and the client or a policy calls it.`);
+      }
+    }
+    if (!fn.service_role) failures.push(`public.${fn.name}(${fn.args}) is not executable by service_role.`);
+  }
+  for (const name of CLIENT_FUNCTIONS.anon) {
+    const overloads = rows.filter((fn) => fn.name === name).length;
+    if (overloads !== 1) failures.push(`public.${name} has ${overloads} overloads; PostgREST needs exactly one to resolve a call by argument names.`);
   }
 }
 
@@ -420,34 +462,180 @@ await post("insert an error log behind a proxy", "app_error_logs", errorPayload(
 withHeaders({ "x-forwarded-for": "7.7.7.7, 10.0.0.1", "cf-connecting-ip": "192.0.2.44" });
 await post("insert an error log through the edge", "app_error_logs", errorPayload(sessionId(5)));
 withHeaders(null);
+
+/** The key the pace rules file an address under: normalised, then hashed with the database's salt. */
+const writerKey = async (address) =>
+  (await one(`select public.hash_client_address(public.normalize_client_address($1)) as key`, [address]))?.key ?? null;
+/** Sets a counter to `count` inside a window that opened just now, so the next request is the one that decides. */
+const presetCounter = (key, count) =>
+  db.query(
+    `insert into public.telemetry_rate_limits (actor_key, window_started_at, request_count) values ($1, now(), $2)
+     on conflict (actor_key) do update set window_started_at = now(), request_count = excluded.request_count`,
+    [key, count],
+  );
+
 {
-  const { rows } = await db.query(`select actor_key from public.telemetry_rate_limits where actor_key like 'tele-ip:%'`);
+  const { rows } = await db.query(`select actor_key from public.telemetry_rate_limits`);
   const keys = rows.map((row) => row.actor_key);
-  check(keys.includes("tele-ip:203.0.113.9"), `the right-most forwarded hop was not the rate-limit key: ${keys.join(", ")}`);
-  check(keys.includes("tele-ip:192.0.2.44"), `cf-connecting-ip was not preferred: ${keys.join(", ")}`);
-  check(!keys.some((key) => /6\.6\.6\.6|7\.7\.7\.7/.test(key)), "a client-written forwarded address became a rate-limit key.");
+  check(keys.includes(`tele-ip:${await writerKey("203.0.113.9")}`), `the right-most forwarded hop was not the rate-limit key: ${keys.join(", ")}`);
+  check(keys.includes(`tele-ip:${await writerKey("192.0.2.44")}`), `cf-connecting-ip was not preferred: ${keys.join(", ")}`);
+  for (const written of ["6.6.6.6", "7.7.7.7"]) {
+    check(!keys.includes(`tele-ip:${await writerKey(written)}`), `a client-written forwarded address (${written}) became a rate-limit key.`);
+  }
+  // Nothing stored is an address: every key's writer part is the keyed hash.
+  check(
+    !keys.some((key) => /(^|[:|])[0-9]{1,3}(\.[0-9]{1,3}){3}($|[|/])/.test(key) || /[0-9a-f]{1,4}:[0-9a-f:]*:/i.test(key.replace(/^[a-z-]+:/, ""))),
+    `a rate-limit key still holds an address: ${keys.join(", ")}`,
+  );
+}
+
+// One IPv6 customer is one writer, whichever host address the request came
+// from, and an IPv4 address is itself however it is spelled.
+{
+  const normalize = async (address) => (await one(`select public.normalize_client_address($1) as a`, [address]))?.a ?? null;
+  const cases = [
+    ["2001:db8:12:34:aaaa:bbbb:cccc:dddd", "2001:db8:12:34::/64"],
+    ["2001:DB8:12:34::1", "2001:db8:12:34::/64"],
+    ["2001:db8:12:35::1", "2001:db8:12:35::/64"],
+    ["::ffff:203.0.113.9", "203.0.113.9"],
+    ["::ffff:cb00:7109", "203.0.113.9"],
+    ["203.0.113.9", "203.0.113.9"],
+    ["203.0.113.9:51234", "203.0.113.9"],
+    ["[2001:db8:12:34::1]:443", "2001:db8:12:34::/64"],
+    ["not-an-address", null],
+    ["999.1.1.1", null],
+    ["", null],
+  ];
+  for (const [address, expected] of cases) {
+    const actual = await normalize(address);
+    check(actual === expected, `normalize_client_address('${address}') is ${actual}; expected ${expected}.`);
+  }
+  check(
+    (await writerKey("2001:db8:12:34::1")) === (await writerKey("2001:db8:12:34:ffff:ffff:ffff:ffff")),
+    "two addresses in one IPv6 /64 are two writers; every per-address limit resets on demand.",
+  );
+  check((await writerKey("2001:db8:12:34::1")) !== (await writerKey("2001:db8:12:35::1")), "two IPv6 /64s share one writer key.");
+  check(/^[0-9a-f]{32}$/.test((await writerKey("203.0.113.9")) ?? ""), "the writer key is not a 32-character hash.");
+  await db.query(`delete from public.private_settings where name = 'address_salt'`);
+  await raises("key a writer with no salt", "service_role", `select public.hash_client_address('203.0.113.9')`, [], /salt is missing/);
+  await db.query(`insert into public.private_settings (name, value) values ('address_salt', repeat('ab', 32))`);
+}
+
+// ---- telemetry limits, each driven to its edge
+
+withHeaders({ "x-forwarded-for": "198.51.100.70" });
+{
+  // 240 an hour for one device on one address.
+  const deviceKey = `tele:${await writerKey("198.51.100.70")}|${sessionId(6)}`;
+  await presetCounter(deviceKey, 239);
+  await post("send a device's 240th telemetry row of the hour", "app_error_logs", errorPayload(sessionId(6)));
+  await postRefused("send a device's 241st telemetry row of the hour", "app_error_logs", errorPayload(sessionId(6)), /^PT429 .*rate limit/);
+  // 1,200 an hour for an address, whatever the device.
+  await presetCounter(`tele-ip:${await writerKey("198.51.100.70")}`, 1199);
+  await post("send an address's 1,200th telemetry row of the hour", "app_error_logs", errorPayload(sessionId(7)));
+  await postRefused("send an address's 1,201st telemetry row of the hour", "app_error_logs", errorPayload(sessionId(8)), /^PT429 .*rate limit/);
+}
+withHeaders({ "x-forwarded-for": "198.51.100.71" });
+{
+  // A replay is dropped for free 600 times an hour, then refused.
+  const replay = casePayload({ session: sessionId(9), runId: "run-replay-1", caseId: "case01" });
+  await post("insert a case row to replay", "playtest_sessions", replay);
+  await presetCounter(`tele-replay:${await writerKey("198.51.100.71")}`, 599);
+  await post("replay a case row for the 600th time in an hour", "playtest_sessions", { ...replay, event_id: uuid() });
+  await postRefused("replay a case row for the 601st time in an hour", "playtest_sessions", { ...replay, event_id: uuid() }, /^PT429 .*rate limit/);
+
+  // Everyone together: a day's bytes, and it fails closed.
+  await db.query(`insert into public.private_settings (name, value) values ('telemetry_daily_bytes', '1000')
+                  on conflict (name) do update set value = excluded.value`);
+  await postRefused("write telemetry past the daily ceiling", "app_error_logs", errorPayload(sessionId(9)), /^PT429 .*daily ceiling/);
+  await db.query(`delete from public.private_settings where name = 'telemetry_daily_bytes'`);
+  await post("write telemetry under the default daily ceiling", "app_error_logs", errorPayload(sessionId(9)));
+}
+withHeaders(null);
+
+// Sizes, at the caps the measured payloads set (20260929010000). The largest
+// honest shapes pass; one step past each cap does not.
+{
+  const honest = casePayload({ session: sessionId(1), runId: "run-size-1", caseId: "case07" });
+  const fullLog = Array.from({ length: 30 }, (_, index) => decisionEntry("case07", index));
+  await post("send a case row with a thirty-scene log", "playtest_sessions", { ...honest, decision_log: fullLog });
+  const oversize = (runId, caseId, patch) => ({ ...casePayload({ session: sessionId(1), runId, caseId }), ...patch });
+  await postRefused("send a 61-entry decision log", "playtest_sessions",
+    oversize("run-size-2", "case08", { decision_log: Array.from({ length: 61 }, () => ({ nodeId: "n" })) }), /invalid playtest session payload/);
+  await postRefused("send a 9 KB decision entry", "playtest_sessions",
+    oversize("run-size-3", "case08", { decision_log: [{ echo: "x".repeat(9000) }] }), /too large/);
+  await postRefused("send a 5 KB summary", "playtest_sessions",
+    oversize("run-size-4", "case08", { summary: { note: "x".repeat(5000) } }), /too large/);
+  await postRefused("send 2 KB of triggers", "playtest_sessions",
+    oversize("run-size-5", "case08", { triggers: { note: "x".repeat(2000) } }), /too large/);
+  await postRefused("send 3 KB of dynamics", "playtest_sessions",
+    oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(3000) } }), /too large/);
+  await postRefused("send a 200 KB row", "playtest_sessions",
+    oversize("run-size-7", "case08", { decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) }), /too large/);
 }
 
 // ---- the ranking
 
 const rankedSession = sessionId(10);
-const playRun = async (runId, { backdate = true } = {}) => {
+/** Dates a run's case rows as if it had been played: the first two hours ago, one every `stepSeconds` after it. */
+const spreadRun = (runId, stepSeconds = 60) =>
+  db.query(
+    `update public.playtest_sessions s
+        set completed_at = now() - interval '2 hours' + (t.position * $2::int) * interval '1 second'
+       from (select id, row_number() over (order by id) - 1 as position
+               from public.playtest_sessions where run_id = $1 and case_id <> 'season-final') t
+      where s.id = t.id`,
+    [runId, stepSeconds],
+  );
+const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null } = {}) => {
   for (const caseId of CASE_SEQUENCE) {
-    const { sql, params } = postgrestInsert("playtest_sessions", casePayload({ session: rankedSession, runId, caseId }));
+    const payload = casePayload({ session, runId, caseId });
+    if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", ...(finalSummary ?? {}) };
+    const { sql, params } = postgrestInsert("playtest_sessions", payload);
     await db.query(sql, params);
   }
-  if (backdate) {
-    await db.query(`update public.playtest_sessions set completed_at = now() - interval '2 hours' where run_id = $1`, [runId]);
-  }
+  if (backdate) await spreadRun(runId);
 };
 
 withHeaders({ "x-forwarded-for": "198.51.100.20" });
-await postRefused("rank a run with no case rows", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /every case of the run/);
+await postRefused("rank a run with no case rows", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /^PT425 .*every case of the run/);
 await playRun("run-ranked-1", { backdate: false });
-await postRefused("rank a run played in under ten minutes", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /implausibly short/);
+await postRefused("rank a run played in under ten minutes", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /^PT425 .*implausibly short/);
+// Every row two hours old and none of them apart: a season flushed in one burst.
 await db.query(`update public.playtest_sessions set completed_at = now() - interval '2 hours' where run_id = 'run-ranked-1'`);
-await postRefused("rank the run from a device that did not play its final case", "playtest_sessions", seasonPayload({ session: sessionId(11), runId: "run-ranked-1" }), /every case of the run/);
-await post("rank a run the server watched being played", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }));
+await postRefused("rank a run whose rows all arrived together", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /^P0001 .*watch it/);
+await spreadRun("run-ranked-1", 10);
+await postRefused("rank a run played in nine minutes", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }), /^P0001 .*watch it/);
+await spreadRun("run-ranked-1");
+await postRefused("rank the run from a device that did not play its final case", "playtest_sessions", seasonPayload({ session: sessionId(11), runId: "run-ranked-1" }), /^PT425 .*every case of the run/);
+{
+  // What the client puts in a ranking row is not what is published. The title,
+  // the score and every summary key come from the server's own copy of the run.
+  const forged = seasonPayload({ session: rankedSession, runId: "run-ranked-1" });
+  forged.case_title = "읽어 보세요 spam.example";
+  forged.summary = {
+    ...forged.summary,
+    burstScore: 100,
+    rank: "S",
+    primary: [{ toString: "x" }, "y"],
+    note: "여기에 아무 글이나 실을 수 있었다",
+    trigger: { nested: true },
+  };
+  await post("rank a run the server watched being played", "playtest_sessions", forged);
+  const row = await one(`select case_title, summary, score from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-ranked-1'`);
+  check(row?.case_title === "SEASON 01 COMPLETE", `a ranking row kept the client's title (${row?.case_title}).`);
+  check(Number(row?.score) === 88 && row?.summary?.rank === "A", `a ranking row took its score from the request (${row?.score}, ${row?.summary?.rank}), not from the run's final case.`);
+  check(!("note" in (row?.summary ?? {})) && !("trigger" in (row?.summary ?? {})), "a ranking summary published a key that is not on the whitelist.");
+  check(
+    Array.isArray(row?.summary?.primary) && typeof row.summary.primary[0] === "string" && typeof row.summary.primary[1] === "number",
+    `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,
+  );
+  check(row?.summary?.seasonComplete === true && row?.summary?.completedCaseCount === CASE_SEQUENCE.length, "a ranking summary lost seasonComplete or the case count.");
+  check(
+    Object.values(row?.summary ?? {}).every((value) => ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value)),
+    `a ranking summary carries an object: ${JSON.stringify(row?.summary)}`,
+  );
+}
 await post("send a second ranking row for the same run", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-1" }));
 check(
   (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-ranked-1'`))?.n === 1,
@@ -456,7 +644,16 @@ check(
 await playRun("run-ranked-2");
 await post("rank a second run with seasonComplete '1'", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-2", seasonComplete: "1" }));
 await playRun("run-ranked-3");
-await postRefused("rank a third run from one device in a day", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-3" }), /limit reached/);
+await postRefused("rank a third run from one device in a day", "playtest_sessions", seasonPayload({ session: rankedSession, runId: "run-ranked-3" }), /^PT429 .*limit reached/);
+{
+  // A final case whose summary carries no usable score cannot rank at all.
+  await playRun("run-ranked-4", { session: sessionId(12), finalSummary: { burstScore: "100", rank: "S" } });
+  await postRefused("rank a run whose final case has no numeric score", "playtest_sessions", seasonPayload({ session: sessionId(12), runId: "run-ranked-4" }), /invalid season ranking score/);
+  // Twenty ranking rows a day for an address, whatever the device.
+  await presetCounter(`season-ip:${await writerKey("198.51.100.20")}`, 20);
+  await playRun("run-ranked-5", { session: sessionId(13) });
+  await postRefused("rank a 21st run from one address in a day", "playtest_sessions", seasonPayload({ session: sessionId(13), runId: "run-ranked-5" }), /^PT429 .*limit reached/);
+}
 withHeaders(null);
 
 {
@@ -471,6 +668,7 @@ withHeaders(null);
   check(rows.every((row) => new Date(row.completed_at) <= new Date()), "a ranking row is dated in the future.");
   check(rows.every((row) => !("runId" in row.summary)), "a ranking summary still carries the full runId.");
   check(rows.every((row) => /^[A-Z0-9]{1,8}$/.test(row.run_tag)), "run_tag is not the short tag the ranking prints.");
+  check(rows.every((row) => row.case_title === "SEASON 01 COMPLETE"), "a ranking row's title is not the constant.");
 }
 await refused("read a ranking row's full run_id", "anon", `select run_id from public.playtest_sessions`);
 await refused("read a ranking row's session_code", "anon", `select session_code from public.public_rankings`, /^42(501|703) /);
@@ -493,34 +691,79 @@ withHeaders({ "x-forwarded-for": "198.51.100.30" });
 await boardPost("post to the board", sessionId(20), "점검", "새 데이터베이스 쓰기 확인");
 await boardRefused("post twice inside 30 seconds", sessionId(20), "점검", "두 번째 글입니다", /30 seconds/);
 await boardPost("post from a second device on the same address", sessionId(21), "교실", "같은 교실의 다른 사람입니다");
-await boardPost("post the same body again from a new session id", sessionId(22), "교실", "같은 교실의 다른 사람입니다");
+// The same words from another device are refused out loud -- the writer is
+// told -- rather than answered with the success a retry gets.
+await boardRefused("post another device's words from the same address", sessionId(22), "교실", "같은 교실의 다른 사람입니다", /^P0001 .*repeats a recent post/);
 check(
   (await one(`select count(*)::int as n from public.board_posts where body = '같은 교실의 다른 사람입니다'`))?.n === 1,
   "the same body from one address was stored twice by rotating session_id.",
 );
 await boardPost("post from a third device on the same address", sessionId(23), "교실셋", "세 번째 사람의 글");
-await boardRefused("flood from one address with rotating session ids", sessionId(24), "봇봇", "네 번째 글", /30 seconds/);
+await boardRefused("flood from one address with rotating session ids", sessionId(24), "봇봇", "네 번째 글", /^PT429 .*30 seconds/);
+{
+  // A retry of a post that landed: accepted, dropped, and counted.
+  const key = (await one(`select actor_key from public.board_posts where session_id = $1`, [sessionId(21)]))?.actor_key;
+  check(/^board:[0-9a-f]{32}$/.test(key ?? ""), `a board post's writer key is not a hash: ${key}`);
+  await boardPost("retry a post that already landed", sessionId(21), "교실", "같은 교실의 다른 사람입니다");
+  check(
+    (await one(`select count(*)::int as n from public.board_posts where body = '같은 교실의 다른 사람입니다'`))?.n === 1,
+    "a retried post was stored twice.",
+  );
+  await presetCounter(`${key}|replay`, 60);
+  await boardRefused("retry a landed post for the 61st time in an hour", sessionId(21), "교실", "같은 교실의 다른 사람입니다", /^PT429 .*rate limit/);
+}
 withHeaders(null);
 
-const filters = [
-  ["a link in the nickname", "spam-site.xyz", "평범한 본문입니다"],
-  ["a bare domain", "점검", "visit spam.com now"],
-  ["a spaced dot", "점검", "example . com 으로 오세요"],
-  ["a bracketed dot", "점검", "example[.]me 로 오세요"],
-  ["a .gg link", "점검", "discord.gg/abc 들어오세요"],
-  ["닷컴", "점검", "스팸닷컴 으로 오세요"],
-  ["a Korean mobile number", "점검", "연락주세요 010-1234-5678"],
-  ["an e-mail address", "점검", "메일 someone@example.org"],
-  ["a whitespace-only body", "점검", "\u3000\u200B\n\t\u00A0"],
-  ["a zero-width nickname", "\u200B\u200B\u200B", "평범한 본문입니다"],
-];
-let filterIp = 40;
-for (const [label, nickname, body] of filters) {
-  withHeaders({ "x-forwarded-for": `198.51.100.${filterIp++}` });
-  await boardRefused(`post ${label}`, sessionId(30 + filterIp), nickname, body, /link|contact|characters/);
+// Hourly caps: ten for a device, thirty for an address. The posts are aged past
+// the thirty-second rule so only the hourly counters decide.
+{
+  const ageBoard = () => db.query(`update public.board_posts set created_at = created_at - interval '5 minutes'`);
+  withHeaders({ "x-forwarded-for": "198.51.100.35" });
+  const addressKey = `board:${await writerKey("198.51.100.35")}`;
+  for (let index = 1; index <= 10; index += 1) {
+    await ageBoard();
+    await boardPost(`post a device's post ${index} of the hour`, sessionId(25), "열번", `한 시간 안의 글 ${index}`);
+  }
+  await ageBoard();
+  await boardRefused("post a device's 11th post of the hour", sessionId(25), "열번", "한 시간 안의 글 11", /^PT429 .*rate limit/);
+  await presetCounter(addressKey, 29);
+  await boardPost("post an address's 30th post of the hour", sessionId(26), "서른", "주소의 서른 번째 글");
+  await ageBoard();
+  await boardRefused("post an address's 31st post of the hour", sessionId(27), "서른", "주소의 서른한 번째 글", /^PT429 .*rate limit/);
+  withHeaders(null);
 }
-withHeaders({ "x-forwarded-for": `198.51.100.${filterIp}` });
-await boardPost("post ordinary prose with a sentence break", sessionId(90), "점검", "Thanks. Me too. 3.5점 정도였어요.");
+
+// Length bounds: 2-24 for the name, 2-300 for the post.
+{
+  let boundIp = 120;
+  const bound = async (label, nickname, body, pattern) => {
+    withHeaders({ "x-forwarded-for": `198.51.100.${boundIp++}` });
+    if (pattern) await boardRefused(label, sessionId(200 + boundIp), nickname, body, pattern);
+    else await boardPost(label, sessionId(200 + boundIp), nickname, body);
+  };
+  await bound("post under a 24-character name", "가".repeat(24), "이름 길이의 위쪽 끝");
+  await bound("post under a 25-character name", "가".repeat(25), "이름이 한 글자 길다", /nickname must be 2-24/);
+  await bound("post under a one-character name", "가", "이름이 한 글자 짧다", /nickname must be 2-24/);
+  await bound("post a 300-character post", "점검", "나".repeat(300));
+  await bound("post a 301-character post", "점검", "다".repeat(301), /post must be 2-300/);
+  withHeaders(null);
+}
+
+// One list of what the filters refuse, shared with the browser's copy of them
+// (tests/unit/board-filter.test.mjs), so the two cannot drift apart unseen.
+const boardFilterCases = JSON.parse(readFileSync(path.join(root, "tests", "fixtures", "board-filter-cases.json"), "utf8"));
+check(boardFilterCases.refused.length >= 10 && boardFilterCases.accepted.length >= 3, "the board filter fixture is nearly empty; the filters were checked against nothing.");
+const FILTER_REASON = { link: /must not contain a link/, contact: /contact details/, characters: /must be 2-/ };
+let filterIp = 40;
+for (const { label, nickname, body, reason } of boardFilterCases.refused) {
+  withHeaders({ "x-forwarded-for": `203.0.113.${filterIp++}` });
+  check(FILTER_REASON[reason], `board filter case "${label}" names an unknown reason: ${reason}`);
+  await boardRefused(`post ${label}`, sessionId(300 + filterIp), nickname, body, FILTER_REASON[reason] ?? /./);
+}
+for (const { label, nickname, body } of boardFilterCases.accepted) {
+  withHeaders({ "x-forwarded-for": `203.0.113.${filterIp++}` });
+  await boardPost(`post ${label}`, sessionId(300 + filterIp), nickname, body);
+}
 withHeaders(null);
 
 await allowed("read the board", "anon", `select id, nickname, body, created_at from public.board_posts`);
@@ -529,37 +772,132 @@ await refused("read board post writer keys", "anon", `select actor_key from publ
 await refused("hide a board post", "anon", `select public.moderate_board_post(1)`);
 await allowed("hide a board post", "service_role", `select public.moderate_board_post((select min(id) from public.board_posts))`);
 {
-  const result = await allowed("read the board after moderation", "anon", `select id from public.board_posts`);
   const hidden = await one(`select min(id) as id from public.board_posts`);
+  const result = await allowed("read the board after moderation", "anon", `select id from public.board_posts`);
   check(!(result?.rows ?? []).some((row) => row.id === hidden.id), "a hidden board post is still readable by anon.");
+  await refused("restore a board post", "anon", `select public.moderate_board_post(${Number(hidden.id)}, false)`);
+  await allowed("restore a board post", "service_role", `select public.moderate_board_post($1, false)`, [hidden.id]);
+  const restored = await allowed("read the board after a post is restored", "anon", `select id from public.board_posts`);
+  check((restored?.rows ?? []).some((row) => row.id === hidden.id), "a restored board post is not readable by anon.");
+  const missing = await allowed("moderate a post that does not exist", "service_role", `select public.moderate_board_post(-1) as found`);
+  check(missing?.rows[0]?.found !== true, "moderating a missing post reported success.");
 }
 
 // ---- cloud saves
 
+/** The payload `flushCloudSave` sends: the save and the settled-window list, and nothing else. */
+const cloudPayload = (marker, extra = {}) => JSON.stringify({ save: { runId: `cloud-${marker}`, log: [] }, settledWindows: [`cloud-${marker}:1:n1`], ...extra });
+const putCloud = (label, code, { savedAt = "now()", payload = cloudPayload(label), expected } = {}) =>
+  allowed(
+    label,
+    "anon",
+    expected === undefined
+      ? `select public.put_cloud_save($1, ${savedAt}, $2::jsonb) as r`
+      : `select public.put_cloud_save(p_code => $1, p_saved_at => ${savedAt}, p_payload => $2::jsonb, p_expected_revision => $3) as r`,
+    expected === undefined ? [code, payload] : [code, payload, expected],
+  );
+const putCloudRefused = (label, code, payload, pattern) =>
+  raises(label, "anon", `select public.put_cloud_save($1, now(), $2::jsonb)`, [code, payload], pattern);
+
 withHeaders({ "x-forwarded-for": "198.51.100.60" });
-await allowed("put a cloud save dated next week", "anon", `select public.put_cloud_save('ABCDEFGH2345', now() + interval '6 days', '{"v":1}'::jsonb)`);
+await putCloud("put a cloud save dated next week", "ABCDEFGH2345", { savedAt: "now() + interval '6 days'" });
 {
   const result = await allowed("get a cloud save", "anon", `select public.get_cloud_save('ABCDEFGH2345') as save`);
   const savedAt = result?.rows[0]?.save?.saved_at;
   check(savedAt && new Date(savedAt) <= new Date(Date.now() + 1000), `a cloud save kept a future saved_at (${savedAt}); it must be clamped to now().`);
 }
 {
-  const result = await allowed("put an honest save after a future-dated one", "anon", `select public.put_cloud_save('ABCDEFGH2345', now(), '{"v":2}'::jsonb) as r`);
+  // A client deployed before 20260929030000 names no revision and is ordered by time.
+  const result = await putCloud("put an honest save after a future-dated one", "ABCDEFGH2345");
   check(result?.rows[0]?.r?.accepted === true, "an honest save was locked out by a future-dated one.");
-  const stale = await allowed("put a save older than the stored one", "anon", `select public.put_cloud_save('ABCDEFGH2345', now() - interval '1 day', '{"v":0}'::jsonb) as r`);
-  check(stale?.rows[0]?.r?.accepted === false, "a stale device overwrote a newer cloud save.");
+  const stale = await putCloud("put a save older than the stored one", "ABCDEFGH2345", { savedAt: "now() - interval '1 day'" });
+  check(stale?.rows[0]?.r?.accepted === false && stale?.rows[0]?.r?.reason === "older", "a stale device overwrote a newer cloud save.");
 }
+{
+  // Lineage: device A and device B both hold revision 1. B uploads; A -- whose
+  // save is *newer by the clock* -- must be refused, because it was not built
+  // on what the server now holds.
+  const first = await putCloud("start a code", "LLLLLLLL2345");
+  const base = first?.rows[0]?.r?.revision;
+  check(base === 1, `a new code starts at revision ${base}; expected 1.`);
+  const fromB = await putCloud("upload from the second device", "LLLLLLLL2345", { expected: base });
+  check(fromB?.rows[0]?.r?.accepted === true && fromB?.rows[0]?.r?.revision === 2, "an upload built on the stored revision was refused.");
+  const fromA = await putCloud("upload from the device that fell behind", "LLLLLLLL2345", { expected: base, savedAt: "now()" });
+  const refusal = fromA?.rows[0]?.r ?? {};
+  check(refusal.accepted === false && refusal.reason === "revision" && refusal.revision === 2,
+    `a device that fell behind overwrote newer play by stamping a later time: ${JSON.stringify(refusal)}`);
+  const stored = await allowed("read the code after the refusal", "anon", `select public.get_cloud_save('LLLLLLLL2345') as save`);
+  check(stored?.rows[0]?.save?.payload?.save?.runId === "cloud-upload from the second device", "the refused upload still replaced the stored save.");
+  // Choosing to overwrite is naming the revision that is there.
+  const overwrite = await putCloud("overwrite on purpose", "LLLLLLLL2345", { expected: 2, savedAt: "now() - interval '1 day'" });
+  check(overwrite?.rows[0]?.r?.accepted === true && overwrite?.rows[0]?.r?.revision === 3, "an explicit overwrite naming the stored revision was refused.");
+
+  const peek = await allowed("peek at a cloud save", "anon", `select public.peek_cloud_save('LLLLLLLL2345') as p`);
+  check(peek?.rows[0]?.p?.revision === 3 && !("payload" in (peek?.rows[0]?.p ?? {})), `peek_cloud_save returned ${JSON.stringify(peek?.rows[0]?.p)}; expected the revision and no payload.`);
+  const unknown = await allowed("peek at a code nobody has used", "anon", `select public.peek_cloud_save('MMMMMMMM2345') as p`);
+  check(unknown?.rows[0]?.p === null, "peeking at an unknown code returned something.");
+  const missing = await allowed("get a code nobody has used", "anon", `select public.get_cloud_save('MMMMMMMM2345') as save`);
+  check(missing?.rows[0]?.save === null, "getting an unknown code returned something.");
+
+  const removed = await allowed("delete a cloud save", "anon", `select public.delete_cloud_save('LLLLLLLL2345') as gone`);
+  check(removed?.rows[0]?.gone === true, "deleting a stored cloud save reported nothing to delete.");
+  const again = await allowed("delete it again", "anon", `select public.delete_cloud_save('LLLLLLLL2345') as gone`);
+  check(again?.rows[0]?.gone === false, "deleting a code with no save reported a deletion.");
+  const after = await allowed("peek after the delete", "anon", `select public.peek_cloud_save('LLLLLLLL2345') as p`);
+  check(after?.rows[0]?.p === null, "a deleted cloud save can still be read.");
+}
+for (const fn of ["put_cloud_save($1, now(), '{\"save\":{}}'::jsonb)", "get_cloud_save($1)", "peek_cloud_save($1)", "delete_cloud_save($1)"]) {
+  for (const code of ["ABCDEFGH234", "ABCDEFGH2340", "abcdefgh2345", "ABCD-EFGH-2345", "", null]) {
+    await raises(`call ${fn.split("(")[0]} with the malformed code ${JSON.stringify(code)}`, "anon", `select public.${fn}`, [code], /invalid cloud save code/);
+  }
+}
+// The payload is the shape the client sends, at the size a save is.
+await putCloudRefused("store an arbitrary object under a code", "NNNNNNNN2345", JSON.stringify({ v: 1 }), /invalid cloud save payload/);
+await putCloudRefused("store an extra key beside the save", "NNNNNNNN2345", cloudPayload("x", { note: "anything" }), /invalid cloud save payload/);
+await putCloudRefused("store a save that is not an object", "NNNNNNNN2345", JSON.stringify({ save: "text" }), /invalid cloud save payload/);
+await putCloudRefused("store 401 settled windows", "NNNNNNNN2345", JSON.stringify({ save: {}, settledWindows: Array.from({ length: 401 }, (_, index) => `w${index}`) }), /invalid cloud save payload/);
+await putCloudRefused("store a settled window that is not a string", "NNNNNNNN2345", JSON.stringify({ save: {}, settledWindows: [{ a: 1 }] }), /invalid cloud save payload/);
+await putCloudRefused("store a 400 KB save", "NNNNNNNN2345", JSON.stringify({ save: { log: "x".repeat(400000) } }), /invalid cloud save payload/);
+await putCloud("store a 300 KB save", "NNNNNNNN2345", { payload: JSON.stringify({ save: { log: "x".repeat(300000) } }) });
+check((await one(`select count(*)::int as n from public.cloud_saves`))?.n === 2, "a refused cloud save left a row behind.");
 {
   let refusedAt = 0;
   for (let attempt = 1; attempt <= 260 && !refusedAt; attempt += 1) {
     try {
-      await run("anon", `select public.put_cloud_save('ZZZZZZZZ2345', now(), '{"v":1}'::jsonb)`);
+      await run("anon", `select public.put_cloud_save('ZZZZZZZZ2345', now(), $1::jsonb)`, [cloudPayload("pace")]);
     } catch (error) {
-      if (/rate limit/.test(error.message)) refusedAt = attempt;
+      if (error.code === "PT429" && /rate limit/.test(error.message)) refusedAt = attempt;
       else throw error;
     }
   }
   check(refusedAt === 241, `cloud saves for one code were refused at put ${refusedAt || "never"}; expected 241.`);
+}
+withHeaders({ "x-forwarded-for": "198.51.100.61" });
+{
+  // An address starts five codes a day; a code it already has goes on saving.
+  const codes = ["PPPPPPPP2345", "QQQQQQQQ2345", "RRRRRRRR2345", "SSSSSSSS2345", "TTTTTTTT2345"];
+  for (const code of codes) await putCloud(`start code ${code}`, code);
+  await putCloudRefused("start a sixth code from one address in a day", "UUUUUUUU2345", cloudPayload("sixth"), /^PT429 .*code limit/);
+  await putCloud("save again under a code the address already has", codes[0]);
+  // 600 puts an hour and 120 reads an hour for an address, 30 deletes.
+  const address = await writerKey("198.51.100.61");
+  await presetCounter(`cloud-put-ip:${address}`, 600);
+  await putCloudRefused("put an address's 601st cloud save of the hour", codes[1], cloudPayload("pace"), /^PT429 .*rate limit/);
+  await presetCounter(`cloud-get-ip:${address}`, 119);
+  await allowed("read an address's 120th cloud save of the hour", "anon", `select public.get_cloud_save($1)`, [codes[1]]);
+  await raises("read an address's 121st cloud save of the hour", "anon", `select public.get_cloud_save($1)`, [codes[1]], /^PT429 .*rate limit/);
+  await raises("peek past an address's read budget", "anon", `select public.peek_cloud_save($1)`, [codes[1]], /^PT429 .*rate limit/);
+  await presetCounter(`cloud-delete-ip:${address}`, 30);
+  await raises("delete past an address's budget", "anon", `select public.delete_cloud_save($1)`, [codes[1]], /^PT429 .*rate limit/);
+}
+withHeaders({ "x-forwarded-for": "198.51.100.62" });
+{
+  // Everyone together: new codes in a day, and it fails closed.
+  await db.query(`insert into public.private_settings (name, value) values ('cloud_daily_new_codes', '0')
+                  on conflict (name) do update set value = excluded.value`);
+  await putCloudRefused("start a code past the daily ceiling", "VVVVVVVV2345", cloudPayload("ceiling"), /^PT429 .*code limit/);
+  await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
+  await putCloud("start a code under the default ceiling", "VVVVVVVV2345");
 }
 withHeaders(null);
 
@@ -573,6 +911,7 @@ const UPDATE_PROBE = {
   board_posts: "hidden = true",
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
+  private_settings: "value = value",
 };
 for (const [table, assignment] of Object.entries(UPDATE_PROBE)) {
   await refused(`update ${table}`, "anon", `update public.${table} set ${assignment}`);
@@ -586,6 +925,13 @@ await refused("read error logs", "anon", `select * from public.app_error_logs`);
 await refused("read a raw decision_log", "anon", `select decision_log from public.playtest_sessions`);
 await refused("read cloud saves directly", "anon", `select * from public.cloud_saves`);
 await refused("read rate limits", "anon", `select * from public.telemetry_rate_limits`);
+await refused("read the address salt", "anon", `select * from public.private_settings`);
+await refused("read a private setting through its helper", "anon", `select public.private_setting_int('telemetry_daily_bytes', 0)`);
+await refused("hash an address", "anon", `select public.hash_client_address('203.0.113.9')`);
+await refused("ask the link filter what it lets through", "anon", `select public.board_text_has_link('spam.com')`);
+await refused("read the season's case list over RPC", "anon", `select public.season_case_ids()`);
+await refused("peek at a cloud save", "authenticated", `select public.peek_cloud_save('ABCDEFGH2345')`);
+await refused("delete a cloud save", "authenticated", `select public.delete_cloud_save('ABCDEFGH2345')`);
 await refused("insert a case row", "authenticated", postgrestInsert("playtest_sessions", casePayload({ session: sessionId(99), runId: "run-auth", caseId: "case01" })).sql.replace("$1::jsonb", `'{"session_id":"x"}'::jsonb`));
 await refused("run purge_old_telemetry", "anon", `select * from public.purge_old_telemetry('180 days')`);
 await refused("bump a rate limit", "anon", `select public.bump_rate_limit('x', '1 hour', 1)`);

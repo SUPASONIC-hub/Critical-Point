@@ -1,5 +1,5 @@
 {
-  "//": "npm run check:types. Only the files listed below are type-checked (plus whatever they import). Each one passed as-is when it joined; add a module once it does too, never loosen a check to get one in.",
+  "//": "npm run check:types. Only the files listed below are type-checked (plus whatever they import). Each one passed as-is when it joined; add a module once it does too, never loosen a check to get one in. maxNodeModuleJsDepth is 0 because a file named jsconfig.json defaults it to 2, which made tsc read and report on React's own JavaScript as soon as a listed module imported it; what is checked is this repository's code.",
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
@@ -11,18 +11,35 @@
     "lib": ["es2023", "dom"],
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "maxNodeModuleJsDepth": 0,
     "jsx": "react-jsx"
   },
   "files": [
     "src/vite-env.d.ts",
+    "src/advancedSystems.js",
+    "src/appConfig.js",
+    "src/gameCases.js",
     "src/gameConstants.js",
+    "src/playerLanguage.js",
     "src/privacyText.js",
     "src/ranking.js",
     "src/responsiveArt.js",
     "src/riskLogic.js",
+    "src/telemetry.js",
     "src/state/diagnosticUtils.js",
+    "src/state/errorRecovery.js",
     "src/state/payloadSchemas.js",
+    "src/state/playtestExport.js",
+    "src/state/runStorageReset.js",
+    "src/state/telemetryEventId.js",
     "src/state/telemetryQueuePolicy.js",
-    "src/state/trace.js"
+    "src/state/trace.js",
+    "src/state/useBoard.js",
+    "src/state/useLocalRanking.js",
+    "src/state/useStableEvent.js",
+    "src/viewModels/appViewModels.js",
+    "src/viewModels/introViewModel.js",
+    "src/viewModels/reportViewModels.js",
+    "src/viewModels/seasonViewModels.js"
   ]
 }

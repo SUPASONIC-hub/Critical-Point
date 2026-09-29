@@ -17,7 +17,7 @@ const operatorProfiles = {
   lab: {
     id: "lab",
     label: "CREDIT REVIEW",
-    title: "기업대출심사팀 출신 분석관",
+    title: "기업금융전략팀 출신 분석관",
     authority: "심사 기준과 검증 절차를 조정할 권한",
     premise: "승인 서류에 반대 의견을 한 줄 쓴 대가로 이 지하 분석실에 배치됐습니다.",
     permissions: ["심사 기록 열람", "검증 기준 제안", "보호 명부 요청"],
@@ -59,7 +59,7 @@ export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
 const endingScenes = {
   "open-oversight": { location: "OBSERVATORY / OPEN FLOOR", image: "/ending-oversight-room.webp", cue: "여러 개의 기록 창이 동시에 열립니다.", choice: "모든 참가자에게 기준 편집 권한을 넘긴다" },
   "evidence-reform": { location: "TRIGGER LAB / PUBLIC AUDIT", image: "/ending-final-archive.webp", cue: "감사 화면과 보호 명부가 한 화면에 겹칩니다.", choice: "공개와 보호를 함께 운영 규칙으로 고정한다" },
-  "human-record": { location: "FIELD OFFICE / WITNESS ROOM", image: "/scene-case05.webp", cue: "당신의 문장이 증언자의 목소리와 겹쳐 재생됩니다.", choice: "다음 분석관에게 사람의 이름부터 전달한다" },
+  "human-record": { location: "FIELD OFFICE / WITNESS ROOM", image: "/scene-case05.webp", cue: "당신이 다시 짠 판이 증언자의 목소리와 겹쳐 재생됩니다.", choice: "다음 분석관에게 사람의 이름부터 전달한다" },
   "profitable-silence": { location: "BOARDROOM / SEALED WINDOW", image: "/scene-case04.webp", cue: "박수 소리 뒤에서 기록 잠금음이 들립니다.", choice: "수익 보고서에 침묵의 비용을 추가한다" },
   "cold-justice": { location: "POLICY ROOM / EMPTY CHAIR", image: "/scene-case03.webp", cue: "완벽한 절차표 옆에 비어 있는 의자가 남습니다.", choice: "절차에 관계 회복 단계를 추가한다" },
   "field-pact": { location: "DELIVERY HUB / NIGHT SHIFT", image: "/scene-case01.webp", cue: "공식 승인 전 현장 라디오가 먼저 응답합니다.", choice: "현장 협약을 공식 권한으로 승격한다" },
@@ -126,21 +126,23 @@ export function getRankingComparison(summary = {}) {
   ];
 }
 
+/** What each ending is called in a sentence. An ending's id is a key, never copy. */
+const ENDING_NAMES = {
+  "open-oversight": "공개와 개입",
+  "evidence-reform": "증거와 개혁",
+  "human-record": "사람과 기록",
+  "profitable-silence": "성과와 침묵",
+  "cold-justice": "절차와 책임",
+  "field-pact": "현장과 협약",
+  "quiet-cover": "보호와 은폐",
+  collapse: "압박과 붕괴",
+  "open-question": "질문과 계승",
+};
+
 export function getEndingPreview(ending = {}) {
   if (!ending?.id) return null;
-  const labels = {
-    "open-oversight": "공개와 개입",
-    "evidence-reform": "증거와 개혁",
-    "human-record": "사람과 기록",
-    "profitable-silence": "성과와 침묵",
-    "cold-justice": "절차와 책임",
-    "field-pact": "현장과 협약",
-    "quiet-cover": "보호와 은폐",
-    collapse: "압박과 붕괴",
-    "open-question": "질문과 계승",
-  };
   return {
-    label: labels[ending.id] ?? "미확정 경로",
+    label: ENDING_NAMES[ending.id] ?? "미확정 경로",
     text: ending.failure ? "현재 선택 패턴이 시스템 붕괴 쪽으로 기울고 있습니다." : "현재 선택 패턴이 이 엔딩의 조건을 강화하고 있습니다.",
   };
 }
@@ -271,11 +273,14 @@ export function getRankingLeague(style = "FIELD DECIDER") {
 
 export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
   const labels = { courier: "현장 기록의 계승", lab: "심사 기준의 계승", public: "공개 책임의 계승" };
-  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 ${endingId}의 결과가 다르게 읽힙니다.` };
+  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
+  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 '${ending}'의 결과가 다르게 읽힙니다.` };
 }
 
+// Both of these printed their keys: "courier 출신 분석관의 선택 이후, open-question 경로는".
 export function getAftermath(endingId = "open-question", origin = "courier") {
-  return { title: "AFTERMATH / NEXT SHIFT", text: `${origin} 출신 분석관의 선택 이후, ${endingId} 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
+  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
+  return { title: "AFTERMATH / NEXT SHIFT", text: `${getOperatorProfile(origin).title}의 선택 이후, '${ending}' 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
 }
 
 /**

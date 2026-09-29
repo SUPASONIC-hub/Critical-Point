@@ -1,0 +1,145 @@
+# Critical Point Canon
+
+The facts every case has to agree on. The season is one chain hung off one loan
+(priority 44), fifty-five cases restate that loan's facts, and a fact stated in
+two places drifts. This file is the prose; `CANON` in `scripts/check-canon.mjs`
+is the same table in a form a script can hold the copy to. Change both or
+neither.
+
+A fact here is a decision, not a discovery: where the copy disagreed, the
+version more of the season stands on was kept and the fewer passages were
+changed. What each decision replaced is in `git log -p` of this file's first
+commit.
+
+## The loan
+
+| Fact | Value |
+|---|---|
+| Loan number | 대출번호 2023-0412 |
+| Borrower | 플로우온, a dawn-delivery logistics platform; founder 권태호, CFO 배성준 |
+| Amount | 310억 원, 운영자금 |
+| Reported debt ratio | 179.6% |
+| Debt ratio once the revenue is put back | 184.2% (사건 01 rounds it to 184%) |
+| 제7조 | past 180% the bank may call the loan before maturity |
+| Margin | 0.4%포인트 between 179.6% and the line |
+| What was moved | 268억 of December's 412억, booked four weeks early |
+| Who wrote 제7조 | KD은행 기업금융전략팀, November 2022, on a one-page request from 그룹전략실 |
+| 플로우온 head-count | 1,140명; 야간조 380명, 181 of them on contract (2023) |
+
+179.6 is always a percentage. 사건 09's 장부 is the ledger that *made* the ratio
+179.6%; it is never an amount of 매출채권.
+
+플로우온's night shift is 80 people by 사건 16 and 사건 23. That is the same
+floor three years and one collapse later, not a second count of the same year.
+
+## The loan's timeline
+
+| When | What | Where it is stated |
+|---|---|---|
+| 2022-10-17 (월) to 10-21 (금) | The trainee's last task: 온새포장, 4,000만 원, 178.4% → 184.7% | 프롤로그 01 |
+| 2022-11-14 18:02 | The analyst, still a trainee, clicks through the 제7조 draft circulation | 프롤로그 02 evidence turn |
+| 2023-04-12 (수) 09:00 | The file lands on the analyst's desk. This is the day in the loan number, **not** the approval | 프롤로그 02 |
+| 2023-04-13 (목) | Site visit, 김포 제2풀필먼트센터 | 프롤로그 02 |
+| 2023-04-14 (금) 23:00 | 184.2% is rebuilt | 프롤로그 02 |
+| 2023-04-18 (화) 18:00 | Opinion due | 프롤로그 02 |
+| 2023-04-19 (수) 10:12 | The dissent is filed (eleven pages) | 프롤로그 02 |
+| 2023-04-27 (목) 05:00 | Agenda fixed; the dissent is 첨부 7 | 프롤로그 03 |
+| 2023-04-27 13:21 | Eleven-minute call, 팀장실 → 한서윤 | 프롤로그 03 evidence turn |
+| 2023-04-27 **13:32** | 한서윤 returns the dissent, 28 minutes before the committee | 프롤로그 03; 사건 11 evidence turn |
+| 2023-04-27 14:00 | 대출심사위원회 opens; 안건 4번 takes 4분 12초; **310억 approved** | 프롤로그 03 |
+| 2023-04-27 **16:05** | 「스마트물류 3호 응대 요령」 is written, two hours after approval; the 22-page 설명서 becomes 4 | 프롤로그 04 evidence turn |
+| 2023-04-27 ~16:20 | The product is on 강서지점's sales list; **sales start this day** | 프롤로그 03, 04 |
+| 2023-04-27 **16:32** | The transfer notice is drafted by 전략팀-공용03, three hours after the rejection | 프롤로그 05 evidence turn |
+| 2023-04-27 **18:44** | The dissent is switched from 보관 to 폐기 on 윤상혁's account, 5시간 12분 after the rejection | 사건 11 evidence turn |
+| 2023-04-28 (금) 08:30 | Committee record confirmed; the 반려 확인 접수증 carries this date | 프롤로그 03, 05 |
+| 2023-05-09 → 05-12 (금) | The re-review request is numbered, and refused three days later | 프롤로그 04 opening |
+| 2023-05-15 (월) | 판매 적정성 사후 점검, 강서지점. 19 days of sales: 213건 at the branch, 2,140건 nationwide | 프롤로그 04 |
+| 2023-06-09 | The follow-up review closes 해당 없음 | 프롤로그 05 |
+| 2023-07-17 (월) | 인사 제2023-1187호 | 프롤로그 05 |
+| 2023-07-24 (월) | First day at 합정동 | 프롤로그 05 |
+
+Three of these are reveals, and each still means what it meant:
+
+- 16:05 -- the sales script was ready two hours after the approval, so the
+  product was designed before the loan was decided.
+- 16:32 -- the transfer was decided the afternoon of the rejection, six weeks
+  before the review that is supposed to have caused it.
+- 13:32 and 18:44 -- the person who returned the dissent and the person who
+  erased it were not the same person.
+
+## The building
+
+| Floor | Who |
+|---|---|
+| 본점 6층 | 기업금융전략팀: 심사실, 팀장실, and in 2022 the trainee desk |
+| 본점 7층 | 인사부 면담실 |
+| 본점 8층 | 기업대출심사팀 (임경수) and its 기록 보관실; 대출심사위원회 회의실 |
+| 본점 지하 1층 | The 기록 보관실 where committee papers are bound |
+| 본사 33층 | 그룹전략실; by 사건 49 "옛 그룹전략실" |
+| 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소 |
+| KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
+
+## The people
+
+| Person | 2022-23 | Main season |
+|---|---|---|
+| 분석관 | 기업금융전략팀, trainee then 심사 담당 | 트리거랩 분석관 → KD캐피탈 위험관리부 (사건 25) |
+| 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 집행유예 (사건 44) |
+| 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
+| 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
+| 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
+| 반재욱 | 감사팀 조사역 3년차 | 감사팀 조사역 |
+| 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
+| 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
+
+오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
+2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
+겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+## The harmed
+
+| Fact | Value |
+|---|---|
+| People harmed | 1,740명 |
+| With papers | 1,528명 |
+| Without papers | 212명 |
+| Accepted by the second standard | 181명 of the 212 |
+| Still 확인 불가 | 31명 |
+
+## The main season's calendar
+
+The weekdays the late season prints fit **2026**. A date that is stated with a
+weekday has to fit it.
+
+| Case | Dates |
+|---|---|
+| 사건 19 | 1월 23일 (금) change notice; demolition 1월 29일 06시 |
+| 사건 20 | 1월 26일 (월) |
+| 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
+| 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
+| 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
+| 사건 26 | 4월 13일 (월) to 만기 4월 27일 (월) |
+| 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
+| 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 사택 퇴거 7월 7일 |
+| 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
+| 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |
+| 사건 46 | 9월 18일 22시 to 9월 19일 20시; 파쇄 9월 19일 18시 |
+| 사건 47 | 추석 사흘 전 to 추석 (9월 25일, 금) |
+| 사건 48 | 추석 밤 to 추석 다음 날 (토) 09:00 임시 심사위원회 |
+| 사건 49 | 연휴가 끝난 화요일, three days after the committee |
+
+## Known and left alone
+
+- **"3년".** The 프롤로그 is dated 2022-23 and the late season's weekdays are
+  2026's, which puts 사건 12 at 추석 2025 and 사건 01 some months before it --
+  a little over two years after the loan. The season says "3년 전" throughout,
+  early and late, and the word is load-bearing in several hundred lines. It is
+  read as "the third year", and no case before 사건 19 prints a weekday with a
+  date that would pin it.
+- **4월 12일 밤.** 프롤로그 05 has the analyst answer 에코 with "4월 12일 밤"
+  and carry "4월 12일 밤에 적은 이름들". That is the night of the day the file
+  arrived, not an approval, and the canon does not contradict it.
+- **사건 26's committee** sits the day before a Monday maturity, which is a
+  Sunday. It did in the calendar it was written against as well.
+- **사건 49's Tuesday** is the first morning the season calls "연휴가 끝난",
+  one working day later than the calendar's.

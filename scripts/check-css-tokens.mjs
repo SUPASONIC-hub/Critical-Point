@@ -22,8 +22,11 @@ const failures = [];
 // ratcheted 300 -> 130), var() uses 1,143 -> 728. The var() floor is a floor on
 // a sheet that got smaller, so it moved with the sheet; the ratio it protects
 // -- tokens over literals -- went from 4.9 to 6.0.
+// The hex allowance was ratcheted again on 2026-09-29, 130 -> 5, to what the
+// sheets measure: the five interlude mood tints in result.css are the only
+// literals left.
 const budgets = {
-  hardcodedHexColors: 130,
+  hardcodedHexColors: 5,
   cssVariableUsages: 700,
 };
 

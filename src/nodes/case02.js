@@ -13,7 +13,7 @@ export const case02Nodes = {
     title: "FALSE SIGNAL",
     speaker: "반재욱",
     text:
-      "트리거랩 데이터 담당 이민서가 외부로 내부 자료를 넘긴 혐의로 지목됐습니다. 접속 기록, 전송 기록, 보안 알림이 모두 한 사람을 가리킵니다. 그런데 넘어갔다는 파일이 문제입니다. 사건 01에서 당신이 열람을 신청했던 플로우온 대출 심사 보고서 원본, 그중에서도 서명란이 비어 있는 3페이지입니다.",
+      "트리거랩 데이터 담당 이민서가 외부로 내부 자료를 넘긴 혐의로 지목됐습니다. 접속 기록, 전송 기록, 보안 알림이 모두 한 사람을 가리킵니다. 그런데 넘어갔다는 파일이 문제입니다. 플로우온 현장에서 당신이 열람을 신청했던 대출 심사 보고서 원본, 그중에서도 서명란이 비어 있는 3페이지입니다.",
     memo: [
       "유출 시각: 어젯밤 23:41",
       "접속 계정: 이민서 (계약직, 재계약 심사 2주 뒤)",
@@ -95,7 +95,7 @@ export const case02Nodes = {
       "이민서는 그 시각에 응급실에 있었다고 말합니다. 진료 기록은 아직 확인 전입니다. 그는 사원증을 뒤집어 쥔 채 묻습니다. '제 재계약 심사가 2주 뒤입니다. 그 전에 이름이 올라가면, 나중에 아니라고 밝혀져도 계약은 끝나요. 기록이 저를 가리키면, 저는 이미 끝난 건가요?'",
     memo: [
       "응급실 방문 주장은 확인 전",
-      "이민서는 사건 01 보고서 스캔 정리 지시를 받았음",
+      "이민서는 플로우온 심사 보고서 스캔 정리 지시를 받았음",
       "지시한 사람 이름이 업무 메일에는 남아 있지 않음",
       "반재욱은 감정적 판단을 경계하라고 경고함",
     ],
@@ -135,7 +135,7 @@ export const case02Nodes = {
     memo: [
       "오진우 보고서: 이민서 단독 유출 가능성 높음",
       "한서윤은 30분 안에 당신의 판단을 요구함",
-      "에코는 당신이 사건 01보다 오래 머물고 있다고 표시함",
+      "에코는 당신이 플로우온 때보다 오래 머물고 있다고 표시함",
       "대체 접속 가능성은 아직 증명되지 않음",
     ],
     triggers: ["competition", "trust", "responsibility"],
@@ -162,49 +162,6 @@ export const case02Nodes = {
         id: "reframe",
         label: "판을 바꿔 제안한다",
         type: "reframe",
-      },
-    ],
-  },
-  c2_final: {
-    phase: "FINAL DECISION",
-    title: "증거와 사람 사이",
-    speaker: "한서윤",
-    text:
-      "완전한 진실은 아직 없습니다. 하지만 보고는 지금 올라가야 합니다. 한서윤이 서류를 밀어 놓으며 말합니다. '하나만 알고 쓰십시오. 이 보고서는 감사팀이 아니라 그룹전략실로 먼저 올라갑니다. 거기 상무가 3년 전 기업금융전략팀장이었습니다.' 기록을 믿을지, 사람의 맥락을 더 팔지, 둘 다 흔드는 제3의 가능성을 공식화할지 정해야 합니다.",
-    memo: [
-      "이민서 징계 여부는 1차 보고에 크게 좌우됨",
-      "유출된 파일은 서명란이 빈 보고서 3페이지",
-      "보고 경로: 감사팀이 아니라 그룹전략실 먼저",
-      "그룹전략실 윤상혁 상무 = 3년 전 기업금융전략팀장",
-    ],
-    triggers: ["trust", "injustice", "responsibility", "curiosity"],
-    choices: [
-      {
-        id: "final_evidence",
-        label: "기록 증거 중심으로 보고한다",
-        effect: { trust: -12, legitimacy: 8, humanCost: 8, fatigue: 2 },
-        next: "case02_result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "final_person",
-        label: "이민서 보호와 추가 검증 필요성을 보고한다",
-        effect: { trust: 11, legitimacy: -4, fatigue: 4 },
-        next: "case02_result",
-        cognition: { persistence: 2, inference: 1 },
-      },
-      {
-        id: "c2_final_final_system",
-        label: "개인 혐의보다 시스템 조작 가능성을 공식화한다",
-        effect: { time: -6, trust: 3, legitimacy: 3, fatigue: 4 },
-        next: "case02_result",
-        cognition: { reframing: 3, inference: 2 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "case02_result",
       },
     ],
   },

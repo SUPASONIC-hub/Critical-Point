@@ -39,7 +39,7 @@ export function useRunReadout({ log, resources, triggers, cognition, node, curre
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
-    const suspenseState = getSuspenseState({ riskPressure, decisionSeconds: 45, log, currentCase });
+    const suspenseState = getSuspenseState({ riskPressure, log, currentCase });
     return buildNarrativeSpine({
       caseObjective: caseObjectives[currentCase],
       node,

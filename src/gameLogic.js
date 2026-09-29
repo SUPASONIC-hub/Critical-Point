@@ -1,4 +1,4 @@
-import { createGauntletLedger } from "./gauntlet/gauntletEngine.js";
+import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
@@ -12,7 +12,6 @@ import {
 
 export {
   applyEffect,
-  applySeededEffectVariation,
   clamp,
   getRiskPressure,
   getRiskPressureDrivers,
@@ -63,7 +62,7 @@ export function createDecisionForecast(choice = {}, resources = {}) {
   const afterRisk = getRiskPressure(afterResources);
   const riskDelta = afterRisk - beforeRisk;
   const effectEntries = Object.entries(choice.effect ?? {}).filter(([, value]) => value !== 0);
-  const scoreDelta = ([key, value]) => (key === "humanCost" || key === "fatigue" ? -value : value);
+  const scoreDelta = ([key, value]) => (isResourceGain(key, value) ? Math.abs(value) : -Math.abs(value));
   const biggestGain = effectEntries
     .filter((entry) => scoreDelta(entry) > 0)
     .sort((a, b) => scoreDelta(b) - scoreDelta(a))[0];
@@ -238,9 +237,11 @@ export function getGameplayStats(entries = [], fallbackRiskPressure = 0) {
   const reflectionScore = Math.round(
     clamp(reframeCount * 10 + routesOpened * 12 + challengeClearCount * 4 + recordsOpened * 10, 0, 100),
   );
+  // Scored decisions only: a TABLE RECORD entry a slot restore carried in has no
+  // response time, and each one used to read as a two-second click.
   const exploitPenalty = Math.min(
     18,
-    entries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
+    scoredEntries.filter((entry) => (entry.responseTimeSec ?? 0) <= 2 && !entry.reframe).length * 5,
   );
   const challengeSupportScore = Math.min(100, challengeClearCount * 18 + currentChallengeStreak * 8);
   // What the score is for: holding a line under pressure. Response rhythm still
@@ -487,7 +488,7 @@ const discoveryClues = {
   case11: {
     id: "c11-two-timestamps",
     title: "다섯 시간 열두 분",
-    text: "반려 서명은 18:02, 폐기 처리는 23:14였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
+    text: "반려 서명은 13:32, 폐기 처리는 18:44였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
   },
   final: {
     id: "final-observer-key",
@@ -710,7 +711,9 @@ const quantile = (values, share) => {
  * nothing to fields they lack, and the ending falls back to the last case.
  */
 export function getSeasonStrain(caseResults = {}, pending = null) {
-  const summaries = [...Object.values(caseResults ?? {}), pending].filter(Boolean);
+  // A replayed case is in both: the summary it is about to replace, and the one pending.
+  const closed = Object.entries(caseResults ?? {}).filter(([caseId]) => caseId !== pending?.caseId).map(([, summary]) => summary);
+  const summaries = [...closed, pending].filter(Boolean);
   const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
   const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
   const seasonResources = closings.length
@@ -997,13 +1000,13 @@ export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "
     // time: what the analyst carried down to 트리거랩 is what the first table
     // asks them to put down.
     case01: {
-      p5_after_hold: { id: "protect-trust", title: "벽의 이름을 오늘의 이름과 잇기", text: "3년 동안 벽에 붙여 둔 열한 개의 이름은 기억이지 기록이 아닙니다. 오늘 72시간 안에서 그 이름들이 누구를 가리키는지 보여 주는 선택을 찾아야 보너스가 열립니다." },
-      p5_after_record: { id: "use-reframe", title: "다시 묶인 매듭을 되찾기", text: "B2의 상자는 당신이 묶은 매듭이 아닙니다. 남겨 둔 기록이 누구의 손을 거쳤는지 판을 뒤집어 확인해야 합니다." },
-      p5_after_alone: { id: "repair-legitimacy", title: "기억을 증거로 바꾸기", text: "가방을 비우고 시작한 3년이 지금 증명할 것을 하나도 남기지 않았습니다. 이번에는 적히는 쪽을 고르는 선택이 압박을 낮춥니다." },
+      p5_after_hold: { id: "protect-trust", title: "벽의 이름을 오늘의 이름과 잇기", text: "3년 동안 벽에 붙여 둔 열한 개의 이름은 기억이지 기록이 아닙니다. 오늘 72시간 안에서 그 이름들이 누구를 가리키는지 보여 주는 선택을 찾으면 숨은 단서가 열릴 수 있습니다." },
+      p5_after_record: { id: "repair-legitimacy", title: "다시 묶인 매듭을 되찾기", text: "B2의 상자는 당신이 묶은 매듭이 아닙니다. 남겨 둔 기록이 누구의 손을 거쳤는지 먼저 묻는 선택이 공정함을 되찾고 압박을 낮춥니다." },
+      p5_after_alone: { id: "protect-trust", title: "기억을 혼자 쥐지 않기", text: "가방을 비우고 시작한 3년은 증명할 것을 하나도 남기지 않았습니다. 기억만 있다는 사실을 옆 사람에게 먼저 꺼내 놓는 선택이 압박을 낮춥니다." },
     },
     case02: {
-      c1_after_people: { id: "protect-trust", title: "보호를 기록으로 만들기", text: "지난 사건처럼 사람을 먼저 보되, 이번에는 보호의 근거까지 기록해야 보너스를 얻습니다." },
-      c1_after_numbers: { id: "find-cost", title: "숫자 뒤의 사람 찾기", text: "공개한 숫자가 누구에게 어떤 부담을 옮겼는지 찾아야 다음 선택의 보너스가 열립니다." },
+      c1_after_people: { id: "protect-trust", title: "보호를 기록으로 만들기", text: "지난 사건처럼 사람을 먼저 보되, 이번에는 보호의 근거까지 기록하면 숨은 단서가 열릴 수 있습니다." },
+      c1_after_numbers: { id: "find-cost", title: "숫자 뒤의 사람 찾기", text: "공개한 숫자가 누구에게 어떤 부담을 옮겼는지 찾으면 숨은 단서가 열릴 수 있습니다." },
       c1_after_silence: { id: "repair-legitimacy", title: "늦은 설명 되찾기", text: "지난 사건의 침묵으로 흔들린 공정함을 회복하는 선택이 다음 압박을 낮춥니다." },
     },
     case03: {
@@ -1012,48 +1015,48 @@ export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "
       c2_after_public: { id: "lower-risk", title: "경보의 위험 낮추기", text: "공개 이후 커진 위험을 낮추는 선택이 다음 사건의 기준이 됩니다." },
     },
     case04: {
-      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업의 빈 책임을 사람·조건·순서로 다시 설계하면 보너스가 열립니다." },
+      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업에서 비어 있던 책임 칸이 누구 것인지 드러나도록 판을 다시 짜야 합니다." },
       c3_after_proof: { id: "repair-legitimacy", title: "정직함의 피해 줄이기", text: "증거를 공개한 뒤 생긴 피해를 줄이면서 공정함을 유지해야 합니다." },
       c3_after_win: { id: "find-cost", title: "승리의 숨은 대가 찾기", text: "좋은 결과 뒤에 남은 규칙 위반의 대가를 먼저 찾으면 다음 압박을 통제할 수 있습니다." },
     },
     case05: {
       c4_after_rule: { id: "lower-risk", title: "새 기준의 빈틈 막기", text: "공개한 기준이 현장에서 만들 위험을 낮추는 선택을 찾아야 합니다." },
-      c4_after_service: { id: "repair-legitimacy", title: "예외의 믿음 회복하기", text: "서비스를 지킨 뒤 흔들린 규칙의 믿음을 회복하는 선택이 보너스를 만듭니다." },
+      c4_after_service: { id: "repair-legitimacy", title: "예외의 믿음 회복하기", text: "서비스를 지킨 뒤 흔들린 규칙의 믿음을 회복하는 선택이 숨은 단서를 열 수 있습니다." },
       c4_after_stop: { id: "protect-trust", title: "멈춤의 피해 보호하기", text: "감사를 위해 멈춘 서비스의 사람들을 먼저 보호해야 다음 사건을 버틸 수 있습니다." },
     },
     case06: {
       c5_after_owner: { id: "protect-trust", title: "책임을 사람에게 돌려주기", text: "자기 책임을 인정한 기준을 옆자리 사람에게도 똑같이 적용하는 선택을 찾아야 합니다." },
       c5_after_system: { id: "use-reframe", title: "정확한 기록 의심하기", text: "당신이 또렷하게 만든 기록이 사람을 겨누고 있지 않은지 판을 뒤집어 확인해야 합니다." },
-      c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 보너스를 만듭니다." },
+      c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 숨은 단서를 열 수 있습니다." },
     },
     case07: {
       c6_after_stand: { id: "protect-trust", title: "지켜 준 자리를 청구서로 만들지 않기", text: "옆자리를 지킨 기준이 이번엔 당신을 향합니다. 그 기준을 스스로에게도 적용하는 선택을 찾아야 합니다." },
-      c6_after_open: { id: "find-cost", title: "공개가 비껴간 사람 찾기", text: "조건을 열었는데 실험은 남았습니다. 그 공개가 누구를 지나쳤는지 찾아야 보너스가 열립니다." },
+      c6_after_open: { id: "find-cost", title: "공개가 비껴간 사람 찾기", text: "조건을 열었는데 실험은 남았습니다. 그 공개가 누구를 지나쳤는지 찾으면 숨은 단서가 열릴 수 있습니다." },
       c6_after_name: { id: "repair-legitimacy", title: "같은 절차를 내 이름으로 열기", text: "남의 이름으로 닫았던 절차가 이번에는 당신 차례입니다. 그 절차를 공정하게 되돌리는 선택이 압박을 낮춥니다." },
     },
     case08: {
       c7_after_stand: { id: "protect-trust", title: "도와준 사람을 흔적에 묻히지 않기", text: "이름을 올려 준 사람들에게 다시 부탁하게 됩니다. 그들의 이름을 흔적표의 피해자로 만들지 않는 선택을 찾아야 합니다." },
-      c7_after_open: { id: "find-cost", title: "원본 뒤에 남은 돈 찾기", text: "원본은 감사인에게 갔지만 돈은 아직 움직입니다. 원본이 비껴간 흐름을 찾아야 보너스가 열립니다." },
+      c7_after_open: { id: "find-cost", title: "원본 뒤에 남은 돈 찾기", text: "원본은 감사인에게 갔지만 돈은 아직 움직입니다. 원본이 비껴간 흐름을 찾으면 숨은 단서가 열릴 수 있습니다." },
       c7_after_alone: { id: "repair-legitimacy", title: "혼자 본 것을 증거로 만들기", text: "아무도 모르게 내려온 조용함은 무기이자 약점입니다. 혼자 본 흔적을 공정한 기록으로 바꾸는 선택이 압박을 낮춥니다." },
     },
     case09: {
-      c8_after_law: { id: "find-cost", title: "느린 법이 놓친 사람 찾기", text: "수사는 시작됐지만 결의는 기다려 주지 않습니다. 기록이 구하지 못한 사람을 먼저 찾아야 보너스가 열립니다." },
+      c8_after_law: { id: "find-cost", title: "느린 법이 놓친 사람 찾기", text: "수사는 시작됐지만 결의는 기다려 주지 않습니다. 기록이 구하지 못한 사람을 먼저 찾으면 숨은 단서가 열릴 수 있습니다." },
       c8_after_friend: { id: "protect-trust", title: "되찾은 친구를 계산서에 쓰지 않기", text: "오진우와 권도현은 동기입니다. 그 관계를 협상 도구로만 쓰지 않는 선택을 찾아야 합니다." },
       c8_after_blade: { id: "use-reframe", title: "혼자 쥔 칼을 계산서로 바꾸기", text: "칼은 벌할 수는 있어도 살리지는 못합니다. 흔적표를 사람을 살리는 계산에 넣도록 판을 다시 짜야 합니다." },
     },
     case10: {
-      c9_after_stay: { id: "find-cost", title: "이긴 판의 청구서 찾기", text: "1,140명은 지켰습니다. 그 열흘 동안 아무도 청구하지 않은 비용이 어디에 쌓였는지 먼저 찾아야 보너스가 열립니다." },
+      c9_after_stay: { id: "find-cost", title: "이긴 판의 청구서 찾기", text: "1,140명은 지켰습니다. 그 열흘 동안 아무도 청구하지 않은 비용이 어디에 쌓였는지 먼저 찾으면 숨은 단서가 열릴 수 있습니다." },
       c9_after_court: { id: "use-reframe", title: "서식 없는 피해를 서식으로 만들기", text: "법정에서는 모든 피해에 서식이 있었습니다. 서식이 없어서 피해가 아닌 것이 된 쪽으로 판을 다시 짜야 합니다." },
       c9_after_return: { id: "protect-trust", title: "하루 늦은 소식을 늦지 않게 만들기", text: "240km는 늘 한 박자 늦습니다. 사람에게 가장 먼저 닿는 선택을 찾아야 합니다." },
     },
     case11: {
       c10_after_rest: { id: "protect-trust", title: "쉬어 본 사람들과 함께 말하기", text: "여섯 명은 이번 주를 버틸 힘이 있습니다. 그 힘을 한 사람의 발언이 아니라 여섯 사람의 문장으로 쓰는 선택을 찾아야 합니다." },
-      c10_after_record: { id: "use-reframe", title: "빼앗긴 제도를 되찾기", text: "당신이 만든 제도가 그룹의 모범 사례가 됐습니다. 그 제도가 누구의 것인지 판을 다시 짜야 보너스가 열립니다." },
+      c10_after_record: { id: "use-reframe", title: "빼앗긴 제도를 되찾기", text: "당신이 만든 제도가 그룹의 모범 사례가 됐습니다. 그 제도가 누구의 것인지 판을 다시 짜면 숨은 단서가 열릴 수 있습니다." },
       c10_after_keep: { id: "repair-legitimacy", title: "서랍 속 명단을 떳떳하게 만들기", text: "조사는 서랍을 겨눕니다. 212명의 이름을 숨긴 기록이 아니라 지킨 기록으로 바꾸는 선택을 찾아야 합니다." },
     },
     // Keyed on case 49's aftermath: the finale follows that case now.
     final: {
-      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "보름달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾아야 보너스가 열립니다." },
+      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "보름달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
       c49_after_record: { id: "use-reframe", title: "내가 묶은 폴더도 의심하기", text: "마흔아홉 사건을 묶은 공개 준비 폴더가 관찰 자료 1번이 됐습니다. 그 폴더가 다시 누군가를 재는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
       c49_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 후임 관리자 추천 사유가 됐습니다. 골목에 남은 동료들이 당신 없이도 지켜질 방법을 찾아야 합니다." },
     },
@@ -1235,8 +1238,10 @@ export function createCaseSummary(
   const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
   const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
   const stats = getGameplayStats(entries, getRiskPressure(resources));
+  const assistTime = entries.reduce((slowest, entry) => Math.max(slowest, Number(entry?.assistTime) || 1), 1);
   const summary = {
     schemaVersion,
+    caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
     primary: sortedTriggers[0] ?? ["responsibility", 0],
     secondary: sortedTriggers[1] ?? ["protection", 0],
     thinking: sortedCognition[0] ?? ["persistence", 0],
@@ -1260,6 +1265,9 @@ export function createCaseSummary(
     momentumScore: stats.momentumScore,
     momentumTier: stats.momentumTier,
     rank: stats.rank,
+    // The slowest table clock any decision of the case was played on, when the
+    // comfort setting slowed it; absent on a case played at the table's pace.
+    ...(assistTime > 1 ? { assistTime } : {}),
     // Carried so the ending can read the season rather than the last case: with
     // resources reset at every case start, one case alone never reaches the
     // thresholds the closing ruling is written against.
@@ -1273,7 +1281,7 @@ export function createCaseSummary(
     // case's log only, which the next case clears.
     reframeRouteCount: entries.filter((entry) => entry?.reframeOpenedRoute).length,
     peopleFirstCount: entries.filter((entry) => !entry?.isSystemEvent && isPeopleFirstEffect(entry?.effect)).length,
-    pushRecord: createGauntletLedger(entries),
+    pushRecord: createTableRecord(entries),
     peakRiskPressure: entries.reduce(
       (peak, entry) => (entry.resourcesAfter ? Math.max(peak, getRiskPressure(entry.resourcesAfter)) : peak),
       getRiskPressure(resources),

@@ -3,7 +3,7 @@
  *
  * The file on the desk is not a training case. It is 대출번호 2023-0412, the one
  * loan the analyst refused to sign off three years ago, and the refusal is why
- * they now work in a basement lab instead of 기업대출심사팀. Everything the
+ * they now work in a basement lab instead of 기업금융전략팀. Everything the
  * season later uncovers is already physically present here: the contract clause
  * that forced the accounting change, the bank that wrote it, and the signature
  * box nobody filled in.
@@ -14,9 +14,9 @@ export const case01Nodes = {
     title: "72 HOURS",
     speaker: "한서윤",
     text:
-      "플로우온은 수도권 당일배송망을 운영하는 물류 플랫폼입니다. 투자금 입금이 취소됐고 현금은 72시간 뒤 바닥납니다. 한서윤은 이것을 훈련용 사례라고 설명했습니다. 그런데 표지 아래쪽에 대출번호가 지워지지 않고 남아 있습니다. 2023-0412. 3년 전 KD은행 기업대출심사팀에서 그 건에 혼자 반대 의견을 쓴 사람이 당신입니다.",
+      "플로우온은 수도권 당일배송망을 운영하는 물류 플랫폼입니다. 투자금 입금이 취소됐고 현금은 72시간 뒤 바닥납니다. 한서윤은 이것을 훈련용 사례라고 설명했습니다. 그런데 표지 아래쪽에 대출번호가 지워지지 않고 남아 있습니다. 2023-0412. 3년 전 KD은행 기업금융전략팀에서 그 건에 혼자 반대 의견을 쓴 사람이 당신입니다.",
     memo: [
-      "직원 126명, 대금 못 받은 협력사 14곳",
+      "직원 1,140명, 대금 못 받은 협력사 14곳",
       "주거래 은행: KD은행 (대출 잔액 310억)",
       "3년 전 심사 의견: 반대 1건 -- 작성자 본인",
       "그 의견서는 지금 사내 시스템에서 검색되지 않음",
@@ -202,49 +202,6 @@ export const case01Nodes = {
         id: "reframe",
         label: "선택지 밖의 구조를 제안한다",
         type: "reframe",
-      },
-    ],
-  },
-  final: {
-    phase: "FINAL DECISION",
-    title: "마지막 6시간",
-    speaker: "한서윤",
-    text:
-      "남은 시간은 6시간입니다. 당신의 결정은 플로우온을 살리지 못합니다. 어떤 손실을 감수할지 정할 수 있을 뿐입니다. 회의를 나서기 직전 한서윤이 말합니다. '3년 전 그 반대 의견서, 저도 봤습니다. 반려 처리한 사람이 접니다.' 그리고 화면 한쪽에 당신의 반응 패턴이 다음 사례 설계에 반영된다는 알림이 잠깐 떴다가 사라집니다.",
-    memo: [
-      "투자자는 최종 답변을 요구함",
-      "직원 공지 전 마지막 회의 가능",
-      "협력사 대표들이 대금 지급 계획을 기다림",
-      "3년 전 반대 의견서를 반려한 사람: 한서윤",
-    ],
-    triggers: ["responsibility", "protection", "order"],
-    choices: [
-      {
-        id: "final_people",
-        label: "직원과 협력사 피해를 줄이는 결말을 택한다",
-        effect: { capital: -12, trust: 13, legitimacy: 6, humanCost: -11, fatigue: 2 },
-        next: "result",
-        cognition: { persistence: 2 },
-      },
-      {
-        id: "final_company",
-        label: "회사 생존 가능성을 가장 크게 남긴다",
-        effect: { capital: 20, trust: -8, legitimacy: -3, humanCost: 8, fatigue: 2 },
-        next: "result",
-        cognition: { risk: 2 },
-      },
-      {
-        id: "final_truth",
-        label: "투명성과 책임 규명을 남긴다",
-        effect: { capital: -10, trust: 5, legitimacy: 11, fatigue: 2 },
-        next: "result",
-        cognition: { inference: 1, persistence: 1 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꿔 제안한다",
-        type: "reframe",
-        next: "result",
       },
     ],
   },

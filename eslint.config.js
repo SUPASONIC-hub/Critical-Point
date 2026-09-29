@@ -9,7 +9,7 @@ const unusedVars = [
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**"],
+    ignores: [".claude/**", "dist/**", "node_modules/**", "test-results/**", "playwright-report/**", "coverage/**"],
   },
   js.configs.recommended,
   {
@@ -17,7 +17,8 @@ export default [
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
-      globals: { ...globals.browser },
+      // __CP_DEBUG_BUILD__ is written by the bundler (vite.config.js `define`).
+      globals: { ...globals.browser, __CP_DEBUG_BUILD__: "readonly" },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: { "react-hooks": reactHooks },
@@ -47,7 +48,9 @@ export default [
     },
   },
   {
-    files: ["scripts/**/*.mjs", "tests/**/*.js", "*.config.js", "eslint.config.js"],
+    // tests/unit/*.test.mjs matched neither pattern until 2026-09-28, so it was
+    // linted with no Node globals and the default unused-vars options.
+    files: ["scripts/**/*.mjs", "tests/**/*.{js,mjs}", "*.config.js", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
@@ -62,7 +65,7 @@ export default [
       "scripts/runtime-smoke.mjs",
       "scripts/build-art-variants.mjs",
       "scripts/build-critical-css.mjs",
-      "tests/**/*.js",
+      "tests/**/*.{js,mjs}",
     ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
