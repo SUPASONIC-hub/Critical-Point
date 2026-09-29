@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { leafRuleTexts, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
+import { seasonData } from "./scripts/vite-season-data.mjs";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -245,7 +246,7 @@ function renderHeaders() {
 }
 
 export default defineConfig(({ command, mode }) => ({
-  plugins: [react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), renderHeaders()],
+  plugins: [seasonData(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which

@@ -1,3 +1,4 @@
+import { CASE_SEQUENCE } from "./gameCases.js";
 import {
   createRouteReaders,
   getBranchDetourBypass,
@@ -53,6 +54,7 @@ export function createSeasonRuntime(index, loadCaseData) {
 
   return {
     ensureCase,
+    ensureAllCases: () => Promise.all(CASE_SEQUENCE.map((caseId) => ensureCase(caseId))),
     isCaseLoaded: (caseId) => loaded.has(caseId),
     nodes,
     echoReplies,

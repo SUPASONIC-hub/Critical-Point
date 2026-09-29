@@ -48,8 +48,13 @@ import { loadedChunk } from "./state/chunkReload.js";
 // stays lazy and starts downloading while the intro is read (see below).
 // The runtime is what deals the table, and the table reads this tab's token, so
 // it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
+// A first visit mounts once the season's first case has arrived; a device with
+// a save, once every case has (state/caseArrival.js).
 const GameRuntime = lazy(() =>
-  Promise.all([loadGameRuntime(), claimTabToken()]).then(([{ GameRuntime }]) => ({ default: GameRuntime })),
+  Promise.all([loadGameRuntime(), claimTabToken()]).then(async ([runtime]) => {
+    await runtime.prepareGameRuntime({ hasSave: readStoredValue(STORAGE_KEY, null) !== null });
+    return { default: runtime.GameRuntime };
+  }),
 );
 const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));

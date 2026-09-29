@@ -132,7 +132,10 @@ export function findSharedReferences(table) {
 
 const gz = (value) => gzipSync(JSON.stringify(value)).length;
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href && process.argv.includes("--emit-json")) {
+  // For the Vite plugin (scripts/vite-season-data.mjs): the shipped data on stdout.
+  process.stdout.write(JSON.stringify(buildRuntimeData(await loadSeasonTables())));
+} else if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const season = await loadSeasonTables();
   const { shared } = splitSeason(season);
   const whole = gz(season.tables);

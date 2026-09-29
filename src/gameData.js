@@ -3474,3 +3474,12 @@ export function getCaseBranchNodes() {
 }
 
 export const { getBranchDetourBypass } = seasonRules;
+
+/**
+ * Every case is here already. The app build reads src/runtime/gameData.app.js
+ * instead, where cases arrive one at a time; these keep the two the same shape
+ * so the code that opens a case can await its arrival in either.
+ */
+export const ensureCase = () => Promise.resolve();
+export const ensureAllCases = () => Promise.resolve();
+export const isCaseLoaded = () => true;
