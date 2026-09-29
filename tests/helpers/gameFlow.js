@@ -1,5 +1,6 @@
 import { expect } from "./network.js";
-import { nodes } from "../../src/gameData.js";
+import { SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
+import { getCaseBranchNodes, nodes, reframeRouteNodes } from "../../src/gameData.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
 // Both sit under the test timeout (playwright.config.js, 60s). At 60s each the
@@ -216,9 +217,41 @@ export async function chooseFirstAvailableChoice(page) {
   if (await decisionNext.isVisible()) await decisionNext.click();
 }
 
+/**
+ * Where committing `choice` sends the run, as useChoiceCommit decides it.
+ *
+ * A 판을 다시 짠다 card does not follow its own `next`. Cashed (and the helper
+ * always cashes), the first one that opens a route in a case jumps to the
+ * case's authored hidden route (`reframeRouteNodes`), or -- in a case without
+ * one, or when the scene already is that route -- to the far side of the
+ * case's first fork. A later reframe in the same case, or one with nowhere to
+ * go, falls back to `choice.next`. "In the same case" is counted the way the
+ * runtime counts it: log entries with `reframeOpenedRoute` whose caseId is the
+ * run's case, or the season's entry case when the save names none it knows.
+ */
+function reframeTargetFor(caseId, fromNodeId) {
+  const dramaticRoute = reframeRouteNodes[caseId];
+  if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
+  const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
+  if (!branch || branch.nodeId === fromNodeId) return null;
+  return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
+}
+
+function expectedNextNode(saved, choice) {
+  if (choice.type !== "reframe" || !saved) return choice.next;
+  const currentCase = saved.currentCase;
+  const countedCase = seasonCasesBase.some((caseItem) => caseItem.id === currentCase) ? currentCase : SEASON_ENTRY_CASE;
+  const reframesOpened = (saved.log ?? []).filter((entry) => entry?.reframeOpenedRoute && entry.caseId === countedCase).length;
+  if (reframesOpened > 0) return choice.next;
+  return reframeTargetFor(currentCase, saved.nodeId) ?? choice.next;
+}
+
 export async function chooseSceneChoice(page, scene, choiceIndex) {
   const choice = scene.choices[choiceIndex];
   await dismissProtocolBreach(page);
+  // Read before the commit rewrites it: the jump depends on the log as it
+  // stood when the card was cashed.
+  const nextNodeId = expectedNextNode(await readJsonStorage(page, TEST_STORAGE_KEYS.save), choice);
   if (choice.type === "reframe") {
     await clickElement(page.locator(".gx-card-wild"), `${scene.title}/${choice.id}`);
   } else {
@@ -249,7 +282,7 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
         Boolean(document.querySelector(".result-page, .ending-reveal"))
       );
     },
-    { nextNodeId: choice.next, nextTitle: nodes[choice.next]?.title ?? "" },
+    { nextNodeId, nextTitle: nodes[nextNodeId]?.title ?? "" },
     { timeout: TRANSITION_TIMEOUT_MS },
   );
 }
