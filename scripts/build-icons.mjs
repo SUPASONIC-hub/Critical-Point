@@ -1,76 +1,59 @@
-/* global document -- the drawing runs inside the page, through page.evaluate. */
-import { mkdirSync, writeFileSync } from "node:fs";
+/* global document, Image -- the drawing runs inside the page, through page.evaluate. */
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 
 /**
- * Draw the app icons.
+ * Draw the app icons from `public/profile.jpg`.
  *
- * The tab and home-screen icon used to be `profile.jpg`, the creator's 256px
- * photo, which is a credit and not a mark. The icon is the brand mark instead
- * -- the lime point with its halo that sits in front of the wordmark on every
- * page (`.brand-mark-dot`) -- on the app's ground, `--ui-bg`.
+ * The tab and home-screen icon is the creator's drawing, `profile.jpg` -- the
+ * owner's choice. A pass on 2026-09-27 had swapped it for the lime brand dot;
+ * that was reverted on 2026-09-29. The files below keep the sizes and names
+ * the page and the manifest ask for, cut from that one image.
  *
  * The browser is the renderer, as it is for the art variants: Playwright is
  * already a devDependency, so there is no image toolchain to install. The PNGs
- * are committed.
+ * are committed. The source is 256px, so the 512px icons are drawn up from it.
  */
+const SOURCE = "public/profile.jpg";
 
 const OUT_DIR = "public/icons";
 const ICONS = [
-  // Rounded tile with transparent corners, for tabs and "any" manifest icons.
-  { file: "favicon-32.png", size: 32, bleed: false },
-  { file: "icon-192.png", size: 192, bleed: false },
-  { file: "icon-512.png", size: 512, bleed: false },
-  // Full-bleed: the platform applies its own mask, and the mark sits well inside
-  // the 80% safe zone a maskable icon is cut to.
-  { file: "icon-maskable-512.png", size: 512, bleed: true },
-  { file: "apple-touch-icon.png", size: 180, bleed: true },
+  // The picture edge to edge, as the tab showed it before.
+  { file: "favicon-32.png", size: 32, inset: 0 },
+  { file: "icon-192.png", size: 192, inset: 0 },
+  { file: "icon-512.png", size: 512, inset: 0 },
+  { file: "apple-touch-icon.png", size: 180, inset: 0 },
+  // A maskable icon is cut to a circle of 80% by the platform, so the picture
+  // sits inside that on its own white ground.
+  { file: "icon-maskable-512.png", size: 512, inset: 0.1 },
 ];
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
 mkdirSync(OUT_DIR, { recursive: true });
 
+const source = `data:image/jpeg;base64,${readFileSync(SOURCE).toString("base64")}`;
+
 for (const icon of ICONS) {
-  const dataUrl = await page.evaluate(({ size, bleed }) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-    const ground = "rgb(6 9 10)";
-    const accent = "rgb(217 255 98)";
-    const c = size / 2;
-
-    ctx.fillStyle = ground;
-    if (bleed) {
+  const dataUrl = await page.evaluate(
+    async ({ size, inset, source }) => {
+      const image = new Image();
+      image.src = source;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, size, size);
-    } else {
-      ctx.beginPath();
-      ctx.roundRect(0, 0, size, size, size * 0.22);
-      ctx.fill();
-    }
-
-    // Small sizes get a bigger point so it survives 16-32px.
-    const small = size <= 48;
-    const dot = size * (small ? 0.2 : 0.15);
-
-    // The halo ring (0 0 0 3px at 16% on a 7px dot).
-    ctx.beginPath();
-    ctx.arc(c, c, dot * 1.85, 0, Math.PI * 2);
-    ctx.fillStyle = "rgb(217 255 98 / 0.18)";
-    ctx.fill();
-
-    // The glow and the point.
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = dot * 1.6;
-    ctx.beginPath();
-    ctx.arc(c, c, dot, 0, Math.PI * 2);
-    ctx.fillStyle = accent;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    return canvas.toDataURL("image/png");
-  }, icon);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      const margin = Math.round(size * inset);
+      ctx.drawImage(image, margin, margin, size - margin * 2, size - margin * 2);
+      return canvas.toDataURL("image/png");
+    },
+    { ...icon, source },
+  );
   const bytes = Buffer.from(dataUrl.split(",")[1], "base64");
   writeFileSync(`${OUT_DIR}/${icon.file}`, bytes);
   console.log(`${OUT_DIR}/${icon.file.padEnd(24)} ${icon.size}px ${String(bytes.length).padStart(6)} bytes`);

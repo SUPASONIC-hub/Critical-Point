@@ -757,8 +757,8 @@ push·`e2e` 라벨·Dependabot PR, 시각 회귀는 `visual` 라벨·Dependabot 
   받습니다). 폰트 CDN도, 여러 조각으로 나뉜 동적 서브셋도 없습니다. **새 문구를 쓰면 이 명령을 다시
   돌리십시오** — `npm run check:fonts`는 원고에 폰트에 없는 글자가 있으면 실패합니다. `pretendard`
   패키지는 원본 TTF를 주는 개발 의존성일 뿐입니다. 굵기는 900까지만 씁니다.
-- `npm run build:icons` — 앱 아이콘(`public/icons/`)과 `public/manifest.webmanifest`(테마 색
-  `#06090a`).
+- `npm run build:icons` — 앱 아이콘(`public/icons/`)을 제작자 그림 `public/profile.jpg`에서 크기별로
+  잘라 만듭니다. 파비콘은 이 그림입니다. `public/manifest.webmanifest`의 테마 색은 `#06090a`.
 
 예산은 내리기만 하고 올리지 않습니다. `npm run check:bundle`은 청크마다의 크기에 더해 **첫 페인트**
 전체(HTML, 그것이 거는 스크립트·스타일시트, 미리 받는 폰트, 휴대폰이 고르는 키 비주얼)의 전송 바이트를
@@ -784,13 +784,16 @@ og·canonical 주소를 절대 주소로 만듭니다. 페이지는 `viewport-fi
 
 ### 자동 배포
 
-`render.yaml`의 `autoDeploy: true`는 자동 배포를 켜지 못합니다. 그 파일은 Blueprint 명세라서 Render가
+`render.yaml`의 설정은 실제 서비스에 적용되지 않습니다. 그 파일은 Blueprint 명세라서 Render가
 Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직접 만든 서비스는 대시보드 설정을 따릅니다.
 헤더도 마찬가지라 대시보드에 손으로 옮겨 두어야 합니다.
 
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난
-`main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다.
+`main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다
+(`render.yaml`에도 `autoDeploy: false`로 기록). 훅은 검증된 커밋을 `ref=`로 지정해 부르고, Render는 특정
+커밋으로 배포된 서비스의 Auto-Deploy를 스스로 끄며 대시보드에 "Auto-Deploy has been disabled to prevent
+accidental deploys"라고 표시합니다. 이것이 의도한 상태이니 다시 켜지 마십시오.
 시크릿이 없으면 배포를 걸지 않고 실행에 경고 주석을 남깁니다.
 
 같은 워크플로의 두 번째 job(`needs: deploy`)이 배포된 사이트를 확인합니다. 저장소 시크릿 `DEPLOY_URL`이

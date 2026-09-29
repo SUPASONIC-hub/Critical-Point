@@ -450,7 +450,8 @@ Still open, on purpose:
 45. The repository carries only what a build, a check or a deploy reads. The
     `Profile.jpg` / `!public/profile.jpg` pair in `.gitignore` stays, because
     Windows matches that name case-insensitively and the app's icon would go
-    with it. Text files are LF on every platform (`.gitattributes`,
+    with it: every file in `public/icons/` is cut from `public/profile.jpg`
+    (`npm run build:icons`), the favicon the owner chose. Text files are LF on every platform (`.gitattributes`,
     `.editorconfig`): the byte budgets measured a different file on a Windows
     CRLF checkout than on the Linux runner.
 46. Every scene has a picture, and none of them is a file. `src/scenePlate.js`
