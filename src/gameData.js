@@ -3465,8 +3465,8 @@ Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {
 // cards in. See nodes/sceneBuild.js.
 sceneBuild.finishSceneGraph(nodes, nodeOrders);
 
-// How far into a case a scene sits; see nodes/sceneBuild.js.
-export const { getCaseRouteLength, getNodeRouteIndex } = sceneBuild.createRouteReaders(nodes, caseOpeningRoutes);
+// How far into a case a scene sits; see seasonRules.js.
+export const { getCaseRouteLength, getNodeRouteIndex } = seasonRules.createRouteReaders(nodes, caseOpeningRoutes);
 
 /** The one authored mid-case fork per case; see seasonRules.js. */
 export function getCaseBranchNodes() {

@@ -1,9 +1,10 @@
-import { CASE_SEQUENCE, CASE_START_NODES } from "./gameCases.js";
+import { CASE_SEQUENCE, CASE_START_NODES, RESULT_NODE_IDS } from "./gameCases.js";
 
 /**
  * The season's rules that read its tables rather than build them: which
- * memory card an opening deals, where a gated detour goes, and which scene of
- * each case forks. They sat in gameData.js beside the tables they read. They
+ * memory card an opening deals, where a gated detour goes, which scene of
+ * each case forks, how deep into its case a scene sits, and whose card a
+ * speaker shows in a given case. They sat in gameData.js beside the tables they read. They
  * are here, taking those tables as arguments, so the runtime can answer them
  * from tables that arrive a case at a time (the per-case chunk split,
  * docs/work-status.md) with the same code `gameData.js` answers them with.
@@ -111,4 +112,60 @@ export function readCaseBranchNodes(nodes, nodeOrders) {
       detourIds: [...new Set(nodes[nodeId].choices.map((choice) => choice.branchId).filter(Boolean))],
     };
   }).filter(Boolean);
+}
+
+/**
+ * How far into its case a scene sits, walked from the graph rather than read
+ * off the order: a case opens on any of its openings and forks from there, so
+ * a scene's depth is the shortest way to it.
+ */
+export function createRouteReaders(nodes, caseOpeningRoutes) {
+  function getPlayableRoute(caseId) {
+    const route = new Map();
+    const queue = [
+      CASE_START_NODES[caseId],
+      ...Object.values(caseOpeningRoutes[caseId] ?? {}),
+    ].filter(Boolean).map((nodeId) => ({ nodeId, depth: 0 }));
+    const seen = new Set();
+    while (queue.length > 0) {
+      const { nodeId, depth } = queue.shift();
+      if (!nodeId || seen.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
+      seen.add(nodeId);
+      route.set(nodeId, depth);
+      for (const choice of nodes[nodeId]?.choices ?? []) {
+        if (choice.next && !seen.has(choice.next) && !RESULT_NODE_IDS.has(choice.next)) {
+          queue.push({ nodeId: choice.next, depth: depth + 1 });
+        }
+      }
+    }
+    return route;
+  }
+
+  return {
+    getCaseRouteLength(caseId) {
+      return Math.max(1, ...getPlayableRoute(caseId).values()) + 1;
+    },
+    getNodeRouteIndex(caseId, nodeId) {
+      const branchStartIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
+      if (branchStartIds.has(nodeId)) return 0;
+      return getPlayableRoute(caseId).get(nodeId) ?? -1;
+    },
+  };
+}
+
+/**
+ * Someone's card in one case: the profile, the role the season's spans give
+ * them by then, and whatever the case's own pack says about them.
+ */
+export function readCharacterProfile({ profiles, roleSpans, overrides }, name, caseId) {
+  const profile = profiles[name];
+  if (!profile) return null;
+  const position = CASE_SEQUENCE.indexOf(caseId);
+  if (position < 0) return profile;
+  const role = roleSpans.reduce(
+    (current, span) =>
+      span.roles[name] && position >= CASE_SEQUENCE.indexOf(span.from) && position <= CASE_SEQUENCE.indexOf(span.to) ? span.roles[name] : current,
+    profile.role,
+  );
+  return { ...profile, role, ...overrides[caseId]?.[name] };
 }

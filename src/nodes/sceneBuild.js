@@ -6,7 +6,7 @@
  * generator has added its scenes -- which is why it is one call
  * (`finishSceneGraph`) and not four that have to be kept in order by hand.
  */
-import { CASE_START_NODES, RESULT_NODE_IDS } from "../gameCases.js";
+import { CASE_START_NODES } from "../gameCases.js";
 import { isResourceGain } from "../gameConstants.js";
 import { createPlateRandom, hashString } from "../scenePlate.js";
 import { applySceneContext } from "./sceneContext.js";
@@ -168,43 +168,4 @@ export function finishSceneGraph(nodes, nodeOrders) {
   applySceneContext(nodes, nodeOrders);
   dealScenes(nodes);
   return nodes;
-}
-
-/**
- * How far into its case a scene sits, walked from the graph rather than read
- * off the order: a case opens on any of its openings and forks from there, so
- * a scene's depth is the shortest way to it.
- */
-export function createRouteReaders(nodes, caseOpeningRoutes) {
-  function getPlayableRoute(caseId) {
-    const route = new Map();
-    const queue = [
-      CASE_START_NODES[caseId],
-      ...Object.values(caseOpeningRoutes[caseId] ?? {}),
-    ].filter(Boolean).map((nodeId) => ({ nodeId, depth: 0 }));
-    const seen = new Set();
-    while (queue.length > 0) {
-      const { nodeId, depth } = queue.shift();
-      if (!nodeId || seen.has(nodeId) || RESULT_NODE_IDS.has(nodeId)) continue;
-      seen.add(nodeId);
-      route.set(nodeId, depth);
-      for (const choice of nodes[nodeId]?.choices ?? []) {
-        if (choice.next && !seen.has(choice.next) && !RESULT_NODE_IDS.has(choice.next)) {
-          queue.push({ nodeId: choice.next, depth: depth + 1 });
-        }
-      }
-    }
-    return route;
-  }
-
-  return {
-    getCaseRouteLength(caseId) {
-      return Math.max(1, ...getPlayableRoute(caseId).values()) + 1;
-    },
-    getNodeRouteIndex(caseId, nodeId) {
-      const branchStartIds = new Set(Object.values(caseOpeningRoutes[caseId] ?? {}));
-      if (branchStartIds.has(nodeId)) return 0;
-      return getPlayableRoute(caseId).get(nodeId) ?? -1;
-    },
-  };
 }
