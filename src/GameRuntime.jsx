@@ -643,7 +643,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // A commit whose next scene is the scene it left never re-runs the scene
     // effect below, so the reveal closing is what hands the table back.
     releaseAdvance();
-    window.requestAnimationFrame(() => focusSceneTitle(sceneTitleRef));
+    // Now, not a frame later: the scene behind the reveal is already mounted,
+    // and on a slow frame the wait was long enough for Tab to move focus to a
+    // control and for the title to take it back.
+    focusSceneTitle(sceneTitleRef);
   }, [decisionReveal, releaseAdvance]);
 
   const musicModeKey = useMemo(() => {
