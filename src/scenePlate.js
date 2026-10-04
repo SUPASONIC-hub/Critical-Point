@@ -186,7 +186,7 @@ const SEASON_MARKERS = {
   haze: { words: ["폭염", "열대야"] },
   fireworks: { words: ["불꽃", "축제"] },
   leaves: { words: ["낙엽", "단풍"], month: /(^|[^0-9])9월/ },
-  moon: { words: ["추석", "보름달", "한가위"] },
+  moon: { words: ["추석", "보름달", "한가위", "달빛"] },
 };
 
 function readSeason(clock, key) {

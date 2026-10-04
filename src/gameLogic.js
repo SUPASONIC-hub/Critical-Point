@@ -291,7 +291,8 @@ export function getObserverTag(entry = {}) {
       text: "준비된 선택지 밖으로 나간 순간입니다. 다음 참가자의 사건에는 이 우회로가 새 조건으로 남습니다.",
     };
   }
-  if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) {
+  // 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄, 미뤘다.
+  if (/침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/.test(choiceText)) {
     return {
       id: "opacity",
       label: "은폐 표본",
@@ -338,7 +339,9 @@ export function getObserverPattern(entries = []) {
   }, {});
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "pattern";
   const latest = taggedEntries.at(-1)?.observerTag ?? null;
-  const repeatedTail = taggedEntries
+  // `every` is true of an empty list: a run with nothing decided was told the
+  // observer had grown sure of it, and the line for that run was never reached.
+  const repeatedTail = taggedEntries.length > 0 && taggedEntries
     .slice(-3)
     .every((entry) => entry.observerTag?.id && entry.observerTag.id === latest?.id);
   const turningPoint = taggedEntries.find((entry, index) => {
@@ -831,7 +834,7 @@ export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "
   const challenges = {
     // Keyed on case 49's aftermath: the finale follows that case now.
     final: {
-      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "보름달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
+      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
       c49_after_record: { id: "use-reframe", title: "내가 묶은 폴더도 의심하기", text: "마흔아홉 사건을 묶은 공개 준비 폴더가 관찰 자료 1번이 됐습니다. 그 폴더가 다시 누군가를 재는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
       c49_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 후임 관리자 추천 사유가 됐습니다. 골목에 남은 동료들이 당신 없이도 지켜질 방법을 찾아야 합니다." },
     },

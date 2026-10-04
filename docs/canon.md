@@ -108,38 +108,39 @@ Three of these are reveals, and each still means what it meant:
 
 ## The main season's calendar
 
-The weekdays the late season prints fit **2026**. A date that is stated with a
-weekday has to fit it.
+사건 01-18 are **2025** and 사건 19 to the finale are **2026**: 사건 12 is the
+추석 a year before 사건 47's, and the weekdays the late season prints fit 2026.
+A date that is stated with a weekday has to fit its year.
 
 | Case | Dates |
 |---|---|
+| 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
+| 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 23일 (금) change notice; demolition 1월 29일 06시 |
 | 사건 20 | 1월 26일 (월) |
 | 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
-| 사건 26 | 4월 13일 (월) to 만기 4월 27일 (월) |
+| 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
 | 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
 | 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 사택 퇴거 7월 7일 |
+| 사건 38-40 | 첫 변론 8월 6일 (목); 다큐 방송 8월 7일 (금) 22시; 사건 40 opens the next afternoon (토) and closes 8월 셋째 주 금요일 |
 | 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
 | 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |
 | 사건 46 | 9월 18일 22시 to 9월 19일 20시; 파쇄 9월 19일 18시 |
 | 사건 47 | 추석 사흘 전 to 추석 (9월 25일, 금) |
 | 사건 48 | 추석 밤 to 추석 다음 날 (토) 09:00 임시 심사위원회 |
-| 사건 49 | 연휴가 끝난 화요일, three days after the committee |
+| 사건 49 | 화요일 9월 29일, three days after the committee and after the holiday; the moon is four nights past full |
 
 ## Known and left alone
 
-- **"3년".** The 프롤로그 is dated 2022-23 and the late season's weekdays are
-  2026's, which puts 사건 12 at 추석 2025 and 사건 01 some months before it --
-  a little over two years after the loan. The season says "3년 전" throughout,
-  early and late, and the word is load-bearing in several hundred lines. It is
-  read as "the third year", and no case before 사건 19 prints a weekday with a
-  date that would pin it.
+- **"3년".** The 프롤로그 is dated 2022-23 and 사건 01 is some months before
+  추석 2025 -- a little over two years after the loan. The season says "3년 전"
+  throughout, early and late, and the word is load-bearing in several hundred
+  lines. It is read as "the third year", and the two lines that cross from the
+  프롤로그 into 사건 01 say so: "햇수로 3년이 지납니다".
+- **사건 22** opens on "2월 셋째 주 월요일", which in 2026 is 2월 16일, inside
+  the 설 holiday.
 - **4월 12일 밤.** 프롤로그 05 has the analyst answer 에코 with "4월 12일 밤"
   and carry "4월 12일 밤에 적은 이름들". That is the night of the day the file
   arrived, not an approval, and the canon does not contradict it.
-- **사건 26's committee** sits the day before a Monday maturity, which is a
-  Sunday. It did in the calendar it was written against as well.
-- **사건 49's Tuesday** is the first morning the season calls "연휴가 끝난",
-  one working day later than the calendar's.
