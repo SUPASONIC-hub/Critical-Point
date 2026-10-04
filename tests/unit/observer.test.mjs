@@ -14,7 +14,9 @@ const calm = { responseTimeSec: 10, challenge: { riskDelta: 0 } };
 test("a decision is filed by the first thing that is true of it", () => {
   // Leaving the prepared choices outranks what the sentence says.
   assert.equal(getObserverTag({ ...calm, reframe: true, choice: "침묵한다" }).label, "거부 표본");
-  assert.equal(getObserverTag({ ...calm, choice: "공개를 미루고 기다린다" }).id, "opacity");
+  for (const choice of ["공개를 미루고 기다린다", "공개를 미룬다", "결정을 미뤄 둔다", "발표를 미룰 수 있다고 한다", "어제 미뤘던 일"]) {
+    assert.equal(getObserverTag({ ...calm, choice }).id, "opacity", choice);
+  }
   assert.equal(getObserverTag({ ...calm, choiceId: "c1_after_silence", choice: "넘어간다" }).id, "opacity");
   assert.equal(getObserverTag({ ...calm, choice: "사람을 줄인다", resourcesBefore: { humanCost: 3 }, resourcesAfter: { humanCost: 9 } }).id, "sacrifice");
   assert.equal(getObserverTag({ responseTimeSec: 2, challenge: { riskDelta: 0 }, choice: "승인한다" }).id, "compliance");
@@ -49,6 +51,14 @@ test("a run's tags are counted over what the player decided, and nothing else", 
   assert.match(pattern.endingRecord.title, /가장 많이 남긴 표본/);
   assert.match(pattern.endingRecord.text, /희생 표본이 최근 기록으로 남아/);
   assert.equal(pattern.arc.title, "말하지 않은 판단이 사건의 어두운 조건으로 축적됩니다.");
+});
+
+test("a run with nothing decided has given the observer no standard yet", () => {
+  const pattern = getObserverPattern([{ isSystemEvent: true }]);
+  assert.equal(pattern.latest, null);
+  assert.equal(pattern.repeatedTail, false);
+  assert.match(pattern.endingRecord.title, /가장 많이 남긴 표본/);
+  assert.match(pattern.endingRecord.text, /아직 관찰자는 확정된 기준을 만들지 못했습니다.$/);
 });
 
 test("three of the same in a row is a standard the observer is sure of", () => {

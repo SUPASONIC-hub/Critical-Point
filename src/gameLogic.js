@@ -291,7 +291,8 @@ export function getObserverTag(entry = {}) {
       text: "준비된 선택지 밖으로 나간 순간입니다. 다음 참가자의 사건에는 이 우회로가 새 조건으로 남습니다.",
     };
   }
-  if (/침묵|미루|비공개|봉인|silence|delay|private/.test(choiceText)) {
+  // 미루다 as it is actually conjugated on the cards: 미루고, 미룬다, 미룰, 미뤄, 미뤘다.
+  if (/침묵|미[루룬룰뤄뤘]|비공개|봉인|silence|delay|private/.test(choiceText)) {
     return {
       id: "opacity",
       label: "은폐 표본",
@@ -338,7 +339,9 @@ export function getObserverPattern(entries = []) {
   }, {});
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "pattern";
   const latest = taggedEntries.at(-1)?.observerTag ?? null;
-  const repeatedTail = taggedEntries
+  // `every` is true of an empty list: a run with nothing decided was told the
+  // observer had grown sure of it, and the line for that run was never reached.
+  const repeatedTail = taggedEntries.length > 0 && taggedEntries
     .slice(-3)
     .every((entry) => entry.observerTag?.id && entry.observerTag.id === latest?.id);
   const turningPoint = taggedEntries.find((entry, index) => {
