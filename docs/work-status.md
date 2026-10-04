@@ -51,9 +51,7 @@ list of the files it touched.
 
 Still open, on purpose:
 
-- The authored copy tables are still matched to their choices by position
-  (priority 11). The fix is one choice object that carries its own label,
-  effect and copy. The finale is the one case that is not a pack (priority 74).
+- The finale is the one case that is not a pack (priority 74).
 - Season length -- about 491 scenes a season, about 46 of them in the 프롤로그 --
   is an authoring decision, not a code problem.
 - The calendar does not close: the 프롤로그 is 2023 and the season's weekdays
@@ -150,14 +148,16 @@ Still open, on purpose:
     `npm run check:text` fails on a one-line template that puts a particle
     straight after an interpolation, and reads the particle written after
     every declared name, so a rename that changes the last sound fails there.
-11. Authored copy tables are matched to their labels by position. Editing one list
-    means editing the other; `npm run check:dialogue` is what catches it when that
-    does not happen. It reads the replies' order too: a scene fails when some
-    other order of its replies answers the labels clearly better than the
-    written one (measured on swapped pairs, it catches a little over half).
-    Replacing
-    the positional tables with one choice object is open work (see Current
-    State).
+11. A choice in a connective or reaction scene is one object: its label, its
+    effect, the line the player speaks and the reply (`connectiveScenes` and
+    `reactionScenes` on a pack, and the finale's in `gameData.js`). They were
+    four lists matched by position, and editing one without the others answered
+    a button with another button's line. `npm run check:dialogue` still reads
+    the replies' order: a scene fails when some other order of its replies
+    answers the labels clearly better than the written one (measured on swapped
+    pairs, it catches a little over half). The route, evidence and authored
+    scenes' choices keep their lines in `voiceLines` and `echoReplies`, keyed by
+    choice id.
 12. Keep the balance guardrails honest. `scripts/check-balance.mjs` asserts that
     every choice costs something, that every resource moves both ways, that no
     choice inside a scene and no column inside a case is Pareto-dominated by a

@@ -99,207 +99,203 @@ aftermathRoutes.forEach(([caseId, nodeId, nextNode]) => {
   nodeOrders[caseId].push(nextNode);
 });
 
+/**
+ * The scenes that grow out of an authored one: a connective scene follows the
+ * scene named in `after`, and a reaction scene follows a connective scene.
+ * Each choice carries its own label, effect, line and reply. They were four
+ * lists matched by position -- labels on the scene, effects, voice and echo in
+ * tables keyed by the scene before -- and a list edited without the others
+ * answered one button with another's line.
+ *
+ * A connective choice is a real trade: the people-first option pays in cash or
+ * time, the procedure-first option makes someone wait (`humanCost`), and the
+ * profit-first option is the only one that gives `fatigue` back. A reaction
+ * scene asks who carries the decision forward, so that is where `fatigue`
+ * comes back: handing the work on or closing the file recovers you and
+ * charges someone else.
+ *
+ * The finale's are written here; every other case's are on its pack.
+ */
 const connectiveScenes = [
-  ["f_witness", "f_archive", "f_confront", "첫 번째 참가자", "도윤하", "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.", ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"], ["이전 참가자에게 먼저 알린다", "복제된 문장을 모두 증거로 수집한다", "실험을 멈추기 위해 서버를 닫는다"]],
-  ["f_dilemma", "f_confront", "f_choice", "끝내는 방법", "에코", "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.", ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"], ["모든 참가자에게 사실을 알린다", "동의와 감시 규칙을 먼저 만든다", "실험 데이터를 전부 폐기한다", "실험을 이어가되 나를 다음 참가자로 등록한다"]],
+  {
+    id: "f_witness",
+    after: "f_archive",
+    next: "f_confront",
+    title: "첫 번째 참가자",
+    speaker: "도윤하",
+    text: "보관소 안에는 당신보다 먼저 실험을 통과한 사람의 기록이 있습니다. 그 사람은 자신의 반응이 다른 사람의 선택지를 만드는 데 쓰였다는 사실을 몰랐습니다.",
+    memo: ["이전 참가자의 동의 기록이 없음", "선택 문장이 다음 사건의 대사로 복제됨", "실험 설계자는 책임을 분산시킴"],
+    choices: [
+      {
+        label: "이전 참가자에게 먼저 알린다",
+        effect: { trust: 9, legitimacy: 6, capital: -4, time: -6, fatigue: 6 },
+        voice: "이전 참가자에게 그의 기록이 남아 있다는 사실부터 알리겠습니다.",
+        echo: "먼저 알리면 실험은 흔들리고, 그는 처음으로 자기 기록을 가진 사람이 됩니다.",
+      },
+      {
+        label: "복제된 문장을 모두 증거로 수집한다",
+        effect: { legitimacy: 9, humanCost: 2, capital: -5, time: -8, fatigue: 6 },
+        voice: "복제된 문장을 전부 증거로 모으겠습니다.",
+        echo: "모은 문장은 실험을 증명하고, 모으는 동안 실험은 계속 돌아갑니다.",
+      },
+      {
+        label: "실험을 멈추기 위해 서버를 닫는다",
+        effect: { humanCost: -6, legitimacy: -6, trust: -4, capital: -7, time: 5, fatigue: -4 },
+        voice: "지금 서버를 닫아 실험을 멈추겠습니다.",
+        echo: "닫힌 서버는 실험을 끝내고, 그 안의 기록도 함께 잠급니다.",
+      },
+    ],
+  },
+  {
+    id: "f_dilemma",
+    after: "f_confront",
+    next: "f_choice",
+    title: "끝내는 방법",
+    speaker: "에코",
+    text: "문을 닫으면 기록도 사라집니다. 문을 열어두면 더 많은 사람이 같은 압박을 받습니다. 당신은 이제 답이 아니라 종료 조건을 설계해야 합니다.",
+    memo: ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"],
+    choices: [
+      {
+        label: "모든 참가자에게 사실을 알린다",
+        effect: { trust: 9, legitimacy: 7, capital: -6, time: -5, fatigue: 6 },
+        voice: "관찰된 선택을 숨기지 않고 당사자에게 돌려주겠습니다.",
+        echo: "관찰은 공개될 때 조작이 아니라 기록이 될 수 있습니다.",
+      },
+      {
+        label: "동의와 감시 규칙을 먼저 만든다",
+        effect: { legitimacy: 9, humanCost: 2, capital: -4, time: -8, fatigue: 5 },
+        voice: "종료 권한과 감시 규칙을 함께 공개하겠습니다.",
+        echo: "종료 권한 없는 실험은 참가자의 동의로 끝나지 않습니다.",
+      },
+      {
+        label: "실험 데이터를 전부 폐기한다",
+        effect: { humanCost: -7, legitimacy: -7, trust: -5, capital: -8, time: 5, fatigue: -4 },
+        voice: "실험 데이터를 전부 폐기하겠습니다.",
+        echo: "폐기된 데이터는 피해를 멈추고, 무엇이 있었는지 증명할 방법도 함께 지웁니다.",
+      },
+      {
+        label: "실험을 이어가되 나를 다음 참가자로 등록한다",
+        effect: { trust: 6, legitimacy: 5, humanCost: -4, capital: -5, fatigue: 9 },
+        voice: "실험을 이어가되 다음 참가자 자리에 제 이름을 넣겠습니다.",
+        echo: "자신을 넣는 선택은 실험을 멈추지 않고 관찰자만 한 명 줄입니다.",
+      },
+    ],
+  },
+  ...CASE_PACKS.flatMap((pack) => pack.connectiveScenes),
 ];
-
-/**
- * Connective-scene effects, keyed by the authored scene each one follows.
- *
- * Every row is a real trade: the people-first option always pays in cash or
- * time, the procedure-first option always makes someone wait (`humanCost`),
- * and the profit-first option is the only one that gives `fatigue` back --
- * cutting the corner costs less of you and more of everyone else. Six scenes
- * carry a fourth option that exists only in that case.
- */
-const authoredSceneChoiceEffects = {
-  f_archive: [
-    { trust: 9, legitimacy: 6, capital: -4, time: -6, fatigue: 6 },
-    { legitimacy: 9, humanCost: 2, capital: -5, time: -8, fatigue: 6 },
-    { humanCost: -6, legitimacy: -6, trust: -4, capital: -7, time: 5, fatigue: -4 },
-  ],
-  f_confront: [
-    { trust: 9, legitimacy: 7, capital: -6, time: -5, fatigue: 6 },
-    { legitimacy: 9, humanCost: 2, capital: -4, time: -8, fatigue: 5 },
-    { humanCost: -7, legitimacy: -7, trust: -5, capital: -8, time: 5, fatigue: -4 },
-    { trust: 6, legitimacy: 5, humanCost: -4, capital: -5, fatigue: 9 },
-  ],
-};
-
-/**
- * Reaction-scene effects, keyed by the connective scene each one answers.
- *
- * Reaction scenes used to reuse the row above them, which made half the graph
- * the same decision twice. Their own question is who carries the decision
- * forward, so this is where `fatigue` comes back: handing the work on or
- * closing the file recovers you and charges someone else.
- */
-const authoredSceneReactionEffects = {
-  f_witness: [
-    { trust: 9, legitimacy: 7, time: -7, fatigue: 6 },
-    { legitimacy: 8, trust: -3, humanCost: 2, time: -5, fatigue: 4 },
-    { humanCost: -5, legitimacy: -8, trust: -4, time: 5, fatigue: -4 },
-  ],
-  f_dilemma: [
-    { trust: 8, legitimacy: 8, time: -8, fatigue: 6 },
-    { legitimacy: 6, humanCost: -5, trust: -4, capital: -5, fatigue: 8 },
-    { time: 6, trust: -7, legitimacy: -6, humanCost: 6, fatigue: -5 },
-  ],
-};
-
-/**
- * Connective-scene copy, keyed by the scene each connective scene grows out of.
- * The lines answer the buttons that scene actually shows: these tables were
- * written against an earlier set of labels and stayed behind when the labels
- * were rewritten, so a player who picked "살아남을 돈을 먼저 확보한다" heard
- * "근거와 책임자를 같은 문서에 공개하겠습니다" back. `check:text` compares the two
- * now, so the pair cannot drift apart again unnoticed.
- */
-const authoredSceneChoiceCopy = {
-  f_archive: { voice: ["이전 참가자에게 그의 기록이 남아 있다는 사실부터 알리겠습니다.", "복제된 문장을 전부 증거로 모으겠습니다.", "지금 서버를 닫아 실험을 멈추겠습니다."], echo: ["먼저 알리면 실험은 흔들리고, 그는 처음으로 자기 기록을 가진 사람이 됩니다.", "모은 문장은 실험을 증명하고, 모으는 동안 실험은 계속 돌아갑니다.", "닫힌 서버는 실험을 끝내고, 그 안의 기록도 함께 잠급니다."] },
-  f_confront: { voice: ["관찰된 선택을 숨기지 않고 당사자에게 돌려주겠습니다.", "종료 권한과 감시 규칙을 함께 공개하겠습니다.", "실험 데이터를 전부 폐기하겠습니다.", "실험을 이어가되 다음 참가자 자리에 제 이름을 넣겠습니다."], echo: ["관찰은 공개될 때 조작이 아니라 기록이 될 수 있습니다.", "종료 권한 없는 실험은 참가자의 동의로 끝나지 않습니다.", "폐기된 데이터는 피해를 멈추고, 무엇이 있었는지 증명할 방법도 함께 지웁니다.", "자신을 넣는 선택은 실험을 멈추지 않고 관찰자만 한 명 줄입니다."] },
-};
-
-/**
- * Reaction-scene copy, keyed by the connective scene each one answers. These
- * used to fall back to the parent's lines, so 54 of the player's sentences
- * repeated verbatim one scene later.
- */
-const authoredSceneReactionCopy = {
-  f_witness: { voice: ["기록을 돌려주고 실험을 처음부터 다시 설명하겠습니다.", "기록은 증거로 두고 동의를 요청하겠습니다.", "기록을 지워 피해를 끝내겠습니다."], echo: ["돌려준 기록은 실험을 흔들고 참가자를 사람으로 되돌립니다.", "동의를 요청하는 순간 실험의 전제가 처음으로 공개됩니다.", "지운 기록은 피해를 멈추고 책임도 함께 지웁니다."] },
-  f_dilemma: { voice: ["종료 조건을 참가자들과 함께 정하겠습니다.", "제가 혼자 버튼을 누르겠습니다.", "버튼을 숨기고 시스템을 지켜보겠습니다."], echo: ["함께 정한 종료 조건은 느리지만 다음 실험에도 남습니다.", "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.", "숨긴 버튼은 통제가 아니라 다음 관찰자의 권한이 됩니다."] },
-};
-
-for (const pack of CASE_PACKS) {
-  connectiveScenes.push(...pack.connectiveScenes);
-  Object.assign(authoredSceneChoiceEffects, pack.choiceEffects);
-  Object.assign(authoredSceneReactionEffects, pack.reactionEffects);
-  Object.assign(authoredSceneChoiceCopy, pack.choiceCopy);
-  Object.assign(authoredSceneReactionCopy, pack.reactionCopy);
-}
-
-function getAuthoredSceneEffects(sourceId, id) {
-  const table = id.endsWith("_reaction") ? authoredSceneReactionEffects : authoredSceneChoiceEffects;
-  const effects = table[sourceId];
-  if (!effects) {
-    throw new Error(`Missing authored choice effects for generated scene source: ${sourceId} (${id})`);
-  }
-  return effects;
-}
-
-function getAuthoredSceneCopy(sourceId, id) {
-  const table = id.endsWith("_reaction") ? authoredSceneReactionCopy : authoredSceneChoiceCopy;
-  const copy = table[sourceId];
-  if (!copy) {
-    throw new Error(`Missing authored choice copy for generated scene source: ${sourceId} (${id})`);
-  }
-  return copy;
-}
-
-function addConnectiveScene([id, sourceId, nextId, title, speaker, text, memo, labels]) {
-  const source = sceneOf(sourceId, `connective scene ${id}`);
-  const effects = getAuthoredSceneEffects(sourceId, id);
-  const copy = getAuthoredSceneCopy(sourceId, id);
-  source.choices.forEach((choice) => { choice.next = id; });
-  nodes[id] = {
-    // A phase is printed on the scene chip and in the mission strip, so it is
-    // player-facing copy, not a pipeline label. These scenes were shipping as
-    // "CONNECTIVE SCENE" -- the name of the function that builds them -- for the
-    // same reason the reaction, branch and route-final families read as build
-    // steps. They are all the same story beat: the part that happens outside
-    // the meeting that was scheduled.
-    phase: "OFF THE RECORD",
-    kind: "connective",
-    title,
-    speaker,
-    text,
-    memo,
-    triggers: source.triggers,
-    choices: labels.map((label, index) => {
-      const choice = {
-        id: `${id}_choice_${index + 1}`,
-        label,
-        effect: effects[index],
-        next: nextId,
-        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
-      };
-      choiceVoiceLines[choice.id] = copy.voice[index];
-      echoReplies[choice.id] = copy.echo[index];
-      return choice;
-    }),
-  };
-}
-
-connectiveScenes.forEach(addConnectiveScene);
-
-const connectiveOrders = {
-  final: [["f_archive", "f_witness"], ["f_confront", "f_dilemma"]],
-};
-
-CASE_PACKS.forEach((pack) => {
-  connectiveOrders[pack.id] = pack.connectiveOrder;
-});
-
-Object.entries(connectiveOrders).forEach(([caseId, pairs]) => {
-  pairs.forEach(([sourceId, bridgeId]) => {
-    sceneOf(bridgeId, `${caseId} connective order`);
-    const order = nodeOrders[caseId];
-    const index = order.indexOf(sourceId);
-    if (index < 0) throw new Error(`${caseId} connective order places ${bridgeId} after ${sourceId}, which is not in the case`);
-    order.splice(index + 1, 0, bridgeId);
-  });
-});
 
 const reactionScenes = [
-  ["f_witness_reaction", "f_witness", "f_confront", "첫 참가자의 선택", "반재욱", "첫 참가자는 자신의 기록을 돌려달라고 요청합니다. 하지만 기록을 돌려주면 지금까지의 실험 전체가 흔들립니다.", ["기록을 돌려주고 실험을 다시 설명한다", "기록을 증거로 보관하고 동의를 요청한다", "기록을 삭제해 피해를 끝낸다"]],
-  ["f_dilemma_reaction", "f_dilemma", "f_choice", "종료 버튼 앞에서", "에코", "종료 버튼 위에는 당신의 이름이 표시되어 있습니다. 누르는 순간 실험은 끝나지만, 책임도 당신에게 남습니다.", ["참가자들과 함께 종료 조건을 정한다", "내가 혼자 버튼을 누른다", "버튼을 숨기고 시스템을 지켜본다"]],
+  {
+    id: "f_witness_reaction",
+    after: "f_witness",
+    next: "f_confront",
+    title: "첫 참가자의 선택",
+    speaker: "반재욱",
+    text: "첫 참가자는 자신의 기록을 돌려달라고 요청합니다. 하지만 기록을 돌려주면 지금까지의 실험 전체가 흔들립니다.",
+    memo: ["이전 참가자가 돌려받을 기록", "동의 없이 복제된 문장"],
+    choices: [
+      {
+        label: "기록을 돌려주고 실험을 다시 설명한다",
+        effect: { trust: 9, legitimacy: 7, time: -7, fatigue: 6 },
+        voice: "기록을 돌려주고 실험을 처음부터 다시 설명하겠습니다.",
+        echo: "돌려준 기록은 실험을 흔들고 참가자를 사람으로 되돌립니다.",
+      },
+      {
+        label: "기록을 증거로 보관하고 동의를 요청한다",
+        effect: { legitimacy: 8, trust: -3, humanCost: 2, time: -5, fatigue: 4 },
+        voice: "기록은 증거로 두고 동의를 요청하겠습니다.",
+        echo: "동의를 요청하는 순간 실험의 전제가 처음으로 공개됩니다.",
+      },
+      {
+        label: "기록을 삭제해 피해를 끝낸다",
+        effect: { humanCost: -5, legitimacy: -8, trust: -4, time: 5, fatigue: -4 },
+        voice: "기록을 지워 피해를 끝내겠습니다.",
+        echo: "지운 기록은 피해를 멈추고 책임도 함께 지웁니다.",
+      },
+    ],
+  },
+  {
+    id: "f_dilemma_reaction",
+    after: "f_dilemma",
+    next: "f_choice",
+    title: "종료 버튼 앞에서",
+    speaker: "에코",
+    text: "종료 버튼 위에는 당신의 이름이 표시되어 있습니다. 누르는 순간 실험은 끝나지만, 책임도 당신에게 남습니다.",
+    memo: ["종료 버튼을 누를 권한", "참가자들과 합의할 종료 조건"],
+    choices: [
+      {
+        label: "참가자들과 함께 종료 조건을 정한다",
+        effect: { trust: 8, legitimacy: 8, time: -8, fatigue: 6 },
+        voice: "종료 조건을 참가자들과 함께 정하겠습니다.",
+        echo: "함께 정한 종료 조건은 느리지만 다음 실험에도 남습니다.",
+      },
+      {
+        label: "내가 혼자 버튼을 누른다",
+        effect: { legitimacy: 6, humanCost: -5, trust: -4, capital: -5, fatigue: 8 },
+        voice: "제가 혼자 버튼을 누르겠습니다.",
+        echo: "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.",
+      },
+      {
+        label: "버튼을 숨기고 시스템을 지켜본다",
+        effect: { time: 6, trust: -7, legitimacy: -6, humanCost: 6, fatigue: -5 },
+        voice: "버튼을 숨기고 시스템을 지켜보겠습니다.",
+        echo: "숨긴 버튼은 통제가 아니라 다음 관찰자의 권한이 됩니다.",
+      },
+    ],
+  },
+  ...CASE_PACKS.flatMap((pack) => pack.reactionScenes),
 ];
 
-const authoredReactionMemos = {
-  f_witness_reaction: ["이전 참가자가 돌려받을 기록", "동의 없이 복제된 문장"],
-  f_dilemma_reaction: ["종료 버튼을 누를 권한", "참가자들과 합의할 종료 조건"],
-};
+// A phase is printed on the scene chip and in the mission strip, so it is
+// player-facing copy, not a pipeline label. These scenes were shipping as
+// "CONNECTIVE SCENE" -- the name of the function that builds them -- for the
+// same reason the reaction, branch and route-final families read as build
+// steps. They are all the same story beat: the part that happens outside the
+// meeting that was scheduled.
+const GENERATED_SCENE_PHASES = { connective: "OFF THE RECORD", reaction: "THE ROOM AFTER" };
+const REACTION_MEMO_FALLBACK = ["다음 선택에 남은 비용", "다음 장면에서 다시 확인할 말"];
 
-for (const pack of CASE_PACKS) {
-  reactionScenes.push(...pack.reactionScenes);
-  Object.assign(authoredReactionMemos, pack.reactionMemos);
-}
-
-function addReactionScene([id, sourceId, nextId, title, speaker, text, labels]) {
-  const source = sceneOf(sourceId, `reaction scene ${id}`);
-  const effects = getAuthoredSceneEffects(sourceId, id);
-  const copy = getAuthoredSceneCopy(sourceId, id);
+function addGeneratedScene(kind, { id, after, next, title, speaker, text, memo, choices }) {
+  const source = sceneOf(after, `${kind} scene ${id}`);
   source.choices.forEach((choice) => { choice.next = id; });
   nodes[id] = {
-    phase: "THE ROOM AFTER",
-    kind: "reaction",
+    phase: GENERATED_SCENE_PHASES[kind],
+    kind,
     title,
     speaker,
     text,
-    memo: authoredReactionMemos[id] ?? ["다음 선택에 남은 비용", "다음 장면에서 다시 확인할 말"],
+    memo: memo ?? REACTION_MEMO_FALLBACK,
     triggers: source.triggers,
-    choices: labels.map((label, index) => {
+    choices: choices.map(({ label, effect, voice, echo }, index) => {
       const choice = {
         id: `${id}_choice_${index + 1}`,
         label,
-        effect: effects[index],
-        next: nextId,
-        cognition: sceneBuild.inferChoiceCognition(label, effects[index]),
+        effect,
+        next,
+        cognition: sceneBuild.inferChoiceCognition(label, effect),
       };
-      choiceVoiceLines[choice.id] = copy.voice[index];
-      echoReplies[choice.id] = copy.echo[index];
+      choiceVoiceLines[choice.id] = voice;
+      echoReplies[choice.id] = echo;
       return choice;
     }),
   };
 }
 
-reactionScenes.forEach(addReactionScene);
+connectiveScenes.forEach((scene) => addGeneratedScene("connective", scene));
 
-reactionScenes.forEach(([id, sourceId]) => {
-  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(sourceId));
-  if (!order) throw new Error(`reaction scene ${id} follows ${sourceId}, which is in no case`);
-  order.splice(order.indexOf(sourceId) + 1, 0, id);
+// A connective scene is played right after the scene it follows.
+connectiveScenes.forEach(({ id, after }) => {
+  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
+  if (!order) throw new Error(`connective scene ${id} follows ${after}, which is in no case`);
+  order.splice(order.indexOf(after) + 1, 0, id);
+});
+
+reactionScenes.forEach((scene) => addGeneratedScene("reaction", scene));
+
+reactionScenes.forEach(({ id, after }) => {
+  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
+  if (!order) throw new Error(`reaction scene ${id} follows ${after}, which is in no case`);
+  order.splice(order.indexOf(after) + 1, 0, id);
 });
 
 // Each case has one authored detour. The second scene always rejoins the existing route.
