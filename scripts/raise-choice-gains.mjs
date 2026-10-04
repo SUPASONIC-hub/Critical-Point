@@ -27,8 +27,8 @@ import { costWhenRising } from "../src/gameConstants.js";
  */
 
 /**
- * Where the authored effects are: every case file, and the tables in
- * gameData.js. The case files are read from the folder. They used to be a list
+ * Where the authored effects are: every case file, the tables in gameData.js
+ * and the memory cards in seasonRules.js. The case files are read from the folder. They used to be a list
  * of eleven names written here when the season was ten cases long; by the time
  * it was fifty-five the list still said eleven, so a run would have raised the
  * first nine cases and the finale by a tenth, left forty-six cases where they
@@ -41,6 +41,9 @@ const AUTHORED = [
     .sort()
     .map((entry) => `${CASE_DIR}/${entry}`),
   "src/gameData.js",
+  // What a memory card gives. It was written in gameData.js until the rules
+  // that read the season's tables moved out of it.
+  "src/seasonRules.js",
 ];
 
 /**

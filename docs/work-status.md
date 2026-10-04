@@ -45,9 +45,9 @@ list of the files it touched.
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
-- Visual baselines still need re-recording after this pass: the font, colours,
-  copy, the case card's markup and the phone header all moved (priority 19
-  says how).
+- Visual baselines were last recorded on 2026-09-29, after the font, colours,
+  copy, the case card's markup and the phone header moved; the comparison
+  passes on main (priority 19 says how to record them again).
 
 Still open, on purpose:
 
