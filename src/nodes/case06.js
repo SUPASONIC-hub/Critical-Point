@@ -209,3 +209,388 @@ export const case06Nodes = {
     ],
   },
 };
+
+/**
+ * Everything else 사건 06 adds to the season, in one place. `src/nodes/casePacks.js`
+ * lists the packs and `gameData.js`, `gameLogic.js` and `sceneContext.js` merge
+ * each field into the table of the same job; see the field comments there.
+ */
+export const case06 = {
+  id: "case06",
+  nodes: case06Nodes,
+  aftermath: {
+    c6_aftershock: {
+      phase: "AFTERMATH",
+      title: "다음 날의 빈 의자",
+      speaker: "반재욱",
+      text: "위원회는 끝났습니다. 오진우의 자리는 치워지지 않았고, 화분은 여전히 물이 넘칩니다. 반재욱이 수첩을 덮고 말합니다. '나는 저 사람을 한 번도 좋아한 적이 없습니다. 그래서 이 결론이 더 불편합니다.'",
+      memo: ["오진우의 사직서는 아직 수리되지 않음", "설정값 자료의 열람 요청이 세 건 들어옴", "당신의 프로필도 같은 폴더에 있음"],
+      triggers: ["responsibility", "affection", "selfAwareness"],
+      choices: [
+        { id: "c6_after_stand", label: "그가 돌아올 자리를 남기고 곁에 선다", effect: { trust: 13, legitimacy: 4, capital: -7, fatigue: 7 }, next: "case06_result", cognition: { persistence: 2 } },
+        { id: "c6_after_open", label: "두 사람의 설정값을 공개 기록으로 연다", effect: { legitimacy: 15, trust: 5, capital: -9, fatigue: 8 }, next: "case06_result", cognition: { inference: 2, reframing: 1 } },
+        { id: "c6_after_name", label: "책임자 이름을 확정하고 사건을 닫는다", effect: { capital: 12, trust: -12, legitimacy: -5, humanCost: 9, fatigue: 3 }, next: "case06_result", cognition: { risk: 2 } },
+      ],
+    },
+  },
+  aftermathRoute: ["c6_final", "c6_aftershock"],
+  connectiveScenes: [
+    ["c6_kitchen", "c6_desk", "c6_logs", "탕비실의 세 사람", "도윤하", "탕비실에서 반재욱이 오진우의 머그컵을 씻고 있습니다. '증거물 아닙니까' 하고 도윤하가 묻자 그는 '커피 자국은 증거가 아닙니다' 하고 답합니다. 셋 다 웃지 않지만, 아무도 먼저 나가지 않습니다.", ["그를 아는 사람이 생각보다 많음", "머그컵은 결국 씻겼음", "위원회 자료는 아직 한 줄도 쓰지 못함"], ["여기서 나눈 이야기를 자료에 넣는다", "이 자리는 기록 밖에 두고 자료는 따로 쓴다", "자리를 끝내고 각자 일로 돌아간다"]],
+    ["c6_family", "c6_logs", "c6_panel", "누나의 전화", "한서윤", "오진우의 누나가 회사로 전화했습니다. 동생이 승진했다고 들었는데 축하 자리를 언제 하느냐고 묻습니다. 그 승진은 노바웍스 입찰 직후의 일이고, 그때부터 그의 결정 창이 줄기 시작했습니다.", ["가족은 아무것도 모름", "승진 시점과 조건 변경 시점이 같음", "통화는 30초 만에 끝났음"], ["가족에게 사실대로 알린다", "회사 공식 창구로 안내한다", "지금은 아무 말도 하지 않는다"]],
+    ["c6_ledger", "c6_panel", "c6_final", "두 장의 프로필", "에코", "위원회 직전, 에코가 두 장의 프로필을 나란히 띄웁니다. 왼쪽은 오진우, 오른쪽은 당신입니다. 축소된 창과 늘어난 창이 같은 그래프의 위아래로 그려집니다. 에코가 말합니다. '둘 중 하나는 대조군입니다.'", ["두 프로필의 실험 번호가 동일", "대조군이 누구인지는 표시되지 않음", "위원회 시작까지 10분"], ["두 장을 함께 위원회에 낸다", "내 것만 빼고 그의 것을 낸다", "둘 다 덮고 사실관계로만 간다"]],
+  ],
+  connectiveOrder: [["c6_desk", "c6_kitchen"], ["c6_logs", "c6_family"], ["c6_panel", "c6_ledger"]],
+  choiceEffects: {
+    c6_desk: [{ trust: 8, legitimacy: 4, time: -6, fatigue: 4 }, { legitimacy: 7, time: -5, humanCost: 3, fatigue: 3 }, { time: 6, capital: 5, trust: -7, humanCost: 4, fatigue: -3 }],
+    c6_logs: [{ trust: 9, legitimacy: 3, time: -7, capital: -4, fatigue: 5 }, { legitimacy: 6, time: -4, humanCost: 4, fatigue: 3 }, { time: 5, trust: -8, legitimacy: -3, humanCost: 5, fatigue: -3 }],
+    c6_panel: [{ legitimacy: 9, trust: 4, time: -6, capital: -5, fatigue: 5 }, { trust: 7, legitimacy: -5, time: -4, humanCost: -4, fatigue: 4 }, { time: 6, legitimacy: 5, trust: -6, humanCost: 4, fatigue: -3 }],
+  },
+  choiceCopy: {
+    c6_desk: { voice: ["기록 밖에서 들은 말도 그 사람의 일부라며, 자료에 넣겠다고 한다.", "이 자리를 지키고 싶어서, 자료는 따로 쓰겠다고 한다.", "감상은 여기까지라며 컵을 내려놓고 먼저 일어선다."], echo: ["기록에 들어간 온기는 증거가 되고, 증거가 된 온기는 반대신문을 받습니다.", "따로 쓰면 이 자리는 남습니다. 남은 자리는 자료에 없으므로 위원회에서 존재하지 않습니다.", "먼저 일어서면 시간은 지켜집니다. 셋이 같은 방에 있던 사실은 아무 데도 기록되지 않습니다."] },
+    c6_logs: { voice: ["가족이 뒤늦게 아는 편이 더 잔인하다며, 사실대로 알린다.", "내 입으로 말할 일이 아니라며, 공식 창구를 안내한다.", "지금 말하면 되돌릴 수 없다며, 축하 인사만 받고 끊는다."], echo: ["사실을 먼저 아는 가족은 준비할 수 있습니다. 그 준비는 당신이 아니라 그들이 감당합니다.", "공식 창구는 정확합니다. 정확한 창구는 대개 가장 늦게 열립니다.", "말하지 않은 30초는 오늘 아무도 다치게 하지 않고, 나중에 그 30초가 가장 길게 기억됩니다."] },
+    c6_panel: { voice: ["대조군이 누구든 같은 실험이라며, 두 장을 함께 낸다.", "그를 먼저 살려야 한다며, 내 프로필은 빼고 그의 것만 낸다.", "프로필은 변수일 뿐이라며, 사실관계만 들고 들어간다."], echo: ["두 장을 함께 내면 실험은 처음으로 대칭이 됩니다. 대칭은 당신도 피험자라는 뜻입니다.", "그의 것만 내면 그는 피해자가 되고, 당신은 여전히 관찰자석에 남습니다.", "사실관계만으로도 위원회는 결론을 냅니다. 그 결론에 왜 그가 빨라졌는지는 들어가지 않습니다."] },
+  },
+  reactionScenes: [
+    ["c6_kitchen_reaction", "c6_kitchen", "c6_logs", "씻어 둔 컵", "반재욱", "반재욱이 컵을 엎어 말려 둔 자리에 포스트잇을 붙입니다. '쓰지 마시오'가 아니라 '오진우'라고만 적혀 있습니다. 그는 그게 무슨 뜻이냐는 질문에 답하지 않습니다.", ["이름표를 그대로 둔다", "자리 정리 절차를 함께 연다", "오늘 안에 자리를 비운다"]],
+    ["c6_family_reaction", "c6_family", "c6_panel", "축하 자리", "도윤하", "누나가 회식 날짜를 다시 물어왔습니다. 도윤하가 조용히 말합니다. '거짓말을 하라는 게 아니라, 오늘은 대답하지 말라는 겁니다.' 그 말이 맞는지는 아무도 모릅니다.", ["오늘은 답하지 않는다", "회사 공식 창구가 답하게 한다", "지금 사실대로 전한다"]],
+    ["c6_ledger_reaction", "c6_ledger", "c6_final", "대조군", "에코", "에코는 어느 쪽이 대조군인지 끝내 말하지 않습니다. 대신 한 줄을 띄웁니다. '대조군은 실험을 모르는 쪽입니다.' 당신은 지금 알고 있습니다.", ["내 프로필까지 함께 올린다", "두 장 다 봉인한다", "아는 것을 쓰지 않고 넘어간다"]],
+  ],
+  reactionEffects: {
+    c6_kitchen: [{ trust: 7, legitimacy: 4, time: -5, capital: -4, fatigue: 4 }, { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 }, { time: 5, capital: 4, trust: -6, humanCost: 4, fatigue: -3 }],
+    c6_family: [{ trust: 8, legitimacy: 3, time: -6, capital: -3, fatigue: 4 }, { legitimacy: 7, time: -3, humanCost: 4, fatigue: 3 }, { time: 6, capital: 4, trust: -7, humanCost: 3, fatigue: -3 }],
+    c6_ledger: [{ legitimacy: 8, trust: 5, time: -6, capital: -4, fatigue: 5 }, { trust: 6, legitimacy: -4, humanCost: -3, time: -3, fatigue: 4 }, { time: 5, legitimacy: 4, trust: -6, humanCost: 4, fatigue: -3 }],
+  },
+  reactionCopy: {
+    c6_kitchen: { voice: ["돌아올 자리를 남기자며, 이름표를 그대로 둔다.", "표시를 남기되 규정대로 자리 정리 절차를 함께 연다.", "지금 치우는 게 서로에게 낫다며, 오늘 안에 자리를 비운다."], echo: ["남겨 둔 자리는 약속이 됩니다. 지켜지지 않은 약속은 그 자리에서 가장 오래 보입니다.", "절차와 함께 남기면 자리는 규정이 됩니다. 규정은 사람보다 먼저 만료됩니다.", "치운 자리는 깔끔합니다. 돌아온 사람이 앉을 곳은 그날부터 없습니다."] },
+    c6_family: { voice: ["오늘은 답하지 않겠다고, 스스로에게 기한을 정한다.", "답할 사람을 정해 두고, 내가 아니라 회사가 말하게 한다.", "미루는 것도 거짓말이라며, 지금 사실대로 전한다."], echo: ["기한을 정한 침묵은 거짓말이 아닙니다. 기한이 지나면 같은 침묵이 거짓말이 됩니다.", "회사가 말하면 문장은 정확해지고, 목소리는 아무의 것도 아니게 됩니다.", "지금 전하면 가족은 오늘부터 압니다. 그가 직접 말할 기회는 사라집니다."] },
+    c6_ledger: { voice: ["아는 쪽의 책임이 더 크다며, 내 프로필까지 함께 올린다.", "아는 것을 무기로 쓰지 않겠다며, 두 장 다 봉인한다.", "지금은 그를 살리는 게 먼저라며, 아는 것을 쓰지 않고 넘어간다."], echo: ["아는 쪽이 올리면 실험은 대칭이 됩니다. 대칭은 보호가 아니라 노출입니다.", "봉인한 앎은 아무도 해치지 않고, 아무도 구하지 않습니다.", "쓰지 않은 앎은 사라지지 않습니다. 다음 사건에서 같은 화면이 당신 이름으로 열립니다."] },
+  },
+  reactionMemos: {
+    c6_kitchen_reaction: ["돌아올 자리를 남기는 방식", "이름표를 뗄 권한"],
+    c6_family_reaction: ["오늘 답하지 않을 권한", "미룬 말에 붙는 이자"],
+    c6_ledger_reaction: ["아는 쪽과 모르는 쪽", "위원회에 들어갈 문장"],
+  },
+  branchPlan: ["c6_logs", 1, "c6_branch_roof", "c6_branch_roof_follow"],
+  branchScenes: {
+    c6_branch_roof: {
+      phase: "SIDE DOOR",
+      title: "옥상의 두 사람",
+      speaker: "오진우",
+      text: "옥상에서 오진우가 난간에 팔을 걸치고 서 있습니다. 그는 당신을 보고 조금 웃습니다. '걱정 마십시오. 여기 올라온 건 흡연구역이 여기뿐이라서입니다. 저는 담배도 안 피웁니다만.' 그리고 한참 뒤에 덧붙입니다. '제가 빨랐던 겁니까, 빠르게 만들어진 겁니까.'",
+      memo: ["그가 먼저 꺼낸 유일한 질문", "위원회까지 남은 시간", "이 대화는 기록되지 않음"],
+      triggers: ["affection", "recognition", "selfAwareness"],
+      choices: [
+        { id: "c6_branch_roof_a", label: "둘 다라고, 아는 대로 말한다", effect: { trust: 9, legitimacy: 4, humanCost: -4, fatigue: 4 }, next: "c6_branch_roof_follow", cognition: { persistence: 2 } },
+        { id: "c6_branch_roof_b", label: "답하지 않고 그의 옆에 같이 선다", effect: { trust: 7, time: -6, humanCost: -5, fatigue: 3 }, next: "c6_branch_roof_follow", cognition: { reframing: 2 } },
+        { id: "c6_branch_roof_c", label: "지금은 위원회 준비가 먼저라고 말한다", effect: { time: 6, legitimacy: 6, trust: -7, humanCost: 4, fatigue: -3 }, next: "c6_branch_roof_follow", cognition: { risk: 2 } },
+      ],
+    },
+    c6_branch_roof_follow: {
+      phase: "SIDE DOOR",
+      title: "내려가는 길",
+      speaker: "도윤하",
+      text: "엘리베이터 앞에서 도윤하가 종이컵 두 개를 들고 서 있습니다. '한 잔은 저 사람 겁니다. 근데 제가 주면 안 받아요.' 컵은 이미 식었습니다. 오진우가 내려오기까지 얼마나 걸릴지는 아무도 모릅니다.",
+      memo: ["그를 아는 사람은 생각보다 많음", "위원회 자료는 아직 제출 전", "식은 커피 두 잔"],
+      triggers: ["affection", "protection", "trust"],
+      choices: [
+        { id: "c6_branch_roof_follow_a", label: "컵을 받아 내가 건넨다", effect: { trust: 8, humanCost: -5, time: -5, fatigue: 3 }, next: "c6_panel", cognition: { reframing: 1 } },
+        { id: "c6_branch_roof_follow_b", label: "도윤하가 직접 줄 자리를 만든다", effect: { trust: 6, legitimacy: 5, capital: -5, fatigue: 4 }, next: "c6_panel", cognition: { inference: 2 } },
+        { id: "c6_branch_roof_follow_c", label: "둘 다 두고 위원회실로 먼저 간다", effect: { time: 5, legitimacy: 6, trust: -6, humanCost: 4, fatigue: -3 }, next: "c6_panel", cognition: { risk: 1 } },
+      ],
+    },
+  },
+  routePlan: {
+    start: "c6_start",
+    result: "c6_aftershock",
+    defaultFree: "c6_route_system",
+    // No four-way split here on purpose. The other cases offer four strategies
+    // against an organisation; this one has a single person in it, so the
+    // authored middle is the route and only the 판을 다시 짠다 card opens a new one.
+    choices: {},
+    system: {
+      route: "c6_route_system",
+      final: "c6_final_system_route",
+      title: "실험 번호가 같은 두 사람",
+      speaker: "에코",
+      text: "오진우 한 사람의 책임을 따지는 대신 두 사람의 조건을 나란히 놓자고 하자 실험 색인이 열립니다. 오진우와 당신의 프로필은 서로 다른 조건이 아니라, 한 실험의 위쪽 선과 아래쪽 선이었습니다.",
+      memo: ["두 프로필의 실험 번호가 동일", "조건 변경 시점이 서로 맞물려 있음", "색인에는 다음 참가자 칸이 비어 있음"],
+      routeChoices: [
+        ["c6_route_system_index", "색인 전체를 열어 다음 참가자 칸을 확인한다", { legitimacy: 9, trust: 4, capital: -5, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
+        ["c6_route_system_quiet", "색인은 닫고 이번 위원회만 넘긴다", { time: 6, capital: 7, trust: -6, legitimacy: -6, humanCost: 4, fatigue: -4 }, { risk: 2 }],
+        ["c6_route_system_pair", "오진우에게 색인을 같이 보자고 한다", { trust: 10, legitimacy: 5, capital: -6, humanCost: -5, fatigue: 7 }, { reframing: 2 }],
+      ],
+      finalTitle: "빈칸이 하나 남은 색인",
+      finalText: "2층 회의실 화면에 실험 색인이 펼쳐져 있습니다. 같은 실험 번호 아래 오진우의 줄과 당신의 줄이 위아래로 붙어 있고, 그 밑의 다음 참가자 칸은 비어 있습니다. 에코가 한 줄을 보탭니다. '위원회가 묻는 것은 책임자 한 명입니다. 색인이 보여 주는 것은 한 실험의 두 줄입니다.'",
+      finalMemo: ["두 프로필의 실험 번호가 같음", "다음 참가자 칸: 공란", "위원회는 결론을 기다리는 중"],
+    },
+    finalChoices: [
+      ["a", "두 사람의 조건을 하나의 기록으로 함께 낸다", { legitimacy: 10, trust: 7, capital: -8, humanCost: -6, fatigue: 8 }, { reframing: 3 }],
+      ["b", "색인을 닫고 이번 사건만 조용히 끝낸다", { capital: 8, time: 5, trust: -7, legitimacy: -7, humanCost: 5, fatigue: -4 }, { risk: 2 }],
+      ["c", "다음 참가자 칸에 내 이름을 적어 넘긴다", { legitimacy: 8, trust: 5, capital: -6, time: -7, humanCost: 3, fatigue: 8 }, { persistence: 2 }],
+    ],
+  },
+  evidencePlan: {
+    node: "c6_evidence_turn",
+    result: "c6_aftershock",
+    sourceRoutes: ["c6_desk", "c6_logs", "c6_panel", "c6_route_system"],
+    requiredAuthority: "FIELD ACCESS",
+    entryVoice: "그의 결정 창이 줄어든 날을 단서의 날짜와 한 줄에 놓아, 조건이 언제부터 바뀌었는지 센다.",
+    entryEcho: "한 줄에 놓으면 그의 속도는 성격이 아니라 일정표가 됩니다.",
+    title: "조건이 바뀐 날짜들",
+    speaker: "에코",
+    text: "단서를 맞추자 그의 결정 창이 줄어든 날짜가 전부 당신이 검증을 택한 다음 날이라는 사실이 드러납니다. 두 사람은 경쟁한 것이 아니라, 서로의 조건이 되어 있었습니다.",
+    memo: ["축소 시점이 당신의 선택 다음 날과 일치", "같은 실험 번호가 두 프로필에 걸려 있음", "이 대조표는 위원회 자료로 제출할 수 있음"],
+    triggers: ["system", "selfAwareness", "injustice"],
+    entryEffect: { legitimacy: 4, trust: 3, time: -3, fatigue: 4 },
+    choices: [
+      ["c6_evidence_turn_pair", "두 프로필의 대조표를 위원회에 낸다", { legitimacy: 11, trust: 5, capital: -8, time: -6, fatigue: 7 }, { inference: 2, persistence: 1 }],
+      ["c6_evidence_turn_shield", "날짜만 남기고 내 쪽 기록은 가린다", { capital: 6, trust: -5, legitimacy: -4, time: 4, humanCost: 4, fatigue: -3 }, { risk: 2 }],
+      ["c6_evidence_turn_hand", "대조표를 오진우에게 먼저 건넨다", { trust: 10, legitimacy: 6, capital: -6, humanCost: -5, fatigue: 6 }, { reframing: 2 }],
+    ],
+    entryLabel: "그의 조건이 바뀐 날짜들을 내 기록과 잇는다",
+  },
+  memoryPlan: {
+    routeNext: "c6_branch_roof",
+    systemNext: "c6_route_system",
+    evidenceNext: "c6_evidence_turn",
+    routeLabel: "직전 사건에서 세운 책임 기준을 옆자리 사람에게도 적용해 본다",
+    systemLabel: "통제실에서 다시 짠 판이 그의 조건표에 기준선으로 갔는지 확인한다",
+    evidenceLabel: "비어 있는 자리의 날짜를 그의 조건이 바뀐 날들과 포갠다",
+    routeEcho: "기준을 옆자리에 대 보러 올라가면 옥상 난간에 오진우가 서 있습니다. 그는 책임을 묻기도 전에 질문 하나를 먼저 꺼냅니다.",
+    systemEcho: "확인하면 오진우의 조건표에 당신이 다시 짠 판이 기준선으로 적혀 있습니다. 그의 시간이 줄어든 자리마다 당신의 선택이 있습니다.",
+    evidenceEcho: "두 날짜를 포개 보면 그의 결정 창이 줄어든 날들이 한 줄로 섭니다. 날짜마다 하루 앞에 당신의 기록이 있습니다.",
+  },
+  openingRoutes: {
+    c5_after_owner: "c6_start_owner",
+    c5_after_system: "c6_start_system",
+    c5_after_name: "c6_start_name",
+  },
+  openingCopy: {
+    c6_start_owner: ["내 책임부터 적은 뒤", "도윤하", "지난 사건에서 당신은 자기 결정부터 공개했습니다. 그 문장을 읽은 사람 중 하나가 옆자리에서 사흘째 나오지 않고 있습니다.", ["당신의 책임 문장이 사내에 회람됨", "오진우는 그 회람 직후 결근함", "위원회는 그 회람을 근거로 쓸 수 있음"]],
+    c6_start_system: ["고친 구조가 부른 사람", "에코", "지난 사건에서 당신은 구조를 고쳤습니다. 새 기준은 승인자를 더 또렷하게 남겼고, 그 기록이 지금 한 사람을 정확히 가리킵니다.", ["새 승인 기록이 책임자를 특정함", "구조 개편은 실제로 작동 중", "정확한 기록이 가장 빠른 표적이 됨"]],
+    c6_start_name: ["두 번째 이름", "반재욱", "지난 사건에서 당신은 책임자 한 사람을 세웠습니다. 조직은 그 방식이 효율적이라고 배웠고, 이번에는 그 방식을 옆자리에 적용하려 합니다.", ["지난 사건의 처리 방식이 선례가 됨", "같은 절차가 이미 준비돼 있음", "이번 대상은 당신이 아는 사람"]],
+  },
+  voiceLines: {
+    c6_start_defend: "보고서보다 사람이 먼저 사라질 수 있다는 걸 알기에, 그를 찾는 일부터 시작한다.",
+    c6_start_record: "감정이 끼어들 자리를 지우고, 그가 실제로 무엇을 승인했는지부터 연다.",
+    c6_start_panel: "시간을 사는 값이 비싸다는 걸 알면서도, 위원회에 기한을 미뤄 달라고 청한다.",
+    c6_desk_person: "기록이 말하지 않는 것을 물으려고, 그를 매일 보던 사람들 앞에 앉는다.",
+    c6_desk_draft: "열한 번 지운 손을 떠올리며, 지워진 문장을 한 줄씩 되돌린다.",
+    c6_desk_seal: "동료의 책상이 아니라 증거물이라고 스스로에게 말하며, 봉인 테이프를 붙인다.",
+    c6_logs_tell: "잔인한 사실이라는 걸 알면서도, 그가 자기 조건을 남에게서 듣지 않게 한다.",
+    c6_logs_shield: "그의 판단까지 열리는 것을 막으려고, 문제 삼을 범위를 설정값으로 좁힌다.",
+    c6_logs_expose: "내 이름이 같은 폴더에 있다는 걸 알면서도, 두 사람의 프로필을 함께 올린다.",
+    c6_panel_respect: "지키고 싶은 것이 경력이 아님을 알아듣고, 그의 조건을 변론에서 뺀다.",
+    c6_panel_submit: "그가 원망할 것을 알면서도, 그를 살릴 자료를 동의 없이 제출한다.",
+    c6_panel_both: "봐주지도 덮지도 않겠다는 듯, 그가 놓친 것과 그에게 걸린 것을 같은 장에 쓴다.",
+    c6_final_person: "오늘 닫을 수 있는 사건을 열어둔 채, 옆자리 사람의 이름을 먼저 뺀다.",
+    c6_final_record: "조직 전체가 조사 대상이 되는 쪽을 택하며, 설정값을 공식 기록으로 연다.",
+    c6_final_close: "가장 빠른 종결이라는 걸 알면서도, 세울 이름 하나를 문서에 적는다.",
+    c6_branch_roof_a: "위로가 되지 않을 답이라는 걸 알면서도, 아는 만큼 그대로 말한다.",
+    c6_branch_roof_b: "무슨 말을 해도 틀릴 것 같아서, 대답 대신 같은 난간에 팔을 건다.",
+    c6_branch_roof_c: "지금 필요한 건 대화가 아니라 자료라고 말하며, 먼저 돌아선다.",
+    c6_branch_roof_follow_a: "식은 컵을 받아 들고, 내 이름으로 건네러 올라간다.",
+    c6_branch_roof_follow_b: "내가 주면 의미가 달라진다는 걸 알기에, 도윤하가 줄 자리를 만든다.",
+    c6_branch_roof_follow_c: "컵 두 개를 그대로 둔 채, 위원회실 문을 먼저 연다.",
+    c6_after_stand: "치우려는 손을 막고, 그가 돌아올 자리를 그대로 남긴다.",
+    c6_after_open: "내 이름이 같이 열린다는 걸 알면서도, 두 사람의 설정값을 공개한다.",
+    c6_after_name: "가장 조용히 끝나는 길이라며, 책임자 이름을 문서에 확정한다.",
+  },
+  echoReplies: {
+    c6_after_stand:
+      "남겨 둔 자리는 그가 돌아올 수 있다는 뜻입니다. 돌아오지 않으면 그 자리가 매일 그것을 말합니다.",
+    c6_after_open:
+      "설정값이 열리면 두 사람 다 피험자가 됩니다. 관찰자석에 앉아 있던 시간도 함께 기록됩니다.",
+    c6_after_name:
+      "확정된 이름은 사건을 닫습니다. 닫은 방식이 이 조직의 다음 실패 처리 절차가 됩니다.",
+    c6_branch_roof_a:
+      "아는 대로 말하면 그는 처음으로 자기 조건을 가진 사람이 됩니다. 그 앎은 위로가 아니라 무게입니다.",
+    c6_branch_roof_b:
+      "옆에 서는 일은 아무것도 해결하지 않습니다. 해결하지 않는 것이 필요한 시간도 있습니다.",
+    c6_branch_roof_c:
+      "준비된 자료는 위원회를 이깁니다. 그가 먼저 꺼낸 질문은 다시 열리지 않습니다.",
+    c6_branch_roof_follow_a:
+      "당신이 건네면 그는 받습니다. 받는 순간 그 커피는 동정이 되고, 그는 그것을 압니다.",
+    c6_branch_roof_follow_b:
+      "자리를 만들면 관계는 당신을 거치지 않습니다. 대신 그 자리를 만드는 값은 당신이 냅니다.",
+    c6_branch_roof_follow_c:
+      "두고 간 컵은 식습니다. 위원회실에서 당신은 가장 먼저 도착한 사람이 됩니다.",
+    c6_start_defend:
+      "사람을 먼저 찾으면 그는 혼자가 아니게 됩니다. 다만 그 시간에 위원회는 당신 없이 자료를 읽습니다.",
+    c6_start_record:
+      "기록은 공평해 보입니다. 그 공평함이 사흘째 연락이 닿지 않는 사람에게도 공평한지는 다른 질문입니다.",
+    c6_start_panel:
+      "기한을 미루면 조사는 숨을 쉽니다. 미룬 값은 현금으로 청구되고, 그가 견뎌야 할 이틀도 함께 늘어납니다.",
+    c6_desk_person:
+      "그를 아는 사람들은 기록에 없는 것을 압니다. 동시에 그들이 지키고 싶은 것도 기록에 없습니다.",
+    c6_desk_draft:
+      "열한 번 지운 문장은 그가 무엇을 말하려다 멈췄는지 보여줍니다. 그가 지운 이유까지 보여주지는 않습니다.",
+    c6_desk_seal:
+      "봉인은 증거를 지킵니다. 봉인된 책상은 그가 돌아올 자리가 아니라 사건 번호가 됩니다.",
+    c6_logs_tell:
+      "자기 조건을 아는 사람만이 그것을 거절할 수 있습니다. 그리고 그 앎은 되돌릴 수 없습니다.",
+    c6_logs_shield:
+      "범위를 좁히면 그의 판단은 지켜집니다. 좁힌 범위는 다음 사람에게도 그대로 적용됩니다.",
+    c6_logs_expose:
+      "두 프로필을 함께 올리면 실험은 처음으로 대칭이 됩니다. 당신의 기록도 같은 날 열립니다.",
+    c6_panel_respect:
+      "그의 뜻을 지키는 변론은 그를 사람으로 둡니다. 위원회는 사람이 아니라 사유서를 읽습니다.",
+    c6_panel_submit:
+      "동의 없는 제출은 그를 살릴 수 있습니다. 살아남은 그는 자기 사건의 증인이 아니라 자료가 됩니다.",
+    c6_panel_both:
+      "놓친 것과 걸린 것을 같은 장에 쓰면 어느 쪽도 변명이 되지 않습니다. 대신 어느 쪽도 그를 구하지 않습니다.",
+    c6_final_person:
+      "이름을 빼면 오늘은 아무도 무너지지 않습니다. 닫히지 않은 배차 사고 건은 다음 사람의 책상으로 갑니다.",
+    c6_final_record:
+      "설정값이 열리면 실험은 조사 대상이 됩니다. 그 조사에서 가장 먼저 읽히는 것은 당신의 1년입니다.",
+    c6_final_close:
+      "세운 이름 하나로 사건은 오늘 닫힙니다. 그 이름은 내일부터 이 조직이 실패를 처리하는 방식이 됩니다.",
+    // 사건 06-11. The hidden route and its close answered with the scene's title and one stock sentence; these are the replies.
+    c6_route_system_index: "끝까지 열면 다음 참가자 칸에는 이름 대신 조건만 먼저 적혀 있습니다. 누가 앉든 같은 실험이 이어진다는 뜻입니다.",
+    c6_route_system_quiet: "색인을 닫으면 위원회는 예정대로 열립니다. 두 사람이 한 실험의 위아래 줄이었다는 사실은 그 방에 들어가지 못합니다.",
+    c6_route_system_pair: "같이 보자고 하면 오진우는 자기 줄보다 당신 줄을 먼저 읽습니다. 한참 뒤에 그가 말합니다. '그럼 제가 빨랐던 게 아니네요.'",
+    c6_final_system_route_a: "한 기록으로 내면 두 사람은 경쟁자가 아니라 같은 실험의 증인이 됩니다. 오진우가 감추고 싶어 한 속도의 이유도 그 기록에 함께 실립니다.",
+    c6_final_system_route_b: "조용히 끝내면 이번 위원회는 짧아집니다. 비어 있는 칸은 비어 있는 채로 다음 사람을 기다립니다.",
+    c6_final_system_route_c: "이름을 적으면 색인은 당신을 다음 참가자로 읽습니다. 그 칸에 앉을 뻔한 누군가는 자기가 비켜 갔다는 것을 끝내 모릅니다.",
+    c6_evidence_turn_pair: "대조표가 제출되면 위원회는 날짜부터 읽습니다. 그의 창이 줄어든 날마다 당신의 선택이 하루 앞에 적혀 있습니다.",
+    c6_evidence_turn_shield: "당신 쪽을 가리면 표에는 그의 줄어든 시간만 남습니다. 누구 때문에 줄었는지는 빈칸이 됩니다.",
+    c6_evidence_turn_hand: "먼저 건네면 오진우가 날짜를 손가락으로 하나씩 짚습니다. 위원회에 낼지 말지는 이제 그가 정합니다.",
+  },
+  setting: { place: "트리거랩 4층 분석관실", clock: "인사위원회까지 48h" },
+  sceneContext: {
+    // ---------------------------------------------------------------- CASE 06
+    c6_start_owner: {
+      place: "트리거랩 4층 분석관실",
+      clock: "인사위원회까지 48h",
+      question: "당신이 공개한 책임 문장을 읽은 사람이 사흘째 나오지 않습니다. 먼저 무엇을 확인하겠습니까?",
+      lead: "복구 통제실을 떠나 트리거랩으로 돌아온 아침입니다. 이번 사건의 조사 대상은 바깥 기관이 아니라 통로 끝 여덟 걸음 거리의 자리입니다.",
+    },
+    c6_start_system: {
+      place: "트리거랩 4층 분석관실",
+      clock: "인사위원회까지 48h",
+      question: "당신이 고친 구조가 승인자를 또렷하게 남겼고, 그 기록이 옆자리를 가리킵니다. 어떻게 하겠습니까?",
+      lead: "복구 통제실을 떠나 트리거랩으로 돌아온 아침입니다. 정확해진 기록이 가장 먼저 겨눈 사람은 당신이 아는 사람이었습니다.",
+    },
+    c6_start_name: {
+      place: "트리거랩 4층 분석관실",
+      clock: "인사위원회까지 48h",
+      question: "한 사람을 세워 닫는 방식이 선례가 됐고, 이번 대상은 옆자리입니다. 그 선례를 따르겠습니까?",
+      lead: "복구 통제실을 떠나 트리거랩으로 돌아온 아침입니다. 지난번 당신이 쓴 절차가 그대로 준비돼 있습니다.",
+    },
+    c6_start: {
+      place: "트리거랩 4층 분석관실",
+      clock: "인사위원회까지 48h",
+      question: "옆자리 오진우가 사흘째 오지 않고, 이틀 뒤 그가 책임자로 세워집니다. 48시간을 어디에 쓰겠습니까?",
+      lead: "복구 통제실에서 돌아온 아침, 처음으로 조사 대상이 바깥 기관이 아닙니다. 사건 파일에 적힌 이름은 그동안 내내 당신 옆방에서 같은 자료를 받던 사람입니다.",
+    },
+    c6_desk: {
+      place: "트리거랩 4층 · 오진우의 자리",
+      clock: "인사위원회까지 41h",
+      question: "그의 책상은 사흘째 그대로입니다. 사람에게 먼저 묻겠습니까, 지워진 기록을 먼저 열겠습니까?",
+      lead: "그의 자리는 통로 끝, 당신 자리에서 여덟 걸음입니다. 두 달 동안 여덟 걸음 안에서 무슨 일이 있었는지 아무도 몰랐습니다.",
+    },
+    c6_kitchen: {
+      place: "트리거랩 4층 탕비실",
+      clock: "인사위원회까지 38h",
+      question: "조사관과 현장 담당이 그의 컵을 두고 실랑이 중입니다. 여기서 들은 말을 자료에 넣겠습니까?",
+      lead: "조사가 잠깐 멈춘 자리입니다. 커피 머신이 고장 나서 셋 다 물만 받아 들고 서 있습니다.",
+    },
+    c6_kitchen_reaction: {
+      place: "트리거랩 4층 탕비실",
+      clock: "인사위원회까지 36h",
+      question: "반재욱이 컵 자리에 그의 이름만 적어 붙였습니다. 그 표시를 그대로 두겠습니까?",
+    },
+    c6_logs: {
+      place: "트리거랩 4층 분석관실 · 실험 단말",
+      clock: "인사위원회까지 30h",
+      question: "그의 결정 창은 그동안 내내 줄고 당신 것은 늘었습니다. 이 사실을 그에게 알리겠습니까?",
+      lead: "노바웍스 입찰장에서 두 번, 에코의 화면에서 한 번 스쳐 간 문장이 있었습니다. 오진우에게도 별도의 압박 조건이 있었을지 모른다는 말. 그 파일이 지금 열렸습니다.",
+    },
+    c6_branch_roof: {
+      place: "트리거랩 옥상",
+      clock: "인사위원회까지 26h",
+      question: "오진우가 묻습니다. 자신이 빨랐던 건지, 빠르게 만들어진 건지. 무엇이라 답하겠습니까?",
+      lead: "사흘 만에 그를 직접 만납니다. 기록되지 않는 유일한 자리입니다.",
+    },
+    c6_branch_roof_follow: {
+      place: "트리거랩 옥상 엘리베이터 앞",
+      clock: "인사위원회까지 25h",
+      question: "도윤하가 식은 커피 두 잔을 들고 서 있습니다. 누가 그에게 건네겠습니까?",
+    },
+    c6_family: {
+      place: "트리거랩 4층 분석관실 · 전화",
+      clock: "인사위원회까지 20h",
+      question: "그의 누나가 승진 축하 자리를 언제 하느냐고 묻습니다. 가족에게 사실대로 알리겠습니까?",
+      lead: "그 승진은 노바웍스 입찰 직후였습니다. 같은 주에 그의 결정 창이 처음 줄었습니다.",
+    },
+    c6_family_reaction: {
+      place: "트리거랩 4층 분석관실 · 전화",
+      clock: "인사위원회까지 18h",
+      question: "누나가 날짜를 다시 물어옵니다. 오늘은 답하지 않는 쪽을 택하겠습니까?",
+    },
+    c6_panel: {
+      place: "트리거랩 2층 인사위원회 대기실",
+      clock: "위원회 시작까지 30m",
+      question: "오진우가 변호하지 말라고 합니다. 그의 뜻을 따르겠습니까, 동의 없이 자료를 내겠습니까?",
+      lead: "사흘 만에 그가 넥타이를 맸습니다. 그가 지키려는 것은 경력이 아니라 자기가 빨랐다는 사실 하나입니다.",
+    },
+    c6_ledger: {
+      place: "트리거랩 2층 인사위원회 대기실",
+      clock: "위원회 시작까지 10m",
+      question: "두 사람의 프로필이 나란히 떴고 하나는 대조군입니다. 두 장을 함께 내겠습니까?",
+    },
+    c6_ledger_reaction: {
+      place: "트리거랩 2층 인사위원회 대기실",
+      clock: "위원회 시작까지 5m",
+      question: "대조군은 실험을 모르는 쪽이라고 합니다. 지금 아는 당신은 무엇을 하겠습니까?",
+    },
+    c6_route_system: {
+      place: "트리거랩 4층 분석관실 · 실험 색인",
+      clock: "인사위원회까지 28h",
+      question: "색인을 열자 두 사람이 한 실험의 위아래 선이었습니다. 다음 참가자 칸까지 확인하겠습니까?",
+      lead: "오진우 한 사람을 따지는 대신 판을 다시 짜자, 사건 파일이 아니라 실험 색인이 열렸습니다.",
+    },
+    c6_final_system_route: {
+      place: "트리거랩 2층 인사위원회실",
+      clock: "결론 요구 직전",
+      question: "색인에는 다음 참가자 칸이 비어 있습니다. 그 칸을 어떻게 하겠습니까?",
+    },
+    c6_evidence_turn: {
+      place: "트리거랩 4층 분석관실 · 실험 단말",
+      clock: "인사위원회까지 22h",
+      question: "그의 조건이 줄어든 날짜가 전부 당신의 선택 다음 날입니다. 이 대조표를 어디에 쓰겠습니까?",
+    },
+    c6_final: {
+      place: "트리거랩 2층 인사위원회실",
+      clock: "결론 요구 직전",
+      question: "그를 세우면 배차 사고 건이 오늘 닫히고, 설정값을 꺼내면 트리거랩이 열립니다. 어느 쪽입니까?",
+      lead: "위원 다섯 명이 당신을 봅니다. 당신의 프로필도 같은 폴더에 있다는 사실은 이 방에서 당신만 압니다.",
+    },
+    c6_aftershock: {
+      place: "트리거랩 4층 · 오진우의 자리",
+      clock: "위원회 다음 날 오전",
+      question: "위원회는 끝났고 자리는 그대로입니다. 그 자리를 남기겠습니까, 설정값을 열겠습니까?",
+      lead: "화분에는 여전히 물이 넘칩니다. 누가 주는지는 이제 모두가 압니다.",
+    },
+  },
+  clue: {
+    id: "c6-mirrored-profile",
+    title: "거울 프로필",
+    text: "경쟁자의 실험 프로필이 당신 것과 같은 번호를 씁니다. 두 사람은 처음부터 한 실험의 양쪽이었습니다.",
+  },
+  outcomes: {
+    c6_after_stand: { tag: "자리를 남긴 결말", title: "돌아올 의자를 치우지 않았다", text: "사건은 오늘 닫히지 않았습니다. 대신 이 조직에서 무너진 사람이 돌아올 수 있다는 전례가 처음 생겼습니다." },
+    c6_after_open: { tag: "조건을 연 결말", title: "두 사람의 설정값을 같은 날 공개했다", text: "경쟁자는 피해자가 아니라 증인이 됐고, 당신도 같은 실험의 피험자로 기록됐습니다." },
+    c6_after_name: { tag: "이름으로 닫은 결말", title: "옆자리의 이름으로 사건을 끝냈다", text: "가장 빠른 종결이었습니다. 그 방식은 이제 이 조직이 실패를 처리하는 표준 절차가 됩니다." },
+  },
+  carryovers: {
+    c6_after_stand: { trust: 8, capital: -5, fatigue: 6 },
+    c6_after_open: { legitimacy: 9, humanCost: -4, fatigue: 6 },
+    c6_after_name: { trust: -10, humanCost: 8, capital: 5 },
+  },
+  continuityChallenges: {
+    c5_after_owner: { id: "protect-trust", title: "책임을 사람에게 돌려주기", text: "자기 책임을 인정한 기준을 옆자리 사람에게도 똑같이 적용하는 선택을 찾아야 합니다." },
+    c5_after_system: { id: "use-reframe", title: "정확한 기록 의심하기", text: "당신이 또렷하게 만든 기록이 사람을 겨누고 있지 않은지 판을 뒤집어 확인해야 합니다." },
+    c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 숨은 단서를 열 수 있습니다." },
+  },
+};

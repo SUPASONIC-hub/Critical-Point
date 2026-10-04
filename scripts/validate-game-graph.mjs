@@ -22,17 +22,6 @@ import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge,
 import { pressureBeats } from "../src/nodes/sceneBuild.js";
 import { sceneContext } from "../src/nodes/sceneContext.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
-import { case01Nodes } from "../src/nodes/case01.js";
-import { case02Nodes } from "../src/nodes/case02.js";
-import { case03Nodes } from "../src/nodes/case03.js";
-import { case04Nodes } from "../src/nodes/case04.js";
-import { case05Nodes } from "../src/nodes/case05.js";
-import { case06Nodes } from "../src/nodes/case06.js";
-import { case07Nodes } from "../src/nodes/case07.js";
-import { case08Nodes } from "../src/nodes/case08.js";
-import { case09Nodes } from "../src/nodes/case09.js";
-import { case10Nodes } from "../src/nodes/case10.js";
-import { case11Nodes } from "../src/nodes/case11.js";
 import { finalCaseNodes } from "../src/nodes/finalCase.js";
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
@@ -379,8 +368,7 @@ CASE_SEQUENCE.forEach((caseId, index) => {
  * A `next` that is written must be the one the built graph uses.
  */
 const authoredSources = [
-  ...[case01Nodes, case02Nodes, case03Nodes, case04Nodes, case05Nodes, case06Nodes, case07Nodes, case08Nodes, case09Nodes, case10Nodes, case11Nodes, finalCaseNodes]
-    .map((table) => ({ owner: "authored", table })),
+  { owner: "authored", table: finalCaseNodes },
   ...AUTHORED_CASE_PACKS.flatMap((pack) => [
     { owner: pack.id, table: pack.nodes },
     { owner: pack.id, table: pack.aftermath },
@@ -499,7 +487,24 @@ const PACK_KEYS = [
   "evidencePlan", "memoryPlan", "openingRoutes", "openingCopy", "openingSignatures", "voiceLines", "echoReplies",
   "characterProfiles", "setting", "sceneContext", "clue", "outcomes", "carryovers", "continuityChallenges",
 ];
-const OPTIONAL_PACK_KEYS = ["characterOverrides"];
+// `routeBody` is the authored stretch a route walks before its final; only
+// 사건 01 and 03-05 route that way. A pack with no one new to introduce writes
+// no `characterProfiles`.
+const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody"];
+/**
+ * 사건 01-11 were written before the shape below was fixed, into tables the
+ * whole season shared. They are packs now, held to everything a pack's tables
+ * have to agree on with each other, but not to the scene counts: 사건 01 has
+ * four connective scenes and ids with no prefix, 사건 01-05 fork into routes
+ * that close on their own finals, and 사건 02 writes its routes out scene by
+ * scene in `gameData.js` instead of in a plan.
+ */
+const EARLY_PACKS = CASE_SEQUENCE.filter((caseId) => /^case(0[1-9]|1[01])$/.test(caseId));
+const PACK_OMISSIONS = {
+  case01: ["memoryPlan"], // deals no memory card
+  case02: ["routePlan"],
+  case06: ["openingSignatures"],
+};
 const sameKeys = (left, right) => left.length === right.length && [...left].sort().join() === [...right].sort().join();
 const keyOwners = new Map();
 function claim(table, key, packId) {
@@ -507,7 +512,7 @@ function claim(table, key, packId) {
   if (owner) failures.push(`${packId}.${table}.${key} is also written by ${owner}`);
   else keyOwners.set(`${table}:${key}`, packId);
 }
-// What 사건 01-11 and the finale write by hand is claimed first, so a pack
+// What the finale writes by hand is claimed first, so a pack
 // cannot take a scene id they already use.
 for (const [nodeId, node] of Object.entries(nodes)) {
   if (!AUTHORED_CASE_PACKS.some((pack) => pack.id === node.caseId)) claim("scene", nodeId, node.caseId);
@@ -515,9 +520,10 @@ for (const [nodeId, node] of Object.entries(nodes)) {
 
 AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   const fail = (message) => failures.push(`pack ${pack.id}: ${message}`);
-  const keys = Object.keys(pack).filter((key) => !OPTIONAL_PACK_KEYS.includes(key));
-  const missing = PACK_KEYS.filter((key) => !keys.includes(key));
-  const extra = keys.filter((key) => !PACK_KEYS.includes(key));
+  const keys = Object.keys(pack);
+  const early = EARLY_PACKS.includes(pack.id);
+  const missing = PACK_KEYS.filter((key) => !keys.includes(key) && !OPTIONAL_PACK_KEYS.includes(key) && !PACK_OMISSIONS[pack.id]?.includes(key));
+  const extra = keys.filter((key) => !PACK_KEYS.includes(key) && !OPTIONAL_PACK_KEYS.includes(key));
   if (missing.length) fail(`is missing ${missing.join(", ")}`);
   if (extra.length) fail(`has fields no module reads: ${extra.join(", ")}`);
   if (missing.length) return;
@@ -529,20 +535,24 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   const connectiveIds = pack.connectiveScenes.map(([id]) => id);
   const reactionIds = pack.reactionScenes.map(([id]) => id);
   const openingIds = Object.values(pack.openingRoutes);
-  const sceneIds = [
-    ...Object.keys(pack.nodes), ...Object.keys(pack.aftermath), ...connectiveIds, ...reactionIds, ...Object.keys(pack.branchScenes),
-    pack.routePlan.system.route, pack.routePlan.system.final,
-    ...Object.values(pack.routePlan.choices).flatMap((route) => [route.route, route.final]),
-    pack.evidencePlan.node, ...openingIds,
-  ];
+  const sceneIds = early
+    ? Object.keys(nodes).filter((sceneId) => nodes[sceneId].caseId === pack.id)
+    : [
+        ...Object.keys(pack.nodes), ...Object.keys(pack.aftermath), ...connectiveIds, ...reactionIds, ...Object.keys(pack.branchScenes),
+        pack.routePlan.system.route, pack.routePlan.system.final,
+        ...Object.values(pack.routePlan.choices).flatMap((route) => [route.route, route.final]),
+        pack.evidencePlan.node, ...openingIds,
+      ];
   const expectedScenes = hasOpenings ? 20 : 17;
-  if (sceneIds.length !== expectedScenes) fail(`writes ${sceneIds.length} scenes, not ${expectedScenes}`);
-  if (Object.keys(pack.nodes).length !== 5) fail(`authors ${Object.keys(pack.nodes).length} scenes, not 5`);
-  if (pack.connectiveScenes.length !== 3 || pack.reactionScenes.length !== 3) fail("does not have three connective and three reaction scenes");
+  if (!early) {
+    if (sceneIds.length !== expectedScenes) fail(`writes ${sceneIds.length} scenes, not ${expectedScenes}`);
+    if (Object.keys(pack.nodes).length !== 5) fail(`authors ${Object.keys(pack.nodes).length} scenes, not 5`);
+    if (pack.connectiveScenes.length !== 3 || pack.reactionScenes.length !== 3) fail("does not have three connective and three reaction scenes");
+  }
   if (Object.keys(pack.branchScenes).length !== 2) fail("does not have a side door of two scenes");
   if (openingIds.length !== (hasOpenings ? 3 : 0)) fail(`has ${openingIds.length} openings`);
   for (const sceneId of sceneIds) {
-    if (!sceneId?.startsWith(prefix)) fail(`the scene ${sceneId} does not carry the case's prefix ${prefix}`);
+    if (!early && !sceneId?.startsWith(prefix)) fail(`the scene ${sceneId} does not carry the case's prefix ${prefix}`);
     else claim("scene", sceneId, pack.id);
     if (nodes[sceneId] && nodes[sceneId].caseId !== pack.id) fail(`the scene ${sceneId} was built into ${nodes[sceneId].caseId}`);
     if (!nodes[sceneId]) fail(`the scene ${sceneId} never reached the graph`);
@@ -584,7 +594,7 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
 
   // Openings are keyed on how the previous case closed.
   if (!sameKeys(Object.keys(pack.openingCopy), openingIds)) fail("openingCopy is not keyed by the openings");
-  if (!sameKeys(Object.keys(pack.openingSignatures), openingIds)) fail("openingSignatures is not keyed by the openings");
+  if (pack.openingSignatures && !sameKeys(Object.keys(pack.openingSignatures), openingIds)) fail("openingSignatures is not keyed by the openings");
   if (!sameKeys(Object.keys(pack.continuityChallenges), Object.keys(pack.openingRoutes)) && hasOpenings) fail("continuityChallenges and openingRoutes are keyed on different outcomes");
   for (const outcomeId of Object.keys(pack.openingRoutes)) {
     if (!outcomeId.startsWith(previousPrefix)) fail(`the opening for ${outcomeId} is not keyed on the previous case`);

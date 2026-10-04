@@ -51,9 +51,9 @@ list of the files it touched.
 
 Still open, on purpose:
 
-- 사건 01-11 are not packs yet (priority 74), and the authored copy tables are
-  still matched to their choices by position (priority 11). The fix is one
-  choice object that carries its own label, effect and copy.
+- The authored copy tables are still matched to their choices by position
+  (priority 11). The fix is one choice object that carries its own label,
+  effect and copy. The finale is the one case that is not a pack (priority 74).
 - Season length -- about 491 scenes a season, about 46 of them in the 프롤로그 --
   is an authoring decision, not a code problem.
 - The calendar does not close: the 프롤로그 is 2023 and the season's weekdays
@@ -480,9 +480,8 @@ Still open, on purpose:
     captured PNG, not the DOM: a fractional document height rasterises a pixel
     or two differently from `scrollHeight`, and the capture is what
     `toHaveScreenshot()` compares.
-48. Adding a case moves keys in a known set of places: the case's pack (or,
-    for 사건 01-11, the per-case tables in `gameData.js`, `gameLogic.js` and
-    `gameDialogue.js`), `CASE_SEQUENCE` and start/result nodes in
+48. Adding a case moves keys in a known set of places: the case's pack,
+    `CASE_SEQUENCE` and start/result nodes in
     `gameCases.js`, the copy in `caseCopy.js`, the next case's openings keyed
     on this one's aftermath, and `season_case_ids()` in a new migration
     (`check:grants` fails until it matches). A scene under pressure is named in
@@ -723,7 +722,7 @@ Still open, on purpose:
     `check:graph`, which validates each pack's shape. Parallel authors get
     names handed out, not examples: one person per name across the season, and
     the check enforces it (priority 56).
-74. A case is one file. From 사건 12 on (and the 프롤로그), a case is a pack:
+74. A case is one file. Every case but the finale is a pack:
     `src/nodes/<id>.js` exports its authored scenes and one object with a field
     per table -- aftermath, connective and reaction scenes with effects and
     copy, side door, hidden route, evidence turn, memory choice, openings keyed
@@ -731,8 +730,8 @@ Still open, on purpose:
     scene context, clue, outcomes, carryovers and continuity challenges. A pack
     may also carry `characterOverrides` (who someone is for that case only) and,
     on its route plan, `system.finalTitle` / `finalText` / `finalMemo` (its
-    hidden route's closing scene). The same card copy for 사건 01-11 and the
-    finale, which have no pack, is `src/nodes/coreCards.js`.
+    hidden route's closing scene). The same card copy for the finale, which has
+    no pack, is `src/nodes/coreCards.js`.
     `src/nodes/casePacks.js` lists the packs and each owning module merges its
     field. What is still written by hand per case: `CASE_SEQUENCE`,
     start/result nodes, `authoredNodeOrders`, objectives and `seasonCasesBase` in
@@ -741,7 +740,13 @@ Still open, on purpose:
     motif; and `season_case_ids()` (priority 60). The scene graph is built on
     `structuredClone` copies of the authored tables, and an authored `next`
     must be the one the built graph uses -- `check:graph` fails on a dead one.
-    사건 01-11 moving into packs is open work.
+    사건 01-11 were moved into packs as they were written, so they are held
+    to what a pack's tables must agree on but not to the scene counts
+    (`EARLY_PACKS` and `PACK_OMISSIONS` in `scripts/validate-game-graph.mjs`):
+    사건 01 has four connective scenes and unprefixed ids, 사건 01 and 03-05
+    carry a `routeBody`, and 사건 02's routes are still written scene by scene
+    in `gameData.js` (`registerCase02DramaticRoutes`). The finale's tables stay
+    in `gameData.js`, `gameDialogue.js`, `gameLogic.js` and `sceneContext.js`.
 75. The ending's gates are placed against the season a player plays.
     `npm run check:endings` replays 600 seasons from seven player archetypes
     through the runtime's own functions -- the opening route and carryover, the

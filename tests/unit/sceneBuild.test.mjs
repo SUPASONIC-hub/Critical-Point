@@ -115,6 +115,8 @@ test("fallback copy is counted, and a written closing scene is used", () => {
   assert.equal(fallbackCopy.scenes.length, new Set(fallbackCopy.scenes).size);
   for (const nodeId of fallbackCopy.scenes) assert.equal(nodes[nodeId].title, "준비된 결말 밖에서");
   for (const pack of CASE_PACKS) {
+    // 사건 02 writes its routes out scene by scene and has no plan.
+    if (!pack.routePlan) continue;
     const { final, finalTitle, finalText, finalMemo } = pack.routePlan.system;
     const written = Boolean(finalTitle && finalText && finalMemo?.length);
     assert.equal(fallbackCopy.scenes.includes(final), !written, `${final} is ${written ? "written" : "not written"} and the report says otherwise`);

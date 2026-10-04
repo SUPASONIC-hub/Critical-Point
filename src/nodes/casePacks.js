@@ -1,15 +1,17 @@
 /**
  * The cases that arrive as one file each.
  *
- * Cases 01-11 were written into the season's shared tables -- aftermath,
- * connective and reaction scenes, their effects and copy, the side door, the
- * hidden route, the evidence turn, the openings, the voice and echo lines, the
- * scene context, the clue and the three outcome tables -- so adding a case
- * meant editing some twenty places in four files. From 사건 12 on, a case is a
- * pack: one object with a field for each of those tables, merged by the module
- * that owns the table (`gameData.js`, `gameLogic.js`, `sceneContext.js`). The
- * season order still lives in `CASE_SEQUENCE`; this list only says which cases
- * carry their own tables.
+ * A case is a pack: one object with a field for each table the season keeps --
+ * aftermath, connective and reaction scenes, their effects and copy, the side
+ * door, the hidden route, the evidence turn, the openings, the voice and echo
+ * lines, the scene context, the clue and the three outcome tables -- merged by
+ * the module that owns the table (`gameData.js`, `gameDialogue.js`,
+ * `gameLogic.js`, `sceneContext.js`). 사건 01-11 were written into those
+ * tables directly, so adding a case meant editing some twenty places in four
+ * files; they were moved into packs as they stood, which is why their shape is
+ * looser than the later ones' (`EARLY_PACKS` in scripts/validate-game-graph.mjs).
+ * Only the finale still writes into the tables. The season order lives in
+ * `CASE_SEQUENCE`; this list only says which cases carry their own tables.
  *
  * The 프롤로그 is five packs of the same shape, and they are listed first
  * because that is the order they play in -- though this list does not decide
@@ -22,6 +24,17 @@ import { prologue02 } from "./prologue02.js";
 import { prologue03 } from "./prologue03.js";
 import { prologue04 } from "./prologue04.js";
 import { prologue05 } from "./prologue05.js";
+import { case01 } from "./case01.js";
+import { case02 } from "./case02.js";
+import { case03 } from "./case03.js";
+import { case04 } from "./case04.js";
+import { case05 } from "./case05.js";
+import { case06 } from "./case06.js";
+import { case07 } from "./case07.js";
+import { case08 } from "./case08.js";
+import { case09 } from "./case09.js";
+import { case10 } from "./case10.js";
+import { case11 } from "./case11.js";
 import { case12 } from "./case12.js";
 import { case13 } from "./case13.js";
 import { case14 } from "./case14.js";
@@ -67,6 +80,17 @@ export const CASE_PACKS = [
   prologue03,
   prologue04,
   prologue05,
+  case01,
+  case02,
+  case03,
+  case04,
+  case05,
+  case06,
+  case07,
+  case08,
+  case09,
+  case10,
+  case11,
   case12,
   case13,
   case14,
