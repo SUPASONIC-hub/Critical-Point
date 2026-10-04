@@ -546,6 +546,12 @@ export const case07 = {
     },
   },
   voiceLines: {
+    c7_final_system_route_a: "다시 낱장으로 흩어지지 않게, 열아홉 건을 하나의 문서로 묶어 외부에 낸다.",
+    c7_final_system_route_b: "열두 시간으로 되돌릴 수 있는 건 하나라며, 내 건만 취소시키고 나머지는 덮는다.",
+    c7_final_system_route_c: "나도 같은 표의 한 줄임을 숨기지 않기로 하고, 표의 마지막 줄에 내 이름을 적어 남긴다.",
+    c7_route_system_quiet: "남의 발령까지 다툴 처지가 아니라며, 표는 닫고 내 건만 처리한다.",
+    c7_route_system_trace: "빈 승인란이 우연인지 가려낼 수 있게, 열아홉 건을 전부 따라가 표를 완성한다.",
+    c7_route_system_call: "기록보다 겪은 사람들 말이 먼저여서, 먼저 발령된 열일곱 명에게 연락한다.",
     // CASE 07. The season's one case where the analyst asks instead of decides,
     // so the lines are spoken to a person in the room rather than to a document.
     c7_start_gather: "짐은 나중에 싸도 된다며, 남은 이틀을 전부 자료에 쓰겠다고 말한다.",
