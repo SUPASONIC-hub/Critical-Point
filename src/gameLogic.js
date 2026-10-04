@@ -435,61 +435,6 @@ function packTable(field) {
 }
 
 const discoveryClues = {
-  case01: {
-    id: "c1-hidden-ledger",
-    title: "숨은 급여표",
-    text: "공식 보고서보다 먼저 움직인 돈의 흔적이 있습니다. 누군가는 이미 다음 사건을 알고 있었습니다.",
-  },
-  case02: {
-    id: "c2-false-timestamp",
-    title: "어긋난 시간",
-    text: "유출 기록의 시간이 서로 맞지 않습니다. 범인보다 기록을 만든 사람이 더 중요할 수 있습니다.",
-  },
-  case03: {
-    id: "c3-second-scoreboard",
-    title: "두 번째 점수판",
-    text: "공개 점수판 뒤에 다른 평가표가 있습니다. 경쟁자는 당신의 답뿐 아니라 망설임도 보고 있습니다.",
-  },
-  case04: {
-    id: "c4-exception-file",
-    title: "예외 파일",
-    text: "이번 규칙 위반은 처음이 아닙니다. 누군가는 오래전부터 예외를 정상처럼 기록해 왔습니다.",
-  },
-  case05: {
-    id: "c5-empty-seat",
-    title: "비어 있는 자리",
-    text: "실패 보고서에는 이름이 하나 빠져 있습니다. 말하지 못한 사람이 시스템의 가장 큰 비용을 떠안았습니다.",
-  },
-  case06: {
-    id: "c6-mirrored-profile",
-    title: "거울 프로필",
-    text: "경쟁자의 실험 프로필이 당신 것과 같은 번호를 씁니다. 두 사람은 처음부터 한 실험의 양쪽이었습니다.",
-  },
-  case07: {
-    id: "c7-drafted-first",
-    title: "먼저 쓰인 발령서",
-    text: "발령서 작성일이 조사 개시보다 12일 앞섭니다. 이 인사는 사건의 결과가 아니라 사건보다 먼저 준비된 답입니다.",
-  },
-  case08: {
-    id: "c8-painting-dates",
-    title: "그림값의 날짜",
-    text: "그림값을 작품이 아니라 승인 일정으로 나누면 딱 떨어집니다. 이 갤러리는 그림을 판 것이 아니라 날짜를 팔았습니다.",
-  },
-  case09: {
-    id: "c9-bought-recovery",
-    title: "사 둔 회수율",
-    text: "청산이 유리하다는 숫자를 만든 감정평가법인이 흔적표와 같은 세무 대리인을 씁니다. 계산서도 누군가 주문할 수 있습니다.",
-  },
-  case10: {
-    id: "c10-default-reason",
-    title: "사유란의 기본값",
-    text: "4년 전 병가 신청서에서 '업무상' 보기가 삭제됐습니다. 열아홉 명이 같은 문구를 쓴 건 열아홉 번의 선택이 아니라 선택지가 하나였기 때문입니다.",
-  },
-  case11: {
-    id: "c11-two-timestamps",
-    title: "다섯 시간 열두 분",
-    text: "반려 서명은 13:32, 폐기 처리는 18:44였습니다. 반려한 사람과 반대 의견을 지운 사람은 같은 사람이 아니었습니다.",
-  },
   final: {
     id: "final-observer-key",
     title: "관찰자의 열쇠",
@@ -845,61 +790,6 @@ function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const outcomes = {
-    case01: {
-      c1_after_people: { tag: "사람을 먼저 세운 결말", title: "급여명세서보다 먼저 이름을 불렀다", text: "직원과 협력사는 당신의 결정을 완전히 믿지는 않지만, 적어도 누가 비용을 떠안는지 알게 됐습니다. 다음 사건은 사람을 보호한 대가로 더 느리게 시작됩니다." },
-      c1_after_numbers: { tag: "숫자를 공개한 결말", title: "현금 흐름표가 약속이 되었다", text: "회사는 더 많은 질문을 받게 됐지만, 숨겨진 손실은 줄었습니다. 다음 사건은 기록을 믿을지 사람을 믿을지 묻습니다." },
-      c1_after_silence: { tag: "침묵을 택한 결말", title: "조용한 하루를 샀다", text: "자금은 하루를 벌었지만 직원들의 믿음은 늦게 회복됩니다. 다음 사건에는 설명되지 않은 비용이 따라옵니다." },
-    },
-    case02: {
-      c2_after_audit: { tag: "기록을 복원한 결말", title: "사라진 11초가 증거가 되었다", text: "범인을 바로 정하지 않고 기록의 흐름을 복원했습니다. 진실은 느려졌지만, 누군가의 이름을 성급히 고정하지 않았습니다." },
-      c2_after_person: { tag: "사람을 만난 결말", title: "보호는 의심받을 권리도 남겼다", text: "이민서는 스스로 말할 수 있었고 사건은 더 복잡해졌습니다. 대신 다음 판단은 사람의 맥락을 지우기 어려워집니다." },
-      c2_after_public: { tag: "즉시 공개한 결말", title: "경보가 사건보다 먼저 퍼졌다", text: "외부의 눈이 사건을 감시하기 시작했습니다. 책임은 분명해졌지만, 아직 확인되지 않은 사실도 함께 퍼졌습니다." },
-    },
-    case03: {
-      c3_after_share: { tag: "공동 설계 결말", title: "승부를 공동 작업으로 바꾸었다", text: "오진우와의 경쟁은 사라지지 않았지만, 고객에게는 두 사람이 책임지는 안이 남았습니다." },
-      c3_after_proof: { tag: "증거를 택한 결말", title: "점수판보다 결함을 먼저 보여주었다", text: "당장 얻을 점수는 줄었지만, 숨겨진 보안 위험이 다음 사건의 공개 기록이 됐습니다." },
-      c3_after_win: { tag: "승리를 확정한 결말", title: "가장 빠른 답이 가장 오래 남았다", text: "당신은 이겼지만, 경쟁자가 숨긴 빈틈까지 함께 가져왔습니다. 다음 사건은 그 승리의 비용을 청구합니다." },
-    },
-    case04: {
-      c4_after_rule: { tag: "기준을 다시 만든 결말", title: "예외가 규칙의 시작이 되었다", text: "예외를 숨기지 않고 공개 조건으로 묶었습니다. 더 느려졌지만 다음 기관이 같은 문을 몰래 열 수 없게 됐습니다." },
-      c4_after_service: { tag: "서비스를 지킨 결말", title: "한 번 더 넘어간 선", text: "사람들은 도움을 받았지만 예외는 기록으로 남았습니다. 다음 사건에서 누군가는 그 기록을 이용하려 합니다." },
-      c4_after_stop: { tag: "감사를 택한 결말", title: "멈춤도 결정이라는 증거", text: "서비스는 흔들렸지만 심사 기준은 처음으로 공개 검토 대상이 됐습니다." },
-    },
-    case05: {
-      c5_after_owner: { tag: "책임을 맡은 결말", title: "내 이름부터 보고서에 올렸다", text: "단독 책임은 문제를 즉시 해결하지 못했지만, 사람들이 숨지 않고 실패를 말할 공간을 만들었습니다." },
-      c5_after_system: { tag: "구조를 고친 결말", title: "범인 대신 반복을 멈추었다", text: "누구도 영웅이 되지 못했지만 같은 실패가 다시 일어날 길은 좁아졌습니다." },
-      c5_after_name: { tag: "책임자를 지목한 결말", title: "한 사람의 이름으로 실패를 닫았다", text: "회의는 빨리 끝났지만, 말하지 못한 사람들의 기록은 아직 남아 있습니다." },
-    },
-    case06: {
-      c6_after_stand: { tag: "자리를 남긴 결말", title: "돌아올 의자를 치우지 않았다", text: "사건은 오늘 닫히지 않았습니다. 대신 이 조직에서 무너진 사람이 돌아올 수 있다는 전례가 처음 생겼습니다." },
-      c6_after_open: { tag: "조건을 연 결말", title: "두 사람의 설정값을 같은 날 공개했다", text: "경쟁자는 피해자가 아니라 증인이 됐고, 당신도 같은 실험의 피험자로 기록됐습니다." },
-      c6_after_name: { tag: "이름으로 닫은 결말", title: "옆자리의 이름으로 사건을 끝냈다", text: "가장 빠른 종결이었습니다. 그 방식은 이제 이 조직이 실패를 처리하는 표준 절차가 됩니다." },
-    },
-    case07: {
-      c7_after_stand: { tag: "사람을 먼저 찾은 결말", title: "이름을 올린 사람들을 하루 만에 다 만났다", text: "문서는 한 줄도 나아가지 않았습니다. 대신 그 문서에 적힌 이름들이 무엇에 동의한 것인지 전부 알고 있게 됐습니다." },
-      c7_after_open: { tag: "원본을 넘긴 결말", title: "권한이 살아 있는 마지막 하루를 다 썼다", text: "외부 감사인은 원본을 받았습니다. 당신은 다음 날 06시 40분 기차에 없었고, 그 사실도 함께 기록됐습니다." },
-      c7_after_alone: { tag: "조용히 떠난 결말", title: "아무에게도 알리지 않고 짐을 쌌다", text: "소란은 없었습니다. 문서에 적힌 다른 이름들은 그대로 남았고, 그들은 당신이 어디 있는지 모릅니다." },
-    },
-    case08: {
-      c8_after_law: { tag: "칼을 법에 맡긴 결말", title: "30년 만에 꺼낸 도장이 흔적표에 찍혔다", text: "복수는 느려졌고 증거는 단단해졌습니다. 오진우는 그 느림을 견디기 어려워했지만, 흔적표에는 이제 반박할 틈이 없습니다." },
-      c8_after_friend: { tag: "친구를 찾은 결말", title: "흔적표보다 먼저 오진우의 문을 두드렸다", text: "고시원 문이 열렸고 둘은 국밥을 먹었습니다. 칼은 아직 아무도 쓰지 않았고, 오진우는 처음으로 복수 말고 다른 계획을 말했습니다." },
-      c8_after_blade: { tag: "칼을 혼자 쥔 결말", title: "흔적표를 혼자 쥐고 기다렸다", text: "아무도 당신이 무엇을 가졌는지 모릅니다. 가장 강한 패를 쥐었지만, 그 패를 쓴 이유를 증언해 줄 사람도 없습니다." },
-    },
-    case09: {
-      c9_after_stay: { tag: "현장을 지킨 결말", title: "야간조의 컵라면이 식기 전에 합의서가 끝났다", text: "고용 승계 합의서의 마지막 서명까지 곁에 있었습니다. 영동지점에는 복귀 지연 사유서가 쌓였고, 풀필먼트센터 휴게실에는 당신 몫의 컵라면이 하나 더 생겼습니다." },
-      c9_after_court: { tag: "끝까지 설명한 결말", title: "살린 이유와 벌한 이유를 법정에서 말했다", text: "회사는 살아남았고, 장부를 부풀린 사람들은 법정에 섰습니다. 계산서 두 장이 같은 사건 번호 아래 묶였습니다." },
-      c9_after_return: { tag: "조용히 돌아간 결말", title: "결의 결과를 영동지점 텔레비전으로 들었다", text: "당신이 없는 자리에서도 결의는 났습니다. 강태민은 당신 몫으로 뜯어 둔 컵라면을 다음 날 아침에 혼자 먹었습니다." },
-    },
-    case10: {
-      c10_after_rest: { tag: "불을 끈 결말", title: "여섯 명이 처음으로 같은 시각에 퇴근했다", text: "34건이 월요일로 넘어갔고, 여섯 사람은 금요일 저녁을 돌려받았습니다. 오래 가는 일은 오래 갈 수 있는 속도로만 갑니다." },
-      c10_after_record: { tag: "제도로 남긴 결말", title: "분담표가 담당자 이름 없이도 도는 문서가 되었다", text: "표는 그룹 제도안으로 접수됐고, 사람이 바뀌어도 남게 됐습니다. 그 표를 누가 자기 성과로 인용할지는 아직 정해지지 않았습니다." },
-      c10_after_keep: { tag: "서랍에 남긴 결말", title: "212개의 이름이 여전히 한 사람의 손에 있다", text: "제도는 통과했고, 제도 밖의 이름들은 당신 서랍에 남았습니다. 보관자가 한 명뿐인 기록은 그 한 명과 함께 사라집니다." },
-    },
-    case11: {
-      c11_after_toast: { tag: "같이 먹은 결말", title: "휴대폰은 밤새 울렸고 아무도 뒤집지 않았다", text: "그날 밤 여섯 사람은 처음으로 같은 테이블에서 끝까지 웃었습니다. 33층의 호출은 다음 날 아침까지 기다려야 했습니다." },
-      c11_after_record: { tag: "기록으로 남긴 결말", title: "잘리지 않은 7분이 누구나 읽는 문서가 되었다", text: "속기록 전문이 공개됐습니다. 당신이 더듬은 12초도, 그룹이 인용할 한 문장도 그대로 남았습니다." },
-      c11_after_summon: { tag: "바로 응한 결말", title: "포장마차를 먼저 나와 33층으로 향했다", text: "당신은 가장 먼저 호출에 답했습니다. 테이블에는 떡볶이 한 접시와 당신 몫의 빈 의자가 남았습니다." },
-    },
     final: {
       f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
       f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
@@ -911,64 +801,7 @@ export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}
 }
 
 export function getOutcomeCarryover({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
-  const carryovers = {
-    case01: {
-      c1_after_people: { trust: 6, humanCost: -3, fatigue: 4 },
-      c1_after_numbers: { capital: -4, legitimacy: 5, fatigue: 2 },
-      c1_after_silence: { capital: 5, trust: -7, legitimacy: -4 },
-    },
-    case02: {
-      c2_after_audit: { time: -5, legitimacy: 6, fatigue: 3 },
-      c2_after_person: { trust: 6, humanCost: -2, fatigue: 5 },
-      c2_after_public: { capital: -5, legitimacy: 8, trust: -3, fatigue: 4 },
-    },
-    case03: {
-      c3_after_share: { trust: 7, fatigue: 5, legitimacy: 3 },
-      c3_after_proof: { capital: -5, legitimacy: 8, time: -4 },
-      c3_after_win: { capital: 7, trust: -8, fatigue: 2 },
-    },
-    case04: {
-      c4_after_rule: { legitimacy: 8, trust: 4, time: -4 },
-      c4_after_service: { humanCost: -4, legitimacy: -8, trust: -3 },
-      c4_after_stop: { capital: -7, legitimacy: 7, humanCost: 8 },
-    },
-    case05: {
-      c5_after_owner: { trust: 7, legitimacy: 5, fatigue: 6 },
-      c5_after_system: { legitimacy: 8, capital: -4, fatigue: 5 },
-      c5_after_name: { trust: -9, humanCost: 7, fatigue: 2 },
-    },
-    case06: {
-      c6_after_stand: { trust: 8, capital: -5, fatigue: 6 },
-      c6_after_open: { legitimacy: 9, humanCost: -4, fatigue: 6 },
-      c6_after_name: { trust: -10, humanCost: 8, capital: 5 },
-    },
-    case07: {
-      c7_after_stand: { trust: 9, capital: -5, fatigue: 6 },
-      c7_after_open: { legitimacy: 10, humanCost: -4, fatigue: 7 },
-      c7_after_alone: { trust: -11, humanCost: 7, capital: 6 },
-    },
-    case08: {
-      c8_after_law: { legitimacy: 10, capital: -5, fatigue: 6 },
-      c8_after_friend: { trust: 9, humanCost: -3, fatigue: 7 },
-      c8_after_blade: { capital: 7, trust: -10, legitimacy: -4 },
-    },
-    case09: {
-      c9_after_stay: { trust: 10, humanCost: -4, fatigue: 7 },
-      c9_after_court: { legitimacy: 10, trust: 3, fatigue: 7 },
-      c9_after_return: { capital: 6, trust: -10, humanCost: 6 },
-    },
-    case10: {
-      c10_after_rest: { trust: 8, humanCost: -5, fatigue: -8 },
-      c10_after_record: { legitimacy: 11, humanCost: 3, fatigue: 5 },
-      c10_after_keep: { capital: 5, trust: 6, legitimacy: -9 },
-    },
-    case11: {
-      c11_after_toast: { trust: 9, humanCost: -4, fatigue: -8 },
-      c11_after_record: { legitimacy: 12, trust: 2, fatigue: 5 },
-      c11_after_summon: { capital: 6, legitimacy: 4, trust: -8 },
-    },
-  };
-  Object.assign(carryovers, packTable("carryovers"));
+  const carryovers = packTable("carryovers");
   return carryovers[caseId]?.[choiceId] ?? {};
 }
 
@@ -996,64 +829,6 @@ export function getSeasonWear(caseId = "") {
 
 export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
   const challenges = {
-    // 사건 01 follows the 프롤로그 now, so it has a predecessor for the first
-    // time: what the analyst carried down to 트리거랩 is what the first table
-    // asks them to put down.
-    case01: {
-      p5_after_hold: { id: "protect-trust", title: "벽의 이름을 오늘의 이름과 잇기", text: "3년 동안 벽에 붙여 둔 열한 개의 이름은 기억이지 기록이 아닙니다. 오늘 72시간 안에서 그 이름들이 누구를 가리키는지 보여 주는 선택을 찾으면 숨은 단서가 열릴 수 있습니다." },
-      p5_after_record: { id: "repair-legitimacy", title: "다시 묶인 매듭을 되찾기", text: "B2의 상자는 당신이 묶은 매듭이 아닙니다. 남겨 둔 기록이 누구의 손을 거쳤는지 먼저 묻는 선택이 공정함을 되찾고 압박을 낮춥니다." },
-      p5_after_alone: { id: "protect-trust", title: "기억을 혼자 쥐지 않기", text: "가방을 비우고 시작한 3년은 증명할 것을 하나도 남기지 않았습니다. 기억만 있다는 사실을 옆 사람에게 먼저 꺼내 놓는 선택이 압박을 낮춥니다." },
-    },
-    case02: {
-      c1_after_people: { id: "protect-trust", title: "보호를 기록으로 만들기", text: "지난 사건처럼 사람을 먼저 보되, 이번에는 보호의 근거까지 기록하면 숨은 단서가 열릴 수 있습니다." },
-      c1_after_numbers: { id: "find-cost", title: "숫자 뒤의 사람 찾기", text: "공개한 숫자가 누구에게 어떤 부담을 옮겼는지 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c1_after_silence: { id: "repair-legitimacy", title: "늦은 설명 되찾기", text: "지난 사건의 침묵으로 흔들린 공정함을 회복하는 선택이 다음 압박을 낮춥니다." },
-    },
-    case03: {
-      c2_after_audit: { id: "find-cost", title: "기록의 빈틈 찾기", text: "복원한 기록이 놓친 비용을 하나 더 찾아야 경쟁자의 빠른 답을 넘어설 수 있습니다." },
-      c2_after_person: { id: "protect-trust", title: "보호와 검증 함께 하기", text: "사람을 지키면서도 근거를 남기는 선택을 찾으면 경쟁 압박을 견딜 수 있습니다." },
-      c2_after_public: { id: "lower-risk", title: "경보의 위험 낮추기", text: "공개 이후 커진 위험을 낮추는 선택이 다음 사건의 기준이 됩니다." },
-    },
-    case04: {
-      c3_after_share: { id: "use-reframe", title: "공동안의 규칙 다시 짜기", text: "공동 작업에서 비어 있던 책임 칸이 누구 것인지 드러나도록 판을 다시 짜야 합니다." },
-      c3_after_proof: { id: "repair-legitimacy", title: "정직함의 피해 줄이기", text: "증거를 공개한 뒤 생긴 피해를 줄이면서 공정함을 유지해야 합니다." },
-      c3_after_win: { id: "find-cost", title: "승리의 숨은 대가 찾기", text: "좋은 결과 뒤에 남은 규칙 위반의 대가를 먼저 찾으면 다음 압박을 통제할 수 있습니다." },
-    },
-    case05: {
-      c4_after_rule: { id: "lower-risk", title: "새 기준의 빈틈 막기", text: "공개한 기준이 현장에서 만들 위험을 낮추는 선택을 찾아야 합니다." },
-      c4_after_service: { id: "repair-legitimacy", title: "예외의 믿음 회복하기", text: "서비스를 지킨 뒤 흔들린 규칙의 믿음을 회복하는 선택이 숨은 단서를 열 수 있습니다." },
-      c4_after_stop: { id: "protect-trust", title: "멈춤의 피해 보호하기", text: "감사를 위해 멈춘 서비스의 사람들을 먼저 보호해야 다음 사건을 버틸 수 있습니다." },
-    },
-    case06: {
-      c5_after_owner: { id: "protect-trust", title: "책임을 사람에게 돌려주기", text: "자기 책임을 인정한 기준을 옆자리 사람에게도 똑같이 적용하는 선택을 찾아야 합니다." },
-      c5_after_system: { id: "use-reframe", title: "정확한 기록 의심하기", text: "당신이 또렷하게 만든 기록이 사람을 겨누고 있지 않은지 판을 뒤집어 확인해야 합니다." },
-      c5_after_name: { id: "repair-legitimacy", title: "선례가 된 방식 되돌리기", text: "이름 하나로 닫은 지난 방식이 이번에도 반복되지 않게 하는 선택이 숨은 단서를 열 수 있습니다." },
-    },
-    case07: {
-      c6_after_stand: { id: "protect-trust", title: "지켜 준 자리를 청구서로 만들지 않기", text: "옆자리를 지킨 기준이 이번엔 당신을 향합니다. 그 기준을 스스로에게도 적용하는 선택을 찾아야 합니다." },
-      c6_after_open: { id: "find-cost", title: "공개가 비껴간 사람 찾기", text: "조건을 열었는데 실험은 남았습니다. 그 공개가 누구를 지나쳤는지 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c6_after_name: { id: "repair-legitimacy", title: "같은 절차를 내 이름으로 열기", text: "남의 이름으로 닫았던 절차가 이번에는 당신 차례입니다. 그 절차를 공정하게 되돌리는 선택이 압박을 낮춥니다." },
-    },
-    case08: {
-      c7_after_stand: { id: "protect-trust", title: "도와준 사람을 흔적에 묻히지 않기", text: "이름을 올려 준 사람들에게 다시 부탁하게 됩니다. 그들의 이름을 흔적표의 피해자로 만들지 않는 선택을 찾아야 합니다." },
-      c7_after_open: { id: "find-cost", title: "원본 뒤에 남은 돈 찾기", text: "원본은 감사인에게 갔지만 돈은 아직 움직입니다. 원본이 비껴간 흐름을 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c7_after_alone: { id: "repair-legitimacy", title: "혼자 본 것을 증거로 만들기", text: "아무도 모르게 내려온 조용함은 무기이자 약점입니다. 혼자 본 흔적을 공정한 기록으로 바꾸는 선택이 압박을 낮춥니다." },
-    },
-    case09: {
-      c8_after_law: { id: "find-cost", title: "느린 법이 놓친 사람 찾기", text: "수사는 시작됐지만 결의는 기다려 주지 않습니다. 기록이 구하지 못한 사람을 먼저 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c8_after_friend: { id: "protect-trust", title: "되찾은 친구를 계산서에 쓰지 않기", text: "오진우와 권도현은 동기입니다. 그 관계를 협상 도구로만 쓰지 않는 선택을 찾아야 합니다." },
-      c8_after_blade: { id: "use-reframe", title: "혼자 쥔 칼을 계산서로 바꾸기", text: "칼은 벌할 수는 있어도 살리지는 못합니다. 흔적표를 사람을 살리는 계산에 넣도록 판을 다시 짜야 합니다." },
-    },
-    case10: {
-      c9_after_stay: { id: "find-cost", title: "이긴 판의 청구서 찾기", text: "1,140명은 지켰습니다. 그 열흘 동안 아무도 청구하지 않은 비용이 어디에 쌓였는지 먼저 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c9_after_court: { id: "use-reframe", title: "서식 없는 피해를 서식으로 만들기", text: "법정에서는 모든 피해에 서식이 있었습니다. 서식이 없어서 피해가 아닌 것이 된 쪽으로 판을 다시 짜야 합니다." },
-      c9_after_return: { id: "protect-trust", title: "하루 늦은 소식을 늦지 않게 만들기", text: "240km는 늘 한 박자 늦습니다. 사람에게 가장 먼저 닿는 선택을 찾아야 합니다." },
-    },
-    case11: {
-      c10_after_rest: { id: "protect-trust", title: "쉬어 본 사람들과 함께 말하기", text: "여섯 명은 이번 주를 버틸 힘이 있습니다. 그 힘을 한 사람의 발언이 아니라 여섯 사람의 문장으로 쓰는 선택을 찾아야 합니다." },
-      c10_after_record: { id: "use-reframe", title: "빼앗긴 제도를 되찾기", text: "당신이 만든 제도가 그룹의 모범 사례가 됐습니다. 그 제도가 누구의 것인지 판을 다시 짜면 숨은 단서가 열릴 수 있습니다." },
-      c10_after_keep: { id: "repair-legitimacy", title: "서랍 속 명단을 떳떳하게 만들기", text: "조사는 서랍을 겨눕니다. 212명의 이름을 숨긴 기록이 아니라 지킨 기록으로 바꾸는 선택을 찾아야 합니다." },
-    },
     // Keyed on case 49's aftermath: the finale follows that case now.
     final: {
       c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "보름달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },

@@ -54,16 +54,15 @@ const NOT_AUTHORED = {
   "src/gauntlet/gauntletEngine.js": "what the table itself bills on a bust, tuned by check:pressure",
   "src/caseCopy.js": "what a NEW GAME+ rank carries into the next run, not what a choice gives",
   "src/gameConstants.js": "the resources a run starts with",
-  "src/gameLogic.js": "carryovers for 사건 01-11, season wear and the reframe card's price: consequences and rules, read by check:endings",
+  "src/gameLogic.js": "season wear and the reframe card's price: rules, read by check:endings",
   "src/riskLogic.js": "defaults for a pressure reading, not an effect",
   "src/state/useChoiceCommit.js": "the clue bonus, one rule for every scene",
 };
 
 /**
  * A carryover is what a case's close does to the next case's opening, not what
- * a choice gives. The ones for 사건 01-11 live in gameLogic.js and were never
- * raised; a pack keeps its own beside its scenes, and they are left alone here
- * so that every case is treated the same.
+ * a choice gives. A pack keeps its own beside its scenes, and they are left
+ * alone here.
  */
 const NOT_RAISED_TABLES = new Set(["carryovers"]);
 
