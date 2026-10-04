@@ -474,7 +474,7 @@ for (const known of UNMEETABLE_CHALLENGES) {
  * The pack validator: what a case file has to be before it is wired in.
  *
  * A pack is one object with a field per table, and the tables are matched to
- * each other by id and by position. Every pack has the same shape -- five
+ * each other by id. Every pack has the same shape -- five
  * authored scenes, an aftermath, three connective and three reaction scenes, a
  * side door of two, a hidden route and its close, an evidence turn and (after
  * the first case) three openings -- so the shape is checked rather than
@@ -482,8 +482,7 @@ for (const known of UNMEETABLE_CHALLENGES) {
  * one was merged last.
  */
 const PACK_KEYS = [
-  "id", "nodes", "aftermath", "aftermathRoute", "connectiveScenes", "connectiveOrder", "choiceEffects", "choiceCopy",
-  "reactionScenes", "reactionEffects", "reactionCopy", "reactionMemos", "branchPlan", "branchScenes", "routePlan",
+  "id", "nodes", "aftermath", "aftermathRoute", "connectiveScenes", "reactionScenes", "branchPlan", "branchScenes", "routePlan",
   "evidencePlan", "memoryPlan", "openingRoutes", "openingCopy", "openingSignatures", "voiceLines", "echoReplies",
   "characterProfiles", "setting", "sceneContext", "clue", "outcomes", "carryovers", "continuityChallenges",
 ];
@@ -532,8 +531,8 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   const prefix = `${caseNodePrefix(pack.id)}_`;
   const previousPrefix = `${caseNodePrefix(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(pack.id) - 1] ?? "")}_`;
   const hasOpenings = CASE_SEQUENCE.indexOf(pack.id) > 0;
-  const connectiveIds = pack.connectiveScenes.map(([id]) => id);
-  const reactionIds = pack.reactionScenes.map(([id]) => id);
+  const connectiveIds = pack.connectiveScenes.map((scene) => scene.id);
+  const reactionIds = pack.reactionScenes.map((scene) => scene.id);
   const openingIds = Object.values(pack.openingRoutes);
   const sceneIds = early
     ? Object.keys(nodes).filter((sceneId) => nodes[sceneId].caseId === pack.id)
@@ -558,33 +557,33 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
     if (!nodes[sceneId]) fail(`the scene ${sceneId} never reached the graph`);
   }
 
-  // Generated scenes: labels, effects, voice and echo are four lists matched
-  // by position, under the id of the scene they follow.
-  const generatedFamilies = [
-    ["connectiveScenes", pack.connectiveScenes, pack.choiceEffects, pack.choiceCopy, 7],
-    ["reactionScenes", pack.reactionScenes, pack.reactionEffects, pack.reactionCopy, 6],
-  ];
-  for (const [family, scenes, effects, copy, labelsAt] of generatedFamilies) {
-    const sources = scenes.map(([, sourceId]) => sourceId);
-    if (!sameKeys(Object.keys(effects), sources)) fail(`${family}: the effects table is keyed ${Object.keys(effects).join(", ")}, the scenes follow ${sources.join(", ")}`);
-    if (!sameKeys(Object.keys(copy), sources)) fail(`${family}: the copy table is keyed ${Object.keys(copy).join(", ")}, the scenes follow ${sources.join(", ")}`);
+  // Generated scenes: every choice carries its own label, effect, line and
+  // reply, so one cannot be edited out from under the others.
+  for (const [family, scenes] of [["connectiveScenes", pack.connectiveScenes], ["reactionScenes", pack.reactionScenes]]) {
     for (const scene of scenes) {
-      const [id, sourceId, nextId] = scene;
-      const labels = scene[labelsAt];
-      if (!sceneIds.includes(sourceId)) fail(`${id} follows ${sourceId}, which the pack does not write`);
-      if (!sceneIds.includes(nextId)) fail(`${id} leads to ${nextId}, which the pack does not write`);
-      if (!Array.isArray(labels)) {
-        fail(`${id} has no list of labels in position ${labelsAt + 1}`);
+      for (const field of ["id", "after", "next", "title", "speaker", "text"]) {
+        if (typeof scene[field] !== "string" || !scene[field]) fail(`${family}: ${scene.id ?? "a scene"} has no ${field}`);
+      }
+      if (!Array.isArray(scene.memo) || !scene.memo.length) fail(`${scene.id} has no memo`);
+      if (!sceneIds.includes(scene.after)) fail(`${scene.id} follows ${scene.after}, which the pack does not write`);
+      if (!sceneIds.includes(scene.next)) fail(`${scene.id} leads to ${scene.next}, which the pack does not write`);
+      if (!Array.isArray(scene.choices) || scene.choices.length < 3) {
+        fail(`${scene.id} deals ${scene.choices?.length ?? 0} choices`);
         continue;
       }
-      const lengths = { labels: labels.length, effects: effects[sourceId]?.length, voice: copy[sourceId]?.voice?.length, echo: copy[sourceId]?.echo?.length };
-      if (new Set(Object.values(lengths)).size !== 1) fail(`${id}: ${Object.entries(lengths).map(([name, length]) => `${length} ${name}`).join(", ")}`);
+      scene.choices.forEach((choice, index) => {
+        const extra = Object.keys(choice).filter((key) => !["label", "effect", "voice", "echo"].includes(key));
+        if (extra.length) fail(`${scene.id} choice ${index + 1} has fields no module reads: ${extra.join(", ")}`);
+        for (const field of ["label", "voice", "echo"]) {
+          if (typeof choice[field] !== "string" || !choice[field]) fail(`${scene.id} choice ${index + 1} has no ${field}`);
+        }
+        const effectKeys = Object.keys(choice.effect ?? {});
+        if (!effectKeys.length || effectKeys.some((key) => !resourceKeys.has(key))) fail(`${scene.id} choice ${index + 1} has no effect on the run's resources`);
+      });
     }
   }
-  if (JSON.stringify(pack.connectiveOrder) !== JSON.stringify(pack.connectiveScenes.map(([id, sourceId]) => [sourceId, id]))) {
-    fail("connectiveOrder does not repeat the connective scenes in order");
-  }
-  if (!sameKeys(Object.keys(pack.reactionMemos), reactionIds)) fail("reactionMemos is not keyed by the reaction scenes");
+  const reactionSources = pack.reactionScenes.map((scene) => scene.after);
+  if (!sameKeys(reactionSources, connectiveIds)) fail("the reaction scenes do not follow the connective scenes one for one");
 
   // The side door: the card it hangs on has to be one the scene deals.
   const [branchSource, branchIndex, branchFirst, branchSecond] = pack.branchPlan;

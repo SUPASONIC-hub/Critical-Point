@@ -243,88 +243,188 @@ export const case07 = {
     },
   },
   aftermathRoute: ["c7_final", "c7_aftershock"],
+  // The connective scenes of case 07 trade in the same three shapes as the rest
+  // of the season -- people first pays in cash or time, procedure first makes
+  // someone wait, the shortcut gives fatigue back -- so the case reads as part
+  // of the set even though its subject is the analyst's own posting.
   connectiveScenes: [
-    ["c7_receipt", "c7_ledger", "c7_counter", "영수증", "반재욱", "택시비를 반으로 나누자며 반재욱이 영수증을 찢어 반쪽을 내밉니다. 마흔한 명을 자른 사람이 4,300원을 두고 실랑이를 합니다. '기록에 남길 수 없는 건 안 받습니다.' 그는 농담을 한 적이 없고, 이번에도 농담이 아닙니다.", ["반쪽 영수증에 그의 서명이 있음", "그는 아직 수첩을 가방에서 꺼내지 않음", "감사팀 서고 출입 기록은 이미 남았음"], ["그의 방식대로 반씩 나눠 적는다", "영수증을 받아 내 경비로 처리한다", "그냥 넘기고 시간을 아낀다"]],
-    ["c7_teller", "c7_counter", "c7_paper", "창구 4번", "도윤하", "지점을 나오는 길에 4번 창구의 노년 행원이 도윤하를 부릅니다. '도 대리, 아직 그 말버릇 있네.' 3년 전 함께 앉아 있던 사람입니다. 그는 묻지도 않고 서랍에서 그해 목표표 사본을 꺼내 놓습니다. 자기 이름이 적힌 쪽을 접어서 밀어 줍니다.", ["4번 창구 행원은 당시 같은 팀", "사본은 지점 자체 보관본", "그는 내년이 정년"], ["접힌 쪽을 펴서 그의 이름도 함께 쓴다", "접힌 그대로 받아 이름은 가린다", "사본은 두고 원본 절차만 밟는다"]],
-    ["c7_ticket", "c7_paper", "c7_final", "기차표", "에코", "에코가 조용히 한 줄을 띄웁니다. 총무팀이 이미 발권한 편도 기차표. 출발 06:40, 강릉행. 승인자 칸에는 이번에도 아무도 없습니다. '시스템은 당신이 갈 것이라고 계산했습니다. 계산은 대개 맞습니다.'", ["편도 기차표가 발령 적용 전에 발권됨", "승인자 칸 공란", "표는 취소해도 기록은 남음"], ["표를 취소하고 그 기록을 증거로 남긴다", "표는 그대로 두고 자료를 먼저 보낸다", "표를 받아 두고 오늘은 아무 말도 안 한다"]],
+    {
+      id: "c7_receipt",
+      after: "c7_ledger",
+      next: "c7_counter",
+      title: "영수증",
+      speaker: "반재욱",
+      text: "택시비를 반으로 나누자며 반재욱이 영수증을 찢어 반쪽을 내밉니다. 마흔한 명을 자른 사람이 4,300원을 두고 실랑이를 합니다. '기록에 남길 수 없는 건 안 받습니다.' 그는 농담을 한 적이 없고, 이번에도 농담이 아닙니다.",
+      memo: ["반쪽 영수증에 그의 서명이 있음", "그는 아직 수첩을 가방에서 꺼내지 않음", "감사팀 서고 출입 기록은 이미 남았음"],
+      choices: [
+        {
+          label: "그의 방식대로 반씩 나눠 적는다",
+          effect: { trust: 8, legitimacy: 4, capital: -6, time: -4, fatigue: 5 },
+          voice: "4,300원도 기록이라며, 그의 방식대로 반씩 적는다.",
+          echo: "반씩 적힌 기록은 아무도 빚지지 않게 합니다. 빚이 없으면 부탁도 없습니다.",
+        },
+        {
+          label: "영수증을 받아 내 경비로 처리한다",
+          effect: { legitimacy: 7, time: -5, humanCost: 3, fatigue: 4 },
+          voice: "영수증을 받아 들고, 오늘 경비는 내가 지겠다고 한다.",
+          echo: "당신이 낸 경비는 그를 편하게 하고, 그 편함은 나중에 수첩을 꺼내기 어렵게 만듭니다.",
+        },
+        {
+          label: "그냥 넘기고 시간을 아낀다",
+          effect: { time: 6, capital: 6, trust: -7, humanCost: 4, fatigue: -3 },
+          voice: "이런 데 쓸 시간이 없다며 그냥 넘긴다.",
+          echo: "아낀 2분은 오늘 쓸모가 있고, 그가 왜 4,300원을 세는 사람인지는 끝내 모릅니다.",
+        },
+      ],
+    },
+    {
+      id: "c7_teller",
+      after: "c7_counter",
+      next: "c7_paper",
+      title: "창구 4번",
+      speaker: "도윤하",
+      text: "지점을 나오는 길에 4번 창구의 노년 행원이 도윤하를 부릅니다. '도 대리, 아직 그 말버릇 있네.' 3년 전 함께 앉아 있던 사람입니다. 그는 묻지도 않고 서랍에서 그해 목표표 사본을 꺼내 놓습니다. 자기 이름이 적힌 쪽을 접어서 밀어 줍니다.",
+      memo: ["4번 창구 행원은 당시 같은 팀", "사본은 지점 자체 보관본", "그는 내년이 정년"],
+      choices: [
+        {
+          label: "접힌 쪽을 펴서 그의 이름도 함께 쓴다",
+          effect: { trust: 9, legitimacy: 5, capital: -5, time: -5, fatigue: 5 },
+          voice: "접힌 종이를 펴서, 그의 이름도 같은 줄에 쓴다.",
+          echo: "펴서 쓰면 그는 증인이 됩니다. 정년 한 해를 앞둔 증인입니다.",
+        },
+        {
+          label: "접힌 그대로 받아 이름은 가린다",
+          effect: { legitimacy: 6, time: -4, humanCost: 4, fatigue: 3 },
+          voice: "접힌 그대로 받아, 그의 이름은 가린 채 쓴다.",
+          echo: "가린 이름은 오늘 그를 지키고, 문서의 힘은 그만큼 줄어듭니다.",
+        },
+        {
+          label: "사본은 두고 원본 절차만 밟는다",
+          effect: { time: 5, capital: 7, trust: -6, humanCost: 5, fatigue: -3 },
+          voice: "사본은 사양하고, 정식 열람 절차만 밟겠다고 한다.",
+          echo: "절차는 깨끗하고 느립니다. 48시간 안에 끝나는 절차는 아닙니다.",
+        },
+      ],
+    },
+    {
+      id: "c7_ticket",
+      after: "c7_paper",
+      next: "c7_final",
+      title: "기차표",
+      speaker: "에코",
+      text: "에코가 조용히 한 줄을 띄웁니다. 총무팀이 이미 발권한 편도 기차표. 출발 06:40, 강릉행. 승인자 칸에는 이번에도 아무도 없습니다. '시스템은 당신이 갈 것이라고 계산했습니다. 계산은 대개 맞습니다.'",
+      memo: ["편도 기차표가 발령 적용 전에 발권됨", "승인자 칸 공란", "표는 취소해도 기록은 남음"],
+      choices: [
+        {
+          label: "표를 취소하고 그 기록을 증거로 남긴다",
+          effect: { legitimacy: 9, trust: 4, capital: -7, time: -6, fatigue: 5 },
+          voice: "표를 취소하고, 취소 기록까지 증거로 붙인다.",
+          echo: "취소 기록은 이 발령이 예정돼 있었다는 증거가 됩니다. 동시에 당신이 저항한다는 신고이기도 합니다.",
+        },
+        {
+          label: "표는 그대로 두고 자료를 먼저 보낸다",
+          effect: { legitimacy: 5, trust: 6, time: -4, humanCost: 3, fatigue: 4 },
+          voice: "표는 그대로 두고, 자료부터 밖으로 보낸다.",
+          echo: "표를 두면 아무도 놀라지 않습니다. 자료는 그 틈으로 나갑니다.",
+        },
+        {
+          label: "표를 받아 두고 오늘은 아무 말도 안 한다",
+          effect: { time: 6, capital: 5, trust: -7, humanCost: 4, fatigue: -3 },
+          voice: "표를 받아 두고, 오늘은 아무 말도 하지 않는다.",
+          echo: "받아 둔 표는 오늘 조용합니다. 06:40에 그 조용함이 끝납니다.",
+        },
+      ],
+    },
   ],
-  connectiveOrder: [["c7_ledger", "c7_receipt"], ["c7_counter", "c7_teller"], ["c7_paper", "c7_ticket"]],
-  choiceEffects: {
-    // The connective scenes of case 07 trade in the same three shapes as the rest
-    // of the season -- people first pays in cash or time, procedure first makes
-    // someone wait, the shortcut gives fatigue back -- so the case reads as part
-    // of the set even though its subject is the analyst's own posting.
-    c7_ledger: [
-      { trust: 8, legitimacy: 4, capital: -6, time: -4, fatigue: 5 },
-      { legitimacy: 7, time: -5, humanCost: 3, fatigue: 4 },
-      { time: 6, capital: 6, trust: -7, humanCost: 4, fatigue: -3 },
-    ],
-    c7_counter: [
-      { trust: 9, legitimacy: 5, capital: -5, time: -5, fatigue: 5 },
-      { legitimacy: 6, time: -4, humanCost: 4, fatigue: 3 },
-      { time: 5, capital: 7, trust: -6, humanCost: 5, fatigue: -3 },
-    ],
-    c7_paper: [
-      { legitimacy: 9, trust: 4, capital: -7, time: -6, fatigue: 5 },
-      { legitimacy: 5, trust: 6, time: -4, humanCost: 3, fatigue: 4 },
-      { time: 6, capital: 5, trust: -7, humanCost: 4, fatigue: -3 },
-    ],
-  },
-  choiceCopy: {
-    c7_ledger: {
-      voice: ["4,300원도 기록이라며, 그의 방식대로 반씩 적는다.", "영수증을 받아 들고, 오늘 경비는 내가 지겠다고 한다.", "이런 데 쓸 시간이 없다며 그냥 넘긴다."],
-      echo: ["반씩 적힌 기록은 아무도 빚지지 않게 합니다. 빚이 없으면 부탁도 없습니다.", "당신이 낸 경비는 그를 편하게 하고, 그 편함은 나중에 수첩을 꺼내기 어렵게 만듭니다.", "아낀 2분은 오늘 쓸모가 있고, 그가 왜 4,300원을 세는 사람인지는 끝내 모릅니다."],
-    },
-    c7_counter: {
-      voice: ["접힌 종이를 펴서, 그의 이름도 같은 줄에 쓴다.", "접힌 그대로 받아, 그의 이름은 가린 채 쓴다.", "사본은 사양하고, 정식 열람 절차만 밟겠다고 한다."],
-      echo: ["펴서 쓰면 그는 증인이 됩니다. 정년 한 해를 앞둔 증인입니다.", "가린 이름은 오늘 그를 지키고, 문서의 힘은 그만큼 줄어듭니다.", "절차는 깨끗하고 느립니다. 48시간 안에 끝나는 절차는 아닙니다."],
-    },
-    c7_paper: {
-      voice: ["표를 취소하고, 취소 기록까지 증거로 붙인다.", "표는 그대로 두고, 자료부터 밖으로 보낸다.", "표를 받아 두고, 오늘은 아무 말도 하지 않는다."],
-      echo: ["취소 기록은 이 발령이 예정돼 있었다는 증거가 됩니다. 동시에 당신이 저항한다는 신고이기도 합니다.", "표를 두면 아무도 놀라지 않습니다. 자료는 그 틈으로 나갑니다.", "받아 둔 표는 오늘 조용합니다. 06:40에 그 조용함이 끝납니다."],
-    },
-  },
   reactionScenes: [
-    ["c7_receipt_reaction", "c7_receipt", "c7_counter", "가방에서 나온 것", "반재욱", "영수증 문제가 끝나자 반재욱이 가방을 엽니다. 수첩은 비닐에 싸여 있습니다. 4년째 같은 비닐입니다. '이걸 어떻게 받을지는 당신이 정하십시오. 나는 어느 쪽이든 오늘 안에 사표를 씁니다.'", ["정식 절차로 접수한다", "사적으로 받아 그를 남긴다", "수첩 없이 증언만 받는다"]],
-    ["c7_teller_reaction", "c7_teller", "c7_paper", "네 개의 이름", "도윤하", "목표표에는 그해 창구 담당 네 명의 이름이 있습니다. 도윤하가 그중 하나입니다. '제 이름은 제가 올릴게요. 나머지 세 사람은 저도 못 정합니다.'", ["네 사람에게 각자 정하게 한다", "한 사람만 남기고 지운다", "이름은 전부 지우고 숫자만 쓴다"]],
-    ["c7_ticket_reaction", "c7_ticket", "c7_final", "06:40", "에코", "에코가 발권 기록 옆에 한 줄을 더 띄웁니다. '이 노선의 지난 3년 발권 기록 중 같은 패턴이 여섯 건 있습니다. 여섯 명 전원이 탑승했습니다.' 당신이 일곱 번째입니다.", ["역에 나가서 타지 않는다", "내려가되 자료는 먼저 보낸다", "하루를 더 기다린다"]],
+    {
+      id: "c7_receipt_reaction",
+      after: "c7_receipt",
+      next: "c7_counter",
+      title: "가방에서 나온 것",
+      speaker: "반재욱",
+      text: "영수증 문제가 끝나자 반재욱이 가방을 엽니다. 수첩은 비닐에 싸여 있습니다. 4년째 같은 비닐입니다. '이걸 어떻게 받을지는 당신이 정하십시오. 나는 어느 쪽이든 오늘 안에 사표를 씁니다.'",
+      memo: ["빚지지 않는 사람에게 부탁하는 법", "사표가 먼저 나가는 순서"],
+      choices: [
+        {
+          label: "정식 절차로 접수한다",
+          effect: { trust: 8, legitimacy: 3, capital: -4, time: -5, fatigue: 4 },
+          voice: "빚을 지지 않겠다는 그의 방식에 맞춰, 수첩도 정식 절차로 받겠다고 한다.",
+          echo: "정식 절차로 받으면 수첩은 증거가 되고, 그는 위반자가 됩니다. 둘 다 기록에 남습니다.",
+        },
+        {
+          label: "사적으로 받아 그를 남긴다",
+          effect: { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 },
+          voice: "사적인 기록이니 사적으로 받겠다고, 조용히 가져간다.",
+          echo: "조용히 받으면 그는 안전하고, 그 수첩은 법정에서 존재한 적이 없게 됩니다.",
+        },
+        {
+          label: "수첩 없이 증언만 받는다",
+          effect: { time: 5, capital: 5, trust: -6, humanCost: 4, fatigue: -3 },
+          voice: "수첩 없이도 된다며, 그의 증언만 받겠다고 한다.",
+          echo: "증언만 받으면 날짜는 남지 않습니다. 남는 것은 한 사람의 기억입니다.",
+        },
+      ],
+    },
+    {
+      id: "c7_teller_reaction",
+      after: "c7_teller",
+      next: "c7_paper",
+      title: "네 개의 이름",
+      speaker: "도윤하",
+      text: "목표표에는 그해 창구 담당 네 명의 이름이 있습니다. 도윤하가 그중 하나입니다. '제 이름은 제가 올릴게요. 나머지 세 사람은 저도 못 정합니다.'",
+      memo: ["자기 이름을 자기가 올릴 권리", "정년 한 해 앞의 증인"],
+      choices: [
+        {
+          label: "네 사람에게 각자 정하게 한다",
+          effect: { trust: 9, legitimacy: 4, capital: -5, time: -4, fatigue: 5 },
+          voice: "네 사람에게 각자 결정하게 하겠다며, 연락처를 받아 나온다.",
+          echo: "각자 정하게 하면 시간이 갑니다. 정한 사람은 자기 이름을 자기가 올린 게 됩니다.",
+        },
+        {
+          label: "한 사람만 남기고 지운다",
+          effect: { legitimacy: 5, trust: 4, time: -3, humanCost: 4, fatigue: 3 },
+          voice: "가장 위험이 적은 한 사람만 남기고 나머지는 지운다.",
+          echo: "한 사람만 남기면 그 한 사람이 전부를 감당합니다. 지점에서는 그 방식을 이미 봤습니다.",
+        },
+        {
+          label: "이름은 전부 지우고 숫자만 쓴다",
+          effect: { time: 6, capital: 4, trust: -7, humanCost: 3, fatigue: -3 },
+          voice: "이름은 전부 지우고 목표표의 숫자만 쓴다.",
+          echo: "숫자만으로도 목표표는 읽힙니다. 누가 그 목표를 받았는지는 읽히지 않습니다.",
+        },
+      ],
+    },
+    {
+      id: "c7_ticket_reaction",
+      after: "c7_ticket",
+      next: "c7_final",
+      title: "06:40",
+      speaker: "에코",
+      text: "에코가 발권 기록 옆에 한 줄을 더 띄웁니다. '이 노선의 지난 3년 발권 기록 중 같은 패턴이 여섯 건 있습니다. 여섯 명 전원이 탑승했습니다.' 당신이 일곱 번째입니다.",
+      memo: ["여섯 명이 전부 탄 노선", "타지 않는 장면의 값"],
+      choices: [
+        {
+          label: "역에 나가서 타지 않는다",
+          effect: { legitimacy: 8, trust: 4, capital: -6, time: -5, fatigue: 5 },
+          voice: "06:40에 실제로 역에 나가서, 가지 않는 장면을 기록으로 남긴다.",
+          echo: "가지 않는 장면은 강력합니다. 그 장면 이후 당신은 협상 대상이 아니라 사건이 됩니다.",
+        },
+        {
+          label: "내려가되 자료는 먼저 보낸다",
+          effect: { legitimacy: 6, time: -4, humanCost: 3, fatigue: 4 },
+          voice: "표를 쓰고 내려가되, 자료 제출은 이미 끝내 둔다.",
+          echo: "내려가면 소란은 없습니다. 자료는 이미 밖에 있고, 당신은 안에 없습니다.",
+        },
+        {
+          label: "하루를 더 기다린다",
+          effect: { time: 6, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
+          voice: "표도 자료도 손대지 않고, 하루를 더 기다린다.",
+          echo: "기다린 하루는 아무것도 바꾸지 않고, 권한 축소는 예정대로 적용됩니다.",
+        },
+      ],
+    },
   ],
-  reactionEffects: {
-    c7_receipt: [
-      { trust: 8, legitimacy: 3, capital: -4, time: -5, fatigue: 4 },
-      { legitimacy: 6, time: -4, humanCost: 3, fatigue: 3 },
-      { time: 5, capital: 5, trust: -6, humanCost: 4, fatigue: -3 },
-    ],
-    c7_teller: [
-      { trust: 9, legitimacy: 4, capital: -5, time: -4, fatigue: 5 },
-      { legitimacy: 5, trust: 4, time: -3, humanCost: 4, fatigue: 3 },
-      { time: 6, capital: 4, trust: -7, humanCost: 3, fatigue: -3 },
-    ],
-    c7_ticket: [
-      { legitimacy: 8, trust: 4, capital: -6, time: -5, fatigue: 5 },
-      { legitimacy: 6, time: -4, humanCost: 3, fatigue: 4 },
-      { time: 6, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
-    ],
-  },
-  reactionCopy: {
-    c7_receipt: {
-      voice: ["빚을 지지 않겠다는 그의 방식에 맞춰, 수첩도 정식 절차로 받겠다고 한다.", "사적인 기록이니 사적으로 받겠다고, 조용히 가져간다.", "수첩 없이도 된다며, 그의 증언만 받겠다고 한다."],
-      echo: ["정식 절차로 받으면 수첩은 증거가 되고, 그는 위반자가 됩니다. 둘 다 기록에 남습니다.", "조용히 받으면 그는 안전하고, 그 수첩은 법정에서 존재한 적이 없게 됩니다.", "증언만 받으면 날짜는 남지 않습니다. 남는 것은 한 사람의 기억입니다."],
-    },
-    c7_teller: {
-      voice: ["네 사람에게 각자 결정하게 하겠다며, 연락처를 받아 나온다.", "가장 위험이 적은 한 사람만 남기고 나머지는 지운다.", "이름은 전부 지우고 목표표의 숫자만 쓴다."],
-      echo: ["각자 정하게 하면 시간이 갑니다. 정한 사람은 자기 이름을 자기가 올린 게 됩니다.", "한 사람만 남기면 그 한 사람이 전부를 감당합니다. 지점에서는 그 방식을 이미 봤습니다.", "숫자만으로도 목표표는 읽힙니다. 누가 그 목표를 받았는지는 읽히지 않습니다."],
-    },
-    c7_ticket: {
-      voice: ["06:40에 실제로 역에 나가서, 가지 않는 장면을 기록으로 남긴다.", "표를 쓰고 내려가되, 자료 제출은 이미 끝내 둔다.", "표도 자료도 손대지 않고, 하루를 더 기다린다."],
-      echo: ["가지 않는 장면은 강력합니다. 그 장면 이후 당신은 협상 대상이 아니라 사건이 됩니다.", "내려가면 소란은 없습니다. 자료는 이미 밖에 있고, 당신은 안에 없습니다.", "기다린 하루는 아무것도 바꾸지 않고, 권한 축소는 예정대로 적용됩니다."],
-    },
-  },
-  reactionMemos: {
-    c7_receipt_reaction: ["빚지지 않는 사람에게 부탁하는 법", "사표가 먼저 나가는 순서"],
-    c7_teller_reaction: ["자기 이름을 자기가 올릴 권리", "정년 한 해 앞의 증인"],
-    c7_ticket_reaction: ["여섯 명이 전부 탄 노선", "타지 않는 장면의 값"],
-  },
   branchPlan: ["c7_counter", 2, "c7_branch_quota", "c7_branch_quota_follow"],
   branchScenes: {
     c7_branch_quota: {
