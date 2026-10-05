@@ -7,9 +7,11 @@ import {
   collectRuntimeErrors,
   completeCase,
   createSeededRandom,
+  dismissProtocolBreach,
   startDebugNode,
+  TRANSITION_TIMEOUT_MS,
 } from "./helpers/gameFlow.js";
-import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
 /**
  * The weekly tier (`npm run test:e2e:full`): what is too slow to gate a push.
@@ -74,6 +76,34 @@ async function assertReloadRoundTrip(page, before) {
   expect(after.lastError).toBeFalsy();
 }
 
+/**
+ * A card that asks for standing -- each case's evidence card -- is locked on
+ * the fresh save a debug jump starts from, and a locked card cannot be staked.
+ * The walk pressed it anyway, so every case failed on its four evidence cards
+ * and the scene behind them was reached only by jumping to it. The run is
+ * given the standing a player would have earned by then: records and the two
+ * gauges the gate reads (`getAuthorityGate`), written to the save from a
+ * static page so the table's own save on the way out does not overwrite them.
+ */
+const KEEP_SAVE_FLAG = "e2e-keep-save";
+
+async function grantAuthority(page) {
+  const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  await page.goto("/profile.jpg");
+  save.resources = { ...save.resources, trust: 90, legitimacy: 90 };
+  save.discoveredClues = CASE_SEQUENCE.map((caseId) => ({ id: `e2e-record-${caseId}`, title: caseId, text: "" }));
+  // The walk clears storage on every load, to start each pair clean; this one
+  // load has to find the save just written.
+  await page.evaluate((flag) => sessionStorage.setItem(flag, "1"), KEEP_SAVE_FLAG);
+  await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
+  await page.goto("/?debug=1");
+  // A runner with four workers on it took longer than eight seconds to bring
+  // the table back in 31 of 220 cards; this is a load, not a transition.
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await page.evaluate((flag) => sessionStorage.removeItem(flag), KEEP_SAVE_FLAG);
+  await dismissProtocolBreach(page);
+}
+
 const pairsIn = (caseId) => nodeOrders[caseId].reduce((count, nodeId) => count + nodes[nodeId].choices.length, 0);
 
 for (const caseId of CASE_SEQUENCE) {
@@ -85,13 +115,13 @@ for (const caseId of CASE_SEQUENCE) {
     const errors = [];
     let aborted = "";
     let walked = 0;
-    await page.addInitScript(() => {
+    await page.addInitScript((keepFlag) => {
       try {
-        localStorage.clear();
+        if (!sessionStorage.getItem(keepFlag)) localStorage.clear();
       } catch {
         // Storage can be blocked before the app boots.
       }
-    });
+    }, KEEP_SAVE_FLAG);
     collectRuntimeErrors(page, errors);
 
     for (const nodeId of nodeOrders[caseId]) {
@@ -101,6 +131,7 @@ for (const caseId of CASE_SEQUENCE) {
         const choice = scene.choices[choiceIndex];
         try {
           await startDebugNode(page, caseId, nodeId);
+          if (choice.requiredAuthority) await grantAuthority(page);
           await chooseSceneChoice(page, scene, choiceIndex);
           await page.waitForSelector(".game-shell, .result-page, .ending-reveal", { timeout: 8000 });
           if (await page.locator(".error-screen").isVisible()) {
@@ -188,6 +219,10 @@ test("saved state survives reload stress during complete season @full", async ({
       await assertReloadRoundTrip(page, before);
     }
     if (index === 1) {
+      // The second case opens behind the relic draft and then its briefing,
+      // and both are modal: the 저장 button under them does not take a click,
+      // which is right, and is where this walk stopped on every run.
+      await dismissProtocolBreach(page);
       await page.locator('[aria-keyshortcuts="P"]').click();
       await assertReloadRoundTrip(page, before);
     }
@@ -196,6 +231,7 @@ test("saved state survives reload stress during complete season @full", async ({
       // third reload this walk takes: a table with a card on it has to survive
       // one. It is asserted, not looked for: `if (await card.isVisible())`
       // skipped the whole check whenever the card was a frame late.
+      await dismissProtocolBreach(page);
       const reframeCard = page.locator(".gx-card-wild");
       await expect(reframeCard).toBeVisible();
       await clickElement(reframeCard, "reframe card");
