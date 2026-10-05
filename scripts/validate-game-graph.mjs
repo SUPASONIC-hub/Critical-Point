@@ -22,7 +22,6 @@ import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge,
 import { pressureBeats } from "../src/nodes/sceneBuild.js";
 import { sceneContext } from "../src/nodes/sceneContext.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
-import { finalCaseNodes } from "../src/nodes/finalCase.js";
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const orderedNodeIds = new Set(Object.values(nodeOrders).flat());
@@ -368,7 +367,6 @@ CASE_SEQUENCE.forEach((caseId, index) => {
  * A `next` that is written must be the one the built graph uses.
  */
 const authoredSources = [
-  { owner: "authored", table: finalCaseNodes },
   ...AUTHORED_CASE_PACKS.flatMap((pack) => [
     { owner: pack.id, table: pack.nodes },
     { owner: pack.id, table: pack.aftermath },
@@ -489,20 +487,24 @@ const PACK_KEYS = [
 // `routeBody` is the authored stretch a route walks before its final; only
 // 사건 01 and 03-05 route that way. A pack with no one new to introduce writes
 // no `characterProfiles`.
-const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody"];
+// `writtenRoutes` is 사건 02 alone: its routes are scenes, not a plan.
+const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody", "writtenRoutes"];
 /**
  * 사건 01-11 were written before the shape below was fixed, into tables the
  * whole season shared. They are packs now, held to everything a pack's tables
  * have to agree on with each other, but not to the scene counts: 사건 01 has
  * four connective scenes and ids with no prefix, 사건 01-05 fork into routes
  * that close on their own finals, and 사건 02 writes its routes out scene by
- * scene in `gameData.js` instead of in a plan.
+ * scene (`writtenRoutes`) instead of in a plan.
  */
-const EARLY_PACKS = CASE_SEQUENCE.filter((caseId) => /^case(0[1-9]|1[01])$/.test(caseId));
+// The finale is as old as they are and as loose: four authored scenes, two
+// connective scenes, and routes that converge on `f_choice`.
+const EARLY_PACKS = CASE_SEQUENCE.filter((caseId) => /^case(0[1-9]|1[01])$|^final$/.test(caseId));
 const PACK_OMISSIONS = {
   case01: ["memoryPlan"], // deals no memory card
   case02: ["routePlan"],
   case06: ["openingSignatures"],
+  final: ["carryovers"], // nothing follows it
 };
 const sameKeys = (left, right) => left.length === right.length && [...left].sort().join() === [...right].sort().join();
 const keyOwners = new Map();
@@ -511,8 +513,8 @@ function claim(table, key, packId) {
   if (owner) failures.push(`${packId}.${table}.${key} is also written by ${owner}`);
   else keyOwners.set(`${table}:${key}`, packId);
 }
-// What the finale writes by hand is claimed first, so a pack
-// cannot take a scene id they already use.
+// A scene of a case that has no pack is claimed first, so a pack cannot take
+// its id. Every case has one now; this holds the door for one that does not.
 for (const [nodeId, node] of Object.entries(nodes)) {
   if (!AUTHORED_CASE_PACKS.some((pack) => pack.id === node.caseId)) claim("scene", nodeId, node.caseId);
 }
@@ -602,9 +604,10 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   // How the case closes.
   const closingIds = Object.values(pack.aftermath).flatMap((scene) => scene.choices.map((choice) => choice.id));
   if (!sameKeys(Object.keys(pack.outcomes), closingIds)) fail("outcomes is not keyed by the aftermath's choices");
-  if (!sameKeys(Object.keys(pack.carryovers), closingIds)) fail("carryovers is not keyed by the aftermath's choices");
-  for (const [outcomeId, carryover] of Object.entries(pack.carryovers)) checkNumberMap(`pack ${pack.id}/${outcomeId}`, "carryover", carryover, resourceKeys);
-  if (!pack.clue?.id?.startsWith(`${caseNodePrefix(pack.id)}-`)) fail(`the clue ${pack.clue?.id} does not carry the case's prefix`);
+  if (pack.carryovers && !sameKeys(Object.keys(pack.carryovers), closingIds)) fail("carryovers is not keyed by the aftermath's choices");
+  for (const [outcomeId, carryover] of Object.entries(pack.carryovers ?? {})) checkNumberMap(`pack ${pack.id}/${outcomeId}`, "carryover", carryover, resourceKeys);
+  // The finale's clue is named after the case, not its scene prefix, and saves hold the id.
+  if (![caseNodePrefix(pack.id), pack.id].some((prefix) => pack.clue?.id?.startsWith(`${prefix}-`))) fail(`the clue ${pack.clue?.id} does not carry the case's prefix`);
   else claim("clue", pack.clue.id, pack.id);
 
   // Every key a table is looked up by belongs to this case, and to no other.

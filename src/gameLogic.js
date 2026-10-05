@@ -437,14 +437,7 @@ function packTable(field) {
   return Object.fromEntries(CASE_PACKS.map((pack) => [pack.id, pack[field]]));
 }
 
-const discoveryClues = {
-  final: {
-    id: "final-observer-key",
-    title: "관찰자의 열쇠",
-    text: "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다.",
-  },
-};
-Object.assign(discoveryClues, packTable("clue"));
+const discoveryClues = packTable("clue");
 
 /**
  * The record each case hides, whether or not this run opened it.
@@ -792,14 +785,7 @@ function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
 }
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
-  const outcomes = {
-    final: {
-      f_after_witness: { tag: "증언을 남긴 결말", title: "첫 참가자의 목소리가 마지막 기록이 되었다", text: "실험을 끝내는 대신 진실을 함께 보존했습니다. 다음 사람은 적어도 자신이 무엇에 참여하는지 알 수 있습니다." },
-      f_after_control: { tag: "규칙을 바꾼 결말", title: "실험은 남았지만 혼자 결정할 수 없게 되었다", text: "트리거를 없애지는 않았습니다. 대신 동의와 감시가 없는 선택은 더 이상 실행되지 않습니다." },
-      f_after_burn: { tag: "폐기한 결말", title: "모든 기록을 태우고 빈 화면을 남겼다", text: "누구도 다시 이용할 수 없게 했지만, 무엇을 잃었는지 증명할 기록도 사라졌습니다." },
-    },
-  };
-  Object.assign(outcomes, packTable("outcomes"));
+  const outcomes = packTable("outcomes");
   return outcomes[caseId]?.[choiceId] ?? { tag: "기록되지 않은 결말", title: "아직 닫히지 않은 결과", text: "이번 선택의 파장은 다음 기록에 남아 있습니다." };
 }
 
@@ -831,15 +817,7 @@ export function getSeasonWear(caseId = "") {
 }
 
 export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {
-  const challenges = {
-    // Keyed on case 49's aftermath: the finale follows that case now.
-    final: {
-      c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
-      c49_after_record: { id: "use-reframe", title: "내가 묶은 폴더도 의심하기", text: "마흔아홉 사건을 묶은 공개 준비 폴더가 관찰 자료 1번이 됐습니다. 그 폴더가 다시 누군가를 재는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
-      c49_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 후임 관리자 추천 사유가 됐습니다. 골목에 남은 동료들이 당신 없이도 지켜질 방법을 찾아야 합니다." },
-    },
-  };
-  Object.assign(challenges, packTable("continuityChallenges"));
+  const challenges = packTable("continuityChallenges");
   return challenges[caseId]?.[choiceId] ?? null;
 }
 
