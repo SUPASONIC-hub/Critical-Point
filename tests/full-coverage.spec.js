@@ -9,6 +9,7 @@ import {
   createSeededRandom,
   dismissProtocolBreach,
   startDebugNode,
+  TRANSITION_TIMEOUT_MS,
 } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
@@ -96,7 +97,9 @@ async function grantAuthority(page) {
   await page.evaluate((flag) => sessionStorage.setItem(flag, "1"), KEEP_SAVE_FLAG);
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/?debug=1");
-  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  // A runner with four workers on it took longer than eight seconds to bring
+  // the table back in 31 of 220 cards; this is a load, not a transition.
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   await page.evaluate((flag) => sessionStorage.removeItem(flag), KEEP_SAVE_FLAG);
   await dismissProtocolBreach(page);
 }
