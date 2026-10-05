@@ -47,6 +47,19 @@ function fallBackOn(choiceId, voice, echo) {
   }
 }
 
+/**
+ * A card is written with its line and its reply beside its label, so the three
+ * are read and changed together. The scene the table is dealt does not carry
+ * them: they are filed here under the card's id, in the two tables the app has
+ * always read (and is shipped, a case at a time).
+ */
+function fileLines({ voice, echo, ...card }, id = card.id) {
+  if (voice) choiceVoiceLines[id] = voice;
+  if (echo) echoReplies[id] = echo;
+  return card;
+}
+const withLinesFiled = (scene) => ({ ...scene, choices: scene.choices.map((choice) => fileLines(choice)) });
+
 /** A scene a table names has to be in the graph; a generator that skipped a mistyped id dropped the scene in silence. */
 function sceneOf(nodeId, owner) {
   const scene = nodes[nodeId];
@@ -59,12 +72,14 @@ function sceneOf(nodeId, owner) {
  * grows the graph at load time -- aftermath, connective, reaction and branch
  * scenes are written into `nodes` -- so the composed object stays mutable.
  */
-export const nodes = structuredClone(Object.assign({}, ...CASE_PACKS.map((pack) => pack.nodes)));
+export const nodes = Object.fromEntries(
+  CASE_PACKS.flatMap((pack) => Object.entries(pack.nodes)).map(([nodeId, scene]) => [nodeId, withLinesFiled(scene)]),
+);
 
 const aftermathNodes = {};
 
 CASE_PACKS.forEach((pack) => Object.assign(aftermathNodes, pack.aftermath));
-for (const [nodeId, scene] of Object.entries(aftermathNodes)) nodes[nodeId] = { ...scene, kind: "aftermath" };
+for (const [nodeId, scene] of Object.entries(aftermathNodes)) nodes[nodeId] = { ...withLinesFiled(scene), kind: "aftermath" };
 
 // [case, the scene that closes it, its aftermath]. 사건 01-05 close on their
 // routes' own finals (`registerDramaticRoutePlan`), so their packs name no scene.
@@ -185,8 +200,8 @@ authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, 
     branchId: firstId,
     ...(conditionId ? { branchCondition: conditionId, branchBypass: bypassNodeId } : {}),
   };
-  nodes[firstId] = { ...authoredBranchScenes[firstId], kind: "branch" };
-  nodes[secondId] = { ...authoredBranchScenes[secondId], kind: "branch" };
+  nodes[firstId] = { ...withLinesFiled(authoredBranchScenes[firstId]), kind: "branch" };
+  nodes[secondId] = { ...withLinesFiled(authoredBranchScenes[secondId]), kind: "branch" };
   const order = nodeOrders[caseId];
   const sourceOrderIndex = order.indexOf(sourceId);
   if (sourceOrderIndex < 0) throw new Error(`${caseId} branch plan leaves from ${sourceId}, which is not in the case`);
@@ -200,8 +215,8 @@ authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, 
  * scenes hand over to each route's own final.
  */
 function registerWrittenRoutes({ id, writtenRoutes: plan }) {
-  for (const [nodeId, scene] of Object.entries(plan.routes)) nodes[nodeId] = { ...scene, kind: "route" };
-  for (const [nodeId, scene] of Object.entries(plan.finals)) nodes[nodeId] = { ...scene, kind: "routeFinal" };
+  for (const [nodeId, scene] of Object.entries(plan.routes)) nodes[nodeId] = { ...withLinesFiled(scene), kind: "route" };
+  for (const [nodeId, scene] of Object.entries(plan.finals)) nodes[nodeId] = { ...withLinesFiled(scene), kind: "routeFinal" };
   sceneOf(plan.start, `${id} written routes`).choices.forEach((choice) => {
     if (plan.open[choice.id]) choice.next = plan.open[choice.id];
   });
@@ -224,13 +239,10 @@ const dramaticRoutePlans = {};
  * case-level list stays as the hidden route's own close.
  */
 function makeFinalChoices(plan, finalId, choices = plan.finalChoices) {
-  return choices.map(([suffix, label, effect, cognition]) => ({
-    id: `${finalId}_${suffix}`,
-    label,
-    effect,
-    cognition,
-    next: plan.result,
-  }));
+  return choices.map((card) => {
+    const id = `${finalId}_${card.id}`;
+    return { ...fileLines(card, id), id, next: plan.result };
+  });
 }
 
 const SHARED_ROUTE_CLOSING = {
@@ -250,13 +262,7 @@ function registerDramaticRoutePlan(caseId, plan) {
       text: route.text,
       memo: route.memo,
       triggers: route.triggers,
-      choices: route.routeChoices.map(([id, label, effect, cognition]) => ({
-        id,
-        label,
-        effect,
-        cognition,
-        next: route.final,
-      })),
+      choices: route.routeChoices.map((card) => ({ ...fileLines(card), next: route.final })),
     };
     nodes[route.final] = {
       phase: "LAST CALL",
@@ -286,13 +292,7 @@ function registerDramaticRoutePlan(caseId, plan) {
     triggers: ["curiosity", "selfAwareness", "responsibility"],
     // The hidden route asked its final's three questions and then asked them
     // again one scene later. It gets its own opening moves instead.
-    choices: (plan.system.routeChoices ?? plan.finalChoices).map(([suffix, label, effect, cognition]) => ({
-      id: suffix.startsWith(plan.system.route) ? suffix : `${plan.system.route}_${suffix}`,
-      label,
-      effect,
-      cognition,
-      next: plan.system.final,
-    })),
+    choices: plan.system.routeChoices.map((card) => ({ ...fileLines(card), next: plan.system.final })),
   };
   // The hidden route closes on the scene its case wrote (`finalTitle`,
   // `finalText`, `finalMemo` on `system`), or on the shared one below.
@@ -386,13 +386,7 @@ function registerEvidenceTurnaround(caseId, plan) {
     text: plan.text,
     memo: plan.memo,
     triggers: plan.triggers,
-    choices: plan.choices.map(([id, label, effect, cognition]) => ({
-      id,
-      label,
-      effect,
-      cognition,
-      next: plan.result,
-    })),
+    choices: plan.choices.map((card) => ({ ...fileLines(card), next: plan.result })),
   };
   plan.sourceRoutes.forEach((routeId) => {
     const route = sceneOf(routeId, `${caseId} evidence plan`);
@@ -459,6 +453,9 @@ const openingSignatureChoices = {};
 for (const pack of CASE_PACKS) {
   Object.assign(branchOpeningCopy, pack.openingCopy);
   Object.assign(openingSignatureChoices, pack.openingSignatures);
+  // What a start card says in one opening alone; the loop below falls back
+  // on the briefing's line for a card with no entry.
+  Object.entries(pack.openingLines ?? {}).forEach(([choiceId, lines]) => fileLines(lines, choiceId));
 }
 
 Object.entries(caseOpeningRoutes).forEach(([caseId, routes]) => {

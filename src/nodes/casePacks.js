@@ -3,9 +3,9 @@
  *
  * A case is a pack: one object with a field for each table the season keeps --
  * aftermath, connective and reaction scenes, their effects and copy, the side
- * door, the hidden route, the evidence turn, the openings, the voice and echo
- * lines, the scene context, the clue and the three outcome tables -- merged by
- * the module that owns the table (`gameData.js`, `gameDialogue.js`,
+ * door, the hidden route, the evidence turn, the openings, the scene context,
+ * the clue and the three outcome tables -- merged by the module that owns the
+ * table (`gameData.js`, `gameDialogue.js`,
  * `gameLogic.js`, `sceneContext.js`). 사건 01-11 were written into those
  * tables directly, so adding a case meant editing some twenty places in four
  * files; they were moved into packs as they stood, which is why their shape is

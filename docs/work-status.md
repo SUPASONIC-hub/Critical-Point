@@ -722,12 +722,15 @@ Still open, on purpose:
     `check:graph`, which validates each pack's shape. Parallel authors get
     names handed out, not examples: one person per name across the season, and
     the check enforces it (priority 56).
-74. A case is one file. Every case but the finale is a pack:
+74. A case is one file. Every case is a pack:
     `src/nodes/<id>.js` exports its authored scenes and one object with a field
     per table -- aftermath, connective and reaction scenes with effects and
     copy, side door, hidden route, evidence turn, memory choice, openings keyed
-    on the previous case's aftermath, voice and echo lines, people, setting and
-    scene context, clue, outcomes, carryovers and continuity challenges. A pack
+    on the previous case's aftermath, people, setting and scene context, clue,
+    outcomes, carryovers and continuity challenges. Every card -- in a scene, a
+    route plan or the evidence turn -- is one object carrying its label,
+    effect, `voice` and `echo`; `gameData.js` files the two lines under the
+    card's id as it builds the scenes. A pack
     may also carry `characterOverrides` (who someone is for that case only) and,
     on its route plan, `system.finalTitle` / `finalText` / `finalMemo` (its
     hidden route's closing scene).

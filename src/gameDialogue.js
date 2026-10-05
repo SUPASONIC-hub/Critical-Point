@@ -230,26 +230,28 @@ export const characterProfileCollisions = [];
 export function getCharacterProfile(name, caseId) {
   return readCharacterProfile({ profiles: characterProfiles, roleSpans: characterRoleSpans, overrides: packCharacterOverrides }, name, caseId);
 }
+/**
+ * What the analyst says on a card, by the card's id. Every line is written on
+ * its card in the case packs; `gameData.js` files them here as it builds the
+ * scenes, so this is empty until that module has loaded.
+ */
 export const choiceVoiceLines = {};
 
-
 /**
- * The authored echo replies. gameData copies these into the runtime table and
- * adds a reply for every scene its generators create, so the graph builder
- * never writes back into this file's data.
+ * The reply for a card that has none. The replies themselves are written on
+ * their cards too; gameData copies this into the runtime table and files the
+ * rest beside it, so the graph builder never writes back into this file's data.
  */
 export const authoredEchoReplies = {
   // What a choice with no reply of its own is answered with.
   default: "그 판단을 유지하려면 숨은 피해자와 비용을 다시 계산해야 합니다. 같은 원칙을 더 불리한 조건에서도 적용하시겠습니까?",
 };
 
-// A case pack's people and lines join these tables here, where the tables live,
+// A case pack's people join these tables here, where the tables live,
 // so a module that reads them -- the scene view reads `characterProfiles`
 // directly -- sees the whole season however its imports happen to be ordered.
 // This ran in gameData.js, so a reader that loaded first saw none of them.
 for (const pack of CASE_PACKS) {
-  Object.assign(choiceVoiceLines, pack.voiceLines);
-  Object.assign(authoredEchoReplies, pack.echoReplies);
   for (const [name, profile] of Object.entries(pack.characterProfiles ?? {})) {
     // A pack introduces its own people. Someone the season already knows is
     // not introduced twice: what changes for them in this case goes in
