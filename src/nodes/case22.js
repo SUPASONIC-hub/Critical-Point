@@ -414,7 +414,7 @@ export const case22 = {
         {
           label: "책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다",
           effect: { legitimacy: 11, trust: 2, time: -4, humanCost: 3, fatigue: 4 },
-          voice: "책임자 한 명이 아니라, 심사위원회 서명으로 양식을 바꾸자고 한다.",
+          voice: "잘못되면 한 사람의 인사 평가로 돌아가는 칸이라며, 책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다.",
           echo: "양식을 바꾸자는 요청은 본점으로 갑니다. 바뀐 양식보다 세온메디칼의 납기가 먼저 옵니다.",
         },
         {
@@ -552,12 +552,12 @@ export const case22 = {
     // CASE 22. Every line is spoken in front of a boy learning what a bank is,
     // so none of them is allowed to sound like the answer a bank would give.
     c22_start_desk: "화면보다 사람이 먼저라며, 강서지점 탁예린의 기업대출 창구부터 찾아간다.",
-    c22_start_code: "0.8초에도 규칙은 있다며, R-17이 어떤 규칙으로 만들어졌는지부터 연다.",
+    c22_start_code: "코드 하나로 끝난 거절의 속을 봐야 한다며, R-17이 어떤 규칙으로 만들어졌는지부터 연다.",
     c22_start_swap: "이름 하나가 문제라면, 대표자를 김 반장으로 바꿔 서류를 다시 넣자고 한다.",
     c22_counter_tell: "남의 입으로 듣게 둘 수는 없어서, 떡을 다 돌리기 전에 문가을에게 거절 사실을 직접 알린다.",
     c22_counter_appeal: "빈손으로 알리지 않겠다며, 탁예린과 재심사 요청서부터 접수한 뒤에 알린다.",
     c22_counter_wait: "아들의 첫 출근을 망치고 싶지 않아서, 하준의 인턴 주간이 끝날 때까지 소식을 미룬다.",
-    c22_branch_shop_a: "빠지지 마시라며, 이사장 자리를 지킨 채 싸우자고 한다.",
+    c22_branch_shop_a: "이름을 붙인 쪽은 은행이니 물러날 사람도 은행이라며, 빠지지 말고 이사장 자리를 지킨 채 싸우자고 한다.",
     c22_branch_shop_b: "출자금을 모은 다섯 명의 자리이기도 하다며, 사임 전에 조합원 총회를 열어 모두의 뜻을 묻는다.",
     c22_branch_shop_c: "월급을 미룬 조합원들이 먼저라며, 일단 이사장 명의만 바꿔 대출부터 받자고 한다.",
     c22_branch_shop_follow_a: "물은 사람에게는 본 대로 답해야 한다며, 하준에게 R-17 화면을 보여 주며 있는 그대로 설명한다.",
@@ -582,7 +582,7 @@ export const case22 = {
     c22_final_system_route_b: "오늘도 답을 기다리는 사람들이 읽을 말부터 바꾸자며, 규칙은 그대로 두고 거절 안내문만 친절하게 고친다.",
     c22_final_system_route_c: "한 곳씩 물으면 같은 답만 돌아온다며, R-17로 거절된 41곳을 모아 공동 이의 신청단을 꾸린다.",
     c22_evidence_turn_purge: "피해자를 위험으로 읽는 기계 앞에 설 수 없다며, 명단을 학습 데이터에서 지우기 전에는 어떤 심사도 받지 않는다.",
-    c22_evidence_turn_hold: "지금 꺼내면 조용히 고쳐지고 끝난다며, 이 기록은 쥐고 있다가 3월 주주총회에서 꺼낸다.",
+    c22_evidence_turn_hold: "주주들이 모인 자리에서 꺼내야 묻히지 않는다며, 이 기록은 쥐고 있다가 3월 주주총회에서 꺼낸다.",
     c22_evidence_turn_share: "제 이름이 어디에 쓰였는지는 본인이 먼저 알아야 한다며, 피해자 모임 1,021명에게 이 사실부터 알린다.",
   },
   echoReplies: {

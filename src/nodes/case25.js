@@ -262,7 +262,7 @@ export const case25 = {
         {
           label: "한서윤의 자리를 비워 두고 사진을 들고 그를 찾아간다",
           effect: { trust: 10, humanCost: -4, time: -4, capital: -3, fatigue: 3 },
-          voice: "한서윤의 자리는 비워 두고, 사진을 들고 그를 찾아간다.",
+          voice: "오지 못한 사람도 이 사진의 한 사람이라며, 한서윤의 자리를 비워 두고 사진을 들고 그를 찾아간다.",
           echo: "빈자리를 둔 사진은 이상하게 꽉 차 보입니다. 사진을 받은 한서윤은 한참 뒤에야 '고마워요' 네 글자를 보냅니다.",
         },
         {
@@ -544,7 +544,7 @@ export const case25 = {
       label: "엇갈린 엘리베이터 운행 기록을 경비실에서 받아 둔다",
       effect: { legitimacy: 9, capital: 3, time: -4, trust: -2, humanCost: 2, fatigue: 3 },
       cognition: { persistence: 1, inference: 1 },
-      voice: "엇갈린 엘리베이터의 운행 기록을, 경비실에서 받아 둔다.",
+      voice: "방금 내려갔다는 말이 말로만 남지 않게, 엇갈린 엘리베이터 운행 기록을 경비실에서 받아 둔다.",
       echo: "기록에는 18시 1분 화물 엘리베이터 하행이 찍혀 있습니다. 문자를 보낸 시각보다 1분 빠릅니다.",
     },
   },
