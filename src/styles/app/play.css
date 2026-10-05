@@ -1008,6 +1008,19 @@
   white-space: nowrap;
 }
 
+/* A long room name gives way with an ellipsis; the clock is kept whole. */
+.gx-dateline-place,
+.gx-dateline-clock {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gx-dateline-clock {
+  flex: none;
+  max-width: 100%;
+}
+
 .gx-dateline-clock::before {
   margin-right: 6px;
   color: var(--ui-line-strong);
@@ -2293,7 +2306,7 @@
 
   .gx-read,
   .gx-table {
-    gap: 6px;
+    gap: 5px;
   }
 
   .gx-hud {
@@ -2306,7 +2319,7 @@
   }
 
   .gx-actions {
-    padding-block: 7px calc(7px + env(safe-area-inset-bottom));
+    padding-block: 6px calc(6px + env(safe-area-inset-bottom));
   }
 
   .gx-actions button {

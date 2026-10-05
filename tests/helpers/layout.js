@@ -25,7 +25,18 @@ export async function measureTable(page) {
       cards: cards.length,
       lastCard: Math.round(bottom),
       actionsTop: Math.round(document.querySelector(".gx-actions").getBoundingClientRect().top),
-      widest: Math.round(Math.max(...[...document.querySelectorAll(".game-shell *")].map((element) => element.getBoundingClientRect().right))),
+      // What is drawn inside an <svg> is clipped to the svg's own box, so a
+      // shape that runs past it is not on the screen: the svg is measured, not
+      // its shapes. The scene plates of nine cases draw past their frame, and
+      // the sweep had been reporting every scene of those cases as too wide.
+      // The page's own scroll width is read as well, which is what a player
+      // would meet as a sideways scroll.
+      widest: Math.round(
+        Math.max(
+          document.documentElement.scrollWidth,
+          ...[...document.querySelectorAll(".game-shell *")].filter((element) => !element.ownerSVGElement).map((element) => element.getBoundingClientRect().right),
+        ),
+      ),
       innerWidth,
     };
   });

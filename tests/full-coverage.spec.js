@@ -7,9 +7,10 @@ import {
   collectRuntimeErrors,
   completeCase,
   createSeededRandom,
+  dismissProtocolBreach,
   startDebugNode,
 } from "./helpers/gameFlow.js";
-import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
 /**
  * The weekly tier (`npm run test:e2e:full`): what is too slow to gate a push.
@@ -74,6 +75,32 @@ async function assertReloadRoundTrip(page, before) {
   expect(after.lastError).toBeFalsy();
 }
 
+/**
+ * A card that asks for standing -- each case's evidence card -- is locked on
+ * the fresh save a debug jump starts from, and a locked card cannot be staked.
+ * The walk pressed it anyway, so every case failed on its four evidence cards
+ * and the scene behind them was reached only by jumping to it. The run is
+ * given the standing a player would have earned by then: records and the two
+ * gauges the gate reads (`getAuthorityGate`), written to the save from a
+ * static page so the table's own save on the way out does not overwrite them.
+ */
+const KEEP_SAVE_FLAG = "e2e-keep-save";
+
+async function grantAuthority(page) {
+  const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  await page.goto("/profile.jpg");
+  save.resources = { ...save.resources, trust: 90, legitimacy: 90 };
+  save.discoveredClues = CASE_SEQUENCE.map((caseId) => ({ id: `e2e-record-${caseId}`, title: caseId, text: "" }));
+  // The walk clears storage on every load, to start each pair clean; this one
+  // load has to find the save just written.
+  await page.evaluate((flag) => sessionStorage.setItem(flag, "1"), KEEP_SAVE_FLAG);
+  await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
+  await page.goto("/?debug=1");
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  await page.evaluate((flag) => sessionStorage.removeItem(flag), KEEP_SAVE_FLAG);
+  await dismissProtocolBreach(page);
+}
+
 const pairsIn = (caseId) => nodeOrders[caseId].reduce((count, nodeId) => count + nodes[nodeId].choices.length, 0);
 
 for (const caseId of CASE_SEQUENCE) {
@@ -85,13 +112,13 @@ for (const caseId of CASE_SEQUENCE) {
     const errors = [];
     let aborted = "";
     let walked = 0;
-    await page.addInitScript(() => {
+    await page.addInitScript((keepFlag) => {
       try {
-        localStorage.clear();
+        if (!sessionStorage.getItem(keepFlag)) localStorage.clear();
       } catch {
         // Storage can be blocked before the app boots.
       }
-    });
+    }, KEEP_SAVE_FLAG);
     collectRuntimeErrors(page, errors);
 
     for (const nodeId of nodeOrders[caseId]) {
@@ -101,6 +128,7 @@ for (const caseId of CASE_SEQUENCE) {
         const choice = scene.choices[choiceIndex];
         try {
           await startDebugNode(page, caseId, nodeId);
+          if (choice.requiredAuthority) await grantAuthority(page);
           await chooseSceneChoice(page, scene, choiceIndex);
           await page.waitForSelector(".game-shell, .result-page, .ending-reveal", { timeout: 8000 });
           if (await page.locator(".error-screen").isVisible()) {
