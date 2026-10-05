@@ -292,7 +292,12 @@ function playwrightArgs() {
   if (runFullCoverage) {
     // Test by test, so `--shard` spreads the per-case walks: a shard by file
     // would hand one runner all of full-coverage.spec.js.
-    return ["test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=4", "--fully-parallel", ...REPORTERS, ...forwardedArgs];
+    // Two workers, not four. Every pair and every measurement opens the dev
+    // server's page afresh, and four of them on one runner timed each other
+    // out: with the walk's own faults fixed (2026-10-05), every one of the 60
+    // tests still failing was a page load, a debug jump or a fifteen-minute
+    // sweep running out of time, in a different place each run.
+    return ["test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=2", "--fully-parallel", ...REPORTERS, ...forwardedArgs];
   }
   if (runSeasonWalk) {
     // One uninterrupted walk, case 1 to the ending, carrying every resource

@@ -44,15 +44,20 @@ jobs:
     #                                   ------
     #                                    11.8 h of one browser
     #
-    # Twelve shards of four workers is about 30 minutes a shard if four
-    # workers do the work of two, which is what a four-core runner gives a
-    # browser suite. The limit is three times that. Re-size both from the
-    # first run that finishes: the durations are in each shard's log.
+    # It was first sized as twelve shards of four workers, on the guess that
+    # four workers do the work of two on a four-core runner. The first runs
+    # that got as far as the tests (2026-10-05) took 23 to 80 minutes a shard,
+    # and with the walk's own faults fixed everything still failing was a
+    # timeout: a page load, a debug jump, a sweep out of its fifteen minutes,
+    # somewhere different each run. Four workers and a dev server were more
+    # than the runner had. So: two workers (scripts/run-e2e.mjs) and twice the
+    # shards, which is the same work for each worker as before and half the
+    # contention. The limit stays where the slowest shard so far would fit.
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # One Node version for CI and the Render build: .node-version.
@@ -74,7 +79,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      - run: npm run test:e2e:full -- --shard=${{ matrix.shard }}/12
+      - run: npm run test:e2e:full -- --shard=${{ matrix.shard }}/24
       - name: Upload full coverage diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
