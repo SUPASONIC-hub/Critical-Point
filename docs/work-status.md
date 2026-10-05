@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-09-29 (the audit fix pass merged 2026-09-28/29: saves that survive a crash, a restore, a stale tab and an older build; one x1.5 cap on the hand; cloud saves ordered by lineage and addresses kept as salted hashes; one canon for the loan; every hidden route, closing and dealt card reply written case by case; comfort settings on the intro; then the season fetched a case at a time)
+Last updated: 2026-10-05 (every voice line read against its scene; labels, replies and dates reconciled; the finale and 사건 02's routes made packs; a card carrying its own line and reply; the weekly tier brought to green)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -39,26 +39,40 @@ list of the files it touched.
   index and one case chunk, not all 55 cases (priority 88).
 - Fast CI checks and the heavyweight e2e tier are split in GitHub Actions; the
   e2e tier runs on three shards, and the uninterrupted season walk and full
-  coverage run weekly. Visual regression has its own label-aware workflow and
-  Linux-only baselines.
+  coverage run weekly. The weekly tier is twenty-four shards of two workers
+  (it was twelve of four, and timed itself out), sized on 2026-10-05, when all
+  twenty-four first passed. Visual regression has its own label-aware workflow
+  and Linux-only baselines.
 - Source text is valid UTF-8. Some Windows shells render Korean incorrectly, so
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
 - Visual baselines were last recorded on 2026-09-29, after the font, colours,
-  copy, the case card's markup and the phone header moved; the comparison
-  passes on main (priority 19 says how to record them again).
+  copy, the case card's markup and the phone header moved, and the phone play
+  screen again on 2026-10-05, when the dateline stopped cutting off its clock;
+  the comparison passes on main (priority 19 says how to record them again).
+- Every case is a pack, the finale included, and every card a pack writes is
+  one object carrying its label, effect, voice line and reply (priority 74).
+- Every voice line has been read beside the scene it is said in (2026-10-05),
+  and what the read-through found around the lines -- labels, replies, counts
+  and dates that disagreed -- is reconciled against `docs/canon.md`.
 
 Still open, on purpose:
 
-- The finale is the one case that is not a pack (priority 74).
 - Season length -- about 491 scenes a season, about 46 of them in the 프롤로그 --
   is an authoring decision, not a code problem.
-- The calendar does not close: the 프롤로그 is 2023 and the season's weekdays
-  are 2026's, so "3년" puts 사건 01 in 2025. 사건 26's committee sits on a
-  Sunday, and 사건 49's 화요일 is still to be reconciled with the rest.
-- Many voice lines are the card's label with a comma put into it (about 2,500
-  when stream F2 counted them), not a line of their own.
+- "3년". The 프롤로그 is 2022-23 and 사건 01 is 2025, a little over two years
+  on; the season says "3년 전" throughout and it is read as "the third year"
+  (`docs/canon.md`, "Known and left alone"). The rest of the calendar closes.
+- An evidence scene narrates from the last of the scenes its card is dealt on.
+  The card's label, line and reply name only what the earliest of them knows;
+  the scene behind it (사건 41, 42, 44, 46, 49) still speaks as if the latest
+  had been played.
+- The older spoken lines of 사건 01-05 and the finale ("…하겠습니다") state the
+  act without a reason. They were left as written.
+- Two numbers no longer sit under the words they were set for:
+  `f_archive_seal`'s effect was written for a label about gathering evidence,
+  and 사건 23's market card keeps the `risk` its old label inferred.
 
 ## Maintenance Priorities
 
