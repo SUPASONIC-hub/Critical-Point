@@ -272,17 +272,22 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
   await clickElement(page.getByTestId("decision-next"), `${scene.title}/${choice.id} next`);
 
   await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  // A side door that asks for something of the run (`branchCondition`) leads
+  // past itself when the run has not got it: 사건 04's opens only for a run that
+  // has already paid, and a fresh one is sent on to `branchBypass`. Either is
+  // where the card goes. The walk waited thirty seconds for the detour, on
+  // every run, and called the card broken.
   await page.waitForFunction(
-    ({ nextNodeId, nextTitle }) => {
+    ({ nextNodeIds, nextTitle }) => {
       const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null");
       const heading = document.querySelector(".game-header h1")?.textContent ?? "";
       return (
-        saved?.nodeId === nextNodeId ||
+        nextNodeIds.includes(saved?.nodeId) ||
         (nextTitle && heading.includes(nextTitle)) ||
         Boolean(document.querySelector(".result-page, .ending-reveal"))
       );
     },
-    { nextNodeId, nextTitle: nodes[nextNodeId]?.title ?? "" },
+    { nextNodeIds: [nextNodeId, choice.branchCondition ? choice.branchBypass : null].filter(Boolean), nextTitle: nodes[nextNodeId]?.title ?? "" },
     { timeout: TRANSITION_TIMEOUT_MS },
   );
 }

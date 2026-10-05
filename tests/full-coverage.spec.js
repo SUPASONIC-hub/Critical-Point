@@ -219,6 +219,10 @@ test("saved state survives reload stress during complete season @full", async ({
       await assertReloadRoundTrip(page, before);
     }
     if (index === 1) {
+      // The second case opens behind the relic draft and then its briefing,
+      // and both are modal: the 저장 button under them does not take a click,
+      // which is right, and is where this walk stopped on every run.
+      await dismissProtocolBreach(page);
       await page.locator('[aria-keyshortcuts="P"]').click();
       await assertReloadRoundTrip(page, before);
     }
@@ -227,6 +231,7 @@ test("saved state survives reload stress during complete season @full", async ({
       // third reload this walk takes: a table with a card on it has to survive
       // one. It is asserted, not looked for: `if (await card.isVisible())`
       // skipped the whole check whenever the card was a frame late.
+      await dismissProtocolBreach(page);
       const reframeCard = page.locator(".gx-card-wild");
       await expect(reframeCard).toBeVisible();
       await clickElement(reframeCard, "reframe card");
