@@ -177,7 +177,7 @@ test("the ranking and the board read from the backend in the release", { tag: "@
  *      새로고침 button (`chunk-reload`) instead of handing it to the root
  *      boundary, so nothing is written to the save.
  */
-test("a scene graph that cannot be fetched reloads once, then offers 새로고침 and leaves the save alone", { tag: "@prod" }, async ({ page }) => {
+test("a scene graph that cannot be fetched reloads once, then offers 새로고침 and leaves the save alone", { tag: "@prod" }, async ({ page, browserName }) => {
   const save = savedAtLastScene();
   await seedSave(page, save);
   let refuse = true;
@@ -187,14 +187,20 @@ test("a scene graph that cannot be fetched reloads once, then offers 새로고�
     refusals += 1;
     return route.abort("failed");
   });
+  let loads = 0;
+  page.on("load", () => {
+    loads += 1;
+  });
   await page.goto("/");
 
-  // The idle prefetch is refused, the tab reloads itself, and the reloaded
-  // intro's prefetch is refused too -- this time without a reload. Waiting for
-  // both keeps the 이어하기 press off the page that is about to go away.
-  await expect
-    .poll(() => refusals, { message: "the runtime chunk was asked for on both loads", timeout: 20_000 })
-    .toBeGreaterThanOrEqual(2);
+  // The idle prefetch is refused and the tab reloads itself; the reloaded
+  // intro's prefetch fails too, this time without a reload. Waiting for the
+  // second load keeps the 이어하기 press off the page that is about to go away.
+  // It is the load that is counted, not the refusals: Chromium asks for the
+  // chunk again after the reload, WebKit remembers that the import failed and
+  // fails it again without a request, and the tab does the same thing in both.
+  await expect.poll(() => loads, { message: "the tab reloaded itself once", timeout: 20_000 }).toBeGreaterThanOrEqual(2);
+  expect(refusals, "the runtime chunk was asked for and refused").toBeGreaterThanOrEqual(1);
   await expect(page.locator(".intro")).toBeVisible();
   expect(
     await page.evaluate((key) => sessionStorage.getItem(key), CHUNK_RELOAD_SESSION_KEY),
@@ -218,10 +224,19 @@ test("a scene graph that cannot be fetched reloads once, then offers 새로고�
   expect(kept.runId).toBe(save.runId);
   expect(kept.nodeId).toBe(save.nodeId);
   expect(kept.lastError ?? null).toBeNull();
+  expect(loads, "the second failure did not reload the tab again").toBe(2);
 
-  // And the way back works once the chunk can be had.
+  // And the way back works once the chunk can be had. 새로고침 reloads the tab
+  // in every engine. Whether the reloaded tab then gets the chunk is asked of
+  // Chromium only: WebKit goes on failing an import it has seen fail, across
+  // reloads and without asking the server, for a length of time that differed
+  // from run to run (2026-10-05). A deploy gives the chunk a new name, so a
+  // player's Safari does not meet that; a test that brings the same file back
+  // under the same name does.
   refuse = false;
   await reload.click();
+  await expect.poll(() => loads, { message: "새로고침 reloaded the tab" }).toBeGreaterThanOrEqual(3);
+  if (browserName === "webkit") return;
   await expect(page.locator(".intro, .game-shell").first()).toBeVisible();
   if (await page.getByTestId("resume-save").isVisible()) await resumeSavedRun(page);
   await expect(page.locator(".game-shell")).toBeVisible();
