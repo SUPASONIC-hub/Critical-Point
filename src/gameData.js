@@ -662,7 +662,7 @@ function registerCase02DramaticRoutes() {
     c2_route_origin_freeze: "원본을 얼리면 누구도 쉽게 결론을 고치지 못합니다.",
     c2_route_origin_token: "토큰을 쫓는 선택은 사람의 이름보다 권한의 이동을 보게 합니다.",
     c2_route_origin_patch: "패치는 마감을 구하지만 공백의 의미도 함께 지웁니다.",
-    c2_route_system_copy: "선택 문장이 증거가 되면 플레이어도 사건 안으로 들어옵니다.",
+    c2_route_system_copy: "선택 문장이 증거가 되면 당신도 사건 안으로 들어옵니다.",
     c2_route_system_warn: "경고는 다음 사람을 지키지만 실험자에게도 당신의 위치를 알립니다.",
     c2_route_system_hide: "흔적을 숨기면 사건은 작아지고, 같은 실험은 계속될 수 있습니다.",
     c2_final_evidence_stop: "절차를 멈추는 문장은 늦지만, 다음 징계의 기준이 됩니다.",

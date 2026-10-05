@@ -25,14 +25,14 @@ export const case06Nodes = {
     choices: [
       {
         id: "c6_start_defend",
-        label: "오진우를 먼저 찾아 상태를 확인한다",
+        label: "결근 중인 오진우를 먼저 찾아 상태를 확인한다",
         effect: { time: -10, trust: 11, legitimacy: -3, fatigue: 3 },
         next: "c6_desk",
         cognition: { persistence: 2 },
       },
       {
         id: "c6_start_record",
-        label: "그의 검토 기록부터 열어 사실관계를 정리한다",
+        label: "오진우의 검토 기록부터 열어 사실관계를 정리한다",
         effect: { time: -8, legitimacy: 9, trust: -4, fatigue: 2 },
         next: "c6_desk",
         cognition: { inference: 2 },
@@ -522,7 +522,7 @@ export const case06 = {
     c6_evidence_turn_hand: "위원회보다 그가 먼저 알아야 한다며, 대조표를 오진우에게 먼저 건넨다.",
     c6_evidence_turn_pair: "경쟁이 아니었다는 것이 기록으로 남게, 두 프로필의 대조표를 위원회에 낸다.",
     c6_evidence_turn_shield: "내 선택이 그의 조건이었다는 것까지 내보일 수는 없어서, 날짜만 남기고 내 쪽 기록은 가린다.",
-    c6_start_defend: "보고서보다 사람이 먼저 사라질 수 있다는 걸 알기에, 그를 찾는 일부터 시작한다.",
+    c6_start_defend: "기록보다 사람이 먼저 사라질 수 있다는 걸 알기에, 결근 중인 오진우를 찾는 일부터 시작한다.",
     c6_start_record: "감정이 끼어들 자리를 지우고, 그가 실제로 무엇을 승인했는지부터 연다.",
     c6_start_panel: "시간을 사는 값이 비싸다는 걸 알면서도, 위원회에 기한을 미뤄 달라고 청한다.",
     c6_desk_person: "기록이 말하지 않는 것을 물으려고, 그를 매일 보던 사람들 앞에 앉는다.",
