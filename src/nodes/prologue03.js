@@ -275,7 +275,7 @@ export const prologue03 = {
         {
           label: "'부속 의견 없음' 여섯 글자를 고쳐 달라고 부행장에게 직접 말한다",
           effect: { trust: 10, legitimacy: 4, humanCost: -4, time: -4, capital: -3, fatigue: 4 },
-          voice: "'부속 의견 없음' 여섯 글자를, 부행장에게 직접 고쳐 달라고 말한다.",
+          voice: "반려했다는 말이 의견이 없었다는 말은 아니어서, '부속 의견 없음' 여섯 글자를 고쳐 달라고 부행장에게 직접 말한다.",
           echo: "말하면 진세라가 펜을 다시 듭니다. 그리고 여섯 글자를 그대로 둔 채 그 옆에 물음표를 하나 그립니다.",
         },
         {
@@ -376,7 +376,7 @@ export const prologue03 = {
         {
           label: "감사팀과 엮여서 좋을 게 없다며 자리를 뜬다",
           effect: { time: 4, capital: 4, trust: -4, legitimacy: -3, humanCost: 3, fatigue: -2 },
-          voice: "이미 충분히 눈에 띈 날이어서, 감사팀과 엮여서 좋을 게 없다며 자리를 뜬다.",
+          voice: "반려된 날에 남의 수첩에까지 오르고 싶지 않아서, 감사팀과 엮여서 좋을 게 없다며 자리를 뜬다.",
           echo: "자리를 뜨면 반재욱은 아무 말 없이 수첩을 닫습니다. 첫 장의 두 줄은 지우지 않습니다.",
         },
       ],
@@ -566,7 +566,7 @@ export const prologue03 = {
   voiceLines: {
     // PROLOGUE 03. Nobody in this chapter shouts, so no line is allowed to sound
     // like a fight. Every one of them is said politely, to a polite person.
-    p3_start_ask: "담당이 읽어야 위원회도 읽는다며, 한서윤 과장에게 마지막 장까지 읽어 달라고 직접 부탁한다.",
+    p3_start_ask: "첨부로 붙은 채로는 회의에서 안 읽힐 테니, 한서윤 과장에게 마지막 장까지 읽어 달라고 직접 부탁한다.",
     p3_start_rule: "누구의 호의에도 기대지 않게, 첨부를 본문 안건으로 올리는 절차를 규정에서 찾아 서면으로 요청한다.",
     p3_start_desk: "첨부까지 넘겨 볼 시간은 없을 테니, 회의 시작 전에 위원 아홉 명 자리마다 한 장짜리 요약을 놓아 둔다.",
     p3_committee_after: "회의를 멈출 일은 아니라고 보고, 회의가 끝난 뒤 한서윤을 붙잡고 이유부터 듣기로 한다.",
@@ -580,7 +580,7 @@ export const prologue03 = {
     p3_branch_closed_c: "볼트 구멍이 오늘 반려의 답은 아니어서, 옛날 이야기는 됐다며 오늘 건 이야기로 돌아간다.",
     p3_branch_closed_follow_a: "그 빨간 줄을 12년째 혼자 긋고 있는 것 같아서, 확신이 문제였던 게 아니라고 그 자리에서 말해 준다.",
     p3_branch_closed_follow_b: "어디가 같은지는 같이 봐야 안다며, 그 사본을 오늘 건 옆에 나란히 놓고 같이 읽자고 한다.",
-    p3_branch_closed_follow_c: "고쳐 주려던 거라면 종이로 받아야 해서, 고칠 시간을 준 거면 사유를 달라며 사본을 돌려준다.",
+    p3_branch_closed_follow_c: "무엇을 고치라는 건지 아직 받은 것이 없어서, 고칠 시간을 준 거면 사유를 달라며 사본을 돌려준다.",
     p3_archive_trust: "내 손에 있으면 빼앗길 수 있다며, 뒷장은 선생님이 맡아 주시면 좋겠다고 부탁한다.",
     p3_archive_register: "누가 찾아도 끈 안에 있게, 뒷장까지 포함한 원본을 정식 보존 목록에 올려 달라고 요청한다.",
     p3_archive_copy: "연필 한 줄은 지우면 그만이라며, 복사기가 꺼지기 전에 뒷장까지 복사해 오늘 밤 들고 나간다.",

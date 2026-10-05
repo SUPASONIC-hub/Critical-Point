@@ -204,7 +204,7 @@ export const case03 = {
         {
           label: "책임 조항을 앞에 세운다",
           effect: { legitimacy: 8, capital: -6, time: -5, fatigue: 5 },
-          voice: "경쟁사의 책임 조항을 문장 단위로 확인해 앞에 세우겠습니다.",
+          voice: "책임 조항을 문장 단위로 확인해 제안서 맨 앞에 세우겠습니다.",
           echo: "책임 조항을 앞에 세우면 제안은 무거워지고, 실패한 날 그 문장만 작동합니다.",
         },
         {
@@ -588,7 +588,7 @@ export const case03 = {
     c3_branch_signal_follow_b: "혼자 받는 박수를 나누어, 공동 책임자를 발표한다.",
     c3_branch_signal_follow_c: "빈칸을 남겨둔 채, 성과 수치부터 확정한다.",
     c3_after_share: "승패를 접어두고, 두 안의 장점을 합쳐 고객에게 다시 제안한다.",
-    c3_after_proof: "점수판보다 먼저, 보안 결함의 증거를 공개한다.",
+    c3_after_proof: "결함을 숨긴 쪽이 높은 점수를 받았으니, 점수보다 보안 결함의 증거를 먼저 공개한다.",
     c3_after_win: "망설임을 끊고, 승리를 확정한 뒤 경쟁자의 허점을 이용한다.",
     c3_score_fast: "평가표가 요구하는 모양으로, 가진 안을 잘라 맞춘다.",
     c3_split_deep: "싼 답이 비싼 이유를 숫자로 만들겠다며 계산을 다시 연다.",
@@ -598,7 +598,7 @@ export const case03 = {
     c3_trap_mirror: "내용보다 순서와 강조로 승부를 보겠다고 정한다.",
     c3_score_invert: "이 표로는 아무도 옳을 수 없다며, 평가 기준 자체를 안건에 올린다.",
     c3_trap_invert: "누가 이 경쟁을 설계했는지부터 고객에게 말한다.",
-    c3_start_audit_fast: "복원해 둔 기록이 있으니 속도로도 진다고 생각하지 않는다.",
+    c3_start_audit_fast: "복원해 둔 기록이 있으니 속도로도 지지 않는다며, 1차안을 먼저 낸다.",
     c3_start_audit_deep: "기록을 복원한 사람답게, 이번에도 결함부터 끝까지 본다.",
     c3_start_audit_mirror: "오진우가 무엇을 지웠을지부터 추정해 대응안을 짠다.",
     c3_start_person_fast: "사람을 지킨 대가를 속도로 갚겠다며 먼저 안을 낸다.",

@@ -291,7 +291,7 @@ export const case01 = {
         {
           label: "임원 보수를 먼저 깎아 줄 돈을 마련한다",
           effect: { capital: -10, trust: 7, legitimacy: 7, humanCost: -3, fatigue: 7 },
-          voice: "먼저 깎을 자리는 제 자리라고 적겠습니다.",
+          voice: "먼저 깎을 자리는 임원 보수라고 적겠습니다.",
           echo: "위에서 먼저 깎으면 지급 순서는 설명이 필요 없어집니다.",
         },
       ],

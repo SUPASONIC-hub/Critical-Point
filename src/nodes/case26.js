@@ -264,7 +264,7 @@ export const case26 = {
         {
           label: "급한 사람부터 임금 일부를 먼저 받을 길을 찾는다",
           effect: { trust: 11, humanCost: -5, capital: -5, time: -4, fatigue: 4 },
-          voice: "급한 사람부터, 임금 일부를 먼저 받을 길을 찾자고 한다.",
+          voice: "등록금 마감이 금요일인 사람도 있어서, 급한 사람부터 임금 일부를 먼저 받을 길을 찾는다.",
           echo: "길을 찾으면 등록금 마감 전에 한 사람 몫은 나옵니다. 나머지 여든여섯 명은 그 순서를 지켜봅니다.",
         },
         {
@@ -554,7 +554,7 @@ export const case26 = {
   voiceLines: {
     // CASE 26. A building that stopped at its bones. Every line is said to
     // someone standing under forty metres of steel, so none may sound like a memo.
-    c26_start_site: "의견서는 나중이라며, 크레인이 선 공사 현장부터 간다.",
+    c26_start_site: "620억이 나간 자리를 보지 않고는 쓸 수 없다며, 의견서보다 먼저 크레인이 선 공사 현장으로 간다.",
     c26_start_terms: "620억이 어떤 약속으로 나갔는지 알아야 한다며, 대출 약정서와 공사 기록부터 한 장씩 대조한다.",
     c26_start_draft: "대표의 뜻을 바로 거스를 수는 없어서, 연장 의견서 초안부터 써 두고 시간을 번다.",
     c26_crane_listen: "쌓은 사람 말부터 들어야 한다며, 크레인 아래에 남아 반장의 요구를 끝까지 받아 적는다.",
@@ -566,7 +566,7 @@ export const case26 = {
     c26_branch_frame_follow_a: "87억이 누구 몫에서 빠졌는지 알 사람들이라며, 빈 확인자 칸을 인부들에게 먼저 보여 주고 같이 따진다.",
     c26_branch_frame_follow_b: "우리 도장이니 우리가 먼저 물어야 한다며, 도장이 찍힌 경위를 부동산금융팀에 공식 질의한다.",
     c26_branch_frame_follow_c: "우리 도장을 우리 손으로 들추기는 어려워서, 사본을 권도현에게 넘기고 브릿지은행이 먼저 싸우게 한다.",
-    c26_creditors_wages: "임금 먼저를 붙인 권도현의 가운데 칸에, 우리 표를 보탠다.",
+    c26_creditors_wages: "유치권이 걸리면 아무도 못 판다는 계산이 맞다며, 임금 먼저를 붙인 권도현의 가운데 칸에 표를 보탠다.",
     c26_creditors_audit: "세 칸 모두 현장을 보고 고를 일이니 결정 전에 실사부터 하자며, 회의를 멈춘다.",
     c26_creditors_extend: "여기서 회사 뜻을 뒤집을 자리는 아니라며, 대표 뜻대로 1년 연장 쪽에 KD캐피탈 표를 던진다.",
     c26_tower_promise: "뭐가 달라지느냐는 물음에 답해야 한다며, 내려오면 임금부터 받게 하겠다고 이름을 걸고 약속한다.",

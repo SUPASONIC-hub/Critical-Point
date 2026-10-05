@@ -265,7 +265,7 @@ export const case44 = {
         {
           label: "모자란 5만 원을 우리가 채우고 모임 일을 맡긴다",
           effect: { trust: 10, humanCost: -5, capital: -5, time: -3, fatigue: 4 },
-          voice: "모자란 5만 원은 우리가 채우고, 모임 일을 맡긴다.",
+          voice: "월세 5만 원 때문에 선 줄이라면 다른 일로도 된다며, 모자란 5만 원을 우리가 채우고 모임 일을 맡긴다.",
           echo: "5만 원이 채워지면 서지호는 남색 모자를 벗고 문가을의 떡 보따리를 듭니다. 줄에서 한 자리가 비고, 그 자리는 다른 알바가 채웁니다.",
         },
         {
@@ -277,7 +277,7 @@ export const case44 = {
         {
           label: "그의 하루벌이니 줄은 그대로 두고 지나간다",
           effect: { time: 4, capital: 3, trust: 2, humanCost: 5, fatigue: -3 },
-          voice: "그의 하루벌이라며, 줄은 그대로 두고 지나간다.",
+          voice: "누구 재판인지도 모르고 선 사람을 탓할 수는 없어서, 그의 하루벌이인 줄은 그대로 두고 지나간다.",
           echo: "줄은 그대로입니다. 서지호가 당첨되면 월세를 내고, 모임 사람 한 명은 복도 모니터로 선고를 봅니다.",
         },
       ],
@@ -366,7 +366,7 @@ export const case44 = {
         {
           label: "들어갈 자리는 이미 있으니 따지지 않고 넘어간다",
           effect: { time: 4, capital: 4, trust: -3, humanCost: 3, fatigue: -4 },
-          voice: "모임 몫으로 들어갈 자리는 이미 있으니, 240만 원짜리 줄은 따지지 않고 넘어간다.",
+          voice: "들어갈 자리는 이미 있으니, 240만 원짜리 줄은 따지지 않고 넘어간다.",
           echo: "넘어가면 오늘은 조용합니다. 다음 재판에도 남색 모자는 옵니다.",
         },
       ],
@@ -496,7 +496,7 @@ export const case44 = {
     result: "c44_aftershock",
     sourceRoutes: ["c44_lottery", "c44_court", "c44_lunch", "c44_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "판결문의 '피해가 상당 부분 회복된 점'이라는 구절을 단서의 장부와 견주어, 그 회복이 누구 이름으로 올랐는지 밝혀 둔다.",
+    entryVoice: "'피해 회복'이라는 구절을 단서의 장부와 견주어, 그 회복이 누구 이름으로 올랐는지 밝혀 둔다.",
     entryEcho: "구절을 장부와 견주면 누가 갚았는지와 누가 갚았다고 적혔는지가 갈라집니다. 둘 사이의 거리가 25억보다 멉니다.",
     entryLabel: "'피해 회복'에 쓰인 돈이 장부에서 누구 이름인지 들춘다",
     title: "갚은 사람의 이름",

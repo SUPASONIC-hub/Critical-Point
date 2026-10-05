@@ -282,7 +282,7 @@ export const prologue04 = {
         {
           label: "숫자만 집계표에 옮기고 이름 칸은 비워 둔다",
           effect: { time: 5, capital: 4, trust: -3, humanCost: 3, fatigue: -3 },
-          voice: "점검표가 묻는 것은 건수뿐이라며, 숫자만 집계표에 옮기고 이름 칸은 비워 둔다.",
+          voice: "이름을 적으면 사람부터 지목될까 봐, 숫자만 집계표에 옮기고 이름 칸은 비워 둔다.",
           echo: "이름 칸이 비면 집계표는 깔끔해집니다. 213이라는 숫자에는 아무 얼굴도 남지 않습니다.",
         },
       ],
@@ -359,7 +359,7 @@ export const prologue04 = {
         {
           label: "오진우에게 창구에서 본 것을 그대로 다 말한다",
           effect: { trust: 9, humanCost: -3, legitimacy: -2, time: -3, fatigue: 3 },
-          voice: "창구에서 본 것을, 오진우에게 그대로 다 말한다.",
+          voice: "내 편이라는 사람에게 숨길 것은 없다며, 오진우에게 창구에서 본 것을 그대로 다 말한다.",
           echo: "다 말하면 오진우가 한참 조용합니다. 그리고 '저도 그 대본 회의에 들어갔었어요'라고 합니다.",
         },
         {
@@ -388,7 +388,7 @@ export const prologue04 = {
         {
           label: "반재욱과 빠진 18쪽을 같이 맞춰 본다",
           effect: { legitimacy: 9, trust: 5, time: -4, humanCost: 2, fatigue: 4 },
-          voice: "반재욱과 함께, 빠진 18쪽을 맞춰 본다.",
+          voice: "물어볼 데가 없으면 직접 봐야 한다며, 반재욱과 빠진 18쪽을 같이 맞춰 본다.",
           echo: "맞춰 보면 두 사람 수첩에 같은 문장이 적힙니다. 반재욱이 자기 쪽 날짜 옆에 당신 이름을 적습니다.",
         },
         {
@@ -423,7 +423,7 @@ export const prologue04 = {
         {
           label: "지금 답할 수 없다며 확인해서 서면으로 알려 주겠다고 한다",
           effect: { legitimacy: 9, trust: 3, time: -5, humanCost: 2, capital: -2, fatigue: 3 },
-          voice: "지금은 답할 수 없다며, 확인해서 서면으로 알려 주겠다고 한다.",
+          voice: "어림짐작으로 답할 돈이 아니어서, 지금 답할 수 없다며 확인해서 서면으로 알려 주겠다고 한다.",
           echo: "서면으로 하겠다고 하면 그가 고개를 끄덕입니다. 종이로 받는 걸 그는 더 믿습니다.",
         },
         {
@@ -501,7 +501,7 @@ export const prologue04 = {
     result: "p4_aftershock",
     sourceRoutes: ["p4_window", "p4_quota", "p4_visit", "p4_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "3분 대본을 서랍에서 꺼내 단서와 포개고, 이 한 장을 누가 언제 만들었는지 맞춰 본다.",
+    entryVoice: "3분 대본을 단서와 포개 놓고, 이 한 장을 누가 언제 만들었는지 맞춰 본다.",
     entryEcho: "파일 이름을 열면 대본의 작성 기록이 따라 나옵니다. 파는 손과 문장을 고른 손은 같은 층에 있지 않습니다.",
     entryLabel: "창구 대본 파일이 만들어진 계정과 시각을 연다",
     title: "대본을 만든 손",
@@ -561,8 +561,8 @@ export const prologue04 = {
     // PROLOGUE 04. Every line here is said next to a counter where someone is
     // smiling, so none of them is allowed to sound like an audit finding.
     p4_start_open: "뒤에서 지켜보기만 하는 사람으로 남지 않게, 창구 뒤에 서기 전에 왜 왔는지 행원들에게 먼저 말한다.",
-    p4_start_board: "창구보다 벽에 걸린 숫자가 먼저 보여서, 실적판과 이번 달 판매 목표 공문부터 사진으로 남긴다.",
-    p4_start_quick: "하루짜리 점검에 더 얹을 것은 없다며, 점검표 스무 칸만 채우고 오늘 안에 본점으로 올라간다.",
+    p4_start_board: "창구를 보기 전에 벽에 걸린 숫자부터 봐야 한다며, 실적판과 이번 달 판매 목표 공문부터 사진으로 남긴다.",
+    p4_start_quick: "사후 점검에 더 얹을 것은 없다며, 점검표 스무 칸만 채우고 오늘 안에 본점으로 올라간다.",
     p4_window_stop: "서명하고 나면 늦는다며, 서명 전에 끼어들어 설명서 12쪽을 손님과 같이 읽는다.",
     p4_window_script: "사람이 아니라 문장을 따지기로 하고, 대본과 설명서를 나란히 놓고 다른 문장을 한 줄씩 적는다.",
     p4_window_watch: "한 건만 보고는 판단할 수 없어서, 끼어들지 않고 오전 판매 여섯 건을 끝까지 지켜본다.",

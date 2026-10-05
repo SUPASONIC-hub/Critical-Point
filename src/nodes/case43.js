@@ -293,7 +293,7 @@ export const case43 = {
         {
           label: "회사가 잊을 사람들의 이름을 들고 가겠다고 답장한다",
           effect: { trust: 10, humanCost: -5, capital: -3, time: -3, fatigue: 4 },
-          voice: "회사가 잊을 사람들의 이름을 들고 가겠다고, 회장에게 답장한다.",
+          voice: "한 사람을 내보내면 잊는다는 말에 맞서, 회사가 잊을 사람들의 이름을 들고 가겠다고 답장한다.",
           echo: "답장에는 읽음 표시만 뜹니다. 월요일 회의실에서 회장은 명단의 첫 이름을 먼저 말합니다. 당신보다 먼저.",
         },
         {
@@ -555,7 +555,7 @@ export const case43 = {
     // result was written before the vote, so none of them may sound like a press release.
     c43_start_arin: "증언할 사람이 먼저라며, 백아린부터 찾아가 자료를 함께 정리한다.",
     c43_start_charter: "표보다 먼저 종이에 무엇이 적혔는지 알아야 한다며, 이사회 규정과 안건 설명서부터 조항별로 따진다.",
-    c43_start_count: "시간이 없다며, 사외이사 일곱 명의 표부터 빠르게 셈한다.",
+    c43_start_count: "여덟 표 중 일곱이 사외이사 손에 있어서, 사외이사 일곱 명의 표부터 빠르게 셈한다.",
     c43_ledger_visit: "0.48은 숫자가 아니라 사람이라며, 막내 사외이사 은채원을 찾아가 피해자들의 이야기를 전한다.",
     c43_ledger_conflict: "해온파트너스 자문위원 출신이 던질 표는 아니라며, 반대 유력 두 사람의 자문 이력을 이해충돌로 공식 제기한다.",
     c43_ledger_target: "남은 시간에 일곱 명을 다 만날 수는 없어서, 확률표대로 표가 될 두 사람만 골라 공략한다.",
@@ -585,7 +585,7 @@ export const case43 = {
     c43_final_system_route_c: "반대한 사람이 조용히 빠지지 않게, 사외이사의 반대표와 그 뒤 재선임 여부를 해마다 공개하게 한다.",
     c43_evidence_turn_reveal: "끝이 미리 정해졌다는 걸 알고 던지게, 두 장의 보도자료를 개회 전에 사외이사 전원에게 보낸다.",
     c43_evidence_turn_protect: "이름도 못 적고 보낸 사람이 먼저라며, 파일을 보낸 홍보실 직원부터 보호할 방법을 찾는다.",
-    c43_evidence_turn_hold: "지금 꺼내면 회사가 문단만 고쳐 쓴다며, 보도자료는 표결 뒤에 쓸 카드로 남겨 둔다.",
+    c43_evidence_turn_hold: "두 장의 끝이 같다는 건 결과가 나온 뒤에 더 또렷하다며, 보도자료는 표결 뒤에 쓸 카드로 남겨 둔다.",
   },
   echoReplies: {
     // CASE 43.

@@ -234,13 +234,13 @@ export const case04 = {
         {
           label: "사실과 모르는 것을 함께 공개한다",
           effect: { legitimacy: 9, trust: 4, capital: -7, fatigue: 6 },
-          voice: "공개 가능한 사실과 아직 모르는 사실을 나누겠습니다.",
+          voice: "확인된 사실과 아직 모르는 것을 나눠 함께 공개하겠습니다.",
           echo: "모르는 것을 함께 적는 것이 공개의 첫 조건입니다.",
         },
         {
           label: "서비스 이용자 피해를 먼저 알린다",
           effect: { humanCost: -6, trust: 8, capital: -6, time: -4, fatigue: 5 },
-          voice: "기자의 문장보다 피해 복구의 순서를 먼저 확정하겠습니다.",
+          voice: "기자의 문장보다 먼저, 이용자가 입을 피해와 복구 순서부터 알리겠습니다.",
           echo: "기사의 속도보다 복구 순서가 피해자에게 직접 닿습니다.",
         },
         {
@@ -515,7 +515,7 @@ export const case04 = {
     result: "c4_aftershock",
     sourceRoutes: ["c4_route_exception", "c4_route_rule", "c4_route_audit", "c4_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "예외 승인 기록을 단서와 수신자별로 나눠, 이 예외가 정말 처음인지 가린다.",
+    entryVoice: "예외 승인 기록을 단서에 비추어 수신자별로 나눠, 이 예외가 정말 처음인지 가린다.",
     entryEcho: "수신자별로 나누면 예외는 판단이 아니라 반복으로 읽힙니다.",
     title: "예외 파일의 원래 수신자",
     speaker: "반재욱",
@@ -590,7 +590,7 @@ export const case04 = {
     c4_branch_exception_follow_c: "결과가 좋았다는 이유를 들어, 감사를 여기서 닫는다.",
     c4_after_rule: "줄 선 요청들을 보며, 예외 조건을 전부 공개하고 새 기준을 만든다.",
     c4_after_service: "서비스를 멈출 수 없다는 이유로, 같은 예외를 한 번 더 허용한다.",
-    c4_after_stop: "감사를 위해, 진행 중이던 예외 적용을 즉시 중단한다.",
+    c4_after_stop: "감사 요청서가 먼저 도착했고 같은 예외를 기다리는 기관이 줄을 서서, 예외 적용을 즉시 중단한다.",
     c4_offer_approve: "이번 한 번이라는 말을 스스로에게 하며, 흔적을 남기지 않는다.",
     c4_leak_approve: "지금 인정하면 다 무너진다며, 의혹을 먼저 밀어낸다.",
     c4_vote_approve: "문 닫는 것보다 낫다는 계산 끝에, 예외에 손을 든다.",
@@ -633,7 +633,7 @@ export const case04 = {
     c4_final_system_b: "결과가 좋았다는 사실을 근거로 삼아, 다음 사용도 열어 둔다.",
     c4_final_system_c: "기준에 잠금장치를 달아, 당사자 동의 없이는 열리지 않게 만든다.",
     c4_evidence_turn_owner: "예외가 처음이 아니었다는 걸 보고, 반복 승인자를 기록에 남긴다.",
-    c4_evidence_turn_stop: "절차를 멈춰 세우고, 피해자 동의를 새 조건으로 끼워 넣는다.",
+    c4_evidence_turn_stop: "예외 승인이 미리 설계된 반복이었으니, 승인 절차를 멈추고 피해자 동의를 새 조건으로 넣는다.",
     c4_evidence_turn_patch: "반복된 흔적은 덮고, 이번 건만 조용히 마무리한다.",
   },
   echoReplies: {

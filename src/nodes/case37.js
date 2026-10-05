@@ -266,7 +266,7 @@ export const case37 = {
         {
           label: "순위표에 오른 사람들에게 먼저 알리고 대응을 같이 정한다",
           effect: { trust: 11, humanCost: -5, legitimacy: 3, time: -4, capital: -2, fatigue: 3 },
-          voice: "순위표에 오른 사람들에게 먼저 알리고, 대응을 같이 정하자고 한다.",
+          voice: "선우진이 남의 입으로 1위를 알게 둘 수 없어서, 순위표에 오른 사람들에게 먼저 알리고 대응을 같이 정한다.",
           echo: "알리면 선우진이 새벽에 순위표를 봅니다. 모르고 자는 밤 하나가 사라집니다.",
         },
         {
@@ -278,7 +278,7 @@ export const case37 = {
         {
           label: "순위표는 무시하고 원본 파일 삭제에만 집중한다",
           effect: { time: 5, capital: 3, trust: -4, humanCost: 4, legitimacy: 1, fatigue: -3 },
-          voice: "순위표는 무시하고, 원본 파일 삭제에만 집중하자고 한다.",
+          voice: "순위표까지 쫓을 손은 없다며, 순위표는 무시하고 원본 파일 삭제에만 집중한다.",
           echo: "원본은 줄어듭니다. 순위표는 원본이 없어도 혼자 살아남습니다.",
         },
       ],
@@ -587,7 +587,7 @@ export const case37 = {
     c37_final_system_route_b: "오늘 회의에서 받아 낼 수 있는 건 여기까지라며, 삭제 비용만 그룹이 내게 하고 사용 문제는 덮는다.",
     c37_final_system_route_c: "읽힌 기록의 주인이 누구인지부터 밝혀야 한다며, 열세 명 이름으로 기록 주인의 권리 선언문을 먼저 낸다.",
     c37_evidence_turn_expose: "한 곳에서 묻히는 일이 없게, 메타데이터를 검찰과 감독원에 동시에 넘기고 공개한다.",
-    c37_evidence_turn_hold: "미리 보이면 그룹이 말을 맞춘다며, 계정 발급 기록은 첫 변론 날까지 쥐고 있는다.",
+    c37_evidence_turn_hold: "그룹이 말을 맞출 틈을 주지 않으려고, 계정 발급 기록은 첫 변론 날까지 쥐고 있는다.",
     c37_evidence_turn_tell: "겨냥된 사람이 모르고 법정에 서지 않게, 정렬 순서 맨 앞에 놓인 증인들에게 먼저 알린다.",
   },
   echoReplies: {

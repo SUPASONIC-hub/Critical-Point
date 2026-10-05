@@ -495,7 +495,7 @@ export const case36 = {
     result: "c36_aftershock",
     sourceRoutes: ["c36_garden", "c36_table", "c36_father", "c36_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "준법감시인 임명안을 단서와 연도순으로 묶어, 이 자리에 앉았던 사람들이 무엇을 확인했는지 되짚어 본다.",
+    entryVoice: "준법감시인 임명 기록을 단서와 연도순으로 묶어, 앞서 그 자리에 앉았던 사람들이 무엇을 확인했는지 되짚어 본다.",
     entryEcho: "연도순으로 묶으면 의자 하나가 세 번 비었다가 세 번 같은 모양으로 채워집니다.",
     entryLabel: "앞선 준법감시인 세 사람의 임명 기록을 잇는다",
     title: "네 번째 의자",
@@ -556,7 +556,7 @@ export const case36 = {
     // said across a table to a man who remembers everything, so none of them
     // is allowed to sound like a speech he could quote back.
     c36_start_share: "혼자 정하지 않겠다며, 초대장을 여섯 명의 단체방에 올리고 같이 정한다.",
-    c36_start_log: "초대받은 사실부터, 참고인 진술 기록에 먼저 남긴다.",
+    c36_start_log: "윤상혁이 다시 소환된 날 온 초대라서, 초대받은 사실을 참고인 진술 기록에 먼저 남긴다.",
     c36_start_alone: "동료들까지 그 식탁에 얽히지 않게, 누구에게도 말하지 않고 일요일에 혼자 간다.",
     c36_garden_flood: "떡집 안부로 넘어갈 일이 아니라며, 사다리를 잡은 채 수해 긴급대출 거절부터 따진다.",
     c36_garden_record: "밥 한 끼라도 참고인 신분으로 듣는 말이라, 오늘 대화를 기록하겠다고 먼저 밝힌다.",
@@ -571,8 +571,8 @@ export const case36 = {
     c36_table_terms: "선언만 확인하는 자리인지 알아야 한다며, 준법감시인의 권한과 임기를 문서로 먼저 보여 달라고 한다.",
     c36_table_listen: "다 듣기 전에는 답하지 않기로 하고, 여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다.",
     c36_father_stay: "절을 받은 사람들이 어찌 됐는지 궁금해서, 아버지 이야기를 끝까지 듣고 그 줄에 섰던 사람들을 묻는다.",
-    c36_father_sign: "이번에는 회장님 이름으로 결정하시라고, 서명을 요구한다.",
-    c36_father_raise: "목소리가 흔들린 틈을 놓치지 않고, 동료들의 복직을 조건에 더 얹는다.",
+    c36_father_sign: "이름을 쓴 사람만 치르는 일을 끊으려고, 이번에는 회장님 이름으로 결정하라고 서명을 요구한다.",
+    c36_father_raise: "이름 하나의 값을 동료들 몫까지 받아 내려고, 흔들린 틈을 타 동료들의 복직을 조건에 더 얹는다.",
     c36_final_refuse: "이름 하나로 닫는 일에 내 이름을 보탤 수 없다며, 자리를 거절하고 동료·피해자들과 조사를 끝까지 간다.",
     c36_final_audit: "확인만 하는 자리로 두지 않겠다며, 자리를 받되 첫 감사 대상을 이 식탁으로 정한다.",
     c36_final_take: "212명을 더 기다리게 할 수는 없다며, 자리를 받고 배상 2차를 월요일 발표문에 넣게 한다.",

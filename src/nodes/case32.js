@@ -557,7 +557,7 @@ export const case32 = {
     // CASE 32. A raid day. Every line is said with an investigator in the room,
     // so none of them is allowed to sound like it is performing for one.
     c32_start_calm: "수사관 앞에서 아무 말이나 하지 않게, 겁먹은 팀원들에게 무엇을 거절할 수 있는지부터 알려 준다.",
-    c32_start_list: "압수 목록을 한 줄씩 확인한 뒤에만, 서명하겠다고 한다.",
+    c32_start_list: "무엇을 가져가는지는 알아야 한다며, 압수 목록을 한 줄씩 확인한 뒤에만 서명한다.",
     c32_start_hand: "두 시까지 남은 시간이 아깝다며, 휴대폰을 순순히 넘기고 오후 조사 준비부터 한다.",
     c32_boxes_seal: "내 이름 옆에 적힌 사람들까지 열리지 않게, 동료들의 기록 상자는 따로 봉인해 달라고 요청한다.",
     c32_boxes_match: "마흔 개가 정말 전부인지 알아야 한다며, 압수 상자와 트리거랩 원래 목록을 한 칸씩 맞춰 본다.",
@@ -585,7 +585,7 @@ export const case32 = {
     c32_route_system_drop: "남의 판결문을 세어도 내 조사는 그대로라며, 통계는 덮고 오늘 조사 일정대로 간다.",
     c32_final_system_route_a: "많이 적은 사람부터 세는 순서가 틀렸다며, 결정한 사람의 서명 흔적부터 찾도록 수사 순서를 바꾸자고 한다.",
     c32_final_system_route_b: "윤상혁까지는 닿지 못해도 사람은 지키겠다며, 실무자 동료들의 처벌만 낮춰 주는 협조를 약속한다.",
-    c32_final_system_route_c: "이름이 많은 실무자들을 위해, 변호 기금을 같이 모은다.",
+    c32_final_system_route_c: "많이 적은 사람이 재판에 가장 가깝다는 말에, 이름이 많은 실무자들을 위한 변호 기금을 같이 모은다.",
     c32_evidence_turn_hand: "빈 승인자 칸은 검사가 채워야 한다며, 반출 기록을 오늘 밤 나은호 검사에게 그대로 넘긴다.",
     c32_evidence_turn_hold: "지금 내면 내 패가 없어진다며, 반출 기록은 쥐고 있다가 신분이 정해질 때 꺼낸다.",
     c32_evidence_turn_share: "자기 기록이 사라진 걸 남에게 듣지 않게, 27번 상자에 기록이 든 동료들에게 먼저 알린다.",

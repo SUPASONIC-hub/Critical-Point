@@ -274,7 +274,7 @@ export const case31 = {
         {
           label: "사진만 찍어 두고 상자는 제자리에 둔다",
           effect: { time: 5, capital: 3, trust: -3, humanCost: 4, fatigue: -4 },
-          voice: "손을 대면 증거에 흠이 난다며, 사진만 찍어 두고 상자는 제자리에 둔다.",
+          voice: "상자가 여기 있었다는 것만은 남기려고, 사진만 찍어 두고 상자는 제자리에 둔다.",
           echo: "사진은 남습니다. 원본 상자는 검사 마지막 날 아침 파쇄 차량에 실립니다.",
         },
       ],
@@ -303,7 +303,7 @@ export const case31 = {
         {
           label: "검사 중이라며 로비까지 정중히 안내한다",
           effect: { time: 4, capital: 3, trust: -3, humanCost: 5, fatigue: -3 },
-          voice: "검사 중이라며, 연지안을 로비까지 정중히 안내한다.",
+          voice: "검사가 끝나기 전에는 해 줄 수 있는 말이 없어서, 검사 중이라며 연지안을 로비까지 정중히 안내한다.",
           echo: "연지안은 고맙다고 하고 돌아섭니다. 엘리베이터 문이 닫히기 전까지 계약서 묶음을 한 번도 내려놓지 않습니다.",
         },
       ],
@@ -380,7 +380,7 @@ export const case31 = {
         {
           label: "명단 제출 전에 계약자들 동의부터 받는다",
           effect: { trust: 10, humanCost: -4, time: -5, fatigue: 4 },
-          voice: "명단을 내기 전에, 계약자들 동의부터 받자고 한다.",
+          voice: "212세대는 자기 이름이 넘어가는 줄도 모른다며, 명단 제출 전에 계약자들 동의부터 받는다.",
           echo: "동의를 구하는 문자 212통이 나갑니다. 사흘 동안 답이 온 사람은 131명, 연지안이 첫 번째입니다.",
         },
         {
@@ -409,7 +409,7 @@ export const case31 = {
         {
           label: "그 대출의 15쪽을 기억하느냐고 되묻는다",
           effect: { trust: 7, legitimacy: 4, humanCost: -3, capital: -3, time: -2, fatigue: 4 },
-          voice: "그 대출의 15쪽을 기억하느냐고, 윤상혁에게 되묻는다.",
+          voice: "숫자를 좋아했다는 말에, 그 대출의 15쪽을 기억하느냐고 윤상혁에게 되묻는다.",
           echo: "윤상혁이 잠깐 층수 표시를 봅니다. '기억하지. 자네보다 잘.' 문이 닫힙니다.",
         },
         {
@@ -538,22 +538,22 @@ export const case31 = {
       label: "빈칸의 이유까지 적어 제출 목록을 원본과 대조한다",
       effect: { legitimacy: 11, trust: 3, time: -7, humanCost: 2, fatigue: 5 },
       cognition: { inference: 2 },
-      voice: "빈칸의 이유까지 적어, 제출 목록을 한지우 앞에서 원본과 대조한다.",
+      voice: "빈칸에는 보통 이유가 있다는 말에, 그 이유까지 적어 제출 목록을 원본과 대조한다.",
       echo: "대조는 두 시간이 걸립니다. 빈칸의 이유를 적는 칸에서 당신은 반재욱의 이름을 쓰지 않습니다. 한지우는 믿는다고 말하지 않고, 체크 표시만 열한 개 늘립니다.",
     },
     c31_start_rush: {
       label: "새벽마다 무엇을 열어 봤는지 접속 기록을 먼저 설명한다",
       effect: { legitimacy: 9, trust: 5, capital: -3, time: -3, humanCost: 3, fatigue: 3 },
       cognition: { persistence: 2 },
-      voice: "새벽마다 무엇을 열어 봤는지, 접속 기록부터 먼저 설명한다.",
+      voice: "04:02 줄에 밑줄이 그어진 걸 보고, 새벽마다 무엇을 열어 봤는지 접속 기록을 먼저 설명한다.",
       echo: "설명하면 한지우가 연 파일 이름을 하나씩 받아 적습니다. 그 목록이 그대로 검사팀의 두 번째 요구 자료가 됩니다.",
     },
   },
   voiceLines: {
     // CASE 31. The regulator in the room. Every line is said to someone who
     // writes the time down next to it.
-    c31_start_face: "숨길 게 없다며, 한지우를 먼저 찾아가 내 자리와 사정을 솔직히 말한다.",
-    c31_start_raw: "요구 자료 148건은, 정리본 대신 원본으로 낸다.",
+    c31_start_face: "의심받는 자리라면 먼저 밝히는 편이 낫다며, 한지우를 먼저 찾아가 내 자리와 사정을 솔직히 말한다.",
+    c31_start_raw: "검사는 다듬지 않은 서류로 받아야 한다며, 요구 자료 148건을 정리본 대신 원본으로 낸다.",
     c31_start_clean: "기한이 먼저라며, 비서실장이 만든 정리본을 그대로 넘긴다.",
     c31_archive_answer: "도장을 찍은 건 부서라며, 실무자 이름은 빼 달라고 하고 질문에는 내가 답한다.",
     c31_archive_trace: "부서 이름으로 하는 말에 짐작이 섞이지 않게, 질문마다 서류 쪽수와 도장 날짜로만 답한다.",
