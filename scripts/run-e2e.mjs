@@ -30,7 +30,8 @@ import path from "node:path";
  *               that CI records baselines with. Needs Docker.
  *
  * Everything else is handed to `playwright test`, so `--shard=1/3`,
- * `--update-snapshots`, `--project=chromium` and spec paths all work.
+ * `--update-snapshots`, `--project=chromium` and spec paths all work. A spec
+ * path without a `--grep` runs that spec minus @visual and @season-full.
  */
 
 // The one Playwright image the visual baselines are recorded and compared in.
@@ -50,6 +51,7 @@ const runSegments = has("--segments");
 const skipSegments = has("--skip-segments");
 const forwardedArgs = argv.filter((arg) => !MODE_FLAGS.includes(arg));
 const hasExplicitTestTarget = forwardedArgs.some((arg) => arg.endsWith(".spec.js") || arg.startsWith("tests/"));
+const hasExplicitGrep = forwardedArgs.some((arg) => /^(-g|--grep|--grep-invert)(=|$)/.test(arg));
 const root = process.cwd();
 
 function spawnCommand(command, args, options = {}) {
@@ -308,8 +310,12 @@ function playwrightArgs() {
       ...(process.env.CI ? ["--workers=1", "--retries=1"] : []), ...REPORTERS, ...forwardedArgs,
     ];
   }
+  // A spec named on the command line still leaves out the two tiers that are
+  // asked for by tag. `tests/season-flow.spec.js` named alone used to take the
+  // fifty-minute continuous walk with it, and the load failed the tests running
+  // beside it on page timeouts. A `--grep` of the caller's own is taken as given.
   const selection = hasExplicitTestTarget
-    ? []
+    ? hasExplicitGrep ? [] : ["--grep-invert", "@visual|@season-full"]
     : usePreview
       ? [...PREVIEW_SPECS, "--grep", "@prod"]
       : // Raster comparison stays in its own workflow and the continuous season
