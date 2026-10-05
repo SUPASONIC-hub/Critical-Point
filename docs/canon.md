@@ -118,6 +118,7 @@ A date that is stated with a weekday has to fit its year.
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 23일 (금) change notice; demolition 1월 29일 06시 |
 | 사건 20 | 1월 26일 (월) |
+| 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday |
 | 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
@@ -139,8 +140,6 @@ A date that is stated with a weekday has to fit its year.
   throughout, early and late, and the word is load-bearing in several hundred
   lines. It is read as "the third year", and the two lines that cross from the
   프롤로그 into 사건 01 say so: "햇수로 3년이 지납니다".
-- **사건 22** opens on "2월 셋째 주 월요일", which in 2026 is 2월 16일, inside
-  the 설 holiday.
 - **4월 12일 밤.** 프롤로그 05 has the analyst answer 에코 with "4월 12일 밤"
   and carry "4월 12일 밤에 적은 이름들". That is the night of the day the file
   arrived, not an approval, and the canon does not contradict it.
