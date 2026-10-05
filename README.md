@@ -730,7 +730,8 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 도구가 빠진, 배포되는 그 빌드)에서 돌고, 러너는 떠 있는 서버가 지금의 `dist/index.html`을 내주는지
 확인한 뒤에만 씁니다. 개발 모드 스모크는 `npm run test:runtime:dev`입니다.
 
-기본 e2e는 `@visual`(스크린샷)과 `@season-full`(시즌 연속 걷기)을 뺀 전부입니다. 시즌은 일곱 사건씩
+기본 e2e는 `@visual`(스크린샷)과 `@season-full`(시즌 연속 걷기)을 뺀 전부입니다. 스펙 파일을 직접 지정해도
+`--grep`을 함께 주지 않으면 이 둘은 빠집니다. 시즌은 일곱 사건씩
 여덟 구간(`@season-segment`)으로 나눠 걷고, GitHub Actions는 기본 e2e를 샤드 세 개에 나눠 push마다
 돌립니다. 끊지 않는 연속 걷기(`npm run test:e2e:season`)와 전체 경로 검증(`npm run test:e2e:full`)은
 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 수행합니다. PR에서는 `verify:quick`만 돌고, e2e는
