@@ -481,14 +481,16 @@ for (const known of UNMEETABLE_CHALLENGES) {
  */
 const PACK_KEYS = [
   "id", "nodes", "aftermath", "aftermathRoute", "connectiveScenes", "reactionScenes", "branchPlan", "branchScenes", "routePlan",
-  "evidencePlan", "memoryPlan", "openingRoutes", "openingCopy", "openingSignatures", "voiceLines", "echoReplies",
+  "evidencePlan", "memoryPlan", "openingRoutes", "openingCopy", "openingSignatures",
   "characterProfiles", "setting", "sceneContext", "clue", "outcomes", "carryovers", "continuityChallenges",
 ];
 // `routeBody` is the authored stretch a route walks before its final; only
 // 사건 01 and 03-05 route that way. A pack with no one new to introduce writes
 // no `characterProfiles`.
 // `writtenRoutes` is 사건 02 alone: its routes are scenes, not a plan.
-const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody", "writtenRoutes"];
+// `openingLines` is what a start card says in one opening alone; most cards
+// say the same thing in all of them.
+const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody", "writtenRoutes", "openingLines"];
 /**
  * 사건 01-11 were written before the shape below was fixed, into tables the
  * whole season shared. They are packs now, held to everything a pack's tables
@@ -610,13 +612,26 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   if (![caseNodePrefix(pack.id), pack.id].some((prefix) => pack.clue?.id?.startsWith(`${prefix}-`))) fail(`the clue ${pack.clue?.id} does not carry the case's prefix`);
   else claim("clue", pack.clue.id, pack.id);
 
-  // Every key a table is looked up by belongs to this case, and to no other.
+  // Every card the pack writes carries its own line and reply. They were two
+  // tables at the foot of the file, keyed by id, five hundred lines from the
+  // label they answer.
+  const writtenCards = [
+    ...[pack.nodes, pack.aftermath, pack.branchScenes, pack.writtenRoutes?.routes, pack.writtenRoutes?.finals]
+      .flatMap((table) => Object.values(table ?? {}))
+      .flatMap((scene) => scene.choices.filter((choice) => choice.type !== "reframe")),
+    ...Object.values(pack.routePlan?.choices ?? {}).flatMap((route) => [...route.routeChoices, ...(route.finalChoices ?? [])]),
+    ...(pack.routePlan ? [...pack.routePlan.system.routeChoices, ...pack.routePlan.finalChoices] : []),
+    ...pack.evidencePlan.choices,
+  ];
+  for (const card of writtenCards) {
+    if (!card.voice || !card.echo) fail(`the card ${card.id} ("${card.label}") is written without its ${card.voice ? "reply" : "line"}`);
+  }
+  // A line one opening has to itself belongs to a card that opening deals.
   const choiceIds = new Set(sceneIds.flatMap((sceneId) => (nodes[sceneId]?.choices ?? []).map((choice) => choice.id)));
-  for (const table of ["voiceLines", "echoReplies"]) {
-    for (const key of Object.keys(pack[table])) {
-      claim(table, key, pack.id);
-      if (!choiceIds.has(key)) fail(`${table}.${key} is a line for a choice the case does not offer`);
-    }
+  for (const [key, lines] of Object.entries(pack.openingLines ?? {})) {
+    claim("openingLines", key, pack.id);
+    if (!choiceIds.has(key) || !openingIds.some((openingId) => key.startsWith(`${openingId}_`))) fail(`openingLines.${key} is a line for a card no opening of the case deals`);
+    if (!lines.voice || !lines.echo) fail(`openingLines.${key} needs both a voice and an echo`);
   }
   for (const key of Object.keys(pack.sceneContext)) {
     claim("sceneContext", key, pack.id);
