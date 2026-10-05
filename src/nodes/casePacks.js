@@ -10,7 +10,7 @@
  * tables directly, so adding a case meant editing some twenty places in four
  * files; they were moved into packs as they stood, which is why their shape is
  * looser than the later ones' (`EARLY_PACKS` in scripts/validate-game-graph.mjs).
- * Only the finale still writes into the tables. The season order lives in
+ * The finale was the last to move. The season order lives in
  * `CASE_SEQUENCE`; this list only says which cases carry their own tables.
  *
  * The 프롤로그 is five packs of the same shape, and they are listed first
@@ -73,6 +73,7 @@ import { case46 } from "./case46.js";
 import { case47 } from "./case47.js";
 import { case48 } from "./case48.js";
 import { case49 } from "./case49.js";
+import { finalCase } from "./finalCase.js";
 
 export const CASE_PACKS = [
   prologue01,
@@ -129,4 +130,5 @@ export const CASE_PACKS = [
   case47,
   case48,
   case49,
+  finalCase,
 ];

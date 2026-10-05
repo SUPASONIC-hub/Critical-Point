@@ -622,7 +622,7 @@ export const case01 = {
       ["c", "기준표 작성 권한을 내 손 밖으로 넘긴다", { trust: 8, legitimacy: 7, capital: -5, time: -5, fatigue: 6 }, { reframing: 2 }],
     ],
   },
-  // CASE 02 already walks its authored middle (registerCase02DramaticRoutes).
+  // CASE 02 already walks its authored middle (its `writtenRoutes`).
   routeBody: {
     routes: {
       c1_route_investigate: { entry: "accounting", tail: "c1_witness_reaction", final: "c1_final_investigate" },

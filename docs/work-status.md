@@ -730,8 +730,7 @@ Still open, on purpose:
     scene context, clue, outcomes, carryovers and continuity challenges. A pack
     may also carry `characterOverrides` (who someone is for that case only) and,
     on its route plan, `system.finalTitle` / `finalText` / `finalMemo` (its
-    hidden route's closing scene). The same card copy for the finale, which has
-    no pack, is `src/nodes/coreCards.js`.
+    hidden route's closing scene).
     `src/nodes/casePacks.js` lists the packs and each owning module merges its
     field. What is still written by hand per case: `CASE_SEQUENCE`,
     start/result nodes, `authoredNodeOrders`, objectives and `seasonCasesBase` in
@@ -744,9 +743,10 @@ Still open, on purpose:
     to what a pack's tables must agree on but not to the scene counts
     (`EARLY_PACKS` and `PACK_OMISSIONS` in `scripts/validate-game-graph.mjs`):
     사건 01 has four connective scenes and unprefixed ids, 사건 01 and 03-05
-    carry a `routeBody`, and 사건 02's routes are still written scene by scene
-    in `gameData.js` (`registerCase02DramaticRoutes`). The finale's tables stay
-    in `gameData.js`, `gameDialogue.js`, `gameLogic.js` and `sceneContext.js`.
+    carry a `routeBody`, and 사건 02's routes are written scene by scene on
+    its pack (`writtenRoutes`). The finale is a pack too (`src/nodes/finalCase.js`),
+    held as loosely as the early ones; no case writes into the tables of
+    `gameData.js`, `gameDialogue.js`, `gameLogic.js` or `sceneContext.js` any more.
 75. The ending's gates are placed against the season a player plays.
     `npm run check:endings` replays 600 seasons from seven player archetypes
     through the runtime's own functions -- the opening route and carryover, the

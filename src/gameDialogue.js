@@ -230,73 +230,7 @@ export const characterProfileCollisions = [];
 export function getCharacterProfile(name, caseId) {
   return readCharacterProfile({ profiles: characterProfiles, roleSpans: characterRoleSpans, overrides: packCharacterOverrides }, name, caseId);
 }
-export const choiceVoiceLines = {
-
-  f_archive_seal: "쓸 수 있는 도구를 내려놓더라도, 악용될 문을 닫자고 한다.",
-  f_archive_reform: "없애기보다 드러내고, 감시받는 규칙 안에 묶자고 한다.",
-  f_archive_destroy: "고칠 수 있다는 기대를 접고, 판단 프로필 데이터를 폐기하라고 요구한다.",
-  f_branch_witness_a: "혼자 알고 있기를 그만두고, 그 빈칸을 참가자들에게 공개한다.",
-  f_branch_witness_b: "결론을 믿기 전에, 삭제된 흔적부터 복원하려 한다.",
-  f_branch_witness_c: "더 파고들지 않기로 하고, 기록의 결론만 믿고 넘어간다.",
-  f_branch_witness_follow_a: "열람을 독점하지 않겠다는 듯, 모든 참가자에게 권한을 연다.",
-  f_branch_witness_follow_b: "감정이 섞이기 전에, 독립 검토자에게 먼저 맡긴다.",
-  f_branch_witness_follow_c: "더 번지지 않게, 내 기록만 보관하고 문을 닫는다.",
-  ending_seal: "누구도 다시 쓰지 못하도록, 내 조건을 봉인하겠다고 말한다.",
-  ending_reform: "숨기는 대신 드러내고, 사용 규칙을 만들자고 제안한다.",
-  ending_expose: "안에서 고칠 수 있다는 기대를 접고, 구조를 외부에 넘긴다.",
-  f_after_witness: "증언을 준비하며, 모든 기록을 증거로 보존한다.",
-  f_after_control: "내 선택이 나도 모르게 복사돼 쓰였으니, 실험을 멈추지 않고 참가자 동의 규칙부터 바꾼다.",
-  f_after_burn: "누구도 다시 이용하지 못하도록, 모든 데이터를 태운다.",
-  f_start_contain: "밖으로 나가기 전에, 안에서 먼저 답을 듣겠다고 말한다.",
-  f_start_expose: "안에서 해결될 일이 아니라며, 밖으로 낼 자료를 정리한다.",
-  f_start_map: "내가 남긴 기록이 어디로 갔는지부터 따라간다.",
-  f_confront_destroy: "내 기록을 잃더라도, 이 구조는 남기지 않겠다고 말한다.",
-  f_confront_reform: "숨기는 대신 쓰는 방법을 내가 쓰겠다고 나선다.",
-  f_confront_seal: "더 쓰이지 않게 하겠다며, 내 기록에 자물쇠를 건다.",
-  f_confront_pact: "승인 절차를 기다리지 않고, 참가자들과 직접 약속을 맺는다.",
-  f_start_owner_map: "골목의 밤이 하루 만에 평가 문장이 됐으니, 내 로그가 사건 설계에 어떻게 쓰였는지부터 추적한다.",
-  f_start_owner_expose: "스물세 명의 밤까지 점수가 된 걸 보고, 더 적히기 전에 즉시 외부 공개를 준비한다.",
-  f_start_owner_contain: "열쇠를 건넨 사람이 이 파일도 알았는지 들어야 해서, 한서윤에게 먼저 내부 설명을 요구한다.",
-  f_start_system_map: "방금 묶은 폴더의 목차가 관찰 자료 1번이 됐으니, 내 로그가 사건 설계에 어떻게 쓰였는지 추적한다.",
-  f_start_system_expose: "공개 버튼 앞까지 모아 둔 기록이 있으니, 이 폴더까지 얹어 즉시 외부 공개를 준비한다.",
-  f_start_system_contain: "내 폴더가 왜 관찰 자료가 됐는지 기록으로 남기려고, 한서윤에게 내부 설명을 요구한다.",
-  f_start_name_map: "7분의 걸음이 벌써 추천 사유가 됐으니, 내 로그가 사건 설계에 어떻게 쓰였는지부터 추적한다.",
-  f_start_name_expose: "연필로 적힌 이름이 굳기 전에 밖에서 먼저 알도록, 즉시 외부 공개를 준비한다.",
-  f_start_name_contain: "혼자 달려와 놓고 또 혼자 정하지 않으려고, 먼저 한서윤에게 내부 설명을 요구한다.",
-
-
-
-
-
-
-  f_route_map_open: "내 로그가 무엇을 바꿨는지 숨기지 않고, 전부 열어 놓는다.",
-  f_route_map_delete: "내 흔적만 지우면 된다는 판단으로, 다른 기록은 그대로 둔다.",
-  f_route_map_return: "복제된 문장은 원래 주인의 것이라고 보고, 그대로 돌려준다.",
-  f_final_map_a: "내가 바꾼 질문의 목록을 한 장으로 만들어 공개한다.",
-  f_final_map_b: "돌려주는 데서 멈추지 않고, 지울 권한까지 함께 넘긴다.",
-  f_final_map_c: "내 질문이 이미 남에게 쓰였으니, 내 로그를 포함한 모든 원본을 다음 참가자에게 넘긴다.",
-  f_route_expose_redact: "구조는 드러내되 사람은 가리려고, 식별자를 지우고 넘긴다.",
-  f_route_expose_raw: "지워질 시간을 주지 않겠다는 듯, 원본을 그대로 넘긴다.",
-  f_route_expose_hold: "폭로가 또 다른 피해가 되지 않게, 감사단이 올 때까지 멈춘다.",
-  f_final_expose_a: "이름이 아니라 구조가 남아야 한다고 보고, 식별자를 지운 증거만 넘긴다.",
-  f_final_expose_b: "당사자 없이 여는 폭로는 또 다른 실험이라고 보고, 동의부터 다시 받는다.",
-  f_final_expose_c: "삭제될 시간을 없애는 것이 먼저라고 판단하고, 원본을 그대로 넘긴다.",
-  f_route_contain_board: "도구에 재어진 사람이 그 도구를 통제해야 한다고 보고, 참가자 대표 운영위를 만든다.",
-  f_route_contain_lab: "밖으로 나가면 다 잃는다는 판단으로, 내부 개혁안으로 봉합한다.",
-  f_route_contain_pause: "쓰기 전에 물어봤어야 한다고 보고, 도구를 멈추고 동의를 다시 받는다.",
-  f_final_contain_a: "남길 조건을 정할 사람은 참가자라고 보고, 운영위에 도구를 넘긴다.",
-  f_final_contain_b: "조건을 정하기 전에 멈춰야 한다고 보고, 동의 절차를 처음부터 다시 받는다.",
-  f_final_contain_c: "판단을 남기지 않겠다는 듯, 구조와 사용 기록을 전부 공개 기록으로 넘긴다.",
-  f_route_system_read: "다음 참가자가 무엇을 받는지 알아야 해서, 내가 다시 짠 판이 어떤 선택지로 바뀌었는지 끝까지 읽는다.",
-  f_route_system_send: "확인하지 않는 편이 낫다고 판단하고, 대기열을 그대로 둔다.",
-  f_route_system_warn: "다음 사람이 알고 고르게 하려고, 이 화면을 먼저 보여준다.",
-  f_final_system_a: "내 판단이 남의 질문이 되는 것을 막겠다고, 복제를 끊는다.",
-  f_final_system_b: "다음 사람은 아직 아무것도 고르지 않았으니, 다시 짠 판은 남기되 바꿀 수 있는 빈칸을 붙인다.",
-  f_final_system_c: "판단을 물려주는 대신 자료를 물려주고, 여기서 끝낸다.",
-  f_evidence_turn_burn: "내 판단 양식을 다음 사람에게 물려주지 않으려고, 내 선택 문장까지 포함해 실험 원본을 폐기한다.",
-  f_evidence_turn_seed: "내 문장을 답이 아니라 경고문으로 바꿔, 다음 사람에게 남긴다.",
-  f_evidence_turn_publish: "복제 규칙까지 포함해, 원본 전부를 밖에 연다.",
-};
+export const choiceVoiceLines = {};
 
 
 /**
@@ -305,113 +239,14 @@ export const choiceVoiceLines = {
  * never writes back into this file's data.
  */
 export const authoredEchoReplies = {
-
-
-
-
-  f_archive_seal:
-    "기록을 봉인하면 악용 가능성은 줄어듭니다. 동시에 이 지식으로 해결할 수 있는 사건들도 닫힙니다.",
-  f_archive_reform:
-    "방식을 바꾸려는 선택입니다. 그러나 시스템을 남기는 순간 누군가 다시 악용할 가능성도 남습니다.",
-  f_archive_destroy:
-    "무너뜨리는 선택입니다. 빠르고 명확하지만, 그 안에 남은 피해자 구제 도구까지 사라질 수 있습니다.",
-  default:
-    "그 판단을 유지하려면 숨은 피해자와 비용을 다시 계산해야 합니다. 같은 원칙을 더 불리한 조건에서도 적용하시겠습니까?",
-  f_branch_witness_a:
-    "공개하면 실험의 대상이 실험을 읽게 됩니다. 그 순간부터 당신의 기록도 그들의 자료입니다.",
-  f_branch_witness_b:
-    "삭제 흔적은 의도를 드러냅니다. 복원된 문장이 당신이 기대한 문장이 아닐 수도 있습니다.",
-  f_branch_witness_c:
-    "결론만 받아들이면 오늘은 끝납니다. 빈칸을 남긴 사람은 당신이 그럴 것을 이미 계산했습니다.",
-  f_branch_witness_follow_a:
-    "모두가 읽으면 은폐는 불가능해집니다. 동시에 누구도 맥락 없이 읽는 것을 막을 수 없습니다.",
-  f_branch_witness_follow_b:
-    "독립 검토는 신뢰를 만듭니다. 검토가 끝날 때까지 참가자들은 계속 모른 채로 남습니다.",
-  f_branch_witness_follow_c:
-    "문을 닫으면 당신은 안전합니다. 다음 참가자는 당신이 받은 것과 똑같은 빈칸을 받게 됩니다.",
-  ending_seal:
-    "봉인은 악용을 막습니다. 그리고 당신이 알아낸 것을 필요로 할 사람에게도 똑같이 닫힙니다.",
-  ending_reform:
-    "규칙은 힘을 길들입니다. 규칙을 만드는 자리에 계속 앉아 있을 수 있느냐가 남은 질문입니다.",
-  ending_expose:
-    "외부는 멈출 힘이 있습니다. 멈춘 뒤에 무엇을 세울지는 외부의 관심사가 아닙니다.",
-  f_after_witness:
-    "보존된 기록은 언젠가 말합니다. 그 기록 안에는 당신이 침묵했던 장면도 같이 남아 있습니다.",
-  f_after_control:
-    "동의는 실험을 정당하게 만듭니다. 정당해진 실험은 멈추기가 훨씬 더 어려워집니다.",
-  f_after_burn:
-    "태우면 악용은 끝납니다. 피해를 증명할 유일한 자료도 같은 불에 들어갑니다.",
-  f_start_contain:
-    "내부 설명은 관계를 지킵니다. 설명할 사람이 설계자와 같은 편이면 시간만 지납니다.",
-  f_start_expose:
-    "공개는 실험을 멈출 수 있습니다. 멈춘 뒤 참가자들의 기록을 누가 지킬지는 정해지지 않았습니다.",
-  f_start_map:
-    "당신의 경로를 따라가면 설계가 보입니다. 그 경로를 따라간 기록도 함께 남습니다.",
-  f_confront_destroy:
-    "폭로는 실험을 끝냅니다. 끝난 실험의 참가자 기록은 누구의 것도 아니게 됩니다.",
-  f_confront_reform:
-    "규칙을 직접 쓰면 통제권이 옵니다. 그 규칙의 첫 적용 대상도 당신입니다.",
-  f_confront_seal:
-    "봉인은 당신을 지킵니다. 봉인된 기록은 다음 참가자를 지키는 데도 쓰이지 못합니다.",
-  f_confront_pact:
-    "직접 맺은 약속은 가장 빨리 지켜집니다. 그 약속을 검증할 사람이 당신뿐이라는 것도 같이 남습니다.",
-  f_start_owner_map:
-    "끝까지 남은 밤도 하루 만에 한 줄이 됐습니다. 그 줄이 어디로 갔는지 따라가면 설계가 보입니다.",
-  f_start_owner_expose:
-    "공개는 실험을 멈출 수 있습니다. 로비에서 기다리는 스물세 명의 칸도 같은 자료에 실려 밖으로 나갑니다.",
-  f_start_owner_contain:
-    "안에서 먼저 물으면 관계는 지켜집니다. 답을 기다리는 동안에도 로비의 스물세 명은 계속 적힙니다.",
-  f_start_system_map:
-    "당신이 묶은 기록이 당신을 재는 잣대가 됐습니다. 언제부터 그렇게 쓰였는지는 로그에 남아 있습니다.",
-  f_start_system_expose:
-    "공개하면 '기록 안에서 멈춤'이라는 분류는 틀린 말이 됩니다. 마흔아홉 사건의 사람들도 그 폴더에 실려 함께 나갑니다.",
-  f_start_system_contain:
-    "안에서 묻고 답을 기록으로 남기는 일입니다. 폴더는 그 반응도 '기록 안에서 멈춤'으로 적을 수 있습니다.",
-  f_start_name_map:
-    "빠른 걸음은 7분 만에 자료가 됐습니다. 그 자료가 흘러간 길을 따라가는 데는 7분보다 오래 걸립니다.",
-  f_start_name_expose:
-    "공개하면 연필로 적힌 이름은 굳지 못합니다. 대신 '압박 시 즉시 상향 대응'이라는 줄에 사례가 하나 더 붙습니다.",
-  f_start_name_contain:
-    "안에서 먼저 물으면 쪽지가 말한 한 시간이 설명을 듣는 데 쓰입니다. 연필로 적힌 이름은 그동안 지워지지 않습니다.",
-
-
-
-
-
-
-  f_route_map_open: "공개하면 모든 케이스의 전제가 흔들립니다. 흔들려야 다시 세울 수 있습니다.",
-  f_route_map_delete: "내 기록만 지운 사람은, 남의 기록을 지울 이유도 만들 수 있습니다.",
-  f_route_map_return: "돌려주려면 동의 절차를 처음부터 다시 밟아야 합니다.",
-  f_final_map_a: "목록이 나오면 지나온 사건들이 다시 읽힙니다.",
-  f_final_map_b: "삭제 권한이 넘어가면 증거도 함께 사라질 수 있습니다. 그것도 그들의 선택입니다.",
-  f_final_map_c: "전부를 넘기면 당신은 판단에서 빠지고, 판단할 사람이 생깁니다.",
-  f_route_expose_redact: "익명화에는 시간이 듭니다. 그 시간에 서버는 계속 닫힙니다.",
-  f_route_expose_raw: "원본은 가장 확실한 증거이고, 가장 확실하게 사람을 노출합니다.",
-  f_route_expose_hold: "기다리는 동안 증거는 줄고, 절차의 정당성은 늘어납니다.",
-  f_final_expose_a: "구조만 남은 증거는 반박당하기 쉽습니다. 대신 아무도 지목되지 않습니다.",
-  f_final_expose_b: "동의를 받는 동안 기회는 지나갈 수 있습니다. 그래도 절차가 남습니다.",
-  f_final_expose_c: "구조는 확실히 드러나고, 그 안의 사람들도 함께 드러납니다.",
-  f_route_contain_board: "운영위는 느립니다. 대신 권한이 실험자 밖으로 나갑니다.",
-  f_route_contain_lab: "내부 개혁은 빠르고, 개혁의 내용을 검증할 사람은 여전히 안에 있습니다.",
-  f_route_contain_pause: "멈춘 동안 연구는 정지하고, 동의는 처음으로 사후가 아니게 됩니다.",
-  f_final_contain_a: "넘어간 도구는 느리게 쓰이고, 쓰이는 이유가 기록됩니다.",
-  f_final_contain_b: "처음부터 받는 동의는 오래 걸리고, 이 실험을 처음으로 정당하게 만듭니다.",
-  f_final_contain_c: "전부 공개되면 도구는 통제되지 않습니다. 대신 숨겨지지도 않습니다.",
-  f_route_system_read: "읽고 나면 다음 참가자의 화면을 모른 척할 수 없습니다.",
-  f_route_system_send: "확인하지 않은 판도 전송됩니다. 모른다는 사실은 기록되지 않습니다.",
-  f_route_system_warn: "보여주는 순간 당신도 실험의 일부였다는 사실이 함께 넘어갑니다.",
-  f_final_system_a: "끊으면 다음 참가자는 자유로워지고, 무엇이 있었는지도 모릅니다.",
-  f_final_system_b: "빈칸이 있으면 복제는 상속이 됩니다. 지우는 것보다 오래 남습니다.",
-  f_final_system_c: "원본을 받은 사람은 처음부터 다시 물을 수 있습니다.",
-  f_evidence_turn_burn: "폐기는 악용을 끝내고, 무슨 일이 있었는지도 함께 끝냅니다.",
-  f_evidence_turn_seed: "경고문이 된 문장은 여전히 다음 사람의 선택지 위에 놓입니다.",
-  f_evidence_turn_publish: "규칙이 공개되면 실험은 끝나고, 참가자들의 이름도 함께 열립니다.",
+  // What a choice with no reply of its own is answered with.
+  default: "그 판단을 유지하려면 숨은 피해자와 비용을 다시 계산해야 합니다. 같은 원칙을 더 불리한 조건에서도 적용하시겠습니까?",
 };
 
 // A case pack's people and lines join these tables here, where the tables live,
 // so a module that reads them -- the scene view reads `characterProfiles`
 // directly -- sees the whole season however its imports happen to be ordered.
-// This ran in gameData.js, so a reader that loaded first saw the finale's only.
+// This ran in gameData.js, so a reader that loaded first saw none of them.
 for (const pack of CASE_PACKS) {
   Object.assign(choiceVoiceLines, pack.voiceLines);
   Object.assign(authoredEchoReplies, pack.echoReplies);

@@ -169,3 +169,17 @@ export function readCharacterProfile({ profiles, roleSpans, overrides }, name, c
   );
   return { ...profile, role, ...overrides[caseId]?.[name] };
 }
+
+/**
+ * Files what each memory card answers under the id the card is dealt with
+ * (`caseNN_memory_route`, `_system`, `_evidence`). The card is dealt at run
+ * time, so it is no scene's choice and the authored echo table -- which is
+ * checked against the graph -- cannot hold its reply; the plan carries it.
+ */
+export function fileMemoryEchoes(memoryPlans, echoReplies) {
+  Object.entries(memoryPlans).forEach(([caseId, plan]) => {
+    for (const kind of ["route", "system", "evidence"]) {
+      if (plan?.[`${kind}Echo`]) echoReplies[`${caseId}_memory_${kind}`] = plan[`${kind}Echo`];
+    }
+  });
+}
