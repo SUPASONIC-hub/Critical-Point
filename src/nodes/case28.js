@@ -507,7 +507,7 @@ export const case28 = {
     entryEffect: { legitimacy: 4, trust: 3, time: -6, capital: -3, fatigue: 5 },
     choices: [
       ["c28_evidence_turn_expose", "TF 요청서와 평택 숫자를 금융감독원 민원에 함께 붙여 낸다", { legitimacy: 12, trust: 5, capital: -7, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
-      ["c28_evidence_turn_hold", "요청서는 쥐고 있다가 싱가포르 건과 한꺼번에 꺼낸다", { capital: 7, time: 5, trust: -5, legitimacy: -5, humanCost: 5, fatigue: -4 }, { risk: 2 }],
+      ["c28_evidence_turn_hold", "요청서는 쥐고 있다가 평택 건과 한꺼번에 꺼낸다", { capital: 7, time: 5, trust: -5, legitimacy: -5, humanCost: 5, fatigue: -4 }, { risk: 2 }],
       ["c28_evidence_turn_share", "절감 목표표를 콜센터 상담사들에게 먼저 보여 준다", { trust: 11, legitimacy: 6, capital: -6, humanCost: -6, fatigue: 8 }, { reframing: 2 }],
     ],
   },
@@ -586,7 +586,7 @@ export const case28 = {
     c28_final_system_route_b: "오후 네 시 합의서가 흔들리지 않게, 대본은 그대로 두고 이의신청 서식만 쉽게 바꾼다.",
     c28_final_system_route_c: "이미 시간표에 밀려난 사람들이 있다며, 3분 안에 끝난 거절 건 전부를 다시 심사할 기금을 따로 만든다.",
     c28_evidence_turn_expose: "보험금으로 공사 구멍을 메운 일은 밖에서 봐야 한다며, TF 요청서와 평택 숫자를 금융감독원 민원에 함께 붙여 낸다.",
-    c28_evidence_turn_hold: "대표실까지 닿기에는 한 장으로 모자라서, 요청서는 쥐고 있다가 싱가포르 건과 한꺼번에 꺼낸다.",
+    c28_evidence_turn_hold: "대표실까지 닿기에는 한 장으로 모자라서, 요청서는 쥐고 있다가 평택 건과 한꺼번에 꺼낸다.",
     c28_evidence_turn_share: "그 대본을 제 목소리로 읽어 온 사람들이라며, 절감 목표표를 콜센터 상담사들에게 먼저 보여 준다.",
   },
   echoReplies: {
@@ -604,7 +604,7 @@ export const case28 = {
     c28_branch_market_follow_b: "제안서는 접수됩니다. KD생명은 '검토하겠다'고 답하고, 만화의 넷째 칸만 빼 달라고 합니다.",
     c28_branch_market_follow_c: "통화 일정은 지켜집니다. 스케치북은 떡집 선반 위에서 하루를 기다립니다.",
     c28_ruler_read: "한 줄씩 읽으면 채도훈이 제19조에서 오래 멈춥니다. 그가 쓴 이의서의 첫 문장은 '저는 같은 선반 앞에 있었습니다'입니다.",
-    c28_ruler_mediate: "신청은 접수됩니다. 조정 결과가 나오기까지 석 달, 채윤아의 등록금 날짜는 그보다 빠릅니다.",
+    c28_ruler_mediate: "신청은 접수됩니다. 조정 결과가 나오기까지 석 달, 채도훈이 버틸 수 있는 날은 그보다 짧습니다.",
     c28_ruler_half: "절반이면 2,100만 원입니다. 채도훈은 고개를 끄덕이고, 제19조는 다음 사람에게도 그대로 남습니다.",
     c28_factory_guard: "촬영은 멈춥니다. 손해사정사 사무소는 '조사 방해'라는 말을 보고서에 적습니다.",
     c28_factory_order: "지시서를 받으면 촬영을 주문한 날짜가 나옵니다. 이의신청이 들어온 바로 다음 날입니다.",
@@ -622,7 +622,7 @@ export const case28 = {
     c28_final_system_route_b: "서식은 쉬워집니다. 쉬운 서식을 알려 주는 말이 대본에 없으면 아무도 그 서식을 모릅니다.",
     c28_final_system_route_c: "기금이 생기면 다시 심사할 거절 건은 12만 건입니다. 누가 그 기금을 채울지는 빈칸입니다.",
     c28_evidence_turn_expose: "민원이 들어가면 태스크포스라는 이름이 공문에 처음 오릅니다. 그 아래 대표실이라는 글자도 함께 오릅니다.",
-    c28_evidence_turn_hold: "쥐고 있으면 싱가포르에서 강한 패가 됩니다. 그사이 대본 4번은 매일 3분씩 읽힙니다.",
+    c28_evidence_turn_hold: "쥐고 있으면 다음 판에서 강한 패가 됩니다. 그사이 대본 4번은 매일 3분씩 읽힙니다.",
     c28_evidence_turn_share: "상담사들이 표를 보면 7층이 조용해집니다. 연하진이 헤드셋을 벗어 책상 위에 내려놓습니다.",
   },
   characterProfiles: {

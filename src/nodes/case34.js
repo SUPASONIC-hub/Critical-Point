@@ -55,7 +55,7 @@ export const case34Nodes = {
       },
       {
         id: "c34_start_verify",
-        label: "만나기 전에 필체와 날짜부터 기록과 대조한다",
+        label: "원본을 보기 전에 필체와 날짜부터 기록과 대조한다",
         effect: { legitimacy: 12, time: -5, trust: -4, humanCost: 2, fatigue: 4 },
         next: "c34_study",
         cognition: { inference: 2 },
@@ -561,7 +561,7 @@ export const case34 = {
     // CASE 34. Every line is said to, or about, someone's daughter. None of them
     // is allowed to sound like it is using her.
     c34_start_meet: "'보관 X' 한 줄의 나머지는 얼굴을 보고 들어야 한다며, 그가 원하는 대로 혼자 직접 만나러 간다.",
-    c34_start_verify: "사진 한 장을 그대로 믿을 수는 없다며, 만나기 전에 필체와 날짜부터 기록과 대조한다.",
+    c34_start_verify: "사진 한 장을 그대로 믿을 수는 없다며, 원본을 보기 전에 필체와 날짜부터 기록과 대조한다.",
     c34_start_scan: "한 쪽만 봐서는 앞뒤 줄을 알 수 없다며, 수첩 전체를 먼저 찍어 보내 달라고 답장한다.",
     c34_study_together: "골라 읽으면 지키는 것도 고르게 된다며, 가리지 말고 처음부터 끝까지 같이 읽자고 한다.",
     c34_study_copy: "수첩이 서랍에만 있어서는 불안하다며, 윤서진의 동의를 받아 모든 쪽을 사본으로 남긴다.",
@@ -598,7 +598,7 @@ export const case34 = {
     // CASE 34.
     c34_start_meet: "혼자 가면 윤서진은 경계를 한 겹 내려놓습니다. 동료들은 그 두 시간 동안 헌책방에서 휴대폰만 봅니다.",
     c34_start_verify: "대조하면 필체는 맞고 날짜도 맞습니다. 그 사이 윤서진은 답장이 없는 휴대폰을 사흘째 들여다봅니다.",
-    c34_start_scan: "답장을 받은 윤서진이 한 시간 뒤에 짧게 씁니다. '직접 뵙고 싶다고 했는데요.' 사진은 오지 않습니다.",
+    c34_start_scan: "답장을 받은 윤서진이 한 시간 뒤에 짧게 씁니다. '원본은 직접 보여 드리고 싶다고 했는데요.' 사진은 오지 않습니다.",
     c34_study_together: "처음부터 읽으면 수첩은 한 사람의 1년이 됩니다. 등록금 줄에서 윤서진이 손을 떼기까지 20분이 걸립니다.",
     c34_study_copy: "사본은 정확합니다. 복사기 소리가 날 때마다 윤서진이 창밖을 봅니다.",
     c34_study_page: "필요한 쪽은 손에 들어옵니다. 가린 줄은 가려진 채로, 윤서진 혼자의 몫으로 남습니다.",
@@ -627,7 +627,7 @@ export const case34 = {
     c34_final_system_route_b: "한 사람을 겨누면 수첩은 강력한 증거가 됩니다. 예순한 건을 지운 시스템은 그대로 다음 대출을 기다립니다.",
     c34_final_system_route_c: "자기 사본을 가질 권리가 생기면 반대한 사람은 더 이상 회사의 선의에 기대지 않습니다. 회사는 그 조항을 오래 반대합니다.",
     c34_evidence_turn_print: "요청이 받아들여지면 수사관들이 33층 문서 파쇄함 기록부터 엽니다. 그 한 장이 아직 있는지는 아무도 모릅니다.",
-    c34_evidence_turn_quiet: "쥐고 있으면 그날까지 아무도 모릅니다. 윤서진도 모릅니다. 그녀가 가장 먼저 알았어야 할 사람일 수도 있습니다.",
+    c34_evidence_turn_quiet: "쥐고 있으면 그날까지 아무도 모릅니다. 윤서진도 모릅니다. 그가 가장 먼저 알았어야 할 사람일 수도 있습니다.",
     c34_evidence_turn_daughter: "보여 주면 윤서진이 '40분'이라는 숫자를 세 번 읽습니다. '지우기 전에 한 장은 남겼네요. 그건 아버지다운 일이에요.'",
   },
   characterProfiles: {

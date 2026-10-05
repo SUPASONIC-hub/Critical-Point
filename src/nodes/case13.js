@@ -127,7 +127,7 @@ export const case13Nodes = {
       },
       {
         id: "c13_market_correct",
-        label: "자막이 촬영 원본과 다르다는 정정 요청을 공식으로 낸다",
+        label: "예고편 자막을 내려 달라는 정정 요청을 공식으로 낸다",
         effect: { legitimacy: 12, trust: 2, time: -6, humanCost: 2, fatigue: 4 },
         cognition: { inference: 2 },
       },
@@ -564,7 +564,7 @@ export const case13 = {
     c13_branch_extras_follow_fee: "6만 4천 원이 된 까닭은 종이로 받아야 한다며, 대행사에 섭외 기준과 수수료 명세서를 공식 요청한다.",
     c13_branch_extras_follow_later: "생중계가 코앞이라, 로봇 소문은 나중 일로 미루고 연락처만 받아 둔다.",
     c13_market_stay: "어떤 말도 떼어 낸 명함을 다시 붙이지 못해서, 변명하지 않고 셔터를 내릴 때까지 문가을 옆에서 떡을 썬다.",
-    c13_market_correct: "편집실이 내 얼굴 위에 얹은 문장이라서, 자막이 촬영 원본과 다르다는 정정 요청을 공식으로 낸다.",
+    c13_market_correct: "편집실이 내 얼굴 위에 얹은 문장이라서, 예고편 자막을 내려 달라는 정정 요청을 공식으로 낸다.",
     c13_market_deal: "명함이 떼인 걸 보고도 물러설 수 없어서, 212명 배상이 걸린 일이니 예고편은 참아 달라고 부탁한다.",
     c13_lab_share: "명함을 뗀 사람이 방송으로 알게 되지 않게, 영상을 문가을과 피해자 모임에 먼저 보낸다.",
     c13_lab_submit: "몰래 튼 영상은 사고로 처리된다며, 영상을 수정 대본으로 혁신위원회에 정식 제출한다.",

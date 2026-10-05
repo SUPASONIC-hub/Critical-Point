@@ -84,7 +84,7 @@ export const finalCaseNodes = {
       },
       {
         id: "f_archive_seal",
-        label: "외부 공개 전 증거와 피해 범위를 더 모은다",
+        label: "기록을 봉인해 악용될 문부터 닫자고 한다",
         effect: { time: -12, legitimacy: 3, humanCost: -4, fatigue: 4 },
         cognition: { inference: 2, persistence: 1 },
       },

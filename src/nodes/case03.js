@@ -214,7 +214,7 @@ export const case03 = {
           echo: "다시 계산한 표는 정확해지고, 그 사이 고객은 상대의 숫자를 먼저 봅니다.",
         },
         {
-          label: "오진우에게 없는 숫자의 출처를 묻는다",
+          label: "내 자료에 없는 숫자의 출처를 오진우에게 묻는다",
           effect: { trust: 6, legitimacy: 5, humanCost: -3, capital: -3, time: -6, fatigue: 5 },
           voice: "그 숫자가 어디서 왔는지 오진우에게 직접 묻겠습니다.",
           echo: "출처를 물으면 상대는 준비할 시간을 얻고, 답하지 않는 것도 하나의 답이 됩니다.",

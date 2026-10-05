@@ -519,7 +519,7 @@ export const case01 = {
         routeChoices: [
           ["c1_route_layoff_notice", "대상자에게 먼저 알리고 절감안을 다시 계산한다", { trust: 8, legitimacy: 6, capital: -6, time: -5, fatigue: 6 }, { persistence: 2 }],
           ["c1_route_layoff_fast", "통보를 늦추고 절감 효과를 먼저 확정한다", { capital: 10, time: 5, trust: -8, legitimacy: -5, humanCost: 6, fatigue: -3 }, { risk: 2 }],
-          ["c1_route_layoff_protect", "제보자를 보호 대상에서 분리해 명단을 다시 짠다", { trust: 6, legitimacy: 7, capital: -5, time: -7, fatigue: 7 }, { inference: 1, reframing: 1 }],
+          ["c1_route_layoff_protect", "제보자를 감축 대상에서 분리해 명단을 다시 짠다", { trust: 6, legitimacy: 7, capital: -5, time: -7, fatigue: 7 }, { inference: 1, reframing: 1 }],
         ],
         finalTitle: "절감액 뒤에 남은 이름",
         finalText: "감축은 비용을 줄였지만 다음 사건의 증언자를 바꿨습니다. 이제 결론은 절감 여부가 아니라, 누구의 침묵을 비용으로 처리했는지에 걸립니다.",
@@ -781,7 +781,7 @@ export const case01 = {
     c1_branch_people_c:
       "조건만 남기면 거래는 성립합니다. 그러나 빈칸은 사라지지 않고, 나중에 다른 사람이 다른 이름으로 채우게 됩니다.",
     c1_branch_people_follow_a:
-      "공개된 약속은 되돌리기 어렵습니다. 그것이 보호 장치이자, 당신이 지지 못할 때 가장 먼저 겨눠질 증거입니다.",
+      "공개된 약속은 되돌리기 어렵습니다. 그것이 보호 장치이자, 당신이 지키지 못할 때 가장 먼저 겨눠질 증거입니다.",
     c1_branch_people_follow_b:
       "계약 밖의 조건을 받아들이면 신뢰는 올라갑니다. 다만 그 예외를 요구할 다음 전화가 반드시 걸려옵니다.",
     c1_branch_people_follow_c:

@@ -326,8 +326,8 @@ export const case49 = {
       next: "c49_final",
       title: "바짓단 2센티",
       speaker: "백아린",
-      text: "밤 열한 시, 안양 중앙시장의 수선집 '윤경수선'에 불이 켜져 있습니다. 백아린이 불러낸 곳입니다. 허윤경이 당신 바짓단을 재며 투덜댑니다. '은행 사람들은 왜 다 바지가 길어. 내일 높은 데 간다며. 밟히면 안 되지.' 2센티를 접어 올리는 동안 백아린이 태블릿을 돌려 보여 줍니다. 33층 옛 그룹전략실의 도면입니다. '그 방 CCTV는 밤 10시가 넘으면 꺼져요. 제가 그 설정을 만들었어요. 늦게 한 결정일수록 기록이 안 남게요.' 그가 웃으려다 맙니다. '고소는 아직 진행 중이에요. 그래도 내일 필요하면, 로비까지는 갈 수 있어요.'",
-      memo: ["윤경수선 -- 바짓단 2센티, 수선비 받지 않음", "33층 옛 그룹전략실 CCTV: 22시 이후 꺼짐", "백아린: 영업비밀 유출 고소 진행 중"],
+      text: "밤 열한 시, 안양 중앙시장의 수선집 '윤경수선'에 불이 켜져 있습니다. 백아린이 불러낸 곳입니다. 허윤경이 당신 바짓단을 재며 투덜댑니다. '은행 사람들은 왜 다 바지가 길어. 내일 높은 데 간다며. 밟히면 안 되지.' 2센티를 접어 올리는 동안 백아린이 태블릿을 돌려 보여 줍니다. 33층 옛 그룹전략실의 도면입니다. '그 방 CCTV는 밤 9시부터 꺼져요. 제가 그 설정을 만들었어요. 늦게 한 결정일수록 기록이 안 남게요.' 그가 웃으려다 맙니다. '고소는 아직 진행 중이에요. 그래도 내일 필요하면, 로비까지는 갈 수 있어요.'",
+      memo: ["윤경수선 -- 바짓단 2센티, 수선비 받지 않음", "33층 옛 그룹전략실 CCTV: 21시부터 꺼짐", "백아린: 영업비밀 유출 고소 진행 중"],
       choices: [
         {
           label: "고소 중인 백아린이 다치지 않게 로비에는 오지 말라고 한다",
@@ -338,7 +338,7 @@ export const case49 = {
         {
           label: "CCTV 설정 기록을 보존해 달라고 공식 요청서를 낸다",
           effect: { legitimacy: 9, trust: 3, time: -5, humanCost: 2, fatigue: 3 },
-          voice: "밤 10시 뒤가 왜 안 남는지부터 남겨야 한다며, CCTV 설정 기록을 보존해 달라고 공식 요청서를 낸다.",
+          voice: "밤 9시 뒤가 왜 안 남는지부터 남겨야 한다며, CCTV 설정 기록을 보존해 달라고 공식 요청서를 낸다.",
           echo: "요청서는 접수됩니다. 설정을 만든 사람이 백아린이라는 사실도 함께 기록에 남습니다.",
         },
         {
@@ -467,7 +467,7 @@ export const case49 = {
       choices: [
         { id: "c49_branch_columbarium_follow_a", label: "만년필을 계속 지니고 내일 그 방에 함께 가져간다", effect: { trust: 13, legitimacy: 3, humanCost: -4, capital: -4, time: -4, fatigue: 5 }, next: "c49_parcels", cognition: { reframing: 3 } },
         { id: "c49_branch_columbarium_follow_b", label: "펜은 임소율에게 돌려주고 그 칸은 그 사람 펜으로 채우게 한다", effect: { legitimacy: 12, trust: 5, time: -6, humanCost: 2, fatigue: 4 }, next: "c49_parcels", cognition: { inference: 2 } },
-        { id: "c49_branch_columbarium_follow_c", label: "펜은 헌책방 1층 영정 옆에 두고 빈손 약속을 지킨다", effect: { time: 5, capital: 6, trust: -3, humanCost: 3, fatigue: -3 }, next: "c49_parcels", cognition: { risk: 1 } },
+        { id: "c49_branch_columbarium_follow_c", label: "펜은 헌책방 1층 영정 옆에 두고 펜 없이 올라간다", effect: { time: 5, capital: 6, trust: -3, humanCost: 3, fatigue: -3 }, next: "c49_parcels", cognition: { risk: 1 } },
       ],
     },
   },
@@ -505,9 +505,9 @@ export const case49 = {
     result: "c49_aftershock",
     sourceRoutes: ["c49_market", "c49_server", "c49_crosswalk", "c49_route_system"],
     requiredAuthority: "FIELD ACCESS",
-    entryVoice: "후임 관리자 지정서의 작성 기록을 단서로 열어, 이 파일을 만든 손이 누구인지 알아본다.",
-    entryEcho: "작성 기록 안에서는 펜을 내미는 손과 펜을 고른 손이 따로 나옵니다.",
-    entryLabel: "후임 관리자 지정서를 만든 계정을 연다",
+    entryVoice: "내일 그 방을 준비한 쪽의 계정 기록을 단서로 열어, 그 자리를 차린 손이 누구인지 알아본다.",
+    entryEcho: "계정 기록 안에서는 펜을 내미는 손과 펜을 고른 손이 따로 나옵니다.",
+    entryLabel: "내일 그 방을 준비한 쪽의 계정 기록을 연다",
     title: "지정서의 작성자",
     speaker: "반재욱",
     text: "단서를 지정서의 속성에 물리자 후임 관리자 지정서의 작성 기록이 열립니다. 파일을 만든 계정은 윤상혁의 것이 아닙니다. 회장 비서실, 여민규 실장의 계정입니다. 작성 시각은 1심 선고 날 밤 23시 14분. 추천 사유 칸에는 한 줄이 적혀 있습니다. '압박이 오를수록 생각이 깊어짐. 관리자로 두면 반대가 안에서 소화됨.' 같은 폴더에 보도자료 초안도 있습니다. 제목은 '트리거랩 자료, 반대 의견 작성자가 직접 관리'. 반재욱이 수첩을 덮습니다. '윤상혁은 칸을 비워 두는 사람이었고, 회장은 그 칸에 들어갈 사람을 고르는 사람이었네요. 내일 펜을 내미는 손은 하나지만, 그 펜을 고른 손은 둘입니다.'",
@@ -523,9 +523,9 @@ export const case49 = {
   memoryPlan: {
     systemNext: "c49_route_system",
     evidenceNext: "c49_evidence_turn",
-    systemLabel: "기록실에서 새로 짠 판이 후임 관리자 지정서에 적혔는지 찾아 읽는다",
-    evidenceLabel: "41%가 적힌 두 쪽의 자문역 이름을 지정서의 작성 기록에 비춘다",
-    systemEcho: "지정서에는 당신의 판 대신 당신의 이름이 올라 있습니다. 에코가 그렇게 이름이 적힌 칸들을 처음부터 모읍니다.",
+    systemLabel: "기록실에서 새로 짠 판이 빈 서명란 문서들에 적혔는지 찾아 읽는다",
+    evidenceLabel: "41%가 적힌 두 쪽의 자문역 이름을 내일 그 방을 준비한 계정에 비춘다",
+    systemEcho: "그 문서들에는 당신의 판 대신 당신의 이름이 올라 있습니다. 에코가 그렇게 이름이 적힌 칸들을 처음부터 모읍니다.",
     evidenceEcho: "자문역 이름을 비추면 지정서를 만든 계정은 그 사람 것이 아닙니다. 작성 시각은 선고가 난 날 밤입니다.",
   },
   openingRoutes: {
@@ -576,7 +576,7 @@ export const case49 = {
     c49_branch_columbarium_c: "돌아갈 시간이 빠듯해서, 짧게 인사만 하고 서울로 돌아가 내일 준비를 서두른다.",
     c49_branch_columbarium_follow_a: "칸을 채우던 사람의 펜이 그 자리에 있어야 한다며, 만년필을 계속 지니고 내일 그 방에 함께 가져간다.",
     c49_branch_columbarium_follow_b: "남의 펜으로 쓴 이름은 또 남의 것이 된다며, 펜은 임소율에게 돌려주고 그 칸은 그 사람 펜으로 채우게 한다.",
-    c49_branch_columbarium_follow_c: "칸을 채우던 사람 곁이 제자리라며, 펜은 헌책방 1층 영정 옆에 두고 빈손 약속을 지킨다.",
+    c49_branch_columbarium_follow_c: "칸을 채우던 사람 곁이 제자리라며, 펜은 헌책방 1층 영정 옆에 두고 펜 없이 올라간다.",
     c49_server_warn: "평가 폴더에 오른 줄을 본인들은 모를 테니, 폴더에 이름이 오른 다른 참가자들부터 찾아 먼저 알린다.",
     c49_server_file: "승인 없는 복원은 증거가 못 된다니, 에코의 마지막 계산을 류세아 이름으로 공식 기록에 올린다.",
     c49_server_copy: "내일이면 누가 폴더를 치울지 몰라서, 에코가 살아 있는 오늘 밤 폴더 경로부터 복사해 둔다.",

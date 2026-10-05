@@ -504,9 +504,9 @@ export const case40 = {
     triggers: ["injustice", "system", "order"],
     entryEffect: { legitimacy: 6, trust: 3, time: -5, fatigue: 4 },
     choices: [
-      ["c40_evidence_turn_hand", "투자 계약서와 이름표 기록을 청문회 자료로 차지원에게 넘긴다", { legitimacy: 13, trust: 5, capital: -7, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
-      ["c40_evidence_turn_show", "계약서를 마서윤에게 먼저 보여 주고 선택을 묻는다", { trust: 12, legitimacy: 4, humanCost: -5, time: -6, fatigue: 5 }, { reframing: 2 }],
-      ["c40_evidence_turn_hold", "계약서는 알아 두고 협상 막판의 카드로 쥔다", { capital: 9, time: 6, trust: -5, legitimacy: -5, humanCost: 4, fatigue: -4 }, { risk: 2 }],
+      ["c40_evidence_turn_hand", "투자 승인서와 이름표 기록을 청문회 자료로 차지원에게 넘긴다", { legitimacy: 13, trust: 5, capital: -7, time: -7, fatigue: 6 }, { inference: 2, persistence: 1 }],
+      ["c40_evidence_turn_show", "승인서를 마서윤에게 먼저 보여 주고 선택을 묻는다", { trust: 12, legitimacy: 4, humanCost: -5, time: -6, fatigue: 5 }, { reframing: 2 }],
+      ["c40_evidence_turn_hold", "승인서는 알아 두고 협상 막판의 카드로 쥔다", { capital: 9, time: 6, trust: -5, legitimacy: -5, humanCost: 4, fatigue: -4 }, { risk: 2 }],
     ],
   },
   memoryPlan: {
@@ -583,9 +583,9 @@ export const case40 = {
     c40_final_system_route_a: "멈춘 사람이 다시 결함으로 배워지지 않게, 망설임을 감점하지 않는 검사만 채용에 쓰게 하는 기준을 만든다.",
     c40_final_system_route_b: "접수가 열리기 전에 받아 낼 수 있는 것부터 받자며, 통계는 두고 탈락자에게 위로금만 지급하게 한다.",
     c40_final_system_route_c: "숫자가 틀려도 사람을 만날 길은 남아야 한다며, 탈락자가 사람 면접을 요구할 권리를 이용 약관에 넣게 한다.",
-    c40_evidence_turn_hand: "한 바퀴 도는 돈은 국회가 물을 일이라며, 투자 계약서와 이름표 기록을 청문회 자료로 차지원에게 넘긴다.",
-    c40_evidence_turn_show: "제 회사가 무엇에 묶여 있는지는 그가 알아야 한다며, 계약서를 마서윤에게 먼저 보여 주고 선택을 묻는다.",
-    c40_evidence_turn_hold: "그룹이 손쓸 틈을 주지 않으려고, 계약서는 알아 두고 협상 막판의 카드로 쥔다.",
+    c40_evidence_turn_hand: "한 바퀴 도는 돈은 국회가 물을 일이라며, 투자 승인서와 이름표 기록을 청문회 자료로 차지원에게 넘긴다.",
+    c40_evidence_turn_show: "제 회사가 무엇에 묶여 있는지는 그가 알아야 한다며, 승인서를 마서윤에게 먼저 보여 주고 선택을 묻는다.",
+    c40_evidence_turn_hold: "그룹이 손쓸 틈을 주지 않으려고, 승인서는 알아 두고 협상 막판의 카드로 쥔다.",
   },
   echoReplies: {
     // CASE 40.
@@ -742,7 +742,7 @@ export const case40 = {
     c40_evidence_turn: {
       place: "KD캐피탈 · 기록실",
       clock: "8월 셋째 주 금요일 · 07시",
-      question: "기록을 판 돈이 투자금이 되어 같은 그룹 공채로 돌아왔습니다. 이 계약서를 어떻게 쓰겠습니까?",
+      question: "기록을 판 돈이 투자금이 되어 같은 그룹 공채로 돌아왔습니다. 이 승인서를 어떻게 쓰겠습니까?",
     },
     c40_final: {
       place: "성수동 핏스코어 · 이사회 회의실",
