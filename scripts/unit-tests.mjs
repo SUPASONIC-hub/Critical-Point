@@ -311,6 +311,8 @@ test("playtest export schema should reject missing and private summary fields", 
   ]);
   assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "summary", currentCase: "case01", summary: {}, gameplay: {}, playerName: "private" }), ["private field playerName"]);
   assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "diagnostic", currentCase: "case01", summary: {}, gameplay: {}, sessionId: "session" }, { includeDiagnostics: true }), []);
+  // A summary handed in where a diagnostic export was asked for is the wrong file.
+  assert.deepEqual(validatePlaytestExport({ saveSchemaVersion: 2, exportedAt: "now", exportMode: "summary", currentCase: "case01", summary: {}, gameplay: {} }, { includeDiagnostics: true }), ["invalid exportMode summary"]);
 });
 test("telemetry schema should reject private fields and unknown types", () => {
   assert.deepEqual(validateTelemetryItem({ type: "unknown", payload: {} }), ["invalid type unknown"]);
