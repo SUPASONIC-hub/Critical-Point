@@ -241,7 +241,7 @@ export const case31Nodes = {
       {
         id: "c31_final_wait",
         label: "서명은 미루고 소명 기간 동안 안에서 더 모은다",
-        effect: { capital: 9, time: 6, legitimacy: -3, trust: 3, humanCost: 4, fatigue: -2 },
+        effect: { capital: 9, time: -6, legitimacy: -3, trust: 3, humanCost: 4, fatigue: -2 },
         voice: "세 장으로는 아직 모자라다며, 서명은 미루고 소명 기간 동안 안에서 더 모은다.",
         echo: "서명은 석 달 뒤로 갑니다. 그동안 모을 수 있는 것과, 그동안 파쇄될 수 있는 것이 함께 늘어납니다.",
         cognition: { risk: 2 },

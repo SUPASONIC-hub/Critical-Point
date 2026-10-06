@@ -118,7 +118,7 @@ export const case05Nodes = {
       {
         id: "c5_blame_blame",
         label: "관리자 징계와 보상안을 먼저 발표한다",
-        effect: { trust: 9, legitimacy: 3, humanCost: -5, fatigue: 2 },
+        effect: { capital: -6, trust: 9, legitimacy: 3, humanCost: -5, fatigue: 2 },
         voice: "기다리는 사람들에게 줄 답이 필요하다며, 징계와 보상을 함께 낸다.",
         echo: "발표는 분노를 가라앉힙니다. 가라앉은 자리에서 구조는 그대로 다음 사건을 준비합니다.",
         cognition: { risk: 2 },
