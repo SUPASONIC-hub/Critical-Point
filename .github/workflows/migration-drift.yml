@@ -1,10 +1,11 @@
 name: Migration Drift
 
 # The client deploys by itself: Verify goes green, deploy.yml presses the hook.
-# The database does not. A migration is applied by a person running
-# `npx supabase db push`, after the client that expects it is live (README,
-# 원격 랭킹), and until 2026-10-06 nothing ever asked whether that had happened.
-# A migration merged and never pushed looked the same as one that was.
+# The database is moved by something else: Supabase's GitHub integration
+# applies a migration when it is merged to main, or a person runs
+# `npx supabase db push` (README, 원격 랭킹), and until 2026-10-06 nothing ever
+# asked whether either had happened. A migration merged and never applied
+# looked the same as one that was.
 #
 # Once a day this asks the live project which migrations it has applied and
 # compares that with `supabase/migrations/` on the default branch, both ways:

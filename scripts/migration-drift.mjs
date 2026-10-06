@@ -6,10 +6,11 @@
  * filesystem here.
  *
  * The client deploys by itself when Verify goes green; a migration is applied
- * by a person running `npx supabase db push` afterwards (README, 원격 랭킹).
- * Nothing compared the two, so a migration that was merged and never pushed
- * looked exactly like one that was: the client ran against the old schema
- * until something it relied on was refused.
+ * at the merge by Supabase's GitHub integration, or by a person running
+ * `npx supabase db push` (README, 원격 랭킹). Nothing compared the two, so a
+ * migration the integration failed on or was switched off for looked exactly
+ * like one that was applied: the client ran against the old schema until
+ * something it relied on was refused.
  */
 
 /** `20260929010000_telemetry_caps_and_ranking.sql` -> `20260929010000`. Files that are not migrations are left out. */

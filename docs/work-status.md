@@ -1248,11 +1248,18 @@ when their output has gone stale (`check:art`, the build's hash comparison,
 
 ## Database Deployment
 
-The project is linked. Apply new schema changes by adding a migration and
-pushing it -- after the client that expects it is deployed, never before:
+The project is linked, and Supabase's GitHub integration deploys to production
+from `main`: a migration merged there is applied within about a minute
+(measured 2026-10-06 on the two `20261006` migrations; the merge commit
+carries a "Supabase Preview" check with the result). The client follows about
+fifteen minutes later, after Verify and Deploy. So the database changes first.
+A migration that changes the shape of a row or of a public column must be
+merged on its own, after a client that accepts both shapes is live; one that
+only moves a limit or a grant may ride with the client change.
 
 ```bash
 npx supabase migration new <name>
+# merge to main applies it; by hand, from a linked checkout:
 npx supabase db push
 ```
 
@@ -1394,7 +1401,8 @@ Looked at and left, on purpose or for the owner:
   browser-cache hit (the runner image's libraries are not known to be there).
 - Needs a hand outside the repository: the four header rules in the Render
   dashboard (priority 66), the `SUPABASE_ACCESS_TOKEN` secret for Migration
-  Drift, a ruleset on `main` (it has no branch protection), and `db push` of
-  the two migrations.
+  Drift, and a ruleset on `main` (it has no branch protection). The two
+  migrations needed no `db push`: the Supabase integration applied them at
+  the merge.
 - Not read: the opening variants against the second scene in the 43 cases the
   content audit only swept, and speech levels season-wide.
