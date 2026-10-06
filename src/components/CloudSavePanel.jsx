@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { CLOUD_SAVE_RETENTION_DAYS } from "../appConfig.js";
 import { telemetryEnabled } from "../telemetry.js";
+import { loadedChunk, quietImport } from "../state/chunkReload.js";
 
 /**
  * 기기 간 이어하기, folded under the intro's primary action.
@@ -28,7 +29,9 @@ export function CloudSavePanel() {
     if (Body || loading || !telemetryEnabled) return;
     setLoading(true);
     setFailed(false);
-    import("./CloudSavePanelBody.jsx")
+    // `quietImport`: the retry below answers a failure, so the page does not
+    // reload for it (state/chunkReload.js).
+    quietImport(() => import("./CloudSavePanelBody.jsx").then(loadedChunk))
       .then(({ CloudSavePanelBody }) => setBody(() => CloudSavePanelBody))
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));

@@ -19,7 +19,7 @@ import {
 import { getOriginStartEffects } from "../../src/advancedSystems.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameConstants.js";
 import { applyEffect } from "../../src/riskLogic.js";
-import { isChunkLoadError, reloadForMissingChunk } from "../../src/state/chunkReload.js";
+import { isChunkLoadError, quietImport, reloadForMissingChunk } from "../../src/state/chunkReload.js";
 import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
 
@@ -306,6 +306,33 @@ test("the reload for a missing chunk happens once, not in a loop", () => {
     assert.equal(reloads, 1);
     assert.equal(reloadForMissingChunk({ now: 1_000_000 + 61_000, reload }), true, "a later deploy is a new reason");
     assert.equal(reloads, 2);
+  } finally {
+    restore();
+  }
+});
+
+test("an offline tab, and an import its own caller answers, are never reloaded", async () => {
+  const { restore } = installStorage();
+  try {
+    let reloads = 0;
+    const reload = () => {
+      reloads += 1;
+    };
+    assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: false }), false, "a reload offline is the browser's offline page");
+    assert.equal(reloads, 0);
+
+    let duringQuiet = null;
+    await assert.rejects(
+      quietImport(() => {
+        duringQuiet = reloadForMissingChunk({ now: 2_000_000, reload, online: true });
+        return Promise.reject(new TypeError("Failed to fetch dynamically imported module: /assets/CloudSavePanelBody-abc.js"));
+      }),
+      /dynamically imported/,
+      "the caller still gets the failure",
+    );
+    assert.equal(duringQuiet, false, "a panel with its own retry keeps the page");
+    assert.equal(reloads, 0);
+    assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: true }), true, "and the next real failure reloads as before");
   } finally {
     restore();
   }

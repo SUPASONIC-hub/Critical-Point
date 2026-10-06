@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   createRunId,
   debugToolsEnabled,
@@ -111,15 +111,16 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
 } from "./advancedSystems.js";
-import { loadedChunk } from "./state/chunkReload.js";
+import { isChunkLoadError, loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
+import { retryableLazy } from "./state/retryableLazy.js";
 export { prepareGameRuntime } from "./state/caseArrival.js";
 
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
-const IntroScreen = lazy(() => import("./screens/IntroScreen.jsx").then(loadedChunk).then(({ IntroScreen }) => ({ default: IntroScreen })));
-const ResultScreen = lazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
-const PlayScreen = lazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
+const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+const IntroScreen = retryableLazy(() => import("./screens/IntroScreen.jsx").then(loadedChunk).then(({ IntroScreen }) => ({ default: IntroScreen })));
+const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
+const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
 const renderNothing = () => null;
 
@@ -708,8 +709,20 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     if (openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
   }
   // A case the season has not fetched yet is opened when it lands (caseArrival.js).
+  // One that cannot be fetched and did not reload the page -- no connection, or
+  // the page already reloaded for it once -- used to end in a dropped promise:
+  // the button did nothing and said nothing.
   function startCase(caseId) {
-    whenCaseReady(caseId, () => startCaseNow(caseId));
+    whenCaseReady(caseId, () => startCaseNow(caseId)).catch((error) => {
+      // A fault in opening the case is not this; it goes on to be recorded.
+      if (!isChunkLoadError(error)) throw error;
+      console.warn(error);
+      setSaveStatus(
+        globalThis.navigator?.onLine === false
+          ? "연결이 끊겨 이 사건을 받지 못했습니다. 연결을 확인한 뒤 다시 눌러 주세요. 저장은 그대로 있습니다."
+          : "이 사건을 받지 못했습니다. 다시 눌러 보고, 계속 안 되면 새로고침해 주세요. 저장은 그대로 있습니다.",
+      );
+    });
   }
   function startCaseNow(caseId) {
     const baseStartNode = CASE_START_NODES[caseId];

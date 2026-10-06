@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
@@ -44,6 +44,7 @@ import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { storageNeedsEveryCase } from "./state/caseArrival.js";
+import { retryableLazy } from "./state/retryableLazy.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
@@ -55,7 +56,7 @@ import { storageNeedsEveryCase } from "./state/caseArrival.js";
 // (state/caseArrival.js): both name scenes anywhere in the season. This runs
 // when the runtime is first drawn, which is after `startGame` below has written
 // the new save -- so it asks what the save holds, not whether there is one.
-const GameRuntime = lazy(() =>
+const GameRuntime = retryableLazy(() =>
   Promise.all([loadGameRuntime(), claimTabToken()]).then(async ([runtime]) => {
     await runtime.prepareGameRuntime({
       hasSave: storageNeedsEveryCase({
@@ -69,8 +70,8 @@ const GameRuntime = lazy(() =>
     return { default: runtime.GameRuntime };
   }),
 );
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
 
 // How long the intro waits for an idle moment before it fetches the runtime anyway.
 const RUNTIME_PREFETCH_TIMEOUT_MS = 4000;

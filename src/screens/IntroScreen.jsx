@@ -37,6 +37,10 @@ export function loadGameRuntime() {
   return gameRuntimeModule;
 }
 
+// A failure here still reloads the page when the browser is online: that is a
+// tab left open across a deploy, and reloading it while the intro is being
+// read is the cheapest moment there is (tests/production-build.spec.js holds
+// the tab to it). Offline it does nothing, and the press loads it again.
 export function prefetchGameRuntime() {
   loadGameRuntime().catch(() => {});
 }
