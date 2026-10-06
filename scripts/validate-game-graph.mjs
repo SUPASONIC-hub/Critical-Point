@@ -659,9 +659,10 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
  * scene its case wrote, every reply is authored, and every memory card a run
  * can be dealt answers in its own words (2026-09-29), so any of those coming
  * back is a failure. A choice with no voice line speaks its own label, which is
- * authored if plain; that count is held where it stands and may only fall.
+ * authored if plain; 54 did on 2026-09-29, and none has since every card came
+ * to carry its own line (2026-10-05), so one coming back is a failure too.
  */
-const VOICE_FALLBACK_CEILING = 54;
+const VOICE_FALLBACK_CEILING = 0;
 const memoryCardsWithoutReply = memoryCards.filter(({ card }) => !echoReplies[card.id]);
 for (const nodeId of fallbackCopy.scenes) failures.push(`${nodeId} closes a hidden route on the shared scene; write finalTitle, finalText and finalMemo on its plan`);
 for (const choiceId of fallbackCopy.echo) failures.push(`${choiceId} answers with a generated reply; give it an authored echo`);
@@ -669,7 +670,7 @@ for (const { caseId, kind, card, reachable } of memoryCardsWithoutReply) {
   if (reachable) failures.push(`${card.id} (${caseId}, ${kind}) can be dealt and takes the default reply; give its plan a ${kind === "evidenceTurn" ? "evidenceEcho" : kind === "systemRoute" ? "systemEcho" : "routeEcho"}`);
 }
 if (fallbackCopy.voice.length > VOICE_FALLBACK_CEILING) {
-  failures.push(`${fallbackCopy.voice.length} choices speak their own label, over the ${VOICE_FALLBACK_CEILING} left on 2026-09-29; write their voice lines`);
+  failures.push(`${fallbackCopy.voice.length} choices speak their own label, over the ${VOICE_FALLBACK_CEILING} allowed; write their voice lines`);
 }
 const fallbackReport =
   `${fallbackCopy.scenes.length} hidden routes close on the shared scene, ` +

@@ -932,7 +932,8 @@ Still open, on purpose:
     is not: every hidden route closes on a scene its case wrote (not the
     shared generated one), every reply is authored, and every memory card a
     run can be dealt answers in its own words. A choice with no voice line
-    speaks its own label; 54 do, held as a ceiling that may only fall. Only
+    speaks its own label; 54 did on 2026-09-29 and none does now, and
+    `check:graph` fails if one comes back. Only
     사건 01-05 have a route split, so only 사건 02-06 can be dealt a route
     memory card; the 48 cards no run could reach are deleted, and `check:graph`
     fails on a card no run can be dealt and on a kind of memory the previous
