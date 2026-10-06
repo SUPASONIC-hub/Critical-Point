@@ -26,7 +26,7 @@ import { getReplaySeedFromLocation } from "./trace.js";
 
 // A replay link is read once per page load. While it is open the tab writes
 // nothing to the save (appConfig.writeSaveState); starting a run of one's own
-// ends it (useAppPersistence.startGame). It is read at the first render, not
+// ends it (runLifecycle.startGame). It is read at the first render, not
 // at import: the scenes it names are checked against the season, and the
 // season's cases arrive after this module does (state/caseArrival.js).
 let replayState;

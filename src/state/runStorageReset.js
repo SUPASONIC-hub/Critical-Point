@@ -22,7 +22,7 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * this tab's last scenes goes too (`clearTraceEvents`, it is in sessionStorage).
  * The last four were left behind while the question asked said "everything".
  *
- * What it keeps, on purpose, and the question now says so (GameRuntime.reset):
+ * What it keeps, on purpose, and the question now says so (runLifecycle.resetRun):
  * the screen and sound settings, the relic codex, the NEW GAME+ unlock and the
  * season it remembers, the board nickname and writer id, and the online save's
  * code, its sync record and the copy on the server.

@@ -121,10 +121,16 @@ const BUDGETS = {
   // `useResultReport`; the reset's key list is `runStorageReset`; and the page
   // lifecycle is one handler in `useWindowSuspension`. Measured 1281 / 116 and
   // 23 / 9 / 6 / 6.
+  // 1300 / 120 -> 980 / 104 on 2026-10-06, and useState 23 -> 10. The run is
+  // one piece of state with one definition (`state/runState.js`), not nineteen
+  // `useState` calls in a hook and ten more here; starting, opening, jumping
+  // and wiping it are events in `state/runLifecycle.js`, not four lists of
+  // setters with a save payload typed out beside each. Measured 964 / 104 and
+  // 10 / 7 / 5 / 7.
   "src/GameRuntime.jsx": {
-    lines: 1300,
-    importedNames: 120,
-    hooks: { useState: 23, useMemo: 10, useEffect: 7, useRef: 7 },
+    lines: 980,
+    importedNames: 104,
+    hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
   // label rather than its position, because the 프롤로그 sits in front of

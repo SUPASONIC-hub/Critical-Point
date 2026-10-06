@@ -8,13 +8,10 @@ import {
   formatSaveTime,
   OPERATOR_ORIGIN_KEY,
   normalizeFeedback,
-  normalizePlayerName,
-  normalizeSavedText,
   parseErrorLog,
   parseRecoverySlots,
   readStoredValue,
   RECOVERY_CENTER_STORAGE_KEY,
-  removeStoredValue,
   SAVE_SLOT_STORAGE_KEY,
   STORAGE_KEY,
   writeStoredValue,
@@ -28,7 +25,6 @@ import {
   caseAftermathNodeId,
   caseOpeningRoutes,
   cognitionLabels,
-  initialResources,
   nodeOrders,
   nodes,
   getContinuityMemoryChoice,
@@ -38,16 +34,10 @@ import {
   triggerLabels,
 } from "./gameData.js";
 import {
-  applyEffect,
   clamp,
-  getCaseOutcome,
-  getOutcomeCarryover,
-  getContinuityChallenge,
   getLeadChoice,
-  getSeasonWear,
   detectPrivacySignals,
   explainResourceTradeoff,
-  makeEmptyScores,
 } from "./gameLogic.js";
 import {
   getSessionId,
@@ -61,20 +51,15 @@ import { easyCognitionLabels, simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import { LazyScreen } from "./components/LazyScreen.jsx";
-import { appendTraceEvent } from "./state/trace.js";
 import { confirmAction } from "./state/confirmAction.js";
-import { createOpeningResources } from "./state/openingState.js";
 import { focusSceneTitle } from "./state/sceneFocus.js";
-import { useGameSaveState } from "./state/useGameSave.js";
+import { useRunState } from "./state/useRunState.js";
 import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
 import { useRunReadout } from "./state/useRunReadout.js";
 import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
 import {
   normalizeRunState,
-  openCaseRun,
-  RUN_INITIAL_STATE,
-  serializeRunState,
 } from "./gauntlet/gauntletEngine.js";
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
@@ -95,9 +80,10 @@ import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlaySho
 import { useOverlayScreens } from "./state/useOverlayScreens.js";
 import { useRuntimeErrorCapture } from "./state/useRuntimeErrorCapture.js";
 import { useNewGamePlus } from "./state/useNewGamePlus.js";
+import { createRunLifecycle } from "./state/runLifecycle.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
-import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
+import { nextCaseSignals } from "./caseCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
@@ -121,11 +107,6 @@ const IntroScreen = retryableLazy(() => import("./screens/IntroScreen.jsx").then
 const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
 const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
-const CONFIRM_RESET =
-  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다.";
-// The line under a season's first scene, before any choice has been answered.
-const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
-
 const speakerPortraits = {
   "한서윤": "/portrait-han-seoyun.webp",
   "반재욱": "/portrait-ban-jaeuk.webp",
@@ -133,8 +114,6 @@ const speakerPortraits = {
   "오진우": "/portrait-oh-jinwoo.webp",
   "에코": "/portrait-echo.webp",
 };
-
-const caseSequence = CASE_SEQUENCE;
 
 // Save suppression has one owner, `AppContent`, which always passes both
 // `onSuppressSaves` and `saveControls`. This file used to keep a second flag and
@@ -147,38 +126,29 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }, [saveControls]);
 
   const { saved, recoverUnreadableSave } = useRuntimeSavedState(initialStartState);
-  // State, not a memo: a reset ends the id the last run's rows were filed under.
-  const [sessionId, setSessionId] = useState(getSessionId);
-  const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
-  const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
-
+  // The run: every field the save holds and the few kept beside them, with
+  // what each transition does to each (state/runState.js).
+  const { run, setters, patchRun } = useRunState(saved, () => ({
+    runId: createRunId(),
+    operatorOrigin: readStoredValue(OPERATOR_ORIGIN_KEY, "courier"),
+    sessionId: getSessionId(),
+    now: nowMs(),
+    // Asked for by the last page (a reset that reloaded), or by a save that could not be read.
+    openRecovery: recoverUnreadableSave || readStoredValue(RECOVERY_CENTER_STORAGE_KEY, "") === "1",
+  }));
   const {
-    runId, setRunId, playerName, setPlayerName, playStyle, setPlayStyle, openingLegacy, setOpeningLegacy,
-    dataConsent, setDataConsent, started, setStarted, currentCase, setCurrentCase,
-    completedCases, setCompletedCases, discoveredClues, setDiscoveredClues,
-    caseResults, setCaseResults, playtestFeedback, setPlaytestFeedback, nodeId, setNodeId,
-    resources, setResources, log, setLog, triggers, setTriggers, cognition, setCognition,
-    lastSavedAt, setLastSavedAt, isPausedSave, setIsPausedSave,
-    pendingTelemetry, setPendingTelemetry,
-  } = useGameSaveState({
-    saved,
-    initialRunId,
-    initialResources,
-    triggerDefaults: makeEmptyScores(triggerLabels),
-    cognitionDefaults: makeEmptyScores(cognitionLabels),
-  });
-  const [decisionReveal, setDecisionReveal] = useState(null);
-  // The run's gauntlet: pot, vault, and the rules the next window is dealt from.
-  // Saved under `dynamics`, the key the save format already reserves for it.
-  const [gauntletRun, setGauntletRun] = useState(() => normalizeRunState(saved?.dynamics));
+    runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
+    discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
+    lastSavedAt, isPausedSave, pendingTelemetry, gauntletRun, staleSave, operatorOrigin, nodeEnteredAt,
+    sessionId, decisionReveal, lastRecoveredError, showRecoveryCenter, showErrorLog,
+  } = run;
+  const {
+    setPlayerName, setPlayStyle, setDataConsent, setStarted, setPlaytestFeedback, setPendingTelemetry,
+    setLastSavedAt, setDecisionReveal, setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
+  } = setters;
+  const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const relicTable = useRelicTable();
-  // Set when this tab's run is older than the save: another tab moved on. The
-  // tab stops -- no table, no writes -- until it reloads from storage.
-  const [staleSave, setStaleSave] = useState(false);
   const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason } = useNewGamePlus(saved);
-  const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
-  const [echo, setEcho] = useState(() => normalizeSavedText(saved?.echo) || OPENING_ECHO);
-  const [nodeEnteredAt, setNodeEnteredAt] = useState(() => (Number.isFinite(saved?.nodeEnteredAt) ? saved.nodeEnteredAt : nowMs()));
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
@@ -195,11 +165,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
           ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
-  const [lastRecoveredError, setLastRecoveredError] = useState(saved?.lastError ?? null);
-  // Asked for by the last page (a reset that reloaded), or by a save that could not be read.
-  const openOnRecovery = () => recoverUnreadableSave || readStoredValue(RECOVERY_CENTER_STORAGE_KEY, "") === "1";
-  const [showRecoveryCenter, setShowRecoveryCenter] = useState(openOnRecovery);
-  const [showErrorLog, setShowErrorLog] = useState(openOnRecovery);
   const [localErrorEntries, setLocalErrorEntries] = useState(() => {
     const rawErrorLog = readStoredValue(ERROR_LOG_STORAGE_KEY, "null");
     const localErrorLog = parseErrorLog(rawErrorLog);
@@ -223,51 +188,19 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const decisionRevealRef = useRef(null);
 
   const {
-    persist: persistenceApi,
-    startGame: persistenceStartGame,
-    resumeSavedGame: persistenceResumeSavedGame,
-    pauseAfterRecovery: persistencePauseAfterRecovery,
-    startFreshAfterRecovery: persistenceStartFreshAfterRecovery,
-    saveCurrentGame: persistenceSaveCurrentGame,
-    refreshLocalErrorLog: persistenceRefreshLocalErrorLog,
-    refreshSaveSlots: persistenceRefreshSaveSlots,
-    dismissRecoveryNotice: persistenceDismissRecoveryNotice,
-    closeRecoveryCenter: persistenceCloseRecoveryCenter,
-    clearLocalErrorLog: persistenceClearLocalErrorLog,
-    deleteSaveSlot: persistenceDeleteSaveSlot,
-    restoreSaveSlot: persistenceRestoreSaveSlot,
-    restoreSaveBackup,
+    persist, applyRun, startFreshAfterRecovery, saveCurrentGame: saveRun, refreshLocalErrorLog, refreshSaveSlots,
+    dismissRecoveryNotice, closeRecoveryCenter, clearLocalErrorLog, deleteSaveSlot, restoreSaveSlot, restoreSaveBackup,
   } = useAppPersistence({
-    state: {
-      runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
-      discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
-      echo, nodeEnteredAt, dynamics: serializeRunState(gauntletRun),
-      isPausedSave, saveSlots,
-    },
+    run,
+    patchRun,
+    saveSlots,
     refs: { pendingTelemetryRef },
-    setters: {
-      setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
-      setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
-      setCognition, setEcho, setOpeningLegacy, setDecisionReveal,
-      setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setNodeId,
-      setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
-    },
+    setters: { setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry },
     config: {
-      normalizePlayerName, operatorOrigin, triggerLabels, cognitionLabels, makeEmptyScores,
       persistSuppressed, onSuppressSaves, onResumeSaves: resumeRuntimeSaves, formatSaveTime,
-      debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
-      initialDynamics: RUN_INITIAL_STATE,
-      openingEcho: OPENING_ECHO,
-      // A new run is this tab's own: it is written over whatever another tab
-      // held, so the lock a stale tab was under goes with the run it was for.
-      resetDecisionDynamics: () => {
-        setGauntletRun(RUN_INITIAL_STATE);
-        setStaleSave(false);
-      },
-      onStaleSave: () => setStaleSave(true),
+      debugErrorKey: DEBUG_RENDER_CRASH_KEY,
     },
   });
-  const persist = persistenceApi;
 
   const fallbackCaseId = seasonCasesBase.some((caseItem) => caseItem.id === currentCase)
     ? currentCase
@@ -275,7 +208,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const operatorProfile = getOperatorProfile(operatorOrigin);
   function setOperatorOrigin(value) {
     const nextOrigin = getOperatorProfiles().some((profile) => profile.id === value) ? value : "courier";
-    setOperatorOriginState(nextOrigin);
+    patchRun({ operatorOrigin: nextOrigin });
     writeStoredValue(OPERATOR_ORIGIN_KEY, nextOrigin);
   }
   const activeNodeOrder = nodeOrders[fallbackCaseId] ?? nodeOrders[SEASON_ENTRY_CASE];
@@ -462,31 +395,37 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
   const nextCaseSignal = nextCaseSignals[currentCase];
-  const resumeSavedGame = persistenceResumeSavedGame;
-  const pauseAfterRecovery = persistencePauseAfterRecovery;
-  const startFreshAfterRecovery = persistenceStartFreshAfterRecovery;
+  const replaceQueueEvent = useStableEvent(replacePendingTelemetry);
+  // Starting, opening, jumping, leaving and wiping the run: each an event the
+  // run's definition answers with a patch, applied and saved in one step.
+  const lifecycle = createRunLifecycle({
+    run,
+    applyRun,
+    patchRun,
+    isOnline,
+    effects: {
+      resetEndingSequence, setNextParticipantMessage, replacePendingTelemetry: replaceQueueEvent, clearLocalRankingRows,
+      setLocalErrorEntries, setSaveSlots, setSaveStatus, setTelemetryStatus, onSuppressSaves,
+      resumeRuntimeSaves,
+    },
+  });
   // The page going away, coming back, or being hidden; see useWindowSuspension.
   // One write per event, carrying everything that event changed.
   const suspension = useWindowSuspension({
     started,
     active: started && !isResult && !staleSave,
     getRun: () => gauntletRun,
-    commit: ({ run = null, pausedForMs = 0, paused } = {}) => {
+    commit: ({ run: heldRun = null, pausedForMs = 0, paused } = {}) => {
       const patch = {};
-      if (run) {
-        setGauntletRun(run);
-        patch.dynamics = serializeRunState(run);
-      }
-      if (pausedForMs > 0) {
-        patch.nodeEnteredAt = nodeEnteredAt + pausedForMs;
-        setNodeEnteredAt(patch.nodeEnteredAt);
-      }
-      if (paused && !persistSuppressed() && readStoredValue(STORAGE_KEY, null) !== null) patch.paused = true;
-      if (Object.keys(patch).length > 0) persist(patch);
+      if (heldRun) patch.gauntletRun = heldRun;
+      if (pausedForMs > 0) patch.nodeEnteredAt = nodeEnteredAt + pausedForMs;
+      // A page going away is saved as paused and the run in memory is not
+      // told: it is about to be gone, and a page that comes back says so below.
+      const leaving = paused && !persistSuppressed() && readStoredValue(STORAGE_KEY, null) !== null;
+      if (Object.keys(patch).length > 0 || leaving) applyRun(patch, { saveOnly: leaving ? { paused: true } : {} });
     },
     onPageShow: () => {
-      setIsPausedSave(false);
-      persist({ paused: false });
+      applyRun({ isPausedSave: false });
     },
   });
   // Leaving on purpose keeps the table as it stands. A window that has closed
@@ -499,17 +438,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       return null;
     }
     const suspendedRun = options.exit ? suspension.suspendNow() : null;
-    if (!suspendedRun) return persistenceSaveCurrentGame(options);
-    setGauntletRun(suspendedRun);
-    return persistenceSaveCurrentGame({ ...options, dynamics: serializeRunState(suspendedRun) });
+    return saveRun(suspendedRun ? { ...options, heldRun: suspendedRun } : options);
   }
-  const refreshLocalErrorLog = persistenceRefreshLocalErrorLog;
-  const refreshSaveSlots = persistenceRefreshSaveSlots;
-  const dismissRecoveryNotice = persistenceDismissRecoveryNotice;
-  const closeRecoveryCenter = persistenceCloseRecoveryCenter;
-  const clearLocalErrorLog = persistenceClearLocalErrorLog;
-  const deleteSaveSlot = persistenceDeleteSaveSlot;
-  const restoreSaveSlot = persistenceRestoreSaveSlot;
   const { queueTelemetry, retryPendingTelemetry, scheduleTelemetryRetry } = useTelemetryQueue({
     pendingTelemetryRef,
     setPendingTelemetry,
@@ -530,12 +460,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
     sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
     playerName, activeCaseMeta, dataConsent, staleSave, clueCount, casesOpened,
-    readers: choiceReaders, persist, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
+    readers: choiceReaders, applyRun, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
     onSeasonFinal: unlockNewGamePlus,
-    setters: {
-      setGauntletRun, setResources, setTriggers, setCognition, setLog, setEcho, setNodeId,
-      setCompletedCases, setCaseResults, setDiscoveredClues, setNodeEnteredAt, setDecisionReveal,
-    },
   });
   const scheduleTelemetryRetryEvent = useStableEvent(scheduleTelemetryRetry);
   const refreshLocalErrorLogEvent = useStableEvent(refreshLocalErrorLog);
@@ -543,8 +469,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const saveCurrentGameEvent = useStableEvent(saveCurrentGame);
   const startCaseEvent = useStableEvent(startCase), openCaseEvent = useStableEvent(openCase);
   const resolveGauntletEvent = useStableEvent(resolveGauntlet);
-  const resetEvent = useStableEvent(reset), retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
-  const startAtNodeEvent = useStableEvent(startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
+  const resetEvent = useStableEvent(lifecycle.resetRun), retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
+  const startAtNodeEvent = useStableEvent(lifecycle.startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
   const showSeasonMapEvent = useStableEvent(showSeasonMap);
   useEffect(() => {
     const updateNetworkStatus = () => {
@@ -684,8 +610,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCase, isResult, nodeId, started]);
 
-  // Persistence, save slots and error-log state are owned by useAppPersistence.
-  const startGame = persistenceStartGame;
   function startNewGamePlus() {
     if (!newGamePlusUnlocked) return;
     unlockNewGamePlus();
@@ -694,7 +618,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // What NEW GAME+ is: the season again, with the last one's record on the
     // intro. The line used to promise hidden authority and extra clues.
     setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
-    startGame();
+    lifecycle.startGame();
   }
   /**
    * A case opened from the result page, by button or by key. Opening the one
@@ -714,7 +638,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   // the page already reloaded for it once -- used to end in a dropped promise:
   // the button did nothing and said nothing.
   function startCase(caseId) {
-    whenCaseReady(caseId, () => startCaseNow(caseId), {
+    whenCaseReady(caseId, () => lifecycle.startCaseNow(caseId), {
       unavailable: ({ offline }) =>
         setSaveStatus(
           offline
@@ -723,89 +647,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         ),
     });
   }
-  function startCaseNow(caseId) {
-    const baseStartNode = CASE_START_NODES[caseId];
-    const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
-    const previousCaseId = caseSequence[caseSequence.indexOf(caseId) - 1];
-    const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
-    const startNode = caseOpeningRoutes[caseId]?.[previousResult?.outcomeChoiceId] ?? baseStartNode;
-    const previousOutcome = previousResult?.outcomeChoiceId
-      ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
-      : null;
-    // The outcome and carryover tables are keyed by the case that produced the
-    // outcome; the continuity challenges are keyed by the case they open
-    // (`case01: { p5_after_hold, ... }`). Looking them up under the previous
-    // case found nothing, so no authored challenge ever reached a table.
-    const continuityChallenge = previousResult?.outcomeChoiceId
-      ? getContinuityChallenge({ caseId, choiceId: previousResult.outcomeChoiceId })
-      : null;
-    const carryoverEffect = previousResult?.outcomeChoiceId
-      ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
-      : {};
-    const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
-    // What the season has worn down is added on top, as check:endings replays it.
-    const openingEffect = { ...(baseLegacy?.effect ?? {}) };
-    [carryoverEffect, getSeasonWear(caseId)].forEach((effect) => Object.entries(effect).forEach(([key, value]) => {
-      openingEffect[key] = (openingEffect[key] ?? 0) + value;
-    }));
-    const legacy = previousResult
-      ? {
-          ...baseLegacy,
-          effect: openingEffect,
-          continuity: previousOutcome,
-          continuityChallenge,
-        }
-      : null;
-    const openingEcho = previousOutcome
-      ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
-      : introEcho;
-    // The origin bonus is the run's opening hand, so it belongs to the season's
-    // first case -- which is the 프롤로그 now, not 사건 01.
-    const seasonOpening = caseId === SEASON_ENTRY_CASE && !previousResult;
-    const openingResources = seasonOpening
-      ? createOpeningResources(operatorOrigin)
-      : previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
-    appendTraceEvent({
-      kind: "case-start",
-      caseId,
-      nodeId: startNode,
-      logLength: 0,
-      resources: openingResources,
-      note: previousResult?.outcomeChoiceId ?? "season-start",
-    });
-    setStarted(true);
-    setIsPausedSave(false);
-    setCurrentCase(caseId);
-    setNodeId(startNode);
-    setResources(openingResources);
-    setLog([]);
-    setTriggers(makeEmptyScores(triggerLabels));
-    setCognition(makeEmptyScores(cognitionLabels));
-    setOpeningLegacy(legacy);
-    setDecisionReveal(null);
-    // A closed case keeps its REBOOT board and its relic draft; an abandoned one forfeits its pot.
-    // A case that already has a summary is played again as practice for the table.
-    const openingRun = openCaseRun(gauntletRun, { replayOf: caseResults[caseId] ?? null });
-    setGauntletRun(openingRun);
-    resetEndingSequence();
-    setEcho(openingEcho);
-    setNodeEnteredAt(nowMs());
-    persist({
-      started: true,
-      paused: false,
-      currentCase: caseId,
-      nodeId: startNode,
-      resources: openingResources,
-      log: [],
-      triggers: makeEmptyScores(triggerLabels),
-      cognition: makeEmptyScores(cognitionLabels),
-      openingLegacy: legacy,
-      echo: openingEcho,
-      dynamics: serializeRunState(openingRun),
-      nodeEnteredAt: nowMs(),
-    });
-  }
-
   /**
    * The table closed a window: settle it. `closedWindow` is the stage's final
    * window -- cashed or bust -- and the verdict it produces is the only thing
@@ -827,8 +668,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   function pickRelic(relicId = null) {
     if (staleSave) return;
     const pickedRun = relicTable.equip(gauntletRun, relicId);
-    setGauntletRun(pickedRun);
-    persist({ dynamics: serializeRunState(pickedRun) });
+    applyRun({ gauntletRun: pickedRun });
   }
 
   /**
@@ -841,70 +681,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     if (staleSave) return;
     // Touching a window is also the end of any suspension it was resumed from.
     const touchedRun = normalizeRunState({ ...gauntletRun, openSeed, openCardId: cardId, suspended: null });
-    setGauntletRun(touchedRun);
-    persist({ dynamics: serializeRunState(touchedRun) });
-  }
-
-  // The question names what goes and what stays (state/runStorageReset.js has
-  // the list). It used to say "everything", and left six kinds of thing behind.
-  function reset() {
-    if (!confirmAction(CONFIRM_RESET)) return;
-    onSuppressSaves();
-    const failedResetKeys = clearRunStorage();
-    removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    // A new id for the next run's rows; the old one went with the keys above.
-    setSessionId(getSessionId());
-    setNextParticipantMessage("");
-    resetEndingSequence();
-    // The tab is its own again: storage holds nothing another tab is ahead in.
-    setStaleSave(false);
-    setShowRecoveryCenter(false);
-    setShowErrorLog(false);
-    setPlayerName("");
-    setOperatorOriginState("courier");
-    removeStoredValue(OPERATOR_ORIGIN_KEY);
-    setRunId(createRunId());
-    setPlayStyle("instinct");
-    setDataConsent(false);
-    setStarted(false);
-    setCurrentCase(SEASON_ENTRY_CASE);
-    setCompletedCases([]);
-    setOpeningLegacy(null);
-    setCaseResults({});
-    setDiscoveredClues([]);
-    setPlaytestFeedback({});
-    replacePendingTelemetry([]);
-    clearLocalRankingRows();
-    setLocalErrorEntries([]);
-    setSaveSlots([]);
-    setLastRecoveredError(null);
-    setNodeId(SEASON_ENTRY_NODE);
-    setResources(initialResources);
-    setLog([]);
-    setTriggers(makeEmptyScores(triggerLabels));
-    setCognition(makeEmptyScores(cognitionLabels));
-    setDecisionReveal(null);
-    setGauntletRun(RUN_INITIAL_STATE);
-    setEcho(OPENING_ECHO);
-    const resetErrorLogSaved = failedResetKeys.length === 0
-      || logStorageResetFailure({ source: "reset", failedStorageKeys: failedResetKeys, currentCase, nodeId });
-    setSaveStatus(
-      failedResetKeys.length === 0
-        ? ""
-        : `일부 브라우저 저장소를 지우지 못했습니다: ${failedResetKeys.join(", ")}${resetErrorLogSaved ? "" : " · 진단 로그 저장도 실패했습니다."}`,
-    );
-    setLastSavedAt("");
-    setIsPausedSave(false);
-    setNodeEnteredAt(nowMs());
-    setTelemetryStatus({
-      tone: telemetryEnabled && isOnline ? "ready" : "local",
-      text: !isOnline
-        ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
-        : telemetryEnabled
-          ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
-          : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
-    });
-    resumeRuntimeSaves();
+    applyRun({ gauntletRun: touchedRun });
   }
 
   function retryStorageCleanup() {
@@ -923,73 +700,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   function showSeasonMap() {
     introLandingRef.current = "roadmap";
-    setStarted(false);
-    setIsPausedSave(true);
-    persist({ started: false, paused: true });
+    lifecycle.leaveToSeasonMap();
   }
 
   function unlockAllCasesForTest() {
     const allPlayableCases = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
-    setCompletedCases(allPlayableCases);
-    persist({ completedCases: allPlayableCases });
-  }
-
-  function startAtNode(
-    caseIdValue,
-    nodeIdValue,
-    {
-      echoText = "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
-      persistRun = true,
-    } = {},
-  ) {
-    const caseId = seasonCasesBase.some((caseItem) => caseItem.id === caseIdValue) ? caseIdValue : "case05";
-    const nodeOptions = nodeOrders[caseId] ?? nodeOrders.case05;
-    const nextNodeId = nodeOptions.includes(nodeIdValue) ? nodeIdValue : nodeOptions[0];
-    appendTraceEvent({
-      kind: "enter",
-      caseId,
-      nodeId: nextNodeId,
-      logLength: 0,
-      resources: initialResources,
-      note: persistRun ? "debug-start" : "replay",
-    });
-    const allPreviousCases = caseSequence.slice(0, Math.max(0, caseSequence.indexOf(caseId)));
-    const now = nowMs();
-    const nextRunId = persistRun ? createRunId() : runId;
-    if (persistRun) setRunId(nextRunId);
-    setStarted(true);
-    setIsPausedSave(false);
-    setCurrentCase(caseId);
-    setCompletedCases(allPreviousCases);
-    setNodeId(nextNodeId);
-    setResources(initialResources);
-    setLog([]);
-    setTriggers(makeEmptyScores(triggerLabels));
-    setCognition(makeEmptyScores(cognitionLabels));
-    setGauntletRun(RUN_INITIAL_STATE);
-    setOpeningLegacy(null);
-    setDecisionReveal(null);
-    setEcho(echoText);
-    setShowErrorLog(false);
-    setNodeEnteredAt(now);
-    if (persistRun) {
-      persist({
-        runId: nextRunId,
-        started: true,
-        paused: false,
-        currentCase: caseId,
-        completedCases: allPreviousCases,
-        nodeId: nextNodeId,
-        resources: initialResources,
-        log: [],
-        triggers: makeEmptyScores(triggerLabels),
-        cognition: makeEmptyScores(cognitionLabels),
-        echo: echoText,
-        openingLegacy: null,
-        dynamics: serializeRunState(RUN_INITIAL_STATE),
-        nodeEnteredAt: now,
-      });
-    }
+    applyRun({ completedCases: allPlayableCases });
   }
 
   function replacePendingTelemetry(queue) {
@@ -998,7 +714,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   function startDebugNode() {
-    whenCaseReady(debugCaseId, () => startAtNode(debugCaseId, debugNodeId));
+    whenCaseReady(debugCaseId, () => lifecycle.startAtNode(debugCaseId, debugNodeId));
   }
 
   function exportPlaytestLog({ includeDiagnostics = false } = {}) {
@@ -1174,7 +890,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     renderErrorLogPanel,
   } = useRuntimeRenderers({
     decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
-    lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
+    lastRecoveredError, started, pauseAfterRecovery: lifecycle.pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
     setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup: retryStorageCleanupEvent,
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
@@ -1213,7 +929,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     operatorOrigin, setOperatorOrigin, sessionCode, isOnline,
     hasResumableSave, lastSavedAt, log, caseResults, completedCases, currentCase,
     newGamePlusUnlocked, newGamePlusMemory, nextParticipantMessage,
-    startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame, persist, setShowRanking,
+    startGame: lifecycle.startGame, startCase: startCaseEvent, startNewGamePlus, resumeSavedGame: lifecycle.resumeSavedGame, persist, setShowRanking,
     setShowBoard,
     setSaveStatus, pendingTelemetry, setPendingTelemetry: replacePendingTelemetry, setTelemetryStatus,
     runtime: {
