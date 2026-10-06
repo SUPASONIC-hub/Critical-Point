@@ -63,7 +63,9 @@ export default defineConfig({
     // there rather than the whole suite twice over: the tests that play the
     // production build from the intro (@prod), and the measurements of what
     // fits on one screen (@layout) -- the fixed action bar under iOS viewport
-    // units is the thing priority 27 promises and Chromium cannot show.
+    // units is the thing priority 27 promises and Chromium cannot show. The
+    // two tags are two runs (scripts/run-e2e.mjs, --webkit): @prod against the
+    // production build, @layout against the dev server.
     {
       name: "webkit",
       grep: /@prod|@layout/,

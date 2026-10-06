@@ -53,6 +53,7 @@
     "test:e2e": "node scripts/run-e2e.mjs",
     "test:performance": "node scripts/run-e2e.mjs --preview tests/performance.spec.js --project=chromium --workers=1",
     "test:e2e:webkit": "node scripts/run-e2e.mjs --preview --webkit",
+    "test:e2e:webkit:layout": "node scripts/run-e2e.mjs --webkit --grep @layout",
     "test:e2e:full": "node scripts/run-e2e.mjs --full",
     "test:e2e:season": "node scripts/run-e2e.mjs --season",
     "test:e2e:preview": "node scripts/run-e2e.mjs --preview",

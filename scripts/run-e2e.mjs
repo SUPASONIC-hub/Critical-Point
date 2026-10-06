@@ -21,10 +21,15 @@ import path from "node:path";
  *               halves as separate jobs
  *   --webkit    the WebKit project (iPhone 14) instead of the two Chromium
  *               ones. It is not part of a default run yet: see the note on
- *               DEFAULT_PROJECTS
+ *               DEFAULT_PROJECTS. The project takes @prod and @layout, and
+ *               the two need different servers: `--preview --webkit` is the
+ *               @prod half (a preview run greps @prod), and `--webkit --grep
+ *               @layout` the other, on the dev server, because the layout
+ *               measurements reach their scenes by the debug jump
  *   --list      load every spec and list its tests, against no server. A spec
  *               that cannot be loaded fails here, on the push, instead of in
- *               the weekly tier where nobody is looking
+ *               the weekly tier where nobody is looking; so does a spec
+ *               that no tier runs
  *   --docker    re-run this command inside the pinned Playwright container, so
  *               screenshots are rendered by the same fonts and browser build
  *               that CI records baselines with. Needs Docker.
@@ -81,6 +86,49 @@ function exitCodeOf(child) {
   });
 }
 
+// The default list. The layout ratchets in visual-regression.spec.js are
+// measurements, not screenshots; leaving the whole spec to `test:visual` --
+// which only greps @visual -- meant nothing ran them.
+const DEFAULT_SPECS = [
+  "tests/accessibility.spec.js",
+  "tests/accessibility-settings.spec.js",
+  "tests/audio-preference.spec.js",
+  "tests/board-ranking.spec.js",
+  "tests/cloud-save.spec.js",
+  "tests/contrast.spec.js",
+  "tests/gauntlet-loop.spec.js",
+  "tests/recovery.spec.js",
+  "tests/save-integrity.spec.js",
+  "tests/save-resume.spec.js",
+  "tests/season-flow.spec.js",
+  "tests/table-keys.spec.js",
+  "tests/visual-regression.spec.js",
+];
+
+// The specs the production build can run: everything tagged @prod, which
+// enters from the intro or from a seeded save rather than the debug jump. The
+// performance budgets are not in this list: they are timings, and a timing
+// taken while two other workers play the game measures the other workers.
+// `npm run test:performance` runs them alone.
+const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js"];
+
+// The weekly tier (--full).
+const FULL_SPECS = ["tests/full-coverage.spec.js", "tests/layout-sweep.spec.js"];
+
+/**
+ * The specs no tier runs. A spec in none of the lists above loads, is listed,
+ * and never starts: tests/table-keys.spec.js and
+ * tests/accessibility-settings.spec.js sat like that until 2026-10-06, fourteen
+ * tests that every tier reported green without having run one of them. A spec
+ * that a package.json script runs by name counts as run, for as long as the
+ * script still names it.
+ */
+function specsNoTierRuns(specs) {
+  const scripts = Object.values(JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).scripts ?? {});
+  const listed = new Set([...PREVIEW_SPECS, ...FULL_SPECS]);
+  return specs.filter((spec) => !listed.has(`tests/${spec}`) && !scripts.some((script) => script.includes(`tests/${spec}`)));
+}
+
 if (has("--list")) {
   // Every spec in tests/, not the default list: the specs outside it are the
   // ones this exists for. `full-coverage.spec.js` failed to load for four
@@ -105,7 +153,20 @@ if (has("--list")) {
     );
     process.exit(code || 1);
   }
-  console.log(`Every spec loads: ${total[1]} tests in ${total[2]} files.`);
+  const unrun = specsNoTierRuns(specs);
+  if (unrun.length) {
+    console.error(
+      `No tier runs ${unrun.join(", ")}. Add ${unrun.length === 1 ? "it" : "them"} to DEFAULT_SPECS, or to the list ${unrun.length === 1 ? "it belongs" : "they belong"} in, in scripts/run-e2e.mjs: ` +
+        "a spec outside every list is green on every push because it never starts.",
+    );
+    process.exit(1);
+  }
+  const absent = [...new Set([...PREVIEW_SPECS, ...FULL_SPECS])].filter((spec) => !specs.includes(spec.slice("tests/".length)));
+  if (absent.length) {
+    console.error(`scripts/run-e2e.mjs lists ${absent.join(", ")}, and tests/ has no such file.`);
+    process.exit(1);
+  }
+  console.log(`Every spec loads, and a tier runs each one: ${total[1]} tests in ${total[2]} files.`);
   process.exit(0);
 }
 
@@ -242,30 +303,6 @@ function stopProcess(child) {
   });
 }
 
-// The default list. The layout ratchets in visual-regression.spec.js are
-// measurements, not screenshots; leaving the whole spec to `test:visual` --
-// which only greps @visual -- meant nothing ran them.
-const DEFAULT_SPECS = [
-  "tests/accessibility.spec.js",
-  "tests/audio-preference.spec.js",
-  "tests/board-ranking.spec.js",
-  "tests/cloud-save.spec.js",
-  "tests/contrast.spec.js",
-  "tests/gauntlet-loop.spec.js",
-  "tests/recovery.spec.js",
-  "tests/save-integrity.spec.js",
-  "tests/save-resume.spec.js",
-  "tests/season-flow.spec.js",
-  "tests/visual-regression.spec.js",
-];
-
-// The specs the production build can run: everything tagged @prod, which
-// enters from the intro or from a seeded save rather than the debug jump. The
-// performance budgets are not in this list: they are timings, and a timing
-// taken while two other workers play the game measures the other workers.
-// `npm run test:performance` runs them alone.
-const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js"];
-
 /**
  * A default run is the two Chromium projects. The WebKit project was added on
  * 2026-09-28 and has only been run on a desktop that was busy with other work,
@@ -297,7 +334,7 @@ function playwrightArgs() {
     // out: with the walk's own faults fixed (2026-10-05), every one of the 60
     // tests still failing was a page load, a debug jump or a fifteen-minute
     // sweep running out of time, in a different place each run.
-    return ["test", "tests/full-coverage.spec.js", "tests/layout-sweep.spec.js", "--project=chromium", "--workers=2", "--fully-parallel", ...REPORTERS, ...forwardedArgs];
+    return ["test", ...FULL_SPECS, "--project=chromium", "--workers=2", "--fully-parallel", ...REPORTERS, ...forwardedArgs];
   }
   if (runSeasonWalk) {
     // One uninterrupted walk, case 1 to the ending, carrying every resource
