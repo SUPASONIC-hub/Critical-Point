@@ -208,7 +208,7 @@ export const case49Nodes = {
       {
         id: "c49_crosswalk_ask",
         label: "무엇을 넘기려는 건지 회장에게 끝까지 캐묻는다",
-        effect: { capital: 7, time: 3, legitimacy: 3, trust: -2, humanCost: 3, fatigue: -2 },
+        effect: { capital: 7, time: -3, legitimacy: 3, trust: -2, humanCost: 3, fatigue: -2 },
         voice: "모르고 받으면 그대로 내 기억이 된다며, 무엇을 넘기려는 건지 회장에게 끝까지 캐묻는다.",
         echo: "캐물으면 회장은 답하지 않고 당신이 한남동에서 한 말을 한 글자도 틀리지 않고 되풀이합니다. 그게 대답입니다.",
         cognition: { risk: 2 },

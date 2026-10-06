@@ -476,7 +476,7 @@ export const case07 = {
         },
         {
           label: "하루를 더 기다린다",
-          effect: { time: 6, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
+          effect: { time: -6, capital: 6, trust: -6, humanCost: 4, fatigue: -3 },
           voice: "표도 자료도 손대지 않고, 하루를 더 기다린다.",
           echo: "기다린 하루는 아무것도 바꾸지 않고, 권한 축소는 예정대로 적용됩니다.",
         },

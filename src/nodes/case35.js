@@ -333,7 +333,7 @@ export const case35 = {
         },
         {
           label: "압착기 둘레에 모래주머니를 쌓고 할머니 곁을 지킨다",
-          effect: { time: 4, capital: 3, trust: 3, humanCost: 4, fatigue: -3 },
+          effect: { time: -4, capital: 3, trust: 3, humanCost: 4, fatigue: 3 },
           voice: "또 살 수 없는 기계라는 말을 꺾지 못해서, 압착기 둘레에 모래주머니를 쌓고 할머니 곁을 지킨다.",
           echo: "압착기는 살아남습니다. 할머니 곁에 남은 강태민은 새벽 5시까지 허리까지 찬 물속에 서 있습니다.",
         },

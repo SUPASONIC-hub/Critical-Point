@@ -177,7 +177,7 @@ export const case02Nodes = {
       {
         id: "c2_pressure_shadow",
         label: "오진우 보고서의 전제를 공격한다",
-        effect: { time: -6, trust: -2, legitimacy: -2, fatigue: 4 },
+        effect: { time: -6, trust: -2, legitimacy: 5, fatigue: 4 },
         voice: "결론이 아니라 그 결론이 서 있는 전제를 겨눈다.",
         echo: "전제를 흔들면 보고서 전체가 흔들립니다. 대신 다음 보고서를 쓸 사람도 당신이 됩니다.",
         cognition: { reframing: 2, inference: 1 },

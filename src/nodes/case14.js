@@ -104,7 +104,7 @@ export const case14Nodes = {
       {
         id: "c14_counter_record",
         label: "정체를 숨긴 채 옆 창구의 설명을 끝까지 녹음해 둔다",
-        effect: { capital: 6, time: 5, legitimacy: 4, trust: -3, humanCost: 4, fatigue: -2 },
+        effect: { capital: 6, time: -5, legitimacy: 4, trust: -3, humanCost: 4, fatigue: -2 },
         voice: "나서면 증거가 거기서 끊긴다며, 정체를 숨긴 채 옆 창구의 설명을 끝까지 녹음해 둔다.",
         echo: "녹음은 증거가 됩니다. 증거가 녹음되는 동안 이정숙의 도장이 가입서에 찍힙니다.",
         cognition: { risk: 2 },
