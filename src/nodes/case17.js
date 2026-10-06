@@ -336,6 +336,7 @@ export const case17 = {
         {
           label: "오늘은 서아가 붙인 대로 두고 다음 이름을 찾는다",
           effect: { time: 5, capital: 3, trust: 3, legitimacy: -3, humanCost: 3, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "별 스티커쯤은 수첩이 견딜 거라며, 오늘은 서아가 붙인 대로 두고 다음 이름을 찾는다.",
           echo: "별점이 붙은 수첩은 증거로는 흠이 됩니다. 법무팀 변호사가 그 스티커를 사진으로 찍어 갈 겁니다.",
         },
@@ -413,12 +414,14 @@ export const case17 = {
         {
           label: "아이 나이가 적힌 스물두 명부터 먼저 찾아간다",
           effect: { trust: 10, humanCost: -5, time: -4, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "탁자에 오르기 전에 그 집들이 먼저 알아야 한다며, 아이 나이가 적힌 스물두 명부터 먼저 찾아간다.",
           echo: "스물두 집을 먼저 돌면 순서가 바뀝니다. 수첩 첫 장부터 기다리던 사람 몇은 한 주를 더 기다립니다.",
         },
         {
           label: "제출 범위에서 가족 정보는 빼라고 법무팀에 요구한다",
           effect: { legitimacy: 8, trust: 3, capital: -3, time: -1, fatigue: 2 },
+          cognition: { persistence: 1 },
           voice: "아이들 나이까지 증거가 되지 않게, 제출 범위에서 가족 정보는 빼라고 법무팀에 요구한다.",
           echo: "요구는 공문으로 남습니다. 법무팀은 숫자를 지우는 대신 '가족 사항 별첨'이라는 칸을 새로 만듭니다.",
         },

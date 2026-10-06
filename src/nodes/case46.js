@@ -394,6 +394,7 @@ export const case46 = {
         {
           label: "확인만 받고 한서윤의 이름은 기록에서 빼 준다",
           effect: { time: 3, capital: 4, trust: 3, legitimacy: -3, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "대기발령 다섯 달째인 사람을 더 몰 수는 없다며, 확인만 받고 한서윤의 이름은 기록에서 빼 준다.",
           echo: "이름이 빠지면 한서윤은 안도합니다. 점을 본 사람의 이름도, 점을 찍은 사람의 이름처럼 기록에서 사라집니다.",
         },
@@ -413,6 +414,7 @@ export const case46 = {
         {
           label: "류세아에게 확인자 서명을 거둘 방법을 같이 찾자고 한다",
           effect: { trust: 9, humanCost: -3, time: -3, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "선배를 지우는 종이에 이름을 남겨 둘 수는 없다며, 류세아에게 확인자 서명을 거둘 방법을 같이 찾자고 한다.",
           echo: "방법을 찾자고 하면 류세아가 휴대폰으로 철회 사유서를 쓰기 시작합니다. 첫 줄은 '확인하지 않고 확인했습니다'입니다.",
         },
@@ -454,6 +456,7 @@ export const case46 = {
         {
           label: "조항은 나중에 다듬고 설계 로그 재계산부터 시작한다",
           effect: { time: 5, capital: 3, trust: 1, humanCost: 3, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "오후가 얼마 남지 않았다며, 조항은 나중에 다듬고 설계 로그 재계산부터 시작한다.",
           echo: "커서는 빈 줄에서 계속 깜박입니다. 에코는 재촉하지 않고 계산을 시작합니다.",
         },

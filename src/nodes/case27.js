@@ -360,6 +360,7 @@ export const case27 = {
         {
           label: "들어온 돈은 조용히 받고 소문이 가라앉기만 기다린다",
           effect: { time: 5, capital: 4, trust: 2, legitimacy: -2, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "떠들수록 줄이 다시 술렁일까 봐, 들어온 돈은 조용히 받고 소문이 가라앉기만 기다린다.",
           echo: "조용히 받은 돈은 조용히 쌓입니다. 곽 사장은 자기가 돌아왔다는 걸 아무도 모른다며 조금 서운해합니다.",
         },
@@ -466,6 +467,7 @@ export const case27 = {
         {
           label: "해지한 적금을 원래 조건 그대로 되살릴 방법을 찾는다",
           effect: { trust: 11, humanCost: -5, capital: -4, legitimacy: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "손주 입학에 맞춰 찾으실 수 있게, 해지한 적금을 원래 조건 그대로 되살릴 방법을 찾는다.",
           echo: "방법은 하나 있습니다. 새봄신협이 이자 차액을 떠안는 것입니다. 남궁솔이 그 칸에 자기 이름을 적습니다.",
         },

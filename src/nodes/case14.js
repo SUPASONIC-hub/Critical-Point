@@ -418,6 +418,7 @@ export const case14 = {
         {
           label: "오늘은 사과만 전하고 설명은 다음 교실로 미룬다",
           effect: { time: 5, capital: 3, trust: 4, legitimacy: -2, humanCost: 2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "손을 잡힌 채로는 숫자를 꺼낼 수 없어서, 오늘은 사과만 전하고 설명은 다음 교실로 미룬다.",
           echo: "미루면 이정숙은 공책을 가방에 넣고 버스를 탑니다. 가입을 되돌릴 수 있는 날이 하루 줄어듭니다.",
         },

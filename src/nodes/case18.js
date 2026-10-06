@@ -331,6 +331,7 @@ export const case18 = {
         {
           label: "부록은 모른 척하고 제안서 본문만 본다",
           effect: { time: 6, capital: 5, trust: -4, humanCost: 4, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "남의 초안까지 떠안을 수는 없다며, 부록은 모른 척하고 제안서 본문만 본다.",
           echo: "본문만 보면 제안은 깔끔합니다. 612명은 부록 3에 그대로 남습니다.",
         },
@@ -348,6 +349,7 @@ export const case18 = {
         {
           label: "빈칸에 트리거랩 동료들의 이름을 적어 준다",
           effect: { trust: 11, legitimacy: 2, humanCost: -5, capital: -3, time: -4, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "잃는 것이 12분만은 아니라는 걸 보여 주려고, 빈칸에 트리거랩 동료들의 이름을 적어 준다.",
           echo: "이름을 적으면 칸이 모자랍니다. 권도현이 '이래서 계산이 안 된 겁니다'라고 말합니다.",
         },

@@ -408,6 +408,7 @@ export const case12 = {
         {
           label: "'그 임직원'을 조항에서 빼라고 요구한다",
           effect: { legitimacy: 10, trust: 5, capital: -6, time: -4, fatigue: 5 },
+          cognition: { reframing: 2 },
           voice: "한 단어가 윤상혁을 덮게 둘 수는 없다며, '그 임직원'을 조항에서 빼라고 요구한다.",
           echo: "한 단어를 빼자고 하면 그룹 측 변호사가 처음으로 목소리를 높입니다. 그 단어가 가장 비싼 단어였다는 뜻입니다.",
         },

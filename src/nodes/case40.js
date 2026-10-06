@@ -320,6 +320,7 @@ export const case40 = {
         {
           label: "망설임 항목을 빼고 탈락자 점수를 다시 계산해 본다",
           effect: { trust: 10, humanCost: -5, capital: -3, time: -3, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "마이너스 0.31이 몇 명을 떨어뜨렸는지 보려고, 망설임 항목을 빼고 탈락자 점수를 다시 계산해 본다.",
           echo: "다시 계산하면 9,412명 중 6,030명이 60점을 넘습니다. 그 숫자를 받아 줄 회사는 아직 없습니다.",
         },
@@ -378,6 +379,7 @@ export const case40 = {
         {
           label: "공채 지원 예정자들에게 검사 구조를 먼저 알린다",
           effect: { trust: 10, humanCost: -4, legitimacy: 3, time: -4, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "모르고 풀면 멈춘 만큼 깎인다며, 공채 지원 예정자들에게 검사 구조를 먼저 알린다.",
           echo: "알리면 지원자들은 멈추지 않는 법을 연습합니다. 검사를 피하는 대신 검사에 맞춰 자기를 고치기 시작합니다.",
         },
@@ -409,6 +411,7 @@ export const case40 = {
         {
           label: "이름표가 붙은 기록의 주인들에게 먼저 알린다",
           effect: { trust: 9, legitimacy: 3, humanCost: -4, time: -3, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "제 기록이 부적합으로 불린 걸 본인이 알아야 한다며, 이름표가 붙은 기록의 주인들에게 먼저 알린다.",
           echo: "알리면 63명이 자기 번호를 찾기 시작합니다. 이민서의 A-017 옆에도, 도윤하의 번호 옆에도 부적합이 붙어 있습니다.",
         },

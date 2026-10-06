@@ -388,6 +388,7 @@ export const case42 = {
         {
           label: "야광봉을 나눠 주며 분위기부터 바꾼다",
           effect: { time: 3, trust: 3, capital: 2, humanCost: 2, fatigue: -5 },
+          cognition: { risk: 1 },
           voice: "아무도 따라 웃지 못한 자리를 풀어 주려고, 야광봉을 나눠 주며 분위기부터 바꾼다.",
           echo: "초록 불빛이 돌자 오진우가 야광봉으로 칼싸움을 겁니다. 한서윤의 이야기는 거기서 멈춥니다.",
         },

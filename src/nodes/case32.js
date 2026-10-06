@@ -381,6 +381,7 @@ export const case32 = {
         {
           label: "도시락을 다 먹을 때까지 조사 얘기는 꺼내지 않는다",
           effect: { trust: 11, humanCost: -5, capital: -3, time: -4, fatigue: -2 },
+          cognition: { persistence: 1 },
           voice: "네 번 만 계란말이 앞에서는 밥이 먼저라며, 도시락을 다 먹을 때까지 조사 얘기는 꺼내지 않는다.",
           echo: "도시락이 비는 동안 아무도 검찰 얘기를 하지 않습니다. 오진우가 계란말이 성공작과 실패작을 맛으로 구별하겠다고 나섰다가 세 번 다 틀립니다.",
         },
@@ -393,6 +394,7 @@ export const case32 = {
         {
           label: "도시락은 들고 들어가 조사를 빨리 끝내고 나온다",
           effect: { time: 5, capital: 4, trust: 3, humanCost: 2, legitimacy: -3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "마지막 조사가 남아 있어서, 도시락은 들고 들어가 조사를 빨리 끝내고 나온다.",
           echo: "도시락은 조사실 책상 위에서 식습니다. 나은호가 계란말이를 한 번 쳐다보고, 조사는 예정보다 20분 일찍 끝납니다.",
         },
@@ -412,6 +414,7 @@ export const case32 = {
         {
           label: "번호를 찾아낸 강태민의 이름은 보고서에서 빼 달라고 한다",
           effect: { trust: 9, humanCost: -4, time: -5, capital: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "도우러 온 사람이 조사에 불려 다니지 않게, 번호를 찾아낸 강태민의 이름은 보고서에서 빼 달라고 한다.",
           echo: "진태윤이 고개를 끄덕입니다. 보고서에는 '현장 확인 중 발견'이라고만 적히고, 강태민은 캔커피 값을 내겠다고 우깁니다.",
         },
@@ -424,6 +427,7 @@ export const case32 = {
         {
           label: "27번 상자는 모른 척하고 오후 조사에만 집중한다",
           effect: { time: 5, capital: 4, trust: -2, humanCost: 3, legitimacy: -2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "먼저 알았다는 기록이 나쁘게 남을까 봐, 27번 상자는 모른 척하고 오후 조사에만 집중한다.",
           echo: "모른 척한 상자는 오후 내내 머릿속에서 굴러다닙니다. 진태윤의 보고서에는 당신이 옆에 있었다는 줄만 남습니다.",
         },
@@ -453,6 +457,7 @@ export const case32 = {
         {
           label: "대꾸하지 않고 은박지를 주워 버린 뒤 다음 조사 시각만 묻는다",
           effect: { time: 5, capital: 2, trust: -3, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "싸워서 얻을 게 없는 자리라며, 대꾸하지 않고 은박지를 주워 버린 뒤 다음 조사 시각만 묻는다.",
           echo: "은박지를 주워 쓰레기통에 넣자 나은호가 한쪽 눈썹을 올립니다. '다음 조사는 20분 뒤입니다. 그리고 고마워요.'",
         },
@@ -482,6 +487,7 @@ export const case32 = {
         {
           label: "도윤하의 일은 도윤하에게 맡기고 오늘 밤 조사에 집중한다",
           effect: { time: 5, capital: 3, trust: 2, humanCost: 3, legitimacy: -2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "본인이 정한 말을 내가 흔들 일은 아니라며, 도윤하의 일은 도윤하에게 맡기고 오늘 밤 조사에 집중한다.",
           echo: "도윤하가 고개를 끄덕입니다. '맞아요, 제 일이에요.' 그가 먼저 택시를 잡습니다. 뒷모습이 오늘따라 작아 보입니다.",
         },

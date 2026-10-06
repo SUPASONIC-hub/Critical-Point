@@ -353,6 +353,7 @@ export const case11 = {
         {
           label: "방청석 자리를 오진우 옆으로 바꿔 준다",
           effect: { trust: 6, legitimacy: 3, time: -3, humanCost: 3, fatigue: 2 },
+          cognition: { persistence: 1 },
           voice: "2년째 통화도 없는 부자가 나란히 앉기라도 하게, 방청석 자리를 오진우 옆으로 바꿔 준다.",
           echo: "옆자리는 말을 강요하지 않습니다. 대신 7분 동안 같은 방향을 보게 합니다.",
         },

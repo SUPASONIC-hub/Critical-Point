@@ -418,6 +418,7 @@ export const case45 = {
         {
           label: "종이를 넘기기 전에 목록부터 만들자고 제안한다",
           effect: { legitimacy: 9, trust: 2, capital: -2, time: -4, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "폐지가 되면 무엇이 있었는지도 모르게 된다며, 종이를 넘기기 전에 목록부터 만들자고 제안한다.",
           echo: "목록 이야기에 임재윤이 코웃음을 칩니다. '아버지랑 똑같은 말을 하시네.' 그래도 폐지 업체 전화는 걸지 않습니다.",
         },

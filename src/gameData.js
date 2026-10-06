@@ -133,13 +133,14 @@ function addGeneratedScene(kind, { id, after, next, title, speaker, text, memo, 
     text,
     memo: memo ?? REACTION_MEMO_FALLBACK,
     triggers: source.triggers,
-    choices: choices.map(({ label, effect, voice, echo }, index) => {
+    choices: choices.map(({ label, effect, voice, echo, cognition }, index) => {
       const choice = {
         id: `${id}_choice_${index + 1}`,
         label,
         effect,
         next,
-        cognition: sceneBuild.inferChoiceCognition(label, effect),
+        // Read from the label unless the card says it itself (sceneBuild.js).
+        cognition: cognition ?? sceneBuild.inferChoiceCognition(label, effect),
       };
       choiceVoiceLines[choice.id] = voice;
       echoReplies[choice.id] = echo;

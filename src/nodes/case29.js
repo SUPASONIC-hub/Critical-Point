@@ -319,6 +319,7 @@ export const case29 = {
         {
           label: "조정 중인 46명을 매각 묶음에서 빼 달라고 요구한다",
           effect: { trust: 11, legitimacy: 3, humanCost: -5, time: -4, capital: -3, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "제일 착실한 사람들이 제일 먼저 전화를 받게 둘 수 없어서, 조정 중인 46명을 매각 묶음에서 빼 달라고 요구한다.",
           echo: "빼 달라는 요구는 곧장 가격표를 흔듭니다. 조현석은 아침 식사 자리에서 그 값을 정확히 말해 줄 겁니다.",
         },
@@ -420,6 +421,7 @@ export const case29 = {
         {
           label: "망고를 받고 오늘은 가격 이야기만 듣는다",
           effect: { time: 4, capital: 4, trust: 2, legitimacy: -4, humanCost: 2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "곤란하다는 그 얼굴을 더 지켜보기로 하고, 망고를 받고 오늘은 가격 이야기만 듣는다.",
           echo: "망고는 정말 맛있습니다. 46명의 노란 표시는 그대로 파일 속에 남습니다.",
         },
@@ -449,6 +451,7 @@ export const case29 = {
         {
           label: "넷 중 하나라도 지금은 증거가 먼저라고 말한다",
           effect: { time: 4, capital: 3, trust: 2, humanCost: 3, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "묶음에 든 사람이 훨씬 많다며, 넷 중 하나라도 지금은 증거가 먼저라고 말한다.",
           echo: "증거가 먼저라는 말에 서하린이 고개를 돌립니다. '저도 7년 전에 그렇게 말했어요.'",
         },

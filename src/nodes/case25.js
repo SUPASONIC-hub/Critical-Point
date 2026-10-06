@@ -319,6 +319,7 @@ export const case25 = {
         {
           label: "한서윤의 자리를 비워 두고 사진을 들고 그를 찾아간다",
           effect: { trust: 10, humanCost: -4, time: -4, capital: -3, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "오지 못한 사람도 이 사진의 한 사람이라며, 한서윤의 자리를 비워 두고 사진을 들고 그를 찾아간다.",
           echo: "빈자리를 둔 사진은 이상하게 꽉 차 보입니다. 사진을 받은 한서윤은 한참 뒤에야 '고마워요' 네 글자를 보냅니다.",
         },

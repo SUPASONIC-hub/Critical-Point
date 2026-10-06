@@ -347,6 +347,7 @@ export const case13 = {
         {
           label: "할머니들에게 제안의 조건과 대가를 있는 그대로 설명한다",
           effect: { trust: 11, humanCost: -5, legitimacy: 3, capital: -2, time: -3, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "조직도로는 대답이 안 된다며, 할머니들에게 제안의 조건과 대가를 있는 그대로 설명한다.",
           echo: "있는 그대로 들은 할머니들이 한참 셈을 합니다. 212명과 동료들 자리, 그리고 당신 얼굴. 한 분이 '그건 남는 장사가 아니네' 합니다.",
         },
@@ -382,12 +383,14 @@ export const case13 = {
         {
           label: "그 제안을 말이 아니라 서면으로 남겨 달라고 한다",
           effect: { legitimacy: 10, trust: 3, humanCost: 2, time: -4, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "밤 11시 40분의 약속은 아침에 사라진다며, 그 제안을 말이 아니라 서면으로 남겨 달라고 한다.",
           echo: "서면을 달라고 하자 백아린이 웃습니다. '반대 의견 쓰신 분답네요.' 새벽 1시에 메일이 옵니다. 서명란은 비어 있습니다.",
         },
         {
           label: "영상 20초와 마지막 문장을 맞바꾸는 제안을 받아들인다",
           effect: { capital: 6, time: 4, trust: -4, legitimacy: 3, humanCost: 2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "'진짜 대본'이 한 토막이라도 생방송에 나갈 수 있어서, 영상 20초와 마지막 문장을 맞바꾸는 제안을 받아들인다.",
           echo: "받아들이면 20초는 전국에 나갑니다. 그 20초 바로 뒤에, 당신은 '과거는 모두 정리되었습니다'를 읽습니다.",
         },
@@ -419,6 +422,7 @@ export const case13 = {
         {
           label: "오늘은 웃고 넘기며 커피나 한 잔 더 산다",
           effect: { time: 3, capital: -2, trust: 4, humanCost: 2, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "그 말을 받아 낼 준비가 아직 안 돼서, 오늘은 웃고 넘기며 커피나 한 잔 더 산다.",
           echo: "커피는 달고 저녁은 짧습니다. 나준혁의 세 가지는 주차장 바람에 흩어집니다.",
         },

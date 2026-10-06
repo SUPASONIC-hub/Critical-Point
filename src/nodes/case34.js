@@ -397,6 +397,7 @@ export const case34 = {
         {
           label: "모레까지 기다리지 말고 오늘 수첩을 넘기자고 한다",
           effect: { time: 6, capital: 4, legitimacy: 3, trust: -6, humanCost: 4, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "기한을 채울수록 윤서진만 마음을 졸인다며, 모레까지 기다리지 말고 오늘 수첩을 넘기자고 한다.",
           echo: "오늘 넘기면 기한 걱정은 사라집니다. 윤서진이 아버지와 마주 앉을 저녁도 함께 사라집니다.",
         },

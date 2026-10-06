@@ -357,6 +357,7 @@ export const prologue01 = {
         {
           label: "점수판에 내 이름 대신 온새포장 직원 열한 명을 적어 달라고 한다",
           effect: { trust: 10, legitimacy: 3, humanCost: -4, time: -4, capital: -3, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "이기고 지는 건 우리가 아니라며, 점수판에 내 이름 대신 온새포장 직원 열한 명을 적어 달라고 한다.",
           echo: "오진우가 마커를 다시 뽑습니다. 열한 칸을 그리다 말고 '이러면 점수판이 아니잖아'라고 합니다. 그래도 지우지는 않습니다.",
         },
@@ -487,6 +488,7 @@ export const prologue01 = {
         {
           label: "고를 시간이 없다며 승인 서류부터 끝낸다",
           effect: { time: 4, capital: 3, trust: 3, legitimacy: -2, humanCost: 2, fatigue: -5 },
+          cognition: { risk: 1 },
           voice: "승인 기한이 먼저라며, 고르지 않고 승인 서류부터 끝낸다.",
           echo: "서류부터 끝내면 30분이 절약됩니다. 오진우는 종이를 주머니에 넣은 채 먼저 퇴근합니다.",
         },

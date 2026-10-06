@@ -333,6 +333,7 @@ export const case30 = {
         {
           label: "잃을 게 없다는 한서윤의 제안을 그대로 받는다",
           effect: { time: 5, capital: 4, trust: -3, humanCost: 4, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "제보에 이름이 필요해지면 누군가는 써야 한다며, 잃을 게 없다는 한서윤의 제안을 그대로 받는다.",
           echo: "제안을 받으면 일은 빨라집니다. 한서윤의 이름이 제보서 맨 위에 올라가고, 그의 어머니는 그 이름을 뉴스에서 먼저 보게 될 수 있습니다.",
         },
@@ -350,6 +351,7 @@ export const case30 = {
         {
           label: "63명 모두에게 자기 기록이 팔렸다는 사실부터 알린다",
           effect: { trust: 10, humanCost: -5, capital: -3, time: -5, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "값이 매겨진 사람들이 먼저 알아야 한다며, 63명 모두에게 자기 기록이 팔렸다는 사실부터 알린다.",
           echo: "알리면 63명 중 마흔한 명이 그날 밤 답장합니다. 나머지 스물두 명은 아직 자기 번호가 뭔지도 모릅니다.",
         },
@@ -439,6 +441,7 @@ export const case30 = {
         {
           label: "류세아에게 이름은 빼고 기술 설명만 부탁한다",
           effect: { trust: 9, humanCost: -4, time: -3, capital: -1, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "한 사람 더 자리를 걸게 할 수는 없어서, 류세아에게 이름은 빼고 기술 설명만 부탁한다.",
           echo: "이름을 빼면 류세아는 설명을 세 쪽으로 써 줍니다. 마지막 줄은 '누가 물어도 제가 쓴 건 아닙니다'입니다.",
         },

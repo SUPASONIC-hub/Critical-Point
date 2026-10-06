@@ -407,6 +407,7 @@ export const case07 = {
         {
           label: "정식 절차로 접수한다",
           effect: { trust: 8, legitimacy: 3, capital: -4, time: -5, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "빚을 지지 않겠다는 그의 방식에 맞춰, 수첩도 정식 절차로 받겠다고 한다.",
           echo: "정식 절차로 받으면 수첩은 증거가 되고, 그는 위반자가 됩니다. 둘 다 기록에 남습니다.",
         },

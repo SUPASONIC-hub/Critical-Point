@@ -431,6 +431,7 @@ export const case01 = {
         {
           label: "증언자를 보호하고 팀 전체에 기준을 설명한다",
           effect: { trust: 8, legitimacy: 4, time: -5, fatigue: 7 },
+          cognition: { persistence: 1 },
           voice: "보호의 기준을 팀 전체가 읽을 수 있게 적겠습니다.",
           echo: "기준이 공개되면 보호는 특혜가 아니라 절차가 됩니다.",
         },

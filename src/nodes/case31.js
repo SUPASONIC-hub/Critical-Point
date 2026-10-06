@@ -377,6 +377,7 @@ export const case31 = {
         {
           label: "동료들 이름은 빼고 자료는 내 이름으로만 낸다",
           effect: { trust: 10, humanCost: -5, legitimacy: -2, capital: -3, time: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "대기발령 중인 사람까지 엮이지 않게, 동료들 이름은 빼고 자료는 내 이름으로만 낸다.",
           echo: "자료는 당신 한 사람의 것이 됩니다. 동료들은 안전해지고, 한지우는 한 사람이 이걸 다 모았을 리 없다는 걸 압니다.",
         },

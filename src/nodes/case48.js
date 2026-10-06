@@ -359,6 +359,7 @@ export const case48 = {
         {
           label: "바뀐 결과 칸 때문에 거절당한 사람들부터 찾아 연락한다",
           effect: { trust: 11, humanCost: -6, time: -5, capital: -2, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "점수보다 떨어진 사람이 먼저라며, 바뀐 결과 칸 때문에 거절당한 사람들부터 찾아 연락한다.",
           echo: "연락을 돌리면 첫 번째로 받는 사람은 문가을입니다. 끝까지정밀의 거절 사유가 무엇이었는지, 이번에는 이유까지 말해 줄 수 있습니다.",
         },
@@ -394,6 +395,7 @@ export const case48 = {
         {
           label: "투자 조건 전문과 부속 합의서를 위원회에 내라고 요구한다",
           effect: { legitimacy: 10, trust: 2, capital: -3, time: -5, humanCost: 3, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "전화 한 통에 떠밀려 서명할 수는 없다며, 투자 조건 전문과 부속 합의서를 위원회에 내라고 요구한다.",
           echo: "전문을 요구하면 조현석이 웃음을 멈춥니다. '부속 합의서라는 건 없어요.' 없는 서류치고는 대답이 너무 빠릅니다.",
         },
@@ -425,6 +427,7 @@ export const case48 = {
         {
           label: "58명 명단과 지금 라이더 명단을 나란히 놓아 본다",
           effect: { trust: 7, legitimacy: 5, humanCost: -3, time: -5, capital: -2, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "지운 이름과 지킬 이름을 한눈에 보려고, 58명 명단과 지금 라이더 명단을 나란히 놓아 본다.",
           echo: "나란히 놓으면 이름 여섯 개가 두 명단에 모두 있습니다. 유하온도 그중 하나입니다.",
         },

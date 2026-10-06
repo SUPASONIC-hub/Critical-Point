@@ -317,6 +317,7 @@ export const case24 = {
         {
           label: "한 줄 칸에 성과 대신 사람 이름을 적어 낸다",
           effect: { trust: 11, legitimacy: 4, humanCost: -5, time: -5, capital: -3, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "성과는 숫자가 아니라 그 사람들이라며, 한 줄 칸에 성과 대신 사람 이름을 적어 낸다.",
           echo: "이름을 적으면 칸이 넘칩니다. 인사부는 '양식 불일치'라며 서류를 한 번 돌려보냅니다.",
         },
@@ -375,6 +376,7 @@ export const case24 = {
         {
           label: "발령 난 동료들이 다치지 않게 이름을 빼 달라고 한다",
           effect: { trust: 8, humanCost: -5, legitimacy: -2, time: -3, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "동료 다섯의 이름이 기사에 나올 수 있다고 해서, 발령 난 동료들이 다치지 않게 이름을 빼 달라고 한다.",
           echo: "이름을 빼면 기사는 조금 흐려집니다. 서하린은 '흐린 기사도 기사예요'라며 초고를 다시 엽니다.",
         },

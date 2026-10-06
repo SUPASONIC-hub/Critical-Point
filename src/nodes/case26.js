@@ -321,6 +321,7 @@ export const case26 = {
         {
           label: "급한 사람부터 임금 일부를 먼저 받을 길을 찾는다",
           effect: { trust: 11, humanCost: -5, capital: -5, time: -4, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "등록금 마감이 금요일인 사람도 있어서, 급한 사람부터 임금 일부를 먼저 받을 길을 찾는다.",
           echo: "길을 찾으면 등록금 마감 전에 한 사람 몫은 나옵니다. 나머지 여든여섯 명은 그 순서를 지켜봅니다.",
         },
@@ -362,6 +363,7 @@ export const case26 = {
         {
           label: "공사가 다시 돌면 해결된다며 오늘은 설명만 하고 간다",
           effect: { time: 5, capital: 4, trust: -1, humanCost: 4, legitimacy: 1, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "입주도 이자도 공사가 다시 돌면 해결된다며, 오늘은 설명만 하고 간다.",
           echo: "설명은 친절합니다. 송하율은 고개를 끄덕이고, 부동산 앱에서 12월 전세 매물을 다시 검색합니다.",
         },

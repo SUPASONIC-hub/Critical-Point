@@ -322,12 +322,14 @@ export const case04 = {
         {
           label: "규칙을 지키고 서비스를 포기한다",
           effect: { legitimacy: 7, humanCost: 7, capital: -8, trust: -3, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "규칙을 지키고 이 서비스는 포기하겠습니다.",
           echo: "지킨 규칙은 다음 심사를 통과시키고, 오늘 그 서비스를 쓰던 사람은 남지 않습니다.",
         },
         {
           label: "결과가 좋다면 기록은 나중에 설명한다",
           effect: { capital: 9, legitimacy: -7, trust: -5, humanCost: 4, time: 4, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "결과가 좋으니 기록은 나중에 설명하겠습니다.",
           echo: "나중으로 미룬 설명은 대개 열리지 않고, 예외는 그동안 규칙이 됩니다.",
         },
@@ -405,6 +407,7 @@ export const case04 = {
         {
           label: "자료를 공개하고 규칙을 다시 쓴다",
           effect: { legitimacy: 9, capital: -8, time: -6, fatigue: 7 },
+          cognition: { reframing: 2 },
           voice: "자료를 공개하고 규칙을 다시 쓰겠습니다.",
           echo: "규칙을 다시 쓰면 이번 사건보다 다음 사건이 달라집니다.",
         },

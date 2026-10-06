@@ -439,6 +439,7 @@ export const case33 = {
         {
           label: "솔기를 뒤집은 일이 옳았다고 오늘 밤 분명히 말해 준다",
           effect: { trust: 10, humanCost: -4, time: -2, legitimacy: -2, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "삐뚤어 보여도 뒤집어야 보이는 것이었다며, 솔기를 뒤집은 일이 옳았다고 오늘 밤 분명히 말해 준다.",
           echo: "옳았다는 말을 들은 백아린이 재봉틀 전원을 끕니다. '삐뚤어도 제가 박은 거니까요.'",
         },

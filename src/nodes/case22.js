@@ -471,6 +471,7 @@ export const case22 = {
         {
           label: "책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다",
           effect: { legitimacy: 11, trust: 2, time: -4, humanCost: 3, fatigue: 4 },
+          cognition: { reframing: 2 },
           voice: "잘못되면 한 사람의 인사 평가로 돌아가는 칸이라며, 책임자 한 명이 아닌 심사위원회 서명으로 양식을 바꾸자고 한다.",
           echo: "양식을 바꾸자는 요청은 본점으로 갑니다. 바뀐 양식보다 세온메디칼의 납기가 먼저 옵니다.",
         },

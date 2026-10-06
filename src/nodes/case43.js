@@ -363,6 +363,7 @@ export const case43 = {
         {
           label: "회장의 한 표는 못 바꾼다고 보고 앞의 표에 집중한다",
           effect: { time: 5, capital: 5, trust: -4, humanCost: 3, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "맨 마지막에 던지겠다는 사람은 이미 정한 사람이라, 회장의 한 표는 못 바꾼다고 보고 앞의 표에 집중한다.",
           echo: "앞의 일곱 표를 세는 동안 회장의 한 표는 아무도 건드리지 않은 채 월요일까지 갑니다.",
         },
@@ -392,6 +393,7 @@ export const case43 = {
         {
           label: "기록 방식은 넘어가고 표결 결과부터 받아 낸다",
           effect: { time: 5, capital: 3, trust: -3, legitimacy: -2, humanCost: 4, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "누가 던졌든 다섯 표면 된다며, 기록 방식은 넘어가고 표결 결과부터 받아 낸다.",
           echo: "결과는 빨리 나옵니다. 누가 어느 쪽이었는지는 여덟 명만 압니다.",
         },
@@ -475,6 +477,7 @@ export const case43 = {
         {
           label: "윤서진의 말을 가족 진술서로 받아 두자고 제안한다",
           effect: { legitimacy: 9, trust: -2, humanCost: 3, time: -3, capital: -2, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "다 안다는 딸의 말은 남겨 둘 값이 있다며, 윤서진의 말을 가족 진술서로 받아 두자고 제안한다.",
           echo: "진술서라는 말에 윤서진의 얼굴이 굳습니다. 그는 서명하지만, 다음 말을 아낍니다.",
         },

@@ -345,12 +345,14 @@ export const case41 = {
         {
           label: "동료들의 방청권을 피해자 모임 사람들에게 넘긴다",
           effect: { trust: 12, humanCost: -5, capital: -3, time: -3, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "그 대답을 직접 들어야 할 사람은 따로 있다며, 동료들의 방청권을 피해자 모임 사람들에게 넘긴다.",
           echo: "넘기면 동료들은 복도 모니터 앞에 섭니다. 강태민은 모니터 앞 의자를 문간까지 날라 줄을 세웁니다.",
         },
         {
           label: "방청권 배정 기준을 공개하라고 국회 사무처에 요구한다",
           effect: { legitimacy: 8, trust: 2, time: -4, humanCost: 2, capital: -1, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "마흔 장이 왜 마흔 장인지는 알아야 한다며, 방청권 배정 기준을 공개하라고 국회 사무처에 요구한다.",
           echo: "기준을 물으면 사무처가 '관례'라고 답합니다. 관례는 적혀 있지 않아서 반박하기도 어렵습니다.",
         },
@@ -463,6 +465,7 @@ export const case41 = {
         {
           label: "한서윤의 이름은 지키고 녹취는 내 목소리로만 설명한다",
           effect: { trust: 11, humanCost: -5, legitimacy: -2, time: -3, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "대기발령 다섯 달에 더 얹을 수는 없다며, 한서윤의 이름은 지키고 녹취는 내 목소리로만 설명한다.",
           echo: "이름을 지키면 한서윤은 방청석에 그대로 앉아 있습니다. 파일 속 목소리만 당신의 설명을 따라 방에 나옵니다.",
         },

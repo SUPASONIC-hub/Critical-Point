@@ -334,6 +334,7 @@ export const case20 = {
         {
           label: "농담 수업은 접고 오늘 옮길 자료부터 끝낸다",
           effect: { time: 5, capital: 5, trust: -3, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "웃음 확률 11퍼센트에 점심을 다 쓸 수는 없다며, 농담 수업은 접고 오늘 옮길 자료부터 끝낸다.",
           echo: "자료 옮기기는 앞당겨집니다. 강태민은 남은 컵라면 하나를 말없이 단말 옆에 두고 올라갑니다.",
         },
@@ -351,6 +352,7 @@ export const case20 = {
         {
           label: "도윤하가 자기 기록을 먼저 읽고 어떻게 할지 정하게 한다",
           effect: { trust: 11, humanCost: -5, time: -4, capital: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "한 번도 본 적 없는 자기 줄이어서, 도윤하가 자기 기록을 먼저 읽고 어떻게 할지 정하게 한다.",
           echo: "먼저 읽게 하면 도윤하는 자기 줄을 세 번 읽습니다. 그리고 이민서의 줄은 읽지 않겠다고 합니다. 그건 본인 몫이라서요.",
         },
@@ -363,6 +365,7 @@ export const case20 = {
         {
           label: "개인 기록 문제는 뒤로 미루고 교체 일정을 따른다",
           effect: { time: 5, capital: 6, trust: -5, legitimacy: -2, humanCost: 4, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "이미 학습에 쓰인 기록은 당장 못 뺀다고 보고, 개인 기록 문제는 뒤로 미루고 교체 일정을 따른다.",
           echo: "일정은 지켜집니다. 도윤하의 7초는 1월 31일 자정에 노아의 일부가 됩니다.",
         },

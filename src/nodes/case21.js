@@ -318,6 +318,7 @@ export const case21 = {
         {
           label: "방명록은 그의 것이니 사진 없이 조용히 덮어 둔다",
           effect: { trust: 11, legitimacy: 4, humanCost: -5, time: -4, capital: -3, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "쉬러 온 손님들에게 손으로 써 준 답글이라, 방명록은 그의 것이니 사진 없이 조용히 덮어 둔다.",
           echo: "덮어 두면 방명록은 다시 그의 것이 됩니다. 그 문장이 어디서 왔는지는 오늘 밤 아무도 적지 않습니다.",
         },

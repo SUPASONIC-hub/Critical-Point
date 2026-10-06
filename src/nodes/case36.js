@@ -328,6 +328,7 @@ export const case36 = {
         {
           label: "수사기관 조항을 지우고 불법은 예외라고 고쳐 쓴다",
           effect: { legitimacy: 9, trust: 2, time: -6, humanCost: 3, fatigue: 2 },
+          cognition: { reframing: 2 },
           voice: "참고인이 입을 막는 종이에 서명할 수는 없어서, 수사기관 조항을 지우고 불법은 예외라고 고쳐 쓴다.",
           echo: "고친 서약서는 받아들여집니다. 여민규는 고친 줄 위에 자기 도장을 찍고, 그 도장은 회장의 것이 아닙니다.",
         },
@@ -469,6 +470,7 @@ export const case36 = {
         {
           label: "윤상혁에게 식탁의 제안을 있는 그대로 알려 준다",
           effect: { trust: 8, legitimacy: 4, humanCost: -3, time: -3, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "자기 이름이 어떻게 쓰이는지는 알아야 한다며, 윤상혁에게 식탁의 제안을 있는 그대로 알려 준다.",
           echo: "있는 그대로 들은 윤상혁이 한참 말이 없다가 '역시 그 문장이군' 합니다. 12년 전 그가 들은 말과 같은 말입니다.",
         },

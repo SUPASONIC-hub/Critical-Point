@@ -446,6 +446,7 @@ export const case35 = {
         {
           label: "서하윤과 함께 공문의 근거 조항부터 따진다",
           effect: { legitimacy: 11, trust: 1, time: -5, humanCost: 2, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "특약 이름과 면책 조항이 서로 어긋난다며, 서하윤과 함께 공문의 근거 조항부터 따진다.",
           echo: "약관 12조와 공문을 나란히 놓자, 면책 조항에는 호우라는 말이 한 번도 없습니다. 따지는 데 사흘이 걸립니다.",
         },

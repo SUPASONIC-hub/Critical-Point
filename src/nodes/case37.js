@@ -336,6 +336,7 @@ export const case37 = {
         {
           label: "순위표는 무시하고 원본 파일 삭제에만 집중한다",
           effect: { time: 5, capital: 3, trust: -4, humanCost: 4, legitimacy: 1, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "순위표까지 쫓을 손은 없다며, 순위표는 무시하고 원본 파일 삭제에만 집중한다.",
           echo: "원본은 줄어듭니다. 순위표는 원본이 없어도 혼자 살아남습니다.",
         },
@@ -382,6 +383,7 @@ export const case37 = {
         {
           label: "선우진의 뜻대로 그의 줄을 실명으로 남기는 방법을 찾는다",
           effect: { trust: 11, humanCost: -4, legitimacy: 2, capital: -3, time: -3, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "쓰러진 날을 제 이름으로 되찾겠다는 말이라서, 선우진의 뜻대로 그의 줄을 실명으로 남기는 방법을 찾는다.",
           echo: "실명이 붙으면 그 줄은 더는 순위표의 1위가 아닙니다. 선우진이라는 사람의 기록이 됩니다. 그리고 느린섬의 주소도 함께 알려집니다.",
         },
@@ -413,6 +415,7 @@ export const case37 = {
         {
           label: "기록 속 사람 이름은 한 글자도 쓰지 말아 달라고 부탁한다",
           effect: { trust: 10, humanCost: -4, capital: -3, time: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "열두 명은 실리겠다고 한 적이 없다며, 기록 속 사람 이름은 한 글자도 쓰지 말아 달라고 부탁한다.",
           echo: "서하린이 이름을 지웁니다. 9시에 나간 기사는 조용하고, 다른 매체의 그래프가 검색 첫 줄을 차지합니다.",
         },
@@ -442,6 +445,7 @@ export const case37 = {
         {
           label: "그 메모는 네가 아니라 쓴 사람의 기록이라고 오진우에게 말해 준다",
           effect: { trust: 9, humanCost: -4, time: -3, capital: -2, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "쓰기 좋은 쪽이라는 말을 혼자 삼키지 않게, 그 메모는 네가 아니라 쓴 사람의 기록이라고 오진우에게 말해 준다.",
           echo: "오진우가 한참 있다가 고개를 끄덕입니다. 그리고 아버지 문자에 처음으로 답장을 씁니다. '밥 먹었어요.'",
         },

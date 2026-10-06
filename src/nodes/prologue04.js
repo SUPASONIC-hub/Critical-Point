@@ -397,6 +397,7 @@ export const prologue04 = {
         {
           label: "오늘은 아무 말도 하지 않고 명단만 적어 온다",
           effect: { time: 5, capital: 3, trust: -4, legitimacy: 2, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "섣부른 말이 골목을 먼저 흔들까 봐, 오늘은 아무 말도 하지 않고 명단만 적어 온다.",
           echo: "명단만 들고 나오면 골목은 아까와 똑같습니다. 신영란이 김치 한 통을 봉투에 넣어 줍니다.",
         },

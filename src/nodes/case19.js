@@ -377,6 +377,7 @@ export const case19 = {
         {
           label: "나준혁에게 그 한 장의 원본을 그대로 건넨다",
           effect: { trust: 11, humanCost: -4, legitimacy: -3, time: -2, fatigue: 3 },
+          cognition: { persistence: 1 },
           voice: "30년 늦게 닿은 칭찬은 본인 것이라며, 나준혁에게 그 한 장의 원본을 그대로 건넨다.",
           echo: "원본을 받은 나준혁이 그 장을 조끼 안주머니에 넣습니다. 목록의 1996-14번은 빈칸이 되고, 그 빈칸은 언젠가 누군가 묻습니다.",
         },

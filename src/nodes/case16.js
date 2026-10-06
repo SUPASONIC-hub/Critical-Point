@@ -385,6 +385,7 @@ export const case16 = {
         {
           label: "잔류 명단의 선발 기준을 공개하라고 요구한다",
           effect: { legitimacy: 10, trust: 5, humanCost: 3, time: -5, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "남는 사람과 나가는 사람이 서로 원망하지 않게, 잔류 명단의 선발 기준을 공개하라고 요구한다.",
           echo: "기준을 묻자 인사 담당자가 '체력 평가'라고 답합니다. 체력 평가를 받은 사람은 아무도 없습니다.",
         },
@@ -410,6 +411,7 @@ export const case16 = {
         {
           label: "선행 조건 조항을 강태민과 야간조에게 그대로 보여 준다",
           effect: { trust: 10, humanCost: -4, time: -4, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "자기 얘기가 적힌 문장은 본인이 먼저 봐야 한다며, 선행 조건 조항을 강태민과 야간조에게 그대로 보여 준다.",
           echo: "조항을 본 대기실이 조용해집니다. 강태민이 처음으로 컵라면 뚜껑을 덮지 않은 채 오래 둡니다.",
         },
