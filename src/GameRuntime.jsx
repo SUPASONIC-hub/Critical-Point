@@ -688,10 +688,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const startGame = persistenceStartGame;
   function startNewGamePlus() {
     if (!newGamePlusUnlocked) return;
-    const memory = caseResults;
     writeStoredValue(NEW_GAME_PLUS_KEY, "true");
-    writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(memory));
-    setNewGamePlusMemory(memory);
+    // The memory is a finished season's. Pressed in the middle of the next one,
+    // this used to write that half season over it.
+    if (caseResults.final) {
+      writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(caseResults));
+      setNewGamePlusMemory(caseResults);
+    }
     setSaveStatus("NEW GAME+ 기록 모드로 시작합니다. 숨겨진 권한과 추가 단서를 추적하세요.");
     startGame();
   }

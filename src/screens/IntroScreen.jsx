@@ -9,6 +9,7 @@ import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
+import { confirmAction } from "../state/confirmAction.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -53,6 +54,8 @@ export function prefetchGameRuntime() {
  * `startCase` / `startNewGamePlus` a press inside the runtime calls. The shell
  * used to answer both with a fresh season, which wiped the completed cases.
  */
+const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새로 시작할까요? 복구 지점은 남습니다.";
+const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -130,8 +133,15 @@ export function IntroScreen({ view, renderers = {} }) {
     }, reducedMotion ? 140 : 860);
   }
 
-  const startNewRun = () => beginOpeningBurst(startGame);
-  const startNewGamePlusRun = () => beginOpeningBurst(startNewGamePlus);
+  // Both start the season over, and a run that can be resumed is progress
+  // thrown away: they ask first, the way every such control does (priority 36).
+  const mayDiscardRun = (question) => !hasResumableSave || confirmAction(question);
+  const startNewRun = () => {
+    if (mayDiscardRun(CONFIRM_START_OVER)) beginOpeningBurst(startGame);
+  };
+  const startNewGamePlusRun = () => {
+    if (mayDiscardRun(CONFIRM_START_NEW_GAME_PLUS)) beginOpeningBurst(startNewGamePlus);
+  };
   const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId));
   // One node with two homes. With no save it is the hero's primary action, so
   // the first click on the page opens the first scene; with a save it sits back
