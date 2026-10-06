@@ -954,17 +954,24 @@ gh run watch                                  # 사이트가 그 커밋을 내�
 - 되돌린 뒤에는 `main`도 되돌려야 합니다(`git revert`로 새 커밋을 만들어 push). 그러지 않으면 다음 push의
   `Verify`가 초록이 되는 순간 문제의 커밋이 다시 배포됩니다.
 - 되돌리는 커밋이 마이그레이션보다 앞선 것이면 스키마는 그대로 남습니다. 마이그레이션은 되돌리는 파일을
-  새로 써서 `db push`합니다.
+  새로 써서 `main`에 병합합니다(병합이 곧 적용입니다. 아래 원격 랭킹 3번).
 
 ## 원격 랭킹 (선택)
 
 1. `.env.example`을 `.env.local`로 복사하고 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`를 채웁니다.
-2. 스키마는 CLI 마이그레이션으로만 적용합니다. `npx supabase link --project-ref <ref>` 후
-   `npx supabase db push`. `supabase` CLI는 개발 의존성으로 버전이 고정되어 있어 `npx supabase`가 그것을
-   씁니다. 마이그레이션은 `supabase/migrations/`에 있고, 원격 이력이 유일한 출처입니다. 대시보드 SQL
-   에디터로 직접 적용하지 마십시오.
-3. **순서: 클라이언트를 먼저 배포하고 그다음 `db push`** 합니다. 2026-09-28 마이그레이션들은 서버가
-   받는 행과 공개 컬럼의 모양을 바꾸므로, 옛 클라이언트가 새 스키마에 쓰거나 읽으면 거절당합니다.
+2. 스키마는 마이그레이션 파일로만 바꿉니다. 마이그레이션은 `supabase/migrations/`에 있고, 원격 이력이
+   유일한 출처입니다. 대시보드 SQL 에디터로 직접 적용하지 마십시오. 손으로 적용해야 할 때는
+   `npx supabase link --project-ref <ref>` 후 `npx supabase db push`를 씁니다. `supabase` CLI는 개발
+   의존성으로 버전이 고정되어 있어 `npx supabase`가 그것을 씁니다.
+3. **`main`에 병합하면 마이그레이션이 곧바로 운영 데이터베이스에 적용됩니다.** Supabase의 GitHub 연동이
+   켜져 있고(대시보드 → Project Settings → Integrations → GitHub, Deploy to production, production
+   branch `main`), 병합 커밋에 "Supabase Preview" 체크로 결과가 남습니다. 2026-10-06 병합에서는 1분 안에
+   적용됐습니다. 클라이언트는 그 뒤 `Verify`와 `Deploy`를 거쳐 15분쯤 늦게 바뀝니다. 그래서 **순서는
+   데이터베이스가 먼저**이고, 그 사이에는 옛 클라이언트가 새 스키마를 만납니다.
+   - 한도나 권한만 바꾸는 마이그레이션은 클라이언트 변경과 한 PR로 병합해도 됩니다.
+   - 서버가 받는 행이나 공개 컬럼의 모양을 바꾸는 마이그레이션(2026-09-28의 것들이 그랬습니다)은 옛
+     클라이언트가 쓰거나 읽다가 거절당합니다. 새 모양과 옛 모양을 둘 다 받는 클라이언트를 **먼저 다른
+     PR로 병합해 배포를 확인한 뒤**, 마이그레이션을 따로 병합합니다.
 4. 익명 사용자는 테이블 전체 권한을 하나도 갖지 않습니다. 마이그레이션이 `anon`·`authenticated`의
    권한을 모두 거둔 뒤 필요한 컬럼만 다시 줍니다. 쓰기는 텔레메트리 세 테이블과 게시판의 정해진 컬럼
    insert뿐이고, 읽기는 `playtest_sessions`의 `run_tag`, `player_name`, `case_id`, `case_title`,
@@ -1004,13 +1011,13 @@ gh run watch                                  # 사이트가 그 커밋을 내�
 Supabase 프로젝트를 쓰고, 운영 마이그레이션 전에는 `npx supabase migration list --linked`와
 `npx supabase db push --dry-run`으로 먼저 확인합니다.
 
-클라이언트는 `Verify`가 초록이면 저절로 배포되지만 마이그레이션은 사람이 `db push`해야 적용됩니다.
-둘이 어긋났는지는 `Migration Drift` 워크플로(`.github/workflows/migration-drift.yml`)가 하루에 한 번
+클라이언트는 `Verify`가 초록이면 저절로 배포되고, 마이그레이션은 병합 때 Supabase 연동이 적용합니다.
+연동이 꺼지거나 적용에 실패하면 저장소와 데이터베이스가 어긋난 채로 남습니다. 둘이 어긋났는지는 `Migration Drift` 워크플로(`.github/workflows/migration-drift.yml`)가 하루에 한 번
 봅니다. 운영 프로젝트의 마이그레이션 이력을 `supabase migration list`로 받아 `supabase/migrations/`와
 양쪽으로 비교하고(`scripts/check-migration-drift.mjs`), 저장소에만 있는 파일이나 데이터베이스에만 있는
 버전이 있으면 실행이 빨갛게 끝나며 이슈 "Supabase migrations are out of step"을 열거나 댓글을 답니다.
-다시 맞으면 그 이슈를 닫습니다. 병합한 마이그레이션을 아직 push하지 않은 날에는 이슈가 열리는 것이
-정상이고, push한 뒤 첫 실행에서 닫힙니다.
+다시 맞으면 그 이슈를 닫습니다. 병합 때 연동이 적용하므로 이슈가 열렸다면 적용이 실패했거나 연동이
+꺼진 것입니다. 병합 커밋의 "Supabase Preview" 체크를 보고, 손으로 `db push`한 뒤 첫 실행에서 닫힙니다.
 
 이 워크플로는 저장소 시크릿 `SUPABASE_ACCESS_TOKEN`이 있어야 일합니다. 없으면 아무것도 묻지 않았다는
 경고 주석만 남기고 초록으로 끝납니다. 토큰은 supabase.com → 계정(Account) → Access Tokens에서
