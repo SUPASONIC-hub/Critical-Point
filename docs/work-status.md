@@ -706,7 +706,8 @@ Still open, on purpose:
     file it is only reported).
     `node scripts/check-deploy.mjs --offline` checks `render.yaml` and
     `dist/index.html` (no inline script, no `on*=` handler, no `javascript:`
-    URL) without a network.
+    URL) without a network, and `dist/sw.js` against that page (priority 89).
+    The live check fails when `/sw.js` is missing or is another release's.
 67. A timing helper that samples a rendered variable and acts a frame later has
     to aim at the middle of the tolerance, not its edge, and has to see the
     value change before trusting it -- a variable written every frame and then
@@ -932,7 +933,8 @@ Still open, on purpose:
     name that is gone. `src/state/chunkReload.js` reloads once by itself (at
     most once a minute, marked in `critical-point-chunk-reload-v1`), and on a
     second failure `LazyScreen` shows a panel with 새로고침; nothing is recorded
-    against the run. Every lazy import goes through `loadedChunk`, because an
+    against the run. With no connection it does not reload: the panel offers a
+    retry, and the service worker (priority 89) answers what it has kept. Every lazy import goes through `loadedChunk`, because an
     import the preload handler took resolves to `undefined` instead of
     throwing, and that must read as a `ChunkLoadError`, not a crash.
 87. Comfort settings live on the intro, in a folded drawer of the setup
@@ -992,6 +994,42 @@ Still open, on purpose:
       season is built from drops the built data and reloads the page.
     - `check:bundle` holds GameRuntime at 551,000 / 176,100 bytes and every
       case chunk to one budget, 84,000 / 20,200 (case01 is the largest).
+89. A copy that was opened once opens again with no connection. The build
+    writes `/sw.js` (`serviceWorker()` in `vite.config.js`,
+    `scripts/service-worker-build.mjs`; the code is
+    `src/serviceWorker/worker.js`) and a release registers it after `load`
+    (`src/serviceWorker/register.js`).
+    - Four rules, by what is asked for. The page: network first, the kept
+      copy only when the network fails or says nothing for three seconds --
+      a player with a connection is never held on an old release. `/assets/*`:
+      kept first, since a hashed name never changes its file. Root images,
+      icons and the manifest: the kept copy now, a fresh one behind it.
+      Another origin, a non-GET and `/sw.js` itself: untouched.
+    - A chunk request is never answered with the page. A tab left open across
+      a deploy has to fail as before, because that failure is what priority 86
+      turns into a reload. Offline it fails too, and `LazyScreen` shows
+      "연결이 끊겼습니다 · 다시 시도" instead.
+    - One cache per release (`critical-point-<release>`); the release is the
+      commit on Render and a hash of the built page elsewhere. Install keeps
+      every file the built page names and fails if one is missing or if the
+      page it fetched is not this release's. Activation deletes the other
+      releases' caches.
+    - The rest of the release -- the cases, the lazy screens, the portraits
+      and the art at 960px -- is fetched when the page asks, which it does
+      once the first case has arrived and the device is idle, not offline and
+      not saving data. Offline, an image asked for at a size that is not kept
+      is answered with the size that is.
+    - The e2e build registers the worker only for `?sw=1`, so the suite and
+      its network guard run without one; `tests/offline.spec.js` (@prod) is
+      the spec that turns it on. `SERVICE_WORKER=off` at build time is the
+      kill switch: the page stops registering and `sw.js` becomes a worker
+      that deletes its caches and unregisters.
+    - New code that the intro needs before any network must be reachable from
+      what `index.html` names, or it is not in the precache; new root files
+      the game draws offline belong in `WARM_ROOT`
+      (`scripts/service-worker-build.mjs`).
+    - Not verified: iOS Safari and an installed copy on a phone. The checks
+      run Chromium only; Playwright WebKit skips the offline spec.
 
 ## Verification Commands
 
