@@ -36,10 +36,6 @@ export function classifyTelemetryFailure(error) {
   return status >= 400 ? "permanent" : "unreachable";
 }
 
-export function isPermanentRefusal(error) {
-  return classifyTelemetryFailure(error) === "permanent";
-}
-
 const isSeasonRow = (item) => item?.type === "case" && item?.payload?.case_id === "season-final";
 const runOf = (item) => (item?.type === "case" ? item?.payload?.run_id ?? null : null);
 

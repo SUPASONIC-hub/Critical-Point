@@ -41,7 +41,3 @@ export async function writeJsonStorage(page, key, value) {
     localStorage.setItem(storageKey, JSON.stringify(storageValue));
   }, { storageKey: key, storageValue: value });
 }
-
-export async function removeStorage(page, key) {
-  await page.evaluate((storageKey) => localStorage.removeItem(storageKey), key);
-}

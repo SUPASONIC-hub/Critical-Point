@@ -125,7 +125,6 @@ test("a refusal is permanent, later, pace or unreachable", () => {
   assert.equal(classify(failure({ name: "AbortError" })), "unreachable");
   assert.equal(classify(failure({ status: 500 })), "unreachable");
   assert.equal(classify(failure({ status: 503 })), "unreachable");
-  assert.equal(policy.isPermanentRefusal(failure({ status: 400, serverMessage: "telemetry rate limit exceeded" })), false);
 });
 
 test("the batch stops at the first send nobody answered", async () => {
