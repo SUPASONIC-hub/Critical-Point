@@ -117,3 +117,33 @@ export function describeDrift({ notApplied, notInRepository, applied }, names = 
   }
   return lines.join("\n");
 }
+
+/**
+ * What the CLI printed when it failed, made safe to leave in a public run's
+ * log. Until 2026-10-06 the workflow printed the CLI's stderr only, and the
+ * CLI writes its progress there and the error itself, as JSON, to stdout: a
+ * token without the permission to create the login role left one line,
+ * "Initialising login role...", and no reason.
+ *
+ * An error from a database client is the kind of text that carries a
+ * connection string, so these go before anything is printed: the userinfo of
+ * any URL, a `password=` in a key-value string, a Supabase token, and a JWT.
+ * GitHub masks the secrets it knows; this is for the ones it was never given,
+ * such as the password of the login role the CLI makes for itself.
+ */
+export function redactCliOutput(text) {
+  return String(text ?? "")
+    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)[^\s/@"']+@/gi, "$1***@")
+    .replace(/\b(password|pwd|passwd|secret|token|apikey|api_key)(["']?\s*[=:]\s*["']?)[^\s"'&,;}]+/gi, "$1$2***")
+    .replace(/\bsb[a-z]_[A-Za-z0-9_-]{8,}/g, "***")
+    .replace(/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/g, "***");
+}
+
+/** The last lines of each stream, redacted, under a line saying which it was. Empty streams are left out. */
+export function describeCliFailure({ stdout = "", stderr = "" }, lines = 20) {
+  const tail = (text) => redactCliOutput(text).trimEnd().split("\n").slice(-lines).join("\n");
+  const parts = [];
+  if (stderr.trim()) parts.push(`stderr:\n${tail(stderr)}`);
+  if (stdout.trim()) parts.push(`stdout:\n${tail(stdout)}`);
+  return parts.length ? parts.join("\n\n") : "The CLI printed nothing on either stream.";
+}

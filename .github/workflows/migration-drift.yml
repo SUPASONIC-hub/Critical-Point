@@ -79,6 +79,18 @@ jobs:
       # The CLI's failure is kept, not thrown: the next step turns "could not
       # ask" into its own verdict, which is reported as such and never as
       # drift.
+      #
+      # What it said is printed here from both streams. The CLI puts its
+      # progress on stderr and the error itself, as JSON, on stdout, and this
+      # step used to print stderr alone: on 2026-10-06 a token that could read
+      # the database and not write to it left "Initialising login role..." and
+      # no reason. The text goes through a redaction first
+      # (scripts/migration-drift.mjs), since this log is public and an error
+      # from a database client can carry a connection string.
+      #
+      # The token needs to write as well as read: the CLI creates the login
+      # role before it can ask anything. One project, database read and write,
+      # is the narrowest token this was seen to work with.
       - name: List the migrations the database has applied
         id: list
         if: steps.token.outputs.configured == 'true'
@@ -95,7 +107,7 @@ jobs:
           echo "exit=$code" >> "$GITHUB_OUTPUT"
           if [ "$code" -ne 0 ]; then
             echo "supabase migration list exited $code:"
-            tail -n 20 migration-list.err
+            node scripts/check-migration-drift.mjs --say-failure migration-list.txt migration-list.err
           fi
       - name: Compare with supabase/migrations
         id: verdict
@@ -106,14 +118,14 @@ jobs:
         run: |
           set -uo pipefail
           if [ "$LIST_EXIT" != "0" ]; then
-            # What the CLI said stays in this run's log (the step above). It is
-            # not copied into an issue: an error from a database client is the
-            # kind of text that carries a connection string.
+            # What the CLI said stays in this run's log (the step above, both
+            # streams, redacted). It is not copied into an issue: an issue is
+            # read by more people for longer than a log is.
             {
               echo "verdict=unreadable"
               echo "summary=\`supabase migration list\` exited $LIST_EXIT, so nothing was compared. What it said is in the run's log."
             } >> "$GITHUB_OUTPUT"
-            echo "::error title=The database could not be asked::supabase migration list exited $LIST_EXIT. A token that expired, or a database password the CLI needs: see the step above."
+            echo "::error title=The database could not be asked::supabase migration list exited $LIST_EXIT. A token that expired or cannot write to the database (the CLI creates a login role first), or a database password the CLI needs: see the step above."
             exit 1
           fi
           node scripts/check-migration-drift.mjs --from migration-list.txt
