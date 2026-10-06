@@ -44,6 +44,8 @@ function observe(harness) {
     run: harness.run,
     saved: harness.saved(),
     slots: harness.slotCount(),
+    storageKeys: harness.storageKeys(),
+    trace: harness.trace(),
     effects: harness.effects,
     status: harness.status,
     outside: harness.outside,
@@ -156,6 +158,76 @@ test("dismissing the recovery notice", async () => {
   const harness = await createRunHarness({ saved: midRun() });
   harness.act("dismissRecoveryNotice");
   pin("recovery/dismiss-notice", harness);
+});
+
+test("opening the season's first case", async () => {
+  const harness = await createRunHarness({ operatorOrigin: "public", patch: { playerName: "분석관" } });
+  harness.act("openCase", "prologue01");
+  pin("openCase/season-first", harness);
+});
+
+test("opening the next case, with what the last one left", async () => {
+  const closed = { ...pausedRun(), log: [], nodeId: "result" };
+  const harness = await createRunHarness({ saved: closed, patch: { decisionReveal: { nextNode: "result" } } });
+  harness.act("openCase", "prologue02");
+  pin("openCase/next-with-legacy", harness);
+});
+
+test("opening a case with no result before it", async () => {
+  const harness = await createRunHarness({ saved: { ...pausedRun(), caseResults: {} } });
+  harness.act("openCase", "prologue03");
+  pin("openCase/no-previous-result", harness);
+});
+
+test("opening a case that already closed, as practice", async () => {
+  const replayed = pausedRun();
+  replayed.caseResults.prologue02 = { rank: "C", outcomeChoiceId: "p2_anything", completedAt: "2026-10-02T00:00:00.000Z" };
+  replayed.completedCases = ["prologue01", "prologue02"];
+  const harness = await createRunHarness({ saved: replayed });
+  harness.act("openCase", "prologue02");
+  pin("openCase/replay-of-closed-case", harness);
+});
+
+test("jumping to a scene as a new run", async () => {
+  const harness = await createRunHarness({ saved: midRun(), patch: dirtyPanels });
+  harness.act("jumpToNode", "case05", "c5_voice");
+  pin("jump/debug-start", harness);
+});
+
+test("jumping to a scene for a replay, which is not saved", async () => {
+  const harness = await createRunHarness({ saved: midRun(), patch: dirtyPanels });
+  harness.act("jumpToNode", "case05", "c5_voice", { echoText: "재현 링크로 연 장면입니다.", persistRun: false });
+  pin("jump/replay-unsaved", harness);
+});
+
+test("jumping to a case and scene the season does not have", async () => {
+  const harness = await createRunHarness();
+  harness.act("jumpToNode", "case99", "nowhere");
+  pin("jump/unknown-ids", harness);
+});
+
+test("leaving for the season map", async () => {
+  const harness = await createRunHarness({ saved: midRun() });
+  harness.act("leaveToSeasonMap");
+  pin("map/leave", harness);
+});
+
+const RESET_STORAGE = {
+  "critical-point-operator-origin": "lab",
+};
+
+test("wiping the run", async () => {
+  const harness = await createRunHarness({ saved: midRun(), operatorOrigin: "lab", patch: dirtyPanels, storage: RESET_STORAGE });
+  harness.act("saveGame");
+  harness.act("resetEverything");
+  pin("reset/confirmed", harness);
+});
+
+test("declining to wipe the run", async () => {
+  const harness = await createRunHarness({ saved: midRun(), patch: dirtyPanels, confirm: false });
+  harness.act("saveGame");
+  harness.act("resetEverything");
+  pin("reset/declined", harness);
 });
 
 test("the fixture holds nothing this file no longer checks", () => {

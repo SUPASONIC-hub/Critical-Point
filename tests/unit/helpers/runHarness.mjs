@@ -46,6 +46,8 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
   const appConfig = await import("../../../src/appConfig.js");
   const { useAppPersistence } = await import("../../../src/state/useAppPersistence.js");
   const { useGameSaveState } = await import("../../../src/state/useGameSave.js");
+  const { createRunLifecycle } = await import("../../../src/state/runLifecycle.js");
+  const { getTraceEvents } = await import("../../../src/state/trace.js");
   const { initialResources, triggerLabels, cognitionLabels } = await import("../../../src/gameData.js");
   const { makeEmptyScores } = await import("../../../src/gameLogic.js");
   const { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } = await import("../../../src/gauntlet/gauntletEngine.js");
@@ -57,6 +59,8 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
 
   let runIds = 0;
   const createRunId = () => `run-${(runIds += 1)}`;
+  let sessionIds = 0;
+  const getSessionId = () => `session-${(sessionIds += 1)}`;
 
   // What the runtime starts from: the save hook's state, and the five pieces
   // GameRuntime kept beside it, read the way its `useState` calls read them.
@@ -93,6 +97,8 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
   const setters = new Proxy({}, {
     get: (_, name) => (value) => {
       if (name === "setSaveStatus") outside.status = value;
+      else if (name === "setTelemetryStatus") outside.telemetryStatus = value;
+      else if (name === "setNextParticipantMessage") effects.push(`next-participant-message:${JSON.stringify(value)}`);
       else if (name === "setLocalErrorEntries") outside.localErrorEntries = value;
       else if (name === "setSaveSlots") outside.saveSlots = value;
       else {
@@ -131,7 +137,33 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
         },
       },
     });
+    const lifecycle = createRunLifecycle({
+      state: { ...run, isOnline: true },
+      setters,
+      persist: persistence.persist,
+      effects: {
+        resetEndingSequence: () => effects.push("reset-ending-sequence"),
+        setNextParticipantMessage: setters.setNextParticipantMessage,
+        replacePendingTelemetry: (queue) => {
+          pendingTelemetryRef.current = queue;
+          run.pendingTelemetry = queue;
+        },
+        clearLocalRankingRows: () => effects.push("clear-local-ranking-rows"),
+        setLocalErrorEntries: setters.setLocalErrorEntries,
+        setSaveSlots: setters.setSaveSlots,
+        setSaveStatus: setters.setSaveStatus,
+        setTelemetryStatus: setters.setTelemetryStatus,
+        onSuppressSaves: () => effects.push("suppress-saves"),
+        resumeRuntimeSaves: () => effects.push("resume-saves"),
+      },
+      createRunId,
+      getSessionId,
+    });
     return {
+      openCase: (caseId) => lifecycle.startCaseNow(caseId),
+      jumpToNode: (caseId, nodeId, options) => lifecycle.startAtNode(caseId, nodeId, options),
+      resetEverything: () => lifecycle.resetRun(),
+      leaveToSeasonMap: () => lifecycle.leaveToSeasonMap(),
       startGame: () => persistence.startGame(),
       resume: () => persistence.resumeSavedGame(),
       pauseAfterRecovery: () => persistence.pauseAfterRecovery(),
@@ -163,6 +195,8 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
       if (!save) return null;
       return { ...save, saveRevision: "<revision>", savedAt: typeof save.savedAt === "string" ? "<savedAt>" : save.savedAt };
     },
+    /** The trace this tab keeps of where it has been, without the clock. */
+    trace: () => getTraceEvents().map(({ t: _t, ...event }) => event),
     slotCount: () => readJson(appConfig.SAVE_SLOT_STORAGE_KEY)?.slots?.length ?? 0,
     storageKeys: () => Object.values(appConfig).filter((value) => typeof value === "string" && globalThis.localStorage.getItem(value) !== null).sort(),
     effects,
