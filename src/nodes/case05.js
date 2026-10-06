@@ -295,6 +295,7 @@ export const case05 = {
         {
           label: "보상안을 만들고 조사를 미룬다",
           effect: { capital: -7, trust: 4, legitimacy: -6, humanCost: -4, time: 5, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "보상안을 먼저 만들고 조사는 뒤로 미루겠습니다.",
           echo: "먼저 도착한 보상은 피해를 덮고, 미룬 조사는 대개 다시 열리지 않습니다.",
         },

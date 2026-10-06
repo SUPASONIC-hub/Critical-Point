@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { authoredNodeOrders, CASE_SEQUENCE, CASE_START_NODES } from "../../src/gameCases.js";
 import { fallbackCopy, nodeOrders, nodes } from "../../src/gameData.js";
 import { CASE_PACKS } from "../../src/nodes/casePacks.js";
-import { finishSceneGraph } from "../../src/nodes/sceneBuild.js";
+import { finishSceneGraph, inferChoiceCognition } from "../../src/nodes/sceneBuild.js";
 import { getScenePlate } from "../../src/scenePlate.js";
 import { getRouteMarker } from "../../src/state/savedState.js";
 
@@ -100,6 +100,30 @@ test("the same scene always deals the same way", () => {
   assert.deepEqual(build(), first);
   assert.deepEqual(first.slice(4), ["reframe", "x_start_evidence_turn"]);
   assert.deepEqual([...first.slice(0, 4)].sort(), ["a", "b", "c", "d"]);
+});
+
+test("a generated card that says how it thinks is believed over its label", () => {
+  const written = CASE_PACKS.flatMap((pack) => [...pack.connectiveScenes, ...pack.reactionScenes]);
+  let said = 0;
+  for (const scene of written) {
+    scene.choices.forEach((card, index) => {
+      const dealt = nodes[scene.id].choices.find((choice) => choice.id === `${scene.id}_choice_${index + 1}`);
+      assert.ok(dealt, `${scene.id} does not deal its card ${index + 1}`);
+      const read = inferChoiceCognition(card.label, card.effect);
+      assert.deepEqual(dealt.cognition, card.cognition ?? read, `${dealt.id} is not the way of thinking its card names`);
+      // One way of thinking a card, weighed as the reading weighs it.
+      const [[type, weight], ...rest] = Object.entries(dealt.cognition);
+      assert.equal(rest.length, 0, `${dealt.id} exercises more than one way of thinking`);
+      assert.equal(weight, type === "reframing" ? 2 : 1, `${dealt.id} weighs ${type} at ${weight}`);
+      if (!card.cognition) return;
+      said += 1;
+      assert.notDeepEqual(card.cognition, read, `${dealt.id} says what its label already reads as, so the line is noise`);
+    });
+  }
+  assert.ok(said > 0, "no generated card names its own way of thinking, so this test proves nothing");
+  // 빼 is in the label and nothing is left out; the card stays with the caller.
+  assert.deepEqual(inferChoiceCognition("지금 아는 것을 전화로 하나도 빼지 않고 다 말해 준다", { trust: 9 }), { risk: 1 });
+  assert.deepEqual(nodes.p3_stairwell.choices.find((choice) => choice.id === "p3_stairwell_choice_1").cognition, { persistence: 1 });
 });
 
 test("the shell's copy of the orders stays as authored", () => {

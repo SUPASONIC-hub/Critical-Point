@@ -356,6 +356,7 @@ export const case38 = {
         {
           label: "빠진 0초 줄도 함께 읽어 달라고 재판부에 요청한다",
           effect: { legitimacy: 10, trust: 2, time: -4, humanCost: 3, capital: -1, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "골라 낸 41줄만으로는 기록이 아니라며, 빠진 0초 줄도 함께 읽어 달라고 재판부에 요청한다.",
           echo: "요청하면 재판부가 연서준에게 원본 전체를 내라고 합니다. 그 원본에는 0초 줄과 함께 열세 명의 망설임이 전부 들어 있습니다.",
         },
@@ -673,7 +674,7 @@ export const case38 = {
         label: "다음 기일까지 아껴 두고 피고가 다시 '없다'고 말하게 둔다",
         effect: { capital: 8, time: 5, legitimacy: 3, trust: -5, humanCost: 5, fatigue: -3 },
         voice: "법정에서 한 번 더 말하면 빠져나갈 길이 없다며, 다음 기일까지 아껴 두고 피고가 다시 '없다'고 말하게 둔다.",
-        echo: "아껴 두면 다음 기일에 연서준은 같은 문장을 반복할 것입니다. 그때까지 212명은 서류 없는 사람으로 남습니다.",
+        echo: "아껴 두면 다음 기일에 피고 측 변호사 연서준은 같은 문장을 반복할 것입니다. 그때까지 212명은 서류 없는 사람으로 남습니다.",
         cognition: { risk: 2 },
       },
     ],

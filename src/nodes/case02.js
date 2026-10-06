@@ -264,6 +264,7 @@ export const case02 = {
         {
           label: "오류로 처리하고 보고 시간을 지킨다",
           effect: { time: 6, capital: 4, legitimacy: -7, humanCost: 4, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "단순 오류로 정리하고 보고 시간을 지키겠습니다.",
           echo: "지킨 마감은 오늘 조용하고, 오류로 닫은 11초는 다음 사건에서 다시 열립니다.",
         },
@@ -388,6 +389,7 @@ export const case02 = {
         {
           label: "보호를 해제하고 조사에 맡긴다",
           effect: { time: 6, trust: -7, humanCost: 6, fatigue: -6 },
+          cognition: { risk: 1 },
           voice: "보호를 풀고 공식 조사에 맡기겠습니다.",
           echo: "보호를 푸는 순간 의심과 기회가 동시에 돌아옵니다.",
         },

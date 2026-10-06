@@ -564,7 +564,9 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   }
 
   // Generated scenes: every choice carries its own label, effect, line and
-  // reply, so one cannot be edited out from under the others.
+  // reply, so one cannot be edited out from under the others. Its way of
+  // thinking is read from the label (sceneBuild.js) unless the card names one:
+  // then it names exactly one, weighed as the reading would weigh it.
   for (const [family, scenes] of [["connectiveScenes", pack.connectiveScenes], ["reactionScenes", pack.reactionScenes]]) {
     for (const scene of scenes) {
       for (const field of ["id", "after", "next", "title", "speaker", "text"]) {
@@ -578,8 +580,15 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
         continue;
       }
       scene.choices.forEach((choice, index) => {
-        const extra = Object.keys(choice).filter((key) => !["label", "effect", "voice", "echo"].includes(key));
+        const extra = Object.keys(choice).filter((key) => !["label", "effect", "voice", "echo", "cognition"].includes(key));
         if (extra.length) fail(`${scene.id} choice ${index + 1} has fields no module reads: ${extra.join(", ")}`);
+        if (choice.cognition !== undefined) {
+          const named = Object.entries(choice.cognition ?? {});
+          const [type, weight] = named[0] ?? [];
+          if (named.length !== 1 || !cognitionKeys.has(type) || weight !== (type === "reframing" ? 2 : 1)) {
+            fail(`${scene.id} choice ${index + 1} names its way of thinking as ${JSON.stringify(choice.cognition)}: one of ${[...cognitionKeys].join(", ")}, reframing at 2 and the rest at 1`);
+          }
+        }
         for (const field of ["label", "voice", "echo"]) {
           if (typeof choice[field] !== "string" || !choice[field]) fail(`${scene.id} choice ${index + 1} has no ${field}`);
         }

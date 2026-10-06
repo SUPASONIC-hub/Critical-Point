@@ -284,6 +284,7 @@ export const finalCase = {
         {
           label: "실험을 멈추기 위해 서버를 닫는다",
           effect: { humanCost: -6, legitimacy: -6, trust: -4, capital: -7, time: 5, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "지금 서버를 닫아 실험을 멈추겠습니다.",
           echo: "닫힌 서버는 실험을 끝내고, 그 안의 기록도 함께 잠급니다.",
         },
@@ -350,6 +351,7 @@ export const finalCase = {
         {
           label: "기록을 삭제해 피해를 끝낸다",
           effect: { humanCost: -5, legitimacy: -8, trust: -4, time: 5, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "기록을 지워 피해를 끝내겠습니다.",
           echo: "지운 기록은 피해를 멈추고 책임도 함께 지웁니다.",
         },
@@ -373,6 +375,7 @@ export const finalCase = {
         {
           label: "내가 혼자 버튼을 누른다",
           effect: { legitimacy: 6, humanCost: -5, trust: -4, capital: -5, fatigue: 8 },
+          cognition: { risk: 1 },
           voice: "제가 혼자 버튼을 누르겠습니다.",
           echo: "혼자 누르면 끝나고, 그 결정의 근거는 아무도 검토하지 않습니다.",
         },

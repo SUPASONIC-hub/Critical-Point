@@ -479,6 +479,7 @@ export const case10 = {
         {
           label: "아버지를 한번 만나러 가자고 말한다",
           effect: { time: 5, capital: 9, trust: -6, humanCost: 5, fatigue: -3 },
+          cognition: { persistence: 1 },
           voice: "288번 증명하는 것보다 한 번 말하는 게 빠르다며, 아버지를 한번 만나러 가자고 말한다.",
           echo: "만나러 가면 그 하루가 표에서 빠집니다. 아버지가 아들을 어떻게 볼지는 아무도 모릅니다.",
         },

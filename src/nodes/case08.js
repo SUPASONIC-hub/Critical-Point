@@ -427,6 +427,7 @@ export const case08 = {
         {
           label: "반찬통을 들고 오진우를 직접 찾아간다",
           effect: { trust: 9, humanCost: -3, capital: -4, time: -6, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "복수를 하든 밥은 먹고 하게 해야 한다는 말에, 반찬통을 들고 오진우를 직접 찾아간다.",
           echo: "직접 찾아가면 그는 문을 열 수도, 안 열 수도 있습니다. 반찬통은 어느 쪽이든 전달됩니다.",
         },
@@ -462,6 +463,7 @@ export const case08 = {
         {
           label: "이름은 그대로 두고 급여 대비 책임 비율을 붙인다",
           effect: { legitimacy: 7, time: -4, humanCost: 3, fatigue: 4 },
+          cognition: { inference: 1 },
           voice: "수습 직원 월급이 도장 찍은 그림값의 0.2%라서, 이름은 그대로 두고 급여 대비 책임 비율을 붙인다.",
           echo: "비율을 붙이면 숫자가 두 사람을 변호합니다. 법정은 비율보다 도장을 먼저 봅니다.",
         },

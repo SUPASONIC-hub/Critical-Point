@@ -22,6 +22,14 @@ import { applySceneContext } from "./sceneContext.js";
  * moving before it is safe), and the axis the card gains most on is worth half
  * a phrase. Ties go to the axis, then the order below. Reframing is worth 2, as
  * the fourth card always was; the rest 1. Choice ids are untouched.
+ *
+ * A phrase list cannot read a sentence. "하나도 빼지 않고 다 말해 준다" has
+ * 빼 in it and is the opposite of leaving something out; "제안서 본문만 본다"
+ * has 제안 in it and proposes nothing; "찾아간다" is going to see someone, not
+ * looking something up. So a generated card may carry `cognition` itself, as
+ * an authored card does, and what it says wins (`addGeneratedScene` in
+ * gameData.js). The label is not reworded to steer the reading: the label is
+ * what the player reads.
  */
 const COGNITION_CUES = {
   reframing: ["다시 짜", "판을", "바꾼다", "바꿔", "구조", "제안", "조건", "규칙", "새로", "설계", "합친다", "첫 문장", "기준을", "뒤집", "등록"],

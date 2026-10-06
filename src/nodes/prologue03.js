@@ -344,6 +344,7 @@ export const prologue03 = {
         {
           label: "기록은 두고 다음 회의의 발언 기회부터 약속받는다",
           effect: { time: 5, capital: 4, trust: -2, legitimacy: -2, humanCost: 2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "지난 회의보다 다음 회의가 중요하다며, 기록은 두고 다음 회의의 발언 기회부터 약속받는다.",
           echo: "약속은 받습니다. 다음 회의는 5월 25일이고, 2023-0412는 그 전에 실행됩니다.",
         },
@@ -361,6 +362,7 @@ export const prologue03 = {
         {
           label: "지금 아는 것을 전화로 하나도 빼지 않고 다 말해 준다",
           effect: { trust: 10, humanCost: -5, time: -5, capital: -3, fatigue: 5 },
+          cognition: { persistence: 1 },
           voice: "모르는 걸 팔게 둘 수는 없다며, 지금 아는 것을 전화로 하나도 빼지 않고 다 말해 준다.",
           echo: "다 말하면 도윤하가 한참 조용합니다. 그리고 묻습니다. '그럼 저는 오늘 몇 건을 판 거예요?'",
         },
@@ -373,6 +375,7 @@ export const prologue03 = {
         {
           label: "확정된 게 없다며 다음에 설명하겠다고 끊는다",
           effect: { time: 5, capital: 4, trust: -3, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "반려된 사람의 말이 창구까지 가면 안 될 것 같아서, 확정된 게 없다며 다음에 설명하겠다고 끊는다.",
           echo: "끊고 나면 조용합니다. 강서지점 실적판에는 그날 저녁까지 네 건이 더 올라갑니다.",
         },
@@ -396,6 +399,7 @@ export const prologue03 = {
         {
           label: "제안의 조건과 일정을 문서로 달라고 한다",
           effect: { legitimacy: 10, trust: 2, time: -5, humanCost: 2, fatigue: 3 },
+          cognition: { inference: 1 },
           voice: "이름도 사람도 아직 없는 조직이어서, 제안의 조건과 일정을 문서로 달라고 한다.",
           echo: "문서로 달라고 하면 그가 펜을 들었다가 놓습니다. '아직 이름도 없는 조직일세. 이름 없는 건 서면이 안 나와.'",
         },

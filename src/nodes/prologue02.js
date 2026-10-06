@@ -323,6 +323,7 @@ export const prologue02 = {
         {
           label: "약속이 문서에 없다는 사실을 야간조에게 그대로 말한다",
           effect: { trust: 11, humanCost: -4, time: -5, capital: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "2년을 기다린 사람에게 헛말은 못 한다며, 약속이 문서에 없다는 사실을 야간조에게 그대로 말한다.",
           echo: "그대로 말하면 강태민이 한참 국만 젓습니다. 그리고 '알려 줘서 고마워요'라고 합니다. 고맙다는 말이 제일 아픕니다.",
         },
@@ -364,6 +365,7 @@ export const prologue02 = {
         {
           label: "확인은 됐으니 통화를 짧게 끊고 계산으로 돌아간다",
           effect: { time: 6, capital: 3, trust: -3, legitimacy: -2, humanCost: 2, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "들을 말은 다 들었고 확인도 됐으니, 통화를 짧게 끊고 계산으로 돌아간다.",
           echo: "끊으면 12분이 남습니다. 남은 건 시간이고, 사라진 건 그가 자기 입으로 말한 문장입니다.",
         },
