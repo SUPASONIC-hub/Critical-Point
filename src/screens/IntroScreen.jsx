@@ -9,6 +9,8 @@ import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
+import { confirmAction } from "../state/confirmAction.js";
+import { useConsentToggle } from "../state/useConsentToggle.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -37,6 +39,10 @@ export function loadGameRuntime() {
   return gameRuntimeModule;
 }
 
+// A failure here still reloads the page when the browser is online: that is a
+// tab left open across a deploy, and reloading it while the intro is being
+// read is the cheapest moment there is (tests/production-build.spec.js holds
+// the tab to it). Offline it does nothing, and the press loads it again.
 export function prefetchGameRuntime() {
   loadGameRuntime().catch(() => {});
 }
@@ -49,6 +55,8 @@ export function prefetchGameRuntime() {
  * `startCase` / `startNewGamePlus` a press inside the runtime calls. The shell
  * used to answer both with a fresh season, which wiped the completed cases.
  */
+const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새로 시작할까요? 복구 지점은 남습니다.";
+const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -63,7 +71,8 @@ function takeRuntimeStartAction() {
 }
 
 export function IntroScreen({ view, renderers = {} }) {
-  const [openingBurst, setOpeningBurst] = useState(false);
+  // The case the burst is opening, or null when there is none.
+  const [openingBurst, setOpeningBurst] = useState(null);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
@@ -82,7 +91,7 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     telemetry: {
       dataConsent, setDataConsent, pendingTelemetry, setTelemetryStatus, telemetryEnabled, isOnline,
-      telemetrySummary, sessionCode, setPendingTelemetry, setSaveStatus,
+      telemetrySummary, sessionCode, setPendingTelemetry,
     },
     debug: {
       debugToolsEnabled, showErrorLog, setShowErrorLog, unlockAllCasesForTest,
@@ -105,6 +114,7 @@ export function IntroScreen({ view, renderers = {} }) {
   const onShowRanking = view.common.setShowRanking;
   const onShowBoard = view.common.setShowBoard;
   const gameTitle = GAME_TITLE;
+  const consent = useConsentToggle({ pendingTelemetry, persist, setDataConsent, setPendingTelemetry, setTelemetryStatus });
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
   // Before paint, so the handed-over press never flashes this screen first.
   useLayoutEffect(() => {
@@ -113,22 +123,34 @@ export function IntroScreen({ view, renderers = {} }) {
     else if (action?.type === "new-game-plus") startNewGamePlus();
   }, [startCase, startNewGamePlus]);
 
-  function beginOpeningBurst(callback) {
+  // `caseId` is the case being opened. The burst used to name the season's
+  // first case whatever was pressed: 사건 30 from the roadmap opened under
+  // "첫 판단 조건 동기화 중".
+  function beginOpeningBurst(callback, caseId = seasonCasesBase[0].id) {
     if (openingBurstRef.current) return;
     openingBurstRef.current = true;
-    setOpeningBurst(true);
+    setOpeningBurst(caseId);
     playOpeningAccent();
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     openingTimerRef.current = window.setTimeout(() => {
       openingBurstRef.current = false;
-      setOpeningBurst(false);
+      setOpeningBurst(null);
       callback();
     }, reducedMotion ? 140 : 860);
   }
 
-  const startNewRun = () => beginOpeningBurst(startGame);
-  const startNewGamePlusRun = () => beginOpeningBurst(startNewGamePlus);
-  const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId));
+  // Both start the season over, and a run that can be resumed is progress
+  // thrown away: they ask first, the way every such control does (priority 36).
+  const mayDiscardRun = (question) => !hasResumableSave || confirmAction(question);
+  const startNewRun = () => {
+    if (mayDiscardRun(CONFIRM_START_OVER)) beginOpeningBurst(startGame);
+  };
+  const startNewGamePlusRun = () => {
+    if (mayDiscardRun(CONFIRM_START_NEW_GAME_PLUS)) beginOpeningBurst(startNewGamePlus);
+  };
+  const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId), caseId);
+  const openingCase = seasonCasesBase.find((caseItem) => caseItem.id === openingBurst) ?? null;
+  const openingIsFirst = openingCase?.id === seasonCasesBase[0].id;
   // One node with two homes. With no save it is the hero's primary action, so
   // the first click on the page opens the first scene; with a save it sits back
   // beside the name input, below the fold, so overwriting a run stays a
@@ -141,7 +163,7 @@ export function IntroScreen({ view, renderers = {} }) {
       onClick={startNewRun}
       onPointerEnter={prefetchGameRuntime}
       onFocus={prefetchGameRuntime}
-      disabled={openingBurst}
+      disabled={Boolean(openingBurst)}
     >
       <ChevronRight size={18} />
       첫 케이스 시작
@@ -176,7 +198,7 @@ export function IntroScreen({ view, renderers = {} }) {
     </div>
   );
   return (
-      <main className="shell intro-shell" aria-busy={openingBurst}>
+      <main className="shell intro-shell" aria-busy={Boolean(openingBurst)}>
         <Music modeKey={musicModeKey} />
         {renderRecoveryNotice()}
         {renderErrorLogPanel()}
@@ -191,7 +213,7 @@ export function IntroScreen({ view, renderers = {} }) {
               <figure className="intro-visual">
                 <picture>
                   <source media={PHONE_ART_MEDIA} srcSet={heroArt.phone} type="image/webp" />
-                  <source srcSet={heroArt.wide} type="image/webp" />
+                  <source srcSet={heroArt.wide} sizes={heroArt.wideSizes} type="image/webp" />
                   <img
                     src="/triggerlab-key-visual.jpg"
                     alt="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습"
@@ -201,7 +223,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   />
                 </picture>
                 <figcaption>
-                  <span>TRIGGERLAB NIGHT SHIFT</span>
+                  <span lang="en">TRIGGERLAB NIGHT SHIFT</span>
                   <b>선택지는 사건을 끝내지 않는다. 다음 압박의 모양을 바꾼다.</b>
                 </figcaption>
               </figure>
@@ -292,7 +314,7 @@ export function IntroScreen({ view, renderers = {} }) {
           <section id="case-access-setup" className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
           <div className="start-console-heading">
             <div>
-              <span>CASE ACCESS SETUP</span>
+              <span lang="en">CASE ACCESS SETUP</span>
               <h2>기록 진입 설정</h2>
             </div>
             <small>이름과 판단 프로토콜은 시작 전 언제든 바꿀 수 있습니다.</small>
@@ -322,7 +344,7 @@ export function IntroScreen({ view, renderers = {} }) {
               {hasResumableSave && startFirstCaseButton}
             </div>
             {newGamePlusUnlocked && (
-              <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={openingBurst}>
+              <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
                 NEW GAME+ 시작
               </button>
@@ -333,9 +355,9 @@ export function IntroScreen({ view, renderers = {} }) {
               </button>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
-            <div className="debug-jump-panel" aria-label="개발용 장면 바로 시작">
+            <div className="debug-jump-panel" role="group" aria-label="개발용 장면 바로 시작">
               <div>
-                <span>DEBUG JUMP</span>
+                <span lang="en">DEBUG JUMP</span>
                 <strong>특정 장면 바로 시작</strong>
               </div>
               <div className="debug-jump-controls">
@@ -393,7 +415,7 @@ export function IntroScreen({ view, renderers = {} }) {
           <div className="intro-drawer-grid">
           <details className="intro-drawer">
             <summary>
-              <span>PRE-START BRIEFING</span>
+              <span lang="en">PRE-START BRIEFING</span>
               <h2>시작 전에 알아둘 것</h2>
             </summary>
           <section className="prestart-briefing" aria-label="시작 전 브리핑">
@@ -419,7 +441,7 @@ export function IntroScreen({ view, renderers = {} }) {
             </div>
             {tutorialSteps && (
               <div className="prestart-tutorial">
-                <span>FIRST RUN PROTOCOL</span>
+                <span lang="en">FIRST RUN PROTOCOL</span>
                 <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
               </div>
             )}
@@ -432,7 +454,7 @@ export function IntroScreen({ view, renderers = {} }) {
             </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
-              <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
+              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 바뀌지 않습니다.</small>
             </div>
             <div className="play-style-grid">
               {playStyleOptions.map((style) => (
@@ -448,7 +470,9 @@ export function IntroScreen({ view, renderers = {} }) {
                 >
                   <span>{style.label}</span>
                   <strong>{style.title}</strong>
-                  <p>{style.text}</p>
+                  {/* Not a <p>: a button holds phrasing content only (see the
+                      case cards below). */}
+                  <em>{style.text}</em>
                   <small>{style.payoff}</small>
                 </button>
               ))}
@@ -477,26 +501,26 @@ export function IntroScreen({ view, renderers = {} }) {
                   >
                     <span>{profile.label}</span>
                     <strong>{profile.title}</strong>
-                    <p>{profile.premise}</p>
+                    <em>{profile.premise}</em>
                     <small>{profile.authority}</small>
                   </button>
                 ))}
               </div>
               <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
-              {originPrologue && <div className="origin-prologue"><span>ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
+              {originPrologue && <div className="origin-prologue"><span lang="en">ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
             </section>
             </details>
           )}
           <details className="intro-drawer">
             <summary>
-              <span>ACCESSIBILITY</span>
+              <span lang="en">ACCESSIBILITY</span>
               <h2>편의 설정</h2>
             </summary>
             <AccessibilityPanel />
           </details>
           <details className="intro-drawer">
             <summary>
-              <span>SEASON 1</span>
+              <span lang="en">SEASON 1</span>
               <h2>생각을 깨우는 조건은 조종 가능한 조건이기도 하다.</h2>
             </summary>
             <div className="season-panel">
@@ -512,7 +536,7 @@ export function IntroScreen({ view, renderers = {} }) {
           {seasonGoals && (
             <details className="intro-drawer">
               <summary>
-                <span>SEASON GOALS</span>
+                <span lang="en">SEASON GOALS</span>
                 <h2>시즌 목표</h2>
               </summary>
             <section className="season-goal-strip" aria-label="시즌 목표">
@@ -551,42 +575,7 @@ export function IntroScreen({ view, renderers = {} }) {
               <input
                 type="checkbox"
                 checked={dataConsent}
-                onChange={(event) => {
-                  const nextConsent = event.target.checked;
-                  if (!nextConsent) {
-                    const previousQueue = pendingTelemetry;
-                    const cleared = persist({ dataConsent: false, pendingTelemetry: [] });
-                    if (!cleared.storageSaved) {
-                      event.target.checked = true;
-                      setDataConsent(true);
-                      setPendingTelemetry(previousQueue);
-                      setSaveStatus("동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.");
-                      setTelemetryStatus({
-                        tone: "error",
-                        text: "동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
-                      });
-                      return;
-                    }
-                    setDataConsent(false);
-                    setPendingTelemetry([]);
-                    setTelemetryStatus({
-                      tone: "local",
-                      text: "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다.",
-                    });
-                    return;
-                  }
-                  const savedConsent = persist({ dataConsent: true });
-                  if (!savedConsent.storageSaved) {
-                    event.target.checked = false;
-                    setSaveStatus("데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.");
-                    setTelemetryStatus({
-                      tone: "error",
-                      text: "데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.",
-                    });
-                    return;
-                  }
-                  setDataConsent(true);
-                }}
+                onChange={consent.onChange}
               />
               <span>
                 <b>플레이테스트 데이터 제공 동의</b>
@@ -600,6 +589,11 @@ export function IntroScreen({ view, renderers = {} }) {
                 </small>
               </span>
             </label>
+            {/* Beside the box it is about, and mounted before it has anything
+                to say, so the sentence is announced when it arrives. */}
+            <p className={`consent-note ${consent.note?.tone ?? ""}`} role="status" aria-live="polite" aria-atomic="true" data-testid="consent-note">
+              {consent.note?.text}
+            </p>
             <div className={`db-status-panel ${telemetrySummary.tone}`}>
               <div>
                 <span>저장 상태</span>
@@ -625,7 +619,7 @@ export function IntroScreen({ view, renderers = {} }) {
           {completedCaseResultList.length > 0 && (
             <section className="season-summary">
               <div>
-                <span>SEASON LOG</span>
+                <span lang="en">SEASON LOG</span>
                 <strong>완료한 케이스에서 반복적으로 활성화된 조건</strong>
               </div>
               <div className="season-summary-list">
@@ -640,7 +634,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   </article>
                 ))}
               </div>
-              <div className="season-journey" aria-label="사건 간 결말 연결">
+              <div className="season-journey" role="group" aria-label="사건 간 결말 연결">
                 {seasonJourney.map((caseItem, index) => (
                   <Fragment key={caseItem.id}>
                     {index > 0 && <ChevronRight className="season-journey-arrow" size={18} aria-hidden="true" />}
@@ -664,8 +658,8 @@ export function IntroScreen({ view, renderers = {} }) {
               </div>
             </section>
           )}
-          <div className="roadmap-heading">
-            <span>SEASON ROADMAP</span>
+          <div id="season-roadmap" className="roadmap-heading" tabIndex={-1}>
+            <span lang="en">SEASON ROADMAP</span>
             <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
           </div>
           <div className="case-roadmap">
@@ -737,13 +731,19 @@ export function IntroScreen({ view, renderers = {} }) {
             })}
           </div>
         </section>
-        {openingBurst && (
-          <div className="opening-burst" data-testid="opening-burst" role="status" aria-live="polite" aria-label="첫 사건으로 진입 중">
-            <div className="opening-burst-grid" aria-hidden="true" />
+        {/* What the burst says to a screen reader. The region is on the page
+            before the burst is, so the sentence is news when it lands; the
+            burst itself is a picture of the same thing. */}
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {openingCase ? `${openingIsFirst ? "첫 사건" : openingCase.label} 진입 중` : ""}
+        </p>
+        {openingCase && (
+          <div className="opening-burst" data-testid="opening-burst" aria-hidden="true">
+            <div className="opening-burst-grid" />
             <div className="opening-burst-panel">
-              <span>CREATIVITY BURST / {`CASE ${caseDisplayCode(seasonCasesBase[0].id)}`} ACCESS</span>
-              <strong>첫 판단 조건 동기화 중</strong>
-              <i aria-hidden="true" />
+              <span lang="en">CREATIVITY BURST / {`CASE ${caseDisplayCode(openingCase.id)}`} ACCESS</span>
+              <strong>{openingIsFirst ? "첫 판단 조건 동기화 중" : `${openingCase.label} 판단 조건 동기화 중`}</strong>
+              <i />
             </div>
           </div>
         )}

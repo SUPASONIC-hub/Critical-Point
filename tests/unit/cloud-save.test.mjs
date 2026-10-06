@@ -194,6 +194,55 @@ test("a put the server refuses is a conflict, with what the server holds", async
   assert.equal(readSync().pending, "2026-09-28T10:00:00.000Z", "the local save is still waiting, not forgotten");
 });
 
+test("another tab of this device uploading in between is not another device", async () => {
+  const save = makeSave({ savedAt: "2026-09-28T10:00:00.000Z" });
+  const behind = { pending: "2026-09-28T10:00:00.000Z", synced: "2026-09-28T09:00:00.000Z", revision: 2 };
+  const otherTabLands = (revision, savedAt) =>
+    browser.storage.setItem(config.CLOUD_SAVE_SYNC_KEY, JSON.stringify({ ...readSync(), synced: savedAt, revision }));
+
+  // The other tab's upload lands, and is recorded, while this tab is asking
+  // what the server holds.
+  resetDevice({ save, sync: behind });
+  const checked = newServer({ stored: { saved_at: "2026-09-28T09:30:00.000Z", payload: {}, revision: 3 } });
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => {
+    otherTabLands(3, "2026-09-28T09:30:00.000Z");
+    return ok({ saved_at: checked.stored.saved_at, revision: checked.stored.revision });
+  });
+  let cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal(puts()[0].body.p_expected_revision, 3, "built on the other tab's copy");
+  assert.equal(cloud.hasCloudConflict(), false);
+
+  // It lands between this tab's check and its put: the put is refused once,
+  // and sent again on the revision the other tab was given.
+  resetDevice({ save, sync: behind });
+  const refusing = newServer({ stored: { saved_at: "2026-09-28T09:00:00.000Z", payload: {}, revision: 2 } });
+  let refusedOnce = false;
+  browser.respond("/rest/v1/rpc/put_cloud_save", ({ body }) => {
+    if (!refusedOnce) {
+      refusedOnce = true;
+      refusing.stored = { saved_at: "2026-09-28T09:59:00.000Z", payload: {}, revision: 3 };
+      otherTabLands(3, "2026-09-28T09:59:00.000Z");
+      return ok({ accepted: false, reason: "revision", saved_at: "2026-09-28T09:59:00.000Z", revision: 3 });
+    }
+    refusing.stored = { saved_at: body.p_saved_at, payload: body.p_payload, revision: body.p_expected_revision + 1 };
+    return ok({ accepted: true, saved_at: body.p_saved_at, revision: body.p_expected_revision + 1 });
+  });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.deepEqual(puts().map((put) => put.body.p_expected_revision), [2, 3]);
+  assert.equal(readSync().revision, 4);
+  assert.equal(readSync().conflict, null);
+
+  // The other tab has not recorded its revision yet, but the copy carries the
+  // time of the save in this device's storage: it is this device's.
+  resetDevice({ save, sync: behind });
+  newServer({ stored: { saved_at: save.savedAt, payload: {}, revision: 3 } });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal(cloud.hasCloudConflict(), false);
+});
+
 test("against today's database the upload is sent the way that database takes it", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T10:00:00.000Z" }), sync: { pending: "2026-09-28T10:00:00.000Z", synced: "", revision: null } });
   const server = oldServer();

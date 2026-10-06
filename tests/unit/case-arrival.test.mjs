@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import { SEASON_ENTRY_CASE } from "../../src/gameCases.js";
 import { createCaseArrival, prepareGameRuntime, whenCaseReady } from "../../src/state/caseArrival.js";
+import { savedRunNamesOtherCases, storageNeedsEveryCase } from "../../src/state/savedRunScope.js";
 
 /**
  * What the runtime waits for before it mounts, and before it opens a case
@@ -66,6 +67,56 @@ test("a case file a deploy removed reloads the page; any other failure is thrown
     "already reloaded once: the panel answers it",
   );
   await assert.rejects(createCaseArrival(fakeStore({ failWith: new Error("bad data") })).whenCaseReady("case03", () => {}), /bad data/);
+});
+
+test("a case that cannot be fetched and did not reload is told to the caller who asked to be told", async () => {
+  const missing = new TypeError("Failed to fetch dynamically imported module: /assets/case03.js");
+  const said = [];
+  const arrival = createCaseArrival(fakeStore({ failWith: missing }), { reload: () => false });
+  await arrival.whenCaseReady("case03", () => assert.fail("opened"), { unavailable: (reason) => said.push(reason) });
+  assert.equal(said.length, 1, "the button says something, where it used to do nothing");
+  assert.equal(typeof said[0].offline, "boolean");
+
+  // A reload that did happen says nothing: the page is going away.
+  await createCaseArrival(fakeStore({ failWith: missing }), { reload: () => true }).whenCaseReady("case03", () => {}, { unavailable: () => assert.fail("told") });
+  // And a fault in opening the case is not a case that could not be fetched.
+  const store = fakeStore();
+  await assert.rejects(
+    createCaseArrival(store).whenCaseReady("case04", () => { throw new Error("opening broke"); }, { unavailable: () => assert.fail("told") }),
+    /opening broke/,
+  );
+});
+
+test("a save just written for a first start does not ask for every case; a run under way does", () => {
+  const fresh = { currentCase: SEASON_ENTRY_CASE, nodeId: "p1_start", log: [], completedCases: [], caseResults: {} };
+  assert.equal(savedRunNamesOtherCases(fresh), false);
+  assert.equal(storageNeedsEveryCase({ saved: fresh }), false, "the shell wrote this before the runtime mounted");
+  assert.equal(storageNeedsEveryCase({ saved: null }), false, "no save at all");
+
+  assert.equal(savedRunNamesOtherCases({ ...fresh, log: [{ nodeId: "p1_start" }] }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, completedCases: [SEASON_ENTRY_CASE] }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, caseResults: { [SEASON_ENTRY_CASE]: {} } }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, currentCase: "case12" }), true);
+});
+
+test("a save that will not read, recovery slots, a kept copy and a replay link each ask for every case", () => {
+  for (const reason of ["unreadable", "hasSlots", "hasBackup", "replay"]) {
+    assert.equal(storageNeedsEveryCase({ saved: null, [reason]: true }), true, reason);
+  }
+});
+
+test("a reader of the whole season runs after every case is here, and not at all when they cannot be fetched", async () => {
+  const store = fakeStore();
+  let release;
+  store.ensureAllCases = () => new Promise((resolve) => (release = resolve));
+  let reads = 0;
+  const pending = createCaseArrival(store).withEveryCase(() => ++reads);
+  await Promise.resolve();
+  assert.equal(reads, 0, "the season is still arriving");
+  release();
+  assert.equal(await pending, 1);
+
+  await assert.rejects(createCaseArrival(fakeStore({ failWith: new Error("offline") })).withEveryCase(() => assert.fail("read")), /offline/);
 });
 
 test("in Node every case is present, so the bound helpers wait for nothing", async () => {

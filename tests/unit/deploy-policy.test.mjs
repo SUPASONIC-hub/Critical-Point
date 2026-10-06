@@ -4,10 +4,15 @@ import { test } from "node:test";
 
 import {
   assetCacheProblems,
+  backendOriginProblems,
+  entryScriptPath,
   firstAssetPath,
+  firstRootImagePath,
   readRenderYamlCsp,
   readRenderYamlHeaders,
   renderYamlHeaderProblems,
+  ROOT_IMAGE_PATHS,
+  rootImageCacheProblems,
   shellCacheProblems,
   siteHeaderProblems,
   wildcardHostProblems,
@@ -70,6 +75,51 @@ test("the asset the cache policy is read from is one the page links", () => {
   assert.equal(firstAssetPath("<p>no assets</p>"), null);
 });
 
+test("an image at the root is kept for a day, not for good and not for nothing", () => {
+  assert.deepEqual(rootImageCacheProblems("public, max-age=86400, stale-while-revalidate=604800"), []);
+  // The host's default, measured 2026-09-28: every image asked about on every visit.
+  assert.equal(rootImageCacheProblems("public, max-age=0, s-maxage=300").length, 1);
+  assert.equal(rootImageCacheProblems(null).length, 1);
+  // The fingerprinted policy on a name that never changes.
+  assert.equal(rootImageCacheProblems("public, max-age=31536000, immutable").length, 2);
+  const headers = readRenderYamlHeaders(yaml);
+  for (const path of ROOT_IMAGE_PATHS) {
+    assert.ok(headers.some((header) => header.path === path && header.name === "cache-control"), `render.yaml has a Cache-Control rule for ${path}`);
+  }
+  assert.match(
+    renderYamlHeaderProblems(yaml.replace(/- path: \/\*\.webp\s*\n\s*name: Cache-Control\s*\n\s*value: .*\n/, "")).join("\n"),
+    /\/\*\.webp: an image served from the root/,
+  );
+});
+
+test("the image the cache policy is read from is one the page names at the root", () => {
+  const html =
+    '<meta property="og:image" content="/triggerlab-key-visual.jpg" /><link rel="icon" href="/icons/favicon-32.png">' +
+    '<link rel="preload" as="image" imagesrcset="/triggerlab-key-visual-480.webp 1x, /triggerlab-key-visual-960.webp 2x">';
+  assert.equal(firstRootImagePath(html), "/triggerlab-key-visual.jpg");
+  assert.equal(firstRootImagePath('<link imagesrcset="/a-480.webp 1x, /a-960.webp 2x">'), "/a-480.webp");
+  assert.equal(firstRootImagePath('<img src="/assets/art-Bszxvk0K.webp"><link href="/icons/icon-192.png">'), null, "a fingerprinted or nested file is not a root image");
+});
+
+test("the entry script is the module the page starts from", () => {
+  const html = '<script type="module" crossorigin src="/assets/index-Cdp_ULJ-.js"></script><script src="/assets/deferred-styles-ae3dcf14.js" defer></script>';
+  assert.equal(entryScriptPath(html), "/assets/index-Cdp_ULJ-.js");
+  assert.equal(entryScriptPath('<script src="/assets/deferred-styles-ae3dcf14.js" defer></script>'), null);
+});
+
+test("a release names the backend its own CSP lets it call", () => {
+  const live = "default-src 'self'; connect-src 'self' https://abcdefgh.supabase.co";
+  assert.deepEqual(backendOriginProblems('const u="https://abcdefgh.supabase.co";', live), []);
+  // Built with no VITE_SUPABASE_URL: every header right, no ranking.
+  assert.match(backendOriginProblems('const u=void 0;', live)[0], /built without VITE_SUPABASE_URL/);
+  // Built for another project.
+  assert.equal(backendOriginProblems('const u="https://zzzzzzzz.supabase.co";', live).length, 1);
+  // render.yaml can only say the wildcard; the placeholder build matches it.
+  assert.deepEqual(backendOriginProblems('const u="https://e2e.supabase.co";', readRenderYamlCsp(yaml)), []);
+  assert.equal(backendOriginProblems('const u="https://e2e.example.com";', readRenderYamlCsp(yaml)).length, 1);
+  assert.match(backendOriginProblems("x", "default-src 'self'; connect-src 'self'")[0], /names no backend origin/);
+});
+
 test("a wildcard host is named where the page may send data", () => {
   assert.deepEqual(wildcardHostProblems("connect-src 'self' https://abcdefgh.supabase.co"), []);
   assert.equal(wildcardHostProblems("connect-src 'self' https://*.supabase.co").length, 1);
@@ -77,4 +127,17 @@ test("a wildcard host is named where the page may send data", () => {
   // render.yaml cannot name the project, so the file is where the wildcard is
   // written down and the live header is where it is refused.
   assert.equal(wildcardHostProblems(readRenderYamlCsp(yaml)).length, 1);
+});
+
+test("the service worker's file is asked for again every time, like the page", async () => {
+  const { WORKER_PATH, workerCacheProblems } = await import("../../scripts/deploy-policy.mjs");
+  const declared = readRenderYamlHeaders(yaml).find((header) => header.path === WORKER_PATH && header.name === "cache-control");
+  assert.equal(declared?.value, "no-cache");
+  assert.deepEqual(workerCacheProblems("no-cache"), []);
+  assert.match(workerCacheProblems("public, max-age=0, s-maxage=300")[0], /^the service worker is held by shared caches for 300s/);
+  assert.match(workerCacheProblems("public, max-age=600")[0], /^the service worker may be reused without asking/);
+  // The file has to say it: a render.yaml without the rule is a failure of the offline check.
+  const without = yaml.replace(/- path: \/sw\.js\s*\n\s*name: Cache-Control\s*\n\s*value: no-cache\s*\n/, "");
+  assert.notEqual(without, yaml);
+  assert.match(renderYamlHeaderProblems(without).join("\n"), /\/sw\.js: the service worker is served with no Cache-Control/);
 });

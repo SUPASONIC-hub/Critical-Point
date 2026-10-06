@@ -22,7 +22,8 @@ Profile.jpg
 /*.md
 !/README.md
 
-# Output of npm run analyze:free-text -- contains player sentences.
+# Output of the free-text analysis script, which was removed with the
+# free-text input. Still ignored: a checkout that ran it holds player sentences.
 analysis-out/
 
 # `eslint --cache` (npm run lint) keeps its per-file results here.

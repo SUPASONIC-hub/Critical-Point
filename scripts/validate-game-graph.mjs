@@ -18,7 +18,7 @@ import {
   triggerLabels,
 } from "../src/gameData.js";
 import { characterProfileCollisions, getCharacterProfile } from "../src/gameDialogue.js";
-import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getOutcomeChoiceId, getRouteMemory, REFRAME_COGNITION, REFRAME_EFFECT } from "../src/gameLogic.js";
+import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getLeadChoice, getOutcomeCarryover, getOutcomeChoiceId, getRouteMemory, REFRAME_COGNITION, REFRAME_EFFECT } from "../src/gameLogic.js";
 import { pressureBeats } from "../src/nodes/sceneBuild.js";
 import { sceneContext } from "../src/nodes/sceneContext.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
@@ -330,14 +330,16 @@ CASE_SEQUENCE.forEach((caseId, index) => {
     if (!getContinuityChallenge({ caseId: nextCaseId, choiceId })) failures.push(`${nextCaseId} has no continuity challenge for ${caseId}/${choiceId}`);
   }
   // The runtime's own two choices, 판 공개 기준 and 관계의 증언, go where a
-  // scene's first choice goes, so on a closing scene they close the case under
-  // ids no table knows. The case records the choice they stand in for, and
-  // that has to be one of the outcomes checked above.
+  // scene's lead card goes, so on a closing scene they close the case under
+  // ids no table knows. The case records the card they stand in for, which has
+  // to be that lead card -- the one whose `next` they were built from -- and
+  // one of the outcomes checked above.
   for (const nodeId of nodeOrders[caseId] ?? []) {
-    const first = nodes[nodeId]?.choices?.[0];
-    if (!first || first.next !== resultNodeId) continue;
+    const lead = getLeadChoice(nodes[nodeId]);
+    if (!lead || lead.next !== resultNodeId) continue;
     for (const bridge of ["adaptive_reframe", "relationship_bridge"]) {
       const standIn = getOutcomeChoiceId(`${caseId}_${bridge}`, nodes[nodeId]);
+      if (standIn !== lead.id) failures.push(`${caseId}_${bridge} closes ${caseId} at ${nodeId} as ${standIn}, but it goes where ${lead.id} goes`);
       if (!outcomeIds.has(standIn)) failures.push(`${caseId}_${bridge} closes ${caseId} at ${nodeId} as ${standIn}, which is not one of its outcomes`);
     }
   }
@@ -562,7 +564,9 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   }
 
   // Generated scenes: every choice carries its own label, effect, line and
-  // reply, so one cannot be edited out from under the others.
+  // reply, so one cannot be edited out from under the others. Its way of
+  // thinking is read from the label (sceneBuild.js) unless the card names one:
+  // then it names exactly one, weighed as the reading would weigh it.
   for (const [family, scenes] of [["connectiveScenes", pack.connectiveScenes], ["reactionScenes", pack.reactionScenes]]) {
     for (const scene of scenes) {
       for (const field of ["id", "after", "next", "title", "speaker", "text"]) {
@@ -576,8 +580,15 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
         continue;
       }
       scene.choices.forEach((choice, index) => {
-        const extra = Object.keys(choice).filter((key) => !["label", "effect", "voice", "echo"].includes(key));
+        const extra = Object.keys(choice).filter((key) => !["label", "effect", "voice", "echo", "cognition"].includes(key));
         if (extra.length) fail(`${scene.id} choice ${index + 1} has fields no module reads: ${extra.join(", ")}`);
+        if (choice.cognition !== undefined) {
+          const named = Object.entries(choice.cognition ?? {});
+          const [type, weight] = named[0] ?? [];
+          if (named.length !== 1 || !cognitionKeys.has(type) || weight !== (type === "reframing" ? 2 : 1)) {
+            fail(`${scene.id} choice ${index + 1} names its way of thinking as ${JSON.stringify(choice.cognition)}: one of ${[...cognitionKeys].join(", ")}, reframing at 2 and the rest at 1`);
+          }
+        }
         for (const field of ["label", "voice", "echo"]) {
           if (typeof choice[field] !== "string" || !choice[field]) fail(`${scene.id} choice ${index + 1} has no ${field}`);
         }
@@ -648,9 +659,10 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
  * scene its case wrote, every reply is authored, and every memory card a run
  * can be dealt answers in its own words (2026-09-29), so any of those coming
  * back is a failure. A choice with no voice line speaks its own label, which is
- * authored if plain; that count is held where it stands and may only fall.
+ * authored if plain; 54 did on 2026-09-29, and none has since every card came
+ * to carry its own line (2026-10-05), so one coming back is a failure too.
  */
-const VOICE_FALLBACK_CEILING = 54;
+const VOICE_FALLBACK_CEILING = 0;
 const memoryCardsWithoutReply = memoryCards.filter(({ card }) => !echoReplies[card.id]);
 for (const nodeId of fallbackCopy.scenes) failures.push(`${nodeId} closes a hidden route on the shared scene; write finalTitle, finalText and finalMemo on its plan`);
 for (const choiceId of fallbackCopy.echo) failures.push(`${choiceId} answers with a generated reply; give it an authored echo`);
@@ -658,7 +670,7 @@ for (const { caseId, kind, card, reachable } of memoryCardsWithoutReply) {
   if (reachable) failures.push(`${card.id} (${caseId}, ${kind}) can be dealt and takes the default reply; give its plan a ${kind === "evidenceTurn" ? "evidenceEcho" : kind === "systemRoute" ? "systemEcho" : "routeEcho"}`);
 }
 if (fallbackCopy.voice.length > VOICE_FALLBACK_CEILING) {
-  failures.push(`${fallbackCopy.voice.length} choices speak their own label, over the ${VOICE_FALLBACK_CEILING} left on 2026-09-29; write their voice lines`);
+  failures.push(`${fallbackCopy.voice.length} choices speak their own label, over the ${VOICE_FALLBACK_CEILING} allowed; write their voice lines`);
 }
 const fallbackReport =
   `${fallbackCopy.scenes.length} hidden routes close on the shared scene, ` +

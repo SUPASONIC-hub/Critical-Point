@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-05 (every voice line read against its scene; labels, replies and dates reconciled; the finale and 사건 02's routes made packs; a card carrying its own line and reply; the weekly tier brought to green)
+Last updated: 2026-10-06 (a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -36,13 +36,23 @@ list of the files it touched.
   table time, a reading clock that waits, calm effects, no letter keys, a
   still intro (priority 87).
 - The app fetches the season a case at a time: the first scene needs the
-  index and one case chunk, not all 55 cases (priority 88).
+  index and one case chunk, not all 55 cases (priority 88). That has been true
+  of a first start only since 2026-10-06; until then the shell's own new save
+  made every start wait for all of them.
+- A copy opened once with a connection opens again without one, an installed
+  copy included (priority 89). Not verified on iOS Safari.
+- The run is one piece of state with one definition (`src/state/runState.js`);
+  what a new game, an opened case, a jump and a reset do to it, in memory and
+  in the save, is read off the same table (priority 1).
 - Fast CI checks and the heavyweight e2e tier are split in GitHub Actions; the
   e2e tier runs on three shards, and the uninterrupted season walk and full
   coverage run weekly. The weekly tier is twenty-four shards of two workers
   (it was twelve of four, and timed itself out), sized on 2026-10-05, when all
-  twenty-four first passed. Visual regression has its own label-aware workflow
-  and Linux-only baselines.
+  twenty-four first passed. Its WebKit job runs twice, `@prod` on the build and
+  `@layout` on the dev server. Visual regression has its own workflow and
+  Linux-only baselines, and compares on its own for a pull request that
+  touches a stylesheet, `index.html`, the font or a baseline. Migration Drift
+  asks the live database once a day which migrations it has run (priority 80).
 - Source text is valid UTF-8. Some Windows shells render Korean incorrectly, so
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
@@ -51,16 +61,24 @@ list of the files it touched.
   copy, the case card's markup and the phone header moved, and the phone play
   screen again on 2026-10-05, when the dateline stopped cutting off its clock;
   the comparison passes on main (priority 19 says how to record them again).
+  The 2026-10-06 audit moved the intro, the 사건 01 result screen and the
+  phone play screen (type in rem with an 11px floor, the hero art by width,
+  `시즌 처음부터 다시`); those baselines are recorded again with that change.
 - Every case is a pack, the finale included, and every card a pack writes is
   one object carrying its label, effect, voice line and reply (priority 74).
+  A generated card may also name its way of thinking (priority 12); 90 do.
 - Every voice line has been read beside the scene it is said in (2026-10-05),
   and what the read-through found around the lines -- labels, replies, counts
   and dates that disagreed -- is reconciled against `docs/canon.md`.
+- 사건 01-07 and the finale are written at the length of the rest of the
+  season (about 310 characters a scene; they were 90-160), and were then read
+  once more in story order by someone who had not written them (2026-10-06).
 
 Still open, on purpose:
 
-- Season length -- about 491 scenes a season, about 46 of them in the 프롤로그 --
-  is an authoring decision, not a code problem.
+- Season length -- one play passes about 521 scenes of the season and about 55
+  of the 프롤로그, of 1,129 written -- is an authoring decision, not a code
+  problem.
 - "3년". The 프롤로그 is 2022-23 and 사건 01 is 2025, a little over two years
   on; the season says "3년 전" throughout and it is read as "the third year"
   (`docs/canon.md`, "Known and left alone"). The rest of the calendar closes.
@@ -73,6 +91,8 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
+- What the 2026-10-06 audit found and left is listed under "Audit of
+  2026-10-06" at the end of this file.
 
 ## Maintenance Priorities
 
@@ -87,28 +107,54 @@ Still open, on purpose:
    is the one repair helper, and a missing key that equals its default is not a
    repair -- otherwise every reload announced one. A run's starting resources
    come from `createOpeningResources` (`src/state/openingState.js`) and nowhere
-   else; the shell, the runtime and the persistence hook all call it.
-2. Keep `GameRuntime.jsx` under its budget (1,300 lines, 120 imported names;
-   1,242 / 119 today). New derivations go into a hook of their own --
+   else; the shell and the run's definition both call it.
+   The run itself is defined once, in `src/state/runState.js`: every field,
+   where the save keeps it, and what a new game, an opened case, a jump and a
+   reset each do to it. A transition is an event (`src/state/runLifecycle.js`)
+   that the definition answers with a patch; `applyRun` makes the change in
+   memory and writes the save from that same patch, so a field cannot be reset
+   in one and missed in the other. A new field goes into that table, with a
+   rule for all four transitions -- the unit test fails without one -- and a
+   change to the run that the save should hold goes through `applyRun`, not a
+   setter and a `persist` call side by side. What each transition does is
+   pinned field by field in `tests/unit/fixtures/run-lifecycle.json`. The
+   shell's `createStartSave` (`AppContent.jsx`) is still its own list: it runs
+   before the runtime chunk is loaded, and the run's definition imports the
+   table engine.
+2. Keep `GameRuntime.jsx` under its budget (980 lines, 104 imported names;
+   964 / 104 today). New derivations go into a hook of their own --
    `useCaseSystems`, `useResultReport`, `useChoiceCommit` (committing a
    decision, with its ranking row and telemetry) and `useRunReadout` (the
    log-derived readouts, memoised) are the pattern -- not into the component
    body. `npm run check:runtime-budget` holds the runtime, `gameData.js` and
    `gameLogic.js`, the play, result and report screens, the stage, and the
-   three view-bag sizes. The stage (`src/gauntlet/GauntletStage.jsx`) is 804
+   three view-bag sizes (79 / 27 / 108 fields against 80 / 28 / 110; a screen
+   takes its callbacks from `actions` and its renderers from `renderers`, and
+   the view carries no second copy of either). The stage
+   (`src/gauntlet/GauntletStage.jsx`) is 809
    lines and 68 imported names; the hand, the table's notices, press timing,
    the frame variables and the table's numbers are their own modules
    (`GauntletHand.jsx`, `TableNotices.jsx`, `timing.js`, `fxVariables.js`,
-   `tableRules.js`). `gameData.js` is 3,566 lines and 20 imported names against
-   3,600 / 21; the graph build's last passes live in `src/nodes/sceneBuild.js`,
-   which it reads through one namespace import. The ending's copy tables are
+   `tableRules.js`). `gameData.js` is 534 lines and 7 imported names against
+   560 / 7, now that no case writes into it; the graph build's last passes live
+   in `src/nodes/sceneBuild.js`,
+   which it reads through one namespace import. The scene plate is one file a
+   room (`src/components/plate/motifs/`), with `ScenePlate.jsx` the frame. The ending's copy tables are
    `src/endingCopy.js`, so `ResultScreen.jsx` is held to 340 lines. Line counts
    here are the ones `check:runtime-budget` prints.
 3. Keep browser-storage ownership in focused hooks such as `useAppPersistence` and `useLocalRanking`.
 4. Route guarded button behaviour through `GuardedButton` instead of repeating
    `aria-disabled` and click guards. A blocked button stays focusable -- no
    `tabIndex={-1}` -- because a keyboard or screen-reader user has to be able
-   to reach it to hear why it is blocked.
+   to reach it to hear why it is blocked. A control that explains why it is
+   blocked takes `blocked`, never the native `disabled`. Focus goes where the
+   page goes: to the intro's heading (or the roadmap's, and the current case's
+   card) when the runtime hands back to the intro, to each ending step's
+   heading or first control, to the report's heading last. A message that has
+   to be announced goes into a live region that was mounted before the text
+   arrived (the save status, the cloud panel's status and alert, the board's);
+   a region that mounts with its text in it is not read. An `aria-label` goes
+   on an element that has a role. Static English copy carries `lang="en"`.
 5. Put reusable Playwright flow behaviour in `tests/helpers/gameFlow.js`. Helpers
    click the way a player does: through the visible control, after it is
    enabled. Every spec takes `test` and `expect` from `tests/helpers/network.js`,
@@ -124,7 +170,11 @@ Still open, on purpose:
    a second home. `comfort.css` is last on purpose, so a tie on specificity
    goes to the player's setting (priority 87). A `transition` never lists
    `box-shadow`, and `check-css-tokens.mjs` allows five hard-coded hex colours,
-   the five there are.
+   the five there are. Type is sized in rem (16px root), so the reader's own
+   font size carries, and a label that says something is never under 11px
+   (2026-10-06). A form control's border is `--ui-line-field`, which holds 3:1
+   against the surface under it; `--ui-line-strong` does not. A text field is
+   16px or iOS zooms the page on focus.
 7. Regenerate `src/styles/critical.generated.css` with `npm run build:critical`
    whenever a stylesheet changes, and commit it. The build fails otherwise --
    it compares the hash of the sheet the file was cut from against the one it
@@ -176,15 +226,28 @@ Still open, on purpose:
     every choice costs something, that every resource moves both ways, that no
     choice inside a scene and no column inside a case is Pareto-dominated by a
     sibling, that no generated column is more than 90% one cognition --
-    cognition is read from the label's phrasing and the effect's dominant axis,
-    not from the card's position -- and that no column carries one axis as its
+    cognition is read from the label's phrasing and the effect's dominant axis
+    (`inferChoiceCognition`), not from the card's position, unless the card
+    names it: the reading cannot tell a negation ("빼지 않고") or a noun that
+    contains a trigger word ("제안서"), so a card it reads wrongly carries an
+    explicit `cognition` (90 of 996 since 2026-10-06; one type, reframing at 2
+    and the rest at 1, held by `check:graph`; a card that names what its label
+    already reads as fails a unit test). Do not reword a label to steer the
+    reading. Cognition feeds the ending -- and that no column carries one axis as its
     top gain in more than half of its cards. Tune effects against it rather
     than around it. A scene's cards are dealt in a shuffled order seeded on the
     scene id (`src/nodes/sceneBuild.js`), so position says nothing; the scene
     records `leadChoiceId`, the card it was written to lead with, and the
     adaptive reframe and the relationship bridge follow that card, never
-    `choices[0]`.
-13. Raise what choices give with `npm run raise:gains`, never by hand: the
+    `choices[0]`. So does what they record: the outcome a case closes on
+    (`getOutcomeChoiceId`) and the scene a bust skips to are the lead card's
+    (`getLeadChoice` in `src/seasonRules.js`). Until 2026-10-06 both read the
+    first card as dealt, and 39 of 55 cases could record a close the player
+    had not taken; `check:graph` now fails when the stand-in is not the lead.
+    Outcomes recorded wrongly before that are not repaired in old saves.
+13. Raise what choices give with `npm run raise:gains -- --write`, never by
+    hand (without `--write` it lists what would change and writes nothing; it
+    refuses a dirty tree and any argument it does not know): the
     uplift has to stay a strictly increasing function of the magnitude, applied
     to gains only, or it starts inventing dominations that `check:balance` was
     written to catch. Read `npm run check:endings` afterwards.
@@ -200,7 +263,10 @@ Still open, on purpose:
     window when it closes, through `resolveGauntlet`. The table's keys live in
     `useTableKeys`, its forecast derivations in `tableReadout.js`.
 15. Ship art at the width it is painted at. `src/responsiveArt.js` lists the
-    images that have 480px and 960px variants and builds the `srcset` for them;
+    images that have 480px and 960px variants and builds the `srcset` for them
+    -- by density on a phone, by width (`960w`, the 1,672px original) past it,
+    where the art is a full-bleed backdrop, with the same list in the preload
+    links of `index.html`;
     `npm run check:art` fails when a variant is missing or has crept back up
     toward the original's weight. Regenerate variants with `npm run build:art`
     -- the browser is the encoder, so there is no image toolchain to install.
@@ -227,7 +293,10 @@ Still open, on purpose:
     `npm run check:visual-baselines` (in `verify:static`) fails on a missing
     Linux baseline, on an orphaned one, and on any other platform's file.
     There is no freshness rule: re-record in the same pass that changes a
-    screen's copy, font or colour.
+    screen's copy, font or colour. The comparison runs on a push to main, on a
+    pull request that touches `src/styles/`, `src/assets/fonts/`, `index.html`
+    or the visual spec and its baselines, on the `visual` label, on a
+    Dependabot pull request and by hand; it does not gate the deploy.
 20. A `run:` step in the Playwright container gets dash, not bash. Say
     `shell: bash` on any step that uses `pipefail`, arrays, or `[[`.
 21. Node has one home: `.node-version` (an exact x.y.z). The Render build reads
@@ -285,7 +354,15 @@ Still open, on purpose:
     clock, not panels on the table, and the comfort settings (priority 87) live
     on the intro. On a phone the header's three icon buttons are drawn 30x28
     but each has an invisible 44px-tall hit area, and 초기화 sits 9px further
-    off than the others.
+    off than the others; the three stance buttons have the same hit area.
+    A phone on its side has a layout of its own
+    (`(max-height: 480px) and (orientation: landscape)` in `responsive.css`):
+    five cards with one staked fit from 640x360 to 932x430, measured against
+    the dock by two tests that can fail (the old one measured a fixed button).
+    The header's right padding subtracts the shell gutter, so it reserves
+    14-18px beside the music controls at every width from 481 to 1366; it used
+    to reserve up to 250px between 481 and 759. Fixed layers pad for the left
+    and right safe areas as well as top and bottom.
 28. The report is three acts. The ending, the rank and the next case are the
     first screen; `왜 이렇게 됐나` answers with three cards; everything else is
     inside `.report-archive`, which is its own file (`ReportArchive.jsx`). It
@@ -357,15 +434,29 @@ Still open, on purpose:
     behind storage stays behind, so its next ordinary save still meets the
     conflict check.
 36. A recovery slot rolls back the story, not the table. There are five slots,
-    each holding the whole log. `restoreSaveSlot` passes the slot through
+    each holding the whole log. A slot is taken where a player would want to
+    go back to -- a run started or resumed, a case opened, a case closed, a
+    save carrying an error (`shouldCaptureSaveSlot`) -- not at every scene,
+    which read and rewrote all five on each decision and left five slots
+    inside the one case that broke (2026-10-06). A restore, of a slot or of the
+    kept copy of an unreadable save, waits for every case before it repairs:
+    repaired against a season still arriving, a slot's log was dropped as
+    unknown scenes and the emptied save force-written. `restoreSaveSlot` passes the slot through
     `carryTableRecordIntoRestore`: busts settled since the slot stay in the log,
     the pot they wiped stays wiped, the board they broke stays broken, and the
     window count never goes backwards. A restore stops the runtime's saves
     before it writes and reloads, so nothing the live tab still holds lands on
     top of it. Every control that throws progress away -- restore, delete a
     slot, clear the error log, start fresh, replay a case, `R` on the result
-    screen -- asks first through `confirmAction` (`src/state/confirmAction.js`);
-    a spec that presses one answers through `tests/helpers/dialogs.js`.
+    screen, and `첫 케이스 시작` or `NEW GAME+ 시작` on a device with a run to
+    resume -- asks first through `confirmAction` (`src/state/confirmAction.js`);
+    a spec that presses one answers through `tests/helpers/dialogs.js`. The
+    reset's question names what goes and what stays, and
+    `src/state/runStorageReset.js` is the list: it also clears the session
+    trace, the settled-window seeds and the line typed for the next analyst,
+    and takes a new telemetry session id; it keeps the settings, the codex,
+    NEW GAME+ (written only from a season that reached the finale), the board
+    name and the online save.
 37. A bust skipping a scene must never be a shortcut. `check:pressure` plays a
     policy that busts every window it can to reach the case's end sooner; it has
     to bank under a quarter of the best blind policy.
@@ -413,7 +504,14 @@ Still open, on purpose:
     (`openCaseRun({ replayOf })`): it plays the same table, drafts no relic and
     keeps nothing -- the vault, the relics, the mastery and any waiting draft
     are handed back when it closes or is left, and the summary keeps the table
-    record of the first close.
+    record of the first close. What a replay does change is the case's story
+    summary (the values the ending reads): the retry asks first and says the
+    record of the play just finished goes, and a replay that could not change
+    an outcome would not be one. A practice window does not lean the season in
+    (`practiceWindows` is taken off the count `getSeasonEscalation` reads), a
+    replayed case's local ranking row replaces the run's earlier one instead of
+    adding to it, and the codex is written after the save has decided the tab
+    is neither stale nor a replay link (2026-10-06).
 40. Every scene grounds itself, because no scene can rely on the one before it.
     The route split opens a case at different authored scenes, so a scene may
     be entered with its predecessor never played. `src/nodes/sceneContext.js`
@@ -451,7 +549,12 @@ Still open, on purpose:
     exists: delete it, it is in the history. What a sweep must not take: a
     symbol referenced by `scripts/unit-tests.mjs` or `scripts/smoke-test.mjs`
     that the app also uses, and `topicParticle`, which priority 10 tells
-    authors to reach for.
+    authors to reach for. The 2026-10-06 sweep took five save fields nothing
+    read (`protocolUsed`, `timerPenaltyCount`, `probeUsed`,
+    `investigatedTargets`, `hypothesisDecisions`; an old save that has them
+    still loads), the readers of entry fields no commit writes, the play
+    view's second copy of its callbacks, and copy that promised what the code
+    did not do (play style "unlocks", NEW GAME+ "hidden authority").
 44. The season is one chain, and its vocabulary is the one a Korean bank uses
     now. Every case hangs off a single bad loan -- KD은행's 310억 to 플로우온,
     대출번호 2023-0412 -- and the analyst is the one who wrote the dissent on it.
@@ -564,7 +667,11 @@ Still open, on purpose:
     render crash that React, the catching boundary and a parent boundary all
     report is recorded once, only a `react-render` failure counts toward the
     retry limit, and the error path keeps one recovery slot per broken scene
-    rather than one per record. Hand-kept case lists are bugs:
+    rather than one per record. A `console.error` line is a record and nothing
+    more: it does not rewrite the save, the same message is one record for two
+    seconds anywhere and a minute at the same scene, and the console gets
+    twelve records a minute (`useRuntimeErrorCapture`, 2026-10-06). A render
+    crash is never folded. Hand-kept case lists are bugs:
     the unlock chain is "the previous case in `seasonCasesBase` is complete",
     the test unlock is `CASE_SEQUENCE` minus the finale, and intro echoes are
     the `caseIntroEchoes` table.
@@ -603,7 +710,10 @@ Still open, on purpose:
     built on, and it is refused when the stored copy has moved past it
     (`20260929030000_cloud_save_lineage.sql`). A refusal is a conflict, and a
     conflict stays -- nothing uploads again until the player loads the server's
-    copy or says this device's progress should replace it. `peek_cloud_save`
+    copy or says this device's progress should replace it. Another tab of the
+    same device is not another device: on a refusal the client reads the sync
+    record again and retries once when the server's revision is the one this
+    device last wrote. `peek_cloud_save`
     asks what revision the server holds without fetching the save. The panel
     can delete the copy under a code (`delete_cloud_save`), and a copy nobody
     has uploaded to for 180 days is purged. The client falls back to the older
@@ -637,8 +747,15 @@ Still open, on purpose:
     not an anti-cheat system; the ranking badge says RUN LINKED, not verified.
 61. Telemetry is idempotent by `event_id`, minted once when the payload is
     built (`src/state/telemetryEventId.js`) and reused by the retry queue.
-    Delivery is a plain POST; a `409` (the unique `event_id` already landed)
-    counts as delivered. `on_conflict` is not used because it needs SELECT on
+    A case row and the season row go into the queue, and so into the save, in
+    the same write as the decision, and are taken out when they land; sent
+    first and queued only on failure, a row in flight when the tab closed was
+    lost, and one lost case row makes a run unrankable (2026-10-06).
+    Delivery is a plain POST; a `409` whose code is `23505` (the unique
+    `event_id` already landed) counts as delivered, and any other `409` is a
+    failure. The request's timer runs through the reading of the body. A
+    consent withdrawn while a batch is failing stays withdrawn: what the batch
+    kept is intersected with what the queue still holds. `on_conflict` is not used because it needs SELECT on
     `event_id`, which anon does not have. The privacy check runs before the
     first send; `spokenChoice` is not private; a `comment` is allowed only on
     feedback rows, whose shape is `{ event_id, session_id, session_code,
@@ -680,12 +797,17 @@ Still open, on purpose:
     into the dashboard by hand. `.github/workflows/deploy.yml` hangs off Verify,
     so only a commit whose e2e tier went green deploys, and Render's own
     Auto-Deploy stays off. The Render build is `npm ci --include=dev && npm run
-    build` and runs no checks. The deploy job needs `RENDER_DEPLOY_HOOK`; its
-    second job (`needs: deploy`) needs `DEPLOY_URL`, waits until the site's
+    build` and runs no checks. The deploy job needs `RENDER_DEPLOY_HOOK`; the
+    same job then needs `DEPLOY_URL`, waits until the site's
     `<meta name="build-sha">` (written from `RENDER_GIT_COMMIT`) names this
-    commit or a later one, then runs `check:deploy`. Either job raises a
+    commit or a later one, then runs `check:deploy`. Either half raises a
     warning annotation when it skips, because a job that cannot do its work
-    should say so where the tick is. `check:deploy` checks the CSP by value
+    should say so where the tick is. A dispatch by hand takes a `sha` and goes
+    through the same gate -- on main, with a green push-event Verify -- unless
+    `force` is set; that is the rollback path, and the README's 수동 배포와 롤백
+    is the procedure. The README's 자동 배포 section lists every header rule the
+    dashboard has to hold; the four added on 2026-10-06 (`/*.webp`, `/*.jpg`,
+    `/icons/*`, `/sw.js`) are warnings in `check:deploy` until they are there. `check:deploy` checks the CSP by value
     (`scripts/deploy-policy.mjs`): `script-src 'self'` with no
     `'unsafe-inline'`, `'unsafe-eval'` or wildcard; `object-src 'none'`;
     `base-uri` and `frame-ancestors` present; no image, font or connect source
@@ -695,13 +817,17 @@ Still open, on purpose:
     policy that does not leak the address, the CSP, a year of HSTS, a
     same-origin opener policy, a permissions policy that switches camera,
     microphone, geolocation, payment and usb off), the cache policy of the
-    page (`no-cache`) and of the hashed assets (a year, `immutable`), and fails
+    page (`no-cache`) and of the hashed assets (a year, `immutable`), fails when
+    the entry script names none of the origins `connect-src` allows (a release
+    built without `VITE_SUPABASE_URL`), warns when an image served from the
+    root is not cached for about a day, and fails
     the live header on a `connect-src` wildcard host such as
     `https://*.supabase.co` (`render.yaml` has to say it that way, so for the
     file it is only reported).
     `node scripts/check-deploy.mjs --offline` checks `render.yaml` and
     `dist/index.html` (no inline script, no `on*=` handler, no `javascript:`
-    URL) without a network.
+    URL) without a network, and `dist/sw.js` against that page (priority 89).
+    The live check fails when `/sw.js` is missing or is another release's.
 67. A timing helper that samples a rendered variable and acts a frame later has
     to aim at the middle of the tolerance, not its edge, and has to see the
     value change before trusting it -- a variable written every frame and then
@@ -773,9 +899,11 @@ Still open, on purpose:
     reached in at least 1% of seasons, none in more than 40%, a people-first
     player collapses in at most 10%, and one who spends people for position
     collapses in at least half. `npm run report:endings` prints the spread,
-    which moves a little with every effect change; at the end of the
-    2026-09-27 pass collapse read about 22% and every other ending sat between
-    about 4% and 20%, field pact and human record the largest. The ruling reads season
+    which moves a little with every effect change and with every card whose
+    way of thinking changes; after the 2026-10-06 audit (thirteen effect
+    corrections, ninety explicit cognitions, the lead-card outcome) collapse
+    reads 23% and every other ending sits between about 4% and 19%, field pact
+    and human record the largest. The ruling reads season
     means and rates: clue gates are rates of cases played; standing gates read
     the mean of each case's closing resources (`finalResources` in the case
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
@@ -804,7 +932,8 @@ Still open, on purpose:
     is not: every hidden route closes on a scene its case wrote (not the
     shared generated one), every reply is authored, and every memory card a
     run can be dealt answers in its own words. A choice with no voice line
-    speaks its own label; 54 do, held as a ceiling that may only fall. Only
+    speaks its own label; 54 did on 2026-09-29 and none does now, and
+    `check:graph` fails if one comes back. Only
     사건 01-05 have a route split, so only 사건 02-06 can be dealt a route
     memory card; the 48 cards no run could reach are deleted, and `check:graph`
     fails on a card no run can be dealt and on a kind of memory the previous
@@ -850,8 +979,16 @@ Still open, on purpose:
     those calls: `saved_at` is clamped to `now()`, a `revision` column counts
     writes (priority 59), puts are limited to 240 an hour per code and 600 per
     address, reads to 120 an hour per address, a payload to 400,000 bytes of
-    `save` and `settledWindows`, and an address to five new codes a day. There
-    are 34 migrations and eight tables.
+    `save` and `settledWindows`, and an address to five new codes a day
+    (1,000 a day for everyone). Telemetry has a byte budget as well as a row
+    count: 32 MB a day for one address, charged by a trigger of its own that
+    fires after the validator, and 200 MB a day for everyone. There
+    are 36 migrations and eight tables. `check:grants` also fails on a
+    SECURITY DEFINER function that does not pin `search_path` and on a view
+    without `security_invoker`. The Migration Drift workflow compares the
+    live project's migration history with `supabase/migrations/` once a day
+    and files an issue when they differ (it needs the `SUPABASE_ACCESS_TOKEN`
+    secret; without it the run says so and compares nothing).
     `free_text_analyses` is service-role only; the client writes nothing to it. `purge_old_telemetry` covers seven tables and is scheduled daily by
     `pg_cron` when the extension exists. `npm run check:grants` (in
     `verify:static`) replays every migration into PGlite with the API roles and
@@ -863,8 +1000,8 @@ Still open, on purpose:
 81. The bundle's budgets ratchet down, never up. `npm run check:bundle` holds
     each chunk at its measured size plus about 5%, the font file on its own,
     and the first paint as a whole -- the HTML, every script and stylesheet it
-    links, the preloaded font and the key visual a phone picks (about 495KB
-    measured). The intro screen is in the entry chunk rather than a lazy one it
+    links, the preloaded font and the key visual a phone picks (about 499KB
+    measured, against 515,000). The intro screen is in the entry chunk rather than a lazy one it
     had to fetch before painting, and the GameRuntime chunk is prefetched on
     idle and on hover or focus of the start action. Only `board-glow` still
     animates a paint property. A number that has to rise is a decision worth
@@ -874,7 +1011,16 @@ Still open, on purpose:
     key, a bust written before its slam, Space and Enter left to the focused
     control, presses graded where the pointer went down, readable names, and
     frame variables that no longer restyle the whole table. Every chunk the
-    build emits has a budget, and a chunk without one fails.
+    build emits has a budget, and a chunk without one fails. The ones that
+    rose on 2026-10-06, each with its note beside the number: a case chunk,
+    84,000 / 20,200 -> 98,900 / 25,400, because 사건 01 (thirty scenes, the
+    most of any case) is 94,175 / 24,159 at the season's length, and it is not
+    the chunk a first visit waits for; `RankingScreen` and
+    `CloudSavePanelBody` by a few hundred bytes for their status regions; and
+    among the stylesheets (`check:css-structure`) `base-intro-ranking.css`
+    71,400 -> 76,900 and `responsive.css` 5,850 -> 10,500 for the landscape
+    table, while `play.css` stayed at 63,700. `sw.js` has a budget of its own
+    (8,780 / 3,150).
 82. Actions are pinned by commit SHA with the tag in a comment, and Dependabot
     (npm and actions, weekly, grouped; npm majors and `@playwright/test`
     ignored, since Playwright moves with the visual-regression container)
@@ -883,7 +1029,13 @@ Still open, on purpose:
     default labels used to arrive as four `labeled` events whose skipped and
     cancelled runs buried the one that checked the code, and a dependency bump
     is the change most likely to break the running game. Workflows run with `contents: read`; only the job that pushes
-    recorded baselines may write. Concurrency groups cancel superseded pull
+    recorded baselines may write to the repository, and the two jobs that file
+    an issue (Full Coverage's and Migration Drift's `report`) hold
+    `issues: write` and run no project code. Full Coverage's report counts a
+    cancelled job as a failure on the schedule, names the ref and the event,
+    and closes its issue when a run on the default branch is green again. The
+    steps every project job shares (Node, `npm ci`, the Playwright browsers)
+    are one composite action, `.github/actions/setup`. Concurrency groups cancel superseded pull
     request runs, never a push to main, and never a deploy. The `supabase` CLI
     is a pinned devDependency, so `npx supabase` runs that version.
 83. Keys: 1-9 stake a card, Space or W pushes, E locks focus, Q cycles the
@@ -897,7 +1049,11 @@ Still open, on purpose:
     and cash. On the result screen `R` replays the case after asking and `N`
     opens the next one. Escape closes the ranking and the board from anywhere.
     With letter keys turned off (priority 87), 1-9, W, E, Q, P, R and N do
-    nothing, and Space, Enter and Escape stay.
+    nothing, and Space, Enter and Escape stay. What the screen says about a
+    key follows the same setting: the digit on a card, the `R` and `N` chips,
+    the hint line over the hand and every `aria-keyshortcuts` come from
+    `useShortcutHints` (`src/state/accessibilitySettings.js`), so a key that
+    does nothing is not advertised.
 84. The facts about the loan have one home, `docs/canon.md`: 대출번호
     2023-0412, the committee's and the approval's dates, the minute the dissent
     was returned, the ratios, the floors, the borrower's staff. Fifty-five
@@ -913,13 +1069,19 @@ Still open, on purpose:
     repair and validate pipeline. Adding a field the validator requires means
     adding the fixture for the build before it first. A save this build cannot
     read is not deleted: it is kept under `critical-point-unreadable-save-v1`
-    (`backUpUnreadableSave`) so a later build can restore it.
+    (`backUpUnreadableSave`) so a later build can restore it. A key a save
+    never wrote is filled in without calling it a repair -- a new trigger or
+    cognition label used to mark every existing save "repaired" -- and a
+    top-level scalar of the wrong type is put right quietly
+    (`normalizeSavedScalars`; `dataConsent` is on only when it is `true`).
+    A field removed from the save (priority 43) is simply not read.
 86. A missing chunk is answered with a reload, never charged to the save. A
     deploy replaces the hashed files, so a tab left open across one asks for a
     name that is gone. `src/state/chunkReload.js` reloads once by itself (at
     most once a minute, marked in `critical-point-chunk-reload-v1`), and on a
     second failure `LazyScreen` shows a panel with 새로고침; nothing is recorded
-    against the run. Every lazy import goes through `loadedChunk`, because an
+    against the run. With no connection it does not reload: the panel offers a
+    retry, and the service worker (priority 89) answers what it has kept. Every lazy import goes through `loadedChunk`, because an
     import the preload handler took resolves to `undefined` instead of
     throwing, and that must read as a `ChunkLoadError`, not a crash.
 87. Comfort settings live on the intro, in a folded drawer of the setup
@@ -934,11 +1096,14 @@ Still open, on purpose:
       `assistTime`, a case summary the slowest of its decisions and the
       finale the slowest of the season, and a ranking row shows "테이블 시간
       ×1.5" once `20260929050000_ranking_assist_time.sql` is applied; until
-      then the server drops the key and the row shows no mark.
+      then the server drops the key and the row shows no mark. The window
+      keeps the slowest scale it was played at, through a suspension, so
+      leaving a slowed table and coming back at x1 does not shed the mark.
     - The reading clock starts held (priority 51).
     - Calm effects: no shake, the flash and the vignette turned down, the bust
       without its full-screen flashes, whatever the OS says.
-    - Letter keys off: 1-9, W, E, Q, P, R, N do nothing (WCAG 2.1.4).
+    - Letter keys off: 1-9, W, E, Q, P, R, N do nothing, and nothing on screen
+      names them (WCAG 2.1.4; priority 83).
     - A still intro: ticker, drifting art and wordmark glitch stop (WCAG 2.2.2).
     CSS answers two of them through attributes on `<html>`,
     `data-calm-effects` and `data-still-intro`, set in `main.jsx` before the
@@ -950,7 +1115,7 @@ Still open, on purpose:
     `src/seasonRuntime.js`, with the index every case needs: orders, openings,
     memory-card plans, each case's fork, the people, the pack fields
     `gameLogic.js` reads) and one `virtual:season-case/<caseId>` chunk per
-    case (its scenes, replies and voice lines, 15-19KB gzip). In the app build
+    case (its scenes, replies and voice lines, 15-20KB gzip, 사건 01 24KB). In the app build
     only, imports of `gameData.js` and `gameDialogue.js` are swapped for
     `src/runtime/*.app.js`, which answer the same names from the store;
     GameRuntime went from 3.26MB / 960KB gzip to 525KB / 169KB. The rules
@@ -960,11 +1125,20 @@ Still open, on purpose:
     table by table and rule by rule.
     - The store's tables are the same objects, filled as cases arrive, so a
       reader stays synchronous. Only code that opens a case waits for it.
-    - `src/state/caseArrival.js` decides the waiting. A first visit mounts once
+    - `src/state/caseArrival.js` decides the waiting, on the answer of
+      `src/state/savedRunScope.js`. A first start mounts once
       `SEASON_ENTRY_CASE` has arrived and fetches the rest behind the table. A
-      device holding any save waits for every case: repairing a save reads the
-      scenes of every case it closed, and a repair that could not find them
-      would rewrite what it read. A page opened from a replay link waits for
+      device whose storage can name a scene anywhere in the season waits for
+      every case: a save whose run has left the first case or holds a log, a
+      save that will not read, recovery slots or a kept copy of a save.
+      Repairing a save reads the scenes of every case it closed, and a repair
+      that could not find them would rewrite what it read. The question is
+      what the save holds, not whether there is one: the shell writes the new
+      save before it mounts the runtime, so "is there a save" was true for
+      every first start, all fifty-five files were waited for, and one failed
+      file blocked the first table (fixed 2026-10-06). While it waits the
+      loading screen counts the cases in and offers `다시 불러오기`. A page
+      opened from a replay link waits for
       every case too, and reads the link at the runtime's first render, not
       at import, since the scenes it names are checked against the season.
       `startCase` and the debug start go through
@@ -978,7 +1152,44 @@ Still open, on purpose:
     - In the dev server a change under `src/nodes/` or to the modules the
       season is built from drops the built data and reloads the page.
     - `check:bundle` holds GameRuntime at 551,000 / 176,100 bytes and every
-      case chunk to one budget, 84,000 / 20,200 (case01 is the largest).
+      case chunk to one budget, 98,900 / 25,400 (case01 is the largest;
+      priority 81 says why it rose).
+89. A copy that was opened once opens again with no connection. The build
+    writes `/sw.js` (`serviceWorker()` in `vite.config.js`,
+    `scripts/service-worker-build.mjs`; the code is
+    `src/serviceWorker/worker.js`) and a release registers it after `load`
+    (`src/serviceWorker/register.js`).
+    - Four rules, by what is asked for. The page: network first, the kept
+      copy only when the network fails or says nothing for three seconds --
+      a player with a connection is never held on an old release. `/assets/*`:
+      kept first, since a hashed name never changes its file. Root images,
+      icons and the manifest: the kept copy now, a fresh one behind it.
+      Another origin, a non-GET and `/sw.js` itself: untouched.
+    - A chunk request is never answered with the page. A tab left open across
+      a deploy has to fail as before, because that failure is what priority 86
+      turns into a reload. Offline it fails too, and `LazyScreen` shows
+      "연결이 끊겼습니다 · 다시 시도" instead.
+    - One cache per release (`critical-point-<release>`); the release is the
+      commit on Render and a hash of the built page elsewhere. Install keeps
+      every file the built page names and fails if one is missing or if the
+      page it fetched is not this release's. Activation deletes the other
+      releases' caches.
+    - The rest of the release -- the cases, the lazy screens, the portraits
+      and the art at 960px -- is fetched when the page asks, which it does
+      once the first case has arrived and the device is idle, not offline and
+      not saving data. Offline, an image asked for at a size that is not kept
+      is answered with the size that is.
+    - The e2e build registers the worker only for `?sw=1`, so the suite and
+      its network guard run without one; `tests/offline.spec.js` (@prod) is
+      the spec that turns it on. `SERVICE_WORKER=off` at build time is the
+      kill switch: the page stops registering and `sw.js` becomes a worker
+      that deletes its caches and unregisters.
+    - New code that the intro needs before any network must be reachable from
+      what `index.html` names, or it is not in the precache; new root files
+      the game draws offline belong in `WARM_ROOT`
+      (`scripts/service-worker-build.mjs`).
+    - Not verified: iOS Safari and an installed copy on a phone. The checks
+      run Chromium only; Playwright WebKit skips the offline spec.
 
 ## Verification Commands
 
@@ -1015,13 +1226,14 @@ own floor in `scripts/coverage-floors.json`, and lists the modules no test
 loads. Every test process writes its own coverage record, so the records are
 merged line by line, function by function and branch by branch; keeping the
 last one made a module's number depend on which process finished last. The
-merged totals are held at 84% of lines, 82% of functions and 73% of branches:
+merged totals are held at 88% of lines, 87% of functions and 76% of branches:
 the branch floor was lowered from 83 to 72 once, only because the union counts
 branches that only some processes report, and has risen since. Every floor is
 a ratchet: `--update` rewrites the file from the measurement and refuses to
 lower anything without `--allow-lower`.
 
-`npm run verify:quick` adds `check:specs` (every spec file loads), the
+`npm run verify:quick` adds `check:specs` (every spec file loads, and some
+tier's list in `scripts/run-e2e.mjs` runs it), the
 production build in e2e mode (`build:e2e`), `check:bundle`,
 `check:deploy:offline`, `test:runtime` (the runtime smoke against `vite preview` of `dist/`), `test:e2e:preview` (the
 `@prod` specs against the same build) and `test:performance`. The dev-mode
@@ -1065,6 +1277,17 @@ and needs `npx supabase db push --include-all`. That migration gives the live
 `playtest_feedback` table the `feedback` column the client sends and gives
 only `submitted_at` a default.
 
+The 2026-10-06 migrations are two, and neither changes what a client sends or
+reads, so the order against the client does not bind them:
+`20261006000000_telemetry_address_byte_budget.sql` (32 MB of telemetry a day
+for one address, `telemetry_address_daily_bytes`, charged by a trigger of its
+own after the validator -- one address at the row cap could spend everyone's
+200 MB in under an hour) and `20261006010000_cloud_code_ceiling.sql` (new
+cloud-save codes a day for everyone, 300 -> 1,000, `cloud_daily_new_codes`;
+it rewrites the one literal in the stored `put_cloud_save` and stops if the
+literal is not there). After pushing, Migration Drift's next run closes the
+issue it opened while the files were merged and not yet pushed.
+
 Manual steps after pushing the 2026-09-28 migrations:
 
 - Verify the rate-limit key: a request that sends its own `cf-connecting-ip`
@@ -1076,3 +1299,102 @@ Manual steps after pushing the 2026-09-28 migrations:
   governs the local stack.
 - Expect the public ranking to be empty: season rows the new rules would refuse
   were deleted.
+
+## Audit of 2026-10-06
+
+Four readers went through the repository as it stood at `c68967d` -- the
+table's logic and state, the screens and stylesheets, the tooling and backend,
+and the case text -- and what they found was fixed in one pass. The rules
+that came out of it are in the priorities above; this is the record of what
+was done and what was looked at and left.
+
+Fixed, by area:
+
+- **Logic and state.** A first start waits for one case (88). A restore waits
+  for the season (36). Case and season rows are queued before they are sent
+  (61). A case records the card it followed (12). A chunk that fails with no
+  connection asks again instead of reloading (86). Withdrawn consent stays
+  withdrawn (61). Starting over asks first (36). A second tab is not a second
+  device (59). A console line no longer rewrites the save (57). Practice does
+  not lean the season in, and a window keeps its own clock record (39, 87).
+  Slots are taken at places worth returning to (36). A missing key is not a
+  repair, and scalars are held to their type (85). Five dead save fields and
+  the copy that promised what they did not do are gone (43). The run has one
+  definition (1), and `GameRuntime.jsx` went from 1,247 lines and 120 imported
+  names to 964 and 104.
+- **Screens.** The header no longer reserves dead room (27). Focus follows the
+  page, and messages are announced (4). Type is in rem; field borders hold
+  3:1; text fields are 16px (6). Shortcut hints follow the setting (83). A
+  phone on its side has a table (27). Wide screens take the art at their own
+  width (15). The cloud panel's successes are not alerts. `ScenePlate.jsx` is
+  one file a room, proved byte-identical over all 1,129 scenes. `시즌 처음부터
+  다시` is told apart from the two per-case retries.
+- **A service worker** (89).
+- **Tooling and backend.** Every spec runs in some tier, and `check:specs`
+  fails on one that does not; two files, fourteen tests, had run nowhere.
+  WebKit gets a pass for `@layout` (17). A hand-run deploy passes the gate, and
+  there is a rollback path (66). The scheduled runs report what happened (82).
+  Visual regression compares on the pull requests that can change a picture
+  (19). One address cannot spend everyone's telemetry day, and the ceiling on
+  new cloud codes is 1,000 (80). `check:grants` holds definer functions to a
+  pinned `search_path` and views to `security_invoker`. `check:deploy` asks
+  which backend the release was built for and whether the worker is this
+  release's. `raise:gains` lists unless told to write (13). Migration Drift.
+- **Case text.** Twenty-five numbered findings: closings and evidence scenes
+  that were false on a route that skipped the middle (사건 01, 04, 08, 12, 23,
+  33, 38, 45, the finale), dates that disagreed with the calendar (사건 23's
+  "3주", 사건 33's 6월 30일), thirteen cards whose numbers contradicted their
+  labels (a card that waits no longer buys time). Seventy-two first mentions
+  in 35 files now introduce the person or thing a skipped scene had set up.
+  Ninety generated cards name their way of thinking (12). 사건 01-07 and the
+  finale were written at the season's length and then read in story order,
+  which changed 85 more places: 임경수 has kept the paper three years, not
+  four; 오진우's "30년" lost its number; the finale opens at eleven at night;
+  사건 01 names the CFO, 배성준, once.
+
+Looked at and left, on purpose or for the owner:
+
+- 사건 07's evidence scene (`src/nodes/case07.js`, the `c7_evidence_turn`
+  body and memo) now dates the posting order to the day after the analyst
+  asked where 온새's repayment terms came from; it had said the dispatch
+  failure's budget ceiling, which the order's own date (twelve days before the
+  inquiry opened) puts a week before that failure happened. This changes
+  which question caused the posting, and waits for the owner's word.
+- 사건 49 says "내일 밤 아홉 시 33층"; the finale's clocks start in B2 at 23:30
+  and reach the 33rd floor at 00:40.
+- 사건 07's 강서지점 has four people at the counter (the number is in a card
+  label) and 프롤로그 04 has six; the papers there are loan applications in one
+  and a trust product in the other.
+- A hidden route's clock is fixed at an early hour of its case, so entered
+  late the time runs backwards. 사건 13, 23 and 33 do the same; it reads as a
+  convention.
+- 사건 01: "협상서는 양쪽 서명을 받았습니다" is followed by a closing scene that
+  treats the sale as still open.
+- 한서윤 speaks 해요체 in 사건 01-05 and 합니다체 from 사건 06; 반재욱 says
+  "저는" in 01-05 and "나는" from 06. Later cases are split the same way.
+- The finale's "마흔아홉 사건과 1년" beside "3년" elsewhere; 사건 06's
+  "사직서는 아직 수리되지 않았습니다" beside a memo that says none was handed in.
+- A replayed case replaces that case's story summary. That is the design
+  (priority 39), not an oversight.
+- Outcomes that finding "a case records the card it followed" got wrong
+  before the fix are not repaired in saves already written.
+- The service worker has not been run on iOS Safari or in an installed copy on
+  a phone, and Playwright WebKit skips the offline spec.
+- 다시 시도 on the offline panel, pressed after the connection returns, ends
+  in the one automatic reload in Chromium instead of opening the screen in
+  place: a failed dynamic import is remembered by the document.
+- The shell's `createStartSave` (`AppContent.jsx`) is still its own list of
+  the run's fields (priority 1).
+- A debug jump keeps `discoveredClues`, `caseResults` and `playtestFeedback`
+  from the run it left; a jump does not close the recovery centre or clear the
+  stale-tab lock. Kept as they were and written on the rows of `RUN_FIELDS`.
+- Not done: manifest `screenshots` (no suitable image exists), smaller icon
+  PNGs (`build:icons` writes lossless files), one breakpoint for the five
+  near 720px (each guards a different component), `install-deps` skipped on a
+  browser-cache hit (the runner image's libraries are not known to be there).
+- Needs a hand outside the repository: the four header rules in the Render
+  dashboard (priority 66), the `SUPABASE_ACCESS_TOKEN` secret for Migration
+  Drift, a ruleset on `main` (it has no branch protection), and `db push` of
+  the two migrations.
+- Not read: the opening variants against the second scene in the 43 cases the
+  content audit only swept, and speech levels season-wide.

@@ -28,7 +28,10 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *   1. Rules that hold for any table, so a new one cannot slip through: RLS is
  *      on, service_role can read and write it, and every policy aimed at anon
  *      or authenticated has the privilege it filters -- a policy without its
- *      grant is never consulted, which is exactly the bug above.
+ *      grant is never consulted, which is exactly the bug above. And for any
+ *      function and any view: no function is an RPC unless it is listed, a
+ *      SECURITY DEFINER function pins its search_path, and a view reads as
+ *      the role asking (`security_invoker`).
  *   2. The contract the client actually relies on, by running it as anon with
  *      the payloads the client actually builds, inserted the way PostgREST
  *      inserts them (only the keys present, `on conflict (event_id) do
@@ -178,6 +181,53 @@ const CLIENT_FUNCTIONS = {
   for (const name of CLIENT_FUNCTIONS.anon) {
     const overloads = rows.filter((fn) => fn.name === name).length;
     if (overloads !== 1) failures.push(`public.${name} has ${overloads} overloads; PostgREST needs exactly one to resolve a call by argument names.`);
+  }
+}
+
+// A SECURITY DEFINER function runs as its owner, with the owner's rights, and
+// resolves every unqualified name through the caller's search_path unless it
+// pins one of its own: a caller who can create a `public.now()`-shaped object
+// in a schema ahead of `public` would have it run as the owner. Every definer
+// function here pins `search_path`; this is the rule, so the next one cannot
+// be written without it. An empty setting (`set search_path = ''`) pins it too.
+{
+  const { rows } = await db.query(`
+    select p.proname as name, pg_get_function_identity_arguments(p.oid) as args,
+           coalesce(p.proconfig, '{}') as config
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.prosecdef
+    order by 1, 2
+  `);
+  if (rows.length === 0) failures.push("no SECURITY DEFINER function was found in public; the search_path rule checked nothing.");
+  for (const fn of rows) {
+    if (!fn.config.some((setting) => /^search_path=/i.test(setting))) {
+      failures.push(
+        `public.${fn.name}(${fn.args}) is SECURITY DEFINER and does not pin search_path. ` +
+          "Add `set search_path = public` to its definition.",
+      );
+    }
+  }
+}
+
+// A view runs as its owner unless it says otherwise, so a plain view over a
+// table reads past that table's RLS and past the column grants anon was given:
+// whatever the view selects is public. `security_invoker = true` makes it read
+// as the role asking. Both views here set it; this holds the next one to it.
+{
+  const { rows } = await db.query(`
+    select c.relname as name, coalesce(c.reloptions, '{}') as options
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relkind in ('v', 'm')
+    order by 1
+  `);
+  if (rows.length === 0) failures.push("no view was found in public; the security_invoker rule checked nothing.");
+  for (const view of rows) {
+    if (!view.options.some((option) => /^security_invoker=(true|on|1)$/i.test(option))) {
+      failures.push(
+        `public.${view.name} is a view without security_invoker, so it reads as its owner and bypasses RLS. ` +
+          `Create it \`with (security_invoker = true)\`.`,
+      );
+    }
   }
 }
 
@@ -551,6 +601,33 @@ withHeaders({ "x-forwarded-for": "198.51.100.71" });
   await db.query(`delete from public.private_settings where name = 'telemetry_daily_bytes'`);
   await post("write telemetry under the default daily ceiling", "app_error_logs", errorPayload(sessionId(9)));
 }
+withHeaders({ "x-forwarded-for": "198.51.100.72" });
+{
+  // One address: a day's bytes of its own, 32 MB, below everyone's 200 MB
+  // (20261006000000). The counter is set one byte short of the limit, so the
+  // next row, whatever its size, is the one that goes over.
+  const address = await writerKey("198.51.100.72");
+  const everyone = async () => (await one(`select request_count as n from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`))?.n ?? 0;
+  await post("write telemetry from an address under its daily bytes", "app_error_logs", errorPayload(sessionId(40)));
+  const charged = (await one(`select request_count as n from public.telemetry_rate_limits where actor_key = $1`, [`tele-bytes-ip:${address}`]))?.n ?? 0;
+  check(charged > 200 && charged < 196608, `a telemetry row charged its address ${charged} bytes; expected the size of the row.`);
+  await presetCounter(`tele-bytes-ip:${address}`, 33554432 - 1);
+  const before = await everyone();
+  await postRefused("write telemetry past an address's daily bytes", "app_error_logs", errorPayload(sessionId(40)), /^PT429 .*address daily budget/);
+  await postRefused("write a case row past an address's daily bytes", "playtest_sessions", casePayload({ session: sessionId(41), runId: "run-bytes-1", caseId: "case01" }), /^PT429 .*address daily budget/);
+  await postRefused("write feedback past an address's daily bytes", "playtest_feedback", feedbackPayload(sessionId(41)), /^PT429 .*address daily budget/);
+  // The refusal rolls back what the same insert charged everyone: an address
+  // at its limit does not spend the day's ceiling for the others.
+  check((await everyone()) === before, "a row refused for its address's bytes was still charged to the global daily ceiling.");
+  // The owner's number wins over the default, in either direction.
+  await db.query(`insert into public.private_settings (name, value) values ('telemetry_address_daily_bytes', '67108864')
+                  on conflict (name) do update set value = excluded.value`);
+  await post("write telemetry under a raised address budget", "app_error_logs", errorPayload(sessionId(40)));
+  await db.query(`delete from public.private_settings where name = 'telemetry_address_daily_bytes'`);
+}
+withHeaders({ "x-forwarded-for": "198.51.100.73" });
+// Another address is not held by the first one's counter.
+await post("write telemetry from a second address while the first is at its limit", "app_error_logs", errorPayload(sessionId(42)));
 withHeaders(null);
 
 // Sizes, at the caps the measured payloads set (20260929010000). The largest
@@ -898,6 +975,14 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start a code past the daily ceiling", "VVVVVVVV2345", cloudPayload("ceiling"), /^PT429 .*code limit/);
   await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
   await putCloud("start a code under the default ceiling", "VVVVVVVV2345");
+  // The default itself: 1,000 a day (20261006010000), driven from one short.
+  // Each new code needs an address of its own, since an address starts five.
+  await presetCounter("global:cloud-new", 999);
+  await putCloud("start the day's 1,000th code", "WWWWWWWW2345");
+  withHeaders({ "x-forwarded-for": "198.51.100.63" });
+  await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
+  await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
+  await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
 }
 withHeaders(null);
 

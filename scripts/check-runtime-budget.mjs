@@ -61,9 +61,12 @@ const BUDGETS = {
   // (`src/nodes/casePacks.js`), so 사건 12 moved out and 13-24 never came in;
   // the file shrank and lost the case12 import but took the pack list and
   // `characterProfiles`, which the packs merge into.
+  // 3600 / 21 -> 560 / 7 on 2026-10-06: ratcheted to what it measures (534 / 7).
+  // Every case is a pack now, the finale included, and the file is the graph
+  // build and nothing a case wrote; the old number had 3,000 lines of room.
   "src/gameData.js": {
-    lines: 3600,
-    importedNames: 21,
+    lines: 560,
+    importedNames: 7,
     hooks: {},
   },
   // gameLogic read 1240 / 17 until 2026-09-11, when `getEndingVariant` started
@@ -81,8 +84,11 @@ const BUDGETS = {
   // 1395 -> 1420 on 2026-09-18: 사건 10's hidden clue, its three outcomes, their
   // carryover and its continuity challenge. Four table rows per case, as before.
   // 1420 -> 1460 on 2026-09-21 for 사건 11 and 12, the same four rows each.
+  // 1460 -> 1260 on 2026-10-06: ratcheted to what it measures (1229). The
+  // case rows above live on the packs, and the rules that read the season's
+  // tables are `seasonRules.js`.
   "src/gameLogic.js": {
-    lines: 1460,
+    lines: 1260,
     importedNames: 18,
     hooks: {},
   },
@@ -121,10 +127,16 @@ const BUDGETS = {
   // `useResultReport`; the reset's key list is `runStorageReset`; and the page
   // lifecycle is one handler in `useWindowSuspension`. Measured 1281 / 116 and
   // 23 / 9 / 6 / 6.
+  // 1300 / 120 -> 980 / 104 on 2026-10-06, and useState 23 -> 10. The run is
+  // one piece of state with one definition (`state/runState.js`), not nineteen
+  // `useState` calls in a hook and ten more here; starting, opening, jumping
+  // and wiping it are events in `state/runLifecycle.js`, not four lists of
+  // setters with a save payload typed out beside each. Measured 964 / 104 and
+  // 10 / 7 / 5 / 7.
   "src/GameRuntime.jsx": {
-    lines: 1300,
-    importedNames: 120,
-    hooks: { useState: 23, useMemo: 10, useEffect: 7, useRef: 7 },
+    lines: 980,
+    importedNames: 104,
+    hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
   // label rather than its position, because the 프롤로그 sits in front of
@@ -151,8 +163,10 @@ const BUDGETS = {
   },
   // The table. 1068 lines until 2026-09-27, when its keyboard handler moved to
   // `useTableKeys` and its forecast derivations to `tableReadout`. Measured 917.
+  // 930 -> 830 on 2026-10-06: ratcheted to what it measures (809); the hand,
+  // the notices and the timing had moved out since.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 930,
+    lines: 830,
     importedNames: 68,
     hooks: {},
   },
@@ -161,7 +175,10 @@ const BUDGETS = {
 // One flat bag per screen is how the runtime hands a screen its data, and each
 // field is a value the runtime had to derive. The play screen's is the one that
 // grew, to 153 fields across six groups, before the gauntlet cut it to 40.
-const VIEW_FIELD_BUDGETS = { intro: 82, play: 44, result: 112 };
+// 82 / 44 / 112 -> 80 / 28 / 110 on 2026-10-06: ratcheted to what they measure
+// (79 / 27 / 108). The play view lost the seventeen callbacks and renderers it
+// carried as a second copy of `actions` and `renderers`.
+const VIEW_FIELD_BUDGETS = { intro: 80, play: 28, result: 110 };
 
 function analyze(relative) {
   const source = readFileSync(path.join(root, relative), "utf8");

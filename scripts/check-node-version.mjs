@@ -59,6 +59,61 @@ if (workflowFiles.length === 0 && !failures.length) {
 const isSetupNode = (step) => typeof step?.uses === "string" && /^actions\/setup-node@/.test(step.uses);
 const runsNode = (step) => typeof step?.run === "string" && /\b(npm|npx|node)\b/.test(step.run);
 
+/** What is wrong with one setup-node step, said for the place it was found in. */
+function setupNodeFailures(step, where) {
+  const found = [];
+  const inline = step.with?.["node-version"];
+  if (inline !== undefined) {
+    found.push(
+      `${where} names Node inline as \`node-version: ${inline}\`. ` +
+        `Use \`node-version-file: ${PIN_FILE}\` so CI and the Render build cannot disagree.`,
+    );
+  }
+  const fromFile = step.with?.["node-version-file"];
+  if (fromFile !== PIN_FILE) {
+    found.push(
+      fromFile
+        ? `${where} reads Node from ${fromFile}; ${PIN_FILE} is the one the Render build reads.`
+        : `${where} has a setup-node step that does not read ${PIN_FILE}. Every one of them has to.`,
+    );
+  }
+  return found;
+}
+
+/**
+ * The jobs that run the project share one composite action
+ * (.github/actions/setup), and the setup-node step lives there, not in the
+ * job. A `uses: ./.github/actions/<name>` step counts as the job's setup-node
+ * when that action has one, and the action's own steps are held to the same
+ * rules as a job's: without this the pin could be dropped from the one place
+ * six jobs take it from, and every job would look as if it had never needed
+ * one.
+ */
+const localActions = new Map();
+function localActionSetsUpNode(uses) {
+  if (typeof uses !== "string" || !uses.startsWith("./")) return false;
+  if (!localActions.has(uses)) {
+    const rel = `${uses.slice(2).replace(/\/$/, "")}/action.yml`;
+    let setsUp = false;
+    try {
+      const action = parseYaml(readFileSync(path.join(root, rel), "utf8"));
+      const steps = Array.isArray(action?.runs?.steps) ? action.runs.steps : [];
+      for (const step of steps.filter(isSetupNode)) failures.push(...setupNodeFailures(step, rel));
+      const firstNode = steps.findIndex(runsNode);
+      const firstSetup = steps.findIndex(isSetupNode);
+      if (firstNode !== -1 && (firstSetup === -1 || firstSetup > firstNode)) {
+        failures.push(`${rel} runs npm ${firstSetup === -1 ? "with no setup-node step" : "before its setup-node step"}.`);
+      }
+      setsUp = firstSetup !== -1;
+    } catch (error) {
+      failures.push(`${rel} could not be read: ${String(error.message).split("\n")[0]}`);
+    }
+    localActions.set(uses, setsUp);
+  }
+  return localActions.get(uses);
+}
+const setsUpNode = (step) => isSetupNode(step) || localActionSetsUpNode(step?.uses);
+
 for (const file of workflowFiles) {
   const rel = `.github/workflows/${file}`;
   let workflow;
@@ -71,25 +126,9 @@ for (const file of workflowFiles) {
   for (const [jobName, job] of Object.entries(workflow?.jobs ?? {})) {
     // A job that calls a reusable workflow has no steps of its own.
     const steps = Array.isArray(job?.steps) ? job.steps : [];
-    for (const step of steps.filter(isSetupNode)) {
-      const inline = step.with?.["node-version"];
-      if (inline !== undefined) {
-        failures.push(
-          `${rel} job \`${jobName}\` names Node inline as \`node-version: ${inline}\`. ` +
-            `Use \`node-version-file: ${PIN_FILE}\` so CI and the Render build cannot disagree.`,
-        );
-      }
-      const fromFile = step.with?.["node-version-file"];
-      if (fromFile !== PIN_FILE) {
-        failures.push(
-          fromFile
-            ? `${rel} job \`${jobName}\` reads Node from ${fromFile}; ${PIN_FILE} is the one the Render build reads.`
-            : `${rel} job \`${jobName}\` has a setup-node step that does not read ${PIN_FILE}. Every one of them has to.`,
-        );
-      }
-    }
+    for (const step of steps.filter(isSetupNode)) failures.push(...setupNodeFailures(step, `${rel} job \`${jobName}\``));
     const firstNode = steps.findIndex(runsNode);
-    const firstSetup = steps.findIndex(isSetupNode);
+    const firstSetup = steps.findIndex(setsUpNode);
     if (firstNode !== -1 && (firstSetup === -1 || firstSetup > firstNode)) {
       failures.push(
         `${rel} job \`${jobName}\` runs npm ${firstSetup === -1 ? "with no setup-node step" : "before its setup-node step"}, ` +

@@ -1,10 +1,13 @@
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { leafRuleTexts, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
+import { buildKillSource, buildWorkerSource, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
+import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -245,8 +248,50 @@ function renderHeaders() {
   };
 }
 
+/**
+ * Writes `/sw.js`, the service worker (src/serviceWorker/worker.js says what
+ * it does; scripts/service-worker-build.mjs how the file is put together).
+ *
+ * After the bundle is on disk, because what the worker keeps is read off the
+ * finished page: the files `index.html` names once every other plugin here has
+ * had its turn with it, and the commit `buildShaMeta` wrote into it. The name
+ * has no hash -- a browser asks for a worker by one fixed address -- so
+ * render.yaml serves it `no-cache`, like the page.
+ *
+ * `SERVICE_WORKER=off` is the kill switch: the build writes a worker that
+ * removes itself and its caches, and the page stops registering one
+ * (`serviceWorkerSetting` below). The README's 오프라인 section says when.
+ */
+const serviceWorkerKilled = () => (process.env.SERVICE_WORKER || "").trim().toLowerCase() === "off";
+
+function serviceWorker() {
+  return {
+    name: "service-worker",
+    apply: "build",
+    writeBundle(options, bundle) {
+      const outDir = options.dir ?? "dist";
+      const target = path.join(outDir, WORKER_FILE);
+      if (serviceWorkerKilled()) {
+        writeFileSync(target, buildKillSource(CACHE_PREFIX));
+        return;
+      }
+      const html = readFileSync(path.join(outDir, "index.html"), "utf8");
+      // The bundle's own files, and what `public/` put at the root.
+      const files = [...Object.keys(bundle), ...readdirSync(outDir)].map((file) => `/${file.replace(WINDOWS_SEPARATOR, "/")}`);
+      const config = workerConfigFor({ sha: process.env.RENDER_GIT_COMMIT, html, files: [...new Set(files)] });
+      writeFileSync(target, buildWorkerSource(readFileSync("src/serviceWorker/worker.js", "utf8"), config));
+    },
+  };
+}
+
+/** What the page is told about registering (src/serviceWorker/register.js). */
+function serviceWorkerSetting(command, mode) {
+  if (command !== "build" || serviceWorkerKilled()) return "off";
+  return mode === "e2e" ? "ask" : "on";
+}
+
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), renderHeaders()],
+  plugins: [seasonData(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which
@@ -257,6 +302,7 @@ export default defineConfig(({ command, mode }) => ({
     __CP_DEBUG_BUILD__: JSON.stringify(
       command === "serve" || loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_DEBUG_TOOLS === "true",
     ),
+    __CP_SERVICE_WORKER__: JSON.stringify(serviceWorkerSetting(command, mode)),
   },
   // The dev server compiles a module the first time it is asked for. Fifty
   // cases are fifty large data modules, and compiling them on the first scene

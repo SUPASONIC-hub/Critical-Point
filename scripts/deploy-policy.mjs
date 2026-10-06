@@ -193,6 +193,89 @@ export function firstAssetPath(html) {
 }
 
 /**
+ * The scene art, the portraits and the key visual are served from the root
+ * under names that do not change when the picture does (`public/`, not
+ * `assets/`). So they are neither of the two cases above: kept for a year, a
+ * replaced picture would never arrive; asked about on every visit -- which is
+ * what the host's default of `max-age=0` does -- thirty-odd images are
+ * thirty-odd round trips before a returning player sees the first scene. A day
+ * is the middle: at least an hour, at most thirty days, and never `immutable`.
+ */
+export function rootImageCacheProblems(value) {
+  const text = String(value ?? "").toLowerCase();
+  const browser = maxAge(text, "max-age");
+  const problems = [];
+  if (browser === null || browser < 3600) {
+    problems.push(`an image served from the root is kept for ${browser ?? 0}s (${value || "no Cache-Control"}), so it is asked about again on every visit; serve max-age=86400`);
+  } else if (browser > 2592000) {
+    problems.push(`an image served from the root is kept for ${browser}s (${value}); its name does not change with its content, so a replaced picture would not arrive`);
+  }
+  if (/\bimmutable\b/.test(text)) problems.push(`an image served from the root is marked immutable (${value}), and its name does not change with its content`);
+  return problems;
+}
+
+/**
+ * `/sw.js` is asked for by one fixed name and says which release a device
+ * keeps, so it is held to what the page is: asked for again every time. A
+ * browser does that for a worker on its own; a cache in front of the site
+ * does not, and one that keeps the file for five minutes has devices
+ * installing the release before this one for five minutes after a deploy.
+ */
+export const WORKER_PATH = "/sw.js";
+
+export function workerCacheProblems(value) {
+  return shellCacheProblems(value).map((problem) => problem.replace(/^the page\b/, "the service worker"));
+}
+
+/** The rules render.yaml declares that policy under: the two formats in `public/`, and the icons. */
+export const ROOT_IMAGE_PATHS = ["/*.webp", "/*.jpg", "/icons/*"];
+
+/** The first image the page names at the root, as a path: `/triggerlab-key-visual-480.webp`. */
+export function firstRootImagePath(html) {
+  const match = /["'\s,](\/[A-Za-z0-9._-]+\.(?:webp|jpe?g))(?=["'\s,?#])/i.exec(String(html ?? ""));
+  return match ? match[1] : null;
+}
+
+/** The script the page starts from, as a path: `/assets/index-abc123.js`. */
+export function entryScriptPath(html) {
+  for (const match of String(html ?? "").matchAll(/<script\b([^>]*)>/gi)) {
+    if (!/\btype\s*=\s*["']?module/i.test(match[1])) continue;
+    const src = /\bsrc\s*=\s*["'](?:https?:\/\/[^"'/]+)?(\/[^"'?#]+\.js)["']/i.exec(match[1])?.[1];
+    if (src) return src;
+  }
+  return null;
+}
+
+/**
+ * Was this release built with the backend it is allowed to talk to?
+ *
+ * The build reads `VITE_SUPABASE_URL` from the host's environment and writes
+ * it into the entry script; when the variable is missing the app runs with
+ * telemetry, the ranking, the board and online save switched off and says
+ * nothing (render.yaml, `envVars`). Every header is then still correct, so a
+ * service rebuilt without its keys passed this check with half the game gone.
+ *
+ * The page's own `connect-src` names the origin the app may call, so the
+ * script has to contain it. A wildcard host (`https://*.supabase.co`, which
+ * is all render.yaml can say) is matched as a pattern.
+ */
+export function backendOriginProblems(script, cspValue) {
+  const origins = (parseCsp(cspValue).get("connect-src") ?? []).filter((source) => /^https:\/\/[^/]+$/i.test(source));
+  if (origins.length === 0) return ["connect-src names no backend origin, so there is nothing to look for in the entry script"];
+  const text = String(script ?? "");
+  const named = origins.some((origin) => {
+    const pattern = origin.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[A-Za-z0-9-]+");
+    return new RegExp(pattern, "i").test(text);
+  });
+  return named
+    ? []
+    : [
+        `the entry script names none of the origins connect-src allows (${origins.join(", ")}): the release was built without VITE_SUPABASE_URL, ` +
+          "or for another project, so telemetry, the ranking, the board and online save are off",
+      ];
+}
+
+/**
  * What `render.yaml` has to declare, so the written record and the checks
  * agree on what the dashboard is meant to be set to.
  */
@@ -203,6 +286,10 @@ export function renderYamlHeaderProblems(yaml) {
   for (const path of ["/", "/index.html"]) {
     problems.push(...shellCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
   }
+  problems.push(...workerCacheProblems(find(WORKER_PATH, "cache-control")).map((problem) => `${WORKER_PATH}: ${problem}`));
   problems.push(...assetCacheProblems(find("/assets/*", "cache-control")).map((problem) => `/assets/*: ${problem}`));
+  for (const path of ROOT_IMAGE_PATHS) {
+    problems.push(...rootImageCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
+  }
   return problems;
 }

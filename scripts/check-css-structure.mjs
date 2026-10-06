@@ -86,7 +86,15 @@ const fileBudgets = {
   // 3030 / 72300 -> 2990 / 71400 on 2026-09-28: the light operator-origin
   // panel and the first draft of the start row went (69 declarations a dark
   // rule always overrode), and eight rules came home from extensions.css.
-  "base-intro-ranking.css": { lines: 2990, bytes: 71400 },
+  // 2990 / 71400 -> 3170 / 76900 on 2026-10-06, measured 3168 / 76817. Type
+  // went from px to rem in every sheet (435 declarations, a few bytes each:
+  // about 500 here), so the player's own font size reaches the page. The
+  // opening burst came in from the one minified line it had been after
+  // app.css's imports (118 lines). The rest is surfaces that had none: dark
+  // buttons and a dark field for the online-save panel, its two message
+  // regions, the note beside the consent box, the loading screen's count and
+  // way out, and the quiet button's two half-rules made one.
+  "base-intro-ranking.css": { lines: 3170, bytes: 76900 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -158,6 +166,9 @@ const fileBudgets = {
   // the play header's first draft went (69 declarations that never won), the
   // report's panel rules at the head of the file moved to result.css, and
   // seven rules came home from extensions.css.
+  // Unchanged on 2026-10-06, measured 2988 / 63612: px to rem cost this file
+  // about 450 bytes, and the developer's overlay (nine rules) moved to
+  // recovery.css beside the debug jump panel, which is what it is.
   "play.css": { lines: 3040, bytes: 63700 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
@@ -179,17 +190,30 @@ const fileBudgets = {
   // that holds, and its held state.
   // 700 / 14600 -> 705 / 14900 on 2026-09-28: the reading clock keeps its
   // caption on a phone, stacked under the number.
-  "briefing.css": { lines: 705, bytes: 14900 },
-  "recovery.css": { lines: 270, bytes: 5754 },
+  // 705 / 14900 -> 705 / 15300 on 2026-10-06, measured 703 / 15226: rem, a
+  // locked card that stays in the tab order, and the page keeping itself out
+  // from under a notch on either side.
+  "briefing.css": { lines: 705, bytes: 15300 },
+  // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
+  // developer's overlay came here from the foot of play.css.
+  "recovery.css": { lines: 330, bytes: 7100 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
   // 465 / 9510 -> 482 / 9950 on 2026-09-27: the proc glow is a layer faded by
   // opacity rather than an animated box-shadow.
-  "relics.css": { lines: 482, bytes: 9950 },
+  // 9950 -> 10100 bytes on 2026-10-06, measured 481 / 10065: rem, and the
+  // draft's side insets.
+  "relics.css": { lines: 482, bytes: 10100 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
   // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
   // edge on every bar's track and a system colour on its fill.
-  "responsive.css": { lines: 240, bytes: 5850 },
+  // 240 / 5850 -> 445 / 10500 on 2026-10-06, measured 444 / 10470, for a
+  // phone held on its side: under 480px of height the table had no layout of
+  // its own and the hand sat a screen and a half below the action bar. The
+  // block is the wide screen's two panes at a phone's scale, with two shorter
+  // steps under it, and it lives here because it restyles the header, the
+  // music controls, the table, the dock and the reveal together.
+  "responsive.css": { lines: 445, bytes: 10500 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about

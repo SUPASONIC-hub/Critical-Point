@@ -32,7 +32,7 @@ export function useCaseSystems({
   pendingTelemetry,
   resources,
 }) {
-  const delayedConsequences = useMemo(() => getDelayedConsequences(log, caseResults), [caseResults, log]);
+  const delayedConsequences = useMemo(() => getDelayedConsequences(caseResults), [caseResults]);
   const seasonGoals = getSeasonGoals();
   const balanceSignals = useMemo(() => getBalanceSignals(log), [log]);
   // The authority gate asks for a share of the cases opened so far, so every

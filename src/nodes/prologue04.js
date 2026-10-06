@@ -114,7 +114,7 @@ export const prologue04Nodes = {
       {
         id: "p4_window_watch",
         label: "끼어들지 않고 오전 판매 여섯 건을 끝까지 지켜본다",
-        effect: { capital: 7, time: 5, legitimacy: 2, trust: -3, humanCost: 4, fatigue: -2 },
+        effect: { capital: 7, time: -5, legitimacy: 2, trust: -3, humanCost: 4, fatigue: -2 },
         voice: "한 건만 보고는 판단할 수 없어서, 끼어들지 않고 오전 판매 여섯 건을 끝까지 지켜본다.",
         echo: "여섯 건이 다 팔립니다. 평균 3분 40초였고, 여섯 명 다 웃으면서 나갔습니다.",
         cognition: { risk: 2 },
@@ -397,6 +397,7 @@ export const prologue04 = {
         {
           label: "오늘은 아무 말도 하지 않고 명단만 적어 온다",
           effect: { time: 5, capital: 3, trust: -4, legitimacy: 2, humanCost: 3, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "섣부른 말이 골목을 먼저 흔들까 봐, 오늘은 아무 말도 하지 않고 명단만 적어 온다.",
           echo: "명단만 들고 나오면 골목은 아까와 똑같습니다. 신영란이 김치 한 통을 봉투에 넣어 줍니다.",
         },

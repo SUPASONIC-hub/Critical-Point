@@ -9,23 +9,20 @@ import { GauntletStage } from "../gauntlet/GauntletStage.jsx";
  * scene's prose is one question and a folded briefing -- the choice is the
  * scene now, and it sits above the fold on a phone.
  */
-export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions = {} }) {
+export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }) {
+  // The view is what the screen shows; `renderers` and `actions` are what it
+  // calls. Every one of those used to arrive twice -- once in the view, where
+  // the runtime filled it with a function that did nothing, and once here --
+  // and the screen picked between them with `??` on thirteen names.
   const {
-    common: {
-      AdaptiveMusic, musicModeKey, renderDecisionReveal: viewRenderDecisionReveal, renderRecoveryNotice: viewRenderRecoveryNotice,
-      renderErrorLogPanel: viewRenderErrorLogPanel, renderSaveStatus: viewRenderSaveStatus, screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef: viewSceneTitleRef,
-    },
+    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId },
-    gauntlet: {
-      gauntletRun, gauntletSeed, resolveGauntlet: viewResolveGauntlet, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice,
-      markWindowTouched: viewMarkWindowTouched, decisionRevealOpen, staleSave, reloadFromStorage: viewReloadFromStorage },
-    status: { resources, resourceMeta, progress, saveCurrentGame: viewSaveCurrentGame, reset: viewReset, routeIndex, routeLength },
-    debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: viewCopyReplayLink, copyDiagnosticTrace: viewCopyDiagnosticTrace },
+    gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave },
+    status: { resources, resourceMeta, progress, routeIndex, routeLength },
+    debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
   } = view;
-  const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const renderSaveStatus = renderers.renderSaveStatus ?? viewRenderSaveStatus;
-  const saveCurrentGame = actions.saveCurrentGame ?? viewSaveCurrentGame; const resolveGauntlet = actions.resolveGauntlet ?? viewResolveGauntlet; const markWindowTouched = actions.markWindowTouched ?? viewMarkWindowTouched; const reloadFromStorage = actions.reloadFromStorage ?? viewReloadFromStorage; const pickRelic = actions.pickRelic; const onSuspendable = actions.onSuspendable ?? null;
-  const reset = actions.reset ?? viewReset; const copyReplayLink = actions.copyReplayLink ?? viewCopyReplayLink; const copyDiagnosticTrace = actions.copyDiagnosticTrace ?? viewCopyDiagnosticTrace;
-  const titleRef = sceneTitleRef ?? viewSceneTitleRef;
+  const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus } = renderers;
+  const { saveCurrentGame, resolveGauntlet, markWindowTouched, reloadFromStorage, pickRelic, onSuspendable = null, reset, copyReplayLink, copyDiagnosticTrace } = actions;
 
   return (
     <main className="shell game-shell gauntlet-shell">
@@ -80,7 +77,7 @@ export function PlayScreen({ view, renderers = {}, sceneTitleRef = null, actions
       {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
         <aside className="debug-overlay" data-testid="debug-overlay" aria-label="개발자 진행 추적">
           <div className="debug-overlay-heading">
-            <span>DEBUG</span>
+            <span lang="en">DEBUG</span>
             <b>{fallbackCaseId} / {resolvedNodeId}</b>
           </div>
           <dl>

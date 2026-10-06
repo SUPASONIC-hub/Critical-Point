@@ -109,10 +109,10 @@ export const prologue02Nodes = {
       },
       {
         id: "p2_site_tour",
-        label: "준비된 동선대로 돌고 일정보다 일찍 본점으로 돌아온다",
+        label: "준비된 동선대로만 돌고 낮 실사를 일정보다 일찍 끝낸다",
         effect: { capital: 8, time: 6, trust: -3, legitimacy: -3, humanCost: 3, fatigue: -3 },
-        voice: "의견서 쓸 시간을 벌 수 있게, 준비된 동선대로 돌고 일정보다 일찍 본점으로 돌아온다.",
-        echo: "동선대로 돌면 세 시간 만에 끝납니다. 돌아오는 차 안에서 당신은 야간조를 한 번도 못 봤다는 걸 깨닫습니다.",
+        voice: "의견서 쓸 시간을 벌 수 있게, 준비된 동선대로만 돌고 낮 실사를 일정보다 일찍 끝낸다.",
+        echo: "동선대로 돌면 세 시간 만에 끝납니다. 가방을 챙기다가 당신은 그 동선에 야간조가 한 번도 없었다는 걸 깨닫습니다.",
         cognition: { risk: 2 },
       },
       {
@@ -244,10 +244,10 @@ export const prologue02Nodes = {
       },
       {
         id: "p2_final_margin",
-        label: "0.4%포인트 하나만 남기고 나머지는 전부 덜어 낸다",
+        label: "0.4%포인트 하나만 본문에 남기고 나머지는 전부 별첨으로 내린다",
         effect: { capital: 10, time: 6, legitimacy: 3, trust: -4, humanCost: 5, fatigue: -3 },
-        voice: "한 시간으로 끝까지 지킬 수 있는 건 숫자 하나라며, 0.4%포인트 하나만 남기고 나머지는 전부 덜어 낸다.",
-        echo: "0.4%포인트만 남기면 의견서는 두 장이 됩니다. 두 장짜리 문서는 반려당해도 아무도 놀라지 않습니다.",
+        voice: "한 시간으로 끝까지 지킬 수 있는 건 숫자 하나라며, 0.4%포인트 하나만 본문에 남기고 나머지는 전부 별첨으로 내린다.",
+        echo: "0.4%포인트만 남기면 본문은 두 장이 됩니다. 나머지 아홉 장은 별첨으로 밀립니다. 두 장짜리 본문은 반려당해도 아무도 놀라지 않습니다.",
         cognition: { risk: 2 },
       },
       {
@@ -323,6 +323,7 @@ export const prologue02 = {
         {
           label: "약속이 문서에 없다는 사실을 야간조에게 그대로 말한다",
           effect: { trust: 11, humanCost: -4, time: -5, capital: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "2년을 기다린 사람에게 헛말은 못 한다며, 약속이 문서에 없다는 사실을 야간조에게 그대로 말한다.",
           echo: "그대로 말하면 강태민이 한참 국만 젓습니다. 그리고 '알려 줘서 고마워요'라고 합니다. 고맙다는 말이 제일 아픕니다.",
         },
@@ -364,6 +365,7 @@ export const prologue02 = {
         {
           label: "확인은 됐으니 통화를 짧게 끊고 계산으로 돌아간다",
           effect: { time: 6, capital: 3, trust: -3, legitimacy: -2, humanCost: 2, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "들을 말은 다 들었고 확인도 됐으니, 통화를 짧게 끊고 계산으로 돌아간다.",
           echo: "끊으면 12분이 남습니다. 남은 건 시간이고, 사라진 건 그가 자기 입으로 말한 문장입니다.",
         },

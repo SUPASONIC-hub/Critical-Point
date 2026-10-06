@@ -66,9 +66,8 @@ export const viewGroups = {
   },
   result: {
     common: [
-      "AdaptiveMusic", "musicModeKey", "renderDecisionReveal", "renderRecoveryNotice",
-      "renderErrorLogPanel", "renderSceneLines", "screenReaderStatus", "GAME_TITLE", "currentCase",
-      "activeCaseMeta", "playerName", "sceneTitleRef", "operatorProfile",
+      "AdaptiveMusic", "musicModeKey", "renderSceneLines", "screenReaderStatus", "GAME_TITLE", "currentCase",
+      "activeCaseMeta", "playerName", "operatorProfile",
     ],
     ending: [
       "endingStep", "endingTwistIndex", "finalAftermathEntry", "finalEndingEntry", "endingProfile",
@@ -107,21 +106,17 @@ export const viewGroups = {
       "authorityState", "authorityReview",
     ],
   },
+  // What the play screen shows. What it calls -- the reveal and recovery
+  // renderers, save, reset, the table's handlers -- arrives as props.
   play: {
-    common: [
-      "AdaptiveMusic", "musicModeKey", "renderDecisionReveal", "renderRecoveryNotice",
-      "renderErrorLogPanel", "renderSaveStatus", "screenReaderStatus", "simplifyPlayerText", "currentCase",
-      "sceneTitleRef",
-    ],
+    common: ["AdaptiveMusic", "musicModeKey", "screenReaderStatus", "simplifyPlayerText", "currentCase"],
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId"],
     gauntlet: [
-      "gauntletRun", "gauntletSeed", "resolveGauntlet", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice", "markWindowTouched",
-      "decisionRevealOpen", "staleSave", "reloadFromStorage",
+      "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
+      "decisionRevealOpen", "staleSave",
     ],
-    status: ["resources", "resourceMeta", "progress", "saveCurrentGame", "reset", "routeIndex", "routeLength"],
-    debug: [
-      "debugToolsEnabled", "fallbackCaseId", "silentFailureCount", "copyReplayLink", "copyDiagnosticTrace",
-    ],
+    status: ["resources", "resourceMeta", "progress", "routeIndex", "routeLength"],
+    debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],
   },
 };
 

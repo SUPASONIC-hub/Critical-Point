@@ -3,15 +3,22 @@ import path from "node:path";
 
 import {
   assetCacheProblems,
+  backendOriginProblems,
   cspProblems,
+  entryScriptPath,
   firstAssetPath,
+  firstRootImagePath,
   inlineScriptProblems,
   readRenderYamlCsp,
   renderYamlHeaderProblems,
+  rootImageCacheProblems,
   shellCacheProblems,
   siteHeaderProblems,
   wildcardHostProblems,
+  WORKER_PATH,
+  workerCacheProblems,
 } from "./deploy-policy.mjs";
+import { buildShaFromHtml, workerProblems } from "./service-worker-build.mjs";
 
 /**
  * Two modes.
@@ -19,13 +26,22 @@ import {
  *   node scripts/check-deploy.mjs            (npm run check:deploy)
  *     Fetches DEPLOY_URL and checks what the live site actually sends: the
  *     page, the security headers, the CSP *value* (see deploy-policy.mjs), how
- *     the page and one fingerprinted asset are cached, and that the served HTML
- *     has no inline script the CSP would block.
+ *     the page and one fingerprinted asset are cached, that the served HTML
+ *     has no inline script the CSP would block, that the entry script names
+ *     the backend the CSP lets it call -- a release built without
+ *     VITE_SUPABASE_URL serves every header correctly and has no ranking --
+ *     and that `/sw.js` is there and was built with the page beside it: a
+ *     worker of one release keeping the page of another is an installed copy
+ *     that opens to nothing offline. How one image from the root is cached,
+ *     and how the worker's file is, are reported and not failed: a slower
+ *     visit and a slower update, not a broken one.
  *
  *   node scripts/check-deploy.mjs --offline
  *     No network. Checks the headers `render.yaml` declares, and
- *     `dist/index.html` when a build exists. The dashboard headers are copied
- *     from render.yaml by hand, so this is the half that can run before a deploy.
+ *     `dist/index.html`, its entry script and `dist/sw.js` -- every file the
+ *     worker lists has to be in the build -- when a build exists. The
+ *     dashboard headers are copied from render.yaml by hand, so this is the
+ *     half that can run before a deploy.
  *
  * The live half is the one that catches the dashboard drifting from the file:
  * on 2026-09-28 the file said `immutable` for `/assets/*` and `no-cache` for the
@@ -36,6 +52,7 @@ const root = process.cwd();
 
 function checkOffline() {
   const problems = [];
+  const notes = [];
   const yaml = readFileSync(path.join(root, "render.yaml"), "utf8");
   const csp = readRenderYamlCsp(yaml);
   if (!csp) problems.push("render.yaml declares no Content-Security-Policy");
@@ -47,6 +64,24 @@ function checkOffline() {
     const html = readFileSync(built, "utf8");
     problems.push(...inlineScriptProblems(html).map((problem) => `dist/index.html: ${problem}`));
     if (!firstAssetPath(html)) problems.push("dist/index.html links no fingerprinted asset, so the live check has nothing to read a cache policy from");
+    if (!firstRootImagePath(html)) problems.push("dist/index.html names no image at the root, so the live check has nothing to read the image cache policy from");
+    const entry = entryScriptPath(html);
+    if (!entry) {
+      problems.push("dist/index.html has no module script, so the live check cannot tell which backend the release was built for");
+    } else {
+      // Said, not failed: `npm run build` on a desktop with no .env.local is a
+      // build without a backend, and a correct one. `npm run build:e2e`, which
+      // is what verify:quick checks, names its placeholder.
+      const script = readFileSync(path.join(root, "dist", entry), "utf8");
+      for (const note of csp ? backendOriginProblems(script, csp) : []) notes.push(`dist${entry}: ${note}`);
+    }
+    const worker = path.join(root, "dist", WORKER_PATH);
+    if (!existsSync(worker)) {
+      problems.push(`dist${WORKER_PATH} is missing: the build writes it (serviceWorker() in vite.config.js), and without it an installed copy cannot open offline`);
+    } else {
+      const hasFile = (file) => existsSync(path.join(root, "dist", file));
+      problems.push(...workerProblems({ source: readFileSync(worker, "utf8"), html, hasFile }).map((problem) => `dist${WORKER_PATH}: ${problem}`));
+    }
   } else {
     console.log("No dist/index.html; run `npm run build` first to check the built page too.");
   }
@@ -58,7 +93,8 @@ function checkOffline() {
   // The file cannot name the project, so it is only said, not failed: the live
   // check is where a wildcard host is refused.
   for (const note of wildcardHostProblems(csp)) console.log(`Note (render.yaml CSP): ${note} when setting it in the dashboard.`);
-  console.log("Offline deploy check passed: render.yaml headers" + (existsSync(built) ? " and dist/index.html" : ""));
+  for (const note of notes) console.log(`Note: ${note}.`);
+  console.log("Offline deploy check passed: render.yaml headers" + (existsSync(built) ? ", dist/index.html and dist/sw.js" : ""));
 }
 
 async function fetchWithTimeout(url, options = {}) {
@@ -117,7 +153,45 @@ async function checkLive() {
       else problems.push(...assetCacheProblems(asset.headers.get("cache-control")).map((problem) => `cache: ${problem} [${assetPath}]`));
     }
 
+    const entryPath = entryScriptPath(body);
+    if (!entryPath) {
+      problems.push("the page has no module script");
+    } else {
+      const entry = await fetchWithTimeout(new URL(entryPath, url.origin));
+      if (!entry.ok) problems.push(`${entryPath} answered HTTP ${entry.status}`);
+      else problems.push(...backendOriginProblems(await entry.text(), response.headers.get("content-security-policy")).map((problem) => `backend: ${problem} [${entryPath}]`));
+    }
+
+    // Asked for under the release's own name, so a cache in front of the site
+    // that still holds the last release's worker is not what answers.
+    const workerUrl = new URL(WORKER_PATH, url.origin);
+    workerUrl.searchParams.set("release", buildShaFromHtml(body) ?? String(Date.now()));
+    const worker = await fetchWithTimeout(workerUrl).catch(() => null);
+    if (!worker?.ok) problems.push(`${WORKER_PATH} answered ${worker ? `HTTP ${worker.status}` : "nothing"}`);
+    else problems.push(...workerProblems({ source: await worker.text(), html: body }).map((problem) => `worker: ${problem}`));
+
     if (problems.length) throw new Error(`\n${problems.join("\n")}`);
+
+    // Reported, not failed: a browser passes its HTTP cache for a worker's
+    // file by itself, so a held copy delays an update and breaks nothing.
+    const plainWorker = await fetchWithTimeout(new URL(WORKER_PATH, url.origin), { method: "HEAD" }).catch(() => null);
+    for (const problem of plainWorker?.ok ? workerCacheProblems(plainWorker.headers.get("cache-control")) : []) {
+      const text = `${problem} [${WORKER_PATH}]. render.yaml declares the rule; add it in the Render dashboard under Settings -> Headers`;
+      console.log(process.env.GITHUB_ACTIONS ? `::warning title=The service worker is cached in between::${text}` : `Note: ${text}.`);
+    }
+
+    // Reported, not failed, and as an annotation when a workflow is reading:
+    // an image asked about on every visit is a slower page, and the rule that
+    // fixes it is one somebody has to type into the dashboard.
+    const imagePath = firstRootImagePath(body);
+    if (imagePath) {
+      const image = await fetchWithTimeout(new URL(imagePath, url.origin), { method: "HEAD" }).catch(() => null);
+      const imageProblems = image?.ok ? rootImageCacheProblems(image.headers.get("cache-control")) : [`${imagePath} answered ${image ? `HTTP ${image.status}` : "nothing"}`];
+      for (const problem of imageProblems) {
+        const text = `${problem} [${imagePath}]. render.yaml declares the rule; add it in the Render dashboard under Settings -> Headers`;
+        console.log(process.env.GITHUB_ACTIONS ? `::warning title=Root images are not cached::${text}` : `Note: ${text}.`);
+      }
+    }
 
     // Reported, not failed: whether the host lets a static site name a file's
     // type is the host's to say, and a browser installs from either.

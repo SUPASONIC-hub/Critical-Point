@@ -85,7 +85,7 @@ export class AppErrorBoundary extends Component {
     return (
       <main className="error-screen">
         <section className="error-panel" role="alert">
-          <span className="eyebrow">CRITICAL POINT / RECOVERY</span>
+          <span className="eyebrow" lang="en">CRITICAL POINT / RECOVERY</span>
           <h1>장면을 불러오지 못했습니다.</h1>
           <p>오류 지점은 자동 저장되었습니다. 수정 후 다시 열면 저장된 장면에서 이어서 진행할 수 있습니다.</p>
           {this.state.recoveryMessage && (
@@ -105,7 +105,6 @@ export class AppErrorBoundary extends Component {
               type="button"
               className="ghost"
               data-testid="error-start-fresh"
-              aria-label="현재 저장본만 초기화"
               onClick={() => this.reload({ clearSave: true })}
             >
               저장본을 초기화하고 새 게임

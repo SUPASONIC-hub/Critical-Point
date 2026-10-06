@@ -34,27 +34,31 @@ export const resourceMeta = {
   fatigue: { label: easyResourceLabels.fatigue, suffix: "", icon: BarChart3 },
 };
 
+// `payoff` is when the stance fits, not what it pays. The pick is the player's
+// own note on how they mean to play: it is saved and shown, and no rule of the
+// table reads it. These lines used to promise a stronger bonus and a cheaper
+// hint, neither of which the game has.
 export const playStyleOptions = [
   {
     id: "instinct",
     label: "감각형",
     title: "첫 반응을 믿는다",
     text: "전술 정보를 덜 보고 장면의 온도와 사람의 반응으로 결정합니다.",
-    payoff: "직관 챌린지 보너스 강화",
+    payoff: "빠르게 정하고 싶을 때",
   },
   {
     id: "auditor",
     label: "감사형",
     title: "근거를 끝까지 확인한다",
     text: "비용과 위험을 펼쳐 본 뒤, 설명 가능한 선택을 밀어붙입니다.",
-    payoff: "전술 챌린지 보너스 강화",
+    payoff: "따져 보고 정하고 싶을 때",
   },
   {
     id: "mediator",
     label: "중재형",
     title: "대화로 압박을 낮춘다",
     text: "에코의 힌트와 관계의 맥락을 활용해 손실을 분산합니다.",
-    payoff: "에코 힌트 비용 절감",
+    payoff: "사람 사이를 먼저 볼 때",
   },
 ];
 

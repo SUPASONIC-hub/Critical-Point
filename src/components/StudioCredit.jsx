@@ -10,11 +10,11 @@ export function StudioCredit({ studio = "Tak'n Roll", creator = "SUPASONIC" }) {
       <img src="/profile.jpg" alt="" width="40" height="40" loading="lazy" decoding="async" />
       <dl>
         <div>
-          <dt>STUDIO</dt>
+          <dt lang="en">STUDIO</dt>
           <dd>{studio}</dd>
         </div>
         <div>
-          <dt>CREATOR</dt>
+          <dt lang="en">CREATOR</dt>
           <dd>{creator}</dd>
         </div>
       </dl>

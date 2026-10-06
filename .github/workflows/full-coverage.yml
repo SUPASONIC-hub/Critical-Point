@@ -7,8 +7,9 @@ name: Full Coverage
 #
 # It failed every week from 2026-08-31 to 2026-09-21 and nobody saw: a
 # scheduled run has no pull request to turn red and no commit to be pinned to.
-# The last job here opens an issue when any of the others fails, and adds to
-# the one already open the week after.
+# The last job here opens an issue when any of the others fails, adds to the
+# one already open the week after, and closes it when a run on the default
+# branch comes back green.
 
 on:
   workflow_dispatch:
@@ -60,25 +61,7 @@ jobs:
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # One Node version for CI and the Render build: .node-version.
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - name: Read the Playwright version
-        id: playwright
-        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        id: browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      - uses: ./.github/actions/setup
       - run: npm run test:e2e:full -- --shard=${{ matrix.shard }}/24
       - name: Upload full coverage diagnostics
         if: always()
@@ -100,24 +83,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - name: Read the Playwright version
-        id: playwright
-        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        id: browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      - uses: ./.github/actions/setup
       - run: npm run test:e2e:season
       - name: Upload season walk diagnostics
         if: always()
@@ -132,33 +98,33 @@ jobs:
 
   webkit:
     runs-on: ubuntu-latest
-    # Safari's engine on an iPhone 14, against the production build: the @prod
-    # tests and the @layout measurements. Weekly, not on every push, until it
-    # has a clean run behind it (scripts/run-e2e.mjs, DEFAULT_PROJECTS); then it
-    # belongs in Verify.
-    timeout-minutes: 45
+    # Safari's engine on an iPhone 14, in two passes, because the two tags
+    # need different servers. The @prod tests play the production build from
+    # the intro. The @layout measurements reach their scenes by the debug jump,
+    # which is compiled out of that build, so they run against the dev server.
+    #
+    # Until 2026-10-06 there was one pass and this comment claimed both: the
+    # preview run adds `--grep @prod`, the project's own grep is
+    # `@prod|@layout`, a test has to match both, and so not one @layout test
+    # had ever run on WebKit. The first green run of the second pass is the
+    # first time the iPhone action bar was measured.
+    #
+    # Weekly, not on every push, until it has a clean run behind it
+    # (scripts/run-e2e.mjs, DEFAULT_PROJECTS); then it belongs in Verify.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - name: Read the Playwright version
-        id: playwright
-        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        id: browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-webkit
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps webkit
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: npx playwright install-deps webkit
+          browser: webkit
       - run: npm run build:e2e
       - run: npm run test:e2e:webkit
+      # Measured whether or not the pass above was green: one says the game
+      # plays, the other that it fits, and a failure in the first is no reason
+      # to learn nothing about the second.
+      - name: Measure the @layout tests on WebKit
+        if: ${{ !cancelled() }}
+        run: npm run test:e2e:webkit:layout
       - name: Upload WebKit diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -174,14 +140,27 @@ jobs:
     # A red run with nobody watching is a green run. This job is the only one
     # here that can write, it writes issues and nothing else, and it runs no
     # project code: it does not check the repository out.
+    #
+    # It runs after every run and decides in the step, because `needs` has
+    # more than two outcomes:
+    #
+    #   failed     any job failed. On the schedule a cancelled job counts as
+    #              well: nobody cancels a run at 03:17 on a Monday, so there a
+    #              cancelled job is one that ran into its timeout, and until
+    #              2026-10-06 a week of nothing but timeouts opened no issue.
+    #   passed     every job succeeded. On the default branch that closes the
+    #              open issue, with the run that proved it; it used to stay
+    #              open until someone remembered it.
+    #   neither    a person cancelled a run they had started. They were
+    #              watching; nothing is written.
     needs: [full-coverage, season-walk, webkit]
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       issues: write
     steps:
-      - name: Open or update the issue
+      - name: Open, update or close the issue
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -189,13 +168,51 @@ jobs:
           TITLE: Full Coverage is failing
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           RESULTS: "full-coverage: ${{ needs.full-coverage.result }}, season-walk: ${{ needs.season-walk.result }}, webkit: ${{ needs.webkit.result }}"
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          ANY_FAILED: ${{ contains(needs.*.result, 'failure') }}
+          ANY_CANCELLED: ${{ contains(needs.*.result, 'cancelled') }}
+          ANY_SKIPPED: ${{ contains(needs.*.result, 'skipped') }}
         run: |
           set -euo pipefail
-          body=$(printf 'The weekly Full Coverage run failed on %s at %s.\n\n%s\n\n%s\n' "$(date -u +%F)" "$GITHUB_SHA" "$RESULTS" "$RUN_URL")
-          existing=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title --jq "map(select(.title == \"$TITLE\")) | .[0].number // empty")
-          if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "$body"
-            echo "Added to issue #$existing."
+          if [ "$ANY_FAILED" = "true" ] || { [ "$EVENT" = "schedule" ] && [ "$ANY_CANCELLED" = "true" ]; }; then
+            verdict=failed
+          elif [ "$ANY_CANCELLED" = "true" ] || [ "$ANY_SKIPPED" = "true" ]; then
+            echo "Cancelled by hand ($RESULTS); nothing to report."
+            exit 0
           else
-            gh issue create --title "$TITLE" --body "$body"
+            verdict=passed
+          fi
+          # A dispatch can be on any branch, and five of them on pull-request
+          # branches were once filed as "the weekly run failed". The body says
+          # what ran and where.
+          if [ "$EVENT" = "schedule" ]; then
+            what="The weekly Full Coverage run"
+          else
+            what="A Full Coverage run started by hand ($EVENT)"
+          fi
+          where=$(printf 'on `%s` at %s, %s' "$REF_NAME" "$GITHUB_SHA" "$(date -u +%F)")
+          existing=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title --jq "map(select(.title == \"$TITLE\")) | .[0].number // empty")
+          if [ "$verdict" = "failed" ]; then
+            body=$(printf '%s failed %s.\n\n%s\n\n%s\n' "$what" "$where" "$RESULTS" "$RUN_URL")
+            if [ -n "$existing" ]; then
+              gh issue comment "$existing" --body "$body"
+              echo "Added to issue #$existing."
+            else
+              gh issue create --title "$TITLE" --body "$body"
+            fi
+            exit 0
+          fi
+          # Green. Only a run of the default branch says the thing the issue is
+          # about is mended: a green pull-request branch has not been merged yet.
+          if [ -z "$existing" ]; then
+            echo "Green, and no issue is open."
+          elif [ "$EVENT" != "schedule" ] && [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
+            echo "Green on $REF_NAME; issue #$existing stays open until $DEFAULT_BRANCH is green."
+          else
+            body=$(printf '%s passed %s.\n\n%s\n\n%s\n\nClosing.\n' "$what" "$where" "$RESULTS" "$RUN_URL")
+            gh issue comment "$existing" --body "$body"
+            gh issue close "$existing" --reason completed
+            echo "Closed issue #$existing."
           fi

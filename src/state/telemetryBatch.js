@@ -36,10 +36,6 @@ export function classifyTelemetryFailure(error) {
   return status >= 400 ? "permanent" : "unreachable";
 }
 
-export function isPermanentRefusal(error) {
-  return classifyTelemetryFailure(error) === "permanent";
-}
-
 const isSeasonRow = (item) => item?.type === "case" && item?.payload?.case_id === "season-final";
 const runOf = (item) => (item?.type === "case" ? item?.payload?.run_id ?? null : null);
 
@@ -60,9 +56,24 @@ export function isHeldBehindCaseRow(item, waiting) {
 }
 
 /**
+ * The queue after a batch: what it holds now, less the rows the batch sent and
+ * did not keep. It starts from the queue as it stands, not from the batch as
+ * it was read. A send takes seconds, and the player can clear the queue in
+ * them -- unticking consent, resetting the run -- and writing the batch's
+ * `kept` back put the rows they had just deleted into the save again, to go
+ * out the next time consent was given.
+ */
+export function reconcileTelemetryQueue(current, batch, kept) {
+  const sent = new Set((Array.isArray(batch) ? batch : []).map((item) => item.id));
+  const keptIds = new Set((Array.isArray(kept) ? kept : []).map((item) => item.id));
+  return (Array.isArray(current) ? current : []).filter((item) => !sent.has(item.id) || keptIds.has(item.id));
+}
+
+/**
  * One pass over the queue. `kept` is what stays queued, in the order it was
- * queued; `aborted` means `canSend` said no part-way (consent unticked, the
- * connection gone), and the caller leaves the queue as it stands.
+ * queued; `refused` counts the rows the server would not take and the queue
+ * let go; `aborted` means `canSend` said no before the pass was over (consent
+ * unticked, the connection gone), and the caller leaves the queue as it stands.
  *
  * Here rather than in the hook so it can be run without a renderer.
  */
@@ -71,6 +82,7 @@ export async function sendTelemetryBatch(items, { canSend = () => true, send = s
   const ordered = planTelemetryBatch(batch);
   const waiting = [];
   let stopped = false;
+  let refused = 0;
   for (const [index, item] of ordered.entries()) {
     if (stopped) {
       waiting.push(item);
@@ -92,8 +104,13 @@ export async function sendTelemetryBatch(items, { canSend = () => true, send = s
       // "permanent" is the server refusing the row itself (a payload over its
       // cap, a run that cannot rank). Sending it again changes nothing.
       if (failure !== "permanent") waiting.push(item);
+      else refused += 1;
       if (failure === "pace" || failure === "unreachable") stopped = true;
     }
   }
-  return { kept: batch.filter((item) => waiting.includes(item)), aborted: false };
+  // Asked once more at the end. A pass that stopped at a failed send no longer
+  // asked on the rows after it, so consent unticked during that send came back
+  // as an ordinary result with every row kept.
+  if (!canSend()) return { kept: batch, aborted: true, refused };
+  return { kept: batch.filter((item) => waiting.includes(item)), aborted: false, refused };
 }

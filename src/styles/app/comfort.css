@@ -25,14 +25,14 @@
 .accessibility-time legend {
   float: left;
   padding: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 .accessibility-time p {
   clear: both;
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.5;
 }
 .accessibility-time > div {
@@ -54,7 +54,7 @@
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .accessibility-time label:has(input:checked) {
@@ -80,11 +80,11 @@
   gap: 3px;
 }
 .accessibility-toggle b {
-  font-size: 13.5px;
+  font-size: 0.84375rem;
 }
 .accessibility-toggle small {
   color: var(--ui-text-2);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.45;
 }
 

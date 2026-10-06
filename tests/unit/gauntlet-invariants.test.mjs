@@ -17,7 +17,9 @@ import {
   createOpenSeed,
   createTableRecord,
   createWindow,
+  ESCALATION_STEP_WINDOWS,
   FOCUS_MODES,
+  getEscalationWindow,
   getFocusBonus,
   getGrooveBonus,
   getHandBonus,
@@ -305,6 +307,39 @@ test("the multiplier on the HUD never claims a threshold the rules refuse", () =
   assert.equal(formatMultiplier(1.1), "×1.1");
 });
 
+test("a window remembers the slowest its clock was run, across being put down", () => {
+  let window = createWindow({ schema: BASE_SCHEMA, seed: "slow-clock" });
+  assert.equal(window.timeScale, 1);
+  window = reduceWindow(window, { type: "TICK", delta: 0.05, scale: 2 });
+  window = reduceWindow(window, { type: "TICK", delta: 0.1, scale: 1 });
+  assert.equal(window.timeScale, 2, "putting the setting back does not take the mark off");
+  assert.equal(reduceWindow(window, { type: "TICK", delta: 0.1, scale: "fast" }).timeScale, 2);
+  assert.equal(reduceWindow(window, { type: "TICK", delta: 0.1 }).timeScale, 2);
+
+  // Saved and left at ×2, resumed after the setting was set back to ×1 on the intro.
+  const run = normalizeRunState({ windowIndex: 7, suspended: { seed: "slow-clock", windowIndex: 7, window } });
+  const resumed = createWindow({ schema: BASE_SCHEMA, seed: "slow-clock", resume: run.suspended.window });
+  assert.equal(resumed.timeScale, 2);
+  assert.equal(createWindow({ schema: BASE_SCHEMA, seed: "slow-clock", resume: { timeScale: 0 } }).timeScale, 1);
+});
+
+test("practice windows do not walk the wall down", () => {
+  const played = { windowIndex: ESCALATION_STEP_WINDOWS * 2, schema: { ...BASE_SCHEMA, mutations: [] } };
+  const leaned = openCaseRun(played);
+  const practised = openCaseRun({ ...played, practiceWindows: ESCALATION_STEP_WINDOWS * 2 });
+  assert.ok(leaned.schema.wallMax < BASE_SCHEMA.wallMax, "two hundred windows of the season lean the table in");
+  assert.equal(practised.schema.wallMax, BASE_SCHEMA.wallMax, "two hundred windows of practice do not");
+  assert.equal(normalizeRunState({ windowIndex: 3, practiceWindows: 9 }).practiceWindows, 3, "never more practice than windows");
+  assert.equal(normalizeRunState({ windowIndex: 3 }).practiceWindows, 0, "a save from before the count has none");
+});
+
+test("a rule or a count the save holds as null takes the default, not zero", () => {
+  assert.equal(normalizeSchema({ ...BASE_SCHEMA, seconds: null }).seconds, BASE_SCHEMA.seconds);
+  assert.equal(normalizeSchema({ ...BASE_SCHEMA, wallMin: null }).wallMin, BASE_SCHEMA.wallMin);
+  assert.equal(normalizeRunState({ bestMultiplier: null }).bestMultiplier, RUN_INITIAL_STATE.bestMultiplier);
+  assert.equal(normalizeRunState({ windowIndex: null }).windowIndex, 0);
+});
+
 test("a replayed case is practice: the table plays, and the season keeps nothing from it", () => {
   const first = { pushRecord: { ...createTableRecord([]), busts: 2, cashes: 6, bestMultiplier: 8 } };
   let run = normalizeRunState({ vault: 5000, grooveVault: 400, relics: ["splint"], relicOffer: ["encore"], stanceMastery: { strike: 2 }, bestMultiplier: 8, schema: { ...BASE_SCHEMA, mutations: ["reboot"] } });
@@ -328,6 +363,9 @@ test("a replayed case is practice: the table plays, and the season keeps nothing
   assert.equal(run.bestMultiplier, 8);
   assert.deepEqual(createTableRecord(log), first.pushRecord, "the summary keeps the record of the first close");
   assert.equal(createCaseSummary({}, {}, log, {}).pushRecord.busts, 2);
+
+  assert.deepEqual([run.windowIndex, run.practiceWindows], [4, 4], "the windows are counted, and counted as practice");
+  assert.equal(getEscalationWindow(run), 0, "so the season has not leaned in for them");
 
   const left = openCaseRun(openCaseRun({ vault: 5000, relicOffer: ["encore"], schema: { ...BASE_SCHEMA, mutations: ["reboot"] } }, { replayOf: first }));
   assert.deepEqual([left.vault, left.relicOffer, left.practice], [5000, ["encore"], null], "a replay left half way hands everything back");

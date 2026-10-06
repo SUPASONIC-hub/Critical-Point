@@ -1,0 +1,181 @@
+name: Migration Drift
+
+# The client deploys by itself: Verify goes green, deploy.yml presses the hook.
+# The database does not. A migration is applied by a person running
+# `npx supabase db push`, after the client that expects it is live (README,
+# 원격 랭킹), and until 2026-10-06 nothing ever asked whether that had happened.
+# A migration merged and never pushed looked the same as one that was.
+#
+# Once a day this asks the live project which migrations it has applied and
+# compares that with `supabase/migrations/` on the default branch, both ways:
+# a file the database has not run, and a version the database has run that no
+# file here accounts for. Either opens an issue, or adds to the one already
+# open, and a later run that finds the two in step closes it -- the same
+# arrangement as Full Coverage, for the same reason: a scheduled run has no
+# pull request to turn red.
+#
+# A migration merged today and pushed tomorrow is reported in between. That is
+# the reminder working, not a false alarm, and the issue closes itself on the
+# first run after the push.
+#
+# It needs one secret, SUPABASE_ACCESS_TOKEN (README says how to make one).
+# Without it the run fetches nothing and says so in a warning: it is not a red
+# run, because nothing is known to be wrong, and not a silent green one,
+# because nothing was checked.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 5 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      verdict: ${{ steps.verdict.outputs.verdict }}
+      summary: ${{ steps.verdict.outputs.summary }}
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The token is handed to the one step that calls the CLI and to nothing
+      # else; the rest of the job only learns whether it exists.
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      # A skipped check reports the same green tick as a passed one. An
+      # annotation is the only part of a run that survives into the checks list.
+      - name: Explain the skipped comparison
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=No migrations were compared::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing. It is green because it did no work, not because the database is in step. Create a personal access token (supabase.com -> Account -> Access Tokens) and add it with: gh secret set SUPABASE_ACCESS_TOKEN"
+      # `npm ci` for the CLI: it is the pinned devDependency, so this lists
+      # with the version `db push` is run with. No browser.
+      - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
+        with:
+          browser: none
+      # `--project-ref` instead of `supabase link`, which would write the ref
+      # into the checkout for no later step to use. The database password is
+      # passed when the repository has one and is otherwise empty: with an
+      # access token the CLI signs in to the database through a short-lived
+      # login role and should not need it. If this step says it does, add
+      # SUPABASE_DB_PASSWORD as a second secret.
+      #
+      # The CLI's failure is kept, not thrown: the next step turns "could not
+      # ask" into its own verdict, which is reported as such and never as
+      # drift.
+      - name: List the migrations the database has applied
+        id: list
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          # `shell: bash` runs with -e, which would end the step on the CLI's
+          # failure before its exit code was written down.
+          set +e -uo pipefail
+          npx supabase migration list --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json > migration-list.txt 2> migration-list.err
+          code=$?
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "supabase migration list exited $code:"
+            tail -n 20 migration-list.err
+          fi
+      - name: Compare with supabase/migrations
+        id: verdict
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          LIST_EXIT: ${{ steps.list.outputs.exit }}
+        run: |
+          set -uo pipefail
+          if [ "$LIST_EXIT" != "0" ]; then
+            # What the CLI said stays in this run's log (the step above). It is
+            # not copied into an issue: an error from a database client is the
+            # kind of text that carries a connection string.
+            {
+              echo "verdict=unreadable"
+              echo "summary=\`supabase migration list\` exited $LIST_EXIT, so nothing was compared. What it said is in the run's log."
+            } >> "$GITHUB_OUTPUT"
+            echo "::error title=The database could not be asked::supabase migration list exited $LIST_EXIT. A token that expired, or a database password the CLI needs: see the step above."
+            exit 1
+          fi
+          node scripts/check-migration-drift.mjs --from migration-list.txt
+
+  report:
+    # Writes issues and nothing else, and runs no project code: it does not
+    # check the repository out. Skipped when there was no token to ask with --
+    # that run has its warning, and an issue about a secret nobody has set
+    # would be opened every day. A job that failed before it reached a verdict
+    # (the install, the runner) is reported as a question that went unanswered.
+    needs: compare
+    if: ${{ always() && (needs.compare.outputs.verdict != '' || needs.compare.result == 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open, update or close the issue
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: Supabase migrations are out of step
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VERDICT: ${{ needs.compare.outputs.verdict }}
+          SUMMARY: ${{ needs.compare.outputs.summary }}
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          # The comparison is of the default branch's migrations with the live
+          # database. A dispatch on another branch compares that branch, whose
+          # migrations are not supposed to be applied yet: its answer is in the
+          # run's own log and is not filed.
+          if [ "$EVENT" != "schedule" ] && [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
+            echo "Run on $REF_NAME ($VERDICT); only $DEFAULT_BRANCH is reported."
+            exit 0
+          fi
+          where=$(printf 'on `%s` at %s, %s (%s)' "$REF_NAME" "$GITHUB_SHA" "$(date -u +%F)" "$EVENT")
+          existing=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title --jq "map(select(.title == \"$TITLE\")) | .[0].number // empty")
+          case "$VERDICT" in
+            in-step)
+              if [ -z "$existing" ]; then
+                echo "In step, and no issue is open."
+              else
+                body=$(printf 'The database and `supabase/migrations/` are in step %s.\n\n%s\n\n%s\n\nClosing.\n' "$where" "$SUMMARY" "$RUN_URL")
+                gh issue comment "$existing" --body "$body"
+                gh issue close "$existing" --reason completed
+                echo "Closed issue #$existing."
+              fi
+              exit 0
+              ;;
+            drift)
+              body=$(printf 'The live database and `supabase/migrations/` are out of step %s.\n\n%s\n\n%s\n' "$where" "$SUMMARY" "$RUN_URL")
+              ;;
+            *)
+              body=$(printf 'The live database could not be compared with `supabase/migrations/` %s. This is not a finding of drift: the question went unanswered.\n\n%s\n\n%s\n' "$where" "$SUMMARY" "$RUN_URL")
+              ;;
+          esac
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+            echo "Added to issue #$existing."
+          else
+            gh issue create --title "$TITLE" --body "$body"
+          fi

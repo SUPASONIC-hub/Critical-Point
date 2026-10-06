@@ -44,25 +44,20 @@ export function createAuthorityState({ casesOpened = 0, evidence, legitimacy, op
 }
 
 export function createActiveBonus({ currentAverageResponseTime, currentChallengeStreak, reframeCombo, log }) {
-  return log.at(-1)?.title === "CRISIS PROTOCOL"
-    ? "구조 개입"
-    : log.at(-1)?.streakReward
-      ? log.at(-1).streakReward.label
-    : log.at(-1)?.instinctSurge
-      ? "INSTINCT SURGE"
-      : log.at(-1)?.auditSurge
-        ? "AUDIT SURGE"
-      : log.at(-1)?.tempoBonus
-        ? "QUICK READ"
-        : reframeCombo >= 2
-          ? "판 바꾸기 보너스"
-          : currentChallengeStreak >= 2
-            ? "연속 챌린지 보너스"
-            : currentAverageResponseTime >= 20
-              ? "숙고 보너스"
-              : log.length >= 3
-                ? "연속 판단 보너스"
-                : "보너스 대기";
+  // The entry's title "CRISIS PROTOCOL", `streakReward`, `instinctSurge` and
+  // `auditSurge` were read here first. No commit writes any of them, so those
+  // four branches never ran.
+  return log.at(-1)?.tempoBonus
+    ? "QUICK READ"
+    : reframeCombo >= 2
+      ? "판 바꾸기 보너스"
+      : currentChallengeStreak >= 2
+        ? "연속 챌린지 보너스"
+        : currentAverageResponseTime >= 20
+          ? "숙고 보너스"
+          : log.length >= 3
+            ? "연속 판단 보너스"
+            : "보너스 대기";
 }
 
 export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {

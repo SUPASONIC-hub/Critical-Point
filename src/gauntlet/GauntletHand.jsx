@@ -1,6 +1,7 @@
 import { Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 /**
  * The hand: every card the scene deals, and 판을 다시 짠다 after them.
@@ -29,6 +30,9 @@ export function GauntletHand({
   fractureAxis,
   onSelect,
 }) {
+  // The digit on a card is its key. With the single-key shortcuts off it is
+  // neither announced nor drawn.
+  const { letterKeys, keys } = useShortcutHints();
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const overclocked = schema.mutations.includes("overclock");
   const reframeSelected = selectedId === REFRAME_CARD_ID;
@@ -47,11 +51,11 @@ export function GauntletHand({
             key={card.id}
             className={`choice gx-card${selected ? " selected" : ""}${sealed ? " is-sealed" : ""}${burn?.fractured ? " is-fractured" : ""}${open ? "" : " locked-choice"}`}
             aria-pressed={selected}
-            aria-keyshortcuts={String(index + 1)}
+            aria-keyshortcuts={keys(index + 1)}
             blocked={blocked || !open}
             onClick={() => onSelect(card.id)}
           >
-            <span className="gx-card-key" aria-hidden="true">{index + 1}</span>
+            {letterKeys && <span className="gx-card-key" aria-hidden="true">{index + 1}</span>}
             <span className="gx-card-label">{card.label}</span>
             {schema.faceDown ? (
               <span className="gx-card-stats">
@@ -117,11 +121,11 @@ export function GauntletHand({
           type="button"
           className={`choice gx-card gx-card-wild${reframeSelected ? " selected" : ""}`}
           aria-pressed={reframeSelected}
-          aria-keyshortcuts={String(cards.length + 1)}
+          aria-keyshortcuts={keys(cards.length + 1)}
           blocked={blocked}
           onClick={() => onSelect(REFRAME_CARD_ID)}
         >
-          <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>
+          {letterKeys && <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>}
           <span className="gx-card-label">{reframeChoice.label}</span>
           <span className="gx-card-stats">
             <b className="gx-card-chips">WILD +{getCardChips(reframeChoice, schema)}</b>

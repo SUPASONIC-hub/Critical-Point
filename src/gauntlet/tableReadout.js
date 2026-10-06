@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
 
@@ -87,8 +87,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
   const stanceEarned = win.focus >= STANCE_CHARGE && win.focusHits > 0;
   const stanceMastery = run?.stanceMastery;
   // The board after this window is the season's next one, and it leans in on
-  // the schedule `resolveWindow` applies (`getSeasonEscalation`).
-  const windowIndex = (Number(run?.windowIndex) || 0) + 1;
+  // the schedule `resolveWindow` applies (`getSeasonEscalation`), which a
+  // practice window does not move along (`getEscalationWindow`).
+  const windowIndex = getEscalationWindow(run) + (run?.practice ? 0 : 1);
 
   const cashMutations = useMemo(
     () =>

@@ -31,8 +31,11 @@ const budgets = [
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 551_000, maxGzip: 176_100 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
-  // case01, was 79,679 / 19,176 on 2026-09-29.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 84_000, maxGzip: 20_200 },
+  // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
+  // 2026-10-06, when cases 01-07 and the finale were written at the length of
+  // the rest of the season: its thirty scenes are the most of any case. It is
+  // not the chunk a first visit waits for; that one is prologue01.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
@@ -73,11 +76,17 @@ const budgets = [
   // 5,293 / 2,232, with the board's loading, error and retry states.
   { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_560, maxGzip: 2_350 },
   // 3,860 / 1,759, with rows typed before they are rendered.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_060, maxGzip: 1_850 },
+  // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
+  // 5%: the count that is not "0명" while it loads, the region that says when
+  // the rows arrive, and `lang` on the English labels.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_420, maxGzip: 1_980 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_010, maxGzip: 3_970 },
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 4_740, maxGzip: 1_990 },
+  // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
+  // 1,995 plus 5%, for telling a success from a failure -- two regions that
+  // are on the page before they speak, where one alert said both.
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_090, maxGzip: 2_100 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_720, maxGzip: 13_520 },
@@ -152,6 +161,21 @@ function checkBudget(file, budget) {
   const gzipBudget = budget.maxGzip ?? Math.ceil(budget.maxBytes * 0.4);
   reported.push(`${file}: ${bytes} bytes raw / ${gzipBytes} bytes gzip`);
   if (gzipBytes > gzipBudget) failures.push(`${file} is ${gzipBytes} gzip bytes, over the ${gzipBudget} gzip budget.`);
+}
+
+// The service worker (src/serviceWorker/worker.js), written to the root by
+// `serviceWorker()` in vite.config.js. Its size is its code plus one line that
+// lists every file of the release: 8,358 / 2,992 on 2026-10-06, plus 5%. It
+// is fetched after `load`, so it is on no paint's path.
+const WORKER_BUDGET = { maxBytes: 8_780, maxGzip: 3_150 };
+try {
+  const worker = readFileSync(path.join(distDir, "sw.js"));
+  const gzipBytes = gzipSync(worker).length;
+  reported.push(`sw.js: ${worker.length} bytes raw / ${gzipBytes} bytes gzip`);
+  if (worker.length > WORKER_BUDGET.maxBytes) failures.push(`sw.js is ${worker.length} bytes, over the ${WORKER_BUDGET.maxBytes} byte budget.`);
+  if (gzipBytes > WORKER_BUDGET.maxGzip) failures.push(`sw.js is ${gzipBytes} gzip bytes, over the ${WORKER_BUDGET.maxGzip} gzip budget.`);
+} catch {
+  failures.push("dist/sw.js is missing; the build writes it (serviceWorker() in vite.config.js).");
 }
 
 // First paint.

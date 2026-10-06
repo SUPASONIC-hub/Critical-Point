@@ -516,18 +516,10 @@ export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0, ca
   return "OBSERVER";
 }
 
-/**
- * The id a case closes on. The runtime builds two choices of its own on a
- * case's closing scene -- `<case>_adaptive_reframe` and
- * `<case>_relationship_bridge` -- and both go where the scene's first choice
- * goes. No outcome, carryover, continuity or opening table knows their ids, so
- * a case they close records the choice they stand in for, and the next case
- * opens as if it had been taken.
- */
-export function getOutcomeChoiceId(choiceId = "", node = null) {
-  if (!/_(adaptive_reframe|relationship_bridge)$/.test(choiceId ?? "")) return choiceId;
-  return node?.choices?.find((choice) => choice.type !== "reframe")?.id ?? choiceId;
-}
+// A scene's lead card, the id a case closes on, and where a scene goes with
+// nobody there to choose: rules that read one scene, kept with the season's
+// other rules.
+export { getLeadChoice, getOutcomeChoiceId, getUnattendedNext } from "./seasonRules.js";
 
 export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0, casesOpened = 0 } = {}) {
   const required = choice.requiredAuthority;
@@ -985,6 +977,34 @@ export function getRouteMemory(entries = []) {
   };
 }
 
+/**
+ * The mean seconds a decision took, over the decisions the player made. A
+ * system entry (a bust carried across a restore, an abandoned window the table
+ * closed) is not one: it has no response time, and counting it as zero pulled
+ * the average down in the summary, the ranking row and the telemetry, while
+ * `getGameplayStats` already left those entries out.
+ */
+export function getAverageResponseTime(entries = []) {
+  const decisions = (Array.isArray(entries) ? entries : []).filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent);
+  if (decisions.length === 0) return 0;
+  return Math.round(decisions.reduce((sum, entry) => sum + (Number(entry.responseTimeSec) || 0), 0) / decisions.length);
+}
+
+/**
+ * What a window with no clock reading of its own took, in seconds. An
+ * abandoned window carries no `elapsed`, and what stood in for it was the wall
+ * clock since the scene was entered -- which a reload does not restart, so a
+ * tab closed overnight logged thirty thousand seconds for one decision. No
+ * window runs longer than its board's clock, so that is the most it can be.
+ */
+export function getWindowResponseTime({ elapsed = 0, enteredAt = 0, now = Date.now(), clockSeconds = 0 } = {}) {
+  const measured = Number(elapsed);
+  if (Number.isFinite(measured) && measured > 0) return Math.max(1, Math.round(measured));
+  const sinceEntry = (Number(now) - Number(enteredAt)) / 1000;
+  const cap = Number(clockSeconds) > 0 ? Number(clockSeconds) : Infinity;
+  return Math.max(1, Math.round(Math.min(Number.isFinite(sinceEntry) ? Math.max(0, sinceEntry) : 0, cap)));
+}
+
 export function createCaseSummary(
   triggerScores = {},
   cognitionScores = {},
@@ -1002,13 +1022,7 @@ export function createCaseSummary(
     secondary: sortedTriggers[1] ?? ["protection", 0],
     thinking: sortedCognition[0] ?? ["persistence", 0],
     reframeCount: stats.reframeCount,
-    averageResponseTime:
-      entries.length > 0
-        ? Math.round(
-            entries.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) /
-              entries.length,
-          )
-        : 0,
+    averageResponseTime: getAverageResponseTime(entries),
     challengeClearCount: stats.challengeClearCount,
     reducedRiskCount: stats.reducedRiskCount,
     rhythmScore: stats.rhythmScore,

@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { parse } from "espree";
 import { costWhenRising } from "../src/gameConstants.js";
@@ -23,7 +24,18 @@ import { costWhenRising } from "../src/gameConstants.js";
  * the cap sooner and the endings written against thresholds shift underneath.
  * `npm run check:endings` is what has to be read after running this.
  *
- * Run with --dry to list what would change.
+ *   (no arguments)   list what would change, and write nothing
+ *   --write          change the files. Refused unless the working tree is
+ *                    clean, so that `git diff` afterwards is this run and
+ *                    nothing else, and `git restore .` takes it back
+ *   --rate=0.1       the fraction a gain goes up by
+ *   --dry            the default, by its old name
+ *
+ * It used to be the other way round: it wrote unless it was given exactly
+ * `--dry`, so `--dry-run`, `--help`, a typo and no arguments at all each
+ * rewrote every effect number in the season -- and a second run did it again
+ * on top of the first, since a raise of a raise is not undone by taking one
+ * back. An argument it does not know now stops it before it reads a file.
  */
 
 /**
@@ -70,8 +82,48 @@ const NOT_AUTHORED = {
 const NOT_RAISED_TABLES = new Set(["carryovers"]);
 
 const RESOURCE_KEYS = new Set(["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"]);
-const RATE = Number(process.argv.find((arg) => arg.startsWith("--rate="))?.split("=")[1] ?? "0.1");
-const dryRun = process.argv.includes("--dry");
+const USAGE = "Usage: node scripts/raise-choice-gains.mjs [--write] [--rate=0.1]   (without --write it only lists what would change)";
+const args = process.argv.slice(2);
+if (args.includes("--help") || args.includes("-h")) {
+  console.log(USAGE);
+  process.exit(0);
+}
+const unknown = args.filter((arg) => !["--write", "--dry"].includes(arg) && !/^--rate=/.test(arg));
+if (unknown.length) {
+  console.error(`Unknown argument${unknown.length === 1 ? "" : "s"}: ${unknown.join(" ")}. Nothing was read or written.\n${USAGE}`);
+  process.exit(2);
+}
+const RATE = Number(args.find((arg) => arg.startsWith("--rate="))?.split("=")[1] ?? "0.1");
+if (!Number.isFinite(RATE) || RATE <= 0 || RATE > 1) {
+  console.error(`--rate has to be a fraction above 0 and at most 1; got "${args.find((arg) => arg.startsWith("--rate="))}". Nothing was read or written.`);
+  process.exit(2);
+}
+// Writing is asked for by name, and `--dry` beside it still wins.
+const dryRun = !args.includes("--write") || args.includes("--dry");
+
+/**
+ * A write lands on top of whatever the working tree holds. On a clean tree the
+ * diff afterwards is exactly this run; on a dirty one it is this run mixed
+ * into someone's unfinished edit, with no way to take one back without the
+ * other. A tree git cannot describe is treated as dirty.
+ */
+if (!dryRun) {
+  let status;
+  try {
+    status = execFileSync("git", ["status", "--porcelain"], { encoding: "utf8" });
+  } catch (error) {
+    console.error(`--write needs a git working tree to check, and \`git status\` failed: ${String(error.message).split("\n")[0]}. Nothing was written.`);
+    process.exit(1);
+  }
+  if (status.trim()) {
+    console.error(
+      "--write changes about sixty files, and the working tree already has changes in it:\n" +
+        status.split(/\r?\n/).filter(Boolean).slice(0, 8).map((line) => `  ${line}`).join("\n") +
+        "\nCommit or set them aside first. Nothing was written.",
+    );
+    process.exit(1);
+  }
+}
 
 /** Strictly increasing in the magnitude, so sibling orderings survive it. */
 function raised(magnitude) {
@@ -204,3 +256,5 @@ console.log(
   `${dryRun ? "Would raise" : "Raised"} ${totalRaised} gains across ${totalEffects} effects in ${filesWithEffects} of ${AUTHORED.length} files ` +
     `at ${RATE * 100}% (floor 1).`,
 );
+if (dryRun) console.log("Nothing was written. Run again with --write, on a clean working tree, to change the files.");
+else console.log("Read `npm run check:endings` and `npm run check:balance` before committing. `git restore src` takes this run back.");

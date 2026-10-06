@@ -1,8 +1,25 @@
 name: Visual Regression
 
+# When the screenshots are compared:
+#
+#   - every push to main;
+#   - a pull request that changes what the screenshots are made of -- the
+#     style sheets, index.html (which carries the inlined critical CSS), the
+#     font, the baselines or this spec -- without anyone asking;
+#   - any other pull request once it carries the `visual` label;
+#   - every Dependabot pull request;
+#   - a dispatch by hand, which can also record the baselines.
+#
+# The second line is from 2026-10-06. Until then a style change was compared
+# only after it had merged, on a run with no pull request attached, and Deploy
+# hangs off Verify alone: the page could be live before its screenshot turned
+# red. There was also a Tuesday schedule. It compared a commit every push had
+# already compared, in a container pinned by digest, so nothing could differ
+# from the push's own run; and like every scheduled run it had nobody watching
+# it. It is gone rather than given a reporter.
 on:
   pull_request:
-    # `labeled` so that adding the `visual` label starts this; see the job condition.
+    # `labeled` so that adding the `visual` label starts this; see the `scope` job.
     types: [opened, synchronize, reopened, labeled]
   push:
     branches:
@@ -14,12 +31,10 @@ on:
         description: "Record the Linux baselines instead of comparing against them, and push them to a branch"
         type: boolean
         default: false
-  schedule:
-    - cron: "43 3 * * 2"
 
 # Read-only by default. Only `push-baselines` below writes, and only on a
-# dispatch that asked for it: a labelled pull request -- whose code is not
-# reviewed yet -- runs with a token that cannot push.
+# dispatch that asked for it: a pull request -- whose code is not reviewed
+# yet -- runs with a token that cannot push.
 permissions:
   contents: read
 
@@ -31,14 +46,64 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    # Decides whether this run compares. A job condition cannot see which
+    # files a pull request touches, and a workflow-level `paths:` filter would
+    # also switch off the label, so the question is asked of the API here. It
+    # runs no project code and does not check the repository out.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      compare: ${{ steps.decide.outputs.compare }}
+    steps:
+      - name: Decide whether to compare
+        id: decide
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          HAS_VISUAL_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'visual') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          decide() { echo "compare=$1" >> "$GITHUB_OUTPUT"; echo "$2"; }
+          if [ "$EVENT" != "pull_request" ]; then
+            decide true "Not a pull request: comparing."
+          elif [ "$ACTION" = "labeled" ]; then
+            # A label changes no pixels. Only `visual` itself starts a run;
+            # any other label would repeat the one the code already had.
+            if [ "$ADDED_LABEL" = "visual" ]; then decide true "Labelled visual: comparing."
+            else decide false "Labelled $ADDED_LABEL, which asks for nothing here."; fi
+          elif [ "$AUTHOR" = "dependabot[bot]" ]; then
+            # An icon or font package bump shows up as pixels before it shows
+            # up anywhere else.
+            decide true "A Dependabot pull request: comparing."
+          elif [ "$HAS_VISUAL_LABEL" = "true" ]; then
+            decide true "Carries the visual label: comparing."
+          else
+            # A failed listing compares: the cost of a wrong yes is a few
+            # minutes, and of a wrong no an unreviewed screenshot on the site.
+            if ! files=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename'); then
+              decide true "::warning title=Compared without knowing why::The pull request's file list could not be read, so the screenshots are compared to be safe."
+              exit 0
+            fi
+            touched=$(printf '%s\n' "$files" | grep -E '^(src/styles/|src/assets/fonts/|index\.html$|tests/visual-regression\.spec\.js)' || true)
+            if [ -n "$touched" ]; then
+              decide true "Touches what the screenshots are made of: $(printf '%s' "$touched" | tr '\n' ' ')"
+            else
+              decide false "No style sheet, font, index.html or baseline in this pull request; add the visual label to compare anyway."
+            fi
+          fi
+
   visual-regression:
-    # Dependabot pull requests compare too: an icon or font package bump shows
-    # up as pixels before it shows up anywhere else.
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'labeled') ||
-      (contains(github.event.pull_request.labels.*.name, 'visual') &&
-       (github.event.action != 'labeled' || github.event.label.name == 'visual'))
+    needs: scope
+    if: needs.scope.outputs.compare == 'true'
     runs-on: ubuntu-latest
     # Screenshots are compared byte-for-byte against a committed baseline, so the
     # thing that renders them has to be pinned as tightly as the code is. The
@@ -51,12 +116,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # One Node version for CI and the Render build: .node-version.
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      # The browsers are the container's own.
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
+          browser: none
 
       # Fails in seconds with the name of the missing file. Without it a missing
       # baseline set surfaces as five screenshot timeouts and no explanation.
@@ -100,9 +163,11 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # The only job in the repository's workflows that can write, and it runs no
-    # project code: it checks out, drops in the PNGs the container recorded,
-    # and pushes them to a fresh branch for a pull request.
+    # The only job in the repository's workflows that can write to the
+    # repository's contents (the report jobs of Full Coverage and Migration
+    # Drift write issues and nothing else), and it runs no project code: it
+    # checks out, drops in the PNGs the container recorded, and pushes them to
+    # a fresh branch for a pull request.
     permissions:
       contents: write
     steps:

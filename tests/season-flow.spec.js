@@ -386,6 +386,35 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
     .toBe("c1_route_system");
 });
 
+// The action bar is `position: fixed`, so "the confirm button is inside the
+// viewport" was true of any layout at all: this passed while the hand sat a
+// screen and a half below the bar. What a phone on its side has to show is the
+// last card above the bar with nothing scrolled, the rule priority 27 holds an
+// upright phone to. 667x375 is an iPhone SE or 8; 844x390 an iPhone 14.
+for (const size of [{ width: 667, height: 375 }, { width: 844, height: 390 }]) {
+  test(`a phone on its side keeps the whole decision on one screen at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "final", "f_start_owner");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await page.locator(".choices .choice:not(.gx-card-wild)").last().dispatchEvent("click");
+    const layout = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll(".choices .choice")].map((card) => card.getBoundingClientRect().bottom);
+      return {
+        cards: cards.length,
+        lastCard: Math.round(Math.max(...cards)),
+        actionsTop: Math.round(document.querySelector(".gx-actions").getBoundingClientRect().top),
+        pageHeight: document.documentElement.scrollHeight,
+        pageWidth: document.documentElement.scrollWidth,
+      };
+    });
+    expect(layout.cards).toBeGreaterThan(3);
+    expect(layout.lastCard, `last card ${layout.lastCard - layout.actionsTop}px under the action bar`).toBeLessThanOrEqual(layout.actionsTop);
+    expect(layout.pageHeight, "the table scrolls").toBeLessThanOrEqual(size.height + 2);
+    expect(layout.pageWidth).toBeLessThanOrEqual(size.width + 1);
+  });
+}
+
 test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 667, height: 375 });
   await page.goto("/?debug=1");
@@ -570,7 +599,10 @@ test("starting a fresh game clears stale recovery guidance", async ({ page }) =>
   });
   await page.goto("/");
   await expect(page.getByText("복구됨")).toBeVisible();
+  // The save is a run that can be resumed, so starting over asks first.
+  const asked = acceptConfirms(page);
   await startFirstRun(page);
+  expect(asked.at(-1)).toContain("첫 사건부터 새로 시작");
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.lastError).toBeNull();
@@ -1220,7 +1252,7 @@ test("error boundary can clear the current saved state", async ({ page }) => {
   });
   await page.reload();
   await expect(page.getByRole("heading", { name: "장면을 불러오지 못했습니다." })).toBeVisible();
-  await page.getByRole("button", { name: "현재 저장본만 초기화" }).click();
+  await page.getByRole("button", { name: "저장본을 초기화하고 새 게임" }).click();
   await expect(page.locator(".intro")).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).toBeNull();
 });
@@ -1258,7 +1290,7 @@ test("error boundary clear save failure does not reload", async ({ page }) => {
   });
   await page.goto("/?debug=1");
   await expect(page.getByRole("heading", { name: "장면을 불러오지 못했습니다." })).toBeVisible();
-  await page.getByRole("button", { name: "현재 저장본만 초기화" }).click();
+  await page.getByRole("button", { name: "저장본을 초기화하고 새 게임" }).click();
   await expect(page.getByText("현재 저장본을 삭제하지 못했습니다. 브라우저 저장소 권한을 확인한 뒤 다시 시도하세요.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "장면을 불러오지 못했습니다." })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).not.toBeNull();
@@ -1506,12 +1538,16 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
 
   await expect(page.locator(".ending-sequence")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toBeVisible();
+  // Each step takes the pressed button away with the block it was in. Focus
+  // goes to where the next one starts, never to <body>.
+  await expect(page.locator(".ending-sequence h1")).toBeFocused();
   for (let index = 0; index < 3; index += 1) {
     await page.locator(".ending-sequence button").click();
   }
 
   await expect(page.locator(".ending-step-1")).toBeVisible();
   await expect(page.locator(".ending-quiet-line")).toBeVisible();
+  await expect(page.locator(".ending-quiet-beat button")).toBeFocused();
   // Reduced motion drops the eight-second hold, so the skip control only
   // appears when the hold is actually running.
   const quietSkip = page.locator(".ending-quiet-skip");
@@ -1519,14 +1555,53 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   await expect(page.getByTestId("ending-next")).toBeVisible();
   await page.getByTestId("ending-next").click();
   await expect(page.locator(".ending-step-2 textarea")).toBeVisible();
+  await expect(page.locator(".ending-step-2 textarea")).toBeFocused();
   await page.locator(".ending-step-2 textarea").fill("다음 사람은 기록보다 먼저 조건을 확인하세요.");
   await page.locator(".ending-step-2 button").click();
 
   await expect(page.locator(".ending-step-3")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
+  await expect(page.locator(".result-hero h1")).toBeFocused();
+  await expect(page.locator(".ending-sequence [role='status']")).toContainText("기록이 열렸습니다");
   await expect
     .poll(async () => page.evaluate(() => localStorage.getItem("critical-point-next-participant-message")))
     .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
+});
+
+test("leaving the table for the intro puts focus on the intro's heading", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.getByRole("button", { name: "저장 후 나가기" }).click();
+  await expect(page.locator(".intro")).toBeVisible();
+  // The pressed button went with the table. Nothing took focus, so a keyboard
+  // or screen-reader player was back at the top of the document, unannounced.
+  await expect(page.locator(".intro h1")).toBeFocused();
+});
+
+test("시즌 로드맵 from a report lands on the roadmap, at the case the season has reached", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_aftershock");
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".result-page")).toBeVisible();
+  await page.getByRole("button", { name: "시즌 로드맵" }).click();
+
+  const heading = page.locator("#season-roadmap");
+  await expect(heading).toBeFocused();
+  await expect(heading).toBeInViewport();
+  // On a phone the roadmap is a rail of every case, and it opened on the first.
+  const rail = await page.evaluate(() => {
+    const track = document.querySelector(".case-roadmap");
+    const card = track.querySelector(".active-case");
+    const trackBox = track.getBoundingClientRect();
+    const cardBox = card.getBoundingClientRect();
+    return { scrolled: track.scrollLeft, cardLeft: cardBox.left - trackBox.left, cardRight: cardBox.right - trackBox.left, width: trackBox.width };
+  });
+  expect(rail.scrolled).toBeGreaterThan(0);
+  expect(rail.cardLeft).toBeGreaterThanOrEqual(-1);
+  expect(rail.cardRight).toBeLessThanOrEqual(rail.width + 1);
 });
 
 test("completed case is retained in the local ranking after leaving the ending", async ({ page }) => {
