@@ -182,6 +182,44 @@ test("consent unticked while a send is in flight stops the batch and leaves the 
   assert.equal(kept.length, items.length);
 });
 
+test("consent unticked during a send that fails is still an aborted batch", async () => {
+  const items = [caseItem("run-g", "case01"), caseItem("run-g", "case02")];
+  let consent = true;
+  const { aborted } = await policy.sendTelemetryBatch(items, {
+    canSend: () => consent,
+    send: async () => {
+      consent = false;
+      throw new Error("Network unavailable");
+    },
+  });
+  assert.equal(aborted, true, "the stopped pass asked nobody on the rows after the failure");
+});
+
+test("a queue cleared while its batch was out is not written back", () => {
+  const [first, second, third] = [caseItem("run-h", "case01"), caseItem("run-h", "case02"), caseItem("run-h", "case03")];
+  const late = feedbackItem(7);
+  // An ordinary pass: the first row landed, the second waits, one was queued meanwhile.
+  assert.deepEqual(
+    policy.reconcileTelemetryQueue([first, second, late], [first, second], [second]).map((item) => item.id),
+    [second.id, late.id],
+  );
+  // The player cleared the queue (consent off, or a reset) while the batch was out.
+  assert.deepEqual(policy.reconcileTelemetryQueue([], [first, second, third], [first, second, third]), []);
+  // A reset that then queued a row of the new run keeps that row only.
+  assert.deepEqual(policy.reconcileTelemetryQueue([late], [first, second], [first, second]), [late]);
+});
+
+test("the batch says how many rows the server refused for good", async () => {
+  const items = [caseItem("run-i", "case01"), caseItem("run-i", "case02")];
+  const { kept, refused } = await policy.sendTelemetryBatch(items, {
+    send: async (item) => {
+      if (item === items[0]) throw failure({ status: 400, serverMessage: "telemetry payload too large" });
+    },
+  });
+  assert.deepEqual(kept, []);
+  assert.equal(refused, 1);
+});
+
 test("the queue holds a season played with no server in reach", () => {
   const seasonRows = [...CASE_SEQUENCE.map((caseId) => caseItem("run-g", caseId)), caseItem("run-g", "season-final")];
   assert.ok(policy.TELEMETRY_QUEUE_MAX_ITEMS > seasonRows.length, `cap ${policy.TELEMETRY_QUEUE_MAX_ITEMS} against ${seasonRows.length} rows`);

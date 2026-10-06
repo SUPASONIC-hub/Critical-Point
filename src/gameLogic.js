@@ -1,6 +1,7 @@
 import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { ENDING_GATES } from "./gameConstants.js";
+import { getBranchDetourBypass } from "./seasonRules.js";
 import { limitText, makeEmptyScores } from "./appConfig.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
@@ -517,16 +518,43 @@ export function getAuthorityLevel({ clueCount = 0, trust = 0, legitimacy = 0, ca
 }
 
 /**
+ * The card a scene was written to lead with, wherever the deal put it
+ * (`leadChoiceId`, nodes/sceneBuild.js). A scene built without one leads with
+ * the first card it deals.
+ */
+export function getLeadChoice(node = null) {
+  const dealt = (node?.choices ?? []).filter((choice) => choice.type !== "reframe");
+  return dealt.find((choice) => choice.id === node.leadChoiceId) ?? dealt[0] ?? null;
+}
+
+/**
  * The id a case closes on. The runtime builds two choices of its own on a
  * case's closing scene -- `<case>_adaptive_reframe` and
- * `<case>_relationship_bridge` -- and both go where the scene's first choice
+ * `<case>_relationship_bridge` -- and both go where the scene's lead card
  * goes. No outcome, carryover, continuity or opening table knows their ids, so
- * a case they close records the choice they stand in for, and the next case
+ * a case they close records the card they stand in for, and the next case
  * opens as if it had been taken.
+ *
+ * That card is the lead card, the one whose `next` they were built from. This
+ * used to read the first card the scene deals, which was the same card until
+ * the deal was shuffled: in 39 of the 55 cases the two then differed, and a
+ * case closed toward one outcome was recorded, and carried over, as another.
  */
 export function getOutcomeChoiceId(choiceId = "", node = null) {
   if (!/_(adaptive_reframe|relationship_bridge)$/.test(choiceId ?? "")) return choiceId;
-  return node?.choices?.find((choice) => choice.type !== "reframe")?.id ?? choiceId;
+  return getLeadChoice(node)?.id ?? choiceId;
+}
+
+/**
+ * Where a scene goes when nobody is there to choose (a bust skips the scene
+ * the card led to, useChoiceCommit.getBlackoutSkip): where its lead card goes
+ * on this run, a gated detour taking its bypass when its condition does not
+ * hold. `null` for a scene that deals nothing.
+ */
+export function getUnattendedNext(node = null, context = {}) {
+  const lead = getLeadChoice(node);
+  if (!lead) return null;
+  return getBranchDetourBypass(lead, context) ?? lead.next ?? null;
 }
 
 export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legitimacy = 0, casesOpened = 0 } = {}) {

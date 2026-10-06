@@ -45,6 +45,7 @@ import {
   getCaseOutcome,
   getOutcomeCarryover,
   getContinuityChallenge,
+  getLeadChoice,
   getSeasonWear,
   detectPrivacySignals,
   explainResourceTradeoff,
@@ -374,7 +375,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const aftermathNodeId = caseAftermathNodeId(fallbackCaseId);
   const adaptiveChoiceUnlocked = resolvedNodeId === aftermathNodeId && currentCaseReframeCount >= 2;
   // The card the scene was written to lead with, wherever the deal put it.
-  const leadChoice = node?.choices?.find((choice) => choice.id === node.leadChoiceId) ?? node?.choices?.[0];
+  const leadChoice = getLeadChoice(node);
   const adaptiveChoice = useMemo(
     () =>
       adaptiveChoiceUnlocked

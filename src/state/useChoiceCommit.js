@@ -15,6 +15,7 @@ import {
   getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
+  getUnattendedNext,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../gameLogic.js";
@@ -28,8 +29,7 @@ import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
-import { isPermanentRefusal } from "./telemetryBatch.js";
-import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
+import { validateTelemetryItem } from "./payloadSchemas.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -55,11 +55,16 @@ function getReframeTarget(caseId, fromNodeId) {
  * an analyst who blew up: the scene the card led to plays out without them,
  * and the table deals the one after it. Never onto a result -- a bust does not
  * close a case -- and never off the authored graph.
+ *
+ * The room goes where the skipped scene's lead card would have taken it
+ * (gameLogic.getUnattendedNext), through the same gate a played card passes.
+ * It used to follow the first card dealt, which the shuffled deal made a
+ * different route on forty fork scenes, and it walked into gated detours.
  */
-function getBlackoutSkip(fromNodeId) {
+function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];
   if (!skippedNode || RESULT_NODE_IDS.has(fromNodeId)) return null;
-  const onward = skippedNode.choices?.find((candidate) => candidate.type !== "free")?.next;
+  const onward = getUnattendedNext(skippedNode, branchContext);
   if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
   return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
 }
@@ -100,8 +105,8 @@ export function useChoiceCommit(context) {
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
     if (currentCase === "final") onSeasonFinal();
-    // How the case row fared: "delivered", "queued" for a retry, or "refused".
-    let caseDelivery = Promise.resolve("refused");
+    // Whether the case row is in the queue, and so whether a ranking row may follow it.
+    let caseRowQueued = false;
     const { saved: localRankingSaved } = appendLocalRankingRow({
       local: true,
       run_id: runId,
@@ -137,35 +142,26 @@ export function useChoiceCommit(context) {
         decision_log: nextLog,
         dynamics: { ...createRunSummary(nextRun), responseTimeSec },
       };
-      setTelemetryStatus({ tone: "pending", text: "케이스 로그를 원격 저장하는 중입니다." });
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
         type: "case",
         label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
         payload: caseTelemetryPayload,
       };
-      // `sendTelemetryItem` runs the privacy check before the first send, the
-      // same one a retry from the queue gets (priority 61).
-      caseDelivery = sendTelemetryItem(caseItem)
-        .then(() => {
-          setTelemetryStatus({ tone: "success", text: "케이스 로그가 원격 저장됐습니다." });
-          return "delivered";
-        })
-        .catch((error) => {
-          console.warn(error);
-          if (isPermanentRefusal(error)) {
-            setTelemetryStatus({ tone: "error", text: "서버가 이 케이스 로그를 받지 않았습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
-            return "refused";
-          }
-          // Queued with the payload it was built with, event id included, so a
-          // retry of a send that did land writes nothing new.
-          queueTelemetry(caseItem);
-          setTelemetryStatus({
-            tone: "error",
-            text: "원격 저장에 실패했습니다. 로컬 대기열에 보관했으니 결과 화면에서 재시도할 수 있습니다.",
-          });
-          return "queued";
-        });
+      // Into the queue first, and so into the save, and sent from there (the
+      // runtime starts a pass as soon as the queue holds a row). The row used
+      // to be sent straight away and queued only when the send failed: a tab
+      // closed or frozen while it was in flight had kept it nowhere, and the
+      // server ranks a run only when every one of its cases has a row. The
+      // queue runs the same privacy check before each send (priority 61), and
+      // the row's event id makes a send that did land harmless to repeat.
+      if (validateTelemetryItem(caseItem).length > 0) {
+        setTelemetryStatus({ tone: "error", text: "이 케이스 로그는 보낼 수 없는 형식이라 원격 저장하지 않습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
+      } else {
+        queueTelemetry(caseItem);
+        caseRowQueued = true;
+        setTelemetryStatus({ tone: "pending", text: "케이스 로그를 보관했습니다. 연결되는 대로 원격 저장합니다." });
+      }
     }
 
     if (currentCase !== "final" || nextCompletedCases.length !== CASE_SEQUENCE.length) return;
@@ -191,28 +187,16 @@ export function useChoiceCommit(context) {
       setSaveStatus("Season ranking save failed: browser storage is unavailable.");
       recordAppError(new Error("Season ranking save failed because browser storage could not be written."), {}, "local-ranking-save");
     }
-    if (telemetryEnabled && dataConsent) {
-      const seasonItem = {
+    // The server takes a ranking row only once the run's last case row has
+    // landed. It goes into the queue behind that row, and the queue holds it
+    // there until the case row is through (telemetryBatch.isHeldBehindCaseRow).
+    // With no case row queued the run cannot rank, and no ranking row is sent.
+    if (telemetryEnabled && dataConsent && caseRowQueued) {
+      queueTelemetry({
         id: `season-final-${runId}`,
         type: "case",
         label: "SEASON 01 COMPLETE",
         payload: seasonTelemetryPayload,
-      };
-      // The server takes a ranking row only once the run's last case row has
-      // landed. The two used to leave together and race; when the ranking row
-      // won, it was refused. It now goes after the case row has an answer:
-      // behind it in the queue when the case row is waiting there, and not at
-      // all when the server refused the case row, since the run cannot rank.
-      caseDelivery.then((outcome) => {
-        if (outcome === "refused") return;
-        if (outcome === "queued") {
-          queueTelemetry(seasonItem);
-          return;
-        }
-        sendTelemetryItem(seasonItem).catch((error) => {
-          console.warn(error);
-          if (!isPermanentRefusal(error)) queueTelemetry(seasonItem);
-        });
       });
     }
   }
@@ -237,12 +221,13 @@ export function useChoiceCommit(context) {
     const { challengeMatch, tacticalRead, riskDelta } = readers.getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
 
     const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(currentCase) - 1];
-    const branchBypass = getBranchDetourBypass(choice, {
+    const branchContext = {
       resources,
       previousOutcomeChoiceId: previousCaseId ? caseResults[previousCaseId]?.outcomeChoiceId : undefined,
-    });
+    };
+    const branchBypass = getBranchDetourBypass(choice, branchContext);
     const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-    const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode) : null;
+    const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode, branchContext) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
     const { verdict, nextRun, unlockedRelics } = relicTable.settle({ run: gauntletRun, window: windowState, card: choice, caseClosed, offerRelics: currentCase !== "final" });
