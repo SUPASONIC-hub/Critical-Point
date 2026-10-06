@@ -31,8 +31,11 @@ const budgets = [
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 551_000, maxGzip: 176_100 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
-  // case01, was 79,679 / 19,176 on 2026-09-29.
-  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 84_000, maxGzip: 20_200 },
+  // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
+  // 2026-10-06, when cases 01-07 and the finale were written at the length of
+  // the rest of the season: its thirty scenes are the most of any case. It is
+  // not the chunk a first visit waits for; that one is prologue01.
+  { pattern: /^(prologue0[1-5]|case[0-9]{2}|final)-.*\.js$/, maxBytes: 98_900, maxGzip: 25_400 },
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
