@@ -263,12 +263,31 @@ async function putRemote(save, expectedRevision) {
 }
 
 /**
+ * Whether a copy the server holds, and this upload did not expect, was put
+ * there by this device after all -- by another tab of it. Every tab keeps its
+ * own timer and its own "one upload at a time", and they share one record of
+ * the last revision. So a tab can read revision n, and find the server at n+1
+ * because the tab beside it uploaded in between: that was held as a conflict
+ * with "another device", and it stopped uploads in both tabs until the player
+ * settled it on the intro.
+ *
+ * Storage is read again, since the other tab writes the revision it was given
+ * there. Before it has, the copy still carries the time of a save this device
+ * wrote: the one in storage now, or the last one recorded as sent.
+ */
+function isOwnRemote(remote, save) {
+  const sync = readSync();
+  if (sync.revision !== null && toRevision(remote?.revision) === sync.revision) return true;
+  return sameInstant(remote?.savedAt, save?.savedAt) || (Boolean(sync.synced) && sameInstant(remote?.savedAt, sync.synced));
+}
+
+/**
  * The revision the next upload is built on, or a conflict. With no revision on
  * record (a device that opted in before revisions were sent) the server's copy
  * counts as this device's own only when its time is the time of the save this
  * device last had accepted.
  */
-async function resolveExpectedRevision(sync, { overwrite }) {
+async function resolveExpectedRevision(sync, save, { overwrite }) {
   if (sync.revision !== null && !overwrite && remoteChecked) return { expected: sync.revision };
   const remote = await peekRemote();
   remoteChecked = true;
@@ -276,7 +295,7 @@ async function resolveExpectedRevision(sync, { overwrite }) {
   if (remote === null) return { expected: 0 };
   if (overwrite) return { expected: remote.revision };
   const own = sync.revision !== null ? remote.revision === sync.revision : Boolean(sync.synced) && sameInstant(remote.savedAt, sync.synced);
-  if (own) return { expected: remote.revision };
+  if (own || isOwnRemote(remote, save)) return { expected: remote.revision };
   return { conflict: remote };
 }
 
@@ -287,7 +306,7 @@ async function upload(save, pending, { overwrite }) {
     publish({ phase: "synced", syncedAt: sync.synced });
     return true;
   }
-  const { expected, conflict } = await resolveExpectedRevision(sync, { overwrite });
+  const { expected, conflict } = await resolveExpectedRevision(sync, save, { overwrite });
   if (conflict) {
     holdConflict(conflict);
     return false;
@@ -299,7 +318,11 @@ async function upload(save, pending, { overwrite }) {
     return true;
   }
   publish({ phase: "syncing", message: "" });
-  const data = await putRemote(save, expected ?? null);
+  let data = await putRemote(save, expected ?? null);
+  // Refused over a copy another tab of this device just put there: built on
+  // that copy, the upload is sent once more (isOwnRemote).
+  const refusedAt = data?.accepted === false ? { savedAt: data.saved_at, revision: toRevision(data.revision) } : null;
+  if (refusedAt && refusedAt.revision !== null && isOwnRemote(refusedAt, save)) data = await putRemote(save, refusedAt.revision);
   if (data?.accepted === false) {
     holdConflict({ savedAt: data.saved_at, revision: data.revision });
     return false;
