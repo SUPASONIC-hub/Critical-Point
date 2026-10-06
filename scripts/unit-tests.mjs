@@ -57,7 +57,7 @@ import {
   RELICS,
   STANCE_RELIC_UNLOCK_COUNT,
 } from "../src/gauntlet/relics.js";
-import { parseRelicCodex } from "../src/gauntlet/useRelicTable.js";
+import { addToRelicCodex, parseRelicCodex, settleAgainstCodex } from "../src/gauntlet/useRelicTable.js";
 import {
   createIntroView,
   createPlayView,
@@ -529,14 +529,13 @@ test("no choice in the graph builds a disagreeing particle", () => {
   }
 });
 
-test("streak rewards take priority in immediate choice feedback", () => {
-  const feedback = getChoiceOutcomeFeedback({
-    choiceId: "choice",
-    effect: { trust: 2 },
-    streakReward: { label: "STREAK PAYOUT", text: "연속 보상" },
-  });
-  assert.equal(feedback.label, "STREAK PAYOUT");
-  assert.equal(feedback.text, "연속 보상");
+test("immediate choice feedback reads the entry's effect, and nothing a commit never writes", () => {
+  assert.equal(getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2 } }).label, "SIGNAL REGISTERED");
+  assert.equal(getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2, time: -3, fatigue: 1 } }).label, "TRADEOFF REGISTERED");
+  // Fields of systems that are gone do not change it.
+  const stale = getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2 }, streakReward: { label: "STREAK PAYOUT", text: "연속 보상" } });
+  assert.equal(stale.label, "SIGNAL REGISTERED");
+  assert.equal(getChoiceOutcomeFeedback({}), null);
 });
 
 const card = (id, effect, extra = {}) => ({ id, label: id, effect, next: "x", ...extra });
@@ -1090,6 +1089,21 @@ test("every relic has copy, the default pool needs no unlock, and ids normalise"
   assert.deepEqual(getRelicPool(["encore"]), [...DEFAULT_RELIC_POOL, "encore"], "the codex adds to the defaults");
   assert.deepEqual(parseRelicCodex("{broken"), { unlocked: [] });
   assert.deepEqual(parseRelicCodex(JSON.stringify({ unlocked: ["insurance", "made-up"] })), { unlocked: ["insurance"] });
+});
+
+test("settling a window proves a feat without writing the codex; keeping it is a second step", () => {
+  // A timeout deals SILENCE, the feat that unlocks STETHOSCOPE.
+  const settlement = { run: normalizeRunState({}), window: { status: "bust", cause: "timeout", gauge: 60 }, card: card("a", { capital: 9 }), caseClosed: false, offerRelics: true };
+  const codex = { unlocked: ["insurance"] };
+  const settled = settleAgainstCodex(settlement, codex.unlocked);
+  assert.deepEqual(settled.unlockedRelics, ["stethoscope"]);
+  assert.deepEqual(codex, { unlocked: ["insurance"] }, "the codex it was read from is as it was");
+  assert.deepEqual(settleAgainstCodex(settlement, ["insurance", "stethoscope"]).unlockedRelics, [], "a feat already held is not proved twice");
+
+  const kept = addToRelicCodex(codex, settled.unlockedRelics);
+  assert.deepEqual(kept, { unlocked: ["insurance", "stethoscope"] });
+  assert.equal(addToRelicCodex(kept, ["stethoscope"]), kept, "keeping it again changes nothing");
+  assert.equal(addToRelicCodex(kept, []), kept);
 });
 
 test("relics bend the next board once, and equipping one never double-applies", () => {

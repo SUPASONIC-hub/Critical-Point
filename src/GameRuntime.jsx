@@ -6,8 +6,6 @@ import {
   ERROR_LOG_STORAGE_KEY,
   FEEDBACK_COMMENT_MAX_LENGTH,
   formatSaveTime,
-  NEW_GAME_PLUS_KEY,
-  NEW_GAME_PLUS_MEMORY_KEY,
   OPERATOR_ORIGIN_KEY,
   normalizeFeedback,
   normalizePlayerName,
@@ -96,6 +94,7 @@ import { useWindowSuspension } from "./state/useWindowSuspension.js";
 import { usePendingTelemetryRef, useRuntimeChoiceShortcuts, useRuntimeOverlayShortcuts } from "./state/useRuntimeShortcuts.js";
 import { useOverlayScreens } from "./state/useOverlayScreens.js";
 import { useRuntimeErrorCapture } from "./state/useRuntimeErrorCapture.js";
+import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
 import { caseIntroEchoes, legacyProfiles, nextCaseSignals } from "./caseCopy.js";
@@ -111,7 +110,7 @@ import {
   getOperatorProfile,
   getOperatorProfiles,
 } from "./advancedSystems.js";
-import { isChunkLoadError, loadedChunk } from "./state/chunkReload.js";
+import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
 import { retryableLazy } from "./state/retryableLazy.js";
 export { prepareGameRuntime } from "./state/caseArrival.js";
@@ -123,6 +122,10 @@ const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").th
 const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
 const renderNothing = () => null;
+const CONFIRM_RESET =
+  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다.";
+// The line under a season's first scene, before any choice has been answered.
+const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
 
 const speakerPortraits = {
   "한서윤": "/portrait-han-seoyun.webp",
@@ -145,7 +148,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }, [saveControls]);
 
   const { saved, recoverUnreadableSave } = useRuntimeSavedState(initialStartState);
-  const sessionId = useMemo(() => getSessionId(), []);
+  // State, not a memo: a reset ends the id the last run's rows were filed under.
+  const [sessionId, setSessionId] = useState(getSessionId);
   const sessionCode = useMemo(() => getSessionCode(sessionId), [sessionId]);
   const initialRunId = useMemo(() => saved?.runId || createRunId(), [saved?.runId]);
 
@@ -156,9 +160,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     caseResults, setCaseResults, playtestFeedback, setPlaytestFeedback, nodeId, setNodeId,
     resources, setResources, log, setLog, triggers, setTriggers, cognition, setCognition,
     lastSavedAt, setLastSavedAt, isPausedSave, setIsPausedSave,
-    pendingTelemetry, setPendingTelemetry, protocolUsed, setProtocolUsed,
-    timerPenaltyCount, setTimerPenaltyCount, probeUsed, setProbeUsed,
-    investigatedTargets, setInvestigatedTargets, hypothesisDecisions, setHypothesisDecisions,
+    pendingTelemetry, setPendingTelemetry,
   } = useGameSaveState({
     saved,
     initialRunId,
@@ -174,17 +176,10 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   // Set when this tab's run is older than the save: another tab moved on. The
   // tab stops -- no table, no writes -- until it reloads from storage.
   const [staleSave, setStaleSave] = useState(false);
-  const [newGamePlusUnlocked, setNewGamePlusUnlocked] = useState(
-    () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
-  );
-  const [newGamePlusMemory, setNewGamePlusMemory] = useState(() => {
-    try { return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {}; } catch { return {}; }
-  });
+  const { newGamePlusUnlocked, newGamePlusMemory, unlockNewGamePlus, rememberSeason } = useNewGamePlus(saved);
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
-  const [echo, setEcho] = useState(
-    () => normalizeSavedText(saved?.echo) || "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-  );
-  const [nodeEnteredAt, setNodeEnteredAt] = useState(() => saved?.nodeEnteredAt ?? nowMs());
+  const [echo, setEcho] = useState(() => normalizeSavedText(saved?.echo) || OPENING_ECHO);
+  const [nodeEnteredAt, setNodeEnteredAt] = useState(() => (Number.isFinite(saved?.nodeEnteredAt) ? saved.nodeEnteredAt : nowMs()));
   const { copyStatus, flashCopyStatus } = useClipboardStatus();
   const { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback } = useFeedbackStatus();
   const [saveStatus, setSaveStatus] = useState("");
@@ -247,16 +242,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     state: {
       runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase, completedCases,
       discoveredClues, caseResults, playtestFeedback, nodeId, resources, log, triggers, cognition,
-      echo, nodeEnteredAt, protocolUsed, timerPenaltyCount, probeUsed,
-      investigatedTargets, hypothesisDecisions, dynamics: serializeRunState(gauntletRun),
+      echo, nodeEnteredAt, dynamics: serializeRunState(gauntletRun),
       isPausedSave, saveSlots,
     },
     refs: { pendingTelemetryRef },
     setters: {
       setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase, setCompletedCases,
       setDiscoveredClues, setCaseResults, setPlaytestFeedback, setResources, setLog, setTriggers,
-      setCognition, setProtocolUsed, setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
-      setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
+      setCognition, setEcho, setOpeningLegacy, setDecisionReveal,
       setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog, setNodeId,
       setNodeEnteredAt, setLastSavedAt, setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
     },
@@ -265,7 +258,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       persistSuppressed, onSuppressSaves, onResumeSaves: resumeRuntimeSaves, formatSaveTime,
       debugErrorKey: DEBUG_RENDER_CRASH_KEY, createRunId,
       initialDynamics: RUN_INITIAL_STATE,
-      resetDecisionDynamics: () => setGauntletRun(RUN_INITIAL_STATE),
+      openingEcho: OPENING_ECHO,
+      // A new run is this tab's own: it is written over whatever another tab
+      // held, so the lock a stale tab was under goes with the run it was for.
+      resetDecisionDynamics: () => {
+        setGauntletRun(RUN_INITIAL_STATE);
+        setStaleSave(false);
+      },
       onStaleSave: () => setStaleSave(true),
     },
   });
@@ -532,10 +531,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
     playerName, activeCaseMeta, dataConsent, staleSave, clueCount, casesOpened,
     readers: choiceReaders, persist, appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus,
-    onSeasonFinal: () => {
-      setNewGamePlusUnlocked(true);
-      writeStoredValue(NEW_GAME_PLUS_KEY, "true");
-    },
+    onSeasonFinal: unlockNewGamePlus,
     setters: {
       setGauntletRun, setResources, setTriggers, setCognition, setLog, setEcho, setNodeId,
       setCompletedCases, setCaseResults, setDiscoveredClues, setNodeEnteredAt, setDecisionReveal,
@@ -688,14 +684,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const startGame = persistenceStartGame;
   function startNewGamePlus() {
     if (!newGamePlusUnlocked) return;
-    writeStoredValue(NEW_GAME_PLUS_KEY, "true");
-    // The memory is a finished season's. Pressed in the middle of the next one,
-    // this used to write that half season over it.
-    if (caseResults.final) {
-      writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(caseResults));
-      setNewGamePlusMemory(caseResults);
-    }
-    setSaveStatus("NEW GAME+ 기록 모드로 시작합니다. 숨겨진 권한과 추가 단서를 추적하세요.");
+    unlockNewGamePlus();
+    // Kept only when this season reached its finale (state/useNewGamePlus.js).
+    rememberSeason(caseResults);
+    // What NEW GAME+ is: the season again, with the last one's record on the
+    // intro. The line used to promise hidden authority and extra clues.
+    setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
     startGame();
   }
   /**
@@ -716,15 +710,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   // the page already reloaded for it once -- used to end in a dropped promise:
   // the button did nothing and said nothing.
   function startCase(caseId) {
-    whenCaseReady(caseId, () => startCaseNow(caseId)).catch((error) => {
-      // A fault in opening the case is not this; it goes on to be recorded.
-      if (!isChunkLoadError(error)) throw error;
-      console.warn(error);
-      setSaveStatus(
-        globalThis.navigator?.onLine === false
-          ? "연결이 끊겨 이 사건을 받지 못했습니다. 연결을 확인한 뒤 다시 눌러 주세요. 저장은 그대로 있습니다."
-          : "이 사건을 받지 못했습니다. 다시 눌러 보고, 계속 안 되면 새로고침해 주세요. 저장은 그대로 있습니다.",
-      );
+    whenCaseReady(caseId, () => startCaseNow(caseId), {
+      unavailable: ({ offline }) =>
+        setSaveStatus(
+          offline
+            ? "연결이 끊겨 이 사건을 받지 못했습니다. 연결을 확인한 뒤 다시 눌러 주세요. 저장은 그대로 있습니다."
+            : "이 사건을 받지 못했습니다. 다시 눌러 보고, 계속 안 되면 새로고침해 주세요. 저장은 그대로 있습니다.",
+        ),
     });
   }
   function startCaseNow(caseId) {
@@ -785,11 +777,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
-    setProtocolUsed(false);
-    setTimerPenaltyCount(0);
-    setProbeUsed(false);
-    setInvestigatedTargets({});
-    setHypothesisDecisions({});
     setOpeningLegacy(legacy);
     setDecisionReveal(null);
     // A closed case keeps its REBOOT board and its relic draft; an abandoned one forfeits its pot.
@@ -808,9 +795,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       log: [],
       triggers: makeEmptyScores(triggerLabels),
       cognition: makeEmptyScores(cognitionLabels),
-      protocolUsed: false,
-      timerPenaltyCount: 0,
-      probeUsed: false,
       openingLegacy: legacy,
       echo: openingEcho,
       dynamics: serializeRunState(openingRun),
@@ -857,16 +841,21 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     persist({ dynamics: serializeRunState(touchedRun) });
   }
 
+  // The question names what goes and what stays (state/runStorageReset.js has
+  // the list). It used to say "everything", and left six kinds of thing behind.
   function reset() {
-    if (
-      typeof globalThis.confirm === "function" &&
-      !globalThis.confirm("저장된 진행과 현재 플레이 기록을 모두 지울까요?")
-    ) {
-      return;
-    }
+    if (!confirmAction(CONFIRM_RESET)) return;
     onSuppressSaves();
     const failedResetKeys = clearRunStorage();
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
+    // A new id for the next run's rows; the old one went with the keys above.
+    setSessionId(getSessionId());
+    setNextParticipantMessage("");
+    resetEndingSequence();
+    // The tab is its own again: storage holds nothing another tab is ahead in.
+    setStaleSave(false);
+    setShowRecoveryCenter(false);
+    setShowErrorLog(false);
     setPlayerName("");
     setOperatorOriginState("courier");
     removeStoredValue(OPERATOR_ORIGIN_KEY);
@@ -890,14 +879,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
-    setProtocolUsed(false);
-    setTimerPenaltyCount(0);
-    setProbeUsed(false);
-    setInvestigatedTargets({});
-    setHypothesisDecisions({});
     setDecisionReveal(null);
     setGauntletRun(RUN_INITIAL_STATE);
-    setEcho("얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.");
+    setEcho(OPENING_ECHO);
     const resetErrorLogSaved = failedResetKeys.length === 0
       || logStorageResetFailure({ source: "reset", failedStorageKeys: failedResetKeys, currentCase, nodeId });
     setSaveStatus(
@@ -977,9 +961,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setLog([]);
     setTriggers(makeEmptyScores(triggerLabels));
     setCognition(makeEmptyScores(cognitionLabels));
-    setProtocolUsed(false);
-    setTimerPenaltyCount(0);
-    setProbeUsed(false);
     setGauntletRun(RUN_INITIAL_STATE);
     setOpeningLegacy(null);
     setDecisionReveal(null);
@@ -998,10 +979,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         log: [],
         triggers: makeEmptyScores(triggerLabels),
         cognition: makeEmptyScores(cognitionLabels),
-          echo: echoText,
-        protocolUsed: false,
-        timerPenaltyCount: 0,
-        probeUsed: false,
+        echo: echoText,
         openingLegacy: null,
         dynamics: serializeRunState(RUN_INITIAL_STATE),
         nodeEnteredAt: now,
@@ -1054,7 +1032,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         riskPressure,
         riskTier,
         activeBonus,
-        protocolUsed,
       },
       diagnostics: {
         playerName,

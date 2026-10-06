@@ -410,8 +410,6 @@ export function useChoiceCommit(context) {
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
       discoveredClues: nextDiscoveredClues,
-      timerPenaltyCount: 0,
-      probeUsed: false,
       dynamics: serializeRunState(nextRun),
       nodeEnteredAt: enteredAt,
     });
@@ -421,6 +419,7 @@ export function useChoiceCommit(context) {
     // the ranking row and the settled seed of a decision nobody kept by then.
     // A replay is not this player's run either.
     if (written?.stale || written?.replay) return;
+    relicTable.keepUnlocks(unlockedRelics);
     if (windowState.seed) recordSettledWindowSeed(windowState.seed);
     if (closedCase) recordClosedCase(closedCase);
     if (!cloudConflictSaid && hasCloudConflict()) {

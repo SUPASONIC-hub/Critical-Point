@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
-  NEW_GAME_PLUS_MEMORY_KEY,
   NEXT_PARTICIPANT_MESSAGE_KEY,
   OPERATOR_ORIGIN_KEY,
   RECOVERY_CENTER_STORAGE_KEY,
@@ -19,6 +18,7 @@ import {
   hasRecoverySlots,
   isSavedStateShapeValid,
   parseCurrentSavedState,
+  readNewGamePlusMemory,
   readStoredValue,
   readUnreadableSave,
   removeStoredValue,
@@ -43,7 +43,7 @@ import { GAME_TITLE } from "./appCopy.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
-import { storageNeedsEveryCase } from "./state/caseArrival.js";
+import { storageNeedsEveryCase } from "./state/savedRunScope.js";
 import { retryableLazy } from "./state/retryableLazy.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
@@ -53,7 +53,7 @@ import { retryableLazy } from "./state/retryableLazy.js";
 // it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
 // A first visit mounts once the season's first case has arrived; a device with
 // a run under way, or a page opened from a replay link, once every case has
-// (state/caseArrival.js): both name scenes anywhere in the season. This runs
+// (state/savedRunScope.js): both name scenes anywhere in the season. This runs
 // when the runtime is first drawn, which is after `startGame` below has written
 // the new save -- so it asks what the save holds, not whether there is one.
 const GameRuntime = retryableLazy(() =>
@@ -111,14 +111,6 @@ function reportInvalidShellSave(saved) {
   recordAppError(error, {}, "silent-save-shape");
 }
 
-function readNewGamePlusMemory() {
-  try {
-    return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {};
-  } catch {
-    return {};
-  }
-}
-
 /**
  * Whether the save in storage is one the player should be shown the recovery
  * centre for: it is there, this build cannot use it as it stands, and there are
@@ -154,11 +146,6 @@ function createStartSave({ playerName, playStyle, dataConsent, operatorOrigin })
     echo: "",
     nodeEnteredAt: now,
     pendingTelemetry: [],
-    protocolUsed: false,
-    timerPenaltyCount: 0,
-    probeUsed: false,
-    investigatedTargets: {},
-    hypothesisDecisions: {},
     paused: false,
     savedAt: new Date(now).toISOString(),
   };
@@ -202,7 +189,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
       Boolean(replaySeed) ||
       Boolean(saved?.started) ||
       Boolean(saved?.lastError) ||
-      Boolean(saved?.dataConsent && saved?.pendingTelemetry?.length > 0) ||
+      Boolean(saved?.dataConsent === true && saved?.pendingTelemetry?.length > 0) ||
       needsRecovery(saved),
   );
   const [initialStartState, setInitialStartState] = useState(null);
@@ -210,7 +197,9 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
-  const [dataConsent, setDataConsent] = useState(Boolean(saved?.dataConsent));
+  // Only `true` is consent: the shell reads the save unrepaired, and a save
+  // edited to hold the string "false" used to tick the box.
+  const [dataConsent, setDataConsent] = useState(saved?.dataConsent === true);
   const [saveStatus, setSaveStatus] = useState("");
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);

@@ -446,7 +446,7 @@ export function IntroScreen({ view, renderers = {} }) {
             </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
-              <small>선택한 프로토콜은 이번 시즌에 적용됩니다.</small>
+              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 바뀌지 않습니다.</small>
             </div>
             <div className="play-style-grid">
               {playStyleOptions.map((style) => (

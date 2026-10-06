@@ -53,14 +53,24 @@ export function repairSavedRoute(state) {
   };
 }
 
+/**
+ * A table of numbers (resources, trigger scores, thinking scores) brought to
+ * the keys this build has. `changed` is a repair: a value that was there and
+ * is not a number, or a key this build does not know. `filled` is not: a key
+ * the save never wrote takes its default, the rule `isMissingSavedValue` holds
+ * the rest of the save to. The two used to be one, so the release that added a
+ * trigger or a thinking label called every existing save damaged -- paused it,
+ * marked it with `lastError`, spent a recovery slot and raised the notice.
+ */
 function normalizeNumberMap(value, defaults) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return { value: { ...defaults }, changed: true };
+  if (value === undefined || value === null) return { value: { ...defaults }, changed: false, filled: true };
+  if (typeof value !== "object" || Array.isArray(value)) {
+    return { value: { ...defaults }, changed: true, filled: true };
   }
 
   const allowedKeys = Object.keys(defaults);
-  const sourceKeys = Object.keys(value);
-  let changed = sourceKeys.length !== allowedKeys.length;
+  let changed = Object.keys(value).some((key) => !Object.hasOwn(defaults, key));
+  let filled = false;
   const next = {};
 
   allowedKeys.forEach((key) => {
@@ -70,37 +80,50 @@ function normalizeNumberMap(value, defaults) {
       return;
     }
     next[key] = defaults[key];
-    changed = true;
+    if (candidate === undefined || candidate === null) filled = true;
+    else changed = true;
   });
 
-  return { value: next, changed };
+  return { value: next, changed, filled };
 }
 
 export function normalizeSavedGameplayState(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
+  return measureSavedGameplayState(state).value;
+}
+
+/** The three tables of a save, normalised, and whether that was a repair. */
+function measureSavedGameplayState(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return { value: null, repaired: false };
 
   const normalizedResources = normalizeNumberMap(state.resources, initialResources);
   const normalizedTriggers = normalizeNumberMap(state.triggers, makeEmptyScores(triggerLabels));
   const normalizedCognition = normalizeNumberMap(state.cognition, makeEmptyScores(cognitionLabels));
+  const maps = [normalizedResources, normalizedTriggers, normalizedCognition];
 
-  if (!normalizedResources.changed && !normalizedTriggers.changed && !normalizedCognition.changed) {
-    return state;
-  }
-
-  return {
+  if (!maps.some((map) => map.changed || map.filled)) return { value: state, repaired: false };
+  const measured = {
     ...state,
     resources: normalizedResources.value,
     triggers: normalizedTriggers.value,
     cognition: normalizedCognition.value,
-    paused: true,
-    lastError: state.lastError ?? {
-      id: `repair-${Date.now()}`,
-      occurredAt: new Date().toISOString(),
-      source: "save-integrity",
-      message: "Saved gameplay metrics were repaired before resume.",
-      currentCase: state.currentCase,
-      nodeId: state.nodeId,
+  };
+  // Only defaults were filled in: the save is whole, and stays as it was.
+  if (!maps.some((map) => map.changed)) return { value: measured, repaired: false };
+
+  return {
+    value: {
+      ...measured,
+      paused: true,
+      lastError: state.lastError ?? {
+        id: `repair-${Date.now()}`,
+        occurredAt: new Date().toISOString(),
+        source: "save-integrity",
+        message: "Saved gameplay metrics were repaired before resume.",
+        currentCase: state.currentCase,
+        nodeId: state.nodeId,
+      },
     },
+    repaired: true,
   };
 }
 
@@ -382,14 +405,44 @@ function normalizeSavedDynamics(state) {
  * recovery slot.
  */
 export function repairSavedState(state) {
-  const routed = repairSavedRoute(state);
-  const measured = normalizeSavedGameplayState(routed);
-  const nested = normalizeNestedState(measured);
+  const plain = normalizeSavedScalars(state);
+  const routed = repairSavedRoute(plain);
+  const measured = measureSavedGameplayState(routed);
+  const nested = normalizeNestedState(measured.value);
   const dealt = normalizeSavedDynamics(nested.value);
   return {
     state: dealt.value,
-    repaired: routed !== state || measured !== routed || nested.repaired || dealt.repaired,
+    repaired: routed !== plain || measured.repaired || nested.repaired || dealt.repaired,
   };
+}
+
+/**
+ * The plain values at the top of a save, held to their kind. The runtime took
+ * them as written: consent by truthiness, so the string "false" switched
+ * telemetry on; the scene's entry time into arithmetic; a name, a way of
+ * playing and a legacy of any type into the screen. Storage is only ever
+ * edited by hand or damaged into this, so it is put right quietly -- the value
+ * a save without the key would have had, no notice, no pause. A key the save
+ * does not carry is left for its reader's default.
+ */
+function normalizeSavedScalars(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return state;
+  const fixes = {};
+  const hold = (key, isKind, fallback) => {
+    if (Object.hasOwn(state, key) && state[key] !== undefined && !isKind(state[key])) fixes[key] = fallback;
+  };
+  const isBoolean = (value) => typeof value === "boolean";
+  const isText = (value) => typeof value === "string";
+  // Only `true` is consent; anything else a save could hold there is not.
+  hold("dataConsent", isBoolean, false);
+  hold("started", isBoolean, false);
+  hold("paused", isBoolean, false);
+  hold("nodeEnteredAt", (value) => Number.isFinite(value) && value > 0, Date.now());
+  hold("playerName", isText, "");
+  hold("playStyle", isText, "instinct");
+  hold("echo", isText, "");
+  hold("openingLegacy", (value) => value === null || (typeof value === "object" && !Array.isArray(value)), null);
+  return Object.keys(fixes).length > 0 ? { ...state, ...fixes } : state;
 }
 
 export function createReplaySavedState(seed) {
@@ -432,18 +485,25 @@ export function createReplaySavedState(seed) {
     echo: "재현 링크로 복원된 장면입니다.",
     nodeEnteredAt: Date.now(),
     pendingTelemetry: [],
-    protocolUsed: false,
-    timerPenaltyCount: 0,
-    probeUsed: false,
   };
 }
 
+/**
+ * Whether this save is a place worth going back to: a run started or picked
+ * up again, a case opened, a case closed, or a save that carries an error.
+ *
+ * Not every scene. A slot is the whole save, and adding one reads, checks and
+ * rewrites all five (appConfig.appendSaveSlot) on top of the save itself. Done
+ * at each scene change, that was six saves' worth of JSON through the main
+ * thread per decision, late in a season on a phone -- and the five slots it
+ * left were the last five scenes, all of them inside the case that broke. The
+ * error path keeps its own slot at the scene that failed (errorRecovery.js).
+ */
 export function shouldCaptureSaveSlot(previousState, nextState) {
   if (!nextState?.saveSchemaVersion) return false;
   if (nextState.lastError) return true;
   if (!previousState?.started && nextState.started) return true;
   if (previousState?.currentCase !== nextState.currentCase) return true;
-  if (previousState?.nodeId !== nextState.nodeId) return true;
   const previousCompletedCount = Array.isArray(previousState?.completedCases) ? previousState.completedCases.length : 0;
   const nextCompletedCount = Array.isArray(nextState.completedCases) ? nextState.completedCases.length : 0;
   return previousCompletedCount !== nextCompletedCount;

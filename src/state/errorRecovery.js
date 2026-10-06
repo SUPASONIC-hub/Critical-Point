@@ -168,7 +168,7 @@ export function takeQueuedErrorTelemetry() {
  */
 export function queueSavedErrorTelemetry(entry, payload) {
   const saved = getSavedRecoveryState();
-  if (!saved?.dataConsent) return false;
+  if (saved?.dataConsent !== true) return false;
   const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
   const item = {
     id: entry.id,
@@ -186,7 +186,7 @@ export function queueSavedErrorTelemetry(entry, payload) {
 function reportErrorRecovery(entry) {
   if (!telemetryEnabled) return;
   const saved = getSavedRecoveryState();
-  if (!saved?.dataConsent) return;
+  if (saved?.dataConsent !== true) return;
   const item = { id: entry.id, type: "error", label: "error", payload: createErrorTelemetryPayload(entry) };
   sendTelemetryItem(item).catch((telemetryError) => {
     console.warn("Critical Point error telemetry failed", telemetryError);

@@ -47,6 +47,42 @@ test("a row that already landed is delivered, not failed", async () => {
   assert.deepEqual(result, { saved: true, duplicate: true });
 });
 
+test("a conflict that is not a duplicate is a refusal, not a delivery", async () => {
+  browser.respond("/rest/v1/playtest_sessions", () => refusal(409, "insert or update violates foreign key constraint", "23503"));
+  await assert.rejects(policy.sendTelemetryItem(caseItem("run-a", "case01")), (error) => {
+    assert.equal(error.status, 409);
+    assert.equal(error.code, "23503");
+    assert.equal(policy.classifyTelemetryFailure(error), "permanent", "and the queue lets it go as refused");
+    return true;
+  });
+});
+
+test("an answer whose body never finishes is ended by the same deadline", async () => {
+  const realSetTimeout = globalThis.setTimeout;
+  let deadline = null;
+  // The request's own timer is the only one set here: hold it, and fire it by hand.
+  globalThis.setTimeout = (callback) => {
+    deadline = callback;
+    return 0;
+  };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, options) => ({
+    ok: true,
+    status: 200,
+    text: () => new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" })))),
+  });
+  try {
+    const pending = telemetry.fetchLeaderboard();
+    await new Promise((resolve) => realSetTimeout(resolve, 0));
+    assert.equal(typeof deadline, "function", "the deadline is still set while the body is read");
+    deadline();
+    await assert.rejects(pending, /aborted/);
+  } finally {
+    globalThis.setTimeout = realSetTimeout;
+    globalThis.fetch = realFetch;
+  }
+});
+
 test("a refusal carries its status, its code and what the server said", async () => {
   browser.respond("/rest/v1/playtest_sessions", () => refusal(429, "telemetry rate limit exceeded", "PT429"));
   await assert.rejects(policy.sendTelemetryItem(caseItem("run-a", "case02")), (error) => {

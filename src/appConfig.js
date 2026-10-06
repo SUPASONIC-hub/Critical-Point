@@ -9,6 +9,9 @@ export const NEW_GAME_PLUS_KEY = "critical-point-new-game-plus-unlocked";
 export const NEW_GAME_PLUS_MEMORY_KEY = "critical-point-new-game-plus-memory";
 export const OPERATOR_ORIGIN_KEY = "critical-point-operator-origin";
 export const NEXT_PARTICIPANT_MESSAGE_KEY = "critical-point-next-participant-message";
+// The random id telemetry rows carry for this device (telemetry.getSessionId).
+// A reset removes it, so the next run's rows are not filed beside the last one's.
+export const SESSION_ID_STORAGE_KEY = "critical-point-session-id";
 // Set by the debug console to force the next render to throw, and cleared by the
 // error boundary's reload. Both files used to spell the string out for
 // themselves, which is one typo away from a boundary that can never be reset.
@@ -88,24 +91,16 @@ export const SAVE_STATE_KEYS = [
   "echo",
   "nodeEnteredAt",
   "pendingTelemetry",
-  "protocolUsed",
-  "timerPenaltyCount",
-  "probeUsed",
-  "investigatedTargets",
-  "hypothesisDecisions",
   "dynamics",
   "paused",
   "savedAt",
 ];
-
-/**
- * How many overtime charges this decision has already taken. Saves written
- * before the window kept charging carry a boolean instead.
- */
-function normalizeTimerPenaltyCount(state = {}) {
-  if (Number.isFinite(state.timerPenaltyCount)) return Math.max(0, Math.trunc(state.timerPenaltyCount));
-  return state.timerPenaltyApplied ? 1 : 0;
-}
+// Five more keys were written here until 2026-10: `protocolUsed`,
+// `timerPenaltyCount`, `probeUsed`, `investigatedTargets` and
+// `hypothesisDecisions`. They belonged to the decision board the table
+// replaced; since then they were saved, reset in six places and copied into
+// every recovery slot, and no rule read them. A save that still carries them
+// loads as before -- nothing looks at them -- and the next write leaves them out.
 
 export function normalizePlayerName(value) {
   return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
@@ -141,9 +136,6 @@ export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSI
       pendingTelemetry: Array.isArray(state.pendingTelemetry) ? state.pendingTelemetry : [],
       caseResults: state.caseResults && typeof state.caseResults === "object" && !Array.isArray(state.caseResults) ? state.caseResults : {},
       playtestFeedback: state.playtestFeedback && typeof state.playtestFeedback === "object" && !Array.isArray(state.playtestFeedback) ? state.playtestFeedback : {},
-      protocolUsed: Boolean(state.protocolUsed),
-      timerPenaltyCount: normalizeTimerPenaltyCount(state),
-      probeUsed: Boolean(state.probeUsed),
       dynamics: state.dynamics && typeof state.dynamics === "object" && !Array.isArray(state.dynamics) ? state.dynamics : null,
     };
   }
@@ -280,6 +272,21 @@ export function readUnreadableSave() {
 export function backUpUnreadableSave(raw) {
   if (typeof raw !== "string" || !raw || readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) === raw) return false;
   return writeStoredValue(SAVE_BACKUP_STORAGE_KEY, raw);
+}
+
+/**
+ * The finished season NEW GAME+ remembers: its case summaries by case id, or
+ * an empty record. The shell and the runtime each parsed the key themselves
+ * and took whatever JSON it held -- an array or a string as readily as the
+ * record they went on to read by case id.
+ */
+export function readNewGamePlusMemory() {
+  try {
+    const memory = JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}"));
+    return memory && typeof memory === "object" && !Array.isArray(memory) ? memory : {};
+  } catch {
+    return {};
+  }
 }
 
 export function hasRecoverySlots() {
@@ -639,11 +646,6 @@ export function createRecoverySnapshot(snapshot) {
     echo: normalizeSavedText(snapshot.echo, 900),
     log: Array.isArray(snapshot.log) ? snapshot.log.filter(isPlainObject) : [],
     pendingTelemetry: [],
-    protocolUsed: Boolean(snapshot.protocolUsed),
-    timerPenaltyCount: normalizeTimerPenaltyCount(snapshot),
-    probeUsed: Boolean(snapshot.probeUsed),
-    investigatedTargets: isPlainObject(snapshot.investigatedTargets) ? snapshot.investigatedTargets : {},
-    hypothesisDecisions: isPlainObject(snapshot.hypothesisDecisions) ? snapshot.hypothesisDecisions : {},
     dynamics: snapshot.dynamics && typeof snapshot.dynamics === "object" && !Array.isArray(snapshot.dynamics) ? snapshot.dynamics : null,
     nodeEnteredAt: Number.isFinite(snapshot.nodeEnteredAt) ? snapshot.nodeEnteredAt : Date.now(),
     savedAt: typeof snapshot.savedAt === "string" ? snapshot.savedAt : new Date().toISOString(),

@@ -12,7 +12,7 @@ import {
 } from "../../src/appConfig.js";
 import { createCloudSavePayload } from "../../src/cloudSave.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameData.js";
-import { repairSavedState } from "../../src/state/savedState.js";
+import { repairSavedState, shouldCaptureSaveSlot } from "../../src/state/savedState.js";
 import { sanitizeTelemetryQueue, validateTelemetryItem } from "../../src/state/payloadSchemas.js";
 
 /** A log entry shaped the way `choose()` in GameRuntime.jsx writes one. */
@@ -154,8 +154,62 @@ test("a recovery slot keeps the whole log, fields and all", () => {
   const snapshot = createRecoverySnapshot({ ...midRunSave(log), investigatedTargets: { a: true }, hypothesisDecisions: { b: "keep" } });
   assert.equal(snapshot.log.length, 30);
   assert.deepEqual(snapshot.log[29], log[29]);
-  assert.deepEqual(snapshot.investigatedTargets, { a: true });
-  assert.deepEqual(snapshot.hypothesisDecisions, { b: "keep" });
+  // The decision board's five fields, which no rule read, are not copied on.
+  for (const key of ["investigatedTargets", "hypothesisDecisions", "protocolUsed", "timerPenaltyCount", "probeUsed"]) {
+    assert.equal(Object.hasOwn(snapshot, key), false, key);
+  }
+});
+
+test("a save that still carries the decision board's fields loads, and is not called repaired", () => {
+  const save = { ...midRunSave([]), protocolUsed: true, timerPenaltyCount: 2, probeUsed: true, investigatedTargets: { a: true }, hypothesisDecisions: { b: "keep" } };
+  const { state, repaired } = repairSavedState(save);
+  assert.equal(repaired, false);
+  assert.equal(isSavedStateShapeValid(state), true);
+});
+
+test("a save from before a trigger or a thinking label existed is filled in, not repaired", () => {
+  const { protection: _dropped, ...olderTriggers } = makeEmptyScores(triggerLabels);
+  const { state, repaired } = repairSavedState({ ...midRunSave([]), paused: false, triggers: olderTriggers });
+  assert.equal(repaired, false, "a label added since the save is a default to fill in");
+  assert.equal(state.triggers.protection, 0);
+  assert.equal(state.paused, false, "and the run is not paused for it");
+  assert.equal(state.lastError ?? null, null);
+
+  const broken = repairSavedState({ ...midRunSave([]), resources: { ...initialResources, trust: "many" } });
+  assert.equal(broken.repaired, true, "a value that is there and is not a number still is");
+  assert.equal(broken.state.resources.trust, initialResources.trust);
+  const unknown = repairSavedState({ ...midRunSave([]), cognition: { ...makeEmptyScores(cognitionLabels), telepathy: 3 } });
+  assert.equal(unknown.repaired, true, "and so is a key this build does not know");
+  assert.equal(Object.hasOwn(unknown.state.cognition, "telepathy"), false);
+});
+
+test("a recovery slot is kept at a run's start, a case's opening and its close, not at every scene", () => {
+  const at = (patch) => ({ saveSchemaVersion: SAVE_SCHEMA_VERSION, started: true, currentCase: "case03", nodeId: "c3_start", completedCases: ["case01", "case02"], ...patch });
+  assert.equal(shouldCaptureSaveSlot(at({}), at({ nodeId: "c3_next" })), false, "the next scene of the same case");
+  assert.equal(shouldCaptureSaveSlot(at({ started: false }), at({})), true, "a run started or picked up again");
+  assert.equal(shouldCaptureSaveSlot(at({}), at({ currentCase: "case04", nodeId: "c4_start" })), true, "a case opened");
+  assert.equal(shouldCaptureSaveSlot(at({}), at({ nodeId: "result", completedCases: ["case01", "case02", "case03"] })), true, "a case closed");
+  assert.equal(shouldCaptureSaveSlot(at({}), at({ nodeId: "c3_next", lastError: { id: "x" } })), true, "a save that carries an error");
+  assert.equal(shouldCaptureSaveSlot(at({}), { nodeId: "c3_next" }), false, "not a save at all");
+});
+
+test("a consent, a time or a name the save holds as the wrong kind of thing is not taken as written", () => {
+  const { state } = repairSavedState({ ...midRunSave([]), dataConsent: "false", nodeEnteredAt: "yesterday", playerName: { toString: () => "x" }, started: "yes", playStyle: 7, openingLegacy: "legacy" });
+  assert.equal(state.dataConsent, false, 'the string "false" is not consent');
+  assert.equal(Number.isFinite(state.nodeEnteredAt), true);
+  assert.equal(state.playerName, "");
+  assert.equal(state.started, false);
+  assert.equal(state.playStyle, "instinct");
+  assert.equal(state.openingLegacy, null);
+  assert.equal(repairSavedState({ ...midRunSave([]), dataConsent: 1 }).state.dataConsent, false, "only true is consent");
+
+  const whole = { ...midRunSave([]), dataConsent: true, nodeEnteredAt: 1_700_000_000_000, playStyle: "auditor", openingLegacy: null };
+  const kept = repairSavedState(whole).state;
+  assert.deepEqual(
+    [kept.dataConsent, kept.nodeEnteredAt, kept.playStyle, kept.playerName, kept.started],
+    [true, 1_700_000_000_000, "auditor", "분석관", true],
+    "values of the right kind are left as they are",
+  );
 });
 
 test("the cloud copy leaves out the name, the comments and the telemetry queue", () => {

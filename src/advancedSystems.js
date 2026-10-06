@@ -72,27 +72,35 @@ export function getEndingSceneProfile(endingId = "open-question") {
   return endingScenes[endingId] ?? endingScenes["open-question"];
 }
 
-export function getDelayedConsequences(log = [], caseResults = {}) {
+// `visible` used to be worked out from `entry.continuitySource`, a field no
+// commit has ever written, so it was false for every entry and read by nothing.
+export function getDelayedConsequences(caseResults = {}) {
   return Object.entries(caseResults)
     .filter(([, result]) => result?.outcomeChoiceId)
     .map(([caseId, result]) => ({
       caseId,
       source: result.outcomeChoiceId,
-      visible: log.some((entry) => entry?.caseId !== caseId && entry?.continuitySource === result.outcomeChoiceId),
       // The outcome id is a key, not copy: it used to print as `c1_after_people`.
       text: `CASE ${caseDisplayCode(caseId)}의 마지막 선택이 다음 사건의 기준으로 남아 있습니다.`,
     }));
 }
 
+/**
+ * The line under the season panel about the way of playing the player picked.
+ * It says what the pick is -- a stance the player declares, which no rule of
+ * the table reads -- and what NEW GAME+ gives, which is last season's record
+ * on this screen. It used to promise choices, quests and endings the pick
+ * unlocked (under two ids the picker does not offer), and "hidden choices"
+ * from a past run; nothing in the game deals either.
+ */
 export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false) {
   const styles = {
-    instinct: { label: "INSTINCT ROUTE", unlock: "빠른 판단으로 압박을 돌파하는 선택지" },
-    auditor: { label: "AUDIT ROUTE", unlock: "증거를 모아 위험 범위를 좁히는 선택지" },
-    relational: { label: "RELATION ROUTE", unlock: "관계 퀘스트와 증언 분기" },
-    reformer: { label: "REFORM ROUTE", unlock: "시스템 재설계와 정책 엔딩" },
+    instinct: { label: "INSTINCT", unlock: "첫 반응으로 정하겠다는 다짐" },
+    auditor: { label: "AUDIT", unlock: "근거를 확인하고 정하겠다는 다짐" },
+    mediator: { label: "MEDIATE", unlock: "대화로 압박을 낮추겠다는 다짐" },
   };
   const base = styles[playStyle] ?? styles.instinct;
-  return { ...base, newGamePlus: newGamePlus ? "과거 플레이 기록을 참조하는 숨은 선택지" : "최종 기록을 완료하면 NEW GAME+ 해금" };
+  return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 마지막 선택을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
 }
 
 /**
@@ -149,12 +157,15 @@ export function getEndingPreview(ending = {}) {
 
 export function getChoiceOutcomeFeedback(entry = {}) {
   if (!entry?.choiceId) return null;
+  // Read off the entry's effect alone. It also read `prematureHypothesis` and
+  // `streakReward`, which belonged to systems that are gone: no commit writes
+  // either, so those branches never ran.
   const effectCount = Object.values(entry.effect ?? {}).filter((value) => value !== 0).length;
-  const tone = entry.prematureHypothesis ? "warning" : entry.streakReward ? "signal" : effectCount >= 3 ? "tradeoff" : "signal";
+  const tone = effectCount >= 3 ? "tradeoff" : "signal";
   return {
     tone,
-    label: entry.prematureHypothesis?.label ?? entry.streakReward?.label ?? (tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED"),
-    text: entry.prematureHypothesis?.text ?? entry.streakReward?.text ?? "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
+    label: tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED",
+    text: "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
   };
 }
 

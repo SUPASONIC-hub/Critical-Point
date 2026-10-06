@@ -53,5 +53,6 @@
     "echo": "숫자를 고치지 않은 값은 현금으로 치렀습니다.",
     "nodeEnteredAt": 1755150000000
   },
-  "expect": { "currentCase": "case01", "nodeId": "payday", "logLength": 2, "repaired": true }
+  "expectNote": "repaired is false: the trigger labels added since this save (revenge, system and the rest) are defaults to fill in, not damage. It read true while a missing label counted as a repair.",
+  "expect": { "currentCase": "case01", "nodeId": "payday", "logLength": 2, "repaired": false }
 }

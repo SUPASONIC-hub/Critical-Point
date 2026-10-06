@@ -63,17 +63,15 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase,
     completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
-    log, triggers, cognition, echo, nodeEnteredAt, protocolUsed,
-    timerPenaltyCount, probeUsed, investigatedTargets, hypothesisDecisions,
+    log, triggers, cognition, echo, nodeEnteredAt,
     dynamics, isPausedSave, saveSlots,
   } = state;
   const { pendingTelemetryRef } = refs;
   const {
     setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase,
     setCompletedCases, setDiscoveredClues, setCaseResults, setPlaytestFeedback,
-    setResources, setLog, setTriggers, setCognition, setProtocolUsed,
-    setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
-    setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
+    setResources, setLog, setTriggers, setCognition, setEcho,
+    setOpeningLegacy, setDecisionReveal,
     setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
     setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
@@ -81,7 +79,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     normalizePlayerName, triggerLabels, cognitionLabels,
     makeEmptyScores, persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime,
-    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin,
+    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin, openingEcho,
   } = config;
 
   /** The queue as the next save should hold it: this tab's, plus rows the error path queued in storage. */
@@ -118,11 +116,6 @@ export function useAppPersistence({ state, refs, setters, config }) {
       echo,
       nodeEnteredAt,
       pendingTelemetry: foldQueuedErrorTelemetry(),
-      protocolUsed,
-      timerPenaltyCount,
-      probeUsed,
-      investigatedTargets,
-      hypothesisDecisions,
       dynamics: dynamics ?? null,
       paused: isPausedSave,
       savedAt: new Date().toISOString(),
@@ -166,13 +159,16 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase(SEASON_ENTRY_CASE);
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
     setResources(openingResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
-    setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
-    setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
+    setOpeningLegacy(null);
+    // The line under the first scene is the season's opening one. It was left
+    // as the last run's last reply: this list reset everything but the echo,
+    // and the save was written with the old one in it.
+    setEcho?.(openingEcho ?? "");
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, echo: "", nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {

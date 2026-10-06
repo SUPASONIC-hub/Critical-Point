@@ -8,14 +8,20 @@ import {
   ERROR_LOG_STORAGE_KEY,
   hasRecoverySlots,
   makeEmptyScores,
+  NEXT_PARTICIPANT_MESSAGE_KEY,
   parseRecoverySlots,
+  readNewGamePlusMemory,
   readUnreadableSave,
   SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
+  SESSION_ID_STORAGE_KEY,
+  SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
   writeSaveState,
 } from "../../src/appConfig.js";
+import { clearRunStorage, RESET_STORAGE_KEYS } from "../../src/state/runStorageReset.js";
+import { TRACE_STORAGE_KEY } from "../../src/state/trace.js";
 import { getOriginStartEffects } from "../../src/advancedSystems.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameConstants.js";
 import { applyEffect } from "../../src/riskLogic.js";
@@ -333,6 +339,52 @@ test("an offline tab, and an import its own caller answers, are never reloaded",
     assert.equal(duringQuiet, false, "a panel with its own retry keeps the page");
     assert.equal(reloads, 0);
     assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: true }), true, "and the next real failure reloads as before");
+  } finally {
+    restore();
+  }
+});
+
+test("a reset removes the run and what was written about it, and keeps what it says it keeps", () => {
+  const { store, restore } = installStorage();
+  try {
+    const kept = {
+      "critical-point-new-game-plus-unlocked": "true",
+      "critical-point-new-game-plus-memory": JSON.stringify({ final: { outcomeChoiceId: "f_seal" } }),
+      "critical-point-board-nickname-v1": "분석관",
+      "critical-point-board-id-v1": "board-1",
+      "critical-point-cloud-code-v1": "ABCDEFGH2345",
+      "critical-point-cloud-sync-v1": "{}",
+      "critical-point-accessibility-v1": "{}",
+      "critical-point-relic-codex-v1": JSON.stringify({ unlocked: ["encore"] }),
+    };
+    for (const [key, value] of Object.entries(kept)) store.set(key, value);
+    for (const key of RESET_STORAGE_KEYS) store.set(key, "written by the run");
+    globalThis.sessionStorage.setItem(TRACE_STORAGE_KEY, JSON.stringify([{ kind: "choose" }]));
+
+    assert.deepEqual(clearRunStorage(), [], "nothing was refused");
+    for (const key of RESET_STORAGE_KEYS) assert.equal(store.has(key), false, `${key} is gone`);
+    assert.equal(globalThis.sessionStorage.getItem(TRACE_STORAGE_KEY), null, "and so is the tab's trace");
+    for (const [key, value] of Object.entries(kept)) assert.equal(store.get(key), value, `${key} is kept`);
+
+    // What the question promised to remove, by name.
+    for (const key of [STORAGE_KEY, SAVE_SLOT_STORAGE_KEY, ERROR_LOG_STORAGE_KEY, SETTLED_WINDOWS_STORAGE_KEY, NEXT_PARTICIPANT_MESSAGE_KEY, SESSION_ID_STORAGE_KEY]) {
+      assert.ok(RESET_STORAGE_KEYS.includes(key), key);
+    }
+  } finally {
+    restore();
+  }
+});
+
+test("the season NEW GAME+ remembers is a record by case, whatever the key holds", () => {
+  const { store, restore } = installStorage();
+  try {
+    assert.deepEqual(readNewGamePlusMemory(), {});
+    for (const held of ['["case01"]', '"text"', "null", "{broken", "7"]) {
+      store.set("critical-point-new-game-plus-memory", held);
+      assert.deepEqual(readNewGamePlusMemory(), {}, held);
+    }
+    store.set("critical-point-new-game-plus-memory", JSON.stringify({ case01: { outcomeChoiceId: "c1_after_people" } }));
+    assert.equal(readNewGamePlusMemory().case01.outcomeChoiceId, "c1_after_people");
   } finally {
     restore();
   }

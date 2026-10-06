@@ -10,29 +10,48 @@ import { createElement, lazy } from "react";
  * new `lazy` over it; the boundary that caught the failure (`LazyScreen`) then
  * draws its children again and the import is made once more.
  */
-const screens = new Set();
 
-export function retryableLazy(load) {
-  const screen = { failed: false, Inner: null };
+/**
+ * The loader and what stands for the screen it loads (`wrap` is `React.lazy`
+ * in the app; a test passes its own). `retry` makes a new one only when the
+ * last load failed, and says whether it did.
+ */
+export function createRetryable(load, wrap) {
+  let failed = false;
   const make = () =>
-    lazy(() =>
+    wrap(() =>
       load().catch((error) => {
-        screen.failed = true;
+        failed = true;
         throw error;
       }),
     );
-  screen.Inner = make();
-  screen.retry = () => {
-    if (!screen.failed) return;
-    screen.failed = false;
-    screen.Inner = make();
-  };
-  screens.add(screen);
-  return function RetryableScreen(props) {
-    return createElement(screen.Inner, props);
+  let current = make();
+  return {
+    get current() {
+      return current;
+    },
+    retry() {
+      if (!failed) return false;
+      failed = false;
+      current = make();
+      return true;
+    },
   };
 }
 
+const screens = new Set();
+
+export function retryableLazy(load) {
+  const screen = createRetryable(load, lazy);
+  screens.add(screen);
+  return function RetryableScreen(props) {
+    return createElement(screen.current, props);
+  };
+}
+
+/** Gives every screen whose import failed a fresh one to load. Returns how many. */
 export function retryFailedScreens() {
-  for (const screen of screens) screen.retry();
+  let retried = 0;
+  for (const screen of screens) retried += screen.retry() ? 1 : 0;
+  return retried;
 }

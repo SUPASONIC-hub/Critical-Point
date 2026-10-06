@@ -12,37 +12,12 @@ import { isChunkLoadError, reloadForMissingChunk } from "./chunkReload.js";
  * always has: repairing a save reads the scenes of every case it closed, and a
  * repair that could not find them would rewrite what it read.
  *
- * `storageNeedsEveryCase` is that question, asked of what storage holds. It
- * reads the run, not whether a save exists: the shell writes the new save
- * before it mounts the runtime, so "is there a save" was true for every first
- * start and the first table waited for all fifty-five cases.
+ * Which of the two a device is -- `hasSave` below -- is decided from what its
+ * storage holds, by `storageNeedsEveryCase` (state/savedRunScope.js).
  *
  * `createCaseArrival` takes the store so the waiting can be tested against one
  * that is slow or fails; the app uses the one bound to gameData below.
  */
-/** Whether a save names a scene outside the season's first case. */
-export function savedRunNamesOtherCases(saved) {
-  if (!saved || typeof saved !== "object") return false;
-  const filled = (value) =>
-    Array.isArray(value) ? value.length > 0 : Boolean(value) && typeof value === "object" && Object.keys(value).length > 0;
-  return (
-    (typeof saved.currentCase === "string" && saved.currentCase !== SEASON_ENTRY_CASE) ||
-    filled(saved.log) ||
-    filled(saved.completedCases) ||
-    filled(saved.caseResults)
-  );
-}
-
-/**
- * Whether the runtime has to wait for every case before it mounts. A save that
- * will not read is taken to need them, since nothing can be told from it; so
- * is a device with recovery slots or a kept copy of a save, which the recovery
- * centre repairs against scenes anywhere in the season; so is a replay link.
- */
-export function storageNeedsEveryCase({ saved = null, unreadable = false, hasSlots = false, hasBackup = false, replay = false } = {}) {
-  return Boolean(replay || unreadable || hasSlots || hasBackup || savedRunNamesOtherCases(saved));
-}
-
 export function createCaseArrival(store, { reload = reloadForMissingChunk } = {}) {
   async function prepareGameRuntime({ hasSave }) {
     if (hasSave) {
@@ -61,15 +36,24 @@ export function createCaseArrival(store, { reload = reloadForMissingChunk } = {}
    * cannot be fetched because a deploy replaced its file is the missing-chunk
    * case, and reloads like any other. Returns the arrival, for a caller that
    * wants to know.
+   *
+   * A case that could not be fetched and did not reload the page -- there is
+   * no connection, or the page reloaded for it a moment ago -- is handed to
+   * `unavailable({ offline })` when the caller gives one. Without it that case
+   * ended as a rejected promise nobody held: the button did nothing and said
+   * nothing. A fault in `open` itself is not that, and is thrown as before.
    */
-  function whenCaseReady(caseId, open) {
+  function whenCaseReady(caseId, open, { unavailable = null } = {}) {
     if (store.isCaseLoaded(caseId)) {
       open();
       return Promise.resolve();
     }
     return store.ensureCase(caseId).then(open, (error) => {
-      if (isChunkLoadError(error) && reload()) return;
-      throw error;
+      if (!isChunkLoadError(error)) throw error;
+      if (reload()) return;
+      if (!unavailable) throw error;
+      console.warn(error);
+      unavailable({ offline: globalThis.navigator?.onLine === false });
     });
   }
 
