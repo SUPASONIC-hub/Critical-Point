@@ -734,13 +734,26 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 `--grep`을 함께 주지 않으면 이 둘은 빠집니다. 시즌은 일곱 사건씩
 여덟 구간(`@season-segment`)으로 나눠 걷고, GitHub Actions는 기본 e2e를 샤드 세 개에 나눠 push마다
 돌립니다. 끊지 않는 연속 걷기(`npm run test:e2e:season`)와 전체 경로 검증(`npm run test:e2e:full`)은
-`Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 수행합니다. PR에서는 `verify:quick`만 돌고, e2e는
-push·`e2e` 라벨·Dependabot PR, 시각 회귀는 `visual` 라벨·Dependabot PR·주간 실행·수동 실행에서 돕니다.
+`Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 수행합니다. 그 워크플로의 마지막 job은 실패한
+실행마다 이슈 "Full Coverage is failing"을 열거나 댓글을 달고(예약 실행에서는 시간 초과로 취소된 job도
+실패로 셉니다), 기본 브랜치의 실행이 다시 초록이 되면 그 이슈를 닫습니다. PR에서는 `verify:quick`만 돌고,
+e2e는 push·`e2e` 라벨·Dependabot PR에서 돕니다. 시각 회귀는 `main` push, 스타일시트·`index.html`·폰트·
+베이스라인을 건드린 PR, `visual` 라벨이 붙은 PR, Dependabot PR, 수동 실행에서 돕니다.
+
+스펙 파일은 `scripts/run-e2e.mjs`의 목록(기본, 프로덕션 빌드, 주간) 중 하나에 들어 있어야 돕니다.
+`npm run check:specs`는 모든 스펙이 로드되는지와 함께, 어느 목록에도 없고 `package.json` 스크립트가
+이름으로 부르지도 않는 스펙이 있으면 실패합니다.
+
+WebKit(iPhone 14) 프로젝트는 아직 주간 워크플로에서만 돌고, 두 번에 나눠 돕니다. `npm run
+test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run test:e2e:webkit:layout`은 개발 서버에서
+`@layout` 측정을 돌립니다(측정은 프로덕션 빌드에 없는 디버그 점프로 장면에 들어갑니다).
 
 워크플로의 액션은 전부 커밋 SHA로 고정하고 옆 주석에 태그를 적습니다. 버전 올리기는 Dependabot(npm과
 액션, 매주, 묶어서; 메이저 버전과 `@playwright/test`는 제외 — Playwright는 시각 회귀 컨테이너와 함께
-올려야 합니다)이 제안합니다. 워크플로 권한은 `contents: read`이고, 쓰기 권한은 기록한 베이스라인을
-브랜치로 올리는 job 하나만 가집니다.
+올려야 합니다)이 제안합니다. 프로젝트를 돌리는 job들이 함께 쓰는 준비 단계(Node, `npm ci`, Playwright
+브라우저)는 `.github/actions/setup`에 한 번만 적혀 있습니다. 워크플로 권한은 `contents: read`이고, 저장소
+내용에 쓰는 것은 기록한 베이스라인을 브랜치로 올리는 job 하나뿐입니다. 이슈에 쓰는 것은 `Full Coverage`와
+`Migration Drift`의 보고 job 둘이고, 둘 다 프로젝트 코드를 실행하지 않습니다.
 
 ## 생성물
 
@@ -797,10 +810,14 @@ Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으�
 accidental deploys"라고 표시합니다. 이것이 의도한 상태이니 다시 켜지 마십시오.
 시크릿이 없으면 배포를 걸지 않고 실행에 경고 주석을 남깁니다.
 
-같은 워크플로의 두 번째 job(`needs: deploy`)이 배포된 사이트를 확인합니다. 저장소 시크릿 `DEPLOY_URL`이
-있으면 사이트가 **이번 커밋(또는 그 뒤 커밋)의 `build-sha`를 내줄 때까지 기다린 뒤** `npm run
-check:deploy`로 살아 있는지와 보안 헤더를 봅니다. 시크릿이 없으면 아무것도 가져오지 않았다는 경고 주석을
-남깁니다. 손으로 돌릴 때는:
+같은 job이 이어서 배포된 사이트를 확인합니다. 저장소 시크릿 `DEPLOY_URL`이 있으면 사이트가 **배포를 건
+바로 그 커밋의 `build-sha`를 내줄 때까지 기다린 뒤** `npm run check:deploy`로 살아 있는지, 보안 헤더,
+캐시 정책, 그리고 진입 스크립트에 CSP의 `connect-src`가 허용한 백엔드 주소가 들어 있는지를 봅니다.
+마지막 것은 `VITE_SUPABASE_URL` 없이 빌드된 배포를 잡습니다. 그런 배포는 헤더가 전부 맞는데도 랭킹·
+게시판·온라인 저장이 꺼져 있습니다. 루트에서 내려가는 이미지(`public/`의 장면 그림·초상화·키 비주얼)의
+캐시 정책은 실패가 아니라 경고로 남깁니다. `render.yaml`은 하루(`max-age=86400`)로 적어 두었지만,
+대시보드 Headers에 같은 규칙(`/*.webp`, `/*.jpg`, `/icons/*`)을 손으로 넣기 전까지는 호스트 기본값이
+나갑니다. 시크릿이 없으면 아무것도 가져오지 않았다는 경고 주석을 남깁니다. 손으로 돌릴 때는:
 
 ```powershell
 $env:DEPLOY_URL = "https://<서비스-이름>.onrender.com"   # 실제 서비스 주소로 바꿔서
@@ -816,8 +833,31 @@ CSS와 React의 style 속성 때문에 `'unsafe-inline'`을 남깁니다. 빌드
 `on*=` 핸들러가 생기면 오프라인 검사가 잡습니다.
 
 `VITE_SUPABASE_URL`과 `VITE_SUPABASE_ANON_KEY`는 값 없이 선언되어 있으므로 Render 대시보드에서
-설정합니다. 없으면 앱은 텔레메트리, 원격 랭킹, 게시판, 온라인 저장을 끈 채로 조용히 동작합니다. 서비스 롤
-키는 Render에도 브라우저에도 넣지 않습니다.
+설정합니다. 없으면 앱은 텔레메트리, 원격 랭킹, 게시판, 온라인 저장을 끈 채로 조용히 동작합니다(배포 뒤
+`check:deploy`가 이 경우 실패합니다). 서비스 롤 키는 Render에도 브라우저에도 넣지 않습니다.
+
+### 수동 배포와 롤백
+
+자동 경로는 되돌리지 않습니다. 사이트가 이미 더 새 커밋을 내주고 있으면 옛 커밋의 `Verify`가 다시
+끝나도 배포를 걸지 않습니다. 되돌리거나 같은 커밋을 다시 배포하려면 `Deploy` 워크플로를 손으로
+실행합니다.
+
+```bash
+git log --oneline --first-parent main        # 되돌아갈 커밋(병합 커밋)을 고릅니다
+gh workflow run Deploy --ref main -f sha=$(git rev-parse <커밋>)
+gh run watch                                  # 사이트가 그 커밋을 내주는지까지 확인합니다
+```
+
+- `sha`는 40자 전체 해시입니다. 비워 두면 실행한 ref의 머리 커밋입니다.
+- 손으로 건 배포도 자동 경로와 같은 관문을 지납니다. 커밋이 `main`에 있어야 하고, 그 커밋의 **push로 돈
+  `Verify`가 초록**이어야 합니다. 병합된 브랜치 중간의 커밋은 그런 실행이 없으므로 병합 커밋을 지정합니다.
+  관문에 걸리면 실행이 빨갛게 끝나고 아무것도 배포되지 않습니다.
+- 관문을 건너뛰려면 `-f force=true`를 더합니다. 실행에 경고 주석이 남습니다. `Verify`가 고장 나 있어서
+  그것을 기다릴 수 없는 때에만 씁니다.
+- 되돌린 뒤에는 `main`도 되돌려야 합니다(`git revert`로 새 커밋을 만들어 push). 그러지 않으면 다음 push의
+  `Verify`가 초록이 되는 순간 문제의 커밋이 다시 배포됩니다.
+- 되돌리는 커밋이 마이그레이션보다 앞선 것이면 스키마는 그대로 남습니다. 마이그레이션은 되돌리는 파일을
+  새로 써서 `db push`합니다.
 
 ## 원격 랭킹 (선택)
 
@@ -835,7 +875,8 @@ CSS와 React의 style 속성 때문에 `'unsafe-inline'`을 남깁니다. 빌드
    점수가 있는 시즌 완주 행만 보이게 하고, `public_rankings` 뷰는 `security_invoker = true`로 같은
    규칙을 상속해 서버가 계산한 `score` 순으로 줍니다. `run_id`와 `session_code`는 공개되지 않습니다.
    `npm run check:grants`는 테이블 단위 권한이 하나라도 있으면 실패하고, 클라이언트가 실제로 보내는
-   요청을 익명 역할로 그대로 실행해 봅니다.
+   요청을 익명 역할로 그대로 실행해 봅니다. `search_path`를 고정하지 않은 `SECURITY DEFINER` 함수와
+   `security_invoker`가 없는 뷰도 실패입니다.
 5. 시간과 모양은 서버가 정합니다. `created_at`·`completed_at`은 클라이언트가 무엇을 보내든 `now()`이고,
    행과 필드마다 크기 상한이 있으며, 랭킹 이름은 늘 `익명 분석관`입니다. 시즌 기록은 그 런이
    `season_case_ids()`의 모든 사건 행을 이미 남겼고 첫 사건 행이 10분 이상 지났을 때만 받고, 런마다 한 줄,
@@ -843,7 +884,10 @@ CSS와 React의 style 속성 때문에 `'unsafe-inline'`을 남깁니다. 빌드
    마이그레이션도 필요합니다** — `check:grants`가 `CASE_SEQUENCE`와 다르면 실패합니다.
 6. 요청 제한의 주소는 `request_client_ip()`가 정합니다. `cf-connecting-ip`가 있으면 그것, 없으면
    `x-forwarded-for`의 가장 오른쪽(신뢰하는 프록시가 붙인) 주소입니다. 카운터는 원자적으로 올리는
-   `bump_rate_limit`이 셉니다. 텔레메트리는 (주소, 세션)마다 시간당 240건, 주소마다 1,200건입니다.
+   `bump_rate_limit`이 셉니다. 텔레메트리는 (주소, 세션)마다 시간당 240건, 주소마다 1,200건이고, 바이트로는
+   주소마다 하루 32MB(`telemetry_address_daily_bytes`), 모두 합쳐 하루 200MB(`telemetry_daily_bytes`)
+   입니다. 괄호 안은 `private_settings`의 이름으로, 마이그레이션 없이 바꿀 수 있습니다. 주소 한도가 전체
+   한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다.
 7. 텔레메트리 행은 만들어질 때 한 번 받은 `event_id`(`src/state/telemetryEventId.js`)를 재시도에도 그대로
    씁니다. `event_id`는 유니크이고, 클라이언트는 평범한 POST를 보내 `409`(이미 있음)를 전달 완료로
    셉니다(`on_conflict`는 `event_id`에 대한 SELECT 권한이 필요해서 쓰지 않습니다). 피드백 행은
@@ -855,12 +899,40 @@ CSS와 React의 style 속성 때문에 `'unsafe-inline'`을 남깁니다. 빌드
    접근합니다. 행은 코드의 SHA-256으로 저장되고, `saved_at`은 `now()`를 넘지 못하며, 기기 사이의 순서는
    서버의 `revision`으로 정합니다(시각이 아님). 충돌은 플레이어가 고를 때까지 유지되고, 패널에서 서버 사본을
    지울 수 있으며(`delete_cloud_save`), 마지막 업로드 후 180일이 지나면 만료됩니다. 쓰기는 코드마다 시간당 240번·주소마다 600번, 읽기는
-   주소마다 시간당 120번까지입니다.
+   주소마다 시간당 120번까지입니다. 새 코드는 주소마다 하루 5개, 모두 합쳐 하루 1,000개(`cloud_daily_new_codes`)까지
+   만들 수 있고, 넘으면 새 코드만 거절되고 이미 있는 코드의 저장은 계속됩니다.
 9. `free_text_analyses` 테이블은 기록으로만 남아 있고 서비스 롤만 접근합니다. 게임은 여기에 쓰지 않습니다.
 
 공개 플레이테스트가 아니라면 전용 프로젝트를 쓰고 키를 주기적으로 교체하십시오. 스테이징은 별도
 Supabase 프로젝트를 쓰고, 운영 마이그레이션 전에는 `npx supabase migration list --linked`와
 `npx supabase db push --dry-run`으로 먼저 확인합니다.
+
+클라이언트는 `Verify`가 초록이면 저절로 배포되지만 마이그레이션은 사람이 `db push`해야 적용됩니다.
+둘이 어긋났는지는 `Migration Drift` 워크플로(`.github/workflows/migration-drift.yml`)가 하루에 한 번
+봅니다. 운영 프로젝트의 마이그레이션 이력을 `supabase migration list`로 받아 `supabase/migrations/`와
+양쪽으로 비교하고(`scripts/check-migration-drift.mjs`), 저장소에만 있는 파일이나 데이터베이스에만 있는
+버전이 있으면 실행이 빨갛게 끝나며 이슈 "Supabase migrations are out of step"을 열거나 댓글을 답니다.
+다시 맞으면 그 이슈를 닫습니다. 병합한 마이그레이션을 아직 push하지 않은 날에는 이슈가 열리는 것이
+정상이고, push한 뒤 첫 실행에서 닫힙니다.
+
+이 워크플로는 저장소 시크릿 `SUPABASE_ACCESS_TOKEN`이 있어야 일합니다. 없으면 아무것도 묻지 않았다는
+경고 주석만 남기고 초록으로 끝납니다. 토큰은 supabase.com → 계정(Account) → Access Tokens에서
+만들고(개인 액세스 토큰, 이름은 자유), 값을 복사해 다음처럼 넣습니다.
+
+```bash
+gh secret set SUPABASE_ACCESS_TOKEN          # 프롬프트에 토큰을 붙여 넣습니다
+gh workflow run "Migration Drift"            # 바로 한 번 돌려 봅니다
+```
+
+토큰은 그 계정이 볼 수 있는 모든 프로젝트를 다룰 수 있으므로 이 시크릿 말고는 어디에도 적지 않습니다.
+CLI는 액세스 토큰이 있으면 데이터베이스에 임시 역할로 접속하게 되어 있습니다(이 저장소에서 실제 토큰으로
+돌려 확인한 것은 아닙니다). 목록 단계가 비밀번호를 요구하며 실패하면 데이터베이스 비밀번호를 `SUPABASE_DB_PASSWORD` 시크릿으로 하나 더 넣습니다. 손으로 볼 때는
+`npx supabase link --project-ref <ref>` 뒤에:
+
+```bash
+npx supabase migration list --linked --output-format json > list.json
+node scripts/check-migration-drift.mjs --from list.json
+```
 
 텔레메트리 보관 기간은 `public.purge_old_telemetry(interval)`이 관리합니다. 텔레메트리 세 테이블,
 게시판, `free_text_analyses`, 오래된 온라인 저장, 요청 제한 카운터까지 일곱 테이블을 비우고, 30일보다

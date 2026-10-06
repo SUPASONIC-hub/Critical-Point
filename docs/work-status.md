@@ -184,7 +184,9 @@ Still open, on purpose:
     records `leadChoiceId`, the card it was written to lead with, and the
     adaptive reframe and the relationship bridge follow that card, never
     `choices[0]`.
-13. Raise what choices give with `npm run raise:gains`, never by hand: the
+13. Raise what choices give with `npm run raise:gains -- --write`, never by
+    hand (without `--write` it lists what would change and writes nothing; it
+    refuses a dirty tree and any argument it does not know): the
     uplift has to stay a strictly increasing function of the magnitude, applied
     to gains only, or it starts inventing dominations that `check:balance` was
     written to catch. Read `npm run check:endings` afterwards.
@@ -695,7 +697,10 @@ Still open, on purpose:
     policy that does not leak the address, the CSP, a year of HSTS, a
     same-origin opener policy, a permissions policy that switches camera,
     microphone, geolocation, payment and usb off), the cache policy of the
-    page (`no-cache`) and of the hashed assets (a year, `immutable`), and fails
+    page (`no-cache`) and of the hashed assets (a year, `immutable`), fails when
+    the entry script names none of the origins `connect-src` allows (a release
+    built without `VITE_SUPABASE_URL`), warns when an image served from the
+    root is not cached for about a day, and fails
     the live header on a `connect-src` wildcard host such as
     `https://*.supabase.co` (`render.yaml` has to say it that way, so for the
     file it is only reported).
@@ -850,8 +855,16 @@ Still open, on purpose:
     those calls: `saved_at` is clamped to `now()`, a `revision` column counts
     writes (priority 59), puts are limited to 240 an hour per code and 600 per
     address, reads to 120 an hour per address, a payload to 400,000 bytes of
-    `save` and `settledWindows`, and an address to five new codes a day. There
-    are 34 migrations and eight tables.
+    `save` and `settledWindows`, and an address to five new codes a day
+    (1,000 a day for everyone). Telemetry has a byte budget as well as a row
+    count: 32 MB a day for one address, charged by a trigger of its own that
+    fires after the validator, and 200 MB a day for everyone. There
+    are 36 migrations and eight tables. `check:grants` also fails on a
+    SECURITY DEFINER function that does not pin `search_path` and on a view
+    without `security_invoker`. The Migration Drift workflow compares the
+    live project's migration history with `supabase/migrations/` once a day
+    and files an issue when they differ (it needs the `SUPABASE_ACCESS_TOKEN`
+    secret; without it the run says so and compares nothing).
     `free_text_analyses` is service-role only; the client writes nothing to it. `purge_old_telemetry` covers seven tables and is scheduled daily by
     `pg_cron` when the extension exists. `npm run check:grants` (in
     `verify:static`) replays every migration into PGlite with the API roles and
@@ -1021,7 +1034,8 @@ branches that only some processes report, and has risen since. Every floor is
 a ratchet: `--update` rewrites the file from the measurement and refuses to
 lower anything without `--allow-lower`.
 
-`npm run verify:quick` adds `check:specs` (every spec file loads), the
+`npm run verify:quick` adds `check:specs` (every spec file loads, and some
+tier's list in `scripts/run-e2e.mjs` runs it), the
 production build in e2e mode (`build:e2e`), `check:bundle`,
 `check:deploy:offline`, `test:runtime` (the runtime smoke against `vite preview` of `dist/`), `test:e2e:preview` (the
 `@prod` specs against the same build) and `test:performance`. The dev-mode
