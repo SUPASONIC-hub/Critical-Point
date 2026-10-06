@@ -78,7 +78,8 @@
     max-width: 46px;
   }
   .result-page .topbar,
-  .ranking-page .topbar {
+  .ranking-page .topbar,
+  .board-page .topbar {
     padding-right: 0;
   }
 .brand-row,
@@ -165,7 +166,7 @@
     padding: 21px;
   }
   .decision-reveal-choice {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .decision-reveal-footer {
     align-items: stretch;
@@ -185,6 +186,212 @@
   }
   .delta-table article p {
     grid-column: auto;
+  }
+}
+/* A phone on its side. Under 480px of height the table had no layout of its
+   own: it took the tablet's or the phone's column, and the hand was a screen
+   and a half below the action bar with the clock running (priority 27). Here
+   it is the wide screen's two panes at a phone's scale -- what to read on the
+   left, the hand on the right, the bar under both -- and the read pane gives
+   up the lines the briefing already said. Fixed layers do not get the body's
+   side padding, so each keeps itself out from under a notch. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .game-shell {
+    --gx-maxw: 100vw;
+    display: block;
+    padding: 6px max(12px, env(safe-area-inset-right)) calc(58px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  /* The music pills sit lower than a one-line header is tall; drawn at the
+     phone's size and a step higher, the hand's top row clears them. */
+  .music-controls {
+    top: max(6px, env(safe-area-inset-top));
+  }
+
+  .music-toggle,
+  .music-volume-toggle {
+    min-height: 34px;
+    padding: 0 9px;
+  }
+
+  .gauntlet-shell .game-header {
+    grid-template-areas: "title status tools";
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    min-height: 36px;
+    margin-bottom: 5px;
+  }
+
+  .gauntlet-shell .game-header .case-chip,
+  .gauntlet-shell .status-bar-progress,
+  .gx-hand-head,
+  .gx-portrait,
+  .gx-dateline,
+  .gx-brief,
+  .gx-situation,
+  .gx-focus-modes small,
+  .gx-focus-signal small,
+  .gx-stat svg {
+    display: none;
+  }
+
+  .gauntlet-shell .game-header h1 {
+    font-size: 0.9375rem;
+  }
+
+  .gauntlet-shell .top-actions.compact-actions button {
+    width: 34px;
+    min-height: 30px;
+  }
+
+  .gauntlet-stage {
+    display: block;
+  }
+
+  .gx-table {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    align-items: start;
+    gap: 5px 12px;
+  }
+
+  .gx-read {
+    gap: 5px;
+  }
+
+  .gx-hud {
+    gap: 4px 10px;
+    padding: 6px 9px 5px;
+  }
+
+  .gx-pot-value {
+    font-size: 1.75rem;
+  }
+
+  .gx-clock {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gx-clock b {
+    font-size: 0.9375rem;
+  }
+
+  .gx-stat {
+    min-height: 20px;
+    padding: 0 7px;
+  }
+
+  .gx-signals {
+    padding-top: 4px;
+  }
+
+  .gx-gauge-track {
+    height: 16px;
+  }
+
+  .gx-scene {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gx-question {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .gx-focus-modes button {
+    min-height: 30px;
+    padding: 4px 7px 6px;
+  }
+
+  .gx-hand {
+    gap: 6px;
+  }
+
+  .gx-hand.hand-3,
+  .gx-hand.hand-5,
+  .gx-hand.hand-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gauntlet-stage .gx-card {
+    gap: 4px;
+    min-height: 0;
+    padding: 6px 8px;
+    border-radius: 12px;
+  }
+
+  .gx-card-label {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* The odd card out takes its row as one line, as it does on a phone held
+     upright (play.css): five cards are two rows and a strip, not three rows. */
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) > :not(.gx-card-label, .gx-card-stats, .gx-card-key) {
+    grid-column: 1 / -1;
+  }
+
+  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) .gx-card-stats {
+    padding-right: 22px;
+  }
+
+  .gauntlet-stage .gx-card-preview {
+    max-height: 19px;
+    overflow: hidden;
+  }
+
+  .gx-actions {
+    max-width: none;
+    gap: 6px;
+    padding: 5px max(12px, env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  .gx-actions button {
+    min-height: 44px;
+    padding: 3px 8px;
+    font-size: 0.9375rem;
+    border-radius: 12px;
+  }
+
+  .decision-reveal-backdrop {
+    padding: 12px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+  }
+}
+
+/* Shorter still: the speaker's line goes at 360px of height, and at 320 the
+   run's standing numbers with it. Both are on the briefing page and in the
+   report. */
+@media (max-height: 360px) and (orientation: landscape) {
+  .gx-speaker {
+    display: none;
+  }
+}
+
+@media (max-height: 340px) and (orientation: landscape) {
+  .gx-bank {
+    display: none;
+  }
+
+  .gx-question {
+    -webkit-line-clamp: 1;
+  }
+
+  .gauntlet-stage .gx-card {
+    padding-block: 4px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
