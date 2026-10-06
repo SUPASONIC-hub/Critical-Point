@@ -1,11 +1,11 @@
-import { lazy, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
-  NEW_GAME_PLUS_MEMORY_KEY,
   NEXT_PARTICIPANT_MESSAGE_KEY,
   OPERATOR_ORIGIN_KEY,
   RECOVERY_CENTER_STORAGE_KEY,
+  SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
   backUpUnreadableSave,
@@ -18,6 +18,7 @@ import {
   hasRecoverySlots,
   isSavedStateShapeValid,
   parseCurrentSavedState,
+  readNewGamePlusMemory,
   readStoredValue,
   readUnreadableSave,
   removeStoredValue,
@@ -42,6 +43,8 @@ import { GAME_TITLE } from "./appCopy.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
+import { storageNeedsEveryCase } from "./state/savedRunScope.js";
+import { retryableLazy } from "./state/retryableLazy.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
@@ -49,18 +52,26 @@ import { loadedChunk } from "./state/chunkReload.js";
 // The runtime is what deals the table, and the table reads this tab's token, so
 // it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
 // A first visit mounts once the season's first case has arrived; a device with
-// a save, or a page opened from a replay link, once every case has
-// (state/caseArrival.js): both name scenes anywhere in the season.
-const GameRuntime = lazy(() =>
+// a run under way, or a page opened from a replay link, once every case has
+// (state/savedRunScope.js): both name scenes anywhere in the season. This runs
+// when the runtime is first drawn, which is after `startGame` below has written
+// the new save -- so it asks what the save holds, not whether there is one.
+const GameRuntime = retryableLazy(() =>
   Promise.all([loadGameRuntime(), claimTabToken()]).then(async ([runtime]) => {
     await runtime.prepareGameRuntime({
-      hasSave: readStoredValue(STORAGE_KEY, null) !== null || Boolean(getReplaySeedFromLocation()),
+      hasSave: storageNeedsEveryCase({
+        saved: readShellSave(),
+        unreadable: readUnreadableSave() !== null,
+        hasSlots: hasRecoverySlots(),
+        hasBackup: readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) !== null,
+        replay: Boolean(getReplaySeedFromLocation()),
+      }),
     });
     return { default: runtime.GameRuntime };
   }),
 );
-const RankingScreen = lazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
-const BoardScreen = lazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
+const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
 
 // How long the intro waits for an idle moment before it fetches the runtime anyway.
 const RUNTIME_PREFETCH_TIMEOUT_MS = 4000;
@@ -100,14 +111,6 @@ function reportInvalidShellSave(saved) {
   recordAppError(error, {}, "silent-save-shape");
 }
 
-function readNewGamePlusMemory() {
-  try {
-    return JSON.parse(readStoredValue(NEW_GAME_PLUS_MEMORY_KEY, "{}")) ?? {};
-  } catch {
-    return {};
-  }
-}
-
 /**
  * Whether the save in storage is one the player should be shown the recovery
  * centre for: it is there, this build cannot use it as it stands, and there are
@@ -143,11 +146,6 @@ function createStartSave({ playerName, playStyle, dataConsent, operatorOrigin })
     echo: "",
     nodeEnteredAt: now,
     pendingTelemetry: [],
-    protocolUsed: false,
-    timerPenaltyCount: 0,
-    probeUsed: false,
-    investigatedTargets: {},
-    hypothesisDecisions: {},
     paused: false,
     savedAt: new Date(now).toISOString(),
   };
@@ -191,7 +189,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
       Boolean(replaySeed) ||
       Boolean(saved?.started) ||
       Boolean(saved?.lastError) ||
-      Boolean(saved?.dataConsent && saved?.pendingTelemetry?.length > 0) ||
+      Boolean(saved?.dataConsent === true && saved?.pendingTelemetry?.length > 0) ||
       needsRecovery(saved),
   );
   const [initialStartState, setInitialStartState] = useState(null);
@@ -199,7 +197,9 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
-  const [dataConsent, setDataConsent] = useState(Boolean(saved?.dataConsent));
+  // Only `true` is consent: the shell reads the save unrepaired, and a save
+  // edited to hold the string "false" used to tick the box.
+  const [dataConsent, setDataConsent] = useState(saved?.dataConsent === true);
   const [saveStatus, setSaveStatus] = useState("");
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);

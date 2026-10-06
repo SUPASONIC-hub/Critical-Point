@@ -47,6 +47,42 @@ test("a row that already landed is delivered, not failed", async () => {
   assert.deepEqual(result, { saved: true, duplicate: true });
 });
 
+test("a conflict that is not a duplicate is a refusal, not a delivery", async () => {
+  browser.respond("/rest/v1/playtest_sessions", () => refusal(409, "insert or update violates foreign key constraint", "23503"));
+  await assert.rejects(policy.sendTelemetryItem(caseItem("run-a", "case01")), (error) => {
+    assert.equal(error.status, 409);
+    assert.equal(error.code, "23503");
+    assert.equal(policy.classifyTelemetryFailure(error), "permanent", "and the queue lets it go as refused");
+    return true;
+  });
+});
+
+test("an answer whose body never finishes is ended by the same deadline", async () => {
+  const realSetTimeout = globalThis.setTimeout;
+  let deadline = null;
+  // The request's own timer is the only one set here: hold it, and fire it by hand.
+  globalThis.setTimeout = (callback) => {
+    deadline = callback;
+    return 0;
+  };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, options) => ({
+    ok: true,
+    status: 200,
+    text: () => new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" })))),
+  });
+  try {
+    const pending = telemetry.fetchLeaderboard();
+    await new Promise((resolve) => realSetTimeout(resolve, 0));
+    assert.equal(typeof deadline, "function", "the deadline is still set while the body is read");
+    deadline();
+    await assert.rejects(pending, /aborted/);
+  } finally {
+    globalThis.setTimeout = realSetTimeout;
+    globalThis.fetch = realFetch;
+  }
+});
+
 test("a refusal carries its status, its code and what the server said", async () => {
   browser.respond("/rest/v1/playtest_sessions", () => refusal(429, "telemetry rate limit exceeded", "PT429"));
   await assert.rejects(policy.sendTelemetryItem(caseItem("run-a", "case02")), (error) => {
@@ -180,6 +216,44 @@ test("consent unticked while a send is in flight stops the batch and leaves the 
   assert.equal(aborted, true);
   assert.deepEqual(sent, [items[0].id], "nothing was sent after consent was withdrawn");
   assert.equal(kept.length, items.length);
+});
+
+test("consent unticked during a send that fails is still an aborted batch", async () => {
+  const items = [caseItem("run-g", "case01"), caseItem("run-g", "case02")];
+  let consent = true;
+  const { aborted } = await policy.sendTelemetryBatch(items, {
+    canSend: () => consent,
+    send: async () => {
+      consent = false;
+      throw new Error("Network unavailable");
+    },
+  });
+  assert.equal(aborted, true, "the stopped pass asked nobody on the rows after the failure");
+});
+
+test("a queue cleared while its batch was out is not written back", () => {
+  const [first, second, third] = [caseItem("run-h", "case01"), caseItem("run-h", "case02"), caseItem("run-h", "case03")];
+  const late = feedbackItem(7);
+  // An ordinary pass: the first row landed, the second waits, one was queued meanwhile.
+  assert.deepEqual(
+    policy.reconcileTelemetryQueue([first, second, late], [first, second], [second]).map((item) => item.id),
+    [second.id, late.id],
+  );
+  // The player cleared the queue (consent off, or a reset) while the batch was out.
+  assert.deepEqual(policy.reconcileTelemetryQueue([], [first, second, third], [first, second, third]), []);
+  // A reset that then queued a row of the new run keeps that row only.
+  assert.deepEqual(policy.reconcileTelemetryQueue([late], [first, second], [first, second]), [late]);
+});
+
+test("the batch says how many rows the server refused for good", async () => {
+  const items = [caseItem("run-i", "case01"), caseItem("run-i", "case02")];
+  const { kept, refused } = await policy.sendTelemetryBatch(items, {
+    send: async (item) => {
+      if (item === items[0]) throw failure({ status: 400, serverMessage: "telemetry payload too large" });
+    },
+  });
+  assert.deepEqual(kept, []);
+  assert.equal(refused, 1);
 });
 
 test("the queue holds a season played with no server in reach", () => {

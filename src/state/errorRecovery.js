@@ -89,8 +89,15 @@ function hasSlotAtRecoveryPoint(saved) {
   );
 }
 
+/** A line written to `console.error`: logged, and nothing more. */
+const CONSOLE_SOURCE = "console-error";
+
 function persistErrorRecovery(entry) {
   appendStoredErrorLog(entry);
+  // A console line is not a failure of the run. It goes in the error log and
+  // the save is left as it is: it used to be rewritten whole, paused and
+  // marked with `lastError`, for every line any script on the page logged.
+  if (entry.context.source === CONSOLE_SOURCE) return;
   const saved = getSavedRecoveryState();
   if (!saved) return;
 
@@ -161,7 +168,7 @@ export function takeQueuedErrorTelemetry() {
  */
 export function queueSavedErrorTelemetry(entry, payload) {
   const saved = getSavedRecoveryState();
-  if (!saved?.dataConsent) return false;
+  if (saved?.dataConsent !== true) return false;
   const pendingTelemetry = Array.isArray(saved.pendingTelemetry) ? saved.pendingTelemetry : [];
   const item = {
     id: entry.id,
@@ -179,7 +186,7 @@ export function queueSavedErrorTelemetry(entry, payload) {
 function reportErrorRecovery(entry) {
   if (!telemetryEnabled) return;
   const saved = getSavedRecoveryState();
-  if (!saved?.dataConsent) return;
+  if (saved?.dataConsent !== true) return;
   const item = { id: entry.id, type: "error", label: "error", payload: createErrorTelemetryPayload(entry) };
   sendTelemetryItem(item).catch((telemetryError) => {
     console.warn("Critical Point error telemetry failed", telemetryError);
@@ -196,12 +203,71 @@ function reportErrorRecovery(entry) {
  */
 const recordedErrors = new WeakMap();
 
-export function recordAppError(error, errorInfo = {}, source = "runtime") {
+/**
+ * The same thing said again. The WeakMap above knows an Error by the object,
+ * and a console line makes a new one every time it is written: a warning that
+ * repeats, or a script on the page that logs in a loop, became a write of the
+ * error log and a row to the server for every line, with nothing to slow it.
+ *
+ * So what was recorded is also remembered by what it said: the same message
+ * from the same source is one record for `REPEAT_BURST_MS` wherever it was
+ * said, and for `REPEAT_WINDOW_MS` at the same scene. A screen that failed to
+ * draw is never folded this way -- each one is a retry the boundary counts.
+ * And however varied the lines, the console gets `CONSOLE_BUDGET` records a
+ * minute; past that a line is still printed, and not recorded.
+ */
+const REPEAT_BURST_MS = 2_000;
+const REPEAT_WINDOW_MS = 60_000;
+const CONSOLE_BUDGET = 12;
+const REPEAT_MEMORY = 60;
+const recentRecords = new Map();
+let consoleRecordTimes = [];
+let lastConsoleRecord = null;
+
+function forgetOldRecords(now) {
+  for (const [key, known] of recentRecords) {
+    if (now - known.at > REPEAT_WINDOW_MS || recentRecords.size > REPEAT_MEMORY) recentRecords.delete(key);
+  }
+}
+
+/** Test seam: what has been recorded is forgotten, as on a fresh page. */
+export function resetRecordedErrors() {
+  recentRecords.clear();
+  consoleRecordTimes = [];
+  lastConsoleRecord = null;
+}
+
+export function recordAppError(error, errorInfo = {}, source = "runtime", { now = Date.now() } = {}) {
   const known = error instanceof Error ? recordedErrors.get(error) : null;
   // A crash first seen as a console line still has to count as a crash.
   const crashSeenAsSomethingElse = source === RENDER_CRASH_SOURCE && known?.context.source !== RENDER_CRASH_SOURCE;
   if (known && !crashSeenAsSomethingElse) return known;
-  const entry = recordNewAppError(error, errorInfo, source);
+  if (source === RENDER_CRASH_SOURCE) return rememberRecord(error, recordNewAppError(error, errorInfo, source));
+
+  const said = `${source}|${serializeError(error).message}`;
+  // Before storage is read at all: this is the line a loop repeats.
+  const burst = recentRecords.get(said);
+  if (burst && now - burst.at < REPEAT_BURST_MS) return burst.entry;
+  const saved = getSavedRecoveryState();
+  const saidHere = `${said}|${saved?.currentCase ?? ""}|${saved?.nodeId ?? ""}`;
+  const repeat = recentRecords.get(saidHere);
+  if (repeat && now - repeat.at < REPEAT_WINDOW_MS) return repeat.entry;
+  if (source === CONSOLE_SOURCE) {
+    consoleRecordTimes = consoleRecordTimes.filter((at) => now - at < REPEAT_WINDOW_MS);
+    // Over the budget: the last record is handed back and nothing is written.
+    if (consoleRecordTimes.length >= CONSOLE_BUDGET) return lastConsoleRecord ?? createErrorRecoveryEntry(error, errorInfo, source);
+    consoleRecordTimes.push(now);
+  }
+
+  const entry = rememberRecord(error, recordNewAppError(error, errorInfo, source));
+  if (source === CONSOLE_SOURCE) lastConsoleRecord = entry;
+  forgetOldRecords(now);
+  recentRecords.set(said, { entry, at: now });
+  recentRecords.set(saidHere, { entry, at: now });
+  return entry;
+}
+
+function rememberRecord(error, entry) {
   if (error instanceof Error) recordedErrors.set(error, entry);
   return entry;
 }

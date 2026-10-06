@@ -570,7 +570,10 @@ test("starting a fresh game clears stale recovery guidance", async ({ page }) =>
   });
   await page.goto("/");
   await expect(page.getByText("복구됨")).toBeVisible();
+  // The save is a run that can be resumed, so starting over asks first.
+  const asked = acceptConfirms(page);
   await startFirstRun(page);
+  expect(asked.at(-1)).toContain("첫 사건부터 새로 시작");
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.lastError).toBeNull();

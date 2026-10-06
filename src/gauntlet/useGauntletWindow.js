@@ -27,7 +27,9 @@ export function useGauntletWindow({ schema, seed, paused, abandoned = false, clo
       if (last && !document.hidden) pending += Math.min(0.25, (time - last) / 1000);
       last = time;
       if (pending >= TICK_BATCH_SECONDS) {
-        dispatch({ type: "TICK", delta: pending / getAccessibility().tableTime });
+        const scale = getAccessibility().tableTime;
+        // The scale rides along so the window remembers the slowest it was run.
+        dispatch({ type: "TICK", delta: pending / scale, scale });
         pending = 0;
       }
       frame = globalThis.requestAnimationFrame(loop);

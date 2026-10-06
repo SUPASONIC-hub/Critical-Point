@@ -33,6 +33,7 @@ import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
 import { createOpeningResources } from "./openingState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
 import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
+import { withEveryCase } from "./caseArrival.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
 
@@ -49,6 +50,7 @@ const CONFIRM_RESTORE_BACKUP = "읽지 못했던 저장본을 다시 읽어 지�
 const SAVE_UNAVAILABLE_MESSAGE = "브라우저 저장소를 사용할 수 없어 현재 상태만 진행합니다.";
 const SAVE_STALE_MESSAGE = "다른 탭에서 이 진행이 더 앞서 있어 이 탭의 진행은 기록하지 않았습니다. 새로고침하면 최신 진행을 불러옵니다.";
 const SAVE_REPLAY_MESSAGE = "재현 링크로 연 장면이라 진행을 기록하지 않습니다. 내 저장은 그대로 남아 있습니다.";
+const RESTORE_NEEDS_CASES_MESSAGE = "사건 자료를 다 받지 못해 되돌리지 않았습니다. 연결을 확인하고 다시 눌러 주세요. 저장은 그대로 있습니다.";
 
 /** Ends a replay: the tab writes its saves again and a reload opens the player's own. */
 function leaveReplaySession() {
@@ -61,17 +63,15 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase,
     completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
-    log, triggers, cognition, echo, nodeEnteredAt, protocolUsed,
-    timerPenaltyCount, probeUsed, investigatedTargets, hypothesisDecisions,
+    log, triggers, cognition, echo, nodeEnteredAt,
     dynamics, isPausedSave, saveSlots,
   } = state;
   const { pendingTelemetryRef } = refs;
   const {
     setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase,
     setCompletedCases, setDiscoveredClues, setCaseResults, setPlaytestFeedback,
-    setResources, setLog, setTriggers, setCognition, setProtocolUsed,
-    setTimerPenaltyCount, setProbeUsed, setInvestigatedTargets,
-    setHypothesisDecisions, setOpeningLegacy, setDecisionReveal,
+    setResources, setLog, setTriggers, setCognition, setEcho,
+    setOpeningLegacy, setDecisionReveal,
     setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
     setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
     setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
@@ -79,7 +79,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
   const {
     normalizePlayerName, triggerLabels, cognitionLabels,
     makeEmptyScores, persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime,
-    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin,
+    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin, openingEcho,
   } = config;
 
   /** The queue as the next save should hold it: this tab's, plus rows the error path queued in storage. */
@@ -116,11 +116,6 @@ export function useAppPersistence({ state, refs, setters, config }) {
       echo,
       nodeEnteredAt,
       pendingTelemetry: foldQueuedErrorTelemetry(),
-      protocolUsed,
-      timerPenaltyCount,
-      probeUsed,
-      investigatedTargets,
-      hypothesisDecisions,
       dynamics: dynamics ?? null,
       paused: isPausedSave,
       savedAt: new Date().toISOString(),
@@ -164,13 +159,16 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase(SEASON_ENTRY_CASE);
     setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
     setResources(openingResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
-    setProtocolUsed(false); setTimerPenaltyCount(0); setProbeUsed(false);
-    setInvestigatedTargets({}); setHypothesisDecisions({}); setOpeningLegacy(null);
+    setOpeningLegacy(null);
+    // The line under the first scene is the season's opening one. It was left
+    // as the last run's last reply: this list reset everything but the echo,
+    // and the save was written with the old one in it.
+    setEcho?.(openingEcho ?? "");
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), protocolUsed: false, timerPenaltyCount: 0, probeUsed: false, investigatedTargets: {}, hypothesisDecisions: {}, dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, echo: "", nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {
@@ -278,9 +276,29 @@ export function useAppPersistence({ state, refs, setters, config }) {
     });
   }
 
-  function restoreSaveSlot(slot) {
-    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-    const nextState = createRestoredSave(carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current), current);
+  /**
+   * A restore's save, built once every case is here (caseArrival.withEveryCase):
+   * the repair inside it reads the scenes the restored log names. `undefined`
+   * when the season could not be fetched, which the player is told.
+   */
+  async function buildRestoredSave(build) {
+    try {
+      return await withEveryCase(() => {
+        const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+        return build(current);
+      });
+    } catch (error) {
+      console.warn(error);
+      setSaveStatus(RESTORE_NEEDS_CASES_MESSAGE);
+      return undefined;
+    }
+  }
+
+  async function restoreSaveSlot(slot) {
+    const nextState = await buildRestoredSave((current) =>
+      createRestoredSave(carryTableRecordIntoRestore(restoreRecoverySnapshot(slot?.snapshot), current), current),
+    );
+    if (nextState === undefined) return;
     if (!nextState) {
       setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
       return;
@@ -298,10 +316,10 @@ export function useAppPersistence({ state, refs, setters, config }) {
    * read again. A newer build may read what an older one could not, which is the
    * rolled-back deploy the copy is kept for.
    */
-  function restoreSaveBackup() {
-    const current = parseCurrentSavedState(readStoredValue(STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
+  async function restoreSaveBackup() {
     const backup = parseCurrentSavedState(readStoredValue(SAVE_BACKUP_STORAGE_KEY, "null"), SAVE_SCHEMA_VERSION);
-    const nextState = backup ? createRestoredSave(backup, current) : null;
+    const nextState = backup ? await buildRestoredSave((current) => createRestoredSave(backup, current)) : null;
+    if (nextState === undefined) return;
     if (!nextState) {
       setSaveStatus("보관한 저장본은 이 버전에서도 읽을 수 없습니다. 지우지 않고 그대로 둡니다.");
       return;

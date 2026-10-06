@@ -7,7 +7,7 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
   const [playerName, setPlayerName] = useState(() => saved?.playerName ?? "");
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   const [openingLegacy, setOpeningLegacy] = useState(saved?.openingLegacy ?? null);
-  const [dataConsent, setDataConsent] = useState(saved?.dataConsent ?? false);
+  const [dataConsent, setDataConsent] = useState(saved?.dataConsent === true);
   const [started, setStarted] = useState(saved?.started ?? false);
   const [currentCase, setCurrentCase] = useState(saved?.currentCase ?? SEASON_ENTRY_CASE);
   const [completedCases, setCompletedCases] = useState(saved?.completedCases ?? []);
@@ -22,11 +22,6 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
   const [lastSavedAt, setLastSavedAt] = useState(saved?.savedAt ?? "");
   const [isPausedSave, setIsPausedSave] = useState(saved?.paused ?? false);
   const [pendingTelemetry, setPendingTelemetry] = useState(saved?.pendingTelemetry ?? []);
-  const [protocolUsed, setProtocolUsed] = useState(saved?.protocolUsed ?? false);
-  const [timerPenaltyCount, setTimerPenaltyCount] = useState(saved?.timerPenaltyCount ?? 0);
-  const [probeUsed, setProbeUsed] = useState(saved?.probeUsed ?? false);
-  const [investigatedTargets, setInvestigatedTargets] = useState(saved?.investigatedTargets ?? {});
-  const [hypothesisDecisions, setHypothesisDecisions] = useState(saved?.hypothesisDecisions ?? {});
 
   return {
     runId, setRunId,
@@ -48,10 +43,5 @@ export function useGameSaveState({ saved, initialRunId, initialResources, trigge
     lastSavedAt, setLastSavedAt,
     isPausedSave, setIsPausedSave,
     pendingTelemetry, setPendingTelemetry,
-    protocolUsed, setProtocolUsed,
-    timerPenaltyCount, setTimerPenaltyCount,
-    probeUsed, setProbeUsed,
-    investigatedTargets, setInvestigatedTargets,
-    hypothesisDecisions, setHypothesisDecisions,
   };
 }

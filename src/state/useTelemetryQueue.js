@@ -9,7 +9,7 @@ import {
   writeSaveState,
 } from "../appConfig.js";
 import { createTelemetryEventId, sanitizeTelemetryQueue, validateTelemetryItem } from "./payloadSchemas.js";
-import { sendTelemetryBatch } from "./telemetryBatch.js";
+import { reconcileTelemetryQueue, sendTelemetryBatch } from "./telemetryBatch.js";
 import { pruneTelemetryQueue } from "./telemetryQueuePolicy.js";
 
 // Rows built before payloads minted their own `event_id` (the case rows built
@@ -117,10 +117,12 @@ export function useTelemetryQueue({
     setIsRetryingTelemetry(true);
     setTelemetryStatus({
       tone: "pending",
-      text: `대기 중인 원격 저장 ${retryBatch.length}건을 다시 전송하는 중입니다.`,
+      // A case row's first send comes through here too (useChoiceCommit), so
+      // this does not say "again".
+      text: `원격 저장 ${retryBatch.length}건을 전송하는 중입니다.`,
     });
 
-    const { kept, aborted } = await sendTelemetryBatch(retryBatch, { canSend });
+    const { kept, aborted, refused } = await sendTelemetryBatch(retryBatch, { canSend });
     retryingRef.current = false;
     setIsRetryingTelemetry(false);
     if (aborted) {
@@ -129,9 +131,9 @@ export function useTelemetryQueue({
       return { attempted: true, failedCount: pendingTelemetryRef.current.length, aborted: true };
     }
 
-    const retryIds = new Set(retryBatch.map((item) => item.id));
-    const newlyQueuedItems = pendingTelemetryRef.current.filter((item) => !retryIds.has(item.id));
-    const nextQueue = pruneTelemetryQueue([...kept, ...newlyQueuedItems]);
+    // From the queue as it is now: rows queued during the batch stay, and a
+    // queue the player cleared during it stays cleared (reconcileTelemetryQueue).
+    const nextQueue = pruneTelemetryQueue(reconcileTelemetryQueue(pendingTelemetryRef.current, retryBatch, kept));
     const queueCommitted = commitPendingTelemetryQueue(nextQueue);
     if (queueCommitted && nextQueue.length === 0) {
       telemetryRetryAttemptRef.current = 0;
@@ -139,10 +141,15 @@ export function useTelemetryQueue({
     }
     setTelemetryStatus(
       queueCommitted && nextQueue.length === 0
-        ? {
-            tone: "success",
-            text: "대기 중이던 원격 저장을 모두 완료했습니다.",
-          }
+        ? refused > 0
+          ? {
+              tone: "error",
+              text: `서버가 받지 않은 기록 ${refused}건은 대기열에서 뺐습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다.`,
+            }
+          : {
+              tone: "success",
+              text: "원격 저장을 모두 완료했습니다.",
+            }
         : {
             tone: "error",
             text: queueCommitted

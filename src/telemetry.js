@@ -1,4 +1,4 @@
-import { BOARD_WRITER_ID_KEY, readStoredValue, writeStoredValue } from "./appConfig.js";
+import { BOARD_WRITER_ID_KEY, readStoredValue, SESSION_ID_STORAGE_KEY, writeStoredValue } from "./appConfig.js";
 
 /** @type {Partial<ImportMetaEnv>} */
 const viteEnv = import.meta.env ?? {};
@@ -19,6 +19,13 @@ function publishTelemetryStats() {
 
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
+/**
+ * One request under one deadline, body included. The answer comes back with
+ * its body already read: the timer used to be cleared as soon as the headers
+ * arrived, so a server that sent headers and then stalled left `json()` or
+ * `text()` waiting with nothing to end the wait -- a ranking or a board that
+ * never finished loading, an online save that never answered.
+ */
 async function fetchWithTimeout(url, options = {}) {
   if (globalThis.navigator?.onLine === false) {
     throw new Error("Network unavailable");
@@ -26,10 +33,17 @@ async function fetchWithTimeout(url, options = {}) {
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = setTimeout(() => controller?.abort(), TELEMETRY_TIMEOUT_MS);
   try {
-    return await fetch(url, {
+    const response = await fetch(url, {
       ...options,
       ...(controller ? { signal: controller.signal } : {}),
     });
+    const body = await response.text();
+    return {
+      ok: response.ok,
+      status: response.status,
+      text: async () => body,
+      json: async () => JSON.parse(body),
+    };
   } finally {
     clearTimeout(timeoutId);
   }
@@ -84,7 +98,7 @@ function createRandomId(prefix) {
 let fallbackSessionId = null;
 
 export function getSessionId() {
-  const key = "critical-point-session-id";
+  const key = SESSION_ID_STORAGE_KEY;
   const existing = readStoredValue(key);
   if (existing) return existing;
 
@@ -132,16 +146,24 @@ function restHeaders(extra = {}) {
  * no `on_conflict`/`resolution` preference on purpose: an ON CONFLICT target
  * needs SELECT on its column, and anon may not read `event_id` (see
  * 20260928030000_converge_data_api_grants.sql).
+ *
+ * Only that 409. PostgREST answers 409 for a foreign-key violation (23503)
+ * too, and for other conflicts; every one of them used to be counted as
+ * delivered, so a row the database had refused left the queue as if it had
+ * landed. Those are thrown like any other refusal.
  */
+const UNIQUE_VIOLATION = "23505";
+
 async function postOnce(table, body, failureLabel) {
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}`, {
     method: "POST",
     headers: restHeaders({ "Content-Type": "application/json", Prefer: "return=minimal" }),
     body: JSON.stringify(body),
   });
-  if (response.status === 409) return { saved: true, duplicate: true };
-  if (!response.ok) throw await createTelemetryError(response, failureLabel);
-  return { saved: true };
+  if (response.ok) return { saved: true };
+  const error = await createTelemetryError(response, failureLabel);
+  if (response.status === 409 && error.code === UNIQUE_VIOLATION) return { saved: true, duplicate: true };
+  throw error;
 }
 
 async function insertRow(table, payload, failureLabel, eventId = null) {

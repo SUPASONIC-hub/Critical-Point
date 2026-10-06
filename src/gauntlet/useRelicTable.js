@@ -29,28 +29,47 @@ function writeRelicCodex(codex) {
  *
  * The codex is the one piece of table state that outlives a season, so it has
  * its own storage key rather than a field in the save: resetting a run keeps
- * what the player unlocked. A feat proved on a case's last window is in the
- * codex before that case's draft is dealt, so the relic it unlocks can be
- * offered at once.
+ * what the player unlocked. A feat proved on a case's last window counts
+ * toward that case's draft, so the relic it unlocks can be offered at once.
+ *
+ * Settling writes nothing. The feats a window proved are returned
+ * (`unlockedRelics`) and go into the codex with `keepUnlocks`, which the
+ * commit calls once the save has said the decision is this player's
+ * (useChoiceCommit). They used to be written as the window settled, before
+ * that was known -- so a page opened from a replay link, or a tab another tab
+ * had moved past, unlocked relics for good from a decision nobody kept.
  */
+export function settleAgainstCodex({ offerRelics = false, ...settlement }, unlocked = []) {
+  const settled = resolveWindow(settlement);
+  const unlockedRelics = getRelicUnlocks(settled, unlocked);
+  const drafted = settlement.caseClosed && offerRelics
+    ? resolveWindow({ ...settlement, offerRelics: true, relicPool: getRelicPool([...unlocked, ...unlockedRelics]) })
+    : settled;
+  return { ...drafted, unlockedRelics };
+}
+
+/** The codex with these feats added, or the same codex when it already holds them. */
+export function addToRelicCodex(codex, unlockedRelics = []) {
+  const held = normalizeRelicIds(codex?.unlocked);
+  const fresh = normalizeRelicIds(unlockedRelics).filter((id) => !held.includes(id));
+  return fresh.length ? { unlocked: [...held, ...fresh] } : codex;
+}
+
 export function useRelicTable() {
   const [codex, setCodex] = useState(readRelicCodex);
   const codexRef = useRef(codex);
 
-  function settle({ offerRelics = false, ...settlement }) {
-    const settled = resolveWindow(settlement);
-    const unlockedRelics = getRelicUnlocks(settled, codexRef.current.unlocked);
-    if (unlockedRelics.length) {
-      const next = { unlocked: [...codexRef.current.unlocked, ...unlockedRelics] };
-      codexRef.current = next;
-      writeRelicCodex(next);
-      setCodex(next);
-    }
-    const drafted = settlement.caseClosed && offerRelics
-      ? resolveWindow({ ...settlement, offerRelics: true, relicPool: getRelicPool(codexRef.current.unlocked) })
-      : settled;
-    return { ...drafted, unlockedRelics };
+  function settle(settlement) {
+    return settleAgainstCodex(settlement, codexRef.current.unlocked);
   }
 
-  return { codex, settle, equip: equipRelic };
+  function keepUnlocks(unlockedRelics) {
+    const next = addToRelicCodex(codexRef.current, unlockedRelics);
+    if (next === codexRef.current) return;
+    codexRef.current = next;
+    writeRelicCodex(next);
+    setCodex(next);
+  }
+
+  return { codex, settle, keepUnlocks, equip: equipRelic };
 }

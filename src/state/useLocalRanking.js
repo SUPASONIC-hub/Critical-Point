@@ -31,8 +31,18 @@ export function parseLocalRankingRows(rawValue) {
   }
 }
 
+/**
+ * A run has one row a case, and one for the season. A case played again -- the
+ * finale above all, whose close writes the season's ranking row -- used to add
+ * a row every time, so the local board could be filled by repeating one case.
+ * The new row takes the place of the run's earlier one for that case; rows
+ * with no run id (older ones) are left as they are.
+ */
 export function appendLocalRankingRowToRows(rows, row) {
-  return [...rows, row].filter((item) => item && typeof item === "object" && item.case_id && item.summary).slice(-100);
+  const sameRunAndCase = (item) => Boolean(row?.run_id) && item?.run_id === row.run_id && item?.case_id === row.case_id;
+  return [...rows.filter((item) => !sameRunAndCase(item)), row]
+    .filter((item) => item && typeof item === "object" && item.case_id && item.summary)
+    .slice(-100);
 }
 
 function readLocalRankingRows() {

@@ -8,19 +8,25 @@ import {
   ERROR_LOG_STORAGE_KEY,
   hasRecoverySlots,
   makeEmptyScores,
+  NEXT_PARTICIPANT_MESSAGE_KEY,
   parseRecoverySlots,
+  readNewGamePlusMemory,
   readUnreadableSave,
   SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
+  SESSION_ID_STORAGE_KEY,
+  SETTLED_WINDOWS_STORAGE_KEY,
   STORAGE_KEY,
   writeSaveState,
 } from "../../src/appConfig.js";
+import { clearRunStorage, RESET_STORAGE_KEYS } from "../../src/state/runStorageReset.js";
+import { TRACE_STORAGE_KEY } from "../../src/state/trace.js";
 import { getOriginStartEffects } from "../../src/advancedSystems.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameConstants.js";
 import { applyEffect } from "../../src/riskLogic.js";
-import { isChunkLoadError, reloadForMissingChunk } from "../../src/state/chunkReload.js";
-import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
+import { isChunkLoadError, quietImport, reloadForMissingChunk } from "../../src/state/chunkReload.js";
+import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, resetRecordedErrors, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
 
 /** Browser storage as one Map, with a byte budget so a full disk can be staged. */
@@ -306,6 +312,134 @@ test("the reload for a missing chunk happens once, not in a loop", () => {
     assert.equal(reloads, 1);
     assert.equal(reloadForMissingChunk({ now: 1_000_000 + 61_000, reload }), true, "a later deploy is a new reason");
     assert.equal(reloads, 2);
+  } finally {
+    restore();
+  }
+});
+
+test("an offline tab, and an import its own caller answers, are never reloaded", async () => {
+  const { restore } = installStorage();
+  try {
+    let reloads = 0;
+    const reload = () => {
+      reloads += 1;
+    };
+    assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: false }), false, "a reload offline is the browser's offline page");
+    assert.equal(reloads, 0);
+
+    let duringQuiet = null;
+    await assert.rejects(
+      quietImport(() => {
+        duringQuiet = reloadForMissingChunk({ now: 2_000_000, reload, online: true });
+        return Promise.reject(new TypeError("Failed to fetch dynamically imported module: /assets/CloudSavePanelBody-abc.js"));
+      }),
+      /dynamically imported/,
+      "the caller still gets the failure",
+    );
+    assert.equal(duringQuiet, false, "a panel with its own retry keeps the page");
+    assert.equal(reloads, 0);
+    assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: true }), true, "and the next real failure reloads as before");
+  } finally {
+    restore();
+  }
+});
+
+test("a reset removes the run and what was written about it, and keeps what it says it keeps", () => {
+  const { store, restore } = installStorage();
+  try {
+    const kept = {
+      "critical-point-new-game-plus-unlocked": "true",
+      "critical-point-new-game-plus-memory": JSON.stringify({ final: { outcomeChoiceId: "f_seal" } }),
+      "critical-point-board-nickname-v1": "분석관",
+      "critical-point-board-id-v1": "board-1",
+      "critical-point-cloud-code-v1": "ABCDEFGH2345",
+      "critical-point-cloud-sync-v1": "{}",
+      "critical-point-accessibility-v1": "{}",
+      "critical-point-relic-codex-v1": JSON.stringify({ unlocked: ["encore"] }),
+    };
+    for (const [key, value] of Object.entries(kept)) store.set(key, value);
+    for (const key of RESET_STORAGE_KEYS) store.set(key, "written by the run");
+    globalThis.sessionStorage.setItem(TRACE_STORAGE_KEY, JSON.stringify([{ kind: "choose" }]));
+
+    assert.deepEqual(clearRunStorage(), [], "nothing was refused");
+    for (const key of RESET_STORAGE_KEYS) assert.equal(store.has(key), false, `${key} is gone`);
+    assert.equal(globalThis.sessionStorage.getItem(TRACE_STORAGE_KEY), null, "and so is the tab's trace");
+    for (const [key, value] of Object.entries(kept)) assert.equal(store.get(key), value, `${key} is kept`);
+
+    // What the question promised to remove, by name.
+    for (const key of [STORAGE_KEY, SAVE_SLOT_STORAGE_KEY, ERROR_LOG_STORAGE_KEY, SETTLED_WINDOWS_STORAGE_KEY, NEXT_PARTICIPANT_MESSAGE_KEY, SESSION_ID_STORAGE_KEY]) {
+      assert.ok(RESET_STORAGE_KEYS.includes(key), key);
+    }
+  } finally {
+    restore();
+  }
+});
+
+test("the season NEW GAME+ remembers is a record by case, whatever the key holds", () => {
+  const { store, restore } = installStorage();
+  try {
+    assert.deepEqual(readNewGamePlusMemory(), {});
+    for (const held of ['["case01"]', '"text"', "null", "{broken", "7"]) {
+      store.set("critical-point-new-game-plus-memory", held);
+      assert.deepEqual(readNewGamePlusMemory(), {}, held);
+    }
+    store.set("critical-point-new-game-plus-memory", JSON.stringify({ case01: { outcomeChoiceId: "c1_after_people" } }));
+    assert.equal(readNewGamePlusMemory().case01.outcomeChoiceId, "c1_after_people");
+  } finally {
+    restore();
+  }
+});
+
+test("a console line goes in the error log and leaves the save as it was", () => {
+  const { store, restore } = installStorage();
+  resetRecordedErrors();
+  try {
+    writeSaveState(runSave(), { force: true });
+    const before = store.get(STORAGE_KEY);
+    recordAppError(new Error("a library warning"), {}, "console-error");
+    assert.equal(store.get(STORAGE_KEY), before, "not paused, not marked, not rewritten");
+    assert.equal(readSlots(store).length, 0, "and no recovery slot for it");
+    assert.equal(JSON.parse(store.get(ERROR_LOG_STORAGE_KEY)).entries.length, 1);
+  } finally {
+    restore();
+  }
+});
+
+test("the same thing said again is one record, and the console has a budget", () => {
+  const { store, restore } = installStorage();
+  resetRecordedErrors();
+  try {
+    writeSaveState(runSave(), { force: true });
+    const logged = () => JSON.parse(store.get(ERROR_LOG_STORAGE_KEY)).entries.length;
+    const at = 5_000_000;
+    // A script that logs one line in a loop: a new Error object every time.
+    const first = recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at });
+    for (let tick = 1; tick <= 50; tick += 1) {
+      assert.equal(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + tick * 100 }), first);
+    }
+    assert.equal(logged(), 1);
+    // Later, at the same scene, it is still the same record; a minute on it is news again.
+    assert.equal(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + 30_000 }), first);
+    assert.notEqual(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + 61_000 }), first);
+    assert.equal(logged(), 2);
+
+    // The same line at another scene is another record once the burst has passed.
+    resetRecordedErrors();
+    const here = recordAppError(new Error("slow frame"), {}, "window-error", { now: at });
+    writeSaveState({ ...readSave(store), nodeId: "c3_next" }, { force: true });
+    assert.notEqual(recordAppError(new Error("slow frame"), {}, "window-error", { now: at + 3_000 }), here);
+
+    // Every line different: twelve a minute are kept and the rest only printed.
+    resetRecordedErrors();
+    const start = logged();
+    for (let line = 0; line < 40; line += 1) recordAppError(new Error(`noise ${line}`), {}, "console-error", { now: at + line });
+    assert.equal(logged() - start, 12);
+
+    // A screen that fails to draw is never folded: each one is a retry.
+    resetRecordedErrors();
+    recordAppError(new Error("render failed twice"), {}, RENDER_CRASH_SOURCE, { now: at });
+    recordAppError(new Error("render failed twice"), {}, RENDER_CRASH_SOURCE, { now: at + 10 });
+    assert.equal(readSave(store).lastError.retryCount, 2);
   } finally {
     restore();
   }

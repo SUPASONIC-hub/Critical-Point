@@ -6,6 +6,7 @@ import { safeStringify } from "./diagnosticUtils.js";
 import { recordAppError } from "./errorRecovery.js";
 
 let consoleErrorHookBusy = false;
+let lastConsoleEntryId = "";
 
 // The error boundary and reportSilentFailure already write their own entries,
 // so skip their console output instead of logging the same failure twice.
@@ -60,8 +61,11 @@ export function useRuntimeErrorCapture({ onRecovered, onLogged }) {
       try {
         const logged = args.find((arg) => arg instanceof Error);
         const consoleError = logged ?? Object.assign(new Error(limitText(text, 400)), { name: "ConsoleError" });
-        recordAppError(consoleError, {}, "console-error");
-        onLogged();
+        // A line said again is the record it already has (errorRecovery.js),
+        // and the error log is read back only when there is a new one in it.
+        const entry = recordAppError(consoleError, {}, "console-error");
+        if (entry.id !== lastConsoleEntryId) onLogged();
+        lastConsoleEntryId = entry.id;
       } catch {
         // Never let diagnostics break the console itself.
       } finally {

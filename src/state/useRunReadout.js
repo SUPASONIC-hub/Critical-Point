@@ -5,6 +5,7 @@ import { caseObjectives, getCaseBranchNodes, nodes, triggerLabels } from "../gam
 import {
   buildNarrativeSpine,
   getAllDiscoveryClueIds,
+  getAverageResponseTime,
   getCounterfactualReport,
   getDecisionFingerprint,
   getDecisionLedger,
@@ -63,9 +64,7 @@ export function useRunReadout({ log, resources, triggers, cognition, node, curre
       // The quiet beat shows the player their own words -- which are now always
       // a line they picked rather than one they typed.
       endingQuietLine: [...log].reverse().find((entry) => entry.spokenChoice)?.spokenChoice ?? "",
-      currentAverageResponseTime: log.length > 0
-        ? Math.round(log.reduce((sum, entry) => sum + (entry.responseTimeSec ?? 0), 0) / log.length)
-        : 0,
+      currentAverageResponseTime: getAverageResponseTime(log),
       reframeEntries: log.filter((entry) => entry.reframeOpenedRoute),
     };
   }, [log]);

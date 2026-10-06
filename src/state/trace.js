@@ -50,6 +50,15 @@ export function getTraceEvents() {
   }
 }
 
+/** Forgets the tab's trace: a reset is the end of the run it was the trace of. */
+export function clearTraceEvents() {
+  try {
+    sessionStorage.removeItem(TRACE_STORAGE_KEY);
+  } catch {
+    // No session storage: there was no trace to forget.
+  }
+}
+
 export function appendTraceEvent(event = {}) {
   try {
     const next = [

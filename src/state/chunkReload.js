@@ -50,8 +50,38 @@ export function loadedChunk(module) {
   throw error;
 }
 
-/** Reloads for a missing chunk unless this tab just did. Returns whether it reloaded. */
-export function reloadForMissingChunk({ now = Date.now(), reload = () => globalThis.location.reload() } = {}) {
+// Imports under way whose failure their own caller answers (`quietImport`).
+let quietImports = 0;
+
+/**
+ * Runs an import whose failure is the caller's to handle, with no reload: a
+ * panel that offers its own retry (the online-save fold). The reload took the
+ * page away before that retry could be pressed.
+ */
+export function quietImport(load) {
+  quietImports += 1;
+  return Promise.resolve()
+    .then(load)
+    .finally(() => {
+      quietImports -= 1;
+    });
+}
+
+/**
+ * Reloads for a missing chunk unless this tab just did. Returns whether it reloaded.
+ *
+ * Never while the browser says it is offline. A reload fetches `index.html`,
+ * which is not cached and has no service worker behind it: with no connection
+ * it replaced a run in progress with the browser's own offline page, for a
+ * chunk that was not missing at all. `LazyScreen` and `startCase` offer the
+ * retry instead.
+ */
+export function reloadForMissingChunk({
+  now = Date.now(),
+  reload = () => globalThis.location.reload(),
+  online = globalThis.navigator?.onLine !== false,
+} = {}) {
+  if (!online || quietImports > 0) return false;
   if (reloadedRecently(now)) return false;
   try {
     globalThis.sessionStorage.setItem(CHUNK_RELOAD_SESSION_KEY, String(now));

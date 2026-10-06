@@ -26,6 +26,7 @@ import {
   getRiskPressure,
   getSeasonStrain,
   getSeasonWear,
+  getUnattendedNext,
   makeEmptyScores,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
@@ -144,11 +145,11 @@ function scoreCard(policy, choice, resources) {
   return score + (random() - 0.5) * policy.noise * 4;
 }
 
-/** What `GameRuntime.getBlackoutSkip` does: the room plays the next scene without the player. */
-function getBlackoutSkip(fromNodeId) {
+/** What `useChoiceCommit.getBlackoutSkip` does: the room plays the next scene without the player. */
+function getBlackoutSkip(fromNodeId, branchContext) {
   const skipped = nodes[fromNodeId];
   if (!skipped || resultNodeIds.has(fromNodeId)) return null;
-  const onward = skipped.choices?.[0]?.next;
+  const onward = getUnattendedNext(skipped, branchContext);
   if (!onward || !nodes[onward] || resultNodeIds.has(onward)) return null;
   return onward;
 }
@@ -263,9 +264,10 @@ function playSeason(seasonIndex, archetype) {
       const baseEffect = reframe ? REFRAME_EFFECT : choice.effect;
       const cognitiveEffect = reframe ? REFRAME_COGNITION : choice.cognition;
       const read = readers.getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
-      const branchBypass = getBranchDetourBypass(choice, { resources, previousOutcomeChoiceId: outcomeId });
+      const branchContext = { resources, previousOutcomeChoiceId: outcomeId };
+      const branchBypass = getBranchDetourBypass(choice, branchContext);
       const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-      const skip = window.status === "bust" ? getBlackoutSkip(plannedNode) : null;
+      const skip = window.status === "bust" ? getBlackoutSkip(plannedNode, branchContext) : null;
       if (skip) skipped += 1;
       const nextNode = skip ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
