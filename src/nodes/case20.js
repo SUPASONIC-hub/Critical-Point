@@ -717,7 +717,7 @@ export const case20 = {
       effect: { trust: 6, legitimacy: 4, capital: -3, time: 3, humanCost: 3, fatigue: 2 },
       cognition: { risk: 1, persistence: 1 },
       voice: "공지보다 서버를 재던 사람이 더 많이 알 것 같아서, 줄자를 들고 있던 담당자를 서버실 앞에서 먼저 붙잡는다.",
-      echo: "붙잡으면 류세아가 줄자를 감으며 사과부터 합니다. 사과하는 사람이 결정한 사람은 아니라는 것도 곧 드러납니다.",
+      echo: "붙잡으면 담당자가 줄자를 감으며 사과부터 합니다. 사과하는 사람이 결정한 사람은 아니라는 것도 곧 드러납니다.",
     },
   },
   characterProfiles: {
