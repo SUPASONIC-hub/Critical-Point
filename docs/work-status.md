@@ -87,9 +87,22 @@ Still open, on purpose:
    is the one repair helper, and a missing key that equals its default is not a
    repair -- otherwise every reload announced one. A run's starting resources
    come from `createOpeningResources` (`src/state/openingState.js`) and nowhere
-   else; the shell, the runtime and the persistence hook all call it.
-2. Keep `GameRuntime.jsx` under its budget (1,300 lines, 120 imported names;
-   1,242 / 119 today). New derivations go into a hook of their own --
+   else; the shell and the run's definition both call it.
+   The run itself is defined once, in `src/state/runState.js`: every field,
+   where the save keeps it, and what a new game, an opened case, a jump and a
+   reset each do to it. A transition is an event (`src/state/runLifecycle.js`)
+   that the definition answers with a patch; `applyRun` makes the change in
+   memory and writes the save from that same patch, so a field cannot be reset
+   in one and missed in the other. A new field goes into that table, with a
+   rule for all four transitions -- the unit test fails without one -- and a
+   change to the run that the save should hold goes through `applyRun`, not a
+   setter and a `persist` call side by side. What each transition does is
+   pinned field by field in `tests/unit/fixtures/run-lifecycle.json`. The
+   shell's `createStartSave` (`AppContent.jsx`) is still its own list: it runs
+   before the runtime chunk is loaded, and the run's definition imports the
+   table engine.
+2. Keep `GameRuntime.jsx` under its budget (980 lines, 104 imported names;
+   964 / 104 today). New derivations go into a hook of their own --
    `useCaseSystems`, `useResultReport`, `useChoiceCommit` (committing a
    decision, with its ranking row and telemetry) and `useRunReadout` (the
    log-derived readouts, memoised) are the pattern -- not into the component

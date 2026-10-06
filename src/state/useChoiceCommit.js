@@ -22,7 +22,7 @@ import {
 } from "../gameLogic.js";
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { applyGauntletEffect, BUST_EFFECT, createRunSummary, serializeRunState } from "../gauntlet/gauntletEngine.js";
+import { applyGauntletEffect, BUST_EFFECT, createRunSummary } from "../gauntlet/gauntletEngine.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
@@ -206,7 +206,7 @@ export function useChoiceCommit(context) {
     const {
       currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
       caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
-      sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, readers, persist, setters,
+      sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, readers, applyRun,
     } = context;
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
     const responseTimeSec = getWindowResponseTime({ elapsed: windowState.elapsed, enteredAt: nodeEnteredAt, clockSeconds: windowState.schema?.seconds ?? gauntletRun?.schema?.seconds });
@@ -374,33 +374,9 @@ export function useChoiceCommit(context) {
     }
 
     const enteredAt = Date.now();
-    setters.setGauntletRun(nextRun);
-    setters.setResources(finalResources);
-    setters.setTriggers(nextTriggers);
-    setters.setCognition(nextCognition);
-    setters.setLog(nextLog);
-    setters.setEcho(nextEcho);
-    setters.setNodeId(nextNode);
-    setters.setCompletedCases(nextCompletedCases);
-    setters.setCaseResults(nextCaseResults);
-    setters.setDiscoveredClues(nextDiscoveredClues);
-    setters.setNodeEnteredAt(enteredAt);
-    setters.setDecisionReveal({
-      verdict,
-      forced,
-      caseClosed,
-      runPot: nextRun.runPot,
-      vault: nextRun.vault,
-      spokenChoice: entry.spokenChoice,
-      beat: entry.sceneBeat,
-      effect: finalEffect,
-      clue,
-      skippedTitle: blackoutSkip?.skippedTitle ?? null,
-      nextTitle: nodes[nextNode]?.title ?? "결과 화면",
-      nextNode,
-      unlockedRelics,
-    });
-    const written = persist({
+    // One patch: the run in memory and the save are both made from it.
+    const written = applyRun({
+      gauntletRun: nextRun,
       resources: finalResources,
       triggers: nextTriggers,
       cognition: nextCognition,
@@ -410,8 +386,22 @@ export function useChoiceCommit(context) {
       completedCases: nextCompletedCases,
       caseResults: nextCaseResults,
       discoveredClues: nextDiscoveredClues,
-      dynamics: serializeRunState(nextRun),
       nodeEnteredAt: enteredAt,
+      decisionReveal: {
+        verdict,
+        forced,
+        caseClosed,
+        runPot: nextRun.runPot,
+        vault: nextRun.vault,
+        spokenChoice: entry.spokenChoice,
+        beat: entry.sceneBeat,
+        effect: finalEffect,
+        clue,
+        skippedTitle: blackoutSkip?.skippedTitle ?? null,
+        nextTitle: nodes[nextNode]?.title ?? "결과 화면",
+        nextNode,
+        unlockedRelics,
+      },
     });
     // Everything that leaves this tab's own state waits for the save to say
     // whose run this is. A tab another tab has moved past is refused by

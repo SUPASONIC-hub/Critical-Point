@@ -15,7 +15,6 @@ import {
   SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   SAVE_SLOT_STORAGE_KEY,
-  SAVE_STATE_KEYS,
   setReplaySession,
   STORAGE_KEY,
   writeSaveState,
@@ -30,9 +29,8 @@ import {
 import { clearReplayFromLocation } from "./trace.js";
 import { confirmAction } from "./confirmAction.js";
 import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
-import { createOpeningResources } from "./openingState.js";
+import { toSavePatch, toSavePayload } from "./runState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
-import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { withEveryCase } from "./caseArrival.js";
 
 const isAheadOfThisTab = (stored, payload) => isSaveAheadOf(stored, payload, getTabToken());
@@ -53,34 +51,16 @@ const SAVE_REPLAY_MESSAGE = "재현 링크로 연 장면이라 진행을 기록�
 const RESTORE_NEEDS_CASES_MESSAGE = "사건 자료를 다 받지 못해 되돌리지 않았습니다. 연결을 확인하고 다시 눌러 주세요. 저장은 그대로 있습니다.";
 
 /** Ends a replay: the tab writes its saves again and a reload opens the player's own. */
-function leaveReplaySession() {
+export function leaveReplaySession() {
   if (!isReplaySession()) return;
   setReplaySession(false);
   clearReplayFromLocation();
 }
 
-export function useAppPersistence({ state, refs, setters, config }) {
-  const {
-    runId, playerName, playStyle, openingLegacy, dataConsent, started, currentCase,
-    completedCases, discoveredClues, caseResults, playtestFeedback, nodeId, resources,
-    log, triggers, cognition, echo, nodeEnteredAt,
-    dynamics, isPausedSave, saveSlots,
-  } = state;
+export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, config }) {
   const { pendingTelemetryRef } = refs;
-  const {
-    setRunId, setPlayerName, setStarted, setIsPausedSave, setCurrentCase,
-    setCompletedCases, setDiscoveredClues, setCaseResults, setPlaytestFeedback,
-    setResources, setLog, setTriggers, setCognition, setEcho,
-    setOpeningLegacy, setDecisionReveal,
-    setLastRecoveredError, setShowRecoveryCenter, setShowErrorLog,
-    setNodeId, setNodeEnteredAt, setLastSavedAt, setSaveStatus,
-    setLocalErrorEntries, setSaveSlots, setPendingTelemetry,
-  } = setters;
-  const {
-    normalizePlayerName, triggerLabels, cognitionLabels,
-    makeEmptyScores, persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime,
-    debugErrorKey, createRunId, initialDynamics, resetDecisionDynamics, onStaleSave, operatorOrigin, openingEcho,
-  } = config;
+  const { setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry } = setters;
+  const { persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime, debugErrorKey } = config;
 
   /** The queue as the next save should hold it: this tab's, plus rows the error path queued in storage. */
   function foldQueuedErrorTelemetry() {
@@ -93,48 +73,22 @@ export function useAppPersistence({ state, refs, setters, config }) {
     return pendingTelemetryRef.current;
   }
 
+  /**
+   * Writes the run as this render holds it, with `nextState` over it. The
+   * keys of `nextState` are the save's; a change to the run itself goes
+   * through `applyRun`, which derives them.
+   */
   function persist(nextState, { force = false } = {}) {
     if (persistSuppressed()) return { storageSaved: false };
-    const baseState = {
-      saveSchemaVersion: SAVE_SCHEMA_VERSION,
-      runId,
-      playerName,
-      playStyle,
-      openingLegacy,
-      dataConsent,
-      started,
-      currentCase,
-      completedCases,
-      discoveredClues,
-      caseResults,
-      playtestFeedback,
-      nodeId,
-      resources,
-      log,
-      triggers,
-      cognition,
-      echo,
-      nodeEnteredAt,
-      pendingTelemetry: foldQueuedErrorTelemetry(),
-      dynamics: dynamics ?? null,
-      paused: isPausedSave,
-      savedAt: new Date().toISOString(),
-    };
-    const missingKeys = SAVE_STATE_KEYS.filter((key) => !Object.hasOwn(baseState, key));
-    if (missingKeys.length > 0 && import.meta.env.DEV) {
-      throw new Error(`Save payload missing keys: ${missingKeys.join(", ")}`);
-    }
     const payload = {
-      ...SAVE_STATE_KEYS.reduce((state, key) => {
-        state[key] = baseState[key];
-        return state;
-      }, {}),
+      ...toSavePayload(run, { pendingTelemetry: foldQueuedErrorTelemetry(), savedAt: new Date().toISOString() }),
       ...nextState,
     };
-    const previousState = { started, currentCase, nodeId, completedCases };
+    const previousState = { started: run.started, currentCase: run.currentCase, nodeId: run.nodeId, completedCases: run.completedCases };
     const result = writeSaveState(payload, { force, isAhead: isAheadOfThisTab });
     if (result.stale) {
-      onStaleSave?.();
+      // The tab stops: no table and no writes until it reloads (runState.staleSave).
+      patchRun({ staleSave: true });
       setSaveStatus(SAVE_STALE_MESSAGE);
       return { ...payload, storageSaved: false, stale: true };
     }
@@ -147,39 +101,17 @@ export function useAppPersistence({ state, refs, setters, config }) {
     return { ...payload, storageSaved: result.saved };
   }
 
-  function startGame() {
-    // A run of one's own ends a replay; from here the tab writes its save again.
-    leaveReplaySession();
-    const name = normalizePlayerName(playerName) || "분석관";
-    const nextRunId = createRunId();
-    const emptyTriggers = makeEmptyScores(triggerLabels);
-    const emptyCognition = makeEmptyScores(cognitionLabels);
-    const openingResources = createOpeningResources(operatorOrigin);
-    setRunId(nextRunId);
-    setPlayerName(name); setStarted(true); setIsPausedSave(false); setCurrentCase(SEASON_ENTRY_CASE);
-    setCompletedCases([]); setDiscoveredClues([]); setCaseResults({}); setPlaytestFeedback({});
-    setResources(openingResources); setLog([]); setTriggers(emptyTriggers); setCognition(emptyCognition);
-    setOpeningLegacy(null);
-    // The line under the first scene is the season's opening one. It was left
-    // as the last run's last reply: this list reset everything but the echo,
-    // and the save was written with the old one in it. Then the save was
-    // written with none, while the run in memory held the opening line; the
-    // next write put it there anyway. Both hold the same line now.
-    setEcho?.(openingEcho ?? "");
-    resetDecisionDynamics?.();
-    setDecisionReveal(null); setLastRecoveredError(null);
-    setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
-    setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, echo: openingEcho ?? "", nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
-  }
-
-  function resumeSavedGame() {
-    setStarted(true); setIsPausedSave(false); setNodeEnteredAt(Date.now()); setSaveStatus(""); setDecisionReveal(null);
-    persist({ started: true, paused: false, nodeEnteredAt: Date.now() });
-  }
-
-  function pauseAfterRecovery() {
-    setStarted(false); setIsPausedSave(true); setSaveStatus("현재 지점을 일시정지했습니다."); persist({ started: false, paused: true });
+  /**
+   * A change to the run, made in memory and written to the save in one step.
+   * `patch` is in the run's own fields; what the save holds for them is read
+   * off the same patch (runState.toSavePatch), so the two cannot disagree.
+   *
+   * `saveOnly` is for the one thing the save is told and the run is not: that
+   * the page is going away (GameRuntime's suspension). Its keys are the save's.
+   */
+  function applyRun(patch, { force = false, saveOnly = {} } = {}) {
+    patchRun(patch);
+    return persist({ ...toSavePatch(patch), ...saveOnly }, { force });
   }
 
   function startFreshAfterRecovery() {
@@ -192,18 +124,26 @@ export function useAppPersistence({ state, refs, setters, config }) {
     writeStoredValue(RECOVERY_CENTER_STORAGE_KEY, "1"); removeStoredValue(debugErrorKey); window.location.reload();
   }
 
-  function saveCurrentGame({ exit = false, dynamics: suspendedDynamics = null } = {}) {
-    const nextNodeEnteredAt = exit ? nodeEnteredAt : Date.now();
-    const payload = persist({ started: exit ? false : started, paused: exit, nodeEnteredAt: nextNodeEnteredAt, ...(suspendedDynamics ? { dynamics: suspendedDynamics } : {}) });
+  /**
+   * `heldRun` is a window put down on the way out (useWindowSuspension): it
+   * goes into the save with the exit, and into the run whatever the save says.
+   */
+  function saveCurrentGame({ exit = false, heldRun = null } = {}) {
+    if (heldRun) patchRun({ gauntletRun: heldRun });
+    const patch = {
+      started: exit ? false : run.started,
+      isPausedSave: exit,
+      nodeEnteredAt: exit ? run.nodeEnteredAt : Date.now(),
+      ...(heldRun ? { gauntletRun: heldRun } : {}),
+    };
+    const payload = persist(toSavePatch(patch));
     // Another tab is ahead: nothing was written, so leaving would drop this
     // tab onto an intro that offers a run the save no longer holds. The table
-    // is already locked (onStaleSave) and persist has said why.
+    // is already locked (the stale lock in `persist`) and persist has said why.
     if (payload.stale) return;
-    if (payload.storageSaved) setLastSavedAt(payload.savedAt);
-    const savedLine = suspendedDynamics ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
-    setIsPausedSave(exit);
+    const savedLine = heldRun ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
+    patchRun(payload.storageSaved ? { ...patch, lastSavedAt: payload.savedAt } : patch);
     setSaveStatus(payload.storageSaved ? savedLine : payload.replay ? SAVE_REPLAY_MESSAGE : SAVE_UNAVAILABLE_MESSAGE);
-    if (exit) setStarted(false); else setNodeEnteredAt(nextNodeEnteredAt);
   }
 
   function refreshSaveSlots() {
@@ -218,8 +158,8 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setLocalErrorEntries(Array.isArray(parsed?.entries) ? parsed.entries : []); refreshSaveSlots();
   }
 
-  function dismissRecoveryNotice() { setLastRecoveredError(null); persist({ lastError: null }); }
-  function closeRecoveryCenter() { setShowErrorLog(false); setShowRecoveryCenter(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
+  function dismissRecoveryNotice() { applyRun({ lastRecoveredError: null }); }
+  function closeRecoveryCenter() { patchRun({ showErrorLog: false, showRecoveryCenter: false }); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
 
   function clearLocalErrorLog() {
     if (!confirmAction(CONFIRM_CLEAR_ERROR_LOG)) return;
@@ -229,7 +169,7 @@ export function useAppPersistence({ state, refs, setters, config }) {
       refreshLocalErrorLog();
       return;
     }
-    setLocalErrorEntries([]); setLastRecoveredError(null); persist({ lastError: null });
+    setLocalErrorEntries([]); applyRun({ lastRecoveredError: null });
   }
 
   function deleteSaveSlot(slotId) {
@@ -336,5 +276,5 @@ export function useAppPersistence({ state, refs, setters, config }) {
     if (restored) removeStoredValue(SAVE_BACKUP_STORAGE_KEY);
   }
 
-  return { persist, startGame, resumeSavedGame, pauseAfterRecovery, startFreshAfterRecovery, saveCurrentGame, refreshLocalErrorLog, refreshSaveSlots, dismissRecoveryNotice, closeRecoveryCenter, clearLocalErrorLog, deleteSaveSlot, restoreSaveSlot, restoreSaveBackup };
+  return { persist, applyRun, startFreshAfterRecovery, saveCurrentGame, refreshLocalErrorLog, refreshSaveSlots, dismissRecoveryNotice, closeRecoveryCenter, clearLocalErrorLog, deleteSaveSlot, restoreSaveSlot, restoreSaveBackup };
 }

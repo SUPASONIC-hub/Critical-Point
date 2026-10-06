@@ -33,26 +33,16 @@ export function restoreGlobals() {
   delete globalThis.window;
 }
 
-const setterField = (name) => {
-  if (name === "setOperatorOriginState") return "operatorOrigin";
-  const field = name.slice(3);
-  return field[0].toLowerCase() + field.slice(1);
-};
-
 export async function createRunHarness({ saved = null, storage = {}, operatorOrigin = "courier", confirm = true, patch = {} } = {}) {
   const effects = [];
   installGlobals({ storage, confirm, effects });
 
   const appConfig = await import("../../../src/appConfig.js");
   const { useAppPersistence } = await import("../../../src/state/useAppPersistence.js");
-  const { useGameSaveState } = await import("../../../src/state/useGameSave.js");
+  const { initialRunState, runReducer } = await import("../../../src/state/runState.js");
   const { createRunLifecycle } = await import("../../../src/state/runLifecycle.js");
   const { getTraceEvents } = await import("../../../src/state/trace.js");
-  const { initialResources, triggerLabels, cognitionLabels } = await import("../../../src/gameData.js");
-  const { makeEmptyScores } = await import("../../../src/gameLogic.js");
-  const { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } = await import("../../../src/gauntlet/gauntletEngine.js");
-  const { createElement } = await import("react");
-  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { normalizeRunState } = await import("../../../src/gauntlet/gauntletEngine.js");
 
   // The tab knows the revision storage starts at, as a page that loaded it does.
   appConfig.adoptSaveRevision();
@@ -62,97 +52,71 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
   let sessionIds = 0;
   const getSessionId = () => `session-${(sessionIds += 1)}`;
 
-  // What the runtime starts from: the save hook's state, and the five pieces
-  // GameRuntime kept beside it, read the way its `useState` calls read them.
-  let loaded;
-  function Probe() {
-    loaded = useGameSaveState({
-      saved,
-      initialRunId: saved?.runId || "run-0",
-      initialResources,
-      triggerDefaults: makeEmptyScores(triggerLabels),
-      cognitionDefaults: makeEmptyScores(cognitionLabels),
-    });
-    return null;
-  }
-  renderToStaticMarkup(createElement(Probe));
-  const run = Object.fromEntries(Object.entries(loaded).filter(([, value]) => typeof value !== "function"));
-  Object.assign(run, {
-    gauntletRun: normalizeRunState(saved?.dynamics),
-    staleSave: false,
-    operatorOrigin,
-    echo: appConfig.normalizeSavedText(saved?.echo) || OPENING_ECHO,
-    nodeEnteredAt: Number.isFinite(saved?.nodeEnteredAt) ? saved.nodeEnteredAt : HARNESS_NOW,
-    decisionReveal: null,
-    lastRecoveredError: saved?.lastError ?? null,
-    showRecoveryCenter: false,
-    showErrorLog: false,
-    sessionId: "session-0",
+  // What the runtime starts from (useRunState's first render), then the
+  // reducer it runs on, driven here without React.
+  let run = {
+    ...initialRunState(saved, { runId: "run-0", operatorOrigin, sessionId: "session-0", now: HARNESS_NOW, openRecovery: false }),
     ...patch,
-  });
+  };
+  const patchRun = (change) => {
+    run = runReducer(run, { type: "patch", patch: change });
+  };
 
   const loadedSavedAt = run.lastSavedAt;
   const outside = { status: null, telemetryStatus: null, localErrorEntries: null, saveSlots: [] };
   const pendingTelemetryRef = { current: run.pendingTelemetry };
-  const setters = new Proxy({}, {
-    get: (_, name) => (value) => {
-      if (name === "setSaveStatus") outside.status = value;
-      else if (name === "setTelemetryStatus") outside.telemetryStatus = value;
-      else if (name === "setNextParticipantMessage") effects.push(`next-participant-message:${JSON.stringify(value)}`);
-      else if (name === "setLocalErrorEntries") outside.localErrorEntries = value;
-      else if (name === "setSaveSlots") outside.saveSlots = value;
-      else {
-        const field = setterField(name);
-        run[field] = typeof value === "function" ? value(run[field]) : value;
-      }
-    },
-  });
+  const setSaveStatus = (value) => {
+    outside.status = value;
+  };
 
   /** One render's worth of functions: they close over the run as it stands now. */
   function render() {
     const persistence = useAppPersistence({
-      state: { ...run, dynamics: serializeRunState(run.gauntletRun) },
+      run,
+      patchRun,
+      saveSlots: outside.saveSlots,
       refs: { pendingTelemetryRef },
-      setters,
+      setters: {
+        setSaveStatus,
+        setLocalErrorEntries: (value) => {
+          outside.localErrorEntries = value;
+        },
+        setSaveSlots: (value) => {
+          outside.saveSlots = value;
+        },
+        setPendingTelemetry: (queue) => patchRun({ pendingTelemetry: queue }),
+      },
       config: {
-        normalizePlayerName: appConfig.normalizePlayerName,
-        operatorOrigin: run.operatorOrigin,
-        triggerLabels,
-        cognitionLabels,
-        makeEmptyScores,
         persistSuppressed: () => false,
         onSuppressSaves: () => effects.push("suppress-saves"),
         onResumeSaves: () => effects.push("resume-saves"),
         formatSaveTime: () => "<time>",
         debugErrorKey: appConfig.DEBUG_RENDER_CRASH_KEY,
-        createRunId,
-        initialDynamics: RUN_INITIAL_STATE,
-        openingEcho: OPENING_ECHO,
-        resetDecisionDynamics: () => {
-          run.gauntletRun = RUN_INITIAL_STATE;
-          run.staleSave = false;
-        },
-        onStaleSave: () => {
-          run.staleSave = true;
-        },
       },
     });
     const lifecycle = createRunLifecycle({
-      state: { ...run, isOnline: true },
-      setters,
-      persist: persistence.persist,
+      run,
+      applyRun: persistence.applyRun,
+      patchRun,
+      isOnline: true,
       effects: {
         resetEndingSequence: () => effects.push("reset-ending-sequence"),
-        setNextParticipantMessage: setters.setNextParticipantMessage,
+        setNextParticipantMessage: (value) => effects.push(`next-participant-message:${JSON.stringify(value)}`),
         replacePendingTelemetry: (queue) => {
           pendingTelemetryRef.current = queue;
-          run.pendingTelemetry = queue;
+          patchRun({ pendingTelemetry: queue });
         },
         clearLocalRankingRows: () => effects.push("clear-local-ranking-rows"),
-        setLocalErrorEntries: setters.setLocalErrorEntries,
-        setSaveSlots: setters.setSaveSlots,
-        setSaveStatus: setters.setSaveStatus,
-        setTelemetryStatus: setters.setTelemetryStatus,
+        setLocalErrorEntries: (value) => {
+          outside.localErrorEntries = value;
+        },
+        setSaveSlots: (value) => {
+          outside.saveSlots = value;
+        },
+        setSaveStatus,
+        setTelemetryStatus: (value) => {
+          outside.telemetryStatus = value;
+        },
         onSuppressSaves: () => effects.push("suppress-saves"),
         resumeRuntimeSaves: () => effects.push("resume-saves"),
       },
@@ -164,15 +128,22 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
       jumpToNode: (caseId, nodeId, options) => lifecycle.startAtNode(caseId, nodeId, options),
       resetEverything: () => lifecycle.resetRun(),
       leaveToSeasonMap: () => lifecycle.leaveToSeasonMap(),
-      startGame: () => persistence.startGame(),
-      resume: () => persistence.resumeSavedGame(),
-      pauseAfterRecovery: () => persistence.pauseAfterRecovery(),
-      // The runtime holds the suspended window before it saves it (GameRuntime.saveCurrentGame).
-      saveGame: (options) => {
-        if (options?.dynamics) run.gauntletRun = normalizeRunState(options.dynamics);
-        return persistence.saveCurrentGame(options);
-      },
+      startGame: () => lifecycle.startGame(),
+      resume: () => lifecycle.resumeSavedGame(),
+      pauseAfterRecovery: () => lifecycle.pauseAfterRecovery(),
+      // The save's `dynamics` is how the test names a held window; the runtime hands over the run itself.
+      saveGame: ({ dynamics, ...options } = {}) =>
+        persistence.saveCurrentGame(dynamics ? { ...options, heldRun: normalizeRunState(dynamics) } : options),
       dismissRecoveryNotice: () => persistence.dismissRecoveryNotice(),
+      closeRecoveryCenter: () => persistence.closeRecoveryCenter(),
+      refreshErrorLog: () => persistence.refreshLocalErrorLog(),
+      clearErrorLog: () => persistence.clearLocalErrorLog(),
+      deleteSlot: (slotId) => persistence.deleteSaveSlot(slotId),
+      restoreSlot: (slot) => persistence.restoreSaveSlot(slot),
+      restoreBackup: () => persistence.restoreSaveBackup(),
+      startFresh: () => persistence.startFreshAfterRecovery(),
+      persist: (patch, options) => persistence.persist(patch, options),
+      applyRun: (patch, options) => persistence.applyRun(patch, options),
     };
   }
 
