@@ -1,0 +1,2882 @@
+{
+  "newGame/from-empty-intro": {
+    "run": {
+      "runId": "run-1",
+      "playerName": "새 분석관",
+      "playStyle": "mediate",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 54,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 10
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "",
+      "isPausedSave": false,
+      "pendingTelemetry": [],
+      "gauntletRun": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": null,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": []
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-1",
+      "playerName": "새 분석관",
+      "playStyle": "mediate",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 54,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 10
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [],
+      "dynamics": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "newGame/unnamed-lab-origin": {
+    "run": {
+      "runId": "run-1",
+      "playerName": "분석관",
+      "playStyle": "instinct",
+      "openingLegacy": null,
+      "dataConsent": false,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 51,
+        "legitimacy": 55,
+        "humanCost": 0,
+        "fatigue": 12
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "",
+      "isPausedSave": false,
+      "pendingTelemetry": [],
+      "gauntletRun": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "lab",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": null,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": []
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-1",
+      "playerName": "분석관",
+      "playStyle": "instinct",
+      "openingLegacy": null,
+      "dataConsent": false,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 51,
+        "legitimacy": 55,
+        "humanCost": 0,
+        "fatigue": 12
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [],
+      "dynamics": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "newGame/over-a-run": {
+    "run": {
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "2026-10-01T00:00:00.000Z",
+      "isPausedSave": false,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "public",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": null,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "resume/paused-run": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "2026-10-01T00:00:00.000Z",
+      "isPausedSave": false,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "effects": [],
+    "status": "",
+    "outside": {
+      "status": "",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "pause/after-recovery": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "2026-10-01T00:00:00.000Z",
+      "isPausedSave": true,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": true,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": "현재 지점을 일시정지했습니다.",
+    "outside": {
+      "status": "현재 지점을 일시정지했습니다.",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "save/in-place": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "<savedAt>",
+      "isPausedSave": false,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": "저장됨 <time>",
+    "outside": {
+      "status": "저장됨 <time>",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "save/and-exit": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "<savedAt>",
+      "isPausedSave": true,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": true,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": "저장됨 <time>",
+    "outside": {
+      "status": "저장됨 <time>",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "save/and-exit-with-held-window": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "<savedAt>",
+      "isPausedSave": true,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": false,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": "seed-held",
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": true,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": "판을 그대로 보관했습니다 <time>",
+    "outside": {
+      "status": "판을 그대로 보관했습니다 <time>",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "save/refused-as-stale": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "<savedAt>",
+      "isPausedSave": false,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": true,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "decisionReveal": null,
+      "lastRecoveredError": {
+        "message": "앞선 오류",
+        "at": "2026-10-01T00:00:00.000Z"
+      },
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 9,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": "다른 탭에서 이 진행이 더 앞서 있어 이 탭의 진행은 기록하지 않았습니다. 새로고침하면 최신 진행을 불러옵니다.",
+    "outside": {
+      "status": "다른 탭에서 이 진행이 더 앞서 있어 이 탭의 진행은 기록하지 않았습니다. 새로고침하면 최신 진행을 불러옵니다.",
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "recovery/dismiss-notice": {
+    "run": {
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "lastSavedAt": "2026-10-01T00:00:00.000Z",
+      "isPausedSave": false,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "gauntletRun": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "staleSave": false,
+      "operatorOrigin": "courier",
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "decisionReveal": null,
+      "lastRecoveredError": null,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "sessionId": "session-0",
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-mid",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
+        }
+      },
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue02",
+      "completedCases": [
+        "prologue01"
+      ],
+      "discoveredClues": [
+        {
+          "id": "clue-a",
+          "caseId": "prologue01"
+        }
+      ],
+      "caseResults": {
+        "prologue01": {
+          "rank": "A",
+          "outcomeChoiceId": "p1_after_credit",
+          "completedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "playtestFeedback": {
+        "prologue01": {
+          "clarity": 4,
+          "comment": "읽기 쉬웠다"
+        }
+      },
+      "nodeId": "p2_start_record",
+      "resources": {
+        "time": 72,
+        "capital": 100,
+        "trust": 41,
+        "legitimacy": 50,
+        "humanCost": 0,
+        "fatigue": 17
+      },
+      "log": [
+        {
+          "caseId": "prologue02",
+          "nodeId": "p2_start_credit",
+          "choiceId": "p2_first",
+          "speaker": "한서윤"
+        }
+      ],
+      "triggers": {
+        "protection": 12,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 3,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 3,
+        "practiceWindows": 0,
+        "runPot": 40,
+        "vault": 12,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 0,
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  }
+}
