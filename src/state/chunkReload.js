@@ -70,11 +70,12 @@ export function quietImport(load) {
 /**
  * Reloads for a missing chunk unless this tab just did. Returns whether it reloaded.
  *
- * Never while the browser says it is offline. A reload fetches `index.html`,
- * which is not cached and has no service worker behind it: with no connection
- * it replaced a run in progress with the browser's own offline page, for a
- * chunk that was not missing at all. `LazyScreen` and `startCase` offer the
- * retry instead.
+ * Never while the browser says it is offline. A reload is for a file the
+ * server no longer has, and with no connection the file is not missing at
+ * all: on a device without the service worker the reload replaced a run in
+ * progress with the browser's own offline page, and on one with it
+ * (serviceWorker/worker.js) the reloaded page would ask for the same file the
+ * worker has not kept. `LazyScreen` and `startCase` offer the retry instead.
  */
 export function reloadForMissingChunk({
   now = Date.now(),
