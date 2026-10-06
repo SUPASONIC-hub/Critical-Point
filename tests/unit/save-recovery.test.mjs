@@ -20,7 +20,7 @@ import { getOriginStartEffects } from "../../src/advancedSystems.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../../src/gameConstants.js";
 import { applyEffect } from "../../src/riskLogic.js";
 import { isChunkLoadError, quietImport, reloadForMissingChunk } from "../../src/state/chunkReload.js";
-import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
+import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, resetRecordedErrors, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
 
 /** Browser storage as one Map, with a byte budget so a full disk can be staged. */
@@ -333,6 +333,61 @@ test("an offline tab, and an import its own caller answers, are never reloaded",
     assert.equal(duringQuiet, false, "a panel with its own retry keeps the page");
     assert.equal(reloads, 0);
     assert.equal(reloadForMissingChunk({ now: 2_000_000, reload, online: true }), true, "and the next real failure reloads as before");
+  } finally {
+    restore();
+  }
+});
+
+test("a console line goes in the error log and leaves the save as it was", () => {
+  const { store, restore } = installStorage();
+  resetRecordedErrors();
+  try {
+    writeSaveState(runSave(), { force: true });
+    const before = store.get(STORAGE_KEY);
+    recordAppError(new Error("a library warning"), {}, "console-error");
+    assert.equal(store.get(STORAGE_KEY), before, "not paused, not marked, not rewritten");
+    assert.equal(readSlots(store).length, 0, "and no recovery slot for it");
+    assert.equal(JSON.parse(store.get(ERROR_LOG_STORAGE_KEY)).entries.length, 1);
+  } finally {
+    restore();
+  }
+});
+
+test("the same thing said again is one record, and the console has a budget", () => {
+  const { store, restore } = installStorage();
+  resetRecordedErrors();
+  try {
+    writeSaveState(runSave(), { force: true });
+    const logged = () => JSON.parse(store.get(ERROR_LOG_STORAGE_KEY)).entries.length;
+    const at = 5_000_000;
+    // A script that logs one line in a loop: a new Error object every time.
+    const first = recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at });
+    for (let tick = 1; tick <= 50; tick += 1) {
+      assert.equal(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + tick * 100 }), first);
+    }
+    assert.equal(logged(), 1);
+    // Later, at the same scene, it is still the same record; a minute on it is news again.
+    assert.equal(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + 30_000 }), first);
+    assert.notEqual(recordAppError(new Error("ResizeObserver loop limit exceeded"), {}, "console-error", { now: at + 61_000 }), first);
+    assert.equal(logged(), 2);
+
+    // The same line at another scene is another record once the burst has passed.
+    resetRecordedErrors();
+    const here = recordAppError(new Error("slow frame"), {}, "window-error", { now: at });
+    writeSaveState({ ...readSave(store), nodeId: "c3_next" }, { force: true });
+    assert.notEqual(recordAppError(new Error("slow frame"), {}, "window-error", { now: at + 3_000 }), here);
+
+    // Every line different: twelve a minute are kept and the rest only printed.
+    resetRecordedErrors();
+    const start = logged();
+    for (let line = 0; line < 40; line += 1) recordAppError(new Error(`noise ${line}`), {}, "console-error", { now: at + line });
+    assert.equal(logged() - start, 12);
+
+    // A screen that fails to draw is never folded: each one is a retry.
+    resetRecordedErrors();
+    recordAppError(new Error("render failed twice"), {}, RENDER_CRASH_SOURCE, { now: at });
+    recordAppError(new Error("render failed twice"), {}, RENDER_CRASH_SOURCE, { now: at + 10 });
+    assert.equal(readSave(store).lastError.retryCount, 2);
   } finally {
     restore();
   }
