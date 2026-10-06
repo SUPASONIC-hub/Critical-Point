@@ -159,7 +159,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [],
       "dynamics": {
@@ -392,7 +392,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [],
       "dynamics": {
@@ -639,7 +639,7 @@
         "reframing": 0,
         "risk": 0
       },
-      "echo": "",
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
       "nodeEnteredAt": 1760000000000,
       "pendingTelemetry": [
         {

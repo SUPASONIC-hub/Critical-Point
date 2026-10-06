@@ -162,13 +162,15 @@ export function useAppPersistence({ state, refs, setters, config }) {
     setOpeningLegacy(null);
     // The line under the first scene is the season's opening one. It was left
     // as the last run's last reply: this list reset everything but the echo,
-    // and the save was written with the old one in it.
+    // and the save was written with the old one in it. Then the save was
+    // written with none, while the run in memory held the opening line; the
+    // next write put it there anyway. Both hold the same line now.
     setEcho?.(openingEcho ?? "");
     resetDecisionDynamics?.();
     setDecisionReveal(null); setLastRecoveredError(null);
     setShowRecoveryCenter(false); setShowErrorLog(false); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     setNodeId(SEASON_ENTRY_NODE); setNodeEnteredAt(Date.now());
-    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, echo: "", nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
+    persist({ runId: nextRunId, playerName: name, playStyle, openingLegacy: null, dataConsent, started: true, currentCase: SEASON_ENTRY_CASE, completedCases: [], discoveredClues: [], caseResults: {}, playtestFeedback: {}, resources: openingResources, log: [], triggers: emptyTriggers, cognition: emptyCognition, echo: openingEcho ?? "", nodeId: SEASON_ENTRY_NODE, nodeEnteredAt: Date.now(), dynamics: initialDynamics ?? null, paused: false, lastError: null }, { force: true });
   }
 
   function resumeSavedGame() {
