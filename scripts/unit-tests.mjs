@@ -110,6 +110,16 @@ test("local ranking history should stay bounded", () => {
     "local ranking history should stay bounded",
   );
 });
+test("a case played again replaces its run's ranking row instead of adding one", () => {
+  const row = (run_id, case_id, momentumScore) => ({ run_id, case_id, summary: { momentumScore } });
+  const first = [row("run-a", "final", 60), row("run-a", "season-final", 61), row("run-b", "season-final", 40), validRanking];
+  const replayed = appendLocalRankingRowToRows(first, row("run-a", "season-final", 99));
+  assert.equal(replayed.filter((item) => item.run_id === "run-a" && item.case_id === "season-final").length, 1);
+  assert.equal(replayed.at(-1).summary.momentumScore, 99, "the row is the case as it now stands");
+  assert.equal(replayed.length, first.length, "the board did not grow");
+  assert.ok(replayed.some((item) => item.run_id === "run-b"), "another run's row is its own");
+  assert.equal(appendLocalRankingRowToRows([validRanking], validRanking).length, 2, "rows with no run id are left alone");
+});
 test("local ranking append should keep the newest row", () => {
   assert.equal(
     appendLocalRankingRowToRows(Array.from({ length: 100 }, (_, index) => ({ case_id: `case-${index}`, summary: {} })), validRanking).at(-1),

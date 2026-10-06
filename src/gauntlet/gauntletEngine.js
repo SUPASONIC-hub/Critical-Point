@@ -198,6 +198,9 @@ export function normalizeSchema(value) {
   const source = value && typeof value === "object" ? value : {};
   const schema = { ...BASE_SCHEMA };
   for (const key of ["seconds", "wallMin", "wallMax", "stepMin", "stepMax", "creep", "startGauge", "chipsScale", "fractureRate", "sealBreak"]) {
+    // A rule the save holds as null takes the default: `Number(null)` is 0,
+    // and a 0-second board clamped to the shortest clock is not what was saved.
+    if (source[key] === null || source[key] === undefined) continue;
     const numeric = Number(source[key]);
     if (Number.isFinite(numeric)) schema[key] = numeric;
   }
@@ -545,6 +548,12 @@ export function drawTellOffset(seed) {
   return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * TELL_ERROR);
 }
 
+/** A clock scale as a window keeps it: 1 (the board's own clock) to 4 times slower. */
+function normalizeTimeScale(value) {
+  const scale = Number(value);
+  return Number.isFinite(scale) ? clamp(scale, 1, 4) : 1;
+}
+
 /** The ways a window can bust on the table, as a hold written at closure records them. */
 const CLOSED_CAUSES = new Set(["push", "creep", "timeout", "focus"]);
 
@@ -580,6 +589,12 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     jammed: false,
     lastGrade: null,
     lastFocusGrade: null,
+    // How many times slower than the board's clock this window has been run,
+    // at its slowest (the table-time comfort setting). It is the window's, and
+    // it is saved with a window put down: the setting itself can be changed on
+    // the intro between leaving a window and cashing it, and the ranking's
+    // "played with a slower clock" mark used to read the setting at the cash.
+    timeScale: 1,
   };
   // A window the player put down on purpose -- saved and left, or hid the tab --
   // picks up exactly where it stood. The wall and the tell are dealt from the
@@ -598,7 +613,7 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
 
 const SUSPENDED_WINDOW_NUMBERS = [
   "gauge", "pushes", "lastStep", "elapsed", "beatCombo", "maxCombo", "groove", "beatHits", "perfects", "slips",
-  "focus", "focusCombo", "maxFocusCombo", "focusHits", "focusPerfects", "focusMisses",
+  "focus", "focusCombo", "maxFocusCombo", "focusHits", "focusPerfects", "focusMisses", "timeScale",
 ];
 
 /**
@@ -636,6 +651,7 @@ function resumeWindow(window, resume) {
   // still live, and the first tick or push decides it the way it would have.
   restored.gauge = clamp(restored.gauge, 0, Math.max(0, window.wall - 0.01));
   restored.elapsed = clamp(restored.elapsed, 0, Math.max(0, window.schema.seconds - 0.1));
+  restored.timeScale = normalizeTimeScale(restored.timeScale);
   restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
   restored.focusMode = normalizeFocusMode(resume.focusMode);
   return restored;
@@ -662,8 +678,12 @@ function advanceClock(window, delta) {
 export function reduceWindow(window, event = {}) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
-    case "TICK":
-      return advanceClock(window, clamp(Number(event.delta) || 0, 0, 1));
+    case "TICK": {
+      const advanced = advanceClock(window, clamp(Number(event.delta) || 0, 0, 1));
+      // The slowest the clock has run in this window (the table-time setting).
+      const scale = normalizeTimeScale(event.scale);
+      return scale > advanced.timeScale ? { ...advanced, timeScale: scale } : advanced;
+    }
     case "PUSH": {
       const pushes = window.pushes + 1;
       const step = drawStep(window.schema, window.seed, pushes);
@@ -747,6 +767,10 @@ export function reduceWindow(window, event = {}) {
 
 export const RUN_INITIAL_STATE = Object.freeze({
   windowIndex: 0,
+  // How many of those windows were practice (a closed case played again). They
+  // seed and order the table like any other window, and the season does not
+  // lean in for them: see `getEscalationWindow`.
+  practiceWindows: 0,
   runPot: 0,
   vault: 0,
   streak: 0,
@@ -808,11 +832,15 @@ function normalizePractice(value) {
 export function normalizeRunState(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "runGroove", "grooveVault"]) {
+  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "runGroove", "grooveVault"]) {
+    // A value the save does not hold, or holds as null, takes the default:
+    // `Number(null)` is 0, which is finite, and used to be taken as written.
+    if (source[key] === null || source[key] === undefined) continue;
     const numeric = Number(source[key]);
     if (Number.isFinite(numeric)) run[key] = numeric;
   }
   run.windowIndex = Math.max(0, Math.trunc(run.windowIndex));
+  run.practiceWindows = clamp(Math.trunc(run.practiceWindows), 0, run.windowIndex);
   run.runPot = Math.max(0, Math.round(run.runPot));
   run.vault = Math.max(0, Math.round(run.vault));
   run.streak = Math.max(0, Math.trunc(run.streak));
@@ -1016,8 +1044,16 @@ function endPractice(run) {
  * relic and add to mastery every time, so the vault the ending reads per case
  * could be filled by repeating one. The replay plays the same table and keeps
  * none of it: the vault, the relics, the mastery and any draft still waiting
- * are remembered here and handed back when the replay closes or is left, and
- * the summary keeps the table record of the case's first close.
+ * are remembered here and handed back when the replay closes or is left, the
+ * summary keeps the table record of the case's first close, and its windows do
+ * not move the season's schedule along (`getEscalationWindow`).
+ *
+ * "None of it" is the table. The story is the other way round, on purpose: a
+ * case played again is that case as it now stands -- its outcome, what it cost
+ * and what it carries into the next case replace the first play's (the retry
+ * button says the earlier choices are thrown away), and the season counts the
+ * case once (`getSeasonStrain`). Its ranking row replaces the run's earlier
+ * one too, so repeating a case adds nothing to the board (useLocalRanking).
  */
 export function openCaseRun(run, { replayOf = null } = {}) {
   const opened = normalizeRunState(run);
@@ -1046,7 +1082,7 @@ export function openCaseRun(run, { replayOf = null } = {}) {
     relicOffer: practice ? [] : offer,
     schema: rebooted
       ? current.schema
-      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery), current.windowIndex), current.relics),
+      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery), getEscalationWindow(current)), current.relics),
   });
 }
 
@@ -1135,6 +1171,17 @@ const ESCALATION_CREEP_STEP = 0.03;
 export function getSeasonEscalation(windowIndex = 0) {
   const steps = clamp(Math.floor((Number(windowIndex) || 0) / ESCALATION_STEP_WINDOWS), 0, ESCALATION_MAX_STEPS);
   return { steps, wallMax: -steps * ESCALATION_WALL_STEP, creep: round2(steps * ESCALATION_CREEP_STEP) };
+}
+
+/**
+ * How far into the season the table has leaned: the windows the run has
+ * played, less the ones that were practice. A replayed case keeps nothing
+ * (`openCaseRun`), and that has to include the schedule -- every window used
+ * to count, so replaying cases walked the wall down for the rest of the
+ * season, for good.
+ */
+export function getEscalationWindow(run) {
+  return Math.max(0, (Number(run?.windowIndex) || 0) - (Number(run?.practiceWindows) || 0));
 }
 
 function applySeasonEscalation(schema, windowIndex) {
@@ -1245,7 +1292,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     focusCharge,
     focusHits,
     stanceMastery: practice?.stanceMastery ?? stanceMastery,
-    windowIndex: current.windowIndex + 1,
+    windowIndex: getEscalationWindow(current) + (current.practice ? 0 : 1),
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -1314,6 +1361,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const settled = {
     practice: current.practice,
     windowIndex: current.windowIndex + 1,
+    practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
     vault: current.vault + secured,
     streak,
@@ -1429,6 +1477,7 @@ export function carryTableRecordIntoRestore(restored, current) {
     dynamics: serializeRunState({
       ...restoredRun,
       windowIndex: currentRun.windowIndex,
+      practiceWindows: Math.max(restoredRun.practiceWindows, currentRun.practiceWindows),
       busts: Math.max(restoredRun.busts, currentRun.busts),
       cashes: Math.max(restoredRun.cashes, currentRun.cashes),
       bestMultiplier: Math.max(restoredRun.bestMultiplier, currentRun.bestMultiplier),

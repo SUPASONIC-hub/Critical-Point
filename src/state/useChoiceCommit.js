@@ -16,6 +16,7 @@ import {
   getRiskPressure,
   getSuspenseEvent,
   getUnattendedNext,
+  getWindowResponseTime,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../gameLogic.js";
@@ -208,7 +209,8 @@ export function useChoiceCommit(context) {
       sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, readers, persist, setters,
     } = context;
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
-    const responseTimeSec = Math.max(1, Math.round(Number(windowState.elapsed) || (Date.now() - nodeEnteredAt) / 1000));
+    const responseTimeSec = getWindowResponseTime({ elapsed: windowState.elapsed, enteredAt: nodeEnteredAt, clockSeconds: windowState.schema?.seconds ?? gauntletRun?.schema?.seconds });
+    const assistTime = Math.max(Number(windowState.timeScale) || 1, getAccessibility().tableTime);
     const reframe = choice.type === "reframe";
     // A reframe that busts is still a reframe the player paid for, but it does
     // not open a door: the wall took the window before the new board was laid.
@@ -313,7 +315,10 @@ export function useChoiceCommit(context) {
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       // The table clock ran this many times slower (the comfort setting); the
       // case summary and the ranking row carry it.
-      ...(getAccessibility().tableTime > 1 ? { assistTime: getAccessibility().tableTime } : {}),
+      // It is the slowest the window was run, not the setting at this moment:
+      // a window played slow, put down, and cashed after the setting was put
+      // back on the intro used to carry no mark.
+      ...(assistTime > 1 ? { assistTime } : {}),
       suspenseEvent,
       clue,
       responseTimeSec,
