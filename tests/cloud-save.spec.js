@@ -146,7 +146,7 @@ test("turning online save off offers to take the online copy back", async ({ pag
   await expect(panel.getByTestId("cloud-save-status")).toContainText("꺼져 있습니다");
   page.once("dialog", (dialog) => dialog.accept());
   await panel.getByTestId("cloud-save-delete").click();
-  await expect(panel.locator(".cloud-save-message")).toContainText("지웠습니다");
+  await expect(panel.getByTestId("cloud-save-done")).toContainText("지웠습니다");
   expect(deleted).toEqual([{ p_code: CODE }]);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).runId, "the device keeps its own save").toBe("run-this-device");
 });
@@ -171,6 +171,6 @@ test("against a database from before the migration the panel still uploads, and 
   await panel.getByTestId("cloud-save-toggle").uncheck();
   page.once("dialog", (dialog) => dialog.accept());
   await panel.getByTestId("cloud-save-delete").click();
-  await expect(panel.locator(".cloud-save-message")).toContainText("180일 뒤에 자동으로 지워집니다");
-  await expect(panel.locator(".cloud-save-message")).not.toContainText("PGRST");
+  await expect(panel.getByTestId("cloud-save-failed")).toContainText("180일 뒤에 자동으로 지워집니다");
+  await expect(panel.getByTestId("cloud-save-failed")).not.toContainText("PGRST");
 });

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { getAccessibility } from "./accessibilitySettings.js";
+import { getAccessibility, useShortcutHints } from "./accessibilitySettings.js";
 
 export function usePendingTelemetryRef(saved) {
   return useRef(saved?.pendingTelemetry ?? []);
@@ -36,6 +36,8 @@ export function useRuntimeOverlayShortcuts({
  * Session keys the runtime owns: save, and the result screen's retry and next.
  * The table's own keys -- number to stake, Space to push, Enter to cash -- live
  * with the table in `GauntletStage`, where the window they act on lives.
+ *
+ * Returns what the result page may say about R and N (`useShortcutHints`).
  */
 export function useRuntimeChoiceShortcuts({
   currentCase,
@@ -47,6 +49,7 @@ export function useRuntimeChoiceShortcuts({
   startCase,
   started,
 }) {
+  const hints = useShortcutHints();
   useEffect(() => {
     const handleShortcut = (event) => {
       if (!started || decisionReveal || isAdvancing) return;
@@ -77,4 +80,5 @@ export function useRuntimeChoiceShortcuts({
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
   }, [currentCase, decisionReveal, isAdvancing, isResult, nextCaseSignal, saveCurrentGame, startCase, started]);
+  return hints;
 }

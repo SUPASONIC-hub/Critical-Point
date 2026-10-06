@@ -63,7 +63,7 @@ function VerdictSlam({ window: win, multiplier, livePot, grooveBonus, runPot, bu
       {win.status === "bust" ? (
         <>
           <Skull size={56} aria-hidden="true" />
-          <strong>BUST</strong>
+          <strong lang="en">BUST</strong>
           <span>
             {win.cause === "timeout"
               ? "시간이 먼저 끝났다"

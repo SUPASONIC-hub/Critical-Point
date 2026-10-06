@@ -413,7 +413,8 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
-  useTableKeys({ select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
+  // The hook that owns the keys also says which of them a control may name.
+  const { letterKeys, keys } = useTableKeys({ select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
@@ -490,7 +491,7 @@ export function GauntletStage({
               <b>{formatNumber(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              <small>연승</small> <b>{run.streak}</b> <small>BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              <small>연승</small> <b>{run.streak}</b> <small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
@@ -521,7 +522,7 @@ export function GauntletStage({
         {(tableRules.length > 0 || ruleHeat > 0) && (
           <section className="gx-active-rules" data-testid="active-mutations" aria-label="현재 적용 중인 변형 규칙">
             <div>
-              <span>ACTIVE RULESET</span>
+              <span lang="en">ACTIVE RULESET</span>
               <b>{joinRules(tableRules)}</b>
               <small>{currentRules}</small>
             </div>
@@ -684,10 +685,14 @@ export function GauntletStage({
         </div>
 
         <div className="gx-hand-head" aria-hidden="true">
-          <span>HAND</span>
+          <span lang="en">HAND</span>
           <b>카드 {handSize}장</b>
           <small>
-            <kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Q</kbd> 자세 · <kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장
+            {letterKeys ? (
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Q</kbd> 자세 · <kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+            ) : (
+              <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
+            )}
           </small>
         </div>
 
@@ -717,7 +722,7 @@ export function GauntletStage({
           onPointerDown={notePointer}
           onClick={push}
           disabled={!canPush}
-          aria-keyshortcuts="Space W"
+          aria-keyshortcuts={keys("Space W")}
           aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${Math.round(nextLow)}에서 ${Math.round(nextHigh)}. 심박에 맞춰 누르면 콤보가 쌓인다`}
         >
           <i className="gx-beat-ring" aria-hidden="true" />
@@ -738,12 +743,12 @@ export function GauntletStage({
           onPointerDown={notePointer}
           onClick={focus}
           disabled={!canFocus}
-          aria-keyshortcuts="E"
+          aria-keyshortcuts={keys("E")}
           aria-label={`락을 건다. 지금 차지 ${Math.round(win.focus)}. 심박에 맞춰 누르면 판돈과 자원 배율이 오른다`}
         >
           <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
-          <span>LOCK</span>
+          <span lang="en">LOCK</span>
           <small>{focusModeProfile.label} {Math.round(win.focus)}</small>
           {win.lastFocusGrade && (
             <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">

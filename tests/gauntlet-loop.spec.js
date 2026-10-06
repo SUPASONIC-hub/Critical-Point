@@ -285,6 +285,32 @@ test("the densest decisions fit the screen Safari leaves on an iPhone 14", { tag
   await expectDensestScenesFit(page, page.viewportSize());
 });
 
+/**
+ * The header keeps room for the music controls that float over its corner.
+ * Between a phone and the table's own width the sum was wrong -- 251px reserved
+ * at 481px wide, on a split-screen tablet or a narrow window -- and the title
+ * was cut to three characters. No layout viewport sat in that band. The tools
+ * have to end just short of the controls: clear of them, and with no dead
+ * room between that the title could have had.
+ */
+test("the play header keeps its title between a phone's width and the table's", { tag: "@layout" }, async ({ page }) => {
+  for (const width of [481, 507, 600, 759, 1100, 1240]) {
+    await page.setViewportSize({ width, height: 900 });
+    await startDebugNode(page, "final", "f_start_owner");
+    const header = await page.evaluate(() => {
+      const box = (selector) => document.querySelector(selector).getBoundingClientRect();
+      return {
+        padRight: Number.parseFloat(getComputedStyle(document.querySelector(".game-header")).paddingRight),
+        toolsRight: Math.round(box(".game-header .top-actions").right),
+        musicLeft: Math.round(box(".music-controls").left),
+      };
+    });
+    expect(header.padRight, `${width}px: room reserved for the music controls`).toBeLessThanOrEqual(112);
+    expect(header.toolsRight, `${width}px: the header tools run under the music controls`).toBeLessThanOrEqual(header.musicLeft);
+    expect(header.musicLeft - header.toolsRight, `${width}px: dead room between the tools and the music controls`).toBeLessThanOrEqual(24);
+  }
+});
+
 test("a small phone fits every fresh board's decision", { tag: "@layout" }, async ({ page }) => {
   // 360x740 holds a fresh board with the last card staked; a board carrying
   // rules can still push the reframe card under the bar there. See priority 27.

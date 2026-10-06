@@ -69,7 +69,7 @@ export function BoardScreen({
             <span className="brand-mark">{gameTitle}</span>
           </div>
           <header className="board-hero">
-            <span>PARTICIPANT BOARD</span>
+            <span lang="en">PARTICIPANT BOARD</span>
             <h1 ref={headingRef} tabIndex={-1}>남겨두고 가는 말</h1>
             <p>
               이름 하나와 짧은 글이면 충분합니다. 여기 적은 이름과 글은 다른 참가자에게 그대로 보입니다.
@@ -161,7 +161,7 @@ export function BoardScreen({
           <section className="board-list-panel" aria-label="참가자 글">
             <div className="board-list-heading">
               <div>
-                <span>PARTICIPANT VOICES</span>
+                <span lang="en">PARTICIPANT VOICES</span>
                 <h2>먼저 지나간 사람들</h2>
               </div>
               {boardStatus === "ready" && <small>{boardPosts.length}개의 글</small>}

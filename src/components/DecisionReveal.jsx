@@ -153,7 +153,7 @@ export function DecisionReveal({ view }) {
 
         {decisionReveal.unlockedRelics?.length > 0 && (
           <div className="gx-reveal-unlock" data-testid="relic-unlocked" role="group" aria-label="새로 해금한 도구">
-            <span>NEW RELIC UNLOCKED</span>
+            <span lang="en">NEW RELIC UNLOCKED</span>
             {decisionReveal.unlockedRelics.map((id) => (
               <b key={id}>
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
@@ -171,7 +171,7 @@ export function DecisionReveal({ view }) {
 
         {overclockMutation && !busted && (
           <div className="gx-reveal-overdrive" data-testid="overdrive-payout" role="group" aria-label="오버클럭 발동">
-            <span>OVERCLOCK TRIGGERED</span>
+            <span lang="en">OVERCLOCK TRIGGERED</span>
             <b>{overclockMutation.title}</b>
             <p>다음 판은 칩 2배로 시작하지만, 푸시 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
           </div>
@@ -194,7 +194,7 @@ export function DecisionReveal({ view }) {
 
         {decisionReveal.skippedTitle && (
           <p className="gx-reveal-skip" data-testid="blackout-skip">
-            <b>LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+            <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
           </p>
         )}
 
