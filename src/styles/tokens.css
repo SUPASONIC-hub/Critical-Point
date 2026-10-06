@@ -95,8 +95,8 @@
   --color-white-soft: rgba(255, 255, 255, 0.68);
   --color-overlay-line: rgba(255, 255, 255, 0.22);
   --color-focus: var(--c-focus-ring);
-  --font-body: 16px;
-  --font-label: 12px;
+  --font-body: 1rem;
+  --font-label: 0.75rem;
   --radius-pill: 999px;
   /* Pretendard ships with the app (the @font-face at the top of this file), so
      Hangul and Latin share one family, one x-height and one set of weights on
@@ -122,6 +122,12 @@
   --ui-glass-strong: rgb(12 17 18 / 0.88);
   --ui-line: rgb(255 255 255 / 0.08);
   --ui-line-strong: rgb(255 255 255 / 0.16);
+  /* The edge of a form control. A field's fill is one surface step from the
+     panel it sits on, so the border is the only thing that says where the
+     field is, and WCAG 1.4.11 asks 3:1 of that. At 0.4 it is 3.06:1 against
+     the lightest ground a field meets (--ui-surface-3) and 3.8:1 against the
+     darkest (--ui-bg-raised); --ui-line-strong is 1.25 to 1.8. */
+  --ui-line-field: rgb(255 255 255 / 0.4);
   --ui-line-accent: rgb(217 255 98 / 0.34);
   --ui-text: rgb(242 246 243);
   --ui-text-2: rgb(190 203 197);

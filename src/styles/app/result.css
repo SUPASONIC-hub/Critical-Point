@@ -41,7 +41,7 @@
 .fingerprint-heading span,
 .fingerprint-grid span {
   color: var(--c-acid);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0;
 }
@@ -57,12 +57,12 @@
 
 .privacy-warning strong {
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .privacy-warning p {
   margin: 5px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
   line-height: 1.45;
 }
@@ -75,7 +75,7 @@
   background: var(--c-danger-deep);
   border: 0;
   border-radius: 5px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 900;
 }
 
@@ -123,7 +123,7 @@
   background: var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--radius-pill);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -150,7 +150,7 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--ui-radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -176,9 +176,14 @@
   color: var(--ui-accent);
 }
 /* Starting the season over is the one tool that throws the run away, so it
-   stands apart at the end of the dock. */
-.result-page .top-actions .ghost:last-child {
+   stands apart at the end of the dock, in the colour of a thing that costs. */
+.result-page .top-actions .season-reset-button {
   margin-left: auto;
+  color: var(--ui-heat);
+  border-color: var(--ui-heat-soft);
+}
+.result-page .top-actions .season-reset-button svg {
+  color: var(--ui-heat);
 }
 .result-page .shortcut-hint {
   display: inline-grid;
@@ -192,7 +197,7 @@
   border-bottom-width: 2px;
   border-radius: 6px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1;
 }
@@ -244,7 +249,7 @@
   background: rgb(255 255 255 / 0.04);
   border: 1px solid var(--ui-line);
   border-radius: var(--radius-pill);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -261,7 +266,7 @@
   max-width: 22ch;
   margin: 0;
   color: var(--ui-text);
-  font-size: clamp(30px, 4.4vw, 58px);
+  font-size: clamp(1.875rem, 4.4vw, 3.625rem);
   font-weight: 800;
   line-height: 1.12;
   letter-spacing: -0.035em;
@@ -287,13 +292,13 @@
 }
 .judgment-profile-panel span {
   color: var(--ui-text-3);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 .judgment-profile-panel strong {
   color: var(--c-coral);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 .judgment-profile-panel p,
@@ -303,7 +308,7 @@
 }
 .judgment-profile-panel small {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* The medal: a ring filled to the run's score around the letter it earned. */
@@ -341,21 +346,21 @@
 }
 .rank-mark span {
   color: var(--ui-text-3);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .rank-mark strong {
   display: block;
   color: var(--rank-tone);
-  font-size: clamp(64px, 7vw, 92px);
+  font-size: clamp(4rem, 7vw, 5.75rem);
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: -0.04em;
 }
 .rank-mark small {
   color: var(--ui-text-2);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
@@ -386,7 +391,7 @@
 .next-case-panel span,
 .rank-copy span {
   color: var(--ui-text-3);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -397,12 +402,12 @@
   background: rgb(255 206 115 / 0.1);
   border: 1px solid rgb(255 206 115 / 0.26);
   border-radius: var(--radius-pill);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .outcome-panel h2 {
   margin: 0;
-  font-size: clamp(21px, 2.2vw, 28px);
+  font-size: clamp(1.3125rem, 2.2vw, 1.75rem);
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.025em;
@@ -411,7 +416,7 @@
 .outcome-panel p {
   margin: 8px 0 0;
   color: var(--ui-text-2);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 .next-case-panel {
@@ -442,7 +447,7 @@
 }
 .next-case-panel h2 {
   margin: 2px 0 0;
-  font-size: clamp(24px, 2.8vw, 34px);
+  font-size: clamp(1.5rem, 2.8vw, 2.125rem);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -450,7 +455,7 @@
 .next-case-panel p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 /* The one place the season says it is changing buildings: the move, then why. */
@@ -465,13 +470,13 @@
 
 .next-case-panel .next-case-movement b {
   color: var(--ui-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   letter-spacing: -0.01em;
 }
 
 .next-case-panel .next-case-movement span {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .next-case-panel .next-case-hook {
@@ -489,7 +494,7 @@
   background: rgb(255 255 255 / 0.05);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 /* The one action on the report carries the accent. */
@@ -506,7 +511,7 @@
   border: 0;
   border-radius: var(--ui-radius-sm);
   box-shadow: var(--ui-shadow-glow);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
@@ -540,7 +545,7 @@
 }
 .rank-copy h2 {
   margin: 0;
-  font-size: clamp(20px, 2.1vw, 26px);
+  font-size: clamp(1.25rem, 2.1vw, 1.625rem);
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.02em;
@@ -549,7 +554,7 @@
 .rank-copy p {
   margin: 0;
   color: var(--ui-text-3);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 .score-breakdown {
@@ -576,19 +581,19 @@
 }
 .score-breakdown span {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .score-breakdown b {
   color: var(--ui-text);
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 .score-breakdown small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .score-breakdown div {
@@ -617,7 +622,7 @@
 }
 .result-why .panel-title-row span {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .result-why .panel-title-row {
@@ -627,7 +632,7 @@
 .result-why .panel-title-row h2 {
   margin: 0;
   color: var(--ui-text);
-  font-size: clamp(20px, 2vw, 24px);
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
   font-weight: 800;
   letter-spacing: -0.025em;
 }
@@ -647,12 +652,12 @@
 }
 .result-why-grid article span {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 .result-why-grid article strong {
   color: var(--ui-text);
-  font-size: 19px;
+  font-size: 1.1875rem;
   font-weight: 800;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -660,7 +665,7 @@
 .result-why-grid article p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 .result-why-doors ul {
@@ -680,12 +685,12 @@
 }
 .result-why-doors li b {
   color: var(--ui-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 .result-why-doors li small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .result-why-doors .ghost {
   justify-self: start;
@@ -737,7 +742,7 @@
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line-strong);
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
   transform: translateY(-50%);
   transition: transform var(--ui-dur) var(--ui-ease);
@@ -747,13 +752,13 @@
 }
 .report-archive > summary span {
   color: var(--ui-text);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 .report-archive > summary b {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .report-archive-body {
@@ -778,7 +783,7 @@
 .report-archive-body :is(section.report-section, section.bars-panel, section.history) h2,
 .report-archive-body .panel-title-row h2 {
   color: var(--ui-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 800;
   letter-spacing: -0.01em;
 }
@@ -809,11 +814,11 @@
 .pressure-ledger-grid span,
 .pressure-ledger-grid small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .pressure-ledger-grid b {
   color: var(--ui-text);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -826,7 +831,7 @@
 .pressure-ledger-note {
   margin: 12px 0 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .fingerprint-panel {
@@ -849,7 +854,7 @@
 }
 .fingerprint-heading h2 {
   margin: 7px 0 5px;
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
@@ -866,7 +871,7 @@
   color: var(--ui-accent-ink);
   background: var(--ui-accent);
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
 }
 .fingerprint-grid {
@@ -885,11 +890,11 @@
   border-radius: var(--ui-radius-sm);
 }
 .fingerprint-grid b {
-  font-size: 16px;
+  font-size: 1rem;
 }
 .fingerprint-grid small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 .counterfactual-panel {
@@ -928,26 +933,26 @@
 }
 .counterfactual-scene span {
   color: var(--ui-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .counterfactual-path b {
   color: var(--ui-text-3);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 .counterfactual-scene small,
 .counterfactual-path small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 .counterfactual-path {
   border-left: 2px solid var(--ui-line-strong);
 }
 .counterfactual-path strong {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 .actual-path {
@@ -962,7 +967,7 @@
 .counterfactual-empty {
   margin: 0;
   color: var(--ui-text-3);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .result-grid {
   display: grid;
@@ -975,7 +980,7 @@
 .report-section strong {
   display: block;
   margin-bottom: 10px;
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -1002,12 +1007,12 @@
   display: block;
   margin-bottom: 6px;
   color: var(--ui-accent);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .achievement-panel p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 .session-panel {
@@ -1026,7 +1031,7 @@
 }
 .session-panel span {
   color: var(--ui-text-3);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -1034,13 +1039,13 @@
   display: block;
   margin: 5px 0;
   font-family: var(--font-mono);
-  font-size: 28px;
+  font-size: 1.75rem;
   letter-spacing: 0.08em;
 }
 .session-panel p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 .remote-status {
@@ -1049,7 +1054,7 @@
   padding: 6px 10px;
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -1079,12 +1084,12 @@
 }
 .retry-telemetry b {
   color: var(--c-amber);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .retry-telemetry p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .retry-telemetry button {
   width: fit-content;
@@ -1094,11 +1099,11 @@
   background: var(--ui-surface-4);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-xs);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
-.retry-telemetry button:disabled,
-.feedback-actions button:disabled {
+.retry-telemetry button[aria-disabled="true"],
+.feedback-actions button[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.48;
 }
@@ -1135,7 +1140,7 @@
   display: block;
   margin-bottom: 8px;
   color: var(--ui-accent);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 .feedback-prompts ul {
@@ -1146,7 +1151,7 @@
 }
 .feedback-prompts li {
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 .feedback-controls {
@@ -1160,7 +1165,7 @@
 }
 .feedback-controls span {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 .feedback-controls select,
@@ -1168,7 +1173,7 @@
   width: 100%;
   color: var(--ui-text);
   background: var(--ui-bg-raised);
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-sm);
 }
 .feedback-controls select {
@@ -1177,7 +1182,7 @@
 }
 .feedback-panel .input-note {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .feedback-actions {
   display: flex;
@@ -1188,7 +1193,7 @@
 }
 .feedback-actions span {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .feedback-panel .privacy-warning {
   color: var(--c-danger-81);
@@ -1203,7 +1208,7 @@
   gap: 12px;
   min-height: 32px;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .bar-row b {
   color: var(--ui-text);
@@ -1231,13 +1236,13 @@
 }
 .story-reveal > span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 .story-reveal h2 {
   margin: 10px 0;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 800;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -1256,11 +1261,11 @@
 }
 .ending-clue-summary strong {
   color: var(--ui-accent);
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .ending-clue-summary span {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: 0;
 }
 .route-atlas {
@@ -1309,7 +1314,7 @@
   border: 2px solid var(--ui-surface-2);
   border-radius: 50%;
   box-shadow: 0 0 0 1px var(--ui-line-strong);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -1347,7 +1352,7 @@
   color: var(--ui-text-2);
   background: var(--ui-surface-3);
   border-radius: var(--radius-pill);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1369,13 +1374,13 @@
 }
 .route-atlas-copy strong {
   color: var(--ui-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 .route-atlas-copy p {
   margin: 0;
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .observer-postmortem {
@@ -1403,17 +1408,17 @@
 }
 .observer-postmortem-grid span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 .observer-postmortem-grid strong {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.4;
 }
 .observer-postmortem-grid p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 .ending-reveal {
@@ -1461,7 +1466,7 @@
   color: var(--ui-text-2);
   background: var(--ui-surface-4);
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -1492,12 +1497,12 @@
 }
 .history article .history-observer span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 .history-observer p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .decision-scene {
   margin-top: 8px;
@@ -1506,7 +1511,7 @@
   width: fit-content;
   cursor: pointer;
   color: var(--ui-chip);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 .decision-scene div {
@@ -1521,7 +1526,7 @@
   background: var(--ui-surface-2);
   border-left: 2px solid var(--c-sky-77);
   border-radius: var(--ui-radius-xs);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 .decision-scene .thought-line {
@@ -1542,7 +1547,7 @@
 }
 .resource-delta-panel h2 {
   margin: 0 0 14px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 800;
 }
 .delta-table {
@@ -1568,13 +1573,13 @@
   grid-column: 2;
   margin: 0;
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 .delta-table span {
   padding: 4px 9px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1600,7 +1605,7 @@
   border-left: 3px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
   box-shadow: none;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 .result-page > :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel) {
@@ -1618,7 +1623,7 @@
 .result-page .failure-objectives > strong,
 .result-page .replay-diagnostics > summary {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -1633,7 +1638,7 @@
   color: var(--ui-text);
 }
 .result-page .ending-variant-panel h2 {
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
   font-weight: 800;
   letter-spacing: -0.025em;
 }
@@ -1679,7 +1684,7 @@
   border: 1px solid var(--ui-line);
   border-left: 3px solid var(--ui-accent);
   border-radius: var(--ui-radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.55;
 }
 
@@ -1737,7 +1742,7 @@
   .result-hero h1 {
     grid-column: 1;
     align-self: center;
-    font-size: clamp(25px, 7vw, 34px);
+    font-size: clamp(1.5625rem, 7vw, 2.125rem);
   }
   .rank-mark {
     grid-column: 2;
@@ -1748,14 +1753,14 @@
     padding: 10px;
   }
   .rank-mark span {
-    font-size: 8px;
-    letter-spacing: 0.1em;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
   }
   .rank-mark strong {
-    font-size: 46px;
+    font-size: 2.875rem;
   }
   .rank-mark small {
-    font-size: 9px;
+    font-size: 0.6875rem;
     letter-spacing: 0;
   }
   .judgment-profile-panel {
@@ -1776,7 +1781,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 32px;
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.08em;
   }
   .result-page .top-actions {
@@ -1795,7 +1800,7 @@
     width: auto;
     min-height: 38px;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     scroll-snap-align: start;
   }
   .result-page .top-actions .ghost:last-child {
@@ -1808,7 +1813,7 @@
     padding: 13px;
   }
   .score-breakdown b {
-    font-size: 22px;
+    font-size: 1.375rem;
   }
   .pressure-ledger-grid,
   .fingerprint-grid {
@@ -1846,7 +1851,7 @@
 
 .interlude-panel span {
   color: var(--interlude-tint, var(--ui-text-3));
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1854,7 +1859,7 @@
 .interlude-panel h2 {
   margin: 0;
   color: var(--ui-text);
-  font-size: clamp(17px, 1.9vw, 21px);
+  font-size: clamp(1.0625rem, 1.9vw, 1.3125rem);
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.02em;
@@ -1862,7 +1867,7 @@
 
 .interlude-panel p {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.75;
 }
 
@@ -1902,27 +1907,27 @@
   gap: 26px;
 }
 .ending-shell .ending-beat > span {
-  font-size: 14px;
+  font-size: 0.875rem;
   letter-spacing: 0.16em;
 }
 .ending-shell .ending-beat blockquote {
-  font-size: clamp(34px, 5vw, 68px);
+  font-size: clamp(2.125rem, 5vw, 4.25rem);
   font-weight: 900;
   line-height: 1.15;
 }
 .ending-shell .ending-quiet-line {
   max-width: 680px;
-  font-size: clamp(24px, 3vw, 42px);
+  font-size: clamp(1.5rem, 3vw, 2.625rem);
   font-weight: 800;
   line-height: 1.5;
 }
 .ending-shell .ending-message-beat label {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .ending-shell .ending-message-beat textarea {
   min-height: 130px;
   background: rgba(255, 255, 255, 0.08);
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .ending-shell .ending-beat button:hover {
   transform: translateY(-2px);
@@ -1950,7 +1955,7 @@
     gap: 6px;
   }
   .ending-shell .ending-beat blockquote {
-    font-size: 34px;
+    font-size: 2.125rem;
   }
 }
 .ending-beat blockquote {
@@ -1961,7 +1966,7 @@
   color: var(--color-white-soft);
   background: none;
   border: 1px solid var(--color-overlay-line);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .ending-message-beat {
   text-align: left;
@@ -1975,7 +1980,7 @@
   width: 100%;
   padding: 12px;
   color: var(--color-white);
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-sm);
   resize: vertical;
 }
@@ -1986,7 +1991,7 @@
 }
 .observation-grid b {
   color: var(--color-white);
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .observer-turning-record {
   background: rgb(217 255 98 / 0.1) !important;
@@ -2007,7 +2012,7 @@
 .ending-twist-card h2 {
   margin: 0;
   color: var(--color-white);
-  font-size: clamp(22px, 3vw, 34px);
+  font-size: clamp(1.375rem, 3vw, 2.125rem);
   line-height: 1.22;
 }
 .ending-shell .ending-sequence {
@@ -2104,7 +2109,7 @@
 }
 .failure-cause {
   flex-basis: 100%;
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.5;
 }
 .play-report-panel > div,
@@ -2114,7 +2119,7 @@
   gap: 7px;
 }
 .play-report-panel article b {
-  font-size: 16px;
+  font-size: 1rem;
 }
 .telemetry-dashboard-panel div {
   align-items: center;
@@ -2138,13 +2143,13 @@
 }
 .ending-sequence-header span {
   color: var(--color-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 900;
   letter-spacing: 0.14em;
 }
 .ending-sequence-header strong {
   color: var(--color-white-soft);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.1em;
 }
 .ending-shell .ending-beat button {
@@ -2155,7 +2160,7 @@
   background: var(--ui-accent);
   color: var(--ui-accent-ink);
   box-shadow: var(--ui-shadow-glow);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 800;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
@@ -2183,13 +2188,13 @@
 }
 .observation-grid span {
   color: var(--color-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   text-transform: uppercase;
 }
 .ending-twist-card p {
   margin: 0;
   color: var(--color-white-soft);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1.75;
 }
@@ -2198,7 +2203,7 @@
   padding-top: 10px;
   color: var(--color-accent);
   border-top: 1px solid rgba(217, 255, 98, 0.18);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 900;
   line-height: 1.5;
 }
@@ -2218,20 +2223,20 @@
 }
 .ending-witness-log span {
   color: var(--color-accent);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-witness-log small {
   display: block;
   color: var(--c-acid);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 900;
   letter-spacing: 0.06em;
 }
 .ending-witness-log b {
   color: var(--color-white);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
@@ -2246,20 +2251,20 @@
 }
 .ending-archive-blueprint span {
   color: var(--color-accent);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.1em;
 }
 .ending-archive-blueprint strong {
   color: var(--color-white);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
 .ending-archive-blueprint p {
   margin: 0;
   color: var(--color-white-soft);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -2299,17 +2304,17 @@
 }
 .observer-pattern-card span {
   color: var(--c-acid);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.1em;
 }
 .observer-pattern-card strong {
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .observer-pattern-card p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 850;
   line-height: 1.55;
   overflow-wrap: anywhere;
@@ -2336,18 +2341,18 @@
 }
 .ending-coda > span {
   color: var(--c-acid);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-coda strong {
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.45;
 }
 .ending-coda p {
   margin: 0;
   color: var(--c-line-soft);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 750;
   line-height: 1.6;
 }
@@ -2363,18 +2368,18 @@
 }
 .ending-axis-grid span {
   color: var(--c-acid);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 .ending-axis-grid b {
-  font-size: 22px;
+  font-size: 1.375rem;
   color: var(--c-paper);
 }
 .ending-axis-grid p {
   margin: 0;
   color: var(--c-line-soft);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 750;
   line-height: 1.5;
 }
@@ -2388,7 +2393,7 @@
   line-height: 1.6;
 }
 .ending-variant-panel small {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 /* Also the intro's season goals; the report is where the strip has its home. */
 .season-goal-strip {
@@ -2402,14 +2407,14 @@
   gap: 3px;
 }
 .season-goal-strip b {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .season-goal-strip small {
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.35;
 }
 .balance-report p {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .ending-visual-profitable-silence .ending-visual {
@@ -2434,34 +2439,34 @@
   align-items: baseline;
 }
 .delayed-consequence-strip p {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
   line-height: 1.5;
 }
 .ending-scene-profile strong {
-  font-size: 19px;
+  font-size: 1.1875rem;
   line-height: 1.4;
 }
 .ending-scene-profile p {
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .failure-objectives {
   flex-wrap: wrap;
   align-items: center;
 }
 .failure-objectives span {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 850;
 }
 .ranking-comparison b,
 .ranking-comparison small {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .ending-preview-panel strong {
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 .ending-preview-panel p {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .play-report-panel article {
@@ -2471,14 +2476,14 @@
 }
 .play-report-panel article small,
 .telemetry-dashboard-panel small {
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 .play-report-panel p {
-  font-size: 11px;
+  font-size: 0.6875rem;
   overflow-wrap: anywhere;
 }
 .telemetry-dashboard-panel b {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .ending-palette-warm .ending-visual {
   filter: sepia(0.28) saturate(1.2) brightness(1.02);
@@ -2493,19 +2498,19 @@
   filter: saturate(1.35) brightness(1.08);
 }
 .authority-review-panel strong {
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.45;
 }
 .authority-review-panel p {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .aftermath-panel p {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .replay-diagnostics p {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .ending-shell,
 .ending-shell *,

@@ -13,7 +13,8 @@
   display: grid;
   place-items: center;
   overflow-y: auto;
-  padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
+  padding: calc(12px + env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
   background: rgb(4 7 8 / 0.74);
   backdrop-filter: blur(12px) saturate(1.1);
 }
@@ -37,14 +38,14 @@
 .gx-draft-kicker {
   display: block;
   color: var(--c-gx-relic);
-  font: 800 11px/1.2 var(--font-sans);
+  font: 800 0.6875rem/1.2 var(--font-sans);
   letter-spacing: 0.14em;
 }
 
 .gx-draft-panel h2 {
   margin: 8px 0 6px;
   color: var(--ui-text);
-  font-size: clamp(20px, 5vw, 25px);
+  font-size: clamp(1.25rem, 5vw, 1.5625rem);
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1.25;
@@ -53,7 +54,7 @@
 .gx-draft-lede {
   margin: 0 0 16px;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 
@@ -119,7 +120,7 @@
   color: var(--ui-text-2);
   background: var(--ui-surface-1);
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
-  font: 700 11px/1 var(--font-sans);
+  font: 700 0.6875rem/1 var(--font-sans);
 }
 
 .gx-relic-emblem {
@@ -146,7 +147,7 @@
 
 .gx-relic-copy b {
   color: var(--c-gx-relic);
-  font: 800 10px/1.2 var(--font-sans);
+  font: 800 0.625rem/1.2 var(--font-sans);
   letter-spacing: 0.14em;
 }
 
@@ -155,7 +156,7 @@
 }
 
 .gx-relic-copy strong {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 750;
   letter-spacing: -0.015em;
   line-height: 1.25;
@@ -163,7 +164,7 @@
 
 .gx-relic-copy small {
   color: var(--ui-text-2);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.45;
 }
 
@@ -175,7 +176,7 @@
   border-radius: 999px;
   color: var(--c-gx-felt);
   background: var(--c-gx-rare);
-  font: 800 10px/1.4 var(--font-sans);
+  font: 800 0.625rem/1.4 var(--font-sans);
   font-style: normal;
 }
 
@@ -224,7 +225,7 @@
 .gx-codex-note {
   flex: 1 1 180px;
   color: var(--ui-text-3);
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.45;
 }
 
@@ -236,7 +237,7 @@
   border-radius: var(--ui-radius-sm);
   color: var(--ui-text-2);
   background: var(--ui-surface-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -257,7 +258,7 @@
   border-radius: var(--radius-pill);
   color: var(--c-gx-relic);
   background: rgb(255 196 87 / 0.08);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 
@@ -295,7 +296,7 @@
     var(--ui-shadow-2),
     0 0 40px var(--c-gx-relic-a30);
   backdrop-filter: blur(14px);
-  font: 800 14px/1 var(--font-sans);
+  font: 800 0.875rem/1 var(--font-sans);
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
@@ -313,7 +314,7 @@
   align-items: center;
   gap: 4px;
   color: var(--c-gx-relic);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-style: normal;
   font-weight: 850;
 }
@@ -332,7 +333,7 @@
 
 .gx-reveal-unlock span {
   color: var(--c-gx-rare);
-  font: 800 11px/1 var(--font-sans);
+  font: 800 0.6875rem/1 var(--font-sans);
   letter-spacing: 0.08em;
 }
 
@@ -341,13 +342,13 @@
   align-items: center;
   gap: 6px;
   color: var(--c-paper);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .gx-reveal-unlock p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .gx-reveal-draft {
@@ -357,7 +358,7 @@
   border-radius: var(--ui-radius-xs);
   color: var(--c-gx-relic);
   background: var(--ui-surface-1);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -367,12 +368,12 @@
   align-items: center;
   gap: 6px;
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .pressure-ledger-relics span {
   color: var(--ui-text-3);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
 }
 

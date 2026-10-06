@@ -80,6 +80,30 @@ export function useAccessibility() {
   return useSyncExternalStore(subscribeAccessibility, getAccessibility, getAccessibility);
 }
 
+/**
+ * The keys a control may claim, given the setting. A key that is one character
+ * -- a digit or a letter, alone or under Shift -- is one of the shortcuts the
+ * setting turns off; Space, Enter and Escape are not. Returns undefined when
+ * nothing is left, so the attribute is not written at all.
+ */
+export function listedShortcuts(keys, letterKeys) {
+  const kept = String(keys ?? "")
+    .split(/\s+/)
+    .filter((key) => key && (letterKeys || key.split("+").at(-1).length > 1));
+  return kept.length > 0 ? kept.join(" ") : undefined;
+}
+
+/**
+ * What a control says about its keys: `keys("Space W")` for `aria-keyshortcuts`,
+ * and `letterKeys` for whether to draw the one-character `<kbd>` at all. Only
+ * the header read the setting until 2026-10-06; every other control went on
+ * naming R, N, E and the digits to a player who had turned them off.
+ */
+export function useShortcutHints() {
+  const { letterKeys } = useAccessibility();
+  return { letterKeys, keys: (spec) => listedShortcuts(spec, letterKeys) };
+}
+
 /** For tests: forget the cached settings so the next read goes to storage. */
 export function resetAccessibilityCache() {
   current = null;

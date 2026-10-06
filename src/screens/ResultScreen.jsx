@@ -3,13 +3,9 @@ import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import * as endingCopy from "../endingCopy.js";
 
-export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
+export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
-    common: {
-      AdaptiveMusic, musicModeKey,
-      renderDecisionReveal: viewRenderDecisionReveal, renderRecoveryNotice: viewRenderRecoveryNotice, renderErrorLogPanel: viewRenderErrorLogPanel,
-      screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta, sceneTitleRef: viewSceneTitleRef,
-    },
+    common: { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta },
     ending: {
       endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant,
       advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage,
@@ -24,7 +20,10 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
     actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
     debug: { debugToolsEnabled, showErrorLog, setShowErrorLog },
   } = view;
-  const renderDecisionReveal = renderers.renderDecisionReveal ?? viewRenderDecisionReveal; const renderRecoveryNotice = renderers.renderRecoveryNotice ?? viewRenderRecoveryNotice; const renderErrorLogPanel = renderers.renderErrorLogPanel ?? viewRenderErrorLogPanel; const titleRef = sceneTitleRef ?? viewSceneTitleRef;
+  const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel } = renderers;
+  // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
+  // whether the page may name them: not when the player turned them off.
+  const { letterKeys, keys } = shortcuts;
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.reframeOpenedRoute || entry.reframeBranchId);
@@ -110,15 +109,16 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
             endingAtmosphere={view.endingAtmosphere}
             endingVisualClass={view.endingVisualClass}
             endingImage={endingSceneProfile?.image ?? "/ending-final-archive.webp"}
+            reportTitleRef={titleRef}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
           <div className="topbar">
             <span className="brand-mark">{GAME_TITLE}</span>
             <div className="top-actions">
-              <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)} aria-keyshortcuts="R">
+              <button type="button" className="ghost replay-case-button" onClick={() => startCase(currentCase)} aria-keyshortcuts={keys("R")}>
                 <RefreshCcw size={16} />
-                <kbd className="shortcut-hint" aria-hidden="true">R</kbd>
+                {letterKeys && <kbd className="shortcut-hint" aria-hidden="true">R</kbd>}
                 이 사건 다시 도전
               </button>
               <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
@@ -168,9 +168,12 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                   진단 로그
                 </button>
               )}
-              <button type="button" className="ghost" onClick={reset}>
+              {/* Not "다시 플레이": beside 이 사건 다시 도전 and 이 사건을 다시 열기
+                  that read as a third way to retry a case, and it is the one
+                  that throws the whole season away. */}
+              <button type="button" className="ghost season-reset-button" onClick={reset}>
                 <RefreshCcw size={16} />
-                다시 플레이
+                시즌 처음부터 다시
               </button>
             </div>
           </div>
@@ -184,20 +187,20 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
               </h1>
               <section className="outcome-panel judgment-profile-panel" aria-label="판단 프로필">
-                <div><span>JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
+                <div><span lang="en">JUDGMENT PROFILE</span><strong>{judgmentProfile.label}</strong></div>
                 <p>{judgmentProfile.text}</p>
                 <small>{view.delayedConsequences?.at(-1)?.text ?? (costliestAlternative ? `가장 무거운 대안: ${costliestAlternative}` : observerEndingRecord.title)}</small>
               </section>
             </div>
             <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
-              <span>CASE RANK</span>
+              <span lang="en">CASE RANK</span>
               <strong>{resultRank}</strong>
               <small>{momentumTier} · {momentumScore} POINTS</small>
             </div>
           </div>
           <section className="outcome-panel" aria-label="내가 만든 결말">
             <div className="outcome-panel-mark">
-              <span>YOUR CONSEQUENCE</span>
+              <span lang="en">YOUR CONSEQUENCE</span>
               <strong>{caseOutcome.tag}</strong>
             </div>
             <div>
@@ -230,8 +233,8 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>
                 <small>{resultBridge}</small>
               </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts="N">
-                <ChevronRight size={18} /><kbd className="shortcut-hint" aria-hidden="true">N</kbd>
+              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>
+                <ChevronRight size={18} />{letterKeys && <kbd className="shortcut-hint" aria-hidden="true">N</kbd>}
                 {nextCaseSignal.button}
               </button>
             </section>
@@ -246,7 +249,7 @@ export function ResultScreen({ view, renderers = {}, sceneTitleRef = null }) {
           )}
           {currentCase === "final" && view.endingEpilogue && (
             <section className="ending-epilogue-panel" aria-label="엔딩 에필로그">
-              <span>AFTER THE RECORD</span>
+              <span lang="en">AFTER THE RECORD</span>
               <p>{view.endingEpilogue}</p>
             </section>
           )}

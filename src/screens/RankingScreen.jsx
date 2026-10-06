@@ -33,7 +33,7 @@ export function RankingScreen({
             <span className="brand-mark">{gameTitle}</span>
           </div>
           <header className="ranking-hero">
-            <span>PUBLIC SIGNAL BOARD</span>
+            <span lang="en">PUBLIC SIGNAL BOARD</span>
             <h1 ref={headingRef} tabIndex={-1}>어디서 생각이 가장 크게 확장됐는가</h1>
             <p>
               완료된 사건의 버스트 점수와 랭크를 비교합니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라,
@@ -54,11 +54,16 @@ export function RankingScreen({
           <section className="ranking-table-panel" aria-label="플레이어 랭킹">
             <div className="ranking-table-heading">
               <div>
-                <span>SEASON 1 / BEST RUN</span>
+                <span lang="en">SEASON 1 / BEST RUN</span>
                 <h2>현재 기준선</h2>
               </div>
-              <small>{leaderboard.length}명의 기록</small>
+              {/* Not a count while there is nothing counted yet: it read
+                  "0명의 기록" beside the line that said it was still loading. */}
+              <small>{leaderboardStatus === "loading" ? "불러오는 중" : `${leaderboard.length}명의 기록`}</small>
             </div>
+            <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+              {leaderboardStatus === "loading" ? "" : `${leaderboard.length}명의 기록을 불러왔습니다.`}
+            </p>
             {leaderboardStatus === "loading" ? (
               <p className="ranking-empty">기록을 불러오는 중입니다.</p>
             ) : leaderboard.length === 0 ? (
@@ -75,16 +80,16 @@ export function RankingScreen({
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">SEASON COMPLETE</span>}
+                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록" lang="en">SEASON COMPLETE</span>}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? triggerLabels.responsibility}</small>
                     </div>
                     <div className="ranking-stat">
-                      <span>RANK</span>
+                      <span lang="en">RANK</span>
                       <b>{entry.rank}</b>
                     </div>
                     <div className="ranking-stat score-stat">
-                      <span>BURST</span>
+                      <span lang="en">BURST</span>
                       <b>{entry.score}</b>
                     </div>
                     <div className="ranking-detail">

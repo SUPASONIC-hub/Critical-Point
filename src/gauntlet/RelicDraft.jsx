@@ -3,6 +3,7 @@ import { Anchor, Bandage, Crosshair, Eye, Fan, Gem, KeyRound, Lock, Repeat, Shie
 import { RELIC_IDS, RELICS } from "./relics.js";
 import { readRelicCodex } from "./useRelicTable.js";
 import { useDialogFocus } from "./useDialogFocus.js";
+import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 const ICONS = {
   timer: Timer,
@@ -37,6 +38,7 @@ export function RelicIcon({ id, size = 14 }) {
  */
 export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
   const [codex] = useState(readRelicCodex);
+  const { letterKeys, keys } = useShortcutHints();
   const dialogRef = useRef(null);
   const firstOption = useRef(null);
   const trapTab = useDialogFocus(dialogRef, firstOption);
@@ -60,10 +62,10 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
                   className={`gx-relic-card relic-${id}${relic.unlock ? " is-rare" : ""}`}
                   data-testid="relic-option"
                   data-relic={id}
-                  aria-keyshortcuts={String(index + 1)}
+                  aria-keyshortcuts={keys(index + 1)}
                   onClick={() => onPick(id)}
                 >
-                  <span className="gx-relic-key" aria-hidden="true">{index + 1}</span>
+                  {letterKeys && <span className="gx-relic-key" aria-hidden="true">{index + 1}</span>}
                   <span className="gx-relic-emblem">
                     <RelicIcon id={id} size={24} />
                   </span>

@@ -2,7 +2,7 @@
   "//": "npm run test:coverage. Floors under the unit tests, as measured; they only rise. Rewrite with `node scripts/check-coverage.mjs --update`.",
   "total": {
     "lines": 87,
-    "functions": 85,
+    "functions": 86,
     "branches": 74
   },
   "files": {
@@ -27,12 +27,13 @@
     "src/scenePlate.js": 100,
     "src/seasonRules.js": 100,
     "src/seasonRuntime.js": 100,
-    "src/state/accessibilitySettings.js": 97,
+    "src/state/accessibilitySettings.js": 100,
     "src/state/caseArrival.js": 100,
     "src/state/chunkReload.js": 98,
     "src/state/confirmAction.js": 100,
     "src/state/diagnosticUtils.js": 100,
     "src/state/errorRecovery.js": 84,
+    "src/state/loadProgress.js": 100,
     "src/state/openingState.js": 100,
     "src/state/payloadSchemas.js": 98,
     "src/state/playtestExport.js": 81,
@@ -46,6 +47,7 @@
     "src/state/telemetryQueuePolicy.js": 100,
     "src/state/trace.js": 63,
     "src/state/useBoard.js": 39,
+    "src/state/useConsentToggle.js": 100,
     "src/state/useLocalRanking.js": 65,
     "src/state/useNewGamePlus.js": 48,
     "src/telemetry.js": 77,

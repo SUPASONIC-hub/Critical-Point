@@ -5,6 +5,7 @@ import {
   readCharacterProfile,
   readContinuityMemoryChoice,
 } from "./seasonRules.js";
+import { noteCasesArrived } from "./state/loadProgress.js";
 
 /**
  * The season as the app will read it once cases arrive one at a time (the
@@ -38,6 +39,8 @@ export function createSeasonRuntime(index, loadCaseData) {
           Object.assign(echoReplies, data.echoReplies);
           Object.assign(choiceVoiceLines, data.choiceVoiceLines);
           loaded.add(caseId);
+          // For the screen that is waiting on the season (LazyScreen.jsx).
+          noteCasesArrived(loaded.size, CASE_SEQUENCE.length);
         })
         .catch((error) => {
           // A failed fetch is asked again next time, not remembered as failed.

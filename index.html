@@ -40,10 +40,11 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <!-- The intro's key visual is the LCP element. These mirror the <picture> in
-         IntroScreen.jsx exactly -- same media split, same density descriptors
-         (getArtSources in src/responsiveArt.js) -- so the browser preloads the
-         file the picture then picks, at every DPR. A preload that disagrees
-         with the picture downloads the art twice. -->
+         IntroScreen.jsx exactly -- same media split, the phone's by density and
+         the wide screen's by width with the same sizes (getArtSources in
+         src/responsiveArt.js) -- so the browser preloads the file the picture
+         then picks, at every DPR and width. A preload that disagrees with the
+         picture downloads the art twice. -->
     <link
       rel="preload"
       as="image"
@@ -56,7 +57,8 @@
       rel="preload"
       as="image"
       type="image/webp"
-      imagesrcset="/triggerlab-key-visual-960.webp 1x, /triggerlab-key-visual.webp 2x"
+      imagesrcset="/triggerlab-key-visual-960.webp 960w, /triggerlab-key-visual.webp 1672w"
+      imagesizes="100vw"
       media="not all and (max-width: 700px)"
       fetchpriority="high"
     />
@@ -73,6 +75,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- The page is drawn by its script. Without one it was a black screen that
+         said nothing. -->
+    <noscript>
+      <p style="margin: 0; padding: 48px 24px; color: #f2f6f3; font: 16px/1.6 sans-serif; text-align: center">
+        임계점은 자바스크립트로 그려지는 게임입니다. 브라우저 설정에서 자바스크립트를 켠 뒤 다시 열어 주세요.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

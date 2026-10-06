@@ -1,6 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { startDebugNode } from "./helpers/gameFlow.js";
+import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 /**
  * The comfort settings (maintenance priority 87): set on the intro, stored on
@@ -55,6 +55,54 @@ test("with single-key shortcuts off, a number stakes nothing and the save button
   // The pointer still does everything the keys did.
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+});
+
+/**
+ * Turning the keys off used to change one button. Everything else went on
+ * naming them: the digit on each card, the R and N chips on the report, the
+ * hint line over the hand, and `aria-keyshortcuts` on eleven controls.
+ */
+test("with single-key shortcuts off, no control names or draws a key that does nothing", async ({ page }) => {
+  await withSettings(page, { letterKeys: false });
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await startDebugNode(page, "case01", "start", { openTable: false });
+
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible();
+  await expect(briefing.locator("kbd")).toHaveCount(0);
+  await expect(briefing.getByTestId("briefing-card").first()).not.toHaveAttribute("aria-keyshortcuts");
+  // Space and Enter are not single-character keys, and stay named.
+  await expect(page.getByTestId("open-table")).toHaveAttribute("aria-keyshortcuts", "Space Enter");
+  await page.getByTestId("open-table").click();
+
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await expect(page.locator(".gx-card-key")).toHaveCount(0);
+  await expect(page.locator(".choices .choice").first()).not.toHaveAttribute("aria-keyshortcuts");
+  await expect(page.getByTestId("commit-push")).toHaveAttribute("aria-keyshortcuts", "Space");
+  await expect(page.getByTestId("commit-focus")).not.toHaveAttribute("aria-keyshortcuts");
+  await expect(page.locator(".gx-hand-head small")).toHaveText("Space 밀기 · Enter 확정");
+});
+
+test("with single-key shortcuts off, the report does not offer R or N", async ({ page }) => {
+  await withSettings(page, { letterKeys: false });
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".result-page")).toBeVisible();
+  await expect(page.locator(".result-page .shortcut-hint")).toHaveCount(0);
+  await expect(page.locator(".replay-case-button")).not.toHaveAttribute("aria-keyshortcuts");
+  await expect(page.locator(".next-case-panel button")).not.toHaveAttribute("aria-keyshortcuts");
+});
+
+test("with the shortcuts on, the same controls name their keys", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await startDebugNode(page, "case01", "start");
+  await expect(page.locator(".gx-card-key").first()).toHaveText("1");
+  await expect(page.locator(".choices .choice").first()).toHaveAttribute("aria-keyshortcuts", "1");
+  await expect(page.getByTestId("commit-push")).toHaveAttribute("aria-keyshortcuts", "Space W");
+  await expect(page.getByTestId("commit-focus")).toHaveAttribute("aria-keyshortcuts", "E");
+  await expect(page.locator(".gx-hand-head small")).toContainText("W 밀기");
 });
 
 test("the reading clock can start held, and waits", async ({ page }) => {

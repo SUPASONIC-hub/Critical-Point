@@ -57,3 +57,53 @@ test("a ranking row shows the slowed clock only for a value the game offers", ()
   assert.equal(buildLeaderboard([row(9)])[0].assistTime, 1);
   assert.equal(buildLeaderboard([row(undefined)])[0].assistTime, 1);
 });
+
+test("a control names only the keys the setting leaves on", () => {
+  const { listedShortcuts } = settings;
+  assert.equal(listedShortcuts("Space W", true), "Space W");
+  assert.equal(listedShortcuts("Space W", false), "Space", "W is one character; Space is not");
+  assert.equal(listedShortcuts("Space Enter W", false), "Space Enter");
+  assert.equal(listedShortcuts("Escape", false), "Escape");
+  // Nothing left means no attribute at all, not an empty one.
+  assert.equal(listedShortcuts("E", false), undefined);
+  assert.equal(listedShortcuts(3, false), undefined, "a card's digit");
+  assert.equal(listedShortcuts(3, true), "3");
+  // Shift does not make P a different kind of key: the setting turns it off too.
+  assert.equal(listedShortcuts("Shift+P", false), undefined);
+  assert.equal(listedShortcuts("Shift+P", true), "Shift+P");
+  assert.equal(listedShortcuts("", true), undefined);
+});
+
+test("the loading screen is told how much of the season has arrived", async () => {
+  const { getLoadProgress, noteCasesArrived, subscribeLoadProgress } = await import("../../src/state/loadProgress.js");
+  let told = 0;
+  const unsubscribe = subscribeLoadProgress(() => {
+    told += 1;
+  });
+  noteCasesArrived(3, 55);
+  assert.deepEqual({ ...getLoadProgress() }, { done: 3, total: 55 });
+  noteCasesArrived(3, 55);
+  assert.equal(told, 1, "the same count again is not news");
+  unsubscribe();
+  noteCasesArrived(4, 55);
+  assert.equal(told, 1);
+  assert.equal(getLoadProgress().done, 4);
+});
+
+test("the hooks read the setting the way a component will", async () => {
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { useConsentToggle } = await import("../../src/state/useConsentToggle.js");
+  function Probe() {
+    const { letterKeys, keys } = settings.useShortcutHints();
+    const consent = useConsentToggle({});
+    return createElement("button", { "aria-keyshortcuts": keys("Space W"), "data-note": String(consent.note) }, letterKeys ? "W" : "");
+  }
+  settings.resetAccessibilityCache();
+  localStorage.setItem(ACCESSIBILITY_SETTINGS_KEY, JSON.stringify({ letterKeys: false }));
+  assert.equal(renderToStaticMarkup(createElement(Probe)), '<button aria-keyshortcuts="Space" data-note="null"></button>');
+  settings.resetAccessibilityCache();
+  localStorage.setItem(ACCESSIBILITY_SETTINGS_KEY, JSON.stringify({ letterKeys: true }));
+  assert.equal(renderToStaticMarkup(createElement(Probe)), '<button aria-keyshortcuts="Space W" data-note="null">W</button>');
+  settings.resetAccessibilityCache();
+});

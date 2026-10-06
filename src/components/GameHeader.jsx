@@ -1,5 +1,5 @@
 import { FileText, RefreshCcw, Save } from "lucide-react";
-import { useAccessibility } from "../state/accessibilitySettings.js";
+import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 /**
  * Scene identity and the run's two standing numbers.
@@ -24,7 +24,7 @@ export function GameHeader({
   progress,
 }) {
   // With the single-key shortcuts off (the comfort setting), P is not one.
-  const { letterKeys } = useAccessibility();
+  const { keys } = useShortcutHints();
   return (
     <header className="game-header">
       <div>
@@ -32,14 +32,14 @@ export function GameHeader({
         <h1 ref={sceneTitleRef} tabIndex={-1}>{node.title}</h1>
       </div>
       <div className="top-actions compact-actions">
-        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts={letterKeys ? "P" : undefined} aria-label="저장" title="저장">
+        <button type="button" className="ghost" onClick={onSave} aria-keyshortcuts={keys("P")} aria-label="저장" title="저장">
           <Save size={16} />
         </button>
         <button
           type="button"
           className="ghost"
           onClick={onSaveAndExit}
-          aria-keyshortcuts={letterKeys ? "Shift+P" : undefined}
+          aria-keyshortcuts={keys("Shift+P")}
           aria-label="저장 후 나가기"
           title="저장 후 나가기"
         >
@@ -50,7 +50,7 @@ export function GameHeader({
         </button>
       </div>
       {/* Layer 1 keeps exactly two standing numbers: which case, and how far in. */}
-      <div className="status-bar" aria-label="현재 진행 상태">
+      <div className="status-bar" role="group" aria-label="현재 진행 상태">
         <span>
           {caseLabel ? <b>{caseLabel}</b> : <>사건 <b>{caseNumber}</b></>}
           <i aria-hidden="true"> · </i>

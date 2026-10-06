@@ -37,7 +37,7 @@ export function GauntletLedger({ log = [], summary = null }) {
           <small>확정 {ledger.cashes}회</small>
         </article>
         <article>
-          <span>BUST</span>
+          <span lang="en">BUST</span>
           <b className={ledger.busts > 0 ? "cost" : ""}>{ledger.busts}</b>
           <small>밀어붙임 {ledger.pushes}회</small>
         </article>

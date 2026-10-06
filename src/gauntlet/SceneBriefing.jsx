@@ -5,9 +5,10 @@ import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { monotonicNow } from "./timing.js";
 import { useDialogFocus } from "./useDialogFocus.js";
+import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
-import { getAccessibility } from "../state/accessibilitySettings.js";
+import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise.
@@ -67,6 +68,7 @@ export function SceneBriefing({
   resourceMeta,
   onOpen,
 }) {
+  const { letterKeys, keys } = useShortcutHints();
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits.
   const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
@@ -131,12 +133,19 @@ export function SceneBriefing({
             ref={timerRef}
             className={`gx-comic-timer${late ? " is-late" : ""}${held ? " is-held" : ""}`}
             aria-pressed={held}
-            aria-label={held ? `읽는 시간 멈춤, ${shown}초 남음. 누르면 다시 흐른다` : `읽는 시간 ${shown}초 남음. 누르면 멈춘다`}
+            // The name stays put. With the seconds in it, a screen reader read
+            // the focused button out again every second, over the briefing the
+            // player had stopped the clock to hear. The count is its description.
+            aria-label="읽는 시간 멈춤"
+            aria-describedby="gx-comic-timer-left"
             data-testid="reading-timer"
             onClick={toggleHold}
           >
-            <b>{shown}</b>
-            <small>{held ? "멈춤 · 누르면 다시 흐른다" : "초 뒤 판이 열린다 · 누르면 멈춤"}</small>
+            <b aria-hidden="true">{shown}</b>
+            <small aria-hidden="true">{held ? "멈춤 · 누르면 다시 흐른다" : "초 뒤 판이 열린다 · 누르면 멈춤"}</small>
+            <span id="gx-comic-timer-left" className="sr-only" role="timer" aria-live="off">
+              {held ? `${shown}초에서 멈춰 있다. 누르면 다시 흐른다` : `${shown}초 뒤 판이 열린다`}
+            </span>
             <i aria-hidden="true" />
           </button>
         </header>
@@ -210,22 +219,25 @@ export function SceneBriefing({
 
         <footer className="gx-comic-actions">
           <p className="gx-comic-hint">
-            카드를 고르면 그 카드를 건 채로 판이 열린다 · <kbd>1</kbd>–<kbd>{cards.length + (reframeChoice ? 1 : 0)}</kbd>
+            카드를 고르면 그 카드를 건 채로 판이 열린다
+            {letterKeys && <> · <kbd>1</kbd>–<kbd>{cards.length + (reframeChoice ? 1 : 0)}</kbd></>}
           </p>
           <div className="gx-comic-cards" role="group" aria-label="바로 걸 카드">
             {cards.map((card, index) => {
               const open = isCardOpen(card);
               return (
-                <button
+                // A locked card stays reachable: it says 잠김, and a disabled
+                // button would be skipped before a keyboard player heard it.
+                <GuardedButton
                   type="button"
                   key={card.id}
-                  className={`gx-comic-card${selectedId === card.id ? " selected" : ""}`}
+                  className={`gx-comic-card${selectedId === card.id ? " selected" : ""}${open ? "" : " is-locked"}`}
                   data-testid="briefing-card"
-                  disabled={!open}
-                  aria-keyshortcuts={String(index + 1)}
+                  blocked={!open}
+                  aria-keyshortcuts={keys(index + 1)}
                   onClick={() => onOpen(card.id)}
                 >
-                  <kbd>{index + 1}</kbd>
+                  {letterKeys && <kbd>{index + 1}</kbd>}
                   <span>{card.label}</span>
                   {(card.id === sealedId || !open) && (
                     <>
@@ -233,7 +245,7 @@ export function SceneBriefing({
                       <span className="sr-only">{open ? "봉인" : "잠김"}</span>
                     </>
                   )}
-                </button>
+                </GuardedButton>
               );
             })}
             {reframeChoice && (
@@ -241,10 +253,10 @@ export function SceneBriefing({
                 type="button"
                 className={`gx-comic-card is-wild${selectedId === REFRAME_CARD_ID ? " selected" : ""}`}
                 data-testid="briefing-card"
-                aria-keyshortcuts={String(cards.length + 1)}
+                aria-keyshortcuts={keys(cards.length + 1)}
                 onClick={() => onOpen(REFRAME_CARD_ID)}
               >
-                <kbd>{cards.length + 1}</kbd>
+                {letterKeys && <kbd>{cards.length + 1}</kbd>}
                 <span>{reframeChoice.label}</span>
               </button>
             )}
@@ -254,7 +266,7 @@ export function SceneBriefing({
             className="gx-open-table"
             data-testid="open-table"
             onClick={() => onOpen(null)}
-            aria-keyshortcuts="Space Enter W"
+            aria-keyshortcuts={keys("Space Enter W")}
             aria-label="판을 연다. 지금부터 시계가 흐르고 카드를 걸 수 있다"
           >
             <Flame size={18} aria-hidden="true" />

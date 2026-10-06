@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { REFRAME_CARD_ID } from "./gauntletEngine.js";
-import { getAccessibility } from "../state/accessibilitySettings.js";
+import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
 
 const isTextField = (target) =>
   target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']");
@@ -54,8 +54,13 @@ function letterOf(event) {
  *
  * The handler is installed once and reads the stage's current actions through
  * a ref, so it never sees a stale window.
+ *
+ * Returns what the table's controls may say about these keys (see
+ * `useShortcutHints`): with the single-key shortcuts off, the digits and
+ * letters are neither announced nor drawn.
  */
 export function useTableKeys(actions) {
+  const hints = useShortcutHints();
   const actionsRef = useRef(actions);
   useLayoutEffect(() => {
     actionsRef.current = actions;
@@ -135,4 +140,6 @@ export function useTableKeys(actions) {
       globalThis.removeEventListener("pointerdown", onPointer, true);
     };
   }, []);
+
+  return hints;
 }

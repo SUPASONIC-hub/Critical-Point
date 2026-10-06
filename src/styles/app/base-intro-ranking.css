@@ -22,7 +22,7 @@
   align-items: center;
   gap: 8px;
   color: var(--c-danger-81);
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
@@ -36,7 +36,7 @@
 }
 .error-panel h1 {
   margin: 14px 0 10px;
-  font-size: clamp(24px, 4vw, 30px);
+  font-size: clamp(1.5rem, 4vw, 1.875rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -157,7 +157,7 @@ summary:focus-visible {
   border-radius: 999px;
   box-shadow: var(--ui-shadow-1);
   backdrop-filter: blur(14px) saturate(140%);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   transition:
@@ -216,7 +216,8 @@ summary:focus-visible {
 /* The music controls float over the top-right corner, so the header rows that
    reach the viewport edge keep that much room free for them. */
 .result-page .topbar,
-.ranking-page .topbar {
+.ranking-page .topbar,
+.board-page .topbar {
   padding-right: 224px;
 }
 .brand-mark,
@@ -226,7 +227,7 @@ summary:focus-visible {
   min-height: 32px;
   padding: 0 12px;
   border: 1px solid rgba(255, 255, 255, 0.34);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -251,19 +252,32 @@ summary:focus-visible {
 .start-input-row input {
   min-width: 0;
 }
-.start-input-row button,
-.ghost {
+.start-input-row button {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border: 0;
   border-radius: 6px;
+  font-size: 0.9375rem;
   font-weight: 800;
 }
-.start-input-row button {
-  flex: 0 0 auto;
-  font-size: 15px;
+/* The quiet button, in one rule. Half of this sat here in a list with the
+   start row's button and the other half 2,400 lines down; every other `.ghost`
+   selector in this file carries a parent, so nothing was between the two. */
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--c-ink-raised);
+  background: var(--c-paper-muted);
+  border: 0;
+  border-radius: 6px;
+  font-weight: 800;
 }
 .data-status {
   width: fit-content;
@@ -301,7 +315,7 @@ summary:focus-visible {
   overflow: hidden;
   background: var(--ui-bg);
 }
-.intro-shell > .save-status {
+.intro-shell .save-status {
   margin: 14px var(--ui-gutter);
 }
 .intro {
@@ -394,12 +408,12 @@ summary:focus-visible {
 }
 .intro-visual span {
   color: var(--ui-accent);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .intro-visual b {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -434,7 +448,7 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
   backdrop-filter: blur(12px);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -492,7 +506,7 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
   backdrop-filter: blur(12px);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   transition:
     background var(--ui-dur-fast) var(--ui-ease),
@@ -555,7 +569,7 @@ summary:focus-visible {
   background: var(--ui-glass);
   border: 1px solid var(--ui-line);
   border-radius: 999px;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 600;
 }
 
@@ -568,7 +582,7 @@ summary:focus-visible {
   justify-items: start;
   gap: 0;
   margin: 0;
-  font-size: clamp(40px, 6.1vw, 96px);
+  font-size: clamp(2.5rem, 6.1vw, 6rem);
   font-weight: 800;
   line-height: 0.92;
   letter-spacing: -0.045em;
@@ -621,7 +635,7 @@ summary:focus-visible {
   align-items: baseline;
   gap: 10px;
   color: var(--ui-text);
-  font-size: clamp(15px, 1.3vw, 18px);
+  font-size: clamp(0.9375rem, 1.3vw, 1.125rem);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.3;
@@ -705,7 +719,7 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
   backdrop-filter: blur(12px);
-  font-size: clamp(13.5px, 1.2vw, 15.5px);
+  font-size: clamp(0.84375rem, 1.2vw, 0.96875rem);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.35;
@@ -723,7 +737,7 @@ summary:focus-visible {
   max-width: 44ch;
   margin: 0;
   color: var(--ui-text-2);
-  font-size: clamp(15px, 1.2vw, 17.5px);
+  font-size: clamp(0.9375rem, 1.2vw, 1.09375rem);
   line-height: 1.75;
   text-wrap: pretty;
 }
@@ -744,7 +758,7 @@ summary:focus-visible {
   color: var(--ui-accent-ink);
   background: var(--ui-accent);
   border-radius: var(--ui-radius-sm);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   box-shadow:
@@ -802,7 +816,7 @@ summary:focus-visible {
   min-height: 44px;
   padding: 0 4px;
   color: var(--ui-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: underline;
   text-decoration-color: var(--ui-line-strong);
@@ -827,7 +841,7 @@ summary:focus-visible {
   width: min(100%, 580px);
   margin: 12px 0 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .cloud-save-panel summary {
   display: inline-flex;
@@ -862,11 +876,11 @@ summary:focus-visible {
 .cloud-save-code span,
 .cloud-save-load label {
   color: var(--ui-text-3);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
 }
 .cloud-save-code strong {
   color: var(--ui-text);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
 }
@@ -878,14 +892,39 @@ summary:focus-visible {
   flex: 1 1 180px;
   min-width: 0;
   min-height: 44px;
+  padding: 0 14px;
+  color: var(--ui-text);
+  background: var(--ui-bg-raised);
+  border: 1px solid var(--ui-line-field);
+  border-radius: var(--ui-radius-sm);
+  /* 16px for the same reason as the board's fields: iOS zooms under it. */
+  font-size: 1rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+/* The panel is dark glass. Its quiet buttons fell back to the paper `.ghost`
+   and its submit to the browser's own, both light slabs on it. */
 .cloud-save-panel button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 44px;
+  padding: 0 14px;
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  font-weight: 700;
+}
+.cloud-save-load button {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.cloud-save-panel button:disabled {
+  color: var(--ui-text-3);
+  background: var(--ui-surface-2);
+  border-color: var(--ui-line);
 }
 .cloud-save-toggle {
   display: inline-flex;
@@ -897,6 +936,14 @@ summary:focus-visible {
 }
 .cloud-save-message {
   color: var(--ui-heat);
+}
+.cloud-save-message.is-done {
+  color: var(--ui-accent);
+}
+/* Both message regions are always on the page (CloudSavePanelBody.jsx). Empty,
+   they take back the grid gap they would otherwise open. */
+.cloud-save-message:empty {
+  margin-top: -10px;
 }
 .intro-stats {
   display: flex;
@@ -914,13 +961,13 @@ summary:focus-visible {
 .intro-stats dt {
   order: 2;
   color: var(--ui-text-3);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 600;
 }
 .intro-stats dd {
   margin: 0;
   color: var(--ui-text);
-  font-size: clamp(24px, 2.3vw, 32px);
+  font-size: clamp(1.5rem, 2.3vw, 2rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
@@ -967,13 +1014,13 @@ summary:focus-visible {
 }
 .studio-credit dt {
   color: var(--ui-text-3);
-  font-size: 9.5px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .studio-credit dd {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 /* The resume card replaces the door when a save exists. */
@@ -1001,17 +1048,17 @@ summary:focus-visible {
 }
 .resume-panel span {
   color: var(--ui-accent);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 .resume-panel small {
   color: var(--ui-text-3);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 500;
   line-height: 1.4;
 }
 .resume-panel strong {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.35;
@@ -1030,7 +1077,7 @@ summary:focus-visible {
   border: 0;
   border-radius: var(--ui-radius-sm);
   box-shadow: 0 10px 32px rgb(217 255 98 / 0.24);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
@@ -1057,7 +1104,7 @@ summary:focus-visible {
   flex: 0 0 auto;
   padding-right: 48px;
   color: var(--ui-text-3);
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 600;
   letter-spacing: 0.22em;
   white-space: nowrap;
@@ -1141,13 +1188,13 @@ summary:focus-visible {
 }
 .start-console-heading span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .start-console-heading h2 {
   margin: 0;
-  font-size: clamp(26px, 2.8vw, 36px);
+  font-size: clamp(1.625rem, 2.8vw, 2.25rem);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.1;
@@ -1155,7 +1202,7 @@ summary:focus-visible {
 .start-console-heading small {
   max-width: 40ch;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -1178,13 +1225,13 @@ summary:focus-visible {
 .start-section-heading span {
   order: 2;
   color: var(--ui-text-3);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .start-section-heading strong {
   color: var(--ui-text);
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.25;
@@ -1193,7 +1240,7 @@ summary:focus-visible {
   display: block;
   margin-bottom: 8px;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .intro .start-panel .start-input-row {
@@ -1205,9 +1252,9 @@ summary:focus-visible {
   padding: 0 16px;
   color: var(--ui-text);
   background: var(--ui-bg-raised);
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-sm);
-  font-size: 16px;
+  font-size: 1rem;
   transition: border-color var(--ui-dur-fast) var(--ui-ease);
 }
 .intro .start-panel .start-input-row input::placeholder {
@@ -1248,7 +1295,7 @@ summary:focus-visible {
   background: var(--ui-surface-3);
   border: 1px dashed var(--ui-line-strong);
   border-radius: var(--ui-radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .intro .past-run-memory {
@@ -1264,14 +1311,14 @@ summary:focus-visible {
 }
 .intro .past-run-memory span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 .intro .past-run-memory p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Intro drawers ------------------------------------------------------------
@@ -1369,7 +1416,7 @@ summary:focus-visible {
   grid-column: 1;
   min-width: 0;
   color: var(--ui-accent);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
@@ -1378,7 +1425,7 @@ summary:focus-visible {
   min-width: 0;
   margin: 0;
   color: var(--ui-text);
-  font-size: clamp(15.5px, 1.3vw, 17px);
+  font-size: clamp(0.96875rem, 1.3vw, 1.0625rem);
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.4;
@@ -1413,7 +1460,7 @@ summary:focus-visible {
   max-width: none;
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.55;
   text-align: left;
@@ -1422,7 +1469,7 @@ summary:focus-visible {
 .intro .operator-origin-selected {
   margin-top: 14px;
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .prestart-briefing {
   display: grid;
@@ -1461,7 +1508,7 @@ summary:focus-visible {
 .prestart-grid span,
 .prestart-tutorial > span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1471,7 +1518,7 @@ summary:focus-visible {
   display: block;
   margin: 0;
   color: var(--ui-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.35;
@@ -1481,7 +1528,7 @@ summary:focus-visible {
 .intro .season-goal-strip small {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -1498,24 +1545,24 @@ summary:focus-visible {
 }
 .prestart-tutorial b {
   color: var(--ui-accent);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .prestart-tutorial small {
   color: var(--ui-text-2);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 500;
   line-height: 1.5;
 }
 .season-panel p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.75;
 }
 .intro .play-style-unlock {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .guide-heading {
   display: flex;
@@ -1523,7 +1570,7 @@ summary:focus-visible {
   gap: 8px;
   margin-bottom: 12px;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 /* Selectable cards: the analyst protocol and the operator origin. */
@@ -1587,23 +1634,23 @@ summary:focus-visible {
 .intro .operator-origin > span {
   padding-right: 28px;
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 .intro .play-style strong,
 .intro .operator-origin strong {
   color: var(--ui-text);
-  font-size: 16.5px;
+  font-size: 1.03125rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.3;
 }
-.intro .play-style p,
-.intro .operator-origin p {
-  margin: 0;
+.intro .play-style em,
+.intro .operator-origin em {
   color: var(--ui-text-2);
-  font-size: 13.5px;
+  font-style: normal;
+  font-size: 0.84375rem;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -1613,7 +1660,7 @@ summary:focus-visible {
   padding-top: 10px;
   color: var(--ui-text-2);
   border-top: 1px solid var(--ui-line);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -1634,22 +1681,35 @@ summary:focus-visible {
 }
 .intro .origin-prologue span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 .intro .origin-prologue strong {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
 }
 .intro .origin-prologue p {
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 /* Data drawer: the consent box and the storage status, on glass. */
 .intro .data-info-panel {
   display: grid;
   gap: 10px;
+}
+.consent-note {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.consent-note.error {
+  color: var(--ui-heat);
+}
+.consent-note:empty {
+  margin-top: -10px;
 }
 .consent-box {
   display: flex;
@@ -1675,18 +1735,18 @@ summary:focus-visible {
   min-width: 0;
 }
 .consent-box b {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 .consent-box small {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.55;
 }
 .intro .data-status {
   padding: 3px 9px;
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 700;
 }
 .intro .data-status.ready {
@@ -1720,13 +1780,13 @@ summary:focus-visible {
 .db-status-panel span,
 .db-status-panel small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.4;
 }
 .db-status-panel strong {
   color: var(--ui-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -1739,7 +1799,7 @@ summary:focus-visible {
 .db-status-panel p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 500;
   line-height: 1.55;
 }
@@ -1754,12 +1814,12 @@ summary:focus-visible {
   display: block;
   margin-bottom: 6px;
   color: var(--c-amber);
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 700;
 }
 .intro .privacy-note p {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 
@@ -1782,12 +1842,12 @@ summary:focus-visible {
 }
 .season-summary span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 .season-summary strong {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.35;
@@ -1810,7 +1870,7 @@ summary:focus-visible {
 .season-summary-list small {
   margin-top: 6px;
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -1841,25 +1901,25 @@ summary:focus-visible {
 }
 .season-journey-card-head b {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 .season-journey-card-head span {
   color: var(--ui-text-3);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
 .season-journey-card strong {
   color: var(--ui-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.4;
 }
 .season-journey-card p,
 .season-journey-card small {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 500;
   line-height: 1.55;
 }
@@ -1893,7 +1953,7 @@ summary:focus-visible {
 .roadmap-heading span {
   flex: 0 0 auto;
   color: var(--ui-text);
-  font-size: clamp(30px, 3.6vw, 48px);
+  font-size: clamp(1.875rem, 3.6vw, 3rem);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -1912,7 +1972,7 @@ summary:focus-visible {
 .roadmap-heading b {
   max-width: 42ch;
   color: var(--ui-text-2);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.6;
   text-align: left;
@@ -1952,7 +2012,7 @@ summary:focus-visible {
   bottom: -22px;
   z-index: -1;
   color: var(--ui-surface-3);
-  font-size: 132px;
+  font-size: 8.25rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.07em;
@@ -2006,7 +2066,7 @@ summary:focus-visible {
 }
 .case-card div > span {
   color: var(--ui-text-2);
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -2020,14 +2080,14 @@ summary:focus-visible {
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line);
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 600;
   line-height: 1.2;
 }
 .case-card h2 {
   margin: 22px 0 8px;
   color: var(--ui-text);
-  font-size: clamp(21px, 1.9vw, 25px);
+  font-size: clamp(1.3125rem, 1.9vw, 1.5625rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -2036,7 +2096,7 @@ summary:focus-visible {
   display: block;
   margin-bottom: 10px;
   color: var(--ui-accent);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .case-card p {
@@ -2044,7 +2104,7 @@ summary:focus-visible {
   margin: 0 0 18px;
   overflow: hidden;
   color: var(--ui-text-2);
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   line-height: 1.6;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -2056,7 +2116,7 @@ summary:focus-visible {
   padding-top: 12px;
   color: var(--ui-text-3);
   border-top: 1px solid var(--ui-line);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.45;
@@ -2155,7 +2215,7 @@ summary:focus-visible {
   background: var(--ui-surface-2);
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   transition: background var(--ui-dur-fast) var(--ui-ease);
 }
@@ -2170,14 +2230,14 @@ summary:focus-visible {
 .ranking-status-bar > div > span,
 .ranking-table-heading span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .ranking-hero h1 {
   margin: 14px 0 14px;
   color: var(--ui-text);
-  font-size: clamp(38px, 5.6vw, 66px);
+  font-size: clamp(2.375rem, 5.6vw, 4.125rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.04;
@@ -2186,7 +2246,7 @@ summary:focus-visible {
 .ranking-hero p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.75;
 }
@@ -2211,7 +2271,7 @@ summary:focus-visible {
   min-width: 0;
 }
 .ranking-status-bar strong {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
@@ -2219,7 +2279,7 @@ summary:focus-visible {
 .ranking-status-bar p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.55;
 }
@@ -2235,7 +2295,7 @@ summary:focus-visible {
   border: 0;
   border-radius: var(--ui-radius-sm);
   box-shadow: 0 10px 32px rgb(217 255 98 / 0.22);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
@@ -2259,13 +2319,13 @@ summary:focus-visible {
 .ranking-table-heading h2 {
   margin: 8px 0 0;
   color: var(--ui-text);
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 .ranking-table-heading small {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -2300,7 +2360,7 @@ summary:focus-visible {
 }
 .ranking-position {
   color: var(--ui-text-3);
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.05em;
@@ -2330,7 +2390,7 @@ summary:focus-visible {
 .ranking-player b {
   margin-bottom: 2px;
   color: var(--ui-text);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   overflow-wrap: anywhere;
@@ -2348,7 +2408,7 @@ summary:focus-visible {
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   vertical-align: middle;
@@ -2375,7 +2435,7 @@ summary:focus-visible {
 .ranking-detail span {
   margin-top: 6px;
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -2386,14 +2446,14 @@ summary:focus-visible {
 }
 .ranking-stat span {
   color: var(--ui-text-3);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
 .ranking-stat b {
   margin-top: 3px;
   color: var(--ui-text);
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
@@ -2413,7 +2473,7 @@ summary:focus-visible {
 .ranking-footnote {
   margin: 16px 4px 0;
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -2456,7 +2516,7 @@ summary:focus-visible {
   background: var(--ui-surface-2);
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 .board-page .brand-mark {
@@ -2470,14 +2530,14 @@ summary:focus-visible {
 .board-status-bar > div > span,
 .board-list-heading span {
   color: var(--ui-accent);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.16em;
 }
 .board-hero h1 {
   margin: 14px 0;
   color: var(--ui-text);
-  font-size: clamp(34px, 5vw, 58px);
+  font-size: clamp(2.125rem, 5vw, 3.625rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.06;
@@ -2486,7 +2546,7 @@ summary:focus-visible {
 .board-hero p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.75;
 }
@@ -2499,20 +2559,26 @@ summary:focus-visible {
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
 }
+.board-status-bar .ghost {
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+}
 .board-status-bar > div {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
 .board-status-bar strong {
-  font-size: 19px;
+  font-size: 1.1875rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 .board-status-bar p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.55;
 }
@@ -2533,7 +2599,7 @@ summary:focus-visible {
 }
 .board-field > span {
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -2544,9 +2610,11 @@ summary:focus-visible {
   padding: 12px 14px;
   color: var(--ui-text);
   background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line-strong);
+  border: 1px solid var(--ui-line-field);
   border-radius: var(--ui-radius-sm);
-  font-size: 15px;
+  /* 16px, not 15: under 16 iOS Safari zooms the page to a focused field and
+     leaves it zoomed. */
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -2561,7 +2629,7 @@ summary:focus-visible {
 }
 .board-field small {
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -2591,7 +2659,7 @@ summary:focus-visible {
   gap: 8px;
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -2602,7 +2670,7 @@ summary:focus-visible {
   background: var(--ui-surface-2);
   border: 1px solid var(--ui-line-strong);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .board-composer-actions {
@@ -2621,7 +2689,7 @@ summary:focus-visible {
   background: var(--ui-accent);
   border: 0;
   border-radius: var(--ui-radius-sm);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
@@ -2636,7 +2704,7 @@ summary:focus-visible {
 .board-post-status {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -2657,13 +2725,13 @@ summary:focus-visible {
 .board-list-heading h2 {
   margin: 8px 0 0;
   color: var(--ui-text);
-  font-size: 23px;
+  font-size: 1.4375rem;
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 .board-list-heading small {
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -2686,7 +2754,7 @@ summary:focus-visible {
 }
 .board-post-head b {
   color: var(--ui-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   overflow-wrap: anywhere;
@@ -2694,14 +2762,14 @@ summary:focus-visible {
 .board-post-head span {
   flex: 0 0 auto;
   color: var(--ui-text-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .board-post p {
   margin: 0;
   color: var(--ui-text-2);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.7;
   white-space: pre-wrap;
@@ -2720,20 +2788,124 @@ summary:focus-visible {
 .board-footnote {
   margin: 16px 4px 0;
   color: var(--ui-text-3);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.6;
 }
 
+/* The opening burst: the half second between pressing a case and its first
+   scene. It was one minified line after app.css's imports until 2026-10-06 --
+   outside every sheet, so outside the structure check and the type scale. */
+.opening-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+  color: var(--c-paper);
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgb(217 255 98 / 0.1), transparent 70%),
+    linear-gradient(90deg, rgb(6 9 10 / 0.95), rgb(6 9 10 / 0.78)),
+    url(/triggerlab-key-visual-960.webp) center / cover;
+  animation: opening-burst-in 0.18s ease-out both;
+}
+.opening-burst-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  background-image:
+    linear-gradient(rgb(217 255 98 / 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(217 255 98 / 0.18) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, var(--c-black), transparent 82%);
+  animation: opening-burst-grid 0.86s steps(4, end) both;
+}
+.opening-burst-panel {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  width: min(860px, 100%);
+  padding: clamp(24px, 6vw, 68px);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-xl);
+  background: var(--ui-glass-strong);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    var(--ui-shadow-2),
+    0 0 90px rgb(217 255 98 / 0.14);
+  text-align: left;
+  animation: opening-burst-panel 0.86s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.opening-burst-panel span {
+  color: var(--ui-accent);
+  font-size: 0.71875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.opening-burst-panel strong {
+  max-width: 12em;
+  font-size: clamp(1.875rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+.opening-burst-panel i {
+  width: min(280px, 70%);
+  height: 5px;
+  background: var(--ui-accent);
+  box-shadow: 0 0 24px rgb(217 255 98 / 0.7);
+  animation: opening-burst-charge 0.86s ease-out both;
+}
+@keyframes opening-burst-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes opening-burst-grid {
+  from {
+    transform: translateX(-12%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes opening-burst-panel {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes opening-burst-charge {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opening-burst,
+  .opening-burst-grid,
+  .opening-burst-panel,
+  .opening-burst-panel i {
+    animation: none;
+  }
+}
 /* Rules gathered here from the later layers so this selector is defined in one file. */
 .game-header {
   flex-wrap: wrap;
-}
-.ghost {
-  min-height: 38px;
-  padding: 0 12px;
-  color: var(--c-ink-raised);
-  background: var(--c-paper-muted);
 }
 textarea {
   width: 100%;
@@ -2874,7 +3046,8 @@ body {
   }
   /* The back button and the brand pill stay one row of pills, dropped below
      the music controls instead of stacked into full-width slabs under them. */
-  .ranking-page .topbar {
+  .ranking-page .topbar,
+  .board-page .topbar {
     flex-direction: row;
     align-items: center;
     padding-top: 50px;
@@ -2929,6 +3102,40 @@ body {
 .screen-loading {
   min-height: 100dvh;
 }
+/* The wait for the season: how many cases have landed, and a way out when it
+   is taking too long (LazyScreen.jsx). */
+.screen-loading-progress {
+  position: relative;
+  width: min(320px, 100%);
+  margin-top: 12px;
+  color: var(--ui-text-2);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.screen-loading-progress i {
+  display: block;
+  height: 4px;
+  margin-bottom: 6px;
+  background: var(--ui-accent);
+  border-radius: var(--radius-pill);
+  transform-origin: left;
+}
+.screen-loading-slow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 16px 0 0;
+  color: var(--ui-text-2);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.screen-loading-slow .ghost {
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+}
 .new-game-plus-button {
   display: flex;
   align-items: center;
@@ -2946,7 +3153,6 @@ body {
 .play-style-unlock strong {
   color: var(--c-acid);
 }
-.operator-origin p,
 .operator-origin small {
   margin: 0;
 }
@@ -2956,6 +3162,6 @@ body {
 }
 @media (max-width: 520px) {
   .start-console-heading h2 {
-    font-size: 23px;
+    font-size: 1.4375rem;
   }
 }

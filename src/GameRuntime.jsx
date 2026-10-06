@@ -121,7 +121,6 @@ const IntroScreen = retryableLazy(() => import("./screens/IntroScreen.jsx").then
 const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
 const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
-const renderNothing = () => null;
 const CONFIRM_RESET =
   "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다.";
 // The line under a season's first scene, before any choice has been answered.
@@ -452,6 +451,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const currentFeedback = normalizeFeedback(playtestFeedback[currentCase]);
   const firstRenderRef = useRef(true);
   const sceneTitleRef = useRef(null);
+  const introLandingRef = useRef(null);
   const hasResumableSave =
     !started &&
     currentCase &&
@@ -545,6 +545,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   const resolveGauntletEvent = useStableEvent(resolveGauntlet);
   const resetEvent = useStableEvent(reset), retryStorageCleanupEvent = useStableEvent(retryStorageCleanup);
   const startAtNodeEvent = useStableEvent(startAtNode), exportPlaytestLogEvent = useStableEvent(exportPlaytestLog);
+  const showSeasonMapEvent = useStableEvent(showSeasonMap);
   useEffect(() => {
     const updateNetworkStatus = () => {
       const online = globalThis.navigator?.onLine !== false;
@@ -621,7 +622,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     showErrorLog,
     closeRecoveryCenter: closeRecoveryCenterEvent,
   });
-  useRuntimeChoiceShortcuts({
+  const shortcutHints = useRuntimeChoiceShortcuts({
     currentCase,
     decisionReveal,
     isAdvancing,
@@ -671,9 +672,12 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // reveal is a modal that takes focus; the scene title behind it waits for
     // the reveal to close (the effect above) instead of stealing focus now.
     const revealOpen = Boolean(decisionReveal);
+    // 시즌 로드맵 enters the intro at the roadmap, not at the top of the page.
+    const roadmap = !started && introLandingRef.current === "roadmap";
+    introLandingRef.current = null;
     window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
-      if (!revealOpen) focusSceneTitle(sceneTitleRef);
+      if (!roadmap) window.scrollTo({ top: 0, left: 0, behavior: getScrollBehavior() });
+      if (!revealOpen) focusSceneTitle(sceneTitleRef, { roadmap, behavior: getScrollBehavior() });
       releaseAdvance();
     });
     // Keyed on where the player is, not on the reveal: the reveal is read once.
@@ -918,6 +922,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
 
   function showSeasonMap() {
+    introLandingRef.current = "roadmap";
     setStarted(false);
     setIsPausedSave(true);
     persist({ started: false, paused: true });
@@ -1222,22 +1227,20 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     return <LazyScreen quiet><IntroScreen view={introView} renderers={{ renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel }} /></LazyScreen>;
   }
   const resultView = createResultView(
-    { AdaptiveMusic, musicModeKey, renderDecisionReveal: renderNothing, renderRecoveryNotice: renderNothing, renderErrorLogPanel: renderNothing, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, sceneTitleRef: null, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
+    { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, clueHypotheses, renderSceneLines, operatorProfile, authorityState, latestChoiceFeedback, endingPreview },
     { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats },
   );
   if (isResult) {
-    return <LazyScreen quiet><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} /></LazyScreen>;
+    return <LazyScreen quiet><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} /></LazyScreen>;
   }
 
   const playView = createPlayView({
-    AdaptiveMusic, musicModeKey, renderDecisionReveal: renderNothing, renderRecoveryNotice: renderNothing, renderErrorLogPanel: renderNothing, renderSaveStatus: renderNothing,
-    screenReaderStatus, simplifyPlayerText, currentCase, sceneTitleRef: null,
+    AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
-    gauntletRun, gauntletSeed, resolveGauntlet: renderNothing,
-    isAdvancing, markWindowTouched: renderNothing, decisionRevealOpen: Boolean(decisionReveal), staleSave, reloadFromStorage: renderNothing,
+    gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
     fixedChoices, clueCount, casesOpened, reframeChoice,
-    resources, resourceMeta, progress, saveCurrentGame: renderNothing, reset: renderNothing, routeIndex, routeLength,
-    debugToolsEnabled, fallbackCaseId, silentFailureCount, copyReplayLink: renderNothing, copyDiagnosticTrace: renderNothing,
+    resources, resourceMeta, progress, routeIndex, routeLength,
+    debugToolsEnabled, fallbackCaseId, silentFailureCount,
   });
   return <LazyScreen quiet><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></LazyScreen>;
 

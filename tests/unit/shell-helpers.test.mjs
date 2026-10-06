@@ -355,7 +355,10 @@ test("the scene title waits for the modal page in front of it", () => {
     focusSceneTitle(titleRef);
     assert.equal(focused.length, 1, "a modal page is in front: wait");
     const [observer] = observers;
-    assert.equal(observer.target, modal.parentNode);
+    // The page, not the modal's parent: the reveal leaves with its backdrop,
+    // and a watcher on the dialog's own parent never saw it go.
+    assert.equal(observer.target, globalThis.document.body);
+    assert.deepEqual(observer.options, { childList: true, subtree: true });
 
     observer.callback();
     assert.equal(focused.length, 1, "still connected");
@@ -378,13 +381,73 @@ test("the scene title waits for the modal page in front of it", () => {
     observers.at(-1).callback();
     assert.equal(focused.length, 2);
 
-    // A modal with no parent to watch: nothing to wait on.
-    modal = { isConnected: true, parentNode: null };
+    // A modal that leaves inside something else is seen leaving all the same.
+    const wrapped = { isConnected: true, parentNode: null };
+    modal = wrapped;
+    globalThis.document.activeElement = globalThis.document.body;
     focusSceneTitle(titleRef);
-    assert.equal(observers.length, 2);
+    assert.equal(observers.length, 3);
+    modal = null;
+    wrapped.isConnected = false;
+    observers.at(-1).callback();
+    assert.equal(focused.length, 3);
   } finally {
     delete globalThis.document;
     delete globalThis.MutationObserver;
+  }
+});
+
+test("a page with no scene title is entered at its heading, and 시즌 로드맵 at the roadmap", () => {
+  class FakeElement {
+    constructor(rect = {}) {
+      this.attributes = {};
+      this.focused = 0;
+      this.scrolledIntoView = null;
+      this.rect = rect;
+    }
+    hasAttribute(name) {
+      return name in this.attributes;
+    }
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+    }
+    focus() {
+      this.focused += 1;
+    }
+    scrollIntoView(options) {
+      this.scrolledIntoView = options;
+    }
+    getBoundingClientRect() {
+      return this.rect;
+    }
+  }
+  const heading = new FakeElement();
+  const roadmap = new FakeElement();
+  const rail = new FakeElement({ left: 16 });
+  Object.assign(rail, { scrollWidth: 4000, clientWidth: 358, scrollLeft: 0 });
+  const card = new FakeElement({ left: 2016 });
+  card.parentElement = rail;
+  globalThis.HTMLElement = FakeElement;
+  globalThis.document = {
+    activeElement: null,
+    body: {},
+    querySelector: (selector) => (selector === "main h1" ? heading : selector === ".case-roadmap .active-case" ? card : null),
+    getElementById: (id) => (id === "season-roadmap" ? roadmap : null),
+  };
+  try {
+    // 저장 후 나가기: the intro has no scene title, so its own heading takes focus.
+    focusSceneTitle({ current: null });
+    assert.equal(heading.focused, 1);
+    assert.equal(heading.attributes.tabindex, "-1", "a heading has to be made focusable first");
+
+    focusSceneTitle({ current: null }, { roadmap: true, behavior: "smooth" });
+    assert.equal(roadmap.focused, 1);
+    assert.deepEqual(roadmap.scrolledIntoView, { block: "start", behavior: "smooth" });
+    assert.equal(rail.scrollLeft, 2000, "the rail is scrolled to the case the season has reached");
+    assert.equal(heading.focused, 1, "the roadmap is where this lands, not the top");
+  } finally {
+    delete globalThis.document;
+    delete globalThis.HTMLElement;
   }
 });
 
@@ -413,4 +476,97 @@ test("every observed reaction has a label and an afterglow, and an unknown one h
   assert.match(endingCopy.getEndingAfterglow(undefined).title, /질문/);
   assert.deepEqual(endingCopy.endingAxisCopy.map((axis) => axis.label), ["PROTECT", "EXPOSE", "HANDOFF"]);
   assert.equal(endingCopy.fallbackObserverEndingRecord.label, "패턴 표본");
+});
+
+test("a heading still on its way in is waited for, a frame at a time, and then given up on", () => {
+  class FakeElement {
+    constructor() {
+      this.focused = 0;
+    }
+    hasAttribute() {
+      return true;
+    }
+    focus() {
+      this.focused += 1;
+    }
+  }
+  const frames = [];
+  let heading = null;
+  globalThis.HTMLElement = FakeElement;
+  globalThis.requestAnimationFrame = (callback) => frames.push(callback);
+  globalThis.document = { activeElement: null, body: {}, querySelector: (selector) => (selector === "main h1" ? heading : null) };
+  try {
+    focusSceneTitle({ current: null });
+    assert.equal(frames.length, 1, "nothing to focus yet: look again next frame");
+    frames.shift()();
+    assert.equal(frames.length, 1);
+    heading = new FakeElement();
+    frames.shift()();
+    assert.equal(heading.focused, 1);
+    assert.equal(frames.length, 0, "found: no more frames");
+
+    // A page that never draws a heading does not keep a frame loop alive.
+    heading = null;
+    focusSceneTitle({ current: null });
+    let ran = 0;
+    while (frames.length) {
+      frames.shift()();
+      ran += 1;
+    }
+    assert.equal(ran, 30);
+  } finally {
+    delete globalThis.document;
+    delete globalThis.HTMLElement;
+    delete globalThis.requestAnimationFrame;
+  }
+});
+
+const { createConsentChange } = await import("../../src/state/useConsentToggle.js");
+
+test("consent is only real once the save holds it, and the box says why it snapped back", () => {
+  const calls = [];
+  const record = (name) => (value) => calls.push([name, value]);
+  const make = (storageSaved, pendingTelemetry = [{ id: "row" }]) =>
+    createConsentChange({
+      pendingTelemetry,
+      persist: (patch) => (calls.push(["persist", patch]), { storageSaved }),
+      setDataConsent: record("consent"),
+      setPendingTelemetry: record("queue"),
+      setTelemetryStatus: record("status"),
+      setNote: record("note"),
+    });
+  const box = (checked) => ({ target: { checked } });
+
+  // A tick the browser kept.
+  let event = box(true);
+  make(true)(event);
+  assert.deepEqual(calls, [["persist", { dataConsent: true }], ["consent", true], ["note", null]]);
+
+  // A tick it refused: the box snaps back and says so beside itself.
+  calls.length = 0;
+  event = box(true);
+  make(false)(event);
+  assert.equal(event.target.checked, false);
+  assert.equal(calls.find(([name]) => name === "consent"), undefined);
+  assert.equal(calls.find(([name]) => name === "note")[1].tone, "error");
+  assert.match(calls.find(([name]) => name === "note")[1].text, /동의를 브라우저 저장본에 반영하지 못했습니다/);
+
+  // An untick it kept empties the queue with it.
+  calls.length = 0;
+  make(true)(box(false));
+  assert.deepEqual(calls[0], ["persist", { dataConsent: false, pendingTelemetry: [] }]);
+  assert.deepEqual(calls.slice(1, 3), [["consent", false], ["queue", []]]);
+  assert.equal(calls.find(([name]) => name === "note")[1].tone, "local");
+
+  // An untick it refused puts the queue back as it was.
+  calls.length = 0;
+  event = box(false);
+  const queue = [{ id: "kept" }];
+  make(false, queue)(event);
+  assert.equal(event.target.checked, true);
+  assert.deepEqual(calls.find(([name]) => name === "queue"), ["queue", queue]);
+  assert.deepEqual(calls.find(([name]) => name === "consent"), ["consent", true]);
+  const note = calls.find(([name]) => name === "note")[1];
+  assert.equal(note.tone, "error");
+  assert.deepEqual(calls.find(([name]) => name === "status")[1], note, "the report's status line is told the same thing");
 });

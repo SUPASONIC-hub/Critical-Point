@@ -394,7 +394,12 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     setSaveStatus,
     pendingTelemetry,
     setPendingTelemetry,
-    renderSaveStatus: () => (saveStatus ? <p className="save-status">{saveStatus}</p> : null),
+    // The same always-mounted region the runtime draws (components/SaveStatus.jsx).
+    renderSaveStatus: () => (
+      <div className="save-status-region" role="status" aria-live="polite" aria-atomic="true">
+        {saveStatus && <p className="save-status">{saveStatus}</p>}
+      </div>
+    ),
   });
 
   return <IntroScreen view={introView} />;

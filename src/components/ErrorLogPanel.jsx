@@ -9,7 +9,7 @@ export function ErrorLogPanel({ view }) {
     <section id="error-log-panel" className="error-log-panel" aria-label="로컬 에러 로그" data-testid="error-log-panel">
       <div className="panel-title-row">
         <div>
-          <span>ERROR LOG</span>
+          <span lang="en">ERROR LOG</span>
           <h2>최근 오류 기록</h2>
         </div>
         <div className="error-log-actions">
@@ -104,7 +104,7 @@ export function ErrorLogPanel({ view }) {
       <section className="save-slot-panel" aria-label="복구 슬롯" data-testid="save-slot-panel">
         <div className="panel-title-row">
           <div>
-            <span>RECOVERY SLOTS</span>
+            <span lang="en">RECOVERY SLOTS</span>
             <h3>최근 복구 지점</h3>
           </div>
           <button type="button" className="ghost" onClick={refreshSaveSlots}>
