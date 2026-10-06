@@ -3,7 +3,7 @@
   "total": {
     "lines": 87,
     "functions": 86,
-    "branches": 74
+    "branches": 75
   },
   "files": {
     "src/advancedSystems.js": 60,
@@ -27,6 +27,8 @@
     "src/scenePlate.js": 100,
     "src/seasonRules.js": 100,
     "src/seasonRuntime.js": 100,
+    "src/serviceWorker/register.js": 100,
+    "src/serviceWorker/worker.js": 99,
     "src/state/accessibilitySettings.js": 100,
     "src/state/caseArrival.js": 100,
     "src/state/chunkReload.js": 98,

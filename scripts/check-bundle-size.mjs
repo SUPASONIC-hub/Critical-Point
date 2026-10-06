@@ -160,6 +160,21 @@ function checkBudget(file, budget) {
   if (gzipBytes > gzipBudget) failures.push(`${file} is ${gzipBytes} gzip bytes, over the ${gzipBudget} gzip budget.`);
 }
 
+// The service worker (src/serviceWorker/worker.js), written to the root by
+// `serviceWorker()` in vite.config.js. Its size is its code plus one line that
+// lists every file of the release: 8,358 / 2,992 on 2026-10-06, plus 5%. It
+// is fetched after `load`, so it is on no paint's path.
+const WORKER_BUDGET = { maxBytes: 8_780, maxGzip: 3_150 };
+try {
+  const worker = readFileSync(path.join(distDir, "sw.js"));
+  const gzipBytes = gzipSync(worker).length;
+  reported.push(`sw.js: ${worker.length} bytes raw / ${gzipBytes} bytes gzip`);
+  if (worker.length > WORKER_BUDGET.maxBytes) failures.push(`sw.js is ${worker.length} bytes, over the ${WORKER_BUDGET.maxBytes} byte budget.`);
+  if (gzipBytes > WORKER_BUDGET.maxGzip) failures.push(`sw.js is ${gzipBytes} gzip bytes, over the ${WORKER_BUDGET.maxGzip} gzip budget.`);
+} catch {
+  failures.push("dist/sw.js is missing; the build writes it (serviceWorker() in vite.config.js).");
+}
+
 // First paint.
 const html = readFileSync(path.join(distDir, "index.html"), "utf8");
 const coldAssets = new Set();

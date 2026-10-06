@@ -128,3 +128,16 @@ test("a wildcard host is named where the page may send data", () => {
   // written down and the live header is where it is refused.
   assert.equal(wildcardHostProblems(readRenderYamlCsp(yaml)).length, 1);
 });
+
+test("the service worker's file is asked for again every time, like the page", async () => {
+  const { WORKER_PATH, workerCacheProblems } = await import("../../scripts/deploy-policy.mjs");
+  const declared = readRenderYamlHeaders(yaml).find((header) => header.path === WORKER_PATH && header.name === "cache-control");
+  assert.equal(declared?.value, "no-cache");
+  assert.deepEqual(workerCacheProblems("no-cache"), []);
+  assert.match(workerCacheProblems("public, max-age=0, s-maxage=300")[0], /^the service worker is held by shared caches for 300s/);
+  assert.match(workerCacheProblems("public, max-age=600")[0], /^the service worker may be reused without asking/);
+  // The file has to say it: a render.yaml without the rule is a failure of the offline check.
+  const without = yaml.replace(/- path: \/sw\.js\s*\n\s*name: Cache-Control\s*\n\s*value: no-cache\s*\n/, "");
+  assert.notEqual(without, yaml);
+  assert.match(renderYamlHeaderProblems(without).join("\n"), /\/sw\.js: the service worker is served with no Cache-Control/);
+});

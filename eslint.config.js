@@ -17,8 +17,9 @@ export default [
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
-      // __CP_DEBUG_BUILD__ is written by the bundler (vite.config.js `define`).
-      globals: { ...globals.browser, __CP_DEBUG_BUILD__: "readonly" },
+      // __CP_DEBUG_BUILD__ and __CP_SERVICE_WORKER__ are written by the bundler
+      // (vite.config.js `define`).
+      globals: { ...globals.browser, __CP_DEBUG_BUILD__: "readonly", __CP_SERVICE_WORKER__: "readonly" },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: { "react-hooks": reactHooks },

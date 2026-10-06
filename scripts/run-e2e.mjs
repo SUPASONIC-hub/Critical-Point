@@ -110,7 +110,7 @@ const DEFAULT_SPECS = [
 // performance budgets are not in this list: they are timings, and a timing
 // taken while two other workers play the game measures the other workers.
 // `npm run test:performance` runs them alone.
-const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js"];
+const PREVIEW_SPECS = [...DEFAULT_SPECS, "tests/production-build.spec.js", "tests/offline.spec.js"];
 
 // The weekly tier (--full).
 const FULL_SPECS = ["tests/full-coverage.spec.js", "tests/layout-sweep.spec.js"];
