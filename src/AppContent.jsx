@@ -6,6 +6,7 @@ import {
   NEXT_PARTICIPANT_MESSAGE_KEY,
   OPERATOR_ORIGIN_KEY,
   RECOVERY_CENTER_STORAGE_KEY,
+  SAVE_BACKUP_STORAGE_KEY,
   SAVE_SCHEMA_VERSION,
   STORAGE_KEY,
   backUpUnreadableSave,
@@ -42,6 +43,7 @@ import { GAME_TITLE } from "./appCopy.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
 import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
+import { storageNeedsEveryCase } from "./state/caseArrival.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
@@ -49,12 +51,20 @@ import { loadedChunk } from "./state/chunkReload.js";
 // The runtime is what deals the table, and the table reads this tab's token, so
 // it mounts once the token is known to be this tab's own (appConfig.claimTabToken).
 // A first visit mounts once the season's first case has arrived; a device with
-// a save, or a page opened from a replay link, once every case has
-// (state/caseArrival.js): both name scenes anywhere in the season.
+// a run under way, or a page opened from a replay link, once every case has
+// (state/caseArrival.js): both name scenes anywhere in the season. This runs
+// when the runtime is first drawn, which is after `startGame` below has written
+// the new save -- so it asks what the save holds, not whether there is one.
 const GameRuntime = lazy(() =>
   Promise.all([loadGameRuntime(), claimTabToken()]).then(async ([runtime]) => {
     await runtime.prepareGameRuntime({
-      hasSave: readStoredValue(STORAGE_KEY, null) !== null || Boolean(getReplaySeedFromLocation()),
+      hasSave: storageNeedsEveryCase({
+        saved: readShellSave(),
+        unreadable: readUnreadableSave() !== null,
+        hasSlots: hasRecoverySlots(),
+        hasBackup: readStoredValue(SAVE_BACKUP_STORAGE_KEY, null) !== null,
+        replay: Boolean(getReplaySeedFromLocation()),
+      }),
     });
     return { default: runtime.GameRuntime };
   }),

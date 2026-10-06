@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { SEASON_ENTRY_CASE } from "../../src/gameCases.js";
-import { createCaseArrival, prepareGameRuntime, whenCaseReady } from "../../src/state/caseArrival.js";
+import { createCaseArrival, prepareGameRuntime, savedRunNamesOtherCases, storageNeedsEveryCase, whenCaseReady } from "../../src/state/caseArrival.js";
 
 /**
  * What the runtime waits for before it mounts, and before it opens a case
@@ -66,6 +66,38 @@ test("a case file a deploy removed reloads the page; any other failure is thrown
     "already reloaded once: the panel answers it",
   );
   await assert.rejects(createCaseArrival(fakeStore({ failWith: new Error("bad data") })).whenCaseReady("case03", () => {}), /bad data/);
+});
+
+test("a save just written for a first start does not ask for every case; a run under way does", () => {
+  const fresh = { currentCase: SEASON_ENTRY_CASE, nodeId: "p1_start", log: [], completedCases: [], caseResults: {} };
+  assert.equal(savedRunNamesOtherCases(fresh), false);
+  assert.equal(storageNeedsEveryCase({ saved: fresh }), false, "the shell wrote this before the runtime mounted");
+  assert.equal(storageNeedsEveryCase({ saved: null }), false, "no save at all");
+
+  assert.equal(savedRunNamesOtherCases({ ...fresh, log: [{ nodeId: "p1_start" }] }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, completedCases: [SEASON_ENTRY_CASE] }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, caseResults: { [SEASON_ENTRY_CASE]: {} } }), true);
+  assert.equal(savedRunNamesOtherCases({ ...fresh, currentCase: "case12" }), true);
+});
+
+test("a save that will not read, recovery slots, a kept copy and a replay link each ask for every case", () => {
+  for (const reason of ["unreadable", "hasSlots", "hasBackup", "replay"]) {
+    assert.equal(storageNeedsEveryCase({ saved: null, [reason]: true }), true, reason);
+  }
+});
+
+test("a reader of the whole season runs after every case is here, and not at all when they cannot be fetched", async () => {
+  const store = fakeStore();
+  let release;
+  store.ensureAllCases = () => new Promise((resolve) => (release = resolve));
+  let reads = 0;
+  const pending = createCaseArrival(store).withEveryCase(() => ++reads);
+  await Promise.resolve();
+  assert.equal(reads, 0, "the season is still arriving");
+  release();
+  assert.equal(await pending, 1);
+
+  await assert.rejects(createCaseArrival(fakeStore({ failWith: new Error("offline") })).withEveryCase(() => assert.fail("read")), /offline/);
 });
 
 test("in Node every case is present, so the bound helpers wait for nothing", async () => {
