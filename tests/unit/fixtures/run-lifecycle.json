@@ -2079,7 +2079,7 @@
         "bestMultiplier": 1,
         "lastOutcome": "none",
         "lastGauge": 0,
-        "openSeed": null,
+        "openSeed": "seed-held",
         "openCardId": null,
         "suspended": null,
         "beatCombo": 0,

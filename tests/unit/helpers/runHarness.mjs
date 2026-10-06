@@ -167,7 +167,11 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
       startGame: () => persistence.startGame(),
       resume: () => persistence.resumeSavedGame(),
       pauseAfterRecovery: () => persistence.pauseAfterRecovery(),
-      saveGame: (options) => persistence.saveCurrentGame(options),
+      // The runtime holds the suspended window before it saves it (GameRuntime.saveCurrentGame).
+      saveGame: (options) => {
+        if (options?.dynamics) run.gauntletRun = normalizeRunState(options.dynamics);
+        return persistence.saveCurrentGame(options);
+      },
       dismissRecoveryNotice: () => persistence.dismissRecoveryNotice(),
     };
   }
