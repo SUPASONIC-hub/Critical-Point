@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { test } from "node:test";
 
-import { compareMigrations, describeDrift, localMigrationVersions, parseMigrationList } from "../../scripts/migration-drift.mjs";
+import { compareMigrations, describeCliFailure, describeDrift, localMigrationVersions, parseMigrationList, redactCliOutput } from "../../scripts/migration-drift.mjs";
 
 // What `supabase migration list --linked --output-format json` prints (CLI
 // 2.118/2.119), cut down to three rows: one applied, one in the repository
@@ -81,4 +81,42 @@ test("every file in supabase/migrations is one the comparison can name", () => {
   const versions = localMigrationVersions(files);
   assert.equal(versions.length, files.length, "a migration file is not named <14 digits>_<name>.sql");
   assert.equal(new Set(versions).size, versions.length, "two migration files share a version");
+});
+
+test("what a failed CLI printed is shown from both streams", () => {
+  // 2026-10-06: the reason was on stdout and only stderr was printed.
+  const text = describeCliFailure({
+    stdout: '{"_tag":"Error","error":{"code":"Forbidden","message":"missing permission to create a login role"}}',
+    stderr: "Initialising login role...\n",
+  });
+  assert.match(text, /stderr:\nInitialising login role\.\.\./);
+  assert.match(text, /stdout:\n.*missing permission to create a login role/);
+  assert.equal(describeCliFailure({ stdout: "  \n", stderr: "" }), "The CLI printed nothing on either stream.");
+});
+
+test("only the last lines of a long stream are kept", () => {
+  const stderr = Array.from({ length: 50 }, (_, index) => `line ${index + 1}`).join("\n");
+  assert.equal(describeCliFailure({ stderr }, 3), "stderr:\nline 48\nline 49\nline 50");
+});
+
+test("nothing that could be a credential is left in what is printed", () => {
+  const jwt = ["eyJhbGciOiJIUzI1NiJ9", "eyJyb2xlIjoiYW5vbiJ9", "c2lnbmF0dXJlLXZhbHVl"].join(".");
+  const secrets = [
+    ["failed to connect to `postgresql://cli_login_postgres:s3cr3t-Pw@db.example.supabase.co:5432/postgres`", "s3cr3t-Pw"],
+    ["host=db.example.supabase.co user=postgres password=hunter2hunter2 dbname=postgres", "hunter2hunter2"],
+    ['{"password": "p4ss-in-json", "role": "cli_login"}', "p4ss-in-json"],
+    [`Authorization failed for ${"sbp"}_0123456789abcdef0123456789abcdef01234567`, "0123456789abcdef"],
+    [`apikey=${jwt}`, "eyJyb2xlIjoiYW5vbiJ9"],
+    [`rejected bearer ${jwt} here`, "c2lnbmF0dXJlLXZhbHVl"],
+  ];
+  for (const [line, secret] of secrets) {
+    const out = redactCliOutput(line);
+    assert.ok(!out.includes(secret), `${secret} survived in: ${out}`);
+    assert.match(out, /\*\*\*/);
+  }
+  // What explains the failure is kept: the host, the database, the message.
+  const kept = redactCliOutput("failed to connect to `postgresql://cli_login_postgres:s3cr3t-Pw@db.example.supabase.co:5432/postgres`: permission denied");
+  assert.match(kept, /db\.example\.supabase\.co:5432\/postgres/);
+  assert.match(kept, /permission denied/);
+  assert.equal(redactCliOutput("Initialising login role..."), "Initialising login role...");
 });

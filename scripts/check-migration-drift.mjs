@@ -1,7 +1,7 @@
 import { appendFileSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import { compareMigrations, describeDrift, localMigrationVersions, parseMigrationList } from "./migration-drift.mjs";
+import { compareMigrations, describeCliFailure, describeDrift, localMigrationVersions, parseMigrationList } from "./migration-drift.mjs";
 
 /**
  * Compares `supabase/migrations/` with what the live project says it has
@@ -22,10 +22,29 @@ import { compareMigrations, describeDrift, localMigrationVersions, parseMigratio
  *
  * In a workflow it also writes `verdict` (in-step | drift | unreadable) and
  * `summary` to the step's outputs.
+ *
+ *   node scripts/check-migration-drift.mjs --say-failure <stdout file> <stderr file>
+ *
+ * prints what a failed CLI left on both streams, with anything that could be a
+ * credential taken out (migration-drift.mjs, `redactCliOutput`), and exits 0:
+ * it reports a failure, it is not one.
  */
 
 const root = process.cwd();
 const args = process.argv.slice(2);
+
+const failureIndex = args.indexOf("--say-failure");
+if (failureIndex !== -1) {
+  const read = (file) => {
+    try {
+      return file ? readFileSync(path.resolve(root, file), "utf8") : "";
+    } catch {
+      return "";
+    }
+  };
+  console.log(describeCliFailure({ stdout: read(args[failureIndex + 1]), stderr: read(args[failureIndex + 2]) }));
+  process.exit(0);
+}
 const fromIndex = args.indexOf("--from");
 const from = fromIndex === -1 ? null : args[fromIndex + 1];
 
