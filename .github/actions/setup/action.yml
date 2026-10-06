@@ -1,0 +1,61 @@
+name: Set up Node and a Playwright browser
+description: >-
+  The steps every job that runs the project used to carry a copy of: Node from
+  .node-version, `npm ci`, and one Playwright browser with its system libraries.
+
+# Six jobs across verify.yml and full-coverage.yml each had these seven steps
+# written out, and a change to one copy (the cache key, the pinned SHA) had to
+# be made six times and was checked by nobody. The checkout stays in the job:
+# a local action cannot be read before the repository is there.
+#
+# Actions are pinned to a full commit SHA here as in the workflows, with the
+# tag in a comment. Dependabot's github-actions ecosystem reads this directory
+# as well (.github/dependabot.yml).
+
+inputs:
+  browser:
+    description: "The Playwright browser the job drives: chromium or webkit. `none` for a job that brings its own (the pinned container)."
+    required: false
+    default: chromium
+
+runs:
+  using: composite
+  steps:
+    # Node comes from .node-version, which is also what the Render build
+    # reads. CI used to say `node-version: 24` while that file said 22.16.0,
+    # so every check ran on a major the deploy never built with.
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: .node-version
+        cache: npm
+    - run: npm ci
+      shell: bash
+    - name: Read the Playwright version
+      id: playwright
+      if: inputs.browser != 'none'
+      shell: bash
+      run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+    # One cache a browser: a job that drives Chromium alone does not download
+    # WebKit to restore it.
+    - name: Cache Playwright browsers
+      id: browsers
+      if: inputs.browser != 'none'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ inputs.browser }}
+    - if: inputs.browser != 'none' && steps.browsers.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        BROWSER: ${{ inputs.browser }}
+      run: npx playwright install --with-deps "$BROWSER"
+    # The cache holds the browser, not the system libraries it links against:
+    # those live outside ~/.cache and the runner image does not promise them.
+    # So this runs apt on a cache hit too. It is the slow half of the step, and
+    # it stays until the jobs run in the pinned container Visual Regression
+    # uses, where the libraries are part of the image.
+    - if: inputs.browser != 'none' && steps.browsers.outputs.cache-hit == 'true'
+      shell: bash
+      env:
+        BROWSER: ${{ inputs.browser }}
+      run: npx playwright install-deps "$BROWSER"
