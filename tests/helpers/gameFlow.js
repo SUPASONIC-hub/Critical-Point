@@ -52,10 +52,6 @@ export async function clickThroughMotion(locator, label) {
   }
 }
 
-export async function waitUntilVisible(locator, timeout = ACTION_TIMEOUT_MS) {
-  return locator.waitFor({ state: "visible", timeout }).then(() => true).catch(() => false);
-}
-
 /**
  * The table's two verbs, for flows that only need to get past a decision.
  *

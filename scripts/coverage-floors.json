@@ -37,7 +37,7 @@
     "src/state/errorRecovery.js": 84,
     "src/state/loadProgress.js": 100,
     "src/state/openingState.js": 100,
-    "src/state/payloadSchemas.js": 98,
+    "src/state/payloadSchemas.js": 99,
     "src/state/playtestExport.js": 81,
     "src/state/retryableLazy.js": 100,
     "src/state/runLifecycle.js": 100,
@@ -58,7 +58,7 @@
     "src/state/useRunState.js": 100,
     "src/telemetry.js": 77,
     "src/viewModels/appViewModels.js": 86,
-    "src/viewModels/sceneViewModels.js": 20,
+    "src/viewModels/sceneViewModels.js": 21,
     "src/viewModels/seasonViewModels.js": 64
   },
   "unloaded": [

@@ -9,7 +9,7 @@ import { useShortcutHints } from "../state/accessibilitySettings.js";
  * one row now, with the label carried by `aria-label` and `title` rather than
  * by a line of type. The decision clock moved out of this bar entirely: it
  * belongs above the choices, where the decision is, and one clock is enough
- * (`src/components/DecisionClock.jsx`).
+ * (the table's own, in `src/gauntlet/GauntletStage.jsx`).
  */
 export function GameHeader({
   node,
