@@ -51,8 +51,9 @@ services:
     # the source of truth for what the site *should* send; `check:deploy`
     # asserts them against what it actually sends -- each security header by
     # value, the CSP by value (scripts/deploy-policy.mjs), the cache policy of
-    # the page, of one fingerprinted asset and of one image from the root, and
-    # that the entry script names the backend `connect-src` allows.
+    # the page, of one fingerprinted asset and of one image from the root,
+    # that the entry script names the backend `connect-src` allows, and that
+    # the service worker is the one built with the page being served.
     # `node scripts/check-deploy.mjs --offline` checks the values below and the
     # built dist/index.html without a network.
     headers:
@@ -87,6 +88,14 @@ services:
         name: Cache-Control
         value: no-cache
       - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      # The service worker (src/serviceWorker/worker.js) is asked for by one
+      # fixed name, and it is what names the release a device keeps: held by a
+      # cache in between, a device goes on installing the release before this
+      # one. A browser passes its own HTTP cache for this file whatever the
+      # header says; this is for the caches that are not the browser's.
+      - path: /sw.js
         name: Cache-Control
         value: no-cache
       - path: /manifest.webmanifest

@@ -214,6 +214,19 @@ export function rootImageCacheProblems(value) {
   return problems;
 }
 
+/**
+ * `/sw.js` is asked for by one fixed name and says which release a device
+ * keeps, so it is held to what the page is: asked for again every time. A
+ * browser does that for a worker on its own; a cache in front of the site
+ * does not, and one that keeps the file for five minutes has devices
+ * installing the release before this one for five minutes after a deploy.
+ */
+export const WORKER_PATH = "/sw.js";
+
+export function workerCacheProblems(value) {
+  return shellCacheProblems(value).map((problem) => problem.replace(/^the page\b/, "the service worker"));
+}
+
 /** The rules render.yaml declares that policy under: the two formats in `public/`, and the icons. */
 export const ROOT_IMAGE_PATHS = ["/*.webp", "/*.jpg", "/icons/*"];
 
@@ -273,6 +286,7 @@ export function renderYamlHeaderProblems(yaml) {
   for (const path of ["/", "/index.html"]) {
     problems.push(...shellCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
   }
+  problems.push(...workerCacheProblems(find(WORKER_PATH, "cache-control")).map((problem) => `${WORKER_PATH}: ${problem}`));
   problems.push(...assetCacheProblems(find("/assets/*", "cache-control")).map((problem) => `/assets/*: ${problem}`));
   for (const path of ROOT_IMAGE_PATHS) {
     problems.push(...rootImageCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
