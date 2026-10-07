@@ -465,18 +465,32 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   // The grade a push earned is a label, not a movement: it stays up for its
   // 0.7s. The blanket rule that cuts every animation short for reduced motion
   // used to take it down in a hundredth of a millisecond, unread.
+  // A push is graded against a beat, and a table that has just opened has not
+  // sounded one yet: pressed then, the push earns no grade and no label. On a
+  // slow runner the press used to land in that gap. The beat's own marker says
+  // when there is one to be graded against.
   const grade = await page.evaluate(
     () =>
       new Promise((resolve) => {
-        document.querySelector("[data-testid='commit-push']").click();
+        const stage = document.querySelector("[data-testid='gauntlet-stage']");
         const started = performance.now();
+        let pressed = false;
         const check = () => {
           const label = document.querySelector(".gx-grade");
           if (label) {
             const style = getComputedStyle(label);
             resolve({ text: label.textContent.trim(), animation: style.animationName, seconds: Number.parseFloat(style.animationDuration), opacity: Number(style.opacity) });
-          } else if (performance.now() - started > 3000) resolve(null);
-          else requestAnimationFrame(check);
+            return;
+          }
+          if (performance.now() - started > 8000) {
+            resolve(null);
+            return;
+          }
+          if (!pressed && getComputedStyle(stage).getPropertyValue("--gx-beat-zone").trim() === "1") {
+            pressed = true;
+            document.querySelector("[data-testid='commit-push']").click();
+          }
+          requestAnimationFrame(check);
         };
         requestAnimationFrame(check);
       }),
