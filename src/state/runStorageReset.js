@@ -25,7 +25,9 @@ import { LOCAL_RANKING_STORAGE_KEY } from "./useLocalRanking.js";
  * What it keeps, on purpose, and the question now says so (runLifecycle.resetRun):
  * the screen and sound settings, the relic codex, the NEW GAME+ unlock and the
  * season it remembers, the board nickname and writer id, and the online save's
- * code, its sync record and the copy on the server.
+ * code, its sync record and the copy on the server. The sync record is kept
+ * and marked: the reset holds a conflict in it, so the next run is not
+ * uploaded over that copy unasked (cloudSave.holdCloudCopyThroughReset).
  *
  * "trigger-prototype" is the save key the prototype wrote before the game had
  * a name; a reset still clears it from browsers that ran that build.

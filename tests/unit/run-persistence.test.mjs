@@ -129,6 +129,16 @@ test("deleting a slot leaves the slots the list on screen had not been told abou
   assert.deepEqual(harness.outside.saveSlots.map((slot) => slot.id), left.map((slot) => slot.id), "and the list shows what storage holds");
 });
 
+test("wiping the run holds the online copy against the run that comes next", async () => {
+  const uploaded = { pending: "", synced: "2026-10-01T00:00:00.000Z", revision: 3 };
+  const harness = await createRunHarness({ storage: { [appConfig.CLOUD_SAVE_SYNC_KEY]: JSON.stringify(uploaded) } });
+  harness.act("startGame");
+  harness.act("resetEverything");
+  assert.equal(harness.saved(), null);
+  assert.deepEqual(stored(appConfig.CLOUD_SAVE_SYNC_KEY).conflict, { savedAt: uploaded.synced, revision: 3 }, "nothing uploads over it until the player chooses");
+  assert.equal(stored(appConfig.CLOUD_SAVE_SYNC_KEY).revision, 3);
+});
+
 test("starting fresh from the recovery notice removes the save, keeps the slots, and reloads into the centre", async () => {
   const harness = await createRunHarness();
   harness.act("startGame");
