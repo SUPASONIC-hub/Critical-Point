@@ -133,6 +133,35 @@ export function readWorkerConfig(source) {
   }
 }
 
+/**
+ * Which worker a `sw.js` is, for a check to say out loud: `{ killed, text }`,
+ * or null when the text is not one the build writes.
+ *
+ * `workerProblems` below has nothing to hold the kill switch to, so it passes
+ * it -- rightly, and until this was added, silently: a `SERVICE_WORKER=off`
+ * left behind in the host's environment made every later deploy green with
+ * offline play switched off, and a deploy meant to switch it off could not be
+ * told from one that had not.
+ */
+export function describeWorker(source) {
+  const config = readWorkerConfig(source);
+  if (!config) return null;
+  if (config.release === "off") {
+    return {
+      killed: true,
+      text:
+        "sw.js is the kill switch (a build with SERVICE_WORKER=off): the page registers no worker, a device that has one loses it " +
+        "and its kept files on the next visit, and nothing opens offline. If that is not what this release is for, " +
+        "take SERVICE_WORKER out of the host's environment and deploy again",
+    };
+  }
+  const count = (list) => (Array.isArray(list) ? list.length : 0);
+  return {
+    killed: false,
+    text: `sw.js is release ${config.release}: ${count(config.precache)} files kept at install, ${count(config.warm)} more once a table is up`,
+  };
+}
+
 /** The commit a built page says it came from (`build-sha`, vite.config.js), or null. */
 export function buildShaFromHtml(html) {
   return /<meta\s+name="build-sha"\s+content="([0-9a-f]{7,40})"/i.exec(String(html ?? ""))?.[1] ?? null;
@@ -146,7 +175,8 @@ export function buildShaFromHtml(html) {
 export function workerProblems({ source, html, hasFile = null }) {
   const config = readWorkerConfig(source);
   if (!config) return ["sw.js carries no WORKER_CONFIG line, so it is not the worker the build writes"];
-  // Switched off on purpose: there is nothing for it to agree with.
+  // Switched off on purpose: there is nothing for it to agree with. Not a
+  // problem, and not nothing either: `describeWorker` is how a check says so.
   if (config.release === "off") return [];
   const problems = [];
   const sha = buildShaFromHtml(html);

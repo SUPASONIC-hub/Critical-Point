@@ -19,6 +19,7 @@ export function parseCsp(value) {
 }
 
 const WILDCARDS = new Set(["*", "https:", "http:", "data:", "blob:"]);
+const isWide = (source) => WILDCARDS.has(source.toLowerCase()) || source.includes("*");
 
 /** Every way `value` falls short of the policy; empty when it holds. */
 export function cspProblems(value) {
@@ -26,24 +27,34 @@ export function cspProblems(value) {
   const problems = [];
   const effective = (name) => csp.get(name) ?? csp.get("default-src") ?? null;
 
-  const scripts = effective("script-src");
-  if (!scripts) {
-    problems.push("no script-src or default-src, so any script runs");
-  } else {
-    for (const source of scripts) {
+  if (!effective("script-src")) problems.push("no script-src or default-src, so any script runs");
+  // `script-src-elem` and `script-src-attr` are what a browser reads for a
+  // <script> and for an inline handler when they are there, in place of
+  // `script-src`: a policy with a strict `script-src` and a loose
+  // `script-src-elem` beside it runs anything, and used to pass.
+  for (const name of ["script-src", "script-src-elem", "script-src-attr"]) {
+    for (const source of (name === "script-src" ? effective(name) : csp.get(name)) ?? []) {
       const lower = source.toLowerCase();
       if (lower === "'unsafe-inline'" || lower === "'unsafe-eval'" || lower === "'unsafe-hashes'") {
-        problems.push(`script-src allows ${source}`);
-      } else if (WILDCARDS.has(lower) || lower.includes("*")) {
-        problems.push(`script-src allows scripts from ${source}`);
+        problems.push(`${name} allows ${source}`);
+      } else if (isWide(source)) {
+        problems.push(`${name} allows scripts from ${source}`);
       }
     }
   }
   if (effective("object-src")?.join(" ") !== "'none'") {
     problems.push("object-src is not 'none'");
   }
+  // By what they say, like the rest: `base-uri *` and `frame-ancestors *` are
+  // both there and both mean the same as leaving them out.
   if (!csp.has("base-uri")) problems.push("no base-uri, so an injected <base> can re-point every relative script");
+  for (const source of (csp.get("base-uri") ?? []).filter(isWide)) {
+    problems.push(`base-uri allows ${source}, so an injected <base> can re-point every relative script`);
+  }
   if (!csp.has("frame-ancestors")) problems.push("no frame-ancestors, so the page can be framed");
+  for (const source of (csp.get("frame-ancestors") ?? []).filter(isWide)) {
+    problems.push(`frame-ancestors allows ${source}, so the page can be framed`);
+  }
   for (const name of ["img-src", "font-src", "connect-src", "default-src"]) {
     for (const source of csp.get(name) ?? []) {
       if (source === "*" || source === "https:" || source === "http:") {
@@ -117,6 +128,37 @@ export function readRenderYamlHeaders(yaml) {
   return headers;
 }
 
+/**
+ * What the app has no use for, and render.yaml's Permissions-Policy switches
+ * off by name. All of them are asked of the live header: five were, so the
+ * other twelve could be lost on the way into the dashboard and nothing said
+ * so. A unit test holds this list to the file's.
+ */
+export const PERMISSIONS_OFF = [
+  "accelerometer",
+  "bluetooth",
+  "browsing-topics",
+  "camera",
+  "display-capture",
+  "encrypted-media",
+  "geolocation",
+  "gyroscope",
+  "hid",
+  "magnetometer",
+  "microphone",
+  "midi",
+  "payment",
+  "publickey-credentials-get",
+  "serial",
+  "usb",
+  "xr-spatial-tracking",
+];
+
+/** The features a Permissions-Policy value switches off for everyone: `name=()`. */
+export function permissionsSwitchedOff(value) {
+  return [...String(value ?? "").matchAll(/([a-z-]+)\s*=\s*\(\s*\)/gi)].map((match) => match[1].toLowerCase());
+}
+
 /** The headers every page is served with, and what each has to say. */
 const SITE_HEADERS = [
   ["x-content-type-options", (value) => (/^nosniff$/i.test(value.trim()) ? null : "is not nosniff")],
@@ -133,8 +175,8 @@ const SITE_HEADERS = [
   // What the app has no use for, switched off by name: a script that ran would
   // have to ask, and the browser would refuse.
   ["permissions-policy", (value) => {
-    const off = new Set([...value.matchAll(/([a-z-]+)\s*=\s*\(\s*\)/gi)].map((match) => match[1].toLowerCase()));
-    const missing = ["camera", "microphone", "geolocation", "payment", "usb"].filter((feature) => !off.has(feature));
+    const off = new Set(permissionsSwitchedOff(value));
+    const missing = PERMISSIONS_OFF.filter((feature) => !off.has(feature));
     return missing.length ? `leaves ${missing.join(", ")} on` : null;
   }],
 ];
@@ -236,6 +278,25 @@ export function firstRootImagePath(html) {
   return match ? match[1] : null;
 }
 
+/**
+ * One file the page names for each of those rules: `[{ rule, path }]`, with a
+ * null path where it names none. The live check used to read the first image
+ * alone, which on a release is a `.webp` -- so `/*.jpg` and `/icons/*` could
+ * be missing from the dashboard for good and no warning ever said so.
+ *
+ * A name written with its origin counts: a release's `og:image` is absolute
+ * (`absoluteSiteUrls`, vite.config.js) and is the one `.jpg` the page names.
+ */
+export function rootImageSamples(html) {
+  const text = String(html ?? "");
+  const named = (file) => new RegExp(`["'\\s,](?:https?://[^"'\\s,/]+)?(/${file})(?=["'\\s,?#])`, "i").exec(text)?.[1] ?? null;
+  return [
+    { rule: "/*.webp", path: named("[A-Za-z0-9._-]+\\.webp") },
+    { rule: "/*.jpg", path: named("[A-Za-z0-9._-]+\\.jpg") },
+    { rule: "/icons/*", path: named("icons/[A-Za-z0-9._-]+") },
+  ];
+}
+
 /** The script the page starts from, as a path: `/assets/index-abc123.js`. */
 export function entryScriptPath(html) {
   for (const match of String(html ?? "").matchAll(/<script\b([^>]*)>/gi)) {
@@ -276,8 +337,35 @@ export function backendOriginProblems(script, cspValue) {
 }
 
 /**
+ * The backend's address in a chunk that is not the entry script, for the
+ * check that runs before a deploy. `scripts` is `[[path, text]]` for every
+ * script the build holds.
+ *
+ * The live check reads the entry script and fails a release that does not
+ * name its backend. Offline the same finding is only a note -- a desktop
+ * build with no `.env.local` has no backend and is a correct build -- so a
+ * change to how the bundle is split that moved the address out of the entry
+ * script passed every check before the merge and turned Deploy red after it.
+ * A build that names its backend somewhere else is that case, and it is told
+ * apart from a build that names none.
+ */
+export function backendPlacementProblems(entryPath, scripts, cspValue) {
+  const names = (text) => backendOriginProblems(text, cspValue).length === 0;
+  const entry = scripts.find(([file]) => file === entryPath);
+  if (!entry || names(entry[1])) return [];
+  const elsewhere = scripts.filter(([file, text]) => file !== entryPath && names(text)).map(([file]) => file);
+  if (elsewhere.length === 0) return [];
+  return [
+    `the backend's address is in ${elsewhere.join(", ")} and not in the entry script ${entryPath}: ` +
+      "the check after a deploy reads the entry script alone and would fail this release",
+  ];
+}
+
+/**
  * What `render.yaml` has to declare, so the written record and the checks
- * agree on what the dashboard is meant to be set to.
+ * agree on what the dashboard is meant to be set to. Every rule in the file
+ * is asked for here: a line that could be deleted without this noticing is a
+ * line the dashboard can lose the same way.
  */
 export function renderYamlHeaderProblems(yaml) {
   const headers = readRenderYamlHeaders(yaml);
@@ -290,6 +378,12 @@ export function renderYamlHeaderProblems(yaml) {
   problems.push(...assetCacheProblems(find("/assets/*", "cache-control")).map((problem) => `/assets/*: ${problem}`));
   for (const path of ROOT_IMAGE_PATHS) {
     problems.push(...rootImageCacheProblems(find(path, "cache-control")).map((problem) => `${path}: ${problem}`));
+  }
+  if (!/^same-origin$/i.test((find("/assets/*", "cross-origin-resource-policy") ?? "").trim())) {
+    problems.push("/assets/*: cross-origin-resource-policy is not same-origin, so another site can load the scripts and the font");
+  }
+  if (!/^application\/manifest\+json$/i.test((find("/manifest.webmanifest", "content-type") ?? "").trim())) {
+    problems.push("/manifest.webmanifest: content-type is not application/manifest+json");
   }
   return problems;
 }

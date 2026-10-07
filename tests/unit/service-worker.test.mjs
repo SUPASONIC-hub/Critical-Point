@@ -6,6 +6,7 @@ import {
   buildKillSource,
   buildShaFromHtml,
   buildWorkerSource,
+  describeWorker,
   entryFromHtml,
   precacheFromHtml,
   readWorkerConfig,
@@ -456,6 +457,19 @@ test("a worker is held to the page beside it", () => {
   assert.match(workerProblems({ source: other, html: stamped })[0], /release fff0000fff0000 and the page is abc1234abc1234/);
   const empty = buildWorkerSource("", { ...workerConfigFor({ sha: "", html: PAGE, files: FILES }), precache: [] });
   assert.match(workerProblems({ source: empty, html: PAGE }).join("\n"), /precaches nothing/);
+});
+
+test("a check can say which worker it found, and the kill switch is not found in silence", () => {
+  const config = workerConfigFor({ sha: "abc1234", html: PAGE, files: FILES });
+  const release = describeWorker(buildWorkerSource("", config));
+  assert.equal(release.killed, false);
+  assert.match(release.text, new RegExp(`^sw\\.js is release ${config.release}: 10 files kept at install, 5 more`));
+  // It passes `workerProblems` by having nothing to disagree with, so every
+  // deploy after a forgotten SERVICE_WORKER=off was green with offline play off.
+  const killed = describeWorker(buildKillSource(CACHE_PREFIX));
+  assert.equal(killed.killed, true);
+  assert.match(killed.text, /kill switch[\s\S]*SERVICE_WORKER/);
+  assert.equal(describeWorker("console.log(1)"), null);
 });
 
 test("the kill switch is a worker that removes its caches and itself, and is not a problem", async () => {
