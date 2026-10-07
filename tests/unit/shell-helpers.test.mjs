@@ -540,7 +540,14 @@ test("consent is only real once the save holds it, and the box says why it snapp
   // A tick the browser kept.
   let event = box(true);
   make(true)(event);
-  assert.deepEqual(calls, [["persist", { dataConsent: true }], ["consent", true], ["note", null]]);
+  assert.deepEqual(calls.slice(0, 3), [["persist", { dataConsent: true }], ["consent", true], ["note", null]]);
+  // The report's line is corrected only if it still says consent was withdrawn.
+  const [, correct] = calls[3];
+  const withdrawn = { tone: "local", text: "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다." };
+  assert.equal(correct(withdrawn).tone, "ready");
+  assert.match(correct(withdrawn).text, /동의했습니다/);
+  const offline = { tone: "local", text: "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다." };
+  assert.equal(correct(offline), offline, "a line about something else is left as it is");
 
   // A tick it refused: the box snaps back and says so beside itself.
   calls.length = 0;
@@ -558,13 +565,13 @@ test("consent is only real once the save holds it, and the box says why it snapp
   assert.deepEqual(calls.slice(1, 3), [["consent", false], ["queue", []]]);
   assert.equal(calls.find(([name]) => name === "note")[1].tone, "local");
 
-  // An untick it refused puts the queue back as it was.
+  // An untick it refused leaves the queue alone: nothing emptied it, and
+  // setting it back to this render's copy dropped rows folded in since.
   calls.length = 0;
   event = box(false);
-  const queue = [{ id: "kept" }];
-  make(false, queue)(event);
+  make(false, [{ id: "kept" }])(event);
   assert.equal(event.target.checked, true);
-  assert.deepEqual(calls.find(([name]) => name === "queue"), ["queue", queue]);
+  assert.equal(calls.find(([name]) => name === "queue"), undefined);
   assert.deepEqual(calls.find(([name]) => name === "consent"), ["consent", true]);
   const note = calls.find(([name]) => name === "note")[1];
   assert.equal(note.tone, "error");

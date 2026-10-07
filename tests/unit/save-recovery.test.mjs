@@ -28,6 +28,7 @@ import { applyEffect } from "../../src/riskLogic.js";
 import { isChunkLoadError, quietImport, reloadForMissingChunk } from "../../src/state/chunkReload.js";
 import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, resetRecordedErrors, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
+import { createConsentChange } from "../../src/state/useConsentToggle.js";
 
 /** Browser storage as one Map, with a byte budget so a full disk can be staged. */
 function installStorage({ quota = Infinity } = {}) {
@@ -275,6 +276,54 @@ test("an error row queued in storage is handed to the runtime's queue once", () 
     const taken = takeQueuedErrorTelemetry();
     assert.deepEqual(taken.map((item) => [item.id, item.type, item.payload.event_id]), [["error-1", "error", "event-1"]]);
     assert.deepEqual(takeQueuedErrorTelemetry(), [], "and is handed over once");
+  } finally {
+    restore();
+  }
+});
+
+test("unticking consent drops the error rows waiting to be folded into the next save", () => {
+  const { restore } = installStorage();
+  try {
+    takeQueuedErrorTelemetry();
+    writeSaveState(runSave({ dataConsent: true }), { force: true });
+    const entry = { id: "error-2", occurredAt: "2026-09-28T00:00:02.000Z", context: { currentCase: "case03", nodeId: "c3_start" } };
+    assert.equal(queueSavedErrorTelemetry(entry, { event_id: "event-2", source: "window-error", error_message: "failed" }), true);
+    // The box on the intro, before a run is started: the shell's own persist
+    // empties the queue in the save, and knows nothing of the error path's list.
+    const said = [];
+    const untick = createConsentChange({
+      persist: () => ({ storageSaved: true }),
+      setDataConsent: () => {},
+      setPendingTelemetry: () => {},
+      setTelemetryStatus: (status) => said.push(status),
+      setNote: () => {},
+    });
+    untick({ target: { checked: false } });
+    assert.match(said.at(-1).text, /대기열도 삭제했습니다/);
+    assert.deepEqual(takeQueuedErrorTelemetry(), [], "the runtime's first save has nothing to put back into a save with consent off");
+  } finally {
+    restore();
+  }
+});
+
+test("an untick the browser refused keeps the error rows it could not delete", () => {
+  const { restore } = installStorage();
+  try {
+    takeQueuedErrorTelemetry();
+    writeSaveState(runSave({ dataConsent: true }), { force: true });
+    const entry = { id: "error-3", occurredAt: "2026-09-28T00:00:03.000Z", context: { currentCase: "case03", nodeId: "c3_start" } };
+    queueSavedErrorTelemetry(entry, { event_id: "event-3", source: "window-error", error_message: "failed" });
+    const queueWrites = [];
+    const untick = createConsentChange({
+      persist: () => ({ storageSaved: false }),
+      setDataConsent: () => {},
+      setPendingTelemetry: (queue) => queueWrites.push(queue),
+      setTelemetryStatus: () => {},
+      setNote: () => {},
+    });
+    untick({ target: { checked: false } });
+    assert.deepEqual(queueWrites, [], "consent is still on, so the queue is not touched");
+    assert.deepEqual(takeQueuedErrorTelemetry().map((item) => item.id), ["error-3"]);
   } finally {
     restore();
   }
