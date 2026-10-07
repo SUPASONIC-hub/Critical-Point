@@ -23,11 +23,18 @@ function LostToTab({ onReload }) {
  * The question a second tab asks before it takes a bet another tab is holding.
  * It is a dialog that wants an answer, so it has a name, takes focus when it
  * opens and keeps Tab inside: it said `alertdialog` and did none of the three.
+ * Escape is the answer that changes nothing -- 그 탭에 두기 -- which is also
+ * where focus starts.
  */
 function HeldElsewhere({ onClaim, onLeave }) {
   const dialogRef = useRef(null);
   const leaveRef = useRef(null);
   const trapTab = useDialogFocus(dialogRef, leaveRef);
+  const onKeyDown = (event) => {
+    if (event.key !== "Escape") return trapTab(event);
+    event.preventDefault();
+    return onLeave();
+  };
   return (
     <div
       ref={dialogRef}
@@ -37,7 +44,7 @@ function HeldElsewhere({ onClaim, onLeave }) {
       aria-labelledby="gx-held-title"
       aria-describedby="gx-held-text"
       data-testid="table-held-elsewhere"
-      onKeyDown={trapTab}
+      onKeyDown={onKeyDown}
     >
       <span id="gx-held-title" className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
       <p id="gx-held-text">

@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { getCloseness, getGoodWindowMs, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
 import { FX_READERS, FX_VARIABLES, registerFxVariables } from "./fxVariables.js";
-import { monotonicNow } from "./timing.js";
+import { createLightGate, monotonicNow } from "./timing.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
@@ -37,12 +37,22 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * 190 a minute next to the wall, and at that rate the vignette and the grade
  * flash were a full-screen red flash at 3.2Hz. The sound, the ring on the push
  * button and the grading keep every beat; the screen-wide pulse takes every
- * other one once the beat is faster than `PULSE_MIN_MS`.
+ * other one once the beat is faster than `PULSE_MIN_MS`. The hit zone is under
+ * the same floor: it is a hard on and off -- a cyan ring and glow on four
+ * buttons -- and it had been left out, so past 180 a minute it blinked faster
+ * than three times a second for everyone, whatever they had turned down. It
+ * lights on every other beat there, and a press on the unlit one grades the
+ * same.
  *
  * Reduced motion removes travel -- the shake and the ring's closing scale --
  * and nothing else. The red closes in, the beat still thumps the vignette's
  * opacity, the bust still floods the screen: colour and sound are not motion.
  * The preference is followed live, not read once at mount.
+ *
+ * The comfort setting (`calmEffects`) turns the body down whatever the OS
+ * says: no shake, the grade flash at a third, no beat pulse on the pot, the
+ * clock and the heart, and the ring held closed as reduced motion holds it,
+ * because a ring that snaps open on every beat is a blink at the beat's rate.
  *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
@@ -118,7 +128,13 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
     let nextBeat = 0;
     let beat = 0;
     let pulsedAt = 0;
-    let upcoming = null;
+    // Beats that have been scheduled and not yet heard, oldest first. It was
+    // one slot, overwritten by each new beat: with more output latency than
+    // one beat lasts -- a Bluetooth speaker near the wall -- every beat was
+    // replaced before its moment came, the clock was never stamped again, and
+    // presses were graded against a beat long gone.
+    const pending = [];
+    const zoneGate = createLightGate(PULSE_MIN_MS);
     let lastTickSecond = -1;
     let droneAt = 0;
     let readersAt = 0;
@@ -155,7 +171,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
         if (time >= nextBeat) {
           const latency = Math.min(LATENCY_MAX_MS, Math.max(0, playHeartbeat(heat)));
           nextBeat = time + 60000 / bpm;
-          upcoming = { at: now + latency, period: 60000 / bpm, heat };
+          pending.push({ at: now + latency, period: 60000 / bpm, heat });
         }
         const remaining = Math.ceil(getRemainingSeconds(win));
         if (remaining <= 5 && remaining !== lastTickSecond) {
@@ -164,17 +180,17 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
         }
       } else {
         nextBeat = time + 120;
-        upcoming = null;
+        pending.length = 0;
       }
-      if (upcoming && now >= upcoming.at) {
-        clock.at = upcoming.at;
-        clock.period = upcoming.period;
+      while (pending.length > 0 && now >= pending[0].at) {
+        const heard = pending.shift();
+        clock.at = heard.at;
+        clock.period = heard.period;
         if (now - pulsedAt >= PULSE_MIN_MS) {
           pulsedAt = now;
           beat = 1;
-          impactRef.current = Math.min(1, impactRef.current + 0.04 + upcoming.heat * 0.12);
+          impactRef.current = Math.min(1, impactRef.current + 0.04 + heard.heat * 0.12);
         }
-        upcoming = null;
       }
       if (!beating) clock.period = 0;
       if (time >= droneAt) {
@@ -183,30 +199,29 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       }
 
       let phase = 0;
-      let zone = 0;
+      let inWindow = false;
       if (beating && clock.period > 0) {
         const since = Math.max(0, now - clock.at);
         phase = Math.min(1, since / clock.period);
         const offset = Math.min(since, Math.max(0, clock.period - since));
-        zone = offset <= getGoodWindowMs(clock.period, wide) ? 1 : 0;
+        inWindow = offset <= getGoodWindowMs(clock.period, wide);
       }
+      const zone = zoneGate(inWindow, now);
 
       beat = Math.max(0, beat - delta / 260);
       impactRef.current = Math.max(0, impactRef.current - delta / 480);
       flashRef.current = Math.max(0, flashRef.current - delta / 240);
       const trauma = Math.min(1, impactRef.current + (live ? Math.pow(felt, 3) * 0.45 : 0));
-      // The comfort setting turns the body down whatever the OS says: no shake,
-      // and the grade flash at a third.
       const calm = getAccessibility().calmEffects;
       const shake = reducedMotion || calm ? 0 : trauma * trauma;
       const x = (Math.sin(time * 0.071) + Math.sin(time * 0.137)) * 0.5 * shake * SHAKE_PX;
       const y = (Math.sin(time * 0.089) + Math.sin(time * 0.173)) * 0.5 * shake * SHAKE_PX * 0.6;
 
       write("--gx-heat", heat.toFixed(3));
-      write("--gx-beat", beat.toFixed(3));
+      write("--gx-beat", calm ? "0.000" : beat.toFixed(3));
       write("--gx-shake-x", `${x.toFixed(2)}px`);
       write("--gx-shake-y", `${y.toFixed(2)}px`);
-      write("--gx-beat-phase", reducedMotion ? "1" : phase.toFixed(2));
+      write("--gx-beat-phase", reducedMotion || calm ? "1" : phase.toFixed(2));
       write("--gx-beat-live", beating ? "1" : "0");
       write("--gx-beat-zone", zone ? "1" : "0");
       write("--gx-flash", (calm ? flashRef.current / 3 : flashRef.current).toFixed(2));

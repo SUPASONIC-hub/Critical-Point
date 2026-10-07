@@ -645,3 +645,10 @@
     opacity: 0;
   }
 }
+
+/* The comfort setting (comfort.css) leaves the room its slow air and takes
+   the two effects that flash. Both rest at opacity 0. */
+:root[data-calm-effects] .gx-plate-flashes > circle,
+:root[data-calm-effects] .gx-plate-lightning {
+  animation: none;
+}

@@ -17,6 +17,55 @@ export function formatMultiplier(value) {
   return multiplier >= 10 ? `×${Math.floor(multiplier)}` : `×${(Math.floor(multiplier * 10 + 1e-9) / 10).toFixed(1)}`;
 }
 
+const VERDICT_CAUSE_COPY = Object.freeze({
+  cash: "직접 확정했다",
+  push: "한 번 더 밀었다",
+  creep: "시계가 올린 열이 벽에 닿았다",
+  timeout: "시계를 방치했다",
+  focus: "헛박자 락이 열을 벽까지 올렸다",
+  abandon: "걸어 둔 판을 떠났다",
+});
+
+/**
+ * Why the window closed, in the reveal's ledger. One sentence a cause
+ * (`VERDICT_CAUSES`): the two busts the player did not press for -- the
+ * clock's heat creeping into the wall, and a lock off the beat heating into it
+ * -- used to fall through to the cash's line, so a BUST headline sat over
+ * "직접 확정했다". A cause this table does not know says only what the outcome
+ * proves.
+ */
+export function describeVerdictCause(verdict) {
+  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
+}
+
+/**
+ * What the table says aloud about its clock, in one polite region. The timer
+ * itself is silent to a screen reader, and the tick that marks the last five
+ * seconds is sound, so the clock is called once at ten seconds and once at
+ * five. It is also called when the reading clock ran out and opened the table
+ * by itself: nothing was pressed, the briefing simply went away, and the first
+ * thing a listener heard about a running clock used to be "10초 남았다".
+ */
+export const CLOCK_OPENED_CALL = "읽는 시간이 끝나 판이 열렸다. 시계가 흐른다";
+const CLOCK_OPENED_SECONDS = 5;
+
+export function getClockCall({ live, paused, remaining, elapsed = 0, openedByClock = false }) {
+  if (!live || paused) return "";
+  if (remaining <= 5) return "5초 남았다";
+  if (remaining <= 10) return "10초 남았다";
+  return openedByClock && elapsed < CLOCK_OPENED_SECONDS ? CLOCK_OPENED_CALL : "";
+}
+
+/**
+ * The two notices about another tab. They are drawn in the same place, and
+ * one is the answer to the other: 그 탭에 두기 stops this table, so the
+ * question that offered it comes down as the notice goes up. It used to stay
+ * -- still a modal dialog holding the focus -- with the notice on top of it.
+ */
+export function getTabNotices({ locked, awaitingClaim, live }) {
+  return { lost: Boolean(locked && (live || awaitingClaim)), held: Boolean(awaitingClaim && !locked) };
+}
+
 export function describeEffect(effect = {}, resourceMeta = {}) {
   return Object.entries(effect)
     .filter(([, value]) => Number(value) !== 0)
