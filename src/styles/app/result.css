@@ -1203,7 +1203,7 @@
 }
 .bar-row {
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr) 40px;
+  grid-template-columns: 5.625rem minmax(0, 1fr) 2.5rem;
   align-items: center;
   gap: 12px;
   min-height: 32px;
@@ -1748,7 +1748,8 @@
     grid-column: 2;
     grid-row: 2;
     align-self: center;
-    width: 104px;
+    /* Never narrower than the rem type inside it at a larger root size. */
+    width: max(104px, 6.5rem);
     gap: 4px;
     padding: 10px;
   }
@@ -1932,7 +1933,7 @@
 .ending-shell .ending-beat button:hover {
   transform: translateY(-2px);
 }
-.ending-shell .ending-quiet-skip {
+.ending-shell .ending-beat .ending-quiet-skip {
   background: var(--ui-glass);
   color: var(--ui-text-2);
   border: 1px solid var(--ui-line-strong);
@@ -1992,6 +1993,11 @@
 .observation-grid b {
   color: var(--color-white);
   font-size: 1.375rem;
+}
+@media (max-width: 480px) {
+  .observation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .observer-turning-record {
   background: rgb(217 255 98 / 0.1) !important;
@@ -2094,7 +2100,7 @@
 }
 .ranking-comparison > div {
   display: grid;
-  grid-template-columns: 84px 1fr 32px;
+  grid-template-columns: 5.25rem 1fr 2rem;
   gap: 8px;
   align-items: center;
 }

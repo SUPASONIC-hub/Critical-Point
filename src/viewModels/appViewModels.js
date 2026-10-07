@@ -47,7 +47,7 @@ export const viewGroups = {
     ],
     telemetry: [
       "dataConsent", "setDataConsent", "pendingTelemetry", "setTelemetryStatus", "telemetryEnabled",
-      "isOnline", "telemetrySummary", "sessionCode", "setPendingTelemetry", "setSaveStatus",
+      "isOnline", "telemetrySummary", "sessionCode", "setPendingTelemetry",
     ],
     debug: [
       "debugToolsEnabled", "showErrorLog", "setShowErrorLog", "unlockAllCasesForTest",

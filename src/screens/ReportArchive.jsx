@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Copy, MessageSquareText, Sparkles } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { GauntletLedger } from "../gauntlet/GauntletLedger.jsx";
-import { isResourceGain } from "../gameConstants.js";
+import * as gameConstants from "../gameConstants.js";
 
 /**
  * Act three of the report: everything it used to open with, folded.
@@ -22,11 +22,11 @@ import { isResourceGain } from "../gameConstants.js";
  * opens it. Nothing in it keeps state of its own: the feedback form is
  * controlled from `view`, so closing and reopening loses nothing.
  */
-export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
+export function ReportArchive({ view, observerEndingRecord, endingAxes, observationLabels }) {
   const [open, setOpen] = useState(false);
   const {
     common: { currentCase, renderSceneLines },
-    ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile },
+    ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile, unopenedClueCount },
     score: {
       decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result, clamp,
       easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
@@ -53,6 +53,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
       text: entry.observerTag.text,
     }));
   const observerTurningPoint = observerPattern?.turningPoint;
+  const clueTotal = clueCount + unopenedClueCount;
   return (
     <details className="report-archive" onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary>
@@ -85,7 +86,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
       <section className="observation-panel" aria-label="관찰 장부">
         <div className="panel-title-row">
           <h2>관찰 장부</h2>
-          <span>이번 시즌에 처음 공개되는 네 가지 반응</span>
+          <span>마지막 사건에서 처음 공개되는 네 가지 반응</span>
         </div>
         <div className="observer-pattern-card">
           <span>{observerEndingRecord.label}</span>
@@ -95,7 +96,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
         <div className="observation-grid">
           {Object.entries(observationLedger).map(([key, value]) => (
             <article key={key}>
-              <span>{key}</span>
+              <span>{observationLabels[key] ?? key}</span>
               <b>{value}</b>
             </article>
           ))}
@@ -130,14 +131,14 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
         <strong lang="en">RETRY OBJECTIVES</strong>
         {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
         <button type="button" onClick={view.startRecoveryRoute}>복구 루트 시작</button>
-        {view.endingCause && <p className="failure-cause"><b>PRIMARY CAUSE: {view.endingCause.id}</b> {view.endingCause.text} {view.endingCause.recovery}</p>}
+        {view.endingCause && <p className="failure-cause"><b lang="en">PRIMARY CAUSE</b> {view.endingCause.text} {view.endingCause.recovery}</p>}
       </section>
     )}
     {view.playReport && (
       <section className="play-report-panel" aria-label="플레이 리포트">
         <span lang="en">PLAYER REPORT</span>
         <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
-        <p>최근 경로: {view.playReport.route.join(" → ") || "기록 없음"}</p>
+        <p>최근 지나온 장면: {view.playReport.route.join(" → ") || "기록 없음"}</p>
       </section>
     )}
     {view.telemetryDashboard && (
@@ -171,7 +172,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
     {view.balanceSignals?.length > 0 && (
       <section className="balance-report" aria-label="플레이 밸런스 리포트">
         <span lang="en">BALANCE SIGNAL</span>
-        <p>{view.balanceSignals.map((signal) => `${signal.choiceId} ${signal.share}%`).join(" · ")} 선택 편중이 감지되었습니다. 다음 기록에서 다른 선택을 시험해 보세요.</p>
+        <p>{view.balanceSignals.map((signal) => `“${signal.label}” ${signal.share}%`).join(" · ")} 선택 편중이 감지되었습니다. 다음 기록에서 다른 선택을 시험해 보세요.</p>
       </section>
     )}
     <section className="ending-axis-panel" aria-label="엔딩 결정 축">
@@ -592,7 +593,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
               {/* Green marks what the run gained, so 사람 피해 +11 is a
                   loss here even though the number went up. */}
               {Object.entries(entry.effect ?? {}).map(([key, value]) => (
-                <span key={key} className={isResourceGain(key, value) ? "delta-up" : "delta-down"}>
+                <span key={key} className={gameConstants.isResourceGain(key, value) ? "delta-up" : "delta-down"}>
                   {resourceMeta[key]?.label ?? key} {value > 0 ? "+" : ""}
                   {value}
                 </span>
@@ -609,9 +610,11 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes }) {
         <h2>{endingProfile.title}</h2>
         <p>{endingProfile.text} {finalAftermathEntry ? `마지막 후폭풍에서 고른 길: "${finalAftermathEntry.choice}".` : ""}</p>
         <div className="ending-clue-summary">
-          <strong>{clueCount}/6 숨은 단서 발견</strong>
+          {/* Out of every clue the season holds, and the bar is the one the
+              record endings ask for. It read "30/6", against a bar of four. */}
+          <strong>{clueCount}/{clueTotal} 숨은 단서 발견</strong>
           <span>
-            {clueCount >= 4
+            {clueCount >= clueTotal * gameConstants.ENDING_GATES.clueRate
               ? "실험의 바깥쪽까지 도달했습니다. 마지막 기록이 당신의 선택을 기다립니다."
               : "다른 장면에서 위험한 성공을 만들면 더 많은 기록을 찾을 수 있습니다."}
           </span>

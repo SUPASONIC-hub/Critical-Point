@@ -148,6 +148,26 @@ export function buildLeaderboard(rows = [], limit = 50) {
     .map((entry, index) => ({ ...entry, position: index + 1 }));
 }
 
+/**
+ * The ranking's status card, by what the table is doing. A headline is a
+ * statement about the rows, so there is none until there are rows to read:
+ * the card said "아직 공개된 기록이 없습니다" while the request was still out.
+ * `canRetry` is a request that failed with the browser online; offline, the
+ * table is fetched again when the connection returns.
+ */
+export function getLeaderboardStatusCopy({ status, headline, error = "" }) {
+  if (status === "idle" || status === "loading") {
+    return { loading: true, canRetry: false, eyebrow: "CONNECTING", title: "기록을 불러오는 중입니다.", text: "" };
+  }
+  return {
+    loading: false,
+    canRetry: status === "error",
+    eyebrow: status === "ready" ? "REMOTE LEADERBOARD" : "LOCAL PLAYTEST BOARD",
+    title: headline.title,
+    text: error || headline.text,
+  };
+}
+
 export function getLeaderboardHeadline(entries = []) {
   if (entries.length === 0) {
     return {

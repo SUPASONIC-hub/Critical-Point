@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ArrowLeft, RotateCw, Send, ShieldAlert } from "lucide-react";
+import { GuardedButton } from "../components/GuardedButton.jsx";
 
 // What the list says in place of posts, by what the board is doing. "Nothing
 // here yet" is only true of a board that answered: it used to be printed
@@ -40,7 +41,7 @@ export function BoardScreen({
   boardPostStatus,
   isPostingToBoard,
   canWriteBoardPost,
-  canSubmitBoardPost,
+  boardSubmitBlock,
   activeBoardPrivacySignals,
   anonymizeBoardBody,
   submitBoardPost,
@@ -95,6 +96,10 @@ export function BoardScreen({
             )}
           </section>
           <section className="board-composer" aria-label="글 남기기">
+            {/* The counter is the field's description, not part of its name:
+                inside the label it made the name "이름 0/24자 · 이 이름은
+                공개됩니다". Hidden from the name, it is still read as the
+                description it is referenced as. */}
             <label className="board-field">
               <span>이름</span>
               <input
@@ -103,9 +108,10 @@ export function BoardScreen({
                 maxLength={nicknameMaxLength}
                 placeholder="게시판에 보일 이름"
                 disabled={!canWriteBoardPost}
+                aria-describedby="board-nickname-count"
                 onChange={(event) => setBoardNickname(event.target.value)}
               />
-              <small>{boardNickname.trim().length}/{nicknameMaxLength}자 · 이 이름은 공개됩니다</small>
+              <small id="board-nickname-count" aria-hidden="true">{boardNickname.trim().length}/{nicknameMaxLength}자 · 이 이름은 공개됩니다</small>
             </label>
             <label className="board-field">
               <span>남길 말</span>
@@ -115,14 +121,16 @@ export function BoardScreen({
                 maxLength={bodyMaxLength}
                 placeholder="사건을 지나며 남은 생각을 적어 주세요. 링크는 올릴 수 없습니다."
                 disabled={!canWriteBoardPost}
+                aria-describedby="board-body-count"
                 onChange={(event) => setBoardBody(event.target.value)}
               />
-              <small>{boardBody.length}/{bodyMaxLength}자</small>
+              <small id="board-body-count" aria-hidden="true">{boardBody.length}/{bodyMaxLength}자</small>
             </label>
             {/* The honeypot. Hidden from sight, from the tab order and from the
                 accessibility tree, so only something reading the markup finds
-                it. A post that fills it is answered with a success and written
-                nowhere. */}
+                it. A browser's autofill reads the markup too: the data-
+                attributes are the ones the common password managers honour,
+                and a post stopped here is told so (checkBoardSubmit). */}
             <label className="board-honeypot" aria-hidden="true">
               <span>홈페이지</span>
               <input
@@ -131,11 +139,15 @@ export function BoardScreen({
                 value={boardHoneypot}
                 tabIndex={-1}
                 autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
+                data-bwignore="true"
+                data-form-type="other"
                 onChange={(event) => setBoardHoneypot(event.target.value)}
               />
             </label>
             {activeBoardPrivacySignals.length > 0 && (
-              <div className="board-privacy-notice">
+              <div className="board-privacy-notice" id="board-privacy-notice" role="alert">
                 <p>
                   <ShieldAlert size={15} />
                   개인 정보로 보이는 표현이 있습니다: {activeBoardPrivacySignals.map((signal) => signal.label).join(", ")}.
@@ -147,13 +159,24 @@ export function BoardScreen({
               </div>
             )}
             <div className="board-composer-actions">
-              <button type="button" disabled={!canSubmitBoardPost} onClick={() => submitBoardPost()}>
+              {/* Blocked, not disabled, as the feedback form's button is: it
+                  stays in the tab order and is described by the words that
+                  say why -- the privacy notice above, or the status beside it.
+                  It was `disabled` with nothing said, for a short name too;
+                  a short name or post is now answered when it is pressed. */}
+              <GuardedButton
+                type="button"
+                blocked={Boolean(boardSubmitBlock)}
+                aria-busy={isPostingToBoard}
+                aria-describedby={boardSubmitBlock === "privacy" ? "board-privacy-notice" : "board-post-status"}
+                onClick={() => submitBoardPost()}
+              >
                 <Send size={16} />
                 {isPostingToBoard ? "올리는 중" : "글 남기기"}
-              </button>
+              </GuardedButton>
               {/* Always in the page, so what it comes to say is announced: a
                   live region that mounts with its text already in it is not. */}
-              <p className="board-post-status" role="status" aria-live="polite" data-testid="board-post-status">
+              <p className="board-post-status" id="board-post-status" role="status" aria-live="polite" data-testid="board-post-status">
                 {canWriteBoardPost || isBoardBusy ? boardPostStatus : "게시판에 연결된 뒤에 글을 남길 수 있습니다."}
               </p>
             </div>
@@ -166,7 +189,9 @@ export function BoardScreen({
               </div>
               {boardStatus === "ready" && <small>{boardPosts.length}개의 글</small>}
             </div>
-            {boardStatus !== "ready" || boardPosts.length === 0 ? (
+            {/* Posts already fetched stay up while the board is read again or
+                cannot be reached; the status card says which. */}
+            {boardPosts.length === 0 ? (
               <p className="board-empty" data-testid="board-list-state">{BOARD_LIST_COPY[boardStatus] ?? BOARD_LIST_COPY.local}</p>
             ) : (
               <div className="board-list">
