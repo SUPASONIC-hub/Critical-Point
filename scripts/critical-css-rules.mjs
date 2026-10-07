@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 /**
  * The stylesheet scanner shared by the critical-CSS generator and the build
  * plugin that inlines its output.
@@ -26,6 +28,41 @@ export function readGeneratedCritical(text) {
     sourceHash: text.slice(STYLESHEET_HASH_PREFIX.length, end).trim(),
     css: text.slice(end + 2).trim(),
   };
+}
+
+/**
+ * Why the generated file cannot be inlined into this build, as the message of
+ * a build error, or null when it was cut from exactly the sheet the build
+ * made. `generated` is what `readGeneratedCritical` returned, `bundledCss`
+ * the text of the app's sheet as the bundle holds it.
+ *
+ * The hash is the authority: a rule *added* to the intro leaves every
+ * previously inlined rule intact, so a rule-by-rule comparison cannot see it,
+ * and the intro would flash the part that is missing. The rule list is only
+ * here to say what changed.
+ *
+ * Two cases used to pass by saying nothing: a generated file with no hash on
+ * its first line, and a bundle the sheet could not be found in. Either is the
+ * guard switched off, and a guard that can be switched off without a word is
+ * not one -- so both are errors. `SKIP_CRITICAL_CSS=true` is the way to build
+ * without it on purpose.
+ */
+export function criticalFreshnessProblem({ generated, bundledCss, file }) {
+  const remedy = "Run `npm run build:critical` and commit the result.";
+  if (!generated.sourceHash) {
+    return `${file} does not say which stylesheet it was cut from (its first line should begin "${STYLESHEET_HASH_PREFIX}"), so this build cannot tell whether it is stale. ${remedy}`;
+  }
+  if (!bundledCss) {
+    return `The app's stylesheet was not found in this build's bundle, so ${file} could not be checked against it. Inlining it unchecked is how a stale file reaches the site; set SKIP_CRITICAL_CSS=true to build without it on purpose.`;
+  }
+  if (generated.sourceHash === createHash("sha256").update(bundledCss).digest("hex")) return null;
+  const missing = leafRuleTexts(generated.css).filter((rule) => !bundledCss.includes(rule));
+  return (
+    `${file} was cut from a different stylesheet than this build produced. ${remedy}\n` +
+    (missing.length
+      ? `${missing.length} inlined rules no longer appear at all; first: ${missing[0].slice(0, 120)}`
+      : `Every inlined rule is still present, so the stylesheet gained rules the intro may paint with.`)
+  );
 }
 
 const BACKSLASH = "\\";
