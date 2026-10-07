@@ -28,7 +28,7 @@ import {
 } from "./savedState.js";
 import { clearReplayFromLocation } from "./trace.js";
 import { confirmAction } from "./confirmAction.js";
-import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
+import { hasSlotAtRecoveryPoint, takeQueuedErrorTelemetry } from "./errorRecovery.js";
 import { toSavePatch, toSavePayload } from "./runState.js";
 import { carryTableRecordIntoRestore, isSaveAheadOf } from "../gauntlet/gauntletEngine.js";
 import { withEveryCase } from "./caseArrival.js";
@@ -57,7 +57,7 @@ export function leaveReplaySession() {
   clearReplayFromLocation();
 }
 
-export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, config }) {
+export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   const { pendingTelemetryRef } = refs;
   const { setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry } = setters;
   const { persistSuppressed, onSuppressSaves, onResumeSaves, formatSaveTime, debugErrorKey } = config;
@@ -96,8 +96,15 @@ export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, con
       setSaveStatus(SAVE_REPLAY_MESSAGE);
       return { ...payload, storageSaved: false, replay: true };
     }
-    if (result.saved && shouldCaptureSaveSlot(previousState, payload)) appendSaveSlot(payload);
+    // One slot for one place. 이어하기 pressed inside the runtime is "a run
+    // picked up again" each time, so leaving a scene and coming back five times
+    // filled all five slots with that scene and pushed out every case boundary.
+    if (result.saved && shouldCaptureSaveSlot(previousState, payload) && !hasSlotAtRecoveryPoint(payload)) appendSaveSlot(payload);
     if (!result.saved) setSaveStatus(SAVE_UNAVAILABLE_MESSAGE);
+    // Every write that landed is the last save, not only 저장 pressed by hand:
+    // the intro prints this time beside 이어하기, and after a choice saved
+    // itself it showed the time the page was loaded, or nothing after a reset.
+    else patchRun({ lastSavedAt: payload.savedAt });
     return { ...payload, storageSaved: result.saved };
   }
 
@@ -142,7 +149,7 @@ export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, con
     // is already locked (the stale lock in `persist`) and persist has said why.
     if (payload.stale) return;
     const savedLine = heldRun ? `판을 그대로 보관했습니다 ${formatSaveTime(payload.savedAt)}` : `저장됨 ${formatSaveTime(payload.savedAt)}`;
-    patchRun(payload.storageSaved ? { ...patch, lastSavedAt: payload.savedAt } : patch);
+    patchRun(patch);
     setSaveStatus(payload.storageSaved ? savedLine : payload.replay ? SAVE_REPLAY_MESSAGE : SAVE_UNAVAILABLE_MESSAGE);
   }
 
@@ -172,9 +179,13 @@ export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, con
     setLocalErrorEntries([]); applyRun({ lastRecoveredError: null });
   }
 
+  // From the slots in storage, not the list on screen. The list is read when
+  // the page loads and when the panel is refreshed, and saves add slots in
+  // between: writing the list back less one slot deleted those too, unasked.
   function deleteSaveSlot(slotId) {
     if (!confirmAction(CONFIRM_DELETE_SLOT)) return;
-    const nextSlots = saveSlots.filter((slot) => slot.id !== slotId);
+    const storedSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
+    const nextSlots = storedSlots.filter((slot) => slot.id !== slotId);
     if (!writeStoredValue(SAVE_SLOT_STORAGE_KEY, JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: nextSlots }))) {
       recordAppError(new Error("Save slot delete failed because local storage could not be written."), {}, "save-slot-delete");
       setSaveStatus("복구 지점을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다."); return;
@@ -208,10 +219,19 @@ export function useAppPersistence({ run, patchRun, saveSlots, refs, setters, con
     if (!repaired || !isSavedStateShapeValid(repaired)) return null;
     // A restore rolls back the story, not the network's backlog or the feedback
     // the player already wrote: both are kept from the current save.
+    //
+    // Nor the consent. A slot is the save as it stood, consent box included,
+    // so restoring one from before the player unticked the box ticked it again
+    // for them, and the next closed case was sent. Consent is what the save
+    // holds now, as it is when a cloud copy is loaded (cloudSave.applyCloudSave);
+    // with no save to ask it is off, and so is the queue it would have sent.
+    const held = isSavedStateShapeValid(current);
+    const dataConsent = held && current.dataConsent === true;
     return normalizeSavedGameplayState({
       ...repaired,
-      playtestFeedback: isSavedStateShapeValid(current) ? current.playtestFeedback : repaired.playtestFeedback,
-      pendingTelemetry: isSavedStateShapeValid(current) ? current.pendingTelemetry : repaired.pendingTelemetry,
+      dataConsent,
+      playtestFeedback: held ? current.playtestFeedback : repaired.playtestFeedback,
+      pendingTelemetry: dataConsent ? current.pendingTelemetry : [],
       paused: true,
       started: false,
       savedAt: new Date().toISOString(),

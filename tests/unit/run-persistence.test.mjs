@@ -26,6 +26,7 @@ test("a change applied to the run is in memory and in the save at once", async (
   assert.deepEqual([harness.run.playerName, harness.run.isPausedSave], ["바뀐 이름", true]);
   assert.deepEqual([harness.saved().playerName, harness.saved().paused], ["바뀐 이름", true]);
   assert.ok(!("decisionReveal" in harness.saved()), "what the save does not keep is not written");
+  assert.equal(harness.run.lastSavedAt, "<savedAt>", "and the run knows when it was last saved, as the intro prints it");
 });
 
 test("the save can be told the page is going away without the run being told", async () => {
@@ -54,7 +55,24 @@ test("a write with no storage under it says so and goes on", async () => {
   globalThis.localStorage.unavailable = false;
   assert.equal(written.storageSaved, false);
   assert.equal(harness.run.playerName, "저장 없이");
+  assert.equal(harness.run.lastSavedAt, "", "a write that did not land is not a save time");
   assert.match(harness.status, /저장소를 사용할 수 없어/);
+});
+
+test("picking a run up again at the same place does not add a slot for it each time", async () => {
+  const harness = await createRunHarness();
+  harness.act("startGame");
+  assert.equal(harness.slotCount(), 1);
+  for (let visit = 0; visit < 5; visit += 1) {
+    harness.act("leaveToSeasonMap");
+    harness.act("resume");
+  }
+  assert.equal(harness.slotCount(), 1, "five visits to one scene used to fill all five slots with it");
+  // A decision later it is another place, and worth a slot of its own.
+  harness.act("applyRun", { log: [{ nodeId: harness.run.nodeId, choiceId: "first" }] });
+  harness.act("leaveToSeasonMap");
+  harness.act("resume");
+  assert.equal(harness.slotCount(), 2);
 });
 
 test("closing the recovery centre closes both panels and forgets it was asked for", async () => {
@@ -97,6 +115,20 @@ test("a recovery slot is deleted from storage and from the list on screen", asyn
   assert.deepEqual(stored(appConfig.SAVE_SLOT_STORAGE_KEY).slots, []);
 });
 
+test("deleting a slot leaves the slots the list on screen had not been told about", async () => {
+  const harness = await createRunHarness();
+  harness.act("startGame");
+  harness.act("refreshErrorLog");
+  const [listed] = harness.outside.saveSlots;
+  // A case opens after the list was read: storage has a second slot, the list one.
+  harness.act("applyRun", { currentCase: "prologue02" });
+  assert.deepEqual([harness.slotCount(), harness.outside.saveSlots.length], [2, 1]);
+  harness.act("deleteSlot", listed.id);
+  const left = stored(appConfig.SAVE_SLOT_STORAGE_KEY).slots;
+  assert.deepEqual(left.map((slot) => slot.currentCase), ["prologue02"], "the slot nobody asked to delete is still in storage");
+  assert.deepEqual(harness.outside.saveSlots.map((slot) => slot.id), left.map((slot) => slot.id), "and the list shows what storage holds");
+});
+
 test("starting fresh from the recovery notice removes the save, keeps the slots, and reloads into the centre", async () => {
   const harness = await createRunHarness();
   harness.act("startGame");
@@ -118,6 +150,48 @@ test("a slot is restored as a paused save on the intro, with the queue the curre
   assert.deepEqual([restored.started, restored.paused, restored.runId], [false, true, slot.snapshot.runId]);
   assert.notEqual(restored.playerName, "슬롯 뒤의 이름");
   assert.deepEqual(harness.effects.slice(-2), ["suppress-saves", "reload"]);
+});
+
+const queuedRow = { id: "case-queued", type: "case", label: "보관된 로그", payload: {} };
+
+test("restoring a slot or a kept save does not give back a consent the player withdrew", async () => {
+  const harness = await createRunHarness({ patch: { dataConsent: true, pendingTelemetry: [queuedRow] } });
+  harness.act("startGame");
+  harness.act("refreshErrorLog");
+  const [slot] = harness.outside.saveSlots;
+  assert.equal(slot.snapshot.dataConsent, true, "the slot was taken while the box was ticked");
+  const saveWhileTicked = globalThis.localStorage.getItem(appConfig.STORAGE_KEY);
+  // The box is unticked: consent off and the queue emptied, in the save.
+  harness.act("persist", { dataConsent: false, pendingTelemetry: [] });
+  await harness.act("restoreSlot", slot);
+  assert.deepEqual([harness.saved().dataConsent, harness.saved().pendingTelemetry], [false, []]);
+  // The kept copy of a save this build could not read goes through the same door.
+  globalThis.localStorage.setItem(appConfig.SAVE_BACKUP_STORAGE_KEY, saveWhileTicked);
+  await harness.act("restoreBackup");
+  assert.deepEqual([harness.saved().dataConsent, harness.saved().pendingTelemetry], [false, []]);
+  assert.equal(globalThis.localStorage.getItem(appConfig.SAVE_BACKUP_STORAGE_KEY), null, "the kept copy was the one restored");
+});
+
+test("restoring a slot keeps a consent given since the slot was taken, and its queue", async () => {
+  const harness = await createRunHarness();
+  harness.act("startGame");
+  harness.act("refreshErrorLog");
+  const [slot] = harness.outside.saveSlots;
+  assert.equal(slot.snapshot.dataConsent, false);
+  harness.act("persist", { dataConsent: true, pendingTelemetry: [queuedRow] });
+  await harness.act("restoreSlot", slot);
+  assert.equal(harness.saved().dataConsent, true);
+  assert.deepEqual(harness.saved().pendingTelemetry.map((item) => item.id), [queuedRow.id]);
+});
+
+test("a kept save restored where there is no save comes back with consent off and nothing queued", async () => {
+  const harness = await createRunHarness({ patch: { dataConsent: true, pendingTelemetry: [queuedRow] } });
+  harness.act("startGame");
+  const saveWhileTicked = globalThis.localStorage.getItem(appConfig.STORAGE_KEY);
+  globalThis.localStorage.removeItem(appConfig.STORAGE_KEY);
+  globalThis.localStorage.setItem(appConfig.SAVE_BACKUP_STORAGE_KEY, saveWhileTicked);
+  await harness.act("restoreBackup");
+  assert.deepEqual([harness.saved().dataConsent, harness.saved().pendingTelemetry], [false, []]);
 });
 
 test("a slot that cannot be read is refused, and so is a backup that is not there", async () => {

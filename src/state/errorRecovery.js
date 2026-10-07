@@ -76,16 +76,23 @@ function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
  * error, so three attempts at a broken scene pushed out every slot from before
  * it and left nothing to roll back to. One slot at the broken point is kept --
  * it is the only slot a first-case crash has -- and no second one.
+ *
+ * The same place is the same run, case, scene, number of decisions and number
+ * of closed cases. The last is for the save's own slots (useAppPersistence),
+ * which ask this too: a case opened again as practice starts at the scene and
+ * the empty log its first opening had, and is a different place to go back to.
  */
-function hasSlotAtRecoveryPoint(saved) {
+export function hasSlotAtRecoveryPoint(saved) {
   const slots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
   const logLength = Array.isArray(saved.log) ? saved.log.length : 0;
+  const closedCases = Array.isArray(saved.completedCases) ? saved.completedCases.length : 0;
   return slots.some(
     (slot) =>
       slot.snapshot.runId === (typeof saved.runId === "string" ? saved.runId : "") &&
       slot.currentCase === saved.currentCase &&
       slot.nodeId === saved.nodeId &&
-      slot.snapshot.log.length === logLength,
+      slot.snapshot.log.length === logLength &&
+      slot.completedCases.length === closedCases,
   );
 }
 
