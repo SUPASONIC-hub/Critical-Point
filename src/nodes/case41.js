@@ -215,7 +215,7 @@ export const case41Nodes = {
       "대질신문 1분 -- 질문 1개",
       "'기억나지 않습니다' 22회, 권도현의 내기까지 1회",
       "방청석: 문가을 · 윤서진 · 문하준",
-      "정회 전에 고른 서류는 참고인석 책상 위",
+      "정회 전에 고른 서류 하나 -- 질문에 실을지는 지금 정함",
     ],
     triggers: ["choice", "injustice", "selfAwareness"],
     choices: [
