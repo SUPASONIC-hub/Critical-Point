@@ -17,6 +17,27 @@ export function formatMultiplier(value) {
   return multiplier >= 10 ? `×${Math.floor(multiplier)}` : `×${(Math.floor(multiplier * 10 + 1e-9) / 10).toFixed(1)}`;
 }
 
+const VERDICT_CAUSE_COPY = Object.freeze({
+  cash: "직접 확정했다",
+  push: "한 번 더 밀었다",
+  creep: "시계가 올린 열이 벽에 닿았다",
+  timeout: "시계를 방치했다",
+  focus: "헛박자 락이 열을 벽까지 올렸다",
+  abandon: "걸어 둔 판을 떠났다",
+});
+
+/**
+ * Why the window closed, in the reveal's ledger. One sentence a cause
+ * (`VERDICT_CAUSES`): the two busts the player did not press for -- the
+ * clock's heat creeping into the wall, and a lock off the beat heating into it
+ * -- used to fall through to the cash's line, so a BUST headline sat over
+ * "직접 확정했다". A cause this table does not know says only what the outcome
+ * proves.
+ */
+export function describeVerdictCause(verdict) {
+  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
+}
+
 export function describeEffect(effect = {}, resourceMeta = {}) {
   return Object.entries(effect)
     .filter(([, value]) => Number(value) !== 0)

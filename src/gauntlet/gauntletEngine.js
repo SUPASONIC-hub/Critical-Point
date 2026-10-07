@@ -556,6 +556,14 @@ function normalizeTimeScale(value) {
 
 /** The ways a window can bust on the table, as a hold written at closure records them. */
 const CLOSED_CAUSES = new Set(["push", "creep", "timeout", "focus"]);
+/**
+ * Every way a window closes, as a verdict names it: the cash, the four busts
+ * the table deals -- a push into the wall, the clock's heat reaching it, the
+ * clock running out, a lock off the beat heating into it -- and a bet walked
+ * away from. Whatever tells the player why reads this list, so a cause added
+ * here without a sentence fails a test instead of borrowing another's.
+ */
+export const VERDICT_CAUSES = Object.freeze(["cash", ...CLOSED_CAUSES, "abandon"]);
 
 export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, closedAs = null, beatCombo = 0, resume = null } = {}) {
   const normalized = normalizeSchema(schema);
@@ -957,11 +965,37 @@ export const MUTATIONS = Object.freeze({
   },
 });
 
+/**
+ * What two of them say once EXPOSE mastery has taken half of the rule back.
+ * A bust deals BLACKOUT and a cash with no push deals COLD FEET, and then the
+ * season's mastery (or GLASS LENS on top of it) turns the cards face up and
+ * lifts the seal. The id stays -- the wall is still closer, the chips are
+ * still thinner -- but the briefing and the reveal went on printing "카드가
+ * 가려지고" over a hand that was face up, and "봉인됐다" over a card that was
+ * not.
+ */
+const LIFTED_MUTATIONS = Object.freeze({
+  blackout: {
+    lifted: (board) => !board.faceDown,
+    title: "벽이 다가왔다",
+    text: `임계점을 넘긴 대가. 벽이 ${BLACKOUT_WALL_SHIFT} 가까워진다. 카드는 EXPOSE 숙련이 뒤집히지 않게 막았다.`,
+  },
+  coldFeet: {
+    lifted: (board) => !board.sealHighest,
+    title: "칩이 줄었다",
+    text: "밀지 않고 확정한 대가. 칩이 줄어든다. 봉인은 EXPOSE 숙련이 풀었다.",
+  },
+});
+
 export function describeMutations(schema) {
-  const { mutations, fracturedAxis, relics } = normalizeSchema(schema);
+  const board = normalizeSchema(schema);
+  const { mutations, fracturedAxis, relics } = board;
   return mutations
     .filter((id) => MUTATIONS[id])
-    .map((id) => ({ id, ...MUTATIONS[id], axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) }));
+    .map((id) => {
+      const { lifted, ...remainder } = LIFTED_MUTATIONS[id] ?? {};
+      return { id, ...MUTATIONS[id], ...(lifted?.(board) ? remainder : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
+    });
 }
 
 /**

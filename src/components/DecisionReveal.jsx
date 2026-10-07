@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.js";
 import { objectParticle, subjectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
+import { describeVerdictCause } from "../gauntlet/tableReadout.js";
 
 function formatMultiplier(value) {
   return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;
@@ -12,14 +13,7 @@ function formatMultiplier(value) {
 
 function createConsequenceLines({ verdict, busted, nextMutations }) {
   if (!verdict) return [];
-  const cause =
-    verdict.cause === "timeout"
-      ? "시계를 방치했다"
-      : verdict.cause === "abandon"
-        ? "걸어 둔 판을 떠났다"
-        : verdict.cause === "push"
-          ? "한 번 더 밀었다"
-          : "직접 확정했다";
+  const cause = describeVerdictCause(verdict);
   // The particle agrees with the number as it is read aloud (priority 10).
   const lostPot = formatNumber(verdict.lostPot);
   const wall = String(verdict.wall);
@@ -63,12 +57,21 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  *
  * Each block is a named group: an `aria-label` on a bare `div` names nothing,
  * because an element with no role has no name to give.
+ *
+ * Focus goes to the way out, which is the sheet's last element, without
+ * scrolling to it. `autoFocus` scrolled: on a screen wider than a phone and
+ * shorter than the sheet -- a phone on its side -- the reveal opened at its
+ * foot, with the verdict it exists to show above the fold.
  */
 export function DecisionReveal({ view }) {
   const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
+  const nextRef = useRef(null);
+  useEffect(() => {
+    if (decisionReveal) nextRef.current?.focus({ preventScroll: true });
+  }, [decisionReveal]);
   useEffect(() => {
     if (!decisionReveal) return;
     playDecisionRevealCue(busted ? "system-alert" : overclocked ? "chain-reaction" : decisionReveal.clue ? "clue-found" : "decision-locked");
@@ -232,7 +235,7 @@ export function DecisionReveal({ view }) {
 
         <div className="decision-reveal-footer">
           <span>다음 · {decisionReveal.nextTitle}</span>
-          <button type="button" data-testid="decision-next" onClick={() => setDecisionReveal(null)} autoFocus>
+          <button ref={nextRef} type="button" data-testid="decision-next" onClick={() => setDecisionReveal(null)}>
             {decisionReveal.caseClosed ? "사건 결과" : "다음 판"}
             <ChevronRight size={17} />
           </button>
