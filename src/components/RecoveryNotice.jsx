@@ -1,6 +1,6 @@
 
 export function RecoveryNotice({ view }) {
-  const { lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showErrorLog, setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice } = view;
+  const { lastRecoveredError, started, pauseAfterRecovery, startFreshAfterRecovery, showErrorLog, setShowRecoveryCenter, setShowErrorLog, refreshLocalErrorLog, dismissRecoveryNotice } = view;
   if (!lastRecoveredError) return null;
   return (
     <section className="recovery-notice" role="status" aria-live="polite">
@@ -27,8 +27,11 @@ export function RecoveryNotice({ view }) {
           aria-expanded={showErrorLog}
           aria-controls={showErrorLog ? "error-log-panel" : undefined}
           onClick={() => {
-          setShowRecoveryCenter(true);
-          setShowErrorLog(true);
+            // The lists are read when the page loads; slots and errors written
+            // since then would be missing from the panel this opens.
+            refreshLocalErrorLog();
+            setShowRecoveryCenter(true);
+            setShowErrorLog(true);
           }}
         >
             에러 로그
