@@ -150,7 +150,9 @@ jobs:
     #              2026-10-06 a week of nothing but timeouts opened no issue.
     #   passed     every job succeeded. On the default branch that closes the
     #              open issue, with the run that proved it; it used to stay
-    #              open until someone remembered it.
+    #              open until someone remembered it. Not when the run is
+    #              older than the failure the issue reports: an old green run
+    #              run again proves the commit it had then.
     #   neither    a person cancelled a run they had started. They were
     #              watching; nothing is written.
     needs: [full-coverage, season-walk, webkit]
@@ -211,6 +213,17 @@ jobs:
           elif [ "$EVENT" != "schedule" ] && [ "$REF_NAME" != "$DEFAULT_BRANCH" ]; then
             echo "Green on $REF_NAME; issue #$existing stays open until $DEFAULT_BRANCH is green."
           else
+            # A green run can be older than the failure it would close: any
+            # run can be run again, and one from before the breakage still
+            # passes, on the commit it had then. Run ids only go up, and every
+            # report this job has written into the issue ends with its run's
+            # address, so the newest run the issue knows of is in its text. A
+            # run older than that says nothing about now.
+            reported=$(gh issue view "$existing" --json body,comments --jq '[.body, .comments[].body] | join("\n")' | grep -oE 'actions/runs/[0-9]+' | grep -oE '[0-9]+$' | sort -n | tail -1 || true)
+            if [ -n "$reported" ] && [ "$reported" -gt "$GITHUB_RUN_ID" ]; then
+              echo "::warning title=An old green run closes nothing::This run ($GITHUB_RUN_ID) is older than run $reported, which issue #$existing reports as failing. The issue stays open until a run newer than that one is green."
+              exit 0
+            fi
             body=$(printf '%s passed %s.\n\n%s\n\n%s\n\nClosing.\n' "$what" "$where" "$RESULTS" "$RUN_URL")
             gh issue comment "$existing" --body "$body"
             gh issue close "$existing" --reason completed
