@@ -319,7 +319,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
           </section>
           {/* Act three. Everything the report used to open with. */}
-          <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} />
+          <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
         </section>
       </main>
 );

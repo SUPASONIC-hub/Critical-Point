@@ -129,7 +129,8 @@ export function getTutorialSteps() {
 export function getRankingComparison(summary = {}) {
   return [
     { label: "EVIDENCE", value: Math.min(100, (summary.challengeClearCount ?? 0) * 20) },
-    { label: "PEOPLE", value: Math.min(100, Math.max(0, 100 - (summary.exploitPenalty ?? 0) * 8)) },
+    // What is left after the 즉답 패널티. It was labelled PEOPLE, which it does not measure.
+    { label: "PATIENCE", value: Math.min(100, Math.max(0, 100 - (summary.exploitPenalty ?? 0) * 8)) },
     { label: "RHYTHM", value: Math.min(100, summary.rhythmScore ?? 0) },
   ];
 }
@@ -183,8 +184,11 @@ export function getSeasonGoals() {
   ];
 }
 
+// `label` is what the report prints: the card as the player read it. The
+// choice id is a key, and it used to be the text ("p1_start_a 60%").
 export function getBalanceSignals(log = []) {
   const choices = log.filter((entry) => !entry?.isSystemEvent);
+  const labelOf = (choiceId) => choices.find((entry) => entry.choiceId === choiceId)?.choice || "이름 없는 선택";
   const counts = choices.reduce((map, entry) => {
     map[entry.choiceId] = (map[entry.choiceId] ?? 0) + 1;
     return map;
@@ -192,7 +196,7 @@ export function getBalanceSignals(log = []) {
   const total = choices.length || 1;
   return Object.entries(counts)
     .filter(([, count]) => count / total >= 0.6)
-    .map(([choiceId, count]) => ({ choiceId, share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
+    .map(([choiceId, count]) => ({ choiceId, label: labelOf(choiceId), share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
 }
 
 export function getPastRunMemory(memory = {}) {
@@ -242,7 +246,8 @@ export function getPlayReport(summary = {}, log = []) {
     decisions: entries.length,
     clues: summary.challengeClearCount ?? 0,
     dominantStyle: summary.reframeCount > summary.challengeClearCount ? "BOARD BREAKER" : summary.pressureAdaptScore >= summary.reflectionScore ? "RISK CUTTER" : "SYSTEM THINKER",
-    route: entries.map((entry) => entry.choiceId).filter(Boolean).slice(-8),
+    // The scenes passed, by title. It listed choice ids ("p1_start_a → ...").
+    route: entries.map((entry) => entry.title).filter(Boolean).slice(-8),
   };
 }
 
