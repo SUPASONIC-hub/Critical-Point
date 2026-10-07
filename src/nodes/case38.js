@@ -284,7 +284,7 @@ export const case38 = {
           voice: "오늘은 이 사람들이 주인인 날이라며, 원고들이 모두 흩어질 때까지 법원 앞에서 문가을 곁에 남는다.",
           echo: "마지막 원고가 버스에 오를 때까지 계단에 남습니다. 문가을이 떡 한 봉지를 당신 가방에 밀어 넣고 '내일 밤 방송도 같이 봐요'라고 합니다.",
           next: "case38_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c38_after_record",
@@ -358,7 +358,7 @@ export const case38 = {
           effect: { legitimacy: 10, trust: 2, time: -4, humanCost: 3, capital: -1, fatigue: 3 },
           cognition: { inference: 1 },
           voice: "골라 낸 41줄만으로는 기록이 아니라며, 빠진 0초 줄도 함께 읽어 달라고 재판부에 요청한다.",
-          echo: "요청하면 재판부가 연서준에게 원본 전체를 내라고 합니다. 그 원본에는 0초 줄과 함께 열세 명의 망설임이 전부 들어 있습니다.",
+          echo: "요청하면 재판부가 연서준에게 원본 전체를 내라고 합니다. 그 원본에는 0초 줄과 함께 63명의 망설임이 전부 들어 있습니다.",
         },
         {
           label: "0초 줄만 오늘 바로 기자들에게 넘긴다",

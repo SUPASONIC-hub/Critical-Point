@@ -183,6 +183,55 @@ test("choosing this device's progress overwrites the stored copy and ends the co
   assert.equal(cloud.getCloudSaveSnapshot().phase, "synced");
 });
 
+test("a reset keeps the online copy: the next run is not uploaded over it until the player says so", async () => {
+  const uploadedAt = "2026-09-28T09:00:00.000Z";
+  resetDevice({ sync: { pending: "", synced: uploadedAt, revision: 4 } });
+  const server = newServer({ stored: { saved_at: uploadedAt, payload: { save: { runId: "run-cloud" } }, revision: 4 } });
+  const cloud = await loadCloudSave();
+
+  // 초기화: the save goes, the code and the record of what was uploaded stay.
+  browser.storage.removeItem(config.STORAGE_KEY);
+  assert.equal(cloud.holdCloudCopyThroughReset(), true);
+  assert.deepEqual(readSync().conflict, { savedAt: uploadedAt, revision: 4 });
+
+  // The first save of the next run. It used to go up as revision 5.
+  browser.storage.setItem(config.STORAGE_KEY, JSON.stringify(makeSave({ runId: "run-after-reset", savedAt: "2026-09-28T10:00:00.000Z" })));
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0);
+  assert.equal(server.stored.payload.save.runId, "run-cloud", "the copy the question said is kept is still there");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "conflict");
+  assert.equal(cloud.hasCloudConflict(), true);
+  assert.match(cloud.describeCloudPhase("conflict"), /초기화하기 전의 진행/);
+
+  // The player's own answer ends it, as it ends any conflict.
+  assert.equal(await cloud.flushCloudSave({ overwrite: true }), true);
+  assert.equal(server.stored.payload.save.runId, "run-after-reset");
+  assert.equal(readSync().conflict, null);
+
+  // A device that never uploaded has no copy to keep, and nothing is held.
+  resetDevice();
+  const fresh = await loadCloudSave();
+  assert.equal(fresh.holdCloudCopyThroughReset(), false);
+  assert.equal(readSync().conflict ?? null, null);
+});
+
+test("uploads are spaced once half the hour's puts are spent, so quick play stays under the server's 240", async () => {
+  const { paceUpload } = await loadCloudSave();
+  const now = 10_000_000;
+  const every = (count, gapMs) => Array.from({ length: count }, (_, index) => now - (count - 1 - index) * gapMs);
+  // Ordinary play: the upload follows the save by the usual moment.
+  assert.equal(paceUpload(2500, [], now), 2500);
+  assert.equal(paceUpload(2500, every(119, 5_000), now), 2500);
+  // The 120th put of the hour was just made: the next waits thirty seconds from it.
+  assert.equal(paceUpload(2500, every(120, 5_000), now), 30_000);
+  assert.equal(paceUpload(2500, every(120, 5_000), now + 29_000), 2500, "a save that comes late waits only the usual moment");
+  assert.equal(paceUpload(0, every(120, 5_000), now + 10_000), 20_000, "and the retry tick is held to the same spacing");
+  // Puts from more than an hour ago are not this hour's.
+  assert.equal(paceUpload(2500, every(120, 5_000), now + 60 * 60_000), 2500);
+  // The worst hour: 120 puts at once, then one every thirty seconds, is 240.
+  assert.ok(120 + (60 * 60_000) / 30_000 <= 240);
+});
+
 test("a put the server refuses is a conflict, with what the server holds", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T10:00:00.000Z" }), sync: { pending: "2026-09-28T10:00:00.000Z", synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
   newServer({ stored: { saved_at: "2026-09-28T09:00:00.000Z", payload: {}, revision: 2 } });
@@ -384,6 +433,16 @@ test("a copy of another run is loaded as it is", async () => {
   const local = JSON.parse(browser.storage.getItem(config.STORAGE_KEY));
   assert.equal(local.dynamics.windowIndex, 3);
   assert.equal(local.dynamics.busts, 0);
+});
+
+test("a finished season loaded from a code opens NEW GAME+ on this device", async () => {
+  resetDevice();
+  const cloud = await loadCloudSave();
+  await cloud.applyCloudSave({ code: CODE, save: makeSave({ runId: "run-unfinished" }), settledWindows: [], revision: 1 });
+  assert.equal(browser.storage.getItem(config.NEW_GAME_PLUS_KEY), null, "a season still being played opens nothing");
+  const finished = makeSave({ runId: "run-finished", caseResults: { final: { rank: "A", outcomeChoiceId: "f_seal" } } });
+  await cloud.applyCloudSave({ code: CODE, save: finished, settledWindows: [], revision: 2 });
+  assert.equal(browser.storage.getItem(config.NEW_GAME_PLUS_KEY), "true", "the intro before the runtime reads only this key");
 });
 
 test("a code that is not a code, a server that is not there, and a copy that is not a save", async () => {

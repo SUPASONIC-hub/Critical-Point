@@ -47,7 +47,7 @@ export const viewGroups = {
     ],
     telemetry: [
       "dataConsent", "setDataConsent", "pendingTelemetry", "setTelemetryStatus", "telemetryEnabled",
-      "isOnline", "telemetrySummary", "sessionCode", "setPendingTelemetry", "setSaveStatus",
+      "isOnline", "telemetrySummary", "sessionCode", "setPendingTelemetry",
     ],
     debug: [
       "debugToolsEnabled", "showErrorLog", "setShowErrorLog", "unlockAllCasesForTest",
@@ -67,7 +67,7 @@ export const viewGroups = {
   result: {
     common: [
       "AdaptiveMusic", "musicModeKey", "renderSceneLines", "screenReaderStatus", "GAME_TITLE", "currentCase",
-      "activeCaseMeta", "playerName", "operatorProfile",
+      "activeCaseMeta", "playerName",
     ],
     ending: [
       "endingStep", "endingTwistIndex", "finalAftermathEntry", "finalEndingEntry", "endingProfile",
@@ -83,7 +83,7 @@ export const viewGroups = {
       "counterfactualReport", "rankingComparison", "rankingIntegrity", "achievementBadges",
       "achievementProgress", "resourceMeta", "explainResourceTradeoff", "routeTimeline",
       "observationLedger", "observerPattern", "decisionFingerprint", "caseResults", "log", "clueCount",
-      "clueHypotheses", "playReport", "balanceSignals",
+      "playReport", "balanceSignals",
     ],
     telemetry: [
       "sessionCode", "telemetryStatus", "pendingTelemetry", "retryPendingTelemetry",
@@ -94,7 +94,7 @@ export const viewGroups = {
     feedback: [
       "feedbackPrompts", "currentFeedback", "updateCurrentFeedback", "FEEDBACK_COMMENT_MAX_LENGTH",
       "activeFeedbackPrivacySignals", "anonymizeFeedbackComment", "submitCurrentFeedback",
-      "isSubmittingFeedback", "feedbackStatus", "latestChoiceFeedback",
+      "isSubmittingFeedback", "feedbackStatus",
     ],
     actions: [
       "startCase", "setStarted", "setShowRanking", "showSeasonMap", "exportPlaytestLog", "copyReplayLink",
@@ -103,7 +103,7 @@ export const viewGroups = {
     ],
     debug: [
       "debugToolsEnabled", "showErrorLog", "setShowErrorLog", "replayDiagnostics", "operationsSnapshot",
-      "authorityState", "authorityReview",
+      "authorityReview",
     ],
   },
   // What the play screen shows. What it calls -- the reveal and recovery

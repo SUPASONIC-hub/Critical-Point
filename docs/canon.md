@@ -87,14 +87,79 @@ Three of these are reveals, and each still means what it meant:
 | 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 집행유예 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
+| 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
-| 반재욱 | 감사팀 조사역 3년차 | 감사팀 조사역 |
+| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
 | 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
+| 이민서 | -- | 트리거랩, A-017 on the list of 63 → KD데이터랩 (사건 25) |
+| 에코 | Unnamed in July 2023; the wave on 1번 단말 | 트리거랩's seventh: replaced by 노아 on 2월 1일 00:00 (사건 20), kept only on the 트리거랩 terminal until the dissolution (사건 24), restored 9월 19일 (사건 46) |
 | 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
 
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
+season; he is never "3년차" (that is 도윤하 at her window). His notebook holds
+the names of the 47 people his inquiries put out of a job, one line each, in
+ink (사건 07, 13, 17, 44; 도윤하's 스프링 수첩 in 프롤로그 04 also counts 47
+names, and is a different notebook).
+
+반재욱 carries one worn black notebook for all twenty years (사건 17), and has
+met the analyst by 프롤로그 02. He opens a new page for each matter. The page
+for this loan starts with one line, '2023-0412 -- 179.6' (4월 15일), and each
+later 프롤로그 adds to that same page: 4월 27일 (two lines), 5월 15일, 6월 9일,
+7월 24일 with the analyst's name.
+
+백아린 hands in her resignation on 3월 27일 (사건 25) and is told it will be
+accepted in two weeks. It never is. The group keeps her on the 33rd floor,
+where her desk is searched on 6월 16일 (사건 32), and answers the resignation
+three days after her report with 징계해고, a criminal complaint and eviction
+(사건 33). The complaint was drafted on 6월 1일, before she reported anything.
+
+## 트리거랩's head count
+
+| Count | Who | Where it is stated |
+|---|---|---|
+| 6 | The people of the main season: 분석관, 한서윤, 오진우, 도윤하, 이민서, 반재욱 | 사건 25's 여섯 명의 단체방; 사건 30 |
+| 7 | The six and 에코. 반재욱 writes '트리거랩 7명'; the seventh desk is 에코's terminal | 사건 24 (이민서 counts six, 반재욱 answers "한 명은 에코입니다"); 사건 30 |
+| 5 | The colleagues whose postings are out in 사건 24. The analyst's own comes that night on the 33rd floor, which makes 사건 25's list six | 사건 24, 25 |
+| 9 | 분석관 on the response-record list 노아 learned from: the six of now and three who left before the analyst came or in the analyst's first year. Their records were kept without asking | 사건 20 |
+| 4 | 1기 참가자, 2022, before the lab existed; 참가자 01 is 선우진 | 사건 19, 21 |
+| 13 | The nine and the four: the profiles in the folder on the B2 terminal | 최종 사건 |
+| 63 | 트리거랩 참가자, A-001 to A-063, numbered by 입사 순서: the nine, the four, and fifty who sat at a lab terminal during training. This is the list sold to 핏스코어 for 18억 and leaked as 38만 줄 | 사건 30, 37, 40 |
+
+The three who left are not named in the main season. 프롤로그 05 shows two of
+them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
+is not one of them: she has spent twelve years on the group's side of the table
+(사건 33) and is "처음 보는 사람" to the analyst in 사건 13.
+
+사건 20 has two nines and they are different people. Nine 분석관 are on the
+list; nine people stand in the server room and laugh at 강태민's joke, and
+강태민 is one of them. "실측 아홉 명" is the second.
+
+The two prices are two contracts. 사건 20's is the lab's own transfer to
+KD데이터랩, paid into 그룹전략실's account: nine analysts, 1,200만 원 each. 사건 30's is KD데이터랩's
+sale to 핏스코어 in May: 63 people for 18억, 2,857만 원 each.
+
+## The 평택 tower
+
+르하임 고덕, a 22-floor 오피스텔 in 평택 고덕; KD캐피탈 lent 620억 at the front
+of the queue and 212 households bought into it. The figures change between
+April and June, and the change is the reveal.
+
+| Fact | April, 사건 26 | June, 사건 31 |
+|---|---|---|
+| Floors | 22 | 22 |
+| Frame | up to the 15th floor | columns to the 15th; no floor was poured above the 9th |
+| Reported progress | 72% (the January report) | 62%: the report on file was quietly lowered |
+| Progress on site | 58%, the estimate the analyst signs in the opinion of 4월 24일 | 45%, measured by 금융감독원 and written long before in 최서진's report |
+| The 9th floor | where a worker fell in the summer of 2025 | the last floor that was poured |
+
+The differences that copy restates: 72 - 58 = 14 (사건 26's "14% 부풀린"),
+62 - 45 = 17%포인트, 58 - 45 = 13%포인트. The last is the analyst's own: the
+number signed in April to correct the report was wrong as well. 사건 27 and 32
+state no floor and no percentage.
 
 ## The harmed
 
@@ -106,6 +171,13 @@ Three of these are reveals, and each still means what it meant:
 | Accepted by the second standard | 181명 of the 212 |
 | Still 확인 불가 | 31명 |
 
+## The lab's record
+
+| Fact | Value |
+|---|---|
+| 트리거랩 반응 기록 that 핏스코어 bought and that leaked in July | 참가자 63명, 38만 줄 (사건 30, 37, finale) |
+| Its 원본, 7번 on 사건 46's disposal list | the same record, so the same 63명 |
+
 ## The main season's calendar
 
 사건 01-18 are **2025** and 사건 19 to the finale are **2026**: 사건 12 is the
@@ -116,7 +188,7 @@ A date that is stated with a weekday has to fit its year.
 |---|---|
 | 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
-| 사건 19 | 1월 23일 (금) change notice; demolition 1월 29일 06시 |
+| 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
 | 사건 20 | 1월 26일 (월) |
 | 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday |
 | 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
@@ -124,7 +196,7 @@ A date that is stated with a weekday has to fit its year.
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
 | 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
-| 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 사택 퇴거 7월 7일 |
+| 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |
 | 사건 38-40 | 첫 변론 8월 6일 (목); 다큐 방송 8월 7일 (금) 22시; 사건 40 opens the next afternoon (토) and closes 8월 셋째 주 금요일 |
 | 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
 | 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |

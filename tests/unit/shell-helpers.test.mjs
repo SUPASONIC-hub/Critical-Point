@@ -158,6 +158,17 @@ test("small shared helpers: text limit, empty scores, run id, save time", () => 
   assert.equal(appConfig.limitText("abcdef", 3), "abc");
   assert.equal(appConfig.limitText("abc", 0), "");
   assert.equal(appConfig.limitText("abc", Number.NaN), "");
+  // An emoji is two UTF-16 units. A cut between them left half a character,
+  // which the database refuses for as long as the row is retried.
+  assert.equal(appConfig.limitText("ab😀cd", 3), "ab");
+  assert.equal(appConfig.limitText("ab😀cd", 4), "ab😀");
+  assert.equal(appConfig.limitText("ab😀", 4), "ab😀", "nothing was cut, so nothing is dropped");
+  assert.equal(appConfig.limitText("가나다라", 3), "가나다", "Korean text is one unit a syllable and is cut where it always was");
+  assert.equal(appConfig.normalizePlayerName(`${"가".repeat(23)}😀`), "가".repeat(23));
+  assert.equal(appConfig.normalizeSavedText("a😀", 2), "a");
+  for (const cut of [appConfig.limitText("😀😀😀", 5), appConfig.normalizePlayerName(`${"x".repeat(23)}😀`)]) {
+    assert.equal(cut.isWellFormed?.() ?? !/[\ud800-\udbff]$/.test(cut), true);
+  }
   assert.deepEqual(appConfig.makeEmptyScores({ a: "A", b: "B" }), { a: 0, b: 0 });
   const id = appConfig.createRunId();
   assert.equal(typeof id, "string");
@@ -277,8 +288,9 @@ test("a press is graded when the pointer went down, not when the click landed", 
   const stamp = now - 400;
   // A click from a pointer: the press is the pointer going down.
   assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 120), stamp - 120);
-  // Enter or Space on the button: detail 0, its own press.
-  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: stamp }, stamp - 120), stamp);
+  // Enter or Space on the button: detail 0, and with no key noted going down
+  // it is its own press. (With one noted it is graded there: table-controls.)
+  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: stamp }, 0), stamp);
   // A pointer that went down too long ago is not this press.
   assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 5000), stamp);
   // No usable stamp, or one from the future: now.
@@ -521,6 +533,14 @@ test("a heading still on its way in is waited for, a frame at a time, and then g
   }
 });
 
+test("the feedback form's status line is said about one case, and only on that case's page", async () => {
+  const { readFeedbackStatus } = await import("../../src/state/useFeedback.js");
+  const saved = { caseId: "case01", text: "피드백을 저장했습니다." };
+  assert.equal(readFeedbackStatus(saved, "case01"), "피드백을 저장했습니다.");
+  assert.equal(readFeedbackStatus(saved, "case02"), "", "it used to stand under the next case's empty form");
+  assert.equal(readFeedbackStatus({ caseId: null, text: "" }, "case01"), "");
+});
+
 const { createConsentChange } = await import("../../src/state/useConsentToggle.js");
 
 test("consent is only real once the save holds it, and the box says why it snapped back", () => {
@@ -540,7 +560,14 @@ test("consent is only real once the save holds it, and the box says why it snapp
   // A tick the browser kept.
   let event = box(true);
   make(true)(event);
-  assert.deepEqual(calls, [["persist", { dataConsent: true }], ["consent", true], ["note", null]]);
+  assert.deepEqual(calls.slice(0, 3), [["persist", { dataConsent: true }], ["consent", true], ["note", null]]);
+  // The report's line is corrected only if it still says consent was withdrawn.
+  const [, correct] = calls[3];
+  const withdrawn = { tone: "local", text: "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다." };
+  assert.equal(correct(withdrawn).tone, "ready");
+  assert.match(correct(withdrawn).text, /동의했습니다/);
+  const offline = { tone: "local", text: "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다." };
+  assert.equal(correct(offline), offline, "a line about something else is left as it is");
 
   // A tick it refused: the box snaps back and says so beside itself.
   calls.length = 0;
@@ -558,13 +585,13 @@ test("consent is only real once the save holds it, and the box says why it snapp
   assert.deepEqual(calls.slice(1, 3), [["consent", false], ["queue", []]]);
   assert.equal(calls.find(([name]) => name === "note")[1].tone, "local");
 
-  // An untick it refused puts the queue back as it was.
+  // An untick it refused leaves the queue alone: nothing emptied it, and
+  // setting it back to this render's copy dropped rows folded in since.
   calls.length = 0;
   event = box(false);
-  const queue = [{ id: "kept" }];
-  make(false, queue)(event);
+  make(false, [{ id: "kept" }])(event);
   assert.equal(event.target.checked, true);
-  assert.deepEqual(calls.find(([name]) => name === "queue"), ["queue", queue]);
+  assert.equal(calls.find(([name]) => name === "queue"), undefined);
   assert.deepEqual(calls.find(([name]) => name === "consent"), ["consent", true]);
   const note = calls.find(([name]) => name === "note")[1];
   assert.equal(note.tone, "error");

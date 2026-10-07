@@ -115,6 +115,72 @@ const BOARD_REFUSAL_COPY = {
   contact: "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.",
 };
 
+/**
+ * Whether this page already put these words on the board. The server takes
+ * the same body from the same device again without storing it, for six hours
+ * (20260929020000): a retry of a post that landed has to look like success.
+ * But every submit here has a new event id, so a player who posts the same
+ * line an hour later is that retry to the server, and was told "글을 올렸습니다"
+ * for a post that went nowhere. `posted` is body -> when. It is kept for the
+ * page, not in the hook: the intro and the runtime each mount the board.
+ */
+const BOARD_REPEAT_WINDOW_MS = 6 * 60 * 60_000;
+const ownBoardPosts = new Map();
+
+export function isOwnRecentPost(posted, body, now = Date.now()) {
+  const at = posted.get(body);
+  return at !== undefined && now - at < BOARD_REPEAT_WINDOW_MS;
+}
+
+/**
+ * Why the 글 남기기 button will not act at all, or null. These are the three
+ * states a press cannot change: no board to post to, a post already on its
+ * way, and text that has to be anonymised first. The button stays reachable
+ * through all three (GuardedButton), and the screen points it at the words
+ * that say which one it is.
+ *
+ * A name or a post that is too short is not here. The button used to be
+ * `disabled` for those as well, with nothing said, so the sentences in
+ * BOARD_REFUSAL_COPY could never be reached; now the press goes through and
+ * `checkBoardSubmit` answers it.
+ */
+export function getBoardSubmitBlock({ boardStatus, isPosting = false, privacySignalCount = 0 }) {
+  if (boardStatus !== "ready") return "offline";
+  if (isPosting) return "posting";
+  if (privacySignalCount > 0) return "privacy";
+  return null;
+}
+
+/**
+ * What a press on 글 남기기 is told instead of being sent, or null when the
+ * post may go. The order is the order the checks have always run in.
+ *
+ * The honeypot used to answer with "글을 올렸습니다" and empty the post: right
+ * for a script, and the same for a person whose browser or password manager
+ * had filled the hidden field, who was told a post went up that went nowhere,
+ * every time. It says so now and the hook empties the field, so a person's
+ * second press goes through; a script that fills every field again is stopped
+ * again, and the trigger on the table is still the defence that counts.
+ */
+export function checkBoardSubmit({ honeypot = "", sinceOpenedMs, privacySignalCount = 0, nickname, body, sinceLastPostMs = null }) {
+  if (honeypot.trim().length > 0) {
+    return { reason: "honeypot", message: "자동으로 채워진 칸이 있어 글을 올리지 않았습니다. 다시 눌러 주세요." };
+  }
+  if (sinceOpenedMs < BOARD_DWELL_MS) {
+    return { reason: "dwell", message: "게시판이 열린 지 얼마 되지 않았습니다. 잠깐 읽어 보고 다시 눌러 주세요." };
+  }
+  if (privacySignalCount > 0) {
+    return { reason: "privacy", message: "식별 정보로 보일 수 있는 표현을 익명화한 뒤 올려 주세요." };
+  }
+  const refusal = getBoardPostRefusal(nickname, body);
+  if (refusal) return { reason: refusal, message: BOARD_REFUSAL_COPY[refusal] };
+  if (sinceLastPostMs !== null && sinceLastPostMs < BOARD_POST_INTERVAL_MS) {
+    const waitSeconds = Math.ceil((BOARD_POST_INTERVAL_MS - sinceLastPostMs) / 1000);
+    return { reason: "interval", message: `글은 30초에 한 번만 올릴 수 있습니다. ${waitSeconds}초 뒤에 다시 눌러 주세요.` };
+  }
+  return null;
+}
+
 function normalizeBoardPost(row = {}) {
   return {
     id: row.id,
@@ -154,7 +220,8 @@ export function useBoard({ showBoard, isOnline }) {
   );
   const [boardBody, setBoardBodyState] = useState("");
   // The honeypot's value. A person never sees the field, so anything in it was
-  // typed by something that reads the markup rather than the page.
+  // put there by something that reads the markup rather than the page -- a
+  // script, or a browser's autofill (see checkBoardSubmit).
   const [boardHoneypot, setBoardHoneypot] = useState("");
   const [boardPostStatus, setBoardPostStatus] = useState("");
   const [isPostingToBoard, setIsPostingToBoard] = useState(false);
@@ -170,7 +237,10 @@ export function useBoard({ showBoard, isOnline }) {
     if (boardOpenedAtRef.current === 0) boardOpenedAtRef.current = Date.now();
     queueMicrotask(() => {
       if (cancelled) return;
-      setBoardStatus("loading");
+      // A board that has answered stays open while it is read again. Every
+      // post used to put the list back to "불러오는 중" and lock the fields the
+      // player had just typed in.
+      setBoardStatus((status) => (status === "ready" ? status : "loading"));
       setBoardError("");
     });
     fetchBoardPosts()
@@ -183,7 +253,8 @@ export function useBoard({ showBoard, isOnline }) {
       .catch((error) => {
         if (cancelled) return;
         console.warn(error);
-        setBoardPosts([]);
+        // The posts already fetched stay: losing the connection while reading
+        // used to empty the list that was on the screen.
         setBoardStatus(isOnline ? "error" : "local");
         setBoardError(
           isOnline
@@ -202,12 +273,11 @@ export function useBoard({ showBoard, isOnline }) {
   // The composer is for a board that answered. It used to stay open with no
   // server in reach, and said so only after the player had written the post.
   const canWriteBoardPost = boardStatus === "ready";
-  const canSubmitBoardPost =
-    canWriteBoardPost &&
-    !isPostingToBoard &&
-    visibleLength(trimmedBoardNickname) >= BOARD_NICKNAME_MIN_LENGTH &&
-    visibleLength(trimmedBoardBody) >= BOARD_POST_MIN_LENGTH &&
-    activeBoardPrivacySignals.length === 0;
+  const boardSubmitBlock = getBoardSubmitBlock({
+    boardStatus,
+    isPosting: isPostingToBoard,
+    privacySignalCount: activeBoardPrivacySignals.length,
+  });
 
   function setBoardNickname(value) {
     setBoardNicknameState(limitText(value, PLAYER_NAME_MAX_LENGTH));
@@ -229,30 +299,21 @@ export function useBoard({ showBoard, isOnline }) {
 
   async function submitBoardPost() {
     if (isPostingToBoard || !canWriteBoardPost) return;
-    // The honeypot is answered with a success the board never receives. A script
-    // that is told it failed tries again; one that is told it worked moves on.
-    if (boardHoneypot.trim().length > 0) {
-      setBoardBodyState("");
-      setBoardPostStatus("글을 올렸습니다.");
+    const stopped = checkBoardSubmit({
+      honeypot: boardHoneypot,
+      sinceOpenedMs: Date.now() - boardOpenedAtRef.current,
+      privacySignalCount: activeBoardPrivacySignals.length,
+      nickname: boardNickname,
+      body: boardBody,
+      sinceLastPostMs: lastBoardPostAt > 0 ? Date.now() - lastBoardPostAt : null,
+    });
+    if (stopped) {
+      if (stopped.reason === "honeypot") setBoardHoneypot("");
+      setBoardPostStatus(stopped.message);
       return;
     }
-    if (Date.now() - boardOpenedAtRef.current < BOARD_DWELL_MS) {
-      setBoardPostStatus("게시판이 열린 지 얼마 되지 않았습니다. 잠깐 읽어 보고 다시 눌러 주세요.");
-      return;
-    }
-    if (activeBoardPrivacySignals.length > 0) {
-      setBoardPostStatus("식별 정보로 보일 수 있는 표현을 익명화한 뒤 올려 주세요.");
-      return;
-    }
-    const refusal = getBoardPostRefusal(boardNickname, boardBody);
-    if (refusal) {
-      setBoardPostStatus(BOARD_REFUSAL_COPY[refusal]);
-      return;
-    }
-    const sinceLastPost = Date.now() - lastBoardPostAt;
-    if (lastBoardPostAt > 0 && sinceLastPost < BOARD_POST_INTERVAL_MS) {
-      const waitSeconds = Math.ceil((BOARD_POST_INTERVAL_MS - sinceLastPost) / 1000);
-      setBoardPostStatus(`글은 30초에 한 번만 올릴 수 있습니다. ${waitSeconds}초 뒤에 다시 눌러 주세요.`);
+    if (isOwnRecentPost(ownBoardPosts, trimmedBoardBody)) {
+      setBoardPostStatus("같은 글을 이미 올렸습니다. 같은 글은 게시판에 한 번만 실립니다.");
       return;
     }
 
@@ -277,6 +338,7 @@ export function useBoard({ showBoard, isOnline }) {
       }
       setBoardBodyState("");
       setLastBoardPostAt(Date.now());
+      ownBoardPosts.set(trimmedBoardBody, Date.now());
       setBoardPostStatus("글을 올렸습니다.");
       reloadBoard();
     } catch (error) {
@@ -305,7 +367,7 @@ export function useBoard({ showBoard, isOnline }) {
     boardPostStatus,
     isPostingToBoard,
     canWriteBoardPost,
-    canSubmitBoardPost,
+    boardSubmitBlock,
     activeBoardPrivacySignals,
     anonymizeBoardBody,
     submitBoardPost,

@@ -284,7 +284,7 @@ export const case16 = {
           voice: "오늘만큼은 먼저 일어서고 싶지 않아서, 마지막 컵라면을 다 먹을 때까지 대기실에 남는다.",
           echo: "마지막 컵라면을 먹는 동안 다람이가 충전기로 돌아갑니다. 반재욱의 문자는 내일 아침까지 기다립니다.",
           next: "case16_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c16_after_record",

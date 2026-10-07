@@ -22,3 +22,8 @@ export function createOpeningResources(operatorOrigin) {
   }
   return opening;
 }
+
+// The line under a season's first scene, before any choice has been answered.
+// Here, not in runState.js, so the shell's first save can hold it without the
+// table's engine coming into the entry chunk with it.
+export const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";

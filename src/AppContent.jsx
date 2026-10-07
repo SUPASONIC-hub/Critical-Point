@@ -10,9 +10,7 @@ import {
   STORAGE_KEY,
   backUpUnreadableSave,
   claimTabToken,
-  createRunId,
   debugToolsEnabled,
-  makeEmptyScores,
   normalizePlayerName,
   getInvalidSavedStateKeys,
   hasRecoverySlots,
@@ -25,8 +23,8 @@ import {
   writeSaveState,
   writeStoredValue,
 } from "./appConfig.js";
-import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "./gameCases.js";
-import { cognitionLabels, triggerLabels } from "./gameConstants.js";
+import { SEASON_ENTRY_CASE } from "./gameCases.js";
+import { triggerLabels } from "./gameConstants.js";
 import { getLeaderboardHeadline } from "./ranking.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import { LazyScreen } from "./components/LazyScreen.jsx";
@@ -36,7 +34,7 @@ import { useLocalRanking } from "./state/useLocalRanking.js";
 import { useLeaderboard } from "./state/useLeaderboard.js";
 import { useBoard } from "./state/useBoard.js";
 import { useOverlayScreens } from "./state/useOverlayScreens.js";
-import { createOpeningResources } from "./state/openingState.js";
+import { createStartSave } from "./state/shellStartSave.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
 import { getOperatorProfiles } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
@@ -123,34 +121,6 @@ function needsRecovery(saved) {
   return unusable && hasRecoverySlots();
 }
 
-function createStartSave({ playerName, playStyle, dataConsent, operatorOrigin }) {
-  const now = Date.now();
-  return {
-    saveSchemaVersion: SAVE_SCHEMA_VERSION,
-    runId: createRunId(),
-    playerName: normalizePlayerName(playerName) || "분석관",
-    playStyle,
-    openingLegacy: null,
-    dataConsent,
-    started: true,
-    currentCase: SEASON_ENTRY_CASE,
-    completedCases: [],
-    discoveredClues: [],
-    caseResults: {},
-    playtestFeedback: {},
-    nodeId: SEASON_ENTRY_NODE,
-    resources: createOpeningResources(operatorOrigin),
-    log: [],
-    triggers: makeEmptyScores(triggerLabels),
-    cognition: makeEmptyScores(cognitionLabels),
-    echo: "",
-    nodeEnteredAt: now,
-    pendingTelemetry: [],
-    paused: false,
-    savedAt: new Date(now).toISOString(),
-  };
-}
-
 /** The three fields the runtime's own resume flips, over an existing save. */
 function createResumedSave(current) {
   const now = Date.now();
@@ -197,9 +167,10 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
-  // Only `true` is consent: the shell reads the save unrepaired, and a save
+  // The box starts ticked on a device with no save. Where there is a save,
+  // only `true` is consent: the shell reads the save unrepaired, and a save
   // edited to hold the string "false" used to tick the box.
-  const [dataConsent, setDataConsent] = useState(saved?.dataConsent === true);
+  const [dataConsent, setDataConsent] = useState(saved ? saved.dataConsent === true : true);
   const [saveStatus, setSaveStatus] = useState("");
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);

@@ -3,6 +3,7 @@ import {
   CLOUD_SAVE_ENABLED_KEY,
   CLOUD_SAVE_SYNC_KEY,
   isSavedStateShapeValid,
+  NEW_GAME_PLUS_KEY,
   parseCurrentSavedState,
   readSettledWindowSeeds,
   readStoredValue,
@@ -62,6 +63,25 @@ const CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const CODE_LENGTH = 12;
 const UPLOAD_DELAY_MS = 2500;
 const RETRY_INTERVAL_MS = 30000;
+// The server takes 240 puts an hour for one code (20260929030000, and
+// check-grants drives it to the 241st). A scene is two saves or more -- the
+// card laid down, then the verdict -- and each used to be an upload 2.5
+// seconds later, so quick play reached the limit and sat in "요청이 너무
+// 잦습니다" until the hour turned. The first half of the budget is spent as
+// before; past it uploads are spaced so the rest of the hour cannot spend the
+// other half. Counted per page load: a reload forgets, and the server still
+// has the last word.
+const HOURLY_PUT_BUDGET = 240;
+const HOUR_MS = 60 * 60_000;
+const SPACED_UPLOAD_MS = HOUR_MS / (HOURLY_PUT_BUDGET / 2);
+const putTimes = [];
+
+/** How long the next automatic upload waits: `delay`, or longer once half the hour's puts are spent. */
+export function paceUpload(delay, recentPuts, now = Date.now()) {
+  const inHour = recentPuts.filter((at) => now - at < HOUR_MS);
+  if (inHour.length < HOURLY_PUT_BUDGET / 2) return delay;
+  return Math.max(delay, inHour.at(-1) + SPACED_UPLOAD_MS - now);
+}
 
 export const cloudSaveAvailable = telemetryEnabled;
 
@@ -253,6 +273,9 @@ async function putRemote(save, expectedRevision) {
     p_saved_at: save.savedAt,
     p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
   };
+  const now = Date.now();
+  while (putTimes.length > 0 && now - putTimes[0] >= HOUR_MS) putTimes.shift();
+  putTimes.push(now);
   if (expectedRevision === null) return (await callSupabaseRpc("put_cloud_save", body)).data;
   try {
     return (await callSupabaseRpc("put_cloud_save", { ...body, p_expected_revision: expectedRevision })).data;
@@ -376,7 +399,7 @@ function scheduleUpload(delay = UPLOAD_DELAY_MS) {
   globalThis.clearTimeout(uploadTimer);
   uploadTimer = globalThis.setTimeout(() => {
     flushCloudSave();
-  }, delay);
+  }, paceUpload(delay, putTimes));
 }
 
 /** Starts following local saves. Safe to call more than once. */
@@ -399,10 +422,34 @@ export function installCloudSync() {
   globalThis.addEventListener("offline", () => {
     if (readSync().pending && !readSync().conflict) publish({ phase: "offline" });
   });
+  // Through the same pacing as an upload after a save: the tick is a retry,
+  // not a second budget.
   globalThis.setInterval(() => {
-    if (readSync().pending && !readSync().conflict && !isOffline()) flushCloudSave();
+    if (readSync().pending && !readSync().conflict && !isOffline()) scheduleUpload(0);
   }, RETRY_INTERVAL_MS);
   scheduleUpload(1000);
+}
+
+/**
+ * 초기화 tells the player the online copy is kept, and nothing here knew a
+ * reset had happened. The code and the revision on record both survive one, so
+ * the first save of the next run was uploaded as the next revision of the same
+ * lineage, and the copy the question had just promised to keep was replaced a
+ * few seconds into the new game.
+ *
+ * A run started after a reset is not built on what the server holds, which is
+ * what a conflict is. So the reset holds one, from this device's own record
+ * and without asking the network: uploads stop, and the panel offers the two
+ * ways out it already has -- load the online copy, or say that this device's
+ * progress replaces it. With nothing on record as uploaded there is nothing to
+ * keep, and nothing is held.
+ */
+export function holdCloudCopyThroughReset() {
+  const sync = readSync();
+  if (sync.conflict || (sync.revision === null && !sync.synced)) return false;
+  writeSync({ pending: "", conflict: { savedAt: sync.synced, revision: sync.revision } });
+  if (isCloudSaveEnabled()) publish({ phase: "conflict", remoteSavedAt: sync.synced, message: "" });
+  return true;
 }
 
 /** Whether uploads are stopped on a conflict the player has not settled. */
@@ -462,6 +509,11 @@ export async function applyCloudSave({ code, save, settledWindows = [], revision
   );
   if (!written.saved) return false;
   writeStoredValue(CLOUD_SAVE_CODE_KEY, code);
+  // A season that reached its finale opens NEW GAME+, and the key that says so
+  // is written on the device that closed the finale. The runtime also reads
+  // the save for it; the intro shown before the runtime loads reads only the
+  // key, so a finished season carried here had no NEW GAME+ button there.
+  if (restored.caseResults?.final) writeStoredValue(NEW_GAME_PLUS_KEY, "true");
   // What was carried across is this device's and not the server's yet, so the
   // copy is only "in step" when nothing had to be carried.
   const carried = restored !== save;
@@ -500,7 +552,9 @@ export function describeCloudPhase(phase) {
       syncing: "온라인에 올리는 중입니다.",
       synced: "기기와 온라인 모두 최신입니다.",
       offline: "오프라인 · 기기에 저장해 두었고, 연결되면 자동으로 올립니다.",
-      conflict: "다른 기기에서 저장한 진행이 온라인에 있어 올리기를 멈췄습니다. 아래에서 어느 쪽을 남길지 골라 주세요.",
+      // True of both ways into a conflict: another device's upload, and a
+      // reset on this one (holdCloudCopyThroughReset).
+      conflict: "온라인에 이 기기의 지금 진행과 이어지지 않는 저장이 있어 올리기를 멈췄습니다. 다른 기기에서 저장했거나 초기화하기 전의 진행입니다. 아래에서 어느 쪽을 남길지 골라 주세요.",
       error: "온라인 저장에 실패했습니다. 기기 저장은 안전하며 잠시 뒤 다시 시도합니다.",
       disabled: "온라인 저장이 꺼져 있습니다. 이 기기에만 저장합니다.",
       unavailable: "이 배포에는 온라인 저장 서버가 없어 이 기기에만 저장합니다.",

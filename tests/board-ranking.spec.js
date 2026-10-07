@@ -30,6 +30,21 @@ async function openBoard(page) {
   await expect(page.locator(".board-page")).toBeVisible();
 }
 
+/**
+ * 글 남기기 while a press cannot do anything: blocked, not disabled. It stays in
+ * the tab order and is described by the line that says why, where a `disabled`
+ * button was skipped by Tab with the reason left unsaid.
+ */
+async function expectBlockedAndExplained(page, reason) {
+  const submit = page.getByRole("button", { name: "글 남기기" });
+  await expect(submit).toHaveAttribute("aria-disabled", "true");
+  await expect(submit).toHaveJSProperty("disabled", false);
+  await expect(submit).toHaveAttribute("aria-describedby", "board-post-status");
+  await submit.focus();
+  await expect(submit, "a keyboard can still reach it").toBeFocused();
+  await expect(page.locator("#board-post-status")).toContainText(reason);
+}
+
 test("the board takes a post, says so aloud, and files it under its own id", async ({ page }) => {
   const posts = [{ id: 1, nickname: "먼저 온 사람", body: "끝까지 가 보세요.", created_at: "2026-09-27T09:00:00Z" }];
   const written = [];
@@ -110,7 +125,9 @@ test("a board that cannot be reached says so, closes the composer, and can be tr
   await expect(page.getByTestId("board-list-state")).not.toContainText("첫 글을 남겨보세요");
   await expect(page.getByPlaceholder("게시판에 보일 이름")).toBeDisabled();
   await expect(page.getByPlaceholder(/사건을 지나며/)).toBeDisabled();
-  await expect(page.getByRole("button", { name: "글 남기기" })).toBeDisabled();
+  await expectBlockedAndExplained(page, "연결된 뒤에");
+  // Pressed anyway, it sends nothing and says nothing new.
+  await page.getByRole("button", { name: "글 남기기" }).click({ force: true });
   await expect(page.getByTestId("board-post-status")).toContainText("연결된 뒤에");
 
   reachable = true;
@@ -118,13 +135,14 @@ test("a board that cannot be reached says so, closes the composer, and can be tr
   await expect(page.locator(".board-post")).toHaveCount(1);
   await expect(page.locator(".board-status-bar")).toContainText("REMOTE BOARD");
   await expect(page.getByPlaceholder(/사건을 지나며/)).toBeEnabled();
+  await expect(page.getByRole("button", { name: "글 남기기" }), "a board that answered takes a press").not.toHaveAttribute("aria-disabled");
   await expect(page.getByTestId("board-retry")).toHaveCount(0);
 });
 
 test("a deployment with no server says the board is not connected", async ({ page }) => {
   await openBoard(page);
   await expect(page.getByTestId("board-list-state")).toHaveText("지금은 게시판에 연결되어 있지 않습니다.");
-  await expect(page.getByRole("button", { name: "글 남기기" })).toBeDisabled();
+  await expectBlockedAndExplained(page, "연결된 뒤에");
 });
 
 test("no ranking row can take the ranking screen down", async ({ page }) => {
@@ -153,6 +171,15 @@ test("no ranking row can take the ranking screen down", async ({ page }) => {
   await expect(page.locator(".ranking-page")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
   await expect(page.locator(".ranking-row")).toHaveCount(rows.length);
+  // The rows are a list, and each says its place in words: the drawn "01" is
+  // hidden from a screen reader, which used to hear a bare number or nothing.
+  const list = page.getByRole("list").filter({ has: page.locator(".ranking-row") });
+  await expect(list.getByRole("listitem")).toHaveCount(rows.length);
+  for (const [index, row] of (await page.locator(".ranking-row").all()).entries()) {
+    await expect(row).toHaveAttribute("role", "listitem");
+    await expect(row.locator(".sr-only")).toHaveText(`${index + 1}위`);
+    await expect(row.locator(".ranking-position")).toHaveAttribute("aria-hidden", "true");
+  }
   await expect(page.locator(".ranking-row").first()).toContainText("주요 압박 책임");
   await expect(page.locator(".ranking-row").last()).toContainText("주요 압박 호기심");
   await expect(page.locator(".error-screen")).toHaveCount(0);

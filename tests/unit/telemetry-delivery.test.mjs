@@ -201,6 +201,99 @@ test("a ranking row goes after its run's case rows, and waits while one of them 
   assert.equal(policy.isHeldBehindCaseRow(season, [final]), true);
 });
 
+test("a ranking row for a run the server will never hold whole is let go, not sent for a week", async () => {
+  const season = caseItem("run-j", "season-final");
+  const final = caseItem("run-j", "final");
+  const other = caseItem("run-k", "case01");
+  const missing = failure({ status: 425, serverMessage: "season ranking requires every case of the run" });
+
+  // Consent ticked part way through the season: the final case lands, the
+  // ranking row is refused for the cases that were never sent, and nothing
+  // this device still holds could change that answer.
+  const sent = [];
+  const midSeason = await policy.sendTelemetryBatch([final, season, other], {
+    send: async (item) => {
+      sent.push(item.id);
+      if (item === season) throw missing;
+    },
+  });
+  assert.deepEqual(sent, [final.id, other.id, season.id]);
+  assert.deepEqual(midSeason.kept, [], "the row used to be kept, and asked again every five minutes for seven days");
+  assert.deepEqual([midSeason.unranked, midSeason.refused], [1, 0]);
+
+  // The same answer from the database before 20260929010000, which says it with a 400.
+  const older = await policy.sendTelemetryBatch([season], {
+    send: async () => {
+      throw failure({ status: 400, serverMessage: "season ranking requires every case of the run" });
+    },
+  });
+  assert.deepEqual([older.kept, older.unranked], [[], 1]);
+
+  // A case row the server refuses for good takes its run's ranking row with
+  // it, unsent; another run's rows are not touched.
+  const attempted = [];
+  const lostCase = await policy.sendTelemetryBatch([final, season, other], {
+    send: async (item) => {
+      attempted.push(item.id);
+      if (item === final) throw failure({ status: 400, serverMessage: "telemetry payload too large" });
+    },
+  });
+  assert.deepEqual(attempted, [final.id, other.id], "the ranking row was not sent to be refused");
+  assert.deepEqual([lostCase.kept, lostCase.refused, lostCase.unranked], [[], 1, 1]);
+
+  // While a case row of the run is still waiting the ranking row waits too:
+  // that case may yet land, and then the answer is different.
+  const waiting = await policy.sendTelemetryBatch([final, season], {
+    send: async (item) => {
+      if (item === final) throw failure({ status: 503 });
+    },
+  });
+  assert.deepEqual(waiting.kept.map((item) => item.id), [final.id, season.id]);
+  assert.equal(waiting.unranked, 0);
+
+  // The words alone decide nothing: a case row answered that way is kept, and
+  // so is a ranking row whose run is only too young.
+  assert.equal(policy.isUnrankableRefusal(final, missing), false);
+  assert.equal(policy.isUnrankableRefusal(season, failure({ status: 425, serverMessage: "season ranking run is implausibly short" })), false);
+  assert.equal(policy.isUnrankableRefusal(season, missing), true);
+});
+
+test("the status line says a run will not rank, and why, beside whatever else the pass did", async () => {
+  const { describeBatchResult } = await import("../../src/state/useTelemetryQueue.js");
+  assert.deepEqual(describeBatchResult({ queueCommitted: true, left: 0 }), { tone: "success", text: "원격 저장을 모두 완료했습니다." });
+  const unranked = describeBatchResult({ queueCommitted: true, left: 0, unranked: 1 });
+  assert.equal(unranked.tone, "error");
+  assert.match(unranked.text, /시즌 랭킹에 오르지 않습니다/);
+  assert.match(unranked.text, /동의 전에 마친 사건/);
+  assert.match(unranked.text, /이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다/);
+  const mixed = describeBatchResult({ queueCommitted: true, left: 2, refused: 1, unranked: 1 });
+  assert.match(mixed.text, /시즌 랭킹에 오르지 않습니다.*기록 1건은 대기열에서 뺐습니다.*2건이 아직 실패 상태/);
+  assert.match(describeBatchResult({ queueCommitted: true, left: 3 }).text, /^원격 저장 3건이 아직 실패 상태/);
+  assert.match(describeBatchResult({ queueCommitted: false, left: 0, unranked: 1 }).text, /브라우저 저장본 갱신에 실패/);
+});
+
+test("rows deleted from the queue during a pass are not sent when consent is ticked again", async () => {
+  const items = ["case01", "case02", "case03", "case04"].map((caseId) => caseItem("run-l", caseId));
+  const late = feedbackItem(9);
+  // The queue as the hook's ref holds it. During the first send the player
+  // unticks the box (the queue is emptied, and they are told so) and ticks it
+  // again, then sends feedback that is queued under the new consent.
+  let queue = [...items];
+  const sent = [];
+  const { kept, aborted } = await policy.sendTelemetryBatch(items, {
+    canSend: () => true,
+    isQueued: (item) => queue.some((queued) => queued.id === item.id),
+    send: async (item) => {
+      sent.push(item.id);
+      if (item === items[0]) queue = [late];
+    },
+  });
+  assert.equal(aborted, false, "consent is on again by the time the pass asks");
+  assert.deepEqual(sent, [items[0].id], "the three rows the player was told were deleted stayed on the device");
+  assert.deepEqual(kept, []);
+  assert.deepEqual(policy.reconcileTelemetryQueue(queue, items, kept), [late], "and the queue keeps only what was queued since");
+});
+
 test("consent unticked while a send is in flight stops the batch and leaves the queue alone", async () => {
   const items = [caseItem("run-f", "case01"), caseItem("run-f", "case02"), caseItem("run-f", "case03")];
   let consent = true;

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber } from "./tableReadout.js";
+import { formatMultiplier, formatNumber, getClockCall, getTabNotices } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 
@@ -23,11 +23,18 @@ function LostToTab({ onReload }) {
  * The question a second tab asks before it takes a bet another tab is holding.
  * It is a dialog that wants an answer, so it has a name, takes focus when it
  * opens and keeps Tab inside: it said `alertdialog` and did none of the three.
+ * Escape is the answer that changes nothing -- 그 탭에 두기 -- which is also
+ * where focus starts.
  */
 function HeldElsewhere({ onClaim, onLeave }) {
   const dialogRef = useRef(null);
   const leaveRef = useRef(null);
   const trapTab = useDialogFocus(dialogRef, leaveRef);
+  const onKeyDown = (event) => {
+    if (event.key !== "Escape") return trapTab(event);
+    event.preventDefault();
+    return onLeave();
+  };
   return (
     <div
       ref={dialogRef}
@@ -37,7 +44,7 @@ function HeldElsewhere({ onClaim, onLeave }) {
       aria-labelledby="gx-held-title"
       aria-describedby="gx-held-text"
       data-testid="table-held-elsewhere"
-      onKeyDown={trapTab}
+      onKeyDown={onKeyDown}
     >
       <span id="gx-held-title" className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
       <p id="gx-held-text">
@@ -87,9 +94,12 @@ function VerdictSlam({ window: win, multiplier, livePot, grooveBonus, runPot, bu
 }
 
 /** Everything that lands over the table: the relic just taken, a table lost to or held by another tab, the verdict. */
-export function TableNotices({ equipped, lost, held, slam, onReload, onClaim, onLeave }) {
+export function TableNotices({ equipped, tab, clock, slam, onReload, onClaim, onLeave }) {
+  const { lost, held } = getTabNotices(tab);
   return (
     <>
+      {/* The clock's calls: silent to the eye, and on the page before they have anything to say. */}
+      <span className="sr-only" role="status">{getClockCall(clock)}</span>
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />
@@ -133,9 +143,16 @@ export function RelicChips({ relics, pulse }) {
  * hidden. The briefing is already where the table is looked up while it runs,
  * so the explanations are lines in it rather than a panel in front of the hand.
  */
-export function TableGlossary({ mutations, relics, stanceMastery }) {
+export function TableGlossary({ question, cards = [], mutations, relics, stanceMastery }) {
   return (
     <>
+      {/* The question and the cards in full. On the table both are cut to a
+          line count, and the briefing page that printed them whole cannot be
+          opened again once the clock runs. */}
+      <li>{question}</li>
+      {cards.map((card, index) => (
+        <li key={card.id ?? index}>카드 {index + 1}: {card.label}</li>
+      ))}
       {mutations.map((mutation) => (
         <li key={mutation.id}>
           {mutation.label}: {mutation.text}

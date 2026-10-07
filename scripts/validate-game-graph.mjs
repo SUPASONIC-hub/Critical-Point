@@ -18,6 +18,7 @@ import {
   triggerLabels,
 } from "../src/gameData.js";
 import { characterProfileCollisions, getCharacterProfile } from "../src/gameDialogue.js";
+import { branchConditions } from "../src/seasonRules.js";
 import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge, getLeadChoice, getOutcomeCarryover, getOutcomeChoiceId, getRouteMemory, REFRAME_COGNITION, REFRAME_EFFECT } from "../src/gameLogic.js";
 import { pressureBeats } from "../src/nodes/sceneBuild.js";
 import { sceneContext } from "../src/nodes/sceneContext.js";
@@ -31,6 +32,29 @@ const failures = [];
 
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+/**
+ * A card a case writes says how it thinks, and says it in the season's range:
+ * one or two ways of thinking, each weighed 1 to 3. `checkNumberMap` lets a
+ * missing map through because an effect may be absent; a missing `cognition`
+ * is a card the report cannot read, and `{ reframing: 40 }` is one card
+ * outweighing a case. The generated cards are held to the narrower rule further
+ * down (one way of thinking, reframing at 2 and the rest at 1); a 판을 다시
+ * 짠다 card carries none, because the runtime weighs it (REFRAME_COGNITION).
+ */
+const AUTHORED_COGNITION_MAX_KEYS = 2;
+const AUTHORED_COGNITION_MAX_WEIGHT = 3;
+function checkAuthoredCognition(owner, cognition) {
+  const named = Object.entries(cognition && typeof cognition === "object" && !Array.isArray(cognition) ? cognition : {});
+  if (named.length === 0) {
+    failures.push(`${owner} names no way of thinking; give it a cognition`);
+    return;
+  }
+  const weighed = named.every(([, weight]) => Number.isInteger(weight) && weight >= 1 && weight <= AUTHORED_COGNITION_MAX_WEIGHT);
+  if (named.length > AUTHORED_COGNITION_MAX_KEYS || !weighed) {
+    failures.push(`${owner} names its way of thinking as ${JSON.stringify(cognition)}: at most ${AUTHORED_COGNITION_MAX_KEYS} of them, each weighed 1 to ${AUTHORED_COGNITION_MAX_WEIGHT}`);
+  }
 }
 
 function checkNumberMap(owner, fieldName, value, allowedKeys) {
@@ -50,6 +74,12 @@ for (const caseId of CASE_SEQUENCE) {
   if (!nodes[CASE_START_NODES[caseId]]) failures.push(`${caseId} start node is missing`);
   if (!CASE_RESULT_NODES[caseId]) failures.push(`${caseId} result node is missing`);
 }
+
+// A card's line and reply are filed under its id for the whole case
+// (`choiceVoiceLines[id] = voice`, gameData.js), so two scenes of a case that
+// deal the same id answer with whichever was written last. 판을 다시 짠다 is the
+// one card every scene shares, under one id, on purpose.
+const cardScenes = new Map();
 
 for (const [nodeId, node] of Object.entries(nodes)) {
   if (!orderedNodeIds.has(nodeId)) failures.push(`${nodeId} is not listed in any case order`);
@@ -76,16 +106,37 @@ for (const [nodeId, node] of Object.entries(nodes)) {
     if (!isNonEmptyString(choice.id)) failures.push(`${nodeId} has a choice without an id`);
     if (choice.id && choiceIds.has(choice.id)) failures.push(`${nodeId} has duplicate choice id ${choice.id}`);
     if (choice.id) choiceIds.add(choice.id);
+    if (choice.id && choice.type !== "reframe") {
+      const cardKey = `${node.caseId}:${choice.id}`;
+      const dealtBy = cardScenes.get(cardKey);
+      if (dealtBy && dealtBy !== nodeId) failures.push(`${nodeId}/${choice.id} reuses the id of a card ${dealtBy} deals in the same case; the later one's line and reply overwrite the earlier`);
+      else cardScenes.set(cardKey, nodeId);
+    }
     if (!isNonEmptyString(choice.label)) failures.push(`${nodeId}/${choice.id ?? "unknown"} has no label`);
     if (!isNonEmptyString(choice.next)) failures.push(`${nodeId}/${choice.id ?? "unknown"} has no next route`);
-    if (choice.next && !nodes[choice.next] && !resultNodeIds.has(choice.next)) {
-      failures.push(`${nodeId}/${choice.id} routes to missing node ${choice.next}`);
+    // A result node closes the case it belongs to and no other: the runtime
+    // shows the result screen for any case's result id, but records the summary
+    // only when it is the current case's (`caseClosed`, useChoiceCommit.js), so
+    // a card sent to another case's result ends the run on a case left open.
+    if (choice.next && !nodes[choice.next] && choice.next !== CASE_RESULT_NODES[node.caseId]) {
+      failures.push(
+        resultNodeIds.has(choice.next)
+          ? `${nodeId}/${choice.id} routes to ${choice.next}, the result of another case; ${node.caseId} closes on ${CASE_RESULT_NODES[node.caseId]}`
+          : `${nodeId}/${choice.id} routes to missing node ${choice.next}`,
+      );
+    }
+    if (nodes[choice.next] && nodes[choice.next].caseId !== node.caseId) {
+      failures.push(`${nodeId}/${choice.id} routes to ${choice.next}, a scene of ${nodes[choice.next].caseId}`);
+    }
+    if (choice.branchCondition !== undefined && !branchConditions[choice.branchCondition]) {
+      failures.push(`${nodeId}/${choice.id} opens its side door on "${choice.branchCondition}", a condition seasonRules.js does not have; the door would always be open`);
     }
     if (choice.type !== undefined && !["fixed", "reframe"].includes(choice.type)) {
       failures.push(`${nodeId}/${choice.id} uses unknown choice type ${choice.type}`);
     }
     checkNumberMap(`${nodeId}/${choice.id ?? "unknown"}`, "effect", choice.effect, resourceKeys);
     checkNumberMap(`${nodeId}/${choice.id ?? "unknown"}`, "cognition", choice.cognition, cognitionKeys);
+    if (choice.type !== "reframe") checkAuthoredCognition(`${nodeId}/${choice.id ?? "unknown"}`, choice.cognition);
   }
   for (const trigger of node.triggers ?? []) {
     if (!triggerLabels[trigger]) failures.push(`${nodeId} uses unknown trigger ${trigger}`);
@@ -250,6 +301,32 @@ for (const caseId of CASE_SEQUENCE) {
   }
   for (const nodeId of reached) {
     if (!closes.has(nodeId)) failures.push(`${caseId}/${nodeId} has no path left to ${resultNodeId}`);
+  }
+
+  // A case only moves forward. "Has a path to the result" is still true of a
+  // decision scene whose card goes back to the case's first scene, and that
+  // card replays the case with its effects charged twice. So no card may lead
+  // to a scene that can come back to the card's own.
+  const reachFrom = new Map();
+  const reachOf = (startId) => {
+    if (reachFrom.has(startId)) return reachFrom.get(startId);
+    const seen = new Set();
+    const pending = [startId];
+    while (pending.length > 0) {
+      const nodeId = pending.pop();
+      if (seen.has(nodeId) || !nodes[nodeId]) continue;
+      seen.add(nodeId);
+      for (const choice of nodes[nodeId].choices ?? []) pending.push(choice.next);
+    }
+    reachFrom.set(startId, seen);
+    return seen;
+  };
+  for (const nodeId of reached) {
+    for (const choice of nodes[nodeId].choices ?? []) {
+      if (nodes[choice.next] && reachOf(choice.next).has(nodeId)) {
+        failures.push(`${caseId}/${nodeId}/${choice.id} leads to ${choice.next}, which can come back to ${nodeId}; a case has no way back`);
+      }
+    }
   }
 
   /**
@@ -601,7 +678,14 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   if (!sameKeys(reactionSources, connectiveIds)) fail("the reaction scenes do not follow the connective scenes one for one");
 
   // The side door: the card it hangs on has to be one the scene deals.
-  const [branchSource, branchIndex, branchFirst, branchSecond] = pack.branchPlan;
+  const [branchSource, branchIndex, branchFirst, branchSecond, branchCondition, ...branchRest] = pack.branchPlan;
+  // The fifth entry is the condition the door opens on. `getBranchDetourBypass`
+  // answers "no bypass" for an id it does not know, so a misspelt condition is
+  // a door that is always open, and nothing printed says so.
+  if (branchCondition !== undefined && !branchConditions[branchCondition]) {
+    fail(`branchPlan opens the side door on "${branchCondition}", which is not one of ${Object.keys(branchConditions).join(", ")}`);
+  }
+  if (branchRest.length) fail(`branchPlan has entries no module reads: ${JSON.stringify(branchRest)}`);
   const branchCard = pack.nodes[branchSource]?.choices?.[branchIndex];
   if (!branchCard || branchCard.type === "reframe") fail(`branchPlan hangs the side door on card ${branchIndex + 1} of ${branchSource}, which is not a card that scene deals`);
   if (!sameKeys(Object.keys(pack.branchScenes), [branchFirst, branchSecond])) fail("branchPlan and branchScenes name different scenes");

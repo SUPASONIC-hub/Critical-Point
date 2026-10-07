@@ -184,7 +184,7 @@ summary:focus-visible {
   box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
 }
 .music-toggle span {
-  max-width: 58px;
+  max-width: 3.625rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -439,7 +439,8 @@ summary:focus-visible {
   gap: 8px;
 }
 .intro .brand-mark,
-.ranking-page .brand-mark {
+.ranking-page .brand-mark,
+.board-page .brand-mark {
   gap: 9px;
   min-height: 34px;
   padding: 0 14px 0 12px;
@@ -1261,7 +1262,7 @@ summary:focus-visible {
   color: var(--ui-text-3);
 }
 .intro .start-panel .start-input-row input:focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
   border-color: var(--ui-accent);
   box-shadow: 0 0 0 4px var(--ui-accent-soft);
 }
@@ -2109,6 +2110,9 @@ summary:focus-visible {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+.active-case p {
+  -webkit-line-clamp: none;
+}
 .case-result-mini,
 .case-lock-note {
   display: block;
@@ -2519,9 +2523,6 @@ summary:focus-visible {
   font-size: 0.875rem;
   font-weight: 600;
 }
-.board-page .brand-mark {
-  color: var(--ui-text-3);
-}
 .board-hero {
   max-width: 720px;
   margin-bottom: 26px;
@@ -2560,6 +2561,7 @@ summary:focus-visible {
   box-shadow: var(--ui-shadow-2);
 }
 .board-status-bar .ghost {
+  margin-top: 12px;
   color: var(--ui-text);
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line-strong);
@@ -2693,10 +2695,10 @@ summary:focus-visible {
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
-.board-composer-actions button:hover:not(:disabled) {
+.board-composer-actions button:hover:not([aria-disabled]) {
   transform: translateY(-2px);
 }
-.board-composer-actions button:disabled {
+.board-composer-actions button[aria-disabled] {
   color: var(--ui-text-3);
   background: var(--ui-surface-3);
   cursor: not-allowed;

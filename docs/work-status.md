@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-06 (a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
+Last updated: 2026-10-07 (a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1367,8 +1367,6 @@ Looked at and left, on purpose or for the owner:
   failure's budget ceiling, which the order's own date (twelve days before the
   inquiry opened) puts a week before that failure happened. This changes
   which question caused the posting, and waits for the owner's word.
-- 사건 49 says "내일 밤 아홉 시 33층"; the finale's clocks start in B2 at 23:30
-  and reach the 33rd floor at 00:40.
 - 사건 07's 강서지점 has four people at the counter (the number is in a card
   label) and 프롤로그 04 has six; the papers there are loan applications in one
   and a trust product in the other.
@@ -1406,3 +1404,80 @@ Looked at and left, on purpose or for the owner:
   the merge.
 - Not read: the opening variants against the second scene in the 43 cases the
   content audit only swept, and speech levels season-wide.
+
+## Audit of 2026-10-07
+
+Fifteen readers went through what the first audit had not: the code written
+on 2026-10-06, the table screen and its sound, the screens around the play
+screen, the tests, the content checks, the 34 older migrations, and 38 case
+files read whole. What they found was fixed the same day, by area, each on a
+branch of its own.
+
+Fixed, by area:
+
+- **Consent and telemetry.** The playtest-data box starts ticked on a device
+  with no save. Restoring a slot or a kept copy keeps this device's consent.
+  A run can carry all twelve relics: the server's limit is 16
+  (`20261007000000`), and `check:grants` ties it to `RELIC_IDS`. A ranking row
+  the server can never take is sent once and let go, and the player is told.
+  Rows the player was told were deleted are not sent after a re-tick. A reset
+  holds the online copy until the player chooses in the panel. A ceiling set
+  past the counter's range is still a ceiling (`20261007010000`).
+- **The table.** Grade labels and the relic toast survive reduced motion.
+  Nothing on the table blinks faster than three times a second, and the
+  comfort setting reaches every animation on the stage. A bust says what
+  closed the window (clock heat and an off-beat lock had read "직접 확정했다").
+  그 탭에 두기 closes the question it answers. A held key does not leak to the
+  focused button, and a walked Space is graded when it goes down. Push and
+  lock keep one accessible name. Sound follows the mute, the volume and the
+  visible tab. `GauntletStage.jsx` is 825 lines and 68 imports.
+- **Screens.** The roadmap card of the case in progress resumes it; another
+  card asks before discarding it. The finale counts clues out of the real
+  total. The phone-on-its-side table is for phones (`pointer: coarse`), so a
+  laptop at 200% keeps the desktop table. The board and the ranking say what
+  they are doing and why a button will not act.
+- **Service worker and tooling.** The kept page answers when the host fails.
+  A page asks the new worker to warm when its release is replaced, and offers
+  a reload instead of a retry that cannot work. A release is the commit plus a
+  hash of the files the page names. A deploy waits for a second build of a
+  commit already served and says when the worker is the kill switch. Migration
+  Drift takes fifteen shapes of credential out of what it prints and reports
+  what it used to drop. Visual regression compares pull requests that change
+  markup.
+- **Case text.** About 300 places in 38 files: openings that follow the ending
+  they come from (the `rush` openings of 사건 18, 30, 35, 36, 37, 40, 47 had
+  gone somewhere the previous case did not), openings that give what the next
+  scene assumes, echoes that leave open what a later scene decides, side
+  branches that no longer return to an earlier hour, evidence scenes in 사건
+  41-44, 46 and 49 that say their own time. Decided with the owner's leave and
+  now in `docs/canon.md`: 반재욱 is a 17-year 조사역 in 2023 (twenty by the
+  season) and carries one notebook; 사건 19 is 1월 19일-22일; 트리거랩 and the
+  33rd floor are different buildings; the 보관 X line is 2023-04-27 18:44 on
+  윤상혁's account; the dissent is eleven pages (사건 31's "15쪽" is the eleven
+  missing pages); the response records hold 63 participants and 1기 was four
+  people; 사건 49's appointment is midnight, as the finale's clocks say.
+
+Looked at and left, for the owner:
+
+- 프롤로그 04's national sales figure was changed from 1,180억 to 214억 so it
+  sits under the 310억 loan; another number may be meant.
+- Sixty-odd cards whose numbers or way of thinking argued with their label
+  were changed (the "곁에 남는다" aftermath card is `persistence`, a card whose
+  echo says a day is lost no longer gains time); the ones that could be read
+  either way were left, and 69 cards whose label waits while `time` rises
+  stand as the game's rule that waiting buys today at a later cost.
+- The content checks now refuse another case's result as a `next`, a way
+  back, a card id used twice in a case and a card with no cognition; the
+  canon check reads 34 facts in every file that states them; a hard word has
+  to be explained on every route to the scene that says it, with 28 case and
+  term pairs allowed as they stand (`--list` names them).
+- 트리거랩 is six people and 에코; the nine on 사건 20's list are those six and
+  three who left; 백아린's resignation is never accepted and comes back as a
+  dismissal; the 평택 tower is 22 floors and the 58% of April was wrong too.
+  All three are in `docs/canon.md`. The make-up of the 63 participants
+  (nine analysts, four of 1기, fifty who sat at the lab's terminal in
+  training) was written to make the count add up and may not be what was
+  meant.
+- Nothing here was looked at in a browser by a person: the louder reveal and
+  card cues, the comfort setting's wider reach, the beat marker at every other
+  beat above 180bpm, the roadmap's open cards printing their summary in full.

@@ -70,6 +70,16 @@ jobs:
     # deploy out of it. GitHub keeps one pending run per group; when a third
     # deploy arrives the second is dropped, which is the right one to drop,
     # because the third contains it.
+    #
+    # That reasoning is about automatic deploys, and a dispatch by hand shares
+    # the group with them. So the two can push each other out of the one
+    # pending place: a rollback dispatched while a deploy is running is
+    # dropped if a merge's Verify finishes before that deploy does, and the
+    # other way round a dispatch drops the merge's deploy that was waiting.
+    # Either shows as a cancelled Deploy run. After dispatching, look for the
+    # run to start; if it was cancelled, dispatch again once the running one
+    # has finished. A dropped automatic deploy is picked up by the next merge,
+    # or by a dispatch of the tip of main.
     concurrency:
       group: deploy-production
       cancel-in-progress: false
@@ -107,7 +117,9 @@ jobs:
         with:
           node-version-file: .node-version
       # What the site serves before the deploy: the commit, when the build
-      # wrote one, and a signature of index.html for a release that did not.
+      # wrote one, a signature of index.html for a release that did not, and
+      # a signature of the service worker's file. The last two are how the
+      # wait below tells a second build of the same commit from the first.
       - name: Record what is live now
         id: before
         if: env.DEPLOY_URL != ''
@@ -117,8 +129,14 @@ jobs:
           html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
           live=$(printf '%s' "$html" | grep -oE '<meta name="build-sha" content="[0-9a-f]{7,40}"' | grep -oE '[0-9a-f]{7,40}' | head -1 || true)
           signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
+          # Empty when the file could not be fetched, which is not a signature.
+          origin=$(printf '%s' "$DEPLOY_URL" | grep -oE '^https?://[^/]+' || true)
+          worker_file=$(curl -fsS --max-time 15 "$origin/sw.js?before=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" || true)
+          worker=""
+          if [ -n "$worker_file" ]; then worker=$(printf '%s' "$worker_file" | sha256sum | cut -d' ' -f1); fi
           echo "live=$live" >> "$GITHUB_OUTPUT"
           echo "signature=$signature" >> "$GITHUB_OUTPUT"
+          echo "worker=$worker" >> "$GITHUB_OUTPUT"
           echo "Live before the deploy: ${live:-an untagged release}."
       # A Verify run can be re-run weeks later, and its completion arrives here
       # looking exactly like a fresh one. Pressed, it would put the old commit
@@ -239,22 +257,70 @@ jobs:
       # an unverified commit passed this check. A release that carries no tag
       # falls back to index.html, or its ETag / Last-Modified, differing from
       # what was live before the deploy was pressed.
+      #
+      # A commit deployed a second time is the case the tag cannot answer: the
+      # site names that commit before the new build exists, so the first look
+      # used to end the wait and the check below ran against the old build.
+      # That is every deploy made to change the host's environment and not
+      # the code -- the service worker's kill switch (README, 오프라인), a
+      # backend address that was missing. When the site already named this
+      # commit, the wait is for what it serves to change: index.html and its
+      # ETag / Last-Modified, or the service worker's file, which a build with
+      # other settings always changes (its release is named for the files the
+      # page loads). A build that comes out the same to the byte, served with
+      # the same headers, cannot be told from the one before it; after ten
+      # minutes the run says so in a warning and checks what is there.
       - name: Wait for the new release to go live
         if: env.DEPLOY_URL != '' && steps.trigger.outputs.triggered == 'true'
         shell: bash
         env:
           BEFORE: ${{ steps.before.outputs.signature }}
+          LIVE_BEFORE: ${{ steps.before.outputs.live }}
+          WORKER_BEFORE: ${{ steps.before.outputs.worker }}
         run: |
           set -uo pipefail
           deadline=$(( $(date +%s) + 1200 ))
+          unchanged_deadline=$(( $(date +%s) + 600 ))
+          origin=$(printf '%s' "$DEPLOY_URL" | grep -oE '^https?://[^/]+' || true)
+          same_before=false
+          if [ -n "$LIVE_BEFORE" ]; then
+            case "$EXPECTED_SHA" in
+              "$LIVE_BEFORE"*) same_before=true ;;
+            esac
+          fi
+          if [ "$same_before" = "true" ]; then
+            echo "The site already served $LIVE_BEFORE when the deploy was pressed; waiting for what it serves to change."
+          fi
           while :; do
             html=$(curl -fsS --max-time 15 -D headers.txt "$DEPLOY_URL" || true)
             live=$(printf '%s' "$html" | grep -oE '<meta name="build-sha" content="[0-9a-f]{7,40}"' | grep -oE '[0-9a-f]{7,40}' | head -1 || true)
             if [ -n "$live" ]; then
               case "$EXPECTED_SHA" in
                 "$live"*)
-                  echo "The site serves $live."
-                  break
+                  if [ "$same_before" != "true" ]; then
+                    echo "The site serves $live."
+                    break
+                  fi
+                  signature=$( { printf '%s' "$html"; grep -iE '^(etag|last-modified):' headers.txt || true; } | sha256sum | cut -d' ' -f1)
+                  # A file that could not be fetched is not a file that changed.
+                  worker_file=$(curl -fsS --max-time 15 "$origin/sw.js?poll=$(date +%s)" || true)
+                  worker="$WORKER_BEFORE"
+                  if [ -n "$worker_file" ] && [ -n "$WORKER_BEFORE" ]; then worker=$(printf '%s' "$worker_file" | sha256sum | cut -d' ' -f1); fi
+                  if [ "$signature" != "$BEFORE" ]; then
+                    echo "The site serves $live again, and its page has changed since the deploy was pressed: the new build is live."
+                    break
+                  fi
+                  if [ "$worker" != "$WORKER_BEFORE" ]; then
+                    echo "The site serves $live again, and its service worker has changed since the deploy was pressed: the new build is live."
+                    break
+                  fi
+                  if [ "$(date +%s)" -ge "$unchanged_deadline" ]; then
+                    echo "::warning title=Could not tell the new build from the old::The site served $live before the deploy was pressed and serves the same page and the same service worker ten minutes later. Either the build came out identical, or it has not gone live: the check below runs against whatever is there. The Render dashboard's deploy log says which."
+                    break
+                  fi
+                  echo "Still serving $live as it was before the deploy."
+                  sleep 20
+                  continue
                   ;;
               esac
               echo "Still serving $live."

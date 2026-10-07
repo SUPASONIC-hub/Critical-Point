@@ -106,12 +106,40 @@ test("with the shortcuts on, the same controls name their keys", async ({ page }
 });
 
 test("the reading clock can start held, and waits", async ({ page }) => {
+  await page.clock.install();
   await withSettings(page, { holdReadingClock: true });
   await startDebugNode(page, "case01", "start", { openTable: false });
   const timer = page.getByTestId("reading-timer");
   await expect(timer).toContainText("멈춤");
   const before = await timer.textContent();
-  await page.waitForTimeout(2500);
+  // The page's own clock, moved by hand and well past the longest reading
+  // time: two and a half seconds of the wall clock proved a held clock no
+  // better than a slow one.
+  await page.clock.runFor(60_000);
   await expect(timer).toHaveText(before ?? "");
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
+});
+
+/** The seconds the table's clock shows, and how many it loses over ten seconds of the page's time. */
+async function clockLossOverTenSeconds(page) {
+  const clock = page.locator(".gx-clock b");
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  const before = Number(await clock.textContent());
+  await page.clock.runFor(10_000);
+  return before - Number(await clock.textContent());
+}
+
+// The setting was only ever read back out of storage. What it is for is the
+// table: forty-five seconds that take ninety.
+test("at 2배 the table's clock runs at half speed", async ({ page }) => {
+  await page.clock.install();
+  await startDebugNode(page, "case01", "start");
+  const plain = await clockLossOverTenSeconds(page);
+  expect(plain, "an unassisted clock loses a second a second").toBeGreaterThanOrEqual(9);
+
+  await withSettings(page, { tableTime: 2 });
+  await startDebugNode(page, "case01", "start");
+  const assisted = await clockLossOverTenSeconds(page);
+  expect(assisted, "ten seconds cost about five").toBeGreaterThanOrEqual(4);
+  expect(assisted).toBeLessThanOrEqual(6);
 });

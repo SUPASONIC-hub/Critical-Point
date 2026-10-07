@@ -16,6 +16,7 @@ import {
 } from "../gameData.js";
 import { applyEffect, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getSeasonWear } from "../gameLogic.js";
 import { caseIntroEchoes, legacyProfiles } from "../caseCopy.js";
+import { holdCloudCopyThroughReset } from "../cloudSave.js";
 import { openCaseRun } from "../gauntlet/gauntletEngine.js";
 import { getSessionId as getSessionIdDefault, telemetryEnabled } from "../telemetry.js";
 import { confirmAction } from "./confirmAction.js";
@@ -25,8 +26,10 @@ import { clearRunStorage, logStorageResetFailure } from "./runStorageReset.js";
 import { appendTraceEvent } from "./trace.js";
 import { leaveReplaySession } from "./useAppPersistence.js";
 
+// The last sentence is what keeps the one before it true: the online copy is
+// not replaced by the next run until the player says so (cloudSave.js).
 const CONFIRM_RESET =
-  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다.";
+  "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다. 온라인 저장은 새 진행을 올리기 전에 시작 화면에서 어느 쪽을 남길지 묻습니다.";
 
 /**
  * What a case opens with, worked out from how the one before it closed: the
@@ -197,6 +200,9 @@ export function createRunLifecycle({
     const failedResetKeys = clearRunStorage();
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
     removeStoredValue(OPERATOR_ORIGIN_KEY);
+    // The copy on the server is kept, as the question said: the next run is
+    // not uploaded over it until the player chooses to.
+    holdCloudCopyThroughReset();
     // A new id for the next run's rows; the old one went with the keys above.
     const patch = runTransition(run, { type: "reset", runId: createRunId(), sessionId: getSessionId(), now: nowMs() });
     setNextParticipantMessage("");

@@ -25,6 +25,33 @@ function normalizeVolumePreset(value) {
   return Object.hasOwn(volumePresets, value) ? value : "normal";
 }
 
+/**
+ * The two sound preferences, read where every cue reads them.
+ *
+ * They live in storage so the choice outlasts the page, and every cue reads
+ * them there rather than from the component, which a cue cannot see. But
+ * storage can refuse a write -- a full quota, a browser that blocks it -- and
+ * the app plays on in that state. The write was never checked, so 배경음 끄기
+ * silenced the score and nothing else: the heartbeat, the drone and the cues
+ * read "on" back from storage, and the next screen's mount turned the score
+ * back on too. A value storage would not take is kept here for the session,
+ * and is dropped the moment a write goes through, so two tabs still agree
+ * through storage whenever storage works.
+ */
+const unsavedPrefs = new Map();
+
+function readPref(key, fallback) {
+  return unsavedPrefs.get(key) ?? readStoredValue(key, fallback);
+}
+
+function writePref(key, value) {
+  if (writeStoredValue(key, value)) unsavedPrefs.delete(key);
+  else unsavedPrefs.set(key, value);
+}
+
+const soundOff = () => readPref(MUSIC_PREF_KEY, "true") === "false";
+const presetMultiplier = () => volumePresets[normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+
 function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
 }
@@ -308,7 +335,7 @@ function followPageVisibility(context) {
     }
     if (!suspendedForHidden) return;
     suspendedForHidden = false;
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    if (soundOff()) return;
     Promise.resolve(context.resume?.()).catch(() => {});
   });
 }
@@ -348,7 +375,7 @@ const REVEAL_PEAK_GAIN = 0.035;
  */
 export function playOpeningAccent() {
   try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
+    if (soundOff()) return;
     // The start button is the page's first gesture now, and on a slow device it
     // is clickable seconds before AdaptiveMusic's mount effect builds the shared
     // runtime. Building it here rather than bailing keeps the cold open's one
@@ -358,7 +385,7 @@ export function playOpeningAccent() {
     if (!context) return;
     Promise.resolve(context.resume?.()).catch(() => {});
 
-    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
+    const multiplier = presetMultiplier();
     const peak = ACCENT_PEAK_GAIN * multiplier;
     const now = context.currentTime;
     const oscillator = context.createOscillator();
@@ -379,17 +406,37 @@ export function playOpeningAccent() {
   }
 }
 
+/**
+ * The context a cue of this module plays on, or null when it must stay quiet:
+ * sound is off, no runtime has been built, or the page is hidden. A hidden
+ * page's context is suspended on purpose (`followPageVisibility`), and these
+ * two cues used to resume it without looking: a window that settled a second
+ * after the player switched tabs opened the reveal behind them, the reveal's
+ * cue woke the context, and the score played on from a tab nobody was looking
+ * at.
+ */
+function wakeForCue() {
+  if (soundOff()) return null;
+  const context = audioRuntime.context;
+  if (!context || globalThis.document?.hidden) return null;
+  Promise.resolve(context.resume?.()).catch(() => {});
+  return context;
+}
+
+/**
+ * A card staked, a stance changed. Like the opening accent it connects to
+ * `destination`: through the music bus it sat under the master's gain, which
+ * is the background score's level and already carries the volume preset, so
+ * the preset was applied twice and the cue peaked at a tenth of the kick drum.
+ */
 export function playTargetLockCue() {
   try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
-    const context = audioRuntime.context;
+    const context = wakeForCue();
     if (!context) return;
-    Promise.resolve(context.resume?.()).catch(() => {});
 
-    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
-    const peak = ACCENT_PEAK_GAIN * 0.72 * multiplier;
+    const peak = ACCENT_PEAK_GAIN * 0.72 * presetMultiplier();
     const now = context.currentTime;
-    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
+    const destination = context.destination;
     const notes = [196, 246.94, 293.66];
 
     notes.forEach((frequency, index) => {
@@ -412,17 +459,15 @@ export function playTargetLockCue() {
   }
 }
 
+/** The reveal's chord. Straight to `destination`, as the target lock is. */
 export function playDecisionRevealCue(tone = "decision-locked") {
   try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return;
-    const context = audioRuntime.context;
+    const context = wakeForCue();
     if (!context) return;
-    Promise.resolve(context.resume?.()).catch(() => {});
 
-    const multiplier = volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier;
-    const peak = REVEAL_PEAK_GAIN * multiplier;
+    const peak = REVEAL_PEAK_GAIN * presetMultiplier();
     const now = context.currentTime;
-    const destination = audioRuntime.bus ?? audioRuntime.master ?? context.destination;
+    const destination = context.destination;
     const patterns = {
       "clue-found": [293.66, 369.99, 440],
       "system-alert": [220, 185, 146.83],
@@ -473,12 +518,17 @@ export function playDecisionRevealCue(tone = "decision-locked") {
  */
 /** Whether the player has sound off. For a voice that outlives the cue that started it. */
 export function isSoundMuted() {
-  return readStoredValue(MUSIC_PREF_KEY, "true") === "false";
+  return soundOff();
+}
+
+/** The volume preset as it stands now, for the same kind of voice. */
+export function getSoundLevel() {
+  return presetMultiplier();
 }
 
 export function acquireCueRuntime() {
   try {
-    if (readStoredValue(MUSIC_PREF_KEY, "true") === "false") return null;
+    if (soundOff()) return null;
     // Deliberately does not build the runtime. `AdaptiveMusic` builds it on
     // mount when the player has sound on, and `playOpeningAccent` builds it for
     // the one gesture that can precede that. A cue firing before either is a
@@ -491,7 +541,7 @@ export function acquireCueRuntime() {
     return {
       context,
       destination: audioRuntime.bus ?? audioRuntime.master ?? context.destination,
-      multiplier: volumePresets[normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal"))].multiplier,
+      multiplier: presetMultiplier(),
     };
   } catch {
     // Audio is an enhancement; browsers may reject it during a gesture.
@@ -500,14 +550,12 @@ export function acquireCueRuntime() {
 }
 
 export function AdaptiveMusic({ modeKey }) {
-  const [enabled, setEnabled] = useState(() => readStoredValue(MUSIC_PREF_KEY, "true") !== "false");
-  const [volumePreset, setVolumePreset] = useState(() =>
-    normalizeVolumePreset(readStoredValue(MUSIC_VOLUME_KEY, "normal")),
-  );
-  const [audioState, setAudioState] = useState(() =>
-    readStoredValue(MUSIC_PREF_KEY, "true") !== "false" ? "starting" : "off",
-  );
+  const [enabled, setEnabled] = useState(() => !soundOff());
+  const [volumePreset, setVolumePreset] = useState(() => normalizeVolumePreset(readPref(MUSIC_VOLUME_KEY, "normal")));
+  const [audioState, setAudioState] = useState(() => (soundOff() ? "off" : "starting"));
   const timerRef = useRef(null);
+  // Set when the effect below has just started the bar, for the one after it.
+  const barStartedRef = useRef(false);
   const stepRef = useRef(0);
   const pulseRef = useRef(null);
   const resumeRef = useRef(null);
@@ -530,7 +578,7 @@ export function AdaptiveMusic({ modeKey }) {
   }, [effectiveVolume, mode]);
 
   useEffect(() => {
-    writeStoredValue(MUSIC_PREF_KEY, String(enabled));
+    writePref(MUSIC_PREF_KEY, String(enabled));
     if (!enabled) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
@@ -545,7 +593,11 @@ export function AdaptiveMusic({ modeKey }) {
     }
 
     function pulse() {
-      if (context.state === "suspended") return;
+      // Only a running context has a moving clock. iOS adds "interrupted" -- a
+      // call, another app's audio -- and a step struck then is scheduled at a
+      // `currentTime` that stands still, so every step of the interruption
+      // sounded together when it ended.
+      if (context.state !== "running") return;
       const currentMode = modeRef.current;
       const step = stepRef.current % STEPS_PER_BAR;
       const destination = audioRuntime.bus ?? audioRuntime.master;
@@ -605,8 +657,16 @@ export function AdaptiveMusic({ modeKey }) {
     function detachUnblockers() {
       for (const type of unblockEvents) window.removeEventListener(type, resumeAfterAutoplayBlock);
     }
+    // Set by a call that found the context stopped, cleared by the one that
+    // strikes the step. A browser may hold `resume()` open until the page has
+    // had a gesture, and the first tap is two events (pointerdown and
+    // touchstart): the call made at mount and one for each event all found it
+    // stopped, and when it started each struck the step it had been waiting
+    // to strike. Every call still asks -- the one inside the gesture is the
+    // one a browser honours -- and one of them answers.
+    let entering = false;
     async function resumeAudio() {
-      const wasRunning = context.state === "running";
+      if (context.state !== "running") entering = true;
       try {
         await context.resume?.();
       } catch (error) {
@@ -620,7 +680,9 @@ export function AdaptiveMusic({ modeKey }) {
       detachUnblockers();
       // A step only for the transition into sound. The interval already
       // carries the bar while the context runs.
-      if (!wasRunning) pulse();
+      if (!entering) return;
+      entering = false;
+      pulse();
     }
     function resumeAfterAutoplayBlock() {
       if (document.hidden) return;
@@ -648,6 +710,7 @@ export function AdaptiveMusic({ modeKey }) {
       resumeAudio();
     }
     timerRef.current = window.setInterval(pulse, modeRef.current.interval);
+    barStartedRef.current = true;
     return () => {
       window.clearInterval(timerRef.current);
       detachUnblockers();
@@ -656,6 +719,13 @@ export function AdaptiveMusic({ modeKey }) {
   }, [enabled]);
 
   useEffect(() => {
+    // The effect above started the bar in this same commit -- a mount, which is
+    // every screen change, or sound turned back on. Restarting it here struck
+    // step 0 a second time at the same instant: the kick, the bass and the pad
+    // doubled at every seam the shared context exists to make seamless.
+    const barJustStarted = barStartedRef.current;
+    barStartedRef.current = false;
+    if (barJustStarted) return;
     if (!enabled || !timerRef.current || !pulseRef.current) return;
     window.clearInterval(timerRef.current);
     // Restart on a bar line so a mode change lands as a musical edit, not a stumble.
@@ -684,7 +754,7 @@ export function AdaptiveMusic({ modeKey }) {
     const currentIndex = volumePresetOrder.indexOf(volumePreset);
     const nextPreset = volumePresetOrder[(currentIndex + 1) % volumePresetOrder.length];
     setVolumePreset(nextPreset);
-    writeStoredValue(MUSIC_VOLUME_KEY, nextPreset);
+    writePref(MUSIC_VOLUME_KEY, nextPreset);
   }
 
   const toggleLabel =

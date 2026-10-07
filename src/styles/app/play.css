@@ -20,7 +20,6 @@
   background: var(--c-acid);
   border: 1px solid var(--c-acid-deep);
   border-radius: 6px;
-  animation: clue-stamp 0.42s 0.16s ease-out both;
 }
 
 .cinematic-clue-card svg {
@@ -58,7 +57,6 @@
   max-height: calc(100dvh - 32px);
   overflow: auto;
   padding: 28px;
-  animation: reveal-in 0.22s ease-out both;
 }
 
 .decision-reveal-footer {
@@ -1706,10 +1704,11 @@
   opacity: calc(var(--gx-heat, 0) * 0.75 + var(--gx-beat, 0) * var(--gx-heat, 0) * 0.25);
 }
 
+/* A shadow: a border's width is layout, and this one moves. */
 .gx-fx-border {
   position: absolute;
   inset: 0;
-  border: calc(var(--gx-heat, 0) * 10px) solid var(--c-gx-heat-a55);
+  box-shadow: inset 0 0 0 calc(var(--gx-heat, 0) * 10px) var(--c-gx-heat-a55);
   opacity: calc(var(--gx-heat, 0) * var(--gx-heat, 0));
 }
 
@@ -2870,8 +2869,7 @@
 }
 
 .gx-fx-fever .gx-fx-border {
-  border-color: var(--c-gx-fever-a40);
-  border-width: 8px;
+  box-shadow: inset 0 0 0 8px var(--c-gx-fever-a40);
   opacity: calc(0.55 + var(--gx-beat, 0) * 0.45);
 }
 
@@ -2953,8 +2951,10 @@
     transform: none;
   }
 
+  /* The fade is the grade's time on screen, so it keeps its length. */
   .gx-grade {
     animation-name: gx-grade-fade;
+    animation-duration: 0.7s !important;
   }
 
   .gx-combo {

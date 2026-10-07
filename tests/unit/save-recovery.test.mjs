@@ -28,6 +28,7 @@ import { applyEffect } from "../../src/riskLogic.js";
 import { isChunkLoadError, quietImport, reloadForMissingChunk } from "../../src/state/chunkReload.js";
 import { queueSavedErrorTelemetry, recordAppError, RENDER_CRASH_SOURCE, resetRecordedErrors, takeQueuedErrorTelemetry } from "../../src/state/errorRecovery.js";
 import { createOpeningResources } from "../../src/state/openingState.js";
+import { createConsentChange } from "../../src/state/useConsentToggle.js";
 
 /** Browser storage as one Map, with a byte budget so a full disk can be staged. */
 function installStorage({ quota = Infinity } = {}) {
@@ -280,6 +281,54 @@ test("an error row queued in storage is handed to the runtime's queue once", () 
   }
 });
 
+test("unticking consent drops the error rows waiting to be folded into the next save", () => {
+  const { restore } = installStorage();
+  try {
+    takeQueuedErrorTelemetry();
+    writeSaveState(runSave({ dataConsent: true }), { force: true });
+    const entry = { id: "error-2", occurredAt: "2026-09-28T00:00:02.000Z", context: { currentCase: "case03", nodeId: "c3_start" } };
+    assert.equal(queueSavedErrorTelemetry(entry, { event_id: "event-2", source: "window-error", error_message: "failed" }), true);
+    // The box on the intro, before a run is started: the shell's own persist
+    // empties the queue in the save, and knows nothing of the error path's list.
+    const said = [];
+    const untick = createConsentChange({
+      persist: () => ({ storageSaved: true }),
+      setDataConsent: () => {},
+      setPendingTelemetry: () => {},
+      setTelemetryStatus: (status) => said.push(status),
+      setNote: () => {},
+    });
+    untick({ target: { checked: false } });
+    assert.match(said.at(-1).text, /대기열도 삭제했습니다/);
+    assert.deepEqual(takeQueuedErrorTelemetry(), [], "the runtime's first save has nothing to put back into a save with consent off");
+  } finally {
+    restore();
+  }
+});
+
+test("an untick the browser refused keeps the error rows it could not delete", () => {
+  const { restore } = installStorage();
+  try {
+    takeQueuedErrorTelemetry();
+    writeSaveState(runSave({ dataConsent: true }), { force: true });
+    const entry = { id: "error-3", occurredAt: "2026-09-28T00:00:03.000Z", context: { currentCase: "case03", nodeId: "c3_start" } };
+    queueSavedErrorTelemetry(entry, { event_id: "event-3", source: "window-error", error_message: "failed" });
+    const queueWrites = [];
+    const untick = createConsentChange({
+      persist: () => ({ storageSaved: false }),
+      setDataConsent: () => {},
+      setPendingTelemetry: (queue) => queueWrites.push(queue),
+      setTelemetryStatus: () => {},
+      setNote: () => {},
+    });
+    untick({ target: { checked: false } });
+    assert.deepEqual(queueWrites, [], "consent is still on, so the queue is not touched");
+    assert.deepEqual(takeQueuedErrorTelemetry().map((item) => item.id), ["error-3"]);
+  } finally {
+    restore();
+  }
+});
+
 test("every way into the season deals the same opening hand", () => {
   for (const origin of ["courier", "lab", "public", "somewhere-else"]) {
     const dealt = createOpeningResources(origin);
@@ -434,6 +483,33 @@ test("the same thing said again is one record, and the console has a budget", ()
     const start = logged();
     for (let line = 0; line < 40; line += 1) recordAppError(new Error(`noise ${line}`), {}, "console-error", { now: at + line });
     assert.equal(logged() - start, 12);
+    // A line past the budget is turned away before the save is read: it used
+    // to parse the whole save first, on every line of the loop.
+    const realGetItem = globalThis.localStorage.getItem;
+    let reads = 0;
+    globalThis.localStorage.getItem = (key) => {
+      reads += 1;
+      return realGetItem(key);
+    };
+    const overBudget = recordAppError(new Error("noise 40"), {}, "console-error", { now: at + 40 });
+    globalThis.localStorage.getItem = realGetItem;
+    assert.equal(reads, 0);
+    assert.match(overBudget.error.message, /^noise 11$/, "the last line that was recorded is handed back");
+
+    // An uncaught error that words itself differently each time has the same
+    // budget, and its own: the console having spent one does not spend this.
+    // (Counted by record: the error log itself keeps only its newest twenty.)
+    const recorded = new Set();
+    let lastError = null;
+    for (let failure = 0; failure < 40; failure += 1) {
+      lastError = recordAppError(new Error(`request ${failure} failed`), {}, "window-error", { now: at + 100 + failure });
+      recorded.add(lastError.id);
+    }
+    assert.equal(recorded.size, 12);
+    assert.equal(lastError.error.message, "request 11 failed");
+    assert.equal(readSave(store).lastError.message, "request 11 failed", "the notice on screen is the last one recorded");
+    // A minute on, the budget is whole again.
+    assert.equal(recordAppError(new Error("request 99 failed"), {}, "window-error", { now: at + 100 + 61_000 }).error.message, "request 99 failed");
 
     // A screen that fails to draw is never folded: each one is a retry.
     resetRecordedErrors();

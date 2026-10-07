@@ -286,7 +286,7 @@ export const case28 = {
           voice: "열흘을 같이 버틴 자리의 끝을 보고 싶어서, 콜센터 불이 꺼질 때까지 남아 상담사들과 떡을 나눈다.",
           echo: "불이 꺼질 때 도윤하가 헤드셋 자국을 문지르며 웃습니다. '오늘은 욕보다 고맙다는 말이 한 통 더 많았어요.' 싱가포르는 다음 주까지 기다립니다.",
           next: "case28_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c28_after_record",

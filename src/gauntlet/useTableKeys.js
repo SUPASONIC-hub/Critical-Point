@@ -8,8 +8,9 @@ const isTextField = (target) =>
 
 // A focused button inside a dialog answers Space and Enter itself. Taking
 // those keys from it made the draft's relic buttons, and any control on the
-// briefing page, unreachable from the keyboard.
-const isDialogButton = (target, selector) => target instanceof HTMLElement && target.matches(`${selector} button`);
+// briefing page, unreachable from the keyboard. A folded note's summary is
+// such a control too.
+const isDialogButton = (target, selector) => target instanceof HTMLElement && target.matches(`${selector} button, ${selector} summary`);
 
 // Anything that answers Space or Enter on its own once it has focus.
 const isControl = (target) => target instanceof HTMLElement && Boolean(target.closest("button, summary, a[href], [role='button']"));
@@ -52,6 +53,14 @@ function letterOf(event) {
  * `:focus-visible` cannot tell the two apart: Chromium turns it on for a
  * pointer-focused button at the first key press, so the walk is tracked here.
  *
+ * A held key repeats, and a repeat is not a second press -- but it is still
+ * the table's key. The handler used to leave a repeat alone before it had
+ * claimed it, so the repeat went on to whatever held focus as a key of its own:
+ * with the pointer's focus left on 밀어붙인다, holding Space pushed once from
+ * here and once more from the button when the key came up, and a second push
+ * can be the wall. A repeat of a key the table would have taken is claimed and
+ * does nothing.
+ *
  * The handler is installed once and reads the stage's current actions through
  * a ref, so it never sees a stale window.
  *
@@ -73,65 +82,7 @@ export function useTableKeys(actions) {
     };
     const onKey = (event) => {
       if (event.key === "Tab") walked = true;
-      if (event.repeat || event.defaultPrevented) return;
-      if (event.ctrlKey || event.metaKey || event.altKey) return;
-      if (isTextField(event.target)) return;
-      if (document.querySelector(".decision-reveal-backdrop")) return;
-      const current = actionsRef.current;
-      const key = event.key;
-      // Single-character keys off (the comfort setting, WCAG 2.1.4): a letter,
-      // a digit or a jamo does nothing. Space, Enter and Escape are not
-      // character keys and stay.
-      if (!getAccessibility().letterKeys && key.length === 1 && key !== " ") return;
-      const letter = letterOf(event);
-      const activation = key === " " || key === "Enter";
-
-      if (current.draftOpen) {
-        // The draft is the decision on screen: nothing reaches the table behind it.
-        if (activation && isDialogButton(event.target, ".gx-draft")) return;
-        const pick = key === "Escape" ? null : current.relicOffer[Number(key) - 1];
-        if (key === "Escape" || pick) {
-          event.preventDefault();
-          current.pickRelic(pick ?? null);
-        } else if (activation) {
-          event.preventDefault();
-        }
-        return;
-      }
-
-      // The briefing opens the table on the key that pushes -- whatever the
-      // player's hand is already resting on -- and a card key opens it with
-      // that card staked.
-      if (current.briefingOpen) {
-        if (activation && isDialogButton(event.target, ".gx-comic")) return;
-        const cardId = cardIdForKey(key, current.cards, current.reframeChoice);
-        if (activation || letter === "w" || cardId) {
-          event.preventDefault();
-          current.openTable(cardId);
-        }
-        return;
-      }
-
-      if (!current.tableOpen) return;
-      if (activation && walked && isControl(event.target)) return;
-      if (letter === "e") {
-        event.preventDefault();
-        current.focus(event);
-      } else if (letter === "q") {
-        event.preventDefault();
-        current.cycleFocusMode();
-      } else if (key === " " || letter === "w") {
-        event.preventDefault();
-        current.push(event);
-      } else if (key === "Enter") {
-        event.preventDefault();
-        current.cash();
-      } else {
-        const cardId = cardIdForKey(key, current.cards, current.reframeChoice);
-        if (!cardId) return;
-        event.preventDefault();
-        current.select(cardId);
-      }
+      handleTableKey(event, actionsRef.current, walked);
     };
     globalThis.addEventListener("keydown", onKey);
     globalThis.addEventListener("pointerdown", onPointer, true);
@@ -142,4 +93,59 @@ export function useTableKeys(actions) {
   }, []);
 
   return hints;
+}
+
+/**
+ * One keydown against the table as it stands. `current` is the stage's
+ * actions and state; `walked` is whether focus got where it is by Tab.
+ * Exported for the unit tests, which press keys no browser has to be open for.
+ */
+export function handleTableKey(event, current, walked = false) {
+  if (event.defaultPrevented) return;
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  if (isTextField(event.target)) return;
+  if (document.querySelector(".decision-reveal-backdrop")) return;
+  const key = event.key;
+  // Single-character keys off (the comfort setting, WCAG 2.1.4): a letter,
+  // a digit or a jamo does nothing. Space, Enter and Escape are not
+  // character keys and stay.
+  if (!getAccessibility().letterKeys && key.length === 1 && key !== " ") return;
+  const letter = letterOf(event);
+  const activation = key === " " || key === "Enter";
+  // The key is the table's: the page does not get it, and the action runs
+  // once however long the key is held.
+  const take = (action) => {
+    event.preventDefault();
+    if (!event.repeat) action();
+  };
+
+  if (current.draftOpen) {
+    // The draft is the decision on screen: nothing reaches the table behind it.
+    if (activation && isDialogButton(event.target, ".gx-draft")) return;
+    const pick = key === "Escape" ? null : current.relicOffer[Number(key) - 1];
+    if (key === "Escape" || pick) take(() => current.pickRelic(pick ?? null));
+    else if (activation) event.preventDefault();
+    return;
+  }
+
+  // The briefing opens the table on the key that pushes -- whatever the
+  // player's hand is already resting on -- and a card key opens it with
+  // that card staked.
+  if (current.briefingOpen) {
+    if (activation && isDialogButton(event.target, ".gx-comic")) return;
+    const cardId = cardIdForKey(key, current.cards, current.reframeChoice);
+    if (activation || letter === "w" || cardId) take(() => current.openTable(cardId));
+    return;
+  }
+
+  if (!current.tableOpen) return;
+  if (activation && walked && isControl(event.target)) return;
+  if (letter === "e") take(() => current.focus(event));
+  else if (letter === "q") take(() => current.cycleFocusMode());
+  else if (key === " " || letter === "w") take(() => current.push(event));
+  else if (key === "Enter") take(() => current.cash());
+  else {
+    const cardId = cardIdForKey(key, current.cards, current.reframeChoice);
+    if (cardId) take(() => current.select(cardId));
+  }
 }

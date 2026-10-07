@@ -699,6 +699,9 @@ const ENDINGS = {
   "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "다음 플레이에서는 숨겨진 단서를 우선 추적해야 합니다.", failure: false },
 };
 
+/** Every ending's id: what a telemetry row names its ending by, and the server's ranking takes. */
+export const ENDING_IDS = Object.freeze(Object.keys(ENDINGS));
+
 export function getEndingVariant({
   resources = {},
   discoveredClues = [],

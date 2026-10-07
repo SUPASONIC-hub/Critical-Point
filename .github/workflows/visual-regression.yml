@@ -3,9 +3,8 @@ name: Visual Regression
 # When the screenshots are compared:
 #
 #   - every push to main;
-#   - a pull request that changes what the screenshots are made of -- the
-#     style sheets, index.html (which carries the inlined critical CSS), the
-#     font, the baselines or this spec -- without anyone asking;
+#   - a pull request that changes what the screenshots are made of, without
+#     anyone asking (the list is in the `scope` job);
 #   - any other pull request once it carries the `visual` label;
 #   - every Dependabot pull request;
 #   - a dispatch by hand, which can also record the baselines.
@@ -93,11 +92,39 @@ jobs:
               decide true "::warning title=Compared without knowing why::The pull request's file list could not be read, so the screenshots are compared to be safe."
               exit 0
             fi
-            touched=$(printf '%s\n' "$files" | grep -E '^(src/styles/|src/assets/fonts/|index\.html$|tests/visual-regression\.spec\.js)' || true)
+            # What the screenshots are made of. The three pictures are the
+            # intro, the table at `c5_voice` and the result of case 01, at two
+            # sizes each (tests/visual-regression.spec.js).
+            #
+            #   src/styles/, src/assets/fonts/, index.html
+            #       the sheets, the font, and the page that carries the
+            #       inlined critical CSS.
+            #   any .jsx
+            #       the markup those sheets style. Until 2026-10-07 a pull
+            #       request that moved an element or renamed a class was not
+            #       compared, and that is most of what changes a screenshot.
+            #   src/nodes/case01.js, src/nodes/case05.js
+            #       the words and choices in the two pictured cases.
+            #   public/
+            #       the key visual, the scene art and the portraits.
+            #   scripts/build-critical-css.mjs, scripts/critical-css-rules.mjs,
+            #   vite.config.js
+            #       what decides which rules are inlined and how the sheet loads.
+            #   playwright.config.js, tests/helpers/, the spec and its baselines
+            #       the browser's settings and how each scene is reached.
+            #   package-lock.json
+            #       React, the icons, Vite and the browser itself.
+            #
+            # Not on the list: the rest of src/*.js (game rules and state can
+            # change a number on the result screen), and the other cases. The
+            # `visual` label is for those, and the push to main compares
+            # everything in any case.
+            pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
+            touched=$(printf '%s\n' "$files" | grep -E "$pattern" || true)
             if [ -n "$touched" ]; then
               decide true "Touches what the screenshots are made of: $(printf '%s' "$touched" | tr '\n' ' ')"
             else
-              decide false "No style sheet, font, index.html or baseline in this pull request; add the visual label to compare anyway."
+              decide false "Nothing in this pull request is on the list of what the screenshots are made of; add the visual label to compare anyway."
             fi
           fi
 

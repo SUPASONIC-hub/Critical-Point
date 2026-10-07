@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
+import { getLeaderboardStatusCopy } from "../ranking.js";
+import { reloadLeaderboard } from "../state/useLeaderboard.js";
 
 export function RankingScreen({
   Music,
@@ -20,6 +22,7 @@ export function RankingScreen({
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
   }, []);
+  const statusCopy = getLeaderboardStatusCopy({ status: leaderboardStatus, headline: rankingHeadline, error: leaderboardError });
 
   return (
       <main className="shell ranking-shell">
@@ -40,16 +43,26 @@ export function RankingScreen({
               압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.
             </p>
           </header>
-          <section className="ranking-status-bar">
+          <section className="ranking-status-bar" aria-busy={statusCopy.loading}>
             <div>
-              <span>{leaderboardStatus === "ready" ? "REMOTE LEADERBOARD" : "LOCAL PLAYTEST BOARD"}</span>
-              <strong>{rankingHeadline.title}</strong>
-              <p>{leaderboardError || rankingHeadline.text}</p>
+              <span>{statusCopy.eyebrow}</span>
+              <strong>{statusCopy.title}</strong>
+              {statusCopy.text && <p>{statusCopy.text}</p>}
             </div>
-            <button type="button" onClick={() => onClose()}>
-              <ChevronRight size={17} />
-              내 기록 만들기
-            </button>
+            {/* One button, as the card is laid out for one: a table that could
+                not be fetched offers the fetch again in place of the way out,
+                which the bar above still has. */}
+            {statusCopy.canRetry ? (
+              <button type="button" data-testid="ranking-retry" onClick={() => reloadLeaderboard()}>
+                <RotateCw size={17} aria-hidden="true" />
+                다시 불러오기
+              </button>
+            ) : (
+              <button type="button" onClick={() => onClose()}>
+                <ChevronRight size={17} />
+                내 기록 만들기
+              </button>
+            )}
           </section>
           <section className="ranking-table-panel" aria-label="플레이어 랭킹">
             <div className="ranking-table-heading">
@@ -59,22 +72,26 @@ export function RankingScreen({
               </div>
               {/* Not a count while there is nothing counted yet: it read
                   "0명의 기록" beside the line that said it was still loading. */}
-              <small>{leaderboardStatus === "loading" ? "불러오는 중" : `${leaderboard.length}명의 기록`}</small>
+              <small>{statusCopy.loading ? "불러오는 중" : `${leaderboard.length}명의 기록`}</small>
             </div>
             <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-              {leaderboardStatus === "loading" ? "" : `${leaderboard.length}명의 기록을 불러왔습니다.`}
+              {statusCopy.loading ? "" : `${leaderboard.length}명의 기록을 불러왔습니다.`}
             </p>
-            {leaderboardStatus === "loading" ? (
+            {statusCopy.loading ? (
               <p className="ranking-empty">기록을 불러오는 중입니다.</p>
             ) : leaderboard.length === 0 ? (
               <p className="ranking-empty">아직 완료된 기록이 없습니다. 첫 시즌을 끝내고 기준선을 세워보세요.</p>
             ) : (
-              <div className="ranking-list">
+              /* A list, so a screen reader says how many rows there are and
+                 where it is among them. The rows were bare <article>s, and the
+                 place a bare "01". */
+              <div className="ranking-list" role="list">
                 {leaderboard.map((entry) => {
                   const isCurrentRun = entry.runId ? entry.runId === runId : entry.sessionCode === sessionCode;
                   return (
-                  <article className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
-                    <strong className="ranking-position">{String(entry.position).padStart(2, "0")}</strong>
+                  <div role="listitem" className={`${isCurrentRun ? "ranking-row current-player" : "ranking-row"}${entry.seasonComplete ? " season-complete" : ""}`} key={entry.id}>
+                    <span className="sr-only">{entry.position}위{isCurrentRun ? ", 내 기록" : ""}</span>
+                    <strong className="ranking-position" aria-hidden="true">{String(entry.position).padStart(2, "0")}</strong>
                     <div className="ranking-player">
                       <b>{entry.headline}</b>
                       <span className="ranking-league-badge">{entry.league}</span>
@@ -98,7 +115,7 @@ export function RankingScreen({
                       <span>판 다시 짜기 {entry.reframeCount}</span>
                       {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                     </div>
-                  </article>
+                  </div>
                   );
                 })}
               </div>

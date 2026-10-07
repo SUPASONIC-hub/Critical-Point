@@ -11,6 +11,7 @@ import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
+import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -57,6 +58,8 @@ export function prefetchGameRuntime() {
  */
 const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새로 시작할까요? 복구 지점은 남습니다.";
 const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
+const CONFIRM_REPLACE_CASE = "진행 중인 사건의 선택 기록을 지우고 이 사건을 열까요? 완료한 사건의 기록은 남습니다.";
+const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요? 지금 판의 선택 기록은 지워집니다.";
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -100,7 +103,8 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     season: {
       seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
-      resourceMeta, seasonCases, caseResults, startCase, getCaseStatusText, normalizeCaseSummary,
+      resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText,
+      normalizeCaseSummary,
     },
     content: {
       playGuideItems, operatorProfiles, operatorOrigin, setOperatorOrigin, operatorProfile, originPrologue,
@@ -148,7 +152,19 @@ export function IntroScreen({ view, renderers = {} }) {
   const startNewGamePlusRun = () => {
     if (mayDiscardRun(CONFIRM_START_NEW_GAME_PLUS)) beginOpeningBurst(startNewGamePlus);
   };
-  const startCaseRun = (caseId) => beginOpeningBurst(() => startCase(caseId), caseId);
+  // A roadmap card. Opening a case starts it at its first scene, so the card of
+  // the case in progress resumes it instead, and a press that would throw a
+  // record away asks first (decideCaseCardPress has the cases).
+  const pressCaseCard = (caseItem) => {
+    const press = decideCaseCardPress({
+      caseId: caseItem.id, status: caseItem.status, currentCase, completedCases, hasResumableSave, logLength: log.length,
+    });
+    if (press === "locked") return;
+    if (press === "resume") return resumeSavedGame();
+    if (press === "replace" && !confirmAction(CONFIRM_REPLACE_CASE)) return;
+    if (press === "restart" && !confirmAction(CONFIRM_RESTART_CASE)) return;
+    beginOpeningBurst(() => startCase(caseItem.id), caseItem.id);
+  };
   const openingCase = seasonCasesBase.find((caseItem) => caseItem.id === openingBurst) ?? null;
   const openingIsFirst = openingCase?.id === seasonCasesBase[0].id;
   // One node with two homes. With no save it is the hero's primary action, so
@@ -563,9 +579,9 @@ export function IntroScreen({ view, renderers = {} }) {
             </div>
           </section>
           </details>
-          {/* The summary text stays visible: consent is opt-in and default off,
-              and this drawer is never nested inside another closed one, so the
-              notice is always one deliberate click away before anything moves. */}
+          {/* The summary text stays visible: the box starts ticked, and this
+              drawer is never nested inside another closed one, so the notice
+              and the way out are always one deliberate click away. */}
           <details className="intro-drawer">
             <summary>
               <h2>데이터 저장 안내</h2>
@@ -671,9 +687,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 caseItem.status === "OPEN" ||
                 caseItem.status === "PLAYING" ||
                 caseItem.status === "COMPLETE";
-              function openCaseFromCard() {
-                if (canOpenCase) startCaseRun(caseItem.id);
-              }
+              const isActiveCase = caseItem.status === "PLAYING" || caseItem.status === "OPEN";
               return (
                 /* A card is an article with a heading, and the heading holds
                    the one control: a <button> may only hold phrasing content,
@@ -691,7 +705,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   data-index={caseDisplayCode(caseItem.id)}
                   className={[
                     "case-card",
-                    caseItem.status === "PLAYING" || caseItem.status === "OPEN" ? "active-case" : caseItem.status === "COMPLETE" ? "complete-case" : "",
+                    isActiveCase ? "active-case" : caseItem.status === "COMPLETE" ? "complete-case" : "",
                     canOpenCase ? "" : "locked-case",
                   ]
                     .filter(Boolean)
@@ -710,7 +724,12 @@ export function IntroScreen({ view, renderers = {} }) {
                       className="case-card-open"
                       blocked={!canOpenCase}
                       aria-label={`${caseItem.label} ${caseItem.title}. ${getCaseStatusText(caseItem.status)}`}
-                      onClick={openCaseFromCard}
+                      /* The summary is cut at three lines on every card but the
+                         one the season is at (.active-case p). The button
+                         covers the card, so its title is the card's tooltip
+                         and carries the whole of a summary that was cut. */
+                      title={isActiveCase ? undefined : simplifyPlayerText(caseItem.summary)}
+                      onClick={() => pressCaseCard(caseItem)}
                     >
                       {simplifyPlayerText(caseItem.title)}
                     </GuardedButton>

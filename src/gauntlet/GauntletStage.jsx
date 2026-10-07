@@ -34,7 +34,7 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
-import { gradePress } from "./timing.js";
+import { press } from "./timing.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -122,10 +122,11 @@ export function GauntletStage({
   const [flash, setFlash] = useState(null);
   // Written by the frame loop on every beat; read here when a push is pressed.
   const beatClock = useRef({ at: 0, period: 0 });
-  // When the pointer last went down on a timed button: a click is graded there.
-  const pointerDownAt = useRef(0);
-  const notePointer = (event) => {
-    pointerDownAt.current = event.timeStamp;
+  // When a press last went down on a timed button -- the pointer, or the key
+  // that will click it at keyup: the click is graded there.
+  const pressDownAt = useRef(0);
+  const notePress = (event) => {
+    if (press.down(event)) pressDownAt.current = event.timeStamp;
   };
   const stageRef = useRef(null);
   // The previous verdict is still on screen while the next table mounts under
@@ -148,6 +149,8 @@ export function GauntletStage({
    * comes back to the briefing instead of inheriting the last one's state.
    */
   const [openedSeed, setOpenedSeed] = useState(null);
+  // The window the reading clock opened by itself, which is said aloud.
+  const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
   const paused = hidden || draftOpen || !tableOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume });
@@ -194,9 +197,8 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
-  // Said once at ten seconds and once at five; the timer itself is silent to a
-  // screen reader, and the tick that marks the last five is sound.
-  const clockCall = !live || paused || remaining > 10 ? "" : remaining > 5 ? "10초 남았다" : "5초 남았다";
+  // A stance cannot be changed on a closed or stopped table, and says so.
+  const stanceBlocked = !live || locked;
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
@@ -338,11 +340,12 @@ export function GauntletStage({
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
-  function openTable(cardId = null) {
+  function openTable(cardId = null, byClock = false) {
     if (!briefingOpen) return;
     const card = cards.find((item) => item.id === cardId);
     if (card && !isCardOpen(card)) return;
     setOpenedSeed(seed);
+    if (byClock) setClockOpenedSeed(seed);
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });
@@ -376,7 +379,7 @@ export function GauntletStage({
     // Graded against the beat the frame loop last landed. With no beat on
     // screen yet -- the first pulse not in -- the press is ungraded: no combo,
     // no slip.
-    const { grade, widened } = gradePress(event, pointerDownAt, beatClock.current, wideBeat);
+    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
     const pushIndex = win.pushes + 1;
     const scored = scoreBeat(win, grade);
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
@@ -394,7 +397,7 @@ export function GauntletStage({
 
   function focus(event) {
     if (!canFocus) return;
-    const { grade, widened } = gradePress(event, pointerDownAt, beatClock.current, wideBeat);
+    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
     const scored = scoreFocus(win, grade);
     dispatch({ type: "FOCUS", grade });
     if (widened) pulseRelic("metronome");
@@ -516,7 +519,6 @@ export function GauntletStage({
           >
             <b>{Math.ceil(remaining)}</b>
           </div>
-          <span className="sr-only" role="status">{clockCall}</span>
         </div>
 
         {(tableRules.length > 0 || ruleHeat > 0) && (
@@ -625,7 +627,7 @@ export function GauntletStage({
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
                 <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
-                {briefOpen && <TableGlossary mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
+                {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
               </ul>
             </details>
           </div>
@@ -669,6 +671,7 @@ export function GauntletStage({
                 type="button"
                 className={`mode-${mode}${active ? " active" : ""}${mastered ? " is-mastered" : ""}`}
                 aria-pressed={active}
+                aria-disabled={stanceBlocked || undefined}
                 onClick={() => setFocusMode(mode)}
               >
                 <span>{profile.label}</span>
@@ -719,16 +722,24 @@ export function GauntletStage({
           type="button"
           className="gx-push"
           data-testid="commit-push"
-          onPointerDown={notePointer}
+          onPointerDown={notePress}
+          onKeyDown={notePress}
           onClick={push}
           disabled={!canPush}
           aria-keyshortcuts={keys("Space W")}
-          aria-label={`밀어붙인다. 열기 ${Math.round(win.gauge)}, 다음 열기 ${Math.round(nextLow)}에서 ${Math.round(nextHigh)}. 심박에 맞춰 누르면 콤보가 쌓인다`}
+          // The name stays put, as the reading clock's does: with the gauge in
+          // it, the button a screen reader is resting on was a new button after
+          // every push. The numbers are its description.
+          aria-label="밀어붙인다"
+          aria-describedby="gx-push-detail"
         >
           <i className="gx-beat-ring" aria-hidden="true" />
           <Flame size={18} aria-hidden="true" />
           <span>밀어붙인다</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
+          <span id="gx-push-detail" className="sr-only">
+            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}. 심박에 맞춰 누르면 콤보가 쌓인다
+          </span>
           {win.lastGrade && (
             <em key={`grade-${win.pushes}`} className={`gx-grade gx-grade-${win.lastGrade}`} aria-hidden="true">
               {GRADE_COPY[win.lastGrade]}
@@ -740,16 +751,21 @@ export function GauntletStage({
           type="button"
           className={`gx-focus focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`}
           data-testid="commit-focus"
-          onPointerDown={notePointer}
+          onPointerDown={notePress}
+          onKeyDown={notePress}
           onClick={focus}
           disabled={!canFocus}
           aria-keyshortcuts={keys("E")}
-          aria-label={`락을 건다. 지금 차지 ${Math.round(win.focus)}. 심박에 맞춰 누르면 판돈과 자원 배율이 오른다`}
+          aria-label="락을 건다"
+          aria-describedby="gx-focus-detail"
         >
           <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
           <span lang="en">LOCK</span>
           <small>{focusModeProfile.label} {Math.round(win.focus)}</small>
+          <span id="gx-focus-detail" className="sr-only">
+            지금 차지 {Math.round(win.focus)}. 심박에 맞춰 누르면 판돈과 자원 배율이 오른다
+          </span>
           {win.lastFocusGrade && (
             <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">
               {FOCUS_COPY[win.lastFocusGrade]}
@@ -796,8 +812,8 @@ export function GauntletStage({
 
       <TableNotices
         equipped={equipped}
-        lost={locked && (win.status === "live" || awaitingClaim)}
-        held={awaitingClaim}
+        tab={{ locked, awaitingClaim, live }}
+        clock={{ live, paused, remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, grooveBonus, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

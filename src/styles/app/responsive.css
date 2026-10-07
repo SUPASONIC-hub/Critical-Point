@@ -75,7 +75,7 @@
     min-width: 0;
   }
   .music-toggle span {
-    max-width: 46px;
+    max-width: 2.875rem;
   }
   .result-page .topbar,
   .ranking-page .topbar,
@@ -142,7 +142,6 @@
     border-left: 0;
   }
   .ranking-detail {
-    grid-column: 2 / -1;
     grid-row: 3;
   }
   .fingerprint-heading {
@@ -160,10 +159,6 @@
   }
   .decision-reveal-backdrop {
     align-items: end;
-    padding: 12px;
-  }
-  .decision-reveal {
-    padding: 21px;
   }
   .decision-reveal-choice {
     font-size: 1.0625rem;
@@ -194,12 +189,13 @@
    it is the wide screen's two panes at a phone's scale -- what to read on the
    left, the hand on the right, the bar under both -- and the read pane gives
    up the lines the briefing already said. Fixed layers do not get the body's
-   side padding, so each keeps itself out from under a notch. */
-@media (max-height: 480px) and (orientation: landscape) {
+   side padding, so each keeps itself out from under a notch. Coarse pointers
+   only: a laptop zoomed to 200% is this short too. */
+@media (max-height: 480px) and (orientation: landscape) and (pointer: coarse) {
   .game-shell {
     --gx-maxw: 100vw;
     display: block;
-    padding: 6px max(12px, env(safe-area-inset-right)) calc(58px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 6px 12px calc(58px + env(safe-area-inset-bottom));
   }
 
   /* The music pills sit lower than a one-line header is tall; drawn at the
@@ -268,8 +264,8 @@
   }
 
   .gx-clock {
-    width: 40px;
-    height: 40px;
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .gx-clock b {
@@ -350,7 +346,7 @@
   }
 
   .gauntlet-stage .gx-card-preview {
-    max-height: 19px;
+    max-height: 1.1875rem;
     overflow: hidden;
   }
 
@@ -367,27 +363,24 @@
     border-radius: 12px;
   }
 
-  .decision-reveal-backdrop {
-    padding: 12px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+  /* .shell, to outrank recovery.css under 768px. */
+  .shell .decision-reveal-backdrop {
+    padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
   }
 }
 
 /* Shorter still: the speaker's line goes at 360px of height, and at 320 the
    run's standing numbers with it. Both are on the briefing page and in the
    report. */
-@media (max-height: 360px) and (orientation: landscape) {
+@media (max-height: 360px) and (orientation: landscape) and (pointer: coarse) {
   .gx-speaker {
     display: none;
   }
 }
 
-@media (max-height: 340px) and (orientation: landscape) {
+@media (max-height: 340px) and (orientation: landscape) and (pointer: coarse) {
   .gx-bank {
     display: none;
-  }
-
-  .gx-question {
-    -webkit-line-clamp: 1;
   }
 
   .gauntlet-stage .gx-card {
@@ -427,17 +420,20 @@
   .bar-track div,
   .score-breakdown i,
   .ranking-comparison em,
-  .ending-axis-grid em {
+  .ending-axis-grid em,
+  .gx-gauge-band,
+  .gx-gauge-wall {
     forced-color-adjust: none;
     background: Highlight;
   }
   .gx-gauge-band {
-    forced-color-adjust: none;
     background: repeating-linear-gradient(-45deg, CanvasText 0 2px, transparent 2px 8px);
     border-left: 2px solid CanvasText;
   }
   .gx-gauge-wall {
-    forced-color-adjust: none;
     background: CanvasText;
+  }
+  [aria-pressed="true"] {
+    outline: 3px solid;
   }
 }

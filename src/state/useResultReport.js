@@ -4,7 +4,6 @@ import { SAVE_SCHEMA_VERSION } from "../appConfig.js";
 import {
   getAftermath,
   getAuthorityReview,
-  getChoiceOutcomeFeedback,
   getEndingAtmosphere,
   getEndingPreview,
   getFailureCause,
@@ -165,7 +164,6 @@ export function useResultReport({
     routeTimeline,
     finalEndingEntry,
     finalAftermathEntry,
-    latestChoiceFeedback: getChoiceOutcomeFeedback(log.at(-1)),
     endingPreview: { ...getEndingPreview(endingVariant), rationale: [
       `${easyResourceLabels.trust} ${standing.trust ?? 0}`,
       `${easyResourceLabels.legitimacy} ${standing.legitimacy ?? 0}`,

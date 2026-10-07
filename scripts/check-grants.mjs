@@ -4,8 +4,10 @@ import { PGlite } from "@electric-sql/pglite";
 
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
-import { createCaseSummary } from "../src/gameLogic.js";
+import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 
 /**
@@ -315,14 +317,16 @@ const uuid = () => `00000000-0000-4000-8000-${String(++uuidCounter).padStart(12,
 const sessionId = (n) => `grants-check-session-${n}`;
 const sessionCodeOf = (id) => id.replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCase();
 
-// A decision-log entry with every key `choose` in src/GameRuntime.jsx writes,
-// at realistic sizes. There is no shared builder for it -- the entry is
-// assembled inline there -- so keep this in step when that object grows.
+// A decision-log entry with every key the commit in src/state/useChoiceCommit.js
+// writes (`entryBase` there, plus `observerTag`), at realistic sizes. There is
+// no shared builder for it -- the entry is assembled inline there -- so the keys
+// are read off that file below and held to this object's.
 function decisionEntry(caseId, index) {
   const resources = { ...initialResources };
   return {
     caseId,
     nodeId: `${caseId}_scene_${index}`,
+    speaker: "한서윤",
     choiceId: `${caseId}_choice_${index}`,
     title: "현장 판단 — 서류가 먼저 도착한 날",
     chapterRule: "기록이 먼저, 해명은 나중",
@@ -330,7 +334,11 @@ function decisionEntry(caseId, index) {
     spokenChoice: "지금 부르겠습니다. 기록은 손대지 마세요.",
     reframe: false,
     reframeOpenedRoute: false,
+    reframeBranchId: null,
     continuityMemory: false,
+    // A bust that skipped a scene: the two keys only such an entry carries.
+    routeChangeKind: "blackout-skip",
+    skippedNodeId: `${caseId}_scene_${index}_skipped`,
     effect: { time: -4, capital: -6, trust: 3, legitimacy: 2, humanCost: 1, fatigue: 2 },
     riskRewardEffect: { time: -1, capital: 2 },
     cognition: { persistence: 2, reflection: 1 },
@@ -339,7 +347,6 @@ function decisionEntry(caseId, index) {
     sceneBeat: { tone: "pressure", line: "시계가 두 번 울렸다.".repeat(4) },
     challenge: { title: "책임의 순서", matched: true, riskDelta: -2 },
     tactical: { read: "압박이 한쪽으로 쏠린다", advice: "속도를 늦춘다" },
-    flowSurge: null,
     tempoBonus: { label: "GROOVE", text: "박자 4회 · 최고 콤보 3 · 판돈 +12" },
     clueReward: null,
     threshold: {
@@ -348,6 +355,7 @@ function decisionEntry(caseId, index) {
       tempo: { hits: 4, maxCombo: 3, groovePot: 12 }, focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
     },
     environmentMode: "stable",
+    assistTime: 1.5,
     suspenseEvent: null,
     clue: null,
     responseTimeSec: 7.4,
@@ -360,12 +368,48 @@ function decisionEntry(caseId, index) {
 const triggers = { responsibility: 12, protection: 8, recognition: 4, autonomy: 3 };
 const cognition = { persistence: 9, reflection: 7, reframing: 3 };
 
-/** `caseTelemetryPayload` in src/GameRuntime.jsx, key for key. */
+// The keys of `entryBase` as the client's source spells them: one per line of
+// that literal, a conditional spread counted by the key inside it.
+{
+  const source = readFileSync(path.join(root, "src", "state", "useChoiceCommit.js"), "utf8").replace(/\r\n/g, "\n");
+  const literal = source.match(/\n( *)const entryBase = \{\n([\s\S]*?)\n\1\};/);
+  const keyLine = literal ? new RegExp(`^${literal[1]}  (?:([A-Za-z]\\w*)[:,]|\\.\\.\\.\\(.*\\{ (\\w+) \\})`) : null;
+  const clientKeys = literal
+    ? literal[2].split("\n").map((line) => line.match(keyLine)).filter(Boolean).map((match) => match[1] ?? match[2])
+    : [];
+  const probeKeys = Object.keys(decisionEntry("case01", 0));
+  if (clientKeys.length < 20) {
+    failures.push(
+      "could not read the decision-log entry's keys from src/state/useChoiceCommit.js (`const entryBase = {`); " +
+        "the entry this check sends can no longer be held to the client's.",
+    );
+  } else {
+    const expected = [...clientKeys, "observerTag"];
+    const differences = [
+      ...expected.filter((key) => !probeKeys.includes(key)).map((key) => `${key} is missing`),
+      ...probeKeys.filter((key) => !expected.includes(key)).map((key) => `${key} is not the client's`),
+    ];
+    if (differences.length) {
+      failures.push(
+        `the decision-log entry this check sends is not the one the client builds: ${differences.join(", ")}. ` +
+          "Bring decisionEntry in scripts/check-grants.mjs in step with entryBase in src/state/useChoiceCommit.js.",
+      );
+    }
+  }
+}
+
+/**
+ * `caseTelemetryPayload` in src/state/useChoiceCommit.js, key for key. The
+ * client sends no `completed_at`: the column's default and the insert trigger
+ * date the row. The probes that forge a date add the key themselves.
+ */
 function casePayload({ session, runId, caseId, completedAt = new Date().toISOString() }) {
   const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index));
   const summary = {
     ...createCaseSummary(triggers, cognition, log, { resources: initialResources, schemaVersion: 7 }),
-    endingVariant: "steady",
+    // The ending as the runtime puts it in a row: its id, not the record the
+    // report prints. A literal here once hid that the client sent the record.
+    endingVariant: toRowSummary({ endingVariant: getEndingVariant({ resources: initialResources }) }).endingVariant,
     gauntlet: createRunSummary(RUN_INITIAL_STATE),
     runId,
     outcomeChoiceId: log.at(-1).choiceId,
@@ -380,7 +424,6 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
     player_name: "익명 분석관",
     case_id: caseId,
     case_title: "수습 딱지",
-    completed_at: completedAt,
     summary,
     resources: initialResources,
     triggers,
@@ -448,7 +491,8 @@ function errorPayload(session, overrides = {}) {
 // ---- telemetry writes, exact shapes
 
 withHeaders({ "x-forwarded-for": "198.51.100.7" });
-const caseRow = casePayload({ session: sessionId(1), runId: "run-contract-1", caseId: "case01", completedAt: "2099-01-01T00:00:00Z" });
+const caseRow = casePayload({ session: sessionId(1), runId: "run-contract-1", caseId: "case01" });
+check(!Object.hasOwn(caseRow, "completed_at"), "the case row this check sends has a completed_at; the client's has none.");
 await post("insert the case row the runtime builds", "playtest_sessions", caseRow);
 // The run/case dedupe drops it silently before the event_id constraint is reached.
 await post("replay the same case row (same event_id)", "playtest_sessions", caseRow);
@@ -459,8 +503,16 @@ await post("send the same run/case under a new event_id", "playtest_sessions", {
      from public.playtest_sessions where run_id = 'run-contract-1'`,
   );
   check(row?.n === 1, `a replayed or re-sent case row was stored ${row?.n} times; event_id and (run_id, case_id) must dedupe.`);
-  check(row?.clamped === true, "a case row dated 2099 kept its date; completed_at must be the server's now().");
+  check(row?.clamped === true, "a case row sent without a date was not given the server's now().");
 }
+await post("insert a case row dated 2099", "playtest_sessions", {
+  ...casePayload({ session: sessionId(1), runId: "run-contract-1b", caseId: "case01" }),
+  completed_at: "2099-01-01T00:00:00Z",
+});
+check(
+  (await one(`select completed_at <= now() as clamped from public.playtest_sessions where run_id = 'run-contract-1b'`))?.clamped === true,
+  "a case row dated 2099 kept its date; completed_at must be the server's now().",
+);
 await post("insert a case row dated 'infinity'", "playtest_sessions", {
   ...casePayload({ session: sessionId(1), runId: "run-contract-2", caseId: "case02" }),
   completed_at: "infinity",
@@ -628,6 +680,23 @@ withHeaders({ "x-forwarded-for": "198.51.100.72" });
 withHeaders({ "x-forwarded-for": "198.51.100.73" });
 // Another address is not held by the first one's counter.
 await post("write telemetry from a second address while the first is at its limit", "app_error_logs", errorPayload(sessionId(42)));
+withHeaders({ "x-forwarded-for": "198.51.100.74" });
+{
+  // A ceiling set above what the counter can count to is still a ceiling. The
+  // counter stops at two billion, and `count <= limit` was true for ever after
+  // (20261007010000): the rule that fails closed had stopped failing.
+  const counter = async () => (await one(`select request_count as n, window_started_at as at from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`)) ?? null;
+  const before = await counter();
+  await db.query(`insert into public.private_settings (name, value) values ('telemetry_daily_bytes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await post("write telemetry under a ceiling set past two billion", "app_error_logs", errorPayload(sessionId(43)));
+  await presetCounter("global:telemetry-bytes", 1999999999);
+  await postRefused("write telemetry once the counter can count no further", "app_error_logs", errorPayload(sessionId(43)), /^PT429 .*daily ceiling/);
+  await db.query(`delete from public.private_settings where name = 'telemetry_daily_bytes'`);
+  // The day's count goes back to what the checks before this one had written.
+  if (before) await db.query(`update public.telemetry_rate_limits set request_count = $1, window_started_at = $2 where actor_key = 'global:telemetry-bytes'`, [before.n, before.at]);
+  else await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`);
+}
 withHeaders(null);
 
 // Sizes, at the caps the measured payloads set (20260929010000). The largest
@@ -649,6 +718,30 @@ withHeaders(null);
     oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(3000) } }), /too large/);
   await postRefused("send a 200 KB row", "playtest_sessions",
     oversize("run-size-7", "case08", { decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) }), /too large/);
+}
+
+// Relics: a run may hold every relic the client has, and the server takes that
+// many. The cap was 9 while the table had twelve, with nothing here to tie the
+// two together, so a run's tenth relic cost it every case row after it and its
+// place in the ranking (20261007000000). The honest row is built from a run
+// that holds all of them, by the builder the runtime uses.
+{
+  const SERVER_RELIC_LIMIT = 16;
+  const withRelics = (runId, caseId, relics) => {
+    const payload = casePayload({ session: sessionId(1), runId, caseId });
+    return { ...payload, dynamics: { ...payload.dynamics, relics } };
+  };
+  const everyRelic = createRunSummary({ ...RUN_INITIAL_STATE, relics: [...RELIC_IDS] }).relics;
+  check(everyRelic.length === RELIC_IDS.length, `a run holding every relic summarises ${everyRelic.length} of ${RELIC_IDS.length}.`);
+  check(
+    RELIC_IDS.length <= SERVER_RELIC_LIMIT,
+    `src/gauntlet/relics.js has ${RELIC_IDS.length} relics and playtest_sessions_dynamics_shape takes ${SERVER_RELIC_LIMIT}. ` +
+      "Add a migration that raises the limit before the relics ship, or a full run loses its case rows.",
+  );
+  await post("send a case row from a run holding every relic", "playtest_sessions", withRelics("run-relics-1", "case09", everyRelic));
+  const filler = (count) => Array.from({ length: count }, (_, index) => RELIC_IDS[index] ?? `relic${index}`);
+  await post(`send a case row with ${SERVER_RELIC_LIMIT} relics`, "playtest_sessions", withRelics("run-relics-2", "case09", filler(SERVER_RELIC_LIMIT)));
+  await postRefused(`send a case row with ${SERVER_RELIC_LIMIT + 1} relics`, "playtest_sessions", withRelics("run-relics-3", "case09", filler(SERVER_RELIC_LIMIT + 1)), /^23514 /);
 }
 
 // ---- the ranking
@@ -708,6 +801,10 @@ await postRefused("rank the run from a device that did not play its final case",
     `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,
   );
   check(row?.summary?.seasonComplete === true && row?.summary?.completedCaseCount === CASE_SEQUENCE.length, "a ranking summary lost seasonComplete or the case count.");
+  check(
+    typeof row?.summary?.endingVariant === "string" && row.summary.endingVariant === getEndingVariant({ resources: initialResources }).id,
+    `a ranking summary does not carry the ending the run's final case row named: ${JSON.stringify(row?.summary?.endingVariant)}`,
+  );
   check(
     Object.values(row?.summary ?? {}).every((value) => ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value)),
     `a ranking summary carries an object: ${JSON.stringify(row?.summary)}`,
@@ -983,6 +1080,12 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
   await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
   await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
+  // The owner's number, as large as they care to make it, is still a limit and
+  // not an error: it was cast to integer, and 2^31 failed every new code (20261007010000).
+  await db.query(`insert into public.private_settings (name, value) values ('cloud_daily_new_codes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await putCloud("start a code under a ceiling set past the integer range", "YYYYYYYY2345");
+  await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
 }
 withHeaders(null);
 
@@ -998,6 +1101,18 @@ const UPDATE_PROBE = {
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
 };
+// The list is typed out because each table needs an assignment of its own, and
+// the rules in part 1 only see table-wide privileges: a new table given a
+// column-level update would be tried by nothing unless it has a line here.
+{
+  const known = tables.map(({ name }) => name);
+  const unprobed = known.filter((name) => !Object.hasOwn(UPDATE_PROBE, name));
+  const gone = Object.keys(UPDATE_PROBE).filter((name) => !known.includes(name));
+  if (unprobed.length) {
+    failures.push(`nothing tries to update, delete from or truncate public.${unprobed.join(", public.")} as anon. Add a line to UPDATE_PROBE in scripts/check-grants.mjs.`);
+  }
+  if (gone.length) failures.push(`UPDATE_PROBE names ${gone.join(", ")}, which the migrations no longer create.`);
+}
 for (const [table, assignment] of Object.entries(UPDATE_PROBE)) {
   await refused(`update ${table}`, "anon", `update public.${table} set ${assignment}`);
   await refused(`delete from ${table}`, "anon", `delete from public.${table}`);

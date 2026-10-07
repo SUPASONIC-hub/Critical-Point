@@ -1,5 +1,5 @@
 import { expect, test } from "./helpers/network.js";
-import { cashStakedCard, resumeSavedRun } from "./helpers/gameFlow.js";
+import { cashStakedCard, resumeSavedRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { savedAtLastScene, seedSave } from "./helpers/seededSave.js";
 
 /**
@@ -23,15 +23,49 @@ test("intro should become usable within the navigation budget", { tag: "@prod" }
 // on the dev server. Two tests now, each measuring what it is called: the first
 // scene from the click that asks for it -- the scene graph fetched, parsed and
 // built -- and the report from the click that closes a case.
+//
+// The first of them used to time the harness and a fixed piece of staging as
+// well. The clock started in the runner before `click()` -- which scrolls,
+// waits for the button to hold still and only then presses -- and stopped at
+// the runner's next poll after the scene was up, so both ends were rounded up
+// by the harness. Between them sat the opening burst, which is on screen for
+// 860ms by design (IntroScreen.jsx) however fast the scene is ready. Now the
+// page keeps both times itself -- the click as the button receives it, the
+// scene as it enters the document -- and the burst is taken out: reduced
+// motion makes it OPENING_BURST_REDUCED_MS, a known length, and that is
+// subtracted.
+const OPENING_BURST_REDUCED_MS = 140;
+
 test("the first scene opens within the render budget", { tag: "@prod" }, async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const start = page.getByTestId("start-first-case");
   await expect(start).toBeEnabled();
-  const clickedAt = await page.evaluate(() => performance.now());
+  await page.evaluate(() => {
+    const times = { clickedAt: null, sceneAt: null };
+    window.__firstScene = times;
+    document.querySelector("[data-testid='start-first-case']").addEventListener(
+      "click",
+      () => {
+        times.clickedAt ??= performance.now();
+      },
+      { capture: true },
+    );
+    const observer = new MutationObserver(() => {
+      if (!document.querySelector("[data-testid='scene-briefing'], .choices .choice")) return;
+      times.sceneAt = performance.now();
+      observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
   await start.click();
-  await expect(page.getByTestId("scene-briefing").or(page.locator(".choices .choice")).first()).toBeVisible();
-  const duration = (await page.evaluate(() => performance.now())) - clickedAt;
+  await expect(page.getByTestId("scene-briefing").or(page.locator(".choices .choice")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const times = await page.evaluate(() => window.__firstScene);
+  expect(times.clickedAt, "the page saw the click").not.toBeNull();
+  expect(times.sceneAt, "the page saw the scene arrive").not.toBeNull();
+  const duration = times.sceneAt - times.clickedAt - OPENING_BURST_REDUCED_MS;
+  expect(duration, "the scene cannot be up before the burst is over").toBeGreaterThanOrEqual(0);
   expect(duration).toBeLessThan(3000);
 });
 

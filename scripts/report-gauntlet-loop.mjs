@@ -93,6 +93,7 @@ const LOCK_SECONDS = 0.6;
 function playCase(caseIndex, decide, grade = null, relics = [], lock = null) {
   let run = openCaseRun({ relics });
   let busts = 0;
+  let midCaseBusts = 0;
   let mutatedAfterBust = 0;
   let played = 0;
   for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
@@ -118,25 +119,32 @@ function playCase(caseIndex, decide, grade = null, relics = [], lock = null) {
     const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed });
     if (verdict.outcome === "bust") {
       busts += 1;
-      if (!caseClosed && nextRun.schema.faceDown && nextRun.schema.startGauge > 0) mutatedAfterBust += 1;
+      if (!caseClosed) midCaseBusts += 1;
+      // Broken is the blackout the bust files on the next board. A bare hand
+      // also has to find it face down and already hot; a mastered lock may turn
+      // the board back over (`applyStanceMastery`), which is the lock working.
+      const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && nextRun.schema.startGauge > 0);
+      if (!caseClosed && broken) mutatedAfterBust += 1;
       // The blackout skip: the room plays the next scene without the player. It
       // never skips onto the result, so the case's last window is always played.
       if (windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
     }
     run = nextRun;
   }
-  return { vault: run.vault, busts, mutatedAfterBust, played };
+  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, played };
 }
 
 function measure(label, decide, grade = null, relics = [], cases = CASES, lock = null) {
   let vault = 0;
   let busts = 0;
+  let midCase = 0;
   let mutated = 0;
   let played = 0;
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
     const result = playCase(caseIndex, decide, grade, relics, lock);
     vault += result.vault;
     busts += result.busts;
+    midCase += result.midCaseBusts;
     mutated += result.mutatedAfterBust;
     played += result.played;
   }
@@ -146,6 +154,7 @@ function measure(label, decide, grade = null, relics = [], cases = CASES, lock =
     bustRate: Number((busts / Math.max(1, played)).toFixed(3)),
     meanWindows: Number((played / cases).toFixed(2)),
     busts,
+    midCase,
     mutated,
   };
 }
@@ -448,11 +457,13 @@ console.log(`late season      blind ${lateBlind.meanVault} (${lateBlind.label}) 
 assert.ok(lateListen.meanVault > lateBlind.meanVault, "late in the season, listening must still beat playing blind");
 assert.ok(lateListen.meanVault < lateSees.meanVault * 0.6, "late in the season, the heartbeat must still not be an answer key");
 
-const bustRows = rows.filter((row) => row.busts > 0);
-assert.ok(
-  bustRows.every((row) => row.mutated > 0),
-  "a bust mid-case always deals a broken board next",
-);
+// "Always" is every one of them. This asked each row for one broken board, so
+// the rule could have held for a single bust in three hundred and passed.
+const bustRows = rows.filter((row) => row.midCase > 0);
+assert.ok(bustRows.length > 0, "no row bust mid-case, so the broken board was never measured");
+for (const row of bustRows) {
+  assert.equal(row.mutated, row.midCase, `a bust mid-case always deals a broken board next (${row.label}: ${row.mutated} of ${row.midCase})`);
+}
 assert.equal(BASE_SCHEMA.stepMin > 0, true);
 assert.ok(getCloseness(0, 90) === 0);
 

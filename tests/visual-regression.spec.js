@@ -1,6 +1,8 @@
 import { expect, test } from "./helpers/network.js";
 import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { measureTable } from "./helpers/layout.js";
+import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 test.use({ colorScheme: "light" });
 
@@ -309,8 +311,15 @@ test("case result explains the ending signals", async ({ page }) => {
   await startDebugNode(page, "case01", "c1_aftershock");
   await completeCurrentCase(page);
   await page.locator("details.report-archive > summary").click();
-  await expect(page.locator(".ending-rationale")).toContainText("믿음");
-  await expect(page.locator(".ending-rationale")).toContainText("공정함");
+  // The two labels are printed whatever the run did, so finding them said only
+  // that the line exists. What explains an ending is the numbers beside them:
+  // the standing the run closed on, and the clues it found.
+  const rationale = page.locator(".ending-rationale");
+  await expect(rationale).toHaveText(/^엔딩 근거: 믿음 \d+ · 공정함 \d+ · \S+ \d+ · 단서 \d+$/);
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  await expect(rationale).toContainText(`믿음 ${saved.resources.trust}`);
+  await expect(rationale).toContainText(`공정함 ${saved.resources.legitimacy}`);
+  await expect(rationale).toContainText(`단서 ${saved.discoveredClues.length}`);
 });
 
 // U-1: one decision used to be seven screens of scrolling on a phone. On the
@@ -325,16 +334,12 @@ test("mobile play screen keeps the whole decision on one screen", { tag: "@layou
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
-  const layout = await page.evaluate(() => {
-    const cards = [...document.querySelectorAll(".choices .choice")].map((card) => card.getBoundingClientRect().bottom);
-    return {
-      lastCard: Math.max(...cards),
-      actions: document.querySelector(".gx-actions").getBoundingClientRect().top,
-      pageHeight: document.body.scrollHeight,
-    };
-  });
-  expect(layout.lastCard).toBeLessThanOrEqual(layout.actions);
-  expect(layout.pageHeight).toBeLessThanOrEqual(844 + 2);
+  // `measureTable` refuses a table with no hand on it: read here by hand, the
+  // last card of no cards was -Infinity, which is above any action bar.
+  const layout = await measureTable(page);
+  expect(layout.cards).toBeGreaterThan(1);
+  expect(layout.lastCard, `last card ${layout.lastCard - layout.actionsTop}px under the action bar`).toBeLessThanOrEqual(layout.actionsTop);
+  expect(await page.evaluate(() => document.body.scrollHeight)).toBeLessThanOrEqual(844 + 2);
 });
 
 test("intro mobile visual baseline @visual", async ({ page }, testInfo) => {

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { isSavedStateShapeValid, parseCurrentSavedState, SAVE_SCHEMA_VERSION } from "../../src/appConfig.js";
 import { normalizeRunState, serializeRunState } from "../../src/gauntlet/gauntletEngine.js";
+import { validateSavedStatePayload } from "../../src/state/payloadSchemas.js";
 import { repairSavedState } from "../../src/state/savedState.js";
 
 /**
@@ -95,6 +96,24 @@ test("a table record that is not a record at all is replaced, and says so", () =
   const empty = load({ ...current, dynamics: {} });
   assert.equal(empty.valid, true, "an empty record is every field missing");
   assert.equal(empty.repaired, false);
+});
+
+test("the validator itself refuses a table record that is not a record", () => {
+  // The test above goes through the repair, which replaces such a record
+  // before the validator sees it; nothing handed the validator one, so the
+  // line that refuses it was run by no test and its coverage came and went
+  // with the order the test processes were merged in (the 2026-10-07 audit,
+  // B4 finding 1).
+  const current = fixtures.find((fixture) => fixture.name === "v2-current.json").save;
+  assert.deepEqual(validateSavedStatePayload(current), []);
+  for (const broken of ["corrupt", ["a", "b"], 42, true]) {
+    assert.deepEqual(validateSavedStatePayload({ ...current, dynamics: broken }), ["invalid dynamics"], JSON.stringify(broken));
+    assert.equal(isSavedStateShapeValid({ ...current, dynamics: broken }), false);
+    assert.deepEqual(validateSavedStatePayload({ ...current, dynamics: broken }, { dynamics: false }), [], "a check that leaves the table out does not read it");
+  }
+  // No record at all is a save from before the table, not a broken one.
+  assert.deepEqual(validateSavedStatePayload({ ...current, dynamics: null }), []);
+  assert.deepEqual(validateSavedStatePayload({ ...current, dynamics: undefined }), []);
 });
 
 test("the decision board's record is brought up to date, not thrown away with the run", () => {

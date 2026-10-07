@@ -1,6 +1,6 @@
 import { Component, Suspense, useEffect, useState, useSyncExternalStore } from "react";
 
-import { isChunkLoadError } from "../state/chunkReload.js";
+import { chunkPanelFor, isChunkLoadError } from "../state/chunkReload.js";
 import { getLoadProgress, subscribeLoadProgress } from "../state/loadProgress.js";
 import { retryFailedScreens } from "../state/retryableLazy.js";
 
@@ -18,15 +18,25 @@ import { retryFailedScreens } from "../state/retryableLazy.js";
  * page, and the panel asks for the same screen again instead
  * (state/retryableLazy.js) -- it used to tell an offline player the game had
  * changed version.
+ *
+ * Two cases sit across that line, and `chunkPanelFor` (state/chunkReload.js)
+ * names them: offline after a new release's worker took the page over, where
+ * asking again cannot work and a reload does; and online after a retry the
+ * browser would not make, where a reload is needed and no version changed.
  */
 export class LazyScreen extends Component {
   state = { error: null, offline: false };
+
+  // Whether this boundary has asked again: the next failure is told as one
+  // that followed a retry.
+  retried = false;
 
   static getDerivedStateFromError(error) {
     return { error, offline: globalThis.navigator?.onLine === false };
   }
 
   retry = () => {
+    this.retried = true;
     retryFailedScreens();
     this.setState({ error: null, offline: false });
   };
@@ -40,7 +50,8 @@ export class LazyScreen extends Component {
       return <Suspense fallback={fallback}>{this.props.children}</Suspense>;
     }
     if (!isChunkLoadError(error)) throw error;
-    if (offline) {
+    const panel = chunkPanelFor({ offline, retried: this.retried });
+    if (panel === "retry") {
       return (
         <main className="error-screen">
           <section className="error-panel" role="alert" data-testid="chunk-offline-panel">
@@ -61,7 +72,7 @@ export class LazyScreen extends Component {
         <section className="error-panel" role="alert" data-testid="chunk-reload-panel">
           <span className="eyebrow" lang="en">CRITICAL POINT / UPDATE</span>
           <h1>화면을 다시 받아야 합니다.</h1>
-          <p>게임이 새 버전으로 바뀌어 이 화면의 파일을 찾지 못했습니다. 저장된 진행은 그대로입니다.</p>
+          <p>{RELOAD_REASON[panel]} 저장된 진행은 그대로입니다.</p>
           <div className="error-actions">
             <button type="button" data-testid="chunk-reload" onClick={() => globalThis.location.reload()}>
               새로고침
@@ -72,6 +83,13 @@ export class LazyScreen extends Component {
     );
   }
 }
+
+// Why the page has to be loaded again, for each case `chunkPanelFor` names.
+const RELOAD_REASON = {
+  reload: "게임이 새 버전으로 바뀌어 이 화면의 파일을 찾지 못했습니다.",
+  "reload-offline": "게임이 새 버전으로 바뀌어 이 화면의 파일을 찾지 못했습니다. 연결이 없어도 새로고침하면 기기에 받아 둔 새 버전으로 열립니다.",
+  "reload-retried": "이 화면의 파일을 다시 받지 못했습니다. 페이지를 새로 열어야 받을 수 있습니다.",
+};
 
 // Long enough that a healthy connection never sees the hint.
 const SLOW_LOAD_MS = 12_000;
