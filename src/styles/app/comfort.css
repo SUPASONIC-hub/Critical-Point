@@ -94,11 +94,11 @@
   font-weight: 700;
 }
 
-/* Calm effects: the table's body. The shake and the flash are written by the
-   frame loop, which reads the setting too (GauntletFx.jsx); these are the
-   parts CSS owns. The vignette and the edge keep telling the heat, at under
-   half the amplitude, and the bust is the settled wash without its two
-   full-screen flashes. */
+/* Calm effects. The frame loop (GauntletFx.jsx) owns the shake, the flash
+   and the beat. Here the vignette and the edge tell the heat at under half
+   strength, the bust is its wash without the two flashes, and nothing pops,
+   slams or glitches in: the grade and the equip toast leave by fading, so
+   they only fade. */
 :root[data-calm-effects] .gx-table {
   transform: none;
 }
@@ -111,11 +111,14 @@
 :root[data-calm-effects] .gx-fx-bust .gx-fx-vignette {
   opacity: 0.4;
 }
-:root[data-calm-effects] .gx-slam-bust::before,
-:root[data-calm-effects] .gx-slam-bust::after,
-:root[data-calm-effects] .gx-breach,
-:root[data-calm-effects] .gx-slam-cashed strong {
+:root[data-calm-effects] .gauntlet-stage :not(.gx-grade, .gx-plate *, .gx-equip-toast),
+:root[data-calm-effects] .gauntlet-stage ::before,
+:root[data-calm-effects] .gauntlet-stage ::after,
+:root[data-calm-effects] .gx-reveal-unlock {
   animation: none;
+}
+:root[data-calm-effects] :is(.gx-grade, .gx-equip-toast) {
+  animation-name: gx-relic-fade;
 }
 
 /* A still intro: the ticker, the drifting art, the wordmark's glitch copies,

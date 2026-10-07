@@ -41,3 +41,27 @@ export function gradePress(event, pointerDown, clock, wide = false) {
   const grade = judgeBeat(since, clock.period, wide);
   return { grade, widened: Boolean(wide && grade && GRADE_RANK[grade] > GRADE_RANK[judgeBeat(since, clock.period) ?? "miss"]) };
 }
+
+/**
+ * A light that may come on no more often than once every `minMs`.
+ *
+ * Asked every frame whether the light's condition holds, and answers whether
+ * the light is on. A turn that would start too soon after the last one is
+ * skipped whole -- the light stays off until the condition has let go and come
+ * back -- so what the player sees is the same light on fewer turns, never a
+ * shortened one. Three flashes a second is the line (WCAG 2.3.1), and the
+ * table's own pulse is held under it by the same number.
+ */
+export function createLightGate(minMs) {
+  let litAt = -Infinity;
+  let asked = false;
+  let lit = false;
+  return (wanted, now) => {
+    if (wanted && !asked) {
+      lit = now - litAt >= minMs;
+      if (lit) litAt = now;
+    }
+    asked = Boolean(wanted);
+    return asked && lit;
+  };
+}

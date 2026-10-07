@@ -471,7 +471,7 @@
   }
 
   .gx-equip-toast {
-    animation-name: gx-relic-fade;
+    animation: gx-relic-fade 1.4s both !important;
   }
 
   .gauntlet-stage .gx-relic-card:hover,
