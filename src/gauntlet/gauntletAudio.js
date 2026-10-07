@@ -1,4 +1,4 @@
-import { acquireCueRuntime, isSoundMuted } from "../components/AdaptiveMusic.jsx";
+import { acquireCueRuntime, getSoundLevel, isSoundMuted } from "../components/AdaptiveMusic.jsx";
 
 /**
  * The gauntlet's sound. Every cue goes through `acquireCueRuntime`, so a muted
@@ -108,7 +108,8 @@ export function startTensionDrone() {
   const runtime = standingRuntime();
   if (!runtime) return { set() {}, stop() {} };
   try {
-    const { context, destination, multiplier } = runtime;
+    const { context, destination } = runtime;
+    let { multiplier } = runtime;
     const master = context.createGain();
     master.gain.setValueAtTime(0.0001, context.currentTime);
     const filter = context.createBiquadFilter();
@@ -133,10 +134,13 @@ export function startTensionDrone() {
         const now = context.currentTime;
         const read = sedated ? 0.35 : closeness;
         // The drone runs for the whole window, so it is the one voice that can
-        // outlive a mute pressed after it started. The preference is in storage,
-        // and the stage drives this ten times a second: it is read once a second.
+        // outlive a mute pressed after it started -- or a volume changed, which
+        // it used to keep as it was when the window opened. The preferences are
+        // in storage, and the stage drives this ten times a second: they are
+        // read once a second.
         if (now - mutedAt >= 1) {
           muted = isSoundMuted();
+          multiplier = getSoundLevel();
           mutedAt = now;
         }
         const level = muted ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
