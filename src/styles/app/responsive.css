@@ -142,7 +142,6 @@
     border-left: 0;
   }
   .ranking-detail {
-    grid-column: 2 / -1;
     grid-row: 3;
   }
   .fingerprint-heading {
@@ -421,17 +420,20 @@
   .bar-track div,
   .score-breakdown i,
   .ranking-comparison em,
-  .ending-axis-grid em {
+  .ending-axis-grid em,
+  .gx-gauge-band,
+  .gx-gauge-wall {
     forced-color-adjust: none;
     background: Highlight;
   }
   .gx-gauge-band {
-    forced-color-adjust: none;
     background: repeating-linear-gradient(-45deg, CanvasText 0 2px, transparent 2px 8px);
     border-left: 2px solid CanvasText;
   }
   .gx-gauge-wall {
-    forced-color-adjust: none;
     background: CanvasText;
+  }
+  [aria-pressed="true"] {
+    outline: 3px solid;
   }
 }
