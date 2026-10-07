@@ -88,13 +88,19 @@ Three of these are reveals, and each still means what it meant:
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
-| 반재욱 | 감사팀 조사역 3년차 | 감사팀 조사역 |
+| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
 | 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
 | 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
 
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+반재욱 carries one worn black notebook for all twenty years (사건 17), and has
+met the analyst by 프롤로그 02. He opens a new page for each matter. The page
+for this loan starts with one line, '2023-0412 -- 179.6' (4월 15일), and each
+later 프롤로그 adds to that same page: 4월 27일 (two lines), 5월 15일, 6월 9일,
+7월 24일 with the analyst's name.
 
 ## The harmed
 
