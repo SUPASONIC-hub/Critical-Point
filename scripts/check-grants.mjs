@@ -317,14 +317,16 @@ const uuid = () => `00000000-0000-4000-8000-${String(++uuidCounter).padStart(12,
 const sessionId = (n) => `grants-check-session-${n}`;
 const sessionCodeOf = (id) => id.replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCase();
 
-// A decision-log entry with every key `choose` in src/GameRuntime.jsx writes,
-// at realistic sizes. There is no shared builder for it -- the entry is
-// assembled inline there -- so keep this in step when that object grows.
+// A decision-log entry with every key the commit in src/state/useChoiceCommit.js
+// writes (`entryBase` there, plus `observerTag`), at realistic sizes. There is
+// no shared builder for it -- the entry is assembled inline there -- so the keys
+// are read off that file below and held to this object's.
 function decisionEntry(caseId, index) {
   const resources = { ...initialResources };
   return {
     caseId,
     nodeId: `${caseId}_scene_${index}`,
+    speaker: "한서윤",
     choiceId: `${caseId}_choice_${index}`,
     title: "현장 판단 — 서류가 먼저 도착한 날",
     chapterRule: "기록이 먼저, 해명은 나중",
@@ -332,7 +334,11 @@ function decisionEntry(caseId, index) {
     spokenChoice: "지금 부르겠습니다. 기록은 손대지 마세요.",
     reframe: false,
     reframeOpenedRoute: false,
+    reframeBranchId: null,
     continuityMemory: false,
+    // A bust that skipped a scene: the two keys only such an entry carries.
+    routeChangeKind: "blackout-skip",
+    skippedNodeId: `${caseId}_scene_${index}_skipped`,
     effect: { time: -4, capital: -6, trust: 3, legitimacy: 2, humanCost: 1, fatigue: 2 },
     riskRewardEffect: { time: -1, capital: 2 },
     cognition: { persistence: 2, reflection: 1 },
@@ -341,7 +347,6 @@ function decisionEntry(caseId, index) {
     sceneBeat: { tone: "pressure", line: "시계가 두 번 울렸다.".repeat(4) },
     challenge: { title: "책임의 순서", matched: true, riskDelta: -2 },
     tactical: { read: "압박이 한쪽으로 쏠린다", advice: "속도를 늦춘다" },
-    flowSurge: null,
     tempoBonus: { label: "GROOVE", text: "박자 4회 · 최고 콤보 3 · 판돈 +12" },
     clueReward: null,
     threshold: {
@@ -350,6 +355,7 @@ function decisionEntry(caseId, index) {
       tempo: { hits: 4, maxCombo: 3, groovePot: 12 }, focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
     },
     environmentMode: "stable",
+    assistTime: 1.5,
     suspenseEvent: null,
     clue: null,
     responseTimeSec: 7.4,
@@ -362,7 +368,41 @@ function decisionEntry(caseId, index) {
 const triggers = { responsibility: 12, protection: 8, recognition: 4, autonomy: 3 };
 const cognition = { persistence: 9, reflection: 7, reframing: 3 };
 
-/** `caseTelemetryPayload` in src/GameRuntime.jsx, key for key. */
+// The keys of `entryBase` as the client's source spells them: one per line of
+// that literal, a conditional spread counted by the key inside it.
+{
+  const source = readFileSync(path.join(root, "src", "state", "useChoiceCommit.js"), "utf8").replace(/\r\n/g, "\n");
+  const literal = source.match(/\n( *)const entryBase = \{\n([\s\S]*?)\n\1\};/);
+  const keyLine = literal ? new RegExp(`^${literal[1]}  (?:([A-Za-z]\\w*)[:,]|\\.\\.\\.\\(.*\\{ (\\w+) \\})`) : null;
+  const clientKeys = literal
+    ? literal[2].split("\n").map((line) => line.match(keyLine)).filter(Boolean).map((match) => match[1] ?? match[2])
+    : [];
+  const probeKeys = Object.keys(decisionEntry("case01", 0));
+  if (clientKeys.length < 20) {
+    failures.push(
+      "could not read the decision-log entry's keys from src/state/useChoiceCommit.js (`const entryBase = {`); " +
+        "the entry this check sends can no longer be held to the client's.",
+    );
+  } else {
+    const expected = [...clientKeys, "observerTag"];
+    const differences = [
+      ...expected.filter((key) => !probeKeys.includes(key)).map((key) => `${key} is missing`),
+      ...probeKeys.filter((key) => !expected.includes(key)).map((key) => `${key} is not the client's`),
+    ];
+    if (differences.length) {
+      failures.push(
+        `the decision-log entry this check sends is not the one the client builds: ${differences.join(", ")}. ` +
+          "Bring decisionEntry in scripts/check-grants.mjs in step with entryBase in src/state/useChoiceCommit.js.",
+      );
+    }
+  }
+}
+
+/**
+ * `caseTelemetryPayload` in src/state/useChoiceCommit.js, key for key. The
+ * client sends no `completed_at`: the column's default and the insert trigger
+ * date the row. The probes that forge a date add the key themselves.
+ */
 function casePayload({ session, runId, caseId, completedAt = new Date().toISOString() }) {
   const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index));
   const summary = {
@@ -384,7 +424,6 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
     player_name: "익명 분석관",
     case_id: caseId,
     case_title: "수습 딱지",
-    completed_at: completedAt,
     summary,
     resources: initialResources,
     triggers,
@@ -452,7 +491,8 @@ function errorPayload(session, overrides = {}) {
 // ---- telemetry writes, exact shapes
 
 withHeaders({ "x-forwarded-for": "198.51.100.7" });
-const caseRow = casePayload({ session: sessionId(1), runId: "run-contract-1", caseId: "case01", completedAt: "2099-01-01T00:00:00Z" });
+const caseRow = casePayload({ session: sessionId(1), runId: "run-contract-1", caseId: "case01" });
+check(!Object.hasOwn(caseRow, "completed_at"), "the case row this check sends has a completed_at; the client's has none.");
 await post("insert the case row the runtime builds", "playtest_sessions", caseRow);
 // The run/case dedupe drops it silently before the event_id constraint is reached.
 await post("replay the same case row (same event_id)", "playtest_sessions", caseRow);
@@ -463,8 +503,16 @@ await post("send the same run/case under a new event_id", "playtest_sessions", {
      from public.playtest_sessions where run_id = 'run-contract-1'`,
   );
   check(row?.n === 1, `a replayed or re-sent case row was stored ${row?.n} times; event_id and (run_id, case_id) must dedupe.`);
-  check(row?.clamped === true, "a case row dated 2099 kept its date; completed_at must be the server's now().");
+  check(row?.clamped === true, "a case row sent without a date was not given the server's now().");
 }
+await post("insert a case row dated 2099", "playtest_sessions", {
+  ...casePayload({ session: sessionId(1), runId: "run-contract-1b", caseId: "case01" }),
+  completed_at: "2099-01-01T00:00:00Z",
+});
+check(
+  (await one(`select completed_at <= now() as clamped from public.playtest_sessions where run_id = 'run-contract-1b'`))?.clamped === true,
+  "a case row dated 2099 kept its date; completed_at must be the server's now().",
+);
 await post("insert a case row dated 'infinity'", "playtest_sessions", {
   ...casePayload({ session: sessionId(1), runId: "run-contract-2", caseId: "case02" }),
   completed_at: "infinity",
@@ -1053,6 +1101,18 @@ const UPDATE_PROBE = {
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
 };
+// The list is typed out because each table needs an assignment of its own, and
+// the rules in part 1 only see table-wide privileges: a new table given a
+// column-level update would be tried by nothing unless it has a line here.
+{
+  const known = tables.map(({ name }) => name);
+  const unprobed = known.filter((name) => !Object.hasOwn(UPDATE_PROBE, name));
+  const gone = Object.keys(UPDATE_PROBE).filter((name) => !known.includes(name));
+  if (unprobed.length) {
+    failures.push(`nothing tries to update, delete from or truncate public.${unprobed.join(", public.")} as anon. Add a line to UPDATE_PROBE in scripts/check-grants.mjs.`);
+  }
+  if (gone.length) failures.push(`UPDATE_PROBE names ${gone.join(", ")}, which the migrations no longer create.`);
+}
 for (const [table, assignment] of Object.entries(UPDATE_PROBE)) {
   await refused(`update ${table}`, "anon", `update public.${table} set ${assignment}`);
   await refused(`delete from ${table}`, "anon", `delete from public.${table}`);
