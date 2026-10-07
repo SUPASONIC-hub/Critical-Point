@@ -44,6 +44,7 @@
     "src/state/runLifecycle.js": 100,
     "src/state/runState.js": 100,
     "src/state/runStorageReset.js": 82,
+    "src/state/shellStartSave.js": 99,
     "src/state/savedRunScope.js": 100,
     "src/state/savedState.js": 83,
     "src/state/sceneFocus.js": 100,
