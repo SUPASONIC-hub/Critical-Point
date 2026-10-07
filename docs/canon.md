@@ -96,6 +96,12 @@ Three of these are reveals, and each still means what it meant:
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
 
+반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
+season; he is never "3년차" (that is 도윤하 at her window). His notebook holds
+the names of the 47 people his inquiries put out of a job, one line each, in
+ink (사건 07, 13, 17, 44; 도윤하's 스프링 수첩 in 프롤로그 04 also counts 47
+names, and is a different notebook).
+
 반재욱 carries one worn black notebook for all twenty years (사건 17), and has
 met the analyst by 프롤로그 02. He opens a new page for each matter. The page
 for this loan starts with one line, '2023-0412 -- 179.6' (4월 15일), and each
@@ -111,6 +117,13 @@ later 프롤로그 adds to that same page: 4월 27일 (two lines), 5월 15일, 6
 | Without papers | 212명 |
 | Accepted by the second standard | 181명 of the 212 |
 | Still 확인 불가 | 31명 |
+
+## The lab's record
+
+| Fact | Value |
+|---|---|
+| 트리거랩 반응 기록 that 핏스코어 bought and that leaked in July | 참가자 63명, 38만 줄 (사건 30, 37, finale) |
+| Its 원본, 7번 on 사건 46's disposal list | the same record, so the same 63명 |
 
 ## The main season's calendar
 
