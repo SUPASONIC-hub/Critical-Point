@@ -1,7 +1,7 @@
 import { appendFileSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import { compareMigrations, describeCliFailure, describeDrift, localMigrationVersions, parseMigrationList } from "./migration-drift.mjs";
+import { compareMigrations, describeCliFailure, describeDrift, localMigrationVersions, parseMigrationList, redactCliOutput } from "./migration-drift.mjs";
 
 /**
  * Compares `supabase/migrations/` with what the live project says it has
@@ -51,7 +51,8 @@ const from = fromIndex === -1 ? null : args[fromIndex + 1];
 function finish(verdict, summary, code) {
   if (process.env.GITHUB_OUTPUT) {
     // A delimiter the summary cannot contain: it is made of digits, file
-    // names and fixed sentences.
+    // names, fixed sentences and, for a version the database holds under
+    // another shape, sixty characters with the line ends taken out.
     appendFileSync(process.env.GITHUB_OUTPUT, `verdict=${verdict}\nsummary<<MIGRATION_DRIFT_EOF\n${summary}\nMIGRATION_DRIFT_EOF\n`);
   }
   (code === 0 ? console.log : console.error)(summary);
@@ -81,12 +82,12 @@ if (local.length !== files.length) {
 
 const listed = parseMigrationList(listing);
 if (listed === null) {
-  finish(
-    "unreadable",
-    "`supabase migration list` printed neither its JSON nor its table, so nothing was compared. " +
-      `What it printed begins: ${JSON.stringify(listing.trim().slice(0, 300))}`,
-    2,
-  );
+  // What it printed goes to the log, redacted, and not into the summary: the
+  // workflow copies the summary into an issue, which is read by more people
+  // for longer than a log is, and text nobody could parse is text nobody has
+  // looked at. It used to be quoted there as it came.
+  console.error(`What \`supabase migration list\` printed begins:\n${redactCliOutput(listing.trim().slice(0, 600))}`);
+  finish("unreadable", "`supabase migration list` printed neither its JSON nor its table, so nothing was compared. What it printed is in the run's log.", 2);
 }
 
 const result = compareMigrations(local, listed);
