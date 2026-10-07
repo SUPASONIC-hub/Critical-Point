@@ -12,7 +12,9 @@ import {
   startDebugNode as startDebugNodeFromHelper,
   cashStakedCard,
   dismissProtocolBreach,
+  TRANSITION_TIMEOUT_MS,
 } from "./helpers/gameFlow.js";
+import { measureTable } from "./helpers/layout.js";
 
 async function startDebugNode(page, caseId, nodeId) {
   await startDebugNodeFromHelper(page, caseId, nodeId, {
@@ -207,7 +209,10 @@ test("hero entry opens the first scene in one click", { tag: "@prod" }, async ({
   });
   await page.getByTestId("start-first-case").click();
   await expect.poll(() => page.evaluate(() => window.__openingBurstSeen), { message: "the opening burst was never drawn" }).toBe(true);
-  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
+  // The wait every other entry into a run is given (gameFlow.js). This one had
+  // eight seconds of its own, and the first request for the season on a cold
+  // dev server builds the whole of it before anything is served.
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   await expect(page.locator(".choices .choice").first()).toBeVisible();
 
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
@@ -339,11 +344,33 @@ test("debug jump opens case 05 scenes directly", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /말할 수 있는 조건|선의의 실패|책임의 모양/ })).toBeVisible();
 });
 
+/**
+ * Whether a pointer at the middle of the control lands on the control. The
+ * action bar is `position: fixed`, so its buttons are "inside the viewport"
+ * whatever the page under them does; what can go wrong is something drawn over
+ * them.
+ */
+const pointerLandsOn = (locator) =>
+  locator.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return Boolean(hit && (hit === element || element.contains(hit)));
+  });
+
 test("mobile decision actions stay reachable without manual page scrolling", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".gx-card.selected")).toBeVisible();
+
+  // The bar's own position proves nothing: it is fixed. The hand is what has
+  // to be on the screen with it -- every card above the bar, nothing scrolled.
+  const table = await measureTable(page);
+  expect(table.lastCard, `last card ${table.lastCard - table.actionsTop}px under the action bar`).toBeLessThanOrEqual(table.actionsTop);
+  expect(await page.evaluate(() => window.scrollY), "nothing was scrolled to get there").toBe(0);
+  expect(await pointerLandsOn(page.getByTestId("commit-push")), "밀어붙인다 is not covered").toBe(true);
+  expect(await pointerLandsOn(page.getByTestId("commit-confirm")), "확정 is not covered").toBe(true);
 
   const pushButton = page.getByTestId("commit-push");
   const pushBox = await pushButton.boundingBox();
@@ -363,6 +390,7 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
   const nextBox = await nextButton.boundingBox();
   expect(nextBox).not.toBeNull();
   expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(viewport.height + 2);
+  expect(await pointerLandsOn(nextButton), "the reveal's next button is not covered").toBe(true);
   const overflow = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth,
@@ -391,46 +419,92 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
 // screen and a half below the bar. What a phone on its side has to show is the
 // last card above the bar with nothing scrolled, the rule priority 27 holds an
 // upright phone to. 667x375 is an iPhone SE or 8; 844x390 an iPhone 14.
-for (const size of [{ width: 667, height: 375 }, { width: 844, height: 390 }]) {
-  test(`a phone on its side keeps the whole decision on one screen at ${size.width}x${size.height}`, async ({ page }) => {
-    await page.setViewportSize(size);
+//
+// The layout is for phones: it is behind `(pointer: coarse)`, because a laptop
+// zoomed to 200% is this short too and is not a phone. So the phone tests run
+// in a touch context on both projects, and say so before they measure.
+const isPhoneOnItsSide = (page) =>
+  page.evaluate(() => matchMedia("(max-height: 480px) and (orientation: landscape) and (pointer: coarse)").matches);
+
+test.describe("a phone on its side", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  for (const size of [{ width: 667, height: 375 }, { width: 844, height: 390 }]) {
+    test(`a phone on its side keeps the whole decision on one screen at ${size.width}x${size.height}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.goto("/?debug=1");
+      await startDebugNode(page, "final", "f_start_owner");
+      expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
+      await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+      await page.locator(".choices .choice:not(.gx-card-wild)").last().dispatchEvent("click");
+      const layout = await page.evaluate(() => {
+        const cards = [...document.querySelectorAll(".choices .choice")].map((card) => card.getBoundingClientRect().bottom);
+        return {
+          cards: cards.length,
+          lastCard: Math.round(Math.max(...cards)),
+          actionsTop: Math.round(document.querySelector(".gx-actions").getBoundingClientRect().top),
+          pageHeight: document.documentElement.scrollHeight,
+          pageWidth: document.documentElement.scrollWidth,
+        };
+      });
+      expect(layout.cards).toBeGreaterThan(3);
+      expect(layout.lastCard, `last card ${layout.lastCard - layout.actionsTop}px under the action bar`).toBeLessThanOrEqual(layout.actionsTop);
+      expect(layout.pageHeight, "the table scrolls").toBeLessThanOrEqual(size.height + 2);
+      expect(layout.pageWidth).toBeLessThanOrEqual(size.width + 1);
+    });
+  }
+
+  test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 667, height: 375 });
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "case05", "c5_voice");
+    expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await page.locator(".choices .choice").first().click();
+    // "Within the viewport" is true of a fixed bar on any layout. The hand has
+    // to be above it, and the buttons have to be what a finger lands on.
+    const table = await measureTable(page);
+    expect(table.lastCard, `last card ${table.lastCard - table.actionsTop}px under the action bar`).toBeLessThanOrEqual(table.actionsTop);
+    const commitButton = page.getByTestId("commit-confirm");
+    await expect(commitButton).toBeVisible();
+    const commitBox = await commitButton.boundingBox();
+    expect(commitBox).not.toBeNull();
+    expect(commitBox.y + commitBox.height).toBeLessThanOrEqual(375 + 2);
+    expect(await pointerLandsOn(commitButton), "확정 is not covered").toBe(true);
+    expect(await pointerLandsOn(page.getByTestId("commit-push")), "밀어붙인다 is not covered").toBe(true);
+    await commitButton.click();
+    const nextButton = page.getByTestId("decision-next");
+    await expect(nextButton).toBeVisible();
+    const nextBox = await nextButton.boundingBox();
+    expect(nextBox).not.toBeNull();
+    expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(375 + 2);
+    expect(await pointerLandsOn(nextButton), "the reveal's next button is not covered").toBe(true);
+  });
+});
+
+// The same short, wide window with a mouse: a laptop at 1366x660 zoomed to
+// 200% reports 683x330. It used to be given the phone's table, laid out for a
+// thumb.
+test.describe("a laptop zoomed to 200%", () => {
+  test.use({ hasTouch: false, isMobile: false });
+
+  test("a short wide window with a mouse keeps the desktop table", async ({ page }) => {
+    await page.setViewportSize({ width: 683, height: 330 });
     await page.goto("/?debug=1");
     await startDebugNode(page, "final", "f_start_owner");
     await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
-    await page.locator(".choices .choice:not(.gx-card-wild)").last().dispatchEvent("click");
-    const layout = await page.evaluate(() => {
-      const cards = [...document.querySelectorAll(".choices .choice")].map((card) => card.getBoundingClientRect().bottom);
+    const seen = await page.evaluate(() => {
       return {
-        cards: cards.length,
-        lastCard: Math.round(Math.max(...cards)),
-        actionsTop: Math.round(document.querySelector(".gx-actions").getBoundingClientRect().top),
-        pageHeight: document.documentElement.scrollHeight,
-        pageWidth: document.documentElement.scrollWidth,
+        short: matchMedia("(max-height: 480px) and (orientation: landscape)").matches,
+        coarse: matchMedia("(pointer: coarse)").matches,
+        shellMaxWidth: getComputedStyle(document.querySelector(".game-shell")).getPropertyValue("--gx-maxw").trim(),
       };
     });
-    expect(layout.cards).toBeGreaterThan(3);
-    expect(layout.lastCard, `last card ${layout.lastCard - layout.actionsTop}px under the action bar`).toBeLessThanOrEqual(layout.actionsTop);
-    expect(layout.pageHeight, "the table scrolls").toBeLessThanOrEqual(size.height + 2);
-    expect(layout.pageWidth).toBeLessThanOrEqual(size.width + 1);
+    expect(seen.short, "the window is as short as a phone on its side").toBe(true);
+    expect(seen.coarse, "and is not a touch screen").toBe(false);
+    // What the phone's layout does to the shell has not been done.
+    expect(seen.shellMaxWidth, "the shell is not stretched to the phone's full width").not.toBe("100vw");
   });
-}
-
-test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {
-  await page.setViewportSize({ width: 667, height: 375 });
-  await page.goto("/?debug=1");
-  await startDebugNode(page, "case05", "c5_voice");
-  await page.locator(".choices .choice").first().click();
-  const commitButton = page.getByTestId("commit-confirm");
-  await expect(commitButton).toBeVisible();
-  const commitBox = await commitButton.boundingBox();
-  expect(commitBox).not.toBeNull();
-  expect(commitBox.y + commitBox.height).toBeLessThanOrEqual(375 + 2);
-  await commitButton.click();
-  const nextButton = page.getByTestId("decision-next");
-  await expect(nextButton).toBeVisible();
-  const nextBox = await nextButton.boundingBox();
-  expect(nextBox).not.toBeNull();
-  expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(375 + 2);
 });
 
 test("leaving an active scene marks the saved run as paused", async ({ page }) => {
@@ -1509,23 +1583,38 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
       currentCase: saved.currentCase,
       nodeId: saved.nodeId,
       logLength: saved.log.length,
+      savedAt: saved.savedAt,
     };
   });
+  // The poll that stood here read the save the moment the failure was let go,
+  // found it unchanged -- nothing had answered yet -- and passed. What has to
+  // be read is the save the failure's own write leaves: the page gets its 500,
+  // rewrites the queue into the save (a new `savedAt`), and only then is the
+  // run compared.
+  const failureAnswered = page.waitForResponse((response) => response.url().includes("/playtest_sessions") && response.status() === 500);
   releaseTelemetryFailure();
+  await failureAnswered;
   await expect
-    .poll(
-      async () =>
-        page.evaluate(() => {
-          const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
-          return {
-            currentCase: saved.currentCase,
-            nodeId: saved.nodeId,
-            logLength: saved.log.length,
-          };
-        }),
-      { timeout: 10_000 },
-    )
-    .toEqual(savedBeforeFailureCallback);
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).savedAt), {
+      message: "the failed send never wrote the queue back into the save",
+      timeout: 10_000,
+    })
+    .not.toBe(savedBeforeFailureCallback.savedAt);
+  const savedAfterFailureCallback = await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem("trigger-prototype-v2"));
+    return {
+      currentCase: saved.currentCase,
+      nodeId: saved.nodeId,
+      logLength: saved.log.length,
+      queued: saved.pendingTelemetry.length,
+    };
+  });
+  expect(savedAfterFailureCallback).toMatchObject({
+    currentCase: savedBeforeFailureCallback.currentCase,
+    nodeId: savedBeforeFailureCallback.nodeId,
+    logLength: savedBeforeFailureCallback.logLength,
+  });
+  expect(savedAfterFailureCallback.queued, "the row that failed is still waiting").toBeGreaterThan(0);
   expect(savedBeforeFailureCallback.currentCase).toBe("final");
 });
 
@@ -1548,10 +1637,10 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   await expect(page.locator(".ending-step-1")).toBeVisible();
   await expect(page.locator(".ending-quiet-line")).toBeVisible();
   await expect(page.locator(".ending-quiet-beat button")).toBeFocused();
-  // Reduced motion drops the eight-second hold, so the skip control only
-  // appears when the hold is actually running.
-  const quietSkip = page.locator(".ending-quiet-skip");
-  if (await quietSkip.isVisible()) await quietSkip.click();
+  // Reduced motion drops the eight-second hold, so there is no skip control
+  // here: the button under the quiet line is already the way on. The hold and
+  // its skip are played in the ranking test below, which runs with motion.
+  await expect(page.locator(".ending-quiet-skip")).toHaveCount(0);
   await expect(page.getByTestId("ending-next")).toBeVisible();
   await page.getByTestId("ending-next").click();
   await expect(page.locator(".ending-step-2 textarea")).toBeVisible();
@@ -1605,7 +1694,9 @@ test("시즌 로드맵 from a report lands on the roadmap, at the case the seaso
 });
 
 test("completed case is retained in the local ranking after leaving the ending", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  // With motion, so the quiet line holds: both ending tests used to ask for
+  // reduced motion and then press the skip only `if` it was there, which it
+  // never was, so the control had not been pressed by any test.
   await page.goto("/?debug=1");
   await startDebugNode(page, "final", "f_aftershock");
   await completeCurrentCase(page);
@@ -1614,7 +1705,10 @@ test("completed case is retained in the local ranking after leaving the ending",
     await page.locator(".ending-sequence button").click();
   }
   const quietSkip = page.locator(".ending-quiet-skip");
-  if (await quietSkip.isVisible()) await quietSkip.click();
+  await expect(quietSkip, "the hold is running, and can be skipped").toBeVisible();
+  await expect(page.getByTestId("ending-next")).toHaveCount(0);
+  await quietSkip.click();
+  await expect(quietSkip).toHaveCount(0);
   await page.getByTestId("ending-next").click();
   await page.locator(".ending-step-2 textarea").fill("랭킹 저장 확인");
   await page.locator(".ending-step-2 button").click();

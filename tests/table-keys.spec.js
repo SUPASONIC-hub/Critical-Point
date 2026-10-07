@@ -140,6 +140,37 @@ test("a key held with Ctrl, Cmd or Alt is the browser's, and a repeat is not a p
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 });
 
+// The pointer pushed, so focus is on 밀어붙인다 and the hand goes back to the
+// keys. Space held there used to push twice: once from the table on the first
+// keydown, and once more from the button itself, which took the repeats the
+// table had let through as a key press of its own. A second push can be the wall.
+test("Space held down pushes once, with the pointer's focus left on the push button", async ({ page }) => {
+  await openTable(page);
+  await page.keyboard.press("1");
+  const push = page.getByTestId("commit-push");
+  await push.click();
+  await expect(push).toBeFocused();
+  await expect.poll(() => gaugeOf(page)).toBeGreaterThanOrEqual(7);
+  const afterClick = await gaugeOf(page);
+
+  await page.keyboard.down("Space");
+  // Playwright sends a key that is already down as a repeat, as a keyboard does.
+  for (let repeat = 0; repeat < 6; repeat += 1) await page.keyboard.down("Space");
+  await expect.poll(() => gaugeOf(page)).toBeGreaterThanOrEqual(afterClick + 7);
+  const afterHold = await gaugeOf(page);
+  await page.keyboard.up("Space");
+  // Two frames on, so a click the button made of the key coming up would have landed.
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  expect(await gaugeOf(page), "the key coming up pushes nothing").toBe(afterHold);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
+
+  await page.keyboard.press("Enter");
+  await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.log.at(-1).threshold.pushes, "one push from the pointer and one from the held key").toBe(2);
+});
+
 test("keys do not reach the table under the reveal", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");

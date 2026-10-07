@@ -431,6 +431,13 @@ test("a second tab asks before it busts a bet another tab is holding", async ({ 
   await looker.waitForSelector(".game-shell");
   await expect(looker.getByTestId("table-held-elsewhere")).toBeVisible();
   await looker.getByTestId("leave-held-window").click();
+  // 그 탭에 두기 answers the question: it goes, and what stands in its place
+  // says the bet is in the other tab. The dialog used to stay up, drawn over
+  // that notice, with both of its buttons still live.
+  await expect(looker.getByTestId("table-held-elsewhere")).toHaveCount(0);
+  await expect(looker.getByRole("alertdialog")).toHaveCount(0);
+  await expect(looker.getByTestId("claim-held-window")).toHaveCount(0);
+  await expect(looker.getByTestId("table-lost-to-tab")).toBeVisible();
   await looker.close();
   await expect(page.getByTestId("table-lost-to-tab")).toHaveCount(0);
   await page.getByTestId("commit-confirm").click();
@@ -455,7 +462,29 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
-  for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
+  // The grade a push earned is a label, not a movement: it stays up for its
+  // 0.7s. The blanket rule that cuts every animation short for reduced motion
+  // used to take it down in a hundredth of a millisecond, unread.
+  const grade = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        document.querySelector("[data-testid='commit-push']").click();
+        const started = performance.now();
+        const check = () => {
+          const label = document.querySelector(".gx-grade");
+          if (label) {
+            const style = getComputedStyle(label);
+            resolve({ text: label.textContent.trim(), animation: style.animationName, seconds: Number.parseFloat(style.animationDuration), opacity: Number(style.opacity) });
+          } else if (performance.now() - started > 3000) resolve(null);
+          else requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+  expect(grade, "a push is graded where the player can see it").not.toBeNull();
+  expect(grade.text).not.toBe("");
+  expect(grade).toMatchObject({ animation: "gx-grade-fade", seconds: 0.7, opacity: 1 });
+  for (let press = 0; press < 2; press += 1) await page.getByTestId("commit-push").click();
   await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-heat")))).toBeGreaterThan(0);
   const shake = await page.evaluate(() => getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-shake-x").trim());
   // Registered as a length, so the computed value is the number, however it was written.

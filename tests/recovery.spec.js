@@ -116,7 +116,13 @@ test("a recovery slot restored in the middle of play is the run that comes back"
 });
 
 test("declining the question leaves the slot, the log and the run as they were", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.dismiss());
+  // Each no is counted. With the answers only given, three buttons that did
+  // nothing at all left the slot, the log and the run as they were too.
+  const asked = [];
+  page.on("dialog", (dialog) => {
+    asked.push(dialog.message());
+    return dialog.dismiss();
+  });
   await seedOnce(page, {
     save: savedRun({ started: false, paused: true }),
     errorLog: {
@@ -139,8 +145,12 @@ test("declining the question leaves the slot, the log and the run as they were",
   await page.getByTestId("open-error-log-from-header").click();
   const panel = page.getByTestId("error-log-panel");
   await panel.getByRole("button", { name: /로그 비우기/ }).click();
+  expect(asked, "로그 비우기 asked first").toHaveLength(1);
   await panel.getByRole("button", { name: "삭제" }).click();
+  expect(asked, "삭제 asked first").toHaveLength(2);
   await page.getByTestId("restore-save-slot-slot-kept").click();
+  expect(asked, "the restore asked first").toHaveLength(3);
+  expect(new Set(asked).size, "and each asked its own question").toBe(3);
 
   await expect(panel.getByText("Kept entry")).toBeVisible();
   await expect(page.getByTestId("restore-save-slot-slot-kept")).toBeVisible();
