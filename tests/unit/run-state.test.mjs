@@ -135,7 +135,7 @@ test("what the four transitions are for", () => {
   const wiped = transition(before, EVENTS.reset);
   assert.deepEqual(
     [wiped.playerName, wiped.playStyle, wiped.dataConsent, wiped.operatorOrigin, wiped.sessionId, wiped.started],
-    ["", "instinct", false, "courier", "session-reset", false],
+    ["", "instinct", true, "courier", "session-reset", false],
   );
   assert.deepEqual(wiped.pendingTelemetry, []);
 });
@@ -174,7 +174,7 @@ test("a run loaded from nothing, and from every save the fixtures keep", () => {
   const empty = initialRunState(null, context);
   assert.deepEqual(
     [empty.runId, empty.operatorOrigin, empty.sessionId, empty.nodeEnteredAt, empty.echo, empty.started, empty.dataConsent],
-    ["run-ctx", "lab", "session-ctx", 1_000, OPENING_ECHO, false, false],
+    ["run-ctx", "lab", "session-ctx", 1_000, OPENING_ECHO, false, true],
   );
   assert.deepEqual(empty.gauntletRun, RUN_INITIAL_STATE);
 

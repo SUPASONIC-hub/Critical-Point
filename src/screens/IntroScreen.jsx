@@ -563,9 +563,9 @@ export function IntroScreen({ view, renderers = {} }) {
             </div>
           </section>
           </details>
-          {/* The summary text stays visible: consent is opt-in and default off,
-              and this drawer is never nested inside another closed one, so the
-              notice is always one deliberate click away before anything moves. */}
+          {/* The summary text stays visible: the box starts ticked, and this
+              drawer is never nested inside another closed one, so the notice
+              and the way out are always one deliberate click away. */}
           <details className="intro-drawer">
             <summary>
               <h2>데이터 저장 안내</h2>

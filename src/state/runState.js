@@ -74,8 +74,10 @@ export const RUN_FIELDS = {
   },
   dataConsent: {
     save: "dataConsent",
-    load: (saved) => saved?.dataConsent === true,
-    fresh: () => false,
+    // Ticked until the player unticks it: a device with no save starts with the
+    // box on. A save answers for itself, and there only `true` is consent.
+    load: (saved) => (saved ? saved.dataConsent === true : true),
+    fresh: () => true,
     newGame: KEEP,
     openCase: KEEP,
     jumpToNode: KEEP,

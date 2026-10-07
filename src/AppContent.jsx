@@ -197,9 +197,10 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
-  // Only `true` is consent: the shell reads the save unrepaired, and a save
+  // The box starts ticked on a device with no save. Where there is a save,
+  // only `true` is consent: the shell reads the save unrepaired, and a save
   // edited to hold the string "false" used to tick the box.
-  const [dataConsent, setDataConsent] = useState(saved?.dataConsent === true);
+  const [dataConsent, setDataConsent] = useState(saved ? saved.dataConsent === true : true);
   const [saveStatus, setSaveStatus] = useState("");
   const [operatorOrigin, setOperatorOriginState] = useState(() => readStoredValue(OPERATOR_ORIGIN_KEY, "courier"));
   const sessionId = useMemo(() => getSessionId(), []);
