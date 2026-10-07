@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "./helpers/network.js";
-import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { cashStakedCard, completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 async function expectNoA11yViolations(page) {
   const results = await new AxeBuilder({ page }).analyze();
@@ -18,6 +19,55 @@ test("case 05 scene has no structural accessibility violations", async ({ page }
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.getByRole("heading", { name: "이름 없는 증언" })).toBeVisible();
   await expectNoA11yViolations(page);
+});
+
+/**
+ * The four dialogs the table opens. Every scene test above audits the table
+ * after `startDebugNode` has closed the briefing page, and none ever stopped on
+ * the reveal, the draft or the question a second tab is asked -- so the
+ * surfaces a player is held on until they answer were the ones never read
+ * (the 2026-10-07 audit, B4 finding 3).
+ */
+test("the briefing page has no structural accessibility violations", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice", { openTable: false });
+  await expect(page.getByTestId("scene-briefing").getByRole("dialog")).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test("the decision reveal has no structural accessibility violations", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  await expect(page.locator(".decision-reveal-backdrop").getByRole("dialog")).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test("the relic draft has no structural accessibility violations", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await page.locator(".next-case-panel button").click();
+  await expect(page.getByTestId("relic-draft")).toBeVisible();
+  await expect(page.getByTestId("relic-option").first()).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test("the question a second tab is asked has no structural accessibility violations", async ({ page, context }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  const second = await context.newPage();
+  await second.goto("/?debug=1");
+  await expect(second.getByRole("alertdialog")).toBeVisible();
+  await expect(second.getByTestId("table-held-elsewhere")).toBeVisible();
+  await expectNoA11yViolations(second);
+  await second.close();
 });
 
 test("final case scene has no structural accessibility violations", async ({ page }) => {
@@ -173,6 +223,61 @@ test("error recovery screen has no structural accessibility violations", async (
     scrollWidth: document.documentElement.scrollWidth,
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+});
+
+/** Points the page at the stub backend, as board-ranking.spec.js does. */
+async function useStubBackend(page) {
+  await page.addInitScript(
+    ({ urlKey, keyKey, url }) => {
+      localStorage.setItem(urlKey, url);
+      localStorage.setItem(keyKey, "anon");
+    },
+    { urlKey: TEST_STORAGE_KEYS.telemetryUrl, keyKey: TEST_STORAGE_KEYS.telemetryKey, url: BACKEND_ORIGIN },
+  );
+}
+
+const stubRows = (rows) => (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rows) });
+
+// The board had no audit at all, and the ranking's was of an empty list: the
+// guard answers every read with no rows, so no row had ever been on the page.
+test("the board, with posts on it, has no structural accessibility violations", async ({ page }) => {
+  await page.route(`${BACKEND_ORIGIN}/**`, stubRows([]));
+  await page.route(
+    `${BACKEND_ORIGIN}/rest/v1/board_posts**`,
+    stubRows([
+      { id: 2, nickname: "나중에 온 사람", body: "두 번째 글입니다.", created_at: "2026-09-28T09:00:00Z" },
+      { id: 1, nickname: "먼저 온 사람", body: "끝까지 가 보세요.", created_at: "2026-09-27T09:00:00Z" },
+    ]),
+  );
+  await useStubBackend(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "게시판" }).first().click();
+  await expect(page.locator(".board-post")).toHaveCount(2);
+  // With something typed that the board will not take as it is: the privacy
+  // notice is an alert, and the button it blocks is described by it.
+  await page.getByPlaceholder("게시판에 보일 이름").fill("분석관 김");
+  await page.getByPlaceholder(/사건을 지나며/).fill("연락은 tester@example.com 으로 주세요");
+  await expect(page.locator("#board-privacy-notice")).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test("ranking screen, with rows on it, has no structural accessibility violations", async ({ page }) => {
+  const row = (tag, score) => ({
+    run_tag: tag,
+    player_name: "익명 분석관",
+    case_id: "season-final",
+    case_title: "SEASON 01 COMPLETE",
+    completed_at: "2026-09-27T09:00:00Z",
+    score,
+    summary: { burstScore: score, rank: "B", primary: ["curiosity", 90], seasonComplete: true, averageResponseTime: 14, reframeCount: 2 },
+  });
+  await page.route(`${BACKEND_ORIGIN}/**`, stubRows([]));
+  await page.route(`${BACKEND_ORIGIN}/rest/v1/public_rankings**`, stubRows([row("AXEROW01", 82), row("AXEROW02", 71)]));
+  await useStubBackend(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  await expect(page.locator(".ranking-row")).toHaveCount(2);
+  await expectNoA11yViolations(page);
 });
 
 test("ranking screen has no structural accessibility violations", async ({ page }) => {

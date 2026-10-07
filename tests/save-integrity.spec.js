@@ -1,6 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
-import { dismissProtocolBreach } from "./helpers/gameFlow.js";
+import { dismissProtocolBreach, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
@@ -102,10 +102,21 @@ test("ordinary save keeps discovered clues and does not create recovery metadata
   await page.goto("/?debug=1");
   await waitForShell(page);
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: false })));
+  // The save the page wrote on its way out, not the seeded one read back: a
+  // pagehide that wrote nothing used to pass every line below.
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).paused).toBe(true);
+  const written = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(written.discoveredClues).toEqual([{ id: "c1-hidden-ledger", title: "hidden ledger", text: "x" }]);
+  expect(typeof written.saveRevision, "the app wrote this save").toBe("number");
   await page.reload();
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.discoveredClues).toHaveLength(1);
   expect(saved.lastError).toBeFalsy();
+  // No recovery metadata: nothing went wrong, so nothing is logged, no notice
+  // waits on the intro, and the recovery centre was not asked to open.
+  expect(await readJsonStorage(page, TEST_STORAGE_KEYS.errorLog)).toBeNull();
+  expect(await readJsonStorage(page, TEST_STORAGE_KEYS.recoveryCenter)).toBeNull();
+  await expect(page.locator(".recovery-notice")).toHaveCount(0);
 });
 
 test("clearing the saved run before navigation does not resurrect it", async ({ page }) => {
@@ -169,14 +180,23 @@ test("a clean scene transition does not manufacture an error log entry", async (
   await page.evaluate((key) => localStorage.removeItem(key), ERROR_LOG_KEY);
 
   await dismissProtocolBreach(page);
+  const firstTitle = await page.locator(".game-header h1").textContent();
   await page.locator(".choices .choice").first().click();
   await page.getByTestId("commit-confirm").click();
   await page.waitForSelector("[data-testid='decision-next']");
   await page.getByTestId("decision-next").click();
-  await page.waitForSelector(".game-shell");
+  // The transition itself. `.game-shell` was on screen all along, under the
+  // reveal, so waiting for it ended at once and everything below was read
+  // before the next scene had mounted -- the moment an error would be logged.
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await dismissProtocolBreach(page);
+  await expect(page.locator(".choices .choice:not([aria-disabled='true'])").first()).toBeVisible();
+  await expect(page.locator(".game-header h1")).not.toHaveText(firstTitle ?? "");
 
   expect(await readErrorSources(page)).toEqual([]);
   const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), STORAGE_KEY);
+  expect(saved.nodeId, "the run is on the next scene").not.toBe("start");
+  expect(saved.log).toHaveLength(1);
   expect(saved.paused).toBe(false);
   expect(saved.lastError).toBeFalsy();
 });

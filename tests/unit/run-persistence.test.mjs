@@ -154,11 +154,25 @@ test("a slot is restored as a paused save on the intro, with the queue the curre
   harness.act("startGame");
   harness.act("refreshErrorLog");
   const [slot] = harness.outside.saveSlots;
-  harness.act("applyRun", { nodeEnteredAt: HARNESS_NOW + 1, playerName: "슬롯 뒤의 이름" });
+  // What the player did after the slot was taken: a row waiting to be sent, and
+  // an answer written under a case. The title promised both were kept and the
+  // save restored from had neither, so a restore that dropped them passed.
+  const feedback = { prologue01: { clarity: "4", difficulty: "2", comment: "슬롯 뒤에 쓴 글" } };
+  assert.deepEqual([slot.snapshot.pendingTelemetry, slot.snapshot.playtestFeedback], [[], {}], "the slot itself holds neither");
+  harness.act("applyRun", {
+    nodeEnteredAt: HARNESS_NOW + 1,
+    playerName: "슬롯 뒤의 이름",
+    dataConsent: true,
+    pendingTelemetry: [queuedRow],
+    playtestFeedback: feedback,
+  });
+  assert.deepEqual(harness.saved().playtestFeedback, feedback, "the current save holds them");
   await harness.act("restoreSlot", slot);
   const restored = harness.saved();
   assert.deepEqual([restored.started, restored.paused, restored.runId], [false, true, slot.snapshot.runId]);
   assert.notEqual(restored.playerName, "슬롯 뒤의 이름");
+  assert.deepEqual(restored.pendingTelemetry, [queuedRow], "the unsent row is still queued");
+  assert.deepEqual(restored.playtestFeedback, feedback, "and the feedback the player wrote is still theirs");
   assert.deepEqual(harness.effects.slice(-2), ["suppress-saves", "reload"]);
 });
 
@@ -172,9 +186,11 @@ test("restoring a slot or a kept save does not give back a consent the player wi
   assert.equal(slot.snapshot.dataConsent, true, "the slot was taken while the box was ticked");
   const saveWhileTicked = globalThis.localStorage.getItem(appConfig.STORAGE_KEY);
   // The box is unticked: consent off and the queue emptied, in the save.
-  harness.act("persist", { dataConsent: false, pendingTelemetry: [] });
+  const feedback = { prologue01: { clarity: "3", difficulty: "3", comment: "동의를 거둔 뒤에도 남는 글" } };
+  harness.act("persist", { dataConsent: false, pendingTelemetry: [], playtestFeedback: feedback });
   await harness.act("restoreSlot", slot);
   assert.deepEqual([harness.saved().dataConsent, harness.saved().pendingTelemetry], [false, []]);
+  assert.deepEqual(harness.saved().playtestFeedback, feedback, "the feedback is the player's with or without consent");
   // The kept copy of a save this build could not read goes through the same door.
   globalThis.localStorage.setItem(appConfig.SAVE_BACKUP_STORAGE_KEY, saveWhileTicked);
   await harness.act("restoreBackup");
