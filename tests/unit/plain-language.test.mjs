@@ -39,4 +39,61 @@ test("a banned bank word is refused at a word start only", () => {
   // 우선순위 holds 수순 only across a syllable boundary of another word.
   assert.deepEqual(findBannedWords("우선순위를 정한다"), []);
   assert.deepEqual(findBannedWords("정기안내를 받는다"), []);
+  assert.deepEqual(findBannedWords("이 상품의 뒷장을 먼저 읽는다"), []);
+  assert.deepEqual(findBannedWords("촛불입니다. 순이익일 뿐입니다."), []);
+});
+
+test("a banned bank word is refused inside the compounds a bank writes", () => {
+  for (const [sentence, word] of [
+    ["전자결재 시스템에 올립니다.", "결재"],
+    ["최종결재만 남았습니다.", "결재"],
+    ["신규여신 한도를 봅니다.", "여신"],
+    ["재기안 요청이 옵니다.", "기안"],
+    ["주택융자 서류입니다.", "융자"],
+    ["사전품의 없이 나갔습니다.", "품의"],
+  ]) {
+    assert.deepEqual(findBannedWords(sentence).map((entry) => entry.word), [word], sentence);
+  }
+});
+
+/**
+ * `check-plain-language.mjs` reads the season when it is imported, so the route
+ * rule is proved on the season: take a gloss away from where every route passes
+ * it, import the check again, and it has to name the case and the term.
+ */
+test("a term is explained on every route to the scene that says it, not just somewhere in the case", async () => {
+  const { CASE_RESULT_NODES, nodes, reframeRouteNodes } = await import("../../src/gameData.js");
+  const check = (probe) => import(`../../scripts/check-plain-language.mjs?probe=${probe}`).then(() => "", (error) => String(error.message));
+  assert.equal(await check("clean"), "");
+
+  // The audit's case: the only gloss sits on the hidden route, which is listed
+  // right after the start but which no ordinary card leads to, and a closing
+  // scene every run reaches says the word bare.
+  const hidden = nodes[reframeRouteNodes.case13];
+  const closing = Object.values(nodes).find((node) => node.caseId === "case13" && node.choices.some((choice) => choice.type !== "reframe" && choice.next === CASE_RESULT_NODES.case13));
+  assert.ok(!Object.values(nodes).some((node) => node.caseId === "case13" && `${node.lead ?? ""} ${node.text}`.includes("엠바고")), "사건 13 says 엠바고 now; pick another word for this probe");
+  const [hiddenText, closingText] = [hidden.text, closing.text];
+  hidden.text = `${hiddenText} 엠바고(보도를 미루기로 한 약속)가 걸려 있습니다.`;
+  closing.text = `${closingText} 엠바고는 내일 풀립니다.`;
+  try {
+    assert.match(await check("hidden-gloss"), /case13\/엠바고: needs a \(plain explanation\) in \S*, where a route reaches it unexplained/);
+  } finally {
+    hidden.text = hiddenText;
+    closing.text = closingText;
+  }
+
+  // 사건 23 explains 주주총회 on its opening scenes; say it bare on one of them
+  // and a route now reads it unexplained.
+  const opening = Object.values(nodes).find((node) => node.caseId === "case23" && /주주총회\(/.test(`${node.lead ?? ""} ${node.text}`));
+  assert.ok(opening, "사건 23 no longer explains 주주총회 where this probe expects it");
+  const field = /주주총회\(/.test(opening.text) ? "text" : "lead";
+  const written = opening[field];
+  opening[field] = written.replace(/주주총회\([^)]*\)/, "주주총회");
+  try {
+    const said = await check("bare");
+    assert.match(said, /case23\/주주총회: needs a \(plain explanation\)/);
+    assert.match(said, /case\/term pairs are read unexplained on some route, over the \d+ allowed/);
+  } finally {
+    opening[field] = written;
+  }
 });

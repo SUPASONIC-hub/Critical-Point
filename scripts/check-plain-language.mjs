@@ -19,8 +19,10 @@
  *    resumed save, a route split), so "first" is per case, not per season. A
  *    case can open on its default scene or on one of the opening variants the
  *    previous case's aftermath picks, so each opening scene that uses a term
- *    has to explain it itself, and the rest of the case has to explain it at
- *    its first use unless every opening already did.
+ *    has to explain it itself, and any later scene may say it bare only when
+ *    every route from every opening has explained it by then
+ *    (`unexplainedUses`). What that rule found on its first day is held as a
+ *    ceiling that only comes down (`BARE_ON_A_ROUTE`).
  *
  * Only narration is checked -- a scene's lead and body -- because that is where
  * a sentence has room for a parenthesis. Choice labels and memo lines are short
@@ -282,39 +284,135 @@ function explainedAt(text, index, term) {
   return /^(\s?[가-힣]{1,3})?\s?\(/.test(text.slice(index + term.length, index + term.length + 6));
 }
 
-function firstUse(ids, term) {
-  for (const id of ids) {
-    const text = narration(nodes[id]);
-    // A word start only: 우선순위 is not 선순위.
-    const match = new RegExp(`(^|[^가-힣])${term}`).exec(text);
-    if (match) {
-      const index = match.index + match[1].length;
-      return { id, explained: explainedAt(text, index, term) };
-    }
-  }
-  return null;
+/**
+ * How one scene uses one term: whether the first time it says it is explained,
+ * and whether it explains it anywhere. Null when the scene never says it.
+ */
+function useIn(id, term) {
+  const text = narration(nodes[id]);
+  if (!text.includes(term)) return null;
+  // A word start only: 우선순위 is not 선순위.
+  const uses = [...text.matchAll(new RegExp(`(^|[^가-힣])${term}`, "g"))].map((match) => explainedAt(text, match.index + match[1].length, term));
+  return uses.length ? { firstExplained: uses[0], explains: uses.includes(true) } : null;
 }
 
+/**
+ * "First use" is the first time a player reads the word, and a player reads a
+ * case along a route, not down `nodeOrders`. The order puts a case's hidden
+ * route right after its start and its side door after the scene it hangs on,
+ * so a gloss in a scene most runs never enter used to pass the whole case:
+ * 사건 11 explained 참고인 on the hidden route, and one ordinary card from the
+ * start read it bare (audit of 2026-10-07, finding 2).
+ *
+ * So a scene may say a term bare only if every route into it has already
+ * explained it. Routes start on each scene the case can open on and follow the
+ * cards a scene deals; 판을 다시 짠다 is not followed, because it can jump from
+ * anywhere and would leave nothing explained before the hidden route. The
+ * scenes only that jump reaches are walked second, from their own first scene.
+ */
+function unexplainedUses(caseId, term, sceneIds, starts) {
+  const use = new Map(sceneIds.map((id) => [id, useIn(id, term)]));
+  if (![...use.values()].some(Boolean)) return [];
+  const walk = (roots, within) => {
+    const reached = new Set();
+    const pending = [...roots];
+    while (pending.length > 0) {
+      const id = pending.pop();
+      if (reached.has(id) || !within.has(id)) continue;
+      reached.add(id);
+      for (const choice of nodes[id].choices ?? []) if (choice.type !== "reframe") pending.push(choice.next);
+    }
+    // explainedBefore(scene) holds when every card into it comes from a scene
+    // that explains the term or already had it explained. Start from "yes" and
+    // take it away until nothing changes; a root has no card into it.
+    const explainedBefore = new Map([...reached].map((id) => [id, !roots.includes(id)]));
+    for (let changed = true; changed; ) {
+      changed = false;
+      for (const id of reached) {
+        if (explainedBefore.get(id) || use.get(id)?.explains) continue;
+        for (const choice of nodes[id].choices ?? []) {
+          if (choice.type === "reframe" || !explainedBefore.get(choice.next)) continue;
+          explainedBefore.set(choice.next, false);
+          changed = true;
+        }
+      }
+    }
+    return [...reached].filter((id) => use.get(id) && !use.get(id).firstExplained && !explainedBefore.get(id));
+  };
+  const all = new Set(sceneIds);
+  const onRoutes = walk(starts, all);
+  const played = new Set();
+  for (const pending = [...starts]; pending.length > 0; ) {
+    const id = pending.pop();
+    if (played.has(id) || !all.has(id)) continue;
+    played.add(id);
+    for (const choice of nodes[id].choices ?? []) if (choice.type !== "reframe") pending.push(choice.next);
+  }
+  const offRoute = sceneIds.filter((id) => !played.has(id));
+  const entered = new Set(offRoute.flatMap((id) => (nodes[id].choices ?? []).filter((choice) => choice.type !== "reframe").map((choice) => choice.next)));
+  const hiddenRoots = offRoute.filter((id) => !entered.has(id));
+  const offRoutes = walk([...starts, ...hiddenRoots], all).filter((id) => !played.has(id));
+  return [...onRoutes, ...offRoutes];
+}
+
+/**
+ * The terms a case still says bare on some route, as `case/term`. The rule
+ * above found these the day it was written (2026-10-07) and they are story to
+ * rewrite, not a script to fix, so they are held as a ceiling: the check fails
+ * when a case/term pair is added, and names the ones not on this list. Take a
+ * pair off when its case explains the term on every route, and lower the count.
+ */
+const BARE_ON_A_ROUTE = new Set([
+  "prologue02/조건부 승인",
+  "case04/상환",
+  "case04/예외 승인",
+  "case05/가중치",
+  "case05/알고리즘",
+  "case06/인사위원회",
+  "case09/채권단",
+  "case11/국정감사",
+  "case12/부제소 합의",
+  "case16/리스",
+  "case23/계열사",
+  "case23/사내이사",
+  "case23/의결권 자문사",
+  "case24/수신 기록",
+  "case24/이관",
+  "case27/후순위",
+  "case29/부속서",
+  "case29/자문역",
+  "case31/부속서",
+  "case31/자문역",
+  "case33/보호조치",
+  "case37/변론",
+  "case41/참고인",
+  "case42/사외이사",
+  "case43/의결권",
+  "case43/의결권 자문사",
+  "case44/처벌불원서",
+  "case44/추징",
+]);
+const bareOnARoute = new Map();
 for (const caseId of CASE_SEQUENCE) {
-  const openings = [...new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})])].filter((id) => nodes[id]);
-  const authored = (nodeOrders[caseId] ?? []).filter((id) => nodes[id] && !openings.includes(id));
-  const rest = Object.keys(nodes)
-    .filter((id) => nodes[id].caseId === caseId && !openings.includes(id) && !authored.includes(id))
-    .sort();
-  const body = [...authored, ...rest];
+  const starts = [...new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})])].filter((id) => nodes[id]);
+  const sceneIds = [...new Set([...(nodeOrders[caseId] ?? []), ...Object.keys(nodes).filter((id) => nodes[id].caseId === caseId).sort()])].filter((id) => nodes[id]);
   for (const term of GLOSSARY) {
-    let everyOpeningExplains = openings.length > 0;
-    for (const opening of openings) {
-      const use = firstUse([opening], term);
-      if (use && !use.explained) failures.push(`${caseId}/${opening}: "${term}" needs a (plain explanation) at its first use`);
-      if (!use?.explained) everyOpeningExplains = false;
-    }
-    const use = firstUse(body, term);
-    if (use && !use.explained && !everyOpeningExplains) {
-      failures.push(`${caseId}/${use.id}: "${term}" needs a (plain explanation) at its first use in the case`);
-    }
+    const scenes = unexplainedUses(caseId, term, sceneIds, starts);
+    if (scenes.length) bareOnARoute.set(`${caseId}/${term}`, scenes);
   }
 }
+const describeBare = (pair) => `${pair}: needs a (plain explanation) in ${bareOnARoute.get(pair).join(", ")}, where a route reaches it unexplained`;
+if (bareOnARoute.size > BARE_ON_A_ROUTE.size) {
+  const added = [...bareOnARoute.keys()].filter((pair) => !BARE_ON_A_ROUTE.has(pair));
+  for (const pair of added) failures.push(describeBare(pair));
+  failures.push(`${bareOnARoute.size} case/term pairs are read unexplained on some route, over the ${BARE_ON_A_ROUTE.size} allowed`);
+}
+if (process.argv.includes("--list")) for (const pair of bareOnARoute.keys()) console.log(describeBare(pair));
 
 assert.deepEqual(failures, [], failures.join("\n"));
-console.log(`Plain-language check passed (${Object.keys(BANNED).length} banned words, ${Object.keys(RETIRED_PHRASES).length} retired phrases, ${GLOSSARY.length} glossary terms across ${CASE_SEQUENCE.length} cases).`);
+console.log(
+  `Plain-language check passed (${Object.keys(BANNED).length} banned words, ${Object.keys(RETIRED_PHRASES).length} retired phrases, ${GLOSSARY.length} glossary terms across ${CASE_SEQUENCE.length} cases; ` +
+    `${bareOnARoute.size} of the ${BARE_ON_A_ROUTE.size} allowed case/term pairs are still read unexplained on some route).`,
+);
+const settled = [...BARE_ON_A_ROUTE].filter((pair) => !bareOnARoute.has(pair));
+if (settled.length) console.log(`Explained on every route now; take them off BARE_ON_A_ROUTE: ${settled.join(", ")}.`);

@@ -46,13 +46,24 @@ export const RETIRED_PHRASES = {
 
 const lineOf = (text, index) => text.slice(0, index).split("\n").length;
 
-/** `[{ word, instead, line }]` for every banned word that starts a word in `text`. */
+/**
+ * Bank words are mostly met in compounds -- 전자결재, 신규여신, 주택융자, 재기안
+ * -- and a word-start rule let every one of them through. Three of the words
+ * are found inside no ordinary Korean word, so they are refused wherever they
+ * stand. The rest do turn up inside other words (상품의 holds 품의, 정기안내
+ * holds 기안), so they are refused at a word start, or behind one of the
+ * prefixes a bank puts in front of them.
+ */
+const REFUSED_ANYWHERE = new Set(["여신", "융자", "결재"]);
+const COMPOUND_PREFIXES = ["재", "사전", "최종", "전자", "신규", "공동"];
+
+/** `[{ word, instead, line }]` for every banned word in `text`, alone or in a compound. */
 export function findBannedWords(text) {
   const found = [];
   for (const [word, instead] of Object.entries(BANNED)) {
     // A Hangul neighbour on the left means the letters are part of another
-    // word (정당해 is not 당해), so only a word start counts.
-    const pattern = new RegExp(`(^|[^가-힣])${word}`, "g");
+    // word (정당해 is not 당해), so only a word start or a known compound counts.
+    const pattern = REFUSED_ANYWHERE.has(word) ? new RegExp(word, "g") : new RegExp(`(?:^|[^가-힣]|${COMPOUND_PREFIXES.join("|")})${word}`, "g");
     for (const match of text.matchAll(pattern)) found.push({ word, instead, line: lineOf(text, match.index) });
   }
   return found;
