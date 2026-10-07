@@ -287,7 +287,7 @@ export const case17 = {
           voice: "법무팀 회의는 내일 아침이니, 트럭 불이 꺼질 때까지 남아 소스 통을 같이 흔든다.",
           echo: "불이 꺼질 때 트럭 앞에 열한 명과 트리거랩이 남습니다. 오진우의 통화는 아직 끝나지 않았습니다.",
           next: "case17_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c17_after_record",

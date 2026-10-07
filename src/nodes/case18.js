@@ -240,7 +240,7 @@ export const case18Nodes = {
       {
         id: "c18_final_block",
         label: "오진우의 결정을 기다리지 않고 매각 자체를 막으러 간다",
-        effect: { capital: 6, time: 4, humanCost: -5, trust: 2, legitimacy: 4, fatigue: 5 },
+        effect: { capital: 6, time: 4, humanCost: -5, trust: -2, legitimacy: 4, fatigue: 5 },
         voice: "누가 팀장이 되든 612명은 그대로라며, 오진우의 결정을 기다리지 않고 매각 자체를 막으러 간다.",
         echo: "막으러 가면 9시 서명은 열리지 않습니다. 오진우는 자기 대신 누군가 정해 버린 아침을, 한동안 당신에게 따지지 않습니다.",
         cognition: { risk: 2 },
@@ -281,7 +281,7 @@ export const case18 = {
           voice: "문자는 내일 답해도 된다며, 오늘은 탕비실 불을 끌 때까지 오진우와 함께 남는다.",
           echo: "불을 끌 때까지 남으면 컵라면 트리가 다 없어집니다. 헌책방 문자에는 내일 아침 첫차에서 답합니다.",
           next: "case18_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c18_after_record",
@@ -712,8 +712,8 @@ export const case18 = {
     },
     c18_start_rush: {
       label: "어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다",
-      effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
-      cognition: { persistence: 2 },
+      effect: { trust: 12, legitimacy: 5, humanCost: 5, fatigue: 4 },
+      cognition: { risk: 2 },
       voice: "오래 끌지 말라는 부탁을 들어주려고, 어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다.",
       echo: "변명을 건너뛰면 이야기는 빠릅니다. 빠른 결론에 오진우가 안도하는 얼굴을 보이고, 그 얼굴이 조금 마음에 걸립니다.",
     },

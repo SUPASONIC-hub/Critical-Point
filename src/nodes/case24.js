@@ -194,7 +194,7 @@ export const case24Nodes = {
       {
         id: "c24_farewell_laugh",
         label: "오늘은 싸움 얘기 없이 웃기만 하고 내일 생각한다",
-        effect: { trust: 6, capital: 5, time: 4, legitimacy: -6, humanCost: 3, fatigue: -6 },
+        effect: { trust: 6, capital: 5, time: -4, legitimacy: -6, humanCost: 3, fatigue: -6 },
         voice: "마지막 밤까지 싸움터로 만들 수는 없다며, 오늘은 싸움 얘기 없이 웃기만 하고 내일 생각한다.",
         echo: "웃으면 강태민이 건배사를 한 번 더 합니다. 해체 이의 기한은 그사이 하루가 줄어듭니다.",
         cognition: { risk: 2 },
@@ -280,7 +280,7 @@ export const case24 = {
           voice: "33층보다 이 사람들이 먼저라며, 불 꺼진 4층에서 마지막 밤을 동료들과 끝까지 보낸다.",
           echo: "불 꺼진 4층에 열아홉 명이 남습니다. 33층의 호출은 이 밤이 끝날 때까지 기다립니다.",
           next: "case24_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c24_after_record",

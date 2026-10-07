@@ -215,8 +215,8 @@ for (const { nodeId, choice } of playableChoices) {
  * each count is a ceiling: the check fails when it rises and prints every
  * offender, and the ceiling comes down as cards are fixed.
  */
-const RUNTIME_DOMINANCE_CEILING = 7;
-const CLOCK_MISMATCH_CEILING = 76;
+const RUNTIME_DOMINANCE_CEILING = 0;
+const CLOCK_MISMATCH_CEILING = 69;
 for (const [name, found, ceiling] of [
   ["runtime cards that beat, or lose to, a written card going the same way", runtimeDominance, RUNTIME_DOMINANCE_CEILING],
   ["labels that disagree with what the card does to the clock", clockMismatches, CLOCK_MISMATCH_CEILING],

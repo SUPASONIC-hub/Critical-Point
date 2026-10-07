@@ -287,7 +287,7 @@ export const case37 = {
           voice: "혼자 읽은 줄은 혼자 남는다며, 먼저 가는 사람 없이 서로의 기록을 끝까지 같이 읽는다.",
           echo: "해가 뜰 때까지 아무도 먼저 집에 가지 않습니다. 끝까지 같이 읽은 표는, 며칠 뒤 누군가의 서면에서 다시 보게 됩니다.",
           next: "case37_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c37_after_record",
@@ -395,7 +395,8 @@ export const case37 = {
         },
         {
           label: "지금은 마음이 흔들릴 때라며 결정을 며칠 미루자고 한다",
-          effect: { time: 5, capital: 3, trust: -3, humanCost: 3, fatigue: -4 },
+          effect: { time: -5, capital: 3, trust: -3, humanCost: 3, fatigue: -4 },
+          cognition: { risk: 1 },
           voice: "기록을 막 본 지금은 마음이 흔들릴 때라며, 결정을 며칠 미루자고 한다.",
           echo: "며칠 뒤 선우진은 같은 말을 합니다. 그사이 순위표의 투표 수가 두 배가 됩니다.",
         },
@@ -564,7 +565,7 @@ export const case37 = {
         {
           id: "c37_branch_rooftop_follow_c",
           label: "공개는 말리고 소문이 식을 때까지 기다리자고 한다",
-          effect: { time: 6, capital: 5, trust: -5, humanCost: 4, fatigue: -4 },
+          effect: { time: -6, capital: 5, trust: -5, humanCost: 4, fatigue: -4 },
           voice: "기자가 대문 앞에 있는 날은 아니라며, 공개는 말리고 소문이 식을 때까지 기다리자고 한다.",
           echo: "소문은 식지 않습니다. 이틀 뒤 이민서는 노트북을 덮으며 '그때도 이랬어요'라고 말합니다.",
           next: "c37_mirror",

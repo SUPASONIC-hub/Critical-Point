@@ -227,7 +227,7 @@ export const case27Nodes = {
         effect: { trust: 11, humanCost: -6, legitimacy: -6, capital: 4, time: -4, fatigue: 5 },
         voice: "140명을 빈손으로 돌려보낼 수는 없다며, 그룹 돈 100억을 받아 오늘 줄부터 막고 조건은 나중에 싸운다.",
         echo: "100억이 들어오면 오늘 줄은 오전 안에 사라집니다. 조건란의 작은 글씨는 다음 주 월요일 이사회 안건으로 올라옵니다.",
-        cognition: { reframing: 2 },
+        cognition: { risk: 2 },
       },
       {
         id: "c27_final_open",
@@ -282,7 +282,7 @@ export const case27 = {
           voice: "서른여덟 명 뒤에도 올 사람이 있다며, 군산에 하루 더 남아 돌아오는 사람들을 끝까지 맞는다.",
           echo: "남으면 토요일 아침 수산시장 곽 사장이 박대를 한 상자 들고 옵니다. 서울로 가는 버스는 일요일 막차입니다.",
           next: "case27_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c27_after_record",
@@ -663,7 +663,7 @@ export const case27 = {
       {
         id: "c27_evidence_turn_hold",
         label: "정리안은 쥐고 라운드힐 거래가 드러날 때까지 기다린다",
-        effect: { capital: 9, time: 5, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
+        effect: { capital: 9, time: -5, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
         voice: "빈 승인자 칸의 주인까지 닿으려면 아직 이르다며, 정리안은 쥐고 라운드힐 거래가 드러날 때까지 기다린다.",
         echo: "쥐고 있으면 라운드힐이라는 이름이 더 큰 판에서 쓸모가 있습니다. 그 사이 새봄신협은 혼자 금요일을 버팁니다.",
         cognition: { risk: 2 },

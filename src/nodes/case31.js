@@ -236,7 +236,7 @@ export const case31Nodes = {
         effect: { legitimacy: 13, trust: 4, capital: -8, time: -5, humanCost: 3, fatigue: 5 },
         voice: "이번에는 서명란을 비워 두지 않겠다며, 확인자 서명란에 내 이름을 쓰고 사실 그대로 확인한다.",
         echo: "서명란이 채워집니다. 그날 저녁 석재우가 당신 책상 위의 명패를 말없이 반듯하게 돌려놓습니다.",
-        cognition: { persistence: 2 },
+        cognition: { inference: 2 },
       },
       {
         id: "c31_final_wait",
@@ -244,7 +244,7 @@ export const case31Nodes = {
         effect: { capital: 9, time: -6, legitimacy: -3, trust: 3, humanCost: 4, fatigue: -2 },
         voice: "세 장으로는 아직 모자라다며, 서명은 미루고 소명 기간 동안 안에서 더 모은다.",
         echo: "서명은 석 달 뒤로 갑니다. 그동안 모을 수 있는 것과, 그동안 파쇄될 수 있는 것이 함께 늘어납니다.",
-        cognition: { risk: 2 },
+        cognition: { persistence: 2 },
       },
       {
         id: "reframe",
@@ -282,7 +282,7 @@ export const case31 = {
           voice: "사람은 내가 챙기라는 말을 따라, 오늘 밤은 헌책방에 모여 동료들과 검사의 끝을 함께 보낸다.",
           echo: "헌책방 1층에 불이 늦게까지 켜집니다. 최서진이 처음으로 그 문을 열고 들어옵니다.",
           next: "case31_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c31_after_record",

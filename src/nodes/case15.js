@@ -284,7 +284,7 @@ export const case15 = {
           voice: "오늘 하루는 남매의 것이라며, 교문 계단에서 식은 도시락을 남매와 끝까지 나눠 먹는다.",
           echo: "뭇국은 차갑지만 서준은 국물까지 다 마십니다. 강태민의 문자는 내일 아침까지 기다립니다.",
           next: "case15_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c15_after_record",

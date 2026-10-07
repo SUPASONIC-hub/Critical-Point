@@ -281,7 +281,7 @@ export const case13 = {
           voice: "강태민 혼자 들게 두지 않으려고, 오늘은 동료들과 마지막 스탠드를 나를 때까지 남는다.",
           echo: "마지막 스탠드를 트럭에 싣고 나면 강태민이 컵라면을 여덟 개 삽니다. 백아린의 '상생'은 내일까지 기다립니다.",
           next: "case13_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c13_after_record",

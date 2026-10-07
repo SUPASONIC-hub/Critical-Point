@@ -44,7 +44,7 @@ export const case42Nodes = {
         voice: "나준혁의 휴가 명령서면 충분하다며, 승인이 없어도 동료들과 경포로 떠난다.",
         echo: "승인 없이 떠나면 금요일 아침 기차는 즐겁습니다. 대표 칸이 비어 있는 동안, 당신의 금요일은 결근으로도 휴가로도 적히지 않습니다.",
         next: "c42_pension",
-        cognition: { reframing: 2 },
+        cognition: { risk: 2 },
       },
       {
         id: "c42_start_ask",
@@ -281,7 +281,7 @@ export const case42 = {
           voice: "방명록 첫 장에 얼굴도 남기고 싶어서, 단체 사진을 찍고 낮 기차까지 동료들과 바다에 남는다.",
           echo: "사진 속 아홉 명은 다 눈을 감고 있어서 강태민이 열두 번을 다시 찍습니다. 바다에서 오진우가 한서윤에게 한 판을 더 청했다가 지고, 의견서는 낮 기차 안에서 쓰기 시작해 자정 7분 전에 나갑니다.",
           next: "case42_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c42_after_record",

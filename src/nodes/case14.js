@@ -280,7 +280,7 @@ export const case14 = {
           voice: "웃는 자리를 먼저 뜨고 싶지 않아서, 오늘은 이정숙과 가입자 모임 저녁 자리에 끝까지 남는다.",
           echo: "저녁 자리에서 이정숙이 모두에게 받아쓰기 시험을 냅니다. 강태민은 이번에도 100점이고, 권도현은 답안 옆에 채점 비용을 적다가 감점됩니다.",
           next: "case14_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c14_after_record",
@@ -417,7 +417,7 @@ export const case14 = {
         },
         {
           label: "오늘은 사과만 전하고 설명은 다음 교실로 미룬다",
-          effect: { time: 5, capital: 3, trust: 4, legitimacy: -2, humanCost: 2, fatigue: -3 },
+          effect: { time: -5, capital: 3, trust: 4, legitimacy: -2, humanCost: 2, fatigue: -3 },
           cognition: { risk: 1 },
           voice: "손을 잡힌 채로는 숫자를 꺼낼 수 없어서, 오늘은 사과만 전하고 설명은 다음 교실로 미룬다.",
           echo: "미루면 이정숙은 공책을 가방에 넣고 버스를 탑니다. 가입을 되돌릴 수 있는 날이 하루 줄어듭니다.",

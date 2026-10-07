@@ -249,7 +249,7 @@ export const finalCase = {
         {
           id: "f_after_burn",
           label: "모든 데이터를 태워 누구도 다시 이용하지 못하게 한다",
-          effect: { legitimacy: 7, trust: -6, humanCost: 4, fatigue: 5 },
+          effect: { legitimacy: 8, trust: -6, humanCost: 4, fatigue: 5 },
           voice: "누구도 다시 이용하지 못하도록, 모든 데이터를 태운다.",
           echo: "태우면 악용은 끝납니다. 피해를 증명할 유일한 자료도 같은 불에 들어갑니다.",
           next: "final_result",

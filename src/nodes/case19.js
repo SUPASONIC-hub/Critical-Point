@@ -282,7 +282,7 @@ export const case19 = {
           voice: "새벽에 깨어 종이를 찾을지 몰라서, 오늘 밤은 보호자 의자에서 임경수 곁을 지킨다.",
           echo: "보호자 의자는 딱딱합니다. 새벽 세 시에 임경수가 깨어 '종이는 어디 있나' 묻고, 대답을 듣고 다시 잠듭니다. 에코의 알림은 아침까지 기다립니다.",
           next: "case19_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c19_after_record",

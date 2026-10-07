@@ -200,7 +200,7 @@ export const case47Nodes = {
         effect: { time: 5, capital: 4, trust: 2, humanCost: 3, fatigue: -4 },
         voice: "2주기에 온 좋은 소식을 온전히 두고 싶어서, 하준의 합격을 먼저 축하하고 수첩 이야기는 저녁으로 미룬다.",
         echo: "하준이 합격 문자를 봉안당 방명록에 옮겨 적습니다. 문가을은 수첩을 가방 제일 안쪽으로 다시 넣습니다.",
-        cognition: { reframing: 1 },
+        cognition: { risk: 1 },
       },
       {
         id: "reframe",
@@ -242,7 +242,7 @@ export const case47Nodes = {
       {
         id: "c47_final_settle",
         label: "31명에게 위로금을 받게 하고 오늘 2차 기준을 모두 끝낸다",
-        effect: { capital: 10, time: 6, humanCost: -3, trust: -3, legitimacy: -8, fatigue: -3 },
+        effect: { capital: 10, time: 6, humanCost: 3, trust: -3, legitimacy: -8, fatigue: -3 },
         voice: "명절에 빈손보다는 300만 원이 낫다며, 31명에게 위로금을 받게 하고 오늘 2차 기준을 모두 끝낸다.",
         echo: "위로금은 연휴 안에 들어옵니다. 31명은 300만 원과 함께 '확인 불가'를 그대로 받고, 다시는 이 일로 소송할 수 없습니다.",
         cognition: { risk: 2 },
@@ -284,7 +284,7 @@ export const case47 = {
           voice: "못다 한 고맙다는 말은 떡으로 받기로 하고, 보름달이 질 때까지 옥상에 남아 모두와 송편을 빚는다.",
           echo: "옥상에 열한 명이 남고, 셔터는 반만 내려가 있습니다. 공지 속 한 줄짜리 안건은 아직 아무도 검색하지 않았습니다.",
           next: "case47_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c47_after_record",

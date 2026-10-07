@@ -282,7 +282,7 @@ export const case29 = {
           voice: "7년 만의 답장을 혼자 읽게 둘 수 없어서, 싱가포르의 마지막 밤을 서하린, 오진우와 끝까지 보낸다.",
           echo: "호커센터 불이 하나씩 꺼질 때까지 플라스틱 의자 세 개가 비지 않습니다. 오진우가 '매운맛은 이제 은퇴합니다'라고 선언하고, 할머니가 박수를 칩니다.",
           next: "case29_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c29_after_record",
