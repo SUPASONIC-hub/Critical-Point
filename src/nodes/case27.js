@@ -663,7 +663,7 @@ export const case27 = {
       {
         id: "c27_evidence_turn_hold",
         label: "정리안은 쥐고 라운드힐 거래가 드러날 때까지 기다린다",
-        effect: { capital: 9, time: 5, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
+        effect: { capital: 9, time: -5, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
         voice: "빈 승인자 칸의 주인까지 닿으려면 아직 이르다며, 정리안은 쥐고 라운드힐 거래가 드러날 때까지 기다린다.",
         echo: "쥐고 있으면 라운드힐이라는 이름이 더 큰 판에서 쓸모가 있습니다. 그 사이 새봄신협은 혼자 금요일을 버팁니다.",
         cognition: { risk: 2 },

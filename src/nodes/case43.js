@@ -153,7 +153,7 @@ export const case43Nodes = {
       {
         id: "c43_advisor_simple",
         label: "개혁 조건은 다음으로 미루고 해임 찬성 권고만 부탁한다",
-        effect: { time: 6, capital: 5, legitimacy: -4, trust: 3, humanCost: 4, fatigue: -3 },
+        effect: { capital: 5, legitimacy: -6, trust: 3, humanCost: 4, fatigue: -3 },
         voice: "조건이 해임을 떨어뜨릴 수도 있다는 말에, 개혁 조건은 다음으로 미루고 해임 찬성 권고만 부탁한다.",
         echo: "표세린이 노트북을 닫습니다. '부탁은 안 받는다고 했죠.' 권고는 그대로 조건부로 나갑니다. 당신의 부탁만 기록에 남습니다.",
         cognition: { risk: 2 },

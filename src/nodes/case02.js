@@ -87,7 +87,7 @@ export const case02Nodes = {
       {
         id: "escalate",
         label: "한서윤에게 즉시 공유한다",
-        effect: { time: -3, trust: 3, legitimacy: 5, fatigue: 2 },
+        effect: { trust: 3, legitimacy: 5, fatigue: 2 },
         voice: "내 손에서 해석권이 떠나는 걸 알면서도 상급자 공유를 택한다.",
         echo: "상급자 공유는 안전합니다. 동시에 사건 해석권을 넘기는 선택이기도 합니다.",
         cognition: { risk: 1 },

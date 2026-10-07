@@ -712,7 +712,7 @@ export const case18 = {
     },
     c18_start_rush: {
       label: "어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다",
-      effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
+      effect: { trust: 12, legitimacy: 5, humanCost: 5, fatigue: 4 },
       cognition: { risk: 2 },
       voice: "오래 끌지 말라는 부탁을 들어주려고, 어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다.",
       echo: "변명을 건너뛰면 이야기는 빠릅니다. 빠른 결론에 오진우가 안도하는 얼굴을 보이고, 그 얼굴이 조금 마음에 걸립니다.",
