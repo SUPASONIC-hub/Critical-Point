@@ -39,7 +39,10 @@ const budgets = [
   // The shell: what the intro needs to boot, now including the intro screen
   // itself, which stopped being a lazy chunk the entry had to fetch before it
   // could paint. 161,674 / 57,486 on 2026-09-27.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_800, maxGzip: 60_400 },
+  // 60,400 -> 61,300 gzip on 2026-10-07, measured 60,666: the shell's start
+  // save tied to the run's fields, the roadmap card that resumes or asks, the
+  // board and ranking states, and the worker's second warm-up.
+  { pattern: /^index-.*\.js$/, maxBytes: 169_800, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -74,15 +77,22 @@ const budgets = [
   // icons the board's states and the recovery controls added.
   { pattern: /^icons-vendor-.*\.js$/, maxBytes: 14_400, maxGzip: 5_150 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 5_560, maxGzip: 2_350 },
+  // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
+  // 5%: a button that says why it will not act, and the counters as
+  // descriptions rather than part of each field's name.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 6_040, maxGzip: 2_490 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
   // the rows arrive, and `lang` on the English labels.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_420, maxGzip: 1_980 },
+  // -> 4,800 / 2,100 on 2026-10-07, measured 4,567 / 2,001 plus 5%: a list
+  // with spoken ranks, and a retry when the rows did not come.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 4_800, maxGzip: 2_100 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_010, maxGzip: 3_970 },
+  // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
+  // online copy held through a reset, and uploads paced under the hourly limit.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 10_960, maxGzip: 4_380 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
