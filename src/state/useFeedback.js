@@ -6,10 +6,23 @@ import { telemetryEnabled } from "../telemetry.js";
 import { createTelemetryEventId } from "./payloadSchemas.js";
 import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 
-export function useFeedbackStatus() {
-  const [feedbackStatus, setFeedbackStatus] = useState("");
+/** What the form's status line says on `caseId`'s result page: only what was said about that case. */
+export function readFeedbackStatus(status, caseId) {
+  return status?.caseId === caseId ? status.text : "";
+}
+
+/**
+ * The line under the feedback form, kept with the case it is about. It was one
+ * string for the whole run and nothing cleared it when a case opened, so
+ * "피드백을 저장했습니다" from one case stood under the empty form of the next.
+ * A send that answers after the player has moved on is still filed under the
+ * case it was sent for: the setter belongs to the render that started it.
+ */
+export function useFeedbackStatus(caseId) {
+  const [status, setStatus] = useState({ caseId: null, text: "" });
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  return { feedbackStatus, setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback };
+  const setFeedbackStatus = (text) => setStatus({ caseId, text });
+  return { feedbackStatus: readFeedbackStatus(status, caseId), setFeedbackStatus, isSubmittingFeedback, setIsSubmittingFeedback };
 }
 
 /**

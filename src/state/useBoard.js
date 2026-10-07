@@ -115,6 +115,23 @@ const BOARD_REFUSAL_COPY = {
   contact: "전화번호나 이메일이 들어간 글은 올릴 수 없습니다. 빼고 다시 올려 주세요.",
 };
 
+/**
+ * Whether this page already put these words on the board. The server takes
+ * the same body from the same device again without storing it, for six hours
+ * (20260929020000): a retry of a post that landed has to look like success.
+ * But every submit here has a new event id, so a player who posts the same
+ * line an hour later is that retry to the server, and was told "글을 올렸습니다"
+ * for a post that went nowhere. `posted` is body -> when. It is kept for the
+ * page, not in the hook: the intro and the runtime each mount the board.
+ */
+const BOARD_REPEAT_WINDOW_MS = 6 * 60 * 60_000;
+const ownBoardPosts = new Map();
+
+export function isOwnRecentPost(posted, body, now = Date.now()) {
+  const at = posted.get(body);
+  return at !== undefined && now - at < BOARD_REPEAT_WINDOW_MS;
+}
+
 function normalizeBoardPost(row = {}) {
   return {
     id: row.id,
@@ -249,6 +266,10 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardPostStatus(BOARD_REFUSAL_COPY[refusal]);
       return;
     }
+    if (isOwnRecentPost(ownBoardPosts, trimmedBoardBody)) {
+      setBoardPostStatus("같은 글을 이미 올렸습니다. 같은 글은 게시판에 한 번만 실립니다.");
+      return;
+    }
     const sinceLastPost = Date.now() - lastBoardPostAt;
     if (lastBoardPostAt > 0 && sinceLastPost < BOARD_POST_INTERVAL_MS) {
       const waitSeconds = Math.ceil((BOARD_POST_INTERVAL_MS - sinceLastPost) / 1000);
@@ -277,6 +298,7 @@ export function useBoard({ showBoard, isOnline }) {
       }
       setBoardBodyState("");
       setLastBoardPostAt(Date.now());
+      ownBoardPosts.set(trimmedBoardBody, Date.now());
       setBoardPostStatus("글을 올렸습니다.");
       reloadBoard();
     } catch (error) {

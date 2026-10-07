@@ -4,8 +4,10 @@ import { PGlite } from "@electric-sql/pglite";
 
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
-import { createCaseSummary } from "../src/gameLogic.js";
+import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
+import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 
 /**
@@ -365,7 +367,9 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
   const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index));
   const summary = {
     ...createCaseSummary(triggers, cognition, log, { resources: initialResources, schemaVersion: 7 }),
-    endingVariant: "steady",
+    // The ending as the runtime puts it in a row: its id, not the record the
+    // report prints. A literal here once hid that the client sent the record.
+    endingVariant: toRowSummary({ endingVariant: getEndingVariant({ resources: initialResources }) }).endingVariant,
     gauntlet: createRunSummary(RUN_INITIAL_STATE),
     runId,
     outcomeChoiceId: log.at(-1).choiceId,
@@ -628,6 +632,23 @@ withHeaders({ "x-forwarded-for": "198.51.100.72" });
 withHeaders({ "x-forwarded-for": "198.51.100.73" });
 // Another address is not held by the first one's counter.
 await post("write telemetry from a second address while the first is at its limit", "app_error_logs", errorPayload(sessionId(42)));
+withHeaders({ "x-forwarded-for": "198.51.100.74" });
+{
+  // A ceiling set above what the counter can count to is still a ceiling. The
+  // counter stops at two billion, and `count <= limit` was true for ever after
+  // (20261007010000): the rule that fails closed had stopped failing.
+  const counter = async () => (await one(`select request_count as n, window_started_at as at from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`)) ?? null;
+  const before = await counter();
+  await db.query(`insert into public.private_settings (name, value) values ('telemetry_daily_bytes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await post("write telemetry under a ceiling set past two billion", "app_error_logs", errorPayload(sessionId(43)));
+  await presetCounter("global:telemetry-bytes", 1999999999);
+  await postRefused("write telemetry once the counter can count no further", "app_error_logs", errorPayload(sessionId(43)), /^PT429 .*daily ceiling/);
+  await db.query(`delete from public.private_settings where name = 'telemetry_daily_bytes'`);
+  // The day's count goes back to what the checks before this one had written.
+  if (before) await db.query(`update public.telemetry_rate_limits set request_count = $1, window_started_at = $2 where actor_key = 'global:telemetry-bytes'`, [before.n, before.at]);
+  else await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`);
+}
 withHeaders(null);
 
 // Sizes, at the caps the measured payloads set (20260929010000). The largest
@@ -649,6 +670,30 @@ withHeaders(null);
     oversize("run-size-6", "case08", { dynamics: { note: "x".repeat(3000) } }), /too large/);
   await postRefused("send a 200 KB row", "playtest_sessions",
     oversize("run-size-7", "case08", { decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) }), /too large/);
+}
+
+// Relics: a run may hold every relic the client has, and the server takes that
+// many. The cap was 9 while the table had twelve, with nothing here to tie the
+// two together, so a run's tenth relic cost it every case row after it and its
+// place in the ranking (20261007000000). The honest row is built from a run
+// that holds all of them, by the builder the runtime uses.
+{
+  const SERVER_RELIC_LIMIT = 16;
+  const withRelics = (runId, caseId, relics) => {
+    const payload = casePayload({ session: sessionId(1), runId, caseId });
+    return { ...payload, dynamics: { ...payload.dynamics, relics } };
+  };
+  const everyRelic = createRunSummary({ ...RUN_INITIAL_STATE, relics: [...RELIC_IDS] }).relics;
+  check(everyRelic.length === RELIC_IDS.length, `a run holding every relic summarises ${everyRelic.length} of ${RELIC_IDS.length}.`);
+  check(
+    RELIC_IDS.length <= SERVER_RELIC_LIMIT,
+    `src/gauntlet/relics.js has ${RELIC_IDS.length} relics and playtest_sessions_dynamics_shape takes ${SERVER_RELIC_LIMIT}. ` +
+      "Add a migration that raises the limit before the relics ship, or a full run loses its case rows.",
+  );
+  await post("send a case row from a run holding every relic", "playtest_sessions", withRelics("run-relics-1", "case09", everyRelic));
+  const filler = (count) => Array.from({ length: count }, (_, index) => RELIC_IDS[index] ?? `relic${index}`);
+  await post(`send a case row with ${SERVER_RELIC_LIMIT} relics`, "playtest_sessions", withRelics("run-relics-2", "case09", filler(SERVER_RELIC_LIMIT)));
+  await postRefused(`send a case row with ${SERVER_RELIC_LIMIT + 1} relics`, "playtest_sessions", withRelics("run-relics-3", "case09", filler(SERVER_RELIC_LIMIT + 1)), /^23514 /);
 }
 
 // ---- the ranking
@@ -708,6 +753,10 @@ await postRefused("rank the run from a device that did not play its final case",
     `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,
   );
   check(row?.summary?.seasonComplete === true && row?.summary?.completedCaseCount === CASE_SEQUENCE.length, "a ranking summary lost seasonComplete or the case count.");
+  check(
+    typeof row?.summary?.endingVariant === "string" && row.summary.endingVariant === getEndingVariant({ resources: initialResources }).id,
+    `a ranking summary does not carry the ending the run's final case row named: ${JSON.stringify(row?.summary?.endingVariant)}`,
+  );
   check(
     Object.values(row?.summary ?? {}).every((value) => ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value)),
     `a ranking summary carries an object: ${JSON.stringify(row?.summary)}`,
@@ -983,6 +1032,12 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
   await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
   await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
+  // The owner's number, as large as they care to make it, is still a limit and
+  // not an error: it was cast to integer, and 2^31 failed every new code (20261007010000).
+  await db.query(`insert into public.private_settings (name, value) values ('cloud_daily_new_codes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await putCloud("start a code under a ceiling set past the integer range", "YYYYYYYY2345");
+  await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
 }
 withHeaders(null);
 

@@ -76,16 +76,23 @@ function createErrorRecoveryEntry(error, errorInfo = {}, source = "runtime") {
  * error, so three attempts at a broken scene pushed out every slot from before
  * it and left nothing to roll back to. One slot at the broken point is kept --
  * it is the only slot a first-case crash has -- and no second one.
+ *
+ * The same place is the same run, case, scene, number of decisions and number
+ * of closed cases. The last is for the save's own slots (useAppPersistence),
+ * which ask this too: a case opened again as practice starts at the scene and
+ * the empty log its first opening had, and is a different place to go back to.
  */
-function hasSlotAtRecoveryPoint(saved) {
+export function hasSlotAtRecoveryPoint(saved) {
   const slots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
   const logLength = Array.isArray(saved.log) ? saved.log.length : 0;
+  const closedCases = Array.isArray(saved.completedCases) ? saved.completedCases.length : 0;
   return slots.some(
     (slot) =>
       slot.snapshot.runId === (typeof saved.runId === "string" ? saved.runId : "") &&
       slot.currentCase === saved.currentCase &&
       slot.nodeId === saved.nodeId &&
-      slot.snapshot.log.length === logLength,
+      slot.snapshot.log.length === logLength &&
+      slot.completedCases.length === closedCases,
   );
 }
 
@@ -213,16 +220,24 @@ const recordedErrors = new WeakMap();
  * from the same source is one record for `REPEAT_BURST_MS` wherever it was
  * said, and for `REPEAT_WINDOW_MS` at the same scene. A screen that failed to
  * draw is never folded this way -- each one is a retry the boundary counts.
- * And however varied the lines, the console gets `CONSOLE_BUDGET` records a
- * minute; past that a line is still printed, and not recorded.
+ * And however varied the lines, a source gets `SOURCE_BUDGET` records a
+ * minute; past that a console line is still printed, and not recorded.
+ *
+ * The budget was the console's alone. An uncaught error or a rejected promise
+ * whose message differs each time (an id in it, a timestamp) was a new record
+ * every time: the error log, the whole save rewritten and a row to the server,
+ * for as long as it went on. Every source but a failed draw has the budget
+ * now, each its own, so a noisy console cannot spend the one a real error
+ * needs. Past it the source's last record is handed back -- the notice it
+ * raised is still the notice on screen.
  */
 const REPEAT_BURST_MS = 2_000;
 const REPEAT_WINDOW_MS = 60_000;
-const CONSOLE_BUDGET = 12;
+const SOURCE_BUDGET = 12;
 const REPEAT_MEMORY = 60;
 const recentRecords = new Map();
-let consoleRecordTimes = [];
-let lastConsoleRecord = null;
+const recordTimesBySource = new Map();
+const lastRecordBySource = new Map();
 
 function forgetOldRecords(now) {
   for (const [key, known] of recentRecords) {
@@ -233,8 +248,8 @@ function forgetOldRecords(now) {
 /** Test seam: what has been recorded is forgotten, as on a fresh page. */
 export function resetRecordedErrors() {
   recentRecords.clear();
-  consoleRecordTimes = [];
-  lastConsoleRecord = null;
+  recordTimesBySource.clear();
+  lastRecordBySource.clear();
 }
 
 export function recordAppError(error, errorInfo = {}, source = "runtime", { now = Date.now() } = {}) {
@@ -248,19 +263,21 @@ export function recordAppError(error, errorInfo = {}, source = "runtime", { now 
   // Before storage is read at all: this is the line a loop repeats.
   const burst = recentRecords.get(said);
   if (burst && now - burst.at < REPEAT_BURST_MS) return burst.entry;
+  // Over the budget: the source's last record is handed back and nothing is
+  // written. Asked before the save is read, not after -- reading it is a parse
+  // of the whole save, and a line past the budget is not remembered above, so
+  // every one of them used to pay for that parse to be told no.
+  const spent = (recordTimesBySource.get(source) ?? []).filter((at) => now - at < REPEAT_WINDOW_MS);
+  recordTimesBySource.set(source, spent);
+  if (spent.length >= SOURCE_BUDGET && lastRecordBySource.has(source)) return lastRecordBySource.get(source);
   const saved = getSavedRecoveryState();
   const saidHere = `${said}|${saved?.currentCase ?? ""}|${saved?.nodeId ?? ""}`;
   const repeat = recentRecords.get(saidHere);
   if (repeat && now - repeat.at < REPEAT_WINDOW_MS) return repeat.entry;
-  if (source === CONSOLE_SOURCE) {
-    consoleRecordTimes = consoleRecordTimes.filter((at) => now - at < REPEAT_WINDOW_MS);
-    // Over the budget: the last record is handed back and nothing is written.
-    if (consoleRecordTimes.length >= CONSOLE_BUDGET) return lastConsoleRecord ?? createErrorRecoveryEntry(error, errorInfo, source);
-    consoleRecordTimes.push(now);
-  }
+  spent.push(now);
 
   const entry = rememberRecord(error, recordNewAppError(error, errorInfo, source));
-  if (source === CONSOLE_SOURCE) lastConsoleRecord = entry;
+  lastRecordBySource.set(source, entry);
   forgetOldRecords(now);
   recentRecords.set(said, { entry, at: now });
   recentRecords.set(saidHere, { entry, at: now });

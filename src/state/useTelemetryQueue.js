@@ -35,6 +35,33 @@ function withEventId(item) {
 // past a minute: a ranking row a day early would otherwise ask 1,440 times.
 const RETRY_DELAY_CAP_MS = 5 * 60_000;
 
+// Said when a ranking row is let go because the server does not hold every
+// case of its run (telemetryBatch.isUnrankableRefusal). It names the two ways
+// that happens, since the player can do something about one of them next time.
+const UNRANKED =
+  "이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 서버에 이 회차의 사건 기록이 모두 있지는 않습니다(데이터 제공 동의 전에 마친 사건이 있거나, 서버가 받지 않은 기록이 있습니다). 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
+
+/**
+ * What the status line says after a pass over the queue. A ranking row that
+ * was let go is said first and whatever else happened after it: it is the one
+ * outcome the player cannot see anywhere else, and the row is no longer in the
+ * queue to be counted as waiting.
+ */
+export function describeBatchResult({ queueCommitted, left, refused = 0, unranked = 0 }) {
+  if (!queueCommitted) {
+    return {
+      tone: "error",
+      text: "원격 저장 응답을 받았지만 브라우저 저장본 갱신에 실패했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
+    };
+  }
+  const lines = [];
+  if (unranked > 0) lines.push(UNRANKED);
+  if (refused > 0) lines.push(`서버가 받지 않은 기록 ${refused}건은 대기열에서 뺐습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다.`);
+  if (left > 0) lines.push(`원격 저장 ${left}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`);
+  if (lines.length === 0) return { tone: "success", text: "원격 저장을 모두 완료했습니다." };
+  return { tone: "error", text: lines.join(" ") };
+}
+
 export function useTelemetryQueue({
   pendingTelemetryRef,
   setPendingTelemetry,
@@ -122,7 +149,11 @@ export function useTelemetryQueue({
       text: `원격 저장 ${retryBatch.length}건을 전송하는 중입니다.`,
     });
 
-    const { kept, aborted, refused } = await sendTelemetryBatch(retryBatch, { canSend });
+    // A row is sent only while the queue still holds it: the consent box
+    // empties the queue on an untick, and a tick a moment later must not send
+    // what the player was just told had been deleted.
+    const isQueued = (item) => pendingTelemetryRef.current.some((queued) => queued.id === item.id);
+    const { kept, aborted, refused, unranked } = await sendTelemetryBatch(retryBatch, { canSend, isQueued });
     retryingRef.current = false;
     setIsRetryingTelemetry(false);
     if (aborted) {
@@ -139,24 +170,7 @@ export function useTelemetryQueue({
       telemetryRetryAttemptRef.current = 0;
       setTelemetryRetryInfo({ attempt: 0, nextRetryAt: "" });
     }
-    setTelemetryStatus(
-      queueCommitted && nextQueue.length === 0
-        ? refused > 0
-          ? {
-              tone: "error",
-              text: `서버가 받지 않은 기록 ${refused}건은 대기열에서 뺐습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다.`,
-            }
-          : {
-              tone: "success",
-              text: "원격 저장을 모두 완료했습니다.",
-            }
-        : {
-            tone: "error",
-            text: queueCommitted
-              ? `원격 저장 ${nextQueue.length}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`
-              : "원격 저장 응답을 받았지만 브라우저 저장본 갱신에 실패했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.",
-          },
-    );
+    setTelemetryStatus(describeBatchResult({ queueCommitted, left: nextQueue.length, refused, unranked }));
     return { attempted: true, failedCount: nextQueue.length, queueCommitted };
   }
 
