@@ -2109,6 +2109,9 @@ summary:focus-visible {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+.active-case p {
+  -webkit-line-clamp: none;
+}
 .case-result-mini,
 .case-lock-note {
   display: block;

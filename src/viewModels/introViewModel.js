@@ -95,7 +95,6 @@ export function createIntroViewModel({
   persist,
   setShowRanking,
   setShowBoard,
-  setSaveStatus,
   pendingTelemetry = [],
   setPendingTelemetry = () => {},
   setTelemetryStatus = () => {},
@@ -155,7 +154,6 @@ export function createIntroViewModel({
     telemetrySummary: createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled }),
     sessionCode,
     setPendingTelemetry,
-    setSaveStatus,
 
     // The shell never draws the console: it hands the whole screen to the
     // runtime when debug tooling is on, so the console is always the runtime's.
@@ -167,7 +165,7 @@ export function createIntroViewModel({
     triggerLabSignals,
     completedCaseResultList: createCompletedCaseResultList(caseResults),
     resourceMeta,
-    seasonCases: createSeasonCases({ seasonCasesBase, completedCases, currentCase }),
+    seasonCases: createSeasonCases({ seasonCasesBase, completedCases, currentCase, hasRun: Boolean(hasResumableSave) }),
     caseResults,
     completedCases,
     currentCase,

@@ -6,8 +6,12 @@ import { createTelemetryEventId } from "../state/telemetryEventId.js";
  * This was a hand-written chain that stopped at 사건 05 and opened the finale
  * straight after it, so 사건 06 and 07 only ever showed as open while being
  * played. The order is the order `seasonCasesBase` lists the season in.
+ *
+ * `hasRun` is whether there is a run to be in the middle of. A device with no
+ * save still has a current case -- the season's first -- and its card read
+ * "진행 중" to a visitor who had not pressed anything yet.
  */
-export function createSeasonCases({ seasonCasesBase, completedCases, currentCase }) {
+export function createSeasonCases({ seasonCasesBase, completedCases, currentCase, hasRun = true }) {
   return seasonCasesBase.map((caseItem, index) => {
     const isCompleted = completedCases.includes(caseItem.id);
     const isCurrent = caseItem.id === currentCase;
@@ -15,9 +19,33 @@ export function createSeasonCases({ seasonCasesBase, completedCases, currentCase
     const isUnlocked = index === 0 || completedCases.includes(previousCaseId) || isCurrent;
     return {
       ...caseItem,
-      status: isCompleted ? "COMPLETE" : isCurrent ? "PLAYING" : isUnlocked ? "OPEN" : "LOCKED",
+      status: isCompleted ? "COMPLETE" : isCurrent && hasRun ? "PLAYING" : isUnlocked ? "OPEN" : "LOCKED",
     };
   });
+}
+
+/**
+ * What pressing a roadmap card does. Opening a case always starts it at its
+ * first scene with an empty choice log, so a press is only that when nothing
+ * is lost by it:
+ *
+ *   "resume"   the card of the case in progress goes back to where it stands;
+ *   "replace"  another card, while a case in progress has choices on record,
+ *              asks before that record is thrown away;
+ *   "restart"  the card of the closed case the run still stands on (its report,
+ *              or a replay of it) asks before starting it over, as the report's
+ *              own 다시 도전 does;
+ *   "open"     anything else opens;
+ *   "locked"   a card the season has not reached does nothing.
+ *
+ * `status` is the card's own, from createSeasonCases above. Every card used to
+ * open, so the card that said "진행 중" restarted the case it named.
+ */
+export function decideCaseCardPress({ caseId, status, currentCase, completedCases = [], hasResumableSave = false, logLength = 0 }) {
+  if (status === "LOCKED") return "locked";
+  if (!hasResumableSave) return "open";
+  if (caseId === currentCase) return status === "PLAYING" ? "resume" : logLength > 0 ? "restart" : "open";
+  return logLength > 0 && !completedCases.includes(currentCase) ? "replace" : "open";
 }
 
 export function createLocalLeaderboardRows({
