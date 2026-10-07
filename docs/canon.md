@@ -87,6 +87,7 @@ Three of these are reveals, and each still means what it meant:
 | 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 집행유예 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
+| 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
 | 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
 | 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
@@ -103,6 +104,12 @@ met the analyst by 프롤로그 02. He opens a new page for each matter. The pag
 for this loan starts with one line, '2023-0412 -- 179.6' (4월 15일), and each
 later 프롤로그 adds to that same page: 4월 27일 (two lines), 5월 15일, 6월 9일,
 7월 24일 with the analyst's name.
+
+백아린 hands in her resignation on 3월 27일 (사건 25) and is told it will be
+accepted in two weeks. It never is. The group keeps her on the 33rd floor,
+where her desk is searched on 6월 16일 (사건 32), and answers the resignation
+three days after her report with 징계해고, a criminal complaint and eviction
+(사건 33). The complaint was drafted on 6월 1일, before she reported anything.
 
 ## 트리거랩's head count
 
@@ -157,7 +164,7 @@ A date that is stated with a weekday has to fit its year.
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
 | 사건 27 | 5월 4일 (월); the 정리안 is dated 4월 28일 |
-| 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 사택 퇴거 7월 7일 |
+| 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |
 | 사건 38-40 | 첫 변론 8월 6일 (목); 다큐 방송 8월 7일 (금) 22시; 사건 40 opens the next afternoon (토) and closes 8월 셋째 주 금요일 |
 | 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
 | 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |
