@@ -21,6 +21,15 @@ page.on("console", (m) => {
 });
 page.on("crash", () => errors.push("PAGE CRASHED"));
 
+// The e2e build is given a made-up backend (.env.e2e), and since 2026-10-07 a
+// device with no save starts with the playtest-data box ticked: closing a case
+// sends its row. Nothing answers at that address, and the failed request is a
+// console error this walk would count as the app's. It is answered here with
+// an empty backend, as the specs' network guard does (tests/helpers/network.js).
+await page.route(/^https:\/\/[^/]*\.supabase\.co\//, (route) =>
+  route.fulfill({ status: route.request().method() === "GET" ? 200 : 201, contentType: "application/json", body: "[]" }),
+);
+
 const TIMEOUT = 10_000;
 // A cold dev server transforms the whole app on first load; give navigation room.
 page.setDefaultNavigationTimeout(60_000);
