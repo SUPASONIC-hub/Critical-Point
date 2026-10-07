@@ -51,11 +51,12 @@ services:
     # the source of truth for what the site *should* send; `check:deploy`
     # asserts them against what it actually sends -- each security header by
     # value, the CSP by value (scripts/deploy-policy.mjs), the cache policy of
-    # the page, of one fingerprinted asset and of one image from the root,
+    # the page, of one fingerprinted asset and of the images from the root,
     # that the entry script names the backend `connect-src` allows, and that
     # the service worker is the one built with the page being served.
     # `node scripts/check-deploy.mjs --offline` checks the values below and the
-    # built dist/index.html without a network.
+    # built dist/index.html without a network, and fails when any of the
+    # fifteen rules is missing from this file.
     headers:
       # Vite fingerprints everything under assets/, so those files never change
       # behind a given name.
@@ -68,7 +69,8 @@ services:
       # host's own default -- measured `max-age=0, s-maxage=300` -- asks about
       # each of thirty-odd images again on every visit. A day, and a week in
       # which a stale copy may be shown while the fresh one is fetched.
-      # `check:deploy` reads the policy of the first root image the page names.
+      # `check:deploy` reads the policy of one file the page names for each of
+      # the three rules, and warns for the rule whose file is served otherwise.
       # Like every rule here, what is in effect is whatever the dashboard was
       # given -- including whether it took these wildcards as written -- and
       # the live check is what says so.

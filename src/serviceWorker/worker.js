@@ -17,10 +17,11 @@
  * Four rules, by what is being asked for (`strategyFor`):
  *
  *   the page       network first, and the kept page only when the network
- *                  fails or says nothing for three seconds. A player with a
- *                  connection is never held on an old release, and nothing
- *                  that reads the page from outside a browser (the deploy
- *                  workflow) sees a worker at all.
+ *                  fails, says nothing for three seconds, or answers with an
+ *                  error of its own (a host that is down says 502 quickly).
+ *                  A player with a connection is never held on an old
+ *                  release, and nothing that reads the page from outside a
+ *                  browser (the deploy workflow) sees a worker at all.
  *   /assets/*      kept first. A fingerprinted file never changes behind its
  *                  name, so the kept copy is the file. A miss goes to the
  *                  network and is kept on the way back.
@@ -36,10 +37,12 @@
  * as it always did, because the failure is what `state/chunkReload.js` turns
  * into a reload.
  *
- * One cache per release, named for it. A new release installs beside the old
- * one, takes over at once (`skipWaiting`, `clients.claim`) and deletes every
- * other release's cache: with the page network-first and the assets named by
- * hash, there is no moment where an old page is fed a new file.
+ * One cache per release, named for it: the commit, and a hash of the files the
+ * page names, so the same commit built again with other settings is another
+ * release (scripts/service-worker-build.mjs). A new release installs beside
+ * the old one, takes over at once (`skipWaiting`, `clients.claim`) and deletes
+ * every other release's cache: with the page network-first and the assets
+ * named by hash, there is no moment where an old page is fed a new file.
  */
 export const CACHE_PREFIX = "critical-point-";
 export const SHELL_URL = "/index.html";
@@ -110,7 +113,7 @@ export function installWorker(scope, config) {
    * it would pair it offline with files it never asks for. The install fails
    * instead, and the next release's worker is the one that installs.
    */
-  async function keepShell(cache) {
+  async function fetchShell() {
     const response = await scope.fetch("/", { cache: "no-cache" });
     if (!isStorable(response, { allowHtml: true })) throw new Error(`The page answered ${response.status}.`);
     const html = await response.text();
@@ -118,13 +121,30 @@ export function installWorker(scope, config) {
     // Rebuilt from its text and its own headers: a navigation may not be
     // answered with a redirected response, and the page keeps the policy
     // headers it was served with when it is opened from here.
-    await cache.put(SHELL_URL, new Response(html, { status: 200, headers: response.headers }));
+    return [SHELL_URL, new Response(html, { status: 200, headers: response.headers })];
   }
 
+  /**
+   * A file to keep, held to `isStorable`: what the page names, at install,
+   * and the rest of the release in the warm-up. `cache.addAll` fetched the
+   * first of those and looked at the status alone: a host that answers a
+   * missing file with its fallback page and a 200 would have had that page
+   * kept as the script.
+   */
+  async function fetchFile(url) {
+    const response = await scope.fetch(url);
+    if (!isStorable(response)) throw new Error(`${url} answered ${response.status}, or with a page.`);
+    return [url, response];
+  }
+
+  // Nothing is written until everything has arrived. The page used to go in
+  // first, and the cache can be one a worker still in charge answers from (an
+  // install tried before under the same name): its kept page was replaced
+  // ahead of files that might never follow.
   async function install() {
     const cache = await openCache();
-    await keepShell(cache);
-    await cache.addAll(config.precache);
+    const arrived = await Promise.all([fetchShell(), ...config.precache.map(fetchFile)]);
+    await Promise.all(arrived.map((file) => cache.put(...file)));
     await scope.skipWaiting();
   }
 
@@ -146,13 +166,16 @@ export function installWorker(scope, config) {
     });
     try {
       const response = await Promise.race([network, quiet]);
-      if (response) return response;
+      // An answer that is not an error is the page. A 502 from a host that is
+      // down is an answer too, and it used to be given as one, in front of a
+      // kept page that would have opened.
+      if (response && response.status < 400) return response;
     } catch {
       // No connection: the kept page, below.
     } finally {
       scope.clearTimeout(timer);
     }
-    // Slow, or gone. With nothing kept the network's own answer is all there is.
+    // Slow, gone, or failing. With nothing kept the network's own answer is all there is.
     return (await kept(cache, SHELL_URL)) ?? network;
   }
 
@@ -203,9 +226,7 @@ export function installWorker(scope, config) {
         const url = queue.shift();
         if (await kept(cache, url)) continue;
         try {
-          const response = await scope.fetch(url);
-          if (isStorable(response)) await cache.put(url, response);
-          else failed = true;
+          await cache.put(...(await fetchFile(url)));
         } catch {
           failed = true;
         }

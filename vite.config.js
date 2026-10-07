@@ -4,7 +4,7 @@ import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
-import { leafRuleTexts, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
+import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
@@ -29,10 +29,25 @@ const CRITICAL_CSS_FILE = "src/styles/critical.generated.css";
  * policy exists to refuse. `defer` runs it after the document is parsed, which
  * on this page is one `<div>` later; a sheet that has already landed by then has
  * a `.sheet`, one that has not gets a listener.
+ *
+ * And a second listener, for the sheet that does not land. It used to be
+ * left as it was, `media="print"` for good: the intro looked right, because
+ * its rules are inlined, and the first table came up with no styles at all
+ * and nothing to press. A link that fails is replaced by a copy of itself,
+ * which the browser fetches again, this time as an ordinary stylesheet. Once:
+ * the copy has no listener, so a server that is really down is asked twice
+ * and not forever. What this cannot see is a sheet that failed before the
+ * script ran -- there is no event left to hear -- and the reload a player
+ * reaches for is what answers that.
+ *
+ * The file has a budget of 200 bytes (scripts/check-bundle-size.mjs), which
+ * is why it is written the way it is. Exported for its unit test
+ * (tests/unit/critical-css.test.mjs), which runs it against a page.
  */
-const DEFERRED_STYLES_SOURCE =
+export const DEFERRED_STYLES_SOURCE =
   'for(const l of document.querySelectorAll("link[data-deferred-style]")){' +
-  'const a=()=>{l.media="all"};l.sheet?a():l.addEventListener("load",a,{once:true})}\n';
+  'const a=()=>{l.media="all"};' +
+  'l.sheet?a():(l.onload=a,l.onerror=()=>{const n=l.cloneNode();n.media="all";l.replaceWith(n)})}\n';
 const DEFERRED_STYLES_FILE = `assets/deferred-styles-${createHash("sha256")
   .update(DEFERRED_STYLES_SOURCE)
   .digest("hex")
@@ -104,24 +119,11 @@ function criticalCss() {
         const bundled = Object.values(context.bundle ?? {}).find(
           (asset) => asset.type === "asset" && asset.fileName === appSheet.href.replace(/^\//, ""),
         );
-        const bundledCss = typeof bundled?.source === "string" ? bundled.source : "";
-        if (bundledCss) {
-          // The hash is the authority: a rule *added* to the intro leaves every
-          // previously inlined rule intact, so a rule-by-rule comparison cannot
-          // see it, and the intro would flash the part that is missing. The
-          // rule list is only here to say what changed.
-          const built = createHash("sha256").update(bundledCss).digest("hex");
-          if (generated.sourceHash && generated.sourceHash !== built) {
-            const missing = leafRuleTexts(critical).filter((rule) => !bundledCss.includes(rule));
-            throw new Error(
-              `${CRITICAL_CSS_FILE} was cut from a different stylesheet than this build produced. ` +
-                `Run \`npm run build:critical\` and commit the result.\n` +
-                (missing.length
-                  ? `${missing.length} inlined rules no longer appear at all; first: ${missing[0].slice(0, 120)}`
-                  : `Every inlined rule is still present, so the stylesheet gained rules the intro may paint with.`),
-            );
-          }
-        }
+        // A bundler may hold an asset as text or as bytes; either is the sheet.
+        const source = bundled?.source;
+        const bundledCss = typeof source === "string" ? source : source instanceof Uint8Array ? Buffer.from(source).toString("utf8") : "";
+        const stale = criticalFreshnessProblem({ generated, bundledCss, file: CRITICAL_CSS_FILE });
+        if (stale) throw new Error(stale);
 
         let out = "";
         let cursor = 0;
