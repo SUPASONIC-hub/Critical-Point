@@ -184,7 +184,7 @@ summary:focus-visible {
   box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
 }
 .music-toggle span {
-  max-width: 58px;
+  max-width: 3.625rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1262,7 +1262,7 @@ summary:focus-visible {
   color: var(--ui-text-3);
 }
 .intro .start-panel .start-input-row input:focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
   border-color: var(--ui-accent);
   box-shadow: 0 0 0 4px var(--ui-accent-soft);
 }
@@ -2561,6 +2561,7 @@ summary:focus-visible {
   box-shadow: var(--ui-shadow-2);
 }
 .board-status-bar .ghost {
+  margin-top: 12px;
   color: var(--ui-text);
   background: var(--ui-surface-3);
   border: 1px solid var(--ui-line-strong);
