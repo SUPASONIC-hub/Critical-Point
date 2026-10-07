@@ -80,3 +80,20 @@ test("this browser's own row keeps its name", () => {
   assert.equal(entry.isLocal, true);
   assert.equal(entry.name, "분석관 김");
 });
+
+test("a telemetry row names its ending by id, in the form the server's ranking takes", async () => {
+  const { ENDING_IDS, getEndingVariant } = await import("../../src/gameLogic.js");
+  const { toRowSummary } = await import("../../src/state/useChoiceCommit.js");
+  // ranking_public_summary, 20260929050000: a string matching this, or the key is dropped.
+  const SERVER_ENDING = /^[a-z][a-z0-9-]{0,39}$/;
+  assert.ok(ENDING_IDS.length >= 2);
+  for (const id of ENDING_IDS) assert.match(id, SERVER_ENDING);
+  const ending = getEndingVariant({});
+  assert.equal(typeof ending, "object", "the run keeps the record the report prints");
+  const row = toRowSummary({ burstScore: 88, rank: "A", endingVariant: ending });
+  assert.equal(row.endingVariant, ending.id);
+  assert.ok(ENDING_IDS.includes(row.endingVariant));
+  assert.deepEqual([row.burstScore, row.rank], [88, "A"], "the rest of the summary is as it was");
+  assert.equal(toRowSummary({ endingVariant: "collapse" }).endingVariant, "collapse");
+  assert.equal(toRowSummary({}).endingVariant, null);
+});

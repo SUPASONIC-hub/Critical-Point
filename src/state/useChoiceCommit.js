@@ -70,6 +70,21 @@ function getBlackoutSkip(fromNodeId, branchContext) {
   return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
 }
 
+/**
+ * A case summary as a telemetry row carries it. The run keeps the ending as
+ * the record the report prints (label, title, text); the row carries its id.
+ * The server's ranking summary publishes `endingVariant` only when it is a
+ * short id string (ranking_public_summary), and check-grants has always sent
+ * it one, so the object the client really sent was dropped from every ranking
+ * row -- and each case row carried two sentences of copy the server already
+ * has by name.
+ */
+export function toRowSummary(caseSummary) {
+  const ending = caseSummary?.endingVariant;
+  const id = typeof ending === "string" ? ending : ending?.id;
+  return { ...caseSummary, endingVariant: typeof id === "string" ? id : null };
+}
+
 function describeTempo(verdict) {
   if (verdict.tempo.groovePot > 0) {
     return { label: "GROOVE", text: `박자 ${verdict.tempo.hits}회 · 최고 콤보 ${verdict.tempo.maxCombo} · 판돈 +${verdict.tempo.groovePot}` };
@@ -102,10 +117,12 @@ export function useChoiceCommit(context) {
 
   function recordClosedCase({ caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec }) {
     const {
-      currentCase, runId, sessionId, sessionCode, playerName, activeCaseMeta, dataConsent,
+      currentCase, runId, sessionId, sessionCode, playerName, activeCaseMeta, dataConsent, caseResults,
       appendLocalRankingRow, queueTelemetry, setSaveStatus, setTelemetryStatus, onSeasonFinal,
     } = context;
-    if (currentCase === "final") onSeasonFinal();
+    // The season as it stands with its finale closed: what NEW GAME+ remembers.
+    if (currentCase === "final") onSeasonFinal({ ...caseResults, [currentCase]: caseSummary });
+    const rowSummary = toRowSummary(caseSummary);
     // Whether the case row is in the queue, and so whether a ranking row may follow it.
     let caseRowQueued = false;
     const { saved: localRankingSaved } = appendLocalRankingRow({
@@ -136,7 +153,7 @@ export function useChoiceCommit(context) {
         player_name: "익명 분석관",
         case_id: currentCase,
         case_title: activeCaseMeta?.title ?? currentCase,
-        summary: caseSummary,
+        summary: rowSummary,
         resources: finalResources,
         triggers: nextTriggers,
         cognition: nextCognition,
@@ -167,7 +184,7 @@ export function useChoiceCommit(context) {
 
     if (currentCase !== "final" || nextCompletedCases.length !== CASE_SEQUENCE.length) return;
     const seasonTelemetryPayload = createSeasonTelemetryPayload({
-      caseSummary,
+      caseSummary: rowSummary,
       completedCaseCount: nextCompletedCases.length,
       cognition: nextCognition,
       decisionLog: nextLog,

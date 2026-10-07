@@ -158,6 +158,17 @@ test("small shared helpers: text limit, empty scores, run id, save time", () => 
   assert.equal(appConfig.limitText("abcdef", 3), "abc");
   assert.equal(appConfig.limitText("abc", 0), "");
   assert.equal(appConfig.limitText("abc", Number.NaN), "");
+  // An emoji is two UTF-16 units. A cut between them left half a character,
+  // which the database refuses for as long as the row is retried.
+  assert.equal(appConfig.limitText("ab😀cd", 3), "ab");
+  assert.equal(appConfig.limitText("ab😀cd", 4), "ab😀");
+  assert.equal(appConfig.limitText("ab😀", 4), "ab😀", "nothing was cut, so nothing is dropped");
+  assert.equal(appConfig.limitText("가나다라", 3), "가나다", "Korean text is one unit a syllable and is cut where it always was");
+  assert.equal(appConfig.normalizePlayerName(`${"가".repeat(23)}😀`), "가".repeat(23));
+  assert.equal(appConfig.normalizeSavedText("a😀", 2), "a");
+  for (const cut of [appConfig.limitText("😀😀😀", 5), appConfig.normalizePlayerName(`${"x".repeat(23)}😀`)]) {
+    assert.equal(cut.isWellFormed?.() ?? !/[\ud800-\udbff]$/.test(cut), true);
+  }
   assert.deepEqual(appConfig.makeEmptyScores({ a: "A", b: "B" }), { a: 0, b: 0 });
   const id = appConfig.createRunId();
   assert.equal(typeof id, "string");
@@ -519,6 +530,14 @@ test("a heading still on its way in is waited for, a frame at a time, and then g
     delete globalThis.HTMLElement;
     delete globalThis.requestAnimationFrame;
   }
+});
+
+test("the feedback form's status line is said about one case, and only on that case's page", async () => {
+  const { readFeedbackStatus } = await import("../../src/state/useFeedback.js");
+  const saved = { caseId: "case01", text: "피드백을 저장했습니다." };
+  assert.equal(readFeedbackStatus(saved, "case01"), "피드백을 저장했습니다.");
+  assert.equal(readFeedbackStatus(saved, "case02"), "", "it used to stand under the next case's empty form");
+  assert.equal(readFeedbackStatus({ caseId: null, text: "" }, "case01"), "");
 });
 
 const { createConsentChange } = await import("../../src/state/useConsentToggle.js");

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { boardTextHasContact, boardTextHasLink, getBoardPostRefusal } from "../../src/state/useBoard.js";
+import { boardTextHasContact, boardTextHasLink, getBoardPostRefusal, isOwnRecentPost } from "../../src/state/useBoard.js";
 
 /**
  * The browser's copy of the board's rules against the list the server's copy is
@@ -50,4 +50,13 @@ test("a domain is a link whatever is written straight after it", () => {
 test("a phone number is contact details whatever is written straight after it", () => {
   assert.equal(boardTextHasContact("010-1234-5678로 주세요"), true);
   assert.equal(boardTextHasContact("2023-0412 대출"), false);
+});
+
+test("words this page already posted are not sent again to be dropped in silence", () => {
+  const now = 1_760_000_000_000;
+  const posted = new Map([["같은 한 줄", now - 60 * 60_000]]);
+  assert.equal(isOwnRecentPost(posted, "같은 한 줄", now), true, "an hour later the server would take it and store nothing");
+  assert.equal(isOwnRecentPost(posted, "다른 한 줄", now), false);
+  assert.equal(isOwnRecentPost(posted, "같은 한 줄", now + 6 * 60 * 60_000), false, "past the server's six hours it is a new post");
+  assert.equal(isOwnRecentPost(new Map(), "같은 한 줄", now), false);
 });

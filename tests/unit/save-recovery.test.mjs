@@ -483,6 +483,33 @@ test("the same thing said again is one record, and the console has a budget", ()
     const start = logged();
     for (let line = 0; line < 40; line += 1) recordAppError(new Error(`noise ${line}`), {}, "console-error", { now: at + line });
     assert.equal(logged() - start, 12);
+    // A line past the budget is turned away before the save is read: it used
+    // to parse the whole save first, on every line of the loop.
+    const realGetItem = globalThis.localStorage.getItem;
+    let reads = 0;
+    globalThis.localStorage.getItem = (key) => {
+      reads += 1;
+      return realGetItem(key);
+    };
+    const overBudget = recordAppError(new Error("noise 40"), {}, "console-error", { now: at + 40 });
+    globalThis.localStorage.getItem = realGetItem;
+    assert.equal(reads, 0);
+    assert.match(overBudget.error.message, /^noise 11$/, "the last line that was recorded is handed back");
+
+    // An uncaught error that words itself differently each time has the same
+    // budget, and its own: the console having spent one does not spend this.
+    // (Counted by record: the error log itself keeps only its newest twenty.)
+    const recorded = new Set();
+    let lastError = null;
+    for (let failure = 0; failure < 40; failure += 1) {
+      lastError = recordAppError(new Error(`request ${failure} failed`), {}, "window-error", { now: at + 100 + failure });
+      recorded.add(lastError.id);
+    }
+    assert.equal(recorded.size, 12);
+    assert.equal(lastError.error.message, "request 11 failed");
+    assert.equal(readSave(store).lastError.message, "request 11 failed", "the notice on screen is the last one recorded");
+    // A minute on, the budget is whole again.
+    assert.equal(recordAppError(new Error("request 99 failed"), {}, "window-error", { now: at + 100 + 61_000 }).error.message, "request 99 failed");
 
     // A screen that fails to draw is never folded: each one is a retry.
     resetRecordedErrors();

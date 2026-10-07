@@ -4,7 +4,8 @@ import { PGlite } from "@electric-sql/pglite";
 
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
-import { createCaseSummary } from "../src/gameLogic.js";
+import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
@@ -366,7 +367,9 @@ function casePayload({ session, runId, caseId, completedAt = new Date().toISOStr
   const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index));
   const summary = {
     ...createCaseSummary(triggers, cognition, log, { resources: initialResources, schemaVersion: 7 }),
-    endingVariant: "steady",
+    // The ending as the runtime puts it in a row: its id, not the record the
+    // report prints. A literal here once hid that the client sent the record.
+    endingVariant: toRowSummary({ endingVariant: getEndingVariant({ resources: initialResources }) }).endingVariant,
     gauntlet: createRunSummary(RUN_INITIAL_STATE),
     runId,
     outcomeChoiceId: log.at(-1).choiceId,
@@ -733,6 +736,10 @@ await postRefused("rank the run from a device that did not play its final case",
     `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,
   );
   check(row?.summary?.seasonComplete === true && row?.summary?.completedCaseCount === CASE_SEQUENCE.length, "a ranking summary lost seasonComplete or the case count.");
+  check(
+    typeof row?.summary?.endingVariant === "string" && row.summary.endingVariant === getEndingVariant({ resources: initialResources }).id,
+    `a ranking summary does not carry the ending the run's final case row named: ${JSON.stringify(row?.summary?.endingVariant)}`,
+  );
   check(
     Object.values(row?.summary ?? {}).every((value) => ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value)),
     `a ranking summary carries an object: ${JSON.stringify(row?.summary)}`,

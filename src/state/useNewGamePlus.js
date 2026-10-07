@@ -16,23 +16,36 @@ export function seasonToRemember(caseResults) {
   return caseResults && typeof caseResults === "object" && !Array.isArray(caseResults) && caseResults.final ? caseResults : null;
 }
 
+/** Writes a finished season to the key the intro reads. Returns what was kept, or null. */
+export function storeSeasonMemory(caseResults) {
+  const season = seasonToRemember(caseResults);
+  if (season) writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(season));
+  return season;
+}
+
 export function useNewGamePlus(saved) {
   const [unlocked, setUnlocked] = useState(
     () => readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true" || Boolean(saved?.caseResults?.final),
   );
   const [memory, setMemory] = useState(readNewGamePlusMemory);
 
-  function unlock() {
-    setUnlocked(true);
-    writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+  function rememberSeason(caseResults) {
+    const season = storeSeasonMemory(caseResults);
+    if (season) setMemory(season);
+    return Boolean(season);
   }
 
-  function rememberSeason(caseResults) {
-    const season = seasonToRemember(caseResults);
-    if (!season) return false;
-    writeStoredValue(NEW_GAME_PLUS_MEMORY_KEY, JSON.stringify(season));
-    setMemory(season);
-    return true;
+  /**
+   * `finishedSeason` is the case results as the finale closed them
+   * (useChoiceCommit). The season is remembered then, not only when NEW GAME+
+   * is pressed: a player who finished and then reset, or started the first
+   * case again, had no results left by the time the button was pressed, and
+   * the intro kept nothing of the season both questions say is kept.
+   */
+  function unlock(finishedSeason = null) {
+    setUnlocked(true);
+    writeStoredValue(NEW_GAME_PLUS_KEY, "true");
+    rememberSeason(finishedSeason);
   }
 
   return { newGamePlusUnlocked: unlocked, newGamePlusMemory: memory, unlockNewGamePlus: unlock, rememberSeason };

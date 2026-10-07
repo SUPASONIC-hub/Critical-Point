@@ -102,13 +102,27 @@ export const SAVE_STATE_KEYS = [
 // every recovery slot, and no rule read them. A save that still carries them
 // loads as before -- nothing looks at them -- and the next write leaves them out.
 
+/**
+ * The first `maxLength` UTF-16 units of `text`, never ending on half a
+ * character. An emoji is two units, and `slice` cuts between them as readily
+ * as anywhere: what is left is a lone surrogate, which is not text. Postgres
+ * will not store it, so the feedback or board row carrying it was refused
+ * with a 400 on every attempt. The half is dropped with the half that was cut.
+ */
+function sliceWholeCharacters(text, maxLength) {
+  const cut = text.slice(0, maxLength);
+  if (cut.length === text.length) return cut;
+  const last = cut.charCodeAt(cut.length - 1);
+  return last >= 0xd800 && last <= 0xdbff ? cut.slice(0, -1) : cut;
+}
+
 export function normalizePlayerName(value) {
-  return typeof value === "string" ? value.trim().slice(0, PLAYER_NAME_MAX_LENGTH) : "";
+  return typeof value === "string" ? sliceWholeCharacters(value.trim(), PLAYER_NAME_MAX_LENGTH) : "";
 }
 
 export function normalizeSavedText(value, maxLength = 0) {
   if (typeof value !== "string") return "";
-  return Number.isFinite(maxLength) && maxLength > 0 ? value.slice(0, maxLength) : value;
+  return Number.isFinite(maxLength) && maxLength > 0 ? sliceWholeCharacters(value, maxLength) : value;
 }
 
 export function normalizeFeedback(value) {
@@ -726,7 +740,7 @@ export async function copyText(value) {
  */
 export function limitText(text = "", maxLength = 0) {
   if (!Number.isFinite(maxLength) || maxLength <= 0) return "";
-  return String(text).slice(0, maxLength);
+  return sliceWholeCharacters(String(text), maxLength);
 }
 
 export function makeEmptyScores(labels) {
