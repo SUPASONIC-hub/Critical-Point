@@ -181,6 +181,8 @@ function resolve(node, scope) {
 const testFiles = walkFiles(path.join(root, "tests"), (name) => name.endsWith(".js"));
 // Helper functions whose parameter is used as a key: name -> parameter indexes.
 const forwarders = new Map();
+// Helper parameters that at least one call site was found for: "file#name:index".
+const followed = new Set();
 const uses = [];
 
 for (const file of testFiles) {
@@ -294,6 +296,7 @@ for (let changed = true; changed; ) {
     for (const index of forwarders.get(id) ?? []) {
       if (use.done.has(index)) continue;
       use.done.add(index);
+      followed.add(`${id}:${index}`);
       uses.push({ where: use.where, key: resolve(use.args[index], use.scope) });
       changed = true;
     }
@@ -302,7 +305,21 @@ for (let changed = true; changed; ) {
 
 let checked = 0;
 for (const use of uses) {
-  if (!use.key || use.key.kind === "param") continue;
+  if (!use.key) continue;
+  // A key that is a parameter is checked where the function is called, and
+  // only a call by the function's own name is followed. A callback with no
+  // name, or a helper reached as `helpers.seed(...)` or under an import alias,
+  // has no call site here, so its key was skipped without a word; the header
+  // has always said such a key fails.
+  if (use.key.kind === "param") {
+    const id = `${use.key.file}#${use.key.fn}`;
+    if (!use.key.fn) {
+      failures.push(`${use.where}: cannot tell which storage key this is (a parameter of a function with no name). Name the function, or pass the key from TEST_STORAGE_KEYS inside it.`);
+    } else if (!followed.has(`${id}:${use.key.index}`)) {
+      failures.push(`${use.where}: cannot tell which storage key this is (parameter ${use.key.index + 1} of ${use.key.fn}, which nothing calls by that name). Call it by name, or use TEST_STORAGE_KEYS inside it.`);
+    }
+    continue;
+  }
   checked += 1;
   if (use.key.kind === "unknown") {
     failures.push(`${use.where}: cannot tell which storage key this is (${use.key.reason}). Use TEST_STORAGE_KEYS or an appConfig key.`);
