@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { getBalanceSignals, getDelayedConsequences, getSeasonGoals } from "../advancedSystems.js";
 import { getAchievementProgress, getOperationsSnapshot, getOperatorReveal } from "../featurePack.js";
-import { getCasesOpened, getClueHypotheses } from "../gameLogic.js";
+import { getCasesOpened } from "../gameLogic.js";
 import { createAuthorityState } from "../viewModels/sceneViewModels.js";
 
 /**
@@ -50,7 +50,6 @@ export function useCaseSystems({
     [casesOpened, discoveredClues.length, operatorOrigin, resources.legitimacy, resources.trust],
   );
   const clueCount = discoveredClues.length;
-  const clueHypotheses = useMemo(() => getClueHypotheses(discoveredClues), [discoveredClues]);
   const operatorReveal = getOperatorReveal({ origin: operatorOrigin, completedCases, caseResults });
   const achievementProgress = getAchievementProgress({ log, completedCases, caseResults });
   const operationsSnapshot = getOperationsSnapshot({
@@ -66,7 +65,6 @@ export function useCaseSystems({
     balanceSignals,
     casesOpened,
     clueCount,
-    clueHypotheses,
     delayedConsequences,
     operationsSnapshot,
     operatorReveal,
