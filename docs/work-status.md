@@ -1461,12 +1461,23 @@ Looked at and left, for the owner:
 
 - 프롤로그 04's national sales figure was changed from 1,180억 to 214억 so it
   sits under the 310억 loan; another number may be meant.
-- Card numbers and cognition types that argue with their labels (about fifty
-  cards, most of them the "곁에 남는다" aftermath card at `reframing: 2`) were
-  not changed: they move the balance checks and want a pass of their own.
-- The content checks still pass what they passed: a card whose `next` is
-  another case's result, a cycle, a term first glossed on a route the player
-  may skip, a canon fact written in another shape.
+- Sixty-odd cards whose numbers or way of thinking argued with their label
+  were changed (the "곁에 남는다" aftermath card is `persistence`, a card whose
+  echo says a day is lost no longer gains time); the ones that could be read
+  either way were left, and 69 cards whose label waits while `time` rises
+  stand as the game's rule that waiting buys today at a later cost.
+- The content checks now refuse another case's result as a `next`, a way
+  back, a card id used twice in a case and a card with no cognition; the
+  canon check reads 34 facts in every file that states them; a hard word has
+  to be explained on every route to the scene that says it, with 28 case and
+  term pairs allowed as they stand (`--list` names them).
+- 트리거랩 is six people and 에코; the nine on 사건 20's list are those six and
+  three who left; 백아린's resignation is never accepted and comes back as a
+  dismissal; the 평택 tower is 22 floors and the 58% of April was wrong too.
+  All three are in `docs/canon.md`. The make-up of the 63 participants
+  (nine analysts, four of 1기, fifty who sat at the lab's terminal in
+  training) was written to make the count add up and may not be what was
+  meant.
 - Nothing here was looked at in a browser by a person: the louder reveal and
   card cues, the comfort setting's wider reach, the beat marker at every other
   beat above 180bpm, the roadmap's open cards printing their summary in full.
