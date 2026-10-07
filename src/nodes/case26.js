@@ -284,7 +284,7 @@ export const case26 = {
           voice: "19일을 버틴 사람들을 박수만으로 보낼 수 없어서, 내려온 반장과 인부들 곁에 남아 현장의 밤을 끝까지 보낸다.",
           echo: "남으면 현장 사무소 컨테이너에 불이 늦게까지 켜집니다. 지강현이 인부 87명의 이름을 하나씩 부르고, 강태민이 대답 대신 컵라면을 돌립니다.",
           next: "case26_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c26_after_record",
@@ -627,7 +627,7 @@ export const case26 = {
         effect: { trust: 9, humanCost: -6, time: 5, capital: -3, legitimacy: -4, fatigue: 4 },
         voice: "표에 칸이 없는 사람을 조건에라도 넣겠다며, 연장은 하되 이자보다 인부 임금이 먼저 나가게 조건만 바꾼다.",
         echo: "조건을 바꾸면 인부들이 먼저 받습니다. 날짜를 옮기는 결정이라는 사실은 바뀌지 않습니다.",
-        cognition: { risk: 2 },
+        cognition: { reframing: 2 },
       },
       {
         id: "c",

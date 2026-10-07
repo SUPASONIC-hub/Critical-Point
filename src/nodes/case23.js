@@ -280,7 +280,7 @@ export const case23 = {
           voice: "새벽 버스로 온 사람들을 그냥 보낼 수 없어서, 마지막 버스가 떠날 때까지 1주 주주들을 배웅한다.",
           echo: "버스 여섯 대의 창문마다 손이 흔들립니다. 월요일 공지는 그사이에도 예약된 시간을 기다립니다.",
           next: "case23_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c23_after_record",
@@ -317,6 +317,7 @@ export const case23 = {
         {
           label: "문가을이 주주총회장에서 직접 말하도록 발언 신청을 바로 넣는다",
           effect: { trust: 12, legitimacy: 3, humanCost: -5, time: -4, capital: -2, fatigue: 4 },
+          cognition: { persistence: 1 },
           voice: "남에게 맡겼다가 데어 본 사람이라서, 문가을이 주주총회장에서 직접 말하도록 발언 신청을 바로 넣는다.",
           echo: "발언 신청서에 문가을의 이름이 당신 이름 위에 올라갑니다. 문가을이 떡 써는 칼을 내려놓고 처음으로 '고마워요'라고 합니다.",
         },

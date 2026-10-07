@@ -105,7 +105,7 @@ export const case49Nodes = {
         effect: { trust: 12, humanCost: -5, capital: -3, time: -4, fatigue: 5 },
         voice: "어느 하나도 가벼운 마음으로 준 게 아니라서, 건넨 물건을 하나도 빼지 않고 전부 들고 올라가겠다고 한다.",
         echo: "전부 들면 가방이 닫히지 않습니다. 강태민이 말없이 자기 가방을 비워 내밉니다.",
-        cognition: { reframing: 2 },
+        cognition: { persistence: 2 },
       },
       {
         id: "c49_market_list",
@@ -295,7 +295,7 @@ export const case49 = {
           voice: "부르는 시각까지 그가 정하게 두지는 않겠다며, 달이 질 때까지 마지막 밤을 모두와 끝까지 보낸다.",
           echo: "달이 질 때까지 골목에 스물세 명이 남습니다. 33층의 호출은 약속한 밤까지 기다립니다.",
           next: "case49_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c49_after_record",

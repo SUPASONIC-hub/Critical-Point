@@ -284,7 +284,7 @@ export const case30 = {
           voice: "읽기만 하러 온 사람도 자리에 앉았으니, 새벽까지 여섯이 함께 계약서를 끝까지 읽고 헤어진다.",
           echo: "새벽 두 시, 여섯 명이 계약서 마지막 쪽을 덮고 헤어집니다. 검사 대응 메일은 아무도 다시 열어 보지 않은 채 아침을 기다립니다.",
           next: "case30_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c30_after_record",

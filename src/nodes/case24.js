@@ -280,7 +280,7 @@ export const case24 = {
           voice: "33층보다 이 사람들이 먼저라며, 불 꺼진 4층에서 마지막 밤을 동료들과 끝까지 보낸다.",
           echo: "불 꺼진 4층에 열아홉 명이 남습니다. 33층의 호출은 이 밤이 끝날 때까지 기다립니다.",
           next: "case24_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c24_after_record",

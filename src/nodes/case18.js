@@ -281,7 +281,7 @@ export const case18 = {
           voice: "문자는 내일 답해도 된다며, 오늘은 탕비실 불을 끌 때까지 오진우와 함께 남는다.",
           echo: "불을 끌 때까지 남으면 컵라면 트리가 다 없어집니다. 헌책방 문자에는 내일 아침 첫차에서 답합니다.",
           next: "case18_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c18_after_record",
@@ -713,7 +713,7 @@ export const case18 = {
     c18_start_rush: {
       label: "어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다",
       effect: { trust: 12, legitimacy: 5, humanCost: 3, time: -5, fatigue: 4 },
-      cognition: { persistence: 2 },
+      cognition: { risk: 2 },
       voice: "오래 끌지 말라는 부탁을 들어주려고, 어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다.",
       echo: "변명을 건너뛰면 이야기는 빠릅니다. 빠른 결론에 오진우가 안도하는 얼굴을 보이고, 그 얼굴이 조금 마음에 걸립니다.",
     },

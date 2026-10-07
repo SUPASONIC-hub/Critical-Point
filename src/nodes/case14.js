@@ -280,7 +280,7 @@ export const case14 = {
           voice: "웃는 자리를 먼저 뜨고 싶지 않아서, 오늘은 이정숙과 가입자 모임 저녁 자리에 끝까지 남는다.",
           echo: "저녁 자리에서 이정숙이 모두에게 받아쓰기 시험을 냅니다. 강태민은 이번에도 100점이고, 권도현은 답안 옆에 채점 비용을 적다가 감점됩니다.",
           next: "case14_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c14_after_record",

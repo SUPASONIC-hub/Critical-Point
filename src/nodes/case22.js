@@ -281,7 +281,7 @@ export const case22 = {
           voice: "오늘만은 일보다 박수가 먼저라며, 수료식 떡 상자가 빌 때까지 하준이네 가족 곁에 남는다.",
           echo: "남아 있으면 객장 불이 꺼질 때까지 떡이 돕니다. 하준이 번호표 기계 위에 마지막 떡을 올려 둡니다.",
           next: "case22_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c22_after_record",

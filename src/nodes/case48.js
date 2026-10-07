@@ -293,7 +293,7 @@ export const case48 = {
           voice: "스무 시간을 같이 샌 사람들과 헤어지기 아쉬워서, 송편을 들고 동료들과 헌책방에서 막차가 끊길 때까지 남는다.",
           echo: "헌책방 불이 막차 시간을 넘겨서까지 켜져 있습니다. 서류 얘기는 한 줄도 나오지 않고, 송편 접시만 세 번 비워집니다. 탁자 가운데에는 임소율이 들고 온 임경수의 서명 연습장과 만년필이 놓여 있습니다.",
           next: "case48_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c48_after_record",

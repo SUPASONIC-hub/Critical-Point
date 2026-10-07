@@ -281,7 +281,7 @@ export const case21 = {
           voice: "급하게 따지 않은 귤을 급하게 들고 갈 수는 없다며, 마지막 비행기 시간까지 느린섬에 남아 귤 상자를 같이 싼다.",
           echo: "남으면 귤 상자 여섯 개가 테이프로 봉해집니다. 서울의 노아는 그날 밤도 1기의 문장으로 선택지를 만듭니다.",
           next: "case21_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c21_after_record",

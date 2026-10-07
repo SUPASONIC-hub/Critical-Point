@@ -285,7 +285,7 @@ export const case35 = {
           voice: "물 퍼 준 사람 몫의 떡을 받았으니, 마지막 모래주머니를 치울 때까지 시장 사람들 곁에 남는다.",
           echo: "마지막 모래주머니가 트럭에 실릴 때 권도현이 꽃장화를 다시 신고 삽을 듭니다. 회장실 이야기는 그날 밤 아무도 꺼내지 않습니다.",
           next: "case35_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c35_after_record",

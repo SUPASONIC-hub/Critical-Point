@@ -284,7 +284,7 @@ export const case33 = {
           voice: "원룸을 혼자 비우게 두지 않으려고, 남은 상자 아홉 개를 다 쌀 때까지 백아린 곁에 남는다.",
           echo: "남으면 마지막 상자에 테이프를 붙이는 밤이 옵니다. 허윤경이 보낸 반찬통이 원룸 바닥에 줄지어 있고, 상자 위에 둔 휴대폰은 아직 조용합니다.",
           next: "case33_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c33_after_record",

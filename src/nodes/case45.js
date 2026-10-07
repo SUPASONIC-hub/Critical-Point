@@ -286,7 +286,7 @@ export const case45 = {
           voice: "봉안을 마치고 맞는 첫 밤이라, 오늘 밤은 셔터를 내릴 때까지 임소율 가족 곁에 남는다.",
           echo: "남으면 셔터가 내려간 가게에서 임재윤이 처음으로 아버지 책장 사이를 걷습니다. 에코 조각은 하룻밤 더 노트북 안에서 기다립니다.",
           next: "case45_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c45_after_record",

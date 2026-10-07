@@ -286,7 +286,7 @@ export const case32 = {
           voice: "아홉 시까지는 아직 밤이 남았다며, 빈 책상들을 동료들과 끝까지 제자리로 돌려놓는다.",
           echo: "책상 스물세 개가 새벽 3시에 제자리로 돌아갑니다. 백아린이 세운 의자 열두 개만은 아무도 건드리지 않습니다.",
           next: "case32_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c32_after_record",

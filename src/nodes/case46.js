@@ -287,7 +287,7 @@ export const case46 = {
           voice: "오늘 하루를 같이 버틴 사람들과 끝도 같이 보려고, 서버실 불이 꺼질 때까지 동료들과 에코 곁에 남는다.",
           echo: "남으면 이민서는 에코가 재회 농담에 웃음 확률을 붙이는 동안 잠이 듭니다. 강태민이 그 위에 점퍼를 덮고, 연시우가 서버실 불을 한 칸씩 끕니다.",
           next: "case46_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c46_after_record",

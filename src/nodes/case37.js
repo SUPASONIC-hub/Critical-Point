@@ -287,7 +287,7 @@ export const case37 = {
           voice: "혼자 읽은 줄은 혼자 남는다며, 먼저 가는 사람 없이 서로의 기록을 끝까지 같이 읽는다.",
           echo: "해가 뜰 때까지 아무도 먼저 집에 가지 않습니다. 끝까지 같이 읽은 표는, 며칠 뒤 누군가의 서면에서 다시 보게 됩니다.",
           next: "case37_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c37_after_record",

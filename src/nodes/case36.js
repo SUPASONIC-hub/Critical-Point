@@ -156,7 +156,7 @@ export const case36Nodes = {
         effect: { capital: 8, time: 4, trust: -3, legitimacy: 2, humanCost: 3, fatigue: -2 },
         voice: "다 듣기 전에는 답하지 않기로 하고, 여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다.",
         echo: "따라 외우면 셰프가 처음으로 웃습니다. 제안은 끝까지 들리고, 끝까지 들은 사람은 반쯤 대답한 사람이 됩니다.",
-        cognition: { risk: 2 },
+        cognition: { persistence: 2 },
       },
       {
         id: "reframe",
@@ -285,7 +285,7 @@ export const case36 = {
           voice: "결과는 얼굴 보고 말해야 한다며, 트럭을 돌려 헌책방 1층의 동료들 곁으로 먼저 간다.",
           echo: "헌책방 1층에 불이 켜져 있습니다. 문을 열자 여섯 명이 한꺼번에 '어떻게 됐어요'라고 묻고, 강태민은 트럭에서 떡 상자를 내립니다.",
           next: "case36_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c36_after_record",
@@ -546,7 +546,7 @@ export const case36 = {
           voice: "마흔 해 정원을 본 석문호가 다치지 않게, 오늘 들은 말은 묻어 두겠다고 약속한다.",
           echo: "약속하면 석문호가 고개를 끄덕이고 호스를 다시 감습니다. 오늘 본 액자는 당신 기억 속에만 남습니다.",
           next: "c36_phone",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c36_branch_annex_follow_b",

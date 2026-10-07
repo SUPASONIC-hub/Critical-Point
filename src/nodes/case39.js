@@ -284,7 +284,7 @@ export const case39 = {
           voice: "밤을 같이 샌 사람들과 끝도 같이 봐야 한다며, 마지막 자막이 올라갈 때까지 편집실 사람들 곁을 지킨다.",
           echo: "자리를 지키면 백아린이 어머니와 통화하는 소리가 들립니다. '응, 나 맞아. 잘 나왔지.' 정정은 크레디트가 끝날 때까지 무릎에서 내려오지 않고, 제보 메일에는 읽음 표시만 남습니다.",
           next: "case39_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c39_after_record",

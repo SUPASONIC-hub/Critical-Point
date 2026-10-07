@@ -283,7 +283,7 @@ export const case40 = {
           voice: "질문 하나는 내일 생각해도 된다며, 오늘은 떡방 셔터를 내릴 때까지 하준의 첫 근무를 함께한다.",
           echo: "셔터가 내려갈 때 하준의 첫 시급이 봉투에 담깁니다. 문가을이 봉투에 '100점'이라고 적습니다. 국회는 월요일까지 기다립니다.",
           next: "case40_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c40_after_record",

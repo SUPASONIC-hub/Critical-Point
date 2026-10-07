@@ -284,7 +284,7 @@ export const case38 = {
           voice: "오늘은 이 사람들이 주인인 날이라며, 원고들이 모두 흩어질 때까지 법원 앞에서 문가을 곁에 남는다.",
           echo: "마지막 원고가 버스에 오를 때까지 계단에 남습니다. 문가을이 떡 한 봉지를 당신 가방에 밀어 넣고 '내일 밤 방송도 같이 봐요'라고 합니다.",
           next: "case38_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c38_after_record",

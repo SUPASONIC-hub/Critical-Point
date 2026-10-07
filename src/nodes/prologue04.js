@@ -117,7 +117,7 @@ export const prologue04Nodes = {
         effect: { capital: 7, time: -5, legitimacy: 2, trust: -3, humanCost: 4, fatigue: -2 },
         voice: "한 건만 보고는 판단할 수 없어서, 끼어들지 않고 오전 판매 여섯 건을 끝까지 지켜본다.",
         echo: "여섯 건이 다 팔립니다. 평균 3분 40초였고, 여섯 명 다 웃으면서 나갔습니다.",
-        cognition: { risk: 2 },
+        cognition: { persistence: 2 },
       },
       {
         id: "reframe",

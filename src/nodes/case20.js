@@ -285,7 +285,7 @@ export const case20 = {
           voice: "첫 아침을 각자 흩어져 맞고 싶지 않아서, 오늘은 동료들과 서버실을 정리하며 하루를 같이 보낸다.",
           echo: "서버실을 정리하는 동안 강태민이 농담을 하나 더 합니다. 이번엔 아무도 계산하지 않고, 그냥 웃습니다.",
           next: "case20_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c20_after_record",

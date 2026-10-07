@@ -281,7 +281,7 @@ export const case11 = {
           voice: "면담은 내일 아침 아홉 시라서, 오늘 밤은 휴대폰을 엎어 두고 끝까지 같이 먹는다.",
           echo: "엎어 둔 휴대폰은 밤새 울립니다. 아무도 뒤집지 않습니다. 떡볶이는 식기 전에 다 먹습니다.",
           next: "case11_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c11_after_record",

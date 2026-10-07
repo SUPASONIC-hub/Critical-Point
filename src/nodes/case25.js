@@ -282,7 +282,7 @@ export const case25 = {
           voice: "한 주 만에 모인 밤을 메일 한 통에 내주지 않으려고, 벚꽃길 끝까지 여섯이 함께 걷고 월요일은 월요일에 연다.",
           echo: "여섯이 끝까지 걸으면 벚꽃길이 생각보다 짧습니다. 평택 메일은 월요일 아침까지 읽지 않은 채로 기다립니다.",
           next: "case25_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c25_after_record",

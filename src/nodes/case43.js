@@ -285,7 +285,7 @@ export const case43 = {
           voice: "로비에서 33층까지 올라와 준 사람들이라, 복도를 지켜 준 사람들 곁에 새벽까지 남는다.",
           echo: "복도의 사람들과 회사 앞 포장마차까지 내려가 새벽 두 시에 헤어집니다. 공시는 그사이 올라오고, 아무도 먼저 휴대폰을 보지 않습니다.",
           next: "case43_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c43_after_record",
@@ -564,7 +564,7 @@ export const case43 = {
           voice: "끝까지 가라고 할 자격은 없다며, 서명은 백아린의 선택이고 그래도 괜찮다고 말해 준다.",
           echo: "괜찮다는 말에 백아린이 한참 웃습니다. 그리고 합의서를 가방에 넣습니다. 서명했는지는 월요일 13시에 알게 됩니다.",
           next: "c43_professor",
-          cognition: { reframing: 2 },
+          cognition: { risk: 2 },
         },
       ],
     },

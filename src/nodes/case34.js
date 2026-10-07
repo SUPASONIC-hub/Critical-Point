@@ -146,7 +146,7 @@ export const case34Nodes = {
         effect: { trust: 11, humanCost: -3, time: -5, capital: -2, fatigue: 5 },
         voice: "누구 딸인지는 본인 입으로 나와야 한다며, 윤서진이 스스로 말할 때까지 곁에서 기다린다.",
         echo: "기다리면 윤서진이 자정 무렵 스스로 말합니다. 문하준은 그때 이미 집에 가고 없습니다.",
-        cognition: { reframing: 2 },
+        cognition: { persistence: 2 },
       },
       {
         id: "c34_sketch_mother",
@@ -290,7 +290,7 @@ export const case34 = {
           voice: "혼자서는 못 읽겠다는 말을 듣고, 오늘은 연구실 불이 꺼질 때까지 사본을 끝까지 같이 읽는다.",
           echo: "마지막 쪽을 덮은 건 자정 무렵입니다. 윤서진이 '혼자 읽었으면 중간에 덮었을 거예요'라고 말합니다. 마지막 복숭아는 문하준이 먹습니다.",
           next: "case34_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c34_after_record",

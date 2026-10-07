@@ -285,7 +285,7 @@ export const case44 = {
           voice: "숨이 찬 사람을 기다리게 할 수 없어서, 남은 떡을 싸 들고 모두 함께 임경수에게 간다.",
           echo: "떡을 싸 들고 가면 병실 창가에 열한 명이 섭니다. 임경수가 눈을 뜨고 떡 냄새부터 알아봅니다.",
           next: "case44_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c44_after_record",

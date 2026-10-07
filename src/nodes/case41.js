@@ -279,7 +279,7 @@ export const case41 = {
           voice: "같이 들은 사람들을 그냥 보낼 수 없어서, 포장마차에 남아 오늘 방청 온 사람들과 끝까지 잔을 비운다.",
           echo: "마지막 잔을 비울 때 포장마차에 열두 명이 남습니다. 문하준은 사이다로 건배를 세 번 합니다.",
           next: "case41_result",
-          cognition: { reframing: 2 },
+          cognition: { persistence: 2 },
         },
         {
           id: "c41_after_record",
