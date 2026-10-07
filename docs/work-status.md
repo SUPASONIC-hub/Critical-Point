@@ -1459,8 +1459,6 @@ Fixed, by area:
 
 Looked at and left, for the owner:
 
-- The 평택 tower is 22 floors at 72% against 58% in 사건 26, and 20 floors at
-  62% against 45% in 사건 31.
 - 프롤로그 04's national sales figure was changed from 1,180억 to 214억 so it
   sits under the 310억 loan; another number may be meant.
 - Card numbers and cognition types that argue with their labels (about fifty

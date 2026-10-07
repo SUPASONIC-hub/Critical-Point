@@ -136,6 +136,25 @@ The two prices are two contracts. 사건 20's is the lab's own transfer to
 KD데이터랩, paid into 그룹전략실's account: nine analysts, 1,200만 원 each. 사건 30's is KD데이터랩's
 sale to 핏스코어 in May: 63 people for 18억, 2,857만 원 each.
 
+## The 평택 tower
+
+르하임 고덕, a 22-floor 오피스텔 in 평택 고덕; KD캐피탈 lent 620억 at the front
+of the queue and 212 households bought into it. The figures change between
+April and June, and the change is the reveal.
+
+| Fact | April, 사건 26 | June, 사건 31 |
+|---|---|---|
+| Floors | 22 | 22 |
+| Frame | up to the 15th floor | columns to the 15th; no floor was poured above the 9th |
+| Reported progress | 72% (the January report) | 62%: the report on file was quietly lowered |
+| Progress on site | 58%, the estimate the analyst signs in the opinion of 4월 24일 | 45%, measured by 금융감독원 and written long before in 최서진's report |
+| The 9th floor | where a worker fell in the summer of 2025 | the last floor that was poured |
+
+The differences that copy restates: 72 - 58 = 14 (사건 26's "14% 부풀린"),
+62 - 45 = 17%포인트, 58 - 45 = 13%포인트. The last is the analyst's own: the
+number signed in April to correct the report was wrong as well. 사건 27 and 32
+state no floor and no percentage.
+
 ## The harmed
 
 | Fact | Value |
