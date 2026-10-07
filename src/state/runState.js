@@ -3,7 +3,7 @@ import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../gameConstants.js";
 import { makeEmptyScores } from "../gameLogic.js";
 import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } from "../gauntlet/gauntletEngine.js";
-import { createOpeningResources } from "./openingState.js";
+import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
 
 /**
  * The run, defined once.
@@ -35,8 +35,7 @@ import { createOpeningResources } from "./openingState.js";
 export const KEEP = Symbol("keep");
 export const FRESH = Symbol("fresh");
 
-// The line under a season's first scene, before any choice has been answered.
-export const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
+export { OPENING_ECHO };
 
 const given = (key) => (event) => event[key];
 const now = (event) => event.now;
