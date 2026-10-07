@@ -93,6 +93,36 @@ export function reloadForMissingChunk({
   return true;
 }
 
+// Whether a new release's service worker took this page over while it was
+// open (serviceWorker/register.js says so).
+let workerReplaced = false;
+
+export function noteWorkerReplaced() {
+  workerReplaced = true;
+}
+
+/**
+ * Which panel a screen whose chunk did not arrive shows (`LazyScreen`):
+ *
+ *   "retry"            offline. The file is still on the server; ask again.
+ *   "reload-offline"   offline, and a new release's worker has replaced the
+ *                      one this page came with. It deleted the cache this
+ *                      page's files were in, so asking again cannot succeed
+ *                      however often it is pressed -- while a reload is
+ *                      answered by that worker with the page it keeps, and
+ *                      opens with no connection.
+ *   "reload-retried"   online, after a retry. A browser that remembers a
+ *                      module it failed to fetch (Chromium does, for as long
+ *                      as the document lives) fails the same import again
+ *                      with the connection back. Nothing changed version, so
+ *                      the panel does not say so.
+ *   "reload"           online: a deploy replaced the file.
+ */
+export function chunkPanelFor({ offline, retried = false, replaced = workerReplaced }) {
+  if (offline) return replaced ? "reload-offline" : "retry";
+  return retried ? "reload-retried" : "reload";
+}
+
 /**
  * Vite raises `vite:preloadError` on the window when a dynamic import or one of
  * its preloads fails. Preventing the default stops the error being thrown into

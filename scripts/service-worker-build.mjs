@@ -9,9 +9,13 @@ import { createHash } from "node:crypto";
  * What the build adds is the three things only a build knows:
  *
  *   release   the commit the build came from (`RENDER_GIT_COMMIT`, the same
- *             one the page carries as `build-sha`), or, for a build that has
- *             none, a hash of the built page -- which names every entry file
- *             by its hash, so it moves when anything the page loads does.
+ *             one the page carries as `build-sha`) and a hash of the files
+ *             the page names; for a build that has no commit, a hash of the
+ *             built page. Either moves when anything the page loads does,
+ *             because every entry file is named by its own hash. The commit
+ *             alone did not: the same commit deployed again with another
+ *             backend address, which is how a release built without one is
+ *             mended, was a new worker writing into the old one's cache.
  *   precache  what the intro needs, read off the built page itself: every
  *             script, stylesheet, font, icon and image the page names. The
  *             worker does not install without all of them.
@@ -24,10 +28,17 @@ import { createHash } from "node:crypto";
 export const WORKER_FILE = "sw.js";
 const CONFIG_LINE = /^const WORKER_CONFIG = (\{.*\});$/m;
 
+const shortHash = (text, length) => createHash("sha256").update(text).digest("hex").slice(0, length);
+
+/**
+ * The names, not the page's text, beside a commit: the live check works this
+ * out again from the page as it was served, and a host that touched the
+ * markup on the way would otherwise make every release disagree with itself.
+ */
 export function releaseIdFor({ sha = "", html }) {
   const commit = String(sha).trim();
-  if (/^[0-9a-f]{7,40}$/.test(commit)) return commit;
-  return `local-${createHash("sha256").update(html).digest("hex").slice(0, 12)}`;
+  if (/^[0-9a-f]{7,40}$/.test(commit)) return `${commit}-${shortHash(precacheFromHtml(html).join("\n"), 8)}`;
+  return `local-${shortHash(html, 12)}`;
 }
 
 const WARM_ROOT = /^\/(?:portrait-[a-z0-9-]+\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
@@ -143,7 +154,7 @@ export function workerProblems({ source, html, hasFile = null }) {
   if (config.release !== expected) {
     problems.push(
       sha
-        ? `sw.js is release ${config.release} and the page is ${sha}: the worker would keep one release's page with another's files`
+        ? `sw.js is release ${config.release} and the page is ${expected}: the worker would keep one release's page with another's files`
         : `sw.js is release ${config.release} and the page hashes to ${expected}: it was not built from this page`,
     );
   }

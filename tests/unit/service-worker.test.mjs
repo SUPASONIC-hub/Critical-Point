@@ -25,6 +25,7 @@ import {
   staleCaches,
   strategyFor,
 } from "../../src/serviceWorker/worker.js";
+import { chunkPanelFor } from "../../src/state/chunkReload.js";
 import { noteCasesArrived } from "../../src/state/loadProgress.js";
 
 /**
@@ -184,6 +185,16 @@ test("install fails when a file the intro needs is missing", async () => {
   assert.equal(scope.skipped, false);
 });
 
+test("install fails on a page served under a file's name, and writes nothing", async () => {
+  // A host that answers a missing file with its fallback page, and a 200.
+  const scope = fakeScope({ ...SITE, [ENTRY]: () => response("<html>", { contentType: "text/html" }) });
+  installWorker(scope, CONFIG);
+  await assert.rejects(scope.dispatch("install").settled(), /index-abc12345\.js answered 200, or with a page/);
+  assert.equal(scope.skipped, false);
+  // Not the page either: a worker still in charge may be answering from this cache.
+  assert.deepEqual([...(scope.stores.get(cacheNameFor("abc1234"))?.keys() ?? [])], []);
+});
+
 test("activate deletes the other releases' caches and no one else's", async () => {
   const scope = fakeScope(SITE);
   scope.stores.set(`${CACHE_PREFIX}older`, new Map());
@@ -213,10 +224,24 @@ test("the page comes from the kept copy when the network is gone, or says nothin
   assert.equal(await (await quiet.answer).text(), SITE["/"]);
 });
 
+test("the page comes from the kept copy when the host answers with an error of its own", async () => {
+  const site = { ...SITE };
+  const scope = await installed(site);
+  site["/"] = () => response("Bad Gateway", { status: 502, contentType: "text/html" });
+  const down = scope.dispatch("fetch", plainRequest("/", "navigate"));
+  assert.equal(await (await down.answer).text(), SITE["/"], "the kept page, not the host's error page");
+  site["/"] = () => response("Not Found", { status: 404, contentType: "text/html" });
+  assert.equal(await (await scope.dispatch("fetch", plainRequest("/", "navigate")).answer).text(), SITE["/"]);
+});
+
 test("with nothing kept, a failed navigation fails as the network did", async () => {
   const scope = fakeScope(SITE, { offline: true });
   installWorker(scope, CONFIG);
   await assert.rejects(scope.dispatch("fetch", plainRequest("/", "navigate")).answer, /Failed to fetch/);
+
+  const failing = fakeScope({ ...SITE, "/": () => response("Bad Gateway", { status: 502, contentType: "text/html" }) });
+  installWorker(failing, CONFIG);
+  assert.equal((await failing.dispatch("fetch", plainRequest("/", "navigate")).answer).status, 502, "the host's own answer is all there is");
 });
 
 test("a fingerprinted file is answered from the cache without asking, and kept on a miss", async () => {
@@ -360,7 +385,15 @@ test("the precache list is what the built page names, each file once", () => {
 });
 
 test("a release is named for its commit, or for its page when it has none", () => {
-  assert.equal(releaseIdFor({ sha: "3c114e616a6e8626a85a92e91075b0451a96a442", html: PAGE }), "3c114e616a6e8626a85a92e91075b0451a96a442");
+  const sha = "3c114e616a6e8626a85a92e91075b0451a96a442";
+  const named = releaseIdFor({ sha, html: PAGE });
+  assert.match(named, new RegExp(`^${sha}-[0-9a-f]{8}$`));
+  // The same commit built again with another backend address has another
+  // entry script, and has to be another release: it used to share the cache.
+  assert.notEqual(releaseIdFor({ sha, html: PAGE.replace("FZxcMdNV", "Changed0") }), named);
+  // The names decide, not the markup around them: the live check works the
+  // release out from the page as it was served.
+  assert.equal(releaseIdFor({ sha, html: PAGE.replaceAll("\n", "\n  ") }), named);
   const local = releaseIdFor({ sha: "", html: PAGE });
   assert.match(local, /^local-[0-9a-f]{12}$/);
   assert.equal(releaseIdFor({ html: PAGE }), local);
@@ -468,23 +501,29 @@ test("the rest of the release is not asked for offline or against a data-saving 
   assert.equal(mayWarm({ online: true, saveData: true }), false);
 });
 
-function fakePage({ readyState = "complete", onLine = true, saveData = false, search = "" } = {}) {
+function fakePage({ readyState = "complete", onLine = true, saveData = false, search = "", controlled = false } = {}) {
   const listeners = new Map();
   const containerListeners = new Map();
   const posted = [];
   const attributes = new Map();
   const registered = [];
-  const registration = { active: { postMessage: (message) => posted.push(message) } };
+  const worker = (name) => ({ name, postMessage: (message) => posted.push({ ...message, to: name }) });
+  const registration = { active: worker("first") };
   const scope = {
     posted,
     attributes,
     registered,
+    registration,
     location: { search },
-    document: { readyState, documentElement: { setAttribute: (name, value) => attributes.set(name, value) } },
+    document: {
+      readyState,
+      documentElement: { setAttribute: (name, value) => attributes.set(name, value), removeAttribute: (name) => attributes.delete(name) },
+    },
     navigator: {
       onLine,
       connection: { saveData },
       serviceWorker: {
+        controller: controlled ? registration.active : null,
         register: async (url) => void registered.push(url),
         ready: Promise.resolve(registration),
         addEventListener: (type, listener) => containerListeners.set(type, listener),
@@ -493,10 +532,19 @@ function fakePage({ readyState = "complete", onLine = true, saveData = false, se
     requestIdleCallback: (work) => work(),
     addEventListener: (type, listener) => listeners.set(type, listener),
     fire: (type) => listeners.get(type)?.(),
-    hear: (data) => containerListeners.get("message")?.({ data }),
+    hear: (data, source) => containerListeners.get("message")?.({ data, source }),
+    /** The active worker takes the page over (`clients.claim`). */
+    claim: () => containerListeners.get("controllerchange")?.(),
+    /** A new release's worker activates and claims the page. */
+    replaceWorker(name) {
+      registration.active = worker(name);
+      scope.claim();
+      return registration.active;
+    },
   };
   return scope;
 }
+const warmAsked = (page) => page.posted.map((message) => message.to);
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 test("nothing registers where it is not wanted, or where there is no worker to register", () => {
@@ -517,7 +565,7 @@ test("registration waits for load, and the warm-up for the first case", async ()
   assert.deepEqual(page.posted, [], "no table yet");
 
   noteCasesArrived(1, 55);
-  assert.deepEqual(page.posted, [{ type: "warm" }]);
+  assert.deepEqual(page.posted, [{ type: "warm", to: "first" }]);
   noteCasesArrived(2, 55);
   assert.equal(page.posted.length, 1, "asked once");
 
@@ -538,7 +586,7 @@ test("a device that already has a table up asks at once, unless it should not", 
   const ready = fakePage({ search: "?sw=1" });
   installServiceWorker({ setting: "ask", scope: ready });
   await settle();
-  assert.deepEqual(ready.posted, [{ type: "warm" }]);
+  assert.deepEqual(ready.posted, [{ type: "warm", to: "first" }]);
 
   const saving = fakePage({ saveData: true });
   installServiceWorker({ setting: "on", scope: saving });
@@ -556,7 +604,62 @@ test("a device that already has a table up asks at once, unless it should not", 
   timed.setTimeout = (work) => work();
   installServiceWorker({ setting: "on", scope: timed });
   await settle();
-  assert.deepEqual(timed.posted, [{ type: "warm" }]);
+  assert.deepEqual(timed.posted, [{ type: "warm", to: "first" }]);
+  noteCasesArrived(0, 0);
+});
+
+test("the last release's worker saying it is whole does not stand for the one that replaces it", async () => {
+  // The visit after a deploy: the old worker is active when the page asks,
+  // has everything, and says so. The new one then deletes that cache.
+  noteCasesArrived(55, 55);
+  assert.equal(chunkPanelFor({ offline: true }), "retry", "no worker has been replaced under a page yet");
+  const page = fakePage({ controlled: true });
+  const old = page.registration.active;
+  installServiceWorker({ setting: "on", scope: page });
+  await settle();
+  assert.deepEqual(warmAsked(page), ["first"]);
+  page.hear({ type: "warmed", complete: true, release: "old" }, old);
+  assert.equal(page.attributes.get(OFFLINE_READY_ATTRIBUTE), "ready", "true of the release in charge at the time");
+
+  const next = page.replaceWorker("second");
+  assert.equal(page.attributes.has(OFFLINE_READY_ATTRIBUTE), false, "the cache that was whole is gone");
+  assert.deepEqual(warmAsked(page), ["first", "second"], "the worker in charge now is asked");
+  // An answer the old worker sent on its way out is about the deleted cache.
+  page.hear({ type: "warmed", complete: true, release: "old" }, old);
+  assert.equal(page.attributes.has(OFFLINE_READY_ATTRIBUTE), false);
+  page.hear({ type: "warmed", complete: true, release: "new" }, next);
+  assert.equal(page.attributes.get(OFFLINE_READY_ATTRIBUTE), "ready");
+  page.fire("online");
+  assert.deepEqual(warmAsked(page), ["first", "second"], "and not asked again once it is whole");
+  // The page's own files went with the old cache, and the panel is told.
+  assert.equal(chunkPanelFor({ offline: true }), "reload-offline");
+  noteCasesArrived(0, 0);
+});
+
+test("the first worker a device installs taking the page over is not a release replaced", async () => {
+  noteCasesArrived(55, 55);
+  const page = fakePage();
+  installServiceWorker({ setting: "on", scope: page });
+  await settle();
+  assert.deepEqual(warmAsked(page), ["first"]);
+  // `clients.claim` from the worker that was just asked: nothing to repeat.
+  page.claim();
+  assert.deepEqual(warmAsked(page), ["first"]);
+  assert.equal(page.attributes.has(OFFLINE_READY_ATTRIBUTE), false);
+  page.hear({ type: "warmed", complete: true }, page.registration.active);
+  assert.equal(page.attributes.get(OFFLINE_READY_ATTRIBUTE), "ready");
+  noteCasesArrived(0, 0);
+});
+
+test("a worker replaced before the first table is up is simply the one asked", async () => {
+  noteCasesArrived(0, 0);
+  const page = fakePage({ controlled: true });
+  installServiceWorker({ setting: "on", scope: page });
+  await settle();
+  page.replaceWorker("second");
+  assert.deepEqual(warmAsked(page), [], "nothing was asked, so nothing is asked again");
+  noteCasesArrived(1, 55);
+  assert.deepEqual(warmAsked(page), ["second"]);
   noteCasesArrived(0, 0);
 });
 

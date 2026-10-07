@@ -1,3 +1,4 @@
+import { noteWorkerReplaced } from "../state/chunkReload.js";
 import { getLoadProgress, subscribeLoadProgress } from "../state/loadProgress.js";
 
 /**
@@ -55,7 +56,23 @@ export function installServiceWorker({
   if (!container || !serviceWorkerWanted(setting, scope.location?.search)) return false;
 
   let warmed = false;
+  // The worker the warm-up was last asked of.
+  let asked = null;
+  let askAgain = () => {};
   const idle = (work) => (typeof scope.requestIdleCallback === "function" ? scope.requestIdleCallback(work) : scope.setTimeout(work, 2000));
+  const root = () => scope.document?.documentElement;
+
+  // A new release took the page over (`clients.claim`). The files this page
+  // was built to ask for went with the old release's cache, and `LazyScreen`
+  // needs to know that (state/chunkReload.js). The first worker a device
+  // installs takes the page over too, and that is not a release changing
+  // under it: only a page that already had a worker has had one replaced.
+  let controlled = Boolean(container.controller);
+  container.addEventListener("controllerchange", () => {
+    if (controlled) noteWorkerReplaced();
+    controlled = true;
+    askAgain();
+  });
 
   const start = () => {
     container
@@ -64,13 +81,29 @@ export function installServiceWorker({
       .then((registration) => {
         container.addEventListener("message", (event) => {
           if (event.data?.type !== "warmed" || !event.data.complete) return;
+          // On the visit after a deploy the worker that is active when the
+          // page asks is the last release's. It has everything, says so, and
+          // is then replaced by one that has deleted its cache: an answer
+          // counts only from the worker in charge when it arrives.
+          if (event.source && event.source !== registration.active) return;
           warmed = true;
           // For whoever needs to know the release is all here: the offline spec.
-          scope.document?.documentElement?.setAttribute(OFFLINE_READY_ATTRIBUTE, "ready");
+          root()?.setAttribute(OFFLINE_READY_ATTRIBUTE, "ready");
         });
         const ask = () => {
-          if (warmed || !mayWarm({ online: scope.navigator.onLine, saveData: scope.navigator.connection?.saveData })) return;
-          registration.active?.postMessage({ type: "warm" });
+          const worker = registration.active;
+          if (!worker || warmed || !mayWarm({ online: scope.navigator.onLine, saveData: scope.navigator.connection?.saveData })) return;
+          asked = worker;
+          worker.postMessage({ type: "warm" });
+        };
+        // What was asked of a worker that has since been replaced, and
+        // anything it answered, was about a cache that is gone: the one in
+        // charge now is asked. Nothing asked yet means nothing to repeat.
+        askAgain = () => {
+          if (!asked || asked === registration.active) return;
+          warmed = false;
+          root()?.removeAttribute?.(OFFLINE_READY_ATTRIBUTE);
+          ask();
         };
         whenFirstCaseArrived(() => {
           idle(ask);

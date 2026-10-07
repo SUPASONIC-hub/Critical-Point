@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { chunkPanelFor } from "../../src/state/chunkReload.js";
 import { createRetryable, retryableLazy, retryFailedScreens } from "../../src/state/retryableLazy.js";
 
 /**
@@ -38,6 +39,21 @@ test("a screen whose import failed gets a new one over the same loader", async (
   assert.deepEqual(await screen.current.factory(), { default: "ResultScreen" });
   assert.equal(loads, 2);
   assert.equal(screen.retry(), false, "one failure, one retry");
+});
+
+test("the panel offers what can work, in words that are true", () => {
+  // Offline with the release the page came with: the file is still there.
+  assert.equal(chunkPanelFor({ offline: true, replaced: false }), "retry");
+  // Offline after a new release's worker deleted this page's files: asking
+  // again cannot succeed, and a reload opens the page that worker keeps.
+  assert.equal(chunkPanelFor({ offline: true, replaced: true }), "reload-offline");
+  assert.equal(chunkPanelFor({ offline: true, replaced: true, retried: true }), "reload-offline");
+  // Online: a deploy replaced the file.
+  assert.equal(chunkPanelFor({ offline: false, replaced: false }), "reload");
+  assert.equal(chunkPanelFor({ offline: false, replaced: true }), "reload");
+  // Online after a retry: the browser refused the same import again, and the
+  // panel that says the game changed version would be saying something false.
+  assert.equal(chunkPanelFor({ offline: false, replaced: false, retried: true }), "reload-retried");
 });
 
 test("the app's screens are components, and a retry touches only the ones that failed", () => {
