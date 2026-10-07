@@ -183,7 +183,8 @@ test("restoring a slot or a kept save does not give back a consent the player wi
 });
 
 test("restoring a slot keeps a consent given since the slot was taken, and its queue", async () => {
-  const harness = await createRunHarness();
+  // The box starts ticked on a new device, so this run begins with it unticked.
+  const harness = await createRunHarness({ patch: { dataConsent: false } });
   harness.act("startGame");
   harness.act("refreshErrorLog");
   const [slot] = harness.outside.saveSlots;
