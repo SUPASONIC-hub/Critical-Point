@@ -632,6 +632,23 @@ withHeaders({ "x-forwarded-for": "198.51.100.72" });
 withHeaders({ "x-forwarded-for": "198.51.100.73" });
 // Another address is not held by the first one's counter.
 await post("write telemetry from a second address while the first is at its limit", "app_error_logs", errorPayload(sessionId(42)));
+withHeaders({ "x-forwarded-for": "198.51.100.74" });
+{
+  // A ceiling set above what the counter can count to is still a ceiling. The
+  // counter stops at two billion, and `count <= limit` was true for ever after
+  // (20261007010000): the rule that fails closed had stopped failing.
+  const counter = async () => (await one(`select request_count as n, window_started_at as at from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`)) ?? null;
+  const before = await counter();
+  await db.query(`insert into public.private_settings (name, value) values ('telemetry_daily_bytes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await post("write telemetry under a ceiling set past two billion", "app_error_logs", errorPayload(sessionId(43)));
+  await presetCounter("global:telemetry-bytes", 1999999999);
+  await postRefused("write telemetry once the counter can count no further", "app_error_logs", errorPayload(sessionId(43)), /^PT429 .*daily ceiling/);
+  await db.query(`delete from public.private_settings where name = 'telemetry_daily_bytes'`);
+  // The day's count goes back to what the checks before this one had written.
+  if (before) await db.query(`update public.telemetry_rate_limits set request_count = $1, window_started_at = $2 where actor_key = 'global:telemetry-bytes'`, [before.n, before.at]);
+  else await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:telemetry-bytes'`);
+}
 withHeaders(null);
 
 // Sizes, at the caps the measured payloads set (20260929010000). The largest
@@ -1015,6 +1032,12 @@ withHeaders({ "x-forwarded-for": "198.51.100.62" });
   await putCloudRefused("start the day's 1,001st code", "XXXXXXXX2345", cloudPayload("thousand"), /^PT429 .*code limit/);
   await putCloud("save under an existing code while new ones are refused", "VVVVVVVV2345");
   await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:cloud-new'`);
+  // The owner's number, as large as they care to make it, is still a limit and
+  // not an error: it was cast to integer, and 2^31 failed every new code (20261007010000).
+  await db.query(`insert into public.private_settings (name, value) values ('cloud_daily_new_codes', '3000000000')
+                  on conflict (name) do update set value = excluded.value`);
+  await putCloud("start a code under a ceiling set past the integer range", "YYYYYYYY2345");
+  await db.query(`delete from public.private_settings where name = 'cloud_daily_new_codes'`);
 }
 withHeaders(null);
 
