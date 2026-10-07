@@ -109,7 +109,7 @@ export const case35Nodes = {
       {
         id: "c35_sandbag_gate",
         label: "입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다",
-        effect: { time: 5, capital: 6, trust: -3, humanCost: 5, fatigue: -3 },
+        effect: { time: 5, capital: 6, trust: -3, humanCost: 5, fatigue: 3 },
         voice: "한 곳만 막을 수 있다면 가장 많은 가게를 고른다며, 입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다.",
         echo: "큰길 쪽 스무 곳은 문을 엽니다. 떡방 골목은 무릎까지 잠기고, 민도현의 라이브 방송은 그 골목을 비춥니다.",
         cognition: { risk: 2 },
@@ -362,7 +362,7 @@ export const case35 = {
         },
         {
           label: "글씨는 사진만 찍고 오늘 밤 기계를 모두 닦는다",
-          effect: { time: 5, capital: 4, trust: -3, humanCost: 3, fatigue: -4 },
+          effect: { time: 5, capital: 4, trust: -3, humanCost: 3, fatigue: 4 },
           voice: "글씨대로 다시 돌게 하는 게 먼저라며, 글씨는 사진만 찍고 오늘 밤 기계를 모두 닦는다.",
           echo: "기계는 녹을 피합니다. 흙과 함께 지워진 글씨는 이제 하준의 휴대폰 사진첩에만 있습니다.",
         },

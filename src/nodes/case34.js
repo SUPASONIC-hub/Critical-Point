@@ -67,7 +67,7 @@ export const case34Nodes = {
       {
         id: "c34_start_scan",
         label: "수첩 전체를 먼저 찍어 보내 달라고 답장한다",
-        effect: { capital: 6, time: 7, legitimacy: -5, trust: 1, humanCost: 3, fatigue: 1 },
+        effect: { capital: 6, legitimacy: -5, trust: 1, humanCost: 3, fatigue: 1 },
         voice: "한 쪽만 봐서는 앞뒤 줄을 알 수 없다며, 수첩 전체를 먼저 찍어 보내 달라고 답장한다.",
         echo: "답장을 받은 윤서진이 한 시간 뒤에 짧게 씁니다. '원본은 직접 보여 드리고 싶다고 했는데요.' 사진은 오지 않습니다.",
         next: "c34_study",

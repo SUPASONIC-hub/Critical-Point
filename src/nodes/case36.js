@@ -153,7 +153,7 @@ export const case36Nodes = {
       {
         id: "c36_table_listen",
         label: "여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다",
-        effect: { capital: 8, time: 4, trust: -3, legitimacy: 2, humanCost: 3, fatigue: -2 },
+        effect: { capital: 8, time: -4, trust: -3, legitimacy: 2, humanCost: 3, fatigue: -2 },
         voice: "다 듣기 전에는 답하지 않기로 하고, 여섯 번째 접시 이름을 따라 외우며 제안을 끝까지 듣는다.",
         echo: "따라 외우면 셰프가 처음으로 웃습니다. 제안은 끝까지 들리고, 끝까지 들은 사람은 반쯤 대답한 사람이 됩니다.",
         cognition: { persistence: 2 },

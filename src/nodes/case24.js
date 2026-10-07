@@ -194,7 +194,7 @@ export const case24Nodes = {
       {
         id: "c24_farewell_laugh",
         label: "오늘은 싸움 얘기 없이 웃기만 하고 내일 생각한다",
-        effect: { trust: 6, capital: 5, time: 4, legitimacy: -6, humanCost: 3, fatigue: -6 },
+        effect: { trust: 6, capital: 5, time: -4, legitimacy: -6, humanCost: 3, fatigue: -6 },
         voice: "마지막 밤까지 싸움터로 만들 수는 없다며, 오늘은 싸움 얘기 없이 웃기만 하고 내일 생각한다.",
         echo: "웃으면 강태민이 건배사를 한 번 더 합니다. 해체 이의 기한은 그사이 하루가 줄어듭니다.",
         cognition: { risk: 2 },

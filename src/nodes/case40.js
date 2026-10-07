@@ -242,7 +242,7 @@ export const case40Nodes = {
       {
         id: "c40_final_cut",
         label: "KD 기록 계약을 끊어 서비스를 오늘 밤 멈춘다",
-        effect: { capital: 10, time: 6, trust: -3, legitimacy: -6, humanCost: 5, fatigue: -4 },
+        effect: { time: 6, trust: -3, legitimacy: -6, humanCost: 8, fatigue: -4 },
         voice: "월요일에 6만 명이 같은 검사를 풀게 둘 수 없어서, KD 기록 계약을 끊어 서비스를 오늘 밤 멈춘다.",
         echo: "끊으면 오늘 밤 서비스가 멈춥니다. 9,412명의 재심사 길도 함께 멈추고, 직원 42명은 월요일에 출근할 곳이 없습니다.",
         cognition: { risk: 2 },

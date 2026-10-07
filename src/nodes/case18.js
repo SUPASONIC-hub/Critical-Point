@@ -240,7 +240,7 @@ export const case18Nodes = {
       {
         id: "c18_final_block",
         label: "오진우의 결정을 기다리지 않고 매각 자체를 막으러 간다",
-        effect: { capital: 6, time: 4, humanCost: -5, trust: 2, legitimacy: 4, fatigue: 5 },
+        effect: { capital: 6, time: 4, humanCost: -5, trust: -2, legitimacy: 4, fatigue: 5 },
         voice: "누가 팀장이 되든 612명은 그대로라며, 오진우의 결정을 기다리지 않고 매각 자체를 막으러 간다.",
         echo: "막으러 가면 9시 서명은 열리지 않습니다. 오진우는 자기 대신 누군가 정해 버린 아침을, 한동안 당신에게 따지지 않습니다.",
         cognition: { risk: 2 },

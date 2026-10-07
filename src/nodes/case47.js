@@ -242,7 +242,7 @@ export const case47Nodes = {
       {
         id: "c47_final_settle",
         label: "31명에게 위로금을 받게 하고 오늘 2차 기준을 모두 끝낸다",
-        effect: { capital: 10, time: 6, humanCost: -3, trust: -3, legitimacy: -8, fatigue: -3 },
+        effect: { capital: 10, time: 6, humanCost: 3, trust: -3, legitimacy: -8, fatigue: -3 },
         voice: "명절에 빈손보다는 300만 원이 낫다며, 31명에게 위로금을 받게 하고 오늘 2차 기준을 모두 끝낸다.",
         echo: "위로금은 연휴 안에 들어옵니다. 31명은 300만 원과 함께 '확인 불가'를 그대로 받고, 다시는 이 일로 소송할 수 없습니다.",
         cognition: { risk: 2 },
