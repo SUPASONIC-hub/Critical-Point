@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { triggerLabels } from "../../src/gameConstants.js";
-import { buildLeaderboard, getLeaderboardHeadline } from "../../src/ranking.js";
+import { buildLeaderboard, getLeaderboardHeadline, getLeaderboardStatusCopy } from "../../src/ranking.js";
 
 /**
  * A remote ranking row is whatever someone posted. The ranking screen prints
@@ -73,6 +73,30 @@ test("a remote row cannot pass itself off as this browser's own", () => {
   assert.equal(entry.isLocal, false);
   assert.equal(entry.name, "익명 분석관");
   assert.notEqual(entry.headline, "읽어 보세요");
+});
+
+test("the status card makes no statement about rows it does not have yet", () => {
+  const headline = getLeaderboardHeadline([]);
+  for (const status of ["idle", "loading"]) {
+    const copy = getLeaderboardStatusCopy({ status, headline });
+    assert.equal(copy.loading, true, status);
+    assert.equal(copy.canRetry, false, status);
+    assert.notEqual(copy.title, headline.title, `${status}: "아직 공개된 기록이 없습니다" is not known yet`);
+    assert.equal(copy.text, "");
+  }
+  const ready = getLeaderboardStatusCopy({ status: "ready", headline });
+  assert.deepEqual([ready.loading, ready.canRetry, ready.title, ready.text], [false, false, headline.title, headline.text]);
+  assert.equal(ready.eyebrow, "REMOTE LEADERBOARD");
+});
+
+test("only a request that failed online offers itself again", () => {
+  const headline = getLeaderboardHeadline(buildLeaderboard([{ ...honest, local: true }]));
+  const failed = getLeaderboardStatusCopy({ status: "error", headline, error: "원격 기록을 불러오지 못했습니다." });
+  assert.equal(failed.canRetry, true);
+  assert.equal(failed.text, "원격 기록을 불러오지 못했습니다.");
+  assert.equal(failed.title, headline.title, "the local rows are still what the card is about");
+  // Offline and no-server boards refetch on their own, or have nothing to fetch.
+  assert.equal(getLeaderboardStatusCopy({ status: "local", headline, error: "오프라인" }).canRetry, false);
 });
 
 test("this browser's own row keeps its name", () => {

@@ -439,7 +439,8 @@ summary:focus-visible {
   gap: 8px;
 }
 .intro .brand-mark,
-.ranking-page .brand-mark {
+.ranking-page .brand-mark,
+.board-page .brand-mark {
   gap: 9px;
   min-height: 34px;
   padding: 0 14px 0 12px;
@@ -2522,9 +2523,6 @@ summary:focus-visible {
   font-size: 0.875rem;
   font-weight: 600;
 }
-.board-page .brand-mark {
-  color: var(--ui-text-3);
-}
 .board-hero {
   max-width: 720px;
   margin-bottom: 26px;
@@ -2696,10 +2694,10 @@ summary:focus-visible {
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
-.board-composer-actions button:hover:not(:disabled) {
+.board-composer-actions button:hover:not([aria-disabled]) {
   transform: translateY(-2px);
 }
-.board-composer-actions button:disabled {
+.board-composer-actions button[aria-disabled] {
   color: var(--ui-text-3);
   background: var(--ui-surface-3);
   cursor: not-allowed;
