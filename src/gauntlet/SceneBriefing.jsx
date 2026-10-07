@@ -95,7 +95,8 @@ export function SceneBriefing({
       // Whole seconds are all the page prints; an unchanged value skips the render.
       setShown(Math.ceil(remaining));
       if (remaining <= 0) {
-        onOpenRef.current(null);
+        // Opened by the clock, not by the player: the table says so aloud.
+        onOpenRef.current(null, true);
         return;
       }
       frame = globalThis.requestAnimationFrame(loop);

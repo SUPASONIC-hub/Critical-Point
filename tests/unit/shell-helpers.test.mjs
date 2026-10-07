@@ -277,8 +277,9 @@ test("a press is graded when the pointer went down, not when the click landed", 
   const stamp = now - 400;
   // A click from a pointer: the press is the pointer going down.
   assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 120), stamp - 120);
-  // Enter or Space on the button: detail 0, its own press.
-  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: stamp }, stamp - 120), stamp);
+  // Enter or Space on the button: detail 0, and with no key noted going down
+  // it is its own press. (With one noted it is graded there: table-controls.)
+  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: stamp }, 0), stamp);
   // A pointer that went down too long ago is not this press.
   assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 5000), stamp);
   // No usable stamp, or one from the future: now.

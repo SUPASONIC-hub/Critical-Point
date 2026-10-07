@@ -229,6 +229,11 @@
   line-height: 1.45;
 }
 
+.gx-codex-note summary {
+  min-height: 24px;
+  cursor: pointer;
+}
+
 .gauntlet-stage .gx-draft-skip {
   margin-left: auto;
   min-height: 38px;
@@ -297,7 +302,8 @@
     0 0 40px var(--c-gx-relic-a30);
   backdrop-filter: blur(14px);
   font: 800 0.875rem/1 var(--font-sans);
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100vw - 24px);
   pointer-events: none;
   transform: translateX(-50%);
   animation: gx-equip-pop 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -462,14 +468,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gx-draft-panel,
-  .gx-draft-hand li,
-  .gx-reveal-unlock,
-  .gx-bank .gx-relic-chip.is-proc,
-  .gx-bank .gx-relic-chip.is-proc::after {
-    animation: none;
-  }
-
   .gx-equip-toast {
     animation: gx-relic-fade 1.4s both !important;
   }

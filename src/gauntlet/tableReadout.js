@@ -38,6 +38,34 @@ export function describeVerdictCause(verdict) {
   return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
 }
 
+/**
+ * What the table says aloud about its clock, in one polite region. The timer
+ * itself is silent to a screen reader, and the tick that marks the last five
+ * seconds is sound, so the clock is called once at ten seconds and once at
+ * five. It is also called when the reading clock ran out and opened the table
+ * by itself: nothing was pressed, the briefing simply went away, and the first
+ * thing a listener heard about a running clock used to be "10초 남았다".
+ */
+export const CLOCK_OPENED_CALL = "읽는 시간이 끝나 판이 열렸다. 시계가 흐른다";
+const CLOCK_OPENED_SECONDS = 5;
+
+export function getClockCall({ live, paused, remaining, elapsed = 0, openedByClock = false }) {
+  if (!live || paused) return "";
+  if (remaining <= 5) return "5초 남았다";
+  if (remaining <= 10) return "10초 남았다";
+  return openedByClock && elapsed < CLOCK_OPENED_SECONDS ? CLOCK_OPENED_CALL : "";
+}
+
+/**
+ * The two notices about another tab. They are drawn in the same place, and
+ * one is the answer to the other: 그 탭에 두기 stops this table, so the
+ * question that offered it comes down as the notice goes up. It used to stay
+ * -- still a modal dialog holding the focus -- with the notice on top of it.
+ */
+export function getTabNotices({ locked, awaitingClaim, live }) {
+  return { lost: Boolean(locked && (live || awaitingClaim)), held: Boolean(awaitingClaim && !locked) };
+}
+
 export function describeEffect(effect = {}, resourceMeta = {}) {
   return Object.entries(effect)
     .filter(([, value]) => Number(value) !== 0)

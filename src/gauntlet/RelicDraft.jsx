@@ -43,7 +43,8 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
   const firstOption = useRef(null);
   const trapTab = useDialogFocus(dialogRef, firstOption);
   const unlockedCount = RELIC_IDS.filter((id) => !RELICS[id].unlock || codex.unlocked.includes(id)).length;
-  const nextLocked = RELIC_IDS.find((id) => RELICS[id].unlock && !codex.unlocked.includes(id));
+  const lockedFeats = RELIC_IDS.filter((id) => RELICS[id].unlock && !codex.unlocked.includes(id)).map((id) => RELICS[id].unlock.text);
+  const codexCount = `도감 ${unlockedCount}/${RELIC_IDS.length}`;
 
   return (
     <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
@@ -96,10 +97,22 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
               );
             })}
           </ol>
-          <small className="gx-codex-note">
-            도감 {unlockedCount}/{RELIC_IDS.length}
-            {nextLocked ? ` · 다음 해금: ${RELICS[nextLocked].unlock.text}` : " · 모두 해금"}
-          </small>
+          {/* Every locked feat, not only the next one. The rest were each in
+              their icon's tooltip, which a touch screen never shows. Folded,
+              so the draft is no taller until it is asked. */}
+          {lockedFeats.length > 1 ? (
+            <details className="gx-codex-note" data-testid="relic-unlock-feats">
+              <summary>
+                {codexCount} · 다음 해금: {lockedFeats[0]} · 나머지 {lockedFeats.length - 1}개 보기
+              </summary>
+              {lockedFeats.slice(1).join(" · ")}
+            </details>
+          ) : (
+            <small className="gx-codex-note">
+              {codexCount}
+              {lockedFeats.length ? ` · 다음 해금: ${lockedFeats[0]}` : " · 모두 해금"}
+            </small>
+          )}
           <button type="button" className="ghost gx-draft-skip" data-testid="relic-skip" aria-keyshortcuts="Escape" onClick={onSkip}>
             고르지 않고 진행
           </button>
