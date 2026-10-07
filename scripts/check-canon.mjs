@@ -292,6 +292,13 @@ export const CANON = [
     find: /변경 신고일은 1월 (\d+)일|철거일이 1월 (\d+)일 금요일/g,
     allow: ["16"],
   },
+  {
+    id: "tower-floors",
+    fact: "르하임 고덕, the 평택 tower, is 22 floors in April and in June",
+    files: /src\/nodes\/case(?:26|31)\.js$/,
+    find: /(\d+)층(?:짜리)? (?:오피스텔|건물)|(\d+)층 중/g,
+    allow: ["22"],
+  },
 ];
 
 const valueOf = (match) => match.slice(1).filter((group) => group !== undefined).map((group) => group.trim()).join(" ");
