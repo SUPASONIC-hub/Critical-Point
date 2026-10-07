@@ -90,6 +90,8 @@ Three of these are reveals, and each still means what it meant:
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
 | 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
 | 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
+| 이민서 | -- | 트리거랩, A-017 on the list of 63 → KD데이터랩 (사건 25) |
+| 에코 | Unnamed in July 2023; the wave on 1번 단말 | 트리거랩's seventh: replaced by 노아 on 2월 1일 00:00 (사건 20), kept only on the 트리거랩 terminal until the dissolution (사건 24), restored 9월 19일 (사건 46) |
 | 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
 
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
@@ -101,6 +103,31 @@ met the analyst by 프롤로그 02. He opens a new page for each matter. The pag
 for this loan starts with one line, '2023-0412 -- 179.6' (4월 15일), and each
 later 프롤로그 adds to that same page: 4월 27일 (two lines), 5월 15일, 6월 9일,
 7월 24일 with the analyst's name.
+
+## 트리거랩's head count
+
+| Count | Who | Where it is stated |
+|---|---|---|
+| 6 | The people of the main season: 분석관, 한서윤, 오진우, 도윤하, 이민서, 반재욱 | 사건 25's 여섯 명의 단체방; 사건 30 |
+| 7 | The six and 에코. 반재욱 writes '트리거랩 7명'; the seventh desk is 에코's terminal | 사건 24 (이민서 counts six, 반재욱 answers "한 명은 에코입니다"); 사건 30 |
+| 5 | The colleagues whose postings are out in 사건 24. The analyst's own comes that night on the 33rd floor, which makes 사건 25's list six | 사건 24, 25 |
+| 9 | 분석관 on the response-record list 노아 learned from: the six of now and three who left before the analyst came or in the analyst's first year. Their records were kept without asking | 사건 20 |
+| 4 | 1기 참가자, 2022, before the lab existed; 참가자 01 is 선우진 | 사건 19, 21 |
+| 13 | The nine and the four: the profiles in the folder on the B2 terminal | 최종 사건 |
+| 63 | 트리거랩 참가자, A-001 to A-063, numbered by 입사 순서: the nine, the four, and fifty who sat at a lab terminal during training. This is the list sold to 핏스코어 for 18억 and leaked as 38만 줄 | 사건 30, 37, 40 |
+
+The three who left are not named in the main season. 프롤로그 05 shows two of
+them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
+is not one of them: she has spent twelve years on the group's side of the table
+(사건 33) and is "처음 보는 사람" to the analyst in 사건 13.
+
+사건 20 has two nines and they are different people. Nine 분석관 are on the
+list; nine people stand in the server room and laugh at 강태민's joke, and
+강태민 is one of them. "실측 아홉 명" is the second.
+
+The two prices are two contracts. 사건 20's is the lab's own transfer to
+KD데이터랩, paid into 그룹전략실's account: nine analysts, 1,200만 원 each. 사건 30's is KD데이터랩's
+sale to 핏스코어 in May: 63 people for 18억, 2,857만 원 each.
 
 ## The harmed
 
