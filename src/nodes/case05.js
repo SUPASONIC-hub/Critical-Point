@@ -35,7 +35,7 @@ export const case05Nodes = {
       {
         id: "c5_start_map",
         label: "누락이 생긴 전체 의사결정 흐름을 그린다",
-        effect: { time: -12, legitimacy: 3, fatigue: 4 },
+        effect: { time: -12, legitimacy: 5, fatigue: 4 },
         voice: "누군가를 지목하기 전에, 실패가 이동한 경로부터 그리자고 한다.",
         echo: "구조를 보는 선택입니다. 다만 구조를 보는 동안 지금 피해를 입는 사람들은 답을 기다립니다.",
         cognition: { inference: 2, persistence: 1 },
@@ -171,7 +171,7 @@ export const case05Nodes = {
       {
         id: "c5_collapse_blame",
         label: "기존 관리자 책임과 현장 보완 교육을 선택한다",
-        effect: { trust: 5, legitimacy: 4, humanCost: -5, fatigue: 2 },
+        effect: { trust: 5, legitimacy: 4, humanCost: -5, fatigue: 3 },
         voice: "사람을 바꾸고 교육을 붙이는, 가장 익숙한 답을 고른다.",
         echo: "익숙한 답은 실행이 쉽습니다. 익숙한 만큼, 다음 누락 때도 같은 답이 다시 나옵니다.",
         cognition: { risk: 1 },

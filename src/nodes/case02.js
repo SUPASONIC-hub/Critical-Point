@@ -169,7 +169,7 @@ export const case02Nodes = {
       {
         id: "c2_pressure_verify",
         label: "30분 안에 반증 가능한 단서 하나만 더 찾는다",
-        effect: { time: -10, trust: 5, legitimacy: 2, fatigue: 4 },
+        effect: { time: -10, trust: 5, legitimacy: 3, fatigue: 4 },
         voice: "결론을 뒤집을 것 하나만 찾겠다며, 남은 30분을 건다.",
         echo: "30분은 반증에는 짧고 변명에는 충분합니다. 못 찾으면 동의한 것으로 기록됩니다.",
         cognition: { persistence: 2, inference: 2 },
