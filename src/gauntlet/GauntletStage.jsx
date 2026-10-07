@@ -32,9 +32,9 @@ import {
   STANCE_MASTERY_GOAL,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
-import { describeEffect, formatMultiplier, formatNumber, getClockCall, getTabNotices, joinRules, useTableForecast } from "./tableReadout.js";
+import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
-import { gradePress, isPressDown } from "./timing.js";
+import { press } from "./timing.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -126,7 +126,7 @@ export function GauntletStage({
   // that will click it at keyup: the click is graded there.
   const pressDownAt = useRef(0);
   const notePress = (event) => {
-    if (isPressDown(event)) pressDownAt.current = event.timeStamp;
+    if (press.down(event)) pressDownAt.current = event.timeStamp;
   };
   const stageRef = useRef(null);
   // The previous verdict is still on screen while the next table mounts under
@@ -197,10 +197,8 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
-  const clockCall = getClockCall({ live, paused, remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed });
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
-  const notices = getTabNotices({ locked, awaitingClaim, live });
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
@@ -381,7 +379,7 @@ export function GauntletStage({
     // Graded against the beat the frame loop last landed. With no beat on
     // screen yet -- the first pulse not in -- the press is ungraded: no combo,
     // no slip.
-    const { grade, widened } = gradePress(event, pressDownAt, beatClock.current, wideBeat);
+    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
     const pushIndex = win.pushes + 1;
     const scored = scoreBeat(win, grade);
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
@@ -399,7 +397,7 @@ export function GauntletStage({
 
   function focus(event) {
     if (!canFocus) return;
-    const { grade, widened } = gradePress(event, pressDownAt, beatClock.current, wideBeat);
+    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
     const scored = scoreFocus(win, grade);
     dispatch({ type: "FOCUS", grade });
     if (widened) pulseRelic("metronome");
@@ -521,7 +519,6 @@ export function GauntletStage({
           >
             <b>{Math.ceil(remaining)}</b>
           </div>
-          <span className="sr-only" role="status">{clockCall}</span>
         </div>
 
         {(tableRules.length > 0 || ruleHeat > 0) && (
@@ -626,24 +623,11 @@ export function GauntletStage({
                   ))}
                 </ul>
               )}
-              {/* The question and the cards in full. On the table both are cut
-                  to a line count, and the briefing page that printed them
-                  whole cannot be opened again once the clock runs. */}
-              {briefOpen && (
-                <>
-                  <p>{scene.question}</p>
-                  <ul>
-                    {[...cards, ...(reframeChoice ? [reframeChoice] : [])].map((card, index) => (
-                      <li key={card.id ?? index}>카드 {index + 1}: {card.label}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
               <ul>
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
                 <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
-                {briefOpen && <TableGlossary mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
+                {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
               </ul>
             </details>
           </div>
@@ -828,8 +812,8 @@ export function GauntletStage({
 
       <TableNotices
         equipped={equipped}
-        lost={notices.lost}
-        held={notices.held}
+        tab={{ locked, awaitingClaim, live }}
+        clock={{ live, paused, remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, grooveBonus, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

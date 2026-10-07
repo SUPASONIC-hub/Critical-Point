@@ -80,3 +80,7 @@ export function createLightGate(minMs) {
     return asked && lit;
   };
 }
+
+// The two halves of a timed press, under one name for the stage: when it went
+// down, and how it is graded.
+export const press = { down: isPressDown, grade: gradePress };
