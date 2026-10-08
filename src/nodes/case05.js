@@ -383,7 +383,7 @@ export const case05 = {
           echo: "자리를 지키게 하는 보장은 비싸고, 다음 증언자를 만듭니다.",
         },
         {
-          label: "증언 뒤에 즉시 조직을 바꾼다",
+          label: "증언 직후에 조직을 바꾼다",
           effect: { legitimacy: 8, capital: -6, time: -6, fatigue: 7 },
           voice: "증언 직후에 조직을 바꾸겠습니다.",
           echo: "증언 뒤의 개편은 빠르지만 그 사람은 개편의 이유가 됩니다.",

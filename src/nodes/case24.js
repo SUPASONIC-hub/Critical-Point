@@ -148,9 +148,9 @@ export const case24Nodes = {
       },
       {
         id: "c24_rooftop_tell",
-        label: "들은 절반부터 곧장 동료들에게 알린다",
+        label: "들은 절반부터 동료들에게 알린다",
         effect: { trust: 8, legitimacy: 4, time: -3, humanCost: 3, fatigue: 3 },
-        voice: "제 기록이 인사부로 갔다는 것은 다들 알아야 한다며, 들은 절반부터 곧장 동료들에게 알린다.",
+        voice: "제 기록이 인사부로 갔다는 것은 다들 알아야 한다며, 들은 절반부터 동료들에게 알린다.",
         echo: "알리면 동료들은 화를 내는 대신 한서윤을 찾으러 옥상으로 올라옵니다. 한서윤은 나머지 절반을 더 말하기 어려워집니다.",
         cognition: { risk: 2 },
       },

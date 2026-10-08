@@ -133,9 +133,9 @@ export const case42Nodes = {
     choices: [
       {
         id: "c42_karaoke_run",
-        label: "노래방을 나와 여다인에게 곧장 달려간다",
+        label: "노래방을 나와 여다인에게 달려간다",
         effect: { trust: 11, humanCost: -5, time: -5, capital: -2, fatigue: 5 },
-        voice: "그 문자를 혼자 읽고 있을 사람이 먼저라, 노래방을 나와 여다인에게 곧장 달려간다.",
+        voice: "그 문자를 혼자 읽고 있을 사람이 먼저라, 노래방을 나와 여다인에게 달려간다.",
         echo: "달려가면 노래방 5번 방에는 나준혁의 100점 화면만 남습니다. 여다인은 관리동 계단에 휴대폰을 쥐고 앉아 있습니다.",
         cognition: { persistence: 2 },
       },

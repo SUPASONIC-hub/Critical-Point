@@ -216,7 +216,7 @@ for (const { nodeId, choice } of playableChoices) {
  * offender, and the ceiling comes down as cards are fixed.
  */
 const RUNTIME_DOMINANCE_CEILING = 0;
-const CLOCK_MISMATCH_CEILING = 69;
+const CLOCK_MISMATCH_CEILING = 54;
 for (const [name, found, ceiling] of [
   ["runtime cards that beat, or lose to, a written card going the same way", runtimeDominance, RUNTIME_DOMINANCE_CEILING],
   ["labels that disagree with what the card does to the clock", clockMismatches, CLOCK_MISMATCH_CEILING],
