@@ -13,10 +13,10 @@ import { createSeasonCases, decideCaseCardPress } from "../../src/viewModels/sea
 const [first, second, third] = seasonCasesBase.map((caseItem) => caseItem.id);
 
 /** The roadmap as the intro builds it, and the press on one of its cards. */
-function pressOn(caseId, { currentCase, completedCases = [], hasResumableSave = true, logLength = 0 }) {
+function pressOn(caseId, { currentCase, completedCases = [], atReport = false, hasResumableSave = true, logLength = 0 }) {
   const cards = createSeasonCases({ seasonCasesBase, completedCases, currentCase, hasRun: hasResumableSave });
   const { status } = cards.find((card) => card.id === caseId);
-  return decideCaseCardPress({ caseId, status, currentCase, completedCases, hasResumableSave, logLength });
+  return decideCaseCardPress({ caseId, status, currentCase, atReport, hasResumableSave, logLength });
 }
 
 test("a visitor with no run is not told the first case is in progress", () => {
@@ -48,11 +48,22 @@ test("another card opens without a question when nothing has been chosen yet", (
 
 test("the next case opens without a question from a closed one", () => {
   // The run stands on the report of the case it just closed; its record is kept in the summary.
-  assert.equal(pressOn(third, { currentCase: second, completedCases: [first, second], logLength: 9 }), "open");
+  assert.equal(pressOn(third, { currentCase: second, completedCases: [first, second], atReport: true, logLength: 9 }), "open");
+  assert.equal(pressOn(first, { currentCase: second, completedCases: [first, second], atReport: true, logLength: 9 }), "open");
+});
+
+test("another card asks before it throws a replay of a closed case away", () => {
+  // 사건 second was closed and is being played again: three choices in, off its report.
+  const replay = { currentCase: second, completedCases: [first, second], atReport: false };
+  assert.equal(pressOn(third, { ...replay, logLength: 3 }), "replace");
+  assert.equal(pressOn(first, { ...replay, logLength: 3 }), "replace");
+  // Reopened and nothing chosen yet: there is nothing to lose.
+  assert.equal(pressOn(third, { ...replay, logLength: 0 }), "open");
 });
 
 test("the card of the closed case the run stands on asks before starting it over", () => {
-  assert.equal(pressOn(second, { currentCase: second, completedCases: [first, second], logLength: 9 }), "restart");
+  assert.equal(pressOn(second, { currentCase: second, completedCases: [first, second], atReport: true, logLength: 9 }), "restart");
+  assert.equal(pressOn(second, { currentCase: second, completedCases: [first, second], atReport: false, logLength: 3 }), "restart");
 });
 
 test("a card the season has not reached does nothing", () => {

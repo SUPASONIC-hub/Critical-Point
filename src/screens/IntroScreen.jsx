@@ -60,6 +60,15 @@ const CONFIRM_START_OVER = "저장된 진행을 지우고 첫 사건부터 새�
 const CONFIRM_START_NEW_GAME_PLUS = "저장된 진행을 지우고 NEW GAME+로 새로 시작할까요? 복구 지점은 남습니다.";
 const CONFIRM_REPLACE_CASE = "진행 중인 사건의 선택 기록을 지우고 이 사건을 열까요? 완료한 사건의 기록은 남습니다.";
 const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요? 지금 판의 선택 기록은 지워집니다.";
+// The consent box is ticked from the first visit and sits in a closed drawer,
+// so the page says so where the eye already is: by the button that starts the
+// sending. It names the drawer the way out is in, and the name opens it: a
+// closed <details> is not scrolled to by its own anchor in every browser.
+const DATA_DRAWER_ID = "data-info";
+function openDataDrawer() {
+  const drawer = document.getElementById(DATA_DRAWER_ID);
+  if (drawer) drawer.open = true;
+}
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -103,7 +112,7 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     season: {
       seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
-      resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText,
+      resourceMeta, seasonCases, caseResults, currentCase, atReport, startCase, getCaseStatusText,
       normalizeCaseSummary,
     },
     content: {
@@ -157,7 +166,7 @@ export function IntroScreen({ view, renderers = {} }) {
   // record away asks first (decideCaseCardPress has the cases).
   const pressCaseCard = (caseItem) => {
     const press = decideCaseCardPress({
-      caseId: caseItem.id, status: caseItem.status, currentCase, completedCases, hasResumableSave, logLength: log.length,
+      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: log.length,
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();
@@ -184,6 +193,13 @@ export function IntroScreen({ view, renderers = {} }) {
       <ChevronRight size={18} />
       첫 케이스 시작
     </button>
+  );
+  // Only while it is true: unticked, or built with no backend, nothing is sent.
+  const consentLine = dataConsent && telemetryEnabled && (
+    <small className="consent-note" data-testid="consent-line">
+      플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래{" "}
+      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>에서 끌 수 있습니다.
+    </small>
   );
   const resumePanel = (
     <div className="resume-panel">
@@ -294,9 +310,13 @@ export function IntroScreen({ view, renderers = {} }) {
                   <a className="intro-briefing-link" href="#case-access-setup">
                     브리핑 먼저 보기
                   </a>
+                  {consentLine}
                 </div>
               )}
               <CloudSavePanel />
+              {/* The resume card has no row for it, so with a save it reads
+                  under the fold that follows the card. */}
+              {hasResumableSave && consentLine}
               <dl className="intro-stats">
                 <div>
                   <dt>사건</dt>
@@ -582,7 +602,7 @@ export function IntroScreen({ view, renderers = {} }) {
           {/* The summary text stays visible: the box starts ticked, and this
               drawer is never nested inside another closed one, so the notice
               and the way out are always one deliberate click away. */}
-          <details className="intro-drawer">
+          <details className="intro-drawer" id={DATA_DRAWER_ID}>
             <summary>
               <h2>데이터 저장 안내</h2>
             </summary>

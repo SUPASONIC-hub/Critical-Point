@@ -1,6 +1,6 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 
-import { BOARD_WRITER_ID_KEY } from "../src/appConfig.js";
+import { BOARD_POST_MAX_LENGTH, BOARD_WRITER_ID_KEY, PLAYER_NAME_MAX_LENGTH } from "../src/appConfig.js";
 
 /**
  * The two screens that show what other players sent: the 참가자 게시판 and the
@@ -90,6 +90,121 @@ test("the board takes a post, says so aloud, and files it under its own id", asy
   await page.getByRole("button", { name: "글 남기기" }).click();
   await expect(status).toContainText("링크가 들어간 글은 올릴 수 없습니다");
   expect(written).toHaveLength(1);
+});
+
+// The server takes the same words from the same device again for six hours and
+// stores nothing. The page remembered its posts only until it was reloaded.
+test("the same words posted again after a reload are not sent, and the person is told", async ({ page }) => {
+  const written = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, async (route) => {
+    if (route.request().method() !== "POST") return route.fulfill(json([]));
+    written.push(route.request().postDataJSON());
+    return route.fulfill({ status: 201, body: "" });
+  });
+  await useMockSupabase(page);
+  await page.clock.install();
+  await openBoard(page);
+  const status = page.getByTestId("board-post-status");
+  await page.getByPlaceholder("게시판에 보일 이름").fill("분석관 김");
+  await page.getByPlaceholder(/사건을 지나며/).fill("끝까지 왔습니다.");
+  await page.clock.runFor(4_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(status).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(1);
+
+  await page.reload();
+  await page.getByRole("button", { name: "게시판" }).first().click();
+  await expect(page.locator(".board-page")).toBeVisible();
+  await expect(page.getByPlaceholder("게시판에 보일 이름")).toHaveValue("분석관 김");
+  await page.getByPlaceholder(/사건을 지나며/).fill("끝까지 왔습니다.");
+  await page.clock.runFor(4_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(page.getByTestId("board-post-status")).toContainText("같은 글을 이미 올렸습니다");
+  await expect(page.getByPlaceholder(/사건을 지나며/), "the words are still in the box").toHaveValue("끝까지 왔습니다.");
+  expect(written, "nothing was sent to be dropped").toHaveLength(1);
+
+  // Other words from the same device go up.
+  await page.getByPlaceholder(/사건을 지나며/).fill("다른 말도 남깁니다.");
+  await page.clock.runFor(31_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(page.getByTestId("board-post-status")).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(2);
+});
+
+/** A board that takes every post and keeps what it was sent. */
+async function boardThatTakesPosts(page) {
+  const written = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, async (route) => {
+    if (route.request().method() !== "POST") return route.fulfill(json([]));
+    written.push(route.request().postDataJSON());
+    return route.fulfill({ status: 201, body: "" });
+  });
+  await useMockSupabase(page);
+  return written;
+}
+
+// The server takes one post per thirty seconds from a device. A second post
+// inside them is stopped on the page, with the seconds left, and keeps its words.
+test("a second post inside thirty seconds is refused with the wait, and goes up after it", async ({ page }) => {
+  const written = await boardThatTakesPosts(page);
+  await page.clock.install();
+  await openBoard(page);
+  const status = page.getByTestId("board-post-status");
+  const body = page.getByPlaceholder(/사건을 지나며/);
+  const submit = page.getByRole("button", { name: "글 남기기" });
+  await page.getByPlaceholder("게시판에 보일 이름").fill("분석관 김");
+  await body.fill("첫 번째 글입니다.");
+  await page.clock.runFor(4_000);
+  await submit.click();
+  await expect(status).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(1);
+
+  await body.fill("두 번째 글입니다.");
+  await page.clock.runFor(10_000);
+  await submit.click();
+  await expect(status).toContainText("글은 30초에 한 번만 올릴 수 있습니다");
+  // Ten of the thirty seconds have gone, so about twenty are named.
+  const waitSeconds = Number((await status.textContent()).match(/(\d+)초 뒤에/)?.[1]);
+  expect(waitSeconds).toBeGreaterThanOrEqual(15);
+  expect(waitSeconds).toBeLessThanOrEqual(20);
+  await expect(body, "the refused words stay in the box").toHaveValue("두 번째 글입니다.");
+  expect(written, "nothing was sent inside the wait").toHaveLength(1);
+
+  await page.clock.runFor(21_000);
+  await submit.click();
+  await expect(status).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(2);
+  expect(written[1].body).toBe("두 번째 글입니다.");
+});
+
+// The limits the trigger holds: a name of 24, a post of 300. The fields stop
+// there, the counters say so, and what is sent is inside both.
+test("the name stops at 24 characters and the post at 300, and that is what is sent", async ({ page }) => {
+  const written = await boardThatTakesPosts(page);
+  await page.clock.install();
+  await openBoard(page);
+  const name = page.getByPlaceholder("게시판에 보일 이름");
+  const body = page.getByPlaceholder(/사건을 지나며/);
+  await expect(name).toHaveAttribute("maxlength", String(PLAYER_NAME_MAX_LENGTH));
+  await expect(body).toHaveAttribute("maxlength", String(BOARD_POST_MAX_LENGTH));
+
+  // fill() sets the value without the browser's own maxlength, which only
+  // stops typing: what holds a pasted or scripted value is the page's code.
+  await name.fill("가".repeat(PLAYER_NAME_MAX_LENGTH + 10));
+  await body.fill("나".repeat(BOARD_POST_MAX_LENGTH + 50));
+  await expect(name).toHaveValue("가".repeat(PLAYER_NAME_MAX_LENGTH));
+  await expect(body).toHaveValue("나".repeat(BOARD_POST_MAX_LENGTH));
+  await expect(page.locator("#board-nickname-count")).toContainText(`${PLAYER_NAME_MAX_LENGTH}/${PLAYER_NAME_MAX_LENGTH}자`);
+  await expect(page.locator("#board-body-count")).toHaveText(`${BOARD_POST_MAX_LENGTH}/${BOARD_POST_MAX_LENGTH}자`);
+
+  await page.clock.runFor(4_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(page.getByTestId("board-post-status")).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(1);
+  expect(written[0].nickname).toHaveLength(PLAYER_NAME_MAX_LENGTH);
+  expect(written[0].body).toHaveLength(BOARD_POST_MAX_LENGTH);
 });
 
 test("a second person's identical post is told it did not go up", async ({ page }) => {

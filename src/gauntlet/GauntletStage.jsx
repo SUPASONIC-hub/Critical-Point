@@ -155,7 +155,6 @@ export function GauntletStage({
   const paused = hidden || draftOpen || !tableOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
-  const readSeconds = useMemo(() => getReadingSeconds({ ...scene.node, question: scene.question }), [scene.node, scene.question]);
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
   const closedRef = useRef(false);
@@ -208,6 +207,8 @@ export function GauntletStage({
     mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier });
+  // The page prints the changed rules under the scene, so they are on its clock.
+  const readSeconds = useMemo(() => getReadingSeconds({ ...scene.node, question: scene.question }, mutations), [scene.node, scene.question, mutations]);
   // The situation board is three one-line cells, so its copy is written to fit
   // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin

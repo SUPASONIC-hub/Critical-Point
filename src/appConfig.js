@@ -25,9 +25,12 @@ export const CLOUD_SAVE_SYNC_KEY = "critical-point-cloud-sync-v1";
 export const CLOUD_SAVE_RETENTION_DAYS = 180;
 // 참가자 게시판 (src/state/useBoard.js): the nickname the player publishes on
 // the board, kept on the device so the form is typed once rather than every
-// visit. Nothing else about the board is stored locally -- the posts are the
-// server's copy.
+// visit. The posts are the server's copy and are not stored locally.
 export const BOARD_NICKNAME_KEY = "critical-point-board-nickname-v1";
+// When this device last posted which words, as a mark of the words and not the
+// words (readOwnBoardPosts in useBoard.js). Entries are dropped after the six
+// hours the server holds a repeat for.
+export const BOARD_OWN_POSTS_KEY = "critical-point-board-posted-v1";
 // The id the board files this device's posts under; apart from the telemetry
 // session id on purpose (getBoardWriterId in src/telemetry.js).
 export const BOARD_WRITER_ID_KEY = "critical-point-board-id-v1";

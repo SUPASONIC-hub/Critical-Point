@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
+import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
@@ -59,6 +60,46 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   expect(Array.isArray(diagnosticPayload.saveSlots)).toBe(true);
   await page.getByRole("button", { name: /마지막 사건 시작/ }).click();
   await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|모든 기록을 묶은 사람의 마지막 밤|곧장 올라간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
+});
+
+// Closing the finale sends the season's row to the online ranking. The page
+// that opens the finale is the last one before that, and it used to say
+// nothing: the first the player heard was the status line after the send.
+test("the page that opens the finale says the season record will be sent", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case49", "c49_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
+  // The next-case panel is drawn with the report; the notice is inside it.
+  await expect(page.locator(".next-case-panel")).toBeVisible();
+  const notice = page.locator(".next-case-panel").getByTestId("season-record-notice");
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다");
+  await expect(page.getByRole("button", { name: /마지막 사건 시작/ })).toBeVisible();
+});
+
+test("a page that opens an ordinary case says nothing about the season record", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".next-case-panel")).toBeVisible();
+  await expect(page.getByTestId("season-record-notice")).toHaveCount(0);
 });
 
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
@@ -274,6 +315,114 @@ test("hero entry resumes a saved run without clobbering it", { tag: "@prod" }, a
   expect(saved.completedCases).toHaveLength(4);
 });
 
+/**
+ * NEW GAME+. A finished season leaves two things on the device: the button,
+ * and the season's record, which the intro shows. Pressed on the pre-start
+ * shell, the press is handed to the runtime (queueRuntimeStartAction), which
+ * starts the season again from its first scene. Nothing pressed that button in
+ * a browser: the shell once answered it with a plain new game, and only a unit
+ * test of the reducer would have noticed.
+ */
+const FINISHED_SEASON = { case01: { outcomeChoiceId: "c1_public" }, final: { outcomeChoiceId: "f_archive_seal" } };
+
+async function seedFinishedSeason(page, save = null) {
+  await page.addInitScript(
+    ({ unlockedKey, memoryKey, memory, saveText }) => {
+      // Once a tab: the reloads below have to find what the page itself wrote.
+      if (sessionStorage.getItem("e2e-seeded")) return;
+      sessionStorage.setItem("e2e-seeded", "1");
+      localStorage.clear();
+      localStorage.setItem(unlockedKey, "true");
+      localStorage.setItem(memoryKey, memory);
+      if (saveText) localStorage.setItem("trigger-prototype-v2", saveText);
+    },
+    { unlockedKey: NEW_GAME_PLUS_KEY, memoryKey: NEW_GAME_PLUS_MEMORY_KEY, memory: JSON.stringify(FINISHED_SEASON), saveText: save ? JSON.stringify(save) : null },
+  );
+}
+
+test("NEW GAME+ starts the season again and keeps the finished one on the intro", { tag: "@prod" }, async ({ page }) => {
+  const asked = acceptConfirms(page);
+  await seedFinishedSeason(page);
+  await page.goto("/");
+  const memory = page.locator(".past-run-memory");
+  await expect(memory).toContainText("PAST RUN MEMORY");
+  await expect(memory).toContainText("이전 기록에서");
+  const button = page.getByRole("button", { name: "NEW GAME+ 시작" });
+  await expect(button).toBeVisible();
+
+  await button.click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // No run was there to lose, so nothing was asked.
+  expect(asked).toEqual([]);
+  // The table is on the screen a moment before its save is: waited for, not read once.
+  const readSave = () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null"));
+  await expect.poll(async () => (await readSave())?.started, { timeout: TRANSITION_TIMEOUT_MS }).toBe(true);
+  const saved = await readSave();
+  expect(saved.started).toBe(true);
+  expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);
+  expect(saved.nodeId).toBe(CASE_START_NODES[CASE_SEQUENCE[0]]);
+  expect(saved.completedCases).toEqual([]);
+  expect(saved.log).toEqual([]);
+  // The season it came from is still on the device, whole.
+  expect(await page.evaluate((key) => localStorage.getItem(key), NEW_GAME_PLUS_KEY)).toBe("true");
+  expect(JSON.parse(await page.evaluate((key) => localStorage.getItem(key), NEW_GAME_PLUS_MEMORY_KEY))).toEqual(FINISHED_SEASON);
+});
+
+test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the run alone", { tag: "@prod" }, async ({ page }) => {
+  const run = {
+    saveSchemaVersion: 2,
+    runId: "e2e-ngplus-guard",
+    playerName: "E2E",
+    started: false,
+    paused: true,
+    currentCase: "case05",
+    nodeId: "c5_voice",
+    completedCases: ["case01", "case02", "case03", "case04"],
+    discoveredClues: [],
+    log: [{ nodeId: "c5_start", choiceId: "seed" }],
+    pendingTelemetry: [],
+    caseResults: {},
+    playtestFeedback: {},
+    resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 },
+    triggers: {},
+    cognition: {},
+  };
+  await seedFinishedSeason(page, run);
+  const asked = [];
+  let answer = false;
+  page.on("dialog", (dialog) => {
+    asked.push(dialog.message());
+    return answer ? dialog.accept() : dialog.dismiss();
+  });
+  await page.goto("/");
+  await expect(page.getByTestId("resume-save")).toBeVisible();
+  const button = page.getByRole("button", { name: "NEW GAME+ 시작" });
+
+  await button.click();
+  await expect.poll(() => asked.length).toBe(1);
+  expect(asked[0]).toContain("NEW GAME+로 새로 시작할까요");
+  // Answered no: the intro is still up and the run is as it was.
+  await expect(page.getByTestId("resume-save")).toBeVisible();
+  await expect(page.getByTestId("opening-burst")).toHaveCount(0);
+  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.runId).toBe("e2e-ngplus-guard");
+  expect(saved.currentCase).toBe("case05");
+  expect(saved.completedCases).toHaveLength(4);
+
+  answer = true;
+  await button.click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  expect(asked).toHaveLength(2);
+  // The new run's save lands a moment after its table does.
+  await expect
+    .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")))?.currentCase, { timeout: TRANSITION_TIMEOUT_MS })
+    .toBe(CASE_SEQUENCE[0]);
+  saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  expect(saved.runId).not.toBe("e2e-ngplus-guard");
+  expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);
+  expect(saved.completedCases).toEqual([]);
+});
+
 // A preference write goes through persist(), which materialises a full save
 // when none exists. That save must not turn the hero into a resume button for
 // a run that never happened.
@@ -282,12 +431,53 @@ test("a consent tick does not turn the hero into a resume button", { tag: "@prod
   await page.goto("/");
   await openIntroDrawer(page, ".data-info-panel");
   const consentCheckbox = page.locator(".consent-box input");
-  await consentCheckbox.check({ force: true });
-  await consentCheckbox.uncheck({ force: true });
+  // The box starts ticked, so check() first was a press that pressed nothing
+  // (and `force` hid that): the two writes are an untick and a tick.
+  await expect(consentCheckbox).toBeChecked();
+  await consentCheckbox.uncheck();
+  await expect(consentCheckbox).not.toBeChecked();
+  await consentCheckbox.check();
+  await expect(consentCheckbox).toBeChecked();
+  // The preference was written: there is a save, and it is not a run.
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.dataConsent)).toBe(true);
 
   await page.reload();
   await expect(page.getByTestId("start-first-case")).toBeVisible();
   await expect(page.getByTestId("resume-save")).toHaveCount(0);
+});
+
+// The box is ticked on a first visit and lives in a closed drawer. The line by
+// the start button is the only thing a person who never opens the drawer is
+// told, so it has to be there exactly while records would be sent.
+test("the start button says play records are sent, for as long as they are", { tag: "@prod" }, async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/");
+  const line = page.locator(".intro-launch").getByTestId("consent-line");
+  await expect(line).toBeVisible();
+  await expect(line).toContainText("익명 전송");
+  await expect(line).toContainText("데이터 저장 안내");
+  // Said without opening anything.
+  await expect(page.locator(".data-info-panel")).toBeHidden();
+
+  // The drawer's name in the line opens the drawer and brings the box to the screen.
+  const consentCheckbox = page.locator(".consent-box input");
+  await line.getByRole("link", { name: "데이터 저장 안내" }).click();
+  await expect(page.locator(".data-info-panel")).toBeVisible();
+  await expect(consentCheckbox).toBeInViewport();
+  await expect(consentCheckbox).toBeChecked();
+  await consentCheckbox.uncheck();
+  await expect(page.getByTestId("consent-line")).toHaveCount(0);
+  await consentCheckbox.check();
+  await expect(line).toBeVisible();
+});
+
+test("a build with no backend does not say records are sent", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(page.getByTestId("consent-line")).toHaveCount(0);
 });
 
 test("representative branch choices advance without browser runtime errors", async ({ page }) => {
@@ -408,7 +598,7 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
   await page.locator(".gx-card-wild").click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
-  await page.getByTestId("decision-next").click({ force: true });
+  await page.getByTestId("decision-next").click();
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
     .toBe("c1_route_system");
@@ -1529,7 +1719,9 @@ test("pending telemetry retries after a failed Supabase response", async ({ page
 });
 
 test("telemetry retry keeps the queue when storage commit fails", async ({ page }) => {
+  let posts = 0;
   await page.route("https://e2e.supabase.co/**", async (route) => {
+    if (route.request().method() === "POST") posts += 1;
     await route.fulfill({
       status: 201,
       contentType: "application/json",
@@ -1576,8 +1768,12 @@ test("telemetry retry keeps the queue when storage commit fails", async ({ page 
   });
   await page.goto("/");
   await expect(page.getByText(/원격 저장 대기열 변경을 반영하지 못했습니다/)).toBeVisible({ timeout: 10_000 });
-  const pendingLength = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")).pendingTelemetry.length);
-  expect(pendingLength).toBe(1);
+  // The row was sent, and the save could not be told so. Reading the save back
+  // proved nothing -- this test is what stops it being written -- so what is
+  // held is what the kept row means: the next load sends it again.
+  expect(posts).toBe(1);
+  await page.reload();
+  await expect.poll(() => posts, { timeout: 10_000 }).toBe(2);
 });
 
 test("consent opt-out failure keeps consent and pending telemetry intact", async ({ page }) => {
@@ -1621,12 +1817,16 @@ test("consent opt-out failure keeps consent and pending telemetry intact", async
   await openIntroDrawer(page, ".data-info-panel");
   const consentCheckbox = page.locator(".consent-box input");
   await expect(consentCheckbox).toBeChecked();
-  await consentCheckbox.click({ force: true });
+  await consentCheckbox.click();
   await expect(consentCheckbox).toBeChecked();
   await expect(page.getByText(/동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다/)).toBeVisible();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
-  expect(saved.dataConsent).toBe(true);
-  expect(saved.pendingTelemetry.length).toBe(1);
+  // The save itself cannot have changed (this test refuses every write to it),
+  // so it is not read back. What the page holds is what counts: the box is
+  // still ticked above, and after a reload it is the same page -- ticked, with
+  // the row still waiting to be sent.
+  await page.reload();
+  await openIntroDrawer(page, ".data-info-panel");
+  await expect(page.locator(".consent-box input")).toBeChecked();
 });
 
 test("delayed telemetry failure does not overwrite newer saved progress", async ({ page }) => {
@@ -1664,7 +1864,8 @@ test("delayed telemetry failure does not overwrite newer saved progress", async 
 
   await page.goto("/?debug=1");
   await openIntroDrawer(page, ".data-info-panel");
-  await page.locator(".consent-box input").check({ force: true });
+  // Ticked from the first visit; check() on it was a press that could not fail.
+  await expect(page.locator(".consent-box input")).toBeChecked();
   await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
   await playtestRequestSeenPromise;

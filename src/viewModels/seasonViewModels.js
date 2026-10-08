@@ -31,7 +31,10 @@ export function createSeasonCases({ seasonCasesBase, completedCases, currentCase
  *
  *   "resume"   the card of the case in progress goes back to where it stands;
  *   "replace"  another card, while a case in progress has choices on record,
- *              asks before that record is thrown away;
+ *              asks before that record is thrown away. A closed case being
+ *              played again is a case in progress: until 2026-10-08 the
+ *              question was asked only of a case not yet closed, and a replay
+ *              three scenes in was dropped by a press on any other card;
  *   "restart"  the card of the closed case the run still stands on (its report,
  *              or a replay of it) asks before starting it over, as the report's
  *              own 다시 도전 does;
@@ -40,12 +43,16 @@ export function createSeasonCases({ seasonCasesBase, completedCases, currentCase
  *
  * `status` is the card's own, from createSeasonCases above. Every card used to
  * open, so the card that said "진행 중" restarted the case it named.
+ *
+ * `atReport` is whether the run stands on a case's report. The choices on
+ * record there are already in that case's summary, so nothing is lost; anywhere
+ * else they are the only copy.
  */
-export function decideCaseCardPress({ caseId, status, currentCase, completedCases = [], hasResumableSave = false, logLength = 0 }) {
+export function decideCaseCardPress({ caseId, status, currentCase, atReport = false, hasResumableSave = false, logLength = 0 }) {
   if (status === "LOCKED") return "locked";
   if (!hasResumableSave) return "open";
   if (caseId === currentCase) return status === "PLAYING" ? "resume" : logLength > 0 ? "restart" : "open";
-  return logLength > 0 && !completedCases.includes(currentCase) ? "replace" : "open";
+  return logLength > 0 && !atReport ? "replace" : "open";
 }
 
 export function createLocalLeaderboardRows({

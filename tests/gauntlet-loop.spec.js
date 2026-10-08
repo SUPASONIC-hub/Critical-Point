@@ -1,4 +1,5 @@
 import { expect, test } from "./helpers/network.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -26,7 +27,15 @@ async function pushUntilBust(page) {
   const stage = page.getByTestId("gauntlet-stage");
   for (let press = 0; press < 20; press += 1) {
     if ((await stage.getAttribute("data-status")) !== "live") break;
-    await page.getByTestId("commit-push").click();
+    // The table can close between the read above and the press -- its own
+    // clock runs out, and that is a bust too. The button is then disabled, and
+    // a press with no limit waited on it until the test timed out (seen on the
+    // phone project, late in a run of the whole file, 2026-10-08). A press that
+    // cannot land is let go; the status below is what is asserted.
+    await page
+      .getByTestId("commit-push")
+      .click({ timeout: 2_000 })
+      .catch(() => {});
   }
   await expect(stage).toHaveAttribute("data-status", "bust");
 }
@@ -513,6 +522,12 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   // The page's own clock, driven from here. This test used to wait on the wall
   // clock -- up to twenty seconds for a reading time that is twelve to
   // thirty-five, so a longer scene body would have failed it.
+  //
+  // Thirty seconds of the page's clock is about 1,800 frames, each one drawn:
+  // that alone took 30 to 52 seconds here on 2026-10-08, and late in a run of
+  // the whole file it passed the default sixty and the test died mid-wait on
+  // whichever line it had reached (Chromium at one line, the phone at another).
+  test.setTimeout(150_000);
   await page.clock.install();
   await startDebugNode(page, "case01", "start", { openTable: false });
   const briefing = page.getByTestId("scene-briefing");
@@ -546,4 +561,127 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
   await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
+});
+
+/**
+ * 번쩍임·흔들림 줄이기, on a page. What the setting does to a frame is held
+ * without a browser (tests/unit/table-motion.test.mjs), and what its rules say
+ * is read from the sheet; neither shows that the two meet on a real table --
+ * that the attribute is on <html>, the rules win the cascade against the
+ * table's own, and the frame loop is the one writing the variables.
+ */
+const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
+
+/** Every element and pseudo-element on the stage that is animating, by name. */
+function animatingOnStage(page) {
+  return page.evaluate(() => {
+    const found = [];
+    for (const element of document.querySelectorAll(".gauntlet-stage *")) {
+      for (const pseudo of [null, "::before", "::after"]) {
+        const name = getComputedStyle(element, pseudo).animationName;
+        if (name === "none") continue;
+        found.push({ who: `${element.tagName.toLowerCase()}.${String(element.getAttribute("class") ?? "").split(/\s+/).join(".")}${pseudo ?? ""}`, name, exempt: !pseudo && (element.matches(".gx-grade, .gx-equip-toast") || Boolean(element.closest(".gx-plate"))) });
+      }
+    }
+    return found;
+  });
+}
+
+/** Presses 밀기 on a beat and returns the grade label it earned, as the page drew it. */
+function pushOnTheBeat(page) {
+  return page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const stage = document.querySelector("[data-testid='gauntlet-stage']");
+        const started = performance.now();
+        let pressed = false;
+        const check = () => {
+          const label = document.querySelector(".gx-grade");
+          if (label) {
+            const style = getComputedStyle(label);
+            resolve({ grade: label.className.match(/gx-grade-(\w+)/)?.[1] ?? "", animation: style.animationName, seconds: Number.parseFloat(style.animationDuration), opacity: Number(style.opacity) });
+            return;
+          }
+          if (performance.now() - started > 8000) return resolve(null);
+          if (!pressed && getComputedStyle(stage.querySelector(".gx-push")).getPropertyValue("--gx-beat-zone").trim() === "1") {
+            pressed = true;
+            document.querySelector("[data-testid='commit-push']").click();
+          }
+          requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+}
+
+test("calm effects still the stage on a real table: only the two fades animate, nothing shakes, and a flash is a third", async ({ page }) => {
+  // The table as it is without the setting, so the checks below are known to
+  // be able to fail: a bust animates the stage (the heat wash, the two flashes,
+  // the slam), and those are among the rules the setting has to beat.
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await expect(page.locator("html")).not.toHaveAttribute("data-calm-effects", "");
+  await pushUntilBust(page);
+  await expect(page.locator(".gx-slam-bust")).toBeVisible();
+  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt).length, { message: "an ordinary bust animates the stage" }).toBeGreaterThan(0);
+
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ calmEffects: true }) });
+  await openTable(page, "case01", "start");
+  await expect(page.locator("html")).toHaveAttribute("data-calm-effects", "");
+  await page.locator(".choices .choice").first().click();
+  await expect(page.locator(".gx-card.selected")).toBeVisible();
+  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt), { message: "nothing on a calm stage animates but the grade, the toast and the plate" }).toEqual([]);
+
+  // The frame loop's variables, watched on the elements that read them for as
+  // long as the table is played: the largest flash and the largest shake.
+  await page.evaluate(() => {
+    const seen = { flash: 0, shake: 0, frames: 0 };
+    window.__fxSeen = seen;
+    const number = (selector, name) => Math.abs(Number.parseFloat(getComputedStyle(document.querySelector(selector) ?? document.body).getPropertyValue(name)) || 0);
+    const watch = () => {
+      seen.frames += 1;
+      seen.flash = Math.max(seen.flash, number(".gx-fx-flash", "--gx-flash"));
+      seen.shake = Math.max(seen.shake, number(".gx-table", "--gx-shake-x"), number(".gx-table", "--gx-shake-y"));
+      requestAnimationFrame(watch);
+    };
+    requestAnimationFrame(watch);
+  });
+
+  // One of the two fades: the grade a push earned still fades out over its 0.7s.
+  const grade = await pushOnTheBeat(page);
+  expect(grade, "a push is graded where the player can see it").not.toBeNull();
+  expect(grade).toMatchObject({ animation: "gx-relic-fade", seconds: 0.7 });
+  expect(Object.keys(GRADE_FLASH)).toContain(grade.grade);
+  // That push flashed, at a third of what its grade flashes.
+  await expect.poll(() => page.evaluate(() => window.__fxSeen.flash)).toBeGreaterThan(0);
+  const afterPush = await page.evaluate(() => ({ ...window.__fxSeen }));
+  expect(afterPush.flash, `a ${grade.grade} push flashes at a third of ${GRADE_FLASH[grade.grade]}`).toBeLessThanOrEqual(GRADE_FLASH[grade.grade] / 3 + 0.005);
+
+  await pushUntilBust(page);
+  await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-bust/);
+  await expect(page.locator(".gx-slam-bust")).toBeVisible();
+  // The bust is the hardest hit the table has (an impact of 1). A few frames
+  // on, so the frames that would have carried it have been drawn.
+  const framesAtBust = await page.evaluate(() => window.__fxSeen.frames);
+  await expect.poll(() => page.evaluate(() => window.__fxSeen.frames)).toBeGreaterThan(framesAtBust + 10);
+  const seen = await page.evaluate(() => ({ ...window.__fxSeen }));
+  expect(seen.shake, "the table never moved, through the bust").toBe(0);
+  expect(seen.flash, "no flash passed a third of full").toBeLessThanOrEqual(1 / 3 + 0.005);
+  // The stage is still: the bust's own animations are off too.
+  expect((await animatingOnStage(page)).filter((entry) => !entry.exempt), "nothing animates on a calm bust").toEqual([]);
+  expect(await page.locator(".gx-table").evaluate((table) => getComputedStyle(table).transform), "the table is not moved").toBe("none");
+});
+
+test("calm effects keep the equip toast, fading", async ({ page }) => {
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ calmEffects: true }) });
+  await closeCaseOneIntoDraft(page);
+  await expect(page.locator("html")).toHaveAttribute("data-calm-effects", "");
+  await page.keyboard.press("1");
+  const toast = page.getByTestId("relic-equipped");
+  await expect(toast).toBeVisible();
+  const style = await toast.evaluate((element) => ({ animation: getComputedStyle(element).animationName, seconds: Number.parseFloat(getComputedStyle(element).animationDuration) }));
+  // The other fade: it leaves by fading and for long enough to be read, where
+  // the stage's blanket rule would have removed its exit altogether.
+  expect(style.animation).toBe("gx-relic-fade");
+  expect(style.seconds).toBeGreaterThanOrEqual(1);
 });
