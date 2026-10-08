@@ -46,18 +46,26 @@ test("a written card may not lose on every axis to a card the runtime deals to t
   assert.match(said, /runtime cards that beat, or lose to, a written card going the same way, over the \d+ allowed/);
 });
 
-test("a label that waits may not gain time, and one that acts at once may not lose it", async () => {
-  const card = Object.values(nodes).flatMap((node) => node.choices).find((choice) => choice.type !== "reframe" && (choice.effect?.time ?? 0) > 0 && !/기다|미루|미룬|보류|바로|즉시|곧장/.test(choice.label));
-  const waits = await balanceCheckAfter(() => swap(card, "label", "결과가 나올 때까지 하루 더 기다린다"));
-  assert.match(waits, new RegExp(`${card.id} waits and gains time`));
-  assert.match(waits, /labels that disagree with what the card does to the clock, over the \d+ allowed/);
+test("on the season, a label that only puts a thing off or acts at once may not lose time", async () => {
+  // The reading itself is held on made-up cards in balance-rules.test.mjs;
+  // this holds that the check asks it of every card the season deals.
+  const plain = /기다|미루|미룬|보류|유예|늦추|늦춘|연기|뒤로 돌리|바로|즉시|곧장/;
+  const cards = Object.values(nodes).flatMap((node) => node.choices).filter((choice) => choice.type !== "reframe" && !plain.test(choice.label));
+  const spender = cards.find((choice) => (choice.effect?.time ?? 0) < 0);
+  const gainer = cards.find((choice) => (choice.effect?.time ?? 0) > 0);
 
-  const spender = Object.values(nodes).flatMap((node) => node.choices).find((choice) => choice.type !== "reframe" && (choice.effect?.time ?? 0) < 0 && !/기다|미루|미룬|보류|바로|즉시|곧장/.test(choice.label));
+  const putsOff = await balanceCheckAfter(() => swap(spender, "label", "명단 공개를 미룬다"));
+  assert.match(putsOff, new RegExp(`${spender.id} only puts a thing off and loses time`));
+  assert.match(putsOff, /labels that disagree with what the card does to the clock, over the \d+ allowed/);
+
   const now = await balanceCheckAfter(() => swap(spender, "label", "서류를 즉시 넘긴다"));
   assert.match(now, new RegExp(`${spender.id} acts at once and loses time`));
 
+  // Putting a thing off buys today, and a second act can spend it.
+  assert.equal(await balanceCheckAfter(() => swap(gainer, "label", "명단 공개를 미룬다")), "");
+  assert.equal(await balanceCheckAfter(() => swap(spender, "label", "명단 공개는 미루고 서류부터 대조한다")), "");
   // A label that refuses the word is not read as saying it.
-  assert.equal(await balanceCheckAfter(() => swap(card, "label", "결과를 기다리지 않고 서류를 넘긴다")), "");
+  assert.equal(await balanceCheckAfter(() => swap(spender, "label", "결과를 기다리지 않고 서류를 넘긴다")), "");
 });
 
 test("the habit walk sets out from every opening variant, not only the default start", async () => {
