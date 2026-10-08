@@ -104,6 +104,18 @@ async function grantAuthority(page) {
   await dismissProtocolBreach(page);
 }
 
+/**
+ * The same standing for the two season walks. They draw a card at random from
+ * every card of the scene, and until 2026-10-08 nothing unlocked the one they
+ * drew: the seeds happened never to land on a locked evidence card, and any
+ * edit that added a choice or moved one would have shifted every later draw
+ * onto cards the walk could not stake -- eight pushes on an empty table and a
+ * failure in a healthy app.
+ */
+const unlockDrawnCard = (page) => async (choice) => {
+  if (choice.requiredAuthority) await grantAuthority(page);
+};
+
 const pairsIn = (caseId) => nodeOrders[caseId].reduce((count, nodeId) => count + nodes[nodeId].choices.length, 0);
 
 for (const caseId of CASE_SEQUENCE) {
@@ -175,7 +187,7 @@ for (let seed = 1; seed <= SEEDED_SEASONS; seed += 1) {
     await startDebugNode(page, CASE_SEQUENCE[0], CASE_START_NODES[CASE_SEQUENCE[0]]);
     for (let index = 0; index < CASE_SEQUENCE.length; index += 1) {
       const caseId = CASE_SEQUENCE[index];
-      await completeCase(page, random);
+      await completeCase(page, random, { beforeChoice: unlockDrawnCard(page) });
       const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
       expect(saved.completedCases).toContain(caseId);
       const outcome = saved.caseResults[caseId]?.outcomeChoiceId;
@@ -238,7 +250,7 @@ test("saved state survives reload stress during complete season @full", async ({
       await expect(reframeCard).toHaveClass(/selected/);
       await assertReloadRoundTrip(page, await readProgress(page));
     }
-    await completeCase(page, random);
+    await completeCase(page, random, { beforeChoice: unlockDrawnCard(page) });
     if (index < CASE_SEQUENCE.length - 1) {
       await page.locator(".next-case-panel button").click();
       await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
