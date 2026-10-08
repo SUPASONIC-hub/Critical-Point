@@ -769,7 +769,7 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 실패로 셉니다), 기본 브랜치의 실행이 다시 초록이 되면 그 이슈를 닫습니다. 이슈가 보고한 실패보다 오래된
 초록 실행(옛 실행 다시 돌리기)은 이슈를 닫지 않습니다. PR에서는 `verify:quick`만 돌고,
 e2e는 push·`e2e` 라벨·Dependabot PR에서 돕니다. 시각 회귀는 `main` push, 그림을 바꿀 수 있는 파일(스타일시트·
-`index.html`·폰트·모든 `.jsx`·`src/nodes/case01.js`·`case05.js`·`public/`·critical CSS 스크립트·
+`index.html`·폰트·모든 `.jsx`·`src/` 바로 아래의 모든 `.js`(`caseCopy.js`·`gameCases.js`·`appCopy.js` 등)·`src/viewModels/`·`src/gauntlet/`·`src/nodes/case01.js`·`case05.js`·`public/`·critical CSS 스크립트·
 `vite.config.js`·`playwright.config.js`·`tests/helpers/`·`package-lock.json`·스펙과 베이스라인)을 건드린 PR, `visual` 라벨이 붙은 PR, Dependabot PR, 수동 실행에서 돕니다.
 
 `tests/offline.spec.js`는 서비스 워커를 켜는 단 하나의 스펙입니다. e2e 빌드는 `?sw=1`로 연 페이지에서만

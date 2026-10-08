@@ -105,6 +105,16 @@ jobs:
             #       compared, and that is most of what changes a screenshot.
             #   src/nodes/case01.js, src/nodes/case05.js
             #       the words and choices in the two pictured cases.
+            #   every module directly in src/ (caseCopy.js, gameCases.js,
+            #   appCopy.js, endingCopy.js, gameLogic.js ...), src/viewModels/
+            #       the sentences those screens print that are not in a case
+            #       file: the roadmap's titles and summaries, the labels of
+            #       the result report, the status words. On 2026-10-08 a pull
+            #       request that changed only src/caseCopy.js was not
+            #       compared, and main's intro baseline broke when it merged.
+            #   src/gauntlet/
+            #       the table at `c5_voice`: its rule and relic text, and the
+            #       numbers the engine deals it.
             #   public/
             #       the key visual, the scene art and the portraits.
             #   scripts/build-critical-css.mjs, scripts/critical-css-rules.mjs,
@@ -115,11 +125,12 @@ jobs:
             #   package-lock.json
             #       React, the icons, Vite and the browser itself.
             #
-            # Not on the list: the rest of src/*.js (game rules and state can
-            # change a number on the result screen), and the other cases. The
-            # `visual` label is for those, and the push to main compares
-            # everything in any case.
-            pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
+            # Not on the list: src/state/ (a hook can change a number on the
+            # result screen), and the other cases. The `visual` label is for
+            # those, and the push to main compares everything in any case.
+            # `npm run check:visual-baselines` holds this pattern to the files
+            # named above.
+            pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/[^/]+\.js$|src/viewModels/|src/gauntlet/|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
             touched=$(printf '%s\n' "$files" | grep -E "$pattern" || true)
             if [ -n "$touched" ]; then
               decide true "Touches what the screenshots are made of: $(printf '%s' "$touched" | tr '\n' ' ')"

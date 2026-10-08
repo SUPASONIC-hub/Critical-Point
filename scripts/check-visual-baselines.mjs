@@ -145,6 +145,49 @@ if (workflowSource && !/^\s*container:\s*(?:image:\s*)?mcr\.microsoft\.com\/play
   failures.push(`${workflowPath} does not run its jobs in the Playwright container, so it would not render on ${PLATFORM}.`);
 }
 
+/**
+ * The pull requests the workflow compares without being asked. Its `scope` job
+ * holds one pattern of paths, and a file missing from it is a screenshot that
+ * changes on main with no pull request attached: `src/caseCopy.js`, which the
+ * intro's roadmap prints, was missing until 2026-10-08. The pattern is read out
+ * of the workflow and held to the files the three pictures are made of, and to
+ * a few they are not, so it cannot be widened into "everything" either.
+ */
+const COMPARED = [
+  "src/styles/app/play.css",
+  "index.html",
+  "src/screens/IntroScreen.jsx",
+  "src/nodes/case01.js",
+  "src/nodes/case05.js",
+  "src/caseCopy.js",
+  "src/gameCases.js",
+  "src/appCopy.js",
+  "src/endingCopy.js",
+  "src/playerLanguage.js",
+  "src/gameLogic.js",
+  "src/viewModels/reportViewModels.js",
+  "src/gauntlet/relics.js",
+  "src/gauntlet/gauntletEngine.js",
+  "public/triggerlab-key-visual.webp",
+  "tests/visual-regression.spec.js",
+  "tests/helpers/gameFlow.js",
+];
+const NOT_COMPARED = ["src/nodes/case30.js", "README.md", "docs/canon.md", "supabase/migrations/x.sql", "tests/offline.spec.js"];
+if (workflowSource) {
+  const scopePattern = workflowSource.match(/^\s*pattern='([^']+)'\s*$/m)?.[1];
+  if (!scopePattern) {
+    failures.push(`${workflowPath} has no \`pattern='...'\` line: nothing says which pull requests are compared.`);
+  } else {
+    const scope = new RegExp(scopePattern);
+    for (const file of COMPARED) {
+      if (!scope.test(file)) failures.push(`${workflowPath} does not compare a pull request that changes ${file}, which a screenshot is made of.`);
+    }
+    for (const file of NOT_COMPARED) {
+      if (scope.test(file)) failures.push(`${workflowPath} compares a pull request that changes only ${file}; the pattern has been widened past what the screenshots are made of.`);
+    }
+  }
+}
+
 const expected = new Set();
 for (const screenshot of screenshotNames) {
   for (const project of visual.projects) {
