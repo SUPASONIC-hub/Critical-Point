@@ -655,9 +655,9 @@ export const case38 = {
     choices: [
       {
         id: "c38_evidence_turn_request",
-        label: "검찰 기록을 법원으로 보내 달라는 신청을 오늘 바로 낸다",
+        label: "검찰 기록을 법원으로 보내 달라는 신청을 오늘 낸다",
         effect: { legitimacy: 13, trust: 4, capital: -4, time: -6, fatigue: 5 },
-        voice: "'없다'는 말을 하루라도 빨리 꺾으려고, 검찰 기록을 법원으로 보내 달라는 신청을 오늘 바로 낸다.",
+        voice: "'없다'는 말을 하루라도 빨리 꺾으려고, 검찰 기록을 법원으로 보내 달라는 신청을 오늘 낸다.",
         echo: "신청은 오늘 접수됩니다. 검찰이 기록을 보내 주기까지 한 달, 그동안 피고는 '없다'는 말을 거두지 않습니다.",
         cognition: { inference: 2, persistence: 1 },
       },

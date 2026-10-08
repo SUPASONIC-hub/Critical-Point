@@ -98,7 +98,7 @@ const finalCaseNodes = {
         effect: { time: -12, legitimacy: 3, humanCost: -4, fatigue: 4 },
         voice: "쓸 수 있는 도구를 내려놓더라도, 악용될 문을 닫자고 한다.",
         echo: "기록을 봉인하면 악용 가능성은 줄어듭니다. 동시에 이 지식으로 해결할 수 있는 사건들도 닫힙니다.",
-        cognition: { inference: 2, persistence: 1 },
+        cognition: { risk: 2, persistence: 1 },
       },
       {
         id: "reframe",

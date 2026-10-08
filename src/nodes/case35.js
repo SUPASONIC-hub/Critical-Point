@@ -43,9 +43,9 @@ export const case35Nodes = {
     choices: [
       {
         id: "c35_start_go",
-        label: "모래주머니를 싣고 곧장 망원시장으로 간다",
+        label: "모래주머니를 싣고 망원시장으로 나선다",
         effect: { trust: 11, humanCost: -5, time: -5, capital: -3, fatigue: 6 },
-        voice: "서류는 물을 막지 못한다며, 모래주머니를 싣고 곧장 망원시장으로 간다.",
+        voice: "서류는 물을 막지 못한다며, 모래주머니를 싣고 망원시장으로 나선다.",
         echo: "트렁크에 모래주머니 스무 개를 싣고 나서면, 올림픽대로는 이미 통제 중입니다. 마지막 1km는 걸어서 갑니다.",
         next: "c35_sandbag",
         cognition: { persistence: 2 },
@@ -409,9 +409,10 @@ export const case35 = {
       memo: ["신청하기도 전에 떨어진 점수", "보면 안 되는 화면"],
       choices: [
         {
-          label: "상인들에게 이 사실을 지금 바로 알린다",
+          label: "상인들에게 이 사실을 지금 알린다",
           effect: { trust: 9, legitimacy: 3, humanCost: -3, time: -3, fatigue: 4 },
-          voice: "거절 문자를 받고서야 알게 할 수는 없다며, 상인들에게 이 사실을 지금 바로 알린다.",
+          cognition: { risk: 1 },
+          voice: "거절 문자를 받고서야 알게 할 수는 없다며, 상인들에게 이 사실을 지금 알린다.",
           echo: "민도현이 라이브 방송에서 그 화면을 읽습니다. 시청자 4천 명이 동시에 은행 앱을 엽니다. 이민서의 접속 기록도 함께 남습니다.",
         },
         {
