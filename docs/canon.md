@@ -84,7 +84,7 @@ Three of these are reveals, and each still means what it meant:
 | Person | 2022-23 | Main season |
 |---|---|---|
 | 분석관 | 기업금융전략팀, trainee then 심사 담당 | 트리거랩 분석관 → KD캐피탈 위험관리부 (사건 25) |
-| 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 집행유예 (사건 44) |
+| 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 징역 3년, 집행유예 5년 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
@@ -98,6 +98,16 @@ Three of these are reveals, and each still means what it meant:
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+Of this table the script holds what copy writes in a shape it can read: each
+person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
+window and her third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,
+the dates of the resignation, the report, 임경수's death and 노아's switch, 2009
+and what followed for 오상철, and 한서윤's one 자네 (in the 프롤로그, a scene
+she speaks has the word only in that line). It does not hold 임경수's
+retirement, 반재욱's twenty years, 백아린's twelve, the 징계해고 of 6월 22일,
+에코's return on 9월 19일, who went where in 사건 25, or how 오진우 speaks:
+each is stated once, in a sentence of its own, and a reader has to keep them.
 
 반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
 season; he is never "3년차" (that is 도윤하 at her window). His notebook holds
@@ -183,6 +193,13 @@ state no floor and no percentage.
 사건 01-18 are **2025** and 사건 19 to the finale are **2026**: 사건 12 is the
 추석 a year before 사건 47's, and the weekdays the late season prints fit 2026.
 A date that is stated with a weekday has to fit its year.
+
+The script checks every one (213 on 2026-10-08). A date that names its year is
+held to it. One that does not takes the year of the file it is in: 프롤로그 01
+is 2022, 프롤로그 02-05 are 2023, 사건 01-18 are 2025, 사건 19 to the finale are
+2026. In the files that sum up every case a weekday has to fit one of those
+four. So a case that looks back at another year with a weekday has to write the
+year.
 
 | Case | Dates |
 |---|---|
