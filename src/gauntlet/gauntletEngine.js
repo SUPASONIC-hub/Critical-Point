@@ -72,8 +72,16 @@ export const READING_MAX_SECONDS = 50;
 const READING_CHARS_PER_SECOND = 16;
 const READING_SETTLE_SECONDS = 6;
 
-export function getReadingSeconds(node = {}) {
-  const chars = [node.lead, node.text, node.question, ...(node.memo ?? [])]
+/**
+ * `breach` is the PROTOCOL BREACH panel, when the page shows one: the changed
+ * rules of this table, each printed as a label, a title and a sentence. They
+ * are read on the same page against the same clock, and until 2026-10-08 they
+ * were not counted -- the page that follows a bust carried the most text and
+ * the clock of the scene alone. The ceiling is the same.
+ */
+export function getReadingSeconds(node = {}, breach = []) {
+  const rules = breach.flatMap((rule) => [rule?.label, rule?.title, rule?.text]);
+  const chars = [node.lead, node.text, node.question, ...(node.memo ?? []), ...rules]
     .filter(Boolean)
     .join("")
     .replace(/\s+/g, "").length;
