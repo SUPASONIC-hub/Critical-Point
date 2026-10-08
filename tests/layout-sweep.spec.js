@@ -57,19 +57,14 @@ for (const caseId of CASE_SEQUENCE) {
  * since a hand that fits with five cards fits with four. That is one to three
  * scenes a case, so the weekly pass grows by about a tenth and not by half.
  *
- * The 390x844 phone and the laptop are held. The 360x740 phone is measured and
- * written to the report, and is not held yet: the first run of this pass
- * (2026-10-08, Chromium, 사건 01 and the finale) found every five-card scene it
- * opened there with its last card under the action bar -- 사건 01 by 19, 35 and
- * 52px, the finale by 4, 4, 4 and 21px -- while the other two sizes fit. That
- * is a defect in the table's small-phone layout, not in this test, and it is
- * the `fixme` below until the layout is fixed.
+ * All three sizes are held. The 360x740 phone was not at first: the first run
+ * of this pass (2026-10-08, Chromium) found every five-card scene it opened
+ * there with its last card under the action bar -- 사건 01 by 19, 35 and 52px,
+ * 사건 05 by up to 28px, the finale by 4 to 21px -- while the other two sizes
+ * fit. On a short phone a board with changed rules now gives the rules line the
+ * situation board's place (play.css), and the same scenes clear the bar.
  */
 const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics: FIVE_RELICS };
-const SMALL_PHONE = "small phone";
-// The furthest any last card sat under the bar on 2026-10-08 was 52px. Past
-// this the small phone has got worse, and that fails.
-const SMALL_PHONE_WORST_PX = 56;
 
 function fullestScenes(caseId) {
   const hands = nodeOrders[caseId].map((nodeId) => [nodeId, nodes[nodeId].choices.filter((choice) => choice.type !== "reframe").length]);
@@ -84,7 +79,6 @@ for (const caseId of CASE_SEQUENCE) {
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];
     const failures = [];
-    const notHeldYet = [];
     for (const nodeId of nodeIds) {
       for (const [name, size] of Object.entries(LAYOUT_VIEWPORTS)) {
         await page.setViewportSize(size);
@@ -97,35 +91,11 @@ for (const caseId of CASE_SEQUENCE) {
         await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip"),`${nodeId} @ ${name}: five relics are carried`).toHaveCount(FIVE_RELICS.length);
         const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)) };
         rows.push(row);
-        if (name === SMALL_PHONE && row.lastCard > row.actionsTop) {
-          if (row.lastCard - row.actionsTop > SMALL_PHONE_WORST_PX) {
-            failures.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar, further than the ${SMALL_PHONE_WORST_PX}px this size is known to miss by`);
-          }
-          notHeldYet.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
-          continue;
-        }
         if (row.lastCard > row.actionsTop) failures.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
         if (row.widest > row.innerWidth + 1) failures.push(`${nodeId} @ ${name}: ${row.widest - row.innerWidth}px wider than the screen`);
       }
     }
     if (process.env.LAYOUT_REPORT_DIR) writeFileSync(`${process.env.LAYOUT_REPORT_DIR}/layout-heavy-${caseId}.json`, JSON.stringify(rows));
-    // Printed in the run's own report, so the weekly pass says how far off the small phone is.
-    if (notHeldYet.length) test.info().annotations.push({ type: "360x740, not held yet", description: notHeldYet.join("; ") });
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }
-
-// The defect, on the scene that showed it worst. Marked as failing: while the
-// last card is under the bar this test fails as expected and the run is green;
-// the day the small phone is fixed it passes, Playwright reports that as a
-// failure, and whoever fixed it holds SMALL_PHONE in the loop above and deletes
-// this test.
-test("the fullest 사건 01 hand fits a 360x740 phone on an overclocked board with five relics @layout", async ({ page }) => {
-  test.fail(true, "360x740: c1_start_hold's last card sat 52px under the action bar on 2026-10-08 (the small-phone table layout, not this test)");
-  await page.setViewportSize(LAYOUT_VIEWPORTS[SMALL_PHONE]);
-  await openBrokenBoard(page, "case01", "c1_start_hold", HEAVY_BOARD);
-  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
-  await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(FIVE_RELICS.length);
-  const row = await measureTable(page);
-  expect(row.lastCard, `last card ${row.lastCard - row.actionsTop}px under the action bar`).toBeLessThanOrEqual(row.actionsTop);
-});
