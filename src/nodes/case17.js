@@ -421,7 +421,7 @@ export const case17 = {
         {
           label: "제출 범위에서 가족 정보는 빼라고 법무팀에 요구한다",
           effect: { legitimacy: 8, trust: 3, capital: -3, time: -1, fatigue: 2 },
-          cognition: { persistence: 1 },
+          cognition: { inference: 1 },
           voice: "아이들 나이까지 증거가 되지 않게, 제출 범위에서 가족 정보는 빼라고 법무팀에 요구한다.",
           echo: "요구는 공문으로 남습니다. 법무팀은 숫자를 지우는 대신 '가족 사항 별첨'이라는 칸을 새로 만듭니다.",
         },

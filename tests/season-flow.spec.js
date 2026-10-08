@@ -654,8 +654,11 @@ test.describe("a phone on its side", () => {
       expect(await page.evaluate(() => document.documentElement.scrollHeight), "the fold costs the table no height").toBeLessThanOrEqual(size.height + 2);
       expect(await pointerLandsOn(fold), "the fold is not covered").toBe(true);
       await fold.click();
+      // The fold draws the question and the cards only once it is open, and it
+      // learns that from the toggle event: read at the click, the list still
+      // holds the case facts alone (main's Verify of 2026-10-08, both sizes).
+      await expect.poll(() => page.locator(".gx-brief li").allTextContents()).toContain(question);
       const lines = await page.locator(".gx-brief li").allTextContents();
-      expect(lines).toContain(question);
       const labels = nodes.c2_trace.choices.filter((choice) => choice.type !== "reframe").map((choice) => choice.label);
       for (const label of labels) expect(lines.some((line) => line.endsWith(`: ${label}`)), `the fold prints "${label}"`).toBe(true);
       const widest = await page.locator(".gx-brief li").evaluateAll((items) => items.filter((item) => item.scrollWidth > item.clientWidth + 1).length);

@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-07 (a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
+Last updated: 2026-10-08 (the two content ratchets are at 0 -- see the last section; 2026-10-07: a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1481,3 +1481,25 @@ Looked at and left, for the owner:
 - Nothing here was looked at in a browser by a person: the louder reveal and
   card cues, the comfort setting's wider reach, the beat marker at every other
   beat above 180bpm, the roadmap's open cards printing their summary in full.
+
+## The two content ratchets, 2026-10-08
+
+Both ceilings the audit of 2026-10-07 left open are at 0, so either check
+fails on the first new offender.
+
+- **Plain language.** The 28 case and term pairs a route could read
+  unexplained each carry the season's gloss at the first place the word is
+  read. `BARE_ON_A_ROUTE` in `check-plain-language.mjs` is empty.
+- **A label against the clock (`check:balance` rule 7).** 시간 is time left
+  today, and putting a thing off buys today at a later price; the echoes say
+  so. The rule read it the other way and held 54 such cards as exceptions.
+  It now reads, in `scripts/balance-rules.mjs`:
+  - a label that waits or puts a thing off (미룬다, 보류한다, 늦춘다, 뒤로
+    돌린다, 기다린다) may gain time, and is refused only when the card loses
+    time and the label is nothing but the putting-off -- the wait word is its
+    last verb and nothing before it names a second act (…고, …며, …채, …부터)
+    or a span waited through (…까지, 동안, 며칠, 하루, 곁);
+  - a label that says it acts at once (바로, 즉시, 곧장) may not lose time.
+  Twelve labels (fifteen dealt cards) said 바로 or 곧장 on a card that takes
+  time for what it does and lost the word. `tests/unit/balance-rules.test.mjs`
+  holds both halves on cards made up for the test.
