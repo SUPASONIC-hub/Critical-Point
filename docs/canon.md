@@ -33,6 +33,9 @@ commit.
 플로우온's night shift is 80 people by 사건 16 and 사건 23. That is the same
 floor three years and one collapse later, not a second count of the same year.
 
+프롤로그 01's 온새포장 and 사건 04's 돌봄 플랫폼 온새 are two companies with one
+name. 사건 04 says so in one sentence and nothing else connects them.
+
 ## The loan's timeline
 
 | When | What | Where it is stated |
@@ -90,7 +93,7 @@ Three of these are reveals, and each still means what it meant:
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
-| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
+| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank; hands in a 사표 in 사건 07 that 감사팀장 never processes (사건 08, 09) |
 | 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
 | 이민서 | -- | 트리거랩, A-017 on the list of 63 → KD데이터랩 (사건 25) |
 | 에코 | Unnamed in July 2023; the wave on 1번 단말 | 트리거랩's seventh: replaced by 노아 on 2월 1일 00:00 (사건 20), kept only on the 트리거랩 terminal until the dissolution (사건 24), restored 9월 19일 (사건 46) |
@@ -139,6 +142,10 @@ three days after her report with 징계해고, a criminal complaint and eviction
 | 4 | 1기 참가자, 2022, before the lab existed; 참가자 01 is 선우진 | 사건 19, 21 |
 | 13 | The nine and the four: the profiles in the folder on the B2 terminal | 최종 사건 |
 | 63 | 트리거랩 참가자, A-001 to A-063, numbered by 입사 순서: the nine, the four, and fifty who sat at a lab terminal during training. This is the list sold to 핏스코어 for 18억 and leaked as 38만 줄 | 사건 30, 37, 40 |
+
+사건 02's two unnamed witnesses and the 보안팀 that locks 이민서's account are
+not 트리거랩: the witnesses are 그룹 전산 위탁 직원 on the 3rd floor of the same
+building, and the team is the group's.
 
 The three who left are not named in the main season. 프롤로그 05 shows two of
 them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
@@ -204,6 +211,7 @@ year.
 
 | Case | Dates |
 |---|---|
+| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The copy prints none of these dates, only the weekday and the intervals |
 | 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
