@@ -19,7 +19,7 @@
  *
  * The emotional spread: 에코's last week spent learning 강태민's dad jokes and
  * explaining each one as a formula, the anger of a consent box marked "not
- * applicable", 도윤하 reading her own 7.2 seconds of hesitation, 이민서 turning
+ * applicable", 도윤하 reading his own 7.2 seconds of hesitation, 이민서 turning
  * 에코's principles into eleven pages a person can read, and a last log that
  * says, one more time, to recount the person the judgement left out. The case
  * closes on what survives midnight, and the oldest line in the list points to

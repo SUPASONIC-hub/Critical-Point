@@ -105,7 +105,7 @@ Three of these are reveals, and each still means what it meant:
 
 Of this table the script holds what copy writes in a shape it can read: each
 person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
-window and her third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,
+window and his third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,
 the dates of the resignation, the report, 임경수's death and 노아's switch, 2009
 and what followed for 오상철, and 한서윤's one 자네 (in the 프롤로그, a scene
 she speaks has the word only in that line). It does not hold 임경수's
@@ -114,7 +114,7 @@ retirement, 반재욱's twenty years, 백아린's twelve, the 징계해고 of 6�
 each is stated once, in a sentence of its own, and a reader has to keep them.
 
 반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
-season; he is never "3년차" (that is 도윤하 at her window). His notebook holds
+season; he is never "3년차" (that is 도윤하 at his window). His notebook holds
 the names of the 47 people his inquiries put out of a job, one line each, in
 ink (사건 07, 13, 17, 44; 도윤하's 스프링 수첩 in 프롤로그 04 also counts 47
 names, and is a different notebook).

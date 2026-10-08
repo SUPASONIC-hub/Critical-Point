@@ -12,9 +12,9 @@
  *
  * This case is the season agreeing with that objection. Ten days after 플로우온
  * is saved, 도윤하 -- who has carried, alone and off the books, the list of
- * everyone hurt by the loan she sold at a branch counter three years ago --
+ * everyone hurt by the loan he sold at a branch counter three years ago --
  * stops being able to stand up. The group files it as a personal matter, and
- * her list, having never been an official record, is due for deletion.
+ * his list, having never been an official record, is due for deletion.
  *
  * So the case does not ask whether goodwill is good. It asks what it costs and
  * who is holding the invoice. A person's obsession is not a renewable resource;
@@ -432,7 +432,7 @@ export const case10 = {
       next: "c10_relay",
       title: "3년 전 2주",
       speaker: "한서윤",
-      text: "한서윤이 자기 병가 기록을 엽니다. 사유란: 개인 사정. 실제 날짜는 3년 전 플로우온 반대 의견서를 반려하는 서명을 한 뒤 두 달째 되는 날입니다. '저는 그때 아무한테도 말 안 했습니다. 말하면 제가 그 서명을 후회한다는 뜻이 되니까요.' 그가 화면을 닫으려다 손을 멈춥니다. '그런데 열아홉 명 중 열여덟 명도 같은 이유로 말을 안 했겠죠.'",
+      text: "한서윤이 자기 병가 기록을 엽니다. 사유란: 개인 사정. 실제 날짜는 3년 전 플로우온 반대 의견서를 반려하는 서명을 한 뒤 두 달째 되는 날입니다. '저는 그때 아무한테도 말 안 했습니다. 말하면 제가 그 서명을 후회한다는 뜻이 되니까요.' 그가 화면을 닫으려다 손을 멈춥니다. '그런데 열아홉 명 중 열여덟 명도 같은 이유로 말을 안 했을 겁니다.'",
       memo: ["사유란에 적히지 않은 이유", "열아홉 번째로 비어 있는 칸"],
       choices: [
         {
