@@ -570,14 +570,14 @@ test("calm effects still the stage on a real table: only the two fades animate, 
   await expect(page.locator("html")).not.toHaveAttribute("data-calm-effects", "");
   await pushUntilBust(page);
   await expect(page.locator(".gx-slam-bust")).toBeVisible();
-  expect((await animatingOnStage(page)).filter((entry) => !entry.exempt).length, "an ordinary bust animates the stage").toBeGreaterThan(0);
+  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt).length, { message: "an ordinary bust animates the stage" }).toBeGreaterThan(0);
 
   await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ calmEffects: true }) });
   await openTable(page, "case01", "start");
   await expect(page.locator("html")).toHaveAttribute("data-calm-effects", "");
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".gx-card.selected")).toBeVisible();
-  expect((await animatingOnStage(page)).filter((entry) => !entry.exempt), "nothing on a calm stage animates but the grade, the toast and the plate").toEqual([]);
+  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt), { message: "nothing on a calm stage animates but the grade, the toast and the plate" }).toEqual([]);
 
   // The frame loop's variables, watched on the elements that read them for as
   // long as the table is played: the largest flash and the largest shake.

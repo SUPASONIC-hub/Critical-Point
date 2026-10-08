@@ -78,6 +78,8 @@ test("the page that opens the finale says the season record will be sent", async
   const decisionNext = page.getByTestId("decision-next");
   if (await decisionNext.isVisible()) await decisionNext.click();
   await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
+  // The next-case panel is drawn with the report; the notice is inside it.
+  await expect(page.locator(".next-case-panel")).toBeVisible();
   const notice = page.locator(".next-case-panel").getByTestId("season-record-notice");
   await expect(notice).toBeVisible();
   await expect(notice).toContainText("피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다");
@@ -352,7 +354,10 @@ test("NEW GAME+ starts the season again and keeps the finished one on the intro"
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   // No run was there to lose, so nothing was asked.
   expect(asked).toEqual([]);
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+  // The table is on the screen a moment before its save is: waited for, not read once.
+  const readSave = () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null"));
+  await expect.poll(async () => (await readSave())?.started, { timeout: TRANSITION_TIMEOUT_MS }).toBe(true);
+  const saved = await readSave();
   expect(saved.started).toBe(true);
   expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);
   expect(saved.nodeId).toBe(CASE_START_NODES[CASE_SEQUENCE[0]]);
@@ -408,6 +413,10 @@ test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the r
   await button.click();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   expect(asked).toHaveLength(2);
+  // The new run's save lands a moment after its table does.
+  await expect
+    .poll(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")))?.currentCase, { timeout: TRANSITION_TIMEOUT_MS })
+    .toBe(CASE_SEQUENCE[0]);
   saved = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
   expect(saved.runId).not.toBe("e2e-ngplus-guard");
   expect(saved.currentCase).toBe(CASE_SEQUENCE[0]);

@@ -67,6 +67,9 @@ for (const caseId of CASE_SEQUENCE) {
  */
 const HEAVY_BOARD = { schema: OVERCLOCKED_BOARD, streak: 2, runPot: 4200, relics: FIVE_RELICS };
 const SMALL_PHONE = "small phone";
+// The furthest any last card sat under the bar on 2026-10-08 was 52px. Past
+// this the small phone has got worse, and that fails.
+const SMALL_PHONE_WORST_PX = 56;
 
 function fullestScenes(caseId) {
   const hands = nodeOrders[caseId].map((nodeId) => [nodeId, nodes[nodeId].choices.filter((choice) => choice.type !== "reframe").length]);
@@ -95,6 +98,9 @@ for (const caseId of CASE_SEQUENCE) {
         const row = { caseId, nodeId, name, board: "overclocked, five relics", ...(await measureTable(page)) };
         rows.push(row);
         if (name === SMALL_PHONE && row.lastCard > row.actionsTop) {
+          if (row.lastCard - row.actionsTop > SMALL_PHONE_WORST_PX) {
+            failures.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar, further than the ${SMALL_PHONE_WORST_PX}px this size is known to miss by`);
+          }
           notHeldYet.push(`${nodeId} @ ${name}: last card ${row.lastCard - row.actionsTop}px under the action bar (${row.cards} cards)`);
           continue;
         }
@@ -109,11 +115,17 @@ for (const caseId of CASE_SEQUENCE) {
   });
 }
 
-test("the fullest hands fit a 360x740 phone on an overclocked board with five relics @layout", async () => {
-  test.fixme(
-    true,
-    "360x740: on the heavy board the last card of every five-card scene measured sits under the action bar " +
-      "(case01 c1_start_hold 52px, c1_start_alone 35px, c1_start_record 19px; final f_start_name 21px, f_start_owner, f_start_system and f_confront 4px). " +
-      "Measured 2026-10-08 when this pass was written. Fix the small-phone table, then hold SMALL_PHONE in the loop above and delete this test.",
-  );
+// The defect, on the scene that showed it worst. Marked as failing: while the
+// last card is under the bar this test fails as expected and the run is green;
+// the day the small phone is fixed it passes, Playwright reports that as a
+// failure, and whoever fixed it holds SMALL_PHONE in the loop above and deletes
+// this test.
+test("the fullest 사건 01 hand fits a 360x740 phone on an overclocked board with five relics @layout", async ({ page }) => {
+  test.fail(true, "360x740: c1_start_hold's last card sat 52px under the action bar on 2026-10-08 (the small-phone table layout, not this test)");
+  await page.setViewportSize(LAYOUT_VIEWPORTS[SMALL_PHONE]);
+  await openBrokenBoard(page, "case01", "c1_start_hold", HEAVY_BOARD);
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(FIVE_RELICS.length);
+  const row = await measureTable(page);
+  expect(row.lastCard, `last card ${row.lastCard - row.actionsTop}px under the action bar`).toBeLessThanOrEqual(row.actionsTop);
 });

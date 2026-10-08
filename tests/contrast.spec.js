@@ -297,8 +297,10 @@ async function collect(page) {
  * bright band of the key visual, where the scrim over it is thinnest. They are
  * listed so the reading can be on for everything else, and each is held to the
  * ratio it measured -- it may not get worse, and a new line may not join it.
- * Take an entry out when its text is fixed; do not add one without a decision.
+ * On a phone-sized screen an entry that is no longer found fails too, so a fix
+ * is noticed and the entry taken out with it. Do not add one without a decision.
  */
+const PHONE_WIDTH = 480;
 const KNOWN_OVER_A_PICTURE = [
   { screen: "intro", text: "臨界點", measured: 3.02, floor: 2.8 },
   { screen: "intro", text: "3년 전 당신은 승인 서류 한 장에", measured: 3.08, floor: 2.8 },
@@ -313,6 +315,13 @@ async function expectReadable(page, label) {
     return !known || Number(finding.match(/= ([\d.]+):1/)?.[1]) < known.floor;
   });
   expect(unknown, `${label}: text over a picture`).toEqual([]);
+  if (page.viewportSize().width <= PHONE_WIDTH) {
+    const fixed = KNOWN_OVER_A_PICTURE.filter((entry) => entry.screen === label && !painted.findings.some((finding) => finding.includes(`"${entry.text}`)));
+    expect(
+      fixed.map((entry) => entry.text),
+      `${label}: these lines now read at 4.5:1 or better over the picture. Take them out of KNOWN_OVER_A_PICTURE`,
+    ).toEqual([]);
+  }
   return painted.measured;
 }
 
