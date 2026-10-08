@@ -90,9 +90,7 @@
   border: 3px solid var(--c-black);
   box-shadow: 4px 4px 0 var(--c-black);
   transform: rotate(2deg);
-  font: inherit;
   text-align: left;
-  cursor: pointer;
 }
 
 .gx-comic-timer b {
@@ -513,7 +511,6 @@
   font-size: 0.8125rem;
   font-weight: 700;
   text-align: left;
-  cursor: pointer;
   transition:
     transform var(--ui-dur-fast) var(--ui-ease),
     border-color var(--ui-dur-fast) var(--ui-ease);
@@ -566,7 +563,6 @@
   box-shadow: 5px 5px 0 var(--c-black);
   font-size: 1.0625rem;
   font-weight: 900;
-  cursor: pointer;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
 
@@ -581,13 +577,17 @@
   opacity: 0.72;
 }
 
-/* Phone: one column, the page fills the screen and scrolls under a docked footer. */
+/* Phone: one column, the page fills the screen and scrolls under a docked
+   footer. The panels are the page's own flex items, and the picture is the one
+   that shrinks: a page longer than the screen crops it to a band. */
 @media (max-width: 700px) {
   .gx-comic {
     padding: 0;
   }
 
   .gx-comic-page {
+    display: flex;
+    flex-direction: column;
     height: 100%;
     padding: 14px 14px 0;
     border-width: 0;
@@ -596,13 +596,11 @@
   }
 
   .gx-comic-grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "splash"
-      "speaker"
-      "story"
-      "file"
-      "breach";
+    display: contents;
+  }
+
+  .gx-panel {
+    flex-shrink: 0;
   }
 
   /* The caption stays on a phone, in three short lines beside the number, so
@@ -619,7 +617,8 @@
   }
 
   .gx-panel-splash {
-    min-height: 0;
+    flex-shrink: 1;
+    min-height: 5.5rem;
   }
 
   .gx-panel-speaker {
@@ -631,7 +630,7 @@
     grid-template-areas:
       "cards"
       "open";
-    margin: 0 -14px;
+    margin: auto -14px 0;
     padding: 10px 14px max(12px, env(safe-area-inset-bottom));
   }
 

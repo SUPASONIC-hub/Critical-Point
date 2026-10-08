@@ -6,6 +6,7 @@ import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
+  clickThroughMotion,
   completeCurrentCase,
   openIntroDrawer,
   resumeSavedRun,
@@ -14,6 +15,7 @@ import {
   cashStakedCard,
   dismissProtocolBreach,
   TRANSITION_TIMEOUT_MS,
+  waitForEntrance,
 } from "./helpers/gameFlow.js";
 import { measureTable } from "./helpers/layout.js";
 
@@ -739,6 +741,85 @@ test.describe("a phone on its side", () => {
     expect(atEnd.atEnd).toBe(true);
     expect(atEnd.lastCardBottom, "the last card is above the docked button").toBeLessThanOrEqual(atEnd.openTop);
     expect(await pointerLandsOn(page.getByTestId("briefing-card").last()), "the last card can be pressed").toBe(true);
+  });
+});
+
+// The briefing on a phone held upright. Its page is longer than the screen on
+// every scene, and the room's drawing used to keep its whole height at the top
+// of it: on a 360x740 phone the story began under the docked footer, so the
+// first screen was a picture and no words. The picture is what gives way now
+// (briefing.css): cropped to a band while the page is longer than the screen,
+// whole when it is not.
+const measureBriefing = (page) =>
+  page.evaluate(() => {
+    const box = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const sheet = document.querySelector(".gx-comic-page");
+    const panels = [...document.querySelectorAll(".gx-comic-page .gx-panel")].map((panel) => panel.getBoundingClientRect().bottom);
+    return {
+      pictureHeight: Math.round(box(".gx-panel-splash").height),
+      drawingHeight: Math.round(box(".gx-panel-splash .gx-plate").height),
+      storyTop: Math.round(box(".gx-panel-story .gx-caption").top),
+      lastPanelBottom: Math.round(Math.max(...panels)),
+      dockTop: Math.round(box(".gx-comic-actions").top),
+      openBottom: Math.round(box("[data-testid='open-table']").bottom),
+      scrollTop: Math.round(sheet.scrollTop),
+      scrolls: sheet.scrollHeight > sheet.clientHeight + 1,
+      pageWidth: document.documentElement.scrollWidth,
+      focusInside: Boolean(document.activeElement?.closest(".gx-comic-page")),
+    };
+  });
+
+async function openHeldBriefing(page, caseId, nodeId) {
+  await startDebugNodeFromHelper(page, caseId, nodeId, { openTable: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  // Held first, so the reading clock does not open the table under the measurement.
+  await page.getByTestId("reading-timer").click();
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+  // The panels pop in one after another; measured before they land, a box is
+  // read mid-scale.
+  await waitForEntrance(page.getByTestId("scene-briefing"));
+}
+
+test.describe("a phone held upright", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  for (const size of [{ width: 390, height: 844 }, { width: 360, height: 740 }]) {
+    test(`a long briefing gives up the picture's height and keeps 판 열기 on screen at ${size.width}x${size.height}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      // The longest story in the season.
+      await openHeldBriefing(page, "case45", "c45_stories");
+      const openButton = page.getByTestId("open-table");
+      const atTop = await measureBriefing(page);
+      expect(atTop.scrolls, "the page is longer than the screen, and scrolls").toBe(true);
+      expect(atTop.pictureHeight, "the picture is cropped to a band").toBeLessThanOrEqual(atTop.drawingHeight - 30);
+      expect(atTop.pictureHeight, "and is still a picture").toBeGreaterThanOrEqual(80);
+      expect(atTop.storyTop, "the story begins above the docked footer").toBeLessThan(atTop.dockTop);
+      expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(size.height);
+      expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
+      expect(atTop.pageWidth, "nothing is wider than the screen").toBeLessThanOrEqual(size.width + 1);
+
+      // The page is what scrolls, and it is the dialog that holds focus: a
+      // keyboard moves it without a pointer.
+      expect(atTop.focusInside, "focus is inside the page").toBe(true);
+      await page.keyboard.press("PageDown");
+      await expect.poll(async () => (await measureBriefing(page)).scrollTop, "PageDown scrolls the story").toBeGreaterThan(100);
+      expect((await measureBriefing(page)).openBottom, "판 열기 stays docked while the story scrolls").toBeLessThanOrEqual(size.height);
+
+      await page.locator(".gx-comic-page").evaluate((sheet) => sheet.scrollTo(0, sheet.scrollHeight));
+      await expect.poll(async () => (await measureBriefing(page)).lastPanelBottom, "the last panel ends above the docked footer").toBeLessThanOrEqual((await measureBriefing(page)).dockTop);
+      await clickThroughMotion(openButton, "판 열기 at the end of the page");
+      await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+    });
+  }
+
+  test("a briefing that fits its screen keeps the whole picture", async ({ page }) => {
+    // The shortest story in the season, on a narrow window tall enough for it.
+    await page.setViewportSize({ width: 700, height: 1400 });
+    await openHeldBriefing(page, "case08", "c8_clerks_reaction");
+    const fits = await measureBriefing(page);
+    expect(fits.scrolls, "the page fits the screen").toBe(false);
+    expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
+    expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
   });
 });
 
