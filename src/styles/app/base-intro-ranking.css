@@ -2113,6 +2113,13 @@ summary:focus-visible {
 .active-case p {
   -webkit-line-clamp: none;
 }
+/* Nothing hovers on a touch screen, so the tooltip that holds a cut summary
+   is never shown there: every card prints its own. */
+@media (hover: none) {
+  .case-card p {
+    -webkit-line-clamp: none;
+  }
+}
 .case-result-mini,
 .case-lock-note {
   display: block;
@@ -2982,7 +2989,6 @@ body {
   }
   .intro .top-actions {
     flex-direction: row;
-    justify-content: flex-start;
     width: auto;
   }
   .intro .top-actions .ghost {
@@ -3073,18 +3079,6 @@ body {
    as they did there; the computed style of every element on the intro, the
    table, the reveal and the report was compared before and after the move. */
 @media (max-width: 860px) {
-  .prestart-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .prestart-heading small {
-    max-width: none;
-    text-align: left;
-  }
-  .prestart-grid,
-  .prestart-tutorial > div {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .start-console-heading {
     align-items: flex-start;
     flex-direction: column;

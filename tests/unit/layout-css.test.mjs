@@ -25,9 +25,9 @@ test("the table's shell does not pad the notch a second time", () => {
 });
 
 test("no phone on its side reads the question as one line", () => {
-  const clamps = sheet("responsive").match(/\.gx-question \{[^}]*\}/g) ?? [];
+  const clamps = (sheet("responsive").match(/\.gx-question \{[^}]*\}/g) ?? []).filter((rule) => rule.includes("line-clamp"));
   assert.equal(clamps.length, 1);
-  assert.match(clamps[0], /-webkit-line-clamp: 2;/, "the brief is hidden there, so the question has nowhere else to be read");
+  assert.match(clamps[0], /-webkit-line-clamp: 2;/);
 });
 
 test("the reveal keeps out from under a side notch at every width", () => {
@@ -46,4 +46,37 @@ test("the quiet skip outranks the ending's primary button", () => {
 test("the callsign field's focus ring survives forced colours", () => {
   const focus = sheet("base-intro-ranking").match(/\.intro \.start-panel \.start-input-row input:focus-visible \{[^}]*\}/)?.[0] ?? "";
   assert.match(focus, /outline: 2px solid transparent;/, "a box-shadow is dropped in forced colours; a transparent outline is repainted");
+});
+
+test("the mastery bar's fill is drawn in forced colours", () => {
+  // A background colour is repainted as the canvas there, and the bar is nothing else.
+  const fills = sheet("responsive").match(/@media \(forced-colors: active\) \{[\s\S]*?(\.gx-gauge-fill,[^{]*)\{[^}]*\}/);
+  assert.ok(fills, "the forced-colours block lists the fills");
+  assert.match(fills[1], /\.gx-focus-modes i b,/);
+  assert.match(fills[0].slice(fills[0].lastIndexOf("{")), /forced-color-adjust: none;\s*background: Highlight;/);
+});
+test("a stance that cannot be changed is dimmed, and the one in force is not", () => {
+  const play = sheet("play");
+  assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\] \{\s*cursor: not-allowed;\s*\}/);
+  assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\]:not\(\.active\) \{\s*opacity: 0\.5;\s*\}/, "the active stance is what a locked table is holding: it stays at full strength");
+});
+
+test("the clock, the key hints and the card preview are sized in the type's own unit", () => {
+  const play = sheet("play");
+  const boxes = [...play.matchAll(/\.gx-clock \{[^}]*\}|\.gx-card-key \{[^}]*\}|\.gx-hand-head kbd \{[^}]*\}|\.gx-card-preview \{[^}]*\}/g)].map((match) => match[0]);
+  assert.ok(boxes.length >= 10, `found ${boxes.length} rules`);
+  for (const box of boxes) {
+    const sized = box.match(/^\s*(?:min-|max-)?(?:width|height): [^;]*;/gm) ?? [];
+    for (const declaration of sized) assert.doesNotMatch(declaration, /\dpx/, `${box.split("{")[0].trim()} holds rem type in a px box: ${declaration.trim()}`);
+  }
+});
+test("a phone on its side keeps the fold that prints the question and the cards whole", () => {
+  const responsive = sheet("responsive");
+  const hidden = responsive.match(/\(pointer: coarse\) \{[\s\S]*?\{\s*display: none;\s*\}/g) ?? [];
+  assert.equal(hidden.length, 3);
+  for (const rule of hidden) assert.doesNotMatch(rule, /\.gx-brief\b/, "the table cuts both to two lines there, and nothing else prints them");
+  // On the speaker's line, and beside the question once that line is gone: a
+  // row of its own is 14px the shortest screens do not have.
+  assert.match(responsive, /\(max-height: 480px\)[\s\S]*?\.gx-brief \{\s*grid-row: 2;\s*\}/);
+  assert.match(responsive, /\(max-height: 360px\)[^{]*\{\s*\.gx-speaker \{\s*display: none;\s*\}[\s\S]*?\.gx-question \{\s*grid-column: 1;\s*\}\s*\.gx-brief \{\s*grid-row: 1;\s*\}/);
 });

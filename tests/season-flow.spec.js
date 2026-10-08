@@ -454,6 +454,33 @@ test.describe("a phone on its side", () => {
     });
   }
 
+  // The table cuts the question and each card to two lines here, and the fold
+  // that prints them whole was hidden with the lines the briefing already
+  // said. It is on the speaker's line, and beside the question on a screen too
+  // short to have one, so it costs no height: the table still does not scroll.
+  for (const size of [{ width: 667, height: 375 }, { width: 640, height: 360 }]) {
+    test(`a phone on its side can read the question and the cards whole at ${size.width}x${size.height}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.goto("/?debug=1");
+      await startDebugNode(page, "case02", "c2_trace");
+      expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
+      await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+      const question = nodes.c2_trace.question ?? (await page.locator(".gx-question").textContent());
+      const cut = await page.locator(".gx-question").evaluate((element) => element.scrollHeight > element.clientHeight + 1);
+      expect(cut, "the longest question in the season does not fit two lines here").toBe(true);
+      const fold = page.locator(".gx-brief summary");
+      await expect(fold).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollHeight), "the fold costs the table no height").toBeLessThanOrEqual(size.height + 2);
+      expect(await pointerLandsOn(fold), "the fold is not covered").toBe(true);
+      await fold.click();
+      const lines = await page.locator(".gx-brief li").allTextContents();
+      expect(lines).toContain(question);
+      const labels = nodes.c2_trace.choices.filter((choice) => choice.type !== "reframe").map((choice) => choice.label);
+      for (const label of labels) expect(lines.some((line) => line.endsWith(`: ${label}`)), `the fold prints "${label}"`).toBe(true);
+      const widest = await page.locator(".gx-brief li").evaluateAll((items) => items.filter((item) => item.scrollWidth > item.clientWidth + 1).length);
+      expect(widest, "nothing in the fold is cut").toBe(0);
+    });
+  }
   test("landscape mobile keeps decision actions within the viewport", async ({ page }) => {
     await page.setViewportSize({ width: 667, height: 375 });
     await page.goto("/?debug=1");
@@ -479,6 +506,70 @@ test.describe("a phone on its side", () => {
     expect(nextBox).not.toBeNull();
     expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(375 + 2);
     expect(await pointerLandsOn(nextButton), "the reveal's next button is not covered").toBe(true);
+  });
+
+  // The briefing's footer -- the hint, every card and 판 열기 -- was docked to
+  // the bottom of the page at every size: 231px of a 375px screen here, which
+  // left the story a strip to scroll through. On a short screen only 판 열기
+  // stays docked, and the cards are where the page ends.
+  test("a phone on its side reads the briefing above one docked button", async ({ page }) => {
+    await page.setViewportSize({ width: 667, height: 375 });
+    await startDebugNodeFromHelper(page, "final", "f_start_owner", { openTable: false });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    // Held first, so the reading clock does not open the table under the measurement.
+    await page.getByTestId("reading-timer").click();
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
+    const openButton = page.getByTestId("open-table");
+    await expect(openButton).toBeVisible();
+    const measure = () =>
+      page.evaluate(() => {
+        const sheet = document.querySelector(".gx-comic-page");
+        const open = document.querySelector("[data-testid='open-table']").getBoundingClientRect();
+        const cards = [...document.querySelectorAll("[data-testid='briefing-card']")].map((card) => card.getBoundingClientRect());
+        return {
+          pageHeight: sheet.clientHeight,
+          openTop: Math.round(open.top),
+          openBottom: Math.round(open.bottom),
+          lastCardBottom: Math.round(Math.max(...cards.map((card) => card.bottom))),
+          firstCardTop: Math.round(Math.min(...cards.map((card) => card.top))),
+          atEnd: sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 1,
+        };
+      });
+    const atTop = await measure();
+    expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(375);
+    expect(atTop.openTop, "and what is docked leaves three quarters of the page to read").toBeGreaterThanOrEqual(atTop.pageHeight * 0.75);
+    expect(atTop.firstCardTop, "the cards are not docked with it").toBeGreaterThan(375);
+    expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
+    await page.locator(".gx-comic-page").evaluate((sheet) => sheet.scrollTo(0, sheet.scrollHeight));
+    const atEnd = await measure();
+    expect(atEnd.atEnd).toBe(true);
+    expect(atEnd.lastCardBottom, "the last card is above the docked button").toBeLessThanOrEqual(atEnd.openTop);
+    expect(await pointerLandsOn(page.getByTestId("briefing-card").last()), "the last card can be pressed").toBe(true);
+  });
+});
+
+// A summary cut at three lines is carried whole by the card's tooltip, and a
+// touch screen never shows one. 390px fits about sixty of a summary's 55 to
+// 185 characters in three lines.
+test.describe("a touch screen", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  test("every roadmap card prints its whole summary where nothing hovers", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await expect(page.locator(".case-roadmap .case-card").first()).toBeAttached();
+    expect(await page.evaluate(() => matchMedia("(hover: none)").matches), "the context cannot hover").toBe(true);
+    const summaries = await page.locator(".case-roadmap .case-card").evaluateAll((cards) =>
+      cards.map((card) => {
+        const summary = card.querySelector("p");
+        return { state: card.className, cut: summary.scrollHeight > summary.clientHeight + 1 };
+      }),
+    );
+    expect(summaries.length).toBeGreaterThan(50);
+    expect(summaries.some((summary) => summary.state.includes("locked-case")), "the roadmap has locked cards").toBe(true);
+    expect(summaries.filter((summary) => summary.cut)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), "the rail does not widen the page").toBeLessThanOrEqual(391);
   });
 });
 
