@@ -48,7 +48,9 @@ const budgets = {
   // is deliberately looser. It should still only go down.
   // 50 -> 23 on 2026-09-15, ratcheted to what the glass pass left.
   // 23 -> 11 on 2026-09-28, to what it measures.
-  repeatedInOneFile: 11,
+  // 11 -> 10 on 2026-10-08: one of the play header's two h1 rules went, with
+  // the wrapping it asked of a title that never wraps.
+  repeatedInOneFile: 10,
 };
 
 const fileBudgets = {

@@ -55,3 +55,18 @@ test("the mastery bar's fill is drawn in forced colours", () => {
   assert.match(fills[1], /\.gx-focus-modes i b,/);
   assert.match(fills[0].slice(fills[0].lastIndexOf("{")), /forced-color-adjust: none;\s*background: Highlight;/);
 });
+test("a stance that cannot be changed is dimmed, and the one in force is not", () => {
+  const play = sheet("play");
+  assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\] \{\s*cursor: not-allowed;\s*\}/);
+  assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\]:not\(\.active\) \{\s*opacity: 0\.5;\s*\}/, "the active stance is what a locked table is holding: it stays at full strength");
+});
+
+test("the clock, the key hints and the card preview are sized in the type's own unit", () => {
+  const play = sheet("play");
+  const boxes = [...play.matchAll(/\.gx-clock \{[^}]*\}|\.gx-card-key \{[^}]*\}|\.gx-hand-head kbd \{[^}]*\}|\.gx-card-preview \{[^}]*\}/g)].map((match) => match[0]);
+  assert.ok(boxes.length >= 10, `found ${boxes.length} rules`);
+  for (const box of boxes) {
+    const sized = box.match(/^\s*(?:min-|max-)?(?:width|height): [^;]*;/gm) ?? [];
+    for (const declaration of sized) assert.doesNotMatch(declaration, /\dpx/, `${box.split("{")[0].trim()} holds rem type in a px box: ${declaration.trim()}`);
+  }
+});
