@@ -1120,3 +1120,4 @@ node scripts/check-migration-drift.mjs --from list.json
 - 코드를 바꾸기 전에 `docs/work-status.md`의 Maintenance Priorities를 읽으십시오. 지금 유효한
   규칙과 금지 사항의 유일한 출처입니다. 무엇을 왜 바꿨는지는 `git log`에 있습니다 --
   이 저장소의 커밋 메시지는 변경 내용이 아니라 그 변경을 하게 만든 상태를 적습니다.
+- 이 게임이 어떤 질문에서 시작해 어떤 순서와 방식으로 만들어졌는지는 `docs/history.md`에 적어 두었습니다.
