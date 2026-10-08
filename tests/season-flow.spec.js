@@ -522,6 +522,30 @@ test.describe("a phone on its side", () => {
   });
 });
 
+// A summary cut at three lines is carried whole by the card's tooltip, and a
+// touch screen never shows one. 390px fits about sixty of a summary's 55 to
+// 185 characters in three lines.
+test.describe("a touch screen", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  test("every roadmap card prints its whole summary where nothing hovers", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await expect(page.locator(".case-roadmap .case-card").first()).toBeAttached();
+    expect(await page.evaluate(() => matchMedia("(hover: none)").matches), "the context cannot hover").toBe(true);
+    const summaries = await page.locator(".case-roadmap .case-card").evaluateAll((cards) =>
+      cards.map((card) => {
+        const summary = card.querySelector("p");
+        return { state: card.className, cut: summary.scrollHeight > summary.clientHeight + 1 };
+      }),
+    );
+    expect(summaries.length).toBeGreaterThan(50);
+    expect(summaries.some((summary) => summary.state.includes("locked-case")), "the roadmap has locked cards").toBe(true);
+    expect(summaries.filter((summary) => summary.cut)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), "the rail does not widen the page").toBeLessThanOrEqual(391);
+  });
+});
+
 // The same short, wide window with a mouse: a laptop at 1366x660 zoomed to
 // 200% reports 683x330. It used to be given the phone's table, laid out for a
 // thumb.
