@@ -62,8 +62,13 @@ const CONFIRM_REPLACE_CASE = "진행 중인 사건의 선택 기록을 지우고
 const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요? 지금 판의 선택 기록은 지워집니다.";
 // The consent box is ticked from the first visit and sits in a closed drawer,
 // so the page says so where the eye already is: by the button that starts the
-// sending. It names the drawer the way out is in.
-const CONSENT_LINE = "플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래 '데이터 저장 안내'에서 끌 수 있습니다.";
+// sending. It names the drawer the way out is in, and the name opens it: a
+// closed <details> is not scrolled to by its own anchor in every browser.
+const DATA_DRAWER_ID = "data-info";
+function openDataDrawer() {
+  const drawer = document.getElementById(DATA_DRAWER_ID);
+  if (drawer) drawer.open = true;
+}
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -191,7 +196,10 @@ export function IntroScreen({ view, renderers = {} }) {
   );
   // Only while it is true: unticked, or built with no backend, nothing is sent.
   const consentLine = dataConsent && telemetryEnabled && (
-    <small className="consent-note" data-testid="consent-line">{CONSENT_LINE}</small>
+    <small className="consent-note" data-testid="consent-line">
+      플레이 기록은 플레이테스트용으로 익명 전송됩니다. 아래{" "}
+      <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>에서 끌 수 있습니다.
+    </small>
   );
   const resumePanel = (
     <div className="resume-panel">
@@ -594,7 +602,7 @@ export function IntroScreen({ view, renderers = {} }) {
           {/* The summary text stays visible: the box starts ticked, and this
               drawer is never nested inside another closed one, so the notice
               and the way out are always one deliberate click away. */}
-          <details className="intro-drawer">
+          <details className="intro-drawer" id={DATA_DRAWER_ID}>
             <summary>
               <h2>데이터 저장 안내</h2>
             </summary>

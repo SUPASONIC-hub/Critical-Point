@@ -453,8 +453,11 @@ test("the start button says play records are sent, for as long as they are", { t
   // Said without opening anything.
   await expect(page.locator(".data-info-panel")).toBeHidden();
 
-  await openIntroDrawer(page, ".data-info-panel");
+  // The drawer's name in the line opens the drawer and brings the box to the screen.
   const consentCheckbox = page.locator(".consent-box input");
+  await line.getByRole("link", { name: "데이터 저장 안내" }).click();
+  await expect(page.locator(".data-info-panel")).toBeVisible();
+  await expect(consentCheckbox).toBeInViewport();
   await expect(consentCheckbox).toBeChecked();
   await consentCheckbox.uncheck();
   await expect(page.getByTestId("consent-line")).toHaveCount(0);

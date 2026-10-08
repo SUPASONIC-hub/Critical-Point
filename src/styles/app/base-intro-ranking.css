@@ -1706,6 +1706,9 @@ summary:focus-visible {
   font-weight: 600;
   line-height: 1.5;
 }
+.consent-note a {
+  color: inherit;
+}
 .consent-note.error {
   color: var(--ui-heat);
 }
