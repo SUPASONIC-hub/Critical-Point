@@ -6,10 +6,11 @@
  * outrank it. That freedom is also how a selector ends up with three homes and
  * nobody can say what it computes to without replaying the import order by hand.
  *
- * This keeps the count from growing: a selector defined at the top level of more
- * than one file, or twice in one file under the same media context, has to be
- * one of the known leftovers. Both budgets are ratchets -- lower them as the
- * leftovers are cleaned up, never raise them.
+ * This keeps the count from growing: a selector defined in more than one file
+ * (at the top level, or under the same media condition), or twice in one file
+ * under the same media context, has to be one of the known leftovers. The four
+ * budgets are ratchets -- lower them as the leftovers are cleaned up, never
+ * raise them.
  *
  * The budgets read 8 and 51 until 2026-09-03, when the parser below stopped
  * losing its place at a comment written in front of an at-rule. It had been
@@ -51,6 +52,23 @@ const budgets = {
   // 11 -> 10 on 2026-10-08: one of the play header's two h1 rules went, with
   // the wrapping it asked of a title that never wraps.
   repeatedInOneFile: 10,
+  // The two numbers above count less than their names say, and these two are
+  // the rest of it (2026-10-08). They are ratchets like the others: measured
+  // on the day they were added, and they only go down.
+  //
+  // "Two homes" above reads the top level alone, so a selector that two files
+  // both restyle under the same media condition was nobody's count: the same
+  // question -- which file wins -- with the import order as the only answer.
+  // Four today: `.season-summary-list`, `.ranking-page .topbar`,
+  // `.board-page .topbar`, `.next-case-panel button`.
+  selectorsWithTwoHomesUnderOneCondition: 4,
+  // "Repeated in one file" above keys on the whole comma list, so
+  // `.a, .b { }` followed by `.a { }` is no repeat to it. This one counts
+  // each selector of the list on its own, under one condition, in one file.
+  // (Split on every comma it reads 145; 35 of those are halves of an `:is()`.)
+  // 110 -> 107 the same day: the dead rules that left play.css and the intro's
+  // 860px blocks took three repeats with them.
+  selectorsRepeatedInOneFile: 107,
 };
 
 const fileBudgets = {
@@ -283,6 +301,28 @@ function readRules() {
   return rules;
 }
 
+/**
+ * The selectors of a rule's comma list, each on its own. A comma inside
+ * `:is()`, `:not()` or `:where()` belongs to that selector: splitting on every
+ * comma made `.page :is(.a` and `.b)` out of one selector.
+ */
+function selectorsOf(rule) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < rule.selector.length; index += 1) {
+    const char = rule.selector[index];
+    if (char === "(" || char === "[") depth += 1;
+    else if (char === ")" || char === "]") depth -= 1;
+    else if (char === "," && depth === 0) {
+      parts.push(rule.selector.slice(start, index));
+      start = index + 1;
+    }
+  }
+  parts.push(rule.selector.slice(start));
+  return parts.map((part) => part.trim()).filter(Boolean);
+}
+
 const failures = [];
 
 const onDisk = readdirSync(APP_DIR).filter((entry) => entry.endsWith(".css")).sort();
@@ -314,7 +354,7 @@ const rules = readRules();
 const homes = new Map();
 for (const rule of rules) {
   if (rule.context !== "") continue;
-  for (const selector of rule.selector.split(",").map((part) => part.trim()).filter(Boolean)) {
+  for (const selector of selectorsOf(rule)) {
     if (!homes.has(selector)) homes.set(selector, new Set());
     homes.get(selector).add(rule.file);
   }
@@ -324,6 +364,23 @@ if (twoHomes.length > budgets.selectorsWithTwoHomes) {
   failures.push(
     `${twoHomes.length} selectors are defined at the top level of more than one file; budget is ${budgets.selectorsWithTwoHomes}.\n` +
       twoHomes.map(([selector, files]) => `    ${selector} -- ${[...files].join(", ")}`).join("\n"),
+  );
+}
+
+const conditionalHomes = new Map();
+for (const rule of rules) {
+  if (rule.context === "") continue;
+  for (const selector of selectorsOf(rule)) {
+    const key = `${rule.context} { ${selector} }`;
+    if (!conditionalHomes.has(key)) conditionalHomes.set(key, new Set());
+    conditionalHomes.get(key).add(rule.file);
+  }
+}
+const twoConditionalHomes = [...conditionalHomes].filter(([, files]) => files.size > 1);
+if (twoConditionalHomes.length > budgets.selectorsWithTwoHomesUnderOneCondition) {
+  failures.push(
+    `${twoConditionalHomes.length} selectors are defined under the same condition in more than one file; budget is ${budgets.selectorsWithTwoHomesUnderOneCondition}.\n` +
+      twoConditionalHomes.map(([key, files]) => `    ${key} -- ${[...files].join(", ")}`).join("\n"),
   );
 }
 
@@ -337,7 +394,28 @@ if (repeats > budgets.repeatedInOneFile) {
   failures.push(`${repeats} rules repeat a selector inside one file; budget is ${budgets.repeatedInOneFile}.`);
 }
 
+const seenSelectors = new Map();
+for (const rule of rules) {
+  for (const selector of selectorsOf(rule)) {
+    const key = `${rule.file}||${rule.context}||${selector}`;
+    seenSelectors.set(key, (seenSelectors.get(key) ?? 0) + 1);
+  }
+}
+const selectorRepeats = [...seenSelectors.values()].reduce((sum, count) => sum + count - 1, 0);
+if (selectorRepeats > budgets.selectorsRepeatedInOneFile) {
+  const worst = [...seenSelectors]
+    .filter(([, count]) => count > 1)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12)
+    .map(([key, count]) => `    ${key.split("||").filter(Boolean).join(" | ")} x${count}`);
+  failures.push(
+    `${selectorRepeats} selectors are written again inside one file under the same condition; budget is ${budgets.selectorsRepeatedInOneFile}. The most repeated:\n${worst.join("\n")}`,
+  );
+}
+
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(
-  `CSS structure checks passed (${rules.length} rules, ${twoHomes.length}/${budgets.selectorsWithTwoHomes} selectors with two homes, ${repeats}/${budgets.repeatedInOneFile} repeated in one file).`,
+  `CSS structure checks passed (${rules.length} rules, ${twoHomes.length}/${budgets.selectorsWithTwoHomes} selectors with two homes, ` +
+    `${twoConditionalHomes.length}/${budgets.selectorsWithTwoHomesUnderOneCondition} with two homes under one condition, ` +
+    `${repeats}/${budgets.repeatedInOneFile} rules and ${selectorRepeats}/${budgets.selectorsRepeatedInOneFile} selectors repeated in one file).`,
 );

@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from "node:fs";
 import { convert } from "fontverter";
-import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset } from "./font-charset.mjs";
+import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComputedCharacters, collectSourceCharacters } from "./font-charset.mjs";
 
 /**
  * Fail when the source can print a character the shipped font does not carry.
@@ -25,6 +25,25 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset } from "./font
 // Past this the one-file subset has stopped paying for itself against the
 // dynamic subset it replaced (~537KB for the intro alone). Ratchet down, never up.
 const MAX_FONT_BYTES = 283_500;
+
+/**
+ * Characters the source writes that Pretendard has no glyph for. `drawn` ones
+ * reach the screen in the system's face; the others are only ever read by a
+ * pattern. A new one fails the check until it is named here, and a name that
+ * no longer applies fails it too.
+ */
+const SYSTEM_FACE_CHARACTERS = {
+  "臨": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
+  "界": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
+  "點": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
+  "故": { drawn: true, where: "case17.js: 고(故) 하윤재" },
+  "▒": { drawn: true, where: "GauntletHand.jsx: a sealed card's hidden numbers (aria-hidden)" },
+  "｡": { drawn: false, where: "useBoard.js: a full stop the board's link filter reads" },
+  "‏": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the end of a range" },
+  "‪": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the start of a range" },
+  "‮": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the end of a range" },
+  "⁤": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the end of a range" },
+};
 
 /**
  * The code points a font maps to a glyph, from its `cmap` table. Formats 4 and
@@ -107,14 +126,15 @@ const describe = (characters) =>
     .map((c) => `${c} (U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0")})`)
     .join(", ") + (characters.length > 40 ? ", ..." : "");
 
-const missing = [...collectCharset()].filter((character) => !built.has(character));
+const missing = [...(await collectCharset())].filter((character) => !built.has(character));
 const failures = [];
 if (missing.length) {
   failures.push(
-    `${missing.length} characters in the source are not in ${FONT_OUTPUT}: ${describe(missing)}\n` +
+    `${missing.length} characters the app can print are not in ${FONT_OUTPUT}: ${describe(missing)}\n` +
       "Run `npm run build:fonts` and commit the result.",
   );
 }
+const computed = await collectComputedCharacters();
 
 let carried = null;
 let drawable = null;
@@ -134,6 +154,27 @@ if (carried && drawable) {
   }
 }
 
+// What the source writes and the face has no glyph for is drawn by whatever
+// the system has. The comparison above lets those through (it has to: nothing
+// could have carried them), and until 2026-10-08 it let them through without
+// a word, under "none missing". Each one is named here with where it is.
+let systemDrawn = [];
+if (drawable) {
+  const undrawable = [...collectSourceCharacters()].filter((character) => !drawable.has(character.codePointAt(0)));
+  const unnamed = undrawable.filter((character) => !(character in SYSTEM_FACE_CHARACTERS));
+  if (unnamed.length) {
+    failures.push(
+      `${unnamed.length} characters in the source have no glyph in Pretendard and will be drawn in the system face: ${describe(unnamed)}\n` +
+        "Change the copy, or name each one in SYSTEM_FACE_CHARACTERS (scripts/check-fonts.mjs) with where it is printed.",
+    );
+  }
+  const stale = Object.keys(SYSTEM_FACE_CHARACTERS).filter((character) => !undrawable.includes(character));
+  if (stale.length) {
+    failures.push(`SYSTEM_FACE_CHARACTERS names characters the source no longer writes, or the face now draws: ${describe(stale)}. Take them off the list.`);
+  }
+  systemDrawn = undrawable.filter((character) => SYSTEM_FACE_CHARACTERS[character]?.drawn);
+}
+
 const bytes = statSync(FONT_OUTPUT).size;
 if (bytes > MAX_FONT_BYTES) failures.push(`${FONT_OUTPUT} is ${bytes} bytes, over the ${MAX_FONT_BYTES} byte budget.`);
 
@@ -142,7 +183,9 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB, none missing from the list, ` +
-      `and the font carries every one Pretendard draws (${carried.size} mapped).`,
+    `Font check passed: ${built.size} characters in ${(bytes / 1024).toFixed(1)}KB, none missing from the list ` +
+      `(${computed.labels} card labels spoken, ${computed.characters.size} characters between them), ` +
+      `and the font carries every one Pretendard draws (${carried.size} mapped). ` +
+      `${systemDrawn.length} printed characters are the system face's, as listed: ${systemDrawn.join(" ")}.`,
   );
 }

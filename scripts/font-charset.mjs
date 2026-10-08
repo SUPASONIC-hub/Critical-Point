@@ -77,12 +77,16 @@ function decodeCssEscapes(text) {
   return out.join("");
 }
 
-/** A sorted string of every code point the font should carry. */
-export function collectCharset(root = process.cwd()) {
+/**
+ * The characters the source itself writes, without the always-carried ranges:
+ * what `check-fonts.mjs` asks about when it wants to know which of them the
+ * face cannot draw.
+ */
+export function collectSourceCharacters(root = process.cwd()) {
   const files = SOURCE_FILES.map((file) => path.join(root, file));
   for (const directory of SOURCE_ROOTS) visit(path.join(root, directory), files);
 
-  const characters = new Set(BASELINE_CHARACTERS);
+  const characters = new Set();
   for (const file of files) {
     const text = readFileSync(file, "utf8");
     const decoded = text + decodeEscapes(text) + (file.endsWith(".css") ? decodeCssEscapes(text) : "");
@@ -95,5 +99,35 @@ export function collectCharset(root = process.cwd()) {
       characters.add(character);
     }
   }
+  return characters;
+}
+
+/**
+ * The characters the app makes rather than writes. A card's label is said back
+ * in the first person (`speechifyChoice`), and for a label ending on a vowel
+ * stem that takes the ㄴ off its last syllable by arithmetic: 미룬다 is spoken
+ * as 미루겠습니다, and 루 need not be written anywhere in the source. Reading the
+ * files alone, such a syllable was outside the list and outside this check.
+ * Every label the season has is spoken here and what comes out is counted.
+ */
+export async function collectComputedCharacters() {
+  const { speechifyChoice } = await import("../src/gameLogic.js");
+  const { nodes } = await import("../src/gameData.js");
+  const characters = new Set();
+  let labels = 0;
+  for (const node of Object.values(nodes)) {
+    for (const choice of node.choices ?? []) {
+      labels += 1;
+      for (const character of speechifyChoice(choice)) characters.add(character);
+    }
+  }
+  if (labels === 0) throw new Error("The scene graph has no card to speak; the computed characters were not measured.");
+  return { characters, labels };
+}
+
+/** A sorted string of every code point the font should carry. */
+export async function collectCharset(root = process.cwd()) {
+  const { characters: computed } = await collectComputedCharacters();
+  const characters = new Set([...BASELINE_CHARACTERS, ...collectSourceCharacters(root), ...computed]);
   return [...characters].sort((a, b) => a.codePointAt(0) - b.codePointAt(0)).join("");
 }

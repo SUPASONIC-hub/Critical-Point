@@ -23,6 +23,7 @@ commit.
 | 제7조 | past 180% the bank may call the loan before maturity |
 | Margin | 0.4%포인트 between 179.6% and the line |
 | What was moved | 268억 of December's 412억, booked four weeks early |
+| 2025: what was moved again | the same shift, repeated at each month-end for 8 months, each time to the same 179.6% (사건 01) |
 | Who wrote 제7조 | KD은행 기업금융전략팀, November 2022, on a one-page request from 그룹전략실 |
 | 플로우온 head-count | 1,140명; 야간조 380명, 181 of them on contract (2023) |
 
@@ -31,6 +32,9 @@ commit.
 
 플로우온's night shift is 80 people by 사건 16 and 사건 23. That is the same
 floor three years and one collapse later, not a second count of the same year.
+
+프롤로그 01's 온새포장 and 사건 04's 돌봄 플랫폼 온새 are two companies with one
+name. 사건 04 says so in one sentence and nothing else connects them.
 
 ## The loan's timeline
 
@@ -84,13 +88,13 @@ Three of these are reveals, and each still means what it meant:
 | Person | 2022-23 | Main season |
 |---|---|---|
 | 분석관 | 기업금융전략팀, trainee then 심사 담당 | 트리거랩 분석관 → KD캐피탈 위험관리부 (사건 25) |
-| 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 집행유예 (사건 44) |
+| 윤상혁 | 기업금융전략팀장 | 그룹전략실 상무 → KD캐피탈 대표이사 (사건 25) → 해임 5 대 3 (사건 43) → 1심 징역 3년, 집행유예 5년 (사건 44) |
 | 한서윤 | 기업금융전략팀 과장 | 트리거랩 실장 → 대기발령 (사건 25) |
 | 오진우 | 기업금융전략팀 대리, the analyst's 사수 | 경쟁 분석관 → 브릿지은행 (사건 25) |
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
-| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank |
-| 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
+| 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank; hands in a 사표 in 사건 07 that 감사팀장 never processes (사건 08, 09) |
+| 도윤하 | 강서지점 4번 창구, 입행 3년차; lives in 망원동 and is a regular of the 망원시장 alley, which is why its shopkeepers took the bus to that window (프롤로그 04) | 트리거랩 현장 담당 → 강서지점 (사건 25) |
 | 이민서 | -- | 트리거랩, A-017 on the list of 63 → KD데이터랩 (사건 25) |
 | 에코 | Unnamed in July 2023; the wave on 1번 단말 | 트리거랩's seventh: replaced by 노아 on 2월 1일 00:00 (사건 20), kept only on the 트리거랩 terminal until the dissolution (사건 24), restored 9월 19일 (사건 46) |
 | 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
@@ -98,6 +102,16 @@ Three of these are reveals, and each still means what it meant:
 오진우 speaks politely (합니다체/해요체) to the analyst from April 2023 on; in
 2022 he is the 사수 and speaks plainly. 한서윤's one 자네 -- "이건 자네를 위한
 겁니다" -- is borrowed from 윤상혁 and is quoted back by him; it stays.
+
+Of this table the script holds what copy writes in a shape it can read: each
+person's rank beside their name (윤상혁, 한서윤, 오진우, 백아린, 임경수), 도윤하's
+window and her third year, A-017 and A-001 to A-063, the 5 대 3, the sentence,
+the dates of the resignation, the report, 임경수's death and 노아's switch, 2009
+and what followed for 오상철, and 한서윤's one 자네 (in the 프롤로그, a scene
+she speaks has the word only in that line). It does not hold 임경수's
+retirement, 반재욱's twenty years, 백아린's twelve, the 징계해고 of 6월 22일,
+에코's return on 9월 19일, who went where in 사건 25, or how 오진우 speaks:
+each is stated once, in a sentence of its own, and a reader has to keep them.
 
 반재욱 is 감사팀 17년차 in 2023 and twenty years at the bank by the main
 season; he is never "3년차" (that is 도윤하 at her window). His notebook holds
@@ -116,6 +130,10 @@ accepted in two weeks. It never is. The group keeps her on the 33rd floor,
 where her desk is searched on 6월 16일 (사건 32), and answers the resignation
 three days after her report with 징계해고, a criminal complaint and eviction
 (사건 33). The complaint was drafted on 6월 1일, before she reported anything.
+She never signs a 합의서: the one in 사건 33 can at most be recommended to her
+and she strikes its conditions, and the one in 사건 43 stays unsigned. The frame
+in her mother's shop holds her 사원증 until the evening of 사건 33 and the 신고
+접수증 from then on (사건 43).
 
 ## 트리거랩's head count
 
@@ -128,6 +146,10 @@ three days after her report with 징계해고, a criminal complaint and eviction
 | 4 | 1기 참가자, 2022, before the lab existed; 참가자 01 is 선우진 | 사건 19, 21 |
 | 13 | The nine and the four: the profiles in the folder on the B2 terminal | 최종 사건 |
 | 63 | 트리거랩 참가자, A-001 to A-063, numbered by 입사 순서: the nine, the four, and fifty who sat at a lab terminal during training. This is the list sold to 핏스코어 for 18억 and leaked as 38만 줄 | 사건 30, 37, 40 |
+
+사건 02's two unnamed witnesses and the 보안팀 that locks 이민서's account are
+not 트리거랩: the witnesses are 그룹 전산 위탁 직원 on the 3rd floor of the same
+building, and the team is the group's.
 
 The three who left are not named in the main season. 프롤로그 05 shows two of
 them at their desks on 2023-07-24: 변유진 and a colleague from a branch. 백아린
@@ -151,7 +173,7 @@ April and June, and the change is the reveal.
 | Fact | April, 사건 26 | June, 사건 31 |
 |---|---|---|
 | Floors | 22 | 22 |
-| Frame | up to the 15th floor | columns to the 15th; no floor was poured above the 9th |
+| Frame | up to the 15th floor; on the stairs the analyst sees columns and no floor from the 10th up | columns to the 15th; no floor was poured above the 9th |
 | Reported progress | 72% (the January report) | 62%: the report on file was quietly lowered |
 | Progress on site | 58%, the estimate the analyst signs in the opinion of 4월 24일 | 45%, measured by 금융감독원 and written long before in 최서진's report |
 | The 9th floor | where a worker fell in the summer of 2025 | the last floor that was poured |
@@ -160,6 +182,11 @@ The differences that copy restates: 72 - 58 = 14 (사건 26's "14% 부풀린"),
 62 - 45 = 17%포인트, 58 - 45 = 13%포인트. The last is the analyst's own: the
 number signed in April to correct the report was wrong as well. 사건 27 and 32
 state no floor and no percentage.
+
+The loan was extended four times, each time over 노아's "거절" by a person's
+account. The fourth exception is under the analyst's 사번 and dated 3월 30일:
+three days before the analyst's first day at KD캐피탈 and 25 days before the
+committee of 4월 24일 (사건 31, hidden route).
 
 ## The harmed
 
@@ -184,14 +211,22 @@ state no floor and no percentage.
 추석 a year before 사건 47's, and the weekdays the late season prints fit 2026.
 A date that is stated with a weekday has to fit its year.
 
+The script checks every one (213 on 2026-10-08). A date that names its year is
+held to it. One that does not takes the year of the file it is in: 프롤로그 01
+is 2022, 프롤로그 02-05 are 2023, 사건 01-18 are 2025, 사건 19 to the finale are
+2026. In the files that sum up every case a weekday has to fit one of those
+four. So a case that looks back at another year with a weekday has to write the
+year.
+
 | Case | Dates |
 |---|---|
+| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The copy prints none of these dates, only the weekday and the intervals |
 | 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
 | 사건 20 | 1월 26일 (월) |
-| 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday |
-| 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
+| 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday. 노아 has been live since 2월 10일, two weeks. 세온메디칼 wants the 5축 가공기 contract by 3월 3일 (화) and the 200 prototypes by 4월 3일 |
+| 사건 23 | 주주총회 3월 20일 (금); the day that fixes who may vote is 3월 6일 (금), a week after the 수료식 where 김 반장 bought the first share; KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
@@ -199,7 +234,7 @@ A date that is stated with a weekday has to fit its year.
 | 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |
 | 사건 38-40 | 첫 변론 8월 6일 (목); 다큐 방송 8월 7일 (금) 22시; 사건 40 opens the next afternoon (토) and closes 8월 셋째 주 금요일 |
 | 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
-| 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |
+| 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목). The day 임경수 refused the 성수동 print shop and missed 임재윤's graduation is 2008년 8월 22일 (금), eighteen years before; he is thirty-two in the 1996 사원증 photograph |
 | 사건 46 | 9월 18일 22시 to 9월 19일 20시; 파쇄 9월 19일 18시 |
 | 사건 47 | 추석 사흘 전 to 추석 (9월 25일, 금) |
 | 사건 48 | 추석 밤 to 추석 다음 날 (토) 09:00 임시 심사위원회 |
