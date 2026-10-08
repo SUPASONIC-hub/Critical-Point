@@ -30,6 +30,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
   const observerEndingRecord = observerPattern?.endingRecord ?? endingCopy.fallbackObserverEndingRecord;
   const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern?.arc?.text ?? observerEndingRecord.text };
+  const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
   const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile?.choice });
   const endingTwists = [
     {
@@ -231,6 +232,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 )}
                 <p>{nextCaseSignal.premise}</p>
                 <p className="next-case-hook">{nextCaseSignal.hook}</p>
+                {seasonRecordNotice && <p data-testid="season-record-notice">{seasonRecordNotice}</p>}
                 <small>{resultBridge}</small>
               </div>
               <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>

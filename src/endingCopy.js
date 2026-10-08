@@ -96,6 +96,29 @@ const openAfterglow = {
   text: "기록은 정답을 보관하지 않습니다. 다음 판단이 시작될 수 있도록, 당신이 멈춘 자리의 온도를 보관합니다.",
 };
 
+/**
+ * What the page that opens the finale says about the season record.
+ *
+ * Closing the finale sends one more row than a case does: the season's, which
+ * is what the online ranking lists. Nothing said so until it had been sent --
+ * or, for a run whose earlier cases were closed with the consent box unticked,
+ * until the server had refused it ("이 회차는 온라인 시즌 랭킹에 오르지
+ * 않습니다", useTelemetryQueue.js). The page before the finale is the last
+ * place the player can still do something with that, so it is said there.
+ *
+ * Null wherever it would be noise: any page that is not the one before the
+ * finale, and a build with no server, which sends nothing and ranks nobody.
+ */
+const SEASON_RECORD_SENT =
+  "피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다. 데이터 제공 동의를 켜기 전에 마친 사건이 있는 회차는 랭킹에 오르지 않습니다.";
+const SEASON_RECORD_NOT_SENT =
+  "데이터 제공 동의가 꺼져 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 전송되지 않고 온라인 랭킹에도 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
+
+export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsent }) {
+  if (nextCaseId !== "final" || !telemetryEnabled) return null;
+  return dataConsent ? SEASON_RECORD_SENT : SEASON_RECORD_NOT_SENT;
+}
+
 /** What the run leaves behind, keyed by the reaction the observer saw most. */
 export function getEndingAfterglow(observation) {
   return endingAfterglows[observation] ?? openAfterglow;

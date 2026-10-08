@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { getBalanceSignals, getPlayReport, getRankingComparison } from "../../src/advancedSystems.js";
+import { getSeasonRecordNotice } from "../../src/endingCopy.js";
 
 /**
  * What the report prints is copy, never a key. The full record listed choice
@@ -14,6 +15,22 @@ const log = [
   { isSystemEvent: true, nodeId: "p1_desk", choiceId: "system", title: "시스템", choice: "" },
 ];
 const ID = /[a-z]+\d*_[a-z0-9_]+/;
+
+test("the page before the finale says whether the season record will be sent", () => {
+  const sent = getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: true, dataConsent: true });
+  assert.match(sent, /피날레를 마치면 .*시즌 기록이 .*전송됩니다/);
+  // The one thing the player can still not undo: cases closed before the box was ticked.
+  assert.match(sent, /동의를 켜기 전에 마친 사건이 있는 회차는 랭킹에 오르지 않습니다/);
+  const notSent = getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: true, dataConsent: false });
+  assert.match(notSent, /동의가 꺼져 있어/);
+  assert.match(notSent, /전송되지 않고 온라인 랭킹에도 오르지 않습니다/);
+  assert.notEqual(sent, notSent);
+  // Nowhere else: another case is next, nothing is next, or no server exists.
+  assert.equal(getSeasonRecordNotice({ nextCaseId: "case49", telemetryEnabled: true, dataConsent: true }), null);
+  assert.equal(getSeasonRecordNotice({ nextCaseId: undefined, telemetryEnabled: true, dataConsent: true }), null);
+  assert.equal(getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: false, dataConsent: true }), null);
+  assert.equal(getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: false, dataConsent: false }), null);
+});
 
 test("the route in the play report is the scenes passed, by title", () => {
   const { route, decisions } = getPlayReport({}, log);

@@ -61,6 +61,44 @@ test("the last case before the finale can unlock and open it", async ({ page }) 
   await expect(page.getByRole("heading", { name: /끝까지 남은 사람의 마지막 밤|모든 기록을 묶은 사람의 마지막 밤|곧장 올라간 사람의 마지막 밤|인사평가 보조지표/ })).toBeVisible();
 });
 
+// Closing the finale sends the season's row to the online ranking. The page
+// that opens the finale is the last one before that, and it used to say
+// nothing: the first the player heard was the status line after the send.
+test("the page that opens the finale says the season record will be sent", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case49", "c49_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
+  const notice = page.locator(".next-case-panel").getByTestId("season-record-notice");
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다");
+  await expect(page.getByRole("button", { name: /마지막 사건 시작/ })).toBeVisible();
+});
+
+test("a page that opens an ordinary case says nothing about the season record", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".next-case-panel")).toBeVisible();
+  await expect(page.getByTestId("season-record-notice")).toHaveCount(0);
+});
+
 test("case flow has no unhandled browser runtime errors", async ({ page }) => {
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
