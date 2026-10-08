@@ -480,6 +480,46 @@ test.describe("a phone on its side", () => {
     expect(nextBox.y + nextBox.height).toBeLessThanOrEqual(375 + 2);
     expect(await pointerLandsOn(nextButton), "the reveal's next button is not covered").toBe(true);
   });
+
+  // The briefing's footer -- the hint, every card and 판 열기 -- was docked to
+  // the bottom of the page at every size: 231px of a 375px screen here, which
+  // left the story a strip to scroll through. On a short screen only 판 열기
+  // stays docked, and the cards are where the page ends.
+  test("a phone on its side reads the briefing above one docked button", async ({ page }) => {
+    await page.setViewportSize({ width: 667, height: 375 });
+    await startDebugNodeFromHelper(page, "final", "f_start_owner", { openTable: false });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    // Held first, so the reading clock does not open the table under the measurement.
+    await page.getByTestId("reading-timer").click();
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
+    const openButton = page.getByTestId("open-table");
+    await expect(openButton).toBeVisible();
+    const measure = () =>
+      page.evaluate(() => {
+        const sheet = document.querySelector(".gx-comic-page");
+        const open = document.querySelector("[data-testid='open-table']").getBoundingClientRect();
+        const cards = [...document.querySelectorAll("[data-testid='briefing-card']")].map((card) => card.getBoundingClientRect());
+        return {
+          pageHeight: sheet.clientHeight,
+          openTop: Math.round(open.top),
+          openBottom: Math.round(open.bottom),
+          lastCardBottom: Math.round(Math.max(...cards.map((card) => card.bottom))),
+          firstCardTop: Math.round(Math.min(...cards.map((card) => card.top))),
+          atEnd: sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 1,
+        };
+      });
+    const atTop = await measure();
+    expect(atTop.openBottom, "판 열기 is on screen before any scrolling").toBeLessThanOrEqual(375);
+    expect(atTop.openTop, "and what is docked leaves three quarters of the page to read").toBeGreaterThanOrEqual(atTop.pageHeight * 0.75);
+    expect(atTop.firstCardTop, "the cards are not docked with it").toBeGreaterThan(375);
+    expect(await pointerLandsOn(openButton), "판 열기 is not covered").toBe(true);
+    await page.locator(".gx-comic-page").evaluate((sheet) => sheet.scrollTo(0, sheet.scrollHeight));
+    const atEnd = await measure();
+    expect(atEnd.atEnd).toBe(true);
+    expect(atEnd.lastCardBottom, "the last card is above the docked button").toBeLessThanOrEqual(atEnd.openTop);
+    expect(await pointerLandsOn(page.getByTestId("briefing-card").last()), "the last card can be pressed").toBe(true);
+  });
 });
 
 // The same short, wide window with a mouse: a laptop at 1366x660 zoomed to
