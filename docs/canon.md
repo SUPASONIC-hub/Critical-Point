@@ -94,7 +94,7 @@ Three of these are reveals, and each still means what it meant:
 | 백아린 | -- | 그룹전략실 차장, 혁신위원회 간사 (사건 13), twelve years at the group by 2026 → 사표 3월 27일, never accepted (사건 25) → 공익신고 6월 19일, 징계해고 6월 22일 (사건 33) |
 | 임경수 | 기업대출심사팀장, retires about June 2024 | 퇴직, 회기동 헌책방 2층; dies 9월 15일 새벽 (사건 45) |
 | 반재욱 | 감사팀 17년차 조사역 (2023) | 감사팀 조사역, by then 20년 at the bank; hands in a 사표 in 사건 07 that 감사팀장 never processes (사건 08, 09) |
-| 도윤하 | 강서지점 4번 창구, 입행 3년차 | 트리거랩 현장 담당 → 강서지점 (사건 25) |
+| 도윤하 | 강서지점 4번 창구, 입행 3년차; lives in 망원동 and is a regular of the 망원시장 alley, which is why its shopkeepers took the bus to that window (프롤로그 04) | 트리거랩 현장 담당 → 강서지점 (사건 25) |
 | 이민서 | -- | 트리거랩, A-017 on the list of 63 → KD데이터랩 (사건 25) |
 | 에코 | Unnamed in July 2023; the wave on 1번 단말 | 트리거랩's seventh: replaced by 노아 on 2월 1일 00:00 (사건 20), kept only on the 트리거랩 terminal until the dissolution (사건 24), restored 9월 19일 (사건 46) |
 | 오상철 | -- | 오진우's father: 수원 매탄지점장, delayed one approval by one day in 2009, moved to a regional management desk three months later, retired five years after |
@@ -131,7 +131,9 @@ where her desk is searched on 6월 16일 (사건 32), and answers the resignatio
 three days after her report with 징계해고, a criminal complaint and eviction
 (사건 33). The complaint was drafted on 6월 1일, before she reported anything.
 She never signs a 합의서: the one in 사건 33 can at most be recommended to her
-and she strikes its conditions, and the one in 사건 43 stays unsigned.
+and she strikes its conditions, and the one in 사건 43 stays unsigned. The frame
+in her mother's shop holds her 사원증 until the evening of 사건 33 and the 신고
+접수증 from then on (사건 43).
 
 ## 트리거랩's head count
 
@@ -171,7 +173,7 @@ April and June, and the change is the reveal.
 | Fact | April, 사건 26 | June, 사건 31 |
 |---|---|---|
 | Floors | 22 | 22 |
-| Frame | up to the 15th floor | columns to the 15th; no floor was poured above the 9th |
+| Frame | up to the 15th floor; on the stairs the analyst sees columns and no floor from the 10th up | columns to the 15th; no floor was poured above the 9th |
 | Reported progress | 72% (the January report) | 62%: the report on file was quietly lowered |
 | Progress on site | 58%, the estimate the analyst signs in the opinion of 4월 24일 | 45%, measured by 금융감독원 and written long before in 최서진's report |
 | The 9th floor | where a worker fell in the summer of 2025 | the last floor that was poured |
@@ -180,6 +182,11 @@ The differences that copy restates: 72 - 58 = 14 (사건 26's "14% 부풀린"),
 62 - 45 = 17%포인트, 58 - 45 = 13%포인트. The last is the analyst's own: the
 number signed in April to correct the report was wrong as well. 사건 27 and 32
 state no floor and no percentage.
+
+The loan was extended four times, each time over 노아's "거절" by a person's
+account. The fourth exception is under the analyst's 사번 and dated 3월 30일:
+three days before the analyst's first day at KD캐피탈 and 25 days before the
+committee of 4월 24일 (사건 31, hidden route).
 
 ## The harmed
 
@@ -218,7 +225,7 @@ year.
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
 | 사건 20 | 1월 26일 (월) |
-| 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday |
+| 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday. 노아 has been live since 2월 10일, two weeks. 세온메디칼 wants the 5축 가공기 contract by 3월 3일 (화) and the 200 prototypes by 4월 3일 |
 | 사건 23 | 주주총회 3월 20일 (금); the day that fixes who may vote is 3월 6일 (금), a week after the 수료식 where 김 반장 bought the first share; KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
