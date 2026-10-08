@@ -9,9 +9,9 @@
  * group should book walks out of the branch in the savings of 3,146 people whose
  * average age is 71. The chain repeats with a friendlier name.
  *
- * It is 도윤하's case. The sales script carries a sentence she used at the same
+ * It is 도윤하's case. The sales script carries a sentence he used at the same
  * counter three years ago, and the widow now signing the fund is the wife of a
- * man she sold a 플로우온-linked product to; he died the winter after. The fund's
+ * man he sold a 플로우온-linked product to; he died the winter after. The fund's
  * designer, 주은채, is not a villain: she built it for pension funds that can
  * wait five years, and the group moved it to the counter without asking. The
  * range runs from 강태민 playing a seventy-three-year-old mystery shopper who

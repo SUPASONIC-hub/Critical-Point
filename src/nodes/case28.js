@@ -5,7 +5,7 @@
  * turns out to hold another link of the same chain. 도윤하 is sent from the
  * 강서지점 window to KD생명's call centre in 구로 for ten days and handed
  * "script 4": the standard call for telling a customer their claim is refused.
- * Her first name on the list is 채도훈, a lathe hand from 가온정밀 who now
+ * His first name on the list is 채도훈, a lathe hand from 가온정밀 who now
  * works at the 끝까지정밀 cooperative. He lost the feeling in two fingers of his
  * right hand in February, and his disability payout of 4,200만 is refused on
  * clause 19 of the policy: he changed jobs without telling the insurer. Same
@@ -15,7 +15,7 @@
  * the team metric is "refusals that stayed refused", a branch table in the
  * rice-cake shop covered in seventeen identical refusal letters, 권도현 taking
  * a steel ruler to a 6.5-point clause, a grey van filming a man working
- * left-handed, and a sales record showing that 도윤하 sold him the policy herself,
+ * left-handed, and a sales record showing that 도윤하 sold him the policy himself,
  * stapled to a factory loan. The laughter is character-made (a ruler, a
  * four-panel comic, 0.8 rice cakes per head), the anger is a metric, the grief
  * is a team leader who learned to read the script best because it was read to

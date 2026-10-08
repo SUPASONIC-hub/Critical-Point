@@ -12,9 +12,9 @@
  *
  * This case is the season agreeing with that objection. Ten days after 플로우온
  * is saved, 도윤하 -- who has carried, alone and off the books, the list of
- * everyone hurt by the loan she sold at a branch counter three years ago --
+ * everyone hurt by the loan he sold at a branch counter three years ago --
  * stops being able to stand up. The group files it as a personal matter, and
- * her list, having never been an official record, is due for deletion.
+ * his list, having never been an official record, is due for deletion.
  *
  * So the case does not ask whether goodwill is good. It asks what it costs and
  * who is holding the invoice. A person's obsession is not a renewable resource;

@@ -4,7 +4,7 @@
  * Twenty-three cases happened in or around one basement room. The Monday after
  * the shareholders' meeting the group posts a one-line notice: 트리거랩 closes
  * on 31 March, reason "운영 성과 없음". The case is the last week of work. The
- * desks empty one by one, 도윤하 is posted back to the very window where she
+ * desks empty one by one, 도윤하 is posted back to the very window where he
  * sold the loan, 오진우 leaves first with a scoreboard nobody knew he kept, and
  * on the rooftop, next to a potted cherry tree barely in bud, 한서윤 confesses
  * half of what the lab was for: the reaction records went to HR as a scoring
