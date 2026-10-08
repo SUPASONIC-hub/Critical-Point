@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   BOARD_NICKNAME_KEY,
+  BOARD_OWN_POSTS_KEY,
   BOARD_POST_MAX_LENGTH,
   PLAYER_NAME_MAX_LENGTH,
   limitText,
@@ -121,14 +122,49 @@ const BOARD_REFUSAL_COPY = {
  * (20260929020000): a retry of a post that landed has to look like success.
  * But every submit here has a new event id, so a player who posts the same
  * line an hour later is that retry to the server, and was told "글을 올렸습니다"
- * for a post that went nowhere. `posted` is body -> when. It is kept for the
- * page, not in the hook: the intro and the runtime each mount the board.
+ * for a post that went nowhere. `posted` is mark -> when.
+ *
+ * It was kept for the page only, and the server's six hours outlast a page: a
+ * reload, or the tab opened again in the afternoon, forgot the post and the
+ * same line was answered with "글을 올렸습니다" again. So it is kept on the
+ * device (BOARD_OWN_POSTS_KEY) as well, as a mark of the words rather than the
+ * words: what a person wrote is on the board, and is not left in storage too.
+ * The copy in memory is what a browser that refuses the write still has.
  */
 const BOARD_REPEAT_WINDOW_MS = 6 * 60 * 60_000;
 const ownBoardPosts = new Map();
 
+/** A short stand-in for a post: its length and an FNV-1a hash of it. */
+export function boardBodyMark(body) {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < body.length; index += 1) hash = Math.imul(hash ^ body.charCodeAt(index), 0x01000193);
+  return `${body.length}:${(hash >>> 0).toString(36)}`;
+}
+
+/** What this device posted inside the server's window: memory and storage together. */
+export function readOwnBoardPosts(now = Date.now()) {
+  const posted = new Map(ownBoardPosts);
+  try {
+    const stored = JSON.parse(readStoredValue(BOARD_OWN_POSTS_KEY, "{}") ?? "{}");
+    for (const [mark, at] of Object.entries(stored && typeof stored === "object" ? stored : {})) {
+      if (Number.isFinite(at) && at > (posted.get(mark) ?? 0)) posted.set(mark, at);
+    }
+  } catch {
+    // An unreadable list is an empty one; the server still drops the repeat.
+  }
+  for (const [mark, at] of posted) {
+    if (now - at >= BOARD_REPEAT_WINDOW_MS) posted.delete(mark);
+  }
+  return posted;
+}
+
+export function rememberOwnBoardPost(body, now = Date.now()) {
+  ownBoardPosts.set(boardBodyMark(body), now);
+  writeStoredValue(BOARD_OWN_POSTS_KEY, JSON.stringify(Object.fromEntries(readOwnBoardPosts(now))));
+}
+
 export function isOwnRecentPost(posted, body, now = Date.now()) {
-  const at = posted.get(body);
+  const at = posted.get(boardBodyMark(body));
   return at !== undefined && now - at < BOARD_REPEAT_WINDOW_MS;
 }
 
@@ -312,7 +348,7 @@ export function useBoard({ showBoard, isOnline }) {
       setBoardPostStatus(stopped.message);
       return;
     }
-    if (isOwnRecentPost(ownBoardPosts, trimmedBoardBody)) {
+    if (isOwnRecentPost(readOwnBoardPosts(), trimmedBoardBody)) {
       setBoardPostStatus("같은 글을 이미 올렸습니다. 같은 글은 게시판에 한 번만 실립니다.");
       return;
     }
@@ -338,7 +374,7 @@ export function useBoard({ showBoard, isOnline }) {
       }
       setBoardBodyState("");
       setLastBoardPostAt(Date.now());
-      ownBoardPosts.set(trimmedBoardBody, Date.now());
+      rememberOwnBoardPost(trimmedBoardBody);
       setBoardPostStatus("글을 올렸습니다.");
       reloadBoard();
     } catch (error) {

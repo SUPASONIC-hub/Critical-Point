@@ -92,6 +92,46 @@ test("the board takes a post, says so aloud, and files it under its own id", asy
   expect(written).toHaveLength(1);
 });
 
+// The server takes the same words from the same device again for six hours and
+// stores nothing. The page remembered its posts only until it was reloaded.
+test("the same words posted again after a reload are not sent, and the person is told", async ({ page }) => {
+  const written = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, async (route) => {
+    if (route.request().method() !== "POST") return route.fulfill(json([]));
+    written.push(route.request().postDataJSON());
+    return route.fulfill({ status: 201, body: "" });
+  });
+  await useMockSupabase(page);
+  await page.clock.install();
+  await openBoard(page);
+  const status = page.getByTestId("board-post-status");
+  await page.getByPlaceholder("게시판에 보일 이름").fill("분석관 김");
+  await page.getByPlaceholder(/사건을 지나며/).fill("끝까지 왔습니다.");
+  await page.clock.runFor(4_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(status).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(1);
+
+  await page.reload();
+  await page.getByRole("button", { name: "게시판" }).first().click();
+  await expect(page.locator(".board-page")).toBeVisible();
+  await expect(page.getByPlaceholder("게시판에 보일 이름")).toHaveValue("분석관 김");
+  await page.getByPlaceholder(/사건을 지나며/).fill("끝까지 왔습니다.");
+  await page.clock.runFor(4_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(page.getByTestId("board-post-status")).toContainText("같은 글을 이미 올렸습니다");
+  await expect(page.getByPlaceholder(/사건을 지나며/), "the words are still in the box").toHaveValue("끝까지 왔습니다.");
+  expect(written, "nothing was sent to be dropped").toHaveLength(1);
+
+  // Other words from the same device go up.
+  await page.getByPlaceholder(/사건을 지나며/).fill("다른 말도 남깁니다.");
+  await page.clock.runFor(31_000);
+  await page.getByRole("button", { name: "글 남기기" }).click();
+  await expect(page.getByTestId("board-post-status")).toHaveText("글을 올렸습니다.");
+  expect(written).toHaveLength(2);
+});
+
 test("a second person's identical post is told it did not go up", async ({ page }) => {
   await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
   await page.route(`${SUPABASE}/rest/v1/board_posts**`, async (route) => {
