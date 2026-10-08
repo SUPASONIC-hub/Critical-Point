@@ -31,7 +31,21 @@ test("case 05 scene has no structural accessibility violations", async ({ page }
 test("the briefing page has no structural accessibility violations", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice", { openTable: false });
-  await expect(page.getByTestId("scene-briefing").getByRole("dialog")).toBeVisible();
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing.getByRole("dialog")).toBeVisible();
+  // The page fades in and its panels pop one after another for about a second.
+  // Read before they land, the contrast rule measures text half faded into
+  // the paper (2.7, 3.26, 3.87 on three runs of 2026-10-08) and fails a page
+  // that passes once it has arrived. The loops that never end (the splash
+  // glitch, a late timer's throb) are not waited for.
+  await briefing.evaluate((node) =>
+    Promise.all(
+      node
+        .getAnimations({ subtree: true })
+        .filter((animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime))
+        .map((animation) => animation.finished.catch(() => {})),
+    ),
+  );
   await expectNoA11yViolations(page);
 });
 
