@@ -294,19 +294,19 @@ async function collect(page) {
 }
 
 /**
- * What the pixel reading found the first time it ran (2026-10-08), and nobody
- * has yet decided how to fix: on a phone, two lines of the intro stand on the
- * bright band of the key visual, where the scrim over it is thinnest. They are
- * listed so the reading can be on for everything else, and each is held to the
- * ratio it measured -- it may not get worse, and a new line may not join it.
- * On a phone-sized screen an entry that is no longer found fails too, so a fix
- * is noticed and the entry taken out with it. Do not add one without a decision.
+ * Lines the pixel reading finds under their ratio and nobody has yet decided
+ * how to fix. An entry is `{ screen, text, measured, floor }`: it is listed so
+ * the reading can be on for everything else, and held to the ratio it measured
+ * -- it may not get worse, and a new line may not join it. On a phone-sized
+ * screen an entry that is no longer found fails too, so a fix is noticed and
+ * the entry taken out with it. Do not add one without a decision.
+ *
+ * Empty since the two it began with (2026-10-08) were fixed: on a phone the
+ * intro's 臨界點 (3.02:1) and its premise paragraph (3.08:1) stood on the bright
+ * band of the key visual, and the reading line now carries its own shade.
  */
 const PHONE_WIDTH = 480;
-const KNOWN_OVER_A_PICTURE = [
-  { screen: "intro", text: "臨界點", measured: 3.02, floor: 2.8 },
-  { screen: "intro", text: "3년 전 당신은 승인 서류 한 장에", measured: 3.08, floor: 2.8 },
-];
+const KNOWN_OVER_A_PICTURE = [];
 
 /** Both readings of one screen. Returns how much text was measured from the pixels. */
 async function expectReadable(page, label) {
