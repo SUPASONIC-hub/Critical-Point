@@ -248,6 +248,7 @@
 
 /* On the table: the season's relics as one wrapped line of the bank row. */
 .gx-bank .gx-relics {
+  display: flex;
   flex-basis: 100%;
   flex-wrap: wrap;
   gap: 4px;
