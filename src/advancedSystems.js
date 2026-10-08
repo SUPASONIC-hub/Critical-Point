@@ -156,20 +156,6 @@ export function getEndingPreview(ending = {}) {
   };
 }
 
-export function getChoiceOutcomeFeedback(entry = {}) {
-  if (!entry?.choiceId) return null;
-  // Read off the entry's effect alone. It also read `prematureHypothesis` and
-  // `streakReward`, which belonged to systems that are gone: no commit writes
-  // either, so those branches never ran.
-  const effectCount = Object.values(entry.effect ?? {}).filter((value) => value !== 0).length;
-  const tone = effectCount >= 3 ? "tradeoff" : "signal";
-  return {
-    tone,
-    label: tone === "tradeoff" ? "TRADEOFF REGISTERED" : "SIGNAL REGISTERED",
-    text: "이 선택은 다음 장면의 관계와 자원에 누적됩니다.",
-  };
-}
-
 export function getEndingVisualClass(endingId = "open-question") {
   return `ending-visual-${String(endingId).replace(/[^a-z0-9-]/gi, "-")}`;
 }

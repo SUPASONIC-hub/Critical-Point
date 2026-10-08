@@ -536,53 +536,6 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 }
 
 /**
- * What the records a run opened add up to. Only cases 01-05 and the finale had
- * a hypothesis, so 49 of the season's records fed nothing here. Each act has one
- * now, formed at two thirds of its records and surer the more it holds; the
- * three first-act pairings stay, as they name something more specific.
- */
-const ACT_HYPOTHESES = [
-  { id: "act-0", from: "prologue01", to: "prologue05", title: "빈칸은 처음부터 비워 두었다", text: "수습 과제의 한 줄, 반려된 의견서, 사유 칸이 빈 발령서가 같은 방식으로 비어 있습니다. 누군가 채우지 않기로 정한 칸입니다." },
-  { id: "act-1", from: "case01", to: "case07", title: "손실은 사라지지 않고 옮겨졌다", text: "310억의 손실이 다른 회사의 장부로, 돌봄 시간으로, 옆자리 동료로 옮겨 간 기록이 한 줄로 이어집니다." },
-  { id: "act-2", from: "case08", to: "case12", title: "숫자가 먼저 정해지고 근거가 뒤따랐다", text: "그림값의 날짜, 사 둔 회수율, 사유란의 기본값이 모두 결론을 먼저 정해 두고 계산을 나중에 맞춘 흔적입니다." },
-  { id: "act-3", from: "case13", to: "case18", title: "개혁은 같은 방식을 다시 썼다", text: "개혁안의 기록에서도 위에서 밀어붙이고 서명란은 비워 두는 방식이 그대로 반복됩니다." },
-  { id: "act-4", from: "case19", to: "case24", title: "실험은 지배구조의 일부였다", text: "트리거랩의 반응 기록이 그룹의 인사 서류와 지배구조 문서로 이어집니다. 관찰은 연구가 아니라 선발이었습니다." },
-  { id: "act-5", from: "case25", to: "case30", title: "흩어진 자리마다 같은 고리가 있다", text: "사람들이 흩어진 곳마다 같은 사슬의 새 고리가 보입니다. 자리를 옮긴 것은 사람이지 방식이 아니었습니다." },
-  { id: "act-6", from: "case31", to: "case36", title: "책임은 한 사람에게 모이도록 짜였다", text: "조사가 시작되자 기록은 모두 한 사람의 서명으로 모입니다. 그 모양은 우연이 아니라 설계입니다." },
-  { id: "act-7", from: "case37", to: "case42", title: "기록의 주인이 결론의 주인이다", text: "법정과 방송과 국회가 다툰 것은 사실이 아니라 기록을 누가 쥐느냐였습니다." },
-  { id: "act-8", from: "case43", to: "case49", title: "빈 서명란은 비운 사람이 채워야 한다", text: "마지막 기록들은 모두 같은 칸을 가리킵니다. 비워 둔 사람이 채우지 않으면, 가장 늦게 온 사람의 이름으로 닫힙니다." },
-];
-
-function getActClueIds(from, to) {
-  const start = CASE_SEQUENCE.indexOf(from);
-  const end = CASE_SEQUENCE.indexOf(to);
-  if (start < 0 || end < start) return [];
-  return CASE_SEQUENCE.slice(start, end + 1).map((caseId) => discoveryClues[caseId]?.id).filter(Boolean);
-}
-
-export function getClueHypotheses(clues = []) {
-  const ids = new Set(clues.map((clue) => clue?.id));
-  const hypotheses = [];
-  if (ids.has("c1-hidden-ledger") && ids.has("c2-false-timestamp")) {
-    hypotheses.push({ id: "ledger-timestamp", title: "기록은 사후에 만들어졌다", text: "누락된 비용과 어긋난 시각이 같은 조작 흐름을 가리킵니다.", confidence: 72 });
-  }
-  if (ids.has("c3-second-scoreboard") && ids.has("c4-exception-file")) {
-    hypotheses.push({ id: "score-exception", title: "예외는 성과 측정의 일부였다", text: "경쟁 점수와 예외 승인 기록이 같은 운영 규칙을 공유합니다.", confidence: 68 });
-  }
-  if (ids.has("c5-empty-seat") && ids.has("final-observer-key")) {
-    hypotheses.push({ id: "observer-operator", title: "관찰자는 외부인이 아니었다", text: "비어 있는 책임 자리와 관찰자 키가 주인공의 이전 기록을 연결합니다.", confidence: 84 });
-  }
-  for (const act of ACT_HYPOTHESES) {
-    const actIds = getActClueIds(act.from, act.to);
-    if (actIds.length === 0) continue;
-    const held = actIds.filter((id) => ids.has(id)).length;
-    if (held * 3 < actIds.length * 2) continue;
-    hypotheses.push({ id: act.id, title: act.title, text: act.text, confidence: Math.round(50 + (held / actIds.length) * 40) });
-  }
-  return hypotheses;
-}
-
-/**
  * Which ending the run earned, read off the season rather than its last case.
  *
  * Replayed through the runtime's own resolve path (`check:endings`), the gates

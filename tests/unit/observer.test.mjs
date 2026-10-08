@@ -1,13 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { getClueHypotheses, getObserverPattern, getObserverTag } from "../../src/gameLogic.js";
-import { CASE_PACKS } from "../../src/nodes/casePacks.js";
+import { getObserverPattern, getObserverTag } from "../../src/gameLogic.js";
 
 /**
  * How the observer files a decision (the tag on each log entry, and what the
- * run's tags add up to on the report), and which hypotheses a set of clues
- * opens. Both are read off the run's log and held clues alone.
+ * run's tags add up to on the report), read off the run's log alone.
  */
 const calm = { responseTimeSec: 10, challenge: { riskDelta: 0 } };
 
@@ -87,22 +85,4 @@ test("the turning point is the first decision that breaks a pattern already set"
   assert.ok(pattern.endingRecord.text.endsWith(pattern.turningPoint.title));
   // Two decisions are not yet a pattern to break.
   assert.equal(getObserverPattern(entries.slice(1, 3)).turningPoint, null);
-});
-
-test("a hypothesis opens on the clues it names", () => {
-  assert.deepEqual(getClueHypotheses([]), []);
-  assert.deepEqual(
-    getClueHypotheses([{ id: "c1-hidden-ledger" }, { id: "c2-false-timestamp" }, null]).map((hypothesis) => hypothesis.id),
-    ["ledger-timestamp"],
-  );
-  assert.deepEqual(getClueHypotheses([{ id: "c1-hidden-ledger" }, { id: "c4-exception-file" }]), []);
-});
-
-test("an act's hypothesis opens at two thirds of its clues, and is surer with more", () => {
-  const prologue = CASE_PACKS.filter((pack) => pack.id.startsWith("prologue")).map((pack) => ({ id: pack.clue.id }));
-  assert.equal(prologue.length, 5);
-  assert.deepEqual(getClueHypotheses(prologue.slice(0, 3)), []);
-  const four = getClueHypotheses(prologue.slice(0, 4));
-  assert.deepEqual(four.map(({ id, confidence }) => [id, confidence]), [["act-0", 82]]);
-  assert.equal(getClueHypotheses(prologue)[0].confidence, 90);
 });

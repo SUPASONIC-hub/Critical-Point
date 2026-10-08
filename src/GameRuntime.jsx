@@ -193,7 +193,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = useAppPersistence({
     run,
     patchRun,
-    saveSlots,
     refs: { pendingTelemetryRef },
     setters: { setSaveStatus, setLocalErrorEntries, setSaveSlots, setPendingTelemetry },
     config: {
