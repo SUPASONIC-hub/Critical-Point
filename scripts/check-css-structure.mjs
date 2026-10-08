@@ -49,7 +49,9 @@ const budgets = {
   // is deliberately looser. It should still only go down.
   // 50 -> 23 on 2026-09-15, ratcheted to what the glass pass left.
   // 23 -> 11 on 2026-09-28, to what it measures.
-  repeatedInOneFile: 11,
+  // 11 -> 10 on 2026-10-08: one of the play header's two h1 rules went, with
+  // the wrapping it asked of a title that never wraps.
+  repeatedInOneFile: 10,
   // The two numbers above count less than their names say, and these two are
   // the rest of it (2026-10-08). They are ratchets like the others: measured
   // on the day they were added, and they only go down.
@@ -64,7 +66,9 @@ const budgets = {
   // `.a, .b { }` followed by `.a { }` is no repeat to it. This one counts
   // each selector of the list on its own, under one condition, in one file.
   // (Split on every comma it reads 145; 35 of those are halves of an `:is()`.)
-  selectorsRepeatedInOneFile: 110,
+  // 110 -> 107 the same day: the dead rules that left play.css and the intro's
+  // 860px blocks took three repeats with them.
+  selectorsRepeatedInOneFile: 107,
 };
 
 const fileBudgets = {

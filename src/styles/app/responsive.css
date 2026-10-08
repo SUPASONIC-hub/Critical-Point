@@ -84,7 +84,6 @@
   }
 .brand-row,
   .topbar,
-  .game-header,
   .start-input-row,
   .top-actions {
     align-items: stretch;
@@ -100,16 +99,6 @@
   }
   .top-actions {
     justify-content: stretch;
-  }
-  /* Icons, not labels: the compact row stays a row on a phone. Stacking it
-     spent 130px above the story on three buttons that are 34px wide. */
-  .top-actions.compact-actions {
-    flex-direction: row;
-    justify-content: flex-end;
-    width: auto;
-  }
-  .top-actions.compact-actions .ghost {
-    width: auto;
   }
   .observer-postmortem-grid,
   .result-grid,
@@ -223,7 +212,6 @@
   .gx-hand-head,
   .gx-portrait,
   .gx-dateline,
-  .gx-brief,
   .gx-situation,
   .gx-focus-modes small,
   .gx-focus-signal small,
@@ -287,6 +275,12 @@
 
   .gx-scene {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The fold stays, on the speaker's line: the question and the cards are cut
+     to two lines here, and it prints both whole. */
+  .gx-brief {
+    grid-row: 2;
   }
 
   .gx-question {
@@ -376,6 +370,15 @@
   .gx-speaker {
     display: none;
   }
+
+  /* With no speaker's line to share, the fold sits beside the question. */
+  .gx-question {
+    grid-column: 1;
+  }
+
+  .gx-brief {
+    grid-row: 1;
+  }
 }
 
 @media (max-height: 340px) and (orientation: landscape) and (pointer: coarse) {
@@ -421,6 +424,7 @@
   .score-breakdown i,
   .ranking-comparison em,
   .ending-axis-grid em,
+  .gx-focus-modes i b,
   .gx-gauge-band,
   .gx-gauge-wall {
     forced-color-adjust: none;
