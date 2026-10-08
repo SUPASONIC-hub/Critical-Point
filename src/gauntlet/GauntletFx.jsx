@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getGoodWindowMs, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
-import { FX_READERS, FX_VARIABLES, fxBeatPhaseValue, fxBeatValue, fxFlashValue, fxShake, registerFxVariables } from "./fxVariables.js";
+import { FX_READERS, FX_VARIABLES, fxBeatPhaseValue, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, registerFxVariables } from "./fxVariables.js";
 import { createLightGate, monotonicNow } from "./timing.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
@@ -53,6 +53,11 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * says: no shake, the grade flash at a third, no beat pulse on the pot, the
  * clock and the heart, and the ring held closed as reduced motion holds it,
  * because a ring that snaps open on every beat is a blink at the beat's rate.
+ *
+ * One thing neither setting touches: --gx-rate, how fast the pulse is, which
+ * lights the gauge's ticks. It is a level that drifts, not a beat (see
+ * `fxRateStep`), so a player with the sound off and the comfort setting on
+ * still has the heartbeat as something to read.
  *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
@@ -128,6 +133,8 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
     let nextBeat = 0;
     let beat = 0;
     let pulsedAt = 0;
+    // The tick light's level; under 0 until the first frame has read the pulse.
+    let rate = -1;
     // Beats that have been scheduled and not yet heard, oldest first. It was
     // one slot, overwritten by each new beat: with more output latency than
     // one beat lasts -- a Bluetooth speaker near the wall -- every beat was
@@ -166,8 +173,11 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       // start: on a starved main thread the callback runs well after `time`, and
       // a press on the beat the player heard would be graded early.
       const now = monotonicNow();
+      // The number the stage prints, read here whether the table is live or
+      // not: the tick light shows it, and is on screen for as long as it is.
+      const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / win.schema.seconds);
+      rate = fxRateStep(rate, fxRateTarget(bpm), delta);
       if (live) {
-        const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / win.schema.seconds);
         if (time >= nextBeat) {
           const latency = Math.min(LATENCY_MAX_MS, Math.max(0, playHeartbeat(heat)));
           nextBeat = time + 60000 / bpm;
@@ -225,6 +235,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       write("--gx-beat-live", beating ? "1" : "0");
       write("--gx-beat-zone", zone ? "1" : "0");
       write("--gx-flash", fxFlashValue(flashRef.current, calm));
+      write("--gx-rate", rate.toFixed(2));
       frame = globalThis.requestAnimationFrame(loop);
     };
     frame = globalThis.requestAnimationFrame(loop);

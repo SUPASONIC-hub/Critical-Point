@@ -542,16 +542,17 @@ export function GauntletStage({
           </section>
         )}
 
-        <div
-          className="gx-gauge"
-          role="meter"
-          aria-label="열기 게이지"
-          aria-valuemin={0}
-          aria-valuemax={GAUGE_MAX}
-          aria-valuenow={Math.round(win.gauge)}
-          aria-valuetext={`열기 ${Math.round(win.gauge)}, 벽은 ${schema.wallMin}에서 ${schema.wallMax} 사이 어딘가`}
-        >
-          <div className="gx-gauge-track">
+        <div className="gx-gauge">
+          {/* The meter is the track, not the block: a meter's children are not read out. */}
+          <div
+            className="gx-gauge-track"
+            role="meter"
+            aria-label="열기 게이지"
+            aria-valuemin={0}
+            aria-valuemax={GAUGE_MAX}
+            aria-valuenow={Math.round(win.gauge)}
+            aria-valuetext={`열기 ${Math.round(win.gauge)}, 벽은 ${schema.wallMin}에서 ${schema.wallMax} 사이 어딘가`}
+          >
             <span className="gx-gauge-band" style={{ left: `${bandLeft}%`, width: `${bandWidth}%` }} />
             {live && (
               <span
@@ -560,21 +561,24 @@ export function GauntletStage({
               />
             )}
             <span className="gx-gauge-fill" style={{ transform: `scaleX(${Math.min(1, win.gauge / GAUGE_MAX)})` }} />
+            {/* The pulse without sound: lit by --gx-rate, a level that drifts and never blinks. */}
+            <span className="gx-gauge-ticks" aria-hidden="true" />
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
             <span className="gx-gauge-seal" style={{ left: `${schema.sealBreak}%` }} hidden={!sealedId} />
           </div>
           <div className="gx-gauge-read">
-            <span>
+            {/* The meter says the first two. The pulse is named text and no live region: read when asked for. */}
+            <span aria-hidden="true">
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <span className="gx-band-label">
+            <span className="gx-band-label" aria-hidden="true">
               벽 {schema.wallMin}–{schema.wallMax}
             </span>
-            <span className="gx-bpm">
+            <span className="gx-bpm" data-testid="gauntlet-bpm">
               <HeartPulse size={14} aria-hidden="true" />
-              <b>{schema.sedated ? "??" : bpm}</b>
+              심박 <b>{schema.sedated ? "교란" : bpm}</b>
             </span>
           </div>
         </div>

@@ -15,6 +15,7 @@ export const FX_READERS = Object.freeze({
   "--gx-beat-live": ".gx-beat-ring",
   "--gx-beat-zone": ".gx-focus-modes button, .gx-push, .gx-focus, .gx-focus-reticle",
   "--gx-flash": ".gx-fx-flash",
+  "--gx-rate": ".gx-gauge-ticks",
 });
 
 export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
@@ -32,6 +33,30 @@ export const fxShake = (trauma, reducedMotion, calm) => (reducedMotion || calm ?
 export const fxBeatValue = (beat, calm) => (calm ? "0.000" : beat.toFixed(3));
 export const fxBeatPhaseValue = (phase, reducedMotion, calm) => (reducedMotion || calm ? "1" : phase.toFixed(2));
 export const fxFlashValue = (flash, calm) => (calm ? flash / 3 : flash).toFixed(2);
+
+/**
+ * The tick light: how fast the pulse is, as how bright the gauge's ticks are.
+ *
+ * It is the heartbeat for a player who has the sound off, and neither setting
+ * above reaches it. Everything else that shows the pulse is a blink at the
+ * pulse's own rate -- the ring, the vignette, the heart beside the number --
+ * and the comfort setting stops those, so with the sound off as well there was
+ * no instrument left. This one is a level, not a beat: 0 at a resting pulse, 1
+ * at the fastest the engine goes, and it drifts to where the pulse is rather
+ * than jumping there. Crossing the whole range takes `RATE_SWEEP_MS`, so the
+ * ticks cannot blink however the pulse moves; tests/unit/table-motion.test.mjs
+ * holds that against three flashes a second with the opacity the sheet gives it.
+ */
+export const RATE_REST_BPM = 60;
+export const RATE_TOP_BPM = 190;
+export const RATE_SWEEP_MS = 2000;
+export const fxRateTarget = (bpm) => Math.min(1, Math.max(0, ((Number(bpm) || 0) - RATE_REST_BPM) / (RATE_TOP_BPM - RATE_REST_BPM)));
+/** One frame of the drift. A negative `rate` is a table that has not drawn yet, which starts on the pulse. */
+export function fxRateStep(rate, target, deltaMs) {
+  if (rate < 0) return target;
+  const reach = Math.max(0, deltaMs) / RATE_SWEEP_MS;
+  return Math.abs(target - rate) <= reach ? target : rate + Math.sign(target - rate) * reach;
+}
 
 const FX_LENGTHS = new Set(["--gx-shake-x", "--gx-shake-y"]);
 

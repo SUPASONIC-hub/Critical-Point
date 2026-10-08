@@ -1,6 +1,7 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
  * The comfort settings (maintenance priority 87): set on the intro, stored on
@@ -142,4 +143,137 @@ test("at 2배 the table's clock runs at half speed", async ({ page }) => {
   const assisted = await clockLossOverTenSeconds(page);
   expect(assisted, "ten seconds cost about five").toBeGreaterThanOrEqual(4);
   expect(assisted).toBeLessThanOrEqual(6);
+});
+
+/**
+ * The heartbeat for a player who cannot hear it. The ring, the pulse and the
+ * red edge are what the comfort setting turns down, so with the sound off and
+ * 번쩍임·흔들림 줄이기 on there was no instrument left at all. Two things stay
+ * whatever is turned down: the number beside the gauge, and the gauge's ticks,
+ * lit by how fast the pulse is.
+ */
+const HEART_READOUTS = [
+  { name: "by default", settings: null, muted: false, reducedMotion: false },
+  { name: "with 번쩍임·흔들림 줄이기 on", settings: { calmEffects: true }, muted: false, reducedMotion: false },
+  { name: "with the sound off", settings: null, muted: true, reducedMotion: false },
+  { name: "with the sound off, 번쩍임·흔들림 줄이기 on and reduced motion", settings: { calmEffects: true }, muted: true, reducedMotion: true },
+];
+
+/** The pulse as the table prints it, and the light the frame loop gives the ticks. */
+function readHeart(page) {
+  return page.evaluate(() => {
+    const readout = document.querySelector("[data-testid='gauntlet-bpm']");
+    const ticks = document.querySelector(".gx-gauge-ticks");
+    const style = ticks ? getComputedStyle(ticks) : null;
+    return {
+      text: readout?.textContent ?? "",
+      bpm: Number(readout?.querySelector("b")?.textContent ?? Number.NaN),
+      rate: style ? Number(style.getPropertyValue("--gx-rate")) : Number.NaN,
+      light: style ? Number(style.opacity) : Number.NaN,
+    };
+  });
+}
+
+for (const { name, settings, muted, reducedMotion } of HEART_READOUTS) {
+  test(`the heartbeat is a number and a tick light beside the gauge ${name}`, async ({ page }) => {
+    if (settings) await withSettings(page, settings);
+    if (muted) await page.addInitScript((key) => localStorage.setItem(key, "false"), TEST_STORAGE_KEYS.musicEnabled);
+    if (reducedMotion) await page.emulateMedia({ reducedMotion: "reduce" });
+    await startDebugNode(page, "case01", "start");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    const stage = page.getByTestId("gauntlet-stage");
+    await expect(stage).toHaveAttribute("data-status", "live");
+    if (settings?.calmEffects) await expect(page.locator("html")).toHaveAttribute("data-calm-effects", "");
+    else await expect(page.locator("html")).not.toHaveAttribute("data-calm-effects", "");
+    if (muted) await expect(page.getByRole("button", { name: "배경음 켜기", exact: true })).toBeVisible();
+
+    // The number: on screen, named, and a pulse a heart can have.
+    const readout = page.getByTestId("gauntlet-bpm");
+    await expect(readout).toBeVisible();
+    await expect(readout).toHaveText(/^심박\s*\d{2,3}$/);
+    const ticks = page.locator(".gx-gauge-ticks");
+    await expect(ticks).toHaveCount(1);
+    // The frame loop has written the light once it reads as a number.
+    await expect.poll(async () => (await readHeart(page)).rate, { message: "the frame loop writes the tick light" }).toBeGreaterThanOrEqual(0);
+    const resting = await readHeart(page);
+    expect(resting.bpm).toBeGreaterThanOrEqual(60);
+    expect(resting.bpm).toBeLessThanOrEqual(190);
+
+    // Three pushes heat the gauge without reaching the lowest wall (45 against
+    // 56), and a hot gauge always races: the number rises and the ticks light.
+    const gauge = page.getByTestId("gauntlet-gauge");
+    for (let press = 0; press < 3; press += 1) {
+      const before = Number(await gauge.textContent());
+      await page.getByTestId("commit-push").click();
+      await expect.poll(async () => Number(await gauge.textContent()), { message: `push ${press + 1} heated the gauge` }).toBeGreaterThan(before);
+    }
+    await expect(stage).toHaveAttribute("data-status", "live");
+    await expect.poll(async () => (await readHeart(page)).bpm, { message: "the number follows the heat" }).toBeGreaterThan(60);
+    await expect.poll(async () => (await readHeart(page)).rate, { message: "the tick light follows the number" }).toBeGreaterThan(0);
+    await expect.poll(async () => (await readHeart(page)).light, { message: "and is drawn" }).toBeGreaterThan(0);
+    const heated = await readHeart(page);
+    expect(heated.bpm).toBeGreaterThanOrEqual(resting.bpm);
+    expect(heated.rate).toBeLessThanOrEqual(1);
+    expect(heated.light, "a faint light, not a lamp").toBeLessThanOrEqual(0.5);
+    await expect(ticks).toHaveCSS("animation-name", "none");
+    await expect(readout).toBeVisible();
+
+    if (settings?.calmEffects) {
+      // What the setting did turn down: the heart beside the number no longer pulses.
+      const beat = await page.locator(".gx-bpm svg").evaluate((icon) => Number(getComputedStyle(icon).getPropertyValue("--gx-beat")));
+      expect(beat).toBe(0);
+    }
+  });
+}
+
+test("the heartbeat number is read out by name, and is not announced as it changes", async ({ page }) => {
+  await startDebugNode(page, "case01", "start");
+  const readout = page.getByTestId("gauntlet-bpm");
+  await expect(readout).toBeVisible();
+  const facts = await readout.evaluate((element) => ({
+    // A meter's children are not read out; the number sits beside it.
+    insideMeter: Boolean(element.closest("[role='meter']")),
+    hidden: Boolean(element.closest("[aria-hidden='true']")),
+    // An ancestor that announces changes would read the pulse on every beat.
+    announced: Boolean(element.closest("[aria-live]:not([aria-live='off']), [role='status'], [role='alert'], [role='timer'], [role='log'], output")),
+    iconHidden: element.querySelector("svg")?.getAttribute("aria-hidden"),
+  }));
+  expect(facts).toEqual({ insideMeter: false, hidden: false, announced: false, iconHidden: "true" });
+  // The gauge is still a meter with its own name and value.
+  const meter = page.getByRole("meter", { name: "열기 게이지" });
+  await expect(meter).toHaveAttribute("aria-valuenow", /^\d+$/);
+  await expect(meter).toHaveAttribute("aria-valuetext", /^열기 \d+, 벽은 \d+에서 \d+ 사이 어딘가$/);
+  await expect(meter.locator(".gx-gauge-ticks")).toHaveAttribute("aria-hidden", "true");
+});
+
+// The row under the gauge is one line on every phone the table promises to
+// fit, upright and on its side, at the fastest pulse there is.
+test("the heartbeat number fits beside the gauge on a small phone and a phone on its side", { tag: "@layout" }, async ({ page }) => {
+  for (const [width, height] of [[360, 740], [390, 844], [740, 360], [844, 390]]) {
+    await page.setViewportSize({ width, height });
+    await startDebugNode(page, "case05", "c5_voice");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    const readout = page.getByTestId("gauntlet-bpm");
+    await expect(readout).toBeVisible();
+    const row = await page.evaluate(() => {
+      const read = document.querySelector(".gx-gauge-read");
+      // The widest the row can be: a full gauge and three figures of pulse.
+      read.querySelector("[data-testid='gauntlet-gauge']").textContent = "100";
+      read.querySelector("[data-testid='gauntlet-bpm'] b").textContent = "190";
+      const box = (element) => element.getBoundingClientRect();
+      const bpm = read.querySelector("[data-testid='gauntlet-bpm']");
+      const band = read.querySelector(".gx-band-label");
+      return {
+        overflow: read.scrollWidth - read.clientWidth,
+        lines: Math.round(box(read).height / Number.parseFloat(getComputedStyle(read).fontSize)),
+        gap: Math.round(box(bpm).left - box(band).right),
+        right: Math.round(box(bpm).right),
+        innerWidth,
+      };
+    });
+    expect(row.overflow, `${width}x${height}: the row is not wider than the gauge`).toBeLessThanOrEqual(0);
+    expect(row.lines, `${width}x${height}: the row is one line`).toBe(1);
+    expect(row.gap, `${width}x${height}: the number does not touch the wall's range`).toBeGreaterThanOrEqual(8);
+    expect(row.right, `${width}x${height}: the number is on the screen`).toBeLessThanOrEqual(row.innerWidth);
+  }
 });
