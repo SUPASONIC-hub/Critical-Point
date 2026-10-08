@@ -510,6 +510,51 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   await expect(page.locator(".gx-fx-bust")).toHaveCount(1);
 });
 
+test("the briefing page holds the clock, stakes a card from the page, and opens the table when it runs out", async ({ page }) => {
+  // The page's own clock, driven from here. This test used to wait on the wall
+  // clock -- up to twenty seconds for a reading time that is twelve to
+  // thirty-five, so a longer scene body would have failed it.
+  //
+  // Thirty seconds of the page's clock is about 1,800 frames, each one drawn:
+  // that alone took 30 to 52 seconds here on 2026-10-08, and late in a run of
+  // the whole file it passed the default sixty and the test died mid-wait on
+  // whichever line it had reached (Chromium at one line, the phone at another).
+  test.setTimeout(150_000);
+  await page.clock.install();
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(briefing).toBeVisible();
+  await expect(briefing.getByRole("dialog")).toBeVisible();
+  await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
+  await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
+  const timer = page.getByTestId("reading-timer");
+  const first = Number(await timer.locator("b").textContent());
+  expect(first).toBeGreaterThanOrEqual(12);
+  await page.clock.runFor(3_000);
+  expect(Number(await timer.locator("b").textContent())).toBeLessThan(first);
+  // The table's own clock has not moved while the page was up.
+  await expect(page.locator(".gx-clock b")).toHaveText("45");
+
+  // A card picked on the page opens the table with that card on it.
+  const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").textContent();
+  await briefing.getByTestId("briefing-card").nth(1).click();
+  await expect(briefing).toHaveCount(0);
+  await expect(page.locator(".choices .choice.selected .gx-card-label")).toHaveText(label);
+  await expect(page.getByTestId("commit-push")).toBeEnabled();
+
+  // Left alone, a page runs out and the table opens with nothing staked.
+  await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
+  expect(reading).toBeLessThanOrEqual(35);
+  await page.clock.runFor((reading - 2) * 1000);
+  await expect(page.getByTestId("scene-briefing")).toBeVisible();
+  await page.clock.runFor(4_000);
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  await expect(page.getByTestId("commit-push")).toBeEnabled();
+  await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
+});
+
 /**
  * 번쩍임·흔들림 줄이기, on a page. What the setting does to a frame is held
  * without a browser (tests/unit/table-motion.test.mjs), and what its rules say
@@ -631,43 +676,4 @@ test("calm effects keep the equip toast, fading", async ({ page }) => {
   // the stage's blanket rule would have removed its exit altogether.
   expect(style.animation).toBe("gx-relic-fade");
   expect(style.seconds).toBeGreaterThanOrEqual(1);
-});
-
-test("the briefing page holds the clock, stakes a card from the page, and opens the table when it runs out", async ({ page }) => {
-  // The page's own clock, driven from here. This test used to wait on the wall
-  // clock -- up to twenty seconds for a reading time that is twelve to
-  // thirty-five, so a longer scene body would have failed it.
-  await page.clock.install();
-  await startDebugNode(page, "case01", "start", { openTable: false });
-  const briefing = page.getByTestId("scene-briefing");
-  await expect(briefing).toBeVisible();
-  await expect(briefing.getByRole("dialog")).toBeVisible();
-  await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
-  await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
-  const timer = page.getByTestId("reading-timer");
-  const first = Number(await timer.locator("b").textContent());
-  expect(first).toBeGreaterThanOrEqual(12);
-  await page.clock.runFor(3_000);
-  expect(Number(await timer.locator("b").textContent())).toBeLessThan(first);
-  // The table's own clock has not moved while the page was up.
-  await expect(page.locator(".gx-clock b")).toHaveText("45");
-
-  // A card picked on the page opens the table with that card on it.
-  const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").textContent();
-  await briefing.getByTestId("briefing-card").nth(1).click();
-  await expect(briefing).toHaveCount(0);
-  await expect(page.locator(".choices .choice.selected .gx-card-label")).toHaveText(label);
-  await expect(page.getByTestId("commit-push")).toBeEnabled();
-
-  // Left alone, a page runs out and the table opens with nothing staked.
-  await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
-  await expect(page.getByTestId("scene-briefing")).toBeVisible();
-  const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
-  expect(reading).toBeLessThanOrEqual(35);
-  await page.clock.runFor((reading - 2) * 1000);
-  await expect(page.getByTestId("scene-briefing")).toBeVisible();
-  await page.clock.runFor(4_000);
-  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
-  await expect(page.getByTestId("commit-push")).toBeEnabled();
-  await expect(page.locator(".choices .choice.selected")).toHaveCount(0);
 });
