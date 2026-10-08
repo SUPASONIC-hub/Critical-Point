@@ -452,7 +452,7 @@ export const case05 = {
           voice: "책임 논의를 미뤄두고, 빠진 안전장치부터 복구한다.",
           echo: "장치 복구는 다음 피해를 막습니다. 이번 피해자는 아직 아무 답도 받지 못했습니다.",
           next: "c5_branch_owner_follow",
-          cognition: { reframing: 2 },
+          cognition: { inference: 1 },
         },
         {
           id: "c5_branch_owner_c",
