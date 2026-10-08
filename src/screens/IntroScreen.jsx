@@ -107,7 +107,7 @@ export function IntroScreen({ view, renderers = {} }) {
     },
     season: {
       seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
-      resourceMeta, seasonCases, caseResults, completedCases, currentCase, startCase, getCaseStatusText,
+      resourceMeta, seasonCases, caseResults, currentCase, atReport, startCase, getCaseStatusText,
       normalizeCaseSummary,
     },
     content: {
@@ -161,7 +161,7 @@ export function IntroScreen({ view, renderers = {} }) {
   // record away asks first (decideCaseCardPress has the cases).
   const pressCaseCard = (caseItem) => {
     const press = decideCaseCardPress({
-      caseId: caseItem.id, status: caseItem.status, currentCase, completedCases, hasResumableSave, logLength: log.length,
+      caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: log.length,
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();

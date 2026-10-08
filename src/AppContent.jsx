@@ -350,6 +350,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     caseResults: saved?.caseResults ?? {},
     completedCases: saved?.completedCases ?? [],
     currentCase: saved?.currentCase ?? SEASON_ENTRY_CASE,
+    nodeId: saved?.nodeId,
     newGamePlusUnlocked: readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true",
     // Read once: it is every case summary of a finished season, and this
     // object is rebuilt on each keystroke in the name field.

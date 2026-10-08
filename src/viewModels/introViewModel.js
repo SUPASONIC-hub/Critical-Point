@@ -29,7 +29,7 @@ import {
   resourceMeta,
   triggerLabSignals,
 } from "../appCopy.js";
-import { CASE_SEQUENCE, caseObjectives, seasonCasesBase } from "../gameCases.js";
+import { CASE_SEQUENCE, RESULT_NODE_IDS, caseObjectives, seasonCasesBase } from "../gameCases.js";
 import { triggerLabels } from "../gameConstants.js";
 import {
   getOperatorProfile,
@@ -84,6 +84,8 @@ export function createIntroViewModel({
   caseResults,
   completedCases,
   currentCase,
+  // The scene the save stands on. Only whether it is a report is read here.
+  nodeId,
   newGamePlusUnlocked,
   newGamePlusMemory,
   nextParticipantMessage,
@@ -169,6 +171,7 @@ export function createIntroViewModel({
     caseResults,
     completedCases,
     currentCase,
+    atReport: RESULT_NODE_IDS.has(nodeId),
     startCase,
     getCaseStatusText,
     normalizeCaseSummary,
