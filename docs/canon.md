@@ -23,6 +23,7 @@ commit.
 | 제7조 | past 180% the bank may call the loan before maturity |
 | Margin | 0.4%포인트 between 179.6% and the line |
 | What was moved | 268억 of December's 412억, booked four weeks early |
+| 2025: what was moved again | the same shift, repeated at each month-end for 8 months, each time to the same 179.6% (사건 01) |
 | Who wrote 제7조 | KD은행 기업금융전략팀, November 2022, on a one-page request from 그룹전략실 |
 | 플로우온 head-count | 1,140명; 야간조 380명, 181 of them on contract (2023) |
 
