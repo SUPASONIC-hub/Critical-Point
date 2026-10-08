@@ -126,6 +126,8 @@ accepted in two weeks. It never is. The group keeps her on the 33rd floor,
 where her desk is searched on 6월 16일 (사건 32), and answers the resignation
 three days after her report with 징계해고, a criminal complaint and eviction
 (사건 33). The complaint was drafted on 6월 1일, before she reported anything.
+She never signs a 합의서: the one in 사건 33 can at most be recommended to her
+and she strikes its conditions, and the one in 사건 43 stays unsigned.
 
 ## 트리거랩's head count
 
