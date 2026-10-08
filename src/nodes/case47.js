@@ -838,7 +838,7 @@ export const case47 = {
     },
     c47_evidence_turn: {
       place: "선재윤 법률사무소 · 자료실",
-      clock: "추석 전날 · 15시",
+      clock: "추석 전 · 자료실",
       question: "31명 몫을 다 주고도 15억이 남고, 그 돈은 나눔 광고로 갑니다. 이 기록을 어떻게 쓰겠습니까?",
     },
     c47_final: {
