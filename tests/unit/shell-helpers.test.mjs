@@ -146,11 +146,11 @@ test("settled window seeds keep strings only and survive a bad record", () => {
 });
 
 test("removeStoredValue reports storage it could not reach", () => {
-  local.setItem("k", "v");
-  assert.equal(appConfig.removeStoredValue("k"), true);
-  assert.equal(local.getItem("k"), null);
+  local.setItem(appConfig.STORAGE_KEY, "v");
+  assert.equal(appConfig.removeStoredValue(appConfig.STORAGE_KEY), true);
+  assert.equal(local.getItem(appConfig.STORAGE_KEY), null);
   local.unavailable = true;
-  assert.equal(appConfig.removeStoredValue("k"), false);
+  assert.equal(appConfig.removeStoredValue(appConfig.STORAGE_KEY), false);
   local.unavailable = false;
 });
 

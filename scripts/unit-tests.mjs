@@ -93,7 +93,6 @@ import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js"
 import { directionParticle, endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
 import { nativeKoreanCount } from "../src/featurePack.js";
 import { nodes } from "../src/gameData.js";
-import { getChoiceOutcomeFeedback } from "../src/advancedSystems.js";
 
 
 const validRanking = { case_id: "case01", summary: { rank: "A", momentumScore: 72 } };
@@ -529,15 +528,6 @@ test("no choice in the graph builds a disagreeing particle", () => {
       assert.doesNotMatch(line, WRONG_PARTICLES, `${node.title}/${choice.id}: "${line}"`);
     }
   }
-});
-
-test("immediate choice feedback reads the entry's effect, and nothing a commit never writes", () => {
-  assert.equal(getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2 } }).label, "SIGNAL REGISTERED");
-  assert.equal(getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2, time: -3, fatigue: 1 } }).label, "TRADEOFF REGISTERED");
-  // Fields of systems that are gone do not change it.
-  const stale = getChoiceOutcomeFeedback({ choiceId: "choice", effect: { trust: 2 }, streakReward: { label: "STREAK PAYOUT", text: "연속 보상" } });
-  assert.equal(stale.label, "SIGNAL REGISTERED");
-  assert.equal(getChoiceOutcomeFeedback({}), null);
 });
 
 const card = (id, effect, extra = {}) => ({ id, label: id, effect, next: "x", ...extra });

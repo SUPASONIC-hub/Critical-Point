@@ -74,7 +74,6 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
     const persistence = useAppPersistence({
       run,
       patchRun,
-      saveSlots: outside.saveSlots,
       refs: { pendingTelemetryRef },
       setters: {
         setSaveStatus,

@@ -41,6 +41,9 @@ const TIME = "(오후 |저녁 |밤 )?(\\d{1,2})(?:시 ?|:)(\\d{1,2})분?";
 // label's colon. No full stop, comma or double quote, so the time belongs to
 // the same clause, and no digit, so "반려 3시간 뒤" is not a time of day.
 const GAP = '[^.,"\\d]{0,14}?';
+// A rank the bank prints beside a name. The longer of two that share a head
+// comes first, so 대표이사 is not read as 대표.
+const RANK = "(팀장|상무|전무|부장|차장|과장|실장|대리|부회장|회장|사장|본부장|대표이사|대표|주임|계장)";
 
 /** The loan, the people around it, and the building they worked in. */
 export const CANON = [
@@ -299,6 +302,240 @@ export const CANON = [
     find: /(\d+)층(?:짜리)? (?:오피스텔|건물)|(\d+)층 중/g,
     allow: ["22"],
   },
+
+  // The afternoon of 27 April 2023 ("The loan's timeline" in docs/canon.md).
+  // Four of its clock times were in the table; these are the rest.
+  {
+    id: "committee-hour",
+    fact: "대출심사위원회 opens at 14:00 on 27 April, and the loan is approved there",
+    files: PROLOGUE,
+    find: /(오후 )?(\d{1,2})시(?: (\d+)분)?,? (?:본점 \d+층 )?대출심사위원회|오늘 (오후 )?(\d{1,2})시(?: (\d+)분)?에 승인된/g,
+    allow: ["오후 2", "14"],
+  },
+  {
+    id: "committee-countdown",
+    fact: "13:32 is 28 minutes before the committee opens, and 08:20 is 5시간 40분 before",
+    files: PROLOGUE,
+    find: /개회 (\d+)분 전|개회까지 (\d+)시간 (\d+)분/g,
+    allow: ["28", "5 40"],
+  },
+  {
+    id: "committee-countdown-summary",
+    fact: "the case summaries put the rejection 28 minutes before the committee",
+    files: new RegExp(SUMMARIES.slice(1)),
+    find: /개회 (\d+)분 전, (?:한서윤|그것은 회의실)/g,
+    allow: ["28"],
+  },
+  {
+    id: "agenda-length",
+    fact: "안건 4번, the loan, takes 4분 12초",
+    files: PROLOGUE,
+    find: /안건 4번(?: 소요 시간 --)? (\d+)분 (\d+)초/g,
+    allow: ["4 12"],
+  },
+  {
+    id: "call-before-rejection",
+    fact: "the call from 팀장실 to 한서윤's desk is logged at 13:21",
+    files: PROLOGUE,
+    find: new RegExp(`${TIME}, (?:6층 )?팀장실 내선`, "g"),
+    allow: ["13 21"],
+  },
+  {
+    id: "call-length",
+    fact: "that call lasts eleven minutes and ends as the dissent is returned",
+    files: caseFiles("prologue03"),
+    find: /통화 시간 (\d+)분|한서윤 자리, (\d+)분|한서윤 자리로 (\d+)분짜리 통화|(\d+)분짜리 통화가 끝나자|'(\d+)분 통화가 끝나자/g,
+    allow: ["11"],
+  },
+  {
+    id: "script-written",
+    fact: "「스마트물류 3호 응대 요령」 was written at 16:05 on 27 April, two hours after the approval",
+    files: PROLOGUE,
+    find: /응대 요령[^"]{0,90}?4월 (\d+)일 (\d{1,2})시 0?(\d{1,2})분|대본 작성: [^"]{0,30}?4월 (\d+)일 (\d{1,2})시 0?(\d{1,2})분/g,
+    allow: ["27 16 5"],
+  },
+  {
+    id: "script-after-approval",
+    fact: "the product reaches the counter two hours after the approval",
+    files: new RegExp(`${PROLOGUE.source}${SUMMARIES}`),
+    find: /승인(?:이 난 지|된 날)? (\S+) ?시간 (?:뒤|만에)|승인된 대출이 (\S+) 시간 만에/g,
+    allow: ["두", "2"],
+  },
+  {
+    id: "script-pages",
+    fact: "the 22-page 설명서 reaches the counters as 4 pages",
+    files: caseFiles("prologue04"),
+    find: /(\d+)쪽에서 (\d+)쪽으로|배포본 (\d+)쪽 (?:→|\/) (?:원본 )?(\d+)쪽|설명서 (\d+)쪽 -- 창구 배포본 (\d+)쪽|(\d+)쪽 중 (\d+)쪽|배포본 (\d+)쪽과 원본 (\d+)쪽/g,
+    allow: ["22 4", "4 22"],
+  },
+  {
+    id: "second-standard",
+    fact: "the second compensation standard accepts 181 of the 212 without papers and leaves 31",
+    files: new RegExp(`${caseFiles("case47").source}${SUMMARIES}`),
+    find: /212명 (?:중|가운데) (\d+)명|(?<![\d,])(\d+)명(?:은|의|이)? (?:연휴 안|연휴 중|오늘 18시|오늘 동의|입금|추석 안에|추석을 쇠고)|(\d+)명에게 (?:나갈 돈은 )?118억|-- (\d+)명 118억/g,
+    allow: ["181", "31"],
+  },
+
+  // The people ("The people" in docs/canon.md): what each is called and when,
+  // in the shapes copy writes it. A rank is read wherever it stands beside the
+  // name; the dated turns are read where the season states them.
+  {
+    id: "yun-post-2023",
+    fact: "윤상혁 was 기업금융전략팀장 in 2022-23",
+    files: SEASON,
+    find: /(?:당시|전) (\S+?팀)장 윤상혁|전 (기업\S+?팀)장(?! 임경수)/g,
+    allow: ["기업금융전략팀"],
+  },
+  {
+    id: "yun-rank-2023",
+    fact: "윤상혁 is 팀장 in the 프롤로그",
+    files: PROLOGUE,
+    find: new RegExp(`윤상혁 ${RANK}|${RANK} 윤상혁`, "g"),
+    allow: ["팀장"],
+  },
+  {
+    id: "yun-rank",
+    fact: "윤상혁 is 팀장, then 그룹전략실 상무, then KD캐피탈 대표이사",
+    files: SEASON,
+    find: new RegExp(`윤상혁 ${RANK}|${RANK} 윤상혁`, "g"),
+    allow: ["팀장", "상무", "대표", "대표이사"],
+  },
+  {
+    id: "han-rank-2023",
+    fact: "한서윤 is 과장 in the 프롤로그",
+    files: PROLOGUE,
+    find: new RegExp(`한서윤 ${RANK}|${RANK} 한서윤`, "g"),
+    allow: ["과장"],
+  },
+  {
+    id: "han-rank",
+    fact: "한서윤 is 기업금융전략팀 과장, then 트리거랩 실장",
+    files: SEASON,
+    find: new RegExp(`한서윤 ${RANK}|${RANK} 한서윤`, "g"),
+    allow: ["과장", "실장"],
+  },
+  {
+    id: "oh-rank",
+    fact: "오진우 is 대리",
+    files: SEASON,
+    find: new RegExp(`오진우 ${RANK}|${RANK} 오진우`, "g"),
+    allow: ["대리"],
+  },
+  {
+    id: "baek-rank",
+    fact: "백아린 is 그룹전략실 차장",
+    files: SEASON,
+    find: new RegExp(`백아린 ${RANK}|${RANK} 백아린`, "g"),
+    allow: ["차장"],
+  },
+  {
+    id: "im-post",
+    fact: "임경수 is 기업대출심사팀장",
+    files: SEASON,
+    find: /(\S*팀장) 임경수/g,
+    allow: ["기업대출심사팀장", "심사팀장"],
+  },
+  {
+    id: "do-window",
+    fact: "도윤하's window at 강서지점 is 4번 창구",
+    files: SEASON,
+    find: /강서지점 (\d+)번 창구/g,
+    allow: ["4"],
+  },
+  {
+    id: "do-tenure-2023",
+    fact: "도윤하 is 입행 3년차 in 2023",
+    files: SEASON,
+    find: /입행 (\d+)년차|(\d+)년차 행원 도윤하/g,
+    allow: ["3"],
+  },
+  {
+    id: "minseo-code",
+    fact: "이민서 is A-017",
+    files: SEASON,
+    find: /(A-\d{3})(?:은|이|는)? 이민서|(A-\d{3}) = 이민서|이민서의 (A-\d{3})/g,
+    allow: ["A-017"],
+  },
+  {
+    id: "participant-codes",
+    fact: "the list of 63 runs A-001 to A-063",
+    files: SEASON,
+    find: /A-001(?:부터| ~) (A-\d{3})/g,
+    allow: ["A-063"],
+  },
+  {
+    id: "yun-dismissal",
+    fact: "윤상혁 is dismissed 5 to 3 (사건 43)",
+    files: SEASON,
+    find: /해임안 가결 -- 찬성 (\d+) · 반대 (\d+)|해임은 (\d+) ?대 (\d+)/g,
+    allow: ["5 3"],
+  },
+  {
+    id: "yun-sentence",
+    fact: "the first trial gives 윤상혁 징역 3년, 집행유예 5년 (사건 44)",
+    files: SEASON,
+    find: /징역 (\d+)년(?:,|에)? 집행유예(?:\([^)]*\))? (\d+)년/g,
+    allow: ["3 5"],
+  },
+  {
+    id: "baek-resignation",
+    fact: "백아린 hands in her resignation on 3월 27일",
+    files: SEASON,
+    find: /(\d+)월 (\d+)일에 낸 사표/g,
+    allow: ["3 27"],
+  },
+  {
+    id: "baek-report",
+    fact: "백아린 files the 공익신고 on 6월 19일",
+    files: SEASON,
+    find: /공익신고 접수 (\d+)월 (\d+)일|(\d+)월 (\d+)일, 그가 금융감독원에 공익신고/g,
+    allow: ["6 19"],
+  },
+  {
+    id: "im-death",
+    fact: "임경수 dies before dawn on 9월 15일 (사건 45)",
+    files: SEASON,
+    find: /임경수 별세: (\d+)월 (\d+)일/g,
+    allow: ["9 15"],
+  },
+  {
+    id: "echo-replaced",
+    fact: "노아 replaces 에코 at 2월 1일 00:00 (사건 20)",
+    files: SEASON,
+    find: /노아 전환 완료: (\d+)월 (\d+)일 (\d+):(\d+)/g,
+    allow: ["2 1 00 00"],
+  },
+  {
+    id: "father-year",
+    fact: "오상철 delayed the approval in 2009",
+    files: SEASON,
+    find: /(\d{4})년, 수원 매탄지점장|오상철 -- (\d{4})년|(\d{4})년 (?:지점장 교체 검토서|인사 공고 사본)/g,
+    allow: ["2009"],
+  },
+  {
+    id: "father-after",
+    fact: "오상철 was moved three months later and retired five years after",
+    files: caseFiles("prologue01"),
+    find: /([^\s"']+ 달) 뒤 (?:오상철은|관리 부서 발령)|(\d+)년 뒤 명예퇴직/g,
+    allow: ["석 달", "5"],
+  },
+  {
+    id: "han-borrowed-line",
+    fact: "한서윤's one 자네 is '이건 자네를 위한 겁니다', borrowed from 윤상혁",
+    files: caseFiles("prologue03"),
+    find: /이건 (\S+?)[을를] 위한 겁니다/g,
+    allow: ["자네"],
+  },
+  {
+    id: "han-one-jane",
+    fact: "in the 프롤로그 a scene 한서윤 speaks has 자네 only in that one line",
+    files: PROLOGUE,
+    // Read only under `speaker: "한서윤"`: the scenes other people speak are
+    // full of 자네, and it is theirs.
+    speaker: "한서윤",
+    find: /(자네)(?!를 위한 겁니다)/g,
+    allow: [],
+  },
 ];
 
 const valueOf = (match) => match.slice(1).filter((group) => group !== undefined).map((group) => group.trim()).join(" ");
@@ -309,22 +546,78 @@ const isComment = (line) => /^\s*(?:\/\/|\/\*|\*)/.test(line);
 // it, not the whole line -- one line of a case file can hold a whole scene.
 const nearby = (line, match) => line.slice(Math.max(0, match.index - 30), match.index + match[0].length + 10);
 
+/**
+ * Every place `text` states a canon fact, agreeing or not. An entry with a
+ * `speaker` is read only on the lines of a scene that speaker has: from a
+ * `speaker: "…"` line to the next one.
+ */
+function* canonStatements(text, file) {
+  const normalized = file.replaceAll("\\", "/");
+  const lines = text.split(/\r?\n/);
+  const speakers = [];
+  let speaker = "";
+  for (const line of lines) {
+    speaker = line.match(/speaker: "([^"]+)"/)?.[1] ?? speaker;
+    speakers.push(speaker);
+  }
+  for (const entry of CANON) {
+    if (!entry.files.test(normalized)) continue;
+    for (const [index, line] of lines.entries()) {
+      if (isComment(line)) continue;
+      if (entry.speaker && speakers[index] !== entry.speaker) continue;
+      for (const match of line.matchAll(entry.find)) {
+        const value = valueOf(match);
+        const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match)));
+        yield { entry, agrees, file: normalized, line: index + 1, found: match[0], value };
+      }
+    }
+  }
+}
+
+/**
+ * The year a date in `file` belongs to when it does not say ("The main
+ * season's calendar" in docs/canon.md). The files that sum up every case can
+ * be speaking of any of the four.
+ */
+export function canonYears(file) {
+  const normalized = file.replaceAll("\\", "/");
+  const prologue = normalized.match(/src\/nodes\/prologue(\d+)\.js$/);
+  if (prologue) return Number(prologue[1]) === 1 ? [2022] : [2023];
+  const numbered = normalized.match(/src\/nodes\/case(\d+)\.js$/);
+  if (numbered) return Number(numbered[1]) <= 18 ? [2025] : [2026];
+  if (/src\/nodes\/finalCase\.js$/.test(normalized)) return [2026];
+  return [2022, 2023, 2025, 2026];
+}
+
+// A date written with its weekday: "4월 27일 목요일", "1월 16일 (금)", with or
+// without a year in front.
+const DATED_WEEKDAY = /(?:(\d{4})년 )?(\d{1,2})월 (\d{1,2})일(?: ?\(([월화수목금토일])\)| ([월화수목금토일])요일)/g;
+const WEEKDAYS = "일월화수목금토";
+const weekdayOf = (year, month, day) => WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+
+/** Every date in `text` that is written with a weekday, and whether the weekday fits its year. */
+function* datedWeekdays(text, file) {
+  const normalized = file.replaceAll("\\", "/");
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
+    if (isComment(line)) continue;
+    for (const match of line.matchAll(DATED_WEEKDAY)) {
+      const [, year, month, day] = match;
+      const weekday = match[4] ?? match[5];
+      const years = year ? [Number(year)] : canonYears(normalized);
+      const agrees = years.some((candidate) => weekdayOf(candidate, Number(month), Number(day)) === weekday);
+      yield { agrees, years, file: normalized, line: index + 1, found: match[0], value: weekday, actual: years.map((candidate) => `${candidate}: ${weekdayOf(candidate, Number(month), Number(day))}요일`).join(", ") };
+    }
+  }
+}
+
 /** Every statement in `text` that gives a canon fact a value the canon does not allow. */
 export function findCanonViolations(text, file) {
   const violations = [];
-  const normalized = file.replaceAll("\\", "/");
-  const lines = text.split(/\r?\n/);
-  for (const entry of CANON) {
-    if (!entry.files.test(normalized)) continue;
-    lines.forEach((line, index) => {
-      if (isComment(line)) return;
-      for (const match of line.matchAll(entry.find)) {
-        const value = valueOf(match);
-        if (entry.allow.includes(value)) continue;
-        if (entry.except?.test(nearby(line, match))) continue;
-        violations.push({ file: normalized, line: index + 1, id: entry.id, fact: entry.fact, found: match[0], value });
-      }
-    });
+  for (const { entry, agrees, ...where } of canonStatements(text, file)) {
+    if (!agrees) violations.push({ ...where, id: entry.id, fact: entry.fact });
+  }
+  for (const { agrees, actual, ...where } of datedWeekdays(text, file)) {
+    if (!agrees) violations.push({ ...where, id: "weekday", fact: `a date stated with a weekday fits its year (${actual})` });
   }
   return violations;
 }
@@ -347,21 +640,23 @@ const COPY_FILES = () => [
 function main() {
   const violations = [];
   const seen = new Map(CANON.map((entry) => [entry.id, 0]));
+  let weekdays = 0;
   for (const file of COPY_FILES()) {
     const text = readFileSync(file, "utf8");
     violations.push(...findCanonViolations(text, file));
     // A fact nothing states any more is a pattern that has rotted, not a pass.
-    for (const entry of CANON) {
-      if (!entry.files.test(file)) continue;
-      const stated = text.split(/\r?\n/).filter((line) => !isComment(line)).join("\n").match(entry.find)?.length ?? 0;
-      seen.set(entry.id, seen.get(entry.id) + stated);
-    }
+    for (const { entry } of canonStatements(text, file)) seen.set(entry.id, seen.get(entry.id) + 1);
+    for (const _date of datedWeekdays(text, file)) weekdays += 1;
   }
   const silent = CANON.filter((entry) => entry.allow.length > 0 && seen.get(entry.id) === 0);
+  // The same for the calendar: the season prints a weekday beside some two
+  // hundred dates, and a pattern that finds none of them has stopped reading.
+  if (weekdays === 0) silent.push({ id: "weekday" });
 
   // `--list` prints what each fact matched, for reading a new pattern's hits.
   if (process.argv.includes("--list")) {
     for (const entry of CANON) console.log(`${String(seen.get(entry.id)).padStart(4)}  ${entry.id}`);
+    console.log(`${String(weekdays).padStart(4)}  weekday`);
   }
 
   if (violations.length || silent.length) {
@@ -375,7 +670,7 @@ function main() {
     process.exit(1);
   }
   const total = [...seen.values()].reduce((sum, count) => sum + count, 0);
-  console.log(`Canon check passed (${CANON.length} facts, ${total} statements agree).`);
+  console.log(`Canon check passed (${CANON.length} facts, ${total} statements agree; ${weekdays} dates fit the weekday they are written with).`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

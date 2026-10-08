@@ -19,6 +19,20 @@ export const FX_READERS = Object.freeze({
 
 export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
 
+/**
+ * What the two settings that turn the body down do to a frame: the OS's
+ * reduced motion, and the comfort setting (`calmEffects`), which is wider.
+ * The frame loop (GauntletFx.jsx) writes what these return, so what the
+ * setting does can be held without a browser (tests/unit/table-motion.test.mjs).
+ *
+ * Either one stills the shake and closes the approach ring. Only the comfort
+ * setting stops the pulse and cuts the flash to a third.
+ */
+export const fxShake = (trauma, reducedMotion, calm) => (reducedMotion || calm ? 0 : trauma * trauma);
+export const fxBeatValue = (beat, calm) => (calm ? "0.000" : beat.toFixed(3));
+export const fxBeatPhaseValue = (phase, reducedMotion, calm) => (reducedMotion || calm ? "1" : phase.toFixed(2));
+export const fxFlashValue = (flash, calm) => (calm ? flash / 3 : flash).toFixed(2);
+
 const FX_LENGTHS = new Set(["--gx-shake-x", "--gx-shake-y"]);
 
 let registered = false;

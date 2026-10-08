@@ -14,7 +14,7 @@ import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset } from "./font
  * font toolchain.
  */
 
-const charset = collectCharset();
+const charset = await collectCharset();
 const source = readFileSync(FONT_SOURCE);
 const woff2 = await subsetFont(source, charset, { targetFormat: "woff2" });
 

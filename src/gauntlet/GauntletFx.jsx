@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getGoodWindowMs, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
-import { FX_READERS, FX_VARIABLES, registerFxVariables } from "./fxVariables.js";
+import { FX_READERS, FX_VARIABLES, fxBeatPhaseValue, fxBeatValue, fxFlashValue, fxShake, registerFxVariables } from "./fxVariables.js";
 import { createLightGate, monotonicNow } from "./timing.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
@@ -213,18 +213,18 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       flashRef.current = Math.max(0, flashRef.current - delta / 240);
       const trauma = Math.min(1, impactRef.current + (live ? Math.pow(felt, 3) * 0.45 : 0));
       const calm = getAccessibility().calmEffects;
-      const shake = reducedMotion || calm ? 0 : trauma * trauma;
+      const shake = fxShake(trauma, reducedMotion, calm);
       const x = (Math.sin(time * 0.071) + Math.sin(time * 0.137)) * 0.5 * shake * SHAKE_PX;
       const y = (Math.sin(time * 0.089) + Math.sin(time * 0.173)) * 0.5 * shake * SHAKE_PX * 0.6;
 
       write("--gx-heat", heat.toFixed(3));
-      write("--gx-beat", calm ? "0.000" : beat.toFixed(3));
+      write("--gx-beat", fxBeatValue(beat, calm));
       write("--gx-shake-x", `${x.toFixed(2)}px`);
       write("--gx-shake-y", `${y.toFixed(2)}px`);
-      write("--gx-beat-phase", reducedMotion || calm ? "1" : phase.toFixed(2));
+      write("--gx-beat-phase", fxBeatPhaseValue(phase, reducedMotion, calm));
       write("--gx-beat-live", beating ? "1" : "0");
       write("--gx-beat-zone", zone ? "1" : "0");
-      write("--gx-flash", (calm ? flashRef.current / 3 : flashRef.current).toFixed(2));
+      write("--gx-flash", fxFlashValue(flashRef.current, calm));
       frame = globalThis.requestAnimationFrame(loop);
     };
     frame = globalThis.requestAnimationFrame(loop);
