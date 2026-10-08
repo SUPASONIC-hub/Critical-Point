@@ -290,6 +290,37 @@ test("a consent tick does not turn the hero into a resume button", { tag: "@prod
   await expect(page.getByTestId("resume-save")).toHaveCount(0);
 });
 
+// The box is ticked on a first visit and lives in a closed drawer. The line by
+// the start button is the only thing a person who never opens the drawer is
+// told, so it has to be there exactly while records would be sent.
+test("the start button says play records are sent, for as long as they are", { tag: "@prod" }, async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/");
+  const line = page.locator(".intro-launch").getByTestId("consent-line");
+  await expect(line).toBeVisible();
+  await expect(line).toContainText("익명 전송");
+  await expect(line).toContainText("데이터 저장 안내");
+  // Said without opening anything.
+  await expect(page.locator(".data-info-panel")).toBeHidden();
+
+  await openIntroDrawer(page, ".data-info-panel");
+  const consentCheckbox = page.locator(".consent-box input");
+  await expect(consentCheckbox).toBeChecked();
+  await consentCheckbox.uncheck();
+  await expect(page.getByTestId("consent-line")).toHaveCount(0);
+  await consentCheckbox.check();
+  await expect(line).toBeVisible();
+});
+
+test("a build with no backend does not say records are sent", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(page.getByTestId("consent-line")).toHaveCount(0);
+});
+
 test("representative branch choices advance without browser runtime errors", async ({ page }) => {
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
