@@ -27,7 +27,15 @@ async function pushUntilBust(page) {
   const stage = page.getByTestId("gauntlet-stage");
   for (let press = 0; press < 20; press += 1) {
     if ((await stage.getAttribute("data-status")) !== "live") break;
-    await page.getByTestId("commit-push").click();
+    // The table can close between the read above and the press -- its own
+    // clock runs out, and that is a bust too. The button is then disabled, and
+    // a press with no limit waited on it until the test timed out (seen on the
+    // phone project, late in a run of the whole file, 2026-10-08). A press that
+    // cannot land is let go; the status below is what is asserted.
+    await page
+      .getByTestId("commit-push")
+      .click({ timeout: 2_000 })
+      .catch(() => {});
   }
   await expect(stage).toHaveAttribute("data-status", "bust");
 }
