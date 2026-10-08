@@ -101,16 +101,6 @@
   .top-actions {
     justify-content: stretch;
   }
-  /* Icons, not labels: the compact row stays a row on a phone. Stacking it
-     spent 130px above the story on three buttons that are 34px wide. */
-  .top-actions.compact-actions {
-    flex-direction: row;
-    justify-content: flex-end;
-    width: auto;
-  }
-  .top-actions.compact-actions .ghost {
-    width: auto;
-  }
   .observer-postmortem-grid,
   .result-grid,
   .feedback-controls,
@@ -421,6 +411,7 @@
   .score-breakdown i,
   .ranking-comparison em,
   .ending-axis-grid em,
+  .gx-focus-modes i b,
   .gx-gauge-band,
   .gx-gauge-wall {
     forced-color-adjust: none;

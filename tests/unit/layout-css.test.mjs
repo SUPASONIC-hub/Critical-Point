@@ -47,3 +47,11 @@ test("the callsign field's focus ring survives forced colours", () => {
   const focus = sheet("base-intro-ranking").match(/\.intro \.start-panel \.start-input-row input:focus-visible \{[^}]*\}/)?.[0] ?? "";
   assert.match(focus, /outline: 2px solid transparent;/, "a box-shadow is dropped in forced colours; a transparent outline is repainted");
 });
+
+test("the mastery bar's fill is drawn in forced colours", () => {
+  // A background colour is repainted as the canvas there, and the bar is nothing else.
+  const fills = sheet("responsive").match(/@media \(forced-colors: active\) \{[\s\S]*?(\.gx-gauge-fill,[^{]*)\{[^}]*\}/);
+  assert.ok(fills, "the forced-colours block lists the fills");
+  assert.match(fills[1], /\.gx-focus-modes i b,/);
+  assert.match(fills[0].slice(fills[0].lastIndexOf("{")), /forced-color-adjust: none;\s*background: Highlight;/);
+});
