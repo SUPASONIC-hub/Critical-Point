@@ -359,39 +359,10 @@ function unexplainedUses(caseId, term, sceneIds, starts) {
  * The terms a case still says bare on some route, as `case/term`. The rule
  * above found these the day it was written (2026-10-07) and they are story to
  * rewrite, not a script to fix, so they are held as a ceiling: the check fails
- * when a case/term pair is added, and names the ones not on this list. Take a
- * pair off when its case explains the term on every route, and lower the count.
+ * when a case/term pair is added, and names the ones not on this list. The last
+ * 28 were explained on 2026-10-08, so the list is empty and any pair fails.
  */
-const BARE_ON_A_ROUTE = new Set([
-  "prologue02/조건부 승인",
-  "case04/상환",
-  "case04/예외 승인",
-  "case05/가중치",
-  "case05/알고리즘",
-  "case06/인사위원회",
-  "case09/채권단",
-  "case11/국정감사",
-  "case12/부제소 합의",
-  "case16/리스",
-  "case23/계열사",
-  "case23/사내이사",
-  "case23/의결권 자문사",
-  "case24/수신 기록",
-  "case24/이관",
-  "case27/후순위",
-  "case29/부속서",
-  "case29/자문역",
-  "case31/부속서",
-  "case31/자문역",
-  "case33/보호조치",
-  "case37/변론",
-  "case41/참고인",
-  "case42/사외이사",
-  "case43/의결권",
-  "case43/의결권 자문사",
-  "case44/처벌불원서",
-  "case44/추징",
-]);
+const BARE_ON_A_ROUTE = new Set([]);
 const bareOnARoute = new Map();
 for (const caseId of CASE_SEQUENCE) {
   const starts = [...new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})])].filter((id) => nodes[id]);
