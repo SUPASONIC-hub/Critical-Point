@@ -435,7 +435,7 @@ export function GauntletStage({
       data-combo={win.beatCombo}
       data-groove={win.groove}
       data-last-grade={win.lastGrade ?? ""}
-      aria-label="임계점 테이블"
+      aria-label="임계점 테이블" style={{ "--gx-question": scene.question.length }}
     >
       <GauntletFx
         window={win}

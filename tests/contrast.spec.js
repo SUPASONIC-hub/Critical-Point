@@ -256,13 +256,15 @@ const openDrawers = (page) => page.evaluate(() => document.querySelectorAll("det
  * fading panel mid-fade whenever a frame ran slow. Infinite animations -- the
  * heartbeat, the gauge glow -- never finish and are left running.
  */
-async function settle(page) {
-  await expect
-    .poll(async () => {
-      await openDrawers(page);
-      return page.evaluate(() => [...document.querySelectorAll("details")].every((details) => details.open));
-    })
-    .toBe(true);
+async function settle(page, { drawers = true } = {}) {
+  if (drawers) {
+    await expect
+      .poll(async () => {
+        await openDrawers(page);
+        return page.evaluate(() => [...document.querySelectorAll("details")].every((details) => details.open));
+      })
+      .toBe(true);
+  }
   await page.evaluate(async () => {
     const finite = () =>
       document.getAnimations().filter((animation) => {
@@ -368,6 +370,53 @@ test("the table and decision reveal stay readable", async ({ page }) => {
   await page.getByTestId("commit-confirm").click();
   await page.waitForSelector("[data-testid='decision-next']");
   await expectReadable(page, "decision reveal");
+});
+
+/**
+ * On a phone the question runs the whole width of the plate behind it, so the
+ * plate fades as the question grows (`--gx-question`, plate.css). The season's
+ * shortest question keeps the room as it was drawn. Its longest is four lines
+ * at this width: it stands on a fainter room, and is measured from the pixels
+ * like every other line over a picture. A wide screen keeps the room whatever
+ * the question is.
+ */
+test("a long question on a phone stands on a fainter picture and stays readable", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const plate = page.locator(".gx-scene .gx-plate-backdrop");
+  const opacity = () => plate.evaluate((element) => Number(getComputedStyle(element).opacity));
+  const lines = () =>
+    page.locator(".gx-question").evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+    });
+
+  await startAt(page, "case05", "c5_final_redesign_route");
+  // Polled: the table has only just taken the briefing's place.
+  await expect.poll(lines, "the shortest question is one or two lines").toBeLessThanOrEqual(2);
+  await expect.poll(opacity, "a short question keeps the room as drawn").toBeCloseTo(0.78, 2);
+
+  await startAt(page, "case02", "c2_trace");
+  await expect.poll(lines, "the longest question is more than two lines").toBeGreaterThan(2);
+  await expect.poll(opacity, "the room behind a long question is fainter").toBeLessThanOrEqual(0.5);
+  expect(await opacity(), "and is still a room").toBeGreaterThanOrEqual(0.4);
+  // Read with the table's fold closed, as a player meets it. `expectReadable`
+  // opens every drawer, and the open fold takes the question's row: the
+  // question drops below the plate, and nothing of it is over the picture.
+  // The composite reading is for a screen with its drawers open -- it reads
+  // what a closed fold holds as if it were shown -- so only the question's own
+  // line is taken from it here.
+  await settle(page, { drawers: false });
+  const composite = await page.evaluate(COLLECT);
+  expect(composite.filter((finding) => finding.startsWith("p.gx-question")), "the question against its panel").toEqual([]);
+  const marked = await page.evaluate(() => (window.__contrastPainted ?? []).some(({ el }) => el.matches(".gx-question")));
+  expect(marked, "the question is one of the lines read from the pixels").toBe(true);
+  const painted = await collectPainted(page);
+  expect(painted.findings, "case02/c2_trace, fold closed: text over a picture").toEqual([]);
+  expect(painted.measured, "the lines over the plate were measured").toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await expect.poll(opacity, "a wide screen keeps the room as drawn").toBeCloseTo(0.78, 2);
 });
 
 test("the report and ending sequence stay readable", async ({ page }) => {
