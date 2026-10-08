@@ -6,12 +6,24 @@ const ACCENT_PEAK_GAIN = 0.045;
 const REVEAL_PEAK_GAIN = 0.035;
 const LOW_PRESET_MULTIPLIER = 0.58;
 const TARGET_LOCK_GAIN_RATIO = 0.72;
+// playTargetLockCue's three notes, and the shortest and longest of
+// playDecisionRevealCue's chords (src/components/AdaptiveMusic.jsx).
+const TARGET_LOCK_NOTES = 3;
+const REVEAL_NOTES_MIN = 2;
+const REVEAL_NOTES_MAX = 4;
 
 /* The probe counts the objects that can make sound instead of listening for it:
-   headless Chromium has no audio device, but node creation is still observable. */
+   headless Chromium has no audio device, but node creation is still observable.
+
+   `voices` is one entry per oscillator wired to a gain: the level that gain is
+   ramped up to. It is what tells a cue from the score. The background pulse
+   makes oscillators all the time, so "three more oscillators than before the
+   click" was true of a click that played nothing; a cue is the oscillators
+   whose gain peaks at the cue's own level, and those are counted. */
 async function installAudioProbe(page) {
   await page.addInitScript(() => {
-    const probe = { contexts: 0, oscillators: 0, risingSweeps: 0, gainTargets: [] };
+    const probe = { contexts: 0, oscillators: 0, risingSweeps: 0, gainTargets: [], voices: [] };
+    const rampsOf = new WeakMap();
     window.__audioProbe = probe;
     try {
       const NativeContext = window.AudioContext || window.webkitAudioContext;
@@ -34,6 +46,13 @@ async function installAudioProbe(page) {
           lastValue = value;
           return rampToValue(value, time);
         };
+        const connect = node.connect.bind(node);
+        node.connect = (destination, ...rest) => {
+          // The same array the gain's ramps are pushed to, so a ramp set after
+          // the wiring is still read.
+          if (rampsOf.has(destination)) probe.voices.push(rampsOf.get(destination));
+          return connect(destination, ...rest);
+        };
         return node;
       };
 
@@ -41,8 +60,11 @@ async function installAudioProbe(page) {
       NativeContext.prototype.createGain = function createGain(...args) {
         const node = nativeCreateGain.apply(this, args);
         const rampToValue = node.gain.exponentialRampToValueAtTime.bind(node.gain);
+        const ramps = [];
+        rampsOf.set(node, ramps);
         node.gain.exponentialRampToValueAtTime = (value, time) => {
           probe.gainTargets.push(value);
+          ramps.push(value);
           return rampToValue(value, time);
         };
         return node;
@@ -72,7 +94,19 @@ async function seedMusicPreference(page, enabled, volume) {
 }
 
 function readProbe(page) {
-  return page.evaluate(() => ({ ...window.__audioProbe, gainTargets: [...window.__audioProbe.gainTargets] }));
+  return page.evaluate(() => ({
+    ...window.__audioProbe,
+    gainTargets: [...window.__audioProbe.gainTargets],
+    // The loudest level each wired oscillator's gain is ramped to.
+    voices: window.__audioProbe.voices.map((ramps) => (ramps.length ? Math.max(...ramps) : 0)),
+  }));
+}
+
+const at = (peak) => (value) => Math.abs(value - peak) < 1e-5;
+
+/** The oscillators wired since `before` whose gain peaks at `peak`: a cue's own notes. */
+function voicesSince(before, after, peak) {
+  return after.voices.slice(before.voices.length).filter(at(peak));
 }
 
 test("muted player hears nothing when the first case starts", { tag: "@prod" }, async ({ page }) => {
@@ -114,25 +148,37 @@ test("music player hears the accent at the chosen volume preset", { tag: "@prod"
   const accentTarget = after.gainTargets.find((value) => Math.abs(value - expectedPeak) < 1e-5);
   expect(accentTarget).toBeCloseTo(expectedPeak, 5);
 
+  // Staking a card plays the lock: three notes, each at the lock's level and
+  // at the chosen preset. Nothing before the click was at that level, so the
+  // three counted are the click's and not the score's.
+  const expectedLockPeak = ACCENT_PEAK_GAIN * TARGET_LOCK_GAIN_RATIO * LOW_PRESET_MULTIPLIER;
   const beforeLock = await readProbe(page);
+  expect(beforeLock.voices.filter(at(expectedLockPeak)), "the lock had not sounded before a card was staked").toHaveLength(0);
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".gx-card.selected")).toBeVisible();
 
+  await expect.poll(async () => voicesSince(beforeLock, await readProbe(page), expectedLockPeak).length).toBe(TARGET_LOCK_NOTES);
   const afterLock = await readProbe(page);
-  const expectedLockPeak = ACCENT_PEAK_GAIN * TARGET_LOCK_GAIN_RATIO * LOW_PRESET_MULTIPLIER;
-  expect(afterLock.oscillators).toBeGreaterThanOrEqual(beforeLock.oscillators + 3);
-  const lockTarget = afterLock.gainTargets.find((value) => Math.abs(value - expectedLockPeak) < 1e-5);
-  expect(lockTarget).toBeCloseTo(expectedLockPeak, 5);
+  expect(afterLock.gainTargets.slice(beforeLock.gainTargets.length).filter(at(expectedLockPeak))).toHaveLength(TARGET_LOCK_NOTES);
 
+  // Cashing opens the reveal, whose chord is two to four notes: the first at
+  // the reveal's level and each one after it quieter, the nth at a nth of it.
+  const expectedRevealPeak = REVEAL_PEAK_GAIN * LOW_PRESET_MULTIPLIER;
   const beforeReveal = await readProbe(page);
+  expect(beforeReveal.voices.filter(at(expectedRevealPeak)), "the reveal had not sounded before the cash").toHaveLength(0);
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
 
+  await expect.poll(async () => voicesSince(beforeReveal, await readProbe(page), expectedRevealPeak).length).toBe(1);
   const afterReveal = await readProbe(page);
-  const expectedRevealPeak = REVEAL_PEAK_GAIN * LOW_PRESET_MULTIPLIER;
-  expect(afterReveal.oscillators).toBeGreaterThanOrEqual(beforeReveal.oscillators + 3);
-  const revealTarget = afterReveal.gainTargets.find((value) => Math.abs(value - expectedRevealPeak) < 1e-5);
-  expect(revealTarget).toBeCloseTo(expectedRevealPeak, 5);
+  const chord = Array.from({ length: REVEAL_NOTES_MAX }, (_, index) => voicesSince(beforeReveal, afterReveal, expectedRevealPeak / (index + 1)).length);
+  expect(chord.slice(0, REVEAL_NOTES_MIN), "the chord's first notes, one each").toEqual(Array(REVEAL_NOTES_MIN).fill(1));
+  // One chord: no level twice, and no fourth note without a third.
+  expect(Math.max(...chord)).toBe(1);
+  expect(chord.join(""), "the notes run on from the first without a gap").toMatch(/^1+0*$/);
+  expect(afterReveal.gainTargets.slice(beforeReveal.gainTargets.length).filter(at(expectedRevealPeak))).toHaveLength(1);
+  // The lock did not sound again when the card was cashed.
+  expect(voicesSince(beforeReveal, afterReveal, expectedLockPeak)).toHaveLength(0);
 });
 
 test("muted player hears nothing when a decision is made", { tag: "@prod" }, async ({ page }) => {
