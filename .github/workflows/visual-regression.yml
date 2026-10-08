@@ -128,8 +128,8 @@ jobs:
             # Not on the list: src/state/ (a hook can change a number on the
             # result screen), and the other cases. The `visual` label is for
             # those, and the push to main compares everything in any case.
-            # `npm run check:visual-baselines` holds this pattern to the files
-            # named above.
+            # scripts/check-visual-baselines.mjs holds this pattern to the
+            # files named above.
             pattern='^(src/styles/|src/assets/fonts/|index\.html$|src/.*\.jsx$|src/[^/]+\.js$|src/viewModels/|src/gauntlet/|src/nodes/case0[15]\.js$|public/|scripts/(build-critical-css|critical-css-rules)\.mjs$|vite\.config\.js$|playwright\.config\.js$|package-lock\.json$|tests/helpers/|tests/visual-regression\.spec\.js)'
             touched=$(printf '%s\n' "$files" | grep -E "$pattern" || true)
             if [ -n "$touched" ]; then
