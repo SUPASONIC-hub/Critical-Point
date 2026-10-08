@@ -483,6 +483,7 @@ export const prologue05 = {
         {
           label: "지금 끈을 풀고 안에 무엇이 있는지 확인한다",
           effect: { time: 3, capital: 4, legitimacy: -4, trust: 2, humanCost: 2, fatigue: -3 },
+          cognition: { risk: 1 },
           voice: "무엇이 들었는지는 알아야 지킬 수 있으니, 지금 끈을 풀고 안에 무엇이 있는지 확인한다.",
           echo: "끈을 풀면 안에는 심사 보고서 종이 원본이 있습니다. 매듭은 다시 묶어도 처음 모양이 되지 않습니다.",
         },
