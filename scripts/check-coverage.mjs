@@ -1,5 +1,6 @@
-import { spawnSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { globSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 /**
@@ -28,12 +29,24 @@ import path from "node:path";
  *
  * `.jsx` is not measured: Node cannot import it. The browser tiers are what
  * run the components.
+ *
+ * Each test file is measured on its own and the reports are added up here
+ * (2026-10-08). One `node --test` over all of them left the adding-up to
+ * Node, which merges the processes' reports in the order it finds their files
+ * on disk -- named by process id -- and whose merge keeps an unexecuted range
+ * only when the next report happens to hold the same one. payloadSchemas.js
+ * line 126, which no test runs, read "covered" or "0" from one run to the
+ * next (143 or 144 lines of 145), and a block no process ran could be
+ * reported as run. A run of one file has one process that loads `src/`, so
+ * nothing is merged before this script sees it, and what this script does
+ * with the reports is a sum: the same answer in any order.
  */
 
 const root = process.cwd();
 const FLOORS_FILE = "scripts/coverage-floors.json";
 const REPORT_DIR = path.join(root, "coverage");
 const REPORT_FILE = path.join(REPORT_DIR, "lcov.info");
+const PARTS_DIR = path.join(REPORT_DIR, "parts");
 const TEST_FILES = ["scripts/unit-tests.mjs", "scripts/smoke-test.mjs", "tests/unit/**/*.test.mjs"];
 
 // Authored copy and tables: prose, scene graphs, music rows. A line of these is
@@ -65,55 +78,102 @@ function sourceModules(directory = "src") {
   return found;
 }
 
-mkdirSync(REPORT_DIR, { recursive: true });
-const run = spawnSync(
-  process.execPath,
-  [
-    "--test",
-    "--experimental-test-coverage",
-    "--test-coverage-include=src/**/*.js",
-    "--test-reporter=lcov",
-    `--test-reporter-destination=${REPORT_FILE}`,
-    "--test-reporter=spec",
-    "--test-reporter-destination=stdout",
-    ...TEST_FILES,
-  ],
-  { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
-);
-if (run.status !== 0) {
-  // The tests themselves failed; their output is the message.
-  process.stdout.write(run.stdout ?? "");
-  process.stderr.write(run.stderr ?? "");
-  process.exit(run.status ?? 1);
+// Sorted, so a part's number is the same file on every machine.
+const testFiles = [...new Set(TEST_FILES.flatMap((pattern) => globSync(pattern, { cwd: root })))].map((file) => file.replace(/\\/g, "/")).sort();
+if (testFiles.length < TEST_FILES.length) {
+  console.error(`The test patterns matched ${testFiles.length} files (${TEST_FILES.join(", ")}); nothing was measured.`);
+  process.exit(1);
 }
-const summary = (run.stdout ?? "").split(/\r?\n/).filter((line) => /^ℹ (tests|pass|fail|skipped) /.test(line));
-console.log(summary.map((line) => line.replace(/^ℹ /, "")).join(", "));
+
+/** One test file, in a `node --test` of its own, with its coverage written to `report`. */
+function runTestFile(testFile, report) {
+  return new Promise((resolve) => {
+    const child = spawn(
+      process.execPath,
+      [
+        "--test",
+        "--experimental-test-coverage",
+        "--test-coverage-include=src/**/*.js",
+        "--test-reporter=lcov",
+        `--test-reporter-destination=${report}`,
+        "--test-reporter=spec",
+        "--test-reporter-destination=stdout",
+        testFile,
+      ],
+      { cwd: root, stdio: ["ignore", "pipe", "pipe"] },
+    );
+    let output = "";
+    child.stdout.on("data", (chunk) => (output += chunk));
+    child.stderr.on("data", (chunk) => (output += chunk));
+    child.on("error", (error) => resolve({ testFile, status: 1, output: `${output}\n${error.message}` }));
+    child.on("close", (status) => resolve({ testFile, status: status ?? 1, output }));
+  });
+}
+
+rmSync(PARTS_DIR, { recursive: true, force: true });
+mkdirSync(PARTS_DIR, { recursive: true });
+const parts = testFiles.map((testFile, index) => ({ testFile, report: path.join(PARTS_DIR, `${String(index).padStart(3, "0")}.info`) }));
+const results = [];
+{
+  const queue = [...parts];
+  const workers = Array.from({ length: Math.min(queue.length, Math.max(1, os.availableParallelism?.() ?? 4)) }, async () => {
+    for (let next = queue.shift(); next; next = queue.shift()) results.push(await runTestFile(next.testFile, next.report));
+  });
+  await Promise.all(workers);
+}
+const failed = results.filter((result) => result.status !== 0).sort((a, b) => a.testFile.localeCompare(b.testFile));
+if (failed.length) {
+  // The tests themselves failed; their output is the message.
+  for (const result of failed) process.stdout.write(`${result.testFile}\n${result.output}\n`);
+  process.exit(1);
+}
+const counted = { tests: 0, pass: 0, fail: 0, skipped: 0 };
+for (const result of results) {
+  for (const match of result.output.matchAll(/^ℹ (tests|pass|fail|skipped) (\d+)/gm)) counted[match[1]] += Number(match[2]);
+}
+console.log(`${Object.entries(counted).map(([name, count]) => `${name} ${count}`).join(", ")} in ${testFiles.length} files`);
 
 const percent = (hit, found) => (found === 0 ? 100 : (hit / found) * 100);
-// Each test file runs in its own process, and each process that loaded a
-// module writes its own record of it. Keeping the last record read made a
-// module's number depend on which process finished last -- cloudSave.js read
-// anywhere from 41% to 62% on the same tree. A line, function or branch counts
-// as covered when any process covered it.
+// One record is one process's account of one module. A line, function or
+// branch counts as covered when any process covered it, so the records are
+// added, and adding does not care which is read first.
+//
+// What a record calls a function or a branch has to mean the same thing in
+// the next record for that to work. Node numbers them by their place in its
+// own list (`anonymous_12`, branch 12), and the list is as long as what that
+// process happened to run. So a function is known here by the line it starts
+// on and its name, and a branch by the line it starts on -- with a count
+// behind it for the second and third on the same line.
 const hits = new Map();
 const entries = (record, key) => [...record.matchAll(new RegExp(`^${key}:(.+)$`, "gm"))].map((match) => match[1].trim());
-for (const record of readFileSync(REPORT_FILE, "utf8").split("end_of_record")) {
+const allRecords = parts.map((part) => readFileSync(part.report, "utf8"));
+// The whole of it in one file as before, for anything else that reads lcov.
+writeFileSync(REPORT_FILE, allRecords.join(""), "utf8");
+for (const record of allRecords.flatMap((report) => report.split("end_of_record"))) {
   const file = record.match(/^SF:(.+)$/m)?.[1]?.trim().replace(/\\/g, "/");
   if (!file) continue;
   if (!hits.has(file)) hits.set(file, { lines: new Map(), functions: new Map(), branches: new Map() });
   const merged = hits.get(file);
   const note = (table, key, count) => table.set(key, (table.get(key) ?? 0) + (Number(count) || 0));
+  const seen = new Map();
+  const nth = (key) => {
+    seen.set(key, (seen.get(key) ?? 0) + 1);
+    return `${key}#${seen.get(key)}`;
+  };
   for (const entry of entries(record, "DA")) {
     const [line, count] = entry.split(",");
     note(merged.lines, line, count);
   }
-  for (const entry of entries(record, "FNDA")) {
+  // FN and FNDA are written in the same order: where it starts, then how often it ran.
+  const started = entries(record, "FN").map((entry) => entry.slice(0, entry.indexOf(",")));
+  entries(record, "FNDA").forEach((entry, index) => {
     const comma = entry.indexOf(",");
-    note(merged.functions, entry.slice(comma + 1), entry.slice(0, comma));
-  }
+    const name = entry.slice(comma + 1).replace(/^anonymous_\d+$/, "anonymous");
+    note(merged.functions, nth(`fn ${started[index]} ${name}`), entry.slice(0, comma));
+  });
   for (const entry of entries(record, "BRDA")) {
     const parts = entry.split(",");
-    note(merged.branches, parts.slice(0, 3).join(","), parts[3] === "-" ? 0 : parts[3]);
+    note(merged.branches, nth(`br ${parts[0]}`), parts[3] === "-" ? 0 : parts[3]);
   }
 }
 const covered = (table) => [[...table.values()].filter((count) => count > 0).length, table.size];
