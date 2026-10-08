@@ -562,7 +562,7 @@ export const case43 = {
           label: "백아린의 선택이니 서명해도 괜찮다고 말해 준다",
           effect: { time: 5, capital: 4, trust: 3, legitimacy: -6, humanCost: 4, fatigue: -4 },
           voice: "끝까지 가라고 할 자격은 없다며, 서명은 백아린의 선택이고 그래도 괜찮다고 말해 준다.",
-          echo: "괜찮다는 말에 백아린이 한참 웃습니다. 그리고 합의서를 가방에 넣습니다. 서명했는지는 월요일 13시에 알게 됩니다.",
+          echo: "괜찮다는 말에 백아린이 한참 웃습니다. 그리고 합의서를 가방에 넣습니다. 월요일 13시가 지나도 그 종이의 서명란은 비어 있습니다.",
           next: "c43_professor",
           cognition: { risk: 2 },
         },

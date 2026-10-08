@@ -126,6 +126,8 @@ accepted in two weeks. It never is. The group keeps her on the 33rd floor,
 where her desk is searched on 6월 16일 (사건 32), and answers the resignation
 three days after her report with 징계해고, a criminal complaint and eviction
 (사건 33). The complaint was drafted on 6월 1일, before she reported anything.
+She never signs a 합의서: the one in 사건 33 can at most be recommended to her
+and she strikes its conditions, and the one in 사건 43 stays unsigned.
 
 ## 트리거랩's head count
 
@@ -208,7 +210,7 @@ year.
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
 | 사건 20 | 1월 26일 (월) |
 | 사건 22 | 2월 넷째 주 월요일, 2월 23일: the first Monday after the 설 holiday (2월 16-18일). The internship runs that week, 수료식 on the Friday |
-| 사건 23 | 주주총회 3월 20일 (금); KD캐피탈 이사회 3월 16일, four days before |
+| 사건 23 | 주주총회 3월 20일 (금); the day that fixes who may vote is 3월 6일 (금), a week after the 수료식 where 김 반장 bought the first share; KD캐피탈 이사회 3월 16일, four days before |
 | 사건 24 | Notice 3월 23일 (월); 트리거랩 dissolved 3월 27일 (금) |
 | 사건 25 | 3월 27일 (금) night on the 33rd floor; 인사 공지 4월 1일 (수), 만우절; 취임식 4월 10일 (금) |
 | 사건 26 | 4월 13일 (월); 심사위원회 4월 24일 (금) 15시, the last working day before 만기 4월 27일 (월); the foreman comes down that evening, day 19 |
@@ -216,7 +218,7 @@ year.
 | 사건 31-33 | 6월 8일 (월); 압수수색 6월 16일 (화); 공익신고 6월 19일 (금); 징계해고·고소 공지 6월 22일 (월) 08시; 사택 퇴거 7월 7일 |
 | 사건 38-40 | 첫 변론 8월 6일 (목); 다큐 방송 8월 7일 (금) 22시; 사건 40 opens the next afternoon (토) and closes 8월 셋째 주 금요일 |
 | 사건 43-44 | 이사회 9월 7일 (월); 1심 선고 9월 10일 |
-| 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목) |
+| 사건 45 | 9월 15일 (화) to 발인·봉안 9월 17일 (목). The day 임경수 refused the 성수동 print shop and missed 임재윤's graduation is 2008년 8월 22일 (금), eighteen years before; he is thirty-two in the 1996 사원증 photograph |
 | 사건 46 | 9월 18일 22시 to 9월 19일 20시; 파쇄 9월 19일 18시 |
 | 사건 47 | 추석 사흘 전 to 추석 (9월 25일, 금) |
 | 사건 48 | 추석 밤 to 추석 다음 날 (토) 09:00 임시 심사위원회 |
