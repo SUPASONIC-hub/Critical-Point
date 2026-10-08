@@ -25,9 +25,9 @@ test("the table's shell does not pad the notch a second time", () => {
 });
 
 test("no phone on its side reads the question as one line", () => {
-  const clamps = sheet("responsive").match(/\.gx-question \{[^}]*\}/g) ?? [];
+  const clamps = (sheet("responsive").match(/\.gx-question \{[^}]*\}/g) ?? []).filter((rule) => rule.includes("line-clamp"));
   assert.equal(clamps.length, 1);
-  assert.match(clamps[0], /-webkit-line-clamp: 2;/, "the brief is hidden there, so the question has nowhere else to be read");
+  assert.match(clamps[0], /-webkit-line-clamp: 2;/);
 });
 
 test("the reveal keeps out from under a side notch at every width", () => {
@@ -69,4 +69,14 @@ test("the clock, the key hints and the card preview are sized in the type's own 
     const sized = box.match(/^\s*(?:min-|max-)?(?:width|height): [^;]*;/gm) ?? [];
     for (const declaration of sized) assert.doesNotMatch(declaration, /\dpx/, `${box.split("{")[0].trim()} holds rem type in a px box: ${declaration.trim()}`);
   }
+});
+test("a phone on its side keeps the fold that prints the question and the cards whole", () => {
+  const responsive = sheet("responsive");
+  const hidden = responsive.match(/\(pointer: coarse\) \{[\s\S]*?\{\s*display: none;\s*\}/g) ?? [];
+  assert.equal(hidden.length, 3);
+  for (const rule of hidden) assert.doesNotMatch(rule, /\.gx-brief\b/, "the table cuts both to two lines there, and nothing else prints them");
+  // On the speaker's line, and beside the question once that line is gone: a
+  // row of its own is 14px the shortest screens do not have.
+  assert.match(responsive, /\(max-height: 480px\)[\s\S]*?\.gx-brief \{\s*grid-row: 2;\s*\}/);
+  assert.match(responsive, /\(max-height: 360px\)[^{]*\{\s*\.gx-speaker \{\s*display: none;\s*\}[\s\S]*?\.gx-question \{\s*grid-column: 1;\s*\}\s*\.gx-brief \{\s*grid-row: 1;\s*\}/);
 });

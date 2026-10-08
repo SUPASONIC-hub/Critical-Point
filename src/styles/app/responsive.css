@@ -84,7 +84,6 @@
   }
 .brand-row,
   .topbar,
-  .game-header,
   .start-input-row,
   .top-actions {
     align-items: stretch;
@@ -213,7 +212,6 @@
   .gx-hand-head,
   .gx-portrait,
   .gx-dateline,
-  .gx-brief,
   .gx-situation,
   .gx-focus-modes small,
   .gx-focus-signal small,
@@ -277,6 +275,12 @@
 
   .gx-scene {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The fold stays, on the speaker's line: the question and the cards are cut
+     to two lines here, and it prints both whole. */
+  .gx-brief {
+    grid-row: 2;
   }
 
   .gx-question {
@@ -365,6 +369,15 @@
 @media (max-height: 360px) and (orientation: landscape) and (pointer: coarse) {
   .gx-speaker {
     display: none;
+  }
+
+  /* With no speaker's line to share, the fold sits beside the question. */
+  .gx-question {
+    grid-column: 1;
+  }
+
+  .gx-brief {
+    grid-row: 1;
   }
 }
 
