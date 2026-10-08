@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
-import { cashStakedCard, completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { cashStakedCard, completeCurrentCase, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 async function expectNoA11yViolations(page) {
@@ -35,17 +35,8 @@ test("the briefing page has no structural accessibility violations", async ({ pa
   await expect(briefing.getByRole("dialog")).toBeVisible();
   // The page fades in and its panels pop one after another for about a second.
   // Read before they land, the contrast rule measures text half faded into
-  // the paper (2.7, 3.26, 3.87 on three runs of 2026-10-08) and fails a page
-  // that passes once it has arrived. The loops that never end (the splash
-  // glitch, a late timer's throb) are not waited for.
-  await briefing.evaluate((node) =>
-    Promise.all(
-      node
-        .getAnimations({ subtree: true })
-        .filter((animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime))
-        .map((animation) => animation.finished.catch(() => {})),
-    ),
-  );
+  // the paper and fails a page that passes once it has arrived.
+  await waitForEntrance(briefing);
   await expectNoA11yViolations(page);
 });
 
@@ -56,6 +47,8 @@ test("the decision reveal has no structural accessibility violations", async ({ 
   await cashStakedCard(page);
   await expect(page.getByTestId("decision-next")).toBeVisible();
   await expect(page.locator(".decision-reveal-backdrop").getByRole("dialog")).toBeVisible();
+  // The backdrop fades in and the window rises; the same race as the briefing.
+  await waitForEntrance(page.locator(".decision-reveal-backdrop"));
   await expectNoA11yViolations(page);
 });
 
@@ -68,6 +61,8 @@ test("the relic draft has no structural accessibility violations", async ({ page
   await page.locator(".next-case-panel button").click();
   await expect(page.getByTestId("relic-draft")).toBeVisible();
   await expect(page.getByTestId("relic-option").first()).toBeVisible();
+  // The draft and each of its cards are dealt in.
+  await waitForEntrance(page.getByTestId("relic-draft"));
   await expectNoA11yViolations(page);
 });
 
@@ -80,6 +75,7 @@ test("the question a second tab is asked has no structural accessibility violati
   await second.goto("/?debug=1");
   await expect(second.getByRole("alertdialog")).toBeVisible();
   await expect(second.getByTestId("table-held-elsewhere")).toBeVisible();
+  await waitForEntrance(second.getByTestId("table-held-elsewhere"));
   await expectNoA11yViolations(second);
   await second.close();
 });

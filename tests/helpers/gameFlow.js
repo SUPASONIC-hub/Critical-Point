@@ -139,7 +139,39 @@ export async function cashStakedCard(page) {
       .poll(async () => (await cash.isEnabled()) || (await stage.getAttribute("data-gauge")) !== gauge, { timeout: 5_000 })
       .toBe(true);
   }
-  await cash.click();
+  // Eight pushes that never opened the seal used to end in a click on a
+  // disabled button, which waited out the whole test and failed as "Test
+  // timeout exceeded" with no word about the table.
+  await expect(cash, "the cash button never enabled: no card is staked, or the seal did not open in eight pushes").toBeEnabled({ timeout: 5_000 });
+  await clickElement(cash, "cash the staked card");
+}
+
+/**
+ * Waits for a surface to finish arriving. The briefing page, the reveal, the
+ * draft and the table's question all fade or pop in, and an audit that reads
+ * them on the way measures text half faded into what is behind it: the
+ * briefing's contrast read 2.7, 3.26 and 3.87 on three runs of 2026-10-08 and
+ * passed once the page had landed.
+ *
+ * Only animations that end, and end soon, are waited for. The loops (the splash
+ * glitch, a late timer's throb) never finish, and a long finite one -- the
+ * reading clock's bar, a table countdown -- is not an entrance.
+ */
+export async function waitForEntrance(locator, { longestMs = 3_000 } = {}) {
+  await locator.evaluate(
+    (node, longest) =>
+      Promise.all(
+        node
+          .getAnimations({ subtree: true })
+          .filter((animation) => {
+            const timing = animation.effect?.getComputedTiming();
+            const left = (timing?.endTime ?? Infinity) - (animation.currentTime ?? 0);
+            return animation.playState !== "finished" && Number.isFinite(left) && left <= longest;
+          })
+          .map((animation) => animation.finished.catch(() => {})),
+      ),
+    longestMs,
+  );
 }
 
 /**
@@ -288,7 +320,13 @@ export async function chooseSceneChoice(page, scene, choiceIndex) {
   );
 }
 
-export async function completeCase(page, random) {
+/**
+ * `beforeChoice` is told which card the walk drew before it is pressed. The
+ * draw is over every card of the scene, locked ones included, and a locked card
+ * cannot be staked: a walk that has to press whatever it draws uses this to
+ * give the run the standing the card asks for (full-coverage.spec.js).
+ */
+export async function completeCase(page, random, { beforeChoice } = {}) {
   for (let step = 0; step < 80; step += 1) {
     if (await page.locator(".result-page").isVisible()) return;
     await expect(page.locator(".game-shell")).toBeVisible({ timeout: 8000 });
@@ -296,6 +334,7 @@ export async function completeCase(page, random) {
     const scene = nodes[nodeId];
     if (!scene) throw new Error(`missing scene ${nodeId}`);
     const choiceIndex = Math.floor(random() * scene.choices.length);
+    await beforeChoice?.(scene.choices[choiceIndex], scene);
     await chooseSceneChoice(page, scene, choiceIndex);
     await page.waitForSelector(".game-shell, .result-page, .ending-reveal", { timeout: 8000 });
   }
