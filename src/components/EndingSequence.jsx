@@ -54,14 +54,17 @@ export function EndingSequence({
     endingStep === 0
       ? endingTwistIndex === 0 ? "" : `${currentEndingTwist.label}. ${currentEndingTwist.title}. ${currentEndingTwist.copy}`
       : endingStep === 1
-        ? endingQuietLine || ""
+        ? endingQuietLine
         : endingStep === 3
           ? `기록이 열렸습니다. ${unopenedRecordCount}개의 기록이 아직 열리지 않았습니다.`
           : "";
 
+  // Every ending has a palette and a class of its own, the unnamed ones
+  // "archive" (getEndingAtmosphere, getEndingVisualClass in advancedSystems.js);
+  // the quiet line is a string, empty when nothing was said (useRunReadout.js).
   return (
     <section
-      className={`ending-sequence ending-step-${endingStep} ending-palette-${endingAtmosphere?.palette ?? "archive"} ${endingVisualClass ?? ""}`}
+      className={`ending-sequence ending-step-${endingStep} ending-palette-${endingAtmosphere.palette} ${endingVisualClass}`}
       aria-label="최종 엔딩 시퀀스"
     >
       <picture>
@@ -96,7 +99,7 @@ export function EndingSequence({
       {endingStep === 0 && (
         <div className="ending-beat">
           <span>
-            RECORD {Math.min(endingTwistIndex + 1, endingTwistCount)} / {endingTwistCount} · {currentEndingTwist.label}
+            RECORD {endingTwistIndex + 1} / {endingTwistCount} · {currentEndingTwist.label}
           </span>
           <blockquote>{currentEndingTwist.evidence}</blockquote>
           <div className="ending-twist-card">

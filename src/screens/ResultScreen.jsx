@@ -7,7 +7,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   const {
     common: { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, GAME_TITLE, playerName, activeCaseMeta },
     ending: {
-      endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingProfile, endingVariant,
+      endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, endingVariant,
       advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage,
       saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine,
       skipEndingQuietHold, endingSceneProfile,
@@ -27,16 +27,20 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   const finalChoiceText = finalAftermathEntry?.choice || finalEndingEntry?.choice || "당신이 남긴 마지막 판단";
   const firstRouteEntry = routeTimeline[0]; const longestRouteEntry = [...routeTimeline].sort((a, b) => (b.responseTimeSec ?? 0) - (a.responseTimeSec ?? 0))[0]; const costliestAlternative = counterfactualReport.find((report) => !report.actualWasSafest)?.costliest?.label;
   const branchRouteEntry = [...routeTimeline].reverse().find((entry) => entry.reframeOpenedRoute || entry.reframeBranchId);
-  const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0] ?? ["compliance", 0];
-  const observerEndingRecord = observerPattern?.endingRecord ?? endingCopy.fallbackObserverEndingRecord;
-  const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern?.arc?.text ?? observerEndingRecord.text };
+  // Read without fallbacks: a run always has a pattern with its record and its
+  // arc, a ledger of four reactions, an ending and that ending's scene
+  // (getObserverPattern, getObservationLedger, getEndingVariant in gameLogic.js;
+  // getEndingSceneProfile in advancedSystems.js). tests/unit/report-copy.test.mjs.
+  const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0][0];
+  const observerEndingRecord = observerPattern.endingRecord;
+  const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern.arc.text };
   const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
-  const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile?.choice });
+  const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile.choice });
   const endingTwists = [
     {
       label: "판정",
       title: finalVerdict.title,
-      evidence: endingVariant?.label ?? endingProfile.tag,
+      evidence: endingVariant.label,
       copy: finalVerdict.ruling,
     },
     {
@@ -48,17 +52,18 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     {
       label: "대가",
       title: endingCopy.endingTwistTitles.cost,
-      evidence: endingSceneProfile?.location ?? `${endingCopy.observationLabels[dominantObservation[0]]} 관찰값이 가장 크게 남았다`,
+      evidence: endingSceneProfile.location,
       copy: finalVerdict.cost,
     },
   ];
-  const currentEndingTwist = endingTwists[endingTwistIndex] ?? endingTwists[0];
+  // The index stops at the last of the three (TWIST_COUNT, useEndingSequence.js).
+  const currentEndingTwist = endingTwists[endingTwistIndex];
   const endingTwistCount = endingTwists.length;
   const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { ...endingCopy.endingAxisCopy[0], value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)) },
     { ...endingCopy.endingAxisCopy[1], value: Math.min(100, Math.round((result.reflectionScore ?? 0) * 0.8 + (result.reframeCount ?? 0) * 8)) },
-    { ...endingCopy.endingAxisCopy[2], value: Math.min(100, Math.round((result.cognitionScore ?? 0) * 0.7 + (observerPattern?.turningPoint ? 24 : 0))) },
+    { ...endingCopy.endingAxisCopy[2], value: Math.min(100, Math.round((result.cognitionScore ?? 0) * 0.7 + (observerPattern.turningPoint ? 24 : 0))) },
   ];
   // The doors this run walked past, named. The counts alone ("기록 3개 미열람")
   // are not a reason to play again; a scene title and the lens that was not
@@ -76,7 +81,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
     branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
-  const endingAfterglow = endingCopy.getEndingAfterglow(dominantObservation[0]);
+  const endingAfterglow = endingCopy.getEndingAfterglow(dominantObservation);
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
@@ -109,9 +114,10 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             unopenedBranchCount={unopenedBranchCount}
             endingAtmosphere={view.endingAtmosphere}
             endingVisualClass={view.endingVisualClass}
-            endingImage={endingSceneProfile?.image ?? "/ending-final-archive.webp"}
+            endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
-            card={view}
+            // The four things a card is made from, and nothing that says who played.
+            card={{ fingerprint: decisionFingerprint, endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -242,7 +248,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               </button>
             </section>
           )}
-          {currentCase === "final" && endingVariant && (
+          {currentCase === "final" && (
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label="결말 변형">
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
@@ -250,7 +256,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <small>{endingVariant.failure ? "자원 관리 실패가 기록되었습니다. 다음 플레이에서는 압박을 분산하십시오." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
             </section>
           )}
-          {currentCase === "final" && view.endingEpilogue && (
+          {currentCase === "final" && (
             <section className="ending-epilogue-panel" aria-label="엔딩 에필로그">
               <span lang="en">AFTER THE RECORD</span>
               <p>{view.endingEpilogue}</p>
@@ -292,8 +298,8 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div className="result-why-grid">
               <article>
                 <span>결말을 정한 축</span>
-                <strong>{endingAxes[0]?.label ?? "기록 부족"}</strong>
-                <p>{endingAxes[0]?.text ?? "선택이 더 쌓이면 축이 갈립니다."}</p>
+                <strong>{endingAxes[0].label}</strong>
+                <p>{endingAxes[0].text}</p>
               </article>
               <article>
                 <span>당신이 반복한 방식</span>

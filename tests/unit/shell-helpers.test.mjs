@@ -468,26 +468,30 @@ const endingCopy = await import("../../src/endingCopy.js");
 test("the ending's verdict: a collapse first, then the final choice, then the open verdict", () => {
   const failure = endingCopy.getFinalVerdict({ endingVariant: { failure: true }, finalChoiceId: "ending_seal" });
   assert.equal(failure.title, "트리거랩의 운영은 붕괴합니다.");
+  // The ending and its scene's action are always given (report-copy.test.mjs
+  // holds that), so the open verdict is written from them and nothing else.
+  const variant = { title: "T", text: "X" };
   for (const id of ["ending_seal", "ending_reform", "ending_expose"]) {
-    const verdict = endingCopy.getFinalVerdict({ finalChoiceId: id });
+    const verdict = endingCopy.getFinalVerdict({ endingVariant: variant, finalChoiceId: id });
     for (const field of ["title", "ruling", "execution", "cost"]) assert.ok(verdict[field], `${id}.${field}`);
+    assert.notEqual(verdict.title, "T", `${id} has a verdict of its own`);
   }
-  const open = endingCopy.getFinalVerdict({ endingVariant: { title: "T", text: "X" }, finalChoiceId: "other", endingSceneChoice: "기록을 넘긴다" });
+  const open = endingCopy.getFinalVerdict({ endingVariant: variant, finalChoiceId: "other", endingSceneChoice: "기록을 넘긴다" });
   assert.equal(open.title, "T");
   assert.equal(open.ruling, "X");
   assert.equal(open.execution, "즉시 적용: 기록을 넘긴다.");
-  assert.equal(endingCopy.getFinalVerdict({}).execution, "즉시 적용: 미해결 기록을 다음 근무자에게 인계합니다.");
+  assert.ok(open.cost);
 });
 
-test("every observed reaction has a label and an afterglow, and an unknown one has the open afterglow", () => {
+test("every observed reaction has a label and an afterglow of its own", () => {
+  const titles = new Set();
   for (const observation of Object.keys(endingCopy.observationLabels)) {
     const afterglow = endingCopy.getEndingAfterglow(observation);
     assert.ok(afterglow.title && afterglow.text, observation);
-    assert.notEqual(afterglow, endingCopy.getEndingAfterglow("unknown"));
+    titles.add(afterglow.title);
   }
-  assert.match(endingCopy.getEndingAfterglow(undefined).title, /질문/);
+  assert.equal(titles.size, 4);
   assert.deepEqual(endingCopy.endingAxisCopy.map((axis) => axis.label), ["PROTECT", "EXPOSE", "HANDOFF"]);
-  assert.equal(endingCopy.fallbackObserverEndingRecord.label, "패턴 표본");
 });
 
 test("a heading still on its way in is waited for, a frame at a time, and then given up on", () => {

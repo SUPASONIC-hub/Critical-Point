@@ -10,12 +10,6 @@
 
 export const observationLabels = { compliance: "순응", defiance: "거부", opacity: "은폐", sacrifice: "희생" };
 
-export const fallbackObserverEndingRecord = {
-  label: "패턴 표본",
-  title: "다음 참가자의 첫 장면은 아직 확정되지 않았습니다.",
-  text: "관찰 기록이 부족해 트리거랩은 가장 조용한 기준부터 복원합니다.",
-};
-
 const choiceVerdicts = {
   ending_seal: {
     title: "트리거랩의 개인 조건 데이터는 봉인됩니다.",
@@ -48,14 +42,21 @@ const failureVerdict = {
  * The ruling the ending sequence reads out: the collapse when the run failed,
  * the verdict of the final choice when it made one of the three, and otherwise
  * the open verdict, written from the ending variant the run reached.
+ *
+ * A run always has both things the open verdict is written from: the ruling
+ * returns one of its endings whatever it is given (`getEndingVariant`,
+ * gameLogic.js), and every ending has a scene with an action of its own
+ * (`getEndingSceneProfile`, advancedSystems.js). The three sentences kept here
+ * for a run without them were never printed; tests/unit/report-copy.test.mjs
+ * holds the two facts.
  */
 export function getFinalVerdict({ endingVariant, finalChoiceId, endingSceneChoice }) {
-  if (endingVariant?.failure) return failureVerdict;
+  if (endingVariant.failure) return failureVerdict;
   return (
     choiceVerdicts[finalChoiceId] ?? {
-      title: endingVariant?.title ?? "트리거랩은 완전히 닫히지 않습니다.",
-      ruling: endingVariant?.text ?? "당신은 답 하나를 확정하지 않고, 다음 사람이 판단해야 할 조건을 남겼습니다.",
-      execution: endingSceneChoice ? `즉시 적용: ${endingSceneChoice}.` : "즉시 적용: 미해결 기록을 다음 근무자에게 인계합니다.",
+      title: endingVariant.title,
+      ruling: endingVariant.text,
+      execution: `즉시 적용: ${endingSceneChoice}.`,
       cost: "남는 대가: 결론을 유예한 만큼 다음 참가자는 더 많은 권한과 더 무거운 질문을 동시에 받습니다.",
     }
   );
@@ -91,11 +92,6 @@ const endingAfterglows = {
   },
 };
 
-const openAfterglow = {
-  title: "당신의 선택은 결론보다 오래 남는 질문이 되었습니다.",
-  text: "기록은 정답을 보관하지 않습니다. 다음 판단이 시작될 수 있도록, 당신이 멈춘 자리의 온도를 보관합니다.",
-};
-
 /**
  * What the page that opens the finale says about the season record.
  *
@@ -119,7 +115,13 @@ export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsen
   return dataConsent ? SEASON_RECORD_SENT : SEASON_RECORD_NOT_SENT;
 }
 
-/** What the run leaves behind, keyed by the reaction the observer saw most. */
+/**
+ * What the run leaves behind, keyed by the reaction the observer saw most. The
+ * observation ledger counts exactly these four (`getObservationLedger`,
+ * gameLogic.js), so there is no fifth answer: a run with nothing observed reads
+ * as the first of them, 순응, and the "open" afterglow this used to hold for an
+ * unknown reaction was never shown.
+ */
 export function getEndingAfterglow(observation) {
-  return endingAfterglows[observation] ?? openAfterglow;
+  return endingAfterglows[observation];
 }
