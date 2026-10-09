@@ -70,16 +70,16 @@ const PULSE_MIN_MS = 345;
 const LATENCY_MAX_MS = 400;
 /** How often the loop looks for readers that mounted since it last looked. */
 const READERS_REFRESH_MS = 400;
-export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, stageRef, grade = null, fever = false, wideBeat = false }) {
-  const stateRef = useRef({ window: liveWindow, paused, wideBeat });
+export function GauntletFx({ window: liveWindow, paused, impact, flash, beatClock, stageRef, grade = null, fever = false, wideBeat = false, beat: beatOn = true }) {
+  const stateRef = useRef({ window: liveWindow, paused, wideBeat, beatOn });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
   const flashedAt = useRef(0);
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    stateRef.current = { window: liveWindow, paused, wideBeat };
-  }, [liveWindow, paused, wideBeat]);
+    stateRef.current = { window: liveWindow, paused, wideBeat, beatOn };
+  }, [liveWindow, paused, wideBeat, beatOn]);
 
   useEffect(() => {
     if (!impact) return;
@@ -147,7 +147,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
     let readersAt = 0;
 
     const loop = (time) => {
-      const { window: win, paused: isPaused, wideBeat: wide } = stateRef.current;
+      const { window: win, paused: isPaused, wideBeat: wide, beatOn: graded } = stateRef.current;
       const delta = last ? Math.min(64, time - last) : 16;
       last = time;
       if (time >= readersAt) {
@@ -166,8 +166,11 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, beatCloc
       // harder the nearer the wall was.
       const felt = win.schema.sedated ? visibleHeat : closeness;
       // The window's clock does not run in a hidden tab, so neither does the
-      // rhythm a push is graded against.
-      const beating = live && !document.hidden;
+      // rhythm a push is graded against. Nor does it before the case has
+      // turned the beat on (`tableUnlocks`): the heart is still heard and the
+      // pulse still shown, but the clock a press is graded against stays at no
+      // period, so every press comes back ungraded and the ring stays dark.
+      const beating = graded && live && !document.hidden;
 
       // The beat is stamped when it actually sounds, not at the frame's nominal
       // start: on a starved main thread the callback runs well after `time`, and

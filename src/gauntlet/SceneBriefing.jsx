@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Lock, TriangleAlert } from "lucide-react";
-import { hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { getReadingSeconds, hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
+import { getBriefingIntro } from "./tableStaging.js";
+import { UNLOCK_INTRO_KICKER } from "./tableUnlocks.js";
 import { monotonicNow } from "./timing.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
@@ -38,6 +40,9 @@ function splitCaptions(text = "") {
  * opens by itself. The player can open it sooner, or stake a card straight
  * from the page, which opens the table with that card already on it.
  *
+ * The first page of a case that turns rules on (`tableUnlocks`) says so in a
+ * panel of the same form, above the breach panel when there are both.
+ *
  * The page holds the table's clock the whole time it is up; its own countdown
  * is the only thing ticking, and it stops while the browser tab is hidden.
  *
@@ -57,7 +62,7 @@ export function SceneBriefing({
   portrait,
   speakerRole,
   question,
-  readSeconds,
+  run,
   tableSeconds,
   cards,
   reframeChoice,
@@ -69,6 +74,13 @@ export function SceneBriefing({
   onOpen,
 }) {
   const { letterKeys, keys } = useShortcutHints();
+  const intro = getBriefingIntro(node.caseId, nodeId, run);
+  // The page prints the changed rules and the new ones under the scene, so
+  // both are on its clock, a sentence of either counted the same way.
+  const readSeconds = useMemo(
+    () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text }))]),
+    [node, question, mutations, intro],
+  );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits.
   const [held, setHeld] = useState(() => getAccessibility().holdReadingClock);
@@ -192,8 +204,23 @@ export function SceneBriefing({
             </div>
           )}
 
+          {intro.length > 0 && (
+            <div className="gx-panel gx-panel-breach" data-testid="unlock-intro">
+              <p className="gx-breach-kicker">{UNLOCK_INTRO_KICKER}</p>
+              <ul>
+                {intro.map((line) => (
+                  <li key={line} className="gx-mutation">
+                    <strong style={{ gridColumn: "1 / -1" }}>{line}</strong>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {broken && (
-            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach">
+            // One `breach` area in the page's grid: beside an introduction the
+            // breach takes the next full row instead of the same cell.
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={intro.length > 0 ? { gridArea: "auto / 1 / auto / -1" } : undefined}>
               <p className="gx-breach-kicker">
                 <TriangleAlert size={14} aria-hidden="true" /> PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다
               </p>

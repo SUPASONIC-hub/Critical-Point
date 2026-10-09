@@ -39,6 +39,10 @@ function letterOf(event) {
  * cycles the stance, Enter cashes. On the draft, 1-3 take a relic and Escape
  * passes; on the briefing page, Space, Enter, W or a card key opens the table.
  *
+ * E and Q are the table's only while the case has LOCK and the stances on
+ * (`tableUnlocks`): the stage hands over no `focus` or `cycleFocusMode` before
+ * then, and the key is left alone like any letter the table has no use for.
+ *
  * A modified key is never the table's: Ctrl/Cmd+R, Ctrl+P and Alt+number are
  * the browser's. Bare Shift used to lock focus too, which meant Shift+P --
  * save and leave -- first fired a lock, and a lock off the beat is a JAM.
@@ -140,8 +144,8 @@ export function handleTableKey(event, current, walked = false) {
 
   if (!current.tableOpen) return;
   if (activation && walked && isControl(event.target)) return;
-  if (letter === "e") take(() => current.focus(event));
-  else if (letter === "q") take(() => current.cycleFocusMode());
+  if (letter === "e" && current.focus) take(() => current.focus(event));
+  else if (letter === "q" && current.cycleFocusMode) take(() => current.cycleFocusMode());
   else if (key === " " || letter === "w") take(() => current.push(event));
   else if (key === "Enter") take(() => current.cash());
   else {

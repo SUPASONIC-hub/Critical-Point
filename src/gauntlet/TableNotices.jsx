@@ -163,10 +163,13 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
           {RELICS[id].name} ({RELICS[id].label}): {RELICS[id].text}
         </li>
       ))}
-      <li>
-        시즌 숙련: 차지를 채운 채로 확정한 판의 수. 자세마다 {STANCE_MASTERY_GOAL}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {stanceMastery.strike} · STEADY {stanceMastery.steady} · EXPOSE{" "}
-        {stanceMastery.expose}).
-      </li>
+      {/* No mastery to explain until the case lets the player choose a stance. */}
+      {stanceMastery && (
+        <li>
+          시즌 숙련: 차지를 채운 채로 확정한 판의 수. 자세마다 {STANCE_MASTERY_GOAL}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {stanceMastery.strike} · STEADY {stanceMastery.steady} · EXPOSE{" "}
+          {stanceMastery.expose}).
+        </li>
+      )}
     </>
   );
 }

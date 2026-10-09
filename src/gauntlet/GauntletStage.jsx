@@ -20,7 +20,6 @@ import {
   getHandBonus,
   getHeartbeatBpm,
   getMultiplier,
-  getReadingSeconds,
   getRemainingSeconds,
   getSealedCardId,
   scoreBeat,
@@ -29,10 +28,10 @@ import {
   SLIP_SECONDS,
   splitOpenSeed,
   getStanceMasteryProfile,
-  STANCE_MASTERY_GOAL,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { getStageRules } from "./tableStaging.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { press } from "./timing.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -53,6 +52,7 @@ import {
 import { hasRelic } from "./relics.js";
 import { RelicDraft } from "./RelicDraft.jsx";
 import { SceneBriefing } from "./SceneBriefing.jsx";
+import { StanceRow } from "./StanceRow.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
@@ -61,12 +61,6 @@ const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
 const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
 const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
-// The stance profiles are written for the engine; the table speaks Korean.
-const FOCUS_MODE_COPY = {
-  strike: "판돈 배율 크게 · 헛박자 가혹",
-  steady: "보상 작게 · 락마다 테이블 냉각",
-  expose: "카드의 자원 효과 증폭",
-};
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -153,7 +147,7 @@ export function GauntletStage({
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
   const paused = hidden || draftOpen || !tableOpen;
-  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume });
+  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume, caseId: scene.node.caseId, run });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
@@ -178,7 +172,6 @@ export function GauntletStage({
   const lockPot = handBonus / grooveBonus;
   const focusModeProfile = getFocusModeProfile(win.focusMode);
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
-  const activeStanceCount = stanceMastery[win.focusMode] ?? 0;
   const livePot = Math.round(selectedChips * multiplier * handBonus);
   const live = win.status === "live";
   const fever = live && grooveBonus >= FEVER_BONUS;
@@ -205,10 +198,17 @@ export function GauntletStage({
   const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
   const {
     mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
-    cashMutations, bustMutations, overdrive, bustKeeps, runTension,
-  } = useTableForecast({ schema, run, win, selectedCard, multiplier });
-  // The page prints the changed rules under the scene, so they are on its clock.
-  const readSeconds = useMemo(() => getReadingSeconds({ ...scene.node, question: scene.question }, mutations), [scene.node, scene.question, mutations]);
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules: dealtRules,
+  } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId });
+  // What this case has turned on (`tableUnlocks`). A control whose rule is not
+  // on yet is not drawn and its key is not the table's: no ring, no LOCK, no
+  // stances. What the window or the run already holds is drawn whatever the
+  // step: a combo, relics or a broken board carried in by an older save.
+  const rules = getStageRules(scene.node.caseId, run, dealtRules);
+  const beatOn = rules.has("beat");
+  const lockOn = rules.has("lock");
+  const stanceOn = rules.has("stance");
+  const chainOn = rules.has("overclock");
   // The situation board is three one-line cells, so its copy is written to fit
   // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin
@@ -418,7 +418,7 @@ export function GauntletStage({
   }
 
   // The hook that owns the keys also says which of them a control may name.
-  const { letterKeys, keys } = useTableKeys({ select, focus, push, cash, cycleFocusMode, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
+  const { letterKeys, keys } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
@@ -447,6 +447,7 @@ export function GauntletStage({
         stageRef={stageRef}
         grade={win.lastGrade}
         fever={fever}
+        beat={beatOn}
       />
 
       <div className="gx-table">
@@ -500,18 +501,26 @@ export function GauntletStage({
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
           </div>
+          {/* Rendered or not, never `hidden`: both signals set their own display,
+              and the row's padding would stand over nothing. */}
+          {(chainOn || lockOn) && (
           <div className="gx-signals">
+            {chainOn && (
             <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
               <b>{overdrive.label}</b> <span>{overdrive.text}</span>
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
             </span>
+            )}
+            {lockOn && (
             <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b>{focusBonus.label} {Math.round(win.focus)}</b>
               <small>판돈 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
+            )}
           </div>
+          )}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
@@ -632,7 +641,7 @@ export function GauntletStage({
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
                 <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
-                {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceMastery} />}
+                {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
           </div>
@@ -659,37 +668,7 @@ export function GauntletStage({
             </small>
           </article>
         </section>
-        <div
-          className={`gx-focus-modes gx-stance-mastery mode-${win.focusMode}`}
-          role="group"
-          aria-label={`자세 · ${focusModeProfile.label} 숙련 ${activeStanceCount}/${STANCE_MASTERY_GOAL}`}
-          data-testid="gauntlet-stance-mastery"
-        >
-          {FOCUS_MODES.map((mode) => {
-            const profile = getFocusModeProfile(mode);
-            const active = win.focusMode === mode;
-            const count = stanceMastery[mode] ?? 0;
-            const mastered = stanceMastery.mastered.includes(mode);
-            return (
-              <button
-                key={mode}
-                type="button"
-                className={`mode-${mode}${active ? " active" : ""}${mastered ? " is-mastered" : ""}`}
-                aria-pressed={active}
-                aria-disabled={stanceBlocked || undefined}
-                onClick={() => setFocusMode(mode)}
-              >
-                <span>{profile.label}</span>
-                <em title="시즌 숙련: 차지한 채로 확정한 판">
-                  <span className="sr-only">시즌 숙련 </span>
-                  {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}
-                </em>
-                <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
-                <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
-              </button>
-            );
-          })}
-        </div>
+        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} onPick={setFocusMode} />}
         </div>
 
         <div className="gx-hand-head" aria-hidden="true">
@@ -697,7 +676,7 @@ export function GauntletStage({
           <b>카드 {handSize}장</b>
           <small>
             {letterKeys ? (
-              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · <kbd>E</kbd> 락 · <kbd>Q</kbd> 자세 · <kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기{lockOn && <> · <kbd>E</kbd> 락</>}{stanceOn && <> · <kbd>Q</kbd> 자세</>} · <kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
             ) : (
               <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
             )}
@@ -722,7 +701,8 @@ export function GauntletStage({
         />
       </div>
 
-      <div className="gx-actions">
+      {/* Every sheet lays the dock out in three columns; without LOCK it is two. */}
+      <div className="gx-actions" style={lockOn ? undefined : { gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)" }}>
         <button
           type="button"
           className="gx-push"
@@ -738,12 +718,12 @@ export function GauntletStage({
           aria-label="밀어붙인다"
           aria-describedby="gx-push-detail"
         >
-          <i className="gx-beat-ring" aria-hidden="true" />
+          {beatOn && <i className="gx-beat-ring" aria-hidden="true" />}
           <Flame size={18} aria-hidden="true" />
           <span>밀어붙인다</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
           <span id="gx-push-detail" className="sr-only">
-            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}. 심박에 맞춰 누르면 콤보가 쌓인다
+            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}{beatOn ? ". 심박에 맞춰 누르면 콤보가 쌓인다" : ""}
           </span>
           {win.lastGrade && (
             <em key={`grade-${win.pushes}`} className={`gx-grade gx-grade-${win.lastGrade}`} aria-hidden="true">
@@ -752,6 +732,7 @@ export function GauntletStage({
             </em>
           )}
         </button>
+        {lockOn && (
         <button
           type="button"
           className={`gx-focus focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`}
@@ -778,6 +759,7 @@ export function GauntletStage({
             </em>
           )}
         </button>
+        )}
         <button
           type="button"
           className="gx-cash commit-confirm"
@@ -802,7 +784,7 @@ export function GauntletStage({
           portrait={scene.speakerPortrait}
           speakerRole={scene.speakerRole}
           question={scene.question}
-          readSeconds={readSeconds}
+          run={run}
           tableSeconds={schema.seconds}
           cards={cards}
           reframeChoice={reframeChoice}
