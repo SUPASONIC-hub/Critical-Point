@@ -804,10 +804,13 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
   `index.html`에는 인라인 스크립트가 하나도 없습니다(CSP가 막습니다). 생성 파일은 잘라낸 스타일시트의
   해시를 함께 기록하므로, 스타일이 바뀌면 빌드가 재생성을 요구하며 실패합니다.
 - `npm run build:fonts` — Pretendard를 게임이 실제로 쓰는 글자만 남겨 자른 폰트 한 벌
-  (`src/assets/fonts/pretendard-cp.woff2`, 약 264KB, 글꼴 이름 "Critical Point Sans", 첫 화면이 미리
+  (`src/assets/fonts/pretendard-cp.woff2`, 약 266KB, 글꼴 이름 "Critical Point Sans", 첫 화면이 미리
   받습니다). 폰트 CDN도, 여러 조각으로 나뉜 동적 서브셋도 없습니다. **새 문구를 쓰면 이 명령을 다시
   돌리십시오** — `npm run check:fonts`는 원고에 폰트에 없는 글자가 있으면 실패합니다. `pretendard`
-  패키지는 원본 TTF를 주는 개발 의존성일 뿐입니다. 굵기는 900까지만 씁니다.
+  패키지는 원본 TTF를 주는 개발 의존성일 뿐입니다. 굵기는 900까지만 씁니다. 완성형 2,350자(KS X 1001)를
+  통째로 담는 고정 목록으로 바꾸는 안은 재 보고 접었습니다. 2026-10-09 기준 지금 파일은 272,208바이트
+  (1,695자, 한글 1,243자)이고, 2,350자를 합치면 461,852바이트(2,803자)로 1.7배가 되어 폰트 예산
+  (283,500바이트)을 넘습니다. 첫 화면이 미리 받는 파일이라 그만큼이 첫 방문에 얹힙니다.
 - `npm run build:icons` — 앱 아이콘(`public/icons/`)을 제작자 그림 `public/profile.jpg`에서 크기별로
   잘라 만듭니다. 파비콘은 이 그림입니다. `public/manifest.webmanifest`의 테마 색은 `#06090a`.
 
