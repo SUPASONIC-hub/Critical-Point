@@ -1,4 +1,4 @@
-import { dismissProtocolBreach, startDebugNode } from "./gameFlow.js";
+import { ACTION_TIMEOUT_MS, clickElement, dismissProtocolBreach, startDebugNode } from "./gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./storage.js";
 
 /**
@@ -40,6 +40,49 @@ export async function measureTable(page) {
       innerWidth,
     };
   });
+}
+
+/**
+ * The same measurement with a card staked: once for each card of the hand that
+ * opens a detail line when it is chosen. The wild card opens none, and a locked
+ * card cannot be chosen, so both are passed over.
+ *
+ * The staked card grows by its detail line and takes its row with it, so which
+ * card pushes the hand furthest down is a matter of which was already the
+ * taller of its row: in 사건 01's first scene that is the first card, not the
+ * last. Every card is staked in turn on the one visit, and the caller reads
+ * the worst.
+ *
+ * A staked card is still on its way when the click returns: the detail mounts
+ * on the next render, and the card lifts 3px over a transition while the one
+ * staked before it settles back. A box read then is a different number on each
+ * run. The wait is for the detail to be in the page, for the hand's
+ * transitions to end, and for one frame after that.
+ *
+ * The table is held still for it. The frame loop shakes `.gx-table` on every
+ * heartbeat, harder the nearer the wall, and the wall is drawn anew on each
+ * visit: on a board that drew a near one the cards never came to rest, a click
+ * waited out its timeout for a card to stop moving (the finale, in two of its
+ * three runs on 2026-10-09), and a box read mid-shake is up to a few pixels off. The
+ * shake is a transform, so stilling it moves nothing in the layout.
+ */
+export async function measureStakedTable(page) {
+  await page.addStyleTag({ content: ".gx-table { transform: none !important; }" });
+  const cards = page.locator(".choices .choice:not(.gx-card-wild):not([aria-disabled='true'])");
+  const count = await cards.count();
+  const rows = [];
+  for (let index = 0; index < count; index += 1) {
+    const card = cards.nth(index);
+    await clickElement(card, `stake card ${index + 1}`);
+    await card.locator(".gx-card-preview").waitFor({ timeout: ACTION_TIMEOUT_MS });
+    await page.locator(".gx-hand").evaluate(async (hand) => {
+      const ending = hand.getAnimations({ subtree: true }).filter((animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime));
+      await Promise.all(ending.map((animation) => animation.finished.catch(() => {})));
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    });
+    rows.push({ staked: index + 1, ...(await measureTable(page)) });
+  }
+  return rows;
 }
 
 /**
