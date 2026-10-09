@@ -84,6 +84,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -195,6 +196,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -319,6 +321,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -430,6 +433,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -554,6 +558,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -686,6 +691,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -810,6 +816,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": true,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -942,6 +949,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": true,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1096,6 +1104,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1261,6 +1270,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1414,6 +1424,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1579,6 +1590,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1731,6 +1743,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1896,6 +1909,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2048,6 +2062,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2213,6 +2228,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2365,6 +2381,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2530,6 +2547,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2682,6 +2700,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2847,6 +2866,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2999,6 +3019,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3161,6 +3182,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3284,6 +3306,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3395,6 +3418,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3573,6 +3597,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3745,6 +3770,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3898,6 +3924,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4045,6 +4072,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4242,6 +4270,7 @@
           "record": null
         },
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4433,6 +4462,7 @@
           "record": null
         },
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4600,6 +4630,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4761,6 +4792,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4926,6 +4958,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5095,6 +5128,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5216,6 +5250,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5385,6 +5420,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5550,6 +5586,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5672,6 +5709,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5838,6 +5876,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -6005,6 +6044,7 @@
         "insuranceSpent": false,
         "practice": null,
         "veteran": false,
+        "story": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,

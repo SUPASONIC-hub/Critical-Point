@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { getAccessibility } from "../state/accessibilitySettings.js";
-import { createWindow, reduceWindow } from "./gauntletEngine.js";
+import { createWindow, getTableClockScale, reduceWindow } from "./gauntletEngine.js";
 import { getTableRules } from "./tableUnlocks.js";
 
 /** Ticks are batched to ten a second: the reducer is exact, the screen does not need sixty renders. */
@@ -13,7 +13,8 @@ const TICK_BATCH_SECONDS = 0.1;
  * The clock stops while the tab is hidden and while `paused` -- the protocol
  * breach is on screen, or the runtime is already advancing. With the table-time
  * setting on, it runs that many times slower: the window, its schema and the
- * save are untouched, only the seconds that reach the reducer are fewer.
+ * save are untouched, only the seconds that reach the reducer are fewer. A
+ * story run's clock is never faster than twice as slow (`getTableClockScale`).
  *
  * `caseId` and `run` say which rules the window is played under
  * (`tableUnlocks`), and the reducer is handed them: a press for a rule the
@@ -27,6 +28,9 @@ export function useGauntletWindow({ schema, seed, paused, abandoned = false, clo
   const reduce = useCallback((window_, event) => reduceWindow(window_, event, rules), [rules]);
   const [window_, dispatch] = useReducer(reduce, { schema, seed, abandoned, closedAs, beatCombo, resume }, createWindow);
   const live = window_.status === "live";
+  // The run's story mark is set when its case opens, so it is one value for as
+  // long as this window is on the table.
+  const story = run?.story === true;
 
   useEffect(() => {
     if (paused || !live) return undefined;
@@ -37,7 +41,7 @@ export function useGauntletWindow({ schema, seed, paused, abandoned = false, clo
       if (last && !document.hidden) pending += Math.min(0.25, (time - last) / 1000);
       last = time;
       if (pending >= TICK_BATCH_SECONDS) {
-        const scale = getAccessibility().tableTime;
+        const scale = getTableClockScale({ story }, getAccessibility().tableTime);
         // The scale rides along so the window remembers the slowest it was run.
         dispatch({ type: "TICK", delta: pending / scale, scale });
         pending = 0;
@@ -46,7 +50,7 @@ export function useGauntletWindow({ schema, seed, paused, abandoned = false, clo
     };
     frame = globalThis.requestAnimationFrame(loop);
     return () => globalThis.cancelAnimationFrame(frame);
-  }, [paused, live]);
+  }, [paused, live, story]);
 
   return [window_, dispatch];
 }

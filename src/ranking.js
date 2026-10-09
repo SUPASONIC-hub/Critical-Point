@@ -98,6 +98,9 @@ function normalizeEntry(input = {}) {
     // setting). 1 when the run did not use it, or the server has not been told
     // to publish the key yet.
     assistTime: [1.5, 2].includes(Number(summary.assistTime)) ? Number(summary.assistTime) : 1,
+    // The run played a case in story mode. Such a season is never posted, so
+    // this is true only on this device's own rows.
+    assistStory: summary.assistStory === true,
     reflectionScore,
     pressureAdaptScore,
     cognitionScore: toCount(summary.cognitionScore),

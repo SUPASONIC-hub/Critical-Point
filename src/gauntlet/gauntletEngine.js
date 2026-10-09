@@ -682,6 +682,45 @@ function resumeWindow(window, resume) {
   return restored;
 }
 
+/** Where a story run's wall stands: the last tenth of the gauge. */
+export const STORY_WALL_MIN = 88;
+export const STORY_WALL_MAX = 98;
+const storyBoards = new WeakMap();
+
+/**
+ * The board a window is dealt from: the run's own, and in a story run the same
+ * board with its wall moved to the far end of the gauge.
+ *
+ * The far wall is laid over the board here and never written into it. The
+ * board the run holds is made when the window before it settles, and a case's
+ * first one when the case before it closes -- under whatever that case was. A
+ * wall baked in there would follow the board into a case opened with the
+ * setting off, and every relic and stance that moves a wall would move it
+ * again. Read at the deal, it is the case's and nothing has to undo it; what
+ * settles the window reads the wall the window drew.
+ *
+ * One board per saved board, so a stage that keys its memos on the board is
+ * handed the same object from one render to the next.
+ */
+export function getTableSchema(run) {
+  const schema = run?.schema ?? BASE_SCHEMA;
+  if (run?.story !== true) return schema;
+  if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
+  return storyBoards.get(schema);
+}
+
+/** A story run's table clock runs at least this many times slower. */
+export const STORY_CLOCK_SCALE = 2;
+
+/**
+ * How many times slower the table clock runs for this run: the table-time
+ * setting, and in a story run never less than `STORY_CLOCK_SCALE`. The two do
+ * not multiply -- a player who already asked for twice the time has it.
+ */
+export function getTableClockScale(run, tableTime = 1) {
+  return Math.max(Number(tableTime) || 1, run?.story === true ? STORY_CLOCK_SCALE : 1);
+}
+
 export function getRemainingSeconds(window) {
   return Math.max(0, window.schema.seconds - window.elapsed);
 }
@@ -846,6 +885,10 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // The run was begun with NEW GAME+: its table has every rule from the first
   // window (`tableUnlocks`). A plain start on the same device does not.
   veteran: false,
+  // The case on the table was opened in story mode (the comfort setting): its
+  // wall is dealt far (`getTableSchema`) and no decision breaks the next board
+  // (`tableUnlocks`). Stamped when a case opens, so a case is one or the other.
+  story: false,
   schema: BASE_SCHEMA,
 });
 
@@ -900,6 +943,7 @@ export function normalizeRunState(value) {
   run.insuranceSpent = source.insuranceSpent === true;
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
+  run.story = source.story === true;
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -1487,6 +1531,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
   const settled = {
     practice: current.practice,
     veteran: current.veteran,
+    story: current.story,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
