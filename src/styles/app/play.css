@@ -285,7 +285,6 @@
 
 .gauntlet-shell .game-header .status-bar b {
   color: var(--ui-text);
-  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -575,7 +574,6 @@
 
 .gx-overdrive b,
 .gx-focus-signal b {
-  font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -1656,7 +1654,6 @@
 }
 
 .gx-slam-bust strong {
-  color: var(--c-paper);
   text-shadow: 0 0 40px var(--c-gx-heat);
 }
 
@@ -2288,6 +2285,10 @@
 
   .gx-hand {
     gap: 6px;
+  }
+
+  .gx-card.selected .gx-card-preview {
+    max-height: 1.0625rem;
   }
 
   .gx-question {
