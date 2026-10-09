@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
+import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
@@ -604,6 +605,40 @@ test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => 
   await expect
     .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.nodeId))
     .toBe("c1_route_system");
+});
+
+// 사건 16's interlude is a dated record of five lines, and the fourth is the
+// player's: the label of the card picked at the committee, as the run's log
+// holds it. A run that never sat in that scene (here, one opened on the
+// aftermath) is shown a line that is true of every route instead.
+test("사건 16's interlude prints the card picked at the committee, or its fallback line", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { text, fallback } = nextCaseSignals.case16.interlude;
+  const cardAt = text.findIndex((line) => line.includes("{card}"));
+  const picked = nodes.c16_final.choices[1].label;
+  const lines = page.locator(".result-page .interlude-panel p");
+
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case16", "c16_final");
+  // By its label: the hand is dealt shuffled, so a position is not a card.
+  await page.locator(".choices .choice", { hasText: picked }).click();
+  await cashStakedCard(page);
+  await page.getByTestId("decision-next").click({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(lines).toHaveText(text.map((line) => line.replace("{card}", picked)));
+  await expect(lines).toHaveCount(5);
+  // The same string the report's decision log is built from.
+  const logged = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.log?.find((entry) => entry.nodeId === "c16_final")?.choice);
+  expect(logged).toBe(picked);
+  await expect(lines.nth(cardAt)).toHaveText(`12월 3일 — 당신이 고른 것: ${logged}.`);
+
+  await startDebugNodeFromHelper(page, "case16", "c16_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(lines).toHaveText(text.map((line) => (line.includes("{card}") ? fallback : line)));
+  await expect(page.locator(".result-page .interlude-panel")).not.toContainText("당신이 고른 것");
 });
 
 // The action bar is `position: fixed`, so "the confirm button is inside the
