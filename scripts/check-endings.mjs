@@ -43,6 +43,7 @@ import {
   resolveWindow,
   RUN_INITIAL_STATE,
 } from "../src/gauntlet/gauntletEngine.js";
+import { getTableRules, STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { getOriginStartEffects } from "../src/advancedSystems.js";
 import { legacyProfiles } from "../src/caseCopy.js";
 import { createInheritedChallenge, createSceneChallenge } from "../src/viewModels/sceneViewModels.js";
@@ -79,6 +80,13 @@ import { createChoiceReaders } from "../src/state/useDecision.js";
 
 const SEASONS = Number(process.env.ENDING_SEASONS) || 600;
 const reportMode = process.argv.includes("--report");
+/**
+ * The seasons are played under the rules each case has, as the runtime deals
+ * them (`tableUnlocks`): everything while the switch is off. `--staged` plays
+ * them with the prologues turning the rules on in steps whatever the switch
+ * says, so the ending bands can be read before it is flipped.
+ */
+const staged = STAGED || process.argv.includes("--staged");
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const EXPECTED = [
   "collapse",
@@ -170,13 +178,13 @@ function mergeEffects(...effects) {
   }, {});
 }
 
-function playWindow(policy, run, windowSeed) {
+function playWindow(policy, run, windowSeed, rules) {
   let win = createWindow({ schema: run.schema, seed: windowSeed, beatCombo: run.beatCombo });
-  win = reduceWindow(win, { type: "SELECT", id: "card" });
+  win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
   // Reading the card and the band before the first press. Creep starts after
   // the grace, so a slow hand is already paying heat.
   for (let second = 0; second < Math.floor(policy.think) && win.status === "live"; second += 1) {
-    win = reduceWindow(win, { type: "TICK", delta: 1 });
+    win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
   }
   const target = policy.heat + (random() - 0.5) * 10;
   for (let press = 0; press < 30 && win.status === "live"; press += 1) {
@@ -184,10 +192,10 @@ function playWindow(policy, run, windowSeed) {
       ? getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm
       : win.gauge < target;
     if (!keepGoing) break;
-    win = reduceWindow(win, { type: "PUSH", grade: null });
-    win = reduceWindow(win, { type: "TICK", delta: 0.7 });
+    win = reduceWindow(win, { type: "PUSH", grade: null }, rules);
+    win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
   }
-  if (win.status === "live") win = reduceWindow(win, { type: "CASH" });
+  if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
   return win;
 }
 
@@ -224,7 +232,11 @@ function playSeason(seasonIndex, archetype) {
     let log = [];
     let nodeId = startNode;
     let caseReframes = 0;
-    run = openCaseRun(run);
+    // What `runLifecycle.startCaseNow` and `useChoiceCommit` pass: the case's
+    // rules, and on the window that closes it the next case's.
+    const rules = getTableRules(caseId, run, staged);
+    const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
+    run = openCaseRun(run, { rules });
     for (let step = 0; step < 60 && nodeId && !resultNodeIds.has(nodeId); step += 1) {
       const node = nodes[nodeId];
       const riskPressure = getRiskPressure(resources);
@@ -254,7 +266,7 @@ function playSeason(seasonIndex, archetype) {
           return !best || score > best.score ? { choice: candidate, score } : best;
         }, null).choice;
 
-      const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`);
+      const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`, rules);
       windows += 1;
       const responseTimeSec = Math.max(1, Math.round(window.elapsed));
       const reframe = choice.type === "reframe";
@@ -271,7 +283,7 @@ function playSeason(seasonIndex, archetype) {
       if (skip) skipped += 1;
       const nextNode = skip ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-      const { verdict, nextRun } = resolveWindow({ run, window, card: choice, caseClosed, offerRelics: caseId !== "final" });
+      const { verdict, nextRun } = resolveWindow({ run, window, card: choice, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
       const busted = verdict.outcome === "bust";
       const gauntletEffect = applyGauntletEffect(baseEffect, {
         outcome: verdict.outcome,
