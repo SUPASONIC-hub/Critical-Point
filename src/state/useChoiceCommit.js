@@ -22,6 +22,7 @@ import {
   REFRAME_EFFECT,
 } from "../gameLogic.js";
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
+import { runsInto } from "../seasonRules.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { getLogicType } from "../gauntlet/logicStreak.js";
@@ -44,10 +45,12 @@ let cloudConflictSaid = false;
 
 /**
  * Where 판을 다시 짠다 leads: the case's authored hidden route, once per case,
- * or the far side of the case's first fork when it has none.
+ * or the far side of the case's first fork when it has none. Nowhere, from a
+ * scene the hidden route itself runs into: the card goes where it says.
  */
 function getReframeTarget(caseId, fromNodeId) {
   const dramaticRoute = reframeRouteNodes[caseId];
+  if (dramaticRoute && runsInto(nodes, dramaticRoute, fromNodeId)) return null;
   if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
   const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
   if (!branch || branch.nodeId === fromNodeId) return null;

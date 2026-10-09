@@ -37,7 +37,7 @@ function load(save) {
 test("every era of save has a fixture", () => {
   assert.deepEqual(
     fixtures.map((fixture) => fixture.name),
-    ["v1-prototype.json", "v2-current.json", "v2-pre-gauntlet.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-unlocks.json"],
+    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-unlocks.json"],
   );
 });
 

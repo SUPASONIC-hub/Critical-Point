@@ -132,6 +132,28 @@ export function readContinuityMemoryChoice({ plans, openingRoutes }, { caseId = 
 }
 
 /**
+ * Whether some run of cards leads from the scene `fromId` to the scene `toId`.
+ * 판을 다시 짠다 asks it before it opens a case's hidden route: a scene that
+ * route itself runs into would be dealt a second time. Today that is the
+ * finale's closing decision alone -- the hidden route's final goes up to the
+ * 33rd floor and comes back down to `f_choice` -- and there the card goes
+ * where it says instead.
+ */
+export function runsInto(nodes, fromId, toId) {
+  const seen = new Set([fromId]);
+  const queue = [fromId];
+  while (queue.length > 0) {
+    for (const { next } of nodes[queue.shift()]?.choices ?? []) {
+      if (next === toId) return true;
+      if (seen.has(next)) continue;
+      seen.add(next);
+      queue.push(next);
+    }
+  }
+  return false;
+}
+
+/**
  * The one authored mid-case fork per case, with the scenes each side leads to.
  * Derived from the graph so adding a branch needs no second list.
  */

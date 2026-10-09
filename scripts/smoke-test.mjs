@@ -725,8 +725,11 @@ for (const [routeId, finalId] of [
 }
 for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
   for (const choice of nodes[finalId].choices) {
-    assert.equal(choice.next, "f_choice", `${finalId} should hand the run to the scene that names the ending`);
+    assert.equal(choice.next, "f_confront", `${finalId} should hand the run to the 33rd floor`);
   }
+}
+for (const choice of nodes.f_confront.choices) {
+  assert.equal(choice.next, "f_choice", "the 33rd floor should hand the run to the scene that names the ending");
 }
 test("early cases should include reaction scenes", () => {
   assert.ok(nodes.c1_witness_reaction && nodes.c2_trace_reaction && nodes.c3_signal_reaction, "early cases should include reaction scenes");

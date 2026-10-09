@@ -112,7 +112,7 @@ const finalCaseNodes = {
     title: "당신의 조건",
     speaker: "윤상혁",
     text:
-      "본사 33층, 옛 그룹전략실. 짐이 빠진 방에 이삿짐 상자 몇 개와 책상 하나만 남았습니다. 이사회에서 해임(이사를 자리에서 물러나게 하는 일)되고 1심에서 집행유예(형을 미뤄 두고 당장 가두지는 않는 판결)를 받은 윤상혁은 이 밤에도 화내지 않습니다. 갤러리 이야기도, 해온파트너스 이야기도 이미 들었다고 합니다. 그는 3년 전 그 서류를 직접 꺼내 서명란이 빈 3페이지를 펼쳐 놓습니다. 빈칸 옆에는 연필 점 하나가 찍혀 있습니다. '여기 이름을 안 넣은 건 실수가 아니라 설계였네. 이름이 없으면 책임도 없고, 책임이 없으면 다음 결정이 빨라지지. 나 혼자 한 설계는 아니었고.' 그가 그 옆에 후임 관리자 지정서와 펜 한 자루를 놓습니다. '자네는 압박이 올라갈수록 더 깊이 생각하더군. 아주 귀한 성질이야. 그런 사람을 어디에 둘지, 3년 전에는 내가 정했네. 이제 내게는 정할 자리가 없어. 그래서 묻지. 이 칸에 누구 이름이 들어가야 하나.'",
+      "새벽의 본사 33층, 옛 그룹전략실. 짐이 빠진 방에 이삿짐 상자 몇 개와 책상 하나만 남았습니다. 이사회에서 해임(이사를 자리에서 물러나게 하는 일)되고 1심에서 집행유예(형을 미뤄 두고 당장 가두지는 않는 판결)를 받은 윤상혁은 밤새 기다리고도 화내지 않습니다. 그는 3년 전 그 서류를 직접 꺼내 서명란이 빈 3페이지를 펼쳐 놓습니다. 빈칸 옆에는 연필 점 하나가 찍혀 있습니다. '여기 이름을 안 넣은 건 실수가 아니라 설계였네. 이름이 없으면 책임도 없고, 책임이 없으면 다음 결정이 빨라지지. 나 혼자 한 설계는 아니었고.' 그가 그 옆에 후임 관리자 지정서와 펜 한 자루를 놓습니다. '자네는 압박이 올라갈수록 더 깊이 생각하더군. 아주 귀한 성질이야. 그런 사람을 어디에 둘지, 3년 전에는 내가 정했네. 이제 내게는 정할 자리가 없어. 그래서 묻지. 이 칸에 누구 이름이 들어가야 하나.'",
     memo: [
       "윤상혁: 이사회 해임, 1심 집행유예 -- 검찰은 항소",
       "2023-0412 승인 문서 3페이지 -- 빈 서명란 옆 연필 점",
@@ -122,44 +122,44 @@ const finalCaseNodes = {
     ],
     triggers: ["responsibility", "curiosity", "order", "protection"],
     choices: [
+      // The four answers to "whose name goes in that box". 사건 49 rehearsed the
+      // first three (c49_final_inside / _all / _his); each card keeps the effect
+      // and the way of thinking of the card that stood in its slot before.
+      // No 판을 다시 짠다 here: every path arrives with its own final behind it,
+      // and the question has one box.
       {
-        id: "f_confront_seal",
-        label: "내 프로필과 관련 데이터를 봉인한다",
+        id: "f_confront_mine",
+        label: "펜을 받아 지정서의 관리자 칸에 내 이름을 쓴다",
         effect: { legitimacy: 5, trust: -2, humanCost: 4, fatigue: 2 },
-        voice: "더 쓰이지 않게 하겠다며, 내 기록에 자물쇠를 건다.",
-        echo: "봉인은 당신을 지킵니다. 봉인된 기록은 다음 참가자를 지키는 데도 쓰이지 못합니다.",
+        voice: "밖에서는 그 칸에 손이 닿지 않는다며, 펜을 받아 지정서의 관리자 칸에 내 이름을 쓴다.",
+        echo: "이름을 쓰자 그가 고개를 끄덕입니다. '그럴 줄 알았네.' 그 말도 폴더에 적힙니다. 3페이지의 빈칸은 그대로입니다.",
         cognition: { risk: 2 },
       },
       {
-        id: "f_confront_reform",
-        label: "프로필을 공개하고 사용 규칙을 직접 설계한다",
+        id: "f_confront_all",
+        label: "그 칸을 비워 둔 사람을 모두 적고 내 이름도 넣는다",
         effect: { trust: 9, legitimacy: 6, humanCost: -4, fatigue: 5 },
-        voice: "숨기는 대신 쓰는 방법을 내가 쓰겠다고 나선다.",
-        echo: "규칙을 직접 쓰면 통제권이 옵니다. 그 규칙의 첫 적용 대상도 당신입니다.",
+        voice: "반대 의견을 쓰고도 끝까지 묻지 않은 것도 비운 것이라며, 그 칸을 비워 둔 사람을 모두 적고 내 이름도 그 아래에 넣는다.",
+        echo: "이름이 한 줄씩 늘어 칸 밖으로 넘칩니다. 그가 처음으로 서류에서 눈을 뗍니다. '칸이 좁군. 좁게 만든 칸이었네.'",
         cognition: { reframing: 3, persistence: 1 },
       },
       {
-        id: "f_confront_destroy",
-        label: "트리거랩의 실험 구조를 폭로한다",
+        id: "f_confront_his",
+        label: "그 칸에는 윤상혁의 이름이 들어가야 한다고 말한다",
         effect: { trust: 5, legitimacy: 8, fatigue: 4 },
-        voice: "내 기록을 잃더라도, 이 구조는 남기지 않겠다고 말한다.",
-        echo: "폭로는 실험을 끝냅니다. 끝난 실험의 참가자 기록은 누구의 것도 아니게 됩니다.",
+        voice: "비워 둔 사람이 채우는 것이 순서라며, 펜을 돌려주고 그 칸에는 윤상혁의 이름이 들어가야 한다고 말한다.",
+        echo: "그는 펜을 받지 않고 책상 위에 둡니다. '내 이름 하나면 자네들은 편하겠지. 그 칸이 다시 비는 데는 3년도 안 걸리네.'",
         cognition: { persistence: 2, risk: 1 },
       },
       {
-        // The only route in the last case that buys trust with legitimacy. The
+        // The only card in the last case that buys trust with legitimacy. The
         // FIELD PACT ending asks for exactly that gap and had no way to open it.
-        id: "f_confront_pact",
-        label: "참가자들과 직접 합의하고 공식 절차는 건너뛴다",
+        id: "f_confront_ask",
+        label: "그 칸에 넣을 이름을 열세 명에게 묻겠다고 한다",
         effect: { trust: 11, legitimacy: -8, humanCost: -4, time: -4, fatigue: 4 },
-        voice: "승인 절차를 기다리지 않고, 참가자들과 직접 약속을 맺는다.",
-        echo: "직접 맺은 약속은 가장 빨리 지켜집니다. 그 약속을 검증할 사람이 당신뿐이라는 것도 같이 남습니다.",
+        voice: "이 방의 두 사람이 정할 이름이 아니라며, 서류를 들고 내려가 그 칸에 넣을 이름을 열세 명에게 묻겠다고 한다.",
+        echo: "'그건 절차가 아니네.' 그는 그렇게 말하고도 서류를 막지 않습니다. 열세 명이 정한 이름은 가장 빨리 믿기고, 어느 규정에도 근거가 없습니다.",
         cognition: { reframing: 2 },
-      },
-      {
-        id: "reframe",
-        label: "마지막으로 판을 바꾼다",
-        type: "reframe",
       },
     ],
   },
@@ -296,7 +296,7 @@ export const finalCase = {
       next: "f_choice",
       title: "끝내는 방법",
       speaker: "에코",
-      text: "여의도에서 돌아와 다시 B2입니다. 보관소 맨 안쪽, 벽에 붙은 작은 단말 하나가 켜져 있습니다. 화면에는 단추가 하나뿐입니다. 종료. 에코가 그 위에 설명을 붙입니다. '이 단말은 기록을 멈추는 권한을 갖고 있습니다. 문을 닫으면 기록도 함께 사라집니다. 빈 서명란도, 열세 명의 망설임도, 당신의 3년도. 문을 열어 두면 기록은 남고, 더 많은 사람이 같은 압박을 받습니다.' 밖으로 내보내기 전에 만들어 둔 백업이 한 벌 있습니다. 참가자 동의 절차는 아직 고칠 수 있습니다. '당신에게 필요한 것은 이제 답이 아닙니다. 끝내는 조건입니다.'",
+      text: "회선을 열어 둔 채 보관소 맨 안쪽으로 들어갑니다. 벽에 붙은 작은 단말 하나가 켜져 있습니다. 화면에는 단추가 하나뿐입니다. 종료. 에코가 그 위에 설명을 붙입니다. '이 단말은 기록을 멈추는 권한을 갖고 있습니다. 문을 닫으면 기록도 함께 사라집니다. 빈 서명란도, 열세 명의 망설임도, 당신의 3년도. 문을 열어 두면 기록은 남고, 더 많은 사람이 같은 압박을 받습니다.' 밖으로 내보내기 전에 만들어 둔 백업이 한 벌 있습니다. 참가자 동의 절차는 아직 고칠 수 있습니다. '당신에게 필요한 것은 이제 답이 아닙니다. 끝내는 조건입니다.'",
       memo: ["서버 종료 권한은 당신에게 있음", "외부 공개 전 백업이 생성됨", "참가자 동의 절차는 아직 바꿀 수 있음"],
       choices: [
         {
@@ -388,13 +388,17 @@ export const finalCase = {
       ],
     },
   ],
-  branchPlan: ["f_confront", 0, "f_branch_witness", "f_branch_witness_follow"],
+  // The side door hangs on the inside route, whose middle its two scenes are:
+  // 한서윤 takes the analyst down from the 3rd-floor room to the 1기 shelf. All
+  // three cards of that scene walk it; the door is marked on the card that asks
+  // for consent again, because the shelf is the people who were never asked.
+  branchPlan: ["f_route_contain", 2, "f_branch_witness", "f_branch_witness_follow"],
   branchScenes: {
     f_branch_witness: {
       phase: "SIDE DOOR",
       title: "이전 기록의 빈칸",
       speaker: "한서윤",
-      text: "B2 보관소 안쪽, '1기'라는 꼬리표가 붙은 선반 앞에 한서윤이 서 있습니다. 그가 상자 하나를 꺼내 뚜껑을 엽니다. 당신보다 먼저 이 실험을 지나간 사람의 기록입니다. 한 장씩 넘기면 낯설지 않습니다. 압박이 올라갈 때 멈춰 서는 자리도, 사람 쪽으로 기우는 순서도 당신과 닮았습니다. 그런데 마지막 장의 마지막 줄이 비어 있습니다. 지운 자국이 종이에 남아 있습니다. 한서윤이 그 줄을 손끝으로 짚습니다. '이 사람이 끝에 뭘 골랐는지는 저도 못 봤어요. 제가 보기 전에 지워졌어요.' 그가 상자를 당신 쪽으로 돌립니다. '이 실험이 알고 싶었던 게 이 한 줄일지도 몰라요. 그래서 다음 사람이 필요했던 거고요.'",
+      text: "한서윤을 따라 B2로 내려갑니다. 보관소 안쪽, '1기'라는 꼬리표가 붙은 선반 앞에서 그가 상자 하나를 꺼내 뚜껑을 엽니다. 당신보다 먼저 이 실험을 지나간 사람의 기록입니다. 한 장씩 넘기면 낯설지 않습니다. 압박이 올라갈 때 멈춰 서는 자리도, 사람 쪽으로 기우는 순서도 당신과 닮았습니다. 그런데 마지막 장의 마지막 줄이 비어 있습니다. 지운 자국이 종이에 남아 있습니다. 한서윤이 그 줄을 손끝으로 짚습니다. '이 사람이 끝에 뭘 골랐는지는 저도 못 봤어요. 제가 보기 전에 지워졌어요.' 그가 상자를 당신 쪽으로 돌립니다. '이 실험이 알고 싶었던 게 이 한 줄일지도 몰라요. 그래서 다음 사람이 필요했던 거고요.'",
       memo: ["이전 참가자의 선택", "삭제된 마지막 문장", "기록을 읽는 권한"],
       triggers: ["selfAwareness", "curiosity"],
       choices: [
@@ -507,7 +511,7 @@ export const finalCase = {
           },
         ],
         finalTitle: "내 기준을 공개할 것인가",
-        finalText: "새벽, 케이스데스크 화면에 에코가 목록 하나를 만들어 놓았습니다. 당신의 선택에서 출발해 다른 사람 앞에 보기로 놓인 문구들입니다. 마흔 줄이 넘습니다. 누구 앞에 놓였는지는 가려져 있고, 언제 놓였는지만 적혀 있습니다. 마지막 줄의 날짜는 어젯밤입니다. 에코가 말합니다. '당신이 만든 기준은 이미 다른 사람에게 쓰였습니다. 이 목록은 증거이기도 하고 피해의 지도이기도 합니다. 열면 지난 사건들이 전부 다시 읽힙니다. 지우면 더는 쓰이지 않지만, 쓰였다는 사실도 함께 사라집니다.' 화면 아래에 단추가 둘 떠 있습니다. 공개와 삭제입니다.",
+        finalText: "새벽, 케이스데스크 화면에 에코가 목록 하나를 만들어 놓았습니다. 당신의 선택에서 출발해 다른 사람 앞에 보기로 놓인 문구들입니다. 마흔 줄이 넘습니다. 누구 앞에 놓였는지는 가려져 있고, 언제 놓였는지만 적혀 있습니다. 마지막 줄의 날짜는 어젯밤입니다. 에코가 말합니다. '당신이 만든 기준은 이미 다른 사람에게 쓰였습니다. 이 목록은 증거이기도 하고 피해의 지도이기도 합니다. 열면 지난 사건들이 전부 다시 읽힙니다. 지우면 더는 쓰이지 않지만, 쓰였다는 사실도 함께 사라집니다.' 화면 아래에 단추가 둘 떠 있습니다. 공개와 삭제입니다. 이것을 정하면 33층에 오를 차례입니다.",
         finalMemo: ["공개하면 지난 사건 전부의 전제가 흔들림", "삭제는 악용을 줄이지만 책임도 지움", "돌려주기는 동의 절차를 다시 요구함"],
         finalChoices: [
           {
@@ -572,7 +576,7 @@ export const finalCase = {
           },
         ],
         finalTitle: "폭로의 피해자를 줄일 것인가",
-        finalText: "새벽, 반재욱이 외부 감사용 사본이 든 봉투를 단말 옆에 놓습니다. 봉투는 아직 봉하지 않았습니다. '구조를 드러내려면 기록을 내놓아야 합니다. 기록을 내놓으면 그 안에 있는 사람이 같이 나갑니다.' 그가 수첩을 펴서 세 줄을 읽습니다. 원본 그대로 넘기면 가장 빠르고, 누가 누구인지도 그대로 나갑니다. 이름을 지우고 넘기면 며칠이 걸립니다. 감사단이 올 때까지 기다리면 그사이 서버가 더 닫힙니다. '진실이 빨리 나가는 것과 사람이 덜 다치는 것. 둘 다는 안 됩니다. 순서를 정하셔야 합니다. 저는 정해진 순서대로 봉투를 봉하겠습니다.'",
+        finalText: "새벽, 반재욱이 외부 감사용 사본이 든 봉투를 단말 옆에 놓습니다. 봉투는 아직 봉하지 않았습니다. '구조를 드러내려면 기록을 내놓아야 합니다. 기록을 내놓으면 그 안에 있는 사람이 같이 나갑니다.' 그가 수첩을 펴서 세 줄을 읽습니다. 원본 그대로 넘기면 가장 빠르고, 누가 누구인지도 그대로 나갑니다. 이름을 지우고 넘기면 며칠이 걸립니다. 감사단이 올 때까지 기다리면 그사이 서버가 더 닫힙니다. '진실이 빨리 나가는 것과 사람이 덜 다치는 것. 둘 다는 안 됩니다. 순서를 정하셔야 합니다. 저는 정해진 순서대로 봉투를 봉하겠습니다. 33층은 그다음입니다.'",
         finalMemo: ["원본 공개는 가장 빠름", "익명화는 시간이 듦", "감사 대기는 증거 삭제 위험을 키움"],
         finalChoices: [
           {
@@ -637,7 +641,7 @@ export const finalCase = {
           },
         ],
         finalTitle: "도구를 남길 조건",
-        finalText: "새벽, 한서윤이 단말 옆에 종이 석 장을 나란히 놓습니다. 폐기 요청서, 내부 개혁안, 운영위원회 구성안. 셋 다 그가 오늘 밤에 쓴 것입니다. '트리거랩은 완전히 거짓도 아니었고 완전히 선의도 아니었어요. 저도 그렇고요.' 그가 종이 모서리를 가지런히 맞춥니다. '없애면 연구도 같이 끝나요. 안에서 고치면 빠른데, 고친 사람을 아무도 안 믿어요. 참가자들한테 넘기면 느려요. 대신 원래 주인한테 돌아가는 거고요.' 반납하지 않은 열쇠가 종이 옆에 놓여 있습니다. '도구를 남길 거면 조건이 있어야 해요. 그 조건을 누가 정하는지, 그걸 먼저 정해야 하고요.'",
+        finalText: "새벽, 한서윤이 단말 옆에 종이 석 장을 나란히 놓습니다. 폐기 요청서, 내부 개혁안, 운영위원회 구성안. 셋 다 그가 오늘 밤에 쓴 것입니다. '트리거랩은 완전히 거짓도 아니었고 완전히 선의도 아니었어요. 저도 그렇고요.' 그가 종이 모서리를 가지런히 맞춥니다. '없애면 연구도 같이 끝나요. 안에서 고치면 빠른데, 고친 사람을 아무도 안 믿어요. 참가자들한테 넘기면 느려요. 대신 원래 주인한테 돌아가는 거고요.' 반납하지 않은 열쇠가 종이 옆에 놓여 있습니다. '도구를 남길 거면 조건이 있어야 해요. 그 조건을 누가 정하는지, 그걸 먼저 정해야 하고요. 33층은 그다음이에요.'",
         finalMemo: ["폐기는 연구를 끝냄", "내부 개혁은 빠르지만 불신을 남김", "참가자 통제는 느리지만 권한을 돌려줌"],
         finalChoices: [
           {
@@ -669,7 +673,7 @@ export const finalCase = {
     },
     system: {
       finalTitle: "다음 사람의 화면",
-      finalText: "새벽의 보관소 단말에는 전송 대기열 두 줄이 나란히 깜빡입니다. 하나는 삭제, 하나는 공개입니다. 그 위에 다음 참가자의 첫 화면이 미리 그려져 있습니다. 이름 칸은 비어 있습니다. 보기 하나는 당신이 다시 짠 판과 글자 하나 다르지 않습니다. 그 사람은 그것이 누군가 3년을 지나 마지막 밤에 꺼낸 답이라는 걸 모른 채, 여러 보기 가운데 하나로 읽게 됩니다. 에코가 마지막으로 묻습니다. '이 사람은 아직 아무것도 고르지 않았습니다. 무엇을 고르게 두겠습니까?' 종료 권한은 아직 당신에게 있습니다. 대기열 두 줄은 서로 기다려 주지 않습니다.",
+      finalText: "새벽의 보관소 단말에는 전송 대기열 두 줄이 나란히 깜빡입니다. 하나는 삭제, 하나는 공개입니다. 그 위에 다음 참가자의 첫 화면이 미리 그려져 있습니다. 이름 칸은 비어 있습니다. 보기 하나는 당신이 다시 짠 판과 글자 하나 다르지 않습니다. 그 사람은 그것이 누군가 3년을 지나 마지막 밤에 꺼낸 답이라는 걸 모른 채, 여러 보기 가운데 하나로 읽게 됩니다. 33층에 오르기 전에 에코가 하나를 묻습니다. '이 사람은 아직 아무것도 고르지 않았습니다. 무엇을 고르게 두겠습니까?' 종료 권한은 아직 당신에게 있습니다. 대기열 두 줄은 서로 기다려 주지 않습니다.",
       finalMemo: ["삭제 전송과 공개 전송: 둘 다 대기 중", "다음 참가자의 첫 화면에 당신이 다시 짠 판이 있음", "종료 권한: 아직 당신에게"],
       route: "f_route_system",
       final: "f_final_system",
@@ -734,19 +738,23 @@ export const finalCase = {
   routeBody: {
     routes: {
       f_route_map: { entry: "f_archive", tail: "f_witness_reaction", final: "f_final_map" },
-      f_route_expose: { entry: "f_confront", tail: "f_dilemma_reaction", final: "f_final_expose" },
+      f_route_expose: { entry: "f_dilemma", tail: "f_dilemma_reaction", final: "f_final_expose" },
       f_route_contain: { entry: "f_branch_witness", tail: "f_branch_witness_follow", final: "f_final_contain" },
     },
-    // f_choice is where the season picks its 봉인/개혁/폭로 framing, so the last
-    // case is the one place the route finals still converge: they hand the run
-    // to that scene instead of jumping past it into the aftermath.
-    rewire: { f_final_map: "f_choice", f_final_expose: "f_choice", f_final_contain: "f_choice", f_final_system: "f_choice" },
+    // The last case is the one place the route finals still converge. Every
+    // path makes its own last decision in B2, goes up to the 33rd floor
+    // (f_confront) to answer the man who left the box empty, and comes back
+    // down to f_choice, where the season picks its 봉인/개혁/폭로 framing.
+    // `f_dilemma` is still written `after: "f_confront"`: that is only where
+    // the build files it, and this rewire is what the 33rd floor leads to.
+    rewire: { f_final_map: "f_confront", f_final_expose: "f_confront", f_final_contain: "f_confront", f_final_system: "f_confront", f_confront: "f_choice" },
   },
   evidencePlan: {
     node: "f_evidence_turn",
-    // Same reason the last case's route finals stop at f_choice: the clue
-    // turnaround must not skip the scene that names the ending.
-    result: "f_choice",
+    // Same reason the last case's route finals go up to f_confront: the clue
+    // turnaround must skip neither the 33rd floor nor the scene that names the
+    // ending.
+    result: "f_confront",
     sourceRoutes: ["f_route_map", "f_route_expose", "f_route_contain", "f_route_system"],
     requiredAuthority: "OVERSIGHT",
     entryVoice: "마지막 선택지들을 단서의 원본과 맞추어, 이 문장들이 어디서 왔는지 밝힌다.",
@@ -754,7 +762,7 @@ export const finalCase = {
     entryLabel: "선택지들이 만들어진 원본 폴더를 연다",
     title: "모든 단서가 당신의 문장을 가리킨다",
     speaker: "에코",
-    text: "쥐고 있던 단서로 감독 권한을 열자 원본 폴더가 통째로 펼쳐집니다. 마흔아홉 사건의 파일이 나란히 서고, 에코가 그 사이에 선을 긋습니다. 사건들을 잇는 것은 회사도 인물도 아닙니다. 물음입니다. 당신이 한 사건에서 고른 답이 다음 사건의 물음을 고쳤고, 그 물음이 다시 당신에게 왔습니다. 선은 전부 한 곳에서 나옵니다. 당신이 판단하는 방식입니다. 에코가 폴더 맨 끝의 빈 파일을 엽니다. 다음 참가자의 첫 화면이고, 보기 몇 개가 벌써 채워져 있습니다. '마지막으로 정할 것은 이 자료를 내놓느냐가 아닙니다. 당신이 판단하는 방식을 다음 사람에게 물려주느냐입니다.'",
+    text: "쥐고 있던 단서로 감독 권한을 열자 원본 폴더가 통째로 펼쳐집니다. 마흔아홉 사건의 파일이 나란히 서고, 에코가 그 사이에 선을 긋습니다. 사건들을 잇는 것은 회사도 인물도 아닙니다. 물음입니다. 당신이 한 사건에서 고른 답이 다음 사건의 물음을 고쳤고, 그 물음이 다시 당신에게 왔습니다. 선은 전부 한 곳에서 나옵니다. 당신이 판단하는 방식입니다. 에코가 폴더 맨 끝의 빈 파일을 엽니다. 다음 참가자의 첫 화면이고, 보기 몇 개가 벌써 채워져 있습니다. '33층에 오르기 전에 정할 것은 이 자료를 내놓느냐가 아닙니다. 당신이 판단하는 방식을 다음 사람에게 물려주느냐입니다.'",
     memo: ["모든 사건의 숨은 단서가 선택 문장과 연결됨", "다음 참가자의 첫 선택지 일부가 이미 생성됨", "종료 권한은 공개와 폐기 중 하나만 완전하게 보장함"],
     triggers: ["selfAwareness", "choice", "system"],
     entryEffect: { legitimacy: 6, trust: 3, time: -5, fatigue: 5 },
@@ -908,15 +916,15 @@ export const finalCase = {
     },
     f_confront: {
       place: "KD금융그룹 본사 33층 옛 그룹전략실",
-      clock: "마지막 밤 · 00:40",
-      question: "서명란을 비워 둔 사람이 당신 앞에 앉아 있습니다. 그 조건을 봉인하겠습니까, 직접 설계하겠습니까?",
-      lead: "보관소를 나와 택시로 여의도에 닿았습니다. 33층, 짐이 빠진 방에서 윤상혁은 3년 전 서류를 이미 책상에 펼쳐 두고 기다리고 있었습니다.",
+      clock: "마지막 밤 · 새벽",
+      question: "서명란을 비워 둔 사람이 펜을 내밉니다. 그 칸에 누구의 이름을 넣겠습니까?",
+      lead: "B2에서 볼 것을 다 보고 보관소를 나와, 택시로 여의도에 닿았습니다. 33층에서 윤상혁은 불을 켜 둔 채 기다리고 있었습니다.",
     },
     f_choice: {
       place: "트리거랩 기록 보관소 B2 · 단말 앞",
       clock: "마지막 밤 · 새벽",
       question: "마흔아홉 사건과 1년의 마지막 선택입니다. 당신의 조건을 약점으로 두겠습니까, 도구로 쓰겠습니까?",
-      lead: "마흔아홉 사건과 1년, 그리고 이 밤이 지났습니다. 트리거랩은 없어졌고, 관리자 칸에는 여전히 점 하나가 찍혀 있습니다. 단말 앞에는 당신과, 반납하지 않은 열쇠를 쥔 한서윤이 있습니다.",
+      lead: "마흔아홉 사건과 1년, 그리고 이 밤이 지났습니다. 트리거랩은 없어졌고, 33층에서 받은 물음은 B2까지 따라 내려왔습니다. 단말 앞에는 당신과, 반납하지 않은 열쇠를 쥔 한서윤이 있습니다.",
     },
     f_witness: {
       place: "트리거랩 기록 보관소 B2 · 이전 참가자 구역",
@@ -1016,7 +1024,7 @@ export const finalCase = {
   },
   // Keyed on case 49's aftermath: the finale follows that case now.
   continuityChallenges: {
-    c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 로비에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
+    c49_after_warm: { id: "protect-trust", title: "집념을 혼자 갖지 않기", text: "달이 질 때까지 곁에 남은 밤이 이번에는 '결속 유지 능력'이라는 관찰 자료가 됐습니다. 골목에서 기다리는 사람들의 선택권까지 빼앗지 않는 방법을 찾으면 숨은 단서가 열릴 수 있습니다." },
     c49_after_record: { id: "use-reframe", title: "내가 묶은 폴더도 의심하기", text: "마흔아홉 사건을 묶은 공개 준비 폴더가 관찰 자료 1번이 됐습니다. 그 폴더가 다시 누군가를 재는 도구가 되지 않는지 판을 뒤집어 확인해야 합니다." },
     c49_after_rush: { id: "repair-legitimacy", title: "먼저 달려간 걸음의 공정함 회복하기", text: "혼자 먼저 올라간 걸음이 후임 관리자 추천 사유가 됐습니다. 골목에 남은 동료들이 당신 없이도 지켜질 방법을 찾아야 합니다." },
   },
