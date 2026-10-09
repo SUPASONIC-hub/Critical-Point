@@ -1,5 +1,9 @@
 import { expect, test } from "./helpers/network.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
+import { CASE_START_NODES } from "../src/gameCases.js";
 import { nodes } from "../src/gameData.js";
+import { getReadingSeconds } from "../src/gauntlet/gauntletEngine.js";
+import { STAGED, UNLOCK_INTRO_KICKER, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { openBrokenBoard } from "./helpers/layout.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
@@ -367,4 +371,139 @@ test("the relic draft keeps focus inside it, and Enter takes the focused relic",
   await dismissProtocolBreach(page);
   await page.keyboard.press("1");
   await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+});
+
+/**
+ * The staged table (src/gauntlet/tableUnlocks.js): the five prologues turn the
+ * rules on in steps, and a rule that is not on yet is not drawn and its key is
+ * not the table's. The shipped switch may still be off, so these open the
+ * table through the debug console's preview (`?debug=1&staged=1`,
+ * src/gauntlet/tableStaging.js), which draws each case under its own step
+ * whatever the switch says. What each step holds is written out here rather
+ * than read from the module the stage reads.
+ */
+const WHOLE = { beat: true, lock: true, stance: true, chain: true };
+const NO_LOCK = { beat: true, lock: false, stance: false, chain: false };
+const STAGED_STEPS = [
+  { caseId: "prologue01", on: { beat: false, lock: false, stance: false, chain: false }, lines: 1 },
+  { caseId: "prologue02", on: NO_LOCK, lines: 2 },
+  { caseId: "prologue03", on: NO_LOCK, lines: 2 },
+  { caseId: "prologue04", on: { beat: true, lock: true, stance: false, chain: true }, lines: 3 },
+  { caseId: "prologue05", on: WHOLE, lines: 1 },
+  { caseId: "case01", on: WHOLE, lines: 0 },
+];
+
+/** A scene's briefing page; `staged` asks the debug console for the staged table. */
+async function openBriefing(page, caseId, nodeId = CASE_START_NODES[caseId], { staged = true } = {}) {
+  await page.goto(staged ? "/?debug=1&staged=1" : "/?debug=1");
+  await startDebugNode(page, caseId, nodeId, { navigate: false, openTable: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+/** Whether the table took the key. One it has no use for is left to the page, not prevented. */
+async function keyTaken(page, init) {
+  return page.evaluate(
+    (options) => !document.body.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...options })),
+    init,
+  );
+}
+
+/** What of the staged rules the open table draws and keys, against what the step has turned on. */
+async function expectTableDraws(page, on) {
+  const count = (drawn) => (drawn ? 1 : 0);
+  await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  await expect(page.getByTestId("commit-push")).toBeEnabled();
+  await expect(page.getByTestId("commit-confirm")).toHaveCount(1);
+  await expect(page.getByTestId("gauntlet-bpm"), "the heartbeat is the table itself").toHaveCount(1);
+  await expect(page.locator(".gx-beat-ring")).toHaveCount(count(on.beat));
+  await expect(page.getByTestId("commit-focus")).toHaveCount(count(on.lock));
+  await expect(page.getByTestId("gauntlet-focus")).toHaveCount(count(on.lock));
+  await expect(page.getByTestId("gauntlet-overdrive")).toHaveCount(count(on.chain));
+  await expect(page.locator(".gx-signals"), "no padded row over nothing").toHaveCount(count(on.lock || on.chain));
+  await expect(page.getByTestId("gauntlet-stance-mastery")).toHaveCount(count(on.stance));
+  // The dock has a column for each button it holds.
+  const columns = await page.locator(".gx-actions").evaluate((dock) => getComputedStyle(dock).gridTemplateColumns.split(" ").length);
+  expect(columns).toBe(on.lock ? 3 : 2);
+  // The key line names a key only while it is the table's (hidden on a phone, written either way).
+  const hint = (await page.locator(".gx-hand-head small").textContent()) ?? "";
+  expect(hint.includes("E 락"), `the key line reads "${hint}"`).toBe(on.lock);
+  expect(hint.includes("Q 자세"), `the key line reads "${hint}"`).toBe(on.stance);
+  expect(hint).toContain("W 밀기");
+
+  expect(await keyTaken(page, { key: "e", code: "KeyE" }), "E").toBe(on.lock);
+  expect(await keyTaken(page, { key: "q", code: "KeyQ" }), "Q").toBe(on.stance);
+  if (on.stance) await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "true");
+
+  // Three seconds in, the heart has been heard more than once: a push now is
+  // graded against it where the beat is on, and comes back ungraded where it
+  // is not -- no grade on the button, no combo in the pot.
+  await expect.poll(async () => Number(await page.locator(".gx-clock b").textContent()), { timeout: 20_000 }).toBeLessThanOrEqual(42);
+  const before = await gaugeOf(page);
+  await page.keyboard.press("w");
+  await expect.poll(() => gaugeOf(page)).toBeGreaterThanOrEqual(before + 7);
+  if (on.beat) {
+    await expect(stageOf(page)).toHaveAttribute("data-last-grade", /^(perfect|good|miss)$/);
+    await expect(page.locator(".gx-push .gx-grade")).toHaveCount(1);
+  } else {
+    await expect(stageOf(page)).toHaveAttribute("data-last-grade", "");
+    await expect(stageOf(page)).toHaveAttribute("data-combo", "0");
+    await expect(page.locator(".gx-push .gx-grade")).toHaveCount(0);
+    await expect(page.getByTestId("gauntlet-combo")).toHaveCount(0);
+  }
+}
+
+for (const step of STAGED_STEPS) {
+  test(`staged: ${step.caseId} introduces, draws and keys only what it has turned on`, async ({ page }) => {
+    await openBriefing(page, step.caseId);
+    const intro = page.getByTestId("unlock-intro");
+    if (step.lines > 0) {
+      const lines = UNLOCK_LADDER.find((rung) => rung.caseId === step.caseId).intro;
+      expect(lines).toHaveLength(step.lines);
+      await expect(intro.locator(".gx-breach-kicker")).toHaveText(UNLOCK_INTRO_KICKER);
+      await expect(intro.locator("li")).toHaveText([...lines]);
+    } else {
+      await expect(intro).toHaveCount(0);
+    }
+    await dismissProtocolBreach(page);
+    await expectTableDraws(page, step.on);
+  });
+}
+
+test("staged: the introduction is on a case's first briefing alone, and on that page's reading clock", async ({ page }) => {
+  // The clock starts held, so the number it shows is the whole reading time.
+  await page.addInitScript(
+    ({ key, value }) => localStorage.setItem(key, value),
+    { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ holdReadingClock: true }) },
+  );
+  await openBriefing(page, "prologue02");
+  const briefing = page.getByTestId("scene-briefing");
+  await expect(page.getByTestId("unlock-intro")).toBeVisible();
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
+  await expect(page.getByTestId("reading-timer")).toContainText("멈춤");
+  // Read off the page: what it prints is what its clock is sized to.
+  const printed = await briefing.evaluate((root) => {
+    const text = (selector) => [...root.querySelectorAll(selector)].map((element) => element.textContent).join("");
+    return {
+      text: text(".gx-panel-story .gx-caption"),
+      question: text(".gx-balloon"),
+      memo: [text(".gx-panel-file li")],
+      intro: text("[data-testid='unlock-intro'] li"),
+    };
+  });
+  const withIntro = getReadingSeconds(printed, [{ text: printed.intro }]);
+  expect(withIntro, "the lines add reading time on this page").toBeGreaterThan(getReadingSeconds(printed));
+  await expect(page.getByTestId("reading-timer").locator("b")).toHaveText(String(withIntro));
+
+  await openBriefing(page, "prologue02", "p2_site");
+  await expect(page.getByTestId("unlock-intro"), "a later scene of the case has nothing new to say").toHaveCount(0);
+});
+
+test("without the preview a prologue's table is what the shipped switch deals", async ({ page }) => {
+  // Off, the table is whole from 프롤로그 01 and nothing is introduced; on,
+  // the first prologue is the first step.
+  await openBriefing(page, "prologue01", CASE_START_NODES.prologue01, { staged: false });
+  await expect(page.getByTestId("unlock-intro")).toHaveCount(STAGED ? STAGED_STEPS[0].lines : 0);
+  await dismissProtocolBreach(page);
+  await expectTableDraws(page, STAGED ? STAGED_STEPS[0].on : WHOLE);
 });
