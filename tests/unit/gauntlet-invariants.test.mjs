@@ -43,6 +43,7 @@ import {
   suspendWindow,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS, RELICS } from "../../src/gauntlet/relics.js";
+import { ALL_RULES, MUTATION_RULES, UNLOCK_LADDER } from "../../src/gauntlet/tableUnlocks.js";
 import { formatMultiplier } from "../../src/gauntlet/tableReadout.js";
 
 /**
@@ -136,6 +137,128 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
   assert.ok(nextRun.schema.sealHighest && nextRun.schema.sealBreak < SEAL_BREAK_GAUGE, "and the seal opens earlier to make room");
 });
 
+/**
+ * The prologues turn the table's rules on in steps (`tableUnlocks`). The steps
+ * are passed here as the rule sets themselves, so these hold whatever the
+ * shipped switch says.
+ */
+const STEPS = UNLOCK_LADDER.map((step) => ({ caseId: step.caseId, rules: step.rules }));
+
+/** What a board holds that its rules do not allow, or null. */
+function outsideOf(schema, rules) {
+  const stray = schema.mutations.filter((id) => id !== "reboot" && !rules.has(MUTATION_RULES[id]));
+  if (stray.length) return `it was dealt ${stray.join(", ")}`;
+  if (schema.faceDown && !rules.has("blackout")) return "its cards are face down with no BLACKOUT";
+  if (schema.sedated && !rules.has("silence")) return "its heartbeat is silenced with no SILENCE";
+  if (schema.sealHighest && !rules.has("coldFeet")) return "a card is sealed with no COLD FEET";
+  if (schema.fracturedAxis && !rules.has("fracture")) return "an axis is fractured with no FRACTURE";
+  return null;
+}
+
+test("at every step of the prologues, no board is dealt a rule the step does not have, and every board still keeps the table's own", () => {
+  for (const { caseId, rules } of STEPS) {
+    let boards = 0;
+    let broken = 0;
+    for (const closure of everyClosure()) {
+      const schema = buildNextSchema({ ...closure, rules });
+      const stray = outsideOf(schema, rules);
+      if (stray) assert.fail(`${caseId}, ${JSON.stringify(closure)}: ${stray}`);
+      assertBoard(schema, () => `${caseId}, ${JSON.stringify(closure)}`);
+      boards += 1;
+      if (schema.mutations.some((id) => id !== "reboot")) broken += 1;
+    }
+    assert.ok(boards > 100_000, `${caseId}: ${boards} boards`);
+    // 프롤로그 01 has no way of breaking a board; every later step has to reach some.
+    if (rules.size === 0) assert.equal(broken, 0, `${caseId} deals only the base board and REBOOT`);
+    else assert.ok(broken > 10_000, `${caseId} reaches boards its rules break: ${broken}`);
+  }
+});
+
+test("with every rule, a board and a settlement are what they are with no rules named", () => {
+  assert.deepEqual([...STEPS.at(-1).rules].sort(), [...ALL_RULES].sort(), "the last step is the whole table");
+  let checked = 0;
+  for (const closure of everyClosure()) {
+    if ((checked += 1) % 211) continue;
+    const plain = buildNextSchema(closure);
+    assert.deepEqual(buildNextSchema({ ...closure, rules: ALL_RULES }), plain);
+    assert.deepEqual(buildNextSchema({ ...closure, rules: STEPS.at(-1).rules }), plain);
+    const settlement = settlementOf(closure, checked);
+    assert.deepEqual(resolveWindow({ ...settlement, rules: ALL_RULES, nextRules: ALL_RULES }), resolveWindow(settlement));
+  }
+});
+
+/** A closure as a run and the window that closed on it, with a hand that used everything. */
+function settlementOf({ relics, streak, windowIndex, stanceMastery, outcome, cause, gauge, pushes, focusMode, focusCharge, focusHits, caseClosed }, index) {
+  return {
+    run: normalizeRunState({ relics, streak, windowIndex, stanceMastery, runPot: 1200, vault: 300, beatCombo: 2, bestCombo: 2 }),
+    window: {
+      status: outcome === "cash" ? "cashed" : "bust", cause, gauge, wall: 90, pushes, seed: `step:${index}`,
+      focus: focusCharge, focusMode, focusHits, focusCombo: focusHits, maxFocusCombo: focusHits, focusPerfects: focusHits ? 1 : 0, lastFocusGrade: focusHits ? "good" : null,
+      groove: 6, beatCombo: 5, maxCombo: 5, beatHits: 3, perfects: 1, slips: 1, lastGrade: "perfect",
+    },
+    card: staked,
+    caseClosed,
+    offerRelics: true,
+  };
+}
+
+test("at every step, a settled window earns nothing from a rule the step does not have and deals no board outside it", () => {
+  for (const [index, { caseId, rules }] of STEPS.entries()) {
+    // The board a closing window deals is the next case's, and so is the draft.
+    const nextRules = STEPS[index + 1]?.rules ?? ALL_RULES;
+    let checked = 0;
+    let settled = 0;
+    for (const closure of everyClosure()) {
+      if ((checked += 1) % 97) continue;
+      const settlement = settlementOf(closure, checked);
+      const { run } = settlement;
+      const dealtUnder = closure.caseClosed ? nextRules : rules;
+      const { verdict, nextRun } = resolveWindow({ ...settlement, rules, nextRules: dealtUnder });
+      const where = () => `${caseId}, ${JSON.stringify(closure)}`;
+      settled += 1;
+
+      const stray = outsideOf(nextRun.schema, dealtUnder);
+      if (stray) assert.fail(`${where()}: ${stray}`);
+      assertBoard(nextRun.schema, where);
+      assert.deepEqual(verdict.nextMutations.map((mutation) => mutation.id), nextRun.schema.mutations, where());
+
+      if (!rules.has("beat")) {
+        assert.deepEqual(
+          [verdict.tempo.grade, verdict.tempo.combo, verdict.tempo.maxCombo, verdict.tempo.hits, verdict.tempo.perfects, verdict.tempo.slips, verdict.tempo.groove, verdict.tempo.bonus, verdict.tempo.groovePot, verdict.tempo.lostCombo],
+          [null, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+          where(),
+        );
+        assert.equal(nextRun.beatCombo, run.beatCombo, `${where()}: the combo the run carries is neither added to nor taken`);
+        assert.equal(nextRun.bestCombo, run.bestCombo, where());
+      }
+      if (!rules.has("lock")) {
+        assert.deepEqual(
+          [verdict.focus.charge, verdict.focus.hits, verdict.focus.perfects, verdict.focus.misses, verdict.focus.combo, verdict.focus.maxCombo, verdict.focus.pot, verdict.focus.potMultiplier, verdict.focus.resourceMultiplier, verdict.focus.jammed],
+          [0, 0, 0, 0, 0, 0, 0, 1, 1, false],
+          where(),
+        );
+        assert.equal(nextRun.focusHits, run.focusHits, where());
+      }
+      if (!rules.has("beat") && !rules.has("lock")) {
+        assert.equal(verdict.pot, verdict.outcome === "cash" ? Math.round(verdict.chips * verdict.multiplier) : 0, `${where()}: the pot is chips times heat`);
+        assert.equal(nextRun.runGroove + nextRun.grooveVault, 0, where());
+      }
+      if (!rules.has("stance")) {
+        assert.equal(verdict.focus.mode, "strike", `${where()}: LOCK is STRIKE`);
+        assert.equal(verdict.focus.stanceEarned, false, where());
+        assert.deepEqual(nextRun.stanceMastery, run.stanceMastery, `${where()}: mastery neither advances nor is taken`);
+      }
+      if (!rules.has("overclock")) assert.equal(nextRun.streak, 0, `${where()}: the chain is not counted`);
+      if (!dealtUnder.has("relics")) assert.deepEqual(nextRun.relicOffer, [], `${where()}: no draft`);
+      else if (closure.caseClosed && closure.relics.length < RELIC_IDS.length) assert.ok(nextRun.relicOffer.length > 0, `${where()}: a draft`);
+      // What the run holds is the player's under any rules.
+      assert.deepEqual(nextRun.relics, run.relics, where());
+      assert.deepEqual(nextRun.schema.relics.slice().sort(), run.relics.slice().sort(), `${where()}: and the board is dealt with them`);
+    }
+    assert.ok(settled > 1000, `${caseId}: ${settled} settlements`);
+  }
+});
+
 test("a board opened, abandoned or re-dealt by a relic keeps the same rules", () => {
   for (const relics of RELIC_SETS) {
     for (const stanceMastery of MASTERIES) {
@@ -148,6 +271,21 @@ test("a board opened, abandoned or re-dealt by a relic keeps the same rules", ()
   }
   const mastered = openCaseRun({ stanceMastery: { strike: 3 } });
   assert.ok(mastered.schema.mutations.includes("strikeMastery"), "an abandoned case reopens with the stances the season has mastered");
+  // A case that has no stance yet lays no mastery board, and takes nothing from the run.
+  for (const { caseId, rules } of STEPS) {
+    for (const relics of RELIC_SETS) {
+      for (const stanceMastery of MASTERIES) {
+        const opened = openCaseRun({ relics, stanceMastery, windowIndex: 460 }, { rules });
+        const stray = outsideOf(opened.schema, rules);
+        if (stray) assert.fail(`${caseId} opened with ${relics.join("+") || "nothing"}: ${stray}`);
+        assertBoard(opened.schema, () => `${caseId} opened with ${relics.join("+") || "nothing"}`);
+        assert.deepEqual(opened.stanceMastery, normalizeRunState({ stanceMastery }).stanceMastery);
+        assert.deepEqual(opened.relics, normalizeRunState({ relics }).relics);
+      }
+    }
+    assert.equal(openCaseRun({ stanceMastery: { strike: 3 } }, { rules }).schema.mutations.includes("strikeMastery"), rules.has("stance"), caseId);
+  }
+  assert.deepEqual(openCaseRun({ stanceMastery: { strike: 3 } }, { rules: ALL_RULES }), mastered);
 });
 
 test("a run survives any number of save round trips unchanged", () => {

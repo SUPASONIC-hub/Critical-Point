@@ -23,6 +23,7 @@ import {
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary } from "../gauntlet/gauntletEngine.js";
+import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
@@ -93,6 +94,25 @@ function describeTempo(verdict) {
     return { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 보상 ${verdict.focus.potMultiplier}x · 자원 ${verdict.focus.resourceMultiplier}x` };
   }
   return null;
+}
+
+/**
+ * The rules a window is settled under (gauntlet/tableUnlocks.js): the ones its
+ * case plays under, and the ones the board it deals will be played under.
+ * Those are the same until the window that closes the case. The board dealt
+ * there, and the relic draft offered with it, are the next case's opening, so
+ * they follow the next case's rules: 프롤로그 05 has the draft, which makes the
+ * offer at the close of 프롤로그 04 the first one.
+ *
+ * A replay closes onto whichever case the player opens next, which is not
+ * known here, and it hands back what the run held before it -- so its closing
+ * board is dealt under everything.
+ */
+export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED) {
+  const rules = getTableRules(caseId, run, staged);
+  if (!caseClosed) return { rules, nextRules: rules };
+  const nextCaseId = run?.practice ? null : CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1];
+  return { rules, nextRules: getTableRules(nextCaseId, run, staged) };
 }
 
 /**
@@ -249,7 +269,14 @@ export function useChoiceCommit(context) {
     const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode, branchContext) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
-    const { verdict, nextRun, unlockedRelics } = relicTable.settle({ run: gauntletRun, window: windowState, card: choice, caseClosed, offerRelics: currentCase !== "final" });
+    const { verdict, nextRun, unlockedRelics } = relicTable.settle({
+      run: gauntletRun,
+      window: windowState,
+      card: choice,
+      caseClosed,
+      offerRelics: currentCase !== "final",
+      ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
+    });
     const busted = verdict.outcome === "bust";
 
     const gauntletEffect = applyGauntletEffect(baseEffect, {

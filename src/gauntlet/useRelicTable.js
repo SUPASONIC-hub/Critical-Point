@@ -38,10 +38,16 @@ function writeRelicCodex(codex) {
  * (useChoiceCommit). They used to be written as the window settled, before
  * that was known -- so a page opened from a replay link, or a tab another tab
  * had moved past, unlocked relics for good from a decision nobody kept.
+ *
+ * `settlement.rules` is what the case plays under (`tableUnlocks`; every rule
+ * when it is left out). A feat is only counted in a case that has `relics`:
+ * before that the table has not said there is such a thing, and the reveal
+ * would announce a tool for a draft the player has never seen. The feat can
+ * be proved again later.
  */
 export function settleAgainstCodex({ offerRelics = false, ...settlement }, unlocked = []) {
   const settled = resolveWindow(settlement);
-  const unlockedRelics = getRelicUnlocks(settled, unlocked);
+  const unlockedRelics = settlement.rules?.has("relics") === false ? [] : getRelicUnlocks(settled, unlocked);
   const drafted = settlement.caseClosed && offerRelics
     ? resolveWindow({ ...settlement, offerRelics: true, relicPool: getRelicPool([...unlocked, ...unlockedRelics]) })
     : settled;

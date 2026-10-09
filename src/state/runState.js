@@ -249,7 +249,10 @@ export const RUN_FIELDS = {
     toSave: serializeRunState,
     load: (saved) => normalizeRunState(saved?.dynamics),
     fresh: () => RUN_INITIAL_STATE,
-    newGame: FRESH,
+    // A run begun with NEW GAME+ is marked: its table has every rule from the
+    // first window, where a plain start turns them on case by case
+    // (gauntlet/tableUnlocks.js). The mark is the run's, not the device's.
+    newGame: (event) => (event.veteran === true ? { ...RUN_INITIAL_STATE, veteran: true } : RUN_INITIAL_STATE),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),

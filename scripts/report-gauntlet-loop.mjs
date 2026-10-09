@@ -15,6 +15,7 @@ import {
   resolveWindow,
 } from "../src/gauntlet/gauntletEngine.js";
 import { hasRelic, RELIC_IDS } from "../src/gauntlet/relics.js";
+import { ALL_RULES } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 
 /**
@@ -46,6 +47,11 @@ import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../sr
  *   and all of them together, the heartbeat still beats playing blind and still
  *   stays far under a player who could see the wall, busting to skip still
  *   loses, and no single relic lifts the best play by more than RELIC_LIFT_CAP.
+ *
+ * Everything below is measured with every rule on. The players take the rules
+ * a case plays under as their last argument (`tableUnlocks`; a Set, everything
+ * when left out) and hand them to the reducer and the settlement, so a step of
+ * the prologues can be measured by passing its rules.
  */
 
 const CASES = 1500;
@@ -90,8 +96,8 @@ const card = { id: "sim", label: "sim", effect: { capital: 12, trust: 6, humanCo
 /** A lock waits for a beat, and the clock runs while it does. */
 const LOCK_SECONDS = 0.6;
 
-function playCase(caseIndex, decide, grade = null, relics = [], lock = null) {
-  let run = openCaseRun({ relics });
+function playCase(caseIndex, decide, grade = null, relics = [], lock = null, rules = ALL_RULES) {
+  let run = openCaseRun({ relics }, { rules });
   let busts = 0;
   let midCaseBusts = 0;
   let mutatedAfterBust = 0;
@@ -99,24 +105,24 @@ function playCase(caseIndex, decide, grade = null, relics = [], lock = null) {
   for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
     played += 1;
     let win = createWindow({ schema: run.schema, seed: `sim:${caseIndex}:${windowIndex}`, beatCombo: run.beatCombo });
-    win = reduceWindow(win, { type: "SELECT", id: card.id });
+    win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
     if (lock) {
       // Charged to the full on the beat, before the first push.
-      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode });
+      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
       for (let press = 0; press < 8 && win.status === "live" && win.focus < FOCUS_MAX; press += 1) {
-        win = reduceWindow(win, { type: "FOCUS", grade: "perfect" });
-        win = reduceWindow(win, { type: "TICK", delta: LOCK_SECONDS });
+        win = reduceWindow(win, { type: "FOCUS", grade: "perfect" }, rules);
+        win = reduceWindow(win, { type: "TICK", delta: LOCK_SECONDS }, rules);
       }
     }
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       if (!decide(win, run)) break;
-      win = reduceWindow(win, { type: "PUSH", grade });
-      win = reduceWindow(win, { type: "TICK", delta: 0.6 });
+      win = reduceWindow(win, { type: "PUSH", grade }, rules);
+      win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
     }
-    if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs });
-    if (win.status === "live") win = reduceWindow(win, { type: "CASH" });
+    if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
+    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
     const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-    const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed });
+    const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
     if (verdict.outcome === "bust") {
       busts += 1;
       if (!caseClosed) midCaseBusts += 1;
@@ -134,14 +140,14 @@ function playCase(caseIndex, decide, grade = null, relics = [], lock = null) {
   return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, played };
 }
 
-function measure(label, decide, grade = null, relics = [], cases = CASES, lock = null) {
+function measure(label, decide, grade = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES) {
   let vault = 0;
   let busts = 0;
   let midCase = 0;
   let mutated = 0;
   let played = 0;
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
-    const result = playCase(caseIndex, decide, grade, relics, lock);
+    const result = playCase(caseIndex, decide, grade, relics, lock, rules);
     vault += result.vault;
     busts += result.busts;
     midCase += result.midCaseBusts;
@@ -330,8 +336,8 @@ function gradePress(win, relics, seed) {
   return judgeBeat(offset, period, hasRelic(relics, "metronome"));
 }
 
-function playHandCase(caseIndex, decide, relics, stanceMastery) {
-  let run = openCaseRun({ relics, stanceMastery });
+function playHandCase(caseIndex, decide, relics, stanceMastery, rules = ALL_RULES) {
+  let run = openCaseRun({ relics, stanceMastery }, { rules });
   let played = 0;
   for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
     played += 1;
@@ -341,15 +347,15 @@ function playHandCase(caseIndex, decide, relics, stanceMastery) {
     // wants most; otherwise the hand works through its cards in turn.
     const sealedId = getSealedCardId(HAND, run.schema);
     const card = HAND.find((candidate) => candidate.id === sealedId) ?? HAND[windowIndex % HAND.length];
-    win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] });
-    win = reduceWindow(win, { type: "SELECT", id: card.id });
+    win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);
+    win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
     for (let lock = 0; lock < 3 && win.status === "live"; lock += 1) {
-      win = reduceWindow(win, { type: "FOCUS", grade: gradePress(win, relics, `${seed}:focus:${lock}`) });
+      win = reduceWindow(win, { type: "FOCUS", grade: gradePress(win, relics, `${seed}:focus:${lock}`) }, rules);
     }
     const mood = handUnit(`${seed}:mood`);
     if (mood < 0.04) {
       // Walked away from the table: the clock runs out.
-      while (win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 });
+      while (win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
     }
     const sealed = card.id === sealedId;
     // One window in eight is cashed cold, as early as the table allows: COLD
@@ -360,19 +366,19 @@ function playHandCase(caseIndex, decide, relics, stanceMastery) {
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       const mustOpen = sealed && win.gauge < win.schema.sealBreak;
       if (!mustOpen && (cold || !decide(win, run))) break;
-      win = reduceWindow(win, { type: "PUSH", grade: gradePress(win, relics, `${seed}:push:${press}`) });
-      win = reduceWindow(win, { type: "TICK", delta: 0.6 });
+      win = reduceWindow(win, { type: "PUSH", grade: gradePress(win, relics, `${seed}:push:${press}`) }, rules);
+      win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
     }
-    if (win.status === "live") win = reduceWindow(win, { type: "CASH" });
+    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
     const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-    const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed });
+    const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
     if (verdict.outcome === "bust" && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
     run = nextRun;
   }
   return { vault: run.vault, played, stanceMastery: run.stanceMastery };
 }
 
-function measureHand(label, decide, relics) {
+function measureHand(label, decide, relics, rules = ALL_RULES) {
   let vault = 0;
   let played = 0;
   // A stance only reshapes a board once it is mastered, three charged cashes
@@ -381,7 +387,7 @@ function measureHand(label, decide, relics) {
   let stanceMastery;
   for (let caseIndex = 0; caseIndex < RELIC_CASES; caseIndex += 1) {
     if (caseIndex % HAND_SEASON === 0) stanceMastery = undefined;
-    const result = playHandCase(caseIndex, decide, relics, stanceMastery);
+    const result = playHandCase(caseIndex, decide, relics, stanceMastery, rules);
     stanceMastery = result.stanceMastery;
     vault += result.vault;
     played += result.played;
@@ -429,20 +435,20 @@ assert.deepEqual(inert, [], `relics the simulation never trips: ${inert.join(", 
 
 // Late in the season the board leans in (`getSeasonEscalation`). The table's
 // rules have to hold there too, not only on a fresh run.
-const lateSeason = (label, decide) => {
+const lateSeason = (label, decide, rules = ALL_RULES) => {
   let vault = 0;
   for (let caseIndex = 0; caseIndex < RELIC_CASES; caseIndex += 1) {
-    let run = openCaseRun({ windowIndex: 450 });
+    let run = openCaseRun({ windowIndex: 450 }, { rules });
     for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
       let win = createWindow({ schema: run.schema, seed: `late:${caseIndex}:${windowIndex}`, beatCombo: run.beatCombo });
-      win = reduceWindow(win, { type: "SELECT", id: card.id });
+      win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
       for (let press = 0; press < 30 && win.status === "live" && decide(win); press += 1) {
-        win = reduceWindow(win, { type: "PUSH" });
-        win = reduceWindow(win, { type: "TICK", delta: 0.6 });
+        win = reduceWindow(win, { type: "PUSH" }, rules);
+        win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
       }
-      if (win.status === "live") win = reduceWindow(win, { type: "CASH" });
+      if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed });
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
       if (verdict.outcome === "bust" && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
       run = nextRun;
     }

@@ -4,9 +4,11 @@
       "runId": "run-1",
       "playerName": "새 분석관",
       "playStyle": "mediate",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue01",
       "completedCases": [],
       "discoveredClues": [],
@@ -47,9 +49,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [],
+      "openingLegacy": null,
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -81,6 +83,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -100,15 +103,13 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": []
     },
     "saved": {
@@ -193,6 +194,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -237,9 +239,11 @@
       "runId": "run-1",
       "playerName": "분석관",
       "playStyle": "instinct",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "lab",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue01",
       "completedCases": [],
       "discoveredClues": [],
@@ -280,9 +284,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [],
+      "openingLegacy": null,
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -314,6 +318,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -333,15 +338,13 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "lab",
-      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": []
     },
     "saved": {
@@ -426,6 +429,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -470,9 +474,11 @@
       "runId": "run-1",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "public",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue01",
       "completedCases": [],
       "discoveredClues": [],
@@ -513,16 +519,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
-        }
-      ],
+      "openingLegacy": null,
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -554,6 +553,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -573,15 +573,20 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "public",
-      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -680,6 +685,263 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "paused": false,
+      "savedAt": "<savedAt>",
+      "lastError": null,
+      "saveRevision": "<revision>"
+    },
+    "slots": 1,
+    "storageKeys": [
+      "trigger-prototype-save-slots-v1",
+      "trigger-prototype-v2"
+    ],
+    "trace": [],
+    "effects": [],
+    "status": null,
+    "outside": {
+      "status": null,
+      "telemetryStatus": null,
+      "localErrorEntries": null,
+      "saveSlots": []
+    }
+  },
+  "newGame/new-game-plus": {
+    "run": {
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "dataConsent": true,
+      "operatorOrigin": "public",
+      "sessionId": "session-0",
+      "started": true,
+      "isPausedSave": false,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "openingLegacy": null,
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "gauntletRun": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "veteran": true,
+        "schema": {
+          "seconds": 45,
+          "wallMin": 56,
+          "wallMax": 92,
+          "stepMin": 7,
+          "stepMax": 15,
+          "creep": 0.5,
+          "startGauge": 0,
+          "chipsScale": 1,
+          "faceDown": false,
+          "sedated": false,
+          "sealHighest": false,
+          "fracturedAxis": null,
+          "fractureRate": 1.5,
+          "sealBreak": 30,
+          "mutations": [],
+          "relics": []
+        }
+      },
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
+      "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
+      "showRecoveryCenter": false,
+      "showErrorLog": false,
+      "pendingTelemetryRef": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ]
+    },
+    "saved": {
+      "saveSchemaVersion": 2,
+      "runId": "run-1",
+      "playerName": "테스터",
+      "playStyle": "audit",
+      "openingLegacy": null,
+      "dataConsent": true,
+      "started": true,
+      "currentCase": "prologue01",
+      "completedCases": [],
+      "discoveredClues": [],
+      "caseResults": {},
+      "playtestFeedback": {},
+      "nodeId": "p1_start",
+      "resources": {
+        "time": 72,
+        "capital": 98,
+        "trust": 50,
+        "legitimacy": 58,
+        "humanCost": 0,
+        "fatigue": 13
+      },
+      "log": [],
+      "triggers": {
+        "protection": 0,
+        "injustice": 0,
+        "revenge": 0,
+        "responsibility": 0,
+        "competition": 0,
+        "reward": 0,
+        "curiosity": 0,
+        "order": 0,
+        "trust": 0,
+        "affection": 0,
+        "recognition": 0,
+        "fear": 0,
+        "system": 0,
+        "helplessness": 0,
+        "selfAwareness": 0,
+        "manipulation": 0,
+        "choice": 0
+      },
+      "cognition": {
+        "persistence": 0,
+        "inference": 0,
+        "reframing": 0,
+        "risk": 0
+      },
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "dynamics": {
+        "windowIndex": 0,
+        "practiceWindows": 0,
+        "runPot": 0,
+        "vault": 0,
+        "streak": 0,
+        "busts": 0,
+        "cashes": 0,
+        "bestMultiplier": 1,
+        "lastOutcome": "none",
+        "lastGauge": 0,
+        "openSeed": null,
+        "openCardId": null,
+        "suspended": null,
+        "beatCombo": 0,
+        "bestCombo": 0,
+        "bestFocusCombo": 0,
+        "focusHits": 0,
+        "focusPerfects": 0,
+        "focusMisses": 0,
+        "stanceMastery": {
+          "strike": 0,
+          "steady": 0,
+          "expose": 0
+        },
+        "runGroove": 0,
+        "grooveVault": 0,
+        "relics": [],
+        "relicOffer": [],
+        "insuranceSpent": false,
+        "practice": null,
+        "veteran": true,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -724,14 +986,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -797,16 +1056,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -838,6 +1095,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -857,18 +1115,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -997,6 +1260,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1040,14 +1304,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": false,
+      "isPausedSave": true,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -1113,16 +1374,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": true,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -1154,6 +1413,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1173,18 +1433,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1759999995000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -1313,6 +1578,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1355,14 +1621,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -1428,16 +1691,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -1469,6 +1730,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1488,18 +1750,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -1628,6 +1895,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1670,14 +1938,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": false,
+      "isPausedSave": true,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -1743,16 +2008,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": true,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -1784,6 +2047,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1803,18 +2067,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1759999995000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -1943,6 +2212,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -1985,14 +2255,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": false,
+      "isPausedSave": true,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -2058,16 +2325,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": true,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -2099,6 +2364,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2118,18 +2384,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1759999995000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -2258,6 +2529,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2300,14 +2572,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -2373,16 +2642,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -2414,6 +2681,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2433,18 +2701,23 @@
           "relics": []
         }
       },
-      "staleSave": true,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": true,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -2573,6 +2846,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2615,14 +2889,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -2688,16 +2959,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -2729,6 +2998,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2748,15 +3018,20 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1759999995000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -2885,6 +3160,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -2928,9 +3204,11 @@
       "runId": "run-0",
       "playerName": "분석관",
       "playStyle": "instinct",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "public",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue01",
       "completedCases": [],
       "discoveredClues": [],
@@ -2971,9 +3249,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [],
+      "openingLegacy": null,
+      "echo": "이번 사건의 핵심은 처음 찾아낸 오차입니다. 에코는 당신이 그것을 누구의 이름으로 남기는지, 그리고 그 결정에 몇 초를 쓰는지 기록합니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -3005,6 +3283,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3024,15 +3303,13 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "public",
-      "echo": "이번 사건의 핵심은 처음 찾아낸 오차입니다. 에코는 당신이 그것을 누구의 이름으로 남기는지, 그리고 그 결정에 몇 초를 쓰는지 기록합니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": []
     },
     "saved": {
@@ -3117,6 +3394,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3178,28 +3456,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "label": "STABLE HAND",
-        "title": "이전 판단의 균형이 남아 있습니다.",
-        "text": "대부분의 압박을 통제했습니다. 다음 사건은 약간의 믿음과 공정함을 가진 채 열립니다.",
-        "effect": {
-          "trust": 12,
-          "legitimacy": -4,
-          "capital": 6
-        },
-        "continuity": {
-          "tag": "공을 넘긴 결말",
-          "title": "의견은 사수의 이름으로 올라갔다",
-          "text": "4,000만 원은 기록에 남았고, 그 옆의 이름은 당신 것이 아닙니다. 오진우가 화이트보드에 그려 둔 점수판의 당신 이름 칸에 처음으로 1이 적혔습니다."
-        },
-        "continuityChallenge": {
-          "id": "protect-trust",
-          "title": "사수가 갚으려는 빚 지켜 내기",
-          "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -3258,16 +3519,28 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "label": "STABLE HAND",
+        "title": "이전 판단의 균형이 남아 있습니다.",
+        "text": "대부분의 압박을 통제했습니다. 다음 사건은 약간의 믿음과 공정함을 가진 채 열립니다.",
+        "effect": {
+          "trust": 12,
+          "legitimacy": -4,
+          "capital": 6
+        },
+        "continuity": {
+          "tag": "공을 넘긴 결말",
+          "title": "의견은 사수의 이름으로 올라갔다",
+          "text": "4,000만 원은 기록에 남았고, 그 옆의 이름은 당신 것이 아닙니다. 오진우가 화이트보드에 그려 둔 점수판의 당신 이름 칸에 처음으로 1이 적혔습니다."
+        },
+        "continuityChallenge": {
+          "id": "protect-trust",
+          "title": "사수가 갚으려는 빚 지켜 내기",
+          "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
         }
-      ],
+      },
+      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -3299,6 +3572,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3318,18 +3592,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -3465,6 +3744,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3526,9 +3806,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue03",
       "completedCases": [
         "prologue01"
@@ -3581,16 +3863,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
-        }
-      ],
+      "openingLegacy": null,
+      "echo": "이번 사건의 핵심은 반려입니다. 에코는 당신을 지켜 주겠다는 말 앞에서 당신이 무엇을 포기하는지 셉니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -3622,6 +3897,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3641,18 +3917,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "이번 사건의 핵심은 반려입니다. 에코는 당신을 지켜 주겠다는 말 앞에서 당신이 무엇을 포기하는지 셉니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -3763,6 +4044,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3824,28 +4106,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "label": "STABLE HAND",
-        "title": "이전 판단의 균형이 남아 있습니다.",
-        "text": "대부분의 압박을 통제했습니다. 다음 사건은 약간의 믿음과 공정함을 가진 채 열립니다.",
-        "effect": {
-          "trust": 12,
-          "legitimacy": -4,
-          "capital": 6
-        },
-        "continuity": {
-          "tag": "공을 넘긴 결말",
-          "title": "의견은 사수의 이름으로 올라갔다",
-          "text": "4,000만 원은 기록에 남았고, 그 옆의 이름은 당신 것이 아닙니다. 오진우가 화이트보드에 그려 둔 점수판의 당신 이름 칸에 처음으로 1이 적혔습니다."
-        },
-        "continuityChallenge": {
-          "id": "protect-trust",
-          "title": "사수가 갚으려는 빚 지켜 내기",
-          "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01",
@@ -3910,16 +4175,28 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "label": "STABLE HAND",
+        "title": "이전 판단의 균형이 남아 있습니다.",
+        "text": "대부분의 압박을 통제했습니다. 다음 사건은 약간의 믿음과 공정함을 가진 채 열립니다.",
+        "effect": {
+          "trust": 12,
+          "legitimacy": -4,
+          "capital": 6
+        },
+        "continuity": {
+          "tag": "공을 넘긴 결말",
+          "title": "의견은 사수의 이름으로 올라갔다",
+          "text": "4,000만 원은 기록에 남았고, 그 옆의 이름은 당신 것이 아닙니다. 오진우가 화이트보드에 그려 둔 점수판의 당신 이름 칸에 처음으로 1이 적혔습니다."
+        },
+        "continuityChallenge": {
+          "id": "protect-trust",
+          "title": "사수가 갚으려는 빚 지켜 내기",
+          "text": "지난가을 공을 돌려받은 오진우가 이번 건을 당신 이름으로 올렸습니다. 그 호의가 빚으로 굳기 전에, 그가 왜 그랬는지부터 듣는 카드가 믿음을 지킵니다."
         }
-      ],
+      },
+      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -3964,6 +4241,7 @@
           "bestCombo": 0,
           "record": null
         },
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -3983,18 +4261,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "이번 사건의 핵심은 0.4%포인트입니다. 에코는 당신이 계산을 끝낸 뒤에도 멈추지 못하는 지점이 어디인지 잽니다. 직전 사건의 결과는 '의견은 사수의 이름으로 올라갔다'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -4149,6 +4432,7 @@
           "bestCombo": 0,
           "record": null
         },
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4210,9 +4494,11 @@
       "runId": "run-1",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "case05",
       "completedCases": [
         "prologue01",
@@ -4279,16 +4565,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
-        }
-      ],
+      "openingLegacy": null,
+      "echo": "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -4320,6 +4599,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4339,18 +4619,23 @@
           "relics": []
         }
       },
-      "staleSave": true,
-      "operatorOrigin": "courier",
-      "echo": "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": true,
       "showRecoveryCenter": true,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -4475,6 +4760,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4534,9 +4820,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "case05",
       "completedCases": [
         "prologue01",
@@ -4603,16 +4891,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "2026-10-01T00:00:00.000Z",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
-        }
-      ],
+      "openingLegacy": null,
+      "echo": "재현 링크로 연 장면입니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -4644,6 +4925,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4663,18 +4945,23 @@
           "relics": []
         }
       },
-      "staleSave": true,
-      "operatorOrigin": "courier",
-      "echo": "재현 링크로 연 장면입니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "2026-10-01T00:00:00.000Z",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": true,
       "showRecoveryCenter": true,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -4718,9 +5005,11 @@
       "runId": "run-1",
       "playerName": "",
       "playStyle": "instinct",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "case05",
       "completedCases": [
         "prologue01",
@@ -4771,9 +5060,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [],
+      "openingLegacy": null,
+      "echo": "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -4805,6 +5094,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4824,15 +5114,13 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "디버그 진입입니다. 이 장면부터 선택 흐름을 재현합니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": []
     },
     "saved": {
@@ -4927,6 +5215,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -4986,14 +5275,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": false,
+      "isPausedSave": true,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -5059,16 +5345,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": true,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1759999995000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -5100,6 +5384,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5119,18 +5404,23 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1759999995000,
-      "decisionReveal": null,
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -5259,6 +5549,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5301,9 +5592,11 @@
       "runId": "run-1",
       "playerName": "",
       "playStyle": "instinct",
-      "openingLegacy": null,
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-1",
       "started": false,
+      "isPausedSave": false,
       "currentCase": "prologue01",
       "completedCases": [],
       "discoveredClues": [],
@@ -5344,9 +5637,9 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "",
-      "isPausedSave": false,
-      "pendingTelemetry": [],
+      "openingLegacy": null,
+      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 0,
         "practiceWindows": 0,
@@ -5378,6 +5671,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5397,15 +5691,13 @@
           "relics": []
         }
       },
-      "staleSave": false,
-      "operatorOrigin": "courier",
-      "echo": "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": null,
+      "pendingTelemetry": [],
+      "lastSavedAt": "",
       "lastRecoveredError": null,
+      "decisionReveal": null,
+      "staleSave": false,
       "showRecoveryCenter": false,
       "showErrorLog": false,
-      "sessionId": "session-1",
       "pendingTelemetryRef": []
     },
     "saved": null,
@@ -5436,14 +5728,11 @@
       "runId": "run-mid",
       "playerName": "테스터",
       "playStyle": "audit",
-      "openingLegacy": {
-        "title": "이어받은 판",
-        "effect": {
-          "trust": 2
-        }
-      },
       "dataConsent": true,
+      "operatorOrigin": "courier",
+      "sessionId": "session-0",
       "started": true,
+      "isPausedSave": false,
       "currentCase": "prologue02",
       "completedCases": [
         "prologue01"
@@ -5509,16 +5798,14 @@
         "reframing": 0,
         "risk": 0
       },
-      "lastSavedAt": "<savedAt>",
-      "isPausedSave": false,
-      "pendingTelemetry": [
-        {
-          "id": "case-kept",
-          "type": "case",
-          "label": "보관된 로그",
-          "payload": {}
+      "openingLegacy": {
+        "title": "이어받은 판",
+        "effect": {
+          "trust": 2
         }
-      ],
+      },
+      "echo": "직전 선택에 돌아온 말.",
+      "nodeEnteredAt": 1760000000000,
       "gauntletRun": {
         "windowIndex": 3,
         "practiceWindows": 0,
@@ -5550,6 +5837,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,
@@ -5569,20 +5857,25 @@
           "relics": []
         }
       },
-      "staleSave": true,
-      "operatorOrigin": "courier",
-      "echo": "직전 선택에 돌아온 말.",
-      "nodeEnteredAt": 1760000000000,
-      "decisionReveal": {
-        "nextNode": "somewhere"
-      },
+      "pendingTelemetry": [
+        {
+          "id": "case-kept",
+          "type": "case",
+          "label": "보관된 로그",
+          "payload": {}
+        }
+      ],
+      "lastSavedAt": "<savedAt>",
       "lastRecoveredError": {
         "message": "앞선 오류",
         "at": "2026-10-01T00:00:00.000Z"
       },
+      "decisionReveal": {
+        "nextNode": "somewhere"
+      },
+      "staleSave": true,
       "showRecoveryCenter": true,
       "showErrorLog": true,
-      "sessionId": "session-0",
       "pendingTelemetryRef": [
         {
           "id": "case-kept",
@@ -5711,6 +6004,7 @@
         "relicOffer": [],
         "insuranceSpent": false,
         "practice": null,
+        "veteran": false,
         "schema": {
           "seconds": 45,
           "wallMin": 56,

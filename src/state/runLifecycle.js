@@ -18,6 +18,7 @@ import { applyEffect, getCaseOutcome, getContinuityChallenge, getOutcomeCarryove
 import { caseIntroEchoes, legacyProfiles } from "../caseCopy.js";
 import { holdCloudCopyThroughReset } from "../cloudSave.js";
 import { openCaseRun } from "../gauntlet/gauntletEngine.js";
+import { getTableRules } from "../gauntlet/tableUnlocks.js";
 import { getSessionId as getSessionIdDefault, telemetryEnabled } from "../telemetry.js";
 import { confirmAction } from "./confirmAction.js";
 import { createOpeningResources } from "./openingState.js";
@@ -107,13 +108,19 @@ export function createRunLifecycle({
     setLocalErrorEntries, setSaveSlots, setSaveStatus, setTelemetryStatus, onSuppressSaves, resumeRuntimeSaves,
   } = effects;
 
-  function startGame() {
+  /**
+   * `veteran` is NEW GAME+: the run is marked, and its table has every rule
+   * from the first window. Anything else -- the start button hands this a
+   * click event -- is a plain start.
+   */
+  function startGame({ veteran = false } = {}) {
     // A run of one's own ends a replay; from here the tab writes its save again.
     leaveReplaySession();
     const patch = runTransition(run, {
       type: "newGame",
       runId: createRunId(),
       playerName: normalizePlayerName(run.playerName) || "분석관",
+      veteran: veteran === true,
       now: nowMs(),
     });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
@@ -151,7 +158,7 @@ export function createRunLifecycle({
       caseId,
       ...opening,
       // A case that already has a summary is played again as practice for the table.
-      gauntletRun: openCaseRun(run.gauntletRun, { replayOf: run.caseResults[caseId] ?? null }),
+      gauntletRun: openCaseRun(run.gauntletRun, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, run.gauntletRun) }),
       now: nowMs(),
     }));
   }

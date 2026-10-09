@@ -127,7 +127,7 @@ export async function createRunHarness({ saved = null, storage = {}, operatorOri
       jumpToNode: (caseId, nodeId, options) => lifecycle.startAtNode(caseId, nodeId, options),
       resetEverything: () => lifecycle.resetRun(),
       leaveToSeasonMap: () => lifecycle.leaveToSeasonMap(),
-      startGame: () => lifecycle.startGame(),
+      startGame: (options) => lifecycle.startGame(options),
       resume: () => lifecycle.resumeSavedGame(),
       pauseAfterRecovery: () => lifecycle.pauseAfterRecovery(),
       // The save's `dynamics` is how the test names a held window; the runtime hands over the run itself.

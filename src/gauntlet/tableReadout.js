@@ -4,6 +4,7 @@ import { formatNumber, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
+import { getTableRules } from "./tableUnlocks.js";
 
 export { formatNumber };
 
@@ -122,8 +123,14 @@ function getOverdriveCopy({ streak, hot, cashMutations }) {
  * rebuilding both boards ten times a second after this was first memoised. The
  * next board asks three things of the heat: is the cash hot enough for the
  * chain, is it hot enough to carry a debt, and has the stance been charged.
+ *
+ * `caseId` is the case on the table. The rules it plays under (`tableUnlocks`)
+ * come back as `rules`, a read-only Set, and both forecasts are dealt under
+ * them: a step that has no OVERCLOCK yet is not told one is coming.
  */
-export function useTableForecast({ schema, run, win, selectedCard, multiplier }) {
+export function useTableForecast({ schema, run, win, selectedCard, multiplier, caseId }) {
+  // The same frozen Set for a case from one render to the next, so it can key a memo.
+  const rules = getTableRules(caseId, run);
   const mutations = useMemo(() => describeMutations(schema), [schema]);
   const relics = run?.relics;
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
@@ -156,8 +163,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
         focusHits: stanceEarned ? 1 : 0,
         stanceMastery,
         windowIndex,
+        rules,
       })),
-    [focusMode, fractureAxis, hot, indebted, pushed, relics, stanceEarned, stanceMastery, streak, windowIndex],
+    [focusMode, fractureAxis, hot, indebted, pushed, relics, rules, stanceEarned, stanceMastery, streak, windowIndex],
   );
   const bustMutations = useMemo(
     () =>
@@ -171,8 +179,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
         caseClosed: false,
         relics: relics ?? [],
         windowIndex,
+        rules,
       })),
-    [fractureAxis, relics, schema.wallMin, windowIndex],
+    [fractureAxis, relics, rules, schema.wallMin, windowIndex],
   );
 
   return useMemo(() => {
@@ -181,6 +190,7 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
     // phone 92px of the table at every case's first window.
     const tableRules = mutations.filter((mutation) => mutation.id !== "reboot");
     return {
+      rules,
       mutations,
       tableRules,
       ruleHeat: getRuleHeat({ mutations: tableRules, schema }),
@@ -198,5 +208,5 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier })
       bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, mutations, relics, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, mutations, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
 }

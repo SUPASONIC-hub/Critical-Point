@@ -99,7 +99,12 @@ const budgets = [
   { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_090, maxGzip: 2_100 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 35_720, maxGzip: 13_520 },
+  // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
+  // 13,515 plus 5% (it stood at 35,120 raw before): the reducer, the next
+  // board and the settlement each ask which rules the case plays under, for
+  // the prologues' staged unlocks. The list of steps and its copy are kept
+  // out of this chunk; they load with the runtime.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_200 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
