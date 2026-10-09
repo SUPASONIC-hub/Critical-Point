@@ -15,7 +15,7 @@ import {
   resolveWindow,
 } from "../src/gauntlet/gauntletEngine.js";
 import { hasRelic, RELIC_IDS } from "../src/gauntlet/relics.js";
-import { ALL_RULES } from "../src/gauntlet/tableUnlocks.js";
+import { ALL_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 
 /**
@@ -48,10 +48,11 @@ import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../sr
  *   stays far under a player who could see the wall, busting to skip still
  *   loses, and no single relic lifts the best play by more than RELIC_LIFT_CAP.
  *
- * Everything below is measured with every rule on. The players take the rules
- * a case plays under as their last argument (`tableUnlocks`; a Set, everything
- * when left out) and hand them to the reducer and the settlement, so a step of
- * the prologues can be measured by passing its rules.
+ * All of that is measured with every rule on. The players take the rules a
+ * case plays under as their last argument (`tableUnlocks`; a Set, everything
+ * when left out) and hand them to the reducer and the settlement, and the
+ * prologues' steps are measured at the end by passing each step's rules: the
+ * bet, the heartbeat and the skip have to hold on the smallest table too.
  */
 
 const CASES = 1500;
@@ -472,6 +473,92 @@ for (const row of bustRows) {
 }
 assert.equal(BASE_SCHEMA.stepMin > 0, true);
 assert.ok(getCloseness(0, 90) === 0);
+
+/**
+ * The prologues, a step at a time (`UNLOCK_LADDER`).
+ *
+ * A new player's first tables are the smallest ones, so the properties above
+ * are asked of each step under its own rules: the bet is still a bet, the
+ * heartbeat is still worth hearing and still not the answer, and busting to
+ * skip is still a loss. Two numbers differ by design. Before OVERCLOCK no board
+ * doubles the chips, so a step banks about two thirds of the whole table; and
+ * the best blind policy busts less there (0.05-0.06 against 0.09), so the
+ * floor on its bust rate is STEP_BUST_FLOOR, not the whole table's 0.08.
+ *
+ * What a bust deals follows the step: a broken board wherever BLACKOUT is on,
+ * and the plain board where it is not -- 프롤로그 01 has no way to break one.
+ * The beat and LOCK are held to what the step gives them: ungraded where the
+ * beat is off, STRIKE whatever the hand asks for until the stances open.
+ */
+const STEP_BUST_FLOOR = 0.04;
+const wholeTable = UNLOCK_LADDER.at(-1);
+assert.deepEqual([...wholeTable.rules].sort(), [...ALL_RULES].sort(), `${wholeTable.caseId} is the whole table, which is everything measured above`);
+const stepReport = UNLOCK_LADDER.slice(0, -1).map((step) => {
+  const { caseId, rules } = step;
+  const under = (label, decide, grade = null, lock = null, cases = CASES) => measure(`${caseId} ${label}`, decide, grade, [], cases, lock, rules);
+  // Fewer rows than the whole table's sweep: the ends that must not win, and the middle where the best one is.
+  const blindRows = [0, 30, 40, 50, 60, 90].map((target) => under(`heat ${target}`, (win) => win.gauge < target));
+  const listenRows = [90, 100, 110, 120].map((threshold) =>
+    under(`heartbeat < ${threshold}`, (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < threshold),
+  );
+  const blind = bestOfRows(blindRows);
+  const listen = bestOfRows(listenRows);
+  const stepListening = (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < heartbeatThreshold(listen.label);
+  return {
+    caseId,
+    rules,
+    blindRows,
+    blind,
+    listen,
+    sees: under("sees the wall", (win) => win.gauge + win.schema.stepMax < win.wall),
+    skip: under("bust to skip", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true)),
+    onBeat: under("on every beat", stepListening, "perfect"),
+    offBeat: under("off every beat", stepListening, "miss"),
+    // The locking hands play fewer cases, so the untimed hand they are held to plays the same ones.
+    unlocked: under("listening (bracket)", stepListening, null, null, BRACKET_CASES),
+    strike: under("strike lock", stepListening, "perfect", { mode: "strike" }, BRACKET_CASES),
+    steady: under("steady lock", stepListening, "perfect", { mode: "steady" }, BRACKET_CASES),
+  };
+});
+for (const row of stepReport) {
+  const { caseId, rules, blind, listen, sees, skip, onBeat, offBeat, unlocked, strike, steady } = row;
+  console.log(
+    `step ${caseId}  blind ${blind.meanVault} (${blind.label.slice(caseId.length + 1)}, bust ${(blind.bustRate * 100).toFixed(1)}%)  heartbeat ${listen.meanVault} (${listen.label.slice(caseId.length + 1)})  sees ${sees.meanVault} (${(listen.meanVault / sees.meanVault).toFixed(3)})  skip ${skip.meanVault} (${(skip.meanVault / blind.meanVault).toFixed(3)})${rules.has("beat") ? `  on the beat ${onBeat.meanVault}` : ""}${rules.has("lock") ? `  LOCK ${strike.meanVault} against ${unlocked.meanVault}` : ""}`,
+  );
+  assert.notEqual(blind.label, row.blindRows[0].label, `${caseId}: never pushing cannot be the best blind policy, or there is no bet`);
+  assert.notEqual(blind.label, row.blindRows.at(-1).label, `${caseId}: pushing as far as possible cannot be the best blind policy either`);
+  assert.ok(blind.bustRate >= STEP_BUST_FLOOR && blind.bustRate <= 0.5, `${caseId}: the best blind policy should bust sometimes, not constantly (got ${blind.bustRate})`);
+  assert.ok(listen.meanVault > blind.meanVault, `${caseId}: listening to the heartbeat should be worth something`);
+  assert.ok(listen.meanVault < sees.meanVault * 0.6, `${caseId}: the heartbeat must not be an answer key: best ${listen.meanVault} against a wall-seeing ${sees.meanVault}`);
+  assert.ok(skip.meanWindows < WINDOWS_PER_CASE, `${caseId}: busting on purpose does shorten a case`);
+  assert.ok(skip.meanVault < blind.meanVault * 0.25, `${caseId}: the skip must not be a shortcut: busting to skip banks ${skip.meanVault} against ${blind.meanVault}`);
+  assert.ok(blind.meanVault <= bestFixed.meanVault, `${caseId}: a step must not bank more than the whole table (${blind.meanVault} against ${bestFixed.meanVault})`);
+
+  // A bust: broken wherever the step can break a board, untouched where it cannot.
+  const bust = [...row.blindRows, skip].filter((played) => played.midCase > 0);
+  assert.ok(bust.length > 0, `${caseId}: no row bust mid-case`);
+  for (const played of bust) {
+    assert.equal(played.mutated, rules.has("blackout") ? played.midCase : 0, `${caseId}: a bust mid-case deals ${rules.has("blackout") ? "a broken board" : "the plain board"} next (${played.label}: ${played.mutated} of ${played.midCase})`);
+  }
+
+  // The beat, where the step has it; a press that is not graded, where it does not.
+  assert.equal(onBeat.busts, listen.busts, `${caseId}: timing must not move the wall`);
+  if (rules.has("beat")) {
+    assert.ok(onBeat.meanVault > listen.meanVault, `${caseId}: pushing on the beat should pay`);
+    assert.ok(onBeat.meanVault <= Math.ceil(listen.meanVault * (1 + GROOVE_CAP)) + 1, `${caseId}: the groove cannot pay past its cap: ${onBeat.meanVault} against ${listen.meanVault}`);
+    assert.ok(offBeat.meanVault <= listen.meanVault, `${caseId}: slipping every push must never pay better than not being graded`);
+  } else {
+    assert.equal(onBeat.meanVault, listen.meanVault, `${caseId}: with no beat, a press on it is paid as any press`);
+    assert.equal(offBeat.meanVault, listen.meanVault, `${caseId}: and a press off it costs nothing`);
+  }
+  // LOCK, where the step has it, is STRIKE until the stances open.
+  if (rules.has("lock")) {
+    assert.ok(strike.meanVault > unlocked.meanVault, `${caseId}: a charged LOCK should pay`);
+    assert.ok(strike.meanVault <= Math.ceil(unlocked.meanVault * HAND_CAP) + 1, `${caseId}: the hand is paid past its cap: ${strike.meanVault} against ${unlocked.meanVault}`);
+    assert.ok(strike.meanVault < sees.meanVault, `${caseId}: the hand must never be worth more than seeing the wall`);
+  }
+  if (!rules.has("stance")) assert.equal(steady.meanVault, strike.meanVault, `${caseId}: a hand that asks for STEADY is ${rules.has("lock") ? "locking in STRIKE" : "not locking at all"}`);
+}
 
 console.log(
   `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; on the beat: ${onBeat.meanVault}, off it: ${offBeat.meanVault}; locked and on the beat: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,
