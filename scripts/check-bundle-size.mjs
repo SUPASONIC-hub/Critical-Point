@@ -55,14 +55,15 @@ const budgets = [
   // paint: the chunk loads after the player has started a run.
   { pattern: /^PlayScreen-.*\.js$/, maxBytes: 104_200, maxGzip: 34_300 },
   // 44,024 / 13,638 on 2026-09-27.
-  // 45,589 / 14,377 on 2026-10-09 with the result card's import, 23 gzip
-  // bytes under the ceiling; 44,344 / 13,962 later that day, once the report
+  // 45,610 / 14,397 on 2026-10-09 with the result card's import and the
+  // interlude's paragraphs, 3 gzip bytes under the ceiling; 44,365 / 13,981
+  // later that day, once the report
   // stopped carrying what it could not print: a stand-in observer record, an
   // "open" afterglow and an open verdict for runs the runtime cannot produce,
   // and a guard on every panel whose record is always there
   // (tests/unit/report-copy.test.mjs holds why). The same change gave the card
   // its four fields back in place of the whole view. The ceiling stays where
-  // it was: measured plus 5% would be 46,561 / 14,660, above it, and a budget
+  // it was: measured plus 5% would be 46,583 / 14,680, above it, and a budget
   // here does not go up.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },
   // The whole stylesheet (the intro's share is also inlined; see
