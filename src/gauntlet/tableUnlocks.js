@@ -17,12 +17,12 @@
  */
 
 /**
- * The switch. While it is off every case plays under every rule and no case
- * has anything to introduce, which is the game as it was before this module.
- * The functions below take it as a last argument so a test (and the balance
- * scripts) can ask about the staged table without the shipped value changing.
+ * The switch, on since 2026-10-09. Off, every case plays under every rule and
+ * no case has anything to introduce, which is the game as it was before this
+ * module. The functions below take it as a last argument so a test (and the
+ * balance scripts) can ask about either table whatever the shipped value is.
  */
-export const STAGED = false;
+export const STAGED = true;
 
 /**
  * The rules a step can turn on. `beat` is the groove and the combo; `lock` is

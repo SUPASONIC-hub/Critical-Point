@@ -1,11 +1,21 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "./helpers/network.js";
-import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { CASE_START_NODES } from "../src/gameCases.js";
 import { nodes } from "../src/gameData.js";
 import { getReadingSeconds } from "../src/gauntlet/gauntletEngine.js";
-import { STAGED, UNLOCK_INTRO_KICKER, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
-import { dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { MUTATION_RULES, UNLOCK_INTRO_KICKER, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import {
+  cashStakedCard,
+  clickElement,
+  clickThroughMotion,
+  completeCurrentCase,
+  dismissProtocolBreach,
+  startDebugNode,
+  TRANSITION_TIMEOUT_MS,
+} from "./helpers/gameFlow.js";
 import { openBrokenBoard } from "./helpers/layout.js";
+import { seedSave } from "./helpers/seededSave.js";
 import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./helpers/storage.js";
 
 /**
@@ -376,11 +386,9 @@ test("the relic draft keeps focus inside it, and Enter takes the focused relic",
 /**
  * The staged table (src/gauntlet/tableUnlocks.js): the five prologues turn the
  * rules on in steps, and a rule that is not on yet is not drawn and its key is
- * not the table's. The shipped switch may still be off, so these open the
- * table through the debug console's preview (`?debug=1&staged=1`,
- * src/gauntlet/tableStaging.js), which draws each case under its own step
- * whatever the switch says. What each step holds is written out here rather
- * than read from the module the stage reads.
+ * not the table's. Each step is opened by the debug jump, on a plain run. What
+ * each step holds is written out here rather than read from the module the
+ * stage reads.
  */
 const WHOLE = { beat: true, lock: true, stance: true, chain: true };
 const NO_LOCK = { beat: true, lock: false, stance: false, chain: false };
@@ -393,10 +401,9 @@ const STAGED_STEPS = [
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];
 
-/** A scene's briefing page; `staged` asks the debug console for the staged table. */
-async function openBriefing(page, caseId, nodeId = CASE_START_NODES[caseId], { staged = true } = {}) {
-  await page.goto(staged ? "/?debug=1&staged=1" : "/?debug=1");
-  await startDebugNode(page, caseId, nodeId, { navigate: false, openTable: false });
+/** A scene's briefing page, with the table behind it still shut. */
+async function openBriefing(page, caseId, nodeId = CASE_START_NODES[caseId]) {
+  await startDebugNode(page, caseId, nodeId, { openTable: false });
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
   await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
 }
@@ -420,6 +427,8 @@ async function expectTableDraws(page, on) {
   await expect(page.getByTestId("commit-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-overdrive")).toHaveCount(count(on.chain));
+  // The run's line counts the chain only where there is one to count.
+  await expect(page.getByTestId("gauntlet-run-signal")).toHaveText(on.chain ? /^연승 \d+ BUST \d+ 최고 / : /^BUST \d+ 최고 /);
   await expect(page.locator(".gx-signals"), "no padded row over nothing").toHaveCount(count(on.lock || on.chain));
   await expect(page.getByTestId("gauntlet-stance-mastery")).toHaveCount(count(on.stance));
   // The dock has a column for each button it holds.
@@ -499,11 +508,159 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
   await expect(page.getByTestId("unlock-intro"), "a later scene of the case has nothing new to say").toHaveCount(0);
 });
 
-test("without the preview a prologue's table is what the shipped switch deals", async ({ page }) => {
-  // Off, the table is whole from 프롤로그 01 and nothing is introduced; on,
-  // the first prologue is the first step.
-  await openBriefing(page, "prologue01", CASE_START_NODES.prologue01, { staged: false });
-  await expect(page.getByTestId("unlock-intro")).toHaveCount(STAGED ? STAGED_STEPS[0].lines : 0);
+/**
+ * The same steps met the way a player meets them, with no debug jump: from
+ * the intro's start button, by NEW GAME+, and by resuming a save written
+ * before there were steps. These run against the production build too.
+ */
+const savedRun = (page) => readJsonStorage(page, TEST_STORAGE_KEYS.save);
+
+/** The page a scene opens on, once the reveal or the report before it has gone. */
+async function expectBriefing(page) {
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+test("a new run meets the table in steps: 프롤로그 01 has no beat and breaks no board, 프롤로그 02 has both", { tag: "@prod" }, async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.addInitScript(() => {
+    // Once a tab, so a reload would find what the run has saved since.
+    if (sessionStorage.getItem("e2e-seeded")) return;
+    sessionStorage.setItem("e2e-seeded", "1");
+    localStorage.clear();
+  });
+  await page.goto("/");
+  await clickElement(page.getByTestId("start-first-case"), "start first case");
+  await expectBriefing(page);
+  expect((await savedRun(page)).currentCase).toBe("prologue01");
+
+  // The first page says what the table is, and its start button can be pressed
+  // with the panel on the page (the gate is pressed where the pointer lands).
+  const intro = page.getByTestId("unlock-intro");
+  await expect(intro.locator(".gx-breach-kicker")).toHaveText(UNLOCK_INTRO_KICKER);
+  await expect(intro.locator("li")).toHaveText([...UNLOCK_LADDER[0].intro]);
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
   await dismissProtocolBreach(page);
-  await expectTableDraws(page, STAGED ? STAGED_STEPS[0].on : WHOLE);
+  await expectTableDraws(page, STAGED_STEPS[0].on);
+
+  // Push and cash are the whole table here, and they work.
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect.poll(async () => (await savedRun(page)).dynamics.cashes).toBe(1);
+  let run = (await savedRun(page)).dynamics;
+  expect(run.veteran, "a plain run").toBe(false);
+  expect(run.runPot, "the cash banked a pot").toBeGreaterThan(0);
+  expect([run.beatCombo, run.streak, run.focusHits], "no combo, no chain, no LOCK").toEqual([0, 0, 0]);
+  expect(run.schema.mutations).toEqual([]);
+
+  // The second scene has nothing new to say. A bust there takes the pot and
+  // the next scene, as the wall always does, and deals the plain board next:
+  // BLACKOUT and AFTERSHOCK are 프롤로그 02's.
+  await clickElement(page.getByTestId("decision-next"), "next scene");
+  await expectBriefing(page);
+  await expect(intro, "only the page the case opens on introduces").toHaveCount(0);
+  await dismissProtocolBreach(page);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  const stage = stageOf(page);
+  for (let press = 0; press < 20 && (await stage.getAttribute("data-status")) === "live"; press += 1) {
+    await page.getByTestId("commit-push").click({ timeout: 2_000 }).catch(() => {});
+  }
+  await expect(stage).toHaveAttribute("data-status", "bust");
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect.poll(async () => (await savedRun(page)).dynamics.busts).toBe(1);
+  run = (await savedRun(page)).dynamics;
+  expect(run.runPot, "the wall took the pot").toBe(0);
+  expect(run.schema.mutations, "and broke nothing").toEqual([]);
+  expect([run.schema.faceDown, run.schema.startGauge]).toEqual([false, 0]);
+  await clickElement(page.getByTestId("decision-next"), "next scene");
+  await expectBriefing(page);
+  await expect(page.getByTestId("protocol-breach"), "no changed rules after a bust").toHaveCount(0);
+
+  // On to the report. 프롤로그 01 closes without a draft.
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  expect((await savedRun(page)).dynamics.relicOffer).toEqual([]);
+  await clickElement(page.locator(".next-case-panel button"), "next case");
+  await expect.poll(async () => (await savedRun(page)).currentCase, { timeout: TRANSITION_TIMEOUT_MS }).toBe("prologue02");
+  await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+
+  // 프롤로그 02 opens on the scene the close of 프롤로그 01 picked, not on its
+  // written first scene, and introduces the beat and the broken board there --
+  // beside the REBOOT panel every closed case leaves.
+  expect((await savedRun(page)).nodeId, "a played run enters on an opening route").not.toBe(CASE_START_NODES.prologue02);
+  await expect(intro.locator("li")).toHaveText([...UNLOCK_LADDER[1].intro]);
+  await expect(page.getByTestId("protocol-breach")).toContainText("REBOOT");
+  await dismissProtocolBreach(page);
+  await expectTableDraws(page, STAGED_STEPS[1].on);
+});
+
+test("a NEW GAME+ run is introduced to nothing and has the whole table on 프롤로그 01", { tag: "@prod" }, async ({ page }) => {
+  await page.addInitScript(
+    ({ unlockedKey, memoryKey }) => {
+      if (sessionStorage.getItem("e2e-seeded")) return;
+      sessionStorage.setItem("e2e-seeded", "1");
+      localStorage.clear();
+      localStorage.setItem(unlockedKey, "true");
+      localStorage.setItem(memoryKey, JSON.stringify({ final: { outcomeChoiceId: "f_archive_seal" } }));
+    },
+    { unlockedKey: NEW_GAME_PLUS_KEY, memoryKey: NEW_GAME_PLUS_MEMORY_KEY },
+  );
+  await page.goto("/");
+  await clickElement(page.getByRole("button", { name: "NEW GAME+ 시작" }), "NEW GAME+");
+  await expectBriefing(page);
+  await expect.poll(async () => (await savedRun(page))?.dynamics?.veteran, { timeout: TRANSITION_TIMEOUT_MS }).toBe(true);
+  expect((await savedRun(page)).currentCase).toBe("prologue01");
+  await expect(page.getByTestId("unlock-intro")).toHaveCount(0);
+  await dismissProtocolBreach(page);
+  await expectTableDraws(page, WHOLE);
+});
+
+// tests/unit/fixtures/saves/v2-pre-unlocks.json: a run left on the page that
+// opens 프롤로그 03 by the last build with every rule on from 프롤로그 01,
+// holding a relic, a mastered STRIKE, a chain and an unanswered draft.
+test("a save from before the steps resumes with what it held and plays on under the step", { tag: "@prod" }, async ({ page }) => {
+  const { save } = JSON.parse(readFileSync("tests/unit/fixtures/saves/v2-pre-unlocks.json", "utf8"));
+  await seedSave(page, save);
+  await page.goto("/");
+  await expect(page.getByTestId("resume-save")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".recovery-notice"), "nothing was repaired, so nothing says 복구됨").toHaveCount(0);
+  await clickElement(page.getByTestId("resume-save"), "resume saved run");
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".recovery-notice")).toHaveCount(0);
+
+  // The draft it had not answered is still its to answer, though 프롤로그 03 offers none.
+  const draft = page.getByTestId("relic-draft");
+  await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(draft.getByTestId("relic-option")).toHaveCount(save.dynamics.relicOffer.length);
+  await clickThroughMotion(draft.getByTestId("relic-option").first(), "the first relic");
+  await expect(draft).toHaveCount(0);
+  const held = [...save.dynamics.relics, save.dynamics.relicOffer[0]];
+  await expect.poll(async () => (await savedRun(page)).dynamics.relics).toEqual(held);
+
+  // The board it was dealt is the board it plays, and the page still
+  // introduces the step: this is the scene 프롤로그 03 opens on.
+  await expectBriefing(page);
+  await expect(page.getByTestId("protocol-breach")).toContainText("REBOOT");
+  await expect(page.getByTestId("unlock-intro").locator("li")).toHaveText([...UNLOCK_LADDER[2].intro]);
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(held.length);
+  await expect(page.getByTestId("active-mutations")).toBeVisible();
+  await expectTableDraws(page, STAGED_STEPS[2].on);
+
+  // One table, played to its verdict: the run keeps what it held, and the
+  // board dealt next follows the step.
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect.poll(async () => (await savedRun(page)).dynamics.windowIndex).toBe(save.dynamics.windowIndex + 1);
+  const after = await savedRun(page);
+  expect(after.lastError ?? null).toBeNull();
+  expect(after.dynamics.relics).toEqual(held);
+  expect(after.dynamics.vault).toBe(save.dynamics.vault);
+  expect(after.dynamics.stanceMastery).toEqual(save.dynamics.stanceMastery);
+  expect(after.dynamics.streak, "the chain it held is not counted before OVERCLOCK").toBe(0);
+  const stepRules = UNLOCK_LADDER[2].rules;
+  expect(after.dynamics.schema.mutations.filter((id) => !stepRules.has(MUTATION_RULES[id])), "nothing dealt from a rule 프롤로그 03 does not have").toEqual([]);
 });

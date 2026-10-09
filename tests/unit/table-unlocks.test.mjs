@@ -77,8 +77,8 @@ test("with the switch off every case plays under everything and has nothing to i
   }
 });
 
-test("the functions asked without a flag answer for the shipped switch", () => {
-  assert.equal(typeof STAGED, "boolean");
+test("the switch is on, and the functions asked without a flag answer for it", () => {
+  assert.equal(STAGED, true, "the prologues ship staged");
   for (const caseId of CASE_SEQUENCE) {
     assert.equal(getTableRules(caseId, {}), rulesFor(caseId, { staged: STAGED }));
     assert.equal(rulesFor(caseId), rulesFor(caseId, { staged: STAGED }));

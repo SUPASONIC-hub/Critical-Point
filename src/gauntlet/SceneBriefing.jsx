@@ -40,8 +40,9 @@ function splitCaptions(text = "") {
  * opens by itself. The player can open it sooner, or stake a card straight
  * from the page, which opens the table with that card already on it.
  *
- * The first page of a case that turns rules on (`tableUnlocks`) says so in a
- * panel of the same form, above the breach panel when there are both.
+ * The page a case opens on, when the case turns rules on (`tableUnlocks`),
+ * says so in a panel of the same form, above the breach panel when there are
+ * both.
  *
  * The page holds the table's clock the whole time it is up; its own countdown
  * is the only thing ticking, and it stops while the browser tab is hidden.
@@ -74,7 +75,7 @@ export function SceneBriefing({
   onOpen,
 }) {
   const { letterKeys, keys } = useShortcutHints();
-  const intro = getBriefingIntro(node.caseId, nodeId, run);
+  const intro = getBriefingIntro(node, nodeId, run);
   // The page prints the changed rules and the new ones under the scene, so
   // both are on its clock, a sentence of either counted the same way.
   const readSeconds = useMemo(
