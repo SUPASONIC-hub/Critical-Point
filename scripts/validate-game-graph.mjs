@@ -686,7 +686,10 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
     fail(`branchPlan opens the side door on "${branchCondition}", which is not one of ${Object.keys(branchConditions).join(", ")}`);
   }
   if (branchRest.length) fail(`branchPlan has entries no module reads: ${JSON.stringify(branchRest)}`);
-  const branchCard = pack.nodes[branchSource]?.choices?.[branchIndex];
+  // The door may hang on a route scene instead of an authored one (gameData.js
+  // hangs it once the routes are built); its cards are the ones its plan writes.
+  const branchRoute = (pack.routePlan ? [...Object.values(pack.routePlan.choices), pack.routePlan.system] : []).find((route) => route.route === branchSource);
+  const branchCard = (pack.nodes[branchSource]?.choices ?? branchRoute?.routeChoices)?.[branchIndex];
   if (!branchCard || branchCard.type === "reframe") fail(`branchPlan hangs the side door on card ${branchIndex + 1} of ${branchSource}, which is not a card that scene deals`);
   if (!sameKeys(Object.keys(pack.branchScenes), [branchFirst, branchSecond])) fail("branchPlan and branchScenes name different scenes");
 
