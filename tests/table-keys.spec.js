@@ -508,6 +508,48 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
   await expect(page.getByTestId("unlock-intro"), "a later scene of the case has nothing new to say").toHaveCount(0);
 });
 
+// The draft a case shows was offered as the case before it closed, so the
+// first one a plain run meets is the offer made at the close of 프롤로그 04.
+test("staged: 프롤로그 03 closes without a draft, and 프롤로그 04 closes onto the first one", async ({ page }) => {
+  test.setTimeout(180_000);
+  /** Plays the scene every way through the case closes on, up to its reveal. */
+  const closeCase = async (caseId) => {
+    await openTable(page, caseId, `p${caseId.at(-1)}_aftershock`);
+    await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+    await page.getByTestId("commit-push").click();
+    await cashStakedCard(page);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect.poll(async () => (await savedRun(page)).completedCases).toContain(caseId);
+  };
+  const openNextCase = async (caseId) => {
+    await clickElement(page.getByTestId("decision-next"), "close the reveal");
+    await clickElement(page.locator(".next-case-panel button"), "next case");
+    await expect.poll(async () => (await savedRun(page)).currentCase, { timeout: TRANSITION_TIMEOUT_MS }).toBe(caseId);
+  };
+
+  await closeCase("prologue03");
+  await expect(page.getByTestId("relic-draft-notice")).toHaveCount(0);
+  expect((await savedRun(page)).dynamics.relicOffer).toEqual([]);
+  await openNextCase("prologue04");
+  await expectBriefing(page);
+  await expect(page.getByTestId("relic-draft")).toHaveCount(0);
+
+  await closeCase("prologue04");
+  await expect(page.getByTestId("relic-draft-notice")).toContainText("도구 3개");
+  await openNextCase("prologue05");
+  const draft = page.getByTestId("relic-draft");
+  await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(draft.getByTestId("relic-option")).toHaveCount(3);
+  await clickThroughMotion(draft.getByTestId("relic-option").first(), "the first relic");
+  await expect(draft).toHaveCount(0);
+  await expectBriefing(page);
+  // The page behind the draft is the one that introduces the stances.
+  await expect(page.getByTestId("unlock-intro").locator("li")).toHaveText([...UNLOCK_LADDER[4].intro]);
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(1);
+  await expectTableDraws(page, WHOLE);
+});
+
 /**
  * The same steps met the way a player meets them, with no debug jump: from
  * the intro's start button, by NEW GAME+, and by resuming a save written
