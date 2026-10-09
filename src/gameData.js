@@ -181,33 +181,54 @@ const authoredBranchScenes = {};
 // column differs per case on purpose: one fixed column would teach the player
 // that the hidden scenes always sit behind the same button.
 const authoredBranchPlans = [];
+// A plan may hang its door on a route scene (`route` on a route plan) instead
+// of an authored one. That scene is not built until the route plans are, so
+// such a plan waits here: its two scenes are written with everyone else's,
+// because a route body may walk them, and its door is hung further down.
+const routeBranchPlans = [];
+const routeScenesOf = ({ routePlan }) => (routePlan ? [...Object.values(routePlan.choices), routePlan.system].map((route) => route.route) : []);
 
 for (const pack of CASE_PACKS) {
   Object.assign(authoredBranchScenes, pack.branchScenes);
-  authoredBranchPlans.push([pack.id, ...pack.branchPlan]);
+  const plans = routeScenesOf(pack).includes(pack.branchPlan[0]) ? routeBranchPlans : authoredBranchPlans;
+  plans.push([pack.id, ...pack.branchPlan]);
 }
 
-authoredBranchPlans.forEach(([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) => {
-  const source = sceneOf(sourceId, `${caseId} branch plan`);
+function writeBranchScenes([caseId, , , firstId, secondId]) {
   const unwritten = [firstId, secondId].find((branchId) => !authoredBranchScenes[branchId]);
   if (unwritten) throw new Error(`${caseId} branch plan names the scene "${unwritten}", which no branch table writes`);
+  nodes[firstId] = { ...withLinesFiled(authoredBranchScenes[firstId]), kind: "branch" };
+  nodes[secondId] = { ...withLinesFiled(authoredBranchScenes[secondId]), kind: "branch" };
+}
+
+function hangBranchDoor([caseId, sourceId, choiceIndex, firstId, secondId, conditionId]) {
+  const source = sceneOf(sourceId, `${caseId} branch plan`);
   if (!source.choices[choiceIndex] || source.choices[choiceIndex].type === "reframe") {
     throw new Error(`${caseId} branch plan puts its detour on card ${choiceIndex + 1} of ${sourceId}, which is not a card that scene deals`);
   }
   const bypassNodeId = source.choices[choiceIndex].next;
+  // A closed door sends the card where it led before the door was hung. On a
+  // route scene whose body already opens into the detour, that is the detour.
+  if (conditionId && bypassNodeId === firstId) {
+    throw new Error(`${caseId} branch plan opens its detour on "${conditionId}", but card ${choiceIndex + 1} of ${sourceId} leads to ${firstId} either way`);
+  }
   source.choices[choiceIndex] = {
     ...source.choices[choiceIndex],
     next: firstId,
     branchId: firstId,
     ...(conditionId ? { branchCondition: conditionId, branchBypass: bypassNodeId } : {}),
   };
-  nodes[firstId] = { ...withLinesFiled(authoredBranchScenes[firstId]), kind: "branch" };
-  nodes[secondId] = { ...withLinesFiled(authoredBranchScenes[secondId]), kind: "branch" };
   const order = nodeOrders[caseId];
   const sourceOrderIndex = order.indexOf(sourceId);
   if (sourceOrderIndex < 0) throw new Error(`${caseId} branch plan leaves from ${sourceId}, which is not in the case`);
   order.splice(sourceOrderIndex + 1, 0, firstId, secondId);
+}
+
+authoredBranchPlans.forEach((plan) => {
+  writeBranchScenes(plan);
+  hangBranchDoor(plan);
 });
+routeBranchPlans.forEach(writeBranchScenes);
 
 
 /**
@@ -363,6 +384,11 @@ function registerRouteBodies(caseId, plan) {
 }
 
 Object.entries(routeBodyPlans).forEach(([caseId, plan]) => registerRouteBodies(caseId, plan));
+
+// The doors that hang on a route scene. After the route bodies, which point
+// every card of a route at its entry and would take the door down again; before
+// the evidence turn, so the card the plan counts to is one the route wrote.
+routeBranchPlans.forEach(hangBranchDoor);
 
 /**
  * Where the first 판을 다시 짠다 of a case lands. It lives next to the route

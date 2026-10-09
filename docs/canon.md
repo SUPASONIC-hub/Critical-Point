@@ -205,6 +205,21 @@ committee of 4월 24일 (사건 31, hidden route).
 | 트리거랩 반응 기록 that 핏스코어 bought and that leaked in July | 참가자 63명, 38만 줄 (사건 30, 37, finale) |
 | Its 원본, 7번 on 사건 46's disposal list | the same record, so the same 63명 |
 
+## The March vote
+
+사건 23's 주주총회 appoints 윤상혁 as 사내이사. The result is the same on every
+route; the cards change what the adviser's reason rests on and what the minute
+is spent on. The 해임안 is 사건 43's, a board vote.
+
+| Fact | Value |
+|---|---|
+| Who holds the shares | 외국인 68%, 국민연금 8%, 직원 5%; the 1주 모임 3,118명 hold 0.0008% |
+| Why the institutions move | 리드라인's 가을떡방 연재 spread; KD은행's brand survey fell two months running and its ESG rating one step |
+| 클리어보트's recommendation | 반대, on every card; about a third of the foreign holders follow it |
+| Pre-count before the meeting | 찬성 55%, with 국민연금's 8% not yet cast (50.6 / 92) |
+| Result | 찬성 50.6%, 가결; the year before, 97.1% |
+| The 49.4% against | 외국인 기관 that follow 클리어보트 22.7% + 국민연금 8% + 그 밖의 기관 18.7% |
+
 ## The main season's calendar
 
 사건 01-18 are **2025** and 사건 19 to the finale are **2026**: 사건 12 is the
@@ -220,7 +235,7 @@ year.
 
 | Case | Dates |
 |---|---|
-| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The copy prints none of these dates, only the weekday and the intervals |
+| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The scenes print none of these dates, only the weekday and the intervals; 사건 16's interlude prints 11월 27일 and 12월 3일 without a weekday and is itself dated 12월 10일, a week after the committee |
 | 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
