@@ -579,28 +579,36 @@ const isComment = (line) => /^\s*(?:\/\/|\/\*|\*)/.test(line);
 const nearby = (line, match) => line.slice(Math.max(0, match.index - 30), match.index + match[0].length + 10);
 
 /**
- * Every place `text` states a canon fact, agreeing or not. An entry with a
- * `speaker` is read only on the lines of a scene that speaker has: from a
- * `speaker: "…"` line to the next one.
+ * The lines of a file that copy can stand on, each with its line number and the
+ * speaker of the scene it is in: from a `speaker: "…"` line to the next one.
+ * The facts and the calendar are both read from this one list, so a file is
+ * split, and its comments are told from its copy, once however many passes
+ * read it. A comment still names a speaker, as it did when every pass split the
+ * text for itself.
  */
-function* canonStatements(text, file) {
-  const normalized = file.replaceAll("\\", "/");
-  const lines = text.split(/\r?\n/);
-  const speakers = [];
+function copyLines(text) {
+  const lines = [];
   let speaker = "";
-  for (const line of lines) {
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
     speaker = line.match(/speaker: "([^"]+)"/)?.[1] ?? speaker;
-    speakers.push(speaker);
+    if (!isComment(line)) lines.push({ number: index + 1, line, speaker });
   }
+  return lines;
+}
+
+/**
+ * Every place the lines of `file` state a canon fact, agreeing or not. An entry
+ * with a `speaker` is read only on the lines of a scene that speaker has.
+ */
+function* canonStatements(lines, file) {
   for (const entry of CANON) {
-    if (!entry.files.test(normalized)) continue;
-    for (const [index, line] of lines.entries()) {
-      if (isComment(line)) continue;
-      if (entry.speaker && speakers[index] !== entry.speaker) continue;
+    if (!entry.files.test(file)) continue;
+    for (const { number, line, speaker } of lines) {
+      if (entry.speaker && speaker !== entry.speaker) continue;
       for (const match of line.matchAll(entry.find)) {
         const value = valueOf(match);
         const agrees = entry.allow.includes(value) || Boolean(entry.except?.test(nearby(line, match)));
-        yield { entry, agrees, file: normalized, line: index + 1, found: match[0], value };
+        yield { entry, agrees, file, line: number, found: match[0], value };
       }
     }
   }
@@ -627,31 +635,43 @@ const DATED_WEEKDAY = /(?:(\d{4})년 )?(\d{1,2})월 (\d{1,2})일(?: ?\(([월화�
 const WEEKDAYS = "일월화수목금토";
 const weekdayOf = (year, month, day) => WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
 
-/** Every date in `text` that is written with a weekday, and whether the weekday fits its year. */
-function* datedWeekdays(text, file) {
-  const normalized = file.replaceAll("\\", "/");
-  for (const [index, line] of text.split(/\r?\n/).entries()) {
-    if (isComment(line)) continue;
+/** Every date in the lines of `file` that is written with a weekday, and whether the weekday fits its year. */
+function* datedWeekdays(lines, file) {
+  for (const { number, line } of lines) {
     for (const match of line.matchAll(DATED_WEEKDAY)) {
       const [, year, month, day] = match;
       const weekday = match[4] ?? match[5];
-      const years = year ? [Number(year)] : canonYears(normalized);
+      const years = year ? [Number(year)] : canonYears(file);
       const agrees = years.some((candidate) => weekdayOf(candidate, Number(month), Number(day)) === weekday);
-      yield { agrees, years, file: normalized, line: index + 1, found: match[0], value: weekday, actual: years.map((candidate) => `${candidate}: ${weekdayOf(candidate, Number(month), Number(day))}요일`).join(", ") };
+      yield { agrees, years, file, line: number, found: match[0], value: weekday, actual: years.map((candidate) => `${candidate}: ${weekdayOf(candidate, Number(month), Number(day))}요일`).join(", ") };
     }
   }
 }
 
-/** Every statement in `text` that gives a canon fact a value the canon does not allow. */
-export function findCanonViolations(text, file) {
+/**
+ * Everything the check reads in `text`: each statement of a canon fact, each
+ * date written with a weekday, and the ones among them the canon does not
+ * allow. The run needs all three -- what contradicts, and how much was read at
+ * all -- and used to read every file three times over to get them.
+ */
+export function readCanon(text, file) {
+  const normalized = file.replaceAll("\\", "/");
+  const lines = copyLines(text);
+  const statements = [...canonStatements(lines, normalized)];
+  const dates = [...datedWeekdays(lines, normalized)];
   const violations = [];
-  for (const { entry, agrees, ...where } of canonStatements(text, file)) {
+  for (const { entry, agrees, ...where } of statements) {
     if (!agrees) violations.push({ ...where, id: entry.id, fact: entry.fact });
   }
-  for (const { agrees, actual, ...where } of datedWeekdays(text, file)) {
+  for (const { agrees, actual, ...where } of dates) {
     if (!agrees) violations.push({ ...where, id: "weekday", fact: `a date stated with a weekday fits its year (${actual})` });
   }
-  return violations;
+  return { statements, dates, violations };
+}
+
+/** Every statement in `text` that gives a canon fact a value the canon does not allow. */
+export function findCanonViolations(text, file) {
+  return readCanon(text, file).violations;
 }
 
 const COPY_FILES = () => [
@@ -674,11 +694,11 @@ function main() {
   const seen = new Map(CANON.map((entry) => [entry.id, 0]));
   let weekdays = 0;
   for (const file of COPY_FILES()) {
-    const text = readFileSync(file, "utf8");
-    violations.push(...findCanonViolations(text, file));
+    const read = readCanon(readFileSync(file, "utf8"), file);
+    violations.push(...read.violations);
     // A fact nothing states any more is a pattern that has rotted, not a pass.
-    for (const { entry } of canonStatements(text, file)) seen.set(entry.id, seen.get(entry.id) + 1);
-    for (const _date of datedWeekdays(text, file)) weekdays += 1;
+    for (const { entry } of read.statements) seen.set(entry.id, seen.get(entry.id) + 1);
+    weekdays += read.dates.length;
   }
   const silent = CANON.filter((entry) => entry.allow.length > 0 && seen.get(entry.id) === 0);
   // The same for the calendar: the season prints a weekday beside some two
