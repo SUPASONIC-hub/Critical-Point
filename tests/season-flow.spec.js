@@ -2062,7 +2062,8 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
   await expect(page.locator(".ending-step-3")).toBeVisible();
   await expect(page.locator(".result-page.final-report-locked")).toHaveCount(0);
   await expect(page.locator(".result-hero h1")).toBeFocused();
-  await expect(page.locator(".ending-sequence [role='status']")).toContainText("기록이 열렸습니다");
+  // The sequence's own region: the result card's buttons bring a second one.
+  await expect(page.locator(".ending-sequence > [role='status']")).toContainText("기록이 열렸습니다");
   await expect
     .poll(async () => page.evaluate(() => localStorage.getItem("critical-point-next-participant-message")))
     .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
