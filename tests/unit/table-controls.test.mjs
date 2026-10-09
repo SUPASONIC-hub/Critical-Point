@@ -101,6 +101,28 @@ test("a held key is still the table's key, and is pressed once", () => {
   }
 });
 
+test("E and Q are not the table's keys before the case turns LOCK and the stances on", () => {
+  // The stage hands over no `focus` without "lock" and no `cycleFocusMode`
+  // without "stance" (tableUnlocks): the key does nothing and stays the page's.
+  for (const [init, missing] of [
+    [{ key: "e", code: "KeyE" }, { focus: null }],
+    [{ key: "ㄷ", code: "KeyE" }, { focus: null }],
+    [{ key: "q", code: "KeyQ" }, { cycleFocusMode: null }],
+  ]) {
+    const { current, calls } = table(missing);
+    for (const repeat of [false, true]) {
+      const event = keydown({ ...init, repeat });
+      handleTableKey(event, current);
+      assert.equal(event.defaultPrevented, false, `${init.code} is left to the page`);
+    }
+    assert.equal(calls.length, 0);
+    // The other key, and the keys every step has, answer as before.
+    handleTableKey(keydown({ key: "w", code: "KeyW" }), current);
+    handleTableKey(keydown(missing.focus === null ? { key: "q", code: "KeyQ" } : { key: "e", code: "KeyE" }), current);
+    assert.deepEqual(calls.map(([name]) => name), ["push", missing.focus === null ? "stance" : "focus"]);
+  }
+});
+
 test("a repeat of a key the table does not own is left to the page", () => {
   const { current, calls } = table();
   for (const init of [{ key: "x", code: "KeyX" }, { key: "9", code: "Digit9" }, { key: "Tab", code: "Tab" }, { key: " ", code: "Space", ctrlKey: true }]) {

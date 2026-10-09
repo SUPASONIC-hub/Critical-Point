@@ -18,6 +18,7 @@
     "src/gauntlet/relics.js": 100,
     "src/gauntlet/tableReadout.js": 25,
     "src/gauntlet/tableRules.js": 100,
+    "src/gauntlet/tableStaging.js": 100,
     "src/gauntlet/tableUnlocks.js": 100,
     "src/gauntlet/timing.js": 100,
     "src/gauntlet/useRelicTable.js": 70,
