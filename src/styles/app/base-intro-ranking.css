@@ -304,10 +304,8 @@ summary:focus-visible {
    use -- rounded surfaces, hairline borders, one acid accent -- so the first
    click does not change the genre.
 
-   The contrast audit reads text against its ancestors' painted backgrounds,
-   and the art is a sibling layer, not an ancestor, so hero copy is measured on
-   the ink ground. The grading below is what makes that measurement honest: the
-   reading column never sits on an ungraded part of the photograph. */
+   The contrast audit measures hero copy against the pixels behind it, so the
+   grading below has to hold under every line of it. */
 .intro-shell {
   position: relative;
   display: block;
@@ -2916,9 +2914,6 @@ summary:focus-visible {
   }
 }
 /* Rules gathered here from the later layers so this selector is defined in one file. */
-.game-header {
-  flex-wrap: wrap;
-}
 textarea {
   width: 100%;
   min-height: 110px;
@@ -3004,8 +2999,7 @@ body {
     grid-template-columns: 1fr;
   }
   .prestart-grid,
-  .prestart-tutorial > div,
-  .season-summary-list {
+  .prestart-tutorial > div {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -3050,10 +3044,19 @@ body {
   .intro .start-priority {
     padding: 18px;
   }
-  .prestart-grid,
-  .prestart-tutorial > div,
-  .season-summary-list {
-    grid-template-columns: 1fr;
+  /* The reading line stands on the photograph's bright band, so it carries
+     its own shade down the copy. */
+  .wordmark-reading::before {
+    content: "";
+    position: absolute;
+    inset: auto 0;
+    z-index: -1;
+    height: 100%;
+    margin-top: -80px;
+    background: linear-gradient(transparent, var(--ui-glass) 72px);
+  }
+  .wordmark-reading i {
+    color: var(--ui-text-2);
   }
   /* The back button and the brand pill stay one row of pills, dropped below
      the music controls instead of stacked into full-width slabs under them. */
