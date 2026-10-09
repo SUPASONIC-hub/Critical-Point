@@ -616,7 +616,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     // What NEW GAME+ is: the season again, with the last one's record on the
     // intro. The line used to promise hidden authority and extra clues.
     setSaveStatus("NEW GAME+로 시작합니다. 지난 시즌의 기록은 시작 화면에 남아 있습니다.");
-    lifecycle.startGame();
+    lifecycle.startGame({ veteran: true });
   }
   /**
    * A case opened from the result page, by button or by key. Opening the one

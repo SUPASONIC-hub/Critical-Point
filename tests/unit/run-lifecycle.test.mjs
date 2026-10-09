@@ -115,6 +115,26 @@ test("a new game over a run already in progress", async () => {
   pin("newGame/over-a-run", harness);
 });
 
+// NEW GAME+ is the same new game with the run marked, and the mark is the
+// run's: the plain start above, over a run on the same device, has none.
+test("a new game begun with NEW GAME+", async () => {
+  const harness = await createRunHarness({ saved: pausedRun(), operatorOrigin: "public", patch: dirtyPanels });
+  harness.act("startGame", { veteran: true });
+  pin("newGame/new-game-plus", harness);
+  assert.equal(harness.run.gauntletRun.veteran, true);
+  assert.equal(harness.saved().dynamics.veteran, true);
+  const { veteran: _mark, ...unmarked } = harness.saved().dynamics;
+  const { veteran: plainMark, ...plainStart } = pinned["newGame/over-a-run"]?.saved.dynamics ?? recorded["newGame/over-a-run"].saved.dynamics;
+  assert.equal(plainMark, false);
+  assert.deepEqual(plain(unmarked), plainStart, "nothing else about the table differs");
+});
+
+test("the start button's click event is a plain start", async () => {
+  const harness = await createRunHarness();
+  harness.act("startGame", { type: "click", veteran: "true" });
+  assert.equal(harness.run.gauntletRun.veteran, false);
+});
+
 test("resuming a paused run", async () => {
   const harness = await createRunHarness({ saved: pausedRun(), patch: { decisionReveal: { nextNode: "somewhere" } } });
   harness.act("resume");

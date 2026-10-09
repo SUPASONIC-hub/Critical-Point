@@ -1,0 +1,130 @@
+{
+  "era": "v2, the last build with every table rule on from 프롤로그 01 -- a run left on the first scene of 프롤로그 03 holding a relic, a mastered STRIKE, a chain and an unanswered draft",
+  "writtenBy": "serializeRunState(openCaseRun(resolveWindow(...).nextRun)) in src/gauntlet/gauntletEngine.js at 497590c (2026-10-09), in the save shape of persist() in src/state/useAppPersistence.js",
+  "save": {
+    "saveSchemaVersion": 2,
+    "runId": "run-pre-unlocks-0001",
+    "playerName": "분석관",
+    "playStyle": "instinct",
+    "openingLegacy": null,
+    "dataConsent": false,
+    "started": false,
+    "currentCase": "prologue03",
+    "completedCases": [
+      "prologue01",
+      "prologue02"
+    ],
+    "discoveredClues": [],
+    "caseResults": {},
+    "playtestFeedback": {},
+    "nodeId": "p3_start_alone",
+    "resources": {
+      "time": 72,
+      "capital": 100,
+      "trust": 50,
+      "legitimacy": 50,
+      "humanCost": 0,
+      "fatigue": 10
+    },
+    "log": [],
+    "triggers": {
+      "protection": 0,
+      "injustice": 0,
+      "revenge": 0,
+      "responsibility": 0,
+      "competition": 0,
+      "reward": 0,
+      "curiosity": 0,
+      "order": 0,
+      "trust": 0,
+      "affection": 0,
+      "recognition": 0,
+      "fear": 0,
+      "system": 0,
+      "helplessness": 0,
+      "selfAwareness": 0,
+      "manipulation": 0,
+      "choice": 0
+    },
+    "cognition": {
+      "persistence": 0,
+      "inference": 0,
+      "reframing": 0,
+      "risk": 0
+    },
+    "echo": "2023년.",
+    "nodeEnteredAt": 1759968000000,
+    "pendingTelemetry": [],
+    "dynamics": {
+      "windowIndex": 16,
+      "practiceWindows": 0,
+      "runPot": 0,
+      "vault": 8262,
+      "streak": 3,
+      "busts": 2,
+      "cashes": 14,
+      "bestMultiplier": 16,
+      "lastOutcome": "cash",
+      "lastGauge": 44,
+      "openSeed": null,
+      "openCardId": null,
+      "suspended": null,
+      "beatCombo": 7,
+      "bestCombo": 9,
+      "bestFocusCombo": 5,
+      "focusHits": 25,
+      "focusPerfects": 10,
+      "focusMisses": 3,
+      "stanceMastery": {
+        "strike": 4,
+        "steady": 1,
+        "expose": 0
+      },
+      "runGroove": 0,
+      "grooveVault": 1174,
+      "relics": [
+        "metronome"
+      ],
+      "relicOffer": [
+        "lockpick",
+        "heatSink",
+        "coldBlood"
+      ],
+      "insuranceSpent": false,
+      "practice": null,
+      "schema": {
+        "seconds": 45,
+        "wallMin": 56,
+        "wallMax": 92,
+        "stepMin": 8,
+        "stepMax": 16,
+        "creep": 0.5,
+        "startGauge": 0,
+        "chipsScale": 1.12,
+        "faceDown": false,
+        "sedated": false,
+        "sealHighest": false,
+        "fracturedAxis": null,
+        "fractureRate": 1.5,
+        "sealBreak": 30,
+        "mutations": [
+          "reboot",
+          "strikeMastery"
+        ],
+        "relics": [
+          "metronome"
+        ]
+      }
+    },
+    "paused": true,
+    "savedAt": "2026-10-09T00:00:00.000Z"
+  },
+  "expect": {
+    "currentCase": "prologue03",
+    "nodeId": "p3_start_alone",
+    "logLength": 0,
+    "repaired": false,
+    "windowIndex": 16,
+    "vault": 8262
+  }
+}

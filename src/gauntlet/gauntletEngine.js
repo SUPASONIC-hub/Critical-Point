@@ -36,6 +36,15 @@ import {
 export { FRACTURE_RATE, HOT_CASH_MULTIPLIER, METRONOME_REACH, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
+ * The rules a window is played under when none are named: all of them. The
+ * callers that know the case pass the case's own (`tableUnlocks.js`, a Set of
+ * rule ids), and everything here only ever asks a set whether it `has` one.
+ * The list itself is not imported: this module is in the chunk the start
+ * screen loads to repair a save, and the list brings the prologues' copy.
+ */
+const ALL_RULES = Object.freeze({ has: () => true });
+
+/**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
  *
  * A decision window is a bet. The player stakes a card, then either CASHES it
@@ -680,6 +689,15 @@ export function getRemainingSeconds(window) {
 /**
  * The live window. `TICK` carries elapsed seconds since the last tick; the
  * reducer owns the arithmetic so a slow frame and a fast one land the same.
+ *
+ * `rules` is what the case plays under (`tableUnlocks`), and an event for a
+ * rule the case does not have yet is ignored here, whatever the stage draws:
+ * without `beat` a push is a push and its grade is not read -- no combo, no
+ * groove, and no slip to pay for a beat nobody was shown; without `lock` a
+ * FOCUS leaves the window as it was; without `stance` so does SET_FOCUS_MODE,
+ * and the window stays in the stance it opened in (STRIKE). A window resumed
+ * from a save keeps what it held -- that is the player's, and `resolveWindow`
+ * decides what it is worth.
  */
 function advanceClock(window, delta) {
   const elapsed = window.elapsed + delta;
@@ -691,7 +709,7 @@ function advanceClock(window, delta) {
   return { ...window, elapsed, gauge };
 }
 
-export function reduceWindow(window, event = {}) {
+export function reduceWindow(window, event = {}, rules = ALL_RULES) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
     case "TICK": {
@@ -704,7 +722,7 @@ export function reduceWindow(window, event = {}) {
       const pushes = window.pushes + 1;
       const step = drawStep(window.schema, window.seed, pushes);
       const gauge = clamp(window.gauge + step, 0, GAUGE_MAX);
-      const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
+      const grade = rules.has("beat") && BEAT_GRADES.has(event.grade) ? event.grade : null;
       const scored = scoreBeat(window, grade);
       const pushed = {
         ...window,
@@ -726,7 +744,7 @@ export function reduceWindow(window, event = {}) {
       return grade === "miss" ? advanceClock(pushed, SLIP_SECONDS) : pushed;
     }
     case "FOCUS": {
-      if (!window.selectedId) return window;
+      if (!window.selectedId || !rules.has("lock")) return window;
       const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
       const scored = scoreFocus(window, grade);
       const profile = getFocusModeProfile(window.focusMode);
@@ -758,6 +776,7 @@ export function reduceWindow(window, event = {}) {
       // A charge belongs to the stance that built it. Changing stance used to
       // keep it, so a hand cooled the gauge with STEADY locks and cashed them as
       // STRIKE: the relief of one stance and the payout and carry of another.
+      if (!rules.has("stance")) return window;
       const focusMode = normalizeFocusMode(event.mode);
       if (focusMode === normalizeFocusMode(window.focusMode)) return window;
       return { ...window, focusMode, focus: 0, focusCombo: 0, jammed: false, lastFocusGrade: null };
@@ -824,6 +843,9 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // Set while a case that already closed is being played again: the table
   // record as it stood when the replay opened. See `openCaseRun`.
   practice: null,
+  // The run was begun with NEW GAME+: its table has every rule from the first
+  // window (`tableUnlocks`). A plain start on the same device does not.
+  veteran: false,
   schema: BASE_SCHEMA,
 });
 
@@ -877,6 +899,7 @@ export function normalizeRunState(value) {
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
   run.insuranceSpent = source.insuranceSpent === true;
   run.practice = normalizePractice(source.practice);
+  run.veteran = source.veteran === true;
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -1096,8 +1119,11 @@ function endPractice(run) {
  * button says the earlier choices are thrown away), and the season counts the
  * case once (`getSeasonStrain`). Its ranking row replaces the run's earlier
  * one too, so repeating a case adds nothing to the board (useLocalRanking).
+ *
+ * `rules` is what the case being opened plays under. A board laid here follows
+ * them; a REBOOT board and a draft the run already holds are kept as they are.
  */
-export function openCaseRun(run, { replayOf = null } = {}) {
+export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
   const opened = normalizeRunState(run);
   const current = endPractice(opened);
   const rebooted = current.schema.mutations.includes("reboot");
@@ -1124,7 +1150,7 @@ export function openCaseRun(run, { replayOf = null } = {}) {
     relicOffer: practice ? [] : offer,
     schema: rebooted
       ? current.schema
-      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery), getEscalationWindow(current)), current.relics),
+      : applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics),
   });
 }
 
@@ -1132,8 +1158,8 @@ export function openCaseRun(run, { replayOf = null } = {}) {
 /** A burn smaller than this is a scratch, not a fracture. */
 export const FRACTURE_MIN_BURN = 10;
 
-function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
-  if (!earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;
+function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}, rules = ALL_RULES) {
+  if (!rules.has("stance") || !earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;
   const next = { ...schema, mutations: [...schema.mutations] };
   const addMutation = (id) => {
     if (!next.mutations.includes(id)) next.mutations.push(id);
@@ -1161,7 +1187,13 @@ function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 
   return next;
 }
 
-function applyStanceMastery(schema, mastery = EMPTY_STANCE_MASTERY) {
+/**
+ * The season's mastery, laid on a new board. It comes with the choice of
+ * stance: a case that has no `stance` yet deals no mastery board, whatever the
+ * run holds, and the run goes on holding it.
+ */
+function applyStanceMastery(schema, mastery = EMPTY_STANCE_MASTERY, rules = ALL_RULES) {
+  if (!rules.has("stance")) return schema;
   const profile = getStanceMasteryProfile(mastery);
   const next = { ...schema, mutations: [...schema.mutations] };
   const addMutation = (id) => {
@@ -1232,51 +1264,102 @@ function applySeasonEscalation(schema, windowIndex) {
   return { ...schema, wallMax: Math.max(schema.wallMin, schema.wallMax + wallMax), creep: round2(schema.creep + creep) };
 }
 
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0 }) {
-  if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery), windowIndex), relics);
+/**
+ * `rules` is what the board is dealt under (`tableUnlocks`): a way of breaking
+ * the next board that the case does not have yet is not dealt, and the board
+ * is the base one in that respect. The relics the run carries are applied
+ * whatever the rules say -- they are held, not dealt -- and so is the season's
+ * lean. With every rule, which is the default, this is the board it always was.
+ */
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES }) {
+  if (caseClosed) return applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
-    schema.faceDown = true;
-    schema.wallMin -= BLACKOUT_WALL_SHIFT;
-    schema.wallMax -= BLACKOUT_WALL_SHIFT;
-    schema.startGauge = AFTERSHOCK_START;
-    schema.mutations.push("blackout", "aftershock");
-    if (cause === "timeout") {
+    if (rules.has("blackout")) {
+      schema.faceDown = true;
+      schema.wallMin -= BLACKOUT_WALL_SHIFT;
+      schema.wallMax -= BLACKOUT_WALL_SHIFT;
+      schema.mutations.push("blackout");
+    }
+    if (rules.has("aftershock")) {
+      schema.startGauge = AFTERSHOCK_START;
+      schema.mutations.push("aftershock");
+    }
+    if (cause === "timeout" && rules.has("silence")) {
       schema.sedated = true;
       schema.seconds = SILENCE_SECONDS;
       schema.mutations.push("silence");
     }
   } else {
-    if (gauge >= HEAT_DEBT_GAUGE) {
+    if (gauge >= HEAT_DEBT_GAUGE && rules.has("heatDebt")) {
       const sink = hasRelic(relics, "heatSink");
       schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
       schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");
     }
-    if (streak >= OVERCLOCK_STREAK) {
+    if (streak >= OVERCLOCK_STREAK && rules.has("overclock")) {
       schema.chipsScale *= OVERCLOCK_CHIPS;
       schema.stepMin += 4;
       schema.stepMax += 6;
       schema.mutations.push("overclock");
     }
-    if (pushes === 0) {
+    if (pushes === 0 && rules.has("coldFeet")) {
       schema.sealHighest = true;
       schema.chipsScale *= COLD_FEET_CHIPS;
       schema.mutations.push("coldFeet");
     }
   }
-  if (burnAxis) {
+  if (burnAxis && rules.has("fracture")) {
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }), stanceMastery), windowIndex), relics);
+  return applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics);
+}
+
+const UNBEATEN = Object.freeze({ beatCombo: 0, maxCombo: 0, groove: 0, beatHits: 0, perfects: 0, slips: 0, lastGrade: null });
+const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0, focusPerfects: 0, focusMisses: 0, jammed: false, lastFocusGrade: null });
+
+/**
+ * The window as the case's rules read it. What a rule the case does not have
+ * would have earned is not there to be settled: no beat, no groove or combo;
+ * no LOCK, no charge; no choice of stance, STRIKE. The reducer already refuses
+ * those presses, so this only ever changes a window that came from somewhere
+ * else -- a save made before the steps existed, a script. With every rule the
+ * window is handed back as it is.
+ */
+function readWindowUnder(window, rules) {
+  const beat = rules.has("beat");
+  const lock = rules.has("lock");
+  const stance = rules.has("stance");
+  if (!window || (beat && lock && stance)) return window;
+  return { ...window, ...(beat ? null : UNBEATEN), ...(lock ? null : UNLOCKED), ...(stance ? null : { focusMode: "strike" }) };
 }
 
 /**
  * Settles a closed window against the run. Returns the verdict the runtime logs
  * and the reveal prints, and the run state the next window is dealt from.
+ *
+ * `rules` is what the case on the table plays under, and decides what this
+ * window can earn and how the next board can break:
+ *
+ *   beat       without it nothing of the tempo is credited, and the combo the
+ *              run carries is neither added to nor taken.
+ *   lock       without it there is no charge, so no LOCK pot and no stance.
+ *   stance     without it LOCK is STRIKE, it carries nothing into the next
+ *              board, and mastery does not advance.
+ *   overclock  without it the chain is not counted. It used to be counted in
+ *              every case, and counting it through the steps before OVERCLOCK
+ *              would let the first cash of the step that has it deal one.
+ *
+ * `nextRules` is what the board dealt here will be played under: the same
+ * rules, except on the window that closes a case, where the caller passes the
+ * next case's. That board and the draft offered with it belong to the next
+ * case, so a draft is offered only when the next case has `relics`. What the
+ * run already holds -- relics, mastery, a draft still waiting, the board on
+ * the table -- is left as it is under any rules.
  */
-export function resolveWindow({ run, window, card, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL }) {
+export function resolveWindow({ run, window: closedWindow, card, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules }) {
+  const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
   const outcome = window?.status === "cashed" ? "cash" : "bust";
@@ -1293,7 +1376,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode) : 1;
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
   // Practice builds no mastery, so it cannot be repeated into a stance relic either.
-  const stanceMastery = current.practice
+  const stanceMastery = current.practice || !rules.has("stance")
     ? current.stanceMastery
     : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
@@ -1313,7 +1396,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   // `runGroove` is the hand's whole share, beat and LOCK: the ending's vault
   // slack reads the vault without it, and neither is reading the table.
   const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
-  const streak = outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
+  const streak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   // A practice run closes a case the table has already been paid for: nothing
   // moves to the vault, and the next case is dealt what the season held before.
@@ -1335,6 +1418,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     focusHits,
     stanceMastery: practice?.stanceMastery ?? stanceMastery,
     windowIndex: getEscalationWindow(current) + (current.practice ? 0 : 1),
+    rules: caseClosed ? nextRules : rules,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -1344,7 +1428,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
   ];
   const relicOffer = practice
     ? practice.relicOffer
-    : caseClosed && offerRelics ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
+    : caseClosed && offerRelics && nextRules.has("relics") ? drawRelicOffer(window?.seed ?? current.windowIndex, relicPool, relics) : [];
   const verdict = {
     outcome,
     cause,
@@ -1396,12 +1480,13 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
       pot: focusPot,
       tier: focusBonus.tier,
       jammed: window?.jammed === true,
-      stanceEarned: !current.practice && earnedStance(focusMode, focusCharge, focusHits, outcome),
+      stanceEarned: !current.practice && rules.has("stance") && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
     },
   };
   const settled = {
     practice: current.practice,
+    veteran: current.veteran,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
@@ -1414,7 +1499,7 @@ export function resolveWindow({ run, window, card, caseClosed = false, offerReli
     lastGauge: gauge,
     // A cash carries the combo into the next window; the wall takes it with the
     // pot, unless ENCORE holds it.
-    beatCombo: outcome === "cash" || encored ? windowCombo : 0,
+    beatCombo: !rules.has("beat") ? current.beatCombo : outcome === "cash" || encored ? windowCombo : 0,
     bestCombo: Math.max(current.bestCombo, verdict.tempo.maxCombo),
     bestFocusCombo: Math.max(current.bestFocusCombo, verdict.focus.maxCombo),
     focusHits: current.focusHits + verdict.focus.hits,
