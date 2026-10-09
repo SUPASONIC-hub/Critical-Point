@@ -31,7 +31,6 @@ import {
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
-import { getStageRules } from "./tableStaging.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { press } from "./timing.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -198,13 +197,12 @@ export function GauntletStage({
   const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
   const {
     mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
-    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules: dealtRules,
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId });
   // What this case has turned on (`tableUnlocks`). A control whose rule is not
   // on yet is not drawn and its key is not the table's: no ring, no LOCK, no
   // stances. What the window or the run already holds is drawn whatever the
   // step: a combo, relics or a broken board carried in by an older save.
-  const rules = getStageRules(scene.node.caseId, run, dealtRules);
   const beatOn = rules.has("beat");
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
@@ -496,7 +494,7 @@ export function GauntletStage({
               <b>{formatNumber(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              <small>연승</small> <b>{run.streak}</b> <small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              {chainOn && <><small>연승</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />

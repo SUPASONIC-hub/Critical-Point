@@ -82,11 +82,11 @@ const SEASONS = Number(process.env.ENDING_SEASONS) || 600;
 const reportMode = process.argv.includes("--report");
 /**
  * The seasons are played under the rules each case has, as the runtime deals
- * them (`tableUnlocks`): everything while the switch is off. `--staged` plays
- * them with the prologues turning the rules on in steps whatever the switch
- * says, so the ending bands can be read before it is flipped.
+ * them (`tableUnlocks`): the prologues turn them on in steps. `--whole` plays
+ * every case under everything, the season as it was before the steps, so the
+ * two sets of ending bands can be read side by side.
  */
-const staged = STAGED || process.argv.includes("--staged");
+const staged = STAGED && !process.argv.includes("--whole");
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const EXPECTED = [
   "collapse",

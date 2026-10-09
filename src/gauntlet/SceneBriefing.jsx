@@ -4,7 +4,7 @@ import { getReadingSeconds, hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.j
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { getBriefingIntro } from "./tableStaging.js";
-import { UNLOCK_INTRO_KICKER } from "./tableUnlocks.js";
+import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./timing.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
@@ -40,8 +40,10 @@ function splitCaptions(text = "") {
  * opens by itself. The player can open it sooner, or stake a card straight
  * from the page, which opens the table with that card already on it.
  *
- * The first page of a case that turns rules on (`tableUnlocks`) says so in a
- * panel of the same form, above the breach panel when there are both.
+ * The page a case opens on, when the case turns rules on (`tableUnlocks`),
+ * says so in a panel of the same form. It sits straight under the speaker and
+ * the question, so it is on the first screen with them; the breach panel
+ * stays where it always was, at the end of the page.
  *
  * The page holds the table's clock the whole time it is up; its own countdown
  * is the only thing ticking, and it stops while the browser tab is hidden.
@@ -74,7 +76,7 @@ export function SceneBriefing({
   onOpen,
 }) {
   const { letterKeys, keys } = useShortcutHints();
-  const intro = getBriefingIntro(node.caseId, nodeId, run);
+  const intro = getBriefingIntro(node, nodeId, run);
   // The page prints the changed rules and the new ones under the scene, so
   // both are on its clock, a sentence of either counted the same way.
   const readSeconds = useMemo(
@@ -122,6 +124,12 @@ export function SceneBriefing({
     setHeld(heldRef.current);
   }
 
+  // The grid has no row for the introduction: its three are the picture and
+  // the speaker, the story and the file, the breach. A page that carries one
+  // places every panel by line instead, a row further down from the story on.
+  // On a phone the panels are a column in the order they are written, and
+  // this is not read.
+  const at = (gridArea) => (intro.length > 0 ? { gridArea } : undefined);
   const broken = mutations.length > 0;
   const sfx = pickSfx(nodeId, broken);
   const captions = splitCaptions(node.text);
@@ -164,7 +172,7 @@ export function SceneBriefing({
         </header>
 
         <div className="gx-comic-grid">
-          <figure className="gx-panel gx-panel-splash">
+          <figure className="gx-panel gx-panel-splash" style={at("1 / 1")}>
             <ScenePlate node={node} nodeId={nodeId} />
             {(node.place || node.clock) && (
               <figcaption className="gx-caption gx-caption-place">
@@ -175,7 +183,7 @@ export function SceneBriefing({
             <strong className="gx-sfx" aria-hidden="true">{sfx}</strong>
           </figure>
 
-          <figure className="gx-panel gx-panel-speaker">
+          <figure className="gx-panel gx-panel-speaker" style={at("1 / 2")}>
             <div className="gx-speaker-frame">
               <SpeakerPortrait name={node.speaker} src={portrait} size={240} />
             </div>
@@ -186,27 +194,9 @@ export function SceneBriefing({
             <blockquote className="gx-balloon">{question}</blockquote>
           </figure>
 
-          <div className="gx-panel gx-panel-story">
-            {node.lead && <p className="gx-caption gx-caption-lead">{node.lead}</p>}
-            {captions.map((caption, index) => (
-              <p key={index} className="gx-caption">{caption}</p>
-            ))}
-          </div>
-
-          {node.memo?.length > 0 && (
-            <div className="gx-panel gx-panel-file">
-              <p className="gx-file-tab">사건 파일</p>
-              <ul>
-                {node.memo.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {intro.length > 0 && (
-            <div className="gx-panel gx-panel-breach" data-testid="unlock-intro">
-              <p className="gx-breach-kicker">{UNLOCK_INTRO_KICKER}</p>
+            <div className="gx-panel gx-panel-breach" data-testid="unlock-intro" style={at("2 / 1 / 3 / -1")}>
+              <p className="gx-breach-kicker">{getUnlockKicker(node.caseId)}</p>
               <ul>
                 {intro.map((line) => (
                   <li key={line} className="gx-mutation">
@@ -217,10 +207,26 @@ export function SceneBriefing({
             </div>
           )}
 
+          <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
+            {node.lead && <p className="gx-caption gx-caption-lead">{node.lead}</p>}
+            {captions.map((caption, index) => (
+              <p key={index} className="gx-caption">{caption}</p>
+            ))}
+          </div>
+
+          {node.memo?.length > 0 && (
+            <div className="gx-panel gx-panel-file" style={at("3 / 2")}>
+              <p className="gx-file-tab">사건 파일</p>
+              <ul>
+                {node.memo.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {broken && (
-            // One `breach` area in the page's grid: beside an introduction the
-            // breach takes the next full row instead of the same cell.
-            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={intro.length > 0 ? { gridArea: "auto / 1 / auto / -1" } : undefined}>
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at("4 / 1 / 5 / -1")}>
               <p className="gx-breach-kicker">
                 <TriangleAlert size={14} aria-hidden="true" /> PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다
               </p>

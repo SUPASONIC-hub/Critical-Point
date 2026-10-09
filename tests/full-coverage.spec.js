@@ -231,9 +231,11 @@ test("saved state survives reload stress during complete season @full", async ({
       await assertReloadRoundTrip(page, before);
     }
     if (index === 1) {
-      // The second case opens behind the relic draft and then its briefing,
-      // and both are modal: the 저장 button under them does not take a click,
-      // which is right, and is where this walk stopped on every run.
+      // The second case opens behind its briefing, which is modal: the 저장
+      // button under it does not take a click, which is right, and is where
+      // this walk stopped on every run. (It opened behind a relic draft as
+      // well until the prologues' steps moved the first draft to the close of
+      // 프롤로그 04; the helper clears whichever is up.)
       await dismissProtocolBreach(page);
       await page.locator('[aria-keyshortcuts="P"]').click();
       await assertReloadRoundTrip(page, before);

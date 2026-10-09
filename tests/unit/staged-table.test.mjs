@@ -24,13 +24,12 @@ import { repairSavedState } from "../../src/state/savedState.js";
 import { getSettlementRules } from "../../src/state/useChoiceCommit.js";
 
 /**
- * The table as the prologues will play it once the switch is on: what the
- * reducer does with a press for a rule the case does not have, what a window
- * is worth there, and what a run that was already under way keeps.
+ * The table as the prologues play it: what the reducer does with a press for
+ * a rule the case does not have, what a window is worth there, and what a run
+ * that was already under way keeps.
  *
  * The staged rules are asked for by name of case with the flag passed, never
- * through the shipped switch, so this file reads the same before and after
- * the switch is flipped.
+ * through the shipped switch; the last two tests are the ones that read it.
  */
 
 const step = (caseId) => rulesFor(caseId, { staged: true });
@@ -264,17 +263,26 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
   assert.equal(shipped.rules, rulesFor(state.currentCase, { staged: STAGED }));
 });
 
-test("while the switch is off, every case is settled under everything, exactly as before", { skip: STAGED ? "the switch is on" : false }, () => {
+test("with the switch off, every case is settled under everything, exactly as before", () => {
   for (const caseId of CASE_SEQUENCE) {
     for (const caseClosed of [false, true]) {
-      assert.deepEqual(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed }), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
+      assert.deepEqual(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed }, false), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
     }
   }
   const closing = { status: "cashed", cause: "cash", gauge: 24, wall: 80, pushes: 2, seed: "close" };
   const settlement = { run: RUN_INITIAL_STATE, window: closing, card: staked, caseClosed: true, offerRelics: true };
   assert.deepEqual(
-    settleAgainstCodex({ ...settlement, ...getSettlementRules({ caseId: "prologue01", run: RUN_INITIAL_STATE, caseClosed: true }) }, []),
+    settleAgainstCodex({ ...settlement, ...getSettlementRules({ caseId: "prologue01", run: RUN_INITIAL_STATE, caseClosed: true }, false) }, []),
     settleAgainstCodex(settlement, []),
-    "프롤로그 01 closes onto a draft, as it does today",
+    "프롤로그 01 closes onto a draft, as it did",
   );
+});
+
+test("as shipped, a plain run's prologues are settled under their steps and a NEW GAME+ run's under everything", () => {
+  const veteran = normalizeRunState({ veteran: true });
+  for (const caseId of CASE_SEQUENCE.slice(0, 5)) {
+    assert.equal(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed: false }).rules, step(caseId), caseId);
+    assert.deepEqual(getSettlementRules({ caseId, run: veteran, caseClosed: true }), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
+  }
+  assert.equal(getSettlementRules({ caseId: "prologue05", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, ALL_RULES, "사건 01 is the whole table");
 });
