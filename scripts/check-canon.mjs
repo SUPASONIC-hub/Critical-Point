@@ -34,6 +34,8 @@ const caseFiles = (names) => new RegExp(`src/nodes/(?:${names})\\.js$`);
 const seasonBut = (names) => new RegExp(`src/(?!nodes/(?:${names})\\.js$)`);
 /** The two files that sum every case up in a line or two. */
 const SUMMARIES = "|src/gameCases\\.js$|src/caseCopy\\.js$";
+/** Where the March vote of 사건 23 is counted: the case, the Monday after, the summaries. */
+const AGM = new RegExp(`${caseFiles("case23|case24").source}${SUMMARIES}`);
 
 // A clock time the way copy writes one: 13:32, 13시 32분, 오후 1시 32분.
 const TIME = "(오후 |저녁 |밤 )?(\\d{1,2})(?:시 ?|:)(\\d{1,2})분?";
@@ -462,6 +464,36 @@ export const CANON = [
     files: SEASON,
     find: /A-001(?:부터| ~) (A-\d{3})/g,
     allow: ["A-063"],
+  },
+  {
+    id: "agm-vote",
+    fact: "윤상혁's appointment passes at 찬성 50.6% (사건 23)",
+    files: AGM,
+    // "찬성 55%" is the pre-count and "찬성률 97.1%" last year's: neither is
+    // a decimal standing right after the word.
+    find: /(?:찬성|가결) (\d+\.\d)%/g,
+    allow: ["50.6"],
+  },
+  {
+    id: "agm-against",
+    fact: "49.4% vote against the appointment (사건 23)",
+    files: AGM,
+    find: /반대 (\d+\.\d)%/g,
+    allow: ["49.4"],
+  },
+  {
+    id: "agm-followers",
+    fact: "of the 49.4%, 22.7% is foreign institutions that follow 클리어보트",
+    files: AGM,
+    find: /외국인 기관(?:이)? (\d+\.\d)%/g,
+    allow: ["22.7"],
+  },
+  {
+    id: "agm-others",
+    fact: "of the 49.4%, 18.7% is the other institutions; 국민연금's 8% is the rest",
+    files: AGM,
+    find: /그 밖의 기관(?:이)? (\d+\.\d)%/g,
+    allow: ["18.7"],
   },
   {
     id: "yun-dismissal",
