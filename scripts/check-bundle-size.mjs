@@ -105,6 +105,13 @@ const budgets = [
   // the prologues' staged unlocks. The list of steps and its copy are kept
   // out of this chunk; they load with the runtime.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 37_870, maxGzip: 14_200 },
+  // The season's result card: the two buttons at the ending, the card's
+  // model and the canvas code that draws it, in one chunk the ending asks for
+  // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
+  // here and not in the report's chunk because that chunk had 181 gzip bytes
+  // left (14,219 of 14,400); what the report's chunk carries for the card is
+  // the import alone, and with it that chunk measures 45,589 / 14,377.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_200 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

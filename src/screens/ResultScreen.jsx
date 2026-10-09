@@ -111,6 +111,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingVisualClass={view.endingVisualClass}
             endingImage={endingSceneProfile?.image ?? "/ending-final-archive.webp"}
             reportTitleRef={titleRef}
+            card={view}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>

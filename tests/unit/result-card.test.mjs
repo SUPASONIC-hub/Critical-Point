@@ -349,7 +349,9 @@ test("the card's modules never mention a field that says who played", () => {
   const pattern = new RegExp(`\\b(${[...FORBIDDEN, "player_name", "run_id", "run_tag", "session_code"].join("|")})\\b`);
   // The one `.name` there is: how a rejected share says the player cancelled it.
   const ABORT_CHECK = 'error?.name === "AbortError"';
-  for (const file of ["resultCard.js", "resultCardModel.js", "resultCardCopy.js"]) {
+  // The buttons' file is in the list because it is handed the report screen's
+  // whole view, and is where the card's four inputs are taken out of it.
+  for (const file of ["resultCard.js", "resultCardModel.js", "resultCardCopy.js", "components/ResultCardShare.jsx"]) {
     const source = readFileSync(new URL(`../../src/${file}`, import.meta.url), "utf8");
     const read = file === "resultCard.js" ? source.replace(ABORT_CHECK, "") : source;
     if (file === "resultCard.js") assert.equal(source.split(ABORT_CHECK).length, 2, "the abort check is written once");
