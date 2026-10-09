@@ -7,6 +7,7 @@ import {
   ALL_RULES,
   getTableRules,
   getUnlockIntro,
+  getUnlockKicker,
   introFor,
   MUTATION_RULES,
   rulesFor,
@@ -112,6 +113,28 @@ test("every step says something, in 합니다체, and the first one explains the
   }
   assert.deepEqual(UNLOCK_LADDER[0].adds, [], "프롤로그 01 turns nothing on");
   assert.match(introFor("prologue01", staged)[0], /밀면.*확정.*심박/, "and says how to push, cash and listen");
+});
+
+test("the line over an introduction says the rules have grown, except over the first table, where nothing has", () => {
+  assert.equal(UNLOCK_INTRO_KICKER, "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다");
+  assert.equal(getUnlockKicker("prologue01"), "FIRST TABLE · 이 판은 이렇게 합니다");
+  assert.equal(UNLOCK_LADDER[0].kicker, getUnlockKicker("prologue01"));
+  for (const step of UNLOCK_LADDER.slice(1)) {
+    assert.equal(step.kicker, UNLOCK_INTRO_KICKER, step.caseId);
+    assert.equal(getUnlockKicker(step.caseId), UNLOCK_INTRO_KICKER);
+  }
+  assert.equal(getUnlockKicker("case01"), UNLOCK_INTRO_KICKER, "a case with no step has the shared line, and no introduction to put it over");
+  assert.equal(getUnlockKicker(undefined), UNLOCK_INTRO_KICKER);
+});
+
+test("heat is 열기 in every line, as the table's own gauge is labelled", () => {
+  for (const step of UNLOCK_LADDER) {
+    for (const line of step.intro) assert.doesNotMatch(line, /열(?!기)/, `${step.caseId}: "${line}"`);
+  }
+  assert.deepEqual(UNLOCK_LADDER[3].intro.slice(1), [
+    "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
+    "카드를 건 뒤 심박에 맞춰 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 박자를 놓치면 열기가 오릅니다.",
+  ]);
 });
 
 test("every next-table mutation but REBOOT belongs to a rule", () => {

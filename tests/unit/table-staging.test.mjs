@@ -78,6 +78,20 @@ test("the introduction is read against the briefing's clock, a line counted as a
   assert.match(briefing, /const intro = getBriefingIntro\(node, nodeId, run\);/);
 });
 
+test("the introduction is written straight after the speaker, and the breach panel stays last", () => {
+  // The order the panels are written in is the order a phone stacks them and
+  // a screen reader reads them; the grid places them in the same order by line.
+  const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
+  const order = ["gx-panel-splash", "gx-panel-speaker", 'data-testid="unlock-intro"', "gx-panel-story", "gx-panel-file", 'data-testid="protocol-breach"'].map((mark) => briefing.indexOf(mark));
+  assert.ok(order.every((index) => index > 0));
+  assert.deepEqual(order, [...order].sort((a, b) => a - b));
+  const rows = [...briefing.matchAll(/style=\{at\("(\d+) \/ /g)].map((match) => Number(match[1]));
+  assert.deepEqual(rows, [1, 1, 2, 3, 3, 4], "picture and speaker, the introduction, story and file, the breach");
+  // The page is still named by its scene title, not by the panel.
+  assert.match(briefing, /aria-labelledby="gx-comic-title"/);
+  assert.match(briefing, /<p className="gx-breach-kicker">\{getUnlockKicker\(node\.caseId\)\}<\/p>/);
+});
+
 test("the stage draws under the rules the engine plays under, with no second answer of its own", () => {
   // Until the switch was on, a debug address (`?staged=1`) drew each case
   // under its step while the engine went on playing every rule. The stage now

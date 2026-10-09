@@ -31,7 +31,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, CASE_START_NODES, caseOpeningRoutes, nodeOrders, nodes } from "../src/gameData.js";
-import { UNLOCK_INTRO_KICKER, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import { UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { BANNED, RETIRED_PHRASES, findBannedWords, findRetiredPhrases } from "./plain-language-rules.mjs";
 
 // Every case file is copy, so the list reads the folder rather than naming each
@@ -275,7 +275,7 @@ for (const file of [...COPY_FILES, ...SCREEN_COPY_FILES]) {
 // A rule's introduction is one line on a briefing, with no room for a
 // parenthesis: it is about the table and says no word that would need one.
 for (const step of UNLOCK_LADDER) {
-  for (const line of [UNLOCK_INTRO_KICKER, ...step.intro]) {
+  for (const line of [step.kicker, ...step.intro]) {
     for (const term of GLOSSARY.filter((word) => line.includes(word))) {
       failures.push(`src/gauntlet/tableUnlocks.js: ${step.caseId}'s introduction says "${term}" with no room to explain it ("${line}")`);
     }

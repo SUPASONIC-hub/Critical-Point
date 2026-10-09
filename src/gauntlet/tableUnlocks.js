@@ -83,7 +83,11 @@ function freezeSet(values) {
 
 export const ALL_RULES = freezeSet(TABLE_RULES);
 
-/** The line over a case's introduction of its new rules. */
+/**
+ * The line over a case's introduction of its new rules. A step may carry its
+ * own (`kicker`): 프롤로그 01 adds nothing to anything, so it does not say
+ * that the rules have grown.
+ */
 export const UNLOCK_INTRO_KICKER = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
 
 /**
@@ -99,6 +103,7 @@ const STEPS = [
   {
     caseId: "prologue01",
     adds: [],
+    kicker: "FIRST TABLE · 이 판은 이렇게 합니다",
     intro: ["밀면 열기와 배율이 오릅니다. 벽에 닿기 전에 확정하십시오. 심박이 빨라지면 벽이 가깝습니다."],
   },
   {
@@ -122,8 +127,8 @@ const STEPS = [
     adds: ["fracture", "overclock", "lock"],
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
-      "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열도 커집니다.",
-      "카드를 건 뒤 심박에 맞춰 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 박자를 놓치면 열이 오릅니다.",
+      "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
+      "카드를 건 뒤 심박에 맞춰 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 박자를 놓치면 열기가 오릅니다.",
     ],
   },
   {
@@ -135,7 +140,8 @@ const STEPS = [
 
 /**
  * The ladder as it is read: each step with the rules it adds, every rule on
- * by then (`rules`, the ones before it and its own), and its lines.
+ * by then (`rules`, the ones before it and its own), its lines and the line
+ * over them.
  */
 export const UNLOCK_LADDER = Object.freeze(
   STEPS.reduce((ladder, step) => {
@@ -145,6 +151,7 @@ export const UNLOCK_LADDER = Object.freeze(
       adds: Object.freeze([...step.adds]),
       rules: freezeSet([...before, ...step.adds]),
       intro: Object.freeze([...step.intro]),
+      kicker: step.kicker ?? UNLOCK_INTRO_KICKER,
     }));
     return ladder;
   }, []),
@@ -182,4 +189,9 @@ export function getTableRules(caseId, run, staged = STAGED) {
 
 export function getUnlockIntro(caseId, run, staged = STAGED) {
   return introFor(caseId, { veteran: run?.veteran === true, staged });
+}
+
+/** The line over a case's introduction: the step's own, or the shared one. */
+export function getUnlockKicker(caseId) {
+  return STEP_BY_CASE.get(caseId)?.kicker ?? UNLOCK_INTRO_KICKER;
 }

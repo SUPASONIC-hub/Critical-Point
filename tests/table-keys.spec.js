@@ -4,7 +4,7 @@ import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY
 import { CASE_START_NODES } from "../src/gameCases.js";
 import { nodes } from "../src/gameData.js";
 import { getReadingSeconds } from "../src/gauntlet/gauntletEngine.js";
-import { MUTATION_RULES, UNLOCK_INTRO_KICKER, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import { MUTATION_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import {
   cashStakedCard,
   clickElement,
@@ -13,6 +13,7 @@ import {
   dismissProtocolBreach,
   startDebugNode,
   TRANSITION_TIMEOUT_MS,
+  waitForEntrance,
 } from "./helpers/gameFlow.js";
 import { openBrokenBoard } from "./helpers/layout.js";
 import { seedSave } from "./helpers/seededSave.js";
@@ -392,12 +393,15 @@ test("the relic draft keeps focus inside it, and Enter takes the focused relic",
  */
 const WHOLE = { beat: true, lock: true, stance: true, chain: true };
 const NO_LOCK = { beat: true, lock: false, stance: false, chain: false };
+/** The line over an introduction. 프롤로그 01 has its own: nothing was added to the first table. */
+const FIRST_TABLE = "FIRST TABLE · 이 판은 이렇게 합니다";
+const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
 const STAGED_STEPS = [
-  { caseId: "prologue01", on: { beat: false, lock: false, stance: false, chain: false }, lines: 1 },
-  { caseId: "prologue02", on: NO_LOCK, lines: 2 },
-  { caseId: "prologue03", on: NO_LOCK, lines: 2 },
-  { caseId: "prologue04", on: { beat: true, lock: true, stance: false, chain: true }, lines: 3 },
-  { caseId: "prologue05", on: WHOLE, lines: 1 },
+  { caseId: "prologue01", on: { beat: false, lock: false, stance: false, chain: false }, lines: 1, kicker: FIRST_TABLE },
+  { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue03", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue04", on: { beat: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
+  { caseId: "prologue05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];
 
@@ -469,7 +473,7 @@ for (const step of STAGED_STEPS) {
     if (step.lines > 0) {
       const lines = UNLOCK_LADDER.find((rung) => rung.caseId === step.caseId).intro;
       expect(lines).toHaveLength(step.lines);
-      await expect(intro.locator(".gx-breach-kicker")).toHaveText(UNLOCK_INTRO_KICKER);
+      await expect(intro.locator(".gx-breach-kicker")).toHaveText(step.kicker);
       await expect(intro.locator("li")).toHaveText([...lines]);
     } else {
       await expect(intro).toHaveCount(0);
@@ -506,6 +510,130 @@ test("staged: the introduction is on a case's first briefing alone, and on that 
 
   await openBriefing(page, "prologue02", "p2_site");
   await expect(page.getByTestId("unlock-intro"), "a later scene of the case has nothing new to say").toHaveCount(0);
+});
+
+/**
+ * Where the introduction sits. It was the last panel of the page, under the
+ * story and the case file -- 500 to 700px below the first screen of a phone --
+ * so a player who pressed 판 열기 without scrolling never saw it. It is now the
+ * panel straight after the speaker: on the first screen with the question, on
+ * a phone and on a laptop, with the breach panel left at the end of the page.
+ */
+const measureIntro = (page) =>
+  page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      return rect ? { top: Math.round(rect.top), bottom: Math.round(rect.bottom), left: Math.round(rect.left), right: Math.round(rect.right) } : null;
+    };
+    const open = document.querySelector("[data-testid='open-table']");
+    const openBox = open.getBoundingClientRect();
+    const hit = document.elementFromPoint(openBox.left + openBox.width / 2, openBox.top + openBox.height / 2);
+    const dock = box(".gx-comic-actions");
+    return {
+      intro: box("[data-testid='unlock-intro']"),
+      question: box(".gx-balloon"),
+      speaker: box(".gx-panel-speaker"),
+      story: box(".gx-panel-story"),
+      picture: box(".gx-panel-splash"),
+      breach: box("[data-testid='protocol-breach']"),
+      open: box("[data-testid='open-table']"),
+      // On a short screen the footer is not a box of its own and only 판 열기 is docked.
+      dockTop: dock && dock.bottom > dock.top ? dock.top : Math.round(openBox.top),
+      openTakesThePointer: Boolean(hit && (hit === open || open.contains(hit))),
+      panels: [...document.querySelectorAll(".gx-comic-page .gx-panel")].map((panel) => panel.dataset.testid ?? panel.className.replace("gx-panel ", "")),
+      pageWidth: document.documentElement.scrollWidth,
+    };
+  });
+
+/**
+ * The reading clock starts held, so it does not open the table under a
+ * measurement. Asked for as a setting, not by pressing the clock: the page is
+ * measured as it lands, with nothing on it pressed or scrolled.
+ */
+const holdReadingClock = (page) =>
+  page.addInitScript(
+    ({ key, value }) => localStorage.setItem(key, value),
+    { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ holdReadingClock: true }) },
+  );
+
+/** A prologue's opening page at `size`, once its panels have landed. */
+async function openIntroPage(page, caseId, size, { reboot = false, rootFontSize = null } = {}) {
+  await page.setViewportSize(size);
+  await openBriefing(page, caseId);
+  if (reboot) {
+    // As a played run meets it: the case before closed, and left its REBOOT.
+    const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    await page.goto("/profile.jpg");
+    save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations: ["reboot"] }, openSeed: null };
+    await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
+    await page.goto("/?debug=1");
+    await expect(page.getByTestId("protocol-breach")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  }
+  await page.addStyleTag({ content: `.debug-overlay { display: none !important; }${rootFontSize ? ` :root { font-size: ${rootFontSize} !important; }` : ""}` });
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+  await waitForEntrance(page.getByTestId("scene-briefing"));
+}
+
+for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+  test(`staged: the introduction is on the first screen with the question at ${size.width}x${size.height}`, async ({ page }) => {
+    test.setTimeout(240_000);
+    await holdReadingClock(page);
+    const phone = size.width < 700;
+    for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
+      await openIntroPage(page, step.caseId, size, { reboot: step.caseId === "prologue02" });
+      const at = await measureIntro(page);
+      const where = `${step.caseId} @ ${size.width}x${size.height}`;
+
+      expect(at.intro.top, `${where}: the panel starts under the speaker`).toBeGreaterThanOrEqual(at.speaker.bottom);
+      expect(at.intro.bottom, `${where}: and ends above the docked footer`).toBeLessThanOrEqual(at.dockTop);
+      expect(at.intro.bottom, `${where}: inside the screen`).toBeLessThanOrEqual(size.height);
+      expect(at.intro.left >= 0 && at.intro.right <= size.width, `${where}: no wider than the screen`).toBe(true);
+      expect(at.question.top >= 0 && at.question.bottom <= at.dockTop, `${where}: the question is on the first screen too`).toBe(true);
+      expect(at.story.top, `${where}: the story follows the panel`).toBeGreaterThanOrEqual(at.intro.bottom);
+      // On a phone the header and the picture band come first; on a laptop the picture is beside the speaker.
+      if (phone) expect(at.picture.bottom, `${where}: the picture is above the speaker`).toBeLessThanOrEqual(at.speaker.top);
+      else expect(at.picture.top, `${where}: the picture is beside the speaker`).toBe(at.speaker.top);
+      expect(at.openTakesThePointer, `${where}: 판 열기 is not covered`).toBe(true);
+      expect(at.open.bottom, `${where}: 판 열기 is docked on screen`).toBeLessThanOrEqual(size.height);
+      expect(at.pageWidth, `${where}: nothing is wider than the screen`).toBeLessThanOrEqual(size.width + 1);
+      // Written in the order they are seen, which is the order they are read aloud.
+      expect(at.panels.slice(0, 4)).toEqual(["gx-panel-splash", "gx-panel-speaker", "unlock-intro", "gx-panel-story"]);
+      if (step.caseId === "prologue02") {
+        expect(at.panels.at(-1), `${where}: the breach panel is still the last one`).toBe("protocol-breach");
+        expect(at.breach.top, `${where}: under everything else`).toBeGreaterThan(at.story.bottom - 1);
+      }
+    }
+  });
+}
+
+test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a phone on its side and at a large type size", async ({ page }) => {
+  test.setTimeout(300_000);
+  await holdReadingClock(page);
+  const SCREENS = [
+    { name: "360x740", size: { width: 360, height: 740 } },
+    { name: "844x390", size: { width: 844, height: 390 } },
+    // The reader's own type size, a quarter larger: the sheets' em breakpoints follow it.
+    { name: "390x844, 20px type", size: { width: 390, height: 844 }, rootFontSize: "20px" },
+  ];
+  for (const screen of SCREENS) {
+    for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
+      await openIntroPage(page, step.caseId, screen.size, { reboot: step.caseId === "prologue02", rootFontSize: screen.rootFontSize });
+      const where = `${step.caseId} @ ${screen.name}`;
+      const at = await measureIntro(page);
+      expect(at.intro, `${where}: the page carries the introduction`).not.toBeNull();
+      expect(at.open.top >= 0 && at.open.bottom <= screen.size.height, `${where}: 판 열기 is on screen before any scrolling`).toBe(true);
+      expect(at.openTakesThePointer, `${where}: 판 열기 is not covered`).toBe(true);
+      expect(at.pageWidth, `${where}: nothing is wider than the screen`).toBeLessThanOrEqual(screen.size.width + 1);
+      // Scrolled to the panel, it is whole above whatever is docked.
+      await page.getByTestId("unlock-intro").evaluate((panel) => panel.scrollIntoView({ block: "start" }));
+      const scrolled = await measureIntro(page);
+      expect(scrolled.openTakesThePointer, `${where}: 판 열기 is still pressable with the panel at the top`).toBe(true);
+      expect(scrolled.open.bottom, `${where}: and still docked`).toBeLessThanOrEqual(screen.size.height);
+    }
+    // And it opens the table.
+    await clickThroughMotion(page.getByTestId("open-table"), `판 열기 @ ${screen.name}`);
+    await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  }
 });
 
 // The draft a case shows was offered as the case before it closed, so the
@@ -579,7 +707,7 @@ test("a new run meets the table in steps: 프롤로그 01 has no beat and breaks
   // The first page says what the table is, and its start button can be pressed
   // with the panel on the page (the gate is pressed where the pointer lands).
   const intro = page.getByTestId("unlock-intro");
-  await expect(intro.locator(".gx-breach-kicker")).toHaveText(UNLOCK_INTRO_KICKER);
+  await expect(intro.locator(".gx-breach-kicker")).toHaveText(FIRST_TABLE);
   await expect(intro.locator("li")).toHaveText([...UNLOCK_LADDER[0].intro]);
   await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
   await dismissProtocolBreach(page);
