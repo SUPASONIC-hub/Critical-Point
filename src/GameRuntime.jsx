@@ -83,7 +83,7 @@ import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
 import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
-import { nextCaseSignals } from "./caseCopy.js";
+import { getNextCaseSignal } from "./caseCopy.js";
 import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
@@ -392,7 +392,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     () => seasonViewModels.createLocalLeaderboardRows({ caseResults, localRankingRows, playerName, runId, seasonCasesBase, sessionCode }),
     [caseResults, localRankingRows, playerName, runId, sessionCode],
   );
-  const nextCaseSignal = nextCaseSignals[currentCase];
+  const nextCaseSignal = getNextCaseSignal(currentCase, log);
   const replaceQueueEvent = useStableEvent(replacePendingTelemetry);
   // Starting, opening, jumping, leaving and wiping the run: each an event the
   // run's definition answers with a patch, applied and saved in one step.

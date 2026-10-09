@@ -216,7 +216,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <section className={`interlude-panel mood-${nextCaseSignal.interlude.mood}`} aria-label="막간">
               <span>{nextCaseSignal.interlude.label}</span>
               <h2>{nextCaseSignal.interlude.title}</h2>
-              <p>{nextCaseSignal.interlude.text}</p>
+              {[nextCaseSignal.interlude.text].flat().map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
           {nextCaseSignal && (

@@ -235,7 +235,7 @@ year.
 
 | Case | Dates |
 |---|---|
-| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The copy prints none of these dates, only the weekday and the intervals |
+| 사건 15-16 | 수능 11월 13일 (목); 첫눈 11월 27일 (목), two weeks later; 리스 승인위원회 12월 3일 (수), twelve days before 사건 17 opens. The scenes print none of these dates, only the weekday and the intervals; 사건 16's interlude prints 11월 27일 and 12월 3일 without a weekday and is itself dated 12월 10일, a week after the committee |
 | 사건 17 | 12월 15일 (월) to 인사위원회 12월 19일 (금); 송년회 12월 21일 (일) |
 | 사건 18 | 12월 22일 (월), the morning after the 송년회; 서명 기한 12월 29일 (월) 09시; 12월 31일 |
 | 사건 19 | 1월 19일 (월) to 1월 22일 (목); change notice 1월 16일 (금); demolition 1월 22일 06시 |
