@@ -317,6 +317,13 @@ export default defineConfig(({ command, mode }) => ({
     },
   },
   build: {
+    // A lazy import is written with the list of files to preload beside it.
+    // The result card's chunk leans only on files the ending screen has
+    // already run, so its list is left out: writing it cost the report's chunk
+    // about 120 gzip bytes it did not have (scripts/check-bundle-size.mjs).
+    modulePreload: {
+      resolveDependencies: (filename, deps) => (/\/ResultCardShare-/.test(filename) ? [] : deps),
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {

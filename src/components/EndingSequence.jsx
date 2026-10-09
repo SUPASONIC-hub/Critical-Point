@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
+import { quietImport } from "../state/chunkReload.js";
 import { focusSceneTitle } from "../state/sceneFocus.js";
 
 export function EndingSequence({
@@ -27,6 +28,7 @@ export function EndingSequence({
   endingVisualClass,
   endingImage,
   reportTitleRef,
+  card,
 }) {
   const endingArt = getArtSources(endingImage);
   // Each step puts a new block on the page and takes the pressed 다음 away
@@ -38,20 +40,31 @@ export function EndingSequence({
   useEffect(() => {
     focusSceneTitle(endingStep < 3 ? stepStartRef : reportTitleRef);
   }, [endingStep, reportTitleRef]);
+  // The result card's buttons and everything that draws the card are a chunk of
+  // their own, asked for when the ending opens so that they are here by the
+  // time the record does (step 3). `quietImport`: a chunk that does not arrive
+  // leaves the ending without the two buttons, not with a reloaded page.
+  const [cardChunk, setCardChunk] = useState();
+  useEffect(() => {
+    quietImport(() => import("./ResultCardShare.jsx")).then(setCardChunk, () => {});
+  }, []);
   // The twists change under a button that stays where it is, so focus does not
   // move and nothing would be said: the region below says each one.
   const announcement =
     endingStep === 0
       ? endingTwistIndex === 0 ? "" : `${currentEndingTwist.label}. ${currentEndingTwist.title}. ${currentEndingTwist.copy}`
       : endingStep === 1
-        ? endingQuietLine || ""
+        ? endingQuietLine
         : endingStep === 3
           ? `기록이 열렸습니다. ${unopenedRecordCount}개의 기록이 아직 열리지 않았습니다.`
           : "";
 
+  // Every ending has a palette and a class of its own, the unnamed ones
+  // "archive" (getEndingAtmosphere, getEndingVisualClass in advancedSystems.js);
+  // the quiet line is a string, empty when nothing was said (useRunReadout.js).
   return (
     <section
-      className={`ending-sequence ending-step-${endingStep} ending-palette-${endingAtmosphere?.palette ?? "archive"} ${endingVisualClass ?? ""}`}
+      className={`ending-sequence ending-step-${endingStep} ending-palette-${endingAtmosphere.palette} ${endingVisualClass}`}
       aria-label="최종 엔딩 시퀀스"
     >
       <picture>
@@ -86,7 +99,7 @@ export function EndingSequence({
       {endingStep === 0 && (
         <div className="ending-beat">
           <span>
-            RECORD {Math.min(endingTwistIndex + 1, endingTwistCount)} / {endingTwistCount} · {currentEndingTwist.label}
+            RECORD {endingTwistIndex + 1} / {endingTwistCount} · {currentEndingTwist.label}
           </span>
           <blockquote>{currentEndingTwist.evidence}</blockquote>
           <div className="ending-twist-card">
@@ -166,6 +179,7 @@ export function EndingSequence({
           <small>단서 {unopenedClueCount}개 · 밟지 않은 갈래 {unopenedBranchCount}개</small>
           <small>다음 참가자는 이 빈칸을 이어받습니다.</small>
           <p>이제 기록 열람을 시작할 수 있습니다.</p>
+          {cardChunk && <cardChunk.default card={card} />}
         </div>
       )}
     </section>

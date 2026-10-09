@@ -909,10 +909,19 @@ const seasonInterludes = {
     text: "추석 다음 날, 문하준이 스케치북 한 장을 들고 떡집에 왔습니다. 협동조합으로 다시 여는 가온정밀의 새 이름 후보입니다. '가온정밀 2' '아빠네 공장' '끝까지정밀'. 김 반장이 세 번째에 동그라미를 치자 강태민이 박수를 치고, 권도현은 '상호에 부사를 넣으면 등기가 되나요'를 진지하게 검색합니다. 문가을은 아무 말 없이 떡을 한 접시 더 썹니다. 그 접시가 대답입니다.",
   },
   case06: {
-    mood: "wry",
+    mood: "quiet",
     label: "막간 · 회사 앞 포장마차",
     title: "반재욱이 술을 샀다. 그는 원래 안 마신다",
-    text: "그는 소주 한 병을 시켜놓고 자기 잔은 채우지 않았습니다. 수첩도 펴지 않았습니다. 한참 뒤에 그가 말했습니다. '나는 사람을 믿는 걸 일로 만들지 않으려고 이 직업을 골랐습니다.' 그리고 잔을 당신 쪽으로 밀었습니다. '오늘은 실패했습니다.'",
+    cardOf: "c6_aftershock",
+    text: [
+      "위원회 이틀 전 — 오진우 결근 사흘째. 사직서는 제출되지 않음.",
+      "위원회 당일 — 2층 인사위원회실, 위원 5명. 오진우는 어느 쪽에도 동의하지 않음.",
+      "위원회 당일 저녁 — 오진우 사직서 제출.",
+      "위원회 다음 날 오전 — 사직서 아직 수리되지 않음. 설정값 자료 열람 요청 3건.",
+      "위원회 다음 날 — 당신이 고른 것: {card}.",
+      "한참 뒤에 그가 말했습니다. '나는 사람을 믿는 걸 일로 만들지 않으려고 이 직업을 골랐습니다.' 그리고 잔을 당신 쪽으로 밀었습니다. '오늘은 실패했습니다.'",
+    ],
+    fallback: "위원회 다음 날 — 통로 끝 자리는 치워지지 않음.",
   },
   case13: {
     mood: "wry",
@@ -936,11 +945,18 @@ const seasonInterludes = {
       "수능 다음 날, 트리거랩 게시판에 명함 시안 한 장이 압정으로 꽂힙니다. 반재욱이 감사팀 프린터 사용 경위서를 A4 두 장으로 제출했다는 소문이 돌고, 나준혁은 피켓 두 장을 코팅해 영동지점 객장에 걸겠다고 합니다. 이서준이 누나 휴대폰으로 단체방에 한 줄을 남깁니다. '핫팩 아직 60개 남았어요. 반장님 거 맞죠?' 강태민의 답은 한 글자입니다. '써.'",
   },
   case16: {
-    mood: "wry",
+    mood: "still",
     label: "막간 · 12월 둘째 주",
-    title: "다람이가 단체방에 들어왔다",
-    text:
-      "승인위원회 일주일 뒤, 야간조 단체방에 새 멤버가 들어왔습니다. 프로필 사진은 주황색 불빛 두 개, 이름은 '다람이(대리 하온)'. 유하온이 로봇의 오류 알림을 단체방으로 연결해 놓은 겁니다. 첫 메시지는 '비닐 감김 C-14', 두 번째는 '그냥 삐짐'. 배수경이 '또 삐졌어?'라고 답하자 강태민이 컵라면 사진을 올립니다. 권도현은 알림 한 건당 데이터 요금을 계산해 보내고, 최서진은 조용히 이모티콘 하나를 누릅니다. 도토리입니다.",
+    title: "야간조 80명, 문자 뒤 13일",
+    cardOf: "c16_final",
+    text: [
+      "11월 27일 04:12 — 계약 종료 문자 1통. 받은 사람 80명, 종료일 12월 31일.",
+      "11월 27일 — 강태민, 처음으로 낮에 트리거랩 4층 방문.",
+      "12월 3일 — KD캐피탈 리스 승인위원회. 원안의 조건: 야간 인력 80명 연내 정리.",
+      "12월 3일 — 당신이 고른 것: {card}.",
+      "12월 10일 — 문자 취소 공지 0건. 12월 31일까지 21일.",
+    ],
+    fallback: "12월 3일 — 위원회가 당신에게 준 발언 시간: 5분.",
   },
   case17: {
     mood: "warm",
@@ -950,11 +966,18 @@ const seasonInterludes = {
       "송년회 다음 날 아침, 반재욱이 가방을 열다 멈춥니다. 앞주머니에 서아가 연습장 한 장을 접어 넣어 놓았습니다. 제목은 '아빠가 다시 만난 사람'. 정태오 아저씨, 별 다섯 개. 소스 통 아빠, 별 네 개 반(너무 세게 흔들어서 반 개 뺌). 권도현이 그 페이지 사진을 받고 '평가 기준이 불투명합니다'라고 답장을 보냈다가, 서아에게 별 한 개를 받습니다. 반재욱은 그날 그 한 장을 앞주머니에 넣은 채 출근합니다.",
   },
   case18: {
-    mood: "wry",
+    mood: "quiet",
     label: "막간 · 새해 첫 출근",
-    title: "권도현이 떡값을 송금했다",
-    text:
-      "새해 첫 출근날, 가을떡방 통장에 권도현 이름으로 4만 2천 원이 들어왔습니다. 메모란에는 '계산기 떡 1개, 흑자 표기 포함'. 문가을이 전화해 선물은 원래 공짜라고 하자 그가 대답합니다. '받은 선물에 값을 안 매기면 제 장부가 안 맞습니다.' 그 얘기를 들은 나준혁은 올해 마니또도 권도현으로 해 달라고 도윤하에게 부탁했습니다. 이유는 '떡값을 두 번 받을 수 있어서'입니다.",
+    title: "오진우, 제안 뒤 11일",
+    cardOf: "c18_final",
+    text: [
+      "12월 22일 — 브릿지은행 인수팀장 제안서 1통. 받은 사람 오진우. 연봉 두 배, 답변 기한 12월 29일 09시.",
+      "12월 23일 — 트리거랩 4층 탕비실. 오진우 메모장 '송별사' 연습 5회, 전부 첫 문장에서 멈춤.",
+      "12월 29일 — 당신이 고른 것: {card}.",
+      "12월 31일 — 여섯 번째 송별사, 처음으로 끝까지. '어느 책상에 앉든 그건 안 잊겠습니다.'",
+      "1월 2일 — 가을떡방 통장에 권도현 이름으로 4만 2천 원. 메모란: '계산기 떡 1개, 흑자 표기 포함'.",
+    ],
+    fallback: "12월 29일 09시 — 브릿지은행 32층. 도하람이 정한 서명 시각.",
   },
   case19: {
     mood: "warm",
@@ -1186,6 +1209,52 @@ const seasonInterludes = {
 for (const [finishedCaseId, signal] of Object.entries(nextCaseSignals)) {
   Object.assign(signal, operatorBriefs[signal.caseId]);
   signal.interlude = seasonInterludes[finishedCaseId] ?? null;
+}
+
+/**
+ * The lines an interlude shows for one run.
+ *
+ * Most interludes are one fixed paragraph and come back as that one line. The
+ * interludes of the cases in which someone leaves are dated records instead,
+ * and one line of each is the player's own: the line holding `{card}` prints
+ * the label of the card the run's log has for the scene `cardOf` names. That is
+ * the log entry's `choice`. The report's decision log prints the same entry's
+ * spoken sentence, so the two name one card in different words.
+ *
+ * A scene can have no card of the player's in the log: a bust skips the scene
+ * after it, the hidden route and the evidence turn close on finals of their
+ * own, a 판을 다시 짠다 entry is a move and not a card, the room plays a card
+ * for a player who staked none, and a restore writes table records under the
+ * scene's id. Then the record shows `fallback`, a fact that holds on every
+ * route. Never an entry from another scene.
+ */
+export function resolveInterludeLines(interlude, log = []) {
+  if (!interlude) return [];
+  const lines = [interlude.text].flat();
+  if (!interlude.cardOf) return lines;
+  const picked = [...log].reverse().find((entry) =>
+    entry?.nodeId === interlude.cardOf && entry.choice && !entry.reframe && !entry.isSystemEvent && !entry.threshold?.forced);
+  return lines.map((line) => {
+    if (!line.includes("{card}")) return line;
+    return picked ? line.replace("{card}", picked.choice) : interlude.fallback;
+  });
+}
+
+const resolvedSignals = new Map();
+
+/**
+ * The next-case panel for a closed case, with its interlude resolved against
+ * the run's log. A case whose interlude reads no card gets the table's own
+ * object back, and a resolved one is kept per text, so the runtime's memos see
+ * the same signal from one render to the next.
+ */
+export function getNextCaseSignal(caseId, log) {
+  const signal = nextCaseSignals[caseId];
+  if (!signal?.interlude?.cardOf) return signal;
+  const text = resolveInterludeLines(signal.interlude, log);
+  const key = `${caseId}\n${text.join("\n")}`;
+  if (!resolvedSignals.has(key)) resolvedSignals.set(key, { ...signal, interlude: { ...signal.interlude, text } });
+  return resolvedSignals.get(key);
 }
 
 /**

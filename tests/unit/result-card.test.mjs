@@ -349,13 +349,38 @@ test("the card's modules never mention a field that says who played", () => {
   const pattern = new RegExp(`\\b(${[...FORBIDDEN, "player_name", "run_id", "run_tag", "session_code"].join("|")})\\b`);
   // The one `.name` there is: how a rejected share says the player cancelled it.
   const ABORT_CHECK = 'error?.name === "AbortError"';
-  for (const file of ["resultCard.js", "resultCardModel.js", "resultCardCopy.js"]) {
+  // The buttons' file is in the list: it is the first of the card's code to
+  // hold what the report screen hands over.
+  for (const file of ["resultCard.js", "resultCardModel.js", "resultCardCopy.js", "components/ResultCardShare.jsx"]) {
     const source = readFileSync(new URL(`../../src/${file}`, import.meta.url), "utf8");
     const read = file === "resultCard.js" ? source.replace(ABORT_CHECK, "") : source;
     if (file === "resultCard.js") assert.equal(source.split(ABORT_CHECK).length, 2, "the abort check is written once");
     const hit = read.split("\n").find((line) => pattern.test(line));
     assert.equal(hit, undefined, `${file}: ${hit}`);
   }
+});
+
+test("the report screen hands the card four things, and the ending passes them on untouched", () => {
+  // These two files do say who played -- the report's header prints it, the
+  // ending holds the message left behind -- so they cannot be in the list
+  // above. What is held is the one line in each that the card goes through.
+  const pattern = new RegExp(`\\b(${[...FORBIDDEN, "player_name", "run_id", "run_tag", "session_code"].join("|")})\\b`);
+  const screen = readFileSync(new URL("../../src/screens/ResultScreen.jsx", import.meta.url), "utf8");
+  const handed = screen.split("\n").filter((line) => /\bcard=/.test(line));
+  assert.equal(handed.length, 1, "the card is handed over on one line");
+  const literal = handed[0].trim().match(/^card=\{\{ (.*) \}\}$/)?.[1];
+  assert.ok(literal, `an object written out where it is handed over, not a view: ${handed[0].trim()}`);
+  assert.deepEqual(
+    literal.split(", ").map((field) => field.split(":")[0]),
+    ["fingerprint", "endingVariant", "endingName", "caseResults"],
+  );
+  assert.doesNotMatch(literal, pattern);
+  assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
+  assert.deepEqual(literal.match(/\bview\b[\w?.]*/g), ["view.endingPreview?.label", "view.score.caseResults"], "of the view, only these two");
+
+  const ending = readFileSync(new URL("../../src/components/EndingSequence.jsx", import.meta.url), "utf8");
+  const uses = ending.split("\n").map((line) => line.trim()).filter((line) => /(^|[^-\w])card\b/.test(line) && !line.startsWith("//") && !line.startsWith("*"));
+  assert.deepEqual(uses, ["card,", "{cardChunk && <cardChunk.default card={card} />}"]);
 });
 
 // ------------------------------------------------------------------ drawing

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { CANON, canonYears, findCanonViolations } from "../../scripts/check-canon.mjs";
+import { CANON, canonYears, findCanonViolations, readCanon } from "../../scripts/check-canon.mjs";
 
 const PROLOGUE = "src/nodes/prologue04.js";
 
@@ -204,4 +204,44 @@ test("every canon fact has a pattern with a value to capture", () => {
     assert.ok(entry.find.global, `${entry.id} must be a global pattern`);
     assert.ok(/\((?!\?)/.test(entry.find.source), `${entry.id} captures nothing`);
   }
+});
+
+test("one reading of a file gives what the run counts and what it reports", () => {
+  // Four lines, two of them comments: a fact and a date that agree, and one of
+  // each that does not. The run adds up the first two lists and prints the third.
+  const file = "src\\nodes\\prologue02.js";
+  const text = [
+    "// 승인된 4월 12일, 4월 27일 금요일",
+    'text: "2023-0412가 승인된 4월 27일 목요일, 본점 6층 기업금융전략팀."',
+    " * 본점 9층 기업금융전략팀",
+    'text: "승인된 4월 12일 (목), 대출번호 2023-0412."',
+  ].join("\r\n");
+  const read = readCanon(text, file);
+
+  assert.deepEqual(
+    read.statements.map(({ entry, agrees, line }) => [entry.id, agrees, line]),
+    [
+      ["loan-number", true, 2],
+      ["loan-number", true, 4],
+      ["approval-date", true, 2],
+      ["approval-date", false, 4],
+      ["team-floor", true, 2],
+    ],
+  );
+  assert.deepEqual(
+    read.dates.map(({ found, agrees, line }) => [found, agrees, line]),
+    [
+      ["4월 27일 목요일", true, 2],
+      ["4월 12일 (목)", false, 4],
+    ],
+  );
+  // A comment is in neither list, and the lines after it keep their numbers.
+  assert.deepEqual(
+    read.violations.map(({ id, file: where, line }) => [id, where, line]),
+    [
+      ["approval-date", "src/nodes/prologue02.js", 4],
+      ["weekday", "src/nodes/prologue02.js", 4],
+    ],
+  );
+  assert.deepEqual(findCanonViolations(text, file), read.violations);
 });
