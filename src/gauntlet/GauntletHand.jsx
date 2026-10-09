@@ -94,17 +94,19 @@ export function GauntletHand({
             {selected && !schema.faceDown && (
               <span className="gx-card-preview">
                 <span className="sr-only">선택한 카드의 상세 영향: </span>
+                {/* First: it is the one chip about the next board rather than
+                    this one, and a short phone shows a single line of them. */}
+                {fractureAxis && (
+                  <i className="gx-card-crack" data-testid="fracture-candidate">
+                    균열 후보 · {labelOf(fractureAxis)}
+                  </i>
+                )}
                 {visibleEffects.map((effect) => (
                   <i key={effect.key} className={effect.gain ? "gain" : "cost"}>
                     {effect.label} {effect.value > 0 ? "+" : ""}{effect.value}
                   </i>
                 ))}
                 {hiddenEffectCount > 0 && <i>외 {hiddenEffectCount}</i>}
-                {fractureAxis && (
-                  <i className="gx-card-crack" data-testid="fracture-candidate">
-                    균열 후보 · {labelOf(fractureAxis)}
-                  </i>
-                )}
               </span>
             )}
             {sealed && (
