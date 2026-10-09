@@ -2,8 +2,29 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { getBalanceSignals, getPlayReport, getRankingComparison } from "../../src/advancedSystems.js";
-import { getSeasonRecordNotice } from "../../src/endingCopy.js";
+import {
+  getAftermath,
+  getAuthorityReview,
+  getBalanceSignals,
+  getDelayedConsequences,
+  getEndingAtmosphere,
+  getEndingPreview,
+  getEndingSceneProfile,
+  getEndingVisualClass,
+  getFailureCause,
+  getFailureObjectives,
+  getOriginEndingVariant,
+  getPlayReport,
+  getRankingComparison,
+  getRankingIntegrity,
+  getSeasonGoals,
+  getTelemetryDashboardSnapshot,
+} from "../../src/advancedSystems.js";
+import { getEndingAfterglow, getSeasonRecordNotice, observationLabels } from "../../src/endingCopy.js";
+import { getAchievementProgress, getEndingEpilogue, getOperationsSnapshot, getOperatorReveal } from "../../src/featurePack.js";
+import { cognitionLabels } from "../../src/gameConstants.js";
+import { ENDING_IDS, getEndingVariant, getObservationLedger, getObserverPattern, getThinkingMotive } from "../../src/gameLogic.js";
+import { easyCognitionLabels } from "../../src/playerLanguage.js";
 
 /**
  * What the report prints is copy, never a key. The full record listed choice
@@ -30,6 +51,64 @@ test("the page before the finale says whether the season record will be sent", (
   assert.equal(getSeasonRecordNotice({ nextCaseId: undefined, telemetryEnabled: true, dataConsent: true }), null);
   assert.equal(getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: false, dataConsent: true }), null);
   assert.equal(getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: false, dataConsent: false }), null);
+});
+
+/**
+ * The report and the ending read these without asking whether they are there
+ * (ResultScreen.jsx, ReportArchive.jsx, EndingSequence.jsx, endingCopy.js).
+ * The fallbacks they used to carry -- a stand-in observer record, an "open"
+ * afterglow, three sentences of an open verdict, a default plate -- could not
+ * be reached, and cost the report's chunk bytes it did not have. What made
+ * them unreachable is held here, on a run with nothing in it: the day one of
+ * these can be missing, this fails before the screen does.
+ */
+test("a run with nothing in it still has everything the report reads without asking", () => {
+  const pattern = getObserverPattern([]);
+  for (const field of ["label", "title", "text"]) assert.ok(pattern.endingRecord[field], `endingRecord.${field}`);
+  assert.ok(pattern.arc.text);
+  assert.equal(pattern.turningPoint, null);
+
+  // Four reactions, each with a label and an afterglow; the most seen of none is the first.
+  const ledger = getObservationLedger([]);
+  assert.deepEqual(Object.keys(ledger), Object.keys(observationLabels));
+  for (const observation of Object.keys(ledger)) assert.ok(getEndingAfterglow(observation).title, observation);
+  assert.equal(Object.entries(ledger).sort((a, b) => b[1] - a[1])[0][0], "compliance");
+
+  const motive = getThinkingMotive({});
+  for (const field of ["label", "when", "path"]) assert.ok(motive[field], `motive.${field}`);
+  // One table would do: the report reads the first and used to fall back on the second.
+  assert.deepEqual(easyCognitionLabels, cognitionLabels);
+
+  const collapse = getEndingVariant({ seasonHumanCost: 9999, casesPlayed: 1 });
+  assert.equal(collapse.failure, true);
+  for (const ending of [getEndingVariant({}), getEndingVariant(), collapse]) {
+    for (const field of ["id", "label", "title", "text"]) assert.ok(ending[field], `${ending.id}.${field}`);
+    assert.ok(getEndingPreview(ending).label);
+    // The retry objectives and the cause they quote come and go together.
+    assert.equal(getFailureObjectives(ending).length > 0, Boolean(ending.failure));
+    assert.equal(getFailureCause(ending) !== null, Boolean(ending.failure));
+  }
+  for (const id of [...ENDING_IDS, "open-question", "an id no ending has", undefined]) {
+    const scene = getEndingSceneProfile(id);
+    for (const field of ["location", "image", "cue", "choice"]) assert.ok(scene[field], `${id}.${field}`);
+    assert.ok(getEndingAtmosphere(id).palette, `${id} palette`);
+    assert.match(getEndingVisualClass(id), /^ending-visual-[a-z0-9-]+$/i);
+    assert.ok(getEndingEpilogue(id), `${id} epilogue`);
+    assert.ok(getAftermath(id).text);
+    assert.ok(getOriginEndingVariant(undefined, id).label);
+  }
+
+  assert.ok(getOperatorReveal().title);
+  assert.equal(getAchievementProgress().length, 3);
+  assert.ok(getOperationsSnapshot().state);
+  assert.ok(getAuthorityReview().title);
+  assert.ok(getRankingIntegrity().label);
+  assert.equal(getTelemetryDashboardSnapshot().completed, 0);
+  assert.equal(getRankingComparison().length, 3);
+  assert.equal(getSeasonGoals().length, 3);
+  assert.deepEqual(getPlayReport().route, []);
+  assert.deepEqual(getDelayedConsequences(), []);
+  assert.deepEqual(getBalanceSignals(), []);
 });
 
 test("the route in the play report is the scenes passed, by title", () => {

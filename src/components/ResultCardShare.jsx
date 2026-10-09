@@ -7,21 +7,6 @@ import { RESULT_CARD_COPY, RESULT_CARD_STATUS } from "../resultCardCopy.js";
 const IDLE_TIMEOUT_MS = 1500;
 
 /**
- * What the card is made from: the 판단 DNA, the ending, what a sentence calls
- * that ending, and the case summaries. The view carries who played and what
- * they wrote as well; none of that is read here, and the model reads only
- * these four whatever it is handed (src/resultCardModel.js).
- */
-function readCardInput(view) {
-  return {
-    fingerprint: view?.score?.decisionFingerprint,
-    endingVariant: view?.ending?.endingVariant,
-    endingName: view?.endingPreview?.label,
-    caseResults: view?.score?.caseResults,
-  };
-}
-
-/**
  * Whether this platform's share sheet takes a PNG. Asked with an empty file
  * before the card exists, so the row of buttons is whole from the start and
  * does not change under a thumb.
@@ -49,11 +34,13 @@ function canShareImages() {
  * chunk had no room for them, and a player who never reaches the ending does
  * not download them.
  *
- * `card` is the report screen's own view, handed over whole because the
- * report's chunk had no bytes left to pick from it; `readCardInput` below is
- * where the four things a card is made from are taken out of it.
+ * `card` is the four things a card is made from and nothing else: the 판단
+ * DNA, the ending, what a sentence calls that ending, and the case summaries.
+ * The report screen picks them out of its view (`ResultScreen.jsx`), so who
+ * played and what they wrote never reach this chunk. It was the whole view for
+ * a day, while the report's chunk had no bytes left to pick with.
  *
- * @param {{ card: object }} props
+ * @param {{ card: { fingerprint?: object, endingVariant?: object, endingName?: string, caseResults?: object } }} props
  */
 export default function ResultCardShare({ card }) {
   const [shareable] = useState(canShareImages);
@@ -61,7 +48,8 @@ export default function ResultCardShare({ card }) {
   // when it could not be made.
   const [held, setHeld] = useState(null);
   const [said, setSaid] = useState("");
-  const input = useRef(readCardInput(card));
+  // The first render's, kept: the screen builds the object anew each render.
+  const input = useRef(card);
   const run = useRef(0);
 
   /** Makes the card, and resolves to it only if this is still the latest attempt on a mounted screen. */

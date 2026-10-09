@@ -29,7 +29,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile, unopenedClueCount },
     score: {
       decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result, clamp,
-      easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
+      easyCognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
       routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, caseResults,
     },
     telemetry: {
@@ -52,7 +52,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       title: entry.title,
       text: entry.observerTag.text,
     }));
-  const observerTurningPoint = observerPattern?.turningPoint;
+  const observerTurningPoint = observerPattern.turningPoint;
   const clueTotal = clueCount + unopenedClueCount;
   return (
     <details className="report-archive" onToggle={(event) => setOpen(event.currentTarget.open)}>
@@ -63,19 +63,23 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       {open && (
       <div className="report-archive-body">
     <GauntletLedger log={log} summary={caseResults?.[currentCase]?.gauntlet} />
-    {currentCase === "final" && view.operatorReveal && (
+    {/* Most panels below are drawn without asking whether their record is
+        there: the runtime derives each one for every run, three goals and
+        three comparisons included (useCaseSystems.js, useResultReport.js and
+        the functions they call). The ones that still ask can be empty. */}
+    {currentCase === "final" && (
       <section className="operator-reveal-panel" aria-label="주인공 정체 공개">
         <span>{view.operatorReveal.title}</span>
         <p>{view.operatorReveal.text}</p>
       </section>
     )}
-    {currentCase === "final" && view.achievementProgress?.length > 0 && (
+    {currentCase === "final" && (
       <section className="achievement-panel ending-achievement-panel" aria-label="업적 진행">
         <span lang="en">ACHIEVEMENT TRACKER</span>
         <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
       </section>
     )}
-    {currentCase === "final" && view.operationsSnapshot && (
+    {currentCase === "final" && (
       <section className="operations-snapshot" aria-label="운영 진단">
         <span lang="en">OPERATIONS</span>
         <strong>{view.operationsSnapshot.state}</strong>
@@ -96,60 +100,51 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         <div className="observation-grid">
           {Object.entries(observationLedger).map(([key, value]) => (
             <article key={key}>
-              <span>{observationLabels[key] ?? key}</span>
+              <span>{observationLabels[key]}</span>
               <b>{value}</b>
             </article>
           ))}
         </div>
       </section>
     )}
-    {endingSceneProfile && (
-      <section className="ending-scene-profile" aria-label="엔딩 장면 프로필">
-        <span>{endingSceneProfile.location}</span>
-        <strong>{endingSceneProfile.cue}</strong>
-        <p>다음 장면의 핵심 행동: {endingSceneProfile.choice}</p>
-      </section>
-    )}
-    {view.endingPreview && (
-      <section className="ending-preview-panel" aria-label="현재 엔딩 방향">
-        <span lang="en">ENDING DIRECTION</span>
-        <strong>{view.endingPreview.label}</strong>
-        <p>{view.endingPreview.text}</p>
-      </section>
-    )}
-    {endingPreview?.rationale && <p className="ending-rationale">엔딩 근거: {endingPreview.rationale.join(" · ")}</p>}
-    {view.authorityReview && (
-      <section className="authority-review-panel" aria-label="권한 심사">
-        <span>{view.authorityReview.title}</span>
-        <strong>{view.authorityReview.text}</strong>
-        <p>{view.authorityReview.next}</p>
-      </section>
-    )}
-    {view.originEndingVariant && <p className="origin-ending-note"><strong>{view.originEndingVariant.label}</strong> {view.originEndingVariant.text}</p>}
+    <section className="ending-scene-profile" aria-label="엔딩 장면 프로필">
+      <span>{endingSceneProfile.location}</span>
+      <strong>{endingSceneProfile.cue}</strong>
+      <p>다음 장면의 핵심 행동: {endingSceneProfile.choice}</p>
+    </section>
+    <section className="ending-preview-panel" aria-label="현재 엔딩 방향">
+      <span lang="en">ENDING DIRECTION</span>
+      <strong>{endingPreview.label}</strong>
+      <p>{endingPreview.text}</p>
+    </section>
+    <p className="ending-rationale">엔딩 근거: {endingPreview.rationale.join(" · ")}</p>
+    <section className="authority-review-panel" aria-label="권한 심사">
+      <span>{view.authorityReview.title}</span>
+      <strong>{view.authorityReview.text}</strong>
+      <p>{view.authorityReview.next}</p>
+    </section>
+    <p className="origin-ending-note"><strong>{view.originEndingVariant.label}</strong> {view.originEndingVariant.text}</p>
     {view.failureObjectives?.length > 0 && (
       <section className="failure-objectives" aria-label="실패 재도전 목표">
         <strong lang="en">RETRY OBJECTIVES</strong>
         {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
         <button type="button" onClick={view.startRecoveryRoute}>복구 루트 시작</button>
-        {view.endingCause && <p className="failure-cause"><b lang="en">PRIMARY CAUSE</b> {view.endingCause.text} {view.endingCause.recovery}</p>}
+        {/* A run with objectives is a collapse, and a collapse has a cause (getFailureCause, advancedSystems.js). */}
+        <p className="failure-cause"><b lang="en">PRIMARY CAUSE</b> {view.endingCause.text} {view.endingCause.recovery}</p>
       </section>
     )}
-    {view.playReport && (
-      <section className="play-report-panel" aria-label="플레이 리포트">
-        <span lang="en">PLAYER REPORT</span>
-        <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
-        <p>최근 지나온 장면: {view.playReport.route.join(" → ") || "기록 없음"}</p>
-      </section>
-    )}
-    {view.telemetryDashboard && (
-      <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
-        <span lang="en">PLAYTEST HEALTH</span>
-        <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
-      </section>
-    )}
+    <section className="play-report-panel" aria-label="플레이 리포트">
+      <span lang="en">PLAYER REPORT</span>
+      <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
+      <p>최근 지나온 장면: {view.playReport.route.join(" → ") || "기록 없음"}</p>
+    </section>
+    <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
+      <span lang="en">PLAYTEST HEALTH</span>
+      <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
+    </section>
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && telemetryStats && <p className="telemetry-stats">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
-    {view.rankingIntegrity && <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`}><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>}
-    {view.aftermath && <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>}
+    <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`}><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>
+    <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && view.replayDiagnostics && <details className="replay-diagnostics"><summary lang="en">REPLAY DIAGNOSTICS</summary><p>{view.replayDiagnostics.text}</p></details>}
     {view.delayedConsequences?.length > 0 && (
       <section className="delayed-consequence-strip" aria-label="챕터 지연 결과">
@@ -157,18 +152,14 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         <p>{view.delayedConsequences.map((item) => item.text).join(" ")}</p>
       </section>
     )}
-    {view.rankingComparison && (
-      <section className="ranking-comparison" aria-label="기록 비교">
-        <span lang="en">RUN COMPARISON</span>
-        {view.rankingComparison.map((item) => <div key={item.label}><b>{item.label}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.value}</small></div>)}
-      </section>
-    )}
-    {view.seasonGoals && (
-      <section className="season-goal-strip result-goals" aria-label="시즌 목표">
-        <span lang="en">SEASON GOALS</span>
-        {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
-      </section>
-    )}
+    <section className="ranking-comparison" aria-label="기록 비교">
+      <span lang="en">RUN COMPARISON</span>
+      {view.rankingComparison.map((item) => <div key={item.label}><b>{item.label}</b><i><em style={{ width: `${item.value}%` }} /></i><small>{item.value}</small></div>)}
+    </section>
+    <section className="season-goal-strip result-goals" aria-label="시즌 목표">
+      <span lang="en">SEASON GOALS</span>
+      {view.seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
+    </section>
     {view.balanceSignals?.length > 0 && (
       <section className="balance-report" aria-label="플레이 밸런스 리포트">
         <span lang="en">BALANCE SIGNAL</span>
@@ -196,14 +187,13 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <span lang="en">DECISION DNA</span>
           <h2>{decisionFingerprint.modeTitle}</h2>
           <p>{decisionFingerprint.modeText}</p>
-          {decisionFingerprint.motive ? (
-            <p>
-              <b>
-                생각이 깨어나는 조건 · {decisionFingerprint.motive.label}
-              </b>{" "}
-              {decisionFingerprint.motive.when}. {decisionFingerprint.motive.path}
-            </p>
-          ) : null}
+          {/* Every run has one: 복합형 when no family led (getThinkingMotive, gameLogic.js). */}
+          <p>
+            <b>
+              생각이 깨어나는 조건 · {decisionFingerprint.motive.label}
+            </b>{" "}
+            {decisionFingerprint.motive.when}. {decisionFingerprint.motive.path}
+          </p>
         </div>
         <strong>{decisionFingerprint.mode}</strong>
       </div>
@@ -215,7 +205,9 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         </article>
         <article>
           <span lang="en">THINKING ENGINE</span>
-          <b>{easyCognitionLabels[decisionFingerprint.primaryCognition[0]] ?? cognitionLabels[decisionFingerprint.primaryCognition[0]]}</b>
+          {/* One table: the second it fell back on names the same four ways of
+              thinking in the same words (cognitionLabels, gameConstants.js). */}
+          <b>{easyCognitionLabels[decisionFingerprint.primaryCognition[0]]}</b>
           <small>{decisionFingerprint.signature.join(" / ")}</small>
         </article>
         <article>
@@ -344,7 +336,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </section>
       <section className="report-section">
         <h2 lang="en">Cognitive Acceleration</h2>
-        <strong>{easyCognitionLabels[result.thinking[0]] ?? cognitionLabels[result.thinking[0]]}</strong>
+        <strong>{easyCognitionLabels[result.thinking[0]]}</strong>
         <p>로그상 가장 자주 사용된 생각 방식입니다. 선택을 빠르게 닫기보다 이 방식으로 한 번 더 버티거나 뒤집었습니다.</p>
       </section>
       <section className="report-section">
