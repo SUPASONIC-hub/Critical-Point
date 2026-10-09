@@ -975,7 +975,7 @@ const seasonInterludes = {
       "12월 23일 — 트리거랩 4층 탕비실. 오진우 메모장 '송별사' 연습 5회, 전부 첫 문장에서 멈춤.",
       "12월 29일 — 당신이 고른 것: {card}.",
       "12월 31일 — 여섯 번째 송별사, 처음으로 끝까지. '어느 책상에 앉든 그건 안 잊겠습니다.'",
-      "1월 2일 — 새해 첫 출근. 임경수 폐렴 입원 중. 헌책방 철거 예고일 4월 14일.",
+      "1월 2일 — 가을떡방 통장에 권도현 이름으로 4만 2천 원. 메모란: '계산기 떡 1개, 흑자 표기 포함'.",
     ],
     fallback: "12월 29일 09시 — 브릿지은행 32층. 도하람이 정한 서명 시각.",
   },
@@ -1218,8 +1218,8 @@ for (const [finishedCaseId, signal] of Object.entries(nextCaseSignals)) {
  * interludes of the cases in which someone leaves are dated records instead,
  * and one line of each is the player's own: the line holding `{card}` prints
  * the label of the card the run's log has for the scene `cardOf` names. That is
- * the log entry's `choice`, the string the report's decision log is built from,
- * so the record cannot say something the report does not.
+ * the log entry's `choice`. The report's decision log prints the same entry's
+ * spoken sentence, so the two name one card in different words.
  *
  * A scene can have no card of the player's in the log: a bust skips the scene
  * after it, the hidden route and the evidence turn close on finals of their

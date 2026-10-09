@@ -629,7 +629,7 @@ test("사건 16's interlude prints the card picked at the committee, or its fall
   await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   await expect(lines).toHaveText(text.map((line) => line.replace("{card}", picked)));
   await expect(lines).toHaveCount(5);
-  // The same string the report's decision log is built from.
+  // The label of the entry the report's decision log prints for that scene.
   const logged = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2") || "null")?.log?.find((entry) => entry.nodeId === "c16_final")?.choice);
   expect(logged).toBe(picked);
   await expect(lines.nth(cardAt)).toHaveText(`12월 3일 — 당신이 고른 것: ${logged}.`);
