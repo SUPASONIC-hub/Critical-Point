@@ -360,6 +360,23 @@ test("intro and scene text stays readable against its panel", async ({ page }) =
   }
 });
 
+/**
+ * Between a phone and a desktop the intro keeps the phone's stage -- the
+ * photograph across the top, the copy over it -- on a screen wide enough that
+ * the copy is a column down its left side. Neither project's own viewport is
+ * in that range (412 and 1280 wide), and 臨界點 read 2.8:1 there until the
+ * reading line's shade was given to every width that has the stage.
+ */
+test("the intro stays readable over its picture on a tablet", async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto("/?debug=1");
+  await page.waitForSelector(".intro-shell");
+  const measured = await expectReadable(page, "intro");
+  expect(measured, "the copy over the key visual was measured").toBeGreaterThan(0);
+  const marked = await page.evaluate(() => (window.__contrastPainted ?? []).filter(({ el }) => el.matches(".wordmark-reading i, .intro-hero-copy > p")).length);
+  expect(marked, "the reading line and the premise are two of the lines read from the pixels").toBe(2);
+});
+
 test("the table and decision reveal stay readable", async ({ page }) => {
   await startAt(page, "case01", "start");
 

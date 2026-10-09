@@ -1991,9 +1991,7 @@ summary:focus-visible {
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   min-height: 260px;
-  width: 100%;
   padding: 22px 22px 20px;
   overflow: hidden;
   color: var(--ui-text);
@@ -2001,7 +1999,6 @@ summary:focus-visible {
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-1);
-  font: inherit;
   transition:
     transform var(--ui-dur) var(--ui-ease),
     border-color var(--ui-dur) var(--ui-ease),
@@ -2043,11 +2040,9 @@ summary:focus-visible {
   color: inherit;
   background: none;
   border: 0;
-  font: inherit;
   letter-spacing: inherit;
   text-align: inherit;
   cursor: inherit;
-  -webkit-text-fill-color: inherit;
 }
 .case-card-open:focus-visible {
   outline: none;
@@ -2973,6 +2968,21 @@ body {
     width: 100%;
     padding: 64px var(--ui-gutter) 28px;
   }
+  /* The reading line stands on the photograph's bright band, so it carries
+     a shade down the copy, no wider. */
+  .wordmark-reading::before {
+    content: "";
+    position: absolute;
+    inset: auto 0;
+    z-index: -1;
+    height: 100%;
+    margin-top: -80px;
+    background: linear-gradient(transparent, var(--ui-glass) 72px);
+    mask: linear-gradient(90deg, black 28rem, transparent 43rem);
+  }
+  .wordmark-reading i {
+    color: var(--ui-text-2);
+  }
   .intro .studio-credit {
     margin-top: 28px;
     transform: none;
@@ -3044,19 +3054,8 @@ body {
   .intro .start-priority {
     padding: 18px;
   }
-  /* The reading line stands on the photograph's bright band, so it carries
-     its own shade down the copy. */
   .wordmark-reading::before {
-    content: "";
-    position: absolute;
-    inset: auto 0;
-    z-index: -1;
-    height: 100%;
-    margin-top: -80px;
-    background: linear-gradient(transparent, var(--ui-glass) 72px);
-  }
-  .wordmark-reading i {
-    color: var(--ui-text-2);
+    mask: none;
   }
   /* The back button and the brand pill stay one row of pills, dropped below
      the music controls instead of stacked into full-width slabs under them. */
