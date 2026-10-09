@@ -38,6 +38,7 @@ import {
   createWindow,
   equipRelic,
   getHeartbeatBpm,
+  getTableSchema,
   openCaseRun,
   reduceWindow,
   resolveWindow,
@@ -76,6 +77,9 @@ import { createChoiceReaders } from "../src/state/useDecision.js";
  * What it does not model: the adaptive and relationship bridge choices (they
  * are runtime-local and rare), stances (FOCUS), and the continuation of a run
  * across a reload.
+ *
+ * Story mode (the comfort setting) is replayed after all of that, as seasons
+ * of its own: see the end of this file.
  */
 
 const SEASONS = Number(process.env.ENDING_SEASONS) || 600;
@@ -179,7 +183,8 @@ function mergeEffects(...effects) {
 }
 
 function playWindow(policy, run, windowSeed, rules) {
-  let win = createWindow({ schema: run.schema, seed: windowSeed, beatCombo: run.beatCombo });
+  // The run's own board, and for a story run the same board with its far wall.
+  let win = createWindow({ schema: getTableSchema(run), seed: windowSeed, beatCombo: run.beatCombo });
   win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
   // Reading the card and the band before the first press. Creep starts after
   // the grace, so a slow hand is already paying heat.
@@ -201,11 +206,15 @@ function playWindow(policy, run, windowSeed, rules) {
 
 const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label: key }]));
 
-function playSeason(seasonIndex, archetype) {
+/**
+ * `story` is a season played in story mode from its first case to its last:
+ * the run carries the mark, which is all the runtime's stamp does to it.
+ */
+function playSeason(seasonIndex, archetype, story = false) {
   const policy = makePolicy(archetype);
   const caseResults = {};
   let discoveredClues = [];
-  let run = normalizeStart();
+  let run = normalizeStart(story);
   let final = null;
   const casePeaks = [];
   let windows = 0;
@@ -279,7 +288,8 @@ function playSeason(seasonIndex, archetype) {
       const branchContext = { resources, previousOutcomeChoiceId: outcomeId };
       const branchBypass = getBranchDetourBypass(choice, branchContext);
       const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-      const skip = window.status === "bust" ? getBlackoutSkip(plannedNode, branchContext) : null;
+      // A story run is skipped past nothing (useChoiceCommit).
+      const skip = window.status === "bust" && !run.story ? getBlackoutSkip(plannedNode, branchContext) : null;
       if (skip) skipped += 1;
       const nextNode = skip ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
@@ -315,6 +325,7 @@ function playSeason(seasonIndex, archetype) {
         resourcesBefore: resources,
         resourcesAfter,
         challenge: { matched: read.challengeMatch, riskDelta: read.finalRiskDelta },
+        ...(run.story ? { assistStory: true } : {}),
         threshold: {
           busted,
           potMultiplier: verdict.multiplier,
@@ -347,8 +358,8 @@ function playSeason(seasonIndex, archetype) {
   return { ending, policy, strain, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults };
 }
 
-function normalizeStart() {
-  return { ...RUN_INITIAL_STATE };
+function normalizeStart(story = false) {
+  return { ...RUN_INITIAL_STATE, story };
 }
 
 const counts = new Map();
@@ -433,3 +444,57 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+
+/**
+ * The same season in story mode.
+ *
+ * Story mode changes what the ending reads of the table and nothing of what it
+ * reads of the story: the wall stands at 88 and up, so a season has next to no
+ * busts and a vault several times the table's, and no bust plays a scene
+ * without the player. The endings are judged by the same function on the same
+ * thresholds (a decision: story mode does not get endings of its own), so two
+ * things have to stay true under that strain. Every ending a season can close
+ * on by choosing is still reachable -- a full vault and a clean record must
+ * not fold them into one. And SYSTEM COLLAPSE still answers for the people a
+ * season spent: the wall being far away is not what it was ever about.
+ *
+ * Collapse by overreach (harm together with a bust rate) needs busts a story
+ * season does not have. It is counted and printed, not required.
+ *
+ * Two of the endings are thin here, and that is measured, not asserted away:
+ * with no bust to take trust and legitimacy down together, COLD JUSTICE and
+ * the open question each close under one story season in a hundred (about five
+ * and four of 600, against 31 and 51 at the table). They are asked to be
+ * reachable, which is what was decided; the line printed below is where to
+ * watch them thin.
+ *
+ * Played after everything above, on the same seeded stream, so the seasons
+ * above are the ones they always were.
+ */
+const STORY_SEASONS = Number(process.env.ENDING_STORY_SEASONS) || SEASONS;
+if (!process.env.ENDING_BASELINE) {
+  const storyCounts = new Map();
+  const collapseCauses = new Map();
+  const storySamples = { busts: [], windows: [], skipped: [], vaultPerCase: [] };
+  for (let index = 0; index < STORY_SEASONS; index += 1) {
+    const season = playSeason(`story:${index}`, POPULATION[index % POPULATION.length], true);
+    storyCounts.set(season.ending.id, (storyCounts.get(season.ending.id) ?? 0) + 1);
+    if (season.ending.cause) collapseCauses.set(season.ending.cause.id, (collapseCauses.get(season.ending.cause.id) ?? 0) + 1);
+    storySamples.busts.push(season.strain.seasonBusts);
+    storySamples.windows.push(season.windows);
+    storySamples.skipped.push(season.skipped);
+    storySamples.vaultPerCase.push(Math.round(season.strain.seasonVaultPerCase));
+    const unmarked = CASE_SEQUENCE.filter((caseId) => season.caseResults[caseId]?.assistStory !== true);
+    assert.deepEqual(unmarked, [], `a story season's case summaries all carry assistStory (season ${index})`);
+  }
+  assert.equal(Math.max(...storySamples.skipped), 0, "a story season skips no scene");
+  const storyMissing = EXPECTED.filter((id) => id !== "collapse" && !storyCounts.has(id));
+  assert.deepEqual(storyMissing, [], `endings a story season can no longer reach in ${STORY_SEASONS} replayed seasons: ${storyMissing.join(", ")}`);
+  const storyUnexpected = [...storyCounts.keys()].filter((id) => !EXPECTED.includes(id));
+  assert.deepEqual(storyUnexpected, [], `unlisted ending ids reached in story mode: ${storyUnexpected.join(", ")}`);
+  assert.ok((collapseCauses.get("harm") ?? 0) > 0, `no story season collapsed on the people it spent in ${STORY_SEASONS} replayed seasons`);
+  const storySpread = EXPECTED.map((id) => `${id} ${(share(storyCounts, id, STORY_SEASONS) * 100).toFixed(1)}%`).join(", ");
+  console.log(
+    `Story-mode ending checks passed (${STORY_SEASONS} replayed seasons: ${storySpread}; collapse by harm ${collapseCauses.get("harm") ?? 0}, by overreach ${collapseCauses.get("overreach") ?? 0}; busts ${band(storySamples.busts)}, windows ${band(storySamples.windows)}, vault a case ${band(storySamples.vaultPerCase)})`,
+  );
+}
