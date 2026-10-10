@@ -926,6 +926,9 @@ export const finalCase = {
     f_choice: {
       place: "트리거랩 기록 보관소 B2 · 단말 앞",
       clock: "마지막 밤 · 새벽",
+      // The other decision of the night every run makes itself: a bust on the
+      // 33rd floor comes down to this terminal, it does not pass it.
+      attended: true,
       question: "마흔아홉 사건과 1년의 마지막 선택입니다. 당신의 조건을 약점으로 두겠습니까, 도구로 쓰겠습니까?",
       lead: "마흔아홉 사건과 1년, 그리고 이 밤이 지났습니다. 트리거랩은 없어졌고, 33층에서 받은 물음은 B2까지 따라 내려왔습니다. 단말 앞에는 당신과, 반납하지 않은 열쇠를 쥔 한서윤이 있습니다.",
     },

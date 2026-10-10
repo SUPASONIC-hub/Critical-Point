@@ -73,8 +73,8 @@ function getReframeTarget(caseId, fromNodeId) {
  * player is a scene they did not read. The bust still costs what a bust costs.
  *
  * And in any run, a scene marked `attended` (its scene context says so; the
- * finale's 33rd floor is the one) is not played without the analyst either:
- * the run lands on it.
+ * finale's two decisions are, the 33rd floor and the last choice in B2) is
+ * not played without the analyst either: the run lands on it.
  */
 function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];

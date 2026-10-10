@@ -262,8 +262,8 @@ test("in every other case the rule changes nothing: no scene with a reframe card
 });
 
 test("a bust on a path's last decision still goes up to the 33rd floor, and costs what a bust costs", () => {
-  // The scene says it itself (`attended` in its scene context), and it is the only one in the season that does.
-  assert.deepEqual(Object.entries(nodes).filter(([, node]) => node.attended).map(([nodeId]) => nodeId), [FLOOR]);
+  // The scenes say it themselves (`attended` in their scene context): the night's two decisions, and nothing else in the season.
+  assert.deepEqual(Object.entries(nodes).filter(([, node]) => node.attended).map(([nodeId]) => nodeId).sort(), ["f_choice", FLOOR]);
 
   for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
     for (const card of nodes[finalId].choices) {
@@ -281,11 +281,24 @@ test("a bust on a path's last decision still goes up to the 33rd floor, and cost
     }
   }
 
-  // The rule is this scene's alone. A bust on the 33rd floor's own card is a
-  // bust like any other: the room plays f_choice without the analyst.
-  const [floorCard] = nodes[FLOOR].choices;
-  const past = commitOn(runAt(FLOOR), floorCard, { bust: true });
-  assert.deepEqual([past.nodeId, past.log[0].skippedNodeId, past.log[0].routeChangeKind], ["f_aftershock", "f_choice", "blackout-skip"]);
+  // The last choice in B2 is the night's other decision: a bust on any card
+  // of the 33rd floor comes down to it.
+  for (const card of nodes[FLOOR].choices) {
+    const down = commitOn(runAt(FLOOR), card, { bust: true });
+    assert.deepEqual([down.nodeId, down.log[0].skippedNodeId, down.log[0].routeChangeKind], ["f_choice", undefined, undefined], card.id);
+    assert.equal(down.log[0].threshold.state, "bust");
+  }
+  // A bust on f_choice's own card lands on the aftermath, and always did: the
+  // aftermath's cards close the case, and a bust never skips onto a result.
+  assert.equal(nodes.f_aftershock.attended, undefined);
+  assert.deepEqual([...new Set(nodes.f_aftershock.choices.map((card) => card.next))], [RESULT]);
+  for (const card of nodes.f_choice.choices) {
+    const after = commitOn(runAt("f_choice"), card, { bust: true });
+    assert.deepEqual([after.nodeId, after.log[0].skippedNodeId], ["f_aftershock", undefined], card.id);
+  }
+  // And a bust on an aftermath card closes the case all the same.
+  const closing = commitOn(runAt("f_aftershock"), nodes.f_aftershock.choices[0], { bust: true });
+  assert.equal(closing.nodeId, RESULT);
   // And a bust one scene earlier skips what it always skipped, not the floor.
   const earlier = commitOn(runAt("f_dilemma_reaction"), nodes.f_dilemma_reaction.choices[0], { bust: true });
   assert.deepEqual([earlier.nodeId, earlier.log[0].skippedNodeId], [FLOOR, "f_final_expose"]);
