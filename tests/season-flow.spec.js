@@ -4,6 +4,8 @@ import { acceptConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
+import { getLogicType } from "../src/gauntlet/logicStreak.js";
+import { easyCognitionLabels } from "../src/playerLanguage.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
@@ -705,8 +707,13 @@ test.describe("a phone on its side", () => {
       // holds the case facts alone (main's Verify of 2026-10-08, both sizes).
       await expect.poll(() => page.locator(".gx-brief li").allTextContents()).toContain(question);
       const lines = await page.locator(".gx-brief li").allTextContents();
-      const labels = nodes.c2_trace.choices.filter((choice) => choice.type !== "reframe").map((choice) => choice.label);
-      for (const label of labels) expect(lines.some((line) => line.endsWith(`: ${label}`)), `the fold prints "${label}"`).toBe(true);
+      // Each card is printed whole with its type's full name after it: the
+      // card's own tag is one word of that name on a screen this narrow.
+      const dealt = nodes.c2_trace.choices.filter((choice) => choice.type !== "reframe");
+      for (const choice of dealt) {
+        const printed = `: ${choice.label} (${easyCognitionLabels[getLogicType(choice)]})`;
+        expect(lines.some((line) => line.endsWith(printed)), `the fold prints "${printed}"`).toBe(true);
+      }
       const widest = await page.locator(".gx-brief li").evaluateAll((items) => items.filter((item) => item.scrollWidth > item.clientWidth + 1).length);
       expect(widest, "nothing in the fold is cut").toBe(0);
     });
