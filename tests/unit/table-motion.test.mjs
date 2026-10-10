@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, RATE_REST_BPM, RATE_SWEEP_MS, RATE_TOP_BPM } from "../../src/gauntlet/fxVariables.js";
@@ -69,8 +69,8 @@ test("nothing on the table marks a beat to press on, and the pulse is still writ
     assert.equal(css.includes(gone), false, `no sheet styles ${gone}`);
     assert.equal(source.includes(gone), false, `and nothing on the table draws ${gone}`);
   }
-  const timing = readFileSync("src/gauntlet/timing.js", "utf8");
-  assert.deepEqual(timing.match(/export const (\w+)/g), ["export const monotonicNow"], "the module that graded a press is left with the clock");
+  assert.equal(existsSync("src/gauntlet/timing.js"), false, "the module that graded a press is gone, and its clock is the frame loop's");
+  assert.match(loop, /monotonicNow, registerFxVariables \} from "\.\/fxVariables\.js"/);
 });
 
 const sheet = (name) => readFileSync(`src/styles/app/${name}.css`, "utf8");

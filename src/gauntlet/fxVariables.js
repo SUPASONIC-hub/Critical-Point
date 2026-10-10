@@ -17,6 +17,9 @@ export const FX_READERS = Object.freeze({
 
 export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
 
+/** The clock the table's frame loops run on. */
+export const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
+
 /**
  * What the two settings that turn the body down do to a frame: the OS's
  * reduced motion, and the comfort setting (`calmEffects`), which is wider.

@@ -22,8 +22,7 @@ const { clamp, formatNumber } = await import("../../src/gameConstants.js");
 const { applyEffect, getSuspenseEvent } = await import("../../src/riskLogic.js");
 const { SEASON_ENTRY_CASE } = await import("../../src/gameCases.js");
 const chunkReload = await import("../../src/state/chunkReload.js");
-const { FX_READERS, FX_VARIABLES, registerFxVariables } = await import("../../src/gauntlet/fxVariables.js");
-const { monotonicNow } = await import("../../src/gauntlet/timing.js");
+const { FX_READERS, FX_VARIABLES, monotonicNow, registerFxVariables } = await import("../../src/gauntlet/fxVariables.js");
 
 // Node's performance.now() counts from process start, a few hundred ms in, so a
 // press "400ms ago" would be a negative stamp. The table's clock is fixed here.

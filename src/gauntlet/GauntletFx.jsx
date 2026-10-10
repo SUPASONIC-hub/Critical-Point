@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
-import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, registerFxVariables } from "./fxVariables.js";
-import { monotonicNow } from "./timing.js";
+import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
@@ -22,12 +21,9 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * page. Registered from here rather than with `@property` in the sheet, which
  * would have cost the play sheet fifty lines of its budget for eight names.
  *
- * The heartbeat is pressure and nothing else. Until 2026-10-10 it was also
- * the table's rhythm: this loop stamped each beat as it reached the ear, and a
- * push or a LOCK was graded against the stamp, with an approach ring and a hit
- * zone drawn from it. Nothing is graded now. The pulse keeps its tempo -- the
- * tempo is the instrument -- in the sound, the number, the vignette and the
- * tick light.
+ * The heartbeat is pressure and nothing else: no press is graded against it.
+ * The pulse keeps its tempo -- the tempo is the instrument -- in the sound, the
+ * number, the vignette and the tick light.
  *
  * What floods the screen pulses under three times a second. The pulse races to
  * 190 a minute next to the wall, and at that rate the vignette was a
