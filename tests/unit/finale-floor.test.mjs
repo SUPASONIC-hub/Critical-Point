@@ -23,7 +23,7 @@ const { parseCurrentSavedState, SAVE_SCHEMA_VERSION } = await import("../../src/
 const { CASE_RESULT_NODES, seasonCasesBase } = await import("../../src/gameCases.js");
 const { caseOpeningRoutes, continuityMemoryChoicePlans, getCaseBranchNodes, nodes, reframeRouteNodes } = await import("../../src/gameData.js");
 const { getCasesOpened, getRiskPressure } = await import("../../src/gameLogic.js");
-const { BASE_SCHEMA, createWindow, reduceWindow } = await import("../../src/gauntlet/gauntletEngine.js");
+const { BASE_SCHEMA, BUST_EFFECT, createWindow, reduceWindow } = await import("../../src/gauntlet/gauntletEngine.js");
 const { addToRelicCodex, settleAgainstCodex } = await import("../../src/gauntlet/useRelicTable.js");
 const { resourceMeta } = await import("../../src/appCopy.js");
 const { applyRunPatch, initialRunState } = await import("../../src/state/runState.js");
@@ -39,7 +39,7 @@ const OPENINGS = ["f_start", ...Object.values(caseOpeningRoutes.final)];
 const finaleScenes = Object.entries(nodes).filter(([, node]) => node.caseId === "final");
 
 /** One cashed card on the run, committed by the runtime's own hook. */
-function commitOn(run, card, { reframesOpened } = {}) {
+function commitOn(run, card, { reframesOpened, bust = false } = {}) {
   const node = nodes[run.nodeId];
   let patch = null;
   let codex = { unlocked: [] };
@@ -101,7 +101,11 @@ function commitOn(run, card, { reframesOpened } = {}) {
   };
   renderToStaticMarkup(createElement(Probe));
   const fresh = createWindow({ schema: BASE_SCHEMA, seed: `unit-33f:${run.log.length}:${run.nodeId}` });
-  api.choose(card, reduceWindow({ ...fresh, selectedId: card.id, gauge: 30, pushes: 3, elapsed: 6 }, { type: "CASH" }));
+  const closed = bust
+    ? reduceWindow({ ...fresh, selectedId: card.id, gauge: fresh.wall - 0.001 }, { type: "PUSH", grade: "good" })
+    : reduceWindow({ ...fresh, selectedId: card.id, gauge: 30, pushes: 3, elapsed: 6 }, { type: "CASH" });
+  assert.equal(closed.status, bust ? "bust" : "cashed");
+  api.choose(card, closed);
   assert.ok(patch, `${run.nodeId}/${card.id} was committed`);
   return applyRunPatch(run, { ...patch, decisionReveal: null });
 }
@@ -255,6 +259,36 @@ test("in every other case the rule changes nothing: no scene with a reframe card
       .filter(([nodeId, node]) => node.caseId === caseId && node.choices.some((card) => card.type === "reframe") && runsInto(nodes, hidden, nodeId))
       .map(([nodeId]) => nodeId));
   assert.deepEqual(past, ["f_choice"]);
+});
+
+test("a bust on a path's last decision still goes up to the 33rd floor, and costs what a bust costs", () => {
+  // The scene says it itself (`attended` in its scene context), and it is the only one in the season that does.
+  assert.deepEqual(Object.entries(nodes).filter(([, node]) => node.attended).map(([nodeId]) => nodeId), [FLOOR]);
+
+  for (const finalId of ["f_final_map", "f_final_expose", "f_final_contain", "f_final_system", "f_evidence_turn"]) {
+    for (const card of nodes[finalId].choices) {
+      const after = commitOn(runAt(finalId), card, { bust: true });
+      const [entry] = after.log;
+      assert.equal(after.nodeId, FLOOR, `${finalId}/${card.id}: the run lands on the 33rd floor`);
+      assert.equal(entry.skippedNodeId, undefined, `${finalId}/${card.id}: nothing was played without the analyst`);
+      assert.notEqual(entry.routeChangeKind, "blackout-skip");
+      assert.equal(after.decisionReveal, null);
+      assert.equal(entry.threshold.state, "bust");
+      for (const [key, value] of Object.entries(BUST_EFFECT)) {
+        assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `${finalId}/${card.id}: the bust's own ${key}`);
+      }
+      assert.equal(after.gauntletRun.busts, 1);
+    }
+  }
+
+  // The rule is this scene's alone. A bust on the 33rd floor's own card is a
+  // bust like any other: the room plays f_choice without the analyst.
+  const [floorCard] = nodes[FLOOR].choices;
+  const past = commitOn(runAt(FLOOR), floorCard, { bust: true });
+  assert.deepEqual([past.nodeId, past.log[0].skippedNodeId, past.log[0].routeChangeKind], ["f_aftershock", "f_choice", "blackout-skip"]);
+  // And a bust one scene earlier skips what it always skipped, not the floor.
+  const earlier = commitOn(runAt("f_dilemma_reaction"), nodes.f_dilemma_reaction.choices[0], { bust: true });
+  assert.deepEqual([earlier.nodeId, earlier.log[0].skippedNodeId], [FLOOR, "f_final_expose"]);
 });
 
 /** `useRuntimeSavedState`'s pipeline, then the run the page starts from. */

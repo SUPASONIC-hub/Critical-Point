@@ -163,7 +163,7 @@ function scoreCard(policy, choice, resources) {
 /** What `useChoiceCommit.getBlackoutSkip` does: the room plays the next scene without the player. */
 function getBlackoutSkip(fromNodeId, branchContext) {
   const skipped = nodes[fromNodeId];
-  if (!skipped || resultNodeIds.has(fromNodeId)) return null;
+  if (!skipped || skipped.attended || resultNodeIds.has(fromNodeId)) return null;
   const onward = getUnattendedNext(skipped, branchContext);
   if (!onward || !nodes[onward] || resultNodeIds.has(onward)) return null;
   return onward;

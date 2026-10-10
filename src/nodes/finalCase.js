@@ -917,6 +917,9 @@ export const finalCase = {
     f_confront: {
       place: "KD금융그룹 본사 33층 옛 그룹전략실",
       clock: "마지막 밤 · 새벽",
+      // The meeting the season was written towards: a bust on a path's last
+      // decision still costs the bust, and the run still goes up to this room.
+      attended: true,
       question: "서명란을 비워 둔 사람이 펜을 내밉니다. 그 칸에 누구의 이름을 넣겠습니까?",
       lead: "B2에서 볼 것을 다 보고 보관소를 나와, 택시로 여의도에 닿았습니다. 33층에서 윤상혁은 불을 켜 둔 채 기다리고 있었습니다.",
     },

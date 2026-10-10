@@ -71,10 +71,14 @@ function getReframeTarget(caseId, fromNodeId) {
  * A story run is not skipped past anything (the caller does not ask): the
  * mode is there so the story can be read, and a scene played without the
  * player is a scene they did not read. The bust still costs what a bust costs.
+ *
+ * And in any run, a scene marked `attended` (its scene context says so; the
+ * finale's 33rd floor is the one) is not played without the analyst either:
+ * the run lands on it.
  */
 function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];
-  if (!skippedNode || RESULT_NODE_IDS.has(fromNodeId)) return null;
+  if (!skippedNode || skippedNode.attended || RESULT_NODE_IDS.has(fromNodeId)) return null;
   const onward = getUnattendedNext(skippedNode, branchContext);
   if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
   return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
