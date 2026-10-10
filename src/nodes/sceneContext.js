@@ -67,6 +67,10 @@ export function applySceneContext(nodes, nodeOrders) {
       // room and its clock, so a scene may state it here and overrule the
       // graph build's own reading (`pressureBeats` in gameData.js).
       if (typeof context?.pressure === "boolean") node.pressure = context.pressure;
+      // A scene the analyst has to be in the room for. A bust plays the next
+      // scene without them (useChoiceCommit.getBlackoutSkip); it does not play
+      // this one: the run lands on it, the bust already paid for.
+      if (context?.attended === true) node.attended = true;
     }
   }
   return nodes;

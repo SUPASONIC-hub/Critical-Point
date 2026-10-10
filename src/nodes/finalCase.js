@@ -917,12 +917,18 @@ export const finalCase = {
     f_confront: {
       place: "KD금융그룹 본사 33층 옛 그룹전략실",
       clock: "마지막 밤 · 새벽",
+      // The meeting the season was written towards: a bust on a path's last
+      // decision still costs the bust, and the run still goes up to this room.
+      attended: true,
       question: "서명란을 비워 둔 사람이 펜을 내밉니다. 그 칸에 누구의 이름을 넣겠습니까?",
       lead: "B2에서 볼 것을 다 보고 보관소를 나와, 택시로 여의도에 닿았습니다. 33층에서 윤상혁은 불을 켜 둔 채 기다리고 있었습니다.",
     },
     f_choice: {
       place: "트리거랩 기록 보관소 B2 · 단말 앞",
       clock: "마지막 밤 · 새벽",
+      // The other decision of the night every run makes itself: a bust on the
+      // 33rd floor comes down to this terminal, it does not pass it.
+      attended: true,
       question: "마흔아홉 사건과 1년의 마지막 선택입니다. 당신의 조건을 약점으로 두겠습니까, 도구로 쓰겠습니까?",
       lead: "마흔아홉 사건과 1년, 그리고 이 밤이 지났습니다. 트리거랩은 없어졌고, 33층에서 받은 물음은 B2까지 따라 내려왔습니다. 단말 앞에는 당신과, 반납하지 않은 열쇠를 쥔 한서윤이 있습니다.",
     },
