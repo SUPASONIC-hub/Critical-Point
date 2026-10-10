@@ -8,7 +8,7 @@ export const TEST_STORAGE_KEYS = Object.freeze({
   errorLog: "trigger-prototype-error-log-v1",
   recoveryCenter: RECOVERY_CENTER_STORAGE_KEY,
   saveSlots: "trigger-prototype-save-slots-v1",
-  localRanking: "critical-point-local-ranking-v7",
+  localRanking: "critical-point-local-ranking-v8",
   relicCodex: "critical-point-relic-codex-v1",
   nextParticipantMessage: "critical-point-next-participant-message",
   forceRenderError: "critical-point-force-render-error",
