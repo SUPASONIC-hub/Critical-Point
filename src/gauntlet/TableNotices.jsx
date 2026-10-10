@@ -2,8 +2,9 @@ import { useRef } from "react";
 import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber, getClockCall, getTabNotices } from "./tableReadout.js";
+import { formatMultiplier, formatNumber, getClockCall, getTabNotices, getTypeName, getTypeParts } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
+import { getLogicType } from "./logicStreak.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 
 /** This tab's table stopped because another tab has the window. */
@@ -64,7 +65,7 @@ function HeldElsewhere({ onClaim, onLeave }) {
 }
 
 /** The verdict, slammed over the table for the beat before the reveal opens. */
-function VerdictSlam({ window: win, multiplier, livePot, grooveBonus, runPot, bustKeeps }) {
+function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps }) {
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
       {win.status === "bust" ? (
@@ -85,7 +86,7 @@ function VerdictSlam({ window: win, multiplier, livePot, grooveBonus, runPot, bu
           <strong>{formatMultiplier(multiplier)}</strong>
           <span>
             +{formatNumber(livePot)}
-            {grooveBonus > 1 ? ` · GROOVE ×${grooveBonus.toFixed(2)} · COMBO ${win.beatCombo}` : ""}
+            {streak > 0 ? ` · 논리 콤보 ${streak}` : ""}
           </span>
         </>
       )}
@@ -111,6 +112,34 @@ export function TableNotices({ equipped, tab, clock, slam, onReload, onClaim, on
       {held && <HeldElsewhere onClaim={onClaim} onLeave={onLeave} />}
       {slam && <VerdictSlam {...slam} />}
     </>
+  );
+}
+
+/**
+ * The logic streak in the HUD: the third of the hand's signals, beside the
+ * chain and the LOCK charge. What it stands at, the type being held and how
+ * far the hold has got, and a note -- what the staked card does to it, or
+ * that a change of type would count. What it pays is in the pot's own line,
+ * where the groove's bonus was.
+ *
+ * The beat's combo stood over the pot's corner. The streak has more to say,
+ * and on a 360px phone anything there ran under the pot's own numbers. In the
+ * signals row it takes room that is its own and adds no height from 프롤로그
+ * 04 on, where the row already is. A phone has the width for three words of
+ * it: "논리", all of the type's name but one word, and the note are not drawn
+ * there (play.css) -- the cards' tags say what each card would do -- and the
+ * buttons' description reads all of it out.
+ */
+export function LogicLine({ logic }) {
+  const [before, word, after] = getTypeParts(logic.type);
+  return (
+    <span className="gx-streak" data-testid="gauntlet-logic" data-streak={logic.after} data-move={logic.move ?? ""}>
+      <b><i>논리 </i>콤보 {logic.after}</b>
+      <span>
+        {logic.type ? <>{before && <i>{before}</i>}{word}{after && <i>{after}</i>} {logic.held}</> : "첫 카드부터"}
+      </span>
+      {logic.note && <em>{logic.note}</em>}
+    </span>
   );
 }
 
@@ -148,10 +177,11 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
     <>
       {/* The question and the cards in full. On the table both are cut to a
           line count, and the briefing page that printed them whole cannot be
-          opened again once the clock runs. */}
+          opened again once the clock runs. A card's type is here in full too:
+          a phone's card has room for one word of it. */}
       <li>{question}</li>
       {cards.map((card, index) => (
-        <li key={card.id ?? index}>카드 {index + 1}: {card.label}</li>
+        <li key={card.id ?? index}>카드 {index + 1}: {card.label} ({getTypeName(getLogicType(card))})</li>
       ))}
       {mutations.map((mutation) => (
         <li key={mutation.id}>

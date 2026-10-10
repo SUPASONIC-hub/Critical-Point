@@ -112,7 +112,7 @@ function closedWindow(kind, seed = `unit-${kind}`) {
   const fresh = createWindow({ schema: BASE_SCHEMA, seed });
   const staked = { ...fresh, selectedId: "a" };
   if (kind === "cash") return reduceWindow({ ...staked, gauge: 30, pushes: 3, elapsed: 6 }, { type: "CASH" });
-  return reduceWindow({ ...staked, gauge: fresh.wall - 0.001 }, { type: "PUSH", grade: "good" });
+  return reduceWindow({ ...staked, gauge: fresh.wall - 0.001 }, { type: "PUSH" });
 }
 
 test("the build under test has a server, so a closed case has somewhere to send its row", async () => {

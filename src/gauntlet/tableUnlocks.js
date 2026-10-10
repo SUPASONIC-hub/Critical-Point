@@ -1,7 +1,7 @@
 /**
  * Which of the table's rules a case plays under.
  *
- * Every rule used to be on from 프롤로그 01: the beat, LOCK and its three
+ * Every rule used to be on from 프롤로그 01: the combo, LOCK and its three
  * stances, the relic draft and nine ways of breaking the next board, all in
  * front of a player who had not yet pushed once. The five prologues now turn
  * them on in steps, and from 사건 01 the table is whole.
@@ -25,7 +25,9 @@
 export const STAGED = true;
 
 /**
- * The rules a step can turn on. `beat` is the groove and the combo; `lock` is
+ * The rules a step can turn on. `logic` is the logic streak and what it pays
+ * (it was `beat`, the groove and its combo, until 2026-10-10; a rule's id is
+ * derived from the case and never saved); `lock` is
  * the LOCK press, in the STRIKE stance until `stance` lets the player choose
  * one -- and with the choice come the boards a stance carries forward (STRIKE
  * WAKE, STEADY LINE, EXPOSED HAND) and the season's mastery of it. `relics`
@@ -33,7 +35,7 @@ export const STAGED = true;
  * mutations, under the ids the engine's `MUTATIONS` catalogue uses.
  */
 export const TABLE_RULES = Object.freeze([
-  "beat",
+  "logic",
   "blackout",
   "aftershock",
   "silence",
@@ -86,7 +88,7 @@ export const ALL_RULES = freezeSet(TABLE_RULES);
 /**
  * The rules a story run plays without (스토리 모드, the comfort setting): the
  * seven ways a decision breaks the next board. A table that is there to be read
- * past does not hand a mistake on to the scene after it. The beat, LOCK, the
+ * past does not hand a mistake on to the scene after it. The streak, LOCK, the
  * stances and the relics stay -- they are the hand's own, and nothing they do
  * is dealt to a player who did not ask for it.
  */
@@ -129,10 +131,10 @@ const STEPS = [
   },
   {
     caseId: "prologue02",
-    adds: ["beat", "blackout", "aftershock", "silence"],
+    adds: ["logic", "blackout", "aftershock", "silence"],
     storyIntro: [0],
     intro: [
-      "심박에 맞춰 밀면 콤보가 쌓이고 판돈이 커집니다.",
+      "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다.",
       "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
     ],
   },
@@ -152,7 +154,7 @@ const STEPS = [
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-      "카드를 건 뒤 심박에 맞춰 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 박자를 놓치면 열기가 오릅니다.",
+      "카드를 건 뒤 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 누를 때마다 시간이 줄어듭니다.",
     ],
   },
   {

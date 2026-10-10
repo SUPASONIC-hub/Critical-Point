@@ -1,6 +1,8 @@
 import { Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { getLogicType } from "./logicStreak.js";
+import { describeCardMove, getTypeParts } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 /**
@@ -13,7 +15,34 @@ import { useShortcutHints } from "../state/accessibilitySettings.js";
  *
  * A face-down card still has a name: the glyphs that hide its numbers are for
  * the eye, and a screen reader is told the numbers are hidden.
+ *
+ * Every card says its type (`CardType`): the logic streak is earned by which
+ * type is picked from scene to scene, so a hand that cannot see the type
+ * cannot play for it. The tag sits on the card's top edge, out of the card's
+ * flow, because a phone's hand has no room to give it (measured at 360x740
+ * and 390x844 on the heaviest boards: in the stats row it wrapped under the
+ * burn and put a staked hand 5px under the action bar, and at the head of the
+ * label it cost a three-line label its line and a sealed hand 13px). It is in
+ * the button, so it is in the card's name.
+ * `moveOf` says what picking a card would do to the streak, once the case has
+ * the rule; the tag of a card that would not end the streak is lit. On a phone
+ * the tag prints one word of the name and the rest is for a screen reader (the
+ * `i` elements, which play.css clips there).
  */
+export function CardType({ card, moveOf }) {
+  const move = moveOf?.(card);
+  const [before, word, after] = getTypeParts(getLogicType(card));
+  return (
+    <span className={`gx-card-type${move && move !== "break" ? " is-on" : ""}`} data-testid="card-type" data-move={move ?? ""}>
+      <span className="sr-only">유형 </span>
+      {before && <i>{before}</i>}
+      {word}
+      {after && <i>{after}</i>}
+      {move && <span className="sr-only">{describeCardMove(move)}</span>}
+    </span>
+  );
+}
+
 export function GauntletHand({
   cards,
   reframeChoice,
@@ -28,6 +57,7 @@ export function GauntletHand({
   visibleEffects,
   hiddenEffectCount,
   fractureAxis,
+  moveOf,
   onSelect,
 }) {
   // The digit on a card is its key. With the single-key shortcuts off it is
@@ -56,7 +86,8 @@ export function GauntletHand({
             onClick={() => onSelect(card.id)}
           >
             {letterKeys && <span className="gx-card-key" aria-hidden="true">{index + 1}</span>}
-            <span className="gx-card-label">{card.label}</span>
+            <CardType card={card} moveOf={moveOf} />
+            <span className="gx-card-label" data-testid="card-label">{card.label}</span>
             {schema.faceDown ? (
               <span className="gx-card-stats">
                 <b className="gx-card-chips" aria-hidden="true">▒▒</b>
@@ -128,7 +159,8 @@ export function GauntletHand({
           onClick={() => onSelect(REFRAME_CARD_ID)}
         >
           {letterKeys && <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>}
-          <span className="gx-card-label">{reframeChoice.label}</span>
+          <CardType card={reframeChoice} moveOf={moveOf} />
+          <span className="gx-card-label" data-testid="card-label">{reframeChoice.label}</span>
           <span className="gx-card-stats">
             <b className="gx-card-chips">WILD +{getCardChips(reframeChoice, schema)}</b>
             <b className="gx-card-burn">이 판을 다시 연다</b>

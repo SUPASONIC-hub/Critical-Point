@@ -45,12 +45,6 @@ function withRuntime(play) {
   }
 }
 
-/** How long after it is scheduled a sound reaches the ear, in milliseconds. Zero when the platform does not say. */
-function getOutputLatencyMs(context) {
-  const seconds = (Number(context?.baseLatency) || 0) + (Number(context?.outputLatency) || 0);
-  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 0;
-}
-
 function envelope(gain, start, peak, attack, release) {
   gain.gain.setValueAtTime(0.0001, start);
   gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), start + attack);
@@ -67,13 +61,9 @@ function getNoise(context) {
   return noiseBuffer;
 }
 
-/**
- * Lub-dub. Louder and brighter as the wall closes in. Returns how late the beat
- * will be heard, so the table can grade a press against the beat that reached
- * the player rather than the one that left the scheduler; zero when silent.
- */
+/** Lub-dub. Louder and brighter as the wall closes in. */
 export function playHeartbeat(closeness = 0) {
-  const runtime = withRuntime(({ context, destination, multiplier }) => {
+  withRuntime(({ context, destination, multiplier }) => {
     const now = context.currentTime;
     // 0.19 at rest is 0.156 on the default preset: audible under the score.
     const level = (0.19 + closeness * 0.13) * multiplier;
@@ -96,7 +86,6 @@ export function playHeartbeat(closeness = 0) {
       oscillator.stop(start + 0.24);
     }
   });
-  return getOutputLatencyMs(runtime?.context);
 }
 
 /**
@@ -195,7 +184,7 @@ const GROOVE_SPARKLE = [2093, 2349.32, 2637.02, 3135.96, 3520, 4186.01];
 
 /**
  * The register. More notes the hotter the pot, and a sparkle run over the top
- * for the groove the beat added to it.
+ * for what the logic streak added to it.
  */
 export function playCashCue(multiplier = 1, grooveBonus = 1) {
   withRuntime(({ context, destination, multiplier: volume }) => {
@@ -230,155 +219,23 @@ export function playCashCue(multiplier = 1, grooveBonus = 1) {
   });
 }
 
-/* The beat --------------------------------------------------------------- */
-
-const PENTATONIC = [0, 2, 4, 7, 9];
-const PERFECT_PARTIALS = [
-  [1, 1],
-  [2.01, 0.42],
-  [3.02, 0.18],
-];
-const GOOD_PARTIALS = [
-  [1, 1],
-  [2, 0.22],
-];
-
-/**
- * A push graded against the heartbeat. On the beat it is a struck bell one
- * pentatonic step higher for every link in the combo, so a long combo is a
- * melody the player hears themselves building; a PERFECT adds a snap and more
- * overtones. A slip is a dull thud and a scrape: the grip went.
- */
-export function playBeatCue(grade, combo = 0) {
-  if (grade !== "perfect" && grade !== "good" && grade !== "miss") return;
-  withRuntime(({ context, destination, multiplier }) => {
-    const now = context.currentTime;
-    if (grade === "miss") {
-      const thud = context.createOscillator();
-      const thudFilter = context.createBiquadFilter();
-      const thudGain = context.createGain();
-      thud.type = "square";
-      thud.frequency.setValueAtTime(96, now);
-      thud.frequency.exponentialRampToValueAtTime(42, now + 0.16);
-      thudFilter.type = "lowpass";
-      thudFilter.frequency.setValueAtTime(420, now);
-      envelope(thudGain, now, 0.13 * multiplier, 0.004, 0.2);
-      thud.connect(thudFilter).connect(thudGain).connect(destination);
-      thud.start(now);
-      thud.stop(now + 0.26);
-
-      const scrape = context.createBufferSource();
-      scrape.buffer = getNoise(context);
-      const scrapeFilter = context.createBiquadFilter();
-      scrapeFilter.type = "bandpass";
-      scrapeFilter.frequency.setValueAtTime(900, now);
-      scrapeFilter.frequency.exponentialRampToValueAtTime(380, now + 0.14);
-      scrapeFilter.Q.setValueAtTime(1.4, now);
-      const scrapeGain = context.createGain();
-      envelope(scrapeGain, now, 0.08 * multiplier, 0.003, 0.14);
-      scrape.connect(scrapeFilter).connect(scrapeGain).connect(destination);
-      scrape.start(now, Math.random() * 0.8, 0.2);
-      return;
-    }
-    const step = Math.max(0, Math.trunc(combo) - 1);
-    const octave = Math.min(1, Math.floor(step / PENTATONIC.length));
-    const semitones = PENTATONIC[step % PENTATONIC.length] + 12 * octave;
-    const root = 523.25 * Math.pow(2, semitones / 12);
-    const perfect = grade === "perfect";
-    const partials = perfect ? PERFECT_PARTIALS : GOOD_PARTIALS;
-    const release = perfect ? 0.52 : 0.28;
-    const level = (perfect ? 0.13 : 0.09) * multiplier;
-    for (let index = 0; index < partials.length; index += 1) {
-      const [ratio, share] = partials[index];
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(root * ratio, now);
-      envelope(gain, now, level * share, 0.003, release);
-      oscillator.connect(gain).connect(destination);
-      oscillator.start(now);
-      oscillator.stop(now + release + 0.05);
-    }
-    if (perfect) {
-      const snap = context.createBufferSource();
-      snap.buffer = getNoise(context);
-      const snapFilter = context.createBiquadFilter();
-      snapFilter.type = "highpass";
-      snapFilter.frequency.setValueAtTime(5200, now);
-      const snapGain = context.createGain();
-      envelope(snapGain, now, 0.07 * multiplier, 0.001, 0.035);
-      snap.connect(snapFilter).connect(snapGain).connect(destination);
-      snap.start(now, Math.random() * 0.8, 0.06);
-    }
-  });
-}
-
-export function playFocusCue(grade, charge = 0) {
-  if (grade !== "perfect" && grade !== "good" && grade !== "miss") return;
+/** A LOCK press: two rising notes, higher the fuller the charge. */
+export function playFocusCue(charge = 0) {
   withRuntime(({ context, destination, multiplier }) => {
     const now = context.currentTime;
     const level = Math.min(1, Math.max(0, Number(charge) || 0));
-    if (grade === "miss") {
-      const noise = context.createBufferSource();
-      noise.buffer = getNoise(context);
-      const filter = context.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.frequency.setValueAtTime(620, now);
-      filter.frequency.exponentialRampToValueAtTime(190, now + 0.18);
-      filter.Q.setValueAtTime(6, now);
-      const gain = context.createGain();
-      envelope(gain, now, 0.11 * multiplier, 0.002, 0.16);
-      noise.connect(filter).connect(gain).connect(destination);
-      noise.start(now, Math.random() * 0.8, 0.22);
-      return;
-    }
-    const perfect = grade === "perfect";
-    const base = perfect ? 1760 : 1318.51;
-    for (let index = 0; index < (perfect ? 3 : 2); index += 1) {
+    const base = 1318.51;
+    for (let index = 0; index < 2; index += 1) {
       const start = now + index * 0.045;
       const oscillator = context.createOscillator();
       const gain = context.createGain();
-      oscillator.type = perfect ? "sine" : "triangle";
+      oscillator.type = "triangle";
       oscillator.frequency.setValueAtTime(base * Math.pow(2, index / 12), start);
       oscillator.frequency.exponentialRampToValueAtTime(base * (1.15 + level * 0.35), start + 0.18);
-      envelope(gain, start, (perfect ? 0.075 : 0.055) * multiplier, 0.003, 0.26);
+      envelope(gain, start, 0.055 * multiplier, 0.003, 0.26);
       oscillator.connect(gain).connect(destination);
       oscillator.start(start);
       oscillator.stop(start + 0.32);
-    }
-  });
-}
-
-const FEVER_CHORD = [659.25, 830.61, 987.77, 1318.51];
-
-/** FEVER: a filter sweep opening under a bright major chord. */
-export function playFeverCue() {
-  withRuntime(({ context, destination, multiplier }) => {
-    const now = context.currentTime;
-    const sweep = context.createOscillator();
-    const sweepFilter = context.createBiquadFilter();
-    const sweepGain = context.createGain();
-    sweep.type = "sawtooth";
-    sweep.frequency.setValueAtTime(220, now);
-    sweep.frequency.exponentialRampToValueAtTime(880, now + 0.45);
-    sweepFilter.type = "lowpass";
-    sweepFilter.frequency.setValueAtTime(380, now);
-    sweepFilter.frequency.exponentialRampToValueAtTime(5200, now + 0.45);
-    sweepFilter.Q.setValueAtTime(7, now);
-    envelope(sweepGain, now, 0.07 * multiplier, 0.05, 0.5);
-    sweep.connect(sweepFilter).connect(sweepGain).connect(destination);
-    sweep.start(now);
-    sweep.stop(now + 0.6);
-    for (let index = 0; index < FEVER_CHORD.length; index += 1) {
-      const start = now + 0.12 + index * 0.04;
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(FEVER_CHORD[index], start);
-      envelope(gain, start, 0.045 * multiplier, 0.006, 0.62);
-      oscillator.connect(gain).connect(destination);
-      oscillator.start(start);
-      oscillator.stop(start + 0.7);
     }
   });
 }

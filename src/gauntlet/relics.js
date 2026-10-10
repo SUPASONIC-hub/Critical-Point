@@ -31,7 +31,6 @@ import {
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
   LOCKPICK_SEAL,
-  METRONOME_REACH,
   SEAL_BREAK_GAUGE,
   SILENCE_SECONDS,
   SPLINT_RATE,
@@ -40,7 +39,7 @@ import {
 } from "./tableRules.js";
 
 export const RELIC_OFFER_SIZE = 3;
-/** The combo that unlocks ENCORE: a hand that has learned the beat. */
+/** The logic streak that unlocks ENCORE: the streak at which the pot's bonus is full. */
 const ENCORE_UNLOCK_COMBO = 8;
 /** The pot the wall has to take from you before INSURANCE is on the table. */
 export const INSURANCE_UNLOCK_LOSS = 5000;
@@ -54,8 +53,8 @@ export const RELICS = Object.freeze({
     label: "METRONOME",
     name: "메트로놈",
     icon: "timer",
-    text: `PERFECT와 GOOD 박자 판정 폭이 ${METRONOME_REACH}배 넓어진다.`,
-    proc: "박자를 붙잡았다",
+    text: "압박이 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.",
+    proc: "전환을 붙잡았다",
     unlock: null,
   },
   coldBlood: {
@@ -98,9 +97,9 @@ export const RELICS = Object.freeze({
     label: "ENCORE",
     name: "앙코르",
     icon: "repeat",
-    text: "BUST가 판돈은 가져가도 박자 콤보는 남겨 둔다.",
+    text: "BUST가 판돈은 가져가도 논리 콤보는 남겨 둔다.",
     proc: "콤보가 벽을 넘어 살아남았다",
-    unlock: { id: "combo", text: `박자 콤보 ${ENCORE_UNLOCK_COMBO} 달성` },
+    unlock: { id: "combo", text: `논리 콤보 ${ENCORE_UNLOCK_COMBO} 달성` },
   },
   insurance: {
     label: "INSURANCE",
@@ -188,7 +187,7 @@ export function getSofteningRelic(mutationId, relics) {
 export function getRelicUnlocks({ verdict, nextRun } = {}, unlocked = []) {
   if (!verdict) return [];
   const earned = [];
-  const maxCombo = Math.max(Number(verdict.tempo?.maxCombo) || 0, Number(nextRun?.bestCombo) || 0);
+  const maxCombo = Math.max(Number(verdict.logic?.streak) || 0, Number(nextRun?.logic?.best) || 0);
   const mastery = nextRun?.stanceMastery && typeof nextRun.stanceMastery === "object" ? nextRun.stanceMastery : {};
   if (maxCombo >= ENCORE_UNLOCK_COMBO) earned.push("encore");
   if (verdict.outcome === "bust" && (Number(verdict.lostPot) || 0) + (Number(verdict.insuredPot) || 0) >= INSURANCE_UNLOCK_LOSS) earned.push("insurance");

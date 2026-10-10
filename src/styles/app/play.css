@@ -397,7 +397,7 @@
 
 .gx-chips,
 .gx-mult,
-.gx-groove {
+.gx-logic-pill {
   padding: 4px 8px;
   border-radius: var(--radius-pill);
 }
@@ -414,7 +414,7 @@
   box-shadow: inset 0 0 0 1px var(--c-gx-heat-a55);
 }
 
-.gx-groove {
+.gx-logic-pill {
   color: var(--c-gx-felt);
   background: var(--c-gx-beat);
   font-size: 0.75rem;
@@ -535,11 +535,12 @@
   background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember), var(--c-gx-heat));
 }
 
-/* Signals: the overclock chain and the focus charge, each a line and a bar. */
+/* Signals: the overclock chain and the focus charge, each a line and a bar,
+   and the logic streak in what room it needs. */
 .gx-signals {
   grid-area: signals;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
   gap: 6px 14px;
   padding-top: 7px;
   border-top: 1px solid var(--ui-line);
@@ -615,11 +616,6 @@
   color: var(--c-gx-fever);
 }
 
-.gx-focus-signal.is-jammed,
-.gx-focus-signal.is-jammed b {
-  color: var(--c-danger-81);
-}
-
 /* Focus stance: a segmented control that also carries the season mastery. */
 .gx-focus-modes {
   display: grid;
@@ -672,7 +668,7 @@
   border-color: var(--gx-mode);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.06),
-    0 0 calc(4px + var(--gx-beat-zone, 0) * 18px) var(--c-gx-beat-a45);
+    0 0 4px var(--c-gx-beat-a45);
 }
 
 /* A closed or stopped table: the stance cannot be changed, and looks it. */
@@ -1447,9 +1443,7 @@
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.18),
     0 10px 26px rgb(120 16 20 / 0.45),
-    0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55),
-    0 0 0 calc(var(--gx-beat-zone, 0) * 3px) var(--c-gx-beat),
-    0 0 calc(var(--gx-beat-zone, 0) * 22px) var(--c-gx-beat-a45);
+    0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55);
 }
 
 .gx-focus {
@@ -1459,33 +1453,13 @@
   border: 1px solid var(--c-gx-beat);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.06),
-    inset 0 0 calc(6px + var(--gx-beat-zone, 0) * 20px) var(--c-gx-beat-a45),
-    0 0 calc(var(--gx-beat-zone, 0) * 24px) var(--c-gx-beat-a45);
+    inset 0 0 6px var(--c-gx-beat-a45);
 }
 
 .gx-focus.focus-locked,
 .gx-focus.focus-deadeye {
   color: var(--c-gx-fever);
   border-color: var(--c-gx-fever);
-}
-
-.gx-focus.is-jammed {
-  color: var(--c-paper);
-  background: var(--c-gx-heat-deep);
-  border-color: var(--c-gx-heat);
-}
-
-/* The lock's approach frame closes onto the button on the beat, the same way
-   the push ring does. It used to be an ellipse drawn through the label. */
-.gx-focus-reticle {
-  position: absolute;
-  inset: 5px;
-  border: 1px dashed currentColor;
-  border-radius: 12px;
-  pointer-events: none;
-  opacity: calc(0.16 + var(--gx-beat-zone, 0) * 0.5);
-  transform: scale(calc(1.08 - var(--gx-beat-phase, 1) * 0.08));
-  will-change: transform, opacity;
 }
 
 .gx-cash {
@@ -2046,7 +2020,7 @@
 
   .gx-chips,
   .gx-mult,
-  .gx-groove {
+  .gx-logic-pill {
     padding: 3px 7px;
   }
 
@@ -2752,166 +2726,80 @@
   }
 }
 
-/* The beat --------------------------------------------------------------
-   The push button is the timing target. --gx-beat-phase runs 0 -> 1 between
-   heartbeats, so the ring closes onto the button's border as the next beat
-   lands, and --gx-beat-zone lights the border while a press would land on it.
-   Everything here moves through transform and opacity: nothing lays out, so
-   the beat costs the compositor, not the page. Cyan is the beat and magenta
-   is fever; lime stays on the control that records a decision. */
-.gx-beat-ring {
-  position: absolute;
-  inset: -4px;
-  border: 3px solid var(--c-gx-beat);
-  border-radius: calc(var(--ui-radius-md) + 4px);
-  pointer-events: none;
-  opacity: calc(var(--gx-beat-live, 0) * (0.15 + var(--gx-beat-phase, 0) * 0.85));
-  /* 1.4 reached 60px past a wide desktop button and out of the dock; the
-     closing motion reads the same from 1.18 and stays on the table. */
-  transform: scale(calc(1.18 - var(--gx-beat-phase, 1) * 0.18));
-  will-change: transform, opacity;
-}
-
-/* Over the button, not above it: a call-out rising past the button's top would
-   slide under the hand. */
-.gx-grade {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font: 900 0.9375rem/1.1 var(--font-sans);
-  letter-spacing: 0.06em;
+/* The logic streak ---------------------------------------------------------
+   The third signal. Cyan is the hand's colour. A card's type is a tag on the
+   card's top edge, lit when picking the card would not end the streak; the
+   briefing's cards carry the same tag the same way. */
+.gx-streak {
+  display: flex;
+  gap: 8px;
+  color: var(--ui-text-2);
+  font: 700 0.6875rem/1.25 var(--font-sans);
   white-space: nowrap;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  animation: gx-grade-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.gx-grade-perfect {
-  color: var(--c-gx-felt);
-  background: var(--c-gx-beat);
-  box-shadow: 0 0 24px var(--c-gx-beat);
-}
-
-.gx-grade-good {
+.gx-streak b,
+.gx-card-type.is-on {
   color: var(--c-gx-beat);
-  background: var(--c-gx-felt);
-  border: 1px solid var(--c-gx-beat);
 }
 
-.gx-grade-miss {
-  color: var(--c-paper);
-  background: var(--c-gx-heat-deep);
-  border: 1px solid var(--c-gx-heat);
+.gx-streak em {
+  color: var(--c-acid);
+  font-style: normal;
 }
 
-.gx-combo {
+.gx-card-type {
+  padding: 0 4px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Out of the card's flow: it takes no line from the label and no width from
+   the stats, whatever the card holds. */
+.gx-comic-cards > * {
+  position: relative;
+}
+
+.gx-card > .gx-card-type,
+.gx-comic-cards .gx-card-type {
   position: absolute;
-  top: -2px;
-  right: 0;
-  display: grid;
-  justify-items: end;
-  color: var(--c-gx-beat);
-  line-height: 1;
-  pointer-events: none;
-  transform-origin: 100% 0;
-  scale: calc(1 + var(--gx-combo, 0) * 0.045);
-  animation: gx-combo-pop 0.34s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  top: -8px;
+  left: 9px;
 }
 
-.gx-combo b {
-  font: 900 1.75rem/0.9 var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 calc(6px + var(--gx-combo, 0) * 2px) var(--c-gx-beat-a45);
+.gx-streak i,
+.gx-card-type i {
+  font-style: normal;
 }
 
-.gx-combo small {
-  font: 800 0.625rem/1.2 var(--font-sans);
-  letter-spacing: 0.14em;
+/* A phone has a third of a row for the streak and half a screen for a card: a
+   type's name is cut to one word and the streak's note is left to the cards'
+   tags. The cut words take no room and stay inline, so a name is read out
+   whole and unbroken. */
+@media (max-width: 719px) {
+  .gx-streak em {
+    display: none;
+  }
+
+  .gx-streak i,
+  .gx-card-type i {
+    font-size: 0;
+  }
 }
 
-.gx-combo.combo-hot b,
-.gx-combo.is-broken {
-  color: var(--c-gx-text-dim);
-  animation-name: gx-combo-break;
-}
-
-.gauntlet-stage.is-fever .gx-hud {
-  border-color: var(--c-gx-fever);
-  box-shadow:
-    inset 0 0 32px var(--c-gx-fever-a40),
-    0 0 18px var(--c-gx-fever-a40);
-}
-
-.gauntlet-stage.is-fever .gx-pot-value {
-  color: var(--c-gx-beat);
-}
-
+/* The flash a LOCK press leaves. Cyan is the hand's colour (the streak and
+   LOCK); lime stays on the control that records a decision. */
 .gx-fx-flash {
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at 50% 100%, var(--c-gx-beat-a45), transparent 70%);
   opacity: var(--gx-flash, 0);
-}
-
-.gx-fx-grade-miss .gx-fx-flash {
-  background: radial-gradient(ellipse at 50% 100%, var(--c-gx-heat-a55), transparent 70%);
-}
-
-.gx-fx-fever .gx-fx-border {
-  box-shadow: inset 0 0 0 8px var(--c-gx-fever-a40);
-  opacity: calc(0.55 + var(--gx-beat, 0) * 0.45);
-}
-
-@keyframes gx-grade-rise {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -30%) scale(0.6);
-  }
-  18% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.15);
-  }
-  70% {
-    opacity: 1;
-    transform: translate(-50%, -75%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -95%) scale(1);
-  }
-}
-
-@keyframes gx-grade-fade {
-  0%,
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes gx-combo-pop {
-  0% {
-    transform: scale(1.6);
-  }
-  100% {
-    transform: none;
-  }
-}
-
-@keyframes gx-combo-break {
-  0% {
-    transform: translateX(-6px) rotate(-6deg);
-  }
-  35% {
-    transform: translateX(5px) rotate(4deg);
-  }
-  100% {
-    transform: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2935,23 +2823,11 @@
 
   .gx-pot-value,
   .gx-bpm svg,
-  .gx-beat-ring,
-  .gx-focus-reticle,
   .gauntlet-stage .gx-card,
   .gauntlet-stage .gx-card.selected {
     transform: none;
   }
 
-  /* The fade is the grade's time on screen, so it keeps its length. */
-  .gx-grade {
-    animation-name: gx-grade-fade;
-    animation-duration: 0.7s !important;
-  }
-
-  .gx-combo {
-    scale: none;
-    animation: none;
-  }
 }
 
 /* Rules that lived in extensions.css, the old "late overrides" file, until

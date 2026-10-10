@@ -19,10 +19,11 @@ function closedWindows() {
   const underWall = { ...staked, gauge: fresh.wall - 0.001, elapsed: READ_GRACE_SECONDS };
   return {
     cash: reduceWindow(staked, { type: "CASH" }),
-    push: reduceWindow({ ...staked, gauge: fresh.wall - 0.001 }, { type: "PUSH", grade: "good" }),
+    push: reduceWindow({ ...staked, gauge: fresh.wall - 0.001 }, { type: "PUSH" }),
     creep: reduceWindow(underWall, { type: "TICK", delta: 1 }),
     timeout: reduceWindow({ ...fresh, schema: { ...fresh.schema, creep: 0 }, elapsed: fresh.schema.seconds - 0.5 }, { type: "TICK", delta: 1 }),
-    focus: reduceWindow(underWall, { type: "FOCUS", grade: "miss" }),
+    // No press closes a window this way since 2026-10-10; a hold written under the slam of one that did still says so.
+    focus: createWindow({ schema: BASE_SCHEMA, seed: "causes", abandoned: true, closedAs: "focus" }),
     abandon: createWindow({ schema: BASE_SCHEMA, seed: "causes", abandoned: true }),
   };
 }
@@ -32,7 +33,7 @@ test("the reveal names what closed the window, one true sentence a cause", () =>
   assert.deepEqual(Object.keys(windows).sort(), [...VERDICT_CAUSES].sort(), "a window for every cause the engine lists");
   const sentences = new Map();
   for (const [cause, window] of Object.entries(windows)) {
-    assert.equal(window.cause, cause, `the reducer closes a window as ${cause}`);
+    assert.equal(window.closedAs ?? window.cause, cause, `the reducer closes a window as ${cause}`);
     assert.equal(window.status, cause === "cash" ? "cashed" : "bust");
     const { verdict } = resolveWindow({ run: null, window, card: { id: "a", effect: {} } });
     assert.equal(verdict.cause, cause, "and the verdict carries it to the reveal");
@@ -45,6 +46,10 @@ test("the reveal names what closed the window, one true sentence a cause", () =>
   }
   assert.match(sentences.get("creep"), /시계/);
   assert.match(sentences.get("focus"), /락/);
+  assert.doesNotMatch(sentences.get("focus"), /박자/, "and no sentence names a beat");
+  // A LOCK press under the wall is charged in clock, and the clock is what closes the window.
+  const pressed = reduceWindow({ ...createWindow({ schema: BASE_SCHEMA, seed: "causes" }), selectedId: "a", gauge: closedWindows().creep.wall - 0.001, elapsed: READ_GRACE_SECONDS }, { type: "FOCUS" });
+  assert.deepEqual([pressed.status, pressed.cause], ["bust", "creep"]);
 
   // A window that bust and was reloaded under its slam is settled as what it bust on.
   for (const closedAs of ["creep", "focus", "timeout", "push"]) {

@@ -97,7 +97,7 @@ test("the stage draws under the rules the engine plays under, with no second ans
   // under its step while the engine went on playing every rule. The stage now
   // takes its rules from the forecast alone, and nothing reads the address.
   const stage = readFileSync("src/gauntlet/GauntletStage.jsx", "utf8");
-  assert.match(stage, /bustKeeps, runTension, rules,\s*\} = useTableForecast\(/);
+  assert.match(stage, /bustKeeps, runTension, rules, logic,\s*\} = useTableForecast\(/);
   assert.doesNotMatch(stage, /tableStaging/);
   assert.doesNotMatch(readFileSync("src/gauntlet/tableStaging.js", "utf8"), /location|URLSearchParams/);
 });

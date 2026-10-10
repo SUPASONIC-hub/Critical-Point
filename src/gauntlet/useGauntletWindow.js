@@ -21,12 +21,12 @@ const TICK_BATCH_SECONDS = 0.1;
  * case does not have yet is ignored there, whether or not the stage drew it.
  * Left out, the window has every rule.
  */
-export function useGauntletWindow({ schema, seed, paused, abandoned = false, closedAs = null, beatCombo = 0, resume = null, caseId, run }) {
+export function useGauntletWindow({ schema, seed, paused, abandoned = false, closedAs = null, resume = null, caseId, run }) {
   const rules = getTableRules(caseId, run);
   // One function per set of rules, and the sets are constants: its identity
   // changes only if the window's rules do.
   const reduce = useCallback((window_, event) => reduceWindow(window_, event, rules), [rules]);
-  const [window_, dispatch] = useReducer(reduce, { schema, seed, abandoned, closedAs, beatCombo, resume }, createWindow);
+  const [window_, dispatch] = useReducer(reduce, { schema, seed, abandoned, closedAs, resume }, createWindow);
   const live = window_.status === "live";
   // The run's story mark is set when its case opens, so it is one value for as
   // long as this window is on the table.

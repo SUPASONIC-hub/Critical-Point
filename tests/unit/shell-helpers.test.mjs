@@ -23,7 +23,7 @@ const { applyEffect, getSuspenseEvent } = await import("../../src/riskLogic.js")
 const { SEASON_ENTRY_CASE } = await import("../../src/gameCases.js");
 const chunkReload = await import("../../src/state/chunkReload.js");
 const { FX_READERS, FX_VARIABLES, registerFxVariables } = await import("../../src/gauntlet/fxVariables.js");
-const { gradePress, monotonicNow, pressedAt } = await import("../../src/gauntlet/timing.js");
+const { monotonicNow } = await import("../../src/gauntlet/timing.js");
 
 // Node's performance.now() counts from process start, a few hundred ms in, so a
 // press "400ms ago" would be a negative stamp. The table's clock is fixed here.
@@ -257,7 +257,7 @@ test("the preload error handler reloads and swallows the error", () => {
   }
 });
 
-test("the frame variables are registered once, not inherited, with a closed ring at rest", () => {
+test("the frame variables are registered once and not inherited", () => {
   assert.deepEqual(FX_VARIABLES, Object.keys(FX_READERS));
   registerFxVariables(); // No CSS API: nothing to do, and nothing remembered.
   const registered = [];
@@ -275,49 +275,16 @@ test("the frame variables are registered once, not inherited, with a closed ring
     const byName = Object.fromEntries(registered.map((definition) => [definition.name, definition]));
     assert.equal(byName["--gx-shake-x"].syntax, "<length>");
     assert.equal(byName["--gx-shake-x"].initialValue, "0px");
-    assert.equal(byName["--gx-beat-phase"].initialValue, "1");
+    assert.equal(byName["--gx-beat"].initialValue, "0");
+    assert.equal("--gx-beat-phase" in byName, false, "the approach ring went with the beat");
     assert.equal(byName["--gx-heat"].initialValue, "0");
   } finally {
     delete globalThis.CSS;
   }
 });
 
-test("a press is graded when the pointer went down, not when the click landed", () => withTableClock(() => {
-  const now = monotonicNow();
-  assert.ok(Number.isFinite(now));
-  const stamp = now - 400;
-  // A click from a pointer: the press is the pointer going down.
-  assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 120), stamp - 120);
-  // Enter or Space on the button: detail 0, and with no key noted going down
-  // it is its own press. (With one noted it is graded there: table-controls.)
-  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: stamp }, 0), stamp);
-  // A pointer that went down too long ago is not this press.
-  assert.equal(pressedAt({ type: "click", detail: 1, timeStamp: stamp }, stamp - 5000), stamp);
-  // No usable stamp, or one from the future: now.
-  assert.equal(pressedAt({ type: "keydown" }), now);
-  assert.equal(pressedAt({ timeStamp: now + 60_000 }), now);
-}));
-
-test("gradePress spends the pointer and says when the wide window made the grade", () => withTableClock(() => {
-  const period = 500;
-  const at = monotonicNow() - 10_000;
-  const onBeat = { type: "keydown", timeStamp: at + period * 4 };
-  const pointer = { current: 123 };
-  const exact = gradePress(onBeat, pointer, { at, period });
-  assert.equal(exact.grade, "perfect");
-  assert.equal(exact.widened, false);
-  assert.equal(pointer.current, 0);
-
-  // Find an offset the narrow window misses and the wide one does not.
-  let widenedSeen = false;
-  for (let offset = 10; offset < period / 2; offset += 5) {
-    const result = gradePress({ type: "keydown", timeStamp: at + period * 4 + offset }, { current: 0 }, { at, period }, true);
-    if (result.widened) {
-      widenedSeen = true;
-      break;
-    }
-  }
-  assert.ok(widenedSeen, "the wider window never changed a grade");
+test("the table's clock is the page's monotonic one", () => withTableClock(() => {
+  assert.ok(Number.isFinite(monotonicNow()));
 }));
 
 const { confirmAction } = await import("../../src/state/confirmAction.js");

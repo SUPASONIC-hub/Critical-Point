@@ -552,9 +552,9 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 // The rest of the gates, on the season's mean closing values (p50s: trust 77,
 // legitimacy 78, capital 93; legitimacy stays over 95 only chasing procedure,
 // capital at 100 only chasing money). Slack at the table buys the lower record
-// bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a combo of 12, or
-// 19,500 a case banked -- between the best blind (15.4k) and heartbeat (24.6k)
-// play check:pressure measures at nine windows a case (16,000 when it was 7).
+// bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a logic streak of
+// 24, or 19,500 a case banked -- between the best blind (15.4k) and heartbeat
+// (24.6k) play check:pressure measures at nine windows a case (16,000 at 7).
 const { collapseHarmPerCase: COLLAPSE_HARM_PER_CASE, collapseBustRate: COLLAPSE_BUST_RATE, collapseOverreachHarm: COLLAPSE_OVERREACH_HARM, clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES;
 const CLUE_RATE_SLACK_BAR = 0.8;
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
@@ -564,7 +564,13 @@ const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, S
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
-export const BEAT_SLACK_COMBO = 12;
+// The streak that opens the slack door: the p90 of the seasons check:endings
+// replays (season best 1 / 3 / 7 / 24 / 109 at min / p10 / p50 / p90 / max; a
+// random hand never passes 8, one that plays for it reaches 40 one season in
+// two). Until 2026-10-10 the door was the beat's, a combo of 12 pushes; no push
+// earns that now, and a season that reached it before then keeps the door open.
+export const LOGIC_SLACK_STREAK = 24;
+const BEAT_SLACK_COMBO = 12;
 
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 
@@ -620,18 +626,17 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
     // The vault is cumulative across the season, so the largest summary holds it,
     // and it is read per case: a season total rises with every case played. The
-    // groove the beat added is taken back out -- the vault's slack rewards
-    // reading the table, and the beat has its own door.
+    // hand's share (`grooveVault`: the logic streak and LOCK, once the beat) is
+    // taken back out -- the vault's slack rewards reading the table, and the
+    // streak has its own door.
     seasonVaultPerCase: summaries.length
       ? summaries.reduce(
         (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.grooveVault) || 0)),
         0,
       ) / summaries.length
       : 0,
-    seasonBestCombo: summaries.reduce(
-      (best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0),
-      0,
-    ),
+    seasonBestCombo: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0), 0),
+    seasonBestLogic: summaries.reduce((best, summary) => Math.max(best, Number(summary.logicRecord?.best) || 0, Number(summary.gauntlet?.bestLogic) || 0), 0),
   };
 }
 
@@ -665,6 +670,7 @@ export function getEndingVariant({
   seasonBestMultiplier = 1,
   seasonVaultPerCase = 0,
   seasonBestCombo = 0,
+  seasonBestLogic = 0,
   casesPlayed = 0,
   seasonWindows = 0,
   sustainedPressure,
@@ -707,7 +713,7 @@ export function getEndingVariant({
   }
 
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
-  const slack = heldTheLine || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
+  const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
   const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
   if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];

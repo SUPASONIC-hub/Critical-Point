@@ -21,8 +21,7 @@ import {
   KINETIC_GRIP_CHIPS,
   LOCK_PRESS_SECONDS,
   LOCKPICK_SEAL,
-  LOGIC,
-  METRONOME_REACH,
+  LOGIC_CAP,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
   SEAL_BREAK_GAUGE,
@@ -324,127 +323,34 @@ export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, 
 
 export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8, time: -4 });
 
-/* ---------------------------------------------------------------- tempo */
+/* ----------------------------------------------------------------- hand */
 
 /**
- * The beat. The heartbeat is the table's one honest instrument, so it is also
- * the table's rhythm: a push landed on the beat is a push made while listening.
+ * What the hand adds to a pot: the logic streak (logicStreak.js) and LOCK.
  *
- * Timing never moves the wall or the step. The odds stay the heartbeat's
- * business and `check:pressure` holds that a perfectly timed player busts
- * exactly as often as an untimed one. What timing moves is what the pot pays
- * (groove) and what the clock costs (a slip).
+ * Neither moves the wall or the step. The odds stay the heartbeat's business
+ * and `check:pressure` holds that a hand that plays for the streak busts
+ * exactly as often as one that does not.
  *
- * The windows are fractions of the beat with a floor in milliseconds, so a
- * pulse racing at 190 bpm next to the wall still leaves a gap a hand can hit.
- */
-const BEAT_PERFECT = 0.07;
-const BEAT_PERFECT_FLOOR_MS = 35;
-const BEAT_GOOD = 0.18;
-const BEAT_GOOD_FLOOR_MS = 60;
-/** An off-beat push costs this much clock, creep included. */
-export const SLIP_SECONDS = 1;
-/** Groove one push can earn from its combo, before a PERFECT's extra point. */
-export const COMBO_POINT_CAP = 4;
-/**
- * Each groove point adds this much to the pot, up to GROOVE_CAP (x1.5). Sized
- * so the beat is a spice and the read is the game: in `check:pressure` a hand
- * that lands every push PERFECT banks 1.45x the best heartbeat policy, while
- * listening to the heartbeat banks 1.55x the best blind one. At 0.04 / x2 the
- * beat paid 1.81x -- past a player who could see the wall -- and timing had
- * become the strategy.
+ * Until 2026-10-10 this was the beat: a push landed on the heartbeat earned
+ * groove, one off it cost a second of clock, and a LOCK was graded the same
+ * way. Nothing here grades a press any more. What is left of it is the groove
+ * a window saved in the middle of a beat still holds, which is paid as it was
+ * shown (`getHandBonus`); each of its points added this much, up to x1.5.
  */
 const GROOVE_RATE = 0.03;
-export const GROOVE_CAP = 0.5;
-/** The groove bonus at which the table goes into fever. */
-export const FEVER_BONUS = 1.3;
 export const FOCUS_MAX = 100;
-const FOCUS_PERFECT_GAIN = 24;
-const FOCUS_GOOD_GAIN = 13;
-const FOCUS_MISS_HEAT = 4;
-const FOCUS_MISS_SECONDS = 1.25;
+const FOCUS_GAIN = 13;
 export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
 
 const FOCUS_MODE_PROFILES = Object.freeze({
-  strike: {
-    label: "STRIKE",
-    text: "더 큰 판돈을 잠그지만, 헛치면 더 크게 막힌다.",
-    gainScale: 1.15,
-    missHeat: FOCUS_MISS_HEAT + 2,
-    missSeconds: FOCUS_MISS_SECONDS,
-    potRate: 1.15,
-    resourceRate: 0.32,
-    reliefPerHit: 0,
-  },
-  steady: {
-    label: "STEADY",
-    text: "보상은 작지만, LOCK마다 판이 식는다.",
-    gainScale: 0.9,
-    missHeat: Math.max(1, FOCUS_MISS_HEAT - 2),
-    missSeconds: FOCUS_MISS_SECONDS * 0.8,
-    potRate: 0.62,
-    resourceRate: 0.34,
-    reliefPerHit: 2,
-  },
-  expose: {
-    label: "EXPOSE",
-    text: "카드의 자원 효과를 키운다.",
-    gainScale: 1,
-    missHeat: FOCUS_MISS_HEAT,
-    missSeconds: FOCUS_MISS_SECONDS,
-    potRate: 0.78,
-    resourceRate: 0.72,
-    reliefPerHit: 0,
-  },
+  strike: { label: "STRIKE", gainScale: 1.15, potRate: 1.15, resourceRate: 0.32, relief: 0 },
+  steady: { label: "STEADY", gainScale: 0.9, potRate: 0.62, resourceRate: 0.34, relief: 2 },
+  expose: { label: "EXPOSE", gainScale: 1, potRate: 0.78, resourceRate: 0.72, relief: 0 },
 });
 
-const BEAT_GRADES = new Set(["perfect", "good", "miss"]);
-
-/** The GOOD window in milliseconds for a beat of this period. */
-export function getGoodWindowMs(periodMs, wide = false) {
-  return Math.max(periodMs * BEAT_GOOD, BEAT_GOOD_FLOOR_MS) * (wide ? METRONOME_REACH : 1);
-}
-
-/**
- * Where a press landed against the beat: "perfect", "good", "miss", or null with
- * no beat to read. `wide` is METRONOME. `sinceBeatMs` may be negative: a
- * press up to one beat ahead of the stamp is read against the beat it preceded.
- */
-export function judgeBeat(sinceBeatMs, periodMs, wide = false) {
-  const period = Number(periodMs);
-  const since = Number(sinceBeatMs);
-  // A press stamped just before the beat it was aimed at -- the hand landed, then
-  // the frame that sounds the beat ran -- is early by that much, not ungraded.
-  // Further back than one beat there is no beat to have aimed at.
-  if (!Number.isFinite(period) || period <= 0 || !Number.isFinite(since) || since < -period) return null;
-  const phase = ((since % period) + period) % period;
-  const offset = Math.min(phase, period - phase);
-  const reach = wide ? METRONOME_REACH : 1;
-  if (offset <= Math.max(period * BEAT_PERFECT, BEAT_PERFECT_FLOOR_MS) * reach) return "perfect";
-  if (offset <= getGoodWindowMs(period, wide)) return "good";
-  return "miss";
-}
-
-/**
- * One graded press against the running combo. A hit extends the combo and
- * earns groove worth the combo's length (capped); a miss breaks the combo and
- * keeps the groove, so the pot on the table never shrinks mid-window. An
- * ungraded press -- no beat on screen yet -- changes neither.
- */
-export function scoreBeat({ beatCombo = 0, groove = 0 } = {}, grade = null) {
-  const combo = Math.max(0, Math.trunc(Number(beatCombo) || 0));
-  const banked = Math.max(0, Number(groove) || 0);
-  if (grade === "perfect" || grade === "good") {
-    const nextCombo = combo + 1;
-    const points = Math.min(COMBO_POINT_CAP, nextCombo) + (grade === "perfect" ? 1 : 0);
-    return { beatCombo: nextCombo, groove: banked + points, points };
-  }
-  if (grade === "miss") return { beatCombo: 0, groove: banked, points: 0 };
-  return { beatCombo: combo, groove: banked, points: 0 };
-}
-
-export function getGrooveBonus(groove) {
-  return round2(1 + Math.min(GROOVE_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
+function getGrooveBonus(groove) {
+  return round2(1 + Math.min(LOGIC_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
 function normalizeFocusMode(value) {
@@ -455,66 +361,35 @@ export function getFocusModeProfile(mode) {
   return FOCUS_MODE_PROFILES[normalizeFocusMode(mode)];
 }
 
-export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}, grade = null) {
-  const charge = clamp(Math.round(Number(focus) || 0), 0, FOCUS_MAX);
-  const combo = Math.max(0, Math.trunc(Number(focusCombo) || 0));
+/**
+ * One LOCK press: the charge it leaves and how far it cools the gauge. Every
+ * press takes what a press landed on the beat used to (the amount a GOOD one
+ * took), a little more for each press before it in the window.
+ */
+export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}) {
   const profile = getFocusModeProfile(focusMode);
-  if (grade === "perfect" || grade === "good") {
-    const nextCombo = combo + 1;
-    const baseGain = grade === "perfect" ? FOCUS_PERFECT_GAIN : FOCUS_GOOD_GAIN;
-    const chainGain = Math.min(12, nextCombo * 2);
-    const gained = Math.round((baseGain + chainGain) * profile.gainScale);
-    return {
-      focus: clamp(charge + gained, 0, FOCUS_MAX),
-      focusCombo: nextCombo,
-      focusHits: 1,
-      focusPerfects: grade === "perfect" ? 1 : 0,
-      focusMisses: 0,
-      focusRelief: grade === "perfect" ? profile.reliefPerHit + 1 : profile.reliefPerHit,
-      jammed: false,
-    };
-  }
-  if (grade === "miss") {
-    return {
-      focus: Math.max(0, charge - 12),
-      focusCombo: 0,
-      focusHits: 0,
-      focusPerfects: 0,
-      focusMisses: 1,
-      focusRelief: 0,
-      jammed: true,
-    };
-  }
-  return {
-    focus: charge,
-    focusCombo: combo,
-    focusHits: 0,
-    focusPerfects: 0,
-    focusMisses: 0,
-    focusRelief: 0,
-    jammed: false,
-  };
+  const presses = Math.max(0, Math.trunc(Number(focusCombo) || 0)) + 1;
+  const gained = Math.round((FOCUS_GAIN + Math.min(12, presses * 2)) * profile.gainScale);
+  return { focus: clamp(Math.round(Number(focus) || 0) + gained, 0, FOCUS_MAX), focusCombo: presses, focusRelief: profile.relief };
 }
 
 /**
- * What the hand can add to a pot, the beat and LOCK together: the groove's own
- * cap. LOCK used to multiply on top of the groove with no ceiling of its own --
- * STRIKE at full charge was x2.15, x3.2 with a full groove -- and
- * `check:pressure`, which had only ever played hands that never locked, measured
- * a hand that locked and pushed on the beat at 3.5 times the best listening
- * policy and nearly twice a player who could see the wall. Timing had become
- * the strategy. The stances still differ in how fast they reach the cap, in
- * what they do to the card's resources, and in the board they carry forward.
+ * What the hand can add to a pot, the streak and LOCK together: the streak's
+ * own cap. LOCK used to multiply on top with no ceiling of its own -- STRIKE
+ * at full charge was x2.15 -- and `check:pressure`, which had only ever played
+ * hands that never locked, measured a hand that locked at 3.5 times the best
+ * listening policy and nearly twice a player who could see the wall. The
+ * stances still differ in how fast they reach the cap, in what they do to the
+ * card's resources, and in the board they carry forward.
  */
-export const HAND_CAP = 1 + GROOVE_CAP;
+export const HAND_CAP = 1 + LOGIC_CAP;
 
 /**
- * `streak` is the logic streak the pot is paid on, and is only given with the
- * switch on (`LOGIC`); left out it is none, which pays x1, and the hand is the
- * beat and LOCK as it was. The larger of the two is paid: no push earns groove
- * once the switch is on, so the only window that holds some is one saved in
- * the middle of a beat and picked up after, and the pot its player saw must
- * not shrink.
+ * `streak` is the logic streak the pot is paid on: the streak after this
+ * window's card. `groove` is what a window saved in the middle of a beat, and
+ * picked up after the beat was taken out, still holds. The larger of the two
+ * is paid, so the pot that window's player saw does not shrink; every other
+ * window holds none.
  */
 export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
   return round2(Math.min(HAND_CAP, Math.max(getLogicBonus(streak), getGrooveBonus(groove)) * getFocusBonus(focus, mode).pot));
@@ -585,17 +460,18 @@ function normalizeTimeScale(value) {
 /** The ways a window can bust on the table, as a hold written at closure records them. */
 const CLOSED_CAUSES = new Set(["push", "creep", "timeout", "focus"]);
 /**
- * Every way a window closes, as a verdict names it: the cash, the four busts
- * the table deals -- a push into the wall, the clock's heat reaching it, the
- * clock running out, a lock off the beat heating into it -- and a bet walked
- * away from. Whatever tells the player why reads this list, so a cause added
- * here without a sentence fails a test instead of borrowing another's.
+ * Every way a window closes, as a verdict names it: the cash, the busts the
+ * table deals -- a push into the wall, the clock's heat reaching it, the clock
+ * running out -- and a bet walked away from. "focus" was a LOCK off the beat
+ * heating into the wall; no press does that now, and a log or a hold written
+ * before 2026-10-10 can still name it. Whatever tells the player why reads
+ * this list, so a cause added here without a sentence fails a test instead of
+ * borrowing another's.
  */
 export const VERDICT_CAUSES = Object.freeze(["cash", ...CLOSED_CAUSES, "abandon"]);
 
-export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, closedAs = null, beatCombo = 0, resume = null } = {}) {
+export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = false, closedAs = null, resume = null } = {}) {
   const normalized = normalizeSchema(schema);
-  const carriedCombo = clamp(Math.trunc(Number(beatCombo) || 0), 0, 999);
   const window = {
     seed: String(seed),
     schema: normalized,
@@ -608,23 +484,11 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     selectedId: null,
     status: "live",
     cause: null,
-    // The combo is carried in from the last cash; groove is earned here.
-    beatCombo: carriedCombo,
-    maxCombo: carriedCombo,
-    groove: 0,
-    beatHits: 0,
-    perfects: 0,
-    slips: 0,
     focus: 0,
     focusMode: "strike",
     focusCombo: 0,
     maxFocusCombo: 0,
     focusHits: 0,
-    focusPerfects: 0,
-    focusMisses: 0,
-    jammed: false,
-    lastGrade: null,
-    lastFocusGrade: null,
     // How many times slower than the board's clock this window has been run,
     // at its slowest (the table-time comfort setting). It is the window's, and
     // it is saved with a window put down: the setting itself can be changed on
@@ -647,6 +511,13 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
   return abandoned ? { ...window, status: "bust", cause: "abandon", closedAs: CLOSED_CAUSES.has(closedAs) ? closedAs : null } : window;
 }
 
+/**
+ * `beatCombo` to `slips`, and LOCK's two grade counts, are the beat's. No
+ * window earns them now and one put down before 2026-10-10 holds them: they
+ * are kept as they were saved and in the order they were saved, because a
+ * save that comes back changed is announced as repaired (state/savedState.js),
+ * and `groove` is still read when that window is paid.
+ */
 const SUSPENDED_WINDOW_NUMBERS = [
   "gauge", "pushes", "lastStep", "elapsed", "beatCombo", "maxCombo", "groove", "beatHits", "perfects", "slips",
   "focus", "focusCombo", "maxFocusCombo", "focusHits", "focusPerfects", "focusMisses", "timeScale",
@@ -742,16 +613,14 @@ export function getRemainingSeconds(window) {
  *
  * `rules` is what the case plays under (`tableUnlocks`), and an event for a
  * rule the case does not have yet is ignored here, whatever the stage draws:
- * without `beat` a push is a push and its grade is not read -- no combo, no
- * groove, and no slip to pay for a beat nobody was shown; without `lock` a
- * FOCUS leaves the window as it was; without `stance` so does SET_FOCUS_MODE,
- * and the window stays in the stance it opened in (STRIKE). A window resumed
- * from a save keeps what it held -- that is the player's, and `resolveWindow`
- * decides what it is worth.
+ * without `lock` a FOCUS leaves the window as it was; without `stance` so does
+ * SET_FOCUS_MODE, and the window stays in the stance it opened in (STRIKE). A
+ * window resumed from a save keeps what it held -- that is the player's, and
+ * `resolveWindow` decides what it is worth.
  *
- * `logic` is the streak's switch (`tableRules`). On, there is no beat to read:
- * a push is never graded, and a FOCUS charges as a GOOD lock did and costs
- * `LOCK_PRESS_SECONDS` of clock -- no JAM, no heat, and no bust of its own.
+ * No press is graded. A push is a push whenever it lands, and a FOCUS charges
+ * (`scoreFocus`) and costs `LOCK_PRESS_SECONDS` of clock -- no JAM, no heat,
+ * and no bust of its own.
  */
 function advanceClock(window, delta) {
   const elapsed = window.elapsed + delta;
@@ -763,7 +632,7 @@ function advanceClock(window, delta) {
   return { ...window, elapsed, gauge };
 }
 
-export function reduceWindow(window, event = {}, rules = ALL_RULES, logic = LOGIC) {
+export function reduceWindow(window, event = {}, rules = ALL_RULES) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
     case "TICK": {
@@ -776,60 +645,22 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES, logic = LOGI
       const pushes = window.pushes + 1;
       const step = drawStep(window.schema, window.seed, pushes);
       const gauge = clamp(window.gauge + step, 0, GAUGE_MAX);
-      const grade = !logic && rules.has("beat") && BEAT_GRADES.has(event.grade) ? event.grade : null;
-      const scored = scoreBeat(window, grade);
-      const pushed = {
-        ...window,
-        pushes,
-        lastStep: step,
-        gauge,
-        beatCombo: scored.beatCombo,
-        maxCombo: Math.max(Number(window.maxCombo) || 0, scored.beatCombo),
-        groove: scored.groove,
-        beatHits: (Number(window.beatHits) || 0) + (scored.points > 0 ? 1 : 0),
-        perfects: (Number(window.perfects) || 0) + (grade === "perfect" ? 1 : 0),
-        slips: (Number(window.slips) || 0) + (grade === "miss" ? 1 : 0),
-        jammed: false,
-        lastGrade: grade,
-      };
-      if (gauge >= window.wall) return { ...pushed, status: "bust", cause: "push" };
-      // A slip is paid in clock, and the clock creeps heat while it runs, so a
-      // mashed push can never be a way to skip creep.
-      return grade === "miss" ? advanceClock(pushed, SLIP_SECONDS) : pushed;
+      const pushed = { ...window, pushes, lastStep: step, gauge };
+      return gauge >= window.wall ? { ...pushed, status: "bust", cause: "push" } : pushed;
     }
     case "FOCUS": {
       if (!window.selectedId || !rules.has("lock")) return window;
-      // With the switch on there is no beat to lock against: every press takes
-      // the charge a GOOD one took, and is paid for in clock below.
-      const grade = logic ? "good" : BEAT_GRADES.has(event.grade) ? event.grade : null;
-      const scored = scoreFocus(window, grade);
-      const profile = getFocusModeProfile(window.focusMode);
-      const focused = {
+      const scored = scoreFocus(window);
+      // The clock creeps heat while it is spent, so the press can run a window
+      // out or into the wall the clock's own way ("timeout", "creep").
+      return advanceClock({
         ...window,
         focus: scored.focus,
         focusCombo: scored.focusCombo,
         maxFocusCombo: Math.max(Number(window.maxFocusCombo) || 0, scored.focusCombo),
-        focusHits: (Number(window.focusHits) || 0) + scored.focusHits,
-        focusPerfects: (Number(window.focusPerfects) || 0) + scored.focusPerfects,
-        focusMisses: (Number(window.focusMisses) || 0) + scored.focusMisses,
-        jammed: scored.jammed,
-        lastFocusGrade: logic ? null : grade,
-      };
-      if (grade !== "miss") {
-        const cooled = scored.focusRelief > 0
-          ? { ...focused, gauge: clamp(focused.gauge - scored.focusRelief, 0, GAUGE_MAX) }
-          : focused;
-        // The clock creeps heat while it is spent, as it does for a slip, so
-        // the press can run a window out or into the wall the clock's own way
-        // ("timeout", "creep") and never as a jammed LOCK ("focus").
-        return logic ? advanceClock(cooled, LOCK_PRESS_SECONDS) : cooled;
-      }
-      const heated = {
-        ...focused,
-        gauge: clamp(focused.gauge + profile.missHeat, 0, GAUGE_MAX),
-      };
-      if (heated.gauge >= heated.wall) return { ...heated, gauge: heated.wall, status: "bust", cause: "focus" };
-      return advanceClock(heated, profile.missSeconds);
+        focusHits: (Number(window.focusHits) || 0) + 1,
+        gauge: clamp(window.gauge - scored.focusRelief, 0, GAUGE_MAX),
+      }, LOCK_PRESS_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -838,14 +669,14 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES, logic = LOGI
       if (!rules.has("stance")) return window;
       const focusMode = normalizeFocusMode(event.mode);
       if (focusMode === normalizeFocusMode(window.focusMode)) return window;
-      return { ...window, focusMode, focus: 0, focusCombo: 0, jammed: false, lastFocusGrade: null };
+      return { ...window, focusMode, focus: 0, focusCombo: 0 };
     }
     case "REDEAL":
       // A relic equipped before the window is touched re-deals it under the new
       // rules. Once a card is staked, a push made or the clock started, the
       // board is the board.
       if (window.pushes > 0 || window.selectedId || window.elapsed > 0) return window;
-      return createWindow({ schema: event.schema, seed: window.seed, beatCombo: window.beatCombo });
+      return createWindow({ schema: event.schema, seed: window.seed });
     case "SELECT":
       return { ...window, selectedId: typeof event.id === "string" ? event.id : null };
     case "CASH": {
@@ -882,9 +713,13 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // A live window the player put down on purpose, with their progress in it.
   // See `normalizeSuspendedWindow`.
   suspended: null,
-  // The beat combo carried into the next window, the longest this run has
-  // held, and the groove share of the pot and the vault. The ending's vault
-  // slack reads the vault without its groove: it rewards reading the table.
+  // The beat's combo and the longest it was, from before 2026-10-10: nothing
+  // adds to them or reads them now, and a save that holds them keeps them
+  // (see `SUSPENDED_WINDOW_NUMBERS`). `runGroove` and `grooveVault` are still
+  // counted under the names the beat gave them: the hand's share of the pot
+  // and of the vault, which is now the logic streak's and LOCK's. The
+  // ending's vault slack reads the vault without it: it rewards reading the
+  // table.
   beatCombo: 0,
   bestCombo: 0,
   bestFocusCombo: 0,
@@ -894,8 +729,7 @@ export const RUN_INITIAL_STATE = Object.freeze({
   stanceMastery: EMPTY_STANCE_MASTERY,
   runGroove: 0,
   grooveVault: 0,
-  // The logic streak (`advanceLogic`). Counted and saved whatever the switch
-  // says; a save from before it reads as this.
+  // The logic streak (`advanceLogic`); a save from before it reads as this.
   logic: LOGIC_INITIAL,
   // The relics this season carries, the three a closed case is offering, and
   // whether INSURANCE has already paid out in this case.
@@ -915,7 +749,9 @@ export const RUN_INITIAL_STATE = Object.freeze({
   schema: BASE_SCHEMA,
 });
 
-const PRACTICE_RECORD_KEYS = ["busts", "cashes", "bestMultiplier", "potBanked", "potLost", "pushes", "bestCombo", "beatHits", "perfects", "slips", "grooveBanked"];
+// The table record's keys (`createGauntletLedger`), and the beat's four counts
+// a replay opened before 2026-10-10 holds: a record keeps the ones it has.
+const PRACTICE_RECORD_KEYS = ["busts", "cashes", "bestMultiplier", "potBanked", "potLost", "pushes", "bestCombo", "beatHits", "perfects", "slips", "grooveBanked", "bestLogic"];
 
 function normalizePractice(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -931,7 +767,7 @@ function normalizePractice(value) {
     bestCombo: clamp(Math.trunc(Number(value.bestCombo) || 0), 0, 999),
     // A replay opened before the streak existed holds none to hand back.
     ...(value.logic ? { logic: normalizeLogic(value.logic) } : null),
-    record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
+    record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.filter((key) => key in source).map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
   };
 }
 
@@ -1387,23 +1223,22 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   return applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics);
 }
 
-const UNBEATEN = Object.freeze({ beatCombo: 0, maxCombo: 0, groove: 0, beatHits: 0, perfects: 0, slips: 0, lastGrade: null });
-const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0, focusPerfects: 0, focusMisses: 0, jammed: false, lastFocusGrade: null });
+const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0 });
 
 /**
  * The window as the case's rules read it. What a rule the case does not have
- * would have earned is not there to be settled: no beat, no groove or combo;
- * no LOCK, no charge; no choice of stance, STRIKE. The reducer already refuses
- * those presses, so this only ever changes a window that came from somewhere
- * else -- a save made before the steps existed, a script. With every rule the
- * window is handed back as it is.
+ * would have earned is not there to be settled: no streak, no groove held
+ * from a beat; no LOCK, no charge; no choice of stance, STRIKE. The reducer
+ * already refuses those presses, so this only ever changes a window that came
+ * from somewhere else -- a save made before the steps existed, a script. With
+ * every rule the window is handed back as it is.
  */
 function readWindowUnder(window, rules) {
-  const beat = rules.has("beat");
+  const logic = rules.has("logic");
   const lock = rules.has("lock");
   const stance = rules.has("stance");
-  if (!window || (beat && lock && stance)) return window;
-  return { ...window, ...(beat ? null : UNBEATEN), ...(lock ? null : UNLOCKED), ...(stance ? null : { focusMode: "strike" }) };
+  if (!window || (logic && lock && stance)) return window;
+  return { ...window, ...(logic ? null : { groove: 0 }), ...(lock ? null : UNLOCKED), ...(stance ? null : { focusMode: "strike" }) };
 }
 
 /**
@@ -1413,8 +1248,8 @@ function readWindowUnder(window, rules) {
  * `rules` is what the case on the table plays under, and decides what this
  * window can earn and how the next board can break:
  *
- *   beat       without it nothing of the tempo is credited, and the combo the
- *              run carries is neither added to nor taken.
+ *   logic      without it the streak pays nothing and is neither added to
+ *              nor taken, whatever the run carries into the case.
  *   lock       without it there is no charge, so no LOCK pot and no stance.
  *   stance     without it LOCK is STRIKE, it carries nothing into the next
  *              board, and mastery does not advance.
@@ -1431,10 +1266,9 @@ function readWindowUnder(window, rules) {
  *
  * The logic streak is settled here on every window (`advanceLogic`): `forced`
  * says the room played the card, `offered` is the types the scene had on the
- * table. `logic` is its switch: off, the streak is kept and reported and the
- * pot is the beat's; on, the pot is paid on the streak.
+ * table. The pot is paid on the streak as this window's card left it.
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, logic = LOGIC }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1449,16 +1283,23 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
-  // The streak after this window's card. It lives where the beat's combo did
-  // (the `beat` rule, until the ladder renames it; without it the type is
-  // false, "not in play"), and a card the room played is not the hand's pick
-  // (null: the bust still ends the streak). 앙코르 is to hold the streak through a bust from
-  // day 6: that is `advanceLogic`'s `bustHolds`, which nothing passes yet.
-  const logicType = rules.has("beat") && (forced ? null : getLogicType(card));
-  const streak = advanceLogic(current.logic, { type: logicType, tier: getHeatTier(outcome, gauge), offered });
-  // What the hand earned before LOCK: the groove, or with the switch on the
-  // streak this card made (and a groove held from before it, see `getHandBonus`).
-  const paidStreak = logic ? streak.logic.streak : 0;
+  // The streak after this window's card. Without the rule the type is false,
+  // "not in play", and a card the room played is not the hand's pick (null:
+  // the bust still ends the streak). Two relics bend it: ENCORE holds the
+  // streak through a bust, every bust, as it held the beat's combo; METRONOME
+  // lets a change of type count as a switch one scene longer after a rise.
+  const logicOn = rules.has("logic");
+  const logicType = logicOn && (forced ? null : getLogicType(card));
+  const streak = advanceLogic(current.logic, {
+    type: logicType,
+    tier: getHeatTier(outcome, gauge),
+    offered,
+    bustHolds: hasRelic(relics, "encore"),
+    reach: hasRelic(relics, "metronome"),
+  });
+  // What the hand earned before LOCK: the streak this card made (or a groove
+  // held from before the beat went, see `getHandBonus`).
+  const paidStreak = logicOn ? streak.logic.streak : 0;
   const earnedBonus = outcome === "cash" ? getHandBonus(reachedGroove, 0, focusMode, paidStreak) : 1;
   const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode, paidStreak) : 1;
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
@@ -1468,21 +1309,22 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
   const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
   const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus) : 0;
-  // The hand's share of the pot, told apart: what the beat earned, and what
-  // LOCK added on top of it under the cap. It was one number called groove, so
-  // a cash with no beat in it printed "GROOVE · 박자 0회".
-  const groovePot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus)) - basePot : 0;
-  const focusPot = pot - basePot - groovePot;
+  // The hand's share of the pot, told apart: what the streak earned, and what
+  // LOCK added on top of it under the cap.
+  const logicPot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus)) - basePot : 0;
+  const focusPot = pot - basePot - logicPot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
   const insured = outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
   const insuredPot = insured ? Math.floor(current.runPot / INSURANCE_SHARE) : 0;
   const lostPot = outcome === "bust" ? current.runPot - insuredPot : 0;
-  const windowCombo = Math.max(0, Math.trunc(Number(window?.beatCombo) || 0));
-  const encored = outcome === "bust" && hasRelic(relics, "encore") && windowCombo > 0;
-  // `runGroove` is the hand's whole share, beat and LOCK: the ending's vault
+  // A relic that bent the streak says so in the reveal: a bust that left a
+  // streak standing, and a switch that only the longer reach allowed.
+  const encored = streak.move === "bust" && streak.logic.streak > 0;
+  const reached = streak.move === "switch" && !current.logic.rose;
+  // `runGroove` is the hand's whole share, streak and LOCK: the ending's vault
   // slack reads the vault without it, and neither is reading the table.
-  const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
+  const runGrooveAfter = outcome === "cash" ? current.runGroove + logicPot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
   const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   // A practice run closes a case the table has already been paid for: nothing
@@ -1511,6 +1353,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const relicProcs = [
     ...(insured ? ["insurance"] : []),
     ...(encored ? ["encore"] : []),
+    ...(reached ? ["metronome"] : []),
     ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
   ];
   const relicOffer = practice
@@ -1536,21 +1379,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     nextMutations,
     relicProcs,
     relicOffer,
-    tempo: {
-      grade: typeof window?.lastGrade === "string" ? window.lastGrade : null,
-      combo: windowCombo,
-      maxCombo: Math.max(windowCombo, Math.trunc(Number(window?.maxCombo) || 0)),
-      hits: Math.trunc(Number(window?.beatHits) || 0),
-      perfects: Math.trunc(Number(window?.perfects) || 0),
-      slips: Math.trunc(Number(window?.slips) || 0),
-      groove: reachedGroove,
-      bonus: getGrooveBonus(reachedGroove),
-      groovePot,
-      lostCombo: outcome === "bust" && !encored ? windowCombo : 0,
-      // Carried on the closing entry of a replayed case, where the summary's
-      // table record is read from (`createTableRecord`).
-      ...(practice?.record ? { firstRecord: practice.record } : {}),
-    },
+    // Carried on the closing entry of a replayed case, where the summary's
+    // table record is read from (`createTableRecord`).
+    ...(practice?.record ? { firstRecord: practice.record } : {}),
     focus: {
       charge: Math.round(focusCharge),
       mode: focusMode,
@@ -1558,28 +1389,29 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       combo: Math.max(0, Math.trunc(Number(window?.focusCombo) || 0)),
       maxCombo: Math.max(0, Math.trunc(Number(window?.maxFocusCombo) || 0)),
       hits: focusHits,
-      perfects: Math.trunc(Number(window?.focusPerfects) || 0),
-      misses: Math.trunc(Number(window?.focusMisses) || 0),
-      grade: typeof window?.lastFocusGrade === "string" ? window.lastFocusGrade : null,
       resourceMultiplier: focusBonus.resource,
       // What LOCK added to this pot, after the hand's cap.
       potMultiplier: round2(handBonus / earnedBonus),
       pot: focusPot,
       tier: focusBonus.tier,
-      jammed: window?.jammed === true,
       stanceEarned: !current.practice && rules.has("stance") && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
     },
     // The streak's own line of the verdict, on every window: the card's type,
     // the tier the window closed in, whether the pressure had risen going into
     // it, what that did to the streak (`advanceLogic`'s move) and the streak
-    // after. The case summary's record is built from these.
+    // after. The case summary's record is built from these. `held` is how many
+    // windows in a row the type has now been picked, `bonus` is what
+    // the hand's pot was multiplied by before LOCK and `pot` what that added.
     logic: {
       type: logicType || null,
       tier: streak.logic.heat,
       rose: current.logic.rose,
       move: streak.move,
       streak: streak.logic.streak,
+      held: streak.logic.held,
+      bonus: earnedBonus,
+      pot: logicPot,
     },
   };
   const settled = {
@@ -1596,14 +1428,12 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     bestMultiplier: Math.max(current.bestMultiplier, multiplier || 1),
     lastOutcome: outcome,
     lastGauge: gauge,
-    // A cash carries the combo into the next window; the wall takes it with the
-    // pot, unless ENCORE holds it.
-    beatCombo: !rules.has("beat") ? current.beatCombo : outcome === "cash" || encored ? windowCombo : 0,
-    bestCombo: Math.max(current.bestCombo, verdict.tempo.maxCombo),
+    beatCombo: current.beatCombo,
+    bestCombo: current.bestCombo,
     bestFocusCombo: Math.max(current.bestFocusCombo, verdict.focus.maxCombo),
     focusHits: current.focusHits + verdict.focus.hits,
-    focusPerfects: current.focusPerfects + verdict.focus.perfects,
-    focusMisses: current.focusMisses + verdict.focus.misses,
+    focusPerfects: current.focusPerfects,
+    focusMisses: current.focusMisses,
     stanceMastery,
     runGroove: caseClosed ? 0 : runGrooveAfter,
     grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
@@ -1711,10 +1541,8 @@ export function carryTableRecordIntoRestore(restored, current) {
       runPot: bustedSince ? 0 : restoredRun.runPot,
       runGroove: bustedSince ? 0 : restoredRun.runGroove,
       streak: bustedSince ? 0 : restoredRun.streak,
-      beatCombo: bustedSince ? 0 : restoredRun.beatCombo,
-      bestCombo: Math.max(restoredRun.bestCombo, currentRun.bestCombo),
-      // The streak goes the way the combo does: a bust since the slot took it,
-      // and the longest it has been is the record's.
+      // A bust since the slot took the streak, and the longest it has been is
+      // the record's.
       logic: {
         ...restoredRun.logic,
         streak: bustedSince ? 0 : restoredRun.logic.streak,
@@ -1761,10 +1589,7 @@ export function createGauntletLedger(log = []) {
   let potBanked = 0;
   let potLost = 0;
   let pushes = 0;
-  let bestCombo = 0;
-  let beatHits = 0;
-  let perfects = 0;
-  let slips = 0;
+  let bestLogic = 0;
   let grooveBanked = 0;
   for (const entry of log) {
     const threshold = entry?.threshold;
@@ -1775,28 +1600,12 @@ export function createGauntletLedger(log = []) {
     potBanked += Number(threshold.pot) || 0;
     potLost += Number(threshold.lostPot) || 0;
     pushes += Number(threshold.pushes) || 0;
-    const tempo = threshold.tempo;
-    if (tempo && typeof tempo === "object") {
-      bestCombo = Math.max(bestCombo, Number(tempo.maxCombo) || 0);
-      beatHits += Number(tempo.hits) || 0;
-      perfects += Number(tempo.perfects) || 0;
-      slips += Number(tempo.slips) || 0;
-      grooveBanked += Number(tempo.groovePot) || 0;
-    }
+    bestLogic = Math.max(bestLogic, Number(threshold.logic?.streak) || 0);
+    // What the hand added before LOCK: the streak's share, and in an entry
+    // logged before 2026-10-10 the beat's (`tempo`), under the beat's name.
+    grooveBanked += Number(threshold.logic?.pot ?? threshold.tempo?.groovePot) || 0;
   }
-  return {
-    busts,
-    cashes,
-    bestMultiplier: round2(bestMultiplier),
-    potBanked,
-    potLost,
-    pushes,
-    bestCombo,
-    beatHits,
-    perfects,
-    slips,
-    grooveBanked,
-  };
+  return { busts, cashes, bestMultiplier: round2(bestMultiplier), potBanked, potLost, pushes, bestLogic, grooveBanked };
 }
 
 /**
@@ -1805,7 +1614,8 @@ export function createGauntletLedger(log = []) {
  * take a bust out of the season the ending reads.
  */
 export function createTableRecord(log = []) {
-  const first = log.findLast((entry) => entry?.threshold?.tempo?.firstRecord)?.threshold.tempo.firstRecord;
+  // A replay closed before 2026-10-10 carried it on the beat's line (`tempo`).
+  const first = log.map((entry) => entry?.threshold?.firstRecord ?? entry?.threshold?.tempo?.firstRecord).findLast(Boolean);
   return first ? { ...createGauntletLedger([]), ...first } : createGauntletLedger(log);
 }
 
@@ -1823,6 +1633,8 @@ export function createRunSummary(run) {
     lastGauge: Math.round(state.lastGauge),
     beatCombo: state.beatCombo,
     bestCombo: state.bestCombo,
+    logicStreak: state.logic.streak,
+    bestLogic: state.logic.best,
     bestFocusCombo: state.bestFocusCombo,
     focusHits: state.focusHits,
     focusPerfects: state.focusPerfects,

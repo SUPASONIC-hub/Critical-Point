@@ -28,6 +28,7 @@ import {
   getSeasonStrain,
   getSeasonWear,
   getUnattendedNext,
+  LOGIC_SLACK_STREAK,
   makeEmptyScores,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
@@ -188,7 +189,7 @@ function mergeEffects(...effects) {
 
 function playWindow(policy, run, windowSeed, rules) {
   // The run's own board, and for a story run the same board with its far wall.
-  let win = createWindow({ schema: getTableSchema(run), seed: windowSeed, beatCombo: run.beatCombo });
+  let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
   win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
   // Reading the card and the band before the first press. Creep starts after
   // the grace, so a slow hand is already paying heat.
@@ -201,7 +202,7 @@ function playWindow(policy, run, windowSeed, rules) {
       ? getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm
       : win.gauge < target;
     if (!keepGoing) break;
-    win = reduceWindow(win, { type: "PUSH", grade: null }, rules);
+    win = reduceWindow(win, { type: "PUSH" }, rules);
     win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
   }
   if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
@@ -340,7 +341,6 @@ function playSeason(seasonIndex, archetype, story = false) {
           pot: verdict.pot,
           lostPot: verdict.lostPot,
           pushes: verdict.pushes,
-          tempo: verdict.tempo,
           focus: verdict.focus,
           logic: verdict.logic,
         },
@@ -364,7 +364,7 @@ function playSeason(seasonIndex, archetype, story = false) {
   }
   const strain = getSeasonStrain(caseResults);
   const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-  return { ending, policy, strain, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults) };
+  return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults) };
 }
 
 /**
@@ -389,9 +389,11 @@ const byArchetype = {};
 const samples = { busts: [], windows: [], clues: [], skipped: [], legitimacy: [], capital: [], trust: [], seasonLegitimacy: [], seasonCapital: [], seasonTrust: [], sustained: [], peak: [], reframes: [], peopleFirst: [] };
 const peopleFirstByArchetype = {};
 const perCasePeak = CASE_SEQUENCE.map(() => []);
-// The logic streak, counted as a shadow: the longest each season reached and its hold rate, by archetype.
+// The logic streak: the longest each season reached and its hold rate, by archetype.
 const logicBest = {};
 const logicHold = {};
+let doorOpen = 0;
+let doorMoved = 0;
 const dump = [];
 for (let index = 0; index < SEASONS; index += 1) {
   const archetype = POPULATION[index % POPULATION.length];
@@ -416,6 +418,13 @@ for (let index = 0; index < SEASONS; index += 1) {
   (peopleFirstByArchetype[archetype] ??= []).push(peopleFirst);
   samples.reframes.push(season.strain.seasonReframeRoutes ?? 0);
   (logicBest[archetype] ??= []).push(season.logic.bestLogic ?? 0);
+  // The slack door: whether the streak opened it, and whether the ending
+  // would be another without it.
+  if (season.strain.seasonBestLogic >= LOGIC_SLACK_STREAK) {
+    doorOpen += 1;
+    const shut = getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic: 0 });
+    if (shut.id !== season.ending.id) doorMoved += 1;
+  }
   (logicHold[archetype] ??= []).push(season.logic.logicHold ?? 0);
   season.casePeaks.forEach((peak, caseIndex) => perCasePeak[caseIndex].push(peak));
   if (process.env.ENDING_DUMP) dump.push({ archetype, ending: season.ending.id, clues: season.clues, final: season.final.resources, strain: season.strain, finalOutcome: season.final.log.at(-1)?.choiceId });
@@ -471,10 +480,13 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
-// min / p10 / p50 / p90 / max, for the day the ending's slack door is pointed at the streak.
+// min / p10 / p50 / p90 / max. The ending's slack door reads the season's best
+// streak (`LOGIC_SLACK_STREAK`), so the line after says how many seasons it
+// opened for and how many of those it gave a different ending.
 const fiveNumbers = (values) => `${Math.min(...values)}/${band(values)}/${Math.max(...values)}`;
 const byHand = (samplesByHand) => Object.entries(samplesByHand).map(([name, values]) => `${name} ${fiveNumbers(values)}`).join(", ");
-console.log(`Logic streak, counted and not paid (season best, min/p10/p50/p90/max: all ${fiveNumbers(Object.values(logicBest).flat())}; ${byHand(logicBest)}; hold rate: all ${fiveNumbers(Object.values(logicHold).flat())}; ${byHand(logicHold)})`);
+console.log(`Logic streak (season best, min/p10/p50/p90/max: all ${fiveNumbers(Object.values(logicBest).flat())}; ${byHand(logicBest)}; hold rate: all ${fiveNumbers(Object.values(logicHold).flat())}; ${byHand(logicHold)})`);
+console.log(`Slack door (a season's best streak of ${LOGIC_SLACK_STREAK} or more): open in ${doorOpen} of ${SEASONS} seasons (${((doorOpen / SEASONS) * 100).toFixed(1)}%); ${doorMoved} of them close on a different ending than they would with the door shut`);
 
 /**
  * The same season in story mode.

@@ -21,13 +21,11 @@ import {
   FOCUS_MODES,
   getEscalationWindow,
   getFocusBonus,
-  getGrooveBonus,
   getHandBonus,
   getMultiplier,
   getReadingSeconds,
   HAND_CAP,
   HOT_CASH_MULTIPLIER,
-  judgeBeat,
   MUTATIONS,
   normalizeRunState,
   normalizeSchema,
@@ -222,24 +220,21 @@ test("at every step, a settled window earns nothing from a rule the step does no
       assertBoard(nextRun.schema, where);
       assert.deepEqual(verdict.nextMutations.map((mutation) => mutation.id), nextRun.schema.mutations, where());
 
-      if (!rules.has("beat")) {
-        assert.deepEqual(
-          [verdict.tempo.grade, verdict.tempo.combo, verdict.tempo.maxCombo, verdict.tempo.hits, verdict.tempo.perfects, verdict.tempo.slips, verdict.tempo.groove, verdict.tempo.bonus, verdict.tempo.groovePot, verdict.tempo.lostCombo],
-          [null, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-          where(),
-        );
-        assert.equal(nextRun.beatCombo, run.beatCombo, `${where()}: the combo the run carries is neither added to nor taken`);
-        assert.equal(nextRun.bestCombo, run.bestCombo, where());
+      if (!rules.has("logic")) {
+        assert.deepEqual([verdict.logic.move, verdict.logic.bonus, verdict.logic.pot], ["none", 1, 0], where());
+        assert.deepEqual(nextRun.logic.streak, run.logic.streak, `${where()}: the streak the run carries is neither added to nor taken`);
       }
+      // What a save holds of the beat is written back as it was, under any rules.
+      assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [run.beatCombo, run.bestCombo], where());
       if (!rules.has("lock")) {
         assert.deepEqual(
-          [verdict.focus.charge, verdict.focus.hits, verdict.focus.perfects, verdict.focus.misses, verdict.focus.combo, verdict.focus.maxCombo, verdict.focus.pot, verdict.focus.potMultiplier, verdict.focus.resourceMultiplier, verdict.focus.jammed],
-          [0, 0, 0, 0, 0, 0, 0, 1, 1, false],
+          [verdict.focus.charge, verdict.focus.hits, verdict.focus.combo, verdict.focus.maxCombo, verdict.focus.pot, verdict.focus.potMultiplier, verdict.focus.resourceMultiplier],
+          [0, 0, 0, 0, 0, 1, 1],
           where(),
         );
         assert.equal(nextRun.focusHits, run.focusHits, where());
       }
-      if (!rules.has("beat") && !rules.has("lock")) {
+      if (!rules.has("logic") && !rules.has("lock")) {
         assert.equal(verdict.pot, verdict.outcome === "cash" ? Math.round(verdict.chips * verdict.multiplier) : 0, `${where()}: the pot is chips times heat`);
         assert.equal(nextRun.runGroove + nextRun.grooveVault, 0, where());
       }
@@ -332,8 +327,8 @@ test("halves round the same way on both sides of zero", () => {
 test("a closed window ignores every input", () => {
   const events = [
     { type: "TICK", delta: 1 },
-    { type: "PUSH", grade: "perfect" },
-    { type: "FOCUS", grade: "perfect" },
+    { type: "PUSH" },
+    { type: "FOCUS" },
     { type: "SET_FOCUS_MODE", mode: "steady" },
     { type: "SELECT", id: "b" },
     { type: "CASH" },
@@ -389,31 +384,29 @@ test("a bust reloaded under its slam stays closed, and breaks the board it would
   assert.ok(!left.nextRun.schema.mutations.includes("silence"));
 });
 
-test("an early press is graded against the beat it was aimed at", () => {
-  assert.equal(judgeBeat(-20, 600), "perfect", "20ms ahead of the stamp");
-  assert.equal(judgeBeat(-90, 600), "good");
-  assert.equal(judgeBeat(-300, 600), "miss", "half a beat early is a slip");
-  assert.equal(judgeBeat(-601, 600), null, "further back than a beat there was no beat to aim at");
-  for (let since = -600; since <= 1800; since += 7) assert.equal(judgeBeat(since, 600), judgeBeat(since + 600, 600), "the grade repeats with the beat");
-});
-
-test("the beat and LOCK are paid under one cap, and their shares add up", () => {
+test("the streak and LOCK are paid under one cap, and their shares add up", () => {
+  const typed = { ...staked, cognition: { risk: 2 } };
   for (const mode of FOCUS_MODES) {
     for (let focus = 0; focus <= 100; focus += 5) {
-      for (let groove = 0; groove <= 40; groove += 2) {
-        const hand = getHandBonus(groove, focus, mode);
-        assert.ok(hand >= 1 && hand <= HAND_CAP, `${mode} ${focus}/${groove}: x${hand}`);
-        assert.ok(hand >= getGrooveBonus(groove), "LOCK never takes the groove away");
-        assert.ok(hand <= getGrooveBonus(groove) * getFocusBonus(focus, mode).pot + 0.006, "and the cap only ever takes away");
-        const window = { status: "cashed", gauge: 44, pushes: 3, focus, focusMode: mode, focusHits: focus ? 3 : 0, groove, beatHits: groove ? 3 : 0 };
-        const { verdict, nextRun } = resolveWindow({ run: RUN_INITIAL_STATE, window, card: staked });
+      // `groove` is what a window saved before 2026-10-10 can still hold; every other window has none.
+      for (const [streak, groove] of [[0, 0], [1, 0], [3, 0], [5, 0], [7, 0], [8, 0], [20, 0], [0, 8], [3, 8], [3, 40], [9, 12]]) {
+        const earned = getHandBonus(groove, 0, mode, streak);
+        const hand = getHandBonus(groove, focus, mode, streak);
+        assert.ok(hand >= 1 && hand <= HAND_CAP, `${mode} ${focus}/${streak}/${groove}: x${hand}`);
+        assert.ok(hand >= earned, "LOCK never takes the streak away");
+        assert.ok(hand <= earned * getFocusBonus(focus, mode).pot + 0.02, "and the cap only ever takes away");
+        // The run holds one fewer: this window's card, of the type it holds, makes the streak the pot is paid on.
+        const run = normalizeRunState({ logic: { streak: Math.max(0, streak - 1), type: "risk", held: streak ? 5 : 1 } });
+        const window = { status: "cashed", gauge: 44, pushes: 3, focus, focusMode: mode, focusHits: focus ? 3 : 0, groove };
+        const { verdict, nextRun } = resolveWindow({ run, window, card: typed });
+        assert.equal(verdict.logic.streak, streak);
         const base = Math.round(verdict.chips * verdict.multiplier);
-        assert.equal(verdict.pot, base + verdict.tempo.groovePot + verdict.focus.pot, "base, groove and focus are the whole pot");
+        assert.equal(verdict.pot, base + verdict.logic.pot + verdict.focus.pot, "base, streak and focus are the whole pot");
         assert.ok(verdict.pot <= Math.round(base * HAND_CAP) + 1);
-        assert.ok(verdict.tempo.groovePot >= 0 && verdict.focus.pot >= 0);
-        if (groove === 0) assert.equal(verdict.tempo.groovePot, 0, "no beat, no groove line");
+        assert.ok(verdict.logic.pot >= 0 && verdict.focus.pot >= 0);
+        if (streak === 0 && groove === 0) assert.equal(verdict.logic.pot, 0, "no streak, no share");
         if (focus === 0) assert.equal(verdict.focus.pot, 0);
-        assert.equal(nextRun.runGroove, verdict.tempo.groovePot + verdict.focus.pot, "the hand's whole share is what the vault slack leaves out");
+        assert.equal(nextRun.runGroove, verdict.logic.pot + verdict.focus.pot, "the hand's whole share is what the vault slack leaves out");
       }
     }
   }
@@ -422,7 +415,7 @@ test("the beat and LOCK are paid under one cap, and their shares add up", () => 
 test("a charge belongs to the stance that built it", () => {
   let window = reduceWindow(createWindow({ seed: "stance" }), { type: "SELECT", id: "a" });
   window = reduceWindow(window, { type: "SET_FOCUS_MODE", mode: "steady" });
-  for (let lock = 0; lock < 4; lock += 1) window = reduceWindow(window, { type: "FOCUS", grade: "perfect" });
+  for (let lock = 0; lock < 5; lock += 1) window = reduceWindow(window, { type: "FOCUS" });
   assert.ok(window.focus > 70);
   assert.equal(reduceWindow(window, { type: "SET_FOCUS_MODE", mode: "steady" }), window, "choosing the stance already held changes nothing");
   const swapped = reduceWindow(window, { type: "SET_FOCUS_MODE", mode: "strike" });
@@ -489,7 +482,7 @@ test("a replayed case is practice: the table plays, and the season keeps nothing
     const caseClosed = index === 3;
     const window = { status: "cashed", gauge: 72, pushes: 5, focus: 100, focusMode: "strike", focusHits: 4, seed: `replay:${index}` };
     const settled = resolveWindow({ run, window, card: staked, caseClosed, offerRelics: true });
-    log.push({ caseId: "case01", threshold: { busted: false, potMultiplier: settled.verdict.multiplier, pot: settled.verdict.pot, pushes: 5, tempo: settled.verdict.tempo, focus: settled.verdict.focus } });
+    log.push({ caseId: "case01", threshold: { busted: false, potMultiplier: settled.verdict.multiplier, pot: settled.verdict.pot, pushes: 5, ...(settled.verdict.firstRecord ? { firstRecord: settled.verdict.firstRecord } : {}), focus: settled.verdict.focus } });
     assert.equal(settled.verdict.focus.stanceEarned, false);
     run = settled.nextRun;
     if (!caseClosed) assert.ok(run.runPot > 0, "the pot on the table is real while it is played");
@@ -594,5 +587,6 @@ test("every rule that reads a frame-loop variable is on an element the loop writ
       }
     }
   }
-  assert.ok(uses >= 20, `the scan has to find the readers it guards: ${uses}`);
+  // 18 since the beat went (2026-10-10): the ring, the reticle and the hit zone read nine more.
+  assert.ok(uses >= 16, `the scan has to find the readers it guards: ${uses}`);
 });

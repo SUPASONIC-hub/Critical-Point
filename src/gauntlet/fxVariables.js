@@ -11,9 +11,6 @@ export const FX_READERS = Object.freeze({
   "--gx-beat": ".gx-pot-value, .gx-clock, .gx-bpm svg, .gx-fx-vignette, .gx-fx-border",
   "--gx-shake-x": ".gx-table",
   "--gx-shake-y": ".gx-table",
-  "--gx-beat-phase": ".gx-focus-reticle, .gx-beat-ring",
-  "--gx-beat-live": ".gx-beat-ring",
-  "--gx-beat-zone": ".gx-focus-modes button, .gx-push, .gx-focus, .gx-focus-reticle",
   "--gx-flash": ".gx-fx-flash",
   "--gx-rate": ".gx-gauge-ticks",
 });
@@ -26,12 +23,11 @@ export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
  * The frame loop (GauntletFx.jsx) writes what these return, so what the
  * setting does can be held without a browser (tests/unit/table-motion.test.mjs).
  *
- * Either one stills the shake and closes the approach ring. Only the comfort
- * setting stops the pulse and cuts the flash to a third.
+ * Either one stills the shake. Only the comfort setting stops the pulse and
+ * cuts the flash to a third.
  */
 export const fxShake = (trauma, reducedMotion, calm) => (reducedMotion || calm ? 0 : trauma * trauma);
 export const fxBeatValue = (beat, calm) => (calm ? "0.000" : beat.toFixed(3));
-export const fxBeatPhaseValue = (phase, reducedMotion, calm) => (reducedMotion || calm ? "1" : phase.toFixed(2));
 export const fxFlashValue = (flash, calm) => (calm ? flash / 3 : flash).toFixed(2);
 
 /**
@@ -39,7 +35,7 @@ export const fxFlashValue = (flash, calm) => (calm ? flash / 3 : flash).toFixed(
  *
  * It is the heartbeat for a player who has the sound off, and neither setting
  * above reaches it. Everything else that shows the pulse is a blink at the
- * pulse's own rate -- the ring, the vignette, the heart beside the number --
+ * pulse's own rate -- the vignette, the heart beside the number --
  * and the comfort setting stops those, so with the sound off as well there was
  * no instrument left. This one is a level, not a beat: 0 at a resting pulse, 1
  * at the fastest the engine goes, and it drifts to where the pulse is rather
@@ -69,8 +65,7 @@ export function registerFxVariables() {
   for (const name of FX_VARIABLES) {
     const length = FX_LENGTHS.has(name);
     try {
-      // The ring rests closed, so the phase a reader sees before the first frame is 1.
-      globalThis.CSS.registerProperty({ name, syntax: length ? "<length>" : "<number>", inherits: false, initialValue: length ? "0px" : name === "--gx-beat-phase" ? "1" : "0" });
+      globalThis.CSS.registerProperty({ name, syntax: length ? "<length>" : "<number>", inherits: false, initialValue: length ? "0px" : "0" });
     } catch {
       // Already registered by an earlier copy of this module (a hot reload).
     }

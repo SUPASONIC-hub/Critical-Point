@@ -6,7 +6,6 @@ import {
   createOpenSeed,
   drawStep,
   equipRelic,
-  FEVER_BONUS,
   FOCUS_MAX,
   FOCUS_MODES,
   GAUGE_MAX,
@@ -15,16 +14,13 @@ import {
   getFocusBonus,
   getFocusModeProfile,
   getForcedCard,
-  getGrooveBonus,
   getHandBonus,
   getHeartbeatBpm,
   getMultiplier,
   getRemainingSeconds,
   getSealedCardId,
-  scoreBeat,
   scoreFocus,
   SEAL_BREAK_GAUGE,
-  SLIP_SECONDS,
   splitOpenSeed,
   getStanceMasteryProfile,
   getTableSchema,
@@ -32,15 +28,14 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
-import { press } from "./timing.js";
+import { listOfferedTypes } from "./logicStreak.js";
+import { LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
-import { RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
+import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
 import {
-  playBeatCue,
   playBustCue,
   playCashCue,
-  playFeverCue,
   playFocusCue,
   playMutationCue,
   playPushCue,
@@ -57,9 +52,6 @@ import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
-const GRADE_COPY = { perfect: "PERFECT", good: "GOOD", miss: `SLIP −${SLIP_SECONDS}s` };
-const FOCUS_COPY = { perfect: "LOCK PERFECT", good: "LOCK", miss: "JAM" };
-const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -106,21 +98,12 @@ export function GauntletStage({
   const [lostToTab, setLostToTab] = useState(false);
   const relics = run?.relics ?? [];
   const relicOffer = run?.relicOffer ?? [];
-  const wideBeat = hasRelic(relics, "metronome");
   // A closed case's draft takes the breach's place: REBOOT is what it replaces.
   const draftPending = relicOffer.length > 0 && Boolean(onPickRelic) && !abandoned;
   const [equipped, setEquipped] = useState(null);
   const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
-  // Written by the frame loop on every beat; read here when a push is pressed.
-  const beatClock = useRef({ at: 0, period: 0 });
-  // When a press last went down on a timed button -- the pointer, or the key
-  // that will click it at keyup: the click is graded there.
-  const pressDownAt = useRef(0);
-  const notePress = (event) => {
-    if (press.down(event)) pressDownAt.current = event.timeStamp;
-  };
   const stageRef = useRef(null);
   // The previous verdict is still on screen while the next table mounts under
   // it; the clock and the briefing wait until the player has read it.
@@ -146,7 +129,7 @@ export function GauntletStage({
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
   const paused = hidden || draftOpen || !tableOpen;
-  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, beatCombo: run?.beatCombo ?? 0, resume, caseId: scene.node.caseId, run });
+  const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, resume, caseId: scene.node.caseId, run });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
@@ -164,17 +147,10 @@ export function GauntletStage({
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
-  const grooveBonus = getGrooveBonus(win.groove);
-  const handBonus = getHandBonus(win.groove, win.focus, win.focusMode);
   const focusBonus = getFocusBonus(win.focus, win.focusMode);
-  // What LOCK is adding to the pot, under the cap it shares with the groove.
-  const lockPot = handBonus / grooveBonus;
   const focusModeProfile = getFocusModeProfile(win.focusMode);
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
-  const livePot = Math.round(selectedChips * multiplier * handBonus);
   const live = win.status === "live";
-  const fever = live && grooveBonus >= FEVER_BONUS;
-  const comboTier = win.beatCombo >= 12 ? "blaze" : win.beatCombo >= 6 ? "hot" : win.beatCombo >= 3 ? "warm" : "cold";
   const settleImpact = useMemo(
     () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
     [claimed, live, win.status],
@@ -193,17 +169,27 @@ export function GauntletStage({
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
   const visibleEffects = selectedEffects.slice(0, 4);
   const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
-  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * handBonus);
-  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
+  // The types on the table, as the settlement will be handed them (useChoiceCommit).
+  const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
-    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules,
-  } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId });
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic,
+  } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId, offered });
+  // What the hand adds to the pot: the logic streak as the staked card would
+  // leave it (`logic`, nothing before the case has the rule), then LOCK on top
+  // under the cap they share. The settlement pays the same two numbers.
+  const earnedBonus = logic ? getHandBonus(win.groove, 0, win.focusMode, logic.after) : 1;
+  const handBonus = getHandBonus(logic ? win.groove : 0, win.focus, win.focusMode, logic?.after);
+  const lockPot = handBonus / earnedBonus;
+  const livePot = Math.round(selectedChips * multiplier * handBonus);
+  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * handBonus);
+  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
   // What this case has turned on (`tableUnlocks`). A control whose rule is not
-  // on yet is not drawn and its key is not the table's: no ring, no LOCK, no
-  // stances. What the window or the run already holds is drawn whatever the
-  // step: a combo, relics or a broken board carried in by an older save.
-  const beatOn = rules.has("beat");
+  // on yet is not drawn and its key is not the table's: no streak line, no
+  // LOCK, no stances. What the run already holds is drawn whatever the step:
+  // relics or a broken board carried in by an older save.
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
@@ -298,7 +284,7 @@ export function GauntletStage({
     if (win.status === "bust") {
       playBustCue();
     } else {
-      playCashCue(multiplier, grooveBonus);
+      playCashCue(multiplier, earnedBonus);
     }
     const savedStake = abandoned ? cards.find((card) => card.id === run?.openCardId) ?? null : null;
     // The runtime refuses a card the run has no authority for unless the room
@@ -373,41 +359,24 @@ export function GauntletStage({
     setFocusMode(FOCUS_MODES[(index + 1) % FOCUS_MODES.length]);
   }
 
-  function push(event) {
+  function push() {
     if (locked || draftOpen || !canPush) return;
-    // Graded against the beat the frame loop last landed. With no beat on
-    // screen yet -- the first pulse not in -- the press is ungraded: no combo,
-    // no slip.
-    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
     const pushIndex = win.pushes + 1;
-    const scored = scoreBeat(win, grade);
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
-    dispatch({ type: "PUSH", grade });
-    if (widened) pulseRelic("metronome");
+    dispatch({ type: "PUSH" });
     if (sealedId && hasRelic(relics, "lockpick") && win.gauge < schema.sealBreak && nextGauge >= schema.sealBreak && nextGauge < SEAL_BREAK_GAUGE) {
       pulseRelic("lockpick");
     }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
-    playBeatCue(grade, scored.beatCombo);
-    if (grooveBonus < FEVER_BONUS && getGrooveBonus(scored.groove) >= FEVER_BONUS) playFeverCue();
-    setImpact({ amount: grade === "miss" ? 0.5 : 0.28 });
-    if (grade) setFlash({ amount: GRADE_FLASH[grade] });
+    setImpact({ amount: 0.28 });
   }
 
-  function focus(event) {
+  function focus() {
     if (!canFocus) return;
-    const { grade, widened } = press.grade(event, pressDownAt, beatClock.current, wideBeat);
-    const scored = scoreFocus(win, grade);
-    dispatch({ type: "FOCUS", grade });
-    if (widened) pulseRelic("metronome");
-    playFocusCue(grade, scored.focus / FOCUS_MAX);
-    if (grade === "miss") {
-      setImpact({ amount: 0.42 });
-      setFlash({ amount: GRADE_FLASH.miss });
-    } else if (grade) {
-      setImpact({ amount: 0.16 });
-      setFlash({ amount: grade === "perfect" ? 0.75 : 0.38 });
-    }
+    dispatch({ type: "FOCUS" });
+    playFocusCue(scoreFocus(win).focus / FOCUS_MAX);
+    setImpact({ amount: 0.16 });
+    setFlash({ amount: 0.38 });
   }
 
   function cash() {
@@ -426,26 +395,18 @@ export function GauntletStage({
   return (
     <section
       ref={stageRef}
-      className={`gauntlet-stage heat-${heatTier}${verdictClass}${schema.faceDown ? " is-face-down" : ""}${schema.sedated ? " is-sedated" : ""}${fever ? " is-fever" : ""}`}
+      className={`gauntlet-stage heat-${heatTier}${verdictClass}${schema.faceDown ? " is-face-down" : ""}${schema.sedated ? " is-sedated" : ""}`}
       data-testid="gauntlet-stage"
       data-gauge={Math.round(win.gauge)}
       data-status={win.status}
-      data-combo={win.beatCombo}
-      data-groove={win.groove}
-      data-last-grade={win.lastGrade ?? ""}
       aria-label="임계점 테이블" style={{ "--gx-question": scene.question.length }}
     >
       <GauntletFx
         window={win}
         paused={paused}
-        wideBeat={wideBeat}
         impact={settleImpact ?? impact}
         flash={flash}
-        beatClock={beatClock}
         stageRef={stageRef}
-        grade={win.lastGrade}
-        fever={fever}
-        beat={beatOn}
       />
 
       <div className="gx-table">
@@ -463,24 +424,13 @@ export function GauntletStage({
               <b className="gx-chips">{selectedChips || "—"}</b>
               <i>×</i>
               <b className="gx-mult" data-testid="gauntlet-multiplier">{formatMultiplier(multiplier)}</b>
-              {grooveBonus > 1 && (
+              {earnedBonus > 1 && (
                 <>
                   <i>×</i>
-                  <b className="gx-groove" data-testid="gauntlet-groove">GROOVE {grooveBonus.toFixed(2)}</b>
+                  <b className="gx-logic-pill" data-testid="gauntlet-logic-bonus">콤보 {earnedBonus.toFixed(2)}</b>
                 </>
               )}
             </span>
-            {(win.beatCombo > 0 || win.groove > 0) && (
-              <span
-                key={`combo-${win.pushes}`}
-                className={`gx-combo combo-${comboTier}${win.lastGrade === "miss" ? " is-broken" : ""}`}
-                data-testid="gauntlet-combo"
-                style={{ "--gx-combo": Math.min(win.beatCombo, 16) }}
-              >
-                <b>{win.beatCombo}</b>
-                <small>{fever ? "FEVER" : "COMBO"}</small>
-              </span>
-            )}
           </div>
           <div className="gx-bank">
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
@@ -501,7 +451,7 @@ export function GauntletStage({
           </div>
           {/* Rendered or not, never `hidden`: both signals set their own display,
               and the row's padding would stand over nothing. */}
-          {(chainOn || lockOn) && (
+          {(chainOn || lockOn || logic) && (
           <div className="gx-signals">
             {chainOn && (
             <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
@@ -510,13 +460,14 @@ export function GauntletStage({
             </span>
             )}
             {lockOn && (
-            <span className={`gx-focus-signal focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`} data-testid="gauntlet-focus">
+            <span className={`gx-focus-signal focus-${focusBonus.tier}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b>{focusBonus.label} {Math.round(win.focus)}</b>
               <small>판돈 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
             )}
+            {logic && <LogicLine logic={logic} />}
           </div>
           )}
           <div
@@ -696,6 +647,7 @@ export function GauntletStage({
           visibleEffects={visibleEffects}
           hiddenEffectCount={hiddenEffectCount}
           fractureAxis={fractureAxis}
+          moveOf={logic?.moveOf}
           onSelect={select}
         />
       </div>
@@ -706,8 +658,6 @@ export function GauntletStage({
           type="button"
           className="gx-push"
           data-testid="commit-push"
-          onPointerDown={notePress}
-          onKeyDown={notePress}
           onClick={push}
           disabled={!canPush}
           aria-keyshortcuts={keys("Space W")}
@@ -715,48 +665,35 @@ export function GauntletStage({
           // it, the button a screen reader is resting on was a new button after
           // every push. The numbers are its description.
           aria-label="밀어붙인다"
-          aria-describedby="gx-push-detail"
+          aria-describedby={logic ? "gx-push-detail gx-logic-detail" : "gx-push-detail"}
         >
-          {beatOn && <i className="gx-beat-ring" aria-hidden="true" />}
           <Flame size={18} aria-hidden="true" />
           <span>밀어붙인다</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
           <span id="gx-push-detail" className="sr-only">
-            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}{beatOn ? ". 심박에 맞춰 누르면 콤보가 쌓인다" : ""}
+            열기 {Math.round(win.gauge)}, 다음 열기 {Math.round(nextLow)}에서 {Math.round(nextHigh)}
           </span>
-          {win.lastGrade && (
-            <em key={`grade-${win.pushes}`} className={`gx-grade gx-grade-${win.lastGrade}`} aria-hidden="true">
-              {GRADE_COPY[win.lastGrade]}
-              {win.lastGrade !== "miss" && win.beatCombo > 1 ? ` ×${win.beatCombo}` : ""}
-            </em>
-          )}
+          {/* What the streak stands at, for the two buttons that act on it. */}
+          {logic && <span id="gx-logic-detail" className="sr-only">{logic.spoken}</span>}
         </button>
         {lockOn && (
         <button
           type="button"
-          className={`gx-focus focus-${focusBonus.tier}${win.jammed ? " is-jammed" : ""}`}
+          className={`gx-focus focus-${focusBonus.tier}`}
           data-testid="commit-focus"
-          onPointerDown={notePress}
-          onKeyDown={notePress}
           onClick={focus}
           disabled={!canFocus}
           aria-keyshortcuts={keys("E")}
           aria-label="락을 건다"
           aria-describedby="gx-focus-detail"
         >
-          <i className="gx-focus-reticle" aria-hidden="true" />
           <Crosshair size={18} aria-hidden="true" />
           <span lang="en">LOCK</span>
-          <small>{focusModeProfile.label} {Math.round(win.focus)}</small>
+          {/* What a press costs is on the button: the clock is the only price. */}
+          <small>{focusModeProfile.label} {Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 차지 {Math.round(win.focus)}. 심박에 맞춰 누르면 판돈과 자원 배율이 오른다
+            지금 차지 {Math.round(win.focus)}. 누를 때마다 판돈과 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다
           </span>
-          {win.lastFocusGrade && (
-            <em key={`focus-${win.focusHits}-${win.focusMisses}`} className={`gx-grade gx-grade-${win.lastFocusGrade}`} aria-hidden="true">
-              {FOCUS_COPY[win.lastFocusGrade]}
-              {win.focusCombo > 1 && win.lastFocusGrade !== "miss" ? ` ×${win.focusCombo}` : ""}
-            </em>
-          )}
         </button>
         )}
         <button
@@ -766,6 +703,7 @@ export function GauntletStage({
           onClick={cash}
           disabled={!canCash}
           aria-keyshortcuts="Enter"
+          aria-describedby={logic ? "gx-logic-detail" : undefined}
         >
           <span>{win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : selectedCard ? "확정" : "카드를 고른다"}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
@@ -792,6 +730,7 @@ export function GauntletStage({
           selectedId={win.selectedId}
           mutations={mutations}
           resourceMeta={resourceMeta}
+          moveOf={logic?.moveOf}
           onOpen={openTable}
         />
       )}
@@ -800,7 +739,7 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         clock={{ live, paused, remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed }}
-        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, grooveBonus, runPot: run.runPot, bustKeeps } : null}
+        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}
         onLeave={() => setLostToTab(true)}
