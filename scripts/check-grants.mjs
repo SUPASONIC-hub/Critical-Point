@@ -764,9 +764,9 @@ const spreadRun = (runId, stepSeconds = 60) =>
       where s.id = t.id`,
     [runId, stepSeconds],
   );
-const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null } = {}) => {
+const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null, storyCases = [] } = {}) => {
   for (const caseId of CASE_SEQUENCE) {
-    const payload = casePayload({ session, runId, caseId });
+    const payload = casePayload({ session, runId, caseId, story: storyCases.includes(caseId) });
     // The finale as the client sends it: the season's two logic numbers ride on its summary (useChoiceCommit).
     if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", logicHold: 82, bestLogic: 17, ...(finalSummary ?? {}) };
     const { sql, params } = postgrestInsert("playtest_sessions", payload);
@@ -837,6 +837,27 @@ await postRefused("rank a third run from one device in a day", "playtest_session
   // A final case whose summary carries no usable score cannot rank at all.
   await playRun("run-ranked-4", { session: sessionId(12), finalSummary: { burstScore: "100", rank: "S" } });
   await postRefused("rank a run whose final case has no numeric score", "playtest_sessions", seasonPayload({ session: sessionId(12), runId: "run-ranked-4" }), /invalid season ranking score/);
+  // Story mode (20261010000000): one case closed in it keeps the season off
+  // the ranking. The client sends no ranking row for such a season; this is a
+  // client that sends one anyway. The run is whole, watched and well spaced --
+  // run-ranked-1 above is the same run without the mark, and it ranked -- so
+  // the mark on one case row in the middle is all there is to refuse, and the
+  // refusal is a plain one (400), which the client's queue lets go.
+  const storyCase = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  await playRun("run-ranked-story", { session: sessionId(14), storyCases: [storyCase] });
+  const marked = await one(
+    `select count(*) filter (where summary->'assistStory' = 'true'::jsonb)::int as story, count(*)::int as n
+       from public.playtest_sessions where run_id = 'run-ranked-story'`,
+  );
+  check(
+    marked?.story === 1 && marked?.n === CASE_SEQUENCE.length,
+    `a story run's case rows did not land as sent: ${marked?.story} of ${marked?.n} carry assistStory, expected 1 of ${CASE_SEQUENCE.length}.`,
+  );
+  await postRefused("rank a season with one case closed in story mode", "playtest_sessions", seasonPayload({ session: sessionId(14), runId: "run-ranked-story" }), /^P0001 story-mode runs are not ranked$/);
+  check(
+    (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-ranked-story'`))?.n === 0,
+    "a season with a story case has a ranking row.",
+  );
   // Twenty ranking rows a day for an address, whatever the device.
   await presetCounter(`season-ip:${await writerKey("198.51.100.20")}`, 20);
   await playRun("run-ranked-5", { session: sessionId(13) });
