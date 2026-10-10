@@ -1,6 +1,7 @@
 import { expect } from "./network.js";
 import { SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
 import { getCaseBranchNodes, nodes, reframeRouteNodes } from "../../src/gameData.js";
+import { runsInto } from "../../src/seasonRules.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
 // Both sit under the test timeout (playwright.config.js, 60s). At 60s each the
@@ -259,6 +260,7 @@ export async function chooseFirstAvailableChoice(page) {
  */
 function reframeTargetFor(caseId, fromNodeId) {
   const dramaticRoute = reframeRouteNodes[caseId];
+  if (dramaticRoute && runsInto(nodes, dramaticRoute, fromNodeId)) return null;
   if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
   const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
   if (!branch || branch.nodeId === fromNodeId) return null;

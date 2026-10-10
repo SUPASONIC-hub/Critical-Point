@@ -1,0 +1,568 @@
+{
+  "era": "v2, the finale before the 33rd floor moved -- an expose-path run that has already answered f_confront with the old card f_confront_reform and was put down on f_dilemma, so it meets the 33rd floor a second time",
+  "writtenBy": "useChoiceCommit's commit() and toSavePayload() in src/state/runState.js at 7e54cdf (2026-10-09, origin/main before the 33rd floor moved), played by a script: f_start_name, its signature card, then the cards the log names",
+  "save": {
+    "saveSchemaVersion": 2,
+    "runId": "run-pre-33f-0001",
+    "playerName": "분석관",
+    "playStyle": "instinct",
+    "openingLegacy": null,
+    "dataConsent": false,
+    "started": false,
+    "currentCase": "final",
+    "completedCases": [
+      "prologue01",
+      "prologue02",
+      "prologue03",
+      "prologue04",
+      "prologue05",
+      "case01",
+      "case02",
+      "case03",
+      "case04",
+      "case05",
+      "case06",
+      "case07",
+      "case08",
+      "case09",
+      "case10",
+      "case11",
+      "case12",
+      "case13",
+      "case14",
+      "case15",
+      "case16",
+      "case17",
+      "case18",
+      "case19",
+      "case20",
+      "case21",
+      "case22",
+      "case23",
+      "case24",
+      "case25",
+      "case26",
+      "case27",
+      "case28",
+      "case29",
+      "case30",
+      "case31",
+      "case32",
+      "case33",
+      "case34",
+      "case35",
+      "case36",
+      "case37",
+      "case38",
+      "case39",
+      "case40",
+      "case41",
+      "case42",
+      "case43",
+      "case44",
+      "case45",
+      "case46",
+      "case47",
+      "case48",
+      "case49"
+    ],
+    "discoveredClues": [
+      {
+        "id": "final-observer-key",
+        "title": "관찰자의 열쇠",
+        "text": "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다."
+      },
+      {
+        "id": "p1-blank-approver",
+        "title": "비어 있는 승인자 칸",
+        "text": "지점들이 쓰는 '간이 재무 요약표'는 2021년 3월 기업금융전략팀이 41개 지점에 배포했습니다. 배포 승인 문서의 작성자 칸에는 오진우 대리의 이름이 있고, 승인자 서명란은 비어 있습니다."
+      }
+    ],
+    "caseResults": {},
+    "playtestFeedback": {},
+    "nodeId": "f_dilemma",
+    "resources": {
+      "time": 65,
+      "capital": 89,
+      "trust": 85,
+      "legitimacy": 73,
+      "humanCost": 0,
+      "fatigue": 26
+    },
+    "log": [
+      {
+        "nodeId": "f_start_name",
+        "caseId": "final",
+        "speaker": "반재욱",
+        "choiceId": "f_start_name_signature",
+        "title": "곧장 올라간 사람의 마지막 밤",
+        "chapterRule": "이름과 서명란",
+        "choice": "연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알린다",
+        "spokenChoice": "혼자 올라온 걸음을 혼자 끝내지 않으려고, 연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알린다.",
+        "reframe": false,
+        "reframeOpenedRoute": false,
+        "reframeBranchId": null,
+        "continuityMemory": false,
+        "effect": {
+          "trust": 13,
+          "humanCost": -9,
+          "legitimacy": -3,
+          "capital": -5,
+          "fatigue": 5
+        },
+        "riskRewardEffect": {
+          "trust": 13,
+          "humanCost": -9,
+          "legitimacy": -3,
+          "capital": -5,
+          "fatigue": 5
+        },
+        "cognition": {
+          "reframing": 2
+        },
+        "triggers": [
+          "curiosity",
+          "responsibility",
+          "order"
+        ],
+        "echo": "먼저 알리면 골목의 사람들이 한 시간을 법니다. 그 시간에 여의도 로비로 올지 말지는 그들이 정합니다. 절차상으로는 유출입니다.",
+        "sceneBeat": "각진 안경, 표지가 닳은 검은 수첩, 말보다 먼저 움직이는 펜. 반재욱은 펜을 멈추고, 방금 나온 단어를 수첩 앞쪽 어느 줄과 맞춰 보듯 고개를 든다.\n'선의는 기록되지 않는다. 기록되는 건 누가 무엇을 알고도 서명란에 이름을 넣었는지다.'\n당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. \"연필로 적힌 내 이름과 이 파일을 동료들에게 먼저 알리겠습니다.\"\n반재욱이 시선을 든다. 상대의 선의를 믿기 전에 근거와 승인 순서를 따진다.\n\"그 판단의 근거를 3년 뒤 감사장에서도 같은 순서로 설명할 수 있습니까?\"\n믿음이 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.",
+        "challenge": {
+          "title": "숨은 비용 찾기",
+          "matched": true,
+          "riskDelta": 2
+        },
+        "tactical": {
+          "grade": "A",
+          "gradeText": "공략 후보",
+          "reward": "챌린지 적중",
+          "cost": "현금 -5",
+          "gain": "믿음 +9"
+        },
+        "tempoBonus": null,
+        "clueReward": null,
+        "threshold": {
+          "state": "cash",
+          "busted": false,
+          "cause": "cash",
+          "forced": false,
+          "gauge": 30,
+          "wall": 78,
+          "pushes": 3,
+          "rewardMultiplier": 1.45,
+          "potMultiplier": 6.62,
+          "pot": 265,
+          "lostPot": 0,
+          "tempo": {
+            "grade": null,
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "slips": 0,
+            "groove": 0,
+            "bonus": 1,
+            "groovePot": 0,
+            "lostCombo": 0
+          },
+          "focus": {
+            "charge": 0,
+            "mode": "strike",
+            "label": "STRIKE",
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "misses": 0,
+            "grade": null,
+            "resourceMultiplier": 1,
+            "potMultiplier": 1,
+            "pot": 0,
+            "tier": "loose",
+            "jammed": false,
+            "stanceEarned": false,
+            "masteryCount": 0
+          }
+        },
+        "environmentMode": "stable",
+        "suspenseEvent": null,
+        "clue": null,
+        "responseTimeSec": 6,
+        "resourcesBefore": {
+          "time": 72,
+          "capital": 100,
+          "trust": 50,
+          "legitimacy": 50,
+          "humanCost": 0,
+          "fatigue": 10
+        },
+        "resourcesAfter": {
+          "time": 72,
+          "capital": 95,
+          "trust": 63,
+          "legitimacy": 47,
+          "humanCost": 0,
+          "fatigue": 15
+        },
+        "observerTag": {
+          "id": "pattern",
+          "label": "패턴 표본",
+          "text": "크게 튀지 않은 선택입니다. 그래서 더 오래 남습니다. 관찰자는 반복되는 기준을 먼저 찾습니다."
+        }
+      },
+      {
+        "nodeId": "f_route_expose",
+        "caseId": "final",
+        "speaker": "반재욱",
+        "choiceId": "f_route_expose_redact",
+        "title": "밖으로 나간 실험",
+        "chapterRule": "이름과 서명란",
+        "choice": "참가자 식별자를 지우고 구조 증거만 공개한다",
+        "spokenChoice": "구조는 드러내되 사람은 가리려고, 식별자를 지우고 넘긴다.",
+        "reframe": false,
+        "reframeOpenedRoute": false,
+        "reframeBranchId": null,
+        "continuityMemory": false,
+        "effect": {
+          "legitimacy": 15,
+          "trust": 9,
+          "capital": -6,
+          "time": -7,
+          "humanCost": -7,
+          "fatigue": 7
+        },
+        "riskRewardEffect": {
+          "legitimacy": 13,
+          "trust": 9,
+          "capital": -6,
+          "time": -7,
+          "humanCost": -7,
+          "fatigue": 8
+        },
+        "cognition": {
+          "persistence": 2
+        },
+        "triggers": [
+          "injustice",
+          "responsibility",
+          "order"
+        ],
+        "echo": "익명화에는 시간이 듭니다. 그 시간에 서버는 계속 닫힙니다.",
+        "sceneBeat": "각진 안경, 표지가 닳은 검은 수첩, 말보다 먼저 움직이는 펜. 반재욱은 펜을 멈추고, 방금 나온 단어를 수첩 앞쪽 어느 줄과 맞춰 보듯 고개를 든다.\n'선의는 기록되지 않는다. 기록되는 건 누가 무엇을 알고도 서명란에 이름을 넣었는지다.'\n당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. \"참가자 식별자를 지우고 구조 증거만 공개하겠습니다.\"\n반재욱이 시선을 든다. 상대의 선의를 믿기 전에 근거와 승인 순서를 따진다.\n\"그 판단의 근거를 3년 뒤 감사장에서도 같은 순서로 설명할 수 있습니까?\"\n공정함이 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.",
+        "challenge": {
+          "title": "숨은 비용 찾기",
+          "matched": true,
+          "riskDelta": 5
+        },
+        "tactical": {
+          "grade": "A",
+          "gradeText": "공략 후보",
+          "reward": "챌린지 적중",
+          "cost": "지침 +8",
+          "gain": "공정함 +9"
+        },
+        "tempoBonus": null,
+        "clueReward": {
+          "label": "EVIDENCE BONUS",
+          "text": "숨은 단서를 확보했다.",
+          "effect": {
+            "legitimacy": 2,
+            "fatigue": -1
+          }
+        },
+        "threshold": {
+          "state": "cash",
+          "busted": false,
+          "cause": "cash",
+          "forced": false,
+          "gauge": 30,
+          "wall": 79,
+          "pushes": 3,
+          "rewardMultiplier": 1.45,
+          "potMultiplier": 6.62,
+          "pot": 331,
+          "lostPot": 0,
+          "tempo": {
+            "grade": null,
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "slips": 0,
+            "groove": 0,
+            "bonus": 1,
+            "groovePot": 0,
+            "lostCombo": 0
+          },
+          "focus": {
+            "charge": 0,
+            "mode": "strike",
+            "label": "STRIKE",
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "misses": 0,
+            "grade": null,
+            "resourceMultiplier": 1,
+            "potMultiplier": 1,
+            "pot": 0,
+            "tier": "loose",
+            "jammed": false,
+            "stanceEarned": false,
+            "masteryCount": 0
+          }
+        },
+        "environmentMode": "overclock",
+        "suspenseEvent": null,
+        "clue": {
+          "id": "final-observer-key",
+          "title": "관찰자의 열쇠",
+          "text": "당신의 선택 습관을 모은 폴더가 이미 완성되어 있습니다. 마지막 질문은 실험을 끝낼지 이용할지입니다."
+        },
+        "responseTimeSec": 6,
+        "resourcesBefore": {
+          "time": 72,
+          "capital": 95,
+          "trust": 63,
+          "legitimacy": 47,
+          "humanCost": 0,
+          "fatigue": 15
+        },
+        "resourcesAfter": {
+          "time": 65,
+          "capital": 89,
+          "trust": 72,
+          "legitimacy": 62,
+          "humanCost": 0,
+          "fatigue": 22
+        },
+        "observerTag": {
+          "id": "pattern",
+          "label": "패턴 표본",
+          "text": "크게 튀지 않은 선택입니다. 그래서 더 오래 남습니다. 관찰자는 반복되는 기준을 먼저 찾습니다."
+        }
+      },
+      {
+        "nodeId": "f_confront",
+        "caseId": "final",
+        "speaker": "윤상혁",
+        "choiceId": "f_confront_reform",
+        "title": "당신의 조건",
+        "chapterRule": "이름과 서명란",
+        "choice": "프로필을 공개하고 사용 규칙을 직접 설계한다",
+        "spokenChoice": "숨기는 대신 쓰는 방법을 내가 쓰겠다고 나선다.",
+        "reframe": false,
+        "reframeOpenedRoute": false,
+        "reframeBranchId": null,
+        "continuityMemory": false,
+        "effect": {
+          "trust": 13,
+          "legitimacy": 11,
+          "humanCost": -6,
+          "fatigue": 4
+        },
+        "riskRewardEffect": {
+          "trust": 13,
+          "legitimacy": 9,
+          "humanCost": -6,
+          "fatigue": 5
+        },
+        "cognition": {
+          "reframing": 3,
+          "persistence": 1
+        },
+        "triggers": [
+          "responsibility",
+          "curiosity",
+          "order",
+          "protection"
+        ],
+        "echo": "규칙을 직접 쓰면 통제권이 옵니다. 그 규칙의 첫 적용 대상도 당신입니다.",
+        "sceneBeat": "장식 하나 없는 감색 정장, 악수할 때만 웃는 눈, 서명란이 비어 있는 서류철. 윤상혁은 상대의 말이 끝나기 전에 서류철을 덮는다. 덮는 속도가 그의 대답이다.\n'숫자는 만들면 된다. 어려운 건 사람인데, 사람도 결국 배치의 문제다.'\n당신은 준비된 대응안의 이름 대신, 결론만 남겨 이렇게 말한다. \"프로필을 공개하고 사용 규칙을 직접 설계하겠습니다.\"\n윤상혁이 시선을 든다. 질책하지 않는다. 대신 상대의 앞날을 그려 주고, 그 그림에서 자리 하나를 비워 둔다.\n\"자네 판단이 틀렸다고 한 적은 없네. 다만 그 판단이 설 자리는 내가 정하지.\"\n믿음이 열린다. 하지만 그 숫자가 공짜로 생긴 것은 아니다.",
+        "challenge": {
+          "title": "숨은 비용 찾기",
+          "matched": true,
+          "riskDelta": 1
+        },
+        "tactical": {
+          "grade": "A",
+          "gradeText": "공략 후보",
+          "reward": "챌린지 적중",
+          "cost": "지침 +5",
+          "gain": "믿음 +9"
+        },
+        "tempoBonus": null,
+        "clueReward": {
+          "label": "EVIDENCE BONUS",
+          "text": "숨은 단서를 확보했다.",
+          "effect": {
+            "legitimacy": 2,
+            "fatigue": -1
+          }
+        },
+        "threshold": {
+          "state": "cash",
+          "busted": false,
+          "cause": "cash",
+          "forced": false,
+          "gauge": 30,
+          "wall": 90,
+          "pushes": 3,
+          "rewardMultiplier": 1.45,
+          "potMultiplier": 6.62,
+          "pot": 636,
+          "lostPot": 0,
+          "tempo": {
+            "grade": null,
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "slips": 0,
+            "groove": 0,
+            "bonus": 1,
+            "groovePot": 0,
+            "lostCombo": 0
+          },
+          "focus": {
+            "charge": 0,
+            "mode": "strike",
+            "label": "STRIKE",
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "perfects": 0,
+            "misses": 0,
+            "grade": null,
+            "resourceMultiplier": 1,
+            "potMultiplier": 1,
+            "pot": 0,
+            "tier": "loose",
+            "jammed": false,
+            "stanceEarned": false,
+            "masteryCount": 0
+          }
+        },
+        "environmentMode": "overclock",
+        "suspenseEvent": null,
+        "clue": {
+          "id": "p1-blank-approver",
+          "title": "비어 있는 승인자 칸",
+          "text": "지점들이 쓰는 '간이 재무 요약표'는 2021년 3월 기업금융전략팀이 41개 지점에 배포했습니다. 배포 승인 문서의 작성자 칸에는 오진우 대리의 이름이 있고, 승인자 서명란은 비어 있습니다."
+        },
+        "responseTimeSec": 6,
+        "resourcesBefore": {
+          "time": 65,
+          "capital": 89,
+          "trust": 72,
+          "legitimacy": 62,
+          "humanCost": 0,
+          "fatigue": 22
+        },
+        "resourcesAfter": {
+          "time": 65,
+          "capital": 89,
+          "trust": 85,
+          "legitimacy": 73,
+          "humanCost": 0,
+          "fatigue": 26
+        },
+        "observerTag": {
+          "id": "pattern",
+          "label": "패턴 표본",
+          "text": "크게 튀지 않은 선택입니다. 그래서 더 오래 남습니다. 관찰자는 반복되는 기준을 먼저 찾습니다."
+        }
+      }
+    ],
+    "triggers": {
+      "protection": 6,
+      "injustice": 6,
+      "revenge": 0,
+      "responsibility": 18,
+      "competition": 0,
+      "reward": 0,
+      "curiosity": 12,
+      "order": 18,
+      "trust": 0,
+      "affection": 0,
+      "recognition": 0,
+      "fear": 0,
+      "system": 0,
+      "helplessness": 0,
+      "selfAwareness": 0,
+      "manipulation": 0,
+      "choice": 0
+    },
+    "cognition": {
+      "persistence": 3,
+      "inference": 0,
+      "reframing": 5,
+      "risk": 0
+    },
+    "echo": "규칙을 직접 쓰면 통제권이 옵니다. 그 규칙의 첫 적용 대상도 당신입니다.",
+    "nodeEnteredAt": 1791547227000,
+    "pendingTelemetry": [],
+    "dynamics": {
+      "windowIndex": 3,
+      "practiceWindows": 0,
+      "runPot": 1232,
+      "vault": 0,
+      "streak": 3,
+      "busts": 0,
+      "cashes": 3,
+      "bestMultiplier": 6.62,
+      "lastOutcome": "cash",
+      "lastGauge": 30,
+      "openSeed": null,
+      "openCardId": null,
+      "suspended": null,
+      "beatCombo": 0,
+      "bestCombo": 0,
+      "bestFocusCombo": 0,
+      "focusHits": 0,
+      "focusPerfects": 0,
+      "focusMisses": 0,
+      "stanceMastery": {
+        "strike": 0,
+        "steady": 0,
+        "expose": 0
+      },
+      "runGroove": 0,
+      "grooveVault": 0,
+      "relics": [],
+      "relicOffer": [],
+      "insuranceSpent": false,
+      "practice": null,
+      "veteran": false,
+      "schema": {
+        "seconds": 45,
+        "wallMin": 56,
+        "wallMax": 92,
+        "stepMin": 11,
+        "stepMax": 21,
+        "creep": 0.5,
+        "startGauge": 0,
+        "chipsScale": 2,
+        "faceDown": false,
+        "sedated": false,
+        "sealHighest": false,
+        "fracturedAxis": null,
+        "fractureRate": 1.5,
+        "sealBreak": 30,
+        "mutations": [
+          "overclock"
+        ],
+        "relics": []
+      }
+    },
+    "paused": true,
+    "savedAt": "2026-10-09T12:00:31.000Z"
+  },
+  "expect": {
+    "currentCase": "final",
+    "nodeId": "f_dilemma",
+    "logLength": 3,
+    "repaired": false
+  }
+}
