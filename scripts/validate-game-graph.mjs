@@ -579,7 +579,8 @@ const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBod
  * scene (`writtenRoutes`) instead of in a plan.
  */
 // The finale is as old as they are and as loose: four authored scenes, two
-// connective scenes, and routes that converge on `f_choice`.
+// connective scenes, and routes that converge on the 33rd floor (`f_confront`)
+// and go down from it to `f_choice`.
 const EARLY_PACKS = CASE_SEQUENCE.filter((caseId) => /^case(0[1-9]|1[01])$|^final$/.test(caseId));
 const PACK_OMISSIONS = {
   case01: ["memoryPlan"], // deals no memory card

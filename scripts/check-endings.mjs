@@ -47,6 +47,7 @@ import {
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { getTableRules, STAGED } from "../src/gauntlet/tableUnlocks.js";
+import { runsInto } from "../src/seasonRules.js";
 import { getOriginStartEffects } from "../src/advancedSystems.js";
 import { legacyProfiles } from "../src/caseCopy.js";
 import { createInheritedChallenge, createSceneChallenge } from "../src/viewModels/sceneViewModels.js";
@@ -171,6 +172,7 @@ function getBlackoutSkip(fromNodeId, branchContext) {
 /** What `GameRuntime.getReframeTarget` does. */
 function getReframeTarget(caseId, fromNodeId) {
   const route = reframeRouteNodes[caseId];
+  if (route && runsInto(nodes, route, fromNodeId)) return null;
   if (route && fromNodeId !== route && nodes[route]) return route;
   const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
   if (!branch || branch.nodeId === fromNodeId) return null;

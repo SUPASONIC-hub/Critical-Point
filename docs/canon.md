@@ -83,6 +83,11 @@ Three of these are reveals, and each still means what it meant:
 | 합정동 옛 전산센터 4층, B2 | 그룹 인지·판단 연구랩 (트리거랩) and its 기록 보관소 |
 | KD캐피탈 12층 / 20층 | 위험관리부 / 대표이사실 |
 
+The finale's night runs in one order on every path: 합정동 B2 (the inside
+route starts in the 3층 운영실 and goes down), then a taxi to 여의도 and 본사
+33층, where 윤상혁 asks whose name goes in the box, then B2 again for the last
+decision and the 04:00 folder.
+
 ## The people
 
 | Person | 2022-23 | Main season |
