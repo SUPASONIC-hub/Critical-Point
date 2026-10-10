@@ -1,6 +1,8 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 
-import { BOARD_POST_MAX_LENGTH, BOARD_WRITER_ID_KEY, PLAYER_NAME_MAX_LENGTH } from "../src/appConfig.js";
+import { ACCESSIBILITY_SETTINGS_KEY, BOARD_POST_MAX_LENGTH, BOARD_WRITER_ID_KEY, PLAYER_NAME_MAX_LENGTH } from "../src/appConfig.js";
+import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 
 /**
  * The two screens that show what other players sent: the 참가자 게시판 and the
@@ -299,4 +301,101 @@ test("no ranking row can take the ranking screen down", async ({ page }) => {
   await expect(page.locator(".ranking-row").last()).toContainText("주요 압박 호기심");
   await expect(page.locator(".error-screen")).toHaveCount(0);
   await expect(page.locator(".ranking-page")).not.toContainText("[object Object]");
+});
+
+/* ------------------------------------------------------------- story mode */
+
+/** A season this device finished, as its own ranking holds it (useChoiceCommit's season row). */
+const localSeasonRow = (runId, score, summary = {}) => ({
+  local: true,
+  run_id: runId,
+  session_code: "LOCAL001",
+  player_name: runId,
+  case_id: "season-final",
+  case_title: "SEASON 01 COMPLETE",
+  completed_at: "2026-10-10T09:00:00Z",
+  score,
+  summary: { burstScore: score, rank: "A", primary: ["curiosity", 90], seasonComplete: true, averageResponseTime: 14, reframeCount: 2, ...summary },
+});
+
+// A story season is kept on this device's ranking, and says what it was: its
+// wall stood far off, so its score is not one to read against the others.
+test("this device's story season is on its ranking with the mark, and no other row has it", async ({ page }) => {
+  const rows = [
+    localSeasonRow("STORYRUN", 88, { assistStory: true, assistTime: 2 }),
+    localSeasonRow("SLOWRUN", 77, { assistTime: 1.5 }),
+    localSeasonRow("PLAINRUN", 66),
+  ];
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: TEST_STORAGE_KEYS.localRanking, value: JSON.stringify(rows) });
+  // The device's setting is on, and marks nothing: the mark is the row's.
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true }) });
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  await expect(page.locator(".ranking-row")).toHaveCount(rows.length);
+  const row = (name) => page.locator(".ranking-row", { hasText: name });
+  await expect(row("STORYRUN").locator(".ranking-assist")).toHaveText(["테이블 시간 ×2", "스토리 모드"]);
+  await expect(row("SLOWRUN").locator(".ranking-assist")).toHaveText(["테이블 시간 ×1.5"]);
+  await expect(row("PLAINRUN").locator(".ranking-assist")).toHaveCount(0);
+  await expect(page.locator(".ranking-page").getByText("스토리 모드", { exact: true })).toHaveCount(1);
+  // The mark is on the screen, inside its row, on a desktop and on a phone.
+  const mark = row("STORYRUN").locator(".ranking-assist").last();
+  await mark.scrollIntoViewIfNeeded();
+  await expect(mark).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+/**
+ * Closes the finale of a season from its last scene, with the backend on and
+ * the consent box as it starts (ticked), and returns the rows the page posted.
+ * The debug jump to the finale counts every case before it as closed, so this
+ * close is the season's.
+ */
+async function closeSeasonAndCollectRows(page) {
+  const posted = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/playtest_sessions**`, async (route) => {
+    if (route.request().method() === "POST") posted.push(...[route.request().postDataJSON()].flat());
+    await route.fulfill({ status: 201, contentType: "application/json", body: "" });
+  });
+  await useMockSupabase(page);
+  await startDebugNode(page, "final", "f_aftershock");
+  await completeCurrentCase(page);
+  await expect(page.locator(".ending-sequence")).toBeVisible();
+  return posted;
+}
+
+const readLocalRanking = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]"), TEST_STORAGE_KEYS.localRanking);
+const readQueue = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null")?.pendingTelemetry ?? [], TEST_STORAGE_KEYS.save);
+
+test("a season closed at the table is sent to the public ranking", async ({ page }) => {
+  test.setTimeout(120_000);
+  const posted = await closeSeasonAndCollectRows(page);
+  await expect.poll(() => posted.map((row) => row.case_id), { timeout: 20_000 }).toEqual(expect.arrayContaining(["final", "season-final"]));
+  expect(posted.find((row) => row.case_id === "season-final").summary.assistStory).toBeUndefined();
+  const local = await readLocalRanking(page);
+  expect(local.find((row) => row.case_id === "season-final").summary.assistStory).toBeUndefined();
+});
+
+// The client is what withholds the row until the server refuses it too (the
+// migration that follows): a story season is never queued and never posted.
+test("a season with a story case is not sent to the public ranking, and this device keeps it with the mark", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true }) });
+  const posted = await closeSeasonAndCollectRows(page);
+  // The finale's own row goes out, marked: the queue has nothing left to send.
+  await expect.poll(() => posted.map((row) => row.case_id), { timeout: 20_000 }).toContain("final");
+  await expect.poll(() => readQueue(page), { timeout: 20_000 }).toEqual([]);
+  expect(posted.find((row) => row.case_id === "final").summary.assistStory).toBe(true);
+  expect(posted.map((row) => row.case_id), "no ranking row was posted").not.toContain("season-final");
+
+  // This device's ranking has the season, marked.
+  const local = await readLocalRanking(page);
+  const season = local.find((row) => row.case_id === "season-final");
+  expect(season, "the season is on this device's ranking").toBeTruthy();
+  expect(season.summary.assistStory).toBe(true);
+
+  expect(season.summary.assistTime).toBe(2);
+  // (How that row is drawn is the test of the seeded ranking above: a page
+  // loaded on this save opens on its ending, not on the intro's 랭킹 button.)
 });

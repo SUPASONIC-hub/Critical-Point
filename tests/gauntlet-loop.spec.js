@@ -384,6 +384,68 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
 
+// 스토리 모드: the wall is far, and hitting it still costs the pot -- but the
+// room does not move on without the analyst, and the next board is not broken.
+// The same card on the same scene, busted at the table and then in story
+// mode: the table's bust plays the next scene unattended and lands on the one
+// after; the story bust lands on that next scene.
+test("a bust in story mode plays the next scene, where the table's bust skips it", async ({ page }) => {
+  test.setTimeout(120_000);
+  const verdict = page.locator(".decision-reveal h2");
+  const bustTheFirstCard = async () => {
+    await openTable(page, "case01", "start");
+    const stage = page.getByTestId("gauntlet-stage");
+    await page.locator(".choices .choice").first().click();
+    await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+    // Not `pushUntilBust`: it ends by reading "bust" off the stage, and a far
+    // wall is reached a dozen pushes in, where a press that found the button
+    // already closed waits out its two seconds -- by then the slam is over and
+    // the stage under the verdict is the next window, live again (seen once in
+    // 72 runs, 2026-10-10). The verdict stays up until it is dismissed, so the
+    // loop stops on that and the verdict is what is asserted.
+    for (let press = 0; press < 30; press += 1) {
+      if ((await verdict.isVisible()) || (await stage.getAttribute("data-status")) !== "live") break;
+      await page
+        .getByTestId("commit-push")
+        .click({ timeout: 1_000 })
+        .catch(() => {});
+    }
+    await expect(verdict).toHaveText("BUST", { timeout: 15_000 });
+    return readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  };
+
+  const atTheTable = await bustTheFirstCard();
+  const skipped = atTheTable.log.at(-1).skippedNodeId;
+  expect(skipped, "the table's bust skips the scene the card led to").toBeTruthy();
+  expect(atTheTable.nodeId).not.toBe(skipped);
+  expect(atTheTable.log.at(-1).assistStory).toBeUndefined();
+  await expect(page.getByTestId("next-mutations")).toContainText("BLACKOUT");
+
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true }) });
+  const inStoryMode = await bustTheFirstCard();
+  const entry = inStoryMode.log.at(-1);
+  expect(entry.threshold.busted).toBe(true);
+  expect(entry.threshold.wall, "the wall it hit was the far one").toBeGreaterThanOrEqual(88);
+  expect(entry.assistStory).toBe(true);
+  expect(entry.skippedNodeId, "no scene is played without the analyst").toBeUndefined();
+  expect(inStoryMode.nodeId, "the next scene is the one the card led to").toBe(skipped);
+  // The bust itself is still a bust: the pot is gone and it is counted.
+  expect(inStoryMode.dynamics.runPot).toBe(0);
+  expect(inStoryMode.dynamics.busts).toBe(1);
+  expect(inStoryMode.dynamics.story).toBe(true);
+  // And the next board is whole: nothing is dealt face down.
+  expect(inStoryMode.dynamics.schema.faceDown).toBeFalsy();
+  await expect(page.locator(".decision-reveal")).not.toContainText("BLACKOUT");
+
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(stage).not.toHaveClass(/is-face-down/);
+  await expect(page.locator(".gx-band-label")).toHaveText("벽 88–98");
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
+});
+
 test("cashing without a single push seals the best card on the next board", async ({ page }) => {
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();

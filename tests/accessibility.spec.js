@@ -14,6 +14,34 @@ test("intro screen has no structural accessibility violations", { tag: "@prod" }
   await expectNoA11yViolations(page);
 });
 
+// The intro's audit above is of closed drawers, and axe does not read what a
+// closed <details> holds. These two are opened: the play-style drawer, whose
+// note points to story mode, and the comfort panel with the switch itself,
+// off and then on.
+test("the play-style drawer and the comfort panel, open, have no structural accessibility violations", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".intro")).toBeVisible();
+  for (const selector of [".play-style-panel", ".accessibility-panel"]) {
+    await page.locator(`details.intro-drawer:has(${selector})`).evaluate((drawer) => {
+      drawer.open = true;
+    });
+  }
+  const pledges = page.getByRole("region", { name: "플레이 스타일 선택" });
+  const toggle = page.getByRole("region", { name: "편의 설정" }).getByLabel(/스토리 모드/);
+  await expect(pledges.getByRole("button")).toHaveCount(3);
+  await expect(toggle).toBeVisible();
+  await expect(toggle).not.toBeChecked();
+  await expectNoA11yViolations(page);
+
+  await toggle.check();
+  await expect(toggle).toBeChecked();
+  // The checked box's own transition has to land before its colours are read.
+  await waitForEntrance(page.locator(".accessibility-panel"));
+  await expectNoA11yViolations(page);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 test("case 05 scene has no structural accessibility violations", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");

@@ -12,7 +12,6 @@ const operatorProfiles = {
     title: "지점 창구 출신 분석관",
     authority: "현장 기록을 가장 먼저 보고, 고객에게 사실을 직접 전달할 권한",
     premise: "창구에서 판 대출이 어떻게 끝나는지를 끝까지 본 사람이 몇 없었습니다. 당신이 그중 하나입니다.",
-    permissions: ["현장 기록 열람", "당사자 인터뷰", "긴급 전달 요청"],
   },
   lab: {
     id: "lab",
@@ -20,7 +19,6 @@ const operatorProfiles = {
     title: "기업금융전략팀 출신 분석관",
     authority: "심사 기준과 검증 절차를 조정할 권한",
     premise: "승인 서류에 반대 의견을 한 줄 쓴 대가로 이 지하 분석실에 배치됐습니다.",
-    permissions: ["심사 기록 열람", "검증 기준 제안", "보호 명부 요청"],
   },
   public: {
     id: "public",
@@ -28,7 +26,6 @@ const operatorProfiles = {
     title: "금융감독 출신 파견 분석관",
     authority: "기록의 공개 범위와 피해 보호 순서를 조정할 권한",
     premise: "감독기관에서 이 그룹을 검사하다가, 그룹 안으로 자리를 옮겨 같은 기록을 다시 봅니다.",
-    permissions: ["공개 범위 제안", "외부 검증 요청", "책임 기록 보존"],
   },
 };
 
@@ -51,7 +48,6 @@ export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
     ...profile,
     level,
     permissions: levelPermissions[level] ?? levelPermissions.OBSERVER,
-    originPermissions: profile.permissions,
   };
 }
 
@@ -188,8 +184,8 @@ export function getBalanceSignals(log = []) {
 export function getPastRunMemory(memory = {}) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
   if (entries.length === 0) return null;
-  const [caseId, result] = entries.at(-1);
-  return { caseId, choice: result.outcomeChoiceId, label: "PAST RUN MEMORY", text: `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
+  const [caseId] = entries.at(-1);
+  return { label: "PAST RUN MEMORY", text: `이전 기록에서 CASE ${caseDisplayCode(caseId)}의 마지막 선택을 남겼습니다. 이번에는 그 결과를 바꿀 수 있습니다.` };
 }
 
 export function getOriginPrologue(origin = "courier") {
