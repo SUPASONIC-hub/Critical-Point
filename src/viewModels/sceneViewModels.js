@@ -47,7 +47,8 @@ export function createActiveBonus({ currentAverageResponseTime, currentChallenge
   // The entry's title "CRISIS PROTOCOL", `streakReward`, `instinctSurge` and
   // `auditSurge` were read here first. No commit writes any of them, so those
   // four branches never ran.
-  return log.at(-1)?.tempoBonus
+  // The hand's line; an entry logged before 2026-10-11 holds it as `tempoBonus`.
+  return (log.at(-1)?.handLine ?? log.at(-1)?.tempoBonus)
     ? "QUICK READ"
     : reframeCombo >= 2
       ? "판 바꾸기 보너스"

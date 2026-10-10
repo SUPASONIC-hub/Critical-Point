@@ -25,17 +25,18 @@ const VERDICT_CAUSE_COPY = Object.freeze({
   push: "한 번 더 밀었다",
   creep: "시계가 올린 열이 벽에 닿았다",
   timeout: "시계를 방치했다",
-  focus: "락이 올린 열이 벽에 닿았다",
   abandon: "걸어 둔 판을 떠났다",
+  // Not one of `VERDICT_CAUSES`: no press heats the gauge now. A verdict logged
+  // before 2026-10-10 can name it, and still reads as it did.
+  focus: "락이 올린 열이 벽에 닿았다",
 });
 
 /**
  * Why the window closed, in the reveal's ledger. One sentence a cause
- * (`VERDICT_CAUSES`): the busts the player did not press for -- the clock's
- * heat creeping into the wall, and before 2026-10-10 a lock off the beat
- * heating into it -- used to fall through to the cash's line, so a BUST
- * headline sat over "직접 확정했다". A cause this table does not know says only
- * what the outcome proves.
+ * (`VERDICT_CAUSES`): the bust the player did not press for -- the clock's
+ * heat creeping into the wall -- used to fall through to the cash's line, so a
+ * BUST headline sat over "직접 확정했다". A cause this table does not know says
+ * only what the outcome proves.
  */
 export function describeVerdictCause(verdict) {
   return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
@@ -103,8 +104,8 @@ const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switc
  * the streak a card is shown to leave is the one its pot is paid on.
  *
  * `after` is the streak with the staked card played (the run's own with none
- * staked), and `bonus` what that pays; the pot's own line prints the bonus, as
- * it printed the groove's. `type` and `held` are the type being held and how
+ * staked), and `bonus` what that pays; the pot's own line prints the bonus.
+ * `type` and `held` are the type being held and how
  * far the hold has got, and `note` what the staked card does, or that a change
  * of type would count. `line` is those in one line -- the sentence a test or a
  * wide screen reads whole -- and `spoken` the sentence the push and confirm

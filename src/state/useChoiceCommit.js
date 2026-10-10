@@ -101,11 +101,10 @@ export function toRowSummary(caseSummary) {
 }
 
 /**
- * The hand's line under a logged decision: the streak when it paid, LOCK when
- * only LOCK did. The entry keeps it under the name it had when the hand's line
- * was the beat's (`tempoBonus`), which is how an older log still prints its own.
+ * The hand's line under a logged decision (`handLine`): the streak when it
+ * paid, LOCK when only LOCK did.
  */
-function describeTempo(verdict) {
+function describeHand(verdict) {
   const streak = describeLogicLog(verdict.logic);
   if (streak) return streak;
   if (verdict.focus?.charge > 0) {
@@ -380,7 +379,7 @@ export function useChoiceCommit(context) {
       sceneBeat: buildSceneBeat(node, choice, finalEffect),
       challenge: { title: sceneChallenge.title, matched: challengeMatch, riskDelta },
       tactical: tacticalRead,
-      tempoBonus: describeTempo(verdict),
+      handLine: describeHand(verdict),
       clueReward,
       threshold: {
         state: busted ? "bust" : "cash",

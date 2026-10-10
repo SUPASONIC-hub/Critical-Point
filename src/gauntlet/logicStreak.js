@@ -3,7 +3,7 @@ import { HEAT_DEBT_GAUGE, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, METRONOME_REACH, SE
 
 /**
  * The logic streak: a combo earned by the type of card a hand picks from one
- * scene to the next, where the beat's was earned by when it pushed.
+ * scene to the next. When a press lands earns nothing.
  *
  * The run carries seven things (`run.logic`). `type` is the type being held
  * and `held` how many windows in a row it has been picked; `streak` is the

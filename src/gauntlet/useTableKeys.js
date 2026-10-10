@@ -45,8 +45,7 @@ function letterOf(event) {
  *
  * A modified key is never the table's: Ctrl/Cmd+R, Ctrl+P and Alt+number are
  * the browser's. Bare Shift used to lock focus too, which meant Shift+P --
- * save and leave -- first fired a lock, and a lock is paid for (in clock now;
- * off the beat it was a JAM).
+ * save and leave -- first fired a lock, and a lock is paid for in clock.
  *
  * Space and Enter belong to whatever the keyboard walked to. The table used to
  * take them from every focused control: a player who tabbed to 저장, the music

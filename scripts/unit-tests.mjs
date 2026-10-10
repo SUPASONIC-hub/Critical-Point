@@ -911,7 +911,7 @@ test("no press is graded: a push is a push whenever it lands, and nothing it car
   for (const grade of ["perfect", "good", "miss"]) {
     assert.deepEqual(reduceWindow(base, { type: "PUSH", grade }), plain, `a push sent with the grade "${grade}" is the same push`);
   }
-  assert.equal(plain.elapsed, base.elapsed, "and it costs no clock: the slip went with the beat");
+  assert.equal(plain.elapsed, base.elapsed, "and it costs no clock");
   for (const key of ["beatCombo", "maxCombo", "groove", "beatHits", "perfects", "slips", "lastGrade"]) {
     assert.equal(key in plain, false, `a window no longer carries ${key}`);
   }
@@ -952,13 +952,13 @@ test("the streak pays the pot from the third card of a type, and the heat multip
   }
   assert.deepEqual(paid.slice(0, 4), [1, 1, 1.06, 1.13], "two cards build, the third pays");
   assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 8");
-  assert.equal(run.runGroove, run.runPot - 11 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept under the beat's old key");
+  assert.equal(run.runHand, run.runPot - 11 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
   const broke = resolveWindow({ run, window: cashedAt(20), card: typed("b", "inference") });
   assert.deepEqual([broke.verdict.logic.move, broke.verdict.logic.bonus, broke.nextRun.logic.streak], ["break", 1, 0]);
   const bust = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
-  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runGroove, bust.nextRun.logic.best], [0, 0, 9], "a bust takes the streak with the pot, and the record stays");
+  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 9], "a bust takes the streak with the pot, and the record stays");
   const closed = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk"), caseClosed: true });
-  assert.equal(closed.nextRun.grooveVault, run.runGroove + closed.verdict.logic.pot, "a closed case moves the hand's share into the vault with the pot");
+  assert.equal(closed.nextRun.handVault, run.runHand + closed.verdict.logic.pot, "a closed case moves the hand's share into the vault with the pot");
   assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closed.nextRun)))), closed.nextRun, "the streak survives a save");
 });
 
@@ -972,11 +972,11 @@ test("LOCK and the streak are paid under one cap", () => {
   assert.equal(bare.pot, locked.pot, "and a full LOCK with no streak reaches the same cap");
 });
 
-test("the ledger reads the streak and still reads a log written under the beat; the ending's door is the streak's", () => {
+test("the ledger reads the streak and still reads a log written before it paid; the ending's door is the streak's alone", () => {
   const ledger = createGauntletLedger([
     { threshold: { busted: false, potMultiplier: 4, pot: 900, pushes: 3, logic: { streak: 5, pot: 240 } } },
     { threshold: { busted: true, potMultiplier: 0, lostPot: 900, pushes: 4, logic: { streak: 0, pot: 0 } } },
-    // Logged before 2026-10-10: the beat's line, and the shadow streak beside it with nothing paid.
+    // Logged before 2026-10-10: the hand's share on the line that build wrote, and the shadow streak beside it with nothing paid.
     { threshold: { busted: false, potMultiplier: 2, pot: 300, pushes: 1, tempo: { maxCombo: 7, hits: 2, perfects: 1, slips: 2, groovePot: 60 }, logic: { streak: 6 } } },
     { threshold: { busted: false, potMultiplier: 2, pot: 100, pushes: 1, tempo: { maxCombo: 9, groovePot: 10 } } },
   ]);
@@ -989,15 +989,16 @@ test("the ledger reads the streak and still reads a log written under the beat; 
   assert.equal(LOGIC_SLACK_STREAK, 24);
   assert.equal(getEndingVariant({ ...base, seasonBestLogic: LOGIC_SLACK_STREAK - 1 }).id, "open-question", "a streak a hand can stumble into opens nothing");
   assert.equal(getEndingVariant({ ...base, seasonBestLogic: LOGIC_SLACK_STREAK }).id, "open-oversight", "a season that held its reasoning earns the clue of slack");
-  assert.equal(getEndingVariant({ ...base, seasonBestCombo: 11 }).id, "open-question");
-  assert.equal(getEndingVariant({ ...base, seasonBestCombo: 12 }).id, "open-oversight", "a season that opened the door on the beat, before the beat went, keeps it open");
+  assert.equal(getEndingVariant({ ...base, seasonBestCombo: 999 }).id, "open-question", "a combo of pushes from before 2026-10-10 opens nothing");
 
   const strain = getSeasonStrain({
-    case01: { gauntlet: { vault: 20000, grooveVault: 6000, bestCombo: 4, bestLogic: 11 }, pushRecord: { bestCombo: 9, busts: 3, bestMultiplier: 64 }, logicRecord: { best: 7 } },
-    case02: { gauntlet: { vault: 20000, grooveVault: 6000 }, logicRecord: { best: 26 } },
+    // A case closed before 2026-10-11 names the hand's share `grooveVault`, and can hold a combo of pushes.
+    case01: { gauntlet: { vault: 18000, grooveVault: 6000, bestCombo: 40, bestLogic: 11 }, pushRecord: { bestCombo: 90, busts: 3, bestMultiplier: 64 }, logicRecord: { best: 7 } },
+    case02: { gauntlet: { vault: 20000, handVault: 6000 }, logicRecord: { best: 26 } },
   });
   assert.equal(strain.seasonVaultPerCase, 7000, "the vault slack is read without the hand's share");
-  assert.equal(strain.seasonBestCombo, 9);
+  assert.equal(getSeasonStrain({ case01: { gauntlet: { vault: 20000, grooveVault: 6000 } } }).seasonVaultPerCase, 14000, "under the name an older summary gave it too");
+  assert.equal("seasonBestCombo" in strain, false, "and the combo of pushes is not read");
   assert.equal(strain.seasonBestLogic, 26, "the longest streak any case reached");
   const { casesPlayed: _cases, seasonWindows: _windows, sustainedPressure: _sustained, seasonReframeRoutes: _reframes, seasonResources: _resources, seasonBestLogic: _logic, ...tableOnly } = strain;
   assert.equal(getEndingVariant({ ...base, ...tableOnly, seasonHumanCost: base.seasonHumanCost, peakRiskPressure: 30 }).id, "open-question", "the hand's share alone cannot buy the vault door");
@@ -1169,15 +1170,15 @@ test("stance relics unlock from mastery and bend their mastered board", () => {
 
 test("INSURANCE keeps a third of the pot once a case, and ENCORE keeps the logic streak through every bust", () => {
   const streak = { streak: 5, best: 5, type: "risk", held: 7 };
-  const run = normalizeRunState({ relics: ["insurance", "encore"], runPot: 900, runGroove: 90, logic: streak });
+  const run = normalizeRunState({ relics: ["insurance", "encore"], runPot: 900, runHand: 90, logic: streak });
   const first = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
   assert.equal(first.verdict.insuredPot, 300);
   assert.equal(first.verdict.lostPot, 600);
   assert.equal(first.nextRun.runPot, 300);
-  assert.equal(first.nextRun.runGroove, 30);
+  assert.equal(first.nextRun.runHand, 30);
   assert.deepEqual([first.verdict.logic.move, first.nextRun.logic.streak], ["bust", 5], "ENCORE: the wall takes the pot, not the streak");
   assert.deepEqual(first.verdict.relicProcs.slice(0, 2), ["insurance", "encore"]);
-  // Its limit is the one it had over the beat's combo: none. INSURANCE pays once a case; ENCORE holds every time.
+  // ENCORE has no limit. INSURANCE pays once a case; ENCORE holds every time.
   const again = resolveWindow({ run: first.nextRun, window: { status: "bust", cause: "timeout", gauge: 30 }, card: typed("a", "risk"), forced: true });
   assert.equal(again.nextRun.logic.streak, 5, "a second bust in the same case, and one the clock dealt with nothing staked");
   assert.ok(again.verdict.relicProcs.includes("encore"));
@@ -1244,7 +1245,7 @@ test("relics are unlocked by feats, and a restore cannot hand an INSURANCE payou
   assert.deepEqual(unlocks({ outcome: "cash", multiplier: 8, logic: { streak: 7 }, nextMutations: [] }), []);
   assert.deepEqual(unlocks({ outcome: "cash", multiplier: 64, logic: { streak: 8 }, nextMutations: [] }), ["encore", "highRoller"]);
   assert.deepEqual(unlocks({ outcome: "bust", logic: { streak: 0 }, nextMutations: [] }, { logic: { best: 8 } }), ["encore"], "the run's longest streak proves it too");
-  assert.deepEqual(unlocks({ outcome: "cash", multiplier: 8, tempo: { maxCombo: 30 }, nextMutations: [] }, { bestCombo: 30 }), [], "a combo of pushes from before the beat went is not a streak");
+  assert.deepEqual(unlocks({ outcome: "cash", multiplier: 8, tempo: { maxCombo: 30 }, nextMutations: [] }, { bestCombo: 30 }), [], "a combo of pushes from before 2026-10-10 is not a streak");
   assert.deepEqual(unlocks({ outcome: "bust", lostPot: INSURANCE_UNLOCK_LOSS, nextMutations: [{ id: "silence" }] }), ["insurance", "stethoscope"]);
   assert.deepEqual(unlocks({ outcome: "bust", lostPot: INSURANCE_UNLOCK_LOSS, nextMutations: [] }, {}, ["insurance"]), [], "an unlock happens once");
 

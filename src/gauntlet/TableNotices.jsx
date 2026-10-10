@@ -119,11 +119,10 @@ export function TableNotices({ equipped, tab, clock, slam, onReload, onClaim, on
  * The logic streak in the HUD: the third of the hand's signals, beside the
  * chain and the LOCK charge. What it stands at, the type being held and how
  * far the hold has got, and a note -- what the staked card does to it, or
- * that a change of type would count. What it pays is in the pot's own line,
- * where the groove's bonus was.
+ * that a change of type would count. What it pays is in the pot's own line.
  *
- * The beat's combo stood over the pot's corner. The streak has more to say,
- * and on a 360px phone anything there ran under the pot's own numbers. In the
+ * It is not drawn over the pot's corner: on a 360px phone anything there ran
+ * under the pot's own numbers, and the streak has more to say. In the
  * signals row it takes room that is its own and adds no height from 프롤로그
  * 04 on, where the row already is. A phone has the width for three words of
  * it: "논리", all of the type's name but one word, and the note are not drawn

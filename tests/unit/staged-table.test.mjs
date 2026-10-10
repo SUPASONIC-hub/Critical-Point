@@ -16,6 +16,7 @@ import {
   resolveWindow,
   RUN_INITIAL_STATE,
   serializeRunState,
+  upgradeRunRecord,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { LOGIC_INITIAL } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_IDS } from "../../src/gauntlet/relics.js";
@@ -224,7 +225,9 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
   assert.equal(repaired, false, "filling in the marks is not a repair");
   assert.equal(state.lastError, undefined, "so there is no 복구됨 notice");
   assert.equal(state.paused, fixture.save.paused);
-  assert.deepEqual(state.dynamics, { ...before, veteran: false, story: false, logic: { ...LOGIC_INITIAL } }, "the table record is the save's, plus the marks that say it is a plain run at the table and a logic streak not yet begun");
+  assert.ok(before.grooveVault > 0 && before.bestCombo > 0, "and it names the hand's share, and counts a combo of pushes, as that build did");
+  assert.deepEqual(state.dynamics, { ...upgradeRunRecord(before), veteran: false, story: false, logic: { ...LOGIC_INITIAL } }, "the table record is the save's under the names this build reads, plus the marks that say it is a plain run at the table and a logic streak not yet begun");
+  assert.deepEqual([state.dynamics.handVault, "bestCombo" in state.dynamics], [before.grooveVault, false]);
   const run = normalizeRunState(state.dynamics);
   assert.deepEqual(serializeRunState(run), state.dynamics, "and it is written back the same");
   assert.equal(run.veteran, false);
@@ -242,15 +245,14 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
 
   // The next window is settled under the step: what it newly produces follows
   // the step, what the run held is still held.
-  // A window from that build, with a groove earned on the beat; the card has no type, so no streak moves.
+  // A window from that build, holding the groove it had earned; the card has no type, so no streak moves.
   const cashed = { status: "cashed", cause: "cash", gauge: HOT_GAUGE, wall: 80, pushes: 0, seed: "after", groove: 5, beatCombo: 9, maxCombo: 9, beatHits: 2 };
   const { verdict, nextRun } = resolveWindow({ run: drafted, window: cashed, card: staked, ...getSettlementRules({ caseId: state.currentCase, run: drafted, caseClosed: false }, true) });
   assert.deepEqual(nextRun.relics, drafted.relics);
   assert.deepEqual(nextRun.stanceMastery, drafted.stanceMastery);
   assert.equal(nextRun.vault, drafted.vault);
-  assert.equal(nextRun.grooveVault, drafted.grooveVault);
+  assert.equal(nextRun.handVault, drafted.handVault);
   assert.deepEqual([verdict.logic.bonus, verdict.logic.pot > 0], [1.15, true], "프롤로그 03 has the streak's rule, so the groove that window held is paid as it was shown");
-  assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [drafted.beatCombo, drafted.bestCombo], "and the combo the run held is written back as it was");
   assert.equal(nextRun.streak, 0, "the chain it was holding is not counted before OVERCLOCK");
   assert.deepEqual(nextRun.schema.mutations, ["coldFeet"], "and the next board is dealt from the step's rules alone");
   for (const id of nextRun.schema.mutations) assert.ok(rules.has(MUTATION_RULES[id]));

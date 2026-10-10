@@ -11,7 +11,7 @@ import {
   triggerLabels,
 } from "../gameData.js";
 import { getOutcomeChoiceId, makeEmptyScores } from "../gameLogic.js";
-import { serializeRunState } from "../gauntlet/gauntletEngine.js";
+import { serializeRunState, upgradeRunRecord } from "../gauntlet/gauntletEngine.js";
 import { recordAppError } from "./errorRecovery.js";
 import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
@@ -371,7 +371,10 @@ export function normalizeSavedNestedState(state) {
  * the validator had thrown the save away.
  *
  * Filling in a field the record never had is not a repair (see
- * `isMissingSavedValue`). Replacing or dropping one it did have is.
+ * `isMissingSavedValue`). Replacing or dropping one it did have is -- except
+ * the keys the engine has retired or renamed (`upgradeRunRecord`): the build
+ * that stopped writing them would otherwise have met every save in play with
+ * a recovery notice, a pause and a spent recovery slot.
  */
 function normalizeSavedDynamics(state) {
   if (!state || typeof state !== "object" || Array.isArray(state)) return { value: state, repaired: false };
@@ -379,7 +382,7 @@ function normalizeSavedDynamics(state) {
   if (isMissingSavedValue(saved)) return { value: state, repaired: false };
   const current = serializeRunState(saved);
   if (JSON.stringify(current) === JSON.stringify(saved)) return { value: state, repaired: false };
-  if (!isSavedValueRepaired(saved, current)) return { value: { ...state, dynamics: current }, repaired: false };
+  if (!isSavedValueRepaired(upgradeRunRecord(saved), current)) return { value: { ...state, dynamics: current }, repaired: false };
   return {
     value: {
       ...state,

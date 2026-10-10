@@ -332,11 +332,10 @@ export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8
  * and `check:pressure` holds that a hand that plays for the streak busts
  * exactly as often as one that does not.
  *
- * Until 2026-10-10 this was the beat: a push landed on the heartbeat earned
- * groove, one off it cost a second of clock, and a LOCK was graded the same
- * way. Nothing here grades a press any more. What is left of it is the groove
- * a window saved in the middle of a beat still holds, which is paid as it was
- * shown (`getHandBonus`); each of its points added this much, up to x1.5.
+ * No press is graded. The one number left from the table that graded them
+ * (until 2026-10-10) is the `groove` a window put down in that build still
+ * holds: it is paid as it was shown (`getHandBonus`), each of its points
+ * adding this much, up to x1.5. No window earns one now.
  */
 const GROOVE_RATE = 0.03;
 export const FOCUS_MAX = 100;
@@ -362,9 +361,9 @@ export function getFocusModeProfile(mode) {
 }
 
 /**
- * One LOCK press: the charge it leaves and how far it cools the gauge. Every
- * press takes what a press landed on the beat used to (the amount a GOOD one
- * took), a little more for each press before it in the window.
+ * One LOCK press: the charge it leaves and how far it cools the gauge: the
+ * same for every press, and a little more for each press before it in the
+ * window.
  */
 export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}) {
   const profile = getFocusModeProfile(focusMode);
@@ -386,10 +385,10 @@ export const HAND_CAP = 1 + LOGIC_CAP;
 
 /**
  * `streak` is the logic streak the pot is paid on: the streak after this
- * window's card. `groove` is what a window saved in the middle of a beat, and
- * picked up after the beat was taken out, still holds. The larger of the two
- * is paid, so the pot that window's player saw does not shrink; every other
- * window holds none.
+ * window's card. `groove` is what a window put down before 2026-10-10 can
+ * still hold (`SUSPENDED_WINDOW_NUMBERS`). The larger of the two is paid, so
+ * the pot that window's player saw does not shrink; every other window holds
+ * none.
  */
 export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
   return round2(Math.min(HAND_CAP, Math.max(getLogicBonus(streak), getGrooveBonus(groove)) * getFocusBonus(focus, mode).pot));
@@ -458,15 +457,14 @@ function normalizeTimeScale(value) {
 }
 
 /** The ways a window can bust on the table, as a hold written at closure records them. */
-const CLOSED_CAUSES = new Set(["push", "creep", "timeout", "focus"]);
+const CLOSED_CAUSES = new Set(["push", "creep", "timeout"]);
 /**
  * Every way a window closes, as a verdict names it: the cash, the busts the
  * table deals -- a push into the wall, the clock's heat reaching it, the clock
- * running out -- and a bet walked away from. "focus" was a LOCK off the beat
- * heating into the wall; no press does that now, and a log or a hold written
- * before 2026-10-10 can still name it. Whatever tells the player why reads
- * this list, so a cause added here without a sentence fails a test instead of
- * borrowing another's.
+ * running out -- and a bet walked away from. Whatever tells the player why
+ * reads this list, so a cause added here without a sentence fails a test
+ * instead of borrowing another's. (A log written before 2026-10-10 can name
+ * one more, "focus"; the readout keeps its sentence and nothing deals it.)
  */
 export const VERDICT_CAUSES = Object.freeze(["cash", ...CLOSED_CAUSES, "abandon"]);
 
@@ -512,16 +510,10 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
 }
 
 /**
- * `beatCombo` to `slips`, and LOCK's two grade counts, are the beat's. No
- * window earns them now and one put down before 2026-10-10 holds them: they
- * are kept as they were saved and in the order they were saved, because a
- * save that comes back changed is announced as repaired (state/savedState.js),
- * and `groove` is still read when that window is paid.
+ * `groove` is not earned by any window now. One put down before 2026-10-10
+ * can hold it, and it is still read when that window is paid (`getHandBonus`).
  */
-const SUSPENDED_WINDOW_NUMBERS = [
-  "gauge", "pushes", "lastStep", "elapsed", "beatCombo", "maxCombo", "groove", "beatHits", "perfects", "slips",
-  "focus", "focusCombo", "maxFocusCombo", "focusHits", "focusPerfects", "focusMisses", "timeScale",
-];
+const SUSPENDED_WINDOW_NUMBERS = ["gauge", "pushes", "lastStep", "elapsed", "groove", "focus", "focusCombo", "maxFocusCombo", "focusHits", "timeScale"];
 
 /**
  * The part of a live window worth keeping when the player puts it down: their
@@ -619,8 +611,8 @@ export function getRemainingSeconds(window) {
  * `resolveWindow` decides what it is worth.
  *
  * No press is graded. A push is a push whenever it lands, and a FOCUS charges
- * (`scoreFocus`) and costs `LOCK_PRESS_SECONDS` of clock -- no JAM, no heat,
- * and no bust of its own.
+ * (`scoreFocus`) and costs `LOCK_PRESS_SECONDS` of clock -- no heat, and no
+ * bust of its own.
  */
 function advanceClock(window, delta) {
   const elapsed = window.elapsed + delta;
@@ -713,22 +705,14 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // A live window the player put down on purpose, with their progress in it.
   // See `normalizeSuspendedWindow`.
   suspended: null,
-  // The beat's combo and the longest it was, from before 2026-10-10: nothing
-  // adds to them or reads them now, and a save that holds them keeps them
-  // (see `SUSPENDED_WINDOW_NUMBERS`). `runGroove` and `grooveVault` are still
-  // counted under the names the beat gave them: the hand's share of the pot
-  // and of the vault, which is now the logic streak's and LOCK's. The
-  // ending's vault slack reads the vault without it: it rewards reading the
-  // table.
-  beatCombo: 0,
-  bestCombo: 0,
   bestFocusCombo: 0,
   focusHits: 0,
-  focusPerfects: 0,
-  focusMisses: 0,
   stanceMastery: EMPTY_STANCE_MASTERY,
-  runGroove: 0,
-  grooveVault: 0,
+  // The hand's share of the case pot and of the vault: what the logic streak
+  // and LOCK added. The ending's vault slack reads the vault without it: it
+  // rewards reading the table.
+  runHand: 0,
+  handVault: 0,
   // The logic streak (`advanceLogic`); a save from before it reads as this.
   logic: LOGIC_INITIAL,
   // The relics this season carries, the three a closed case is offering, and
@@ -749,9 +733,52 @@ export const RUN_INITIAL_STATE = Object.freeze({
   schema: BASE_SCHEMA,
 });
 
-// The table record's keys (`createGauntletLedger`), and the beat's four counts
-// a replay opened before 2026-10-10 holds: a record keeps the ones it has.
-const PRACTICE_RECORD_KEYS = ["busts", "cashes", "bestMultiplier", "potBanked", "potLost", "pushes", "bestCombo", "beatHits", "perfects", "slips", "grooveBanked", "bestLogic"];
+// The table record's keys (`createGauntletLedger`): a record keeps the ones it has.
+const PRACTICE_RECORD_KEYS = ["busts", "cashes", "bestMultiplier", "potBanked", "potLost", "pushes", "grooveBanked", "bestLogic"];
+
+/**
+ * What a record written before 2026-10-11 holds that this build does not: the
+ * counts of the table that graded a press against the heartbeat, which nothing
+ * reads, and the hand's share under the names that table gave it.
+ */
+const RETIRED_RUN_KEYS = ["beatCombo", "bestCombo", "focusPerfects", "focusMisses"];
+const RETIRED_WINDOW_KEYS = ["beatCombo", "maxCombo", "beatHits", "perfects", "slips", "focusPerfects", "focusMisses"];
+const RETIRED_RECORD_KEYS = ["bestCombo", "beatHits", "perfects", "slips"];
+const RENAMED_RUN_KEYS = [["runGroove", "runHand"], ["grooveVault", "handVault"]];
+
+const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+function withoutKeys(source, retired, renamed = []) {
+  if (!isRecord(source) || ![...retired, ...renamed.map(([old]) => old)].some((key) => key in source)) return source;
+  const next = { ...source };
+  for (const key of retired) delete next[key];
+  for (const [old, name] of renamed) {
+    if (!(name in next) && old in next) next[name] = next[old];
+    delete next[old];
+  }
+  return next;
+}
+
+/**
+ * A saved run record with those keys set aside and the two renamed ones read
+ * under their new names; the record itself when it holds none of them. Every
+ * reader of a record goes through this (`normalizeRunState`), and so does the
+ * save's repair (state/savedState.js): a key retired here is not a value the
+ * save lost, so a save from that build comes back without a recovery notice.
+ */
+export function upgradeRunRecord(value) {
+  if (!isRecord(value)) return value;
+  const run = withoutKeys(value, RETIRED_RUN_KEYS, RENAMED_RUN_KEYS);
+  const window = withoutKeys(run.suspended?.window, RETIRED_WINDOW_KEYS);
+  const record = withoutKeys(run.practice?.record, RETIRED_RECORD_KEYS);
+  const practice = withoutKeys(record === run.practice?.record ? run.practice : { ...run.practice, record }, ["bestCombo"], [RENAMED_RUN_KEYS[1]]);
+  if (window === run.suspended?.window && practice === run.practice) return run;
+  return {
+    ...run,
+    ...(window === run.suspended?.window ? null : { suspended: { ...run.suspended, window } }),
+    ...(practice === run.practice ? null : { practice }),
+  };
+}
 
 function normalizePractice(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -759,12 +786,11 @@ function normalizePractice(value) {
   const source = value.record && typeof value.record === "object" ? value.record : null;
   return {
     vault,
-    grooveVault: clamp(Math.round(Number(value.grooveVault) || 0), 0, vault),
+    handVault: clamp(Math.round(Number(value.handVault) || 0), 0, vault),
     relics: normalizeRelicIds(value.relics),
     relicOffer: normalizeRelicIds(value.relicOffer, RELIC_OFFER_SIZE),
     stanceMastery: normalizeStanceMastery(value.stanceMastery),
     bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
-    bestCombo: clamp(Math.trunc(Number(value.bestCombo) || 0), 0, 999),
     // A replay opened before the streak existed holds none to hand back.
     ...(value.logic ? { logic: normalizeLogic(value.logic) } : null),
     record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.filter((key) => key in source).map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
@@ -772,9 +798,9 @@ function normalizePractice(value) {
 }
 
 export function normalizeRunState(value) {
-  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const source = isRecord(value) ? upgradeRunRecord(value) : {};
   const run = { ...RUN_INITIAL_STATE };
-  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "beatCombo", "bestCombo", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "runGroove", "grooveVault"]) {
+  for (const key of ["windowIndex", "practiceWindows", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastGauge", "bestFocusCombo", "focusHits", "runHand", "handVault"]) {
     // A value the save does not hold, or holds as null, takes the default:
     // `Number(null)` is 0, which is finite, and used to be taken as written.
     if (source[key] === null || source[key] === undefined) continue;
@@ -790,15 +816,11 @@ export function normalizeRunState(value) {
   run.cashes = Math.max(0, Math.trunc(run.cashes));
   run.bestMultiplier = clamp(run.bestMultiplier, 1, 512);
   run.lastGauge = clamp(run.lastGauge, 0, GAUGE_MAX);
-  run.beatCombo = clamp(Math.trunc(run.beatCombo), 0, 999);
-  run.bestCombo = clamp(Math.trunc(run.bestCombo), run.beatCombo, 999);
   run.bestFocusCombo = clamp(Math.trunc(run.bestFocusCombo), 0, 999);
   run.focusHits = Math.max(0, Math.trunc(run.focusHits));
-  run.focusPerfects = Math.max(0, Math.trunc(run.focusPerfects));
-  run.focusMisses = Math.max(0, Math.trunc(run.focusMisses));
   run.stanceMastery = normalizeStanceMastery(source.stanceMastery);
-  run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
-  run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
+  run.runHand = clamp(Math.round(run.runHand), 0, run.runPot);
+  run.handVault = clamp(Math.round(run.handVault), 0, run.vault);
   run.logic = normalizeLogic(source.logic);
   run.relics = normalizeRelicIds(source.relics);
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
@@ -1038,12 +1060,11 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
   const practice = replayOf
     ? {
         vault: current.vault,
-        grooveVault: current.grooveVault,
+        handVault: current.handVault,
         relics: current.relics,
         relicOffer: offer,
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
-        bestCombo: current.bestCombo,
         logic: current.logic,
         record: replayOf.pushRecord ?? null,
       }
@@ -1051,7 +1072,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
   return normalizeRunState({
     ...current,
     runPot: 0,
-    runGroove: 0,
+    runHand: 0,
     insuranceSpent: false,
     practice,
     relicOffer: practice ? [] : offer,
@@ -1227,8 +1248,8 @@ const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focu
 
 /**
  * The window as the case's rules read it. What a rule the case does not have
- * would have earned is not there to be settled: no streak, no groove held
- * from a beat; no LOCK, no charge; no choice of stance, STRIKE. The reducer
+ * would have earned is not there to be settled: no streak, no groove an old
+ * window held; no LOCK, no charge; no choice of stance, STRIKE. The reducer
  * already refuses those presses, so this only ever changes a window that came
  * from somewhere else -- a save made before the steps existed, a script. With
  * every rule the window is handed back as it is.
@@ -1286,7 +1307,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // The streak after this window's card. Without the rule the type is false,
   // "not in play", and a card the room played is not the hand's pick (null:
   // the bust still ends the streak). Two relics bend it: ENCORE holds the
-  // streak through a bust, every bust, as it held the beat's combo; METRONOME
+  // streak through a bust, every bust; METRONOME
   // lets a change of type count as a switch one scene longer after a rise.
   const logicOn = rules.has("logic");
   const logicType = logicOn && (forced ? null : getLogicType(card));
@@ -1297,8 +1318,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     bustHolds: hasRelic(relics, "encore"),
     reach: hasRelic(relics, "metronome"),
   });
-  // What the hand earned before LOCK: the streak this card made (or a groove
-  // held from before the beat went, see `getHandBonus`).
+  // What the hand earned before LOCK: the streak this card made (or the groove
+  // a window put down before 2026-10-10 still holds, see `getHandBonus`).
   const paidStreak = logicOn ? streak.logic.streak : 0;
   const earnedBonus = outcome === "cash" ? getHandBonus(reachedGroove, 0, focusMode, paidStreak) : 1;
   const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode, paidStreak) : 1;
@@ -1322,9 +1343,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // streak standing, and a switch that only the longer reach allowed.
   const encored = streak.move === "bust" && streak.logic.streak > 0;
   const reached = streak.move === "switch" && !current.logic.rose;
-  // `runGroove` is the hand's whole share, streak and LOCK: the ending's vault
+  // `runHand` is the hand's whole share, streak and LOCK: the ending's vault
   // slack reads the vault without it, and neither is reading the table.
-  const runGrooveAfter = outcome === "cash" ? current.runGroove + logicPot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
+  const runHandAfter = outcome === "cash" ? current.runHand + logicPot + focusPot : insured ? Math.floor(current.runHand / INSURANCE_SHARE) : 0;
   const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   // A practice run closes a case the table has already been paid for: nothing
@@ -1428,15 +1449,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     bestMultiplier: Math.max(current.bestMultiplier, multiplier || 1),
     lastOutcome: outcome,
     lastGauge: gauge,
-    beatCombo: current.beatCombo,
-    bestCombo: current.bestCombo,
     bestFocusCombo: Math.max(current.bestFocusCombo, verdict.focus.maxCombo),
     focusHits: current.focusHits + verdict.focus.hits,
-    focusPerfects: current.focusPerfects,
-    focusMisses: current.focusMisses,
     stanceMastery,
-    runGroove: caseClosed ? 0 : runGrooveAfter,
-    grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
+    runHand: caseClosed ? 0 : runHandAfter,
+    handVault: current.handVault + (caseClosed ? runHandAfter : 0),
     logic: streak.logic,
     relics,
     relicOffer,
@@ -1539,7 +1556,7 @@ export function carryTableRecordIntoRestore(restored, current) {
       cashes: Math.max(restoredRun.cashes, currentRun.cashes),
       bestMultiplier: Math.max(restoredRun.bestMultiplier, currentRun.bestMultiplier),
       runPot: bustedSince ? 0 : restoredRun.runPot,
-      runGroove: bustedSince ? 0 : restoredRun.runGroove,
+      runHand: bustedSince ? 0 : restoredRun.runHand,
       streak: bustedSince ? 0 : restoredRun.streak,
       // A bust since the slot took the streak, and the longest it has been is
       // the record's.
@@ -1550,8 +1567,6 @@ export function carryTableRecordIntoRestore(restored, current) {
       },
       bestFocusCombo: Math.max(restoredRun.bestFocusCombo, currentRun.bestFocusCombo),
       focusHits: Math.max(restoredRun.focusHits, currentRun.focusHits),
-      focusPerfects: Math.max(restoredRun.focusPerfects, currentRun.focusPerfects),
-      focusMisses: Math.max(restoredRun.focusMisses, currentRun.focusMisses),
       stanceMastery: normalizeStanceMastery({
         strike: Math.max(restoredRun.stanceMastery.strike, currentRun.stanceMastery.strike),
         steady: Math.max(restoredRun.stanceMastery.steady, currentRun.stanceMastery.steady),
@@ -1601,8 +1616,9 @@ export function createGauntletLedger(log = []) {
     potLost += Number(threshold.lostPot) || 0;
     pushes += Number(threshold.pushes) || 0;
     bestLogic = Math.max(bestLogic, Number(threshold.logic?.streak) || 0);
-    // What the hand added before LOCK: the streak's share, and in an entry
-    // logged before 2026-10-10 the beat's (`tempo`), under the beat's name.
+    // What the hand added before LOCK: the streak's share. An entry logged
+    // before 2026-10-10 holds it on another line (`tempo`), and a case that
+    // was open across that day still counts those entries.
     grooveBanked += Number(threshold.logic?.pot ?? threshold.tempo?.groovePot) || 0;
   }
   return { busts, cashes, bestMultiplier: round2(bestMultiplier), potBanked, potLost, pushes, bestLogic, grooveBanked };
@@ -1614,7 +1630,7 @@ export function createGauntletLedger(log = []) {
  * take a bust out of the season the ending reads.
  */
 export function createTableRecord(log = []) {
-  // A replay closed before 2026-10-10 carried it on the beat's line (`tempo`).
+  // A replay closed before 2026-10-10 carried it on another line (`tempo`).
   const first = log.map((entry) => entry?.threshold?.firstRecord ?? entry?.threshold?.tempo?.firstRecord).findLast(Boolean);
   return first ? { ...createGauntletLedger([]), ...first } : createGauntletLedger(log);
 }
@@ -1631,16 +1647,12 @@ export function createRunSummary(run) {
     bestMultiplier: state.bestMultiplier,
     lastOutcome: state.lastOutcome,
     lastGauge: Math.round(state.lastGauge),
-    beatCombo: state.beatCombo,
-    bestCombo: state.bestCombo,
     logicStreak: state.logic.streak,
     bestLogic: state.logic.best,
     bestFocusCombo: state.bestFocusCombo,
     focusHits: state.focusHits,
-    focusPerfects: state.focusPerfects,
-    focusMisses: state.focusMisses,
     stanceMastery: normalizeStanceMastery(state.stanceMastery),
-    grooveVault: state.grooveVault,
+    handVault: state.handVault,
     relics: [...state.relics],
     mutations: [...state.schema.mutations],
   };

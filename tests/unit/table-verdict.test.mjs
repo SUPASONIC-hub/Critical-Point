@@ -22,8 +22,6 @@ function closedWindows() {
     push: reduceWindow({ ...staked, gauge: fresh.wall - 0.001 }, { type: "PUSH" }),
     creep: reduceWindow(underWall, { type: "TICK", delta: 1 }),
     timeout: reduceWindow({ ...fresh, schema: { ...fresh.schema, creep: 0 }, elapsed: fresh.schema.seconds - 0.5 }, { type: "TICK", delta: 1 }),
-    // No press closes a window this way since 2026-10-10; a hold written under the slam of one that did still says so.
-    focus: createWindow({ schema: BASE_SCHEMA, seed: "causes", abandoned: true, closedAs: "focus" }),
     abandon: createWindow({ schema: BASE_SCHEMA, seed: "causes", abandoned: true }),
   };
 }
@@ -45,14 +43,18 @@ test("the reveal names what closed the window, one true sentence a cause", () =>
     assert.doesNotMatch(sentences.get(cause), /확정/, `a ${cause} bust is not reported as the player's cash`);
   }
   assert.match(sentences.get("creep"), /시계/);
-  assert.match(sentences.get("focus"), /락/);
-  assert.doesNotMatch(sentences.get("focus"), /박자/, "and no sentence names a beat");
+  // No press closes a window on its own, so "focus" is not a cause the engine deals. A verdict logged before
+  // 2026-10-10 can name it, and its reveal still reads as it did.
+  assert.equal(VERDICT_CAUSES.includes("focus"), false);
+  const logged = describeVerdictCause({ outcome: "bust", cause: "focus" });
+  assert.equal(logged, "락이 올린 열이 벽에 닿았다");
+  assert.equal([...sentences.values()].includes(logged), false, "a sentence of its own");
   // A LOCK press under the wall is charged in clock, and the clock is what closes the window.
   const pressed = reduceWindow({ ...createWindow({ schema: BASE_SCHEMA, seed: "causes" }), selectedId: "a", gauge: closedWindows().creep.wall - 0.001, elapsed: READ_GRACE_SECONDS }, { type: "FOCUS" });
   assert.deepEqual([pressed.status, pressed.cause], ["bust", "creep"]);
 
   // A window that bust and was reloaded under its slam is settled as what it bust on.
-  for (const closedAs of ["creep", "focus", "timeout", "push"]) {
+  for (const closedAs of ["creep", "timeout", "push"]) {
     const reloaded = createWindow({ schema: BASE_SCHEMA, seed: "causes", abandoned: true, closedAs });
     const { verdict } = resolveWindow({ run: null, window: reloaded, card: { id: "a", effect: {} } });
     assert.equal(describeVerdictCause(verdict), sentences.get(closedAs));

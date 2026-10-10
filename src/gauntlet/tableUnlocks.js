@@ -1,7 +1,7 @@
 /**
  * Which of the table's rules a case plays under.
  *
- * Every rule used to be on from 프롤로그 01: the combo, LOCK and its three
+ * Every rule used to be on from 프롤로그 01: the streak, LOCK and its three
  * stances, the relic draft and nine ways of breaking the next board, all in
  * front of a player who had not yet pushed once. The five prologues now turn
  * them on in steps, and from 사건 01 the table is whole.
@@ -26,8 +26,7 @@ export const STAGED = true;
 
 /**
  * The rules a step can turn on. `logic` is the logic streak and what it pays
- * (it was `beat`, the groove and its combo, until 2026-10-10; a rule's id is
- * derived from the case and never saved); `lock` is
+ * (a rule's id is derived from the case and never saved); `lock` is
  * the LOCK press, in the STRIKE stance until `stance` lets the player choose
  * one -- and with the choice come the boards a stance carries forward (STRIKE
  * WAKE, STEADY LINE, EXPOSED HAND) and the season's mastery of it. `relics`

@@ -1,0 +1,380 @@
+{
+  "era": "v2, the table that still kept what the beat had written -- the builds of 2026-10-10 paid the logic streak and wrote the hand's share as `runGroove` and `grooveVault`, with the beat's counts beside it. A 프롤로그 02 that had closed once and is being played again, put down mid-window: the window holds a groove from before the beat went, the log's one entry carries the lines that build wrote, and the first close's summary and record carry a combo of pushes",
+  "writtenBy": "the keys of serializeRunState(), normalizePractice() and SUSPENDED_WINDOW_NUMBERS in src/gauntlet/gauntletEngine.js and of createRunSummary() at ce736cf (2026-10-10); the log entry's `tempoBonus` and `threshold.tempo` as useChoiceCommit.js wrote them at 1dac96c, the last build before #81. Composed by hand from those shapes: the values are not a recorded run",
+  "save": {
+    "saveSchemaVersion": 2,
+    "runId": "run-hand-names-0001",
+    "playerName": "분석관",
+    "playStyle": "instinct",
+    "openingLegacy": null,
+    "dataConsent": false,
+    "started": false,
+    "currentCase": "prologue02",
+    "completedCases": [
+      "prologue01",
+      "prologue02"
+    ],
+    "discoveredClues": [],
+    "caseResults": {
+      "prologue02": {
+        "schemaVersion": 2,
+        "primary": [
+          "responsibility",
+          3
+        ],
+        "secondary": [
+          "protection",
+          2
+        ],
+        "thinking": [
+          "persistence",
+          4
+        ],
+        "reframeCount": 0,
+        "averageResponseTime": 14,
+        "challengeClearCount": 2,
+        "reducedRiskCount": 1,
+        "rhythmScore": 58,
+        "cognitionScore": 55,
+        "pressureAdaptScore": 47,
+        "reflectionScore": 50,
+        "exploitPenalty": 0,
+        "burstScore": 61,
+        "momentumScore": 61,
+        "momentumTier": "RISING",
+        "rank": "B",
+        "finalHumanCost": 0,
+        "peakRiskPressure": 14,
+        "runId": "run-hand-names-0001",
+        "outcomeChoiceId": null,
+        "outcomeNodeId": null,
+        "routeMemory": {
+          "evidenceTurn": false,
+          "systemRoute": false,
+          "routeSplit": false
+        },
+        "pushRecord": {
+          "busts": 1,
+          "cashes": 5,
+          "bestMultiplier": 4.2,
+          "potBanked": 3180,
+          "potLost": 640,
+          "pushes": 17,
+          "bestCombo": 11,
+          "beatHits": 12,
+          "perfects": 5,
+          "slips": 2,
+          "grooveBanked": 260
+        },
+        "logicRecord": {
+          "best": 3,
+          "windows": 6,
+          "held": 4
+        },
+        "gauntlet": {
+          "windowIndex": 15,
+          "runPot": 0,
+          "vault": 7300,
+          "streak": 0,
+          "busts": 2,
+          "cashes": 13,
+          "bestMultiplier": 4.2,
+          "lastOutcome": "cash",
+          "lastGauge": 31,
+          "beatCombo": 4,
+          "bestCombo": 11,
+          "logicStreak": 2,
+          "bestLogic": 3,
+          "bestFocusCombo": 2,
+          "focusHits": 3,
+          "focusPerfects": 1,
+          "focusMisses": 1,
+          "stanceMastery": {
+            "strike": 1,
+            "steady": 0,
+            "expose": 0
+          },
+          "grooveVault": 520,
+          "relics": [],
+          "mutations": [
+            "reboot"
+          ]
+        },
+        "completedAt": "2026-10-09T11:20:00.000Z"
+      }
+    },
+    "playtestFeedback": {},
+    "nodeId": "p2_site",
+    "resources": {
+      "time": 66,
+      "capital": 100,
+      "trust": 57,
+      "legitimacy": 50,
+      "humanCost": 0,
+      "fatigue": 12
+    },
+    "log": [
+      {
+        "nodeId": "p2_start",
+        "caseId": "prologue02",
+        "choiceId": "p2_start_team",
+        "title": "310억이 올라온 아침",
+        "choice": "팀원들을 모아 이 건을 어떻게 볼지 먼저 나눈다",
+        "spokenChoice": "",
+        "reframe": false,
+        "reframeOpenedRoute": false,
+        "reframeBranchId": "",
+        "continuityMemory": false,
+        "routeChangeKind": "",
+        "effect": {
+          "time": -4,
+          "trust": 3
+        },
+        "riskRewardEffect": {
+          "time": -4,
+          "trust": 3
+        },
+        "cognition": {
+          "persistence": 1
+        },
+        "triggers": [],
+        "echo": "",
+        "challenge": {
+          "title": "첫 장면",
+          "matched": true,
+          "riskDelta": -1
+        },
+        "tempoBonus": {
+          "label": "FEVER",
+          "text": "콤보 7 · PERFECT 3회 · 그루브 판돈 +180"
+        },
+        "threshold": {
+          "state": "cash",
+          "busted": false,
+          "cause": "cash",
+          "forced": false,
+          "gauge": 38,
+          "wall": 71,
+          "pushes": 4,
+          "rewardMultiplier": 1.2,
+          "potMultiplier": 2.6,
+          "pot": 780,
+          "lostPot": 0,
+          "tempo": {
+            "combo": 7,
+            "maxCombo": 7,
+            "hits": 4,
+            "perfects": 3,
+            "slips": 1,
+            "groove": 9,
+            "groovePot": 180,
+            "bonus": 1.27
+          },
+          "focus": {
+            "charge": 0,
+            "mode": "strike",
+            "label": "STRIKE",
+            "combo": 0,
+            "maxCombo": 0,
+            "hits": 0,
+            "resourceMultiplier": 1,
+            "potMultiplier": 1,
+            "pot": 0,
+            "tier": "loose",
+            "stanceEarned": false,
+            "masteryCount": 1
+          },
+          "logic": {
+            "type": "persistence",
+            "tier": 1,
+            "rose": false,
+            "move": "build",
+            "streak": 0
+          }
+        },
+        "environmentMode": "stable",
+        "responseTimeSec": 12,
+        "resourcesBefore": {
+          "time": 70,
+          "capital": 100,
+          "trust": 54,
+          "legitimacy": 50,
+          "humanCost": 0,
+          "fatigue": 12
+        },
+        "resourcesAfter": {
+          "time": 66,
+          "capital": 100,
+          "trust": 57,
+          "legitimacy": 50,
+          "humanCost": 0,
+          "fatigue": 12
+        },
+        "isSystemEvent": false
+      }
+    ],
+    "triggers": {
+      "protection": 0,
+      "injustice": 0,
+      "revenge": 0,
+      "responsibility": 0,
+      "competition": 0,
+      "reward": 0,
+      "curiosity": 0,
+      "order": 0,
+      "trust": 0,
+      "affection": 0,
+      "recognition": 0,
+      "fear": 0,
+      "system": 0,
+      "helplessness": 0,
+      "selfAwareness": 0,
+      "manipulation": 0,
+      "choice": 0
+    },
+    "cognition": {
+      "persistence": 0,
+      "inference": 0,
+      "reframing": 0,
+      "risk": 0
+    },
+    "echo": "",
+    "nodeEnteredAt": 1760083200000,
+    "pendingTelemetry": [],
+    "protocolUsed": false,
+    "timerPenaltyCount": 0,
+    "probeUsed": false,
+    "investigatedTargets": {},
+    "hypothesisDecisions": {},
+    "dynamics": {
+      "windowIndex": 17,
+      "practiceWindows": 1,
+      "runPot": 780,
+      "vault": 7300,
+      "streak": 0,
+      "busts": 2,
+      "cashes": 14,
+      "bestMultiplier": 4.2,
+      "lastOutcome": "cash",
+      "lastGauge": 38,
+      "openSeed": null,
+      "openCardId": null,
+      "suspended": {
+        "seed": "run-hand-names-0001:17:p2_site",
+        "windowIndex": 17,
+        "window": {
+          "gauge": 33,
+          "pushes": 4,
+          "lastStep": 9,
+          "elapsed": 9,
+          "beatCombo": 6,
+          "maxCombo": 7,
+          "groove": 12,
+          "beatHits": 5,
+          "perfects": 3,
+          "slips": 1,
+          "focus": 37,
+          "focusCombo": 2,
+          "maxFocusCombo": 2,
+          "focusHits": 2,
+          "focusPerfects": 1,
+          "focusMisses": 1,
+          "timeScale": 1,
+          "selectedId": "p2_site_floor",
+          "focusMode": "strike"
+        }
+      },
+      "beatCombo": 6,
+      "bestCombo": 11,
+      "bestFocusCombo": 2,
+      "focusHits": 3,
+      "focusPerfects": 1,
+      "focusMisses": 1,
+      "stanceMastery": {
+        "strike": 1,
+        "steady": 0,
+        "expose": 0
+      },
+      "runGroove": 180,
+      "grooveVault": 520,
+      "logic": {
+        "streak": 0,
+        "best": 3,
+        "type": "persistence",
+        "held": 1,
+        "heat": 1,
+        "rose": false,
+        "reach": 0
+      },
+      "relics": [],
+      "relicOffer": [],
+      "insuranceSpent": false,
+      "practice": {
+        "vault": 7300,
+        "grooveVault": 520,
+        "relics": [],
+        "relicOffer": [],
+        "stanceMastery": {
+          "strike": 1,
+          "steady": 0,
+          "expose": 0
+        },
+        "bestMultiplier": 4.2,
+        "bestCombo": 11,
+        "logic": {
+          "streak": 2,
+          "best": 3,
+          "type": "persistence",
+          "held": 4,
+          "heat": 1,
+          "rose": false,
+          "reach": 0
+        },
+        "record": {
+          "busts": 1,
+          "cashes": 5,
+          "bestMultiplier": 4.2,
+          "potBanked": 3180,
+          "potLost": 640,
+          "pushes": 17,
+          "bestCombo": 11,
+          "beatHits": 12,
+          "perfects": 5,
+          "slips": 2,
+          "grooveBanked": 260
+        }
+      },
+      "veteran": false,
+      "story": false,
+      "schema": {
+        "seconds": 45,
+        "wallMin": 56,
+        "wallMax": 92,
+        "stepMin": 7,
+        "stepMax": 15,
+        "creep": 0.5,
+        "startGauge": 0,
+        "chipsScale": 1,
+        "faceDown": false,
+        "sedated": false,
+        "sealHighest": false,
+        "fracturedAxis": null,
+        "fractureRate": 1.5,
+        "sealBreak": 30,
+        "mutations": [],
+        "relics": []
+      }
+    },
+    "paused": true,
+    "savedAt": "2026-10-10T08:00:00.000Z"
+  },
+  "expect": {
+    "currentCase": "prologue02",
+    "nodeId": "p2_site",
+    "logLength": 1,
+    "repaired": false,
+    "windowIndex": 17,
+    "vault": 7300,
+    "suspended": true
+  }
+}

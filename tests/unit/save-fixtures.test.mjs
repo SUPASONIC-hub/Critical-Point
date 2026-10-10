@@ -5,7 +5,9 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { isSavedStateShapeValid, parseCurrentSavedState, SAVE_SCHEMA_VERSION } from "../../src/appConfig.js";
-import { normalizeRunState, serializeRunState } from "../../src/gauntlet/gauntletEngine.js";
+import { getEndingVariant, getSeasonStrain } from "../../src/gameLogic.js";
+import { createGauntletLedger, createTableRecord, createWindow, getHandBonus, normalizeRunState, reduceWindow, resolveWindow, serializeRunState } from "../../src/gauntlet/gauntletEngine.js";
+import { describeVerdictCause } from "../../src/gauntlet/tableReadout.js";
 import { validateSavedStatePayload } from "../../src/state/payloadSchemas.js";
 import { repairSavedState } from "../../src/state/savedState.js";
 
@@ -37,7 +39,7 @@ function load(save) {
 test("every era of save has a fixture", () => {
   assert.deepEqual(
     fixtures.map((fixture) => fixture.name),
-    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-unlocks.json"],
+    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-hand-names.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-unlocks.json"],
   );
 });
 
@@ -71,6 +73,65 @@ test("the save this build writes is not called repaired", () => {
   assert.equal(repaired, false);
   assert.equal(state.lastError, undefined, "no recovery notice on an ordinary resume");
   assert.deepEqual(state.dynamics, serializeRunState(current.save.dynamics), "and its table record is unchanged");
+});
+
+/**
+ * The table until 2026-10-10 graded each press against the heartbeat (the
+ * beat), and the builds of that day still wrote what it had counted. This
+ * build writes none of it and names the hand's share for what it is. A save
+ * from either must come back whole and unannounced: what is read is read as it
+ * was, what nothing reads is dropped without being called a repair.
+ */
+test("a save from the table that graded a press loads without a notice, under the names this build reads", () => {
+  const fixture = fixtures.find((entry) => entry.name === "v2-pre-hand-names.json");
+  const saved = fixture.save.dynamics;
+  const { state, repaired, valid } = load(fixture.save);
+  assert.deepEqual([valid, repaired, state.paused], [true, false, fixture.save.paused], "no 복구됨 notice, no pause it did not have");
+  assert.equal(state.lastError, undefined);
+  const run = state.dynamics;
+
+  // The hand's share, under its own names; the counts nothing reads are gone, at every depth.
+  assert.deepEqual([run.runHand, run.handVault, run.practice.handVault], [saved.runGroove, saved.grooveVault, saved.practice.grooveVault]);
+  const gone = ["beatCombo", "bestCombo", "maxCombo", "beatHits", "perfects", "slips", "focusPerfects", "focusMisses", "runGroove", "grooveVault"];
+  for (const record of [run, run.suspended.window, run.practice, run.practice.record]) {
+    for (const key of gone) assert.equal(key in record, false, key);
+  }
+  // Everything else the record held is as it was saved.
+  const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, ...rest } = saved;
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, ...kept } = run;
+  assert.deepEqual(kept, rest);
+  assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);
+  assert.deepEqual(run.logic, saved.logic, "the streak is the save's");
+
+  // The window put down with a groove is still paid on it: x1.36, with the streak at none.
+  const table = normalizeRunState(run);
+  const resumed = createWindow({ schema: table.schema, seed: table.suspended.seed, resume: table.suspended.window });
+  assert.deepEqual([resumed.status, resumed.groove, resumed.gauge, resumed.focus, resumed.selectedId], ["live", 12, 33, 37, suspended.window.selectedId]);
+  const { verdict, nextRun } = resolveWindow({ run: table, window: reduceWindow(resumed, { type: "CASH" }), card: { id: suspended.window.selectedId, effect: {} } });
+  assert.equal(verdict.logic.bonus, getHandBonus(12, 0, "strike", 0));
+  assert.equal(verdict.logic.bonus, 1.36);
+  assert.ok(verdict.pot > Math.round(verdict.chips * verdict.multiplier));
+  assert.equal(nextRun.runHand, runGroove + verdict.logic.pot + verdict.focus.pot, "and the share it had banked is added to, not started over");
+
+  // The log is the save's own: the line the archive prints, and the share and the cause its ledger reads.
+  const [entry] = state.log;
+  assert.deepEqual(entry, fixture.save.log[0]);
+  assert.equal(entry.tempoBonus.label, "FEVER");
+  assert.equal(createGauntletLedger(state.log).grooveBanked, 180, "the ledger still counts what that entry banked");
+  assert.equal(describeVerdictCause({ outcome: "bust", cause: "focus" }), "락이 올린 열이 벽에 닿았다", "a verdict of that table still reads as it did");
+
+  // The first close's summary: its record is handed back when the replay closes, and the vault slack leaves its share out.
+  const summary = state.caseResults.prologue02;
+  assert.deepEqual(summary.pushRecord, fixture.save.caseResults.prologue02.pushRecord, "a summary is not rewritten");
+  const closing = resolveWindow({ run: table, window: reduceWindow(resumed, { type: "CASH" }), card: { id: "a", effect: {} }, caseClosed: true });
+  assert.deepEqual([closing.verdict.practice, closing.verdict.firstRecord.busts, closing.verdict.firstRecord.grooveBanked], [true, 1, 260]);
+  assert.deepEqual(createTableRecord([{ threshold: { ...entry.threshold, firstRecord: closing.verdict.firstRecord } }]).busts, 1);
+  assert.deepEqual([closing.nextRun.vault, closing.nextRun.handVault], [7300, 520], "the replay hands the vault and the share back");
+  const strain = getSeasonStrain(state.caseResults);
+  assert.equal(strain.seasonVaultPerCase, 7300 - 520);
+  // Decided for this build: the combo of pushes that summary holds (11, under the old door's 12 or over it) opens nothing.
+  const season = { ...strain, resources: { trust: 80, legitimacy: 90, capital: 60 }, seasonResources: { trust: 80, legitimacy: 90, capital: 60 }, discoveredClues: [], log: [] };
+  assert.equal(getEndingVariant(season).id, getEndingVariant({ ...season, seasonBestCombo: 99 }).id);
 });
 
 test("a table record missing one field is filled in without a recovery notice", () => {
