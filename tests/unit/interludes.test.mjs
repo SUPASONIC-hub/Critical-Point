@@ -85,7 +85,7 @@ test("every interlude has one of the five moods, a 막간 label and a title", ()
 });
 
 test("a dated record names a scene of its own case, one card line and a fallback", () => {
-  assert.deepEqual(records.map(([caseId]) => caseId).sort(), ["case06", "case16", "case18"]);
+  assert.deepEqual(records.map(([caseId]) => caseId).sort(), ["case06", "case16", "case18", "case40"]);
   for (const [caseId, interlude] of records) {
     const scene = nodes[interlude.cardOf];
     assert.ok(scene, `${caseId}: ${interlude.cardOf} is not a scene`);
@@ -125,10 +125,12 @@ test("the runtime gets one signal object per resolved text", () => {
  * Canon has never decided what became of 플로우온's night shift after 12월 31일:
  * 사건 17 has contracts ending, 사건 23 has eighty people on shift, 사건 48 has a
  * former 막내 somewhere else. A record that stops on its own date cannot settle
- * it, and neither may the two records written beside it.
+ * it, and neither may the two records written beside it. 사건 40 is the same
+ * shape: one card of three stops 핏스코어 that night and its 42 people have no
+ * Monday, the other two do not, and the record stops the day before.
  */
 test("no dated record says how the night shift ended", () => {
-  const OUTCOME = /나갔|나간다|떠났|떠난|해고|퇴사|퇴직|짐을 쌌|복직|돌아왔|남았습니다|전원|정리됐|정리되었|취소됐|취소되었|철회|연장|재계약|가동됐|가동 시작|대기실이 비/;
+  const OUTCOME = /나갔|나간다|떠났|떠난|해고|퇴사|퇴직|짐을 쌌|복직|돌아왔|남았습니다|전원|정리됐|정리되었|취소됐|취소되었|철회|연장|재계약|가동됐|가동 시작|대기실이 비|출근할|멈췄|중단|폐업|문을 닫/;
   for (const [caseId, interlude] of records) {
     const fixed = [...interlude.text.filter((line) => !line.includes("{card}")), interlude.fallback, interlude.title];
     for (const line of fixed) assert.doesNotMatch(line, OUTCOME, `${caseId}: ${line}`);
