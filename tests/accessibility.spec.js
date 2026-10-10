@@ -15,8 +15,9 @@ test("intro screen has no structural accessibility violations", { tag: "@prod" }
 });
 
 // The intro's audit above is of closed drawers, and axe does not read what a
-// closed <details> holds. These two are opened: the play-style drawer with its
-// story card, and the comfort panel with its story switch, off and then on.
+// closed <details> holds. These two are opened: the play-style drawer, whose
+// note points to story mode, and the comfort panel with the switch itself,
+// off and then on.
 test("the play-style drawer and the comfort panel, open, have no structural accessibility violations", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
@@ -25,20 +26,18 @@ test("the play-style drawer and the comfort panel, open, have no structural acce
       drawer.open = true;
     });
   }
-  const card = page.getByRole("region", { name: "플레이 스타일 선택" }).getByRole("button", { name: /스토리 모드/ });
+  const pledges = page.getByRole("region", { name: "플레이 스타일 선택" });
   const toggle = page.getByRole("region", { name: "편의 설정" }).getByLabel(/스토리 모드/);
-  await expect(card).toBeVisible();
+  await expect(pledges.getByRole("button")).toHaveCount(3);
   await expect(toggle).toBeVisible();
-  await expect(card).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle).not.toBeChecked();
   await expectNoA11yViolations(page);
 
-  await card.click();
-  await expect(card).toHaveAttribute("aria-pressed", "true");
+  await toggle.check();
   await expect(toggle).toBeChecked();
-  // The selected card's own transition has to land before its colours are read.
-  await waitForEntrance(card);
+  // The checked box's own transition has to land before its colours are read.
+  await waitForEntrance(page.locator(".accessibility-panel"));
   await expectNoA11yViolations(page);
-  // Four cards, one row of four or two of two, and none wider than the page.
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });

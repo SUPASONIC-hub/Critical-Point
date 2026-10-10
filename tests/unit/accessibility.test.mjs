@@ -146,23 +146,22 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   }
 });
 
-test("the intro's story card is a switch beside the three pledges, not a fourth pledge", () => {
+// The pledges are a pick-one list and story mode is on or off: as a fourth
+// card it read as two of four picked. It is chosen in the comfort panel alone,
+// and the drawer says where.
+test("the play-style drawer holds the three pledges and points to the comfort panel for story mode", () => {
   const intro = source("screens/IntroScreen.jsx");
   const grid = intro.slice(intro.indexOf('<div className="play-style-grid">'), intro.indexOf('<p className="play-style-note">'));
-  const [pledge, story, ...more] = grid.split("<button").slice(1);
-  assert.equal(more.length, 0, "the mapped pledge card and the story card");
-  // The pledge cards still choose one of three and write it to the save.
+  const [pledge, ...more] = grid.split("<button").slice(1);
+  assert.equal(more.length, 0, "one mapped pledge card and no other");
   assert.match(pledge, /setPlayStyle\(style\.id\)/);
   assert.match(pledge, /aria-pressed=\{playStyle === style\.id\}/);
-  assert.doesNotMatch(pledge, /storyMode/);
-  // The story card flips the device setting and touches no pledge.
-  assert.match(story, /onClick=\{\(\) => setAccessibility\(\{ storyMode: !storyMode \}\)\}/);
-  assert.match(story, /aria-pressed=\{storyMode\}/);
-  assert.match(story, /className=\{storyMode \? "play-style selected" : "play-style"\}/);
-  assert.doesNotMatch(story, /setPlayStyle|persist\(/);
-  assert.match(intro, /const \{ storyMode \} = useAccessibility\(\);/);
-  assert.ok(intro.includes("고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 스토리 모드만 바꿉니다."));
+  assert.doesNotMatch(intro, /storyMode|setAccessibility|useAccessibility/, "the intro screen itself reads and sets no setting");
+  assert.ok(intro.includes("고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다."));
   assert.ok(!intro.includes("판의 규칙은 바뀌지 않습니다"));
+  // The one switch: the comfort panel's checkbox, writing the device setting.
+  const panel = source("components/AccessibilityPanel.jsx");
+  assert.match(panel, /onChange=\{\(event\) => setAccessibility\(\{ \[toggle\.key\]: event\.target\.checked \}\)\}/);
 });
 
 test("the report and the ranking row show what the run recorded, never the device's setting", () => {
@@ -172,7 +171,10 @@ test("the report and the ranking row show what the run recorded, never the devic
     assert.doesNotMatch(screen, /accessibilitySettings|useAccessibility|getAccessibility|storyMode/, `${name} does not read the setting`);
   }
   // The case's own summary (the season's, on the finale: caseResults.final).
-  assert.ok(result.includes('{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}'));
+  // It ends the eyebrow line that says whose record this is, not the rank badge.
+  assert.ok(result.includes('의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>'));
+  assert.ok(result.includes("<small>{momentumTier} · {momentumScore} POINTS</small>"));
+  assert.equal(result.split("assistStory").length, 2, "and is printed once");
   // The row model's field, beside the table-time mark and in its class.
   assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">스토리 모드</span>}'));
   // And the row model takes it from the row's summary alone.

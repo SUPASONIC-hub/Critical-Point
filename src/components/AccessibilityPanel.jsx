@@ -1,7 +1,7 @@
 import { setAccessibility, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
 
-// 스토리 모드 is first: it is the one that changes what the table asks, and
-// the intro's play-style drawer shows the same switch.
+// 스토리 모드 is first: it is the one that changes what the table asks. This
+// is the only place it is chosen; the play-style drawer's note points here.
 const TOGGLES = [
   {
     key: "storyMode",

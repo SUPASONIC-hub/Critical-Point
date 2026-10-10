@@ -8,7 +8,6 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
-import { setAccessibility, useAccessibility } from "../state/accessibilitySettings.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
@@ -88,9 +87,7 @@ export function IntroScreen({ view, renderers = {} }) {
   const [openingBurst, setOpeningBurst] = useState(null);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
-  const heroArt = getArtSources("/triggerlab-key-visual.webp");
-  const { storyMode } = useAccessibility();
-  const {
+  const heroArt = getArtSources("/triggerlab-key-visual.webp");  const {
     common: {
       AdaptiveMusic, musicModeKey, triggerLabels,
       renderRecoveryNotice: viewRenderRecoveryNotice,
@@ -490,7 +487,11 @@ export function IntroScreen({ view, renderers = {} }) {
             </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
-              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 스토리 모드만 바꿉니다.</small>
+              {/* The three cards are a pick-one pledge and change no rule. The
+                  one setting that does is on or off, so it is a switch in the
+                  comfort panel and not a fourth card here, where it read as
+                  two of four picked. */}
+              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다.</small>
             </div>
             <div className="play-style-grid">
               {playStyleOptions.map((style) => (
@@ -512,20 +513,6 @@ export function IntroScreen({ view, renderers = {} }) {
                   <small>{style.payoff}</small>
                 </button>
               ))}
-              {/* Not a fourth 다짐: the three above are one choice, and this is
-                  the comfort setting (AccessibilityPanel shows the same switch),
-                  on or off beside whichever of them is chosen. */}
-              <button
-                type="button"
-                className={storyMode ? "play-style selected" : "play-style"}
-                onClick={() => setAccessibility({ storyMode: !storyMode })}
-                aria-pressed={storyMode}
-              >
-                <span>스토리 모드</span>
-                <strong>줄거리를 먼저 본다</strong>
-                <em>벽이 멀어지고 시계가 느려집니다.</em>
-                <small>공개 랭킹에는 오르지 않습니다</small>
-              </button>
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>

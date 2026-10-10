@@ -190,7 +190,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               eyebrow used to open on a bare possessive when no name was set. */}
           <div className={`result-hero rank-${resultRank.toLowerCase()}`}>
             <div className="result-hero-copy">
-              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필</p>
+              <p>{activeCaseMeta?.label} · {playerName?.trim() ? `${playerName.trim()} 분석관` : "익명 분석관"}의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>
               <h1 ref={titleRef} tabIndex={-1}>
                 {currentCase === "final" ? "이제 당신은 자신의 조건을 어떻게 쓸지 선택해야 합니다." : <><em>{triggerLabels[result.primary[0]]}</em> 조건에서 생각이 가장 오래 유지됐습니다.</>}
               </h1>
@@ -203,7 +203,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
               <span lang="en">CASE RANK</span>
               <strong>{resultRank}</strong>
-              <small>{momentumTier} · {momentumScore} POINTS{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</small>
+              <small>{momentumTier} · {momentumScore} POINTS</small>
             </div>
           </div>
           <section className="outcome-panel" aria-label="내가 만든 결말">

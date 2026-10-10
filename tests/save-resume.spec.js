@@ -170,7 +170,7 @@ test("a story case put down mid-table is still a story case after the setting is
 
   await page.getByTestId("decision-next").click();
   await expect(page.locator(".result-page")).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator(".rank-mark small")).toContainText(" · 스토리 모드 · 공개 랭킹 제외");
+  await expect(page.locator(".result-hero-copy > p")).toContainText(" · 스토리 모드 · 공개 랭킹 제외");
   const closed = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(closed.caseResults.case01.assistStory).toBe(true);
   expect((await settings()).storyMode, "and the setting is still off").toBe(false);
