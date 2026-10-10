@@ -1129,7 +1129,7 @@ const seasonInterludes = {
   case40: {
     mood: "still",
     label: "막간 · 떡방 아르바이트 둘째 날",
-    title: "41점 문자와 핏스코어 42명",
+    title: "리더십 부족 동지회",
     cardOf: "c40_final",
     text: [
       "8월 7일 밤 — 탈락 통보 문자 1통. 문하준 41점, 면접 기준 60점. 사람 면접 0분.",
