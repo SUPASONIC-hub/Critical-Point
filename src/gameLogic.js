@@ -971,11 +971,12 @@ const LOGIC_RECORD_KEYS = { grow: "grows", switch: "switches", break: "breaks", 
  * picked it, what became of the streak window by window, and the longest it
  * stood in this case.
  *
- * A window whose verdict made no move ("none": the room played the card, or
- * the case does not have the rule yet) is not one of them -- nothing was asked
- * of the hand there, and counting it would call it a streak held. A case with
- * no window left is no record (null), and so is every log written before the
- * streak was.
+ * A window whose verdict made no move ("none": the case does not have the rule
+ * yet) is not one of them -- nothing was asked of the hand there, and counting
+ * it would call it a streak held. A window run out with nothing staked is a
+ * bust like any other and is counted as one; the room's card has no type, so
+ * it adds to no type's count. A case with no window left is no record (null),
+ * and so is every log written before the streak was.
  */
 export function createLogicRecord(entries = []) {
   const record = { windows: 0, heat: 0, peak: 0, top: null, grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0 };

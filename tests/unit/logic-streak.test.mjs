@@ -137,14 +137,26 @@ test("a bust ends the streak, and the hold follows the card that was played", ()
   assert.deepEqual([seam.move, seam.logic.streak], ["bust", 1], "the seam: a bust that is held leaves the streak standing");
 });
 
-test("a card the room played, and a window with no card, change nothing of the streak", () => {
-  const grown = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }]).run;
+test("a window run out with nothing staked is a bust like any other, and the room's card is not the hand's pick", () => {
+  const grown = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }, { card: card("risk") }]).run;
+  assert.deepEqual([grown.logic.streak, grown.logic.held], [2, 4]);
   const timeout = closed(50, "bust", { cause: "timeout", selectedId: null });
   const forced = play([{ card: card("inference"), forced: true, window: timeout }], { run: grown });
-  assert.deepEqual(forced.lines[0], { type: null, tier: 3, rose: false, move: "none", streak: 1 });
-  assert.deepEqual(forced.run.logic, { ...grown.logic, heat: 3, rose: true }, "only the table's own heat moved");
-  const cardless = play([{ card: undefined }, { card: { id: "bare", effect: { capital: 3 } } }], { run: grown });
-  assert.deepEqual(cardless.lines.map((line) => line.move), ["none", "none"]);
+  assert.deepEqual(forced.lines[0], { type: null, tier: 3, rose: false, move: "bust", streak: 0 }, "letting the clock run out does not spare the streak");
+  assert.deepEqual(forced.run.logic, { ...grown.logic, streak: 0, heat: 3, rose: true }, "and what the hand was holding is left as it was");
+  // So the hand picks up its hold where it left it: the next card of its type grows at once.
+  assert.deepEqual(play([{ card: card("risk") }], { run: forced.run }).lines[0], { type: "risk", tier: 0, rose: true, move: "grow", streak: 1 });
+  // The same for a bust with no card at all, and for a hand that had not picked anything yet.
+  assert.deepEqual(play([{ card: undefined, window: timeout }], { run: grown }).run.logic, forced.run.logic);
+  const first = play([{ card: card("risk"), forced: true, window: timeout }]);
+  assert.deepEqual([first.lines[0].move, first.run.logic.type, first.run.logic.held], ["bust", null, 0]);
+  // 앙코르's seam spares the streak on this bust as on any.
+  const held = advanceLogic(grown.logic, { type: null, tier: 3, bustHolds: true });
+  assert.deepEqual([held.move, held.logic.streak, held.logic.held], ["bust", 2, 4]);
+  // The room only ever plays a card on a bust. A window settled with no pick and no bust -- nothing
+  // the game does, but the function is asked -- is nothing the hand did.
+  const cardless = play([{ card: undefined }, { card: { id: "bare", effect: { capital: 3 } } }, { card: card("inference"), forced: true }], { run: grown });
+  assert.deepEqual(cardless.lines.map((line) => [line.type, line.move, line.streak]), [[null, "none", 2], [null, "none", 2], [null, "none", 2]]);
   assert.deepEqual(cardless.run.logic, grown.logic);
 });
 
@@ -239,7 +251,6 @@ test("a saved streak is read back whole, and anything else reads as none", () =>
   assert.deepEqual(normalizeRunState({ logic }).logic, logic);
   for (const none of [undefined, null, "streak", 7, []]) assert.deepEqual(normalizeLogic(none), LOGIC_INITIAL);
   assert.deepEqual(normalizeLogic({ streak: -3, best: "x", type: 4, held: 2.9, heat: 9, rose: "yes" }), { streak: 0, best: 0, type: null, held: 2, heat: 3, rose: false });
-  assert.equal(normalizeLogic({ type: "x".repeat(90) }).type.length, 40);
 });
 
 /* ------------------------------------------------------------ old saves */
@@ -358,7 +369,8 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   // A card the room played is not the hand's pick.
   const forced = sceneContext(sceneId, holding({ type: other, held: 5, streak: 3, best: 3 }));
   commit(forced.context, picked, { ...cashed("commit-forced"), status: "bust", cause: "timeout" }, true);
-  assert.deepEqual(forced.did.patches[0].log[0].threshold.logic, { type: null, tier: 3, rose: false, move: "none", streak: 3 });
+  assert.deepEqual(forced.did.patches[0].log[0].threshold.logic, { type: null, tier: 3, rose: false, move: "bust", streak: 0 });
+  assert.deepEqual([forced.did.patches[0].gauntletRun.logic.type, forced.did.patches[0].gauntletRun.logic.held], [other, 5], "what the hand was holding is left as it was");
 
   // 프롤로그 01 does not have the rule: its entries say so and its summary carries no record.
   const first = sceneContext("p1_start", holding({ type: "risk", held: 2, streak: 3, best: 3 }));
@@ -397,6 +409,12 @@ test("the case's logic record is built from its log", () => {
   assert.deepEqual(createLogicRecord(CASE_LOG), { windows: 8, heat: 11, peak: 3, top: ["risk", 5], grows: 1, switches: 1, breaks: 1, busts: 1, keeps: 1, best: 1 });
   // A window whose verdict made no move is not one of the record's windows.
   assert.equal(createLogicRecord([entry({ type: null, tier: 3, rose: false, move: "none", streak: 4 })]), null);
+  // A window run out with nothing staked is: a bust, with no type to count.
+  assert.deepEqual(
+    createLogicRecord([entry({ type: "risk", tier: 1, rose: false, move: "grow", streak: 3 }), entry({ type: null, tier: 3, rose: false, move: "bust", streak: 0 })]),
+    { windows: 2, heat: 4, peak: 3, top: ["risk", 1], grows: 1, switches: 0, breaks: 0, busts: 1, keeps: 0, best: 3 },
+  );
+  assert.deepEqual(createLogicRecord([entry({ type: null, tier: 3, rose: false, move: "bust", streak: 0 })]), { windows: 1, heat: 3, peak: 3, top: null, grows: 0, switches: 0, breaks: 0, busts: 1, keeps: 0, best: 0 });
   // Ties in the most-picked type go to the one that got there first.
   assert.deepEqual(createLogicRecord([entry({ type: "risk", tier: 0, move: "build", streak: 0 }), entry({ type: "inference", tier: 0, move: "break", streak: 0 })]).top, ["risk", 1]);
   // A log from before the streak, a move this build does not know, and no log at all are no record.

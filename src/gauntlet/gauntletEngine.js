@@ -1450,10 +1450,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
   // The streak after this window's card. It lives where the beat's combo did
-  // (the `beat` rule, until the ladder renames it), and a card the room played
-  // is not the hand's pick. 앙코르 is to hold the streak through a bust from
+  // (the `beat` rule, until the ladder renames it; without it the type is
+  // false, "not in play"), and a card the room played is not the hand's pick
+  // (null: the bust still ends the streak). 앙코르 is to hold the streak through a bust from
   // day 6: that is `advanceLogic`'s `bustHolds`, which nothing passes yet.
-  const logicType = forced || !rules.has("beat") ? null : getLogicType(card);
+  const logicType = rules.has("beat") && (forced ? null : getLogicType(card));
   const streak = advanceLogic(current.logic, { type: logicType, tier: getHeatTier(outcome, gauge), offered });
   // What the hand earned before LOCK: the groove, or with the switch on the
   // streak this card made (and a groove held from before it, see `getHandBonus`).
@@ -1574,7 +1575,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     // it, what that did to the streak (`advanceLogic`'s move) and the streak
     // after. The case summary's record is built from these.
     logic: {
-      type: logicType,
+      type: logicType || null,
       tier: streak.logic.heat,
       rose: current.logic.rose,
       move: streak.move,

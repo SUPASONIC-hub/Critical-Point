@@ -26,7 +26,7 @@ export function normalizeLogic(value) {
   return {
     streak: count("streak"),
     best: count("best"),
-    type: typeof value?.type === "string" ? value.type.slice(0, 40) : null,
+    type: typeof value?.type === "string" ? value.type : null,
     held: count("held"),
     heat: count("heat", 3),
     rose: value?.rose === true,
@@ -58,11 +58,20 @@ export function getLogicBonus(streak) {
 }
 
 /**
- * One settled window against the streak. `type` is the card's, and null when
- * the streak is not in play: the room played the card, there was no card, or
- * the case does not have the rule yet -- the streak is neither added to nor
- * taken there. `tier` is what the window closed in, and `offered` the types
- * the scene had on the table, when the caller knows them.
+ * One settled window against the streak. `type` is the card the hand picked;
+ * null when it picked none (the room played the card, or there was none); and
+ * false when the streak is not in play at all -- a case that does not have the
+ * rule yet, where it is neither added to nor taken. `tier` is what the window
+ * closed in, and `offered` the types the scene had on the table, when the
+ * caller knows them.
+ *
+ * A bust ends the streak whoever played the card. A window run out with
+ * nothing staked is a bust like any other -- it used to be read as no move at
+ * all, which made letting the clock run out the one bust that spared the
+ * streak -- but the room's card is not the hand's pick, so what the hand was
+ * holding (`type`, `held`) is left as it was. In the game the room only ever
+ * plays a card on a bust; a window that closed without one and without a pick
+ * is nothing the hand did, and moves nothing.
  *
  * `bustHolds` is the seam for 앙코르. That relic is given its new meaning with
  * the switch (day 6: a bust takes the pot and leaves the streak), and the
@@ -75,15 +84,18 @@ export function getLogicBonus(streak) {
  * every window whatever the move: they are the table's, not the hand's, and
  * the next window reads them under any rules.
  */
-export function advanceLogic(logic, { type = null, tier = 0, offered = null, bustHolds = false } = {}) {
+export function advanceLogic(logic, { type, tier, offered, bustHolds }) {
   const next = { ...logic, heat: tier, rose: tier > logic.heat };
-  if (!type) return { logic: next, move: "none" };
+  const bust = tier === 3;
+  if (!(type ?? bust)) return { logic: next, move: "none" };
   const same = type === logic.type;
-  next.type = type;
-  next.held = same ? logic.held + 1 : 1;
+  if (type) {
+    next.type = type;
+    next.held = same ? logic.held + 1 : 1;
+  }
   const held = same ? (next.held < LOGIC_HOLD ? "build" : "grow") : !logic.type ? "build" : null;
   const left = logic.rose ? "switch" : offered && !offered.includes(logic.type) ? "keep" : "break";
-  const move = tier === 3 ? "bust" : held ?? left;
+  const move = bust ? "bust" : held ?? left;
   if (move === "grow" || move === "switch") next.streak += 1;
   if (move === "break" || (move === "bust" && !bustHolds)) next.streak = 0;
   next.best = Math.max(next.best, next.streak);
