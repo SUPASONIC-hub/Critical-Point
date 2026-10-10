@@ -4,6 +4,7 @@ import {
   createWindow,
   FOCUS_MAX,
   FOCUS_MODES,
+  getCardChips,
   getCloseness,
   getHeartbeatBpm,
   getSealedCardId,
@@ -15,6 +16,7 @@ import {
   reduceWindow,
   resolveWindow,
 } from "../src/gauntlet/gauntletEngine.js";
+import { getLogicBonus, getLogicType } from "../src/gauntlet/logicStreak.js";
 import { hasRelic, RELIC_IDS } from "../src/gauntlet/relics.js";
 import { ALL_RULES, MUTATION_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
@@ -58,6 +60,10 @@ import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../sr
  * Story mode is measured last, and held to different properties on purpose: it
  * is the table stepping back, so what is asked of it is that it does step back
  * (see the story tier at the end).
+ *
+ * The logic streak is measured after that, with its switch forced on for its
+ * own rows only (`LOGIC` in tableRules.js ships off): every row above is played
+ * with the switch as shipped.
  */
 
 const CASES = 1500;
@@ -642,6 +648,157 @@ assert.ok(
   storySafe.meanVault > bestFixed.meanVault,
   `a story run is expected to out-bank the table (${storySafe.meanVault} against ${bestFixed.meanVault}); if it no longer does, the reason it is kept off the public ranking has gone and the exclusion should be looked at again`,
 );
+
+/**
+ * The logic streak, with its switch forced on (it ships off: `LOGIC`).
+ *
+ * The streak is to take the beat's place in the pot, so it is held to the
+ * beat's place in the table: a hand skill that pays up to the hand's cap,
+ * moves no wall, and pays a hand that plays for it about what a hand that
+ * landed every push on the beat was paid -- and a hand that does not, next to
+ * nothing.
+ *
+ * Five hands play the best listening policy, ungraded and unlocked, on the
+ * same seeded windows as the untimed hand above, with the one simulated card
+ * given a type. What types a window has on the table is a scene of the real
+ * season, drawn by seed from every scene that deals cards (the scene's own
+ * cards and its wild card; not a walk of the graph, so a case here is nine
+ * scenes from anywhere in the season). The streak carries from case to case
+ * for a season's length, as the run carries it.
+ *
+ *   holds one type        위험 다루기 whenever the table has it, and back to it after a scene that did not
+ *   holds, follows table  its type while the table has it, and whatever it had to take from then on
+ *   switches on a rise    the same, and leaves its type when the pressure rose
+ *   random type           the type of a card drawn at random
+ *   richest card          the type of the scene's richest card
+ *
+ * Decided tolerances: the holder's mean pot bonus over its cashed windows is
+ * in [1.28, 1.40] (the beat paid a human hand 1.285 and an all-PERFECT one
+ * 1.394); the random hand's is at most 1.10; the holder busts exactly as often
+ * as the untimed hand; and it banks no more than that hand times the cap. The
+ * share of cashed windows paid at the cap is printed, not asserted.
+ *
+ * The second hand is the best holding play there is -- going back to a type
+ * the table took away ends the streak, and it never goes back -- and it is
+ * printed beside the holder, held to the cap and to nothing else: 1.420 when
+ * this was written, above the band the plain holder is held to.
+ */
+const SCENES = Object.values(nodes)
+  .map((node) => (node.choices ?? []).map((choice) => ({ type: getLogicType(choice), chips: choice.type === "reframe" ? 0 : getCardChips(choice) })).filter((offer) => offer.type))
+  .filter((offers) => offers.some((offer) => offer.chips > 0));
+const sceneFor = (caseIndex, windowIndex) => SCENES[Math.floor(handUnit(`scene:${caseIndex}:${windowIndex}`) * SCENES.length)];
+const SEASON_CASES = CASE_SEQUENCE.length;
+const LOGIC_HANDS = {
+  "holds one type": (offers) => (offers.some((offer) => offer.type === "risk") ? "risk" : offers[0].type),
+  "holds, follows table": (offers, logic) => (offers.some((offer) => offer.type === (logic.type ?? "risk")) ? logic.type ?? "risk" : offers[0].type),
+  "switches on a rise": (offers, logic) => {
+    const held = logic.type ?? "risk";
+    const other = offers.find((offer) => offer.type !== held)?.type;
+    if (logic.rose && other) return other;
+    return offers.some((offer) => offer.type === held) ? held : offers[0].type;
+  },
+  "random type": (offers, _logic, seed) => offers[Math.floor(handUnit(`${seed}:type`) * offers.length)].type,
+  "richest card": (offers) => offers.reduce((best, offer) => (offer.chips > best.chips ? offer : best)).type,
+};
+
+/**
+ * One case with the switch on. `pickType` gives the simulated card its type
+ * (left out, the card has none and no streak is in play); `lock` charges a
+ * stance to the full before the first push, a press at a time and nothing
+ * else -- with the switch on the press itself is what costs the clock.
+ */
+function playSwitchedCase(caseIndex, decide, { pickType = null, lock = null, logic = undefined } = {}) {
+  let run = openCaseRun(logic ? { logic } : {});
+  const result = { busts: 0, played: 0, cashed: 0, bonus: 0, capped: 0 };
+  for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
+    result.played += 1;
+    const seed = `sim:${caseIndex}:${windowIndex}`;
+    const offers = sceneFor(caseIndex, windowIndex);
+    const staked = pickType ? { ...card, cognition: { [pickType(offers, run.logic, seed)]: 1 } } : card;
+    let win = createWindow({ schema: run.schema, seed, beatCombo: run.beatCombo });
+    win = reduceWindow(win, { type: "SELECT", id: card.id }, ALL_RULES, true);
+    if (lock) {
+      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, ALL_RULES, true);
+      for (let press = 0; press < 8 && win.status === "live" && win.focus < FOCUS_MAX; press += 1) {
+        win = reduceWindow(win, { type: "FOCUS" }, ALL_RULES, true);
+      }
+    }
+    for (let press = 0; press < 30 && win.status === "live"; press += 1) {
+      if (!decide(win, run)) break;
+      win = reduceWindow(win, { type: "PUSH" }, ALL_RULES, true);
+      win = reduceWindow(win, { type: "TICK", delta: 0.6 }, ALL_RULES, true);
+    }
+    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, ALL_RULES, true);
+    const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
+    const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: [...new Set(offers.map((offer) => offer.type))], caseClosed, logic: true });
+    if (verdict.outcome === "bust") {
+      result.busts += 1;
+      if (windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
+    } else {
+      // What the streak paid this pot, before LOCK and under the cap.
+      const bonus = Math.min(HAND_CAP, getLogicBonus(verdict.logic.streak));
+      result.cashed += 1;
+      result.bonus += bonus;
+      if (bonus >= HAND_CAP) result.capped += 1;
+    }
+    run = nextRun;
+  }
+  return { ...result, vault: run.vault, logic: run.logic };
+}
+
+function measureSwitched(label, decide, options = {}, cases = CASES) {
+  const total = { vault: 0, busts: 0, played: 0, cashed: 0, bonus: 0, capped: 0, best: 0 };
+  let logic;
+  for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
+    // A new season: the streak starts again, as a new run's does.
+    if (caseIndex % SEASON_CASES === 0) logic = undefined;
+    const result = playSwitchedCase(caseIndex, decide, { ...options, logic });
+    logic = result.logic;
+    for (const key of ["vault", "busts", "played", "cashed", "bonus", "capped"]) total[key] += result[key];
+    total.best = Math.max(total.best, result.logic.best);
+  }
+  return {
+    label,
+    meanVault: Math.round(total.vault / cases),
+    busts: total.busts,
+    bustRate: Number((total.busts / Math.max(1, total.played)).toFixed(3)),
+    meanBonus: Number((total.bonus / Math.max(1, total.cashed)).toFixed(3)),
+    capShare: Number((total.capped / Math.max(1, total.cashed)).toFixed(3)),
+    best: total.best,
+  };
+}
+
+const offerShare = (type) => ((SCENES.filter((offers) => offers.some((offer) => offer.type === type)).length / SCENES.length) * 100).toFixed(0);
+console.log(
+  `logic streak     switch forced on for the rows below; offers from ${SCENES.length} scenes of the season (on the table: ${["risk", "inference", "persistence", "reframing"].map((type) => `${type} ${offerShare(type)}%`).join(", ")})`,
+);
+const logicRows = Object.entries(LOGIC_HANDS).map(([name, pickType]) => measureSwitched(name, listening, { pickType }));
+for (const row of logicRows) {
+  console.log(
+    `logic ${row.label.padEnd(20)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  pot bonus ${row.meanBonus.toFixed(3)}  at the cap ${(row.capShare * 100).toFixed(0).padStart(3)}%  best streak ${row.best}`,
+  );
+  assert.equal(row.busts, bestHeartbeatSoFar.busts, `${row.label}: the streak must not move the wall: it busts exactly as often as the untimed hand`);
+  assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap: ${row.meanVault} against ${bestHeartbeatSoFar.meanVault}`);
+}
+const holder = logicRows.find((row) => row.label === "holds one type");
+const randomType = logicRows.find((row) => row.label === "random type");
+assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.4, `a hand that holds a type should be paid about what the beat paid a good hand (1.28 to 1.40): ${holder.meanBonus}`);
+assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a type at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
+assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a type should pay");
+
+/**
+ * LOCK with the switch on: every press charges as a GOOD lock did and costs
+ * 1.5 seconds of clock, with no beat to judge it. It replaces a LOCK landed on
+ * every beat (the rows "lock, listening" above), so it has to bank about what
+ * that banked: within LOCK_SHIFT of it for each stance. No streak is in play
+ * here -- the card has no type -- so the pot is LOCK's alone, as it is there.
+ */
+const LOCK_SHIFT = 0.06;
+const switchedLocks = lockReport.map((row) => ({ mode: row.mode, was: row.listen.meanVault, now: measureSwitched(`${row.mode} lock, pressed`, listening, { lock: { mode: row.mode } }).meanVault }));
+console.log(`logic LOCK         a press charges and costs clock: ${switchedLocks.map((row) => `${row.mode} ${row.now} against ${row.was} on the beat (${((row.now / row.was - 1) * 100).toFixed(1)}%)`).join(", ")}`);
+for (const row of switchedLocks) {
+  assert.ok(Math.abs(row.now / row.was - 1) <= LOCK_SHIFT, `a pressed ${row.mode} LOCK banks ${row.now} against ${row.was} for one landed on every beat, more than ${LOCK_SHIFT * 100}% away`);
+}
 
 console.log(
   `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; on the beat: ${onBeat.meanVault}, off it: ${offBeat.meanVault}; locked and on the beat: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,

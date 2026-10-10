@@ -36,6 +36,25 @@ export const STEADY_LINE_COOL = 8;
 export const STEADY_LINE_SECONDS = 4;
 export const STEADY_LINE_WALL = 3;
 
+/**
+ * The switch for the LOGIC STREAK, off until the stage can show it. The streak
+ * is the combo a hand earns by the type of card it picks from scene to scene,
+ * and it is to take the beat's place in the pot. Off, the streak is counted,
+ * saved and reported and pays nothing: the pot reads the groove, a push and a
+ * LOCK are graded against the beat, and the table plays as it did. On, the pot
+ * reads the streak, a push is not graded and a LOCK press charges for clock.
+ * The engine's functions take it as a last argument so a test (and the balance
+ * scripts) can ask about either table whatever the shipped value is.
+ */
+export const LOGIC = false;
+/** What each step of the streak adds to the pot, and where that stops: x1.5 at a streak of 8. */
+export const LOGIC_RATE = 0.0625;
+export const LOGIC_CAP = 0.5;
+/** A type held this many windows in a row starts to grow the streak. */
+export const LOGIC_HOLD = 3;
+/** With the switch on, the table clock one LOCK press costs. */
+export const LOCK_PRESS_SECONDS = 1.5;
+
 /** How much wider METRONOME makes both beat windows. */
 export const METRONOME_REACH = 1.5;
 export const COLD_BLOOD_START = 11;
