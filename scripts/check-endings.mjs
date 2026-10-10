@@ -24,6 +24,7 @@ import {
   getGameplayStats,
   getOutcomeCarryover,
   getRiskPressure,
+  getSeasonLogic,
   getSeasonStrain,
   getSeasonWear,
   getUnattendedNext,
@@ -44,6 +45,7 @@ import {
   resolveWindow,
   RUN_INITIAL_STATE,
 } from "../src/gauntlet/gauntletEngine.js";
+import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { getTableRules, STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { getOriginStartEffects } from "../src/advancedSystems.js";
 import { legacyProfiles } from "../src/caseCopy.js";
@@ -268,7 +270,11 @@ function playSeason(seasonIndex, archetype, story = false) {
       const fixed = [...node.choices.filter((choice) => choice.type !== "reframe"), ...(memoryChoice ? [memoryChoice] : [])]
         .filter((choice) => getAuthorityGate(choice, standing).unlocked);
       const takeReframe = reframeChoice && caseReframes === 0 && random() < policy.reframe;
-      const choice = takeReframe
+      // What `useChoiceCommit.getOfferedTypes` hands the settlement: the types on the table.
+      const offered = [...new Set([...fixed, ...(reframeChoice ? [reframeChoice] : [])].map(getLogicType).filter(Boolean))];
+      const choice = policy.logicHand
+        ? pickByType(policy, fixed, run.logic)
+        : takeReframe
         ? reframeChoice
         : fixed.reduce((best, candidate) => {
           const score = scoreCard(policy, candidate, resources);
@@ -293,7 +299,7 @@ function playSeason(seasonIndex, archetype, story = false) {
       if (skip) skipped += 1;
       const nextNode = skip ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-      const { verdict, nextRun } = resolveWindow({ run, window, card: choice, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
+      const { verdict, nextRun } = resolveWindow({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
       const busted = verdict.outcome === "bust";
       const gauntletEffect = applyGauntletEffect(baseEffect, {
         outcome: verdict.outcome,
@@ -334,6 +340,7 @@ function playSeason(seasonIndex, archetype, story = false) {
           pushes: verdict.pushes,
           tempo: verdict.tempo,
           focus: verdict.focus,
+          logic: verdict.logic,
         },
       }];
       resources = resourcesAfter;
@@ -355,7 +362,20 @@ function playSeason(seasonIndex, archetype, story = false) {
   }
   const strain = getSeasonStrain(caseResults);
   const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-  return { ending, policy, strain, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults };
+  return { ending, policy, strain, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults) };
+}
+
+/**
+ * A hand that plays for the logic streak, for the measurement at the end of
+ * this file: it holds one type of card, and `switch` leaves it for another
+ * only when the pressure rose going into the window (the streak's own rule,
+ * gauntlet/logicStreak.js). When its type is not on the table it takes what is.
+ */
+function pickByType(policy, cards, logic) {
+  const held = logic.type ?? policy.holds;
+  const leave = policy.logicHand === "switch" && logic.rose;
+  const wanted = cards.filter((candidate) => (getLogicType(candidate) === held) !== leave);
+  return pick(wanted.length ? wanted : cards);
 }
 
 function normalizeStart(story = false) {
@@ -367,6 +387,9 @@ const byArchetype = {};
 const samples = { busts: [], windows: [], clues: [], skipped: [], legitimacy: [], capital: [], trust: [], seasonLegitimacy: [], seasonCapital: [], seasonTrust: [], sustained: [], peak: [], reframes: [], peopleFirst: [] };
 const peopleFirstByArchetype = {};
 const perCasePeak = CASE_SEQUENCE.map(() => []);
+// The logic streak, counted as a shadow: the longest each season reached and its hold rate, by archetype.
+const logicBest = {};
+const logicHold = {};
 const dump = [];
 for (let index = 0; index < SEASONS; index += 1) {
   const archetype = POPULATION[index % POPULATION.length];
@@ -390,6 +413,8 @@ for (let index = 0; index < SEASONS; index += 1) {
   samples.peopleFirst.push(peopleFirst);
   (peopleFirstByArchetype[archetype] ??= []).push(peopleFirst);
   samples.reframes.push(season.strain.seasonReframeRoutes ?? 0);
+  (logicBest[archetype] ??= []).push(season.logic.bestLogic ?? 0);
+  (logicHold[archetype] ??= []).push(season.logic.logicHold ?? 0);
   season.casePeaks.forEach((peak, caseIndex) => perCasePeak[caseIndex].push(peak));
   if (process.env.ENDING_DUMP) dump.push({ archetype, ending: season.ending.id, clues: season.clues, final: season.final.resources, strain: season.strain, finalOutcome: season.final.log.at(-1)?.choiceId });
 }
@@ -444,6 +469,10 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+// min / p10 / p50 / p90 / max, for the day the ending's slack door is pointed at the streak.
+const fiveNumbers = (values) => `${Math.min(...values)}/${band(values)}/${Math.max(...values)}`;
+const byHand = (samplesByHand) => Object.entries(samplesByHand).map(([name, values]) => `${name} ${fiveNumbers(values)}`).join(", ");
+console.log(`Logic streak, counted and not paid (season best, min/p10/p50/p90/max: all ${fiveNumbers(Object.values(logicBest).flat())}; ${byHand(logicBest)}; hold rate: all ${fiveNumbers(Object.values(logicHold).flat())}; ${byHand(logicHold)})`);
 
 /**
  * The same season in story mode.
@@ -497,4 +526,21 @@ if (!process.env.ENDING_BASELINE) {
   console.log(
     `Story-mode ending checks passed (${STORY_SEASONS} replayed seasons: ${storySpread}; collapse by harm ${collapseCauses.get("harm") ?? 0}, by overreach ${collapseCauses.get("overreach") ?? 0}; busts ${band(storySamples.busts)}, windows ${band(storySamples.windows)}, vault a case ${band(storySamples.vaultPerCase)})`,
   );
+}
+
+/**
+ * Two hands that play for the logic streak, in report mode only: neither is in
+ * the population the endings are judged on, and they are played last, so every
+ * season above is the season it always was. They are here to say how long a
+ * streak a season can hold when a hand means to hold one.
+ */
+if (reportMode) {
+  const LOGIC_SEASONS = Number(process.env.ENDING_LOGIC_SEASONS) || 40;
+  const hands = { "holds one type": { logicHand: "hold", holds: "risk" }, "switches when the pressure rose": { logicHand: "switch", holds: "risk" } };
+  const lines = Object.entries(hands).map(([name, hand]) => {
+    ARCHETYPES[name] = { values: {}, noise: 0, ...hand };
+    const seasons = Array.from({ length: LOGIC_SEASONS }, (_, index) => playSeason(`logic:${name}:${index}`, name).logic);
+    return `${name}: best ${fiveNumbers(seasons.map((season) => season.bestLogic ?? 0))}, hold rate ${fiveNumbers(seasons.map((season) => season.logicHold ?? 0))}`;
+  });
+  console.log(`Logic streak, played for (${LOGIC_SEASONS} seasons a hand, min/p10/p50/p90/max; ${lines.join("; ")})`);
 }
