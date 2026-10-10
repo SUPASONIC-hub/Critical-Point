@@ -1,6 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
+import { completeCurrentCase, dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
@@ -276,4 +276,204 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
     expect(row.gap, `${width}x${height}: the number does not touch the wall's range`).toBeGreaterThanOrEqual(8);
     expect(row.right, `${width}x${height}: the number is on the screen`).toBeLessThanOrEqual(row.innerWidth);
   }
+});
+
+/* ------------------------------------------------------------- story mode */
+
+/**
+ * 스토리 모드 (ROADMAP, day 3): the comfort setting that moves the wall away
+ * so the story can be read. The engine is unit-tested
+ * (tests/unit/story-mode.test.mjs); these are the two controls that turn it
+ * on, and the table, the report and the next case answering to it.
+ */
+
+const WALL_BAND = ".gx-band-label";
+const FAR_WALL = "벽 88–98";
+
+const storedSettings = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), ACCESSIBILITY_SETTINGS_KEY);
+const savedRun = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), TEST_STORAGE_KEYS.save);
+
+/** The two drawers of the intro that hold the switch, opened the way a player opens them. */
+async function openStoryControls(page) {
+  for (const title of ["어떤 방식으로 판단할까요?", "편의 설정"]) {
+    const drawer = page.locator("details.intro-drawer", { has: page.locator("summary", { hasText: title }) });
+    if (!(await drawer.evaluate((element) => element.open))) await drawer.locator("summary").click();
+  }
+  const styles = page.getByRole("region", { name: "플레이 스타일 선택" });
+  return {
+    toggle: page.getByRole("region", { name: "편의 설정" }).getByLabel(/스토리 모드/),
+    card: styles.getByRole("button", { name: /스토리 모드/ }),
+    pledge: (label) => styles.getByRole("button", { name: new RegExp(label) }),
+  };
+}
+
+test("story mode is one switch in two places, kept across a reload, and no pledge moves with it", async ({ page }) => {
+  await page.goto("/");
+  let { toggle, card, pledge } = await openStoryControls(page);
+  // Off until chosen, in both places, and the first switch of the comfort panel.
+  await expect(toggle).not.toBeChecked();
+  await expect(card).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("region", { name: "편의 설정" }).getByRole("checkbox").first()).toHaveAccessibleName(/^스토리 모드/);
+  await expect(card).toContainText("줄거리를 먼저 본다");
+  await expect(card).toContainText("벽이 멀어지고 시계가 느려집니다.");
+  await expect(card).toContainText("공개 랭킹에는 오르지 않습니다");
+  await expect(page.locator(".play-style-panel .panel-title-row small")).toHaveText("고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 스토리 모드만 바꿉니다.");
+
+  // A pledge is chosen first, so there is one to keep.
+  await pledge("감사형").click();
+  await expect(pledge("감사형")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".play-style-note")).toHaveText("현재 선택: 감사형 · 근거를 끝까지 확인한다");
+
+  // The comfort switch turns it on, and the card says so.
+  await toggle.check();
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  await expect(card).toHaveClass(/selected/);
+  expect((await storedSettings(page)).storyMode).toBe(true);
+  // The card turns it off, and the switch says so; then on again.
+  await card.click();
+  await expect(toggle).not.toBeChecked();
+  await expect(card).not.toHaveClass(/selected/);
+  expect((await storedSettings(page)).storyMode).toBe(false);
+  await card.click();
+  await expect(toggle).toBeChecked();
+
+  // Three pledges, one of them chosen, whatever the card beside them says.
+  for (const [label, pressed] of [["감각형", "false"], ["감사형", "true"], ["중재형", "false"]]) {
+    await expect(pledge(label)).toHaveAttribute("aria-pressed", pressed);
+  }
+  await expect(page.locator(".play-style-note")).toHaveText("현재 선택: 감사형 · 근거를 끝까지 확인한다");
+  expect((await savedRun(page)).playStyle).toBe("auditor");
+  // And choosing another pledge leaves the switch where it was.
+  await pledge("중재형").click();
+  await expect(pledge("중재형")).toHaveAttribute("aria-pressed", "true");
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  expect(await storedSettings(page)).toMatchObject({ storyMode: true, tableTime: 1, calmEffects: false });
+
+  await page.reload();
+  ({ toggle, card, pledge } = await openStoryControls(page));
+  await expect(toggle).toBeChecked();
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  await expect(pledge("중재형")).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the story card is reached and pressed from the keyboard", async ({ page }) => {
+  await page.goto("/");
+  const { toggle, card, pledge } = await openStoryControls(page);
+  // It is the next stop after the last pledge, and a real button.
+  await pledge("중재형").focus();
+  await page.keyboard.press("Tab");
+  await expect(card).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle).toBeChecked();
+  await page.keyboard.press("Enter");
+  await expect(card).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle).not.toBeChecked();
+  // The comfort switch is a checkbox a keyboard can flip too.
+  await toggle.focus();
+  await page.keyboard.press("Space");
+  await expect(toggle).toBeChecked();
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  expect((await storedSettings(page)).storyMode).toBe(true);
+});
+
+test("a case opened in story mode stands its wall at 88 to 98 and runs its clock at half speed", async ({ page }) => {
+  await page.clock.install();
+  // Table time is left at 1배: the half speed is the mode's own.
+  await withSettings(page, { storyMode: true, tableTime: 1 });
+  await startDebugNode(page, "case01", "start");
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(page.locator(WALL_BAND)).toHaveText(FAR_WALL);
+  await expect(page.getByRole("meter", { name: "열기 게이지" })).toHaveAttribute("aria-valuetext", /^열기 \d+, 벽은 88에서 98 사이 어딘가$/);
+  expect((await savedRun(page)).dynamics.story, "the case is stamped, whatever the setting says later").toBe(true);
+
+  const slowed = await clockLossOverTenSeconds(page);
+  expect(slowed, "ten seconds cost about five").toBeGreaterThanOrEqual(4);
+  expect(slowed).toBeLessThanOrEqual(6);
+});
+
+test("a table opened without story mode keeps the wall it was dealt", async ({ page }) => {
+  await startDebugNode(page, "case01", "start");
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  await expect(page.locator(WALL_BAND)).toHaveText(/^벽 \d+–\d+$/);
+  await expect(page.locator(WALL_BAND)).not.toHaveText(FAR_WALL);
+  expect((await savedRun(page)).dynamics.story).toBe(false);
+});
+
+/** Plays the scene on the table to its end and stops on the case's report. */
+async function closeCaseToReport(page) {
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: 30_000 });
+}
+
+test("the report of a story case says so beside its score", async ({ page }) => {
+  test.setTimeout(120_000);
+  await withSettings(page, { storyMode: true });
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await expect(page.locator(WALL_BAND)).toHaveText(FAR_WALL);
+  await closeCaseToReport(page);
+  await expect(page.locator(".rank-mark small")).toHaveText(/^.+ · \d+ POINTS · 스토리 모드 · 공개 랭킹 제외$/);
+  const saved = await savedRun(page);
+  expect(saved.caseResults.case01.assistStory).toBe(true);
+  expect(saved.caseResults.case01.assistTime, "a story case's clock is recorded with it").toBe(2);
+  // The mark stays inside the badge it is printed in, on a desktop and on a phone.
+  const fit = await page.locator(".rank-mark").evaluate((mark) => {
+    const small = mark.querySelector("small").getBoundingClientRect();
+    const box = mark.getBoundingClientRect();
+    return {
+      left: Math.round(small.left - box.left),
+      right: Math.round(box.right - small.right),
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  expect(fit.left, "the line stays inside the badge").toBeGreaterThanOrEqual(0);
+  expect(fit.right).toBeGreaterThanOrEqual(0);
+  expect(fit.overflow, "and the page is no wider for it").toBeLessThanOrEqual(1);
+});
+
+// The setting is the device's; the case is the run's. Turned on with a case
+// under way it changes nothing on the table -- the case finishes on the wall
+// it was dealt and its report carries no mark -- and the next case opens far.
+test("story mode turned on in the middle of a case starts with the next case", async ({ page }) => {
+  test.setTimeout(150_000);
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const band = page.locator(WALL_BAND);
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  const dealt = await band.textContent();
+  expect(dealt).not.toBe(FAR_WALL);
+
+  // The only place the switch is: the intro, by way of 저장 후 나가기.
+  await page.getByRole("button", { name: "저장 후 나가기" }).click();
+  await expect(page.locator(".intro")).toBeVisible();
+  const { toggle, card } = await openStoryControls(page);
+  await toggle.check();
+  await expect(card).toHaveAttribute("aria-pressed", "true");
+  expect((await storedSettings(page)).storyMode).toBe(true);
+  expect((await savedRun(page)).dynamics.story, "the case under way is not restamped").toBe(false);
+
+  await page.getByTestId("resume-save").click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  await expect(band).toHaveText(dealt ?? "");
+  expect((await savedRun(page)).dynamics.story).toBe(false);
+
+  await closeCaseToReport(page);
+  await expect(page.locator(".rank-mark small")).toHaveText(/^.+ · \d+ POINTS$/);
+  await expect(page.locator(".result-page")).not.toContainText("스토리 모드");
+  expect("assistStory" in (await savedRun(page)).caseResults.case01).toBe(false);
+
+  // The next case is opened with the setting on, and is a story case throughout.
+  await page.locator(".next-case-panel button").click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  await expect(band).toHaveText(FAR_WALL);
+  const next = await savedRun(page);
+  expect(next.currentCase).toBe("case02");
+  expect(next.dynamics.story).toBe(true);
 });

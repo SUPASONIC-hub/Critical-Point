@@ -25,7 +25,9 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    when a case opens (state/runLifecycle.js) and written on
  *                    the run, so a change takes effect from the next case. A
  *                    season that used it carries `assistStory` and is kept off
- *                    the public ranking. Nothing on screen sets it yet.
+ *                    the public ranking. Two controls on the intro set it and
+ *                    show the same state: the first switch of the comfort
+ *                    panel and the fourth card of the play-style drawer.
  */
 export const TABLE_TIME_SCALES = Object.freeze([1, 1.5, 2]);
 

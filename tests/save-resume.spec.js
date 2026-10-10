@@ -1,8 +1,9 @@
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
-import { dismissProtocolBreach, resumeSavedRun, startDebugNode } from "./helpers/gameFlow.js";
+import { cashStakedCard, dismissProtocolBreach, openIntroDrawer, resumeSavedRun, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
-import { createWindow, normalizeSchema } from "../src/gauntlet/gauntletEngine.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
+import { createWindow, getTableSchema, normalizeSchema } from "../src/gauntlet/gauntletEngine.js";
 
 /**
  * Stopping mid-season and picking it up again: on the same device with a bet
@@ -108,6 +109,71 @@ test("a reload keeps a live table on the same wall", async ({ page }) => {
   expect(settled.busted).toBe(true);
   expect(settled.wall).toBeCloseTo(dealt.wall, 1);
   expect(settled.pushes).toBe(pushes);
+});
+
+// 스토리 모드 is read when a case opens and written on the run, so what is on
+// the table does not change with the switch. A story case put down mid-table,
+// the switch turned off on the intro, the page loaded again: the table comes
+// back on its far wall, and the case closes as the story case it was.
+test("a story case put down mid-table is still a story case after the setting is turned off", async ({ page }) => {
+  test.setTimeout(120_000);
+  const settings = () => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), ACCESSIBILITY_SETTINGS_KEY);
+  // Turned on the way a player turns it on, so no init script puts it back on the reload below.
+  await page.goto("/?debug=1");
+  await openIntroDrawer(page, ".accessibility-panel");
+  const toggle = page.getByRole("region", { name: "편의 설정" }).getByLabel(/스토리 모드/);
+  await toggle.check();
+  expect((await settings()).storyMode).toBe(true);
+
+  // 사건 01's last scene: one decision from its report.
+  await startDebugNode(page, "case01", "c1_aftershock", { navigate: false, resetStorage: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const band = page.locator(".gx-band-label");
+  await expect(band).toHaveText("벽 88–98");
+  await stakeAndPush(page);
+  await page.getByRole("button", { name: "저장 후 나가기" }).click();
+  const before = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(before.dynamics.story).toBe(true);
+  expect(before.dynamics.suspended, "the live window is written into the run").toBeTruthy();
+  // The wall this window was dealt, from the engine and the run's own mark.
+  const seed = String(before.dynamics.openSeed).split("#")[0];
+  const dealt = createWindow({ schema: getTableSchema({ story: true, schema: normalizeSchema(before.dynamics.schema) }), seed });
+  expect(dealt.wall).toBeGreaterThanOrEqual(88);
+  expect(normalizeSchema(before.dynamics.schema).wallMin, "the board in the save is the table's own: the far wall is not written into it").toBeLessThan(88);
+
+  // Off, on the intro the exit lands on.
+  await expect(page.locator(".intro")).toBeVisible();
+  await openIntroDrawer(page, ".accessibility-panel");
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  expect((await settings()).storyMode).toBe(false);
+
+  await page.reload();
+  expect((await settings()).storyMode, "the reload did not turn it back on").toBe(false);
+  await resumeSavedRun(page);
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(band).toHaveText("벽 88–98");
+  const resumed = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(resumed.dynamics.story).toBe(true);
+  expect(resumed.dynamics.windowIndex).toBe(before.dynamics.windowIndex);
+
+  // The verdict reads the wall the window drew before it was put down.
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  const settled = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  expect(settled.threshold.busted).toBe(false);
+  expect(settled.threshold.wall).toBeCloseTo(dealt.wall, 1);
+  expect(settled.assistStory).toBe(true);
+  expect(settled.assistTime).toBe(2);
+
+  await page.getByTestId("decision-next").click();
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator(".rank-mark small")).toContainText(" · 스토리 모드 · 공개 랭킹 제외");
+  const closed = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(closed.caseResults.case01.assistStory).toBe(true);
+  expect((await settings()).storyMode, "and the setting is still off").toBe(false);
 });
 
 test("a save made offline is uploaded when the connection comes back", async ({ page, context }) => {

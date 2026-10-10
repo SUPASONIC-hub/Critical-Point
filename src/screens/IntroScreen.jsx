@@ -8,6 +8,7 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { caseDisplayCode } from "../gameCases.js";
+import { setAccessibility, useAccessibility } from "../state/accessibilitySettings.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
@@ -88,6 +89,7 @@ export function IntroScreen({ view, renderers = {} }) {
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");
+  const { storyMode } = useAccessibility();
   const {
     common: {
       AdaptiveMusic, musicModeKey, triggerLabels,
@@ -475,12 +477,10 @@ export function IntroScreen({ view, renderers = {} }) {
                 <p>프롤로그에서 남긴 것이 3년 뒤 사건 01의 첫 장면을 정합니다.</p>
               </article>
             </div>
-            {tutorialSteps && (
-              <div className="prestart-tutorial">
-                <span lang="en">FIRST RUN PROTOCOL</span>
-                <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
-              </div>
-            )}
+            <div className="prestart-tutorial">
+              <span lang="en">FIRST RUN PROTOCOL</span>
+              <div>{tutorialSteps.map((step) => <article key={step.id}><b>{step.label}</b><small>{step.text}</small></article>)}</div>
+            </div>
           </section>
           </details>
           <details className="intro-drawer">
@@ -490,7 +490,7 @@ export function IntroScreen({ view, renderers = {} }) {
             </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
             <div className="panel-title-row">
-              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 바뀌지 않습니다.</small>
+              <small>고른 방식은 내 다짐으로 기록됩니다. 판의 규칙은 스토리 모드만 바꿉니다.</small>
             </div>
             <div className="play-style-grid">
               {playStyleOptions.map((style) => (
@@ -512,16 +512,29 @@ export function IntroScreen({ view, renderers = {} }) {
                   <small>{style.payoff}</small>
                 </button>
               ))}
+              {/* Not a fourth 다짐: the three above are one choice, and this is
+                  the comfort setting (AccessibilityPanel shows the same switch),
+                  on or off beside whichever of them is chosen. */}
+              <button
+                type="button"
+                className={storyMode ? "play-style selected" : "play-style"}
+                onClick={() => setAccessibility({ storyMode: !storyMode })}
+                aria-pressed={storyMode}
+              >
+                <span>스토리 모드</span>
+                <strong>줄거리를 먼저 본다</strong>
+                <em>벽이 멀어지고 시계가 느려집니다.</em>
+                <small>공개 랭킹에는 오르지 않습니다</small>
+              </button>
             </div>
             <p className="play-style-note">현재 선택: {activePlayStyle.label} · {activePlayStyle.title}</p>
           </section>
           </details>
-          {operatorProfiles?.length > 0 && (
-            <details className="intro-drawer">
-              <summary>
-                <span>03 OPERATOR ORIGIN</span>
-                <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
-              </summary>
+          <details className="intro-drawer">
+            <summary>
+              <span>03 OPERATOR ORIGIN</span>
+              <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
+            </summary>
             <section className="operator-origin-panel start-console-section" aria-label="주인공 출신과 권한 선택">
               <div className="panel-title-row">
                 <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
@@ -542,11 +555,10 @@ export function IntroScreen({ view, renderers = {} }) {
                   </button>
                 ))}
               </div>
-              <p className="operator-origin-selected">현재 출신: {operatorProfile?.title} · 첫 권한: {operatorProfile?.authority}</p>
-              {originPrologue && <div className="origin-prologue"><span lang="en">ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>}
+              <p className="operator-origin-selected">현재 출신: {operatorProfile.title} · 첫 권한: {operatorProfile.authority}</p>
+              <div className="origin-prologue"><span lang="en">ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>
             </section>
-            </details>
-          )}
+          </details>
           <details className="intro-drawer">
             <summary>
               <span lang="en">ACCESSIBILITY</span>
@@ -565,21 +577,17 @@ export function IntroScreen({ view, renderers = {} }) {
                 설계할 수 있다면, 나는 여전히 자유로운지 묻게 됩니다.
               </p>
             </div>
-            {playStyleUnlocks && (
-              <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
-            )}
+            <p className="play-style-unlock"><strong>{playStyleUnlocks.label}</strong> · {playStyleUnlocks.unlock} · {playStyleUnlocks.newGamePlus}</p>
           </details>
-          {seasonGoals && (
-            <details className="intro-drawer">
-              <summary>
-                <span lang="en">SEASON GOALS</span>
-                <h2>시즌 목표</h2>
-              </summary>
+          <details className="intro-drawer">
+            <summary>
+              <span lang="en">SEASON GOALS</span>
+              <h2>시즌 목표</h2>
+            </summary>
             <section className="season-goal-strip" aria-label="시즌 목표">
               {seasonGoals.map((goal) => <article key={goal.id}><b>{goal.label}</b><small>{goal.text}</small></article>)}
             </section>
-            </details>
-          )}
+          </details>
           <details className="intro-drawer">
             <summary>
               <h2>처음 플레이 가이드</h2>

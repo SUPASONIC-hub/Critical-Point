@@ -203,7 +203,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div className="rank-mark" style={{ "--rank-score": `${clamp(momentumScore, 0, 100)}%` }}>
               <span lang="en">CASE RANK</span>
               <strong>{resultRank}</strong>
-              <small>{momentumTier} · {momentumScore} POINTS</small>
+              <small>{momentumTier} · {momentumScore} POINTS{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</small>
             </div>
           </div>
           <section className="outcome-panel" aria-label="내가 만든 결말">

@@ -1,6 +1,13 @@
 import { setAccessibility, TABLE_TIME_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
 
+// 스토리 모드 is first: it is the one that changes what the table asks, and
+// the intro's play-style drawer shows the same switch.
 const TOGGLES = [
+  {
+    key: "storyMode",
+    label: "스토리 모드",
+    text: "벽이 멀어지고, 깨진 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
+  },
   {
     key: "holdReadingClock",
     label: "읽기 시계 자동 넘김 끄기",
