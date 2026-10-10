@@ -95,10 +95,10 @@
 }
 
 /* Calm effects. The frame loop (GauntletFx.jsx) owns the shake, the flash
-   and the beat. Here the vignette and the edge tell the heat at under half
+   and the pulse. Here the vignette and the edge tell the heat at under half
    strength, the bust is its wash without the two flashes, and nothing pops,
-   slams or glitches in: the grade and the equip toast leave by fading, so
-   they only fade. */
+   slams or glitches in: the equip toast leaves by fading, so it only
+   fades. */
 :root[data-calm-effects] .gx-table {
   transform: none;
 }
