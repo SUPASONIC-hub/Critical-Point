@@ -222,16 +222,17 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
   assert.equal(fixture.save.currentCase, "prologue03");
   assert.ok(before.relics.length > 0 && before.relicOffer.length === 3 && before.streak >= 2 && before.beatCombo > 0);
   assert.ok(before.stanceMastery.strike >= 3 && before.schema.mutations.includes("strikeMastery"));
-  assert.ok(!("veteran" in before), "the save has no mark: it was written before there was one");
+  assert.ok(!("veteran" in before) && !("story" in before), "the save has neither mark: it was written before there was one");
 
   const { state, repaired } = load(fixture.save);
-  assert.equal(repaired, false, "filling in the mark is not a repair");
+  assert.equal(repaired, false, "filling in the marks is not a repair");
   assert.equal(state.lastError, undefined, "so there is no 복구됨 notice");
   assert.equal(state.paused, fixture.save.paused);
-  assert.deepEqual(state.dynamics, { ...before, veteran: false }, "the table record is the save's, plus a mark that says it is a plain run");
+  assert.deepEqual(state.dynamics, { ...before, veteran: false, story: false }, "the table record is the save's, plus the marks that say it is a plain run at the table");
   const run = normalizeRunState(state.dynamics);
   assert.deepEqual(serializeRunState(run), state.dynamics, "and it is written back the same");
   assert.equal(run.veteran, false);
+  assert.equal(run.story, false);
 
   // The same holds when the prologues are staged: nothing is stripped on load,
   // and reopening the case leaves the board and the draft where they were.

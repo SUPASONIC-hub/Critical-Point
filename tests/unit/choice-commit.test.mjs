@@ -396,3 +396,144 @@ test("a finale closed without consent sends no ranking row either: the run canno
   assert.deepEqual(did.queued, []);
   assert.deepEqual(did.rankingRows.map((row) => row.case_id), ["final", "season-final"], "this device still ranks it");
 });
+
+/* ------------------------------------------------------------- story mode */
+
+/** The run as a case opened in story mode holds it (the stamp is runLifecycle's). */
+const inStoryMode = (run, extra = {}) => ({ ...run, story: true, ...extra });
+const finaleScene = () => {
+  const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
+  return { finaleId, earlier: CASE_SEQUENCE.filter((caseId) => caseId !== "final") };
+};
+
+test("a decision at the table says nothing about story mode", () => {
+  const { context, did } = sceneContext("p1_aftershock");
+  mount(context).choose(context.node.choices[1], closedWindow("cash"));
+  const [patch] = did.patches;
+  assert.equal("assistStory" in patch.log[0], false);
+  assert.equal("assistTime" in patch.log[0], false);
+  assert.equal("assistStory" in patch.caseResults.prologue01, false);
+  assert.equal("assistStory" in did.queued[0].payload.summary, false);
+  assert.equal(patch.gauntletRun.story, false);
+});
+
+test("in a story run a bust costs the bust and the pot, and no scene is played without the analyst", () => {
+  const { context, did } = sceneContext("p1_start");
+  context.gauntletRun = inStoryMode(context.gauntletRun, { runPot: 500 });
+  const card = context.node.choices[0];
+  const window = closedWindow("bust");
+  assert.equal(window.status, "bust");
+  mount(context).choose(card, window);
+
+  const [patch] = did.patches;
+  const [entry] = patch.log;
+  assert.equal(entry.threshold.state, "bust");
+  for (const [key, value] of Object.entries(BUST_EFFECT)) {
+    assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `the bust's own ${key} is still charged`);
+  }
+  assert.equal(entry.threshold.lostPot, 500, "and the pot is still lost");
+  assert.equal(patch.gauntletRun.runPot, 0);
+  assert.equal(patch.gauntletRun.busts, 1);
+  // The card led to p1_counter, and that is where the run goes.
+  assert.equal(patch.nodeId, card.next);
+  assert.equal(entry.skippedNodeId, undefined);
+  assert.equal(entry.routeChangeKind, undefined);
+  assert.equal(patch.decisionReveal.skippedTitle, null);
+  assert.equal(patch.decisionReveal.nextTitle, nodes[card.next].title);
+  // Nor is the next board broken, and the run is still a story run.
+  assert.equal(entry.environmentMode, "stable");
+  assert.deepEqual(patch.gauntletRun.schema.mutations, []);
+  assert.equal(patch.gauntletRun.story, true);
+  // The same bust at the table, for the difference.
+  const table = sceneContext("p1_start");
+  mount(table.context).choose(card, closedWindow("bust", "unit-bust-table"));
+  assert.equal(table.did.patches[0].log[0].routeChangeKind, "blackout-skip");
+
+  // 프롤로그 01 has no way to break a board in any run. In 사건 01, which has
+  // every rule, the table's bust breaks the next board and the story run's does not.
+  const wholeTable = Object.keys(nodes).find((id) => nodes[id].caseId === "case01" && nodes[id].choices?.some((choice) => nodes[choice.next]));
+  const bustIn = (run) => {
+    const scene = sceneContext(wholeTable);
+    scene.context.gauntletRun = run(scene.context.gauntletRun);
+    mount(scene.context).choose(scene.context.node.choices.find((choice) => nodes[choice.next]), closedWindow("bust", `unit-bust-${wholeTable}`), true);
+    return scene.did.patches[0];
+  };
+  assert.match(bustIn((run) => run).log[0].environmentMode, /blackout/);
+  const storyBust = bustIn(inStoryMode);
+  assert.equal(storyBust.log[0].environmentMode, "stable");
+  assert.deepEqual(storyBust.gauntletRun.schema.mutations, []);
+  assert.equal(storyBust.log[0].skippedNodeId, undefined);
+});
+
+test("a story run's decisions and its case summary are marked, with the clock it was given", () => {
+  const { context, did } = sceneContext("p1_aftershock");
+  context.gauntletRun = inStoryMode(context.gauntletRun);
+  // A window cashed before its first tick has no scale of its own to report.
+  const window = closedWindow("cash");
+  assert.equal(window.timeScale, 1);
+  mount(context).choose(context.node.choices[1], window);
+
+  const [patch] = did.patches;
+  assert.equal(patch.log[0].assistStory, true);
+  assert.equal(patch.log[0].assistTime, 2, "a story run's clock is never faster than twice as slow");
+  const summary = patch.caseResults.prologue01;
+  assert.equal(summary.assistStory, true);
+  assert.equal(summary.assistTime, 2);
+  assert.equal(did.rankingRows[0].summary.assistStory, true, "this device's ranking row has it");
+  // The case row is still sent, with the mark, and the server's shape check takes it.
+  assert.equal(did.queued.length, 1);
+  assert.deepEqual(validateTelemetryItem(did.queued[0]), []);
+  assert.equal(did.queued[0].payload.summary.assistStory, true);
+  assert.equal(did.queued[0].payload.decision_log[0].assistStory, true);
+});
+
+test("a story case played again at the table is still a story case: the vault it banked is still in the season", () => {
+  const { context, did } = sceneContext("p1_aftershock", {
+    completedCases: ["prologue01"],
+    caseResults: { prologue01: { burstScore: 60, rank: "B", assistStory: true } },
+  });
+  assert.equal(context.gauntletRun.story, false, "the replay itself is played at the table");
+  mount(context).choose(context.node.choices[1], closedWindow("cash", "replay-at-table"));
+  const [patch] = did.patches;
+  assert.equal("assistStory" in patch.log[0], false, "its decisions are not marked");
+  assert.equal(patch.caseResults.prologue01.assistStory, true, "and the case keeps the mark of the play that banked its vault");
+});
+
+test("a season with any story case is not sent to the public ranking, and this device still ranks it with the mark", async () => {
+  const { buildLeaderboard } = await import("../../src/ranking.js");
+  const { finaleId, earlier } = finaleScene();
+  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B" }]));
+  const seasons = {
+    "the finale itself": { caseResults: plainResults, story: true },
+    "one case long before it": { caseResults: { ...plainResults, [earlier[7]]: { burstScore: 60, rank: "B", assistStory: true } }, story: false },
+  };
+  for (const [which, { caseResults, story }] of Object.entries(seasons)) {
+    const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
+    if (story) context.gauntletRun = inStoryMode(context.gauntletRun);
+    mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash", `story-season-${story}`));
+
+    const summary = did.patches[0].caseResults.final;
+    assert.equal(did.patches[0].completedCases.length, CASE_SEQUENCE.length);
+    assert.equal(summary.assistStory, true, `${which}: the finale carries the season's mark`);
+    assert.equal(did.seasonFinals.length, 1, "NEW GAME+ is still told");
+    // Only the case row leaves the device.
+    assert.deepEqual(did.queued.map((item) => item.payload.case_id), ["final"], which);
+    assert.equal(did.queued.some((item) => item.id.startsWith("season-final")), false);
+    assert.equal(did.queued[0].payload.summary.assistStory, true, "the case row says why");
+    assert.deepEqual(validateTelemetryItem(did.queued[0]), []);
+    // The device's own ranking keeps the season, marked.
+    assert.deepEqual(did.rankingRows.map((row) => row.case_id), ["final", "season-final"]);
+    assert.equal(did.rankingRows[1].summary.assistStory, true);
+    assert.equal(did.rankingRows[1].summary.seasonComplete, true);
+    const [ranked] = buildLeaderboard(did.rankingRows);
+    assert.deepEqual([ranked.seasonComplete, ranked.assistStory, ranked.isLocal], [true, true, true], which);
+  }
+
+  // A season with no story case is sent as it always was.
+  const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults: plainResults });
+  mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash", "plain-season"));
+  assert.equal("assistStory" in did.patches[0].caseResults.final, false);
+  assert.deepEqual(did.queued.map((item) => item.payload.case_id), ["final", "season-final"]);
+  assert.equal("assistStory" in did.queued[1].payload.summary, false);
+  assert.equal(buildLeaderboard(did.rankingRows)[0].assistStory, false);
+});

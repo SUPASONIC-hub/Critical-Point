@@ -7,6 +7,7 @@ import {
   getCloseness,
   getHeartbeatBpm,
   getSealedCardId,
+  getTableSchema,
   judgeBeat,
   GROOVE_CAP,
   HAND_CAP,
@@ -15,7 +16,7 @@ import {
   resolveWindow,
 } from "../src/gauntlet/gauntletEngine.js";
 import { hasRelic, RELIC_IDS } from "../src/gauntlet/relics.js";
-import { ALL_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import { ALL_RULES, MUTATION_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 
 /**
@@ -53,6 +54,10 @@ import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../sr
  * when left out) and hand them to the reducer and the settlement, and the
  * prologues' steps are measured at the end by passing each step's rules: the
  * bet, the heartbeat and the skip have to hold on the smallest table too.
+ *
+ * Story mode is measured last, and held to different properties on purpose: it
+ * is the table stepping back, so what is asked of it is that it does step back
+ * (see the story tier at the end).
  */
 
 const CASES = 1500;
@@ -97,15 +102,24 @@ const card = { id: "sim", label: "sim", effect: { capital: 12, trust: 6, humanCo
 /** A lock waits for a beat, and the clock runs while it does. */
 const LOCK_SECONDS = 0.6;
 
-function playCase(caseIndex, decide, grade = null, relics = [], lock = null, rules = ALL_RULES) {
-  let run = openCaseRun({ relics }, { rules });
+/**
+ * `story` plays the case as a story run: the run carries the mark, so its
+ * windows are dealt from the far wall (`getTableSchema`), and a bust skips no
+ * scene (useChoiceCommit). It is `true`, or the run the case opens from -- a
+ * season far along, say. The rules a story run plays under are the caller's to
+ * pass, as everywhere here.
+ */
+function playCase(caseIndex, decide, grade = null, relics = [], lock = null, rules = ALL_RULES, story = false) {
+  let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics }, { rules });
   let busts = 0;
   let midCaseBusts = 0;
   let mutatedAfterBust = 0;
+  let nextTableRules = 0;
   let played = 0;
   for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
     played += 1;
-    let win = createWindow({ schema: run.schema, seed: `sim:${caseIndex}:${windowIndex}`, beatCombo: run.beatCombo });
+    // The run's own board for every run but a story one, whose wall stands far.
+    let win = createWindow({ schema: getTableSchema(run), seed: `sim:${caseIndex}:${windowIndex}`, beatCombo: run.beatCombo });
     win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
     if (lock) {
       // Charged to the full on the beat, before the first push.
@@ -134,25 +148,30 @@ function playCase(caseIndex, decide, grade = null, relics = [], lock = null, rul
       if (!caseClosed && broken) mutatedAfterBust += 1;
       // The blackout skip: the room plays the next scene without the player. It
       // never skips onto the result, so the case's last window is always played.
-      if (windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
+      // A story run is skipped past nothing.
+      if (!story && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
     }
+    // A board that carries one of the seven next-table rules, whatever dealt it.
+    if (nextRun.schema.mutations.some((id) => STORY_OFF_RULES.includes(MUTATION_RULES[id]))) nextTableRules += 1;
     run = nextRun;
   }
-  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, played };
+  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played };
 }
 
-function measure(label, decide, grade = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES) {
+function measure(label, decide, grade = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
   let vault = 0;
   let busts = 0;
   let midCase = 0;
   let mutated = 0;
+  let nextTableRules = 0;
   let played = 0;
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
-    const result = playCase(caseIndex, decide, grade, relics, lock, rules);
+    const result = playCase(caseIndex, decide, grade, relics, lock, rules, story);
     vault += result.vault;
     busts += result.busts;
     midCase += result.midCaseBusts;
     mutated += result.mutatedAfterBust;
+    nextTableRules += result.nextTableRules;
     played += result.played;
   }
   return {
@@ -163,6 +182,7 @@ function measure(label, decide, grade = null, relics = [], cases = CASES, lock =
     busts,
     midCase,
     mutated,
+    nextTableRules,
   };
 }
 
@@ -559,6 +579,69 @@ for (const row of stepReport) {
   }
   if (!rules.has("stance")) assert.equal(steady.meanVault, strike.meanVault, `${caseId}: a hand that asks for STEADY is ${rules.has("lock") ? "locking in STRIKE" : "not locking at all"}`);
 }
+
+/**
+ * Story mode (스토리 모드), the table stepping back so the story can be read.
+ *
+ * A story run's wall is dealt at 88-98 whatever its board says, it plays
+ * without the seven next-table rules, and a bust skips no scene. None of the
+ * properties above is asked of it -- there is no bet to speak of at heat 70
+ * under a wall that starts at 88 -- and three others are:
+ *
+ * - a hand that pushes to heat 70 and stops does not bust: under one window in
+ *   a hundred, on the whole table, on every prologue's step, with every relic
+ *   and late in the season where the clock's heat is at its steepest;
+ * - the wall is still a wall: a hand that never stops still busts every time;
+ * - no window deals a next-table rule, whatever the hand did -- a bust, a cold
+ *   cash, a hot one, a chain of them.
+ *
+ * It also banks several times what the table pays anyone else, which is why a
+ * season with a story case is kept off the public ranking: the ratio is
+ * printed, against the best blind policy and against the same hand.
+ */
+const STORY_SAFE_HEAT = 70;
+const STORY_BUST_CEILING = 0.01;
+const storyHand = (label, decide, { rules = STORY_RULES, relics = [], cases = CASES, from = true } = {}) =>
+  measure(`story ${label}`, decide, null, relics, cases, null, rules, from);
+const storyHeat = [50, 60, STORY_SAFE_HEAT, 80, 90].map((target) => storyHand(`heat ${target}`, (win) => win.gauge < target));
+const storySafe = storyHeat.find((row) => row.label === `story heat ${STORY_SAFE_HEAT}`);
+const storyMash = storyHand("mash", () => true);
+const storyCold = storyHand("never pushes", () => false);
+const storyTiers = [
+  ...UNLOCK_LADDER.slice(0, -1).map((step) => ({ name: step.caseId, options: { rules: step.storyRules, cases: BRACKET_CASES } })),
+  { name: "every relic", options: { relics: RELIC_IDS, cases: BRACKET_CASES } },
+  { name: "late season", options: { from: { windowIndex: 450 }, cases: BRACKET_CASES } },
+].map(({ name, options }) => ({
+  name,
+  safe: storyHand(`${name}, heat ${STORY_SAFE_HEAT}`, (win) => win.gauge < STORY_SAFE_HEAT, options),
+  mash: storyHand(`${name}, mash`, () => true, options),
+}));
+const storyRows = [...storyHeat, storyMash, storyCold, ...storyTiers.flatMap((tier) => [tier.safe, tier.mash])];
+for (const row of storyRows) {
+  console.log(
+    `${row.label.padEnd(30)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${row.meanWindows}`,
+  );
+  assert.equal(row.nextTableRules, 0, `${row.label}: a story run was dealt a next-table rule on ${row.nextTableRules} boards`);
+  assert.equal(row.meanWindows, WINDOWS_PER_CASE, `${row.label}: a story run is skipped past nothing, so it plays every window`);
+}
+assert.deepEqual([...STORY_RULES].sort(), [...ALL_RULES].filter((rule) => !STORY_OFF_RULES.includes(rule)).sort(), "a story run plays under everything but the seven next-table rules");
+for (const safe of [storySafe, ...storyTiers.map((tier) => tier.safe)]) {
+  assert.ok(safe.bustRate < STORY_BUST_CEILING, `${safe.label}: a hand that stops at heat ${STORY_SAFE_HEAT} busts ${(safe.bustRate * 100).toFixed(1)}% of its windows`);
+}
+for (const mash of [storyMash, ...storyTiers.map((tier) => tier.mash)]) {
+  assert.ok(mash.bustRate > 0.99, `${mash.label}: the wall is still a wall, and a hand that never stops must bust (got ${mash.bustRate})`);
+  assert.equal(mash.meanVault, 0, `${mash.label}: and bank nothing`);
+}
+// The table's own rows, for the ratio. A normal hand at the same heat is the row above.
+const sameHand = fixed.find((row) => row.label === `heat ${STORY_SAFE_HEAT}`);
+const storyBest = bestOfRows(storyHeat);
+console.log(
+  `story mode       best blind ${storyBest.meanVault} (${storyBest.label.slice("story ".length)}, bust ${(storyBest.bustRate * 100).toFixed(1)}%), ${(storyBest.meanVault / bestFixed.meanVault).toFixed(1)}x the table's best blind ${bestFixed.meanVault} and ${(storyBest.meanVault / oracle.meanVault).toFixed(2)}x a player who sees its wall (${oracle.meanVault}); the same hand at heat ${STORY_SAFE_HEAT}: ${storySafe.meanVault} against ${sameHand.meanVault} (${(storySafe.meanVault / sameHand.meanVault).toFixed(1)}x)`,
+);
+assert.ok(
+  storySafe.meanVault > bestFixed.meanVault,
+  `a story run is expected to out-bank the table (${storySafe.meanVault} against ${bestFixed.meanVault}); if it no longer does, the reason it is kept off the public ranking has gone and the exclusion should be looked at again`,
+);
 
 console.log(
   `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; on the beat: ${onBeat.meanVault}, off it: ${offBeat.meanVault}; locked and on the beat: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,

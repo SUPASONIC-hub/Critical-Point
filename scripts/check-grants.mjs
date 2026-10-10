@@ -321,7 +321,11 @@ const sessionCodeOf = (id) => id.replace(/[^a-z0-9]/gi, "").slice(-8).toUpperCas
 // writes (`entryBase` there, plus `observerTag`), at realistic sizes. There is
 // no shared builder for it -- the entry is assembled inline there -- so the keys
 // are read off that file below and held to this object's.
-function decisionEntry(caseId, index) {
+//
+// `story` is an entry of a case played in story mode, the one key such an
+// entry adds (`assistStory`). The runs below are played without it: a season
+// with a story case is one the client does not send for ranking.
+function decisionEntry(caseId, index, { story = false } = {}) {
   const resources = { ...initialResources };
   return {
     caseId,
@@ -356,6 +360,7 @@ function decisionEntry(caseId, index) {
     },
     environmentMode: "stable",
     assistTime: 1.5,
+    ...(story ? { assistStory: true } : {}),
     suspenseEvent: null,
     clue: null,
     responseTimeSec: 7.4,
@@ -377,7 +382,7 @@ const cognition = { persistence: 9, reflection: 7, reframing: 3 };
   const clientKeys = literal
     ? literal[2].split("\n").map((line) => line.match(keyLine)).filter(Boolean).map((match) => match[1] ?? match[2])
     : [];
-  const probeKeys = Object.keys(decisionEntry("case01", 0));
+  const probeKeys = Object.keys(decisionEntry("case01", 0, { story: true }));
   if (clientKeys.length < 20) {
     failures.push(
       "could not read the decision-log entry's keys from src/state/useChoiceCommit.js (`const entryBase = {`); " +
@@ -403,8 +408,8 @@ const cognition = { persistence: 9, reflection: 7, reframing: 3 };
  * client sends no `completed_at`: the column's default and the insert trigger
  * date the row. The probes that forge a date add the key themselves.
  */
-function casePayload({ session, runId, caseId, completedAt = new Date().toISOString() }) {
-  const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index));
+function casePayload({ session, runId, caseId, completedAt = new Date().toISOString(), story = false }) {
+  const log = Array.from({ length: 6 }, (_, index) => decisionEntry(caseId, index, { story }));
   const summary = {
     ...createCaseSummary(triggers, cognition, log, { resources: initialResources, schemaVersion: 7 }),
     // The ending as the runtime puts it in a row: its id, not the record the

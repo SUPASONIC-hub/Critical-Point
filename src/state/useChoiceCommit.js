@@ -22,7 +22,7 @@ import {
 } from "../gameLogic.js";
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { applyGauntletEffect, BUST_EFFECT, createRunSummary } from "../gauntlet/gauntletEngine.js";
+import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -62,6 +62,10 @@ function getReframeTarget(caseId, fromNodeId) {
  * (gameLogic.getUnattendedNext), through the same gate a played card passes.
  * It used to follow the first card dealt, which the shuffled deal made a
  * different route on forty fork scenes, and it walked into gated detours.
+ *
+ * A story run is not skipped past anything (the caller does not ask): the
+ * mode is there so the story can be read, and a scene played without the
+ * player is a scene they did not read. The bust still costs what a bust costs.
  */
 function getBlackoutSkip(fromNodeId, branchContext) {
   const skippedNode = nodes[fromNodeId];
@@ -229,7 +233,13 @@ export function useChoiceCommit(context) {
     // landed. It goes into the queue behind that row, and the queue holds it
     // there until the case row is through (telemetryBatch.isHeldBehindCaseRow).
     // With no case row queued the run cannot rank, and no ranking row is sent.
-    if (telemetryEnabled && dataConsent && caseRowQueued) {
+    //
+    // Nor for a season that played any case in story mode. Its wall stood at
+    // 88 and up, so it banked several times what the table pays anyone else
+    // (check:pressure prints the ratio), and the public ranking compares
+    // seasons played on one table. The case rows above are still sent, with
+    // the mark, and this device's own ranking keeps the row.
+    if (telemetryEnabled && dataConsent && caseRowQueued && !caseSummary.assistStory) {
       queueTelemetry({
         id: `season-final-${runId}`,
         type: "case",
@@ -247,7 +257,9 @@ export function useChoiceCommit(context) {
     } = context;
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
     const responseTimeSec = getWindowResponseTime({ elapsed: windowState.elapsed, enteredAt: nodeEnteredAt, clockSeconds: windowState.schema?.seconds ?? gauntletRun?.schema?.seconds });
-    const assistTime = Math.max(Number(windowState.timeScale) || 1, getAccessibility().tableTime);
+    const assistTime = Math.max(Number(windowState.timeScale) || 1, getTableClockScale(gauntletRun, getAccessibility().tableTime));
+    // The case on the table was opened in story mode (gauntletEngine's `story`).
+    const assistStory = gauntletRun?.story === true;
     const reframe = choice.type === "reframe";
     // A reframe that busts is still a reframe the player paid for, but it does
     // not open a door: the wall took the window before the new board was laid.
@@ -266,7 +278,7 @@ export function useChoiceCommit(context) {
     };
     const branchBypass = getBranchDetourBypass(choice, branchContext);
     const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-    const blackoutSkip = windowState.status === "bust" ? getBlackoutSkip(plannedNode, branchContext) : null;
+    const blackoutSkip = windowState.status === "bust" && !assistStory ? getBlackoutSkip(plannedNode, branchContext) : null;
     const nextNode = blackoutSkip?.nodeId ?? plannedNode;
     const caseClosed = CASE_RESULT_NODES[currentCase] === nextNode;
     const { verdict, nextRun, unlockedRelics } = relicTable.settle({
@@ -363,6 +375,9 @@ export function useChoiceCommit(context) {
       // a window played slow, put down, and cashed after the setting was put
       // back on the intro used to carry no mark.
       ...(assistTime > 1 ? { assistTime } : {}),
+      // Played in story mode: a far wall and no next-table rules. The case
+      // summary carries it, and a season with any such case is not ranked.
+      ...(assistStory ? { assistStory } : {}),
       suspenseEvent,
       clue,
       responseTimeSec,
@@ -407,11 +422,19 @@ export function useChoiceCommit(context) {
         outcomeNodeId: entry.nodeId,
         completedAt: new Date().toISOString(),
       };
+      // A case played again keeps the table record of its first close, and the
+      // vault that play banked stays banked (openCaseRun). So it keeps that
+      // play's story mark as well: playing a story case once more at the table
+      // does not make the season one that was played there.
+      if (caseResults[currentCase]?.assistStory === true) caseSummary.assistStory = true;
       // The ranking publishes the run's final case row, so the finale carries
       // the slowest table clock of the whole season, not only its own.
       if (currentCase === "final") {
         const seasonAssist = Object.values(caseResults).reduce((slowest, result) => Math.max(slowest, Number(result?.assistTime) || 1), caseSummary.assistTime ?? 1);
         if (seasonAssist > 1) caseSummary.assistTime = seasonAssist;
+        // And the story mark of any case in it: one such case keeps the whole
+        // season off the public ranking (`recordClosedCase`).
+        if (Object.values(caseResults).some((result) => result?.assistStory === true)) caseSummary.assistStory = true;
       }
       nextCaseResults = { ...caseResults, [currentCase]: caseSummary };
       closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };

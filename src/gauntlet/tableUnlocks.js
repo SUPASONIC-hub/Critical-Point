@@ -84,6 +84,23 @@ function freezeSet(values) {
 export const ALL_RULES = freezeSet(TABLE_RULES);
 
 /**
+ * The rules a story run plays without (스토리 모드, the comfort setting): the
+ * seven ways a decision breaks the next board. A table that is there to be read
+ * past does not hand a mistake on to the scene after it. The beat, LOCK, the
+ * stances and the relics stay -- they are the hand's own, and nothing they do
+ * is dealt to a player who did not ask for it.
+ */
+export const STORY_OFF_RULES = Object.freeze(["blackout", "aftershock", "silence", "coldFeet", "heatDebt", "fracture", "overclock"]);
+
+/** A set of rules as a story run plays it: the same set, less the seven. */
+function withoutStoryOff(rules) {
+  return freezeSet([...rules].filter((rule) => !STORY_OFF_RULES.includes(rule)));
+}
+
+/** Everything a story run can have: what it plays under from 사건 01, and under NEW GAME+. */
+export const STORY_RULES = withoutStoryOff(ALL_RULES);
+
+/**
  * The line over a case's introduction of its new rules. A step may carry its
  * own (`kicker`): 프롤로그 01 adds nothing to anything, so it does not say
  * that the rules have grown.
@@ -98,6 +115,10 @@ export const UNLOCK_INTRO_KICKER = "NEW PROTOCOL · 이번 사건부터 규칙�
  *
  * The draft a case shows was offered when the case before it closed, so
  * `relics` in 프롤로그 05 means the offer made as 프롤로그 04 closes.
+ *
+ * `storyIntro` is which of the lines a story run is told, by position: a line
+ * about a rule the run plays without would describe a board it never sees.
+ * Left out, the step says all of them.
  */
 const STEPS = [
   {
@@ -109,6 +130,7 @@ const STEPS = [
   {
     caseId: "prologue02",
     adds: ["beat", "blackout", "aftershock", "silence"],
+    storyIntro: [0],
     intro: [
       "심박에 맞춰 밀면 콤보가 쌓이고 판돈이 커집니다.",
       "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
@@ -117,6 +139,7 @@ const STEPS = [
   {
     caseId: "prologue03",
     adds: ["coldFeet", "heatDebt"],
+    storyIntro: [],
     intro: [
       "한 번도 밀지 않고 확정하면 다음 판에서 가장 비싼 카드가 잠깁니다.",
       "열기 60 이상에서 확정하면 다음 판은 열기를 안고 시작하고 시간이 줄어듭니다.",
@@ -125,6 +148,7 @@ const STEPS = [
   {
     caseId: "prologue04",
     adds: ["fracture", "overclock", "lock"],
+    storyIntro: [2],
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
@@ -141,16 +165,21 @@ const STEPS = [
 /**
  * The ladder as it is read: each step with the rules it adds, every rule on
  * by then (`rules`, the ones before it and its own), its lines and the line
- * over them.
+ * over them. `storyRules` and `storyIntro` are the same two for a story run.
+ * Every set is made once, here: a caller is handed the same object each time
+ * it asks, and may key a memo on it.
  */
 export const UNLOCK_LADDER = Object.freeze(
   STEPS.reduce((ladder, step) => {
     const before = ladder.length ? [...ladder[ladder.length - 1].rules] : [];
+    const rules = freezeSet([...before, ...step.adds]);
     ladder.push(Object.freeze({
       caseId: step.caseId,
       adds: Object.freeze([...step.adds]),
-      rules: freezeSet([...before, ...step.adds]),
+      rules,
+      storyRules: withoutStoryOff(rules),
       intro: Object.freeze([...step.intro]),
+      storyIntro: Object.freeze(step.storyIntro ? step.storyIntro.map((line) => step.intro[line]) : [...step.intro]),
       kicker: step.kicker ?? UNLOCK_INTRO_KICKER,
     }));
     return ladder;
@@ -169,26 +198,37 @@ function findStep(caseId, { veteran = false, staged = STAGED } = {}) {
  * plays under its own step, however far the season has gone since. Everything
  * when the switch is off, when the run began with NEW GAME+ (`veteran`), and
  * for a case the ladder does not name.
+ *
+ * `story` takes the seven next-table rules out of whichever of those it is
+ * (`STORY_OFF_RULES`): a prologue's step less the seven, or everything less
+ * the seven.
  */
 export function rulesFor(caseId, options) {
-  return findStep(caseId, options)?.rules ?? ALL_RULES;
+  const step = findStep(caseId, options);
+  if (options?.story === true) return step?.storyRules ?? STORY_RULES;
+  return step?.rules ?? ALL_RULES;
 }
 
-/** What the case says about the rules it turns on; nothing when it turns none on. */
+/**
+ * What the case says about the rules it turns on; nothing when it turns none
+ * on. A story run is told only about the ones it plays under.
+ */
 export function introFor(caseId, options) {
-  return findStep(caseId, options)?.intro ?? NO_INTRO;
+  const step = findStep(caseId, options);
+  return (options?.story === true ? step?.storyIntro : step?.intro) ?? NO_INTRO;
 }
 
 /**
  * The same two questions asked with the run in hand. `run` is the gauntlet's
- * run (the save's `dynamics`), which carries the NEW GAME+ mark.
+ * run (the save's `dynamics`), which carries the NEW GAME+ mark and the story
+ * mark its case was opened with.
  */
 export function getTableRules(caseId, run, staged = STAGED) {
-  return rulesFor(caseId, { veteran: run?.veteran === true, staged });
+  return rulesFor(caseId, { veteran: run?.veteran === true, story: run?.story === true, staged });
 }
 
 export function getUnlockIntro(caseId, run, staged = STAGED) {
-  return introFor(caseId, { veteran: run?.veteran === true, staged });
+  return introFor(caseId, { veteran: run?.veteran === true, story: run?.story === true, staged });
 }
 
 /** The line over a case's introduction: the step's own, or the shared one. */

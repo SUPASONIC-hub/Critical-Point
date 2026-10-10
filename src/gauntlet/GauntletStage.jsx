@@ -3,7 +3,6 @@ import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { getTabToken, STORAGE_KEY } from "../appConfig.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
-  BASE_SCHEMA,
   createOpenSeed,
   drawStep,
   equipRelic,
@@ -28,6 +27,7 @@ import {
   SLIP_SECONDS,
   splitOpenSeed,
   getStanceMasteryProfile,
+  getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
@@ -88,7 +88,7 @@ export function GauntletStage({
   onReload,
   scene,
 }) {
-  const schema = run?.schema ?? BASE_SCHEMA;
+  const schema = getTableSchema(run);
   const tabToken = getTabToken();
   // Read once, at mount: a save that already names this window means a bet was
   // placed on it and never settled. If this tab placed it, this is a reload and
@@ -326,7 +326,7 @@ export function GauntletStage({
   function pickRelic(relicId) {
     if (!draftOpen) return;
     if (relicId) {
-      dispatch({ type: "REDEAL", schema: equipRelic(run, relicId).schema });
+      dispatch({ type: "REDEAL", schema: getTableSchema(equipRelic(run, relicId)) });
       playRelicEquipCue();
       setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1 }));
     }

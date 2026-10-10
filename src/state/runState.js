@@ -3,6 +3,7 @@ import { SEASON_ENTRY_CASE, SEASON_ENTRY_NODE } from "../gameCases.js";
 import { cognitionLabels, initialResources, triggerLabels } from "../gameConstants.js";
 import { makeEmptyScores } from "../gameLogic.js";
 import { normalizeRunState, RUN_INITIAL_STATE, serializeRunState } from "../gauntlet/gauntletEngine.js";
+import { getAccessibility } from "./accessibilitySettings.js";
 import { createOpeningResources, OPENING_ECHO } from "./openingState.js";
 
 /**
@@ -41,6 +42,12 @@ const given = (key) => (event) => event[key];
 const now = (event) => event.now;
 const emptyTriggers = () => makeEmptyScores(triggerLabels);
 const emptyCognition = () => makeEmptyScores(cognitionLabels);
+/**
+ * The table a run opens on, with the two marks a start can give it: NEW GAME+
+ * (`veteran`) and story mode (`story`, the comfort setting as it stood at the
+ * start). The engine's own opening table when it has neither.
+ */
+const openingTable = (veteran, story) => (veteran || story ? { ...RUN_INITIAL_STATE, veteran, story } : RUN_INITIAL_STATE);
 
 export const RUN_FIELDS = {
   runId: {
@@ -247,16 +254,24 @@ export const RUN_FIELDS = {
   gauntletRun: {
     save: "dynamics",
     toSave: serializeRunState,
-    load: (saved) => normalizeRunState(saved?.dynamics),
+    // A save whose table is null is the one 시작 wrote from the pre-start shell
+    // (shellStartSave.js): a run with no table yet. The shell cannot stamp the
+    // story mark -- the table is the engine's, and the engine is not in the
+    // entry chunk -- so the opening table is made here, as the device's
+    // setting stands. Any table the save does hold keeps the mark it has.
+    load: (saved) => (saved?.dynamics === null ? openingTable(false, getAccessibility().storyMode) : normalizeRunState(saved?.dynamics)),
     fresh: () => RUN_INITIAL_STATE,
     // A run begun with NEW GAME+ is marked: its table has every rule from the
     // first window, where a plain start turns them on case by case
     // (gauntlet/tableUnlocks.js). The mark is the run's, not the device's.
-    newGame: (event) => (event.veteran === true ? { ...RUN_INITIAL_STATE, veteran: true } : RUN_INITIAL_STATE),
+    // The story mark is the caller's reading of the comfort setting. The
+    // season's first case is played from here without being opened, so this is
+    // where it gets its mark; every later case gets its own as it opens.
+    newGame: (event) => openingTable(event.veteran === true, event.story === true),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),
-    jumpToNode: FRESH,
+    jumpToNode: (event) => openingTable(false, event.story === true),
     reset: FRESH,
   },
   // The queue the telemetry sender empties. The save holds it; the sender's

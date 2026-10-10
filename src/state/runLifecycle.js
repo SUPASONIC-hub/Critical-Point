@@ -20,6 +20,7 @@ import { holdCloudCopyThroughReset } from "../cloudSave.js";
 import { openCaseRun } from "../gauntlet/gauntletEngine.js";
 import { getTableRules } from "../gauntlet/tableUnlocks.js";
 import { getSessionId as getSessionIdDefault, telemetryEnabled } from "../telemetry.js";
+import { getAccessibility } from "./accessibilitySettings.js";
 import { confirmAction } from "./confirmAction.js";
 import { createOpeningResources } from "./openingState.js";
 import { runTransition } from "./runState.js";
@@ -112,6 +113,9 @@ export function createRunLifecycle({
    * `veteran` is NEW GAME+: the run is marked, and its table has every rule
    * from the first window. Anything else -- the start button hands this a
    * click event -- is a plain start.
+   *
+   * The story mark is the comfort setting as it stands at this press. The
+   * season's first case is played straight from here, with no `startCaseNow`.
    */
   function startGame({ veteran = false } = {}) {
     // A run of one's own ends a replay; from here the tab writes its save again.
@@ -121,6 +125,7 @@ export function createRunLifecycle({
       runId: createRunId(),
       playerName: normalizePlayerName(run.playerName) || "분석관",
       veteran: veteran === true,
+      story: getAccessibility().storyMode,
       now: nowMs(),
     });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);
@@ -153,12 +158,17 @@ export function createRunLifecycle({
       note,
     });
     resetEndingSequence();
+    // Story mode is the device's setting, and a case takes it as it opens: the
+    // mark is written on the run here and read from the run until the next
+    // case opens. A setting changed in the middle of a case changes nothing
+    // about that case -- its windows, a window put down, its record.
+    const table = { ...run.gauntletRun, story: getAccessibility().storyMode };
     applyRun(runTransition(run, {
       type: "openCase",
       caseId,
       ...opening,
       // A case that already has a summary is played again as practice for the table.
-      gauntletRun: openCaseRun(run.gauntletRun, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, run.gauntletRun) }),
+      gauntletRun: openCaseRun(table, { replayOf: run.caseResults[caseId] ?? null, rules: getTableRules(caseId, table) }),
       now: nowMs(),
     }));
   }
@@ -193,6 +203,8 @@ export function createRunLifecycle({
       completedCases: CASE_SEQUENCE.slice(0, Math.max(0, CASE_SEQUENCE.indexOf(caseId))),
       echo: echoText,
       runId: persistRun ? createRunId() : run.runId,
+      // A run of this device's own takes its setting; a replay is somebody else's table.
+      story: persistRun && getAccessibility().storyMode,
       now: nowMs(),
     });
     if (persistRun) applyRun(patch);

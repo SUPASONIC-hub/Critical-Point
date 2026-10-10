@@ -994,6 +994,10 @@ export function createCaseSummary(
     // The slowest table clock any decision of the case was played on, when the
     // comfort setting slowed it; absent on a case played at the table's pace.
     ...(assistTime > 1 ? { assistTime } : {}),
+    // Any decision of the case was played in story mode (a far wall, no
+    // next-table rules); absent otherwise. The finale's summary carries the
+    // season's, and a season that has it is kept off the public ranking.
+    ...(entries.some((entry) => entry?.assistStory === true) ? { assistStory: true } : {}),
     // Carried so the ending can read the season rather than the last case: with
     // resources reset at every case start, one case alone never reaches the
     // thresholds the closing ruling is written against.

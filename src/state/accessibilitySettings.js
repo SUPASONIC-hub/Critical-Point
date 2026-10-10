@@ -18,6 +18,14 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    (WCAG 2.1.4). Space, Enter and Escape stay.
  *   stillIntro       the intro's ticker, drifting art and blinking wordmark
  *                    stop (WCAG 2.2.2).
+ *   storyMode        스토리 모드: the table steps back so the story can be read.
+ *                    The wall stands far off, no decision breaks the next
+ *                    board, the table clock runs at least twice as slow and a
+ *                    bust skips no scene. It is read when a run starts and
+ *                    when a case opens (state/runLifecycle.js) and written on
+ *                    the run, so a change takes effect from the next case. A
+ *                    season that used it carries `assistStory` and is kept off
+ *                    the public ranking. Nothing on screen sets it yet.
  */
 export const TABLE_TIME_SCALES = Object.freeze([1, 1.5, 2]);
 
@@ -27,13 +35,14 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   calmEffects: false,
   letterKeys: true,
   stillIntro: false,
+  storyMode: false,
 });
 
 export function normalizeAccessibility(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const settings = { ...DEFAULT_ACCESSIBILITY };
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
-  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro"]) {
+  for (const key of ["holdReadingClock", "calmEffects", "letterKeys", "stillIntro", "storyMode"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);
