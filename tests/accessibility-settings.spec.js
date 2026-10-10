@@ -147,8 +147,9 @@ test("at 2배 the table's clock runs at half speed", async ({ page }) => {
 });
 
 /**
- * The heartbeat for a player who cannot hear it. The ring, the pulse and the
- * red edge are what the comfort setting turns down, so with the sound off and
+ * The heartbeat for a player who cannot hear it. The pulse and the red edge
+ * are what the comfort setting turns down (and, until the beat went, the ring
+ * a press was timed against), so with the sound off and
  * 번쩍임·흔들림 줄이기 on there was no instrument left at all. Two things stay
  * whatever is turned down: the number beside the gauge, and the gauge's ticks,
  * lit by how fast the pulse is.
