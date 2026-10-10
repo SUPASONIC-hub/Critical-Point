@@ -41,38 +41,33 @@ const open = (seed = "staged") => reduceWindow(createWindow({ seed }), { type: "
 const HOT_GAUGE = 30;
 assert.ok(getMultiplier(HOT_GAUGE) >= HOT_CASH_MULTIPLIER);
 
-test("without the beat, a push is a push: its grade is not read, and a miss costs no clock", () => {
+test("a push is a push at every step: nothing it is sent with is read, and it costs no clock", () => {
   const ungraded = reduceWindow(open(), { type: "PUSH" });
-  for (const grade of ["perfect", "good", "miss", null]) {
-    const pushed = reduceWindow(open(), { type: "PUSH", grade }, step("prologue01"));
-    assert.deepEqual(pushed, ungraded, `${grade}: exactly the ungraded push`);
-    assert.deepEqual([pushed.beatCombo, pushed.groove, pushed.beatHits, pushed.perfects, pushed.slips, pushed.lastGrade, pushed.elapsed], [0, 0, 0, 0, 0, null, 0]);
+  for (const caseId of ["prologue01", "prologue02", "prologue05"]) {
+    for (const grade of ["perfect", "good", "miss", null]) {
+      const pushed = reduceWindow(open(), { type: "PUSH", grade }, step(caseId));
+      assert.deepEqual(pushed, ungraded, `${caseId}, ${grade}: exactly the push`);
+      assert.equal(pushed.elapsed, 0);
+    }
   }
-  // With the beat the same presses are graded, as they always were.
-  const beat = step("prologue02");
-  assert.equal(reduceWindow(open(), { type: "PUSH", grade: "perfect" }, beat).beatCombo, 1);
-  assert.ok(reduceWindow(open(), { type: "PUSH", grade: "miss" }, beat).elapsed > 0, "and a slip is paid in clock");
-  assert.deepEqual(reduceWindow(open(), { type: "PUSH", grade: "good" }, beat), reduceWindow(open(), { type: "PUSH", grade: "good" }));
 });
 
 test("a LOCK press before LOCK, and a stance change before the stances, leave the window as it was", () => {
   for (const caseId of ["prologue01", "prologue02", "prologue03"]) {
     const rules = step(caseId);
     const window = open();
-    for (const grade of ["perfect", "good", "miss", null]) {
-      assert.equal(reduceWindow(window, { type: "FOCUS", grade }, rules), window, `${caseId}: FOCUS ${grade} is ignored`);
-    }
+    assert.equal(reduceWindow(window, { type: "FOCUS" }, rules), window, `${caseId}: FOCUS is ignored`);
     for (const mode of ["steady", "expose", "strike"]) {
       assert.equal(reduceWindow(window, { type: "SET_FOCUS_MODE", mode }, rules), window, `${caseId}: ${mode} is ignored`);
     }
   }
   // 프롤로그 04 has LOCK, in STRIKE: the press charges, the stance does not move.
   const four = step("prologue04");
-  const locked = reduceWindow(open(), { type: "FOCUS", grade: "perfect" }, four);
+  const locked = reduceWindow(open(), { type: "FOCUS" }, four);
   assert.ok(locked.focus > 0 && locked.focusMode === "strike");
-  assert.deepEqual(locked, reduceWindow(open(), { type: "FOCUS", grade: "perfect" }), "exactly the STRIKE lock");
+  assert.deepEqual(locked, reduceWindow(open(), { type: "FOCUS" }), "exactly the STRIKE lock");
   assert.equal(reduceWindow(locked, { type: "SET_FOCUS_MODE", mode: "steady" }, four), locked, "and its charge is not thrown away by a stance it cannot take");
-  assert.ok(reduceWindow(open(), { type: "FOCUS", grade: "miss" }, four).gauge > open().gauge, "a missed lock still heats");
+  assert.equal(locked.elapsed, open().elapsed + 1.5, "and the press costs its clock");
   // 프롤로그 05 has the choice.
   assert.equal(reduceWindow(open(), { type: "SET_FOCUS_MODE", mode: "steady" }, step("prologue05")).focusMode, "steady");
 });
@@ -247,14 +242,15 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
 
   // The next window is settled under the step: what it newly produces follows
   // the step, what the run held is still held.
+  // A window from that build, with a groove earned on the beat; the card has no type, so no streak moves.
   const cashed = { status: "cashed", cause: "cash", gauge: HOT_GAUGE, wall: 80, pushes: 0, seed: "after", groove: 5, beatCombo: 9, maxCombo: 9, beatHits: 2 };
   const { verdict, nextRun } = resolveWindow({ run: drafted, window: cashed, card: staked, ...getSettlementRules({ caseId: state.currentCase, run: drafted, caseClosed: false }, true) });
   assert.deepEqual(nextRun.relics, drafted.relics);
   assert.deepEqual(nextRun.stanceMastery, drafted.stanceMastery);
   assert.equal(nextRun.vault, drafted.vault);
   assert.equal(nextRun.grooveVault, drafted.grooveVault);
-  assert.ok(verdict.tempo.groovePot > 0, "프롤로그 03 has the beat, so the groove is paid");
-  assert.equal(nextRun.beatCombo, 9);
+  assert.deepEqual([verdict.logic.bonus, verdict.logic.pot > 0], [1.15, true], "프롤로그 03 has the streak's rule, so the groove that window held is paid as it was shown");
+  assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [drafted.beatCombo, drafted.bestCombo], "and the combo the run held is written back as it was");
   assert.equal(nextRun.streak, 0, "the chain it was holding is not counted before OVERCLOCK");
   assert.deepEqual(nextRun.schema.mutations, ["coldFeet"], "and the next board is dealt from the step's rules alone");
   for (const id of nextRun.schema.mutations) assert.ok(rules.has(MUTATION_RULES[id]));

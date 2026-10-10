@@ -111,13 +111,13 @@
 :root[data-calm-effects] .gx-fx-bust .gx-fx-vignette {
   opacity: 0.4;
 }
-:root[data-calm-effects] .gauntlet-stage :not(.gx-grade, .gx-plate *, .gx-equip-toast),
+:root[data-calm-effects] .gauntlet-stage :not(.gx-plate *, .gx-equip-toast),
 :root[data-calm-effects] .gauntlet-stage ::before,
 :root[data-calm-effects] .gauntlet-stage ::after,
 :root[data-calm-effects] .gx-reveal-unlock {
   animation: none;
 }
-:root[data-calm-effects] :is(.gx-grade, .gx-equip-toast) {
+:root[data-calm-effects] .gx-equip-toast {
   animation-name: gx-relic-fade;
 }
 

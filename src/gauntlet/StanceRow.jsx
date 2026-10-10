@@ -2,7 +2,7 @@ import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntle
 
 // The stance profiles are written for the engine; the table speaks Korean.
 const FOCUS_MODE_COPY = {
-  strike: "판돈 배율 크게 · 헛박자 가혹",
+  strike: "판돈 배율 크게 · 차지가 빠르다",
   steady: "보상 작게 · 락마다 테이블 냉각",
   expose: "카드의 자원 효과 증폭",
 };

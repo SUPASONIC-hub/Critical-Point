@@ -1,6 +1,10 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
+import { CASE_RESULT_NODES } from "../src/gameCases.js";
+import { nodeOrders, nodes } from "../src/gameData.js";
+import { getLogicType } from "../src/gauntlet/logicStreak.js";
+import { easyCognitionLabels } from "../src/playerLanguage.js";
+import { clickElement, dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
@@ -41,90 +45,129 @@ async function pushUntilBust(page) {
 }
 
 /**
- * Presses push from inside the page at a chosen point of the beat the frame
- * loop is drawing: "on" the frame a beat lands, "off" halfway to the next one.
- * Reading the phase and clicking in the same frame is what makes the grade
- * deterministic; a click sent from the test runner lands whenever it lands.
+ * Four scenes of 사건 01 in a row, read off the graph: one type of card is on
+ * the table in each of the first three (the card to hold the type with), and
+ * in the fourth it is there beside a card of another type. The cards are
+ * found by their words, not their place: the hand is dealt shuffled.
  */
-async function pushAtBeat(page, where) {
-  return page.evaluate(
-    (mode) =>
-      new Promise((resolve) => {
-        // The FX loop writes its variables on the stage, not the document.
-        const root = document.querySelector("[data-testid='gauntlet-stage']");
-        const button = document.querySelector("[data-testid='commit-push']");
-        const started = performance.now();
-        // The FX loop has to be observably running before any of its variables
-        // can be trusted: `--gx-beat-live` is written each frame and left
-        // standing when the loop stops, so a single read of "1" is also what a
-        // stopped heartbeat looks like. Two differing phases prove it is ticking.
-        let framesSeen = 0;
-        let lastPhase = Number.NaN;
-        const check = () => {
-          const style = getComputedStyle(root);
-          const beating = style.getPropertyValue("--gx-beat-live").trim() === "1";
-          const phase = Number(style.getPropertyValue("--gx-beat-phase"));
-          const inZone = style.getPropertyValue("--gx-beat-zone").trim() === "1";
-          if (phase !== lastPhase) {
-            framesSeen += 1;
-            lastPhase = phase;
-          }
-          const live = beating && framesSeen >= 2;
-          // `--gx-beat-zone` is the app's own answer to "would a press land in
-          // the GOOD window right now", computed from the clock it grades with.
-          // This used to aim at `phase <= 0.02` instead, which is not the same
-          // target: phase clamps at 1 rather than wrapping, so it only sits
-          // that low for the first 2% of a period -- about 12ms of a 600ms beat,
-          // which is shorter than the 16.7ms frame this callback runs on. The
-          // window was therefore routinely stepped straight over on a loaded
-          // runner, and the reading that did catch it could already be a frame
-          // stale by the time the click was dispatched. The GOOD window is
-          // +/-18% of the period with a 60ms floor, so a frame of drift stays
-          // inside it.
-          const ready = live && (mode === "on" ? inZone : !inZone && phase >= 0.45 && phase <= 0.55);
-          if (ready) {
-            button.click();
-            resolve(true);
-          } else if (performance.now() - started > 8000) {
-            resolve(false);
-          } else {
-            requestAnimationFrame(check);
-          }
-        };
-        requestAnimationFrame(check);
-      }),
-    where,
-  );
+function findStreakWalk(caseId = "case01") {
+  const results = new Set(Object.values(CASE_RESULT_NODES));
+  const playable = (node) => (node?.choices ?? []).filter((choice) => choice.type !== "reframe" && !choice.requiredAuthority);
+  for (const startId of nodeOrders[caseId]) {
+    for (const type of Object.keys(easyCognitionLabels)) {
+      const held = [];
+      let nodeId = startId;
+      while (held.length < 3) {
+        const card = playable(nodes[nodeId]).find((choice) => getLogicType(choice) === type && !results.has(choice.next) && nodes[choice.next]?.caseId === caseId);
+        if (!card) break;
+        held.push({ nodeId, label: card.label });
+        nodeId = card.next;
+      }
+      const last = playable(nodes[nodeId]);
+      const same = last.find((choice) => getLogicType(choice) === type);
+      const other = last.find((choice) => getLogicType(choice) !== type);
+      if (held.length === 3 && same && other) return { caseId, type, held, last: { nodeId, same: same.label, other: other.label, otherType: getLogicType(other) } };
+    }
+  }
+  return null;
 }
 
-test("a push on the heartbeat builds a combo the pot pays for, and a slip breaks it", async ({ page }) => {
-  await openTable(page, "case01", "start");
-  await page.locator(".choices .choice").first().click();
-  const stage = page.getByTestId("gauntlet-stage");
+const cardOf = (page, label) => page.locator(".choices .choice").filter({ has: page.getByTestId("card-label").filter({ hasText: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`) }) });
+const clockOf = async (page) => Number(await page.locator(".gx-clock b").textContent());
 
-  expect(await pushAtBeat(page, "on")).toBe(true);
-  await expect(stage).toHaveAttribute("data-last-grade", /^(perfect|good)$/);
-  await expect(stage).toHaveAttribute("data-combo", "1");
-  expect(await pushAtBeat(page, "on")).toBe(true);
-  await expect(stage).toHaveAttribute("data-combo", "2");
-  await expect(page.getByTestId("gauntlet-combo")).toContainText("2");
-  await expect(page.getByTestId("gauntlet-groove")).toContainText("GROOVE");
-
-  expect(await pushAtBeat(page, "off")).toBe(true);
-  await expect(stage).toHaveAttribute("data-last-grade", "miss");
-  await expect(stage).toHaveAttribute("data-combo", "0");
-  await expect(stage).not.toHaveAttribute("data-groove", "0");
-  await expect(page.locator(".gx-grade-miss")).toContainText("SLIP");
-
+/** Pushes once (so no COLD FEET seals the next hand), cashes, and reads the reveal's line about the streak. */
+async function cashForStreak(page) {
+  await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
-  await expect(page.locator(".gx-reveal-groove")).toContainText("GROOVE");
-  await expect(page.getByTestId("consequence-ledger")).toContainText("박자 기록");
-  await page.getByTestId("decision-next").click();
-  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-  expect(saved.dynamics.beatCombo).toBe(0);
-  expect(saved.dynamics.bestCombo).toBe(2);
-  expect(saved.log.at(-1).threshold.tempo.hits).toBe(2);
-  expect(saved.log.at(-1).threshold.tempo.groovePot).toBeGreaterThan(0);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  return page.getByTestId("consequence-ledger").locator("article", { hasText: "논리 콤보" }).locator("b");
+}
+
+async function nextScene(page, nodeId) {
+  await clickElement(page.getByTestId("decision-next"), "next scene");
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId, { timeout: TRANSITION_TIMEOUT_MS }).toBe(nodeId);
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("commit-push")).toBeEnabled({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+test("three cards of one type in a row grow the logic streak and the pot shows what it pays; another type with no rise in pressure ends it; LOCK costs clock", async ({ page }) => {
+  test.setTimeout(180_000);
+  const walk = findStreakWalk();
+  expect(walk, "사건 01 still has four scenes in a row that deal one type").not.toBeNull();
+  const typeName = easyCognitionLabels[walk.type];
+  const line = page.getByTestId("gauntlet-logic");
+  const bonus = page.getByTestId("gauntlet-logic-bonus");
+  await openTable(page, walk.caseId, walk.held[0].nodeId);
+
+  // Before a card is staked: nothing held, nothing paid, and every card says its type.
+  await expect(line).toHaveAttribute("data-streak", "0");
+  await expect(line).toContainText("콤보 0");
+  await expect(bonus).toHaveCount(0);
+  const cards = page.locator(".choices .choice");
+  await expect(cards.getByTestId("card-type")).toHaveCount(await cards.count());
+  await expect(cardOf(page, walk.held[0].label)).toHaveAccessibleName(new RegExp(`유형 ${typeName}`));
+
+  // The first two build the hold: 1/3, 2/3. The pot is not paid for them yet.
+  for (const [index, scene] of walk.held.slice(0, 2).entries()) {
+    await cardOf(page, scene.label).click();
+    await expect(line).toHaveAttribute("data-move", "build");
+    await expect(line).toContainText(`${index + 1}/3`);
+    await expect(line).toContainText("쌓는 중");
+    await expect(bonus).toHaveCount(0);
+    await expect(await cashForStreak(page)).toContainText(`${typeName} ${index + 1}/3`);
+    await nextScene(page, walk.held[index + 1].nodeId);
+  }
+
+  // The third grows it: the card's tag is lit and says so, the HUD shows the streak it will leave, and the pot is paid on it.
+  const third = cardOf(page, walk.held[2].label);
+  await expect(third.getByTestId("card-type")).toHaveAttribute("data-move", "grow");
+  await expect(third.getByTestId("card-type")).toHaveClass(/is-on/);
+  await expect(third).toHaveAccessibleName(new RegExp(`유형 ${typeName} ?\\(콤보 이어 감\\)`));
+  await third.click();
+  await expect(line).toHaveAttribute("data-streak", "1");
+  await expect(line).toContainText("3/3");
+  await expect(line).toContainText("이어 감");
+  await expect(bonus).toHaveText("콤보 1.06");
+  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(new RegExp(`논리 콤보 1, 판돈 1\\.06배\\. ${typeName} 3/3\\. 이 카드로 이어 감`));
+  await expect(page.getByTestId("commit-confirm")).toHaveAccessibleDescription(/논리 콤보 1, 판돈 1\.06배/);
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}[을를] 이어 갔다\\. 논리 콤보 1, 판돈 ×1\\.06\\.$`));
+  await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.06");
+  let saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.logic).toMatchObject({ streak: 1, best: 1, type: walk.type, held: 3 });
+  expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "grow", streak: 1, bonus: 1.06 });
+  expect(saved.log.at(-1).threshold.logic.pot).toBeGreaterThan(0);
+  expect(saved.log.at(-1).tempoBonus.label).toBe("LOGIC STREAK");
+  expect(saved.log.at(-1).threshold.tempo, "no line is written for the beat").toBeUndefined();
+  await nextScene(page, walk.last.nodeId);
+
+  // The fourth scene: the held type would grow it again, another type ends it -- the last three closed cold, so nothing rose.
+  await expect(line).toHaveAttribute("data-streak", "1");
+  await expect(line).not.toContainText("전환 가능");
+  await expect(bonus).toHaveText("콤보 1.06");
+  await expect(cardOf(page, walk.last.same).getByTestId("card-type")).toHaveAttribute("data-move", "grow");
+  const other = cardOf(page, walk.last.other);
+  await expect(other.getByTestId("card-type")).toHaveAttribute("data-move", "break");
+  await expect(other.getByTestId("card-type")).not.toHaveClass(/is-on/);
+  await other.click();
+  await expect(line).toHaveAttribute("data-streak", "0");
+  await expect(line).toContainText("끊김");
+  await expect(bonus).toHaveCount(0);
+
+  // LOCK is a plain press: it charges, and the table's clock pays for it.
+  const lock = page.getByTestId("commit-focus");
+  await expect(lock.locator("small")).toHaveText("STRIKE 0 · −1.5초");
+  const before = await clockOf(page);
+  await lock.click();
+  await lock.click();
+  await expect(page.getByTestId("gauntlet-focus")).toContainText("STRIKE 37");
+  expect(await clockOf(page)).toBeLessThanOrEqual(before - 3);
+  await expect(page.locator(".gx-grade, .gx-beat-ring")).toHaveCount(0);
+
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^압박이 오르지 않았는데 ${easyCognitionLabels[walk.last.otherType]}(으)?로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
+  saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.dynamics.logic).toMatchObject({ streak: 0, best: 1, type: walk.last.otherType, held: 1 });
+  expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "break", streak: 0, bonus: 1, pot: 0 });
+  expect(saved.log.at(-1).threshold.focus.charge).toBe(37);
 });
 
 /** Closes case01 from its last scene with one push and a cash, and opens case02's first table. */
@@ -533,42 +576,11 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
-  // The grade a push earned is a label, not a movement: it stays up for its
-  // 0.7s. The blanket rule that cuts every animation short for reduced motion
-  // used to take it down in a hundredth of a millisecond, unread.
-  // A push is graded against a beat, and a table that has just opened has not
-  // sounded one yet: pressed then, the push earns no grade and no label. On a
-  // slow runner the press used to land in that gap. The beat's own marker says
-  // when there is one to be graded against.
-  const grade = await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        const stage = document.querySelector("[data-testid='gauntlet-stage']");
-        const started = performance.now();
-        let pressed = false;
-        const check = () => {
-          const label = document.querySelector(".gx-grade");
-          if (label) {
-            const style = getComputedStyle(label);
-            resolve({ text: label.textContent.trim(), animation: style.animationName, seconds: Number.parseFloat(style.animationDuration), opacity: Number(style.opacity) });
-            return;
-          }
-          if (performance.now() - started > 8000) {
-            resolve(null);
-            return;
-          }
-          if (!pressed && getComputedStyle(stage).getPropertyValue("--gx-beat-zone").trim() === "1") {
-            pressed = true;
-            document.querySelector("[data-testid='commit-push']").click();
-          }
-          requestAnimationFrame(check);
-        };
-        requestAnimationFrame(check);
-      }),
-  );
-  expect(grade, "a push is graded where the player can see it").not.toBeNull();
-  expect(grade.text).not.toBe("");
-  expect(grade).toMatchObject({ animation: "gx-grade-fade", seconds: 0.7, opacity: 1 });
+  // A push is a push: nothing rises off the button to say when it landed.
+  await page.getByTestId("commit-push").click();
+  await expect(page.locator(".gx-grade, .gx-beat-ring")).toHaveCount(0);
+  // The streak's line is words, not movement, and is there as it always is.
+  await expect(page.getByTestId("gauntlet-logic")).toBeVisible();
   for (let press = 0; press < 2; press += 1) await page.getByTestId("commit-push").click();
   await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-heat")))).toBeGreaterThan(0);
   const shake = await page.evaluate(() => getComputedStyle(document.querySelector("[data-testid='gauntlet-stage']")).getPropertyValue("--gx-shake-x").trim());
@@ -606,10 +618,10 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(page.locator(".gx-clock b")).toHaveText("45");
 
   // A card picked on the page opens the table with that card on it.
-  const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").textContent();
+  const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").first().textContent();
   await briefing.getByTestId("briefing-card").nth(1).click();
   await expect(briefing).toHaveCount(0);
-  await expect(page.locator(".choices .choice.selected .gx-card-label")).toHaveText(label);
+  await expect(page.locator(".choices .choice.selected").getByTestId("card-label")).toHaveText(label);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
 
   // Left alone, a page runs out and the table opens with nothing staked.
@@ -632,7 +644,8 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
  * that the attribute is on <html>, the rules win the cascade against the
  * table's own, and the frame loop is the one writing the variables.
  */
-const GRADE_FLASH = { perfect: 0.9, good: 0.45, miss: 0.6 };
+/** What a LOCK press flashes (GauntletStage's `focus`): the one flash a press still makes. */
+const LOCK_FLASH = 0.38;
 
 /** Every element and pseudo-element on the stage that is animating, by name. */
 function animatingOnStage(page) {
@@ -642,41 +655,14 @@ function animatingOnStage(page) {
       for (const pseudo of [null, "::before", "::after"]) {
         const name = getComputedStyle(element, pseudo).animationName;
         if (name === "none") continue;
-        found.push({ who: `${element.tagName.toLowerCase()}.${String(element.getAttribute("class") ?? "").split(/\s+/).join(".")}${pseudo ?? ""}`, name, exempt: !pseudo && (element.matches(".gx-grade, .gx-equip-toast") || Boolean(element.closest(".gx-plate"))) });
+        found.push({ who: `${element.tagName.toLowerCase()}.${String(element.getAttribute("class") ?? "").split(/\s+/).join(".")}${pseudo ?? ""}`, name, exempt: !pseudo && (element.matches(".gx-equip-toast") || Boolean(element.closest(".gx-plate"))) });
       }
     }
     return found;
   });
 }
 
-/** Presses 밀기 on a beat and returns the grade label it earned, as the page drew it. */
-function pushOnTheBeat(page) {
-  return page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        const stage = document.querySelector("[data-testid='gauntlet-stage']");
-        const started = performance.now();
-        let pressed = false;
-        const check = () => {
-          const label = document.querySelector(".gx-grade");
-          if (label) {
-            const style = getComputedStyle(label);
-            resolve({ grade: label.className.match(/gx-grade-(\w+)/)?.[1] ?? "", animation: style.animationName, seconds: Number.parseFloat(style.animationDuration), opacity: Number(style.opacity) });
-            return;
-          }
-          if (performance.now() - started > 8000) return resolve(null);
-          if (!pressed && getComputedStyle(stage.querySelector(".gx-push")).getPropertyValue("--gx-beat-zone").trim() === "1") {
-            pressed = true;
-            document.querySelector("[data-testid='commit-push']").click();
-          }
-          requestAnimationFrame(check);
-        };
-        requestAnimationFrame(check);
-      }),
-  );
-}
-
-test("calm effects still the stage on a real table: only the two fades animate, nothing shakes, and a flash is a third", async ({ page }) => {
+test("calm effects still the stage on a real table: only the toast's fade animates, nothing shakes, and a flash is a third", async ({ page }) => {
   // The table as it is without the setting, so the checks below are known to
   // be able to fail: a bust animates the stage (the heat wash, the two flashes,
   // the slam), and those are among the rules the setting has to beat.
@@ -692,7 +678,7 @@ test("calm effects still the stage on a real table: only the two fades animate, 
   await expect(page.locator("html")).toHaveAttribute("data-calm-effects", "");
   await page.locator(".choices .choice").first().click();
   await expect(page.locator(".gx-card.selected")).toBeVisible();
-  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt), { message: "nothing on a calm stage animates but the grade, the toast and the plate" }).toEqual([]);
+  await expect.poll(async () => (await animatingOnStage(page)).filter((entry) => !entry.exempt), { message: "nothing on a calm stage animates but the toast and the plate" }).toEqual([]);
 
   // The frame loop's variables, watched on the elements that read them for as
   // long as the table is played: the largest flash and the largest shake.
@@ -709,15 +695,18 @@ test("calm effects still the stage on a real table: only the two fades animate, 
     requestAnimationFrame(watch);
   });
 
-  // One of the two fades: the grade a push earned still fades out over its 0.7s.
-  const grade = await pushOnTheBeat(page);
-  expect(grade, "a push is graded where the player can see it").not.toBeNull();
-  expect(grade).toMatchObject({ animation: "gx-relic-fade", seconds: 0.7 });
-  expect(Object.keys(GRADE_FLASH)).toContain(grade.grade);
-  // That push flashed, at a third of what its grade flashes.
+  // The streak's line and the cards' types are text: the setting leaves them as they are.
+  const line = page.getByTestId("gauntlet-logic");
+  await expect(line).toBeVisible();
+  await expect(line).toContainText("콤보 0");
+  expect(await line.evaluate((element) => ({ animation: getComputedStyle(element).animationName, opacity: Number(getComputedStyle(element).opacity) }))).toEqual({ animation: "none", opacity: 1 });
+  await expect(page.locator(".choices .choice").first().getByTestId("card-type")).toBeVisible();
+  // A LOCK press flashes, at a third of what it flashes without the setting.
+  await page.getByTestId("commit-focus").click();
   await expect.poll(() => page.evaluate(() => window.__fxSeen.flash)).toBeGreaterThan(0);
-  const afterPush = await page.evaluate(() => ({ ...window.__fxSeen }));
-  expect(afterPush.flash, `a ${grade.grade} push flashes at a third of ${GRADE_FLASH[grade.grade]}`).toBeLessThanOrEqual(GRADE_FLASH[grade.grade] / 3 + 0.005);
+  const afterPress = await page.evaluate(() => ({ ...window.__fxSeen }));
+  expect(afterPress.flash, `a LOCK press flashes at a third of ${LOCK_FLASH}`).toBeLessThanOrEqual(LOCK_FLASH / 3 + 0.005);
+  await expect(page.locator(".gx-grade")).toHaveCount(0);
 
   await pushUntilBust(page);
   await expect(page.getByTestId("gauntlet-stage")).toHaveClass(/is-bust/);

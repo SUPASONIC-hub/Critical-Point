@@ -2,10 +2,10 @@ import { useEffect, useRef } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.js";
-import { objectParticle, subjectParticle, topicParticle } from "../playerLanguage.js";
+import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
-import { describeVerdictCause } from "../gauntlet/tableReadout.js";
+import { describeLogicMove, describeVerdictCause } from "../gauntlet/tableReadout.js";
 
 function formatMultiplier(value) {
   return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;
@@ -28,16 +28,12 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     : verdict.pushes === 0
       ? "너무 일찍 멈춘 대가로 다음 판의 큰 카드가 잠길 수 있다."
       : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
-  const tempo = verdict.tempo;
-  const beatLine = !tempo || tempo.hits + tempo.slips === 0
-    ? null
-    : busted
-      ? `박자 ${tempo.hits}회 · 헛박자 ${tempo.slips}회. 벽이 콤보 ${tempo.lostCombo}도 가져갔다.`
-      : `박자 ${tempo.hits}회(PERFECT ${tempo.perfects}) · 헛박자 ${tempo.slips}회. 콤보 ${tempo.combo}${subjectParticle(String(tempo.combo))} 다음 판으로 이어진다.`;
+  // What the card did to the logic streak; nothing where the streak is not in play.
+  const logicLine = describeLogicMove(verdict.logic);
   return [
     ["판정 원인", cause],
     ["열기 기록", heatLine],
-    ...(beatLine ? [["박자 기록", beatLine]] : []),
+    ...(logicLine ? [["논리 콤보", logicLine]] : []),
     ...(verdict.relicProcs?.length
       ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
       : []),
@@ -135,7 +131,7 @@ export function DecisionReveal({ view }) {
             ) : (
               <p className="gx-reveal-gain">
                 {verdict.chips} × {verdict.multiplier}
-                {verdict.tempo?.groovePot > 0 && <span className="gx-reveal-groove"> × GROOVE {verdict.tempo.bonus.toFixed(2)}</span>} ={" "}
+                {verdict.logic?.pot > 0 && <span> × 콤보 {verdict.logic.bonus.toFixed(2)}</span>} ={" "}
                 <b>+{formatNumber(verdict.pot)}</b>
               </p>
             )}

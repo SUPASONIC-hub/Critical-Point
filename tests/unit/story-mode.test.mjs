@@ -74,7 +74,7 @@ const story = normalizeRunState({ story: true });
 
 test("the rules a story run plays without are the seven next-table rules, and no other", () => {
   assert.deepEqual(sorted(STORY_OFF_RULES), SEVEN);
-  assert.deepEqual(sorted(STORY_RULES), ["beat", "lock", "relics", "stance"]);
+  assert.deepEqual(sorted(STORY_RULES), ["lock", "logic", "relics", "stance"]);
   assert.deepEqual(sorted([...STORY_RULES, ...STORY_OFF_RULES]), sorted(TABLE_RULES), "what is kept and what is taken are the whole table");
   // Every mutation the seven own is one a story board must not carry; the stances' are kept.
   for (const [mutation, rule] of Object.entries(MUTATION_RULES)) {
@@ -85,10 +85,10 @@ test("the rules a story run plays without are the seven next-table rules, and no
 test("a story run's rules are its case's own, less the seven: on every step, under NEW GAME+ and with the steps off", () => {
   const expected = {
     prologue01: [],
-    prologue02: ["beat"],
-    prologue03: ["beat"],
-    prologue04: ["beat", "lock"],
-    prologue05: ["beat", "lock", "relics", "stance"],
+    prologue02: ["logic"],
+    prologue03: ["logic"],
+    prologue04: ["lock", "logic"],
+    prologue05: ["lock", "logic", "relics", "stance"],
   };
   for (const caseId of PROLOGUES) {
     const base = rulesFor(caseId, { staged: true });
@@ -124,7 +124,7 @@ test("a story rule set is the same object every time it is asked for, and nothin
     const rules = getTableRules(caseId, run, staged);
     assert.equal(getTableRules(caseId, { ...run }, staged), rules, `${caseId}: so it can key a memo`);
     assert.throws(() => rules.add("blackout"), TypeError);
-    assert.throws(() => rules.delete("beat"), TypeError);
+    assert.throws(() => rules.delete("logic"), TypeError);
     assert.throws(() => rules.clear(), TypeError);
     assert.ok(Object.isFrozen(rules));
   }
@@ -138,11 +138,11 @@ test("a story run is introduced only to the rules it plays under", () => {
   const [one, two, three, four, five] = UNLOCK_LADDER;
   const told = (caseId) => introFor(caseId, { staged: true, story: true });
   assert.deepEqual(told("prologue01"), [...one.intro], "the table itself is explained as ever");
-  assert.deepEqual(told("prologue02"), [two.intro[0]], "the beat, and not the wall's three rules");
-  assert.match(told("prologue02")[0], /심박에 맞춰 밀면/);
+  assert.deepEqual(told("prologue02"), [two.intro[0]], "the logic streak, and not the wall's three rules");
+  assert.match(told("prologue02")[0], /논리 콤보/);
   assert.deepEqual(told("prologue03"), [], "COLD FEET and HEAT DEBT are both off, so there is nothing to say");
   assert.deepEqual(told("prologue04"), [four.intro[2]], "LOCK, and neither FRACTURE nor OVERCLOCK");
-  assert.match(told("prologue04")[0], /LOCK/);
+  assert.match(told("prologue04")[0], /LOCK을 누르면 .* 누를 때마다 시간이 줄어듭니다/);
   assert.deepEqual(told("prologue05"), [...five.intro], "the stances are kept");
   // No line a story run is told is new: each is one the step already says.
   for (const step of UNLOCK_LADDER) {
@@ -445,7 +445,7 @@ test("a setting changed in the middle of a case applies from the next case, and 
   assert.equal(harness.run.currentCase, "prologue02");
   assert.equal(harness.run.gauntletRun.story, true);
   assert.equal(harness.saved().dynamics.story, true);
-  assert.deepEqual(sorted(getTableRules("prologue02", harness.run.gauntletRun, true)), ["beat"]);
+  assert.deepEqual(sorted(getTableRules("prologue02", harness.run.gauntletRun, true)), ["logic"]);
   const far = wallOf();
   assert.ok(far >= 88);
   assert.deepEqual(harness.run.gauntletRun.schema, harness.saved().dynamics.schema);

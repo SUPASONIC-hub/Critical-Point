@@ -1,20 +1,18 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
 import { installBrowser } from "./helpers/browser.mjs";
-import { PIN, replayEngine } from "./helpers/engineReplay.mjs";
 
 /**
- * The logic streak, as a shadow.
+ * The logic streak.
  *
- * The streak is counted on every settled window, saved with the run and
- * written into the log and the case summary, and it pays nothing: the switch
- * (`LOGIC` in tableRules.js) is off. Everything the switch turns on is written
- * and is tested here by passing the switch as an argument, never by reading
- * the shipped constant -- so these tests say the same thing on the day it is
- * flipped. The one test that reads the constant says what the build ships.
+ * The streak is counted on every settled window, saved with the run, written
+ * into the log and the case summary, and paid: it is the hand's share of the
+ * pot, where the beat's groove was until 2026-10-10. For the five days before
+ * that it was counted as a shadow behind a switch (`LOGIC`) and paid nothing;
+ * the switch and the beat it switched to are gone, and what is left of the
+ * beat is what an older save or log still holds.
  */
 installBrowser();
 const { createElement } = await import("react");
@@ -22,16 +20,19 @@ const { renderToStaticMarkup } = await import("react-dom/server");
 const { parseCurrentSavedState, isSavedStateShapeValid, SAVE_SCHEMA_VERSION } = await import("../../src/appConfig.js");
 const { CASE_RESULT_NODES, CASE_SEQUENCE } = await import("../../src/gameCases.js");
 const { nodes } = await import("../../src/gameData.js");
-const { createCaseSummary, createLogicRecord, getRiskPressure, getSeasonLogic } = await import("../../src/gameLogic.js");
+const { createCaseSummary, createLogicRecord, getRiskPressure, getSeasonLogic, REFRAME_COGNITION } = await import("../../src/gameLogic.js");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  BASE_SCHEMA, carryTableRecordIntoRestore, createWindow, getFocusBonus, getHandBonus, HAND_CAP, normalizeRunState,
-  openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, STANCE_CHARGE, VERDICT_CAUSES,
+  BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, normalizeRunState,
+  openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, STANCE_CHARGE, suspendWindow, VERDICT_CAUSES,
 } = engine;
-const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
-const { HEAT_DEBT_GAUGE, LOCK_PRESS_SECONDS, LOGIC, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, SEAL_BREAK_GAUGE } = await import("../../src/gauntlet/tableRules.js");
+const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, listOfferedTypes, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
+const { getRelicUnlocks, RELICS } = await import("../../src/gauntlet/relics.js");
+const { describeCardMove, describeLogicLog, describeLogicMove, getTypeName, getTypeParts, readLogic } = await import("../../src/gauntlet/tableReadout.js");
+const { HEAT_DEBT_GAUGE, LOCK_PRESS_SECONDS, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, METRONOME_REACH, SEAL_BREAK_GAUGE } = await import("../../src/gauntlet/tableRules.js");
 const { ALL_RULES, rulesFor, STORY_RULES } = await import("../../src/gauntlet/tableUnlocks.js");
-const { addToRelicCodex, settleAgainstCodex } = await import("../../src/gauntlet/useRelicTable.js");
+const { addToRelicCodex, parseRelicCodex, settleAgainstCodex } = await import("../../src/gauntlet/useRelicTable.js");
+const { easyCognitionLabels } = await import("../../src/playerLanguage.js");
 const { resourceMeta } = await import("../../src/appCopy.js");
 const { initialRunState } = await import("../../src/state/runState.js");
 const { repairSavedState } = await import("../../src/state/savedState.js");
@@ -48,23 +49,34 @@ const COLD = 10;
 const WARM = SEAL_BREAK_GAUGE;
 const HOT = HEAT_DEBT_GAUGE;
 
+/** The five things a verdict's line says about the streak itself; what it paid is `bonus` and `pot`, beside them. */
+const move = ({ type, tier, rose, move: made, streak }) => ({ type, tier, rose, move: made, streak });
+/** The streak as the run holds it, less `reach`, which only METRONOME reads. */
+const six = ({ reach: _reach, ...logic }) => logic;
+
 /** Plays a string of settlements and hands back each verdict's line and the run after it. */
-function play(moves, { run = RUN_INITIAL_STATE, rules = ALL_RULES, logic = false } = {}) {
+function play(moves, { run = RUN_INITIAL_STATE, rules = ALL_RULES } = {}) {
   const lines = [];
-  for (const move of moves) {
-    const settled = resolveWindow({ run, window: move.window ?? closed(move.gauge ?? COLD), card: move.card, forced: move.forced, offered: move.offered, rules: move.rules ?? rules, logic });
-    lines.push(settled.verdict.logic);
+  const paid = [];
+  for (const played of moves) {
+    const settled = resolveWindow({ run, window: played.window ?? closed(played.gauge ?? COLD), card: played.card, forced: played.forced, offered: played.offered, rules: played.rules ?? rules });
+    lines.push(move(settled.verdict.logic));
+    paid.push(settled.verdict.logic);
     run = settled.nextRun;
   }
-  return { lines, run };
+  return { lines, paid, run };
 }
 
-test("the build ships the streak as a shadow", () => {
-  assert.equal(LOGIC, false, "the pot still reads the beat; day 6 flips this with the stage");
-  assert.deepEqual(RUN_INITIAL_STATE.logic, { streak: 0, best: 0, type: null, held: 0, heat: 0, rose: false });
+test("the build ships the streak, and it is what the hand is paid on", () => {
+  assert.deepEqual(RUN_INITIAL_STATE.logic, { streak: 0, best: 0, type: null, held: 0, heat: 0, rose: false, reach: 0 });
   assert.equal(RUN_INITIAL_STATE.logic, LOGIC_INITIAL);
   assert.ok(Object.isFrozen(LOGIC_INITIAL));
-  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS], [0.0625, 0.5, 3, 1.5]);
+  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS, METRONOME_REACH], [0.0625, 0.5, 3, 1.5, 2]);
+  const tableRules = readFileSync(new URL("../../src/gauntlet/tableRules.js", import.meta.url), "utf8");
+  assert.equal(/export const LOGIC\b/.test(tableRules), false, "the switch went with the beat it switched to");
+  for (const gone of ["judgeBeat", "scoreBeat", "getGoodWindowMs", "getGrooveBonus", "SLIP_SECONDS", "FEVER_BONUS", "COMBO_POINT_CAP", "GROOVE_CAP"]) {
+    assert.equal(gone in engine, false, `the engine no longer exports ${gone}`);
+  }
 });
 
 test("a card's type is the largest key of its cognition, and the wild card is 판 바꾸기", () => {
@@ -82,6 +94,21 @@ test("a card's type is the largest key of its cognition, and the wild card is �
   assert.deepEqual(untyped.map((choice) => choice.id), []);
 });
 
+test("every card in the built graph has a tag to print: one of the four plain names, and the wild card's is 판 바꾸기", () => {
+  const names = Object.values(easyCognitionLabels);
+  assert.deepEqual(names, ["끝까지 버티기", "꼼꼼히 확인하기", "판 바꾸기", "위험 다루기"]);
+  const cards = Object.values(nodes).flatMap((node) => node.choices ?? []);
+  assert.ok(cards.length > 3000, "the whole season's hand");
+  const untagged = cards.filter((choice) => !names.includes(getTypeName(getLogicType(choice))));
+  assert.deepEqual(untagged.map((choice) => choice.id), [], "no card without a tag");
+  const wild = cards.filter((choice) => choice.type === "reframe");
+  assert.ok(wild.length > 0);
+  for (const choice of wild) assert.equal(getTypeName(getLogicType(choice)), "판 바꾸기", choice.id);
+  // The commit scores the wild card with this map, and its largest key is the same type.
+  assert.equal(getLogicType({ cognition: REFRAME_COGNITION }), "reframing");
+  assert.equal(getTypeName("nothing"), "");
+});
+
 test("the heat a window closed in is a tier: under 30, from 30, from 60, and a bust", () => {
   assert.deepEqual([SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE], [30, 60], "the engine's own two lines");
   assert.deepEqual([0, 29.99, 30, 59.99, 60, 100].map((gauge) => getHeatTier("cash", gauge)), [0, 0, 1, 1, 2, 2]);
@@ -93,7 +120,7 @@ test("the first card builds, a held type grows the streak from the third window"
   assert.deepEqual(lines.map((line) => line.move), ["build", "build", "grow", "grow"]);
   assert.deepEqual(lines.map((line) => line.streak), [0, 0, 1, 2]);
   assert.deepEqual(lines.map((line) => line.type), ["risk", "risk", "risk", "risk"]);
-  assert.deepEqual(run.logic, { streak: 2, best: 2, type: "risk", held: 4, heat: 0, rose: false });
+  assert.deepEqual(six(run.logic), { streak: 2, best: 2, type: "risk", held: 4, heat: 0, rose: false });
 });
 
 test("changing type when the pressure rose is a switch: the streak grows and the hold starts again", () => {
@@ -101,7 +128,7 @@ test("changing type when the pressure rose is a switch: the streak grows and the
   const { lines, run } = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk"), gauge: WARM }, { card: card("inference"), gauge: WARM }]);
   assert.deepEqual(lines.map((line) => line.rose), [false, false, false, true], "`rose` is what the window was played under");
   assert.deepEqual(lines.at(-1), { type: "inference", tier: 1, rose: true, move: "switch", streak: 2 });
-  assert.deepEqual(run.logic, { streak: 2, best: 2, type: "inference", held: 1, heat: 1, rose: false });
+  assert.deepEqual(six(run.logic), { streak: 2, best: 2, type: "inference", held: 1, heat: 1, rose: false });
   // Holding through the same rise grows it as any held window does.
   const held = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk"), gauge: WARM }, { card: card("risk"), gauge: WARM }]);
   assert.deepEqual(held.lines.at(-1), { type: "risk", tier: 1, rose: true, move: "grow", streak: 2 });
@@ -112,10 +139,10 @@ test("changing type because the held one was not on the table keeps the streak; 
   assert.equal(grown.logic.streak, 2);
   const kept = play([{ card: card("inference"), offered: ["inference", "persistence"] }], { run: grown });
   assert.deepEqual(kept.lines[0], { type: "inference", tier: 0, rose: false, move: "keep", streak: 2 });
-  assert.deepEqual(kept.run.logic, { streak: 2, best: 2, type: "inference", held: 1, heat: 0, rose: false });
+  assert.deepEqual(six(kept.run.logic), { streak: 2, best: 2, type: "inference", held: 1, heat: 0, rose: false });
   const broken = play([{ card: card("inference"), offered: ["inference", "risk"] }], { run: grown });
   assert.deepEqual(broken.lines[0], { type: "inference", tier: 0, rose: false, move: "break", streak: 0 });
-  assert.deepEqual(broken.run.logic, { streak: 0, best: 2, type: "inference", held: 1, heat: 0, rose: false });
+  assert.deepEqual(six(broken.run.logic), { streak: 0, best: 2, type: "inference", held: 1, heat: 0, rose: false });
   // A caller that does not say what was on the table cannot claim the type was missing.
   assert.equal(play([{ card: card("inference") }], { run: grown }).lines[0].move, "break");
   // When the pressure rose the change is a switch whatever was on the table.
@@ -127,14 +154,89 @@ test("a bust ends the streak, and the hold follows the card that was played", ()
   const grown = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }]).run;
   const bust = play([{ card: card("risk"), window: closed(70, "bust") }], { run: grown });
   assert.deepEqual(bust.lines[0], { type: "risk", tier: 3, rose: false, move: "bust", streak: 0 });
-  assert.deepEqual(bust.run.logic, { streak: 0, best: 1, type: "risk", held: 4, heat: 3, rose: true });
+  assert.deepEqual(six(bust.run.logic), { streak: 0, best: 1, type: "risk", held: 4, heat: 3, rose: true });
   const other = play([{ card: card("inference"), window: closed(70, "bust") }], { run: grown });
-  assert.deepEqual(other.run.logic, { streak: 0, best: 1, type: "inference", held: 1, heat: 3, rose: true });
-  // 앙코르 does not hold it yet: the relic is given that meaning on day 6, through `bustHolds`.
-  const encore = play([{ card: card("risk"), window: closed(70, "bust") }], { run: { ...grown, relics: ["encore"] } });
-  assert.equal(encore.lines[0].streak, 0);
-  const seam = advanceLogic(grown.logic, { type: "risk", tier: 3, bustHolds: true });
-  assert.deepEqual([seam.move, seam.logic.streak], ["bust", 1], "the seam: a bust that is held leaves the streak standing");
+  assert.deepEqual(six(other.run.logic), { streak: 0, best: 1, type: "inference", held: 1, heat: 3, rose: true });
+  const held = advanceLogic(grown.logic, { type: "risk", tier: 3, bustHolds: true });
+  assert.deepEqual([held.move, held.logic.streak], ["bust", 1], "a bust that is held (앙코르) leaves the streak standing");
+});
+
+test("앙코르 holds the streak through a bust, every bust, and nothing else", () => {
+  assert.equal(RELICS.encore.text, "BUST가 판돈은 가져가도 논리 콤보는 남겨 둔다.");
+  assert.equal(RELICS.encore.unlock.text, "논리 콤보 8 달성");
+  const grown = play(Array.from({ length: 6 }, () => ({ card: card("risk") }))).run;
+  assert.equal(grown.logic.streak, 4);
+  const holding = { ...grown, relics: ["encore"], runPot: 1200 };
+  const bust = resolveWindow({ run: holding, window: closed(70, "bust"), card: card("risk") });
+  assert.deepEqual([bust.verdict.logic.move, bust.verdict.logic.streak, bust.nextRun.logic.streak], ["bust", 4, 4]);
+  assert.equal(bust.nextRun.runPot, 0, "the pot is still the wall's");
+  assert.deepEqual(bust.verdict.relicProcs, ["encore"]);
+  // No limit a case, which is the limit it had over the beat's combo: the second and the third are held too.
+  let run = bust.nextRun;
+  for (const window of [closed(40, "bust"), closed(50, "bust", { cause: "timeout", selectedId: null })]) {
+    const again = resolveWindow({ run, window, card: card("inference"), forced: window.cause === "timeout" });
+    assert.equal(again.nextRun.logic.streak, 4);
+    assert.ok(again.verdict.relicProcs.includes("encore"));
+    run = again.nextRun;
+  }
+  // The streak it kept is paid on the next cash, and grows from where it stood.
+  const next = resolveWindow({ run: bust.nextRun, window: closed(COLD), card: card("risk") });
+  assert.deepEqual([next.verdict.logic.move, next.verdict.logic.streak, next.verdict.logic.bonus], ["grow", 5, 1.31]);
+  // It is not a way to change type for free, and with no streak to hold it does not say it held one.
+  assert.equal(play([{ card: card("inference"), offered: ["risk", "inference"] }], { run: holding }).run.logic.streak, 0);
+  assert.deepEqual(resolveWindow({ run: normalizeRunState({ relics: ["encore"] }), window: closed(70, "bust"), card: card("risk") }).verdict.relicProcs, []);
+  // Without the relic the same bust takes it.
+  assert.equal(resolveWindow({ run: grown, window: closed(70, "bust"), card: card("risk") }).nextRun.logic.streak, 0);
+  // In a case that does not have the rule the streak is not in play, and the relic has nothing to say.
+  const off = resolveWindow({ run: holding, window: closed(70, "bust"), card: card("risk"), rules: step("prologue01") });
+  assert.deepEqual([off.verdict.logic.move, off.nextRun.logic.streak, off.verdict.relicProcs], ["none", 4, []]);
+});
+
+test("앙코르 is unlocked by a logic streak of 8, and a codex that already holds it keeps it", () => {
+  const unlocks = (verdict, nextRun = {}) => getRelicUnlocks({ verdict, nextRun }, []);
+  assert.deepEqual(unlocks({ outcome: "cash", logic: { streak: 7 }, nextMutations: [] }, { logic: { best: 7 } }), []);
+  assert.deepEqual(unlocks({ outcome: "cash", logic: { streak: 8 }, nextMutations: [] }), ["encore"]);
+  // The codex is a list of ids under its own key, so what a player unlocked on the beat is still theirs.
+  const saved = JSON.stringify({ unlocked: ["encore", "metronome", "insurance", "gone-relic"] });
+  assert.deepEqual(parseRelicCodex(saved), { unlocked: ["encore", "metronome", "insurance"] });
+  assert.deepEqual(addToRelicCodex(parseRelicCodex(saved), ["encore"]), parseRelicCodex(saved), "and proving it again adds nothing");
+});
+
+test("메트로놈: after the pressure rose, a change of type counts as a switch on that scene and on the next", () => {
+  assert.equal(RELICS.metronome.text, "압박이 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.");
+  assert.equal(RELICS.metronome.proc, "전환을 붙잡았다");
+  assert.equal(RELICS.metronome.unlock, null, "still in the pool every season can draft from");
+  const offered = ["risk", "inference", "persistence"];
+  // Three cold windows build a streak of 1, then a warm close: the pressure has risen.
+  const risen = (relics) => play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }, { card: card("risk"), gauge: WARM }], { run: normalizeRunState({ relics }) }).run;
+  const bare = risen([]);
+  const held = risen(["metronome"]);
+  assert.deepEqual([bare.logic.rose, bare.logic.reach, bare.logic.streak], [true, METRONOME_REACH, 2]);
+  // The scene the pressure rose into: a switch for anyone.
+  for (const run of [bare, held]) {
+    const now = resolveWindow({ run, window: closed(WARM), card: card("inference"), offered });
+    assert.deepEqual([now.verdict.logic.move, now.verdict.logic.streak], ["switch", 3]);
+    assert.deepEqual(now.verdict.relicProcs, [], "nothing the relic did");
+  }
+  // The scene after it, with the type held through the first: a break without the relic, a switch with it.
+  const after = (run) => resolveWindow({ run: resolveWindow({ run, window: closed(WARM), card: card("risk"), offered }).nextRun, window: closed(WARM), card: card("inference"), offered });
+  assert.deepEqual([after(bare).verdict.logic.move, after(bare).nextRun.logic.streak], ["break", 0]);
+  const caught = after(held);
+  assert.deepEqual([caught.verdict.logic.move, caught.verdict.logic.streak, caught.verdict.logic.rose], ["switch", 4, false]);
+  assert.deepEqual(caught.verdict.relicProcs, ["metronome"], "and the reveal says the relic caught it");
+  // Both scenes can be switched on, one after the other.
+  const twice = resolveWindow({ run: resolveWindow({ run: held, window: closed(WARM), card: card("inference"), offered }).nextRun, window: closed(WARM), card: card("persistence"), offered });
+  assert.deepEqual([twice.verdict.logic.move, twice.verdict.logic.streak], ["switch", 4]);
+  // And the third scene is past it.
+  let run = held;
+  for (let index = 0; index < 2; index += 1) run = resolveWindow({ run, window: closed(WARM), card: card("risk"), offered }).nextRun;
+  assert.equal(run.logic.reach, 0);
+  assert.equal(resolveWindow({ run, window: closed(WARM), card: card("inference"), offered }).verdict.logic.move, "break");
+  // A rise inside the allowance starts it again.
+  const again = advanceLogic({ ...LOGIC_INITIAL, heat: 0, rose: false, reach: 1 }, { type: "risk", tier: 2 });
+  assert.deepEqual([again.logic.rose, again.logic.reach], [true, METRONOME_REACH]);
+  // A save from before the relic's new meaning reads as no allowance left.
+  assert.equal(normalizeLogic({ streak: 3, rose: true }).reach, 0);
 });
 
 test("a window run out with nothing staked is a bust like any other, and the room's card is not the hand's pick", () => {
@@ -143,14 +245,14 @@ test("a window run out with nothing staked is a bust like any other, and the roo
   const timeout = closed(50, "bust", { cause: "timeout", selectedId: null });
   const forced = play([{ card: card("inference"), forced: true, window: timeout }], { run: grown });
   assert.deepEqual(forced.lines[0], { type: null, tier: 3, rose: false, move: "bust", streak: 0 }, "letting the clock run out does not spare the streak");
-  assert.deepEqual(forced.run.logic, { ...grown.logic, streak: 0, heat: 3, rose: true }, "and what the hand was holding is left as it was");
+  assert.deepEqual(forced.run.logic, { ...grown.logic, streak: 0, heat: 3, rose: true, reach: METRONOME_REACH }, "and what the hand was holding is left as it was");
   // So the hand picks up its hold where it left it: the next card of its type grows at once.
   assert.deepEqual(play([{ card: card("risk") }], { run: forced.run }).lines[0], { type: "risk", tier: 0, rose: true, move: "grow", streak: 1 });
   // The same for a bust with no card at all, and for a hand that had not picked anything yet.
   assert.deepEqual(play([{ card: undefined, window: timeout }], { run: grown }).run.logic, forced.run.logic);
   const first = play([{ card: card("risk"), forced: true, window: timeout }]);
   assert.deepEqual([first.lines[0].move, first.run.logic.type, first.run.logic.held], ["bust", null, 0]);
-  // 앙코르's seam spares the streak on this bust as on any.
+  // 앙코르 spares the streak on this bust as on any.
   const held = advanceLogic(grown.logic, { type: null, tier: 3, bustHolds: true });
   assert.deepEqual([held.move, held.logic.streak, held.logic.held], ["bust", 2, 4]);
   // The room only ever plays a card on a bust. A window settled with no pick and no bust -- nothing
@@ -167,13 +269,15 @@ test("the wild card is played as 판 바꾸기", () => {
 });
 
 test("in a case that does not have the rule yet the streak is neither added to nor taken", () => {
-  assert.equal(step("prologue01").has("beat"), false, "프롤로그 01 is before the step the streak lives on");
-  assert.equal(step("prologue02").has("beat"), true);
+  assert.equal(step("prologue01").has("logic"), false, "프롤로그 01 is before the step the streak lives on");
+  assert.equal(step("prologue02").has("logic"), true);
+  assert.equal(ALL_RULES.has("beat"), false, "the rule was the beat's until 2026-10-10 and is named for the streak now");
   const grown = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }]).run;
   const off = play([{ card: card("inference") }, { card: card("risk"), window: closed(70, "bust") }, { card: card("risk"), gauge: HOT }], { run: grown, rules: step("prologue01") });
   assert.deepEqual(off.lines.map((line) => [line.type, line.move, line.streak]), [[null, "none", 1], [null, "none", 1], [null, "none", 1]]);
   assert.deepEqual(off.lines.map((line) => line.tier), [0, 3, 2], "the heat is the table's and is read under any rules");
-  assert.deepEqual(off.run.logic, { ...grown.logic, heat: 2, rose: false });
+  assert.deepEqual(six(off.run.logic), { ...six(grown.logic), heat: 2, rose: false });
+  assert.deepEqual(off.paid.map((line) => [line.bonus, line.pot]), [[1, 0], [1, 0], [1, 0]], "and it pays nothing there, whatever the run carries in");
   // Story mode and every later step have the rule.
   for (const rules of [STORY_RULES, step("prologue02"), step("prologue04"), ALL_RULES]) {
     assert.equal(play([{ card: card("risk") }], { run: grown, rules }).lines[0].move, "grow");
@@ -195,12 +299,12 @@ test("the streak and the heat carry across a case boundary", () => {
   let run = openCaseRun(RUN_INITIAL_STATE, { rules: ALL_RULES });
   run = play([{ card: card("risk") }, { card: card("risk") }, { card: card("risk") }], { run }).run;
   const closing = resolveWindow({ run, window: closed(WARM), card: card("risk"), caseClosed: true });
-  assert.deepEqual(closing.verdict.logic, { type: "risk", tier: 1, rose: false, move: "grow", streak: 2 });
+  assert.deepEqual(move(closing.verdict.logic), { type: "risk", tier: 1, rose: false, move: "grow", streak: 2 });
   const next = openCaseRun(closing.nextRun, { rules: ALL_RULES });
-  assert.deepEqual(next.logic, { streak: 2, best: 2, type: "risk", held: 4, heat: 1, rose: true });
-  assert.equal(next.runPot, 0, "the pot is the case's; the streak is the season's, as the beat's combo is");
+  assert.deepEqual(six(next.logic), { streak: 2, best: 2, type: "risk", held: 4, heat: 1, rose: true });
+  assert.equal(next.runPot, 0, "the pot is the case's; the streak is the season's, as the beat's combo was");
   const first = resolveWindow({ run: next, window: closed(COLD), card: card("inference") });
-  assert.deepEqual(first.verdict.logic, { type: "inference", tier: 0, rose: true, move: "switch", streak: 3 });
+  assert.deepEqual(move(first.verdict.logic), { type: "inference", tier: 0, rose: true, move: "switch", streak: 3 });
   // A case abandoned and opened again, and a run written out and read back, hold it too.
   assert.deepEqual(openCaseRun(serializeRunState(run), { rules: step("prologue03") }).logic, run.logic);
   assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closing.nextRun)))).logic, closing.nextRun.logic);
@@ -236,21 +340,24 @@ test("a slot restored after a bust takes the streak and keeps the longest it has
   // No bust since the slot: the slot's streak stands, the record is the longest either saw.
   const clean = carryTableRecordIntoRestore(save(atSlot), save(grownOn)).dynamics;
   assert.deepEqual(clean.logic, { ...atSlot.logic, best: 4 });
-  // A bust since: the streak is gone, as the pot and the beat's combo are.
+  // A bust since: the streak is gone, as the pot is.
   const bust = play([{ card: card("risk"), window: closed(70, "bust") }], { run: grownOn }).run;
   const restored = carryTableRecordIntoRestore(save(atSlot), save(bust)).dynamics;
   assert.deepEqual(restored.logic, { ...atSlot.logic, streak: 0, best: 4 });
-  assert.equal(restored.beatCombo, 0);
+  // What the slot held of the beat is the slot's, and is written back as it was.
+  const beaten = normalizeRunState({ ...atSlot, beatCombo: 5, bestCombo: 9 });
+  const kept = carryTableRecordIntoRestore(save(beaten), save(bust)).dynamics;
+  assert.deepEqual([kept.beatCombo, kept.bestCombo], [5, 9]);
   // Another run's save, or one that is not ahead, is left alone.
   assert.deepEqual(carryTableRecordIntoRestore(save(atSlot), { ...save(bust), runId: "run-b" }).dynamics.logic, atSlot.logic);
 });
 
 test("a saved streak is read back whole, and anything else reads as none", () => {
-  const logic = { streak: 5, best: 9, type: "risk", held: 3, heat: 2, rose: true };
+  const logic = { streak: 5, best: 9, type: "risk", held: 3, heat: 2, rose: true, reach: 2 };
   assert.deepEqual(normalizeLogic(logic), logic);
   assert.deepEqual(normalizeRunState({ logic }).logic, logic);
   for (const none of [undefined, null, "streak", 7, []]) assert.deepEqual(normalizeLogic(none), LOGIC_INITIAL);
-  assert.deepEqual(normalizeLogic({ streak: -3, best: "x", type: 4, held: 2.9, heat: 9, rose: "yes" }), { streak: 0, best: 0, type: null, held: 2, heat: 3, rose: false });
+  assert.deepEqual(normalizeLogic({ streak: -3, best: "x", type: 4, held: 2.9, heat: 9, rose: "yes", reach: 7 }), { streak: 0, best: 0, type: null, held: 2, heat: 3, rose: false, reach: 2 });
 });
 
 /* ------------------------------------------------------------ old saves */
@@ -287,7 +394,7 @@ for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).s
 
 test("a save that carries a streak is not called repaired, with or without a replay in it", () => {
   const current = JSON.parse(readFileSync(new URL("v2-current.json", SAVES), "utf8")).save;
-  const logic = { streak: 4, best: 11, type: "persistence", held: 6, heat: 2, rose: true };
+  const logic = { streak: 4, best: 11, type: "persistence", held: 6, heat: 2, rose: true, reach: 2 };
   const run = normalizeRunState({ ...current.dynamics, logic });
   const saved = load({ ...current, dynamics: serializeRunState(run) });
   assert.equal(saved.repaired, false);
@@ -296,6 +403,48 @@ test("a save that carries a streak is not called repaired, with or without a rep
   const midReplay = load({ ...current, dynamics: JSON.parse(JSON.stringify(serializeRunState(replay))) });
   assert.equal(midReplay.repaired, false);
   assert.deepEqual(midReplay.state.dynamics.practice.logic, logic);
+  // A save written while the streak was a shadow (2026-10-10, before `reach`) is filled in, not repaired.
+  const { reach: _reach, ...shadow } = logic;
+  const older = load({ ...current, dynamics: { ...serializeRunState(run), logic: shadow } });
+  assert.equal(older.repaired, false);
+  assert.deepEqual(older.state.dynamics.logic, { ...shadow, reach: 0 });
+});
+
+test("a save with a window put down in the middle of a beat resumes with no repair, holds what it held, and is paid at least what it showed", () => {
+  const fixture = JSON.parse(readFileSync(new URL("v2-current.json", SAVES), "utf8")).save;
+  // As a build before 2026-10-10 wrote it: a combo carried, a groove earned in the window, a LOCK graded.
+  const beat = { beatCombo: 6, maxCombo: 7, groove: 12, beatHits: 5, perfects: 3, slips: 1 };
+  const window = { ...fixture.dynamics.suspended.window, ...beat, gauge: 33, pushes: 4, elapsed: 9, focus: 37, focusCombo: 2, maxFocusCombo: 2, focusHits: 2, focusPerfects: 1, focusMisses: 1 };
+  const dynamics = { ...fixture.dynamics, beatCombo: 6, bestCombo: 11, runGroove: 0, grooveVault: 260, suspended: { ...fixture.dynamics.suspended, window } };
+  const { state, repaired, valid } = load({ ...fixture, dynamics });
+  assert.deepEqual([valid, repaired], [true, false], "no 복구됨 notice");
+  assert.equal(state.lastError, undefined);
+  assert.deepEqual(state.dynamics.suspended, dynamics.suspended, "the window is written back as it was saved, the beat's counts among them");
+  for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault"]) assert.equal(state.dynamics[key], dynamics[key], key);
+
+  // Picked up: the window is live with its groove, and what the stage shows is what the settlement pays.
+  const run = normalizeRunState(state.dynamics);
+  const resumed = createWindow({ schema: run.schema, seed: run.suspended.seed, resume: run.suspended.window });
+  assert.deepEqual([resumed.status, resumed.groove, resumed.gauge, resumed.focus], ["live", 12, 33, 37]);
+  assert.equal(getHandBonus(resumed.groove, 0, "strike", 0), 1.36, "groove 12 was x1.36 on the beat");
+  const cashed = reduceWindow(resumed, { type: "CASH" });
+  const staked = card("risk");
+  const { verdict, nextRun } = resolveWindow({ run, window: cashed, card: staked, rules: step("prologue02") });
+  const base = Math.round(verdict.chips * verdict.multiplier);
+  assert.equal(verdict.logic.bonus, 1.36, "the streak is at none, so the groove is the larger and is paid");
+  assert.equal(verdict.pot, Math.round(verdict.chips * verdict.multiplier * 1.36), "what the window showed its player");
+  assert.ok(verdict.pot > base);
+  // 프롤로그 02 has no LOCK, so the charge is not settled there; on the whole table it is, on top and under the cap.
+  const whole = resolveWindow({ run, window: cashed, card: staked }).verdict;
+  assert.equal(whole.pot, Math.round(whole.chips * whole.multiplier * getHandBonus(12, 37, "strike", 0)));
+  assert.ok(whole.pot >= verdict.pot);
+  assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [6, 11], "the run's old combo is neither read nor rewritten");
+  // Put down again before it is cashed, it holds everything it held (and the clock scale a window now keeps).
+  const again = suspendWindow(resumed, run.windowIndex).window;
+  for (const [key, value] of Object.entries(run.suspended.window)) assert.equal(again[key], value, key);
+  // A streak that would pay more is what is paid.
+  const streaking = normalizeRunState({ ...run, logic: { ...LOGIC_INITIAL, type: "risk", held: 9, streak: 7, best: 7 } });
+  assert.equal(resolveWindow({ run: streaking, window: cashed, card: staked, rules: step("prologue02") }).verdict.logic.bonus, 1.5);
 });
 
 /* ------------------------------------------------------- the commit */
@@ -347,10 +496,14 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   commit(context, picked, cashed("commit-grow"));
   const [patch] = did.patches;
   const entry = patch.log[0];
-  assert.deepEqual(entry.threshold.logic, { type, tier: 1, rose: false, move: "grow", streak: 4 });
+  assert.deepEqual(move(entry.threshold.logic), { type, tier: 1, rose: false, move: "grow", streak: 4 });
+  assert.deepEqual([entry.threshold.logic.held, entry.threshold.logic.bonus], [3, 1.25], "with the hold it reached and what it paid");
+  assert.equal(entry.threshold.logic.pot, entry.threshold.pot - Math.round(patch.decisionReveal.verdict.chips * patch.decisionReveal.verdict.multiplier));
   assert.deepEqual(entry.threshold.logic, patch.decisionReveal.verdict.logic);
-  assert.deepEqual(patch.gauntletRun.logic, { streak: 4, best: 4, type, held: 3, heat: 1, rose: true });
-  assert.equal(entry.threshold.tempo.groove, 0, "and everything the entry held before is still on it");
+  assert.deepEqual(six(patch.gauntletRun.logic), { streak: 4, best: 4, type, held: 3, heat: 1, rose: true });
+  assert.equal("tempo" in entry.threshold, false, "the beat's line is no longer written");
+  assert.deepEqual(entry.tempoBonus, describeLogicLog(entry.threshold.logic), "and the archive's line is the streak's");
+  assert.match(entry.tempoBonus.text, /^논리 콤보 4 · 판돈 ×1\.25 · \+\d/);
 
   // A type the scene does not deal is one the hand could not have held: the streak is kept.
   const offered = getOfferedTypes(scene, { clueCount: 0, trust: 50, legitimacy: 50, casesOpened: 0 });
@@ -369,13 +522,14 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   // A card the room played is not the hand's pick.
   const forced = sceneContext(sceneId, holding({ type: other, held: 5, streak: 3, best: 3 }));
   commit(forced.context, picked, { ...cashed("commit-forced"), status: "bust", cause: "timeout" }, true);
-  assert.deepEqual(forced.did.patches[0].log[0].threshold.logic, { type: null, tier: 3, rose: false, move: "bust", streak: 0 });
+  assert.deepEqual(move(forced.did.patches[0].log[0].threshold.logic), { type: null, tier: 3, rose: false, move: "bust", streak: 0 });
   assert.deepEqual([forced.did.patches[0].gauntletRun.logic.type, forced.did.patches[0].gauntletRun.logic.held], [other, 5], "what the hand was holding is left as it was");
 
   // 프롤로그 01 does not have the rule: its entries say so and its summary carries no record.
   const first = sceneContext("p1_start", holding({ type: "risk", held: 2, streak: 3, best: 3 }));
   commit(first.context, first.context.node.choices[0], cashed("commit-off"));
-  assert.deepEqual(first.did.patches[0].log[0].threshold.logic, { type: null, tier: 1, rose: false, move: "none", streak: 3 });
+  assert.deepEqual(move(first.did.patches[0].log[0].threshold.logic), { type: null, tier: 1, rose: false, move: "none", streak: 3 });
+  assert.equal(first.did.patches[0].log[0].threshold.logic.bonus, 1, "and the streak it carried in pays nothing there");
 });
 
 test("what a scene has on the table is its cards' types, the wild one among them, less any card the player cannot play", () => {
@@ -388,6 +542,110 @@ test("what a scene has on the table is its cards' types, the wild one among them
   assert.deepEqual(getOfferedTypes({ choices: [card("risk"), { ...gated, cognition: { persistence: 3 } }] }, newcomer), ["risk"]);
   assert.deepEqual(getOfferedTypes(null, standing), []);
   assert.deepEqual(getOfferedTypes({}, standing), []);
+  // The table asks the same function with its own gate, so the two cannot disagree.
+  assert.deepEqual(listOfferedTypes(scene.choices), getOfferedTypes(scene, standing));
+  assert.deepEqual(listOfferedTypes(scene.choices, (choice) => choice !== WILD), ["risk", "inference"]);
+  assert.deepEqual(listOfferedTypes(undefined), []);
+});
+
+/* ------------------------------------------------- what the table shows */
+
+test("the streak the table shows a card leaving is the streak its pot is paid on", () => {
+  const types = ["risk", "inference", "persistence", "reframing"];
+  let seed = 7;
+  const next = (count) => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed % count; };
+  for (let round = 0; round < 400; round += 1) {
+    const relics = [[], ["metronome"], ["encore"], ["metronome", "encore"]][next(4)];
+    const logic = normalizeLogic({ streak: next(12), best: 20, type: [null, ...types][next(5)], held: next(6), heat: next(4), rose: next(2) === 1, reach: next(3) });
+    const offered = types.filter(() => next(3) > 0);
+    const staked = card(types[next(4)]);
+    const run = normalizeRunState({ logic, relics });
+    const shown = readLogic({ logic: run.logic, card: staked, offered, relics });
+    const { verdict } = resolveWindow({ run, window: closed(next(90)), card: staked, offered });
+    assert.equal(shown.after, verdict.logic.streak, `round ${round}`);
+    assert.equal(shown.move, verdict.logic.move);
+    assert.equal(Math.round(shown.bonus * 100) / 100, verdict.logic.bonus);
+    assert.equal(shown.moveOf(staked), verdict.logic.move, "and the card's own tag says the same");
+  }
+});
+
+test("the HUD's line: the streak, the type held and how far, and when a change of type would count; what it pays is the pot's", () => {
+  const idle = readLogic({ logic: LOGIC_INITIAL, card: null, offered: ["risk"] });
+  assert.equal(idle.line, "논리 콤보 0 · 첫 카드부터 센다");
+  assert.deepEqual([idle.after, idle.bonus, idle.move, idle.type, idle.note], [0, 1, null, null, ""]);
+  const holding = normalizeLogic({ streak: 4, best: 4, type: "risk", held: 2, rose: false });
+  const waiting = readLogic({ logic: holding, card: null, offered: ["risk", "inference"] });
+  assert.equal(waiting.line, "논리 콤보 4 · 위험 다루기 2/3");
+  assert.deepEqual([waiting.after, waiting.bonus, waiting.type, waiting.held, waiting.note], [4, 1.25, "risk", "2/3", ""]);
+  assert.equal(readLogic({ logic: { ...holding, rose: true }, card: null, offered: [] }).line, "논리 콤보 4 · 위험 다루기 2/3 · 전환 가능");
+  assert.equal(readLogic({ logic: { ...holding, reach: 1 }, card: null, offered: [] }).line, "논리 콤보 4 · 위험 다루기 2/3", "the second scene of a rise is METRONOME's alone");
+  assert.equal(readLogic({ logic: { ...holding, reach: 1 }, card: null, offered: [], relics: ["metronome"] }).line, "논리 콤보 4 · 위험 다루기 2/3 · 전환 가능");
+  // With a card staked, the line is the streak as that card leaves it.
+  const lines = (logic, type, offered = ["risk", "inference"]) => readLogic({ logic, card: card(type), offered }).line;
+  assert.equal(lines(holding, "risk"), "논리 콤보 5 · 위험 다루기 3/3 · 이어 감");
+  assert.equal(lines({ ...holding, held: 1 }, "risk"), "논리 콤보 4 · 위험 다루기 2/3 · 쌓는 중");
+  assert.equal(lines(holding, "inference"), "논리 콤보 0 · 꼼꼼히 확인하기 1/3 · 끊김");
+  assert.equal(lines({ ...holding, rose: true }, "inference"), "논리 콤보 5 · 꼼꼼히 확인하기 1/3 · 전환");
+  assert.equal(lines(holding, "persistence", ["persistence", "inference"]), "논리 콤보 4 · 끝까지 버티기 1/3 · 유지");
+  assert.equal(lines({ ...holding, held: 40 }, "risk"), "논리 콤보 5 · 위험 다루기 3/3 · 이어 감", "the hold is shown to three and no further");
+  assert.equal(readLogic({ logic: holding, card: card("risk"), offered: [] }).bonus, 1.3125, "and the pot's own line prints what it pays");
+  // The sentence the push and confirm buttons are described by says all of it.
+  assert.equal(readLogic({ logic: holding, card: card("risk"), offered: [] }).spoken, "논리 콤보 5, 판돈 1.31배. 위험 다루기 3/3. 이 카드로 이어 감.");
+  assert.equal(readLogic({ logic: { ...holding, rose: true }, card: null, offered: [] }).spoken, "논리 콤보 4, 판돈 1.25배. 위험 다루기 2/3. 압박이 올라 유형을 바꿔도 콤보가 오른다.");
+});
+
+test("a type's name is cut around one word, which is what a phone's card prints, and put back whole for a reader", () => {
+  assert.deepEqual(getTypeParts("risk"), ["", "위험", " 다루기"]);
+  assert.deepEqual(getTypeParts("inference"), ["꼼꼼히 ", "확인", "하기"]);
+  assert.deepEqual(getTypeParts("persistence"), ["끝까지 ", "버티기", ""]);
+  assert.deepEqual(getTypeParts("reframing"), ["판 ", "바꾸기", ""]);
+  for (const type of Object.keys(easyCognitionLabels)) {
+    assert.equal(getTypeParts(type).join(""), easyCognitionLabels[type], "the three pieces are the name");
+    assert.ok(getTypeParts(type)[1].length >= 2 && getTypeParts(type)[1].length <= 3);
+  }
+  assert.equal(new Set(Object.keys(easyCognitionLabels).map((type) => getTypeParts(type)[1])).size, 4, "no two types print the same word");
+  assert.deepEqual(getTypeParts("nothing"), ["", "", ""]);
+  assert.deepEqual(getTypeParts(null), ["", "", ""]);
+
+  // What a card's tag adds for a screen reader once the streak is in play (the tag itself is drawn in GauntletHand.jsx).
+  assert.deepEqual(["grow", "build", "switch", "keep", "break", "none", undefined].map(describeCardMove), ["(콤보 이어 감)", "(콤보 쌓는 중)", "(콤보 전환)", "(콤보 유지)", "(콤보 끊김)", "", ""]);
+});
+
+test("the reveal says what the card did to the streak, one sentence a move", () => {
+  const line = (made, extra = {}) => describeLogicMove({ type: "risk", tier: 1, rose: false, move: made, streak: 4, held: 3, bonus: 1.25, pot: 120, ...extra });
+  assert.equal(line("grow"), "위험 다루기를 이어 갔다. 논리 콤보 4, 판돈 ×1.25.");
+  assert.equal(line("build", { held: 2, streak: 0, bonus: 1 }), "위험 다루기 2/3. 같은 유형 세 번째부터 콤보가 오른다. 논리 콤보 0, 판돈 ×1.00.");
+  assert.equal(line("switch", { type: "inference", rose: true }), "압박이 오른 판에서 꼼꼼히 확인하기로 바꿨다. 전환으로 콤보가 올랐다. 논리 콤보 4, 판돈 ×1.25.");
+  assert.equal(line("keep", { type: "reframing" }), "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. 논리 콤보 4, 판돈 ×1.25.");
+  assert.equal(line("break", { type: "persistence", streak: 0 }), "압박이 오르지 않았는데 끝까지 버티기로 바꿨다. 논리 콤보는 0, 다시 1/3부터 센다.");
+  assert.equal(line("bust", { streak: 0 }), "벽에 닿아 논리 콤보가 끊겼다.");
+  assert.equal(line("bust", { streak: 6 }), "벽에 닿았지만 논리 콤보 6은 남았다.");
+  assert.equal(line("bust", { streak: 5 }), "벽에 닿았지만 논리 콤보 5는 남았다.");
+  for (const none of [line("none"), describeLogicMove(null), describeLogicMove(undefined), describeLogicMove({ move: "leap" })]) assert.equal(none, null);
+  // The archive's one line is only written when the streak paid.
+  assert.deepEqual(describeLogicLog({ streak: 4, bonus: 1.25, pot: 1200 }), { label: "LOGIC STREAK", text: "논리 콤보 4 · 판돈 ×1.25 · +1,200" });
+  for (const unpaid of [{ streak: 0, bonus: 1, pot: 0 }, { streak: 3 }, null]) assert.equal(describeLogicLog(unpaid), null);
+});
+
+test("the run summary a telemetry row carries has the streak beside the beat's old keys", () => {
+  const run = normalizeRunState({ beatCombo: 3, bestCombo: 9, grooveVault: 120, vault: 900, logic: { streak: 5, best: 12, type: "risk", held: 7 } });
+  const summary = createRunSummary(run);
+  assert.deepEqual([summary.logicStreak, summary.bestLogic], [5, 12]);
+  assert.deepEqual([summary.beatCombo, summary.bestCombo, summary.grooveVault], [3, 9, 120], "what the server still types when present");
+  assert.deepEqual(Object.keys(summary), ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastOutcome", "lastGauge", "beatCombo", "bestCombo", "logicStreak", "bestLogic", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "stanceMastery", "grooveVault", "relics", "mutations"]);
+  assert.deepEqual([createRunSummary({}).logicStreak, createRunSummary({}).bestLogic], [0, 0]);
+});
+
+test("a replayed case's first record is read from an entry logged before or after the beat went", () => {
+  const first = { busts: 2, cashes: 6, bestMultiplier: 8, potBanked: 900, potLost: 300, pushes: 14, bestCombo: 7, beatHits: 9, perfects: 4, slips: 2, grooveBanked: 80 };
+  const before = createTableRecord([{ threshold: { busted: false, pot: 10, tempo: { firstRecord: first } } }]);
+  const after = createTableRecord([{ threshold: { busted: false, pot: 10, firstRecord: first } }]);
+  assert.deepEqual(before, after);
+  assert.deepEqual([after.busts, after.bestCombo, after.bestLogic], [2, 7, 0]);
+  const practice = openCaseRun(RUN_INITIAL_STATE, { replayOf: { pushRecord: first } });
+  const closing = resolveWindow({ run: practice, window: closed(COLD), card: card("risk"), caseClosed: true });
+  assert.deepEqual(closing.verdict.firstRecord, first, "the verdict that closes a replay carries it, with the keys it was saved with");
+  assert.equal("firstRecord" in resolveWindow({ run: RUN_INITIAL_STATE, window: closed(COLD), card: card("risk"), caseClosed: true }).verdict, false);
 });
 
 /* ------------------------------------------------------ the record */
@@ -486,9 +744,9 @@ test("the finale's summary carries the season's numbers, and a season without re
   assert.deepEqual(["logicRecord" in again, "logicHold" in again, "bestLogic" in again], [false, false, false]);
 });
 
-/* ------------------------------------------- behind the switch: on */
+/* --------------------------------------------------------- what it pays */
 
-test("with the switch on, the streak pays 1 + min(0.5, streak x 0.0625) and the hand is capped as it was", () => {
+test("the streak pays 1 + min(0.5, streak x 0.0625) and the hand is capped as it was", () => {
   assert.deepEqual([0, 1, 4, 8, 9, 40].map(getLogicBonus), [1, 1.0625, 1.25, 1.5, 1.5, 1.5]);
   assert.deepEqual([-2, null, undefined, "x"].map(getLogicBonus), [1, 1, 1, 1]);
   assert.equal(HAND_CAP, 1.5);
@@ -501,60 +759,61 @@ test("with the switch on, the streak pays 1 + min(0.5, streak x 0.0625) and the 
       }
     }
   }
-  // Left out, the hand is the groove's, as it has always been called.
+  // A groove is only ever one a save held from before the beat went, and is paid as it was.
   assert.equal(getHandBonus(10, 0, "strike"), 1.3);
   assert.equal(getHandBonus(0, 0, "strike"), 1);
 });
 
-test("with the switch on, the pot is paid on the streak the card made; with it off, the same streak pays nothing", () => {
+test("the pot is paid on the streak the card made", () => {
   const run = normalizeRunState({ ...RUN_INITIAL_STATE, logic: { ...LOGIC_INITIAL, type: "risk", held: 5, streak: 3, best: 3 } });
   const window = closed(44);
-  const off = resolveWindow({ run, window, card: card("risk"), logic: false });
-  const on = resolveWindow({ run, window, card: card("risk"), logic: true });
-  const base = Math.round(off.verdict.chips * off.verdict.multiplier);
-  assert.equal(off.verdict.pot, base, "off: the streak is counted and the pot does not read it");
-  assert.equal(on.verdict.logic.streak, 4);
-  assert.equal(on.verdict.pot, Math.round(off.verdict.chips * off.verdict.multiplier * 1.25), "on: 1 + 4 x 0.0625");
-  assert.deepEqual(on.verdict.logic, off.verdict.logic, "the line of the verdict is the same either way");
-  assert.deepEqual(on.nextRun.logic, off.nextRun.logic);
-  assert.equal(on.verdict.tempo.groovePot, on.verdict.pot - base, "the hand's share is told apart as the groove's was");
-  assert.equal(on.nextRun.runGroove, on.verdict.pot - base);
-  assert.equal(on.verdict.focus.potMultiplier, 1);
-  // A card that ends the streak is paid as a bare one, and a bust pays nothing either way.
-  assert.equal(resolveWindow({ run, window, card: card("inference"), offered: ["risk", "inference"], logic: true }).verdict.pot, base);
-  assert.equal(resolveWindow({ run, window: closed(44, "bust"), card: card("risk"), logic: true }).verdict.pot, 0);
+  const paid = resolveWindow({ run, window, card: card("risk") });
+  const base = Math.round(paid.verdict.chips * paid.verdict.multiplier);
+  assert.equal(paid.verdict.logic.streak, 4);
+  assert.equal(paid.verdict.pot, Math.round(paid.verdict.chips * paid.verdict.multiplier * 1.25), "1 + 4 x 0.0625");
+  assert.deepEqual([paid.verdict.logic.bonus, paid.verdict.logic.pot], [1.25, paid.verdict.pot - base], "the hand's share is told apart as the groove's was");
+  assert.equal(paid.nextRun.runGroove, paid.verdict.pot - base);
+  assert.equal(paid.verdict.focus.potMultiplier, 1);
+  assert.equal("tempo" in paid.verdict, false, "the verdict has no line for the beat");
+  // A card with no type is paid bare, whatever the run carries: no streak moved for it.
+  assert.equal(resolveWindow({ run, window, card: { ...card("risk"), cognition: undefined } }).verdict.pot, Math.round(base * 1.19), "the streak it stood at");
+  // A card that ends the streak is paid as a bare one, and a bust pays nothing.
+  assert.equal(resolveWindow({ run, window, card: card("inference"), offered: ["risk", "inference"] }).verdict.pot, base);
+  assert.equal(resolveWindow({ run, window: closed(44, "bust"), card: card("risk") }).verdict.pot, 0);
   // At a streak of 8 and past it the pot is at the cap, with or without a full LOCK.
   const capped = normalizeRunState({ ...run, logic: { ...run.logic, streak: 30, best: 30 } });
-  assert.equal(resolveWindow({ run: capped, window, card: card("risk"), logic: true }).verdict.pot, Math.round(base * HAND_CAP));
-  const locked = resolveWindow({ run: capped, window: { ...window, focus: 100, focusHits: 5 }, card: card("risk"), logic: true });
+  assert.equal(resolveWindow({ run: capped, window, card: card("risk") }).verdict.pot, Math.round(base * HAND_CAP));
+  const locked = resolveWindow({ run: capped, window: { ...window, focus: 100, focusHits: 5 }, card: card("risk") });
   assert.equal(locked.verdict.pot, Math.round(base * HAND_CAP));
   assert.equal(locked.verdict.focus.pot, 0, "LOCK adds nothing over a streak already at the cap");
-  // In a case without the rule the streak neither moves nor pays more than it stood at.
-  const prologue = resolveWindow({ run, window, card: card("inference"), rules: step("prologue01"), logic: true });
-  assert.deepEqual([prologue.verdict.logic.move, prologue.nextRun.logic.streak], ["none", 3]);
+  // In a case without the rule the streak neither moves nor pays.
+  const prologue = resolveWindow({ run, window, card: card("inference"), rules: step("prologue01") });
+  assert.deepEqual([prologue.verdict.logic.move, prologue.nextRun.logic.streak, prologue.verdict.pot], ["none", 3, base]);
 });
 
-test("a window saved in the middle of a beat and picked up after the flip is paid the larger of the two", () => {
+test("a window saved in the middle of a beat and picked up after is paid the larger of the two", () => {
   const window = closed(44, "cashed", { groove: 10, beatCombo: 4, maxCombo: 4, beatHits: 4 });
   const run = (streak) => normalizeRunState({ ...RUN_INITIAL_STATE, logic: { ...LOGIC_INITIAL, type: "risk", held: 5, streak, best: streak } });
   const base = (settled) => Math.round(settled.verdict.chips * settled.verdict.multiplier);
   // Groove 10 is x1.3; a streak of 2 (after this card) is x1.125: the pot the player saw stands.
-  const low = resolveWindow({ run: run(1), window, card: card("risk"), logic: true });
+  const low = resolveWindow({ run: run(1), window, card: card("risk") });
   assert.equal(low.verdict.pot, Math.round(base(low) * 1.3));
   // A streak of 7 (after this card) is x1.4375: the streak is the larger.
-  const high = resolveWindow({ run: run(6), window, card: card("risk"), logic: true });
+  const high = resolveWindow({ run: run(6), window, card: card("risk") });
   assert.equal(high.verdict.pot, Math.round(base(high) * 1.44));
   assert.equal(getHandBonus(10, 0, "strike", 2), 1.3);
   assert.equal(getHandBonus(10, 0, "strike", 7), 1.44);
   assert.equal(getHandBonus(40, 0, "strike", 0), 1.5);
+  // In a case without the rule that groove is not there to be settled, as it never was.
+  const off = resolveWindow({ run: run(1), window, card: card("risk"), rules: step("prologue01") });
+  assert.equal(off.verdict.pot, base(off));
 });
 
-test("with the switch on, a push is not graded and a LOCK press charges for clock", () => {
+test("a push is not graded and a LOCK press charges for clock", () => {
   const open = (seed = "lock-a") => reduceWindow(createWindow({ seed }), { type: "SELECT", id: "a" });
-  const on = (window, event, rules = ALL_RULES) => reduceWindow(window, event, rules, true);
   const ungraded = reduceWindow(open(), { type: "PUSH" });
   for (const grade of ["perfect", "good", "miss", null]) {
-    assert.deepEqual(on(open(), { type: "PUSH", grade }), ungraded, `${grade}: a push is a push`);
+    assert.deepEqual(reduceWindow(open(), { type: "PUSH", grade }), ungraded, `${grade}: a push is a push`);
   }
 
   for (const mode of ["strike", "steady", "expose"]) {
@@ -562,16 +821,15 @@ test("with the switch on, a push is not graded and a LOCK press charges for cloc
     const wall = window.wall;
     for (let press = 1; press <= 6; press += 1) {
       const before = window;
-      const good = scoreFocus(before, "good");
-      // Whatever the stage sends as a grade, the press is the same press.
-      const pressed = on(before, { type: "FOCUS", grade: ["miss", "perfect", null, "good", "miss", undefined][press - 1] });
-      assert.equal(pressed.focus, good.focus, `${mode} press ${press}: the charge a GOOD lock took`);
+      const scored = scoreFocus(before);
+      // Whatever a caller sends as a grade, the press is the same press.
+      const pressed = reduceWindow(before, { type: "FOCUS", grade: ["miss", "perfect", null, "good", "miss", undefined][press - 1] });
+      assert.equal(pressed.focus, scored.focus, `${mode} press ${press}`);
       assert.equal(pressed.focusCombo, press);
       assert.equal(pressed.focusHits, press);
-      assert.deepEqual([pressed.focusPerfects, pressed.focusMisses, pressed.jammed, pressed.lastFocusGrade], [0, 0, false, null], "no PERFECT, no miss, no JAM");
       assert.equal(pressed.elapsed, before.elapsed + LOCK_PRESS_SECONDS, "and 1.5 seconds of table clock");
       // No heat of its own: the gauge moves only by what the stance cools and what the clock creeps.
-      const expected = reduceWindow({ ...before, gauge: Math.max(0, before.gauge - good.focusRelief), elapsed: before.elapsed }, { type: "TICK", delta: 1 });
+      const expected = reduceWindow({ ...before, gauge: Math.max(0, before.gauge - scored.focusRelief), elapsed: before.elapsed }, { type: "TICK", delta: 1 });
       const crept = reduceWindow(expected, { type: "TICK", delta: LOCK_PRESS_SECONDS - 1 });
       assert.equal(pressed.gauge, crept.gauge);
       assert.equal(pressed.wall, wall);
@@ -580,82 +838,46 @@ test("with the switch on, a push is not graded and a LOCK press charges for cloc
     }
     assert.equal(window.status, "live");
   }
-
-  // The switch off: the beat-graded LOCK, exactly.
-  const miss = reduceWindow(open(), { type: "FOCUS", grade: "miss" });
-  assert.deepEqual([miss.jammed, miss.focusMisses, miss.gauge > 0], [true, 1, true]);
-  assert.deepEqual(reduceWindow(open(), { type: "FOCUS", grade: "miss" }, ALL_RULES, false), miss);
-  assert.equal(reduceWindow(open(), { type: "FOCUS", grade: null }).focus, 0, "and an ungraded press does nothing");
+  // The decided charge: what a GOOD lock took on the beat, 13 and 2 a press before it, by the stance's scale.
+  assert.deepEqual(["strike", "steady", "expose"].map((focusMode) => [0, 1, 2, 3, 4].map((focusCombo) => scoreFocus({ focus: 0, focusCombo, focusMode }).focus)), [[17, 20, 22, 24, 26], [14, 15, 17, 19, 21], [15, 17, 19, 21, 23]]);
+  assert.deepEqual(["strike", "steady", "expose"].map((focusMode) => scoreFocus({ focusMode }).focusRelief), [0, 2, 0]);
 
   // Without `lock`, or with no card staked, the press is still refused.
   const bare = createWindow({ seed: "lock-bare" });
-  assert.equal(on(bare, { type: "FOCUS" }), bare);
-  assert.equal(on(open(), { type: "FOCUS" }, step("prologue03")).focus, 0);
+  assert.equal(reduceWindow(bare, { type: "FOCUS" }), bare);
+  assert.equal(reduceWindow(open(), { type: "FOCUS" }, step("prologue03")).focus, 0);
 });
 
-test("with the switch on, a LOCK press cannot bust on its own, and the clock it spends can only close a window the clock's way", () => {
-  const on = (window, event) => reduceWindow(window, event, ALL_RULES, true);
+test("a LOCK press cannot bust on its own, and the clock it spends can only close a window the clock's way", () => {
   const fresh = reduceWindow(createWindow({ seed: "lock-wall" }), { type: "SELECT", id: "a" });
-  // Just under the wall, before the grace has run: a beat-graded miss busts here, a press does not.
+  // Just under the wall, before the grace has run: a LOCK off the beat used to bust here.
   const brink = { ...fresh, gauge: fresh.wall - 0.5 };
-  assert.deepEqual([reduceWindow(brink, { type: "FOCUS", grade: "miss" }).status, reduceWindow(brink, { type: "FOCUS", grade: "miss" }).cause], ["bust", "focus"]);
-  const pressed = on(brink, { type: "FOCUS", grade: "miss" });
+  const pressed = reduceWindow(brink, { type: "FOCUS", grade: "miss" });
   assert.deepEqual([pressed.status, pressed.cause, pressed.gauge], ["live", null, brink.gauge]);
   // Late in the window the clock it costs creeps heat, and that can reach the wall or the end of the clock.
-  const late = on({ ...brink, elapsed: 20 }, { type: "FOCUS" });
+  const late = reduceWindow({ ...brink, elapsed: 20 }, { type: "FOCUS" });
   assert.deepEqual([late.status, late.cause], ["bust", "creep"]);
-  const last = on({ ...fresh, elapsed: fresh.schema.seconds - 1, schema: { ...fresh.schema, creep: 0 } }, { type: "FOCUS" });
+  const last = reduceWindow({ ...fresh, elapsed: fresh.schema.seconds - 1, schema: { ...fresh.schema, creep: 0 } }, { type: "FOCUS" });
   assert.deepEqual([last.status, last.cause], ["bust", "timeout"]);
-  assert.ok(VERDICT_CAUSES.includes("focus"), "the cause stays in the list for the logs that hold it");
+  assert.ok(VERDICT_CAUSES.includes("focus"), "the cause stays in the list for the logs and the holds that name it");
+  // A hold written under the slam of a jammed LOCK, before the beat went, still closes as it was held.
+  const held = createWindow({ seed: "lock-held", abandoned: true, closedAs: "focus" });
+  assert.equal(resolveWindow({ run: RUN_INITIAL_STATE, window: held, card: card("risk") }).verdict.cause, "focus");
 });
 
-test("with the switch on, the stances, mastery and the boards they carry are what they were", () => {
+test("the stances, mastery and the boards they carry are what they were", () => {
   for (const mode of ["strike", "steady", "expose"]) {
     let window = reduceWindow(reduceWindow(createWindow({ seed: `carry-${mode}` }), { type: "SELECT", id: "a" }), { type: "SET_FOCUS_MODE", mode });
-    while (window.focus < STANCE_CHARGE) window = reduceWindow(window, { type: "FOCUS" }, ALL_RULES, true);
-    window = reduceWindow(reduceWindow(window, { type: "PUSH" }, ALL_RULES, true), { type: "CASH" }, ALL_RULES, true);
+    while (window.focus < STANCE_CHARGE) window = reduceWindow(window, { type: "FOCUS" });
+    window = reduceWindow(reduceWindow(window, { type: "PUSH" }), { type: "CASH" });
     assert.equal(window.status, "cashed");
-    const on = resolveWindow({ run: RUN_INITIAL_STATE, window, card: card("risk"), logic: true });
-    const off = resolveWindow({ run: RUN_INITIAL_STATE, window, card: card("risk"), logic: false });
-    assert.equal(on.verdict.focus.stanceEarned, true, mode);
-    assert.equal(on.nextRun.stanceMastery[mode], 1);
-    assert.deepEqual(on.nextRun.stanceMastery, off.nextRun.stanceMastery);
-    assert.deepEqual(on.nextRun.schema, off.nextRun.schema, "the board the stance carries forward");
-    assert.deepEqual(on.verdict.nextMutations, off.verdict.nextMutations);
-    assert.deepEqual(on.verdict.focus.resourceMultiplier, off.verdict.focus.resourceMultiplier);
-    assert.equal(on.verdict.pot, off.verdict.pot, "with no streak and no groove the LOCK pot is the same pot");
+    const settled = resolveWindow({ run: RUN_INITIAL_STATE, window, card: card("risk") });
+    assert.equal(settled.verdict.focus.stanceEarned, true, mode);
+    assert.equal(settled.nextRun.stanceMastery[mode], 1);
+    assert.ok(settled.verdict.nextMutations.some((mutation) => mutation.id === { strike: "strikeWake", steady: "steadyLine", expose: "exposedHand" }[mode]), "the board the stance carries forward");
+    assert.ok(settled.verdict.focus.resourceMultiplier > 1);
+    assert.ok(settled.verdict.focus.pot > 0, "with no streak the LOCK pot is LOCK's");
   }
-});
-
-/* ------------------------------------------ behind the switch: off */
-
-test("with the switch off, a seeded batch of windows settles exactly as it did before the streak", async () => {
-  const pinned = JSON.parse(readFileSync(fileURLToPath(PIN), "utf8"));
-  const digests = await replayEngine();
-  assert.equal(digests.length, pinned.windows, "the batch is the one that was pinned");
-  assert.ok(digests.length >= 400);
-  const moved = digests.map((digest, index) => (digest === pinned.digests[index] ? null : index)).filter((index) => index !== null);
-  assert.deepEqual(moved, [], "windows, verdicts and runs are the pinned ones, apart from the `logic` fields the digest leaves out");
-});
-
-test("with the switch off, the verdict and the run gain the streak's fields and nothing else changes", () => {
-  const run = normalizeRunState({ ...RUN_INITIAL_STATE, logic: { ...LOGIC_INITIAL, type: "risk", held: 9, streak: 30, best: 30 } });
-  const bare = normalizeRunState(RUN_INITIAL_STATE);
-  for (const window of [closed(44, "cashed", { groove: 7, beatCombo: 3, maxCombo: 3, beatHits: 3, focus: 80, focusHits: 4 }), closed(61), closed(50, "bust")]) {
-    const withStreak = resolveWindow({ run, window, card: card("risk") });
-    const without = resolveWindow({ run: bare, window, card: { ...card("risk"), cognition: undefined } });
-    const { logic: _line, ...verdict } = withStreak.verdict;
-    const { logic: _other, ...plainVerdict } = without.verdict;
-    assert.deepEqual(verdict, plainVerdict, "a streak of thirty moves no number of the verdict");
-    const { logic: _state, ...nextRun } = withStreak.nextRun;
-    const { logic: _plain, ...plainRun } = without.nextRun;
-    assert.deepEqual(nextRun, plainRun);
-  }
-  // The default is the shipped switch.
-  const window = closed(44);
-  assert.deepEqual(resolveWindow({ run, window, card: card("risk") }), resolveWindow({ run, window, card: card("risk"), logic: LOGIC }));
-  const live = reduceWindow(createWindow({ seed: "default" }), { type: "SELECT", id: "a" });
-  assert.deepEqual(reduceWindow(live, { type: "FOCUS", grade: "good" }), reduceWindow(live, { type: "FOCUS", grade: "good" }, ALL_RULES, LOGIC));
 });
 
 test("every settlement carries the streak's line", () => {
@@ -669,14 +891,13 @@ test("every settlement carries the streak's line", () => {
     { run: RUN_INITIAL_STATE, window: closed(10), card: card("risk"), rules: step("prologue01") },
   ];
   for (const settlement of settlements) {
-    for (const logic of [false, true]) {
-      const { verdict, nextRun } = resolveWindow({ ...settlement, logic });
-      assert.deepEqual(Object.keys(verdict.logic), ["type", "tier", "rose", "move", "streak"]);
-      assert.ok(moves.has(verdict.logic.move));
-      assert.ok([0, 1, 2, 3].includes(verdict.logic.tier));
-      assert.equal(typeof verdict.logic.rose, "boolean");
-      assert.ok(Number.isInteger(verdict.logic.streak));
-      assert.deepEqual(Object.keys(nextRun.logic), ["streak", "best", "type", "held", "heat", "rose"]);
-    }
+    const { verdict, nextRun } = resolveWindow(settlement);
+    assert.deepEqual(Object.keys(verdict.logic), ["type", "tier", "rose", "move", "streak", "held", "bonus", "pot"]);
+    assert.ok(moves.has(verdict.logic.move));
+    assert.ok([0, 1, 2, 3].includes(verdict.logic.tier));
+    assert.equal(typeof verdict.logic.rose, "boolean");
+    assert.ok(Number.isInteger(verdict.logic.streak) && Number.isInteger(verdict.logic.held) && Number.isInteger(verdict.logic.pot));
+    assert.ok(verdict.logic.bonus >= 1 && verdict.logic.bonus <= HAND_CAP);
+    assert.deepEqual(Object.keys(nextRun.logic), ["streak", "best", "type", "held", "heat", "rose", "reach"]);
   }
 });

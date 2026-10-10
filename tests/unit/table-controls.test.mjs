@@ -35,7 +35,6 @@ globalThis.HTMLElement = FakeElement;
 let revealOpen = false;
 globalThis.document = { querySelector: (selector) => (revealOpen && selector === ".decision-reveal-backdrop" ? {} : null) };
 
-const { isPressDown, monotonicNow, pressedAt } = await import("../../src/gauntlet/timing.js");
 const { CLOCK_OPENED_CALL, getClockCall, getTabNotices } = await import("../../src/gauntlet/tableReadout.js");
 const { handleTableKey } = await import("../../src/gauntlet/useTableKeys.js");
 const settings = await import("../../src/state/accessibilitySettings.js");
@@ -210,36 +209,6 @@ test("no key reaches a table that is closed, covered or typed over", () => {
     settings.setAccessibility({ letterKeys: true });
   }
 });
-
-// Node's performance.now() counts from process start; the table's clock is fixed here.
-const TABLE_NOW = 100_000;
-function withTableClock(run) {
-  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "performance");
-  Object.defineProperty(globalThis, "performance", { value: { now: () => TABLE_NOW }, configurable: true, writable: true });
-  try {
-    run();
-  } finally {
-    Object.defineProperty(globalThis, "performance", descriptor);
-  }
-}
-
-test("Space on the focused button is graded where the key went down", () => withTableClock(() => {
-  const up = monotonicNow() - 50;
-  const down = up - 180;
-  // The walked button notes the keydown; the click arrives at keyup, detail 0.
-  assert.equal(isPressDown({ type: "keydown", key: " ", repeat: false }), true);
-  assert.equal(isPressDown({ type: "keydown", key: "Enter", repeat: false }), true);
-  assert.equal(isPressDown({ type: "pointerdown" }), true);
-  assert.equal(isPressDown({ type: "keydown", key: " ", repeat: true }), false, "a repeat is the same press still down");
-  assert.equal(isPressDown({ type: "keydown", key: "Tab", repeat: false }), false);
-  assert.equal(isPressDown({ type: "keyup", key: " " }), false);
-  assert.equal(isPressDown(undefined), false);
-  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: up }, down), down, "graded at keydown, not at release");
-  // With nothing noted -- a click an assistive tool made -- it is its own press.
-  assert.equal(pressedAt({ type: "click", detail: 0, timeStamp: up }, 0), up);
-  // The table's own key path hands over the keydown itself.
-  assert.equal(pressedAt({ type: "keydown", timeStamp: down }, 0), down);
-}));
 
 test("그 탭에 두기 takes the question down as the notice goes up", () => {
   // A second tab opens on a bet another tab holds: the question, alone.

@@ -25,7 +25,8 @@ import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } f
 import { runsInto } from "../seasonRules.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
-import { getLogicType } from "../gauntlet/logicStreak.js";
+import { listOfferedTypes } from "../gauntlet/logicStreak.js";
+import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -99,10 +100,14 @@ export function toRowSummary(caseSummary) {
   return { ...caseSummary, endingVariant: typeof id === "string" ? id : null };
 }
 
+/**
+ * The hand's line under a logged decision: the streak when it paid, LOCK when
+ * only LOCK did. The entry keeps it under the name it had when the hand's line
+ * was the beat's (`tempoBonus`), which is how an older log still prints its own.
+ */
 function describeTempo(verdict) {
-  if (verdict.tempo.groovePot > 0) {
-    return { label: "GROOVE", text: `박자 ${verdict.tempo.hits}회 · 최고 콤보 ${verdict.tempo.maxCombo} · 판돈 +${verdict.tempo.groovePot}` };
-  }
+  const streak = describeLogicLog(verdict.logic);
+  if (streak) return streak;
   if (verdict.focus?.charge > 0) {
     return { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 보상 ${verdict.focus.potMultiplier}x · 자원 ${verdict.focus.resourceMultiplier}x` };
   }
@@ -136,8 +141,7 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
  * played is not an offer.
  */
 export function getOfferedTypes(node, standing) {
-  const open = (node?.choices ?? []).filter((card) => getAuthorityGate(card, standing).unlocked);
-  return [...new Set(open.map(getLogicType).filter(Boolean))];
+  return listOfferedTypes(node?.choices, (card) => getAuthorityGate(card, standing).unlocked);
 }
 
 /**
@@ -390,7 +394,8 @@ export function useChoiceCommit(context) {
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
         lostPot: verdict.lostPot,
-        tempo: verdict.tempo,
+        // Only on the entry that closes a replayed case (`createTableRecord`).
+        ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,
         logic: verdict.logic,
       },

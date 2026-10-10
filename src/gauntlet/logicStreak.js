@@ -1,15 +1,17 @@
 import { clamp } from "../gameConstants.js";
-import { HEAT_DEBT_GAUGE, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, SEAL_BREAK_GAUGE } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, METRONOME_REACH, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
  * The logic streak: a combo earned by the type of card a hand picks from one
  * scene to the next, where the beat's was earned by when it pushed.
  *
- * The run carries six things (`run.logic`). `type` is the type being held and
- * `held` how many windows in a row it has been picked; `streak` is the combo
- * and `best` the longest it has been; `heat` is the tier the last window
+ * The run carries seven things (`run.logic`). `type` is the type being held
+ * and `held` how many windows in a row it has been picked; `streak` is the
+ * combo and `best` the longest it has been; `heat` is the tier the last window
  * closed in and `rose` whether that was higher than the window before it --
  * which is what "the pressure rose" means to the window about to be played.
+ * `reach` is how many more windows that rise is good for in a hand that holds
+ * METRONOME (`METRONOME_REACH` as it rises, one fewer each window after).
  *
  * Holding a type grows the streak from the third window (`LOGIC_HOLD`).
  * Changing type when the pressure rose is an answer to it, and grows the
@@ -30,6 +32,7 @@ export function normalizeLogic(value) {
     held: count("held"),
     heat: count("heat", 3),
     rose: value?.rose === true,
+    reach: count("reach", METRONOME_REACH),
   };
 }
 
@@ -45,6 +48,16 @@ export const LOGIC_INITIAL = Object.freeze(normalizeLogic());
 export function getLogicType(card) {
   if (card?.type === "reframe") return "reframing";
   return Object.entries(card?.cognition ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}
+
+/**
+ * The types a scene has on the table: its cards' (the wild one among them),
+ * less any that cannot be played -- a card the hand cannot pick is not an
+ * offer. The table and the settlement both ask here, so the streak a card is
+ * shown to leave is the one it is paid on.
+ */
+export function listOfferedTypes(cards = [], isOpen = () => true) {
+  return [...new Set(cards.filter(isOpen).map(getLogicType).filter(Boolean))];
 }
 
 /** The heat a window closed in, as a tier: 0 cold, 1 past the seal's heat, 2 past HEAT DEBT's, 3 a bust. */
@@ -73,10 +86,10 @@ export function getLogicBonus(streak) {
  * plays a card on a bust; a window that closed without one and without a pick
  * is nothing the hand did, and moves nothing.
  *
- * `bustHolds` is the seam for 앙코르. That relic is given its new meaning with
- * the switch (day 6: a bust takes the pot and leaves the streak), and the
- * settlement will pass whether the run holds it; until then nothing passes it
- * and a bust always ends the streak.
+ * Two relics bend it, and the settlement passes whether the run holds them.
+ * `bustHolds` is 앙코르: a bust takes the pot and leaves the streak. `reach`
+ * is 메트로놈: a change of type counts as a switch not only on the window the
+ * pressure rose into but on the one after it as well.
  *
  * The move is what happened to the streak: "build" (a first card, or a held
  * type not yet held long enough), "grow", "switch", "keep", "break", "bust",
@@ -84,8 +97,9 @@ export function getLogicBonus(streak) {
  * every window whatever the move: they are the table's, not the hand's, and
  * the next window reads them under any rules.
  */
-export function advanceLogic(logic, { type, tier, offered, bustHolds }) {
-  const next = { ...logic, heat: tier, rose: tier > logic.heat };
+export function advanceLogic(logic, { type, tier, offered, bustHolds, reach }) {
+  const rose = tier > logic.heat;
+  const next = { ...logic, heat: tier, rose, reach: rose ? METRONOME_REACH : Math.max(0, (logic.reach || 0) - 1) };
   const bust = tier === 3;
   if (!(type ?? bust)) return { logic: next, move: "none" };
   const same = type === logic.type;
@@ -94,7 +108,7 @@ export function advanceLogic(logic, { type, tier, offered, bustHolds }) {
     next.held = same ? logic.held + 1 : 1;
   }
   const held = same ? (next.held < LOGIC_HOLD ? "build" : "grow") : !logic.type ? "build" : null;
-  const left = logic.rose ? "switch" : offered && !offered.includes(logic.type) ? "keep" : "break";
+  const left = logic.rose || (reach && logic.reach > 0) ? "switch" : offered && !offered.includes(logic.type) ? "keep" : "break";
   const move = bust ? "bust" : held ?? left;
   if (move === "grow" || move === "switch") next.streak += 1;
   if (move === "break" || (move === "bust" && !bustHolds)) next.streak = 0;

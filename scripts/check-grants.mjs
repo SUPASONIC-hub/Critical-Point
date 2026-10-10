@@ -351,14 +351,15 @@ function decisionEntry(caseId, index, { story = false } = {}) {
     sceneBeat: { tone: "pressure", line: "시계가 두 번 울렸다.".repeat(4) },
     challenge: { title: "책임의 순서", matched: true, riskDelta: -2 },
     tactical: { read: "압박이 한쪽으로 쏠린다", advice: "속도를 늦춘다" },
-    tempoBonus: { label: "GROOVE", text: "박자 4회 · 최고 콤보 3 · 판돈 +12" },
+    // The hand's line under a logged decision: the logic streak's since 2026-10-10 (useChoiceCommit's `describeTempo`).
+    tempoBonus: { label: "LOGIC STREAK", text: "논리 콤보 12 · 판돈 ×1.50 · +14" },
     clueReward: null,
     threshold: {
       state: "cash", busted: false, cause: "cashed", forced: false, gauge: 63, wall: 88, pushes: 3,
       rewardMultiplier: 1.4, potMultiplier: 1.8, pot: 42, lostPot: 0,
-      tempo: { hits: 4, maxCombo: 3, groovePot: 12 }, focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
+      focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
       // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
-      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index },
+      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.5, pot: 14 },
     },
     environmentMode: "stable",
     assistTime: 1.5,

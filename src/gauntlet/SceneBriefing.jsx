@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Lock, TriangleAlert } from "lucide-react";
+import { CardType } from "./GauntletHand.jsx";
 import { getReadingSeconds, hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
@@ -38,7 +39,9 @@ function splitCaptions(text = "") {
  * pinned beside it, and -- when the last decision broke this board -- the new
  * rules as a red panel. The page has its own clock: when it runs out the table
  * opens by itself. The player can open it sooner, or stake a card straight
- * from the page, which opens the table with that card already on it.
+ * from the page, which opens the table with that card already on it. A card
+ * there says its type as it does in the hand (`CardType`), and `moveOf` what
+ * staking it would do to the logic streak.
  *
  * The page a case opens on, when the case turns rules on (`tableUnlocks`),
  * says so in a panel of the same form. It sits straight under the speaker and
@@ -73,6 +76,7 @@ export function SceneBriefing({
   selectedId,
   mutations,
   resourceMeta,
+  moveOf,
   onOpen,
 }) {
   const { letterKeys, keys } = useShortcutHints();
@@ -273,6 +277,7 @@ export function SceneBriefing({
                 >
                   {letterKeys && <kbd>{index + 1}</kbd>}
                   <span>{card.label}</span>
+                  <CardType card={card} moveOf={moveOf} />
                   {(card.id === sealedId || !open) && (
                     <>
                       <Lock size={12} aria-hidden="true" />
@@ -292,6 +297,7 @@ export function SceneBriefing({
               >
                 {letterKeys && <kbd>{cards.length + 1}</kbd>}
                 <span>{reframeChoice.label}</span>
+                <CardType card={reframeChoice} moveOf={moveOf} />
               </button>
             )}
           </div>

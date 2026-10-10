@@ -40,7 +40,7 @@ async function openTable(page, caseId = "case01", nodeId = "start") {
 
 const stageOf = (page) => page.getByTestId("gauntlet-stage");
 const gaugeOf = async (page) => Number(await stageOf(page).getAttribute("data-gauge"));
-const selectedLabel = (page) => page.locator(".gx-card.selected .gx-card-label");
+const selectedLabel = (page) => page.locator(".gx-card.selected").getByTestId("card-label");
 
 /** A key as the keyboard sends it: the character the layout types, and the key it was typed on. */
 async function sendKey(page, init) {
@@ -49,39 +49,10 @@ async function sendKey(page, init) {
   }, init);
 }
 
-/** Waits for the frame loop's GOOD window and sends the key inside it, so the press is graded a hit. */
-async function sendKeyOnBeat(page, init) {
-  return page.evaluate(
-    (options) =>
-      new Promise((resolve) => {
-        const stage = document.querySelector("[data-testid='gauntlet-stage']");
-        const started = performance.now();
-        let seen = 0;
-        let lastPhase = Number.NaN;
-        const check = () => {
-          const style = getComputedStyle(stage);
-          const phase = Number(style.getPropertyValue("--gx-beat-phase"));
-          if (phase !== lastPhase) {
-            seen += 1;
-            lastPhase = phase;
-          }
-          const ready = seen >= 2 && style.getPropertyValue("--gx-beat-live").trim() === "1" && style.getPropertyValue("--gx-beat-zone").trim() === "1";
-          if (ready) {
-            document.body.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...options }));
-            resolve(true);
-          } else if (performance.now() - started > 8000) resolve(false);
-          else requestAnimationFrame(check);
-        };
-        requestAnimationFrame(check);
-      }),
-    init,
-  );
-}
-
 test("number keys stake, Space and W push, Enter cashes", async ({ page }) => {
   // A scene that deals 판을 다시 짠다, so the hand's last number is the wild card.
   await openTable(page, "case02", "c2_logs");
-  const labels = await page.locator(".choices .choice .gx-card-label").allTextContents();
+  const labels = await page.locator(".choices .choice").getByTestId("card-label").allTextContents();
   await expect(page.locator(".gx-card-wild")).toHaveCount(1);
 
   await page.keyboard.press("2");
@@ -110,15 +81,30 @@ test("number keys stake, Space and W push, Enter cashes", async ({ page }) => {
   expect(saved.log.at(-1).threshold.forced).toBe(false);
 });
 
-test("E locks on the beat, Q changes the stance and the charge goes with it", async ({ page }) => {
+/** The seconds the table's clock shows it has left. */
+const clockOf = async (page) => Number(await page.locator(".gx-clock b").textContent());
+
+test("E locks: a press charges and costs the clock, Q changes the stance and the charge goes with it", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const focus = page.getByTestId("gauntlet-focus");
   await expect(focus).toContainText("STRIKE 0");
+  // The button says what a press costs, to the eye and to a screen reader.
+  const lock = page.getByTestId("commit-focus");
+  await expect(lock.locator("small")).toHaveText("STRIKE 0 · −1.5초");
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 판돈과 자원 배율이 오르고 시간이 1\.5초 줄어든다/);
+  await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
-  expect(await sendKeyOnBeat(page, { key: "e", code: "KeyE" })).toBe(true);
-  await expect(focus).not.toContainText("STRIKE 0");
-  await expect(page.locator(".gx-focus .gx-grade")).toContainText("LOCK");
+  // Any moment is as good as another: the press is not timed.
+  const before = await clockOf(page);
+  await page.keyboard.press("e");
+  await expect(focus).toContainText("STRIKE 17");
+  await page.keyboard.press("e");
+  await expect(focus).toContainText("STRIKE 37");
+  await expect(lock.locator("small")).toHaveText("STRIKE 37 · −1.5초");
+  expect(await clockOf(page), "two presses cost three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 
   await page.keyboard.press("q");
   await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "true");
@@ -288,7 +274,7 @@ test("an untouched window that runs out cannot be replayed by reloading under th
 test("Space and Enter belong to the control the keyboard walked to", async ({ page }) => {
   await openTable(page);
   const cards = page.locator(".choices .choice");
-  const labels = await page.locator(".choices .choice .gx-card-label").allTextContents();
+  const labels = await page.locator(".choices .choice").getByTestId("card-label").allTextContents();
 
   // Walked to with Tab: the card answers, the table does not.
   await cards.nth(0).focus();
@@ -391,16 +377,16 @@ test("the relic draft keeps focus inside it, and Enter takes the focused relic",
  * each step holds is written out here rather than read from the module the
  * stage reads.
  */
-const WHOLE = { beat: true, lock: true, stance: true, chain: true };
-const NO_LOCK = { beat: true, lock: false, stance: false, chain: false };
+const WHOLE = { logic: true, lock: true, stance: true, chain: true };
+const NO_LOCK = { logic: true, lock: false, stance: false, chain: false };
 /** The line over an introduction. 프롤로그 01 has its own: nothing was added to the first table. */
 const FIRST_TABLE = "FIRST TABLE · 이 판은 이렇게 합니다";
 const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니다";
 const STAGED_STEPS = [
-  { caseId: "prologue01", on: { beat: false, lock: false, stance: false, chain: false }, lines: 1, kicker: FIRST_TABLE },
+  { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 1, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
-  { caseId: "prologue04", on: { beat: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
+  { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];
@@ -427,13 +413,20 @@ async function expectTableDraws(page, on) {
   await expect(page.getByTestId("commit-push")).toBeEnabled();
   await expect(page.getByTestId("commit-confirm")).toHaveCount(1);
   await expect(page.getByTestId("gauntlet-bpm"), "the heartbeat is the table itself").toHaveCount(1);
-  await expect(page.locator(".gx-beat-ring")).toHaveCount(count(on.beat));
+  // The beat is gone from every step: nothing marks a moment to press on.
+  await expect(page.locator(".gx-beat-ring, .gx-focus-reticle, .gx-grade, [data-testid='gauntlet-combo']")).toHaveCount(0);
+  // A card says its type wherever cards are shown; the streak they earn is drawn from the step that has it.
+  const cards = page.locator(".choices .choice");
+  await expect(cards.getByTestId("card-type")).toHaveCount(await cards.count());
+  await expect(page.getByTestId("gauntlet-logic")).toHaveCount(count(on.logic));
+  if (on.logic) await expect(page.getByTestId("gauntlet-logic")).toContainText("콤보 0");
+  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(on.logic ? /다음 열기 \d+에서 \d+ 논리 콤보 0, 판돈 1\.00배/ : /다음 열기 \d+에서 \d+$/);
   await expect(page.getByTestId("commit-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-overdrive")).toHaveCount(count(on.chain));
   // The run's line counts the chain only where there is one to count.
   await expect(page.getByTestId("gauntlet-run-signal")).toHaveText(on.chain ? /^연승 \d+ BUST \d+ 최고 / : /^BUST \d+ 최고 /);
-  await expect(page.locator(".gx-signals"), "no padded row over nothing").toHaveCount(count(on.lock || on.chain));
+  await expect(page.locator(".gx-signals"), "no padded row over nothing").toHaveCount(count(on.lock || on.chain || on.logic));
   await expect(page.getByTestId("gauntlet-stance-mastery")).toHaveCount(count(on.stance));
   // The dock has a column for each button it holds.
   const columns = await page.locator(".gx-actions").evaluate((dock) => getComputedStyle(dock).gridTemplateColumns.split(" ").length);
@@ -448,22 +441,11 @@ async function expectTableDraws(page, on) {
   expect(await keyTaken(page, { key: "q", code: "KeyQ" }), "Q").toBe(on.stance);
   if (on.stance) await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "true");
 
-  // Three seconds in, the heart has been heard more than once: a push now is
-  // graded against it where the beat is on, and comes back ungraded where it
-  // is not -- no grade on the button, no combo in the pot.
-  await expect.poll(async () => Number(await page.locator(".gx-clock b").textContent()), { timeout: 20_000 }).toBeLessThanOrEqual(42);
+  // A push is a push at every step: the heat goes up and nothing judges when it landed.
   const before = await gaugeOf(page);
   await page.keyboard.press("w");
   await expect.poll(() => gaugeOf(page)).toBeGreaterThanOrEqual(before + 7);
-  if (on.beat) {
-    await expect(stageOf(page)).toHaveAttribute("data-last-grade", /^(perfect|good|miss)$/);
-    await expect(page.locator(".gx-push .gx-grade")).toHaveCount(1);
-  } else {
-    await expect(stageOf(page)).toHaveAttribute("data-last-grade", "");
-    await expect(stageOf(page)).toHaveAttribute("data-combo", "0");
-    await expect(page.locator(".gx-push .gx-grade")).toHaveCount(0);
-    await expect(page.getByTestId("gauntlet-combo")).toHaveCount(0);
-  }
+  await expect(page.locator(".gx-grade")).toHaveCount(0);
 }
 
 for (const step of STAGED_STEPS) {
@@ -691,7 +673,7 @@ async function expectBriefing(page) {
   await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
 }
 
-test("a new run meets the table in steps: 프롤로그 01 has no beat and breaks no board, 프롤로그 02 has both", { tag: "@prod" }, async ({ page }) => {
+test("a new run meets the table in steps: 프롤로그 01 has no logic streak and breaks no board, 프롤로그 02 has both", { tag: "@prod" }, async ({ page }) => {
   test.setTimeout(300_000);
   await page.addInitScript(() => {
     // Once a tab, so a reload would find what the run has saved since.
@@ -721,7 +703,7 @@ test("a new run meets the table in steps: 프롤로그 01 has no beat and breaks
   let run = (await savedRun(page)).dynamics;
   expect(run.veteran, "a plain run").toBe(false);
   expect(run.runPot, "the cash banked a pot").toBeGreaterThan(0);
-  expect([run.beatCombo, run.streak, run.focusHits], "no combo, no chain, no LOCK").toEqual([0, 0, 0]);
+  expect([run.logic.streak, run.logic.type, run.streak, run.focusHits], "no streak and no type held, no chain, no LOCK").toEqual([0, null, 0, 0]);
   expect(run.schema.mutations).toEqual([]);
 
   // The second scene has nothing new to say. A bust there takes the pot and
@@ -757,7 +739,7 @@ test("a new run meets the table in steps: 프롤로그 01 has no beat and breaks
   await expect(page.getByTestId("relic-draft")).toHaveCount(0);
 
   // 프롤로그 02 opens on the scene the close of 프롤로그 01 picked, not on its
-  // written first scene, and introduces the beat and the broken board there --
+  // written first scene, and introduces the logic streak and the broken board there --
   // beside the REBOOT panel every closed case leaves.
   expect((await savedRun(page)).nodeId, "a played run enters on an opening route").not.toBe(CASE_START_NODES.prologue02);
   await expect(intro.locator("li")).toHaveText([...UNLOCK_LADDER[1].intro]);

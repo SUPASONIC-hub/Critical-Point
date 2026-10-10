@@ -2,8 +2,10 @@ import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
+import { advanceLogic, getLogicBonus, getLogicType } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
-import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
+import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
 import { getTableRules } from "./tableUnlocks.js";
 
 export { formatNumber };
@@ -23,21 +25,118 @@ const VERDICT_CAUSE_COPY = Object.freeze({
   push: "한 번 더 밀었다",
   creep: "시계가 올린 열이 벽에 닿았다",
   timeout: "시계를 방치했다",
-  focus: "헛박자 락이 열을 벽까지 올렸다",
+  focus: "락이 올린 열이 벽에 닿았다",
   abandon: "걸어 둔 판을 떠났다",
 });
 
 /**
  * Why the window closed, in the reveal's ledger. One sentence a cause
- * (`VERDICT_CAUSES`): the two busts the player did not press for -- the
- * clock's heat creeping into the wall, and a lock off the beat heating into it
- * -- used to fall through to the cash's line, so a BUST headline sat over
- * "직접 확정했다". A cause this table does not know says only what the outcome
- * proves.
+ * (`VERDICT_CAUSES`): the busts the player did not press for -- the clock's
+ * heat creeping into the wall, and before 2026-10-10 a lock off the beat
+ * heating into it -- used to fall through to the cash's line, so a BUST
+ * headline sat over "직접 확정했다". A cause this table does not know says only
+ * what the outcome proves.
  */
 export function describeVerdictCause(verdict) {
   return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
 }
+
+/** The name a card's type goes by on the table (the report's plain names). */
+export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
+
+/**
+ * The one word of each name a phone's card has room for. A card there is half
+ * a 360px screen wide and its stats row already holds the chips and the burn,
+ * so the tag prints this word and keeps the rest of the name for a screen
+ * reader and for a wider card (`getTypeParts`).
+ */
+const TYPE_KEYWORDS = Object.freeze({ persistence: "버티기", inference: "확인", reframing: "바꾸기", risk: "위험" });
+
+/** A type's name cut around its keyword: what comes before it, the word, and what comes after. */
+export function getTypeParts(type) {
+  const name = getTypeName(type);
+  const word = TYPE_KEYWORDS[type] ?? name;
+  const at = name.indexOf(word);
+  return [name.slice(0, at), word, name.slice(at + word.length)];
+}
+
+const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
+
+/**
+ * What a settled card did to the logic streak, as the reveal says it: one
+ * sentence a move (`advanceLogic`). Nothing for a window the streak was not
+ * in play on, or a verdict logged before the streak paid.
+ */
+export function describeLogicMove(logic) {
+  const type = getTypeName(logic?.type);
+  const streak = Number(logic?.streak) || 0;
+  const paid = `논리 콤보 ${streak}, 판돈 ${bonusText(logic?.bonus)}.`;
+  switch (logic?.move) {
+    case "grow":
+      return `${type}${objectParticle(type)} 이어 갔다. ${paid}`;
+    case "build":
+      return `${type} ${Math.min(LOGIC_HOLD, Number(logic.held) || 1)}/${LOGIC_HOLD}. 같은 유형 세 번째부터 콤보가 오른다. ${paid}`;
+    case "switch":
+      return `압박이 오른 판에서 ${type}${directionParticle(type)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
+    case "keep":
+      return `지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
+    case "break":
+      return `압박이 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${LOGIC_HOLD}부터 센다.`;
+    case "bust":
+      return streak > 0 ? `벽에 닿았지만 논리 콤보 ${streak}${topicParticle(String(streak))} 남았다.` : "벽에 닿아 논리 콤보가 끊겼다.";
+    default:
+      return null;
+  }
+}
+
+/** The same move as the archive's one line under a logged decision. */
+export function describeLogicLog(logic) {
+  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: `논리 콤보 ${logic.streak} · 판돈 ${bonusText(logic.bonus)} · +${formatNumber(logic.pot)}` } : null;
+}
+
+const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switch: "전환", keep: "유지", break: "끊김" });
+
+/**
+ * The streak as the table shows it while a window is open: where it stands,
+ * and what each card would do to it. `offered` is the types the scene has on
+ * the table (`listOfferedTypes`), the same list the settlement is handed, so
+ * the streak a card is shown to leave is the one its pot is paid on.
+ *
+ * `after` is the streak with the staked card played (the run's own with none
+ * staked), and `bonus` what that pays; the pot's own line prints the bonus, as
+ * it printed the groove's. `type` and `held` are the type being held and how
+ * far the hold has got, and `note` what the staked card does, or that a change
+ * of type would count. `line` is those in one line -- the sentence a test or a
+ * wide screen reads whole -- and `spoken` the sentence the push and confirm
+ * buttons are described by.
+ */
+export function readLogic({ logic, card, offered, relics = [] }) {
+  const reach = hasRelic(relics, "metronome");
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach });
+  const moveOf = (candidate) => play(getLogicType(candidate)).move;
+  const staked = card ? play(getLogicType(card)) : null;
+  const now = staked?.logic ?? logic;
+  const open = logic.rose || (reach && logic.reach > 0);
+  const held = `${Math.min(LOGIC_HOLD, now.held)}/${LOGIC_HOLD}`;
+  const hold = now.type ? `${getTypeName(now.type)} ${held}` : "첫 카드부터 센다";
+  const bonus = getLogicBonus(now.streak);
+  const did = staked ? MOVE_COPY[staked.move] : null;
+  const note = did ?? (open && !staked ? "전환 가능" : "");
+  return {
+    after: now.streak,
+    bonus,
+    move: staked?.move ?? null,
+    moveOf,
+    type: now.type,
+    held,
+    note,
+    line: [`논리 콤보 ${now.streak}`, hold, note].filter(Boolean).join(" · "),
+    spoken: `논리 콤보 ${now.streak}, 판돈 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 압박이 올라 유형을 바꿔도 콤보가 오른다." : ""}`,
+  };
+}
+
+/** What a card's tag adds for a screen reader: what picking it would do to the streak. */
+export const describeCardMove = (move) => (MOVE_COPY[move] ? `(콤보 ${MOVE_COPY[move]})` : "");
 
 /**
  * What the table says aloud about its clock, in one polite region. The timer
@@ -127,12 +226,20 @@ function getOverdriveCopy({ streak, hot, cashMutations }) {
  * `caseId` is the case on the table. The rules it plays under (`tableUnlocks`)
  * come back as `rules`, a read-only Set, and both forecasts are dealt under
  * them: a step that has no OVERCLOCK yet is not told one is coming.
+ *
+ * `logic` is the streak as the table shows it (`readLogic`), and null in a
+ * case that does not have the rule yet.
  */
-export function useTableForecast({ schema, run, win, selectedCard, multiplier, caseId }) {
+export function useTableForecast({ schema, run, win, selectedCard, multiplier, caseId, offered }) {
   // The same frozen Set for a case from one render to the next, so it can key a memo.
   const rules = getTableRules(caseId, run);
   const mutations = useMemo(() => describeMutations(schema), [schema]);
   const relics = run?.relics;
+  const streakState = run?.logic;
+  const logic = useMemo(
+    () => (rules.has("logic") && streakState ? readLogic({ logic: streakState, card: selectedCard, offered, relics }) : null),
+    [offered, relics, rules, selectedCard, streakState],
+  );
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
   const hot = multiplier >= HOT_CASH_MULTIPLIER;
@@ -191,6 +298,7 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
     const tableRules = mutations.filter((mutation) => mutation.id !== "reboot");
     return {
       rules,
+      logic,
       mutations,
       tableRules,
       ruleHeat: getRuleHeat({ mutations: tableRules, schema }),
@@ -208,5 +316,5 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, mutations, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
 }

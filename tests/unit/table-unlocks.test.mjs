@@ -45,9 +45,9 @@ test("the ladder is the five prologues in the season's order, each step holding 
 test("each step is the one the author decided", () => {
   const rules = (caseId) => [...rulesFor(caseId, staged)].sort();
   assert.deepEqual(rules("prologue01"), []);
-  assert.deepEqual(rules("prologue02"), ["aftershock", "beat", "blackout", "silence"]);
-  assert.deepEqual(rules("prologue03"), ["aftershock", "beat", "blackout", "coldFeet", "heatDebt", "silence"]);
-  assert.deepEqual(rules("prologue04"), ["aftershock", "beat", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "overclock", "silence"]);
+  assert.deepEqual(rules("prologue02"), ["aftershock", "blackout", "logic", "silence"]);
+  assert.deepEqual(rules("prologue03"), ["aftershock", "blackout", "coldFeet", "heatDebt", "logic", "silence"]);
+  assert.deepEqual(rules("prologue04"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "overclock", "silence"]);
   // The stance and the draft come last: a draft in 05 is the offer made as 04 closes.
   assert.deepEqual(rules("prologue05"), [...TABLE_RULES].sort());
   assert.ok(!rulesFor("prologue04", staged).has("relics") && !rulesFor("prologue04", staged).has("stance"));
@@ -92,7 +92,7 @@ test("a rule set is the same object every time it is asked for, and nothing can 
     const rules = getTableRules(caseId, {}, true);
     assert.equal(getTableRules(caseId, {}, true), rules, "so it can key a memo");
     assert.throws(() => rules.add("relics"), TypeError);
-    assert.throws(() => rules.delete("beat"), TypeError);
+    assert.throws(() => rules.delete("logic"), TypeError);
     assert.throws(() => rules.clear(), TypeError);
   }
   assert.throws(() => ALL_RULES.clear(), TypeError);
@@ -133,8 +133,13 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
   }
   assert.deepEqual(UNLOCK_LADDER[3].intro.slice(1), [
     "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-    "카드를 건 뒤 심박에 맞춰 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 박자를 놓치면 열기가 오릅니다.",
+    "카드를 건 뒤 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 누를 때마다 시간이 줄어듭니다.",
   ]);
+  // 프롤로그 02 teaches the logic streak where it taught the beat, and no line says a press is timed.
+  assert.equal(UNLOCK_LADDER[1].intro[0], "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다.");
+  for (const step of UNLOCK_LADDER) {
+    for (const line of step.intro) assert.doesNotMatch(line, /박자|심박에 맞춰/, `${step.caseId}: "${line}"`);
+  }
 });
 
 test("every next-table mutation but REBOOT belongs to a rule", () => {

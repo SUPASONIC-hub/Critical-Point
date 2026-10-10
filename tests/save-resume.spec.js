@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
-import { cashStakedCard, dismissProtocolBreach, openIntroDrawer, resumeSavedRun, startDebugNode } from "./helpers/gameFlow.js";
+import { cashStakedCard, clickElement, dismissProtocolBreach, openIntroDrawer, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { seedSave } from "./helpers/seededSave.js";
 import { readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { createWindow, getTableSchema, normalizeSchema } from "../src/gauntlet/gauntletEngine.js";
@@ -45,6 +47,48 @@ test("leaving with a bet on the table keeps the table as it stood", async ({ pag
   await expect
     .poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.suspended, { timeout: 5_000 })
     .toBeNull();
+});
+
+// tests/unit/fixtures/saves/v2-current.json is a run put down in 프롤로그 02 with
+// a card staked. Here it is given what a build before 2026-10-10 would have
+// written into that window: a groove earned on the beat (12 points, x1.36 on
+// the pot) and the combo that earned it. The beat is gone; the window is not.
+test("a window saved in the middle of a beat resumes with no repair notice and pays at least what it showed", { tag: "@prod" }, async ({ page }) => {
+  const { save } = JSON.parse(readFileSync("tests/unit/fixtures/saves/v2-current.json", "utf8"));
+  const window = { ...save.dynamics.suspended.window, groove: 12, beatCombo: 6, maxCombo: 7, beatHits: 5, perfects: 3, slips: 1 };
+  const dynamics = { ...save.dynamics, beatCombo: 6, bestCombo: 11, suspended: { ...save.dynamics.suspended, window } };
+  await seedSave(page, { ...save, dynamics });
+  await page.goto("/");
+  await expect(page.getByTestId("resume-save")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".recovery-notice"), "nothing was repaired, so nothing says 복구됨").toHaveCount(0);
+  await clickElement(page.getByTestId("resume-save"), "resume saved run");
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".recovery-notice")).toHaveCount(0);
+  await dismissProtocolBreach(page);
+
+  // The table it left: the heat where it stood, and the pot still multiplied
+  // by what the beat had earned it. (The card the fixture had staked is no
+  // longer one this scene deals, so the hand stakes one.)
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  expect(Number(await stage.getAttribute("data-gauge"))).toBeGreaterThanOrEqual(window.gauge);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(page.getByTestId("gauntlet-logic-bonus")).toHaveText("콤보 1.36");
+  await expect(page.locator(".gx-beat-ring, .gx-grade")).toHaveCount(0);
+  const shown = Number((await page.getByTestId("gauntlet-pot").textContent()).replace(/[^\d]/g, ""));
+  expect(shown).toBeGreaterThan(0);
+
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.36");
+  const after = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const settled = after.log.at(-1).threshold;
+  expect(settled.logic.bonus, "the groove is the larger of the two, and is paid").toBe(1.36);
+  expect(settled.pot, "the clock only ever adds heat, so the pot is at least the one on screen").toBeGreaterThanOrEqual(shown);
+  expect(after.lastError ?? null).toBeNull();
+  expect([after.dynamics.beatCombo, after.dynamics.bestCombo], "the run's old combo is written back as it was").toEqual([6, 11]);
+  await expect(page.locator(".recovery-notice")).toHaveCount(0);
 });
 
 // A window that has closed is on its slam for most of a second before the

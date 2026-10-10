@@ -42,14 +42,14 @@ export function GauntletLedger({ log = [], summary = null }) {
           <small>밀어붙임 {ledger.pushes}회</small>
         </article>
         <article>
-          <span>최고 콤보</span>
-          <b className={ledger.bestCombo > 0 ? "gain" : ""}>{ledger.bestCombo}</b>
-          <small>PERFECT {ledger.perfects} · 헛박자 {ledger.slips}</small>
+          <span>논리 콤보</span>
+          <b className={ledger.bestLogic > 0 ? "gain" : ""}>{ledger.bestLogic}</b>
+          <small>이 사건 최고</small>
         </article>
         <article>
-          <span>그루브 판돈</span>
+          <span>콤보 판돈</span>
           <b className={ledger.grooveBanked > 0 ? "gain" : ""}>{formatNumber(ledger.grooveBanked)}</b>
-          <small>박자 {ledger.beatHits}회</small>
+          <small>콤보가 얹은 몫</small>
         </article>
         <article>
           <span>잃은 판돈</span>
