@@ -24,7 +24,7 @@ test("the intro's drawer stores a setting and the page answers before its first 
   await page.goto("/");
   await page.locator(".intro-drawer > summary", { hasText: "편의 설정" }).click();
   const panel = page.getByRole("region", { name: "편의 설정" });
-  await panel.getByLabel("2배").check();
+  await panel.getByRole("radio", { name: "2배", exact: true }).check();
   await panel.getByLabel(/첫 화면 움직임 멈추기/).check();
   await panel.getByLabel(/번쩍임·흔들림 줄이기/).check();
 
@@ -40,7 +40,7 @@ test("the intro's drawer stores a setting and the page answers before its first 
   await expect(ticker).toHaveCSS("animation-name", "none");
 
   await page.locator(".intro-drawer > summary", { hasText: "편의 설정" }).click();
-  await expect(page.getByRole("region", { name: "편의 설정" }).getByLabel("2배")).toBeChecked();
+  await expect(page.getByRole("region", { name: "편의 설정" }).getByRole("radio", { name: "2배", exact: true })).toBeChecked();
 });
 
 test("with single-key shortcuts off, a number stakes nothing and the save button names no key", async ({ page }) => {
