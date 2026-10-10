@@ -357,6 +357,8 @@ function decisionEntry(caseId, index, { story = false } = {}) {
       state: "cash", busted: false, cause: "cashed", forced: false, gauge: 63, wall: 88, pushes: 3,
       rewardMultiplier: 1.4, potMultiplier: 1.8, pot: 42, lostPot: 0,
       tempo: { hits: 4, maxCombo: 3, groovePot: 12 }, focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
+      // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
+      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index },
     },
     environmentMode: "stable",
     assistTime: 1.5,
@@ -765,7 +767,8 @@ const spreadRun = (runId, stepSeconds = 60) =>
 const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null } = {}) => {
   for (const caseId of CASE_SEQUENCE) {
     const payload = casePayload({ session, runId, caseId });
-    if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", ...(finalSummary ?? {}) };
+    // The finale as the client sends it: the season's two logic numbers ride on its summary (useChoiceCommit).
+    if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", logicHold: 82, bestLogic: 17, ...(finalSummary ?? {}) };
     const { sql, params } = postgrestInsert("playtest_sessions", payload);
     await db.query(sql, params);
   }
@@ -801,6 +804,12 @@ await postRefused("rank the run from a device that did not play its final case",
   check(row?.case_title === "SEASON 01 COMPLETE", `a ranking row kept the client's title (${row?.case_title}).`);
   check(Number(row?.score) === 88 && row?.summary?.rank === "A", `a ranking row took its score from the request (${row?.score}, ${row?.summary?.rank}), not from the run's final case.`);
   check(!("note" in (row?.summary ?? {})) && !("trigger" in (row?.summary ?? {})), "a ranking summary published a key that is not on the whitelist.");
+  // The season's logic numbers are sent from now on and published by nothing
+  // yet: the whitelist gains them with the report that reads them (ROADMAP,
+  // 8일째). Until then the server keeps them on the case row and no further.
+  const finalRow = await one(`select summary from public.playtest_sessions where case_id = 'final' and run_id = 'run-ranked-1'`);
+  check(finalRow?.summary?.logicHold === 82 && finalRow?.summary?.bestLogic === 17 && finalRow?.summary?.logicRecord?.windows === 6, `the final case row did not keep the logic record it was sent: ${JSON.stringify(finalRow?.summary?.logicRecord)}`);
+  check(!("logicHold" in (row?.summary ?? {})) && !("bestLogic" in (row?.summary ?? {})) && !("logicRecord" in (row?.summary ?? {})), "a ranking summary published a logic number before the whitelist was given it.");
   check(
     Array.isArray(row?.summary?.primary) && typeof row.summary.primary[0] === "string" && typeof row.summary.primary[1] === "number",
     `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,

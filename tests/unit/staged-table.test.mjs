@@ -17,6 +17,7 @@ import {
   RUN_INITIAL_STATE,
   serializeRunState,
 } from "../../src/gauntlet/gauntletEngine.js";
+import { LOGIC_INITIAL } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_IDS } from "../../src/gauntlet/relics.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, rulesFor, STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { settleAgainstCodex } from "../../src/gauntlet/useRelicTable.js";
@@ -228,7 +229,7 @@ test("a run saved mid-prologue before the steps keeps everything it held, with n
   assert.equal(repaired, false, "filling in the marks is not a repair");
   assert.equal(state.lastError, undefined, "so there is no 복구됨 notice");
   assert.equal(state.paused, fixture.save.paused);
-  assert.deepEqual(state.dynamics, { ...before, veteran: false, story: false }, "the table record is the save's, plus the marks that say it is a plain run at the table");
+  assert.deepEqual(state.dynamics, { ...before, veteran: false, story: false, logic: { ...LOGIC_INITIAL } }, "the table record is the save's, plus the marks that say it is a plain run at the table and a logic streak not yet begun");
   const run = normalizeRunState(state.dynamics);
   assert.deepEqual(serializeRunState(run), state.dynamics, "and it is written back the same");
   assert.equal(run.veteran, false);

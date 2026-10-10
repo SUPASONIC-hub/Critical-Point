@@ -15,6 +15,7 @@
     "src/gameLogic.js": 96,
     "src/gauntlet/fxVariables.js": 100,
     "src/gauntlet/gauntletEngine.js": 96,
+    "src/gauntlet/logicStreak.js": 100,
     "src/gauntlet/relics.js": 100,
     "src/gauntlet/tableReadout.js": 25,
     "src/gauntlet/tableRules.js": 100,

@@ -1,5 +1,6 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
+import { advanceLogic, getHeatTier, getLogicBonus, getLogicType, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
 import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE } from "./relics.js";
 import {
   AFTERSHOCK_START,
@@ -18,7 +19,9 @@ import {
   HOT_CASH_MULTIPLIER,
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
+  LOCK_PRESS_SECONDS,
   LOCKPICK_SEAL,
+  LOGIC,
   METRONOME_REACH,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
@@ -33,7 +36,7 @@ import {
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
 
-export { FRACTURE_RATE, HOT_CASH_MULTIPLIER, METRONOME_REACH, SEAL_BREAK_GAUGE } from "./tableRules.js";
+export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
 /**
  * The rules a window is played under when none are named: all of them. The
@@ -59,7 +62,7 @@ const ALL_RULES = Object.freeze({ has: () => true });
  * draw the same walls and the same steps from the same seeds.
  */
 
-export const WINDOW_SECONDS = 45;
+const WINDOW_SECONDS = 45;
 /** Seconds of reading before the clock starts creeping heat into the gauge. */
 export const READ_GRACE_SECONDS = 4;
 export const GAUGE_MAX = 100;
@@ -161,7 +164,7 @@ export function drawStep(schema, seed, pushIndex) {
  * at 84. The smallest push (7) is worth x1.55 on its own, so every press
  * visibly buys something -- and every press is visibly more to lose.
  */
-export const DOUBLING_HEAT = 11;
+const DOUBLING_HEAT = 11;
 
 export function getMultiplier(gauge) {
   const raw = Math.pow(2, clamp(Number(gauge) || 0, 0, GAUGE_MAX) / DOUBLING_HEAT);
@@ -258,7 +261,7 @@ export function normalizeSchema(value) {
  * "__wild__" spelled out in four places in the stage and one in the briefing.
  */
 export const REFRAME_CARD_ID = "__reframe__";
-export const WILD_CARD_CHIPS = 24;
+const WILD_CARD_CHIPS = 24;
 
 /** Chips: what a card is worth before heat. The sum of what it gains. */
 export function getCardChips(choice, schema = BASE_SCHEMA) {
@@ -335,10 +338,10 @@ export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8
  * The windows are fractions of the beat with a floor in milliseconds, so a
  * pulse racing at 190 bpm next to the wall still leaves a gap a hand can hit.
  */
-export const BEAT_PERFECT = 0.07;
-export const BEAT_PERFECT_FLOOR_MS = 35;
-export const BEAT_GOOD = 0.18;
-export const BEAT_GOOD_FLOOR_MS = 60;
+const BEAT_PERFECT = 0.07;
+const BEAT_PERFECT_FLOOR_MS = 35;
+const BEAT_GOOD = 0.18;
+const BEAT_GOOD_FLOOR_MS = 60;
 /** An off-beat push costs this much clock, creep included. */
 export const SLIP_SECONDS = 1;
 /** Groove one push can earn from its combo, before a PERFECT's extra point. */
@@ -351,15 +354,15 @@ export const COMBO_POINT_CAP = 4;
  * beat paid 1.81x -- past a player who could see the wall -- and timing had
  * become the strategy.
  */
-export const GROOVE_RATE = 0.03;
+const GROOVE_RATE = 0.03;
 export const GROOVE_CAP = 0.5;
 /** The groove bonus at which the table goes into fever. */
 export const FEVER_BONUS = 1.3;
 export const FOCUS_MAX = 100;
-export const FOCUS_PERFECT_GAIN = 24;
-export const FOCUS_GOOD_GAIN = 13;
-export const FOCUS_MISS_HEAT = 4;
-export const FOCUS_MISS_SECONDS = 1.25;
+const FOCUS_PERFECT_GAIN = 24;
+const FOCUS_GOOD_GAIN = 13;
+const FOCUS_MISS_HEAT = 4;
+const FOCUS_MISS_SECONDS = 1.25;
 export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
 
 const FOCUS_MODE_PROFILES = Object.freeze({
@@ -444,7 +447,7 @@ export function getGrooveBonus(groove) {
   return round2(1 + Math.min(GROOVE_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
-export function normalizeFocusMode(value) {
+function normalizeFocusMode(value) {
   return FOCUS_MODES.includes(value) ? value : "strike";
 }
 
@@ -505,8 +508,16 @@ export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } =
  */
 export const HAND_CAP = 1 + GROOVE_CAP;
 
-export function getHandBonus(groove, focus, mode = "strike") {
-  return round2(Math.min(HAND_CAP, getGrooveBonus(groove) * getFocusBonus(focus, mode).pot));
+/**
+ * `streak` is the logic streak the pot is paid on, and is only given with the
+ * switch on (`LOGIC`); left out it is none, which pays x1, and the hand is the
+ * beat and LOCK as it was. The larger of the two is paid: no push earns groove
+ * once the switch is on, so the only window that holds some is one saved in
+ * the middle of a beat and picked up after, and the pot its player saw must
+ * not shrink.
+ */
+export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
+  return round2(Math.min(HAND_CAP, Math.max(getLogicBonus(streak), getGrooveBonus(groove)) * getFocusBonus(focus, mode).pot));
 }
 
 export function getFocusBonus(focus, mode = "strike") {
@@ -522,9 +533,9 @@ export function getFocusBonus(focus, mode = "strike") {
 }
 
 export const STANCE_MASTERY_GOAL = 3;
-export const EMPTY_STANCE_MASTERY = Object.freeze({ strike: 0, steady: 0, expose: 0 });
+const EMPTY_STANCE_MASTERY = Object.freeze({ strike: 0, steady: 0, expose: 0 });
 
-export function normalizeStanceMastery(value) {
+function normalizeStanceMastery(value) {
   const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
   return FOCUS_MODES.reduce((mastery, mode) => {
     mastery[mode] = clamp(Math.trunc(Number(source[mode]) || 0), 0, 99);
@@ -539,7 +550,7 @@ function earnedStance(mode, charge, hits, outcome) {
   return outcome === "cash" && FOCUS_MODES.includes(mode) && charge >= STANCE_CHARGE && hits > 0;
 }
 
-export function advanceStanceMastery(mastery, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
+function advanceStanceMastery(mastery, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}) {
   const next = normalizeStanceMastery(mastery);
   const mode = normalizeFocusMode(focusMode);
   if (earnedStance(mode, focusCharge, focusHits, outcome)) next[mode] += 1;
@@ -737,6 +748,10 @@ export function getRemainingSeconds(window) {
  * and the window stays in the stance it opened in (STRIKE). A window resumed
  * from a save keeps what it held -- that is the player's, and `resolveWindow`
  * decides what it is worth.
+ *
+ * `logic` is the streak's switch (`tableRules`). On, there is no beat to read:
+ * a push is never graded, and a FOCUS charges as a GOOD lock did and costs
+ * `LOCK_PRESS_SECONDS` of clock -- no JAM, no heat, and no bust of its own.
  */
 function advanceClock(window, delta) {
   const elapsed = window.elapsed + delta;
@@ -748,7 +763,7 @@ function advanceClock(window, delta) {
   return { ...window, elapsed, gauge };
 }
 
-export function reduceWindow(window, event = {}, rules = ALL_RULES) {
+export function reduceWindow(window, event = {}, rules = ALL_RULES, logic = LOGIC) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
     case "TICK": {
@@ -761,7 +776,7 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       const pushes = window.pushes + 1;
       const step = drawStep(window.schema, window.seed, pushes);
       const gauge = clamp(window.gauge + step, 0, GAUGE_MAX);
-      const grade = rules.has("beat") && BEAT_GRADES.has(event.grade) ? event.grade : null;
+      const grade = !logic && rules.has("beat") && BEAT_GRADES.has(event.grade) ? event.grade : null;
       const scored = scoreBeat(window, grade);
       const pushed = {
         ...window,
@@ -784,7 +799,9 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
     }
     case "FOCUS": {
       if (!window.selectedId || !rules.has("lock")) return window;
-      const grade = BEAT_GRADES.has(event.grade) ? event.grade : null;
+      // With the switch on there is no beat to lock against: every press takes
+      // the charge a GOOD one took, and is paid for in clock below.
+      const grade = logic ? "good" : BEAT_GRADES.has(event.grade) ? event.grade : null;
       const scored = scoreFocus(window, grade);
       const profile = getFocusModeProfile(window.focusMode);
       const focused = {
@@ -796,13 +813,16 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
         focusPerfects: (Number(window.focusPerfects) || 0) + scored.focusPerfects,
         focusMisses: (Number(window.focusMisses) || 0) + scored.focusMisses,
         jammed: scored.jammed,
-        lastFocusGrade: grade,
+        lastFocusGrade: logic ? null : grade,
       };
       if (grade !== "miss") {
         const cooled = scored.focusRelief > 0
           ? { ...focused, gauge: clamp(focused.gauge - scored.focusRelief, 0, GAUGE_MAX) }
           : focused;
-        return cooled;
+        // The clock creeps heat while it is spent, as it does for a slip, so
+        // the press can run a window out or into the wall the clock's own way
+        // ("timeout", "creep") and never as a jammed LOCK ("focus").
+        return logic ? advanceClock(cooled, LOCK_PRESS_SECONDS) : cooled;
       }
       const heated = {
         ...focused,
@@ -874,6 +894,9 @@ export const RUN_INITIAL_STATE = Object.freeze({
   stanceMastery: EMPTY_STANCE_MASTERY,
   runGroove: 0,
   grooveVault: 0,
+  // The logic streak (`advanceLogic`). Counted and saved whatever the switch
+  // says; a save from before it reads as this.
+  logic: LOGIC_INITIAL,
   // The relics this season carries, the three a closed case is offering, and
   // whether INSURANCE has already paid out in this case.
   relics: [],
@@ -906,6 +929,8 @@ function normalizePractice(value) {
     stanceMastery: normalizeStanceMastery(value.stanceMastery),
     bestMultiplier: clamp(Number(value.bestMultiplier) || 1, 1, 512),
     bestCombo: clamp(Math.trunc(Number(value.bestCombo) || 0), 0, 999),
+    // A replay opened before the streak existed holds none to hand back.
+    ...(value.logic ? { logic: normalizeLogic(value.logic) } : null),
     record: source ? Object.fromEntries(PRACTICE_RECORD_KEYS.map((key) => [key, Math.max(0, Number(source[key]) || 0)])) : null,
   };
 }
@@ -938,6 +963,7 @@ export function normalizeRunState(value) {
   run.stanceMastery = normalizeStanceMastery(source.stanceMastery);
   run.runGroove = clamp(Math.round(run.runGroove), 0, run.runPot);
   run.grooveVault = clamp(Math.round(run.grooveVault), 0, run.vault);
+  run.logic = normalizeLogic(source.logic);
   run.relics = normalizeRelicIds(source.relics);
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
   run.insuranceSpent = source.insuranceSpent === true;
@@ -1182,6 +1208,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
         stanceMastery: current.stanceMastery,
         bestMultiplier: current.bestMultiplier,
         bestCombo: current.bestCombo,
+        logic: current.logic,
         record: replayOf.pushRecord ?? null,
       }
     : null;
@@ -1282,11 +1309,11 @@ function applyStanceMastery(schema, mastery = EMPTY_STANCE_MASTERY, rules = ALL_
  * off `windowIndex`, which a save carries and a restore never rolls back.
  */
 export const ESCALATION_STEP_WINDOWS = 100;
-export const ESCALATION_MAX_STEPS = 4;
+const ESCALATION_MAX_STEPS = 4;
 const ESCALATION_WALL_STEP = 2;
 const ESCALATION_CREEP_STEP = 0.03;
 
-export function getSeasonEscalation(windowIndex = 0) {
+function getSeasonEscalation(windowIndex = 0) {
   const steps = clamp(Math.floor((Number(windowIndex) || 0) / ESCALATION_STEP_WINDOWS), 0, ESCALATION_MAX_STEPS);
   return { steps, wallMax: -steps * ESCALATION_WALL_STEP, creep: round2(steps * ESCALATION_CREEP_STEP) };
 }
@@ -1401,8 +1428,13 @@ function readWindowUnder(window, rules) {
  * case, so a draft is offered only when the next case has `relics`. What the
  * run already holds -- relics, mastery, a draft still waiting, the board on
  * the table -- is left as it is under any rules.
+ *
+ * The logic streak is settled here on every window (`advanceLogic`): `forced`
+ * says the room played the card, `offered` is the types the scene had on the
+ * table. `logic` is its switch: off, the streak is kept and reported and the
+ * pot is the beat's; on, the pot is paid on the streak.
  */
-export function resolveWindow({ run, window: closedWindow, card, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, logic = LOGIC }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1417,7 +1449,18 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
   const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
-  const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode) : 1;
+  // The streak after this window's card. It lives where the beat's combo did
+  // (the `beat` rule, until the ladder renames it; without it the type is
+  // false, "not in play"), and a card the room played is not the hand's pick
+  // (null: the bust still ends the streak). 앙코르 is to hold the streak through a bust from
+  // day 6: that is `advanceLogic`'s `bustHolds`, which nothing passes yet.
+  const logicType = rules.has("beat") && (forced ? null : getLogicType(card));
+  const streak = advanceLogic(current.logic, { type: logicType, tier: getHeatTier(outcome, gauge), offered });
+  // What the hand earned before LOCK: the groove, or with the switch on the
+  // streak this card made (and a groove held from before it, see `getHandBonus`).
+  const paidStreak = logic ? streak.logic.streak : 0;
+  const earnedBonus = outcome === "cash" ? getHandBonus(reachedGroove, 0, focusMode, paidStreak) : 1;
+  const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode, paidStreak) : 1;
   const focusHits = Math.trunc(Number(window?.focusHits) || 0);
   // Practice builds no mastery, so it cannot be repeated into a stance relic either.
   const stanceMastery = current.practice || !rules.has("stance")
@@ -1428,7 +1471,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
   // The hand's share of the pot, told apart: what the beat earned, and what
   // LOCK added on top of it under the cap. It was one number called groove, so
   // a cash with no beat in it printed "GROOVE · 박자 0회".
-  const groovePot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * getGrooveBonus(reachedGroove))) - basePot : 0;
+  const groovePot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus)) - basePot : 0;
   const focusPot = pot - basePot - groovePot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
@@ -1440,7 +1483,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
   // `runGroove` is the hand's whole share, beat and LOCK: the ending's vault
   // slack reads the vault without it, and neither is reading the table.
   const runGrooveAfter = outcome === "cash" ? current.runGroove + groovePot + focusPot : insured ? Math.floor(current.runGroove / INSURANCE_SHARE) : 0;
-  const streak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
+  const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
   const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
   // A practice run closes a case the table has already been paid for: nothing
   // moves to the vault, and the next case is dealt what the season held before.
@@ -1453,7 +1496,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
     cause,
     gauge,
     pushes: Number(window?.pushes) || 0,
-    streak,
+    streak: hotStreak,
     burnAxis: fractureAxis,
     caseClosed,
     relics: practice?.relics ?? relics,
@@ -1514,18 +1557,29 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
       label: focusBonus.label,
       combo: Math.max(0, Math.trunc(Number(window?.focusCombo) || 0)),
       maxCombo: Math.max(0, Math.trunc(Number(window?.maxFocusCombo) || 0)),
-      hits: Math.trunc(Number(window?.focusHits) || 0),
+      hits: focusHits,
       perfects: Math.trunc(Number(window?.focusPerfects) || 0),
       misses: Math.trunc(Number(window?.focusMisses) || 0),
       grade: typeof window?.lastFocusGrade === "string" ? window.lastFocusGrade : null,
       resourceMultiplier: focusBonus.resource,
       // What LOCK added to this pot, after the hand's cap.
-      potMultiplier: round2(handBonus / (outcome === "cash" ? getGrooveBonus(reachedGroove) : 1)),
+      potMultiplier: round2(handBonus / earnedBonus),
       pot: focusPot,
       tier: focusBonus.tier,
       jammed: window?.jammed === true,
       stanceEarned: !current.practice && rules.has("stance") && earnedStance(focusMode, focusCharge, focusHits, outcome),
       masteryCount: stanceMastery[focusMode],
+    },
+    // The streak's own line of the verdict, on every window: the card's type,
+    // the tier the window closed in, whether the pressure had risen going into
+    // it, what that did to the streak (`advanceLogic`'s move) and the streak
+    // after. The case summary's record is built from these.
+    logic: {
+      type: logicType || null,
+      tier: streak.logic.heat,
+      rose: current.logic.rose,
+      move: streak.move,
+      streak: streak.logic.streak,
     },
   };
   const settled = {
@@ -1536,7 +1590,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
     vault: current.vault + secured,
-    streak,
+    streak: hotStreak,
     busts: current.busts + (outcome === "bust" ? 1 : 0),
     cashes: current.cashes + (outcome === "cash" ? 1 : 0),
     bestMultiplier: Math.max(current.bestMultiplier, multiplier || 1),
@@ -1553,6 +1607,7 @@ export function resolveWindow({ run, window: closedWindow, card, caseClosed = fa
     stanceMastery,
     runGroove: caseClosed ? 0 : runGrooveAfter,
     grooveVault: current.grooveVault + (caseClosed ? runGrooveAfter : 0),
+    logic: streak.logic,
     relics,
     relicOffer,
     insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
@@ -1658,6 +1713,13 @@ export function carryTableRecordIntoRestore(restored, current) {
       streak: bustedSince ? 0 : restoredRun.streak,
       beatCombo: bustedSince ? 0 : restoredRun.beatCombo,
       bestCombo: Math.max(restoredRun.bestCombo, currentRun.bestCombo),
+      // The streak goes the way the combo does: a bust since the slot took it,
+      // and the longest it has been is the record's.
+      logic: {
+        ...restoredRun.logic,
+        streak: bustedSince ? 0 : restoredRun.logic.streak,
+        best: Math.max(restoredRun.logic.best, currentRun.logic.best),
+      },
       bestFocusCombo: Math.max(restoredRun.bestFocusCombo, currentRun.bestFocusCombo),
       focusHits: Math.max(restoredRun.focusHits, currentRun.focusHits),
       focusPerfects: Math.max(restoredRun.focusPerfects, currentRun.focusPerfects),

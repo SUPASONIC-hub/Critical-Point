@@ -12,6 +12,7 @@ import {
   getEndingVariant,
   getObserverTag,
   getOutcomeChoiceId,
+  getSeasonLogic,
   getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
@@ -23,6 +24,7 @@ import {
 import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { getLogicType } from "../gauntlet/logicStreak.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -117,6 +119,18 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
   if (!caseClosed) return { rules, nextRules: rules };
   const nextCaseId = run?.practice ? null : CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1];
   return { rules, nextRules: getTableRules(nextCaseId, run, staged) };
+}
+
+/**
+ * The types of card a scene has on the table, for the logic streak: a hand
+ * that leaves its type because no card of that type was there keeps its streak
+ * (`advanceLogic` in gauntlet/logicStreak.js). The scene's own cards, the wild one among
+ * them, less any the player's standing has not opened -- a card that cannot be
+ * played is not an offer.
+ */
+export function getOfferedTypes(node, standing) {
+  const open = (node?.choices ?? []).filter((card) => getAuthorityGate(card, standing).unlocked);
+  return [...new Set(open.map(getLogicType).filter(Boolean))];
 }
 
 /**
@@ -253,7 +267,7 @@ export function useChoiceCommit(context) {
     const {
       currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
       caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
-      sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, readers, applyRun,
+      sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, readers, applyRun, clueCount, casesOpened,
     } = context;
     const windowState = closedWindow ?? { status: "cashed", cause: "cash", gauge: 0, wall: 0, pushes: 0, elapsed: 0 };
     const responseTimeSec = getWindowResponseTime({ elapsed: windowState.elapsed, enteredAt: nodeEnteredAt, clockSeconds: windowState.schema?.seconds ?? gauntletRun?.schema?.seconds });
@@ -285,6 +299,10 @@ export function useChoiceCommit(context) {
       run: gauntletRun,
       window: windowState,
       card: choice,
+      // For the logic streak: whether the room played this card, and what the
+      // scene had on the table.
+      forced,
+      offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
       caseClosed,
       offerRelics: currentCase !== "final",
       ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
@@ -367,6 +385,7 @@ export function useChoiceCommit(context) {
         lostPot: verdict.lostPot,
         tempo: verdict.tempo,
         focus: verdict.focus,
+        logic: verdict.logic,
       },
       environmentMode: verdict.nextMutations.map((mutation) => mutation.id).join("+") || "stable",
       // The table clock ran this many times slower (the comfort setting); the
@@ -407,6 +426,7 @@ export function useChoiceCommit(context) {
       const caseSummaryDraft = createCaseSummary(nextTriggers, nextCognition, nextLog, {
         resources: finalResources,
         schemaVersion: SAVE_SCHEMA_VERSION,
+        replayOf: caseResults[currentCase],
       });
       const caseSummary = {
         ...caseSummaryDraft,
@@ -435,6 +455,9 @@ export function useChoiceCommit(context) {
         // And the story mark of any case in it: one such case keeps the whole
         // season off the public ranking (`recordClosedCase`).
         if (Object.values(caseResults).some((result) => result?.assistStory === true)) caseSummary.assistStory = true;
+        // And the season's two logic numbers (`logicHold`, `bestLogic`), where
+        // its cases have a record to make them from.
+        Object.assign(caseSummary, getSeasonLogic({ ...caseResults, [currentCase]: caseSummary }));
       }
       nextCaseResults = { ...caseResults, [currentCase]: caseSummary };
       closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };

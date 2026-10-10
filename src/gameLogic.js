@@ -961,16 +961,77 @@ export function getWindowResponseTime({ elapsed = 0, enteredAt = 0, now = Date.n
   return Math.max(1, Math.round(Math.min(Number.isFinite(sinceEntry) ? Math.max(0, sinceEntry) : 0, cap)));
 }
 
+/** What a logic verdict's move adds one to in the case's record; "build" is counted as a window only. */
+const LOGIC_RECORD_KEYS = { grow: "grows", switch: "switches", break: "breaks", bust: "busts", keep: "keeps", build: null };
+
+/**
+ * The case's logic streak, as the report will read it once the log is gone:
+ * the windows in which the streak was in play, the heat they closed in (the
+ * tiers summed, and the highest), the type picked most with how many windows
+ * picked it, what became of the streak window by window, and the longest it
+ * stood in this case.
+ *
+ * A window whose verdict made no move ("none": the case does not have the rule
+ * yet) is not one of them -- nothing was asked of the hand there, and counting
+ * it would call it a streak held. A window run out with nothing staked is a
+ * bust like any other and is counted as one; the room's card has no type, so
+ * it adds to no type's count. A case with no window left is no record (null),
+ * and so is every log written before the streak was.
+ */
+export function createLogicRecord(entries = []) {
+  const record = { windows: 0, heat: 0, peak: 0, top: null, grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0 };
+  const picked = {};
+  for (const entry of entries) {
+    const logic = entry?.threshold?.logic;
+    if (!logic || !Object.hasOwn(LOGIC_RECORD_KEYS, logic.move)) continue;
+    const tier = Number(logic.tier) || 0;
+    record.windows += 1;
+    record.heat += tier;
+    record.peak = Math.max(record.peak, tier);
+    record.best = Math.max(record.best, Number(logic.streak) || 0);
+    if (LOGIC_RECORD_KEYS[logic.move]) record[LOGIC_RECORD_KEYS[logic.move]] += 1;
+    if (typeof logic.type === "string") {
+      picked[logic.type] = (picked[logic.type] ?? 0) + 1;
+      if (!record.top || picked[logic.type] > record.top[1]) record.top = [logic.type, picked[logic.type]];
+    }
+  }
+  return record.windows > 0 ? record : null;
+}
+
+/**
+ * The season's two logic numbers, from its cases' records. `logicHold` is, of
+ * the windows where the streak could have ended, the share where it did not:
+ * a window that kept the streak because the held type was not on the table
+ * could not have ended it, so it is in neither count. `bestLogic` is the
+ * longest streak any case reached. A season with no record carries neither,
+ * and one with no window that could have ended a streak carries no hold.
+ */
+export function getSeasonLogic(caseResults = {}) {
+  const records = Object.values(caseResults ?? {}).map((result) => result?.logicRecord).filter((record) => record && typeof record === "object");
+  if (!records.length) return {};
+  const sum = (key) => records.reduce((total, record) => total + (Number(record[key]) || 0), 0);
+  const open = sum("windows") - sum("keeps");
+  return {
+    ...(open > 0 ? { logicHold: clamp(Math.round((100 * (open - sum("breaks") - sum("busts"))) / open), 0, 100) } : {}),
+    bestLogic: records.reduce((best, record) => Math.max(best, Number(record.best) || 0), 0),
+  };
+}
+
+/**
+ * `replayOf` is the summary the case already has, when it is being played
+ * again: the replay is practice, and the record of its first close stands.
+ */
 export function createCaseSummary(
   triggerScores = {},
   cognitionScores = {},
   entries = [],
-  { resources = {}, schemaVersion = 1, includeLongestDecision = false } = {},
+  { resources = {}, schemaVersion = 1, includeLongestDecision = false, replayOf = null } = {},
 ) {
   const sortedTriggers = Object.entries(triggerScores).sort((a, b) => b[1] - a[1]);
   const sortedCognition = Object.entries(cognitionScores).sort((a, b) => b[1] - a[1]);
   const stats = getGameplayStats(entries, getRiskPressure(resources));
   const assistTime = entries.reduce((slowest, entry) => Math.max(slowest, Number(entry?.assistTime) || 1), 1);
+  const logicRecord = replayOf ? replayOf.logicRecord : createLogicRecord(entries);
   const summary = {
     schemaVersion,
     caseId: entries.find((entry) => entry?.caseId)?.caseId ?? null,
@@ -1012,6 +1073,9 @@ export function createCaseSummary(
     reframeRouteCount: entries.filter((entry) => entry?.reframeOpenedRoute).length,
     peopleFirstCount: entries.filter((entry) => !entry?.isSystemEvent && isPeopleFirstEffect(entry?.effect)).length,
     pushRecord: createTableRecord(entries),
+    // The logic streak's record of the case, when it has one (`createLogicRecord`);
+    // a replayed case keeps its first, as the table record above does.
+    ...(logicRecord ? { logicRecord } : {}),
     peakRiskPressure: entries.reduce(
       (peak, entry) => (entry.resourcesAfter ? Math.max(peak, getRiskPressure(entry.resourcesAfter)) : peak),
       getRiskPressure(resources),
