@@ -1940,6 +1940,20 @@
   font-weight: 800;
 }
 
+/* A short window: the way on stays at the sheet's foot, as it does on a phone
+   (recovery.css). The reveal says what the card did to the logic streak in a
+   row the beat only had when a push was graded, and at 720px of height that
+   row put the next button 15px under the fold of a sheet that scrolls. */
+@media (max-height: 800px) {
+  .gx-reveal .decision-reveal-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding-top: 12px;
+    background: inherit;
+  }
+}
+
 /* Phone ------------------------------------------------------------------------
    Every pixel of height here is a card under the dock on some scene, so the
    phone keeps the same objects and drops only padding, secondary copy and the
