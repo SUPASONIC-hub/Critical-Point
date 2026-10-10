@@ -363,7 +363,6 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     persist,
     setShowRanking,
     setShowBoard,
-    setSaveStatus,
     pendingTelemetry,
     setPendingTelemetry,
     // The same always-mounted region the runtime draws (components/SaveStatus.jsx).
