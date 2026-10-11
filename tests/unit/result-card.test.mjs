@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { getEndingPreview, getRankingLeague } from "../../src/advancedSystems.js";
-import { ENDING_IDS, getDecisionFingerprint, getEndingVariant, getThinkingMotive } from "../../src/gameLogic.js";
+import { ENDING_IDS, getDecisionFingerprint, getEndingVariant, getSeasonLogic, getThinkingMotive } from "../../src/gameLogic.js";
 import { buildLeaderboard } from "../../src/ranking.js";
 import {
   RESULT_CARD_FILE_NAME,
@@ -65,6 +65,9 @@ const FINGERPRINTS = [
 ];
 const MOTIVES = [{ affection: 1 }, { revenge: 1 }, { responsibility: 1 }, { curiosity: 1 }, {}].map((scores) => getThinkingMotive(scores));
 
+/** A case's logic record: `windows` closed, of which `breaks` and `busts` ended the streak and `keeps` could not have. */
+const logicRecord = (record) => ({ windows: 0, keeps: 0, breaks: 0, busts: 0, best: 0, ...record });
+
 const THEME = { ground: "ground", panel: "panel", text: "text", dim: "dim", accent: "accent", heat: "heat", fontFamily: '"Critical Point Sans", sans-serif' };
 
 /**
@@ -105,7 +108,8 @@ function fakeContext({ hangul = 0.92 } = {}) {
 }
 
 function modelOf({ ending = ENDINGS[0], fingerprint = FINGERPRINTS[0], caseResults = { final: { burstScore: 71, rank: "B" } }, host = HOST } = {}) {
-  return buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, caseResults, host });
+  // As the buttons' file builds it: the 논리 유지력 read off the same summaries.
+  return buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, caseResults, logicHold: getSeasonLogic(caseResults).logicHold, host });
 }
 
 function draw(model, options) {
@@ -229,6 +233,58 @@ test("a season with any case in story mode is marked, and no other season is", (
   assert.equal(marked(story), true);
 });
 
+test("the card carries the season's 논리 유지력 as the report reads it, and a season without one carries none", () => {
+  const caseResults = {
+    case01: { burstScore: 50, rank: "B", logicRecord: logicRecord({ windows: 8, keeps: 1, breaks: 1, best: 4 }) },
+    // A case from before the record was kept is passed over.
+    case02: { burstScore: 60, rank: "B" },
+    final: { burstScore: 70, rank: "A", logicRecord: logicRecord({ windows: 8, keeps: 1, busts: 1, best: 9 }), logicHold: 3, bestLogic: 2 },
+  };
+  const model = modelOf({ caseResults });
+  // From the cases' records, not from the two numbers the finale's summary was stamped with.
+  assert.equal(model.logicHold, 86);
+  assert.equal(model.logicHold, getSeasonLogic(caseResults).logicHold);
+  assert.equal(Object.hasOwn(model, "bestLogic"), false, "the longest streak is not on the card");
+  for (const [windows, breaks, expected] of [[4, 0, 100], [4, 4, 0], [3, 2, 33]]) {
+    assert.equal(modelOf({ caseResults: { final: { logicRecord: logicRecord({ windows, breaks }) } } }).logicHold, expected);
+  }
+  // No record at all, a record that is not one, and a season whose every window kept the streak by default.
+  for (const without of [{ final: { burstScore: 71, rank: "B" } }, { final: { logicRecord: "x", logicHold: 90 } }, { final: { logicRecord: logicRecord({ windows: 2, keeps: 2, best: 5 }) } }, [], undefined]) {
+    assert.equal(Object.hasOwn(modelOf({ caseResults: without }), "logicHold"), false);
+  }
+  // The model prints a whole score from 0 to 100 or no line: anything else it is handed is no score.
+  for (const odd of [undefined, null, "86", 86.5, -1, 101, NaN, Infinity, {}, [86], true]) {
+    assert.equal(Object.hasOwn(buildResultCardModel({ caseResults, logicHold: odd }), "logicHold"), false, String(odd));
+  }
+  assert.deepEqual([0, 100].map((score) => buildResultCardModel({ logicHold: score }).logicHold), [0, 100]);
+  // And the buttons' file hands it the score read off the summaries it was given, and nothing else of them.
+  const buttons = readFileSync(new URL("../../src/components/ResultCardShare.jsx", import.meta.url), "utf8");
+  assert.equal(buttons.split("buildResultCardModel({ ...input.current, logicHold: getSeasonLogic(input.current.caseResults).logicHold, host: window.location.host })").length, 2);
+  assert.equal(buttons.match(/getSeasonLogic/g).length, 2, "imported once and called once");
+});
+
+test("the 논리 유지력 line is drawn only for a season that has one, and the rest of the card does not move", () => {
+  const plain = { case01: { burstScore: 88, rank: "A" }, final: { burstScore: 70, rank: "B" } };
+  const scored = { case01: { ...plain.case01, logicRecord: logicRecord({ windows: 7, breaks: 1, best: 6 }) }, final: plain.final };
+  for (const ending of ENDINGS) {
+    const without = draw(modelOf({ ending, caseResults: plain }));
+    const withLine = draw(modelOf({ ending, caseResults: scored }));
+    const added = withLine.texts.filter((entry) => !without.texts.some((other) => other.text === entry.text && other.x === entry.x && other.y === entry.y));
+    assert.deepEqual(added.map((entry) => entry.text), [RESULT_CARD_LABELS.logic, "86점"], ending.id);
+    assert.deepEqual(without.texts, withLine.texts.filter((entry) => !added.includes(entry)), `${ending.id}: every other line is where it was`);
+    assert.deepEqual(without.rects, withLine.rects, ending.id);
+    assert.equal(without.texts.some((entry) => entry.text === RESULT_CARD_LABELS.logic), false);
+    const [label, value] = added;
+    assert.equal(label.y, value.y, "one line");
+    assert.deepEqual([label.x, label.color, value.color, label.size, value.size], [RESULT_CARD_MARGIN, "dim", "text", 26, 26]);
+    assert.ok(value.x >= label.x + label.width + 12, "the score starts after its label");
+    // In a story-mode season too, as the score cells are.
+    const story = draw(modelOf({ ending, caseResults: { ...scored, final: { ...plain.final, assistStory: true } } })).texts.map((entry) => entry.text);
+    for (const expected of [RESULT_CARD_LABELS.story, RESULT_CARD_LABELS.logic, "86점"]) assert.ok(story.includes(expected), `${ending.id}: "${expected}" on a story season's card`);
+  }
+  assert.equal(RESULT_CARD_LABELS.logic, "논리 유지력");
+});
+
 // --------------------------------------------------------------- share text
 
 test("the copied line has one shape for every ending and every 판단 DNA", () => {
@@ -299,7 +355,8 @@ test("every character the card can draw or copy has a glyph in the game's font",
   for (const ending of ENDINGS) {
     for (const fingerprint of FINGERPRINTS) {
       for (const motive of MOTIVES) {
-        const model = modelOf({ ending, fingerprint: { ...fingerprint, motive }, caseResults: { case01: { burstScore: 100, rank: "S", assistStory: true } } });
+        const model = modelOf({ ending, fingerprint: { ...fingerprint, motive }, caseResults: { case01: { burstScore: 100, rank: "S", assistStory: true, logicRecord: logicRecord({ windows: 5, best: 5 }) } } });
+        assert.equal(model.logicHold, 100);
         for (const entry of draw(model).texts) strings.add(entry.text);
         strings.add(buildShareText(model, ORIGIN));
       }
@@ -329,18 +386,20 @@ test("nothing that says who played reaches the card or the copied line", () => {
     endingVariant: { ...ending, ...stuffed },
     endingName: ending.name,
     host: HOST,
+    logicHold: 83,
     caseResults: {
-      case01: { burstScore: 90, rank: "A", assistStory: true, ...stuffed },
+      case01: { burstScore: 90, rank: "A", assistStory: true, logicRecord: { ...logicRecord({ windows: 6, breaks: 1, best: 4 }), ...stuffed }, ...stuffed },
       final: { burstScore: 70, rank: "B", reframeCount: 2, reflectionScore: 60, pressureAdaptScore: 20, ...stuffed },
     },
   });
+  assert.equal(model.logicHold, 83);
   const out = [JSON.stringify(model), buildShareText(model, ORIGIN), ...draw(model).texts.map((entry) => entry.text)];
   assert.ok(out.length > 12);
   for (const text of out) assert.doesNotMatch(text, /SENTINEL/);
   // The card is the same card with or without them.
   assert.deepEqual(
     model,
-    buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, host: HOST, caseResults: { case01: { burstScore: 90, rank: "A", assistStory: true }, final: { burstScore: 70, rank: "B", reframeCount: 2, reflectionScore: 60, pressureAdaptScore: 20 } } }),
+    buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, host: HOST, logicHold: 83, caseResults: { case01: { burstScore: 90, rank: "A", assistStory: true, logicRecord: logicRecord({ windows: 6, breaks: 1, best: 4 }) }, final: { burstScore: 70, rank: "B", reframeCount: 2, reflectionScore: 60, pressureAdaptScore: 20 } } }),
   );
   for (const key of FORBIDDEN) assert.equal(Object.hasOwn(model, key), false, `the model has no ${key}`);
 });
@@ -424,7 +483,8 @@ test("the card is 1080 by 1350 and paints its ground first", () => {
 });
 
 test("every line of every card is inside the margins, and nothing runs into the cells or the footer", () => {
-  const caseResults = { case01: { burstScore: 100, rank: "S", assistStory: true }, final: { burstScore: 100, rank: "S", reframeCount: 5, reflectionScore: 90, pressureAdaptScore: 10 } };
+  // The widest the card gets: 100점 in the cell and on the 논리 유지력 line.
+  const caseResults = { case01: { burstScore: 100, rank: "S", assistStory: true, logicRecord: logicRecord({ windows: 9, best: 9 }) }, final: { burstScore: 100, rank: "S", reframeCount: 5, reflectionScore: 90, pressureAdaptScore: 10 } };
   const longestMotive = longestOf(MOTIVES.map((motive) => motive.label));
   let cards = 0;
   // The second pass is a face a fifth wider than the game's, as a system
@@ -438,6 +498,7 @@ test("every line of every card is inside the margins, and nothing runs into the 
         assertInsideCard(ctx, label);
         const { panels, cellsTop, cellsBottom, footerRule } = regions(ctx);
         assert.equal(model.league, "REFRAME LEAGUE");
+        assert.deepEqual(ctx.texts.filter((entry) => entry.y === 966).map((entry) => entry.text), [RESULT_CARD_LABELS.logic, "100점"], `${label}: the 논리 유지력 line`);
         const footer = ctx.texts.filter((entry) => entry.y > footerRule.y);
         assert.deepEqual(footer.map((entry) => entry.text), [HOST, RESULT_CARD_LABELS.byline]);
         assert.ok(footer[0].x + footer[0].width < footer[1].x - footer[1].width, `${label}: the host and the byline do not meet`);
@@ -502,11 +563,11 @@ test("the collapse is drawn in the wall's colour and every other ending in the a
 test("the card prints what was decided and nothing else", () => {
   const ending = ENDINGS.find((candidate) => candidate.id === "human-record");
   const fingerprint = { ...FINGERPRINTS[1], motive: MOTIVES[0] };
-  const ctx = draw(modelOf({ ending, fingerprint, caseResults: { case09: { burstScore: 87, rank: "A" }, final: { burstScore: 60, rank: "B" } } }));
+  const ctx = draw(modelOf({ ending, fingerprint, caseResults: { case09: { burstScore: 87, rank: "A", logicRecord: logicRecord({ windows: 12, keeps: 2, breaks: 3, best: 5 }) }, final: { burstScore: 60, rank: "B" } } }));
   const texts = ctx.texts.map((entry) => entry.text);
   for (const expected of [
     RESULT_CARD_LABELS.game, RESULT_CARD_LABELS.season, RESULT_CARD_LABELS.dna, "RE-FRAMER", MOTIVES[0].label, RESULT_CARD_LABELS.ending,
-    ending.name, "HUMAN RECORD", RESULT_CARD_LABELS.burst, "87점", RESULT_CARD_LABELS.rank, "A", RESULT_CARD_LABELS.league, "FIELD", "LEAGUE", HOST, RESULT_CARD_LABELS.byline,
+    ending.name, "HUMAN RECORD", RESULT_CARD_LABELS.burst, "87점", RESULT_CARD_LABELS.rank, "A", RESULT_CARD_LABELS.league, "FIELD", "LEAGUE", RESULT_CARD_LABELS.logic, "70점", HOST, RESULT_CARD_LABELS.byline,
   ]) {
     assert.ok(texts.includes(expected), `"${expected}" is on the card`);
   }
@@ -606,7 +667,8 @@ test("the card comes out as a PNG file, drawn after the font was asked for, with
       },
     },
   });
-  const model = modelOf();
+  const model = modelOf({ caseResults: { final: { burstScore: 71, rank: "B", logicRecord: logicRecord({ windows: 25, breaks: 2, best: 8 }) } } });
+  assert.equal(model.logicHold, 92);
   const file = await renderResultCardFile(model, { document: documentRef });
   assert.ok(file instanceof File);
   assert.equal(file.name, "critical-point-result.png");

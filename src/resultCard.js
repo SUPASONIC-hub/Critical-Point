@@ -29,6 +29,9 @@ const CELLS_TOP = 1000;
 const CELLS_HEIGHT = 170;
 const CELL_GAP = 20;
 const CELL_PADDING = 28;
+// The one line between the ending and the cells sits on the cells, not on the
+// ending: the longest ending stops at 912.
+const LOGIC_BASELINE = 966;
 const FOOTER_RULE = 1206;
 const FOOTER_BASELINE = 1256;
 // The two weights the card is set in. `renderResultCardFile` asks for both
@@ -144,7 +147,16 @@ export function drawResultCard(ctx, model, theme) {
     }
   }
 
-  // 4. Three cells: the best table of the season, its rank, and the league.
+  // 4. 논리 유지력, on one line over the cells, for a season that has one.
+  if (model.logicHold !== undefined) {
+    ctx.font = fontOf(theme, REGULAR, 26);
+    // The label is five syllables, so the score beside it starts well inside the left half.
+    const scoreLeft = LEFT + ctx.measureText(RESULT_CARD_LABELS.logic).width + 16;
+    write(RESULT_CARD_LABELS.logic, LEFT, LOGIC_BASELINE, { size: 26, color: theme.dim });
+    write(`${model.logicHold}${RESULT_CARD_LABELS.points}`, scoreLeft, LOGIC_BASELINE, { weight: HEAVY, size: 26, maxWidth: CONTENT_WIDTH / 2 });
+  }
+
+  // 5. Three cells: the best table of the season, its rank, and the league.
   const cellWidth = (CONTENT_WIDTH - CELL_GAP * 2) / 3;
   const inner = cellWidth - CELL_PADDING * 2;
   const cells = [
@@ -166,7 +178,7 @@ export function drawResultCard(ctx, model, theme) {
     });
   });
 
-  // 5. The foot: where the game is, and that the record is an anonymous one.
+  // 6. The foot: where the game is, and that the record is an anonymous one.
   ctx.fillStyle = theme.panel;
   ctx.fillRect(LEFT, FOOTER_RULE, CONTENT_WIDTH, 2);
   if (model.host) write(model.host, LEFT, FOOTER_BASELINE, { weight: HEAVY, size: 28, color: accent, maxWidth: CONTENT_WIDTH / 2 + 60 });
@@ -175,7 +187,7 @@ export function drawResultCard(ctx, model, theme) {
 
 /** Every string a card prints, for the font to be asked about before it is drawn. */
 function cardText(model) {
-  return [...Object.values(RESULT_CARD_LABELS), ...Object.values(model).filter((value) => typeof value === "string"), String(model.bestBurst)].join("");
+  return [...Object.values(RESULT_CARD_LABELS), ...Object.values(model).filter((value) => typeof value !== "boolean")].join("");
 }
 
 /**

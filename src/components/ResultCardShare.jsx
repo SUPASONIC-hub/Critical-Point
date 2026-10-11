@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { copyText } from "../appConfig.js";
+import { getSeasonLogic } from "../gameLogic.js";
 import { buildResultCardModel, buildShareText, renderResultCardFile, shareOrSave } from "../resultCard.js";
 import { RESULT_CARD_COPY, RESULT_CARD_STATUS } from "../resultCardCopy.js";
 
@@ -56,7 +57,8 @@ export default function ResultCardShare({ card }) {
   async function make() {
     const attempt = (run.current += 1);
     setHeld(null);
-    const model = buildResultCardModel({ ...input.current, host: window.location.host });
+    // The 논리 유지력 is read off the stored summaries here, as the report reads it.
+    const model = buildResultCardModel({ ...input.current, logicHold: getSeasonLogic(input.current.caseResults).logicHold, host: window.location.host });
     const file = await renderResultCardFile(model, { document });
     if (attempt !== run.current) return null;
     const made = file ? { file, text: buildShareText(model, window.location.origin) } : false;
