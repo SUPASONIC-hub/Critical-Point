@@ -837,9 +837,14 @@ Still open, on purpose:
 70. When the season's length changes, reset both rankings: a migration deletes
     the `season-final` rows (per-case telemetry stays) and the local board moves
     to a new `critical-point-local-ranking-vN` key that retires the old ones
-    (v7 today). The 2026-09-28 migration also deleted every season row the new
+    (v8 today). The 2026-09-28 migration also deleted every season row the new
     server rules would have refused, so the public ranking starts over when it
-    is pushed.
+    is pushed. The table changing what it pays is the same occasion: on
+    2026-10-11 both were reset once more (v8, and
+    `20261011010000_logic_table_ranking_reset.sql`), because a score from the
+    beat table does not compare with one from the logic-streak table.
+    `check:grants` replays that migration over a seeded database and fails if
+    it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
     copy, and requires every glossary term (189) to carry a plain explanation
