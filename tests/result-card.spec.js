@@ -5,8 +5,10 @@ import { expect, test } from "./helpers/network.js";
 import { completeCurrentCase, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
+import { getSeasonLogic } from "../src/gameLogic.js";
 import { RESULT_CARD_FILE_NAME, RESULT_CARD_HEIGHT, RESULT_CARD_WIDTH } from "../src/resultCard.js";
 import { RESULT_CARD_COPY } from "../src/resultCardCopy.js";
+import { LOGIC_REPORT_COPY } from "../src/logicReport.js";
 import { buildResultCardModel } from "../src/resultCardModel.js";
 
 /**
@@ -132,6 +134,10 @@ async function readCardPixels(page, file) {
     const at = (x, y) => Array.from(data.slice((y * canvas.width + x) * 4, (y * canvas.width + x) * 4 + 3)).join(",");
     const colours = new Set();
     for (let y = 0; y < canvas.height; y += 5) for (let x = 0; x < canvas.width; x += 5) colours.add(at(x, y));
+    // The band the 논리 유지력 line is set in, between the longest ending and the cells.
+    const ground = at(12, 12);
+    let logicInk = 0;
+    for (let y = 942; y < 976; y += 1) for (let x = 80; x < 540; x += 1) if (at(x, y) !== ground) logicInk += 1;
     const tokens = getComputedStyle(document.documentElement);
     const painted = (token) => {
       const probe = document.createElement("canvas");
@@ -146,6 +152,7 @@ async function readCardPixels(page, file) {
       width: bitmap.width,
       height: bitmap.height,
       colours: colours.size,
+      logicInk,
       // The corner is ground; (540, 141) is on the hairline under the top strip.
       corner: at(12, 12),
       hairline: at(540, 141),
@@ -157,7 +164,7 @@ async function readCardPixels(page, file) {
 }
 
 /** The download is a card: named, a PNG of the card's size, and drawn on. */
-async function expectCardFile(page, download, { failure = false, keepAs } = {}) {
+async function expectCardFile(page, download, { failure = false, logic, keepAs } = {}) {
   expect(download.suggestedFilename()).toBe(RESULT_CARD_FILE_NAME);
   const file = await download.path();
   const bytes = readFileSync(file);
@@ -168,6 +175,7 @@ async function expectCardFile(page, download, { failure = false, keepAs } = {}) 
   expect(pixels.colours, "text was drawn: a flat rectangle has a handful of colours").toBeGreaterThan(40);
   expect(pixels.corner, "the ground is the table's felt").toBe(pixels.ground);
   expect(pixels.hairline, failure ? "the collapse ending is drawn in the wall's colour" : "the hairline is the accent").toBe(failure ? pixels.heat : pixels.accent);
+  if (logic !== undefined) expect(pixels.logicInk > 0, logic ? "the 논리 유지력 line is drawn over the cells" : "a season without the score has nothing over the cells").toBe(logic);
   if (KEEP && keepAs) {
     mkdirSync(KEEP, { recursive: true });
     writeFileSync(path.join(KEEP, keepAs), bytes);
@@ -189,14 +197,15 @@ async function keepScreenshots(page, testInfo, label) {
   await page.setViewportSize(before);
 }
 
-/** The copied line, as `buildShareText` writes it for this page's season. */
+/** The copied line, as `buildShareText` writes it for this page's season, and the season's 논리 유지력 if it has one. */
 async function expectedShareLine(page) {
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   const { bestBurst, bestRank } = buildResultCardModel({ caseResults: saved.caseResults });
+  const { logicHold } = getSeasonLogic(saved.caseResults);
   const modeTitle = await page.locator(".result-why-grid article").nth(1).locator("strong").innerText();
   const origin = new URL(page.url()).origin;
   const pattern = new RegExp(`^트리거랩에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\. ${origin}/$`);
-  return { pattern, bestBurst, bestRank };
+  return { pattern, bestBurst, bestRank, logicHold };
 }
 
 test("결과 카드 저장 downloads a drawn 1080x1350 card and copies its line", async ({ page }, testInfo) => {
@@ -260,15 +269,53 @@ for (const season of [
     await save.click();
     const download = await downloading;
     await expect(status).toHaveText(RESULT_CARD_COPY.saved);
-    const bytes = await expectCardFile(page, download, { failure: Boolean(season.failure), keepAs: `${season.keepAs}-${testInfo.project.name}.png` });
+    const line = await expectedShareLine(page);
+    const bytes = await expectCardFile(page, download, { failure: Boolean(season.failure), logic: line.logicHold !== undefined, keepAs: `${season.keepAs}-${testInfo.project.name}.png` });
     for (const sentinel of [PLAYER, MESSAGE]) expect(bytes.includes(Buffer.from(sentinel)), `${sentinel} in the file's bytes`).toBe(false);
 
-    const line = await expectedShareLine(page);
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     expect(copied).toMatch(line.pattern);
     expect(copied).not.toContain(PLAYER);
     expect(copied).not.toContain(MESSAGE);
     expect(pageErrors).toEqual([]);
+  });
+}
+
+// The card's 논리 유지력 is the report's: both read the season's stored
+// summaries, so the number the panel prints is the one the card was given, and
+// the line is on the card exactly when the panel has a score. A story-mode
+// season keeps it, as it keeps its score cells.
+for (const season of [
+  { title: "a season with a logic record", keepAs: "ending-logic", extra: {} },
+  { title: "a story-mode season", keepAs: "ending-logic-story", extra: { assistStory: true } },
+]) {
+  test(`the card carries the 논리 유지력 the closing report prints: ${season.title}`, { tag: "@prod" }, async ({ page }, testInfo) => {
+    test.setTimeout(120_000);
+    await withoutWebShare(page);
+    const record = (logicRecord) => ({ burstScore: 64, rank: "B", ...season.extra, logicRecord: { windows: 8, heat: 6, peak: 2, top: ["risk", 5], grows: 2, switches: 1, breaks: 0, busts: 0, keeps: 0, best: 3, ...logicRecord } });
+    await seedSave(page, savedRunAt("final", "f_aftershock", { caseResults: { case01: record({ breaks: 2 }), case02: record({ busts: 1, keeps: 1, best: 7 }) } }));
+    await page.goto("/");
+    await resumeSavedRun(page);
+    await openTheRecord(page);
+    await leaveTheMessage(page);
+    await expectCardReady(page);
+
+    const line = await expectedShareLine(page);
+    expect(line.logicHold, "the season has a score from 0 to 100").toBeGreaterThanOrEqual(0);
+    expect(line.logicHold).toBeLessThan(100);
+    await expect(page.getByTestId("logic-report").locator("p").nth(1)).toContainText(LOGIC_REPORT_COPY.hold(line.logicHold));
+    await expect(page.locator(".result-hero-copy > p").filter({ hasText: "스토리 모드" })).toHaveCount(season.extra.assistStory ? 1 : 0);
+
+    const { save, status } = cardControls(page);
+    const downloading = page.waitForEvent("download");
+    await save.click();
+    const download = await downloading;
+    await expect(status).toHaveText(RESULT_CARD_COPY.saved);
+    await expectCardFile(page, download, { logic: true, keepAs: `${season.keepAs}-${testInfo.project.name}.png` });
+    // The copied line is the one it was: the score is on the card only.
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    expect(copied).toMatch(line.pattern);
+    expect(copied).not.toContain(LOGIC_REPORT_COPY.label);
   });
 }
 

@@ -5,9 +5,9 @@ import { buildLeaderboard } from "./ranking.js";
  * and the line that is copied next to it. Nothing here touches the page, so
  * the tests can read the whole card without a canvas.
  *
- * The card is public the moment it is saved, so it is built from four things
- * only -- the 판단 DNA, the ending, the case summaries and the site's host --
- * and nothing that says who played. `buildResultCardModel` reads the fields it
+ * The card is public the moment it is saved, so it is built from five things
+ * only -- the 판단 DNA, the ending, the case summaries, the 논리 유지력 read off
+ * those summaries and the site's host -- and nothing that says who played. `buildResultCardModel` reads the fields it
  * lists and no others, whatever else the object it is handed carries.
  */
 
@@ -20,6 +20,7 @@ export const RESULT_CARD_LABELS = Object.freeze({
   burst: "최고 버스트",
   rank: "랭크",
   league: "리그",
+  logic: "논리 유지력",
   points: "점",
   story: "스토리 모드",
   byline: "익명 분석관의 기록",
@@ -77,10 +78,11 @@ function readSeasonLeague(finalSummary) {
  * @param {{ label?: string, title?: string, failure?: boolean }} [input.endingVariant] The ending the season reached.
  * @param {string} [input.endingName] The ending as a sentence calls it, in Korean.
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
+ * @param {number} [input.logicHold] The season's 논리 유지력, 0 to 100, as `getSeasonLogic` reads it off those summaries.
  * @param {string} [input.host] The site's host, printed at the foot of the card.
  */
 export function buildResultCardModel(input = {}) {
-  const { fingerprint, endingVariant, endingName, caseResults, host } = input ?? {};
+  const { fingerprint, endingVariant, endingName, caseResults, logicHold, host } = input ?? {};
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const summaries = Object.values(results).filter((summary) => summary && typeof summary === "object");
   const best = readBestCase(summaries);
@@ -96,6 +98,9 @@ export function buildResultCardModel(input = {}) {
     bestBurst: best.burst,
     bestRank: best.rank,
     league: readSeasonLeague(Array.isArray(results) ? null : results.final),
+    // A season with no window that could have ended a streak has no 논리 유지력,
+    // and its card has no such field.
+    ...(Number.isInteger(logicHold) && logicHold >= 0 && logicHold <= 100 ? { logicHold } : {}),
     // A season with any case played in story mode says so on the card.
     story: summaries.some((summary) => Boolean(summary.assistStory)),
     host: toText(host),
