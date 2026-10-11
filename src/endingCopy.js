@@ -123,13 +123,19 @@ export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsen
   return beatSeason ? SEASON_RECORD_BEAT_TABLE : SEASON_RECORD_SENT;
 }
 
+const openAfterglow = {
+  title: "당신의 선택은 결론보다 오래 남는 질문이 되었습니다.",
+  text: "기록은 정답을 보관하지 않습니다. 다음 판단이 시작될 수 있도록, 당신이 멈춘 자리의 온도를 보관합니다.",
+};
+
 /**
- * What the run leaves behind, keyed by the reaction the observer saw most. The
- * observation ledger counts exactly these four (`getObservationLedger`,
- * gameLogic.js), so there is no fifth answer: a run with nothing observed reads
- * as the first of them, 순응, and the "open" afterglow this used to hold for an
- * unknown reaction was never shown.
+ * What the run leaves behind, read from the observation ledger: the afterglow
+ * of the reaction the observer saw most, the first of them on a tie. The ledger
+ * counts exactly these four (`getObservationLedger`, gameLogic.js), and a
+ * finale can end with all four at zero. That run is not told it kept order: it
+ * gets the open afterglow, which names no reaction.
  */
-export function getEndingAfterglow(observation) {
-  return endingAfterglows[observation];
+export function getEndingAfterglow(ledger) {
+  const [observation, seen] = Object.entries(ledger).sort((a, b) => b[1] - a[1])[0];
+  return seen > 0 ? endingAfterglows[observation] : openAfterglow;
 }

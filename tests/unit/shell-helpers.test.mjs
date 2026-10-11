@@ -450,13 +450,16 @@ test("the ending's verdict: a collapse first, then the final choice, then the op
 });
 
 test("every observed reaction has a label and an afterglow of its own", () => {
+  const none = { compliance: 0, defiance: 0, opacity: 0, sacrifice: 0 };
+  assert.deepEqual(Object.keys(none), Object.keys(endingCopy.observationLabels));
+  // One ledger per reaction seen alone, and the one where none was: five sentences.
   const titles = new Set();
-  for (const observation of Object.keys(endingCopy.observationLabels)) {
-    const afterglow = endingCopy.getEndingAfterglow(observation);
-    assert.ok(afterglow.title && afterglow.text, observation);
+  for (const ledger of [none, ...Object.keys(none).map((observation) => ({ ...none, [observation]: 1 }))]) {
+    const afterglow = endingCopy.getEndingAfterglow(ledger);
+    assert.ok(afterglow.title && afterglow.text, JSON.stringify(ledger));
     titles.add(afterglow.title);
   }
-  assert.equal(titles.size, 4);
+  assert.equal(titles.size, 5);
   assert.deepEqual(endingCopy.endingAxisCopy.map((axis) => axis.label), ["PROTECT", "EXPOSE", "HANDOFF"]);
 });
 
