@@ -97,6 +97,7 @@ const DEFAULT_SPECS = [
   "tests/cloud-save.spec.js",
   "tests/contrast.spec.js",
   "tests/gauntlet-loop.spec.js",
+  "tests/logic-report.spec.js",
   "tests/recovery.spec.js",
   "tests/result-card.spec.js",
   "tests/save-integrity.spec.js",

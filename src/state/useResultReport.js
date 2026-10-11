@@ -15,8 +15,9 @@ import {
   getTelemetryDashboardSnapshot,
 } from "../advancedSystems.js";
 import { getFailureRecovery } from "../featurePack.js";
-import { caseAftermathNodeId, nodes, triggerLabels } from "../gameData.js";
+import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
+import { createLogicReport } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
@@ -139,6 +140,9 @@ export function useResultReport({
   // or the last case's when no summary carries one.
   const standing = seasonStrain.seasonResources ?? resources;
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
+  // The season's logic panel, from the stored summaries: `result` above is made
+  // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
+  const logicReport = useMemo(() => createLogicReport({ caseResults, cases: seasonCasesBase }), [caseResults]);
   const routeTimeline = useMemo(
     () =>
       log
@@ -161,6 +165,7 @@ export function useResultReport({
     result,
     endingVariant,
     rankingComparison,
+    logicReport,
     routeTimeline,
     finalEndingEntry,
     finalAftermathEntry,
