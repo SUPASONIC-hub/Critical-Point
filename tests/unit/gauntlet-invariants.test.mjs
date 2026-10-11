@@ -4,7 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { getAftermath, getOriginEndingVariant } from "../../src/advancedSystems.js";
+import { getAftermath, getOriginEndingVariant } from "../../src/runtimeSystems.js";
 import { getOperatorReveal } from "../../src/featurePack.js";
 import { nodes } from "../../src/gameData.js";
 import { createCaseSummary, getGameplayStats, getSeasonStrain } from "../../src/gameLogic.js";

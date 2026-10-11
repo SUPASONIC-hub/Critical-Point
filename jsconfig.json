@@ -28,6 +28,7 @@
     "src/resultCardCopy.js",
     "src/resultCardModel.js",
     "src/riskLogic.js",
+    "src/runtimeSystems.js",
     "src/telemetry.js",
     "src/state/diagnosticUtils.js",
     "src/state/errorRecovery.js",

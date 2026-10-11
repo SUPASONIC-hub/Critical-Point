@@ -292,8 +292,39 @@ function serviceWorkerSetting(command, mode) {
   return mode === "e2e" ? "ask" : "on";
 }
 
+/**
+ * Gives `src/runtimeSystems.js` a file of its own.
+ *
+ * It is what a run and its report read and the screen before a run does not,
+ * taken out of the entry chunk (it was the larger half of advancedSystems.js).
+ * Only the runtime imports it, so left alone the bundler writes it into the
+ * runtime's chunk, which has no room for it (scripts/check-bundle-size.mjs).
+ * `manualChunks` cannot name it either: a manual chunk takes the modules it
+ * imports with it, and those are the entry chunk's. So it is emitted as a
+ * chunk that is only ever loaded after the page's own entry, which is what
+ * lets it import from the entry chunk instead of pulling what they share into
+ * a third file. Nothing asks for it by name: the runtime's chunk imports it,
+ * and it is on the list fetched beside the runtime.
+ */
+const RUNTIME_SYSTEMS = "src/runtimeSystems.js";
+
+function runtimeSystemsChunk() {
+  return {
+    name: "runtime-systems-chunk",
+    apply: "build",
+    buildStart() {
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(RUNTIME_SYSTEMS),
+        name: "runtimeSystems",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+    },
+  };
+}
+
 export default defineConfig(({ command, mode }) => ({
-  plugins: [seasonData(), react(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
+  plugins: [seasonData(), react(), runtimeSystemsChunk(), criticalCss(), absoluteSiteUrls(), buildShaMeta(), serviceWorker(), renderHeaders()],
   // The debug console -- the case jump, unlock-all, the forced render error --
   // is dead code in a release, and this constant is how the bundler is told.
   // `debugToolsEnabled` used to read `(import.meta.env ?? {}).DEV`, which

@@ -46,7 +46,7 @@ const failureVerdict = {
  * A run always has both things the open verdict is written from: the ruling
  * returns one of its endings whatever it is given (`getEndingVariant`,
  * gameLogic.js), and every ending has a scene with an action of its own
- * (`getEndingSceneProfile`, advancedSystems.js). The three sentences kept here
+ * (`getEndingSceneProfile`, runtimeSystems.js). The three sentences kept here
  * for a run without them were never printed; tests/unit/report-copy.test.mjs
  * holds the two facts.
  */

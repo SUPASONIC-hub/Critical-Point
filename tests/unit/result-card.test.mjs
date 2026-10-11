@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { getEndingPreview, getRankingLeague } from "../../src/advancedSystems.js";
+import { getRankingLeague } from "../../src/advancedSystems.js";
+import { getEndingPreview } from "../../src/runtimeSystems.js";
 import { ENDING_IDS, getDecisionFingerprint, getEndingVariant, getSeasonLogic, getThinkingMotive } from "../../src/gameLogic.js";
 import { buildLeaderboard } from "../../src/ranking.js";
 import {

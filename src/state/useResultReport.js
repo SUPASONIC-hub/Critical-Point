@@ -1,6 +1,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 
 import { SAVE_SCHEMA_VERSION } from "../appConfig.js";
+import { getRankingIntegrity } from "../advancedSystems.js";
 import {
   getAftermath,
   getAuthorityReview,
@@ -10,10 +11,9 @@ import {
   getOriginEndingVariant,
   getPlayReport,
   getRankingComparison,
-  getRankingIntegrity,
   getReplayDiagnostics,
   getTelemetryDashboardSnapshot,
-} from "../advancedSystems.js";
+} from "../runtimeSystems.js";
 import { getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
