@@ -57,8 +57,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     },
   ];
   // The index stops at the last of the three (TWIST_COUNT, useEndingSequence.js).
-  const currentEndingTwist = endingTwists[endingTwistIndex];
-  const endingTwistCount = endingTwists.length;
+  const currentEndingTwist = endingTwists[endingTwistIndex]; const endingTwistCount = endingTwists.length;
   const isFinalEndingTwist = endingTwistIndex >= endingTwistCount - 1;
   const endingAxes = [
     { ...endingCopy.endingAxisCopy[0], value: Math.min(100, Math.round((result.pressureAdaptScore ?? 0) * 0.7 + (result.reducedRiskCount ?? 0) * 10)) },
@@ -260,6 +259,11 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <section className="ending-epilogue-panel" aria-label="엔딩 에필로그">
               <span lang="en">AFTER THE RECORD</span>
               <p>{view.endingEpilogue}</p>
+            </section>
+          )}
+          {currentCase === "final" && view.logicReport && (
+            <section className="ending-epilogue-panel" aria-label={view.logicReport.label} data-testid="logic-report">
+              <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
           {currentCase === "final" && view.failureRecovery && (

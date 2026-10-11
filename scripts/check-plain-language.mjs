@@ -59,6 +59,7 @@ const SCREEN_COPY_FILES = [
   "src/viewModels/sceneViewModels.js",
   "src/viewModels/reportViewModels.js",
   "src/state/useResultReport.js",
+  "src/logicReport.js",
 ];
 
 /**

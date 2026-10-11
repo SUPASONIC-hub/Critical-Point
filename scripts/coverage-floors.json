@@ -23,6 +23,7 @@
     "src/gauntlet/tableUnlocks.js": 100,
     "src/gauntlet/useRelicTable.js": 70,
     "src/gauntlet/useTableKeys.js": 83,
+    "src/logicReport.js": 100,
     "src/playerLanguage.js": 98,
     "src/privacyText.js": 100,
     "src/ranking.js": 96,
