@@ -16,6 +16,7 @@ import {
   LOGIC_REPORT_MIN_CASES,
   LOGIC_STANDING_PENDING,
   getRankedLogicHold,
+  hasBeatTableCase,
   readStanding,
 } from "../../src/logicReport.js";
 import { easyCognitionLabels } from "../../src/playerLanguage.js";
@@ -28,7 +29,8 @@ import { easyCognitionLabels } from "../../src/playerLanguage.js";
 const record = (values = {}) => ({ windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...values });
 // Seven cases as the season lists them (id, label, title); the titles are this file's own, so a retitled case moves no assertion.
 const CASES = ["72시간", "가짜 신호", "이름 없는 승인", "넷째", "다섯째", "여섯째", "일곱째"].map((title, index) => ({ id: `case0${index + 1}`, label: `사건 0${index + 1}`, title }));
-const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values) } : { rank: "B" }]));
+// A case with a record was closed at the logic table, so its run summary has the table's mark; one without is a summary from before it.
+const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values), gauntlet: { logicStreak: 0 } } : { rank: "B" }]));
 
 /** Six cases at a mean heat of 0.5, and 사건 03 at 2.0 with five of its eight windows on 위험 다루기. */
 const SEASON = seasonOf([{}, { breaks: 1 }, { windows: 8, heat: 16, peak: 3, top: ["risk", 5], grows: 3, switches: 1, breaks: 1, busts: 1, best: 9 }, {}, { keeps: 2 }, {}, { best: 4 }]);
@@ -92,7 +94,9 @@ test("one case reads as held, as switched, or as not staying on a type", () => {
 
 test("a season with few recorded cases names none, and one with no record prints no panel", () => {
   assert.equal(LOGIC_REPORT_MIN_CASES, 5);
-  const four = seasonOf([{}, null, { windows: 8, heat: 16, breaks: 2, best: 3 }, {}, null, {}, null]);
+  // Three of the seven closed with no window to count: cases of this table still, with its mark and no record.
+  const four = { ...seasonOf([{}, null, { windows: 8, heat: 16, breaks: 2, best: 3 }, {}, null, {}, null]) };
+  for (const [id, summary] of Object.entries(four)) if (!summary.logicRecord) four[id] = { ...summary, gauntlet: { logicStreak: 0 } };
   assert.deepEqual(createLogicReport({ caseResults: four, cases: CASES }).lines, [
     "논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.",
     "논리 유지력 92점 · 최고 논리 콤보 3 · 순위는 시즌 기록이 50건 모이면 나옵니다.",
@@ -180,6 +184,29 @@ test("a season is ranked on its score unless it has none, or a story-mode case",
   assert.equal(getRankedLogicHold(seasonOf([{ windows: 2, keeps: 2, best: 5 }])), null);
   assert.equal(getRankedLogicHold(seasonOf([null, null])), null);
   assert.equal(getRankedLogicHold(), null);
+});
+
+test("a season with a case from before the logic table is on no ranking, and its panel prints no rank", () => {
+  assert.equal(hasBeatTableCase(SEASON), false);
+  assert.equal(hasBeatTableCase(), false);
+  assert.equal(hasBeatTableCase({}), false, "a season with nothing closed yet has no such case");
+  // One case closed at the beat table: a run summary without the mark, or none at all.
+  const beatSummary = { windowIndex: 9, vault: 1200, beatCombo: 4, bestCombo: 11, grooveVault: 520 };
+  for (const [label, old] of [["no mark", { rank: "B", gauntlet: beatSummary }], ["no run summary", { rank: "B" }], ["a mark that is no number", { rank: "B", gauntlet: { logicStreak: "3" } }], ["no summary", null]]) {
+    const season = { ...SEASON, [CASES[5].id]: old };
+    assert.equal(hasBeatTableCase(season), true, label);
+    assert.equal(getRankedLogicHold(season), null, label);
+  }
+  // The season still has a score, from the cases that have a record, and the panel prints it alone.
+  const season = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: beatSummary } };
+  assert.equal(getSeasonLogic(season).logicHold, 92);
+  for (const standing of [LOGIC_STANDING_PENDING, { band: 10 }, null]) {
+    assert.equal(createLogicReport({ caseResults: season, cases: CASES, standing }).lines[1], "논리 유지력 92점 · 최고 논리 콤보 9");
+  }
+  // A case with the mark and no record (no window of it could be counted) is not such a case.
+  const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0 } } };
+  assert.equal(hasBeatTableCase(windowless), false);
+  assert.equal(getRankedLogicHold(windowless), 92);
 });
 
 test("the report says 열기 and never 압박, and every character it can print is in the game's font", () => {

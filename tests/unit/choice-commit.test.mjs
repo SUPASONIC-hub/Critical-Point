@@ -367,7 +367,7 @@ test("a decision the save refused sends nothing and unlocks nothing", () => {
 test("the finale closes the season: NEW GAME+ is told, and a ranking row waits behind the last case row", () => {
   const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
   const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
-  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1 }]));
+  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1, gauntlet: { logicStreak: 0 } }]));
   const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
   const card = context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final);
   mount(context).choose(card, closedWindow("cash"));
@@ -502,10 +502,11 @@ test("a story case played again at the table is still a story case: the vault it
 test("a season with any story case is not sent to the public ranking, and this device still ranks it with the mark", async () => {
   const { buildLeaderboard } = await import("../../src/ranking.js");
   const { finaleId, earlier } = finaleScene();
-  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B" }]));
+  // Every case closed at the logic table: its run summary has the table's mark (`hasBeatTableCase`).
+  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0 } }]));
   const seasons = {
     "the finale itself": { caseResults: plainResults, story: true },
-    "one case long before it": { caseResults: { ...plainResults, [earlier[7]]: { burstScore: 60, rank: "B", assistStory: true } }, story: false },
+    "one case long before it": { caseResults: { ...plainResults, [earlier[7]]: { ...plainResults[earlier[7]], assistStory: true } }, story: false },
   };
   for (const [which, { caseResults, story }] of Object.entries(seasons)) {
     const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
@@ -536,4 +537,27 @@ test("a season with any story case is not sent to the public ranking, and this d
   assert.deepEqual(did.queued.map((item) => item.payload.case_id), ["final", "season-final"]);
   assert.equal("assistStory" in did.queued[1].payload.summary, false);
   assert.equal(buildLeaderboard(did.rankingRows)[0].assistStory, false);
+});
+
+test("a season with a case from before the logic table is not sent to the public ranking, and this device still ranks it", () => {
+  const { finaleId, earlier } = finaleScene();
+  const logicResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0 } }]));
+  const seasons = {
+    "a case with the beat table's summary": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B", gauntlet: { beatCombo: 4, bestCombo: 11, grooveVault: 520 } } },
+    "a case from before the table": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B" } },
+    // The finale first closed at the beat table and played again here: the server keeps the first close's row.
+    "the finale's own first close": { ...logicResults, final: { burstScore: 60, rank: "B", gauntlet: { beatCombo: 2 } } },
+  };
+  for (const [which, caseResults] of Object.entries(seasons)) {
+    const { context, did } = sceneContext(finaleId, { completedCases: caseResults.final ? [...earlier, "final"] : earlier, caseResults });
+    mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash", `beat-season-${which.length}`));
+    assert.equal(did.patches[0].completedCases.length, CASE_SEQUENCE.length, which);
+    // The finale just closed has the mark, as the row it is sent with has.
+    assert.equal(typeof did.patches[0].caseResults.final.gauntlet.logicStreak, "number", which);
+    // Its case row leaves the device as any season's does; the ranking row is not queued to be refused.
+    assert.deepEqual(did.queued.map((item) => item.payload.case_id), ["final"], which);
+    assert.equal(typeof did.queued[0].payload.dynamics.logicStreak, "number", which);
+    assert.deepEqual(did.rankingRows.map((row) => row.case_id), ["final", "season-final"], which);
+    assert.equal(did.seasonFinals.length, 1, which);
+  }
 });

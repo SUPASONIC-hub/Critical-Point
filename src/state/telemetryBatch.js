@@ -14,6 +14,8 @@ import { sendTelemetryItem } from "./telemetryQueuePolicy.js";
 const PACE_REFUSAL = /rate limit exceeded|limit reached|daily ceiling|at least 30 seconds apart/;
 const NOT_YET_REFUSAL = /requires every case of the run|implausibly short/;
 const MISSING_CASE_REFUSAL = /requires every case of the run/;
+// A season with a case closed before the table paid the logic streak (20261011010000).
+const BEAT_TABLE_REFUSAL = /beat-table runs are not ranked/;
 
 /**
  * What a failed send means for the row and for the rest of the batch:
@@ -95,10 +97,23 @@ export function isUnrankableRefusal(item, error) {
 }
 
 /**
+ * Whether a ranking row was refused because its season has a case closed at
+ * the table that paid for a press on the beat. Read from what the server said,
+ * whatever status it said it with: the answer is about what the run was, so
+ * the row is let go, and the status line says why (useTelemetryQueue.js).
+ */
+export function isBeatTableRefusal(item, error) {
+  if (!isSeasonRow(item)) return false;
+  return BEAT_TABLE_REFUSAL.test(`${error?.serverMessage ?? ""} ${error instanceof Error ? error.message : ""}`);
+}
+
+/**
  * One pass over the queue. `kept` is what stays queued, in the order it was
  * queued; `refused` counts the rows the server would not take and the queue
  * let go; `unranked` counts the ranking rows let go because their run is
- * missing a case row on the server and always will be; `aborted` means
+ * missing a case row on the server and always will be; `beatTable` counts the
+ * ranking rows let go for a case from the beat table, which are not among
+ * `refused`; `aborted` means
  * `canSend` said no before the pass was over (consent unticked, the connection
  * gone), and the caller leaves the queue as it stands.
  *
@@ -118,6 +133,7 @@ export async function sendTelemetryBatch(items, { canSend = () => true, isQueued
   let stopped = false;
   let refused = 0;
   let unranked = 0;
+  let beatTable = 0;
   for (const [index, item] of ordered.entries()) {
     if (stopped) {
       waiting.push(item);
@@ -144,7 +160,8 @@ export async function sendTelemetryBatch(items, { canSend = () => true, isQueued
       const failure = classifyTelemetryFailure(error);
       // "permanent" is the server refusing the row itself (a payload over its
       // cap, a run that cannot rank). Sending it again changes nothing.
-      if (failure === "permanent") {
+      if (isBeatTableRefusal(item, error)) beatTable += 1;
+      else if (failure === "permanent") {
         refused += 1;
         if (!isSeasonRow(item) && runOf(item) !== null) brokenRuns.add(runOf(item));
       } else if (failure === "later" && isUnrankableRefusal(item, error)) unranked += 1;
@@ -155,6 +172,6 @@ export async function sendTelemetryBatch(items, { canSend = () => true, isQueued
   // Asked once more at the end. A pass that stopped at a failed send no longer
   // asked on the rows after it, so consent unticked during that send came back
   // as an ordinary result with every row kept.
-  if (!canSend()) return { kept: batch, aborted: true, refused, unranked };
-  return { kept: batch.filter((item) => waiting.includes(item)), aborted: false, refused, unranked };
+  if (!canSend()) return { kept: batch, aborted: true, refused, unranked, beatTable };
+  return { kept: batch.filter((item) => waiting.includes(item)), aborted: false, refused, unranked, beatTable };
 }

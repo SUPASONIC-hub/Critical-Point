@@ -83,13 +83,29 @@ export function readStanding(data, value) {
 }
 
 /**
+ * Whether the season has a case closed before the table paid the logic streak.
+ * The mark is the server's own (20261011010000): a numeric `logicStreak` in
+ * the run summary a closed case keeps as `gauntlet`, which is what its row was
+ * sent with as `dynamics` (`createRunSummary`, written by every build since
+ * the streak pays and by none before). A summary with no `gauntlet` is from
+ * before the table. Not `logicRecord`: a case with no window has none.
+ *
+ * One thing it cannot see: a case closed at the beat table and played again at
+ * this one. The device keeps the replay's summary and the server the first
+ * close's row, so that season is told only when the server refuses it.
+ */
+export function hasBeatTableCase(caseResults = {}) {
+  return Object.values(caseResults ?? {}).some((result) => typeof result?.gauntlet?.logicStreak !== "number");
+}
+
+/**
  * The score a season is ranked on, or null when it is on no ranking: a season
- * with no score, and one with a story-mode case in it, which is kept off the
- * public ranking (`recordClosedCase`).
+ * with no score, and one kept off the public ranking (`recordClosedCase`) for
+ * a story-mode case in it or a case from the beat table.
  */
 export function getRankedLogicHold(caseResults = {}) {
   const { logicHold } = getSeasonLogic(caseResults);
-  return logicHold === undefined || Object.values(caseResults).some((result) => result?.assistStory === true) ? null : logicHold;
+  return logicHold === undefined || hasBeatTableCase(caseResults) || Object.values(caseResults).some((result) => result?.assistStory === true) ? null : logicHold;
 }
 
 /**

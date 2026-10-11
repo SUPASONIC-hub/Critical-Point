@@ -29,6 +29,7 @@ import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
+import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
@@ -263,7 +264,13 @@ export function useChoiceCommit(context) {
     // (check:pressure prints the ratio), and the public ranking compares
     // seasons played on one table. The case rows above are still sent, with
     // the mark, and this device's own ranking keeps the row.
-    if (telemetryEnabled && dataConsent && caseRowQueued && !caseSummary.assistStory) {
+    //
+    // Nor for a season with a case closed before the table paid the logic
+    // streak: the server refuses its row (20261011010000), and the page before
+    // the finale has said so (`getSeasonRecordNotice`). Read from the cases as
+    // they stood before this close, so a finale first closed at the beat table
+    // and played again counts too. Its case rows are sent as any season's are.
+    if (telemetryEnabled && dataConsent && caseRowQueued && !caseSummary.assistStory && !hasBeatTableCase(caseResults)) {
       queueTelemetry({
         id: `season-final-${runId}`,
         type: "case",

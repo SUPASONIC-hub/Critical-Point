@@ -4,6 +4,7 @@ import { acceptConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
+import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
@@ -21,6 +22,7 @@ import {
   waitForEntrance,
 } from "./helpers/gameFlow.js";
 import { measureTable } from "./helpers/layout.js";
+import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 
 async function startDebugNode(page, caseId, nodeId) {
   await startDebugNodeFromHelper(page, caseId, nodeId, {
@@ -89,6 +91,37 @@ test("the page that opens the finale says the season record will be sent", async
   await expect(notice).toBeVisible();
   await expect(notice).toContainText("피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다");
   await expect(page.getByRole("button", { name: /마지막 사건 시작/ })).toBeVisible();
+});
+
+// A season begun before the table paid the logic streak is refused by the
+// ranking (20261011010000), and its row is not sent. The page used to tell it,
+// like any other, that the record would go to the online ranking.
+test("the page that opens the finale tells a season with a case from before the logic table that it will not rank", async ({ page }) => {
+  test.setTimeout(180_000);
+  // A returning player's save, one scene from the end of 사건 49, the research box ticked. 사건 48 was closed
+  // at the beat table: its summary has no run summary with a streak in it (`hasBeatTableCase`, src/logicReport.js).
+  const resources = { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 };
+  const beatCase = createCaseSummary({}, {}, [{ caseId: "case48" }], { resources, schemaVersion: 2 });
+  await seedSave(page, savedRunAt("case49", "c49_aftershock", { caseResults: { case48: beatCase }, dataConsent: true }));
+  // After the seed, which clears storage.
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/");
+  await resumeSavedRun(page);
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible();
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
+  const notice = page.locator(".next-case-panel").getByTestId("season-record-notice");
+  await expect(notice).toBeVisible();
+  await expect(notice).toHaveText("논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.");
+  await expect(notice).not.toContainText("전송됩니다");
+  await expect(page.getByRole("button", { name: /마지막 사건 시작/ })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow, "the notice does not widen the page").toBeLessThanOrEqual(1);
 });
 
 test("a page that opens an ordinary case says nothing about the season record", async ({ page }) => {

@@ -41,13 +41,18 @@ const RETRY_DELAY_CAP_MS = 5 * 60_000;
 const UNRANKED =
   "이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 서버에 이 회차의 사건 기록이 모두 있지는 않습니다(데이터 제공 동의 전에 마친 사건이 있거나, 서버가 받지 않은 기록이 있습니다). 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
 
+// Said when a ranking row is let go because its season has a case closed
+// before the table paid the logic streak (telemetryBatch.isBeatTableRefusal).
+const BEAT_TABLE =
+  "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
+
 /**
  * What the status line says after a pass over the queue. A ranking row that
  * was let go is said first and whatever else happened after it: it is the one
  * outcome the player cannot see anywhere else, and the row is no longer in the
  * queue to be counted as waiting.
  */
-export function describeBatchResult({ queueCommitted, left, refused = 0, unranked = 0 }) {
+export function describeBatchResult({ queueCommitted, left, refused = 0, unranked = 0, beatTable = 0 }) {
   if (!queueCommitted) {
     return {
       tone: "error",
@@ -56,6 +61,7 @@ export function describeBatchResult({ queueCommitted, left, refused = 0, unranke
   }
   const lines = [];
   if (unranked > 0) lines.push(UNRANKED);
+  if (beatTable > 0) lines.push(BEAT_TABLE);
   if (refused > 0) lines.push(`서버가 받지 않은 기록 ${refused}건은 대기열에서 뺐습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다.`);
   if (left > 0) lines.push(`원격 저장 ${left}건이 아직 실패 상태입니다. 잠시 후 다시 시도하세요.`);
   if (lines.length === 0) return { tone: "success", text: "원격 저장을 모두 완료했습니다." };
@@ -153,7 +159,7 @@ export function useTelemetryQueue({
     // empties the queue on an untick, and a tick a moment later must not send
     // what the player was just told had been deleted.
     const isQueued = (item) => pendingTelemetryRef.current.some((queued) => queued.id === item.id);
-    const { kept, aborted, refused, unranked } = await sendTelemetryBatch(retryBatch, { canSend, isQueued });
+    const { kept, aborted, refused, unranked, beatTable } = await sendTelemetryBatch(retryBatch, { canSend, isQueued });
     retryingRef.current = false;
     setIsRetryingTelemetry(false);
     if (aborted) {
@@ -170,7 +176,7 @@ export function useTelemetryQueue({
       telemetryRetryAttemptRef.current = 0;
       setTelemetryRetryInfo({ attempt: 0, nextRetryAt: "" });
     }
-    setTelemetryStatus(describeBatchResult({ queueCommitted, left: nextQueue.length, refused, unranked }));
+    setTelemetryStatus(describeBatchResult({ queueCommitted, left: nextQueue.length, refused, unranked, beatTable }));
     return { attempted: true, failedCount: nextQueue.length, queueCommitted };
   }
 
