@@ -17,11 +17,12 @@ import {
 import { getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
-import { createLogicReport } from "../logicReport.js";
+import { createLogicReport, getRankedLogicHold } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { getRouteMarker } from "./savedState.js";
+import { useLogicStanding } from "./useLogicStanding.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 
 const RANK_LINES = {
@@ -142,7 +143,10 @@ export function useResultReport({
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
-  const logicReport = useMemo(() => createLogicReport({ caseResults, cases: seasonCasesBase }), [caseResults]);
+  // Its rank is asked for once the finale has closed, and only for a season the ranking takes.
+  const rankedHold = useMemo(() => (currentCase === "final" && caseResults.final ? getRankedLogicHold(caseResults) : null), [caseResults, currentCase]);
+  const logicStanding = useLogicStanding(rankedHold);
+  const logicReport = useMemo(() => createLogicReport({ caseResults, cases: seasonCasesBase, standing: logicStanding }), [caseResults, logicStanding]);
   const routeTimeline = useMemo(
     () =>
       log
