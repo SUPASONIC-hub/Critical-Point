@@ -692,7 +692,7 @@ export function GauntletStage({
           {/* What a press costs is on the button: the clock is the only price. */}
           <small>{focusModeProfile.label} {Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 차지 {Math.round(win.focus)}. 누를 때마다 판돈과 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다
+            지금 차지 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. 판돈 배율은 상한까지만 오른다
           </span>
         </button>
         )}
