@@ -5,6 +5,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { classifyTelemetryFailure, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
@@ -25,7 +26,7 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  * So this replays every migration into an in-process Postgres (PGlite) set up
  * the way a project is after that date: the API roles exist and can use the
  * schema, functions and sequences keep their default grants, and tables get
- * none. Then it asserts three things.
+ * none. Then it asserts five things.
  *
  *   1. Rules that hold for any table, so a new one cannot slip through: RLS is
  *      on, service_role can read and write it, and every policy aimed at anon
@@ -45,6 +46,9 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *      a newer save, and every privilege 20260928 revoked.
  *   4. The limits themselves: each hourly and daily budget is driven to its
  *      edge, because a limit nobody has run is a number in a comment.
+ *   5. What a migration that deletes leaves behind. The ranking reset of
+ *      2026-10-11 is replayed over a database with a row in every table, and
+ *      every row but the ranking rows has to come out of it as it went in.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -65,14 +69,145 @@ await db.exec(`
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
 
+// The ranking reset of 2026-10-11 deletes rows, and a delete is judged by what
+// it leaves. So the database it meets here is not empty: just before that file
+// is replayed, every table gets a row, and `playtest_sessions` gets a run's
+// case rows and two ranking rows -- one the public ranking shows and one it
+// does not (no score), since the reset takes both. The tables are read before
+// and after, and the seeded rows are taken out again, so the rest of this
+// check runs on the database it always had.
+const RANKING_RESET = "20261011010000_logic_table_ranking_reset.sql";
+const RESET_SEED = "grants-check-reset";
+/** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
+async function readEverythingButRanking() {
+  const { rows: seen } = await db.query(`
+    select c.relname as name from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relkind in ('r', 'p') order by 1
+  `);
+  const state = {};
+  for (const { name } of seen) {
+    const { rows } = await db.query(
+      `select to_jsonb(t)::text as row from public.${name} t ${name === "playtest_sessions" ? "where case_id <> 'season-final'" : ""} order by 1`,
+    );
+    state[name] = rows.map(({ row }) => row);
+  }
+  return state;
+}
+async function seedBeforeRankingReset() {
+  // Rows put in place as stored rows, past the insert triggers: what the reset
+  // meets is rows written under older rules, not rows today's trigger admits.
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    const session = (summary, caseId, dynamics = null) =>
+      db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, player_name, case_id, case_title, summary, dynamics)
+         values ($1, $2, 'RESETSEED', '익명 분석관', $3, $4, $5::jsonb, $6::jsonb)`,
+        [`${RESET_SEED}-session`, summary.runId, caseId, caseId === "season-final" ? "SEASON 01 COMPLETE" : "수습 딱지", JSON.stringify({ ...summary, runId: undefined }), dynamics === null ? null : JSON.stringify(dynamics)],
+      );
+    const beatTable = { windowIndex: 6, runPot: 0, vault: 320, streak: 2, busts: 1, cashes: 5, bestMultiplier: 2.4, lastGauge: 61, lastOutcome: "cash", mutations: [], responseTimeSec: 7.4, beatCombo: 3, bestCombo: 9, grooveVault: 40 };
+    // A run the beat table closed: two of its case rows and its ranking row.
+    await session({ runId: `${RESET_SEED}-run-1`, burstScore: 71 }, "case01", beatTable);
+    await session({ runId: `${RESET_SEED}-run-1`, burstScore: 91, rank: "S" }, "final", beatTable);
+    await session({ runId: `${RESET_SEED}-run-1`, burstScore: 91, rank: "S", seasonComplete: true }, "season-final");
+    // A ranking row the public ranking does not show: it has no score.
+    await session({ runId: `${RESET_SEED}-run-2`, burstScore: 64 }, "final", beatTable);
+    await session({ runId: `${RESET_SEED}-run-2`, seasonComplete: true }, "season-final");
+    // A stored case row the new constraint would refuse, were it sent today.
+    await session({ runId: `${RESET_SEED}-run-3`, burstScore: 50 }, "case02", { ...beatTable, handVault: "forty" });
+    await db.query(`insert into public.playtest_feedback (session_id, session_code, case_id, feedback) values ($1, 'RESETSEED', 'case01', '{"clarity": 4}')`, [`${RESET_SEED}-session`]);
+    await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
+    await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
+    await db.query(`insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '점검', '랭킹을 비우기 전에 쓴 글', 'board:${RESET_SEED}')`, [`${RESET_SEED}-session`]);
+    await db.query(`insert into public.cloud_saves (code_hash, saved_at, payload) values ($1, now(), '{"save": {}}')`, [RESET_SEED]);
+    await db.query(`insert into public.telemetry_rate_limits (actor_key, request_count) values ($1, 7)`, [RESET_SEED]);
+    await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+}
+/** Takes the seeded rows out again; the tables are named, so one added later is caught by the count below. */
+async function removeRankingResetSeed() {
+  let removed = 0;
+  for (const [table, column, value] of [
+    ["playtest_sessions", "session_id", `${RESET_SEED}-session`],
+    ["playtest_feedback", "session_id", `${RESET_SEED}-session`],
+    ["app_error_logs", "session_id", `${RESET_SEED}-session`],
+    ["free_text_analyses", "session_id", `${RESET_SEED}-session`],
+    ["board_posts", "session_id", `${RESET_SEED}-session`],
+    ["cloud_saves", "code_hash", RESET_SEED],
+    ["telemetry_rate_limits", "actor_key", RESET_SEED],
+    ["private_settings", "name", RESET_SEED],
+  ]) {
+    removed += (await db.query(`delete from public.${table} where ${column} = $1`, [value])).affectedRows ?? 0;
+  }
+  return removed;
+}
+let beforeReset = null;
+let afterReset = null;
+let rankingBeforeReset = null;
+let rankingAfterReset = null;
+const countRanking = async () =>
+  (await db.query(
+    `select count(*)::int as n, (count(*) filter (where summary->>'seasonComplete' = 'true' and score is not null))::int as shown
+       from public.playtest_sessions where case_id = 'season-final'`,
+  )).rows[0];
+
 const files = readdirSync(MIGRATIONS).filter((file) => file.endsWith(".sql")).sort();
+if (!files.includes(RANKING_RESET)) failures.push(`supabase/migrations/${RANKING_RESET} is gone; the check of what the ranking reset leaves ran against nothing.`);
 for (const file of files) {
+  if (file === RANKING_RESET) {
+    await seedBeforeRankingReset();
+    beforeReset = await readEverythingButRanking();
+    rankingBeforeReset = await countRanking();
+  }
   try {
     await db.exec(readFileSync(path.join(MIGRATIONS, file), "utf8"));
   } catch (error) {
     console.error(`supabase/migrations/${file} does not apply to a fresh database: ${error.message}`);
     process.exit(1);
   }
+  if (file === RANKING_RESET) {
+    afterReset = await readEverythingButRanking();
+    rankingAfterReset = await countRanking();
+  }
+}
+
+// What the ranking reset removed, and what it left (20261011010000).
+if (beforeReset && afterReset) {
+  if (rankingBeforeReset.n !== 2 || rankingBeforeReset.shown !== 1) {
+    failures.push(`the ranking reset met ${rankingBeforeReset.n} ranking rows, ${rankingBeforeReset.shown} of them shown; the check seeds two, one shown and one not.`);
+  }
+  if (rankingAfterReset.n !== 0) failures.push(`the ranking reset left ${rankingAfterReset.n} season-final rows; it has to leave none, shown or not.`);
+  const names = Object.keys(beforeReset);
+  if (JSON.stringify(names) !== JSON.stringify(Object.keys(afterReset))) {
+    failures.push(`the ranking reset changed the tables in public: ${names.join(", ")} before, ${Object.keys(afterReset).join(", ")} after.`);
+  }
+  for (const name of names) {
+    // A table with no row before the reset proves nothing by having none after it.
+    if (beforeReset[name].length === 0) {
+      failures.push(`public.${name} held no row when the ranking reset ran, so nothing shows the reset leaves it alone. Seed one in seedBeforeRankingReset in scripts/check-grants.mjs.`);
+    }
+    if (JSON.stringify(beforeReset[name]) !== JSON.stringify(afterReset[name] ?? null)) {
+      failures.push(
+        `the ranking reset changed public.${name}: ${beforeReset[name].length} rows before${name === "playtest_sessions" ? " (ranking rows aside)" : ""}, ` +
+          `${afterReset[name]?.length ?? 0} after, or a row among them was rewritten. It may delete season-final rows and nothing else.`,
+      );
+    }
+  }
+  // The run's own case rows are among what stayed, the `final` one with them,
+  // and so is a stored row the new constraint would refuse: NOT VALID re-reads nothing.
+  const kept = (await db.query(
+    `select run_id, case_id, dynamics->>'handVault' as hand from public.playtest_sessions where session_id = $1 order by run_id, case_id`,
+    [`${RESET_SEED}-session`],
+  )).rows.map((row) => `${row.run_id.slice(RESET_SEED.length + 1)}:${row.case_id}${row.hand ? `:${row.hand}` : ""}`);
+  if (JSON.stringify(kept) !== JSON.stringify(["run-1:case01", "run-1:final", "run-2:final", "run-3:case02:forty"])) {
+    failures.push(`after the ranking reset the seeded runs hold ${JSON.stringify(kept)}; expected their case rows and no ranking row.`);
+  }
+  const removed = await removeRankingResetSeed();
+  if (removed !== 11) failures.push(`the ranking-reset seed took ${removed} rows out again; it put in 13 and the reset deletes 2.`);
+  const left = await readEverythingButRanking();
+  const stray = Object.entries(left).filter(([, rows]) => rows.some((row) => row.includes(RESET_SEED))).map(([name]) => name);
+  if (stray.length) failures.push(`the ranking-reset seed is still in public.${stray.join(", public.")}; everything after this would run beside it.`);
 }
 
 // ------------------------------------------------------------------ 1. rules
@@ -752,6 +887,40 @@ withHeaders(null);
   await postRefused(`send a case row with ${SERVER_RELIC_LIMIT + 1} relics`, "playtest_sessions", withRelics("run-relics-3", "case09", filler(SERVER_RELIC_LIMIT + 1)), /^23514 /);
 }
 
+// The hand's keys in `dynamics` (20261011010000): the logic streak's two and
+// the hand's share of the vault are numbers when they are there, and a row
+// without them -- a client from before the streak -- is taken as it was. The
+// three keys of the beat table keep the same rule for the tabs and queues that
+// still send them.
+{
+  const built = createRunSummary(RUN_INITIAL_STATE);
+  const NEW_KEYS = ["logicStreak", "bestLogic", "handVault"];
+  const RETIRED_KEYS = ["beatCombo", "bestCombo", "grooveVault"];
+  check(
+    NEW_KEYS.every((key) => typeof built[key] === "number") && RETIRED_KEYS.every((key) => !(key in built)),
+    `the run summary the client builds no longer has the hand's keys this check types: ${JSON.stringify(Object.keys(built))}. ` +
+      "Bring playtest_sessions_dynamics_shape and this block in step with createRunSummary in src/gauntlet/gauntletEngine.js.",
+  );
+  let shapeRun = 0;
+  const withDynamics = (patch, drop = []) => {
+    const payload = casePayload({ session: sessionId(1), runId: `run-shape-${++shapeRun}`, caseId: "case10" });
+    const dynamics = { ...payload.dynamics, ...patch };
+    for (const key of drop) delete dynamics[key];
+    return { ...payload, dynamics };
+  };
+  // A run summary as a save can hold it: a streak and a share of the vault that are not zero.
+  await post("send a case row whose hand holds a streak and a share of the vault", "playtest_sessions", withDynamics({ logicStreak: 12, bestLogic: 17, handVault: 140, vault: 320 }));
+  await post("send a case row with none of the hand's keys", "playtest_sessions", withDynamics({}, [...NEW_KEYS]));
+  await post("send the case row a beat-table build sends", "playtest_sessions", withDynamics({ beatCombo: 3, bestCombo: 9, grooveVault: 40 }, [...NEW_KEYS]));
+  for (const key of [...NEW_KEYS, ...RETIRED_KEYS]) {
+    await post(`send a case row with ${key} as a number`, "playtest_sessions", withDynamics({ [key]: 5 }));    for (const [kind, value] of [["a string", "5"], ["null", null], ["an object", { value: 5 }], ["an array", [5]], ["a boolean", true]]) {
+      await postRefused(`send a case row with ${key} as ${kind}`, "playtest_sessions", withDynamics({ [key]: value }), /^23514 .*playtest_sessions_dynamics_shape/);
+    }
+  }
+  const shape = await one(`select convalidated as validated from pg_constraint where conname = 'playtest_sessions_dynamics_shape' and conrelid = 'public.playtest_sessions'::regclass`);
+  check(shape?.validated === false, "playtest_sessions_dynamics_shape is validated: adding it re-read every stored row, and a row written under an older shape would have stopped the migration.");
+}
+
 // ---- the ranking
 
 const rankedSession = sessionId(10);
@@ -765,9 +934,13 @@ const spreadRun = (runId, stepSeconds = 60) =>
       where s.id = t.id`,
     [runId, stepSeconds],
   );
-const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null, storyCases = [] } = {}) => {
+/** The run summary a build of the beat table sent as `dynamics`: its three keys, and none of the hand's. */
+const beatTableDynamics = ({ logicStreak: _streak, bestLogic: _best, handVault: _hand, ...rest }) => ({ ...rest, beatCombo: 3, bestCombo: 9, grooveVault: 40 });
+// `dynamicsOf(caseId, dynamics)` answers with what that case row carries in place of the client's own.
+const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null, storyCases = [], dynamicsOf = null } = {}) => {
   for (const caseId of CASE_SEQUENCE) {
     const payload = casePayload({ session, runId, caseId, story: storyCases.includes(caseId) });
+    if (dynamicsOf) payload.dynamics = dynamicsOf(caseId, payload.dynamics);
     // The finale as the client sends it: the season's two logic numbers ride on its summary (useChoiceCommit).
     if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", logicHold: 82, bestLogic: 17, ...(finalSummary ?? {}) };
     const { sql, params } = postgrestInsert("playtest_sessions", payload);
@@ -867,6 +1040,82 @@ await postRefused("rank a third run from one device in a day", "playtest_session
   await presetCounter(`season-ip:${await writerKey("198.51.100.20")}`, 20);
   await playRun("run-ranked-5", { session: sessionId(13) });
   await postRefused("rank a 21st run from one address in a day", "playtest_sessions", seasonPayload({ session: sessionId(13), runId: "run-ranked-5" }), /^PT429 .*limit reached/);
+}
+withHeaders(null);
+
+// ---- a season from the beat table stays out (20261011010000)
+//
+// The reset deleted the row that said "this run is ranked already", so a run
+// whose case rows are all stored could ask again. Each run below is whole,
+// watched and well spaced, like run-ranked-1, which ranked: what its case rows
+// carry in `dynamics` is all there is to refuse.
+withHeaders({ "x-forwarded-for": "198.51.100.21" });
+{
+  const BEAT_REFUSAL = /^P0001 beat-table runs are not ranked$/;
+  const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
+  const marked = (runId) => one(
+    `select (count(*) filter (where jsonb_typeof(dynamics->'logicStreak') = 'number'))::int as logic, count(*)::int as n
+       from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
+    [runId],
+  );
+  const refusedRun = async (label, runId, session, expected, pattern = BEAT_REFUSAL) => {
+    const rows = await marked(runId);
+    check(rows?.n === CASE_SEQUENCE.length && rows?.logic === expected, `${runId}'s case rows did not land as sent: ${rows?.logic} of ${rows?.n} carry logicStreak, expected ${expected} of ${CASE_SEQUENCE.length}.`);
+    await postRefused(label, "playtest_sessions", seasonPayload({ session, runId }), pattern);
+    check((await rankingRows(runId)) === 0, `${runId} has a ranking row; a season with a case from the beat table must have none.`);
+  };
+
+  // The run that ranked is the one every case row of which carries the mark,
+  // and it is the run summary the client builds that carries it.
+  check(typeof createRunSummary(RUN_INITIAL_STATE).logicStreak === "number", "the run summary the client builds has no numeric logicStreak; every season would be refused as one from the beat table.");
+  const ranked = await marked("run-ranked-1");
+  check(
+    ranked?.logic === CASE_SEQUENCE.length && (await rankingRows("run-ranked-1")) === 1,
+    `run-ranked-1 has ${await rankingRows("run-ranked-1")} ranking rows with ${ranked?.logic} of ${ranked?.n} case rows carrying logicStreak; the run that ranks is the one with all of them.`,
+  );
+
+  // A season finished at the beat table, as the reset leaves it: every case
+  // row stored, three days old, its ranking row gone. It was ranked once --
+  // the row is put in place and deleted the way the migration deletes it.
+  await playRun("run-beat-1", { session: sessionId(15), dynamicsOf: (_caseId, dynamics) => beatTableDynamics(dynamics) });
+  await db.query(`update public.playtest_sessions set completed_at = completed_at - interval '3 days' where run_id = 'run-beat-1'`);
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    await db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary)
+       values ($1, 'run-beat-1', 'BEAT', 'season-final', 'SEASON 01 COMPLETE', '{"seasonComplete": true, "burstScore": 88, "rank": "A"}')`,
+      [sessionId(15)],
+    );
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  check((await rankingRows("run-beat-1")) === 1, "the beat-table run's old ranking row was not put in place.");
+  await post("send the ranking row of a ranked beat-table run again before the reset", "playtest_sessions", seasonPayload({ session: sessionId(15), runId: "run-beat-1" }));
+  await db.query(`delete from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-beat-1'`);
+  await refusedRun("rank a season finished at the beat table again after the reset", "run-beat-1", sessionId(15), 0);
+
+  // Begun at the beat table and finished at this one: the first ten cases are the old build's.
+  const early = CASE_SEQUENCE.slice(0, 10);
+  await playRun("run-beat-2", { session: sessionId(16), dynamicsOf: (caseId, dynamics) => (early.includes(caseId) ? beatTableDynamics(dynamics) : dynamics) });
+  await refusedRun("rank a season begun at the beat table and finished at the logic table", "run-beat-2", sessionId(16), CASE_SEQUENCE.length - 10);
+
+  // One case row with no `dynamics` at all is not a logic-table row either:
+  // the client sends the run summary with every case row.
+  const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  check(casePayload({ session: sessionId(17), runId: "run-beat-probe", caseId: middle }).dynamics?.logicStreak === 0, "the case row this check builds carries no logicStreak in dynamics.");
+  await playRun("run-beat-3", { session: sessionId(17), dynamicsOf: (caseId, dynamics) => (caseId === middle ? null : dynamics) });
+  await refusedRun("rank a season with one case row that carries no dynamics", "run-beat-3", sessionId(17), CASE_SEQUENCE.length - 1);
+
+  // Both a story season and a beat-table one: the story check stands first, so it is told that.
+  await playRun("run-beat-story", { session: sessionId(19), storyCases: [middle], dynamicsOf: (_caseId, dynamics) => beatTableDynamics(dynamics) });
+  await refusedRun("rank a story season from the beat table", "run-beat-story", sessionId(19), 0, /^P0001 story-mode runs are not ranked$/);
+
+  // What the client's queue makes of the refusal: PostgREST answers a plain
+  // exception 400, and the row is dropped -- not sent again, and not read as a
+  // run that is missing a case.
+  const refusal = { status: 400, serverMessage: "beat-table runs are not ranked" };
+  check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the beat-table refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+  check(!isUnrankableRefusal({ type: "case", payload: { case_id: "season-final" } }, refusal), "the client's queue reads the beat-table refusal as a run missing a case row.");
 }
 withHeaders(null);
 
