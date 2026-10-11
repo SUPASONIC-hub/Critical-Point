@@ -109,7 +109,7 @@ test("a season with few recorded cases names none, and one with no record prints
 
 test("a story-mode season prints the sentence and the score, and no rank", () => {
   const story = { ...SEASON, [CASES[4].id]: { ...SEASON[CASES[4].id], assistStory: true } };
-  for (const standing of [undefined, LOGIC_STANDING_PENDING, { band: 10 }, { below: true }, null]) {
+  for (const standing of [undefined, LOGIC_STANDING_PENDING, { band: 10 }, null]) {
     const report = createLogicReport({ caseResults: story, cases: CASES, ...(standing === undefined ? {} : { standing }) });
     assert.deepEqual(report.lines, [
       "열기가 가장 높았던 사건은 사건 03 「이름 없는 승인」입니다. 그 사건의 8판 가운데 5판을 '위험 다루기'로 닫았습니다.",
@@ -119,19 +119,19 @@ test("a story-mode season prints the sentence and the score, and no rank", () =>
   }
 });
 
-test("the rank beside the score: waiting for the floor, a band, under the median, or nothing", () => {
+test("the rank beside the score: waiting for the floor, a band, or nothing", () => {
   assert.equal(LOGIC_RANK_FLOOR, 50);
-  assert.deepEqual(LOGIC_RANK_BANDS, [1, 5, 10, 25, 50]);
+  assert.deepEqual(LOGIC_RANK_BANDS, [10, 25, 50]);
   assert.equal(getLogicRankLine(LOGIC_STANDING_PENDING), "순위는 시즌 기록이 50건 모이면 나옵니다.");
-  assert.deepEqual(LOGIC_RANK_BANDS.map((band) => getLogicRankLine({ band })), ["상위 1% 안", "상위 5% 안", "상위 10% 안", "상위 25% 안", "상위 50% 안"]);
-  assert.equal(getLogicRankLine({ below: true }), "상위 50% 밖");
-  // A ranking that could not be read, and anything that is not a standing.
-  for (const none of [null, undefined, {}, { band: 7 }, { band: "10" }, { pending: 1 }, { below: "yes" }, "pending", 10]) assert.equal(getLogicRankLine(none), "");
+  assert.deepEqual(LOGIC_RANK_BANDS.map((band) => getLogicRankLine({ band })), ["상위 10% 안", "상위 25% 안", "상위 50% 안"]);
+  // A season under the median, a ranking that could not be read, and anything that is not a standing.
+  for (const none of [null, undefined, {}, { below: true }, { band: 1 }, { band: 5 }, { band: 7 }, { band: "10" }, { pending: 1 }, "pending", 10]) assert.equal(getLogicRankLine(none), "");
   assert.equal(LOGIC_RANK_COPY.none, "");
+  assert.deepEqual(Object.keys(LOGIC_RANK_COPY), ["pending", "band", "none"]);
 
   const line = (standing) => createLogicReport({ caseResults: SEASON, cases: CASES, standing }).lines[1];
   assert.equal(line({ band: 10 }), "논리 유지력 93점 · 최고 논리 콤보 9 · 상위 10% 안");
-  assert.equal(line({ below: true }), "논리 유지력 93점 · 최고 논리 콤보 9 · 상위 50% 밖");
+  assert.equal(line({ below: true }), "논리 유지력 93점 · 최고 논리 콤보 9", "under the median: the score and the streak alone");
   assert.equal(line(null), "논리 유지력 93점 · 최고 논리 콤보 9");
 });
 
@@ -143,7 +143,7 @@ test("the report says 열기 and never 압박, and every character it can print 
       .map((line) => String.fromCodePoint(parseInt(line.slice(0, line.indexOf(" ")), 16))),
   );
   assert.ok(charset.size > 1000, "the charset file was read");
-  const strings = new Set(["0123456789", ...LOGIC_RANK_BANDS.map((band) => LOGIC_RANK_COPY.band(band)), LOGIC_RANK_COPY.pending, LOGIC_RANK_COPY.below]);
+  const strings = new Set(["0123456789", ...LOGIC_RANK_BANDS.map((band) => LOGIC_RANK_COPY.band(band)), LOGIC_RANK_COPY.pending]);
   for (const entry of Object.values(LOGIC_REPORT_COPY)) {
     if (typeof entry === "string") strings.add(entry);
   }
@@ -151,7 +151,7 @@ test("the report says 열기 and never 압박, and every character it can print 
   strings.add(LOGIC_REPORT_COPY.switched(2)).add(LOGIC_REPORT_COPY.broken(3)).add(LOGIC_REPORT_COPY.hold(100)).add(LOGIC_REPORT_COPY.best(24));
   // Any case of the season can be the one named.
   for (const caseItem of seasonCasesBase) strings.add(LOGIC_REPORT_COPY.lead(`${caseItem.label} 「${caseItem.title}」`));
-  assert.ok(strings.size > 70);
+  assert.ok(strings.size > 65);
   for (const text of strings) {
     assert.deepEqual([...text].filter((character) => !charset.has(character)), [], `"${text}" has characters the font was not cut with`);
     assert.doesNotMatch(text, /압박/);

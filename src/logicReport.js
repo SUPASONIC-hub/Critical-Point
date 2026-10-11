@@ -25,7 +25,7 @@ import { directionParticle, easyCognitionLabels } from "./playerLanguage.js";
 /** Season records the ranking needs before it places anyone. */
 export const LOGIC_RANK_FLOOR = 50;
 /** The bands a standing can name, best first: "상위 N% 안". */
-export const LOGIC_RANK_BANDS = [1, 5, 10, 25, 50];
+export const LOGIC_RANK_BANDS = [10, 25, 50];
 /** Cases with a record a season needs before one of them is named. */
 export const LOGIC_REPORT_MIN_CASES = 5;
 /** Windows a case needs before its heat is an average worth comparing. */
@@ -48,15 +48,15 @@ export const LOGIC_REPORT_COPY = {
 
 /**
  * What the score's line says of the season's place among the others.
- * `pending` is the ranking with fewer than the floor of records; `band` a
- * place inside one of `LOGIC_RANK_BANDS`; `below` a place under the median.
- * `none` is a ranking that could not be read -- no answer, an error, a server
- * without the function -- and it is nothing: the score stands alone.
+ * `pending` is the ranking with fewer than the floor of records, and `band` a
+ * place inside one of `LOGIC_RANK_BANDS`. `none` is nothing, and the score
+ * stands alone: a season placed under the median is told no rank, and neither
+ * is one whose ranking could not be read -- no answer, an error, a server
+ * without the function.
  */
 export const LOGIC_RANK_COPY = {
   pending: `순위는 시즌 기록이 ${LOGIC_RANK_FLOOR}건 모이면 나옵니다.`,
   band: (percent) => `상위 ${percent}% 안`,
-  below: "상위 50% 밖",
   none: "",
 };
 
@@ -64,12 +64,12 @@ export const LOGIC_RANK_COPY = {
 export const LOGIC_STANDING_PENDING = Object.freeze({ pending: true });
 
 /**
- * The rank line for a standing: `{ pending: true }`, `{ band: 10 }`,
- * `{ below: true }`, or nothing at all for a ranking that could not be read.
+ * The rank line for a standing: `{ pending: true }` or `{ band: 10 }`. Any
+ * other standing -- under the median, or a ranking that could not be read --
+ * has no line.
  */
 export function getLogicRankLine(standing) {
   if (LOGIC_RANK_BANDS.includes(standing?.band)) return LOGIC_RANK_COPY.band(standing.band);
-  if (standing?.below === true) return LOGIC_RANK_COPY.below;
   return standing?.pending === true ? LOGIC_RANK_COPY.pending : LOGIC_RANK_COPY.none;
 }
 
