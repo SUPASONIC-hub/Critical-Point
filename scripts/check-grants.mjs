@@ -151,7 +151,7 @@ for (const { tablename, policyname, cmd, roles } of policies) {
 // caller may execute, so a helper a trigger calls becomes an unmetered endpoint.
 // The list is what the client calls and what a policy needs (20260929040000).
 const CLIENT_FUNCTIONS = {
-  anon: ["delete_cloud_save", "get_cloud_save", "is_season_case_id", "peek_cloud_save", "put_cloud_save"],
+  anon: ["delete_cloud_save", "get_cloud_save", "is_season_case_id", "logic_hold_cutoffs", "peek_cloud_save", "put_cloud_save"],
   authenticated: [],
 };
 {
@@ -805,12 +805,16 @@ await postRefused("rank the run from a device that did not play its final case",
   check(row?.case_title === "SEASON 01 COMPLETE", `a ranking row kept the client's title (${row?.case_title}).`);
   check(Number(row?.score) === 88 && row?.summary?.rank === "A", `a ranking row took its score from the request (${row?.score}, ${row?.summary?.rank}), not from the run's final case.`);
   check(!("note" in (row?.summary ?? {})) && !("trigger" in (row?.summary ?? {})), "a ranking summary published a key that is not on the whitelist.");
-  // The season's logic numbers are sent from now on and published by nothing
-  // yet: the whitelist gains them with the report that reads them (ROADMAP,
-  // 8일째). Until then the server keeps them on the case row and no further.
+  // The season's two logic numbers ride on the final case row's summary, and
+  // the whitelist publishes them from there (20261011000000). The per-case
+  // record they were made from is an object and stays on the case row.
   const finalRow = await one(`select summary from public.playtest_sessions where case_id = 'final' and run_id = 'run-ranked-1'`);
   check(finalRow?.summary?.logicHold === 82 && finalRow?.summary?.bestLogic === 17 && finalRow?.summary?.logicRecord?.windows === 6, `the final case row did not keep the logic record it was sent: ${JSON.stringify(finalRow?.summary?.logicRecord)}`);
-  check(!("logicHold" in (row?.summary ?? {})) && !("bestLogic" in (row?.summary ?? {})) && !("logicRecord" in (row?.summary ?? {})), "a ranking summary published a logic number before the whitelist was given it.");
+  check(
+    row?.summary?.logicHold === 82 && row?.summary?.bestLogic === 17,
+    `a ranking summary does not carry the logic numbers of the run's final case row: ${JSON.stringify([row?.summary?.logicHold, row?.summary?.bestLogic])}`,
+  );
+  check(!("logicRecord" in (row?.summary ?? {})), "a ranking summary published the final case's logic record.");
   check(
     Array.isArray(row?.summary?.primary) && typeof row.summary.primary[0] === "string" && typeof row.summary.primary[1] === "number",
     `a ranking summary's primary is not [name, number]: ${JSON.stringify(row?.summary?.primary)}`,
@@ -883,6 +887,113 @@ withHeaders(null);
 await refused("read a ranking row's full run_id", "anon", `select run_id from public.playtest_sessions`);
 await refused("read a ranking row's session_code", "anon", `select session_code from public.public_rankings`, /^42(501|703) /);
 await allowed("read telemetry health", "anon", `select * from public.telemetry_health limit 1`);
+
+// ---- the hold rate's cut points (20261011000000)
+
+{
+  // What the client calls: `rpc/logic_hold_cutoffs` with no argument, as anon.
+  const cutoffs = async (label) => (await allowed(label, "anon", `select public.logic_hold_cutoffs() as c`))?.rows[0]?.c ?? null;
+  // percentile_disc: the first value at or past that share of the ordered pool.
+  const cutAt = (values, share) => [...values].sort((a, b) => a - b)[Math.ceil(share * values.length) - 1];
+  // Ranking rows put in place without playing fifty seasons: the insert
+  // trigger is switched off for these statements only, and `score` is still
+  // the column's own reading of `burstScore`.
+  let seeded = 0;
+  const seed = async (summary) => {
+    seeded += 1;
+    await db.exec(`set session_replication_role = replica`);
+    try {
+      await db.query(
+        `insert into public.playtest_sessions (session_id, run_id, session_code, player_name, case_id, case_title, summary)
+         values ($1, $2, 'CUTOFFS', '익명 분석관', $3, 'SEASON 01 COMPLETE', $4::jsonb)`,
+        [`grants-check-cutoffs-${seeded}`, `run-cutoffs-${seeded}`, summary.caseId ?? "season-final", JSON.stringify({ seasonComplete: true, burstScore: 50, rank: "B", ...summary, caseId: undefined })],
+      );
+    } finally {
+      await db.exec(`set session_replication_role = origin`);
+    }
+  };
+
+  // The two runs ranked above each carry a hold rate of 82.
+  const pool = [82, 82];
+  const few = await cutoffs("read the hold rate's cut points with two seasons ranked");
+  check(few?.n === 2 && Object.keys(few).length === 1, `with two seasons the cut points answered ${JSON.stringify(few)}; expected the count alone.`);
+
+  // Rows that are no part of the pool, whatever their number: a hold rate that
+  // is not a number, one outside 0 to 100, a season with no score, one not
+  // marked complete, and a case row. None of them may count or move a cut.
+  for (const summary of [
+    { logicHold: "100" },
+    { logicHold: "not a number" },
+    { logicHold: null },
+    { logicHold: true },
+    { logicHold: [100] },
+    { logicHold: { value: 100 } },
+    { logicHold: 101 },
+    { logicHold: -1 },
+    { logicHold: 1e9 },
+    { bestLogic: 40 },
+    { logicHold: 100, burstScore: null },
+    { logicHold: 100, burstScore: 101 },
+    { logicHold: 100, seasonComplete: "1" },
+    { logicHold: 100, seasonComplete: false },
+    { logicHold: 100, caseId: "final" },
+  ]) await seed(summary);
+  const ignored = await cutoffs("read the cut points beside rows that carry no usable hold rate");
+  check(ignored?.n === 2 && Object.keys(ignored).length === 1, `rows with no usable hold rate were counted: ${JSON.stringify(ignored)}`);
+
+  // Forty-nine seasons is still the count alone; the fiftieth brings the cuts.
+  for (let value = 1; pool.length < 49; value += 2) {
+    await seed({ logicHold: value, bestLogic: value });
+    pool.push(value);
+  }
+  const under = await cutoffs("read the cut points with forty-nine seasons");
+  check(under?.n === 49 && !("cuts" in (under ?? {})), `with forty-nine seasons the cut points answered ${JSON.stringify(under)}; expected the count alone.`);
+  await seed({ logicHold: 100, bestLogic: 3 });
+  pool.push(100);
+  const full = await cutoffs("read the cut points with fifty seasons");
+  const expected = { n: 50, cuts: { 50: cutAt(pool, 0.5), 25: cutAt(pool, 0.75), 10: cutAt(pool, 0.9) } };
+  check(JSON.stringify(Object.keys(full ?? {}).sort()) === '["cuts","n"]' && JSON.stringify(Object.keys(full?.cuts ?? {}).sort()) === '["10","25","50"]',
+    `the cut points have keys the client does not read, or lack one it does: ${JSON.stringify(full)}`);
+  check(
+    full?.n === expected.n && [50, 25, 10].every((band) => full?.cuts?.[band] === expected.cuts[band]),
+    `with fifty seasons the cut points answered ${JSON.stringify(full)}; expected ${JSON.stringify(expected)}.`,
+  );
+  check(
+    [50, 25, 10].every((band) => Number.isFinite(full?.cuts?.[band]) && full.cuts[band] >= 0 && full.cuts[band] <= 100) && full.cuts[50] <= full.cuts[25] && full.cuts[25] <= full.cuts[10],
+    `the cut points are not three ordered numbers from 0 to 100: ${JSON.stringify(full?.cuts)}`,
+  );
+  // The count and the cuts are of the rows anon can read in the ranking, and
+  // the answer does not depend on who asks.
+  const visible = await allowed("count the ranking's seasons that carry a hold rate", "anon",
+    `select count(*)::int as n from public.public_rankings where jsonb_typeof(summary->'logicHold') = 'number' and (summary->>'logicHold')::numeric between 0 and 100`);
+  check(visible?.rows[0]?.n === full?.n, `the cut points were read from ${full?.n} seasons and the ranking shows ${visible?.rows[0]?.n} with a hold rate.`);
+  const asService = await allowed("read the cut points", "service_role", `select public.logic_hold_cutoffs() as c`);
+  check(JSON.stringify(asService?.rows[0]?.c) === JSON.stringify(full), "the cut points differ for the service role, which reads past the ranking's policy.");
+
+  // Who may ask: anon and the service role, by name. Not PUBLIC, and not
+  // `authenticated`, which the app never is.
+  await refused("read the hold rate's cut points", "authenticated", `select public.logic_hold_cutoffs()`);
+  const fn = await one(
+    `select p.prosecdef as definer, p.provolatile as volatility, coalesce(p.proconfig, '{}') as config,
+            (select coalesce(array_agg(case a.grantee when 0 then 'public' else a.grantee::regrole::text end), '{}')
+               from aclexplode(p.proacl) a where a.privilege_type = 'EXECUTE' and a.grantee <> p.proowner) as grantees
+       from pg_proc p where p.oid = 'public.logic_hold_cutoffs()'::regprocedure`,
+  );
+  check(JSON.stringify([...(fn?.grantees ?? [])].sort()) === '["anon","service_role"]', `logic_hold_cutoffs is executable by ${JSON.stringify(fn?.grantees)}; expected anon and service_role only.`);
+  check(fn?.definer === false, "logic_hold_cutoffs is SECURITY DEFINER; it reads what its caller may read and needs no more.");
+  check(fn?.volatility === "s" && fn.config.some((setting) => /^search_path=(""|)$/.test(setting)), "logic_hold_cutoffs is not STABLE with an empty search_path.");
+
+  // The whitelist takes the two numbers as numbers and nothing else under those names.
+  const published = await allowed("build a public summary", "service_role",
+    `select public.ranking_public_summary($1::jsonb) as kept, public.ranking_public_summary($2::jsonb) as dropped`,
+    [JSON.stringify({ logicHold: 82.4567, bestLogic: 17 }), JSON.stringify({ logicHold: "82", bestLogic: { best: 17 }, logicRecord: { windows: 6 } })]);
+  check(JSON.stringify(published?.rows[0]?.kept) === JSON.stringify({ bestLogic: 17, logicHold: 82.457 }), `the whitelist published ${JSON.stringify(published?.rows[0]?.kept)} for two numeric logic keys.`);
+  check(JSON.stringify(published?.rows[0]?.dropped) === "{}", `the whitelist published a logic key that is not a number: ${JSON.stringify(published?.rows[0]?.dropped)}`);
+
+  // The seeded rows go, so everything after this sees the two ranked runs.
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-cutoffs-%'`);
+  check((await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final'`))?.n === 2, "the cut-point check left ranking rows behind.");
+}
 
 // ---- the board
 
