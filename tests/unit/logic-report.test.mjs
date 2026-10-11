@@ -15,6 +15,8 @@ import {
   LOGIC_REPORT_COPY,
   LOGIC_REPORT_MIN_CASES,
   LOGIC_STANDING_PENDING,
+  getRankedLogicHold,
+  readStanding,
 } from "../../src/logicReport.js";
 import { easyCognitionLabels } from "../../src/playerLanguage.js";
 
@@ -133,6 +135,51 @@ test("the rank beside the score: waiting for the floor, a band, or nothing", () 
   assert.equal(line({ band: 10 }), "논리 유지력 93점 · 최고 논리 콤보 9 · 상위 10% 안");
   assert.equal(line({ below: true }), "논리 유지력 93점 · 최고 논리 콤보 9", "under the median: the score and the streak alone");
   assert.equal(line(null), "논리 유지력 93점 · 최고 논리 콤보 9");
+});
+
+test("a standing is read from the ranking's cut points and the season's own score", () => {
+  // 90 and up is the top tenth, 75 the top quarter, 60 the median.
+  const cuts = { 50: 60, 25: 75, 10: 90 };
+  const ranked = { n: 50, cuts };
+  assert.deepEqual([100, 90].map((value) => readStanding(ranked, value)), [{ band: 10 }, { band: 10 }], "the cut itself is inside its band");
+  assert.deepEqual([89, 75].map((value) => readStanding(ranked, value)), [{ band: 25 }, { band: 25 }]);
+  assert.deepEqual([74, 60].map((value) => readStanding(ranked, value)), [{ band: 50 }, { band: 50 }]);
+  assert.deepEqual([59, 0].map((value) => readStanding(ranked, value)), [null, null], "under the median: no standing");
+  assert.deepEqual(readStanding({ n: 4000, cuts: { 50: 0, 25: 0, 10: 0 } }, 0), { band: 10 }, "cuts may be equal, and zero");
+  assert.deepEqual(readStanding({ n: 50, cuts: { 50: 100, 25: 100, 10: 100 } }, 100), { band: 10 });
+  assert.deepEqual(readStanding({ n: 50, cuts: { 50: 60.5, 25: 75, 10: 90 } }, 60), null, "a cut between two scores");
+
+  // Under the floor the answer is a count alone.
+  for (const records of [0, 1, 49]) assert.equal(readStanding({ n: records }, 93), LOGIC_STANDING_PENDING);
+  assert.equal(readStanding({ n: 49, cuts }, 93), LOGIC_STANDING_PENDING);
+  assert.equal(getLogicRankLine(readStanding({ n: 12 }, 93)), LOGIC_RANK_COPY.pending);
+  assert.equal(getLogicRankLine(readStanding(ranked, 93)), "상위 10% 안");
+
+  // No answer (a build with no server, the e2e backend's null), or not an answer.
+  for (const none of [null, undefined, [], {}, "", "{}", 50, true, { n: "50", cuts }, { n: 50.5, cuts }, { n: -1 }, { n: NaN }, { n: Infinity, cuts }, { n: null }, { cuts }]) {
+    assert.equal(readStanding(none, 93), null, JSON.stringify(none) ?? "undefined");
+  }
+  // A count over the floor with cuts that are missing, not scores, or out of order.
+  const broken = [
+    undefined, null, [], "cuts", {},
+    { 50: 60, 25: 75 }, { 50: 60, 10: 90 }, { 25: 75, 10: 90 },
+    { ...cuts, 10: "90" }, { ...cuts, 25: null }, { ...cuts, 50: NaN }, { ...cuts, 10: Infinity },
+    { ...cuts, 10: 101 }, { ...cuts, 50: -1 }, { ...cuts, 10: 100.5 },
+    { 50: 80, 25: 75, 10: 90 }, { 50: 60, 25: 95, 10: 90 }, { 50: 90, 25: 75, 10: 60 },
+  ];
+  for (const bad of broken) assert.equal(readStanding({ n: 50, cuts: bad }, 100), null, JSON.stringify(bad) ?? "undefined");
+  // And a season with no score to place.
+  for (const value of [undefined, null, NaN, Infinity, "93"]) assert.equal(readStanding(ranked, value), null);
+});
+
+test("a season is ranked on its score unless it has none, or a story-mode case", () => {
+  assert.equal(getRankedLogicHold(SEASON), 93);
+  assert.equal(getRankedLogicHold(seasonOf([{ windows: 4, breaks: 4 }])), 0, "a score of nothing is a score");
+  assert.equal(getRankedLogicHold({ ...SEASON, [CASES[4].id]: { ...SEASON[CASES[4].id], assistStory: true } }), null);
+  // No window that could have ended a streak, a save from before the streak, and no season.
+  assert.equal(getRankedLogicHold(seasonOf([{ windows: 2, keeps: 2, best: 5 }])), null);
+  assert.equal(getRankedLogicHold(seasonOf([null, null])), null);
+  assert.equal(getRankedLogicHold(), null);
 });
 
 test("the report says 열기 and never 압박, and every character it can print is in the game's font", () => {

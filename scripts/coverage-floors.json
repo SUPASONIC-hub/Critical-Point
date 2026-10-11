@@ -84,6 +84,7 @@
     "src/state/useClipboardStatus.js",
     "src/state/useEndingSequence.js",
     "src/state/useLeaderboard.js",
+    "src/state/useLogicStanding.js",
     "src/state/useOverlayScreens.js",
     "src/state/useResultReport.js",
     "src/state/useRunReadout.js",

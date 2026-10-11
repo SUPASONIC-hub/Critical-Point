@@ -1,12 +1,12 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
-import { expect, test } from "./helpers/network.js";
+import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 import { completeCurrentCase, resumeSavedRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { seasonCasesBase } from "../src/gameCases.js";
 import { createCaseSummary } from "../src/gameLogic.js";
-import { createLogicReport, LOGIC_REPORT_COPY } from "../src/logicReport.js";
+import { createLogicReport, getRankedLogicHold, LOGIC_REPORT_COPY, readStanding } from "../src/logicReport.js";
 
 /**
  * The season's logic panel on the closing report (src/logicReport.js).
@@ -16,11 +16,30 @@ import { createLogicReport, LOGIC_REPORT_COPY } from "../src/logicReport.js";
  * cases already closed and their logic records in it, plays the finale's last
  * scene and opens the record.
  *
+ * The rank beside the score is read from the server's cut points
+ * (`logic_hold_cutoffs()`, src/state/useLogicStanding.js). The stub backend
+ * answers them here, as a ranking short of its records, as one with cuts, and
+ * as a server that has not got the function yet.
+ *
  * `LOGIC_REPORT_OUT=<directory>` keeps a screenshot of the panel at a laptop's
  * width and at a phone's, for a person to look at. Nothing is written without it.
  */
 const KEEP = process.env.LOGIC_REPORT_OUT;
 const HOT_CASE = seasonCasesBase.find((caseItem) => caseItem.id === "case03");
+const CUTOFFS_URL = `${BACKEND_ORIGIN}/rest/v1/rpc/logic_hold_cutoffs`;
+const json = (body, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });
+// What PostgREST answers for a function the database has not got.
+const NO_FUNCTION = json({ code: "PGRST202", message: "Could not find the function public.logic_hold_cutoffs without parameters in the schema cache", details: null, hint: null }, 404);
+
+/** Answers the ranking's cut points with `answer`; returns the bodies the page asked with. */
+async function answerCutoffs(page, answer) {
+  const asked = [];
+  await page.route(CUTOFFS_URL, async (route) => {
+    asked.push(route.request().postData());
+    await route.fulfill(answer);
+  });
+  return asked;
+}
 
 test.beforeEach(async ({ page }) => {
   // Reduced motion drops the ending's eight-second hold.
@@ -50,8 +69,18 @@ function recordedSeason(extra = {}) {
 }
 
 /** From the season's last scene to the open record (the ending's step 3). */
-async function openTheRecord(page, caseResults) {
-  await seedSave(page, savedRunAt("final", "f_aftershock", { caseResults }));
+async function openTheRecord(page, caseResults, { backend = true, save = {} } = {}) {
+  await seedSave(page, savedRunAt("final", "f_aftershock", { caseResults, ...save }));
+  // After the seed, which clears storage. A build is given its server; these point the page at the stub.
+  if (backend) {
+    await page.addInitScript(
+      ({ urlKey, keyKey, url }) => {
+        localStorage.setItem(urlKey, url);
+        localStorage.setItem(keyKey, "anon");
+      },
+      { urlKey: TEST_STORAGE_KEYS.telemetryUrl, keyKey: TEST_STORAGE_KEYS.telemetryKey, url: BACKEND_ORIGIN },
+    );
+  }
   await page.goto("/");
   await resumeSavedRun(page);
   await completeCurrentCase(page);
@@ -70,11 +99,15 @@ async function openTheRecord(page, caseResults) {
   await expect(page.locator(".ending-step-3")).toBeVisible();
 }
 
-/** The lines the module writes for the season the page saved, the finale's own record included. */
-async function expectedLines(page) {
+/**
+ * The lines the module writes for the season the page saved, the finale's own
+ * record included, with the standing read from `cutoffs` (the server's answer;
+ * none is no standing).
+ */
+async function expectedLines(page, cutoffs = null) {
   await expect.poll(async () => Boolean((await readJsonStorage(page, TEST_STORAGE_KEYS.save))?.caseResults?.final), "the finale is in the save").toBe(true);
-  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-  return createLogicReport({ caseResults: saved.caseResults, cases: seasonCasesBase }).lines;
+  const { caseResults } = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  return createLogicReport({ caseResults, cases: seasonCasesBase, standing: readStanding(cutoffs, getRankedLogicHold(caseResults)) }).lines;
 }
 
 async function keepScreenshots(page, testInfo, label) {
@@ -97,7 +130,9 @@ test("the closing report names the hottest case, the score and the rank still to
   test.setTimeout(120_000);
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(String(error)));
-  await openTheRecord(page, recordedSeason());
+  // A ranking with twelve seasons in it, and a player who ticked the research box.
+  const asked = await answerCutoffs(page, json({ n: 12 }));
+  await openTheRecord(page, recordedSeason(), { save: { dataConsent: true } });
 
   const panel = page.getByTestId("logic-report");
   await expect(panel).toBeVisible();
@@ -109,8 +144,10 @@ test("the closing report names the hottest case, the score and the rank still to
   // The finale's own window is in the score, so the number is the page's; its shape is fixed.
   await expect(lines.nth(1)).toHaveText(/^논리 유지력 \d{1,3}점 · 최고 논리 콤보 9 · 순위는 시즌 기록이 50건 모이면 나옵니다\.$/);
   await expect(lines.nth(2)).toHaveText(LOGIC_REPORT_COPY.caption);
-  await expect(lines).toHaveText(await expectedLines(page));
+  await expect(lines).toHaveText(await expectedLines(page, { n: 12 }));
   await expect(panel).not.toContainText("압박");
+  // Asked once, and with nothing of the season in the question.
+  expect(asked).toEqual(["{}"]);
 
   // It is the panel after the epilogue, in the epilogue's own frame.
   await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(2);
@@ -124,6 +161,8 @@ test("the closing report names the hottest case, the score and the rank still to
 
 test("a story-mode season's panel prints the sentence and the score, and no rank", async ({ page }, testInfo) => {
   test.setTimeout(120_000);
+  // The server would place any score in the top tenth; a story season does not ask it.
+  const asked = await answerCutoffs(page, json({ n: 64, cuts: { 50: 0, 25: 0, 10: 0 } }));
   await openTheRecord(page, recordedSeason({ assistStory: true }));
 
   await expect(page.locator(".result-hero-copy > p")).toContainText("스토리 모드");
@@ -132,19 +171,54 @@ test("a story-mode season's panel prints the sentence and the score, and no rank
   await expect(lines.nth(0)).toContainText(`열기가 가장 높았던 사건은 사건 03 「${HOT_CASE.title}」입니다.`);
   await expect(lines.nth(1)).toHaveText(/^논리 유지력 \d{1,3}점 · 최고 논리 콤보 9$/);
   await expect(lines).toHaveText(await expectedLines(page));
-  await expect(page.getByTestId("logic-report")).not.toContainText("순위");
+  await expect(page.getByTestId("logic-report")).not.toContainText(/순위|상위/);
+  expect(asked).toEqual([]);
   await keepScreenshots(page, testInfo, "story");
 });
+
+// The season scores in the 80s (the seeded cases' 100 x 37 / 42, and the finale's own window).
+for (const [title, answer, cutoffs, rank, label] of [
+  ["a score over the top tenth's cut is told 상위 10% 안", json({ n: 64, cuts: { 50: 10, 25: 20, 10: 30 } }), { n: 64, cuts: { 50: 10, 25: 20, 10: 30 } }, " · 상위 10% 안", "band"],
+  ["a score under the median is told no rank", json({ n: 64, cuts: { 50: 98, 25: 99, 10: 100 } }), { n: 64, cuts: { 50: 98, 25: 99, 10: 100 } }, "", "under-median"],
+  ["a server without the ranking's function leaves the score with no rank, and nothing is said of it", NO_FUNCTION, null, "", "no-function"],
+]) {
+  test(title, async ({ page }, testInfo) => {
+    test.setTimeout(120_000);
+    const pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(String(error)));
+    // What the app would print of the refusal (the browser's own line for a 404 names no function).
+    const warnings = [];
+    page.on("console", (message) => {
+      if (message.text().includes("logic_hold_cutoffs")) warnings.push(message.text());
+    });
+    const asked = await answerCutoffs(page, answer);
+    await openTheRecord(page, recordedSeason());
+
+    await expect.poll(() => asked.length, "the ranking was asked").toBe(1);
+    const panel = page.getByTestId("logic-report");
+    const lines = panel.locator("p");
+    await expect(lines).toHaveCount(3);
+    await expect(lines.nth(1)).toHaveText(new RegExp(`^논리 유지력 \\d{1,3}점 · 최고 논리 콤보 9${rank}$`));
+    await expect(lines).toHaveText(await expectedLines(page, cutoffs));
+    if (!rank) await expect(panel).not.toContainText(/순위|상위/);
+    expect(asked, "asked once").toHaveLength(1);
+    expect(warnings).toEqual([]);
+    expect(pageErrors).toEqual([]);
+    await keepScreenshots(page, testInfo, label);
+  });
+}
 
 test("a season whose earlier cases have no logic record names no case", async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   // A save from before the streak: summaries with no record. The finale just played has one.
-  await openTheRecord(page, { case01: closedCase("case01"), case02: closedCase("case02") });
+  // And a build with no server: nothing to ask, so the score stands with no rank.
+  await openTheRecord(page, { case01: closedCase("case01"), case02: closedCase("case02") }, { backend: false });
 
   const lines = page.getByTestId("logic-report").locator("p");
   await expect(lines).toHaveCount(3);
   await expect(lines.nth(0)).toHaveText("논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.");
   await expect(lines.nth(1)).toContainText(/최고 논리 콤보 \d+/);
   await expect(lines).toHaveText(await expectedLines(page));
+  await expect(page.getByTestId("logic-report")).not.toContainText(/순위|상위/);
   await keepScreenshots(page, testInfo, "few-records");
 });

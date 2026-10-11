@@ -16,10 +16,9 @@ import { directionParticle, easyCognitionLabels } from "./playerLanguage.js";
  * This report says 열기, never 압박: the report's own "압박 대응" is the risk
  * to the resources, and the heat of the table is another thing.
  *
- * Every sentence the panel can print is in this file, the rank lines the
- * standing will bring included (the standing itself is read from the server
- * by a later change; until then the panel prints the line for a season
- * ranking that has not gathered its records).
+ * Every sentence the panel can print is in this file, the rank lines
+ * included. The standing they are chosen by is read here too (`readStanding`)
+ * from what the server answers; asking the server is `useLogicStanding`'s.
  */
 
 /** Season records the ranking needs before it places anyone. */
@@ -60,8 +59,38 @@ export const LOGIC_RANK_COPY = {
   none: "",
 };
 
-/** The standing a season has before anything is read from the server. */
+/** The standing of a season in a ranking still short of the floor. */
 export const LOGIC_STANDING_PENDING = Object.freeze({ pending: true });
+
+/**
+ * A season's standing, from the server's answer (`logic_hold_cutoffs()`) and
+ * the season's own score. The answer is `{ n }` under the floor, and over it
+ * `{ n, cuts: { 10, 25, 50 } }`: the lowest score still inside each band.
+ * Nothing about the season is sent; the place is worked out here.
+ *
+ * Null is no standing, and the panel prints no rank for it: a score under the
+ * median, and any answer that is not that shape -- a count that is no count, a
+ * cut that is missing, not a score, or above the cut of a better band.
+ */
+export function readStanding(data, value) {
+  const records = data?.n;
+  if (!Number.isInteger(records) || records < 0 || !Number.isFinite(value)) return null;
+  if (records < LOGIC_RANK_FLOOR) return LOGIC_STANDING_PENDING;
+  const cuts = LOGIC_RANK_BANDS.map((band) => data.cuts?.[band]);
+  if (!cuts.every((cut, index) => typeof cut === "number" && cut >= 0 && cut <= (index ? cuts[index - 1] : 100))) return null;
+  const place = cuts.findIndex((cut) => value >= cut);
+  return place < 0 ? null : { band: LOGIC_RANK_BANDS[place] };
+}
+
+/**
+ * The score a season is ranked on, or null when it is on no ranking: a season
+ * with no score, and one with a story-mode case in it, which is kept off the
+ * public ranking (`recordClosedCase`).
+ */
+export function getRankedLogicHold(caseResults = {}) {
+  const { logicHold } = getSeasonLogic(caseResults);
+  return logicHold === undefined || Object.values(caseResults).some((result) => result?.assistStory === true) ? null : logicHold;
+}
 
 /**
  * The rank line for a standing: `{ pending: true }` or `{ band: 10 }`. Any
@@ -118,23 +147,22 @@ export function describeLogicCase(record) {
  * it, and what the score measures. Null for a season with no record at all (a
  * save from before the streak), which prints no panel.
  *
- * A season with a story-mode case in it is kept off the public ranking
- * (`recordClosedCase`), so its score carries no rank line whatever the
- * standing is.
+ * A season on no ranking (`getRankedLogicHold`) carries no rank line whatever
+ * the standing is.
  */
 export function createLogicReport({ caseResults = {}, cases = [], standing = LOGIC_STANDING_PENDING } = {}) {
   const season = getSeasonLogic(caseResults);
   if (!("bestLogic" in season)) return null;
   const recorded = cases.filter((caseItem) => count(caseResults[caseItem.id]?.logicRecord, "windows") > 0);
   const hottest = recorded.length >= LOGIC_REPORT_MIN_CASES ? getHottestCase(caseResults, cases) : null;
-  const story = Object.values(caseResults).some((result) => result?.assistStory === true);
+  const ranked = getRankedLogicHold(caseResults) !== null;
   const scored = "logicHold" in season;
   return {
     label: LOGIC_REPORT_COPY.label,
     mark: LOGIC_REPORT_COPY.mark,
     lines: [
       hottest ? `${LOGIC_REPORT_COPY.lead(`${hottest.label} 「${hottest.title}」`)} ${describeLogicCase(hottest.record)}` : LOGIC_REPORT_COPY.tooFew,
-      [scored && LOGIC_REPORT_COPY.hold(season.logicHold), LOGIC_REPORT_COPY.best(season.bestLogic), scored && !story && getLogicRankLine(standing)].filter(Boolean).join(" · "),
+      [scored && LOGIC_REPORT_COPY.hold(season.logicHold), LOGIC_REPORT_COPY.best(season.bestLogic), ranked && getLogicRankLine(standing)].filter(Boolean).join(" · "),
       LOGIC_REPORT_COPY.caption,
     ],
   };
