@@ -83,7 +83,7 @@ export const viewGroups = {
       "counterfactualReport", "rankingComparison", "rankingIntegrity", "achievementBadges",
       "achievementProgress", "resourceMeta", "explainResourceTradeoff", "routeTimeline",
       "observationLedger", "observerPattern", "decisionFingerprint", "caseResults", "log", "clueCount",
-      "playReport", "balanceSignals",
+      "playReport", "balanceSignals", "logicReport",
     ],
     telemetry: [
       "sessionCode", "telemetryStatus", "pendingTelemetry", "retryPendingTelemetry",
