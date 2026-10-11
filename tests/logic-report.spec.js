@@ -46,10 +46,32 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
 });
 
-/** A closed case's summary as the game writes one, with the logic record given. */
+/**
+ * A closed case's summary as the game writes one, with the logic record given.
+ * A case with a record was closed at the logic table, so it carries that
+ * table's mark too: the streak in its run summary (`hasBeatTableCase`,
+ * src/logicReport.js). One with no record is a summary from before the table.
+ */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  return { ...summary, ...(logicRecord ? { logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } } : {}), ...extra };
+  const atLogicTable = { gauntlet: { logicStreak: 0 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
+}
+
+const SESSIONS_URL = `${BACKEND_ORIGIN}/rest/v1/playtest_sessions**`;
+// What PostgREST answers when the insert trigger raises a plain exception.
+const refusal = (message) => json({ code: "P0001", message, details: null, hint: null }, 400);
+
+/** Answers each row the page posts with `answerFor(row)`, or as created; returns the case ids posted. */
+async function collectPostedRows(page, answerFor = () => null) {
+  const posted = [];
+  await page.route(SESSIONS_URL, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    const [row] = [route.request().postDataJSON()].flat();
+    posted.push(row.case_id);
+    await route.fulfill(answerFor(row) ?? { status: 201, contentType: "application/json", body: "" });
+  });
+  return posted;
 }
 
 /**
@@ -174,6 +196,63 @@ test("a story-mode season's panel prints the sentence and the score, and no rank
   await expect(page.getByTestId("logic-report")).not.toContainText(/순위|상위/);
   expect(asked).toEqual([]);
   await keepScreenshots(page, testInfo, "story");
+});
+
+// A season begun before the table paid the logic streak is on no ranking (the
+// server refuses its row, 20261011010000): the panel treats it as it treats a
+// story season, and the ranking row is not posted to be refused.
+test("a season with a case from before the logic table prints the score and no rank, and posts no ranking row", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  // The server would place any score in the top tenth; this season does not ask it.
+  const asked = await answerCutoffs(page, json({ n: 64, cuts: { 50: 0, 25: 0, 10: 0 } }));
+  const posted = await collectPostedRows(page);
+  // 사건 07 closed at the beat table: a summary with no streak in it. The research box is ticked.
+  await openTheRecord(page, { ...recordedSeason(), case07: closedCase("case07") }, { save: { dataConsent: true } });
+
+  const lines = page.getByTestId("logic-report").locator("p");
+  await expect(lines).toHaveCount(3);
+  await expect(lines.nth(0)).toContainText(`열기가 가장 높았던 사건은 사건 03 「${HOT_CASE.title}」입니다.`);
+  await expect(lines.nth(1)).toHaveText(/^논리 유지력 \d{1,3}점 · 최고 논리 콤보 9$/);
+  await expect(lines).toHaveText(await expectedLines(page));
+  await expect(page.getByTestId("logic-report")).not.toContainText(/순위|상위/);
+  expect(asked).toEqual([]);
+
+  // The finale's own row went out and the queue is empty: no ranking row was held back to send later.
+  await expect.poll(() => posted, { timeout: 20_000 }).toContain("final");
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).pendingTelemetry, { timeout: 20_000 }).toEqual([]);
+  expect(posted, "no ranking row was posted").not.toContain("season-final");
+  // This device's own ranking keeps the season.
+  const local = await readJsonStorage(page, TEST_STORAGE_KEYS.localRanking, []);
+  expect(local.map((row) => row.case_id)).toContain("season-final");
+  await keepScreenshots(page, testInfo, "beat-table");
+});
+
+// A season the device takes for a logic-table one can still be refused: a case
+// closed at the beat table and played again keeps the replay's summary here,
+// and the server keeps the first close's row. The record's status line says why.
+test("a ranking row refused for a case from the beat table is said on the record's status line", async ({ page }) => {
+  test.setTimeout(120_000);
+  const posted = await collectPostedRows(page, (row) => (row.case_id === "season-final" ? refusal("beat-table runs are not ranked") : null));
+  await answerCutoffs(page, json({ n: 12 }));
+  await openTheRecord(page, recordedSeason(), { save: { dataConsent: true } });
+
+  await expect.poll(() => posted, { timeout: 20_000 }).toEqual(["final", "season-final"]);
+  // The status line is in the report's third act, which is drawn once it is opened.
+  await page.locator("details.report-archive > summary").click();
+  await expect(page.locator(".report-archive-body")).toBeVisible();
+  const status = page.locator(".session-panel .remote-status");
+  await expect(status).toHaveText(
+    "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
+    { timeout: 20_000 },
+  );
+  await expect(status).toHaveClass(/error/);
+  await expect(status).not.toContainText("서버가 받지 않은 기록");
+  // Let go, not kept to be asked again: nothing waits, and it was asked once.
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).pendingTelemetry).toEqual([]);
+  await expect(page.locator(".retry-telemetry")).toHaveCount(0);
+  expect(posted.filter((caseId) => caseId === "season-final")).toHaveLength(1);
+  await status.scrollIntoViewIfNeeded();
+  await expect(status).toBeVisible();
 });
 
 // The season scores in the 80s (the seeded cases' 100 x 37 / 42, and the finale's own window).

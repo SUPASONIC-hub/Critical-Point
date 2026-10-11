@@ -396,6 +396,35 @@ for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).s
   });
 }
 
+test("the mark of a case closed at the logic table is the streak in its run summary, and loading a save keeps it either way", async () => {
+  const { hasBeatTableCase } = await import("../../src/logicReport.js");
+  const saveOf = (name) => JSON.parse(readFileSync(new URL(name, SAVES), "utf8")).save;
+  // What this build writes on every closed case, and sends as the row's `dynamics`: a number, from a table never played too.
+  for (const run of [RUN_INITIAL_STATE, normalizeRunState({ logic: { streak: 7, best: 9 } }), normalizeRunState({ logic: { streak: "x" } })]) {
+    const summary = JSON.parse(JSON.stringify(createRunSummary(run)));
+    assert.equal(typeof summary.logicStreak, "number");
+    assert.equal(hasBeatTableCase({ case01: { gauntlet: summary } }), false);
+  }
+  // The decision board's season (2026-09-14): its closed case has no run summary at all.
+  const board = saveOf("v2-pre-gauntlet.json");
+  assert.equal("gauntlet" in board.caseResults.case01, false);
+  // The first build that paid the streak (2026-10-10): the summary has the mark, beside the beat's old counts.
+  const paid = saveOf("v2-pre-hand-names.json");
+  assert.equal(paid.caseResults.prologue02.gauntlet.logicStreak, 2);
+  assert.ok("beatCombo" in paid.caseResults.prologue02.gauntlet);
+  // A case of the builds between, composed from that one: the same summary as the beat table wrote it, without the two keys.
+  const { logicStreak: _streak, bestLogic: _best, ...beatSummary } = paid.caseResults.prologue02.gauntlet;
+  const between = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: beatSummary } } };
+  for (const [save, expected] of [[board, true], [paid, false], [between, true]]) {
+    assert.equal(hasBeatTableCase(save.caseResults), expected);
+    const { state, valid } = load(save);
+    assert.equal(valid, true);
+    assert.equal(hasBeatTableCase(state.caseResults), expected, "loading neither adds the mark nor drops it");
+  }
+  // Not the logic record: a case of this table with no window to count has the mark and no record.
+  assert.equal(createCaseSummary({}, {}, [{ caseId: "case01" }], { resources: {} }).logicRecord, undefined);
+});
+
 test("a save that carries a streak is not called repaired, with or without a replay in it", () => {
   const current = JSON.parse(readFileSync(new URL("v2-current.json", SAVES), "utf8")).save;
   const logic = { streak: 4, best: 11, type: "persistence", held: 6, heat: 2, rose: true, reach: 2 };

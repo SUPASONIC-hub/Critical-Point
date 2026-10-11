@@ -270,6 +270,46 @@ test("the status line says a run will not rank, and why, beside whatever else th
   assert.match(mixed.text, /시즌 랭킹에 오르지 않습니다.*기록 1건은 대기열에서 뺐습니다.*2건이 아직 실패 상태/);
   assert.match(describeBatchResult({ queueCommitted: true, left: 3 }).text, /^원격 저장 3건이 아직 실패 상태/);
   assert.match(describeBatchResult({ queueCommitted: false, left: 0, unranked: 1 }).text, /브라우저 저장본 갱신에 실패/);
+  // A season refused for a case from before the logic table has its own sentence, and not the generic one.
+  assert.deepEqual(describeBatchResult({ queueCommitted: true, left: 0, beatTable: 1 }), {
+    tone: "error",
+    text: "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
+  });
+  assert.match(describeBatchResult({ queueCommitted: true, left: 1, refused: 2, beatTable: 1 }).text, /논리 콤보 규칙이 생기기 전에.*기록 2건은 대기열에서 뺐습니다.*1건이 아직 실패 상태/);
+});
+
+test("a ranking row refused for a case from the beat table is let go and counted apart from the other refusals", async () => {
+  const season = caseItem("run-b", "season-final");
+  const final = caseItem("run-b", "final");
+  const said = "beat-table runs are not ranked";
+  // PostgREST answers a plain exception 400, with the trigger's words as the body's message.
+  const refusedOnce = await policy.sendTelemetryBatch([final, season], {
+    send: async (item) => {
+      if (item === season) throw failure({ status: 400, serverMessage: said });
+    },
+  });
+  assert.deepEqual([refusedOnce.kept, refusedOnce.beatTable, refusedOnce.refused, refusedOnce.unranked], [[], 1, 0, 0]);
+  assert.equal(policy.classifyTelemetryFailure(failure({ status: 400, serverMessage: said })), "permanent");
+  // Read from the words wherever they are, and with whatever else is around them.
+  assert.equal(policy.isBeatTableRefusal(season, failure({ status: 400, serverMessage: `P0001: ${said} (run-b)` })), true);
+  assert.equal(policy.isBeatTableRefusal(season, Object.assign(new Error(`telemetry insert failed: ${said}`), { status: 400 })), true);
+  // Only a ranking row, and only those words: the story refusal beside it is an ordinary refusal still.
+  assert.equal(policy.isBeatTableRefusal(final, failure({ status: 400, serverMessage: said })), false);
+  assert.equal(policy.isBeatTableRefusal(season, failure({ status: 400, serverMessage: "story-mode runs are not ranked" })), false);
+  assert.equal(policy.isBeatTableRefusal(season, failure({ status: 400 })), false);
+  const story = await policy.sendTelemetryBatch([season], {
+    send: async () => {
+      throw failure({ status: 400, serverMessage: "story-mode runs are not ranked" });
+    },
+  });
+  assert.deepEqual([story.kept, story.beatTable, story.refused], [[], 0, 1]);
+  // A case row answered that way is refused as any row is, and takes its run's ranking row with it.
+  const caseRow = await policy.sendTelemetryBatch([final, season], {
+    send: async () => {
+      throw failure({ status: 400, serverMessage: said });
+    },
+  });
+  assert.deepEqual([caseRow.kept, caseRow.beatTable, caseRow.refused, caseRow.unranked], [[], 0, 1, 1]);
 });
 
 test("rows deleted from the queue during a pass are not sent when consent is ticked again", async () => {

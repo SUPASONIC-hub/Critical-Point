@@ -17,7 +17,7 @@ import {
 import { getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
-import { createLogicReport, getRankedLogicHold } from "../logicReport.js";
+import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
@@ -170,6 +170,8 @@ export function useResultReport({
     endingVariant,
     rankingComparison,
     logicReport,
+    // For the page before the finale (`getSeasonRecordNotice`).
+    beatSeason: hasBeatTableCase(caseResults),
     routeTimeline,
     finalEndingEntry,
     finalAftermathEntry,

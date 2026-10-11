@@ -102,6 +102,11 @@ const endingAfterglows = {
  * 않습니다", useTelemetryQueue.js). The page before the finale is the last
  * place the player can still do something with that, so it is said there.
  *
+ * A season with a case closed before the table paid the logic streak is not
+ * ranked either (`hasBeatTableCase`, logicReport.js; `beatSeason` here), and
+ * its row is not sent: with the box ticked it is told that, not that the
+ * record will go to the ranking.
+ *
  * Null wherever it would be noise: any page that is not the one before the
  * finale, and a build with no server, which sends nothing and ranks nobody.
  */
@@ -109,10 +114,13 @@ const SEASON_RECORD_SENT =
   "피날레를 마치면 이 회차의 시즌 기록이 이름 없이 온라인 랭킹으로 전송됩니다. 데이터 제공 동의를 켜기 전에 마친 사건이 있는 회차는 랭킹에 오르지 않습니다.";
 const SEASON_RECORD_NOT_SENT =
   "데이터 제공 동의가 꺼져 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 전송되지 않고 온라인 랭킹에도 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
+const SEASON_RECORD_BEAT_TABLE =
+  "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.";
 
-export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsent }) {
+export function getSeasonRecordNotice({ nextCaseId, telemetryEnabled, dataConsent, beatSeason }) {
   if (nextCaseId !== "final" || !telemetryEnabled) return null;
-  return dataConsent ? SEASON_RECORD_SENT : SEASON_RECORD_NOT_SENT;
+  if (!dataConsent) return SEASON_RECORD_NOT_SENT;
+  return beatSeason ? SEASON_RECORD_BEAT_TABLE : SEASON_RECORD_SENT;
 }
 
 /**
