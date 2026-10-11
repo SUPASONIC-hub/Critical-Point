@@ -842,7 +842,11 @@ Still open, on purpose:
     is pushed. The table changing what it pays is the same occasion: on
     2026-10-11 both were reset once more (v8, and
     `20261011010000_logic_table_ranking_reset.sql`), because a score from the
-    beat table does not compare with one from the logic-streak table.
+    beat table does not compare with one from the logic-streak table. The same
+    migration makes the server refuse a `season-final` row for a run with any
+    case row whose `dynamics` has no numeric `logicStreak`, since deleting a
+    ranking row also deletes what said the run was already ranked; a season
+    begun before 2026-10-10 therefore never ranks.
     `check:grants` replays that migration over a seeded database and fails if
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`

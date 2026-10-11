@@ -5,6 +5,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { initialResources } from "../src/gameConstants.js";
 import { CASE_SEQUENCE } from "../src/gameCases.js";
 import { createCaseSummary, getEndingVariant } from "../src/gameLogic.js";
+import { classifyTelemetryFailure, isUnrankableRefusal } from "../src/state/telemetryBatch.js";
 import { toRowSummary } from "../src/state/useChoiceCommit.js";
 import { createRunSummary, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
@@ -933,9 +934,13 @@ const spreadRun = (runId, stepSeconds = 60) =>
       where s.id = t.id`,
     [runId, stepSeconds],
   );
-const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null, storyCases = [] } = {}) => {
+/** The run summary a build of the beat table sent as `dynamics`: its three keys, and none of the hand's. */
+const beatTableDynamics = ({ logicStreak: _streak, bestLogic: _best, handVault: _hand, ...rest }) => ({ ...rest, beatCombo: 3, bestCombo: 9, grooveVault: 40 });
+// `dynamicsOf(caseId, dynamics)` answers with what that case row carries in place of the client's own.
+const playRun = async (runId, { backdate = true, session = rankedSession, finalSummary = null, storyCases = [], dynamicsOf = null } = {}) => {
   for (const caseId of CASE_SEQUENCE) {
     const payload = casePayload({ session, runId, caseId, story: storyCases.includes(caseId) });
+    if (dynamicsOf) payload.dynamics = dynamicsOf(caseId, payload.dynamics);
     // The finale as the client sends it: the season's two logic numbers ride on its summary (useChoiceCommit).
     if (caseId === "final") payload.summary = { ...payload.summary, burstScore: 88, rank: "A", logicHold: 82, bestLogic: 17, ...(finalSummary ?? {}) };
     const { sql, params } = postgrestInsert("playtest_sessions", payload);
@@ -1035,6 +1040,82 @@ await postRefused("rank a third run from one device in a day", "playtest_session
   await presetCounter(`season-ip:${await writerKey("198.51.100.20")}`, 20);
   await playRun("run-ranked-5", { session: sessionId(13) });
   await postRefused("rank a 21st run from one address in a day", "playtest_sessions", seasonPayload({ session: sessionId(13), runId: "run-ranked-5" }), /^PT429 .*limit reached/);
+}
+withHeaders(null);
+
+// ---- a season from the beat table stays out (20261011010000)
+//
+// The reset deleted the row that said "this run is ranked already", so a run
+// whose case rows are all stored could ask again. Each run below is whole,
+// watched and well spaced, like run-ranked-1, which ranked: what its case rows
+// carry in `dynamics` is all there is to refuse.
+withHeaders({ "x-forwarded-for": "198.51.100.21" });
+{
+  const BEAT_REFUSAL = /^P0001 beat-table runs are not ranked$/;
+  const rankingRows = async (runId) => (await one(`select count(*)::int as n from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.n;
+  const marked = (runId) => one(
+    `select (count(*) filter (where jsonb_typeof(dynamics->'logicStreak') = 'number'))::int as logic, count(*)::int as n
+       from public.playtest_sessions where run_id = $1 and case_id <> 'season-final'`,
+    [runId],
+  );
+  const refusedRun = async (label, runId, session, expected, pattern = BEAT_REFUSAL) => {
+    const rows = await marked(runId);
+    check(rows?.n === CASE_SEQUENCE.length && rows?.logic === expected, `${runId}'s case rows did not land as sent: ${rows?.logic} of ${rows?.n} carry logicStreak, expected ${expected} of ${CASE_SEQUENCE.length}.`);
+    await postRefused(label, "playtest_sessions", seasonPayload({ session, runId }), pattern);
+    check((await rankingRows(runId)) === 0, `${runId} has a ranking row; a season with a case from the beat table must have none.`);
+  };
+
+  // The run that ranked is the one every case row of which carries the mark,
+  // and it is the run summary the client builds that carries it.
+  check(typeof createRunSummary(RUN_INITIAL_STATE).logicStreak === "number", "the run summary the client builds has no numeric logicStreak; every season would be refused as one from the beat table.");
+  const ranked = await marked("run-ranked-1");
+  check(
+    ranked?.logic === CASE_SEQUENCE.length && (await rankingRows("run-ranked-1")) === 1,
+    `run-ranked-1 has ${await rankingRows("run-ranked-1")} ranking rows with ${ranked?.logic} of ${ranked?.n} case rows carrying logicStreak; the run that ranks is the one with all of them.`,
+  );
+
+  // A season finished at the beat table, as the reset leaves it: every case
+  // row stored, three days old, its ranking row gone. It was ranked once --
+  // the row is put in place and deleted the way the migration deletes it.
+  await playRun("run-beat-1", { session: sessionId(15), dynamicsOf: (_caseId, dynamics) => beatTableDynamics(dynamics) });
+  await db.query(`update public.playtest_sessions set completed_at = completed_at - interval '3 days' where run_id = 'run-beat-1'`);
+  await db.exec(`set session_replication_role = replica`);
+  try {
+    await db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary)
+       values ($1, 'run-beat-1', 'BEAT', 'season-final', 'SEASON 01 COMPLETE', '{"seasonComplete": true, "burstScore": 88, "rank": "A"}')`,
+      [sessionId(15)],
+    );
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  check((await rankingRows("run-beat-1")) === 1, "the beat-table run's old ranking row was not put in place.");
+  await post("send the ranking row of a ranked beat-table run again before the reset", "playtest_sessions", seasonPayload({ session: sessionId(15), runId: "run-beat-1" }));
+  await db.query(`delete from public.playtest_sessions where case_id = 'season-final' and run_id = 'run-beat-1'`);
+  await refusedRun("rank a season finished at the beat table again after the reset", "run-beat-1", sessionId(15), 0);
+
+  // Begun at the beat table and finished at this one: the first ten cases are the old build's.
+  const early = CASE_SEQUENCE.slice(0, 10);
+  await playRun("run-beat-2", { session: sessionId(16), dynamicsOf: (caseId, dynamics) => (early.includes(caseId) ? beatTableDynamics(dynamics) : dynamics) });
+  await refusedRun("rank a season begun at the beat table and finished at the logic table", "run-beat-2", sessionId(16), CASE_SEQUENCE.length - 10);
+
+  // One case row with no `dynamics` at all is not a logic-table row either:
+  // the client sends the run summary with every case row.
+  const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  check(casePayload({ session: sessionId(17), runId: "run-beat-probe", caseId: middle }).dynamics?.logicStreak === 0, "the case row this check builds carries no logicStreak in dynamics.");
+  await playRun("run-beat-3", { session: sessionId(17), dynamicsOf: (caseId, dynamics) => (caseId === middle ? null : dynamics) });
+  await refusedRun("rank a season with one case row that carries no dynamics", "run-beat-3", sessionId(17), CASE_SEQUENCE.length - 1);
+
+  // Both a story season and a beat-table one: the story check stands first, so it is told that.
+  await playRun("run-beat-story", { session: sessionId(19), storyCases: [middle], dynamicsOf: (_caseId, dynamics) => beatTableDynamics(dynamics) });
+  await refusedRun("rank a story season from the beat table", "run-beat-story", sessionId(19), 0, /^P0001 story-mode runs are not ranked$/);
+
+  // What the client's queue makes of the refusal: PostgREST answers a plain
+  // exception 400, and the row is dropped -- not sent again, and not read as a
+  // run that is missing a case.
+  const refusal = { status: 400, serverMessage: "beat-table runs are not ranked" };
+  check(classifyTelemetryFailure(refusal) === "permanent", `the client's queue reads the beat-table refusal as "${classifyTelemetryFailure(refusal)}"; it has to let the row go.`);
+  check(!isUnrankableRefusal({ type: "case", payload: { case_id: "season-final" } }, refusal), "the client's queue reads the beat-table refusal as a run missing a case row.");
 }
 withHeaders(null);
 
