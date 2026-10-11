@@ -49,6 +49,7 @@ const COPY_FILES = [
   "src/gameLogic.js",
   "src/featurePack.js",
   "src/advancedSystems.js",
+  "src/runtimeSystems.js",
   // The lines a prologue's first briefing says about the rules it turns on.
   "src/gauntlet/tableUnlocks.js",
 ];

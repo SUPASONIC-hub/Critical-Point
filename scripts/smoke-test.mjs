@@ -76,7 +76,8 @@ import {
 import { authoredEchoReplies } from "../src/gameDialogue.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
-import { getRankingIntegrity, getTelemetryDashboardSnapshot } from "../src/advancedSystems.js";
+import { getRankingIntegrity } from "../src/advancedSystems.js";
+import { getTelemetryDashboardSnapshot } from "../src/runtimeSystems.js";
 import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedState.js";
 import { validateTelemetryItem } from "../src/state/payloadSchemas.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";

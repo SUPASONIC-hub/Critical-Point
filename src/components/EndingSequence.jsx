@@ -60,7 +60,7 @@ export function EndingSequence({
           : "";
 
   // Every ending has a palette and a class of its own, the unnamed ones
-  // "archive" (getEndingAtmosphere, getEndingVisualClass in advancedSystems.js);
+  // "archive" (getEndingAtmosphere, getEndingVisualClass in runtimeSystems.js);
   // the quiet line is a string, empty when nothing was said (useRunReadout.js).
   return (
     <section

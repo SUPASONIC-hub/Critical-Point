@@ -1,6 +1,13 @@
+/**
+ * What the screen before a run reads: the analyst's three origins, the line
+ * about the way of playing, the season's goals, and what a ranking row is
+ * called. This is in the entry chunk, so it holds only that. What a run in
+ * progress and its report read is in runtimeSystems.js, which arrives with the
+ * runtime.
+ */
 import { caseDisplayCode } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
-import { directionParticle, easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
+import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
 
 const HARM = easyResourceLabels.humanCost;
 const percent = (share) => Math.round(share * 100);
@@ -37,50 +44,6 @@ export function getOperatorProfile(origin = "courier") {
   return operatorProfiles[origin] ?? operatorProfiles.courier;
 }
 
-export function getAuthorityProfile(origin = "courier", level = "OBSERVER") {
-  const profile = getOperatorProfile(origin);
-  const levelPermissions = {
-    OBSERVER: ["제한 열람", "질문 요청", "관찰 기록"],
-    "FIELD ACCESS": ["기록 대조", "관계자 질문", "기준 제안"],
-    OVERSIGHT: ["기록 공개", "현장 개입", "실험 종료"],
-  };
-  return {
-    ...profile,
-    level,
-    permissions: levelPermissions[level] ?? levelPermissions.OBSERVER,
-  };
-}
-
-
-const endingScenes = {
-  "open-oversight": { location: "OBSERVATORY / OPEN FLOOR", image: "/ending-oversight-room.webp", cue: "여러 개의 기록 창이 동시에 열립니다.", choice: "모든 참가자에게 기준 편집 권한을 넘긴다" },
-  "evidence-reform": { location: "TRIGGER LAB / PUBLIC AUDIT", image: "/ending-final-archive.webp", cue: "감사 화면과 보호 명부가 한 화면에 겹칩니다.", choice: "공개와 보호를 함께 운영 규칙으로 고정한다" },
-  "human-record": { location: "FIELD OFFICE / WITNESS ROOM", image: "/scene-case05.webp", cue: "당신이 다시 짠 판이 증언자의 목소리와 겹쳐 재생됩니다.", choice: "다음 분석관에게 사람의 이름부터 전달한다" },
-  "profitable-silence": { location: "BOARDROOM / SEALED WINDOW", image: "/scene-case04.webp", cue: "박수 소리 뒤에서 기록 잠금음이 들립니다.", choice: "수익 보고서에 침묵의 비용을 추가한다" },
-  "cold-justice": { location: "POLICY ROOM / EMPTY CHAIR", image: "/scene-case03.webp", cue: "완벽한 절차표 옆에 비어 있는 의자가 남습니다.", choice: "절차에 관계 회복 단계를 추가한다" },
-  "field-pact": { location: "DELIVERY HUB / NIGHT SHIFT", image: "/scene-case01.webp", cue: "공식 승인 전 현장 라디오가 먼저 응답합니다.", choice: "현장 협약을 공식 권한으로 승격한다" },
-  "quiet-cover": { location: "ARCHIVE / LOW LIGHT", image: "/scene-case02.webp", cue: "압박계는 낮지만 잠긴 폴더가 더 많아집니다.", choice: "안전한 기록 하나를 열어 다음 단서로 삼는다" },
-  collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", cue: "경보와 사람들의 호출이 한꺼번에 끊깁니다.", choice: "다음 플레이에서 압박을 분산할 기준을 남긴다" },
-  "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.webp", cue: "다음 분석관의 출입증이 천천히 켜집니다.", choice: "답 대신 가장 위험한 질문을 인계한다" },
-};
-
-export function getEndingSceneProfile(endingId = "open-question") {
-  return endingScenes[endingId] ?? endingScenes["open-question"];
-}
-
-// `visible` used to be worked out from `entry.continuitySource`, a field no
-// commit has ever written, so it was false for every entry and read by nothing.
-export function getDelayedConsequences(caseResults = {}) {
-  return Object.entries(caseResults)
-    .filter(([, result]) => result?.outcomeChoiceId)
-    .map(([caseId, result]) => ({
-      caseId,
-      source: result.outcomeChoiceId,
-      // The outcome id is a key, not copy: it used to print as `c1_after_people`.
-      text: `CASE ${caseDisplayCode(caseId)}의 마지막 선택이 다음 사건의 기준으로 남아 있습니다.`,
-    }));
-}
-
 /**
  * The line under the season panel about the way of playing the player picked.
  * It says what the pick is -- a stance the player declares, which no rule of
@@ -99,20 +62,6 @@ export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false)
   return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 마지막 선택을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
 }
 
-/**
- * What would have kept the season standing, quoted from the gate that closed
- * it (`ENDING_GATES`). It promised "risk pressure under 60, human cost under
- * 50, three clues" -- none of which the collapse gate has ever read.
- */
-export function getFailureObjectives(variant = {}) {
-  if (!variant.failure) return [];
-  const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
-  return [
-    `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${collapseHarmPerCase} 아래로 닫기`,
-    `터진 판을 전체의 ${percent(collapseBustRate)}% 아래로 줄이거나, ${HARM}${objectParticle(HARM)} 평균 ${collapseOverreachHarm} 아래로 닫기`,
-  ];
-}
-
 export function getTutorialSteps() {
   return [
     { id: "read", label: "장면 읽기", text: "상황, 화자, 이번 장면의 한계를 확인합니다." },
@@ -120,40 +69,6 @@ export function getTutorialSteps() {
     { id: "commit", label: "기록 확정", text: "선택을 확정하면 다음 장면과 랭킹에 남습니다." },
     { id: "replay", label: "다시 보기", text: "다른 기록은 다른 권한과 엔딩을 엽니다." },
   ];
-}
-
-export function getRankingComparison(summary = {}) {
-  return [
-    { label: "EVIDENCE", value: Math.min(100, (summary.challengeClearCount ?? 0) * 20) },
-    // What is left after the 즉답 패널티. It was labelled PEOPLE, which it does not measure.
-    { label: "PATIENCE", value: Math.min(100, Math.max(0, 100 - (summary.exploitPenalty ?? 0) * 8)) },
-    { label: "RHYTHM", value: Math.min(100, summary.rhythmScore ?? 0) },
-  ];
-}
-
-/** What each ending is called in a sentence. An ending's id is a key, never copy. */
-const ENDING_NAMES = {
-  "open-oversight": "공개와 개입",
-  "evidence-reform": "증거와 개혁",
-  "human-record": "사람과 기록",
-  "profitable-silence": "성과와 침묵",
-  "cold-justice": "절차와 책임",
-  "field-pact": "현장과 협약",
-  "quiet-cover": "보호와 은폐",
-  collapse: "압박과 붕괴",
-  "open-question": "질문과 계승",
-};
-
-export function getEndingPreview(ending = {}) {
-  if (!ending?.id) return null;
-  return {
-    label: ENDING_NAMES[ending.id] ?? "미확정 경로",
-    text: ending.failure ? "현재 선택 패턴이 시스템 붕괴 쪽으로 기울고 있습니다." : "현재 선택 패턴이 이 엔딩의 조건을 강화하고 있습니다.",
-  };
-}
-
-export function getEndingVisualClass(endingId = "open-question") {
-  return `ending-visual-${String(endingId).replace(/[^a-z0-9-]/gi, "-")}`;
 }
 
 export function getSeasonGoals() {
@@ -164,21 +79,6 @@ export function getSeasonGoals() {
     { id: "evidence", label: "EVIDENCE SEASON", text: `사건 기록의 ${percent(ENDING_GATES.clueRate)}% 이상 열기` },
     { id: "trust", label: "TRUST SEASON", text: `${easyResourceLabels.trust}${objectParticle(easyResourceLabels.trust)} 사건마다 평균 ${ENDING_GATES.oversightTrust} 이상으로 지키기` },
   ];
-}
-
-// `label` is what the report prints: the card as the player read it. The
-// choice id is a key, and it used to be the text ("p1_start_a 60%").
-export function getBalanceSignals(log = []) {
-  const choices = log.filter((entry) => !entry?.isSystemEvent);
-  const labelOf = (choiceId) => choices.find((entry) => entry.choiceId === choiceId)?.choice || "이름 없는 선택";
-  const counts = choices.reduce((map, entry) => {
-    map[entry.choiceId] = (map[entry.choiceId] ?? 0) + 1;
-    return map;
-  }, {});
-  const total = choices.length || 1;
-  return Object.entries(counts)
-    .filter(([, count]) => count / total >= 0.6)
-    .map(([choiceId, count]) => ({ choiceId, label: labelOf(choiceId), share: Math.round((count / total) * 100), count, signal: "CHOICE DOMINANCE" }));
 }
 
 export function getPastRunMemory(memory = {}) {
@@ -197,52 +97,6 @@ export function getOriginPrologue(origin = "courier") {
   return profiles[origin] ?? profiles.courier;
 }
 
-
-/**
- * Why the season collapsed, from the door it came through (`variant.cause`,
- * set by `getEndingVariant`, which the report always computes fresh). It used
- * to guess from the last case's resources and blame 판단 피로 or the clock.
- */
-export function getFailureCause(variant = {}) {
-  if (!variant?.failure) return null;
-  const { id = "harm", harmPerCase = 0, bustRate = 0 } = variant.cause ?? {};
-  const harm = `사건마다 ${HARM}${subjectParticle(HARM)} 평균 ${harmPerCase}${directionParticle(String(harmPerCase))} 닫혔습니다.`;
-  return id === "overreach"
-    ? { id, value: percent(bustRate), text: `판의 ${percent(bustRate)}%가 벽에 닿았고, ${harm}`, recovery: "심박이 빨라지면 확정하십시오." }
-    : { id: "human-cost", value: harmPerCase, text: harm, recovery: `${HARM}${objectParticle(HARM)} 줄이는 카드를 먼저 고르십시오.` };
-}
-
-export function getEndingAtmosphere(endingId = "open-question") {
-  const atmospheres = {
-    "open-oversight": { palette: "lime", motion: "expanding", sound: "wide-harmonics" },
-    "evidence-reform": { palette: "mint", motion: "layered", sound: "measured-pulse" },
-    "human-record": { palette: "warm", motion: "close-focus", sound: "voice-memory" },
-    collapse: { palette: "redline", motion: "fractured", sound: "low-impact" },
-  };
-  return atmospheres[endingId] ?? { palette: "archive", motion: "slow-pan", sound: "quiet-motif" };
-}
-
-export function getPlayReport(summary = {}, log = []) {
-  const entries = log.filter((entry) => !entry?.isSystemEvent);
-  return {
-    decisions: entries.length,
-    clues: summary.challengeClearCount ?? 0,
-    dominantStyle: summary.reframeCount > summary.challengeClearCount ? "BOARD BREAKER" : summary.pressureAdaptScore >= summary.reflectionScore ? "RISK CUTTER" : "SYSTEM THINKER",
-    // The scenes passed, by title. It listed choice ids ("p1_start_a → ...").
-    route: entries.map((entry) => entry.title).filter(Boolean).slice(-8),
-  };
-}
-
-export function getTelemetryDashboardSnapshot({ errors = [], pending = [], rankings = [], caseResults = {} } = {}) {
-  return {
-    errors: errors.length,
-    pending: pending.length,
-    runs: new Set(rankings.map((row) => row.run_id).filter(Boolean)).size,
-    completed: Object.keys(caseResults).length,
-    lastError: errors.at(-1)?.error?.message ?? errors.at(-1)?.error_message ?? "none",
-  };
-}
-
 export function getOriginStartEffects(origin = "courier") {
   return {
     courier: { capital: 4, trust: 4, legitimacy: 0, fatigue: 0 },
@@ -251,34 +105,11 @@ export function getOriginStartEffects(origin = "courier") {
   }[origin] ?? { capital: 0, trust: 0, legitimacy: 0, fatigue: 0 };
 }
 
-export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {}) {
-  return {
-    title: `${origin.title ?? "분석관"} / AUTHORITY REVIEW`,
-    text: level === "OVERSIGHT"
-      ? "당신은 기록을 읽는 사람에서 종료 조건을 제안하는 사람으로 이동했습니다. 이제 권한의 결과도 책임져야 합니다."
-      : `현재 권한은 ${level}입니다. ${result.challengeClearCount ?? 0}개의 검증 신호와 관계 기록이 다음 심사의 근거가 됩니다.`,
-    next: level === "OBSERVER" ? "증거와 관계자의 믿음을 확보하십시오." : level === "FIELD ACCESS" ? "공정함과 사람 피해를 함께 관리하십시오." : "공개 이후의 피해 복구까지 설계하십시오.",
-  };
-}
-
-
 export function getRankingLeague(style = "FIELD DECIDER") {
   if (style.includes("RISK")) return "RISK LEAGUE";
   if (style.includes("BOARD")) return "REFRAME LEAGUE";
   if (style.includes("SYSTEM")) return "SYSTEM LEAGUE";
   return "FIELD LEAGUE";
-}
-
-export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
-  const labels = { courier: "현장 기록의 계승", lab: "심사 기준의 계승", public: "공개 책임의 계승" };
-  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
-  return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 '${ending}'의 결과가 다르게 읽힙니다.` };
-}
-
-// Both of these printed their keys: "courier 출신 분석관의 선택 이후, open-question 경로는".
-export function getAftermath(endingId = "open-question", origin = "courier") {
-  const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
-  return { title: "AFTERMATH / NEXT SHIFT", text: `${getOperatorProfile(origin).title}의 선택 이후, '${ending}' 경로는 다음 근무자의 질문과 현장의 대응으로 이어집니다.` };
 }
 
 /**
@@ -294,8 +125,4 @@ export function getRankingIntegrity(entry = {}) {
     label: entry.runId ? "RUN LINKED" : "RUN ID MISSING",
     text: entry.runId ? "한 플레이로 묶인 기록입니다. 서버 검증은 없습니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
   };
-}
-
-export function getReplayDiagnostics({ runId = "", caseId = "", nodeId = "", choiceId = "", pending = 0 } = {}) {
-  return { runId, scene: `${caseId}/${nodeId}`, choiceId, pending, text: `${caseId}/${nodeId}에서 ${choiceId || "선택 없음"} 처리 후 대기 큐 ${pending}건` };
 }

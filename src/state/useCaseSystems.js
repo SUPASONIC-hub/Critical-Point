@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
-import { getBalanceSignals, getDelayedConsequences, getSeasonGoals } from "../advancedSystems.js";
+import { getSeasonGoals } from "../advancedSystems.js";
+import { getBalanceSignals, getDelayedConsequences } from "../runtimeSystems.js";
 import { getAchievementProgress, getOperationsSnapshot, getOperatorReveal } from "../featurePack.js";
 import { getCasesOpened } from "../gameLogic.js";
 import { createAuthorityState } from "../viewModels/sceneViewModels.js";
