@@ -64,11 +64,13 @@ test("the page before the finale says whether the season record will be sent", (
 /**
  * The report and the ending read these without asking whether they are there
  * (ResultScreen.jsx, ReportArchive.jsx, EndingSequence.jsx, endingCopy.js).
- * The fallbacks they used to carry -- a stand-in observer record, an "open"
- * afterglow, three sentences of an open verdict, a default plate -- could not
- * be reached, and cost the report's chunk bytes it did not have. What made
- * them unreachable is held here, on a run with nothing in it: the day one of
- * these can be missing, this fails before the screen does.
+ * The fallbacks they used to carry -- a stand-in observer record, three
+ * sentences of an open verdict, a default plate -- could not be reached, and
+ * cost the report's chunk bytes it did not have. What made them unreachable is
+ * held here, on a run with nothing in it: the day one of these can be missing,
+ * this fails before the screen does. The "open" afterglow went with them and
+ * came back: a ledger with nothing counted is reachable, and it is what that
+ * run is told.
  */
 test("a run with nothing in it still has everything the report reads without asking", () => {
   const pattern = getObserverPattern([]);
@@ -76,11 +78,20 @@ test("a run with nothing in it still has everything the report reads without ask
   assert.ok(pattern.arc.text);
   assert.equal(pattern.turningPoint, null);
 
-  // Four reactions, each with a label and an afterglow; the most seen of none is the first.
+  // Four reactions, each with a label and an afterglow; with none seen, the
+  // run is told the open one and not the first reaction's.
   const ledger = getObservationLedger([]);
   assert.deepEqual(Object.keys(ledger), Object.keys(observationLabels));
-  for (const observation of Object.keys(ledger)) assert.ok(getEndingAfterglow(observation).title, observation);
-  assert.equal(Object.entries(ledger).sort((a, b) => b[1] - a[1])[0][0], "compliance");
+  assert.deepEqual(Object.values(ledger), [0, 0, 0, 0]);
+  for (const observation of Object.keys(ledger)) assert.ok(getEndingAfterglow({ ...ledger, [observation]: 1 }).title, observation);
+  const open = getEndingAfterglow(ledger);
+  assert.equal(open.title, "당신의 선택은 결론보다 오래 남는 질문이 되었습니다.");
+  assert.equal(open.text, "기록은 정답을 보관하지 않습니다. 다음 판단이 시작될 수 있도록, 당신이 멈춘 자리의 온도를 보관합니다.");
+  const compliance = getEndingAfterglow({ ...ledger, compliance: 1 });
+  assert.match(compliance.title, /^당신은 질서를 지켰고/);
+  // A tie between reactions that were seen still goes to the first of them.
+  assert.equal(getEndingAfterglow({ ...ledger, defiance: 2, sacrifice: 2 }), getEndingAfterglow({ ...ledger, defiance: 1 }));
+  assert.equal(getEndingAfterglow({ compliance: 1, defiance: 1, opacity: 1, sacrifice: 1 }), compliance);
 
   const motive = getThinkingMotive({});
   for (const field of ["label", "when", "path"]) assert.ok(motive[field], `motive.${field}`);

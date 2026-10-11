@@ -62,7 +62,9 @@ const budgets = [
   // "open" afterglow and an open verdict for runs the runtime cannot produce,
   // and a guard on every panel whose record is always there
   // (tests/unit/report-copy.test.mjs holds why). The same change gave the card
-  // its four fields back in place of the whole view. The ceiling stays where
+  // its four fields back in place of the whole view. The "open" afterglow was
+  // not one of those after all -- a finale's ledger can be all zero -- and came
+  // back on 2026-10-11 for that run, inside this ceiling. The ceiling stays where
   // it was: measured plus 5% would be 46,583 / 14,680, above it, and a budget
   // here does not go up.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 46_300, maxGzip: 14_400 },

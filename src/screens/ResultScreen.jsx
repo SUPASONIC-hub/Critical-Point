@@ -31,7 +31,6 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // arc, a ledger of four reactions, an ending and that ending's scene
   // (getObserverPattern, getObservationLedger, getEndingVariant in gameLogic.js;
   // getEndingSceneProfile in runtimeSystems.js). tests/unit/report-copy.test.mjs.
-  const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0][0];
   const observerEndingRecord = observerPattern.endingRecord;
   const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern.arc.text };
   const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
@@ -80,7 +79,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     longestRouteEntry && { id: "longest", label: "가장 오래 붙잡은 말", tag: longestRouteEntry.observerTag?.label, text: longestRouteEntry.spokenChoice || longestRouteEntry.choice },
     branchRouteEntry && { id: "branch", label: "판을 흔든 말", tag: branchRouteEntry.observerTag?.label, text: branchRouteEntry.spokenChoice || branchRouteEntry.choice },
   ].filter(Boolean);
-  const endingAfterglow = endingCopy.getEndingAfterglow(dominantObservation);
+  const endingAfterglow = endingCopy.getEndingAfterglow(observationLedger);
   return (
       <main className={`shell ${currentCase === "final" ? "ending-shell" : ""}`}>
         <AdaptiveMusic modeKey={musicModeKey} />
