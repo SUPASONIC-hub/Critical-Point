@@ -1064,6 +1064,8 @@ gh run watch                                  # 사이트가 그 커밋을 내�
    `completed_at`, `summary`, `score`와 게시판의 `id`, `nickname`, `body`, `created_at`뿐입니다. RLS가
    점수가 있는 시즌 완주 행만 보이게 하고, `public_rankings` 뷰는 `security_invoker = true`로 같은
    규칙을 상속해 서버가 계산한 `score` 순으로 줍니다. `run_id`와 `session_code`는 공개되지 않습니다.
+   `logic_hold_cutoffs()`는 같은 행들의 논리 유지력(`summary.logicHold`)에서 상위 10·25·50% 경계값 셋과
+   행 수만 돌려주고(50행 미만이면 행 수만), 인자를 받지 않아 플레이어의 값은 기기를 떠나지 않습니다.
    `npm run check:grants`는 테이블 단위 권한이 하나라도 있으면 실패하고, 클라이언트가 실제로 보내는
    요청을 익명 역할로 그대로 실행해 봅니다. `search_path`를 고정하지 않은 `SECURITY DEFINER` 함수와
    `security_invoker`가 없는 뷰도 실패입니다.
