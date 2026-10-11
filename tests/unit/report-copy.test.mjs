@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
+import { getRankingIntegrity, getSeasonGoals } from "../../src/advancedSystems.js";
 import {
   getAftermath,
   getAuthorityReview,
@@ -16,10 +17,8 @@ import {
   getOriginEndingVariant,
   getPlayReport,
   getRankingComparison,
-  getRankingIntegrity,
-  getSeasonGoals,
   getTelemetryDashboardSnapshot,
-} from "../../src/advancedSystems.js";
+} from "../../src/runtimeSystems.js";
 import { getEndingAfterglow, getSeasonRecordNotice, observationLabels } from "../../src/endingCopy.js";
 import { getAchievementProgress, getEndingEpilogue, getOperationsSnapshot, getOperatorReveal } from "../../src/featurePack.js";
 import { cognitionLabels } from "../../src/gameConstants.js";

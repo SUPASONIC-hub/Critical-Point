@@ -30,7 +30,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   // Read without fallbacks: a run always has a pattern with its record and its
   // arc, a ledger of four reactions, an ending and that ending's scene
   // (getObserverPattern, getObservationLedger, getEndingVariant in gameLogic.js;
-  // getEndingSceneProfile in advancedSystems.js). tests/unit/report-copy.test.mjs.
+  // getEndingSceneProfile in runtimeSystems.js). tests/unit/report-copy.test.mjs.
   const dominantObservation = Object.entries(observationLedger).sort((a, b) => b[1] - a[1])[0][0];
   const observerEndingRecord = observerPattern.endingRecord;
   const judgmentProfile = { label: observerEndingRecord.label.replace(" 표본", "형"), text: observerPattern.arc.text };

@@ -192,8 +192,9 @@ test("the report and the ranking row show what the run recorded, never the devic
 test("the intro and the origin profiles carry nothing the page cannot print", async () => {
   // Removed on 2026-10-10 to make room for story mode's copy in the entry
   // chunk; this holds why each was dead, so none comes back as a guard.
-  const { getOperatorProfile, getOperatorProfiles, getOriginPrologue, getPastRunMemory, getPlayStyleUnlocks, getSeasonGoals, getTutorialSteps, getAuthorityProfile } =
+  const { getOperatorProfile, getOperatorProfiles, getOriginPrologue, getPastRunMemory, getPlayStyleUnlocks, getSeasonGoals, getTutorialSteps } =
     await import("../../src/advancedSystems.js");
+  const { getAuthorityProfile } = await import("../../src/runtimeSystems.js");
   // The drawers the intro no longer guards: each of these is always there.
   assert.equal(getOperatorProfiles().length, 3);
   assert.ok(getTutorialSteps().length > 0);

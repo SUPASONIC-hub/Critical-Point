@@ -122,6 +122,14 @@ const budgets = [
   // left (14,219 of 14,400); what the report's chunk carries for the card is
   // the import and the four fields it hands over.
   { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_200 },
+  // What a run and its report read about the analyst, the ending and the
+  // record (src/runtimeSystems.js). It was in the entry chunk, inside
+  // advancedSystems.js, where the screen before a run never called it: taking
+  // it out took the entry chunk from 169,332 / 61,055 to 162,396 / 58,367 on
+  // 2026-10-11. It is a file of its own, loaded beside the runtime, because
+  // the runtime's chunk had 667 gzip bytes left and this is 2,600 inside it
+  // (runtimeSystemsChunk in vite.config.js). 7,103 / 3,633, plus 5%.
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 7_460, maxGzip: 3_815 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

@@ -1,5 +1,5 @@
 import { getCharacterProfile } from "../gameDialogue.js";
-import { getAuthorityProfile } from "../advancedSystems.js";
+import { getAuthorityProfile } from "../runtimeSystems.js";
 import { AUTHORITY_THRESHOLDS, getAuthorityClueThresholds, getAuthorityLevel } from "../gameLogic.js";
 import { easyResourceLabels, subjectParticle } from "../playerLanguage.js";
 

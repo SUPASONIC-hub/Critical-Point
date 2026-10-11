@@ -89,13 +89,8 @@ import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
-import {
-  getEndingSceneProfile,
-  getFailureObjectives,
-  getEndingVisualClass,
-  getOperatorProfile,
-  getOperatorProfiles,
-} from "./advancedSystems.js";
+import { getOperatorProfile, getOperatorProfiles } from "./advancedSystems.js";
+import { getEndingSceneProfile, getFailureObjectives, getEndingVisualClass } from "./runtimeSystems.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
 import { retryableLazy } from "./state/retryableLazy.js";
