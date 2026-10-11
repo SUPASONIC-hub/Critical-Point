@@ -545,7 +545,8 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
                     {entry.flowSurge.label} · {entry.flowSurge.text}
                   </small>
                 )}
-                {entry.tempoBonus && <small className="tempo-bonus-log">{entry.tempoBonus.label} · {entry.tempoBonus.text}</small>}
+                {/* An entry logged before 2026-10-11 holds the line as `tempoBonus`. */}
+                {[entry.handLine ?? entry.tempoBonus].map((line) => line && <small key="hand" className="hand-line-log">{line.label} · {line.text}</small>)}
                 {entry.suspenseEvent && (
                   <small className="suspense-event-log">
                     {entry.suspenseEvent.label} · {entry.suspenseEvent.text}

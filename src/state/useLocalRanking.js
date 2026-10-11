@@ -9,8 +9,11 @@ import { readStoredValue, removeStoredValue, writeStoredValue } from "../appConf
 // then fifty on 2026-09-22). v7 is the fifty-five-case season: the 프롤로그
 // added five cases in front of 사건 01 on 2026-09-23, so a season now starts
 // three years earlier and every completed run before it was scored over a
-// shorter one. Retired keys are never read and are removed on first load.
-export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v7";
+// shorter one. v8 is the same season scored by the logic streak: until
+// 2026-10-10 the hand's share of a pot came from timing a push to the
+// heartbeat, and a score from that table does not compare with one from this.
+// Retired keys are never read and are removed on first load.
+export const LOCAL_RANKING_STORAGE_KEY = "critical-point-local-ranking-v8";
 const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v1",
   "critical-point-local-ranking-v2",
@@ -18,6 +21,7 @@ const RETIRED_LOCAL_RANKING_STORAGE_KEYS = [
   "critical-point-local-ranking-v4",
   "critical-point-local-ranking-v5",
   "critical-point-local-ranking-v6",
+  "critical-point-local-ranking-v7",
 ];
 
 export function parseLocalRankingRows(rawValue) {

@@ -6,7 +6,7 @@ import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { getBriefingIntro } from "./tableStaging.js";
 import { getUnlockKicker } from "./tableUnlocks.js";
-import { monotonicNow } from "./timing.js";
+import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";

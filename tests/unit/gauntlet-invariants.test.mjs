@@ -188,7 +188,7 @@ test("with every rule, a board and a settlement are what they are with no rules 
 /** A closure as a run and the window that closed on it, with a hand that used everything. */
 function settlementOf({ relics, streak, windowIndex, stanceMastery, outcome, cause, gauge, pushes, focusMode, focusCharge, focusHits, caseClosed }, index) {
   return {
-    run: normalizeRunState({ relics, streak, windowIndex, stanceMastery, runPot: 1200, vault: 300, beatCombo: 2, bestCombo: 2 }),
+    run: normalizeRunState({ relics, streak, windowIndex, stanceMastery, runPot: 1200, vault: 300 }),
     window: {
       status: outcome === "cash" ? "cashed" : "bust", cause, gauge, wall: 90, pushes, seed: `step:${index}`,
       focus: focusCharge, focusMode, focusHits, focusCombo: focusHits, maxFocusCombo: focusHits, focusPerfects: focusHits ? 1 : 0, lastFocusGrade: focusHits ? "good" : null,
@@ -224,8 +224,8 @@ test("at every step, a settled window earns nothing from a rule the step does no
         assert.deepEqual([verdict.logic.move, verdict.logic.bonus, verdict.logic.pot], ["none", 1, 0], where());
         assert.deepEqual(nextRun.logic.streak, run.logic.streak, `${where()}: the streak the run carries is neither added to nor taken`);
       }
-      // What a save holds of the beat is written back as it was, under any rules.
-      assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [run.beatCombo, run.bestCombo], where());
+      // The counts a window from before 2026-10-10 can carry reach no run, under any rules.
+      assert.equal(["beatCombo", "bestCombo", "focusPerfects", "focusMisses"].some((key) => key in nextRun), false, where());
       if (!rules.has("lock")) {
         assert.deepEqual(
           [verdict.focus.charge, verdict.focus.hits, verdict.focus.combo, verdict.focus.maxCombo, verdict.focus.pot, verdict.focus.potMultiplier, verdict.focus.resourceMultiplier],
@@ -236,7 +236,7 @@ test("at every step, a settled window earns nothing from a rule the step does no
       }
       if (!rules.has("logic") && !rules.has("lock")) {
         assert.equal(verdict.pot, verdict.outcome === "cash" ? Math.round(verdict.chips * verdict.multiplier) : 0, `${where()}: the pot is chips times heat`);
-        assert.equal(nextRun.runGroove + nextRun.grooveVault, 0, where());
+        assert.equal(nextRun.runHand + nextRun.handVault, 0, where());
       }
       if (!rules.has("stance")) {
         assert.equal(verdict.focus.mode, "strike", `${where()}: LOCK is STRIKE`);
@@ -406,7 +406,7 @@ test("the streak and LOCK are paid under one cap, and their shares add up", () =
         assert.ok(verdict.logic.pot >= 0 && verdict.focus.pot >= 0);
         if (streak === 0 && groove === 0) assert.equal(verdict.logic.pot, 0, "no streak, no share");
         if (focus === 0) assert.equal(verdict.focus.pot, 0);
-        assert.equal(nextRun.runGroove, verdict.logic.pot + verdict.focus.pot, "the hand's whole share is what the vault slack leaves out");
+        assert.equal(nextRun.runHand, verdict.logic.pot + verdict.focus.pot, "the hand's whole share is what the vault slack leaves out");
       }
     }
   }
@@ -473,7 +473,7 @@ test("a rule or a count the save holds as null takes the default, not zero", () 
 
 test("a replayed case is practice: the table plays, and the season keeps nothing from it", () => {
   const first = { pushRecord: { ...createTableRecord([]), busts: 2, cashes: 6, bestMultiplier: 8 } };
-  let run = normalizeRunState({ vault: 5000, grooveVault: 400, relics: ["splint"], relicOffer: ["encore"], stanceMastery: { strike: 2 }, bestMultiplier: 8, schema: { ...BASE_SCHEMA, mutations: ["reboot"] } });
+  let run = normalizeRunState({ vault: 5000, handVault: 400, relics: ["splint"], relicOffer: ["encore"], stanceMastery: { strike: 2 }, bestMultiplier: 8, schema: { ...BASE_SCHEMA, mutations: ["reboot"] } });
   run = openCaseRun(run, { replayOf: first });
   assert.ok(run.practice);
   assert.deepEqual(run.relicOffer, [], "no draft is dealt at a replay's first table");
@@ -489,7 +489,7 @@ test("a replayed case is practice: the table plays, and the season keeps nothing
     else assert.deepEqual([settled.verdict.practice, settled.verdict.secured], [true, 0]);
   }
   assert.equal(run.practice, null);
-  assert.deepEqual([run.vault, run.grooveVault, run.relics, run.relicOffer], [5000, 400, ["splint"], ["encore"]], "the vault, the relics and the waiting draft are as they were");
+  assert.deepEqual([run.vault, run.handVault, run.relics, run.relicOffer], [5000, 400, ["splint"], ["encore"]], "the vault, the relics and the waiting draft are as they were");
   assert.deepEqual(run.stanceMastery, { strike: 2, steady: 0, expose: 0 });
   assert.equal(run.bestMultiplier, 8);
   assert.deepEqual(createTableRecord(log), first.pushRecord, "the summary keeps the record of the first close");

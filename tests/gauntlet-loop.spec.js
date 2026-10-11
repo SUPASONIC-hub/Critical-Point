@@ -136,8 +136,8 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect(saved.dynamics.logic).toMatchObject({ streak: 1, best: 1, type: walk.type, held: 3 });
   expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "grow", streak: 1, bonus: 1.06 });
   expect(saved.log.at(-1).threshold.logic.pot).toBeGreaterThan(0);
-  expect(saved.log.at(-1).tempoBonus.label).toBe("LOGIC STREAK");
-  expect(saved.log.at(-1).threshold.tempo, "no line is written for the beat").toBeUndefined();
+  expect(saved.log.at(-1).handLine.label).toBe("LOGIC STREAK");
+  expect([saved.log.at(-1).tempoBonus, saved.log.at(-1).threshold.tempo], "neither line an older build wrote is written").toEqual([undefined, undefined]);
   await nextScene(page, walk.last.nodeId);
 
   // The fourth scene: the held type would grow it again, another type ends it -- the last three closed cold, so nothing rose.

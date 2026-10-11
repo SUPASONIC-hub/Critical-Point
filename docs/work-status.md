@@ -132,9 +132,9 @@ Still open, on purpose:
    takes its callbacks from `actions` and its renderers from `renderers`, and
    the view carries no second copy of either). The stage
    (`src/gauntlet/GauntletStage.jsx`) is 809
-   lines and 68 imported names; the hand, the table's notices, press timing,
-   the frame variables and the table's numbers are their own modules
-   (`GauntletHand.jsx`, `TableNotices.jsx`, `timing.js`, `fxVariables.js`,
+   lines and 68 imported names; the hand, the table's notices, the frame
+   variables and their clock, and the table's numbers are their own modules
+   (`GauntletHand.jsx`, `TableNotices.jsx`, `fxVariables.js`,
    `tableRules.js`). `gameData.js` is 534 lines and 7 imported names against
    560 / 7, now that no case writes into it; the graph build's last passes live
    in `src/nodes/sceneBuild.js`,
@@ -460,24 +460,21 @@ Still open, on purpose:
 37. A bust skipping a scene must never be a shortcut. `check:pressure` plays a
     policy that busts every window it can to reach the case's end sooner; it has
     to bank under a quarter of the best blind policy.
-38. The heartbeat is also the table's rhythm, and the beat is a hand skill, never
-    a second instrument. A push is graded PERFECT, GOOD or SLIP against the beat
-    `GauntletFx` last sounded (`beatClock`, stamped with `performance.now()` when
-    the beat fires, compared to the input event's `timeStamp`). Timing never
-    moves the wall or the step: on-beat pushes build a combo and groove, and
-    the pot rides the hand -- groove and LOCK multiplied together
-    (`getHandBonus`) under one cap, `HAND_CAP` = x1.5, because LOCK on top of
-    a full groove once reached x3.2. A slip breaks the combo and costs
-    `SLIP_SECONDS` of clock with creep, and groove never falls mid-window. A
-    cash carries the combo into the next window; a bust takes it with the pot.
-    `check:pressure` is the ratchet: a perfectly timed hand busts exactly as
-    often as an untimed one, a slipping hand never banks more, and the beat must
-    pay less over listening than listening pays over playing blind. The
-    ending's vault slack (19,500 a case) reads the vault without `grooveVault`;
-    the beat's own door is `BEAT_SLACK_COMBO`. A timing helper in the tests
-    reads `--gx-beat-zone` (the app's own answer, +/-18% of the period with a
-    60ms floor) rather than aiming at the edge of a phase value it samples a
-    frame late.
+38. The hand's skill is the logic streak (`src/gauntlet/logicStreak.js`), never
+    a second instrument: holding one type of card from scene to scene, or
+    changing it when the pressure rose, builds a streak, and the pot rides the
+    hand -- the streak and LOCK multiplied together (`getHandBonus`) under one
+    cap, `HAND_CAP` = x1.5. Neither moves the wall or the step, and no press is
+    timed: the heartbeat is pressure and nothing is graded against it (until
+    2026-10-10 a push was, PERFECT, GOOD or SLIP). A bust takes the streak with
+    the pot. `check:pressure` is the ratchet: a hand that holds a type busts
+    exactly as often as one whose cards have none, and is never paid past the
+    cap. The ending's vault slack (19,500 a case) reads the vault without the
+    hand's share (`handVault`); the streak's own door is `LOGIC_SLACK_STREAK`.
+    What a save from the timed table still holds is read where it pays or
+    prints -- a put-down window's `groove`, a log entry's `tempo` line and
+    `tempoBonus` -- and the rest is dropped on load without a recovery notice
+    (`upgradeRunRecord`; `tests/unit/fixtures/saves/v2-pre-hand-names.json`).
 39. Relics bend a rule; they never break the table. A closed case (not the
     final one) drafts three relics from `getRelicPool` -- the defaults plus what
     the codex unlocked -- seeded by its last window so a reload cannot reroll

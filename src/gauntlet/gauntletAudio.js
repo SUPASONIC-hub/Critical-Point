@@ -180,13 +180,13 @@ export function playPushCue(pushIndex = 1, closeness = 0) {
 }
 
 const CASH_NOTES = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98];
-const GROOVE_SPARKLE = [2093, 2349.32, 2637.02, 3135.96, 3520, 4186.01];
+const STREAK_SPARKLE = [2093, 2349.32, 2637.02, 3135.96, 3520, 4186.01];
 
 /**
  * The register. More notes the hotter the pot, and a sparkle run over the top
  * for what the logic streak added to it.
  */
-export function playCashCue(multiplier = 1, grooveBonus = 1) {
+export function playCashCue(multiplier = 1, streakBonus = 1) {
   withRuntime(({ context, destination, multiplier: volume }) => {
     const now = context.currentTime;
     const count = Math.min(CASH_NOTES.length, 2 + Math.floor(Math.log2(Math.max(1, multiplier))));
@@ -204,13 +204,13 @@ export function playCashCue(multiplier = 1, grooveBonus = 1) {
       oscillator.start(start);
       oscillator.stop(start + 0.3);
     }
-    const sparkles = Math.min(GROOVE_SPARKLE.length, Math.round((Math.max(1, grooveBonus) - 1) * GROOVE_SPARKLE.length));
+    const sparkles = Math.min(STREAK_SPARKLE.length, Math.round((Math.max(1, streakBonus) - 1) * STREAK_SPARKLE.length));
     for (let index = 0; index < sparkles; index += 1) {
       const start = now + count * 0.065 + index * 0.045;
       const oscillator = context.createOscillator();
       const gain = context.createGain();
       oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(GROOVE_SPARKLE[index], start);
+      oscillator.frequency.setValueAtTime(STREAK_SPARKLE[index], start);
       envelope(gain, start, 0.045 * volume, 0.002, 0.3);
       oscillator.connect(gain).connect(destination);
       oscillator.start(start);

@@ -24,7 +24,7 @@ const { createCaseSummary, createLogicRecord, getRiskPressure, getSeasonLogic, R
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
   BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, normalizeRunState,
-  openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, STANCE_CHARGE, suspendWindow, VERDICT_CAUSES,
+  createOpenSeed, openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, splitOpenSeed, STANCE_CHARGE, suspendWindow, upgradeRunRecord, VERDICT_CAUSES,
 } = engine;
 const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, listOfferedTypes, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
 const { getRelicUnlocks, RELICS } = await import("../../src/gauntlet/relics.js");
@@ -344,10 +344,12 @@ test("a slot restored after a bust takes the streak and keeps the longest it has
   const bust = play([{ card: card("risk"), window: closed(70, "bust") }], { run: grownOn }).run;
   const restored = carryTableRecordIntoRestore(save(atSlot), save(bust)).dynamics;
   assert.deepEqual(restored.logic, { ...atSlot.logic, streak: 0, best: 4 });
-  // What the slot held of the beat is the slot's, and is written back as it was.
-  const beaten = normalizeRunState({ ...atSlot, beatCombo: 5, bestCombo: 9 });
-  const kept = carryTableRecordIntoRestore(save(beaten), save(bust)).dynamics;
-  assert.deepEqual([kept.beatCombo, kept.bestCombo], [5, 9]);
+  // A slot written before 2026-10-11 names the hand's share as that build did, and counts a combo of pushes.
+  const { runHand: _hand, handVault: _vault, ...slot } = serializeRunState(atSlot);
+  const older = { ...save(atSlot), dynamics: { ...slot, runPot: 500, runGroove: 40, vault: 900, grooveVault: 120, beatCombo: 5, bestCombo: 9 } };
+  const kept = carryTableRecordIntoRestore(older, save(grownOn)).dynamics;
+  assert.deepEqual([kept.runHand, kept.handVault], [40, 120]);
+  assert.equal(["beatCombo", "bestCombo", "runGroove", "grooveVault"].some((key) => key in kept), false);
   // Another run's save, or one that is not ahead, is left alone.
   assert.deepEqual(carryTableRecordIntoRestore(save(atSlot), { ...save(bust), runId: "run-b" }).dynamics.logic, atSlot.logic);
 });
@@ -369,21 +371,23 @@ const load = (save) => {
   return { state, repaired, valid: isSavedStateShapeValid(state) };
 };
 
-for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).sort()) {
+const savedBeforeTheStreak = (name) => !JSON.stringify(JSON.parse(readFileSync(new URL(name, SAVES), "utf8")).save.dynamics ?? {}).includes('"logic"');
+
+for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).sort().filter(savedBeforeTheStreak)) {
   test(`${name}, written before the streak, loads with one not yet begun and no new repair`, () => {
     const fixture = JSON.parse(readFileSync(new URL(name, SAVES), "utf8"));
-    assert.equal(JSON.stringify(fixture.save).includes('"logic"'), false, "the fixture is a save from before the streak");
     const { state, repaired, valid } = load(fixture.save);
     assert.equal(valid, true);
     if ("repaired" in fixture.expect) assert.equal(repaired, fixture.expect.repaired, "the streak adds no repair of its own");
     assert.deepEqual(normalizeRunState(state.dynamics).logic, LOGIC_INITIAL);
     if (fixture.save.dynamics && !repaired) {
       assert.deepEqual(state.dynamics.logic, { ...LOGIC_INITIAL });
-      // Every key the save held is written back as it was: the beat's among them.
-      for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault"]) {
-        if (key in fixture.save.dynamics) assert.equal(state.dynamics[key], fixture.save.dynamics[key], key);
+      // What the save held is written back under the names this build reads; the counts nothing reads are not.
+      for (const [old, name] of [["runGroove", "runHand"], ["grooveVault", "handVault"]]) {
+        if (old in fixture.save.dynamics) assert.equal(state.dynamics[name], fixture.save.dynamics[old], name);
       }
-      if (fixture.save.dynamics.suspended) assert.deepEqual(state.dynamics.suspended, fixture.save.dynamics.suspended);
+      for (const gone of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(gone in state.dynamics, false, gone);
+      if (fixture.save.dynamics.suspended) assert.deepEqual(state.dynamics.suspended, upgradeRunRecord(fixture.save.dynamics).suspended);
     }
     // Loaded, saved and loaded again, it is the same save and still not a repair.
     const again = load(JSON.parse(JSON.stringify({ ...state, lastError: undefined, paused: false })));
@@ -410,23 +414,27 @@ test("a save that carries a streak is not called repaired, with or without a rep
   assert.deepEqual(older.state.dynamics.logic, { ...shadow, reach: 0 });
 });
 
-test("a save with a window put down in the middle of a beat resumes with no repair, holds what it held, and is paid at least what it showed", () => {
+test("a save with a window put down before 2026-10-10 resumes with no repair, holds its groove, and is paid at least what it showed", () => {
   const fixture = JSON.parse(readFileSync(new URL("v2-current.json", SAVES), "utf8")).save;
   // As a build before 2026-10-10 wrote it: a combo carried, a groove earned in the window, a LOCK graded.
+  assert.ok("beatCombo" in fixture.dynamics && "grooveVault" in fixture.dynamics, "the fixture is a save of that build");
   const beat = { beatCombo: 6, maxCombo: 7, groove: 12, beatHits: 5, perfects: 3, slips: 1 };
   const window = { ...fixture.dynamics.suspended.window, ...beat, gauge: 33, pushes: 4, elapsed: 9, focus: 37, focusCombo: 2, maxFocusCombo: 2, focusHits: 2, focusPerfects: 1, focusMisses: 1 };
   const dynamics = { ...fixture.dynamics, beatCombo: 6, bestCombo: 11, runGroove: 0, grooveVault: 260, suspended: { ...fixture.dynamics.suspended, window } };
   const { state, repaired, valid } = load({ ...fixture, dynamics });
   assert.deepEqual([valid, repaired], [true, false], "no 복구됨 notice");
   assert.equal(state.lastError, undefined);
-  assert.deepEqual(state.dynamics.suspended, dynamics.suspended, "the window is written back as it was saved, the beat's counts among them");
-  for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault"]) assert.equal(state.dynamics[key], dynamics[key], key);
+  const { beatCombo: _combo, maxCombo: _longest, beatHits: _hits, perfects: _perfects, slips: _slips, focusPerfects: _locked, focusMisses: _jammed, ...held } = window;
+  assert.deepEqual(state.dynamics.suspended.window, held, "the window is written back with its progress and its groove, without the counts nothing reads");
+  assert.deepEqual([state.dynamics.runHand, state.dynamics.handVault], [0, 260], "the hand's share is carried under its new names");
+  for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(key in state.dynamics, false, key);
+  assert.equal(load(JSON.parse(JSON.stringify(state))).repaired, false, "and the save it is written back as loads clean");
 
   // Picked up: the window is live with its groove, and what the stage shows is what the settlement pays.
   const run = normalizeRunState(state.dynamics);
   const resumed = createWindow({ schema: run.schema, seed: run.suspended.seed, resume: run.suspended.window });
   assert.deepEqual([resumed.status, resumed.groove, resumed.gauge, resumed.focus], ["live", 12, 33, 37]);
-  assert.equal(getHandBonus(resumed.groove, 0, "strike", 0), 1.36, "groove 12 was x1.36 on the beat");
+  assert.equal(getHandBonus(resumed.groove, 0, "strike", 0), 1.36, "groove 12 was x1.36");
   const cashed = reduceWindow(resumed, { type: "CASH" });
   const staked = card("risk");
   const { verdict, nextRun } = resolveWindow({ run, window: cashed, card: staked, rules: step("prologue02") });
@@ -438,7 +446,7 @@ test("a save with a window put down in the middle of a beat resumes with no repa
   const whole = resolveWindow({ run, window: cashed, card: staked }).verdict;
   assert.equal(whole.pot, Math.round(whole.chips * whole.multiplier * getHandBonus(12, 37, "strike", 0)));
   assert.ok(whole.pot >= verdict.pot);
-  assert.deepEqual([nextRun.beatCombo, nextRun.bestCombo], [6, 11], "the run's old combo is neither read nor rewritten");
+  assert.equal("beatCombo" in nextRun || "bestCombo" in nextRun, false, "the run's old combo is not carried");
   // Put down again before it is cashed, it holds everything it held (and the clock scale a window now keeps).
   const again = suspendWindow(resumed, run.windowIndex).window;
   for (const [key, value] of Object.entries(run.suspended.window)) assert.equal(again[key], value, key);
@@ -501,9 +509,9 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   assert.equal(entry.threshold.logic.pot, entry.threshold.pot - Math.round(patch.decisionReveal.verdict.chips * patch.decisionReveal.verdict.multiplier));
   assert.deepEqual(entry.threshold.logic, patch.decisionReveal.verdict.logic);
   assert.deepEqual(six(patch.gauntletRun.logic), { streak: 4, best: 4, type, held: 3, heat: 1, rose: true });
-  assert.equal("tempo" in entry.threshold, false, "the beat's line is no longer written");
-  assert.deepEqual(entry.tempoBonus, describeLogicLog(entry.threshold.logic), "and the archive's line is the streak's");
-  assert.match(entry.tempoBonus.text, /^논리 콤보 4 · 판돈 ×1\.25 · \+\d/);
+  assert.equal("tempo" in entry.threshold || "tempoBonus" in entry, false, "neither line a build before 2026-10-11 wrote is written");
+  assert.deepEqual(entry.handLine, describeLogicLog(entry.threshold.logic), "and the archive's line is the streak's");
+  assert.match(entry.handLine.text, /^논리 콤보 4 · 판돈 ×1\.25 · \+\d/);
 
   // A type the scene does not deal is one the hand could not have held: the streak is kept.
   const offered = getOfferedTypes(scene, { clueCount: 0, trust: 50, legitimacy: 50, casesOpened: 0 });
@@ -627,16 +635,18 @@ test("the reveal says what the card did to the streak, one sentence a move", () 
   for (const unpaid of [{ streak: 0, bonus: 1, pot: 0 }, { streak: 3 }, null]) assert.equal(describeLogicLog(unpaid), null);
 });
 
-test("the run summary a telemetry row carries has the streak beside the beat's old keys", () => {
-  const run = normalizeRunState({ beatCombo: 3, bestCombo: 9, grooveVault: 120, vault: 900, logic: { streak: 5, best: 12, type: "risk", held: 7 } });
+test("the run summary a telemetry row carries has the streak and the hand's share, and none of the keys a graded press wrote", () => {
+  // The record of a run begun before 2026-10-11: its keys are read, and the row is written in this build's.
+  const run = normalizeRunState({ beatCombo: 3, bestCombo: 9, focusPerfects: 2, focusMisses: 1, grooveVault: 120, vault: 900, logic: { streak: 5, best: 12, type: "risk", held: 7 } });
   const summary = createRunSummary(run);
   assert.deepEqual([summary.logicStreak, summary.bestLogic], [5, 12]);
-  assert.deepEqual([summary.beatCombo, summary.bestCombo, summary.grooveVault], [3, 9, 120], "what the server still types when present");
-  assert.deepEqual(Object.keys(summary), ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastOutcome", "lastGauge", "beatCombo", "bestCombo", "logicStreak", "bestLogic", "bestFocusCombo", "focusHits", "focusPerfects", "focusMisses", "stanceMastery", "grooveVault", "relics", "mutations"]);
+  assert.equal(summary.handVault, 120);
+  // The server asks for none of the keys left out: it types `beatCombo`, `bestCombo` and `grooveVault` only when a row has them.
+  assert.deepEqual(Object.keys(summary), ["windowIndex", "runPot", "vault", "streak", "busts", "cashes", "bestMultiplier", "lastOutcome", "lastGauge", "logicStreak", "bestLogic", "bestFocusCombo", "focusHits", "stanceMastery", "handVault", "relics", "mutations"]);
   assert.deepEqual([createRunSummary({}).logicStreak, createRunSummary({}).bestLogic], [0, 0]);
 });
 
-test("a replayed case's first record is read from an entry logged before or after the beat went", () => {
+test("a replayed case's first record is read from an entry logged before or after 2026-10-10", () => {
   const first = { busts: 2, cashes: 6, bestMultiplier: 8, potBanked: 900, potLost: 300, pushes: 14, bestCombo: 7, beatHits: 9, perfects: 4, slips: 2, grooveBanked: 80 };
   const before = createTableRecord([{ threshold: { busted: false, pot: 10, tempo: { firstRecord: first } } }]);
   const after = createTableRecord([{ threshold: { busted: false, pot: 10, firstRecord: first } }]);
@@ -644,7 +654,8 @@ test("a replayed case's first record is read from an entry logged before or afte
   assert.deepEqual([after.busts, after.bestCombo, after.bestLogic], [2, 7, 0]);
   const practice = openCaseRun(RUN_INITIAL_STATE, { replayOf: { pushRecord: first } });
   const closing = resolveWindow({ run: practice, window: closed(COLD), card: card("risk"), caseClosed: true });
-  assert.deepEqual(closing.verdict.firstRecord, first, "the verdict that closes a replay carries it, with the keys it was saved with");
+  const { bestCombo: _combo, beatHits: _hits, perfects: _perfects, slips: _slips, ...kept } = first;
+  assert.deepEqual(closing.verdict.firstRecord, kept, "the verdict that closes a replay carries it, with the keys the table record has");
   assert.equal("firstRecord" in resolveWindow({ run: RUN_INITIAL_STATE, window: closed(COLD), card: card("risk"), caseClosed: true }).verdict, false);
 });
 
@@ -759,7 +770,7 @@ test("the streak pays 1 + min(0.5, streak x 0.0625) and the hand is capped as it
       }
     }
   }
-  // A groove is only ever one a save held from before the beat went, and is paid as it was.
+  // A groove is only ever one a window put down before 2026-10-10 held, and is paid as it was.
   assert.equal(getHandBonus(10, 0, "strike"), 1.3);
   assert.equal(getHandBonus(0, 0, "strike"), 1);
 });
@@ -771,10 +782,10 @@ test("the pot is paid on the streak the card made", () => {
   const base = Math.round(paid.verdict.chips * paid.verdict.multiplier);
   assert.equal(paid.verdict.logic.streak, 4);
   assert.equal(paid.verdict.pot, Math.round(paid.verdict.chips * paid.verdict.multiplier * 1.25), "1 + 4 x 0.0625");
-  assert.deepEqual([paid.verdict.logic.bonus, paid.verdict.logic.pot], [1.25, paid.verdict.pot - base], "the hand's share is told apart as the groove's was");
-  assert.equal(paid.nextRun.runGroove, paid.verdict.pot - base);
+  assert.deepEqual([paid.verdict.logic.bonus, paid.verdict.logic.pot], [1.25, paid.verdict.pot - base], "the hand's share is told apart");
+  assert.equal(paid.nextRun.runHand, paid.verdict.pot - base);
   assert.equal(paid.verdict.focus.potMultiplier, 1);
-  assert.equal("tempo" in paid.verdict, false, "the verdict has no line for the beat");
+  assert.equal("tempo" in paid.verdict, false, "the verdict has no line for a graded press");
   // A card with no type is paid bare, whatever the run carries: no streak moved for it.
   assert.equal(resolveWindow({ run, window, card: { ...card("risk"), cognition: undefined } }).verdict.pot, Math.round(base * 1.19), "the streak it stood at");
   // A card that ends the streak is paid as a bare one, and a bust pays nothing.
@@ -791,7 +802,7 @@ test("the pot is paid on the streak the card made", () => {
   assert.deepEqual([prologue.verdict.logic.move, prologue.nextRun.logic.streak, prologue.verdict.pot], ["none", 3, base]);
 });
 
-test("a window saved in the middle of a beat and picked up after is paid the larger of the two", () => {
+test("a window put down before 2026-10-10 with a groove, and picked up after, is paid the larger of the two", () => {
   const window = closed(44, "cashed", { groove: 10, beatCombo: 4, maxCombo: 4, beatHits: 4 });
   const run = (streak) => normalizeRunState({ ...RUN_INITIAL_STATE, logic: { ...LOGIC_INITIAL, type: "risk", held: 5, streak, best: streak } });
   const base = (settled) => Math.round(settled.verdict.chips * settled.verdict.multiplier);
@@ -838,7 +849,7 @@ test("a push is not graded and a LOCK press charges for clock", () => {
     }
     assert.equal(window.status, "live");
   }
-  // The decided charge: what a GOOD lock took on the beat, 13 and 2 a press before it, by the stance's scale.
+  // The decided charge: 13 and 2 a press before it, by the stance's scale.
   assert.deepEqual(["strike", "steady", "expose"].map((focusMode) => [0, 1, 2, 3, 4].map((focusCombo) => scoreFocus({ focus: 0, focusCombo, focusMode }).focus)), [[17, 20, 22, 24, 26], [14, 15, 17, 19, 21], [15, 17, 19, 21, 23]]);
   assert.deepEqual(["strike", "steady", "expose"].map((focusMode) => scoreFocus({ focusMode }).focusRelief), [0, 2, 0]);
 
@@ -850,7 +861,7 @@ test("a push is not graded and a LOCK press charges for clock", () => {
 
 test("a LOCK press cannot bust on its own, and the clock it spends can only close a window the clock's way", () => {
   const fresh = reduceWindow(createWindow({ seed: "lock-wall" }), { type: "SELECT", id: "a" });
-  // Just under the wall, before the grace has run: a LOCK off the beat used to bust here.
+  // Just under the wall, before the grace has run: a press does not heat the gauge.
   const brink = { ...fresh, gauge: fresh.wall - 0.5 };
   const pressed = reduceWindow(brink, { type: "FOCUS", grade: "miss" });
   assert.deepEqual([pressed.status, pressed.cause, pressed.gauge], ["live", null, brink.gauge]);
@@ -859,10 +870,13 @@ test("a LOCK press cannot bust on its own, and the clock it spends can only clos
   assert.deepEqual([late.status, late.cause], ["bust", "creep"]);
   const last = reduceWindow({ ...fresh, elapsed: fresh.schema.seconds - 1, schema: { ...fresh.schema, creep: 0 } }, { type: "FOCUS" });
   assert.deepEqual([last.status, last.cause], ["bust", "timeout"]);
-  assert.ok(VERDICT_CAUSES.includes("focus"), "the cause stays in the list for the logs and the holds that name it");
-  // A hold written under the slam of a jammed LOCK, before the beat went, still closes as it was held.
+  assert.equal(VERDICT_CAUSES.includes("focus"), false, "so no window closes as a LOCK's own bust");
+  // A hold a build before 2026-10-10 wrote under the slam of one is a bust all the same: a window left.
   const held = createWindow({ seed: "lock-held", abandoned: true, closedAs: "focus" });
-  assert.equal(resolveWindow({ run: RUN_INITIAL_STATE, window: held, card: card("risk") }).verdict.cause, "focus");
+  const settled = resolveWindow({ run: RUN_INITIAL_STATE, window: held, card: card("risk") }).verdict;
+  assert.deepEqual([settled.outcome, settled.cause, settled.pot], ["bust", "abandon", 0]);
+  assert.equal(splitOpenSeed(createOpenSeed("seed", "tab", "focus")).closedAs, null);
+  assert.equal(splitOpenSeed("seed#tab~focus").closedAs, null);
 });
 
 test("the stances, mastery and the boards they carry are what they were", () => {

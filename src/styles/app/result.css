@@ -1482,7 +1482,7 @@
   color: var(--c-danger-81);
   background: var(--ui-heat-soft);
 }
-.history-challenge :is(.tempo-bonus-log, .challenge-grade.grade-a) {
+.history-challenge :is(.hand-line-log, .challenge-grade.grade-a) {
   color: var(--ui-chip);
   background: var(--ui-chip-soft);
 }

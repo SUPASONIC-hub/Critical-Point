@@ -567,10 +567,8 @@ const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // The streak that opens the slack door: the p90 of the seasons check:endings
 // replays (season best 1 / 3 / 7 / 24 / 109 at min / p10 / p50 / p90 / max; a
 // random hand never passes 8, one that plays for it reaches 40 one season in
-// two). Until 2026-10-10 the door was the beat's, a combo of 12 pushes; no push
-// earns that now, and a season that reached it before then keeps the door open.
+// two).
 export const LOGIC_SLACK_STREAK = 24;
-const BEAT_SLACK_COMBO = 12;
 
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 
@@ -626,16 +624,15 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
     // The vault is cumulative across the season, so the largest summary holds it,
     // and it is read per case: a season total rises with every case played. The
-    // hand's share (`grooveVault`: the logic streak and LOCK, once the beat) is
-    // taken back out -- the vault's slack rewards reading the table, and the
-    // streak has its own door.
+    // hand's share (`handVault`: the logic streak and LOCK) is taken back out --
+    // the vault's slack rewards reading the table, and the streak has its own
+    // door. A case closed before 2026-10-11 wrote it as `grooveVault`.
     seasonVaultPerCase: summaries.length
       ? summaries.reduce(
-        (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.grooveVault) || 0)),
+        (vault, summary) => Math.max(vault, (Number(summary.gauntlet?.vault) || 0) - (Number(summary.gauntlet?.handVault ?? summary.gauntlet?.grooveVault) || 0)),
         0,
       ) / summaries.length
       : 0,
-    seasonBestCombo: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestCombo) || 0, Number(summary.gauntlet?.bestCombo) || 0), 0),
     seasonBestLogic: summaries.reduce((best, summary) => Math.max(best, Number(summary.logicRecord?.best) || 0, Number(summary.gauntlet?.bestLogic) || 0), 0),
   };
 }
@@ -669,7 +666,6 @@ export function getEndingVariant({
   seasonBusts = 0,
   seasonBestMultiplier = 1,
   seasonVaultPerCase = 0,
-  seasonBestCombo = 0,
   seasonBestLogic = 0,
   casesPlayed = 0,
   seasonWindows = 0,
@@ -713,7 +709,7 @@ export function getEndingVariant({
   }
 
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
-  const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonBestCombo >= BEAT_SLACK_COMBO || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
+  const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
   const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
   if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];

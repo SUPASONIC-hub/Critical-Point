@@ -51,9 +51,10 @@ test("leaving with a bet on the table keeps the table as it stood", async ({ pag
 
 // tests/unit/fixtures/saves/v2-current.json is a run put down in 프롤로그 02 with
 // a card staked. Here it is given what a build before 2026-10-10 would have
-// written into that window: a groove earned on the beat (12 points, x1.36 on
-// the pot) and the combo that earned it. The beat is gone; the window is not.
-test("a window saved in the middle of a beat resumes with no repair notice and pays at least what it showed", { tag: "@prod" }, async ({ page }) => {
+// written into that window: a groove (12 points, x1.36 on the pot) and the
+// combo of timed pushes that earned it. No push is timed now; the window is
+// still that player's, and so is its pot.
+test("a window put down before 2026-10-10 resumes with no repair notice and pays at least what it showed", { tag: "@prod" }, async ({ page }) => {
   const { save } = JSON.parse(readFileSync("tests/unit/fixtures/saves/v2-current.json", "utf8"));
   const window = { ...save.dynamics.suspended.window, groove: 12, beatCombo: 6, maxCombo: 7, beatHits: 5, perfects: 3, slips: 1 };
   const dynamics = { ...save.dynamics, beatCombo: 6, bestCombo: 11, suspended: { ...save.dynamics.suspended, window } };
@@ -67,7 +68,7 @@ test("a window saved in the middle of a beat resumes with no repair notice and p
   await dismissProtocolBreach(page);
 
   // The table it left: the heat where it stood, and the pot still multiplied
-  // by what the beat had earned it. (The card the fixture had staked is no
+  // by the groove it held. (The card the fixture had staked is no
   // longer one this scene deals, so the hand stakes one.)
   const stage = page.getByTestId("gauntlet-stage");
   await expect(stage).toHaveAttribute("data-status", "live");
@@ -75,7 +76,6 @@ test("a window saved in the middle of a beat resumes with no repair notice and p
   await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
   await expect(page.locator(".gx-card.selected")).toHaveCount(1);
   await expect(page.getByTestId("gauntlet-logic-bonus")).toHaveText("콤보 1.36");
-  await expect(page.locator(".gx-beat-ring, .gx-grade")).toHaveCount(0);
   const shown = Number((await page.getByTestId("gauntlet-pot").textContent()).replace(/[^\d]/g, ""));
   expect(shown).toBeGreaterThan(0);
 
@@ -87,7 +87,9 @@ test("a window saved in the middle of a beat resumes with no repair notice and p
   expect(settled.logic.bonus, "the groove is the larger of the two, and is paid").toBe(1.36);
   expect(settled.pot, "the clock only ever adds heat, so the pot is at least the one on screen").toBeGreaterThanOrEqual(shown);
   expect(after.lastError ?? null).toBeNull();
-  expect([after.dynamics.beatCombo, after.dynamics.bestCombo], "the run's old combo is written back as it was").toEqual([6, 11]);
+  expect(Object.keys(after.dynamics).filter((key) => ["beatCombo", "bestCombo", "focusPerfects", "focusMisses", "runGroove", "grooveVault"].includes(key)), "the save is written back in this build's keys").toEqual([]);
+  expect(after.dynamics.handVault, "with the hand's share of the vault under its new name").toBe(save.dynamics.grooveVault);
+  expect(after.dynamics.runHand, "and this pot's share added to the case's").toBe(settled.logic.pot);
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
 });
 
