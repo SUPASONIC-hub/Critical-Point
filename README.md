@@ -542,7 +542,7 @@ npm run dev
 자주 쓰는 명령:
 
 ```bash
-npm run verify:static   # 브라우저 없는 검사 25개를 병렬로 (~40초)
+npm run verify:static   # 브라우저 없는 검사 25개를 병렬로 (~1분)
 npm run verify:quick    # + 프로덕션 빌드, 번들 예산, 빌드 위 런타임 스모크와 @prod e2e
 npm run verify          # + 기본 e2e와 성능 예산
 npm run test:coverage   # 단위·스모크 테스트 커버리지 (로직 모듈 합계 줄 88%·함수 87%·분기 76%, 모듈마다 하한)
@@ -787,7 +787,7 @@ Dependabot PR은 라벨 없이도 e2e와 시각 회귀를 모두 돕니다(의�
 ## 검증
 
 ```bash
-npm run verify:static # 브라우저가 필요 없는 검사 25개, 병렬 (~40초)
+npm run verify:static # 브라우저가 필요 없는 검사 25개, 병렬 (~1분)
 npm run verify:quick  # verify:static + 빌드 + 번들 예산 + 빌드 위 런타임 스모크 + @prod e2e
 npm run verify        # verify:quick + 기본 e2e + 성능 예산
 npm run verify:full   # verify + 전체 경로 검증 + 시즌 연속 걷기
