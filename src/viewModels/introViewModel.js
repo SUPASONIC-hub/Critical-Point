@@ -48,7 +48,7 @@ import { createSeasonCases, normalizeCaseSummary } from "./seasonViewModels.js";
 /** Both callers show the same screen, so they play the same cue. */
 const INTRO_MUSIC_MODE = "intro:menu";
 
-export function getCaseStatusText(status) {
+function getCaseStatusText(status) {
   if (status === "PLAYING") return "진행 중";
   if (status === "OPEN") return "시작 가능";
   if (status === "COMPLETE") return "완료됨";

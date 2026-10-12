@@ -8,7 +8,7 @@
  * that forced the accounting change, the bank that wrote it, and the signature
  * box nobody filled in.
  */
-export const case01Nodes = {
+const case01Nodes = {
   start: {
     phase: "CASE BRIEFING",
     title: "72 HOURS",

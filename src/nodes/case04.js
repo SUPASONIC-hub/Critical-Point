@@ -7,7 +7,7 @@
  * fell by exactly that much. The organisation is now being asked to fake the
  * number the bank created.
  */
-export const case04Nodes = {
+const case04Nodes = {
   c4_start: {
     phase: "CASE 04 BRIEFING",
     title: "THE PRICE",

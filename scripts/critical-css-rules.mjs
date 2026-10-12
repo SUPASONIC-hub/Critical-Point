@@ -132,7 +132,7 @@ export function parseRules(css, from = 0, to = css.length) {
  * keeps a subset of each group's children -- but a leaf rule is sliced verbatim,
  * so it either appears in the full sheet or the critical file is stale.
  */
-export function leafRuleTexts(css) {
+function leafRuleTexts(css) {
   const texts = [];
   const walk = (items) => {
     for (const item of items) {

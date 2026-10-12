@@ -38,7 +38,7 @@ function range(from, to) {
  * punctuation block, arrows, and the Hangul compatibility jamo an IME shows
  * while a syllable is still being composed in the name field.
  */
-export const BASELINE_CHARACTERS =
+const BASELINE_CHARACTERS =
   range(0x20, 0x7e) +
   range(0xa0, 0xbf) +
   "×÷" +

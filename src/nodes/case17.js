@@ -27,7 +27,7 @@
  * the notebook -- court, owners, or fire -- and a phone call from 브릿지은행
  * that opens 사건 18.
  */
-export const case17Nodes = {
+const case17Nodes = {
   c17_start: {
     phase: "CASE 17 BRIEFING",
     title: "회사 기록물",

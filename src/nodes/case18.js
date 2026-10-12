@@ -23,7 +23,7 @@
  * that lets him choose. It ends on 12월 31일 with a message from 임경수's
  * granddaughter, which is where 4막 begins.
  */
-export const case18Nodes = {
+const case18Nodes = {
   c18_start: {
     phase: "CASE 18 BRIEFING",
     title: "연봉 두 배",

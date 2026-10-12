@@ -26,7 +26,7 @@
  * case closes on an offer to pay one man in full if nobody asks about the other
  * 1,317, and 서하린 calls about Singapore.
  */
-export const case28Nodes = {
+const case28Nodes = {
   c28_start: {
     phase: "CASE 28 BRIEFING",
     title: "대본 4번",

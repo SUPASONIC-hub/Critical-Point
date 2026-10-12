@@ -28,7 +28,7 @@ export const LOGIC_RANK_BANDS = [10, 25, 50];
 /** Cases with a record a season needs before one of them is named. */
 export const LOGIC_REPORT_MIN_CASES = 5;
 /** Windows a case needs before its heat is an average worth comparing. */
-export const LOGIC_REPORT_MIN_WINDOWS = 3;
+const LOGIC_REPORT_MIN_WINDOWS = 3;
 
 export const LOGIC_REPORT_COPY = {
   label: "논리 유지력",

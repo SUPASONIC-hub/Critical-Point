@@ -17,7 +17,7 @@
  * That is the beat the season was missing -- not a win, but the discovery that
  * the debts run both ways.
  */
-export const case07Nodes = {
+const case07Nodes = {
   c7_start: {
     phase: "CASE 07 BRIEFING",
     title: "발령",

@@ -28,7 +28,7 @@ import { pathToFileURL } from "node:url";
 export const SPLIT_TABLES = ["nodes", "echoReplies", "choiceVoiceLines", "sceneContext"];
 
 /** The fields of a case pack that `gameLogic.js` reads (its `packTable`), all small. */
-export const PACK_LOGIC_FIELDS = ["clue", "outcomes", "carryovers", "continuityChallenges"];
+const PACK_LOGIC_FIELDS = ["clue", "outcomes", "carryovers", "continuityChallenges"];
 
 export async function loadSeasonTables() {
   const [data, dialogue, context] = await Promise.all([

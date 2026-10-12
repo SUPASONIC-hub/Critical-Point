@@ -25,7 +25,7 @@
  * year, and on 서하린 at the courthouse steps: next week's documentary, and a
  * defence lawyer who smiled at her crew (사건 39).
  */
-export const case38Nodes = {
+const case38Nodes = {
   c38_start: {
     phase: "CASE 38 BRIEFING",
     title: "원고 1,740명",

@@ -16,7 +16,7 @@
  * The dilemma is not whether the trail is real. It is whether the hand that
  * follows it is allowed to become the thing it is following.
  */
-export const case08Nodes = {
+const case08Nodes = {
   c8_start: {
     phase: "CASE 08 BRIEFING",
     title: "240km 밖의 창구",

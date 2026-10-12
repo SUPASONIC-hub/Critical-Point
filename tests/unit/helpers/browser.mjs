@@ -10,7 +10,7 @@ import { registerHooks } from "node:module";
  * and `installBrowser` writes the keys. Both have to happen before the module
  * is loaded, which is why the tests import what they test with `await import`.
  */
-export const TEST_SERVER = "https://unit.supabase.test";
+const TEST_SERVER = "https://unit.supabase.test";
 
 registerHooks({
   load(url, context, nextLoad) {

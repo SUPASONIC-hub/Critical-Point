@@ -25,7 +25,7 @@
  * closes on what survives midnight, and the oldest line in the list points to
  * 제주 and the first participant.
  */
-export const case20Nodes = {
+const case20Nodes = {
   c20_start: {
     phase: "CASE 20 BRIEFING",
     title: "교체 공지",

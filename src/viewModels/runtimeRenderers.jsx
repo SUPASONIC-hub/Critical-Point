@@ -9,7 +9,7 @@ function getSceneLineType(line) {
   return "narration-line";
 }
 
-export function renderSceneLines(text = "") {
+function renderSceneLines(text = "") {
   return text.split("\n").map((line, index) => (
     <p className={getSceneLineType(line)} key={`${index}-${line.slice(0, 12)}`}>
       {line}

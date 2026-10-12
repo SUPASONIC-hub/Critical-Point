@@ -21,7 +21,7 @@
  * the first morning of the second sale, and its last beat hands the next case
  * to 이민서.
  */
-export const case14Nodes = {
+const case14Nodes = {
   c14_start: {
     phase: "CASE 14 BRIEFING",
     title: "은행이 망하지 않는 한",

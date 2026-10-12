@@ -103,7 +103,7 @@ const SLOW_LOAD_MS = 12_000;
  * the page again. The count is a progress bar to a screen reader, not a status
  * that speaks fifty-five times.
  */
-export function ScreenLoading() {
+function ScreenLoading() {
   const { done, total } = useSyncExternalStore(subscribeLoadProgress, getLoadProgress, getLoadProgress);
   const [slow, setSlow] = useState(false);
   useEffect(() => {

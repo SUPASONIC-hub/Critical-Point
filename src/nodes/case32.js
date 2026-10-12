@@ -27,7 +27,7 @@
  * the emptied floor, 백아린 squares twelve chairs without a word and leaves the
  * seizure list with box 27 blank; 사건 33 begins a week later with her report.
  */
-export const case32Nodes = {
+const case32Nodes = {
   c32_start: {
     phase: "CASE 32 BRIEFING",
     title: "07시 40분",

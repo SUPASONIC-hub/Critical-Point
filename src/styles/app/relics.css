@@ -85,9 +85,7 @@
   color: var(--ui-text);
   background: linear-gradient(160deg, var(--ui-surface-3), var(--ui-surface-2));
   box-shadow: var(--ui-shadow-1);
-  font: inherit;
   text-align: left;
-  cursor: pointer;
   transition:
     transform 0.15s ease-out,
     border-color 0.15s ease-out;

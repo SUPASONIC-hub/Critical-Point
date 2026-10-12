@@ -7,7 +7,7 @@
  * a name before the analyst asked whose name belonged in that box. She is a
  * contract worker up for renewal, which is the entire reason it is her.
  */
-export const case02Nodes = {
+const case02Nodes = {
   c2_start: {
     phase: "CASE 02 BRIEFING",
     title: "FALSE SIGNAL",

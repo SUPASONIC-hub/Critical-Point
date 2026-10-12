@@ -32,7 +32,7 @@
  * Nobody dies and nobody is fired. The one thing the analyst learns here is the
  * thing that makes them stop, three years later, in front of 2023-0412.
  */
-export const prologue01Nodes = {
+const prologue01Nodes = {
   p1_start: {
     phase: "PROLOGUE 01 BRIEFING",
     title: "수습 마지막 과제",

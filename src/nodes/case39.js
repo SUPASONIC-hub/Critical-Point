@@ -24,7 +24,7 @@
  * the group's right of reply. The case ends forty minutes into the broadcast,
  * on a tip from someone who says they worked in the chairman's office.
  */
-export const case39Nodes = {
+const case39Nodes = {
   c39_start: {
     phase: "CASE 39 BRIEFING",
     title: "정확히 20분",

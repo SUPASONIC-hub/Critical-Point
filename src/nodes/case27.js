@@ -22,7 +22,7 @@
  * the rumour ran. The final choice is the one the bible asks for: stop the run
  * with group money, open every number to the queue, or limit withdrawals.
  */
-export const case27Nodes = {
+const case27Nodes = {
   c27_start: {
     phase: "CASE 27 BRIEFING",
     title: "금요일 밤의 캡처",

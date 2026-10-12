@@ -31,7 +31,7 @@
  * words and takes responsibility in hard ones. 도윤하 smiles while he sells,
  * and the smile is sincere. That is the chapter.
  */
-export const prologue04Nodes = {
+const prologue04Nodes = {
   p4_start: {
     phase: "PROLOGUE 04 BRIEFING",
     title: "사후 점검",

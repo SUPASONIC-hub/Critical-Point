@@ -25,7 +25,7 @@
  * aftermath hands 사건 27 its thread: the smallest lender at the back of the
  * table, 군산 새봄신협, and a lender table that leaves the building.
  */
-export const case26Nodes = {
+const case26Nodes = {
   c26_start: {
     phase: "CASE 26 BRIEFING",
     title: "작성자 칸",

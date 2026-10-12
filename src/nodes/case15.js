@@ -25,7 +25,7 @@
  * of her with her brother's lunch in her hand. The final choice is hers as much
  * as the analyst's: fight, sign and change it from inside, or show the paper.
  */
-export const case15Nodes = {
+const case15Nodes = {
   c15_start: {
     phase: "CASE 15 BRIEFING",
     title: "7쪽짜리 축하",

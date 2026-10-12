@@ -26,7 +26,7 @@
  * water, and on a text from the chairman's office inviting the analyst to
  * dinner in 한남동 -- which is 사건 36.
  */
-export const case35Nodes = {
+const case35Nodes = {
   c35_start: {
     phase: "CASE 35 BRIEFING",
     title: "시간당 110mm",

@@ -36,7 +36,7 @@
  * take it head on, keep a copy where nobody can return it, or believe the man who
  * says this was for you.
  */
-export const prologue03Nodes = {
+const prologue03Nodes = {
   p3_start: {
     phase: "PROLOGUE 03 BRIEFING",
     title: "첨부 7번",

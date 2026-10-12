@@ -25,7 +25,7 @@
  * motion passes 5 to 3; the first-instance verdict is days away, which is where
  * 사건 44 begins.
  */
-export const case43Nodes = {
+const case43Nodes = {
   c43_start: {
     phase: "CASE 43 BRIEFING",
     title: "안건 제1호",

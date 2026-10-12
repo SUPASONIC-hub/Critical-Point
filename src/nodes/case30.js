@@ -24,7 +24,7 @@
  * desk that wrote "no issue" on the deal is the analyst's own. The aftermath
  * announces the regulator's inspection that opens the next act.
  */
-export const case30Nodes = {
+const case30Nodes = {
   c30_start: {
     phase: "CASE 30 BRIEFING",
     title: "임시(진짜 임시)",

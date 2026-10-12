@@ -28,7 +28,7 @@
  * unties, a desk that fills up and empties again, until a training case lands
  * with 2023-0412 still legible under the cover.
  */
-export const prologue05Nodes = {
+const prologue05Nodes = {
   p5_start: {
     phase: "PROLOGUE 05 BRIEFING",
     title: "사유 칸",

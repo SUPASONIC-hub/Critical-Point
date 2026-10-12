@@ -27,7 +27,7 @@
  * demand letter delivered at the altar under the group's wreath; the joy is a
  * son who stops calling the paper his father's other family.
  */
-export const case45Nodes = {
+const case45Nodes = {
   c45_start: {
     phase: "CASE 45 BRIEFING",
     title: "3호 빈소",

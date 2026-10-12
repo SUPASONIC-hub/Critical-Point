@@ -23,7 +23,7 @@
  * on a confirmer's signature box, and the aftermath hands the file to the
  * prosecutors -- 사건 32's search and seizure.
  */
-export const case31Nodes = {
+const case31Nodes = {
   c31_start: {
     phase: "CASE 31 BRIEFING",
     title: "검사역",

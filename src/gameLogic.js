@@ -638,7 +638,7 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
 }
 
 /** The finale's own answer, read off its log: "witness", "control", "burn", or null before it. */
-export function getFinaleOutcome(log = []) {
+function getFinaleOutcome(log = []) {
   const entry = [...(log ?? [])].reverse().find((item) => /^f_after_(witness|control|burn)$/.test(item?.choiceId ?? ""));
   return entry ? entry.choiceId.slice("f_after_".length) : null;
 }
@@ -753,7 +753,7 @@ export function getOutcomeCarryover({ caseId = CASE_SEQUENCE[0], choiceId = "" }
  * finale -- in the two axes a long season spends. The table leans in on the
  * same schedule (`getSeasonEscalation`).
  */
-export const SEASON_WEAR = Object.freeze({ fatigue: 14, time: -8 });
+const SEASON_WEAR = Object.freeze({ fatigue: 14, time: -8 });
 
 export function getSeasonWear(caseId = "") {
   const index = CASE_SEQUENCE.indexOf(caseId);

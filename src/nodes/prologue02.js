@@ -27,7 +27,7 @@
  * no. The first of those is the document that, three years later, is not in the
  * archive. The reader already knows that. The analyst does not.
  */
-export const prologue02Nodes = {
+const prologue02Nodes = {
   p2_start: {
     phase: "PROLOGUE 02 BRIEFING",
     title: "310억이 올라온 아침",

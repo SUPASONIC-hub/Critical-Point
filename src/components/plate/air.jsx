@@ -4,14 +4,14 @@ import { round, span } from "./primitives.jsx";
 export const SCREEN_MOTIFS = new Set(["control", "archive", "desk", "lobby", "newsroom", "server", "trading"]);
 
 /** Rooms with open sky over them, where a night can be raining. */
-export const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
+const OUTDOOR_MOTIFS = new Set(["skyline", "street", "coast"]);
 
 /**
  * Rooms seen through glass with weather on the other side of it. A taxi and a
  * dawn café are interiors -- no rain falls on the player -- but both are mostly
  * window, so the night outside runs down them instead of hanging as dust.
  */
-export const GLASS_MOTIFS = new Set(["transit", "cafe"]);
+const GLASS_MOTIFS = new Set(["transit", "cafe"]);
 
 /**
  * What hangs in the room's air. By day it is dust catching the light; after

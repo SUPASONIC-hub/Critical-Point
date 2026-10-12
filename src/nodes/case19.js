@@ -23,7 +23,7 @@
  * closes on where the originals finally go, and plants the 트리거랩 budget
  * review (and the name 선우진) that the rest of the act will follow.
  */
-export const case19Nodes = {
+const case19Nodes = {
   c19_start: {
     phase: "CASE 19 BRIEFING",
     title: "철거 예고문",

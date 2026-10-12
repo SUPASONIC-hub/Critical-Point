@@ -25,7 +25,7 @@
  * reframes the badge, remembers the photo on 윤상혁's desk of a daughter holding
  * sunflowers, and leaves nine boxes still to pack: the doors into 사건 34.
  */
-export const case33Nodes = {
+const case33Nodes = {
   c33_start: {
     phase: "CASE 33 BRIEFING",
     title: "사흘 만의 답장",

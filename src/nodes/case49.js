@@ -35,7 +35,7 @@
  * true to form, pulls the meeting forward: come up now. The three aftermath
  * choices open the finale's three doors.
  */
-export const case49Nodes = {
+const case49Nodes = {
   c49_start: {
     phase: "CASE 49 BRIEFING",
     title: "빈 서명란 이야기를 하지",

@@ -26,7 +26,7 @@
  * the day on its own sentence: "끝났다는 말은, 우리가 할게요." 임경수's call at
  * the end opens 사건 45.
  */
-export const case44Nodes = {
+const case44Nodes = {
   c44_start: {
     phase: "CASE 44 BRIEFING",
     title: "선고 전날",
