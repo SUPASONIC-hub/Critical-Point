@@ -256,15 +256,7 @@
   .decision-reveal {
     width: 100%;
     max-height: calc(100dvh - 16px);
-    padding: 18px;
-  }
-  .decision-reveal-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
-    padding-top: 12px;
-    padding-bottom: env(safe-area-inset-bottom);
-    background: inherit;
+    --reveal-pad: 18px;
   }
 }
 /* The developer's overlay on the play screen. It sat at the foot of play.css

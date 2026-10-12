@@ -55,7 +55,8 @@
   width: min(680px, 100%);
   max-height: calc(100dvh - 32px);
   overflow: auto;
-  padding: 28px;
+  --reveal-pad: 28px;
+  padding: var(--reveal-pad);
 }
 
 .decision-reveal-footer {
@@ -1940,17 +1941,23 @@
   font-weight: 800;
 }
 
-/* A short window: the way on stays at the sheet's foot, as it does on a phone
-   (recovery.css). The reveal says what the card did to the logic streak in a
-   row of its own, and at 720px of height that row put the next button 15px
-   under the fold of a sheet that scrolls. */
-@media (max-height: 800px) {
+/* A short window or a phone: the way on stays at the sheet's foot. The reveal
+   says what the card did to the logic streak in a row of its own, and at 720px
+   of height that row put the next button 15px under the fold of a sheet that
+   scrolls. A sticky row stops at the sheet's padding, so the row takes that
+   padding as its own and reaches the sheet's edge: what scrolls under it used
+   to show again in the strip below the button. Its ground is flat, because the
+   sheet's own, inherited, drew the sheet's glow again at the row's size. */
+@media (max-height: 800px), (max-width: 768px) {
   .gx-reveal .decision-reveal-footer {
     position: sticky;
-    bottom: 0;
+    /* Both: the offset is where it sticks, the margin how far it may go. */
+    bottom: calc(0px - var(--reveal-pad));
     z-index: 1;
-    padding-top: 12px;
-    background: inherit;
+    margin-bottom: calc(0px - var(--reveal-pad));
+    padding: 12px 0 calc(var(--reveal-pad) + env(safe-area-inset-bottom));
+    background: var(--ui-surface-1);
+    border-top: 1px solid var(--ui-line);
   }
 }
 
