@@ -645,8 +645,9 @@
 }
 
 /* Short, or large type (em follows the reader's font size): the docked footer
-   took over half the page. Only 판 열기 stays docked. */
-@media (max-height: 35em) {
+   took over half the page. Only 판 열기 stays docked. A phone upright with
+   672px or less to show (390x664) is short the same way. */
+@media (max-height: 35em), (max-width: 700px) and (max-height: 42em) {
   .gx-comic-actions {
     display: contents;
   }

@@ -588,11 +588,16 @@ for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) 
   });
 }
 
-test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a phone on its side and at a large type size", async ({ page }) => {
-  test.setTimeout(300_000);
+test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a short one, a phone on its side and at a large type size", async ({ page }) => {
+  test.setTimeout(420_000);
   await holdReadingClock(page);
   const SCREENS = [
     { name: "360x740", size: { width: 360, height: 740 } },
+    // What Safari leaves of an iPhone 14 with its bars drawn. The docked cards
+    // were 217 to 265px of it, the introduction showed 12 to 36px above them
+    // and the story began under them. Only 판 열기 is docked there now
+    // (briefing.css), so the panel and the question are on the first screen.
+    { name: "390x664", size: { width: 390, height: 664 }, firstScreen: true },
     { name: "844x390", size: { width: 844, height: 390 } },
     // The reader's own type size, a quarter larger: the sheets' em breakpoints follow it.
     { name: "390x844, 20px type", size: { width: 390, height: 844 }, rootFontSize: "20px" },
@@ -606,6 +611,12 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
       expect(at.open.top >= 0 && at.open.bottom <= screen.size.height, `${where}: 판 열기 is on screen before any scrolling`).toBe(true);
       expect(at.openTakesThePointer, `${where}: 판 열기 is not covered`).toBe(true);
       expect(at.pageWidth, `${where}: nothing is wider than the screen`).toBeLessThanOrEqual(screen.size.width + 1);
+      if (screen.firstScreen) {
+        expect(at.intro.top, `${where}: the panel starts under the speaker`).toBeGreaterThanOrEqual(at.speaker.bottom);
+        expect(at.intro.bottom, `${where}: the panel ends above what is docked`).toBeLessThanOrEqual(at.dockTop);
+        expect(at.question.top >= 0 && at.question.bottom <= at.dockTop, `${where}: the question is whole above what is docked`).toBe(true);
+        expect(at.open.bottom - at.dockTop, `${where}: what is docked is 판 열기 alone, not the cards with it`).toBeLessThanOrEqual(at.open.bottom - at.open.top + 1);
+      }
       // Scrolled to the panel, it is whole above whatever is docked.
       await page.getByTestId("unlock-intro").evaluate((panel) => panel.scrollIntoView({ block: "start" }));
       const scrolled = await measureIntro(page);
