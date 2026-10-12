@@ -24,7 +24,7 @@
  * son's CV. It closes the Friday before the group's autumn hiring opens on the
  * test, and 차지원 calls: 윤상혁 is on the witness list for 사건 41.
  */
-export const case40Nodes = {
+const case40Nodes = {
   c40_start: {
     phase: "CASE 40 BRIEFING",
     title: "41점",

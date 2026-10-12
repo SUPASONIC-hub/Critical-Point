@@ -21,7 +21,7 @@
  * and whose name signed for it. The lights go off at 18:00 and 윤상혁 asks the
  * analyst up. The three aftermath choices open the finale's three doors.
  */
-export const case24Nodes = {
+const case24Nodes = {
   c24_start: {
     phase: "CASE 24 BRIEFING",
     title: "성과 없음",

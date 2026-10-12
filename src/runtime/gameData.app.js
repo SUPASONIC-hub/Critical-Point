@@ -12,7 +12,6 @@ export {
   SEASON_ENTRY_CASE,
   SEASON_ENTRY_NODE,
   caseAftermathNodeId,
-  caseDisplayCode,
   caseNodePrefix,
   caseObjectives,
   seasonCasesBase,

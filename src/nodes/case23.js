@@ -27,7 +27,7 @@
  * because 국민연금 votes in the room (50.6 / 92). A reorganisation notice is
  * already scheduled for Monday, which is where 사건 24 begins.
  */
-export const case23Nodes = {
+const case23Nodes = {
   c23_start: {
     phase: "CASE 23 BRIEFING",
     title: "안건 제3호",

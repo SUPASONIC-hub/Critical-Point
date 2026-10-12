@@ -24,7 +24,7 @@
  * paid tonight, and on 문가을 almost saying thank you -- and on a KD캐피탈 credit
  * committee after the holiday, with the analyst's name on the panel (사건 48).
  */
-export const case47Nodes = {
+const case47Nodes = {
   c47_start: {
     phase: "CASE 47 BRIEFING",
     title: "1년 뒤, 같은 문자",

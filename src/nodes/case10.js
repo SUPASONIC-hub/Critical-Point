@@ -23,7 +23,7 @@
  * That trade is the case, and the last scene refuses to resolve it: 도윤하 comes
  * back, opens a new notebook, and starts writing the dropped names down again.
  */
-export const case10Nodes = {
+const case10Nodes = {
   c10_start: {
     phase: "CASE 10 BRIEFING",
     title: "열흘",

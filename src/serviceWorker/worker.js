@@ -49,7 +49,7 @@ export const SHELL_URL = "/index.html";
 export const NAVIGATION_TIMEOUT_MS = 3000;
 // How many files the warm-up asks for at once: behind a table in play, not
 // in front of it.
-export const WARM_CONCURRENCY = 3;
+const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
 

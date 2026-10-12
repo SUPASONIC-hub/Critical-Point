@@ -9,7 +9,7 @@
  * years earlier, and that the reviewer who signed the weighting table is the man
  * in the next chair.
  */
-export const case05Nodes = {
+const case05Nodes = {
   c5_start: {
     phase: "CASE 05 BRIEFING",
     title: "NO ONE TO BLAME",

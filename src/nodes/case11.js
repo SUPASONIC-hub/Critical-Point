@@ -21,7 +21,7 @@
  * night at a 포장마차 that ends with the call from the 33rd floor the finale
  * answers.
  */
-export const case11Nodes = {
+const case11Nodes = {
   c11_start: {
     phase: "CASE 11 BRIEFING",
     title: "익명의 A씨",

@@ -22,7 +22,7 @@
  * and on an old technician asking whether one share is enough to speak at the
  * March shareholders' meeting, which is 사건 23.
  */
-export const case22Nodes = {
+const case22Nodes = {
   c22_start: {
     phase: "CASE 22 BRIEFING",
     title: "0.8초",

@@ -28,7 +28,7 @@
  * aftermath hands the season to 추석 at the rice-cake shop, and to the credit
  * committee the last dotted file has already seated the analyst on.
  */
-export const case46Nodes = {
+const case46Nodes = {
   c46_start: {
     phase: "CASE 46 BRIEFING",
     title: "파쇄까지 스무 시간",

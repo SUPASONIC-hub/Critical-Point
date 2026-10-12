@@ -23,7 +23,7 @@
  * writes back. The case closes on a group chat where 이민서 starts typing three
  * times and stops -- the message that opens 사건 30.
  */
-export const case29Nodes = {
+const case29Nodes = {
   c29_start: {
     phase: "CASE 29 BRIEFING",
     title: "같은 비행기",

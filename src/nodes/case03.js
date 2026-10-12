@@ -7,7 +7,7 @@
  * 오진우 is a personnel review dressed as a bid, and both of them are being
  * timed by the same man.
  */
-export const case03Nodes = {
+const case03Nodes = {
   c3_start: {
     phase: "CASE 03 BRIEFING",
     title: "RED TEAM",

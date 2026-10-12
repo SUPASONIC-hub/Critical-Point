@@ -22,7 +22,7 @@
  * counts the forty-seven addresses he once touched as "risk cleared". Cutting
  * one man off is being paid for, again, by the people at the edge of the chain.
  */
-export const case42Nodes = {
+const case42Nodes = {
   c42_start: {
     phase: "CASE 42 BRIEFING",
     title: "빈 승인란의 휴가",

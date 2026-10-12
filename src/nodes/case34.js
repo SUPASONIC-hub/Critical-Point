@@ -31,7 +31,7 @@
  * on a sky coming down low over the bookshop and a message about a blocked
  * drain at the factory in 인천, which opens 사건 35.
  */
-export const case34Nodes = {
+const case34Nodes = {
   c34_start: {
     phase: "CASE 34 BRIEFING",
     title: "모르는 번호",

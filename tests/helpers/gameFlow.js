@@ -343,7 +343,7 @@ export async function completeCase(page, random, { beforeChoice } = {}) {
   throw new Error("case did not reach result");
 }
 
-export async function dismissDecisionRevealIfPresent(page) {
+async function dismissDecisionRevealIfPresent(page) {
   const reveal = page.locator(".decision-reveal-backdrop");
   const revealNext = reveal.getByTestId("decision-next");
   if (!(await revealNext.isVisible())) return;

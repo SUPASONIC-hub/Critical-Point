@@ -209,7 +209,7 @@ const MOOD_TRIGGERS = [
   ["cold", ["fear", "helplessness", "manipulation"]],
 ];
 
-export function getPlateMood(triggers = []) {
+function getPlateMood(triggers = []) {
   const first = triggers?.[0];
   return MOOD_TRIGGERS.find(([, keys]) => keys.includes(first))?.[0] ?? "none";
 }

@@ -3,7 +3,7 @@ import { readStoredValue, writeStoredValue } from "../appConfig.js";
 import { equipRelic, resolveWindow } from "./gauntletEngine.js";
 import { getRelicPool, getRelicUnlocks, normalizeRelicIds } from "./relics.js";
 
-export const RELIC_CODEX_STORAGE_KEY = "critical-point-relic-codex-v1";
+const RELIC_CODEX_STORAGE_KEY = "critical-point-relic-codex-v1";
 
 export function parseRelicCodex(rawValue) {
   try {

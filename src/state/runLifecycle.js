@@ -37,7 +37,7 @@ const CONFIRM_RESET =
  * What a case opens with, worked out from how the one before it closed: the
  * scene, the hand, the legacy the table shows, and the line under the scene.
  */
-export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
+function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
   const baseStartNode = CASE_START_NODES[caseId];
   const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];

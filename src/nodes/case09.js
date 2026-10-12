@@ -17,7 +17,7 @@
  * accountability is a cover-up; accountability without rescue is 1,140 people
  * paying for someone else's crime a second time.
  */
-export const case09Nodes = {
+const case09Nodes = {
   c9_start: {
     phase: "CASE 09 BRIEFING",
     title: "다시, 72시간",

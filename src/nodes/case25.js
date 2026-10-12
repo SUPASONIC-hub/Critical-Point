@@ -23,7 +23,7 @@
  * with a Monday agenda item -- a stalled officetel site in 평택 -- which is where
  * 사건 26 begins.
  */
-export const case25Nodes = {
+const case25Nodes = {
   c25_start: {
     phase: "CASE 25 BRIEFING",
     title: "오지 않은 사람",

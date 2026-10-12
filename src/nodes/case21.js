@@ -22,7 +22,7 @@
  * and the anger is the note that turned the pressure up. The last question is
  * not whether he should know but who gets to decide when.
  */
-export const case21Nodes = {
+const case21Nodes = {
   c21_start: {
     phase: "CASE 21 BRIEFING",
     title: "맨 아래 줄",

@@ -20,7 +20,7 @@
  * tuition payment. It ends on a hot night at a 포장마차 with "next time, somewhere
  * without paperwork", which 사건 42 takes to the sea.
  */
-export const case41Nodes = {
+const case41Nodes = {
   c41_start: {
     phase: "CASE 41 BRIEFING",
     title: "이번에는 온다",

@@ -8,7 +8,7 @@
  * 사건 05 both say 오진우 was given his own pressure condition, and nothing ever
  * answered them.
  */
-export const case06Nodes = {
+const case06Nodes = {
   c6_start: {
     phase: "CASE 06 BRIEFING",
     title: "THE ROOM NEXT DOOR",

@@ -22,7 +22,7 @@
  * compensation standard includes -- the 212 from 사건 10 come due again -- and
  * the 33rd floor is waiting after it.
  */
-export const case12Nodes = {
+const case12Nodes = {
   c12_start: {
     phase: "CASE 12 BRIEFING",
     title: "300억의 조건",

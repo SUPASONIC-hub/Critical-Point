@@ -12,7 +12,6 @@ import { createStorage } from "./browser.mjs";
  * `effects` and `status`, so they do not change when the wiring here does.
  */
 export const HARNESS_NOW = 1_760_000_000_000;
-export const OPENING_ECHO = "얼마나 똑똑한지는 묻지 않겠습니다. 대신 언제 생각을 멈추지 못하는지 보겠습니다.";
 
 const realDateNow = Date.now;
 

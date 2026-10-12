@@ -25,7 +25,7 @@
  * reports that an account with no name has opened the lab's reaction records
  * three times tonight -- three days before 사건 37's leak.
  */
-export const case36Nodes = {
+const case36Nodes = {
   c36_start: {
     phase: "CASE 36 BRIEFING",
     title: "한남동의 카드",

@@ -34,7 +34,7 @@
  * file to the board for two weeks and lets the investment deadline pass. The
  * aftermath ends on a name that has not called since the verdict -- 사건 49.
  */
-export const case48Nodes = {
+const case48Nodes = {
   c48_start: {
     phase: "CASE 48 BRIEFING",
     title: "제7조",

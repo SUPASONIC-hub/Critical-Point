@@ -22,7 +22,7 @@
  * closure costs under one cost code, and the aftermath points at the "상생"
  * product that becomes 사건 14.
  */
-export const case13Nodes = {
+const case13Nodes = {
   c13_start: {
     phase: "CASE 13 BRIEFING",
     title: "과거는 정리됐다고",

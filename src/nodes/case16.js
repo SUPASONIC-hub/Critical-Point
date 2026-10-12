@@ -24,7 +24,7 @@
  * finding out it has been the robots' maintenance crew all along. The case closes
  * on eighty-one cup noodles and a call from 반재욱 about his notebook -- 사건 17.
  */
-export const case16Nodes = {
+const case16Nodes = {
   c16_start: {
     phase: "CASE 16 BRIEFING",
     title: "새벽 4시 12분",

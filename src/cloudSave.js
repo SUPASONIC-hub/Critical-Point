@@ -83,7 +83,7 @@ export function paceUpload(delay, recentPuts, now = Date.now()) {
   return Math.max(delay, inHour.at(-1) + SPACED_UPLOAD_MS - now);
 }
 
-export const cloudSaveAvailable = telemetryEnabled;
+const cloudSaveAvailable = telemetryEnabled;
 
 let snapshot = Object.freeze({ phase: "idle", syncedAt: "", remoteSavedAt: "", message: "" });
 const listeners = new Set();

@@ -27,7 +27,7 @@
  * they sign that the records are distorted -- which would also erase them as
  * evidence. The aftermath hands the season to 사건 38 and 1,740 plaintiffs.
  */
-export const case37Nodes = {
+const case37Nodes = {
   c37_start: {
     phase: "CASE 37 BRIEFING",
     title: "TL_full.zip",
