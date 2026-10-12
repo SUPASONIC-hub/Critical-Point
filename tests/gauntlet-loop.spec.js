@@ -4,7 +4,7 @@ import { CASE_RESULT_NODES } from "../src/gameCases.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
-import { clickElement, dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { cashStakedCard, clickElement, dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
@@ -362,6 +362,73 @@ test("the play header keeps its title between a phone's width and the table's", 
     expect(header.musicLeft - header.toolsRight, `${width}px: dead room between the tools and the music controls`).toBeLessThanOrEqual(24);
   }
 });
+
+/**
+ * The reveal's way on is a row stuck to the foot of a sheet that scrolls, on a
+ * phone and in a window 800px tall or shorter. A sticky row stops at the
+ * sheet's padding, so 18px of sheet (28px on a desktop) stayed open under the
+ * button, and whatever had scrolled under the row showed again there: the lime
+ * 숨은 단서 발견 card as a band over and under the button, its title readable
+ * beneath it on a desktop. The row reaches the sheet's edge now.
+ *
+ * Whether a decision turns up a clue is rolled from the run, so the card is
+ * stood in for: an element with the card's own class, put where the sheet puts
+ * it, straight before the row. With it the sheet is longer than either screen,
+ * and it is scrolled to where the card lies under the row.
+ */
+for (const size of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
+  test(`the reveal's next row reaches the foot of its sheet, and nothing under it shows around it at ${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await openTable(page, "final", "f_confront");
+    await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+    await cashStakedCard(page);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await waitForEntrance(page.locator(".decision-reveal-backdrop"));
+    const at = await page.locator(".decision-reveal").evaluate((sheet) => {
+      const row = sheet.querySelector(".decision-reveal-footer");
+      if (!sheet.querySelector(".cinematic-clue-card")) {
+        const card = document.createElement("div");
+        card.className = "cinematic-clue-card";
+        card.innerHTML = "<div><span>숨은 단서 발견</span><strong>관찰자의 열쇠</strong><p>이 판에서 나온 단서가 놓이는 자리입니다. 줄 밑으로 지나갑니다.</p></div>";
+        row.before(card);
+      }
+      sheet.scrollTop = 0;
+      // Scrolled until the card's top is just inside the row's: the card is
+      // taller than the row, so it runs on past the row's foot.
+      sheet.scrollTop = sheet.querySelector(".cinematic-clue-card").getBoundingClientRect().top - row.getBoundingClientRect().top - 4;
+      const card = sheet.querySelector(".cinematic-clue-card").getBoundingClientRect();
+      const rowBox = row.getBoundingClientRect();
+      const button = row.querySelector("button").getBoundingClientRect();
+      const sheetBox = sheet.getBoundingClientRect();
+      // The sheet's own foot, inside its border: where what it scrolls is cut off.
+      const foot = sheetBox.top + sheet.clientTop + sheet.clientHeight;
+      const strays = [];
+      for (let y = Math.ceil(button.bottom) + 1; y < foot - 1; y += 3) {
+        for (const x of [rowBox.left + 8, rowBox.left + rowBox.width / 2, rowBox.right - 8]) {
+          const hit = document.elementFromPoint(x, y);
+          if (!hit || !row.contains(hit)) strays.push(`${Math.round(x)},${y}: ${hit ? hit.className || hit.tagName : "nothing"}`);
+        }
+      }
+      return {
+        position: getComputedStyle(row).position,
+        scrolls: sheet.scrollHeight > sheet.clientHeight + 1,
+        cardUnderRow: Math.round(Math.min(card.bottom, rowBox.bottom) - Math.max(card.top, rowBox.top)),
+        openUnderRow: Math.round((foot - rowBox.bottom) * 10) / 10,
+        underButton: Math.round(foot - button.bottom),
+        strays,
+      };
+    });
+    expect(at.position, "the row is stuck to the sheet's foot").toBe("sticky");
+    expect(at.scrolls, "the sheet is longer than the screen").toBe(true);
+    expect(at.cardUnderRow, "the clue card has scrolled under the row").toBeGreaterThan(0);
+    expect(at.openUnderRow, `${at.openUnderRow}px of the sheet is open under the row`).toBeLessThanOrEqual(1);
+    expect(at.underButton, "the button keeps the sheet's padding under it").toBeGreaterThanOrEqual(17);
+    expect(at.strays, `under the button the pointer meets something that is not the row: ${at.strays.join("; ")}`).toEqual([]);
+    // And the row still does its job.
+    await clickElement(page.getByTestId("decision-next"), "next");
+    await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  });
+}
 
 test("a small phone fits every fresh board's decision", { tag: "@layout" }, async ({ page }) => {
   // 360x740 holds a fresh board with the last card staked; a board carrying

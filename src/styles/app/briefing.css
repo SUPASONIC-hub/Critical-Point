@@ -192,7 +192,7 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   max-width: 72%;
   padding: 6px 10px;
@@ -236,11 +236,8 @@
 
 /* A board the last decision broke arrives glitched: a red and a cyan fringe
    split the splash at its edges and jitter back together, the way a signal does
-   when it is being interfered with. It used to be a drop-shadow filter on the
-   plate, which repainted the drawing at every step and, because the plate is
-   opaque and fills the panel, landed almost entirely outside the clip. The
-   fringe is its own layer, moved by opacity and transform only, and the
-   plate keeps its push-in. */
+   when it is being interfered with. The fringe is its own layer, moved by
+   opacity and transform only, and the plate keeps its push-in. */
 .is-broken .gx-panel-splash::before {
   position: absolute;
   inset: 0;
@@ -304,8 +301,7 @@
   transform: rotate(-3deg);
 }
 
-.gx-speaker-frame img,
-.gx-speaker-frame svg {
+.gx-speaker-frame > * {
   display: block;
   width: 100%;
   height: 100%;
@@ -621,6 +617,10 @@
     min-height: 5.5rem;
   }
 
+  .gx-sfx {
+    font-size: 1.75rem;
+  }
+
   .gx-panel-speaker {
     grid-template-columns: 76px 1fr;
   }
@@ -645,8 +645,9 @@
 }
 
 /* Short, or large type (em follows the reader's font size): the docked footer
-   took over half the page. Only 판 열기 stays docked. */
-@media (max-height: 35em) {
+   took over half the page. Only 판 열기 stays docked. A phone upright with
+   672px or less to show (390x664) is short the same way. */
+@media (max-height: 35em), (max-width: 700px) and (max-height: 42em) {
   .gx-comic-actions {
     display: contents;
   }
