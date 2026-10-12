@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-08 (the two content ratchets are at 0 -- see the last section; 2026-10-07: a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
+Last updated: 2026-10-11 (the thirteen-day rework is closed and deployed: the table's rules step in over the five 프롤로그, story mode, the result card, the logic streak in place of the beat, the season's logic report, 사건 23 and the finale's 33층 rewritten -- see Current State and priorities 38, 70 and 87; 2026-10-08: the two content ratchets are at 0 -- see the last section; 2026-10-07: a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -32,9 +32,18 @@ list of the files it touched.
 - The ranking is ordered by a score the server reads off the run's own `final`
   case row and types, and the server decides every timestamp, identity and
   rate a telemetry row claims (priority 60).
-- Five comfort settings sit in a folded drawer on the intro's setup console:
-  table time, a reading clock that waits, calm effects, no letter keys, a
-  still intro (priority 87).
+- Six comfort settings sit in a folded drawer on the intro's setup console:
+  story mode, table time, a reading clock that waits, calm effects, no letter
+  keys, a still intro (priority 87).
+- The table's rules turn on in steps over 프롤로그 01-05 and are all on from
+  사건 01 (`src/gauntlet/tableUnlocks.js`); a NEW GAME+ run has them all from
+  the first case.
+- The hand's skill is the logic streak (priority 38). Nothing on the table is
+  timed against the heartbeat: the beat key, its ring and its grades left on
+  2026-10-10, and both rankings were reset for it on 2026-10-11 (priority 70).
+- The season's ending carries a result card (a 1080x1350 PNG to share or
+  save, `src/resultCard.js`) and a `LOGIC HOLD` panel (`src/logicReport.js`)
+  whose rank line asks the server once, with `logic_hold_cutoffs()`.
 - The app fetches the season a case at a time: the first scene needs the
   index and one case chunk, not all 55 cases (priority 88). That has been true
   of a first start only since 2026-10-06; until then the shell's own new save
@@ -382,7 +391,7 @@ Still open, on purpose:
     could see the wall banks. It plays the window count the graph actually
     deals (measured, 9 a case) rather than a literal, and it plays hands that
     charge a stance and LOCK as well as hands that only push: the x1.5 cap
-    (priority 38) is on the beat and LOCK together.
+    (priority 38) is on the streak and LOCK together.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most.
@@ -1105,6 +1114,14 @@ Still open, on purpose:
       then the server drops the key and the row shows no mark. The window
       keeps the slowest scale it was played at, through a suspension, so
       leaving a slowed table and coming back at x1 does not shed the mark.
+    - Story mode (the run's `story` mark, set from the setting when a case
+      opens, so it applies from the next case): the wall is drawn at 88-98
+      (`getTableSchema`), the seven next-table rules are off
+      (`STORY_OFF_RULES`, `tableUnlocks.js`), a bust does not skip the next
+      scene, and the clock runs at least twice as slow
+      (`getTableClockScale`). A case closed under it carries `assistStory`,
+      and a season with one is not sent to the public ranking
+      (`20261010000000_ranking_excludes_story_mode.sql`).
     - The reading clock starts held (priority 51).
     - Calm effects: no shake, the flash and the vignette turned down, the bust
       without its full-screen flashes, whatever the OS says.
@@ -1232,7 +1249,7 @@ own floor in `scripts/coverage-floors.json`, and lists the modules no test
 loads. Every test process writes its own coverage record, so the records are
 merged line by line, function by function and branch by branch; keeping the
 last one made a module's number depend on which process finished last. The
-merged totals are held at 88% of lines, 87% of functions and 76% of branches:
+merged totals are held at 90% of lines, 89% of functions and 76% of branches:
 the branch floor was lowered from 83 to 72 once, only because the union counts
 branches that only some processes report, and has risen since. Every floor is
 a ratchet: `--update` rewrites the file from the measurement and refuses to
