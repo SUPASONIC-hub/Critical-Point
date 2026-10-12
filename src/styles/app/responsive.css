@@ -74,8 +74,8 @@
   .music-volume-toggle {
     min-width: 0;
   }
-  .music-toggle span {
-    max-width: 2.875rem;
+  .music-controls span {
+    display: none;
   }
   .result-page .topbar,
   .ranking-page .topbar,

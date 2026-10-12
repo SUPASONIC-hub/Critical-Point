@@ -965,6 +965,119 @@ test.describe("a phone held upright", () => {
       expect(broken.word, "a broken board slams").toMatch(/!$/);
     });
   }
+
+  // The two music buttons are fixed to the top right of every screen, and each
+  // screen keeps that corner clear for them. With their labels they were up to
+  // 195px wide on a phone -- more than half of a 360px screen -- and the
+  // ending's header ran under them. On a phone they are icons now, 80px.
+  //
+  // Read as the screen lands and again with the page at its top: the ending
+  // arrives a little way down its page. A line of text counts where it is
+  // printed, so a line cut short by its box counts only up to the cut.
+  const textUnderMusic = (page) =>
+    page.evaluate(() => {
+      const buttons = [...document.querySelectorAll(".music-controls button")]
+        .map((button) => ({ button, box: button.getBoundingClientRect() }))
+        .filter(({ button, box }) => {
+          if (box.width === 0) return false;
+          // A layer over the controls (the briefing page) hides them; nothing is under a button nobody sees.
+          const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+          return Boolean(hit && button.contains(hit));
+        });
+      const found = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.textContent.trim() || node.parentElement.closest(".music-controls, .debug-overlay, .sr-only")) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const line of range.getClientRects()) {
+          for (const { box } of buttons) {
+            if (Math.min(line.right, box.right) - Math.max(line.left, box.left) <= 0.5 || Math.min(line.bottom, box.bottom) - Math.max(line.top, box.top) <= 0.5) continue;
+            // What is left of the line once every box that clips it has, and whether anything shows it.
+            const shown = { left: line.left, right: line.right, top: line.top, bottom: line.bottom };
+            let seen = true;
+            for (let element = node.parentElement; element && element !== document.documentElement; element = element.parentElement) {
+              const style = getComputedStyle(element);
+              if (style.visibility === "hidden" || Number(style.opacity) === 0) seen = false;
+              if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+              const clip = element.getBoundingClientRect();
+              shown.left = Math.max(shown.left, clip.left);
+              shown.right = Math.min(shown.right, clip.right);
+              shown.top = Math.max(shown.top, clip.top);
+              shown.bottom = Math.min(shown.bottom, clip.bottom);
+            }
+            const across = Math.min(shown.right, box.right) - Math.max(shown.left, box.left);
+            const down = Math.min(shown.bottom, box.bottom) - Math.max(shown.top, box.top);
+            if (seen && across > 0.5 && down > 0.5) found.push(`"${node.textContent.trim().slice(0, 24)}" by ${Math.round(across)}x${Math.round(down)}px`);
+          }
+        }
+      }
+      return { buttons: buttons.length, found: [...new Set(found)] };
+    });
+
+  test("the music buttons stand on no line of text on a phone, on any screen", async ({ page }) => {
+    test.setTimeout(240_000);
+    const SIZES = [{ width: 360, height: 740 }, { width: 390, height: 844 }];
+    const covered = [];
+    const read = async (screen, { asLanded = false } = {}) => {
+      for (const size of SIZES) {
+        await page.setViewportSize(size);
+        for (const top of asLanded ? [false, true] : [true]) {
+          if (top) await page.evaluate(() => window.scrollTo(0, 0));
+          const under = await textUnderMusic(page);
+          expect(under.buttons, `${screen} @ ${size.width}x${size.height}: a music button is on the screen`).toBeGreaterThan(0);
+          covered.push(...under.found.map((line) => `${screen} @ ${size.width}x${size.height}${top ? "" : ", as it lands"}: ${line}`));
+        }
+      }
+    };
+
+    await page.setViewportSize(SIZES[0]);
+    await page.goto("/");
+    await expect(page.getByTestId("start-first-case")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await read("intro");
+    await page.getByRole("button", { name: "랭킹" }).first().click();
+    await expect(page.locator(".ranking-page")).toBeVisible();
+    await read("ranking");
+    await page.goto("/");
+    await page.getByRole("button", { name: "게시판" }).first().click();
+    await expect(page.locator(".board-page")).toBeVisible();
+    await read("board");
+
+    await startDebugNodeFromHelper(page, "case01", "c1_aftershock");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await expect(page.getByTestId("commit-push")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await read("table");
+    await completeCurrentCase(page);
+    await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await read("사건 01 result");
+
+    await startDebugNodeFromHelper(page, "final", "f_aftershock");
+    await completeCurrentCase(page);
+    const ending = page.locator(".ending-sequence");
+    await expect(ending).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    // Every twist of the first step, then the quiet line, the message and the opened record.
+    for (let press = 0; press < 8 && (await ending.evaluate((section) => section.classList.contains("ending-step-0"))); press += 1) {
+      const said = await ending.innerText();
+      await read("ending step 0", { asLanded: true });
+      await ending.locator("button").first().click();
+      // The next twist, or the next step, is a new screen of words.
+      await expect.poll(() => ending.innerText(), { timeout: TRANSITION_TIMEOUT_MS }).not.toBe(said);
+    }
+    await expect(page.locator(".ending-step-1")).toBeVisible();
+    await read("ending step 1", { asLanded: true });
+    // The way on is there once the quiet line has been held.
+    await page.getByTestId("ending-next").click({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(page.locator(".ending-step-2")).toBeVisible();
+    await read("ending step 2", { asLanded: true });
+    await page.locator(".ending-step-2 button").click();
+    await expect(page.locator(".ending-step-3")).toBeVisible();
+    await expect(page.locator(".ending-step-3 .ending-coda")).toBeVisible();
+    await read("ending step 3", { asLanded: true });
+
+    expect(covered, covered.join("\n")).toEqual([]);
+  });
 });
 
 // A summary cut at three lines is carried whole by the card's tooltip, and a
