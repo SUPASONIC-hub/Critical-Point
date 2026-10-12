@@ -896,6 +896,75 @@ test.describe("a phone held upright", () => {
     expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
     expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
   });
+
+  // The band holds two things pinned in it: the room's name and clock in a
+  // caption at the top left, and the scene's sound at the bottom right. Neither
+  // knows where the other ends. The sound was drawn last and 38px tall, so over
+  // a caption that runs long it sat on the clock's line: 12 of the season's
+  // 1,129 scenes at 390px and 87 at 360px, the worst by 32px (the three below
+  // are among them). The caption is drawn over the sound now, and the sound is
+  // smaller on a phone.
+  const measureBand = (page) =>
+    page.evaluate(() => {
+      const caption = document.querySelector(".gx-caption-place");
+      const sound = document.querySelector(".gx-sfx");
+      const word = sound.getBoundingClientRect();
+      const band = document.querySelector(".gx-panel-splash").getBoundingClientRect();
+      // The lines as they are printed, not the caption's box: a text node's
+      // own rectangles, one to a line.
+      const lines = [...caption.querySelectorAll("b, span")].flatMap((part) => {
+        const range = document.createRange();
+        range.selectNodeContents(part.firstChild);
+        return [...range.getClientRects()];
+      });
+      const under = lines.map((line) => Math.min(Math.min(line.right, word.right) - Math.max(line.left, word.left), Math.min(line.bottom, word.bottom) - Math.max(line.top, word.top)));
+      return {
+        word: sound.textContent,
+        lines: lines.length,
+        // Positive when a line of the caption and the sound share pixels.
+        shared: Math.round(Math.max(...under) * 10) / 10,
+        captionOnTop: Number(getComputedStyle(caption).zIndex) > Number(getComputedStyle(sound).zIndex),
+        lastLineBelowBand: Math.round((Math.max(...lines.map((line) => line.bottom)) - band.bottom) * 10) / 10,
+        bandHeight: Math.round(band.height),
+      };
+    });
+
+  for (const size of [{ width: 360, height: 740 }, { width: 390, height: 844 }]) {
+    test(`the sound in the picture band stays off the caption's lines at ${size.width}x${size.height}`, async ({ page }) => {
+      test.setTimeout(180_000);
+      await page.setViewportSize(size);
+      const expectClear = async (where) => {
+        const band = await measureBand(page);
+        expect(band.lines, `${where}: the caption prints the room and the clock`).toBeGreaterThanOrEqual(2);
+        expect(band.bandHeight, `${where}: the picture is the cropped band`).toBeLessThanOrEqual(100);
+        expect(band.shared, `${where}: "${band.word}" shares ${band.shared}px with a line of the caption`).toBeLessThanOrEqual(0.5);
+        expect(band.captionOnTop, `${where}: where their boxes meet, the caption is the one drawn on top`).toBe(true);
+        expect(band.lastLineBelowBand, `${where}: the caption's last line is inside the band`).toBeLessThanOrEqual(0);
+        return band;
+      };
+      // The longest calm sound over the longest captions.
+      for (const [caseId, nodeId] of [["case46", "c46_cage"], ["case24", "c24_final"], ["case18", "c18_evidence_turn"]]) {
+        await openHeldBriefing(page, caseId, nodeId);
+        const band = await expectClear(`${nodeId} @ ${size.width}x${size.height}`);
+        expect(band.word, `${nodeId} makes the three-letter sound`).toBe("지이잉");
+      }
+      // A board the last decision broke slams instead, with a mark after it.
+      await openHeldBriefing(page, "prologue05", "p5_basement");
+      const save = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+      // Written from a static page: leaving the table saves its live state on the way out.
+      await page.goto("/profile.jpg");
+      save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations: ["reboot"] }, openSeed: null };
+      await page.evaluate((value) => localStorage.setItem("trigger-prototype-v2", JSON.stringify(value)), save);
+      await page.goto("/?debug=1");
+      await expect(page.getByTestId("protocol-breach")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+      await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+      await page.getByTestId("reading-timer").click();
+      await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+      await waitForEntrance(page.getByTestId("scene-briefing"));
+      const broken = await expectClear(`p5_basement on a broken board @ ${size.width}x${size.height}`);
+      expect(broken.word, "a broken board slams").toMatch(/!$/);
+    });
+  }
 });
 
 // A summary cut at three lines is carried whole by the card's tooltip, and a
