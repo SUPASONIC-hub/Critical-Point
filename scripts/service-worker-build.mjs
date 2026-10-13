@@ -1,21 +1,31 @@
 import { createHash } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 /**
- * How `/sw.js` is put together, as pure functions: `serviceWorker()` in
- * vite.config.js calls them with the built page and the list of files, and
- * `check-deploy.mjs` reads the result back. No filesystem and no network here.
+ * How `/sw.js` is put together: `serviceWorker()` in vite.config.js calls
+ * these with the built page and the files beside it, and `check-deploy.mjs`
+ * reads the result back. Pure functions and no network; `shippedFiles` is the
+ * one that reads a disk, and it reads the build's own directory.
  *
  * The worker's code is src/serviceWorker/worker.js, which says what it does.
  * What the build adds is the three things only a build knows:
  *
- *   release   the commit the build came from (`RENDER_GIT_COMMIT`, the same
- *             one the page carries as `build-sha`) and a hash of the files
- *             the page names; for a build that has no commit, a hash of the
- *             built page. Either moves when anything the page loads does,
- *             because every entry file is named by its own hash. The commit
- *             alone did not: the same commit deployed again with another
- *             backend address, which is how a release built without one is
- *             mended, was a new worker writing into the old one's cache.
+ *   release   what is shipped, and nothing else: `<8 hex>-<12 hex>`. The
+ *             first is a hash of the file names the page names, which the
+ *             live check can work out again from the page as it was served.
+ *             The second is a hash of every file of the build -- its path and
+ *             its bytes, the page without the commit it carries, and the
+ *             worker's own code. Two builds that ship the same files are the
+ *             same release whatever commit they came from, so a merge that
+ *             changes no shipped file leaves `sw.js` the same to the byte and
+ *             no device throws its cache away. Any file that does change --
+ *             a portrait at the root, the manifest, the page's own text --
+ *             is another release: those names carry no hash of their own.
+ *             The commit used to be part of the name, and every merge, a
+ *             line of documentation included, made every device download
+ *             everything again. The commit is still on the page, as
+ *             `build-sha`, for the deploy workflow to read.
  *   precache  what the intro needs, read off the built page itself: every
  *             script, stylesheet, font, icon and image the page names. The
  *             worker does not install without all of them.
@@ -26,19 +36,58 @@ import { createHash } from "node:crypto";
  *             gives it to a screen that asked for another (`artVariants`).
  */
 export const WORKER_FILE = "sw.js";
+const PAGE_PATH = "/index.html";
+const WORKER_PATH = `/${WORKER_FILE}`;
 const CONFIG_LINE = /^const WORKER_CONFIG = (\{.*\});$/m;
+// The line `buildShaMeta` (vite.config.js) writes, with the indent in front
+// of it and the line end behind: taken out, a page built from a commit is the
+// page built from none.
+const BUILD_SHA_LINE = /[ \t]*<meta\s+name="build-sha"\s+content="[^"]*"\s*\/?>[ \t]*\r?\n?/gi;
 
-const shortHash = (text, length) => createHash("sha256").update(text).digest("hex").slice(0, length);
+const digest = (content) => createHash("sha256").update(content).digest("hex");
+const byName = ([a], [b]) => (a < b ? -1 : a > b ? 1 : 0);
+
+/** The built page without the commit it says it came from: the part of it that is shipped to be drawn. */
+export function pageWithoutCommit(html) {
+  return String(html ?? "").replace(BUILD_SHA_LINE, "");
+}
 
 /**
- * The names, not the page's text, beside a commit: the live check works this
- * out again from the page as it was served, and a host that touched the
- * markup on the way would otherwise make every release disagree with itself.
+ * Every file under `dir` but the page and the worker, as `[path, sha256]`
+ * with the path from the root (`/assets/x.js`), sorted. The bytes and not the
+ * names alone: a file under assets/ is named by its hash, but nothing from
+ * `public/` is, and one rule for all of them has no list to keep.
  */
-export function releaseIdFor({ sha = "", html }) {
-  const commit = String(sha).trim();
-  if (/^[0-9a-f]{7,40}$/.test(commit)) return `${commit}-${shortHash(precacheFromHtml(html).join("\n"), 8)}`;
-  return `local-${shortHash(html, 12)}`;
+export function shippedFiles(dir) {
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))
+    .map((file) => [`/${path.relative(dir, file).replace(/\\/g, "/")}`, file])
+    .filter(([name]) => name !== PAGE_PATH && name !== WORKER_PATH)
+    .map(([name, file]) => [name, digest(readFileSync(file))])
+    .sort(byName);
+}
+
+/**
+ * The half of a release's name the live check can work out again. The names,
+ * not the page's text: a host that touched the markup on the way would
+ * otherwise make every release disagree with itself.
+ */
+export function pageKeyFor(html) {
+  return digest(precacheFromHtml(html).join("\n")).slice(0, 8);
+}
+
+/**
+ * A release's name. `files` is `shippedFiles()` of the build and `logic` the
+ * worker's code (`workerBody`, or `workerLogic` of a built one); the page goes
+ * in without its commit. No commit anywhere: the same files are the same name.
+ */
+export function releaseIdFor({ html, files = [], logic = "" }) {
+  const shipped = new Map(files);
+  shipped.set(PAGE_PATH, digest(pageWithoutCommit(html)));
+  shipped.set(WORKER_PATH, digest(logic));
+  const lines = [...shipped].sort(byName).map(([name, hash]) => `${name}\t${hash}`);
+  return `${pageKeyFor(html)}-${digest(lines.join("\n")).slice(0, 12)}`;
 }
 
 const WARM_ROOT = /^\/(?:portrait-[a-z0-9-]+\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
@@ -76,18 +125,29 @@ export function entryFromHtml(html) {
   return null;
 }
 
-/** What the worker is told: `files` are the build's own, as paths from the root (`/assets/x.js`). */
-export function workerConfigFor({ sha, html, files }) {
+/**
+ * What the worker is told. `files` is `shippedFiles()` of the build, each
+ * file's path from the root and a hash of its bytes; `logic` is `workerBody`
+ * of the worker's source.
+ */
+export function workerConfigFor({ html, files, logic = "" }) {
   const entry = entryFromHtml(html);
   if (!entry) throw new Error("The built page has no module script, so the service worker cannot tell its release's page from another's.");
   const precache = precacheFromHtml(html);
   const first = new Set(precache);
-  const warm = files.filter((file) => !first.has(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file))).sort();
-  return { release: releaseIdFor({ sha, html }), entry, precache, warm };
+  const warm = files
+    .map(([file]) => file)
+    .filter((file) => !first.has(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file)))
+    .sort();
+  return { release: releaseIdFor({ html, files, logic }), entry, precache, warm };
 }
 
-/** `worker.js` as a classic script: its `export` keywords gone, the config in front, the call behind. */
-export function buildWorkerSource(template, config) {
+/**
+ * `worker.js` as a classic script, without the line that says which release
+ * it is: its `export` keywords gone and the call behind. This is the worker's
+ * code as it is shipped, and part of what a release is named for.
+ */
+export function workerBody(template) {
   // Its comments are for whoever reads the source, and are a third of the
   // file: block comments and whole-line `//` ones go. Nothing else is
   // minified -- a worker somebody has to read in a browser's inspector on a
@@ -97,7 +157,17 @@ export function buildWorkerSource(template, config) {
     .replace(/^[ \t]*\/\*\*?[\s\S]*?\*\/[ \t]*\r?\n/gm, "")
     .replace(/^[ \t]*\/\/.*\r?\n/gm, "");
   if (/^\s*import\s/m.test(body)) throw new Error("src/serviceWorker/worker.js imports something; a classic worker cannot.");
-  return `const WORKER_CONFIG = ${JSON.stringify(config)};\n${body}\ninstallWorker(self, WORKER_CONFIG);\n`;
+  return `${body}\ninstallWorker(self, WORKER_CONFIG);\n`;
+}
+
+/** The built worker: the config in front of `workerBody`. */
+export function buildWorkerSource(template, config) {
+  return `const WORKER_CONFIG = ${JSON.stringify(config)};\n${workerBody(template)}`;
+}
+
+/** A built worker's code without its config line: `workerBody` of the source it was built from. */
+export function workerLogic(source) {
+  return String(source ?? "").replace(/^const WORKER_CONFIG = \{.*\};\r?\n/m, "");
 }
 
 /**
@@ -169,25 +239,30 @@ export function buildShaFromHtml(html) {
 
 /**
  * Every way a built or served worker disagrees with the page beside it.
- * `hasFile(path)` answers whether the build holds that file; leave it out for
- * the live site, where each file would be a request.
+ * `hasFile(path)` answers whether the build holds that file and `files` is
+ * `shippedFiles()` of it; leave both out for the live site, where each file
+ * would be a request. There the name is held to the half of it the page
+ * alone decides (`pageKeyFor`); with the build in hand, to all of it.
  */
-export function workerProblems({ source, html, hasFile = null }) {
+export function workerProblems({ source, html, hasFile = null, files = null }) {
   const config = readWorkerConfig(source);
   if (!config) return ["sw.js carries no WORKER_CONFIG line, so it is not the worker the build writes"];
   // Switched off on purpose: there is nothing for it to agree with. Not a
   // problem, and not nothing either: `describeWorker` is how a check says so.
   if (config.release === "off") return [];
   const problems = [];
-  const sha = buildShaFromHtml(html);
-  const expected = releaseIdFor({ sha: sha ?? "", html });
-  if (config.release !== expected) {
-    problems.push(
-      sha
-        ? `sw.js is release ${config.release} and the page is ${expected}: the worker would keep one release's page with another's files`
-        : `sw.js is release ${config.release} and the page hashes to ${expected}: it was not built from this page`,
-    );
+  const release = String(config.release);
+  if (files) {
+    const expected = releaseIdFor({ html, files, logic: workerLogic(source) });
+    if (release !== expected) problems.push(`sw.js is release ${release} and the build beside it is ${expected}: it was not built from these files`);
+  } else if (!release.startsWith(`${pageKeyFor(html)}-`)) {
+    problems.push(`sw.js is release ${release} and the page's files are ${pageKeyFor(html)}: the worker would keep one release's page with another's files`);
   }
+  // The page says its commit and the worker does not: a worker that did
+  // would differ from the last one after every merge, and each device would
+  // download the whole release again for a line of documentation.
+  const sha = buildShaFromHtml(html);
+  if (sha && String(source).includes(sha)) problems.push(`sw.js names the commit ${sha}: a release is named for the files it ships, so that the same files are the same worker`);
   const entry = entryFromHtml(html);
   if (config.entry !== entry) problems.push(`sw.js expects the entry script ${config.entry} and the page loads ${entry}`);
   if (!Array.isArray(config.precache) || config.precache.length === 0) problems.push("sw.js precaches nothing, so an offline launch has no page to draw");

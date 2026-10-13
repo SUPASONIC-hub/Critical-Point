@@ -20,7 +20,7 @@ import {
   WORKER_PATH,
   workerCacheProblems,
 } from "./deploy-policy.mjs";
-import { buildShaFromHtml, describeWorker, releaseIdFor, workerProblems } from "./service-worker-build.mjs";
+import { buildShaFromHtml, describeWorker, pageKeyFor, shippedFiles, workerProblems } from "./service-worker-build.mjs";
 
 /**
  * Two modes.
@@ -34,7 +34,12 @@ import { buildShaFromHtml, describeWorker, releaseIdFor, workerProblems } from "
  *     VITE_SUPABASE_URL serves every header correctly and has no ranking --
  *     and that `/sw.js` is there and was built with the page beside it: a
  *     worker of one release keeping the page of another is an installed copy
- *     that opens to nothing offline. How the images from the root are cached
+ *     that opens to nothing offline. A release is named for the files it
+ *     ships and not for its commit (service-worker-build.mjs); from here only
+ *     the half of the name the page decides can be worked out again, and
+ *     that half and the entry script are what the worker is held to. A worker
+ *     that names the page's commit fails: that is the name that made every
+ *     merge a download of everything. How the images from the root are cached
  *     (one file for each rule render.yaml has for them), and how the worker's
  *     file is, are reported and not failed: a slower visit and a slower
  *     update, not a broken one.
@@ -42,7 +47,8 @@ import { buildShaFromHtml, describeWorker, releaseIdFor, workerProblems } from "
  *   node scripts/check-deploy.mjs --offline
  *     No network. Checks the headers `render.yaml` declares, and
  *     `dist/index.html`, its scripts and `dist/sw.js` -- every file the
- *     worker lists has to be in the build -- when a build exists. The
+ *     worker lists has to be in the build, and its release has to be the one
+ *     the files of the build hash to -- when a build exists. The
  *     dashboard headers are copied from render.yaml by hand, so this is the
  *     half that can run before a deploy.
  *
@@ -112,7 +118,7 @@ function checkOffline() {
     } else {
       const hasFile = (file) => existsSync(path.join(root, "dist", file));
       workerSource = readFileSync(worker, "utf8");
-      problems.push(...workerProblems({ source: workerSource, html, hasFile }).map((problem) => `dist${WORKER_PATH}: ${problem}`));
+      problems.push(...workerProblems({ source: workerSource, html, hasFile, files: shippedFiles(path.join(root, "dist")) }).map((problem) => `dist${WORKER_PATH}: ${problem}`));
     }
   } else {
     console.log("No dist/index.html; run `npm run build` first to check the built page too.");
@@ -203,13 +209,14 @@ async function checkLive() {
       else problems.push(...backendOriginProblems(entry.text, response.headers.get("content-security-policy")).map((problem) => `backend: ${problem} [${entryPath}]`));
     }
 
-    // Asked for under the release's own name, so a cache in front of the site
-    // that still holds the last release's worker is not what answers. The
-    // name is the one the worker carries, not the commit alone: the same
-    // commit deployed twice is two releases, and the second must not be
-    // answered with the first's file.
+    // Asked for under an address of this deploy's own, so a cache in front
+    // of the site that still holds the last one's worker is not what answers:
+    // the commit the page names, and the half of the release's name the page
+    // decides. Not the commit alone: the same commit deployed again with
+    // another backend address is another release, and must not be answered
+    // with the first's file.
     const workerUrl = new URL(WORKER_PATH, url.origin);
-    workerUrl.searchParams.set("release", releaseIdFor({ sha: buildShaFromHtml(body) ?? "", html: body }));
+    workerUrl.searchParams.set("release", `${buildShaFromHtml(body) ?? "untagged"}-${pageKeyFor(body)}`);
     const worker = await fetchWithTimeout(workerUrl).catch(() => null);
     if (!worker?.ok) problems.push(`${WORKER_PATH} answered ${worker ? `HTTP ${worker.status}` : "nothing"}`);
     else problems.push(...workerProblems({ source: worker.text, html: body }).map((problem) => `worker: ${problem}`));

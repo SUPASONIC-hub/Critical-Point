@@ -266,8 +266,11 @@ jobs:
       # backend address that was missing. When the site already named this
       # commit, the wait is for what it serves to change: index.html and its
       # ETag / Last-Modified, or the service worker's file, which a build with
-      # other settings always changes (its release is named for the files the
-      # page loads). A build that comes out the same to the byte, served with
+      # other settings always changes (its release is named for the files it
+      # ships, and for nothing else: a new commit that ships the same files
+      # has the same worker, which is why the commit is read off the page
+      # above and never off the worker). A build that comes out the same to
+      # the byte, served with
       # the same headers, cannot be told from the one before it; after ten
       # minutes the run says so in a warning and checks what is there.
       - name: Wait for the new release to go live
