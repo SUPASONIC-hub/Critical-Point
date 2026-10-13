@@ -119,6 +119,11 @@ test("leaving during the verdict slam keeps the verdict", async ({ page }) => {
 // table too. What it can never keep is a table that already hit the wall: a
 // closed window is not suspended, so the bust stands (unit-tests.mjs).
 test("a reload keeps a live table on the same wall", async ({ page }) => {
+  // After the reload the briefing is up again and the pushes below wait for its
+  // reading clock to open the table: about 40 seconds of this test at the pace
+  // of 2026-10-13 (ten characters a second), 57 in all against the 60-second
+  // default on the first main run after that change.
+  test.setTimeout(120_000);
   await startDebugNode(page, "case02", "c2_logs");
   await stakeAndPush(page);
   const stage = page.getByTestId("gauntlet-stage");
