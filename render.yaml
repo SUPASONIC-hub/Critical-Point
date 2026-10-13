@@ -112,6 +112,11 @@ services:
       # Two years, the length browsers' preload lists ask for. No `preload`:
       # that is a promise about the whole registrable domain, and on
       # *.onrender.com the domain is not ours to promise for.
+      # What production answers with is not this value: on 2026-10-12 the site
+      # served `max-age=315360000; includeSubdomains; preload`. Where that comes
+      # from was not established (the dashboard rule or the platform's own
+      # header on *.onrender.com); `check:deploy` passes because it asks for a
+      # year or more.
       - path: /*
         name: Strict-Transport-Security
         value: max-age=63072000; includeSubDomains

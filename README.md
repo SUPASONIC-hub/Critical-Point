@@ -1009,6 +1009,10 @@ Blueprint로 관리하는 서비스에만 적용되고, 대시보드에서 직�
 넣기 전까지 `check:deploy`가 실패가 아니라 경고로 알립니다. `check:deploy`는 세 그림 규칙마다 페이지가 부르는 파일을
 하나씩(`.webp`, `og:image`의 `.jpg`, 아이콘) 읽고, 빠진 규칙마다 경고합니다.
 
+`Strict-Transport-Security`는 표의 값과 운영이 내보내는 값이 다릅니다. 2026-10-12에 운영이 실제로 내보낸 값은
+`max-age=315360000; includeSubdomains; preload`였습니다. 대시보드 규칙에서 오는지 Render가 직접 넣는지는
+확인하지 못했습니다. `check:deploy`는 1년 이상이면 통과시키므로 이 차이를 알리지 않습니다.
+
 배포를 거는 것은 `.github/workflows/deploy.yml`입니다. Render 대시보드 → 서비스 → Settings → Deploy
 Hook에서 URL을 복사해 저장소 시크릿 `RENDER_DEPLOY_HOOK`에 넣으면, `Verify`(e2e 포함)가 초록으로 끝난
 `main` 푸시마다 배포를 겁니다. Render의 자체 Auto-Deploy는 CI 결과와 무관하게 배포하므로 꺼 둡니다
@@ -1237,9 +1241,9 @@ node scripts/check-migration-drift.mjs --from list.json
   이유로 원고를 고치기 전에 `npm run check:encoding`과 `npm run check:text`를 기준으로 삼으십시오.
 - Prettier는 `src/styles`만 관리합니다(`npm run format`). `app.css`가 다시 압축된 형태로
   커밋되는 것을 막기 위한 장치이고, JS/JSX 포맷은 diff 가독성을 위해 강제하지 않습니다.
-- ESLint(`npm run lint`)에서 `no-unused-vars`와 `no-undef`는 오류, `react-hooks/exhaustive-deps`와
-  `react-hooks/set-state-in-effect`는 경고입니다. 후자는 `AppContent`가 아직 명령형으로 다루는
-  효과들에 대한 남은 과제입니다.
+- ESLint(`npm run lint`)는 `--max-warnings 0`으로 돌아 경고도 실패입니다. `react-hooks/exhaustive-deps`도
+  오류로 올렸고, 그 규칙을 줄 단위로 끈 곳이 일곱 군데 남아 있습니다(`GameRuntime.jsx` 1,
+  `GauntletStage.jsx` 4, `GauntletFx.jsx` 1, `useDialogFocus.js` 1). 끈 이유는 각 줄 옆에 적혀 있습니다.
 - 사건 하나는 파일 하나입니다. 쉰다섯 사건 모두 `src/nodes/*.js`가 그 사건의 장면과 표(여파·연결·반응
   장면, 효과와 대사, 샛길, 숨은 라우트, 단서 반전, 오프닝, 장면 좌표, 결말 표)를 한 객체로 내보내고,
   `src/nodes/casePacks.js`에 올리면 각 표를 가진 모듈이 합칩니다(사건 01~11과 마지막 사건은 옛 표에서 그대로

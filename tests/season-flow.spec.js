@@ -519,6 +519,10 @@ test("a build with no backend does not say records are sent", async ({ page }) =
 });
 
 test("representative branch choices advance without browser runtime errors", async ({ page }) => {
+  // 23 to 40 seconds alone on the desktop this is written on and about 30 in
+  // CI, against the 60-second default: it timed out whenever another run
+  // shared the machine (three times on 2026-10-11, once on 2026-10-12).
+  test.setTimeout(120_000);
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
