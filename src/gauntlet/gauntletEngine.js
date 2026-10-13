@@ -945,7 +945,7 @@ export const MUTATIONS = Object.freeze({
  * lifts the seal. The id stays -- the wall is still closer, the chips are
  * still thinner -- but the briefing and the reveal went on printing "카드가
  * 가려지고" over a hand that was face up, and "봉인됐다" over a card that was
- * not.
+ * not. An entry that reads this way carries `lifted: true`.
  */
 const LIFTED_MUTATIONS = Object.freeze({
   blackout: {
@@ -974,7 +974,7 @@ export function describeMutations(schema) {
       const { lifted, ...remainder } = LIFTED_MUTATIONS[id] ?? {};
       // What is printed, and nothing else: a verdict carries these objects.
       const { label, title, text } = MUTATIONS[id];
-      return { id, label, title, text, ...(lifted?.(board) ? remainder : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
+      return { id, label, title, text, ...(lifted?.(board) ? { ...remainder, lifted: true } : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
     });
 }
 

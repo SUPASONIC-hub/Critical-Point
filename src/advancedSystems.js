@@ -62,11 +62,14 @@ export function getPlayStyleUnlocks(playStyle = "instinct", newGamePlus = false)
   return { ...base, newGamePlus: newGamePlus ? "지난 시즌의 마지막 선택을 이 화면에서 다시 볼 수 있습니다" : "최종 기록을 완료하면 NEW GAME+ 해금" };
 }
 
+// The steps described the decision board the gauntlet table replaced on
+// 2026-09-14: read, compare the listed costs, confirm. Nothing said that a
+// card is staked and pushed, or that there is a wall.
 export function getTutorialSteps() {
   return [
-    { id: "read", label: "장면 읽기", text: "상황, 화자, 이번 장면의 한계를 확인합니다." },
-    { id: "weigh", label: "대가 비교", text: "선택지의 자원 변화와 관계 영향을 비교합니다." },
-    { id: "commit", label: "기록 확정", text: "선택을 확정하면 다음 장면과 랭킹에 남습니다." },
+    { id: "read", label: "장면 읽기", text: "상황과 화자, 질문을 읽습니다. 읽는 시간은 점수에 들어가지 않습니다." },
+    { id: "weigh", label: "카드 걸기", text: "카드 한 장을 골라 겁니다. 카드마다 얻는 것과 치르는 것이 다릅니다." },
+    { id: "commit", label: "밀기와 확정", text: "밀수록 열기와 배율이 오릅니다. 보이지 않는 벽에 닿기 전에 확정하면 판돈이 쌓이고, 사건을 닫으면 금고로 갑니다." },
     { id: "replay", label: "다시 보기", text: "다른 기록은 다른 권한과 엔딩을 엽니다." },
   ];
 }

@@ -65,10 +65,15 @@ const CONFIRM_RESTART_CASE = "이 사건을 처음부터 다시 시작할까요?
 // sending. It names the drawer the way out is in, and the name opens it: a
 // closed <details> is not scrolled to by its own anchor in every browser.
 const DATA_DRAWER_ID = "data-info";
-function openDataDrawer() {
-  const drawer = document.getElementById(DATA_DRAWER_ID);
+// "브리핑 먼저 보기" pointed at the name field until 2026-10-13: its target was
+// the start panel, while the briefing it names sat in a closed drawer below.
+const BRIEFING_DRAWER_ID = "prestart-briefing";
+const openDrawer = (id) => () => {
+  const drawer = document.getElementById(id);
   if (drawer) drawer.open = true;
-}
+};
+const openDataDrawer = openDrawer(DATA_DRAWER_ID);
+const openBriefingDrawer = openDrawer(BRIEFING_DRAWER_ID);
 const START_ACTION_TTL_MS = 60_000;
 let pendingStartAction = null;
 
@@ -306,7 +311,7 @@ export function IntroScreen({ view, renderers = {} }) {
               ) : (
                 <div className="start-input-row intro-launch">
                   {startFirstCaseButton}
-                  <a className="intro-briefing-link" href="#case-access-setup">
+                  <a className="intro-briefing-link" href={`#${BRIEFING_DRAWER_ID}`} onClick={openBriefingDrawer}>
                     브리핑 먼저 보기
                   </a>
                   {consentLine}
@@ -448,7 +453,7 @@ export function IntroScreen({ view, renderers = {} }) {
               drawers tile two-up on a wide screen and an open one takes the
               whole row, so its contents never read at half width. */}
           <div className="intro-drawer-grid">
-          <details className="intro-drawer">
+          <details className="intro-drawer" id={BRIEFING_DRAWER_ID}>
             <summary>
               <span lang="en">PRE-START BRIEFING</span>
               <h2>시작 전에 알아둘 것</h2>

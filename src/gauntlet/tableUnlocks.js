@@ -126,7 +126,14 @@ const STEPS = [
     caseId: "prologue01",
     adds: [],
     kicker: "FIRST TABLE · 이 판은 이렇게 합니다",
-    intro: ["밀면 열기와 배율이 오릅니다. 벽에 닿기 전에 확정하십시오. 심박이 빨라지면 벽이 가깝습니다."],
+    // The second line is what a bust costs, which the first table never said:
+    // the first bust was the tutorial. A story run is not told it, because
+    // there the next scene is not skipped.
+    storyIntro: [0],
+    intro: [
+      "밀면 열기와 배율이 오릅니다. 벽에 닿기 전에 확정하십시오. 심박이 빨라지면 벽이 가깝습니다.",
+      "벽에 닿으면 이 사건에 걸린 판돈 전부와 다음 장면을 잃습니다. 금고에 넣은 것은 그대로입니다.",
+    ],
   },
   {
     caseId: "prologue02",
