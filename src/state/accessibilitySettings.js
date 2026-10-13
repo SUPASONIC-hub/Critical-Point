@@ -104,14 +104,59 @@ export function listedShortcuts(keys, letterKeys) {
 }
 
 /**
+ * A mouse, a trackpad or a pen on any of the device's inputs: the sign that a
+ * keyboard may be there to press. A phone has none; a touch laptop, and a
+ * tablet with a mouse attached, have one. Where the question cannot be asked
+ * (node, a browser without `matchMedia`) the answer is yes, so the hints
+ * follow the setting as they always did.
+ */
+const FINE_POINTER = "(any-pointer: fine)";
+const finePointerQuery = () => globalThis.matchMedia?.(FINE_POINTER) ?? null;
+
+export function hasFinePointer() {
+  return finePointerQuery()?.matches ?? true;
+}
+
+/** A mouse can be attached, or taken away, with the page open. */
+export function subscribeFinePointer(listener) {
+  const query = finePointerQuery();
+  query?.addEventListener?.("change", listener);
+  return () => query?.removeEventListener?.("change", listener);
+}
+
+const assumeFinePointer = () => true;
+
+/**
+ * What `useShortcutHints` answers, from the setting and the pointer:
+ *
+ *   keys(spec)  for `aria-keyshortcuts`. By the setting alone: the keys work
+ *               on every device, and a keyboard paired with a phone is not
+ *               something the page can see.
+ *   letterKeys  whether to draw a one-character key -- a card's digit, R, N.
+ *   drawn       whether to draw any key at all, Space and Enter included.
+ */
+export function shortcutHints(letterKeys, finePointer) {
+  return {
+    drawn: finePointer,
+    letterKeys: letterKeys && finePointer,
+    keys: (spec) => listedShortcuts(spec, letterKeys),
+  };
+}
+
+/**
  * What a control says about its keys: `keys("Space W")` for `aria-keyshortcuts`,
  * and `letterKeys` for whether to draw the one-character `<kbd>` at all. Only
  * the header read the setting until 2026-10-06; every other control went on
  * naming R, N, E and the digits to a player who had turned them off.
+ *
+ * And until 2026-10-12 the setting was all that was read, so a phone drew a
+ * digit on every card and R and N on the report's buttons, for keys it does
+ * not have. The pointer is asked here and nowhere else.
  */
 export function useShortcutHints() {
   const { letterKeys } = useAccessibility();
-  return { letterKeys, keys: (spec) => listedShortcuts(spec, letterKeys) };
+  const finePointer = useSyncExternalStore(subscribeFinePointer, hasFinePointer, assumeFinePointer);
+  return shortcutHints(letterKeys, finePointer);
 }
 
 /** For tests: forget the cached settings so the next read goes to storage. */

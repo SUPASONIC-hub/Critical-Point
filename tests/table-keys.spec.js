@@ -431,11 +431,17 @@ async function expectTableDraws(page, on) {
   // The dock has a column for each button it holds.
   const columns = await page.locator(".gx-actions").evaluate((dock) => getComputedStyle(dock).gridTemplateColumns.split(" ").length);
   expect(columns).toBe(on.lock ? 3 : 2);
-  // The key line names a key only while it is the table's (hidden on a phone, written either way).
+  // The key line names a key only while it is the table's, and is written
+  // only where a mouse or a trackpad says there may be keys to press: a touch
+  // context (mobile-chromium, webkit) gets an empty line, and the keys below
+  // are taken all the same. The page is asked, not the project, because the
+  // production walks run this on WebKit too.
   const hint = (await page.locator(".gx-hand-head small").textContent()) ?? "";
-  expect(hint.includes("E 락"), `the key line reads "${hint}"`).toBe(on.lock);
-  expect(hint.includes("Q 자세"), `the key line reads "${hint}"`).toBe(on.stance);
-  expect(hint).toContain("W 밀기");
+  const keysDrawn = await page.evaluate(() => matchMedia("(any-pointer: fine)").matches);
+  expect(hint.includes("E 락"), `the key line reads "${hint}"`).toBe(keysDrawn && on.lock);
+  expect(hint.includes("Q 자세"), `the key line reads "${hint}"`).toBe(keysDrawn && on.stance);
+  if (keysDrawn) expect(hint).toContain("W 밀기");
+  else expect(hint, "no key is drawn on a touch screen").toBe("");
 
   expect(await keyTaken(page, { key: "e", code: "KeyE" }), "E").toBe(on.lock);
   expect(await keyTaken(page, { key: "q", code: "KeyQ" }), "Q").toBe(on.stance);

@@ -109,6 +109,61 @@ test("the hooks read the setting the way a component will", async () => {
   settings.resetAccessibilityCache();
 });
 
+// A phone drew a digit on every card and R and N on the report: the setting
+// was all a hint asked about. The pointer is the second question.
+test("a key is drawn only where a mouse or a trackpad says a keyboard may be there", () => {
+  const { shortcutHints } = settings;
+  const read = (hints) => [hints.drawn, hints.letterKeys, hints.keys("Space W"), hints.keys(1)];
+  assert.deepEqual(read(shortcutHints(true, true)), [true, true, "Space W", "1"], "a laptop");
+  // Named to a screen reader, because the key works if one arrives; not drawn.
+  assert.deepEqual(read(shortcutHints(true, false)), [false, false, "Space W", "1"], "a phone");
+  assert.deepEqual(read(shortcutHints(false, true)), [true, false, "Space", undefined], "a laptop with the letters off");
+  assert.deepEqual(read(shortcutHints(false, false)), [false, false, "Space", undefined], "a phone with the letters off");
+});
+
+test("the pointer is asked of the browser, heard when it changes, and taken as a mouse where it cannot be asked", () => {
+  const { hasFinePointer, subscribeFinePointer } = settings;
+  // Node, and the hook's server render: the hints follow the setting alone.
+  assert.equal(globalThis.matchMedia, undefined);
+  assert.equal(hasFinePointer(), true);
+  assert.doesNotThrow(() => subscribeFinePointer(() => {})());
+
+  const asked = [];
+  const listeners = new Set();
+  let fine = false;
+  globalThis.matchMedia = (query) => {
+    asked.push(query);
+    return {
+      get matches() {
+        return fine;
+      },
+      addEventListener: (type, listener) => type === "change" && listeners.add(listener),
+      removeEventListener: (type, listener) => type === "change" && listeners.delete(listener),
+    };
+  };
+  try {
+    assert.equal(hasFinePointer(), false, "a phone");
+    assert.deepEqual(asked, ["(any-pointer: fine)"], "any of the inputs, not the first: a touch laptop has a trackpad");
+    let told = 0;
+    const unsubscribe = subscribeFinePointer(() => told++);
+    assert.equal(listeners.size, 1);
+    // A mouse is attached with the page open.
+    fine = true;
+    for (const listener of listeners) listener({ matches: true });
+    assert.equal(told, 1);
+    assert.equal(hasFinePointer(), true);
+    unsubscribe();
+    assert.equal(listeners.size, 0);
+
+    // A browser whose query list cannot be listened to still answers.
+    globalThis.matchMedia = () => ({ matches: false });
+    assert.equal(hasFinePointer(), false);
+    assert.doesNotThrow(() => subscribeFinePointer(() => {})());
+  } finally {
+    delete globalThis.matchMedia;
+  }
+});
+
 /* ------------------------------------------------------------- story mode */
 
 const source = (file) => readFileSync(new URL(`../../src/${file}`, import.meta.url), "utf8");

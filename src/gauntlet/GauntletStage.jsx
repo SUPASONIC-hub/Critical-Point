@@ -385,7 +385,7 @@ export function GauntletStage({
   }
 
   // The hook that owns the keys also says which of them a control may name.
-  const { letterKeys, keys } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
+  const { letterKeys, keys, drawn } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
@@ -623,11 +623,11 @@ export function GauntletStage({
         <div className="gx-hand-head" aria-hidden="true">
           <span lang="en">HAND</span>
           <b>카드 {handSize}장</b>
-          {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. */}
+          {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. A touch screen wide enough to show the line has no key to name, and gets none. */}
           <small>
             {letterKeys ? (
               <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> 락 · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
-            ) : (
+            ) : drawn && (
               <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
             )}
           </small>

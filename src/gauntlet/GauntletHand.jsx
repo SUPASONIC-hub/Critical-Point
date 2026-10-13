@@ -71,7 +71,7 @@ export function GauntletHand({
   onSelect,
 }) {
   // The digit on a card is its key. With the single-key shortcuts off it is
-  // neither announced nor drawn.
+  // neither announced nor drawn; on a phone it is announced and not drawn.
   const { letterKeys, keys } = useShortcutHints();
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const overclocked = schema.mutations.includes("overclock");
