@@ -69,18 +69,26 @@ const WALL_FLOOR = 38;
 /**
  * The briefing before the table has a clock of its own. It is sized to what
  * the scene asks the player to read -- lead, body, case facts and question --
- * at a brisk Korean reading pace, with a floor so a short scene still lands.
- * When it runs out the table opens on its own; the player can open it, or
- * stake a card, any time before that.
+ * at an unhurried Korean reading pace, with a floor so a short scene still
+ * lands. When it runs out the table opens on its own; the player can open it,
+ * stake a card, or hold the clock, any time before that.
  *
- * The ceiling sits above the longest scene in the season (690 characters, 49
- * seconds). At 35 it cut 86 scenes short -- the longest would have had to be
- * read at 24 characters a second, half again the pace this function assumes --
- * and the table opened by itself on a page nobody could have finished.
+ * The pace is ten characters a second and the ceiling 95 seconds, decided on
+ * 2026-10-13: the owner asked for ample reading time, and sixteen characters a
+ * second was fast. Before that the pace was sixteen under a ceiling of 50, and
+ * before that under one of 35, which cut 86 scenes short.
+ *
+ * At ten the season's scenes run from 22 seconds to 75 (160 to 690
+ * characters; half are under 41 seconds, nine in ten under 54), so no scene
+ * sits on the floor and none reaches the ceiling by itself. The twenty seconds
+ * above the longest scene are what the changed rules of a bust add to its
+ * page: two rules (97 characters) make it 85 seconds, and a bust by timeout
+ * with a fractured axis (196) makes it 95. Only a page with more rules than
+ * that on one of the longest scenes is cut -- eight rules there ask for 122.
  */
 export const READING_MIN_SECONDS = 12;
-export const READING_MAX_SECONDS = 50;
-const READING_CHARS_PER_SECOND = 16;
+export const READING_MAX_SECONDS = 95;
+const READING_CHARS_PER_SECOND = 10;
 const READING_SETTLE_SECONDS = 6;
 
 /**
