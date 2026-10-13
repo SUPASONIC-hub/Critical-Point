@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicType } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
@@ -310,6 +310,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       logic,
       mutations,
       tableRules,
+      // The ones the last decision cost the player: what the briefing's alarm
+      // sounds for. It used to sound for every entry, a reward and REBOOT too.
+      breach: tableRules.filter(isPenaltyMutation),
       ruleHeat: getRuleHeat({ mutations: tableRules, schema }),
       ruleObjective: getRuleObjective(tableRules),
       currentRules: mutations.length

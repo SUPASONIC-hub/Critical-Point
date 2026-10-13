@@ -966,15 +966,26 @@ test.describe("a phone held upright", () => {
         const band = await expectClear(`${nodeId} @ ${size.width}x${size.height}`);
         expect(band.word, `${nodeId} makes the three-letter sound`).toBe("지이잉");
       }
-      // A board the last decision broke slams instead, with a mark after it.
       await openHeldBriefing(page, "prologue05", "p5_basement");
-      const save = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
-      // Written from a static page: leaving the table saves its live state on the way out.
-      await page.goto("/profile.jpg");
-      save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations: ["reboot"] }, openSeed: null };
-      await page.evaluate((value) => localStorage.setItem("trigger-prototype-v2", JSON.stringify(value)), save);
-      await page.goto("/?debug=1");
-      await expect(page.getByTestId("protocol-breach")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+      const dealBoard = async (mutations) => {
+        const save = await page.evaluate(() => JSON.parse(localStorage.getItem("trigger-prototype-v2")));
+        // Written from a static page: leaving the table saves its live state on the way out.
+        await page.goto("/profile.jpg");
+        save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations }, openSeed: null };
+        await page.evaluate((value) => localStorage.setItem("trigger-prototype-v2", JSON.stringify(value)), save);
+        await page.goto("/?debug=1");
+      };
+      // A board that carries a reward is not a broken one. OVERCLOCK used to
+      // draw the red panel and the slam; it is told as a rule in force.
+      await dealBoard(["overclock"]);
+      await expect(page.getByTestId("carried-rules")).toContainText("OVERCLOCK", { timeout: TRANSITION_TIMEOUT_MS });
+      await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
+      await expect(page.locator(".gx-comic-page")).not.toHaveClass(/is-broken/);
+      await expect(page.locator(".gx-sfx")).not.toHaveText(/!$/);
+      // A board the last decision broke slams instead, with a mark after it.
+      await dealBoard(["aftershock"]);
+      await expect(page.getByTestId("protocol-breach")).toContainText("AFTERSHOCK", { timeout: TRANSITION_TIMEOUT_MS });
+      await expect(page.getByTestId("carried-rules")).toHaveCount(0);
       await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
       await page.getByTestId("reading-timer").click();
       await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");

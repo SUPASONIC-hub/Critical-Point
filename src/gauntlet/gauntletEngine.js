@@ -84,8 +84,9 @@ const READING_CHARS_PER_SECOND = 16;
 const READING_SETTLE_SECONDS = 6;
 
 /**
- * `breach` is the PROTOCOL BREACH panel, when the page shows one: the changed
- * rules of this table, each printed as a label, a title and a sentence. They
+ * `breach` is every rule the page prints under the scene -- the PROTOCOL
+ * BREACH panel, the rules the board carries and a case's introduction of its
+ * new ones -- each printed as a label, a title and a sentence. They
  * are read on the same page against the same clock, and until 2026-10-08 they
  * were not counted -- the page that follows a bust carried the most text and
  * the clock of the scene alone. The ceiling is the same.
@@ -850,24 +851,35 @@ export function serializeRunState(value) {
  * The catalogue of ways a decision breaks the next board. Each one is keyed to
  * something the player did, and each one changes a rule, not a number on a
  * report.
+ *
+ * `penalty` marks the ones that are a cost and nothing else. The briefing's
+ * red PROTOCOL BREACH panel, its alarm and its glitch said "your last decision
+ * broke this board" for all fourteen, so a player who had charged a stance,
+ * chained two hot cashes or closed a case was told off for it at the next
+ * table. The six marked here keep that treatment (`isPenaltyMutation`); the
+ * rest are told as rules the board carries.
  */
 export const MUTATIONS = Object.freeze({
   blackout: {
+    penalty: true,
     label: "BLACKOUT",
     title: "카드가 뒤집혔다",
     text: `임계점을 넘긴 대가. 다음 판은 카드의 칩과 소모가 가려지고, 벽이 ${BLACKOUT_WALL_SHIFT} 가까워진다.`,
   },
   aftershock: {
+    penalty: true,
     label: "AFTERSHOCK",
     title: "여진이 남았다",
     text: `게이지가 ${AFTERSHOCK_START}에서 시작한다. 방금 터진 열이 아직 식지 않았다.`,
   },
   silence: {
+    penalty: true,
     label: "SILENCE",
     title: "심장이 거짓말을 한다",
     text: `시간을 흘려보낸 대가. 다음 판은 심박이 벽을 알려주지 않고, 결정 시간이 ${SILENCE_SECONDS}초다.`,
   },
   heatDebt: {
+    penalty: true,
     label: "HEAT DEBT",
     title: "탐욕은 열을 남긴다",
     text: `높은 배율로 확정한 대가. 이번 열의 ${HEAT_DEBT_SHARE}분의 1을 안고 시작하고, ${HEAT_DEBT_SECONDS}초를 잃는다.`,
@@ -878,11 +890,13 @@ export const MUTATIONS = Object.freeze({
     text: `연속으로 x${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
   },
   coldFeet: {
+    penalty: true,
     label: "COLD FEET",
     title: "가장 좋은 카드가 봉인됐다",
     text: `밀지 않고 확정한 대가. 가장 비싼 카드는 게이지 ${SEAL_BREAK_GAUGE}${objectParticle(String(SEAL_BREAK_GAUGE))} 넘겨야 열리고, 칩이 줄어든다.`,
   },
   fracture: {
+    penalty: true,
     label: "FRACTURE",
     title: "균열이 난 축",
     text: `방금 가장 크게 태운 축. 다음 판에서 그 축을 태우는 카드는 ${FRACTURE_RATE}배로 청구된다.`,
@@ -946,6 +960,11 @@ const LIFTED_MUTATIONS = Object.freeze({
   },
 });
 
+/** True for the mutations that only cost the player; takes an id or a described mutation. */
+export function isPenaltyMutation(mutation) {
+  return MUTATIONS[mutation?.id ?? mutation]?.penalty === true;
+}
+
 export function describeMutations(schema) {
   const board = normalizeSchema(schema);
   const { mutations, fracturedAxis, relics } = board;
@@ -953,7 +972,9 @@ export function describeMutations(schema) {
     .filter((id) => MUTATIONS[id])
     .map((id) => {
       const { lifted, ...remainder } = LIFTED_MUTATIONS[id] ?? {};
-      return { id, ...MUTATIONS[id], ...(lifted?.(board) ? remainder : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
+      // What is printed, and nothing else: a verdict carries these objects.
+      const { label, title, text } = MUTATIONS[id];
+      return { id, label, title, text, ...(lifted?.(board) ? remainder : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
     });
 }
 

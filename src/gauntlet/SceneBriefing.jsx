@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Lock, TriangleAlert } from "lucide-react";
 import { CardType, WildName } from "./GauntletHand.jsx";
-import { getReadingSeconds, hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
+import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { getBriefingIntro } from "./tableStaging.js";
@@ -31,15 +31,42 @@ function splitCaptions(text = "") {
     .filter(Boolean);
 }
 
+/** A rule of this board as a row: its label, what it is, what it does, the relic that softened it. */
+function RuleRows({ rules, resourceMeta }) {
+  return (
+    <ul>
+      {rules.map((mutation) => (
+        <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
+          <b>{mutation.label}</b>
+          <strong>
+            {mutation.title}
+            {mutation.axis ? ` · ${resourceMeta[mutation.axis]?.label ?? mutation.axis}` : ""}
+          </strong>
+          <small>{mutation.text}</small>
+          {mutation.softenedBy && (
+            <em className="gx-mutation-relic">
+              <RelicIcon id={mutation.softenedBy} size={11} /> {RELICS[mutation.softenedBy].softens.text}
+            </em>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /**
  * The scene, told as a page of a graphic novel before the table opens.
  *
  * A splash panel of the room with its caption and sound, the speaker with the
  * scene's question in a balloon, the narration as caption boxes, the case file
  * pinned beside it, and -- when the last decision broke this board -- the new
- * rules as a red panel. The page has its own clock: when it runs out the table
- * opens by itself. The player can open it sooner, or stake a card straight
- * from the page, which opens the table with that card already on it. A card
+ * rules as a red panel. `mutations` is the table's own list (`tableRules`, so
+ * no REBOOT), and only the penalties in it are a breach: the red panel, the
+ * slam and the glitch used to answer a charged stance, an OVERCLOCK and the
+ * season's mastery too. Those are told in a panel of the introduction's form,
+ * above the breach when the board carries both. The page has its own clock:
+ * when it runs out the table opens by itself. The player can open it sooner,
+ * or stake a card straight from the page, which opens the table with that card already on it. A card
  * there says its type as it does in the hand (`CardType`), and `moveOf` what
  * staking it would do to the logic streak.
  *
@@ -81,8 +108,9 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
-  // The page prints the changed rules and the new ones under the scene, so
-  // both are on its clock, a sentence of either counted the same way.
+  // The page prints the changed rules, the carried ones and the new ones under
+  // the scene, so all three are on its clock, a sentence of any counted the
+  // same way. `mutations` is exactly the two lists printed below.
   const readSeconds = useMemo(
     () => getReadingSeconds({ ...node, question }, [...mutations, ...intro.map((text) => ({ text }))]),
     [node, question, mutations, intro],
@@ -133,8 +161,13 @@ export function SceneBriefing({
   // places every panel by line instead, a row further down from the story on.
   // On a phone the panels are a column in the order they are written, and
   // this is not read.
-  const at = (gridArea) => (intro.length > 0 ? { gridArea } : undefined);
-  const broken = mutations.length > 0;
+  // A board that carries both kinds of rule has one more panel than the grid
+  // has rows under the story, and names the row (`row`) whatever the page.
+  const at = (gridArea, row = 0) => (row ? { gridArea: `${row} / 1 / ${row + 1} / -1` } : intro.length > 0 ? { gridArea } : undefined);
+  const penalties = mutations.filter(isPenaltyMutation);
+  const carried = mutations.filter((mutation) => !isPenaltyMutation(mutation));
+  const broken = penalties.length > 0;
+  const carryRow = intro.length > 0 ? 4 : 3;
   const sfx = pickSfx(nodeId, broken);
   const captions = splitCaptions(node.text);
   const late = !held && shown <= 5;
@@ -229,28 +262,19 @@ export function SceneBriefing({
             </div>
           )}
 
+          {carried.length > 0 && (
+            <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at("4 / 1 / 5 / -1", broken ? carryRow : 0)}>
+              <p className="gx-breach-kicker"><span lang="en">CARRIED OVER</span> · 이번 판에 이어지는 규칙</p>
+              <RuleRows rules={carried} resourceMeta={resourceMeta} />
+            </div>
+          )}
+
           {broken && (
-            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at("4 / 1 / 5 / -1")}>
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at("4 / 1 / 5 / -1", carried.length > 0 ? carryRow + 1 : 0)}>
               <p className="gx-breach-kicker">
                 <TriangleAlert size={14} aria-hidden="true" /> PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다
               </p>
-              <ul>
-                {mutations.map((mutation) => (
-                  <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
-                    <b>{mutation.label}</b>
-                    <strong>
-                      {mutation.title}
-                      {mutation.axis ? ` · ${resourceMeta[mutation.axis]?.label ?? mutation.axis}` : ""}
-                    </strong>
-                    <small>{mutation.text}</small>
-                    {mutation.softenedBy && (
-                      <em className="gx-mutation-relic">
-                        <RelicIcon id={mutation.softenedBy} size={11} /> {RELICS[mutation.softenedBy].softens.text}
-                      </em>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <RuleRows rules={penalties} resourceMeta={resourceMeta} />
             </div>
           )}
         </div>
