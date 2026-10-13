@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Lock, TriangleAlert } from "lucide-react";
-import { CardType } from "./GauntletHand.jsx";
+import { CardType, WildName } from "./GauntletHand.jsx";
 import { getReadingSeconds, hashSeed, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
@@ -298,6 +298,7 @@ export function SceneBriefing({
                 {letterKeys && <kbd>{cards.length + 1}</kbd>}
                 <span>{reframeChoice.label}</span>
                 <CardType card={reframeChoice} moveOf={moveOf} />
+                <WildName />
               </button>
             )}
           </div>

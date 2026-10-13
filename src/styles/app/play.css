@@ -2794,6 +2794,12 @@
   left: 9px;
 }
 
+/* The wild card's name, on the same edge at the other end. */
+.gx-card-type.gx-card-name {
+  right: 9px;
+  left: auto;
+}
+
 .gx-streak i,
 .gx-card-type i {
   font-style: normal;

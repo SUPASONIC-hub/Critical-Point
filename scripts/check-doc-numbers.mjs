@@ -139,12 +139,9 @@ export const DOC_NUMBERS = [
   },
   {
     file: "README.md",
-    what: "판을 다시 짠다 on every scene",
-    pattern: /`판을 다시 짠다`는 모든 장면에 한 장씩/gd,
-    claim: true,
-    warning: true,
-    compute: () => `${scenesWithReframe.toLocaleString("en-US")} of ${game.scenes.toLocaleString("en-US")} scenes deal the card`,
-    holds: () => scenesWithReframe === game.scenes,
+    what: "scenes written, scenes that deal 판을 다시 짠다",
+    pattern: said("쓰인 장면\\s+#개 가운데 #개"),
+    compute: () => [game.scenes, scenesWithReframe],
   },
 
   // docs/work-status.md
