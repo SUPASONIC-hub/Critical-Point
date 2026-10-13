@@ -5,11 +5,9 @@ import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.j
 import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
-import { describeLogicMove, describeNextTable, describeVerdictCause } from "../gauntlet/tableReadout.js";
-
-function formatMultiplier(value) {
-  return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;
-}
+// formatMultiplier is the table's: this file had a copy that rounded to nearest,
+// so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
+import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
 
 function createConsequenceLines({ verdict, busted, nextMutations }) {
   if (!verdict) return [];
@@ -80,7 +78,7 @@ export function DecisionReveal({ view }) {
     ? "DECISION"
     : busted
       ? "BUST"
-      : `×${verdict.multiplier >= 10 ? Math.round(verdict.multiplier) : verdict.multiplier}`;
+      : `×${verdict.multiplier >= 10 ? Math.floor(verdict.multiplier) : verdict.multiplier}`;
   const subline = !verdict
     ? ""
     : busted
