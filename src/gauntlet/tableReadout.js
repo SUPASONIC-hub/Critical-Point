@@ -140,6 +140,14 @@ export function readLogic({ logic, card, offered, relics = [] }) {
 export const describeCardMove = (move) => (MOVE_COPY[move] ? `(콤보 ${MOVE_COPY[move]})` : "");
 
 /**
+ * What the wild card is called. The guide and the scene's challenge send the
+ * player to "'판을 다시 짠다' 카드", and the card printed only the label its
+ * scene wrote (다른 방법을 제안한다 on 354 of the 427 scenes that deal it) over
+ * an English "WILD": nothing on the table had the name the help used.
+ */
+export const REFRAME_CARD_NAME = "판을 다시 짠다";
+
+/**
  * What the table says aloud about its clock, in one polite region. The timer
  * itself is silent to a screen reader, and the tick that marks the last five
  * seconds is sound, so the clock is called once at ten seconds and once at

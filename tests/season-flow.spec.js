@@ -636,8 +636,22 @@ test("mobile decision actions stay reachable without manual page scrolling", asy
 // scoring three of four keyword buckets, which the player could not see either.
 test("판을 다시 짠다 enters the case's hidden route", async ({ page }) => {
   await page.goto("/?debug=1");
-  await startDebugNode(page, "case01", "payday");
-  await page.locator(".gx-card-wild").click();
+  await startDebugNodeFromHelper(page, "case01", "payday", { navigate: false, resetStorage: false, expectGameShell: false, openTable: false });
+  // The guide sends the player to "'판을 다시 짠다' 카드", and this scene's card
+  // is labelled 다른 방법을 제안한다: the name is on it, in the briefing's list
+  // and on the table, and the English "WILD" that stood for it is gone.
+  const listed = page.getByTestId("scene-briefing").getByTestId("briefing-card").last();
+  await expect(listed.getByTestId("wild-name")).toHaveText("판을 다시 짠다");
+  await expect(listed.locator("span").first(), "the card's own label is still the first thing on it").toHaveText(nodes.payday.choices.find((choice) => choice.type === "reframe").label);
+  await dismissProtocolBreach(page);
+  const wild = page.locator(".gx-card-wild");
+  await expect(wild.getByTestId("wild-name")).toBeVisible();
+  await expect(wild.getByTestId("wild-name")).toHaveText("판을 다시 짠다");
+  await expect(wild.getByTestId("card-type")).toHaveCount(1);
+  await expect(wild.locator(".gx-card-burn")).toHaveText("이 판을 다시 연다");
+  await expect(wild.locator(".gx-card-chips")).toHaveText(/^\+\d+$/);
+  await expect(wild).not.toContainText("WILD");
+  await wild.click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible();
   await page.getByTestId("decision-next").click();

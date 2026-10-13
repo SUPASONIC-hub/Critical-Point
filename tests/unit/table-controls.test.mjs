@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { createStorage } from "./helpers/browser.mjs";
@@ -35,7 +36,7 @@ globalThis.HTMLElement = FakeElement;
 let revealOpen = false;
 globalThis.document = { querySelector: (selector) => (revealOpen && selector === ".decision-reveal-backdrop" ? {} : null) };
 
-const { CLOCK_OPENED_CALL, getClockCall, getTabNotices } = await import("../../src/gauntlet/tableReadout.js");
+const { CLOCK_OPENED_CALL, getClockCall, getTabNotices, REFRAME_CARD_NAME } = await import("../../src/gauntlet/tableReadout.js");
 const { handleTableKey } = await import("../../src/gauntlet/useTableKeys.js");
 const settings = await import("../../src/state/accessibilitySettings.js");
 
@@ -243,4 +244,29 @@ test("the clock is called when it opens the table by itself, then at ten and fiv
   assert.equal(getClockCall({ ...live, remaining: 9, elapsed: 3, openedByClock: true }), "10초 남았다");
   assert.equal(getClockCall({ live: false, paused: false, remaining: 3, openedByClock: true }), "");
   assert.equal(getClockCall({ live: true, paused: true, remaining: 3, openedByClock: true }), "");
+});
+
+// The help named a card the table did not: the guide and the scene's challenge
+// say '판을 다시 짠다' 카드, and the card printed its scene's label over an
+// English "WILD". The markup is read as text here; season-flow.spec.js reads
+// the screen.
+test("the wild card carries the name the help uses", async () => {
+  const { playGuideItems } = await import("../../src/appCopy.js");
+  const { createSceneChallenge } = await import("../../src/viewModels/sceneViewModels.js");
+  assert.equal(REFRAME_CARD_NAME, "판을 다시 짠다");
+
+  const named = `'${REFRAME_CARD_NAME}' 카드`;
+  assert.ok(playGuideItems.some((item) => item.text.includes(named)), "the guide names the card as the table does");
+  const challenge = createSceneChallenge({ reframeChoice: { type: "reframe" }, reframeCombo: 0, inheritedChallenge: null, node: { triggers: [] }, riskPressure: 0 });
+  assert.equal(challenge.id, "use-reframe");
+  assert.ok(challenge.text.includes(named), "and so does the scene's challenge");
+
+  const hand = readFileSync("src/gauntlet/GauntletHand.jsx", "utf8");
+  const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
+  assert.doesNotMatch(hand, /WILD \+/, "the English kicker is gone from the card");
+  assert.match(hand, /\{REFRAME_CARD_NAME\}/);
+  for (const [name, source] of [["the hand", hand], ["the briefing's list", briefing]]) {
+    assert.match(source, /<WildName \/>/, `${name} prints the name`);
+  }
+  assert.match(hand, /<b className="gx-card-chips">\+\{getCardChips\(reframeChoice, schema\)\}<\/b>/, "the chip is the gain alone");
 });

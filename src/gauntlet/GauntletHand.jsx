@@ -2,7 +2,7 @@ import { Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { getLogicType } from "./logicStreak.js";
-import { describeCardMove, getTypeParts } from "./tableReadout.js";
+import { describeCardMove, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 /**
@@ -41,6 +41,16 @@ export function CardType({ card, moveOf }) {
       {move && <span className="sr-only">{describeCardMove(move)}</span>}
     </span>
   );
+}
+
+/**
+ * The wild card's name, on the edge of the card opposite its type. The card's
+ * own label changes from scene to scene and the help names the card 판을 다시
+ * 짠다, so the name is printed on every one of them, here and in the briefing's
+ * list. Out of the card's flow for the reason the type is: it takes no line.
+ */
+export function WildName() {
+  return <span className="gx-card-type gx-card-name" data-testid="wild-name">{REFRAME_CARD_NAME}</span>;
 }
 
 export function GauntletHand({
@@ -159,10 +169,11 @@ export function GauntletHand({
           onClick={() => onSelect(REFRAME_CARD_ID)}
         >
           {letterKeys && <span className="gx-card-key" aria-hidden="true">{cards.length + 1}</span>}
+          <WildName />
           <CardType card={reframeChoice} moveOf={moveOf} />
           <span className="gx-card-label" data-testid="card-label">{reframeChoice.label}</span>
           <span className="gx-card-stats">
-            <b className="gx-card-chips">WILD +{getCardChips(reframeChoice, schema)}</b>
+            <b className="gx-card-chips">+{getCardChips(reframeChoice, schema)}</b>
             <b className="gx-card-burn">이 판을 다시 연다</b>
           </span>
         </GuardedButton>
