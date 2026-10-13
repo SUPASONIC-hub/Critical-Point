@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-11 (the thirteen-day rework is closed and deployed: the table's rules step in over the five 프롤로그, story mode, the result card, the logic streak in place of the beat, the season's logic report, 사건 23 and the finale's 33층 rewritten -- see Current State and priorities 38, 70 and 87; 2026-10-08: the two content ratchets are at 0 -- see the last section; 2026-10-07: a second audit and its fixes -- see "Audit of 2026-10-07" at the end; before that: a whole-repository audit and its fixes: the table's state and its save from one definition; a first start that waits for one case; a service worker; a landscape layout and type in rem; 사건 01-07 and the finale written at the season's length; explicit cognition on generated cards; deploy, report and database-limit fixes -- see "Audit of 2026-10-06" at the end)
+Last updated: 2026-10-12 (the state of `main` at `05c7b7c`; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -12,7 +12,7 @@ list of the files it touched.
 - The season is 55 cases: 프롤로그 01-05, 사건 01-49 and the finale
   (`CASE_SEQUENCE` in `src/gameCases.js`). A season deals about 490 decision
   windows, about 9 a case.
-- `npm run verify:static` (25 checks, in parallel, ~40s) and `npm run
+- `npm run verify:static` (25 checks, in parallel, about a minute) and `npm run
   verify:quick` pass. The browser tiers run against the production build served
   by `vite preview`, not the dev server.
 - The play screen holds one decision on one screen: on a 390x844 phone the page
@@ -57,22 +57,28 @@ list of the files it touched.
   e2e tier runs on five shards, and the uninterrupted season walk and full
   coverage run weekly. The weekly tier is twenty-four shards of two workers
   (it was twelve of four, and timed itself out), sized on 2026-10-05, when all
-  twenty-four first passed. Its WebKit job runs twice, `@prod` on the build and
+  twenty-four first passed -- on a run dispatched by hand; no run the schedule
+  started has passed yet. Its WebKit job runs twice, `@prod` on the build and
   `@layout` on the dev server. Visual regression has its own workflow and
-  Linux-only baselines, and compares on its own for a pull request that
-  touches a stylesheet, `index.html`, the font or a baseline. Migration Drift
+  Linux-only baselines. It compares on every push to main, on every Dependabot
+  pull request, on any pull request carrying the `visual` label, and on its
+  own for a pull request that touches what the screenshots are made of: a
+  stylesheet, the font, `index.html`, any `.jsx`, a module directly in
+  `src/`, `src/viewModels/`, `src/gauntlet/`, the two pictured cases
+  (`src/nodes/case01.js`, `case05.js`), `public/`, the two critical-CSS
+  scripts, `vite.config.js`, `playwright.config.js`, `package-lock.json`,
+  `tests/helpers/`, the spec or a baseline (the pattern is in the `scope`
+  job of `.github/workflows/visual-regression.yml`). Migration Drift
   asks the live database once a day which migrations it has run (priority 80).
 - Source text is valid UTF-8. Some Windows shells render Korean incorrectly, so
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
-- Visual baselines were last recorded on 2026-09-29, after the font, colours,
-  copy, the case card's markup and the phone header moved, and the phone play
-  screen again on 2026-10-05, when the dateline stopped cutting off its clock;
-  the comparison passes on main (priority 19 says how to record them again).
-  The 2026-10-06 audit moved the intro, the 사건 01 result screen and the
-  phone play screen (type in rem with an 11px floor, the hero art by width,
-  `시즌 처음부터 다시`); those baselines are recorded again with that change.
+- Visual baselines were last recorded on 2026-10-10 (both play screens, the
+  day the beat left the table), 2026-10-09 (both intro pictures) and
+  2026-10-08 (the phone result screen); the desktop result screen is as it
+  was recorded on 2026-09-29. The comparison passes on main (priority 19 says
+  how to record them again).
 - Every case is a pack, the finale included, and every card a pack writes is
   one object carrying its label, effect, voice line and reply (priority 74).
   A generated card may also name its way of thinking (priority 12); 90 do.
@@ -100,8 +106,8 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
-- What the 2026-10-06 audit found and left is listed under "Audit of
-  2026-10-06" at the end of this file.
+- What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
+  "Looked at and left" at the end of this file.
 
 ## Maintenance Priorities
 
@@ -1249,7 +1255,7 @@ own floor in `scripts/coverage-floors.json`, and lists the modules no test
 loads. Every test process writes its own coverage record, so the records are
 merged line by line, function by function and branch by branch; keeping the
 last one made a module's number depend on which process finished last. The
-merged totals are held at 90% of lines, 89% of functions and 76% of branches:
+merged totals are held at 94% of lines, 94% of functions and 87% of branches:
 the branch floor was lowered from 83 to 72 once, only because the union counts
 branches that only some processes report, and has risen since. Every floor is
 a ratchet: `--update` rewrites the file from the measurement and refuses to
@@ -1330,199 +1336,73 @@ Manual steps after pushing the 2026-09-28 migrations:
 - Expect the public ranking to be empty: season rows the new rules would refuse
   were deleted.
 
-## Audit of 2026-10-06
+## Looked at and left
 
-Four readers went through the repository as it stood at `c68967d` -- the
-table's logic and state, the screens and stylesheets, the tooling and backend,
-and the case text -- and what they found was fixed in one pass. The rules
-that came out of it are in the priorities above; this is the record of what
-was done and what was looked at and left.
+What the audits of 2026-10-06 and 2026-10-07 saw and knowingly did not change,
+one entry each under the date it was written down. An entry is as it was
+recorded; none has been checked again since. The lines under "Still open, on
+purpose" in Current State are not repeated here. What the audits fixed, and
+the full wording of every entry, is in `docs/history.md` ("부록: 감사 기록
+원문").
 
-Fixed, by area:
+Both ceilings the 2026-10-07 audit left open reached 0 on 2026-10-08 and are
+not listed: `BARE_ON_A_ROUTE` in `check-plain-language.mjs` is empty (it
+held 28 case and term pairs), and `check:balance` rule 7
+(`scripts/balance-rules.mjs`) holds no card as an exception.
 
-- **Logic and state.** A first start waits for one case (88). A restore waits
-  for the season (36). Case and season rows are queued before they are sent
-  (61). A case records the card it followed (12). A chunk that fails with no
-  connection asks again instead of reloading (86). Withdrawn consent stays
-  withdrawn (61). Starting over asks first (36). A second tab is not a second
-  device (59). A console line no longer rewrites the save (57). Practice does
-  not lean the season in, and a window keeps its own clock record (39, 87).
-  Slots are taken at places worth returning to (36). A missing key is not a
-  repair, and scalars are held to their type (85). Five dead save fields and
-  the copy that promised what they did not do are gone (43). The run has one
-  definition (1), and `GameRuntime.jsx` went from 1,247 lines and 120 imported
-  names to 964 and 104.
-- **Screens.** The header no longer reserves dead room (27). Focus follows the
-  page, and messages are announced (4). Type is in rem; field borders hold
-  3:1; text fields are 16px (6). Shortcut hints follow the setting (83). A
-  phone on its side has a table (27). Wide screens take the art at their own
-  width (15). The cloud panel's successes are not alerts. `ScenePlate.jsx` is
-  one file a room, proved byte-identical over all 1,129 scenes. `시즌 처음부터
-  다시` is told apart from the two per-case retries.
-- **A service worker** (89).
-- **Tooling and backend.** Every spec runs in some tier, and `check:specs`
-  fails on one that does not; two files, fourteen tests, had run nowhere.
-  WebKit gets a pass for `@layout` (17). A hand-run deploy passes the gate, and
-  there is a rollback path (66). The scheduled runs report what happened (82).
-  Visual regression compares on the pull requests that can change a picture
-  (19). One address cannot spend everyone's telemetry day, and the ceiling on
-  new cloud codes is 1,000 (80). `check:grants` holds definer functions to a
-  pinned `search_path` and views to `security_invoker`. `check:deploy` asks
-  which backend the release was built for and whether the worker is this
-  release's. `raise:gains` lists unless told to write (13). Migration Drift.
-- **Case text.** Twenty-five numbered findings: closings and evidence scenes
-  that were false on a route that skipped the middle (사건 01, 04, 08, 12, 23,
-  33, 38, 45, the finale), dates that disagreed with the calendar (사건 23's
-  "3주", 사건 33's 6월 30일), thirteen cards whose numbers contradicted their
-  labels (a card that waits no longer buys time). Seventy-two first mentions
-  in 35 files now introduce the person or thing a skipped scene had set up.
-  Ninety generated cards name their way of thinking (12). 사건 01-07 and the
-  finale were written at the season's length and then read in story order,
-  which changed 85 more places: 임경수 has kept the paper three years, not
-  four; 오진우's "30년" lost its number; the finale opens at eleven at night;
-  사건 01 names the CFO, 배성준, once.
+Case text, for the owner:
 
-Looked at and left, on purpose or for the owner:
+- 2026-10-06: 사건 07's evidence scene (`c7_evidence_turn`) dates the posting
+  order to the day after the analyst asked about 온새's repayment terms, not to
+  the dispatch failure's budget ceiling; which question caused the posting
+  waits for the owner's word.
+- 2026-10-06: 사건 07's 강서지점 has four people at the counter and 프롤로그 04
+  has six.
+- 2026-10-06: a hidden route's clock is fixed at an early hour of its case, so
+  entered late the time runs backwards (사건 13, 23 and 33 too); it reads as
+  a convention.
+- 2026-10-06: 사건 01's "협상서는 양쪽 서명을 받았습니다" is followed by a
+  closing scene that treats the sale as still open.
+- 2026-10-06: 한서윤 speaks 해요체 in 사건 01-05 and 합니다체 from 사건 06, and
+  반재욱 says "저는" in 01-05 and "나는" from 06; later cases split the same way.
+- 2026-10-06: the finale's "마흔아홉 사건과 1년" stands beside "3년" elsewhere,
+  and 사건 06's "사직서는 아직 수리되지 않았습니다" beside a memo that says
+  none was handed in.
+- 2026-10-06: not read -- the opening variants against the second scene in the
+  43 cases the content audit only swept, and speech levels season-wide.
+- 2026-10-07: 프롤로그 04's national sales figure went from 1,180억 to 214억 to
+  sit under the 310억 loan; another number may be meant.
+- 2026-10-07: cards whose numbers or way of thinking could be read either way
+  against their label were left as they were.
+- 2026-10-07: the make-up of the 63 participants (nine analysts, four of 1기,
+  fifty at the lab's terminal in training) was written to make the count add
+  up and may not be what was meant.
 
-- 사건 07's evidence scene (`src/nodes/case07.js`, the `c7_evidence_turn`
-  body and memo) now dates the posting order to the day after the analyst
-  asked where 온새's repayment terms came from; it had said the dispatch
-  failure's budget ceiling, which the order's own date (twelve days before the
-  inquiry opened) puts a week before that failure happened. This changes
-  which question caused the posting, and waits for the owner's word.
-- 사건 07's 강서지점 has four people at the counter (the number is in a card
-  label) and 프롤로그 04 has six; the papers there are loan applications in one
-  and a trust product in the other.
-- A hidden route's clock is fixed at an early hour of its case, so entered
-  late the time runs backwards. 사건 13, 23 and 33 do the same; it reads as a
-  convention.
-- 사건 01: "협상서는 양쪽 서명을 받았습니다" is followed by a closing scene that
-  treats the sale as still open.
-- 한서윤 speaks 해요체 in 사건 01-05 and 합니다체 from 사건 06; 반재욱 says
-  "저는" in 01-05 and "나는" from 06. Later cases are split the same way.
-- The finale's "마흔아홉 사건과 1년" beside "3년" elsewhere; 사건 06's
-  "사직서는 아직 수리되지 않았습니다" beside a memo that says none was handed in.
-- A replayed case replaces that case's story summary. That is the design
-  (priority 39), not an oversight.
-- Outcomes that finding "a case records the card it followed" got wrong
-  before the fix are not repaired in saves already written.
-- The service worker has not been run on iOS Safari or in an installed copy on
-  a phone, and Playwright WebKit skips the offline spec.
-- 다시 시도 on the offline panel, pressed after the connection returns, ends
-  in the one automatic reload in Chromium instead of opening the screen in
-  place: a failed dynamic import is remembered by the document.
-- The shell's `createStartSave` (`AppContent.jsx`) is still its own list of
-  the run's fields (priority 1).
-- A debug jump keeps `discoveredClues`, `caseResults` and `playtestFeedback`
-  from the run it left; a jump does not close the recovery centre or clear the
-  stale-tab lock. Kept as they were and written on the rows of `RUN_FIELDS`.
-- Not done: manifest `screenshots` (no suitable image exists), smaller icon
-  PNGs (`build:icons` writes lossless files), one breakpoint for the five
-  near 720px (each guards a different component), `install-deps` skipped on a
-  browser-cache hit (the runner image's libraries are not known to be there).
-- Needs a hand outside the repository: the four header rules in the Render
-  dashboard (priority 66), the `SUPABASE_ACCESS_TOKEN` secret for Migration
-  Drift, and a ruleset on `main` (it has no branch protection). The two
-  migrations needed no `db push`: the Supabase integration applied them at
-  the merge.
-- Not read: the opening variants against the second scene in the 43 cases the
-  content audit only swept, and speech levels season-wide.
+Code, screens and tooling:
 
-## Audit of 2026-10-07
-
-Fifteen readers went through what the first audit had not: the code written
-on 2026-10-06, the table screen and its sound, the screens around the play
-screen, the tests, the content checks, the 34 older migrations, and 38 case
-files read whole. What they found was fixed the same day, by area, each on a
-branch of its own.
-
-Fixed, by area:
-
-- **Consent and telemetry.** The playtest-data box starts ticked on a device
-  with no save. Restoring a slot or a kept copy keeps this device's consent.
-  A run can carry all twelve relics: the server's limit is 16
-  (`20261007000000`), and `check:grants` ties it to `RELIC_IDS`. A ranking row
-  the server can never take is sent once and let go, and the player is told.
-  Rows the player was told were deleted are not sent after a re-tick. A reset
-  holds the online copy until the player chooses in the panel. A ceiling set
-  past the counter's range is still a ceiling (`20261007010000`).
-- **The table.** Grade labels and the relic toast survive reduced motion.
-  Nothing on the table blinks faster than three times a second, and the
-  comfort setting reaches every animation on the stage. A bust says what
-  closed the window (clock heat and an off-beat lock had read "직접 확정했다").
-  그 탭에 두기 closes the question it answers. A held key does not leak to the
-  focused button, and a walked Space is graded when it goes down. Push and
-  lock keep one accessible name. Sound follows the mute, the volume and the
-  visible tab. `GauntletStage.jsx` is 825 lines and 68 imports.
-- **Screens.** The roadmap card of the case in progress resumes it; another
-  card asks before discarding it. The finale counts clues out of the real
-  total. The phone-on-its-side table is for phones (`pointer: coarse`), so a
-  laptop at 200% keeps the desktop table. The board and the ranking say what
-  they are doing and why a button will not act.
-- **Service worker and tooling.** The kept page answers when the host fails.
-  A page asks the new worker to warm when its release is replaced, and offers
-  a reload instead of a retry that cannot work. A release is the commit plus a
-  hash of the files the page names. A deploy waits for a second build of a
-  commit already served and says when the worker is the kill switch. Migration
-  Drift takes fifteen shapes of credential out of what it prints and reports
-  what it used to drop. Visual regression compares pull requests that change
-  markup.
-- **Case text.** About 300 places in 38 files: openings that follow the ending
-  they come from (the `rush` openings of 사건 18, 30, 35, 36, 37, 40, 47 had
-  gone somewhere the previous case did not), openings that give what the next
-  scene assumes, echoes that leave open what a later scene decides, side
-  branches that no longer return to an earlier hour, evidence scenes in 사건
-  41-44, 46 and 49 that say their own time. Decided with the owner's leave and
-  now in `docs/canon.md`: 반재욱 is a 17-year 조사역 in 2023 (twenty by the
-  season) and carries one notebook; 사건 19 is 1월 19일-22일; 트리거랩 and the
-  33rd floor are different buildings; the 보관 X line is 2023-04-27 18:44 on
-  윤상혁's account; the dissent is eleven pages (사건 31's "15쪽" is the eleven
-  missing pages); the response records hold 63 participants and 1기 was four
-  people; 사건 49's appointment is midnight, as the finale's clocks say.
-
-Looked at and left, for the owner:
-
-- 프롤로그 04's national sales figure was changed from 1,180억 to 214억 so it
-  sits under the 310억 loan; another number may be meant.
-- Sixty-odd cards whose numbers or way of thinking argued with their label
-  were changed (the "곁에 남는다" aftermath card is `persistence`, a card whose
-  echo says a day is lost no longer gains time); the ones that could be read
-  either way were left, and 69 cards whose label waits while `time` rises
-  stand as the game's rule that waiting buys today at a later cost.
-- The content checks now refuse another case's result as a `next`, a way
-  back, a card id used twice in a case and a card with no cognition; the
-  canon check reads 34 facts in every file that states them; a hard word has
-  to be explained on every route to the scene that says it, with 28 case and
-  term pairs allowed as they stand (`--list` names them).
-- 트리거랩 is six people and 에코; the nine on 사건 20's list are those six and
-  three who left; 백아린's resignation is never accepted and comes back as a
-  dismissal; the 평택 tower is 22 floors and the 58% of April was wrong too.
-  All three are in `docs/canon.md`. The make-up of the 63 participants
-  (nine analysts, four of 1기, fifty who sat at the lab's terminal in
-  training) was written to make the count add up and may not be what was
-  meant.
-- Nothing here was looked at in a browser by a person: the louder reveal and
-  card cues, the comfort setting's wider reach, the beat marker at every other
-  beat above 180bpm, the roadmap's open cards printing their summary in full.
-
-## The two content ratchets, 2026-10-08
-
-Both ceilings the audit of 2026-10-07 left open are at 0, so either check
-fails on the first new offender.
-
-- **Plain language.** The 28 case and term pairs a route could read
-  unexplained each carry the season's gloss at the first place the word is
-  read. `BARE_ON_A_ROUTE` in `check-plain-language.mjs` is empty.
-- **A label against the clock (`check:balance` rule 7).** 시간 is time left
-  today, and putting a thing off buys today at a later price; the echoes say
-  so. The rule read it the other way and held 54 such cards as exceptions.
-  It now reads, in `scripts/balance-rules.mjs`:
-  - a label that waits or puts a thing off (미룬다, 보류한다, 늦춘다, 뒤로
-    돌린다, 기다린다) may gain time, and is refused only when the card loses
-    time and the label is nothing but the putting-off -- the wait word is its
-    last verb and nothing before it names a second act (…고, …며, …채, …부터)
-    or a span waited through (…까지, 동안, 며칠, 하루, 곁);
-  - a label that says it acts at once (바로, 즉시, 곧장) may not lose time.
-  Twelve labels (fifteen dealt cards) said 바로 or 곧장 on a card that takes
-  time for what it does and lost the word. `tests/unit/balance-rules.test.mjs`
-  holds both halves on cards made up for the test.
+- 2026-10-06: a replayed case replaces that case's story summary; that is the
+  design (priority 39).
+- 2026-10-06: outcomes recorded wrongly before "a case records the card it
+  followed" (priority 12) are not repaired in saves already written.
+- 2026-10-06: the service worker has not been run on iOS Safari or in an
+  installed copy on a phone, and Playwright WebKit skips the offline spec
+  (priority 89).
+- 2026-10-06: 다시 시도 on the offline panel, pressed after the connection
+  returns, ends in the one automatic reload in Chromium, not the screen
+  opened in place: the document remembers a failed dynamic import.
+- 2026-10-06: the shell's `createStartSave` is still its own list of the
+  run's fields (priority 1).
+- 2026-10-06: a debug jump keeps `discoveredClues`, `caseResults` and
+  `playtestFeedback` from the run it left, and does not close the recovery
+  centre or clear the stale-tab lock; written on the rows of `RUN_FIELDS`.
+- 2026-10-06: not done -- manifest `screenshots` (no suitable image), smaller
+  icon PNGs (`build:icons` writes lossless files), one breakpoint for the
+  five near 720px (each guards a different component), `install-deps`
+  skipped on a browser-cache hit (the runner's libraries are not known).
+- 2026-10-06: needs a hand outside the repository -- the four header rules in
+  the Render dashboard (priority 66), the `SUPABASE_ACCESS_TOKEN` secret for
+  Migration Drift, and a ruleset on `main` (it had no branch protection).
+- 2026-10-07: nothing of that day's fixes was looked at in a browser by a
+  person: the louder reveal and card cues, the comfort setting's wider reach,
+  the beat marker at every other beat above 180bpm, the roadmap's open cards
+  printing their summary in full.
