@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
-  BASE_SCHEMA, buildNextSchema, createWindow, describeMutations, READ_GRACE_SECONDS, reduceWindow, resolveWindow, VERDICT_CAUSES,
+  BASE_SCHEMA, buildNextSchema, createWindow, describeMutations, isPenaltyMutation, MUTATIONS, READ_GRACE_SECONDS, reduceWindow, resolveWindow, VERDICT_CAUSES,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { describeVerdictCause } from "../../src/gauntlet/tableReadout.js";
 
@@ -93,4 +93,65 @@ test("BLACKOUT and COLD FEET say what is left once EXPOSE mastery has lifted the
   assert.doesNotMatch(coldFeet.title, /봉인/);
   assert.match(coldFeet.text, /칩이 줄어든다/);
   assert.ok(liftedCold.chipsScale < BASE_SCHEMA.chipsScale * 1.5 && liftedCold.chipsScale === plainCold.chipsScale, "the chips are still thinner");
+});
+
+/**
+ * Which mutations are a breach. The briefing's red panel, its alarm and its
+ * glitch answered every entry of the list until 2026-10-12 -- a charged
+ * stance, a hot chain, the season's mastery and a closed case among them. A
+ * mutation added to the catalogue has to be given a kind here before this
+ * passes, so none is a breach, or not one, by default.
+ */
+const MUTATION_KINDS = {
+  blackout: "penalty",
+  aftershock: "penalty",
+  silence: "penalty",
+  heatDebt: "penalty",
+  coldFeet: "penalty",
+  fracture: "penalty",
+  overclock: "carry",
+  strikeWake: "carry",
+  steadyLine: "carry",
+  exposedHand: "carry",
+  strikeMastery: "carry",
+  steadyMastery: "carry",
+  exposeMastery: "carry",
+  reboot: "reset",
+};
+
+test("every mutation is a penalty or it is not, and only the penalties are a breach", () => {
+  assert.deepEqual(Object.keys(MUTATION_KINDS).sort(), Object.keys(MUTATIONS).sort(), "every mutation in the catalogue has a kind");
+  for (const [id, kind] of Object.entries(MUTATION_KINDS)) {
+    assert.equal(isPenaltyMutation(id), kind === "penalty", id);
+    assert.equal(isPenaltyMutation({ id }), kind === "penalty", `${id}, as the table describes it`);
+    assert.ok(MUTATIONS[id].penalty === true || !("penalty" in MUTATIONS[id]), `${id}: the mark is true or absent`);
+  }
+  for (const unknown of [undefined, null, "", "toString", "nothing", {}, { id: "nothing" }]) assert.equal(isPenaltyMutation(unknown), false);
+});
+
+test("a described mutation is what it was before the mark: the id and what is printed", () => {
+  // One to a board: a schema holds eight at most.
+  for (const id of Object.keys(MUTATIONS)) {
+    const [mutation, ...rest] = describeMutations({ ...BASE_SCHEMA, mutations: [id], fracturedAxis: "trust" });
+    assert.equal(rest.length, 0);
+    assert.equal(mutation.id, id);
+    assert.deepEqual(Object.keys(mutation), ["id", "label", "title", "text", "axis", "softenedBy"], id);
+    assert.equal(mutation.label, MUTATIONS[id].label);
+  }
+});
+
+test("a bust deals only penalties, a charged stance and a closed case deal none", () => {
+  const ids = (schema) => schema.mutations;
+  const bust = buildNextSchema({ outcome: "bust", cause: "timeout", gauge: 80, pushes: 2, streak: 0, burnAxis: "trust", caseClosed: false });
+  assert.ok(ids(bust).length >= 4 && ids(bust).every(isPenaltyMutation), ids(bust).join());
+  for (const [focusMode, carry] of [["strike", "strikeWake"], ["steady", "steadyLine"], ["expose", "exposedHand"]]) {
+    const cash = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 30, pushes: 2, streak: 0, burnAxis: null, caseClosed: false, focusMode, focusCharge: 99, focusHits: 9 });
+    assert.deepEqual(ids(cash), [carry], focusMode);
+    assert.equal(ids(cash).some(isPenaltyMutation), false);
+  }
+  const chained = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 30, pushes: 2, streak: 99, burnAxis: null, caseClosed: false });
+  assert.deepEqual(ids(chained), ["overclock"]);
+  const closed = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 30, pushes: 2, streak: 0, caseClosed: true, stanceMastery: { strike: 9, steady: 9, expose: 9 } });
+  assert.deepEqual(ids(closed), ["reboot", "strikeMastery", "steadyMastery", "exposeMastery"]);
+  assert.equal(ids(closed).some(isPenaltyMutation), false);
 });

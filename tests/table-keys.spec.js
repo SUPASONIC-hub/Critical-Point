@@ -539,14 +539,15 @@ const holdReadingClock = (page) =>
   );
 
 /** A prologue's opening page at `size`, once its panels have landed. */
-async function openIntroPage(page, caseId, size, { reboot = false, rootFontSize = null } = {}) {
+async function openIntroPage(page, caseId, size, { broken = false, rootFontSize = null } = {}) {
   await page.setViewportSize(size);
   await openBriefing(page, caseId);
-  if (reboot) {
-    // As a played run meets it: the case before closed, and left its REBOOT.
+  if (broken) {
+    // As a run that broke its last board meets it. REBOOT stood here until the
+    // breach panel was kept for penalties: a closed case no longer draws one.
     const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
     await page.goto("/profile.jpg");
-    save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations: ["reboot"] }, openSeed: null };
+    save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), mutations: ["aftershock"] }, openSeed: null };
     await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
     await page.goto("/?debug=1");
     await expect(page.getByTestId("protocol-breach")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
@@ -562,7 +563,7 @@ for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) 
     await holdReadingClock(page);
     const phone = size.width < 700;
     for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
-      await openIntroPage(page, step.caseId, size, { reboot: step.caseId === "prologue02" });
+      await openIntroPage(page, step.caseId, size, { broken: step.caseId === "prologue02" });
       const at = await measureIntro(page);
       const where = `${step.caseId} @ ${size.width}x${size.height}`;
 
@@ -604,7 +605,7 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
   ];
   for (const screen of SCREENS) {
     for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
-      await openIntroPage(page, step.caseId, screen.size, { reboot: step.caseId === "prologue02", rootFontSize: screen.rootFontSize });
+      await openIntroPage(page, step.caseId, screen.size, { broken: step.caseId === "prologue02", rootFontSize: screen.rootFontSize });
       const where = `${step.caseId} @ ${screen.name}`;
       const at = await measureIntro(page);
       expect(at.intro, `${where}: the page carries the introduction`).not.toBeNull();
@@ -750,11 +751,13 @@ test("a new run meets the table in steps: 프롤로그 01 has no logic streak an
   await expect(page.getByTestId("relic-draft")).toHaveCount(0);
 
   // 프롤로그 02 opens on the scene the close of 프롤로그 01 picked, not on its
-  // written first scene, and introduces the logic streak and the broken board there --
-  // beside the REBOOT panel every closed case leaves.
+  // written first scene, and introduces the logic streak and the broken board there.
+  // The REBOOT a closed case leaves is not a breach, and the page draws no panel for it.
   expect((await savedRun(page)).nodeId, "a played run enters on an opening route").not.toBe(CASE_START_NODES.prologue02);
   await expect(intro.locator("li")).toHaveText([...UNLOCK_LADDER[1].intro]);
-  await expect(page.getByTestId("protocol-breach")).toContainText("REBOOT");
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
+  await expect(page.getByTestId("carried-rules")).toHaveCount(0);
+  await expect(page.getByTestId("scene-briefing")).not.toContainText("REBOOT");
   await dismissProtocolBreach(page);
   await expectTableDraws(page, STAGED_STEPS[1].on);
 });
@@ -805,7 +808,7 @@ test("a save from before the steps resumes with what it held and plays on under 
   // The board it was dealt is the board it plays, and the page still
   // introduces the step: this is the scene 프롤로그 03 opens on.
   await expectBriefing(page);
-  await expect(page.getByTestId("protocol-breach")).toContainText("REBOOT");
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
   await expect(page.getByTestId("unlock-intro").locator("li")).toHaveText([...UNLOCK_LADDER[2].intro]);
   await dismissProtocolBreach(page);
   await expect(page.getByTestId("gauntlet-relics").locator(".gx-relic-chip")).toHaveCount(held.length);

@@ -174,7 +174,7 @@ export function GauntletStage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
-    mutations, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
+    breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
     cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId, offered });
   // What the hand adds to the pot: the logic streak as the staked card would
@@ -211,7 +211,7 @@ export function GauntletStage({
   }, [draftOpen]);
 
   useEffect(() => {
-    if (briefingOpen && mutations.length > 0) playMutationCue(mutations.length);
+    if (briefingOpen && breach.length > 0) playMutationCue(breach.length);
     // The breach sounds once, when the briefing that carries it first shows.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [briefingOpen]);
@@ -728,7 +728,7 @@ export function GauntletStage({
           isCardOpen={isCardOpen}
           sealedId={sealBroken ? null : sealedId}
           selectedId={win.selectedId}
-          mutations={mutations}
+          mutations={tableRules}
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}

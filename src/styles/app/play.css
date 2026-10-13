@@ -1571,6 +1571,21 @@
   background: var(--c-acid);
 }
 
+/* The rules a board carries: the breach panel's shape without its alarm. */
+.gx-panel.gx-carry {
+  background: var(--ui-surface-2);
+  border-color: var(--c-gx-chip);
+}
+
+.gx-carry .gx-breach-kicker {
+  color: var(--c-gx-chip);
+}
+
+.gx-carry b {
+  color: var(--c-gx-chip);
+  background: var(--ui-chip-soft);
+}
+
 .gx-slam {
   position: fixed;
   inset: 0;

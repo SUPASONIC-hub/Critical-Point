@@ -82,11 +82,15 @@ test("the introduction is written straight after the speaker, and the breach pan
   // The order the panels are written in is the order a phone stacks them and
   // a screen reader reads them; the grid places them in the same order by line.
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
-  const order = ["gx-panel-splash", "gx-panel-speaker", 'data-testid="unlock-intro"', "gx-panel-story", "gx-panel-file", 'data-testid="protocol-breach"'].map((mark) => briefing.indexOf(mark));
+  const order = ["gx-panel-splash", "gx-panel-speaker", 'data-testid="unlock-intro"', "gx-panel-story", "gx-panel-file", 'data-testid="carried-rules"', 'data-testid="protocol-breach"'].map((mark) => briefing.indexOf(mark));
   assert.ok(order.every((index) => index > 0));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
   const rows = [...briefing.matchAll(/style=\{at\("(\d+) \/ /g)].map((match) => Number(match[1]));
-  assert.deepEqual(rows, [1, 1, 2, 3, 3, 4], "picture and speaker, the introduction, story and file, the breach");
+  // The carried rules and the breach are written for the same row: a board
+  // with both names a row for each (`at`'s second argument).
+  assert.deepEqual(rows, [1, 1, 2, 3, 3, 4, 4], "picture and speaker, the introduction, story and file, the carried rules, the breach");
+  // The carried rules keep the breach panel's shape and drop its red (`gx-carry`, play.css).
+  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker"><span lang="en">CARRIED OVER<\/span> · 이번 판에 이어지는 규칙<\/p>/);
   // The page is still named by its scene title, not by the panel.
   assert.match(briefing, /aria-labelledby="gx-comic-title"/);
   assert.match(briefing, /<p className="gx-breach-kicker">\{getUnlockKicker\(node\.caseId\)\}<\/p>/);
