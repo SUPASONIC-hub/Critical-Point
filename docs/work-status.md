@@ -182,7 +182,14 @@ Still open, on purpose:
    more -- `extensions.css` was retired on 2026-09-28 and its rules went home
    -- so a new rule goes to the file that owns its selector, and
    `check:css-structure` holds each sheet's budget and fails on a selector with
-   a second home. `comfort.css` is last on purpose, so a tie on specificity
+   a second home. A sheet's budget is its lines and UTF-8 bytes with the
+   comments taken out (2026-10-13; `scripts/css-size.mjs` has the rule, read
+   as LF on any checkout): the build strips comments, so they were bytes no
+   player downloads, and counting them made deleting a note the cheapest way
+   to fit a rule. Each budget came down that day by exactly the comment lines
+   and bytes its sheet held, so no sheet gained room -- `base-intro-ranking.css`
+   is still 3 bytes under its number, `responsive.css` 12, `result.css` 39 --
+   and a comment costs nothing from here on. `comfort.css` is last on purpose, so a tie on specificity
    goes to the player's setting (priority 87). A `transition` never lists
    `box-shadow`, and `check-css-tokens.mjs` allows five hard-coded hex colours,
    the five there are. Type is sized in rem (16px root), so the reader's own
@@ -1040,8 +1047,11 @@ Still open, on purpose:
     `CloudSavePanelBody` by a few hundred bytes for their status regions; and
     among the stylesheets (`check:css-structure`) `base-intro-ranking.css`
     71,400 -> 76,900 and `responsive.css` 5,850 -> 10,500 for the landscape
-    table, while `play.css` stayed at 63,700. `sw.js` has a budget of its own
-    (8,780 / 3,150).
+    table, while `play.css` stayed at 63,700. (Those three are the sheets
+    as written. Since 2026-10-13 a sheet is measured without its comments,
+    and the same three budgets read 67,101, 7,967 and 55,420: each less the
+    comment bytes its sheet held that day, the room under it unchanged.)
+    `sw.js` has a budget of its own (8,780 / 3,150).
 82. Actions are pinned by commit SHA with the tag in a comment, and Dependabot
     (npm and actions, weekly, grouped; npm majors and `@playwright/test`
     ignored, since Playwright moves with the visual-regression container)

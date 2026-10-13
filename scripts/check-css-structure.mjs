@@ -28,9 +28,16 @@
  * the phone's play screen lost more than half its height. The file budgets are sized to the file
  * as it stands, so a surface that grows has to move its number; the two
  * duplication budgets above are the ones that only go down.
+ *
+ * Since 2026-10-13 a file's lines and bytes are counted with its comments
+ * taken out (scripts/css-size.mjs has the rule). The numbers in the two
+ * paragraphs above, and every one dated before that day in the notes beside
+ * `fileBudgets`, are of the file as written, comments included.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
+
+import { measureCss } from "./css-size.mjs";
 
 const APP_DIR = "src/styles/app";
 const IMPORT_ORDER = readFileSync("src/styles/app.css", "utf8")
@@ -71,6 +78,33 @@ const budgets = {
   selectorsRepeatedInOneFile: 107,
 };
 
+// Lines and UTF-8 bytes of each sheet WITHOUT ITS COMMENTS, since 2026-10-13
+// (the rule is in css-size.mjs: a comment goes with the spaces in front of it,
+// and a line that held nothing else goes with its line break).
+//
+// Before that day the file was counted as written. The build strips comments,
+// so the budget was charging for bytes no player downloads, and with sheets
+// sitting 3, 12 and 39 bytes under their number the way to fit a rule was to
+// delete the note that explained another. A comment costs nothing now.
+//
+// Nothing was loosened to get there. Each number came down by exactly the
+// comment lines and bytes its sheet held on 2026-10-13 (at cce9df8), so every
+// sheet had the same room to the byte on both sides of the change:
+//
+//                           as written       comments      without         budget          room
+//   base-intro-ranking.css  3169 / 76897   139 /  9799   3030 / 67098   3031 / 67101     1 /    3
+//   play.css                2869 / 61486   115 /  8280   2754 / 53206   2925 / 55420   171 / 2214
+//   plate.css                665 / 15121    77 /  5632    588 /  9489    588 /  9768     0 /  279
+//   briefing.css             699 / 15243    31 /  2222    668 / 13021    674 / 13078     6 /   57
+//   recovery.css             320 /  6891     6 /   398    314 /  6493    324 /  6702    10 /  209
+//   relics.css               479 / 10002     9 /   690    470 /  9312    473 /  9410     3 /   98
+//   responsive.css           444 / 10488    39 /  2533    405 /  7955    406 /  7967     1 /   12
+//   result.css              2534 / 60761    51 /  3711   2483 / 57050   2509 / 57089    26 /   39
+//   comfort.css              135 /  3755    16 /  1109    119 /  2646    124 /  2691     5 /   45
+//
+// The histories below keep their numbers as they were measured at the time,
+// comments included; each ends with the step to the number that holds now.
+// A budget moved after 2026-10-13 is a number without comments on both sides.
 const fileBudgets = {
   // base-intro-ranking.css read 1795 / 38900 until 2026-09-10, when the intro
   // was redesigned into the full-bleed cold open. The file grew because it
@@ -114,7 +148,9 @@ const fileBudgets = {
   // buttons and a dark field for the online-save panel, its two message
   // regions, the note beside the consent box, the loading screen's count and
   // way out, and the quiet button's two half-rules made one.
-  "base-intro-ranking.css": { lines: 3170, bytes: 76900 },
+  // 3170 / 76900 -> 3031 / 67101 on 2026-10-13: comments no longer counted
+  // (139 lines and 9799 bytes of them that day), the room unchanged.
+  "base-intro-ranking.css": { lines: 3031, bytes: 67101 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -189,7 +225,9 @@ const fileBudgets = {
   // Unchanged on 2026-10-06, measured 2988 / 63612: px to rem cost this file
   // about 450 bytes, and the developer's overlay (nine rules) moved to
   // recovery.css beside the debug jump panel, which is what it is.
-  "play.css": { lines: 3040, bytes: 63700 },
+  // 3040 / 63700 -> 2925 / 55420 on 2026-10-13: comments no longer counted
+  // (115 lines and 8280 bytes of them that day), the room unchanged.
+  "play.css": { lines: 2925, bytes: 55420 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -199,7 +237,9 @@ const fileBudgets = {
   // missed (dusk), the paper that turns in the rooms made of paper, the near and
   // far planes closing on a pressure beat, and the backdrop breathing behind the
   // table instead of standing still under a running clock.
-  "plate.css": { lines: 665, bytes: 15400 },
+  // 665 / 15400 -> 588 / 9768 on 2026-10-13: comments no longer counted
+  // (77 lines and 5632 bytes of them that day), the room unchanged.
+  "plate.css": { lines: 588, bytes: 9768 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
@@ -213,17 +253,23 @@ const fileBudgets = {
   // 705 / 14900 -> 705 / 15300 on 2026-10-06, measured 703 / 15226: rem, a
   // locked card that stays in the tab order, and the page keeping itself out
   // from under a notch on either side.
-  "briefing.css": { lines: 705, bytes: 15300 },
+  // 705 / 15300 -> 674 / 13078 on 2026-10-13: comments no longer counted
+  // (31 lines and 2222 bytes of them that day), the room unchanged.
+  "briefing.css": { lines: 674, bytes: 13078 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
-  "recovery.css": { lines: 330, bytes: 7100 },
+  // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted
+  // (6 lines and 398 bytes of them that day), the room unchanged.
+  "recovery.css": { lines: 324, bytes: 6702 },
   // relics.css arrived on 2026-09-15 with the relic draft, sized to the file.
   // 460 / 9400 -> 465 / 9510 on 2026-09-15 when the draft became a glass modal.
   // 465 / 9510 -> 482 / 9950 on 2026-09-27: the proc glow is a layer faded by
   // opacity rather than an animated box-shadow.
   // 9950 -> 10100 bytes on 2026-10-06, measured 481 / 10065: rem, and the
   // draft's side insets.
-  "relics.css": { lines: 482, bytes: 10100 },
+  // 482 / 10100 -> 473 / 9410 on 2026-10-13: comments no longer counted
+  // (9 lines and 690 bytes of them that day), the room unchanged.
+  "relics.css": { lines: 473, bytes: 9410 },
   // 200 / 4700 -> 204 / 4800 on 2026-09-27: reduced motion zeroes delays too.
   // 204 / 4800 -> 240 / 5850 on 2026-09-28 for the forced-colours block: an
   // edge on every bar's track and a system colour on its fill.
@@ -233,7 +279,9 @@ const fileBudgets = {
   // block is the wide screen's two panes at a phone's scale, with two shorter
   // steps under it, and it lives here because it restyles the header, the
   // music controls, the table, the dock and the reveal together.
-  "responsive.css": { lines: 445, bytes: 10500 },
+  // 445 / 10500 -> 406 / 7967 on 2026-10-13: comments no longer counted
+  // (39 lines and 2533 bytes of them that day), the room unchanged.
+  "responsive.css": { lines: 406, bytes: 7967 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -253,9 +301,13 @@ const fileBudgets = {
   // at the head of play.css came here too. The nine sheets together went from
   // 11,492 lines / 257,177 bytes to 10,767 / 242,536 in the same pass, with
   // 514 declarations that never won a cascade deleted.
-  "result.css": { lines: 2560, bytes: 60800 },
+  // 2560 / 60800 -> 2509 / 57089 on 2026-10-13: comments no longer counted
+  // (51 lines and 3711 bytes of them that day), the room unchanged.
+  "result.css": { lines: 2509, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
-  "comfort.css": { lines: 140, bytes: 3800 },
+  // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
+  // (16 lines and 1109 bytes of them that day), the room unchanged.
+  "comfort.css": { lines: 124, bytes: 2691 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */
@@ -340,13 +392,12 @@ for (const file of onDisk) {
     failures.push(`${file} has no CSS size budget.`);
     continue;
   }
-  const lines = css.split(/\r?\n/).length;
-  if (lines > budget.lines) failures.push(`${file} is ${lines} lines, over the ${budget.lines} budget.`);
-  // Bytes, as the budget is named and as the bundle is served. `css.length`
-  // counts UTF-16 units, which undercounts every Korean character in a comment
-  // or a `content` string by two.
-  const bytes = Buffer.byteLength(css, "utf8");
-  if (bytes > budget.bytes) failures.push(`${file} is ${bytes} bytes, over the ${budget.bytes} budget.`);
+  // Comments are not counted (2026-10-13), and the message says so: the
+  // number is not the one an editor or `wc` shows for the file, and nobody
+  // should conclude from it that deleting a comment would help.
+  const { lines, bytes } = measureCss(css);
+  if (lines > budget.lines) failures.push(`${file} is ${lines} lines without its comments, over the ${budget.lines} budget.`);
+  if (bytes > budget.bytes) failures.push(`${file} is ${bytes} bytes without its comments, over the ${budget.bytes} budget.`);
 }
 
 const rules = readRules();
