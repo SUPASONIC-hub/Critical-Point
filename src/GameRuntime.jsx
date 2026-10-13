@@ -619,7 +619,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    * first: `R` did it on one keypress, while the report was being read.
    */
   function openCase(caseId) {
-    if (caseId === currentCase && !confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워집니다.")) return false;
+    if (caseId === currentCase && !confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워지고, 다시 하는 판은 연습으로 세어 금고는 그대로입니다. 이 사건의 결과 요약은 새 판을 끝내면 그 판의 것으로 바뀝니다.")) return false;
     startCase(caseId);
     return true;
   }

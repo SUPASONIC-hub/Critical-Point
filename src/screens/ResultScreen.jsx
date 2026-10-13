@@ -251,7 +251,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? "자원 관리 실패가 기록되었습니다. 다음 플레이에서는 압박을 분산하십시오." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
+              <small>{endingVariant.failure ? "사람 피해가 감당할 수 있는 선을 넘은 것으로 기록되었습니다." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
             </section>
           )}
           {currentCase === "final" && (
