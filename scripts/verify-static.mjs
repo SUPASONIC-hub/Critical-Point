@@ -46,6 +46,7 @@ export const CHECKS = [
   "check:node",
   "check:grants",
   "check:canon",
+  "check:doc-numbers",
 ];
 
 const root = process.cwd();
