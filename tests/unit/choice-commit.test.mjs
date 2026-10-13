@@ -156,6 +156,7 @@ test("a cashed card moves the run to the scene it leads to and logs what was pai
   assert.equal(patch.decisionReveal.caseClosed, false);
   assert.equal(patch.decisionReveal.skippedTitle, null);
   assert.equal(patch.decisionReveal.verdict.outcome, "cash");
+  assert.equal(patch.decisionReveal.echo, entry.echo, "the reveal closes on the line written for the card");
 
   // Nothing leaves the tab for a case that is still open; the settled seed is kept so the window cannot be replayed.
   assert.deepEqual([did.rankingRows.length, did.queued.length, did.telemetryStatus.length], [0, 0, 0]);
@@ -196,6 +197,7 @@ test("a card behind an authority gate says why it is locked, and a forced card g
   assert.equal(did.patches.length, 1);
   assert.equal(did.patches[0].nodeId, locked.next);
   assert.equal(did.patches[0].log[0].threshold.forced, true);
+  assert.equal(did.patches[0].decisionReveal.echo, null, "a card the clock staked was not chosen: its reveal keeps the template too");
   assert.equal(did.patches[0].log[0].routeChangeKind, "evidence-turn");
 });
 
@@ -240,6 +242,9 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   assert.equal(entry.threshold.state, "bust");
   assert.equal(entry.threshold.rewardMultiplier, 1);
   assert.equal(entry.clue, null, "a bust finds nothing");
+  assert.ok(entry.echo, "the card has a line of its own");
+  assert.equal(patch.decisionReveal.echo, null, "which says what confirming it came to: a bust closes on the sentence made from the effect");
+  assert.equal(patch.decisionReveal.beat, entry.sceneBeat);
   for (const [key, value] of Object.entries(BUST_EFFECT)) {
     assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `the bust's own ${key} is on top of what the card cost`);
   }

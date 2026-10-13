@@ -211,7 +211,7 @@ export function DecisionReveal({ view }) {
         )}
 
         <div className="decision-reveal-beat">
-          {renderSceneLines(String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
+          {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
         </div>
 
         {decisionReveal.clue && (
