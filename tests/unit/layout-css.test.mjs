@@ -59,6 +59,23 @@ test("a stance that cannot be changed is dimmed, and the one in force is not", (
   const play = sheet("play");
   assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\] \{\s*cursor: not-allowed;\s*\}/);
   assert.match(play, /\.gx-focus-modes \[aria-disabled="true"\]:not\(\.active\) \{\s*opacity: 0\.5;\s*\}/, "the active stance is what a locked table is holding: it stays at full strength");
+  // The attribute those rules read is GuardedButton's: the row set it by hand
+  // with the click still wired and no reason, and explained the count in a title.
+  const row = readFileSync(new globalThis.URL("../../src/gauntlet/StanceRow.jsx", import.meta.url), "utf8");
+  assert.match(row, /<GuardedButton[^>]*?blocked=\{blocked\}\s+aria-describedby=\{blocked \? "gx-stance-blocked gx-stance-detail" : "gx-stance-detail"\}/);
+  assert.match(row, /\{blocked && <span id="gx-stance-blocked" className="sr-only">[^<]+<\/span>\}/);
+  assert.match(row, /<span id="gx-stance-detail" className="sr-only">/);
+  assert.equal(/aria-disabled=|\stitle=/.test(row), false, "no raw aria-disabled, and nothing a phone cannot show");
+});
+
+test("the briefing cards, the draft's skip and its folded feats are pressed over 44px and drawn no larger", () => {
+  const play = sheet("play");
+  assert.match(play, /\.gx-comic-card::before \{\s*content: "";\s*position: absolute;\s*inset: -4px 0;\s*\}/);
+  assert.match(play, /\.gx-codex-note summary::before \{\s*content: "";\s*position: absolute;\s*inset: -10px 0;\s*\}/);
+  assert.match(play, /\.gauntlet-stage \.gx-draft-skip::before \{\s*content: "";\s*position: absolute;\s*inset: 0 0 -8px;\s*\}/);
+  assert.match(sheet("briefing"), /\.gx-comic-card \{[^}]*min-height: 40px;/);
+  assert.match(sheet("relics"), /\.gx-codex-note summary \{\s*position: relative;\s*min-height: 24px;/);
+  assert.match(sheet("relics"), /\.gauntlet-stage \.gx-draft-skip \{\s*position: relative;\s*margin-left: auto;\s*min-height: 38px;/);
 });
 
 test("the clock, the key hints and the card preview are sized in the type's own unit", () => {

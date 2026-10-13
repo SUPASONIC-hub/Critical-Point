@@ -1,3 +1,4 @@
+import { GuardedButton } from "../components/GuardedButton.jsx";
 import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 
 // The stance profiles are written for the engine; the table speaks Korean.
@@ -10,6 +11,12 @@ const FOCUS_MODE_COPY = {
 /**
  * The three stances and the season's mastery of each. The stage draws it only
  * once the case lets the player choose a stance (`tableUnlocks`, "stance").
+ *
+ * On a closed or stopped table the buttons were `aria-disabled` with nothing
+ * said and a click still wired, and what the mastery count counts was a
+ * `title` on the count, which a phone never shows and a screen reader reads
+ * late or not at all. Both are the buttons' description now; the folded
+ * briefing (`TableGlossary`) is where the count is explained on screen.
  */
 export function StanceRow({ mode: current, mastery, blocked, onPick }) {
   return (
@@ -25,24 +32,27 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
         const count = mastery[mode] ?? 0;
         const mastered = mastery.mastered.includes(mode);
         return (
-          <button
+          <GuardedButton
             key={mode}
             type="button"
             className={`mode-${mode}${active ? " active" : ""}${mastered ? " is-mastered" : ""}`}
             aria-pressed={active}
-            aria-disabled={blocked || undefined}
+            blocked={blocked}
+            aria-describedby={blocked ? "gx-stance-blocked gx-stance-detail" : "gx-stance-detail"}
             onClick={() => onPick(mode)}
           >
             <span>{profile.label}</span>
-            <em title="시즌 숙련: 차지한 채로 확정한 판">
+            <em>
               <span className="sr-only">시즌 숙련 </span>
               {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}
             </em>
             <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
             <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
-          </button>
+          </GuardedButton>
         );
       })}
+      {blocked && <span id="gx-stance-blocked" className="sr-only">판이 열려 있을 때만 자세를 바꿀 수 있습니다.</span>}
+      <span id="gx-stance-detail" className="sr-only">시즌 숙련: 차지한 채로 확정한 판</span>
     </div>
   );
 }

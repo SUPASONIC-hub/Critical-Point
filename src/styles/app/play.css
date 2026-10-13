@@ -2787,6 +2787,31 @@
   position: relative;
 }
 
+/* A briefing card is drawn 40px tall, the draft's 고르지 않고 진행 38 and its
+   list of locked feats one 24px line; each is pressed over 44, the way the
+   stance buttons are, and none is drawn any larger. The rules are here
+   because briefing.css and relics.css have no room for them. A card reaches
+   2px past its border into the 6px between rows; the skip button reaches
+   down only, and where it wraps under the feats' line it is the later of
+   the two, so the 2px of that line's reach that land on it are its own. */
+.gx-comic-card::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+
+.gx-codex-note summary::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0;
+}
+
+.gauntlet-stage .gx-draft-skip::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -8px;
+}
+
 .gx-card > .gx-card-type,
 .gx-comic-cards .gx-card-type {
   position: absolute;
