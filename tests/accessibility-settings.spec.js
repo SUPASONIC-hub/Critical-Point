@@ -207,9 +207,9 @@ test("the reading clock can start held, and waits", async ({ page }) => {
   const timer = page.getByTestId("reading-timer");
   await expect(timer).toContainText("멈춤");
   const before = await timer.textContent();
-  // The page's own clock, moved by hand and well past the longest reading
-  // time: two and a half seconds of the wall clock proved a held clock no
-  // better than a slow one.
+  // The page's own clock, moved by hand and past this page's reading time
+  // (52 seconds): two and a half seconds of the wall clock proved a held
+  // clock no better than a slow one.
   await page.clock.runFor(60_000);
   await expect(timer).toHaveText(before ?? "");
   await expect(page.getByTestId("scene-briefing")).toBeVisible();

@@ -591,11 +591,11 @@ test("the briefing's reading clock follows the text and stays inside its bounds"
   // sentence are counted, and nothing else about a rule is.
   const breach = [MUTATIONS.blackout, MUTATIONS.coldFeet, MUTATIONS.aftershock];
   const breachChars = breach.flatMap((rule) => [rule.label, rule.title, rule.text]).join("").replace(/\s+/g, "").length;
-  assert.equal(getReadingSeconds({ text: "가".repeat(200) }, breach), Math.round(6 + (200 + breachChars) / 16), "the changed rules count as reading");
+  assert.equal(getReadingSeconds({ text: "가".repeat(200) }, breach), Math.round(6 + (200 + breachChars) / 10), "the changed rules count as reading");
   assert.ok(getReadingSeconds({ text: "가".repeat(200) }, breach) > short);
   assert.equal(getReadingSeconds({ text: "가".repeat(200) }, []), short, "a page with no breach panel is timed as before");
   assert.equal(getReadingSeconds({ text: "가".repeat(200) }, [{ id: "x", softenedBy: "lens" }]), short, "a rule with nothing printed adds nothing");
-  assert.equal(getReadingSeconds({ text: "가".repeat(690) }, breach), READING_MAX_SECONDS, "the ceiling holds with a breach panel");
+  assert.equal(getReadingSeconds({ text: "가".repeat(900) }, breach), READING_MAX_SECONDS, "the ceiling holds with a breach panel");
   for (const node of Object.values(nodes).filter((item) => item.choices?.length)) {
     const seconds = getReadingSeconds(node);
     assert.ok(seconds >= READING_MIN_SECONDS && seconds <= READING_MAX_SECONDS, `${node.title}: ${seconds}s`);

@@ -69,7 +69,7 @@ test("the introduction is read against the briefing's clock, a line counted as a
   for (const step of UNLOCK_LADDER) {
     const chars = step.intro.join("").replace(/\s+/g, "").length;
     const seconds = getReadingSeconds(node, step.intro.map((text) => ({ text })));
-    assert.equal(seconds, Math.min(READING_MAX_SECONDS, Math.round(6 + (200 + chars) / 16)), `${step.caseId}'s lines count`);
+    assert.equal(seconds, Math.min(READING_MAX_SECONDS, Math.round(6 + (200 + chars) / 10)), `${step.caseId}'s lines count`);
     assert.ok(seconds > getReadingSeconds(node));
   }
   // The page that counts them is the page that prints them.

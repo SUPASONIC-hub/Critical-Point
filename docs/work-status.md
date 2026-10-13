@@ -641,7 +641,7 @@ Still open, on purpose:
     boxes, the memo as a pinned case file, and the protocol breach as a red
     panel when the last decision broke this board
     (`data-testid="protocol-breach"`). The page has its own reading clock,
-    `getReadingSeconds(node)`, 12-50s; when it runs out the table opens by
+    `getReadingSeconds(node)`, 12-95s; when it runs out the table opens by
     itself. The clock is a button (`aria-pressed`) that holds and resumes it,
     and it starts held when the player asked for that (priority 87).
     `판 열기`/Space/Enter/W opens the table sooner, and a card button or number

@@ -546,12 +546,15 @@ test("no scene is cut short by the reading clock", () => {
   for (const [id, node] of Object.entries(nodes)) {
     if (!node.choices?.length) continue;
     const chars = [node.lead, node.text, node.question, ...(node.memo ?? [])].filter(Boolean).join("").replace(/\s+/g, "").length;
-    const needs = Math.round(6 + chars / 16);
+    const needs = Math.round(6 + chars / 10);
     longest = Math.max(longest, needs);
     assert.ok(getReadingSeconds(node) >= Math.min(needs, READING_MAX_SECONDS));
     assert.ok(needs <= READING_MAX_SECONDS, `${id} needs ${needs}s and the page closes at ${READING_MAX_SECONDS}`);
   }
-  assert.ok(READING_MAX_SECONDS - longest <= 5, `the ceiling stays a ceiling: longest scene ${longest}s`);
+  // The room above the longest scene is what a bust's changed rules add to its
+  // page (a timeout with a fractured axis: 196 characters, twenty seconds at ten
+  // a second), and no more.
+  assert.ok(READING_MAX_SECONDS - longest <= 20, `the ceiling stays a ceiling: longest scene ${longest}s`);
 });
 
 /**

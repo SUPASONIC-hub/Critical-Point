@@ -661,13 +661,16 @@ test("reduced motion keeps the bust and the heat, and loses only the shake", asy
 
 test("the briefing page holds the clock, stakes a card from the page, and opens the table when it runs out", async ({ page }) => {
   // The page's own clock, driven from here. This test used to wait on the wall
-  // clock -- up to twenty seconds for a reading time that is twelve to
-  // thirty-five, so a longer scene body would have failed it.
+  // clock -- up to twenty seconds for a reading time that was twelve to
+  // thirty-five then, so a longer scene body would have failed it.
   //
   // Thirty seconds of the page's clock is about 1,800 frames, each one drawn:
   // that alone took 30 to 52 seconds here on 2026-10-08, and late in a run of
   // the whole file it passed the default sixty and the test died mid-wait on
   // whichever line it had reached (Chromium at one line, the phone at another).
+  // The clock has been ten characters a second since 2026-10-13, so the page
+  // run out below is 37 seconds where it was 26: about 42 seconds of the
+  // page's clock in all, where it was 31.
   test.setTimeout(150_000);
   await page.clock.install();
   await startDebugNode(page, "case01", "start", { openTable: false });
@@ -695,7 +698,7 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await startDebugNode(page, "case01", "c1_branch_people", { openTable: false });
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   const reading = Number(await page.getByTestId("reading-timer").locator("b").textContent());
-  expect(reading).toBeLessThanOrEqual(35);
+  expect(reading).toBeLessThanOrEqual(95);
   await page.clock.runFor((reading - 2) * 1000);
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   await page.clock.runFor(4_000);
