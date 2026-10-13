@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from "node:fs";
 import { convert } from "fontverter";
-import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComputedCharacters, collectSourceCharacters } from "./font-charset.mjs";
+import { CHARSET_OUTPUT, FONT_OUTPUT, FONT_SOURCE, collectCharset, collectComputedCharacters, collectSourceCharacters, readCharsetList } from "./font-charset.mjs";
 
 /**
  * Fail when the source can print a character the shipped font does not carry.
@@ -109,12 +109,7 @@ async function readFontCharacters(file) {
 
 let built;
 try {
-  built = new Set(
-    readFileSync(CHARSET_OUTPUT, "utf8")
-      .split("\n")
-      .filter(Boolean)
-      .map((line) => String.fromCodePoint(parseInt(line.slice(0, line.indexOf(" ")), 16))),
-  );
+  built = readCharsetList();
 } catch {
   console.error(`${CHARSET_OUTPUT} is missing. Run \`npm run build:fonts\`.`);
   process.exit(1);

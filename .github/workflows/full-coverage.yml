@@ -30,7 +30,7 @@ jobs:
     # reload walk and the layout sweep: about 170 tests, one a case for the
     # pairs and one a case for the sweep, split test by test over the shards.
     #
-    # How the numbers were chosen. The season is 1,129 scenes and 4,206
+    # How the numbers were chosen. The season is 1,129 scenes and 4,205
     # scene-choice pairs (counted from nodeOrders). The only timings taken so
     # far are from a desktop that was running other suites at the same time,
     # 2026-09-28, one worker: 60 pairs in 24.2 minutes (24s a pair, several of
@@ -38,7 +38,7 @@ jobs:
     # CI's own figure for walking a case is 25s for about 9 tables, so a pair,
     # which also pays for a fresh page, is put at 6s and a measurement at 3s:
     #
-    #   pairs    4,206 x 6s            = 7.0 h
+    #   pairs    4,205 x 6s            = 7.0 h
     #   sweep    1,129 x 3 sizes x 3s  = 2.8 h
     #   seasons  4 x 55 cases x 25s    = 1.5 h
     #   reload   55 cases x 30s        = 0.5 h
