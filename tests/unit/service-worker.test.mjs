@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test } from "node:test";
 
 import {
@@ -8,10 +10,15 @@ import {
   buildWorkerSource,
   describeWorker,
   entryFromHtml,
+  pageKeyFor,
+  pageWithoutCommit,
   precacheFromHtml,
   readWorkerConfig,
   releaseIdFor,
+  shippedFiles,
+  workerBody,
   workerConfigFor,
+  workerLogic,
   workerProblems,
 } from "../../scripts/service-worker-build.mjs";
 import { installServiceWorker, mayWarm, OFFLINE_READY_ATTRIBUTE, serviceWorkerWanted } from "../../src/serviceWorker/register.js";
@@ -385,25 +392,11 @@ test("the precache list is what the built page names, each file once", () => {
   assert.equal(entryFromHtml("<html></html>"), null);
 });
 
-test("a release is named for its commit, or for its page when it has none", () => {
-  const sha = "3c114e616a6e8626a85a92e91075b0451a96a442";
-  const named = releaseIdFor({ sha, html: PAGE });
-  assert.match(named, new RegExp(`^${sha}-[0-9a-f]{8}$`));
-  // The same commit built again with another backend address has another
-  // entry script, and has to be another release: it used to share the cache.
-  assert.notEqual(releaseIdFor({ sha, html: PAGE.replace("FZxcMdNV", "Changed0") }), named);
-  // The names decide, not the markup around them: the live check works the
-  // release out from the page as it was served.
-  assert.equal(releaseIdFor({ sha, html: PAGE.replaceAll("\n", "\n  ") }), named);
-  const local = releaseIdFor({ sha: "", html: PAGE });
-  assert.match(local, /^local-[0-9a-f]{12}$/);
-  assert.equal(releaseIdFor({ html: PAGE }), local);
-  assert.notEqual(releaseIdFor({ html: PAGE.replace("FZxcMdNV", "Changed0") }), local, "a page that names another entry is another release");
-  assert.equal(releaseIdFor({ sha: "not a commit", html: PAGE }), local);
-});
-
-const FILES = [
-  "/index.html",
+// What a build ships beside its page: each file's path and a hash of its
+// bytes, as `shippedFiles` reads them off the disk. The hash here is the
+// path's own text, which is all these tests need of it.
+const shipped = (paths) => paths.map((file) => [file, `bytes of ${file}`]);
+const FILES = shipped([
   "/assets/index-FZxcMdNV.js",
   "/assets/react-vendor-DJzcuUew.js",
   "/assets/case02-CN_k66fr.js",
@@ -414,23 +407,122 @@ const FILES = [
   "/scene-case01-480.webp",
   "/scene-case01-960.webp",
   "/triggerlab-key-visual-960.webp",
-  "/sw.js",
-];
+  "/manifest.webmanifest",
+  "/icons/favicon-32.png",
+]);
+const LOGIC = "function installWorker() {}\n";
+// The page as `buildShaMeta` (vite.config.js) leaves it for a commit: one
+// line in front of `</head>`, which is on a line of its own in index.html.
+const BUILT = PAGE.replace("</head>", "\n  </head>");
+const builtFrom = (sha) => BUILT.replace("</head>", `    <meta name="build-sha" content="${sha}" />\n  </head>`);
+const changed = (file) => FILES.map(([name, hash]) => (name === file ? [name, `${hash}, changed`] : [name, hash]));
+
+test("a release is named for the files it ships, whatever commit they came from", () => {
+  const named = releaseIdFor({ html: BUILT, files: FILES, logic: LOGIC });
+  assert.match(named, /^[0-9a-f]{8}-[0-9a-f]{12}$/);
+  // Two merges that ship the same files, and a build with no commit at all:
+  // one release, so one `sw.js`, and no device downloads anything again.
+  const first = "3c114e616a6e8626a85a92e91075b0451a96a442";
+  const second = "05c7b7c1d2e3f405162738495a6b7c8d9e0f1a2b";
+  assert.notEqual(builtFrom(first), builtFrom(second));
+  assert.equal(buildShaFromHtml(builtFrom(first)), first);
+  assert.equal(pageWithoutCommit(builtFrom(first)), BUILT, "the page without its commit is the page built from none");
+  assert.equal(pageWithoutCommit(builtFrom(second)), BUILT);
+  assert.equal(releaseIdFor({ html: builtFrom(first), files: FILES, logic: LOGIC }), named);
+  assert.equal(releaseIdFor({ html: builtFrom(second), files: FILES, logic: LOGIC }), named);
+  assert.equal(named.includes(first.slice(0, 7)), false);
+  // The order the disk gave the files in is not a difference.
+  assert.equal(releaseIdFor({ html: BUILT, files: [...FILES].reverse(), logic: LOGIC }), named);
+});
+
+test("a file that changes behind a name with no hash in it is another release", () => {
+  const named = releaseIdFor({ html: BUILT, files: FILES, logic: LOGIC });
+  const [page] = named.split("-");
+  // Nothing in these names moves when the file does, so the worker would go
+  // on answering with the copy it kept: a portrait, the manifest, an icon,
+  // the credit's picture, a piece of art.
+  for (const file of ["/portrait-echo.webp", "/manifest.webmanifest", "/icons/favicon-32.png", "/profile.jpg", "/scene-case01-960.webp"]) {
+    const other = releaseIdFor({ html: BUILT, files: changed(file), logic: LOGIC });
+    assert.notEqual(other, named, `${file} changed`);
+    assert.equal(other.split("-")[0], page, "the page names the same files, so its half of the name stays");
+  }
+  // The page's own text: a title, the inlined styles. It names the same files.
+  const retitled = BUILT.replace("<head>", "<head><title>another</title>");
+  assert.notEqual(retitled, BUILT);
+  assert.equal(pageKeyFor(retitled), pageKeyFor(BUILT));
+  assert.notEqual(releaseIdFor({ html: retitled, files: FILES, logic: LOGIC }), named);
+  // The worker's own code, which is shipped under one fixed name.
+  assert.notEqual(releaseIdFor({ html: BUILT, files: FILES, logic: `${LOGIC}// changed\n` }), named);
+  // A file added, and a file taken away.
+  assert.notEqual(releaseIdFor({ html: BUILT, files: [...FILES, ["/portrait-new.webp", "new"]], logic: LOGIC }), named);
+  assert.notEqual(releaseIdFor({ html: BUILT, files: FILES.slice(1), logic: LOGIC }), named);
+});
+
+test("a file under another hashed name is another release, in both halves when the page names it", () => {
+  const named = releaseIdFor({ html: BUILT, files: FILES, logic: LOGIC });
+  // The entry script: the same commit built again with another backend
+  // address has another one, and used to share the first's cache.
+  const rebuilt = releaseIdFor({
+    html: BUILT.replace("FZxcMdNV", "Changed0"),
+    files: FILES.map(([name, hash]) => [name.replace("FZxcMdNV", "Changed0"), hash]),
+    logic: LOGIC,
+  });
+  assert.notEqual(rebuilt.split("-")[0], named.split("-")[0]);
+  assert.notEqual(rebuilt.split("-")[1], named.split("-")[1]);
+  // A case's chunk, which the page does not name: the second half alone.
+  const recased = releaseIdFor({ html: BUILT, files: FILES.map(([name, hash]) => [name.replace("CN_k66fr", "Changed0"), hash]), logic: LOGIC });
+  assert.equal(recased.split("-")[0], named.split("-")[0]);
+  assert.notEqual(recased, named);
+  // The half the live check works out again is the names and not the markup
+  // around them: a host that touched the page on the way still agrees.
+  assert.equal(pageKeyFor(BUILT.replaceAll("\n", "\n  ")), pageKeyFor(BUILT));
+  assert.notEqual(pageKeyFor(BUILT.replace("FZxcMdNV", "Changed0")), pageKeyFor(BUILT));
+});
+
+test("the files of a build are read with their bytes, without the page and the worker", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "cp-shipped-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  mkdirSync(path.join(dir, "assets"));
+  mkdirSync(path.join(dir, "icons"));
+  const write = (file, text) => writeFileSync(path.join(dir, file), text);
+  write("index.html", "<html></html>");
+  write("sw.js", "const WORKER_CONFIG = {};\n");
+  write("portrait-echo.webp", "a portrait");
+  write("manifest.webmanifest", "{}");
+  write("assets/index-FZxcMdNV.js", "entry");
+  write("icons/favicon-32.png", "icon");
+  const before = shippedFiles(dir);
+  assert.deepEqual(before.map(([name]) => name), ["/assets/index-FZxcMdNV.js", "/icons/favicon-32.png", "/manifest.webmanifest", "/portrait-echo.webp"]);
+  assert.ok(before.every(([, hash]) => /^[0-9a-f]{64}$/.test(hash)));
+  assert.deepEqual(shippedFiles(dir), before, "the same files read again are the same");
+  // The same name over other bytes, which is what no hashed name would show.
+  write("portrait-echo.webp", "another portrait");
+  const after = shippedFiles(dir);
+  assert.notEqual(after[3][1], before[3][1]);
+  assert.deepEqual(after.slice(0, 3), before.slice(0, 3));
+  assert.notEqual(releaseIdFor({ html: BUILT, files: after, logic: LOGIC }), releaseIdFor({ html: BUILT, files: before, logic: LOGIC }));
+});
 
 test("the warm list is every other build file, the portraits and the art at one size, and nothing twice", () => {
-  const config = workerConfigFor({ sha: "", html: PAGE, files: FILES });
+  const config = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file)]) });
   assert.deepEqual(config.warm, ["/assets/RankingScreen-BHGTYjZL.js", "/assets/case02-CN_k66fr.js", "/portrait-echo.webp", "/profile.jpg", "/scene-case01-960.webp"]);
   assert.equal(config.warm.includes("/triggerlab-key-visual-960.webp"), false, "already in the precache");
   assert.equal(config.entry, "/assets/index-FZxcMdNV.js");
   assert.equal(config.precache.includes("/assets/index-FZxcMdNV.js"), true);
   assert.throws(() => workerConfigFor({ html: "<html></html>", files: FILES }), /no module script/);
+  // The page and the worker are not files the worker is named for twice: a
+  // list that has them, as a directory does, names the same release.
+  assert.equal(config.release, workerConfigFor({ html: PAGE, files: FILES }).release);
 });
 
 test("the built worker is the source without its exports, and says what it was built with", () => {
   const template = readFileSync("src/serviceWorker/worker.js", "utf8");
-  const config = workerConfigFor({ sha: "abc1234", html: PAGE, files: FILES });
+  const config = workerConfigFor({ html: PAGE, files: FILES, logic: workerBody(template) });
   const source = buildWorkerSource(template, config);
   assert.equal(/^export /m.test(source), false);
+  // The config line is the only thing a release adds: the rest is the code,
+  // read back out of a built worker as it went in.
+  assert.equal(workerLogic(source), workerBody(template));
   assert.match(source, /installWorker\(self, WORKER_CONFIG\);\n$/);
   assert.deepEqual(readWorkerConfig(source), config);
   // It runs as a classic script against a scope, and registers its listeners.
@@ -441,26 +533,40 @@ test("the built worker is the source without its exports, and says what it was b
 });
 
 test("a worker is held to the page beside it", () => {
-  const config = workerConfigFor({ sha: "", html: PAGE, files: FILES });
-  const source = buildWorkerSource("export function installWorker() {}\n", config);
-  const hasFile = (file) => FILES.includes(file) || config.precache.includes(file);
-  assert.deepEqual(workerProblems({ source, html: PAGE, hasFile }), []);
-  assert.match(workerProblems({ source, html: PAGE.replace("FZxcMdNV", "Changed0"), hasFile }).join("\n"), /not built from this page[\s\S]*expects the entry script/);
+  const template = "export function installWorker() {}\n";
+  const config = workerConfigFor({ html: PAGE, files: FILES, logic: workerBody(template) });
+  const source = buildWorkerSource(template, config);
+  const hasFile = (file) => FILES.some(([name]) => name === file) || config.precache.includes(file);
+  assert.deepEqual(workerProblems({ source, html: PAGE, hasFile, files: FILES }), []);
+  assert.match(workerProblems({ source, html: PAGE.replace("FZxcMdNV", "Changed0"), hasFile, files: FILES }).join("\n"), /not built from these files[\s\S]*expects the entry script/);
   assert.match(workerProblems({ source, html: PAGE, hasFile: (file) => file !== "/assets/case02-CN_k66fr.js" }).join("\n"), /lists \/assets\/case02-CN_k66fr\.js/);
   assert.match(workerProblems({ source: "console.log(1)", html: PAGE })[0], /no WORKER_CONFIG/);
   assert.equal(readWorkerConfig("const WORKER_CONFIG = {broken};"), null);
 
+  // With the build in hand, the whole name: a portrait that is not the one
+  // the worker was built beside, and a worker whose code is not the one named.
+  assert.match(workerProblems({ source, html: PAGE, files: changed("/portrait-echo.webp") })[0], /not built from these files/);
+  assert.match(workerProblems({ source: source.replace("function installWorker() {}", "function installWorker() { return 1; }"), html: PAGE, files: FILES })[0], /not built from these files/);
+
+  // The live site: the page alone, so the half of the name it decides.
+  assert.deepEqual(workerProblems({ source, html: PAGE }), []);
+  assert.deepEqual(workerProblems({ source, html: PAGE.replaceAll("\n", "\n  ") }), [], "markup a host touched on the way is not another release");
+  const other = buildWorkerSource("", { ...config, release: "fff00000-000000000000" });
+  assert.match(workerProblems({ source: other, html: PAGE })[0], /release fff00000-000000000000 and the page's files are [0-9a-f]{8}: /);
+
+  // The page says its commit and the worker is the same one for every commit.
   const stamped = PAGE.replace("</head>", '<meta name="build-sha" content="abc1234abc1234" /></head>');
   assert.equal(buildShaFromHtml(stamped), "abc1234abc1234");
   assert.equal(buildShaFromHtml(PAGE), null);
-  const other = buildWorkerSource("", { ...config, release: "fff0000fff0000" });
-  assert.match(workerProblems({ source: other, html: stamped })[0], /release fff0000fff0000 and the page is abc1234abc1234/);
-  const empty = buildWorkerSource("", { ...workerConfigFor({ sha: "", html: PAGE, files: FILES }), precache: [] });
+  assert.deepEqual(workerProblems({ source, html: stamped, hasFile, files: FILES }), [], "the same worker beside a page of any commit");
+  const named = buildWorkerSource("", { ...config, release: `abc1234abc1234-${config.release}` });
+  assert.match(workerProblems({ source: named, html: stamped }).join("\n"), /names the commit abc1234abc1234/);
+  const empty = buildWorkerSource("", { ...config, precache: [] });
   assert.match(workerProblems({ source: empty, html: PAGE }).join("\n"), /precaches nothing/);
 });
 
 test("a check can say which worker it found, and the kill switch is not found in silence", () => {
-  const config = workerConfigFor({ sha: "abc1234", html: PAGE, files: FILES });
+  const config = workerConfigFor({ html: PAGE, files: FILES });
   const release = describeWorker(buildWorkerSource("", config));
   assert.equal(release.killed, false);
   assert.match(release.text, new RegExp(`^sw\\.js is release ${config.release}: 10 files kept at install, 5 more`));

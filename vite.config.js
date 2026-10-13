@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
-import { buildKillSource, buildWorkerSource, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
+import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { seasonData } from "./scripts/vite-season-data.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 
@@ -174,6 +174,11 @@ function absoluteSiteUrls() {
  * release it pressed rather than check whichever one is still live. Render sets
  * `RENDER_GIT_COMMIT` on every build; a local build has none and writes nothing,
  * which keeps `dist/index.html` byte-identical for the e2e preview probe.
+ *
+ * This line is the only place a build says its commit. The service worker's
+ * release is named for the page without it (`pageWithoutCommit`,
+ * scripts/service-worker-build.mjs), which reads the line as it is written
+ * here: on a line of its own, in front of `</head>`.
  */
 function buildShaMeta() {
   return {
@@ -256,9 +261,12 @@ function renderHeaders() {
  *
  * After the bundle is on disk, because what the worker keeps is read off the
  * finished page: the files `index.html` names once every other plugin here has
- * had its turn with it, and the commit `buildShaMeta` wrote into it. The name
- * has no hash -- a browser asks for a worker by one fixed address -- so
- * render.yaml serves it `no-cache`, like the page.
+ * had its turn with it. The commit `buildShaMeta` wrote into that page is the
+ * one thing left out: the worker says nothing about which commit it came
+ * from, so two commits that ship the same files write the same worker and a
+ * device that has one keeps what it has. The name has no hash -- a browser
+ * asks for a worker by one fixed address -- so render.yaml serves it
+ * `no-cache`, like the page.
  *
  * `SERVICE_WORKER=off` is the kill switch: the build writes a worker that
  * removes itself and its caches, and the page stops registering one
@@ -270,7 +278,7 @@ function serviceWorker() {
   return {
     name: "service-worker",
     apply: "build",
-    writeBundle(options, bundle) {
+    writeBundle(options) {
       const outDir = options.dir ?? "dist";
       const target = path.join(outDir, WORKER_FILE);
       if (serviceWorkerKilled()) {
@@ -278,10 +286,13 @@ function serviceWorker() {
         return;
       }
       const html = readFileSync(path.join(outDir, "index.html"), "utf8");
-      // The bundle's own files, and what `public/` put at the root.
-      const files = [...Object.keys(bundle), ...readdirSync(outDir)].map((file) => `/${file.replace(WINDOWS_SEPARATOR, "/")}`);
-      const config = workerConfigFor({ sha: process.env.RENDER_GIT_COMMIT, html, files: [...new Set(files)] });
-      writeFileSync(target, buildWorkerSource(readFileSync("src/serviceWorker/worker.js", "utf8"), config));
+      const template = readFileSync("src/serviceWorker/worker.js", "utf8");
+      // Everything on disk -- the bundle's own files and what `public/` put
+      // beside them -- with a hash of each: the release is named for those
+      // and not for `RENDER_GIT_COMMIT`, so a commit that ships the same
+      // files writes the same `sw.js`.
+      const config = workerConfigFor({ html, files: shippedFiles(outDir), logic: workerBody(template) });
+      writeFileSync(target, buildWorkerSource(template, config));
     },
   };
 }

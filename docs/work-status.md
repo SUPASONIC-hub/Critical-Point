@@ -846,8 +846,11 @@ Still open, on purpose:
     file it is only reported).
     `node scripts/check-deploy.mjs --offline` checks `render.yaml` and
     `dist/index.html` (no inline script, no `on*=` handler, no `javascript:`
-    URL) without a network, and `dist/sw.js` against that page (priority 89).
-    The live check fails when `/sw.js` is missing or is another release's.
+    URL) without a network, and `dist/sw.js` against that page and against
+    every file of the build, whose hash is the release's name (priority 89).
+    The live check fails when `/sw.js` is missing, is another release's (the
+    half of the name the page decides, and the entry script), or names the
+    page's commit.
 67. A timing helper that samples a rendered variable and acts a frame later has
     to aim at the middle of the tolerance, not its edge, and has to see the
     value change before trusting it -- a variable written every frame and then
@@ -1209,8 +1212,13 @@ Still open, on purpose:
       a deploy has to fail as before, because that failure is what priority 86
       turns into a reload. Offline it fails too, and `LazyScreen` shows
       "연결이 끊겼습니다 · 다시 시도" instead.
-    - One cache per release (`critical-point-<release>`); the release is the
-      commit on Render and a hash of the built page elsewhere. Install keeps
+    - One cache per release (`critical-point-<release>`); the release is
+      named for what is shipped and not for the commit: a hash of the file
+      names the page names, then a hash of every file in `dist/` (path and
+      bytes), the page without its `build-sha` line and the worker's code.
+      A merge that ships the same files writes the same `sw.js` to the byte
+      and no device downloads anything again; a file from `public/` that
+      changes behind its name is another release. Install keeps
       every file the built page names and fails if one is missing or if the
       page it fetched is not this release's. Activation deletes the other
       releases' caches.

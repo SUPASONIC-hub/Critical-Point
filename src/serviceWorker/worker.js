@@ -37,12 +37,15 @@
  * as it always did, because the failure is what `state/chunkReload.js` turns
  * into a reload.
  *
- * One cache per release, named for it: the commit, and a hash of the files the
- * page names, so the same commit built again with other settings is another
- * release (scripts/service-worker-build.mjs). A new release installs beside
- * the old one, takes over at once (`skipWaiting`, `clients.claim`) and deletes
- * every other release's cache: with the page network-first and the assets
- * named by hash, there is no moment where an old page is fed a new file.
+ * One cache per release, named for it: a hash of the files the build ships
+ * and of this code, and not the commit, so a commit that ships the same files
+ * is the same release and this file is the same to the byte -- the browser
+ * finds nothing to install and the cache stays -- while the same commit built
+ * again with other settings is another (scripts/service-worker-build.mjs). A
+ * new release installs beside the old one, takes over at once (`skipWaiting`,
+ * `clients.claim`) and deletes every other release's cache: with the page
+ * network-first and the assets named by hash, there is no moment where an old
+ * page is fed a new file.
  */
 export const CACHE_PREFIX = "critical-point-";
 export const SHELL_URL = "/index.html";
