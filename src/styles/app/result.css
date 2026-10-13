@@ -290,7 +290,11 @@
   align-items: baseline;
   gap: 4px 10px;
 }
-.judgment-profile-panel span {
+.judgment-profile-panel span,
+.outcome-panel-mark span,
+.next-case-panel span,
+.rank-copy span,
+.session-panel span {
   color: var(--ui-text-3);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -386,14 +390,6 @@
   background:
     radial-gradient(90% 70% at 0% 100%, rgb(255 206 115 / 0.08), transparent 65%),
     var(--ui-surface-1);
-}
-.outcome-panel-mark span,
-.next-case-panel span,
-.rank-copy span {
-  color: var(--ui-text-3);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
 }
 .outcome-panel-mark strong {
   justify-self: start;
@@ -620,7 +616,8 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
 }
-.result-why .panel-title-row span {
+.result-why .panel-title-row span,
+.report-archive > summary b {
   color: var(--ui-text-3);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -636,7 +633,8 @@
   font-weight: 800;
   letter-spacing: -0.025em;
 }
-.result-why-grid {
+.result-why-grid,
+.ending-axis-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -688,7 +686,9 @@
   font-size: 0.875rem;
   font-weight: 700;
 }
-.result-why-doors li small {
+.result-why-doors li small,
+.pressure-ledger-grid span,
+.pressure-ledger-grid small {
   color: var(--ui-text-3);
   font-size: 0.75rem;
 }
@@ -756,11 +756,6 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
-.report-archive > summary b {
-  color: var(--ui-text-3);
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
 .report-archive-body {
   display: grid;
   gap: 12px;
@@ -811,11 +806,6 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-sm);
 }
-.pressure-ledger-grid span,
-.pressure-ledger-grid small {
-  color: var(--ui-text-3);
-  font-size: 0.75rem;
-}
 .pressure-ledger-grid b {
   color: var(--ui-text);
   font-size: 1.375rem;
@@ -849,7 +839,8 @@
   justify-content: space-between;
   gap: 16px;
 }
-.fingerprint-heading > div {
+.fingerprint-heading > div,
+.session-panel > div {
   min-width: 0;
 }
 .fingerprint-heading h2 {
@@ -892,7 +883,9 @@
 .fingerprint-grid b {
   font-size: 1rem;
 }
-.fingerprint-grid small {
+.fingerprint-grid small,
+.counterfactual-scene small,
+.counterfactual-path small {
   color: var(--ui-text-3);
   font-size: 0.75rem;
   line-height: 1.4;
@@ -942,12 +935,6 @@
   font-weight: 700;
   letter-spacing: 0.1em;
 }
-.counterfactual-scene small,
-.counterfactual-path small {
-  color: var(--ui-text-3);
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
 .counterfactual-path {
   border-left: 2px solid var(--ui-line-strong);
 }
@@ -984,7 +971,11 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
-.achievement-panel {
+.achievement-panel,
+.feedback-panel,
+.route-atlas,
+.observer-postmortem,
+.resource-delta-panel {
   padding: 18px;
   color: var(--ui-text);
   background: var(--ui-surface-2);
@@ -1009,7 +1000,9 @@
   color: var(--ui-accent);
   font-size: 0.9375rem;
 }
-.achievement-panel p {
+.achievement-panel p,
+.session-panel p,
+.observer-postmortem-grid p {
   margin: 0;
   color: var(--ui-text-2);
   font-size: 0.8125rem;
@@ -1026,27 +1019,12 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-md);
 }
-.session-panel > div {
-  min-width: 0;
-}
-.session-panel span {
-  color: var(--ui-text-3);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
 .session-panel strong {
   display: block;
   margin: 5px 0;
   font-family: var(--font-mono);
   font-size: 1.75rem;
   letter-spacing: 0.08em;
-}
-.session-panel p {
-  margin: 0;
-  color: var(--ui-text-2);
-  font-size: 0.8125rem;
-  line-height: 1.5;
 }
 .remote-status {
   display: inline-block;
@@ -1059,7 +1037,8 @@
   line-height: 1.4;
 }
 .remote-status.ready,
-.remote-status.success {
+.remote-status.success,
+.delta-up {
   color: var(--ui-accent);
   background: var(--ui-accent-soft);
 }
@@ -1068,7 +1047,8 @@
   color: var(--c-amber);
   background: rgb(255 206 115 / 0.1);
 }
-.remote-status.error {
+.remote-status.error,
+.delta-down {
   color: var(--c-danger-81);
   background: var(--ui-heat-soft);
 }
@@ -1121,13 +1101,6 @@
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-sm);
   font-weight: 700;
-}
-.feedback-panel {
-  padding: 18px;
-  color: var(--ui-text);
-  background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-md);
 }
 .feedback-prompts {
   margin-bottom: 12px;
@@ -1268,13 +1241,6 @@
   font-size: 0.8125rem;
   letter-spacing: 0;
 }
-.route-atlas {
-  padding: 18px;
-  color: var(--ui-text);
-  background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-md);
-}
 .route-atlas-track {
   display: grid;
   grid-auto-flow: column;
@@ -1383,13 +1349,6 @@
   font-size: 0.75rem;
   line-height: 1.5;
 }
-.observer-postmortem {
-  padding: 18px;
-  color: var(--ui-text);
-  background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-md);
-}
 .observer-postmortem-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1406,7 +1365,8 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-sm);
 }
-.observer-postmortem-grid span {
+.observer-postmortem-grid span,
+.history article .history-observer span {
   color: var(--ui-accent);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -1414,12 +1374,6 @@
 .observer-postmortem-grid strong {
   font-size: 0.875rem;
   line-height: 1.4;
-}
-.observer-postmortem-grid p {
-  margin: 0;
-  color: var(--ui-text-2);
-  font-size: 0.8125rem;
-  line-height: 1.5;
 }
 .ending-reveal {
   border-color: var(--ui-line-accent);
@@ -1495,11 +1449,6 @@
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
 }
-.history article .history-observer span {
-  color: var(--ui-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-}
 .history-observer p {
   margin: 0;
   font-size: 0.8125rem;
@@ -1538,13 +1487,6 @@
   border-left-color: var(--ui-accent);
   font-weight: 700;
 }
-.resource-delta-panel {
-  padding: 18px;
-  color: var(--ui-text);
-  background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-md);
-}
 .resource-delta-panel h2 {
   margin: 0 0 14px;
   font-size: 0.9375rem;
@@ -1582,14 +1524,6 @@
   font-size: 0.75rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-.delta-up {
-  color: var(--ui-accent);
-  background: var(--ui-accent-soft);
-}
-.delta-down {
-  color: var(--c-danger-81);
-  background: var(--ui-heat-soft);
 }
 /* The season's extension panels are one inner surface on the report. Their
    own rules, further down, set only what differs from panel to panel; the
@@ -1736,7 +1670,8 @@
   .result-hero-copy {
     display: contents;
   }
-  .result-hero-copy > p {
+  .result-hero-copy > p,
+  .judgment-profile-panel {
     grid-column: 1 / -1;
   }
   .result-hero h1 {
@@ -1763,9 +1698,6 @@
   .rank-mark small {
     font-size: 0.6875rem;
     letter-spacing: 0;
-  }
-  .judgment-profile-panel {
-    grid-column: 1 / -1;
   }
 }
 @media (max-width: 480px) {
@@ -2085,7 +2017,8 @@
   height: 6px;
   overflow: hidden;
 }
-.ending-axis-grid em {
+.ending-axis-grid em,
+.ranking-comparison em {
   display: block;
   height: 100%;
 }
@@ -2108,10 +2041,6 @@
   display: block;
   height: 7px;
   overflow: hidden;
-}
-.ranking-comparison em {
-  display: block;
-  height: 100%;
 }
 .failure-cause {
   flex-basis: 100%;
@@ -2345,7 +2274,8 @@
   border-radius: var(--ui-radius-md);
   text-align: left;
 }
-.ending-coda > span {
+.ending-coda > span,
+.ending-axis-grid span {
   color: var(--c-acid);
   font-size: 0.625rem;
   font-weight: 900;
@@ -2362,21 +2292,10 @@
   font-weight: 750;
   line-height: 1.6;
 }
-.ending-axis-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
 .ending-axis-grid article {
   display: grid;
   gap: 8px;
   padding: 12px;
-}
-.ending-axis-grid span {
-  color: var(--c-acid);
-  font-size: 0.625rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
 }
 .ending-axis-grid b {
   font-size: 1.375rem;
@@ -2412,14 +2331,19 @@
   display: grid;
   gap: 3px;
 }
-.season-goal-strip b {
+.season-goal-strip b,
+.play-report-panel article small,
+.telemetry-dashboard-panel small {
   font-size: 0.625rem;
 }
 .season-goal-strip small {
   font-size: 0.6875rem;
   line-height: 1.35;
 }
-.balance-report p {
+.balance-report p,
+.ending-preview-panel p,
+.authority-review-panel p,
+.aftermath-panel p {
   font-size: 0.75rem;
   line-height: 1.5;
 }
@@ -2465,24 +2389,17 @@
   font-weight: 850;
 }
 .ranking-comparison b,
-.ranking-comparison small {
+.ranking-comparison small,
+.replay-diagnostics p {
   font-size: 0.6875rem;
 }
 .ending-preview-panel strong {
   font-size: 1.0625rem;
 }
-.ending-preview-panel p {
-  font-size: 0.75rem;
-  line-height: 1.5;
-}
 .play-report-panel article {
   display: grid;
   gap: 2px;
   min-width: 74px;
-}
-.play-report-panel article small,
-.telemetry-dashboard-panel small {
-  font-size: 0.625rem;
 }
 .play-report-panel p {
   font-size: 0.6875rem;
@@ -2506,17 +2423,6 @@
 .authority-review-panel strong {
   font-size: 0.9375rem;
   line-height: 1.45;
-}
-.authority-review-panel p {
-  font-size: 0.75rem;
-  line-height: 1.5;
-}
-.aftermath-panel p {
-  font-size: 0.75rem;
-  line-height: 1.5;
-}
-.replay-diagnostics p {
-  font-size: 0.6875rem;
 }
 .ending-shell,
 .ending-shell *,
