@@ -600,7 +600,7 @@ npm run dev
 자주 쓰는 명령:
 
 ```bash
-npm run verify:static   # 브라우저 없는 검사 25개를 병렬로 (~1분)
+npm run verify:static   # 브라우저 없는 검사 26개를 병렬로 (~1분)
 npm run verify:quick    # + 프로덕션 빌드, 번들 예산, 빌드 위 런타임 스모크와 @prod e2e, 성능 예산
 npm run verify          # + 기본 e2e
 npm run test:coverage   # 단위·스모크 테스트 커버리지 (로직 모듈 합계 줄 94%·함수 94%·분기 87%, 모듈마다 하한)
@@ -855,7 +855,7 @@ Dependabot PR은 라벨 없이도 e2e와 시각 회귀를 모두 돕니다(의�
 ## 검증
 
 ```bash
-npm run verify:static # 브라우저가 필요 없는 검사 25개, 병렬 (~1분)
+npm run verify:static # 브라우저가 필요 없는 검사 26개, 병렬 (~1분)
 npm run verify:quick  # verify:static + 빌드 + 번들 예산 + 빌드 위 런타임 스모크 + @prod e2e + 성능 예산
 npm run verify        # verify:quick + 기본 e2e
 npm run verify:full   # verify + 전체 경로 검증 + 시즌 연속 걷기
@@ -865,7 +865,8 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 `verify:static`(`scripts/verify-static.mjs`)은 단위·스모크 테스트, lint(`eslint --cache`), 압박
 시뮬레이션, 엔딩, 밸런스, 타입(`check:types`), 대사, 그래프, 런타임 예산, 뷰 계약, 상수, 텍스트, 쉬운 말,
 인코딩, CSS 토큰, CSS 구조, CSS 포맷, 아트 예산, 폰트, 내보내기 스키마, 테스트 저장소 키, 시각
-베이스라인, Node 핀, DB 권한, 서사 사실(canon) 25개 검사를 한꺼번에 돌리고, 모두 끝난 뒤 실패한 것을 모아 보고합니다.
+베이스라인, Node 핀, DB 권한, 서사 사실(canon), 문서에 적힌 숫자(`check:doc-numbers`) 26개 검사를 한꺼번에 돌리고,
+모두 끝난 뒤 실패한 것을 모아 보고합니다.
 한 검사가 실패해도 나머지가 가려지지 않습니다. `npm test`도 `node --test`로 돌아가므로 어서션 하나가
 실패해도 나머지가 모두 실행되고, `tests/unit/**/*.test.mjs`를 함께 줍니다.
 

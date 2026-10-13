@@ -375,7 +375,7 @@ README의 문장으로는 "예산은 내리기만 하고 올리지 않습니다.
 | 괄호로 풀어 주는 용어 | 189개 | README |
 | 추적하는 파일 | 14 → 465 | 첫 커밋, `git ls-files` |
 | `src`의 JS·JSX | 77,491줄 (그중 사건 파일 49,663줄) | `git ls-files`와 `wc -l` |
-| 정적 검사 | 16 → 19 → 25 | 9월 4일·11일 커밋 메시지, `npm run verify:static` |
+| 정적 검사 | 16 → 19 → 25 → 26 | 9월 4일·11일 커밋 메시지, `npm run verify:static` |
 | 단위 테스트 | 767개 통과 | `npm test` |
 | 브라우저 테스트 | 스펙 파일 18개, `test(` 165개 | `tests/*.spec.js` |
 | 워크플로 | 5 | `.github/workflows/` |

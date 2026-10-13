@@ -12,7 +12,7 @@ list of the files it touched.
 - The season is 55 cases: 프롤로그 01-05, 사건 01-49 and the finale
   (`CASE_SEQUENCE` in `src/gameCases.js`). A season deals about 490 decision
   windows, about 9 a case.
-- `npm run verify:static` (25 checks, in parallel, about a minute) and `npm run
+- `npm run verify:static` (26 checks, in parallel, about a minute) and `npm run
   verify:quick` pass. The browser tiers run against the production build served
   by `vite preview`, not the dev server.
 - The play screen holds one decision on one screen: on a 390x844 phone the page
@@ -1233,7 +1233,7 @@ Still open, on purpose:
 ## Verification Commands
 
 ```bash
-npm run verify:static   # 25 checks, in parallel
+npm run verify:static   # 26 checks, in parallel
 npm run verify:quick    # + check:specs, build:e2e, check:bundle, check:deploy:offline,
                         #   test:runtime, test:e2e:preview, test:performance
 npm run verify          # + test:e2e
@@ -1242,7 +1242,7 @@ npm run test:coverage   # the unit tests with per-module coverage floors
 npm run test:visual:docker   # visual regression in the pinned Linux container
 ```
 
-`npm run verify:static` is `scripts/verify-static.mjs`: 25 checks run side by
+`npm run verify:static` is `scripts/verify-static.mjs`: 26 checks run side by
 side in a pool, each one's output held and printed as a block, and the run fails
 after all of them have reported. The list is `CHECKS` in that file, and each
 entry is an npm script, so `npm run <check>` alone does exactly what it does
@@ -1255,8 +1255,8 @@ is), `check:dialogue`, `check:graph`, `check:runtime-budget`, `check:views`,
 `check:constants`, `check:text`, `check:plain-language`, `check:encoding`,
 `check:css`, `check:css-structure`, `format:check`, `check:art`,
 `check:fonts`, `check:export-schema`, `check:test-storage`,
-`check:visual-baselines`, `check:node`, `check:grants` and `check:canon`. None
-of them needs a browser.
+`check:visual-baselines`, `check:node`, `check:grants`, `check:canon` and
+`check:doc-numbers`. None of them needs a browser.
 
 `test:coverage` is `scripts/check-coverage.mjs`. It leaves the authored data
 (`src/nodes/`, `gameData.js`, `gameDialogue.js`, `gameCases.js`, the copy
