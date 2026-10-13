@@ -1349,6 +1349,8 @@ summary:focus-visible {
 }
 .intro-drawer {
   min-width: 0;
+  /* Clears the fixed music pills: their top, 38px of height, 8px of air. */
+  scroll-margin-top: calc(max(16px, env(safe-area-inset-top)) + 46px);
   background: var(--ui-surface-1);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-md);

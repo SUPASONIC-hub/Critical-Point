@@ -97,3 +97,16 @@ test("a phone on its side keeps the fold that prints the question and the cards 
   assert.match(responsive, /\(max-height: 480px\)[\s\S]*?\.gx-brief \{\s*grid-row: 2;\s*\}/);
   assert.match(responsive, /\(max-height: 360px\)[^{]*\{\s*\.gx-speaker \{\s*display: none;\s*\}[\s\S]*?\.gx-question \{\s*grid-column: 1;\s*\}\s*\.gx-brief \{\s*grid-row: 1;\s*\}/);
 });
+test("an intro drawer opened by its link stops below the music pills", () => {
+  const intro = sheet("base-intro-ranking");
+  const pills = intro.match(/\.music-controls \{[^}]*\}/)?.[0] ?? "";
+  const size = intro.match(/\.music-toggle,\s*\.music-volume-toggle \{[^}]*\}/)?.[0] ?? "";
+  const drawer = intro.match(/\n\.intro-drawer \{[^}]*\}/)?.[0] ?? "";
+  const top = pills.match(/top: (max\(16px, env\(safe-area-inset-top\)\));/)?.[1];
+  const height = Number(size.match(/min-height: (\d+)px;/)?.[1]);
+  assert.ok(top && height, "the pills are still placed and sized where this reads them");
+  const margin = drawer.match(/scroll-margin-top: calc\((.*) \+ (\d+)px\);/);
+  assert.ok(margin, "the drawer has a scroll margin");
+  assert.equal(margin[1], top, "the same offset the pills are pinned at, notch included");
+  assert.ok(Number(margin[2]) > height, "and more than their height below it");
+});
