@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { getNextCaseSignal, nextCaseSignals, resolveInterludeLines } from "../../src/caseCopy.js";
-import { nodeOrders, nodes } from "../../src/gameData.js";
+import { caseAftermathNodeId, nodeOrders, nodes } from "../../src/gameData.js";
+import { getCaseOutcome } from "../../src/gameLogic.js";
 
 /**
  * The interlude on a case's report (src/caseCopy.js). Most are one fixed
@@ -106,6 +107,62 @@ test("a dated record names a scene of its own case, one card line and a fallback
     // Each line is a paragraph on the report, keyed by its text.
     assert.equal(new Set(fallen).size, fallen.length, caseId);
   }
+});
+
+/**
+ * The report prints 내가 만든 결말 directly above the 막간: the tag, title and
+ * text of the outcome keyed by the card that closed the case, which is the one
+ * the log holds for the case's aftermath scene (useResultReport.js). The screen
+ * check of 사건 06 read one card in both panels, so each record is resolved
+ * here for every card its scene deals beside every outcome the case can close
+ * on, and the two panels may share no sentence and the record no label twice.
+ */
+const closings = (caseId) => nodes[caseAftermathNodeId(caseId)].choices.filter((candidate) => candidate.type !== "reframe");
+const count = (text, part) => text.split(part).length - 1;
+
+test("a dated record prints its card once and no sentence of the outcome panel above it", () => {
+  for (const [caseId, interlude] of records) {
+    assert.ok(closings(caseId).length >= 3, caseId);
+    for (const choice of nodes[interlude.cardOf].choices.filter((candidate) => candidate.type !== "reframe")) {
+      const lines = resolveInterludeLines(interlude, [card(interlude.cardOf, choice.label)]);
+      const printed = [interlude.label, interlude.title, ...lines].join("\n");
+      assert.equal(count(printed, choice.label), 1, `${caseId}: ${choice.id} is printed ${count(printed, choice.label)} times`);
+      assert.equal(new Set(lines).size, lines.length, `${caseId}: ${choice.id}`);
+      for (const closing of closings(caseId)) {
+        const outcome = getCaseOutcome({ caseId, choiceId: closing.id });
+        // An outcome of the case's own, not the line a missing key falls back to.
+        assert.notEqual(outcome.tag, getCaseOutcome({ caseId, choiceId: "" }).tag, `${caseId}: ${closing.id}`);
+        for (const said of [outcome.tag, outcome.title, outcome.text]) {
+          assert.ok(!printed.includes(said), `${caseId}: ${choice.id} repeats the outcome panel's "${said}"`);
+          assert.ok(!said.includes(choice.label), `${caseId}: the outcome of ${closing.id} already prints ${choice.id}`);
+        }
+      }
+    }
+  }
+});
+
+/**
+ * Every record quotes the card of the committee scene, so the outcome panel and
+ * the record are about two different cards of the run. 사건 06 once named its
+ * aftermath scene, the one whose card the outcome panel is keyed by: every run
+ * read that one card as the panel's title and again, as its label, in the
+ * record under it. Its line now quotes c6_final and is dated 위원회 당일, the
+ * day of that scene, and the line shown without a card is of that day too.
+ */
+test("a dated record quotes a card other than the one the outcome panel is keyed by", () => {
+  for (const [caseId, interlude] of records) {
+    assert.notEqual(interlude.cardOf, caseAftermathNodeId(caseId), caseId);
+    // The scene before the aftermath on the case's written route: the committee.
+    assert.equal(interlude.cardOf, `c${Number(caseId.slice(4))}_final`, caseId);
+  }
+  const case06 = nextCaseSignals.case06.interlude;
+  const cardAt = case06.text.findIndex((line) => line.includes("{card}"));
+  assert.equal(case06.text[cardAt], "위원회 당일 — 당신이 고른 것: {card}.");
+  assert.equal(case06.fallback, "위원회 당일 — 회의록 결론 칸은 한서윤이 채움.");
+  // In date order: after the committee sits, before the resignation that evening.
+  assert.match(case06.text[cardAt - 1], /^위원회 당일 — /);
+  assert.match(case06.text[cardAt + 1], /^위원회 당일 저녁 — /);
+  assert.ok([...case06.text, case06.fallback].every((line) => !/^위원회 다음 날 — /.test(line)));
 });
 
 test("the runtime gets one signal object per resolved text", () => {
