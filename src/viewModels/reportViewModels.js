@@ -4,7 +4,10 @@
  */
 
 export function createEndingProfile({ finalEndingEntry }) {
+  // The id comes out of a saved log. Without a prototype the lookup finds only
+  // the three framings: "toString" from a damaged save is undecided, not a function.
   return {
+  __proto__: null,
   ending_seal: {
     tag: "봉인",
     title: "당신은 문을 닫았지만, 흔적은 남겼다.",
