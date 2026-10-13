@@ -461,6 +461,15 @@ export function useChoiceCommit(context) {
         vault: nextRun.vault,
         spokenChoice: entry.spokenChoice,
         beat: entry.sceneBeat,
+        // What this card's own line says came of it. The reveal closed on the
+        // last sentence of the beat, which is one of three templates
+        // (describeDelta), so some 490 reveals a season ended on a dozen
+        // sentences while the line written for the card was shown only in the
+        // archive. The reframe card has no line of its own (the default echo),
+        // and a line written for a card that was confirmed is not what came of
+        // a bust or of a card the clock staked: those keep the sentence made
+        // from the effect.
+        echo: reframe || busted || forced ? null : entry.echo,
         effect: finalEffect,
         clue,
         skippedTitle: blackoutSkip?.skippedTitle ?? null,
