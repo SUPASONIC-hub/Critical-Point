@@ -7,22 +7,17 @@ import {
 } from "../appConfig.js";
 import {
   CASE_SEQUENCE,
-  CASE_START_NODES,
-  SEASON_ENTRY_CASE,
-  caseOpeningRoutes,
   initialResources,
   nodeOrders,
   seasonCasesBase,
 } from "../gameData.js";
-import { applyEffect, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getSeasonWear } from "../gameLogic.js";
-import { caseIntroEchoes, legacyProfiles } from "../caseCopy.js";
 import { holdCloudCopyThroughReset } from "../cloudSave.js";
 import { openCaseRun } from "../gauntlet/gauntletEngine.js";
 import { getTableRules } from "../gauntlet/tableUnlocks.js";
 import { getSessionId as getSessionIdDefault, telemetryEnabled } from "../telemetry.js";
 import { getAccessibility } from "./accessibilitySettings.js";
+import { describeCaseOpening } from "./caseRoutes.js";
 import { confirmAction } from "./confirmAction.js";
-import { createOpeningResources } from "./openingState.js";
 import { runTransition } from "./runState.js";
 import { clearRunStorage, logStorageResetFailure } from "./runStorageReset.js";
 import { appendTraceEvent } from "./trace.js";
@@ -32,55 +27,6 @@ import { leaveReplaySession } from "./useAppPersistence.js";
 // not replaced by the next run until the player says so (cloudSave.js).
 const CONFIRM_RESET =
   "저장된 진행, 순위 기록, 복구 지점, 오류 기록을 모두 지울까요? 화면과 소리 설정, 도구 도감, NEW GAME+ 기록, 게시판 이름, 이어하기 코드와 온라인에 올린 저장은 남습니다. 온라인 저장은 새 진행을 올리기 전에 시작 화면에서 어느 쪽을 남길지 묻습니다.";
-
-/**
- * What a case opens with, worked out from how the one before it closed: the
- * scene, the hand, the legacy the table shows, and the line under the scene.
- */
-function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
-  const baseStartNode = CASE_START_NODES[caseId];
-  const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
-  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
-  const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
-  const nodeId = caseOpeningRoutes[caseId]?.[previousResult?.outcomeChoiceId] ?? baseStartNode;
-  const previousOutcome = previousResult?.outcomeChoiceId
-    ? getCaseOutcome({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
-    : null;
-  // The outcome and carryover tables are keyed by the case that produced the
-  // outcome; the continuity challenges are keyed by the case they open
-  // (`case01: { p5_after_hold, ... }`). Looking them up under the previous
-  // case found nothing, so no authored challenge ever reached a table.
-  const continuityChallenge = previousResult?.outcomeChoiceId
-    ? getContinuityChallenge({ caseId, choiceId: previousResult.outcomeChoiceId })
-    : null;
-  const carryoverEffect = previousResult?.outcomeChoiceId
-    ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: previousResult.outcomeChoiceId })
-    : {};
-  const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
-  // What the season has worn down is added on top, as check:endings replays it.
-  const openingEffect = { ...(baseLegacy?.effect ?? {}) };
-  [carryoverEffect, getSeasonWear(caseId)].forEach((effect) => Object.entries(effect).forEach(([key, value]) => {
-    openingEffect[key] = (openingEffect[key] ?? 0) + value;
-  }));
-  const openingLegacy = previousResult
-    ? {
-        ...baseLegacy,
-        effect: openingEffect,
-        continuity: previousOutcome,
-        continuityChallenge,
-      }
-    : null;
-  const echo = previousOutcome
-    ? `${introEcho} 직전 사건의 결과는 '${previousOutcome.title}'로 기록됐습니다. 이번 사건은 그 선택의 비용을 이어받습니다.`
-    : introEcho;
-  // The origin bonus is the run's opening hand, so it belongs to the season's
-  // first case -- which is the 프롤로그 now, not 사건 01.
-  const seasonOpening = caseId === SEASON_ENTRY_CASE && !previousResult;
-  const resources = seasonOpening
-    ? createOpeningResources(operatorOrigin)
-    : previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
-  return { nodeId, resources, openingLegacy, echo, note: previousResult?.outcomeChoiceId ?? "season-start" };
-}
 
 /**
  * Starting, opening, jumping, leaving and wiping a run.

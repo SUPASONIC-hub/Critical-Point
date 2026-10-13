@@ -39,6 +39,7 @@
     "src/serviceWorker/worker.js": 99,
     "src/state/accessibilitySettings.js": 100,
     "src/state/caseArrival.js": 100,
+    "src/state/caseRoutes.js": 99,
     "src/state/chunkReload.js": 98,
     "src/state/confirmAction.js": 100,
     "src/state/diagnosticUtils.js": 100,

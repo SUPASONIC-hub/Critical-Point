@@ -1,7 +1,7 @@
 import { expect } from "./network.js";
 import { SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
-import { getCaseBranchNodes, nodes, reframeRouteNodes } from "../../src/gameData.js";
-import { runsInto } from "../../src/seasonRules.js";
+import { nodes } from "../../src/gameData.js";
+import { getReframeTarget } from "../../src/state/caseRoutes.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
 // Both sit under the test timeout (playwright.config.js, 60s). At 60s each the
@@ -247,7 +247,8 @@ export async function chooseFirstAvailableChoice(page) {
 }
 
 /**
- * Where committing `choice` sends the run, as useChoiceCommit decides it.
+ * Where committing `choice` sends the run, as useChoiceCommit decides it
+ * (the jump is the runtime's own `getReframeTarget`).
  *
  * A 판을 다시 짠다 card does not follow its own `next`. Cashed (and the helper
  * always cashes), the first one that opens a route in a case jumps to the
@@ -258,22 +259,13 @@ export async function chooseFirstAvailableChoice(page) {
  * runtime counts it: log entries with `reframeOpenedRoute` whose caseId is the
  * run's case, or the season's entry case when the save names none it knows.
  */
-function reframeTargetFor(caseId, fromNodeId) {
-  const dramaticRoute = reframeRouteNodes[caseId];
-  if (dramaticRoute && runsInto(nodes, dramaticRoute, fromNodeId)) return null;
-  if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
-  const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
-  if (!branch || branch.nodeId === fromNodeId) return null;
-  return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
-}
-
 function expectedNextNode(saved, choice) {
   if (choice.type !== "reframe" || !saved) return choice.next;
   const currentCase = saved.currentCase;
   const countedCase = seasonCasesBase.some((caseItem) => caseItem.id === currentCase) ? currentCase : SEASON_ENTRY_CASE;
   const reframesOpened = (saved.log ?? []).filter((entry) => entry?.reframeOpenedRoute && entry.caseId === countedCase).length;
   if (reframesOpened > 0) return choice.next;
-  return reframeTargetFor(currentCase, saved.nodeId) ?? choice.next;
+  return getReframeTarget(currentCase, saved.nodeId) ?? choice.next;
 }
 
 export async function chooseSceneChoice(page, scene, choiceIndex) {
