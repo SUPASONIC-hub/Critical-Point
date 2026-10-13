@@ -897,7 +897,7 @@ npm run test:visual   # 시각 회귀만 (베이스라인은 리눅스 전용 �
 
 기본 e2e는 `@visual`(스크린샷)과 `@season-full`(시즌 연속 걷기)을 뺀 전부입니다. 스펙 파일을 직접 지정해도
 `--grep`을 함께 주지 않으면 이 둘은 빠집니다. 시즌은 일곱 사건씩
-여덟 구간(`@season-segment`)으로 나눠 걷고, GitHub Actions는 기본 e2e를 샤드 세 개에 나눠 push마다
+여덟 구간(`@season-segment`)으로 나눠 걷고, GitHub Actions는 기본 e2e를 샤드 다섯 개에 나눠 push마다
 돌립니다. 끊지 않는 연속 걷기(`npm run test:e2e:season`)와 전체 경로 검증(`npm run test:e2e:full`)은
 `Full Coverage` 워크플로가 매주 월요일과 수동 실행으로 수행합니다. 그 워크플로의 마지막 job은 실패한
 실행마다 이슈 "Full Coverage is failing"을 열거나 댓글을 달고(예약 실행에서는 시간 초과로 취소된 job도

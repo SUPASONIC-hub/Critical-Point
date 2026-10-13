@@ -54,7 +54,7 @@ list of the files it touched.
   what a new game, an opened case, a jump and a reset do to it, in memory and
   in the save, is read off the same table (priority 1).
 - Fast CI checks and the heavyweight e2e tier are split in GitHub Actions; the
-  e2e tier runs on three shards, and the uninterrupted season walk and full
+  e2e tier runs on five shards, and the uninterrupted season walk and full
   coverage run weekly. The weekly tier is twenty-four shards of two workers
   (it was twelve of four, and timed itself out), sized on 2026-10-05, when all
   twenty-four first passed. Its WebKit job runs twice, `@prod` on the build and
@@ -286,7 +286,7 @@ Still open, on purpose:
     tests in `visual-regression.spec.js` and `save-resume.spec.js` are in it.
     The season is walked in eight `@season-segment` tests of seven cases, each
     from a fresh save at its first case, which Verify runs as a job of its own
-    on four shards on every push; the rest of the list runs on three. The continuous walk -- the only thing that carries
+    on four shards on every push; the rest of the list runs on five. The continuous walk -- the only thing that carries
     resources and flags across all 55 cases -- is `npm run test:e2e:season`,
     run weekly by Full Coverage with `test:e2e:full`.
 18. The e2e runner takes a free port from the OS. Never pin one: a dev server
