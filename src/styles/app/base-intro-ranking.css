@@ -243,13 +243,17 @@ summary:focus-visible {
   background: rgba(255, 255, 255, 0.14);
   color: inherit;
 }
-.game-header h1:focus {
+.game-header h1:focus,
+.start-priority:focus {
   outline: none;
 }
 .story-reveal span {
   font-weight: 900;
 }
-.start-input-row input {
+.start-input-row input,
+.ranking-player,
+.ranking-stat,
+.ranking-detail {
   min-width: 0;
 }
 .start-input-row button {
@@ -1080,7 +1084,9 @@ summary:focus-visible {
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
-.resume-panel button:hover {
+.resume-panel button:hover,
+.ranking-status-bar button:hover,
+.board-composer-actions button:hover:not([aria-disabled]) {
   transform: translateY(-2px);
 }
 /* Protocol ticker -----------------------------------------------------------
@@ -1172,20 +1178,24 @@ summary:focus-visible {
   box-shadow: var(--ui-shadow-2);
   scroll-margin-top: 24px;
 }
-.start-priority:focus {
-  outline: none;
-}
 .start-console-heading {
   display: grid;
   gap: 10px;
   min-width: 0;
 }
-.start-console-heading > div {
+.start-console-heading > div,
+.board-field {
   display: grid;
   gap: 8px;
   min-width: 0;
 }
-.start-console-heading span {
+.start-console-heading span,
+.ranking-hero > span,
+.ranking-status-bar > div > span,
+.ranking-table-heading span,
+.board-hero > span,
+.board-status-bar > div > span,
+.board-list-heading span {
   color: var(--ui-accent);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -1308,7 +1318,9 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
 }
-.intro .past-run-memory span {
+.intro .past-run-memory span,
+.intro .origin-prologue span,
+.season-summary span {
   color: var(--ui-accent);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -1477,7 +1489,8 @@ summary:focus-visible {
 .prestart-heading {
   display: block;
 }
-.prestart-grid {
+.prestart-grid,
+.season-summary-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -1678,12 +1691,6 @@ summary:focus-visible {
   border-left: 3px solid var(--ui-accent);
   border-radius: var(--ui-radius-sm);
 }
-.intro .origin-prologue span {
-  color: var(--ui-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
 .intro .origin-prologue strong {
   font-size: 1rem;
   font-weight: 700;
@@ -1693,11 +1700,14 @@ summary:focus-visible {
   font-size: 0.875rem;
 }
 /* Data drawer: the consent box and the storage status, on glass. */
-.intro .data-info-panel {
+.intro .data-info-panel,
+.ranking-list,
+.board-list {
   display: grid;
   gap: 10px;
 }
-.consent-note {
+.consent-note,
+.board-post-status {
   margin: 0;
   color: var(--ui-text-2);
   font-size: 0.8125rem;
@@ -1842,22 +1852,11 @@ summary:focus-visible {
   gap: 6px;
   margin-bottom: 16px;
 }
-.season-summary span {
-  color: var(--ui-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
 .season-summary strong {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.35;
-}
-.season-summary-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
 }
 .season-summary-list article {
   padding: 14px 16px;
@@ -2199,7 +2198,8 @@ summary:focus-visible {
    The same glass system as the intro: a big headline, a status card with the
    one acid button, and the board as a stack of row cards. The first three
    positions are lit gold, silver and bronze; the player's own row glows acid. */
-.ranking-shell {
+.ranking-shell,
+.board-shell {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -2233,14 +2233,6 @@ summary:focus-visible {
   max-width: 760px;
   margin-bottom: 28px;
 }
-.ranking-hero > span,
-.ranking-status-bar > div > span,
-.ranking-table-heading span {
-  color: var(--ui-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
 .ranking-hero h1 {
   margin: 14px 0 14px;
   color: var(--ui-text);
@@ -2250,7 +2242,8 @@ summary:focus-visible {
   line-height: 1.04;
   text-wrap: balance;
 }
-.ranking-hero p {
+.ranking-hero p,
+.board-hero p {
   margin: 0;
   color: var(--ui-text-2);
   font-size: 1rem;
@@ -2272,7 +2265,8 @@ summary:focus-visible {
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
 }
-.ranking-status-bar > div {
+.ranking-status-bar > div,
+.board-status-bar > div {
   display: grid;
   gap: 6px;
   min-width: 0;
@@ -2283,7 +2277,8 @@ summary:focus-visible {
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
-.ranking-status-bar p {
+.ranking-status-bar p,
+.board-status-bar p {
   margin: 0;
   color: var(--ui-text-2);
   font-size: 0.875rem;
@@ -2306,17 +2301,16 @@ summary:focus-visible {
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
-.ranking-status-bar button:hover {
-  transform: translateY(-2px);
-}
-.ranking-table-panel {
+.ranking-table-panel,
+.board-list-panel {
   padding: clamp(16px, 2.4vw, 24px);
   background: var(--ui-surface-1);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-1);
 }
-.ranking-table-heading {
+.ranking-table-heading,
+.board-list-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -2330,15 +2324,12 @@ summary:focus-visible {
   font-weight: 800;
   letter-spacing: -0.03em;
 }
-.ranking-table-heading small {
+.ranking-table-heading small,
+.board-list-heading small {
   color: var(--ui-text-3);
   font-size: 0.8125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-}
-.ranking-list {
-  display: grid;
-  gap: 10px;
 }
 .ranking-row {
   display: grid;
@@ -2381,11 +2372,6 @@ summary:focus-visible {
 }
 .ranking-row:nth-child(3) .ranking-position {
   color: rgb(226 162 116);
-}
-.ranking-player,
-.ranking-stat,
-.ranking-detail {
-  min-width: 0;
 }
 .ranking-player b,
 .ranking-player small,
@@ -2477,14 +2463,16 @@ summary:focus-visible {
   margin-top: 0;
   font-variant-numeric: tabular-nums;
 }
-.ranking-footnote {
+.ranking-footnote,
+.board-footnote {
   margin: 16px 4px 0;
   color: var(--ui-text-3);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.6;
 }
-.ranking-empty {
+.ranking-empty,
+.board-empty {
   margin: 0;
   padding: 44px 16px;
   color: var(--ui-text-2);
@@ -2500,10 +2488,6 @@ summary:focus-visible {
    status card, the same row-card stack. What is new is the composer, which is
    the only form in the app whose text another player reads, so it carries the
    counters, the privacy call-out and the hidden honeypot field. */
-.board-shell {
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
 .board-page {
   width: min(880px, 100%);
   margin: 0 auto;
@@ -2530,14 +2514,6 @@ summary:focus-visible {
   max-width: 720px;
   margin-bottom: 26px;
 }
-.board-hero > span,
-.board-status-bar > div > span,
-.board-list-heading span {
-  color: var(--ui-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
 .board-hero h1 {
   margin: 14px 0;
   color: var(--ui-text);
@@ -2546,13 +2522,6 @@ summary:focus-visible {
   letter-spacing: -0.045em;
   line-height: 1.06;
   text-wrap: balance;
-}
-.board-hero p {
-  margin: 0;
-  color: var(--ui-text-2);
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.75;
 }
 .board-status-bar {
   margin-bottom: 14px;
@@ -2570,22 +2539,10 @@ summary:focus-visible {
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-sm);
 }
-.board-status-bar > div {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
 .board-status-bar strong {
   font-size: 1.1875rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-}
-.board-status-bar p {
-  margin: 0;
-  color: var(--ui-text-2);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.55;
 }
 .board-composer {
   display: grid;
@@ -2596,11 +2553,6 @@ summary:focus-visible {
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-1);
-}
-.board-field {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
 }
 .board-field > span {
   color: var(--ui-text-2);
@@ -2698,34 +2650,10 @@ summary:focus-visible {
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
 }
-.board-composer-actions button:hover:not([aria-disabled]) {
-  transform: translateY(-2px);
-}
 .board-composer-actions button[aria-disabled] {
   color: var(--ui-text-3);
   background: var(--ui-surface-3);
   cursor: not-allowed;
-}
-.board-post-status {
-  margin: 0;
-  color: var(--ui-text-2);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.5;
-}
-.board-list-panel {
-  padding: clamp(16px, 2.4vw, 24px);
-  background: var(--ui-surface-1);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-lg);
-  box-shadow: var(--ui-shadow-1);
-}
-.board-list-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
 }
 .board-list-heading h2 {
   margin: 8px 0 0;
@@ -2733,16 +2661,6 @@ summary:focus-visible {
   font-size: 1.4375rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-}
-.board-list-heading small {
-  color: var(--ui-text-3);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.board-list {
-  display: grid;
-  gap: 10px;
 }
 .board-post {
   padding: 14px 18px;
@@ -2779,23 +2697,6 @@ summary:focus-visible {
   line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-}
-.board-empty {
-  margin: 0;
-  padding: 44px 16px;
-  color: var(--ui-text-2);
-  background: var(--ui-surface-2);
-  border: 1px dashed var(--ui-line-strong);
-  border-radius: var(--ui-radius-md);
-  text-align: center;
-  font-weight: 500;
-}
-.board-footnote {
-  margin: 16px 4px 0;
-  color: var(--ui-text-3);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.6;
 }
 
 /* The opening burst: the half second between pressing a case and its first
@@ -3002,9 +2903,7 @@ body {
   .intro .top-actions .ghost {
     width: auto;
   }
-  .intro .start-priority {
-    grid-template-columns: 1fr;
-  }
+  .intro .start-priority,
   .intro-drawer-grid {
     grid-template-columns: 1fr;
   }
