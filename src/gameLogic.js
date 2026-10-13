@@ -645,7 +645,7 @@ function getFinaleOutcome(log = []) {
 }
 
 const ENDINGS = {
-  collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 감당할 시간이 남지 않았다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true },
+  collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 사람이 치른 값을 감당하지 못했다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true },
   "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false },
   "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false },
   "human-record": { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false },
