@@ -173,7 +173,7 @@ test("the report and the ranking row show what the run recorded, never the devic
   // The case's own summary (the season's, on the finale: caseResults.final).
   // It ends the eyebrow line that says whose record this is, not the rank badge.
   assert.ok(result.includes('의 생각 활성 프로필{view.score.caseResults[currentCase]?.assistStory && " · 스토리 모드 · 공개 랭킹 제외"}</p>'));
-  assert.ok(result.includes("<small>{momentumTier} · {momentumScore} POINTS</small>"));
+  assert.ok(result.includes('<small lang="en">{momentumTier} · {momentumScore} POINTS</small>'));
   assert.equal(result.split("assistStory").length, 2, "and is printed once");
   // The row model's field, beside the table-time mark and in its class.
   assert.ok(ranking.includes('{entry.assistStory && <span className="ranking-assist">스토리 모드</span>}'));

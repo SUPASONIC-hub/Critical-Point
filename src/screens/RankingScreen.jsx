@@ -111,7 +111,7 @@ export function RankingScreen({
                     </div>
                     <div className="ranking-detail">
                       <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString("ko-KR") : "기록 시각 없음"}</span>
-                      <span>평균 {entry.averageResponseTime}s</span>
+                      <span>평균 {entry.averageResponseTime}초</span>
                       <span>판 다시 짜기 {entry.reframeCount}</span>
                       {entry.assistTime > 1 && <span className="ranking-assist">테이블 시간 ×{entry.assistTime}</span>}
                       {entry.assistStory && <span className="ranking-assist">스토리 모드</span>}

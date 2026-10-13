@@ -346,7 +346,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       </section>
       <section className="report-section">
         <h2 lang="en">Avg Time</h2>
-        <strong>{result.averageResponseTime}s</strong>
+        <strong>{result.averageResponseTime}초</strong>
         <p>각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가 명확했거나 압박이 약했을 수 있습니다.</p>
       </section>
       <section className="report-section wide-report">
@@ -392,7 +392,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     {observerRouteRecords.length > 0 && (
       <section className="observer-postmortem" aria-label="관찰자 회고">
         <div className="panel-title-row">
-          <h2>
+          <h2 lang="en">
             <Sparkles size={17} />
             OBSERVER POSTMORTEM
           </h2>
@@ -571,7 +571,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
                 <div>{renderSceneLines(entry.sceneBeat)}</div>
               </details>
             )}
-            <small>{entry.responseTimeSec}s · {entry.echo}</small>
+            <small>{entry.responseTimeSec}초 · {entry.echo}</small>
           </div>
         </article>
       ))}
