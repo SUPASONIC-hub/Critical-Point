@@ -356,7 +356,7 @@ export function IntroScreen({ view, renderers = {} }) {
           </div>
           <div className="start-panel start-console-section">
             <div className="start-section-heading">
-              <span>01 IDENTITY</span>
+              <span lang="en">01 IDENTITY</span>
               <strong>분석관 호출명</strong>
             </div>
             <label htmlFor="playerName">분석관 이름</label>
@@ -482,7 +482,7 @@ export function IntroScreen({ view, renderers = {} }) {
           </details>
           <details className="intro-drawer">
             <summary>
-              <span>02 ANALYST PROTOCOL</span>
+              <span lang="en">02 ANALYST PROTOCOL</span>
               <h2>어떤 방식으로 판단할까요?</h2>
             </summary>
           <section className="play-style-panel" aria-label="플레이 스타일 선택">
@@ -519,7 +519,7 @@ export function IntroScreen({ view, renderers = {} }) {
           </details>
           <details className="intro-drawer">
             <summary>
-              <span>03 OPERATOR ORIGIN</span>
+              <span lang="en">03 OPERATOR ORIGIN</span>
               <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
             </summary>
             <section className="operator-origin-panel start-console-section" aria-label="주인공 출신과 권한 선택">
@@ -659,7 +659,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     <b>{caseItem.label}</b>
                     <span>{triggerLabels[caseItem.result.primary[0]]}</span>
                     <small>
-                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}s · 판 다시 짜기{" "}
+                      RANK {caseItem.result.rank} · {caseItem.result.averageResponseTime}초 · 판 다시 짜기{" "}
                       {caseItem.result.reframeCount}
                     </small>
                   </article>
@@ -756,7 +756,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   )}
                   {savedResult && (
                     <small className="case-result-mini">
-                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}s · 판 다시 짜기{" "}
+                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}초 · 판 다시 짜기{" "}
                       {savedResult.reframeCount}
                     </small>
                   )}

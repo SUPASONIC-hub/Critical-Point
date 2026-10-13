@@ -105,7 +105,7 @@ export function TableNotices({ equipped, tab, clock, slam, onReload, onClaim, on
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />
           <span>장착</span>
-          <b>{RELICS[equipped.id].label}</b>
+          <b lang="en">{RELICS[equipped.id].label}</b>
         </div>
       )}
       {lost && <LostToTab onReload={onReload} />}

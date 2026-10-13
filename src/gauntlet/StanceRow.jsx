@@ -41,7 +41,7 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
             aria-describedby={blocked ? "gx-stance-blocked gx-stance-detail" : "gx-stance-detail"}
             onClick={() => onPick(mode)}
           >
-            <span>{profile.label}</span>
+            <span lang="en">{profile.label}</span>
             <em>
               <span className="sr-only">시즌 숙련 </span>
               {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}

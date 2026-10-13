@@ -416,7 +416,7 @@ export function GauntletStage({
         <div className="gx-read">
         <div className="gx-hud">
           <div className="gx-pot" aria-live="off">
-            <span className="gx-label">POT</span>
+            <span className="gx-label" lang="en">POT</span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
               {win.status === "bust" ? 0 : formatNumber(livePot)}
             </strong>
@@ -491,7 +491,7 @@ export function GauntletStage({
             <ul>
               {tableRules.slice(0, 3).map((mutation) => (
                 <li key={mutation.id} className={`mut-${mutation.id}`}>
-                  <strong>{mutation.label}</strong>
+                  <strong lang="en">{mutation.label}</strong>
                   <small>{mutation.title}</small>
                 </li>
               ))}

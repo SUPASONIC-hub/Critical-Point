@@ -49,7 +49,7 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
   return (
     <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
       <div className="gx-draft-panel">
-        <span className="gx-draft-kicker">CASE CLOSED · RELIC DRAFT</span>
+        <span className="gx-draft-kicker" lang="en">CASE CLOSED · RELIC DRAFT</span>
         <h2 id="gx-draft-title">다음 사건에 가져갈 도구 하나</h2>
         <p className="gx-draft-lede">고른 도구는 시즌이 끝날 때까지 테이블의 규칙 하나를 바꾼다. 고를 때까지 시계는 멈춰 있다.</p>
         <ul className="gx-draft-hand">
@@ -71,7 +71,7 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
                     <RelicIcon id={id} size={24} />
                   </span>
                   <span className="gx-relic-copy">
-                    <b>{relic.label}</b>
+                    <b lang="en">{relic.label}</b>
                     <strong>{relic.name}</strong>
                     <small>{relic.text}</small>
                   </span>

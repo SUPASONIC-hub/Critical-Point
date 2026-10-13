@@ -203,7 +203,7 @@ export function DecisionReveal({ view }) {
             <ul>
               {nextMutations.map((mutation) => (
                 <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
-                  <b>{mutation.label}</b>
+                  <b lang="en">{mutation.label}</b>
                   <small>
                     {mutation.title}
                     {mutation.axis ? ` · ${resourceMeta?.[mutation.axis]?.label ?? mutation.axis}` : ""}
