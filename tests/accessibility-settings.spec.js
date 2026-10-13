@@ -64,7 +64,7 @@ test("with single-key shortcuts off, a number stakes nothing and the save button
  * naming them: the digit on each card, the R and N chips on the report, the
  * hint line over the hand, and `aria-keyshortcuts` on eleven controls.
  */
-test("with single-key shortcuts off, no control names or draws a key that does nothing", async ({ page }) => {
+test("with single-key shortcuts off, no control names or draws a key that does nothing", async ({ page, hasTouch }) => {
   await withSettings(page, { letterKeys: false });
   await page.setViewportSize({ width: 1366, height: 768 });
   await startDebugNode(page, "case01", "start", { openTable: false });
@@ -82,7 +82,9 @@ test("with single-key shortcuts off, no control names or draws a key that does n
   await expect(page.locator(".choices .choice").first()).not.toHaveAttribute("aria-keyshortcuts");
   await expect(page.getByTestId("commit-push")).toHaveAttribute("aria-keyshortcuts", "Space");
   await expect(page.getByTestId("commit-focus")).not.toHaveAttribute("aria-keyshortcuts");
-  await expect(page.locator(".gx-hand-head small")).toHaveText("Space 밀기 · Enter 확정");
+  // Space and Enter are drawn where there may be a keyboard; a touch screen
+  // (mobile-chromium) is drawn no key at all, whatever the setting.
+  await expect(page.locator(".gx-hand-head small")).toHaveText(hasTouch ? "" : "Space 밀기 · Enter 확정");
 });
 
 test("with single-key shortcuts off, the report does not offer R or N", async ({ page }) => {
@@ -97,15 +99,106 @@ test("with single-key shortcuts off, the report does not offer R or N", async ({
   await expect(page.locator(".next-case-panel button")).not.toHaveAttribute("aria-keyshortcuts");
 });
 
-test("with the shortcuts on, the same controls name their keys", async ({ page }) => {
+test("with the shortcuts on, the same controls name their keys", async ({ page, hasTouch }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await startDebugNode(page, "case01", "start");
-  await expect(page.locator(".gx-card-key").first()).toHaveText("1");
+  // Named to a screen reader on every device; drawn only where there is a
+  // mouse or a trackpad (see "a key is drawn only where..." below).
+  if (hasTouch) await expect(page.locator(".gx-card-key")).toHaveCount(0);
+  else await expect(page.locator(".gx-card-key").first()).toHaveText("1");
   await expect(page.locator(".choices .choice").first()).toHaveAttribute("aria-keyshortcuts", "1");
   await expect(page.getByTestId("commit-push")).toHaveAttribute("aria-keyshortcuts", "Space W");
   await expect(page.getByTestId("commit-focus")).toHaveAttribute("aria-keyshortcuts", "E");
-  await expect(page.locator(".gx-hand-head small")).toContainText("W 밀기");
+  if (hasTouch) await expect(page.locator(".gx-hand-head small")).toHaveText("");
+  else await expect(page.locator(".gx-hand-head small")).toContainText("W 밀기");
 });
+
+/**
+ * The setting was all a hint asked about, so a phone drew a digit on every
+ * card of the table, the briefing page and the relic draft, and R and N on the
+ * report's buttons: keys it does not have. A hint is drawn where a mouse or a
+ * trackpad says a keyboard may be there (`any-pointer: fine`, asked once, in
+ * `useShortcutHints`). What a screen reader is told and what a key does are
+ * the same on both: both contexts run on both projects.
+ */
+for (const { name, touch, viewport } of [
+  { name: "a touch screen with no mouse", touch: true, viewport: { width: 390, height: 844 } },
+  { name: "a screen with a mouse", touch: false, viewport: { width: 1366, height: 768 } },
+]) {
+  test.describe(name, () => {
+    test.use({ hasTouch: touch, isMobile: touch });
+
+    test(`a key is drawn only where there may be one to press: the briefing page and the table on ${name}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await startDebugNode(page, "case01", "start", { openTable: false });
+      await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+      expect(await page.evaluate(() => matchMedia("(any-pointer: fine)").matches), "the context is what the test says it is").toBe(!touch);
+
+      const briefing = page.getByTestId("scene-briefing");
+      await expect(briefing).toBeVisible();
+      const cards = briefing.getByTestId("briefing-card");
+      if (touch) {
+        await expect(briefing.locator("kbd")).toHaveCount(0);
+        await expect(briefing.locator(".gx-comic-hint")).toHaveText("카드를 고르면 그 카드를 건 채로 판이 열린다");
+      } else {
+        await expect(cards.first().locator("kbd")).toHaveText("1");
+        await expect(briefing.locator(".gx-comic-hint kbd")).toHaveCount(2);
+      }
+      await expect(cards.first()).toHaveAttribute("aria-keyshortcuts", "1");
+      await expect(page.getByTestId("open-table")).toHaveAttribute("aria-keyshortcuts", "Space Enter W");
+
+      // The key is taken whether or not it was drawn: a keyboard paired with a
+      // phone is not something the page can see.
+      await page.keyboard.press("2");
+      await expect(briefing).toHaveCount(0);
+      await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+
+      const hand = page.locator(".choices .choice");
+      if (touch) {
+        await expect(page.locator(".gx-card-key")).toHaveCount(0);
+        await expect(page.locator(".gx-hand-head kbd")).toHaveCount(0);
+      } else {
+        await expect(page.locator(".gx-card-key")).toHaveCount(await hand.count());
+        await expect(page.locator(".gx-card-key").first()).toHaveText("1");
+        await expect(page.locator(".gx-hand-head small")).toContainText("W 밀기");
+      }
+      await expect(hand.first()).toHaveAttribute("aria-keyshortcuts", "1");
+      await expect(page.getByTestId("commit-push")).toHaveAttribute("aria-keyshortcuts", "Space W");
+    });
+
+    test(`a key is drawn only where there may be one to press: the report and the relic draft on ${name}`, async ({ page }) => {
+      test.setTimeout(120_000);
+      await page.setViewportSize(viewport);
+      await startDebugNode(page, "case01", "c1_aftershock");
+      await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+      await closeCaseToReport(page);
+
+      const replay = page.locator(".replay-case-button");
+      const next = page.locator(".next-case-panel button");
+      if (touch) {
+        await expect(page.locator(".result-page .shortcut-hint")).toHaveCount(0);
+      } else {
+        await expect(replay.locator(".shortcut-hint")).toHaveText("R");
+        await expect(next.locator(".shortcut-hint")).toHaveText("N");
+      }
+      await expect(replay).toHaveAttribute("aria-keyshortcuts", "R");
+      await expect(next).toHaveAttribute("aria-keyshortcuts", "N");
+
+      // N opens the next case on both, and case 01 closes onto the first draft.
+      await page.keyboard.press("KeyN");
+      const draft = page.getByTestId("relic-draft");
+      await expect(draft).toBeVisible({ timeout: 30_000 });
+      const options = draft.getByTestId("relic-option");
+      if (touch) {
+        await expect(draft.locator(".gx-relic-key")).toHaveCount(0);
+      } else {
+        await expect(draft.locator(".gx-relic-key")).toHaveCount(await options.count());
+        await expect(draft.locator(".gx-relic-key").first()).toHaveText("1");
+      }
+      await expect(options.first()).toHaveAttribute("aria-keyshortcuts", "1");
+    });
+  });
+}
 
 test("the reading clock can start held, and waits", async ({ page }) => {
   await page.clock.install();

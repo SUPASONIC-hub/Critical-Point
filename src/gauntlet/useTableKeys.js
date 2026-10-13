@@ -70,7 +70,9 @@ function letterOf(event) {
  *
  * Returns what the table's controls may say about these keys (see
  * `useShortcutHints`): with the single-key shortcuts off, the digits and
- * letters are neither announced nor drawn.
+ * letters are neither announced nor drawn, and where there is no mouse or
+ * trackpad no key is drawn at all. The handler below asks neither question
+ * of the pointer: a key that arrives is taken.
  */
 export function useTableKeys(actions) {
   const hints = useShortcutHints();
