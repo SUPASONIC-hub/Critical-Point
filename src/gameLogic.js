@@ -1,7 +1,7 @@
 import { createTableRecord } from "./gauntlet/gauntletEngine.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 import { ENDING_GATES } from "./gameConstants.js";
-import { limitText, makeEmptyScores } from "./appConfig.js";
+import * as seasonStanding from "./seasonStanding.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import {
   applyEffect,
@@ -555,7 +555,7 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 // bar: no bust and a x16 cash (heat 44 at DOUBLING_HEAT 11), a logic streak of
 // 24, or 19,500 a case banked -- between the best blind (15.4k) and heartbeat
 // (24.6k) play check:pressure measures at nine windows a case (16,000 at 7).
-const { collapseHarmPerCase: COLLAPSE_HARM_PER_CASE, collapseBustRate: COLLAPSE_BUST_RATE, collapseOverreachHarm: COLLAPSE_OVERREACH_HARM, clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES;
+const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = ENDING_GATES; // the collapse gates are read in seasonStanding.js
 const CLUE_RATE_SLACK_BAR = 0.8;
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
 const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
@@ -601,26 +601,26 @@ const quantile = (values, share) => {
  * nothing to fields they lack, and the ending falls back to the last case.
  */
 export function getSeasonStrain(caseResults = {}, pending = null) {
-  // A replayed case is in both: the summary it is about to replace, and the one pending.
-  const closed = Object.entries(caseResults ?? {}).filter(([caseId]) => caseId !== pending?.caseId).map(([, summary]) => summary);
-  const summaries = [...closed, pending].filter(Boolean);
+  // The cases, and the four sums the collapse gate reads, are `seasonStanding.js`'s.
+  const summaries = seasonStanding.readClosedCases(caseResults, pending).map(([, summary]) => summary);
+  const collapse = seasonStanding.readCollapseTally(summaries);
   const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
   const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
   const seasonResources = closings.length
     ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0)))]))
     : null;
   return {
-    casesPlayed: summaries.length,
-    seasonWindows: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0) + (Number(summary.pushRecord?.cashes) || 0), 0),
+    casesPlayed: collapse.casesPlayed,
+    seasonWindows: collapse.seasonWindows,
     sustainedPressure: Math.round(quantile(peaks, 0.75)),
     seasonReframeRoutes: summaries.reduce(
       (sum, summary) => sum + (Number(summary.reframeRouteCount ?? summary.reframeCount) || 0),
       0,
     ),
     seasonResources,
-    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
+    seasonHumanCost: collapse.seasonHumanCost,
     peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
-    seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
+    seasonBusts: collapse.seasonBusts,
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
     // The vault is cumulative across the season, so the largest summary holds it,
     // and it is read per case: a season total rises with every case played. The
@@ -675,14 +675,12 @@ export function getEndingVariant({
 } = {}) {
   // A caller that still passes only the old six fields (a report built before
   // `getSeasonStrain` moved here) reads as a whole season with the last case
-  // standing in for its closing values.
-  const cases = Math.max(1, Number(casesPlayed) || CASE_SEQUENCE.length);
+  // standing in for its closing values. The collapse gate is `readCollapseGate`'s.
+  const { cases, harm, bustRate, cause } = seasonStanding.readCollapseGate({ seasonHumanCost, resources, casesPlayed, seasonBusts, seasonWindows });
   const standing = seasonResources ?? resources;
   const trust = Number(standing.trust) || 0;
   const legitimacy = Number(standing.legitimacy) || 0;
   const capital = Number(standing.capital) || 0;
-  const harm = Math.max(Number(seasonHumanCost) || 0, Number(resources.humanCost) || 0) / cases;
-  const bustRate = seasonWindows > 0 ? seasonBusts / seasonWindows : 0;
   const sustained = Number.isFinite(sustainedPressure) ? sustainedPressure : Math.max(Number(peakRiskPressure) || 0, getRiskPressure(resources));
   const reframeRoutes = Number.isFinite(seasonReframeRoutes)
     ? seasonReframeRoutes
@@ -693,8 +691,7 @@ export function getEndingVariant({
 
   // The collapse says which door it came through, so the report's advice can
   // quote the gate that closed rather than a number of its own.
-  const overreach = harm >= COLLAPSE_OVERREACH_HARM && bustRate >= COLLAPSE_BUST_RATE;
-  if (harm >= COLLAPSE_HARM_PER_CASE || overreach) return { ...ENDINGS.collapse, cause: { id: harm >= COLLAPSE_HARM_PER_CASE ? "harm" : "overreach", harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
+  if (cause) return { ...ENDINGS.collapse, cause: { id: cause, harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
 
   const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= COLD_GAP;
   const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST;
@@ -1250,5 +1247,5 @@ export const REFRAME_COGNITION = { reframing: 3, inference: 1 };
 
 // Both live in appConfig.js, and the privacy patterns in privacyText.js, so the
 // pre-start shell can use them without pulling in the scene graph.
-export { limitText, makeEmptyScores };
+export { limitText, makeEmptyScores } from "./appConfig.js";
 export { anonymizeSensitiveText, detectPrivacySignals } from "./privacyText.js";
