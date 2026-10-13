@@ -20,6 +20,23 @@ export function formatMultiplier(value) {
   return multiplier >= 10 ? `×${Math.floor(multiplier)}` : `×${(Math.floor(multiplier * 10 + 1e-9) / 10).toFixed(1)}`;
 }
 
+/**
+ * The reveal's sentence about the next board, read off what that board was
+ * actually dealt (`verdict.nextMutations`). The line used to follow the bust
+ * and the push count alone, so a prologue table with no rule to break yet --
+ * and every story run -- was told "기본 규칙으로 복귀" and, in the same breath,
+ * that the room had broken a rule or that a card might be sealed for stopping
+ * early. COLD FEET says a card is locked only while the seal stands: EXPOSE
+ * mastery or GLASS LENS lifts it and leaves the id (`lifted`).
+ */
+export function describeNextTable(nextMutations = [], busted = false) {
+  if (nextMutations.length === 0) return "";
+  if (busted) return "다음 판은 회의실이 깨뜨린 규칙으로 시작한다.";
+  return nextMutations.some((mutation) => mutation.id === "coldFeet" && !mutation.lifted)
+    ? "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 잠긴다."
+    : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+}
+
 const VERDICT_CAUSE_COPY = Object.freeze({
   cash: "직접 확정했다",
   push: "한 번 더 밀었다",

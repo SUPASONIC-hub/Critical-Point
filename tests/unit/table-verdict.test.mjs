@@ -4,7 +4,7 @@ import { test } from "node:test";
 import {
   BASE_SCHEMA, buildNextSchema, createWindow, describeMutations, isPenaltyMutation, MUTATIONS, READ_GRACE_SECONDS, reduceWindow, resolveWindow, VERDICT_CAUSES,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { describeVerdictCause } from "../../src/gauntlet/tableReadout.js";
+import { describeNextTable, describeVerdictCause } from "../../src/gauntlet/tableReadout.js";
 
 /**
  * What the reveal and the briefing say happened, against what the engine did:
@@ -93,6 +93,17 @@ test("BLACKOUT and COLD FEET say what is left once EXPOSE mastery has lifted the
   assert.doesNotMatch(coldFeet.title, /봉인/);
   assert.match(coldFeet.text, /칩이 줄어든다/);
   assert.ok(liftedCold.chipsScale < BASE_SCHEMA.chipsScale * 1.5 && liftedCold.chipsScale === plainCold.chipsScale, "the chips are still thinner");
+
+  // The reveal's "다음 판" line promises a locked card only on a board that seals one.
+  const general = "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+  assert.match(describeNextTable(describeMutations(plainCold), false), /가장 비싼 카드가 잠긴다\.$/);
+  assert.equal(describeNextTable(describeMutations(liftedCold), false), general, "EXPOSE mastery lifted the seal: the id stays, nothing is locked");
+  const lens = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, stanceMastery: { strike: 0, steady: 0, expose: 3, mastered: [] }, relics: ["glassLens"] });
+  assert.deepEqual([lens.mutations.includes("coldFeet"), lens.sealHighest], [true, false], "GLASS LENS lifts it on the first rung of mastery");
+  assert.equal(describeNextTable(describeMutations(lens), false), general);
+  assert.equal(describeNextTable(describeMutations(buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, relics: ["lockpick"] })), false).endsWith("잠긴다."), true, "a lockpick opens the seal sooner, and the card is still sealed");
+  assert.equal(describeNextTable(describeMutations(plainBust), true), "다음 판은 회의실이 깨뜨린 규칙으로 시작한다.");
+  assert.equal(describeNextTable([], false), "");
 });
 
 /**
@@ -135,7 +146,8 @@ test("a described mutation is what it was before the mark: the id and what is pr
     const [mutation, ...rest] = describeMutations({ ...BASE_SCHEMA, mutations: [id], fracturedAxis: "trust" });
     assert.equal(rest.length, 0);
     assert.equal(mutation.id, id);
-    assert.deepEqual(Object.keys(mutation), ["id", "label", "title", "text", "axis", "softenedBy"], id);
+    // `lifted` is there only on a rule whose seal has been lifted: the reveal reads it.
+    assert.deepEqual(Object.keys(mutation).filter((key) => key !== "lifted"), ["id", "label", "title", "text", "axis", "softenedBy"], id);
     assert.equal(mutation.label, MUTATIONS[id].label);
   }
 });

@@ -5,7 +5,7 @@ import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.j
 import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
-import { describeLogicMove, describeVerdictCause } from "../gauntlet/tableReadout.js";
+import { describeLogicMove, describeNextTable, describeVerdictCause } from "../gauntlet/tableReadout.js";
 
 function formatMultiplier(value) {
   return value >= 10 ? `×${Math.round(value)}` : `×${Number(value || 1).toFixed(1)}`;
@@ -23,11 +23,7 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
   const nextRule = nextMutations.length > 0
     ? nextMutations.map((mutation) => mutation.label).join(" / ")
     : "기본 규칙으로 복귀";
-  const tableLine = busted
-    ? "다음 판은 회의실이 깨뜨린 규칙으로 시작한다."
-    : verdict.pushes === 0
-      ? "너무 일찍 멈춘 대가로 다음 판의 큰 카드가 잠길 수 있다."
-      : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
+  const tableLine = describeNextTable(nextMutations, busted);
   // What the card did to the logic streak; nothing where the streak is not in play.
   const logicLine = describeLogicMove(verdict.logic);
   return [
@@ -37,7 +33,7 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
     ...(verdict.relicProcs?.length
       ? [["도구 발동", verdict.relicProcs.map((id) => `${RELICS[id]?.name ?? id}: ${RELICS[id]?.proc ?? ""}`).join(" · ")]]
       : []),
-    ["다음 판", `${nextRule}. ${tableLine}`],
+    ["다음 판", tableLine ? `${nextRule}. ${tableLine}` : `${nextRule}.`],
   ];
 }
 

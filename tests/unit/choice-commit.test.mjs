@@ -189,7 +189,7 @@ test("a card behind an authority gate says why it is locked, and a forced card g
 
   choose(locked, closedWindow("cash"));
   assert.equal(did.patches.length, 0);
-  assert.match(did.saveStatus.at(-1), /^Choice locked: FIELD ACCESS /);
+  assert.match(did.saveStatus.at(-1), /^Choice locked: 믿음 55 이상 또는 단서 2개 이상이 필요합니다\. 지금 믿음 \d+, 단서 \d+개\.$/);
 
   // The clock running out stakes whatever the table forces, gate or no gate.
   choose(locked, closedWindow("cash"), true);

@@ -76,9 +76,11 @@ export const playGuideItems = [
     title: "상태 변화",
     text: "선택 뒤에 달라지는 시간, 현금, 믿음, 공정함, 사람 피해, 지침을 보여줍니다.",
   },
+  // This entry was "반응 버튼", a control no screen has, and the guide said
+  // nothing of the wall or the pulse that points at it.
   {
-    title: "반응 버튼",
-    text: "당신이 특히 오래 고민하거나 쉽게 움직이는 마음의 지점입니다. 다음 사건에도 영향을 줍니다.",
+    title: "벽과 심박",
+    text: "밀 때마다 열기가 오르고, 보이지 않는 벽에 닿으면 이 사건에 걸린 판돈을 잃습니다. 심박이 빨라지면 벽이 가깝습니다. 심박은 열기와 남은 시간으로도 오르고, 벽 신호에는 오차가 있습니다.",
   },
 ];
 
