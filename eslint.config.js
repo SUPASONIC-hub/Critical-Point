@@ -25,27 +25,17 @@ export default [
     plugins: { "react-hooks": reactHooks },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // Advisory for now: AppContent still drives several effects imperatively.
-      // Tracked as follow-up work; correctness rules below stay errors.
-      "react-hooks/exhaustive-deps": "warn",
-      "react-hooks/set-state-in-effect": "warn",
+      // An error like the rest. It was "warn" (and set-state-in-effect with
+      // it) for the effects AppContent drove imperatively, but `npm run lint`
+      // runs with --max-warnings 0, so a warning already failed the run and the
+      // level only said otherwise. What is left is seven lines that switch
+      // the rule off for the line after them, each with its reason beside it:
+      // GameRuntime.jsx (1), GauntletStage.jsx (4), GauntletFx.jsx (1),
+      // useDialogFocus.js (1). (The directive is not spelled out here: a
+      // comment line that starts with it is read as one.)
+      "react-hooks/exhaustive-deps": "error",
       "no-unused-vars": unusedVars,
       "no-console": ["warn", { allow: ["warn", "error"] }],
-    },
-  },
-  {
-    // The runtime is one 2,000-line component whose handlers call Date.now and
-    // read refs. Before the gauntlet rewrite the React Compiler bailed on it
-    // without reporting, so these rules never ran here; the rewrite changed
-    // what the compiler can analyse and it now reads the whole body. The
-    // findings are about handlers that predate the rewrite, so they are
-    // advisory here until those handlers move into hooks of their own.
-    // Everywhere else they stay errors.
-    files: ["src/GameRuntime.jsx"],
-    rules: {
-      "react-hooks/purity": "warn",
-      "react-hooks/refs": "warn",
-      "react-hooks/preserve-manual-memoization": "warn",
     },
   },
   {
