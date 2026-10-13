@@ -413,13 +413,76 @@ test("over its cap the queue gives up error reports first and case rows last", (
   assert.deepEqual(policy.pruneTelemetryQueue([expired]), []);
 });
 
-test("a missing function is told apart from a function that refused", async () => {
+test("a function that is missing and one that refused are both errors, with the server's code and words kept apart", async () => {
   browser.respond("/rest/v1/rpc/peek_cloud_save", () => missingFunction("peek_cloud_save(p_code)"));
-  await assert.rejects(telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }), (error) => telemetry.isMissingRpc(error));
+  await assert.rejects(telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }), (error) => error.status === 404 && error.code === "PGRST202");
   browser.respond("/rest/v1/rpc/peek_cloud_save", () => refusal(400, "invalid cloud save code"));
-  await assert.rejects(telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }), (error) => !telemetry.isMissingRpc(error));
+  await assert.rejects(
+    telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }),
+    (error) => error.status === 400 && error.code === "P0001" && error.serverMessage === "invalid cloud save code",
+  );
   browser.respond("/rest/v1/rpc/peek_cloud_save", () => ok({ saved_at: "2026-09-28T00:00:00Z", revision: 3 }));
   assert.deepEqual((await telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" })).data, { saved_at: "2026-09-28T00:00:00Z", revision: 3 });
+});
+
+test("a device that says it is offline is not made to wait for the deadline: nothing is sent, and the row is kept", async () => {
+  browser.respond("/rest/v1/playtest_sessions", () => ok(undefined, 201));
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => ok({ revision: 1 }));
+  const item = caseItem("run-offline", "case01");
+  const before = browser.calls.length;
+  const failedBefore = telemetry.getTelemetryStats().failed;
+  browser.setOnline(false);
+  try {
+    await assert.rejects(telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }), (error) => {
+      assert.match(error.message, /^Network unavailable$/);
+      assert.equal(error.status, undefined, "no server answered, so there is no status to read");
+      assert.equal(policy.classifyTelemetryFailure(error), "unreachable");
+      return true;
+    });
+    await assert.rejects(policy.sendTelemetryItem(item), /^Error: Network unavailable$/);
+    assert.equal(browser.calls.length, before, "neither request reached the network");
+    assert.equal(telemetry.getTelemetryStats().failed, failedBefore + 1, "the row counts as a send that failed");
+
+    // The queue's own pass over the same device: one attempt, and every row still there.
+    const items = [item, caseItem("run-offline", "case02")];
+    const { kept } = await policy.sendTelemetryBatch(items, { send: policy.sendTelemetryItem });
+    assert.deepEqual(kept.map((entry) => entry.id), items.map((entry) => entry.id));
+    assert.equal(browser.calls.length, before, "and still nothing sent");
+  } finally {
+    browser.setOnline(true);
+  }
+  // Back online, the same row and the same call go out.
+  assert.equal((await policy.sendTelemetryItem(item)).saved, true);
+  assert.deepEqual((await telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" })).data, { revision: 1 });
+  assert.equal(browser.calls.length, before + 2);
+});
+
+test("a refusal whose body is not JSON is read by its status alone, with its text kept for the console", async () => {
+  const page = (status, text) => () => new globalThis.Response(text, { status, headers: { "Content-Type": "text/html" } });
+
+  // A gateway's page in front of a server that is down.
+  browser.respond("/rest/v1/rpc/peek_cloud_save", page(502, "<html><body>502 Bad Gateway</body></html>"));
+  await assert.rejects(telemetry.callSupabaseRpc("peek_cloud_save", { p_code: "x" }), (error) => {
+    assert.equal(error.status, 502);
+    assert.equal(error.code, "", "a page has no PostgREST code");
+    assert.equal(error.serverMessage, "", "and nothing the server raised");
+    assert.equal(error.message, "peek_cloud_save failed: 502: <html><body>502 Bad Gateway</body></html>");
+    assert.equal(policy.classifyTelemetryFailure(error), "unreachable", "the row is kept for when the server is back");
+    return true;
+  });
+
+  // JSON cut off part-way has no code and no message to read either.
+  browser.respond("/rest/v1/playtest_sessions", page(400, '{"code":"P0001","message":"telemetry rate limit exc'));
+  await assert.rejects(policy.sendTelemetryItem(caseItem("run-page", "case01")), (error) => {
+    assert.equal(error.status, 400);
+    assert.equal(error.code, "");
+    assert.equal(error.serverMessage, "");
+    return true;
+  });
+
+  // The same status with the whole body is the refusal it says it is.
+  browser.respond("/rest/v1/playtest_sessions", () => refusal(400, "telemetry payload too large"));
+  await assert.rejects(policy.sendTelemetryItem(caseItem("run-page", "case01")), (error) => error.code === "P0001" && error.serverMessage === "telemetry payload too large");
 });
 
 test("a device that cannot store an id still has one id, and the board has its own", () => {

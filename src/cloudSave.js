@@ -17,7 +17,7 @@ import {
   writeStoredValue,
 } from "./appConfig.js";
 import { clearReplayFromLocation } from "./state/trace.js";
-import { callSupabaseRpc, isMissingRpc, telemetryEnabled } from "./telemetry.js";
+import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
 
 /**
  * Saves that follow the player to another device, and survive being offline.
@@ -47,10 +47,16 @@ import { callSupabaseRpc, isMissingRpc, telemetryEnabled } from "./telemetry.js"
  * the player either loads the copy the server holds or says, in so many words,
  * that this device's progress should replace it.
  *
- * The client is deployed before the migration it was written for
- * (20260929030000), so each new call falls back to the one the older database
- * answers: no `peek_cloud_save` means this device's own bookkeeping decides,
- * and no `p_expected_revision` means the put is sent the old way.
+ * The database is taken to be at 20260929030000 or later, the migration that
+ * brought `peek_cloud_save`, `delete_cloud_save` and `p_expected_revision`. A
+ * merge applies its migrations before the client it carries is deployed, so
+ * the calls this file used to fall back to for an older database were never
+ * made. Against one without them a put that names a revision, and a delete,
+ * fail and are shown as failures, and a peek is one more question the server
+ * did not answer. That last case is the one production has -- the server
+ * cannot be asked (no answer, or its read limit): this device's own
+ * bookkeeping decides then, and with no revision on record the put names none
+ * and the server orders it by time.
  *
  * This file must not import the scene graph: the intro loads it, when the
  * fold is opened or the device has opted in (`main.jsx`), and it is not part
@@ -250,8 +256,8 @@ function holdConflict({ savedAt = "", revision = null } = {}) {
 
 /**
  * What the server holds for this code: `{ savedAt, revision }`, `null` when it
- * holds nothing, `undefined` when it cannot say (a database without
- * `peek_cloud_save`, or no answer at all).
+ * holds nothing, `undefined` when it cannot say (no answer at all, or a
+ * refusal such as the read limit).
  */
 async function peekRemote() {
   try {
@@ -261,12 +267,12 @@ async function peekRemote() {
     const revision = toRevision(data?.revision);
     return revision === null ? undefined : { savedAt: String(data.saved_at ?? ""), revision };
   } catch (error) {
-    if (!isMissingRpc(error)) console.warn("Critical Point cloud save could not be checked", error);
+    console.warn("Critical Point cloud save could not be checked", error);
     return undefined;
   }
 }
 
-/** One put. A database without `p_expected_revision` gets the call it knows. */
+/** One put. With no revision to name (`resolveExpectedRevision`) the server orders it by time. */
 async function putRemote(save, expectedRevision) {
   const body = {
     p_code: getCloudCode(),
@@ -277,12 +283,7 @@ async function putRemote(save, expectedRevision) {
   while (putTimes.length > 0 && now - putTimes[0] >= HOUR_MS) putTimes.shift();
   putTimes.push(now);
   if (expectedRevision === null) return (await callSupabaseRpc("put_cloud_save", body)).data;
-  try {
-    return (await callSupabaseRpc("put_cloud_save", { ...body, p_expected_revision: expectedRevision })).data;
-  } catch (error) {
-    if (!isMissingRpc(error)) throw error;
-    return (await callSupabaseRpc("put_cloud_save", body)).data;
-  }
+  return (await callSupabaseRpc("put_cloud_save", { ...body, p_expected_revision: expectedRevision })).data;
 }
 
 /**
@@ -524,23 +525,19 @@ export async function applyCloudSave({ code, save, settledWindows = [], revision
 }
 
 /**
- * Takes the online copy back. "unsupported" is a database from before
- * `delete_cloud_save`; the copy then ages out on its own.
+ * Takes the online copy back. "unsupported" is a deployment with no server
+ * configured, where there is nobody to ask; a server that refuses or does not
+ * answer is an error, and the caller says so.
  */
 export async function deleteCloudSave() {
   if (!cloudSaveAvailable) return { deleted: false, unsupported: true };
   const code = normalizeCloudCode(readStoredValue(CLOUD_SAVE_CODE_KEY, ""));
   if (!code) return { deleted: false };
   if (isOffline()) throw cloudError("오프라인이라 온라인 사본을 지울 수 없습니다. 연결된 뒤 다시 시도하세요.");
-  try {
-    const { data } = await callSupabaseRpc("delete_cloud_save", { p_code: code });
-    writeSync({ pending: "", synced: "", revision: null, conflict: null });
-    remoteChecked = false;
-    return { deleted: data === true };
-  } catch (error) {
-    if (isMissingRpc(error)) return { deleted: false, unsupported: true };
-    throw error;
-  }
+  const { data } = await callSupabaseRpc("delete_cloud_save", { p_code: code });
+  writeSync({ pending: "", synced: "", revision: null, conflict: null });
+  remoteChecked = false;
+  return { deleted: data === true };
 }
 
 /** The one status line each phase prints. */

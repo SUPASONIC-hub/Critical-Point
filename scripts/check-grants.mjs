@@ -1377,7 +1377,8 @@ await putCloud("put a cloud save dated next week", "ABCDEFGH2345", { savedAt: "n
   check(savedAt && new Date(savedAt) <= new Date(Date.now() + 1000), `a cloud save kept a future saved_at (${savedAt}); it must be clamped to now().`);
 }
 {
-  // A client deployed before 20260929030000 names no revision and is ordered by time.
+  // A put that names no revision is ordered by time: the client sends one when
+  // the server could not tell it what it holds and it has no revision on record.
   const result = await putCloud("put an honest save after a future-dated one", "ABCDEFGH2345");
   check(result?.rows[0]?.r?.accepted === true, "an honest save was locked out by a future-dated one.");
   const stale = await putCloud("put a save older than the stored one", "ABCDEFGH2345", { savedAt: "now() - interval '1 day'" });
