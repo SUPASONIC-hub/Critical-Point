@@ -131,3 +131,18 @@ export async function collectCharset(root = process.cwd()) {
   const characters = new Set([...BASELINE_CHARACTERS, ...collectSourceCharacters(root), ...computed]);
   return [...characters].sort((a, b) => a.codePointAt(0) - b.codePointAt(0)).join("");
 }
+
+/**
+ * The characters the committed list says the font was cut from: one code point
+ * a line, in hex, as `build-fonts.mjs` writes them. `check-fonts.mjs` compares
+ * the source against it and `check-doc-numbers.mjs` counts it, so the line
+ * format is read in one place.
+ */
+export function readCharsetList(root = process.cwd()) {
+  return new Set(
+    readFileSync(path.join(root, CHARSET_OUTPUT), "utf8")
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => String.fromCodePoint(parseInt(line.slice(0, line.indexOf(" ")), 16))),
+  );
+}
