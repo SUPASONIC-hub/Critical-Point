@@ -76,18 +76,6 @@ async function createTelemetryError(response, fallbackMessage) {
   });
 }
 
-/**
- * Whether the server has no such function, or none that takes those arguments.
- * The client ships before the migration it was written for, so a new RPC is
- * called with a fallback for the database that has not got it yet.
- */
-export function isMissingRpc(error) {
-  return (
-    error?.code === "PGRST202" ||
-    (Number(error?.status) === 404 && /could not find the function/i.test(String(error?.serverMessage ?? error?.message ?? "")))
-  );
-}
-
 function createRandomId(prefix) {
   return globalThis.crypto?.randomUUID?.() ?? `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }

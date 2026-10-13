@@ -150,27 +150,3 @@ test("turning online save off offers to take the online copy back", async ({ pag
   expect(deleted).toEqual([{ p_code: CODE }]);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).runId, "the device keeps its own save").toBe("run-this-device");
 });
-
-test("against a database from before the migration the panel still uploads, and says what it cannot do", async ({ page }) => {
-  const missing = (name) => json({ code: "PGRST202", message: `Could not find the function public.${name} in the schema cache`, details: null, hint: null }, 404);
-  const puts = [];
-  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
-  await page.route(`${SUPABASE}/rest/v1/rpc/peek_cloud_save`, (route) => route.fulfill(missing("peek_cloud_save")));
-  await page.route(`${SUPABASE}/rest/v1/rpc/delete_cloud_save`, (route) => route.fulfill(missing("delete_cloud_save")));
-  await page.route(`${SUPABASE}/rest/v1/rpc/put_cloud_save`, (route) => {
-    const body = route.request().postDataJSON();
-    puts.push(body);
-    return route.fulfill("p_expected_revision" in body ? missing("put_cloud_save") : json({ accepted: true, saved_at: body.p_saved_at }));
-  });
-  await seedDevice(page);
-  await page.goto("/");
-  const panel = await openPanel(page);
-  await expect(panel.getByTestId("cloud-save-status")).toContainText("모두 최신입니다", { timeout: 15_000 });
-  expect(puts.at(-1)).not.toHaveProperty("p_expected_revision");
-
-  await panel.getByTestId("cloud-save-toggle").uncheck();
-  page.once("dialog", (dialog) => dialog.accept());
-  await panel.getByTestId("cloud-save-delete").click();
-  await expect(panel.getByTestId("cloud-save-failed")).toContainText("180일 뒤에 자동으로 지워집니다");
-  await expect(panel.getByTestId("cloud-save-failed")).not.toContainText("PGRST");
-});

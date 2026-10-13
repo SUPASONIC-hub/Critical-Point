@@ -735,8 +735,9 @@ Still open, on purpose:
     device last wrote. `peek_cloud_save`
     asks what revision the server holds without fetching the save. The panel
     can delete the copy under a code (`delete_cloud_save`), and a copy nobody
-    has uploaded to for 180 days is purged. The client falls back to the older
-    calls when the database has not been migrated yet. The consent copy
+    has uploaded to for 180 days is purged. The client assumes that migration:
+    it no longer falls back to the older calls for a database without it, and
+    such a database is reported as a failed upload or delete. The consent copy
     describes what is sent, and no longer mentions free input.
     A replay link never writes the save: while one is open `writeSaveState` and
     `appendSaveSlot` are no-ops, and starting a run, restoring a slot or

@@ -5,8 +5,10 @@ import { installBrowser, missingFunction, ok, refusal } from "./helpers/browser.
 
 /**
  * Two devices and one continuation code (priority 59), against a scripted
- * server -- once as the database answers from 20260929030000 on, once as it
- * answers today, because the client is deployed before the migration is.
+ * server that answers as the database does from 20260929030000 on -- and,
+ * since that server has a read limit, once when it cannot be asked what it
+ * holds. A database from before that migration is a failure, not a second way
+ * of uploading.
  */
 const browser = installBrowser();
 const config = await import("../../src/appConfig.js");
@@ -80,18 +82,22 @@ function newServer({ stored = null } = {}) {
   return server;
 }
 
-/** The database as it is before that migration: three arguments, ordered by time. */
-function oldServer({ stored = null } = {}) {
-  const server = { stored };
-  browser.respond("/rest/v1/rpc/peek_cloud_save", () => missingFunction("peek_cloud_save(p_code)"));
-  browser.respond("/rest/v1/rpc/delete_cloud_save", () => missingFunction("delete_cloud_save(p_code)"));
+/**
+ * The same database past its read limit: it will not say what it holds, and a
+ * put that names no revision is ordered by time, as `put_cloud_save` orders it.
+ */
+function serverPastItsReadLimit({ stored = null } = {}) {
+  const server = newServer({ stored });
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => refusal(429, "cloud save rate limit exceeded", "PT429"));
   browser.respond("/rest/v1/rpc/put_cloud_save", ({ body }) => {
-    if ("p_expected_revision" in body) return missingFunction("put_cloud_save(p_code, p_expected_revision, p_payload, p_saved_at)");
-    if (server.stored && Date.parse(server.stored.saved_at) > Date.parse(body.p_saved_at)) {
-      return ok({ accepted: false, saved_at: server.stored.saved_at });
+    const current = server.stored?.revision ?? 0;
+    const named = "p_expected_revision" in body;
+    const refused = named ? body.p_expected_revision !== current : Date.parse(server.stored?.saved_at) > Date.parse(body.p_saved_at);
+    if (server.stored && refused) {
+      return ok({ accepted: false, reason: named ? "revision" : "older", saved_at: server.stored.saved_at, revision: current });
     }
-    server.stored = { saved_at: body.p_saved_at, payload: body.p_payload };
-    return ok({ accepted: true, saved_at: body.p_saved_at });
+    server.stored = { saved_at: body.p_saved_at, payload: body.p_payload, revision: current + 1 };
+    return ok({ accepted: true, saved_at: body.p_saved_at, revision: current + 1 });
   });
   return server;
 }
@@ -292,32 +298,34 @@ test("another tab of this device uploading in between is not another device", as
   assert.equal(cloud.hasCloudConflict(), false);
 });
 
-test("against today's database the upload is sent the way that database takes it", async () => {
+test("a server that cannot be asked, and no revision on record: the upload names none", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T10:00:00.000Z" }), sync: { pending: "2026-09-28T10:00:00.000Z", synced: "", revision: null } });
-  const server = oldServer();
+  const server = serverPastItsReadLimit();
   const cloud = await loadCloudSave();
   assert.equal(await cloud.flushCloudSave(), true);
   assert.equal(puts().length, 1);
   assert.equal("p_expected_revision" in puts()[0].body, false);
   assert.equal(server.stored.saved_at, "2026-09-28T10:00:00.000Z");
   assert.equal(cloud.getCloudSaveSnapshot().phase, "synced");
-  assert.equal(readSync().revision, null);
+  assert.equal(readSync().revision, 1, "the revision the server gave back is on record from here on");
 });
 
-test("a revision on record and a database that does not take one: the old call is made", async () => {
+test("a database from before the migration is a failure the player is told, not a second upload", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T10:00:00.000Z" }), sync: { pending: "2026-09-28T10:00:00.000Z", synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
-  const server = oldServer();
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => missingFunction("peek_cloud_save(p_code)"));
+  browser.respond("/rest/v1/rpc/put_cloud_save", () => missingFunction("put_cloud_save(p_code, p_expected_revision, p_payload, p_saved_at)"));
   const cloud = await loadCloudSave();
-  assert.equal(await cloud.flushCloudSave(), true);
-  assert.equal(puts().length, 2, "the new call, then the one the database knows");
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 1, "it used to be sent again without the revision");
   assert.equal(puts()[0].body.p_expected_revision, 2);
-  assert.equal("p_expected_revision" in puts()[1].body, false);
-  assert.equal(server.stored.saved_at, "2026-09-28T10:00:00.000Z");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "error");
+  assert.match(cloud.getCloudSaveSnapshot().message, /온라인 저장에 실패했습니다/);
+  assert.equal(readSync().pending, "2026-09-28T10:00:00.000Z", "the local save is still waiting");
 });
 
-test("today's database refusing an older save is a conflict too, and it stays one", async () => {
+test("a put with no revision that the server refuses as older is a conflict too, and it stays one", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T08:00:00.000Z" }), sync: { pending: "2026-09-28T08:00:00.000Z", synced: "", revision: null } });
-  oldServer({ stored: { saved_at: "2026-09-28T11:00:00.000Z", payload: {} } });
+  serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T11:00:00.000Z", payload: {}, revision: 3 } });
   const cloud = await loadCloudSave();
   assert.equal(await cloud.flushCloudSave(), false);
   assert.equal(cloud.getCloudSaveSnapshot().phase, "conflict");
@@ -458,7 +466,7 @@ test("a code that is not a code, a server that is not there, and a copy that is 
   await assert.rejects(cloud.fetchCloudSave(CODE), /오프라인/);
 });
 
-test("the online copy can be taken back, where the database allows it", async () => {
+test("the online copy can be taken back, and a server that fails to is an error", async () => {
   resetDevice({ enabled: false, sync: { pending: "", synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
   const server = newServer({ stored: { saved_at: "2026-09-28T09:00:00.000Z", payload: {}, revision: 2 } });
   const cloud = await loadCloudSave();
@@ -466,6 +474,8 @@ test("the online copy can be taken back, where the database allows it", async ()
   assert.equal(server.stored, null);
   assert.deepEqual({ synced: readSync().synced, revision: readSync().revision }, { synced: "", revision: null });
   assert.deepEqual(await cloud.deleteCloudSave(), { deleted: false });
-  oldServer();
-  assert.deepEqual(await cloud.deleteCloudSave(), { deleted: false, unsupported: true });
+  // A database from before `delete_cloud_save` used to be answered with "it
+  // ages out on its own"; it is a failure like any other now.
+  browser.respond("/rest/v1/rpc/delete_cloud_save", () => missingFunction("delete_cloud_save(p_code)"));
+  await assert.rejects(cloud.deleteCloudSave(), (error) => /온라인 저장에 실패했습니다/.test(cloud.describeCloudFailure(error)));
 });
