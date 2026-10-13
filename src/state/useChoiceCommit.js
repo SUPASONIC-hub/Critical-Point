@@ -16,13 +16,11 @@ import {
   getSeasonStrain,
   getRiskPressure,
   getSuspenseEvent,
-  getUnattendedNext,
   getWindowResponseTime,
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../gameLogic.js";
-import { getBranchDetourBypass, getCaseBranchNodes, nodes, reframeRouteNodes } from "../gameData.js";
-import { runsInto } from "../seasonRules.js";
+import { getBranchDetourBypass, nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
@@ -34,6 +32,7 @@ import { telemetryEnabled } from "../telemetry.js";
 import { createSeasonLeaderboardRow, createSeasonTelemetryPayload } from "../viewModels/seasonViewModels.js";
 import { recordAppError, reportSilentFailure } from "./savedState.js";
 import { getAccessibility } from "./accessibilitySettings.js";
+import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
 import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { validateTelemetryItem } from "./payloadSchemas.js";
@@ -44,47 +43,6 @@ import { validateTelemetryItem } from "./payloadSchemas.js";
 // priority 27 gives that screen to the table.
 const CLOUD_CONFLICT_MESSAGE = "온라인 저장이 멈췄습니다. 이 기기에는 저장됩니다. 시작 화면의 '다른 기기에서 이어하기'에서 확인해 주세요.";
 let cloudConflictSaid = false;
-
-/**
- * Where 판을 다시 짠다 leads: the case's authored hidden route, once per case,
- * or the far side of the case's first fork when it has none. Nowhere, from a
- * scene the hidden route itself runs into: the card goes where it says.
- */
-function getReframeTarget(caseId, fromNodeId) {
-  const dramaticRoute = reframeRouteNodes[caseId];
-  if (dramaticRoute && runsInto(nodes, dramaticRoute, fromNodeId)) return null;
-  if (dramaticRoute && fromNodeId !== dramaticRoute && nodes[dramaticRoute]) return dramaticRoute;
-  const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
-  if (!branch || branch.nodeId === fromNodeId) return null;
-  return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
-}
-
-/**
- * What a bust costs the story, not just the score. The room does not wait for
- * an analyst who blew up: the scene the card led to plays out without them,
- * and the table deals the one after it. Never onto a result -- a bust does not
- * close a case -- and never off the authored graph.
- *
- * The room goes where the skipped scene's lead card would have taken it
- * (gameLogic.getUnattendedNext), through the same gate a played card passes.
- * It used to follow the first card dealt, which the shuffled deal made a
- * different route on forty fork scenes, and it walked into gated detours.
- *
- * A story run is not skipped past anything (the caller does not ask): the
- * mode is there so the story can be read, and a scene played without the
- * player is a scene they did not read. The bust still costs what a bust costs.
- *
- * And in any run, a scene marked `attended` (its scene context says so; the
- * finale's two decisions are, the 33rd floor and the last choice in B2) is
- * not played without the analyst either: the run lands on it.
- */
-function getBlackoutSkip(fromNodeId, branchContext) {
-  const skippedNode = nodes[fromNodeId];
-  if (!skippedNode || skippedNode.attended || RESULT_NODE_IDS.has(fromNodeId)) return null;
-  const onward = getUnattendedNext(skippedNode, branchContext);
-  if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
-  return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
-}
 
 /**
  * A case summary as a telemetry row carries it. The run keeps the ending as

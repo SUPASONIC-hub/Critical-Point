@@ -7,27 +7,19 @@ import {
   cognitionLabels,
   getBranchDetourBypass,
   getContinuityMemoryChoice,
-  initialResources,
   nodes,
-  reframeRouteNodes,
-  getCaseBranchNodes,
   triggerLabels,
 } from "../src/gameData.js";
 import {
   applyEffect,
   createCaseSummary,
   getAuthorityGate,
-  getCaseOutcome,
   getCasesOpened,
-  getContinuityChallenge,
   getEndingVariant,
   getGameplayStats,
-  getOutcomeCarryover,
   getRiskPressure,
   getSeasonLogic,
   getSeasonStrain,
-  getSeasonWear,
-  getUnattendedNext,
   LOGIC_SLACK_STREAK,
   makeEmptyScores,
   REFRAME_COGNITION,
@@ -48,10 +40,8 @@ import {
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { getTableRules, STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { runsInto } from "../src/seasonRules.js";
-import { getOriginStartEffects } from "../src/advancedSystems.js";
-import { legacyProfiles } from "../src/caseCopy.js";
 import { createInheritedChallenge, createSceneChallenge } from "../src/viewModels/sceneViewModels.js";
+import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../src/state/caseRoutes.js";
 import { createChoiceReaders } from "../src/state/useDecision.js";
 
 /**
@@ -161,25 +151,6 @@ function scoreCard(policy, choice, resources) {
   return score + (random() - 0.5) * policy.noise * 4;
 }
 
-/** What `useChoiceCommit.getBlackoutSkip` does: the room plays the next scene without the player. */
-function getBlackoutSkip(fromNodeId, branchContext) {
-  const skipped = nodes[fromNodeId];
-  if (!skipped || skipped.attended || resultNodeIds.has(fromNodeId)) return null;
-  const onward = getUnattendedNext(skipped, branchContext);
-  if (!onward || !nodes[onward] || resultNodeIds.has(onward)) return null;
-  return onward;
-}
-
-/** What `GameRuntime.getReframeTarget` does. */
-function getReframeTarget(caseId, fromNodeId) {
-  const route = reframeRouteNodes[caseId];
-  if (route && runsInto(nodes, route, fromNodeId)) return null;
-  if (route && fromNodeId !== route && nodes[route]) return route;
-  const branch = getCaseBranchNodes().find((item) => item.caseId === caseId);
-  if (!branch || branch.nodeId === fromNodeId) return null;
-  return branch.detourIds[0] ?? branch.nextIds[0] ?? null;
-}
-
 function mergeEffects(...effects) {
   return effects.reduce((merged, effect = {}) => {
     for (const [key, value] of Object.entries(effect)) merged[key] = (merged[key] ?? 0) + value;
@@ -225,26 +196,16 @@ function playSeason(seasonIndex, archetype, story = false) {
   let windows = 0;
   let skipped = 0;
   for (const caseId of CASE_SEQUENCE) {
-    const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
-    const previousResult = previousCaseId ? caseResults[previousCaseId] : null;
-    const outcomeId = previousResult?.outcomeChoiceId;
-    const startNode = caseOpeningRoutes[caseId]?.[outcomeId] ?? CASE_START_NODES[caseId];
-    // The continuity table is keyed by the case that opens, as the runtime reads it.
-    const continuityChallenge = outcomeId ? getContinuityChallenge({ caseId, choiceId: outcomeId }) : null;
-    const carryover = outcomeId ? getOutcomeCarryover({ caseId: previousCaseId, choiceId: outcomeId }) : {};
-    const baseLegacy = previousResult ? legacyProfiles[previousResult.rank] ?? legacyProfiles.C : null;
-    // The season's wear, which `GameRuntime.startCase` adds to the opening too.
-    const openingEffect = mergeEffects(baseLegacy?.effect ?? {}, carryover, getSeasonWear(caseId));
-    const openingLegacy = previousResult
-      ? { ...baseLegacy, effect: openingEffect, continuity: getCaseOutcome({ caseId: previousCaseId, choiceId: outcomeId }), continuityChallenge }
-      : null;
-    const originEffect = previousResult ? {} : getOriginStartEffects(policy.origin);
-    let resources = applyEffect(previousResult ? applyEffect(initialResources, openingEffect) : initialResources, originEffect);
+    // The opening route, the legacy and the hand, as `runLifecycle.startCaseNow` opens the case.
+    const opening = describeCaseOpening(caseId, { caseResults, operatorOrigin: policy.origin });
+    const { openingLegacy } = opening;
+    const outcomeId = caseResults[CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1]]?.outcomeChoiceId;
+    let resources = opening.resources;
     const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
     let triggers = makeEmptyScores(triggerLabels);
     let cognition = makeEmptyScores(cognitionLabels);
     let log = [];
-    let nodeId = startNode;
+    let nodeId = opening.nodeId;
     let caseReframes = 0;
     // What `runLifecycle.startCaseNow` and `useChoiceCommit` pass: the case's
     // rules, and on the window that closes it the next case's.
@@ -300,7 +261,7 @@ function playSeason(seasonIndex, archetype, story = false) {
       // A story run is skipped past nothing (useChoiceCommit).
       const skip = window.status === "bust" && !run.story ? getBlackoutSkip(plannedNode, branchContext) : null;
       if (skip) skipped += 1;
-      const nextNode = skip ?? plannedNode;
+      const nextNode = skip?.nodeId ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
       const { verdict, nextRun } = resolveWindow({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
       const busted = verdict.outcome === "bust";

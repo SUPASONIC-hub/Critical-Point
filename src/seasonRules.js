@@ -71,7 +71,7 @@ export function getOutcomeChoiceId(choiceId = "", node = null) {
 
 /**
  * Where a scene goes when nobody is there to choose (a bust skips the scene
- * the card led to, useChoiceCommit.getBlackoutSkip): where its lead card goes
+ * the card led to, caseRoutes.getBlackoutSkip): where its lead card goes
  * on this run, a gated detour taking its bypass when its condition does not
  * hold. `null` for a scene that deals nothing.
  */

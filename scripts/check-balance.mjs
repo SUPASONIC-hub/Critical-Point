@@ -271,7 +271,7 @@ function walkCase(startId, axes) {
 //    This walked columns until the deal was shuffled (gameData.js); a column
 //    is no longer a way of playing, so the walk asks the cards.
 //    A season opens every case after the first on one of its three opening
-//    variants (`describeCaseOpening`, runLifecycle.js), each with a signature
+//    variants (`describeCaseOpening`, caseRoutes.js), each with a signature
 //    card the default start does not deal, so the walk sets out from each of
 //    them as well: from the default start alone it measured a scene a season
 //    shows only on a retry or a debug jump.
