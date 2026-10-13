@@ -228,11 +228,13 @@
 }
 
 .gx-codex-note summary {
+  position: relative;
   min-height: 24px;
   cursor: pointer;
 }
 
 .gauntlet-stage .gx-draft-skip {
+  position: relative;
   margin-left: auto;
   min-height: 38px;
   padding: 8px 14px;
