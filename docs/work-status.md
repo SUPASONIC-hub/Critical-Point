@@ -470,7 +470,7 @@ Still open, on purpose:
     before it writes and reloads, so nothing the live tab still holds lands on
     top of it. Every control that throws progress away -- restore, delete a
     slot, clear the error log, start fresh, replay a case, `R` on the result
-    screen, and `첫 케이스 시작` or `NEW GAME+ 시작` on a device with a run to
+    screen, and `프롤로그 시작` or `NEW GAME+ 시작` on a device with a run to
     resume -- asks first through `confirmAction` (`src/state/confirmAction.js`);
     a spec that presses one answers through `tests/helpers/dialogs.js`. The
     reset's question names what goes and what stays, and

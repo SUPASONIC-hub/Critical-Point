@@ -195,7 +195,7 @@ export function IntroScreen({ view, renderers = {} }) {
       disabled={Boolean(openingBurst)}
     >
       <ChevronRight size={18} />
-      첫 케이스 시작
+      프롤로그 시작
     </button>
   );
   // Only while it is true: unticked, or built with no backend, nothing is sent.
@@ -304,7 +304,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 3년 전 당신은 승인 서류 한 장에 혼자 반대 의견을 썼습니다. 대출은 그대로 나갔고,
                 당신은 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫
                 파일에, 그때 그 대출번호가 그대로 남아 있습니다. 오래 붙잡은 조건은 다음 사건의
-                압력이 되어 돌아옵니다.
+                압력이 되어 돌아옵니다. 이야기는 그보다 조금 앞, 수습 마지막 과제에서 시작합니다.
               </p>
               {hasResumableSave ? (
                 resumePanel
