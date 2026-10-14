@@ -5,9 +5,9 @@
  * and the few direct `confirm` calls): restoring or deleting a recovery slot,
  * restoring the kept backup, clearing the error log, starting fresh after a
  * recovery or from the error screen, 프롤로그 시작 / NEW GAME+ 시작 over a run
- * that can be resumed, 초기화 / 다시 플레이, reopening the case that
- * just closed (the 이 사건 다시 도전 button, `R` on the result page, 이 사건을
- * 다시 열기, 복구 루트 시작), exporting the diagnostic log, and the cloud save's
+ * that can be resumed, 초기화 (the play header's and the result page's), reopening
+ * the case that just closed (이 사건 다시 도전 in both places on the result page,
+ * `R` there, 복구 루트 시작), exporting the diagnostic log, and the cloud save's
  * overwrite, import and delete. With no listener Playwright dismisses a dialog,
  * so an unanswered question turns the click into a no-op and the test fails
  * somewhere further on, or passes having tested nothing.
