@@ -71,7 +71,7 @@
   min-height: 34px;
   margin-top: 9px;
   padding: 0 10px;
-  color:var(--c-paper);
+  color: var(--c-paper);
   background: var(--c-danger-deep);
   border: 0;
   border-radius: 5px;
@@ -214,8 +214,7 @@
   color: var(--ui-text);
   background:
     radial-gradient(60% 90% at 0% 0%, rgb(217 255 98 / 0.1), transparent 62%),
-    radial-gradient(50% 80% at 100% 100%, rgb(104 196 255 / 0.07), transparent 70%),
-    var(--ui-surface-1);
+    radial-gradient(50% 80% at 100% 100%, rgb(104 196 255 / 0.07), transparent 70%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-xl);
   box-shadow: var(--ui-shadow-2);
@@ -388,8 +387,7 @@
 }
 .outcome-panel:not(.judgment-profile-panel) {
   background:
-    radial-gradient(90% 70% at 0% 100%, rgb(255 206 115 / 0.08), transparent 65%),
-    var(--ui-surface-1);
+    radial-gradient(90% 70% at 0% 100%, rgb(255 206 115 / 0.08), transparent 65%), var(--ui-surface-1);
 }
 .outcome-panel-mark strong {
   justify-self: start;
@@ -425,8 +423,7 @@
   overflow: hidden;
   color: var(--ui-text);
   background:
-    radial-gradient(80% 120% at 100% 0%, rgb(217 255 98 / 0.14), transparent 60%),
-    var(--ui-surface-2);
+    radial-gradient(80% 120% at 100% 0%, rgb(217 255 98 / 0.14), transparent 60%), var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow:
@@ -767,7 +764,8 @@
 .report-archive-body .result-grid > section {
   margin: 0;
 }
-.report-archive-body :is(section.report-section, section.bars-panel, section.history, section.pressure-ledger) {
+.report-archive-body
+  :is(section.report-section, section.bars-panel, section.history, section.pressure-ledger) {
   padding: 18px;
   color: var(--ui-text);
   background: var(--ui-surface-2);
@@ -1201,9 +1199,7 @@
 .story-reveal {
   padding: 24px;
   color: var(--ui-text);
-  background:
-    radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%),
-    var(--ui-surface-2);
+  background: radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
 }
@@ -1528,7 +1524,31 @@
 /* The season's extension panels are one inner surface on the report. Their
    own rules, further down, set only what differs from panel to panel; the
    .result-page scope is what lets this outrank them from above. */
-.result-page :is(.ending-variant-panel, .ending-epilogue-panel, .failure-recovery-panel, .operator-reveal-panel, .operations-snapshot, .observation-panel, .ending-scene-profile, .ending-preview-panel, .authority-review-panel, .origin-ending-note, .failure-objectives, .play-report-panel, .telemetry-dashboard-panel, .ranking-integrity, .aftermath-panel, .replay-diagnostics, .delayed-consequence-strip, .ranking-comparison, .season-goal-strip, .balance-report, .ending-axis-panel, .telemetry-stats) {
+.result-page
+  :is(
+    .ending-variant-panel,
+    .ending-epilogue-panel,
+    .failure-recovery-panel,
+    .operator-reveal-panel,
+    .operations-snapshot,
+    .observation-panel,
+    .ending-scene-profile,
+    .ending-preview-panel,
+    .authority-review-panel,
+    .origin-ending-note,
+    .failure-objectives,
+    .play-report-panel,
+    .telemetry-dashboard-panel,
+    .ranking-integrity,
+    .aftermath-panel,
+    .replay-diagnostics,
+    .delayed-consequence-strip,
+    .ranking-comparison,
+    .season-goal-strip,
+    .balance-report,
+    .ending-axis-panel,
+    .telemetry-stats
+  ) {
   display: grid;
   gap: 8px;
   margin: 0;
@@ -1542,18 +1562,35 @@
   font-size: 0.875rem;
   line-height: 1.6;
 }
-.result-page > :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel) {
+.result-page
+  > :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel) {
   padding: clamp(18px, 2.4vw, 26px);
   background:
-    radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%),
-    var(--ui-surface-1);
+    radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
   border-radius: var(--ui-radius-lg);
 }
 .result-page .ending-variant-panel.failure,
 .result-page .ranking-integrity.invalid {
   border-left-color: var(--ui-heat);
 }
-.result-page :is(section.ending-variant-panel, section.ending-epilogue-panel, section.operator-reveal-panel, section.operations-snapshot, section.ending-scene-profile, section.ending-preview-panel, section.authority-review-panel, section.play-report-panel, section.telemetry-dashboard-panel, section.aftermath-panel, section.delayed-consequence-strip, section.ranking-comparison, section.season-goal-strip, section.balance-report) > span,
+.result-page
+  :is(
+    section.ending-variant-panel,
+    section.ending-epilogue-panel,
+    section.operator-reveal-panel,
+    section.operations-snapshot,
+    section.ending-scene-profile,
+    section.ending-preview-panel,
+    section.authority-review-panel,
+    section.play-report-panel,
+    section.telemetry-dashboard-panel,
+    section.aftermath-panel,
+    section.delayed-consequence-strip,
+    section.ranking-comparison,
+    section.season-goal-strip,
+    section.balance-report
+  )
+  > span,
 .result-page .failure-objectives > strong,
 .result-page .replay-diagnostics > summary {
   color: var(--ui-accent);
@@ -1561,14 +1598,54 @@
   font-weight: 700;
   letter-spacing: 0.12em;
 }
-.result-page :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel, section.operator-reveal-panel, section.operations-snapshot, section.observation-panel, section.ending-scene-profile, section.ending-preview-panel, section.authority-review-panel, p.origin-ending-note, section.failure-objectives, section.play-report-panel, section.telemetry-dashboard-panel, p.ranking-integrity, section.aftermath-panel, details.replay-diagnostics, section.delayed-consequence-strip, section.ranking-comparison, section.season-goal-strip, section.balance-report) :is(p, small, li, em),
+.result-page
+  :is(
+    section.ending-variant-panel,
+    section.ending-epilogue-panel,
+    section.failure-recovery-panel,
+    section.operator-reveal-panel,
+    section.operations-snapshot,
+    section.observation-panel,
+    section.ending-scene-profile,
+    section.ending-preview-panel,
+    section.authority-review-panel,
+    p.origin-ending-note,
+    section.failure-objectives,
+    section.play-report-panel,
+    section.telemetry-dashboard-panel,
+    p.ranking-integrity,
+    section.aftermath-panel,
+    details.replay-diagnostics,
+    section.delayed-consequence-strip,
+    section.ranking-comparison,
+    section.season-goal-strip,
+    section.balance-report
+  )
+  :is(p, small, li, em),
 .result-page .failure-objectives > span,
 .result-page :is(.ranking-integrity.valid, .ranking-integrity.invalid) {
   margin: 0;
   color: var(--ui-text-2);
   font-style: normal;
 }
-.result-page :is(section.ending-variant-panel, section.failure-recovery-panel, section.operations-snapshot, section.ending-scene-profile, section.ending-preview-panel, section.authority-review-panel, p.origin-ending-note, section.failure-objectives, section.play-report-panel, section.telemetry-dashboard-panel, p.ranking-integrity, section.aftermath-panel, section.ranking-comparison, section.season-goal-strip) :is(h2, strong, b) {
+.result-page
+  :is(
+    section.ending-variant-panel,
+    section.failure-recovery-panel,
+    section.operations-snapshot,
+    section.ending-scene-profile,
+    section.ending-preview-panel,
+    section.authority-review-panel,
+    p.origin-ending-note,
+    section.failure-objectives,
+    section.play-report-panel,
+    section.telemetry-dashboard-panel,
+    p.ranking-integrity,
+    section.aftermath-panel,
+    section.ranking-comparison,
+    section.season-goal-strip
+  )
+  :is(h2, strong, b) {
   color: var(--ui-text);
 }
 .result-page .ending-variant-panel h2 {
@@ -1804,11 +1881,21 @@
   line-height: 1.75;
 }
 
-.interlude-panel.mood-warm { --interlude-tint: #f0b968; }
-.interlude-panel.mood-quiet { --interlude-tint: #8fb8d8; }
-.interlude-panel.mood-wry { --interlude-tint: #9fd6a8; }
-.interlude-panel.mood-grief { --interlude-tint: #d89ab0; }
-.interlude-panel.mood-still { --interlude-tint: #a9a4c4; }
+.interlude-panel.mood-warm {
+  --interlude-tint: #f0b968;
+}
+.interlude-panel.mood-quiet {
+  --interlude-tint: #8fb8d8;
+}
+.interlude-panel.mood-wry {
+  --interlude-tint: #9fd6a8;
+}
+.interlude-panel.mood-grief {
+  --interlude-tint: #d89ab0;
+}
+.interlude-panel.mood-still {
+  --interlude-tint: #a9a4c4;
+}
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
    an element they can match at the same specificity, so they compute exactly

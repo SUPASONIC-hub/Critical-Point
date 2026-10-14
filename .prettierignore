@@ -2,8 +2,14 @@
 # checked in minified again. JS/JSX formatting is left to ESLint and review so
 # that behaviour changes stay readable in diffs.
 *
+# `*` also matches the directories on the way down, and a file inside an
+# ignored directory cannot be re-included: each directory needs its own line.
+# Until 2026-10-13 `src/` had none, so every sheet read `ignored: true` and
+# `format:check` passed without opening one.
+!src/
 !src/styles/
-!src/styles/*.css
+!src/styles/**/
+!src/styles/**/*.css
 
 # Minified output of `npm run build:critical`, sliced verbatim out of the built
 # stylesheet. Reformatting it would break the staleness guard in vite.config.js,
