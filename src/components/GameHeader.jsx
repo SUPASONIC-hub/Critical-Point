@@ -1,5 +1,6 @@
-import { FileText, RefreshCcw, Save } from "lucide-react";
+import { FileText, RefreshCcw, Save, Settings2 } from "lucide-react";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
+import { setComfortDialogOpen } from "./ComfortDialog.jsx";
 
 /**
  * Scene identity and the run's two standing numbers.
@@ -10,6 +11,11 @@ import { useShortcutHints } from "../state/accessibilitySettings.js";
  * by a line of type. The decision clock moved out of this bar entirely: it
  * belongs above the choices, where the decision is, and one clock is enough
  * (the table's own, in `src/gauntlet/GauntletStage.jsx`).
+ *
+ * 편의 설정 is the third of the four, between the two saves and 초기화: the
+ * comfort panel the intro has, opened in a dialog that holds the table's
+ * clock (ComfortDialog.jsx). The table draws the dialog, with its other
+ * pages; this button only asks for it.
  */
 export function GameHeader({
   node,
@@ -44,6 +50,9 @@ export function GameHeader({
           title="저장 후 나가기"
         >
           <FileText size={16} />
+        </button>
+        <button type="button" className="ghost" onClick={() => setComfortDialogOpen(true)} aria-haspopup="dialog" aria-label="편의 설정" title="편의 설정" data-testid="open-comfort-settings">
+          <Settings2 size={16} />
         </button>
         <button type="button" className="ghost header-reset" onClick={onReset} aria-label="초기화" title="초기화">
           <RefreshCcw size={16} />

@@ -32,7 +32,8 @@ list of the files it touched.
 - The ranking is ordered by a score the server reads off the run's own `final`
   case row and types, and the server decides every timestamp, identity and
   rate a telemetry row claims (priority 60).
-- Six comfort settings sit in a folded drawer on the intro's setup console:
+- Six comfort settings sit in a folded drawer on the intro's setup console,
+  and in a dialog the play header opens that holds the table's clock:
   story mode, table time, a reading clock that waits, calm effects, no letter
   keys, a still intro (priority 87).
 - The table's rules turn on in steps over 프롤로그 01-05 and are all on from
@@ -378,8 +379,8 @@ Still open, on purpose:
     the table is the change this rule exists to stop. The briefing page
     (priority 51) and the relic draft (priority 39) are modals that hold the
     clock, not panels on the table, as is the question `confirmAction` asks
-    (`초기화` in the middle of a case); the comfort settings (priority 87) live
-    on the intro. On a phone the header's three icon buttons are drawn 30x28
+    (`초기화` in the middle of a case), and so is the comfort settings' dialog
+    (priority 87). On a phone the header's four icon buttons are drawn 28x28
     but each has an invisible 44px-tall hit area, and 초기화 sits 9px further
     off than the others; the three stance buttons have the same hit area.
     A phone on its side has a layout of its own
@@ -506,12 +507,13 @@ Still open, on purpose:
     final one) drafts three relics from `getRelicPool` -- the defaults plus what
     the codex unlocked -- seeded by its last window so a reload cannot reroll
     them, and `openCaseRun` carries the offer to the next case's first table.
-    The draft, the briefing page and the question `confirmAction` asks are
-    the only surfaces allowed in front of the table, and each holds the clock
-    while it is up (the question through `useConfirmOpen`). The draft traps
-    focus and returns it on close, keys 1-3 take a relic, Enter takes the
-    focused one, Escape passes, and `dismissProtocolBreach` passes for flows
-    that only need to get past a decision. A pick re-deals the untouched window (`REDEAL`) through the same
+    The draft, the briefing page, the question `confirmAction` asks and the
+    comfort settings' dialog (priority 87) are the only surfaces allowed in
+    front of the table, and each holds the clock while it is up (the question
+    through `useConfirmOpen`, the settings through `useComfortDialogOpen`). The
+    draft traps focus and returns it on close, keys 1-3 take a relic, Enter
+    takes the focused one, Escape passes, and `dismissProtocolBreach` passes
+    for flows that only need to get past a decision. A pick re-deals the untouched window (`REDEAL`) through the same
     `equipRelic` the runtime saves. The board records the relics it was dealt
     (`schema.relics`), so `applyRelics` is idempotent. A relic that softens a
     mutation names itself on the breach (`softenedBy`). The codex
@@ -1126,7 +1128,9 @@ Still open, on purpose:
     import the preload handler took resolves to `undefined` instead of
     throwing, and that must read as a `ChunkLoadError`, not a crash.
 87. Comfort settings live on the intro, in a folded drawer of the setup
-    console -- never a panel in front of the table (priority 27). They are
+    console, and in a dialog the play header opens
+    (`src/components/ComfortDialog.jsx`), which holds the table's clock while
+    it is up -- never a panel on the table (priority 27). They are
     stored under one key (`ACCESSIBILITY_SETTINGS_KEY`,
     `critical-point-accessibility-v1`, in `appConfig.js`) and read by
     `src/state/accessibilitySettings.js`, a leaf module the shell loads before

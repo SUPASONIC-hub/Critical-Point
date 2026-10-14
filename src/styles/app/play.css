@@ -1545,6 +1545,61 @@
   border-radius: var(--ui-radius-sm);
 }
 
+/* The comfort settings in front of the table (ComfortDialog.jsx). The
+   backdrop is the reveal's, a step above the briefing page and the music
+   controls: on a short phone the sheet reaches the top of the screen, and
+   닫기 would be under the two music buttons. The panel inside is the intro's
+   (comfort.css); only its spacing is the drawer's there, and is given here. */
+.comfort-backdrop {
+  z-index: 31;
+}
+
+.comfort-dialog {
+  display: grid;
+  gap: 12px;
+  width: min(520px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 18px;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+}
+
+.comfort-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.comfort-dialog h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.comfort-dialog-note {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.comfort-dialog .ghost {
+  min-height: 44px;
+  color: var(--ui-text);
+  background: var(--ui-surface-3);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+}
+
+.comfort-dialog .accessibility-panel {
+  display: grid;
+  gap: 10px;
+}
+
 .gx-mutation {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -2036,12 +2091,15 @@
 
   .gauntlet-shell .top-actions.compact-actions button {
     position: relative;
-    width: 30px;
+    width: 28px;
     min-height: 28px;
     border-radius: 8px;
   }
 
-  /* The drawn button stays 30x28 so the header keeps its one row; what the
+  /* Four buttons since 편의 설정 joined them, each 28px wide where three were
+     30: 130px of tools with their gaps, against the 240px a 360px phone has
+     left of the music controls, which leaves the case stamp its 100px.
+     The drawn button stays 28x28 so the header keeps its one row; what the
      finger has to hit is 44px tall, and as wide as the gap to its neighbour
      allows without two targets overlapping. 초기화 sits apart: it is the one
      that throws the run away (it asks first, too). */

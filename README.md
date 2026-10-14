@@ -687,7 +687,7 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
 
 ### 편의 설정
 
-첫 화면의 `편의 설정` 서랍에서 고르고, 이 기기에 저장됩니다(`src/state/accessibilitySettings.js`).
+첫 화면의 `편의 설정` 서랍이나 플레이 화면 머리의 `편의 설정` 버튼에서 고르고, 이 기기에 저장됩니다(`src/state/accessibilitySettings.js`). 플레이 중에 연 창이 떠 있는 동안 판의 시계는 멈춥니다.
 
 | 설정 | 동작 |
 |---|---|
