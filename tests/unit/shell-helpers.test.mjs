@@ -286,18 +286,133 @@ test("the table's clock is the page's monotonic one", () => withTableClock(() =>
   assert.ok(Number.isFinite(monotonicNow()));
 }));
 
-const { confirmAction } = await import("../../src/state/confirmAction.js");
+const { answerConfirm, confirmAction, isConfirmOpen, mountConfirmHost, useConfirmOpen, watchConfirm } = await import("../../src/state/confirmAction.js");
 const { focusSceneTitle } = await import("../../src/state/sceneFocus.js");
 
-test("a destructive action asks first, and goes ahead where there is no dialog", () => {
-  assert.equal(confirmAction("reset?"), true, "no confirm() in the host");
+test("with no dialog on the page a destructive action asks the browser, and goes ahead where there is none", async () => {
+  const unasked = confirmAction("reset?");
+  assert.ok(unasked instanceof Promise, "the answer is awaited whoever gives it");
+  assert.equal(await unasked, true, "no confirm() in the host");
   const asked = [];
   globalThis.confirm = (message) => (asked.push(message), false);
   try {
-    assert.equal(confirmAction("reset?"), false);
+    assert.equal(await confirmAction("reset?"), false);
     assert.deepEqual(asked, ["reset?"]);
   } finally {
     delete globalThis.confirm;
+  }
+});
+
+/** The dialog as `confirmAction` sees it: what it was last told to show. */
+function mountDialog() {
+  const shown = [];
+  const unmount = mountConfirmHost((question) => shown.push(question));
+  return { shown, unmount };
+}
+
+/** Whether a promise has an answer yet, without waiting for one. */
+async function settled(promise) {
+  const pending = Symbol("pending");
+  return (await Promise.race([promise, Promise.resolve(pending)])) !== pending;
+}
+
+test("the dialog on the page is what asks, and the browser is left out of it", async () => {
+  const dialog = mountDialog();
+  globalThis.confirm = () => assert.fail("the browser's dialog was asked");
+  try {
+    const answer = confirmAction("reset?");
+    assert.deepEqual(dialog.shown, ["reset?"]);
+    assert.equal(await settled(answer), false, "nothing goes ahead while the question is up");
+    answerConfirm(true);
+    assert.equal(await answer, true);
+    assert.deepEqual(dialog.shown, ["reset?", null], "and the question comes down with its answer");
+
+    const declined = confirmAction("delete?");
+    answerConfirm(false);
+    assert.equal(await declined, false);
+    assert.deepEqual(dialog.shown, ["reset?", null, "delete?", null]);
+  } finally {
+    delete globalThis.confirm;
+    dialog.unmount();
+  }
+});
+
+test("an answer with no question up answers nothing", async () => {
+  answerConfirm(true);
+  const dialog = mountDialog();
+  try {
+    answerConfirm(true);
+    assert.deepEqual(dialog.shown, [], "the dialog is not told to close what it never opened");
+    const answer = confirmAction("reset?");
+    answerConfirm(true);
+    answerConfirm(false);
+    assert.equal(await answer, true, "and a second answer does not reach the first question");
+    assert.deepEqual(dialog.shown, ["reset?", null]);
+  } finally {
+    dialog.unmount();
+  }
+});
+
+test("one question at a time: a second one answers the first no", async () => {
+  const dialog = mountDialog();
+  try {
+    const first = confirmAction("reset?");
+    const second = confirmAction("delete?");
+    assert.equal(await first, false);
+    assert.equal(await settled(second), false);
+    assert.deepEqual(dialog.shown, ["reset?", null, "delete?"]);
+    answerConfirm(true);
+    assert.equal(await second, true);
+  } finally {
+    dialog.unmount();
+  }
+});
+
+test("the table is told while a question is up, and holds its clock for that long", async () => {
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const Table = () => createElement("i", null, useConfirmOpen() ? "paused" : "live");
+  const told = [];
+  const stopWatching = watchConfirm(() => told.push(isConfirmOpen()));
+  const dialog = mountDialog();
+  try {
+    assert.equal(renderToStaticMarkup(createElement(Table)), "<i>live</i>");
+    const answer = confirmAction("reset?");
+    assert.equal(renderToStaticMarkup(createElement(Table)), "<i>paused</i>");
+    answerConfirm(false);
+    assert.equal(await answer, false);
+    assert.equal(renderToStaticMarkup(createElement(Table)), "<i>live</i>");
+    assert.deepEqual(told, [true, false], "once as it goes up and once as it comes down");
+    stopWatching();
+    confirmAction("delete?");
+    dialog.unmount();
+    assert.deepEqual(told, [true, false], "and nobody is told once they stop watching");
+    assert.equal(isConfirmOpen(), false, "a dialog that leaves takes its question with it");
+  } finally {
+    stopWatching();
+    dialog.unmount();
+  }
+});
+
+test("a dialog that leaves the page answers its question no, and only takes itself off", async () => {
+  const dialog = mountDialog();
+  const answer = confirmAction("reset?");
+  dialog.unmount();
+  assert.equal(await answer, false, "nobody is left to say yes");
+  assert.deepEqual(dialog.shown, ["reset?", null]);
+  assert.equal(await confirmAction("reset?"), true, "and the next question is asked as it is with no dialog");
+  assert.deepEqual(dialog.shown, ["reset?", null]);
+
+  // A second mount replaces the first; the first one's leaving is then not the dialog's.
+  const later = mountDialog();
+  try {
+    dialog.unmount();
+    const asked = confirmAction("delete?");
+    assert.deepEqual(later.shown, ["delete?"]);
+    answerConfirm(true);
+    assert.equal(await asked, true);
+  } finally {
+    later.unmount();
   }
 });
 

@@ -618,13 +618,13 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    * that just closed starts it over and throws its record away, so that asks
    * first: `R` did it on one keypress, while the report was being read.
    */
-  function openCase(caseId) {
-    if (caseId === currentCase && !confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워지고, 다시 하는 판은 연습으로 세어 금고는 그대로입니다. 이 사건의 결과 요약은 새 판을 끝내면 그 판의 것으로 바뀝니다.")) return false;
-    startCase(caseId);
+  async function openCase(caseId) {
+    if (caseId === currentCase && !(await confirmAction("이 사건을 처음부터 다시 시작할까요? 방금 끝낸 판의 선택 기록은 지워지고, 다시 하는 판은 연습으로 세어 금고는 그대로입니다. 이 사건의 결과 요약은 새 판을 끝내면 그 판의 것으로 바뀝니다."))) return false;
+    startCaseEvent(caseId);
     return true;
   }
-  function startRecoveryRoute() {
-    if (openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
+  async function startRecoveryRoute() {
+    if (await openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
   }
   // A case the season has not fetched yet is opened when it lands (caseArrival.js).
   // One that cannot be fetched and did not reload the page -- no connection, or

@@ -158,24 +158,25 @@ export function IntroScreen({ view, renderers = {} }) {
 
   // Both start the season over, and a run that can be resumed is progress
   // thrown away: they ask first, the way every such control does (priority 36).
-  const mayDiscardRun = (question) => !hasResumableSave || confirmAction(question);
-  const startNewRun = () => {
-    if (mayDiscardRun(CONFIRM_START_OVER)) beginOpeningBurst(startGame);
+  // With no run to lose nothing is awaited: the first press on the page still
+  // opens the burst, and starts its sound, inside the press itself.
+  const startNewRun = async () => {
+    if (!hasResumableSave || (await confirmAction(CONFIRM_START_OVER))) beginOpeningBurst(startGame);
   };
-  const startNewGamePlusRun = () => {
-    if (mayDiscardRun(CONFIRM_START_NEW_GAME_PLUS)) beginOpeningBurst(startNewGamePlus);
+  const startNewGamePlusRun = async () => {
+    if (!hasResumableSave || (await confirmAction(CONFIRM_START_NEW_GAME_PLUS))) beginOpeningBurst(startNewGamePlus);
   };
   // A roadmap card. Opening a case starts it at its first scene, so the card of
   // the case in progress resumes it instead, and a press that would throw a
   // record away asks first (decideCaseCardPress has the cases).
-  const pressCaseCard = (caseItem) => {
+  const pressCaseCard = async (caseItem) => {
     const press = decideCaseCardPress({
       caseId: caseItem.id, status: caseItem.status, currentCase, atReport, hasResumableSave, logLength: log.length,
     });
     if (press === "locked") return;
     if (press === "resume") return resumeSavedGame();
-    if (press === "replace" && !confirmAction(CONFIRM_REPLACE_CASE)) return;
-    if (press === "restart" && !confirmAction(CONFIRM_RESTART_CASE)) return;
+    if (press === "replace" && !(await confirmAction(CONFIRM_REPLACE_CASE))) return;
+    if (press === "restart" && !(await confirmAction(CONFIRM_RESTART_CASE))) return;
     beginOpeningBurst(() => startCase(caseItem.id), caseItem.id);
   };
   const openingCase = seasonCasesBase.find((caseItem) => caseItem.id === openingBurst) ?? null;

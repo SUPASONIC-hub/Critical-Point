@@ -159,8 +159,8 @@ export function createRunLifecycle({
 
   // The question names what goes and what stays (state/runStorageReset.js has
   // the list). It used to say "everything", and left six kinds of thing behind.
-  function resetRun() {
-    if (!confirmAction(CONFIRM_RESET)) return;
+  async function resetRun() {
+    if (!(await confirmAction(CONFIRM_RESET))) return;
     onSuppressSaves();
     const failedResetKeys = clearRunStorage();
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);

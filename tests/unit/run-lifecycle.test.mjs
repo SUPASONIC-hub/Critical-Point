@@ -239,14 +239,14 @@ const RESET_STORAGE = {
 test("wiping the run", async () => {
   const harness = await createRunHarness({ saved: midRun(), operatorOrigin: "lab", patch: dirtyPanels, storage: RESET_STORAGE });
   harness.act("saveGame");
-  harness.act("resetEverything");
+  await harness.act("resetEverything");
   pin("reset/confirmed", harness);
 });
 
 test("declining to wipe the run", async () => {
   const harness = await createRunHarness({ saved: midRun(), patch: dirtyPanels, confirm: false });
   harness.act("saveGame");
-  harness.act("resetEverything");
+  await harness.act("resetEverything");
   pin("reset/declined", harness);
 });
 

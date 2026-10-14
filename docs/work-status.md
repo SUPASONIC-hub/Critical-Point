@@ -175,8 +175,9 @@ Still open, on purpose:
    enabled. Every spec takes `test` and `expect` from `tests/helpers/network.js`,
    whose route answers the stub backend and fails a test on any request that
    leaves the machine. A spec that presses a control that asks first accepts
-   through `tests/helpers/dialogs.js`: Playwright dismisses an unanswered
-   dialog, which turns the press into a silent no-op.
+   through `tests/helpers/dialogs.js`: the question is a dialog in the game
+   (`src/components/ConfirmDialog.jsx`), not the browser's, and an unanswered
+   one stays up and covers the page, so the next click times out on it.
 6. Keep CSS split by surface under `src/styles/app/` (nine sheets); preserve
    import order in `src/styles/app.css`. There is no catch-all late sheet any
    more -- `extensions.css` was retired on 2026-09-28 and its rules went home
@@ -373,7 +374,8 @@ Still open, on purpose:
     on a phone is one line; a wide screen is two panes. A new panel in front of
     the table is the change this rule exists to stop. The briefing page
     (priority 51) and the relic draft (priority 39) are modals that hold the
-    clock, not panels on the table, and the comfort settings (priority 87) live
+    clock, not panels on the table, as is the question `confirmAction` asks
+    (`초기화` in the middle of a case); the comfort settings (priority 87) live
     on the intro. On a phone the header's three icon buttons are drawn 30x28
     but each has an invisible 44px-tall hit area, and 초기화 sits 9px further
     off than the others; the three stance buttons have the same hit area.
@@ -501,11 +503,12 @@ Still open, on purpose:
     final one) drafts three relics from `getRelicPool` -- the defaults plus what
     the codex unlocked -- seeded by its last window so a reload cannot reroll
     them, and `openCaseRun` carries the offer to the next case's first table.
-    The draft and the briefing page are the only surfaces allowed in front of
-    the table: the draft holds the clock, traps focus and returns it on close,
-    keys 1-3 take a relic, Enter takes the focused one, Escape passes, and
-    `dismissProtocolBreach` passes for flows that only need to get past a
-    decision. A pick re-deals the untouched window (`REDEAL`) through the same
+    The draft, the briefing page and the question `confirmAction` asks are
+    the only surfaces allowed in front of the table, and each holds the clock
+    while it is up (the question through `useConfirmOpen`). The draft traps
+    focus and returns it on close, keys 1-3 take a relic, Enter takes the
+    focused one, Escape passes, and `dismissProtocolBreach` passes for flows
+    that only need to get past a decision. A pick re-deals the untouched window (`REDEAL`) through the same
     `equipRelic` the runtime saves. The board records the relics it was dealt
     (`schema.relics`), so `applyRelics` is idempotent. A relic that softens a
     mutation names itself on the breach (`softenedBy`). The codex

@@ -69,6 +69,18 @@
   border-color: var(--ui-line);
   cursor: not-allowed;
 }
+/* The question a destructive control asks (components/ConfirmDialog.jsx): the
+   panel and the buttons are the error screen's, in front of whatever is up. */
+.confirm-layer {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(4 7 8 / 0.72);
+  overflow: auto;
+}
 * {
   box-sizing: border-box;
 }
