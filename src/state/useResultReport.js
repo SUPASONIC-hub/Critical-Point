@@ -19,7 +19,7 @@ import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../g
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
 import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
-import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
+import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
@@ -138,6 +138,9 @@ export function useResultReport({
     () => getEndingVariant({ resources, discoveredClues, log, ...seasonStrain }),
     [discoveredClues, log, resources, seasonStrain],
   );
+  // The same season against the collapse gate, for the line each report prints
+  // and the cases a collapse offers to play again (reportViewModels.js).
+  const seasonStanding = useMemo(() => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase }), [caseResults, resources]);
   // What the ruling read: the standing the season's cases closed on on average,
   // or the last case's when no summary carries one.
   const standing = seasonStrain.seasonResources ?? resources;
@@ -169,6 +172,7 @@ export function useResultReport({
     ...reportCopy,
     result,
     endingVariant,
+    seasonStanding,
     rankingComparison,
     logicReport,
     // For the page before the finale (`getSeasonRecordNotice`).

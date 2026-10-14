@@ -9,7 +9,8 @@
  * fresh after a recovery or from the error screen, 프롤로그 시작 / NEW GAME+
  * 시작 over a run that can be resumed, 초기화 (the play header's and the result
  * page's), reopening the case that just closed (이 사건 다시 도전 in both places
- * on the result page, `R` there, 복구 루트 시작), a roadmap card that would drop
+ * on the result page, `R` there, a collapse's 다시 도전 for that case), a roadmap
+ * card that would drop
  * a record, and the cloud save's overwrite, import and delete. One question is
  * still the browser's own `confirm`: exporting the diagnostic log, a
  * debug-build tool. Both kinds are answered here and land in the same list.

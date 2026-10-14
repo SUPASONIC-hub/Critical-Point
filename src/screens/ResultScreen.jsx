@@ -212,6 +212,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div>
               <h2>{caseOutcome.title}</h2>
               <p>{caseOutcome.text}</p>
+              <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
             </div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
