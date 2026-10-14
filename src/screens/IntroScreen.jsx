@@ -386,7 +386,7 @@ export function IntroScreen({ view, renderers = {} }) {
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
-                NEW GAME+ 시작
+                <span><span lang="en">NEW GAME+</span> 시작</span>
               </button>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
@@ -761,7 +761,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   )}
                   {savedResult && (
                     <small className="case-result-mini">
-                      RANK {savedResult.rank} · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}초 · 판 다시 짜기{" "}
+                      <span lang="en">RANK {savedResult.rank}</span> · {triggerLabels[savedResult.primary[0]]} · {savedResult.averageResponseTime}초 · 판 다시 짜기{" "}
                       {savedResult.reframeCount}
                     </small>
                   )}

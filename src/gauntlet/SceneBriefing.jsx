@@ -184,7 +184,7 @@ export function SceneBriefing({
         onKeyDown={trapTab}
       >
         <header className="gx-comic-top">
-          <p className="gx-comic-kicker">{node.phase}</p>
+          <p className="gx-comic-kicker" lang="en">{node.phase}</p>
           <p id="gx-comic-title" className="gx-comic-title">{node.title}</p>
           <button
             type="button"
@@ -272,7 +272,7 @@ export function SceneBriefing({
           {broken && (
             <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at("4 / 1 / 5 / -1", carried.length > 0 ? carryRow + 1 : 0)}>
               <p className="gx-breach-kicker">
-                <TriangleAlert size={14} aria-hidden="true" /> PROTOCOL BREACH · 이번 판의 규칙이 바뀌었다
+                <TriangleAlert size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span> · 이번 판의 규칙이 바뀌었다</span>
               </p>
               <RuleRows rules={penalties} resourceMeta={resourceMeta} />
             </div>
