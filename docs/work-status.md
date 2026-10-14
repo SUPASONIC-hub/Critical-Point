@@ -1238,6 +1238,37 @@ Still open, on purpose:
       (`scripts/service-worker-build.mjs`).
     - Not verified: iOS Safari and an installed copy on a phone. The checks
       run Chromium only; Playwright WebKit skips the offline spec.
+90. The next change to the shape of a save raises `SAVE_SCHEMA_VERSION`
+    (`src/appConfig.js`) from 2 to 3. There has been one step so far:
+    `migrateSavedState` lifts a save marked 1, or not marked, to 2 by giving
+    it `runId`, `discoveredClues`, `pendingTelemetry`, `caseResults`,
+    `playtestFeedback` and `dynamics`. Every change since was made under the
+    same 2 -- keys added and filled in on load (priority 85), five keys
+    dropped (the note under `SAVE_STATE_KEYS`) -- so the number does not say
+    which build wrote a save. The change that raises it adds the 2-to-3 step
+    to `migrateSavedState`, which answers null for any pair of versions it
+    has no step for, and a fixture written by the build before it
+    (`tests/unit/fixtures/saves/`, priority 85). A build still at 2 does not
+    read a save marked 3: it keeps the text under
+    `critical-point-unreadable-save-v1` and deletes nothing. The same constant
+    is written into the play-log export and into every case summary's
+    `schemaVersion`, which `ranking_public_summary` publishes.
+91. The rank line of the `LOGIC HOLD` panel is read whatever the research
+    consent says, and the read carries nothing of the player's. When a season
+    ends on a score the ranking takes (`getRankedLogicHold`,
+    `src/logicReport.js`), `useLogicStanding`
+    (`src/state/useLogicStanding.js`) calls `logic_hold_cutoffs()` once
+    through `callSupabaseRpc` (`src/telemetry.js`): a POST to
+    `/rest/v1/rpc/logic_hold_cutoffs` whose body is `{}` and whose headers
+    are the anon key, as on every request to the backend. No session id, run
+    id, name, score or hold rate is in it. The answer is the number of ranked
+    seasons and, from fifty of them, three cut points
+    (`20261011000000_logic_hold_cutoffs.sql`); the place is worked out on the
+    device (`readStanding`). The function is `stable` and writes nothing, so
+    the server learns what any request tells it, an address and a time. An
+    unticked box stops the telemetry rows -- case, season, feedback and error
+    rows -- and does not stop this read. A build with no backend asks
+    nothing.
 
 ## Verification Commands
 
