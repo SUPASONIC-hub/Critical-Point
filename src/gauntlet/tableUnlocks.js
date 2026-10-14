@@ -139,8 +139,12 @@ const STEPS = [
     caseId: "prologue02",
     adds: ["logic", "blackout", "aftershock", "silence"],
     storyIntro: [0],
+    // The last sentence of the first line: the streak pays for holding a type
+    // and the report's 관점 전환 score (gameLogic's `getCognitionSpread`) for
+    // spreading the picks over the four, and nothing else says so before the
+    // season's closing report (logicReport.js, `caption`).
     intro: [
-      "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다.",
+      "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다. 사건 결과의 '관점 전환' 점수는 반대로 네 유형을 고르게 쓸수록 오릅니다.",
       "벽에 닿으면 다음 판은 카드가 가려지고, 열기를 안은 채 시작합니다.",
     ],
   },
