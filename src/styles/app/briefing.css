@@ -611,6 +611,12 @@
     min-height: 5.5rem;
   }
 
+  /* A caption of three lines is 74.9px, and the band at its shortest has
+     82px inside its border. */
+  .gx-caption-place {
+    top: 4px;
+  }
+
   .gx-sfx {
     font-size: 1.75rem;
   }

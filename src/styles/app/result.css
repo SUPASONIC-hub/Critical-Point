@@ -1783,11 +1783,12 @@
   .result-page > .topbar {
     align-items: stretch;
   }
-  /* The music toggles float over the right half of this row. */
+  /* The music toggles float over this row's right end: two icons here, 92px
+     from the screen's edge, which is 76px of this row and 8px of air. */
   .result-page .brand-mark {
     align-self: flex-start;
     display: block;
-    max-width: calc(100% - 196px);
+    max-width: calc(100% - 84px);
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 32px;
