@@ -1,6 +1,6 @@
 import { expect } from "./network.js";
-import { SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
-import { nodes } from "../../src/gameData.js";
+import { RESULT_NODE_IDS, SEASON_ENTRY_CASE, seasonCasesBase } from "../../src/gameCases.js";
+import { nodeOrders, nodes } from "../../src/gameData.js";
 import { getReframeTarget } from "../../src/state/caseRoutes.js";
 import { clearGameStorage, readJsonStorage, TEST_STORAGE_KEYS } from "./storage.js";
 
@@ -381,6 +381,87 @@ export async function completeCurrentCase(page) {
     }
   }
   throw new Error("Case did not reach result page");
+}
+
+/**
+ * A card of `caseId` whose bust makes the room play a scene without the
+ * analyst, read off the graph: the scene to open (`fromId`), the card to stake
+ * there (by its words -- the hand is dealt shuffled), the scene the card leads
+ * to and a bust skips (`skippedId`), and the scene the run lands on instead
+ * (`onwardId`).
+ *
+ * The rule is spelled out here and not asked of `getBlackoutSkip`, so a test
+ * that uses the walk does not prove the runtime with the runtime: no skip onto
+ * a result, of an `attended` scene, or of a scene whose lead card goes nowhere
+ * or to a result. Cards that are gated (an authority, a side door with a
+ * condition) are passed over, on the table and as the skipped scene's lead,
+ * so the walk is the same on every run.
+ *
+ * Of the walks a case has, the one nearest its result: a test that goes on to
+ * close the case has the fewest scenes left to play.
+ */
+export function findSkippedSceneWalk(caseId = "case01") {
+  const dealt = (scene) => (scene?.choices ?? []).filter((choice) => choice.type !== "reframe");
+  const leadOf = (scene) => dealt(scene).find((choice) => choice.id === scene.leadChoiceId) ?? dealt(scene)[0] ?? null;
+  const scenesLeft = (nodeId) => {
+    let left = 0;
+    for (let at = nodeId; nodes[at] && !RESULT_NODE_IDS.has(at) && left < 40; left += 1) at = leadOf(nodes[at])?.next;
+    return left;
+  };
+  let nearest = null;
+  for (const fromId of nodeOrders[caseId] ?? []) {
+    if (RESULT_NODE_IDS.has(fromId)) continue;
+    for (const card of dealt(nodes[fromId])) {
+      if (card.requiredAuthority || card.branchCondition) continue;
+      const skipped = nodes[card.next];
+      if (!skipped || skipped.attended || RESULT_NODE_IDS.has(card.next) || !skipped.text || !skipped.question) continue;
+      const lead = leadOf(skipped);
+      if (!lead || lead.branchCondition || !nodes[lead.next] || RESULT_NODE_IDS.has(lead.next)) continue;
+      const left = scenesLeft(lead.next);
+      if (!nearest || left < nearest.left) nearest = { caseId, fromId, label: card.label, skippedId: card.next, onwardId: lead.next, left };
+    }
+  }
+  return nearest;
+}
+
+/**
+ * Pushes the staked card into the wall and waits for the reveal to say BUST.
+ *
+ * The loop stops on the verdict or on a stage that is no longer live, and a
+ * press that finds the button already closed is let go (the table's own clock
+ * can close it first, which is a bust too). What is asserted is the reveal's
+ * headline, which stays up until it is dismissed: the stage's own "bust" is
+ * gone 1.35 seconds after the slam, when the next window is dealt under the
+ * reveal (see the story-mode bust in gauntlet-loop.spec.js).
+ */
+export async function bustStakedCard(page) {
+  const stage = page.getByTestId("gauntlet-stage");
+  const verdict = page.locator(".decision-reveal h2");
+  for (let press = 0; press < 30; press += 1) {
+    if ((await verdict.isVisible()) || (await stage.getAttribute("data-status")) !== "live") break;
+    await page
+      .getByTestId("commit-push")
+      .click({ timeout: 1_000 })
+      .catch(() => {});
+  }
+  await expect(verdict, "the staked card did not bust").toHaveText("BUST", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+/**
+ * The fold a bust leaves for the scene it skipped (`SceneMinutes`), against
+ * the scene's own data: the summary names it, and inside are when, where and
+ * who, the lead if the scene has one, its text, its question, and the line
+ * that says nothing was played. Text is read whether the fold is open or not.
+ */
+export async function expectSceneMinutes(fold, scene) {
+  await expect(fold.locator("summary")).toHaveText(`회의록 · 「${scene.title}」`);
+  const notes = fold.locator("div > small");
+  await expect(notes).toHaveCount(2);
+  await expect(notes.first()).toHaveText([scene.clock, scene.place, scene.speaker].filter(Boolean).join(" · "));
+  await expect(fold.locator("div > p")).toHaveText([...(scene.lead ? [scene.lead] : []), scene.text, `질문 · ${scene.question}`]);
+  await expect(fold.locator("div > p.spoken-line")).toHaveText(`질문 · ${scene.question}`);
+  await expect(notes.last()).toHaveText("당신은 이 자리에 없었다. 낸 카드 없음.");
 }
 
 export function createSeededRandom(seed) {

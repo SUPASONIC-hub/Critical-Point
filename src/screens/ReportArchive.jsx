@@ -25,7 +25,7 @@ import * as gameConstants from "../gameConstants.js";
 export function ReportArchive({ view, observerEndingRecord, endingAxes, observationLabels }) {
   const [open, setOpen] = useState(false);
   const {
-    common: { currentCase, renderSceneLines },
+    common: { currentCase, renderSceneLines, renderSceneMinutes },
     ending: { finalAftermathEntry, endingProfile, endingPreview, endingSceneProfile, unopenedClueCount },
     score: {
       decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result, clamp,
@@ -571,6 +571,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
                 <div>{renderSceneLines(entry.sceneBeat)}</div>
               </details>
             )}
+            {entry.skippedNodeId && renderSceneMinutes(entry.skippedNodeId)}
             <small>{entry.responseTimeSec}초 · {entry.echo}</small>
           </div>
         </article>

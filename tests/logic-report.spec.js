@@ -1,10 +1,11 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
-import { completeCurrentCase, resumeSavedRun, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { bustStakedCard, clickElement, completeCurrentCase, expectSceneMinutes, findSkippedSceneWalk, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { seasonCasesBase } from "../src/gameCases.js";
+import { nodes } from "../src/gameData.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { createLogicReport, getRankedLogicHold, LOGIC_REPORT_COPY, readStanding } from "../src/logicReport.js";
 
@@ -300,4 +301,58 @@ test("a season whose earlier cases have no logic record names no case", async ({
   await expect(lines).toHaveText(await expectedLines(page));
   await expect(page.getByTestId("logic-report")).not.toContainText(/순위|상위/);
   await keepScreenshots(page, testInfo, "few-records");
+});
+
+/**
+ * The record's decision log (전체 기록), for a case with one bust in it. The
+ * bust played a scene without the analyst, and its row in the log holds that
+ * scene's minutes in the same closed fold the reveal showed -- read from the
+ * id the log entry already carries (`skippedNodeId`), so a case closed and
+ * reopened later still has them.
+ *
+ * Reached by the debug jump, on the dev server: the walk is read off the graph
+ * (`findSkippedSceneWalk`, the card of 사건 01 nearest its result whose bust
+ * skips a scene), busted once, and the case is cashed to its report.
+ */
+test("the record's decision log holds the skipped scene minutes under the bust's entry, and under no other", async ({ page }) => {
+  test.setTimeout(240_000);
+  const walk = findSkippedSceneWalk("case01");
+  expect(walk, "사건 01 still has a card whose bust skips a scene").not.toBeNull();
+  const skipped = nodes[walk.skippedId];
+  await startDebugNode(page, walk.caseId, walk.fromId);
+  // The debug overlay is harness chrome; on a phone it sits over the action bar.
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  // By its words, whole: the hand is dealt shuffled.
+  const words = new RegExp(`^${walk.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
+  const card = page.locator(".choices .choice").filter({ has: page.getByTestId("card-label").filter({ hasText: words }) });
+  await clickElement(card, `stake ${walk.label}`);
+  await bustStakedCard(page);
+  await expect(page.locator(".decision-reveal").getByTestId("scene-minutes")).toHaveCount(1);
+  await clickElement(page.getByTestId("decision-next"), "next after the bust");
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await completeCurrentCase(page);
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+
+  // One bust in the case, and it is the entry that names the skipped scene.
+  const { log } = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const skips = log.flatMap((entry, index) => (entry.skippedNodeId ? [index] : []));
+  expect(skips, "the case holds one decision that skipped a scene").toHaveLength(1);
+  expect(log[skips[0]].skippedNodeId).toBe(walk.skippedId);
+  expect(log.filter((entry) => entry.threshold?.busted), "the case holds one bust").toHaveLength(1);
+
+  await page.locator("details.report-archive > summary").click();
+  await expect(page.locator(".report-archive-body")).toBeVisible();
+  const rows = page.locator(".report-archive-body section.history > article");
+  await expect(rows).toHaveCount(log.length);
+  const row = rows.nth(skips[0]);
+  await expect(row.locator("div > b").first()).toHaveText(log[skips[0]].title);
+  const fold = row.getByTestId("scene-minutes");
+  await expect(fold).toHaveCount(1);
+  await expect(page.locator(".report-archive-body section.history").getByTestId("scene-minutes"), "no other row has minutes").toHaveCount(1);
+  await expect(fold).toHaveJSProperty("open", false);
+  await expectSceneMinutes(fold, skipped);
+  await clickElement(fold.locator("summary"), "open the minutes in the record");
+  await expect(fold).toHaveJSProperty("open", true);
+  await expect(fold.locator("div > p").first()).toBeVisible();
+  await expect(fold.locator("div > p.spoken-line")).toBeVisible();
 });
