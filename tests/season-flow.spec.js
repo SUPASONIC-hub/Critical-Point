@@ -845,13 +845,17 @@ const measureBriefing = (page) =>
   page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
     const sheet = document.querySelector(".gx-comic-page");
+    // Short phones (briefing.css, up to 46.25em) dock 판 열기 alone: the footer is
+    // display: contents and has no box of its own, so there the dock is the button.
+    const actions = document.querySelector(".gx-comic-actions");
+    const dock = getComputedStyle(actions).display === "contents" ? document.querySelector("[data-testid='open-table']") : actions;
     const panels = [...document.querySelectorAll(".gx-comic-page .gx-panel")].map((panel) => panel.getBoundingClientRect().bottom);
     return {
       pictureHeight: Math.round(box(".gx-panel-splash").height),
       drawingHeight: Math.round(box(".gx-panel-splash .gx-plate").height),
       storyTop: Math.round(box(".gx-panel-story .gx-caption").top),
       lastPanelBottom: Math.round(Math.max(...panels)),
-      dockTop: Math.round(box(".gx-comic-actions").top),
+      dockTop: Math.round(dock.getBoundingClientRect().top),
       openBottom: Math.round(box("[data-testid='open-table']").bottom),
       scrollTop: Math.round(sheet.scrollTop),
       scrolls: sheet.scrollHeight > sheet.clientHeight + 1,

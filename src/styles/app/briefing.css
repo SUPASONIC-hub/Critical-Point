@@ -640,8 +640,10 @@
 
 /* Short, or large type (em follows the reader's font size): the docked footer
    took over half the page. Only 판 열기 stays docked. A phone upright with
-   672px or less to show (390x664) is short the same way. */
-@media (max-height: 35em), (max-width: 700px) and (max-height: 42em) {
+   672px or less to show (390x664) is short the same way, and so is one with
+   740px (360x740): its docked cards start at 493px and covered 62px of a
+   two-line introduction that ends at 555px. 46.25em is 740px at 16px type. */
+@media (max-height: 35em), (max-width: 700px) and (max-height: 46.25em) {
   .gx-comic-actions {
     display: contents;
   }
