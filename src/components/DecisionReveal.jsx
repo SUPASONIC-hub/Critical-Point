@@ -48,6 +48,13 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
  * Each block is a named group: an `aria-label` on a bare `div` names nothing,
  * because an element with no role has no name to give.
  *
+ * The dialog's own name is 판정 결과, not its headline. The table's slam
+ * (`VerdictSlam`, TableNotices.jsx) is an alert that has already said the
+ * headline -- BUST, or the multiplier -- with the wall and the pot, and a
+ * dialog named by the same word had a screen reader say it a second time as
+ * focus arrived. The headline is still the sheet's heading, on screen and to
+ * a reader that walks the sheet.
+ *
  * Focus goes to the way out, which is the sheet's last element, without
  * scrolling to it. `autoFocus` scrolled: on a screen wider than a phone and
  * shorter than the sheet -- a phone on its side -- the reveal opened at its
@@ -96,12 +103,12 @@ export function DecisionReveal({ view }) {
         className={`decision-reveal gx-reveal${busted ? " is-bust" : " is-cashed"}${overclocked ? " is-overdrive" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="decision-reveal-title"
+        aria-label="판정 결과"
         onKeyDown={trapDecisionRevealFocus}
       >
         <div className="gx-reveal-verdict">
           {busted && <Skull size={34} aria-hidden="true" />}
-          <h2 id="decision-reveal-title">{headline}</h2>
+          <h2>{headline}</h2>
           <p>{subline}</p>
         </div>
 

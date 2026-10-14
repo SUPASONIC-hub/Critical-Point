@@ -244,6 +244,29 @@ test("the report and the ranking row show what the run recorded, never the devic
   settings.resetAccessibilityCache();
 });
 
+// A bust was read twice: the slam over the table is an alert ("BUST", the wall,
+// the pot), and the reveal that opens 1.35 seconds later was a dialog named by
+// its own headline, "BUST" again as focus arrived. The slam is on the page
+// first and says more, so it keeps the announcement; the dialog has a name
+// that is not the verdict.
+test("a verdict is announced once, by the slam, and the reveal's name does not repeat it", () => {
+  const notices = source("gauntlet/TableNotices.jsx");
+  const reveal = source("components/DecisionReveal.jsx");
+  // The one announcement, and what it says of a bust: the word, why, and the pot.
+  assert.match(notices, /<div className=\{`gx-slam gx-slam-\$\{win\.status\}`\} role="alert">/);
+  const slam = notices.slice(notices.indexOf("function VerdictSlam("), notices.indexOf("export function TableNotices("));
+  assert.match(slam, /<strong lang="en">BUST<\/strong>/);
+  for (const said of ["시간이 먼저 끝났다", "테이블을 떠났다", "벽은 ${win.wall}에 있었다", "판돈 {formatNumber(runPot)} → {formatNumber(bustKeeps)}"]) {
+    assert.ok(slam.includes(said), `the slam says: ${said}`);
+  }
+  // The reveal is a named modal dialog that announces nothing by itself.
+  assert.match(reveal, /role="dialog"\s+aria-modal="true"\s+aria-label="판정 결과"/);
+  assert.doesNotMatch(reveal, /aria-labelledby|aria-describedby|aria-live|role="(?:alert|status|log)"/, "no second voice for the verdict");
+  // What it shows is what it showed: the headline as the sheet's heading, and the line under it.
+  assert.match(reveal, /\{busted && <Skull size=\{34\} aria-hidden="true" \/>\}\s+<h2>\{headline\}<\/h2>\s+<p>\{subline\}<\/p>/);
+  assert.match(reveal, /busted\s+\? "BUST"/);
+});
+
 test("the intro and the origin profiles carry nothing the page cannot print", async () => {
   // Removed on 2026-10-10 to make room for story mode's copy in the entry
   // chunk; this holds why each was dead, so none comes back as a guard.
