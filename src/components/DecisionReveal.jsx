@@ -8,6 +8,7 @@ import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
 import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
+import { isPenaltyMutation } from "../gauntlet/gauntletEngine.js";
 
 function createConsequenceLines({ verdict, busted, nextMutations }) {
   if (!verdict) return [];
@@ -193,10 +194,10 @@ export function DecisionReveal({ view }) {
 
         {nextMutations.length > 0 && (
           <div className="gx-reveal-mutations" data-testid="next-mutations" role="group" aria-label="다음 판의 규칙 변화">
-            <span>다음 판이 이렇게 부서진다</span>
+            <span>{nextMutations.some(isPenaltyMutation) ? "다음 판이 이렇게 부서진다" : "다음 판의 규칙"}</span>
             <ul>
               {nextMutations.map((mutation) => (
-                <li key={mutation.id} className={`gx-mutation mut-${mutation.id}`}>
+                <li key={mutation.id} className={`gx-mutation mut-${mutation.id}${isPenaltyMutation(mutation) ? "" : " gx-carry"}`}>
                   <b lang="en">{mutation.label}</b>
                   <small>
                     {mutation.title}

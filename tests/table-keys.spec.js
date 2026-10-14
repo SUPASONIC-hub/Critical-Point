@@ -595,6 +595,46 @@ for (const size of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) 
   });
 }
 
+/**
+ * How the introduction is drawn. It had the breach panel's red border and
+ * hatching: the first page of the game, and of every prologue after it, opened
+ * on a panel that looked like the one a bust leaves. It is drawn as a rule the
+ * board carries now (`gx-carry`). Two panels are compared as the browser
+ * computed them -- 프롤로그 01's introduction, and the breach panel of a board
+ * that carries AFTERSHOCK -- so no colour is written here.
+ */
+test("staged: the introduction is drawn as a carried rule, with a border that is not the breach panel's", async ({ page }) => {
+  test.setTimeout(120_000);
+  await holdReadingClock(page);
+  const size = page.viewportSize();
+  const drawn = (testId) =>
+    page.getByTestId(testId).evaluate((panel) => {
+      const style = getComputedStyle(panel);
+      return {
+        classes: [...panel.classList],
+        border: [style.borderTopColor, style.borderRightColor, style.borderBottomColor, style.borderLeftColor].join(" | "),
+        borderWidth: Number.parseFloat(style.borderTopWidth),
+      };
+    });
+
+  await openIntroPage(page, "prologue01", size);
+  await expect(page.getByTestId("protocol-breach")).toHaveCount(0);
+  const first = await drawn("unlock-intro");
+  expect(first.classes, "프롤로그 01's introduction is a carried-rule panel").toEqual(expect.arrayContaining(["gx-panel", "gx-carry"]));
+  expect(first.borderWidth, "the panel has a border to colour").toBeGreaterThan(0);
+
+  // 프롤로그 02's first page on a board the last decision broke: both panels on one page.
+  await openIntroPage(page, "prologue02", size, { broken: true });
+  const intro = await drawn("unlock-intro");
+  const breach = await drawn("protocol-breach");
+  expect(intro.classes).toContain("gx-carry");
+  expect(breach.classes, "the breach panel is not a carried-rule panel").not.toContain("gx-carry");
+  expect(breach.borderWidth).toBeGreaterThan(0);
+  expect(first.border, "프롤로그 01's introduction has the breach panel's border").not.toBe(breach.border);
+  expect(intro.border, "on one page, the introduction has the breach panel's border").not.toBe(breach.border);
+  expect(intro.border, "every introduction is drawn alike").toBe(first.border);
+});
+
 test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a short one, a phone on its side and at a large type size", async ({ page }) => {
   test.setTimeout(420_000);
   await holdReadingClock(page);

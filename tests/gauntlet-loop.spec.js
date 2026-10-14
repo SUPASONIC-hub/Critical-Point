@@ -1,6 +1,7 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { CASE_RESULT_NODES } from "../src/gameCases.js";
+import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
@@ -598,6 +599,134 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("active-mutations")).toContainText("OVERCLOCK");
   await expect(page.getByTestId("overclock-card-boost").first()).toContainText("x2");
+});
+
+/**
+ * The reveal's list of the next board's rules says the board is broken only
+ * when it is. Its heading read 다음 판이 이렇게 부서진다 over every list -- over
+ * an OVERCLOCK the player had earned and over the REBOOT of a closed case --
+ * and every row was drawn as damage. The heading now follows the list, and a
+ * row that is not a penalty is drawn as a rule the board carries (`gx-carry`).
+ *
+ * Which rules only cost the player is written out here and not read from the
+ * engine (`isPenaltyMutation`), which is what the reveal itself asks.
+ */
+const PENALTY_RULES = new Set(["blackout", "aftershock", "silence", "heatDebt", "coldFeet", "fracture"]);
+
+/** The list as the reveal draws it: its heading, and each row's rule with whether it is drawn as a carried rule. */
+async function readNextRules(page) {
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const list = page.getByTestId("next-mutations");
+  await expect(list).toBeVisible();
+  const heading = (await list.locator(":scope > span").textContent()).trim();
+  const rows = await list.locator("li.gx-mutation").evaluateAll((items) =>
+    items.map((item) => ({ id: [...item.classList].find((name) => name.startsWith("mut-"))?.slice(4) ?? "", carry: item.classList.contains("gx-carry") })),
+  );
+  return { heading, rows, ids: rows.map((row) => row.id) };
+}
+
+/** Every row is drawn for what its rule is: a penalty plain, anything else as a carried rule. */
+function expectRowsDrawnByKind(rows) {
+  expect(rows.length, "the list has rows").toBeGreaterThan(0);
+  for (const row of rows) expect(row.carry, `${row.id} is ${PENALTY_RULES.has(row.id) ? "a penalty: not drawn as a carried rule" : "not a penalty: drawn as a carried rule"}`).toBe(!PENALTY_RULES.has(row.id));
+}
+
+/**
+ * Two scenes of a case in a row that each deal a plain card costing less than
+ * FRACTURE asks for (10 of one resource): cashed, neither breaks the next
+ * board, so two hot cashes on them leave OVERCLOCK alone in the list.
+ */
+function findCoolWalk(caseId = "case01") {
+  const results = new Set(Object.values(CASE_RESULT_NODES));
+  const cool = (node) =>
+    (node?.choices ?? []).find(
+      (choice) =>
+        choice.type !== "reframe" &&
+        !choice.requiredAuthority &&
+        !choice.branchCondition &&
+        nodes[choice.next] &&
+        // Neither card closes the case: a closed case deals REBOOT and nothing else.
+        !results.has(choice.next) &&
+        Object.entries(choice.effect ?? {}).every(([key, value]) => value === 0 || isResourceGain(key, value) || Math.abs(value) < 10),
+    );
+  for (const firstId of nodeOrders[caseId]) {
+    const first = cool(nodes[firstId]);
+    if (!first) continue;
+    const second = cool(nodes[first.next]);
+    if (second) return { caseId, firstId, first: first.label, secondId: first.next, second: second.label };
+  }
+  return null;
+}
+
+/**
+ * Pushes the staked card to a hot cash (x4 is heat 22) and no further. From
+ * under 24 one push adds 15 at most, so the heat stays under 40: short of the
+ * nearest wall a board can draw (56) and of HEAT DEBT (60).
+ */
+async function pushToHotCash(page) {
+  const stage = page.getByTestId("gauntlet-stage");
+  const heat = async () => Number(await stage.getAttribute("data-gauge"));
+  for (let press = 0; press < 6 && (await heat()) < 24; press += 1) {
+    const before = await heat();
+    await page.getByTestId("commit-push").click();
+    await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
+  }
+  expect(await heat(), "the card is hot enough to cash at x4").toBeGreaterThanOrEqual(24);
+  await expect(stage).toHaveAttribute("data-status", "live");
+}
+
+test("a bust's next rules are headed as a broken board, and no row is drawn as a carried rule", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await page.locator(".choices .choice").first().click();
+  await pushUntilBust(page);
+  await expect(page.locator(".decision-reveal h2")).toHaveText("BUST", { timeout: TRANSITION_TIMEOUT_MS });
+  const list = await readNextRules(page);
+  expect(list.ids, "a bust deals BLACKOUT and AFTERSHOCK").toEqual(expect.arrayContaining(["blackout", "aftershock"]));
+  expect(list.ids.filter((id) => !PENALTY_RULES.has(id)), "a bust deals nothing but penalties").toEqual([]);
+  expect(list.heading).toMatch(/부서진다/);
+  expectRowsDrawnByKind(list.rows);
+  expect(list.rows.some((row) => row.carry)).toBe(false);
+});
+
+test("an earned OVERCLOCK's next rules are not headed as a broken board, and its row is drawn as a carried rule", async ({ page }) => {
+  test.setTimeout(120_000);
+  const walk = findCoolWalk();
+  expect(walk, "사건 01 still has two scenes in a row with a card that fractures nothing").not.toBeNull();
+  await openTable(page, walk.caseId, walk.firstId);
+  await cardOf(page, walk.first).click();
+  await pushToHotCash(page);
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await nextScene(page, walk.secondId);
+
+  await cardOf(page, walk.second).click();
+  await pushToHotCash(page);
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("OVERCLOCK READY");
+  await page.getByTestId("commit-confirm").click();
+  await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED", { timeout: TRANSITION_TIMEOUT_MS });
+  const list = await readNextRules(page);
+  expect(list.ids, "two hot cashes deal OVERCLOCK").toContain("overclock");
+  expect(list.ids.filter((id) => PENALTY_RULES.has(id)), "nothing in this list costs the player").toEqual([]);
+  expect(list.heading).toMatch(/규칙/);
+  expect(list.heading).not.toMatch(/부서진다/);
+  expectRowsDrawnByKind(list.rows);
+  await expect(page.getByTestId("next-mutations").locator("li.mut-overclock")).toHaveClass(/(^|\s)gx-carry(\s|$)/);
+});
+
+test("a closed case's next rules are REBOOT, not headed as a broken board, and drawn as a carried rule", async ({ page }) => {
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  const list = await readNextRules(page);
+  await expect(page.getByTestId("decision-next")).toContainText("사건 결과");
+  expect(list.ids, "a closed case deals REBOOT").toContain("reboot");
+  expect(list.ids.filter((id) => PENALTY_RULES.has(id)), "a closed case deals no penalty").toEqual([]);
+  expect(list.heading).toMatch(/규칙/);
+  expect(list.heading).not.toMatch(/부서진다/);
+  expectRowsDrawnByKind(list.rows);
+  await expect(page.getByTestId("next-mutations").locator("li.mut-reboot")).toHaveClass(/(^|\s)gx-carry(\s|$)/);
 });
 
 test("a second tab asks before it busts a bet another tab is holding", async ({ page, context }) => {

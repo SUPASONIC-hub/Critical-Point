@@ -93,7 +93,8 @@ test("the introduction is written straight after the speaker, and the breach pan
   assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker"><span lang="en">CARRIED OVER<\/span> · 이번 판에 이어지는 규칙<\/p>/);
   // The page is still named by its scene title, not by the panel.
   assert.match(briefing, /aria-labelledby="gx-comic-title"/);
-  assert.match(briefing, /<p className="gx-breach-kicker">\{getUnlockKicker\(node\.caseId\)\}<\/p>/);
+  // The introduction teaches and accuses nobody, so it takes the same calm form.
+  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="unlock-intro"[^\n]*\s+<p className="gx-breach-kicker">\{getUnlockKicker\(node\.caseId\)\}<\/p>/);
 });
 
 test("the stage draws under the rules the engine plays under, with no second answer of its own", () => {
