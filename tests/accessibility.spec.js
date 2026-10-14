@@ -80,6 +80,107 @@ test("the decision reveal has no structural accessibility violations", async ({ 
   await expectNoA11yViolations(page);
 });
 
+/**
+ * A bust is said once. The slam over the table is an alert -- BUST, where the
+ * wall was, what the pot came to -- and 1.35 seconds later the reveal opens
+ * and takes focus. The reveal was a dialog named by its own headline, so a
+ * screen reader said BUST a second time as focus arrived; it is named 판정 결과
+ * now, and the headline is the sheet's heading.
+ *
+ * The slam is gone from the page at about the moment the reveal opens, so the
+ * alerts are counted from before the card is pushed rather than looked for at
+ * one instant: every element that was ever an alert saying BUST, and the most
+ * there were at once.
+ */
+async function watchVerdictAlerts(page) {
+  await page.evaluate(() => {
+    const seen = new Set();
+    const record = { ever: 0, most: 0 };
+    window.__bustAlerts = record;
+    const scan = () => {
+      const now = [...document.querySelectorAll("[role='alert']")].filter((element) => element.textContent.includes("BUST"));
+      for (const element of now) seen.add(element);
+      record.ever = seen.size;
+      record.most = Math.max(record.most, now.length);
+    };
+    new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["role"] });
+    scan();
+  });
+}
+
+const VERDICT_DIALOG = "판정 결과";
+
+test("a bust is announced once, by the slam: the reveal is named 판정 결과 and its headline still reads BUST", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "start");
+  // The debug overlay is harness chrome; on a phone it sits over the action bar.
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice").first().click();
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await watchVerdictAlerts(page);
+  expect(await page.evaluate(() => window.__bustAlerts.ever), "nothing has said BUST before the wall").toBe(0);
+
+  // Into the wall. The loop stops on the verdict, which stays up until it is
+  // dismissed; the stage's own "bust" is gone once the next window is dealt.
+  const stage = page.getByTestId("gauntlet-stage");
+  const headline = page.locator(".decision-reveal h2");
+  for (let press = 0; press < 30; press += 1) {
+    if ((await headline.isVisible()) || (await stage.getAttribute("data-status")) !== "live") break;
+    await page
+      .getByTestId("commit-push")
+      .click({ timeout: 1_000 })
+      .catch(() => {});
+  }
+  await expect(headline).toHaveText("BUST", { timeout: 30_000 });
+  await expect(page.getByTestId("decision-next")).toBeFocused();
+
+  // One alert said BUST, and it was the slam: never two at once, never a second one.
+  const alerts = await page.evaluate(() => ({ ...window.__bustAlerts }));
+  expect(alerts.ever, "elements that were an alert saying BUST, from the push to the open reveal").toBe(1);
+  expect(alerts.most, "alerts saying BUST at one time").toBe(1);
+  expect(await page.getByRole("alert").filter({ hasText: "BUST" }).count(), "alerts saying BUST with the reveal open").toBeLessThanOrEqual(1);
+
+  // The dialog focus arrived in is named for what it is, not for the verdict.
+  const dialog = page.getByRole("dialog", { name: VERDICT_DIALOG, exact: true });
+  await expect(dialog).toHaveCount(1);
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAccessibleName(VERDICT_DIALOG);
+  await expect(page.getByRole("dialog", { name: /BUST/ })).toHaveCount(0);
+  await expect(dialog).not.toHaveAttribute("aria-labelledby", /.*/);
+  // It is no alert itself and holds none: the verdict in it is read by walking the sheet.
+  await expect(dialog.getByRole("alert")).toHaveCount(0);
+  await expect(dialog.locator("[aria-live]")).toHaveCount(0);
+  // The headline is still there to be seen, as the sheet's heading.
+  const heading = dialog.getByRole("heading", { level: 2 });
+  await expect(heading).toHaveCount(1);
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveText("BUST");
+});
+
+test("a cash's reveal has the same name, and its headline is the multiplier", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "start");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await watchVerdictAlerts(page);
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("decision-next")).toBeFocused();
+
+  const dialog = page.getByRole("dialog", { name: VERDICT_DIALOG, exact: true });
+  await expect(dialog).toHaveCount(1);
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAccessibleName(VERDICT_DIALOG);
+  const heading = dialog.getByRole("heading", { level: 2 });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveText(/^×\d+(\.\d+)?$/);
+  // The multiplier is the slam's to say, as BUST is: the dialog is not named by it.
+  await expect(page.getByRole("dialog", { name: /×/ })).toHaveCount(0);
+  await expect(dialog.getByRole("alert")).toHaveCount(0);
+  expect(await page.evaluate(() => window.__bustAlerts.ever), "a cash says BUST nowhere").toBe(0);
+});
+
 test("the relic draft has no structural accessibility violations", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case01", "c1_aftershock");
