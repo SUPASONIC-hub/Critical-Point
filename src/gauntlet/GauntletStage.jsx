@@ -51,6 +51,7 @@ import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { useConfirmOpen } from "../state/confirmAction.js";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
+import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 
@@ -206,6 +207,10 @@ export function GauntletStage({
   // The folded briefing on the table draws its own copy of the plate; nothing
   // is drawn into it until the player opens it.
   const [briefOpen, setBriefOpen] = useState(false);
+
+  // The report's chunk, asked for while a table is up and the browser is idle,
+  // so the case does not end on an empty page (state/retryableLazy.js).
+  useEffect(() => prefetchScreenWhenIdle("result"), []);
 
   useEffect(() => {
     if (draftOpen) playRelicDealCue(relicOffer.length);
