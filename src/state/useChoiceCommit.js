@@ -67,7 +67,7 @@ function describeHand(verdict) {
   const streak = describeLogicLog(verdict.logic);
   if (streak) return streak;
   if (verdict.focus?.charge > 0) {
-    return { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 보상 ${verdict.focus.potMultiplier}x · 자원 ${verdict.focus.resourceMultiplier}x` };
+    return { label: "FOCUS", text: `LOCK ${verdict.focus.charge} · 배율 ×${verdict.focus.potMultiplier} · 자원 ×${verdict.focus.resourceMultiplier}` };
   }
   return null;
 }

@@ -1,7 +1,7 @@
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatNumber } from "../gameConstants.js";
+import { formatMultiplier, formatNumber } from "./tableReadout.js";
 import { objectParticle } from "../playerLanguage.js";
 
 /**
@@ -33,7 +33,7 @@ export function GauntletLedger({ log = [], summary = null }) {
         </article>
         <article>
           <span>최고 배율</span>
-          <b>×{formatNumber(ledger.bestMultiplier)}</b>
+          <b>{formatMultiplier(ledger.bestMultiplier)}</b>
           <small>확정 {ledger.cashes}회</small>
         </article>
         <article>

@@ -895,7 +895,7 @@ export const MUTATIONS = Object.freeze({
   overclock: {
     label: "OVERCLOCK",
     title: "판돈이 두 배로 뛴다",
-    text: `연속으로 x${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
+    text: `연속으로 ×${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
   },
   coldFeet: {
     penalty: true,
