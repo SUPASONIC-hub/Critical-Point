@@ -546,12 +546,13 @@ test("a page with no scene title is entered at its heading, and 시즌 로드맵
 
 const endingCopy = await import("../../src/endingCopy.js");
 
-test("the ending's verdict: a collapse first, then the final choice, then the open verdict", () => {
+test("the ending's verdict: a collapse first, then the final choice where the ending agrees, then the open verdict", () => {
   const failure = endingCopy.getFinalVerdict({ endingVariant: { failure: true }, finalChoiceId: "ending_seal" });
   assert.equal(failure.title, "트리거랩의 운영은 붕괴합니다.");
   // The ending and its scene's action are always given (report-copy.test.mjs
   // holds that), so the open verdict is written from them and nothing else.
-  const variant = { title: "T", text: "X" };
+  // open-question is an ending all three verdicts agree with (report-copy.test.mjs holds the rest).
+  const variant = { id: "open-question", title: "T", text: "X" };
   for (const id of ["ending_seal", "ending_reform", "ending_expose"]) {
     const verdict = endingCopy.getFinalVerdict({ endingVariant: variant, finalChoiceId: id });
     for (const field of ["title", "ruling", "execution", "cost"]) assert.ok(verdict[field], `${id}.${field}`);

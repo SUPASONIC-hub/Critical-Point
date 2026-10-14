@@ -361,7 +361,7 @@ test("the intro's start button deals the origin's opening hand", { tag: "@prod" 
   await page.getByTestId("start-first-case").click();
   await page.waitForSelector(".game-shell");
   const opened = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-  // 공공 출신: legitimacy +8, capital -2, fatigue +3.
+  // 기록을 남긴 분석관(public): legitimacy +8, capital -2, fatigue +3.
   expect(opened.resources).toMatchObject({ legitimacy: 58, capital: 98, fatigue: 13, trust: 50 });
 });
 

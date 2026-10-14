@@ -45,7 +45,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
     {
       label: "집행",
       title: endingCopy.endingTwistTitles.execution,
-      evidence: finalChoiceText,
+      evidence: finalEndingEntry?.choice || finalChoiceText,
       copy: finalVerdict.execution,
     },
     {
@@ -276,7 +276,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div className="rank-copy">
               <span lang="en">SCORE BREAKDOWN · {momentumScore} POINTS</span>
               <h2>{rankLine}</h2>
-              <p>다음 케이스는 이 랭크보다 트리거 분포를 더 중요하게 사용합니다. 랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
+              <p>{currentCase !== "final" && "다음 사건은 이 랭크에 따라 믿음과 공정함을 조금 얹거나, 지침을 안고 시작합니다. "}랭크는 정답 여부보다 생각이 정밀하게 솟은 조건을 비교하는 플레이 지표입니다.</p>
             </div>
             <div className="score-breakdown">
               {scoreBreakdown.map((item) => (

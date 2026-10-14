@@ -12,36 +12,44 @@ import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
 const HARM = easyResourceLabels.humanCost;
 const percent = (share) => Math.round(share * 100);
 
+// One analyst, three things that analyst remembers longest. They used to be
+// three careers (a branch desk, the strategy team, a regulator), and two of
+// them were not the analyst every prologue writes. The only thing the pick
+// changes is where 프롤로그 01's numbers start (getOriginStartEffects), so
+// `start` says that and nothing more.
 const operatorProfiles = {
   courier: {
     id: "courier",
-    label: "BRANCH DESK",
-    title: "지점 창구 출신 분석관",
-    authority: "현장 기록을 가장 먼저 보고, 고객에게 사실을 직접 전달할 권한",
-    premise: "창구에서 판 대출이 어떻게 끝나는지를 끝까지 본 사람이 몇 없었습니다. 당신이 그중 하나입니다.",
+    label: "SITE VISIT",
+    title: "현장을 본 분석관",
+    premise: "서류의 숫자보다 그 숫자 뒤에서 일하는 사람들을 가장 오래 기억합니다.",
   },
   lab: {
     id: "lab",
-    label: "CREDIT REVIEW",
-    title: "기업금융전략팀 출신 분석관",
-    authority: "심사 기준과 검증 절차를 조정할 권한",
-    premise: "승인 서류에 반대 의견을 한 줄 쓴 대가로 이 지하 분석실에 배치됐습니다.",
+    label: "DISSENT",
+    title: "반대 의견서를 쓴 분석관",
+    premise: "모두가 맞다고 한 숫자에 혼자 아니라고 적었던 일을 가장 오래 기억합니다.",
   },
   public: {
     id: "public",
-    label: "PUBLIC AUDITOR",
-    title: "금융감독 출신 파견 분석관",
-    authority: "기록의 공개 범위와 피해 보호 순서를 조정할 권한",
-    premise: "감독기관에서 이 그룹을 검사하다가, 그룹 안으로 자리를 옮겨 같은 기록을 다시 봅니다.",
+    label: "ON RECORD",
+    title: "기록을 남긴 분석관",
+    premise: "적어 두지 않은 판단은 아무 데도 남지 않는다는 것을 가장 오래 기억합니다.",
   },
 };
 
+const startLine = (origin) => Object.entries(getOriginStartEffects(origin))
+  .filter(([, value]) => value !== 0)
+  .map(([key, value]) => `${easyResourceLabels[key]} ${value > 0 ? "+" : "−"}${Math.abs(value)}`)
+  .join(" · ");
+const withStart = (profile) => ({ ...profile, start: startLine(profile.id) });
+
 export function getOperatorProfiles() {
-  return Object.values(operatorProfiles);
+  return Object.values(operatorProfiles).map(withStart);
 }
 
 export function getOperatorProfile(origin = "courier") {
-  return operatorProfiles[origin] ?? operatorProfiles.courier;
+  return withStart(operatorProfiles[origin] ?? operatorProfiles.courier);
 }
 
 /**
@@ -93,9 +101,9 @@ export function getPastRunMemory(memory = {}) {
 
 export function getOriginPrologue(origin = "courier") {
   const profiles = {
-    courier: { title: "창구 마감이 늦어진 밤", text: "당신은 창구에서 직접 판 대출이 어떻게 끝나는지를 끝까지 본 사람입니다. 그 기억이 첫 번째 권한을 열었습니다." },
-    lab: { title: "반대 의견을 쓴 밤", text: "당신은 승인 서류에 혼자 반대 의견을 썼고, 다음 인사에서 이 지하로 내려왔습니다. 3년이 지나 같은 번호의 파일이 책상에 올라옵니다." },
-    public: { title: "검사 자료를 덮은 밤", text: "당신은 감독기관에서 이 그룹을 검사하다 안쪽으로 자리를 옮겼습니다. 공개 권한은 크지만, 보호해야 할 사람도 함께 늘어납니다." },
+    courier: { title: "열한 명의 공장", text: "당신이 가장 오래 기억하는 것은 수습 마지막 과제의 온새포장입니다. 서류 한 장 뒤에 직원 열한 명의 11월이 걸려 있었습니다." },
+    lab: { title: "반대 의견을 쓴 밤", text: "당신이 가장 오래 기억하는 것은 혼자 쓴 반대 의견서입니다. 시작은 수습 마지막 과제에서 합계에 들어가지 않은 4,000만 원짜리 한 줄이었습니다." },
+    public: { title: "비워 둔 서명란", text: "당신이 가장 오래 기억하는 것은 속도 칸 하나만 채워지고 서명란이 빈 수습 평가표입니다. 그날부터 당신은 판단을 적어 둡니다." },
   };
   return profiles[origin] ?? profiles.courier;
 }

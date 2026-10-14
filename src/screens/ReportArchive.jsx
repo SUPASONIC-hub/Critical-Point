@@ -79,7 +79,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small lang={item.unlocked ? "en" : undefined}>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
       </section>
     )}
-    {currentCase === "final" && (
+    {__CP_DEBUG_BUILD__ && debugToolsEnabled && currentCase === "final" && (
       <section className="operations-snapshot" aria-label="운영 진단">
         <span lang="en">OPERATIONS</span>
         <strong>{view.operationsSnapshot.state}</strong>
@@ -138,10 +138,10 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <div><article><b>{view.playReport.decisions}</b><small>결정</small></article><article><b>{view.playReport.clues}</b><small>검증 신호</small></article><article><b>{view.playReport.dominantStyle}</b><small>행동 성향</small></article></div>
       <p>최근 지나온 장면: {view.playReport.route.join(" → ") || "기록 없음"}</p>
     </section>
-    <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
+    {__CP_DEBUG_BUILD__ && debugToolsEnabled && <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
       <span lang="en">PLAYTEST HEALTH</span>
       <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
-    </section>
+    </section>}
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && telemetryStats && <p className="telemetry-stats">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
     <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`}><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>
     <section className="aftermath-panel" aria-label="엔딩 이후 변화"><span>{view.aftermath.title}</span><p>{view.aftermath.text}</p></section>
@@ -260,7 +260,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <div>
         <span lang="en">PLAYTEST SESSION</span>
         <strong data-testid="session-code">{sessionCode}</strong>
-        <p>테스터 인터뷰, JSON 로그, 원격 저장 기록을 맞출 때 쓰는 짧은 세션 코드입니다.</p>
+        <p>기록 삭제를 요청할 때 쓰는 짧은 세션 코드입니다.</p>
         <small
           className={`remote-status ${telemetryStatus.tone}`}
           role="status"
@@ -327,7 +327,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="report-section">
         <h2 lang="en">Primary Trigger</h2>
         <strong>{triggerLabels[result.primary[0]]}</strong>
-        <p>{result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다. 이후 선택 로그는 이 조건을 중심으로 다음 사건에 반영됩니다.</p>
+        <p>{result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다.</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Secondary Trigger</h2>
@@ -342,7 +342,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="report-section">
         <h2 lang="en">Reframe</h2>
         <strong>{result.reframeCount}회</strong>
-        <p>준비된 선택지를 고르는 대신 판을 다시 연 횟수입니다. 0회라면 다음 테스트에서는 구조 재설계 유도가 충분했는지 확인해야 합니다.</p>
+        <p>준비된 선택지를 고르는 대신 판을 다시 연 횟수입니다.</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Avg Time</h2>
@@ -422,7 +422,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <MessageSquareText size={17} />
           플레이테스트 피드백
         </h2>
-        <span>이 케이스가 실제로 고민을 만들었는지 확인합니다.</span>
+        <span>이 케이스가 얼마나 고민됐는지 남겨 주세요.</span>
       </div>
       <div className="feedback-prompts">
         <span>이번 케이스에서 확인할 질문</span>
@@ -624,7 +624,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     ) : (
       <section className="story-reveal">
         <span lang="en">NEXT CASE SIGNAL</span>
-        <h2>다음 사건은 당신이 가장 강하게 반응한 조건을 중심으로 재구성됩니다.</h2>
+        <h2>다음 사건의 첫 장면은 이번 사건을 어떻게 닫았는지에 따라 달라집니다.</h2>
         <p>트리거랩은 사건 해결 능력만 보지 않습니다. 어떤 압박이 들어왔을 때 당신이 더 오래 생각하고, 더 쉽게 원칙을 바꾸며, 더 많은 손실을 감수하는지 기록합니다.</p>
       </section>
     )}

@@ -526,11 +526,11 @@ export function IntroScreen({ view, renderers = {} }) {
           <details className="intro-drawer">
             <summary>
               <span lang="en">03 OPERATOR ORIGIN</span>
-              <h2>당신은 어디에서 이 기록을 시작했습니까?</h2>
+              <h2>당신은 무엇을 가장 오래 기억합니까?</h2>
             </summary>
-            <section className="operator-origin-panel start-console-section" aria-label="주인공 출신과 권한 선택">
+            <section className="operator-origin-panel start-console-section" aria-label="분석관의 기억 선택">
               <div className="panel-title-row">
-                <small>출신에 따라 첫 권한과 사건을 보는 관점이 달라집니다.</small>
+                <small>무엇을 가장 오래 기억하는지에 따라 프롤로그 01의 시작 수치가 조금 달라집니다.</small>
               </div>
               <div className="operator-origin-grid">
                 {operatorProfiles.map((profile) => (
@@ -544,11 +544,11 @@ export function IntroScreen({ view, renderers = {} }) {
                     <span>{profile.label}</span>
                     <strong>{profile.title}</strong>
                     <em>{profile.premise}</em>
-                    <small>{profile.authority}</small>
+                    <small>{profile.start}</small>
                   </button>
                 ))}
               </div>
-              <p className="operator-origin-selected">현재 출신: {operatorProfile.title} · 첫 권한: {operatorProfile.authority}</p>
+              <p className="operator-origin-selected">현재 선택: {operatorProfile.title} · 프롤로그 01 시작 {operatorProfile.start}</p>
               <div className="origin-prologue"><span lang="en">ORIGIN PROLOGUE</span><strong>{originPrologue.title}</strong><p>{originPrologue.text}</p></div>
             </section>
           </details>

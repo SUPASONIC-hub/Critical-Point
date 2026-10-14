@@ -61,7 +61,7 @@ function useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result
       rankLine: RANK_LINES[rank] ?? RANK_LINE_FALLBACK,
       resultBridge: result.longestDecision
         ? `${primaryTrigger} 압박이 가장 오래 남았고, "${result.longestDecision.title}"에서 판단 시간이 길어졌습니다.`
-        : `${primaryTrigger} 압박이 다음 사건의 시작 조건으로 기록됩니다.`,
+        : `${primaryTrigger} 압박이 가장 오래 남았습니다.`,
       scoreBreakdown: createScoreBreakdown({ cognitionScore, consistencyScore, exploitPenalty, pressureAdaptScore, reflectionScore, rhythmScore }),
       achievementBadges: createAchievementBadges({
         challengeClearCount,
