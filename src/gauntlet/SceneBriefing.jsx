@@ -232,7 +232,7 @@ export function SceneBriefing({
           </figure>
 
           {intro.length > 0 && (
-            <div className="gx-panel gx-panel-breach" data-testid="unlock-intro" style={at("2 / 1 / 3 / -1")}>
+            <div className="gx-panel gx-panel-breach gx-carry" data-testid="unlock-intro" style={at("2 / 1 / 3 / -1")}>
               <p className="gx-breach-kicker">{getUnlockKicker(node.caseId)}</p>
               <ul>
                 {intro.map((line) => (
