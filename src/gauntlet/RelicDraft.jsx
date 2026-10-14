@@ -49,7 +49,7 @@ export function RelicDraft({ offer = [], owned = [], onPick, onSkip }) {
   return (
     <div ref={dialogRef} className="gx-draft" role="dialog" aria-modal="true" aria-labelledby="gx-draft-title" data-testid="relic-draft" onKeyDown={trapTab}>
       <div className="gx-draft-panel">
-        <span className="gx-draft-kicker" lang="en">CASE CLOSED · RELIC DRAFT</span>
+        <span className="gx-draft-kicker">사건 종료 · <span lang="en">RELIC DRAFT</span></span>
         <h2 id="gx-draft-title">다음 사건에 가져갈 도구 하나</h2>
         <p className="gx-draft-lede">고른 도구는 시즌이 끝날 때까지 테이블의 규칙 하나를 바꾼다. 고를 때까지 시계는 멈춰 있다.</p>
         <ul className="gx-draft-hand">

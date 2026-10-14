@@ -6,7 +6,7 @@ import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntle
 // x1.5): a combo of 8 is already there, and LOCK then adds nothing to the pot.
 const FOCUS_MODE_COPY = {
   strike: "배율 빠르게 · 콤보 합쳐 1.5배까지",
-  steady: "보상 작게 · 락마다 테이블 냉각",
+  steady: "배율 작게 · LOCK마다 테이블 냉각",
   expose: "카드의 자원 효과 증폭",
 };
 
@@ -44,17 +44,17 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
             onClick={() => onPick(mode)}
           >
             <span lang="en">{profile.label}</span>
-            <em lang={mastered ? "en" : undefined}>
-              <span className="sr-only" lang="ko">시즌 숙련 </span>
-              {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}
+            <em>
+              <span className="sr-only">시즌 숙련 </span>
+              {mastered ? "완성" : `${count}/${STANCE_MASTERY_GOAL}`}
             </em>
             <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
             <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
           </GuardedButton>
         );
       })}
-      {blocked && <span id="gx-stance-blocked" className="sr-only">판이 열려 있을 때만 자세를 바꿀 수 있습니다.</span>}
-      <span id="gx-stance-detail" className="sr-only">시즌 숙련: 차지한 채로 확정한 판</span>
+      {blocked && <span id="gx-stance-blocked" className="sr-only">판이 열려 있을 때만 자세를 바꿀 수 있다.</span>}
+      <span id="gx-stance-detail" className="sr-only">시즌 숙련: 충전한 채로 확정한 판</span>
     </div>
   );
 }

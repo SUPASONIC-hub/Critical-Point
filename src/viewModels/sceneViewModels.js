@@ -82,7 +82,7 @@ export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {
                 : "이전 판단의 비용 확인하기",
         text:
           openingLegacy.label === "CLEAR SIGNAL"
-            ? "이전 케이스에서 얻은 믿음을 잃지 않는 선택이 다음 압박의 문을 엽니다."
+            ? "이전 사건에서 얻은 믿음을 잃지 않는 선택이 다음 압박의 문을 엽니다."
             : openingLegacy.label === "OPEN WOUND"
               ? "공정함을 회복하는 선택으로 지난 사건의 균열을 먼저 봉합해야 합니다."
               : openingLegacy.label === "UNFINISHED COST"

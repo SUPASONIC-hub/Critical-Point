@@ -191,7 +191,7 @@ export function createRunLifecycle({
       text: !isOnline
         ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
         : telemetryEnabled
-          ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          ? "원격 저장 준비됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
     });
     resumeRuntimeSaves();

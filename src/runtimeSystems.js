@@ -65,7 +65,7 @@ export function getFailureObjectives(variant = {}) {
   const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
   return [
     `사건마다 ${HARM}${objectParticle(HARM)} 평균 ${collapseHarmPerCase} 아래로 닫기`,
-    `터진 판을 전체의 ${percent(collapseBustRate)}% 아래로 줄이거나, ${HARM}${objectParticle(HARM)} 평균 ${collapseOverreachHarm} 아래로 닫기`,
+    `벽에 닿은 판을 전체의 ${percent(collapseBustRate)}% 아래로 줄이거나, ${HARM}${objectParticle(HARM)} 평균 ${collapseOverreachHarm} 아래로 닫기`,
   ];
 }
 

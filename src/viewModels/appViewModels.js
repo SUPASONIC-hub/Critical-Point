@@ -182,7 +182,7 @@ export function createTelemetrySummary({ dataConsent, isOnline, telemetryEnabled
     ? {
         tone: "ready",
         title: "원격 저장 준비됨",
-        text: "케이스 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다.",
+        text: "사건 완료와 피드백 제출 시 동의한 기록만 원격 저장합니다.",
       }
     : {
         tone: "pending",

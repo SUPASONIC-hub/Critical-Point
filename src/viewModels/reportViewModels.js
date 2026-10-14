@@ -80,7 +80,7 @@ export function createScoreBreakdown({ cognitionScore, consistencyScore, exploit
     label: "기준 유지",
     value: consistencyScore,
     text: `${consistencyScore}점`,
-    note: "압박이 올라간 장면에서도 같은 방향을 지켰는지 봅니다. 버스트 점수에서 가장 큰 몫입니다.",
+    note: "열기가 올라간 장면에서도 같은 방향을 지켰는지 봅니다. 버스트 점수에서 가장 큰 몫입니다.",
   },
   {
     label: "생각 리듬",
@@ -139,7 +139,7 @@ export function createAchievementBadges({ challengeClearCount, currentChallengeS
     ? { title: "Flow Surge", text: `${flowSurgeCount}번 보너스 자원 회복을 만들었습니다.` }
     : { title: "No Surge", text: "챌린지와 위험 제어가 아직 보너스로 이어지지 않았습니다." },
   riskTier === "CRITICAL"
-    ? { title: "Crisis Runner", text: "높은 압력 상태로 케이스를 통과했습니다." }
+    ? { title: "Crisis Runner", text: "높은 압력 상태로 사건을 통과했습니다." }
     : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
   ];
 }

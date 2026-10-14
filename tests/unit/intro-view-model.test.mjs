@@ -124,7 +124,7 @@ test("the roadmap calls the current case in progress only when there is a run to
 test("each roadmap status has its own words, and one the screen does not know reads as locked", () => {
   const { getCaseStatusText } = intro();
   const texts = ["PLAYING", "OPEN", "COMPLETE", "LOCKED"].map(getCaseStatusText);
-  assert.deepEqual(texts, ["진행 중", "시작 가능", "완료됨", "이전 케이스 필요"]);
+  assert.deepEqual(texts, ["진행 중", "시작 가능", "완료됨", "이전 사건 필요"]);
   assert.equal(getCaseStatusText(undefined), getCaseStatusText("LOCKED"));
 });
 

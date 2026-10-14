@@ -157,7 +157,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       !isOnline
         ? "오프라인. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다."
         : telemetryEnabled
-          ? "원격 저장 준비됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          ? "원격 저장 준비됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
   });
   const [localErrorEntries, setLocalErrorEntries] = useState(() => {
@@ -479,7 +479,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       setTelemetryStatus({
         tone: telemetryEnabled ? "ready" : "local",
         text: telemetryEnabled
-          ? "네트워크 연결됨. 데이터 제공 동의 시 케이스 완료 로그가 저장됩니다."
+          ? "네트워크 연결됨. 데이터 제공 동의 시 사건 완료 로그가 저장됩니다."
           : "로컬 저장. 이 플레이는 브라우저와 JSON 로그로만 저장됩니다.",
       });
     };
@@ -855,8 +855,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     queueTelemetry,
   });
   const screenReaderStatus = isResult
-    ? `${activeCaseMeta?.label ?? "현재 케이스"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
-    : `${activeCaseMeta?.label ?? "현재 케이스"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
+    ? `${activeCaseMeta?.label ?? "현재 사건"} 결과 화면입니다. 랭크 ${resultRank}, 버스트 ${momentumScore}점, 주요 트리거는 ${triggerLabels[result.primary[0]]}입니다.`
+    : `${activeCaseMeta?.label ?? "현재 사건"} ${node.title} 장면입니다. 진행률 ${progress}퍼센트, 챌린지는 ${sceneChallenge.title}, 위험 압력은 ${riskTier} ${riskPressure}입니다.`;
   function trapDecisionRevealFocus(event) {
     if (event.key !== "Tab") return;
     const focusable = Array.from(

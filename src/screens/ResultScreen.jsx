@@ -228,7 +228,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           {nextCaseSignal && (
             <section className="next-case-panel">
               <div>
-                <span lang="en">{nextCaseSignal.eyebrow} · CONTAMINATED BY YOUR LAST STANDARD</span>
+                <span>{nextCaseSignal.eyebrow} · <span lang="en">CONTAMINATED BY YOUR LAST STANDARD</span></span>
                 <h2>{nextCaseSignal.title}</h2>
                 {nextCaseSignal.movement && (
                   <p className="next-case-movement">

@@ -122,7 +122,7 @@ export function DecisionReveal({ view }) {
       ? verdict.cause === "timeout"
         ? "시간이 먼저 끝났다. 망설임도 벽이다."
         : verdict.cause === "abandon"
-          ? "걸어 둔 판을 두고 테이블을 떠났다. 떠난 판은 터진 판이다."
+          ? "걸어 둔 판을 두고 테이블을 떠났다. 떠난 판은 벽에 닿은 판으로 친다."
           : `열기 ${verdict.gauge} — 벽은 ${verdict.wall}에 있었다.`
       : `열기 ${verdict.gauge}에서 확정. 벽은 ${verdict.wall}에 있었다.`;
 
@@ -189,7 +189,7 @@ export function DecisionReveal({ view }) {
 
         {decisionReveal.unlockedRelics?.length > 0 && (
           <div className="gx-reveal-unlock" data-testid="relic-unlocked" role="group" aria-label="새로 해금한 도구">
-            <span lang="en">NEW RELIC UNLOCKED</span>
+            <span>새 도구 해금</span>
             {decisionReveal.unlockedRelics.map((id) => (
               <b key={id}>
                 <RelicIcon id={id} size={16} /> {RELICS[id].label} · {RELICS[id].name}
@@ -207,9 +207,9 @@ export function DecisionReveal({ view }) {
 
         {overclockMutation && !busted && (
           <div className="gx-reveal-overdrive" data-testid="overdrive-payout" role="group" aria-label="오버클럭 발동">
-            <span lang="en">OVERCLOCK TRIGGERED</span>
+            <span>오버클럭 발동</span>
             <b>{overclockMutation.title}</b>
-            <p>다음 판은 칩 2배로 시작하지만, 푸시 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
+            <p>다음 판은 칩 2배로 시작하지만, 밀기 폭도 커진다. 이 보상은 더 큰 벽을 데려온다.</p>
           </div>
         )}
 

@@ -118,7 +118,7 @@ test("a save from the table that graded a press loads without a notice, under th
   assert.deepEqual(entry, fixture.save.log[0]);
   assert.equal(entry.tempoBonus.label, "FEVER");
   assert.equal(createGauntletLedger(state.log).grooveBanked, 180, "the ledger still counts what that entry banked");
-  assert.equal(describeVerdictCause({ outcome: "bust", cause: "focus" }), "락이 올린 열이 벽에 닿았다", "a verdict of that table still reads as it did");
+  assert.equal(describeVerdictCause({ outcome: "bust", cause: "focus" }), "LOCK이 올린 열기가 벽에 닿았다", "a verdict of that table still reads as it did");
 
   // The first close's summary: its record is handed back when the replay closes, and the vault slack leaves its share out.
   const summary = state.caseResults.prologue02;

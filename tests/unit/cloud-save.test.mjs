@@ -524,7 +524,7 @@ test("a failure is told to the player in Korean, never in the server's words", a
 });
 
 test("loading a copy keeps this device's name, consent and queue", async () => {
-  const queued = { id: "case-1", type: "case", label: "케이스 로그", payload: { event_id: "e1", session_id: "unit-session-1", case_id: "case01" } };
+  const queued = { id: "case-1", type: "case", label: "사건 로그", payload: { event_id: "e1", session_id: "unit-session-1", case_id: "case01" } };
   resetDevice({ save: makeSave({ runId: "run-local", playerName: "이 기기의 이름", dataConsent: true, pendingTelemetry: [queued] }) });
   const remote = makeSave({ runId: "run-remote", playerName: "", dataConsent: false, currentCase: "case09", nodeId: "c9_start", savedAt: "2026-09-28T11:00:00.000Z" });
   newServer({ stored: { saved_at: remote.savedAt, payload: { save: remote, settledWindows: ["seed-remote"] }, revision: 7 } });
@@ -545,7 +545,7 @@ test("loading a copy keeps this device's name, consent and queue", async () => {
 });
 
 test("a device without consent does not inherit a queue", async () => {
-  const queued = { id: "case-1", type: "case", label: "케이스 로그", payload: { event_id: "e1", session_id: "unit-session-1", case_id: "case01" } };
+  const queued = { id: "case-1", type: "case", label: "사건 로그", payload: { event_id: "e1", session_id: "unit-session-1", case_id: "case01" } };
   resetDevice({ save: makeSave({ dataConsent: false, pendingTelemetry: [queued] }) });
   const remote = makeSave({ runId: "run-remote", dataConsent: true });
   const cloud = await loadCloudSave();
