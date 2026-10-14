@@ -84,10 +84,16 @@ function newServer({ stored = null } = {}) {
 
 /**
  * The same database past its read limit: it will not say what it holds, and a
- * put that names no revision is ordered by time, as `put_cloud_save` orders it.
+ * put that names no revision is ordered by time, as `put_cloud_save` orders it
+ * -- so such a put, were one sent, replaces any copy older than the present.
+ * `liftLimit` is the hour turning.
  */
 function serverPastItsReadLimit({ stored = null } = {}) {
   const server = newServer({ stored });
+  server.liftLimit = () =>
+    browser.respond("/rest/v1/rpc/peek_cloud_save", () =>
+      ok(server.stored ? { saved_at: server.stored.saved_at, revision: server.stored.revision } : null),
+    );
   browser.respond("/rest/v1/rpc/peek_cloud_save", () => refusal(429, "cloud save rate limit exceeded", "PT429"));
   browser.respond("/rest/v1/rpc/put_cloud_save", ({ body }) => {
     const current = server.stored?.revision ?? 0;
@@ -298,16 +304,124 @@ test("another tab of this device uploading in between is not another device", as
   assert.equal(cloud.hasCloudConflict(), false);
 });
 
-test("a server that cannot be asked, and no revision on record: the upload names none", async () => {
-  resetDevice({ save: makeSave({ savedAt: "2026-09-28T10:00:00.000Z" }), sync: { pending: "2026-09-28T10:00:00.000Z", synced: "", revision: null } });
+test("a server that cannot be asked, and no revision on record: nothing is uploaded until it answers", async () => {
+  // This device has no revision on record (it opted in before revisions were
+  // sent, or took its online copy back), and another device has since played
+  // the code to revision 3. This one is opened at noon, past the read limit.
+  const noon = "2026-09-28T12:00:00.000Z";
+  resetDevice({ save: makeSave({ savedAt: noon }), sync: { pending: "", synced: "2026-09-28T09:00:00.000Z", revision: null } });
+  const server = serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T11:00:00.000Z", payload: { save: { runId: "evening" } }, revision: 3 } });
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0, "it used to go out naming no revision, and noon is later than eleven");
+  assert.equal(server.stored.payload.save.runId, "evening");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "error");
+  assert.match(cloud.getCloudSaveSnapshot().message, /너무 잦습니다.*다시 시도합니다/);
+  assert.equal(readSync().pending, noon, "the save is noted as waiting, which is what the retry tick reads");
+  assert.equal(readSync().conflict ?? null, null, "not knowing is not a conflict");
+
+  // Asked again on the next try, and again refused.
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(browser.callsTo("/rest/v1/rpc/peek_cloud_save").length, 2);
+  assert.equal(puts().length, 0);
+
+  // The hour turns: the server answers, and what it holds is another device's.
+  server.liftLimit();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0);
+  assert.equal(server.stored.payload.save.runId, "evening");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "conflict");
+  assert.deepEqual(readSync().conflict, { savedAt: "2026-09-28T11:00:00.000Z", revision: 3 });
+});
+
+test("a new device whose first question goes unanswered waits, then starts the code", async () => {
+  const savedAt = "2026-09-28T10:00:00.000Z";
+  resetDevice({ save: makeSave({ savedAt }) });
   const server = serverPastItsReadLimit();
   const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0);
+  assert.equal(readSync().pending, savedAt);
+  server.liftLimit();
   assert.equal(await cloud.flushCloudSave(), true);
   assert.equal(puts().length, 1);
-  assert.equal("p_expected_revision" in puts()[0].body, false);
-  assert.equal(server.stored.saved_at, "2026-09-28T10:00:00.000Z");
+  assert.equal(puts()[0].body.p_expected_revision, 0, "only an answer that the server holds nothing lets the first upload out");
+  assert.deepEqual({ pending: readSync().pending, revision: readSync().revision }, { pending: "", revision: 1 });
   assert.equal(cloud.getCloudSaveSnapshot().phase, "synced");
-  assert.equal(readSync().revision, 1, "the revision the server gave back is on record from here on");
+});
+
+test("no connection to ask over, or an answer with no revision in it, is not an answer either", async () => {
+  const savedAt = "2026-09-28T10:00:00.000Z";
+  const sync = { pending: savedAt, synced: "", revision: null };
+  resetDevice({ save: makeSave({ savedAt }), sync });
+  newServer({ stored: { saved_at: "2026-09-28T09:30:00.000Z", payload: {}, revision: 2 } });
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => {
+    throw new TypeError("fetch failed");
+  });
+  let cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0);
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "error");
+  assert.match(cloud.getCloudSaveSnapshot().message, /연결하지 못했습니다/);
+
+  resetDevice({ save: makeSave({ savedAt }), sync });
+  newServer({ stored: { saved_at: "2026-09-28T09:30:00.000Z", payload: {}, revision: 2 } });
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => ok({ saved_at: "2026-09-28T09:30:00.000Z" }));
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0);
+  assert.match(cloud.getCloudSaveSnapshot().message, /온라인 저장에 실패했습니다/, "the server did answer, so it is not called a connection that failed");
+  assert.equal(readSync().pending, savedAt);
+});
+
+test("every put names a revision: with one on record, a server that cannot be asked still gets the upload", async () => {
+  const savedAt = "2026-09-28T10:00:00.000Z";
+  resetDevice({ save: makeSave({ savedAt }), sync: { pending: savedAt, synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
+  const server = serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T09:00:00.000Z", payload: {}, revision: 2 } });
+  let cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal(puts()[0].body.p_expected_revision, 2);
+  assert.equal(server.stored.revision, 3);
+
+  // And when that revision is stale the server refuses it: a conflict, not a loss.
+  resetDevice({ save: makeSave({ savedAt }), sync: { pending: savedAt, synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
+  const moved = serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T09:40:00.000Z", payload: { save: { runId: "evening" } }, revision: 5 } });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts()[0].body.p_expected_revision, 2);
+  assert.equal(moved.stored.payload.save.runId, "evening");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "conflict");
+});
+
+test("an overwrite the server cannot be asked about names the copy the player was shown", async () => {
+  const savedAt = "2026-09-28T12:00:00.000Z";
+  const held = { savedAt: "2026-09-28T11:00:00.000Z", revision: 3 };
+  resetDevice({ save: makeSave({ savedAt }), sync: { pending: savedAt, synced: "", revision: 1, conflict: held } });
+  const server = serverPastItsReadLimit({ stored: { saved_at: held.savedAt, payload: {}, revision: 3 } });
+  let cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave({ overwrite: true }), true);
+  assert.equal(puts()[0].body.p_expected_revision, 3);
+  assert.equal(server.stored.revision, 4);
+  assert.equal(readSync().conflict, null);
+
+  // A third upload since the question was put: that is not the copy the
+  // player agreed to replace, so it is a conflict again.
+  resetDevice({ save: makeSave({ savedAt }), sync: { pending: savedAt, synced: "", revision: 1, conflict: held } });
+  const again = serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T11:30:00.000Z", payload: { save: { runId: "third" } }, revision: 4 } });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave({ overwrite: true }), false);
+  assert.equal(again.stored.payload.save.runId, "third");
+  assert.deepEqual(readSync().conflict, { savedAt: "2026-09-28T11:30:00.000Z", revision: 4 });
+
+  // A conflict that never learned a revision has nothing to name: nothing is
+  // sent, and the conflict is still the player's to settle.
+  resetDevice({ save: makeSave({ savedAt }), sync: { pending: savedAt, synced: "", revision: null, conflict: { savedAt: held.savedAt, revision: null } } });
+  serverPastItsReadLimit({ stored: { saved_at: held.savedAt, payload: {}, revision: 3 } });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave({ overwrite: true }), false);
+  assert.equal(puts().length, 0);
+  assert.equal(cloud.hasCloudConflict(), true);
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "error");
 });
 
 test("a database from before the migration is a failure the player is told, not a second upload", async () => {
@@ -323,15 +437,16 @@ test("a database from before the migration is a failure the player is told, not 
   assert.equal(readSync().pending, "2026-09-28T10:00:00.000Z", "the local save is still waiting");
 });
 
-test("a put with no revision that the server refuses as older is a conflict too, and it stays one", async () => {
+test("a later local write does not slip past a server that still cannot be asked", async () => {
   resetDevice({ save: makeSave({ savedAt: "2026-09-28T08:00:00.000Z" }), sync: { pending: "2026-09-28T08:00:00.000Z", synced: "", revision: null } });
-  serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T11:00:00.000Z", payload: {}, revision: 3 } });
+  const server = serverPastItsReadLimit({ stored: { saved_at: "2026-09-28T11:00:00.000Z", payload: { save: { runId: "evening" } }, revision: 3 } });
   const cloud = await loadCloudSave();
   assert.equal(await cloud.flushCloudSave(), false);
-  assert.equal(cloud.getCloudSaveSnapshot().phase, "conflict");
+  // Stamped later than the server's copy: ordered by time it would be taken.
   browser.storage.setItem(config.STORAGE_KEY, JSON.stringify(makeSave({ savedAt: "2026-09-28T12:00:00.000Z" })));
   assert.equal(await cloud.flushCloudSave(), false);
-  assert.equal(puts().length, 1, "the later local write did not slip past the conflict");
+  assert.equal(puts().length, 0);
+  assert.equal(server.stored.payload.save.runId, "evening");
 });
 
 test("offline, and switched off, nothing is sent", async () => {
@@ -346,6 +461,45 @@ test("offline, and switched off, nothing is sent", async () => {
   assert.equal(await cloud.flushCloudSave(), false);
   assert.equal(cloud.getCloudSaveSnapshot().phase, "disabled");
   assert.equal(browser.calls.length, 0);
+});
+
+test("a connection that drops while the server is being asked sends no put", async () => {
+  // The first upload of a run, with nothing yet marked pending: the peek is
+  // answered, and the device is offline by the time the put would go.
+  resetDevice({ sync: { pending: "", synced: "", revision: null } });
+  const server = newServer();
+  let dropped = false;
+  browser.respond("/rest/v1/rpc/peek_cloud_save", () => {
+    if (!dropped) browser.setOnline(false);
+    dropped = true;
+    return ok(null);
+  });
+  let cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.equal(puts().length, 0, "nothing leaves the device while offline");
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "offline");
+  assert.equal(readSync().pending, makeSave().savedAt, "the save is waiting for the connection");
+  browser.setOnline(true);
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.deepEqual(puts().map((put) => put.body.p_expected_revision), [0]);
+  assert.equal(server.stored.revision, 1);
+
+  // Refused over another tab's copy, the second put is not sent once the
+  // connection has gone in between.
+  const save = makeSave({ savedAt: "2026-09-28T10:00:00.000Z" });
+  resetDevice({ save, sync: { pending: save.savedAt, synced: "2026-09-28T09:00:00.000Z", revision: 2 } });
+  newServer({ stored: { saved_at: "2026-09-28T09:00:00.000Z", payload: {}, revision: 2 } });
+  browser.respond("/rest/v1/rpc/put_cloud_save", () => {
+    browser.storage.setItem(config.CLOUD_SAVE_SYNC_KEY, JSON.stringify({ ...readSync(), synced: "2026-09-28T09:59:00.000Z", revision: 3 }));
+    browser.setOnline(false);
+    return ok({ accepted: false, reason: "revision", saved_at: "2026-09-28T09:59:00.000Z", revision: 3 });
+  });
+  cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), false);
+  assert.deepEqual(puts().map((put) => put.body.p_expected_revision), [2]);
+  assert.equal(cloud.getCloudSaveSnapshot().phase, "offline");
+  assert.equal(readSync().pending, save.savedAt);
+  assert.equal(cloud.hasCloudConflict(), false, "another tab's copy is not held as a conflict");
 });
 
 test("a failure is told to the player in Korean, never in the server's words", async () => {
