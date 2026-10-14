@@ -168,8 +168,7 @@
   background:
     radial-gradient(120% 60% at 50% 120%, var(--c-gx-heat-a18), transparent 62%),
     radial-gradient(60% 45% at 0% 0%, rgb(94 234 255 / 0.05), transparent 70%),
-    radial-gradient(55% 40% at 100% 0%, rgb(217 255 98 / 0.04), transparent 70%),
-    var(--ui-bg);
+    radial-gradient(55% 40% at 100% 0%, rgb(217 255 98 / 0.04), transparent 70%), var(--ui-bg);
 }
 
 /* A felt weave under everything, faded out toward the edges. */
@@ -740,9 +739,7 @@
   padding: 8px 11px;
   border: 1px solid var(--c-gx-heat-a55);
   border-radius: var(--ui-radius-sm);
-  background:
-    linear-gradient(90deg, rgb(255 56 56 / 0.16), transparent 70%),
-    var(--ui-surface-1);
+  background: linear-gradient(90deg, rgb(255 56 56 / 0.16), transparent 70%), var(--ui-surface-1);
   box-shadow:
     inset 3px 0 0 var(--c-gx-heat),
     0 0 calc(var(--gx-heat, 0) * 24px) var(--c-gx-heat-a18);
@@ -842,7 +839,11 @@
   height: 22px;
   overflow: hidden;
   background:
-    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgb(255 255 255 / 0.06) calc(10% - 1px) 10%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(10% - 1px),
+      rgb(255 255 255 / 0.06) calc(10% - 1px) 10%
+    ),
     var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--radius-pill);
@@ -2390,7 +2391,10 @@
     align-items: center;
   }
 
-  .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) > :not(.gx-card-label, .gx-card-stats, .gx-card-key) {
+  .gauntlet-stage
+    .gx-hand
+    > .gx-card:last-child:nth-child(odd)
+    > :not(.gx-card-label, .gx-card-stats, .gx-card-key) {
     grid-column: 1 / -1;
   }
 
@@ -2894,7 +2898,6 @@
   .gauntlet-stage .gx-card.selected {
     transform: none;
   }
-
 }
 
 /* Rules that lived in extensions.css, the old "late overrides" file, until

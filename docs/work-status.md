@@ -1293,7 +1293,10 @@ them), `lint` (`eslint --cache`), `check:pressure`, `check:endings`,
 `src/vite-env.d.ts` typing the build-time env; a module joins once it passes as
 is), `check:dialogue`, `check:graph`, `check:runtime-budget`, `check:views`,
 `check:constants`, `check:text`, `check:plain-language`, `check:encoding`,
-`check:css`, `check:css-structure`, `format:check`, `check:art`,
+`check:css`, `check:css-structure`, `format:check` (`prettier --check src/styles`: every
+hand-written sheet, with the generated `critical.generated.css` left out by
+`.prettierignore`; until 2026-10-13 that file ignored `src/` itself and the
+check passed without reading a sheet), `check:art`,
 `check:fonts`, `check:export-schema`, `check:test-storage`,
 `check:visual-baselines`, `check:node`, `check:grants`, `check:canon`,
 `check:card-labels` and `check:doc-numbers`. None of them needs a browser.

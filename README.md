@@ -1252,8 +1252,15 @@ node scripts/check-migration-drift.mjs --from list.json
   디버그 진단 로그에만 들어갑니다.
 - Windows PowerShell은 유효한 UTF-8 한글을 깨져 보이게 출력할 수 있습니다. 화면에서 깨져 보인다는
   이유로 원고를 고치기 전에 `npm run check:encoding`과 `npm run check:text`를 기준으로 삼으십시오.
-- Prettier는 `src/styles`만 관리합니다(`npm run format`). `app.css`가 다시 압축된 형태로
+- Prettier는 `src/styles`만 관리합니다(`npm run format`, 검사는 `verify:static`의 `format:check`).
+  손으로 쓴 시트 전부(`app.css`, `tokens.css`, `app/*.css`)가 대상이고, 빌드가 만든
+  `critical.generated.css`만 `.prettierignore`로 빠집니다. `app.css`가 다시 압축된 형태로
   커밋되는 것을 막기 위한 장치이고, JS/JSX 포맷은 diff 가독성을 위해 강제하지 않습니다.
+  2026-10-13 전에는 `.prettierignore`가 `src/` 디렉터리째 무시하고 있어서 `format:check`가 시트를
+  하나도 읽지 않고 통과했습니다. 파일이 실제로 읽히는지는
+  `npx prettier --file-info src/styles/app/result.css`의 `ignored: false`로 확인합니다.
+  `responsive.css`의 `/* prettier-ignore */` 두 곳은 줄을 나누면 그 시트의 예산(`check:css-structure`)을
+  넘기 때문에 한 줄로 둔 것입니다.
 - ESLint(`npm run lint`)는 `--max-warnings 0`으로 돌아 경고도 실패입니다. `react-hooks/exhaustive-deps`도
   오류로 올렸고, 그 규칙을 줄 단위로 끈 곳이 일곱 군데 남아 있습니다(`GameRuntime.jsx` 1,
   `GauntletStage.jsx` 4, `GauntletFx.jsx` 1, `useDialogFocus.js` 1). 끈 이유는 각 줄 옆에 적혀 있습니다.

@@ -17,7 +17,7 @@
   .shell {
     padding: 16px;
   }
-.result-grid {
+  .result-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .achievement-panel > div:last-child {
@@ -57,7 +57,7 @@
   .counterfactual-scene {
     grid-column: 1 / -1;
   }
-.observer-postmortem-grid {
+  .observer-postmortem-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -82,7 +82,7 @@
   .board-page .topbar {
     padding-right: 0;
   }
-.brand-row,
+  .brand-row,
   .topbar,
   .start-input-row,
   .top-actions {
@@ -165,7 +165,7 @@
   .panel-title-row {
     display: grid;
   }
-.delta-table article {
+  .delta-table article {
     grid-template-columns: 1fr;
   }
   .delta-table article p {
@@ -331,6 +331,9 @@
     align-items: center;
   }
 
+  /* Kept on one line: broken at 110 columns it is three lines more, and this
+     sheet's line budget has room for one. */
+  /* prettier-ignore */
   .gauntlet-stage .gx-hand > .gx-card:last-child:nth-child(odd) > :not(.gx-card-label, .gx-card-stats, .gx-card-key) {
     grid-column: 1 / -1;
   }
@@ -347,6 +350,7 @@
   .gx-actions {
     max-width: none;
     gap: 6px;
+    /* prettier-ignore */
     padding: 5px max(12px, env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 

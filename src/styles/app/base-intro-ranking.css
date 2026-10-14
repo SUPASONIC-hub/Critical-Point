@@ -5,9 +5,7 @@
   place-items: center;
   padding: 24px;
   color: var(--ui-text);
-  background:
-    radial-gradient(60% 50% at 50% 0%, rgb(255 92 72 / 0.1), transparent 70%),
-    var(--ui-bg);
+  background: radial-gradient(60% 50% at 50% 0%, rgb(255 92 72 / 0.1), transparent 70%), var(--ui-bg);
 }
 .error-panel {
   width: min(100%, 560px);
@@ -390,7 +388,13 @@ summary:focus-visible {
     radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
     linear-gradient(0deg, var(--ui-bg) 0%, rgb(6 9 10 / 0) 30%),
     linear-gradient(180deg, rgb(6 9 10 / 0.7) 0%, rgb(6 9 10 / 0) 20%),
-    linear-gradient(90deg, var(--ui-bg) 0%, rgb(6 9 10 / 0.94) 28%, rgb(6 9 10 / 0.55) 52%, rgb(6 9 10 / 0.08) 78%);
+    linear-gradient(
+      90deg,
+      var(--ui-bg) 0%,
+      rgb(6 9 10 / 0.94) 28%,
+      rgb(6 9 10 / 0.55) 52%,
+      rgb(6 9 10 / 0.08) 78%
+    );
 }
 .intro-visual figcaption {
   position: absolute;
@@ -1171,8 +1175,7 @@ summary:focus-visible {
   padding: clamp(20px, 3vw, 32px);
   color: var(--ui-text);
   background:
-    radial-gradient(80% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%),
-    var(--ui-surface-1);
+    radial-gradient(80% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -1312,9 +1315,7 @@ summary:focus-visible {
   margin: 0 auto 14px;
   padding: 16px 20px;
   color: var(--ui-text);
-  background:
-    linear-gradient(90deg, rgb(217 255 98 / 0.08), transparent 60%),
-    var(--ui-surface-1);
+  background: linear-gradient(90deg, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
 }
@@ -1616,9 +1617,7 @@ summary:focus-visible {
 }
 .intro .play-style.selected,
 .intro .operator-origin.selected {
-  background:
-    linear-gradient(160deg, rgb(217 255 98 / 0.1), transparent 55%),
-    var(--ui-surface-2);
+  background: linear-gradient(160deg, rgb(217 255 98 / 0.1), transparent 55%), var(--ui-surface-2);
   border-color: var(--ui-accent);
   box-shadow:
     0 0 0 1px var(--ui-accent),
@@ -2159,8 +2158,7 @@ summary:focus-visible {
 }
 .case-card.active-case {
   background:
-    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%),
-    var(--ui-surface-1);
+    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%), var(--ui-surface-1);
   border-color: rgb(217 255 98 / 0.6);
   box-shadow:
     0 0 0 1px rgb(217 255 98 / 0.25),
@@ -2260,9 +2258,7 @@ summary:focus-visible {
   margin-bottom: 14px;
   padding: 20px 20px 20px 24px;
   color: var(--ui-text);
-  background:
-    radial-gradient(90% 140% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%),
-    var(--ui-surface-1);
+  background: radial-gradient(90% 140% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -2352,9 +2348,7 @@ summary:focus-visible {
   transform: translateY(-1px);
 }
 .ranking-row.current-player {
-  background:
-    linear-gradient(90deg, rgb(217 255 98 / 0.09), transparent 60%),
-    var(--ui-surface-2);
+  background: linear-gradient(90deg, rgb(217 255 98 / 0.09), transparent 60%), var(--ui-surface-2);
   border-color: rgb(217 255 98 / 0.55);
   box-shadow: inset 3px 0 var(--ui-accent);
 }
@@ -2711,8 +2705,8 @@ summary:focus-visible {
   display: grid;
   place-items: center;
   overflow: hidden;
-  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
-    max(24px, env(safe-area-inset-left));
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   color: var(--c-paper);
   background:
     radial-gradient(60% 60% at 50% 50%, rgb(217 255 98 / 0.1), transparent 70%),
@@ -2864,7 +2858,14 @@ body {
   }
   .intro-hero-art::after {
     background:
-      linear-gradient(180deg, rgb(6 9 10 / 0.72) 0%, rgb(6 9 10 / 0.12) 20%, rgb(6 9 10 / 0.55) 48%, rgb(6 9 10 / 0.9) 72%, var(--ui-bg) 90%),
+      linear-gradient(
+        180deg,
+        rgb(6 9 10 / 0.72) 0%,
+        rgb(6 9 10 / 0.12) 20%,
+        rgb(6 9 10 / 0.55) 48%,
+        rgb(6 9 10 / 0.9) 72%,
+        var(--ui-bg) 90%
+      ),
       radial-gradient(80% 50% at 30% 70%, rgb(217 255 98 / 0.06), transparent 70%);
   }
   .intro-hero-copy {
