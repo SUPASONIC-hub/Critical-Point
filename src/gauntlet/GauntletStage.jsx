@@ -26,7 +26,7 @@ import {
   getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
-import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { listOfferedTypes } from "./logicStreak.js";
 import { LOCK_PRESS_SECONDS } from "./tableRules.js";
@@ -570,6 +570,8 @@ export function GauntletStage({
                 folded copy is for looking something up while it runs. */}
             <details className="gx-brief" onToggle={(event) => setBriefOpen(event.currentTarget.open)}>
               <summary>사건 브리핑</summary>
+              {/* The six numbers and the clue count a locked card states its condition in; the HUD prints none of them. */}
+              <p data-testid="brief-standing">{describeStanding(resources, resourceMeta, clueCount)}</p>
               {/* The room, before the words about it. Ten raster files cannot
                   cover 169 scenes, so the picture is drawn from the scene's own
                   `place` and `phase` rather than shipped as art. Inside the
@@ -590,6 +592,7 @@ export function GauntletStage({
                 </ul>
               )}
               <ul>
+                {scene.challenge && <li data-testid="brief-challenge">이 장면의 챌린지: {scene.challenge}.</li>}
                 <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
                 <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>

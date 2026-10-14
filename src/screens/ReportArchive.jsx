@@ -30,7 +30,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     score: {
       decisionFingerprint, observationLedger, observerPattern, triggerLabels, triggers, result, clamp,
       easyCognitionLabels, formatRiskDelta, counterfactualReport, achievementBadges,
-      routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, caseResults,
+      routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, caseResults, caseChange,
     },
     telemetry: {
       sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry,
@@ -580,6 +580,13 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     <section className="resource-delta-panel">
       <h2 lang="en">Resource Change</h2>
       <div className="delta-table">
+        {/* The case as a whole, ahead of its decisions: where the six stood when it opened and where it left them. */}
+        {caseChange.length > 0 && (
+          <article data-testid="case-resource-change">
+            <b>사건 전 → 후</b>
+            <div>{caseChange.map((row) => <span key={row.key} className={row.gain === null ? undefined : row.gain ? "delta-up" : "delta-down"}>{row.text}</span>)}</div>
+          </article>
+        )}
         {log.map((entry, index) => (
           <article key={`${entry.nodeId}-delta-${index}`}>
             <b>{String(index + 1).padStart(2, "0")} · {entry.title}</b>

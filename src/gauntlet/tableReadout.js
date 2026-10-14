@@ -205,6 +205,47 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
     .sort((left, right) => Math.abs(right.value) - Math.abs(left.value));
 }
 
+/**
+ * The run's six numbers and the clues it holds, as one line of the folded
+ * briefing. A locked card states its condition in these ("지금 믿음 N, 단서
+ * N개", `getAuthorityGate`) and the table printed none of them: the HUD is the
+ * pot, the heat and the clock. The values are printed as the gate reads them,
+ * so the line and a locked card's sentence never disagree.
+ */
+export function describeStanding(resources = {}, resourceMeta = {}, clueCount = 0) {
+  return [
+    ...Object.entries(resourceMeta).map(([key, meta]) => `${meta.label} ${Number(resources?.[key]) || 0}${meta.suffix ?? ""}`),
+    `단서 ${Number(clueCount) || 0}개`,
+  ].join(" · ");
+}
+
+/**
+ * The same six across the case just closed: what its first logged decision
+ * started from and what its last one left. The log is emptied when a case
+ * opens (`RUN_FIELDS.log`) and only a commit moves the resources, so the two
+ * ends of the log are the two ends of the case. `labels` is the six names in
+ * the order they are printed (`easyResourceLabels`).
+ *
+ * An entry saved without them, or rebuilt from a replay seed, holds `{}`
+ * for both (`savedState.js`), so each end is the nearest entry with numbers;
+ * a resource either end lacks is left out rather than printed as 0, and a log
+ * with no numbers at all lists nothing. `gain` is null for a value that did
+ * not move: it is neither a gain nor a loss.
+ */
+export function describeCaseChange(log = [], labels = {}) {
+  const held = (value) => Boolean(value) && Object.keys(value).length > 0;
+  const before = log.find((entry) => held(entry?.resourcesBefore))?.resourcesBefore;
+  const after = log.findLast((entry) => held(entry?.resourcesAfter))?.resourcesAfter;
+  if (!before || !after) return [];
+  return Object.entries(labels)
+    .filter(([key]) => typeof before[key] === "number" && typeof after[key] === "number")
+    .map(([key, label]) => ({
+      key,
+      text: `${label} ${before[key]} → ${after[key]}`,
+      gain: before[key] === after[key] ? null : isResourceGain(key, after[key] - before[key]),
+    }));
+}
+
 export function joinRules(items) {
   if (!items.length) return "기본 규칙";
   return items.map((item) => item.label).join(" / ");

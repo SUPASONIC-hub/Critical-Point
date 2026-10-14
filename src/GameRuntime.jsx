@@ -780,7 +780,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   });
 
   const {
-    achievementBadges,
+    achievementBadges, caseChange,
     aftermath,
     authorityReview,
     beatSeason,
@@ -937,7 +937,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     return <LazyScreen quiet><IntroScreen view={introView} renderers={{ renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel }} /></LazyScreen>;
   }
   const resultView = createResultView(
-    { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines, renderSceneMinutes, endingPreview },
+    { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines, renderSceneMinutes, endingPreview, caseChange },
     { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats, logicReport, beatSeason },
   );
   if (isResult) {
@@ -946,7 +946,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   const playView = createPlayView({
     AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
-    node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId,
+    node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
     fixedChoices, clueCount, casesOpened, reframeChoice,
     resources, resourceMeta, progress, routeIndex, routeLength,

@@ -6,7 +6,7 @@ import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { createCaseSummary } from "../src/gameLogic.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { easyCognitionLabels } from "../src/playerLanguage.js";
+import { easyCognitionLabels, easyResourceLabels } from "../src/playerLanguage.js";
 import { encodeReplaySeed, REPLAY_QUERY_KEY } from "../src/state/trace.js";
 import {
   chooseFirstAvailableChoice,
@@ -23,6 +23,7 @@ import {
 } from "./helpers/gameFlow.js";
 import { measureTable } from "./helpers/layout.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
+import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 async function startDebugNode(page, caseId, nodeId) {
   await startDebugNodeFromHelper(page, caseId, nodeId, {
@@ -2356,6 +2357,57 @@ test("시즌 로드맵 from a report lands on the roadmap, at the case the seaso
   expect(rail.scrolled).toBeGreaterThan(0);
   expect(rail.cardLeft).toBeGreaterThanOrEqual(-1);
   expect(rail.cardRight).toBeLessThanOrEqual(rail.width + 1);
+});
+
+// The archive's resource panel listed each decision's change and never the
+// case's: its first row is now the six numbers from where the case's first
+// logged decision started to where its last one left them (`describeCaseChange`,
+// src/gauntlet/tableReadout.js).
+test("the resource panel of 전체 기록 opens on the six numbers of the case, from the start of its first decision to the end of its last", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/?debug=1");
+  // Two scenes from the report, so the case's first decision and its last are two entries.
+  await startDebugNode(page, "case01", "c1_final_system");
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.locator(".result-page")).toBeVisible();
+  await expect
+    .poll(async () => Boolean((await readJsonStorage(page, TEST_STORAGE_KEYS.save))?.caseResults?.case01), { message: "the closed case is in the save" })
+    .toBe(true);
+
+  const { log } = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(log.length, "the case closed on more than one decision").toBeGreaterThanOrEqual(2);
+  // Each end is the nearest entry that holds numbers, as the row reads them; played here, that is the first and the last.
+  const held = (value) => Boolean(value) && Object.keys(value).length > 0;
+  const first = log.find((entry) => held(entry?.resourcesBefore));
+  const last = log.findLast((entry) => held(entry?.resourcesAfter));
+  expect(log.indexOf(first), "the first decision holds what it started from").toBe(0);
+  expect(log.indexOf(last), "the last decision holds what it left").toBe(log.length - 1);
+  const expected = Object.entries(easyResourceLabels).map(([key, label]) => ({ label, before: first.resourcesBefore[key], after: last.resourcesAfter[key] }));
+  expect(expected.every((row) => Number.isFinite(row.before) && Number.isFinite(row.after)), "the save holds all six at both ends").toBe(true);
+  expect(expected.some((row) => row.before !== row.after), "the case moved at least one of the six").toBe(true);
+
+  await page.locator("details.report-archive > summary").click();
+  await expect(page.locator(".report-archive-body")).toBeVisible();
+  const row = page.getByTestId("case-resource-change");
+  await expect(row).toHaveCount(1);
+  await expect(row).toBeVisible();
+  expect(await row.evaluate((element) => element === element.parentElement.firstElementChild), "the case's row is ahead of its decisions'").toBe(true);
+
+  // Each resource is "{name} {before} → {after}"; the names and the two numbers are read, not the mark between them.
+  const printed = await row.locator("span").evaluateAll((spans) => spans.map((span) => ({ text: span.textContent ?? "", mark: span.className })));
+  const read = printed.map(({ text }) => {
+    const parts = text.match(/^(.+?) (-?\d+)\D+?(-?\d+)$/);
+    return parts ? { label: parts[1], before: Number(parts[2]), after: Number(parts[3]) } : { unread: text };
+  });
+  expect(read).toEqual(expected);
+  // A value that did not move is marked neither as a gain nor as a loss; one that moved is marked as one of them.
+  printed.forEach(({ mark }, index) => {
+    const moved = expected[index].before !== expected[index].after;
+    expect(mark, `${expected[index].label} ${moved ? "moved" : "did not move"}`).toMatch(moved ? /^delta-(up|down)$/ : /^$/);
+  });
 });
 
 test("completed case is retained in the local ranking after leaving the ending", async ({ page }) => {

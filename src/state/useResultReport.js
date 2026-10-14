@@ -21,6 +21,7 @@ import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logi
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
+import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
 import { useLogicStanding } from "./useLogicStanding.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
@@ -173,6 +174,8 @@ export function useResultReport({
     // For the page before the finale (`getSeasonRecordNotice`).
     beatSeason: hasBeatTableCase(caseResults),
     routeTimeline,
+    // The six resources across the case just closed, for the archive's resource panel.
+    caseChange: describeCaseChange(log, easyResourceLabels),
     finalEndingEntry,
     finalAftermathEntry,
     endingPreview: { ...getEndingPreview(endingVariant), rationale: [

@@ -8,7 +8,10 @@ import { resourceMeta } from "../../src/appCopy.js";
 import {
   BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, HOT_CASH_MULTIPLIER, RUN_INITIAL_STATE,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { describeEffect, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
+import { describeCaseChange, describeEffect, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
+import { getAuthorityGate } from "../../src/gameLogic.js";
+import { initialResources } from "../../src/gameConstants.js";
+import { easyResourceLabels } from "../../src/playerLanguage.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 
@@ -80,6 +83,69 @@ test("an effect on a resource the table has no name for is listed under its key"
   assert.deepEqual(describeEffect({ rumour: 2 }, resourceMeta), [{ key: "rumour", value: 2, label: "rumour", gain: true }]);
   assert.deepEqual(describeEffect({ trust: 2 }), [{ key: "trust", value: 2, label: "trust", gain: true }], "and so is every one of them with no names handed over");
   assert.deepEqual(describeEffect(), [], "a card with no effect lists nothing");
+});
+
+test("the folded briefing's line names all six resources and the clues held, in the table's own order", () => {
+  const line = describeStanding(initialResources, resourceMeta, 2);
+  assert.equal(line, "남은 시간 72시간 · 현금 100 · 믿음 50 · 공정함 50 · 사람 피해 0 · 지침 10 · 단서 2개");
+  assert.deepEqual(
+    line.split(" · ").slice(0, -1).map((part) => part.replace(/ -?\d+\D*$/, "")),
+    Object.values(resourceMeta).map((meta) => meta.label),
+    "one part a resource, under the name every other screen gives it",
+  );
+});
+
+test("the line prints the numbers a locked card's sentence quotes", () => {
+  const resources = { ...initialResources, trust: 41, legitimacy: 63 };
+  const line = describeStanding(resources, resourceMeta, 1);
+  const field = getAuthorityGate({ requiredAuthority: "FIELD ACCESS" }, { clueCount: 1, trust: 41, legitimacy: 63 });
+  const oversight = getAuthorityGate({ requiredAuthority: "OVERSIGHT" }, { clueCount: 1, trust: 41, legitimacy: 63 });
+  assert.equal(field.unlocked, false, "the card is locked, so its reason is the sentence with the numbers");
+  assert.match(field.reason, /지금 믿음 41, 단서 1개\./);
+  assert.match(oversight.reason, /지금 단서 1개, 공정함 63\./);
+  for (const part of ["믿음 41", "공정함 63", "단서 1개"]) assert.ok(line.split(" · ").includes(part), `the line holds "${part}"`);
+});
+
+test("a run with a number missing prints 0 for it rather than a gap", () => {
+  assert.equal(describeStanding({ trust: 12 }, { trust: { label: "믿음", suffix: "" }, time: { label: "남은 시간", suffix: "시간" } }), "믿음 12 · 남은 시간 0시간 · 단서 0개");
+  assert.equal(describeStanding(undefined, { trust: { label: "믿음" } }, undefined), "믿음 0 · 단서 0개", "a name with no suffix prints none");
+  assert.equal(describeStanding(), "단서 0개", "with no names handed over only the clues are counted");
+});
+
+test("the case's change reads the first decision's start and the last decision's end", () => {
+  const log = [
+    { resourcesBefore: { ...initialResources }, resourcesAfter: { ...initialResources, trust: 58, humanCost: 6 } },
+    { resourcesBefore: { ...initialResources, trust: 58, humanCost: 6 }, resourcesAfter: { ...initialResources, trust: 44, humanCost: 11, fatigue: 4 } },
+  ];
+  const rows = describeCaseChange(log, easyResourceLabels);
+  assert.deepEqual(rows.map((row) => row.key), Object.keys(easyResourceLabels), "all six, in the order the labels are written");
+  assert.deepEqual(rows.map((row) => row.text), ["남은 시간 72 → 72", "현금 100 → 100", "믿음 50 → 44", "공정함 50 → 50", "사람 피해 0 → 11", "지침 10 → 4"]);
+});
+
+test("a change is marked by whether it was good for the run, and a value that did not move by neither", () => {
+  const log = [{ resourcesBefore: { ...initialResources }, resourcesAfter: { ...initialResources, trust: 44, capital: 120, humanCost: 11, fatigue: 4 } }];
+  const gain = Object.fromEntries(describeCaseChange(log, easyResourceLabels).map((row) => [row.key, row.gain]));
+  assert.deepEqual(gain, { time: null, capital: true, trust: false, legitimacy: null, humanCost: false, fatigue: true }, "사람 피해 rising is a loss, 지침 falling is a gain");
+});
+
+test("an entry that holds no numbers is passed over for the nearest one that does", () => {
+  const log = [
+    { isSystemEvent: true, resourcesBefore: {}, resourcesAfter: {} },
+    { resourcesBefore: { trust: 50 }, resourcesAfter: { trust: 55 } },
+    { resourcesBefore: { trust: 55 }, resourcesAfter: { trust: 61 } },
+    { resourcesBefore: {}, resourcesAfter: {} },
+    null,
+  ];
+  assert.deepEqual(describeCaseChange(log, easyResourceLabels), [{ key: "trust", text: "믿음 50 → 61", gain: true }], "and a resource neither end names is left out, not printed as 0");
+});
+
+test("a log with no numbers lists no change at all", () => {
+  assert.deepEqual(describeCaseChange([], easyResourceLabels), []);
+  assert.deepEqual(describeCaseChange(undefined, easyResourceLabels), []);
+  assert.deepEqual(describeCaseChange([{ resourcesBefore: {}, resourcesAfter: {} }], easyResourceLabels), [], "a replayed link's entries carry none");
+  assert.deepEqual(describeCaseChange([{ resourcesBefore: { trust: 50 } }], easyResourceLabels), [], "one end alone is not a change");
+  assert.deepEqual(describeCaseChange([{ resourcesBefore: { trust: 50 }, resourcesAfter: { trust: "61" } }], easyResourceLabels), [], "a value that is not a number is not printed");
+  assert.deepEqual(describeCaseChange([{ resourcesBefore: { trust: 50 }, resourcesAfter: { trust: 61 } }]), [], "and with no names handed over nothing is listed");
 });
 
 test("a list of rules is read by its labels, and an empty one says the table is on its base rules", () => {
