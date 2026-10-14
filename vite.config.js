@@ -319,6 +319,17 @@ function serviceWorkerSetting(command, mode) {
  */
 const RUNTIME_SYSTEMS = "src/runtimeSystems.js";
 
+/**
+ * The season's copy between and around cases (src/caseCopy.js): every
+ * next-case teaser and interlude, the chapter rules, the rank legacy lines and
+ * 에코's opening lines. Only the runtime reads it, and from the first table on,
+ * so it gets a file the same way and for the same reason as runtimeSystems and
+ * is fetched beside the runtime: it was about a fifth of the runtime's chunk,
+ * and that chunk had 255 gzip bytes left on 2026-10-14
+ * (scripts/check-bundle-size.mjs).
+ */
+const CASE_COPY = "src/caseCopy.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -328,6 +339,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(RUNTIME_SYSTEMS),
         name: "runtimeSystems",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(CASE_COPY),
+        name: "caseCopy",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },

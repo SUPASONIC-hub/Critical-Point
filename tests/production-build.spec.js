@@ -176,13 +176,18 @@ test("the ranking and the board read from the backend in the release", { tag: "@
  *      LazyScreen around the runtime, which shows `chunk-reload-panel` with a
  *      새로고침 button (`chunk-reload`) instead of handing it to the root
  *      boundary, so nothing is written to the save.
+ *
+ * The season copy (src/caseCopy.js) is its own chunk, loaded beside the
+ * runtime: the runtime imports it statically, so refusing it fails the same
+ * import and must end the same way.
  */
-test("a scene graph that cannot be fetched reloads once, then offers 새로고침 and leaves the save alone", { tag: "@prod" }, async ({ page, browserName }) => {
+for (const [chunk, what] of [["GameRuntime", "a scene graph"], ["caseCopy", "the season copy beside the scene graph"]]) {
+test(`${what} that cannot be fetched reloads once, then offers 새로고침 and leaves the save alone`, { tag: "@prod" }, async ({ page, browserName }) => {
   const save = savedAtLastScene();
   await seedSave(page, save);
   let refuse = true;
   let refusals = 0;
-  await page.route("**/assets/GameRuntime-*.js", (route) => {
+  await page.route(`**/assets/${chunk}-*.js`, (route) => {
     if (!refuse) return route.continue();
     refusals += 1;
     return route.abort("failed");
@@ -242,3 +247,4 @@ test("a scene graph that cannot be fetched reloads once, then offers 새로고�
   await expect(page.locator(".game-shell")).toBeVisible();
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(save.nodeId);
 });
+}

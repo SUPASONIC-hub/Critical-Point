@@ -132,6 +132,15 @@ const budgets = [
   // the runtime's chunk had 667 gzip bytes left and this is 2,600 inside it
   // (runtimeSystemsChunk in vite.config.js). 7,103 / 3,633, plus 5%.
   { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 7_460, maxGzip: 3_815 },
+  // The season's copy between and around cases (src/caseCopy.js): the
+  // next-case teasers and interludes, chapter rules, rank legacy lines and
+  // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
+  // bytes left (175,845 of 176,100) on 2026-10-14; it is fetched beside the
+  // runtime the same way runtimeSystems is (CASE_COPY in
+  // vite.config.js), so nothing loads later than it did. Taking it out left the
+  // runtime's ceiling where it was, for the changes that were waiting on it.
+  // 108,233 / 34,828, plus 5%.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 113_650, maxGzip: 36_570 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
