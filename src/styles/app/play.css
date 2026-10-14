@@ -272,6 +272,13 @@
   border-color: var(--ui-line-accent);
 }
 
+/* 초기화 stands apart from the two saves at every width: it is the one that
+   throws the run away. The gap was a phone's alone, and on a wider screen
+   the three sat 4px apart, as one group. */
+.gauntlet-shell .top-actions.compact-actions .header-reset {
+  margin-left: 9px;
+}
+
 .gauntlet-shell .game-header .status-bar {
   grid-area: status;
   display: flex;
@@ -2027,10 +2034,6 @@
     content: "";
     position: absolute;
     inset: -8px -1.5px;
-  }
-
-  .gauntlet-shell .top-actions.compact-actions .header-reset {
-    margin-left: 9px;
   }
 
   .gauntlet-shell .top-actions.compact-actions .header-reset::before {

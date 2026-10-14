@@ -174,12 +174,12 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   진단 로그
                 </button>
               )}
-              {/* Not "다시 플레이": beside 이 사건 다시 도전 and 이 사건을 다시 열기
-                  that read as a third way to retry a case, and it is the one
-                  that throws the whole season away. */}
+              {/* 초기화, the name the play header gives the same season wipe; not
+                  "다시 플레이", which beside 이 사건 다시 도전 (this page's one name
+                  for a retry) read as another way to retry. */}
               <button type="button" className="ghost season-reset-button" onClick={reset}>
                 <RefreshCcw size={16} />
-                시즌 처음부터 다시
+                초기화
               </button>
             </div>
           </div>
@@ -325,7 +325,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   <p>단서 {unopenedClueCount}개와 분기 {unopenedBranchCount}개가 아직 기록에 없습니다.</p>
                 )}
                 <button type="button" className="ghost" onClick={() => startCase(currentCase)}>
-                  이 사건을 다시 열기
+                  이 사건 다시 도전
                 </button>
               </article>
             </div>
