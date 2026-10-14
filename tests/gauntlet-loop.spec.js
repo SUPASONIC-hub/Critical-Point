@@ -5,7 +5,7 @@ import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
-import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
+import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
@@ -81,6 +81,8 @@ async function cashForStreak(page) {
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // 사건 01 has no rule left to introduce, so the ledger is behind 자세히.
+  await openRevealDetails(page);
   return page.getByTestId("consequence-ledger").locator("article", { hasText: "논리 콤보" }).locator("b");
 }
 
@@ -384,6 +386,8 @@ for (const size of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) 
     await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
     await cashStakedCard(page);
     await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    // The whole sheet: the short one may fit these screens, and this is about a sheet that scrolls.
+    await openRevealDetails(page);
     await waitForEntrance(page.locator(".decision-reveal-backdrop"));
     const at = await page.locator(".decision-reveal").evaluate((sheet) => {
       const row = sheet.querySelector(".decision-reveal-footer");
@@ -462,6 +466,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await page.locator(".choices .choice").first().click();
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
+  await openRevealDetails(page);
   await expect(page.getByTestId("consequence-ledger")).toContainText("판정 원인");
   await expect(page.getByTestId("consequence-ledger")).toContainText("다음 판");
   await page.getByTestId("decision-next").click();
@@ -476,6 +481,8 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
 
   const reveal = page.locator(".decision-reveal");
   await expect(reveal.locator("h2")).toHaveText("BUST");
+  // Still open from the cash above: 자세히 is the visit's, not the reveal's.
+  await expect(page.getByTestId("reveal-details")).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByTestId("consequence-ledger")).toContainText("판돈");
   await expect(reveal.locator(".decision-bonus")).toHaveCount(0);
   await expect(page.getByTestId("next-mutations")).toContainText("BLACKOUT");
@@ -1070,4 +1077,106 @@ test("calm effects keep the equip toast, fading", async ({ page }) => {
   // the stage's blanket rule would have removed its exit altogether.
   expect(style.animation).toBe("gx-relic-fade");
   expect(style.seconds).toBeGreaterThanOrEqual(1);
+});
+
+/**
+ * The short reveal. A season is some 300 decisions, and each one ended on the
+ * whole sheet: the ledger, the pot's sum, the words of the choice. Once a case
+ * has no rule left to introduce (`isTableTaught`: 사건 01 on, and a NEW GAME+
+ * run from its first table) the sheet is the verdict, what was received and
+ * paid, the next rules and the card's own line, and 자세히 opens the rest.
+ */
+async function cashFirstCard(page) {
+  await dismissProtocolBreach(page);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+  await page.getByTestId("commit-push").click();
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+}
+
+test("past the prologues the reveal is short; 자세히 opens the whole sheet from the keyboard and stays open for the visit", async ({ page }) => {
+  await openTable(page, "case01", "start");
+  await cashFirstCard(page);
+  const sheet = page.locator(".decision-reveal");
+  const details = page.getByTestId("reveal-details");
+  const next = page.getByTestId("decision-next");
+  const ledger = page.getByTestId("consequence-ledger");
+
+  // Short: the verdict, the two columns and the way on; no ledger, no sum, no quote.
+  await expect(sheet.locator("h2")).toHaveText(/^×/);
+  await expect(details).toHaveText("자세히");
+  await expect(details).toHaveAttribute("aria-expanded", "false");
+  await expect(sheet.locator(".decision-reveal-stakes")).toBeVisible();
+  await expect(ledger).toHaveCount(0);
+  await expect(sheet.locator(".gx-reveal-pot, .decision-reveal-choice")).toHaveCount(0);
+
+  // Focus opens on the way on, as it always did; Tab stays inside, between the two buttons.
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(details).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(details).toBeFocused();
+
+  // Enter on the button opens the whole sheet; focus stays on it, and it stays on screen.
+  await page.keyboard.press("Enter");
+  await expect(details).toHaveAttribute("aria-expanded", "true");
+  await expect(details).toBeFocused();
+  await expect(details).toBeInViewport();
+  await expect(ledger).toContainText("판정 원인");
+  await expect(sheet.locator(".gx-reveal-gain")).toBeVisible();
+  await expect(sheet.locator(".decision-reveal-choice")).toBeVisible();
+  await expect(page.locator(".decision-reveal-backdrop"), "the key opened the sheet and did not close the reveal").toBeVisible();
+
+  // Enter on the way on closes the reveal, as today.
+  await page.keyboard.press("Tab");
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+
+  // The next decision of the visit opens whole, and the button closes it again.
+  await cashFirstCard(page);
+  await expect(details).toHaveAttribute("aria-expanded", "true");
+  await expect(ledger).toBeVisible();
+  await clickElement(details, "close 자세히");
+  await expect(details).toHaveAttribute("aria-expanded", "false");
+  await expect(ledger).toHaveCount(0);
+
+  // Nothing of it is saved: the save has neither the reveal nor the choice.
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.decisionReveal).toBeUndefined();
+  expect(JSON.stringify(saved)).not.toContain("detailsOpen");
+});
+
+test("a prologue keeps the whole sheet and has no 자세히: it is still teaching", async ({ page }) => {
+  await openTable(page, "prologue01", "p1_start");
+  await cashFirstCard(page);
+  await expect(page.getByTestId("reveal-details")).toHaveCount(0);
+  await expect(page.getByTestId("consequence-ledger")).toContainText("판정 원인");
+  await expect(page.locator(".decision-reveal .gx-reveal-pot")).toBeVisible();
+  await expect(page.locator(".decision-reveal .decision-reveal-choice")).toBeVisible();
+  await expect(page.getByTestId("decision-next")).toBeFocused();
+});
+
+// The whole sheet was taller than a 360x740 phone: its last line needed 86px
+// of scroll. The short one is what the player meets 300 times, and it fits.
+test("the short reveal fits a small phone without scrolling, and the whole sheet is the taller one", { tag: "@layout" }, async ({ page }) => {
+  await page.setViewportSize(LAYOUT_VIEWPORTS["small phone"]);
+  await openTable(page, "case01", "start");
+  await cashFirstCard(page);
+  const sheet = page.locator(".decision-reveal");
+  await waitForEntrance(page.locator(".decision-reveal-backdrop"));
+  const measure = () => sheet.evaluate((element) => ({ content: element.scrollHeight, box: element.clientHeight }));
+  const short = await measure();
+  expect(short.content - short.box, `the short sheet scrolls ${short.content - short.box}px at 360x740`).toBeLessThanOrEqual(1);
+  await expect(page.getByTestId("decision-next")).toBeInViewport({ ratio: 1 });
+
+  await clickElement(page.getByTestId("reveal-details"), "open 자세히");
+  await expect(page.getByTestId("consequence-ledger")).toBeVisible();
+  const whole = await measure();
+  expect(whole.content, "the whole sheet is the taller one").toBeGreaterThan(short.content + 100);
+  // The foot is stuck on a phone: the way on is still on screen over the longer sheet.
+  await expect(page.getByTestId("decision-next")).toBeInViewport({ ratio: 1 });
+  await expect(page.getByTestId("reveal-details")).toBeInViewport();
 });

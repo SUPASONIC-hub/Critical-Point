@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "./helpers/network.js";
 import { acceptConfirms } from "./helpers/dialogs.js";
-import { cashStakedCard, clickElement, dismissProtocolBreach, openIntroDrawer, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { cashStakedCard, clickElement, dismissProtocolBreach, openIntroDrawer, openRevealDetails, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { seedSave } from "./helpers/seededSave.js";
 import { readJsonStorage, readStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
@@ -84,6 +84,8 @@ test("a window put down before 2026-10-10 resumes with no repair notice and pays
 
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  // The pot's sum is on the whole sheet; past the prologues it is behind 자세히.
+  await openRevealDetails(page);
   await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.36");
   const after = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   const settled = after.log.at(-1).threshold;

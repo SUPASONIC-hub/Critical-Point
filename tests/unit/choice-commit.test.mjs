@@ -154,6 +154,7 @@ test("a cashed card moves the run to the scene it leads to and logs what was pai
   assert.equal(patch.decisionReveal.nextNode, card.next);
   assert.equal(patch.decisionReveal.nextTitle, nodes[card.next].title);
   assert.equal(patch.decisionReveal.caseClosed, false);
+  assert.equal(patch.decisionReveal.short, false, "프롤로그 01 is still introducing the table: the whole sheet");
   assert.equal(patch.decisionReveal.skippedTitle, null);
   assert.equal(patch.decisionReveal.verdict.outcome, "cash");
   assert.equal(patch.decisionReveal.echo, entry.echo, "the reveal closes on the line written for the card");
@@ -162,6 +163,17 @@ test("a cashed card moves the run to the scene it leads to and logs what was pai
   assert.deepEqual([did.rankingRows.length, did.queued.length, did.telemetryStatus.length], [0, 0, 0]);
   assert.deepEqual(JSON.parse(browser.storage.getItem(SETTLED_WINDOWS_STORAGE_KEY)), [window.seed]);
   assert.deepEqual(did.kept.length, 1, "the feats the window proved go to the codex once the save has taken the decision");
+});
+
+// The short reveal (tableUnlocks' `isTableTaught`): the same card on the same
+// scene, in a run begun with NEW GAME+, which has nothing left to be taught.
+test("a run begun with NEW GAME+ is handed the short reveal on the first table of 프롤로그 01", () => {
+  const plain = sceneContext("p1_start");
+  const { context, did } = sceneContext("p1_start", { gauntletRun: { ...plain.context.gauntletRun, veteran: true } });
+  mount(context).choose(context.node.choices[0], closedWindow("cash", "unit-veteran"));
+  assert.equal(did.patches.length, 1);
+  assert.equal(did.patches[0].decisionReveal.short, true);
+  assert.equal(did.patches[0].decisionReveal.verdict.outcome, "cash");
 });
 
 test("a second press does nothing until the reveal releases the first", () => {

@@ -148,6 +148,22 @@ export async function cashStakedCard(page) {
 }
 
 /**
+ * Opens 자세히 on the reveal that is up, for a test that reads the whole sheet
+ * (the ledger, the pot's sum). From 사건 01 on the reveal is short and those are
+ * behind the button; in a prologue there is no button and this does nothing.
+ * Once open it stays open for the page's visit, so a second call is a no-op.
+ * The sheet is drawn in one render: when the next button is there, so is the
+ * button, if this reveal has one.
+ */
+export async function openRevealDetails(page) {
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const details = page.getByTestId("reveal-details");
+  if ((await details.count()) === 0 || (await details.getAttribute("aria-expanded")) === "true") return;
+  await clickElement(details, "open 자세히");
+  await expect(details).toHaveAttribute("aria-expanded", "true");
+}
+
+/**
  * Waits for a surface to finish arriving. The briefing page, the reveal, the
  * draft and the table's question all fade or pop in, and an audit that reads
  * them on the way measures text half faded into what is behind it: the

@@ -25,7 +25,7 @@ import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
-import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
+import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
 import { hasCloudConflict } from "../cloudSave.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { telemetryEnabled } from "../telemetry.js";
@@ -457,6 +457,9 @@ export function useChoiceCommit(context) {
         verdict,
         forced,
         caseClosed,
+        // The short sheet, once the case has no rule left to introduce
+        // (tableUnlocks): decided here because the reveal is not told the case.
+        short: isTableTaught(currentCase, gauntletRun),
         runPot: nextRun.runPot,
         vault: nextRun.vault,
         spokenChoice: entry.spokenChoice,
