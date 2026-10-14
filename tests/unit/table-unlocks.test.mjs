@@ -136,7 +136,7 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
     "카드를 건 뒤 LOCK을 누르면 판돈과 자원 배율이 오릅니다. 누를 때마다 시간이 줄어듭니다.",
   ]);
   // 프롤로그 02 teaches the logic streak where it taught the beat, and no line says a press is timed.
-  assert.equal(UNLOCK_LADDER[1].intro[0], "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다.");
+  assert.equal(UNLOCK_LADDER[1].intro[0], "같은 생각 유형의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 판돈이 커집니다. 지난 판을 더 뜨겁게 닫았다면 유형을 바꿔도 콤보가 이어집니다. 사건 결과의 '관점 전환' 점수는 반대로 네 유형을 고르게 쓸수록 오릅니다.");
   for (const step of UNLOCK_LADDER) {
     for (const line of step.intro) assert.doesNotMatch(line, /박자|심박에 맞춰/, `${step.caseId}: "${line}"`);
   }
