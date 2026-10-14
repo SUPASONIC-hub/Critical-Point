@@ -118,13 +118,13 @@ export function GauntletHand({
                 {burn?.fractured && (
                   <i className="gx-card-rule-tax" data-testid="fracture-tax">
                     <span className="sr-only">균열 청구 </span>
-                    {schema.fractureRate}x
+                    ×{schema.fractureRate}
                   </i>
                 )}
                 {overclocked && (
                   <i className="gx-card-overclock" data-testid="overclock-card-boost">
                     <span className="sr-only">오버클럭 칩 </span>
-                    x2
+                    ×2
                   </i>
                 )}
               </span>

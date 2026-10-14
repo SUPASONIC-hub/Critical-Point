@@ -231,10 +231,10 @@ function getRuleObjective(mutations) {
 function getOverdriveCopy({ streak, hot, cashMutations }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
   if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
-  if (streak > 0 && hot) return { label: "CHAIN LIVE", text: "한 번 더 x4+ 확정하면 오버클럭", progress: 75 };
-  if (streak > 0) return { label: "CHAIN HELD", text: "이번 판도 x4 이상으로 확정해야 이어진다", progress: 50 };
+  if (streak > 0 && hot) return { label: "CHAIN LIVE", text: "한 번 더 ×4+ 확정하면 오버클럭", progress: 75 };
+  if (streak > 0) return { label: "CHAIN HELD", text: "이번 판도 ×4 이상으로 확정해야 이어진다", progress: 50 };
   if (hot) return { label: "IGNITION", text: "확정하면 오버클럭 체인 1단계", progress: 35 };
-  return { label: "DORMANT", text: "x4 이상 확정부터 체인이 켜진다", progress: 12 };
+  return { label: "DORMANT", text: "×4 이상 확정부터 체인이 켜진다", progress: 12 };
 }
 
 /**

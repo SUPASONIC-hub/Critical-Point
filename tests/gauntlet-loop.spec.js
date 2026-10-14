@@ -566,7 +566,7 @@ test("cashing without a single push seals the best card on the next board", asyn
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("active-mutations")).toContainText("COLD FEET");
   await expect(page.getByTestId("active-rule-objective")).toContainText("금고로 넘겨라");
-  await expect(page.getByTestId("fracture-tax").first()).toContainText("1.5x");
+  await expect(page.getByTestId("fracture-tax").first()).toContainText("×1.5");
   const sealed = page.locator(".gx-card.is-sealed");
   await expect(sealed).toHaveCount(1);
   await expect(page.getByTestId("sealed-card-lock")).toContainText("최고 칩 봉인");
@@ -598,7 +598,7 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
   await expect(page.getByTestId("next-mutations")).toContainText("OVERCLOCK");
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("active-mutations")).toContainText("OVERCLOCK");
-  await expect(page.getByTestId("overclock-card-boost").first()).toContainText("x2");
+  await expect(page.getByTestId("overclock-card-boost").first()).toContainText("×2");
 });
 
 /**
