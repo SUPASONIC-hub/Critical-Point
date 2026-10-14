@@ -106,7 +106,9 @@ test("a device that fell behind is stopped, and the player chooses which progres
   expect(sync.revision).toBe(4);
 });
 
-test("a conflict is said during play, where the save speaks", async ({ page }) => {
+// @once: the desktop project only (playwright.config.js). The other tests
+// here each press a control of the panel that nothing else presses.
+test("a conflict is said during play, where the save speaks", { tag: "@once" }, async ({ page }) => {
   await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
   await page.route(`${SUPABASE}/rest/v1/rpc/peek_cloud_save`, (route) => route.fulfill(json({ saved_at: "2026-09-28T11:00:00.000Z", revision: 3 })));
   let uploads = 0;

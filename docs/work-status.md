@@ -298,6 +298,9 @@ Still open, on purpose:
     verification. The default e2e list is every spec except `@visual`
     (screenshots) and `@season-full` (the uninterrupted walk); the measurement
     tests in `visual-regression.spec.js` and `save-resume.spec.js` are in it.
+    A test tagged `@once` runs in the desktop project only: `mobile-chromium`
+    leaves it out (`grepInvert` in `playwright.config.js`), because what it
+    asserts is a save, a request or a page state no viewport or touch reaches.
     The season is walked in eight `@season-segment` tests of seven cases, each
     from a fresh save at its first case, which Verify runs as a job of its own
     on four shards on every push; the rest of the list runs on five. The continuous walk -- the only thing that carries

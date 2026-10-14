@@ -28,7 +28,10 @@ async function stakeAndPush(page) {
   await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
 }
 
-test("leaving with a bet on the table keeps the table as it stood", async ({ page }) => {
+// @once, here and on the verdict slam below: the desktop project only
+// (playwright.config.js). 저장 후 나가기 and 이어하기 are pressed on the phone by
+// the story-mode test further down.
+test("leaving with a bet on the table keeps the table as it stood", { tag: "@once" }, async ({ page }) => {
   await startDebugNode(page, "case02", "c2_logs");
   await stakeAndPush(page);
   await page.getByRole("button", { name: "저장 후 나가기" }).click();
@@ -96,7 +99,7 @@ test("a window put down before 2026-10-10 resumes with no repair notice and pays
 // A window that has closed is on its slam for most of a second before the
 // verdict is committed. Leaving then used to drop the verdict and bring the
 // hold back as a bust, so a cash became a BUST; the exit now waits.
-test("leaving during the verdict slam keeps the verdict", async ({ page }) => {
+test("leaving during the verdict slam keeps the verdict", { tag: "@once" }, async ({ page }) => {
   await startDebugNode(page, "case02", "c2_logs");
   await stakeAndPush(page);
   const cash = page.getByTestId("commit-confirm");
@@ -119,10 +122,11 @@ test("leaving during the verdict slam keeps the verdict", async ({ page }) => {
 // table too. What it can never keep is a table that already hit the wall: a
 // closed window is not suspended, so the bust stands (unit-tests.mjs).
 test("a reload keeps a live table on the same wall", async ({ page }) => {
-  // After the reload the briefing is up again and the pushes below wait for its
-  // reading clock to open the table: about 40 seconds of this test at the pace
-  // of 2026-10-13 (ten characters a second), 57 in all against the 60-second
-  // default on the first main run after that change.
+  // After the reload the briefing is up again. The pushes below waited for its
+  // reading clock to open the table -- about 40 seconds at ten characters a
+  // second, 57 in all against the 60-second default on the first main run of
+  // 2026-10-13 -- and now open it by its button after the reload. The 120
+  // seconds stay from then.
   test.setTimeout(120_000);
   await startDebugNode(page, "case02", "c2_logs");
   await stakeAndPush(page);
@@ -137,6 +141,7 @@ test("a reload keeps a live table on the same wall", async ({ page }) => {
   await page.reload();
   await expect(stage).toHaveAttribute("data-status", "live");
   await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await dismissProtocolBreach(page);
   const after = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(after.dynamics.windowIndex).toBe(before.dynamics.windowIndex);
   // The table as it stood: the gauge where it was (creep only ever adds), and

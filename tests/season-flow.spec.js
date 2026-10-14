@@ -1153,7 +1153,12 @@ test.describe("a laptop zoomed to 200%", () => {
   });
 });
 
-test("leaving an active scene marks the saved run as paused", async ({ page }) => {
+// @once, here and below: the test runs in the desktop project only
+// (playwright.config.js, the phone project's grepInvert). The tag is for a
+// test that reads a save, a request or what the page says, and presses nothing
+// that an untagged test does not press on the phone on the same screen. A test
+// that is the only one to press a control stays in both projects.
+test("leaving an active scene marks the saved run as paused", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide")));
@@ -1166,7 +1171,7 @@ test("leaving an active scene marks the saved run as paused", async ({ page }) =
   expect(saved.nodeId).toBe("c5_voice");
 });
 
-test("bfcache return resumes an active scene without losing its route", async ({ page }) => {
+test("bfcache return resumes an active scene without losing its route", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide")));
@@ -1430,7 +1435,7 @@ test("corrupt saved route is repaired before resume", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "NO ONE TO BLAME" })).toBeVisible();
 });
 
-test("corrupt saved nested gameplay data is repaired before render", async ({ page }) => {
+test("corrupt saved nested gameplay data is repaired before render", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1488,7 +1493,7 @@ test("corrupt saved nested gameplay data is repaired before render", async ({ pa
   expect(repaired.playtestFeedback.missing).toBeUndefined();
 });
 
-test("corrupt error log entries are filtered before the diagnostics panel renders", async ({ page }) => {
+test("corrupt error log entries are filtered before the diagnostics panel renders", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1538,7 +1543,7 @@ test("corrupt error log entries are filtered before the diagnostics panel render
   expect(entries[1].error.stack).toBe("");
 });
 
-test("restoring a corrupt recovery slot repairs nested data before resume", async ({ page }) => {
+test("restoring a corrupt recovery slot repairs nested data before resume", { tag: "@once" }, async ({ page }) => {
   await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
@@ -1693,7 +1698,7 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
   await expect(page.locator(".choices .choice").first()).toBeVisible();
 });
 
-test("recovery slot delete failure keeps the slot visible", async ({ page }) => {
+test("recovery slot delete failure keeps the slot visible", { tag: "@once" }, async ({ page }) => {
   await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
@@ -1747,7 +1752,7 @@ test("recovery slot delete failure keeps the slot visible", async ({ page }) => 
   await expect(page.getByTestId("save-slot-panel").getByText("case05 / c5_voice")).toBeVisible();
 });
 
-test("recovery slot restore repairs invalid saved route before writing", async ({ page }) => {
+test("recovery slot restore repairs invalid saved route before writing", { tag: "@once" }, async ({ page }) => {
   await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
@@ -1873,6 +1878,8 @@ test("reset clears progress, error logs, and recovery slots", async ({ page }) =
   });
   await page.reload();
   await expect(page.locator(".game-shell")).toBeVisible();
+  // The briefing page covers 초기화, and the click used to wait out its reading clock.
+  await dismissProtocolBreach(page);
   await page.getByRole("button", { name: /초기화/ }).click();
   const storedKeys = await page.evaluate(() => ({
     save: localStorage.getItem("trigger-prototype-v2"),
@@ -1907,7 +1914,7 @@ test("reset failure records failed storage keys", async ({ page }) => {
   expect(["StorageResetError", "StorageResetRetryError"]).toContain(errorLog.entries[0].error.name);
 });
 
-test("repeated render errors block the retry loop and preserve recovery choices", async ({ page }) => {
+test("repeated render errors block the retry loop and preserve recovery choices", { tag: "@once" }, async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",
@@ -1977,7 +1984,7 @@ test("error boundary can clear the current saved state", async ({ page }) => {
   expect(await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).toBeNull();
 });
 
-test("error boundary clear save failure does not reload", async ({ page }) => {
+test("error boundary clear save failure does not reload", { tag: "@once" }, async ({ page }) => {
   await acceptConfirms(page);
   await page.addInitScript(() => {
     localStorage.setItem(
@@ -2016,7 +2023,7 @@ test("error boundary clear save failure does not reload", async ({ page }) => {
   expect(await page.evaluate(() => localStorage.getItem("trigger-prototype-v2"))).not.toBeNull();
 });
 
-test("pending telemetry retries after a failed Supabase response", async ({ page }) => {
+test("pending telemetry retries after a failed Supabase response", { tag: "@once" }, async ({ page }) => {
   let requestCount = 0;
   const postBodies = [];
   // Only table writes are telemetry. The cloud-save RPC fires a few seconds
@@ -2080,7 +2087,7 @@ test("pending telemetry retries after a failed Supabase response", async ({ page
   expect(postBodies[1].event_id).toBe("telemetry-retry-e2e");
 });
 
-test("telemetry retry keeps the queue when storage commit fails", async ({ page }) => {
+test("telemetry retry keeps the queue when storage commit fails", { tag: "@once" }, async ({ page }) => {
   let posts = 0;
   await page.route("https://e2e.supabase.co/**", async (route) => {
     if (route.request().method() === "POST") posts += 1;
@@ -2138,7 +2145,7 @@ test("telemetry retry keeps the queue when storage commit fails", async ({ page 
   await expect.poll(() => posts, { timeout: 10_000 }).toBe(2);
 });
 
-test("consent opt-out failure keeps consent and pending telemetry intact", async ({ page }) => {
+test("consent opt-out failure keeps consent and pending telemetry intact", { tag: "@once" }, async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",
