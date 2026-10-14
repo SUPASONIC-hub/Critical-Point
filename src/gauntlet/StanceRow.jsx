@@ -2,8 +2,10 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 
 // The stance profiles are written for the engine; the table speaks Korean.
+// STRIKE's line names the cap it shares with the logic combo (`HAND_CAP`,
+// x1.5): a combo of 8 is already there, and LOCK then adds nothing to the pot.
 const FOCUS_MODE_COPY = {
-  strike: "판돈 배율 크게 · 차지가 빠르다",
+  strike: "배율 빠르게 · 콤보 합쳐 1.5배까지",
   steady: "보상 작게 · 락마다 테이블 냉각",
   expose: "카드의 자원 효과 증폭",
 };
