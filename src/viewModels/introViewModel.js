@@ -29,7 +29,7 @@ import {
   resourceMeta,
   triggerLabSignals,
 } from "../appCopy.js";
-import { CASE_SEQUENCE, RESULT_NODE_IDS, caseObjectives, seasonCasesBase } from "../gameCases.js";
+import { CASE_SEQUENCE, RESULT_NODE_IDS, TYPICAL_CASE_MINUTES, caseObjectives, seasonCasesBase } from "../gameCases.js";
 import { triggerLabels } from "../gameConstants.js";
 import {
   getOperatorProfile,
@@ -175,6 +175,7 @@ export function createIntroViewModel({
     startCase,
     getCaseStatusText,
     normalizeCaseSummary,
+    caseMinutes: TYPICAL_CASE_MINUTES,
 
     playGuideItems,
     operatorProfiles: getOperatorProfiles(),
