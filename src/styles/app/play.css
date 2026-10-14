@@ -915,6 +915,18 @@
   opacity: calc(var(--gx-rate, 0) * 0.45);
 }
 
+/* A notch hanging from the track's top edge at each heat the rules read (30
+   and 60, placed inline). Borders, a light one beside a dark one: the pair
+   shows on the dark track and on the lit fill alike, and a border is still
+   drawn in forced colours where a background is not. */
+.gx-gauge-mark {
+  position: absolute;
+  inset: 0 auto 55% 0;
+  z-index: 2;
+  border-inline: 1px solid var(--c-ink-deep);
+  border-left-color: var(--c-paper);
+}
+
 .gx-gauge-read {
   display: flex;
   align-items: center;

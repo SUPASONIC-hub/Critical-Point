@@ -43,6 +43,49 @@ test("the quiet skip outranks the ending's primary button", () => {
   assert.ok(result.includes(".ending-shell .ending-beat button {"), "the rule it has to beat is still two classes and a tag");
 });
 
+test("a card's streak sign is printed at every width, on the line its tag already has", () => {
+  const hand = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletHand.jsx", import.meta.url), "utf8");
+  const tag = hand.slice(hand.indexOf("export function CardType("), hand.indexOf("export function WildName("));
+  // Inside the tag, for the eye; the words for a screen reader stay beside it.
+  assert.match(tag, /<span className=\{`gx-card-type[^>]*>\s*\{mark && <b className="gx-card-move"[^>]*aria-hidden="true">\{mark\} <\/b>\}/);
+  assert.match(tag, /const mark = getMoveMark\(move\);/);
+  assert.match(tag, /\{move && <span className="sr-only">\{describeCardMove\(move\)\}<\/span>\}/);
+
+  // No sheet takes the sign, or the tag it is in, off the screen: under 720px
+  // the rest of the type's name is cut (`.gx-card-type i`) and the sign is not.
+  const hides = /display:\s*none|visibility:\s*hidden|font-size:\s*0[;\s]|opacity:\s*0[;\s]/;
+  const isTheSign = (selector) => /\.gx-card-move\b/.test(selector) || /\.gx-card-type(?![-\w])(?!.*\si$)/.test(selector);
+  let read = 0;
+  for (const name of ["play", "responsive", "comfort", "briefing", "recovery", "relics"]) {
+    for (const [, selectors, body] of sheet(name).replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
+      const mine = selectors.split(",").map((selector) => selector.trim()).filter(isTheSign);
+      if (mine.length === 0) continue;
+      read += 1;
+      assert.doesNotMatch(body, hides, `${name}.css hides ${mine.join(", ")}`);
+    }
+  }
+  assert.ok(read >= 3, "the tag's own rules are still where this reads them");
+  // The phone's cut is still the name's other words, and only those.
+  const phone = sheet("play").match(/@media \(max-width: 719px\) \{\s*\.gx-streak em \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.match(phone, /\.gx-streak i,\s*\.gx-card-type i \{\s*font-size: 0;\s*\}/);
+  assert.doesNotMatch(phone, /gx-card-move/);
+
+  // Out of the card's flow, so it adds no height to a card: the tag is
+  // absolutely placed on the card's top edge and the sign is inline in it.
+  assert.match(sheet("play"), /\.gx-card > \.gx-card-type,\s*\.gx-comic-cards \.gx-card-type \{\s*position: absolute;\s*top: -8px;/);
+});
+
+test("the gauge marks the heats its rules read, and takes no height for it", () => {
+  const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
+  const meter = stage.slice(stage.indexOf('role="meter"'), stage.indexOf('className="gx-gauge-read"'));
+  // From the rules' own numbers, not a copy of them.
+  assert.match(meter, /\{logic && \[SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE\]\.map\(\(at\) => \(\s*<span key=\{at\} className="gx-gauge-mark"[^>]*style=\{\{ left: `\$\{at\}%` \}\} \/>/);
+  const rule = sheet("play").match(/\n\.gx-gauge-mark \{([^}]*)\}/)?.[1] ?? "";
+  assert.match(rule, /position: absolute;/, "inside the track, out of its flow");
+  assert.match(rule, /border-inline: 1px solid/, "a border is still drawn in forced colours");
+  assert.doesNotMatch(rule, /height|margin|padding/);
+});
+
 test("the callsign field's focus ring survives forced colours", () => {
   const focus = sheet("base-intro-ranking").match(/\.intro \.start-panel \.start-input-row input:focus-visible \{[^}]*\}/)?.[0] ?? "";
   assert.match(focus, /outline: 2px solid transparent;/, "a box-shadow is dropped in forced colours; a transparent outline is repainted");

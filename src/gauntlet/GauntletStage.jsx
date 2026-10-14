@@ -29,7 +29,7 @@ import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { listOfferedTypes } from "./logicStreak.js";
-import { LOCK_PRESS_SECONDS } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -533,6 +533,10 @@ export function GauntletStage({
             <span className="gx-gauge-fill" style={{ transform: `scaleX(${Math.min(1, win.gauge / GAUGE_MAX)})` }} />
             {/* The pulse without sound: lit by --gx-rate, a level that drifts and never blinks. */}
             <span className="gx-gauge-ticks" aria-hidden="true" />
+            {/* The two heats the rules read: a window closed at 30 or 60 has risen a tier for the streak, and 60 is HEAT DEBT's. */}
+            {logic && [SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE].map((at) => (
+              <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
+            ))}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
