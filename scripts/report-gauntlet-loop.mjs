@@ -16,8 +16,8 @@ import {
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { RELIC_IDS } from "../src/gauntlet/relics.js";
-import { LOCK_PRESS_SECONDS } from "../src/gauntlet/tableRules.js";
+import { DEFAULT_RELIC_POOL, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
+import { LOCK_PRESS_SECONDS, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { ALL_RULES, MUTATION_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 
@@ -121,6 +121,42 @@ function handUnit(seed) {
 const SCENES = Object.values(nodes)
   .map((node) => (node.choices ?? []).map((choice) => ({ type: getLogicType(choice), chips: choice.type === "reframe" ? 0 : getCardChips(choice) })).filter((offer) => offer.type))
   .filter((offers) => offers.some((offer) => offer.chips > 0));
+/**
+ * What the measurements at the end of this file count, a window at a time
+ * (`playCase` returns one, `measure` adds them up). Nothing here is asserted
+ * on or printed by the rows above. `moves` is what each window did to the logic
+ * streak (`advanceLogic`'s move); `bustAt` files each bust under the push it
+ * happened on, or under the clock ("creep", "timeout"), and `pushed` is how
+ * many pushes each window made; the `lock` numbers are the cashes that held a
+ * charge, how many of them LOCK added nothing to, and the pots told apart.
+ */
+const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0 });
+function see(seen, verdict) {
+  const count = (map, key) => {
+    map[key] = (map[key] ?? 0) + 1;
+  };
+  seen.windows += 1;
+  seen.streakSum += verdict.logic.streak;
+  count(seen.moves, verdict.logic.move);
+  count(seen.pushed, verdict.pushes);
+  if (verdict.outcome === "bust") count(seen.bustAt, verdict.cause === "push" ? verdict.pushes : verdict.cause);
+  else {
+    seen.pot += verdict.pot;
+    seen.logicPot += verdict.logic.pot;
+    seen.focusPot += verdict.focus.pot;
+    if (verdict.focus.charge > 0) {
+      seen.lockCashed += 1;
+      if (verdict.focus.pot === 0) seen.lockUnpaid += 1;
+    }
+  }
+}
+function addSeen(total, part) {
+  for (const [key, value] of Object.entries(part)) {
+    if (typeof value === "number") total[key] += value;
+    else for (const [inner, amount] of Object.entries(value)) total[key][inner] = (total[key][inner] ?? 0) + amount;
+  }
+  return total;
+}
 const sceneFor = (caseIndex, windowIndex) => SCENES[Math.floor(handUnit(`scene:${caseIndex}:${windowIndex}`) * SCENES.length)];
 const SEASON_CASES = CASE_SEQUENCE.length;
 
@@ -145,6 +181,7 @@ function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}
   let mutatedAfterBust = 0;
   let nextTableRules = 0;
   let played = 0;
+  const seen = newSeen();
   for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
     played += 1;
     // The run's own board for every run but a story one, whose wall stands far.
@@ -174,6 +211,7 @@ function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}
     if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
     const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
     const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules });
+    see(seen, verdict);
     if (verdict.outcome === "cash") {
       // What the streak paid this pot, before LOCK and under the cap.
       paid.cashed += 1;
@@ -197,7 +235,7 @@ function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}
     if (nextRun.schema.mutations.some((id) => STORY_OFF_RULES.includes(MUTATION_RULES[id]))) nextTableRules += 1;
     run = nextRun;
   }
-  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic };
+  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen };
 }
 
 function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
@@ -209,6 +247,7 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
   let mutated = 0;
   let nextTableRules = 0;
   let played = 0;
+  const seen = newSeen();
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
     // A hand that plays for the streak carries it from case to case for a
     // season's length, and starts again with the next season.
@@ -223,6 +262,7 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     mutated += result.mutatedAfterBust;
     nextTableRules += result.nextTableRules;
     played += result.played;
+    addSeen(seen, result.seen);
   }
   return {
     label,
@@ -237,6 +277,8 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     meanBonus: Number((paid.bonus / Math.max(1, paid.cashed)).toFixed(3)),
     capShare: Number((paid.capped / Math.max(1, paid.cashed)).toFixed(3)),
     best: paid.best,
+    // For the measurements at the end of this file; no row above reads it.
+    seen,
   };
 }
 
@@ -778,6 +820,133 @@ assert.ok(
   storySafe.meanVault > bestFixed.meanVault,
   `a story run is expected to out-bank the table (${storySafe.meanVault} against ${bestFixed.meanVault}); if it no longer does, the reason it is kept off the public ranking has gone and the exclusion should be looked at again`,
 );
+
+/**
+ * Measured, not judged (2026-10-13, the plan's "규칙 측정"). Nothing below is
+ * asserted, and it is played after every row above, on seeds of its own or on
+ * rows already measured, so no number, tolerance or exit code above moves.
+ *
+ * The wild card. 판을 다시 짠다 is on the table of some scenes and has a type of
+ * its own (`getLogicType`: 판 바꾸기, "reframing"), so the suspicion that a hand
+ * staking nothing else can never lose its streak is two hands here: one stakes
+ * the wild card whenever a scene deals it and otherwise picks as the random
+ * hand does (the same draw), and one holds 판 바꾸기 as "holds one type" holds
+ * 위험 다루기 -- the wild card or a written card of that type, whichever the
+ * scene has. Both play the listening policy on the windows the five hands
+ * above play. The staked card here is the one simulated card with a type
+ * given to it, so what is compared is the streak, not the wild card's chips
+ * (`check-endings.mjs --report` plays the card itself).
+ */
+const perCent = (part, whole, digits = 1) => ((100 * part) / Math.max(1, whole)).toFixed(digits);
+const isWild = (offer) => offer.chips === 0 && offer.type === "reframing";
+const WILD_HANDS = {
+  "stakes the wild card": (offers, logic, seed) => (offers.some(isWild) ? "reframing" : LOGIC_HANDS["random type"](offers, logic, seed)),
+  "holds 판 바꾸기": (offers) => (offers.some((offer) => offer.type === "reframing") ? "reframing" : offers[0].type),
+};
+const streakLine = (row) =>
+  `${row.label.padEnd(20)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  pot bonus ${row.meanBonus.toFixed(3)}  at the cap ${(row.capShare * 100).toFixed(0).padStart(3)}%  best streak ${String(row.best).padStart(3)}  mean streak ${(row.seen.streakSum / row.seen.windows).toFixed(2).padStart(5)}  ended by a change of type ${perCent(row.seen.moves.break ?? 0, row.seen.windows).padStart(4)}% of windows, by a bust ${perCent(row.seen.moves.bust ?? 0, row.seen.windows).padStart(4)}%  kept off the table ${perCent(row.seen.moves.keep ?? 0, row.seen.windows).padStart(4)}%`;
+console.log(
+  `measured: wild card (not asserted; on the table of ${SCENES.filter((offers) => offers.some(isWild)).length} of ${SCENES.length} scenes, a written 판 바꾸기 card on ${SCENES.filter((offers) => offers.some((offer) => offer.type === "reframing" && !isWild(offer))).length})`,
+);
+for (const row of Object.entries(WILD_HANDS).map(([name, pickType]) => measure(name, listening, pickType))) console.log(`measured wild  ${streakLine(row)}`);
+for (const row of logicRows) console.log(`measured hand  ${streakLine(row)}`);
+
+/**
+ * LOCK on top of a streak, and STEADY's cooling. The lock rows above stake a
+ * card with no type, so they cannot say what a LOCK is worth to a hand that
+ * already holds a streak: the best holding hand plays the same cases bare and
+ * with each stance charged to the full. "LOCK added nothing" is the share of
+ * cashes holding a charge whose pot LOCK did not move (the streak had already
+ * filled the hand's cap).
+ *
+ * STEADY cools the gauge by its relief a press and the press costs clock,
+ * which creeps heat in. Measured on the plain board: charged to the stance
+ * line before the first push (where the gauge has nothing to cool), and after
+ * pushing to the seal's heat, against STRIKE on the same presses, which is the
+ * creep alone.
+ */
+const stacked = [null, ...FOCUS_MODES].map((mode) => measure(`holds, follows table${mode ? ` + ${mode} lock` : ""}`, listening, LOGIC_HANDS["holds, follows table"], [], BRACKET_CASES, mode ? { mode } : null));
+for (const row of stacked) {
+  console.log(
+    `measured lock  ${row.label.padEnd(34)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  streak's share of the pots ${perCent(row.seen.logicPot, row.seen.pot).padStart(4)}%  LOCK's ${perCent(row.seen.focusPot, row.seen.pot).padStart(4)}%  LOCK added nothing on ${row.seen.lockUnpaid} of ${row.seen.lockCashed} charged cashes (${perCent(row.seen.lockUnpaid, row.seen.lockCashed)}%)`,
+  );
+}
+for (const mode of ["strike", "steady"]) {
+  const idle = measure(`listening, waits a ${mode} lock's clock`, listening, null, [], BRACKET_CASES, { mode, idle: true });
+  const bare = lockReport.find((row) => row.mode === mode).listen;
+  console.log(`measured lock  no streak: ${bare.label} ${bare.meanVault} (bust ${(bare.bustRate * 100).toFixed(1)}%, ${CASES} cases) against ${idle.meanVault} for the same clock with no press (bust ${(idle.bustRate * 100).toFixed(1)}%, ${BRACKET_CASES} cases) and ${bestHeartbeatSoFar.meanVault} with no clock spent (bust ${(bestHeartbeatSoFar.bustRate * 100).toFixed(1)}%)`);
+}
+const coolingOf = (mode, heat) => {
+  const sum = { windows: 0, presses: 0, change: 0, seconds: 0 };
+  for (let index = 0; index < CASES; index += 1) {
+    let win = createWindow({ schema: BASE_SCHEMA, seed: `cooling:${index}` });
+    win = reduceWindow(win, { type: "SELECT", id: card.id });
+    win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode });
+    for (let press = 0; press < 30 && win.status === "live" && win.gauge < heat; press += 1) {
+      win = reduceWindow(win, { type: "PUSH" });
+      win = reduceWindow(win, { type: "TICK", delta: 0.6 });
+    }
+    if (win.status !== "live") continue;
+    const before = win;
+    for (let press = 0; press < 8 && win.status === "live" && win.focus < STANCE_CHARGE; press += 1) win = reduceWindow(win, { type: "FOCUS" });
+    if (win.status !== "live") continue;
+    sum.windows += 1;
+    sum.presses += win.focusHits;
+    sum.change += win.gauge - before.gauge;
+    sum.seconds += win.elapsed - before.elapsed;
+  }
+  return { presses: sum.presses / sum.windows, change: sum.change / sum.windows, seconds: sum.seconds / sum.windows, windows: sum.windows };
+};
+for (const heat of [0, SEAL_BREAK_GAUGE, 45]) {
+  const [strike, steady] = ["strike", "steady"].map((mode) => coolingOf(mode, heat));
+  console.log(
+    `measured cool  charged to the stance line ${heat ? `after pushing to heat ${heat}` : "before the first push"}: STEADY ${steady.presses.toFixed(1)} presses over ${steady.seconds.toFixed(1)}s, gauge ${steady.change >= 0 ? "+" : ""}${steady.change.toFixed(2)} (${steady.windows} windows); STRIKE ${strike.presses.toFixed(1)} presses over ${strike.seconds.toFixed(1)}s, gauge +${strike.change.toFixed(2)} (the creep alone)`,
+  );
+}
+
+/**
+ * Which push a bust happens on. A plain board's wall stands at 56 or more and
+ * a push is 15 at most, so three pushes from cold cannot reach it; the boards
+ * a bust or a hot cash deals are not plain (a start already hot, a wall pulled
+ * closer), and the clock creeps heat in.
+ */
+for (const row of [bestFixed, fixed.find((entry) => entry.label === "heat 60"), bestHeartbeatSoFar, heartbeat.find((entry) => entry.label === "heartbeat < 120")]) {
+  const { bustAt, pushed } = row.seen;
+  const reached = (push) => Object.entries(pushed).reduce((sum, [pushes, windows]) => sum + (Number(pushes) >= push ? windows : 0), 0);
+  const early = [1, 2, 3].reduce((sum, push) => sum + (bustAt[push] ?? 0), 0);
+  console.log(
+    `measured bust  ${row.label.padEnd(16)} ${row.busts} busts in ${row.seen.windows} windows; on push 1-3: ${early} (${perCent(early, row.busts)}% of busts); ${[1, 2, 3, 4, 5, 6].map((push) => `push ${push}: ${bustAt[push] ?? 0} of ${reached(push)} (${perCent(bustAt[push] ?? 0, reached(push))}%)`).join(", ")}; by the clock ${(bustAt.creep ?? 0) + (bustAt.timeout ?? 0)}`,
+  );
+}
+
+/**
+ * Tools together (2026-10-13, the plan's question of a cap on tools). The
+ * relic rows above play each tool alone and all twelve at once; a cap asks
+ * about the sets between. The same hand on the same cases holds the five
+ * tools that need no unlock (a first season), the seven a feat unlocks, and
+ * the builds a cap of 3, 5 or 8 slots would leave a player who keeps the
+ * tools that lift best play most when held alone (the rows above, so the
+ * order is read, not written here). "Of the whole lift" is the share of what
+ * all twelve add to listening play that the set keeps.
+ */
+const liftOf = (row) => row.listen.meanVault / relicBaseline.listen.meanVault;
+const everyTool = relicReport[relicReport.length - 1];
+const ranked = relicReport.filter((row) => row.relics.length === 1).sort((left, right) => right.listen.meanVault - left.listen.meanVault);
+console.log(`measured tools one at a time, by what it adds to listening play: ${ranked.map((row) => `${row.name} ${liftOf(row) >= 1 ? "+" : ""}${((liftOf(row) - 1) * 100).toFixed(1)}%${RELICS[row.name].unlock ? " (unlocked)" : ""}`).join(", ")}; all ${RELIC_IDS.length} together +${((liftOf(everyTool) - 1) * 100).toFixed(1)}%`);
+const toolSets = [
+  ["the 5 from the start", DEFAULT_RELIC_POOL],
+  [`the ${RELIC_IDS.length - DEFAULT_RELIC_POOL.length} a feat unlocks`, RELIC_IDS.filter((id) => RELICS[id].unlock)],
+  ...[3, 5, 8].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
+  ...[3, 5].map((slots) => [`worst ${slots} alone`, ranked.slice(-slots).map((row) => row.name)]),
+];
+for (const [name, relics] of toolSets) {
+  const blind = bestOf([40, 50, 60].map((target) => measureHand(`${name} heat ${target}`, (win) => win.gauge < target, relics)));
+  const listen = bestOf([90, 100, 110].map((threshold) => measureHand(`${name} heartbeat < ${threshold}`, (win) => getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < threshold, relics)));
+  const kept = (listen.meanVault - relicBaseline.listen.meanVault) / Math.max(1, everyTool.listen.meanVault - relicBaseline.listen.meanVault);
+  console.log(
+    `measured tools ${name.padEnd(22)} blind ${String(blind.meanVault).padStart(6)}  heartbeat ${String(listen.meanVault).padStart(6)} (x${liftOf({ listen }).toFixed(3)} of none, ${(kept * 100).toFixed(0)}% of the whole lift; none ${relicBaseline.listen.meanVault}, all ${everyTool.listen.meanVault})  ${relics.join("+")}`,
+  );
+}
 
 console.log(
   `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; holding a type: ${holder.meanVault} (pot bonus ${holder.meanBonus.toFixed(3)}), a random type: ${randomType.meanVault}; locked: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,

@@ -31,14 +31,19 @@ import {
   createRunSummary,
   createWindow,
   equipRelic,
+  FRACTURE_MIN_BURN,
+  getCardBurn,
   getHeartbeatBpm,
   getTableSchema,
+  HAND_CAP,
   openCaseRun,
   reduceWindow,
   resolveWindow,
   RUN_INITIAL_STATE,
+  STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
+import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
 import { getTableRules, STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { createInheritedChallenge, createSceneChallenge } from "../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../src/state/caseRoutes.js";
@@ -158,7 +163,7 @@ function mergeEffects(...effects) {
   }, {});
 }
 
-function playWindow(policy, run, windowSeed, rules) {
+function playWindow(policy, run, windowSeed, rules, hand = null) {
   // The run's own board, and for a story run the same board with its far wall.
   let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
   win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
@@ -166,6 +171,14 @@ function playWindow(policy, run, windowSeed, rules) {
   // the grace, so a slow hand is already paying heat.
   for (let second = 0; second < Math.floor(policy.think) && win.status === "live"; second += 1) {
     win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+  }
+  // `hand` is the tool hand measured at the end of this file, and null for
+  // every season before it: a stance, charged or not, and a window now and
+  // then left to run out its clock.
+  if (hand) {
+    win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: hand.mode }, rules);
+    for (let lock = 0; hand.locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) win = reduceWindow(win, { type: "FOCUS" }, rules);
+    while (hand.walks && win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
   }
   const target = policy.heat + (random() - 0.5) * 10;
   for (let press = 0; press < 30 && win.status === "live"; press += 1) {
@@ -185,8 +198,17 @@ const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label
 /**
  * `story` is a season played in story mode from its first case to its last:
  * the run carries the mark, which is all the runtime's stamp does to it.
+ *
+ * `watch` is handed every settled window (the measurements at the end of this
+ * file). It reads and draws nothing, so a season played with one is the season
+ * played without.
+ *
+ * `tools` is the tool table of the same measurements (`toolTable`), and null
+ * for every season before them: it settles a window against a codex as the
+ * runtime does, takes the draft its own way and may play the tool hand. Left
+ * out, the draft is the five tools that need no unlock, one taken at random.
  */
-function playSeason(seasonIndex, archetype, story = false) {
+function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
   const policy = makePolicy(archetype);
   const caseResults = {};
   let discoveredClues = [];
@@ -212,6 +234,7 @@ function playSeason(seasonIndex, archetype, story = false) {
     const rules = getTableRules(caseId, run, staged);
     const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
     run = openCaseRun(run, { rules });
+    if (tools) tools.caseNumber = CASE_SEQUENCE.indexOf(caseId) + 1;
     for (let step = 0; step < 60 && nodeId && !resultNodeIds.has(nodeId); step += 1) {
       const node = nodes[nodeId];
       const riskPressure = getRiskPressure(resources);
@@ -233,7 +256,10 @@ function playSeason(seasonIndex, archetype, story = false) {
       const standing = { clueCount: discoveredClues.length, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened: getCasesOpened(caseId) };
       const fixed = [...node.choices.filter((choice) => choice.type !== "reframe"), ...(memoryChoice ? [memoryChoice] : [])]
         .filter((choice) => getAuthorityGate(choice, standing).unlocked);
-      const takeReframe = reframeChoice && caseReframes === 0 && random() < policy.reframe;
+      // `wildOnly` is the hand measured at the end of this file: it stakes the
+      // wild card on every scene that deals one, which the table allows (only
+      // the route a reframe opens is once a case). It draws nothing here.
+      const takeReframe = reframeChoice && (policy.wildOnly || (caseReframes === 0 && random() < policy.reframe));
       // What `useChoiceCommit.getOfferedTypes` hands the settlement: the types on the table.
       const offered = [...new Set([...fixed, ...(reframeChoice ? [reframeChoice] : [])].map(getLogicType).filter(Boolean))];
       const choice = policy.logicHand
@@ -245,7 +271,7 @@ function playSeason(seasonIndex, archetype, story = false) {
           return !best || score > best.score ? { choice: candidate, score } : best;
         }, null).choice;
 
-      const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`, rules);
+      const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`, rules, tools?.hand ? tools.dealHand() : null);
       windows += 1;
       const responseTimeSec = Math.max(1, Math.round(window.elapsed));
       const reframe = choice.type === "reframe";
@@ -263,8 +289,9 @@ function playSeason(seasonIndex, archetype, story = false) {
       if (skip) skipped += 1;
       const nextNode = skip?.nodeId ?? plannedNode;
       const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-      const { verdict, nextRun } = resolveWindow({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
+      const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
       const busted = verdict.outcome === "bust";
+      watch?.({ verdict, card: choice, dealtWild: Boolean(reframeChoice), board: run.schema });
       const gauntletEffect = applyGauntletEffect(baseEffect, {
         outcome: verdict.outcome,
         gauge: verdict.gauge,
@@ -317,7 +344,7 @@ function playSeason(seasonIndex, archetype, story = false) {
         };
         caseResults[caseId] = summary;
         casePeaks.push(summary.peakRiskPressure);
-        if (run.relicOffer.length) run = equipRelic(run, pick(run.relicOffer));
+        if (run.relicOffer.length) run = equipRelic(run, tools ? tools.draft(run) : pick(run.relicOffer));
         if (caseId === "final") final = { resources, log };
       }
       nodeId = nextNode;
@@ -325,7 +352,7 @@ function playSeason(seasonIndex, archetype, story = false) {
   }
   const strain = getSeasonStrain(caseResults);
   const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-  return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults) };
+  return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics };
 }
 
 /**
@@ -345,6 +372,63 @@ function normalizeStart(story = false) {
   return { ...RUN_INITIAL_STATE, story };
 }
 
+/**
+ * What a season's windows are counted into, for the measurements at the end of
+ * this file (`playSeason`'s `watch`). Nothing here is asserted on, and nothing
+ * here draws from the seeded stream.
+ *
+ * `moves` is what each window did to the logic streak (`advanceLogic`'s move),
+ * and `wildMoves` the same for the windows that staked 판을 다시 짠다 alone.
+ * `bustAt` files every bust under the push it happened on, or under the clock
+ * when no push made it ("creep", "timeout"); `pushed` is how many pushes each
+ * window made, so the two together say how often push N is the one that busts.
+ */
+function watchSeason() {
+  const seen = { windows: 0, dealtWild: 0, stakedWild: 0, cashed: 0, busts: 0, moves: {}, wildMoves: {}, streakSum: 0, best: 0, bonusSum: 0, capped: 0, pot: 0, logicPot: 0, banked: 0, bustAt: {}, pushed: {}, fractureDealt: 0, fractureBurn: 0, fracturedBoards: 0 };
+  const count = (map, key) => {
+    map[key] = (map[key] ?? 0) + 1;
+  };
+  seen.watch = ({ verdict, card, dealtWild, board }) => {
+    const wild = card.type === "reframe";
+    seen.windows += 1;
+    if (dealtWild) seen.dealtWild += 1;
+    if (wild) seen.stakedWild += 1;
+    count(seen.moves, verdict.logic.move);
+    if (wild) count(seen.wildMoves, verdict.logic.move);
+    seen.streakSum += verdict.logic.streak;
+    seen.best = Math.max(seen.best, verdict.logic.streak);
+    seen.banked += verdict.secured;
+    count(seen.pushed, verdict.pushes);
+    if (verdict.outcome === "cash") {
+      seen.cashed += 1;
+      seen.bonusSum += verdict.logic.bonus;
+      if (verdict.logic.bonus >= HAND_CAP) seen.capped += 1;
+      seen.pot += verdict.pot;
+      seen.logicPot += verdict.logic.pot;
+    } else {
+      seen.busts += 1;
+      count(seen.bustAt, verdict.cause === "push" ? verdict.pushes : verdict.cause);
+    }
+    // FRACTURE: the card's largest burn reached the line (whatever the case's
+    // rules), the next board was dealt cracked, and this one was played cracked.
+    if (Math.abs(getCardBurn(card, board)?.value ?? 0) >= FRACTURE_MIN_BURN) seen.fractureBurn += 1;
+    if (verdict.nextMutations.some((mutation) => mutation.id === "fracture")) seen.fractureDealt += 1;
+    if (board.fracturedAxis) seen.fracturedBoards += 1;
+  };
+  return seen;
+}
+/** The watched seasons' counts, added up. */
+function addSeen(list) {
+  const total = watchSeason();
+  for (const seen of list) {
+    for (const [key, value] of Object.entries(seen)) {
+      if (typeof value === "number") total[key] = key === "best" ? Math.max(total.best, value) : total[key] + value;
+      else if (typeof value === "object") for (const [inner, amount] of Object.entries(value)) total[key][inner] = (total[key][inner] ?? 0) + amount;
+    }
+  }
+  return total;
+}
+
 const counts = new Map();
 const byArchetype = {};
 const samples = { busts: [], windows: [], clues: [], skipped: [], legitimacy: [], capital: [], trust: [], seasonLegitimacy: [], seasonCapital: [], seasonTrust: [], sustained: [], peak: [], reframes: [], peopleFirst: [] };
@@ -355,10 +439,21 @@ const logicBest = {};
 const logicHold = {};
 let doorOpen = 0;
 let doorMoved = 0;
+// Measured for the report at the end of this file, and asserted nowhere: what
+// every window of the population did, how many seasons the slack door could
+// move at all, and the tools each season ended holding.
+const populationSeen = [];
+const populationBuilds = [];
+let doorCouldMove = 0;
 const dump = [];
 for (let index = 0; index < SEASONS; index += 1) {
   const archetype = POPULATION[index % POPULATION.length];
-  const season = playSeason(index, archetype);
+  const seen = watchSeason();
+  const season = playSeason(index, archetype, false, seen.watch);
+  populationSeen.push(seen);
+  populationBuilds.push(season.relics);
+  const closesOn = (seasonBestLogic) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic }).id;
+  if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
   counts.set(season.ending.id, (counts.get(season.ending.id) ?? 0) + 1);
   byArchetype[archetype] ??= new Map();
   byArchetype[archetype].set(season.ending.id, (byArchetype[archetype].get(season.ending.id) ?? 0) + 1);
@@ -523,4 +618,209 @@ if (reportMode) {
     return `${name}: best ${fiveNumbers(seasons.map((season) => season.bestLogic ?? 0))}, hold rate ${fiveNumbers(seasons.map((season) => season.logicHold ?? 0))}`;
   });
   console.log(`Logic streak, played for (${LOGIC_SEASONS} seasons a hand, min/p10/p50/p90/max; ${lines.join("; ")})`);
+}
+
+/**
+ * Measured, not judged (2026-10-13, the plan's "규칙 측정"): report mode only,
+ * after everything above, so every season above is the season it always was
+ * and no number, floor or exit code moves. Nothing below is asserted.
+ *
+ * The first part is a hand that stakes 판을 다시 짠다 on every scene that deals
+ * it and otherwise picks as the `balanced` archetype does, beside that
+ * archetype on the same seasons: the seeded stream is set again before each
+ * season, the same for both hands, so the two are the same player (heat, tell,
+ * origin) at the same walls and differ in the one habit. The question it is
+ * here for is whether the wild card is a way never to lose the logic streak.
+ * It is not a free one: the card has a type of its own (`getLogicType`: 판
+ * 바꾸기), so staking it after another type is a change of type like any other.
+ *
+ * The second part reads the population above for the plan's other suspicions:
+ * what the streak pays and whether its door moves an ending, which push a bust
+ * happens on, how many different sets of tools seasons end with, and how often
+ * a card burns enough to crack the next board.
+ */
+if (reportMode) {
+  const WILD_SEASONS = Number(process.env.ENDING_WILD_SEASONS) || 80;
+  const per = (part, whole, digits = 1) => ((100 * part) / Math.max(1, whole)).toFixed(digits);
+  ARCHETYPES["stakes the wild card"] = { ...ARCHETYPES.balanced, wildOnly: true };
+  const hands = { "ordinary (balanced)": "balanced", "stakes the wild card": "stakes the wild card" };
+  console.log(`Wild card only (measured, not asserted; ${WILD_SEASONS} seasons a hand, the same players at the same walls; streaks are min/p10/p50/p90/max of a season's longest)`);
+  for (const [name, archetype] of Object.entries(hands)) {
+    const played = Array.from({ length: WILD_SEASONS }, (_, index) => {
+      seed = (20260927 + Math.imul(index + 1, 2654435761)) >>> 0;
+      const seen = watchSeason();
+      const season = playSeason(`wild:${index}`, archetype, false, seen.watch);
+      return { seen, season };
+    });
+    const total = addSeen(played.map((entry) => entry.seen));
+    const endings = new Map();
+    for (const { season } of played) endings.set(season.ending.id, (endings.get(season.ending.id) ?? 0) + 1);
+    const moves = (map) => ["build", "grow", "switch", "keep", "break", "bust", "none"].map((move) => `${move} ${map[move] ?? 0}`).join(", ");
+    console.log(
+      `  ${name}: windows a season ${(total.windows / WILD_SEASONS).toFixed(0)}, wild card dealt on ${per(total.dealtWild, total.windows)}% and staked on ${per(total.stakedWild, total.windows)}%; longest streak ${fiveNumbers(played.map((entry) => entry.seen.best))}, mean streak over every window ${(total.streakSum / total.windows).toFixed(2)}; streak ended by a change of type on ${per(total.moves.break ?? 0, total.windows)}% of windows (${((total.moves.break ?? 0) / WILD_SEASONS).toFixed(1)} a season) and by a bust on ${per(total.moves.bust ?? 0, total.windows)}% (${((total.moves.bust ?? 0) / WILD_SEASONS).toFixed(1)} a season); hold rate ${fiveNumbers(played.map((entry) => entry.season.logic.logicHold ?? 0))}; pot bonus x${(total.bonusSum / Math.max(1, total.cashed)).toFixed(3)} over cashed windows, at the cap on ${per(total.capped, total.cashed)}%; banked a season ${fiveNumbers(played.map((entry) => entry.seen.banked))} (mean ${Math.round(total.banked / WILD_SEASONS)}), the streak's share of the pots ${per(total.logicPot, total.pot)}%; slack door open in ${played.filter((entry) => entry.season.strain.seasonBestLogic >= LOGIC_SLACK_STREAK).length} seasons`,
+    );
+    console.log(`    moves: ${moves(total.moves)}${total.stakedWild ? `; on the wild card alone: ${moves(total.wildMoves)}` : ""}`);
+    console.log(`    endings: ${EXPECTED.map((id) => `${id} ${endings.get(id) ?? 0}`).join(", ")}`);
+  }
+
+  const all = addSeen(populationSeen);
+  const meanBonus = all.bonusSum / Math.max(1, all.cashed);
+  // The pot doubles every 11 points of heat (`getMultiplier`), so a bonus is worth this much heat.
+  const asHeat = (bonus) => (Math.log2(bonus) * 11).toFixed(1);
+  console.log(
+    `Streak's weight (measured, the ${SEASONS} seasons above): pot bonus x${meanBonus.toFixed(3)} over cashed windows (the heat of ${asHeat(meanBonus)} points; the cap x${HAND_CAP} is ${asHeat(HAND_CAP)} points and the smallest push is 7), at the cap on ${per(all.capped, all.cashed)}% of them; the streak's share of every pot cashed ${per(all.logicPot, all.pot)}%; the slack door would give ${doorCouldMove} of ${SEASONS} seasons a different ending if it were open for all of them (open in ${doorOpen}, moved ${doorMoved})`,
+  );
+  const pushedAtLeast = (push) => Object.entries(all.pushed).reduce((sum, [pushes, windows]) => sum + (Number(pushes) >= push ? windows : 0), 0);
+  const early = [1, 2, 3].reduce((sum, push) => sum + (all.bustAt[push] ?? 0), 0);
+  const byClock = (all.bustAt.creep ?? 0) + (all.bustAt.timeout ?? 0);
+  console.log(
+    `Busts by push (measured, the ${SEASONS} seasons above): ${all.busts} busts in ${all.windows} windows; on push 1-3: ${early} (${per(early, all.busts)}% of busts); ${[1, 2, 3, 4, 5, 6, 7, 8].map((push) => `push ${push}: ${all.bustAt[push] ?? 0} of ${pushedAtLeast(push)} (${per(all.bustAt[push] ?? 0, pushedAtLeast(push))}%)`).join(", ")}; by the clock ${byClock} (creep ${all.bustAt.creep ?? 0}, timeout ${all.bustAt.timeout ?? 0})`,
+  );
+  const builds = new Map();
+  for (const relics of populationBuilds) {
+    const key = [...relics].sort().join("+") || "(none)";
+    builds.set(key, (builds.get(key) ?? 0) + 1);
+  }
+  const commonest = [...builds.entries()].sort((a, b) => b[1] - a[1])[0];
+  const wholePool = populationBuilds.filter((relics) => DEFAULT_RELIC_POOL.every((id) => relics.includes(id))).length;
+  console.log(
+    `Tools at the season's end (measured, the ${SEASONS} seasons above; ${RELIC_IDS.length} tools, ${DEFAULT_RELIC_POOL.length} in the draft from the start, one taken at random from each draft): held ${fiveNumbers(populationBuilds.map((relics) => relics.length))}; ${builds.size} different sets; the commonest set closes ${commonest[1]} seasons (${commonest[0].split("+").length} tools); ${wholePool} seasons hold every tool the draft starts with`,
+  );
+  const cards = Object.values(nodes).flatMap((node) => (node.choices ?? []).filter((choice) => choice.type !== "reframe"));
+  const burns = cards.map((choice) => Math.abs(getCardBurn(choice)?.value ?? 0));
+  console.log(
+    `FRACTURE (measured): ${burns.filter((burn) => burn >= FRACTURE_MIN_BURN).length} of ${cards.length} cards burn ${FRACTURE_MIN_BURN} or more on one axis as written (${[9, 8, 7, 6, 5].map((line) => `${line} or more: ${burns.filter((burn) => burn >= line).length}`).join(", ")}; no burn at all: ${burns.filter((burn) => burn === 0).length}); in the ${SEASONS} seasons above a staked card reached the line on ${all.fractureBurn} of ${all.windows} windows (${per(all.fractureBurn, all.windows, 2)}%), a cracked board was dealt after ${all.fractureDealt} (${per(all.fractureDealt, all.windows, 2)}%) and played on ${all.fracturedBoards}; seasons that never saw one: ${populationSeen.filter((seen) => seen.fractureDealt === 0).length}`,
+  );
+}
+
+/**
+ * Tools the codex unlocks (measured, not judged, 2026-10-13: the plan's
+ * question of a cap on tools). Report mode only, after everything above, on a
+ * stream set again before each season, so nothing above moves. Nothing below
+ * is asserted, and no rule is changed: a cap is tried here by a hand that
+ * passes on the draft once it holds that many, which the table already allows.
+ *
+ * The seasons above draft from the five tools that need no unlock, so every
+ * one of them ends with those five. The other seven come from the codex, which
+ * outlives a season (`useRelicTable`): a feat proved on a window puts its tool
+ * in the pool of every later draft. `toolTable` settles a window the way
+ * `settleAgainstCodex` does (it is those lines without the hook's storage),
+ * and the brackets are a codex that never learns (the seasons above), one
+ * that starts empty and learns, the season after it on what the first left,
+ * and a codex that holds everything (a veteran).
+ *
+ * The hand. The seasons above lock no stance and never run a clock out, so
+ * that hand cannot prove four of the seven feats (three charged cashes in a
+ * stance, three times; one SILENCE) and holds those four tools for nothing.
+ * The tool hand is the same player with two habits added, those of the relic
+ * hand in `report-gauntlet-loop.mjs`: one window in two it charges a stance,
+ * in a stance that rotates by case, and one window in twenty-five it leaves
+ * the clock to run out. It is a different player from the one the ending
+ * bands are tuned on, so its rows are read against each other, not against
+ * the bands.
+ *
+ * The draft. `random` takes one of the offered tools at random and never
+ * passes, as the seasons above do. A season offers 51 drafts and has 12 tools,
+ * so any hand that never passes ends with every tool in its pool: under no cap
+ * the sets a season ends with say nothing about the policy, and "taken of
+ * offered" is one in the size of the offer. `need` takes the offered tool the
+ * season has had most use for so far (the rule a tool softens, counted as it
+ * is dealt; INSURANCE a lost pot, ENCORE a streak a bust ended, METRONOME a
+ * streak a change of type ended; HIGH ROLLER, a trade, last). Under a cap the
+ * two bracket a player: `random` is the widest the builds can spread, `need`
+ * the narrowest a hand that reads its own play would leave them.
+ */
+function toolTable({ codex = [], learns = false, hand = false, slots = Infinity, policy = "random" } = {}) {
+  const count = (map, key) => {
+    map[key] = (map[key] ?? 0) + 1;
+  };
+  const table = { codex: [...codex], hand, caseNumber: 0, featAt: {}, offered: {}, picked: {}, drafts: 0, passes: 0, lastTakeAt: 0, need: {} };
+  table.dealHand = () => ({ mode: ["strike", "steady", "strike", "steady", "expose"][table.caseNumber % 5], locks: random() < 0.5, walks: random() < 0.04 });
+  table.settle = (settlement) => {
+    const settled = resolveWindow(settlement);
+    const fresh = settlement.rules.has("relics") ? getRelicUnlocks(settled, Object.keys(table.featAt)) : [];
+    for (const id of fresh) table.featAt[id] = table.caseNumber;
+    if (learns) table.codex = [...new Set([...table.codex, ...fresh])];
+    return settlement.caseClosed && settlement.offerRelics ? resolveWindow({ ...settlement, relicPool: getRelicPool(table.codex) }) : settled;
+  };
+  table.see = (verdict) => {
+    for (const mutation of verdict.nextMutations) count(table.need, mutation.id);
+    if (verdict.outcome === "bust" && verdict.lostPot + (verdict.insuredPot ?? 0) > 0) count(table.need, "tool:insurance");
+    if (verdict.logic.move === "bust") count(table.need, "tool:encore");
+    if (verdict.logic.move === "break") count(table.need, "tool:metronome");
+  };
+  const needOf = (id) => table.need[RELICS[id].softens?.mutation ?? `tool:${id}`] ?? 0;
+  table.draft = (run) => {
+    table.drafts += 1;
+    for (const id of run.relicOffer) count(table.offered, id);
+    if (run.relics.length >= slots) {
+      table.passes += 1;
+      return null;
+    }
+    const taken = policy === "need" ? run.relicOffer.reduce((best, id) => (needOf(id) > needOf(best) ? id : best)) : pick(run.relicOffer);
+    count(table.picked, taken);
+    table.lastTakeAt = table.caseNumber;
+    return taken;
+  };
+  return table;
+}
+
+if (reportMode) {
+  const TOOL_SEASONS = Number(process.env.ENDING_TOOL_SEASONS) || 80;
+  const per = (part, whole, digits = 1) => ((100 * part) / Math.max(1, whole)).toFixed(digits);
+  const UNLOCKABLE = RELIC_IDS.filter((id) => RELICS[id].unlock);
+  const startSet = [...DEFAULT_RELIC_POOL].sort().join("+");
+  const nameSet = (ids) => (ids.length === 0 ? "(none)" : ids.length === RELIC_IDS.length ? `all ${RELIC_IDS.length}` : ids.join("+") === startSet ? `the ${DEFAULT_RELIC_POOL.length} from the start` : ids.join("+"));
+  const playTools = (name, options, codexOf = () => options.codex ?? []) => {
+    const played = Array.from({ length: TOOL_SEASONS }, (_, index) => {
+      seed = (20261013 + Math.imul(index + 1, 2654435761)) >>> 0;
+      const seen = watchSeason();
+      const table = toolTable({ ...options, codex: codexOf(index) });
+      const watch = (settled) => {
+        seen.watch(settled);
+        table.see(settled.verdict);
+      };
+      const season = playSeason(`tools:${index}`, POPULATION[index % POPULATION.length], false, watch, table);
+      return { seen, table, season };
+    });
+    const total = addSeen(played.map((entry) => entry.seen));
+    const sum = (read) => played.reduce((all, entry) => all + read(entry), 0);
+    const tally = (read) => {
+      const map = new Map();
+      for (const entry of played) map.set(read(entry), (map.get(read(entry)) ?? 0) + 1);
+      return map;
+    };
+    const sets = [...tally((entry) => nameSet([...entry.season.relics].sort())).entries()].sort((a, b) => b[1] - a[1]);
+    const held = [...tally((entry) => entry.season.relics.length).entries()].sort((a, b) => a[0] - b[0]);
+    const endings = tally((entry) => entry.season.ending.id);
+    const whole = played.filter((entry) => getRelicPool(entry.table.codex).every((id) => entry.season.relics.includes(id))).length;
+    console.log(
+      `  ${name}: ${sets.length} different sets in ${TOOL_SEASONS} seasons; tools held at the end ${held.map(([size, seasons]) => `${size}: ${seasons}`).join(", ")}; every tool of its pool held in ${whole} seasons; the last tool is taken as case ${fiveNumbers(played.map((entry) => entry.table.lastTakeAt))} of ${CASE_SEQUENCE.length} closes; drafts with a tool on offer ${(sum((entry) => entry.table.drafts) / TOOL_SEASONS).toFixed(1)} a season, passed ${(sum((entry) => entry.table.passes) / TOOL_SEASONS).toFixed(1)}; banked a season ${fiveNumbers(played.map((entry) => entry.seen.banked))} (mean ${Math.round(total.banked / TOOL_SEASONS)}); windows a season ${(total.windows / TOOL_SEASONS).toFixed(0)}, bust on ${per(total.busts, total.windows)}%`,
+    );
+    console.log(`    sets: ${sets.slice(0, 5).map(([key, seasons]) => `${key} ${per(seasons, TOOL_SEASONS)}%`).join("; ")}`);
+    console.log(`    endings: ${EXPECTED.map((id) => `${id} ${endings.get(id) ?? 0}`).join(", ")}`);
+    const offeredOf = (id) => sum((entry) => entry.table.offered[id] ?? 0);
+    console.log(`    taken of offered: ${RELIC_IDS.filter((id) => offeredOf(id) > 0).map((id) => `${id} ${sum((entry) => entry.table.picked[id] ?? 0)}/${offeredOf(id)}`).join(", ")}`);
+    const feats = UNLOCKABLE.map((id) => {
+      const cases = played.map((entry) => entry.table.featAt[id]).filter(Boolean);
+      return `${id} ${cases.length}${cases.length ? ` (${fiveNumbers(cases)})` : ""}`;
+    });
+    console.log(`    feats proved (seasons, and the case each is first proved in, min/p10/p50/p90/max): ${feats.join(", ")}`);
+    return played;
+  };
+  console.log(
+    `Tools the codex unlocks (measured, not asserted; ${TOOL_SEASONS} seasons a row, the population's players in turn and the same players in every row; ${RELIC_IDS.length} tools, ${UNLOCKABLE.length} of them unlocked by a feat; a draft as each case from ${CASE_SEQUENCE[3]} to the one before ${CASE_SEQUENCE[CASE_SEQUENCE.length - 1]} closes, ${CASE_SEQUENCE.length - 4} a season)`,
+  );
+  console.log(" the hand of the seasons above (no stance, no clock run out), random draft:");
+  playTools("nothing unlocked, and nothing learned", {});
+  playTools("everything unlocked", { codex: UNLOCKABLE });
+  console.log(" the tool hand (a stance charged one window in two, one window in twenty-five run out), random draft:");
+  playTools("nothing unlocked, and nothing learned", { hand: true });
+  const first = playTools("a new codex, first season", { hand: true, learns: true });
+  playTools("the same codex, second season", { hand: true, learns: true }, (index) => first[index].table.codex);
+  playTools("everything unlocked", { hand: true, codex: UNLOCKABLE });
+  console.log(" a cap tried by passing (the tool hand, everything unlocked; no swap: the first tools taken are the ones kept):");
+  for (const slots of [3, 5, 8]) {
+    for (const policy of ["random", "need"]) playTools(`${slots} slots, ${policy} draft`, { hand: true, codex: UNLOCKABLE, slots, policy });
+  }
 }
