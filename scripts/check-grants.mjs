@@ -26,7 +26,7 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  * So this replays every migration into an in-process Postgres (PGlite) set up
  * the way a project is after that date: the API roles exist and can use the
  * schema, functions and sequences keep their default grants, and tables get
- * none. Then it asserts five things.
+ * none. Then it asserts six things.
  *
  *   1. Rules that hold for any table, so a new one cannot slip through: RLS is
  *      on, service_role can read and write it, and every policy aimed at anon
@@ -49,6 +49,10 @@ import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels
  *   5. What a migration that deletes leaves behind. The ranking reset of
  *      2026-10-11 is replayed over a database with a row in every table, and
  *      every row but the ranking rows has to come out of it as it went in.
+ *   6. That the telemetry trigger function in parts (20261014000000) is the
+ *      function it was: each part is run by nobody but the service role, the
+ *      triggers are wired as before, and one row for every refusal, sent to
+ *      both definitions, is refused or stored the same way by each.
  *
  * Needs no Docker and no network, which is what lets it sit in
  * `verify:static`.
@@ -1537,6 +1541,380 @@ await refused("put a cloud save", "authenticated", `select public.put_cloud_save
 // The trigger's last branch still serves the one table only service_role writes.
 await allowed("record a free-text analysis", "service_role",
   `insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ('${sessionId(98)}', 'case01', 'n1', '{}')`);
+
+// ---- the telemetry trigger function and its parts (20261014000000)
+//
+// `validate_telemetry_insert` was one function restated whole at every rule
+// change; it is now a short one that calls nine parts. Three things are held
+// here. Who may run each part: the rule in part 1 already refuses any function
+// anon can execute, and this names the nine, so one that is dropped, renamed
+// or given another signature is noticed too. That the trigger function still
+// calls every one of them: a later migration that pastes the whole function
+// back would leave the parts in place and unused, and a rule changed in a part
+// after that would change nothing. And that the function is still wired to the
+// four tables, before the address budget's trigger, as it has been.
+const VALIDATOR_PARTS = {
+  telemetry_check_envelope: ["text, text, text, text, integer", "void"],
+  telemetry_check_session_row: ["text, jsonb, jsonb, text, text, jsonb, jsonb, jsonb, jsonb", "void"],
+  telemetry_case_is_replay: ["text, text, text, text", "boolean"],
+  ranking_check_request: ["jsonb, jsonb, text", "void"],
+  ranking_check_run_marks: ["text", "void"],
+  ranking_check_run: ["text, text", "void"],
+  ranking_run_summary: ["text, text", "jsonb"],
+  ranking_charge_limits: ["text, text", "void"],
+  telemetry_charge_pace: ["text, text, integer", "void"],
+};
+{
+  const describeFunction = (signature) => one(
+    `select p.prosecdef as definer, p.provolatile as volatility, coalesce(p.proconfig, '{}') as config,
+            p.prorettype::regtype::text as returns, p.prosrc as source,
+            (select coalesce(array_agg(case a.grantee when 0 then 'public' else a.grantee::regrole::text end), '{}')
+               from aclexplode(p.proacl) a where a.privilege_type = 'EXECUTE' and a.grantee <> p.proowner) as grantees
+       from pg_proc p where p.oid = to_regprocedure($1)`,
+    [signature],
+  );
+  const pinsPublic = (fn) => (fn?.config ?? []).some((setting) => /^search_path=public$/.test(setting));
+  const onlyServiceRole = (fn) => JSON.stringify([...(fn?.grantees ?? [])].sort()) === '["service_role"]';
+
+  const validator = await describeFunction("public.validate_telemetry_insert()");
+  check(validator !== null, "public.validate_telemetry_insert() is gone; the telemetry tables have no insert trigger function.");
+  check(validator?.definer === true && pinsPublic(validator), "validate_telemetry_insert is no longer SECURITY DEFINER with search_path = public; its parts run as its owner and read that path.");
+  check(validator?.returns === "trigger", `validate_telemetry_insert returns ${validator?.returns}; expected trigger.`);
+  check(onlyServiceRole(validator), `validate_telemetry_insert is executable by ${JSON.stringify(validator?.grantees)}; expected service_role only.`);
+
+  // A part is called by the trigger function or by another part
+  // (ranking_check_run calls ranking_check_run_marks).
+  const parts = {};
+  for (const [name, [args]] of Object.entries(VALIDATOR_PARTS)) parts[name] = await describeFunction(`public.${name}(${args})`);
+  const callers = (name) => [validator?.source, ...Object.entries(parts).filter(([other]) => other !== name).map(([, fn]) => fn?.source)];
+
+  for (const [name, [args, returns]] of Object.entries(VALIDATOR_PARTS)) {
+    const part = parts[name];
+    if (!part) {
+      failures.push(`public.${name}(${args}) does not exist; validate_telemetry_insert calls it (20261014000000).`);
+      continue;
+    }
+    const overloads = (await one(
+      `select count(*)::int as n from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = $1`,
+      [name],
+    ))?.n;
+    check(overloads === 1, `public.${name} has ${overloads} overloads; the trigger function's call has to mean one of them.`);
+    check(onlyServiceRole(part), `public.${name} is executable by ${JSON.stringify(part.grantees)}; expected service_role only, like every helper a trigger calls.`);
+    check(part.definer === false, `public.${name} is SECURITY DEFINER; it is called by the trigger function alone and runs as that function's owner already.`);
+    check(pinsPublic(part), `public.${name} does not pin search_path = public, the trigger function's own.`);
+    check(part.volatility === "v", `public.${name} is not VOLATILE; a part marked stable reads the table as it was before the advisory lock was waited for.`);
+    check(part.returns === returns, `public.${name} returns ${part.returns}; expected ${returns}.`);
+    check(
+      callers(name).some((source) => source?.includes(`public.${name}(`) === true),
+      `neither validate_telemetry_insert nor another of its parts calls public.${name}; a migration restated the whole function, and a rule changed in that part would now change nothing.`,
+    );
+    for (const role of ["anon", "authenticated"]) {
+      await refused(`call the trigger function's part ${name}`, role, `select public.${name}(${args.split(", ").map((type) => `null::${type}`).join(", ")})`);
+    }
+  }
+
+  // Wiring: BEFORE INSERT, for each row, enabled, on the four tables; the
+  // address budget (20261006000000) sorts after it on the three anon writes.
+  const { rows: wired } = await db.query(`
+    select c.relname as "table", t.tgname as name, p.proname as fn, t.tgtype::int as type, t.tgenabled::text as enabled
+    from pg_trigger t
+    join pg_class c on c.oid = t.tgrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    join pg_proc p on p.oid = t.tgfoid
+    where n.nspname = 'public' and not t.tgisinternal
+      and p.proname in ('validate_telemetry_insert', 'charge_telemetry_address_bytes')
+  `);
+  // tgtype: 1 for each row, 2 before, 4 insert.
+  const wiring = wired.map((row) => `${row.table}.${row.name}>${row.fn}:${row.type}:${row.enabled}`).sort();
+  const expectedWiring = [
+    "app_error_logs.validate_app_error_log_insert>validate_telemetry_insert:7:O",
+    "app_error_logs.zz_charge_address_bytes>charge_telemetry_address_bytes:7:O",
+    "free_text_analyses.validate_free_text_analyses_insert>validate_telemetry_insert:7:O",
+    "playtest_feedback.validate_playtest_feedback_insert>validate_telemetry_insert:7:O",
+    "playtest_feedback.zz_charge_address_bytes>charge_telemetry_address_bytes:7:O",
+    "playtest_sessions.validate_playtest_session_insert>validate_telemetry_insert:7:O",
+    "playtest_sessions.zz_charge_address_bytes>charge_telemetry_address_bytes:7:O",
+  ];
+  check(
+    JSON.stringify(wiring) === JSON.stringify(expectedWiring),
+    `the telemetry triggers are wired as ${JSON.stringify(wiring)}; expected ${JSON.stringify(expectedWiring)}.`,
+  );
+}
+
+// ---- in parts, the trigger function refuses and stores what the whole one did
+//
+// 20261014000000 is a refactor: for any row, the function in parts has to do
+// what the function 20261011010000 wrote out whole did. That is tried here on
+// one row for each refusal the function has, and on the rows it takes, drops
+// and rewrites. Each row is sent twice, in a transaction that is rolled back
+// both times, so both definitions meet the same database: once with the
+// function as the migrations leave it, once with the whole one put back in
+// its place. What has to match is the refusal, code and message, or else the
+// row as it was stored (a date that is the transaction's own reads "now") and
+// every rate-limit counter after it.
+//
+// A probe also says which outcome it expects, so a row that is refused for
+// another reason than its label's by both definitions is not a match.
+//
+// On the day a rule does change -- a part is restated -- the rows that part
+// decides stop matching, which is this check doing its work: give those
+// probes the new expectation and move them out of this comparison, or retire
+// the comparison with the whole function it compares against.
+{
+  const definitionIn = (file) =>
+    readFileSync(path.join(MIGRATIONS, file), "utf8").match(/^create or replace function public\.validate_telemetry_insert\(\)[\s\S]*?^\$\$;/m)?.[0] ?? null;
+  const whole = files.includes(RANKING_RESET) ? definitionIn(RANKING_RESET) : null;
+  const installed = async () =>
+    one(`select p.prosrc as source, pg_get_functiondef(p.oid) as definition from pg_proc p where p.oid = 'public.validate_telemetry_insert()'::regprocedure`);
+  const before = await installed();
+  check(whole !== null, `could not read validate_telemetry_insert out of supabase/migrations/${RANKING_RESET}; the function in parts was compared with nothing.`);
+
+  const address = "198.51.100.90";
+  const headers = { "x-forwarded-for": address };
+  const writer = await writerKey(address);
+  const device = sessionId(60);
+  const RUN = "run-parts-1";
+  const middle = CASE_SEQUENCE[Math.floor(CASE_SEQUENCE.length / 2)];
+  const without = (object, key) => Object.fromEntries(Object.entries(object).filter(([name]) => name !== key));
+
+  // A season whole, watched and well spaced, and not ranked: every ranking
+  // probe starts from it and changes one thing inside its own transaction.
+  await playRun(RUN, { session: device });
+  // A case row that is stored, for the probes that send it again.
+  const landed = casePayload({ session: device, runId: "run-parts-replay", caseId: "case01" });
+  {
+    const { sql, params } = postgrestInsert("playtest_sessions", landed);
+    await db.query(sql, params);
+  }
+
+  let partsRun = 0;
+  const sessionRow = (patch = {}, options = {}) => ({ ...casePayload({ session: device, runId: `run-parts-row-${++partsRun}`, caseId: "case02", ...options }), ...patch });
+  const season = (patch = {}, options = {}) => ({ ...seasonPayload({ session: device, runId: RUN, ...options }), ...patch });
+  const feedback = (patch = {}) => ({ ...feedbackPayload(device), ...patch });
+  const errorLog = (patch = {}) => errorPayload(device, patch);
+  const doing = (...statements) => async () => {
+    for (const [text, params = []] of statements) await db.query(text, params);
+  };
+  const counterAt = (key, count) => () => presetCounter(key, count);
+  const ofCase = (assignment, caseId = middle) => [`update public.playtest_sessions set ${assignment} where run_id = $1 and case_id = $2`, [RUN, caseId]];
+  const ofRun = (assignment) => [`update public.playtest_sessions set ${assignment} where run_id = $1`, [RUN]];
+  const dropCase = [`delete from public.playtest_sessions where run_id = $1 and case_id = $2`, [RUN, CASE_SEQUENCE[2]]];
+  const STORY = ofCase(`summary = summary || '{"assistStory": true}'::jsonb`);
+  const BEAT = ofCase(`dynamics = dynamics - 'logicStreak'`);
+  const twoRankedToday = async () => {
+    await db.exec(`set local session_replication_role = replica`);
+    await db.query(
+      `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary)
+       values ($1, 'run-parts-old-1', 'PARTS', 'season-final', 'SEASON 01 COMPLETE', '{"seasonComplete": true}'),
+              ($1, 'run-parts-old-2', 'PARTS', 'season-final', 'SEASON 01 COMPLETE', '{"seasonComplete": true}')`,
+      [device],
+    );
+    await db.exec(`set local session_replication_role = origin`);
+  };
+
+  const P = (message) => new RegExp(`^P0001 ${message}$`);
+  const LATER = (message) => new RegExp(`^PT425 ${message}$`);
+  const PACE = (message) => new RegExp(`^PT429 ${message}$`);
+  const EVERY_CASE = LATER("season ranking requires every case of the run");
+  const FIELD = P("playtest session field too large");
+  const SHAPE = P("invalid playtest session payload");
+  const RANK_LIMIT = PACE("season ranking limit reached");
+  const RATE = PACE("telemetry rate limit exceeded");
+  const STORED = "stored";
+  const DROPPED = "dropped";
+
+  // [what is sent, what has to happen, the table, the row, and what else the probe needs]
+  const probes = [
+    // The envelope: session id, session code, event id, the row's bytes.
+    ["a feedback row with a five-character session id", P("invalid telemetry session id"), "playtest_feedback", feedback({ session_id: "short" })],
+    ["a case row with a 129-character session id", P("invalid telemetry session id"), "playtest_sessions", sessionRow({ session_id: "s".repeat(129) })],
+    ["an error log with no session id", P("invalid telemetry session id"), "app_error_logs", without(errorLog(), "session_id")],
+    ["a case row with a 33-character session code", P("invalid telemetry session code"), "playtest_sessions", sessionRow({ session_code: "X".repeat(33) })],
+    ["a feedback row with an empty event id", P("invalid telemetry event id"), "playtest_feedback", feedback({ event_id: "" })],
+    ["an error log with a 129-character event id", P("invalid telemetry event id"), "app_error_logs", errorLog({ event_id: "e".repeat(129) })],
+    ["a 200 KB case row", P("telemetry payload too large"), "playtest_sessions", sessionRow({ decision_log: Array.from({ length: 30 }, () => ({ echo: "x".repeat(7000) })) })],
+    ["a 600 KB error log", P("telemetry payload too large"), "app_error_logs", errorLog({ error_stack: "x".repeat(600000) })],
+    ["a 300 KB error log, which is cut and kept", STORED, "app_error_logs", errorLog({ error_stack: "x".repeat(300000) })],
+
+    // A case row: its shape and its caps.
+    ["a case row for a case that does not exist", SHAPE, "playtest_sessions", sessionRow({}, { caseId: "bogus" })],
+    ["a case row whose summary is an array", SHAPE, "playtest_sessions", sessionRow({ summary: [] })],
+    ["a case row whose decision log is an object", SHAPE, "playtest_sessions", sessionRow({ decision_log: {} })],
+    ["a case row with a 61-entry decision log", SHAPE, "playtest_sessions", sessionRow({ decision_log: Array.from({ length: 61 }, () => ({ nodeId: "n" })) })],
+    // The function lets a null log through; the column does not.
+    ["a case row whose decision log is null", /^(23502|42501) /, "playtest_sessions", sessionRow({ decision_log: null })],
+    ["a case row with a 129-character run id", FIELD, "playtest_sessions", sessionRow({ run_id: "r".repeat(129) })],
+    ["a case row with an 81-character title", FIELD, "playtest_sessions", sessionRow({ case_title: "가".repeat(81) })],
+    ["a case row with a 5 KB summary", FIELD, "playtest_sessions", sessionRow({ summary: { note: "x".repeat(5000) } })],
+    ["a case row with 2 KB of resources", FIELD, "playtest_sessions", sessionRow({ resources: { note: "x".repeat(2000) } })],
+    ["a case row with 2 KB of triggers", FIELD, "playtest_sessions", sessionRow({ triggers: { note: "x".repeat(2000) } })],
+    ["a case row with 2 KB of cognition", FIELD, "playtest_sessions", sessionRow({ cognition: { note: "x".repeat(2000) } })],
+    ["a case row with 3 KB of dynamics", FIELD, "playtest_sessions", sessionRow({ dynamics: { note: "x".repeat(3000) } })],
+    ["a case row with a 9 KB decision entry", P("decision log entry too large"), "playtest_sessions", sessionRow({ decision_log: [{ echo: "x".repeat(9000) }] })],
+    ["a case row", STORED, "playtest_sessions", sessionRow()],
+    ["a case row from a request with no address", STORED, "playtest_sessions", sessionRow(), { headers: null }],
+    ["a case row with an empty run id", STORED, "playtest_sessions", sessionRow({ run_id: "" })],
+
+    // One row per run and case.
+    ["a case row that is stored already", DROPPED, "playtest_sessions", { ...landed, event_id: uuid() }],
+    ["a stored case row again from a request with no address", DROPPED, "playtest_sessions", { ...landed, event_id: uuid() }, { headers: null }],
+    ["a stored case row again past the hour's replays", RATE, "playtest_sessions", { ...landed, event_id: uuid() }, { setup: counterAt(`tele-replay:${writer}`, 600) }],
+
+    // The ranking row: what the request says, then the run, then what is published, then the limits.
+    ["the ranking row of a watched season", STORED, "playtest_sessions", season()],
+    ["a ranking row that says the season is not complete", P("season ranking requires a completed summary"), "playtest_sessions", season({}, { seasonComplete: false })],
+    ["a ranking row with seasonComplete '1'", STORED, "playtest_sessions", season({}, { seasonComplete: "1" })],
+    // `null not in (...)` is null, and the function has always let that pass.
+    ["a ranking row that does not say whether the season is complete", STORED, "playtest_sessions", (() => { const row = season(); return { ...row, summary: without(row.summary, "seasonComplete") }; })()],
+    ["a ranking row with no decisions", P("season ranking requires decisions"), "playtest_sessions", season({ decision_log: [] })],
+    ["a ranking row with an empty run id", P("season ranking requires a run id"), "playtest_sessions", season({ run_id: "" })],
+    ["a ranking row for a run nobody played", EVERY_CASE, "playtest_sessions", season({}, { runId: "run-parts-none" })],
+    ["a ranking row for a run missing a case", EVERY_CASE, "playtest_sessions", season(), { setup: doing(dropCase) }],
+    ["a ranking row from a device that did not play the final case", EVERY_CASE, "playtest_sessions", season({}, { session: sessionId(61) })],
+    ["a ranking row for a season with a story case", P("story-mode runs are not ranked"), "playtest_sessions", season(), { setup: doing(STORY) }],
+    ["a ranking row for a season with a beat-table case", P("beat-table runs are not ranked"), "playtest_sessions", season(), { setup: doing(BEAT) }],
+    ["a ranking row for a season with a case that has no dynamics", P("beat-table runs are not ranked"), "playtest_sessions", season(), { setup: doing(ofCase("dynamics = null")) }],
+    ["a ranking row for a season played in no time", LATER("season ranking run is implausibly short"), "playtest_sessions", season(), { setup: doing(ofRun("completed_at = now()")) }],
+    ["a ranking row for a season whose rows arrived together", P("season ranking run was not played where the server could watch it"), "playtest_sessions", season(), { setup: doing(ofRun("completed_at = now() - interval '2 hours'")) }],
+    ["a ranking row whose final case has a text score", P("invalid season ranking score"), "playtest_sessions", season(), { setup: doing(ofCase(`summary = summary || '{"burstScore": "100"}'::jsonb`, "final")) }],
+    ["a ranking row whose final case scored 101", P("invalid season ranking score"), "playtest_sessions", season(), { setup: doing(ofCase(`summary = summary || '{"burstScore": 101}'::jsonb`, "final")) }],
+    ["a ranking row whose final case has rank Z", P("invalid season ranking rank"), "playtest_sessions", season(), { setup: doing(ofCase(`summary = summary || '{"rank": "Z"}'::jsonb`, "final")) }],
+    ["a device's third ranking row of the day", RANK_LIMIT, "playtest_sessions", season(), { setup: twoRankedToday }],
+    ["an address's 21st ranking row of the day", RANK_LIMIT, "playtest_sessions", season(), { setup: counterAt(`season-ip:${writer}`, 20) }],
+    // Two reasons at once: the one that stood first is the one that is told.
+    ["a ranking row for a run missing a case, with a story case", EVERY_CASE, "playtest_sessions", season(), { setup: doing(dropCase, STORY) }],
+    ["a ranking row for a story season from the beat table", P("story-mode runs are not ranked"), "playtest_sessions", season(), { setup: doing(STORY, BEAT) }],
+    ["a ranking row for a story season played in no time", P("story-mode runs are not ranked"), "playtest_sessions", season(), { setup: doing(STORY, ofRun("completed_at = now()")) }],
+    ["a ranking row for a beat-table season whose rows arrived together", P("beat-table runs are not ranked"), "playtest_sessions", season(), { setup: doing(BEAT, ofRun("completed_at = now() - interval '2 hours'")) }],
+    ["a ranking row with a text score and rank Z", P("invalid season ranking score"), "playtest_sessions", season(), { setup: doing(ofCase(`summary = summary || '{"burstScore": "100", "rank": "Z"}'::jsonb`, "final")) }],
+    ["a third ranking row of the day with rank Z", P("invalid season ranking rank"), "playtest_sessions", season(), { setup: async () => { await doing(ofCase(`summary = summary || '{"rank": "Z"}'::jsonb`, "final"))(); await twoRankedToday(); } }],
+
+    // Feedback, error logs, and the table only the service role writes.
+    ["a feedback row", STORED, "playtest_feedback", feedback()],
+    ["a feedback row about no case", STORED, "playtest_feedback", feedback({ case_id: null })],
+    ["a feedback row for a case that does not exist", P("invalid feedback case"), "playtest_feedback", feedback({ case_id: "bogus" })],
+    ["a feedback row for the ranking row's case id", P("invalid feedback case"), "playtest_feedback", feedback({ case_id: "season-final" })],
+    ["a feedback row whose feedback is an array", P("invalid feedback payload"), "playtest_feedback", feedback({ feedback: [] })],
+    ["a feedback row with 9 KB of feedback", P("invalid feedback payload"), "playtest_feedback", feedback({ feedback: { comment: "x".repeat(9000) } })],
+    ["an error log", STORED, "app_error_logs", errorLog()],
+    ["an error log for a case that does not exist", P("invalid error log case"), "app_error_logs", errorLog({ current_case: "bogus" })],
+    ["an error log for an unknown case", STORED, "app_error_logs", errorLog({ current_case: "unknown" })],
+    ["an error log dated 2099", STORED, "app_error_logs", errorLog({ occurred_at: "2099-01-01T00:00:00Z" })],
+    ["an error log dated forty days ago", STORED, "app_error_logs", errorLog({ occurred_at: new Date(Date.now() - 40 * 86400000).toISOString() })],
+    ["an error log dated yesterday", STORED, "app_error_logs", errorLog({ occurred_at: new Date(Date.now() - 86400000).toISOString() })],
+    ["an error log with an oversized viewport and context", STORED, "app_error_logs", errorLog({ viewport: { note: "x".repeat(3000) }, context: { note: "x".repeat(9000) } })],
+    ["a free-text analysis from the service role", STORED, "free_text_analyses", { event_id: uuid(), session_id: device, case_id: "case01", node_id: "n1", analysis: {} }, { role: "service_role" }],
+    ["a free-text analysis with a five-character session id", P("invalid telemetry session id"), "free_text_analyses", { event_id: uuid(), session_id: "short", case_id: "case01", node_id: "n1", analysis: {} }, { role: "service_role" }],
+
+    // Pace: the device, the address, everyone.
+    ["a device's 241st telemetry row of the hour", RATE, "app_error_logs", errorLog(), { setup: counterAt(`tele:${writer}|${device}`, 240) }],
+    ["a device's 241st row of the hour from a request with no address", RATE, "app_error_logs", errorLog(), { headers: null, setup: counterAt(`tele:-|${device}`, 240) }],
+    ["an address's 1,201st telemetry row of the hour", RATE, "app_error_logs", errorLog(), { setup: counterAt(`tele-ip:${writer}`, 1200) }],
+    ["a telemetry row past the day's ceiling", PACE("telemetry daily ceiling reached"), "playtest_feedback", feedback(), {
+      setup: doing([`insert into public.private_settings (name, value) values ('telemetry_daily_bytes', '1000') on conflict (name) do update set value = excluded.value`]),
+    }],
+  ];
+
+  /** What one definition does with one probe: the refusal, or the stored row and every counter. Nothing it writes is kept. */
+  const outcomeOf = async ([, , table, payload, { headers: sentWith = headers, role = "anon", setup = null } = {}]) => {
+    await db.exec(`begin`);
+    try {
+      try {
+        if (setup) await setup();
+      } catch (error) {
+        return { setupFailed: `${error.code} ${error.message}` };
+      }
+      await db.query(`select set_config('request.headers', $1, true)`, [sentWith ? JSON.stringify(sentWith) : ""]);
+      const insert = postgrestInsert(table, payload);
+      try {
+        await db.exec(`set local role ${role}`);
+        await db.query(insert.sql, insert.params);
+      } catch (error) {
+        return { refused: `${error.code} ${error.message}` };
+      }
+      await db.exec(`reset role`);
+      // The byte counters less the row's own size. The second pass gets later
+      // ids from the sequence, which no rollback winds back, and a row whose id
+      // has one digit more charges one byte more. The global ceiling and the
+      // address's budget each charged the row with its id in it (the global one
+      // before the trigger rewrote it, which is the same in both passes), and
+      // the address's only for a request with an address to a table the anon
+      // role writes.
+      const charged = ["global:telemetry-bytes"];
+      if (sentWith && table !== "free_text_analyses") charged.push(`tele-bytes-ip:${writer}`);
+      await db.query(
+        `update public.telemetry_rate_limits r set request_count = r.request_count - s.bytes
+           from (select octet_length(to_jsonb(t)::text) as bytes from public.${table} t where t.event_id = $1) s
+          where r.actor_key = any($2::text[])`,
+        [payload.event_id ?? null, charged],
+      );
+      // The row as stored, but for its id; a date equal to the transaction's now() reads "now".
+      const stored = await one(
+        `select (
+           select jsonb_object_agg(e.key, case
+             when e.key in ('completed_at', 'created_at', 'occurred_at') and jsonb_typeof(e.value) = 'string'
+               then case when (e.value #>> '{}')::timestamptz = now() then '"now"'::jsonb else e.value end
+             else e.value end)
+           from jsonb_each(to_jsonb(t) - 'id') e
+         )::text as row
+         from public.${table} t where t.event_id = $1`,
+        [payload.event_id ?? null],
+      );
+      const counters = await one(
+        `select coalesce(jsonb_agg(jsonb_build_array(actor_key, request_count) order by actor_key), '[]'::jsonb)::text as counters from public.telemetry_rate_limits`,
+      );
+      return { stored: stored?.row ?? null, counters: counters?.counters ?? null };
+    } finally {
+      await db.exec(`rollback`);
+    }
+  };
+  const outcomes = async () => {
+    const seen = [];
+    for (const probe of probes) seen.push(await outcomeOf(probe));
+    return seen;
+  };
+
+  if (whole && before) {
+    const inParts = await outcomes();
+    await db.exec(whole);
+    let asWhole = null;
+    let comparedWith;
+    try {
+      comparedWith = (await installed())?.source ?? null;
+      asWhole = await outcomes();
+    } finally {
+      // The function the migrations ended on goes back, whatever happened above.
+      await db.exec(before.definition);
+    }
+    check((await installed())?.source === before.source, "the trigger function was not put back as the migrations left it; everything after this ran on another definition.");
+    check(
+      comparedWith !== null && comparedWith !== before.source && !comparedWith.includes("public.telemetry_check_envelope("),
+      `the function 20261011010000 wrote out whole was not the one the second pass ran; the function in parts was compared with itself.`,
+    );
+    probes.forEach(([label, expected], index) => {
+      const now = inParts[index];
+      const then = asWhole?.[index] ?? null;
+      const said = now.setupFailed ? `could not be set up (${now.setupFailed})` : now.refused ? `was refused: ${now.refused}` : now.stored ? "was stored" : "was dropped";
+      const asExpected =
+        expected === STORED ? Boolean(now.stored) && !now.refused && !now.setupFailed
+        : expected === DROPPED ? now.stored === null && !now.refused && !now.setupFailed && now.counters !== null
+        : Boolean(now.refused) && expected.test(now.refused);
+      check(asExpected, `${label} ${said}; expected ${expected instanceof RegExp ? `a refusal matching ${expected}` : `it to be ${expected}`}.`);
+      check(
+        JSON.stringify(now) === JSON.stringify(then),
+        `${label}: validate_telemetry_insert in parts and the whole function of 20261011010000 disagree. ` +
+          `In parts: ${JSON.stringify(now).slice(0, 400)}. Whole: ${JSON.stringify(then).slice(0, 400)}.`,
+      );
+    });
+    // Nothing a probe wrote is left: the run it borrowed is still whole and still unranked.
+    const left = await one(
+      `select (count(*) filter (where case_id <> 'season-final'))::int as cases, (count(*) filter (where case_id = 'season-final'))::int as ranked
+         from public.playtest_sessions where run_id = $1`,
+      [RUN],
+    );
+    check(left?.cases === CASE_SEQUENCE.length && left?.ranked === 0, `the probes left ${RUN} with ${left?.cases} case rows and ${left?.ranked} ranking rows; each was to be rolled back.`);
+  }
+}
 
 // ---- retention runs as the service role and reaches every table
 
