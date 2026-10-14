@@ -236,7 +236,7 @@ const case32Nodes = {
       },
       {
         id: "c32_final_stand",
-        label: "내 이름이 쓰인 검토서부터 수사 대상으로 조사받겠다고 한다",
+        label: "내 이름이 적힌 검토서부터 수사받겠다고 한다",
         effect: { legitimacy: 13, trust: 6, capital: -8, time: -7, humanCost: -3, fatigue: 5 },
         voice: "몇 달이 걸려도 대신 쓴 사람을 찾아야 한다며, 내 이름이 쓰인 검토서부터 수사 대상으로 조사받겠다고 한다.",
         echo: "수사 대상이 되면 몇 달 동안 당신 이름 뒤에 한 단어가 붙습니다. 대신 누가 그 서명을 했는지 찾는 일이 수사가 됩니다.",
@@ -689,7 +689,7 @@ export const case32 = {
   memoryPlan: {
     systemNext: "c32_route_system",
     evidenceNext: "c32_evidence_turn",
-    systemLabel: "검사 기간에 새로 짠 판이 압수 목록의 분류 기준으로 쓰였는지 맞춰 본다",
+    systemLabel: "검사 기간에 짠 판이 압수 목록 분류 기준이 됐는지 본다",
     evidenceLabel: "연장의 날짜를 33층 문서 반출 기록과 나란히 놓는다",
     systemEcho: "압수 목록은 상자를 이름으로 분류했습니다. 당신 이름이 붙은 상자가 가장 많습니다. 노아가 상자 속 이름의 수와 재판에 넘겨진 사람을 나란히 셉니다.",
     evidenceEcho: "연장 날짜표를 반출 기록에 대면 목록에서 빠진 상자 하나가 나옵니다. 나간 시각 바로 앞에 전화가 한 통 있습니다.",

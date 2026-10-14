@@ -680,7 +680,7 @@ export const case41 = {
     systemNext: "c41_route_system",
     evidenceNext: "c41_evidence_turn",
     systemLabel: "서버실에서 새로 짠 판이 청문회 질의서에 묻어 들어갔는지 짚어 본다",
-    evidenceLabel: "부적합의 기준점에 붙은 40억 승인서를 윤상혁이 답해야 할 날짜들 옆에 둔다",
+    evidenceLabel: "부적합의 기준점의 승인서를 윤상혁이 답할 날짜 옆에 둔다",
     systemEcho: "질의서는 당신의 판을 싣지 않았습니다. 예상 답변 칸마다 같은 대답이 적혀 있습니다. 이민서가 그 대답을 20년 치 회의록에서 셉니다.",
     evidenceEcho: "승인서를 옆에 두면 기억나지 않는다던 날에 그의 서명이 있습니다. 반재욱이 같은 식으로 청문회 날 정회까지 표를 채워 갑니다.",
   },

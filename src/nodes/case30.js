@@ -684,7 +684,7 @@ export const case30 = {
   memoryPlan: {
     systemNext: "c30_route_system",
     evidenceNext: "c30_evidence_turn",
-    systemLabel: "탑승구 앞에서 새로 짠 판이 데이터 계약서 용도 칸에 적혔는지 확인해 본다",
+    systemLabel: "탑승구에서 짠 판이 데이터 계약서 용도 칸에 적혔는지 본다",
     evidenceLabel: "우편함 214번을 핏스코어의 주주 명단과 나란히 놓는다",
     systemEcho: "용도 칸에 적힌 것은 '조직 적합도 모델 개발' 한 줄입니다. 당신의 판은 거기 없고, 당신의 반응 기록이 제공 대상 칸에 있습니다. 노아가 같은 식으로 맺은 계약 서른여덟 건을 엽니다.",
     evidenceEcho: "우편함의 주소를 핏스코어 주주 명단에 대면 그룹 돈이 들어간 줄이 하나 있습니다. 투자 검토 의견은 한 줄이고, 쓴 자리는 당신 책상입니다.",

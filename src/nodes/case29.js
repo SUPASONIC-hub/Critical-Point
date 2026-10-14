@@ -232,7 +232,7 @@ const case29Nodes = {
       },
       {
         id: "c29_final_report",
-        label: "부속서 C를 이사회에 보고하기 전에는 의견서를 낼 수 없다고 한다",
+        label: "이사회에 부속서 C를 보고해야 의견서를 낸다고 한다",
         effect: { legitimacy: 13, trust: 5, capital: -8, time: -6, humanCost: 2, fatigue: 5 },
         voice: "내 서명이 해마다 12억짜리 자리의 조건일 수는 없다며, 부속서 C를 이사회에 보고하기 전에는 의견서를 낼 수 없다고 한다.",
         echo: "보고 전에는 못 낸다고 하면 서명식이 멈춥니다. 조현석이 처음으로 영어로 욕을 하고, 곧 한국어로 사과합니다.",
@@ -240,7 +240,7 @@ const case29Nodes = {
       },
       {
         id: "c29_final_sign",
-        label: "의견서에 서명하고 부속서가 붙은 계약서를 들고 귀국해 뒤에서 싸운다",
+        label: "의견서에 서명하고 부속서를 들고 귀국해 뒤에서 싸운다",
         effect: { capital: 10, time: 6, legitimacy: 4, trust: -5, humanCost: 5, fatigue: -2 },
         voice: "빈 서명란으로는 여기서 밀려날 뿐이라며, 의견서에 서명하고 부속서가 붙은 계약서를 들고 귀국해 뒤에서 싸운다.",
         echo: "서명하면 거래가 닫힙니다. 가방 속 계약서는 무겁고, 46명의 첫 독촉 전화는 다음 달 첫째 주에 갑니다.",

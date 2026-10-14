@@ -194,7 +194,7 @@ const case12Nodes = {
       },
       {
         id: "c12_memorial_son",
-        label: "문하준에게 은행이 어떻게 판단하는지 직접 가르쳐 주겠다고 약속한다",
+        label: "문하준에게 은행이 판단하는 법을 가르쳐 주겠다고 약속한다",
         effect: { trust: 11, humanCost: -4, capital: -5, time: -7, fatigue: 5 },
         voice: "그 다짐을 흘려듣지 않겠다며, 문하준에게 은행이 어떻게 판단하는지 직접 가르쳐 주겠다고 약속한다.",
         echo: "약속하면 문하준이 휴대폰에 당신 번호를 저장합니다. 이름 칸에 '반대 의견'이라고 적습니다.",
@@ -680,7 +680,7 @@ export const case12 = {
   memoryPlan: {
     systemNext: "c12_route_system",
     evidenceNext: "c12_evidence_turn",
-    systemLabel: "참고인석을 앞두고 새로 짠 판이 배상안 보도자료에 어떻게 옮겨졌는지 읽는다",
+    systemLabel: "참고인석 전에 짠 판이 배상안 보도자료에 옮겨졌는지 읽는다",
     evidenceLabel: "폐기 기록을 들고 배상금이 어디서 나왔는지 장부를 넘긴다",
     systemEcho: "읽어 보면 보도자료는 당신의 판에서 기한과 날짜를 뺀 나머지만 실었습니다. 에코가 그 옆에 같은 조건이 붙었던 배상안들을 띄웁니다.",
     evidenceEcho: "폐기 시각이 적힌 기록을 배상금 장부에 대면 돈이 나온 계정이 읽힙니다. 지운 사람 쪽 계정은 그 목록에 없습니다.",

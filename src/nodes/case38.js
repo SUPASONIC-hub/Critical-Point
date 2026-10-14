@@ -288,7 +288,7 @@ export const case38 = {
         },
         {
           id: "c38_after_record",
-          label: "증언 요지와 방청 기록을 문서로 정리해 대리인단과 리드라인에 넘긴다",
+          label: "증언 요지와 방청 기록을 정리해 대리인단과 리드라인에 넘긴다",
           effect: { legitimacy: 14, trust: 2, time: -5, capital: -2, fatigue: 4 },
           voice: "방송 전에 오늘 법정이 글로 서 있어야 한다며, 증언 요지와 방청 기록을 문서로 정리해 대리인단과 리드라인에 넘긴다.",
           echo: "문서는 밤 11시에 대리인단과 리드라인에 도착합니다. 서하린이 그중 두 문장에 밑줄을 긋습니다. 문하준의 팔각형 그림은 뺄지 말지 한참 고민합니다.",
@@ -682,7 +682,7 @@ export const case38 = {
   memoryPlan: {
     systemNext: "c38_route_system",
     evidenceNext: "c38_evidence_turn",
-    systemLabel: "데이터센터에서 새로 짠 판이 그룹 쪽 서면의 첨부에 끼어 있는지 넘겨 본다",
+    systemLabel: "데이터센터에서 짠 판이 그룹 쪽 서면 첨부에 끼었는지 본다",
     evidenceLabel: "정렬된 유출의 증인 순서를 피고가 없다고 한 서류 목록 곁에 편다",
     systemEcho: "첨부 17번까지 넘겨도 당신의 판은 없고 당신의 망설임만 있습니다. 이민서가 서면이 떼어 내려는 212명 쪽으로 표를 돌립니다.",
     evidenceEcho: "증인 순서를 곁에 펴면 저쪽은 누가 무엇을 가졌는지 먼저 알고 있었습니다. 없다던 서류의 목록에도 상자 번호가 달려 있습니다.",

@@ -682,8 +682,8 @@ export const case44 = {
   memoryPlan: {
     systemNext: "c44_route_system",
     evidenceNext: "c44_evidence_turn",
-    systemLabel: "이사회 전날 새로 짠 판이 그룹 입장문에 되풀이됐는지 읽어 내려간다",
-    evidenceLabel: "두 장의 보도자료가 쓰인 날짜를 처벌불원서가 만들어진 날의 장부 위에 올린다",
+    systemLabel: "이사회 전날 새로 짠 판이 그룹 입장문에 되풀이됐는지 읽는다",
+    evidenceLabel: "보도자료 두 장의 날짜를 처벌불원서 날의 장부에 올린다",
     systemEcho: "입장문을 끝까지 읽어도 판이 옮겨 간 흔적은 없습니다. 이민서가 그 대신 회사가 용서한 재판들을 10년 치로 검색합니다.",
     evidenceEcho: "날짜를 올리면 결말을 먼저 써 두는 버릇이 장부에도 있습니다. 배상금 한 줄이 선고 전에 이름을 갈아입었습니다.",
   },

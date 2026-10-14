@@ -656,7 +656,7 @@ export const case40 = {
     choices: [
       {
         id: "c40_evidence_turn_hand",
-        label: "투자 승인서와 이름표 기록을 청문회 자료로 국회 보좌관 차지원에게 넘긴다",
+        label: "승인서와 이름표 기록을 청문회 자료로 차지원에게 넘긴다",
         effect: { legitimacy: 13, trust: 5, capital: -7, time: -7, fatigue: 6 },
         voice: "한 바퀴 도는 돈은 국회가 물을 일이라며, 투자 승인서와 이름표 기록을 청문회 자료로 국회 보좌관 차지원에게 넘긴다.",
         echo: "자료가 넘어가면 차지원이 질문지를 다시 씁니다. 윤상혁의 서명이 청문회 화면에 뜰 차례를 기다립니다.",

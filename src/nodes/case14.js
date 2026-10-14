@@ -132,7 +132,7 @@ const case14Nodes = {
     choices: [
       {
         id: "c14_desk_play",
-        label: "창구에서 들은 설명을 주은채에게 그대로 옮기고 함께 멈추자고 한다",
+        label: "창구에서 들은 설명을 주은채에게 전하고 함께 멈추자고 한다",
         effect: { trust: 12, legitimacy: 6, capital: -5, time: -7, fatigue: 5 },
         voice: "자기 펀드가 어떻게 팔리는지 들어야 한다며, 창구에서 들은 설명을 주은채에게 그대로 옮기고 함께 멈추자고 한다.",
         echo: "설명을 들은 주은채가 두 번 되묻습니다. 세 번째에는 형광펜을 내려놓고 한동안 화면만 봅니다.",
@@ -185,7 +185,7 @@ const case14Nodes = {
       },
       {
         id: "c14_class_notice",
-        label: "이미 가입한 어르신들에게 취소 방법을 서면으로 안내한다",
+        label: "이미 가입한 어르신들께 취소 방법을 서면으로 알린다",
         effect: { legitimacy: 10, trust: 4, time: -4, humanCost: 3, fatigue: 4 },
         voice: "말로 들은 것은 또 달라진다며, 이미 가입한 어르신들에게 취소 방법을 서면으로 안내한다.",
         echo: "서면 안내는 모두에게 갑니다. 글씨가 작아서 이정숙이 돋보기를 돌려 가며 다시 읽어 줍니다.",

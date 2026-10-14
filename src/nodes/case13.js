@@ -502,7 +502,7 @@ export const case13 = {
       choices: [
         {
           id: "c13_branch_extras_tell",
-          label: "곽민재와 보조출연자들에게 이 광고가 무엇인지 먼저 알린다",
+          label: "곽민재와 보조출연자들에게 이 광고의 정체부터 알린다",
           effect: { trust: 11, humanCost: -4, time: -3, capital: -2, fatigue: 4 },
           voice: "웃기 전에 알 권리가 있다며, 곽민재와 보조출연자들에게 이 광고가 무엇인지 먼저 알린다.",
           echo: "알리면 여덟 명 중 둘이 도시락을 덮고 일어섭니다. 남은 여섯에게는 오늘 일당이 필요합니다. 곽민재도 남습니다.",
@@ -595,7 +595,7 @@ export const case13 = {
         },
         {
           id: "c13_route_system_clause",
-          label: "권고 이행 여부를 분기마다 공개하는 조항을 출연 조건에 넣는다",
+          label: "권고 이행을 분기마다 공개하는 조항을 출연 조건에 넣는다",
           effect: { legitimacy: 9, capital: 4, trust: 3, time: -7, humanCost: 3, fatigue: 6 },
           voice: "17건으로 끝난 전례를 따르지 않게, 권고 이행 여부를 분기마다 공개하는 조항을 출연 조건에 넣는다.",
           echo: "조항이 들어가면 위원회는 매 분기 숫자를 내야 합니다. 첫 숫자가 나오기까지 석 달이 걸립니다.",
@@ -682,7 +682,7 @@ export const case13 = {
   memoryPlan: {
     systemNext: "c13_route_system",
     evidenceNext: "c13_evidence_turn",
-    systemLabel: "조정 전날 새로 짠 판이 혁신위원회 계획서 어디에 들어갔는지 짚는다",
+    systemLabel: "조정 전날 짠 판이 혁신위원회 계획서 어디에 들었는지 짚는다",
     evidenceLabel: "직전 단서의 광고비 계정을 혁신위원회 예산서에 붙인다",
     systemEcho: "짚어 보면 계획서에는 당신의 판에서 온 말이 제목에만 남았습니다. 에코가 사고 뒤에 세워진 위원회 스물세 곳을 그 밑에 답니다.",
     evidenceEcho: "광고비 계정을 예산서에 붙이면 비용 코드 하나가 두 번 나옵니다. 한 번은 광고이고, 한 번은 4층을 비우는 공사입니다.",

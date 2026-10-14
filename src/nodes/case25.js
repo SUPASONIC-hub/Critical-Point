@@ -436,7 +436,7 @@ export const case25 = {
       memo: ["KD데이터랩 서버 -- 트리거랩 폴더, 이름만 바뀜", "매주 월요일 새벽 외부 계정 접속"],
       choices: [
         {
-          label: "이민서가 혼자 위험해지지 않게 그 폴더는 건드리지 말라고 한다",
+          label: "이민서 혼자 위험해지지 않게 그 폴더는 건드리지 말라고 한다",
           effect: { trust: 9, humanCost: -4, legitimacy: -2, time: -3, fatigue: 3 },
           voice: "갓 출근한 이민서가 혼자 위험해지지 않게, 그 폴더는 건드리지 말라고 한다.",
           echo: "건드리지 말라고 하면 이민서는 고개를 끄덕입니다. 월요일 새벽의 접속은 그다음 주에도 이어집니다.",
@@ -704,7 +704,7 @@ export const case25 = {
   },
   openingSignatures: {
     c25_start_warm: {
-      label: "로비에서 기다린 다섯에게 빈방 사진을 보여 주고 아침까지 곁을 지킨다",
+      label: "로비의 다섯에게 빈방 사진을 보여 주고 아침까지 곁을 지킨다",
       effect: { trust: 10, humanCost: -3, time: -5, capital: -2, fatigue: 4 },
       cognition: { reframing: 2 },
       voice: "같이 건너온 밤은 같이 끝내야 한다며, 로비에서 기다린 다섯에게 빈방 사진을 보여 주고 아침까지 곁을 지킨다.",

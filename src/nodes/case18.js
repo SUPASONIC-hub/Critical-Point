@@ -231,7 +231,7 @@ const case18Nodes = {
       },
       {
         id: "c18_final_terms",
-        label: "보내되 채무자 보호 조항과 안팎에서 같이 싸울 약속을 조건으로 건다",
+        label: "보내되 채무자 보호 조항과 함께 싸울 약속을 조건으로 건다",
         effect: { legitimacy: 13, trust: 8, capital: -6, time: -8, humanCost: 3, fatigue: 6 },
         voice: "혼자 들어가 혼자 싸우게 두지 않으려고, 보내되 채무자 보호 조항과 안팎에서 같이 싸울 약속을 조건으로 건다.",
         echo: "조건을 걸면 오진우는 가고, 계약서에 채무자 보호 조항 한 장이 붙습니다. 그 조항을 지키게 할 사람은 이제 다른 은행에 있습니다.",
@@ -681,7 +681,7 @@ export const case18 = {
   memoryPlan: {
     systemNext: "c18_route_system",
     evidenceNext: "c18_evidence_turn",
-    systemLabel: "수첩을 두고 새로 짠 판이 브릿지의 후보자 평가표에 실렸는지 확인한다",
+    systemLabel: "수첩을 두고 짠 판이 브릿지 후보자 평가표에 실렸는지 본다",
     evidenceLabel: "내선 번호의 주인을 매각 계약서 부속 합의서에서 찾는다",
     systemEcho: "확인하면 평가표에 실린 것은 판이 아니라 숫자입니다. 소수점까지 트리거랩의 반응 기록과 같고, 에코가 두 숫자에 밑줄을 긋습니다.",
     evidenceEcho: "내선 번호의 주인을 매각 계약서에 대면 부속 합의서가 한 장 더 딸려 나옵니다. 가격이 아닌 것이 거래 조건에 들어 있습니다.",
@@ -712,7 +712,7 @@ export const case18 = {
       echo: "물으면 브릿지는 정중한 답장을 보냅니다. '공개된 자료를 참고했습니다.' 누가 그 자료를 건넸는지는 적혀 있지 않습니다.",
     },
     c18_start_rush: {
-      label: "어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다",
+      label: "어젯밤 먼저 뜬 일은 변명 없이 오진우와 결론까지 이야기한다",
       effect: { trust: 12, legitimacy: 5, humanCost: 5, fatigue: 4 },
       cognition: { risk: 2 },
       voice: "오래 끌지 말라는 부탁을 들어주려고, 어젯밤 먼저 뜬 일은 변명하지 않고 오진우와 바로 결론까지 이야기한다.",

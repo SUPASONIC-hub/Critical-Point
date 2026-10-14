@@ -598,7 +598,7 @@ export const case20 = {
         },
         {
           id: "c20_route_system_notify",
-          label: "심사를 앞둔 신청인들에게 엔진이 바뀐다는 사실부터 알린다",
+          label: "심사를 앞둔 신청인들에게 엔진이 바뀐다고 먼저 알린다",
           effect: { trust: 10, humanCost: -5, legitimacy: 3, capital: -6, time: -6, fatigue: 6 },
           voice: "결정에서 빠진 사람들이 먼저 알아야 한다며, 심사를 앞둔 신청인들에게 엔진이 바뀐다는 사실부터 알린다.",
           echo: "알림을 받은 신청인 중 수백 명이 전화를 겁니다. 창구 직원들은 노아가 무엇인지 설명할 문장을 아직 받지 못했습니다.",

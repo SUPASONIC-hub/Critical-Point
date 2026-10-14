@@ -612,7 +612,7 @@ export const case19 = {
     finalChoices: [
       {
         id: "a",
-        label: "기록 보관처가 있는 건물은 철거 전에 기록 조사를 거치게 하라고 요구한다",
+        label: "기록이 보관된 건물은 철거 전 기록 조사를 거치라고 요구한다",
         effect: { legitimacy: 13, trust: 6, capital: -8, humanCost: -4, fatigue: 7 },
         voice: "다음 건물에서 같은 일이 되풀이되지 않게, 기록 보관처가 있는 건물은 철거 전에 기록 조사를 거치게 하라고 요구한다.",
         echo: "조건이 생기면 다음 철거 전에 누군가 건물 안의 종이를 확인해야 합니다. 그 조건에 KD리얼티는 석 달 동안 답하지 않습니다.",
@@ -653,7 +653,7 @@ export const case19 = {
     choices: [
       {
         id: "c19_evidence_turn_file",
-        label: "변경 공문과 예산서 사본을 묶어 감사위원회에 정식으로 낸다",
+        label: "변경 공문과 예산서 사본을 감사위원회에 정식으로 낸다",
         effect: { legitimacy: 13, trust: 4, capital: -7, time: -7, fatigue: 6 },
         voice: "두 장이 한 줄에 놓인 이상 절차로 가야 한다며, 변경 공문과 예산서 사본을 묶어 감사위원회에 정식으로 낸다.",
         echo: "감사위원회에 가면 백아린의 이름이 공식 문서에 처음 오릅니다. 선우진의 이름도 함께 오르고, 그는 아직 그 사실을 모릅니다.",
@@ -661,7 +661,7 @@ export const case19 = {
       },
       {
         id: "c19_evidence_turn_hold",
-        label: "선우진이라는 이름은 알아 두고 지금은 아무에게도 말하지 않는다",
+        label: "선우진이란 이름은 알아 두고 아직 누구에게도 말하지 않는다",
         effect: { capital: 8, time: 6, trust: -6, legitimacy: -5, humanCost: 5, fatigue: -4 },
         voice: "이름 하나로 움직이기엔 아직 이르다며, 선우진이라는 이름은 알아 두고 지금은 아무에게도 말하지 않는다.",
         echo: "이름은 당신 수첩에만 있습니다. 211번 상자가 있는 B2의 출입 기록은 그룹이 매일 봅니다.",

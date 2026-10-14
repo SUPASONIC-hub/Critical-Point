@@ -712,7 +712,7 @@ export const case39 = {
       echo: "출처가 붙으면 두 문장은 법정 기록이 됩니다. 법정 기록을 자르는 일은 광고 이름으로 하기 조금 어려워집니다.",
     },
     c39_start_rush: {
-      label: "도율이 사본을 언제 받았는지 방송국 법무팀부터 찾아가 묻는다",
+      label: "도율이 사본을 언제 받았는지 방송국 법무팀에 묻는다",
       effect: { legitimacy: 6, capital: 4, time: 3, trust: -4, humanCost: 2, fatigue: 2 },
       cognition: { risk: 2 },
       voice: "20분을 짚은 손이 어디서 왔는지 먼저 잡으려고, 도율이 사본을 언제 받았는지 방송국 법무팀부터 찾아가 묻는다.",
