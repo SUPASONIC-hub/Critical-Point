@@ -231,6 +231,10 @@ test("a save made offline is uploaded when the connection comes back", async ({ 
   const uploads = [];
   // Playwright tries the most recently added route first, so the catch-all goes in first.
   await page.route(`${SUPABASE}/**`, (route) => route.fulfill({ status: 201, contentType: "application/json", body: "{}" }));
+  // A code the server has never seen. The catch-all's `{}` is an answer with
+  // no revision in it, and a device with none on record uploads nothing
+  // until it has been told what the server holds (cloudSave.js).
+  await page.route(`${SUPABASE}/rest/v1/rpc/peek_cloud_save`, (route) => route.fulfill({ status: 200, contentType: "application/json", body: "null" }));
   await page.route(`${SUPABASE}/rest/v1/rpc/put_cloud_save`, async (route) => {
     uploads.push(route.request().postDataJSON());
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ accepted: true }) });
@@ -242,6 +246,15 @@ test("a save made offline is uploaded when the connection comes back", async ({ 
   // the page's own timers rather than 3.5 wall-clock seconds of hoping.
   await page.clock.install();
   await startDebugNode(page, "case02", "c2_logs");
+  // Starting the node is a save, uploaded 2.5 seconds later. Going offline
+  // while that upload is between its peek and its put let the put be counted
+  // as one sent offline (1 run in 6), so the device is first let catch up.
+  await expect
+    .poll(async () => {
+      const [save, sync] = await Promise.all([readJsonStorage(page, TEST_STORAGE_KEYS.save), readJsonStorage(page, TEST_STORAGE_KEYS.cloudSync)]);
+      return Boolean(save?.savedAt) && sync?.synced === save.savedAt && !sync.pending;
+    }, { message: "the save made by starting the node is uploaded before the connection goes", timeout: 10_000 })
+    .toBe(true);
   await context.setOffline(true);
   const offlineUploads = uploads.length;
   await page.getByRole("button", { name: "저장", exact: true }).click();

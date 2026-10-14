@@ -16,7 +16,7 @@ import {
   setCloudSaveEnabled,
   subscribeCloudSave,
 } from "../cloudSave.js";
-import { CLOUD_SAVE_CODE_KEY, CLOUD_SAVE_RETENTION_DAYS, readStoredValue, STORAGE_KEY } from "../appConfig.js";
+import { CLOUD_SAVE_CODE_KEY, readStoredValue, STORAGE_KEY } from "../appConfig.js";
 import { confirmAction } from "../state/confirmAction.js";
 
 function hasLocalRun() {
@@ -94,7 +94,10 @@ export function CloudSavePanelBody() {
     try {
       const { deleted, unsupported } = await deleteCloudSave();
       if (unsupported) {
-        failed(`지금은 온라인 사본을 바로 지울 수 없습니다. 마지막으로 올린 날부터 ${CLOUD_SAVE_RETENTION_DAYS}일 뒤에 자동으로 지워집니다.`);
+        // No server in this build, so no promise about a copy: it used to
+        // say the copy is removed after the retention period, which nothing
+        // here can know or do.
+        failed("이 배포에는 온라인 저장 서버가 없어 여기서는 온라인 사본을 지울 수 없습니다.");
       } else {
         done(deleted ? "온라인에 올린 진행 기록을 지웠습니다." : "온라인에 남아 있는 진행 기록이 없습니다.");
       }

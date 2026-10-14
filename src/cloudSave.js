@@ -54,9 +54,15 @@ import { callSupabaseRpc, telemetryEnabled } from "./telemetry.js";
  * made. Against one without them a put that names a revision, and a delete,
  * fail and are shown as failures, and a peek is one more question the server
  * did not answer. That last case is the one production has -- the server
- * cannot be asked (no answer, or its read limit): this device's own
- * bookkeeping decides then, and with no revision on record the put names none
- * and the server orders it by time.
+ * cannot be asked (no answer, or its read limit). An upload still goes out
+ * then if this device has a revision on record to name, because the server
+ * refuses it when that revision is stale. With none on record nothing goes
+ * out: the save waits, the panel says why, and the retry tick asks again. It
+ * used to be sent naming no revision, and the server orders such a put by the
+ * save's own time -- which every local write stamps with the present -- so a
+ * device whose question went unanswered replaced whatever the code held.
+ * Every put now names a revision; 0 is "the server holds nothing", and only
+ * an answered peek can say so.
  *
  * This file must not import the scene graph: the intro loads it, when the
  * fold is opened or the device has opted in (`main.jsx`), and it is not part
@@ -255,35 +261,30 @@ function holdConflict({ savedAt = "", revision = null } = {}) {
 }
 
 /**
- * What the server holds for this code: `{ savedAt, revision }`, `null` when it
- * holds nothing, `undefined` when it cannot say (no answer at all, or a
- * refusal such as the read limit).
+ * What the server holds for this code: `{ savedAt, revision }`, or `null` when
+ * it holds nothing. It throws when the server cannot say: no answer at all, a
+ * refusal such as the read limit, or an answer with no revision in it.
  */
 async function peekRemote() {
-  try {
-    const { data } = await callSupabaseRpc("peek_cloud_save", { p_code: getCloudCode() });
-    if (data === null) return null;
-    // An answer with no revision in it is not an answer to this question.
-    const revision = toRevision(data?.revision);
-    return revision === null ? undefined : { savedAt: String(data.saved_at ?? ""), revision };
-  } catch (error) {
-    console.warn("Critical Point cloud save could not be checked", error);
-    return undefined;
-  }
+  const { data } = await callSupabaseRpc("peek_cloud_save", { p_code: getCloudCode() });
+  if (data === null) return null;
+  const revision = toRevision(data?.revision);
+  // The status keeps it from being described as a connection that failed.
+  if (revision === null) throw Object.assign(new Error("no revision"), { status: 200 });
+  return { savedAt: String(data.saved_at ?? ""), revision };
 }
 
-/** One put. With no revision to name (`resolveExpectedRevision`) the server orders it by time. */
+/** One put, on the revision it was built on: the server refuses it when the stored copy is at another. */
 async function putRemote(save, expectedRevision) {
-  const body = {
-    p_code: getCloudCode(),
-    p_saved_at: save.savedAt,
-    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
-  };
   const now = Date.now();
   while (putTimes.length > 0 && now - putTimes[0] >= HOUR_MS) putTimes.shift();
   putTimes.push(now);
-  if (expectedRevision === null) return (await callSupabaseRpc("put_cloud_save", body)).data;
-  return (await callSupabaseRpc("put_cloud_save", { ...body, p_expected_revision: expectedRevision })).data;
+  return (await callSupabaseRpc("put_cloud_save", {
+    p_code: getCloudCode(),
+    p_saved_at: save.savedAt,
+    p_payload: { save: createCloudSavePayload(save), settledWindows: readSettledWindowSeeds() },
+    p_expected_revision: expectedRevision,
+  })).data;
 }
 
 /**
@@ -310,17 +311,43 @@ function isOwnRemote(remote, save) {
  * record (a device that opted in before revisions were sent) the server's copy
  * counts as this device's own only when its time is the time of the save this
  * device last had accepted.
+ *
+ * When the server cannot be asked, the revision is one this device already
+ * has: the one on record, or for an overwrite the one the conflict named,
+ * which is the copy the player was shown and agreed to replace. With neither,
+ * the failure is thrown and nothing is uploaded; the save is noted as pending
+ * so the retry tick asks again.
  */
 async function resolveExpectedRevision(sync, save, { overwrite }) {
   if (sync.revision !== null && !overwrite && remoteChecked) return { expected: sync.revision };
-  const remote = await peekRemote();
   remoteChecked = true;
-  if (remote === undefined) return { expected: overwrite ? null : sync.revision };
+  let remote;
+  try {
+    remote = await peekRemote();
+  } catch (error) {
+    console.warn("Critical Point cloud save could not be checked", error);
+    const known = (overwrite && sync.conflict ? sync.conflict : sync).revision;
+    if (known !== null) return { expected: known };
+    if (!sync.pending) writeSync({ pending: save.savedAt });
+    throw error;
+  }
   if (remote === null) return { expected: 0 };
   if (overwrite) return { expected: remote.revision };
   const own = sync.revision !== null ? remote.revision === sync.revision : Boolean(sync.synced) && sameInstant(remote.savedAt, sync.synced);
   if (own || isOwnRemote(remote, save)) return { expected: remote.revision };
   return { conflict: remote };
+}
+
+/**
+ * flushCloudSave checks the connection once, before the peek, and the
+ * connection can drop while the peek is answered. A put is never sent while
+ * the device is offline: the save is left pending, and the `online` event
+ * sends it.
+ */
+function stayOnline(save) {
+  if (!isOffline()) return;
+  if (!readSync().pending) writeSync({ pending: save.savedAt });
+  throw Object.assign(new Error("offline"), { status: 0 });
 }
 
 async function upload(save, pending, { overwrite }) {
@@ -337,16 +364,20 @@ async function upload(save, pending, { overwrite }) {
   }
   // The server holds what this device last sent, and nothing has changed here.
   if (upToDate && !overwrite && expected !== 0) {
-    if (expected !== null) writeSync({ revision: expected });
+    writeSync({ revision: expected });
     publish({ phase: "synced", syncedAt: sync.synced });
     return true;
   }
+  stayOnline(save);
   publish({ phase: "syncing", message: "" });
-  let data = await putRemote(save, expected ?? null);
+  let data = await putRemote(save, expected);
   // Refused over a copy another tab of this device just put there: built on
   // that copy, the upload is sent once more (isOwnRemote).
   const refusedAt = data?.accepted === false ? { savedAt: data.saved_at, revision: toRevision(data.revision) } : null;
-  if (refusedAt && refusedAt.revision !== null && isOwnRemote(refusedAt, save)) data = await putRemote(save, refusedAt.revision);
+  if (refusedAt && refusedAt.revision !== null && isOwnRemote(refusedAt, save)) {
+    stayOnline(save);
+    data = await putRemote(save, refusedAt.revision);
+  }
   if (data?.accepted === false) {
     holdConflict({ savedAt: data.saved_at, revision: data.revision });
     return false;
