@@ -155,7 +155,7 @@ export function GauntletHand({
                 <Lock size={12} aria-hidden="true" /> 최고 칩 봉인 {schema.sealBreak}
               </span>
             )}
-            {!open && <span className="gx-card-seal">LOCKED · {getLockReason(card)}</span>}
+            {!open && <span className="gx-card-seal"><span><span lang="en">LOCKED</span> · {getLockReason(card)}</span></span>}
           </GuardedButton>
         );
       })}

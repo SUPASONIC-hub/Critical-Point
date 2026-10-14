@@ -42,8 +42,8 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
             onClick={() => onPick(mode)}
           >
             <span lang="en">{profile.label}</span>
-            <em>
-              <span className="sr-only">시즌 숙련 </span>
+            <em lang={mastered ? "en" : undefined}>
+              <span className="sr-only" lang="ko">시즌 숙련 </span>
               {mastered ? "MASTER" : `${count}/${STANCE_MASTERY_GOAL}`}
             </em>
             <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>

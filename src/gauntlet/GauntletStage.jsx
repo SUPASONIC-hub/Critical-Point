@@ -455,14 +455,14 @@ export function GauntletStage({
           <div className="gx-signals">
             {chainOn && (
             <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
-              <b>{overdrive.label}</b> <span>{overdrive.text}</span>
+              <b lang="en">{overdrive.label}</b> <span>{overdrive.text}</span>
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
             </span>
             )}
             {lockOn && (
             <span className={`gx-focus-signal focus-${focusBonus.tier}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
-              <b>{focusBonus.label} {Math.round(win.focus)}</b>
+              <b lang="en">{focusBonus.label} {Math.round(win.focus)}</b>
               <small>판돈 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
@@ -690,7 +690,7 @@ export function GauntletStage({
           <Crosshair size={18} aria-hidden="true" />
           <span lang="en">LOCK</span>
           {/* What a press costs is on the button: the clock is the only price. */}
-          <small>{focusModeProfile.label} {Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
+          <small><span lang="en">{focusModeProfile.label} {Math.round(win.focus)}</span> · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
             지금 차지 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. 판돈 배율은 상한까지만 오른다
           </span>

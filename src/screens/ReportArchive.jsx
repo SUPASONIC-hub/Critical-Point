@@ -76,7 +76,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     {currentCase === "final" && (
       <section className="achievement-panel ending-achievement-panel" aria-label="업적 진행">
         <span lang="en">ACHIEVEMENT TRACKER</span>
-        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
+        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small lang={item.unlocked ? "en" : undefined}>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
       </section>
     )}
     {currentCase === "final" && (

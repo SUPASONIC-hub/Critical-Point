@@ -45,7 +45,7 @@ export function RankingScreen({
           </header>
           <section className="ranking-status-bar" aria-busy={statusCopy.loading}>
             <div>
-              <span>{statusCopy.eyebrow}</span>
+              <span lang="en">{statusCopy.eyebrow}</span>
               <strong>{statusCopy.title}</strong>
               {statusCopy.text && <p>{statusCopy.text}</p>}
             </div>
