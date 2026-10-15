@@ -140,6 +140,10 @@ let doorMoved = 0;
 const populationSeen = [];
 const populationBuilds = [];
 let doorCouldMove = 0;
+// The ending funnel at the very end of the report: each row's seasons, kept in
+// report mode only (`funnelRow`). Filled by the population below and by the
+// wild-card hands; it reads the seasons and draws nothing.
+const funnelRows = [];
 const dump = [];
 for (let index = 0; index < SEASONS; index += 1) {
   const archetype = POPULATION[index % POPULATION.length];
@@ -147,6 +151,7 @@ for (let index = 0; index < SEASONS; index += 1) {
   const season = playSeason(index, archetype, false, seen.watch);
   populationSeen.push(seen);
   populationBuilds.push(season.relics);
+  if (reportMode) funnelRow(archetype).push(funnelSeason(season));
   const closesOn = (seasonBestLogic) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic }).id;
   if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
   counts.set(season.ending.id, (counts.get(season.ending.id) ?? 0) + 1);
@@ -350,6 +355,7 @@ if (reportMode) {
     const total = addSeen(played.map((entry) => entry.seen));
     const endings = new Map();
     for (const { season } of played) endings.set(season.ending.id, (endings.get(season.ending.id) ?? 0) + 1);
+    funnelRow(`${name}, the wild-card seasons`).push(...played.map((entry) => funnelSeason(entry.season)));
     const moves = (map) => ["build", "grow", "switch", "keep", "break", "bust", "none"].map((move) => `${move} ${map[move] ?? 0}`).join(", ");
     console.log(
       `  ${name}: windows a season ${(total.windows / WILD_SEASONS).toFixed(0)}, wild card dealt on ${per(total.dealtWild, total.windows)}% and staked on ${per(total.stakedWild, total.windows)}%; longest streak ${fiveNumbers(played.map((entry) => entry.seen.best))}, mean streak over every window ${(total.streakSum / total.windows).toFixed(2)}; streak ended by a change of type on ${per(total.moves.break ?? 0, total.windows)}% of windows (${((total.moves.break ?? 0) / WILD_SEASONS).toFixed(1)} a season) and by a bust on ${per(total.moves.bust ?? 0, total.windows)}% (${((total.moves.bust ?? 0) / WILD_SEASONS).toFixed(1)} a season); hold rate ${fiveNumbers(played.map((entry) => entry.season.logic.logicHold ?? 0))}; pot bonus x${(total.bonusSum / Math.max(1, total.cashed)).toFixed(3)} over cashed windows, at the cap on ${per(total.capped, total.cashed)}%; banked a season ${fiveNumbers(played.map((entry) => entry.seen.banked))} (mean ${Math.round(total.banked / WILD_SEASONS)}), the streak's share of the pots ${per(total.logicPot, total.pot)}%; slack door open in ${played.filter((entry) => entry.season.strain.seasonBestLogic >= LOGIC_SLACK_STREAK).length} seasons`,
@@ -517,5 +523,63 @@ if (reportMode) {
   console.log(" a cap tried by passing (the tool hand, everything unlocked; no swap: the first tools taken are the ones kept):");
   for (const slots of [3, 5, 8]) {
     for (const policy of ["random", "need"]) playTools(`${slots} slots, ${policy} draft`, { hand: true, codex: UNLOCKABLE, slots, policy });
+  }
+}
+
+/**
+ * The ending funnel (measured, not asserted, 2026-10-14: improvement notes C2,
+ * for day 10): for each archetype of the population above, and for the two
+ * wild-card hands, how its seasons spread over the endings, which answer the
+ * finale took, and -- where `src/judgementHabit.js` exists -- which of the
+ * judgement habits the result card would name the season. It is the last thing
+ * the report prints and it plays no season and draws nothing from the stream,
+ * so every line above is the line it was and a before/after diff of a rule
+ * change only grows at the bottom.
+ *
+ * The finale's answer is read as `getEndingVariant` reads it (the last
+ * `f_after_*` card of the final case): witness keeps every record and goes
+ * outside (폭로), control changes the consent rules from inside (개혁), burn
+ * seals everything away (봉인). "none" is a final case closed without one of
+ * the three, which the wild card's route can do.
+ *
+ * The habits are what the card would print for a bot, so `marathon` and
+ * `lightning` read the bot's seconds (its think time and pushes), not a
+ * person's. Without the module the line says so once and is skipped.
+ */
+function funnelRow(name) {
+  let row = funnelRows.find((entry) => entry.name === name);
+  if (!row) funnelRows.push((row = { name, seasons: [] }));
+  return row.seasons;
+}
+function funnelSeason(season) {
+  const answer = [...(season.final?.log ?? [])].reverse().find((entry) => /^f_after_(witness|control|burn)$/.test(entry?.choiceId ?? ""));
+  return { ending: season.ending.id, finale: answer ? answer.choiceId.slice("f_after_".length) : "none", caseResults: season.caseResults };
+}
+if (reportMode) {
+  const per = (part, whole) => ((100 * part) / Math.max(1, whole)).toFixed(1);
+  const tally = (seasons, read) => {
+    const map = new Map();
+    for (const season of seasons) map.set(read(season), (map.get(read(season)) ?? 0) + 1);
+    return map;
+  };
+  const spreadOf = (map, ids, total) => ids.map((id) => `${id} ${map.get(id) ?? 0} (${per(map.get(id) ?? 0, total)}%)`).join(", ");
+  const FINALE = [["witness", "폭로"], ["control", "개혁"], ["burn", "봉인"], ["none", "none"]];
+  let habits = null;
+  try {
+    habits = await import("../src/judgementHabit.js");
+  } catch (error) {
+    if (error?.code !== "ERR_MODULE_NOT_FOUND" || !String(error.message).includes("judgementHabit")) throw error;
+  }
+  console.log(`Ending funnel by player (measured, not asserted; each archetype's seasons of the ${SEASONS} above, then the wild-card hands' ${Number(process.env.ENDING_WILD_SEASONS) || 80} seasons each; counts, and the share of that row's seasons)`);
+  if (!habits) console.log("  judgement habits: skipped, src/judgementHabit.js is not on this branch");
+  for (const { name, seasons } of funnelRows) {
+    const total = seasons.length;
+    console.log(`  ${name} (${total} seasons): ${spreadOf(tally(seasons, (season) => season.ending), EXPECTED, total)}`);
+    const finale = tally(seasons, (season) => season.finale);
+    console.log(`    finale: ${FINALE.map(([id, word]) => `${id === "none" ? id : `${id}/${word}`} ${finale.get(id) ?? 0} (${per(finale.get(id) ?? 0, total)}%)`).join(", ")}`);
+    if (habits) {
+      const named = tally(seasons, (season) => habits.getJudgementHabit(season.caseResults)?.id ?? "(too few windows)");
+      console.log(`    habits: ${spreadOf(named, [...habits.JUDGEMENT_HABITS.map((habit) => habit.id), "(too few windows)"], total)}`);
+    }
   }
 }
