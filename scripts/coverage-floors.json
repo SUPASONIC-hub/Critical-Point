@@ -89,6 +89,7 @@
     "src/responsiveArt.js",
     "src/runtime/gameData.app.js",
     "src/runtime/gameDialogue.app.js",
+    "src/state/tabTitle.js",
     "src/state/useCaseSystems.js",
     "src/state/useClipboardStatus.js",
     "src/state/useEndingSequence.js",
