@@ -436,7 +436,14 @@ test("the report screen hands the card four things, and the ending passes them o
   );
   assert.doesNotMatch(literal, pattern);
   assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
-  assert.deepEqual(literal.match(/\bview\b[\w?.]*/g), ["view.endingPreview?.label", "view.score.caseResults"], "of the view, only these two");
+  // A collapse hands in its ending with the season's mark on the label
+  // (`endingCause.cardEnding`, useResultReport.js): the ending and a fixed
+  // phrase, nothing that says who played.
+  assert.deepEqual(
+    literal.match(/\bview\b[\w?.]*/g),
+    ["view.endingCause?.cardEnding", "view.endingPreview?.label", "view.score.caseResults"],
+    "of the view, only these three",
+  );
 
   const ending = readFileSync(new URL("../../src/components/EndingSequence.jsx", import.meta.url), "utf8");
   const uses = ending.split("\n").map((line) => line.trim()).filter((line) => /(^|[^-\w])card\b/.test(line) && !line.startsWith("//") && !line.startsWith("*"));
