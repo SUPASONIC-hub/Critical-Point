@@ -5,6 +5,7 @@ import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.j
 import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
+import { SceneMinutes } from "./SceneMinutes.jsx";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
 // so a ×1.75 the table printed as "×1.7" was "×1.8" in the heat record a moment later.
 import { describeLogicMove, describeNextTable, describeVerdictCause, formatMultiplier } from "../gauntlet/tableReadout.js";
@@ -194,9 +195,12 @@ export function DecisionReveal({ view }) {
         </div>
 
         {decisionReveal.skippedTitle && (
-          <p className="gx-reveal-skip" data-testid="blackout-skip">
-            <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
-          </p>
+          <>
+            <p className="gx-reveal-skip" data-testid="blackout-skip">
+              <b lang="en">LOST SCENE</b> 회의실은 당신 없이 「{decisionReveal.skippedTitle}」을 넘겼다.
+            </p>
+            <SceneMinutes nodeId={decisionReveal.skippedNodeId} />
+          </>
         )}
 
         {nextMutations.length > 0 && (

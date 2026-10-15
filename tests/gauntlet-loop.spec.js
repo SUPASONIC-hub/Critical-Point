@@ -5,7 +5,7 @@ import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { easyCognitionLabels } from "../src/playerLanguage.js";
-import { cashStakedCard, clickElement, dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
+import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
 
@@ -556,6 +556,142 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   await expect(page.locator(".gx-band-label")).toHaveText("벽 88–98");
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
 });
+
+/**
+ * What a bust's skip cost, as something that can still be read: the reveal's
+ * LOST SCENE line is followed by a closed fold with the skipped scene's
+ * minutes (SceneMinutes.jsx). The walk is read off the graph
+ * (`findSkippedSceneWalk`): the scene of 사건 01 nearest its result where a
+ * plain card leads to a scene a bust skips.
+ */
+async function bustOnSkippedSceneWalk(page) {
+  const walk = findSkippedSceneWalk("case01");
+  expect(walk, "사건 01 still has a card whose bust skips a scene").not.toBeNull();
+  await openTable(page, walk.caseId, walk.fromId);
+  await clickElement(cardOf(page, walk.label), `stake ${walk.label}`);
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await bustStakedCard(page);
+  return walk;
+}
+
+test("a bust's reveal folds the skipped scene minutes: closed, opened from the keyboard, and in the scene's own words", async ({ page }) => {
+  test.setTimeout(120_000);
+  const walk = await bustOnSkippedSceneWalk(page);
+  const skipped = nodes[walk.skippedId];
+  const reveal = page.locator(".decision-reveal");
+  const next = page.getByTestId("decision-next");
+  const fold = reveal.getByTestId("scene-minutes");
+  const summary = fold.locator("summary");
+
+  // The bust's log entry names the scene the room played alone, and the run stands on the one after it.
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1).skippedNodeId, { timeout: TRANSITION_TIMEOUT_MS }).toBe(walk.skippedId);
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(walk.onwardId);
+
+  // The line that was there before, and under it one fold, closed.
+  await expect(page.getByTestId("blackout-skip")).toContainText(`「${skipped.title}」`);
+  await expect(fold).toHaveCount(1);
+  await expect(fold).toHaveJSProperty("open", false);
+  await expect(fold.locator("div > p").first()).toBeHidden();
+  await expectSceneMinutes(fold, skipped);
+
+  // From the keyboard: focus opens on the way out, Shift+Tab steps back to the fold (the focusable just
+  // before it; a short reveal heads its sheet with 자세히, so Tab would wrap there), Enter opens it.
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(summary).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(fold).toHaveJSProperty("open", true);
+  await expect(fold.locator("div > p").first()).toBeVisible();
+  await expect(fold.locator("div > p.spoken-line")).toBeVisible();
+  // Enter was the fold's: the reveal is still up, on the same verdict, and the run has not moved.
+  await expect(reveal).toBeVisible();
+  await expect(reveal.locator("h2")).toHaveText("BUST");
+  await expect(summary).toBeFocused();
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(walk.onwardId);
+  // And it closes again on the same key.
+  await page.keyboard.press("Enter");
+  await expect(fold).toHaveJSProperty("open", false);
+  await page.keyboard.press("Enter");
+  await expect(fold).toHaveJSProperty("open", true);
+
+  // Tab goes on to the way out, which still leaves: the next table is the scene after the skipped one.
+  await page.keyboard.press("Tab");
+  await expect(next).toBeFocused();
+  await clickElement(next, "next after reading the minutes");
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(walk.onwardId);
+});
+
+test("a cash on the same card shows no skipped scene minutes", async ({ page }) => {
+  const walk = findSkippedSceneWalk("case01");
+  expect(walk, "사건 01 still has a card whose bust skips a scene").not.toBeNull();
+  await openTable(page, walk.caseId, walk.fromId);
+  await clickElement(cardOf(page, walk.label), `stake ${walk.label}`);
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const reveal = page.locator(".decision-reveal");
+  await expect(reveal.locator("h2")).toHaveText(/^×/);
+  await expect(reveal.getByTestId("blackout-skip")).toHaveCount(0);
+  await expect(reveal.getByTestId("scene-minutes")).toHaveCount(0);
+  await expect(reveal.locator("details")).toHaveCount(0);
+  // The scene the bust would have skipped is the one the run plays next.
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId, { timeout: TRANSITION_TIMEOUT_MS }).toBe(walk.skippedId);
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  expect(saved.log.at(-1).threshold.busted).toBeFalsy();
+  expect(saved.log.at(-1).skippedNodeId).toBeUndefined();
+});
+
+/**
+ * With the fold open the sheet is longer, and on a phone it scrolls. The way
+ * out is a row stuck to the sheet's foot (see the test of that row above): it
+ * has to stay under the pointer wherever the sheet is scrolled to, and take it.
+ */
+for (const size of [LAYOUT_VIEWPORTS.phone, LAYOUT_VIEWPORTS["small phone"]]) {
+  test(`the reveal's next button takes the pointer with the skipped scene minutes open at ${size.width}x${size.height}`, async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.setViewportSize(size);
+    const walk = await bustOnSkippedSceneWalk(page);
+    const next = page.getByTestId("decision-next");
+    await waitForEntrance(page.locator(".decision-reveal-backdrop"));
+    const fold = page.locator(".decision-reveal").getByTestId("scene-minutes");
+    await clickElement(fold.locator("summary"), "open the minutes");
+    await expect(fold).toHaveJSProperty("open", true);
+    await expect(fold.locator("div > p").first()).toBeVisible();
+
+    // Where the pointer lands on the button: at the sheet's top, with the fold
+    // at the top of what is shown, and at the sheet's foot.
+    const hitAt = (place) =>
+      page.locator(".decision-reveal").evaluate((sheet, where) => {
+        if (where === "top") sheet.scrollTop = 0;
+        else if (where === "foot") sheet.scrollTop = sheet.scrollHeight;
+        else sheet.querySelector("[data-testid='scene-minutes']").scrollIntoView({ block: "start" });
+        const button = sheet.querySelector("[data-testid='decision-next']");
+        const box = button.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+        return {
+          onScreen: box.top >= 0 && box.bottom <= innerHeight && box.left >= 0 && box.right <= innerWidth,
+          hit: hit && (hit === button || button.contains(hit)) ? "" : hit ? `<${hit.tagName.toLowerCase()} class="${hit.getAttribute("class") ?? ""}">` : "nothing",
+          widest: Math.round(Math.max(...[...sheet.querySelectorAll("[data-testid='scene-minutes'], [data-testid='scene-minutes'] *")].map((element) => element.getBoundingClientRect().right))),
+          innerWidth,
+        };
+      }, place);
+    for (const place of ["top", "fold", "foot"]) {
+      const at = await hitAt(place);
+      expect(at.onScreen, `${place}: the next button is on the screen`).toBe(true);
+      expect(at.hit, `${place}: the pointer on the next button lands on ${at.hit}`).toBe("");
+      expect(at.widest, `${place}: the open minutes are wider than the screen`).toBeLessThanOrEqual(at.innerWidth + 1);
+    }
+
+    // And it takes a press where it is, with the fold still open above it.
+    await page.locator(".decision-reveal").evaluate((sheet) => sheet.querySelector("[data-testid='scene-minutes']").scrollIntoView({ block: "start" }));
+    await expect(fold).toHaveJSProperty("open", true);
+    await pressAt(page, next);
+    await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+    expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(walk.onwardId);
+  });
+}
 
 test("cashing without a single push seals the best card on the next board", async ({ page }) => {
   await openTable(page, "case01", "start");

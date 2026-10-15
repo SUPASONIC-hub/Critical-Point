@@ -254,6 +254,7 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   assert.notEqual(patch.nodeId, card.next);
   assert.ok(nodes[patch.nodeId], "and stayed on the authored graph");
   assert.equal(patch.decisionReveal.skippedTitle, nodes[card.next].title);
+  assert.equal(patch.decisionReveal.skippedNodeId, card.next, "the reveal can open the scene's minutes");
   assert.equal(patch.gauntletRun.busts, 1);
 });
 

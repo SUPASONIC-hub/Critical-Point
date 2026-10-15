@@ -115,3 +115,24 @@ export function getBlackoutSkip(fromNodeId, branchContext) {
   if (!onward || !nodes[onward] || RESULT_NODE_IDS.has(onward)) return null;
   return { nodeId: onward, skippedNodeId: fromNodeId, skippedTitle: skippedNode.title };
 }
+
+/**
+ * The minutes of a scene the room played without the analyst: what a bust's
+ * skip (getBlackoutSkip) cost, as something that can still be read. The log
+ * entry of the bust already names the scene (`skippedNodeId`), so the report
+ * reads this off the save as it is; nothing new is recorded.
+ *
+ * Null for an id the graph does not have -- a save written against an older
+ * graph keeps the id as it was written -- and for a scene with no text.
+ */
+export function getSceneMinutes(nodeId) {
+  const scene = nodes[nodeId];
+  if (!scene?.text) return null;
+  return {
+    title: scene.title ?? "",
+    heading: [scene.clock, scene.place, scene.speaker].filter(Boolean).join(" · "),
+    lead: scene.lead ?? "",
+    text: scene.text,
+    question: scene.question ?? "",
+  };
+}

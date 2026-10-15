@@ -2,6 +2,7 @@ import { DecisionReveal } from "../components/DecisionReveal.jsx";
 import { ErrorLogPanel } from "../components/ErrorLogPanel.jsx";
 import { RecoveryNotice } from "../components/RecoveryNotice.jsx";
 import { SaveStatus } from "../components/SaveStatus.jsx";
+import { SceneMinutes } from "../components/SceneMinutes.jsx";
 
 function getSceneLineType(line) {
   if (line.startsWith("'")) return "thought-line";
@@ -31,6 +32,7 @@ export function useRuntimeRenderers({
   const errorLogPanelView = { showErrorLog, debugToolsEnabled, showRecoveryCenter, copyDiagnosticTrace, exportPlaytestLog, refreshLocalErrorLog, clearLocalErrorLog, closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries, startAtNode, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup };
   return {
     renderSceneLines,
+    renderSceneMinutes: (nodeId) => <SceneMinutes nodeId={nodeId} />,
     renderDecisionReveal: () => <DecisionReveal view={decisionRevealView} />,
     renderRecoveryNotice: () => <RecoveryNotice view={recoveryNoticeView} />,
     renderSaveStatus: () => <SaveStatus view={saveStatusView} />,
