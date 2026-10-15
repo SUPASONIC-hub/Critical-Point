@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
-import { cashStakedCard, completeCurrentCase, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
+import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 async function expectNoA11yViolations(page) {
@@ -442,4 +442,44 @@ test("ranking screen has no structural accessibility violations", async ({ page 
     scrollWidth: document.documentElement.scrollWidth,
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+});
+
+/**
+ * The table's one voice (tableVoice.js, E3). Drafted 2026-10-14 in
+ * `table-voice` and not yet run: run with --repeat-each=3 --retries=0 on both
+ * projects before it merges (e2e runs only on main, and a failure there skips
+ * the deploy).
+ *
+ * case01 `start` is the table the overclock test pushes three times without
+ * meeting the wall, so one push here lands live.
+ */
+const PUSH_CALL = /^열기 \d+ · (벽까지 최소 \d+|다음 (푸시|밀기)가 벽 사정권)$/;
+
+test("a push is said in the table's one polite region, with the shown band and never the drawn wall", async ({ page }) => {
+  await startDebugNode(page, "case01", "start");
+  const voice = page.getByTestId("table-voice");
+  await expect(voice).toHaveAttribute("role", "status");
+  await expect(voice).toHaveText("");
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await page.getByTestId("commit-push").click();
+  await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+  await expect(voice).toHaveText(PUSH_CALL);
+  // Not compared with the meter: the clock's creep can move the heat after the call.
+  // The heartbeat is not said: it is the one number that moves on every tick.
+  await expect(voice).not.toContainText("심박");
+  // One region on the table speaks; the pot and the heartbeat are read when asked for.
+  await expect(page.getByTestId("gauntlet-stage").locator("[role='status'], [aria-live='polite'], [aria-live='assertive']")).toHaveCount(1);
+});
+
+test("the verdict is the slam's alone, and the next table says what the cash banked", async ({ page }) => {
+  await startDebugNode(page, "case01", "start");
+  const voice = page.getByTestId("table-voice");
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await cashStakedCard(page);
+  // Under the slam and the reveal the voice is empty, so the multiplier is heard once.
+  await expect(voice).toHaveText("");
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  const runPot = await page.getByTestId("gauntlet-run-pot").textContent();
+  await expect(voice).toHaveText(new RegExp(`^판돈 ${runPot} · 금고 [\\d,]+$`));
 });

@@ -2,10 +2,11 @@ import { useRef } from "react";
 import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber, getClockCall, getTabNotices, getTypeName, getTypeParts } from "./tableReadout.js";
+import { formatMultiplier, formatNumber, getTabNotices, getTypeName, getTypeParts } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicType } from "./logicStreak.js";
 import { useDialogFocus } from "./useDialogFocus.js";
+import { useTableVoice } from "./tableVoice.js";
 
 /** This tab's table stopped because another tab has the window. */
 function LostToTab({ onReload }) {
@@ -94,13 +95,15 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
   );
 }
 
-/** Everything that lands over the table: the relic just taken, a table lost to or held by another tab, the verdict. */
-export function TableNotices({ equipped, tab, clock, slam, onReload, onClaim, onLeave }) {
+/** Everything that lands over the table: what it says aloud, the relic just taken, a table lost to or held by another tab, the verdict. */
+export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, onLeave }) {
   const { lost, held } = getTabNotices(tab);
+  const said = useTableVoice(voice);
   return (
     <>
-      {/* The clock's calls: silent to the eye, and on the page before they have anything to say. */}
-      <span className="sr-only" role="status">{getClockCall(clock)}</span>
+      {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
+          Silent to the eye, and on the page before it has anything to say. */}
+      <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">
           <RelicIcon id={equipped.id} size={18} />
