@@ -2468,6 +2468,12 @@
     font-size: 0.625rem;
   }
 
+  /* The wild card's name tag ends 6px down, where the key began: 2px apart,
+     level with the label's first line. */
+  .gx-card-wild .gx-card-key {
+    top: 8px;
+  }
+
   .gx-card-label {
     display: -webkit-box;
     overflow: hidden;

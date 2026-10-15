@@ -2930,9 +2930,12 @@ body {
   .intro .top-actions .ghost {
     width: auto;
   }
+  /* minmax(0, ...): a bare 1fr is never narrower than its content, and the
+     name field's own width (20 characters of a Hangul font) pushed the
+     「분석관 호출명」 panel past a 390px screen's edge, cutting 01 IDENTITY. */
   .intro .start-priority,
   .intro-drawer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .prestart-grid,
   .prestart-tutorial > div {
