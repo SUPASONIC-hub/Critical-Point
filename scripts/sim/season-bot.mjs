@@ -1,0 +1,539 @@
+/**
+ * The simulated players, in one place: the season player of
+ * `check-endings.mjs` (`playWindow` and `playSeason`, with the archetypes and
+ * the seeded stream they draw from) and the case players of
+ * `report-gauntlet-loop.mjs` (`playCase` and `playHandCase`). Both scripts
+ * import them from here; what each one measures and asserts stays in the script.
+ *
+ * Nothing here changes what a script prints. The season player draws from one
+ * stream per `createSeasonBot`, in the order it always drew, and the case
+ * players draw from nothing but their seeds (`handUnit`).
+ */
+import {
+  CASE_RESULT_NODES,
+  CASE_SEQUENCE,
+  CASE_START_NODES,
+  caseOpeningRoutes,
+  cognitionLabels,
+  getBranchDetourBypass,
+  getContinuityMemoryChoice,
+  nodes,
+  triggerLabels,
+} from "../../src/gameData.js";
+import {
+  applyEffect,
+  createCaseSummary,
+  getAuthorityGate,
+  getCasesOpened,
+  getEndingVariant,
+  getGameplayStats,
+  getRiskPressure,
+  getSeasonLogic,
+  getSeasonStrain,
+  makeEmptyScores,
+  REFRAME_COGNITION,
+  REFRAME_EFFECT,
+} from "../../src/gameLogic.js";
+import {
+  applyGauntletEffect,
+  BUST_EFFECT,
+  createRunSummary,
+  createWindow,
+  equipRelic,
+  FOCUS_MAX,
+  getHeartbeatBpm,
+  getSealedCardId,
+  getTableSchema,
+  HAND_CAP,
+  openCaseRun,
+  reduceWindow,
+  resolveWindow,
+  RUN_INITIAL_STATE,
+  STANCE_CHARGE,
+} from "../../src/gauntlet/gauntletEngine.js";
+import { getLogicType } from "../../src/gauntlet/logicStreak.js";
+import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
+import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
+import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
+import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
+import { createChoiceReaders } from "../../src/state/useDecision.js";
+
+// ---------------------------------------------------------------------------
+// The season player (check-endings.mjs).
+// ---------------------------------------------------------------------------
+
+/** How a card reads to a player who values these axes. Costs are negative. */
+export const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
+const worth = (key, value) => (key === "humanCost" || key === "fatigue" ? -value : value);
+
+/**
+ * The players. `values` weighs what a card gains and burns; `heat` is where the
+ * table policy cashes; `reframe` is the chance of taking 판을 다시 짠다 when it
+ * is on the table and this case has not yet been reframed.
+ */
+export const ARCHETYPES = {
+  // Named, and asserted on in check-endings.mjs.
+  "people-first": { values: { trust: 1, humanCost: 1.4 }, noise: 2 },
+  "spend-people": { values: { capital: 1, time: 0.6, humanCost: -1.2, trust: -0.4 }, noise: 2 },
+  // The rest of the population.
+  random: { values: {}, noise: 100 },
+  procedure: { values: { legitimacy: 1.2, trust: 0.2 }, noise: 3 },
+  money: { values: { capital: 1.2, time: 0.5 }, noise: 3 },
+  balanced: { values: { trust: 0.5, legitimacy: 0.5, capital: 0.5, humanCost: 0.5, fatigue: 0.3, time: 0.3 }, noise: 4 },
+  "min-risk": { minRisk: true, noise: 1 },
+};
+export const POPULATION = ["random", "random", "procedure", "money", "balanced", "min-risk", "people-first", "spend-people"];
+
+const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
+const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label: key }]));
+
+/**
+ * One season player and the seeded stream it draws from. `seed` starts the
+ * stream and `reseed` sets it again (the report's paired seasons); `random`
+ * and `pick` are the same stream, for the script's own draws (the tool hand
+ * and the relic draft), so every draw keeps its place in it. `staged` plays
+ * each case under the rules `tableUnlocks` deals it. `archetypes` is this
+ * bot's own table of players, a copy of ARCHETYPES the script may add hands to.
+ */
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES } }) {
+  let seed = start;
+  function random() {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  }
+  const pick = (list) => list[Math.floor(random() * list.length)];
+  const reseed = (next) => {
+    seed = next;
+  };
+
+  function makePolicy(archetype) {
+    const base = archetypes[archetype];
+    return {
+      archetype,
+      ...base,
+      // Heat the table cashes at. A player who reads the heartbeat is modelled
+      // separately, with the tell the stage shows.
+      heat: pick([35, 42, 48, 52, 56, 60]),
+      listens: random() < 0.4,
+      bpm: pick([95, 100, 105, 110]),
+      reframe: pick([0, 0.15, 0.35, 0.6]),
+      think: 2 + random() * 10,
+      origin: pick(["courier", "lab", "public"]),
+    };
+  }
+
+  function scoreCard(policy, choice, resources) {
+    const effect = choice.effect ?? {};
+    let score;
+    if (policy.minRisk) score = -getRiskPressure(applyEffect(resources, effect));
+    else score = RESOURCE_KEYS.reduce((sum, key) => sum + (policy.values[key] ?? 0) * worth(key, effect[key] ?? 0), 0);
+    return score + (random() - 0.5) * policy.noise * 4;
+  }
+
+  function mergeEffects(...effects) {
+    return effects.reduce((merged, effect = {}) => {
+      for (const [key, value] of Object.entries(effect)) merged[key] = (merged[key] ?? 0) + value;
+      return merged;
+    }, {});
+  }
+
+  function playWindow(policy, run, windowSeed, rules, hand = null) {
+    // The run's own board, and for a story run the same board with its far wall.
+    let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
+    win = reduceWindow(win, { type: "SELECT", id: "card" }, rules);
+    // Reading the card and the band before the first press. Creep starts after
+    // the grace, so a slow hand is already paying heat.
+    for (let second = 0; second < Math.floor(policy.think) && win.status === "live"; second += 1) {
+      win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+    }
+    // `hand` is the tool hand measured at the end of check-endings.mjs, and null for
+    // every season before it: a stance, charged or not, and a window now and
+    // then left to run out its clock.
+    if (hand) {
+      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: hand.mode }, rules);
+      for (let lock = 0; hand.locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) win = reduceWindow(win, { type: "FOCUS" }, rules);
+      while (hand.walks && win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+    }
+    const target = policy.heat + (random() - 0.5) * 10;
+    for (let press = 0; press < 30 && win.status === "live"; press += 1) {
+      const keepGoing = policy.listens
+        ? getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm
+        : win.gauge < target;
+      if (!keepGoing) break;
+      win = reduceWindow(win, { type: "PUSH" }, rules);
+      win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
+    }
+    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+    return win;
+  }
+
+  /**
+   * `story` is a season played in story mode from its first case to its last:
+   * the run carries the mark, which is all the runtime's stamp does to it.
+   *
+   * `watch` is handed every settled window (the measurements at the end of
+   * check-endings.mjs). It reads and draws nothing, so a season played with one is the season
+   * played without.
+   *
+   * `tools` is the tool table of the same measurements (`toolTable`), and null
+   * for every season before them: it settles a window against a codex as the
+   * runtime does, takes the draft its own way and may play the tool hand. Left
+   * out, the draft is the five tools that need no unlock, one taken at random.
+   */
+  function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
+    const policy = makePolicy(archetype);
+    const caseResults = {};
+    let discoveredClues = [];
+    let run = normalizeStart(story);
+    let final = null;
+    const casePeaks = [];
+    let windows = 0;
+    let skipped = 0;
+    for (const caseId of CASE_SEQUENCE) {
+      // The opening route, the legacy and the hand, as `runLifecycle.startCaseNow` opens the case.
+      const opening = describeCaseOpening(caseId, { caseResults, operatorOrigin: policy.origin });
+      const { openingLegacy } = opening;
+      const outcomeId = caseResults[CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1]]?.outcomeChoiceId;
+      let resources = opening.resources;
+      const openingNodes = new Set([CASE_START_NODES[caseId], ...Object.values(caseOpeningRoutes[caseId] ?? {})]);
+      let triggers = makeEmptyScores(triggerLabels);
+      let cognition = makeEmptyScores(cognitionLabels);
+      let log = [];
+      let nodeId = opening.nodeId;
+      let caseReframes = 0;
+      // What `runLifecycle.startCaseNow` and `useChoiceCommit` pass: the case's
+      // rules, and on the window that closes it the next case's.
+      const rules = getTableRules(caseId, run, staged);
+      const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
+      run = openCaseRun(run, { rules });
+      if (tools) tools.caseNumber = CASE_SEQUENCE.indexOf(caseId) + 1;
+      for (let step = 0; step < 60 && nodeId && !resultNodeIds.has(nodeId); step += 1) {
+        const node = nodes[nodeId];
+        const riskPressure = getRiskPressure(resources);
+        const stats = getGameplayStats(log, riskPressure);
+        const reframeChoice = node.choices.find((choice) => choice.type === "reframe");
+        const inheritedChallenge = createInheritedChallenge({ isOpeningNode: openingNodes.has(nodeId), openingLegacy });
+        const sceneChallenge = createSceneChallenge({ reframeChoice, reframeCombo: stats.reframeCount, inheritedChallenge, node, riskPressure });
+        const readers = createChoiceReaders({
+          sceneChallenge,
+          resources,
+          log,
+          riskPressure,
+          discoveredClues,
+          currentCase: caseId,
+          currentChallengeStreak: stats.currentChallengeStreak,
+          resourceMeta,
+        });
+        const memoryChoice = getContinuityMemoryChoice({ caseId, nodeId, caseResults });
+        const standing = { clueCount: discoveredClues.length, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened: getCasesOpened(caseId) };
+        const fixed = [...node.choices.filter((choice) => choice.type !== "reframe"), ...(memoryChoice ? [memoryChoice] : [])]
+          .filter((choice) => getAuthorityGate(choice, standing).unlocked);
+        // `wildOnly` is the hand measured at the end of check-endings.mjs: it stakes the
+        // wild card on every scene that deals one, which the table allows (only
+        // the route a reframe opens is once a case). It draws nothing here.
+        const takeReframe = reframeChoice && (policy.wildOnly || (caseReframes === 0 && random() < policy.reframe));
+        // What `useChoiceCommit.getOfferedTypes` hands the settlement: the types on the table.
+        const offered = [...new Set([...fixed, ...(reframeChoice ? [reframeChoice] : [])].map(getLogicType).filter(Boolean))];
+        const choice = policy.logicHand
+          ? pickByType(policy, fixed, run.logic)
+          : takeReframe
+          ? reframeChoice
+          : fixed.reduce((best, candidate) => {
+            const score = scoreCard(policy, candidate, resources);
+            return !best || score > best.score ? { choice: candidate, score } : best;
+          }, null).choice;
+
+        const window = playWindow(policy, run, `season:${seasonIndex}:${run.windowIndex}`, rules, tools?.hand ? tools.dealHand() : null);
+        windows += 1;
+        const responseTimeSec = Math.max(1, Math.round(window.elapsed));
+        const reframe = choice.type === "reframe";
+        const reframeOpenedRoute = reframe && window.status === "cashed";
+        const reframeTarget = reframeOpenedRoute && caseReframes === 0 ? getReframeTarget(caseId, nodeId) : null;
+        if (reframe) caseReframes += 1;
+        const baseEffect = reframe ? REFRAME_EFFECT : choice.effect;
+        const cognitiveEffect = reframe ? REFRAME_COGNITION : choice.cognition;
+        const read = readers.getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
+        const branchContext = { resources, previousOutcomeChoiceId: outcomeId };
+        const branchBypass = getBranchDetourBypass(choice, branchContext);
+        const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
+        // A story run is skipped past nothing (useChoiceCommit).
+        const skip = window.status === "bust" && !run.story ? getBlackoutSkip(plannedNode, branchContext) : null;
+        if (skip) skipped += 1;
+        const nextNode = skip?.nodeId ?? plannedNode;
+        const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
+        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
+        const busted = verdict.outcome === "bust";
+        watch?.({ verdict, card: choice, dealtWild: Boolean(reframeChoice), board: run.schema });
+        const gauntletEffect = applyGauntletEffect(baseEffect, {
+          outcome: verdict.outcome,
+          gauge: verdict.gauge,
+          fracturedAxis: verdict.fracturedAxis,
+          fractureRate: verdict.fractureRate,
+          focusMultiplier: verdict.focus?.resourceMultiplier,
+        });
+        const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
+        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
+        const resourcesAfter = applyEffect(resources, finalEffect);
+        if (clue) discoveredClues = [...discoveredClues, clue];
+        triggers = { ...triggers };
+        for (const trigger of node.triggers ?? []) triggers[trigger] = (triggers[trigger] ?? 0) + (reframe ? 10 : 6);
+        cognition = { ...cognition };
+        for (const [key, value] of Object.entries(cognitiveEffect ?? {})) cognition[key] = (cognition[key] ?? 0) + value;
+        log = [...log, {
+          nodeId,
+          caseId,
+          choiceId: choice.id,
+          choice: choice.label,
+          reframe,
+          reframeOpenedRoute,
+          reframeBranchId: reframeTarget,
+          effect: finalEffect,
+          cognition: cognitiveEffect ?? {},
+          clue,
+          responseTimeSec,
+          resourcesBefore: resources,
+          resourcesAfter,
+          challenge: { matched: read.challengeMatch, riskDelta: read.riskDelta },
+          ...(run.story ? { assistStory: true } : {}),
+          threshold: {
+            busted,
+            potMultiplier: verdict.multiplier,
+            pot: verdict.pot,
+            lostPot: verdict.lostPot,
+            pushes: verdict.pushes,
+            focus: verdict.focus,
+            logic: verdict.logic,
+          },
+        }];
+        resources = resourcesAfter;
+        run = nextRun;
+        if (caseClosed) {
+          const summary = {
+            ...createCaseSummary(triggers, cognition, log, { resources }),
+            gauntlet: createRunSummary(run),
+            outcomeChoiceId: choice.id,
+            outcomeNodeId: nodeId,
+          };
+          caseResults[caseId] = summary;
+          casePeaks.push(summary.peakRiskPressure);
+          if (run.relicOffer.length) run = equipRelic(run, tools ? tools.draft(run) : pick(run.relicOffer));
+          if (caseId === "final") final = { resources, log };
+        }
+        nodeId = nextNode;
+      }
+    }
+    const strain = getSeasonStrain(caseResults);
+    const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics };
+  }
+
+  /**
+   * A hand that plays for the logic streak, for the measurement at the end of
+   * check-endings.mjs: it holds one type of card, and `switch` leaves it for another
+   * only when the pressure rose going into the window (the streak's own rule,
+   * gauntlet/logicStreak.js). When its type is not on the table it takes what is.
+   */
+  function pickByType(policy, cards, logic) {
+    const held = logic.type ?? policy.holds;
+    const leave = policy.logicHand === "switch" && logic.rose;
+    const wanted = cards.filter((candidate) => (getLogicType(candidate) === held) !== leave);
+    return pick(wanted.length ? wanted : cards);
+  }
+
+  function normalizeStart(story = false) {
+    return { ...RUN_INITIAL_STATE, story };
+  }
+
+  return { random, pick, reseed, archetypes, makePolicy, scoreCard, playWindow, playSeason, pickByType };
+}
+
+// ---------------------------------------------------------------------------
+// The case players (report-gauntlet-loop.mjs).
+// ---------------------------------------------------------------------------
+
+export function handUnit(seed) {
+  let value = 2166136261;
+  for (const character of seed) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
+  value = (Math.imul(value >>> 0, 1664525) + 1013904223) >>> 0;
+  value ^= value >>> 15;
+  return (Math.imul(value, 2246822519) >>> 0) / 4294967296;
+}
+
+/**
+ * What the measurements at the end of report-gauntlet-loop.mjs count, a window
+ * at a time (`playCase` returns one, `measure` adds them up). Nothing here is
+ * asserted on or printed by that script's other rows. `moves` is what each window did to the logic
+ * streak (`advanceLogic`'s move); `bustAt` files each bust under the push it
+ * happened on, or under the clock ("creep", "timeout"), and `pushed` is how
+ * many pushes each window made; the `lock` numbers are the cashes that held a
+ * charge, how many of them LOCK added nothing to, and the pots told apart.
+ */
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0 });
+function see(seen, verdict) {
+  const count = (map, key) => {
+    map[key] = (map[key] ?? 0) + 1;
+  };
+  seen.windows += 1;
+  seen.streakSum += verdict.logic.streak;
+  count(seen.moves, verdict.logic.move);
+  count(seen.pushed, verdict.pushes);
+  if (verdict.outcome === "bust") count(seen.bustAt, verdict.cause === "push" ? verdict.pushes : verdict.cause);
+  else {
+    seen.pot += verdict.pot;
+    seen.logicPot += verdict.logic.pot;
+    seen.focusPot += verdict.focus.pot;
+    if (verdict.focus.charge > 0) {
+      seen.lockCashed += 1;
+      if (verdict.focus.pot === 0) seen.lockUnpaid += 1;
+    }
+  }
+}
+
+export const HAND = [
+  { id: "people", label: "people", cognition: { persistence: 1 }, effect: { trust: 10, humanCost: -4, time: -6, capital: -3, fatigue: 5 } },
+  { id: "record", label: "record", cognition: { inference: 1 }, effect: { legitimacy: 10, time: -5, trust: -3, humanCost: 3, fatigue: 3 } },
+  { id: "fast", label: "fast", cognition: { risk: 1 }, effect: { capital: 8, time: 5, legitimacy: -12, trust: -3, humanCost: 3 } },
+];
+/** How often the hand leaves the type it is holding for the next card along. */
+export const HAND_WANDER = 0.2;
+/** How often it charges a stance before it pushes. */
+export const HAND_LOCKS = 0.5;
+// Most hands lean on one or two stances; EXPOSE, which clears seals for good
+// once mastered, is the one they reach for least.
+export const STANCES = ["strike", "steady", "strike", "steady", "expose"];
+
+/**
+ * The two case players, for a case `windowsPerCase` windows long. `card` is
+ * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
+ * windowIndex)` the scene whose types a typed hand picks from.
+ */
+export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor }) {
+  /**
+   * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
+   * in report-gauntlet-loop.mjs), which puts the logic streak in play; `logic` is the streak the case
+   * opens with, carried from the case before as a run carries it. `lock` charges
+   * a stance to the full before the first push, a press at a time: the press
+   * itself is what costs the clock (`lock.idle`: the same clock, and no press).
+   *
+   * `story` plays the case as a story run: the run carries the mark, so its
+   * windows are dealt from the far wall (`getTableSchema`), and a bust skips no
+   * scene (useChoiceCommit). It is `true`, or the run the case opens from -- a
+   * season far along, say. The rules a story run plays under are the caller's to
+   * pass, as everywhere here.
+   */
+  function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, rules = ALL_RULES, story = false) {
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}) }, { rules });
+    const paid = { cashed: 0, bonus: 0, capped: 0 };
+    let busts = 0;
+    let midCaseBusts = 0;
+    let mutatedAfterBust = 0;
+    let nextTableRules = 0;
+    let played = 0;
+    const seen = newSeen();
+    for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
+      played += 1;
+      // The run's own board for every run but a story one, whose wall stands far.
+      const seed = `sim:${caseIndex}:${windowIndex}`;
+      const offers = pickType ? sceneFor(caseIndex, windowIndex) : null;
+      const staked = pickType ? { ...card, cognition: { [pickType(offers, run.logic, seed)]: 1 } } : card;
+      let win = createWindow({ schema: getTableSchema(run), seed });
+      win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
+      if (lock) {
+        win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
+        let charge = win;
+        for (let press = 0; press < 8 && win.status === "live" && charge.focus < FOCUS_MAX; press += 1) {
+          const pressed = reduceWindow(charge, { type: "FOCUS" }, rules);
+          // `idle` is the hand a LOCK is compared with like for like: it lets
+          // the same clock run and does not press (a tick carries a second at most).
+          if (lock.idle && pressed !== charge) for (const delta of [1, LOCK_PRESS_SECONDS - 1]) win = reduceWindow(win, { type: "TICK", delta }, rules);
+          charge = pressed;
+          if (!lock.idle) win = pressed;
+        }
+      }
+      for (let press = 0; press < 30 && win.status === "live"; press += 1) {
+        if (!decide(win, run)) break;
+        win = reduceWindow(win, { type: "PUSH" }, rules);
+        win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
+      }
+      if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
+      if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+      const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules });
+      see(seen, verdict);
+      if (verdict.outcome === "cash") {
+        // What the streak paid this pot, before LOCK and under the cap.
+        paid.cashed += 1;
+        paid.bonus += verdict.logic.bonus;
+        if (verdict.logic.bonus >= HAND_CAP) paid.capped += 1;
+      }
+      if (verdict.outcome === "bust") {
+        busts += 1;
+        if (!caseClosed) midCaseBusts += 1;
+        // Broken is the blackout the bust files on the next board. A bare hand
+        // also has to find it face down and already hot; a mastered lock may turn
+        // the board back over (`applyStanceMastery`), which is the lock working.
+        const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && nextRun.schema.startGauge > 0);
+        if (!caseClosed && broken) mutatedAfterBust += 1;
+        // The blackout skip: the room plays the next scene without the player. It
+        // never skips onto the result, so the case's last window is always played.
+        // A story run is skipped past nothing.
+        if (!story && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
+      }
+      // A board that carries one of the seven next-table rules, whatever dealt it.
+      if (nextRun.schema.mutations.some((id) => STORY_OFF_RULES.includes(MUTATION_RULES[id]))) nextTableRules += 1;
+      run = nextRun;
+    }
+    return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen };
+  }
+
+  function playHandCase(caseIndex, decide, relics, { stanceMastery, logic } = {}, rules = ALL_RULES) {
+    let run = openCaseRun({ relics, stanceMastery, ...(logic ? { logic } : {}) }, { rules });
+    let played = 0;
+    for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
+      played += 1;
+      const seed = `hand:${caseIndex}:${windowIndex}`;
+      let win = createWindow({ schema: run.schema, seed });
+      // The richest card is the one a COLD FEET board seals, and the one a hand
+      // wants most; otherwise the hand holds its type, and now and then leaves it.
+      const sealedId = getSealedCardId(HAND, run.schema);
+      const held = HAND.findIndex((candidate) => getLogicType(candidate) === run.logic.type);
+      const wanted = HAND[(Math.max(0, held) + (handUnit(`${seed}:card`) < HAND_WANDER ? 1 : 0)) % HAND.length];
+      const card = HAND.find((candidate) => candidate.id === sealedId) ?? wanted;
+      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);
+      win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
+      // Four or five presses charge a stance; three, when a press was graded, used
+      // to. A charged stance fills the hand's cap by itself, so a hand that locked
+      // every window would be paid nothing by its streak and the two relics that
+      // bend the streak could not move a number: it locks one window in two.
+      const locks = handUnit(`${seed}:lock`) < HAND_LOCKS;
+      for (let lock = 0; locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) {
+        win = reduceWindow(win, { type: "FOCUS" }, rules);
+      }
+      const mood = handUnit(`${seed}:mood`);
+      if (mood < 0.04) {
+        // Walked away from the table: the clock runs out.
+        while (win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
+      }
+      const sealed = card.id === sealedId;
+      // One window in eight is cashed cold, as early as the table allows: COLD
+      // FEET seals the next hand's richest card, and a sealed card has to be
+      // pushed to the seal before it cashes -- which is what LOCKPICK and GLASS
+      // LENS bend.
+      const cold = mood >= 0.04 && mood < 0.165;
+      for (let press = 0; press < 30 && win.status === "live"; press += 1) {
+        const mustOpen = sealed && win.gauge < win.schema.sealBreak;
+        if (!mustOpen && (cold || !decide(win, run))) break;
+        win = reduceWindow(win, { type: "PUSH" }, rules);
+        win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
+      }
+      if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
+      const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
+      if (verdict.outcome === "bust" && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
+      run = nextRun;
+    }
+    return { vault: run.vault, played, stanceMastery: run.stanceMastery, logic: run.logic };
+  }
+
+  return { playCase, playHandCase };
+}

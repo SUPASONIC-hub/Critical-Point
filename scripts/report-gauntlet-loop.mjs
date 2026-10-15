@@ -2,13 +2,10 @@ import assert from "node:assert/strict";
 import {
   BASE_SCHEMA,
   createWindow,
-  FOCUS_MAX,
   FOCUS_MODES,
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
-  getSealedCardId,
-  getTableSchema,
   HAND_CAP,
   openCaseRun,
   reduceWindow,
@@ -17,9 +14,10 @@ import {
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
 import { DEFAULT_RELIC_POOL, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
-import { LOCK_PRESS_SECONDS, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
-import { ALL_RULES, MUTATION_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
+import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
+import { createCaseBot, handUnit, newSeen } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -104,14 +102,6 @@ const WINDOWS_PER_CASE = Math.round(MEASURED_WINDOWS_PER_CASE);
 // skip are the table without the hand's share.
 const card = { id: "sim", label: "sim", effect: { capital: 12, trust: 6, humanCost: 4 } };
 
-function handUnit(seed) {
-  let value = 2166136261;
-  for (const character of seed) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
-  value = (Math.imul(value >>> 0, 1664525) + 1013904223) >>> 0;
-  value ^= value >>> 15;
-  return (Math.imul(value, 2246822519) >>> 0) / 4294967296;
-}
-
 /**
  * What types a window has on the table: a scene of the real season, drawn by
  * seed from every scene that deals cards (the scene's own cards and its wild
@@ -121,35 +111,7 @@ function handUnit(seed) {
 const SCENES = Object.values(nodes)
   .map((node) => (node.choices ?? []).map((choice) => ({ type: getLogicType(choice), chips: choice.type === "reframe" ? 0 : getCardChips(choice) })).filter((offer) => offer.type))
   .filter((offers) => offers.some((offer) => offer.chips > 0));
-/**
- * What the measurements at the end of this file count, a window at a time
- * (`playCase` returns one, `measure` adds them up). Nothing here is asserted
- * on or printed by the rows above. `moves` is what each window did to the logic
- * streak (`advanceLogic`'s move); `bustAt` files each bust under the push it
- * happened on, or under the clock ("creep", "timeout"), and `pushed` is how
- * many pushes each window made; the `lock` numbers are the cashes that held a
- * charge, how many of them LOCK added nothing to, and the pots told apart.
- */
-const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0 });
-function see(seen, verdict) {
-  const count = (map, key) => {
-    map[key] = (map[key] ?? 0) + 1;
-  };
-  seen.windows += 1;
-  seen.streakSum += verdict.logic.streak;
-  count(seen.moves, verdict.logic.move);
-  count(seen.pushed, verdict.pushes);
-  if (verdict.outcome === "bust") count(seen.bustAt, verdict.cause === "push" ? verdict.pushes : verdict.cause);
-  else {
-    seen.pot += verdict.pot;
-    seen.logicPot += verdict.logic.pot;
-    seen.focusPot += verdict.focus.pot;
-    if (verdict.focus.charge > 0) {
-      seen.lockCashed += 1;
-      if (verdict.focus.pot === 0) seen.lockUnpaid += 1;
-    }
-  }
-}
+/** The counts of `newSeen` (scripts/sim/season-bot.mjs), added up. */
 function addSeen(total, part) {
   for (const [key, value] of Object.entries(part)) {
     if (typeof value === "number") total[key] += value;
@@ -160,83 +122,10 @@ function addSeen(total, part) {
 const sceneFor = (caseIndex, windowIndex) => SCENES[Math.floor(handUnit(`scene:${caseIndex}:${windowIndex}`) * SCENES.length)];
 const SEASON_CASES = CASE_SEQUENCE.length;
 
-/**
- * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
- * below), which puts the logic streak in play; `logic` is the streak the case
- * opens with, carried from the case before as a run carries it. `lock` charges
- * a stance to the full before the first push, a press at a time: the press
- * itself is what costs the clock (`lock.idle`: the same clock, and no press).
- *
- * `story` plays the case as a story run: the run carries the mark, so its
- * windows are dealt from the far wall (`getTableSchema`), and a bust skips no
- * scene (useChoiceCommit). It is `true`, or the run the case opens from -- a
- * season far along, say. The rules a story run plays under are the caller's to
- * pass, as everywhere here.
- */
-function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, rules = ALL_RULES, story = false) {
-  let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}) }, { rules });
-  const paid = { cashed: 0, bonus: 0, capped: 0 };
-  let busts = 0;
-  let midCaseBusts = 0;
-  let mutatedAfterBust = 0;
-  let nextTableRules = 0;
-  let played = 0;
-  const seen = newSeen();
-  for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
-    played += 1;
-    // The run's own board for every run but a story one, whose wall stands far.
-    const seed = `sim:${caseIndex}:${windowIndex}`;
-    const offers = pickType ? sceneFor(caseIndex, windowIndex) : null;
-    const staked = pickType ? { ...card, cognition: { [pickType(offers, run.logic, seed)]: 1 } } : card;
-    let win = createWindow({ schema: getTableSchema(run), seed });
-    win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
-    if (lock) {
-      win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
-      let charge = win;
-      for (let press = 0; press < 8 && win.status === "live" && charge.focus < FOCUS_MAX; press += 1) {
-        const pressed = reduceWindow(charge, { type: "FOCUS" }, rules);
-        // `idle` is the hand a LOCK is compared with like for like: it lets
-        // the same clock run and does not press (a tick carries a second at most).
-        if (lock.idle && pressed !== charge) for (const delta of [1, LOCK_PRESS_SECONDS - 1]) win = reduceWindow(win, { type: "TICK", delta }, rules);
-        charge = pressed;
-        if (!lock.idle) win = pressed;
-      }
-    }
-    for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-      if (!decide(win, run)) break;
-      win = reduceWindow(win, { type: "PUSH" }, rules);
-      win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
-    }
-    if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
-    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
-    const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-    const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules });
-    see(seen, verdict);
-    if (verdict.outcome === "cash") {
-      // What the streak paid this pot, before LOCK and under the cap.
-      paid.cashed += 1;
-      paid.bonus += verdict.logic.bonus;
-      if (verdict.logic.bonus >= HAND_CAP) paid.capped += 1;
-    }
-    if (verdict.outcome === "bust") {
-      busts += 1;
-      if (!caseClosed) midCaseBusts += 1;
-      // Broken is the blackout the bust files on the next board. A bare hand
-      // also has to find it face down and already hot; a mastered lock may turn
-      // the board back over (`applyStanceMastery`), which is the lock working.
-      const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && nextRun.schema.startGauge > 0);
-      if (!caseClosed && broken) mutatedAfterBust += 1;
-      // The blackout skip: the room plays the next scene without the player. It
-      // never skips onto the result, so the case's last window is always played.
-      // A story run is skipped past nothing.
-      if (!story && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
-    }
-    // A board that carries one of the seven next-table rules, whatever dealt it.
-    if (nextRun.schema.mutations.some((id) => STORY_OFF_RULES.includes(MUTATION_RULES[id]))) nextTableRules += 1;
-    run = nextRun;
-  }
-  return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen };
-}
+// The two players are `scripts/sim/season-bot.mjs`: `playCase` stakes the
+// simulated card above, `playHandCase` the relic hand's three cards (`HAND`
+// there; the hand is described with the relic rows below).
+const { playCase, playHandCase } = createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor });
 
 function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
   const paid = { cashed: 0, bonus: 0, capped: 0, best: 0 };
@@ -490,68 +379,8 @@ assert.ok(
  * (a wider beat window) and ENCORE (the beat's combo) then bent.
  */
 const RELIC_CASES = 300;
-const HAND = [
-  { id: "people", label: "people", cognition: { persistence: 1 }, effect: { trust: 10, humanCost: -4, time: -6, capital: -3, fatigue: 5 } },
-  { id: "record", label: "record", cognition: { inference: 1 }, effect: { legitimacy: 10, time: -5, trust: -3, humanCost: 3, fatigue: 3 } },
-  { id: "fast", label: "fast", cognition: { risk: 1 }, effect: { capital: 8, time: 5, legitimacy: -12, trust: -3, humanCost: 3 } },
-];
-/** How often the hand leaves the type it is holding for the next card along. */
-const HAND_WANDER = 0.2;
-/** How often it charges a stance before it pushes. */
-const HAND_LOCKS = 0.5;
-// Most hands lean on one or two stances; EXPOSE, which clears seals for good
-// once mastered, is the one they reach for least.
-const STANCES = ["strike", "steady", "strike", "steady", "expose"];
 /** Cases a stance mastery is carried through before the hand starts a new season. */
 const HAND_SEASON = 10;
-function playHandCase(caseIndex, decide, relics, { stanceMastery, logic } = {}, rules = ALL_RULES) {
-  let run = openCaseRun({ relics, stanceMastery, ...(logic ? { logic } : {}) }, { rules });
-  let played = 0;
-  for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
-    played += 1;
-    const seed = `hand:${caseIndex}:${windowIndex}`;
-    let win = createWindow({ schema: run.schema, seed });
-    // The richest card is the one a COLD FEET board seals, and the one a hand
-    // wants most; otherwise the hand holds its type, and now and then leaves it.
-    const sealedId = getSealedCardId(HAND, run.schema);
-    const held = HAND.findIndex((candidate) => getLogicType(candidate) === run.logic.type);
-    const wanted = HAND[(Math.max(0, held) + (handUnit(`${seed}:card`) < HAND_WANDER ? 1 : 0)) % HAND.length];
-    const card = HAND.find((candidate) => candidate.id === sealedId) ?? wanted;
-    win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: STANCES[caseIndex % STANCES.length] }, rules);
-    win = reduceWindow(win, { type: "SELECT", id: card.id }, rules);
-    // Four or five presses charge a stance; three, when a press was graded, used
-    // to. A charged stance fills the hand's cap by itself, so a hand that locked
-    // every window would be paid nothing by its streak and the two relics that
-    // bend the streak could not move a number: it locks one window in two.
-    const locks = handUnit(`${seed}:lock`) < HAND_LOCKS;
-    for (let lock = 0; locks && lock < 5 && win.status === "live" && win.focus < STANCE_CHARGE; lock += 1) {
-      win = reduceWindow(win, { type: "FOCUS" }, rules);
-    }
-    const mood = handUnit(`${seed}:mood`);
-    if (mood < 0.04) {
-      // Walked away from the table: the clock runs out.
-      while (win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
-    }
-    const sealed = card.id === sealedId;
-    // One window in eight is cashed cold, as early as the table allows: COLD
-    // FEET seals the next hand's richest card, and a sealed card has to be
-    // pushed to the seal before it cashes -- which is what LOCKPICK and GLASS
-    // LENS bend.
-    const cold = mood >= 0.04 && mood < 0.165;
-    for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-      const mustOpen = sealed && win.gauge < win.schema.sealBreak;
-      if (!mustOpen && (cold || !decide(win, run))) break;
-      win = reduceWindow(win, { type: "PUSH" }, rules);
-      win = reduceWindow(win, { type: "TICK", delta: 0.6 }, rules);
-    }
-    if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
-    const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-    const { verdict, nextRun } = resolveWindow({ run, window: win, card, caseClosed, rules });
-    if (verdict.outcome === "bust" && windowIndex < WINDOWS_PER_CASE - 2) windowIndex += 1;
-    run = nextRun;
-  }
-  return { vault: run.vault, played, stanceMastery: run.stanceMastery, logic: run.logic };
-}
 
 function measureHand(label, decide, relics, rules = ALL_RULES) {
   let vault = 0;
