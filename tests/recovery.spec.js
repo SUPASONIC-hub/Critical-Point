@@ -104,6 +104,8 @@ test("a recovery slot restored in the middle of play is the run that comes back"
   });
   await page.goto("/?debug=1");
   await page.waitForSelector(".game-shell");
+  // The briefing page covers the notice, and the click used to wait out its reading clock.
+  await dismissProtocolBreach(page);
   await page.getByTestId("open-error-log-from-notice").click();
   await page.getByTestId("restore-save-slot-slot-before").click();
 
@@ -248,7 +250,10 @@ test("focus stays inside the briefing page that opens on the next scene", async 
   }
 });
 
-test("focus stays inside the briefing page a fresh scene opens on", async ({ page }) => {
+// @once, here and on the tab token below: the desktop project only
+// (playwright.config.js). table-keys.spec.js asks the same of the same page on
+// the phone, in the test that goes on to walk it with Tab.
+test("focus stays inside the briefing page a fresh scene opens on", { tag: "@once" }, async ({ page }) => {
   await startDebugNode(page, "case01", "start", { openTable: false });
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   await settleFrames(page);
@@ -360,7 +365,7 @@ test("the intro's start button deals the origin's opening hand", { tag: "@prod" 
   expect(opened.resources).toMatchObject({ legitimacy: 58, capital: 98, fatigue: 13, trust: 50 });
 });
 
-test("a tab opened from this one takes a table token of its own", async ({ page, context }) => {
+test("a tab opened from this one takes a table token of its own", { tag: "@once" }, async ({ page, context }) => {
   await page.goto("/?debug=1");
   await page.waitForSelector(".intro");
   const original = await page.evaluate(() => {

@@ -49,7 +49,14 @@ async function sendKey(page, init) {
   }, init);
 }
 
-test("number keys stake, Space and W push, Enter cashes", async ({ page }) => {
+// @once, here and below: the desktop project only (playwright.config.js). A
+// key has no place on the screen, and the table takes one whatever the pointer
+// is (useTableKeys.js), so a test that presses keys and reads the table's state
+// or the save is tagged. Not tagged: the tests that put focus where a pointer
+// or Tab leaves it, the ones that measure, and the staged steps, whose key line
+// is drawn by the pointer -- and those still press 1, 2, Space, W, Enter, E and
+// Q on the phone.
+test("number keys stake, Space and W push, Enter cashes", { tag: "@once" }, async ({ page }) => {
   // A scene that deals 판을 다시 짠다, so the hand's last number is the wild card.
   await openTable(page, "case02", "c2_logs");
   const labels = await page.locator(".choices .choice").getByTestId("card-label").allTextContents();
@@ -84,7 +91,7 @@ test("number keys stake, Space and W push, Enter cashes", async ({ page }) => {
 /** The seconds the table's clock shows it has left. */
 const clockOf = async (page) => Number(await page.locator(".gx-clock b").textContent());
 
-test("E locks: a press charges and costs the clock, Q changes the stance and the charge goes with it", async ({ page }) => {
+test("E locks: a press charges and costs the clock, Q changes the stance and the charge goes with it", { tag: "@once" }, async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const focus = page.getByTestId("gauntlet-focus");
@@ -114,7 +121,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await expect(page.locator(".gx-focus-modes button.mode-strike")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the letters work on a Hangul layout", async ({ page }) => {
+test("the letters work on a Hangul layout", { tag: "@once" }, async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   await sendKey(page, { key: "ㅈ", code: "KeyW" });
@@ -123,7 +130,7 @@ test("the letters work on a Hangul layout", async ({ page }) => {
   await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("a key held with Ctrl, Cmd or Alt is the browser's, and a repeat is not a press", async ({ page }) => {
+test("a key held with Ctrl, Cmd or Alt is the browser's, and a repeat is not a press", { tag: "@once" }, async ({ page }) => {
   await openTable(page);
   for (const modifier of ["ctrlKey", "metaKey", "altKey"]) {
     await sendKey(page, { key: "1", code: "Digit1", [modifier]: true });
@@ -172,7 +179,7 @@ test("Space held down pushes once, with the pointer's focus left on the push but
   expect(saved.log.at(-1).threshold.pushes, "one push from the pointer and one from the held key").toBe(2);
 });
 
-test("keys do not reach the table under the reveal", async ({ page }) => {
+test("keys do not reach the table under the reveal", { tag: "@once" }, async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   await page.keyboard.press("Enter");
@@ -188,7 +195,7 @@ test("keys do not reach the table under the reveal", async ({ page }) => {
   await expect(page.locator(".decision-reveal-backdrop")).toBeVisible();
 });
 
-test("a locked card refuses its number key as it refuses a click", async ({ page }) => {
+test("a locked card refuses its number key as it refuses a click", { tag: "@once" }, async ({ page }) => {
   expect(lockedIndex, "the scene still deals a gated card").toBeGreaterThan(0);
   await openTable(page, GATED.caseId, GATED.nodeId);
   const locked = page.locator(".choices .choice").nth(lockedIndex);
@@ -212,7 +219,7 @@ test("a locked card refuses its number key as it refuses a click", async ({ page
 // A save written while the key could still stake a locked card holds that card
 // as the open bet. The runtime refuses it, so the window used to stay closed and
 // unsettled through every reload.
-test("a save that holds a locked card as its bet still settles", async ({ page }) => {
+test("a save that holds a locked card as its bet still settles", { tag: "@once" }, async ({ page }) => {
   await openTable(page, GATED.caseId, GATED.nodeId);
   await page.keyboard.press("1");
   await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics?.openSeed ?? null).not.toBeNull();
@@ -232,7 +239,7 @@ test("a save that holds a locked card as its bet still settles", async ({ page }
   expect(settled.log.at(-1).choiceId).not.toBe(gatedCards[lockedIndex].id);
 });
 
-test("an untouched window that runs out cannot be replayed by reloading under the slam", async ({ page }) => {
+test("an untouched window that runs out cannot be replayed by reloading under the slam", { tag: "@once" }, async ({ page }) => {
   test.setTimeout(120_000);
   // The shortest clock a board can carry, so the test waits twelve seconds, not forty-five.
   await openBrokenBoard(page, "case01", "start", { schema: { seconds: 12 } });
@@ -471,7 +478,7 @@ for (const step of STAGED_STEPS) {
   });
 }
 
-test("staged: the introduction is on a case's first briefing alone, and on that page's reading clock", async ({ page }) => {
+test("staged: the introduction is on a case's first briefing alone, and on that page's reading clock", { tag: "@once" }, async ({ page }) => {
   // The clock starts held, so the number it shows is the whole reading time.
   await page.addInitScript(
     ({ key, value }) => localStorage.setItem(key, value),

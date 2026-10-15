@@ -88,7 +88,11 @@ function validSavedState(patch = {}) {
   };
 }
 
-test("ordinary save keeps discovered clues and does not create recovery metadata", async ({ page }) => {
+// @once, here and below: the desktop project only (playwright.config.js).
+// These read the save and the error log, and press the debug jump and the
+// table's own buttons at most. The one that is not tagged is the only test to
+// press 새 게임으로 시작 on the recovery notice.
+test("ordinary save keeps discovered clues and does not create recovery metadata", { tag: "@once" }, async ({ page }) => {
   await page.addInitScript((saved) => {
     if (sessionStorage.getItem("save-integrity-seeded")) return;
     sessionStorage.setItem("save-integrity-seeded", "1");
@@ -119,7 +123,7 @@ test("ordinary save keeps discovered clues and does not create recovery metadata
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
 });
 
-test("clearing the saved run before navigation does not resurrect it", async ({ page }) => {
+test("clearing the saved run before navigation does not resurrect it", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "case02", "c2_logs");
   await clearGameStorage(page);
@@ -147,6 +151,8 @@ test("start fresh from recovery clears the saved run and returns to intro", asyn
   }));
   await page.goto("/?debug=1");
   await expect(page.locator(".recovery-notice")).toBeVisible();
+  // The briefing page covers the notice, and the click used to wait out its reading clock.
+  await dismissProtocolBreach(page);
   await page.getByTestId("start-fresh-after-recovery").click();
   await expect
     .poll(async () => page.evaluate(() => localStorage.getItem("trigger-prototype-v2")).catch(() => "navigating"))
@@ -165,13 +171,13 @@ async function readErrorSources(page) {
   }, ERROR_LOG_KEY);
 }
 
-test("a first visit with no saved run does not manufacture an error log entry", async ({ page }) => {
+test("a first visit with no saved run does not manufacture an error log entry", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await expect(page.locator(".intro-shell")).toBeVisible();
   expect(await readErrorSources(page)).toEqual([]);
 });
 
-test("a clean scene transition does not manufacture an error log entry", async ({ page }) => {
+test("a clean scene transition does not manufacture an error log entry", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await page.getByTestId("debug-case-select").selectOption("case01");
   await page.getByTestId("debug-node-select").selectOption("start");
@@ -201,7 +207,7 @@ test("a clean scene transition does not manufacture an error log entry", async (
   expect(saved.lastError).toBeFalsy();
 });
 
-test("a saved run that fails shape validation is still reported", async ({ page }) => {
+test("a saved run that fails shape validation is still reported", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await page.evaluate(
     ([storageKey, logKey]) => {
@@ -219,7 +225,7 @@ test("a saved run that fails shape validation is still reported", async ({ page 
   expect(sources.some((source) => String(source).startsWith("silent-"))).toBe(true);
 });
 
-test("console.error from anywhere in the app reaches the error log", async ({ page }) => {
+test("console.error from anywhere in the app reaches the error log", { tag: "@once" }, async ({ page }) => {
   await page.goto("/?debug=1");
   await page.getByTestId("debug-case-select").selectOption("case01");
   await page.getByTestId("debug-node-select").selectOption("start");

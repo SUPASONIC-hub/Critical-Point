@@ -57,6 +57,18 @@ export default defineConfig({
     },
     {
       name: "mobile-chromium",
+      // A test tagged @once runs in `chromium` and not again here: what it
+      // asserts is a save, a request or a state of the page that no viewport,
+      // pointer or touch setting reaches, and every control it presses is
+      // pressed on the phone, on the same screen, by a test that is not
+      // tagged. A key is a control with no place on the screen, so a test
+      // that only presses keys is tagged too, while an untagged test still
+      // presses each of those keys here; a test that reads where focus lands
+      // after a pointer or Tab, or that is tagged @prod or @layout, is not.
+      // A project's own grepInvert is applied as well as the
+      // `--grep`/`--grep-invert` scripts/run-e2e.mjs passes, not instead of
+      // it, so the default list's `@visual|@season-full` still holds here.
+      grepInvert: /@once/,
       use: { ...devices["Pixel 7"] },
     },
     // Safari's engine, on the phone most players hold. It runs what differs
