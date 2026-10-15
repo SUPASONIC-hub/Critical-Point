@@ -614,6 +614,17 @@ export function getRemainingSeconds(window) {
 }
 
 /**
+ * How much faster the clock heats the gauge with every push: 1 + pushes x 0.12.
+ * The seconds run as they always do; it is the heat each second adds that
+ * grows. The table prints it beside the bank (`describeClockHeat`).
+ */
+export const CLOCK_HEAT_PER_PUSH = 0.12;
+
+export function getClockHeatRate(pushes) {
+  return 1 + Math.max(0, Number(pushes) || 0) * CLOCK_HEAT_PER_PUSH;
+}
+
+/**
  * The live window. `TICK` carries elapsed seconds since the last tick; the
  * reducer owns the arithmetic so a slow frame and a fast one land the same.
  *
@@ -632,7 +643,7 @@ function advanceClock(window, delta) {
   const elapsed = window.elapsed + delta;
   const creepFrom = Math.max(window.elapsed, READ_GRACE_SECONDS);
   const creeping = Math.max(0, elapsed - creepFrom);
-  const gauge = clamp(window.gauge + creeping * window.schema.creep * (1 + window.pushes * 0.12), 0, GAUGE_MAX);
+  const gauge = clamp(window.gauge + creeping * window.schema.creep * getClockHeatRate(window.pushes), 0, GAUGE_MAX);
   if (gauge >= window.wall) return { ...window, elapsed, gauge: window.wall, status: "bust", cause: "creep" };
   if (elapsed >= window.schema.seconds) return { ...window, elapsed: window.schema.seconds, gauge, status: "bust", cause: "timeout" };
   return { ...window, elapsed, gauge };

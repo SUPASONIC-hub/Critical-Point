@@ -177,7 +177,7 @@ export function GauntletStage({
   const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
-    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic,
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic, clockHeat,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId, offered });
   // What the hand adds to the pot: the logic streak as the staked card would
   // leave it (`logic`, nothing before the case has the rule), then LOCK on top
@@ -459,6 +459,14 @@ export function GauntletStage({
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
+            {/* Each push makes the clock heat the gauge faster; said once it is. */}
+            {live && clockHeat && (
+              <span className="gx-stat" data-testid="gauntlet-clock-heat">
+                <span className="sr-only">{clockHeat.spoken}</span>
+                <small aria-hidden="true">시계 열기</small>
+                <b aria-hidden="true">{clockHeat.text}</b>
+              </span>
+            )}
           </div>
           {/* Rendered or not, never `hidden`: both signals set their own display,
               and the row's padding would stand over nothing. */}
