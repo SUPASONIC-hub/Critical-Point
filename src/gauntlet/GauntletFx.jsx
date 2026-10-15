@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getHeartbeatBpm, getRemainingSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
-import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, monotonicNow, registerFxVariables } from "./fxVariables.js";
+import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 
 /**
@@ -30,7 +30,8 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * full-screen red flash at 3.2Hz. The sound keeps every beat; the screen-wide
  * pulse takes every other one once the beat is faster than `PULSE_MIN_MS`.
  *
- * Reduced motion removes travel -- the shake -- and nothing else. The red
+ * Reduced motion removes travel -- the shake -- and, since 2026-10-14, the
+ * tension steps below, and nothing else. The red
  * closes in, the beat still thumps the vignette's opacity, the bust still
  * floods the screen: colour and sound are not motion. The preference is
  * followed live, not read once at mount.
@@ -44,10 +45,20 @@ import { getAccessibility } from "../state/accessibilitySettings.js";
  * `fxRateStep`), so a player with the sound off and the comfort setting on
  * still has the heartbeat as something to read.
  *
+ * The steps (`fxTier`, 2026-10-14): as the gauge the table shows comes
+ * within a push of the band, and again inside it, the gauge's glow steps up
+ * (--gx-tier), the heartbeat lifts a little in pitch and its second beat comes
+ * a little sooner, and in the band the table trembles by `TREMOR_PX`. The
+ * tempo -- the number beside the gauge -- is the engine's and is not touched.
+ * All three are read off what is drawn, never the wall, and both settings
+ * take all three away; the sound goes only where the heartbeat already goes.
+ *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
  */
 const SHAKE_PX = 11;
+/** The critical tier's tremor: felt, and too small to lose a line of text to. */
+const TREMOR_PX = 1.5;
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 /** 2.9 a second: the fastest anything screen-wide may pulse. */
 const PULSE_MIN_MS = 345;
@@ -130,6 +141,8 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
         readersAt = time + READERS_REFRESH_MS;
       }
       const live = win.status === "live" && !isPaused;
+      const calm = getAccessibility().calmEffects;
+      const tier = fxTier(win, live, reducedMotion, calm);
       const tellWall = win.wall + (win.tellOffset ?? 0);
       // Same shape as the pulse: the tell on top of a floor built from the heat
       // the gauge already shows, so a hot gauge always reads red.
@@ -147,7 +160,7 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       rate = fxRateStep(rate, fxRateTarget(bpm), delta);
       if (live) {
         if (time >= nextBeat) {
-          playHeartbeat(heat);
+          playHeartbeat(heat, tier);
           nextBeat = time + 60000 / bpm;
           if (now - pulsedAt >= PULSE_MIN_MS) {
             pulsedAt = now;
@@ -172,17 +185,18 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       impactRef.current = Math.max(0, impactRef.current - delta / 480);
       flashRef.current = Math.max(0, flashRef.current - delta / 240);
       const trauma = Math.min(1, impactRef.current + (live ? Math.pow(felt, 3) * 0.45 : 0));
-      const calm = getAccessibility().calmEffects;
       const shake = fxShake(trauma, reducedMotion, calm);
       const x = (Math.sin(time * 0.071) + Math.sin(time * 0.137)) * 0.5 * shake * SHAKE_PX;
       const y = (Math.sin(time * 0.089) + Math.sin(time * 0.173)) * 0.5 * shake * SHAKE_PX * 0.6;
 
       write("--gx-heat", heat.toFixed(3));
       write("--gx-beat", fxBeatValue(beat, calm));
-      write("--gx-shake-x", `${x.toFixed(2)}px`);
-      write("--gx-shake-y", `${y.toFixed(2)}px`);
+      const tremor = tier === 2 ? TREMOR_PX : 0;
+      write("--gx-shake-x", `${(x + Math.sin(time * 0.031) * tremor).toFixed(2)}px`);
+      write("--gx-shake-y", `${(y + Math.sin(time * 0.043) * tremor * 0.6).toFixed(2)}px`);
       write("--gx-flash", fxFlashValue(flashRef.current, calm));
       write("--gx-rate", rate.toFixed(2));
+      write("--gx-tier", String(tier));
       frame = globalThis.requestAnimationFrame(loop);
     };
     frame = globalThis.requestAnimationFrame(loop);

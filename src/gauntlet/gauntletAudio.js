@@ -61,23 +61,31 @@ function getNoise(context) {
   return noiseBuffer;
 }
 
-/** Lub-dub. Louder and brighter as the wall closes in. */
-export function playHeartbeat(closeness = 0) {
+/**
+ * Lub-dub. Louder and brighter as the wall closes in.
+ *
+ * `tier` is the step the table shows (`fxTier`: 0, 1 hot, 2 critical, and 0
+ * under either comfort setting). Each step lifts the beat 6% -- 110 to 123Hz
+ * at the top of the thump, still under the lowpass, nothing bright -- and
+ * brings the second beat 10ms sooner. The tempo stays the engine's.
+ */
+export function playHeartbeat(closeness = 0, tier = 0) {
   withRuntime(({ context, destination, multiplier }) => {
     const now = context.currentTime;
     // 0.19 at rest is 0.156 on the default preset: audible under the score.
     const level = (0.19 + closeness * 0.13) * multiplier;
     for (const [offset, share, pitch] of [
       [0, 1, 1],
-      [0.17 - closeness * 0.05, 0.7, 0.86],
+      [0.17 - closeness * 0.05 - tier * 0.01, 0.7, 0.86],
     ]) {
       const start = now + offset;
+      const lift = pitch * (1 + tier * 0.06);
       const oscillator = context.createOscillator();
       const body = context.createBiquadFilter();
       const gain = context.createGain();
       oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(110 * pitch, start);
-      oscillator.frequency.exponentialRampToValueAtTime(34 * pitch, start + 0.11);
+      oscillator.frequency.setValueAtTime(110 * lift, start);
+      oscillator.frequency.exponentialRampToValueAtTime(34 * lift, start + 0.11);
       body.type = "lowpass";
       body.frequency.setValueAtTime(180 + closeness * 260, start);
       envelope(gain, start, level * share, 0.008, 0.2);
