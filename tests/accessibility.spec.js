@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -179,6 +180,145 @@ test("a cash's reveal has the same name, and its headline is the multiplier", as
   await expect(page.getByRole("dialog", { name: /×/ })).toHaveCount(0);
   await expect(dialog.getByRole("alert")).toHaveCount(0);
   expect(await page.evaluate(() => window.__bustAlerts.ever), "a cash says BUST nowhere").toBe(0);
+});
+
+/**
+ * The box a finger can press each visible control under `root` in, for every
+ * one under `min` px either way. Runs in the page.
+ *
+ * Several controls are pressed over more than they draw: a positioned ::before
+ * or ::after reaches into the gap around them (the briefing's cards, the
+ * stances, the header's buttons; layout-css.test.mjs holds the rules). The box
+ * is the control's own layout box joined with any such pseudo-element that
+ * takes the pointer. Layout boxes, not getBoundingClientRect: the briefing's
+ * cards breathe and the table shakes, and a transform moves no hit area the
+ * player can count on. offsetWidth rounds to the pixel, which is the tolerance.
+ */
+function narrowTargets(root, min) {
+  const px = (value) => (value === "" || value === "auto" ? null : Number.parseFloat(value));
+  const span = (start, end, size, inner) => {
+    if (start !== null && end !== null) return [start, inner - end];
+    if (start !== null && size !== null) return [start, start + size];
+    if (end !== null && size !== null) return [inner - end - size, inner - end];
+    return null;
+  };
+  const pressBox = (element) => {
+    const own = getComputedStyle(element);
+    const box = { left: 0, top: 0, right: element.offsetWidth, bottom: element.offsetHeight };
+    // A pseudo-element is placed against the control only when the control is positioned.
+    if (own.position === "static") return box;
+    const [bl, bt, br, bb] = [own.borderLeftWidth, own.borderTopWidth, own.borderRightWidth, own.borderBottomWidth].map(Number.parseFloat);
+    for (const pseudo of ["::before", "::after"]) {
+      const style = getComputedStyle(element, pseudo);
+      if (["none", "normal"].includes(style.content) || style.display === "none" || style.position !== "absolute" || style.pointerEvents === "none") continue;
+      const x = span(px(style.left), px(style.right), px(style.width), element.offsetWidth - bl - br);
+      const y = span(px(style.top), px(style.bottom), px(style.height), element.offsetHeight - bt - bb);
+      if (!x || !y) continue;
+      box.left = Math.min(box.left, x[0] + bl);
+      box.right = Math.max(box.right, x[1] + bl);
+      box.top = Math.min(box.top, y[0] + bt);
+      box.bottom = Math.max(box.bottom, y[1] + bt);
+    }
+    return box;
+  };
+  const CONTROLS = "button, a[href], summary, input:not([type='hidden']), select, textarea, [role='button'], [role='switch'], [role='tab'], [tabindex]:not([tabindex='-1'])";
+  return [...root.querySelectorAll(CONTROLS)]
+    .filter((element) => !element.closest(".debug-overlay, .sr-only") && element.offsetWidth > 0 && element.checkVisibility({ visibilityProperty: true }))
+    .map((element) => {
+      const box = pressBox(element);
+      const name = element.getAttribute("aria-label") || element.textContent.trim().replace(/\s+/g, " ").slice(0, 24) || element.className;
+      return { name, width: Math.round(box.right - box.left), height: Math.round(box.bottom - box.top) };
+    })
+    .filter((target) => target.width < min || target.height < min)
+    .map((target) => `${target.name}: ${target.width}x${target.height}`);
+}
+
+/** Polled, so a surface still settling is read again rather than failed on one frame. */
+async function expectTouchTargets(root, where) {
+  await expect
+    .poll(() => root.evaluate(narrowTargets, 44), { message: `${where}: controls a finger presses over less than 44x44px` })
+    .toEqual([]);
+}
+
+/**
+ * Every control on the three surfaces a phone player presses most -- the
+ * briefing page, the live table and the decision reveal -- takes a press over
+ * at least 44x44 CSS px (WCAG 2.5.5), on a small Android phone and on what
+ * Safari leaves of an iPhone 14. The fixes so far were held by reading the
+ * sheets (layout-css.test.mjs); this is the screen they were for. The reading
+ * clock is held so the briefing does not open the table while it is measured.
+ */
+for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
+  test(`the briefing, the table and the reveal are pressed over 44x44px at ${size.width}x${size.height}`, async ({ page }) => {
+    const where = `${size.width}x${size.height}`;
+    await page.addInitScript(
+      ({ key, value }) => localStorage.setItem(key, value),
+      { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ holdReadingClock: true }) },
+    );
+    await page.setViewportSize(size);
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "case01", "start", { openTable: false });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+
+    const briefing = page.getByTestId("scene-briefing");
+    await expect(briefing.getByRole("dialog")).toBeVisible();
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    await waitForEntrance(briefing);
+    await expectTouchTargets(briefing, `the briefing @ ${where}`);
+
+    await dismissProtocolBreach(page);
+    await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+    // 사건 01 has the whole table, so the stances are on it.
+    await expect(page.getByTestId("gauntlet-stance-mastery")).toBeVisible();
+    await waitForEntrance(page.locator(".game-shell"));
+    await expectTouchTargets(page.locator("body"), `the table @ ${where}`);
+
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await cashStakedCard(page);
+    const reveal = page.locator(".decision-reveal-backdrop");
+    await expect(reveal.getByTestId("decision-next")).toBeVisible();
+    await waitForEntrance(reveal);
+    await expectTouchTargets(reveal, `the reveal @ ${where}`);
+  });
+}
+
+/**
+ * A stance is a GuardedButton (StanceRow.jsx): on a table that is not live it
+ * is aria-disabled, says why in its description and drops the press. Read
+ * through the accessibility tree, not the markup layout-css.test.mjs matches.
+ * Under the reveal the stage is behind a modal, so the buttons are found by
+ * class: a role query leaves out what the dialog hides.
+ */
+test("a stance that cannot be changed says why, and one that can says only what its count counts", async ({ page }) => {
+  // Patterns, not the sentences: the copy is still being worded (one-name-per-term
+  // rewrites both), and what is held here is which of them is said when.
+  const DETAIL = /^시즌 숙련: \S.*판$/;
+  const BLOCKED = /^판이 열려 있을 때만 자세를 바꿀 수 있\S*\. 시즌 숙련: \S.*판$/;
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "start");
+  const stage = page.getByTestId("gauntlet-stage");
+  const stances = page.locator(".gx-focus-modes button");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(stances).toHaveCount(3);
+  for (let index = 0; index < 3; index += 1) {
+    await expect(stances.nth(index)).not.toHaveAttribute("aria-disabled", "true");
+    await expect(stances.nth(index)).toHaveAccessibleDescription(DETAIL);
+  }
+
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible();
+  await expect(stage).not.toHaveAttribute("data-status", "live");
+  for (let index = 0; index < 3; index += 1) {
+    await expect(stances.nth(index)).toHaveAttribute("aria-disabled", "true");
+    await expect(stances.nth(index)).toHaveAccessibleDescription(BLOCKED);
+  }
+  // And it refuses the press it says it refuses. React flushes a click's state
+  // before dispatchEvent returns, so a stance that took it would show it here.
+  const steady = page.locator(".gx-focus-modes button.mode-steady");
+  await expect(steady).toHaveAttribute("aria-pressed", "false");
+  await steady.dispatchEvent("click");
+  await expect(steady).toHaveAttribute("aria-pressed", "false");
 });
 
 test("the relic draft has no structural accessibility violations", async ({ page }) => {
