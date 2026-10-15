@@ -15,6 +15,7 @@ import {
   getRiskPressure,
   getSuspenseState,
 } from "../gameLogic.js";
+import { getJudgementHabit } from "../judgementHabit.js";
 import { getTraceEvents } from "./trace.js";
 
 /**
@@ -36,7 +37,7 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
-export function useRunReadout({ log, resources, triggers, cognition, node, currentCase, clueCount, seedBase, debugTools }) {
+export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, seedBase, debugTools }) {
   const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   const narrativeSpine = useMemo(() => {
@@ -70,9 +71,13 @@ export function useRunReadout({ log, resources, triggers, cognition, node, curre
   }, [log]);
   const gameplayStats = useMemo(() => getGameplayStats(log, riskPressure), [log, riskPressure]);
   const decisionLedger = useMemo(() => getDecisionLedger(log, resources), [log, resources]);
+  // The season's 판단 습관 rides on the fingerprint because the fingerprint is
+  // what the report already hands the result card: the card is given the
+  // finished name and no new field (judgementHabit.js).
+  const judgementHabit = useMemo(() => getJudgementHabit(caseResults), [caseResults]);
   const decisionFingerprint = useMemo(
-    () => getDecisionFingerprint({ triggerScores: triggers, cognitionScores: cognition, entries: log, resources }),
-    [cognition, log, resources, triggers],
+    () => ({ ...getDecisionFingerprint({ triggerScores: triggers, cognitionScores: cognition, entries: log, resources }), habit: judgementHabit }),
+    [cognition, judgementHabit, log, resources, triggers],
   );
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);

@@ -50,6 +50,8 @@ const COPY_FILES = [
   "src/featurePack.js",
   "src/advancedSystems.js",
   "src/runtimeSystems.js",
+  // The 판단 습관 names and lines the result card prints.
+  "src/judgementHabit.js",
   // The lines a prologue's first briefing says about the rules it turns on.
   "src/gauntlet/tableUnlocks.js",
 ];

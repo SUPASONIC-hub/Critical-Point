@@ -307,7 +307,8 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               </article>
               <article>
                 <span>당신이 반복한 방식</span>
-                <strong>{decisionFingerprint.modeTitle}</strong>
+                <strong>{decisionFingerprint.habit?.title || decisionFingerprint.modeTitle}</strong>
+                {decisionFingerprint.habit ? <p>{decisionFingerprint.habit.line}</p> : null}
                 <p>{view.endingCause ? view.endingCause.text : decisionFingerprint.modeText}</p>
               </article>
               <article className="result-why-doors">

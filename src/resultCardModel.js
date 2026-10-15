@@ -74,7 +74,7 @@ function readSeasonLeague(finalSummary) {
 
 /**
  * @param {object} [input]
- * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string } }} [input.fingerprint] The 판단 DNA.
+ * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string }, habit?: { title?: string } | null }} [input.fingerprint] The 판단 DNA, with the season's 판단 습관 when it has one.
  * @param {{ label?: string, title?: string, failure?: boolean }} [input.endingVariant] The ending the season reached.
  * @param {string} [input.endingName] The ending as a sentence calls it, in Korean.
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
@@ -87,7 +87,10 @@ export function buildResultCardModel(input = {}) {
   const summaries = Object.values(results).filter((summary) => summary && typeof summary === "object");
   const best = readBestCase(summaries);
   return {
-    modeTitle: toText(fingerprint?.modeTitle, UNREAD_MODE_TITLE),
+    // The season's 판단 습관 (`judgementHabit.js`) takes the large line when it
+    // has one; the 판단 DNA title stands in for a season without one. The
+    // habit's own line is not drawn: the card's chunk had no room for it.
+    modeTitle: toText(fingerprint?.habit?.title, toText(fingerprint?.modeTitle, UNREAD_MODE_TITLE)),
     mode: toText(fingerprint?.mode),
     motiveLabel: toText(fingerprint?.motive?.label),
     endingName: toText(endingName, UNREAD_ENDING_NAME),
