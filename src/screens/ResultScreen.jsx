@@ -115,7 +115,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint: decisionFingerprint, endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults }}
+            card={{ fingerprint: decisionFingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -252,7 +252,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
               <p>{endingVariant.text}</p>
-              <small>{endingVariant.failure ? "사람 피해가 감당할 수 있는 선을 넘은 것으로 기록되었습니다." : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
+              <small>{endingVariant.failure ? view.endingCause.toll : "이 결말은 단서, 관계, 자원 조합에 따라 달라집니다."}</small>
             </section>
           )}
           {currentCase === "final" && (
