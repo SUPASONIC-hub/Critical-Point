@@ -19,7 +19,7 @@ import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../g
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
 import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
-import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout } from "../viewModels/reportViewModels.js";
+import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout, describeDecisionPace, getDecisionPace } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
@@ -122,13 +122,17 @@ export function useResultReport({
   triggers,
 }) {
   const telemetryStats = useSyncExternalStore(subscribeTelemetryStats, getTelemetryStats, getTelemetryStats);
+  // `decisionPaceLine` is the report's alone: the summary a case stores is
+  // written by useChoiceCommit, so a save carries no new key.
   const result = useMemo(
-    () =>
-      createCaseSummary(triggers, cognition, log, {
+    () => ({
+      ...createCaseSummary(triggers, cognition, log, {
         resources,
         schemaVersion: SAVE_SCHEMA_VERSION,
         includeLongestDecision: true,
       }),
+      decisionPaceLine: describeDecisionPace(getDecisionPace(log)),
+    }),
     [triggers, cognition, log, resources],
   );
   // The season as `check:endings` replays it: the case summaries so far
