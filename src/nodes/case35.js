@@ -108,7 +108,7 @@ const case35Nodes = {
       },
       {
         id: "c35_sandbag_gate",
-        label: "입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다",
+        label: "입구에 다 쌓아 큰길 쪽 가게 스무 곳을 지킨다",
         effect: { time: 5, capital: 6, trust: -3, humanCost: 5, fatigue: 3 },
         voice: "한 곳만 막을 수 있다면 가장 많은 가게를 고른다며, 입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다.",
         echo: "큰길 쪽 스무 곳은 문을 엽니다. 떡방 골목은 무릎까지 잠기고, 민도현의 라이브 방송은 그 골목을 비춥니다.",

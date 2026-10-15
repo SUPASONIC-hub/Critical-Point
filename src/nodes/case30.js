@@ -180,7 +180,7 @@ const case30Nodes = {
     choices: [
       {
         id: "c30_leaving_let",
-        label: "반재욱의 이름을 모든 기록에서 빼고 단체방 자리만 남겨 둔다",
+        label: "반재욱의 이름은 빼고 단체방 자리만 남긴다",
         effect: { trust: 12, humanCost: -5, legitimacy: -3, time: -3, fatigue: 5 },
         voice: "서아의 내년까지 걸게 할 수는 없다며, 반재욱의 이름을 모든 기록에서 빼고 단체방 자리만 남겨 둔다.",
         echo: "이름을 빼면 반재욱은 어디에도 없습니다. 단체방의 그의 자리에는 읽음 숫자만 하나 남습니다.",
@@ -196,7 +196,7 @@ const case30Nodes = {
       },
       {
         id: "c30_leaving_ask",
-        label: "감사팀 권한으로 딱 한 번만 조회해 달라고 부탁한다",
+        label: "감사팀 권한으로 한 번만 조회해 달라고 한다",
         effect: { capital: 5, time: 5, trust: -4, legitimacy: 3, humanCost: 4, fatigue: -2 },
         voice: "KD데이터랩만 빠진 까닭은 안에서만 볼 수 있어서, 감사팀 권한으로 딱 한 번만 조회해 달라고 부탁한다.",
         echo: "부탁하면 반재욱이 조회를 해 줍니다. 그리고 그 조회 기록이 서약서의 첫 번째 위반이 됩니다.",

@@ -97,7 +97,7 @@ const case29Nodes = {
       },
       {
         id: "c29_marina_basis",
-        label: "가격을 정한 근거 자료를 실사 목록에 공식으로 올린다",
+        label: "가격 산정 근거를 실사 목록에 공식으로 올린다",
         effect: { legitimacy: 12, trust: -4, time: -4, humanCost: 3, fatigue: 4 },
         voice: "30.7%가 어디서 나왔는지 남아야 한다며, 가격을 정한 근거 자료를 실사 목록에 공식으로 올린다.",
         echo: "근거 자료는 목록에 오릅니다. 자료실이 서명식 한 시간 전에 열린다는 답도 함께 옵니다.",
@@ -150,7 +150,7 @@ const case29Nodes = {
       },
       {
         id: "c29_hawker_photo",
-        label: "오진우에게 오늘 밤 부속서를 찍어 달라고 부탁한다",
+        label: "오진우에게 오늘 밤 부속서 사진을 부탁한다",
         effect: { capital: 8, time: 6, legitimacy: 3, trust: -4, humanCost: 4, fatigue: -1 },
         voice: "부속서 C를 볼 길이 지금은 그뿐이라며, 오진우에게 오늘 밤 부속서를 찍어 달라고 부탁한다.",
         echo: "부탁하면 오진우가 고개를 끄덕입니다. 그의 휴대폰 화면 잠금이 풀리는 소리가 오늘 밤 가장 큰 소리입니다.",
@@ -187,7 +187,7 @@ const case29Nodes = {
       },
       {
         id: "c29_hotel_official",
-        label: "부속서 원본을 라운드힐에 공식으로 요청해 확인한다",
+        label: "라운드힐에 부속서 원본을 공식 요청한다",
         effect: { legitimacy: 12, trust: -3, time: -4, humanCost: 3, fatigue: 3 },
         voice: "제보자 없이도 설 수 있는 증거가 필요하다며, 부속서 원본을 라운드힐에 공식으로 요청해 확인한다.",
         echo: "공식 요청은 조현석의 메일함으로 갑니다. 답장은 '서명식 자리에서 보여 드리겠습니다' 한 줄입니다.",
