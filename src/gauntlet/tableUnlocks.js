@@ -247,3 +247,19 @@ export function getUnlockIntro(caseId, run, staged = STAGED) {
 export function getUnlockKicker(caseId) {
   return STEP_BY_CASE.get(caseId)?.kicker ?? UNLOCK_INTRO_KICKER;
 }
+
+/**
+ * Whether the table has nothing left to introduce in this case: the case is
+ * not a step of the ladder for this run. True from 사건 01 on, for a run begun
+ * with NEW GAME+ in every case, and everywhere with the switch off; false in
+ * the five prologues of a plain run, 프롤로그 05 included -- it plays under
+ * every rule, and two of them are new there. Asked of the case alone, like
+ * `rulesFor`: a prologue played again is still a step. A story run is told
+ * less, but its prologues are steps all the same.
+ *
+ * The decision reveal reads this (`useChoiceCommit`): while a case is still
+ * introducing rules the reveal is the full sheet, because it is teaching.
+ */
+export function isTableTaught(caseId, run, staged = STAGED) {
+  return findStep(caseId, { veteran: run?.veteran === true, staged }) === null;
+}

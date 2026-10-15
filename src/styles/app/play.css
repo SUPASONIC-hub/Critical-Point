@@ -1752,6 +1752,21 @@
   font-weight: 600;
 }
 
+/* 자세히: the short sheet's way to the whole one. Under the verdict, above
+   everything it opens, so what grows is below the button and the top of the
+   sheet -- the verdict and the button -- is what stays in view. */
+.gx-reveal-more {
+  display: block;
+  min-height: 44px;
+  margin: 0 auto;
+  padding: 0 14px;
+  color: var(--ui-text-2);
+  background: none;
+  border: 0;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .gx-reveal-consequence {
   display: grid;
   gap: 0;

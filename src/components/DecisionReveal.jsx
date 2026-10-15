@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
 import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.js";
@@ -38,6 +38,27 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
 }
 
 /**
+ * Whether 자세히 is open. A season is some 300 reveals, and once every rule of
+ * the table has been introduced (`decisionReveal.short`, set by the commit from
+ * `isTableTaught`) the same whole sheet each time is the table, the slam and
+ * then a page of rows the player has read. So the sheet is short from there:
+ * the verdict, the card the room played if it was not the player's, what was
+ * received and paid, a scene lost, the next rules, the card's own line, a clue
+ * -- and whatever happens once (a relic unlocked, the draft, an overclock). The
+ * ledger, the pot's sum, the words of the choice and the closing sentence made
+ * from the effect are behind the button, which opens the sheet as it was.
+ *
+ * It lives here and not in the save or the settings: it is this visit's, like
+ * the reveal itself (`runState.js`, never saved). A module variable because the
+ * play screen and the report each mount a reveal of their own, and the choice
+ * made on one holds on the other.
+ */
+let detailsOpen = false;
+const flipDetails = () => {
+  detailsOpen = !detailsOpen;
+};
+
+/**
  * The verdict, then the bill, then what broke.
  *
  * This modal used to stack up to seven lime "SURGE" cards over every commit --
@@ -68,6 +89,7 @@ export function DecisionReveal({ view }) {
   const busted = verdict?.outcome === "bust";
   const overclocked = !busted && Boolean(verdict?.nextMutations?.some((mutation) => mutation.id === "overclock"));
   const nextRef = useRef(null);
+  const [, redraw] = useState(0);
   useEffect(() => {
     if (decisionReveal) nextRef.current?.focus({ preventScroll: true });
   }, [decisionReveal]);
@@ -82,7 +104,13 @@ export function DecisionReveal({ view }) {
   const formatEffect = ([key, value]) => `${resourceMeta?.[key]?.label ?? key} ${value > 0 ? "+" : ""}${value}`;
   const nextMutations = verdict?.nextMutations ?? [];
   const overclockMutation = nextMutations.find((mutation) => mutation.id === "overclock");
-  const consequenceLines = createConsequenceLines({ verdict, busted, nextMutations });
+  // The whole sheet: while the case is still introducing rules, and once 자세히 is open.
+  const full = !decisionReveal.short || detailsOpen;
+  const toggleDetails = () => {
+    flipDetails();
+    redraw((count) => count + 1);
+  };
+  const consequenceLines = full ? createConsequenceLines({ verdict, busted, nextMutations }) : [];
   const headline = !verdict
     ? "DECISION"
     : busted
@@ -114,6 +142,12 @@ export function DecisionReveal({ view }) {
           <p>{subline}</p>
         </div>
 
+        {decisionReveal.short && (
+          <button type="button" className="gx-reveal-more" data-testid="reveal-details" aria-expanded={detailsOpen} onClick={toggleDetails}>
+            자세히
+          </button>
+        )}
+
         {consequenceLines.length > 0 && (
           <div className="gx-reveal-consequence" data-testid="consequence-ledger" role="group" aria-label="판정 후폭풍">
             {consequenceLines.map(([label, text]) => (
@@ -125,7 +159,7 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
-        {verdict && (
+        {full && verdict && (
           <div className="gx-reveal-pot" role="group" aria-label="판돈">
             {busted ? (
               <p className="gx-reveal-loss">
@@ -179,9 +213,11 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
-        <p className="decision-reveal-choice">
-          {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
-        </p>
+        {(full || decisionReveal.forced) && (
+          <p className="decision-reveal-choice">
+            {decisionReveal.forced ? "회의실이 대신 골랐다: " : ""}"{decisionReveal.spokenChoice}"
+          </p>
+        )}
 
         <div className="decision-reveal-stakes" role="group" aria-label="선택으로 열린 것과 닫힌 것">
           <article>
@@ -220,9 +256,11 @@ export function DecisionReveal({ view }) {
           </div>
         )}
 
-        <div className="decision-reveal-beat">
-          {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
-        </div>
+        {(full || decisionReveal.echo) && (
+          <div className="decision-reveal-beat">
+            {renderSceneLines(decisionReveal.echo || String(decisionReveal.beat ?? "").split("\n").slice(-1).join("\n"))}
+          </div>
+        )}
 
         {decisionReveal.clue && (
           <div className="cinematic-clue-card">
