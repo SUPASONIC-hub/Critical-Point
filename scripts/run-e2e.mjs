@@ -103,6 +103,8 @@ const DEFAULT_SPECS = [
   "tests/save-integrity.spec.js",
   "tests/save-resume.spec.js",
   "tests/season-flow.spec.js",
+  "tests/season-recovery.spec.js",
+  "tests/season-telemetry.spec.js",
   "tests/table-keys.spec.js",
   "tests/visual-regression.spec.js",
 ];

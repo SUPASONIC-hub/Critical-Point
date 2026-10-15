@@ -1332,6 +1332,13 @@ production build in e2e mode (`build:e2e`), `check:bundle`,
 smoke is `npm run test:runtime:dev`. Run the browser tiers one at a time:
 several at once on one machine time out on page loads.
 
+The season tests are three specs: `season-flow.spec.js` holds the season
+walk (`@season-segment`, `@season-full`, which `--segments` and `--season`
+name by that file) and the screens met on the way, `season-recovery.spec.js`
+saves, recovery and storage failures, and `season-telemetry.spec.js` the
+telemetry retries. Helpers more than one of them uses are in
+`tests/helpers/seasonFlow.js`.
+
 Four artifacts are generated and committed, so a deploy needs no browser and no
 font tooling to build: `npm run build:art`, `npm run build:critical`, `npm run
 build:fonts` and `npm run build:icons`. The first three have a guard that fails

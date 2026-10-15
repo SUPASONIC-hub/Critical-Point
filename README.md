@@ -1080,6 +1080,10 @@ e2e는 push·`e2e` 라벨·Dependabot PR에서 돕니다. 시각 회귀는 `main
 `npm run check:specs`는 모든 스펙이 로드되는지와 함께, 어느 목록에도 없고 `package.json` 스크립트가
 이름으로 부르지도 않는 스펙이 있으면 실패합니다.
 
+시즌 테스트는 세 스펙입니다. `season-flow.spec.js`는 시즌 걷기(`@season-segment`·`@season-full`)와 그 길에서
+만나는 화면, `season-recovery.spec.js`는 저장·복구·저장소 실패, `season-telemetry.spec.js`는 텔레메트리
+재시도를 봅니다. 둘 이상이 함께 쓰는 도우미는 `tests/helpers/seasonFlow.js`에 있습니다.
+
 WebKit(iPhone 14) 프로젝트는 아직 주간 워크플로에서만 돌고, 두 번에 나눠 돕니다. `npm run
 test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run test:e2e:webkit:layout`은 개발 서버에서
 `@layout` 측정을 돌립니다(측정은 프로덕션 빌드에 없는 디버그 점프로 장면에 들어갑니다).
