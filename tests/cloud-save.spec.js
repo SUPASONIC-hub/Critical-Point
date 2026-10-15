@@ -1,4 +1,5 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { acceptConfirms, dismissConfirms } from "./helpers/dialogs.js";
 import { cashStakedCard, dismissProtocolBreach, resumeSavedRun } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -89,11 +90,11 @@ test("a device that fell behind is stopped, and the player chooses which progres
   expect(puts).toHaveLength(0);
 
   // Declining the question changes nothing.
-  page.once("dialog", (dialog) => dialog.dismiss());
+  await dismissConfirms(page);
   await reopened.getByRole("button", { name: "이 기기의 진행으로 덮어쓰기" }).click();
   expect(puts).toHaveLength(0);
 
-  page.once("dialog", (dialog) => dialog.accept());
+  await acceptConfirms(page);
   await reopened.getByRole("button", { name: "이 기기의 진행으로 덮어쓰기" }).click();
   await expect(reopened.getByTestId("cloud-save-status")).toContainText("모두 최신입니다");
   expect(puts).toHaveLength(1);
@@ -144,7 +145,7 @@ test("turning online save off offers to take the online copy back", async ({ pag
 
   await panel.getByTestId("cloud-save-toggle").uncheck();
   await expect(panel.getByTestId("cloud-save-status")).toContainText("꺼져 있습니다");
-  page.once("dialog", (dialog) => dialog.accept());
+  await acceptConfirms(page);
   await panel.getByTestId("cloud-save-delete").click();
   await expect(panel.getByTestId("cloud-save-done")).toContainText("지웠습니다");
   expect(deleted).toEqual([{ p_code: CODE }]);

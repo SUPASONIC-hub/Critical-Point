@@ -48,6 +48,7 @@ import { RelicDraft } from "./RelicDraft.jsx";
 import { SceneBriefing } from "./SceneBriefing.jsx";
 import { StanceRow } from "./StanceRow.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
+import { useConfirmOpen } from "../state/confirmAction.js";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 
@@ -128,7 +129,9 @@ export function GauntletStage({
   // The window the reading clock opened by itself, which is said aloud.
   const [clockOpenedSeed, setClockOpenedSeed] = useState(null);
   const tableOpen = openedSeed === seed;
-  const paused = hidden || draftOpen || !tableOpen;
+  // A question (초기화 in the middle of play) holds the clock as the draft does.
+  const asking = useConfirmOpen();
+  const paused = hidden || draftOpen || !tableOpen || asking;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, resume, caseId: scene.node.caseId, run });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
   const resolvedRef = useRef(false);

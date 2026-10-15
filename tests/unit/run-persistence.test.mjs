@@ -89,7 +89,7 @@ test("the error log is read from storage, and cleared only when the question is 
   const declined = await createRunHarness({ confirm: false, patch: { lastRecoveredError: { message: "앞선 오류" } } });
   declined.act("startGame");
   declined.act("applyRun", { lastRecoveredError: { message: "새 오류" } });
-  declined.act("clearErrorLog");
+  await declined.act("clearErrorLog");
   assert.deepEqual(declined.run.lastRecoveredError, { message: "새 오류" });
 
   const harness = await createRunHarness();
@@ -98,7 +98,7 @@ test("the error log is read from storage, and cleared only when the question is 
   assert.deepEqual(harness.saved().lastError, { message: "새 오류" });
   harness.act("refreshErrorLog");
   assert.deepEqual(harness.outside.localErrorEntries, []);
-  harness.act("clearErrorLog");
+  await harness.act("clearErrorLog");
   assert.equal(harness.run.lastRecoveredError, null);
   assert.equal(harness.saved().lastError, null);
   assert.equal(globalThis.localStorage.getItem(appConfig.ERROR_LOG_STORAGE_KEY), null);
@@ -110,7 +110,7 @@ test("a recovery slot is deleted from storage and from the list on screen", asyn
   harness.act("refreshErrorLog");
   const [slot] = harness.outside.saveSlots;
   assert.ok(slot?.id, "a new game leaves a slot to go back to");
-  harness.act("deleteSlot", slot.id);
+  await harness.act("deleteSlot", slot.id);
   assert.deepEqual(harness.outside.saveSlots, []);
   assert.deepEqual(stored(appConfig.SAVE_SLOT_STORAGE_KEY).slots, []);
 });
@@ -123,7 +123,7 @@ test("deleting a slot leaves the slots the list on screen had not been told abou
   // A case opens after the list was read: storage has a second slot, the list one.
   harness.act("applyRun", { currentCase: "prologue02" });
   assert.deepEqual([harness.slotCount(), harness.outside.saveSlots.length], [2, 1]);
-  harness.act("deleteSlot", listed.id);
+  await harness.act("deleteSlot", listed.id);
   const left = stored(appConfig.SAVE_SLOT_STORAGE_KEY).slots;
   assert.deepEqual(left.map((slot) => slot.currentCase), ["prologue02"], "the slot nobody asked to delete is still in storage");
   assert.deepEqual(harness.outside.saveSlots.map((slot) => slot.id), left.map((slot) => slot.id), "and the list shows what storage holds");
@@ -133,7 +133,7 @@ test("wiping the run holds the online copy against the run that comes next", asy
   const uploaded = { pending: "", synced: "2026-10-01T00:00:00.000Z", revision: 3 };
   const harness = await createRunHarness({ storage: { [appConfig.CLOUD_SAVE_SYNC_KEY]: JSON.stringify(uploaded) } });
   harness.act("startGame");
-  harness.act("resetEverything");
+  await harness.act("resetEverything");
   assert.equal(harness.saved(), null);
   assert.deepEqual(stored(appConfig.CLOUD_SAVE_SYNC_KEY).conflict, { savedAt: uploaded.synced, revision: 3 }, "nothing uploads over it until the player chooses");
   assert.equal(stored(appConfig.CLOUD_SAVE_SYNC_KEY).revision, 3);
@@ -142,7 +142,7 @@ test("wiping the run holds the online copy against the run that comes next", asy
 test("starting fresh from the recovery notice removes the save, keeps the slots, and reloads into the centre", async () => {
   const harness = await createRunHarness();
   harness.act("startGame");
-  harness.act("startFresh");
+  await harness.act("startFresh");
   assert.equal(harness.saved(), null);
   assert.equal(harness.slotCount(), 1);
   assert.equal(globalThis.localStorage.getItem(appConfig.RECOVERY_CENTER_STORAGE_KEY), "1");

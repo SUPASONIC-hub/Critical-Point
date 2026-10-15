@@ -307,7 +307,7 @@ test("another device picks the run up from its code", async ({ page }) => {
   await panel.getByLabel("다른 기기의 코드").fill("ABCD-EFGH-JKLM");
   // Asks first when this device already holds a run; this one does not, but
   // an unanswered question would turn the import into a silent no-op.
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await panel.getByRole("button", { name: "불러와서 이어하기" }).click();
   await expect(page.getByTestId("resume-save")).toBeVisible({ timeout: 10_000 });
   const local = await readJsonStorage(page, TEST_STORAGE_KEYS.save);

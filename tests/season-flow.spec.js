@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
-import { acceptConfirms } from "./helpers/dialogs.js";
+import { acceptConfirms, dismissConfirms } from "./helpers/dialogs.js";
 import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
@@ -34,7 +34,7 @@ async function startDebugNode(page, caseId, nodeId) {
 
 test("the last case before the finale can unlock and open it", async ({ page }) => {
   test.setTimeout(180_000);
-  const dialogMessages = acceptConfirms(page);
+  const dialogMessages = await acceptConfirms(page);
   await page.goto("/?debug=1");
   await startDebugNode(page, "case49", "c49_aftershock");
   await completeCurrentCase(page);
@@ -379,7 +379,7 @@ async function seedFinishedSeason(page, save = null) {
 }
 
 test("NEW GAME+ starts the season again and keeps the finished one on the intro", { tag: "@prod" }, async ({ page }) => {
-  const asked = acceptConfirms(page);
+  const asked = await acceptConfirms(page);
   await seedFinishedSeason(page);
   await page.goto("/");
   const memory = page.locator(".past-run-memory");
@@ -426,12 +426,7 @@ test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the r
     cognition: {},
   };
   await seedFinishedSeason(page, run);
-  const asked = [];
-  let answer = false;
-  page.on("dialog", (dialog) => {
-    asked.push(dialog.message());
-    return answer ? dialog.accept() : dialog.dismiss();
-  });
+  const asked = await dismissConfirms(page);
   await page.goto("/");
   await expect(page.getByTestId("resume-save")).toBeVisible();
   const button = page.getByRole("button", { name: "NEW GAME+ 시작" });
@@ -447,7 +442,7 @@ test("NEW GAME+ over a run that can be resumed asks first, and a no leaves the r
   expect(saved.currentCase).toBe("case05");
   expect(saved.completedCases).toHaveLength(4);
 
-  answer = true;
+  await acceptConfirms(page);
   await button.click();
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   expect(asked).toHaveLength(2);
@@ -1325,7 +1320,7 @@ test("starting a fresh game clears stale recovery guidance", async ({ page }) =>
   await page.goto("/");
   await expect(page.getByText("복구됨")).toBeVisible();
   // The save is a run that can be resumed, so starting over asks first.
-  const asked = acceptConfirms(page);
+  const asked = await acceptConfirms(page);
   await startFirstRun(page);
   expect(asked.at(-1)).toContain("첫 사건부터 새로 시작");
   await expect(page.locator(".recovery-notice")).toHaveCount(0);
@@ -1544,7 +1539,7 @@ test("corrupt error log entries are filtered before the diagnostics panel render
 });
 
 test("restoring a corrupt recovery slot repairs nested data before resume", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     const snapshot = {
@@ -1609,7 +1604,7 @@ test("storage write failure does not block scene start", async ({ page }) => {
 });
 
 test("recovery slot can be restored and deleted from debug panel", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1699,7 +1694,7 @@ test("recovery slot can be restored and deleted from debug panel", async ({ page
 });
 
 test("recovery slot delete failure keeps the slot visible", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1753,7 +1748,7 @@ test("recovery slot delete failure keeps the slot visible", async ({ page }) => 
 });
 
 test("recovery slot restore repairs invalid saved route before writing", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1801,7 +1796,7 @@ test("recovery slot restore repairs invalid saved route before writing", async (
 });
 
 test("error log clear failure keeps the log visible", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1839,7 +1834,7 @@ test("error log clear failure keeps the log visible", async ({ page }) => {
 });
 
 test("reset clears progress, error logs, and recovery slots", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1889,7 +1884,7 @@ test("reset clears progress, error logs, and recovery slots", async ({ page }) =
 });
 
 test("reset failure records failed storage keys", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await startDebugNode(page, "case05", "c5_voice");
   await expect(page.locator(".game-shell")).toBeVisible();
@@ -1951,7 +1946,7 @@ test("repeated render errors block the retry loop and preserve recovery choices"
 });
 
 test("error boundary can clear the current saved state", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.goto("/?debug=1");
   await page.evaluate(() => {
     localStorage.setItem(
@@ -1983,7 +1978,7 @@ test("error boundary can clear the current saved state", async ({ page }) => {
 });
 
 test("error boundary clear save failure does not reload", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   await page.addInitScript(() => {
     localStorage.setItem(
       "trigger-prototype-v2",

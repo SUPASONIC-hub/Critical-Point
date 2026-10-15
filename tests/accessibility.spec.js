@@ -209,6 +209,19 @@ test("the question a second tab is asked has no structural accessibility violati
   await second.close();
 });
 
+// The question a destructive control asks is a dialog of the game's own since
+// it stopped being the browser's (src/components/ConfirmDialog.jsx), so it is
+// read like the other four. Nothing answers it here: it stays up for the audit.
+test("the question before a reset has no structural accessibility violations", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.getByRole("button", { name: /초기화/ }).click();
+  const question = page.getByRole("alertdialog");
+  await expect(question).toBeVisible();
+  await expect(question.getByRole("button", { name: "취소" })).toBeFocused();
+  await expectNoA11yViolations(page);
+});
+
 test("final case scene has no structural accessibility violations", async ({ page }) => {
   await page.goto("/?debug=1");
   await startDebugNode(page, "final", "f_start");

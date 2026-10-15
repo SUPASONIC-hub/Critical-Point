@@ -56,12 +56,12 @@ export class AppErrorBoundary extends Component {
     this.setState({ retryCount: readRetryCount() });
   }
 
-  reload({ clearSave = false } = {}) {
+  async reload({ clearSave = false } = {}) {
     if (!clearSave && readRetryCount() >= MAX_RETRIES_FROM_ONE_SAVE) {
       this.setState({ recoveryMessage: RETRY_BLOCKED_MESSAGE });
       return;
     }
-    if (clearSave && !confirmAction("저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다.")) return;
+    if (clearSave && !(await confirmAction("저장된 진행을 지우고 새 게임으로 시작할까요? 복구 슬롯과 오류 기록은 남습니다."))) return;
 
     if (clearSave) suppressSaves();
     if (clearSave && !removeStoredValue(STORAGE_KEY)) {

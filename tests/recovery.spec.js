@@ -1,5 +1,5 @@
 import { expect, test } from "./helpers/network.js";
-import { acceptConfirms } from "./helpers/dialogs.js";
+import { acceptConfirms, answerConfirm, confirmDialog, dismissConfirms } from "./helpers/dialogs.js";
 import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -77,7 +77,7 @@ const focusIsInside = (page, selector) =>
   page.evaluate((target) => Boolean(document.querySelector(target)?.contains(document.activeElement)), selector);
 
 test("a recovery slot restored in the middle of play is the run that comes back", async ({ page }) => {
-  acceptConfirms(page);
+  await acceptConfirms(page);
   const slotSnapshot = savedRun({ nodeId: "c5_start", started: true, runId: "run-recovery-e2e" });
   await seedOnce(page, {
     save: savedRun({
@@ -118,11 +118,7 @@ test("a recovery slot restored in the middle of play is the run that comes back"
 test("declining the question leaves the slot, the log and the run as they were", async ({ page }) => {
   // Each no is counted. With the answers only given, three buttons that did
   // nothing at all left the slot, the log and the run as they were too.
-  const asked = [];
-  page.on("dialog", (dialog) => {
-    asked.push(dialog.message());
-    return dialog.dismiss();
-  });
+  const asked = await dismissConfirms(page);
   await seedOnce(page, {
     save: savedRun({ started: false, paused: true }),
     errorLog: {
@@ -145,11 +141,11 @@ test("declining the question leaves the slot, the log and the run as they were",
   await page.getByTestId("open-error-log-from-header").click();
   const panel = page.getByTestId("error-log-panel");
   await panel.getByRole("button", { name: /로그 비우기/ }).click();
-  expect(asked, "로그 비우기 asked first").toHaveLength(1);
+  await expect.poll(() => asked.length, "로그 비우기 asked first").toBe(1);
   await panel.getByRole("button", { name: "삭제" }).click();
-  expect(asked, "삭제 asked first").toHaveLength(2);
+  await expect.poll(() => asked.length, "삭제 asked first").toBe(2);
   await page.getByTestId("restore-save-slot-slot-kept").click();
-  expect(asked, "the restore asked first").toHaveLength(3);
+  await expect.poll(() => asked.length, "the restore asked first").toBe(3);
   expect(new Set(asked).size, "and each asked its own question").toBe(3);
 
   await expect(panel.getByText("Kept entry")).toBeVisible();
@@ -271,14 +267,71 @@ test("Escape closes 랭킹 and 게시판 and gives focus back to what opened the
   }
 });
 
+/**
+ * The question is a dialog in the game (src/components/ConfirmDialog.jsx), not
+ * the browser's. Nothing here answers for the test: it is driven by keyboard,
+ * the way the dialog has to work for someone with no pointer.
+ */
+test("the question takes focus on 취소, keeps Tab and Escape to itself, and hands focus back", async ({ page }) => {
+  await seedOnce(page, {
+    save: savedRun({ started: false, paused: true }),
+    slots: {
+      recoverySlotSchemaVersion: 1,
+      slots: [{
+        id: "slot-kept",
+        savedAt: "2026-09-27T10:00:00.000Z",
+        currentCase: "case05",
+        nodeId: "c5_start",
+        completedCases: [],
+        snapshot: savedRun({ nodeId: "c5_start" }),
+      }],
+    },
+  });
+  await page.goto("/?debug=1");
+  await page.getByTestId("open-error-log-from-header").click();
+  const panel = page.getByTestId("error-log-panel");
+  const remove = panel.getByRole("button", { name: "삭제" });
+  const slot = page.getByTestId("restore-save-slot-slot-kept");
+  const dialog = confirmDialog(page);
+
+  // Opened from the keyboard: Enter on the button that asks.
+  await remove.focus();
+  await page.keyboard.press("Enter");
+  await expect(dialog).toHaveRole("alertdialog");
+  await expect(dialog).toHaveAttribute("aria-modal", "true");
+  await expect(dialog).toHaveAccessibleName(/이 복구 지점을 지울까요/);
+  // Not on the answer that deletes.
+  await expect(dialog.getByTestId("confirm-no")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(dialog.getByTestId("confirm-yes")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(dialog.getByTestId("confirm-no")).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(dialog.getByTestId("confirm-yes")).toBeFocused();
+
+  // Escape answers no, and only that: the recovery centre behind closes on
+  // Escape too, and must not hear this one.
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(panel).toBeVisible();
+  await expect(slot).toBeVisible();
+  await expect(remove).toBeFocused();
+
+  // 취소 by its button is the same no.
+  await page.keyboard.press("Enter");
+  await answerConfirm(page, false);
+  await expect(slot).toBeVisible();
+
+  // And yes does what was asked.
+  await remove.focus();
+  await page.keyboard.press("Enter");
+  expect(await answerConfirm(page, true)).toContain("이 복구 지점을 지울까요");
+  await expect(slot).toHaveCount(0);
+});
+
 test("replaying a closed case asks first, by key and by button", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  let answer = "dismiss";
-  const asked = [];
-  page.on("dialog", (dialog) => {
-    asked.push(dialog.message());
-    return answer === "accept" ? dialog.accept() : dialog.dismiss();
-  });
+  const asked = await dismissConfirms(page);
   await startDebugNode(page, "case02", "c2_aftershock");
   await completeCurrentCase(page);
   await expect(page.locator(".result-page")).toBeVisible();
@@ -286,11 +339,11 @@ test("replaying a closed case asks first, by key and by button", async ({ page }
 
   await page.keyboard.press("r");
   await page.locator(".replay-case-button").click();
-  expect(asked).toHaveLength(2);
+  await expect.poll(() => asked.length).toBe(2);
   await expect(page.locator(".result-page")).toBeVisible();
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log).toEqual(closed.log);
 
-  answer = "accept";
+  await acceptConfirms(page);
   await page.keyboard.press("r");
   await page.waitForSelector(".game-shell");
   await dismissProtocolBreach(page);

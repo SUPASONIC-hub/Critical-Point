@@ -121,8 +121,8 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
     return persist({ ...toSavePatch(patch), ...saveOnly }, { force });
   }
 
-  function startFreshAfterRecovery() {
-    if (!confirmAction(CONFIRM_START_FRESH)) return;
+  async function startFreshAfterRecovery() {
+    if (!(await confirmAction(CONFIRM_START_FRESH))) return;
     onSuppressSaves();
     leaveReplaySession();
     // Nothing was removed and nothing reloads, so the run on screen goes on and
@@ -168,8 +168,8 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   function dismissRecoveryNotice() { applyRun({ lastRecoveredError: null }); }
   function closeRecoveryCenter() { patchRun({ showErrorLog: false, showRecoveryCenter: false }); removeStoredValue(RECOVERY_CENTER_STORAGE_KEY); }
 
-  function clearLocalErrorLog() {
-    if (!confirmAction(CONFIRM_CLEAR_ERROR_LOG)) return;
+  async function clearLocalErrorLog() {
+    if (!(await confirmAction(CONFIRM_CLEAR_ERROR_LOG))) return;
     if (!removeStoredValue(ERROR_LOG_STORAGE_KEY)) {
       recordAppError(new Error("Error log clear failed because local storage could not be written."), {}, "error-log-clear");
       setSaveStatus("오류 기록을 지우지 못했습니다. 브라우저 저장소를 사용할 수 없습니다.");
@@ -182,8 +182,8 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
   // From the slots in storage, not the list on screen. The list is read when
   // the page loads and when the panel is refreshed, and saves add slots in
   // between: writing the list back less one slot deleted those too, unasked.
-  function deleteSaveSlot(slotId) {
-    if (!confirmAction(CONFIRM_DELETE_SLOT)) return;
+  async function deleteSaveSlot(slotId) {
+    if (!(await confirmAction(CONFIRM_DELETE_SLOT))) return;
     const storedSlots = parseRecoverySlots(readStoredValue(SAVE_SLOT_STORAGE_KEY, "null"))?.slots ?? [];
     const nextSlots = storedSlots.filter((slot) => slot.id !== slotId);
     if (!writeStoredValue(SAVE_SLOT_STORAGE_KEY, JSON.stringify({ recoverySlotSchemaVersion: RECOVERY_SLOT_SCHEMA_VERSION, slots: nextSlots }))) {
@@ -265,7 +265,7 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
       setSaveStatus("이 복구 슬롯은 손상되어 불러올 수 없습니다. 다른 슬롯을 고르세요.");
       return;
     }
-    if (!confirmAction(CONFIRM_RESTORE_SLOT)) return;
+    if (!(await confirmAction(CONFIRM_RESTORE_SLOT))) return;
     replaceSaveAndReload(nextState, {
       source: "save-slot-restore",
       what: "Save slot restore",
@@ -286,7 +286,7 @@ export function useAppPersistence({ run, patchRun, refs, setters, config }) {
       setSaveStatus("보관한 저장본은 이 버전에서도 읽을 수 없습니다. 지우지 않고 그대로 둡니다.");
       return;
     }
-    if (!confirmAction(CONFIRM_RESTORE_BACKUP)) return;
+    if (!(await confirmAction(CONFIRM_RESTORE_BACKUP))) return;
     const restored = replaceSaveAndReload(nextState, {
       source: "save-backup-restore",
       what: "Save backup restore",

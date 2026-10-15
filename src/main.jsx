@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { App, AppErrorBoundary, logCaughtRenderError } from "./App.jsx";
+import { ConfirmDialog } from "./components/ConfirmDialog.jsx";
 import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue } from "./appConfig.js";
 import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installServiceWorker } from "./serviceWorker/register.js";
@@ -22,7 +23,11 @@ claimTabToken();
 installServiceWorker();
 
 createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderError }).render(
-  <AppErrorBoundary>
-    <App />
-  </AppErrorBoundary>,
+  <>
+    <AppErrorBoundary>
+      <App />
+    </AppErrorBoundary>
+    {/* What every destructive control asks through (state/confirmAction.js); beside the boundary, whose own screen asks too. */}
+    <ConfirmDialog />
+  </>,
 );

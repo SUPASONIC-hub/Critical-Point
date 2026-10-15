@@ -63,7 +63,7 @@ export function CloudSavePanelBody() {
         failed("그 코드로 저장된 진행이 없습니다.");
         return;
       }
-      if (hasLocalRun() && !confirmAction("이 기기의 저장을 불러온 진행으로 바꿉니다. 계속할까요?")) return;
+      if (hasLocalRun() && !(await confirmAction("이 기기의 저장을 불러온 진행으로 바꿉니다. 계속할까요?"))) return;
       if (!(await applyCloudSave(found))) {
         failed("브라우저 저장소에 쓸 수 없어 불러오지 못했습니다.");
         return;
@@ -77,7 +77,7 @@ export function CloudSavePanelBody() {
   }
 
   async function overwriteRemote() {
-    if (!confirmAction("온라인에 있는 다른 기기의 진행을 이 기기의 진행으로 바꿉니다. 되돌릴 수 없습니다. 계속할까요?")) return;
+    if (!(await confirmAction("온라인에 있는 다른 기기의 진행을 이 기기의 진행으로 바꿉니다. 되돌릴 수 없습니다. 계속할까요?"))) return;
     setBusy(true);
     setOutcome(null);
     try {
@@ -88,7 +88,7 @@ export function CloudSavePanelBody() {
   }
 
   async function removeRemote() {
-    if (!confirmAction("온라인에 올린 진행 기록을 지웁니다. 이 기기의 저장은 그대로 남습니다. 계속할까요?")) return;
+    if (!(await confirmAction("온라인에 올린 진행 기록을 지웁니다. 이 기기의 저장은 그대로 남습니다. 계속할까요?"))) return;
     setBusy(true);
     setOutcome(null);
     try {
