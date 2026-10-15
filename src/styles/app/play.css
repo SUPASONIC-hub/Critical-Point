@@ -1715,8 +1715,15 @@
   animation: gx-bust-flash 1.2s ease-out both;
 }
 
+/* The break: for 0.9 s the BUST word -- and only the word; the sentence under
+   it with the wall and the pot never moves -- splits into two offset copies
+   and is cut by a scanline, then settles. The verdict is already written, so
+   nothing the player decides is under it. Reduced motion stops it below and
+   the comfort setting with every animation on the stage (comfort.css). The
+   keyframes, gx-break, are in result.css beside the collapse ending's. */
 .gx-slam-bust strong {
   text-shadow: 0 0 40px var(--c-gx-heat);
+  animation: gx-break 0.9s steps(1);
 }
 
 .gx-slam-cashed strong {
@@ -2958,6 +2965,7 @@
   }
 
   .gx-breach,
+  .gx-slam-bust strong,
   .gx-slam-cashed strong {
     animation: none;
   }
