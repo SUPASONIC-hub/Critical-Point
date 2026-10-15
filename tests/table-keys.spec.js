@@ -1007,3 +1007,100 @@ test("a save from before the steps resumes with what it held and plays on under 
   const stepRules = UNLOCK_LADDER[2].rules;
   expect(after.dynamics.schema.mutations.filter((id) => !stepRules.has(MUTATION_RULES[id])), "nothing dealt from a rule 프롤로그 03 does not have").toEqual([]);
 });
+
+// The case's last choice is held, not clicked (src/gauntlet/holdConfirm.js,
+// improvement notes A4): a pointer or Enter held for 0.8s, Space held on the
+// focused button, or -- for a player who cannot hold -- a second press within
+// three seconds. Every other table still cashes on one press.
+test.describe("the case's last choice is held", () => {
+  const CLOSING = { caseId: "prologue01", nodeId: "p1_final" };
+
+  async function stakeClosing(page) {
+    await openTable(page, CLOSING.caseId, CLOSING.nodeId);
+    await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake a card");
+    const cash = page.getByTestId("commit-confirm");
+    for (let press = 0; press < 8 && !(await cash.isEnabled()); press += 1) await page.getByTestId("commit-push").click();
+    await expect(cash).toBeEnabled();
+    await expect(cash).toHaveAttribute("data-hold", "idle");
+    return cash;
+  }
+
+  test("a click arms 확정, says so, and a second press confirms", async ({ page }) => {
+    const cash = await stakeClosing(page);
+    await expect(cash).toContainText("꾹 눌러 확정");
+    await expect(cash).toHaveAccessibleDescription(/길게 눌러 확정/);
+    await cash.click();
+    await expect(cash).toHaveAttribute("data-hold", "armed");
+    await expect(cash).toContainText("한 번 더");
+    await expect(page.getByText("한 번 더 누르면 확정된다")).toHaveCount(1);
+    await expect(stageOf(page), "one click does not close the case").toHaveAttribute("data-status", "live");
+    await cash.click();
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
+  });
+
+  test("a press held for 0.8s confirms before it is let go; one slid off confirms nothing", async ({ page }) => {
+    const cash = await stakeClosing(page);
+    const box = await cash.boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(cash).toHaveClass(/is-holding/);
+    await page.mouse.move(box.x + box.width / 2, box.y - 120);
+    await expect(cash).toHaveAttribute("data-hold", "idle");
+    await page.mouse.up();
+    await page.waitForTimeout(1_000);
+    await expect(stageOf(page), "a hold that slid off is dropped").toHaveAttribute("data-status", "live");
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
+    await page.mouse.up();
+  });
+
+  test("a click with no pointer behind it, as a screen reader sends, arms and confirms the same way", async ({ page }) => {
+    const cash = await stakeClosing(page);
+    const tap = () => cash.evaluate((button) => button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })));
+    await tap();
+    await expect(cash).toHaveAttribute("data-hold", "armed");
+    await tap();
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
+  });
+
+  test("Enter held confirms, a short Enter arms, and Space holds on the button the keyboard walked to", async ({ page }) => {
+    let cash = await stakeClosing(page);
+    // The card was staked with the pointer, so Enter is the table's.
+    await page.keyboard.press("Enter");
+    await expect(cash).toHaveAttribute("data-hold", "armed");
+    await page.keyboard.press("Enter");
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed");
+
+    await stakeClosing(page);
+    await page.keyboard.down("Enter");
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
+    await page.keyboard.up("Enter");
+
+    cash = await stakeClosing(page);
+    await cash.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(cash).toBeFocused();
+    await page.keyboard.down(" ");
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
+    await page.keyboard.up(" ");
+  });
+
+  test("reduced motion draws the line at once and still asks for the hold", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const cash = await stakeClosing(page);
+    await page.keyboard.down("Enter");
+    await expect(cash).toHaveClass(/is-holding/);
+    expect(await cash.evaluate((button) => getComputedStyle(button, "::after").animationName)).toBe("none");
+    await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
+    await page.keyboard.up("Enter");
+  });
+
+  test("an ordinary scene cashes on one press", async ({ page }) => {
+    await openTable(page);
+    await clickElement(page.locator(".choices .choice").first(), "stake a card");
+    await expect(page.getByTestId("commit-confirm")).not.toHaveAttribute("data-hold");
+  });
+});

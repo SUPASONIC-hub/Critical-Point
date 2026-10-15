@@ -145,6 +145,37 @@ export async function cashStakedCard(page) {
   // timeout exceeded" with no word about the table.
   await expect(cash, "the cash button never enabled: no card is staked, or the seal did not open in eight pushes").toBeEnabled({ timeout: 5_000 });
   await clickElement(cash, "cash the staked card");
+  await confirmHeldCash(page, "cash the staked card");
+}
+
+/**
+ * The case's last choice is confirmed by a hold or a second press
+ * (src/gauntlet/holdConfirm.js): a click there only arms 확정, and the button
+ * says so with `data-hold="armed"`. The second press is the fallback a player
+ * who cannot hold uses, so taking it here walks the same path they do. Read
+ * off the page rather than the locator: on every other scene the reveal has
+ * already covered the table, and there is no attribute to wait for.
+ */
+export async function confirmHeldCash(page, label = "confirm the held 확정") {
+  const readHold = () => page.evaluate(() => document.querySelector("[data-testid='commit-confirm']")?.dataset.hold ?? null);
+  if ((await readHold()) === null) return;
+  await expect.poll(readHold, { message: `${label}: the first press did not arm 확정`, timeout: 2_000 }).toBe("armed");
+  await clickElement(page.getByTestId("commit-confirm"), `${label} (second press)`);
+}
+
+/**
+ * Holds 확정 down with the pointer for `ms`, for a test of the hold itself:
+ * the line fills, and the table cashes before the pointer comes up.
+ */
+export async function holdToConfirm(page, ms = 900) {
+  const cash = page.getByTestId("commit-confirm");
+  await expect(cash).toBeEnabled({ timeout: ACTION_TIMEOUT_MS });
+  const box = await cash.boundingBox();
+  if (!box) throw new Error("확정 has no box to hold");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(ms);
+  await page.mouse.up();
 }
 
 /**

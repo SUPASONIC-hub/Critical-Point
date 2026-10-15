@@ -21,6 +21,8 @@ import {
   getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
+import { isClosingScene } from "./holdConfirm.js";
+import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
@@ -395,8 +397,15 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
+  // The scene that closes the case is confirmed by a hold or a second press,
+  // not a click (holdConfirm.js); every other table cashes as it always did.
+  const holdsCash = isClosingScene(scene.node);
+  const cashHold = useHoldConfirm({ enabled: holdsCash && canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  // Short enough for the dock's 108px on a 360px phone; the full sentence is the button's description.
+  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : !selectedCard ? "카드를 고른다" : !holdsCash ? "확정" : cashHold.phase === "armed" ? "한 번 더" : "꾹 눌러 확정";
+
   // The hook that owns the keys also says which of them a control may name.
-  const { letterKeys, keys, drawn } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
+  const { letterKeys, keys, drawn } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
@@ -734,16 +743,21 @@ export function GauntletStage({
         )}
         <button
           type="button"
-          className="gx-cash commit-confirm"
+          className={`gx-cash commit-confirm${cashHold.phase === "holding" ? " is-holding" : ""}`}
           data-testid="commit-confirm"
-          onClick={cash}
+          data-hold={holdsCash ? cashHold.phase : undefined}
+          {...(holdsCash ? cashHold.buttonProps : { onClick: cash })}
           disabled={!canCash}
           aria-keyshortcuts="Enter"
-          aria-describedby={logic ? "gx-logic-detail" : undefined}
+          aria-describedby={[holdsCash && "gx-cash-hold", logic && "gx-logic-detail"].filter(Boolean).join(" ") || undefined}
         >
-          <span>{win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : selectedCard ? "확정" : "카드를 고른다"}</span>
+          <span>{cashLabel}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
         </button>
+        {/* Outside the button, so neither is read into its name. The second is
+            what a press that did not hold says: one more confirms. */}
+        {holdsCash && <span id="gx-cash-hold" className="sr-only">길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다</span>}
+        {holdsCash && <span className="sr-only" aria-live="polite">{cashHold.phase === "armed" ? "한 번 더 누르면 확정된다" : ""}</span>}
       </div>
 
       {draftOpen && (

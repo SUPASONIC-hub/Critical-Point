@@ -1517,6 +1517,23 @@
   display: none;
 }
 
+/* A closing scene's 확정 is held (holdConfirm.js): a line fills out from the
+   middle in the 0.8s the hold takes. Reduced motion draws it full at once. */
+.gx-cash.is-holding::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 6px;
+  height: 3px;
+  background: currentColor;
+  animation: gx-hold 0.8s linear both;
+}
+
+@keyframes gx-hold {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 /* Overlays -------------------------------------------------------------------- */
 .gx-breach {
   position: fixed;
@@ -2989,7 +3006,8 @@
 
   .gx-breach,
   .gx-slam-bust strong,
-  .gx-slam-cashed strong {
+  .gx-slam-cashed strong,
+  .gx-cash.is-holding::after {
     animation: none;
   }
 
