@@ -125,15 +125,19 @@ export function getRankingLeague(style = "FIELD DECIDER") {
 
 /**
  * Whether a ranking row is well formed: a run id, a completion time, a rank.
- * It used to call any row with a run id "RUN VERIFIED", but nothing on the
- * server checks a run -- the id is written by the same client that writes the
- * score. The label says what is true: the row is tied to one run.
+ * It used to call any row with a run id "RUN VERIFIED", but the run id is
+ * written by the same client that writes the score. The label says what is
+ * true: the row is tied to one run. The sentence says what the server does
+ * with a season (validate_telemetry_insert, *_ranking_suspicion_marks): it
+ * takes one only when every case row is there and was spread over the time a
+ * season takes, and marks -- does not refuse -- one whose score, rank, times
+ * or walls do not add up. DRAFT copy (2026-10-14), for the user to decide.
  */
 export function getRankingIntegrity(entry = {}) {
   const summary = entry.summary ?? {};
   return {
     valid: Boolean(entry.runId && entry.completedAt && summary.rank),
     label: entry.runId ? "RUN LINKED" : "RUN ID MISSING",
-    text: entry.runId ? "한 플레이로 묶인 기록입니다. 서버 검증은 없습니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
+    text: entry.runId ? "한 플레이로 묶인 기록입니다. 공개 랭킹은 모든 사건 기록이 15분 이상에 걸쳐 서버에 도착한 시즌만 받고, 점수·등급·시간이 맞지 않는 기록은 서버에 따로 표시해 둡니다." : "플레이 식별자가 없어 임시 로컬 기록으로 처리됩니다.",
   };
 }

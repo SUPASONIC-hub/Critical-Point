@@ -158,6 +158,11 @@ const countRanking = async () =>
 
 const files = readdirSync(MIGRATIONS).filter((file) => file.endsWith(".sql")).sort();
 if (!files.includes(RANKING_RESET)) failures.push(`supabase/migrations/${RANKING_RESET} is gone; the check of what the ranking reset leaves ran against nothing.`);
+// The ranking's suspicion marks (`*_ranking_suspicion_marks.sql`, drafted on
+// 2026-10-14). Their checks below run once the migration is among the files,
+// and from then on they must pass; while it is still a `.sql.draft` they are
+// skipped and said to be.
+const SUSPICION_MARKS = files.some((file) => file.endsWith("_ranking_suspicion_marks.sql"));
 for (const file of files) {
   if (file === RANKING_RESET) {
     await seedBeforeRankingReset();
@@ -290,7 +295,11 @@ for (const { tablename, policyname, cmd, roles } of policies) {
 // caller may execute, so a helper a trigger calls becomes an unmetered endpoint.
 // The list is what the client calls and what a policy needs (20260929040000).
 const CLIENT_FUNCTIONS = {
-  anon: ["delete_cloud_save", "get_cloud_save", "is_season_case_id", "logic_hold_cutoffs", "peek_cloud_save", "put_cloud_save"],
+  anon: [
+    "delete_cloud_save", "get_cloud_save", "is_season_case_id", "logic_hold_cutoffs", "peek_cloud_save", "put_cloud_save",
+    // The ranking policy calls it as anon: whether marked rows are hidden.
+    ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
+  ],
   authenticated: [],
 };
 {
@@ -1140,6 +1149,99 @@ withHeaders(null);
 await refused("read a ranking row's full run_id", "anon", `select run_id from public.playtest_sessions`);
 await refused("read a ranking row's session_code", "anon", `select session_code from public.public_rankings`, /^42(501|703) /);
 await allowed("read telemetry health", "anon", `select * from public.telemetry_health limit 1`);
+
+// ---- the ranking's suspicion marks (*_ranking_suspicion_marks.sql)
+//
+// Every run below is whole, watched and well spaced, like run-ranked-1, so the
+// validator takes each one. What differs is what the marks are for, and the
+// rule is that none of it is refused: every ranking row is stored, and only
+// its `suspicion` says what failed. The runs are taken out again at the end,
+// so the hold-rate pool below is the one it always was.
+if (!SUSPICION_MARKS) {
+  console.log("Suspicion marks: skipped, the migration is still a draft (supabase/migrations/*_ranking_suspicion_marks.sql.draft).");
+} else {
+  // The thresholds are written twice, once in gameLogic.js and once in SQL.
+  const logicSource = readFileSync(path.join(root, "src", "gameLogic.js"), "utf8");
+  const rankLine = logicSource.match(/rank: momentumScore >= (\d+) \? "S" : momentumScore >= (\d+) \? "A" : momentumScore >= (\d+) \? "B" : "C"/);
+  const tierLine = logicSource.match(/momentumTier: momentumScore >= (\d+) \? "BURST" : momentumScore >= (\d+) \? "FLOW" : momentumScore >= (\d+) \? "READY" : "BUILDING"/);
+  if (!rankLine || !tierLine) {
+    failures.push("could not read the rank and tier thresholds from src/gameLogic.js (getGameplayStats); the marks' copies can no longer be held to them.");
+  } else {
+    const [s, a, b] = rankLine.slice(1).map(Number);
+    const [burst, flow, ready] = tierLine.slice(1).map(Number);
+    const { rows } = await db.query(
+      `select n, public.ranking_rank_for(n) as rank, public.ranking_tier_for(n) as tier from generate_series(0, 100) n`,
+    );
+    const off = rows.filter(({ n, rank, tier }) =>
+      rank !== (n >= s ? "S" : n >= a ? "A" : n >= b ? "B" : "C") || tier !== (n >= burst ? "BURST" : n >= flow ? "FLOW" : n >= ready ? "READY" : "BUILDING"));
+    check(off.length === 0, `ranking_rank_for / ranking_tier_for disagree with gameLogic.js at ${off.map(({ n }) => n).join(", ")}; bring the migration's thresholds in step.`);
+  }
+
+  withHeaders({ "x-forwarded-for": "198.51.100.22" });
+  const honest = { burstScore: 88, momentumScore: 88, rank: "S", momentumTier: "BURST" };
+  const marksOf = async (runId) =>
+    (await one(`select suspicion from public.playtest_sessions where case_id = 'season-final' and run_id = $1`, [runId]))?.suspicion ?? null;
+  let n = 40;
+  const markedRun = async (label, runId, expected, { finalSummary = honest, stepSeconds = 60, after = null } = {}) => {
+    const session = sessionId(n++);
+    await playRun(runId, { session, finalSummary });
+    if (stepSeconds !== 60) await spreadRun(runId, stepSeconds);
+    if (after) await after(runId);
+    await post(`rank ${label}`, "playtest_sessions", seasonPayload({ session, runId }));
+    const marks = await marksOf(runId);
+    check(
+      Array.isArray(marks) && JSON.stringify([...marks].sort()) === JSON.stringify([...expected].sort()),
+      `${label}: the ranking row's marks are ${JSON.stringify(marks)}, expected ${JSON.stringify(expected)}.`,
+    );
+  };
+
+  await markedRun("an honest season", "run-marks-honest", []);
+  await markedRun("a season whose rank is not the letter its score earns", "run-marks-rank", ["rank-off-score"], { finalSummary: { ...honest, rank: "A" } });
+  await markedRun("a season whose tier is not the one its score earns", "run-marks-tier", ["tier-off-score"], { finalSummary: { ...honest, momentumTier: "READY" } });
+  await markedRun("a season with a broken, two-faced score", "run-marks-score", ["score-twins-differ", "score-not-whole"], { finalSummary: { ...honest, burstScore: 99.5 } });
+  await markedRun("a season with a part above 100", "run-marks-part", ["part-out-of-range"], { finalSummary: { ...honest, consistencyScore: 140 } });
+  // 54 gaps of 20 seconds is 18 minutes, past the validator's fifteen; the
+  // decisions of those cases claim 40 (6 of 7.4 seconds a case).
+  await markedRun("a season whose decisions took longer than the server saw pass", "run-marks-time", ["time-over-gap"], { stepSeconds: 20 });
+  await markedRun("a season with a wall no table deals", "run-marks-wall", ["wall-out-of-range"], {
+    after: (runId) =>
+      db.query(
+        `update public.playtest_sessions set decision_log = jsonb_set(decision_log, '{0,threshold,wall}', '140'::jsonb)
+          where run_id = $1 and case_id = $2`,
+        [runId, CASE_SEQUENCE[3]],
+      ),
+  });
+  // The fixture's own finale (88 ranked "A") is one the marks catch. It sets
+  // burstScore and rank only, so momentumScore and momentumTier stay the case
+  // summary's own, and those are caught too.
+  const fixtureMarks = ["rank-off-score", "score-twins-differ", "tier-off-score"];
+  check(JSON.stringify([...((await marksOf("run-ranked-1")) ?? [])].sort()) === JSON.stringify(fixtureMarks), `run-ranked-1 (88 ranked "A") carries ${JSON.stringify(await marksOf("run-ranked-1"))}, expected ${JSON.stringify(fixtureMarks)}.`);
+  check(
+    (await one(`select count(*)::int as n from public.playtest_sessions where case_id <> 'season-final' and suspicion is not null`))?.n === 0,
+    "a case row carries suspicion marks; only ranking rows are marked.",
+  );
+
+  // Not published, and not the client's to write.
+  await refused("read a ranking row's suspicion marks", "anon", `select suspicion from public.playtest_sessions`);
+  await postRefused("send a case row with its own suspicion marks", "playtest_sessions", { ...casePayload({ session: sessionId(39), runId: "run-marks-self", caseId: "case01" }), suspicion: [] }, /^42501 /);
+
+  // The switch: off by default, so the ranking shows every row; on, it shows only the unmarked ones.
+  const shown = async () =>
+    ((await allowed("read the ranking with marked rows", "anon", `select run_tag from public.public_rankings where case_id = 'season-final'`))?.rows ?? []).length;
+  const counts = await one(
+    `select count(*)::int as all_rows, (count(*) filter (where coalesce(cardinality(suspicion), 0) = 0))::int as clean
+       from public.playtest_sessions where case_id = 'season-final' and summary->>'seasonComplete' = 'true' and score is not null`,
+  );
+  check((await shown()) === counts.all_rows, `with the switch off the ranking shows ${await shown()} of ${counts.all_rows} rows; marked rows have to stay on it.`);
+  await db.query(`insert into public.private_settings (name, value) values ('ranking_hide_marked', '1')`);
+  const hidden = await shown();
+  check(hidden === counts.clean && hidden >= 1, `with the switch on the ranking shows ${hidden} rows; expected the ${counts.clean} unmarked ones.`);
+  await db.query(`delete from public.private_settings where name = 'ranking_hide_marked'`);
+  check((await shown()) === counts.all_rows, "the ranking did not come back whole when the switch was turned off.");
+
+  withHeaders(null);
+  await db.query(`delete from public.playtest_sessions where run_id like 'run-marks-%'`);
+}
 
 // ---- the hold rate's cut points (20261011000000)
 
