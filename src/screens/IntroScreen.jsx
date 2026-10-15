@@ -7,6 +7,7 @@ import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
+import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
 import { loadedChunk } from "../state/chunkReload.js";
 import { confirmAction } from "../state/confirmAction.js";
@@ -206,10 +207,13 @@ export function IntroScreen({ view, renderers = {} }) {
       <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>데이터 저장 안내</a>에서 끌 수 있습니다.
     </small>
   );
+  const analystTitle = getAnalystTitle({ currentCase, caseResults });
   const resumePanel = (
     <div className="resume-panel">
       <div>
-        <span>저장된 진행</span>
+        {/* The record title rises with the season; it is read from the
+            case in play and the cases closed (src/analystTitle.js). */}
+        <span>저장된 진행{analystTitle ? ` · 기록 칭호 ${analystTitle}` : ""}</span>
         {/* The scene title and the route position are read from the
             graph, which the pre-start shell has not loaded. It prints
             the case and the save time instead of guessing them. */}

@@ -7,6 +7,7 @@
   },
   "files": {
     "src/advancedSystems.js": 100,
+    "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
     "src/cloudSave.js": 90,
     "src/endingCopy.js": 100,
