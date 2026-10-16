@@ -117,7 +117,7 @@ export function IntroScreen({ view, renderers = {} }) {
     season: {
       seasonCasesBase, caseObjectives, triggerLabSignals, completedCaseResultList, seasonJourney,
       resourceMeta, seasonCases, caseResults, currentCase, atReport, startCase, getCaseStatusText,
-      normalizeCaseSummary,
+      normalizeCaseSummary, caseMinutes,
     },
     content: {
       playGuideItems, operatorProfiles, operatorOrigin, setOperatorOrigin, operatorProfile, originPrologue,
@@ -327,9 +327,13 @@ export function IntroScreen({ view, renderers = {} }) {
                   <dt>사건</dt>
                   <dd>{String(seasonCases.length).padStart(2, "0")}</dd>
                 </div>
+                {/* How long one of them takes (gameCases.TYPICAL_CASE_MINUTES):
+                    nothing on the page said whether this is an evening or a
+                    month. The 45-second window this cell used to print is
+                    still in the protocol line under the stage. */}
                 <div>
-                  <dt>판단 창</dt>
-                  <dd>45<small>초</small></dd>
+                  <dt>한 사건</dt>
+                  <dd>{caseMinutes}<small>분 안팎</small></dd>
                 </div>
                 <div>
                   <dt>정답</dt>

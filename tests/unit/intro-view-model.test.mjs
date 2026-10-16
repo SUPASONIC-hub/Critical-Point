@@ -18,7 +18,7 @@ import { installBrowser } from "./helpers/browser.mjs";
  */
 installBrowser();
 const { playStyleOptions } = await import("../../src/appCopy.js");
-const { RESULT_NODE_IDS, seasonCasesBase } = await import("../../src/gameCases.js");
+const { RESULT_NODE_IDS, TYPICAL_CASE_MINUTES, seasonCasesBase } = await import("../../src/gameCases.js");
 const { telemetryEnabled } = await import("../../src/telemetry.js");
 const { createTelemetrySummary, INTRO_FIELDS_WITHOUT_RUNTIME } = await import("../../src/viewModels/appViewModels.js");
 const { createCompletedCaseResultList, createIntroViewModel } = await import("../../src/viewModels/introViewModel.js");
@@ -43,6 +43,13 @@ test("the shell's intro shows nothing for each field only the runtime can supply
   assert.equal(view.node, null, "no scene title before the graph is loaded");
   assert.deepEqual(view.seasonJourney, []);
   assert.equal(view.debugToolsEnabled, false, "and the shell never draws the debug console");
+});
+
+// What the 한 사건 stat prints (tests/unit/season-length.test.mjs holds the
+// number to the graph). The shell draws it before the graph is loaded.
+test("both intros are handed the minutes one case takes", () => {
+  assert.equal(intro().season.caseMinutes, TYPICAL_CASE_MINUTES);
+  assert.equal(intro({ runtime: runtimeFields() }).season.caseMinutes, TYPICAL_CASE_MINUTES);
 });
 
 test("the runtime's intro carries the runtime's own values for those fields", () => {

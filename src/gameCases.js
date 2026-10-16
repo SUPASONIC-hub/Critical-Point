@@ -139,6 +139,22 @@ export const CASE_RESULT_NODES = {
 export const RESULT_NODE_IDS = new Set(Object.values(CASE_RESULT_NODES));
 
 /**
+ * About how many minutes one case takes, which the intro prints so a first
+ * visit can tell the size of the season: fifty-five of these.
+ *
+ * A round number over a range, not a measurement. On the route its lead cards
+ * walk a case is 7 to 14 decisions (12 in thirty-one of the fifty-five, 14 in
+ * eighteen), and each decision is a briefing page, whose reading clock allows
+ * 22 to 75 seconds, and a table whose clock allows 45. Someone who uses 70% of
+ * each reading clock, 18 seconds at each table and a minute on the report
+ * spends 6 to 13 minutes on a case and 11 on the median one. Using 40% and 8
+ * seconds makes the median 6; letting every clock run out makes it 20.
+ * tests/unit/season-length.test.mjs walks the graph and holds the number
+ * between those.
+ */
+export const TYPICAL_CASE_MINUTES = 10;
+
+/**
  * Where a new run begins.
  *
  * It was the literal pair `("case01", "start")` in six places -- the shell's

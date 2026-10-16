@@ -57,7 +57,7 @@ export const viewGroups = {
     season: [
       "seasonCasesBase", "caseObjectives", "triggerLabSignals", "completedCaseResultList", "seasonJourney",
       "resourceMeta", "seasonCases", "caseResults", "completedCases", "currentCase", "atReport", "startCase",
-      "getCaseStatusText", "normalizeCaseSummary",
+      "getCaseStatusText", "normalizeCaseSummary", "caseMinutes",
     ],
     content: [
       "playGuideItems", "operatorProfiles", "operatorOrigin", "setOperatorOrigin", "operatorProfile",
