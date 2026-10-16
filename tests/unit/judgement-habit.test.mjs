@@ -53,16 +53,16 @@ test("there are eleven habits, each with an id, a name and one line, and the las
 
 test("each habit names the season it is written for", () => {
   const cases = [
-    ["bulldozer", { harm: ENDING_GATES.collapseHarmPerCase }],
+    ["bulldozer", { harm: 25 }],
     ["moth", { busts: 3 }],
-    ["tightrope", { pushes: 60, busts: 1 }],
+    ["tightrope", { pushes: 40, busts: 0 }],
     ["reframer", { reframes: 1 }],
+    ["shield", { peopleFirst: 8, harm: 2 }],
     ["one-track", { logic: { windows: 10, keeps: 0, breaks: 1, busts: 0 } }],
-    ["shield", { peopleFirst: 6, harm: 2 }],
+    ["card-shopper", { logic: { windows: 10, keeps: 0, breaks: 8, busts: 0 } }],
     ["stepping-stone", { pushes: 30, busts: 0 }],
     ["marathon", { seconds: 24 }],
     ["lightning", { seconds: 4 }],
-    ["card-shopper", { logic: { windows: 10, keeps: 0, breaks: 8, busts: 0 } }],
     ["steady", {}],
   ];
   assert.deepEqual(cases.map(([id]) => id), JUDGEMENT_HABITS.map((habit) => habit.id), "every habit is reached");
@@ -73,6 +73,10 @@ test("the habits are tried in order: the harm a season did comes before how it p
   assert.equal(habitOf({ harm: 25, busts: 4, reframes: 1 }), "bulldozer");
   assert.equal(habitOf({ busts: 4, reframes: 1, seconds: 30 }), "moth");
   assert.equal(habitOf({ reframes: 1, peopleFirst: 8, harm: 0 }), "reframer");
+  // Putting people first is read before holding one logic.
+  assert.equal(habitOf({ peopleFirst: 8, harm: 2, logic: { windows: 10, keeps: 0, breaks: 1, busts: 0 } }), "shield");
+  // A season that only just crossed the collapse gate is named for how it played, not for its harm.
+  assert.equal(habitOf({ harm: ENDING_GATES.collapseHarmPerCase, busts: 3 }), "moth");
   // Putting people first is not a shield while the harm is near the overreach gate.
   assert.equal(habitOf({ peopleFirst: 8, harm: ENDING_GATES.collapseOverreachHarm }), "steady");
   // A careful hand that is also slow is named for its hand.
@@ -80,18 +84,36 @@ test("the habits are tried in order: the harm a season did comes before how it p
 });
 
 test("the thresholds sit where they are written", () => {
-  // 0.25 of the windows BUST is a moth, one fewer is not.
-  assert.equal(habitOf({ windows: 20, busts: 5, pushes: 80 }), "moth");
-  assert.equal(habitOf({ windows: 20, busts: 4, pushes: 80 }), "steady");
-  // 0.7 wild cards a case: 7 of 10 cases is a reframer, 6 is not.
+  // 25 harm a case is a bulldozer, 24 is not.
+  assert.equal(habitOf({ harm: 25 }), "bulldozer");
+  assert.equal(habitOf({ harm: 24 }), "steady");
+  // 0.28 of the windows BUST is a moth, one fewer is not.
+  assert.equal(habitOf({ windows: 25, busts: 7, pushes: 100 }), "moth");
+  assert.equal(habitOf({ windows: 25, busts: 6, pushes: 100 }), "steady");
+  // 3.6 pushes a window under 0.09 BUSTs is a tightrope; 3.5 is not, nor is 0.1 BUSTs.
+  assert.equal(habitOf({ pushes: 36, busts: 0 }), "tightrope");
+  assert.equal(habitOf({ pushes: 35, busts: 0 }), "steady");
+  assert.equal(habitOf({ pushes: 36, busts: 1 }), "steady");
+  // One wild card a case: 10 of 10 cases is a reframer, 9 is not.
   const wild = (count) => Object.fromEntries(Array.from({ length: 10 }, (_, index) => [`case${index}`, summary({ reframes: index < count ? 1 : 0 })]));
-  assert.equal(getJudgementHabit(wild(7)).id, "reframer");
-  assert.equal(getJudgementHabit(wild(6)).id, "steady");
-  // 20 seconds is a marathon, 19 is not; 5 is lightning, 6 is not.
-  assert.equal(habitOf({ seconds: 20 }), "marathon");
-  assert.equal(habitOf({ seconds: 19 }), "steady");
-  assert.equal(habitOf({ seconds: 5 }), "lightning");
-  assert.equal(habitOf({ seconds: 6 }), "steady");
+  assert.equal(getJudgementHabit(wild(10)).id, "reframer");
+  assert.equal(getJudgementHabit(wild(9)).id, "steady");
+  // 0.7 of the decisions for people is a shield, 0.6 is not.
+  assert.equal(habitOf({ peopleFirst: 7, harm: 2 }), "shield");
+  assert.equal(habitOf({ peopleFirst: 6, harm: 2 }), "steady");
+  // A 논리 유지력 of 75 is 외길, 74 is not; under 45 is card shopping, 45 is not.
+  const hold = (breaks) => ({ logic: { windows: 100, keeps: 0, breaks, busts: 0 } });
+  assert.equal(habitOf(hold(25)), "one-track");
+  assert.equal(habitOf(hold(26)), "steady");
+  assert.equal(habitOf(hold(56)), "card-shopper");
+  assert.equal(habitOf(hold(55)), "steady");
+  // 3.3 pushes a window with at most 0.04 BUSTs is a stepping stone.
+  assert.equal(habitOf({ pushes: 33, busts: 0 }), "stepping-stone");
+  // 12 seconds is a marathon, 11 is not; 6 is lightning, 7 is not.
+  assert.equal(habitOf({ seconds: 12 }), "marathon");
+  assert.equal(habitOf({ seconds: 11 }), "steady");
+  assert.equal(habitOf({ seconds: 6 }), "lightning");
+  assert.equal(habitOf({ seconds: 7 }), "steady");
 });
 
 test("the logic habits need enough windows to read a 논리 유지력", () => {

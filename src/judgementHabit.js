@@ -26,6 +26,18 @@ import { readClosedCases, readCollapseTally } from "./seasonStanding.js";
 export const HABIT_MIN_WINDOWS = 5;
 /** Logic windows the 논리 유지력 has to be read over before it names a season. */
 const LOGIC_MIN_WINDOWS = 10;
+/**
+ * Harm a case closed on, on average, that names a bulldozer: past the collapse
+ * gate (ENDING_GATES.collapseHarmPerCase, 20), so a season that only just
+ * collapsed can still be named for how it pushed or held its logic.
+ *
+ * The thresholds below were set on 2026-10-15 from `npm run report:endings`
+ * (600 bot seasons and the two wild-card hands' 80 each): bust rate, pushes and
+ * seconds move with the season rather than the bot, so those habits each take
+ * a share of every kind of player, and harm, people first, logic hold and wild
+ * cards are what tell the kinds apart.
+ */
+const BULLDOZER_HARM_PER_CASE = 25;
 
 /**
  * The habits, in the order they are tried. `holds` is handed the season as
@@ -37,62 +49,63 @@ export const JUDGEMENT_HABITS = Object.freeze([
     id: "bulldozer",
     title: "실적 우선 불도저형",
     line: "판은 이겼는데, 사람 피해가 뒤에 쌓였습니다.",
-    // The collapse gate itself: harm a case closed on, on average.
-    holds: (season) => season.harmPerCase >= ENDING_GATES.collapseHarmPerCase,
+    holds: (season) => season.harmPerCase >= BULLDOZER_HARM_PER_CASE,
   },
   {
     id: "moth",
     title: "하이리스크 불나방형",
     line: "벽이 가까워질수록 손이 더 빨라집니다.",
-    holds: (season) => season.bustRate >= 0.25,
+    holds: (season) => season.bustRate >= 0.28,
   },
   {
     id: "tightrope",
     title: "벽 앞 줄타기 장인형",
     line: "벽 바로 앞까지 밀고도 멀쩡히 돌아옵니다.",
-    holds: (season) => season.pushesPerWindow >= 5.5 && season.bustRate < 0.12,
+    // Pushes and BUSTs rise together (3.6 pushes a window usually BUSTs about
+    // one window in ten), so this is pushing that far and BUSTing less.
+    holds: (season) => season.pushesPerWindow >= 3.6 && season.bustRate < 0.09,
   },
   {
     id: "reframer",
     title: "판 뒤집기 상습범형",
     line: "카드가 마음에 안 들면 판부터 다시 짭니다.",
-    holds: (season) => season.wildPerCase >= 0.7,
-  },
-  {
-    id: "one-track",
-    title: "외길 논리형",
-    line: "한 번 정한 논리는 열기가 올라도 놓지 않습니다.",
-    holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold >= 80,
+    holds: (season) => season.wildPerCase >= 1,
   },
   {
     id: "shield",
     title: "사람 먼저 방패형",
     line: "숫자보다 그 숫자 뒤의 사람을 먼저 셉니다.",
-    holds: (season) => season.peopleFirstShare >= 0.5 && season.harmPerCase < ENDING_GATES.collapseOverreachHarm,
+    holds: (season) => season.peopleFirstShare >= 0.7 && season.harmPerCase < ENDING_GATES.collapseOverreachHarm,
   },
   {
-    id: "stepping-stone",
-    title: "돌다리 두들김형",
-    line: "벽 근처엔 가지도 않고 일찍 LOCK을 누릅니다.",
-    holds: (season) => season.pushesPerWindow <= 3.5 && season.bustRate <= 0.05,
-  },
-  {
-    id: "marathon",
-    title: "생각 마라톤형",
-    line: "결론보다 생각이 오래 걸려야 마음이 놓입니다.",
-    holds: (season) => season.averageSeconds >= 20,
-  },
-  {
-    id: "lightning",
-    title: "속전속결형",
-    line: "읽자마자 고르고, 고르자마자 밉니다.",
-    holds: (season) => season.averageSeconds > 0 && season.averageSeconds <= 5,
+    id: "one-track",
+    title: "외길 논리형",
+    line: "한 번 정한 논리는 열기가 올라도 놓지 않습니다.",
+    holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold >= 75,
   },
   {
     id: "card-shopper",
     title: "카드 쇼핑형",
     line: "판마다 다른 카드를 집고, 콤보는 신경 안 씁니다.",
-    holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold < 30,
+    holds: (season) => season.logicWindows >= LOGIC_MIN_WINDOWS && season.logicHold < 45,
+  },
+  {
+    id: "stepping-stone",
+    title: "돌다리 두들김형",
+    line: "벽 근처엔 가지도 않고 일찍 LOCK을 누릅니다.",
+    holds: (season) => season.pushesPerWindow <= 3.3 && season.bustRate <= 0.04,
+  },
+  {
+    id: "marathon",
+    title: "생각 마라톤형",
+    line: "결론보다 생각이 오래 걸려야 마음이 놓입니다.",
+    holds: (season) => season.averageSeconds >= 12,
+  },
+  {
+    id: "lightning",
+    title: "속전속결형",
+    line: "읽자마자 고르고, 고르자마자 밉니다.",
+    holds: (season) => season.averageSeconds > 0 && season.averageSeconds <= 6,
   },
   {
     id: "steady",
