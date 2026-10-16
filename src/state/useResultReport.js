@@ -14,7 +14,7 @@ import {
   getReplayDiagnostics,
   getTelemetryDashboardSnapshot,
 } from "../runtimeSystems.js";
-import { getFailureRecovery } from "../featurePack.js";
+import { COLLAPSED_SEASON_MARK, getCollapseToll, getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
 import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
 import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
@@ -189,7 +189,14 @@ export function useResultReport({
       `단서 ${discoveredClues.length}`,
     ] },
     failureRecovery: getFailureRecovery(endingVariant, resources),
-    endingCause: getFailureCause(endingVariant, resources),
+    // A collapse also says what it cost (getCollapseToll, featurePack.js), and
+    // the result card is handed the ending with the season's mark on its label
+    // (`cardEnding`), so the card's chunk prints it without a byte of its own.
+    endingCause: endingVariant.failure ? {
+      ...getFailureCause(endingVariant, resources),
+      toll: getCollapseToll({ caseResults, resources, cases: seasonCasesBase }),
+      cardEnding: { ...endingVariant, label: `${endingVariant.label} · ${COLLAPSED_SEASON_MARK}` },
+    } : null,
     endingAtmosphere: getEndingAtmosphere(endingVariant.id),
     originEndingVariant: getOriginEndingVariant(operatorOrigin, endingVariant.id),
     aftermath: getAftermath(endingVariant.id, operatorOrigin),
