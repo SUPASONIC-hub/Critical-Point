@@ -83,7 +83,7 @@ export const viewGroups = {
       "counterfactualReport", "rankingComparison", "rankingIntegrity", "achievementBadges",
       "achievementProgress", "resourceMeta", "explainResourceTradeoff", "routeTimeline",
       "observationLedger", "observerPattern", "decisionFingerprint", "caseResults", "log", "clueCount",
-      "playReport", "balanceSignals", "logicReport",
+      "playReport", "balanceSignals", "logicReport", "caseChange",
     ],
     telemetry: [
       "sessionCode", "telemetryStatus", "pendingTelemetry", "retryPendingTelemetry",
@@ -110,7 +110,7 @@ export const viewGroups = {
   // renderers, save, reset, the table's handlers -- arrives as props.
   play: {
     common: ["AdaptiveMusic", "musicModeKey", "screenReaderStatus", "simplifyPlayerText", "currentCase"],
-    scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId"],
+    scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
       "decisionRevealOpen", "staleSave",

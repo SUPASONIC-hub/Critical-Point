@@ -16,7 +16,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
   // and the screen picked between them with `??` on thirteen names.
   const {
     common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
-    scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId },
+    scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge },
     gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave },
     status: { resources, resourceMeta, progress, routeIndex, routeLength },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
@@ -71,7 +71,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
           node, nodeId: resolvedNodeId,
           speakerPortrait,
           speakerRole: speakerProfile.role,
-          question: narrativeSpine.question,
+          question: narrativeSpine.question, challenge: sceneChallenge.title,
         }}
       />
       {__CP_DEBUG_BUILD__ && debugToolsEnabled && (

@@ -5,6 +5,7 @@ import { CASE_START_NODES } from "../src/gameCases.js";
 import { nodes } from "../src/gameData.js";
 import { getReadingSeconds } from "../src/gauntlet/gauntletEngine.js";
 import { MUTATION_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
+import { easyResourceLabels } from "../src/playerLanguage.js";
 import {
   cashStakedCard,
   clickElement,
@@ -214,6 +215,123 @@ test("a locked card refuses its number key as it refuses a click", { tag: "@once
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
   await page.keyboard.press(String(lockedIndex + 1));
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
+});
+
+// The folded 사건 브리핑 opens on the run's six numbers and its clue count
+// (`describeStanding`, src/gauntlet/tableReadout.js). A locked card states its
+// condition in two of them and the table printed neither.
+const standingLine = (page) => page.getByTestId("brief-standing");
+
+/** Opens the folded briefing, or shuts it; a fold already there is left alone. */
+async function setBriefFold(page, open) {
+  const fold = page.locator(".gx-brief");
+  if ((await fold.evaluate((element) => element.open)) !== open) {
+    await clickElement(fold.locator("summary"), `${open ? "open" : "shut"} 사건 브리핑`);
+  }
+  await expect(fold).toHaveJSProperty("open", open);
+}
+
+/** The number a text prints after each of the six names, and the clues it counts; null for one it does not print. */
+function readStanding(text) {
+  const after = (pattern) => {
+    const found = text.match(pattern);
+    return found ? Number(found[1]) : null;
+  };
+  return {
+    ...Object.fromEntries(Object.entries(easyResourceLabels).map(([key, label]) => [key, after(new RegExp(`${label} (-?\\d+)`))])),
+    clues: after(/단서 (\d+)개/),
+  };
+}
+
+/** The same seven as the save holds them. */
+function heldStanding(save) {
+  return {
+    ...Object.fromEntries(Object.keys(easyResourceLabels).map((key) => [key, Number(save?.resources?.[key]) || 0])),
+    clues: (save?.discoveredClues ?? []).length,
+  };
+}
+
+/** Waits until the line and the save agree, and returns what both hold. */
+async function expectLinePrintsTheSave(page, where) {
+  await expect
+    .poll(
+      async () => {
+        const printed = JSON.stringify(readStanding((await standingLine(page).textContent()) ?? ""));
+        const held = JSON.stringify(heldStanding(await readJsonStorage(page, TEST_STORAGE_KEYS.save)));
+        return printed === held ? "same" : `the line prints ${printed}, the save holds ${held}`;
+      },
+      { message: `the briefing's standing line ${where}`, timeout: 10_000 },
+    )
+    .toBe("same");
+  return heldStanding(await readJsonStorage(page, TEST_STORAGE_KEYS.save));
+}
+
+test("the folded briefing prints the six numbers and the clue count the save holds, a locked card quotes the same two, and the next table prints the new ones", async ({ page }) => {
+  test.setTimeout(120_000);
+  expect(lockedIndex, "the scene still deals a gated card").toBeGreaterThan(0);
+  await openTable(page, GATED.caseId, GATED.nodeId);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
+
+  await setBriefFold(page, true);
+  await expect(standingLine(page)).toBeVisible();
+  expect(await standingLine(page).evaluate((line) => line.previousElementSibling?.tagName), "the line is the fold's first").toBe("SUMMARY");
+  const before = await expectLinePrintsTheSave(page, "on the table the run opened");
+
+  // The scene's challenge leads the table's own list.
+  const challenge = page.getByTestId("brief-challenge");
+  await expect(challenge).toHaveCount(1);
+  await expect(challenge).toHaveText(/\S+: \S/);
+  expect(await challenge.evaluate((item) => item === item.parentElement.firstElementChild), "the challenge is its list's first item").toBe(true);
+
+  // The locked card's sentence ends "지금 믿음 N, 단서 N개." (`getAuthorityGate`).
+  const locked = page.locator(".choices .choice").nth(lockedIndex);
+  await expect(locked).toHaveAttribute("aria-disabled", "true");
+  const quoted = ((await locked.textContent()) ?? "").match(/지금 믿음 (-?\d+), 단서 (\d+)개/);
+  expect(quoted, "the locked card says what the run holds now").not.toBeNull();
+  expect({ trust: Number(quoted[1]), clues: Number(quoted[2]) }, "the card and the line quote the same trust and clues").toEqual({ trust: before.trust, clues: before.clues });
+
+  // Shut again before the bet: the open fold takes the room the cards stand in.
+  await setBriefFold(page, false);
+  await clickElement(page.locator(".choices .choice:not([aria-disabled='true'])").first(), "stake the first open card");
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await clickElement(page.getByTestId("decision-next"), "next after the reveal");
+  await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+  await expect
+    .poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save))?.nodeId, { message: "the run moved on to the next scene", timeout: TRANSITION_TIMEOUT_MS })
+    .not.toBe(GATED.nodeId);
+  // The next table by its 판 열기, not by waiting out the briefing's reading clock.
+  await dismissProtocolBreach(page);
+  await expect(stageOf(page)).toHaveAttribute("data-status", "live");
+
+  await setBriefFold(page, true);
+  await expect(standingLine(page)).toBeVisible();
+  const after = await expectLinePrintsTheSave(page, "on the table after the cash");
+  expect(after, "the cashed card moved the numbers").not.toEqual(before);
+
+  // At a small phone's width the line wraps: nothing of it is cut, sideways or by a clamp, and it can be brought on screen.
+  await page.setViewportSize({ width: 360, height: 740 });
+  await setBriefFold(page, true);
+  const fit = await page.locator(".gx-brief").evaluate((fold) => {
+    const line = fold.querySelector("[data-testid='brief-standing']");
+    line.scrollIntoView({ block: "nearest", inline: "nearest" });
+    const box = line.getBoundingClientRect();
+    return {
+      cutSideways: line.scrollWidth > line.clientWidth + 1,
+      clamped: line.scrollHeight > line.clientHeight + 1,
+      left: Math.round(box.left),
+      right: Math.round(box.right),
+      screen: document.documentElement.clientWidth,
+      itemsCut: Array.from(fold.querySelectorAll("li")).filter((item) => item.scrollWidth > item.clientWidth + 1).length,
+    };
+  });
+  expect(fit.cutSideways, "the line is not cut at 360px").toBe(false);
+  expect(fit.clamped, "the line is not clamped to fewer lines than it has").toBe(false);
+  expect(fit.left, "the line starts on the screen").toBeGreaterThanOrEqual(0);
+  expect(fit.right, "the line ends on the screen").toBeLessThanOrEqual(fit.screen + 1);
+  expect(fit.itemsCut, "nothing in the fold's lists is cut, the challenge included").toBe(0);
+  await expect(standingLine(page)).toBeInViewport();
+  expect(readStanding((await standingLine(page).textContent()) ?? ""), "the line still prints all seven at that width").toEqual(after);
 });
 
 // A save written while the key could still stake a locked card holds that card
