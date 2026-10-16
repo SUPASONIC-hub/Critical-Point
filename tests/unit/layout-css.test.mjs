@@ -121,6 +121,13 @@ test("the briefing cards, the draft's skip and its folded feats are pressed over
   assert.match(sheet("relics"), /\.gauntlet-stage \.gx-draft-skip \{\s*position: relative;\s*margin-left: auto;\s*min-height: 38px;/);
 });
 
+test("the header's tools and the stances are pressed over 44px tall, not 44 less their borders", () => {
+  const play = sheet("play");
+  // Placed against the padding box: -8px around a 28px button with a 1px border is 42.
+  assert.match(play, /\.gauntlet-shell \.top-actions\.compact-actions button::before \{\s*content: "";\s*position: absolute;\s*inset: calc\(50% - 22px\) -1\.5px;\s*\}/);
+  assert.match(play, /\.gx-focus-modes button::before \{\s*content: "";\s*position: absolute;\s*inset: calc\(50% - 22px\) 0;\s*\}/);
+});
+
 test("the music pills, the folded case file and the report's tools are pressed over 44px and drawn no larger", () => {
   const intro = sheet("base-intro-ranking");
   assert.match(intro, /\.music-toggle,\s*\.music-volume-toggle \{\s*position: relative;/);
