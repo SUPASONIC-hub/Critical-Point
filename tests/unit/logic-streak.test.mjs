@@ -28,7 +28,8 @@ const {
 } = engine;
 const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, listOfferedTypes, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
 const { getRelicUnlocks, RELICS } = await import("../../src/gauntlet/relics.js");
-const { describeCardMove, describeLogicLog, describeLogicMove, getTypeName, getTypeParts, readLogic } = await import("../../src/gauntlet/tableReadout.js");
+const { describeCardMove, describeLogicLog, describeLogicMove, getMoveMark, getTypeName, getTypeParts, readLogic } = await import("../../src/gauntlet/tableReadout.js");
+const { readCharsetList } = await import("../../scripts/font-charset.mjs");
 const { HEAT_DEBT_GAUGE, LOCK_PRESS_SECONDS, LOGIC_CAP, LOGIC_HOLD, LOGIC_RATE, METRONOME_REACH, SEAL_BREAK_GAUGE } = await import("../../src/gauntlet/tableRules.js");
 const { ALL_RULES, rulesFor, STORY_RULES } = await import("../../src/gauntlet/tableUnlocks.js");
 const { addToRelicCodex, parseRelicCodex, settleAgainstCodex } = await import("../../src/gauntlet/useRelicTable.js");
@@ -646,6 +647,28 @@ test("a type's name is cut around one word, which is what a phone's card prints,
 
   // What a card's tag adds for a screen reader once the streak is in play (the tag itself is drawn in GauntletHand.jsx).
   assert.deepEqual(["grow", "build", "switch", "keep", "break", "none", undefined].map(describeCardMove), ["(콤보 이어 감)", "(콤보 쌓는 중)", "(콤보 전환)", "(콤보 유지)", "(콤보 끊김)", "", ""]);
+});
+
+test("a card's tag says what it would do to the streak without its colour", () => {
+  // Every move a card on the table can be shown to make (`readLogic` plays it
+  // at tier 0, so never "bust") has a sign and has words for a screen reader.
+  const moves = ["grow", "build", "switch", "keep", "break"];
+  const charset = readCharsetList();
+  for (const move of moves) {
+    const mark = getMoveMark(move);
+    assert.equal([...mark].length, 1, `${move} prints one sign`);
+    assert.ok(charset.has(mark), `${mark} (${move}) is a character the game's font was cut with`);
+    assert.ok(describeCardMove(move), `${move} is said in words too`);
+  }
+  // The colour splits the moves in two (lit, or not for "break"); the signs
+  // split them the same way and further. What ends the streak shares its sign
+  // with nothing, and neither does either of the two that raise it.
+  for (const alone of ["break", "grow", "switch"]) {
+    assert.equal(moves.filter((move) => getMoveMark(move) === getMoveMark(alone)).length, 1, `${alone} has a sign of its own`);
+  }
+  assert.equal(getMoveMark("build"), getMoveMark("keep"), "both leave the streak where it is");
+  // Nothing to say where the streak is not in play, or for a move no card shows.
+  assert.deepEqual(["none", "bust", null, undefined].map(getMoveMark), ["", "", "", ""]);
 });
 
 test("the reveal says what the card did to the streak, one sentence a move", () => {

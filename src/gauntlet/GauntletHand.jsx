@@ -2,7 +2,7 @@ import { Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { getLogicType } from "./logicStreak.js";
-import { describeCardMove, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
+import { describeCardMove, getMoveMark, getTypeParts, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 
 /**
@@ -28,12 +28,18 @@ import { useShortcutHints } from "../state/accessibilitySettings.js";
  * the rule; the tag of a card that would not end the streak is lit. On a phone
  * the tag prints one word of the name and the rest is for a screen reader (the
  * `i` elements, which play.css clips there).
+ * The colour is not the only thing that says it: the tag opens with a sign
+ * for the move (`getMoveMark`), at every width, on the line the tag already
+ * has, so it costs a card no height. The sign is for the eye; a screen reader
+ * is told the move in words at the end of the tag.
  */
 export function CardType({ card, moveOf }) {
   const move = moveOf?.(card);
+  const mark = getMoveMark(move);
   const [before, word, after] = getTypeParts(getLogicType(card));
   return (
     <span className={`gx-card-type${move && move !== "break" ? " is-on" : ""}`} data-testid="card-type" data-move={move ?? ""}>
+      {mark && <b className="gx-card-move" data-testid="card-move" aria-hidden="true">{mark} </b>}
       <span className="sr-only">유형 </span>
       {before && <i>{before}</i>}
       {word}

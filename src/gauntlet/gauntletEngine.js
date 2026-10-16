@@ -167,6 +167,11 @@ export function drawStep(schema, seed, pushIndex) {
   return stepMin + Math.floor(seededUnit(`step:${seed}:${pushIndex}`) * (stepMax - stepMin + 1));
 }
 
+/** Whether a push from one heat to the next is the one the lockpick opened a sealed card with. */
+export function lockpickOpensSeal(relics, schema, fromGauge, toGauge) {
+  return hasRelic(relics, "lockpick") && fromGauge < schema.sealBreak && toGauge >= schema.sealBreak && toGauge < SEAL_BREAK_GAUGE;
+}
+
 /**
  * The pot multiplier doubles every 11 points of heat: x1 cold, x44 at 60, x199
  * at 84. The smallest push (7) is worth x1.55 on its own, so every press

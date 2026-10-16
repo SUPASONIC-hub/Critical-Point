@@ -25,6 +25,8 @@ export const SILENCE_SECONDS = 30;
 export const HEAT_DEBT_GAUGE = 60;
 export const HEAT_DEBT_SHARE = 3;
 export const HEAT_DEBT_SECONDS = 12;
+/** The two heats the rules read, marked on the gauge: a seal breaks at 30, HEAT DEBT starts at 60. */
+export const GAUGE_MARKS = [SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE];
 /** A cash at this multiplier or better builds the chain; this many in a row OVERCLOCK the board. */
 export const HOT_CASH_MULTIPLIER = 4;
 export const OVERCLOCK_STREAK = 2;

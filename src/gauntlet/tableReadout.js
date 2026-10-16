@@ -157,6 +157,19 @@ export function readLogic({ logic, card, offered, relics = [] }) {
 export const describeCardMove = (move) => (MOVE_COPY[move] ? `(콤보 ${MOVE_COPY[move]})` : "");
 
 /**
+ * The same, as the one sign the tag prints for the eye. The tag's colour said
+ * only "ends the streak or not", and colour alone says nothing to a player who
+ * cannot tell cyan from grey (WCAG 1.4.1): the sign is what the streak's number
+ * would do. Up for a card that raises it, the two-way arrow for one that
+ * raises it by changing type, level for one that leaves it where it is, and a
+ * cross for the one that ends it. All four are glyphs the game's face draws
+ * (the heavy cross U+2715 is on the charset list and not in Pretendard).
+ */
+const MOVE_MARKS = Object.freeze({ grow: "▲", switch: "↔", build: "=", keep: "=", break: "×" });
+
+export const getMoveMark = (move) => MOVE_MARKS[move] ?? "";
+
+/**
  * What the wild card is called. The guide and the scene's challenge send the
  * player to "'판을 다시 짠다' 카드", and the card printed only the label its
  * scene wrote (다른 방법을 제안한다 on 354 of the 427 scenes that deal it) over
