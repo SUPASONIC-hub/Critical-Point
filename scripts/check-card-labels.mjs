@@ -40,8 +40,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import { CASE_SEQUENCE, continuityMemoryChoicePlans, nodes } from "../src/gameData.js";
 
 const MAX_LABEL = 30;
-const OVER_CEILING = 773;
-const LONGEST_LABEL = 43;
+const OVER_CEILING = 727;
+const LONGEST_LABEL = 40;
 
 // The lengths the distribution is reported at; MAX_LABEL is one of them.
 const MARKS = [24, 28, 30, 32, 36];
