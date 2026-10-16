@@ -4,7 +4,6 @@ import {
   debugToolsEnabled,
   DEBUG_RENDER_CRASH_KEY,
   ERROR_LOG_STORAGE_KEY,
-  FEEDBACK_COMMENT_MAX_LENGTH,
   formatSaveTime,
   OPERATOR_ORIGIN_KEY,
   normalizeFeedback,
@@ -24,7 +23,6 @@ import {
   SEASON_ENTRY_NODE,
   caseAftermathNodeId,
   caseOpeningRoutes,
-  cognitionLabels,
   nodeOrders,
   nodes,
   getContinuityMemoryChoice,
@@ -34,10 +32,8 @@ import {
   triggerLabels,
 } from "./gameData.js";
 import {
-  clamp,
   getLeadChoice,
   detectPrivacySignals,
-  explainResourceTradeoff,
 } from "./gameLogic.js";
 import {
   getSessionId,
@@ -47,7 +43,7 @@ import {
   telemetryEnabled,
 } from "./telemetry.js";
 import { getLeaderboardHeadline } from "./ranking.js";
-import { easyCognitionLabels, simplifyPlayerText } from "./playerLanguage.js";
+import { simplifyPlayerText } from "./playerLanguage.js";
 import { GAME_TITLE } from "./appCopy.js";
 import { AdaptiveMusic } from "./components/AdaptiveMusic.jsx";
 import { LazyScreen } from "./components/LazyScreen.jsx";
@@ -81,16 +77,15 @@ import { useOverlayScreens } from "./state/useOverlayScreens.js";
 import { useRuntimeErrorCapture } from "./state/useRuntimeErrorCapture.js";
 import { useNewGamePlus } from "./state/useNewGamePlus.js";
 import { createRunLifecycle } from "./state/runLifecycle.js";
-import { getEndingEpilogue } from "./featurePack.js";
 import { resourceMeta } from "./appCopy.js";
 import { getNextCaseSignal } from "./caseCopy.js";
-import { createPlayView, createResultView } from "./viewModels/appViewModels.js";
+import { createPlayView } from "./viewModels/appViewModels.js";
+import { createResultViewModel } from "./viewModels/resultViewModel.js";
 import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import { getOperatorProfile, getOperatorProfiles } from "./advancedSystems.js";
-import { getEndingSceneProfile, getFailureObjectives, getEndingVisualClass } from "./runtimeSystems.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
 import { retryableLazy } from "./state/retryableLazy.js";
@@ -776,38 +771,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     }),
   });
 
-  const {
-    achievementBadges, caseChange,
-    aftermath,
-    authorityReview,
-    beatSeason,
-    caseOutcome,
-    endingAtmosphere,
-    endingCause,
-    endingPreview,
-    endingProfile,
-    endingVariant,
-    failureRecovery,
-    feedbackPrompts,
-    finalAftermathEntry,
-    finalEndingEntry,
-    logicReport,
-    originEndingVariant,
-    playReport,
-    rankLine,
-    rankingComparison,
-    rankingIntegrity,
-    replayDiagnostics,
-    result,
-    resultBridge,
-    resultRank,
-    routeTimeline,
-    scoreBreakdown,
-    seasonJourney,
-    seasonStanding,
-    telemetryDashboard,
-    telemetryStats,
-  } = useResultReport({
+  const report = useResultReport({
     authorityState,
     caseResults,
     cognition,
@@ -828,6 +792,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     runId,
     triggers,
   });
+  // What the runtime reads itself; the result view takes the whole report (viewModels/resultViewModel.js).
+  const { result, resultRank, routeTimeline, seasonJourney } = report;
 
   const routeLength = getCaseRouteLength(fallbackCaseId);
   const routeIndex = getNodeRouteIndex(fallbackCaseId, resolvedNodeId);
@@ -934,12 +900,28 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   if (!started) {
     return <LazyScreen quiet><IntroScreen view={introView} renderers={{ renderSaveStatus, renderRecoveryNotice, renderErrorLogPanel }} /></LazyScreen>;
   }
-  const resultView = createResultView(
-    { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines, renderSceneMinutes, endingPreview, caseChange },
-    { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, seasonStanding, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats, logicReport, beatSeason },
-  );
+  const resultView = createResultViewModel(report, {
+    AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, playerName, activeCaseMeta, renderSceneLines, renderSceneMinutes,
+    endingStep, endingTwistIndex, advanceEndingStep, endingQuietReady, endingQuietLine, skipEndingQuietHold,
+    unopenedRecordCount, unopenedClueCount, unopenedBranchCount, operatorReveal,
+    nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage,
+    caseResults, decisionFingerprint, observationLedger, observerPattern, triggers, momentumTier, momentumScore,
+    formatRiskDelta, counterfactualReport, achievementProgress, balanceSignals, log, clueCount,
+    sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, dataConsent, isOnline,
+    isRetryingTelemetry, copySessionCode, copyStatus,
+    currentFeedback, updateCurrentFeedback, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback,
+    isSubmittingFeedback, feedbackStatus,
+    startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent,
+    exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, nextCaseSignal,
+    seasonGoals, delayedConsequences, showErrorLog, setShowErrorLog, operationsSnapshot,
+  });
   if (isResult) {
-    return <LazyScreen quiet><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} /></LazyScreen>;
+    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel };
+    return (
+      <LazyScreen quiet>
+        <ResultScreen view={resultView} renderers={renderers} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} />
+      </LazyScreen>
+    );
   }
 
   const playView = createPlayView({
@@ -950,6 +932,15 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources, resourceMeta, progress, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
   });
-  return <LazyScreen quiet><PlayScreen view={playView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus }} sceneTitleRef={sceneTitleRef} actions={{ saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace }} /></LazyScreen>;
+  const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
+  const playActions = {
+    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic,
+    onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace,
+  };
+  return (
+    <LazyScreen quiet>
+      <PlayScreen view={playView} renderers={playRenderers} sceneTitleRef={sceneTitleRef} actions={playActions} />
+    </LazyScreen>
+  );
 
 }

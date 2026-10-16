@@ -137,8 +137,11 @@ Still open, on purpose:
    shell's `createStartSave` (`AppContent.jsx`) is still its own list: it runs
    before the runtime chunk is loaded, and the run's definition imports the
    table engine.
-2. Keep `GameRuntime.jsx` under its budget (980 lines, 104 imported names;
-   964 / 104 today). New derivations go into a hook of their own --
+2. Keep `GameRuntime.jsx` under its budget (960 lines, 96 imported names, no
+   line over 190 characters; 947 / 95 / 183 today). Every budgeted file has a
+   longest-line cap now, so a budget cannot be met by joining lines; a screen's
+   bag of names belongs in a view model (`viewModels/resultViewModel.js` builds
+   the report's). New derivations go into a hook of their own --
    `useCaseSystems`, `useResultReport`, `useChoiceCommit` (committing a
    decision, with its ranking row and telemetry) and `useRunReadout` (the
    log-derived readouts, memoised) are the pattern -- not into the component

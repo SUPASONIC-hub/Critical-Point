@@ -52,6 +52,7 @@ const VIEW_PROVIDER_FILES = [
   "src/AppContent.jsx",
   "src/GameRuntime.jsx",
   "src/viewModels/introViewModel.js",
+  "src/viewModels/resultViewModel.js",
 ];
 /**
  * A screen's bag is assembled in one place. The intro used to be assembled twice
@@ -62,7 +63,8 @@ const VIEW_PROVIDER_FILES = [
 const ASSEMBLED_IN = {
   intro: "src/viewModels/introViewModel.js",
   play: "src/GameRuntime.jsx",
-  result: "src/GameRuntime.jsx",
+  // GameRuntime.jsx passes what only it knows; the bag is written out there.
+  result: "src/viewModels/resultViewModel.js",
 };
 
 /** Field names passed into each create*View call, and the file that passes them. */
