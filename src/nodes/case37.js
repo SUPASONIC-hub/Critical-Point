@@ -689,8 +689,8 @@ export const case37 = {
   memoryPlan: {
     systemNext: "c37_route_system",
     evidenceNext: "c37_evidence_turn",
-    systemLabel: "식사 날 새벽에 새로 짠 판이 유출 파일의 판정 칸에도 찍혔는지 훑어본다",
-    evidenceLabel: "네 번째 의자가 차려진 식탁의 시각을 유출 파일의 작성 시각과 겹친다",
+    systemLabel: "식사 날 새벽에 짠 판이 유출 파일 판정 칸에 찍혔는지 본다",
+    evidenceLabel: "네 번째 의자를 차린 시각을 유출 파일의 작성 시각과 겹친다",
     systemEcho: "판정 칸에 찍힌 것은 당신의 판이 아니라 점수입니다. 노아가 그 점수를 밖에서 누가 달라고 하는지 요청 기록을 엽니다.",
     evidenceEcho: "식탁의 시각을 파일에 겹치면 디저트 복숭아가 나오던 때 파일이 만들어졌습니다. 만든 계정에는 발급을 요청한 부서가 붙어 있습니다.",
   },

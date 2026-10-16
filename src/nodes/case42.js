@@ -680,7 +680,7 @@ export const case42 = {
     systemNext: "c42_route_system",
     evidenceNext: "c42_evidence_turn",
     systemLabel: "참고인석에서 새로 짠 판이 노아의 회수 사유에 섞여 들었는지 헤쳐 본다",
-    evidenceLabel: "기억의 날짜표에 적힌 서명 날짜를 청문회 뒤에 생긴 문서들과 나란히 세운다",
+    evidenceLabel: "기억의 날짜표의 서명 날짜를 청문회 뒤 문서들과 견준다",
     systemEcho: "회수 사유는 '내부 기준' 네 글자가 전부입니다. 판이 끼어들 틈이 없습니다. 노아가 그 네 글자를 항목별로 풉니다.",
     evidenceEcho: "나란히 세우는 일은 경포까지 따라옵니다. 청문회 다음 날 아침에 태어난 주소 목록이 하나 있고, 그 목록을 만든 파일에는 제목이 있습니다.",
   },

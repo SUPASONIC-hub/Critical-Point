@@ -100,7 +100,7 @@ const case44Nodes = {
       },
       {
         id: "c44_lottery_report",
-        label: "대리 줄서기 문자를 법원 경위에게 알리고 확인을 요청한다",
+        label: "대리 줄서기 문자를 법원 경위에게 알린다",
         effect: { legitimacy: 11, trust: 2, time: -5, humanCost: 2, fatigue: 4 },
         voice: "돈 주고 세운 줄이 추첨에 섞여서는 안 된다며, 대리 줄서기 문자를 법원 경위에게 알리고 확인을 요청한다.",
         echo: "경위가 확인하는 동안 추첨이 20분 늦어집니다. 돈을 받고 서는 것까지 막을 규정은 없다는 답이 돌아옵니다. 남색 모자 스무 명은 줄에 그대로 있고, 뒤에 선 어르신들이 다리를 두드립니다.",
@@ -108,7 +108,7 @@ const case44Nodes = {
       },
       {
         id: "c44_lottery_press",
-        label: "기자석 옆자리를 얻어 먼저 들어가 기록부터 챙긴다",
+        label: "기자석 옆자리로 먼저 들어가 기록부터 챙긴다",
         effect: { time: 6, capital: 4, trust: -5, humanCost: 4, legitimacy: 2, fatigue: -3 },
         voice: "누가 당첨되든 받아 적을 사람은 안에 있어야 한다며, 기자석 옆자리를 얻어 먼저 들어가 기록부터 챙긴다.",
         echo: "기자석 옆자리는 약속받습니다. 다만 8시에 문가을의 번호가 불리면, 당신은 그 자리를 두고 그의 옆으로 옮겨 앉게 됩니다.",
@@ -145,7 +145,7 @@ const case44Nodes = {
       },
       {
         id: "c44_court_note",
-        label: "양형 사유를 한 줄씩 받아 적어 다음 재판 자료로 남긴다",
+        label: "양형 사유를 받아 적어 다음 재판 자료로 남긴다",
         effect: { legitimacy: 12, trust: 3, time: -4, humanCost: 1, fatigue: 4 },
         voice: "뒤집으려면 이유부터 정확히 알아야 한다며, 양형 사유를 한 줄씩 받아 적어 다음 재판 자료로 남긴다.",
         echo: "받아 적은 양형 사유는 열한 줄입니다. 그중 세 줄이 같은 300억을 가리킵니다.",
@@ -190,7 +190,7 @@ const case44Nodes = {
       },
       {
         id: "c44_lunch_state",
-        label: "열두 번의 날짜를 아는 증인으로 진술서를 쓰겠다고 한다",
+        label: "날짜 열두 번을 아는 증인으로 진술서를 쓴다",
         effect: { legitimacy: 13, trust: -3, time: -5, humanCost: 2, fatigue: 5 },
         voice: "검사가 찾는 이유가 이 자리에 앉아 있다며, 열두 번의 날짜를 아는 증인으로 진술서를 쓰겠다고 한다.",
         echo: "진술서를 쓰겠다고 하면 나은호가 처음으로 수저를 내려놓습니다. '그럼 당신도 증인으로 법정에 서요. 저쪽 변호인 여덟 명이 당신의 3년을 전부 물을 거예요.'",
@@ -198,7 +198,7 @@ const case44Nodes = {
       },
       {
         id: "c44_lunch_money",
-        label: "항소보다 추징금이 피해자에게 가는 길부터 찾자고 한다",
+        label: "추징금이 피해자에게 갈 길부터 찾자고 한다",
         effect: { capital: 9, time: 3, trust: -4, legitimacy: -3, humanCost: 4, fatigue: -2 },
         voice: "형량이 늘어도 가게는 돌아오지 않는다며, 항소보다 추징금이 피해자에게 가는 길부터 찾자고 한다.",
         echo: "돈부터 찾으면 문가을이 고개를 끄덕입니다. 나은호는 '그건 제 일이 아니네요' 하고 순댓국만 비우고 갑니다.",
@@ -682,8 +682,8 @@ export const case44 = {
   memoryPlan: {
     systemNext: "c44_route_system",
     evidenceNext: "c44_evidence_turn",
-    systemLabel: "이사회 전날 새로 짠 판이 그룹 입장문에 되풀이됐는지 읽어 내려간다",
-    evidenceLabel: "두 장의 보도자료가 쓰인 날짜를 처벌불원서가 만들어진 날의 장부 위에 올린다",
+    systemLabel: "이사회 전날 새로 짠 판이 그룹 입장문에 되풀이됐는지 읽는다",
+    evidenceLabel: "보도자료 두 장의 날짜를 처벌불원서 날의 장부에 올린다",
     systemEcho: "입장문을 끝까지 읽어도 판이 옮겨 간 흔적은 없습니다. 이민서가 그 대신 회사가 용서한 재판들을 10년 치로 검색합니다.",
     evidenceEcho: "날짜를 올리면 결말을 먼저 써 두는 버릇이 장부에도 있습니다. 배상금 한 줄이 선고 전에 이름을 갈아입었습니다.",
   },

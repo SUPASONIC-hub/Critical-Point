@@ -693,7 +693,7 @@ export const case49 = {
     systemNext: "c49_route_system",
     evidenceNext: "c49_evidence_turn",
     systemLabel: "기록실에서 새로 짠 판이 빈 서명란 문서들에 적혔는지 찾아 읽는다",
-    evidenceLabel: "41%가 적힌 두 쪽의 자문역 이름을 내일 그 방을 준비한 계정에 비춘다",
+    evidenceLabel: "41% 두 쪽의 자문역 이름을 그 방을 준비한 계정에 비춘다",
     systemEcho: "그 문서들에는 당신의 판 대신 당신의 이름이 올라 있습니다. 에코가 그렇게 이름이 적힌 칸들을 처음부터 모읍니다.",
     evidenceEcho: "자문역 이름을 비추면 지정서를 만든 계정은 그 사람 것이 아닙니다. 작성 시각은 선고가 난 날 밤입니다.",
   },

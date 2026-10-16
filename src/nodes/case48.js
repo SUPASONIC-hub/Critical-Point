@@ -682,7 +682,7 @@ export const case48 = {
       },
       {
         id: "c48_evidence_turn_founder",
-        label: "루프나우 대표 민하랑에게 먼저 이면 합의를 보여 주고 함께 정한다",
+        label: "민하랑 대표에게 이면 합의부터 보여 주고 함께 정한다",
         effect: { trust: 12, legitimacy: 6, capital: -6, humanCost: -5, fatigue: 7 },
         voice: "자기 회사를 정리할 약속을 모르고 있을 수 있어서, 루프나우 대표 민하랑에게 먼저 이면 합의를 보여 주고 함께 정한다.",
         echo: "보여 주면 민하랑이 두 쪽을 세 번 읽습니다. 그리고 묻습니다. '41%면, 우리 라이더 보증금은 몇 퍼센트예요?'",
@@ -693,7 +693,7 @@ export const case48 = {
   memoryPlan: {
     systemNext: "c48_route_system",
     evidenceNext: "c48_evidence_turn",
-    systemLabel: "떡방에서 새로 짠 판이 이번 서명지의 칸 어딘가에 남았는지 세어 본다",
+    systemLabel: "떡방에서 짠 판이 이번 서명지 칸 어딘가에 남았는지 본다",
     evidenceLabel: "남는 22억이 가려던 곳을 투자 계약서의 목차에 없는 쪽과 견주어 읽는다",
     systemEcho: "서명지에는 칸이 다섯 개뿐이고, 판이 들어갈 칸은 따로 없습니다. 에코가 그 다섯 칸이 10년 동안 어떻게 채워졌는지 셉니다.",
     evidenceEcho: "견주어 읽으면 돈이 남는 자리에는 늘 먼저 정해진 주인이 있습니다. 계약서 맨 뒤에 목차에 없는 두 쪽이 붙어 있습니다.",

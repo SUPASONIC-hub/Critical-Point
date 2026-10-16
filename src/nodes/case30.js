@@ -180,7 +180,7 @@ const case30Nodes = {
     choices: [
       {
         id: "c30_leaving_let",
-        label: "반재욱의 이름을 모든 기록에서 빼고 단체방 자리만 남겨 둔다",
+        label: "반재욱의 이름은 빼고 단체방 자리만 남긴다",
         effect: { trust: 12, humanCost: -5, legitimacy: -3, time: -3, fatigue: 5 },
         voice: "서아의 내년까지 걸게 할 수는 없다며, 반재욱의 이름을 모든 기록에서 빼고 단체방 자리만 남겨 둔다.",
         echo: "이름을 빼면 반재욱은 어디에도 없습니다. 단체방의 그의 자리에는 읽음 숫자만 하나 남습니다.",
@@ -196,7 +196,7 @@ const case30Nodes = {
       },
       {
         id: "c30_leaving_ask",
-        label: "감사팀 권한으로 딱 한 번만 조회해 달라고 부탁한다",
+        label: "감사팀 권한으로 한 번만 조회해 달라고 한다",
         effect: { capital: 5, time: 5, trust: -4, legitimacy: 3, humanCost: 4, fatigue: -2 },
         voice: "KD데이터랩만 빠진 까닭은 안에서만 볼 수 있어서, 감사팀 권한으로 딱 한 번만 조회해 달라고 부탁한다.",
         echo: "부탁하면 반재욱이 조회를 해 줍니다. 그리고 그 조회 기록이 서약서의 첫 번째 위반이 됩니다.",
@@ -684,7 +684,7 @@ export const case30 = {
   memoryPlan: {
     systemNext: "c30_route_system",
     evidenceNext: "c30_evidence_turn",
-    systemLabel: "탑승구 앞에서 새로 짠 판이 데이터 계약서 용도 칸에 적혔는지 확인해 본다",
+    systemLabel: "탑승구에서 짠 판이 데이터 계약서 용도 칸에 적혔는지 본다",
     evidenceLabel: "우편함 214번을 핏스코어의 주주 명단과 나란히 놓는다",
     systemEcho: "용도 칸에 적힌 것은 '조직 적합도 모델 개발' 한 줄입니다. 당신의 판은 거기 없고, 당신의 반응 기록이 제공 대상 칸에 있습니다. 노아가 같은 식으로 맺은 계약 서른여덟 건을 엽니다.",
     evidenceEcho: "우편함의 주소를 핏스코어 주주 명단에 대면 그룹 돈이 들어간 줄이 하나 있습니다. 투자 검토 의견은 한 줄이고, 쓴 자리는 당신 책상입니다.",

@@ -796,7 +796,7 @@ export const finalCase = {
   memoryPlan: {
     systemNext: "f_route_system",
     evidenceNext: "f_evidence_turn",
-    systemLabel: "달빛 아래에서 다시 짠 판이 다음 참가자의 선택지로 넘어갔는지 비춰 본다",
+    systemLabel: "달빛 아래 다시 짠 판이 다음 참가자의 선택지가 됐는지 본다",
     evidenceLabel: "지정서의 작성자를 따라 모든 선택 문장의 원본까지 간다",
     systemEcho: "비춰 보면 다음 참가자의 선택지 셋 중 하나에서 어제 당신이 다시 짠 판의 조건이 빠짐없이 읽힙니다.",
     evidenceEcho: "작성자를 따라가면 설계 로그의 잠금이 풀립니다. 매번 다르던 질문들이 같은 원본에서 갈라져 나온 것이 보입니다.",

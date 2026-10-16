@@ -615,7 +615,7 @@ export const case33 = {
     finalChoices: [
       {
         id: "a",
-        label: "신고자를 고소한 회사가 결론까지 신고자 소송비를 대게 하는 규칙을 제안한다",
+        label: "신고자를 고소한 회사가 신고자 소송비를 대는 규칙을 제안한다",
         effect: { legitimacy: 12, trust: 7, capital: -7, humanCost: -3, time: -2, fatigue: 6 },
         voice: "버티는 값을 신고자가 치르는 게 문제라며, 신고자를 고소한 회사가 결론까지 신고자 소송비를 대게 하는 규칙을 제안한다.",
         echo: "규칙이 생기면 다음 고소는 두 번 생각하고 들어옵니다. 이번 고소는 이미 들어와 있습니다.",
@@ -707,14 +707,14 @@ export const case33 = {
       echo: "여섯 명이 한꺼번에 오면 원룸이 꽉 찹니다. 백아린은 현관에 신발을 어디 둘지 몰라 처음으로 당황합니다.",
     },
     c33_start_record: {
-      label: "고소장 자료 목록이 신고 자료와 같다는 걸 금감원에 공식으로 알린다",
+      label: "고소장 자료가 신고 자료와 같다고 금감원에 공식으로 알린다",
       effect: { legitimacy: 12, trust: -1, capital: -5, time: -5, fatigue: 4 },
       cognition: { inference: 2 },
       voice: "그룹이 신고 내용을 벌써 봤다는 뜻이라서, 고소장 자료 목록이 신고 자료와 같다는 걸 금감원에 공식으로 알린다.",
       echo: "알리면 금감원 안에서 누가 그 목록을 밖으로 보냈는지 묻기 시작합니다. 답은 엿새 뒤 골목에서 옵니다.",
     },
     c33_start_rush: {
-      label: "나은호 검사에게 백아린을 참고인으로 먼저 보호해 달라고 요청한다",
+      label: "나은호 검사에게 참고인 백아린부터 보호해 달라고 한다",
       effect: { trust: 10, legitimacy: 6, humanCost: 2, time: -5, fatigue: 4 },
       cognition: { persistence: 2 },
       voice: "고소가 수사를 앞지르지 못하게, 나은호 검사에게 백아린을 참고인으로 먼저 보호해 달라고 요청한다.",

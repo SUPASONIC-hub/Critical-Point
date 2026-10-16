@@ -295,7 +295,7 @@ export const case27 = {
         },
         {
           id: "c27_after_rush",
-          label: "캡처를 들고 곧장 KD캐피탈 부동산금융팀으로 올라간다",
+          label: "캡처를 들고 곧장 KD캐피탈 부동산금융팀에 올라간다",
           effect: { capital: 8, legitimacy: 5, trust: -6, humanCost: 5, fatigue: 5 },
           voice: "줄이 끝났다고 끝난 일이 아니라며, 캡처를 들고 곧장 KD캐피탈 부동산금융팀으로 올라간다.",
           echo: "곧장 올라가면 12층 부동산금융팀 자리는 불이 꺼져 있습니다. 사내 메신저 목록에서 그 대화방은 이미 사라졌습니다.",
@@ -712,7 +712,7 @@ export const case27 = {
       echo: "밝히면 남궁솔은 당신을 한참 봅니다. 그리고 '그럼 그 표를 쓴 사람이 누군지도 같이 찾아 주세요'라고 합니다.",
     },
     c27_start_rush: {
-      label: "금요일 밤 부동산금융팀의 메신저 알림을 떠올려 대화방부터 찾는다",
+      label: "금요일 밤 부동산금융팀 메신저 알림을 떠올려 대화방을 찾는다",
       effect: { legitimacy: 10, capital: 4, trust: -4, humanCost: 3, time: -3, fatigue: 3 },
       cognition: { persistence: 2 },
       voice: "그 웃음소리가 우연일 리 없다며, 금요일 밤 부동산금융팀의 메신저 알림을 떠올려 대화방부터 찾는다.",

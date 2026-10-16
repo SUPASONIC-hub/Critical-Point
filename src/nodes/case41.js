@@ -102,7 +102,7 @@ const case41Nodes = {
       },
       {
         id: "c41_drill_hand",
-        label: "질문 초안은 의원실에 맡기고 증거 정리에만 집중한다",
+        label: "질문 초안은 의원실에 맡기고 증거만 정리한다",
         effect: { time: 6, capital: 5, legitimacy: 3, trust: -2, humanCost: 3, fatigue: -3 },
         voice: "1분짜리 형식은 그쪽이 더 잘 안다며, 질문 초안은 의원실에 맡기고 증거 정리에만 집중한다.",
         echo: "의원실은 질문을 잘 씁니다. 다만 그 질문의 마지막 줄은 의원실이 원하는 문장입니다.",
@@ -176,7 +176,7 @@ const case41Nodes = {
     choices: [
       {
         id: "c41_chamber_notebook",
-        label: "윤서진의 동의를 받아 아버지 수첩의 한 줄을 꺼낸다",
+        label: "윤서진의 동의로 아버지 수첩의 한 줄을 낸다",
         effect: { trust: 9, legitimacy: 6, humanCost: 4, time: -5, fatigue: 6 },
         voice: "알고 있었다는 건 그의 글씨가 말해 준다며, 윤서진의 동의를 받아 아버지 수첩의 한 줄을 꺼낸다.",
         echo: "윤서진이 가방을 무릎에 올리고 고개를 끄덕입니다. 그 한 줄이 나오면 방청석 셋째 줄이 조용해질 겁니다.",
@@ -192,7 +192,7 @@ const case41Nodes = {
       },
       {
         id: "c41_chamber_invest",
-        label: "핏스코어 40억 투자 승인서를 꺼내 오늘 뉴스를 잡는다",
+        label: "핏스코어 40억 투자 승인서로 뉴스를 잡는다",
         effect: { capital: 8, time: 3, legitimacy: 4, trust: -3, humanCost: 4, fatigue: -2 },
         voice: "방을 움직이는 건 큰 숫자라며, 핏스코어 40억 투자 승인서를 꺼내 오늘 뉴스를 잡는다.",
         echo: "40억을 꺼내면 뉴스가 될 겁니다. 뉴스가 되는 순간 방청석의 1,740명은 화면 밖으로 밀려납니다.",
@@ -680,7 +680,7 @@ export const case41 = {
     systemNext: "c41_route_system",
     evidenceNext: "c41_evidence_turn",
     systemLabel: "서버실에서 새로 짠 판이 청문회 질의서에 묻어 들어갔는지 짚어 본다",
-    evidenceLabel: "부적합의 기준점에 붙은 40억 승인서를 윤상혁이 답해야 할 날짜들 옆에 둔다",
+    evidenceLabel: "부적합의 기준점의 승인서를 윤상혁이 답할 날짜 옆에 둔다",
     systemEcho: "질의서는 당신의 판을 싣지 않았습니다. 예상 답변 칸마다 같은 대답이 적혀 있습니다. 이민서가 그 대답을 20년 치 회의록에서 셉니다.",
     evidenceEcho: "승인서를 옆에 두면 기억나지 않는다던 날에 그의 서명이 있습니다. 반재욱이 같은 식으로 청문회 날 정회까지 표를 채워 갑니다.",
   },

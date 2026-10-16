@@ -685,7 +685,7 @@ export const case43 = {
     systemNext: "c43_route_system",
     evidenceNext: "c43_evidence_turn",
     systemLabel: "경포에서 새로 짠 판이 해임안 설명서에 베껴졌는지 대조한다",
-    evidenceLabel: "주소가 받는 벌의 작성일을 홍보실 보도자료 폴더의 날짜와 포갠다",
+    evidenceLabel: "주소가 받는 벌의 작성일을 홍보실 보도자료 날짜와 포갠다",
     systemEcho: "설명서는 당신의 판을 베끼지 않았습니다. 2023년 이야기도 한 줄 없습니다. 노아가 빠진 줄을 찾으려고 10년 치 회의 기록을 폅니다.",
     evidenceEcho: "날짜를 포개 두면 이사회 날에 답이 옵니다. 정리표도 보도자료도 결과보다 먼저 쓰였습니다. 폴더에는 파일이 둘입니다.",
   },

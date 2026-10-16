@@ -108,7 +108,7 @@ const case35Nodes = {
       },
       {
         id: "c35_sandbag_gate",
-        label: "입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다",
+        label: "입구에 다 쌓아 큰길 쪽 가게 스무 곳을 지킨다",
         effect: { time: 5, capital: 6, trust: -3, humanCost: 5, fatigue: 3 },
         voice: "한 곳만 막을 수 있다면 가장 많은 가게를 고른다며, 입구에 한꺼번에 쌓아 큰길 쪽 가게 스무 곳을 지킨다.",
         echo: "큰길 쪽 스무 곳은 문을 엽니다. 떡방 골목은 무릎까지 잠기고, 민도현의 라이브 방송은 그 골목을 비춥니다.",
@@ -684,7 +684,7 @@ export const case35 = {
   memoryPlan: {
     systemNext: "c35_route_system",
     evidenceNext: "c35_evidence_turn",
-    systemLabel: "데이터센터에서 판을 새로 짠 것처럼 노아에게도 이유의 이유를 끝까지 묻는다",
+    systemLabel: "데이터센터의 판처럼 노아에게도 이유의 이유를 끝까지 묻는다",
     evidenceLabel: "'보관 X'의 날짜를 노아의 수해 심사 기록에 대 본다",
     systemEcho: "끝까지 물으면 노아의 답이 한 바퀴를 돕니다. 세 번째 질문에서 처음으로 1초 넘게 걸립니다.",
     evidenceEcho: "출력 기록을 심사 기록에 겹치면 기준을 넣어 달라고 한 부서가 읽힙니다. 지금 당신이 앉아 있는 부서이고, 요청일에 당신은 아직 거기 없었습니다.",
