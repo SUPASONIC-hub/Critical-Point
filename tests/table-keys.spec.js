@@ -100,7 +100,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   // The button says what a press costs, to the eye and to a screen reader.
   const lock = page.getByTestId("commit-focus");
   await expect(lock.locator("small")).toHaveText("0 · −1.5초");
-  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 판돈 배율은 상한까지만 오른다/);
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 상한까지만 오른다/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
   // Any moment is as good as another: the press is not timed.
@@ -201,7 +201,7 @@ test("a locked card refuses its number key as it refuses a click", { tag: "@once
   await openTable(page, GATED.caseId, GATED.nodeId);
   const locked = page.locator(".choices .choice").nth(lockedIndex);
   await expect(locked).toHaveAttribute("aria-disabled", "true");
-  await expect(locked).toContainText("LOCKED");
+  await expect(locked).toContainText("잠김");
 
   await page.keyboard.press(String(lockedIndex + 1));
   await expect(page.locator(".gx-card.selected")).toHaveCount(0);
@@ -217,7 +217,7 @@ test("a locked card refuses its number key as it refuses a click", { tag: "@once
   await expect(page.getByTestId("scene-briefing")).toBeVisible();
 });
 
-// The folded 사건 브리핑 opens on the run's six numbers and its clue count
+// The folded 사건 파일 opens on the run's six numbers and its clue count
 // (`describeStanding`, src/gauntlet/tableReadout.js). A locked card states its
 // condition in two of them and the table printed neither.
 const standingLine = (page) => page.getByTestId("brief-standing");
@@ -226,7 +226,7 @@ const standingLine = (page) => page.getByTestId("brief-standing");
 async function setBriefFold(page, open) {
   const fold = page.locator(".gx-brief");
   if ((await fold.evaluate((element) => element.open)) !== open) {
-    await clickElement(fold.locator("summary"), `${open ? "open" : "shut"} 사건 브리핑`);
+    await clickElement(fold.locator("summary"), `${open ? "open" : "shut"} 사건 파일`);
   }
   await expect(fold).toHaveJSProperty("open", open);
 }
@@ -545,12 +545,12 @@ async function expectTableDraws(page, on) {
   await expect(cards.getByTestId("card-type")).toHaveCount(await cards.count());
   await expect(page.getByTestId("gauntlet-logic")).toHaveCount(count(on.logic));
   if (on.logic) await expect(page.getByTestId("gauntlet-logic")).toContainText("콤보 0");
-  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(on.logic ? /다음 열기 \d+에서 \d+ 논리 콤보 0, 판돈 1\.00배/ : /다음 열기 \d+에서 \d+$/);
+  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(on.logic ? /다음 열기 \d+에서 \d+ 논리 콤보 0, 배율 1\.00배/ : /다음 열기 \d+에서 \d+$/);
   await expect(page.getByTestId("commit-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-focus")).toHaveCount(count(on.lock));
   await expect(page.getByTestId("gauntlet-overdrive")).toHaveCount(count(on.chain));
   // The run's line counts the chain only where there is one to count.
-  await expect(page.getByTestId("gauntlet-run-signal")).toHaveText(on.chain ? /^연승 \d+ BUST \d+ 최고 / : /^BUST \d+ 최고 /);
+  await expect(page.getByTestId("gauntlet-run-signal")).toHaveText(on.chain ? /^연속 \d+ BUST \d+ 최고 / : /^BUST \d+ 최고 /);
   await expect(page.locator(".gx-signals"), "no padded row over nothing").toHaveCount(count(on.lock || on.chain || on.logic));
   await expect(page.getByTestId("gauntlet-stance-mastery")).toHaveCount(count(on.stance));
   // The dock has a column for each button it holds.
@@ -563,7 +563,7 @@ async function expectTableDraws(page, on) {
   // production walks run this on WebKit too.
   const hint = (await page.locator(".gx-hand-head small").textContent()) ?? "";
   const keysDrawn = await page.evaluate(() => matchMedia("(any-pointer: fine)").matches);
-  expect(hint.includes("E 락"), `the key line reads "${hint}"`).toBe(keysDrawn && on.lock);
+  expect(hint.includes("E LOCK"), `the key line reads "${hint}"`).toBe(keysDrawn && on.lock);
   expect(hint.includes("Q 자세"), `the key line reads "${hint}"`).toBe(keysDrawn && on.stance);
   if (keysDrawn) expect(hint).toContain("W 밀기");
   else expect(hint, "no key is drawn on a touch screen").toBe("");

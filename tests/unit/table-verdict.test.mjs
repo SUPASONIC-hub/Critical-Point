@@ -47,7 +47,7 @@ test("the reveal names what closed the window, one true sentence a cause", () =>
   // 2026-10-10 can name it, and its reveal still reads as it did.
   assert.equal(VERDICT_CAUSES.includes("focus"), false);
   const logged = describeVerdictCause({ outcome: "bust", cause: "focus" });
-  assert.equal(logged, "락이 올린 열이 벽에 닿았다");
+  assert.equal(logged, "LOCK이 올린 열기가 벽에 닿았다");
   assert.equal([...sentences.values()].includes(logged), false, "a sentence of its own");
   // A LOCK press under the wall is charged in clock, and the clock is what closes the window.
   const pressed = reduceWindow({ ...createWindow({ schema: BASE_SCHEMA, seed: "causes" }), selectedId: "a", gauge: closedWindows().creep.wall - 0.001, elapsed: READ_GRACE_SECONDS }, { type: "FOCUS" });
@@ -96,13 +96,13 @@ test("BLACKOUT and COLD FEET say what is left once EXPOSE mastery has lifted the
 
   // The reveal's "다음 판" line promises a locked card only on a board that seals one.
   const general = "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
-  assert.match(describeNextTable(describeMutations(plainCold), false), /가장 비싼 카드가 잠긴다\.$/);
+  assert.match(describeNextTable(describeMutations(plainCold), false), /가장 비싼 카드가 봉인된다\.$/);
   assert.equal(describeNextTable(describeMutations(liftedCold), false), general, "EXPOSE mastery lifted the seal: the id stays, nothing is locked");
   const lens = buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, stanceMastery: { strike: 0, steady: 0, expose: 3, mastered: [] }, relics: ["glassLens"] });
   assert.deepEqual([lens.mutations.includes("coldFeet"), lens.sealHighest], [true, false], "GLASS LENS lifts it on the first rung of mastery");
   assert.equal(describeNextTable(describeMutations(lens), false), general);
-  assert.equal(describeNextTable(describeMutations(buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, relics: ["lockpick"] })), false).endsWith("잠긴다."), true, "a lockpick opens the seal sooner, and the card is still sealed");
-  assert.equal(describeNextTable(describeMutations(plainBust), true), "다음 판은 회의실이 깨뜨린 규칙으로 시작한다.");
+  assert.equal(describeNextTable(describeMutations(buildNextSchema({ outcome: "cash", cause: "cash", gauge: 10, pushes: 0, streak: 0, relics: ["lockpick"] })), false).endsWith("봉인된다."), true, "a lockpick opens the seal sooner, and the card is still sealed");
+  assert.equal(describeNextTable(describeMutations(plainBust), true), "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.");
   assert.equal(describeNextTable([], false), "");
 });
 

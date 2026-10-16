@@ -53,7 +53,7 @@ test("a reframe, a card the room played and a table record are not the player's 
   const reframed = card("c16_final", "마지막으로 판을 바꿔 제안한다", { reframe: true });
   assert.equal(cardLine([reframed]), record.fallback);
   assert.equal(cardLine([card("c16_final", "승인을 막는다", { threshold: { forced: true } })]), record.fallback);
-  assert.equal(cardLine([card("c16_final", "복구 전에 난 BUST", { isSystemEvent: true })]), record.fallback);
+  assert.equal(cardLine([card("c16_final", "복구 전에 벽에 닿은 판", { isSystemEvent: true })]), record.fallback);
   assert.equal(cardLine([card("c16_final", "")]), record.fallback);
   // A card the player staked counts whether or not the table then bust.
   assert.match(cardLine([card("c16_final", "승인을 막는다", { threshold: { busted: true, forced: false } })]), /승인을 막는다\.$/);

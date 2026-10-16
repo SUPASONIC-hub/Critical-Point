@@ -201,7 +201,7 @@ export function GauntletStage({
   // The situation board is three one-line cells, so its copy is written to fit
   // one: on a phone it was three stacked rows and 142px of the table.
   const dangerLine = nextHigh >= schema.wallMin
-    ? "다음 푸시가 벽 사정권"
+    ? "다음 밀기가 벽 사정권"
     : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const handBlocked = !live || isAdvancing || !tableOpen;
@@ -425,7 +425,7 @@ export function GauntletStage({
         <div className="gx-read">
         <div className="gx-hud">
           <div className="gx-pot" aria-live="off">
-            <span className="gx-label" lang="en">POT</span>
+            <span className="gx-label">이번 판</span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
               {win.status === "bust" ? 0 : formatNumber(livePot)}
             </strong>
@@ -453,7 +453,7 @@ export function GauntletStage({
               <b>{formatNumber(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              {chainOn && <><small>연승</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              {chainOn && <><small>연속</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
@@ -463,8 +463,8 @@ export function GauntletStage({
           {(chainOn || lockOn || logic) && (
           <div className="gx-signals">
             {chainOn && (
-            <span className={`gx-overdrive od-${overdrive.label.split(" ")[0].toLowerCase()}`} data-testid="gauntlet-overdrive">
-              <b lang="en">{overdrive.label}</b> <span>{overdrive.text}</span>
+            <span className={`gx-overdrive od-${overdrive.id}`} data-testid="gauntlet-overdrive">
+              <b>{overdrive.label}</b> <span>{overdrive.text}</span>
               <i aria-hidden="true"><em style={{ width: `${overdrive.progress}%` }} /></i>
             </span>
             )}
@@ -472,7 +472,7 @@ export function GauntletStage({
             <span className={`gx-focus-signal focus-${focusBonus.tier}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b lang="en">{focusBonus.label} {Math.round(win.focus)}</b>
-              <small>판돈 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
+              <small>배율 {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
             )}
@@ -492,7 +492,7 @@ export function GauntletStage({
         {(tableRules.length > 0 || ruleHeat > 0) && (
           <section className="gx-active-rules" data-testid="active-mutations" aria-label="현재 적용 중인 변형 규칙">
             <div>
-              <span lang="en">ACTIVE RULESET</span>
+              <span>적용 중인 규칙</span>
               <b>{joinRules(tableRules)}</b>
               <small>{currentRules}</small>
             </div>
@@ -579,7 +579,7 @@ export function GauntletStage({
             {/* The briefing page told this story before the clock started; this
                 folded copy is for looking something up while it runs. */}
             <details className="gx-brief" onToggle={(event) => setBriefOpen(event.currentTarget.open)}>
-              <summary>사건 브리핑</summary>
+              <summary>사건 파일</summary>
               {/* The six numbers and the clue count a locked card states its condition in; the HUD prints none of them. */}
               <p data-testid="brief-standing">{describeStanding(resources, resourceMeta, clueCount)}</p>
               {/* The room, before the words about it. Ten raster files cannot
@@ -603,9 +603,9 @@ export function GauntletStage({
               )}
               <ul>
                 {scene.challenge && <li data-testid="brief-challenge">이 장면의 챌린지: {scene.challenge}.</li>}
-                <li>현재 판돈: {formatNumber(run.runPot)}. BUST면 금고 밖 판돈은 사라진다.</li>
+                <li>현재 판돈: {formatNumber(run.runPot)}. 벽에 닿으면 금고 밖 판돈은 사라진다.</li>
                 <li>이번 판 규칙: {currentRules}.</li>
-                <li>다음 푸시 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
+                <li>다음 밀기 예고: 열기 {Math.round(win.gauge)} → {Math.round(nextLow)}–{Math.round(nextHigh)}.</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
@@ -642,7 +642,7 @@ export function GauntletStage({
           {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. A touch screen wide enough to show the line has no key to name, and gets none. */}
           <small>
             {letterKeys ? (
-              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> 락 · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
             ) : drawn && (
               <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
             )}
@@ -700,7 +700,7 @@ export function GauntletStage({
           onClick={focus}
           disabled={!canFocus}
           aria-keyshortcuts={keys("E")}
-          aria-label="락을 건다"
+          aria-label="LOCK을 건다"
           aria-describedby="gx-focus-detail"
         >
           <Crosshair size={18} aria-hidden="true" />
@@ -711,7 +711,7 @@ export function GauntletStage({
               112px in a button with 82px of room at 390px (74px at 360px). */}
           <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 차지 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. 판돈 배율은 상한까지만 오른다
+            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. 칩 배율은 상한까지만 오른다
           </span>
         </button>
         )}

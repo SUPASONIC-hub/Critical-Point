@@ -109,7 +109,7 @@ export function getFailureRecovery(ending = {}, resources = {}) {
   const { collapseHarmPerCase, collapseBustRate, collapseOverreachHarm } = ENDING_GATES;
   const key = ending.cause?.id ?? (Number(resources.humanCost) > 0 ? "harm" : "overreach");
   const text = key === "overreach"
-    ? `다음 시즌에는 터진 판을 전체의 ${Math.round(collapseBustRate * 100)}% 아래로 줄이거나, 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseOverreachHarm} 아래로 닫으면 무너지지 않습니다.`
+    ? `다음 시즌에는 벽에 닿은 판을 전체의 ${Math.round(collapseBustRate * 100)}% 아래로 줄이거나, 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseOverreachHarm} 아래로 닫으면 무너지지 않습니다.`
     : `다음 시즌에는 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseHarmPerCase} 아래로 닫으면 무너지지 않습니다.`;
   return { key, title: "RECOVERY ROUTE", text };
 }

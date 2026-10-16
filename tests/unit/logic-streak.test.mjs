@@ -163,7 +163,7 @@ test("a bust ends the streak, and the hold follows the card that was played", ()
 });
 
 test("앙코르 holds the streak through a bust, every bust, and nothing else", () => {
-  assert.equal(RELICS.encore.text, "BUST가 판돈은 가져가도 논리 콤보는 남겨 둔다.");
+  assert.equal(RELICS.encore.text, "벽에 닿아 판돈을 잃어도 논리 콤보는 남는다.");
   assert.equal(RELICS.encore.unlock.text, "논리 콤보 8 달성");
   const grown = play(Array.from({ length: 6 }, () => ({ card: card("risk") }))).run;
   assert.equal(grown.logic.streak, 4);
@@ -204,7 +204,7 @@ test("앙코르 is unlocked by a logic streak of 8, and a codex that already hol
 });
 
 test("메트로놈: after the pressure rose, a change of type counts as a switch on that scene and on the next", () => {
-  assert.equal(RELICS.metronome.text, "압박이 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.");
+  assert.equal(RELICS.metronome.text, "열기가 오른 다음 장면까지, 유형을 바꿔도 전환으로 인정된다.");
   assert.equal(RELICS.metronome.proc, "전환을 붙잡았다");
   assert.equal(RELICS.metronome.unlock, null, "still in the pool every season can draft from");
   const offered = ["risk", "inference", "persistence"];
@@ -541,7 +541,7 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   assert.deepEqual(six(patch.gauntletRun.logic), { streak: 4, best: 4, type, held: 3, heat: 1, rose: true });
   assert.equal("tempo" in entry.threshold || "tempoBonus" in entry, false, "neither line a build before 2026-10-11 wrote is written");
   assert.deepEqual(entry.handLine, describeLogicLog(entry.threshold.logic), "and the archive's line is the streak's");
-  assert.match(entry.handLine.text, /^논리 콤보 4 · 판돈 ×1\.25 · \+\d/);
+  assert.match(entry.handLine.text, /^논리 콤보 4 · 배율 ×1\.25 · \+\d/);
 
   // A type the scene does not deal is one the hand could not have held: the streak is kept.
   const offered = getOfferedTypes(scene, { clueCount: 0, trust: 50, legitimacy: 50, casesOpened: 0 });
@@ -628,8 +628,8 @@ test("the HUD's line: the streak, the type held and how far, and when a change o
   assert.equal(lines({ ...holding, held: 40 }, "risk"), "논리 콤보 5 · 위험 다루기 3/3 · 이어 감", "the hold is shown to three and no further");
   assert.equal(readLogic({ logic: holding, card: card("risk"), offered: [] }).bonus, 1.3125, "and the pot's own line prints what it pays");
   // The sentence the push and confirm buttons are described by says all of it.
-  assert.equal(readLogic({ logic: holding, card: card("risk"), offered: [] }).spoken, "논리 콤보 5, 판돈 1.31배. 위험 다루기 3/3. 이 카드로 이어 감.");
-  assert.equal(readLogic({ logic: { ...holding, rose: true }, card: null, offered: [] }).spoken, "논리 콤보 4, 판돈 1.25배. 위험 다루기 2/3. 압박이 올라 유형을 바꿔도 콤보가 오른다.");
+  assert.equal(readLogic({ logic: holding, card: card("risk"), offered: [] }).spoken, "논리 콤보 5, 배율 1.31배. 위험 다루기 3/3. 이 카드로 이어 감.");
+  assert.equal(readLogic({ logic: { ...holding, rose: true }, card: null, offered: [] }).spoken, "논리 콤보 4, 배율 1.25배. 위험 다루기 2/3. 열기가 올라 유형을 바꿔도 콤보가 오른다.");
 });
 
 test("a type's name is cut around one word, which is what a phone's card prints, and put back whole for a reader", () => {
@@ -673,17 +673,17 @@ test("a card's tag says what it would do to the streak without its colour", () =
 
 test("the reveal says what the card did to the streak, one sentence a move", () => {
   const line = (made, extra = {}) => describeLogicMove({ type: "risk", tier: 1, rose: false, move: made, streak: 4, held: 3, bonus: 1.25, pot: 120, ...extra });
-  assert.equal(line("grow"), "위험 다루기를 이어 갔다. 논리 콤보 4, 판돈 ×1.25.");
-  assert.equal(line("build", { held: 2, streak: 0, bonus: 1 }), "위험 다루기 2/3. 같은 유형 세 번째부터 콤보가 오른다. 논리 콤보 0, 판돈 ×1.00.");
-  assert.equal(line("switch", { type: "inference", rose: true }), "압박이 오른 판에서 꼼꼼히 확인하기로 바꿨다. 전환으로 콤보가 올랐다. 논리 콤보 4, 판돈 ×1.25.");
-  assert.equal(line("keep", { type: "reframing" }), "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. 논리 콤보 4, 판돈 ×1.25.");
-  assert.equal(line("break", { type: "persistence", streak: 0 }), "압박이 오르지 않았는데 끝까지 버티기로 바꿨다. 논리 콤보는 0, 다시 1/3부터 센다.");
+  assert.equal(line("grow"), "위험 다루기를 이어 갔다. 논리 콤보 4, 배율 ×1.25.");
+  assert.equal(line("build", { held: 2, streak: 0, bonus: 1 }), "위험 다루기 2/3. 같은 유형 세 번째부터 콤보가 오른다. 논리 콤보 0, 배율 ×1.00.");
+  assert.equal(line("switch", { type: "inference", rose: true }), "열기가 오른 판에서 꼼꼼히 확인하기로 바꿨다. 전환으로 콤보가 올랐다. 논리 콤보 4, 배율 ×1.25.");
+  assert.equal(line("keep", { type: "reframing" }), "지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. 논리 콤보 4, 배율 ×1.25.");
+  assert.equal(line("break", { type: "persistence", streak: 0 }), "열기가 오르지 않았는데 끝까지 버티기로 바꿨다. 논리 콤보는 0, 다시 1/3부터 센다.");
   assert.equal(line("bust", { streak: 0 }), "벽에 닿아 논리 콤보가 끊겼다.");
   assert.equal(line("bust", { streak: 6 }), "벽에 닿았지만 논리 콤보 6은 남았다.");
   assert.equal(line("bust", { streak: 5 }), "벽에 닿았지만 논리 콤보 5는 남았다.");
   for (const none of [line("none"), describeLogicMove(null), describeLogicMove(undefined), describeLogicMove({ move: "leap" })]) assert.equal(none, null);
   // The archive's one line is only written when the streak paid.
-  assert.deepEqual(describeLogicLog({ streak: 4, bonus: 1.25, pot: 1200 }), { label: "LOGIC STREAK", text: "논리 콤보 4 · 판돈 ×1.25 · +1,200" });
+  assert.deepEqual(describeLogicLog({ streak: 4, bonus: 1.25, pot: 1200 }), { label: "LOGIC STREAK", text: "논리 콤보 4 · 배율 ×1.25 · +1,200" });
   for (const unpaid of [{ streak: 0, bonus: 1, pot: 0 }, { streak: 3 }, null]) assert.equal(describeLogicLog(unpaid), null);
 });
 

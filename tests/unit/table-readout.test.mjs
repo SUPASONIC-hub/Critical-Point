@@ -160,7 +160,7 @@ test("a table on its base rules reports no heat, no rule to lift and a dormant c
   assert.equal(read.ruleHeat, 0);
   assert.equal(read.currentRules, "규칙 안정");
   assert.match(read.ruleObjective, /^규칙 안정/);
-  assert.equal(read.overdrive.label, "DORMANT");
+  assert.equal(read.overdrive.label, "꺼짐");
   assert.equal(read.fractureAxis, null);
   assert.equal(read.bustKeeps, 0, "a bust leaves nothing of the case pot without INSURANCE");
   assert.equal(read.runTension, 0);
@@ -236,7 +236,7 @@ test("the chain climbs from dormant to ready as the cashes stay hot", () => {
     forecast({ multiplier: hot, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK }),
     forecast({ multiplier: hot, run: run({ streak: 1 }) }),
   ].map((read) => read.overdrive);
-  assert.deepEqual(ladder.map((step) => step.label), ["DORMANT", "IGNITION", "CHAIN HELD", "CHAIN LIVE", "OVERCLOCK READY"]);
+  assert.deepEqual(ladder.map((step) => step.label), ["꺼짐", "점화", "유지", "이어짐", "오버클럭 준비"]);
   const progress = ladder.map((step) => step.progress);
   assert.deepEqual(progress, [...progress].sort((a, b) => a - b), "each step fills more of the bar than the one before");
   assert.equal(new Set(progress).size, progress.length);
@@ -249,7 +249,7 @@ test("OVERCLOCK is promised only where the cash forecast really carries it", () 
   const early = forecast({ multiplier: HOT_CASH_MULTIPLIER, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK });
   assert.ok(!early.rules.has("overclock"), `${BEFORE_OVERCLOCK} has no OVERCLOCK yet`);
   assert.ok(!ids(early.cashMutations).includes("overclock"), "so its cash forecast names none");
-  assert.notEqual(early.overdrive.label, "OVERCLOCK READY", "and the chain does not say it is ready");
+  assert.notEqual(early.overdrive.label, "오버클럭 준비", "and the chain does not say it is ready");
   const under = forecast({ multiplier: HOT_CASH_MULTIPLIER - 0.1, run: run({ streak: 1 }) });
   assert.ok(!ids(under.cashMutations).includes("overclock"), "a cash under the hot line breaks the chain instead");
 });

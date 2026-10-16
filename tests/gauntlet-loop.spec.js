@@ -131,9 +131,9 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   await expect(line).toContainText("3/3");
   await expect(line).toContainText("이어 감");
   await expect(bonus).toHaveText("콤보 1.06");
-  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(new RegExp(`논리 콤보 1, 판돈 1\\.06배\\. ${typeName} 3/3\\. 이 카드로 이어 감`));
-  await expect(page.getByTestId("commit-confirm")).toHaveAccessibleDescription(/논리 콤보 1, 판돈 1\.06배/);
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}[을를] 이어 갔다\\. 논리 콤보 1, 판돈 ×1\\.06\\.$`));
+  await expect(page.getByTestId("commit-push")).toHaveAccessibleDescription(new RegExp(`논리 콤보 1, 배율 1\\.06배\\. ${typeName} 3/3\\. 이 카드로 이어 감`));
+  await expect(page.getByTestId("commit-confirm")).toHaveAccessibleDescription(/논리 콤보 1, 배율 1\.06배/);
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^${typeName}[을를] 이어 갔다\\. 논리 콤보 1, 배율 ×1\\.06\\.$`));
   await expect(page.locator(".gx-reveal-gain")).toContainText("× 콤보 1.06");
   let saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 1, best: 1, type: walk.type, held: 3 });
@@ -166,7 +166,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
   expect(await clockOf(page)).toBeLessThanOrEqual(before - 3);
   await expect(page.locator(".gx-grade, .gx-beat-ring")).toHaveCount(0);
 
-  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^압박이 오르지 않았는데 ${easyCognitionLabels[walk.last.otherType]}(으)?로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
+  await expect(await cashForStreak(page)).toHaveText(new RegExp(`^열기가 오르지 않았는데 ${easyCognitionLabels[walk.last.otherType]}(으)?로 바꿨다\\. 논리 콤보는 0, 다시 1/3부터 센다\\.$`));
   saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(saved.dynamics.logic).toMatchObject({ streak: 0, best: 1, type: walk.last.otherType, held: 1 });
   expect(saved.log.at(-1).threshold.logic).toMatchObject({ move: "break", streak: 0, bonus: 1, pot: 0 });
@@ -445,7 +445,7 @@ test("a small phone fits every fresh board's decision", { tag: "@layout" }, asyn
 
 test("every push visibly compounds the pot, and the odds are never printed", async ({ page }) => {
   await openTable(page, "case01", "start");
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("DORMANT");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("꺼짐");
   await page.locator(".choices .choice").first().click();
   const pot = page.getByTestId("gauntlet-pot");
   let previous = await readNumber(pot);
@@ -455,7 +455,7 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
     await expect.poll(() => readNumber(pot)).toBeGreaterThanOrEqual(Math.floor(previous * 1.5));
     previous = await readNumber(pot);
   }
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
   await expect(page.getByTestId("gauntlet-stage")).not.toContainText(/%/);
 });
 
@@ -727,17 +727,17 @@ test("two hot cashouts trigger an overclock payout banner", async ({ page }) => 
   await openTable(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
   for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
   await page.getByTestId("commit-confirm").click();
   await page.getByTestId("decision-next").click();
 
   await dismissProtocolBreach(page);
   await page.locator(".choices .choice").first().click();
   for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("OVERCLOCK READY");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
   await page.getByTestId("commit-confirm").click();
   await expect(page.locator(".decision-reveal")).toHaveClass(/is-overdrive/);
-  await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED");
+  await expect(page.getByTestId("overdrive-payout")).toContainText("오버클럭 발동");
   await expect(page.getByTestId("next-mutations")).toContainText("OVERCLOCK");
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("active-mutations")).toContainText("OVERCLOCK");
@@ -838,16 +838,16 @@ test("an earned OVERCLOCK's next rules are not headed as a broken board, and its
   await openTable(page, walk.caseId, walk.firstId);
   await cardOf(page, walk.first).click();
   await pushToHotCash(page);
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("IGNITION");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
   await page.getByTestId("commit-confirm").click();
   await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   await nextScene(page, walk.secondId);
 
   await cardOf(page, walk.second).click();
   await pushToHotCash(page);
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("OVERCLOCK READY");
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
   await page.getByTestId("commit-confirm").click();
-  await expect(page.getByTestId("overdrive-payout")).toContainText("OVERCLOCK TRIGGERED", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("overdrive-payout")).toContainText("오버클럭 발동", { timeout: TRANSITION_TIMEOUT_MS });
   const list = await readNextRules(page);
   expect(list.ids, "two hot cashes deal OVERCLOCK").toContain("overclock");
   expect(list.ids.filter((id) => PENALTY_RULES.has(id)), "nothing in this list costs the player").toEqual([]);

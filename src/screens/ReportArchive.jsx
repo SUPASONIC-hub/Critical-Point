@@ -76,7 +76,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     {currentCase === "final" && (
       <section className="achievement-panel ending-achievement-panel" aria-label="업적 진행">
         <span lang="en">ACHIEVEMENT TRACKER</span>
-        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small lang={item.unlocked ? "en" : undefined}>{item.unlocked ? "UNLOCKED" : `${item.value} / ${item.goal}`}</small></article>)}</div>
+        <div>{view.achievementProgress.map((item) => <article key={item.id}><b>{item.label}</b><small>{item.unlocked ? "해금" : `${item.value} / ${item.goal}`}</small></article>)}</div>
       </section>
     )}
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && currentCase === "final" && (
@@ -140,7 +140,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
     </section>
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && <section className="telemetry-dashboard-panel" aria-label="플레이테스트 상태">
       <span lang="en">PLAYTEST HEALTH</span>
-      <div><b>{view.telemetryDashboard.completed}</b><small>완료 케이스</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
+      <div><b>{view.telemetryDashboard.completed}</b><small>완료 사건</small><b>{view.telemetryDashboard.pending}</b><small>재전송 대기</small><b>{view.telemetryDashboard.errors}</b><small>로컬 오류</small><b>{view.telemetryDashboard.runs}</b><small>분리된 런</small></div>
     </section>}
     {__CP_DEBUG_BUILD__ && debugToolsEnabled && telemetryStats && <p className="telemetry-stats">TELEMETRY: {telemetryStats.saved} saved / {telemetryStats.failed} failed / {telemetryStats.attempted} attempted</p>}
     <p className={`ranking-integrity ${view.rankingIntegrity.valid ? "valid" : "invalid"}`}><strong>{view.rankingIntegrity.label}</strong> {view.rankingIntegrity.text}</p>
@@ -312,7 +312,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <Sparkles size={17} />
           획득 배지
         </h2>
-        <span>이번 케이스의 플레이 스타일입니다.</span>
+        <span>이번 사건의 플레이 스타일입니다.</span>
       </div>
       <div>
         {achievementBadges.map((badge) => (
@@ -327,7 +327,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="report-section">
         <h2 lang="en">Primary Trigger</h2>
         <strong>{triggerLabels[result.primary[0]]}</strong>
-        <p>{result.longestDecision?.title ?? "이번 케이스"}에서 가장 오래 남은 압박입니다.</p>
+        <p>{result.longestDecision?.title ?? "이번 사건"}에서 가장 오래 남은 압박입니다.</p>
       </section>
       <section className="report-section">
         <h2 lang="en">Secondary Trigger</h2>
@@ -422,10 +422,10 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
           <MessageSquareText size={17} />
           플레이테스트 피드백
         </h2>
-        <span>이 케이스가 얼마나 고민됐는지 남겨 주세요.</span>
+        <span>이 사건이 얼마나 고민됐는지 남겨 주세요.</span>
       </div>
       <div className="feedback-prompts">
-        <span>이번 케이스에서 확인할 질문</span>
+        <span>이번 사건에서 확인할 질문</span>
         <ul>
           {feedbackPrompts.map((prompt) => (
             <li key={prompt}>{prompt}</li>

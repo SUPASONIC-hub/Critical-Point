@@ -97,7 +97,7 @@ export function RankingScreen({
                       <span className="ranking-league-badge">{entry.league}</span>
                       <span className="ranking-style-badge">{entry.handle}</span>
                       <span className={`ranking-integrity-badge ${entry.integrity?.valid ? "valid" : "invalid"}`}>{entry.integrity?.label}</span>
-                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록" lang="en">SEASON COMPLETE</span>}
+                      {entry.seasonComplete && <span className="season-complete-badge" aria-label="시즌 완료 기록">시즌 완료</span>}
                       {/* `entry.trigger` is always a key of triggerLabels (normalizeEntry in ranking.js). */}
                       <small>{entry.caseTitle} · {entry.runLabel} · 주요 압박 {triggerLabels[entry.trigger] ?? triggerLabels.responsibility}</small>
                     </div>

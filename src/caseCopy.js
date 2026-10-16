@@ -296,7 +296,7 @@ export const legacyProfiles = {
   S: {
     label: "CLEAR SIGNAL",
     title: "이전 판단이 쌓은 믿음이 다음 사건을 받칩니다.",
-    text: "직전 케이스에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 믿음과 공정함을 품고 시작합니다.",
+    text: "직전 사건에서 기준을 끝까지 설명해 냈습니다. 다음 사건은 작은 믿음과 공정함을 품고 시작합니다.",
     effect: { trust: 4, legitimacy: 3 },
   },
   A: {
@@ -321,7 +321,7 @@ export const legacyProfiles = {
 
 export const nextCaseSignals = {
   prologue01: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "prologue02",
     title: "프롤로그 02 - 2023-0412",
     button: "프롤로그 02 시작",
@@ -331,7 +331,7 @@ export const nextCaseSignals = {
       "수습 때 당신이 찾아낸 건 4,000만 원짜리 빈 줄이었습니다. 이번 서류에서 어긋난 숫자는 0.4%포인트이고, 그 선을 그은 곳은 당신이 앉아 있는 팀입니다.",
   },
   prologue02: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "prologue03",
     title: "프롤로그 03 - 반려",
     button: "프롤로그 03 시작",
@@ -341,7 +341,7 @@ export const nextCaseSignals = {
       "반려한 사람은 한서윤 과장입니다. 그는 화를 내지 않고, 사과하지도 않고, 복도에서 12년 전 자기가 쓴 의견서 이야기를 꺼냅니다.",
   },
   prologue03: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "prologue04",
     title: "프롤로그 04 - 4번 창구",
     button: "프롤로그 04 시작",
@@ -351,7 +351,7 @@ export const nextCaseSignals = {
       "강서지점 4번 창구에는 3년차 행원 도윤하가 앉아 있습니다. 그는 웃으면서 팔고, 자기가 파는 것이 무엇인지 모릅니다. 그리고 그가 파는 사람들은 그가 이름을 아는 사람들입니다.",
   },
   prologue04: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "prologue05",
     title: "프롤로그 05 - 지하 4층",
     button: "프롤로그 05 시작",
@@ -361,7 +361,7 @@ export const nextCaseSignals = {
       "가는 곳은 합정동 옛 전산센터 4층, 모두가 지하 4층이라고 부르는 방입니다. 거기서 당신에게 처음 말을 거는 건 사람이 아닙니다.",
   },
   prologue05: {
-    eyebrow: "FIRST CASE UNLOCKED",
+    eyebrow: "첫 사건 열림",
     caseId: "case01",
     title: "사건 01 - 72시간",
     button: "사건 01 시작",
@@ -371,7 +371,7 @@ export const nextCaseSignals = {
       "그때 막지 못한 회사의 현금이 72시간 뒤 바닥납니다. 3년 전 당신의 계산이 맞았다는 것이, 이제 증명이 아니라 청구서로 도착합니다.",
   },
   case01: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case02",
     title: "사건 02 - 가짜 신호",
     button: "사건 02 시작",
@@ -381,7 +381,7 @@ export const nextCaseSignals = {
       "당신이 그 대출의 서명란을 들여다본 건 어제 오후였습니다. 오늘 아침 그 서류는 증거물이 되었고, 열람 기록은 다른 사람 이름으로 정리돼 있습니다.",
   },
   case02: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case03",
     title: "사건 03 - 경쟁자의 반격",
     button: "사건 03 시작",
@@ -391,7 +391,7 @@ export const nextCaseSignals = {
       "기록과 사람 사이에서 당신이 머문 시간은 그대로 점수가 됐습니다. 다음 판의 배점표는 입찰이 아니라 두 사람을 비교하려고 만들어졌습니다.",
   },
   case03: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case04",
     title: "사건 04 - 치러야 할 대가",
     button: "사건 04 시작",
@@ -401,7 +401,7 @@ export const nextCaseSignals = {
       "손실은 사라지지 않고 옮겨 다닙니다. 입찰장에서 지워진 숫자가 이번에는 돌봄 시간 3%로 나타납니다.",
   },
   case04: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case05",
     title: "사건 05 - 범인은 없었다",
     button: "사건 05 시작",
@@ -411,7 +411,7 @@ export const nextCaseSignals = {
       "당신이 그은 예외의 선은 사라지지 않습니다. 다음 사건에서 그 선은 배차 시스템의 가중치가 되어 가장 조용한 사람들부터 밀어냅니다.",
   },
   case05: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case06",
     title: "사건 06 - 같은 방의 사람",
     button: "사건 06 시작",
@@ -421,7 +421,7 @@ export const nextCaseSignals = {
       "책임자를 세우는 방식은 조직의 습관입니다. 이번에는 그 습관이 당신이 매일 얼굴을 보던 사람에게 적용됩니다.",
   },
   case06: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case07",
     title: "사건 07 - 되갚는 자리",
     button: "사건 07 시작",
@@ -431,7 +431,7 @@ export const nextCaseSignals = {
       "옆자리 사람의 조건을 확인한 사람은 다음 차례가 됩니다. 이번에는 당신이 묻는 쪽이 아니라 부탁하는 쪽입니다.",
   },
   case07: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case08",
     title: "사건 08 - 돈의 흔적",
     button: "사건 08 시작",
@@ -441,7 +441,7 @@ export const nextCaseSignals = {
       "사람은 욕망을 갖고, 욕망은 돈을 쓰고, 돈은 흔적을 남깁니다. 당신을 240km 밖으로 보낸 사람은 하필 그 흔적이 지나가는 창구로 당신을 보냈습니다.",
   },
   case08: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case09",
     title: "사건 09 - 두 장의 손익계산서",
     button: "사건 09 시작",
@@ -451,7 +451,7 @@ export const nextCaseSignals = {
       "흔적은 사람을 벌할 수 있습니다. 사람을 살리려면 다른 계산서가 필요합니다. 그 계산서의 절반은 당신이 도우려는 사람이 쥐고 있고, 그는 동정을 받지 않습니다.",
   },
   case09: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case10",
     title: "사건 10 - 멈추지 못하는 사람",
     button: "사건 10 시작",
@@ -461,7 +461,7 @@ export const nextCaseSignals = {
       "선의는 이 조직의 장부 어디에도 지출로 잡히지 않습니다. 잡히지 않는 비용은 줄어들지도 않습니다. 이번 사건은 그 청구서가 누구 앞으로 오는지 묻습니다.",
   },
   case10: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case11",
     title: "사건 11 - 모두가 보는 방",
     button: "사건 11 시작",
@@ -471,7 +471,7 @@ export const nextCaseSignals = {
       "지금까지의 사건은 모두 닫힌 방에서 결정됐습니다. 이번에는 카메라 열두 대 앞에서 말해야 하고, 증인석의 윤상혁 자리는 비어 있습니다.",
   },
   case11: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case12",
     title: "사건 12 - 1,740번째 사람",
     button: "사건 12 시작",
@@ -481,7 +481,7 @@ export const nextCaseSignals = {
       "지금까지 숫자였던 1,740명의 가게와 공장과 추모공원으로 갑니다. 그곳의 사람들은 반대 의견을 쓴 당신에게 고맙다고 하지 않습니다.",
   },
   case12: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case13",
     title: "사건 13 - 혁신의 얼굴",
     button: "사건 13 시작",
@@ -489,7 +489,7 @@ export const nextCaseSignals = {
     hook: "대가는 212명의 배상 기준과 동료들의 자리입니다. 조건은 한 문장입니다. 반대 의견을 쓴 사람이 카메라 앞에서 '과거는 정리됐다'고 말하는 것.",
   },
   case13: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case14",
     title: "사건 14 - 착한 펀드",
     button: "사건 14 시작",
@@ -498,7 +498,7 @@ export const nextCaseSignals = {
     hook: "판매 대본 둘째 장의 한 줄. '은행이 망하지 않는 한 걱정 안 하셔도 돼요.' 도윤하가 3년 전 창구에서 쓰던 문장입니다.",
   },
   case14: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case15",
     title: "사건 15 - 정규직 심사",
     button: "사건 15 시작",
@@ -506,7 +506,7 @@ export const nextCaseSignals = {
     hook: "사라진 11초를 '본인의 조작 실수'로 인정하면 정규직. 면접은 동생의 수능 날 아침 8시 40분입니다.",
   },
   case15: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case16",
     title: "사건 16 - 무인 창고",
     button: "사건 16 시작",
@@ -515,7 +515,7 @@ export const nextCaseSignals = {
       "72시간의 첫 밤에 당신에게 컵라면을 뜯어 주던 사람이 이번에는 낮에 찾아옵니다. 로봇은 적이 아니고, 로봇을 빌려 주는 심사역은 선량합니다. 그런데 계약서 부속서 3쪽에 사람이 먼저 나가야 한다고 적혀 있습니다.",
   },
   case16: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case17",
     title: "사건 17 - 수첩의 이름들",
     button: "사건 17 시작",
@@ -523,7 +523,7 @@ export const nextCaseSignals = {
     hook: "수첩에는 그가 20년 동안 내보낸 47명의 이름이 있습니다. 넘기기 전에 한 명씩 찾아갑니다. 첫 번째 이름은 공원 주차장에서 떡꼬치를 굽고 있습니다.",
   },
   case17: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case18",
     title: "사건 18 - 스카우트",
     button: "사건 18 시작",
@@ -532,7 +532,7 @@ export const nextCaseSignals = {
     hook: "아버지를 밀어낸 은행의 서류를 전부 볼 수 있는 자리입니다. 오진우는 이기는 쪽이 어딘지는 계산할 수 있다고 말합니다. 맞는 쪽이 어딘지는 모르겠다고요.",
   },
   case18: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case19",
     title: "사건 19 - 종이의 무게",
     button: "사건 19 시작",
@@ -541,7 +541,7 @@ export const nextCaseSignals = {
     hook: "남은 시간은 72시간, 상자는 312개. 병실의 임경수는 이번엔 전부 태워 달라고 합니다.",
   },
   case19: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case20",
     title: "사건 20 - 에코의 업데이트",
     button: "사건 20 시작",
@@ -549,7 +549,7 @@ export const nextCaseSignals = {
     hook: "노아의 학습 목록 1,208번째 줄에, 당신이 망설인 초까지 적혀 있습니다.",
   },
   case20: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case21",
     title: "사건 21 - 첫 번째 참가자",
     button: "사건 21 시작",
@@ -557,7 +557,7 @@ export const nextCaseSignals = {
     hook: "그는 지금 제주에서 귤 창고를 고쳐 게스트하우스를 합니다. 그리고 회사가 보낸 감사금 봉투가 당신보다 먼저 그 집 계산대에 도착해 있습니다.",
   },
   case21: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case22",
     title: "사건 22 - 인턴 문하준",
     button: "사건 22 시작",
@@ -566,7 +566,7 @@ export const nextCaseSignals = {
     hook: "거절 사유 칸에는 세상을 떠난 아버지의 이름이 적혀 있습니다. 노아가 온 뒤로 그 결과를 뒤집는 서명란에 이름을 쓴 사람은 전국에 한 명도 없습니다.",
   },
   case22: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case23",
     title: "사건 23 - 주주총회",
     button: "사건 23 시작",
@@ -574,7 +574,7 @@ export const nextCaseSignals = {
     hook: "표는 외국인 기관과 국민연금이 던집니다. 영동 객장에서 망원시장, 새벽 두 시 반의 야간조 대기실까지 그들이 반대할 근거를 모으러 갑니다. 발언 시간은 1분입니다.",
   },
   case23: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case24",
     title: "사건 24 - 마지막 출근",
     button: "사건 24 시작",
@@ -582,7 +582,7 @@ export const nextCaseSignals = {
     hook: "마지막 출근까지 일주일. 책상이 하나씩 비고, 옥상 벚나무에 봉오리가 맺힙니다. 그리고 금요일, 33층이 빈 서명란 이야기를 하자고 합니다.",
   },
   case24: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case25",
     title: "사건 25 - 오지 않은 사람",
     button: "사건 25 시작",
@@ -590,7 +590,7 @@ export const nextCaseSignals = {
     hook: "윤상혁은 KD캐피탈 대표이사로 영전하고, 명단에 오른 여섯 명은 여섯 곳으로 흩어집니다. 명단 맨 끝 줄에 당신 이름이 있습니다. 대표이사 직속.",
   },
   case25: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case26",
     title: "사건 26 - 골조만 남은 건물",
     button: "사건 26 시작",
@@ -598,7 +598,7 @@ export const nextCaseSignals = {
     hook: "'1년 연장으로 가지. 의견서는 자네가 쓰게.' 작성자 칸에는 당신 이름이 이미 인쇄돼 있고, 평택의 타워크레인 꼭대기에는 8일째 한 사람이 내려오지 않고 있습니다.",
   },
   case26: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case27",
     title: "사건 27 - 동네 금고",
     button: "사건 27 시작",
@@ -606,7 +606,7 @@ export const nextCaseSignals = {
     hook: "나준혁이 도장 세 개를 챙겨 군산으로 내려갑니다. 줄 선 사람들의 이름을 다 아는 전무가 문을 열고, 그 캡처의 회색 말풍선은 당신 휴대폰 속 사내 메신저와 똑같은 색입니다.",
   },
   case27: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case28",
     title: "사건 28 - 약관의 글씨",
     button: "사건 28 시작",
@@ -614,7 +614,7 @@ export const nextCaseSignals = {
     hook: "하루 180통, 평균 3분. 내일 오전 10시 통화 목록 첫 줄에 가온정밀에서 23년 선반을 돌린 사람의 이름이 있습니다.",
   },
   case28: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case29",
     title: "사건 29 - 마리나의 밤",
     button: "사건 29 시작",
@@ -622,7 +622,7 @@ export const nextCaseSignals = {
     hook: "출장 명령서에는 당신 이름이, 같은 비행기 두 줄 뒤에는 서하린이 있습니다. 마리나 베이의 루프탑, 매운맛 5단계 칠리크랩, 그리고 서명란 아래 이미 인쇄된 당신 이름.",
   },
   case29: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case30",
     title: "사건 30 - 여섯 명의 단체방",
     button: "사건 30 시작",
@@ -630,7 +630,7 @@ export const nextCaseSignals = {
     hook: "한 달 만에 여섯 개의 의자가 헌책방 탁자에 붙습니다. 단체방 이름 투표는 몇 번을 해도 3 대 3이고, 이번에는 모두가 자기 자리를 걸어야 합니다.",
   },
   case30: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case31",
     title: "사건 31 - 검사역",
     button: "사건 31 시작",
@@ -638,7 +638,7 @@ export const nextCaseSignals = {
     hook: "검사역 한지우는 당신 부서의 자료를 두 번 확인하겠다고 합니다. 기분 나쁘셔도 된다고, 규정이라고. 그의 수첩에는 질문 번호가 벌써 42번까지 매겨져 있습니다.",
   },
   case31: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case32",
     title: "사건 32 - 압수수색",
     button: "사건 32 시작",
@@ -646,7 +646,7 @@ export const nextCaseSignals = {
     hook: "검사는 당신을 증언하러 오라고 부릅니다. 그런데 질문은 수사 대상에게 하는 질문이고, 상자에서는 당신이 쓴 적 없는 당신의 서명이 나옵니다.",
   },
   case32: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case33",
     title: "사건 33 - 보호받을 권리",
     button: "사건 33 시작",
@@ -654,7 +654,7 @@ export const nextCaseSignals = {
     hook: "12년 동안 그룹의 문장을 다듬던 사람이 짐을 쌉니다. 상자 이름은 '_최종_진짜최종', 어머니의 수선집 벽에는 아직 그의 사원증이 액자로 걸려 있습니다.",
   },
   case33: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case34",
     title: "사건 34 - 아버지의 수첩",
     button: "사건 34 시작",
@@ -663,7 +663,7 @@ export const nextCaseSignals = {
     hook: "그는 아버지를 지키고 싶어서 연락했다고 합니다. 그리고 지키고 싶다는 사람이, 가장 불리한 한 줄을 가장 먼저 보냈습니다.",
   },
   case34: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case35",
     title: "사건 35 - 장마",
     button: "사건 35 시작",
@@ -671,7 +671,7 @@ export const nextCaseSignals = {
     hook: "비가 그치기도 전에 KD은행의 수해 긴급 대출이 무더기로 거절됩니다. 거절 사유는 한 줄입니다. '침수 피해 사업장.'",
   },
   case35: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case36",
     title: "사건 36 - 회장의 식탁",
     button: "사건 36 시작",
@@ -679,7 +679,7 @@ export const nextCaseSignals = {
     hook: "같은 주에 윤상혁은 두 번째로 검찰에 불려 갑니다. 그 식탁에 불려 가는 사람은 두 종류라고 한서윤이 말합니다. 자리를 받는 사람, 그리고 자리를 비워 주는 사람.",
   },
   case36: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case37",
     title: "사건 37 - 유출",
     button: "사건 37 시작",
@@ -688,7 +688,7 @@ export const nextCaseSignals = {
     hook: "맨 앞줄은 '분석관 A'입니다. 원래 순서라면 거기 있을 수 없는 줄입니다.",
   },
   case37: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case38",
     title: "사건 38 - 원고 1,740명",
     button: "사건 38 시작",
@@ -696,7 +696,7 @@ export const nextCaseSignals = {
     hook: "그룹 쪽 변호사는 여덟 명이고, 그들의 서면 첨부 17번은 유출된 당신의 망설임 기록입니다. 떡 마흔 상자는 보안 검색대를 넘지 못합니다.",
   },
   case38: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case39",
     title: "사건 39 - 편집실의 밤",
     button: "사건 39 시작",
@@ -704,7 +704,7 @@ export const nextCaseSignals = {
     hook: "아침 10시까지 70분으로 줄이지 않으면 방송이 나가지 않습니다. 편집실에는 떡 상자와 에너지 음료 캔 탑, 그리고 키보드 위를 걷는 고양이 한 마리가 있습니다.",
   },
   case39: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case40",
     title: "사건 40 - 적합도 점수",
     button: "사건 40 시작",
@@ -714,7 +714,7 @@ export const nextCaseSignals = {
       "핏스코어 대표는 면접에서 스물한 번 떨어진 끝에 숫자가 사람보다 공정하다고 믿게 된 사람입니다. 그 숫자가 가장 크게 감점하는 것은 망설인 시간이고, 기준점에는 당신의 9초가 들어 있습니다.",
   },
   case40: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case41",
     title: "사건 41 - 두 번째 청문회",
     button: "사건 41 시작",
@@ -724,7 +724,7 @@ export const nextCaseSignals = {
       "헌책방 모의 청문회에서 나준혁은 무엇을 물어도 같은 대답만 합니다. 실전에서 몇 번 나올지 내기판이 돌고, 당신에게 남은 건 대질신문(두 사람을 마주 세워 묻는 방식) 1분과 질문 하나입니다.",
   },
   case41: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case42",
     title: "사건 42 - 경포의 불꽃",
     button: "사건 42 시작",
@@ -732,7 +732,7 @@ export const nextCaseSignals = {
     hook: "당신의 휴가 신청서는 대표이사 칸에서 나흘째 멈춰 있습니다. 그리고 나준혁이 잡은 펜션의 주소는, 작년 여름 당신이 쫓던 바로 그 주소입니다.",
   },
   case42: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case43",
     title: "사건 43 - 이사회",
     button: "사건 43 시작",
@@ -740,7 +740,7 @@ export const nextCaseSignals = {
     hook: "권도현이 사외이사 일곱 명을 손익계산서 일곱 장으로 만들어 옵니다. 회장의 칸만 비어 있습니다. 변수가 아니라 상수라서요.",
   },
   case43: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case44",
     title: "사건 44 - 1심 선고",
     button: "사건 44 시작",
@@ -748,7 +748,7 @@ export const nextCaseSignals = {
     hook: "선고 전날 오후, 피해자인 KD은행이 윤상혁을 용서한다는 서류를 냈습니다. 대표이사 서명란은 비어 있고, 법인 도장만 찍혀 있습니다.",
   },
   case44: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case45",
     title: "사건 45 - 마지막 종이",
     button: "사건 45 시작",
@@ -756,7 +756,7 @@ export const nextCaseSignals = {
     hook: "임소율의 주머니에 누런 봉투가 있습니다. 겉봉의 연필 글씨. '율이와 반대 의견 쓴 사람이 같이. 셋째 날 새벽에 열 것.'",
   },
   case45: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case46",
     title: "사건 46 - 에코의 귀환",
     button: "사건 46 시작",
@@ -764,7 +764,7 @@ export const nextCaseSignals = {
     hook: "폐기 승인서의 승인자 칸은 비어 있습니다. 이민서가 노트북을 돌려 보이며 말합니다. '복원하면 첫마디가 뭘지 알아요. 다시 계산하십시오.'",
   },
   case46: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case47",
     title: "사건 47 - 1년 뒤 추석",
     button: "사건 47 시작",
@@ -772,7 +772,7 @@ export const nextCaseSignals = {
     hook: "같은 날 도착한 2차 배상 기준안에서 서류 없는 212명 중 31명에게 '확인 불가'가 찍혔습니다. 작년 추석, 문가을이 떡을 썰다 말고 물었던 바로 그 서른한 명입니다.",
   },
   case47: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case48",
     title: "사건 48 - 새로 쓰는 반대 의견",
     button: "사건 48 시작",
@@ -780,7 +780,7 @@ export const nextCaseSignals = {
     hook: "계약서 14쪽 제7조는 2023-0412 계약서와 쉼표 자리까지 같습니다. 그리고 이번에는 서명란 맨 아래 칸에 당신 이름이 인쇄돼 있습니다.",
   },
   case48: {
-    eyebrow: "NEXT CASE UNLOCKED",
+    eyebrow: "다음 사건 열림",
     caseId: "case49",
     title: "사건 49 - 33층으로",
     button: "사건 49 시작",
@@ -789,7 +789,7 @@ export const nextCaseSignals = {
     hook: "올라가기까지 하루. 떡방에서는 모두가 들고 갈 물건을 건네고, 옛 트리거랩 B2에서는 후임 관리자 칸이 당신 이름을 기다리고, 달빛 아래서 회장이 마지막으로 전화합니다.",
   },
   case49: {
-    eyebrow: "FINAL CASE UNLOCKED",
+    eyebrow: "마지막 사건 열림",
     caseId: "final",
     title: "마지막 사건 - 빈 서명란",
     button: "마지막 사건 시작",

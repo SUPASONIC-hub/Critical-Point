@@ -396,7 +396,7 @@ export function IntroScreen({ view, renderers = {} }) {
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
               <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
-                테스트용 전체 케이스 열기
+                테스트용 전체 사건 열기
               </button>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
@@ -415,7 +415,7 @@ export function IntroScreen({ view, renderers = {} }) {
                     setDebugCaseId(nextCaseId);
                     setDebugNodeId(nextNodeOptions[0] ?? "start");
                   }}
-                  aria-label="디버그 케이스 선택"
+                  aria-label="디버그 사건 선택"
                 >
                   {caseSequence.map((caseId) => (
                     <option key={caseId} value={caseId}>
@@ -622,7 +622,7 @@ export function IntroScreen({ view, renderers = {} }) {
                 <b>플레이테스트 데이터 제공 동의</b>
                 <small>
                   {telemetryEnabled
-                    ? "케이스 결과, 선택 로그, 응답 시간, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다."
+                    ? "사건 결과, 선택 로그, 응답 시간, 보낸 피드백, 오류 보고가 이 기기의 무작위 식별 번호와 함께 연구용으로 저장되고 180일 뒤 지워집니다. 이름은 원격 저장하지 않으며, 접속 주소는 요청 횟수를 제한하는 데만 씁니다."
                     : "현재 배포 환경에는 원격 저장이 설정되어 있지 않습니다."}
                 </small>
                 <small className={telemetryEnabled ? "data-status ready" : "data-status local"}>
@@ -661,7 +661,7 @@ export function IntroScreen({ view, renderers = {} }) {
             <section className="season-summary">
               <div>
                 <span lang="en">SEASON LOG</span>
-                <strong>완료한 케이스에서 반복적으로 활성화된 조건</strong>
+                <strong>완료한 사건에서 반복적으로 활성화된 조건</strong>
               </div>
               <div className="season-summary-list">
                 {completedCaseResultList.map((caseItem) => (
@@ -701,7 +701,7 @@ export function IntroScreen({ view, renderers = {} }) {
           )}
           <div id="season-roadmap" className="roadmap-heading" tabIndex={-1}>
             <span lang="en">SEASON ROADMAP</span>
-            <b>케이스는 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
+            <b>사건은 완료한 판단 로그를 다음 압박으로 넘기며 순서대로 열립니다.</b>
           </div>
           <div className="case-roadmap">
             {seasonCases.map((caseItem) => {
@@ -762,7 +762,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   <b>{simplifyPlayerText(caseItem.trigger)}</b>
                   <p>{simplifyPlayerText(caseItem.summary)}</p>
                   {caseItem.status === "LOCKED" && (
-                    <small className="case-lock-note">앞선 케이스의 판단 로그가 필요합니다.</small>
+                    <small className="case-lock-note">앞선 사건의 판단 로그가 필요합니다.</small>
                   )}
                   {savedResult && (
                     <small className="case-result-mini">

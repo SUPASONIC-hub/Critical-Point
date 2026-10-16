@@ -148,7 +148,7 @@ export function useChoiceCommit(context) {
     }
 
     if (!telemetryEnabled) {
-      setTelemetryStatus({ tone: "local", text: "원격 저장 미설정. 이 케이스 로그는 로컬과 JSON 내보내기에만 남습니다." });
+      setTelemetryStatus({ tone: "local", text: "원격 저장 미설정. 이 사건 로그는 로컬과 JSON 내보내기에만 남습니다." });
     } else if (!dataConsent) {
       setTelemetryStatus({ tone: "local", text: "데이터 제공 동의가 없어 원격 저장을 건너뛰었습니다." });
     } else {
@@ -170,7 +170,7 @@ export function useChoiceCommit(context) {
       const caseItem = {
         id: `case-${caseTelemetryPayload.event_id}`,
         type: "case",
-        label: `${activeCaseMeta?.label ?? currentCase} 케이스 로그`,
+        label: `${activeCaseMeta?.label ?? currentCase} 사건 로그`,
         payload: caseTelemetryPayload,
       };
       // Into the queue first, and so into the save, and sent from there (the
@@ -181,11 +181,11 @@ export function useChoiceCommit(context) {
       // queue runs the same privacy check before each send (priority 61), and
       // the row's event id makes a send that did land harmless to repeat.
       if (validateTelemetryItem(caseItem).length > 0) {
-        setTelemetryStatus({ tone: "error", text: "이 케이스 로그는 보낼 수 없는 형식이라 원격 저장하지 않습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
+        setTelemetryStatus({ tone: "error", text: "이 사건 로그는 보낼 수 없는 형식이라 원격 저장하지 않습니다. 기록은 이 기기와 JSON 내보내기에 남아 있습니다." });
       } else {
         queueTelemetry(caseItem);
         caseRowQueued = true;
-        setTelemetryStatus({ tone: "pending", text: "케이스 로그를 보관했습니다. 연결되는 대로 원격 저장합니다." });
+        setTelemetryStatus({ tone: "pending", text: "사건 로그를 보관했습니다. 연결되는 대로 원격 저장합니다." });
       }
     }
 

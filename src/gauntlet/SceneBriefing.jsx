@@ -264,7 +264,7 @@ export function SceneBriefing({
 
           {carried.length > 0 && (
             <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at("4 / 1 / 5 / -1", broken ? carryRow : 0)}>
-              <p className="gx-breach-kicker"><span lang="en">CARRIED OVER</span> · 이번 판에 이어지는 규칙</p>
+              <p className="gx-breach-kicker">이월 · 이번 판에 이어지는 규칙</p>
               <RuleRows rules={carried} resourceMeta={resourceMeta} />
             </div>
           )}

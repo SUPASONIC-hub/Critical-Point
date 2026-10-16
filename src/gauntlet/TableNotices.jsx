@@ -49,12 +49,12 @@ function HeldElsewhere({ onClaim, onLeave }) {
     >
       <span id="gx-held-title" className="gx-breach-kicker">이 판은 다른 탭에서 걸려 있다</span>
       <p id="gx-held-text">
-        다른 탭(또는 이전 세션)에서 카드를 걸어 둔 판입니다. 여기서 이어가면 그 판은 떠난 판으로 BUST 처리됩니다.
-        아직 그 탭에서 하는 중이면 그대로 두세요.
+        다른 탭(또는 이전 세션)에서 카드를 걸어 둔 판이다. 여기서 이어가면 그 판은 떠난 판이 되어 벽에 닿은 것으로 끝난다.
+        아직 그 탭에서 하는 중이면 그대로 둔다.
       </p>
       <div className="gx-held-actions">
         <button type="button" className="ghost" data-testid="claim-held-window" onClick={onClaim}>
-          여기서 이어가기 · BUST 처리
+          여기서 이어가기 · 그 판은 잃음
         </button>
         <button ref={leaveRef} type="button" className="ghost" data-testid="leave-held-window" onClick={onLeave}>
           그 탭에 두기
@@ -195,7 +195,7 @@ export function TableGlossary({ question, cards = [], mutations, relics, stanceM
       {/* No mastery to explain until the case lets the player choose a stance. */}
       {stanceMastery && (
         <li>
-          시즌 숙련: 차지를 채운 채로 확정한 판의 수. 자세마다 {STANCE_MASTERY_GOAL}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {stanceMastery.strike} · STEADY {stanceMastery.steady} · EXPOSE{" "}
+          시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {STANCE_MASTERY_GOAL}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {stanceMastery.strike} · STEADY {stanceMastery.steady} · EXPOSE{" "}
           {stanceMastery.expose}).
         </li>
       )}

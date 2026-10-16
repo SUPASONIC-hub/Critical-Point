@@ -519,7 +519,7 @@ test("the rules a sentence quotes are the rules the table applies", () => {
   assert.ok(MUTATIONS.aftershock.text.includes(`${bust.startGauge}에서`));
   assert.ok(MUTATIONS.silence.text.includes(`${bust.seconds}초`));
   assert.ok(MUTATIONS.blackout.text.includes(`${BASE_SCHEMA.wallMin - bust.wallMin} 가까워진다`));
-  assert.ok(MUTATIONS.coldFeet.text.includes(`게이지 ${SEAL_BREAK_GAUGE}을`));
+  assert.ok(MUTATIONS.coldFeet.text.includes(`열기 ${SEAL_BREAK_GAUGE}을`));
   assert.ok(RELICS.lockpick.text.includes(`${applyRelics(BASE_SCHEMA, ["lockpick"]).sealBreak}에서 열린다`));
   assert.ok(RELICS.coldBlood.text.includes("22가 아니라 11에서"));
   assert.ok(RELICS.steadyAnchor.text.includes("열기 4를 더"));

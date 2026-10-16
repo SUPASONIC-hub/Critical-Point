@@ -455,7 +455,7 @@ test("story mode is the comfort panel's first switch, kept across a reload, and 
   await expect(toggle).not.toBeChecked();
   await expect(page.getByRole("region", { name: "편의 설정" }).getByRole("checkbox").first()).toHaveAccessibleName(/^스토리 모드/);
   await expect(page.locator(".accessibility-toggle").first().locator("small")).toHaveText(
-    "벽이 멀어지고, 깨진 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
+    "벽이 멀어지고, 벽에 닿은 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
   );
   // The drawer of pledges: three cards, and a sentence that points to the switch.
   await expect(styles.getByRole("button")).toHaveCount(3);

@@ -52,7 +52,7 @@ function getCaseStatusText(status) {
   if (status === "PLAYING") return "진행 중";
   if (status === "OPEN") return "시작 가능";
   if (status === "COMPLETE") return "완료됨";
-  return "이전 케이스 필요";
+  return "이전 사건 필요";
 }
 
 /** The cases already closed, with their stored summary read back in full. */

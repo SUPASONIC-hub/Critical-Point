@@ -90,7 +90,7 @@ test("the introduction is written straight after the speaker, and the breach pan
   // with both names a row for each (`at`'s second argument).
   assert.deepEqual(rows, [1, 1, 2, 3, 3, 4, 4], "picture and speaker, the introduction, story and file, the carried rules, the breach");
   // The carried rules keep the breach panel's shape and drop its red (`gx-carry`, play.css).
-  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker"><span lang="en">CARRIED OVER<\/span> · 이번 판에 이어지는 규칙<\/p>/);
+  assert.match(briefing, /className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules"[^\n]*\s+<p className="gx-breach-kicker">이월 · 이번 판에 이어지는 규칙<\/p>/);
   // The page is still named by its scene title, not by the panel.
   assert.match(briefing, /aria-labelledby="gx-comic-title"/);
   // The introduction teaches and accuses nobody, so it takes the same calm form.

@@ -883,7 +883,7 @@ export const MUTATIONS = Object.freeze({
     penalty: true,
     label: "AFTERSHOCK",
     title: "여진이 남았다",
-    text: `게이지가 ${AFTERSHOCK_START}에서 시작한다. 방금 터진 열이 아직 식지 않았다.`,
+    text: `열기가 ${AFTERSHOCK_START}에서 시작한다. 방금 벽에 닿은 열기가 아직 식지 않았다.`,
   },
   silence: {
     penalty: true,
@@ -894,25 +894,25 @@ export const MUTATIONS = Object.freeze({
   heatDebt: {
     penalty: true,
     label: "HEAT DEBT",
-    title: "탐욕은 열을 남긴다",
-    text: `높은 배율로 확정한 대가. 이번 열의 ${HEAT_DEBT_SHARE}분의 1을 안고 시작하고, ${HEAT_DEBT_SECONDS}초를 잃는다.`,
+    title: "탐욕은 열기를 남긴다",
+    text: `높은 배율로 확정한 대가. 이번 열기의 ${HEAT_DEBT_SHARE}분의 1을 안고 시작하고, ${HEAT_DEBT_SECONDS}초를 잃는다.`,
   },
   overclock: {
     label: "OVERCLOCK",
-    title: "판돈이 두 배로 뛴다",
-    text: `연속으로 ×${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
+    title: "칩이 두 배로 뛴다",
+    text: `연속으로 ×${HOT_CASH_MULTIPLIER} 이상을 챙겼다. 칩이 ${OVERCLOCK_CHIPS}배지만, 한 번 밀 때 오르는 열기도 커진다.`,
   },
   coldFeet: {
     penalty: true,
     label: "COLD FEET",
     title: "가장 좋은 카드가 봉인됐다",
-    text: `밀지 않고 확정한 대가. 가장 비싼 카드는 게이지 ${SEAL_BREAK_GAUGE}${objectParticle(String(SEAL_BREAK_GAUGE))} 넘겨야 열리고, 칩이 줄어든다.`,
+    text: `밀지 않고 확정한 대가. 가장 비싼 카드는 열기 ${SEAL_BREAK_GAUGE}${objectParticle(String(SEAL_BREAK_GAUGE))} 넘겨야 열리고, 칩이 줄어든다.`,
   },
   fracture: {
     penalty: true,
     label: "FRACTURE",
-    title: "균열이 난 축",
-    text: `방금 가장 크게 태운 축. 다음 판에서 그 축을 태우는 카드는 ${FRACTURE_RATE}배로 청구된다.`,
+    title: "균열이 난 자원",
+    text: `방금 가장 크게 태운 자원. 다음 판에서 그 자원을 태우는 카드는 ${FRACTURE_RATE}배로 청구된다.`,
   },
   reboot: {
     label: "REBOOT",
@@ -922,32 +922,32 @@ export const MUTATIONS = Object.freeze({
   strikeWake: {
     label: "STRIKE WAKE",
     title: "다음 판이 더 두껍게 깨어난다",
-    text: `STRIKE로 채운 LOCK. 다음 판은 칩이 ${STRIKE_WAKE_CHIPS}배지만, 한 번 밀 때 오르는 열도 커진다.`,
+    text: `STRIKE로 충전한 LOCK. 다음 판은 칩이 ${STRIKE_WAKE_CHIPS}배지만, 한 번 밀 때 오르는 열기도 커진다.`,
   },
   steadyLine: {
     label: "STEADY LINE",
     title: "다음 판이 식은 채 열린다",
-    text: `STEADY로 채운 LOCK. 다음 판은 열기 ${STEADY_LINE_COOL} 낮게 시작하고 시간이 ${STEADY_LINE_SECONDS}초 늘며, 벽이 ${STEADY_LINE_WALL} 멀어진다.`,
+    text: `STEADY로 충전한 LOCK. 다음 판은 열기 ${STEADY_LINE_COOL} 낮게 시작하고 시간이 ${STEADY_LINE_SECONDS}초 늘며, 벽이 ${STEADY_LINE_WALL} 멀어진다.`,
   },
   exposedHand: {
     label: "EXPOSED HAND",
     title: "다음 판은 패를 숨기지 못한다",
-    text: "EXPOSE로 채운 LOCK. 다음 판은 카드가 뒤집히지 않고, COLD FEET 봉인도 풀린다.",
+    text: "EXPOSE로 충전한 LOCK. 다음 판은 카드가 뒤집히지 않고, COLD FEET 봉인도 풀린다.",
   },
   strikeMastery: {
     label: "STRIKE MASTERY",
     title: "시즌이 먼저 치는 법을 익혔다",
-    text: "STRIKE LOCK을 거듭 채운 결과. 새 판마다 칩이 두꺼워지고, 밀 때 오르는 열이 1 늘어난다.",
+    text: "STRIKE LOCK을 거듭 충전한 결과. 새 판마다 칩이 두꺼워지고, 밀 때 오르는 열기가 1 늘어난다.",
   },
   steadyMastery: {
     label: "STEADY MASTERY",
     title: "시즌이 버티는 법을 익혔다",
-    text: "STEADY LOCK을 거듭 채운 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
+    text: "STEADY LOCK을 거듭 충전한 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
   },
   exposeMastery: {
     label: "EXPOSE MASTERY",
     title: "시즌이 판을 읽는 법을 익혔다",
-    text: "EXPOSE LOCK을 거듭 채운 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",
+    text: "EXPOSE LOCK을 거듭 충전한 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",
   },
 });
 
@@ -1573,7 +1573,7 @@ export function carryTableRecordIntoRestore(restored, current) {
     caseId: entry.caseId,
     choiceId: "table-record-carry",
     title: "TABLE RECORD",
-    choice: "복구 전에 난 BUST",
+    choice: "복구 전에 벽에 닿은 판",
     effect: {},
     threshold: entry.threshold,
     resourcesBefore: restored.resources,

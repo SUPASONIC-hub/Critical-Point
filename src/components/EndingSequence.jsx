@@ -94,7 +94,7 @@ export function EndingSequence({
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
       <div className="ending-sequence-header">
         <span lang="en">SEASON 01 / FINAL RECORD</span>
-        <strong lang="en">SEASON COMPLETE</strong>
+        <strong>시즌 완료</strong>
       </div>
       {endingStep === 0 && (
         <div className="ending-beat">
@@ -169,7 +169,7 @@ export function EndingSequence({
       )}
       {endingStep === 3 && (
         <div className="ending-beat">
-          <span lang="en">RECORD OPENED</span>
+          <span>기록 열림</span>
           <div className="ending-coda">
             <span>당신이 남긴 것</span>
             <strong>{endingAfterglow.title}</strong>

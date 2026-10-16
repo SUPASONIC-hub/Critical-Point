@@ -15,9 +15,9 @@ export function GauntletLedger({ log = [], summary = null }) {
   const relics = normalizeRelicIds(summary?.relics);
   const potLost = formatNumber(ledger.potLost);
   const note = ledger.busts > 0
-    ? `벽에 ${ledger.busts}번 부딪혀 판돈 ${potLost}${objectParticle(potLost)} 잃었다. 금고에 들어간 것만 남는다.`
+    ? `벽에 ${ledger.busts}번 닿아 판돈 ${potLost}${objectParticle(potLost)} 잃었다. 금고에 들어간 것만 남는다.`
     : ledger.cashes > 0
-      ? "한 번도 터지지 않았다. 더 밀 수 있었는지는 벽만 안다."
+      ? "한 번도 벽에 닿지 않았다. 더 밀 수 있었는지는 벽만 안다."
       : "아직 테이블에 앉지 않았다.";
   return (
     <section className="pressure-ledger" aria-label="테이블 장부">

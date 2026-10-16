@@ -5,7 +5,7 @@ import { takeQueuedErrorTelemetry } from "./errorRecovery.js";
 const REVOKE_NOT_SAVED = "동의 해제 내용을 브라우저 저장본에 반영하지 못했습니다. 저장소 권한을 확인한 뒤 다시 시도하세요.";
 const GRANT_NOT_SAVED = "데이터 제공 동의를 브라우저 저장본에 반영하지 못했습니다.";
 const REVOKED = "데이터 제공 동의를 해제했습니다. 미전송 원격 대기열도 삭제했습니다.";
-const GRANTED = "데이터 제공에 동의했습니다. 지금부터 마치는 케이스에 적용됩니다.";
+const GRANTED = "데이터 제공에 동의했습니다. 지금부터 마치는 사건에 적용됩니다.";
 
 /**
  * What a tick or an untick of the consent box writes, and what it says when

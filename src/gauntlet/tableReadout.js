@@ -31,21 +31,21 @@ export function formatMultiplier(value) {
  */
 export function describeNextTable(nextMutations = [], busted = false) {
   if (nextMutations.length === 0) return "";
-  if (busted) return "다음 판은 회의실이 깨뜨린 규칙으로 시작한다.";
+  if (busted) return "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.";
   return nextMutations.some((mutation) => mutation.id === "coldFeet" && !mutation.lifted)
-    ? "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 잠긴다."
+    ? "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 봉인된다."
     : "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.";
 }
 
 const VERDICT_CAUSE_COPY = Object.freeze({
   cash: "직접 확정했다",
   push: "한 번 더 밀었다",
-  creep: "시계가 올린 열이 벽에 닿았다",
+  creep: "시계가 올린 열기가 벽에 닿았다",
   timeout: "시계를 방치했다",
   abandon: "걸어 둔 판을 떠났다",
   // Not one of `VERDICT_CAUSES`: no press heats the gauge now. A verdict logged
   // before 2026-10-10 can name it, and still reads as it did.
-  focus: "락이 올린 열이 벽에 닿았다",
+  focus: "LOCK이 올린 열기가 벽에 닿았다",
 });
 
 /**
@@ -56,7 +56,7 @@ const VERDICT_CAUSE_COPY = Object.freeze({
  * only what the outcome proves.
  */
 export function describeVerdictCause(verdict) {
-  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열이 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
+  return VERDICT_CAUSE_COPY[verdict?.cause] ?? (verdict?.outcome === "bust" ? "열기가 벽에 닿았다" : VERDICT_CAUSE_COPY.cash);
 }
 
 /** The name a card's type goes by on the table (the report's plain names). */
@@ -88,18 +88,18 @@ const bonusText = (bonus) => `×${(Number(bonus) || 1).toFixed(2)}`;
 export function describeLogicMove(logic) {
   const type = getTypeName(logic?.type);
   const streak = Number(logic?.streak) || 0;
-  const paid = `논리 콤보 ${streak}, 판돈 ${bonusText(logic?.bonus)}.`;
+  const paid = `논리 콤보 ${streak}, 배율 ${bonusText(logic?.bonus)}.`;
   switch (logic?.move) {
     case "grow":
       return `${type}${objectParticle(type)} 이어 갔다. ${paid}`;
     case "build":
       return `${type} ${Math.min(LOGIC_HOLD, Number(logic.held) || 1)}/${LOGIC_HOLD}. 같은 유형 세 번째부터 콤보가 오른다. ${paid}`;
     case "switch":
-      return `압박이 오른 판에서 ${type}${directionParticle(type)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
+      return `열기가 오른 판에서 ${type}${directionParticle(type)} 바꿨다. 전환으로 콤보가 올랐다. ${paid}`;
     case "keep":
       return `지키던 유형의 카드가 이 장면에 없었다. 콤보는 그대로다. ${paid}`;
     case "break":
-      return `압박이 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${LOGIC_HOLD}부터 센다.`;
+      return `열기가 오르지 않았는데 ${type}${directionParticle(type)} 바꿨다. 논리 콤보는 0, 다시 1/${LOGIC_HOLD}부터 센다.`;
     case "bust":
       return streak > 0 ? `벽에 닿았지만 논리 콤보 ${streak}${topicParticle(String(streak))} 남았다.` : "벽에 닿아 논리 콤보가 끊겼다.";
     default:
@@ -109,7 +109,7 @@ export function describeLogicMove(logic) {
 
 /** The same move as the archive's one line under a logged decision. */
 export function describeLogicLog(logic) {
-  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: `논리 콤보 ${logic.streak} · 판돈 ${bonusText(logic.bonus)} · +${formatNumber(logic.pot)}` } : null;
+  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: `논리 콤보 ${logic.streak} · 배율 ${bonusText(logic.bonus)} · +${formatNumber(logic.pot)}` } : null;
 }
 
 const MOVE_COPY = Object.freeze({ grow: "이어 감", build: "쌓는 중", switch: "전환", keep: "유지", break: "끊김" });
@@ -149,7 +149,7 @@ export function readLogic({ logic, card, offered, relics = [] }) {
     held,
     note,
     line: [`논리 콤보 ${now.streak}`, hold, note].filter(Boolean).join(" · "),
-    spoken: `논리 콤보 ${now.streak}, 판돈 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 압박이 올라 유형을 바꿔도 콤보가 오른다." : ""}`,
+    spoken: `논리 콤보 ${now.streak}, 배율 ${bonus.toFixed(2)}배. ${hold}.${did ? ` 이 카드로 ${did}.` : open && !staked ? " 열기가 올라 유형을 바꿔도 콤보가 오른다." : ""}`,
   };
 }
 
@@ -284,11 +284,11 @@ function getRuleObjective(mutations) {
 
 function getOverdriveCopy({ streak, hot, cashMutations }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
-  if (willOverdrive) return { label: "OVERCLOCK READY", text: "지금 확정하면 다음 판은 칩 2배, 푸시 폭 증가", progress: 100 };
-  if (streak > 0 && hot) return { label: "CHAIN LIVE", text: "한 번 더 ×4+ 확정하면 오버클럭", progress: 75 };
-  if (streak > 0) return { label: "CHAIN HELD", text: "이번 판도 ×4 이상으로 확정해야 이어진다", progress: 50 };
-  if (hot) return { label: "IGNITION", text: "확정하면 오버클럭 체인 1단계", progress: 35 };
-  return { label: "DORMANT", text: "×4 이상 확정부터 체인이 켜진다", progress: 12 };
+  if (willOverdrive) return { id: "ready", label: "오버클럭 준비", text: "지금 확정하면 다음 판은 칩 2배, 밀기 폭 증가", progress: 100 };
+  if (streak > 0 && hot) return { id: "live", label: "이어짐", text: "한 번 더 ×4+ 확정하면 오버클럭", progress: 75 };
+  if (streak > 0) return { id: "held", label: "유지", text: "이번 판도 ×4 이상으로 확정해야 이어진다", progress: 50 };
+  if (hot) return { id: "ignition", label: "점화", text: "확정하면 오버클럭 연속 1단계", progress: 35 };
+  return { id: "dormant", label: "꺼짐", text: "×4 이상 확정부터 연속이 켜진다", progress: 12 };
 }
 
 /**
