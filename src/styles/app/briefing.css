@@ -274,7 +274,9 @@
   }
 }
 
-/* The speaker, with speed lines behind them and the scene's question in a balloon. */
+/* The speaker on a halftone ground, the scene's question in a balloon. The ground
+   was rays fanning from behind the portrait until 2026-10-15: read as the rising-sun
+   flag, so it is now the comic's dot screen, the one the drawn silhouettes use. */
 .gx-panel-speaker {
   grid-area: speaker;
   display: grid;
@@ -284,7 +286,7 @@
   align-items: start;
   padding: 12px;
   background:
-    repeating-conic-gradient(from 0deg at 18% 30%, rgb(255 255 255 / 0.07) 0deg 2deg, transparent 2deg 9deg),
+    radial-gradient(circle, rgb(255 255 255 / 0.08) 1.3px, transparent 1.7px) 0 0 / 7px 7px,
     var(--ui-surface-3);
   animation-delay: 0.08s;
 }
