@@ -85,6 +85,7 @@ import { createIntroViewModel } from "./viewModels/introViewModel.js";
 import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import { createActiveBonus, createInheritedChallenge, createSceneChallenge, createSpeakerProfile } from "./viewModels/sceneViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
+import { getSpeakerPortrait } from "./speakerPortraits.js";
 import { getOperatorProfile, getOperatorProfiles } from "./advancedSystems.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
@@ -97,13 +98,6 @@ const IntroScreen = retryableLazy(() => import("./screens/IntroScreen.jsx").then
 const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })), "result");
 const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
-const speakerPortraits = {
-  "한서윤": "/portrait-han-seoyun.webp",
-  "반재욱": "/portrait-ban-jaeuk.webp",
-  "도윤하": "/portrait-do-yunha.webp",
-  "오진우": "/portrait-oh-jinwoo.webp",
-  "에코": "/portrait-echo.webp",
-};
 
 // Save suppression has one owner, `AppContent`, which always passes both
 // `onSuppressSaves` and `saveControls`. This file used to keep a second flag and
@@ -224,7 +218,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   } = useEndingSequence({ isResult, currentCase });
   const activeCaseMeta = seasonCasesBase.find((caseItem) => caseItem.id === currentCase);
   const speakerProfile = createSpeakerProfile({ node });
-  const speakerPortrait = speakerPortraits[node?.speaker] ?? null; // unpainted speakers are drawn by SpeakerPortrait
+  const speakerPortrait = getSpeakerPortrait(node?.speaker); // unpainted speakers are drawn by SpeakerPortrait
   const localSeasonLeaderboardRow = useMemo(
     () =>
       caseResults.final && completedCases.includes("final")

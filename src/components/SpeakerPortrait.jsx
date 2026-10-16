@@ -11,7 +11,14 @@
  * a halftone ground, tinted from the name so every character keeps one colour
  * across the season, with their initial in the corner. It is `alt=""` /
  * `aria-hidden` either way -- the name is printed right beside it.
+ *
+ * A portrait that does not arrive is drawn the same way, in its place. Only the
+ * five portraits that shipped first are fetched ahead by the service worker
+ * (scripts/service-worker-build.mjs); a later one comes when its speaker first
+ * speaks, so a device that meets that speaker offline has no picture to show.
  */
+import { useState } from "react";
+
 const TINTS = ["--c-sky", "--c-amber", "--c-coral", "--c-sage", "--c-violet", "--c-danger-81", "--c-sky-86", "--c-acid-72"];
 
 function tintOf(name = "") {
@@ -21,8 +28,10 @@ function tintOf(name = "") {
 }
 
 export function SpeakerPortrait({ name = "", src = null, size, className = "" }) {
-  if (src) {
-    return <img className={className} src={src} alt="" width={size} height={size} loading="lazy" decoding="async" />;
+  // The source that failed, not a flag: the next speaker's portrait gets its own try.
+  const [failed, setFailed] = useState(null);
+  if (src && src !== failed) {
+    return <img className={className} src={src} alt="" width={size} height={size} loading="lazy" decoding="async" onError={() => setFailed(src)} />;
   }
   const tint = `var(${tintOf(name)})`;
   const id = `portrait-${tintOf(name).slice(4)}-${size}`;

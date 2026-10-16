@@ -507,6 +507,10 @@ test("the warm list is every other build file, the portraits and the art at one 
   const config = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file)]) });
   assert.deepEqual(config.warm, ["/assets/RankingScreen-BHGTYjZL.js", "/assets/case02-CN_k66fr.js", "/portrait-echo.webp", "/profile.jpg", "/scene-case01-960.webp"]);
   assert.equal(config.warm.includes("/triggerlab-key-visual-960.webp"), false, "already in the precache");
+  // Only the five portraits that shipped first are warmed; a later one is
+  // fetched when its speaker first appears, and sw.js does not grow with it.
+  const withNew = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file), "/portrait-lee-minseo.webp"]) });
+  assert.deepEqual(withNew.warm, config.warm);
   assert.equal(config.entry, "/assets/index-FZxcMdNV.js");
   assert.equal(config.precache.includes("/assets/index-FZxcMdNV.js"), true);
   assert.throws(() => workerConfigFor({ html: "<html></html>", files: FILES }), /no module script/);
