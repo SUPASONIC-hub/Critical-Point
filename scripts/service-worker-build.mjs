@@ -30,7 +30,7 @@ import path from "node:path";
  *             script, stylesheet, font, icon and image the page names. The
  *             worker does not install without all of them.
  *   warm      every other file the build emitted under assets/ -- the cases
- *             and the screens -- and, from the root, the portraits, the
+ *             and the screens -- and, from the root, the first five portraits, the
  *             credit's picture and each piece of art at 960px, fetched once
  *             a table is up. One size of the art, not three: the worker
  *             gives it to a screen that asked for another (`artVariants`).
@@ -90,7 +90,12 @@ export function releaseIdFor({ html, files = [], logic = "" }) {
   return `${pageKeyFor(html)}-${digest(lines.join("\n")).slice(0, 12)}`;
 }
 
-const WARM_ROOT = /^\/(?:portrait-[a-z0-9-]+\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
+// The portraits the warm-up fetches are the five that shipped first, by name.
+// A portrait added after them is fetched when its speaker first appears and
+// kept from then on (the root-image rule in worker.js); offline before that,
+// SpeakerPortrait draws the silhouette in its place. Every name in the warm
+// list is bytes in `sw.js`, whose budget had room for one more.
+const WARM_ROOT = /^\/(?:portrait-(?:ban-jaeuk|do-yunha|echo|han-seoyun|oh-jinwoo)\.webp|[a-z0-9-]+-960\.webp|profile\.jpg)$/;
 
 const sameOriginPath = (value) => (/^\/[^/]/.test(value) ? value.split(/[?#]/)[0] : null);
 

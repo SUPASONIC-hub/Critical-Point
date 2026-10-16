@@ -55,6 +55,7 @@ export default [
     files: [
       "scripts/runtime-smoke.mjs",
       "scripts/build-art-variants.mjs",
+      "scripts/build-portrait.mjs",
       "scripts/build-critical-css.mjs",
       "tests/**/*.{js,mjs}",
     ],
