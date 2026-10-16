@@ -28,6 +28,7 @@
     "check:pressure": "node scripts/report-gauntlet-loop.mjs",
     "check:endings": "node scripts/check-endings.mjs",
     "report:endings": "node scripts/check-endings.mjs --report",
+    "report:near-miss": "node scripts/report-near-miss.mjs",
     "check:art": "node scripts/check-art-budget.mjs",
     "build:art": "node scripts/build-art-variants.mjs",
     "build:critical": "node scripts/build-critical-css.mjs",
