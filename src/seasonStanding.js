@@ -48,6 +48,13 @@ export function readCollapseTally(summaries = []) {
  * Harm is the larger of the season's sum and the harm on the table now, per
  * case. `cause` is the door the collapse came through -- harm before
  * overreach -- or null while the season stands.
+ *
+ * @param {object} [input]
+ * @param {number} [input.seasonHumanCost]
+ * @param {Record<string, any>} [input.resources]
+ * @param {number} [input.casesPlayed]
+ * @param {number} [input.seasonBusts]
+ * @param {number} [input.seasonWindows]
  */
 export function readCollapseGate({ seasonHumanCost = 0, resources = {}, casesPlayed = 0, seasonBusts = 0, seasonWindows = 0 } = {}) {
   const cases = Math.max(1, Number(casesPlayed) || CASE_SEQUENCE.length);

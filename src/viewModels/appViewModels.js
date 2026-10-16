@@ -83,7 +83,7 @@ export const viewGroups = {
       "counterfactualReport", "rankingComparison", "rankingIntegrity", "achievementBadges",
       "achievementProgress", "resourceMeta", "explainResourceTradeoff", "routeTimeline",
       "observationLedger", "observerPattern", "decisionFingerprint", "caseResults", "log", "clueCount",
-      "playReport", "balanceSignals", "logicReport", "caseChange",
+      "playReport", "balanceSignals", "logicReport", "caseChange", "seasonStanding",
     ],
     telemetry: [
       "sessionCode", "telemetryStatus", "pendingTelemetry", "retryPendingTelemetry",
@@ -98,7 +98,7 @@ export const viewGroups = {
     ],
     actions: [
       "startCase", "setStarted", "setShowRanking", "showSeasonMap", "exportPlaytestLog", "copyReplayLink",
-      "reset", "startRecoveryRoute", "nextCaseSignal", "resultBridge", "seasonGoals", "failureObjectives",
+      "reset", "nextCaseSignal", "resultBridge", "seasonGoals", "failureObjectives",
       "failureRecovery", "delayedConsequences",
     ],
     debug: [

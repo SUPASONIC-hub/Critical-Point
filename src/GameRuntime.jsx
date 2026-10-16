@@ -623,9 +623,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     startCaseEvent(caseId);
     return true;
   }
-  async function startRecoveryRoute() {
-    if (await openCase(currentCase)) setSaveStatus("복구 루트로 다시 시작합니다. 이번 목표는 피해를 줄이고 기록을 보존하는 것입니다.");
-  }
   // A case the season has not fetched yet is opened when it lands (caseArrival.js).
   // One that cannot be fetched and did not reload the page -- no connection, or
   // the page already reloaded for it once -- used to end in a dropped promise:
@@ -807,6 +804,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     routeTimeline,
     scoreBreakdown,
     seasonJourney,
+    seasonStanding,
     telemetryDashboard,
     telemetryStats,
   } = useResultReport({
@@ -938,7 +936,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }
   const resultView = createResultView(
     { AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase, endingStep, endingTwistIndex, finalAftermathEntry, finalEndingEntry, caseResults, decisionFingerprint, observationLedger, observerPattern, endingProfile, endingVariant, advanceEndingStep, endingQuietReady, nextParticipantMessage, setNextParticipantMessage, saveNextParticipantMessage, unopenedRecordCount, unopenedClueCount, unopenedBranchCount, endingQuietLine, skipEndingQuietHold, GAME_TITLE, startCase: openCaseEvent, setStarted, setShowRanking, showSeasonMap: showSeasonMapEvent, debugToolsEnabled, showErrorLog, setShowErrorLog, exportPlaytestLog: exportPlaytestLogEvent, copyReplayLink, reset: resetEvent, playerName, activeCaseMeta, triggerLabels, triggers, result, caseOutcome, resultRank, momentumTier, momentumScore, rankLine, scoreBreakdown, clamp, easyCognitionLabels, cognitionLabels, formatRiskDelta, counterfactualReport, sessionCode, telemetryStatus, pendingTelemetry, retryPendingTelemetry, scheduleTelemetryRetry, telemetryEnabled, dataConsent, isOnline, isRetryingTelemetry, copySessionCode, copyStatus, nextCaseSignal, resultBridge, achievementBadges, feedbackPrompts, currentFeedback, updateCurrentFeedback, FEEDBACK_COMMENT_MAX_LENGTH, activeFeedbackPrivacySignals, anonymizeFeedbackComment, submitCurrentFeedback, isSubmittingFeedback, feedbackStatus, routeTimeline, resourceMeta, explainResourceTradeoff, log, clueCount, renderSceneLines, renderSceneMinutes, endingPreview, caseChange },
-    { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, startRecoveryRoute, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats, logicReport, beatSeason },
+    { endingSceneProfile: getEndingSceneProfile(endingVariant.id), endingVisualClass: getEndingVisualClass(endingVariant.id), failureObjectives: getFailureObjectives(endingVariant), delayedConsequences, rankingComparison, seasonGoals, balanceSignals, seasonStanding, endingCause, authorityReview, endingAtmosphere, originEndingVariant, aftermath, rankingIntegrity, replayDiagnostics, playReport, endingEpilogue: getEndingEpilogue(endingVariant.id), failureRecovery, achievementProgress, operatorReveal, operationsSnapshot, telemetryDashboard, telemetryStats, logicReport, beatSeason },
   );
   if (isResult) {
     return <LazyScreen quiet><ResultScreen view={resultView} renderers={{ renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel }} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} /></LazyScreen>;

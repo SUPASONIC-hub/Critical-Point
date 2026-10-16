@@ -1,7 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { expect, expectNoStrayRequests, guardNetwork, test } from "./helpers/network.js";
 import { acceptConfirms, dismissConfirms } from "./helpers/dialogs.js";
-import { CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
+import { CASE_SEQUENCE, CASE_START_NODES, nodes, seasonCasesBase } from "../src/gameData.js";
+import { ENDING_GATES } from "../src/gameConstants.js";
+import { SEASON_STANDING_NEAR } from "../src/seasonStanding.js";
 import { nextCaseSignals } from "../src/caseCopy.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } from "../src/appConfig.js";
 import { createCaseSummary } from "../src/gameLogic.js";
@@ -2322,6 +2324,219 @@ test("final ending sequence reveals twists, accepts a handoff note, and unlocks 
     .poll(async () => page.evaluate(() => localStorage.getItem("critical-point-next-participant-message")))
     .toBe("다음 사람은 기록보다 먼저 조건을 확인하세요.");
 });
+
+/**
+ * Where the season stands against SYSTEM COLLAPSE, on every case's report
+ * (`createSeasonStandingReadout`, src/viewModels/reportViewModels.js), and the
+ * cases a collapse offers to play again. The unit tests hold the sentences;
+ * these are a returning player's save, with cases already closed on a known
+ * harm, played to its report.
+ */
+const HARM_GATE = ENDING_GATES.collapseHarmPerCase;
+const STANDING_MARKS = { clear: "○", near: "▲", over: "■" };
+const SEED_RESOURCES = { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 };
+// Windows a seeded case cashed, so one bust on the scene played here is a few percent of the season and not all of it.
+const SEED_CASHES = 8;
+
+/** A closed case's summary as the game writes one, closed on `harm` with no window busted. */
+function closedOnHarm(caseId, harm) {
+  const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { ...SEED_RESOURCES, humanCost: harm }, schemaVersion: 2 });
+  return { ...summary, pushRecord: { ...summary.pushRecord, busts: 0, cashes: SEED_CASHES } };
+}
+
+/** One decimal, cut and not rounded: 19.96 a case is 19.9. */
+const cutToTenth = (total, cases) => Math.floor((total * 10) / cases) / 10;
+const roundToTenth = (total, cases) => Math.round((total * 10) / cases) / 10;
+
+/** A season's harm over `cases` whose mean is inside the band and reads differently cut than rounded. */
+function harmTotalFor({ low, high }, cases) {
+  for (let total = Math.ceil(low * cases) + 1; total < high * cases - 1; total += 1) {
+    if (cutToTenth(total, cases) !== roundToTenth(total, cases)) return total;
+  }
+  throw new Error(`no season total between ${low} and ${high} a case over ${cases} cases tells a cut from a rounding`);
+}
+
+/** What the save a report was drawn from says the line prints: the gate's own sums, read off the summaries. */
+function standingOf(save) {
+  const summaries = Object.values(save?.caseResults ?? {}).filter(Boolean);
+  const sumOf = (read) => summaries.reduce((sum, summary) => sum + (Number(read(summary)) || 0), 0);
+  const cases = Math.max(1, summaries.length);
+  const total = Math.max(sumOf((summary) => summary.finalHumanCost), Number(save?.resources?.humanCost) || 0);
+  const busts = sumOf((summary) => summary.pushRecord?.busts);
+  const windows = busts + sumOf((summary) => summary.pushRecord?.cashes);
+  const mean = total / cases;
+  return {
+    cases,
+    mean,
+    perCase: cutToTenth(total, cases),
+    rounded: roundToTenth(total, cases),
+    bustRate: windows > 0 ? busts / windows : 0,
+    bustPercent: windows > 0 ? Math.floor((busts * 100) / windows) : 0,
+    // The harm route's level. The seeds keep busts far under their own gate, so it is the season's.
+    level: mean >= HARM_GATE ? "over" : mean >= HARM_GATE * SEASON_STANDING_NEAR - 1e-9 ? "near" : "clear",
+  };
+}
+
+/** The save once the case that just closed is in it. */
+async function readClosedSave(page, caseId) {
+  await expect
+    .poll(async () => Boolean((await readJsonStorage(page, TEST_STORAGE_KEYS.save))?.caseResults?.[caseId]), { message: `${caseId} is in the save` })
+    .toBe(true);
+  return readJsonStorage(page, TEST_STORAGE_KEYS.save);
+}
+
+for (const band of [
+  { level: "clear", low: 12, high: HARM_GATE * SEASON_STANDING_NEAR },
+  { level: "near", low: HARM_GATE * SEASON_STANDING_NEAR + 1, high: HARM_GATE },
+  { level: "over", low: HARM_GATE + 1, high: HARM_GATE + 10 },
+]) {
+  test(`the report of a case says where the season stands against collapse: ${band.level}`, async ({ page }) => {
+    test.setTimeout(120_000);
+    // 사건 01's last scene: none of its cards moves the harm, so the case closes on what the seed gave it, none.
+    const closing = "case01";
+    const closedBefore = CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(closing));
+    const cases = closedBefore.length + 1;
+    const total = harmTotalFor(band, cases);
+    const share = Math.floor(total / closedBefore.length);
+    const caseResults = Object.fromEntries(
+      closedBefore.map((caseId, index) => [caseId, closedOnHarm(caseId, share + (index < total % closedBefore.length ? 1 : 0))]),
+    );
+    await seedSave(page, savedRunAt(closing, "c1_aftershock", { caseResults }));
+    await page.goto("/");
+    await resumeSavedRun(page);
+    await completeCurrentCase(page);
+    const decisionNext = page.getByTestId("decision-next");
+    if (await decisionNext.isVisible()) await decisionNext.click();
+    await expect(page.locator(".decision-reveal-backdrop")).toHaveCount(0, { timeout: TRANSITION_TIMEOUT_MS });
+    await expect(page.locator(".result-page")).toBeVisible();
+
+    // The numbers are read off the save the report was drawn from, the case played here included.
+    const standing = standingOf(await readClosedSave(page, closing));
+    expect(standing.cases, "the seeded cases and the one that closed").toBe(cases);
+    expect(standing.level, `the seed still stands ${band.level}: ${standing.mean} a case against ${HARM_GATE}`).toBe(band.level);
+    expect(standing.bustRate, "busts are far from their own gate, so the level is the harm's").toBeLessThan(ENDING_GATES.collapseBustRate * SEASON_STANDING_NEAR);
+
+    const line = page.locator(".outcome-panel").getByTestId("season-standing");
+    await expect(line).toHaveCount(1);
+    await expect(line).toBeVisible();
+    // The level without its colour: a class, a shape and a word.
+    await expect(line).toHaveClass(new RegExp(`(^|\\s)${band.level}(\\s|$)`));
+    await expect(line.locator("b")).toContainText(STANDING_MARKS[band.level]);
+    await expect(line.locator("b")).toContainText("붕괴선");
+
+    const text = (await line.textContent()) ?? "";
+    const numbers = text.match(/\d+(?:\.\d+)?/g) ?? [];
+    expect(numbers, `the mean, cut to one decimal, in "${text}"`).toContain(String(standing.perCase));
+    expect(numbers, `the gate in "${text}"`).toContain(String(HARM_GATE));
+    expect(text, "the share of windows that bust, cut to a whole percent").toMatch(new RegExp(`(?<![\\d.])${standing.bustPercent}%`));
+    if (standing.rounded !== standing.perCase) {
+      expect(numbers, `the mean is cut, not rounded up to ${standing.rounded}`).not.toContain(String(standing.rounded));
+    }
+  });
+}
+
+/** From a seeded save on the finale's last scene to its open record, with 전체 기록 unfolded. */
+async function openSeededFinaleArchive(page, overrides) {
+  // Reduced motion drops the ending's eight-second hold.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seedSave(page, savedRunAt("final", "f_aftershock", overrides));
+  await page.goto("/");
+  await resumeSavedRun(page);
+  await completeCurrentCase(page);
+  const ending = page.locator(".ending-sequence");
+  await expect(ending).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  for (let twist = 0; twist < 3; twist += 1) {
+    await expect(ending).toHaveClass(/ending-step-0/);
+    await ending.locator("button").click();
+  }
+  await expect(page.locator(".ending-step-1")).toBeVisible();
+  await page.getByTestId("ending-next").click();
+  await expect(page.locator(".ending-step-2")).toBeVisible();
+  await page.locator(".ending-step-2 button").click();
+  await expect(page.locator(".ending-step-3")).toBeVisible();
+  await page.locator("details.report-archive > summary").click();
+  await expect(page.locator(".report-archive-body")).toBeVisible();
+}
+
+/** The closed cases a collapse lists, read off the save: most harm first, ties in season order, three at most, none that closed on no harm. */
+function worstHarmCases(save) {
+  const seasonOrder = (caseId) => (CASE_SEQUENCE.includes(caseId) ? CASE_SEQUENCE.indexOf(caseId) : CASE_SEQUENCE.length);
+  return Object.entries(save?.caseResults ?? {})
+    .filter(([, summary]) => Boolean(summary))
+    .map(([caseId, summary]) => ({ caseId, harm: Number(summary.finalHumanCost) || 0 }))
+    .filter((entry) => entry.harm > 0)
+    .sort((a, b) => b.harm - a.harm || seasonOrder(a.caseId) - seasonOrder(b.caseId))
+    .slice(0, 3)
+    .map((entry) => ({ ...entry, label: seasonCasesBase.find((caseItem) => caseItem.id === entry.caseId)?.label }))
+    .filter((entry) => entry.label);
+}
+
+// Five closed cases, written out of order: two tie on the most harm, and 사건 04 and 사건 02 are left off the list.
+const HARM_SEED = { case07: 60, case05: 90, case02: 40, case03: 90, case04: 10 };
+const harmSeededCases = () => Object.fromEntries(Object.entries(HARM_SEED).map(([caseId, harm]) => [caseId, closedOnHarm(caseId, harm)]));
+
+for (const season of [
+  // The finale closes on next to no harm: the three are other cases, and opening one of them throws nothing away.
+  { title: "three earlier cases, opened without a question", overrides: {}, listed: ["case03", "case05", "case07"], replay: "case03", asks: false },
+  // The finale closes on the most harm of all: it is on the list, and opening the case that just closed asks first.
+  { title: "the finale among them, opened after a question", overrides: { resources: { ...SEED_RESOURCES, humanCost: 96 } }, replay: "final", asks: true },
+]) {
+  test(`a collapse offers its most harmful cases to play again: ${season.title}`, async ({ page }) => {
+    test.setTimeout(120_000);
+    const asked = await acceptConfirms(page);
+    await openSeededFinaleArchive(page, { caseResults: harmSeededCases(), ...season.overrides });
+    await expect(page.locator(".ending-variant-panel.failure"), "the season collapsed").toHaveCount(1);
+    await expect(page.locator(".outcome-panel").getByTestId("season-standing")).toHaveClass(/(^|\s)over(\s|$)/);
+
+    const save = await readClosedSave(page, "final");
+    const worst = worstHarmCases(save);
+    expect(worst.length, "three cases are listed").toBe(3);
+    if (season.listed) expect(worst.map((entry) => entry.caseId), "the seeded worst three, the tie in season order").toEqual(season.listed);
+    expect(worst.map((entry) => entry.caseId), `${season.replay} is on the list`).toContain(season.replay);
+
+    const panel = page.locator(".failure-objectives");
+    await expect(panel).toBeVisible();
+    // 복구 루트 시작 reopened the finale whatever had gone wrong; it is gone from the page.
+    await expect(page.getByRole("button", { name: "복구 루트 시작" })).toHaveCount(0);
+    await expect(panel).not.toContainText("복구 루트");
+    // Every button of the panel is one of the listed cases, in the list's order, by its name and the harm it closed on.
+    const buttons = panel.locator("button");
+    await expect(buttons).toHaveCount(worst.length);
+    for (const [index, entry] of worst.entries()) {
+      await expect(buttons.nth(index)).toContainText(entry.label);
+      await expect(buttons.nth(index)).toHaveText(new RegExp(`(?<!\\d)${entry.harm}(?!\\d)`));
+    }
+
+    expect(asked, "nothing has been asked before the press").toEqual([]);
+    await buttons.nth(worst.findIndex((entry) => entry.caseId === season.replay)).click();
+    // Only the case that just closed has a record to throw away (`openCase`, src/GameRuntime.jsx).
+    // The in-game question reports what it asked through an exposed function, a turn after the click.
+    await expect.poll(() => asked.length, season.asks ? "reopening the case that just closed asks first" : "another case opens without a question").toBe(season.asks ? 1 : 0);
+    if (season.asks) expect(asked[0]).toContain("다시 시작");
+
+    // The case's first scene: its summary is still the season's until the new play closes.
+    await expect
+      .poll(
+        async () => {
+          const now = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+          return `${now?.currentCase}/${now?.nodeId}`;
+        },
+        { message: `${season.replay} opened on its first scene`, timeout: TRANSITION_TIMEOUT_MS },
+      )
+      .toBe(`${season.replay}/${CASE_START_NODES[season.replay]}`);
+    await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    // A relic draft, when the closed case left one, stands in front of the briefing page.
+    const briefing = page.getByTestId("scene-briefing");
+    const draftSkip = page.getByTestId("relic-skip");
+    await expect(briefing.or(draftSkip).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    if (await draftSkip.isVisible()) await clickThroughMotion(draftSkip, "skip the relic draft");
+    // Read at once: the page's reading clock opens the table by itself after 12 to 95 seconds.
+    await expect(briefing).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(page.getByTestId("open-table")).toBeVisible();
+    const reopened = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+    expect(reopened.caseResults[season.replay]?.finalHumanCost, "the case keeps its summary until it is closed again").toBe(worst.find((entry) => entry.caseId === season.replay).harm);
+  });
+}
 
 test("leaving the table for the intro puts focus on the intro's heading", async ({ page }) => {
   await page.goto("/?debug=1");

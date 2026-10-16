@@ -2,6 +2,50 @@
  * Derived report state: the ending framing, the score rows, the badges and the
  * storage banner. All of it is a pure read of a finished run.
  */
+import { easyResourceLabels } from "../playerLanguage.js";
+import { getSeasonStanding } from "../seasonStanding.js";
+
+// A shape and a word for each level, so the level is read without its colour.
+const STANDING_MARKS = { clear: ["○", "붕괴선 아래"], near: ["▲", "붕괴선 가까움"], over: ["■", "붕괴선 넘음"] };
+
+/**
+ * The line every case's report prints about SYSTEM COLLAPSE, and on a collapse
+ * the cases worth playing again. All of it is `getSeasonStanding`, so the line
+ * cannot say what the ending does not.
+ *
+ * `route` is the gate the level was read from, and the line prints that gate:
+ * harm against 20, or -- when busts are what brought the season near -- harm
+ * against 10 beside the bust share against a fifth. Both numbers are cut, not
+ * rounded: 19.96 a case prints 19.9, never the 20 the season has not reached.
+ *
+ * `harmCases` keeps only cases the season can open (`cases`, the roadmap's
+ * list): a summary under an id the season no longer has cannot be replayed.
+ *
+ * @param {object} [input]
+ * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
+ * @param {Record<string, any>} [input.resources] The resources on the table now.
+ * @param {Array<{ id: string, label: string }>} [input.cases] The cases the season can open.
+ */
+export function createSeasonStandingReadout({ caseResults, resources, cases = [] } = {}) {
+  const { level, harm, overreach, casesCounted, harmCases } = getSeasonStanding({ caseResults, resources });
+  const route = level === harm.level ? "harm" : "overreach";
+  const perCase = Math.floor((harm.total * 10) / casesCounted) / 10;
+  const bustPercent = overreach.windows > 0 ? Math.floor((overreach.busts * 100) / overreach.windows) : 0;
+  const harmLabel = easyResourceLabels.humanCost;
+  const labels = new Map(cases.map((caseItem) => [caseItem.id, caseItem.label]));
+  return {
+    level,
+    route,
+    mark: STANDING_MARKS[level][0],
+    label: STANDING_MARKS[level][1],
+    text: route === "harm"
+      ? `시즌 평균 ${harmLabel} ${perCase} / ${harm.gate} · 터진 판 ${bustPercent}%`
+      : `시즌 평균 ${harmLabel} ${perCase} / ${overreach.harmGate} · 터진 판 ${bustPercent}% / ${Math.round(overreach.bustGate * 100)}%`,
+    harmCases: harmCases
+      .filter((entry) => labels.has(entry.caseId))
+      .map((entry) => ({ ...entry, text: `${labels.get(entry.caseId)} 다시 도전 · ${harmLabel} ${entry.harm}` })),
+  };
+}
 
 export function createEndingProfile({ finalEndingEntry }) {
   // The id comes out of a saved log. Without a prototype the lookup finds only

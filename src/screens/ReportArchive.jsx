@@ -128,7 +128,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
       <section className="failure-objectives" aria-label="실패 재도전 목표">
         <strong lang="en">RETRY OBJECTIVES</strong>
         {view.failureObjectives.map((objective) => <span key={objective}>□ {objective}</span>)}
-        <button type="button" onClick={view.startRecoveryRoute}>복구 루트 시작</button>
+        {view.seasonStanding.harmCases.map((item) => <button type="button" key={item.caseId} onClick={() => view.startCase(item.caseId)}>{item.text}</button>)}
         {/* A run with objectives is a collapse, and a collapse has a cause (getFailureCause, runtimeSystems.js). */}
         <p className="failure-cause"><b lang="en">PRIMARY CAUSE</b> {view.endingCause.text} {view.endingCause.recovery}</p>
       </section>
