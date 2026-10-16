@@ -9,16 +9,10 @@ import {
   FOCUS_MAX,
   FOCUS_MODES,
   GAUGE_MAX,
-  getCardChips,
   REFRAME_CARD_ID,
-  getFocusBonus,
-  getForcedCard,
   getHandBonus,
-  getHeartbeatBpm,
-  getMultiplier,
-  getRemainingSeconds,
-  getSealedCardId,
   lockpickOpensSeal,
+  readRoomCards,
   scoreFocus,
   splitOpenSeed,
   getStanceMasteryProfile,
@@ -26,6 +20,7 @@ import {
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { listOfferedTypes } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
@@ -141,7 +136,7 @@ export function GauntletStage({
   const touchedRef = useRef(undefined);
   const closedRef = useRef(false);
 
-  const sealedId = useMemo(() => getSealedCardId(cards, schema), [cards, schema]);
+  const { sealedId, forcedCard } = useMemo(() => readRoomCards(cards, schema), [cards, schema]);
   const sealBroken = win.gauge >= schema.sealBreak;
   const getGate = (card) => getAuthorityGate(card, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened });
   const isCardOpen = (card) => getGate(card).unlocked;
@@ -151,24 +146,19 @@ export function GauntletStage({
   // with it selected.
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
-  const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
-  const multiplier = getMultiplier(win.gauge);
-  const focusBonus = getFocusBonus(win.focus, win.focusMode);
+  const {
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh,
+  } = readTableMeters({ win, schema, selectedCard });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   const settleImpact = useMemo(
     () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
     [claimed, live, win.status],
   );
-  const remaining = getRemainingSeconds(win);
-  const tellWall = win.wall + (win.tellOffset ?? 0);
-  const bpm = getHeartbeatBpm(win.gauge, tellWall, schema.sedated, win.elapsed / schema.seconds);
   const sealedLock = selectedCard && selectedCard.id === sealedId && !sealBroken;
   const canCash = live && !paused && Boolean(selectedCard) && !sealedLock;
   const canFocus = canCash && win.focus < FOCUS_MAX;
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
-  const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
-  const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
@@ -189,8 +179,8 @@ export function GauntletStage({
   const handBonus = getHandBonus(logic ? win.groove : 0, win.focus, win.focusMode, logic?.after);
   const lockPot = handBonus / earnedBonus;
   const livePot = Math.round(selectedChips * multiplier * handBonus);
-  const nextPotLow = Math.round(selectedChips * getMultiplier(nextLow) * handBonus);
-  const nextPotHigh = Math.round(selectedChips * getMultiplier(nextHigh) * handBonus);
+  const nextPotLow = Math.round(selectedChips * nextMultiplierLow * handBonus);
+  const nextPotHigh = Math.round(selectedChips * nextMultiplierHigh * handBonus);
   // What this case has turned on (`tableUnlocks`). A control whose rule is not
   // on yet is not drawn and its key is not the table's: no streak line, no
   // LOCK, no stances. What the run already holds is drawn whatever the step:
@@ -300,7 +290,7 @@ export function GauntletStage({
     // played it, and a refused window never settles. So a locked card is never
     // handed over as the player's: the room plays its own.
     const staked = selectedCard ?? (savedStake && isCardOpen(savedStake) ? savedStake : null);
-    const card = staked ?? getForcedCard(cards, schema);
+    const card = staked ?? forcedCard;
     const timer = globalThis.setTimeout(() => {
       if (resolvedRef.current) return;
       resolvedRef.current = true;
