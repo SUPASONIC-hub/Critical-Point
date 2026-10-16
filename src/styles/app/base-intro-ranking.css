@@ -155,6 +155,7 @@ summary:focus-visible {
 }
 .music-toggle,
 .music-volume-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -179,6 +180,17 @@ summary:focus-visible {
 .music-volume-toggle:hover {
   color: var(--ui-text);
   border-color: rgb(255 255 255 / 0.3);
+}
+/* A phone draws the pills 38x36 (34 tall on its side); the finger presses
+   over 44x44 centred on each, whatever size it is drawn. A pill wider than
+   that is pressed over itself. Side by side the two reach into the 6px gap
+   between them and meet there; off the table the volume pill is 36 wide, so
+   the two areas overlap by 1px. */
+.music-toggle::before,
+.music-volume-toggle::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 22px);
 }
 .music-volume-toggle {
   min-width: 74px;

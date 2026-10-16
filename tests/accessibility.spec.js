@@ -184,7 +184,8 @@ test("a cash's reveal has the same name, and its headline is the multiplier", as
 
 /**
  * The box a finger can press each visible control under `root` in, for every
- * one under `min` px either way. Runs in the page.
+ * one under `min` px either way -- or under its own minimum, for a control one
+ * of `exceptions` names by selector. Runs in the page.
  *
  * Several controls are pressed over more than they draw: a positioned ::before
  * or ::after reaches into the gap around them (the briefing's cards, the
@@ -194,7 +195,7 @@ test("a cash's reveal has the same name, and its headline is the multiplier", as
  * cards breathe and the table shakes, and a transform moves no hit area the
  * player can count on. offsetWidth rounds to the pixel, which is the tolerance.
  */
-function narrowTargets(root, min) {
+function narrowTargets(root, { min, exceptions }) {
   const px = (value) => (value === "" || value === "auto" ? null : Number.parseFloat(value));
   const span = (start, end, size, inner) => {
     if (start !== null && end !== null) return [start, inner - end];
@@ -227,16 +228,40 @@ function narrowTargets(root, min) {
     .map((element) => {
       const box = pressBox(element);
       const name = element.getAttribute("aria-label") || element.textContent.trim().replace(/\s+/g, " ").slice(0, 24) || element.className;
-      return { name, width: Math.round(box.right - box.left), height: Math.round(box.bottom - box.top) };
+      const floor = exceptions.find((exception) => element.matches(exception.selector)) ?? { width: min, height: min };
+      return { name, width: Math.round(box.right - box.left), height: Math.round(box.bottom - box.top), floor };
     })
-    .filter((target) => target.width < min || target.height < min)
+    .filter((target) => target.width < target.floor.width || target.height < target.floor.height)
     .map((target) => `${target.name}: ${target.width}x${target.height}`);
 }
+
+/**
+ * The controls held to less than 44x44, each by name and with the reason.
+ * WCAG 2.5.8's spacing exception is the rule they are held to instead: a
+ * target under 24px either way fails, and one that is 24 or more passes when
+ * the areas of its neighbours do not overlap it. Every one here is still
+ * pressed over 44px the other way.
+ */
+const TOUCH_TARGET_EXCEPTIONS = [
+  {
+    // 저장, 저장 후 나가기 and 초기화 on a phone. They are drawn 30x28 so the
+    // header keeps its one row beside the title and the case count, and each
+    // is pressed over 44px tall and as wide as the gap to its neighbour lets
+    // it be without overlapping (play.css): 33px for the two saves, 37.5 for
+    // 초기화, which stands 9px apart because it throws the run away and asks
+    // first. Three 44px areas would cost the title 30px of a 360px row.
+    selector: ".gauntlet-shell .top-actions.compact-actions button",
+    width: 24,
+    height: 44,
+  },
+];
 
 /** Polled, so a surface still settling is read again rather than failed on one frame. */
 async function expectTouchTargets(root, where) {
   await expect
-    .poll(() => root.evaluate(narrowTargets, 44), { message: `${where}: controls a finger presses over less than 44x44px` })
+    .poll(() => root.evaluate(narrowTargets, { min: 44, exceptions: TOUCH_TARGET_EXCEPTIONS }), {
+      message: `${where}: controls a finger presses over less than 44x44px (or their named exception's minimum)`,
+    })
     .toEqual([]);
 }
 
@@ -279,6 +304,41 @@ for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
     await expect(reveal.getByTestId("decision-next")).toBeVisible();
     await waitForEntrance(reveal);
     await expectTouchTargets(reveal, `the reveal @ ${where}`);
+  });
+}
+
+/**
+ * The two surfaces a case ends on, at the same two sizes: the report, with
+ * its archive folded as it opens, and the tool draft dealt in front of the
+ * next case. Read from the sheets before this test, the report's tool dock
+ * and its second 이 사건 다시 도전 were drawn 38px tall on a phone and the
+ * music pill 38x36; each is pressed over 44 now (result.css,
+ * base-intro-ranking.css). The draft's cards, its skip and its folded feats
+ * were already held (layout-css.test.mjs).
+ */
+for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
+  test(`the case report and the tool draft are pressed over 44x44px at ${size.width}x${size.height}`, async ({ page }) => {
+    const where = `${size.width}x${size.height}`;
+    await page.setViewportSize(size);
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "case01", "c1_aftershock");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await completeCurrentCase(page);
+    const decisionNext = page.getByTestId("decision-next");
+    if (await decisionNext.isVisible()) await decisionNext.click();
+
+    const report = page.locator(".result-page");
+    await expect(report).toBeVisible();
+    await expect(page.locator(".next-case-panel button")).toBeVisible();
+    await waitForEntrance(report);
+    await expectTouchTargets(page.locator("body"), `the report @ ${where}`);
+
+    await page.locator(".next-case-panel button").click();
+    const draft = page.getByTestId("relic-draft");
+    await expect(draft).toBeVisible();
+    await expect(page.getByTestId("relic-option").first()).toBeVisible();
+    await waitForEntrance(draft);
+    await expectTouchTargets(draft, `the tool draft @ ${where}`);
   });
 }
 

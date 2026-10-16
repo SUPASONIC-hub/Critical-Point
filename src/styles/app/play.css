@@ -1081,6 +1081,7 @@
 }
 
 .gx-brief summary {
+  position: relative;
   color: var(--ui-text-2);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1089,6 +1090,18 @@
 
 .gx-brief summary:hover {
   color: var(--ui-text);
+}
+
+/* Folded, the summary is one 12px line, about 18px tall. It is pressed over
+   44px from its top down -- not up, where .gx-scene's overflow would cut the
+   area off at the scene's edge -- across the speaker's line beside it, which
+   takes no press of its own. Open, the area would lie over the briefing's
+   text, so it is the folded summary's alone. */
+.gx-brief:not([open]) summary::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 44px;
 }
 
 .gx-brief p {

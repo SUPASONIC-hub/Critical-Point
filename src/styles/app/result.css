@@ -142,6 +142,7 @@
   backdrop-filter: blur(12px);
 }
 .result-page .top-actions .ghost {
+  position: relative;
   flex: 0 0 auto;
   width: auto;
   min-height: 40px;
@@ -690,6 +691,7 @@
   font-size: 0.75rem;
 }
 .result-why-doors .ghost {
+  position: relative;
   justify-self: start;
   margin-top: 4px;
   color: var(--ui-text);
@@ -700,6 +702,16 @@
 }
 .result-why-doors .ghost:hover {
   background: var(--ui-surface-4);
+}
+/* The dock's tools are drawn 40px tall (38 on a phone) and the second
+   이 사건 다시 도전 38; each is pressed over 44, centred. On a phone the dock
+   scrolls sideways, and a scroller clips what reaches past its padding: the
+   dock's 6px holds the 3px. */
+.result-page .top-actions .ghost::before,
+.result-why-doors .ghost::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 22px) 0;
 }
 
 /* Act three: the archive --------------------------------------------------- */

@@ -121,6 +121,22 @@ test("the briefing cards, the draft's skip and its folded feats are pressed over
   assert.match(sheet("relics"), /\.gauntlet-stage \.gx-draft-skip \{\s*position: relative;\s*margin-left: auto;\s*min-height: 38px;/);
 });
 
+test("the music pills, the folded case file and the report's tools are pressed over 44px and drawn no larger", () => {
+  const intro = sheet("base-intro-ranking");
+  assert.match(intro, /\.music-toggle,\s*\.music-volume-toggle \{\s*position: relative;/);
+  assert.match(intro, /\.music-toggle::before,\s*\.music-volume-toggle::before \{\s*content: "";\s*position: absolute;\s*inset: calc\(50% - 22px\);\s*\}/);
+  const play = sheet("play");
+  assert.match(play, /\.gx-brief summary \{\s*position: relative;/);
+  // Down from its top, and folded only: .gx-scene clips above, and open it would cover the text.
+  assert.match(play, /\.gx-brief:not\(\[open\]\) summary::before \{\s*content: "";\s*position: absolute;\s*inset: 0 0 auto;\s*height: 44px;\s*\}/);
+  const result = sheet("result");
+  assert.match(result, /\.result-page \.top-actions \.ghost \{\s*position: relative;/);
+  assert.match(result, /\.result-why-doors \.ghost \{\s*position: relative;/);
+  assert.match(result, /\.result-page \.top-actions \.ghost::before,\s*\.result-why-doors \.ghost::before \{\s*content: "";\s*position: absolute;\s*inset: calc\(50% - 22px\) 0;\s*\}/);
+  // The phone's dock scrolls sideways and clips at its padding box: 3px of reach needs 6px of padding.
+  assert.match(result, /\.result-page \.top-actions \{[^}]*padding: 6px;/);
+});
+
 test("the clock, the key hints and the card preview are sized in the type's own unit", () => {
   const play = sheet("play");
   const boxes = [...play.matchAll(/\.gx-clock \{[^}]*\}|\.gx-card-key \{[^}]*\}|\.gx-hand-head kbd \{[^}]*\}|\.gx-card-preview \{[^}]*\}/g)].map((match) => match[0]);
