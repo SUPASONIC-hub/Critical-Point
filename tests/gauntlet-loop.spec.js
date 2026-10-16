@@ -158,7 +158,7 @@ test("three cards of one type in a row grow the logic streak and the pot shows w
 
   // LOCK is a plain press: it charges, and the table's clock pays for it.
   const lock = page.getByTestId("commit-focus");
-  await expect(lock.locator("small")).toHaveText("STRIKE 0 · −1.5초");
+  await expect(lock.locator("small")).toHaveText("0 · −1.5초");
   const before = await clockOf(page);
   await lock.click();
   await lock.click();

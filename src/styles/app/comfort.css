@@ -6,11 +6,13 @@
    one also turns the heat down, which no OS setting asks for. Last in the
    cascade so a tie on specificity goes to the player. */
 
-/* The settings panel, a card on the intro drawer's surface like its siblings. */
+/* The settings panel, a card on the intro drawer's surface like its siblings.
+   The drawer already insets every child 20px (`.intro .intro-drawer >
+   :not(summary)` in base-intro-ranking.css); a padding of 20px here on top of
+   it left a toggle's text 184px on a 360px phone. */
 .intro .intro-drawer > .accessibility-panel {
   display: grid;
   gap: 10px;
-  padding: 0 20px 20px;
   color: var(--ui-text);
 }
 .accessibility-time {

@@ -99,7 +99,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await expect(focus).toContainText("STRIKE 0");
   // The button says what a press costs, to the eye and to a screen reader.
   const lock = page.getByTestId("commit-focus");
-  await expect(lock.locator("small")).toHaveText("STRIKE 0 · −1.5초");
+  await expect(lock.locator("small")).toHaveText("0 · −1.5초");
   await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 판돈 배율은 상한까지만 오른다/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
@@ -109,7 +109,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await expect(focus).toContainText("STRIKE 17");
   await page.keyboard.press("e");
   await expect(focus).toContainText("STRIKE 37");
-  await expect(lock.locator("small")).toHaveText("STRIKE 37 · −1.5초");
+  await expect(lock.locator("small")).toHaveText("37 · −1.5초");
   expect(await clockOf(page), "two presses cost three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
   await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");

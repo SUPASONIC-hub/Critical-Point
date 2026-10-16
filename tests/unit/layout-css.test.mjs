@@ -220,3 +220,56 @@ test("an intro drawer opened by its link stops below the music pills", () => {
   assert.equal(margin[1], top, "the same offset the pills are pinned at, notch included");
   assert.ok(Number(margin[2]) > height, "and more than their height below it");
 });
+
+// Four leftovers of the 2026-10-12 screen check. Each number below was computed
+// from the sheets and the font's own advances, not read off a screen.
+const source = (path) => readFileSync(new globalThis.URL(`../../src/${path}`, import.meta.url), "utf8");
+
+test("the LOCK button's sub-line is the charge and the price, without the stance", () => {
+  // At 390px the button has 82px inside its padding (74px at 360px). With the
+  // stance in front the line was 94 to 112px and `nowrap`; without it, 57 to 70px.
+  const stage = source("gauntlet/GauntletStage.jsx");
+  const lock = stage.match(/data-testid="commit-focus"[\s\S]*?<\/button>/)?.[0] ?? "";
+  assert.match(lock, /<small>\{Math\.round\(win\.focus\)\} · −\{LOCK_PRESS_SECONDS\}초<\/small>/);
+  assert.match(stage, /data-testid="gauntlet-focus">[\s\S]*?<b[^>]*>\{focusBonus\.label\} \{Math\.round\(win\.focus\)\}<\/b>/, "the HUD's signal is where the stance is named");
+  // What the arithmetic stands on: three columns, a 6px gap and 10px sides on a phone.
+  const phone = sheet("play").match(/\n {2}\.gx-actions \{\s*grid-template-columns: 1fr 0\.78fr 1\.12fr;\s*gap: 6px;\s*padding-inline: 10px;\s*\}/);
+  assert.ok(phone, "the phone's dock is still the one the sub-line was measured in");
+  assert.match(sheet("play"), /\.gx-actions button small \{[^}]*white-space: nowrap;/);
+});
+
+test("the comfort panel is inset once by the drawer, not twice", () => {
+  const panel = sheet("comfort").match(/\.intro \.intro-drawer > \.accessibility-panel \{[^}]*\}/)?.[0] ?? "";
+  assert.match(panel, /display: grid;/);
+  assert.doesNotMatch(panel, /padding/, "the drawer's own 20px is the inset; 20px more left a toggle's text 184px at 360px");
+  assert.match(sheet("base-intro-ranking"), /\.intro \.intro-drawer > :not\(summary\) \{\s*width: auto;\s*margin: 2px 20px 20px;\s*\}/);
+});
+
+test("the result page's brand pill keeps clear of two music icons, not of two labelled pills", () => {
+  const pill = sheet("result").match(/@media \(max-width: 480px\) \{[\s\S]*?\n {2}\.result-page \.brand-mark \{[^}]*\}/)?.[0] ?? "";
+  const reserved = Number(pill.match(/max-width: calc\(100% - (\d+)px\);/)?.[1]);
+  // The icons end 92px from the screen's edge (10 + 38 + 6 + 38) and the page
+  // is padded 16px, so 76px of the row is under them.
+  assert.ok(reserved >= 76, "the pill ends before the music icons begin");
+  // The title is 165px of text in a pill with 30px of padding and border, on a
+  // row of 328px at 360px.
+  assert.ok(328 - reserved >= 195, "and TRIGGERLAB: CRITICAL POINT is printed whole at 360px");
+  const phone = sheet("responsive").match(/@media \(max-width: 480px\) \{\s*\.music-controls \{[\s\S]*?\.music-controls span \{\s*display: none;\s*\}/)?.[0] ?? "";
+  assert.match(phone, /right: max\(10px, env\(safe-area-inset-right\)\);/);
+  assert.match(phone, /padding: 0 9px;/, "the icons are still the size this was measured against");
+});
+
+test("a three-line place caption ends inside the briefing's cropped band", () => {
+  const briefing = sheet("briefing");
+  const phone = briefing.slice(briefing.indexOf("@media (max-width: 700px)"));
+  const top = Number(phone.match(/\n {2}\.gx-caption-place \{\s*top: (\d+)px;\s*\}/)?.[1]);
+  assert.ok(Number.isFinite(top), "the phone places the caption itself");
+  assert.match(phone, /\.gx-panel-splash \{\s*flex-shrink: 1;\s*min-height: 5\.5rem;\s*\}/);
+  // Two lines of the room at 13px and one of the clock at 12px, both 1.55 tall,
+  // in 6px of padding and a 2px border: 74.9px. The band is 88px with a 3px border.
+  const caption = 2 * 13 * 1.55 + 12 * 1.55 + 2 * 6 + 2 * 2;
+  assert.ok(top + caption <= 88 - 2 * 3, `the caption ends at ${top + caption}px of 82`);
+  assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid[^}]*font-size: 0\.875rem;[^}]*line-height: 1\.55;/);
+  assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;/);
+  assert.match(briefing, /\.gx-panel \{[^}]*border: 3px solid/);
+});

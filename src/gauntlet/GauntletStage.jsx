@@ -12,7 +12,6 @@ import {
   getCardChips,
   REFRAME_CARD_ID,
   getFocusBonus,
-  getFocusModeProfile,
   getForcedCard,
   getHandBonus,
   getHeartbeatBpm,
@@ -155,7 +154,6 @@ export function GauntletStage({
   const selectedChips = selectedCard ? getCardChips(selectedCard, schema) : 0;
   const multiplier = getMultiplier(win.gauge);
   const focusBonus = getFocusBonus(win.focus, win.focusMode);
-  const focusModeProfile = getFocusModeProfile(win.focusMode);
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   const settleImpact = useMemo(
@@ -707,8 +705,11 @@ export function GauntletStage({
         >
           <Crosshair size={18} aria-hidden="true" />
           <span lang="en">LOCK</span>
-          {/* What a press costs is on the button: the clock is the only price. */}
-          <small><span lang="en">{focusModeProfile.label} {Math.round(win.focus)}</span> · −{LOCK_PRESS_SECONDS}초</small>
+          {/* What a press costs is on the button: the clock is the only price.
+              The stance is not named here: the HUD's signal beside the streak
+              prints it with the same charge, and with it the line was 94 to
+              112px in a button with 82px of room at 390px (74px at 360px). */}
+          <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
             지금 차지 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. 판돈 배율은 상한까지만 오른다
           </span>
