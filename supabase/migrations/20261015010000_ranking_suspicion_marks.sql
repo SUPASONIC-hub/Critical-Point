@@ -1,9 +1,8 @@
--- DRAFT (2026-10-14, branch ranking-marks). Not a migration until it is renamed
--- to `<14 digits>_ranking_suspicion_marks.sql` with a timestamp after every
--- migration on main at the time (and after 20261014000000 if
--- telemetry-validator-parts lands first). As `.sql.draft` it is read by
--- nothing: check-grants and check-migration-drift keep only names ending in
--- `.sql`, and the Supabase CLI applies only `<digits>_<name>.sql`.
+-- DRAFT (2026-10-14, branch ranking-marks), not to merge yet. Named as a
+-- migration (20261015010000) so `npm run check:grants` replays it with the
+-- rest; the Supabase CLI would apply it on merge as well, so before it merges
+-- it takes a timestamp after every migration on main at the time (and after
+-- 20261014000000 if telemetry-validator-parts lands first).
 --
 -- Server checks, phase 1: mark, don't refuse.
 --
