@@ -110,6 +110,7 @@ export function handleTableKey(event, current, walked = false) {
   if (event.defaultPrevented) return;
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   if (isTextField(event.target)) return;
+  // The reveal, and the comfort settings, whose backdrop has the same class.
   if (document.querySelector(".decision-reveal-backdrop")) return;
   const key = event.key;
   // Single-character keys off (the comfort setting, WCAG 2.1.4): a letter,

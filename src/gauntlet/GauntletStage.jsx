@@ -49,6 +49,7 @@ import { SceneBriefing } from "./SceneBriefing.jsx";
 import { StanceRow } from "./StanceRow.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { useConfirmOpen } from "../state/confirmAction.js";
+import { ComfortDialog, useComfortDialogOpen } from "../components/ComfortDialog.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
@@ -132,7 +133,10 @@ export function GauntletStage({
   const tableOpen = openedSeed === seed;
   // A question (초기화 in the middle of play) holds the clock as the draft does.
   const asking = useConfirmOpen();
-  const paused = hidden || draftOpen || !tableOpen || asking;
+  // The comfort settings, opened from the play header, hold the clock as the
+  // draft does: the table is covered, and nothing on it can be pressed.
+  const comfortOpen = useComfortDialogOpen();
+  const paused = hidden || draftOpen || !tableOpen || asking || comfortOpen;
   const [win, dispatch] = useGauntletWindow({ schema, seed, paused, abandoned, closedAs: hold.closedAs, resume, caseId: scene.node.caseId, run });
   const briefingOpen = !tableOpen && !hidden && !draftOpen && win.status === "live";
   const resolvedRef = useRef(false);
@@ -755,6 +759,9 @@ export function GauntletStage({
         onClaim={claimHeldWindow}
         onLeave={() => setLostToTab(true)}
       />
+      {/* A closed window is on its way to the reveal, which is a dialog of its
+          own: the settings close when the window does (ComfortDialog.jsx). */}
+      <ComfortDialog live={live} />
     </section>
   );
 }

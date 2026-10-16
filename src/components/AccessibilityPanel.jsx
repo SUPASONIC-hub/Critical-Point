@@ -31,8 +31,9 @@ const TOGGLES = [
 ];
 
 /**
- * The comfort settings, in the intro's setup console (never a panel in front
- * of the table). Each one is stored the moment it changes and read where it
+ * The comfort settings: in the intro's setup console, and in the dialog the
+ * play header opens (ComfortDialog.jsx), which holds the table's clock while
+ * it is up. Each one is stored the moment it changes and read where it
  * applies: src/state/accessibilitySettings.js says what each one does.
  */
 export function AccessibilityPanel() {

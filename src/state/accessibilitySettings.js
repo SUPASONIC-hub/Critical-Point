@@ -2,10 +2,11 @@ import { useSyncExternalStore } from "react";
 import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 
 /**
- * What the player asked the game to turn down, set once on the intro and read
- * wherever it applies. A leaf module: the shell loads it before the first
- * paint (the intro's motion is one of the settings), so it imports nothing
- * that would pull the scene graph into the entry chunk.
+ * What the player asked the game to turn down, set on the intro or from the
+ * play header (components/ComfortDialog.jsx) and read wherever it applies. A
+ * leaf module: the shell loads it before the first paint (the intro's motion
+ * is one of the settings), so it imports nothing that would pull the scene
+ * graph into the entry chunk.
  *
  *   tableTime        the table's clock runs this many times slower (1, 1.5, 2).
  *                    A run that used it carries `assistTime` into its case

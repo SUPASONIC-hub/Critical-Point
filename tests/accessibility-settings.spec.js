@@ -240,6 +240,49 @@ test("at 2배 the table's clock runs at half speed", async ({ page }) => {
 });
 
 /**
+ * The panel opened from the intro alone: a player who found the clock too
+ * fast in the middle of a case had to save, leave the table, change it and
+ * come back. The play header opens it in a dialog (ComfortDialog.jsx). The
+ * table's clock is held for as long as the dialog is up, a key pressed in it
+ * is not the table's, and 테이블 시간 is read on every tick, so the window
+ * already on the table runs at the new speed.
+ */
+test("the play header opens the comfort settings over a held clock, and 2배 reaches the table already open", async ({ page }) => {
+  await page.clock.install();
+  await startDebugNode(page, "case01", "start");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const stage = page.getByTestId("gauntlet-stage");
+  const clock = page.locator(".gx-clock b");
+  await expect(stage).toHaveAttribute("data-status", "live");
+
+  const opener = page.getByRole("button", { name: "편의 설정", exact: true });
+  await opener.click();
+  const dialog = page.getByRole("dialog", { name: "편의 설정" });
+  await expect(dialog).toBeVisible();
+  await expect(page.getByTestId("comfort-dialog-close")).toBeFocused();
+
+  // A minute of the page's time, and a card key: the table has neither.
+  const held = await clock.textContent();
+  await page.clock.runFor(60_000);
+  await page.keyboard.press("1");
+  await expect(clock).toHaveText(held ?? "");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(page.locator(".gx-card.selected")).toHaveCount(0);
+
+  await dialog.getByRole("radio", { name: "2배", exact: true }).check();
+  expect((await storedSettings(page)).tableTime).toBe(2);
+
+  // Escape closes it and hands focus back to the button that opened it.
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+
+  const assisted = await clockLossOverTenSeconds(page);
+  expect(assisted, "ten seconds cost about five on the window that was already open").toBeGreaterThanOrEqual(4);
+  expect(assisted).toBeLessThanOrEqual(6);
+});
+
+/**
  * The heartbeat for a player who cannot hear it. The pulse and the red edge
  * are what the comfort setting turns down (and, until the beat went, the ring
  * a press was timed against), so with the sound off and
@@ -544,7 +587,8 @@ test("story mode turned on in the middle of a case starts with the next case", a
   const dealt = await band.textContent();
   expect(dealt).not.toBe(FAR_WALL);
 
-  // The only place the switch is: the intro, by way of 저장 후 나가기.
+  // The intro's copy of the switch, by way of 저장 후 나가기 (the play header
+  // opens the same panel; the rule it sets is the same from either).
   await page.getByRole("button", { name: "저장 후 나가기" }).click();
   await expect(page.locator(".intro")).toBeVisible();
   const { toggle } = await openStoryControls(page);
