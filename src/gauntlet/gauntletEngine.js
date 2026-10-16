@@ -1628,6 +1628,16 @@ export function getForcedCard(choices = [], schema = BASE_SCHEMA) {
 }
 
 /**
+ * The two cards the room picks out of a hand on its own: the one a sealed hand
+ * locks (`getSealedCardId`) and the one it plays when the window closes with
+ * nothing staked (`getForcedCard`). Both read only the hand and the board, so
+ * the table reads them once per deal instead of asking the engine twice.
+ */
+export function readRoomCards(choices = [], schema = BASE_SCHEMA) {
+  return { sealedId: getSealedCardId(choices, schema), forcedCard: getForcedCard(choices, schema) };
+}
+
+/**
  * The run's push record, rebuilt from the decision log so a resumed save and a
  * live run agree on it.
  */

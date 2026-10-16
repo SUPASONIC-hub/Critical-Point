@@ -18,6 +18,7 @@
     "src/gauntlet/gauntletEngine.js": 99,
     "src/gauntlet/logicStreak.js": 100,
     "src/gauntlet/relics.js": 100,
+    "src/gauntlet/tableMeters.js": 100,
     "src/gauntlet/tableReadout.js": 100,
     "src/gauntlet/tableRules.js": 100,
     "src/gauntlet/tableStaging.js": 100,
