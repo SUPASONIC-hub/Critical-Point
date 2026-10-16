@@ -45,9 +45,8 @@ export class LazyScreen extends Component {
     const { error, offline } = this.state;
     if (!error) {
       // `quiet` is for a screen swapped in mid-run, where a status line would
-      // flash between two scenes.
-      const fallback = this.props.quiet ? <main className="shell screen-loading" aria-busy="true" /> : <ScreenLoading />;
-      return <Suspense fallback={fallback}>{this.props.children}</Suspense>;
+      // flash between two scenes: it says nothing for QUIET_LOAD_MS.
+      return <Suspense fallback={<ScreenLoading quiet={this.props.quiet} />}>{this.props.children}</Suspense>;
     }
     if (!isChunkLoadError(error)) throw error;
     const panel = chunkPanelFor({ offline, retried: this.retried });
@@ -93,6 +92,11 @@ const RELOAD_REASON = {
 
 // Long enough that a healthy connection never sees the hint.
 const SLOW_LOAD_MS = 12_000;
+// How long a quiet screen stays an empty page. A chunk the browser already
+// holds is drawn within a frame or two; one that is still on its way after
+// this long is a wait, and a wait is told. The page was empty until the chunk
+// came, however long that took, with no status and no way out.
+const QUIET_LOAD_MS = 600;
 
 /**
  * What a lazy screen shows while its chunk arrives: a status, not a blank page.
@@ -103,16 +107,24 @@ const SLOW_LOAD_MS = 12_000;
  * the page again. The count is a progress bar to a screen reader, not a status
  * that speaks fifty-five times.
  */
-function ScreenLoading() {
+function ScreenLoading({ quiet = false }) {
   const { done, total } = useSyncExternalStore(subscribeLoadProgress, getLoadProgress, getLoadProgress);
+  const [told, setTold] = useState(!quiet);
   const [slow, setSlow] = useState(false);
   useEffect(() => {
+    const tell = globalThis.setTimeout(() => setTold(true), QUIET_LOAD_MS);
     const timer = globalThis.setTimeout(() => setSlow(true), SLOW_LOAD_MS);
-    return () => globalThis.clearTimeout(timer);
+    return () => {
+      globalThis.clearTimeout(tell);
+      globalThis.clearTimeout(timer);
+    };
   }, []);
+  if (!told) return <main className="shell screen-loading" aria-busy="true" />;
   // A first visit waits for one case, and a bar that reads 1/55 as it leaves
   // says the wrong thing: the bar is for the wait that takes them all.
-  const counting = total > 0 && done > 1 && done < total;
+  // Not on a quiet screen: there the cases landing are the rest of the season
+  // arriving behind a run, not what this screen is waiting for.
+  const counting = !quiet && total > 0 && done > 1 && done < total;
   return (
     <main className="shell screen-loading" aria-busy="true">
       <p className="save-status" role="status">

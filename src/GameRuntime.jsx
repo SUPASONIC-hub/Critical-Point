@@ -99,7 +99,7 @@ export { prepareGameRuntime } from "./state/caseArrival.js";
 const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
 const IntroScreen = retryableLazy(() => import("./screens/IntroScreen.jsx").then(loadedChunk).then(({ IntroScreen }) => ({ default: IntroScreen })));
-const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })));
+const ResultScreen = retryableLazy(() => import("./screens/ResultScreen.jsx").then(loadedChunk).then(({ ResultScreen }) => ({ default: ResultScreen })), "result");
 const PlayScreen = retryableLazy(() => import("./screens/PlayScreen.jsx").then(loadedChunk).then(({ PlayScreen }) => ({ default: PlayScreen })));
 const nowMs = () => Date.now();
 const speakerPortraits = {
