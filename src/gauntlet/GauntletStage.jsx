@@ -19,8 +19,8 @@ import {
   getMultiplier,
   getRemainingSeconds,
   getSealedCardId,
+  lockpickOpensSeal,
   scoreFocus,
-  SEAL_BREAK_GAUGE,
   splitOpenSeed,
   getStanceMasteryProfile,
   getTableSchema,
@@ -29,7 +29,7 @@ import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { listOfferedTypes } from "./logicStreak.js";
-import { HEAT_DEBT_GAUGE, LOCK_PRESS_SECONDS } from "./tableRules.js";
+import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -43,7 +43,6 @@ import {
   playRelicEquipCue,
   playRelicProcCue,
 } from "./gauntletAudio.js";
-import { hasRelic } from "./relics.js";
 import { RelicDraft } from "./RelicDraft.jsx";
 import { SceneBriefing } from "./SceneBriefing.jsx";
 import { StanceRow } from "./StanceRow.jsx";
@@ -376,7 +375,7 @@ export function GauntletStage({
     const pushIndex = win.pushes + 1;
     const nextGauge = win.gauge + drawStep(win.schema, win.seed, pushIndex);
     dispatch({ type: "PUSH" });
-    if (sealedId && hasRelic(relics, "lockpick") && win.gauge < schema.sealBreak && nextGauge >= schema.sealBreak && nextGauge < SEAL_BREAK_GAUGE) {
+    if (sealedId && lockpickOpensSeal(relics, schema, win.gauge, nextGauge)) {
       pulseRelic("lockpick");
     }
     playPushCue(pushIndex, Math.min(1, win.gauge / 90));
@@ -534,7 +533,7 @@ export function GauntletStage({
             {/* The pulse without sound: lit by --gx-rate, a level that drifts and never blinks. */}
             <span className="gx-gauge-ticks" aria-hidden="true" />
             {/* The two heats the rules read: a window closed at 30 or 60 has risen a tier for the streak, and 60 is HEAT DEBT's. */}
-            {logic && [SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE].map((at) => (
+            {logic && GAUGE_MARKS.map((at) => (
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
             {win.status === "bust" && win.cause !== "abandon" && (

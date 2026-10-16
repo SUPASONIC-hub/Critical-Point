@@ -79,7 +79,7 @@ test("the gauge marks the heats its rules read, and takes no height for it", () 
   const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   const meter = stage.slice(stage.indexOf('role="meter"'), stage.indexOf('className="gx-gauge-read"'));
   // From the rules' own numbers, not a copy of them.
-  assert.match(meter, /\{logic && \[SEAL_BREAK_GAUGE, HEAT_DEBT_GAUGE\]\.map\(\(at\) => \(\s*<span key=\{at\} className="gx-gauge-mark"[^>]*style=\{\{ left: `\$\{at\}%` \}\} \/>/);
+  assert.match(meter, /\{logic && GAUGE_MARKS\.map\(\(at\) => \(\s*<span key=\{at\} className="gx-gauge-mark"[^>]*style=\{\{ left: `\$\{at\}%` \}\} \/>/);
   const rule = sheet("play").match(/\n\.gx-gauge-mark \{([^}]*)\}/)?.[1] ?? "";
   assert.match(rule, /position: absolute;/, "inside the track, out of its flow");
   assert.match(rule, /border-inline: 1px solid/, "a border is still drawn in forced colours");
