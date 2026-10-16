@@ -34,7 +34,7 @@ const endingScenes = {
   "cold-justice": { location: "POLICY ROOM / EMPTY CHAIR", image: "/scene-case03.webp", cue: "완벽한 절차표 옆에 비어 있는 의자가 남습니다.", choice: "절차에 관계 회복 단계를 추가한다" },
   "field-pact": { location: "DELIVERY HUB / NIGHT SHIFT", image: "/scene-case01.webp", cue: "공식 승인 전 현장 라디오가 먼저 응답합니다.", choice: "현장 협약을 공식 권한으로 승격한다" },
   "quiet-cover": { location: "ARCHIVE / LOW LIGHT", image: "/scene-case02.webp", cue: "압박계는 낮지만 잠긴 폴더가 더 많아집니다.", choice: "안전한 기록 하나를 열어 다음 단서로 삼는다" },
-  collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", cue: "경보와 사람들의 호출이 한꺼번에 끊깁니다.", choice: "다음 플레이에서 압박을 분산할 기준을 남긴다" },
+  collapse: { location: "SYSTEM CORE / REDLINE", image: "/ending-system-collapse.webp", cue: "경보와 사람들의 호출이 한꺼번에 끊깁니다.", choice: "압박을 분산할 기준을 남긴다" },
   "open-question": { location: "TRANSFER HALL / NEXT SHIFT", image: "/ending-final-archive.webp", cue: "다음 분석관의 출입증이 천천히 켜집니다.", choice: "답 대신 가장 위험한 질문을 인계한다" },
 };
 
@@ -174,7 +174,7 @@ export function getAuthorityReview(origin = {}, level = "OBSERVER", result = {})
 }
 
 export function getOriginEndingVariant(origin = "courier", endingId = "open-question") {
-  const labels = { courier: "현장 기록의 계승", lab: "심사 기준의 계승", public: "공개 책임의 계승" };
+  const labels = { courier: "현장 기록의 계승", lab: "반대 의견의 계승", public: "남긴 기록의 계승" };
   const ending = ENDING_NAMES[endingId] ?? ENDING_NAMES["open-question"];
   return { label: labels[origin] ?? labels.courier, text: `${labels[origin] ?? labels.courier} 경로에서 '${ending}'의 결과가 다르게 읽힙니다.` };
 }

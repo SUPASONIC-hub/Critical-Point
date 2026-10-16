@@ -646,13 +646,13 @@ function getFinaleOutcome(log = []) {
 
 const ENDINGS = {
   collapse: { id: "collapse", label: "SYSTEM COLLAPSE", title: "권한은 있었지만, 사람이 치른 값을 감당하지 못했다.", text: "기록은 남았지만 사람과 운영 모두를 지키지 못한 실패 엔딩입니다.", failure: true },
-  "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "다음 시즌의 첫 권한은 이번 기록에서 파생됩니다.", failure: false },
+  "open-oversight": { id: "open-oversight", label: "OPEN OVERSIGHT", title: "당신은 사건을 해결한 사람이 아니라 기준을 만든 사람이 되었다.", text: "이번 시즌의 기록이 다음 분석관이 따를 기준으로 남았습니다.", failure: false },
   "evidence-reform": { id: "evidence-reform", label: "EVIDENCE REFORM", title: "증거를 공개하되, 사람을 다시 소모하지 않는 규칙을 만들었다.", text: "폭로와 보호 사이에 새 운영 기준이 생겼습니다.", failure: false },
   "human-record": { id: "human-record", label: "HUMAN RECORD", title: "정답 대신, 누구의 목소리도 지워지지 않는 기록을 남겼다.", text: "당신이 다시 짠 판이 다음 참가자의 첫 단서가 됩니다.", failure: false },
   "profitable-silence": { id: "profitable-silence", label: "PROFITABLE SILENCE", title: "조직은 살아남았지만, 아무도 같은 질문을 다시 하지 않았다.", text: "가장 높은 점수와 가장 낮은 믿음이 함께 기록되었습니다.", failure: false },
   "cold-justice": { id: "cold-justice", label: "COLD JUSTICE", title: "절차는 완벽했지만, 그 절차 안의 사람은 돌아오지 않았다.", text: "공정함은 지켰지만 관계 비용이 다음 사건으로 넘어갑니다.", failure: false },
   "field-pact": { id: "field-pact", label: "FIELD PACT", title: "공식 승인보다 먼저, 현장의 약속이 다음 문을 열었다.", text: "당신의 관계망이 잠긴 기록에 접근할 수 있게 합니다.", failure: false },
-  "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "다음 플레이에서는 숨겨진 단서를 우선 추적해야 합니다.", failure: false },
+  "quiet-cover": { id: "quiet-cover", label: "QUIET COVER", title: "위험은 낮췄지만, 진실도 아직 잠들어 있다.", text: "무너진 것도, 드러난 것도 없이 시즌이 닫혔습니다.", failure: false },
 };
 
 /** Every ending's id: what a telemetry row names its ending by, and the server's ranking takes. */
@@ -729,7 +729,7 @@ function getOpenQuestionEnding({ trust, legitimacy, capital, humanCost }) {
   const open = (title, text) => ({ id: "open-question", label: "OPEN QUESTION", title, text, failure: false });
   if (held === trust) return open("답은 못 냈지만, 당신에게 말을 거는 사람은 남았다.", `사건마다 사람 피해 ${humanCost}${objectParticle(String(humanCost))} 남긴 채 문을 닫았습니다. 다음 참가자는 당신을 아는 사람들에게서 시작합니다.`);
   if (held === legitimacy) return open("절차는 남았고, 그 절차가 무엇을 위한 것인지는 남지 않았다.", `공정함은 ${legitimacy}에서 멈췄고 이유를 적어둔 문서는 없습니다. 다음 사람은 규칙만 물려받습니다.`);
-  return open("장부는 버텼고, 질문은 그대로 넘어갔다.", `현금 ${capital}${objectParticle(String(capital))} 지킨 대신 닫히지 않은 기록이 남았습니다. 다음 플레이에서 다른 권한으로 열립니다.`);
+  return open("장부는 버텼고, 질문은 그대로 넘어갔다.", `현금 ${capital}${objectParticle(String(capital))} 지킨 대신 닫히지 않은 기록이 남았습니다.`);
 }
 
 export function getCaseOutcome({ caseId = CASE_SEQUENCE[0], choiceId = "" } = {}) {

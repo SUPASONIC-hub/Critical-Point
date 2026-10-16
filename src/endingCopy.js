@@ -34,14 +34,27 @@ const choiceVerdicts = {
 const failureVerdict = {
   title: "트리거랩의 운영은 붕괴합니다.",
   ruling: "권한은 있었지만 사건마다 쌓인 사람 피해를 감당하지 못했습니다. 기록은 보존되지만, 지금의 시스템은 더 이상 같은 방식으로 작동할 수 없습니다.",
-  execution: "즉시 적용: 진행 중인 케이스 정지, 복구 키 분리, 다음 실행에서 압박 분산 조건 강제.",
-  cost: "남는 대가: 실패는 결론이 아니라 복구 조건이 됩니다. 다음 플레이는 더 좁은 권한에서 시작합니다.",
+  execution: "즉시 적용: 진행 중인 케이스 정지, 복구 키 분리.",
+  cost: "남는 대가: 실패는 결론이 아니라 복구 조건이 됩니다.",
+};
+
+/**
+ * The endings each final choice's verdict can stand beside. The verdict and
+ * the epilogue are read from two things -- the last card and the season's
+ * ruling -- and ten pairs said opposite things: 폭로 printed "외부로 넘어가고"
+ * above a QUIET COVER epilogue that says nothing came out.
+ */
+const VERDICT_ENDINGS = {
+  ending_seal: ["quiet-cover", "cold-justice", "field-pact", "open-question"],
+  ending_reform: ["open-oversight", "evidence-reform", "human-record", "cold-justice", "field-pact", "open-question"],
+  ending_expose: ["evidence-reform", "human-record", "field-pact", "open-question"],
 };
 
 /**
  * The ruling the ending sequence reads out: the collapse when the run failed,
- * the verdict of the final choice when it made one of the three, and otherwise
- * the open verdict, written from the ending variant the run reached.
+ * the verdict of the final choice when it made one of the three and the ending
+ * agrees with it (VERDICT_ENDINGS), and otherwise the open verdict, written
+ * from the ending variant the run reached.
  *
  * A run always has both things the open verdict is written from: the ruling
  * returns one of its endings whatever it is given (`getEndingVariant`,
@@ -52,8 +65,9 @@ const failureVerdict = {
  */
 export function getFinalVerdict({ endingVariant, finalChoiceId, endingSceneChoice }) {
   if (endingVariant.failure) return failureVerdict;
+  const agrees = VERDICT_ENDINGS[finalChoiceId]?.includes(endingVariant.id);
   return (
-    choiceVerdicts[finalChoiceId] ?? {
+    (agrees ? choiceVerdicts[finalChoiceId] : null) ?? {
       title: endingVariant.title,
       ruling: endingVariant.text,
       execution: `즉시 적용: ${endingSceneChoice}.`,

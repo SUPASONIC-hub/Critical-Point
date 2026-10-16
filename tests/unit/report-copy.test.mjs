@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { getRankingIntegrity, getSeasonGoals } from "../../src/advancedSystems.js";
+import { getOperatorProfile, getOperatorProfiles, getOriginStartEffects, getRankingIntegrity, getSeasonGoals } from "../../src/advancedSystems.js";
 import {
   getAftermath,
   getAuthorityReview,
@@ -19,7 +19,7 @@ import {
   getRankingComparison,
   getTelemetryDashboardSnapshot,
 } from "../../src/runtimeSystems.js";
-import { getEndingAfterglow, getSeasonRecordNotice, observationLabels } from "../../src/endingCopy.js";
+import { getEndingAfterglow, getFinalVerdict, getSeasonRecordNotice, observationLabels } from "../../src/endingCopy.js";
 import { getAchievementProgress, getEndingEpilogue, getOperationsSnapshot, getOperatorReveal } from "../../src/featurePack.js";
 import { cognitionLabels } from "../../src/gameConstants.js";
 import { ENDING_IDS, getEndingVariant, getObservationLedger, getObserverPattern, getThinkingMotive } from "../../src/gameLogic.js";
@@ -35,6 +35,57 @@ const log = [
   { isSystemEvent: true, nodeId: "p1_desk", choiceId: "system", title: "시스템", choice: "" },
 ];
 const ID = /[a-z]+\d*_[a-z0-9_]+/;
+
+/**
+ * The final choice's verdict is printed only beside an ending that agrees with
+ * it; otherwise the ending's own verdict is. 폭로 used to print "외부로 넘어가고"
+ * above a QUIET COVER epilogue saying nothing came out.
+ */
+test("the verdict of the last card is printed only beside an ending that agrees with it", () => {
+  const agrees = {
+    ending_seal: ["quiet-cover", "cold-justice", "field-pact", "open-question"],
+    ending_reform: ["open-oversight", "evidence-reform", "human-record", "cold-justice", "field-pact", "open-question"],
+    ending_expose: ["evidence-reform", "human-record", "field-pact", "open-question"],
+  };
+  const sealed = getFinalVerdict({ endingVariant: { id: "quiet-cover", failure: false }, finalChoiceId: "ending_seal", endingSceneChoice: "x" });
+  for (const [choiceId, fits] of Object.entries(agrees)) {
+    const own = getFinalVerdict({ endingVariant: { id: fits[0], failure: false }, finalChoiceId: choiceId, endingSceneChoice: "x" });
+    for (const id of ENDING_IDS) {
+      const variant = { id, failure: id === "collapse", title: `제목 ${id}`, text: `본문 ${id}` };
+      const verdict = getFinalVerdict({ endingVariant: variant, finalChoiceId: choiceId, endingSceneChoice: "장면 행동" });
+      if (id === "collapse") assert.equal(verdict.title, "트리거랩의 운영은 붕괴합니다.");
+      else if (fits.includes(id)) assert.equal(verdict, own, `${choiceId} × ${id}`);
+      else {
+        assert.equal(verdict.title, `제목 ${id}`, `${choiceId} × ${id}`);
+        assert.equal(verdict.ruling, `본문 ${id}`);
+        assert.equal(verdict.execution, "즉시 적용: 장면 행동.");
+      }
+    }
+  }
+  // The pair the audit named, and a run with no final card.
+  const exposeQuiet = getFinalVerdict({ endingVariant: { id: "quiet-cover", failure: false, title: "위험은 낮췄지만", text: "무너진 것도" }, finalChoiceId: "ending_expose", endingSceneChoice: "x" });
+  assert.equal(exposeQuiet.title, "위험은 낮췄지만");
+  assert.notEqual(exposeQuiet, sealed);
+  assert.equal(getFinalVerdict({ endingVariant: { id: "field-pact", failure: false, title: "t", text: "r" }, finalChoiceId: undefined, endingSceneChoice: "x" }).title, "t");
+});
+
+/**
+ * The origin is three things one analyst remembers, and what it changes is
+ * 프롤로그 01's starting numbers -- which each button prints, from the same
+ * table the run applies.
+ */
+test("each origin prints the starting numbers it applies and promises nothing else", () => {
+  assert.deepEqual(getOperatorProfiles().map((profile) => profile.title), ["현장을 본 분석관", "반대 의견서를 쓴 분석관", "기록을 남긴 분석관"]);
+  assert.equal(getOperatorProfile("courier").start, "현금 +4 · 믿음 +4");
+  assert.equal(getOperatorProfile("lab").start, "믿음 +1 · 공정함 +5 · 지침 +2");
+  assert.equal(getOperatorProfile("public").start, "현금 −2 · 공정함 +8 · 지침 +3");
+  assert.equal(getOperatorProfile("nobody").start, getOperatorProfile("courier").start);
+  for (const profile of getOperatorProfiles()) {
+    const changed = Object.values(getOriginStartEffects(profile.id)).filter((value) => value !== 0).length;
+    assert.equal(profile.start.split(" · ").length, changed);
+    assert.equal("authority" in profile, false);
+  }
+});
 
 test("the page before the finale says whether the season record will be sent", () => {
   const sent = getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: true, dataConsent: true });

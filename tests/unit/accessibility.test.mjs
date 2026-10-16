@@ -279,7 +279,7 @@ test("the intro and the origin profiles carry nothing the page cannot print", as
   assert.ok(getSeasonGoals().length > 0);
   for (const origin of ["courier", "lab", "public", "nobody", undefined]) {
     assert.equal(typeof getOperatorProfile(origin).title, "string");
-    assert.equal(typeof getOperatorProfile(origin).authority, "string");
+    assert.equal(typeof getOperatorProfile(origin).start, "string");
     assert.equal(typeof getOriginPrologue(origin).title, "string");
   }
   for (const style of ["instinct", "auditor", "mediator", "nobody", undefined]) assert.equal(typeof getPlayStyleUnlocks(style).label, "string");
