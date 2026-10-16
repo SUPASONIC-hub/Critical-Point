@@ -75,6 +75,7 @@
     "src/viewModels/appViewModels.js": 98,
     "src/viewModels/introViewModel.js": 100,
     "src/viewModels/reportViewModels.js": 100,
+    "src/viewModels/resultViewModel.js": 100,
     "src/viewModels/sceneViewModels.js": 100,
     "src/viewModels/seasonViewModels.js": 86
   },

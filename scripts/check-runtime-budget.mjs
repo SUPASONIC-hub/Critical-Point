@@ -35,6 +35,12 @@ import { viewGroups } from "../src/viewModels/appViewModels.js";
 
 const root = process.cwd();
 
+// `longestLine` is a cap on one line's length in characters, set on
+// 2026-10-15 at what each file measured, rounded up to the next ten. A line
+// budget alone can be met by joining lines: GameRuntime held 980 while two of
+// its lines ran to 1,448 and 589 characters, each a view bag every branch
+// appended a name to, so every two such branches conflicted on one line.
+
 const BUDGETS = {
   // 2382 / 12 -> 2384 / 13 on 2026-09-16: the composed graph is handed to
   // `applySceneContext`, so every scene -- authored or generated -- carries the
@@ -66,6 +72,7 @@ const BUDGETS = {
   // build and nothing a case wrote; the old number had 3,000 lines of room.
   "src/gameData.js": {
     lines: 560,
+    longestLine: 200,
     importedNames: 7,
     hooks: {},
   },
@@ -89,6 +96,7 @@ const BUDGETS = {
   // tables are `seasonRules.js`.
   "src/gameLogic.js": {
     lines: 1260,
+    longestLine: 190,
     importedNames: 18,
     hooks: {},
   },
@@ -133,9 +141,18 @@ const BUDGETS = {
   // and wiping it are events in `state/runLifecycle.js`, not four lists of
   // setters with a save payload typed out beside each. Measured 964 / 104 and
   // 10 / 7 / 5 / 7.
+  // 980 / 104 -> 960 / 96 on 2026-10-15, with a longest line of 190. It had
+  // met 980 partly by writing the result view as two lines of 1,448 and 589
+  // characters and the play screen's props as one of 418. The result bag is
+  // `viewModels/resultViewModel.js` now, which imports the constants and the
+  // ending helpers itself and takes the report hook's return value whole, so
+  // nine imported names and the report's 29-name unpacking went with it.
+  // Measured 950 / 95 and a longest line of 175 (183 once confirm-in-game's
+  // awaited confirm lands, which is why the cap is 190 rather than 180).
   "src/GameRuntime.jsx": {
-    lines: 980,
-    importedNames: 104,
+    lines: 960,
+    longestLine: 190,
+    importedNames: 96,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -144,6 +161,7 @@ const BUDGETS = {
   // 111 -> 100 on 2026-09-27: ratcheted to what it measures (98).
   "src/screens/PlayScreen.jsx": {
     lines: 100,
+    longestLine: 170,
     importedNames: 4,
     hooks: {},
   },
@@ -153,11 +171,13 @@ const BUDGETS = {
   // `src/endingCopy.js`, read through one namespace import. Measured 324 / 10.
   "src/screens/ResultScreen.jsx": {
     lines: 340,
+    longestLine: 280,
     importedNames: 10,
     hooks: {},
   },
   "src/screens/ReportArchive.jsx": {
     lines: 640,
+    longestLine: 260,
     importedNames: 7,
     hooks: {},
   },
@@ -167,6 +187,7 @@ const BUDGETS = {
   // the notices and the timing had moved out since.
   "src/gauntlet/GauntletStage.jsx": {
     lines: 830,
+    longestLine: 250,
     importedNames: 68,
     hooks: {},
   },
@@ -205,8 +226,11 @@ function analyze(relative) {
   };
   walk(program.body);
 
+  const lengths = source.split("\n").map((line) => line.replace(/\r$/, "").length);
+  const longest = Math.max(...lengths);
   return {
-    lines: source.split("\n").length,
+    lines: lengths.length,
+    longestLine: { length: longest, line: lengths.indexOf(longest) + 1 },
     importedNames: program.body
       .filter((node) => node.type === "ImportDeclaration")
       .reduce((total, node) => total + node.specifiers.length, 0),
@@ -222,6 +246,12 @@ for (const [relative, budget] of Object.entries(BUDGETS)) {
   if (actual.lines > budget.lines) {
     failures.push(`${relative} is ${actual.lines} lines, over the ${budget.lines} budget.`);
   }
+  if (actual.longestLine.length > budget.longestLine) {
+    failures.push(
+      `${relative}:${actual.longestLine.line} is ${actual.longestLine.length} characters, over the ${budget.longestLine} cap. ` +
+        "Break it up; if it is a bag of names, it belongs in a view model.",
+    );
+  }
   if (actual.importedNames > budget.importedNames) {
     failures.push(`${relative} imports ${actual.importedNames} names, over the ${budget.importedNames} budget.`);
   }
@@ -231,7 +261,7 @@ for (const [relative, budget] of Object.entries(BUDGETS)) {
       failures.push(`${relative} calls ${hook} ${count} times, over the ${limit} budget. Move the new state into a hook of its own.`);
     }
   }
-  reported.push(`${relative}: ${actual.lines} lines, ${actual.importedNames} imports`);
+  reported.push(`${relative}: ${actual.lines} lines, ${actual.importedNames} imports, longest line ${actual.longestLine.length}`);
 }
 
 for (const [screen, limit] of Object.entries(VIEW_FIELD_BUDGETS)) {
