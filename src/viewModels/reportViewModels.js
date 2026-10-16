@@ -143,3 +143,45 @@ export function createAchievementBadges({ challengeClearCount, currentChallengeS
     : { title: "Pressure Keeper", text: "위험 압력을 통제 가능한 범위에 묶었습니다." },
   ];
 }
+
+/** The most decisions each end of `getDecisionPace` reads, and the fewest that make a comparison. */
+export const DECISION_PACE_SIZE = 10;
+export const DECISION_PACE_MIN = 3;
+
+/**
+ * How fast the first decisions of a log were made against the last: the same
+ * number from each end -- at most `size`, at most half of what was counted, so
+ * no decision is in both -- and each end's average, in whole seconds. Null
+ * when fewer than `min` fit at each end. A mirror for the report, not a
+ * reading the table acts on.
+ *
+ * `responseTimeSec` is the table clock's own reading (`getWindowResponseTime`),
+ * and that clock does not run while the briefing is up, its reading clock held
+ * or not, nor while the table is paused (GauntletStage's `paused`). Left out is
+ * what that reading cannot be compared on: a window played on a slowed clock
+ * (`assistTime`: its seconds are table seconds), one played in story mode
+ * (`assistStory`), a card the table dealt because none was staked
+ * (`threshold.forced`), the table's system entries, and an entry with no
+ * reading (a save from before it was written).
+ */
+export function getDecisionPace(entries = [], { size = DECISION_PACE_SIZE, min = DECISION_PACE_MIN } = {}) {
+  const times = (Array.isArray(entries) ? entries : [])
+    .filter((entry) => entry && typeof entry === "object" && !entry.isSystemEvent)
+    .filter((entry) => !(Number(entry.assistTime) > 1) && entry.assistStory !== true && entry.threshold?.forced !== true)
+    .map((entry) => Number(entry.responseTimeSec))
+    .filter((seconds) => Number.isFinite(seconds) && seconds > 0);
+  const count = Math.min(size, Math.floor(times.length / 2));
+  if (count < Math.max(1, min)) return null;
+  const average = (part) => Math.round(part.reduce((sum, seconds) => sum + seconds, 0) / part.length);
+  return { count, first: average(times.slice(0, count)), last: average(times.slice(-count)) };
+}
+
+/** The report's one line on that pace (ReportArchive's Avg Time), or "" when there is none. */
+export function describeDecisionPace(pace) {
+  if (!pace) return "";
+  const { count, first, last } = pace;
+  if (first === last) return `앞의 ${count}번도 뒤의 ${count}번도 평균 ${last}초 만에 골랐습니다.`;
+  return last < first
+    ? `뒤의 ${count}번은 평균 ${last}초 만에 골랐습니다. 앞의 ${count}번은 ${first}초였습니다.`
+    : `뒤의 ${count}번은 평균 ${last}초를 들여 골랐습니다. 앞의 ${count}번은 ${first}초였습니다.`;
+}

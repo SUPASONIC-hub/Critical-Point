@@ -348,6 +348,7 @@ export function ReportArchive({ view, observerEndingRecord, endingAxes, observat
         <h2 lang="en">Avg Time</h2>
         <strong>{result.averageResponseTime}초</strong>
         <p>각 국면에서 결정을 내리기까지 걸린 평균 시간입니다. 짧을수록 선택지가 명확했거나 압박이 약했을 수 있습니다.</p>
+        {result.decisionPaceLine && <p>{result.decisionPaceLine}</p>}
       </section>
       <section className="report-section wide-report">
         <h2 lang="en">Longest Decision</h2>
