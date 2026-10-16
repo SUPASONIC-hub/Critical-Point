@@ -2386,6 +2386,29 @@
     gap: 6px;
   }
 
+  /* Five cards under a rules line (GitHub issue 100): at 360x740, with five relics
+     carried, 23 such hands ended 8, 16 or 19px under the action bar. The room
+     comes out of the air and no word is cut: 2px off each of the card's block
+     paddings on three rows (12px), 2px off the gap between a card's label and
+     its numbers on the two rows that stack them (4px), 2px off each of the
+     hand's two row gaps (4px) -- 20px -- and 1px off each gap of the column
+     above the hand (3px, 4px with the stance row). Clamping the labels at two
+     lines would have cut about two labels in three. `.gx-read` holds the rules
+     line and the hand follows it, so `:has()` is how the hand knows the board
+     changed; a browser without it keeps the hand as it was. */
+  .gx-read:has(.gx-active-rules) {
+    gap: 3px;
+  }
+
+  .gx-read:has(.gx-active-rules) ~ .hand-5 {
+    gap: 4px;
+  }
+
+  .gx-read:has(.gx-active-rules) ~ .hand-5 .gx-card {
+    gap: 4px;
+    padding-block: 6px;
+  }
+
   .gx-card.selected .gx-card-preview {
     max-height: 1.0625rem;
   }

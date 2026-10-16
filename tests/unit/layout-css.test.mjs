@@ -140,6 +140,73 @@ test("a phone on its side keeps the fold that prints the question and the cards 
   assert.match(responsive, /\(max-height: 480px\)[\s\S]*?\.gx-brief \{\s*grid-row: 2;\s*\}/);
   assert.match(responsive, /\(max-height: 360px\)[^{]*\{\s*\.gx-speaker \{\s*display: none;\s*\}[\s\S]*?\.gx-question \{\s*grid-column: 1;\s*\}\s*\.gx-brief \{\s*grid-row: 1;\s*\}/);
 });
+/**
+ * Issue #100. Written from arithmetic on 2026-10-13 and not yet measured in a
+ * browser: the sweep's "the fullest ... hands fit on an overclocked board with
+ * five relics" tests are what say it fits. This holds that the rules are still
+ * written so that they apply, and that they still add up to the 19px the
+ * worst of the 23 hands was under by.
+ */
+test("a short phone gives a five-card hand under a rules line 20px without cutting a label", () => {
+  const play = sheet("play");
+  const short = play.match(/@media \(max-width: 480px\) and \(max-height: 760px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const px = (rule, property) => Number(rule.match(new RegExp(`\\n\\s*${property}: (\\d+)px`))?.[1]);
+
+  const hand = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \{[^}]*\}/)?.[0] ?? "";
+  const card = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) ~ \.hand-5 \.gx-card \{[^}]*\}/)?.[0] ?? "";
+  const column = short.match(/\n {2}\.gx-read:has\(\.gx-active-rules\) \{[^}]*\}/)?.[0] ?? "";
+  assert.ok(hand && card && column, "the three rules are in the short-phone block");
+
+  // What they are taken from: the short phone's own hand, and the phone's card.
+  const plainHand = px(short.match(/\n {2}\.gx-hand \{[^}]*\}/)?.[0] ?? "", "gap");
+  const phoneCard = play.match(/@media \(max-width: 719px\) \{\s*\.gauntlet-stage \.gx-card \{[^}]*\}/)?.[0] ?? "";
+  const [, padBlock] = phoneCard.match(/padding: (\d+)px \d+px;/) ?? [];
+  const plainColumn = px(short.match(/\n {2}\.gx-read,\s*\.gx-table \{[^}]*\}/)?.[0] ?? "", "gap");
+  assert.ok(plainHand && padBlock && plainColumn, "the rules they are taken from are where this reads them");
+
+  // Two rows of two cards and a strip: three rows of padding, two row gaps,
+  // and two rows whose cards stack a label over their numbers.
+  const fromPadding = 3 * 2 * (Number(padBlock) - px(card, "padding-block"));
+  const fromCardGap = 2 * (px(phoneCard, "gap") - px(card, "gap"));
+  const fromHandGap = 2 * (plainHand - px(hand, "gap"));
+  assert.equal(fromPadding + fromCardGap + fromHandGap, 20, "19px is the furthest a hand was under the action bar; a rounded 19 can be 19.99");
+  // The column above the hand: the HUD, the rules line, the gauge and the scene.
+  assert.ok(3 * (plainColumn - px(column, "gap")) >= 3, "and the column above gives 3px more");
+
+  // More specific than the rules it changes, wherever they sit in the sheet:
+  // `.gauntlet-stage .gx-card` is two classes and comes later.
+  assert.match(play, /\n {2}\.gauntlet-stage \.gx-card \{\s*gap: 6px;/);
+  // The room is not taken from the words. Only a phone on its side cuts a label at two lines.
+  assert.doesNotMatch(short, /\.gx-card-label/);
+  assert.match(play, /@media \(max-width: 719px\) \{[\s\S]*?\.gx-card-label \{[^}]*-webkit-line-clamp: 3;/);
+  // The board is told by the rules line, as the situation board's rule tells it.
+  assert.match(short, /\.gx-active-rules ~ \.gx-situation \{\s*display: none;/);
+  const stage = readFileSync(new globalThis.URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
+  const read = stage.indexOf('<div className="gx-read">');
+  const rules = stage.indexOf('className="gx-active-rules"');
+  const head = stage.indexOf('<div className="gx-hand-head"');
+  assert.ok(read > 0 && read < rules && rules < head, "the rules line is inside the column the hand follows");
+  assert.match(readFileSync(new globalThis.URL("../../src/gauntlet/GauntletHand.jsx", import.meta.url), "utf8"), /className=\{`choices gx-hand hand-\$\{handSize\}`\}/);
+});
+
+/**
+ * Written from arithmetic on 2026-10-13, not yet measured: at 360x740 the
+ * docked cards started at 493px and the first briefing's introduction ended at
+ * 555px. With 판 열기 alone docked (56px, 8px off the bottom) the dock starts
+ * at 676px.
+ */
+test("a 740px phone docks 판 열기 alone under the briefing, as a 664px one does", () => {
+  const briefing = sheet("briefing");
+  const query = briefing.match(/@media ([^{]*)\{\s*\.gx-comic-actions \{\s*display: contents;\s*\}/)?.[1] ?? "";
+  const tallest = Number(query.match(/\(max-width: 700px\) and \(max-height: ([\d.]+)em\)/)?.[1]);
+  assert.ok(tallest * 16 >= 740, `${query.trim()}: 360x740 is ${740 / 16}em tall at 16px type`);
+  assert.ok(tallest * 16 < 839, "a 412x839 or 390x844 phone keeps its cards docked");
+  assert.match(query, /\(max-height: 35em\),/, "any screen that short, whatever its width");
+  const open = briefing.slice(briefing.indexOf(query)).match(/\.gx-open-table \{[^}]*\}/)?.[0] ?? "";
+  assert.match(open, /position: sticky;\s*bottom: 8px;/);
+  assert.match(briefing, /\n\.gx-open-table \{[^}]*min-height: 56px;/, "740 - 8 - 56 = 676px, and the panel ends at 555px");
+});
+
 test("an intro drawer opened by its link stops below the music pills", () => {
   const intro = sheet("base-intro-ranking");
   const pills = intro.match(/\.music-controls \{[^}]*\}/)?.[0] ?? "";
