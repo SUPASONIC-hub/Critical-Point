@@ -244,12 +244,13 @@ function narrowTargets(root, { min, exceptions }) {
  */
 const TOUCH_TARGET_EXCEPTIONS = [
   {
-    // 저장, 저장 후 나가기 and 초기화 on a phone. They are drawn 30x28 so the
-    // header keeps its one row beside the title and the case count, and each
-    // is pressed over 44px tall and as wide as the gap to its neighbour lets
-    // it be without overlapping (play.css): 33px for the two saves, 37.5 for
-    // 초기화, which stands 9px apart because it throws the run away and asks
-    // first. Three 44px areas would cost the title 30px of a 360px row.
+    // The header's four tools on a phone: 저장, 저장 후 나가기, 편의 설정 and
+    // 초기화. They are drawn 28x28 so the header keeps its one row beside the
+    // music controls and the case stamp, and each is pressed over 44px tall
+    // and as wide as the 3px gap to its neighbour lets it be without
+    // overlapping (play.css): 29px, and 34 for 초기화, which stands 9px apart
+    // because it throws the run away and asks first. Four 44px areas would
+    // not fit the 240px a 360px row has left of the music controls.
     selector: ".gauntlet-shell .top-actions.compact-actions button",
     width: 24,
     height: 44,
@@ -344,10 +345,13 @@ for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
 
 /**
  * A stance is a GuardedButton (StanceRow.jsx): on a table that is not live it
- * is aria-disabled, says why in its description and drops the press. Read
- * through the accessibility tree, not the markup layout-css.test.mjs matches.
- * Under the reveal the stage is behind a modal, so the buttons are found by
- * class: a role query leaves out what the dialog hides.
+ * is aria-disabled, says why in its description and drops the press. Live, it
+ * is read through the accessibility tree, not the markup layout-css.test.mjs
+ * matches. Closed, the table is there for 760ms only (RESOLVE_DELAY_MS): a
+ * commit sets the next scene and opens the reveal in one render, so the stage
+ * under the reveal is the next scene's, and live. The closed table is read in
+ * one frame instead, the frame its status leaves live, by the ids its
+ * description names.
  */
 test("a stance that cannot be changed says why, and one that can says only what its count counts", async ({ page }) => {
   // Patterns, not the sentences: the copy is still being worded (one-name-per-term
@@ -364,21 +368,40 @@ test("a stance that cannot be changed says why, and one that can says only what 
     await expect(stances.nth(index)).not.toHaveAttribute("aria-disabled", "true");
     await expect(stances.nth(index)).toHaveAccessibleDescription(DETAIL);
   }
+  await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "false");
 
   await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  const closed = page.waitForFunction(
+    () => {
+      const table = document.querySelector("[data-testid='gauntlet-stage']");
+      if (!table || table.getAttribute("data-status") === "live") return false;
+      const buttons = [...table.querySelectorAll(".gx-focus-modes button")];
+      const said = (button) =>
+        (button.getAttribute("aria-describedby") ?? "")
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((id) => document.getElementById(id)?.textContent.trim() ?? "")
+          .join(" ");
+      const read = buttons.map((button) => ({ disabled: button.getAttribute("aria-disabled"), description: said(button) }));
+      // And it refuses the press it says it refuses. React flushes a click's
+      // state before dispatchEvent returns, so a stance that took it shows it here.
+      const steady = table.querySelector(".gx-focus-modes button.mode-steady");
+      steady.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      return { status: table.getAttribute("data-status"), read, steadyPressed: steady.getAttribute("aria-pressed") };
+    },
+    null,
+    { polling: "raf", timeout: 30_000 },
+  );
   await cashStakedCard(page);
-  await expect(page.getByTestId("decision-next")).toBeVisible();
-  await expect(stage).not.toHaveAttribute("data-status", "live");
-  for (let index = 0; index < 3; index += 1) {
-    await expect(stances.nth(index)).toHaveAttribute("aria-disabled", "true");
-    await expect(stances.nth(index)).toHaveAccessibleDescription(BLOCKED);
+  const table = await (await closed).jsonValue();
+  expect(table.status).toBe("cashed");
+  expect(table.read).toHaveLength(3);
+  for (const stance of table.read) {
+    expect(stance.disabled).toBe("true");
+    expect(stance.description).toMatch(BLOCKED);
   }
-  // And it refuses the press it says it refuses. React flushes a click's state
-  // before dispatchEvent returns, so a stance that took it would show it here.
-  const steady = page.locator(".gx-focus-modes button.mode-steady");
-  await expect(steady).toHaveAttribute("aria-pressed", "false");
-  await steady.dispatchEvent("click");
-  await expect(steady).toHaveAttribute("aria-pressed", "false");
+  expect(table.steadyPressed).toBe("false");
+  await expect(page.getByTestId("decision-next")).toBeVisible();
 });
 
 test("the relic draft has no structural accessibility violations", async ({ page }) => {
