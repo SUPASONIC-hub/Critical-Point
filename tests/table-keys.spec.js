@@ -592,7 +592,7 @@ const STAGED_STEPS = [
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "prologue05", on: WHOLE, lines: 4, kicker: NEW_PROTOCOL },
+  { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];
 

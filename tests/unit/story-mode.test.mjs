@@ -144,7 +144,7 @@ test("a story run is introduced only to the rules it plays under", () => {
   assert.match(told("prologue03")[0], /조회/);
   assert.deepEqual(told("prologue04"), [four.intro[2]], "LOCK, and neither FRACTURE nor OVERCLOCK");
   assert.match(told("prologue04")[0], /LOCK을 누르면 .* 누를 때마다 시간이 줄어듭니다/);
-  assert.deepEqual(told("prologue05"), [five.intro[0], five.intro[1], five.intro[3]], "the stances and the relic slots are kept, and not the line on what a charge pays on the next board");
+  assert.deepEqual(told("prologue05"), [five.intro[0], five.intro[1]], "the stances (with STEADY's cold board) and the relic slots are kept, and not the line on what a charge pays on the next board");
   // No line a story run is told is new: each is one the step already says.
   for (const step of UNLOCK_LADDER) {
     for (const line of step.storyIntro) assert.ok(step.intro.includes(line), `${step.caseId}: "${line}"`);

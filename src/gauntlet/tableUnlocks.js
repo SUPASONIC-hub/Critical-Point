@@ -185,14 +185,15 @@ const STEPS = [
     // does once LOCK is at its own cap (`LOCK_CAP`): nothing to this hand's
     // multiplier, and the stance's carry if it reached `STANCE_CHARGE`
     // (`applyFocusCarry`). STEADY's relief is taken off the heat there is, so
-    // on a cold board before the first push it cools nothing. A story run is
-    // told no promise about the next board, so not the third.
-    storyIntro: [0, 1, 3],
+    // on a cold board before the first push it cools nothing: said in the
+    // first line's brackets, as the README says it, so the four things fit
+    // the phone's first screen in three lines (table-keys, 390x664). A story
+    // run is told no promise about the next board, so not the third.
+    storyIntro: [0, 1],
     intro: [
-      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다.",
+      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘(민 뒤에만), EXPOSE는 자원입니다.",
       "사건이 닫힐 때마다 도구 3개 중 하나를 고릅니다. 도구는 5개까지 들고, 다 차면 하나를 내려놓고 바꿉니다.",
       `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
-      "STEADY는 데워진 열기만 식힙니다. 한 번 민 뒤에 충전하십시오.",
     ],
   },
 ];
