@@ -4,7 +4,7 @@ import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { createSeasonBot, POPULATION } from "./sim/season-bot.mjs";
+import { AUDIT_WEEK, createSeasonBot, POPULATION } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -145,12 +145,16 @@ let doorCouldMove = 0;
 // wild-card hands; it reads the seasons and draws nothing.
 const funnelRows = [];
 const dump = [];
+// AUDIT_WEEK=1 only (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
+const auditTally = { seasons: 0, caught: 0, lost: 0, secured: 0 };
 for (let index = 0; index < SEASONS; index += 1) {
   const archetype = POPULATION[index % POPULATION.length];
   const seen = watchSeason();
   const season = playSeason(index, archetype, false, seen.watch);
   populationSeen.push(seen);
   populationBuilds.push(season.relics);
+  if (season.audits.caught > 0) auditTally.seasons += 1;
+  for (const key of ["caught", "lost", "secured"]) auditTally[key] += season.audits[key];
   if (reportMode) funnelRow(archetype).push(funnelSeason(season));
   const closesOn = (seasonBestLogic) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic }).id;
   if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
@@ -243,6 +247,7 @@ const fiveNumbers = (values) => `${Math.min(...values)}/${band(values)}/${Math.m
 const byHand = (samplesByHand) => Object.entries(samplesByHand).map(([name, values]) => `${name} ${fiveNumbers(values)}`).join(", ");
 console.log(`Logic streak (season best, min/p10/p50/p90/max: all ${fiveNumbers(Object.values(logicBest).flat())}; ${byHand(logicBest)}; hold rate: all ${fiveNumbers(Object.values(logicHold).flat())}; ${byHand(logicHold)})`);
 console.log(`Slack door (a season's best streak of ${LOGIC_SLACK_STREAK} or more): open in ${doorOpen} of ${SEASONS} seasons (${((doorOpen / SEASONS) * 100).toFixed(1)}%); ${doorMoved} of them close on a different ending than they would with the door shut`);
+if (AUDIT_WEEK) console.log(`Audit (measured, AUDIT_WEEK=1): ${auditTally.caught} closes caught in ${auditTally.seasons} of ${SEASONS} seasons (${(auditTally.caught / SEASONS).toFixed(2)} a season), ${((auditTally.lost / Math.max(1, auditTally.secured)) * 100).toFixed(1)}% of what the closes moved to the vault`);
 
 /**
  * The same season in story mode.

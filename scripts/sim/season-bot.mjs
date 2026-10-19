@@ -137,6 +137,15 @@ const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label: key }]));
 
 /**
+ * AUDIT_WEEK=1 plays every season and case that is not a story one under B3's
+ * test week (the run carries `weekRule: "audit"`, auditRisk.js), and counts
+ * the audit as the runtime does, a case at a time. Left out, no run carries
+ * the stamp and every line these players print stays where it was.
+ */
+export const AUDIT_WEEK = process.env.AUDIT_WEEK === "1";
+const auditStamp = (story) => (AUDIT_WEEK && !story ? { weekRule: "audit" } : {});
+
+/**
  * One season player and the seeded stream it draws from. `seed` starts the
  * stream and `reseed` sets it again (the report's paired seasons); `random`
  * and `pick` are the same stream, for the script's own draws (the tool hand
@@ -250,6 +259,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     const casePeaks = [];
     let windows = 0;
     let skipped = 0;
+    // AUDIT_WEEK only: the season's closes the audit took its part of, and what its closes moved.
+    const audits = { caught: 0, lost: 0, secured: 0 };
     for (const caseId of CASE_SEQUENCE) {
       // The opening route, the legacy and the hand, as `runLifecycle.startCaseNow` opens the case.
       const opening = describeCaseOpening(caseId, { caseResults, operatorOrigin: policy.origin });
@@ -267,6 +278,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       const rules = getTableRules(caseId, run, staged);
       const nextCaseRules = getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged);
       run = openCaseRun(run, { rules });
+      let audit = 0;
       if (tools) tools.caseNumber = CASE_SEQUENCE.indexOf(caseId) + 1;
       for (let step = 0; step < 60 && nodeId && !resultNodeIds.has(nodeId); step += 1) {
         const node = nodes[nodeId];
@@ -322,7 +334,13 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         if (skip) skipped += 1;
         const nextNode = skip?.nodeId ?? plannedNode;
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules });
+        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit });
+        audit = verdict.audit?.count ?? 0;
+        if (verdict.audit?.caught) {
+          audits.caught += 1;
+          audits.lost += verdict.audit.lost;
+        }
+        if (verdict.audit) audits.secured += verdict.secured + verdict.audit.lost;
         const busted = verdict.outcome === "bust";
         watch?.({ verdict, card: choice, dealtWild: Boolean(reframeChoice), board: run.schema });
         const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -385,7 +403,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     }
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, logic: getSeasonLogic(caseResults), relics: run.relics, audits };
   }
 
   /**
@@ -402,7 +420,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
   }
 
   function normalizeStart(story = false) {
-    return { ...RUN_INITIAL_STATE, story };
+    return { ...RUN_INITIAL_STATE, story, ...auditStamp(story) };
   }
 
   return { random, pick, reseed, archetypes, makePolicy, scoreCard, playWindow, playSeason, pickByType };
@@ -429,7 +447,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0 });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, audits: 0, auditLost: 0, auditSecured: 0 });
 function see(seen, verdict) {
   const count = (map, key) => {
     map[key] = (map[key] ?? 0) + 1;
@@ -438,6 +456,12 @@ function see(seen, verdict) {
   seen.streakSum += verdict.logic.streak;
   count(seen.moves, verdict.logic.move);
   count(seen.pushed, verdict.pushes);
+  // AUDIT_WEEK only: the closes the audit took its part of, that part, and what those closes moved before it.
+  if (verdict.audit?.caught) {
+    seen.audits += 1;
+    seen.auditLost += verdict.audit.lost;
+  }
+  if (verdict.audit) seen.auditSecured += verdict.secured + verdict.audit.lost;
   if (verdict.outcome === "bust") count(seen.bustAt, verdict.cause === "push" ? verdict.pushes : verdict.cause);
   else {
     seen.pot += verdict.pot;
@@ -499,7 +523,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * pass, as everywhere here.
    */
   function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, rules = ALL_RULES, story = false) {
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}) }, { rules });
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), ...auditStamp(false) }, { rules });
+    let audit = 0;
     const paid = { cashed: 0, bonus: 0, capped: 0 };
     let busts = 0;
     let midCaseBusts = 0;
@@ -536,7 +561,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (lock?.cashAs && win.status === "live") win = reduceWindow(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
       if (win.status === "live") win = reduceWindow(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules });
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type))] : undefined, caseClosed, rules, audit });
+      audit = verdict.audit?.count ?? 0;
       see(seen, verdict);
       if (verdict.outcome === "cash") {
         // What the streak paid this pot, before LOCK and under the cap.
