@@ -241,6 +241,9 @@ test("결과 카드 저장 downloads a drawn 1080x1350 card and copies its line"
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toMatch(line.pattern);
   expect(copied).not.toContain(MESSAGE);
+  // The card has no room for the habit's line; the report's 당신이 반복한 방식 box draws it under the name.
+  const habit = getJudgementHabit((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).caseResults);
+  if (habit) await expect(page.locator(".result-why-grid article").nth(1).locator("p").first()).toHaveText(habit.line);
 
   await keepScreenshots(page, testInfo, "buttons-after-save");
 });
