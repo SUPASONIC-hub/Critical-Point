@@ -44,7 +44,7 @@ const UNRANKED =
 // Said when a ranking row is let go because its season has a case closed
 // before the table paid the logic streak (telemetryBatch.isBeatTableRefusal).
 const BEAT_TABLE =
-  "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
+  "지금 판 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.";
 
 /**
  * What the status line says after a pass over the queue. A ranking row that

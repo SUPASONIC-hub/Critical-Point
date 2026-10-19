@@ -1760,6 +1760,17 @@ export function createTableRecord(log = []) {
   return first ? { ...createGauntletLedger([]), ...first } : createGauntletLedger(log);
 }
 
+/**
+ * The mark of a case closed at the table of 2026-10-1X (TODO(rules)): every
+ * run summary carries it, so every case row carries it as `dynamics`, and the
+ * server ranks no season with a case row without it (20261015020000; the
+ * reset of 20261011010000 read `logicStreak` the same way). Raise the number,
+ * never reuse it, when the table changes again. The migration,
+ * telemetryBatch.js and check-grants.mjs name it too.
+ */
+export const RULES_MARK_KEY = "tableRules";
+export const RULES_MARK = 2;
+
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
   return {
@@ -1780,5 +1791,6 @@ export function createRunSummary(run) {
     handVault: state.handVault,
     relics: [...state.relics],
     mutations: [...state.schema.mutations],
+    [RULES_MARK_KEY]: RULES_MARK,
   };
 }

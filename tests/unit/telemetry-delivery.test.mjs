@@ -273,9 +273,9 @@ test("the status line says a run will not rank, and why, beside whatever else th
   // A season refused for a case from before the logic table has its own sentence, and not the generic one.
   assert.deepEqual(describeBatchResult({ queueCommitted: true, left: 0, beatTable: 1 }), {
     tone: "error",
-    text: "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
+    text: "지금 판 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
   });
-  assert.match(describeBatchResult({ queueCommitted: true, left: 1, refused: 2, beatTable: 1 }).text, /논리 콤보 규칙이 생기기 전에.*기록 2건은 대기열에서 뺐습니다.*1건이 아직 실패 상태/);
+  assert.match(describeBatchResult({ queueCommitted: true, left: 1, refused: 2, beatTable: 1 }).text, /지금 판 규칙이 생기기 전에.*기록 2건은 대기열에서 뺐습니다.*1건이 아직 실패 상태/);
 });
 
 test("a ranking row refused for a case from the beat table is let go and counted apart from the other refusals", async () => {

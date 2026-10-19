@@ -98,7 +98,7 @@ test("the page before the finale says whether the season record will be sent", (
   assert.notEqual(sent, notSent);
   // A season with a case from before the logic table is told it will not rank, and why, in place of "전송됩니다".
   const beat = getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: true, dataConsent: true, beatSeason: true });
-  assert.equal(beat, "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.");
+  assert.equal(beat, "지금 판 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.");
   assert.doesNotMatch(beat, /전송/);
   assert.equal(getSeasonRecordNotice({ nextCaseId: "final", telemetryEnabled: true, dataConsent: true, beatSeason: false }), sent);
   // With the box unticked nothing is sent whatever the season is, and that sentence is already true.

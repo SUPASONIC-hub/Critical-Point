@@ -55,7 +55,7 @@ test.beforeEach(async ({ page }) => {
  */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  const atLogicTable = { gauntlet: { logicStreak: 0 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 2 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["inference", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
   return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
 }
 
@@ -243,7 +243,7 @@ test("a ranking row refused for a case from the beat table is said on the record
   await expect(page.locator(".report-archive-body")).toBeVisible();
   const status = page.locator(".session-panel .remote-status");
   await expect(status).toHaveText(
-    "논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
+    "지금 판 규칙이 생기기 전에 마친 사건이 있어, 이 회차는 온라인 시즌 랭킹에 오르지 않습니다. 이 기기의 순위 기록과 JSON 내보내기에는 남아 있습니다.",
     { timeout: 20_000 },
   );
   await expect(status).toHaveClass(/error/);

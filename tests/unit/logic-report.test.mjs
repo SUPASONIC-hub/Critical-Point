@@ -30,7 +30,7 @@ const record = (values = {}) => ({ windows: 6, heat: 3, peak: 1, top: ["inferenc
 // Seven cases as the season lists them (id, label, title); the titles are this file's own, so a retitled case moves no assertion.
 const CASES = ["72시간", "가짜 신호", "이름 없는 승인", "넷째", "다섯째", "여섯째", "일곱째"].map((title, index) => ({ id: `case0${index + 1}`, label: `사건 0${index + 1}`, title }));
 // A case with a record was closed at the logic table, so its run summary has the table's mark; one without is a summary from before it.
-const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values), gauntlet: { logicStreak: 0 } } : { rank: "B" }]));
+const seasonOf = (records) => Object.fromEntries(records.map((values, index) => [CASES[index].id, values ? { logicRecord: record(values), gauntlet: { logicStreak: 0, tableRules: 2 } } : { rank: "B" }]));
 
 /** Six cases at a mean heat of 0.5, and 사건 03 at 2.0 with five of its eight windows on 위험 다루기. */
 const SEASON = seasonOf([{}, { breaks: 1 }, { windows: 8, heat: 16, peak: 3, top: ["risk", 5], grows: 3, switches: 1, breaks: 1, busts: 1, best: 9 }, {}, { keeps: 2 }, {}, { best: 4 }]);
@@ -96,7 +96,7 @@ test("a season with few recorded cases names none, and one with no record prints
   assert.equal(LOGIC_REPORT_MIN_CASES, 5);
   // Three of the seven closed with no window to count: cases of this table still, with its mark and no record.
   const four = { ...seasonOf([{}, null, { windows: 8, heat: 16, breaks: 2, best: 3 }, {}, null, {}, null]) };
-  for (const [id, summary] of Object.entries(four)) if (!summary.logicRecord) four[id] = { ...summary, gauntlet: { logicStreak: 0 } };
+  for (const [id, summary] of Object.entries(four)) if (!summary.logicRecord) four[id] = { ...summary, gauntlet: { logicStreak: 0, tableRules: 2 } };
   assert.deepEqual(createLogicReport({ caseResults: four, cases: CASES }).lines, [
     "논리 콤보 기록이 있는 사건이 아직 적어, 열기가 가장 높았던 사건을 짚지 않습니다.",
     "논리 유지력 92점 · 최고 논리 콤보 3 · 순위는 시즌 기록이 50건 모이면 나옵니다.",
@@ -204,9 +204,15 @@ test("a season with a case from before the logic table is on no ranking, and its
     assert.equal(createLogicReport({ caseResults: season, cases: CASES, standing }).lines[1], "논리 유지력 92점 · 최고 논리 콤보 9");
   }
   // A case with the mark and no record (no window of it could be counted) is not such a case.
-  const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0 } } };
+  const windowless = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet: { logicStreak: 0, tableRules: 2 } } };
   assert.equal(hasBeatTableCase(windowless), false);
   assert.equal(getRankedLogicHold(windowless), 92);
+  // TODO(rules): one case closed at the logic table before 2026-10-1X: the streak's mark and not the table's (20261015020000).
+  for (const [label, gauntlet] of [["no table mark", { logicStreak: 4 }], ["an older table mark", { logicStreak: 4, tableRules: 1 }], ["a table mark that is no number", { logicStreak: 4, tableRules: "2" }]]) {
+    const season = { ...SEASON, [CASES[5].id]: { rank: "B", gauntlet } };
+    assert.equal(hasBeatTableCase(season), true, label);
+    assert.equal(getRankedLogicHold(season), null, label);
+  }
 });
 
 test("the report says 열기 and never 압박, and every character it can print is in the game's font", () => {

@@ -111,7 +111,7 @@ test("the page that opens the finale tells a season with a case from before the 
   await expect(page.locator(".decision-reveal-backdrop")).toBeHidden();
   const notice = page.locator(".next-case-panel").getByTestId("season-record-notice");
   await expect(notice).toBeVisible();
-  await expect(notice).toHaveText("논리 콤보 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.");
+  await expect(notice).toHaveText("지금 판 규칙이 생기기 전에 마친 사건이 있어, 피날레를 마쳐도 이 회차의 시즌 기록은 온라인 랭킹에 오르지 않습니다. 이 기기의 순위 기록에는 남습니다.");
   await expect(notice).not.toContainText("전송됩니다");
   await expect(page.getByRole("button", { name: /마지막 사건 시작/ })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -1521,6 +1521,6 @@ test("completed case is retained in the local ranking after leaving the ending",
   await expect(page.locator(".ranking-list .ranking-row")).toHaveCount(1);
   await expect(page.locator(".ranking-list .ranking-row")).toContainText("SEASON 01 COMPLETE");
   await expect
-    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v8") || "[]").length))
+    .poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem("critical-point-local-ranking-v9") || "[]").length))
     .toBeGreaterThan(0);
 });
