@@ -1525,7 +1525,7 @@
   inset: auto 14px 6px;
   height: 3px;
   background: currentColor;
-  animation: gx-hold 0.8s linear both;
+  animation: gx-hold 0.8s linear;
 }
 
 @keyframes gx-hold {
