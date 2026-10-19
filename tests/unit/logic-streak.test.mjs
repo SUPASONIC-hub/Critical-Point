@@ -388,7 +388,9 @@ for (const name of readdirSync(SAVES).filter((file) => file.endsWith(".json")).s
         if (old in fixture.save.dynamics) assert.equal(state.dynamics[name], fixture.save.dynamics[old], name);
       }
       for (const gone of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(gone in state.dynamics, false, gone);
-      if (fixture.save.dynamics.suspended) assert.deepEqual(state.dynamics.suspended, upgradeRunRecord(fixture.save.dynamics).suspended);
+      // The 2 -> 3 step writes out that no SCOUT was spent on a window put down before it (appConfig's `migrateSavedState`).
+      const suspended = upgradeRunRecord(fixture.save.dynamics).suspended;
+      if (suspended) assert.deepEqual(state.dynamics.suspended, suspended.window ? { ...suspended, window: { ...suspended.window, scouted: false } } : suspended);
     }
     // Loaded, saved and loaded again, it is the same save and still not a repair.
     const again = load(JSON.parse(JSON.stringify({ ...state, lastError: undefined, paused: false })));
@@ -455,7 +457,7 @@ test("a save with a window put down before 2026-10-10 resumes with no repair, ho
   assert.deepEqual([valid, repaired], [true, false], "no 복구됨 notice");
   assert.equal(state.lastError, undefined);
   const { beatCombo: _combo, maxCombo: _longest, beatHits: _hits, perfects: _perfects, slips: _slips, focusPerfects: _locked, focusMisses: _jammed, ...held } = window;
-  assert.deepEqual(state.dynamics.suspended.window, held, "the window is written back with its progress and its groove, without the counts nothing reads");
+  assert.deepEqual(state.dynamics.suspended.window, { ...held, scouted: false }, "the window is written back with its progress and its groove, without the counts nothing reads");
   assert.deepEqual([state.dynamics.runHand, state.dynamics.handVault], [0, 260], "the hand's share is carried under its new names");
   for (const key of ["beatCombo", "bestCombo", "runGroove", "grooveVault", "focusPerfects", "focusMisses"]) assert.equal(key in state.dynamics, false, key);
   assert.equal(load(JSON.parse(JSON.stringify(state))).repaired, false, "and the save it is written back as loads clean");

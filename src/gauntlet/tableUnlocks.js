@@ -32,8 +32,10 @@ export const STAGED = true;
  * the LOCK press, in the STRIKE stance until `stance` lets the player choose
  * one -- and with the choice come the boards a stance carries forward (STRIKE
  * WAKE, STEADY LINE, EXPOSED HAND) and the season's mastery of it. `relics`
- * is the draft a closed case offers. The other seven are the next-table
- * mutations, under the ids the engine's `MUTATIONS` catalogue uses.
+ * is the draft a closed case offers. `scout` is SCOUT, the one look a window
+ * that narrows the drawn band around the wall for table clock (B1, 11일차
+ * 초안). The other seven are the next-table mutations, under the ids the
+ * engine's `MUTATIONS` catalogue uses.
  */
 export const TABLE_RULES = Object.freeze([
   "logic",
@@ -47,6 +49,7 @@ export const TABLE_RULES = Object.freeze([
   "lock",
   "stance",
   "relics",
+  "scout",
 ]);
 
 /**
@@ -152,11 +155,16 @@ const STEPS = [
   },
   {
     caseId: "prologue03",
-    adds: ["coldFeet", "heatDebt"],
-    storyIntro: [],
+    adds: ["coldFeet", "heatDebt", "scout"],
+    // SCOUT is the hand's own, so a story run is told it (B1 초안). The 3초 and
+    // the 20 are SCOUT_SECONDS and 2 * SCOUT_REACH (tableRules.js): this module
+    // imports only the two LOCK numbers, so they are written out and move with
+    // the constants.
+    storyIntro: [2],
     intro: [
       "한 번도 밀지 않고 확정하면 다음 판에서 가장 비싼 카드가 봉인됩니다.",
       "열기 60 이상에서 확정하면 다음 판은 열기를 안고 시작하고 시간이 줄어듭니다.",
+      "조회를 누르면 시간 3초를 쓰고 벽 구간이 20칸 폭으로 좁혀집니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다.",
     ],
   },
   {

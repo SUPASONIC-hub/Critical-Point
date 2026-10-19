@@ -6,6 +6,7 @@ import {
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
+  getWindowBand,
   HAND_CAP,
   openCaseRun,
   reduceWindow,
@@ -186,6 +187,14 @@ const heartbeat = [80, 90, 100, 110, 120, 130, 140, 150, 160].map((threshold) =>
 const oracle = measure("sees the wall", (win) => win.gauge + win.schema.stepMax < win.wall);
 // Blows up every window it can to reach the end of the case sooner, and plays the
 // last window (which a skip can never jump over) the way the best blind policy does.
+// SCOUT (B1): the one look a window, bought with table clock, then pushes
+// while the next step stays this far past the near end of the band it drew.
+// It is information, so it must sit between the heartbeat and the wall seen.
+const scoutRows = [0, 3, 6, 9].map((margin) =>
+  measure(`scout, margin ${margin}`, Object.assign((win) => win.gauge + win.schema.stepMax - margin < getWindowBand(win).wallMin, { scout: true })),
+);
+/** The most a scouting hand may bank, as a share of a hand that sees the wall. */
+const SCOUT_SEES_CAP = 0.8;
 const skipper = measure("bust to skip", (win) =>
   win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true,
 );
@@ -256,7 +265,7 @@ const lockReport = FOCUS_MODES.map((mode) => ({
 }));
 const swapped = locking("steady lock, cashed as strike", listening, { mode: "steady", cashAs: "strike" });
 
-const rows = [...fixed, ...heartbeat, oracle, skipper, ...lockReport.flatMap((row) => [row.blind, row.listen, row.sees]), swapped];
+const rows = [...fixed, ...heartbeat, ...scoutRows, oracle, skipper, ...lockReport.flatMap((row) => [row.blind, row.listen, row.sees]), swapped];
 for (const row of rows) {
   console.log(
     `${row.label.padEnd(16)} vault ${String(row.meanVault).padStart(8)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${row.meanWindows}`,
@@ -282,6 +291,15 @@ assert.ok(bestHeartbeat.meanVault > bestFixed.meanVault, "listening to the heart
 assert.ok(
   bestHeartbeat.meanVault < oracle.meanVault * 0.6,
   `the heartbeat must not be an answer key: best ${bestHeartbeat.meanVault} against a wall-seeing ${oracle.meanVault}`,
+);
+const bestScout = bestOfRows(scoutRows);
+console.log(
+  `scout            blind ${bestFixed.meanVault} < heartbeat ${bestHeartbeat.meanVault} < scout ${bestScout.meanVault} (${bestScout.label}, bust ${(bestScout.bustRate * 100).toFixed(1)}%) < sees ${oracle.meanVault}  (scout/sees ${(bestScout.meanVault / oracle.meanVault).toFixed(3)}, heartbeat/sees ${(bestHeartbeat.meanVault / oracle.meanVault).toFixed(3)})`,
+);
+assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
+assert.ok(
+  bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
+  `SCOUT must not be an answer key: ${bestScout.meanVault} against a wall-seeing ${oracle.meanVault}`,
 );
 assert.ok(skipper.meanWindows < WINDOWS_PER_CASE, "busting on purpose does shorten a case");
 assert.ok(

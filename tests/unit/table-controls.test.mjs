@@ -60,6 +60,7 @@ function table(state = {}) {
       push: note("push"),
       cash: note("cash"),
       cycleFocusMode: note("stance"),
+      scout: note("scout"),
       pickRelic: note("relic"),
       cancelSwap: note("cancel"),
       openTable: note("open"),
@@ -83,6 +84,7 @@ test("a held key is still the table's key, and is pressed once", () => {
     [{ key: "w", code: "KeyW" }, "push"],
     [{ key: "e", code: "KeyE" }, "focus"],
     [{ key: "q", code: "KeyQ" }, "stance"],
+    [{ key: "r", code: "KeyR" }, "scout"],
     [{ key: "Enter", code: "Enter" }, "cash"],
     [{ key: "2", code: "Digit2" }, "select"],
   ]) {
@@ -102,13 +104,15 @@ test("a held key is still the table's key, and is pressed once", () => {
   }
 });
 
-test("E and Q are not the table's keys before the case turns LOCK and the stances on", () => {
+test("E, Q and R are not the table's keys before the case turns LOCK, the stances and SCOUT on", () => {
   // The stage hands over no `focus` without "lock" and no `cycleFocusMode`
   // without "stance" (tableUnlocks): the key does nothing and stays the page's.
   for (const [init, missing] of [
     [{ key: "e", code: "KeyE" }, { focus: null }],
     [{ key: "ㄷ", code: "KeyE" }, { focus: null }],
     [{ key: "q", code: "KeyQ" }, { cycleFocusMode: null }],
+    [{ key: "r", code: "KeyR" }, { scout: null }],
+    [{ key: "ㄱ", code: "KeyR" }, { scout: null }],
   ]) {
     const { current, calls } = table(missing);
     for (const repeat of [false, true]) {

@@ -39,7 +39,7 @@ function load(save) {
 test("every era of save has a fixture", () => {
   assert.deepEqual(
     fixtures.map((fixture) => fixture.name),
-    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-hand-names.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-unlocks.json"],
+    ["v1-prototype.json", "v2-current.json", "v2-pre-33f-at-confront.json", "v2-pre-33f-at-dilemma.json", "v2-pre-33f-in-branch.json", "v2-pre-gauntlet.json", "v2-pre-hand-names.json", "v2-pre-prologue.json", "v2-pre-relic.json", "v2-pre-scout.json", "v2-pre-unlocks.json", "v3-current.json"],
   );
 });
 
@@ -67,9 +67,12 @@ for (const fixture of fixtures) {
   });
 }
 
+// v2-current.json was the save this build wrote until SAVE_SCHEMA_VERSION 3 (SCOUT); it is an era now.
 test("the save this build writes is not called repaired", () => {
-  const current = fixtures.find((fixture) => fixture.name === "v2-current.json");
-  const { state, repaired } = load(current.save);
+  const current = fixtures.find((fixture) => fixture.name === "v3-current.json");
+  assert.equal(current.save.saveSchemaVersion, SAVE_SCHEMA_VERSION, "the fixture is this build's own");
+  const { parsed, state, repaired } = load(current.save);
+  assert.deepEqual(parsed, current.save, "nothing to migrate");
   assert.equal(repaired, false);
   assert.equal(state.lastError, undefined, "no recovery notice on an ordinary resume");
   assert.deepEqual(state.dynamics, serializeRunState(current.save.dynamics), "and its table record is unchanged");

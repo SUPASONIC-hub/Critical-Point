@@ -44,6 +44,7 @@ import {
   getHeartbeatBpm,
   getSealedCardId,
   getTableSchema,
+  getWindowBand,
   HAND_CAP,
   openCaseRun,
   reduceWindow,
@@ -126,6 +127,9 @@ export const ARCHETYPES = {
 };
 export const POPULATION = ["random", "random", "procedure", "money", "balanced", "min-risk", "people-first", "spend-people"];
 
+/** How far past the scouted band's near end a scouting hand lets the next step reach. */
+const SCOUT_EDGE = 3;
+
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const resourceMeta = Object.fromEntries(RESOURCE_KEYS.map((key) => [key, { label: key }]));
 
@@ -197,10 +201,20 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       while (hand.walks && win.status === "live") win = reduceWindow(win, { type: "TICK", delta: 1 }, rules);
     }
     const target = policy.heat + (random() - 0.5) * 10;
+    // SCOUT (B1): the player who reads the heartbeat also takes the one look
+    // the table sells, and pushes while the next step stays under the band it
+    // drew -- past that, on the heartbeat, never past the band's far end. No
+    // draw from the stream: without the rule the season is the season before it.
+    const scouts = policy.listens && rules.has("scout");
+    if (scouts) win = scoutWindow(win, true, rules);
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
-      const keepGoing = policy.listens
-        ? getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm
-        : win.gauge < target;
+      const band = scouts ? getWindowBand(win) : null;
+      const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
+      const keepGoing = band
+        ? win.gauge + win.schema.stepMax - SCOUT_EDGE < band.wallMin || (hears && win.gauge + win.schema.stepMax < band.wallMax)
+        : policy.listens
+          ? hears
+          : win.gauge < target;
       if (!keepGoing) break;
       win = reduceWindow(win, { type: "PUSH" }, rules);
       win = reduceWindow(win, { type: "TICK", delta: 0.7 }, rules);
@@ -451,6 +465,22 @@ export const STANCES = ["strike", "steady", "strike", "steady", "expose"];
  * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
  * windowIndex)` the scene whose types a typed hand picks from.
  */
+/**
+ * SCOUT as a hand plays it (B1): the look, before the first push. `scout` is
+ * the decide function's own mark (`decide.scout`): `true` presses SCOUT as the
+ * table does, and `{ seconds }` is a sweep's candidate price, paid on the clock
+ * the same way (the band's reach is the decide function's to read, through
+ * `getWindowBand`). A case without the rule looks at nothing.
+ */
+export function scoutWindow(win, scout, rules = ALL_RULES) {
+  if (!scout || win.status !== "live") return win;
+  if (scout === true || !Number.isFinite(scout.seconds)) return reduceWindow(win, { type: "SCOUT" }, rules);
+  if (!rules.has("scout") || win.scouted) return win;
+  let spent = { ...win, scouted: true };
+  for (let left = scout.seconds; left > 0 && spent.status === "live"; left -= 1) spent = reduceWindow(spent, { type: "TICK", delta: Math.min(1, left) }, rules);
+  return spent;
+}
+
 export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor }) {
   /**
    * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
@@ -494,6 +524,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
           if (!lock.idle) win = pressed;
         }
       }
+      win = scoutWindow(win, decide.scout, rules);
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         if (!decide(win, run)) break;
         win = reduceWindow(win, { type: "PUSH" }, rules);

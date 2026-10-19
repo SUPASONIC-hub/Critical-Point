@@ -49,6 +49,14 @@ export const LOGIC_CAP = 0.6;
 export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;
+/**
+ * SCOUT (B1, 11일차 초안): what one look at the wall costs on the table clock,
+ * once a window, and how far the band it draws reaches -- a band
+ * `2 * SCOUT_REACH` wide that holds the wall at a seeded place inside it, cut
+ * to the board's own band. Measured in check:pressure ("scout" rows).
+ */
+export const SCOUT_SECONDS = 3;
+export const SCOUT_REACH = 10;
 
 /** METRONOME: how many windows after the pressure rose a change of type still counts as a switch. */
 export const METRONOME_REACH = 2;

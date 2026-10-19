@@ -516,7 +516,7 @@ const NEW_PROTOCOL = "NEW PROTOCOL · 이번 사건부터 규칙이 늘어납니
 const STAGED_STEPS = [
   { caseId: "prologue01", on: { logic: false, lock: false, stance: false, chain: false }, lines: 2, kicker: FIRST_TABLE },
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
-  { caseId: "prologue03", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
+  { caseId: "prologue03", on: NO_LOCK, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "prologue05", on: WHOLE, lines: 4, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },

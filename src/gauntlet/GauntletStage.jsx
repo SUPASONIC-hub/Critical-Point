@@ -19,6 +19,7 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
+  getWindowBand,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { isClosingScene } from "./holdConfirm.js";
@@ -28,7 +29,7 @@ import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
-import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
+import { GAUGE_MARKS, LOCK_PRESS_SECONDS, SCOUT_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -172,6 +173,8 @@ export function GauntletStage({
   const canCash = live && !paused && Boolean(selectedCard) && !sealedLock;
   const canFocus = canCash && win.focus < FOCUS_MAX;
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
+  // The band the window draws: the board's, or the narrower one SCOUT bought.
+  const band = getWindowBand(win);
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
@@ -204,6 +207,8 @@ export function GauntletStage({
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
+  const scoutOn = rules.has("scout");
+  const canScout = scoutOn && live && !paused && !locked && !win.scouted;
   // STEADY's relief comes off the heat there is (`FOCUS` in the engine clamps
   // at 0), so on a cold board -- before the first push -- a press cools
   // nothing. The stance line says "민 뒤", and the LOCK button says it again
@@ -233,8 +238,10 @@ export function GauntletStage({
 
   // A stake or a push is written to the save before anything can be won or lost
   // in this window, with the card staked. Reading alone is not a touch, so a
-  // save and exit taken before the bet is placed resumes a fresh window.
-  const touched = win.pushes > 0 || Boolean(win.selectedId);
+  // save and exit taken before the bet is placed resumes a fresh window. A
+  // look is a touch: otherwise F5 hands back the clock SCOUT cost and the band
+  // stays in the player's head.
+  const touched = win.pushes > 0 || Boolean(win.selectedId) || win.scouted === true;
   const touchedCardId = selectedCard && !reframeSelected ? selectedCard.id : null;
   useEffect(() => {
     if (!touched || abandoned || win.status !== "live") return;
@@ -402,6 +409,12 @@ export function GauntletStage({
     setFlash({ amount: 0.38 });
   }
 
+  function scout() {
+    if (!canScout || draftOpen) return;
+    playTargetLockCue();
+    dispatch({ type: "SCOUT" });
+  }
+
   function cash() {
     if (!canCash) return;
     dispatch({ type: "CASH", locked: sealedLock });
@@ -417,15 +430,15 @@ export function GauntletStage({
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
-    cycleFocusMode: stanceOn ? cycleFocusMode : null,
+    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
     cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
     briefingOpen, tableOpen, openTable,
   });
 
-  const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
-  const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
+  const bandLeft = (band.wallMin / GAUGE_MAX) * 100;
+  const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
-  const heatTier = win.status === "bust" ? "bust" : win.gauge >= schema.wallMin ? "critical" : win.gauge >= schema.wallMin - schema.stepMax ? "hot" : "cold";
+  const heatTier = win.status === "bust" ? "bust" : win.gauge >= band.wallMin ? "critical" : win.gauge >= band.wallMin - schema.stepMax ? "hot" : "cold";
   // The tab says what the table shows (tabTitle.js): never the hidden wall. A
   // bust stays on it until the next table opens; the briefing leaves it be.
   const busted = win.status === "bust" && win.cause !== "abandon";
@@ -549,7 +562,7 @@ export function GauntletStage({
             aria-valuemin={0}
             aria-valuemax={GAUGE_MAX}
             aria-valuenow={Math.round(win.gauge)}
-            aria-valuetext={`열기 ${Math.round(win.gauge)}, 벽은 ${schema.wallMin}에서 ${schema.wallMax} 사이 어딘가`}
+            aria-valuetext={`열기 ${Math.round(win.gauge)}, ${band.scouted ? "조회한 " : ""}벽은 ${band.wallMin}에서 ${band.wallMax} 사이 어딘가`}
           >
             <span className="gx-gauge-band" style={{ left: `${bandLeft}%`, width: `${bandWidth}%` }} />
             {live && (
@@ -570,14 +583,23 @@ export function GauntletStage({
             )}
             <span className="gx-gauge-seal" style={{ left: `${schema.sealBreak}%` }} hidden={!sealedId} />
           </div>
+          {/* What the look bought, said once, beside the row and not in it: the row is no live region. */}
+          {scoutOn && <span className="sr-only" aria-live="polite">{band.scouted ? `조회했다. 벽은 ${band.wallMin}에서 ${band.wallMax} 사이 어딘가` : ""}</span>}
           <div className="gx-gauge-read">
             {/* The meter says the first two. The pulse is named text and no live region: read when asked for. */}
             <span aria-hidden="true">
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <span className="gx-band-label" aria-hidden="true">
-              벽 {schema.wallMin}–{schema.wallMax}
-            </span>
+            {/* SCOUT sits on the band it narrows: no fourth button in the dock at 360px. */}
+            {canScout ? (
+              <button type="button" className="gx-band-label gx-scout" data-testid="commit-scout" onClick={scout} aria-keyshortcuts={keys("R")} aria-label={`벽 조회, 시간 ${SCOUT_SECONDS}초`}>
+                벽 {band.wallMin}–{band.wallMax} · 조회 −{SCOUT_SECONDS}초
+              </button>
+            ) : (
+              <span className={`gx-band-label${band.scouted ? " is-scouted" : ""}`} aria-hidden="true">
+                벽 {band.wallMin}–{band.wallMax}{band.scouted && " · 조회함"}
+              </span>
+            )}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}
@@ -657,7 +679,7 @@ export function GauntletStage({
             <span>현재 위험</span>
             <b>{dangerLine}</b>
             <small>
-              벽 {schema.wallMin}–{schema.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
+              벽 {band.wallMin}–{band.wallMax} · 심박 <span className="gx-situation-bpm">{schema.sedated ? "교란" : bpm}</span>
             </small>
           </article>
           <article className="gx-situation-card">
@@ -682,7 +704,7 @@ export function GauntletStage({
           {/* A key's piece ends on its separator, so the whole line is cut into the text it always was. A touch screen wide enough to show the line has no key to name, and gets none. */}
           <small>
             {letterKeys ? (
-              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
+              <><kbd>1</kbd>–<kbd>{handSize}</kbd> 걸기 · <kbd>Space</kbd>/<kbd>W</kbd> 밀기 · {lockOn && <><kbd>E</kbd> LOCK · </>}{stanceOn && <><kbd>Q</kbd> 자세 · </>}{scoutOn && <><kbd>R</kbd> 조회 · </>}<kbd>Enter</kbd> 확정 · <kbd>P</kbd> 저장</>
             ) : drawn && (
               <><kbd>Space</kbd> 밀기 · <kbd>Enter</kbd> 확정</>
             )}

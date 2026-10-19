@@ -46,8 +46,8 @@ test("each step is the one the author decided", () => {
   const rules = (caseId) => [...rulesFor(caseId, staged)].sort();
   assert.deepEqual(rules("prologue01"), []);
   assert.deepEqual(rules("prologue02"), ["aftershock", "blackout", "logic", "silence"]);
-  assert.deepEqual(rules("prologue03"), ["aftershock", "blackout", "coldFeet", "heatDebt", "logic", "silence"]);
-  assert.deepEqual(rules("prologue04"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "overclock", "silence"]);
+  assert.deepEqual(rules("prologue03"), ["aftershock", "blackout", "coldFeet", "heatDebt", "logic", "scout", "silence"]);
+  assert.deepEqual(rules("prologue04"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "overclock", "scout", "silence"]);
   // The stance and the draft come last: a draft in 05 is the offer made as 04 closes.
   assert.deepEqual(rules("prologue05"), [...TABLE_RULES].sort());
   assert.ok(!rulesFor("prologue04", staged).has("relics") && !rulesFor("prologue04", staged).has("stance"));

@@ -24,6 +24,8 @@ import {
   LOGIC_CAP,
   OVERCLOCK_CHIPS,
   OVERCLOCK_STREAK,
+  SCOUT_REACH,
+  SCOUT_SECONDS,
   SEAL_BREAK_GAUGE,
   SILENCE_SECONDS,
   SPLINT_RATE,
@@ -517,6 +519,8 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     // the intro between leaving a window and cashing it, and the ranking's
     // "played with a slower clock" mark used to read the setting at the cash.
     timeScale: 1,
+    // SCOUT has been spent on this window (`getWindowBand`): once a window.
+    scouted: false,
   };
   // A window the player put down on purpose -- saved and left, or hid the tab --
   // picks up exactly where it stood. The wall and the tell are dealt from the
@@ -555,6 +559,8 @@ function normalizeSuspendedWindow(value, windowIndex) {
   }
   window.selectedId = typeof source.selectedId === "string" ? source.selectedId.slice(0, 200) : null;
   window.focusMode = normalizeFocusMode(source.focusMode);
+  // The look is kept, never the band it drew: that is dealt from the seed again.
+  window.scouted = source.scouted === true;
   return { seed: value.seed.slice(0, 200), windowIndex, window };
 }
 
@@ -577,6 +583,7 @@ function resumeWindow(window, resume) {
   restored.timeScale = normalizeTimeScale(restored.timeScale);
   restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
   restored.focusMode = normalizeFocusMode(resume.focusMode);
+  restored.scouted = resume.scouted === true;
   return restored;
 }
 
@@ -659,6 +666,21 @@ function advanceClock(window, delta) {
   return { ...window, elapsed, gauge };
 }
 
+/**
+ * The band a window draws: the board's, and once SCOUT has been spent on it a
+ * band `2 * SCOUT_REACH` wide that holds the wall, cut to the board's. Where
+ * the wall sits inside it is dealt from the seed, so the look narrows the risk
+ * without printing the wall: the middle of the band is not the wall.
+ */
+export function getWindowBand(window, reach = SCOUT_REACH) {
+  const { wallMin, wallMax } = window.schema;
+  if (window.scouted !== true) return { wallMin, wallMax, scouted: false };
+  // `reach` is the constant everywhere but the balance scripts' sweeps.
+  const span = reach * 2;
+  const low = window.wall - Math.floor(seededUnit(`scout:${window.seed}`) * (span + 1));
+  return { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
+}
+
 export function reduceWindow(window, event = {}, rules = ALL_RULES) {
   if (!window || window.status !== "live") return window;
   switch (event.type) {
@@ -688,6 +710,12 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
         focusHits: (Number(window.focusHits) || 0) + 1,
         gauge: clamp(window.gauge - scored.focusRelief, 0, GAUGE_MAX),
       }, LOCK_PRESS_SECONDS);
+    }
+    case "SCOUT": {
+      // One look a window, paid in clock like a LOCK press: no heat of its own,
+      // but the clock creeps heat while it is spent.
+      if (window.scouted === true || !rules.has("scout")) return window;
+      return advanceClock({ ...window, scouted: true }, SCOUT_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to

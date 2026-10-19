@@ -64,7 +64,9 @@ export const debugToolsEnabled =
   ((import.meta.env ?? {}).VITE_ENABLE_DEBUG_TOOLS === "true" ||
     new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
 export const SAVE_SLOT_MAX_ITEMS = 5;
-export const SAVE_SCHEMA_VERSION = 2;
+// 3 since B1 (11일차): a put-down window carries `scouted`, whether SCOUT was
+// spent on it (gauntletEngine's `getWindowBand`). See `migrateSavedState`.
+export const SAVE_SCHEMA_VERSION = 3;
 export const RECOVERY_SLOT_SCHEMA_VERSION = 1;
 export const PLAYER_NAME_MAX_LENGTH = 24;
 export const FEEDBACK_COMMENT_MAX_LENGTH = 600;
@@ -143,8 +145,29 @@ export function migrateSavedState(state, targetSchemaVersion = SAVE_SCHEMA_VERSI
   const sourceVersion = Number(state.saveSchemaVersion ?? 1);
   if (sourceVersion > targetSchemaVersion) return null;
   if (sourceVersion === targetSchemaVersion) return state;
+  // One step at a time, so a v1 save reaches v3 through v2.
+  const stepped = migrateOneStep(state, sourceVersion);
+  return stepped ? migrateSavedState(stepped, targetSchemaVersion) : null;
+}
 
-  if (sourceVersion === 1 && targetSchemaVersion === 2) {
+/**
+ * 2 -> 3: a window put down before SCOUT had no look spent on it. The engine
+ * reads a missing `scouted` as false already (`normalizeSuspendedWindow`); the
+ * step writes it out so a v3 save always says it.
+ */
+function migrateSuspendedScout(dynamics) {
+  const window = dynamics?.suspended?.window;
+  if (!window || typeof window !== "object" || Array.isArray(window)) return dynamics;
+  return { ...dynamics, suspended: { ...dynamics.suspended, window: { ...window, scouted: window.scouted === true } } };
+}
+
+function migrateOneStep(state, sourceVersion) {
+  if (sourceVersion === 2) {
+    const dynamics = state.dynamics && typeof state.dynamics === "object" && !Array.isArray(state.dynamics) ? migrateSuspendedScout(state.dynamics) : state.dynamics;
+    return { ...state, saveSchemaVersion: 3, dynamics };
+  }
+
+  if (sourceVersion === 1) {
     return {
       ...state,
       saveSchemaVersion: 2,

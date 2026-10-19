@@ -955,6 +955,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* SCOUT (B1 초안): the band label is the button that narrows it, once a window. */
+.gx-scout {
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gx-band-label.is-scouted {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
 .gx-bpm {
   display: inline-flex;
   align-items: center;
