@@ -967,9 +967,9 @@
   cursor: pointer;
 }
 
-.gx-band-label.is-scouted {
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
+.gx-scout.is-scouted {
+  border-style: dotted;
+  cursor: default;
 }
 
 .gx-bpm {

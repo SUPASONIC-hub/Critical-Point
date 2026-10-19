@@ -590,15 +590,15 @@ export function GauntletStage({
             <span aria-hidden="true">
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            {/* SCOUT sits on the band it narrows: no fourth button in the dock at 360px. */}
-            {canScout ? (
-              <button type="button" className="gx-band-label gx-scout" data-testid="commit-scout" onClick={scout} aria-keyshortcuts={keys("R")} aria-label={`벽 조회, 시간 ${SCOUT_SECONDS}초`}>
-                벽 {band.wallMin}–{band.wallMax} · 조회 −{SCOUT_SECONDS}초
+            {/* SCOUT sits on the band it narrows: no fourth button in the dock at 360px. Spent, the button
+                stays where it was, aria-disabled, so a focus on it is not dropped to the page. */}
+            {canScout || band.scouted ? (
+              <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={scout} aria-disabled={!canScout}
+                aria-keyshortcuts={canScout ? keys("R") : undefined} aria-label={band.scouted ? undefined : `벽 조회, 시간 ${SCOUT_SECONDS}초`}>
+                벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : `조회 −${SCOUT_SECONDS}초`}
               </button>
             ) : (
-              <span className={`gx-band-label${band.scouted ? " is-scouted" : ""}`} aria-hidden="true">
-                벽 {band.wallMin}–{band.wallMax}{band.scouted && " · 조회함"}
-              </span>
+              <span className="gx-band-label" aria-hidden="true">벽 {band.wallMin}–{band.wallMax}</span>
             )}
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
