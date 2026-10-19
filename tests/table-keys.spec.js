@@ -1066,6 +1066,8 @@ test.describe("the case's last choice is held", () => {
   });
 
   test("Enter held confirms, a short Enter arms, and Space holds on the button the keyboard walked to", async ({ page }) => {
+    // Three tables opened from the debug menu: about 30s alone, past 60s beside a second worker.
+    test.setTimeout(120_000);
     let cash = await stakeClosing(page);
     // The card was staked with the pointer, so Enter is the table's.
     await page.keyboard.press("Enter");
