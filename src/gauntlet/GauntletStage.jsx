@@ -759,7 +759,8 @@ export function GauntletStage({
       <TableNotices
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
-        clock={{ live, paused, remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed }}
+        // What the table says aloud, in one polite region (tableVoice.js).
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}
