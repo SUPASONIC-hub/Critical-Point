@@ -147,6 +147,15 @@ const budgets = [
   // (TABLE_AUDIO in vite.config.js), so nothing loads later than it did.
   // Taking it out took PlayScreen to 97,898 / 32,131. 6,676 / 2,166 measured.
   { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_700, maxGzip: 2_205 },
+  // The other players' wall rate on the scene page (improvement notes D3):
+  // src/state/useSceneBustRates.js and src/sceneTraces.js. Written into the
+  // PlayScreen chunk they added about 945 / 441 bytes to it on 2026-10-19,
+  // more than its 104,200 / 34,300 budget left before tableAudio came out; it
+  // is fetched with the table (SCENE_TRACES in vite.config.js), so the line
+  // appears when it did. PlayScreen carries only the import, 141 / 54.
+  // 1,054 / 652 measured, plus the 4 bytes tableAudio was given for the
+  // hashed file names it imports.
+  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_058, maxGzip: 656 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];

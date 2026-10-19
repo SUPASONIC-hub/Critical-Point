@@ -12,6 +12,7 @@ import { GuardedButton } from "../components/GuardedButton.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
+import { useSceneTraceLine } from "../state/useSceneBustRates.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise.
@@ -108,6 +109,8 @@ export function SceneBriefing({
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
+  // The other players' wall rate here, pinned last in the case file (D3).
+  const trace = useSceneTraceLine(node.caseId, nodeId);
   // The page prints the changed rules, the carried ones and the new ones under
   // the scene, so all three are on its clock, a sentence of any counted the
   // same way. `mutations` is exactly the two lists printed below.
@@ -255,13 +258,14 @@ export function SceneBriefing({
             ))}
           </div>
 
-          {node.memo?.length > 0 && (
+          {(node.memo?.length > 0 || trace) && (
             <div className="gx-panel gx-panel-file" style={at("3 / 2")}>
               <p className="gx-file-tab">사건 파일</p>
               <ul>
-                {node.memo.map((item) => (
+                {(node.memo ?? []).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
+                {trace && <li data-testid="scene-trace">{trace}</li>}
               </ul>
             </div>
           )}
