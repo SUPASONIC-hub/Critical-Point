@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-12 (the state of `main` at `05c7b7c`; what changed and when is in `git log`)
+Last updated: 2026-10-19 (the state of `main` at `8531b88`; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -59,7 +59,8 @@ list of the files it touched.
   coverage run weekly. The weekly tier is twenty-four shards of two workers
   (it was twelve of four, and timed itself out), sized on 2026-10-05, when all
   twenty-four first passed -- on a run dispatched by hand; no run the schedule
-  started has passed yet. Its WebKit job runs twice, `@prod` on the build and
+  started has passed yet (the one of 2026-10-12 failed; one dispatched by hand
+  passed on 2026-10-16 at `f79d7d3`). Its WebKit job runs twice, `@prod` on the build and
   `@layout` on the dev server. Visual regression has its own workflow and
   Linux-only baselines. It compares on every push to main, on every Dependabot
   pull request, on any pull request carrying the `visual` label, and on its
@@ -75,14 +76,15 @@ list of the files it touched.
   text integrity is guarded by `npm run check:text`, not by terminal inspection.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
-- Visual baselines were last recorded on 2026-10-10 (both play screens, the
-  day the beat left the table), 2026-10-09 (both intro pictures) and
-  2026-10-08 (the phone result screen); the desktop result screen is as it
-  was recorded on 2026-09-29. The comparison passes on main (priority 19 says
-  how to record them again).
+- Visual baselines were last recorded on 2026-10-19 (the phone intro, #188)
+  and 2026-10-16 (the other five: both play screens and the desktop intro
+  with #160, both result screens with #154), all in the Playwright 1.62.1
+  container. #181 moved the library and the container to 1.64.1 without
+  recording them again, and the comparison passes on main at `8531b88` in the
+  1.64.1 container (priority 19 says how to record them again).
 - Every case is a pack, the finale included, and every card a pack writes is
   one object carrying its label, effect, voice line and reply (priority 74).
-  A generated card may also name its way of thinking (priority 12); 90 do.
+  A generated card may also name its way of thinking (priority 12); 95 do.
 - Every voice line has been read beside the scene it is said in (2026-10-05),
   and what the read-through found around the lines -- labels, replies, counts
   and dates that disagreed -- is reconciled against `docs/canon.md`.
@@ -107,6 +109,12 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
+- Six pull requests are open, all drafts: #183 (server checks, phase 1: mark
+  suspicious ranking seasons, refuse nothing), #190 (day 10's rules, combo
+  cap, five tool slots and ranking reset v9; not to merge, needs a rebase),
+  #196 (the goodwill a collapse takes back, copy only), #197 and #198 (scene
+  bust rates, server and client halves) and #199 (this week's rule, F7; not to
+  merge, for after day 10).
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
@@ -138,7 +146,7 @@ Still open, on purpose:
    before the runtime chunk is loaded, and the run's definition imports the
    table engine.
 2. Keep `GameRuntime.jsx` under its budget (960 lines, 96 imported names, no
-   line over 190 characters; 947 / 95 / 183 today). Every budgeted file has a
+   line over 190 characters; 943 / 96 / 183 today). Every budgeted file has a
    longest-line cap now, so a budget cannot be met by joining lines; a screen's
    bag of names belongs in a view model (`viewModels/resultViewModel.js` builds
    the report's). New derivations go into a hook of their own --
@@ -147,14 +155,15 @@ Still open, on purpose:
    log-derived readouts, memoised) are the pattern -- not into the component
    body. `npm run check:runtime-budget` holds the runtime, `gameData.js` and
    `gameLogic.js`, the play, result and report screens, the stage, and the
-   three view-bag sizes (79 / 27 / 108 fields against 80 / 28 / 110; a screen
+   three view-bag sizes (80 / 28 / 108 fields against 80 / 28 / 110; a screen
    takes its callbacks from `actions` and its renderers from `renderers`, and
    the view carries no second copy of either). The stage
-   (`src/gauntlet/GauntletStage.jsx`) is 809
-   lines and 68 imported names; the hand, the table's notices, the frame
-   variables and their clock, and the table's numbers are their own modules
-   (`GauntletHand.jsx`, `TableNotices.jsx`, `fxVariables.js`,
-   `tableRules.js`). `gameData.js` is 534 lines and 7 imported names against
+   (`src/gauntlet/GauntletStage.jsx`) is 808
+   lines and 67 imported names against 830 / 68; the hand, the table's
+   notices, the frame variables and their clock, the table's numbers, its
+   voice and the held 확정 are their own modules (`GauntletHand.jsx`,
+   `TableNotices.jsx`, `fxVariables.js`, `tableRules.js`, `tableVoice.js`,
+   `holdConfirm.js`). `gameData.js` is 560 lines and 7 imported names against
    560 / 7, now that no case writes into it; the graph build's last passes live
    in `src/nodes/sceneBuild.js`,
    which it reads through one namespace import. The scene plate is one file a
@@ -172,8 +181,15 @@ Still open, on purpose:
    heading or first control, to the report's heading last. A message that has
    to be announced goes into a live region that was mounted before the text
    arrived (the save status, the cloud panel's status and alert, the board's);
-   a region that mounts with its text in it is not read. An `aria-label` goes
-   on an element that has a role. Static English copy carries `lang="en"`.
+   a region that mounts with its text in it is not read. The table speaks
+   through one polite region (`useTableVoice`, `src/gauntlet/tableVoice.js`):
+   the heat and the danger line after a push, the LOCK charge's carried rule,
+   the pot and vault after a bank, the clock at ten and five seconds, and an
+   armed 확정; calls are 1.5 seconds apart and it falls silent when the window
+   closes, so the verdict is read once. An `aria-label` goes on an element
+   that has a role, and holds the control's visible text (axe 4.14's
+   `label-content-name-mismatch`, `@axe-core/playwright` 4.14.0). Static
+   English copy carries `lang="en"`.
 5. Put reusable Playwright flow behaviour in `tests/helpers/gameFlow.js`. Helpers
    click the way a player does: through the visible control, after it is
    enabled. Every spec takes `test` and `expect` from `tests/helpers/network.js`,
@@ -192,9 +208,11 @@ Still open, on purpose:
    as LF on any checkout): the build strips comments, so they were bytes no
    player downloads, and counting them made deleting a note the cheapest way
    to fit a rule. Each budget came down that day by exactly the comment lines
-   and bytes its sheet held, so no sheet gained room -- `base-intro-ranking.css`
-   is still 3 bytes under its number, `responsive.css` 12, `result.css` 39 --
-   and a comment costs nothing from here on. `comfort.css` is last on purpose, so a tie on specificity
+   and bytes its sheet held, so no sheet gained room, and a comment costs
+   nothing from here on. Room since has been made, not granted: #110 and #180
+   wrote repeated declaration blocks once under a grouped selector, and on
+   `8531b88` `play.css` is 1 byte under its 55,420 and `responsive.css` 4
+   under its 7,967. `comfort.css` is last on purpose, so a tie on specificity
    goes to the player's setting (priority 87). A `transition` never lists
    `box-shadow`, and `check-css-tokens.mjs` allows five hard-coded hex colours,
    the five there are. Type is sized in rem (16px root), so the reader's own
@@ -257,7 +275,7 @@ Still open, on purpose:
     (`inferChoiceCognition`), not from the card's position, unless the card
     names it: the reading cannot tell a negation ("빼지 않고") or a noun that
     contains a trigger word ("제안서"), so a card it reads wrongly carries an
-    explicit `cognition` (90 of 996 since 2026-10-06; one type, reframing at 2
+    explicit `cognition` (95 of 996 today; one type, reframing at 2
     and the rest at 1, held by `check:graph`; a card that names what its label
     already reads as fails a unit test). Do not reword a label to steer the
     reading. Cognition feeds the ending -- and that no column carries one axis as its
@@ -316,7 +334,8 @@ Still open, on purpose:
     `--preview` the probe compares the served `index.html` to
     `dist/index.html` for the same reason.
 19. Visual baselines are Linux only, recorded and compared in the digest-pinned
-    Playwright container. Record them with `npm run test:visual:docker --
+    Playwright container (`v1.64.1-noble` since #181, the version
+    `@playwright/test` is locked at). Record them with `npm run test:visual:docker --
     --update-snapshots`, or dispatch Visual Regression with
     `update_baselines=true` and merge the `visual-baselines/<run_id>` branch it
     pushes. `win32` and `darwin` files are gitignored, and
@@ -653,8 +672,9 @@ Still open, on purpose:
     panel when the last decision broke this board
     (`data-testid="protocol-breach"`). The page has its own reading clock,
     `getReadingSeconds(node)`, 12-95s; when it runs out the table opens by
-    itself. The clock is a button (`aria-pressed`) that holds and resumes it,
-    and it starts held when the player asked for that (priority 87).
+    itself. The clock is a switch (`role="switch"`, `aria-checked`, named 읽는
+    시간 멈춤, the seconds its description) that holds and resumes it, and
+    it starts held when the player asked for that (priority 87).
     `판 열기`/Space/Enter/W opens the table sooner, and a card button or number
     key opens it with that card staked (`openTable(cardId)` goes through the
     same authority gate as a click on the table). The page traps focus and
@@ -765,7 +785,14 @@ Still open, on purpose:
     one the server reads, and types, from the run's own `final` case row, and
     its public summary is built from an allow-list of typed keys of that row
     (`ranking_public_summary`, `20260929010000_telemetry_caps_and_ranking.sql`)
-    -- server-ordered and server-typed, not server-computed.
+    -- server-ordered and server-typed, not server-computed. Since
+    `20261014000000_telemetry_validator_parts.sql` (#182)
+    `validate_telemetry_insert` is a short body over nine helpers, one per
+    rule that has changed together (envelope, case row, replay, ranking
+    request, run, run marks, summary, limits, pace), with the same messages in
+    the same order; anon may execute none of them, and `check:grants` replays
+    72 rows through the old and the new definitions and fails on a difference.
+    The next rule change restates the one helper it is about.
     `season_case_ids()` is the database's copy of `CASE_SEQUENCE`, and
     `check:grants` fails when they differ, so a change to the season's cases
     needs a migration redefining it. Rate limits key on `request_client_key()`
@@ -1026,7 +1053,7 @@ Still open, on purpose:
     (1,000 a day for everyone). Telemetry has a byte budget as well as a row
     count: 32 MB a day for one address, charged by a trigger of its own that
     fires after the validator, and 200 MB a day for everyone. There
-    are 36 migrations and eight tables. `check:grants` also fails on a
+    are 42 migrations and eight tables. `check:grants` also fails on a
     SECURITY DEFINER function that does not pin `search_path` and on a view
     without `security_invoker`. The Migration Drift workflow compares the
     live project's migration history with `supabase/migrations/` once a day
@@ -1053,7 +1080,16 @@ Still open, on purpose:
     (raw / gzip), for the table's audit fixes: one gate for a card's click and
     key, a bust written before its slam, Space and Enter left to the focused
     control, presses graded where the pointer went down, readable names, and
-    frame variables that no longer restyle the whole table. Every chunk the
+    frame variables that no longer restyle the whole table. That number did
+    not move again: on 2026-10-19 the chunk stood at 104,323 once #179 and
+    #172, each within it alone, were both in -- main's first red -- and #191
+    split the table's sound (`src/gauntlet/gauntletAudio.js`) into a chunk of
+    its own, `tableAudio`, fetched with the table (`TABLE_AUDIO` in
+    `vite.config.js`), which took PlayScreen to 97,898 / 32,131. `tableAudio`
+    is held at 6,700 / 2,205 (6,676 / 2,166 measured; #185 moved it by what
+    the heartbeat's tension steps measured, and its gzip by the few bytes the
+    entry chunk's hashed name moves it in every build). Trim and split first;
+    a number moves only by what is still measured short. Every chunk the
     build emits has a budget, and a chunk without one fails. The ones that
     rose on 2026-10-06, each with its note beside the number: a case chunk,
     84,000 / 20,200 -> 98,900 / 25,400, because 사건 01 (thirty scenes, the
@@ -1092,7 +1128,12 @@ Still open, on purpose:
     (`event.code`: `KeyW`, `KeyP`, ...), because with a Hangul layout on
     `event.key` is a jamo. Space and Enter belong to whatever control the
     keyboard walked to with Tab; only with nothing such focused do they push
-    and cash. On the result screen `R` replays the case after asking and `N`
+    and cash. On a scene that closes the case (`isClosingScene`,
+    `src/gauntlet/holdConfirm.js`; about one a case) 확정 is held for 0.8
+    seconds (`HOLD_MS`), Enter and Space included, and a short press arms it
+    so a second press within 3 seconds confirms -- the path for a screen
+    reader's virtual click or a hand that cannot hold. On the result screen
+    `R` replays the case after asking and `N`
     opens the next one. Escape closes the ranking and the board from anywhere.
     With letter keys turned off (priority 87), 1-9, W, E, Q, P, R and N do
     nothing, and Space, Enter and Escape stay. What the screen says about a
