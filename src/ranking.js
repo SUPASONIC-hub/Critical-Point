@@ -74,6 +74,7 @@ function normalizeEntry(input = {}) {
   const caseId = toText(row.case_id);
   const completedAt = toText(row.completed_at);
   const localName = (toText(row.player_name) || "현재 분석관").slice(0, 24);
+  const seasonComplete = caseId === "season-final" || summary.seasonComplete === true;
   return {
     id: `${runTag || toText(row.session_code) || "local"}-${caseId || "case"}-${completedAt || "latest"}`,
     runId,
@@ -107,7 +108,12 @@ function normalizeEntry(input = {}) {
     style,
     league: getRankingLeague(style),
     integrity: getRankingIntegrity({ runId: runId || runTag, completedAt, summary: { rank: toText(summary.rank) } }),
-    seasonComplete: caseId === "season-final" || summary.seasonComplete === true,
+    seasonComplete,
+    // A season that ended in SYSTEM COLLAPSE keeps saying so on the board
+    // (improvement note C6). Its ending is the object the run kept on this
+    // device's rows and the id the server publishes on its own; a case row
+    // carries the season's standing at that case, so only a season row counts.
+    collapsed: seasonComplete && (summary.endingVariant?.id ?? summary.endingVariant) === "collapse",
     summary,
   };
 }

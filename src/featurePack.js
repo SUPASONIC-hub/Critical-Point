@@ -3,6 +3,7 @@ import { ENDING_GATES } from "./gameConstants.js";
 import { isPeopleFirstEffect } from "./gameLogic.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import { getOperatorProfile } from "./advancedSystems.js";
+import { getSeasonStanding } from "./seasonStanding.js";
 
 
 
@@ -112,6 +113,31 @@ export function getFailureRecovery(ending = {}, resources = {}) {
     ? `다음 시즌에는 벽에 닿은 판을 전체의 ${Math.round(collapseBustRate * 100)}% 아래로 줄이거나, 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseOverreachHarm} 아래로 닫으면 무너지지 않습니다.`
     : `다음 시즌에는 사건마다 ${harm}${objectParticle(harm)} 평균 ${collapseHarmPerCase} 아래로 닫으면 무너지지 않습니다.`;
   return { key, title: "RECOVERY ROUTE", text };
+}
+
+/** What a season that collapsed is marked with on the result card (improvement note C6). */
+export const COLLAPSED_SEASON_MARK = "붕괴한 시즌";
+
+/**
+ * What a collapse cost, in the words the collapse panel prints under its
+ * ending (improvement note C4). Only what the season's summaries hold: the
+ * case that closed on the most harm, as `getSeasonStanding` lists it, with its
+ * label, title and the harm it closed on. The season's mean harm is not
+ * repeated here; the report prints it beside this (`getFailureCause`).
+ * A season over the line on the table's harm alone has no closed case to
+ * name, and its toll is the first and last sentence.
+ *
+ * @param {{ caseResults?: Record<string, any>, resources?: Record<string, any>, cases?: Array<{ id: string, label: string, title: string }> }} [input]
+ */
+export function getCollapseToll({ caseResults = {}, resources = {}, cases = [] } = {}) {
+  const harm = easyResourceLabels.humanCost;
+  const [worst] = getSeasonStanding({ caseResults, resources }).harmCases;
+  const named = worst && cases.find((caseItem) => caseItem.id === worst.caseId);
+  return [
+    `${harm}${subjectParticle(harm)} 감당할 수 있는 선을 넘은 것으로 기록되었습니다.`,
+    named && `가장 큰 피해가 난 곳은 ${named.label} 「${named.title}」입니다. 그 사건 하나가 ${harm} ${worst.harm}${objectParticle(String(worst.harm))} 남겼습니다.`,
+    "그 값은 장부가 아니라, 당신의 판단을 기다리던 사람들이 치렀습니다.",
+  ].filter(Boolean).join(" ");
 }
 
 export function getOperationsSnapshot({ errors = [], pending = [], rankings = [], caseResults = {} } = {}) {
