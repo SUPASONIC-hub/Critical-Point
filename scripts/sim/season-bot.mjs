@@ -52,6 +52,7 @@ import {
   STANCE_CHARGE,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../../src/gauntlet/logicStreak.js";
+import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
@@ -61,6 +62,47 @@ import { createChoiceReaders } from "../../src/state/useDecision.js";
 // ---------------------------------------------------------------------------
 // The season player (check-endings.mjs).
 // ---------------------------------------------------------------------------
+
+/**
+ * The tools a full hand puts down first, weakest first (day 11, item 6). The
+ * first three are the ones `check:pressure` measured adding nothing alone
+ * (SPLINT, LOCKPICK, GLASS LENS, in the order the day-10 plan named them);
+ * the rest follow that report's "measured tools one at a time" from the
+ * least lift to the most, so INSURANCE is the last to go (measured
+ * 2026-10-16: HIGH ROLLER -1.8%, STEADY ANCHOR +0.1, ENCORE +1.3, COLD BLOOD
+ * +1.4, METRONOME +2.1, HEAT SINK +3.3, STETHOSCOPE +3.9, KINETIC GRIP +5.3,
+ * INSURANCE +8.7). HIGH ROLLER measures below the first three; it follows
+ * them because the plan named those three.
+ */
+export const RELIC_DROP_ORDER = Object.freeze([
+  "splint",
+  "lockpick",
+  "glassLens",
+  "highRoller",
+  "steadyAnchor",
+  "encore",
+  "coldBlood",
+  "metronome",
+  "heatSink",
+  "stethoscope",
+  "kineticGrip",
+  "insurance",
+]);
+
+/**
+ * A draft answered against the slots. Under `RELIC_SLOTS` the taken tool goes
+ * in; with them full the weakest of the held tools and the taken one is put
+ * down -- the taken one itself means a pass (`tools.weakest`, when the tool
+ * table has its own reading of weak, picks instead). `tools.swapped` hears which, so
+ * the tool table counts what was kept, not what was reached for.
+ */
+export function takeIntoSlots(run, taken, tools = null) {
+  if (!taken || run.relics.length < RELIC_SLOTS) return equipRelic(run, taken);
+  const rank = (id) => RELIC_DROP_ORDER.indexOf(id);
+  const weakest = tools?.weakest?.([...run.relics, taken]) ?? [...run.relics, taken].reduce((low, id) => (rank(id) < rank(low) ? id : low));
+  tools?.swapped?.(taken, weakest);
+  return weakest === taken ? equipRelic(run, null) : equipRelic(run, taken, weakest);
+}
 
 /** How a card reads to a player who values these axes. Costs are negative. */
 export const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -179,6 +221,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * for every season before them: it settles a window against a codex as the
    * runtime does, takes the draft its own way and may play the tool hand. Left
    * out, the draft is the five tools that need no unlock, one taken at random.
+   * Either way a full hand swaps (`takeIntoSlots`); five tools from a pool of
+   * five never fill past the slots, so the seasons before the tool table never do.
    */
   function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
     const policy = makePolicy(archetype);
@@ -316,7 +360,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           };
           caseResults[caseId] = summary;
           casePeaks.push(summary.peakRiskPressure);
-          if (run.relicOffer.length) run = equipRelic(run, tools ? tools.draft(run) : pick(run.relicOffer));
+          if (run.relicOffer.length) run = takeIntoSlots(run, tools ? tools.draft(run) : pick(run.relicOffer), tools);
           if (caseId === "final") final = { resources, log };
         }
         nodeId = nextNode;

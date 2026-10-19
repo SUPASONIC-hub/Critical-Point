@@ -13,11 +13,11 @@ import {
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicType } from "../src/gauntlet/logicStreak.js";
-import { DEFAULT_RELIC_POOL, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
+import { DEFAULT_RELIC_POOL, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { createCaseBot, handUnit, newSeen } from "./sim/season-bot.mjs";
+import { createCaseBot, handUnit, newSeen, RELIC_DROP_ORDER } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -756,10 +756,13 @@ for (const row of [bestFixed, fixed.find((entry) => entry.label === "heat 60"), 
  * relic rows above play each tool alone and all twelve at once; a cap asks
  * about the sets between. The same hand on the same cases holds the five
  * tools that need no unlock (a first season), the seven a feat unlocks, and
- * the builds a cap of 3, 5 or 8 slots would leave a player who keeps the
+ * the builds a cap of 3 or 5 slots would leave a player who keeps the
  * tools that lift best play most when held alone (the rows above, so the
  * order is read, not written here). "Of the whole lift" is the share of what
- * all twelve add to listening play that the set keeps.
+ * all twelve add to listening play that the set keeps. Since day 11 the table
+ * holds `RELIC_SLOTS` (5) and a full hand swaps; "the swap keeps" is the five
+ * the season bot's swap ends with once everything is unlocked
+ * (`RELIC_DROP_ORDER`, written there and not read from here).
  */
 const liftOf = (row) => row.listen.meanVault / relicBaseline.listen.meanVault;
 const everyTool = relicReport[relicReport.length - 1];
@@ -768,7 +771,8 @@ console.log(`measured tools one at a time, by what it adds to listening play: ${
 const toolSets = [
   ["the 5 from the start", DEFAULT_RELIC_POOL],
   [`the ${RELIC_IDS.length - DEFAULT_RELIC_POOL.length} a feat unlocks`, RELIC_IDS.filter((id) => RELICS[id].unlock)],
-  ...[3, 5, 8].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
+  ...[3, 5].map((slots) => [`best ${slots} alone`, ranked.slice(0, slots).map((row) => row.name)]),
+  ["the swap keeps", RELIC_DROP_ORDER.slice(-RELIC_SLOTS)],
   ...[3, 5].map((slots) => [`worst ${slots} alone`, ranked.slice(-slots).map((row) => row.name)]),
 ];
 for (const [name, relics] of toolSets) {

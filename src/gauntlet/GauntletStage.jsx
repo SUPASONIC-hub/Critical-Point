@@ -108,6 +108,8 @@ export function GauntletStage({
   // A closed case's draft takes the breach's place: REBOOT is what it replaces.
   const draftPending = relicOffer.length > 0 && Boolean(onPickRelic) && !abandoned;
   const [equipped, setEquipped] = useState(null);
+  // The offered relic waiting for a slot: with the slots full, taking one asks what to put down.
+  const [swapFor, setSwapFor] = useState(null);
   const [relicPulse, setRelicPulse] = useState(null);
   const [impact, setImpact] = useState(null);
   const [flash, setFlash] = useState(null);
@@ -321,15 +323,23 @@ export function GauntletStage({
    * Takes a drafted relic, or passes with null. The window on the table has not
    * been touched -- the draft holds the clock -- so it is re-dealt at once under
    * the rules the relic bends, from the same pure function the runtime saves.
+   * With the slots full the engine takes nothing until a relic is put down
+   * (`dropId`), so the first answer only opens the swap step.
    */
-  function pickRelic(relicId) {
+  function pickRelic(relicId, dropId = null) {
     if (!draftOpen) return;
     if (relicId) {
-      dispatch({ type: "REDEAL", schema: getTableSchema(equipRelic(run, relicId)) });
+      const next = equipRelic(run, relicId, dropId);
+      if (next.relicOffer.length) {
+        setSwapFor(relicId);
+        return;
+      }
+      dispatch({ type: "REDEAL", schema: getTableSchema(next) });
       playRelicEquipCue();
-      setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1 }));
+      setEquipped((previous) => ({ id: relicId, n: (previous?.n ?? 0) + 1, dropped: dropId }));
     }
-    onPickRelic(relicId);
+    setSwapFor(null);
+    onPickRelic(relicId, dropId);
   }
 
   function pulseRelic(id) {
@@ -408,7 +418,8 @@ export function GauntletStage({
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
     cycleFocusMode: stanceOn ? cycleFocusMode : null,
-    cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable,
+    cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null),
+    briefingOpen, tableOpen, openTable,
   });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
@@ -771,7 +782,7 @@ export function GauntletStage({
       </div>
 
       {draftOpen && (
-        <RelicDraft offer={relicOffer} owned={relics} onPick={pickRelic} onSkip={() => pickRelic(null)} />
+        <RelicDraft offer={relicOffer} owned={relics} swapFor={swapFor} onPick={pickRelic} onBack={() => setSwapFor(null)} onSkip={() => pickRelic(null)} />
       )}
 
       {briefingOpen && (

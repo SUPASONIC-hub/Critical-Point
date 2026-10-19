@@ -51,6 +51,7 @@ import {
   normalizeRelicIds,
   RELIC_IDS,
   RELIC_OFFER_SIZE,
+  RELIC_SLOTS,
   RELICS,
   STANCE_RELIC_UNLOCK_COUNT,
 } from "../src/gauntlet/relics.js";
@@ -1235,6 +1236,33 @@ test("a closed case drafts three relics it cannot reroll, and equipping takes on
   assert.deepEqual([passed.relics, passed.relicOffer], [[], []]);
   const roundTrip = normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(picked))));
   assert.deepEqual(roundTrip, picked, "relics survive a save");
+});
+
+test("a draft with the slots full takes a relic only by putting one down, in one answer", () => {
+  const carried = ["metronome", "coldBlood", "heatSink", "highRoller", "splint"];
+  assert.equal(carried.length, RELIC_SLOTS);
+  const settled = resolveWindow({
+    run: normalizeRunState({ relics: carried, schema: applyRelics(BASE_SCHEMA, carried) }),
+    window: { status: "cashed", gauge: 20, pushes: 2, seed: "case01:9" },
+    card: card("a", { capital: 9 }),
+    caseClosed: true,
+    offerRelics: true,
+    relicPool: [...carried, "lockpick", "encore", "insurance"],
+  }).nextRun;
+  const opened = openCaseRun(settled);
+  const [take] = opened.relicOffer;
+  assert.deepEqual(equipRelic(opened, take), opened, "full and nothing put down: the offer stays");
+  assert.deepEqual(equipRelic(opened, take, "lockpick"), opened, "only a carried relic can be put down");
+  const swapped = equipRelic(opened, take, "highRoller");
+  assert.deepEqual(swapped.relics, carried.map((id) => (id === "highRoller" ? take : id)), "the new relic takes the slot it freed");
+  assert.deepEqual(swapped.relicOffer, []);
+  assert.ok(!swapped.schema.relics.includes("highRoller"), "the board on the table is dealt without it");
+  assert.ok(swapped.schema.wallMin > opened.schema.wallMin, "HIGH ROLLER's closer wall goes with it");
+  assert.deepEqual(equipRelic(opened, null).relics, carried, "a pass keeps all five");
+  const old = normalizeRunState({ ...opened, relics: [...carried, "lockpick"] });
+  assert.equal(old.relics.length, RELIC_SLOTS + 1, "a season saved before the cap keeps what it carries");
+  assert.deepEqual(equipRelic(old, old.relicOffer[0]), old);
+  assert.equal(equipRelic(old, old.relicOffer[0], "splint").relics.length, RELIC_SLOTS + 1, "and swaps, never grows");
 });
 
 test("a window is re-dealt by a relic only while nobody has touched it", () => {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
 import { getEndingVariant, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
-import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELICS } from "../src/gauntlet/relics.js";
+import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot, POPULATION } from "./sim/season-bot.mjs";
 
@@ -385,7 +385,7 @@ if (reportMode) {
   const commonest = [...builds.entries()].sort((a, b) => b[1] - a[1])[0];
   const wholePool = populationBuilds.filter((relics) => DEFAULT_RELIC_POOL.every((id) => relics.includes(id))).length;
   console.log(
-    `Tools at the season's end (measured, the ${SEASONS} seasons above; ${RELIC_IDS.length} tools, ${DEFAULT_RELIC_POOL.length} in the draft from the start, one taken at random from each draft): held ${fiveNumbers(populationBuilds.map((relics) => relics.length))}; ${builds.size} different sets; the commonest set closes ${commonest[1]} seasons (${commonest[0].split("+").length} tools); ${wholePool} seasons hold every tool the draft starts with`,
+    `Tools at the season's end (measured, the ${SEASONS} seasons above; ${RELIC_IDS.length} tools, ${DEFAULT_RELIC_POOL.length} in the draft from the start, one taken at random from each draft, ${RELIC_SLOTS} slots): held ${fiveNumbers(populationBuilds.map((relics) => relics.length))}; ${builds.size} different sets; the commonest set closes ${commonest[1]} seasons (${commonest[0].split("+").length} tools); ${wholePool} seasons hold every tool the draft starts with`,
   );
   const cards = Object.values(nodes).flatMap((node) => (node.choices ?? []).filter((choice) => choice.type !== "reframe"));
   const burns = cards.map((choice) => Math.abs(getCardBurn(choice)?.value ?? 0));
@@ -421,7 +421,11 @@ if (reportMode) {
  * the bands.
  *
  * The draft. `random` takes one of the offered tools at random and never
- * passes, as the seasons above do. A season offers 51 drafts and has 12 tools,
+ * passes, as the seasons above do. Since day 11 the hand holds `RELIC_SLOTS`
+ * (5): a full hand swaps, putting down the weakest of what it holds and what
+ * it took (`takeIntoSlots`, `RELIC_DROP_ORDER` in the season bot) -- a pass
+ * when the taken tool is the weakest. The paragraph below is the uncapped
+ * table, the one the cap was decided on. A season offers 51 drafts and has 12 tools,
  * so any hand that never passes ends with every tool in its pool: under no cap
  * the sets a season ends with say nothing about the policy, and "taken of
  * offered" is one in the size of the offer. `need` takes the offered tool the
@@ -431,11 +435,11 @@ if (reportMode) {
  * two bracket a player: `random` is the widest the builds can spread, `need`
  * the narrowest a hand that reads its own play would leave them.
  */
-function toolTable({ codex = [], learns = false, hand = false, slots = Infinity, policy = "random" } = {}) {
+function toolTable({ codex = [], learns = false, hand = false, slots = Infinity, policy = "random", drop = "order" } = {}) {
   const count = (map, key) => {
     map[key] = (map[key] ?? 0) + 1;
   };
-  const table = { codex: [...codex], hand, caseNumber: 0, featAt: {}, offered: {}, picked: {}, drafts: 0, passes: 0, lastTakeAt: 0, need: {} };
+  const table = { codex: [...codex], hand, caseNumber: 0, featAt: {}, offered: {}, picked: {}, dropped: {}, drafts: 0, passes: 0, swaps: 0, lastTakeAt: 0, need: {} };
   table.dealHand = () => ({ mode: ["strike", "steady", "strike", "steady", "expose"][table.caseNumber % 5], locks: random() < 0.5, walks: random() < 0.04 });
   table.settle = (settlement) => {
     const settled = resolveWindow(settlement);
@@ -462,6 +466,18 @@ function toolTable({ codex = [], learns = false, hand = false, slots = Infinity,
     count(table.picked, taken);
     table.lastTakeAt = table.caseNumber;
     return taken;
+  };
+  // A full hand's swap: by the bot's fixed order (`RELIC_DROP_ORDER`), or `need`, the tool this season has had least use for.
+  if (drop === "need") table.weakest = (ids) => ids.reduce((low, id) => (needOf(id) < needOf(low) ? id : low));
+  // The slots were full (`takeIntoSlots`): the taken tool went in for `dropped`, or was itself put back.
+  table.swapped = (taken, dropped) => {
+    if (dropped === taken) {
+      table.picked[taken] -= 1;
+      table.passes += 1;
+      return;
+    }
+    table.swaps += 1;
+    count(table.dropped, dropped);
   };
   return table;
 }
@@ -496,12 +512,14 @@ if (reportMode) {
     const endings = tally((entry) => entry.season.ending.id);
     const whole = played.filter((entry) => getRelicPool(entry.table.codex).every((id) => entry.season.relics.includes(id))).length;
     console.log(
-      `  ${name}: ${sets.length} different sets in ${TOOL_SEASONS} seasons; tools held at the end ${held.map(([size, seasons]) => `${size}: ${seasons}`).join(", ")}; every tool of its pool held in ${whole} seasons; the last tool is taken as case ${fiveNumbers(played.map((entry) => entry.table.lastTakeAt))} of ${CASE_SEQUENCE.length} closes; drafts with a tool on offer ${(sum((entry) => entry.table.drafts) / TOOL_SEASONS).toFixed(1)} a season, passed ${(sum((entry) => entry.table.passes) / TOOL_SEASONS).toFixed(1)}; banked a season ${fiveNumbers(played.map((entry) => entry.seen.banked))} (mean ${Math.round(total.banked / TOOL_SEASONS)}); windows a season ${(total.windows / TOOL_SEASONS).toFixed(0)}, bust on ${per(total.busts, total.windows)}%`,
+      `  ${name}: ${sets.length} different sets in ${TOOL_SEASONS} seasons; tools held at the end ${held.map(([size, seasons]) => `${size}: ${seasons}`).join(", ")}; every tool of its pool held in ${whole} seasons; the last tool is taken as case ${fiveNumbers(played.map((entry) => entry.table.lastTakeAt))} of ${CASE_SEQUENCE.length} closes; drafts with a tool on offer ${(sum((entry) => entry.table.drafts) / TOOL_SEASONS).toFixed(1)} a season, passed ${(sum((entry) => entry.table.passes) / TOOL_SEASONS).toFixed(1)}, swapped ${(sum((entry) => entry.table.swaps) / TOOL_SEASONS).toFixed(1)}; banked a season ${fiveNumbers(played.map((entry) => entry.seen.banked))} (mean ${Math.round(total.banked / TOOL_SEASONS)}); windows a season ${(total.windows / TOOL_SEASONS).toFixed(0)}, bust on ${per(total.busts, total.windows)}%`,
     );
     console.log(`    sets: ${sets.slice(0, 5).map(([key, seasons]) => `${key} ${per(seasons, TOOL_SEASONS)}%`).join("; ")}`);
     console.log(`    endings: ${EXPECTED.map((id) => `${id} ${endings.get(id) ?? 0}`).join(", ")}`);
     const offeredOf = (id) => sum((entry) => entry.table.offered[id] ?? 0);
     console.log(`    taken of offered: ${RELIC_IDS.filter((id) => offeredOf(id) > 0).map((id) => `${id} ${sum((entry) => entry.table.picked[id] ?? 0)}/${offeredOf(id)}`).join(", ")}`);
+    const droppedOf = (id) => sum((entry) => entry.table.dropped[id] ?? 0);
+    if (RELIC_IDS.some((id) => droppedOf(id) > 0)) console.log(`    put down in a swap: ${RELIC_IDS.filter((id) => droppedOf(id) > 0).map((id) => `${id} ${droppedOf(id)}`).join(", ")}`);
     const feats = UNLOCKABLE.map((id) => {
       const cases = played.map((entry) => entry.table.featAt[id]).filter(Boolean);
       return `${id} ${cases.length}${cases.length ? ` (${fiveNumbers(cases)})` : ""}`;
@@ -520,8 +538,10 @@ if (reportMode) {
   const first = playTools("a new codex, first season", { hand: true, learns: true });
   playTools("the same codex, second season", { hand: true, learns: true }, (index) => first[index].table.codex);
   playTools("everything unlocked", { hand: true, codex: UNLOCKABLE });
-  console.log(" a cap tried by passing (the tool hand, everything unlocked; no swap: the first tools taken are the ones kept):");
-  for (const slots of [3, 5, 8]) {
+  console.log(` the swap at ${RELIC_SLOTS} slots read another way (the tool hand, everything unlocked; the rows above put down by the bot's fixed order):`);
+  for (const policy of ["random", "need"]) playTools(`${policy} draft, the least-needed put down`, { hand: true, codex: UNLOCKABLE, policy, drop: "need" });
+  console.log(` a cap tried by passing (the tool hand, everything unlocked; no swap: the first tools taken are the ones kept; the table swaps at ${RELIC_SLOTS}, so a cap above it is not tried):`);
+  for (const slots of [3, 5]) {
     for (const policy of ["random", "need"]) playTools(`${slots} slots, ${policy} draft`, { hand: true, codex: UNLOCKABLE, slots, policy });
   }
 }

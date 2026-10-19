@@ -61,6 +61,7 @@ function table(state = {}) {
       cash: note("cash"),
       cycleFocusMode: note("stance"),
       pickRelic: note("relic"),
+      cancelSwap: note("cancel"),
       openTable: note("open"),
       ...state,
     },
@@ -249,6 +250,20 @@ test("the briefing and the draft take their keys once, and leave their own butto
     assert.equal(own.defaultPrevented, false, `the draft's ${tag} answers Space`);
   }
   assert.equal(draft.calls.length, 1);
+});
+
+test("with the relic slots full, a number puts down the relic in that slot and Escape goes back to the offer", () => {
+  const swap = table({ draftOpen: true, tableOpen: false, relicOffer: ["metronome", "splint"], swapFor: "encore", relics: ["coldBlood", "heatSink", "lockpick"] });
+  handleTableKey(keydown({ key: "2", code: "Digit2" }), swap.current);
+  // A slot with nothing in it is not a key of the swap, and the offer's numbers are not read behind it.
+  const empty = keydown({ key: "5", code: "Digit5" });
+  handleTableKey(empty, swap.current);
+  assert.equal(empty.defaultPrevented, false);
+  const stray = keydown({ key: " " });
+  handleTableKey(stray, swap.current);
+  assert.equal(stray.defaultPrevented, true, "Space on the table behind the swap is swallowed");
+  handleTableKey(keydown({ key: "Escape", code: "Escape" }), swap.current);
+  assert.deepEqual(swap.calls, [["relic", "encore", "heatSink"], ["cancel"]]);
 });
 
 test("no key reaches a table that is closed, covered or typed over", () => {

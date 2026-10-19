@@ -172,14 +172,17 @@ const STEPS = [
   {
     caseId: "prologue05",
     adds: ["stance", "relics"],
-    // What a charge does once LOCK is at its own cap (`LOCK_CAP`): nothing to
-    // this hand's multiplier, and the stance's carry if it reached
-    // `STANCE_CHARGE` (`applyFocusCarry`). STEADY's relief is taken off the
-    // heat there is, so on a cold board before the first push it cools nothing.
-    // A story run is told no promise about the next board, so not the second.
-    storyIntro: [0, 2],
+    // The second line is the relic slots (RELIC_OFFER_SIZE and RELIC_SLOTS in
+    // relics.js, written out like SCOUT's numbers). The third is what a charge
+    // does once LOCK is at its own cap (`LOCK_CAP`): nothing to this hand's
+    // multiplier, and the stance's carry if it reached `STANCE_CHARGE`
+    // (`applyFocusCarry`). STEADY's relief is taken off the heat there is, so
+    // on a cold board before the first push it cools nothing. A story run is
+    // told no promise about the next board, so not the third.
+    storyIntro: [0, 1, 3],
     intro: [
       "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다.",
+      "사건이 닫힐 때마다 도구 3개 중 하나를 고릅니다. 도구는 5개까지 들고, 다 차면 하나를 내려놓고 바꿉니다.",
       `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
       "STEADY는 데워진 열기만 식힙니다. 한 번 민 뒤에 충전하십시오.",
     ],

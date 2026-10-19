@@ -109,6 +109,7 @@ export function TableNotices({ equipped, tab, voice, slam, onReload, onClaim, on
           <RelicIcon id={equipped.id} size={18} />
           <span>장착</span>
           <b lang="en">{RELICS[equipped.id].label}</b>
+          {equipped.dropped && <span>· {RELICS[equipped.dropped].name} 내려놓음</span>}
         </div>
       )}
       {lost && <LostToTab onReload={onReload} />}

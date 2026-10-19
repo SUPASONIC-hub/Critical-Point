@@ -1,7 +1,7 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
 import { advanceLogic, getHeatTier, getLogicBonus, getLogicType, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
-import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE } from "./relics.js";
+import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_OFFER_SIZE, RELIC_SLOTS } from "./relics.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -1063,15 +1063,47 @@ export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
     .map((entry) => entry.id);
 }
 
+const NO_STANCE_RULES = Object.freeze({ has: (id) => id !== "stance" });
+
+/**
+ * The board on the table dealt again without one relic. `applyRelics` only
+ * adds, so the board is laid again the way it was laid -- the REBOOT board a
+ * closed case deals, or the base board `openCaseRun` lays -- and kept only if
+ * laying it with every relic it carries gives back the board on the table.
+ * Whether the case has `stance` is read off the same test (the board is the
+ * only place it is written). A board that cannot be laid again keeps what it
+ * was dealt, and the relic put down is gone from the next board on.
+ */
+function redealWithout(schema, relics, run) {
+  const windowIndex = getEscalationWindow(run);
+  const want = JSON.stringify(schema);
+  for (const base of [{ ...BASE_SCHEMA, mutations: ["reboot"] }, BASE_SCHEMA]) {
+    for (const rules of [ALL_RULES, NO_STANCE_RULES]) {
+      const laid = applySeasonEscalation(applyStanceMastery(base, run.stanceMastery, rules), windowIndex);
+      if (JSON.stringify(applyRelics(laid, schema.relics)) === want) return applyRelics(laid, relics);
+    }
+  }
+  return schema;
+}
+
 /**
  * Takes (or passes on) the relic a closed case offered. The board on the table
  * is re-dealt with it at once; a pass clears the offer and changes nothing else.
+ *
+ * With `RELIC_SLOTS` full, taking one is a swap: `dropId` names the relic put
+ * down, in the same call, so no half-made swap is ever saved and the save's
+ * shape does not change. A take with the slots full and nothing put down
+ * changes nothing -- the offer stays, and the draft asks what to put down. The
+ * relic put down goes where it stood, and the board is dealt without it.
  */
-export function equipRelic(run, relicId = null) {
+export function equipRelic(run, relicId = null, dropId = null) {
   const current = normalizeRunState(run);
   const picked = relicId && current.relicOffer.includes(relicId) ? relicId : null;
-  const relics = picked ? [...current.relics, picked] : current.relics;
-  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(current.schema, relics) });
+  const dropped = picked && current.relics.length >= RELIC_SLOTS && current.relics.includes(dropId) ? dropId : null;
+  if (picked && current.relics.length >= RELIC_SLOTS && !dropped) return current;
+  const relics = !picked ? current.relics : dropped ? current.relics.map((id) => (id === dropped ? picked : id)) : [...current.relics, picked];
+  const board = dropped ? redealWithout(current.schema, relics, current) : current.schema;
+  return normalizeRunState({ ...current, relics, relicOffer: [], schema: applyRelics(board, relics) });
 }
 
 /** What a practice run borrowed, handed back. */

@@ -40,7 +40,9 @@ function letterOf(event) {
 /**
  * The table's keys: 1-9 stake a card, Space or W pushes, E locks focus, Q
  * cycles the stance, Enter cashes. On the draft, 1-3 take a relic and Escape
- * passes; on the briefing page, Space, Enter, W or a card key opens the table.
+ * passes; with the slots full, 1-9 then put down a carried relic and Escape
+ * goes back to the offer; on the briefing page, Space, Enter, W or a card key
+ * opens the table.
  *
  * E and Q are the table's only while the case has LOCK and the stances on
  * (`tableUnlocks`): the stage hands over no `focus` or `cycleFocusMode` before
@@ -177,6 +179,14 @@ export function handleTableKey(event, current, walked = false) {
   if (current.draftOpen) {
     // The draft is the decision on screen: nothing reaches the table behind it.
     if (activation && isDialogButton(event.target, ".gx-draft")) return;
+    // The swap step: 1-9 put down the relic in that slot, Escape goes back to the offer.
+    if (current.swapFor) {
+      const drop = current.relics?.[Number(key) - 1];
+      if (key === "Escape") take(() => current.cancelSwap());
+      else if (drop) take(() => current.pickRelic(current.swapFor, drop));
+      else if (activation) event.preventDefault();
+      return;
+    }
     const pick = key === "Escape" ? null : current.relicOffer[Number(key) - 1];
     if (key === "Escape" || pick) take(() => current.pickRelic(pick ?? null));
     else if (activation) event.preventDefault();
