@@ -18,7 +18,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
     common: { AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase },
     scene: { node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge },
     gauntlet: { gauntletRun, gauntletSeed, isAdvancing, fixedChoices, clueCount, casesOpened, reframeChoice, decisionRevealOpen, staleSave, auditCount },
-    status: { resources, resourceMeta, progress, routeIndex, routeLength },
+    status: { resources, resourceMeta, progress, routePath },
     debug: { debugToolsEnabled, fallbackCaseId, silentFailureCount },
   } = view;
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus } = renderers;
@@ -82,7 +82,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
             <b>{fallbackCaseId} / {resolvedNodeId}</b>
           </div>
           <dl>
-            <div><dt>path</dt><dd>{Math.max(0, routeIndex) + 1}/{routeLength}</dd></div>
+            <div><dt>path</dt><dd>{routePath}</dd></div>
             <div><dt>run</dt><dd>w{gauntletRun.windowIndex} pot {gauntletRun.runPot} vault {gauntletRun.vault}</dd></div>
             <div><dt>resources</dt><dd>{Object.entries(resources).map(([key, value]) => `${key}:${value}`).join(" ")}</dd></div>
             <div><dt>silent</dt><dd>{silentFailureCount}</dd></div>

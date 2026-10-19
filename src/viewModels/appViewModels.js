@@ -115,7 +115,8 @@ export const viewGroups = {
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
       "decisionRevealOpen", "staleSave", "auditCount",
     ],
-    status: ["resources", "resourceMeta", "progress", "routeIndex", "routeLength"],
+    // The debug overlay's path, one string since 2026-10-19 (it was two numbers), so the audit count fits the budget.
+    status: ["resources", "resourceMeta", "progress", "routePath"],
     debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],
   },
 };
