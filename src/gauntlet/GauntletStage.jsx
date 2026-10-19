@@ -19,7 +19,6 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
-  getWindowBand,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { isClosingScene } from "./holdConfirm.js";
@@ -29,10 +28,10 @@ import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
-import { GAUGE_MARKS, LOCK_PRESS_SECONDS, SCOUT_SECONDS } from "./tableRules.js";
+import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
-import { LogicLine, RelicChips, TableGlossary, TableNotices } from "./TableNotices.jsx";
+import { LogicLine, RelicChips, ScoutBand, TableGlossary, TableNotices } from "./TableNotices.jsx";
 import {
   playBustCue,
   playCashCue,
@@ -161,7 +160,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band,
   } = readTableMeters({ win, schema, selectedCard });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -173,8 +172,6 @@ export function GauntletStage({
   const canCash = live && !paused && Boolean(selectedCard) && !sealedLock;
   const canFocus = canCash && win.focus < FOCUS_MAX;
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
-  // The band the window draws: the board's, or the narrower one SCOUT bought.
-  const band = getWindowBand(win);
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
   const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
@@ -209,10 +206,7 @@ export function GauntletStage({
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
   const canScout = scoutOn && live && !paused && !locked && !win.scouted;
-  // STEADY's relief comes off the heat there is (`FOCUS` in the engine clamps
-  // at 0), so on a cold board -- before the first push -- a press cools
-  // nothing. The stance line says "민 뒤", and the LOCK button says it again
-  // while it is true.
+  // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const handBlocked = !live || isAdvancing || !tableOpen;
@@ -588,16 +582,7 @@ export function GauntletStage({
             <span aria-hidden="true">
               열기 <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            {/* SCOUT sits on the band it narrows: no fourth button in the dock at 360px. Spent, the button
-                stays where it was, aria-disabled, so a focus on it is not dropped to the page. */}
-            {canScout || band.scouted ? (
-              <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={scout} aria-disabled={!canScout}
-                aria-keyshortcuts={canScout ? keys("R") : undefined} aria-label={band.scouted ? undefined : `벽 조회, 시간 ${SCOUT_SECONDS}초`}>
-                벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : `조회 −${SCOUT_SECONDS}초`}
-              </button>
-            ) : (
-              <span className="gx-band-label" aria-hidden="true">벽 {band.wallMin}–{band.wallMax}</span>
-            )}
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
             {/* Each push makes the clock heat the gauge faster; said once it is.
                 In this one-line row and before the pulse, so it moves nothing:
                 in the bank rail it wrapped to a second line at 360px. */}

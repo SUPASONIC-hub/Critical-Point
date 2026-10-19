@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { migrateSavedState, SAVE_SCHEMA_VERSION } from "../../src/appConfig.js";
 import { BASE_SCHEMA, createWindow, getWindowBand, reduceWindow, suspendWindow } from "../../src/gauntlet/gauntletEngine.js";
+import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { SCOUT_REACH, SCOUT_SECONDS } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, rulesFor } from "../../src/gauntlet/tableUnlocks.js";
 
@@ -54,4 +56,22 @@ test("a v2 save reaches v3 with its put-down window marked as not looked at", ()
   assert.equal(v3.dynamics.suspended.window.scouted, false);
   assert.equal(migrateSavedState({ saveSchemaVersion: 1 }).saveSchemaVersion, 3, "a v1 save steps through v2");
   assert.equal(migrateSavedState({ saveSchemaVersion: 4 }), null, "a save from a newer build is not read");
+});
+
+test("the stage reads the band it draws off the meters, and SCOUT's button is ScoutBand's", () => {
+  // Both moved out of GauntletStage on 2026-10-19, to keep it inside 830 lines and 68 names.
+  const fresh = createWindow({ schema: BASE_SCHEMA, seed: "scout:meters" });
+  const looked = reduceWindow(fresh, { type: "SCOUT" }, ALL_RULES);
+  for (const win of [fresh, looked]) {
+    assert.deepEqual(readTableMeters({ win, schema: win.schema, selectedCard: null }).band, getWindowBand(win));
+  }
+  const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
+  assert.ok(!stage.includes("getWindowBand") && !stage.includes("gx-band-label"), "the stage draws no band of its own");
+  assert.match(stage, /<ScoutBand band=\{band\} canScout=\{canScout\} onScout=\{scout\} shortcut=\{canScout \? keys\("R"\) : undefined\} \/>/);
+  const notices = readFileSync(new URL("../../src/gauntlet/TableNotices.jsx", import.meta.url), "utf8");
+  const scoutBand = notices.slice(notices.indexOf("export function ScoutBand("), notices.indexOf("export function TableGlossary("));
+  // Before the case has SCOUT, the plain label; after, the button, which stays put once spent.
+  assert.match(scoutBand, /if \(!canScout && !band\.scouted\) return <span className="gx-band-label" aria-hidden="true">/);
+  assert.match(scoutBand, /data-testid="commit-scout" onClick=\{onScout\} aria-disabled=\{!canScout\}/);
+  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : `벽 조회, 시간 \$\{SCOUT_SECONDS\}초`\}/);
 });
