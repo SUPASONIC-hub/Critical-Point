@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { formatNumber, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicType } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
@@ -18,6 +18,20 @@ export { formatNumber };
 export function formatMultiplier(value) {
   const multiplier = Number(value) || 0;
   return multiplier >= 10 ? `×${Math.floor(multiplier)}` : `×${(Math.floor(multiplier * 10 + 1e-9) / 10).toFixed(1)}`;
+}
+
+/**
+ * How much faster the clock heats the gauge after this many pushes
+ * (`getClockHeatRate`), for the bank rail: nothing before the first push, then
+ * `×1.12`, `×1.24`... Two decimals, because a step is 0.12 and the table's
+ * one-decimal floor (`formatMultiplier`) would print ×1.12 and ×1.19 alike.
+ * The spoken name says what grows -- the heat, not the seconds.
+ */
+export function describeClockHeat(pushes) {
+  const rate = getClockHeatRate(pushes);
+  if (!(rate > 1)) return null;
+  const value = (Math.round(rate * 100) / 100).toFixed(2);
+  return { text: `×${value}`, spoken: `시계가 올리는 열기 ${value}배` };
 }
 
 /**
@@ -326,7 +340,8 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
   const streak = run?.streak ?? 0;
   const { focusMode } = win;
   const indebted = win.gauge >= HEAT_DEBT_GAUGE;
-  const pushed = win.pushes > 0;
+  const { pushes } = win;
+  const pushed = pushes > 0;
   const stanceEarned = win.focus >= STANCE_CHARGE && win.focusHits > 0;
   const stanceMastery = run?.stanceMastery;
   // The board after this window is the season's next one, and it leans in on
@@ -397,7 +412,8 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       overdrive: getOverdriveCopy({ streak, hot, cashMutations }),
       // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
       bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
+      clockHeat: describeClockHeat(pushes),
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
 }

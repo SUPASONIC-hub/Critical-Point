@@ -385,7 +385,8 @@ test("the heartbeat number is read out by name, and is not announced as it chang
 });
 
 // The row under the gauge is one line on every phone the table promises to
-// fit, upright and on its side, at the fastest pulse there is.
+// fit, upright and on its side, at the fastest pulse there is, with the
+// clock's heat rate a push puts in it.
 test("the heartbeat number fits beside the gauge on a small phone and a phone on its side", { tag: "@layout" }, async ({ page }) => {
   for (const [width, height] of [[360, 740], [390, 844], [740, 360], [844, 390]]) {
     await page.setViewportSize({ width, height });
@@ -393,14 +394,19 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
     await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
     const readout = page.getByTestId("gauntlet-bpm");
     await expect(readout).toBeVisible();
+    await page.keyboard.press("1");
+    await page.keyboard.press("w");
+    await expect(page.getByTestId("gauntlet-clock-heat"), "one push puts the clock's rate in the row").toBeAttached();
     const row = await page.evaluate(() => {
       const read = document.querySelector(".gx-gauge-read");
-      // The widest the row can be: a full gauge and three figures of pulse.
+      // The widest the row can be: a full gauge, three figures of pulse and a clock ten pushes in.
       read.querySelector("[data-testid='gauntlet-gauge']").textContent = "100";
       read.querySelector("[data-testid='gauntlet-bpm'] b").textContent = "190";
+      read.querySelector("[data-testid='gauntlet-clock-heat'] b").textContent = "×2.20";
       const box = (element) => element.getBoundingClientRect();
       const bpm = read.querySelector("[data-testid='gauntlet-bpm']");
-      const band = read.querySelector(".gx-band-label");
+      // What stands before the pulse: the clock's rate.
+      const band = bpm.previousElementSibling;
       return {
         overflow: read.scrollWidth - read.clientWidth,
         lines: Math.round(box(read).height / Number.parseFloat(getComputedStyle(read).fontSize)),
@@ -411,7 +417,7 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
     });
     expect(row.overflow, `${width}x${height}: the row is not wider than the gauge`).toBeLessThanOrEqual(0);
     expect(row.lines, `${width}x${height}: the row is one line`).toBe(1);
-    expect(row.gap, `${width}x${height}: the number does not touch the wall's range`).toBeGreaterThanOrEqual(8);
+    expect(row.gap, `${width}x${height}: the number does not touch the clock's rate`).toBeGreaterThanOrEqual(8);
     expect(row.right, `${width}x${height}: the number is on the screen`).toBeLessThanOrEqual(row.innerWidth);
   }
 });

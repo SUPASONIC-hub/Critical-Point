@@ -177,7 +177,7 @@ export function GauntletStage({
   const offered = useMemo(() => listOfferedTypes(scene.node.choices, isCardOpen), [scene.node, standing]);
   const {
     breach, tableRules, ruleHeat, ruleObjective, currentRules, fractureAxis,
-    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic,
+    cashMutations, bustMutations, overdrive, bustKeeps, runTension, rules, logic, clockHeat,
   } = useTableForecast({ schema, run, win, selectedCard, multiplier, caseId: scene.node.caseId, offered });
   // What the hand adds to the pot: the logic streak as the staked card would
   // leave it (`logic`, nothing before the case has the rule), then LOCK on top
@@ -549,6 +549,15 @@ export function GauntletStage({
             <span className="gx-band-label" aria-hidden="true">
               벽 {schema.wallMin}–{schema.wallMax}
             </span>
+            {/* Each push makes the clock heat the gauge faster; said once it is.
+                In this one-line row and before the pulse, so it moves nothing:
+                in the bank rail it wrapped to a second line at 360px. */}
+            {live && clockHeat && (
+              <span data-testid="gauntlet-clock-heat">
+                <span className="sr-only">{clockHeat.spoken}</span>
+                <span aria-hidden="true">시계 열기 <b>{clockHeat.text}</b></span>
+              </span>
+            )}
             <span className="gx-bpm" data-testid="gauntlet-bpm">
               <HeartPulse size={14} aria-hidden="true" />
               심박 <b>{schema.sedated ? "교란" : bpm}</b>

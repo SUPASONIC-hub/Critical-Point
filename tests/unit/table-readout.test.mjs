@@ -6,9 +6,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { resourceMeta } from "../../src/appCopy.js";
 import {
-  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, HOT_CASH_MULTIPLIER, RUN_INITIAL_STATE,
+  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, HOT_CASH_MULTIPLIER, reduceWindow, RUN_INITIAL_STATE,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { describeCaseChange, describeEffect, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
+import { describeCaseChange, describeClockHeat, describeEffect, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
 import { getAuthorityGate } from "../../src/gameLogic.js";
 import { initialResources } from "../../src/gameConstants.js";
 import { easyResourceLabels } from "../../src/playerLanguage.js";
@@ -65,6 +65,27 @@ test("a multiplier that is not a number prints as zero rather than NaN", () => {
     assert.equal(formatMultiplier(value), "×0.0", `${String(value)} prints as zero`);
   }
   assert.equal(formatMultiplier("3.95"), "×3.9", "a multiplier read back as text is still rounded down");
+});
+
+test("the clock's heat rate is said only once a push has made it faster, to two decimals", () => {
+  for (const pushes of [0, -1, undefined, Number.NaN]) assert.equal(describeClockHeat(pushes), null, `${String(pushes)} pushes: the clock heats at its own rate`);
+  assert.deepEqual(describeClockHeat(1), { text: "×1.12", spoken: "시계가 올리는 열기 1.12배" });
+  assert.deepEqual(describeClockHeat(2), { text: "×1.24", spoken: "시계가 올리는 열기 1.24배" });
+  assert.equal(describeClockHeat(5).text, "×1.60", "no float tail: 1 + 5 x 0.12 is not printed 1.5999");
+  assert.equal(describeClockHeat(9).text, "×2.08");
+  assert.equal(forecast().clockHeat, null, "the forecast says nothing before the first push");
+  assert.equal(forecast({ win: { ...QUIET_WINDOW, pushes: 3 } }).clockHeat.text, "×1.36");
+});
+
+test("the printed heat rate is the one the clock runs at", () => {
+  // Past the reading grace, one second of clock adds creep x rate of heat.
+  const live = (pushes) => ({ status: "live", schema: { ...BASE_SCHEMA, seconds: 45, creep: 1 }, wall: 99, gauge: 0, elapsed: 10, pushes });
+  for (const pushes of [0, 1, 2, 4]) {
+    const after = reduceWindow(live(pushes), { type: "TICK", delta: 1 });
+    assert.ok(Math.abs(after.gauge - getClockHeatRate(pushes)) < 1e-9, `${pushes} pushes heat ${after.gauge} a second`);
+    const said = describeClockHeat(pushes);
+    assert.equal(said ? Number(said.text.slice(1)) : 1, Math.round(getClockHeatRate(pushes) * 100) / 100);
+  }
 });
 
 test("a card's effect is listed largest first, without the resources it does not move", () => {
