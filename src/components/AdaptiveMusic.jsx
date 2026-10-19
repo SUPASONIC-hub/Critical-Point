@@ -765,6 +765,9 @@ export function AdaptiveMusic({ modeKey }) {
         : audioState === "running"
           ? "배경음 끄기"
           : "배경음 재생하기";
+  // Playing, the button shows the mode; its name starts with that (WCAG 2.5.3).
+  const playing = enabled && audioState === "running";
+  const toggleName = playing ? `${mode.label} ${toggleLabel}` : toggleLabel;
 
   return (
     <div className="music-controls">
@@ -784,11 +787,11 @@ export function AdaptiveMusic({ modeKey }) {
           setAudioState("off");
           setEnabled(false);
         }}
-        aria-label={toggleLabel}
+        aria-label={toggleName}
         title={toggleLabel}
       >
-        {enabled && audioState === "running" ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        <span>{enabled && audioState === "running" ? mode.label : toggleLabel}</span>
+        {playing ? <Volume2 size={18} /> : <VolumeX size={18} />}
+        <span>{playing ? mode.label : toggleLabel}</span>
       </button>
       {enabled && audioState !== "unsupported" && (
         <button

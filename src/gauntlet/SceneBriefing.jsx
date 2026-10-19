@@ -190,7 +190,11 @@ export function SceneBriefing({
             type="button"
             ref={timerRef}
             className={`gx-comic-timer${late ? " is-late" : ""}${held ? " is-held" : ""}`}
-            aria-pressed={held}
+            // A switch: what it shows is its state, the seconds and whether they
+            // run, and a switch's shown text is its value, not its name (axe
+            // reads it so for label-in-name, WCAG 2.5.3).
+            role="switch"
+            aria-checked={held}
             // The name stays put. With the seconds in it, a screen reader read
             // the focused button out again every second, over the briefing the
             // player had stopped the clock to hear. The count is its description.
@@ -332,10 +336,12 @@ export function SceneBriefing({
             data-testid="open-table"
             onClick={() => onOpen(null)}
             aria-keyshortcuts={keys("Space Enter W")}
-            aria-label="판을 연다. 지금부터 시계가 흐르고 카드를 걸 수 있다"
+            // The name starts with what the button shows (WCAG 2.5.3); the space
+            // after the label is not drawn in the flex row.
+            aria-label={`판 열기 ${tableSeconds}초 시작. 지금부터 시계가 흐르고 카드를 걸 수 있다`}
           >
             <Flame size={18} aria-hidden="true" />
-            <span>판 열기</span>
+            <span>판 열기</span>{" "}
             <small>{tableSeconds}초 시작</small>
           </button>
         </footer>
