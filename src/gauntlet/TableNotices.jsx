@@ -179,7 +179,7 @@ export function ScoutBand({ band, canScout, onScout, shortcut }) {
   return (
     <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
       aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : `벽 조회, 시간 ${SCOUT_SECONDS}초`}>
-      벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : `조회 −${SCOUT_SECONDS}초`}
+      벽 {band.wallMin}–{band.wallMax} · {band.scouted ? "조회함" : "조회"}
     </button>
   );
 }

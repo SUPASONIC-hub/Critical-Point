@@ -568,7 +568,8 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   const stage = page.getByTestId("gauntlet-stage");
   await expect(stage).toHaveAttribute("data-status", "live");
   await expect(stage).not.toHaveClass(/is-face-down/);
-  await expect(page.locator(".gx-band-label")).toHaveText("벽 88–98");
+  // The band label is SCOUT's button here, its text followed by " · 조회".
+  await expect(page.locator(".gx-band-label")).toHaveText(/^벽 88–98(?: · |$)/);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
 });
 

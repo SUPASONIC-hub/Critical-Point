@@ -409,7 +409,12 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
       const band = bpm.previousElementSibling;
       return {
         overflow: read.scrollWidth - read.clientWidth,
-        lines: Math.round(box(read).height / Number.parseFloat(getComputedStyle(read).fontSize)),
+        // One line is every part on one middle: the band is SCOUT's 24px pill
+        // from 프롤로그 03 on, so the row is no longer one font size tall.
+        lines: [...read.children]
+          .map((part) => (box(part).top + box(part).bottom) / 2)
+          .sort((a, b) => a - b)
+          .filter((middle, index, middles) => index === 0 || middle - middles[index - 1] > 4).length,
         gap: Math.round(box(bpm).left - box(band).right),
         right: Math.round(box(bpm).right),
         innerWidth,
@@ -432,7 +437,8 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
  */
 
 const WALL_BAND = ".gx-band-label";
-const FAR_WALL = "벽 88–98";
+// The band label is SCOUT's button from 프롤로그 03 on, its text followed by " · 조회" (or " · 조회함").
+const FAR_WALL = /^벽 88–98(?: · |$)/;
 const LONGEST_CASE_LABEL = seasonCasesBase.map((caseItem) => caseItem.label).sort((a, b) => b.length - a.length)[0];
 
 const storedSettings = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), ACCESSIBILITY_SETTINGS_KEY);
@@ -530,7 +536,7 @@ test("a case opened in story mode stands its wall at 88 to 98 and runs its clock
 test("a table opened without story mode keeps the wall it was dealt", async ({ page }) => {
   await startDebugNode(page, "case01", "start");
   await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
-  await expect(page.locator(WALL_BAND)).toHaveText(/^벽 \d+–\d+$/);
+  await expect(page.locator(WALL_BAND)).toHaveText(/^벽 \d+–\d+(?: · |$)/);
   await expect(page.locator(WALL_BAND)).not.toHaveText(FAR_WALL);
   expect((await savedRun(page)).dynamics.story).toBe(false);
 });
@@ -591,7 +597,7 @@ test("story mode turned on in the middle of a case starts with the next case", a
   const band = page.locator(WALL_BAND);
   await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
   const dealt = await band.textContent();
-  expect(dealt).not.toBe(FAR_WALL);
+  expect(dealt).not.toMatch(FAR_WALL);
 
   // The intro's copy of the switch, by way of 저장 후 나가기 (the play header
   // opens the same panel; the rule it sets is the same from either).

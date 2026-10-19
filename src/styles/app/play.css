@@ -932,7 +932,7 @@
 .gx-gauge-read {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   padding-inline: 4px;
   color: var(--ui-text-2);
   font: 600 0.75rem/1 var(--font-sans);
@@ -949,10 +949,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* SCOUT (B1 초안): the band label is the button that narrows it, once a window. */
+/* SCOUT (B1 초안): the band label is the button that narrows it, once a window.
+   Drawn 24px tall (a 12px line and 5px above and below) and pressed over 44
+   with the codex note's area below; its 3초 is in its name, as the row has
+   to stay one line at 360px with the clock's rate and the pulse in it. */
 .gx-scout {
-  min-height: 24px;
-  padding: 2px 8px;
+  padding: 5px 6px;
   border: 1px dashed currentColor;
   border-radius: 999px;
   background: transparent;
@@ -2919,7 +2921,8 @@
 
 /* Out of the card's flow: it takes no line from the label and no width from
    the stats, whatever the card holds. */
-.gx-comic-cards > * {
+.gx-comic-cards > *,
+.gx-scout {
   position: relative;
 }
 
@@ -2936,6 +2939,7 @@
   inset: -4px 0;
 }
 
+.gx-scout::before,
 .gx-codex-note summary::before {
   content: "";
   position: absolute;
