@@ -111,6 +111,12 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await expect(focus).toContainText("STRIKE 37");
   await expect(lock.locator("small")).toHaveText("37 · −1.5초");
   expect(await clockOf(page), "two presses cost three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  await expect(focus.locator("small"), "below the cap the signal names the multiplier").toHaveText(/^배율 ×1\.\d · 자원 ×/);
+  // At the cap the word comes first, so a line cut short by its ellipsis still says it.
+  await page.keyboard.press("e");
+  await expect(focus).toContainText("STRIKE 59");
+  await expect(focus.locator("small")).toHaveText(/^상한 ×1\.5 · 자원 ×/);
+  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
   await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 

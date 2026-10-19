@@ -479,7 +479,7 @@ export function GauntletStage({
             <span className={`gx-focus-signal focus-${focusBonus.tier}`} data-testid="gauntlet-focus">
               <Crosshair size={13} aria-hidden="true" />
               <b lang="en">{focusBonus.label} {Math.round(win.focus)}</b>
-              <small>배율 {formatMultiplier(lockPot)}{lockCapped && " 상한"} · 자원 {formatMultiplier(focusBonus.resource)}</small>
+              <small>{lockCapped ? "상한" : "배율"} {formatMultiplier(lockPot)} · 자원 {formatMultiplier(focusBonus.resource)}</small>
               <i aria-hidden="true"><em style={{ width: `${Math.round(win.focus)}%` }} /></i>
             </span>
             )}
