@@ -174,7 +174,13 @@ export function DecisionReveal({ view }) {
               </p>
             )}
             <p className="gx-reveal-bank">
-              {decisionReveal.caseClosed ? (
+              {decisionReveal.caseClosed && verdict.audit?.caught ? (
+                // AUDIT (B3): the line says what the audit took of the case's share. 초안.
+                <>
+                  <Vault size={14} aria-hidden="true" /> 감사 적발: 금고로 갈 <b>{formatNumber(verdict.secured + verdict.audit.lost)}</b> 중{" "}
+                  <b>{formatNumber(verdict.audit.lost)}</b> 환수 · 금고 <b>{formatNumber(decisionReveal.vault)}</b>
+                </>
+              ) : decisionReveal.caseClosed ? (
                 <>
                   <Vault size={14} aria-hidden="true" /> 금고로 이동 <b>{formatNumber(verdict.secured)}</b> · 금고{" "}
                   <b>{formatNumber(decisionReveal.vault)}</b>

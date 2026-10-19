@@ -1,4 +1,5 @@
 import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand } from "./gauntletEngine.js";
+import { readAudit } from "./auditRisk.js";
 
 /**
  * The 현재 위험 cell's line, and the voice's after the heat (`describePush`).
@@ -29,8 +30,12 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
  * relief: STEADY's relief comes off the heat there is (`FOCUS` clamps at 0).
  * `band` is the wall band the window draws: the board's, or the narrower one
  * SCOUT bought (`getWindowBand`); the danger line reads its low edge.
+ *
+ * `audit` is the case's audit off its log; on a week that counts it the
+ * reading says where it stands and what a cash now would make it (B3:
+ * the heat and the pushes, never the wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard }) {
+export function readTableMeters({ win, schema, selectedCard, run = null, audit = 0 }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
@@ -47,5 +52,6 @@ export function readTableMeters({ win, schema, selectedCard }) {
     dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: band.wallMin }),
     belowRelief: win.gauge < getFocusModeProfile(win.focusMode).relief,
     band,
+    audit: readAudit(run, audit, win),
   };
 }

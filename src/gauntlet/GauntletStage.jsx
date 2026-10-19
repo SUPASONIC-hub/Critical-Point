@@ -71,6 +71,7 @@ const TAB_TITLES = {
 export function GauntletStage({
   seed,
   run,
+  auditCount = 0,
   cards,
   reframeChoice,
   resources,
@@ -160,8 +161,8 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band,
-  } = readTableMeters({ win, schema, selectedCard });
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   const settleImpact = useMemo(
@@ -492,6 +493,8 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>연속</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>최고</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
+              {/* AUDIT on a week that counts it (B3): one token, the bank's ember one short of the limit. */}
+              {audit && <> <span className={audit.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-audit"><small>감사</small> <b>{audit.count}/{audit.limit}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
@@ -759,7 +762,7 @@ export function GauntletStage({
           {...(holdsCash ? cashHold.buttonProps : { onClick: cash })}
           disabled={!canCash}
           aria-keyshortcuts="Enter"
-          aria-describedby={[holdsCash && "gx-cash-hold", logic && "gx-logic-detail"].filter(Boolean).join(" ") || undefined}
+          aria-describedby={[holdsCash && "gx-cash-hold", logic && "gx-logic-detail", audit && "gx-audit-detail"].filter(Boolean).join(" ") || undefined}
         >
           <span>{cashLabel}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
@@ -767,6 +770,7 @@ export function GauntletStage({
         {/* Outside the button, so neither is read into its name. The second is
             what a press that did not hold says: one more confirms. */}
         {holdsCash && <span id="gx-cash-hold" className="sr-only">길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다</span>}
+        {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
 
       {draftOpen && (
@@ -798,7 +802,7 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

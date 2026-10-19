@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatNumber } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
+import { describeAudit } from "./auditRisk.js";
 
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
@@ -18,6 +19,9 @@ import { getClockCall } from "./tableReadout.js";
  * - when a cash has banked the hand into the case pot, or a closed case has
  *   moved that pot to the vault: what is at stake now and what is safe, once,
  *   as the next window's table opens (the slam said the cash's own +N);
+ * - on a week that counts the audit (B3), where it stands when the table opens
+ *   on a count the last window moved: once, never per push (the cash button
+ *   carries what a cash now would do, in its description);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
  * - that a first press armed 확정 and a second one seals it (useHoldConfirm);
  * - what a look (SCOUT) bought: the narrower band, once, as the button is spent.
@@ -43,7 +47,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, stance: 3, scout: 4, push: 5 });
+const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, audit: 3, stance: 4, scout: 5, push: 6 });
 
 /** What the voice says when a first press has armed 확정 (hold-to-seal). */
 export const HOLD_ARMED_CALL = "한 번 더 누르면 확정된다";
@@ -119,6 +123,17 @@ export function findBank(before, after) {
 }
 
 /**
+ * The audit between the window `before` was dealt and the one `after` is, or
+ * null: as `findBank`, only the very next window, and only on a table that
+ * counts it (`after.audit`, the meters' reading) when the count moved.
+ */
+export function findAudit(before, after) {
+  if (!before || !after.audit || after.windowIndex !== before.windowIndex + 1) return null;
+  if (after.audit.count === before.audit?.count) return null;
+  return { windowIndex: after.windowIndex, text: describeAudit(after.audit) };
+}
+
+/**
  * The one region's text, for `TableNotices`, which draws it: the stage hands
  * over what the facts are read from and imports nothing for it. `speaking` is
  * a running table a listener is on: not under the briefing, a draft, the
@@ -126,7 +141,7 @@ export function findBank(before, after) {
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, ...table }) {
+export function useTableVoice({ speaking, run, audit = null, ...table }) {
   const facts = readTableFacts(table);
   const [said, setSaid] = useState("");
   const factsRef = useRef(null);
@@ -134,15 +149,20 @@ export function useTableVoice({ speaking, run, ...table }) {
   const lastAtRef = useRef(0);
   const timerRef = useRef(null);
   const bankRef = useRef(null);
+  const auditRef = useRef(null);
 
-  // Once a window: the bank since the last table, kept until it can be said.
-  // `??=` because a development mount runs this twice, and the second run
-  // finds the pot already heard.
+  // Once a window: the bank and the audit since the last table, kept until
+  // they can be said. `??=` because a development mount runs this twice, and
+  // the second run finds the pot already heard.
+  // The reading is a fresh object every render; its count is what is heard.
+  const auditCount = audit?.count ?? null;
+  const auditLimit = audit?.limit ?? null;
   useEffect(() => {
-    const dealt = { windowIndex: run.windowIndex, runPot: run.runPot, vault: run.vault };
+    const dealt = { windowIndex: run.windowIndex, runPot: run.runPot, vault: run.vault, audit: auditCount === null ? null : { count: auditCount, limit: auditLimit } };
     bankRef.current ??= findBank(heard, dealt);
+    auditRef.current ??= findAudit(heard, dealt);
     heard = dealt;
-  }, [run.windowIndex, run.runPot, run.vault]);
+  }, [run.windowIndex, run.runPot, run.vault, auditCount, auditLimit]);
 
   useEffect(() => {
     const before = factsRef.current;
@@ -159,6 +179,10 @@ export function useTableVoice({ speaking, run, ...table }) {
     if (bankRef.current) {
       calls.push({ kind: "bank", text: bankRef.current.text });
       bankRef.current = null;
+    }
+    if (auditRef.current) {
+      calls.push({ kind: "audit", text: auditRef.current.text });
+      auditRef.current = null;
     }
     if (!calls.length) return;
     queueRef.current = queueCalls(queueRef.current, calls);

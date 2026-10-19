@@ -255,6 +255,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
   });
   const {
+    auditCount,
     counterfactualReport,
     currentAverageResponseTime,
     decisionFingerprint,
@@ -924,7 +925,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     AdaptiveMusic, musicModeKey, screenReaderStatus, simplifyPlayerText, currentCase,
     node, speakerProfile, speakerPortrait, narrativeSpine, resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
-    fixedChoices, clueCount, casesOpened, reframeChoice,
+    fixedChoices, clueCount, casesOpened, reframeChoice, auditCount,
     resources, resourceMeta, progress, routeIndex, routeLength,
     debugToolsEnabled, fallbackCaseId, silentFailureCount,
   });

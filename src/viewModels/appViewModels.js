@@ -113,7 +113,7 @@ export const viewGroups = {
     scene: ["node", "speakerProfile", "speakerPortrait", "narrativeSpine", "resolvedNodeId", "sceneChallenge"],
     gauntlet: [
       "gauntletRun", "gauntletSeed", "isAdvancing", "fixedChoices", "clueCount", "casesOpened", "reframeChoice",
-      "decisionRevealOpen", "staleSave",
+      "decisionRevealOpen", "staleSave", "auditCount",
     ],
     status: ["resources", "resourceMeta", "progress", "routeIndex", "routeLength"],
     debug: ["debugToolsEnabled", "fallbackCaseId", "silentFailureCount"],

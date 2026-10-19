@@ -16,6 +16,7 @@ import {
   getSuspenseState,
 } from "../gameLogic.js";
 import { getJudgementHabit } from "../judgementHabit.js";
+import { countAudit } from "../gauntlet/auditRisk.js";
 import { getTraceEvents } from "./trace.js";
 
 /**
@@ -82,6 +83,8 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // What this run left shut: clues never surfaced, and the far side of every fork.
   const unopenedClueCount = Math.max(0, getAllDiscoveryClueIds().length - clueCount);
   const gauntletSeed = useMemo(() => (seedBase ? dealGauntletSeed(seedBase) : null), [seedBase]);
+  // The case's audit (B3), off the same log the settlement counts; the table shows it only on a week that has it.
+  const auditCount = useMemo(() => countAudit(log), [log]);
   // The trace is session storage, not state, and only the debug overlay prints
   // it, so only a debug build reads it on render.
   const silentFailureCount = debugTools
@@ -99,6 +102,7 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
     unopenedClueCount,
     unopenedRecordCount: unopenedClueCount + logReadout.unopenedBranchCount,
     gauntletSeed,
+    auditCount,
     silentFailureCount,
   };
 }
