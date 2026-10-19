@@ -19,7 +19,8 @@ import { getClockCall } from "./tableReadout.js";
  *   moved that pot to the vault: what is at stake now and what is safe, once,
  *   as the next window's table opens (the slam said the cash's own +N);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
- * - that a first press armed 확정 and a second one seals it (useHoldConfirm).
+ * - that a first press armed 확정 and a second one seals it (useHoldConfirm);
+ * - what a look (SCOUT) bought: the narrower band, once, as the button is spent.
  *
  * It does not say the heartbeat (a number that moves every tick is a region
  * that never stops talking), the creep the clock adds to the heat, or the
@@ -42,7 +43,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * before the push's and the stance's: a listener out of time has the least of
  * it to lose.
  */
-const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, stance: 3, push: 4 });
+const KIND_ORDER = Object.freeze({ hold: 0, clock: 1, bank: 2, stance: 3, scout: 4, push: 5 });
 
 /** What the voice says when a first press has armed 확정 (hold-to-seal). */
 export const HOLD_ARMED_CALL = "한 번 더 누르면 확정된다";
@@ -50,6 +51,9 @@ export const HOLD_ARMED_CALL = "한 번 더 누르면 확정된다";
 export const describePush = ({ gauge, dangerLine }) => `열기 ${Math.round(gauge)} · ${dangerLine}`;
 
 export const describeStanceCarry = ({ focus, carry }) => `충전 ${Math.round(focus)} · 확정하면 다음 판 ${carry.label} · ${carry.title}`;
+
+/** What a look bought (`getWindowBand`): the band it narrowed to, never the wall inside it. */
+export const describeScout = ({ wallMin, wallMax }) => `조회했다. 벽은 ${wallMin}에서 ${wallMax} 사이 어딘가`;
 
 export const describeBank = ({ runPot, vault }) => `판돈 ${formatNumber(runPot)} · 금고 ${formatNumber(vault)}`;
 
@@ -61,7 +65,7 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, armed = false }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, armed = false, band = null }) {
   const carry = findStanceCarry(cashMutations);
   return {
     live,
@@ -71,6 +75,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ar
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
     hold: armed ? HOLD_ARMED_CALL : "",
+    scout: band?.scouted ? describeScout(band) : "",
   };
 }
 
@@ -84,6 +89,7 @@ export function listTableCalls(before, after) {
   if (after.hold && after.hold !== before.hold) calls.push({ kind: "hold", text: after.hold });
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
+  if (after.scout && after.scout !== before.scout) calls.push({ kind: "scout", text: after.scout });
   if (after.pushes > before.pushes) calls.push({ kind: "push", text: after.push });
   return calls;
 }
