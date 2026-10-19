@@ -14,6 +14,7 @@ import {
 import { holdCloudCopyThroughReset } from "../cloudSave.js";
 import { openCaseRun } from "../gauntlet/gauntletEngine.js";
 import { getTableRules } from "../gauntlet/tableUnlocks.js";
+import { pickSeasonWeekRule } from "../gauntlet/weeklyRules.js";
 import { getSessionId as getSessionIdDefault, telemetryEnabled } from "../telemetry.js";
 import { getAccessibility } from "./accessibilitySettings.js";
 import { describeCaseOpening } from "./caseRoutes.js";
@@ -22,6 +23,8 @@ import { runTransition } from "./runState.js";
 import { clearRunStorage, logStorageResetFailure } from "./runStorageReset.js";
 import { appendTraceEvent } from "./trace.js";
 import { leaveReplaySession } from "./useAppPersistence.js";
+import { weeklyRuleNow as weeklyRuleNowDefault } from "./weeklyClock.js";
+import { weekRuleTurnedDown } from "./weeklyRuleChoice.js";
 
 // The last sentence is what keeps the one before it true: the online copy is
 // not replaced by the next run until the player says so (cloudSave.js).
@@ -49,6 +52,7 @@ export function createRunLifecycle({
   createRunId = createRunIdDefault,
   getSessionId = getSessionIdDefault,
   nowMs = () => Date.now(),
+  weeklyRuleNow = weeklyRuleNowDefault,
 }) {
   const {
     resetEndingSequence, setNextParticipantMessage, replacePendingTelemetry, clearLocalRankingRows,
@@ -63,15 +67,19 @@ export function createRunLifecycle({
    * The story mark is the comfort setting as it stands at this press. The
    * season's first case is played straight from here, with no `startCaseNow`.
    */
-  function startGame({ veteran = false } = {}) {
+  // Turned down by the start screen's box (one device key, 결정 27) unless the caller says.
+  function startGame({ veteran = false, declineWeekRule = weekRuleTurnedDown() } = {}) {
     // A run of one's own ends a replay; from here the tab writes its save again.
     leaveReplaySession();
+    const story = getAccessibility().storyMode;
     const patch = runTransition(run, {
       type: "newGame",
       runId: createRunId(),
       playerName: normalizePlayerName(run.playerName) || "분석관",
       veteran: veteran === true,
-      story: getAccessibility().storyMode,
+      story,
+      // 이번 주의 규칙, read off the weekly clock (held still in test builds).
+      weekRule: pickSeasonWeekRule(weeklyRuleNow(), { declined: declineWeekRule === true, story }),
       now: nowMs(),
     });
     removeStoredValue(RECOVERY_CENTER_STORAGE_KEY);

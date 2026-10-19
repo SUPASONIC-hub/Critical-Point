@@ -101,7 +101,9 @@ test("a save from the table that graded a press loads without a notice, under th
   }
   // Everything else the record held is as it was saved.
   const { beatCombo: _a, bestCombo: _b, focusPerfects: _c, focusMisses: _d, runGroove, grooveVault: _e, suspended, practice, ...rest } = saved;
-  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, ...kept } = run;
+  // `weekRule` came after this save (이번 주의 규칙): it reads as none.
+  const { suspended: _window, practice: _practice, runHand: _f, handVault: _g, weekRule, ...kept } = run;
+  assert.equal(weekRule, null);
   assert.deepEqual(kept, rest);
   assert.deepEqual([run.practice.logic, run.practice.vault, run.practice.record.grooveBanked], [practice.logic, practice.vault, practice.record.grooveBanked]);
   assert.deepEqual(run.logic, saved.logic, "the streak is the save's");

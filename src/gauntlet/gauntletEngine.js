@@ -36,6 +36,7 @@ import {
   STEADY_LINE_WALL,
   STRIKE_WAKE_CHIPS,
 } from "./tableRules.js";
+import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
 
 export { HOT_CASH_MULTIPLIER, SEAL_BREAK_GAUGE } from "./tableRules.js";
 
@@ -609,9 +610,30 @@ const storyBoards = new WeakMap();
  */
 export function getTableSchema(run) {
   const schema = run?.schema ?? BASE_SCHEMA;
-  if (run?.story !== true) return schema;
+  if (run?.story !== true) return getWeekBoard(schema, run?.weekRule);
   if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
   return storyBoards.get(schema);
+}
+
+/**
+ * The week's rule, laid over the board at the deal as the story wall is and
+ * for the same reasons. A story case deals the story wall and no week's rule.
+ * Only the numbers `normalizeSchema` clamps move, and they are clamped here,
+ * so the rule cannot push a board past its ends.
+ */
+const weekBoards = new Map();
+function getWeekBoard(schema, weekRule) {
+  const overlay = weekRuleOverlay(weekRule, schema);
+  if (!overlay) return schema;
+  if (!weekBoards.has(weekRule)) weekBoards.set(weekRule, new WeakMap());
+  const boards = weekBoards.get(weekRule);
+  if (!boards.has(schema)) {
+    const clamped = normalizeSchema({ ...schema, ...overlay });
+    const moved = { ...schema };
+    for (const key of ["seconds", "wallMin", "wallMax", "startGauge", "chipsScale", "fractureRate", "sealBreak"]) moved[key] = clamped[key];
+    boards.set(schema, moved);
+  }
+  return boards.get(schema);
 }
 
 /** A story run's table clock runs at least this many times slower. */
@@ -793,6 +815,9 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // wall is dealt far (`getTableSchema`) and no decision breaks the next board
   // (`tableUnlocks`). Stamped when a case opens, so a case is one or the other.
   story: false,
+  // 이번 주의 규칙 the season was started under (gauntlet/weeklyRules.js), or
+  // null. Stamped once at the season's start and carried to its end (D3).
+  weekRule: null,
   schema: BASE_SCHEMA,
 });
 
@@ -891,6 +916,7 @@ export function normalizeRunState(value) {
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
   run.story = source.story === true;
+  run.weekRule = normalizeWeekRuleId(source.weekRule);
   run.lastOutcome = ["none", "cash", "bust"].includes(source.lastOutcome) ? source.lastOutcome : "none";
   run.openSeed = typeof source.openSeed === "string" ? source.openSeed.slice(0, 200) : null;
   run.openCardId = run.openSeed && typeof source.openCardId === "string" ? source.openCardId.slice(0, 200) : null;
@@ -1554,6 +1580,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     practice: current.practice,
     veteran: current.veteran,
     story: current.story,
+    weekRule: current.weekRule,
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
@@ -1792,5 +1819,7 @@ export function createRunSummary(run) {
     relics: [...state.relics],
     mutations: [...state.schema.mutations],
     [RULES_MARK_KEY]: RULES_MARK,
+    // The server checks that every case row of a run says the same (D1).
+    weekRule: state.weekRule,
   };
 }
