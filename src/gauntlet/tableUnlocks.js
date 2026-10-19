@@ -8,13 +8,15 @@
  *
  * This module is the list and the two questions asked of it -- which rules
  * does this case play under (`getTableRules`), and what does it say about the
- * ones it has just turned on (`getUnlockIntro`). It imports nothing, so the
- * engine, the stage and the balance scripts can all read it. The engine only
- * ever receives a set of rules; it does not know about cases.
+ * ones it has just turned on (`getUnlockIntro`). It imports only two of the
+ * engine's numbers that its copy quotes, and the engine does not import it, so
+ * the engine, the stage and the balance scripts can all read it. The engine
+ * only ever receives a set of rules; it does not know about cases.
  *
  * Pushing, cashing, the wall and the heartbeat are the table itself and are
  * not listed: no step is without them.
  */
+import { HAND_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -170,7 +172,17 @@ const STEPS = [
   {
     caseId: "prologue05",
     adds: ["stance", "relics"],
-    intro: ["자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다."],
+    // What a charge does once the stake multiplier is at its cap (`HAND_CAP`):
+    // nothing to this hand's, and the stance's carry if it reached
+    // `STANCE_CHARGE` (`applyFocusCarry`). STEADY's relief is taken off the
+    // heat there is, so on a cold board before the first push it cools nothing.
+    // A story run is told no promise about the next board, so not the second.
+    storyIntro: [0, 2],
+    intro: [
+      "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다.",
+      `칩 배율이 ${HAND_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
+      "STEADY는 데워진 열기만 식힙니다. 한 번 민 뒤에 충전하십시오.",
+    ],
   },
 ];
 

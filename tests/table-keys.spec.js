@@ -100,7 +100,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   // The button says what a press costs, to the eye and to a screen reader.
   const lock = page.getByTestId("commit-focus");
   await expect(lock.locator("small")).toHaveText("0 · −1.5초");
-  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 상한까지만 오른다/);
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 콤보와 합쳐 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
   // Any moment is as good as another: the press is not timed.
@@ -111,6 +111,12 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await expect(focus).toContainText("STRIKE 37");
   await expect(lock.locator("small")).toHaveText("37 · −1.5초");
   expect(await clockOf(page), "two presses cost three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  await expect(focus.locator("small"), "below the cap the signal names the multiplier").toHaveText(/^배율 ×1\.\d · 자원 ×/);
+  // At the cap the word comes first, so a line cut short by its ellipsis still says it.
+  await page.keyboard.press("e");
+  await expect(focus).toContainText("STRIKE 59");
+  await expect(focus.locator("small")).toHaveText(/^상한 ×1\.5 · 자원 ×/);
+  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
   await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 
@@ -512,7 +518,7 @@ const STAGED_STEPS = [
   { caseId: "prologue02", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue03", on: NO_LOCK, lines: 2, kicker: NEW_PROTOCOL },
   { caseId: "prologue04", on: { logic: true, lock: true, stance: false, chain: true }, lines: 3, kicker: NEW_PROTOCOL },
-  { caseId: "prologue05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "prologue05", on: WHOLE, lines: 3, kicker: NEW_PROTOCOL },
   { caseId: "case01", on: WHOLE, lines: 0 },
 ];
 
