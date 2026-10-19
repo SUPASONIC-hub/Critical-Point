@@ -141,6 +141,12 @@ const budgets = [
   // runtime's ceiling where it was, for the changes that were waiting on it.
   // 108,233 / 34,828, plus 5%.
   { pattern: /^caseCopy-.*\.js$/, maxBytes: 113_650, maxGzip: 36_570 },
+  // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
+  // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
+  // changes that each fitted were merged together; it is fetched with the table
+  // (TABLE_AUDIO in vite.config.js), so nothing loads later than it did.
+  // Taking it out took PlayScreen to 97,898 / 32,131. 6,676 / 2,166 measured.
+  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_680, maxGzip: 2_170 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
