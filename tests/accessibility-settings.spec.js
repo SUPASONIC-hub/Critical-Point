@@ -409,8 +409,8 @@ test("the heartbeat number fits beside the gauge on a small phone and a phone on
       const band = bpm.previousElementSibling;
       return {
         overflow: read.scrollWidth - read.clientWidth,
-        // One line is every part on one middle: the band is SCOUT's 24px pill
-        // from 프롤로그 03 on, so the row is no longer one font size tall.
+        // One line is every part on one middle: the band is SCOUT's pill, taller
+        // than the font, from 프롤로그 03 on.
         lines: [...read.children]
           .map((part) => (box(part).top + box(part).bottom) / 2)
           .sort((a, b) => a - b)

@@ -950,11 +950,13 @@
 }
 
 /* SCOUT (B1 초안): the band label is the button that narrows it, once a window.
-   Drawn 24px tall (a 12px line and 5px above and below) and pressed over 44
-   with the codex note's area below; its 3초 is in its name, as the row has
-   to stay one line at 360px with the clock's rate and the pulse in it. */
+   Drawn 14px tall, its 12px line and border, so the row is no taller than
+   a phone on its side has room for (season-flow, 640x360), and on a phone
+   pressed over 44 with the stances' area below (centred against the padding
+   box, inside the 1px border); its 3초 is in its name, as the row has to
+   stay one line at 360px with the clock's rate and the pulse in it. */
 .gx-scout {
-  padding: 5px 6px;
+  padding: 0 6px;
   border: 1px dashed currentColor;
   border-radius: 999px;
   background: transparent;
@@ -2249,6 +2251,7 @@
 
   /* Centred at 44 against the padding box: -8px reached 42 on a 28px stance,
      whose 1px border is outside the box the area is placed in. */
+  .gx-scout::before,
   .gx-focus-modes button::before {
     content: "";
     position: absolute;
@@ -2939,7 +2942,6 @@
   inset: -4px 0;
 }
 
-.gx-scout::before,
 .gx-codex-note summary::before {
   content: "";
   position: absolute;
