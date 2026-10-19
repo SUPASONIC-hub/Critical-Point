@@ -194,7 +194,15 @@ const budgets = [
   // (check:text) is one UTF-8 byte longer than "×1.75로".
   // 1,142 / 719 -> 1,159 / 738 on 2026-10-21, measured 1,159 / 734: NEAR WALL
   // says what the 4 is, 벽 띠가 열기 4만큼 앞당겨 선다 (+17).
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_159, maxGzip: 738 },
+  // 1,141 / 719 -> 1,552 / 957 on 2026-10-19, measured 1,552 / 953 plus the
+  // hash noise: B3's AUDIT is a week's device, so its entry, its line, its
+  // four numbers, the allowlist of devices and the check that reads it live
+  // here. Cut first: its numbers were imported from tableRules.js, which
+  // pulled that whole module into this chunk (2,033 / 1,246), and the line
+  // lost its first sentence; the HUD's and the voice's words are in the
+  // table's own chunk (tableMeters.js, tableVoice.js).
+  // Rebased on main (2026-10-21): main's 1,142 plus B3's 411 bytes.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_570, maxGzip: 976 },
   { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on

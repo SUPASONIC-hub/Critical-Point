@@ -25,7 +25,6 @@
  * starts (the unit test holds every entry to it against the day it was added).
  */
 
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE } from "./tableRules.js";
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -45,6 +44,20 @@ export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
+/**
+ * AUDIT (B3, the `audit` device, auditRisk.js): a cash pushed at least once
+ * and closed below `AUDIT_HEAT` adds one to the case's audit, a cash at
+ * HEAT DEBT's heat or more takes `AUDIT_RELIEF` off it. When the case closes
+ * with `AUDIT_LIMIT` or more, one part in `AUDIT_SHARE` of what it moves to
+ * the vault is lost. B, the design's starting values. Here, beside the other
+ * week's numbers, while it is a week's device: imported from tableRules.js
+ * this chunk took the whole of that module (check:bundle, 2026-10-19); it
+ * moves there when it becomes a rule of the table.
+ */
+export const AUDIT_HEAT = 40;
+export const AUDIT_LIMIT = 4;
+export const AUDIT_RELIEF = 2;
+export const AUDIT_SHARE = 4;
 /** HEAVY FRACTURE: what FRACTURE bills the cracked axis that week. */
 export const HEAVY_FRACTURE_RATE = 1.75;
 
@@ -70,7 +83,7 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "AUDIT WEEK",
     // 초안 문구 (B3 decision 11 asks for the line by number).
     title: "감사 주간",
-    text: `이번 주는 감사팀이 장부를 본다. 한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정할 때마다 감사가 한 칸 찬다. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`,
+    text: `한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정하면 감사 +1. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`,
     rules: Object.freeze(["audit"]),
   }),
 });

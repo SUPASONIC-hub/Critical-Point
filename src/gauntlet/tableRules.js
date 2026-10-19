@@ -73,15 +73,3 @@ export const KINETIC_GRIP_CHIPS = 1.08;
 export const STEADY_ANCHOR_COOL = 4;
 export const STEADY_ANCHOR_SECONDS = 2;
 export const GLASS_LENS_SEAL = 8;
-
-/**
- * AUDIT (B3, a week's device for now, `weeklyRules.js`): a cash pushed at
- * least once and closed below `AUDIT_HEAT` adds one to the case's audit, a
- * cash at `HEAT_DEBT_GAUGE` or more takes `AUDIT_RELIEF` off it. When the case
- * closes with `AUDIT_LIMIT` or more, one part in `AUDIT_SHARE` of what it
- * moves to the vault is lost (auditRisk.js). B, the design's starting values.
- */
-export const AUDIT_HEAT = 40;
-export const AUDIT_LIMIT = 4;
-export const AUDIT_RELIEF = 2;
-export const AUDIT_SHARE = 4;

@@ -1,5 +1,5 @@
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, HEAT_DEBT_GAUGE } from "./tableRules.js";
-import { weekRuleHasDevice } from "./weeklyRules.js";
+import { HEAT_DEBT_GAUGE } from "./tableRules.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, weekRuleHasDevice } from "./weeklyRules.js";
 
 /**
  * AUDIT (B3): the ledger that is too quiet.
@@ -76,24 +76,3 @@ export function judgeAudit({ count, secured, hand }) {
     handLost: caught ? Math.floor(Math.max(0, hand) / AUDIT_SHARE) : 0,
   };
 }
-
-/**
- * The HUD's reading, or null on a table without the audit: where it stands,
- * what a cash right now would make it, and whether the next +1 fills it.
- * `spoken` is that for the 확정 button's description.
- */
-export function readAudit(run, count, win) {
-  if (!isAuditOn(run)) return null;
-  const now = Math.max(0, Math.trunc(Number(count) || 0));
-  const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes });
-  const reading = { count: now, limit: AUDIT_LIMIT, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= AUDIT_LIMIT - 1 };
-  return { ...reading, spoken: describeAuditIfCash(reading) };
-}
-
-/** What the voice says when a table opens on an audit that moved (tableVoice.js). 초안. */
-export const describeAudit = ({ count, limit }) =>
-  `감사 위험 ${count}/${limit}. ${limit}칸이 차면 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다`;
-
-/** The cash button's description: what this cash does to the audit. 초안. */
-export const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
-  ifCash > 0 ? `지금 확정하면 감사 +1, ${afterCash}/${limit}` : ifCash < 0 ? `지금 확정하면 감사 −${-ifCash}, ${afterCash}/${limit}` : `지금 확정해도 감사 ${afterCash}/${limit} 그대로`;

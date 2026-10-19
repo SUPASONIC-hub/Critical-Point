@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { addAudit, auditStep, countAudit, isAuditOn, judgeAudit, readAudit } from "../../src/gauntlet/auditRisk.js";
+import { addAudit, auditStep, countAudit, isAuditOn, judgeAudit } from "../../src/gauntlet/auditRisk.js";
 import { normalizeRunState, openCaseRun, resolveWindow } from "../../src/gauntlet/gauntletEngine.js";
-import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
+import { readAudit, readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { findAudit } from "../../src/gauntlet/tableVoice.js";
-import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
-import { getWeekRule, pickSeasonWeekRule, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
+import { HEAT_DEBT_GAUGE } from "../../src/gauntlet/tableRules.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE, getWeekRule, pickSeasonWeekRule, weekRuleHasDevice, weekRuleOverlay } from "../../src/gauntlet/weeklyRules.js";
 
 const card = { id: "a", label: "a", effect: { capital: 9, trust: -12 }, next: "x" };
 const cash = (gauge, pushes = 2) => ({ status: "cashed", cause: "cash", gauge, wall: 95, pushes, seed: `audit:${gauge}:${pushes}` });
