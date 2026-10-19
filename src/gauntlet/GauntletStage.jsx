@@ -158,7 +158,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief,
   } = readTableMeters({ win, schema, selectedCard });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -202,6 +202,11 @@ export function GauntletStage({
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
+  // STEADY's relief comes off the heat there is (`FOCUS` in the engine clamps
+  // at 0), so on a cold board -- before the first push -- a press cools
+  // nothing. The stance line says "민 뒤", and the LOCK button says it again
+  // while it is true.
+  const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const handBlocked = !live || isAdvancing || !tableOpen;
   // The folded briefing on the table draws its own copy of the plate; nothing
@@ -729,8 +734,9 @@ export function GauntletStage({
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
           aria-label={`LOCK ${Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
-          aria-describedby="gx-focus-detail"
+          aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
+          {steadyCold && <span id="gx-steady-cold" className="sr-only">열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라</span>}
           <Crosshair size={18} aria-hidden="true" />
           {/* The space keeps LOCK and the charge two words to whoever reads the
               text; in the flex row a space between items is not drawn. */}

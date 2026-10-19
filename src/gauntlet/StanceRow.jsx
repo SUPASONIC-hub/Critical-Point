@@ -4,9 +4,13 @@ import { FOCUS_MODES, getFocusModeProfile, STANCE_MASTERY_GOAL } from "./gauntle
 // The stance profiles are written for the engine; the table speaks Korean.
 // STRIKE's line names the cap it shares with the logic combo (`HAND_CAP`,
 // x1.5): a combo of 8 is already there, and LOCK then adds nothing to the pot.
+// STEADY's line says "민 뒤" (after a push): its relief is taken off the heat
+// there is, so before the first push it cools nothing. The line keeps the
+// length of the line before it (21 characters) so the 360px stance row does
+// not wrap anew.
 const FOCUS_MODE_COPY = {
   strike: "배율 빠르게 · 콤보 합쳐 1.5배까지",
-  steady: "배율 작게 · LOCK마다 테이블 냉각",
+  steady: "배율 작게 · 민 뒤 LOCK마다 냉각",
   expose: "카드의 자원 효과 증폭",
 };
 

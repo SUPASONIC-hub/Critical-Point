@@ -979,7 +979,10 @@ Still open, on purpose:
     summary, alongside `reframeRouteCount` and `peopleFirstCount`); the
     authority gate asks for records from 60% of the cases opened, never fewer
     than four; a finale that burns the records closes OPEN OVERSIGHT, EVIDENCE
-    REFORM and HUMAN RECORD. The gates a player is told about live in
+    REFORM and HUMAN RECORD; HUMAN RECORD also asks for every case's record
+    (`HUMAN_RECORD_CLUE_RATE`), not only a reframed route in seven cases of
+    ten, since staking the wild card wherever it was dealt closed 94% of
+    seasons on it. The gates a player is told about live in
     `ENDING_GATES`, and the report's advice quotes them. Later cases open with
     `SEASON_WEAR` (fatigue +14, time -8 by the finale, linear in position).
 76. The season's entry point is data. `src/gameCases.js` owns

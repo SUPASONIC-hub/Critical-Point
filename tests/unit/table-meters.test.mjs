@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
-  BASE_SCHEMA, GAUGE_MAX, getCardChips, getFocusBonus, getForcedCard, getHeartbeatBpm, getMultiplier, getRemainingSeconds,
+  BASE_SCHEMA, GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getForcedCard, getHeartbeatBpm, getMultiplier, getRemainingSeconds,
   getSealedCardId, readRoomCards,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { describeDanger, readTableMeters } from "../../src/gauntlet/tableMeters.js";
@@ -63,6 +63,14 @@ test("the 현재 위험 line says the heat is in the band once it is, and reads 
   assert.equal(describeDanger({ gauge: 50, nextHigh: 65, wallMin: 56 }), "밀면 벽 사정권");
   // A 360px phone cut the old line to 다음 밀기가 벽 사…; every line is now shorter than what it showed.
   for (const text of ["벽 구간 안", "밀면 벽 사정권", line(0)]) assert.ok(text.length < "다음 밀기가 벽 사".length, text);
+});
+
+test("a board colder than the stance's relief is read as below it, so STEADY's LOCK says it cools nothing yet", () => {
+  const relief = getFocusModeProfile("steady").relief;
+  assert.equal(readTableMeters({ win: windowAt({ gauge: 0 }), schema: BASE_SCHEMA, selectedCard: null }).belowRelief, true);
+  assert.equal(readTableMeters({ win: windowAt({ gauge: relief }), schema: BASE_SCHEMA, selectedCard: null }).belowRelief, false);
+  // A stance with no relief is never below it.
+  assert.equal(readTableMeters({ win: windowAt({ gauge: 0, focusMode: "strike" }), schema: BASE_SCHEMA, selectedCard: null }).belowRelief, false);
 });
 
 test("the heartbeat hears the tell wall, and a window saved without a tell hears the wall", () => {

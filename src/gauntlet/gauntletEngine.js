@@ -1129,7 +1129,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES } = {}) {
 
 /** Builds the next board from what just happened. */
 /** A burn smaller than this is a scratch, not a fracture. */
-export const FRACTURE_MIN_BURN = 10;
+export const FRACTURE_MIN_BURN = 8;
 
 function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}, rules = ALL_RULES) {
   if (!rules.has("stance") || !earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;

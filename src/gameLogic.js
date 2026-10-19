@@ -561,6 +561,13 @@ const CLUE_RATE_SLACK_BAR = 0.8;
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
 const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
 const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten (p75 0.75)
+// HUMAN RECORD also asks that every case's record opened, not only how often the
+// wild card was taken: staking 판을 다시 짠다 wherever dealt closed 94% of seasons
+// as HUMAN RECORD (2026-10-14, `report:endings` "Wild card only") on the reframe
+// rate alone, at a clue rate (p25 0.98) under the card-free archetypes' (p25 1.00);
+// harm and people-first decisions could not tell them from a balanced season.
+// With it (2026-10-15) that hand closes 67.5% as HUMAN RECORD, all 13.7% (14.0%).
+const HUMAN_RECORD_CLUE_RATE = 1;
 const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
@@ -709,7 +716,7 @@ export function getEndingVariant({
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
   const recordsOpen = clueRate >= (slack ? CLUE_RATE_SLACK_BAR : CLUE_RATE_BAR);
-  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];
   if (cold) return ENDINGS["cold-justice"];
   if (recordsOpen && legitimacy >= REFORM_LEGITIMACY) return ENDINGS["evidence-reform"];

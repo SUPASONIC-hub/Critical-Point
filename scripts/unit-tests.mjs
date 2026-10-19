@@ -1044,6 +1044,13 @@ test("the finale answers: burning every record closes the endings made of record
   assert.equal(withFinale("f_after_burn"), "quiet-cover", "no record survives the burn to build oversight on");
 });
 
+test("HUMAN RECORD asks for the season's whole record, not only the wild card", () => {
+  const reframed = { ...seasonAtTheBar, seasonReframeRoutes: 44 };
+  const clues = (length) => Array.from({ length }, (_, index) => ({ id: `c${index}` }));
+  assert.equal(getEndingVariant({ ...reframed, discoveredClues: clues(55) }).id, "human-record", "a reframed season that opened every record");
+  assert.notEqual(getEndingVariant({ ...reframed, discoveredClues: clues(54) }).id, "human-record", "one record short, the reframe rate alone does not close it");
+});
+
 test("the season's standing is the mean of what its cases closed on", () => {
   const summary = (trust, legitimacy, capital, humanCost, peak, routes) => ({
     finalResources: { trust, legitimacy, capital, humanCost, fatigue: 20, time: 50 },
