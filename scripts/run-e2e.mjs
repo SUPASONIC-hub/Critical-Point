@@ -43,7 +43,7 @@ import path from "node:path";
 // `npm run check:visual-baselines` fails when its version is not the locked
 // @playwright/test version, and the Visual Regression workflow pins the same tag.
 const PLAYWRIGHT_IMAGE =
-  "mcr.microsoft.com/playwright:v1.62.1-noble@sha256:dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e";
+  "mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf";
 
 const MODE_FLAGS = ["--full", "--runtime", "--preview", "--season", "--docker", "--segments", "--skip-segments", "--list", "--webkit"];
 const argv = process.argv.slice(2);
