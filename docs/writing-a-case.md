@@ -13,6 +13,26 @@
 모양을 모두 갖추고 있습니다. 사건 01~11과 마지막 사건은 옛 표에서 옮겨 와 모양이 느슨하니 견본으로 쓰지
 마십시오.
 
+새 사건을 견본으로 게임에 넣어 두지는 않았습니다. 들어간 사건은 모두 시즌의 이야기이고, 이야기 없는 견본
+사건은 검사(결말 퍼널, 시즌 완주)를 함께 바꾸게 하기 때문입니다. 대신 견본은 둘입니다. 1장의 **뼈대 견본**은
+사건 49의 모양을 그대로 줄인 것이고, 4장은 실제 장면을 한 글자도 고치지 않고 옮긴 것입니다. 실제 파일 하나를
+처음부터 끝까지 읽고 싶다면 지금 가장 짧은 사건 파일은 `src/nodes/case24.js`(약 850줄)입니다. 사건 12~49는
+모두 850~870줄이라 어느 것을 읽어도 길이는 비슷합니다.
+
+차례
+
+1. 사건 하나에 들어가는 것 (뼈대 견본)
+2. 장면 하나
+3. 카드 하나
+4. 견본: 실제 장면 하나
+5. 나머지 표
+6. 시즌에 사건을 올리기
+7. 검사가 지키는 규칙
+8. 쓰고 나서 돌릴 순서
+9. 흔한 실수
+10. 글 방향: 한국 직장의 블랙 코미디
+11. 참고: 파일 위치
+
 ---
 
 ## 1. 사건 하나에 들어가는 것
@@ -49,6 +69,73 @@
   `case50_result`로 씁니다.
 - 카드 id는 한 사건 안에서 겹치면 안 됩니다. 겹치면 뒤에 쓴 대사가 앞의 것을 덮어씁니다.
 - 단서 id는 `c50-`으로 시작합니다(예: 사건 49의 `c49-successor-form`).
+- 여파 카드 셋은 대부분의 사건이 `c50_after_warm`(사람 쪽), `c50_after_record`(기록 쪽), `c50_after_rush`(속도
+  쪽)처럼 이름을 붙였습니다. 검사가 요구하는 것은 아니지만, 다음 사건과 마지막 사건이 이 id로 키를 쓰므로
+  같은 이름을 쓰면 옮길 때 덜 헷갈립니다.
+
+### 뼈대 견본
+
+사건 49(`src/nodes/case49.js`)를 사건 50이라고 치고 칸만 남긴 모양입니다. `...`과 주석 자리를 채우면 검사가
+읽는 모양이 됩니다. 각 칸의 자세한 모양은 2~5장에 있습니다.
+
+```js
+/**
+ * CASE 50 -- 이 사건이 무엇을 다루는지 한두 문단. 지금까지는 영어로 써 왔습니다.
+ */
+const case50Nodes = {
+  c50_start: {
+    phase: "CASE 50 BRIEFING",
+    title: "...",
+    speaker: "한서윤",
+    text: "...",
+    memo: ["...", "..."],
+    triggers: ["responsibility", "curiosity"],
+    choices: [
+      {
+        id: "c50_start_share",
+        label: "...", // 30자 이하
+        effect: { trust: 10, time: -5, fatigue: 4 },
+        voice: "이유를 말하며, + 라벨을 거의 그대로.",
+        echo: "카드를 받아 여는 문장. ...",
+        next: "c50_market",
+        cognition: { persistence: 2 },
+      },
+      // 사람 쪽·절차 쪽·속도 쪽이 하나씩 되도록 카드 둘 더
+      { id: "reframe", label: "다른 방법을 제안한다", type: "reframe", next: "c50_market" },
+    ],
+  },
+  // c50_market ... 결정 장면 c50_final까지, 본 장면은 모두 다섯
+};
+
+export const case50 = {
+  id: "case50",
+  nodes: case50Nodes,
+  aftermath: {
+    c50_aftershock: { phase: "AFTERMATH", title: "...", speaker: "...", text: "...", memo: [], triggers: [], choices: [/* 결말 카드 셋, next: "case50_result" */] },
+  },
+  aftermathRoute: ["c50_final", "c50_aftershock"],
+  connectiveScenes: [/* 셋: { id, after, next, title, speaker, text, memo, choices } -- 카드에 id·next 없음 */],
+  reactionScenes: [/* 셋: after가 연결 장면 id */],
+  branchPlan: ["c50_market", 0, "c50_branch_x", "c50_branch_x_follow"],
+  branchScenes: { c50_branch_x: { /* ... */ }, c50_branch_x_follow: { /* ... */ } },
+  routePlan: { /* 5장 */ },
+  evidencePlan: { /* 5장 */ },
+  memoryPlan: { systemNext: "...", evidenceNext: "...", systemLabel: "...", evidenceLabel: "...", systemEcho: "...", evidenceEcho: "..." },
+  openingRoutes: { c49_after_warm: "c50_start_warm", c49_after_record: "c50_start_record", c49_after_rush: "c50_start_rush" },
+  openingCopy: { c50_start_warm: ["제목", "화자", "본문", ["메모"]] /* 셋 모두 */ },
+  openingSignatures: { c50_start_warm: { label: "...", effect: {}, cognition: {}, voice: "...", echo: "..." } /* 셋 모두 */ },
+  characterProfiles: {},
+  setting: { place: "...", clock: "10월 초 목요일 · 09시" },
+  sceneContext: { c50_start: { place: "...", clock: "...", question: "...", lead: "..." } /* 장면 20개 모두 */ },
+  clue: { id: "c50-...", title: "...", text: "..." },
+  outcomes: { c50_after_warm: { tag: "...", title: "...", text: "..." } /* 셋 모두 */ },
+  carryovers: { c50_after_warm: { trust: 10, fatigue: -5 } /* 셋 모두 */ },
+  continuityChallenges: { c49_after_warm: { id: "protect-trust", title: "...", text: "..." } /* 셋 모두 */ },
+};
+```
+
+키 두 종류를 헷갈리지 않게 봅니다. `openingRoutes`와 `continuityChallenges`는 **앞 사건**(사건 49)의 여파 카드
+id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 카드 id로 씁니다.
 
 ---
 
@@ -423,6 +510,14 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 - `${...}` 뒤에 "을/를", "이/가"를 박아 쓰면 안 됩니다. 숫자나 이름에 따라 조사가 바뀌기 때문입니다.
 - 인물 이름과 회사 이름 뒤의 조사는 받침에 맞아야 합니다. "진태윤가"는 실패, "진태윤이"는 통과입니다.
 
+### 판의 말은 이름 하나 — 물러난 말 (`npm test`)
+
+판의 말은 하나에 이름 하나입니다(one-name-per-term). 물러난 말(푸시 → 밀기, 락 → LOCK, 차지 → 충전, 케이스 →
+사건, 체인·연승 → 연속, 압박계 → 열기)은 `tests/unit/retired-terms.test.mjs`가 막습니다. 이 검사는 이야기
+파일(`src/nodes/`)은 읽지 않습니다. 이야기 속에서 "연락", "차지하다"는 평범한 말이기 때문입니다. 대신 6장에서
+고치는 **사건 둘레의 문구**(`src/gameCases.js`, `src/caseCopy.js`, `src/appCopy.js`)는 읽으므로, 사건 카드나
+예고에 "케이스 50", "3연승" 같은 말을 쓰면 `npm test`에서 실패합니다.
+
 ### 그 밖에 같이 돌릴 것
 
 - `npm run check:balance`: 늘 같은 쪽 카드만 골라도 모든 자원을 이기는 일이 없는지, 자원마다 오르기도 하고
@@ -435,7 +530,89 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 
 ---
 
-## 8. 참고: 파일 위치
+## 8. 쓰고 나서 돌릴 순서
+
+앞의 검사가 통과해야 뒤의 검사가 뜻 있는 말을 합니다. 그래프가 깨져 있으면 대사·쉬운 말 검사는 엉뚱한 장면을
+읽기 때문입니다.
+
+1. `npm run check:graph` — 사건 모양과 장면 잇기. 가장 먼저, 통과할 때까지 이것만 돌립니다.
+2. `npm run check:canon` — 대출 사실과 요일이 붙은 날짜.
+3. `npm run check:dialogue` — 연결·반응 장면의 대사가 자기 카드를 받는지. 사건을 더했다면 기대값부터 고칩니다(6장 7).
+4. `npm run check:plain-language` — 쓰지 않는 말, 용어집 풀이.
+5. `npm run check:card-labels` — 라벨 30자.
+6. `npm run check:text` — 깨진 글자, `${...}` 뒤 조사, 이름 뒤 조사.
+7. `npm run check:fonts` — 새 음절. 실패하면 `npm run build:fonts`를 돌리고 다시 확인합니다.
+8. `npm run check:balance`, `npm run check:endings` — 숫자. 둘 다 느리니 글이 다 정해진 뒤에 돌립니다.
+9. 시즌에 올렸다면 `npm run check:doc-numbers`(README의 사건 수)와 `npm run check:grants`(서버의 사건 목록).
+10. `npm run lint`, `npm test` — 물러난 말 검사도 여기 들어 있습니다.
+11. 마지막으로 `npm run verify:static` 한 번. 위의 검사를 모두 나란히 돌리고, 실패한 것을 모아 보여 줍니다. 몇
+    개만 고르려면 `npm run verify:static -- check:graph check:canon`처럼 이름을 붙입니다.
+
+브라우저 테스트는 main에 병합된 뒤에 돕니다. 그 전에 위 순서를 모두 통과시켜 둡니다.
+
+---
+
+## 9. 흔한 실수
+
+| 실수 | 잡는 곳 | 고치는 법 |
+| --- | --- | --- |
+| 연결·반응 장면의 카드에 `id`나 `next`를 씀 | `check:graph` | 둘 다 지웁니다. 게임이 붙입니다 |
+| 연결 장면이 가져가는 장면의 카드에 `next`를 남김 | `check:graph` "drop the dead next" | `next`를 지웁니다 |
+| 장면 id가 `c50_`으로 시작하지 않음, 카드 id가 사건 안에서 겹침 | `check:graph` "reuses the id of a card" | 1장 이름 짓기대로 고칩니다. `장면id_짧은말` 모양이면 겹치지 않습니다 |
+| `openingRoutes`의 키를 이번 사건 id로 씀 | `check:graph` | 앞 사건 여파 카드 id(`c49_after_*`)로 씁니다 |
+| 마지막 사건의 오프닝·과제 키를 옮기지 않음 | `check:graph` | 6장 3대로 `c50_after_*`로 바꿉니다 |
+| 사건 19 뒤의 사건에 2025년 달력으로 요일을 씀 | `check:canon` | 연도 표를 봅니다. 2025년 10월 16일은 목요일, 2026년 10월 16일은 금요일입니다 |
+| 어려운 말을 라벨이나 메모에서만 풂, 또는 오프닝 하나에서만 풂 | `check:plain-language` | 본문이나 `lead`에서, 그 말이 처음 읽히는 모든 길에서 풉니다 |
+| 라벨이 30자를 넘음 | `check:card-labels` | 줄입니다. 이유는 `voice`로 옮기면 됩니다 |
+| `build:fonts` 뒤 글꼴 파일이나 글자 목록 파일 하나만 커밋함 | `check:fonts` | 둘 다 커밋합니다 |
+| PowerShell에서 한글이 깨져 보여 원고를 "고침" | `check:text`, `check:encoding` | 화면이 아니라 검사를 믿습니다. 원고는 대개 멀쩡합니다 |
+| 사건 카드·예고에 "케이스", "연승" | `npm test`(물러난 말) | "사건", "연속"으로 씁니다 |
+| 새 인물의 이름이 시즌에 이미 있음 | `check:graph` | 다른 이름을 짓거나, 같은 사람이면 `characterOverrides`로 씁니다 |
+| 대사 검사의 기대값, README의 사건 수, 서버의 사건 목록을 그대로 둠 | `check:dialogue`, `check:doc-numbers`, `check:grants` | 6장 6~7대로 함께 고칩니다 |
+| `voice`가 라벨과 다른 말을 함 | `check:dialogue` | "이유, + 라벨을 거의 그대로" 모양으로 다시 씁니다 |
+
+---
+
+## 10. 글 방향: 한국 직장의 블랙 코미디
+
+이 게임의 웃음은 한국 직장과 금융의 부조리에서 나옵니다. 새 사건이나 카드 문구를 쓸 때 이 방향을 기준으로
+삼습니다. 지금 사건들도 이미 이쪽에 있습니다. 강서지점 입구의 실적판과 그대로 붙은 "이달의 판매왕"
+스티커(사건 07), 대표이사와 CFO가 작은아버지와 고모부인 회사(사건 09), 33층에 올라가는 날 "왕복 교통비
+견적"을 보내는 동료(사건 49)가 그 예입니다.
+
+**쓸 만한 소재**
+
+- 낙하산: 회장 조카가 본부장으로 오는 날, 그 사람의 첫 지시가 "보고서 글꼴 통일"인 아침.
+- 실적 압박 메시지: 부장이 새벽 1시에 단체방에 올리는 "다들 자나? 내일 9시까지 실적 공유 부탁 ^^", 웃는 얼굴
+  이모티콘 뒤의 숫자 목표.
+- 숫자 맞추기: 보고서에 맞춰 바뀌는 숫자, 회의를 위한 사전 회의, 승인 라인에 이름만 남은 사람.
+- 책임이 내려가는 길: 위에서 정한 일을 창구 직원의 이름으로 남기는 공문.
+
+**쓰는 법**
+
+- 웃음의 과녁은 제도와 권력입니다. 피해를 본 사람(창구 직원, 야간조, 대출을 받은 소상공인)을 웃음거리로
+  삼지 않습니다.
+- 우스운 장면과 대가를 한 장면에 둡니다. 사건 49의 여파처럼 컵라면 두 개와 명세서의 "흑자"가 나오는 같은
+  장면에서 그 밤이 마지막일 수 있다는 무게가 함께 갑니다. 카드의 `echo`는 웃긴 첫 문장 뒤에 치르는 것을
+  한 줄 남기면 좋습니다.
+- 농담은 인물이 합니다. 내레이션이 플레이어에게 윙크하지 않고, 인물이 자기 말투대로 진지하게 우스운 말을
+  합니다(인물의 말투는 `characterProfiles`의 `voice`, `line`에 있습니다).
+- 직장 은어도 어려운 말입니다. "낙하산", "대기발령" 같은 말은 처음 읽히는 곳에서 괄호로 풉니다. 용어집에
+  없으면 더해 둡니다(7장 check:plain-language).
+
+**지킬 것**
+
+- **실존 인물과 실존 기업은 쓰지 않습니다.** 정치인, 기업인, 연예인, 실제 은행·증권사·그룹의 이름을 쓰지
+  않고, 실제 사건을 알아볼 수 있게 옮겨 오지도 않습니다. 회사와 은행은 시즌의 가상 이름(KD금융그룹, KD은행,
+  KD캐피탈, 플로우온 같은 것)을 쓰고, 새 회사 이름은 지금 들어도 어색하지 않되 실제로 없는 이름을 지은 뒤
+  검색해서 확인합니다. 금융감독원, 국정감사, 부제소 합의처럼 제도와 기관의 일반 이름은 씁니다.
+- **canon을 지킵니다.** 대출 2023-0412의 사실은 `docs/canon.md`의 값만 쓰고, 메시지에 날짜와 요일을 박을
+  때는 연도 표(7장 check:canon)를 봅니다. 새벽 단체방 메시지도 사건의 해 달력에 맞는 요일이어야 합니다.
+- 우스운 숫자도 숫자입니다. 메모에 적은 금액·인원·시각은 같은 사건의 다른 장면과 맞아야 합니다.
+
+---
+
+## 11. 참고: 파일 위치
 
 | 무엇 | 파일 |
 | --- | --- |
