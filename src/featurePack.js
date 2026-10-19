@@ -63,7 +63,7 @@ export function getEndingEpilogue(endingId = "open-question") {
     "quiet-cover":
       "위험 곡선은 끝까지 평평했습니다. 무너진 것도 드러난 것도 없고, '인사평가_보조지표' 폴더는 다시 잠겼습니다. 당신이 열지 않은 문 뒤의 기록은 그대로 있습니다.",
     collapse:
-      `${nativeKoreanCount(NUMBERED_CASES)} 사건 가운데 여러 건이 정상화되지 못한 채 닫혔습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다.`,
+      `${nativeKoreanCount(NUMBERED_CASES)} 사건 가운데 여러 건이 정상화되지 못한 채 닫혔습니다. 강태민이 잃는 것 칸에 적은 야간 수당, 권도현이 서명의 값에 더한 가족 학자금 지원처럼, 회사가 버틸 때 사람들 몫으로 붙어 있던 것부터 거둬졌습니다. 남은 것은 기록뿐이고 그 기록에도 서명한 사람이 없습니다.`,
   };
   return (
     epilogues[endingId] ||
