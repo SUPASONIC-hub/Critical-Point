@@ -70,10 +70,13 @@ import { createChoiceReaders } from "../../src/state/useDecision.js";
  * (SPLINT, LOCKPICK, GLASS LENS, in the order the day-10 plan named them);
  * the rest follow that report's "measured tools one at a time" from the
  * least lift to the most, so INSURANCE is the last to go (measured
- * 2026-10-16: HIGH ROLLER -1.8%, STEADY ANCHOR +0.1, ENCORE +1.3, COLD BLOOD
- * +1.4, METRONOME +2.1, HEAT SINK +3.3, STETHOSCOPE +3.9, KINETIC GRIP +5.3,
- * INSURANCE +8.7). HIGH ROLLER measures below the first three; it follows
- * them because the plan named those three.
+ * 2026-10-16 at the day-ten table, the streak to x1.6: HIGH ROLLER -1.8%,
+ * STEADY ANCHOR +0.1, COLD BLOOD +1.4, ENCORE +1.7, METRONOME +2.8, HEAT SINK
+ * +3.4, STETHOSCOPE +4.0, KINETIC GRIP +5.4, INSURANCE +8.7). HIGH ROLLER
+ * measures below the first three; it follows them because the plan named
+ * those three. ENCORE now measures above COLD BLOOD (it was +1.3 under the
+ * x1.5 cap) and is still put down first: the order is the one measured at
+ * x1.5, kept so the swap's measures stay comparable.
  */
 export const RELIC_DROP_ORDER = Object.freeze([
   "splint",
@@ -461,11 +464,6 @@ export const HAND_LOCKS = 0.5;
 export const STANCES = ["strike", "steady", "strike", "steady", "expose"];
 
 /**
- * The two case players, for a case `windowsPerCase` windows long. `card` is
- * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
- * windowIndex)` the scene whose types a typed hand picks from.
- */
-/**
  * SCOUT as a hand plays it (B1): the look, before the first push. `scout` is
  * the decide function's own mark (`decide.scout`): `true` presses SCOUT as the
  * table does, and `{ seconds }` is a sweep's candidate price, paid on the clock
@@ -481,6 +479,11 @@ export function scoutWindow(win, scout, rules = ALL_RULES) {
   return spent;
 }
 
+/**
+ * The two case players, for a case `windowsPerCase` windows long. `card` is
+ * the one simulated card `playCase` stakes, and `sceneFor(caseIndex,
+ * windowIndex)` the scene whose types a typed hand picks from.
+ */
 export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor }) {
   /**
    * `pickType` gives the simulated card a type for the window (`LOGIC_HANDS`
