@@ -459,14 +459,6 @@ export function GauntletStage({
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
             <RelicChips relics={relics} pulse={relicPulse} />
-            {/* Each push makes the clock heat the gauge faster; said once it is. */}
-            {live && clockHeat && (
-              <span className="gx-stat" data-testid="gauntlet-clock-heat">
-                <span className="sr-only">{clockHeat.spoken}</span>
-                <small aria-hidden="true">시계 열기</small>
-                <b aria-hidden="true">{clockHeat.text}</b>
-              </span>
-            )}
           </div>
           {/* Rendered or not, never `hidden`: both signals set their own display,
               and the row's padding would stand over nothing. */}
@@ -557,6 +549,15 @@ export function GauntletStage({
             <span className="gx-band-label" aria-hidden="true">
               벽 {schema.wallMin}–{schema.wallMax}
             </span>
+            {/* Each push makes the clock heat the gauge faster; said once it is.
+                In this one-line row and before the pulse, so it moves nothing:
+                in the bank rail it wrapped to a second line at 360px. */}
+            {live && clockHeat && (
+              <span data-testid="gauntlet-clock-heat">
+                <span className="sr-only">{clockHeat.spoken}</span>
+                <span aria-hidden="true">시계 열기 <b>{clockHeat.text}</b></span>
+              </span>
+            )}
             <span className="gx-bpm" data-testid="gauntlet-bpm">
               <HeartPulse size={14} aria-hidden="true" />
               심박 <b>{schema.sedated ? "교란" : bpm}</b>
