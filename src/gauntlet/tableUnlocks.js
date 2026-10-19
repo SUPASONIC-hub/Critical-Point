@@ -16,7 +16,7 @@
  * Pushing, cashing, the wall and the heartbeat are the table itself and are
  * not listed: no step is without them.
  */
-import { HAND_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
+import { LOCK_CAP, STANCE_CHARGE } from "./gauntletEngine.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -166,21 +166,21 @@ const STEPS = [
     intro: [
       "가장 크게 태운 자원은 다음 판에서 1.5배로 청구됩니다.",
       "×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다.",
-      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 콤보와 합쳐 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다.",
+      "카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 LOCK으로 1.5배까지(콤보로는 1.6배까지) 오릅니다. 누를 때마다 시간이 줄어듭니다.",
     ],
   },
   {
     caseId: "prologue05",
     adds: ["stance", "relics"],
-    // What a charge does once the stake multiplier is at its cap (`HAND_CAP`):
-    // nothing to this hand's, and the stance's carry if it reached
+    // What a charge does once LOCK is at its own cap (`LOCK_CAP`): nothing to
+    // this hand's multiplier, and the stance's carry if it reached
     // `STANCE_CHARGE` (`applyFocusCarry`). STEADY's relief is taken off the
     // heat there is, so on a cold board before the first push it cools nothing.
     // A story run is told no promise about the next board, so not the second.
     storyIntro: [0, 2],
     intro: [
       "자세는 LOCK이 무엇을 키울지 정합니다. STRIKE는 배율(1.5배 상한에 가장 빨리), STEADY는 식힘, EXPOSE는 자원입니다.",
-      `칩 배율이 ${HAND_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
+      `칩 배율이 ${LOCK_CAP}배에 닿은 뒤의 LOCK은 이번 판 배율에 더하지 않고, ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치릅니다.`,
       "STEADY는 데워진 열기만 식힙니다. 한 번 민 뒤에 충전하십시오.",
     ],
   },

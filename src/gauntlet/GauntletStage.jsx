@@ -11,7 +11,7 @@ import {
   GAUGE_MAX,
   REFRAME_CARD_ID,
   getHandBonus,
-  HAND_CAP,
+  LOCK_CAP,
   lockpickOpensSeal,
   readRoomCards,
   scoreFocus,
@@ -191,7 +191,7 @@ export function GauntletStage({
   const lockPot = handBonus / earnedBonus;
   // At the cap a press adds nothing more to this hand's multiplier; what a
   // charge still pays is the resources and, with a stance, the next board.
-  const lockCapped = handBonus >= HAND_CAP;
+  const lockCapped = handBonus >= LOCK_CAP;
   const livePot = Math.round(selectedChips * multiplier * handBonus);
   const nextPotLow = Math.round(selectedChips * nextMultiplierLow * handBonus);
   const nextPotHigh = Math.round(selectedChips * nextMultiplierHigh * handBonus);
@@ -747,7 +747,7 @@ export function GauntletStage({
               112px in a button with 82px of room at 390px (74px at 360px). */}
           <small>{Math.round(win.focus)} · −{LOCK_PRESS_SECONDS}초</small>
           <span id="gx-focus-detail" className="sr-only">
-            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${HAND_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 콤보와 합쳐 ${HAND_CAP}배까지만 오른다`}
+            지금 충전 {Math.round(win.focus)}. 누를 때마다 자원 배율이 오르고 시간이 {LOCK_PRESS_SECONDS}초 줄어든다. {lockCapped ? `칩 배율이 ${LOCK_CAP}배에 닿아 이번 판에는 더하지 않는다` : `칩 배율은 LOCK으로 ${LOCK_CAP}배까지만 오른다`}
             {stanceOn && `. ${STANCE_CHARGE} 이상 충전해 확정하면 다음 판에서 치른다`}
           </span>
         </button>

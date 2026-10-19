@@ -35,6 +35,7 @@ import {
   isSaveAheadOf,
   carryTableRecordIntoRestore,
   HAND_CAP,
+  LOCK_CAP,
   scoreFocus,
   applyRelics,
   drawRelicOffer,
@@ -943,7 +944,7 @@ test("a LOCK press charges what a GOOD one did, cools as its stance does and cos
 test("the streak pays the pot from the third card of a type, and the heat multiplier is the heat's alone", () => {
   let run = RUN_INITIAL_STATE;
   const paid = [];
-  for (let index = 0; index < 11; index += 1) {
+  for (let index = 0; index < 12; index += 1) {
     const { verdict, nextRun } = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk") });
     paid.push(verdict.logic.bonus);
     assert.equal(verdict.pot, Math.round(verdict.chips * verdict.multiplier * verdict.logic.bonus));
@@ -951,25 +952,26 @@ test("the streak pays the pot from the third card of a type, and the heat multip
     run = nextRun;
   }
   assert.deepEqual(paid.slice(0, 4), [1, 1, 1.06, 1.13], "two cards build, the third pays");
-  assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 8");
-  assert.equal(run.runHand, run.runPot - 11 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
+  assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 10");
+  assert.equal(run.runHand, run.runPot - 12 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
   const broke = resolveWindow({ run, window: cashedAt(20), card: typed("b", "inference") });
   assert.deepEqual([broke.verdict.logic.move, broke.verdict.logic.bonus, broke.nextRun.logic.streak], ["break", 1, 0]);
   const bust = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
-  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 9], "a bust takes the streak with the pot, and the record stays");
+  assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 10], "a bust takes the streak with the pot, and the record stays");
   const closed = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk"), caseClosed: true });
   assert.equal(closed.nextRun.handVault, run.runHand + closed.verdict.logic.pot, "a closed case moves the hand's share into the vault with the pot");
   assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closed.nextRun)))), closed.nextRun, "the streak survives a save");
 });
 
-test("LOCK and the streak are paid under one cap", () => {
-  const run = normalizeRunState({ logic: { streak: 7, best: 7, type: "risk", held: 9 } });
+test("LOCK and the streak are paid under one cap, LOCK's share under its own", () => {
+  const run = normalizeRunState({ logic: { streak: 9, best: 9, type: "risk", held: 11 } });
   const locked = resolveWindow({ run, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
   assert.equal(locked.logic.bonus, HAND_CAP, "the streak alone is at the cap");
   assert.equal(locked.focus.potMultiplier, 1, "so a full LOCK adds nothing to this pot");
   assert.equal(locked.pot, Math.round(locked.chips * locked.multiplier * HAND_CAP));
   const bare = resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20, { focus: 100, focusMode: "strike", focusHits: 5 }), card: typed("a", "risk") }).verdict;
-  assert.equal(bare.pot, locked.pot, "and a full LOCK with no streak reaches the same cap");
+  assert.equal(bare.pot, Math.round(bare.chips * bare.multiplier * LOCK_CAP), "and a full LOCK with no streak stops at its own cap, under the streak's");
+  assert.ok(bare.pot < locked.pot);
 });
 
 test("the ledger reads the streak and still reads a log written before it paid; the ending's door is the streak's alone", () => {

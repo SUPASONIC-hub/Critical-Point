@@ -65,7 +65,7 @@ export function getHeatTier(outcome, gauge) {
   return outcome === "bust" ? 3 : gauge >= HEAT_DEBT_GAUGE ? 2 : gauge >= SEAL_BREAK_GAUGE ? 1 : 0;
 }
 
-/** What a streak pays: x1 with none, x1.5 from a streak of 8. */
+/** What a streak pays: x1 with none, x1.6 from a streak of 10. */
 export function getLogicBonus(streak) {
   return 1 + Math.min(LOGIC_CAP, Math.max(0, Number(streak) || 0) * LOGIC_RATE);
 }

@@ -23,7 +23,7 @@ const { nodes } = await import("../../src/gameData.js");
 const { createCaseSummary, createLogicRecord, getRiskPressure, getSeasonLogic, REFRAME_COGNITION } = await import("../../src/gameLogic.js");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, normalizeRunState,
+  BASE_SCHEMA, carryTableRecordIntoRestore, createRunSummary, createTableRecord, createWindow, getFocusBonus, getHandBonus, HAND_CAP, LOCK_CAP, normalizeRunState,
   createOpenSeed, openCaseRun, reduceWindow, resolveWindow, RUN_INITIAL_STATE, scoreFocus, serializeRunState, splitOpenSeed, STANCE_CHARGE, suspendWindow, upgradeRunRecord, VERDICT_CAUSES,
 } = engine;
 const { advanceLogic, getHeatTier, getLogicBonus, getLogicType, listOfferedTypes, LOGIC_INITIAL, normalizeLogic } = await import("../../src/gauntlet/logicStreak.js");
@@ -72,7 +72,7 @@ test("the build ships the streak, and it is what the hand is paid on", () => {
   assert.deepEqual(RUN_INITIAL_STATE.logic, { streak: 0, best: 0, type: null, held: 0, heat: 0, rose: false, reach: 0 });
   assert.equal(RUN_INITIAL_STATE.logic, LOGIC_INITIAL);
   assert.ok(Object.isFrozen(LOGIC_INITIAL));
-  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS, METRONOME_REACH], [0.0625, 0.5, 3, 1.5, 2]);
+  assert.deepEqual([LOGIC_RATE, LOGIC_CAP, LOGIC_HOLD, LOCK_PRESS_SECONDS, METRONOME_REACH], [0.0625, 0.6, 3, 1.5, 2]);
   const tableRules = readFileSync(new URL("../../src/gauntlet/tableRules.js", import.meta.url), "utf8");
   assert.equal(/export const LOGIC\b/.test(tableRules), false, "the switch went with the beat it switched to");
   for (const gone of ["judgeBeat", "scoreBeat", "getGoodWindowMs", "getGrooveBonus", "SLIP_SECONDS", "FEVER_BONUS", "COMBO_POINT_CAP", "GROOVE_CAP"]) {
@@ -809,14 +809,15 @@ test("the finale's summary carries the season's numbers, and a season without re
 
 /* --------------------------------------------------------- what it pays */
 
-test("the streak pays 1 + min(0.5, streak x 0.0625) and the hand is capped as it was", () => {
-  assert.deepEqual([0, 1, 4, 8, 9, 40].map(getLogicBonus), [1, 1.0625, 1.25, 1.5, 1.5, 1.5]);
+test("the streak pays 1 + min(0.6, streak x 0.0625), and LOCK lifts the hand only to its own cap", () => {
+  assert.deepEqual([0, 1, 4, 8, 9, 10, 40].map(getLogicBonus), [1, 1.0625, 1.25, 1.5, 1.5625, 1.6, 1.6]);
   assert.deepEqual([-2, null, undefined, "x"].map(getLogicBonus), [1, 1, 1, 1]);
-  assert.equal(HAND_CAP, 1.5);
+  assert.deepEqual([HAND_CAP, LOCK_CAP], [1.6, 1.5]);
   for (let streak = 0; streak <= 12; streak += 1) {
     for (const mode of ["strike", "steady", "expose"]) {
       for (const focus of [0, 35, 70, 100]) {
-        const expected = Math.round(Math.min(HAND_CAP, getLogicBonus(streak) * getFocusBonus(focus, mode).pot) * 100) / 100;
+        const logic = getLogicBonus(streak);
+        const expected = Math.round(Math.min(HAND_CAP, Math.max(logic, Math.min(LOCK_CAP, logic * getFocusBonus(focus, mode).pot))) * 100) / 100;
         assert.equal(getHandBonus(0, focus, mode, streak), expected, `streak ${streak}, ${mode} at ${focus}`);
         assert.ok(getHandBonus(0, focus, mode, streak) <= HAND_CAP);
       }
@@ -843,7 +844,7 @@ test("the pot is paid on the streak the card made", () => {
   // A card that ends the streak is paid as a bare one, and a bust pays nothing.
   assert.equal(resolveWindow({ run, window, card: card("inference"), offered: ["risk", "inference"] }).verdict.pot, base);
   assert.equal(resolveWindow({ run, window: closed(44, "bust"), card: card("risk") }).verdict.pot, 0);
-  // At a streak of 8 and past it the pot is at the cap, with or without a full LOCK.
+  // At a streak of 10 and past it the pot is at the cap, with or without a full LOCK.
   const capped = normalizeRunState({ ...run, logic: { ...run.logic, streak: 30, best: 30 } });
   assert.equal(resolveWindow({ run: capped, window, card: card("risk") }).verdict.pot, Math.round(base * HAND_CAP));
   const locked = resolveWindow({ run: capped, window: { ...window, focus: 100, focusHits: 5 }, card: card("risk") });

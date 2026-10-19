@@ -38,9 +38,13 @@ export const STEADY_LINE_COOL = 8;
 export const STEADY_LINE_SECONDS = 4;
 export const STEADY_LINE_WALL = 3;
 
-/** What each step of the streak adds to the pot, and where that stops: x1.5 at a streak of 8. */
+/**
+ * What each step of the streak adds to the pot, and where that stops: x1.6 at
+ * a streak of 10. Until 2026-10-16 it stopped at x1.5 (a streak of 8), 6.4
+ * points of heat where the smallest push is 7.
+ */
 export const LOGIC_RATE = 0.0625;
-export const LOGIC_CAP = 0.5;
+export const LOGIC_CAP = 0.6;
 /** A type held this many windows in a row starts to grow the streak. */
 export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */

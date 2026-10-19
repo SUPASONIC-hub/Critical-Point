@@ -431,8 +431,8 @@ Still open, on purpose:
     policy has to beat every blind one and stay under 60% of what a player who
     could see the wall banks. It plays the window count the graph actually
     deals (measured, 9 a case) rather than a literal, and it plays hands that
-    charge a stance and LOCK as well as hands that only push: the x1.5 cap
-    (priority 38) is on the streak and LOCK together.
+    charge a stance and LOCK as well as hands that only push: the hand's cap
+    (priority 38) is x1.6 for the streak and x1.5 for LOCK, together.
 30. Lime is the accent for one thing at a time. `--c-acid` marks the control
     that records a decision and the active step of the decision rail; a note, a
     quote or a heading gets a lime rule at most.
@@ -514,7 +514,7 @@ Still open, on purpose:
     a second instrument: holding one type of card from scene to scene, or
     changing it when the pressure rose, builds a streak, and the pot rides the
     hand -- the streak and LOCK multiplied together (`getHandBonus`) under one
-    cap, `HAND_CAP` = x1.5. Neither moves the wall or the step, and no press is
+    cap, `HAND_CAP` = x1.6, LOCK's share stopping at `LOCK_CAP` = x1.5. Neither moves the wall or the step, and no press is
     timed: the heartbeat is pressure and nothing is graded against it (until
     2026-10-10 a push was, PERFECT, GOOD or SLIP). A bust takes the streak with
     the pot. `check:pressure` is the ratchet: a hand that holds a type busts

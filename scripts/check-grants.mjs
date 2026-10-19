@@ -500,14 +500,14 @@ function decisionEntry(caseId, index, { story = false } = {}) {
     challenge: { title: "책임의 순서", matched: true, riskDelta: -2 },
     tactical: { read: "압박이 한쪽으로 쏠린다", advice: "속도를 늦춘다" },
     // The hand's line under a logged decision (useChoiceCommit's `describeHand`).
-    handLine: { label: "LOGIC STREAK", text: "논리 콤보 12 · 판돈 ×1.50 · +14" },
+    handLine: { label: "LOGIC STREAK", text: "논리 콤보 12 · 판돈 ×1.60 · +14" },
     clueReward: null,
     threshold: {
       state: "cash", busted: false, cause: "cashed", forced: false, gauge: 63, wall: 88, pushes: 3,
       rewardMultiplier: 1.4, potMultiplier: 1.8, pot: 42, lostPot: 0,
       focus: { charge: 0, potMultiplier: 1, resourceMultiplier: 1 },
       // The logic streak's line (gauntletEngine's `verdict.logic`); the case summary's `logicRecord` is built from it.
-      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.5, pot: 14 },
+      logic: { type: "persistence", tier: 2, rose: index % 2 === 1, move: index % 3 === 2 ? "switch" : "grow", streak: 12 + index, held: 4, bonus: 1.6, pot: 14 },
     },
     environmentMode: "stable",
     assistTime: 1.5,

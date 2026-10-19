@@ -298,7 +298,10 @@ for (const row of logicRows) {
     `${row.label}: the streak must pay less than listening does: the type is the spice, reading the table is the game`,
   );
 }
-assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.4, `a hand that holds a type should be paid about what the beat paid a good hand (1.28 to 1.40): ${holder.meanBonus}`);
+// The band's top was 1.40 while the streak's cap was x1.5 (the hand measured
+// 1.376); the cap rose to x1.6 on 2026-10-16 so that it is worth more than one
+// push, and the same hand measured 1.429.
+assert.ok(holder.meanBonus >= 1.28 && holder.meanBonus <= 1.45, `a hand that holds a type should be paid about what the beat paid a good hand, and a little more since the cap rose past one push (1.28 to 1.45): ${holder.meanBonus}`);
 assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a type at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
 assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a type should pay");
 /**

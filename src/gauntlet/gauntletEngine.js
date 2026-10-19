@@ -349,9 +349,11 @@ export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8
  * No press is graded. The one number left from the table that graded them
  * (until 2026-10-10) is the `groove` a window put down in that build still
  * holds: it is paid as it was shown (`getHandBonus`), each of its points
- * adding this much, up to x1.5. No window earns one now.
+ * adding this much, up to x1.5 (the hand's cap when it was shown, kept when
+ * the streak's cap rose on 2026-10-16). No window earns one now.
  */
 const GROOVE_RATE = 0.03;
+const GROOVE_CEILING = 0.5;
 export const FOCUS_MAX = 100;
 const FOCUS_GAIN = 13;
 export const FOCUS_MODES = Object.freeze(["strike", "steady", "expose"]);
@@ -363,7 +365,7 @@ const FOCUS_MODE_PROFILES = Object.freeze({
 });
 
 function getGrooveBonus(groove) {
-  return round2(1 + Math.min(LOGIC_CAP, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
+  return round2(1 + Math.min(GROOVE_CEILING, Math.max(0, Number(groove) || 0) * GROOVE_RATE));
 }
 
 function normalizeFocusMode(value) {
@@ -394,8 +396,15 @@ export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } =
  * listening policy and nearly twice a player who could see the wall. The
  * stances still differ in how fast they reach the cap, in what they do to the
  * card's resources, and in the board they carry forward.
+ *
+ * On 2026-10-16 the streak's cap rose past one push (x1.5 was 6.4 points of
+ * heat, the smallest push 7) and LOCK's did not: LOCK lifts the pot to
+ * `LOCK_CAP` and no further, so a streak at or past it is paid the streak and
+ * LOCK adds nothing. Measured with LOCK under the streak's cap, a hand that
+ * locked with no streak banked more than a player who sees the wall.
  */
 export const HAND_CAP = 1 + LOGIC_CAP;
+export const LOCK_CAP = 1.5;
 
 /**
  * `streak` is the logic streak the pot is paid on: the streak after this
@@ -405,7 +414,8 @@ export const HAND_CAP = 1 + LOGIC_CAP;
  * none.
  */
 export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
-  return round2(Math.min(HAND_CAP, Math.max(getLogicBonus(streak), getGrooveBonus(groove)) * getFocusBonus(focus, mode).pot));
+  const logic = Math.max(getLogicBonus(streak), getGrooveBonus(groove));
+  return round2(Math.min(HAND_CAP, Math.max(logic, Math.min(LOCK_CAP, logic * getFocusBonus(focus, mode).pot))));
 }
 
 export function getFocusBonus(focus, mode = "strike") {
