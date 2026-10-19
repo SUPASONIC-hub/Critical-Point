@@ -859,7 +859,10 @@
     var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--radius-pill);
-  box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.55);
+  /* --gx-tier (GauntletFx, fxTier): 0, 1 within a push of the band, 2 in it. */
+  box-shadow:
+    inset 0 2px 8px rgb(0 0 0 / 0.55),
+    0 0 calc(var(--gx-tier, 0) * 7px) calc(var(--gx-tier, 0) * 1px) var(--c-gx-heat-a55);
 }
 
 .gx-gauge-band {

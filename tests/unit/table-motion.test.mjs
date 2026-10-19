@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, RATE_REST_BPM, RATE_SWEEP_MS, RATE_TOP_BPM } from "../../src/gauntlet/fxVariables.js";
+import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, RATE_REST_BPM, RATE_SWEEP_MS, RATE_TOP_BPM } from "../../src/gauntlet/fxVariables.js";
 import { getHeartbeatBpm } from "../../src/gauntlet/gauntletEngine.js";
 
 test("the comfort setting stills the shake and the pulse, and leaves a third of the flash", () => {
@@ -25,6 +25,25 @@ test("the comfort setting stills the shake and the pulse, and leaves a third of 
   assert.equal(fxShake(trauma, true, false), 0);
   assert.equal(fxBeatValue(beat, false), "1.000");
   assert.equal(fxFlashValue(flash, false), "0.90");
+});
+
+test("the tension steps read the gauge the table draws, and either setting takes them away", () => {
+  // The lowest wall 56 and a step of up to 15: hot from 41, critical from 56.
+  const at = (gauge, wall) => ({ gauge, wall, schema: { wallMin: 56, wallMax: 70, stepMax: 15 } });
+  assert.equal(fxTier(at(40, 57), true, false, false), 0);
+  assert.equal(fxTier(at(41, 57), true, false, false), 1);
+  assert.equal(fxTier(at(56, 57), true, false, false), 2);
+  // The wall itself is never read: a gauge a point under it is as cold as one far from it.
+  assert.equal(fxTier(at(40, 41), true, false, false), fxTier(at(40, 70), true, false, false));
+  // Off a live table, and under either setting, there is no step.
+  for (const [live, reducedMotion, calm] of [[false, false, false], [true, true, false], [true, false, true]]) {
+    assert.equal(fxTier(at(60, 61), live, reducedMotion, calm), 0);
+  }
+  const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
+  const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
+  assert.match(frame, /const tier = fxTier\(win, live, reducedMotion, calm\);/);
+  assert.equal(frame.split('write("--gx-tier",').length - 1, 1, "written once a frame");
+  assert.equal(FX_READERS["--gx-tier"], ".gx-gauge-track");
 });
 
 test("the frame loop reads the setting every frame and writes what those three return", () => {
@@ -53,14 +72,14 @@ test("the frame loop reads the setting every frame and writes what those three r
  */
 
 test("nothing on the table marks a beat to press on, and the pulse is still written", () => {
-  assert.deepEqual(FX_VARIABLES, ["--gx-heat", "--gx-beat", "--gx-shake-x", "--gx-shake-y", "--gx-flash", "--gx-rate"]);
+  assert.deepEqual(FX_VARIABLES, ["--gx-heat", "--gx-beat", "--gx-shake-x", "--gx-shake-y", "--gx-flash", "--gx-rate", "--gx-tier"]);
   const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   for (const gone of ["--gx-beat-phase", "--gx-beat-live", "--gx-beat-zone", "beatClock", "getGoodWindowMs", "pending", "LATENCY"]) {
     assert.equal(loop.includes(gone), false, `the frame loop no longer has ${gone}`);
   }
   // The heart still sounds on its own tempo, and the vignette still takes the beat.
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
-  assert.match(frame, /playHeartbeat\(heat\);\s+nextBeat = time \+ 60000 \/ bpm;/);
+  assert.match(frame, /playHeartbeat\(heat, tier\);\s+nextBeat = time \+ 60000 \/ bpm;/);
   assert.match(frame, /if \(now - pulsedAt >= PULSE_MIN_MS\)/, "under three screen-wide pulses a second, as before");
   assert.match(FX_READERS["--gx-beat"], /\.gx-fx-vignette/);
   const css = ["play", "responsive", "comfort", "plate", "relics", "briefing", "result", "base-intro-ranking", "recovery"].map((name) => readFileSync(`src/styles/app/${name}.css`, "utf8")).join(" ");

@@ -13,6 +13,7 @@ export const FX_READERS = Object.freeze({
   "--gx-shake-y": ".gx-table",
   "--gx-flash": ".gx-fx-flash",
   "--gx-rate": ".gx-gauge-ticks",
+  "--gx-tier": ".gx-gauge-track",
 });
 
 export const FX_VARIABLES = Object.freeze(Object.keys(FX_READERS));
@@ -32,6 +33,20 @@ export const monotonicNow = () => globalThis.performance?.now?.() ?? Date.now();
 export const fxShake = (trauma, reducedMotion, calm) => (reducedMotion || calm ? 0 : trauma * trauma);
 export const fxBeatValue = (beat, calm) => (calm ? "0.000" : beat.toFixed(3));
 export const fxFlashValue = (flash, calm) => (calm ? flash / 3 : flash).toFixed(2);
+
+/**
+ * How near the wall the table shows the gauge to be, in the stage's heat-*
+ * steps: 0 cold, 1 hot (the next push's top reaches the band), 2 critical (in
+ * the band). Read off what is drawn -- the gauge, the band's floor, the step's
+ * top -- and never the wall, so the gauge glow, the heartbeat's pitch and the
+ * critical tremor that step with it tell a player nothing the gauge does not.
+ * Either setting takes the step away, and a table that is not live has none.
+ */
+export const fxTier = (win, live, reducedMotion, calm) => {
+  if (!live || reducedMotion || calm) return 0;
+  const { wallMin, stepMax } = win.schema;
+  return win.gauge >= wallMin ? 2 : win.gauge >= wallMin - stepMax ? 1 : 0;
+};
 
 /**
  * The tick light: how fast the pulse is, as how bright the gauge's ticks are.

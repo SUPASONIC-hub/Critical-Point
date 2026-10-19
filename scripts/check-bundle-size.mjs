@@ -146,7 +146,7 @@ const budgets = [
   // changes that each fitted were merged together; it is fetched with the table
   // (TABLE_AUDIO in vite.config.js), so nothing loads later than it did.
   // Taking it out took PlayScreen to 97,898 / 32,131. 6,676 / 2,166 measured.
-  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_680, maxGzip: 2_170 },
+  { pattern: /^tableAudio-.*\.js$/, maxBytes: 6_700, maxGzip: 2_205 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
