@@ -59,7 +59,9 @@
   padding: var(--reveal-pad);
 }
 
-.decision-reveal-footer {
+/* Also the comfort dialog's head (below): a title and a button at the ends. */
+.decision-reveal-footer,
+.comfort-dialog-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -764,9 +766,12 @@
   letter-spacing: 0.12em;
 }
 
+/* One line each, cut with an ellipsis: here and on the situation cards. */
 .gx-active-rules b,
 .gx-active-rules small,
-.gx-active-rules li {
+.gx-active-rules li,
+.gx-situation-card b,
+.gx-situation-card small {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1137,14 +1142,7 @@
   line-height: 1;
 }
 
-.gx-situation-card b,
-.gx-situation-card small {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
+/* .gx-situation-card b and small cut to one line with .gx-active-rules b. */
 .gx-situation-card b {
   color: var(--ui-text);
   font-size: 0.8125rem;
@@ -1173,7 +1171,9 @@
   display: none;
 }
 
-.gx-hand {
+/* Two columns of equal cards; the reveal's stakes use the same grid. */
+.gx-hand,
+.gx-reveal .decision-reveal-stakes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
@@ -1580,13 +1580,7 @@
   box-shadow: var(--ui-shadow-2);
 }
 
-.comfort-dialog-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
+/* .comfort-dialog-head lays out with .decision-reveal-footer, at the top. */
 .comfort-dialog h2 {
   margin: 0;
   font-size: 1.0625rem;
@@ -1965,12 +1959,7 @@
   font-weight: 700;
 }
 
-.gx-reveal .decision-reveal-stakes {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
+/* .gx-reveal .decision-reveal-stakes takes the hand's two-column grid. */
 .gx-reveal .decision-reveal-stakes article {
   display: grid;
   gap: 4px;
@@ -2084,8 +2073,21 @@
     padding-right: 96px;
   }
 
+  /* What a phone does without: the case chip and the progress bar, the stats'
+     icons, the relic names, the small lines under the focus signal and the
+     stances, the rules panel's names and list (its way out stays, below), and
+     OVERCLOCK's per-card badge -- it bills every card alike and the rules
+     panel names it; FRACTURE stays, it tells cards apart. Nothing else in
+     this block sets display, so one rule here hides them as the seven did. */
   .gauntlet-shell .game-header .case-chip,
-  .gauntlet-shell .status-bar-progress {
+  .gauntlet-shell .status-bar-progress,
+  .gx-stat svg,
+  .gauntlet-stage .gx-bank .gx-relic-name,
+  .gx-focus-signal small,
+  .gx-focus-modes small,
+  .gauntlet-stage .gx-active-rules > div,
+  .gauntlet-stage .gx-active-rules ul,
+  .gauntlet-stage .gx-card-stats .gx-card-overclock {
     display: none;
   }
 
@@ -2158,7 +2160,9 @@
     font-size: 1rem;
   }
 
-  .gx-bank {
+  .gx-bank,
+  .gx-gauge,
+  .gx-situation {
     gap: 4px;
   }
 
@@ -2166,10 +2170,6 @@
     gap: 4px;
     min-height: 22px;
     padding: 1px 7px;
-  }
-
-  .gx-stat svg {
-    display: none;
   }
 
   .gauntlet-stage .gx-bank .gx-relics {
@@ -2180,10 +2180,6 @@
     padding: 2px 4px;
   }
 
-  .gauntlet-stage .gx-bank .gx-relic-name {
-    display: none;
-  }
-
   .gx-signals {
     gap: 4px 10px;
     padding-top: 5px;
@@ -2192,10 +2188,6 @@
   .gx-overdrive,
   .gx-focus-signal {
     gap: 3px 5px;
-  }
-
-  .gx-focus-signal small {
-    display: none;
   }
 
   .gx-focus-modes {
@@ -2230,16 +2222,8 @@
     font-size: 0.6875rem;
   }
 
-  .gx-focus-modes small {
-    display: none;
-  }
-
   .gx-focus-modes i {
     inset: auto 7px 2px;
-  }
-
-  .gx-gauge {
-    gap: 4px;
   }
 
   .gx-gauge-track {
@@ -2263,26 +2247,19 @@
     line-height: 1.35;
   }
 
-  .gx-situation {
-    gap: 4px;
-  }
-
   .gx-situation-card {
     gap: 2px;
     padding: 5px 7px;
     border-radius: 10px;
   }
 
-  .gx-situation-card span {
+  .gx-situation-card span,
+  .gx-situation-card small {
     font-size: 0.625rem;
   }
 
   .gx-situation-card b {
     font-size: 0.75rem;
-  }
-
-  .gx-situation-card small {
-    font-size: 0.625rem;
   }
 
   /* The rules panel on a phone: the way out and the pressure bar on one line.
@@ -2291,11 +2268,6 @@
     grid-template-columns: minmax(0, 1fr) 56px;
     gap: 3px 8px;
     padding: 5px 9px;
-  }
-
-  .gauntlet-stage .gx-active-rules > div,
-  .gauntlet-stage .gx-active-rules ul {
-    display: none;
   }
 
   .gauntlet-stage .gx-active-rules p {
@@ -2313,13 +2285,6 @@
     grid-row: 1;
     grid-column: 2;
     align-self: center;
-  }
-
-  /* OVERCLOCK bills every card alike and the rules panel names it, so the
-     per-card badge is for a screen with room. FRACTURE stays: it tells cards
-     apart. */
-  .gauntlet-stage .gx-card-stats .gx-card-overclock {
-    display: none;
   }
 
   .gx-actions {
