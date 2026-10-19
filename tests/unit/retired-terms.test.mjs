@@ -8,6 +8,9 @@ import { fileURLToPath } from "node:url";
 // retired are listed here with the name that replaced them, so a new line that
 // brings one back fails here instead of in a playtest. The story (`src/nodes/`)
 // is not scanned: there 차지하다, 연락 and 터지다 are everyday Korean.
+// 압박 is retired only as a name for the table's gauge (압박계, now 열기): the
+// report's risk measures (압박 대응, 압박 누적/회수) and the everyday sense
+// (시간 압박) keep the word.
 const RETIRED = [
   { word: /푸시/, instead: "밀기" },
   { word: /(?<![가-힣])락(?!픽)/, instead: "LOCK" },
@@ -16,6 +19,7 @@ const RETIRED = [
   { word: /체인/, instead: "연속" },
   { word: /연승/, instead: "연속" },
   { word: /게이지가|게이지 \d/, instead: "열기" },
+  { word: /압박계/, instead: "열기" },
 ];
 
 const ROOT = fileURLToPath(new URL("../../src/", import.meta.url));
@@ -46,10 +50,10 @@ test("no player line outside the story uses a retired term", () => {
 });
 
 test("the names the retired words leave alone are not refused", () => {
-  for (const line of ["락픽: 열기 30에서 열림", "차지원은 대답 대신", "케이스데스크", "연락이 왔다", "허락을 받았다"]) {
+  for (const line of ["락픽: 열기 30에서 열림", "차지원은 대답 대신", "케이스데스크", "연락이 왔다", "허락을 받았다", "압박 대응", "시간 압박"]) {
     assert.deepEqual(RETIRED.filter(({ word }) => word.test(line)), [], line);
   }
-  for (const line of ["E 락 · 확정", "차지가 빠르다", "이전 케이스", "오버클럭 체인", "연승 2", "다음 푸시"]) {
+  for (const line of ["E 락 · 확정", "차지가 빠르다", "이전 케이스", "오버클럭 체인", "연승 2", "다음 푸시", "압박계는 낮지만"]) {
     assert.ok(RETIRED.some(({ word }) => word.test(line)), line);
   }
 });
