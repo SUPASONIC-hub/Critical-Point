@@ -1846,6 +1846,32 @@
     animation: none;
   }
 }
+/* The collapse ending's first frame breaks (gx-break, below) and settles
+   in 0.9 s: the header bar only, never the record or a button, and not with
+   reduced motion or the comfort setting. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-calm-effects]) .ending-visual-collapse.ending-step-0 .ending-sequence-header {
+    animation: gx-break 0.9s steps(1);
+  }
+}
+
+/* gx-break lives here though the verdict slam's BUST word (play.css) uses it
+   too: every sheet ships in the one app stylesheet, so a keyframes rule is
+   found from any of them. steps(1): each frame holds, as a broken signal
+   does, and the last ends at the word. */
+@keyframes gx-break {
+  0%,
+  50% {
+    clip-path: inset(0 0 45%);
+    text-shadow:
+      -6px 0 var(--c-gx-heat),
+      6px 0 var(--c-gx-hand);
+  }
+  25%,
+  75% {
+    clip-path: inset(40% 0 0);
+  }
+}
 
 /* 막간. The season's only unpressured screen: no numbers, no button, a quiet
    ground and one mood tint so the six cases do not read as one long siren. */
