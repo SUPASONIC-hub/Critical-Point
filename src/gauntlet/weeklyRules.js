@@ -13,6 +13,11 @@
  * FRACTURE bill, the seal, the clock, the chips. A rule is laid over the board
  * where the story wall is (`getTableSchema`), never written into it.
  *
+ * One exception, by name: a rule may switch on a device the table does not
+ * otherwise have (`rules`), from `WEEK_RULE_DEVICES` and nothing else (B3
+ * decision 8, widened to two by B2 decision 11). There is no general frame;
+ * the engine asks `weekRuleHasDevice` for the one it means.
+ *
  * A leaf module, like tableRules.js: pure functions of a time in milliseconds.
  * What "now" is lives in state/weeklyClock.js, so a test can hold it still.
  *
@@ -20,6 +25,7 @@
  * starts (the unit test holds every entry to it against the day it was added).
  */
 
+import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_SHARE } from "./tableRules.js";
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -30,6 +36,12 @@ export { isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs };
 export const WEEKLY_NOTICE_DAYS = 7;
 /** A rule id is stored on the run and checked by the server: at most this long. */
 export const WEEK_RULE_ID_MAX = 32;
+
+/**
+ * The devices a week may switch on: AUDIT (B3, auditRisk.js) and, when it is
+ * built, B2's CASCADE. A device a rule names outside this list is not on.
+ */
+export const WEEK_RULE_DEVICES = Object.freeze(["audit", "cascade"]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
@@ -52,6 +64,14 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     title: "균열이 깊다",
     text: `이번 주는 FRACTURE가 금 간 자원을 ${HEAVY_FRACTURE_RATE}배로 청구한다.`,
     schema: Object.freeze({ fractureRate: HEAVY_FRACTURE_RATE }),
+  }),
+  // B3's test week: a device; no number on the board moves.
+  "audit": Object.freeze({
+    label: "AUDIT WEEK",
+    // 초안 문구 (B3 decision 11 asks for the line by number).
+    title: "감사 주간",
+    text: `이번 주는 감사팀이 장부를 본다. 한 번 이상 밀고 열기 ${AUDIT_HEAT} 미만에서 확정할 때마다 감사가 한 칸 찬다. ${AUDIT_LIMIT}칸이 찬 채 사건이 닫히면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃는다.`,
+    rules: Object.freeze(["audit"]),
   }),
 });
 
@@ -94,7 +114,7 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, calend
  */
 export function weekRuleOverlay(id, schema) {
   const rule = getWeekRule(id);
-  if (!rule || !schema) return null;
+  if (!rule?.schema || !schema) return null;
   const overlay = {};
   for (const [key, value] of Object.entries(rule.schema)) {
     if (key === "wallShift") {
@@ -105,4 +125,9 @@ export function weekRuleOverlay(id, schema) {
     }
   }
   return overlay;
+}
+
+/** Whether the rule `id` switches on `device`, which has to be one `WEEK_RULE_DEVICES` allows. */
+export function weekRuleHasDevice(id, device) {
+  return WEEK_RULE_DEVICES.includes(device) && Boolean(getWeekRule(id)?.rules?.includes(device));
 }

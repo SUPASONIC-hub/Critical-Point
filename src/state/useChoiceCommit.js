@@ -23,6 +23,7 @@ import {
 import { getBranchDetourBypass, nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { applyGauntletEffect, BUST_EFFECT, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { countAudit } from "../gauntlet/auditRisk.js";
 import { listOfferedTypes } from "../gauntlet/logicStreak.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { getTableRules, isTableTaught, STAGED } from "../gauntlet/tableUnlocks.js";
@@ -280,6 +281,8 @@ export function useChoiceCommit(context) {
       offered: getOfferedTypes(node, { clueCount, trust: resources.trust, legitimacy: resources.legitimacy, casesOpened }),
       caseClosed,
       offerRelics: currentCase !== "final",
+      // The case's audit so far, read off its log (auditRisk.js); the engine reads it only on a week that has it.
+      audit: countAudit(log),
       ...getSettlementRules({ caseId: currentCase, run: gauntletRun, caseClosed }),
     });
     const busted = verdict.outcome === "bust";

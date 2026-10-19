@@ -17,6 +17,7 @@ const {
   NEAR_WALL_SHIFT,
   pickSeasonWeekRule,
   WEEK_RULE_CATALOGUE,
+  WEEK_RULE_DEVICES,
   WEEK_RULE_ID_MAX,
   weekRuleAt,
   weekRuleOverlay,
@@ -105,9 +106,12 @@ test("the calendar names known rules, one per week, announced a week ahead", () 
     assert.ok(id.length <= WEEK_RULE_ID_MAX, id);
     assert.match(id, /^[a-z][a-z0-9-]*$/);
     for (const key of ["label", "title", "text"]) assert.ok(typeof rule[key] === "string" && rule[key].length > 0, `${id}.${key}`);
-    for (const key of Object.keys(rule.schema)) {
+    for (const key of Object.keys(rule.schema ?? {})) {
       assert.ok(["wallShift", "seconds", "chipsScale", "fractureRate", "sealBreak"].includes(key), `${id} moves only a number normalizeSchema clamps (D4): ${key}`);
     }
+    // Or switches on a device, by name, from the allowlist (B3 decision 8, B2 decision 11).
+    for (const device of rule.rules ?? []) assert.ok(WEEK_RULE_DEVICES.includes(device), `${id} switches on only an allowed device: ${device}`);
+    assert.ok(rule.schema || rule.rules?.length, `${id} moves a number or switches on a device`);
   }
 });
 
