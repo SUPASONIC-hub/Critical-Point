@@ -349,10 +349,17 @@ test("the densest decisions fit the screen Safari leaves on an iPhone 14", { tag
  * room between that the title could have had.
  */
 test("the play header keeps its title between a phone's width and the table's", { tag: "@layout" }, async ({ page }) => {
-  for (const width of [481, 507, 600, 759, 1100, 1240]) {
+  // One board, opened once: only the window's width changes between readings.
+  // Opening the scene anew at each of the six widths made the test long enough
+  // to fail on a loaded machine.
+  const widths = [481, 507, 600, 759, 1100, 1240];
+  await page.setViewportSize({ width: widths[0], height: 900 });
+  await startDebugNode(page, "final", "f_start_owner");
+  for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await startDebugNode(page, "final", "f_start_owner");
-    const header = await page.evaluate(() => {
+    const header = await page.evaluate(async () => {
+      // The resize is laid out and any listener on it has run by the second frame.
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const box = (selector) => document.querySelector(selector).getBoundingClientRect();
       return {
         padRight: Number.parseFloat(getComputedStyle(document.querySelector(".game-header")).paddingRight),
