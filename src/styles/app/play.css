@@ -311,12 +311,6 @@
   box-shadow: 0 0 12px var(--ui-accent-glow);
 }
 
-/* At the table the music controls are icons; their labels carry the state. */
-.gauntlet-shell .music-toggle span,
-.gauntlet-shell .music-volume-toggle span {
-  display: none;
-}
-
 .gauntlet-shell .music-toggle,
 .gauntlet-shell .music-volume-toggle {
   justify-content: center;
@@ -964,7 +958,6 @@
   background: transparent;
   font: inherit;
   white-space: nowrap;
-  cursor: pointer;
 }
 
 .gx-scout.is-scouted {
@@ -1105,10 +1098,6 @@
   cursor: pointer;
 }
 
-.gx-brief summary:hover {
-  color: var(--ui-text);
-}
-
 /* Folded, the summary is one 12px line, about 18px tall. It is pressed over
    44px from its top down -- not up, where .gx-scene's overflow would cut the
    area off at the scene's edge -- across the speaker's line beside it, which
@@ -1195,12 +1184,14 @@
   box-shadow: inset 0 0 calc(8px + var(--gx-heat, 0) * 28px) var(--c-gx-heat-a18);
 }
 
-.gx-situation-risk b {
-  color: var(--c-danger-81);
-}
-
 /* The hand ------------------------------------------------------------------ */
-.gx-hand-head {
+/* Four things the table does not draw, in one rule: the music controls' labels
+   (at the table they are icons, and the labels carry the state), the hand's
+   head, and the 확정 button's pot line while it is empty. */
+.gauntlet-shell .music-toggle span,
+.gauntlet-shell .music-volume-toggle span,
+.gx-hand-head,
+.gx-cash b:empty {
   display: none;
 }
 
@@ -1406,6 +1397,7 @@
   color: var(--c-acid);
 }
 
+.gx-situation-risk b,
 .gx-card-preview .cost {
   color: var(--c-danger-81);
 }
@@ -1528,10 +1520,6 @@
 .gx-cash b {
   font: 800 1.125rem/1 var(--font-sans);
   font-variant-numeric: tabular-nums;
-}
-
-.gx-cash b:empty {
-  display: none;
 }
 
 /* A closing scene's 확정 is held (holdConfirm.js): a line fills out from the
@@ -1918,10 +1906,6 @@
   font-weight: 700;
 }
 
-.gx-reveal.is-cashed .gx-reveal-consequence span {
-  color: var(--c-acid);
-}
-
 .gx-reveal-consequence b {
   min-width: 0;
   color: var(--ui-text);
@@ -1952,6 +1936,7 @@
   font-weight: 800;
 }
 
+.gx-reveal.is-cashed .gx-reveal-consequence span,
 .gx-reveal-gain b {
   color: var(--c-acid);
 }
@@ -1969,6 +1954,7 @@
   font-size: 0.75rem;
 }
 
+.gx-brief summary:hover,
 .gx-reveal-bank b {
   color: var(--ui-text);
 }
@@ -2074,10 +2060,7 @@
   letter-spacing: 0.08em;
 }
 
-.gx-reveal .decision-reveal-beat p {
-  color: var(--ui-text-2);
-}
-
+.gx-reveal .decision-reveal-beat p,
 .gx-reveal .decision-reveal-footer span {
   color: var(--ui-text-2);
 }
@@ -2156,7 +2139,8 @@
     font-size: 0.9375rem;
   }
 
-  .gauntlet-shell .top-actions.compact-actions {
+  .gauntlet-shell .top-actions.compact-actions,
+  .gauntlet-stage .gx-bank .gx-relics {
     gap: 3px;
   }
 
@@ -2229,10 +2213,6 @@
     gap: 4px;
     min-height: 22px;
     padding: 1px 7px;
-  }
-
-  .gauntlet-stage .gx-bank .gx-relics {
-    gap: 3px;
   }
 
   .gauntlet-stage .gx-bank .gx-relic-chip {
@@ -2319,10 +2299,6 @@
     font-size: 0.625rem;
   }
 
-  .gx-situation-card b {
-    font-size: 0.75rem;
-  }
-
   /* The rules panel on a phone: the way out and the pressure bar on one line.
      The rule names are already the first words of the way out. */
   .gauntlet-stage .gx-active-rules {
@@ -2386,6 +2362,7 @@
     grid-template-columns: 62px minmax(0, 1fr);
   }
 
+  .gx-situation-card b,
   .gx-reveal-consequence b {
     font-size: 0.75rem;
   }
@@ -2398,6 +2375,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .gauntlet-stage .gx-situation-card small,
   .gx-portrait,
   .gx-active-rules ~ .gx-situation {
     display: none;
@@ -2449,10 +2427,6 @@
 
   .gx-pot-value {
     font-size: 1.75rem;
-  }
-
-  .gauntlet-stage .gx-situation-card small {
-    display: none;
   }
 
   .gauntlet-shell .game-header {
@@ -3024,17 +2998,14 @@
   .gx-breach,
   .gx-slam-bust strong,
   .gx-slam-cashed strong,
-  .gx-cash.is-holding::after {
+  .gx-cash.is-holding::after,
+  .gx-slam-bust::before,
+  .gx-slam-bust::after {
     animation: none;
   }
 
   .gx-slam-bust {
     background: var(--c-gx-heat-a55);
-  }
-
-  .gx-slam-bust::before,
-  .gx-slam-bust::after {
-    animation: none;
   }
 
   .gx-pot-value,
