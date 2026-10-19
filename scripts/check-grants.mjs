@@ -320,6 +320,7 @@ for (const { tablename, policyname, cmd, roles } of policies) {
 const CLIENT_FUNCTIONS = {
   anon: [
     "delete_cloud_save", "get_cloud_save", "is_season_case_id", "logic_hold_cutoffs", "peek_cloud_save", "put_cloud_save",
+    "scene_bust_rates",
     // The ranking policy calls it as anon: whether marked rows are hidden.
     ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
   ],
@@ -1708,6 +1709,7 @@ const UPDATE_PROBE = {
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
+  scene_bust_stats: "windows = windows",
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -1733,6 +1735,9 @@ await refused("read error logs", "anon", `select * from public.app_error_logs`);
 await refused("read a raw decision_log", "anon", `select decision_log from public.playtest_sessions`);
 await refused("read cloud saves directly", "anon", `select * from public.cloud_saves`);
 await refused("read rate limits", "anon", `select * from public.telemetry_rate_limits`);
+await refused("read the scene snapshot directly", "anon", `select * from public.scene_bust_stats`);
+await allowed("read the scene wall rates", "anon", `select public.scene_bust_rates()`);
+await refused("rebuild the scene snapshot", "anon", `select public.refresh_scene_bust_stats()`);
 await refused("read the address salt", "anon", `select * from public.private_settings`);
 await refused("read a private setting through its helper", "anon", `select public.private_setting_int('telemetry_daily_bytes', 0)`);
 await refused("hash an address", "anon", `select public.hash_client_address('203.0.113.9')`);
