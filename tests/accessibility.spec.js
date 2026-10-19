@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
+import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
@@ -179,6 +180,228 @@ test("a cash's reveal has the same name, and its headline is the multiplier", as
   await expect(page.getByRole("dialog", { name: /×/ })).toHaveCount(0);
   await expect(dialog.getByRole("alert")).toHaveCount(0);
   expect(await page.evaluate(() => window.__bustAlerts.ever), "a cash says BUST nowhere").toBe(0);
+});
+
+/**
+ * The box a finger can press each visible control under `root` in, for every
+ * one under `min` px either way -- or under its own minimum, for a control one
+ * of `exceptions` names by selector. Runs in the page.
+ *
+ * Several controls are pressed over more than they draw: a positioned ::before
+ * or ::after reaches into the gap around them (the briefing's cards, the
+ * stances, the header's buttons; layout-css.test.mjs holds the rules). The box
+ * is the control's own layout box joined with any such pseudo-element that
+ * takes the pointer. Layout boxes, not getBoundingClientRect: the briefing's
+ * cards breathe and the table shakes, and a transform moves no hit area the
+ * player can count on. offsetWidth rounds to the pixel, which is the tolerance.
+ */
+function narrowTargets(root, { min, exceptions }) {
+  const px = (value) => (value === "" || value === "auto" ? null : Number.parseFloat(value));
+  const span = (start, end, size, inner) => {
+    if (start !== null && end !== null) return [start, inner - end];
+    if (start !== null && size !== null) return [start, start + size];
+    if (end !== null && size !== null) return [inner - end - size, inner - end];
+    return null;
+  };
+  const pressBox = (element) => {
+    const own = getComputedStyle(element);
+    const box = { left: 0, top: 0, right: element.offsetWidth, bottom: element.offsetHeight };
+    // A pseudo-element is placed against the control only when the control is positioned.
+    if (own.position === "static") return box;
+    const [bl, bt, br, bb] = [own.borderLeftWidth, own.borderTopWidth, own.borderRightWidth, own.borderBottomWidth].map(Number.parseFloat);
+    for (const pseudo of ["::before", "::after"]) {
+      const style = getComputedStyle(element, pseudo);
+      if (["none", "normal"].includes(style.content) || style.display === "none" || style.position !== "absolute" || style.pointerEvents === "none") continue;
+      const x = span(px(style.left), px(style.right), px(style.width), element.offsetWidth - bl - br);
+      const y = span(px(style.top), px(style.bottom), px(style.height), element.offsetHeight - bt - bb);
+      if (!x || !y) continue;
+      box.left = Math.min(box.left, x[0] + bl);
+      box.right = Math.max(box.right, x[1] + bl);
+      box.top = Math.min(box.top, y[0] + bt);
+      box.bottom = Math.max(box.bottom, y[1] + bt);
+    }
+    return box;
+  };
+  const CONTROLS = "button, a[href], summary, input:not([type='hidden']), select, textarea, [role='button'], [role='switch'], [role='tab'], [tabindex]:not([tabindex='-1'])";
+  return [...root.querySelectorAll(CONTROLS)]
+    .filter((element) => !element.closest(".debug-overlay, .sr-only") && element.offsetWidth > 0 && element.checkVisibility({ visibilityProperty: true }))
+    .map((element) => {
+      const box = pressBox(element);
+      const name = element.getAttribute("aria-label") || element.textContent.trim().replace(/\s+/g, " ").slice(0, 24) || element.className;
+      const floor = exceptions.find((exception) => element.matches(exception.selector)) ?? { width: min, height: min };
+      return { name, width: Math.round(box.right - box.left), height: Math.round(box.bottom - box.top), floor };
+    })
+    .filter((target) => target.width < target.floor.width || target.height < target.floor.height)
+    .map((target) => `${target.name}: ${target.width}x${target.height}`);
+}
+
+/**
+ * The controls held to less than 44x44, each by name and with the reason.
+ * WCAG 2.5.8's spacing exception is the rule they are held to instead: a
+ * target under 24px either way fails, and one that is 24 or more passes when
+ * the areas of its neighbours do not overlap it. Every one here is still
+ * pressed over 44px the other way.
+ */
+const TOUCH_TARGET_EXCEPTIONS = [
+  {
+    // The header's four tools on a phone: 저장, 저장 후 나가기, 편의 설정 and
+    // 초기화. They are drawn 28x28 so the header keeps its one row beside the
+    // music controls and the case stamp, and each is pressed over 44px tall
+    // and as wide as the 3px gap to its neighbour lets it be without
+    // overlapping (play.css): 29px, and 34 for 초기화, which stands 9px apart
+    // because it throws the run away and asks first. Four 44px areas would
+    // not fit the 240px a 360px row has left of the music controls.
+    selector: ".gauntlet-shell .top-actions.compact-actions button",
+    width: 24,
+    height: 44,
+  },
+];
+
+/** Polled, so a surface still settling is read again rather than failed on one frame. */
+async function expectTouchTargets(root, where) {
+  await expect
+    .poll(() => root.evaluate(narrowTargets, { min: 44, exceptions: TOUCH_TARGET_EXCEPTIONS }), {
+      message: `${where}: controls a finger presses over less than 44x44px (or their named exception's minimum)`,
+    })
+    .toEqual([]);
+}
+
+/**
+ * Every control on the three surfaces a phone player presses most -- the
+ * briefing page, the live table and the decision reveal -- takes a press over
+ * at least 44x44 CSS px (WCAG 2.5.5), on a small Android phone and on what
+ * Safari leaves of an iPhone 14. The fixes so far were held by reading the
+ * sheets (layout-css.test.mjs); this is the screen they were for. The reading
+ * clock is held so the briefing does not open the table while it is measured.
+ */
+for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
+  test(`the briefing, the table and the reveal are pressed over 44x44px at ${size.width}x${size.height}`, async ({ page }) => {
+    const where = `${size.width}x${size.height}`;
+    await page.addInitScript(
+      ({ key, value }) => localStorage.setItem(key, value),
+      { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ holdReadingClock: true }) },
+    );
+    await page.setViewportSize(size);
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "case01", "start", { openTable: false });
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+
+    const briefing = page.getByTestId("scene-briefing");
+    await expect(briefing.getByRole("dialog")).toBeVisible();
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    await waitForEntrance(briefing);
+    await expectTouchTargets(briefing, `the briefing @ ${where}`);
+
+    await dismissProtocolBreach(page);
+    await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+    // 사건 01 has the whole table, so the stances are on it.
+    await expect(page.getByTestId("gauntlet-stance-mastery")).toBeVisible();
+    await waitForEntrance(page.locator(".game-shell"));
+    await expectTouchTargets(page.locator("body"), `the table @ ${where}`);
+
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await cashStakedCard(page);
+    const reveal = page.locator(".decision-reveal-backdrop");
+    await expect(reveal.getByTestId("decision-next")).toBeVisible();
+    await waitForEntrance(reveal);
+    await expectTouchTargets(reveal, `the reveal @ ${where}`);
+  });
+}
+
+/**
+ * The two surfaces a case ends on, at the same two sizes: the report, with
+ * its archive folded as it opens, and the tool draft dealt in front of the
+ * next case. Read from the sheets before this test, the report's tool dock
+ * and its second 이 사건 다시 도전 were drawn 38px tall on a phone and the
+ * music pill 38x36; each is pressed over 44 now (result.css,
+ * base-intro-ranking.css). The draft's cards, its skip and its folded feats
+ * were already held (layout-css.test.mjs).
+ */
+for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
+  test(`the case report and the tool draft are pressed over 44x44px at ${size.width}x${size.height}`, async ({ page }) => {
+    const where = `${size.width}x${size.height}`;
+    await page.setViewportSize(size);
+    await page.goto("/?debug=1");
+    await startDebugNode(page, "case01", "c1_aftershock");
+    await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+    await completeCurrentCase(page);
+    const decisionNext = page.getByTestId("decision-next");
+    if (await decisionNext.isVisible()) await decisionNext.click();
+
+    const report = page.locator(".result-page");
+    await expect(report).toBeVisible();
+    await expect(page.locator(".next-case-panel button")).toBeVisible();
+    await waitForEntrance(report);
+    await expectTouchTargets(page.locator("body"), `the report @ ${where}`);
+
+    await page.locator(".next-case-panel button").click();
+    const draft = page.getByTestId("relic-draft");
+    await expect(draft).toBeVisible();
+    await expect(page.getByTestId("relic-option").first()).toBeVisible();
+    await waitForEntrance(draft);
+    await expectTouchTargets(draft, `the tool draft @ ${where}`);
+  });
+}
+
+/**
+ * A stance is a GuardedButton (StanceRow.jsx): on a table that is not live it
+ * is aria-disabled, says why in its description and drops the press. Live, it
+ * is read through the accessibility tree, not the markup layout-css.test.mjs
+ * matches. Closed, the table is there for 760ms only (RESOLVE_DELAY_MS): a
+ * commit sets the next scene and opens the reveal in one render, so the stage
+ * under the reveal is the next scene's, and live. The closed table is read in
+ * one frame instead, the frame its status leaves live, by the ids its
+ * description names.
+ */
+test("a stance that cannot be changed says why, and one that can says only what its count counts", async ({ page }) => {
+  // Patterns, not the sentences: the copy is still being worded (one-name-per-term
+  // rewrites both), and what is held here is which of them is said when.
+  const DETAIL = /^시즌 숙련: \S.*판$/;
+  const BLOCKED = /^판이 열려 있을 때만 자세를 바꿀 수 있\S*\. 시즌 숙련: \S.*판$/;
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "case01", "start");
+  const stage = page.getByTestId("gauntlet-stage");
+  const stances = page.locator(".gx-focus-modes button");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(stances).toHaveCount(3);
+  for (let index = 0; index < 3; index += 1) {
+    await expect(stances.nth(index)).not.toHaveAttribute("aria-disabled", "true");
+    await expect(stances.nth(index)).toHaveAccessibleDescription(DETAIL);
+  }
+  await expect(page.locator(".gx-focus-modes button.mode-steady")).toHaveAttribute("aria-pressed", "false");
+
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  const closed = page.waitForFunction(
+    () => {
+      const table = document.querySelector("[data-testid='gauntlet-stage']");
+      if (!table || table.getAttribute("data-status") === "live") return false;
+      const buttons = [...table.querySelectorAll(".gx-focus-modes button")];
+      const said = (button) =>
+        (button.getAttribute("aria-describedby") ?? "")
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((id) => document.getElementById(id)?.textContent.trim() ?? "")
+          .join(" ");
+      const read = buttons.map((button) => ({ disabled: button.getAttribute("aria-disabled"), description: said(button) }));
+      // And it refuses the press it says it refuses. React flushes a click's
+      // state before dispatchEvent returns, so a stance that took it shows it here.
+      const steady = table.querySelector(".gx-focus-modes button.mode-steady");
+      steady.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      return { status: table.getAttribute("data-status"), read, steadyPressed: steady.getAttribute("aria-pressed") };
+    },
+    null,
+    { polling: "raf", timeout: 30_000 },
+  );
+  await cashStakedCard(page);
+  const table = await (await closed).jsonValue();
+  expect(table.status).toBe("cashed");
+  expect(table.read).toHaveLength(3);
+  for (const stance of table.read) {
+    expect(stance.disabled).toBe("true");
+    expect(stance.description).toMatch(BLOCKED);
+  }
+  expect(table.steadyPressed).toBe("false");
+  await expect(page.getByTestId("decision-next")).toBeVisible();
 });
 
 test("the relic draft has no structural accessibility violations", async ({ page }) => {

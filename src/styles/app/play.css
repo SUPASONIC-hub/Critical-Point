@@ -1081,6 +1081,7 @@
 }
 
 .gx-brief summary {
+  position: relative;
   color: var(--ui-text-2);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1089,6 +1090,18 @@
 
 .gx-brief summary:hover {
   color: var(--ui-text);
+}
+
+/* Folded, the summary is one 12px line, about 18px tall. It is pressed over
+   44px from its top down -- not up, where .gx-scene's overflow would cut the
+   area off at the scene's edge -- across the speaker's line beside it, which
+   takes no press of its own. Open, the area would lie over the briefing's
+   text, so it is the folded summary's alone. */
+.gx-brief:not([open]) summary::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 44px;
 }
 
 .gx-brief p {
@@ -2126,11 +2139,13 @@
      The drawn button stays 28x28 so the header keeps its one row; what the
      finger has to hit is 44px tall, and as wide as the gap to its neighbour
      allows without two targets overlapping. 초기화 sits apart: it is the one
-     that throws the run away (it asks first, too). */
+     that throws the run away (it asks first, too). The area is placed against
+     the padding box, 1px inside the drawn edge: -8px made it 42 tall, so it
+     is centred at 44 instead. */
   .gauntlet-shell .top-actions.compact-actions button::before {
     content: "";
     position: absolute;
-    inset: -8px -1.5px;
+    inset: calc(50% - 22px) -1.5px;
   }
 
   .gauntlet-shell .top-actions.compact-actions .header-reset::before {
@@ -2216,10 +2231,12 @@
     border-radius: 9px;
   }
 
+  /* Centred at 44 against the padding box: -8px reached 42 on a 28px stance,
+     whose 1px border is outside the box the area is placed in. */
   .gx-focus-modes button::before {
     content: "";
     position: absolute;
-    inset: -8px 0;
+    inset: calc(50% - 22px) 0;
   }
 
   .gx-focus-modes span {
