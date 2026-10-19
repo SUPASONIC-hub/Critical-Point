@@ -405,7 +405,11 @@ export function GauntletStage({
   const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? "봉인됨" : !selectedCard ? "카드를 고른다" : !holdsCash ? "확정" : cashHold.phase === "armed" ? "한 번 더" : "꾹 눌러 확정";
 
   // The hook that owns the keys also says which of them a control may name.
-  const { letterKeys, keys, drawn } = useTableKeys({ select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null, cycleFocusMode: stanceOn ? cycleFocusMode : null, cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable });
+  const { letterKeys, keys, drawn } = useTableKeys({
+    select, focus: lockOn ? focus : null, push, cash, cashHold: holdsCash && canCash ? cashHold : null,
+    cycleFocusMode: stanceOn ? cycleFocusMode : null,
+    cards, reframeChoice, draftOpen, relicOffer, pickRelic, briefingOpen, tableOpen, openTable,
+  });
 
   const bandLeft = (schema.wallMin / GAUGE_MAX) * 100;
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
