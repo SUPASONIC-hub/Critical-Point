@@ -501,3 +501,13 @@ test("a device that cannot store an id still has one id, and the board has its o
   assert.equal(browser.storage.getItem("critical-point-session-id"), stored);
   assert.notEqual(telemetry.getBoardWriterId(), stored, "a board post must not carry the telemetry session id");
 });
+
+test("the ranking asks for one board: the ordinary one, or a week's rule's own", async () => {
+  browser.respond("/rest/v1/public_rankings", () => ok([]));
+  await telemetry.fetchLeaderboard();
+  await telemetry.fetchLeaderboard(100, "2026-W46");
+  const [ordinary, week] = browser.callsTo("/rest/v1/public_rankings").slice(-2).map((call) => new URL(call.path, "https://x").searchParams);
+  assert.equal(ordinary.get("week"), "is.null");
+  assert.equal(week.get("week"), "eq.2026-W46");
+  assert.ok(ordinary.get("select").split(",").includes("week"));
+});

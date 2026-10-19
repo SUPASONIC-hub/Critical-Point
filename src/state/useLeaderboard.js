@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { buildLeaderboard } from "../ranking.js";
 import { fetchLeaderboard } from "../telemetry.js";
@@ -15,12 +15,51 @@ export function reloadLeaderboard() {
 }
 
 /**
+ * Which board the screen shows: the ordinary ranking (no week, no rule), or a
+ * week's rule's own (이번 주의 규칙, two tabs), named by its week for the
+ * server and by its rule for this browser's rows. Kept here for the same
+ * reason as the reload: the screen picks it, the hook its two callers run
+ * fetches it, and neither caller passes it.
+ */
+const ORDINARY_BOARD = Object.freeze({ week: null, rule: null });
+let leaderboardWeek = ORDINARY_BOARD;
+const weekListeners = new Set();
+
+export function selectLeaderboardWeek(week = null, rule = null) {
+  const next = typeof week === "string" && week && typeof rule === "string" && rule ? { week, rule } : ORDINARY_BOARD;
+  if (next.week === leaderboardWeek.week && next.rule === leaderboardWeek.rule) return;
+  leaderboardWeek = next;
+  weekListeners.forEach((listener) => listener());
+}
+
+function subscribeWeek(listener) {
+  weekListeners.add(listener);
+  return () => weekListeners.delete(listener);
+}
+
+const readWeek = () => leaderboardWeek;
+
+export function useLeaderboardWeek() {
+  return useSyncExternalStore(subscribeWeek, readWeek, readWeek);
+}
+
+/**
+ * The rule a row of this browser's own was played under, or null: its board.
+ * The device cannot know the week the server will write, so its rows are
+ * told apart by the rule (a rule run in two weeks shares one local board).
+ */
+export function localRowRule(row) {
+  const rule = row?.summary?.gauntlet?.weekRule;
+  return typeof rule === "string" && rule ? rule : null;
+}
+
+/**
  * Owns the ranking table shown by the ranking screen: remote rows merged with
  * this browser's own completed runs, plus the status/error copy that explains
  * which of the two the player is looking at. The remote rows are the server's
  * best-scored completed seasons (`fetchLeaderboard`), identified by run tag
  * only; `buildLeaderboard` matches this browser's copy of a run to its remote
- * row by that tag.
+ * row by that tag. Both are of the board picked (`useLeaderboardWeek`).
  *
  * Extracted from AppContent() unchanged; it only ever reads local rows and
  * never writes game state.
@@ -30,6 +69,7 @@ export function useLeaderboard({ showRanking, isOnline, localLeaderboardRows, lo
   const [leaderboardStatus, setLeaderboardStatus] = useState("idle");
   const [leaderboardError, setLeaderboardError] = useState("");
   const [reloadToken, setReloadToken] = useState(0);
+  const board = useLeaderboardWeek();
 
   useEffect(() => {
     const listener = () => setReloadToken((token) => token + 1);
@@ -42,13 +82,14 @@ export function useLeaderboard({ showRanking, isOnline, localLeaderboardRows, lo
   useEffect(() => {
     if (!showRanking) return undefined;
     let cancelled = false;
-    const localRows = [...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])];
+    const localRows = [...localLeaderboardRows, ...(localSeasonLeaderboardRow ? [localSeasonLeaderboardRow] : [])]
+      .filter((row) => localRowRule(row) === board.rule);
     queueMicrotask(() => {
       if (cancelled) return;
       setLeaderboardStatus("loading");
       setLeaderboardError("");
     });
-    fetchLeaderboard()
+    fetchLeaderboard(100, board.week)
       .then(({ rows = [], skipped = false }) => {
         if (cancelled) return;
         setLeaderboard(buildLeaderboard([...rows, ...localRows]));
@@ -68,7 +109,7 @@ export function useLeaderboard({ showRanking, isOnline, localLeaderboardRows, lo
     return () => {
       cancelled = true;
     };
-  }, [isOnline, localLeaderboardRows, localSeasonLeaderboardRow, reloadToken, showRanking]);
+  }, [isOnline, localLeaderboardRows, localSeasonLeaderboardRow, reloadToken, showRanking, board]);
 
   return { leaderboard, leaderboardStatus, leaderboardError };
 }
