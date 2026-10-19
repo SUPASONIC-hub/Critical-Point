@@ -6,6 +6,7 @@ import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
+import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
@@ -360,6 +361,7 @@ export function IntroScreen({ view, renderers = {} }) {
           {nextParticipantMessage && (
             <p className="previous-participant-message">이전 참가자가 남긴 말: “{nextParticipantMessage}”</p>
           )}
+          <WeeklyRuleNotice />
           <section id="case-access-setup" className="start-priority" aria-label="게임 시작 준비" tabIndex={-1}>
           <div className="start-console-heading">
             <div>

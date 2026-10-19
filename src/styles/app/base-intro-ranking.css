@@ -1170,7 +1170,8 @@ summary:focus-visible {
 /* Briefing ----------------------------------------------------------------
    The setup card and the drawers are one section: a wide card with the call
    sign, then the pre-start drawers tiled two-up. */
-.previous-participant-message {
+.previous-participant-message,
+.weekly-rule-notice {
   width: min(var(--ui-page-max), 100%);
   margin: clamp(32px, 5vw, 56px) auto 0;
   padding: 14px 18px;
@@ -1182,6 +1183,13 @@ summary:focus-visible {
 }
 .intro p.previous-participant-message {
   max-width: none;
+}
+/* 이번 주의 규칙 (WeeklyRuleNotice): the line, then its box. */
+.weekly-rule-notice p {
+  margin: 0;
+}
+.weekly-rule-notice p:not(:last-child) {
+  margin-bottom: 8px;
 }
 .start-panel,
 .start-priority,
@@ -2357,6 +2365,27 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+/* 이번 주의 규칙: the ordinary board and the week's (RankingScreen WeekBoards). */
+.ranking-week-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.ranking-week-tabs button {
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+}
+.ranking-week-tabs button[aria-pressed="true"] {
+  color: var(--ui-accent-ink);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
 }
 .ranking-row {
   display: grid;

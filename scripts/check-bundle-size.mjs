@@ -123,7 +123,11 @@ const budgets = [
   // here and not in the report's chunk because that chunk had 181 gzip bytes
   // left (14,219 of 14,400); what the report's chunk carries for the card is
   // the import and the four fields it hands over.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_200 },
+  // 4,200 -> 4,209 gzip on 2026-10-19, measured 4,205 plus the 4 bytes of hash
+  // noise the tableAudio line allows: the chunk's own code did not change, it
+  // gained one more `import "./weeklyRules-<hash>.js"` (이번 주의 규칙 has a
+  // chunk of its own, below). The raw budget does not move.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_690, maxGzip: 4_209 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -156,6 +160,15 @@ const budgets = [
   // 1,054 / 652 measured, plus the 4 bytes tableAudio was given for the
   // hashed file names it imports.
   { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_058, maxGzip: 656 },
+  // 이번 주의 규칙 (2026-10-19), split off the entry chunk so the entry stays
+  // under its budget: the rules and their words (src/gauntlet/weeklyRules.js),
+  // shared by the runtime, the engine and the views below, and the start
+  // screen's line and the ranking's two boards (WeeklyRuleViews.jsx), fetched
+  // only in a week the calendar has (WeeklyRuleNotice.jsx). The entry keeps
+  // the calendar, the clock and the device's choice. Each at what it measured
+  // (1,141 / 715 and 1,662 / 909), the gzip with the 4 bytes of hash noise.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 1_141, maxGzip: 719 },
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 1_662, maxGzip: 913 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
 ];
@@ -233,7 +246,10 @@ function checkBudget(file, budget) {
 // `serviceWorker()` in vite.config.js. Its size is its code plus one line that
 // lists every file of the release: 8,358 / 2,992 on 2026-10-06, plus 5%. It
 // is fetched after `load`, so it is on no paint's path.
-const WORKER_BUDGET = { maxBytes: 8_780, maxGzip: 3_150 };
+// 8,780 / 3,150 -> 8,792 / 3,171 on 2026-10-19, measured 8,792 / 3,167 (gzip
+// plus the 4 bytes of hash noise): the list names two more files, the chunks
+// 이번 주의 규칙 was split into above; the worker's code did not change.
+const WORKER_BUDGET = { maxBytes: 8_792, maxGzip: 3_171 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
