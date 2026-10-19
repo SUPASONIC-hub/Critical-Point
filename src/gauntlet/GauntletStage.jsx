@@ -703,8 +703,10 @@ export function GauntletStage({
           aria-keyshortcuts={keys("Space W")}
           // The name stays put, as the reading clock's does: with the gauge in
           // it, the button a screen reader is resting on was a new button after
-          // every push. The numbers are its description.
-          aria-label="밀어붙인다"
+          // every push. The numbers are its description. The name starts with
+          // what the button shows, the step range too, so a voice command that
+          // reads the button out finds it (WCAG 2.5.3); the range holds for the scene.
+          aria-label={`밀어붙인다 +${schema.stepMin}~${schema.stepMax}`}
           aria-describedby={logic ? "gx-push-detail gx-logic-detail" : "gx-push-detail"}
         >
           <Flame size={18} aria-hidden="true" />
@@ -724,11 +726,15 @@ export function GauntletStage({
           onClick={focus}
           disabled={!canFocus}
           aria-keyshortcuts={keys("E")}
-          aria-label="LOCK을 건다"
+          // The name is what the button shows, charge and price included (WCAG
+          // 2.5.3): it changes when a press changes the charge, not on a clock.
+          aria-label={`LOCK ${Math.round(win.focus)} · −${LOCK_PRESS_SECONDS}초`}
           aria-describedby="gx-focus-detail"
         >
           <Crosshair size={18} aria-hidden="true" />
-          <span lang="en">LOCK</span>
+          {/* The space keeps LOCK and the charge two words to whoever reads the
+              text; in the flex row a space between items is not drawn. */}
+          <span lang="en">LOCK</span>{" "}
           {/* What a press costs is on the button: the clock is the only price.
               The stance is not named here: the HUD's signal beside the streak
               prints it with the same charge, and with it the line was 94 to

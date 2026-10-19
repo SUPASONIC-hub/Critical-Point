@@ -288,7 +288,7 @@ for (const size of [{ width: 360, height: 740 }, { width: 390, height: 664 }]) {
 
     const briefing = page.getByTestId("scene-briefing");
     await expect(briefing.getByRole("dialog")).toBeVisible();
-    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
     await waitForEntrance(briefing);
     await expectTouchTargets(briefing, `the briefing @ ${where}`);
 

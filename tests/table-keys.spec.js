@@ -456,7 +456,7 @@ test("the briefing page keeps focus and Tab inside it, and the keys open the tab
   // A focused control on the page answers Enter itself: the clock is held, the table stays shut.
   await page.getByTestId("reading-timer").focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
   await expect(briefing).toBeVisible();
 
   await page.keyboard.press("2");
@@ -690,7 +690,7 @@ async function openIntroPage(page, caseId, size, { broken = false, rootFontSize 
     await expect(page.getByTestId("protocol-breach")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   }
   await page.addStyleTag({ content: `.debug-overlay { display: none !important; }${rootFontSize ? ` :root { font-size: ${rootFontSize} !important; }` : ""}` });
-  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
   await waitForEntrance(page.getByTestId("scene-briefing"));
 }
 

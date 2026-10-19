@@ -796,7 +796,7 @@ test.describe("a phone on its side", () => {
     await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
     // Held first, so the reading clock does not open the table under the measurement.
     await page.getByTestId("reading-timer").click();
-    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
     expect(await isPhoneOnItsSide(page), "the context is a touch screen on its side").toBe(true);
     const openButton = page.getByTestId("open-table");
     await expect(openButton).toBeVisible();
@@ -861,7 +861,7 @@ async function openHeldBriefing(page, caseId, nodeId) {
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
   // Held first, so the reading clock does not open the table under the measurement.
   await page.getByTestId("reading-timer").click();
-  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
   // The panels pop in one after another; measured before they land, a box is
   // read mid-scale.
   await waitForEntrance(page.getByTestId("scene-briefing"));
@@ -982,7 +982,7 @@ test.describe("a phone held upright", () => {
       await expect(page.getByTestId("carried-rules")).toHaveCount(0);
       await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
       await page.getByTestId("reading-timer").click();
-      await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-pressed", "true");
+      await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
       await waitForEntrance(page.getByTestId("scene-briefing"));
       const broken = await expectClear(`p5_basement on a broken board @ ${size.width}x${size.height}`);
       expect(broken.word, "a broken board slams").toMatch(/!$/);
