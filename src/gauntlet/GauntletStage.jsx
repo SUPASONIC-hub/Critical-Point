@@ -53,7 +53,7 @@ import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
 const TAB_TITLES = {
-  hot: () => "▲ 다음 밀기가 벽 사정권",
+  hot: () => "▲ 밀면 벽 사정권",
   critical: (gauge) => `▲ 열기 ${gauge} · 벽 구간 안`,
   bust: "[BUST] 판이 벽에 닿았다",
 };
@@ -156,7 +156,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine,
   } = readTableMeters({ win, schema, selectedCard });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -200,11 +200,6 @@ export function GauntletStage({
   const lockOn = rules.has("lock");
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
-  // The situation board is three one-line cells, so its copy is written to fit
-  // one: on a phone it was three stacked rows and 142px of the table.
-  const dangerLine = nextHigh >= schema.wallMin
-    ? "다음 밀기가 벽 사정권"
-    : `벽까지 최소 ${Math.max(0, Math.ceil(schema.wallMin - nextHigh))}`;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
   const handBlocked = !live || isAdvancing || !tableOpen;
   // The folded briefing on the table draws its own copy of the plate; nothing

@@ -453,7 +453,7 @@ test("ranking screen has no structural accessibility violations", async ({ page 
  * case01 `start` is the table the overclock test pushes three times without
  * meeting the wall, so one push here lands live.
  */
-const PUSH_CALL = /^열기 \d+ · (벽까지 최소 \d+|다음 밀기가 벽 사정권)$/;
+const PUSH_CALL = /^열기 \d+ · (벽까지 최소 \d+|밀면 벽 사정권|벽 구간 안)$/;
 
 test("a push is said in the table's one polite region, with the shown band and never the drawn wall", async ({ page }) => {
   await startDebugNode(page, "case01", "start");

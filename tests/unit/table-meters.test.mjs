@@ -5,7 +5,7 @@ import {
   BASE_SCHEMA, GAUGE_MAX, getCardChips, getFocusBonus, getForcedCard, getHeartbeatBpm, getMultiplier, getRemainingSeconds,
   getSealedCardId, readRoomCards,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
+import { describeDanger, readTableMeters } from "../../src/gauntlet/tableMeters.js";
 
 /**
  * The table's HUD numbers and the two cards the room picks moved out of
@@ -46,6 +46,23 @@ test("no staked card reads zero chips, and the next push's range stops at the to
   assert.equal(meters.selectedChips, 0);
   assert.equal(meters.nextLow, GAUGE_MAX);
   assert.equal(meters.nextHigh, GAUGE_MAX);
+});
+
+test("the 현재 위험 line says the heat is in the band once it is, and reads the band, never the wall", () => {
+  const schema = BASE_SCHEMA; // band 56-92, a push adds up to 15
+  const line = (gauge, extra = {}) => readTableMeters({ win: windowAt({ gauge, ...extra }), schema, selectedCard: null }).dangerLine;
+  assert.equal(line(30), `벽까지 최소 ${schema.wallMin - (30 + schema.stepMax)}`);
+  assert.equal(line(schema.wallMin - schema.stepMax - 1), "벽까지 최소 1");
+  assert.equal(line(schema.wallMin - schema.stepMax), "밀면 벽 사정권");
+  assert.equal(line(schema.wallMin - 1), "밀면 벽 사정권");
+  // 56 to 68 in the shots of 2026-10-17 read 다음 밀기가 벽 사정권 here while the tab read 벽 구간 안.
+  for (const gauge of [schema.wallMin, 60, 67, 68]) assert.equal(line(gauge), "벽 구간 안", `열기 ${gauge}`);
+  // The drawn wall and its tell move nothing: the line reads the band's low edge.
+  assert.equal(line(60, { wall: 90, tellOffset: 0 }), line(60, { wall: 57, tellOffset: -3 }));
+  assert.equal(line(30, { wall: 57 }), line(30, { wall: 92 }));
+  assert.equal(describeDanger({ gauge: 50, nextHigh: 65, wallMin: 56 }), "밀면 벽 사정권");
+  // A 360px phone cut the old line to 다음 밀기가 벽 사…; every line is now shorter than what it showed.
+  for (const text of ["벽 구간 안", "밀면 벽 사정권", line(0)]) assert.ok(text.length < "다음 밀기가 벽 사".length, text);
 });
 
 test("the heartbeat hears the tell wall, and a window saved without a tell hears the wall", () => {
