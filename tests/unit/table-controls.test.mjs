@@ -37,7 +37,7 @@ let revealOpen = false;
 globalThis.document = { querySelector: (selector) => (revealOpen && selector === ".decision-reveal-backdrop" ? {} : null) };
 
 const { CLOCK_OPENED_CALL, getClockCall, getTabNotices, REFRAME_CARD_NAME } = await import("../../src/gauntlet/tableReadout.js");
-const { handleTableKey } = await import("../../src/gauntlet/useTableKeys.js");
+const { endHeldKey, handleTableKey, tableKeyListeners } = await import("../../src/gauntlet/useTableKeys.js");
 const settings = await import("../../src/state/accessibilitySettings.js");
 
 const CARDS = [{ id: "a" }, { id: "b" }, { id: "c" }];
@@ -149,6 +149,78 @@ test("Space and Enter stay with a control the keyboard walked to, held or not", 
     assert.equal(letter.defaultPrevented, true);
     assert.equal(calls.length, repeat ? 0 : 1);
   }
+});
+
+test("on a closing scene Enter starts the held 확정 instead of cashing, once however long it is held", () => {
+  const presses = [];
+  const cashHold = { press: () => presses.push("press"), release: () => true, cancel: () => {} };
+  const { current, calls } = table({ cashHold });
+  const first = keydown({ key: "Enter", code: "Enter" });
+  assert.equal(handleTableKey(first, current), "hold", "the key-up that ends the hold is told whose it is");
+  assert.equal(first.defaultPrevented, true);
+  const repeat = keydown({ key: "Enter", code: "Enter", repeat: true });
+  handleTableKey(repeat, current);
+  assert.equal(repeat.defaultPrevented, true, "a repeat is still taken");
+  assert.deepEqual(presses, ["press"], "a repeat is not a second press, which would confirm");
+  assert.equal(calls.length, 0, "nothing cashed on the key-down");
+
+  // Space on the table is still the push: only on the button itself is it 확정.
+  handleTableKey(keydown({ key: " ", code: "Space" }), current);
+  assert.deepEqual(calls.map(([name]) => name), ["push"]);
+  const onButton = keydown({ key: " ", code: "Space", target: new FakeElement(".gx-cash") });
+  assert.equal(handleTableKey(onButton, current, true), "hold");
+  assert.equal(onButton.defaultPrevented, true, "the button's own click on key-up is not a second press");
+  assert.deepEqual(presses, ["press", "press"]);
+
+  // Walked, with nothing focused, Enter still holds: it never cashes past the hold.
+  const loose = keydown({ key: "Enter", code: "Enter" });
+  assert.equal(handleTableKey(loose, current, true), "hold");
+  assert.deepEqual(presses, ["press", "press", "press"]);
+  assert.equal(calls.filter(([name]) => name === "cash").length, 0);
+
+  // A control the keyboard walked to that is not 확정 keeps its keys.
+  const card = keydown({ key: "Enter", code: "Enter", target: new FakeElement("button", [".choices"]) });
+  assert.equal(handleTableKey(card, current, true), undefined);
+  assert.equal(card.defaultPrevented, false);
+  assert.equal(presses.length, 3);
+});
+
+test("only the key a held 확정 began on ends it, and a window left mid-hold cancels it", () => {
+  const ends = [];
+  const current = { cashHold: { press: () => {}, release: () => (ends.push("release"), true), cancel: () => ends.push("cancel") } };
+  const other = keydown({ key: " ", code: "Space" });
+  assert.equal(endHeldKey(other, current, "Enter"), "Enter", "another key's key-up leaves the hold held");
+  assert.equal(other.defaultPrevented, false);
+  const up = keydown({ key: "Enter", code: "Enter" });
+  assert.equal(endHeldKey(up, current, "Enter"), null);
+  assert.equal(up.defaultPrevented, true, "the key-up that ended a hold is not a click on 확정");
+  assert.equal(endHeldKey(null, current, "Enter"), null);
+  assert.deepEqual(ends, ["release", "cancel"]);
+  const unheld = keydown({ key: "Enter", code: "Enter" });
+  assert.equal(endHeldKey(unheld, { cashHold: { release: () => false } }, "Enter"), null);
+  assert.equal(unheld.defaultPrevented, false, "a release that ended nothing leaves the key alone");
+  assert.equal(endHeldKey(null, { cashHold: null }, null), null);
+});
+
+test("the window listeners end the hold on its own key's key-up, and on a lost window", () => {
+  const ends = [];
+  const cashHold = { press: () => ends.push("press"), release: () => (ends.push("release"), true), cancel: () => ends.push("cancel") };
+  const actionsRef = { current: table({ cashHold }).current };
+  const listeners = Object.fromEntries(tableKeyListeners(actionsRef).map(([type, listener]) => [type, listener]));
+  listeners.pointerdown();
+  listeners.keydown(keydown({ key: "Enter", code: "Enter" }));
+  listeners.keyup(keydown({ key: " ", code: "Space" }));
+  listeners.keyup(keydown({ key: "Enter", code: "Enter" }));
+  listeners.keydown(keydown({ key: "Tab", code: "Tab" }));
+  listeners.keydown(keydown({ key: "Enter", code: "Enter" }));
+  listeners.blur();
+  assert.deepEqual(ends, ["press", "release", "press", "cancel"]);
+});
+
+test("without a held 확정, Enter cashes as it always did", () => {
+  const { current, calls } = table({ cashHold: null });
+  assert.equal(handleTableKey(keydown({ key: "Enter", code: "Enter" }), current), undefined);
+  assert.deepEqual(calls.map(([name]) => name), ["cash"]);
 });
 
 test("the briefing and the draft take their keys once, and leave their own buttons alone", () => {

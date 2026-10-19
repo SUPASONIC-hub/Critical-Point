@@ -13,7 +13,7 @@ globalThis.localStorage = createStorage();
 
 const voice = await import("../../src/gauntlet/tableVoice.js");
 const { CLOCK_OPENED_CALL } = await import("../../src/gauntlet/tableReadout.js");
-const { describePush, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
+const { HOLD_ARMED_CALL, describePush, describeStanceCarry, describeBank, findBank, findStanceCarry, listTableCalls, queueCalls, readTableFacts } = voice;
 
 const STRIKE_WAKE = { id: "strikeWake", label: "STRIKE WAKE", title: "다음 판이 더 두껍게 깨어난다" };
 const STEADY_LINE = { id: "steadyLine", label: "STEADY LINE", title: "다음 판이 식은 채 열린다" };
@@ -65,6 +65,16 @@ test("the clock is said at ten and at five, once each, and a pause is not a seco
   assert.equal(readTableFacts({ win: tableWindow(), live: true, dangerLine: "", cashMutations: [], clock: { remaining: 8, paused: true } }).clock, "10초 남았다");
   const opened = at(45, { openedByClock: true, win: tableWindow({ elapsed: 0 }) });
   assert.deepEqual(listTableCalls(at(45, { win: tableWindow({ elapsed: 0 }) }), opened), [{ kind: "clock", text: CLOCK_OPENED_CALL }]);
+});
+
+test("an armed 확정 is said through the table's voice, once, and ahead of anything waiting", () => {
+  const armed = (on, win = tableWindow()) => readTableFacts({ win, live: true, dangerLine: "", cashMutations: [], clock: { remaining: 30, elapsed: win.elapsed }, armed: on });
+  assert.deepEqual(listTableCalls(armed(false), armed(true)), [{ kind: "hold", text: HOLD_ARMED_CALL }]);
+  assert.deepEqual(listTableCalls(armed(true), armed(true)), [], "still armed is not news");
+  assert.deepEqual(listTableCalls(armed(true), armed(false)), [], "the arm lapsing is not said");
+  assert.equal(facts().hold, "", "a table no press armed says nothing of it");
+  const queue = queueCalls([{ kind: "clock", text: "10초 남았다" }], [{ kind: "hold", text: HOLD_ARMED_CALL }]);
+  assert.deepEqual(queue.map((call) => call.kind), ["hold", "clock"], "it lapses in three seconds, so it goes first");
 });
 
 test("a call waiting its turn is replaced by a newer one of its kind, and the clock goes first", () => {

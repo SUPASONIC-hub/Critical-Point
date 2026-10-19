@@ -15,6 +15,9 @@ const isDialogButton = (target, selector) => target instanceof HTMLElement && ta
 // Anything that answers Space or Enter on its own once it has focus.
 const isControl = (target) => target instanceof HTMLElement && Boolean(target.closest("button, summary, a[href], [role='button']"));
 
+// The 확정 button, which on a closing scene answers a held Enter or Space.
+const isCashButton = (target) => target instanceof HTMLElement && Boolean(target.closest(".gx-cash"));
+
 function cardIdForKey(key, cards, reframeChoice) {
   const index = Number(key) - 1;
   if (!Number.isInteger(index) || index < 0) return null;
@@ -65,6 +68,11 @@ function letterOf(event) {
  * can be the wall. A repeat of a key the table would have taken is claimed and
  * does nothing.
  *
+ * On the scene that closes a case the stage hands over `cashHold`, and Enter
+ * (or Space on the focused 확정) starts a hold instead of cashing: the key-up
+ * ends it, and a hold that filled has already cashed. A repeat is still
+ * nothing, so a held key is one press however long it is held.
+ *
  * The handler is installed once and reads the stage's current actions through
  * a ref, so it never sees a stale window.
  *
@@ -82,19 +90,10 @@ export function useTableKeys(actions) {
   });
 
   useEffect(() => {
-    let walked = false;
-    const onPointer = () => {
-      walked = false;
-    };
-    const onKey = (event) => {
-      if (event.key === "Tab") walked = true;
-      handleTableKey(event, actionsRef.current, walked);
-    };
-    globalThis.addEventListener("keydown", onKey);
-    globalThis.addEventListener("pointerdown", onPointer, true);
+    const listeners = tableKeyListeners(actionsRef);
+    for (const [type, listener, capture] of listeners) globalThis.addEventListener(type, listener, capture);
     return () => {
-      globalThis.removeEventListener("keydown", onKey);
-      globalThis.removeEventListener("pointerdown", onPointer, true);
+      for (const [type, listener, capture] of listeners) globalThis.removeEventListener(type, listener, capture);
     };
   }, []);
 
@@ -102,9 +101,58 @@ export function useTableKeys(actions) {
 }
 
 /**
+ * The window listeners `useTableKeys` installs, reading the stage's current
+ * actions through `actionsRef`: `[type, listener, capture]` each. Exported
+ * for the unit tests.
+ */
+export function tableKeyListeners(actionsRef) {
+  let walked = false;
+  const onPointer = () => {
+    walked = false;
+  };
+  // The key a held 확정 began on: only its key-up ends the hold, and a
+  // window left mid-hold drops it rather than letting it fill unseen.
+  let heldKey = null;
+  const onKey = (event) => {
+    if (event.key === "Tab") walked = true;
+    if (handleTableKey(event, actionsRef.current, walked) === "hold") heldKey = event.key;
+  };
+  const onKeyUp = (event) => {
+    heldKey = endHeldKey(event, actionsRef.current, heldKey);
+  };
+  const onBlur = () => {
+    heldKey = endHeldKey(null, actionsRef.current, heldKey);
+  };
+  return [
+    ["keydown", onKey],
+    ["keyup", onKeyUp],
+    ["blur", onBlur],
+    ["pointerdown", onPointer, true],
+  ];
+}
+
+/**
+ * The end of a held 확정's key: `event` is a key-up, or null when the window
+ * lost focus mid-hold. Only the key-up of the key the hold began on releases
+ * it (and keeps its click from being a second press); a lost window cancels it
+ * rather than letting it fill unseen. Returns the key still held. Exported for
+ * the unit tests.
+ */
+export function endHeldKey(event, current, heldKey) {
+  if (!event) {
+    current.cashHold?.cancel();
+    return null;
+  }
+  if (event.key !== heldKey) return heldKey;
+  if (current.cashHold?.release()) event.preventDefault();
+  return null;
+}
+
+/**
  * One keydown against the table as it stands. `current` is the stage's
  * actions and state; `walked` is whether focus got where it is by Tab.
  * Exported for the unit tests, which press keys no browser has to be open for.
+ * Returns "hold" when the key began a held 확정, so its key-up can end it.
  */
 export function handleTableKey(event, current, walked = false) {
   if (event.defaultPrevented) return;
@@ -146,6 +194,17 @@ export function handleTableKey(event, current, walked = false) {
   }
 
   if (!current.tableOpen) return;
+  // A closing scene's 확정 is held (`useHoldConfirm`): Enter starts the hold
+  // wherever the table would have cashed on it, and Space does on the button
+  // itself once the keyboard has walked there (a pointer's focus left on it
+  // still pushes). The key-up that ends it is `useTableKeys`'s.
+  if (current.cashHold && activation) {
+    const holds = isCashButton(event.target) ? walked || key === "Enter" : key === "Enter" && !(walked && isControl(event.target));
+    if (holds) {
+      take(() => current.cashHold.press());
+      return "hold";
+    }
+  }
   if (activation && walked && isControl(event.target)) return;
   if (letter === "e" && current.focus) take(() => current.focus(event));
   else if (letter === "q" && current.cycleFocusMode) take(() => current.cycleFocusMode());

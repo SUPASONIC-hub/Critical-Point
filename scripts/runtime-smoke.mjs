@@ -135,6 +135,12 @@ async function stakeAndCash(cardIndex = 0) {
     await page.getByTestId("commit-push").click();
   }
   await cash.click();
+  // The case's last choice takes a hold or a second press (holdConfirm.js);
+  // a click there only arms it.
+  if (await page.evaluate(() => "hold" in (document.querySelector("[data-testid='commit-confirm']")?.dataset ?? {}))) {
+    await page.waitForSelector("[data-testid='commit-confirm'][data-hold='armed']", { timeout: 2000 });
+    await cash.click();
+  }
 }
 
 await step("stake a card on the table", async () => {
