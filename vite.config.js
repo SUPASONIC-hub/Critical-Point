@@ -330,6 +330,18 @@ const RUNTIME_SYSTEMS = "src/runtimeSystems.js";
  */
 const CASE_COPY = "src/caseCopy.js";
 
+/**
+ * The table's sound (src/gauntlet/gauntletAudio.js): the heartbeat, the
+ * clock's tick, the drone and the push and bust cues. Only the table imports
+ * it, so left alone it is written into the PlayScreen chunk, which went over
+ * its budget on 2026-10-19 (104,323 of 104,200) when two changes that each
+ * fitted were merged together. It gets a file the same way caseCopy does: the
+ * table's chunk imports it statically, so the runtime's `import()` of the
+ * table fetches both at once and the table starts no later and sounds no
+ * different. Its one import, AdaptiveMusic, is the entry chunk's.
+ */
+const TABLE_AUDIO = "src/gauntlet/gauntletAudio.js";
+
 function runtimeSystemsChunk() {
   return {
     name: "runtime-systems-chunk",
@@ -345,6 +357,12 @@ function runtimeSystemsChunk() {
         type: "chunk",
         id: path.resolve(CASE_COPY),
         name: "caseCopy",
+        implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
+      });
+      this.emitFile({
+        type: "chunk",
+        id: path.resolve(TABLE_AUDIO),
+        name: "tableAudio",
         implicitlyLoadedAfterOneOf: [path.resolve("index.html")],
       });
     },
