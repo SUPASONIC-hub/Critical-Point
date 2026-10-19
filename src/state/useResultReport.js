@@ -24,6 +24,7 @@ import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
 import { describeCaseChange } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
 import { useLogicStanding } from "./useLogicStanding.js";
+import { useScreenTabTitle } from "./tabTitle.js";
 import { getTelemetryStats, subscribeTelemetryStats } from "../telemetry.js";
 
 const RANK_LINES = {
@@ -119,6 +120,7 @@ export function useResultReport({
   resources,
   riskTier,
   runId,
+  tabScreen,
   triggers,
 }) {
   const telemetryStats = useSyncExternalStore(subscribeTelemetryStats, getTelemetryStats, getTelemetryStats);
@@ -171,6 +173,13 @@ export function useResultReport({
   const outcomeEntry = [...log].reverse().find((entry) => entry.nodeId === outcomeNodeId);
 
   const reportCopy = useReportCopy({ caseResults, gameplayStats, log, nextCaseSignal, result, riskTier });
+  const caseOutcome = getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) });
+  // The tab on a result (tabTitle.js, 개선 포인트 A3): the season's ruling by its
+  // label, a case by the ending it closed on. Drafts for the user to decide.
+  const resultTabTitle = currentCase === "final"
+    ? endingVariant.id === "collapse" ? "[SYSTEM COLLAPSE] 시즌 붕괴" : `[${endingVariant.label}] 시즌 판정`
+    : `[사건 종료] ${caseOutcome.tag}`;
+  useScreenTabTitle(tabScreen, tabScreen === "result" ? resultTabTitle : null);
 
   return {
     ...reportCopy,
@@ -225,7 +234,7 @@ export function useResultReport({
       choiceId: log.at(-1)?.choiceId,
       pending: pendingTelemetry.length,
     }),
-    caseOutcome: getCaseOutcome({ caseId: currentCase, choiceId: getOutcomeChoiceId(outcomeEntry?.choiceId, nodes[outcomeNodeId]) }),
+    caseOutcome,
     endingProfile: createEndingProfile({ finalEndingEntry }),
   };
 }

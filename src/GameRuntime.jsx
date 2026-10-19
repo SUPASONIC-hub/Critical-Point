@@ -785,6 +785,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     riskTier,
     runId,
+    tabScreen: !started ? "intro" : isResult ? "result" : "play",
     triggers,
   });
   // What the runtime reads itself; the result view takes the whole report (viewModels/resultViewModel.js).

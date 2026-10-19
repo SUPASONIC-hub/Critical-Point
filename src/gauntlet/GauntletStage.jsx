@@ -22,6 +22,7 @@ import { useGauntletWindow } from "./useGauntletWindow.js";
 import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
+import { useTabTitle } from "../state/tabTitle.js";
 import { listOfferedTypes } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -48,6 +49,12 @@ import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
+// Drafts (개선 포인트 A3). A cold table leaves the tab as index.html has it.
+const TAB_TITLES = {
+  hot: () => "▲ 다음 밀기가 벽 사정권",
+  critical: (gauge) => `▲ 열기 ${gauge} · 벽 구간 안`,
+  bust: "[BUST] 판이 벽에 닿았다",
+};
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -390,6 +397,11 @@ export function GauntletStage({
   const bandWidth = ((schema.wallMax - schema.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
   const heatTier = win.status === "bust" ? "bust" : win.gauge >= schema.wallMin ? "critical" : win.gauge >= schema.wallMin - schema.stepMax ? "hot" : "cold";
+  // The tab says what the table shows (tabTitle.js): never the hidden wall. A
+  // bust stays on it until the next table opens; the briefing leaves it be.
+  const busted = win.status === "bust" && win.cause !== "abandon";
+  const tabTitle = busted ? TAB_TITLES.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
+  useTabTitle("table", tabTitle, { rank: 1, keep: busted });
 
   return (
     <section
