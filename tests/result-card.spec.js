@@ -10,6 +10,7 @@ import { RESULT_CARD_FILE_NAME, RESULT_CARD_HEIGHT, RESULT_CARD_WIDTH } from "..
 import { RESULT_CARD_COPY } from "../src/resultCardCopy.js";
 import { LOGIC_REPORT_COPY } from "../src/logicReport.js";
 import { buildResultCardModel } from "../src/resultCardModel.js";
+import { getJudgementHabit } from "../src/judgementHabit.js";
 
 /**
  * The season's result card, from the buttons at the ending to the file.
@@ -202,7 +203,9 @@ async function expectedShareLine(page) {
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   const { bestBurst, bestRank } = buildResultCardModel({ caseResults: saved.caseResults });
   const { logicHold } = getSeasonLogic(saved.caseResults);
-  const modeTitle = await page.locator(".result-why-grid article").nth(1).locator("strong").innerText();
+  // The card names the season's 판단 습관 when it has one, and the 판단 DNA
+  // title the report prints when it has not (judgementHabit.js).
+  const modeTitle = getJudgementHabit(saved.caseResults)?.title ?? (await page.locator(".result-why-grid article").nth(1).locator("strong").innerText());
   const origin = new URL(page.url()).origin;
   const pattern = new RegExp(`^트리거랩에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\. ${origin}/$`);
   return { pattern, bestBurst, bestRank, logicHold };
@@ -238,6 +241,9 @@ test("결과 카드 저장 downloads a drawn 1080x1350 card and copies its line"
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toMatch(line.pattern);
   expect(copied).not.toContain(MESSAGE);
+  // The card has no room for the habit's line; the report's 당신이 반복한 방식 box draws it under the name.
+  const habit = getJudgementHabit((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).caseResults);
+  if (habit) await expect(page.locator(".result-why-grid article").nth(1).locator("p").first()).toHaveText(habit.line);
 
   await keepScreenshots(page, testInfo, "buttons-after-save");
 });

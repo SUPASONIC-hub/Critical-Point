@@ -277,6 +277,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     triggers,
     cognition,
+    caseResults,
     node,
     currentCase,
     clueCount,
