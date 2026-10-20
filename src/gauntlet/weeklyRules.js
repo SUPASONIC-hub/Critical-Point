@@ -51,7 +51,7 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
   "heavy-fracture": Object.freeze({
     label: "HEAVY FRACTURE",
     title: "균열이 깊다",
-    text: `이번 주는 FRACTURE가 금 간 자원을 ×${HEAVY_FRACTURE_RATE}로 청구한다.`,
+    text: `이번 주는 FRACTURE가 금 간 자원을 ${HEAVY_FRACTURE_RATE}배로 청구한다.`,
     schema: Object.freeze({ fractureRate: HEAVY_FRACTURE_RATE }),
   }),
 });
