@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-10-20 (the state of `main` at `41464a4`; what changed and when is in `git log`)
+Last updated: 2026-10-20 (the state of `main` at `6cd7f87`; what changed and when is in `git log`)
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -77,11 +77,11 @@ list of the files it touched.
 - The Supabase schema is deployed through CLI migrations in
   `supabase/migrations/`, never by pasting SQL into the dashboard editor.
 - Visual baselines were last recorded on 2026-10-20 (both intro pictures
-  with #203, the English question under the title; both play screens with
-  #190, SCOUT's band button), in the Playwright 1.64.1 container, and
-  2026-10-16 (both result screens, #154) in 1.62.1. The comparison passes on
-  main at `41464a4` in the 1.64.1 container (priority 19 says how to record
-  them again).
+  with #203, the English question under the title, and the desktop one again
+  with #209; both play screens with #190, SCOUT's band button), in the
+  Playwright 1.64.1 container, and 2026-10-16 (both result screens, #154) in
+  1.62.1. The comparison passes on main at `6cd7f87` in the 1.64.1 container
+  (priority 19 says how to record them again).
 - Every case is a pack, the finale included, and every card a pack writes is
   one object carrying its label, effect, voice line and reply (priority 74).
   A generated card may also name its way of thinking (priority 12); 95 do.
@@ -109,10 +109,10 @@ Still open, on purpose:
 - Two numbers no longer sit under the words they were set for:
   `f_archive_seal`'s effect was written for a label about gathering evidence,
   and 사건 23's market card keeps the `risk` its old label inferred.
-- Three pull requests are left as drafts: #198 (scene bust rates, the
-  client half; its server half, #197, is in), #199 (this week's rule, F7; for
-  after day 10) and #201 (B3, the audit risk of a device-shaped weekly rule;
-  a measurement, not to merge).
+- Three pull requests are open: #199 (this week's rule, F7; to merge on the
+  morning of 2026-10-21), and two drafts that are measurements, not to merge:
+  #201 (B3, the audit risk of a device-shaped weekly rule; its decisions are
+  recorded) and #208 (B2, the visible chain risk; decisions pending).
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
@@ -156,10 +156,11 @@ Still open, on purpose:
    three view-bag sizes (80 / 28 / 108 fields against 80 / 28 / 110; a screen
    takes its callbacks from `actions` and its renderers from `renderers`, and
    the view carries no second copy of either). The stage
-   (`src/gauntlet/GauntletStage.jsx`) is 830
-   lines and 68 imported names against 830 / 68, with no room left after
-   day 10's SCOUT (#190 drew its band button in `TableNotices.jsx`'s
-   `ScoutBand` and read the band from `readTableMeters` to fit); the hand, the table's
+   (`src/gauntlet/GauntletStage.jsx`) is 813
+   lines and 68 imported names against 830 / 68: day 10's SCOUT took it to
+   830 / 68 (#190 drew its band button in `TableNotices.jsx`'s `ScoutBand`
+   and read the band from `readTableMeters` to fit), and #205 gave the case
+   file's prose to `SceneBriefing.jsx` (`CaseFileStory`); the hand, the table's
    notices, the frame variables and their clock, the table's numbers, its
    voice and the held 확정 are their own modules (`GauntletHand.jsx`,
    `TableNotices.jsx`, `fxVariables.js`, `tableRules.js`, `tableVoice.js`,
@@ -211,8 +212,8 @@ Still open, on purpose:
    and bytes its sheet held, so no sheet gained room, and a comment costs
    nothing from here on. Room since has been made, not granted: #110 and #180
    wrote repeated declaration blocks once under a grouped selector, and so
-   did #190 for SCOUT's rules (55,688 to 55,404); on `41464a4` `play.css` is
-   7 bytes under its 55,420 and `responsive.css` 4 under its 7,967. `comfort.css` is last on purpose, so a tie on specificity
+   did #190 for SCOUT's rules (55,688 to 55,404); on `6cd7f87` `play.css` is
+   8 bytes under its 55,420 and `responsive.css` 4 under its 7,967. `comfort.css` is last on purpose, so a tie on specificity
    goes to the player's setting (priority 87). A `transition` never lists
    `box-shadow`, and `check-css-tokens.mjs` allows five hard-coded hex colours,
    the five there are. Type is sized in rem (16px root), so the reader's own
@@ -920,7 +921,8 @@ Still open, on purpose:
     switch that would hide marked rows, is off. The scene bust rates' server
     half (`20261020020000`, #197) keeps a snapshot, `scene_bust_stats`, that
     pg_cron rebuilds hourly and only `scene_bust_rates()` reads, answering
-    for scenes past 50 windows and 50 runs.
+    for scenes past 50 windows and 50 runs; the client half (#198) asks it
+    once a page and says nothing when it has no answer.
     `check:grants` replays that migration over a seeded database and fails if
     it removes or rewrites any row but the `season-final` ones.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
@@ -1101,9 +1103,12 @@ Still open, on purpose:
     `vite.config.js`), which took PlayScreen to 97,898 / 32,131. `tableAudio`
     is held at 6,700 / 2,205 (6,676 / 2,166 measured; #185 moved it by what
     the heartbeat's tension steps measured, and its gzip by the few bytes the
-    entry chunk's hashed name moves it in every build). On `41464a4`, with
-    day 10's table in, PlayScreen is 103,095 / 34,233 (67 bytes of gzip
-    left) and `tableAudio` 6,700 / 2,195, at its raw number. Trim and split first;
+    entry chunk's hashed name moves it in every build). The scene page's line
+    of other analysts' busts (#198) was split the same way, into
+    `sceneTraces` (`SCENE_TRACES` in `vite.config.js`), held at 1,058 / 656
+    (1,054 / 654 measured). On `6cd7f87`, with day 10's table and the prose
+    marks (#205) in, PlayScreen is 103,249 / 34,275 (25 bytes of gzip left)
+    and `tableAudio` 6,700 / 2,198, at its raw number. Trim and split first;
     a number moves only by what is still measured short. Every chunk the
     build emits has a budget, and a chunk without one fails. The ones that
     rose on 2026-10-06, each with its note beside the number: a case chunk,
