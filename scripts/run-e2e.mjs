@@ -107,6 +107,7 @@ const DEFAULT_SPECS = [
   "tests/season-telemetry.spec.js",
   "tests/table-keys.spec.js",
   "tests/visual-regression.spec.js",
+  "tests/weekly-rule.spec.js",
 ];
 
 // The specs the production build can run: everything tagged @prod, which
