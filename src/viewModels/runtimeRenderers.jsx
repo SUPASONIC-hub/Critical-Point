@@ -1,4 +1,5 @@
 import { DecisionReveal } from "../components/DecisionReveal.jsx";
+import { Prose } from "../components/Prose.jsx";
 import { ErrorLogPanel } from "../components/ErrorLogPanel.jsx";
 import { RecoveryNotice } from "../components/RecoveryNotice.jsx";
 import { SaveStatus } from "../components/SaveStatus.jsx";
@@ -13,7 +14,7 @@ function getSceneLineType(line) {
 function renderSceneLines(text = "") {
   return text.split("\n").map((line, index) => (
     <p className={getSceneLineType(line)} key={`${index}-${line.slice(0, 12)}`}>
-      {line}
+      <Prose text={line} />
     </p>
   ));
 }

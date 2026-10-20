@@ -23,7 +23,7 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { isClosingScene } from "./holdConfirm.js";
 import { useHoldConfirm } from "./useHoldConfirm.js";
-import { describeEffect, describeStanding, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
 import { readTableMeters } from "./tableMeters.js";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTabTitle } from "../state/tabTitle.js";
@@ -43,7 +43,7 @@ import {
   playRelicProcCue,
 } from "./gauntletAudio.js";
 import { RelicDraft } from "./RelicDraft.jsx";
-import { SceneBriefing } from "./SceneBriefing.jsx";
+import { CaseFileStory, SceneBriefing } from "./SceneBriefing.jsx";
 import { StanceRow } from "./StanceRow.jsx";
 import { playTargetLockCue } from "../components/AdaptiveMusic.jsx";
 import { useConfirmOpen } from "../state/confirmAction.js";
@@ -626,26 +626,9 @@ export function GauntletStage({
             <details className="gx-brief" onToggle={(event) => setBriefOpen(event.currentTarget.open)}>
               <summary>사건 파일</summary>
               {/* The six numbers and the clue count a locked card states its condition in; the HUD prints none of them. */}
-              <p data-testid="brief-standing">{describeStanding(resources, resourceMeta, clueCount)}</p>
-              {/* The room, before the words about it. Ten raster files cannot
-                  cover 169 scenes, so the picture is drawn from the scene's own
-                  `place` and `phase` rather than shipped as art. Inside the
-                  closed briefing because priority 27 gives the table its height
-                  budget and a picture in front of the cards would spend it. */}
-              {briefOpen && <ScenePlate node={scene.node} nodeId={scene.nodeId} />}
-              {scene.node.lead && <p className="gx-brief-lead">{scene.node.lead}</p>}
-              <p>{scene.node.text}</p>
-              {/* The case facts. Every scene has carried a `memo` since the graph
-                  was written and none of them ever reached the DOM, so the
-                  briefing explained the table and never the situation the cards
-                  are answering. */}
-              {scene.node.memo?.length > 0 && (
-                <ul className="gx-brief-memo">
-                  {scene.node.memo.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
+              {/* The standing, the room, the story and its facts: CaseFileStory
+                  in SceneBriefing.jsx, which says why each is here. */}
+              <CaseFileStory node={scene.node} nodeId={scene.nodeId} open={briefOpen} standing={[resources, resourceMeta, clueCount]} />
               <ul>
                 {scene.challenge && <li data-testid="brief-challenge">이 장면의 챌린지: {scene.challenge}.</li>}
                 <li>현재 판돈: {formatNumber(run.runPot)}. 벽에 닿으면 금고 밖 판돈은 사라진다.</li>

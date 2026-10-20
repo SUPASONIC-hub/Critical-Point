@@ -5,10 +5,12 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { getBriefingIntro } from "./tableStaging.js";
+import { describeStanding } from "./tableReadout.js";
 import { getUnlockKicker } from "./tableUnlocks.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
+import { Prose, ProseCaptions, ProseItems } from "../components/Prose.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { getAccessibility, useShortcutHints } from "../state/accessibilitySettings.js";
@@ -22,14 +24,6 @@ const SFX_BROKEN = ["쾅!", "쩌억!", "콰직!"];
 function pickSfx(nodeId, broken) {
   const pool = broken ? SFX_BROKEN : SFX_CALM;
   return pool[hashSeed(`sfx:${nodeId}`) % pool.length];
-}
-
-/** Narration reads as a strip of caption boxes, one sentence to a box. */
-function splitCaptions(text = "") {
-  return text
-    .split(/(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
 }
 
 /** A rule of this board as a row: its label, what it is, what it does, the relic that softened it. */
@@ -89,6 +83,44 @@ function RuleRows({ rules, resourceMeta }) {
  * CSS variable the loop writes on the element, and the number only changes
  * when a whole second has gone.
  */
+/**
+ * The table's folded case file, under its summary: the six numbers and the
+ * clue count a locked card states its condition in (the HUD prints none of
+ * them), then the scene told again for looking something up while the clock
+ * runs. `standing` is the resources, their labels and the clue count.
+ *
+ * The room comes before the words about it. Ten raster files cannot cover 169
+ * scenes, so the picture is drawn from the scene's own `place` and `phase`
+ * rather than shipped as art. It is drawn only while the fold is open because
+ * priority 27 gives the table its height budget and a picture in front of the
+ * cards would spend it.
+ *
+ * Then the case facts. Every scene has carried a `memo` since the graph was
+ * written and none of them ever reached the DOM, so the briefing explained the
+ * table and never the situation the cards are answering.
+ */
+export function CaseFileStory({ node, nodeId, open, standing }) {
+  return (
+    <>
+      <p data-testid="brief-standing">{describeStanding(...standing)}</p>
+      {open && <ScenePlate node={node} nodeId={nodeId} />}
+      {node.lead && (
+        <p className="gx-brief-lead">
+          <Prose text={node.lead} />
+        </p>
+      )}
+      <p>
+        <Prose text={node.text} />
+      </p>
+      {node.memo?.length > 0 && (
+        <ul className="gx-brief-memo">
+          <ProseItems items={node.memo} />
+        </ul>
+      )}
+    </>
+  );
+}
+
 export function SceneBriefing({
   node,
   nodeId,
@@ -172,7 +204,6 @@ export function SceneBriefing({
   const broken = penalties.length > 0;
   const carryRow = intro.length > 0 ? 4 : 3;
   const sfx = pickSfx(nodeId, broken);
-  const captions = splitCaptions(node.text);
   const late = !held && shown <= 5;
 
   return (
@@ -235,7 +266,7 @@ export function SceneBriefing({
               <b>{node.speaker}</b>
               <span>{speakerRole}</span>
             </figcaption>
-            <blockquote className="gx-balloon">{question}</blockquote>
+            <blockquote className="gx-balloon"><Prose text={question} /></blockquote>
           </figure>
 
           {intro.length > 0 && (
@@ -252,19 +283,15 @@ export function SceneBriefing({
           )}
 
           <div className="gx-panel gx-panel-story" style={at("3 / 1")}>
-            {node.lead && <p className="gx-caption gx-caption-lead">{node.lead}</p>}
-            {captions.map((caption, index) => (
-              <p key={index} className="gx-caption">{caption}</p>
-            ))}
+            {node.lead && <p className="gx-caption gx-caption-lead"><Prose text={node.lead} /></p>}
+            <ProseCaptions text={node.text} />
           </div>
 
           {(node.memo?.length > 0 || trace) && (
             <div className="gx-panel gx-panel-file" style={at("3 / 2")}>
               <p className="gx-file-tab">사건 파일</p>
               <ul>
-                {(node.memo ?? []).map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
+                <ProseItems items={node.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
               </ul>
             </div>

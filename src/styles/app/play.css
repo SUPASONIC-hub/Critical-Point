@@ -80,8 +80,8 @@
 
 .decision-reveal-beat p {
   margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.65;
+  font-size: 0.875rem;
+  line-height: 1.75;
 }
 
 .decision-reveal-beat .spoken-line {
@@ -1117,8 +1117,8 @@
 .gx-brief p {
   margin: 6px 0 0;
   color: var(--ui-text-2);
-  font-size: 0.8125rem;
-  line-height: 1.6;
+  font-size: 0.875rem;
+  line-height: 1.75;
 }
 
 .gx-brief ul {

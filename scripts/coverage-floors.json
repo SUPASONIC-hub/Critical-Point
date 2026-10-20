@@ -10,6 +10,7 @@
     "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
     "src/cloudSave.js": 90,
+    "src/components/proseMarks.js": 100,
     "src/endingCopy.js": 100,
     "src/featurePack.js": 91,
     "src/gameConstants.js": 100,

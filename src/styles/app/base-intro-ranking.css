@@ -3100,3 +3100,45 @@ body {
     font-size: 1.4375rem;
   }
 }
+
+/* Reading marks in scene prose, on every screen that prints a scene
+   (src/components/Prose.jsx). Speech is brighter and heavier than the
+   narration, a figure is bold in the accent with even digits, a glossed word
+   is underlined and its gloss is a quieter italic aside. The words carry each
+   mark too -- quotes, digits, parentheses -- so colour is never the only sign.
+   Dark grounds take the defaults; the paper panels of the briefing page and
+   the clue card set their own. Lowest contrast: 4.70:1 (--ui-text-3 on
+   --ui-surface-4), 5.19:1 (--c-teal on --c-amber). */
+.pr-say {
+  color: var(--pr-say, var(--ui-text));
+  font-weight: 800;
+}
+
+.pr-num {
+  color: var(--pr-num, var(--c-amber));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-term {
+  text-decoration: underline dotted 1.5px;
+  text-underline-offset: 0.22em;
+}
+
+.pr-note {
+  color: var(--pr-note, var(--ui-text-3));
+  font-size: 0.92em;
+  font-style: italic;
+  font-weight: 500;
+}
+
+:is(.gx-caption, .gx-panel-file li, .gx-balloon, .cinematic-clue-card) {
+  --pr-say: var(--c-teal);
+  --pr-num: var(--c-danger-deep);
+  --pr-note: var(--c-ink-raised);
+}
+
+/* A line that is all one thought keeps the colour its line is drawn in. */
+.thought-line {
+  --pr-say: currentcolor;
+}
