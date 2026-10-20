@@ -73,5 +73,5 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   // Before the case has SCOUT, the plain label; after, the button, which stays put once spent.
   assert.match(scoutBand, /if \(!canScout && !band\.scouted\) return <span className="gx-band-label" aria-hidden="true">/);
   assert.match(scoutBand, /data-testid="commit-scout" onClick=\{onScout\} aria-disabled=\{!canScout\}/);
-  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : `벽 조회, 시간 \$\{SCOUT_SECONDS\}초`\}/);
+  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : `벽 \$\{band\.wallMin\}–\$\{band\.wallMax\} · 조회, 시간 \$\{SCOUT_SECONDS\}초`\}/);
 });

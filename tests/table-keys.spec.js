@@ -138,7 +138,8 @@ test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds, 
   await openTable(page);
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
-  await expect(scout).toHaveAccessibleName("벽 조회, 시간 3초");
+  // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price.
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 시간 3초$/);
   await expect(scout).toHaveAttribute("aria-disabled", "false");
   const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
   const [low, high] = await bandOf();
