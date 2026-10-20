@@ -48,7 +48,10 @@ const budgets = [
   // the ranking's board switch, after the words went to chunks of their own
   // and the clock stopped writing a third copy of import.meta.env (158). Raw
   // sizes carry no hash noise.
-  { pattern: /^index-.*\.js$/, maxBytes: 169_930, maxGzip: 61_300 },
+  // 169,930 -> 169,935 the same evening, measured 169,935: the case summary that
+  // ships with the shell says 사라진 열한 쪽 again, not 11쪽 (+5 bytes), so the
+  // dissent's length does not read as a page number beside 14쪽 and 26쪽.
+  { pattern: /^index-.*\.js$/, maxBytes: 169_935, maxGzip: 61_300 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and

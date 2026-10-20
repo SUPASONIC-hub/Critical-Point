@@ -47,6 +47,12 @@ const OTHER_SHAPES = [
   ["plaintiffs", "src/nodes/case36.js", 'label: "피해자 1,470명 이야기부터 꺼낸다"'],
   ["dissent-pages", "src/nodes/case31.js", 'title: "빠진 열다섯 쪽"'],
   ["dissent-pages", "src/nodes/prologue03.js", "memo: [\"반대 의견서 -- 본문 아닌 '첨부 7', 15쪽\"]"],
+  // The same count in digits (#209 wrote counts of ten or more in digits).
+  ["dissent-pages", "src/nodes/case31.js", 'title: "빠진 15쪽"'],
+  ["dissent-pages", "src/nodes/case31.js", 'question: "사라진 15쪽을 한 번만 물었던 사람이 다시 묻습니다."'],
+  ["dissent-pages", "src/nodes/case31.js", 'label: "15쪽을 쓴 사람으로서 그날을 털어놓는다"'],
+  ["dissent-pages", "src/nodes/case31.js", 'voice: "그 15쪽을 쓴 사람으로서 그날의 이야기를 한다."'],
+  ["dissent-pages", "src/gameCases.js", 'summary: "사라진 15쪽의 사연이 확인자 서명란 앞에 놓입니다."'],
   ["auditor-tenure", "src/nodes/case07.js", 'text: "감사팀 3년차 조사역 반재욱이 수첩을 폅니다."'],
   ["auditor-notebook", "src/nodes/case07.js", 'memo: ["수첩에 적힌 이름 43명, 마지막 줄은 연필"]'],
   ["auditor-notebook", "src/nodes/case44.js", 'text: "반재욱이 43명의 이름이 적힌 수첩의 맨 뒷장을 폅니다."'],
