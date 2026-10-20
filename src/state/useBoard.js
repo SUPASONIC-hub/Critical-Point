@@ -240,7 +240,7 @@ function describeBoardFailure(error, isOnline) {
   // answered with "글을 올렸습니다" for a post that was stored nowhere.
   if (/repeats a recent post/.test(message)) return "같은 글이 조금 전에 올라와 있습니다. 표현을 바꿔 다시 올려 주세요.";
   if (/at least 30 seconds apart/.test(message)) return "글은 30초에 한 번만 올릴 수 있습니다. 잠시 뒤에 다시 눌러 주세요.";
-  if (/rate limit exceeded/.test(message)) return "한 시간에 열 번까지만 올릴 수 있습니다. 시간을 두고 다시 찾아와 주세요.";
+  if (/rate limit exceeded/.test(message)) return "한 시간에 10번까지만 올릴 수 있습니다. 시간을 두고 다시 찾아와 주세요.";
   if (/nickname must be/.test(message)) return BOARD_REFUSAL_COPY["nickname-characters"];
   if (/post must be/.test(message)) return BOARD_REFUSAL_COPY["body-characters"];
   if (!isOnline) return "오프라인이라 글을 올리지 못했습니다. 연결된 뒤에 다시 눌러 주세요.";

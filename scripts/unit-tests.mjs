@@ -89,7 +89,7 @@ import { test } from "node:test";
 import { createPlateRandom, getPlateMotif, getPlateOrg, getPlateTone, getScenePlate, PLATE_MOTIFS, PLATE_TONE_NAMES } from "../src/scenePlate.js";
 import { explainResourceTradeoff, getThinkingMotive } from "../src/gameLogic.js";
 import { directionParticle, endsOnConsonant, objectParticle, subjectParticle } from "../src/playerLanguage.js";
-import { nativeKoreanCount } from "../src/featurePack.js";
+import { getEndingEpilogue } from "../src/featurePack.js";
 import { nodes } from "../src/gameData.js";
 
 
@@ -491,13 +491,9 @@ test("direction particles take 로 after a vowel or ㄹ and 으로 after any oth
   assert.equal(directionParticle("공정함 40"), "으로", "40 is read 사십");
   assert.equal(directionParticle("x"), "으로", "a Latin letter is read as ending on a consonant, as the other particles read it");
 });
-test("a count in front of a counter is read the native way", () => {
-  assert.equal(nativeKoreanCount(49), "마흔아홉");
-  assert.equal(nativeKoreanCount(20), "스무");
-  assert.equal(nativeKoreanCount(21), "스물한");
-  assert.equal(nativeKoreanCount(12), "열두");
-  assert.equal(nativeKoreanCount(1), "한");
-  assert.equal(nativeKoreanCount(120), "120", "past 99 a person writes the digits");
+test("the collapse epilogue writes the season's case count in digits", () => {
+  // Counts of ten or more are digits in the copy (10-20); the epilogue reads its count off the season.
+  assert.match(getEndingEpilogue("collapse"), /^\d+개 사건 가운데 /);
 });
 
 // The result ledger's sentence reads the same numbers the same way.
